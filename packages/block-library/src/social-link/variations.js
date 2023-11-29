@@ -35,6 +35,7 @@ import {
 	SoundCloudIcon,
 	SpotifyIcon,
 	TelegramIcon,
+	ThreadsIcon,
 	TiktokIcon,
 	TumblrIcon,
 	TwitchIcon,
@@ -43,6 +44,7 @@ import {
 	VkIcon,
 	WhatsAppIcon,
 	WordPressIcon,
+	XIcon,
 	YelpIcon,
 	YouTubeIcon,
 } from './icons';
@@ -256,6 +258,12 @@ const variations = [
 		icon: TelegramIcon,
 	},
 	{
+		name: 'threads',
+		attributes: { service: 'threads' },
+		title: 'Threads',
+		icon: ThreadsIcon,
+	},
+	{
 		name: 'tiktok',
 		attributes: { service: 'tiktok' },
 		title: 'TikTok',
@@ -296,6 +304,13 @@ const variations = [
 		attributes: { service: 'whatsapp' },
 		title: 'WhatsApp',
 		icon: WhatsAppIcon,
+	},
+	{
+		name: 'x',
+		attributes: { service: 'x' },
+		keywords: [ 'twitter' ],
+		title: 'X',
+		icon: XIcon,
 	},
 	{
 		name: 'yelp',

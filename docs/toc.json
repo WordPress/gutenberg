@@ -7,10 +7,20 @@
 			{
 				"docs/getting-started/devenv/README.md": [
 					{
-						"docs/getting-started/devenv/docker-ubuntu.md": []
+						"docs/getting-started/devenv/nodejs-development-environment.md": []
+					},
+					{
+						"docs/getting-started/devenv/get-started-with-wp-env.md": []
+					},
+					{
+						"docs/getting-started/devenv/get-started-with-create-block.md": []
+					},
+					{
+						"docs/getting-started/devenv/get-started-with-wp-scripts.md": []
 					}
 				]
 			},
+			{ "docs/getting-started/quick-start-guide.md": [] },
 			{
 				"docs/getting-started/create-block/README.md": [
 					{
@@ -36,8 +46,27 @@
 					}
 				]
 			},
-			{ "docs/getting-started/full-site-editing.md": [] },
-			{ "docs/getting-started/outreach.md": [] }
+			{
+				"docs/getting-started/fundamentals/README.md": [
+					{
+						"docs/getting-started/fundamentals/file-structure-of-a-block.md": []
+					},
+					{
+						"docs/getting-started/fundamentals/block-json.md": []
+					},
+					{
+						"docs/getting-started/fundamentals/registration-of-a-block.md": []
+					},
+					{
+						"docs/getting-started/fundamentals/block-wrapper.md": []
+					},
+					{
+						"docs/getting-started/fundamentals/javascript-in-the-block-editor.md": []
+					}
+				]
+			},
+			{ "docs/getting-started/glossary.md": [] },
+			{ "docs/getting-started/faq.md": [] }
 		]
 	},
 	{
@@ -80,11 +109,7 @@
 			{
 				"docs/how-to-guides/platform/README.md": [
 					{
-						"docs/how-to-guides/platform/custom-block-editor/README.md": [
-							{
-								"docs/how-to-guides/platform/custom-block-editor/tutorial.md": []
-							}
-						]
+						"docs/how-to-guides/platform/custom-block-editor.md": []
 					}
 				]
 			},
@@ -108,6 +133,7 @@
 				]
 			},
 			{ "docs/how-to-guides/curating-the-editor-experience.md": [] },
+			{ "docs/how-to-guides/enqueueing-assets-in-the-editor.md": [] },
 			{ "docs/how-to-guides/feature-flags.md": [] },
 			{ "docs/how-to-guides/format-api.md": [] },
 			{
@@ -139,7 +165,6 @@
 			{ "docs/how-to-guides/propagating-updates.md": [] },
 			{
 				"docs/how-to-guides/themes/README.md": [
-					{ "docs/how-to-guides/themes/block-theme-overview.md": [] },
 					{ "docs/how-to-guides/themes/theme-json.md": [] },
 					{ "docs/how-to-guides/themes/theme-support.md": [] }
 				]
@@ -272,6 +297,9 @@
 					},
 					{ "docs/reference-guides/data/data-core-blocks.md": [] },
 					{
+						"docs/reference-guides/data/data-core-commands.md": []
+					},
+					{
 						"docs/reference-guides/data/data-core-customize-widgets.md": []
 					},
 					{ "docs/reference-guides/data/data-core-edit-post.md": [] },
@@ -284,6 +312,7 @@
 						"docs/reference-guides/data/data-core-keyboard-shortcuts.md": []
 					},
 					{ "docs/reference-guides/data/data-core-notices.md": [] },
+					{ "docs/reference-guides/data/data-core-nux.md": [] },
 					{
 						"docs/reference-guides/data/data-core-preferences.md": []
 					},
@@ -302,6 +331,7 @@
 				"docs/explanations/architecture/README.md": [
 					{ "docs/explanations/architecture/key-concepts.md": [] },
 					{ "docs/explanations/architecture/data-flow.md": [] },
+					{ "docs/explanations/architecture/entities.md": [] },
 					{ "docs/explanations/architecture/modularity.md": [] },
 					{ "docs/explanations/architecture/performance.md": [] },
 					{
@@ -322,8 +352,6 @@
 					}
 				]
 			},
-			{ "docs/explanations/faq.md": [] },
-			{ "docs/explanations/glossary.md": [] },
 			{ "docs/explanations/history.md": [] }
 		]
 	},
@@ -350,7 +378,6 @@
 							}
 						]
 					},
-					{ "docs/contributors/code/grammar.md": [] },
 					{ "docs/contributors/code/scripts.md": [] },
 					{ "docs/contributors/code/managing-packages.md": [] },
 					{
@@ -385,8 +412,7 @@
 			},
 			{
 				"docs/contributors/design/README.md": [
-					{ "docs/contributors/design/the-block.md": [] },
-					{ "docs/contributors/design/reference.md": [] }
+					{ "docs/contributors/design/the-block.md": [] }
 				]
 			},
 			{
@@ -399,8 +425,7 @@
 			{ "docs/contributors/accessibility-testing.md": [] },
 			{ "docs/contributors/repository-management.md": [] },
 			{ "docs/contributors/folder-structure.md": [] },
-			{ "docs/contributors/versions-in-wordpress.md": [] },
-			{ "docs/contributors/roadmap.md": [] }
+			{ "docs/contributors/versions-in-wordpress.md": [] }
 		]
 	}
 ]

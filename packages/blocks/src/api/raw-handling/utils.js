@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mergeWith } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { isPhrasingContent, getPhrasingContentSchema } from '@wordpress/dom';
@@ -51,7 +46,7 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 		);
 	} );
 
-	return mergeWith( {}, ...schemas, ( objValue, srcValue, key ) => {
+	function mergeTagNameSchemaProperties( objValue, srcValue, key ) {
 		switch ( key ) {
 			case 'children': {
 				if ( objValue === '*' || srcValue === '*' ) {
@@ -77,7 +72,30 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 				};
 			}
 		}
-	} );
+	}
+
+	// A tagName schema is an object with children, attributes, require, and
+	// isMatch properties.
+	function mergeTagNameSchemas( a, b ) {
+		for ( const key in b ) {
+			a[ key ] = a[ key ]
+				? mergeTagNameSchemaProperties( a[ key ], b[ key ], key )
+				: { ...b[ key ] };
+		}
+		return a;
+	}
+
+	// A schema is an object with tagName schemas by tag name.
+	function mergeSchemas( a, b ) {
+		for ( const key in b ) {
+			a[ key ] = a[ key ]
+				? mergeTagNameSchemas( a[ key ], b[ key ] )
+				: { ...b[ key ] };
+		}
+		return a;
+	}
+
+	return schemas.reduce( mergeSchemas, {} );
 }
 
 /**

@@ -6,13 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	RawHTML,
-	Platform,
-	useRef,
-	useCallback,
-	forwardRef,
-} from '@wordpress/element';
+import { Platform, useRef, useCallback, forwardRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	pasteHandler,
@@ -23,16 +17,12 @@ import {
 } from '@wordpress/blocks';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
-	__experimentalRichText as RichText,
 	__unstableCreateElement,
 	isEmpty,
-	__unstableIsEmptyLine as isEmptyLine,
 	insert,
-	__unstableInsertLineSeparator as insertLineSeparator,
+	remove,
 	create,
-	replace,
 	split,
-	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
@@ -51,10 +41,11 @@ import {
 	addActiveFormats,
 	getMultilineTag,
 	getAllowedFormats,
-	isShortcode,
 	createLinkInParagraph,
 } from './utils';
 import EmbedHandlerPicker from './embed-handler-picker';
+import { Content } from './content';
+import RichText from './native';
 
 const classes = 'block-editor-rich-text__editable';
 
@@ -80,6 +71,7 @@ function RichTextWrapper(
 		onSplit,
 		__unstableOnSplitAtEnd: onSplitAtEnd,
 		__unstableOnSplitMiddle: onSplitMiddle,
+		__unstableOnSplitAtDoubleLineEnd: onSplitAtDoubleLineEnd,
 		identifier,
 		preserveWhiteSpace,
 		__unstablePastePlainText: pastePlainText,
@@ -231,7 +223,7 @@ function RichTextWrapper(
 			// an intentional user interaction distinguishing between Backspace and
 			// Delete to remove the empty field, but also to avoid merge & remove
 			// causing destruction of two fields (merge, then removed merged).
-			if ( onRemove && isEmpty( value ) && isReverse ) {
+			else if ( onRemove && isEmpty( value ) && isReverse ) {
 				onRemove( ! isReverse );
 			}
 		},
@@ -343,32 +335,34 @@ function RichTextWrapper(
 				onCustomEnter();
 			}
 
-			if ( multiline ) {
-				if ( shiftKey ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( value, '\n' ) );
-					}
-				} else if ( canSplit && isEmptyLine( value ) ) {
-					splitValue( value );
-				} else {
-					onChange( insertLineSeparator( value ) );
-				}
-			} else {
-				const { text, start: splitStart, end: splitEnd } = value;
-				const canSplitAtEnd =
-					onSplitAtEnd &&
-					splitStart === splitEnd &&
-					splitEnd === text.length;
+			const { text, start: splitStart, end: splitEnd } = value;
+			const canSplitAtEnd =
+				onSplitAtEnd &&
+				splitStart === splitEnd &&
+				splitEnd === text.length;
 
-				if ( shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( value, '\n' ) );
-					}
-				} else if ( ! canSplit && canSplitAtEnd ) {
-					onSplitAtEnd();
-				} else if ( canSplit ) {
-					splitValue( value );
+			if ( shiftKey ) {
+				if ( ! disableLineBreaks ) {
+					onChange( insert( value, '\n' ) );
 				}
+			} else if ( canSplit ) {
+				splitValue( value );
+			} else if ( canSplitAtEnd ) {
+				onSplitAtEnd();
+			} else if (
+				// For some blocks it's desirable to split at the end of the
+				// block when there are two line breaks at the end of the
+				// block, so triple Enter exits the block.
+				onSplitAtDoubleLineEnd &&
+				splitStart === splitEnd &&
+				splitEnd === text.length &&
+				text.slice( -2 ) === '\n\n'
+			) {
+				value.start = value.end - 2;
+				onChange( remove( value ) );
+				onSplitAtDoubleLineEnd();
+			} else if ( ! disableLineBreaks ) {
+				onChange( insert( value, '\n' ) );
 			}
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -438,18 +432,6 @@ function RichTextWrapper(
 
 			let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
 
-			// Force the blocks mode when the user is pasting
-			// on a new line & the content resembles a shortcode.
-			// Otherwise it's going to be detected as inline
-			// and the shortcode won't be replaced.
-			if (
-				mode === 'AUTO' &&
-				isEmpty( value ) &&
-				isShortcode( plainText )
-			) {
-				mode = 'BLOCKS';
-			}
-
 			const isPastedURL = isURL( plainText.trim() );
 			const presentEmbedHandlerPicker = () =>
 				embedHandlerPickerRef.current?.presentPicker( {
@@ -476,20 +458,8 @@ function RichTextWrapper(
 			} );
 
 			if ( typeof content === 'string' ) {
-				let valueToInsert = create( { html: content } );
-
+				const valueToInsert = create( { html: content } );
 				addActiveFormats( valueToInsert, activeFormats );
-
-				// If the content should be multiline, we should process text
-				// separated by a line break as separate lines.
-				if ( multilineTag ) {
-					valueToInsert = replace(
-						valueToInsert,
-						/\n+/g,
-						LINE_SEPARATOR
-					);
-				}
-
 				onChange( insert( value, valueToInsert ) );
 			} else if ( content.length > 0 ) {
 				// When an URL is pasted in an empty paragraph then the EmbedHandlerPicker should showcase options allowing the transformation of that URL
@@ -707,32 +677,7 @@ function RichTextWrapper(
 
 const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
 
-ForwardedRichTextContainer.Content = ( {
-	value,
-	tagName: Tag,
-	multiline,
-	...props
-} ) => {
-	// Handle deprecated `children` and `node` sources.
-	if ( Array.isArray( value ) ) {
-		value = childrenSource.toHTML( value );
-	}
-
-	const MultilineTag = getMultilineTag( multiline );
-
-	if ( ! value && MultilineTag ) {
-		value = `<${ MultilineTag }></${ MultilineTag }>`;
-	}
-
-	const content = <RawHTML>{ value }</RawHTML>;
-
-	if ( Tag ) {
-		const { format, ...restProps } = props;
-		return <Tag { ...restProps }>{ content }</Tag>;
-	}
-
-	return content;
-};
+ForwardedRichTextContainer.Content = Content;
 
 ForwardedRichTextContainer.isEmpty = ( value ) => {
 	return ! value || value.length === 0;
@@ -742,6 +687,8 @@ ForwardedRichTextContainer.Content.defaultProps = {
 	format: 'string',
 	value: '',
 };
+
+ForwardedRichTextContainer.Raw = RichText;
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md

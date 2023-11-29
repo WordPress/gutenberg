@@ -18,7 +18,10 @@ const defaultSettings = {
 			defaultPalette: true,
 			defaultGradients: true,
 			palette: {
-				default: [ { name: 'Black', slug: 'black', color: '#000000' } ],
+				default: [
+					{ name: 'Black', slug: 'black', color: '#000000' },
+					{ name: 'White', slug: 'white', color: '#ffffff' },
+				],
 			},
 		},
 	},
@@ -44,13 +47,13 @@ async function setup( attributes, useCoreBlocks, customSettings ) {
 
 async function createAndSelectBlock() {
 	await userEvent.click(
-		screen.getByRole( 'button', {
+		screen.getByRole( 'option', {
 			name: 'Color: Black',
 		} )
 	);
 	await userEvent.click(
 		screen.getByRole( 'button', {
-			name: 'Select Cover',
+			name: 'Select parent block: Cover',
 		} )
 	);
 }
@@ -61,15 +64,15 @@ describe( 'Cover block', () => {
 			await setup();
 
 			expect(
-				screen.getByRole( 'group', {
-					name: 'To edit this block, you need permission to upload media.',
-				} )
+				within( screen.getByLabelText( 'Block: Cover' ) ).getByText(
+					'To edit this block, you need permission to upload media.'
+				)
 			).toBeInTheDocument();
 		} );
 
 		test( 'can set overlay color using color picker on block placeholder', async () => {
 			const { container } = await setup();
-			const colorPicker = screen.getByRole( 'button', {
+			const colorPicker = screen.getByRole( 'option', {
 				name: 'Color: Black',
 			} );
 			await userEvent.click( colorPicker );
@@ -93,7 +96,7 @@ describe( 'Cover block', () => {
 			await setup();
 
 			await userEvent.click(
-				screen.getByRole( 'button', {
+				screen.getByRole( 'option', {
 					name: 'Color: Black',
 				} )
 			);
@@ -257,7 +260,7 @@ describe( 'Cover block', () => {
 				} )
 			);
 			expect(
-				within( screen.queryByLabelText( 'Block: Cover' ) ).queryByRole(
+				within( screen.getByLabelText( 'Block: Cover' ) ).queryByRole(
 					'img'
 				)
 			).not.toBeInTheDocument();
@@ -281,15 +284,18 @@ describe( 'Cover block', () => {
 						name: 'Styles',
 					} )
 				);
-
-				fireEvent.change(
-					screen.getByRole( 'spinbutton', {
-						name: 'Overlay opacity',
-					} ),
-					{
-						target: { value: '40' },
-					}
-				);
+				// Need act here as the isDark method is async.
+				// eslint-disable-next-line testing-library/no-unnecessary-act
+				await act( async () => {
+					fireEvent.change(
+						screen.getByRole( 'spinbutton', {
+							name: 'Overlay opacity',
+						} ),
+						{
+							target: { value: '40' },
+						}
+					);
+				} );
 
 				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-40' );
 			} );
@@ -312,12 +318,16 @@ describe( 'Cover block', () => {
 					} )
 				);
 
-				fireEvent.change(
-					screen.getByRole( 'slider', {
-						name: 'Overlay opacity',
-					} ),
-					{ target: { value: 30 } }
-				);
+				// Need act here as the isDark method is async.
+				// eslint-disable-next-line testing-library/no-unnecessary-act
+				await act( async () => {
+					fireEvent.change(
+						screen.getByRole( 'slider', {
+							name: 'Overlay opacity',
+						} ),
+						{ target: { value: 30 } }
+					);
+				} );
 
 				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-30' );
 			} );
@@ -373,6 +383,56 @@ describe( 'Cover block', () => {
 					'min-height: 300px;'
 				);
 			} );
+		} );
+	} );
+
+	describe( 'isDark settings', () => {
+		test( 'should toggle is-light class if background changed from light to dark', async () => {
+			await setup();
+			const colorPicker = screen.getByRole( 'option', {
+				name: 'Color: White',
+			} );
+			await userEvent.click( colorPicker );
+
+			const coverBlock = screen.getByLabelText( 'Block: Cover' );
+
+			expect( coverBlock ).toHaveClass( 'is-light' );
+
+			await selectBlock( 'Block: Cover' );
+			await userEvent.click(
+				screen.getByRole( 'tab', {
+					name: 'Styles',
+				} )
+			);
+			await userEvent.click( screen.getByText( 'Overlay' ) );
+			const popupColorPicker = screen.getByRole( 'option', {
+				name: 'Color: Black',
+			} );
+			await userEvent.click( popupColorPicker );
+			expect( coverBlock ).not.toHaveClass( 'is-light' );
+		} );
+		test( 'should remove is-light class if overlay color is removed', async () => {
+			await setup();
+			const colorPicker = screen.getByRole( 'option', {
+				name: 'Color: White',
+			} );
+			await userEvent.click( colorPicker );
+			const coverBlock = screen.getByLabelText( 'Block: Cover' );
+			expect( coverBlock ).toHaveClass( 'is-light' );
+			await selectBlock( 'Block: Cover' );
+			await userEvent.click(
+				screen.getByRole( 'tab', {
+					name: 'Styles',
+				} )
+			);
+			await userEvent.click( screen.getByText( 'Overlay' ) );
+			// The default color is black, so clicking the black color option will remove the background color,
+			// which should remove the isDark setting and assign the is-light class.
+			const popupColorPicker = screen.getByRole( 'option', {
+				name: 'Color: White',
+			} );
+			await userEvent.click( popupColorPicker );
+			expect( coverBlock ).not.toHaveClass( 'is-light' );
 		} );
 	} );
 } );

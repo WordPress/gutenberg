@@ -27,6 +27,7 @@
 		{ "path": "packages/html-entities" },
 		{ "path": "packages/i18n" },
 		{ "path": "packages/icons" },
+		{ "path": "packages/interactivity" },
 		{ "path": "packages/is-shallow-equal" },
 		{ "path": "packages/keycodes" },
 		{ "path": "packages/lazy-import" },
@@ -42,7 +43,9 @@
 		{ "path": "packages/report-flaky-tests" },
 		{ "path": "packages/rich-text" },
 		{ "path": "packages/style-engine" },
+		{ "path": "packages/sync" },
 		{ "path": "packages/token-list" },
+		{ "path": "packages/undo-manager" },
 		{ "path": "packages/url" },
 		{ "path": "packages/warning" },
 		{ "path": "packages/wordcount" }

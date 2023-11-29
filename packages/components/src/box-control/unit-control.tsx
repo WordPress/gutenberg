@@ -67,7 +67,7 @@ function Tooltip( {
 	 * https://github.com/WordPress/gutenberg/pull/24966#issuecomment-685875026
 	 */
 	return (
-		<BaseTooltip text={ text } position="top">
+		<BaseTooltip text={ text } placement="top">
 			<div>{ children }</div>
 		</BaseTooltip>
 	);

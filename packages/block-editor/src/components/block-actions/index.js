@@ -11,7 +11,7 @@ import {
 /**
  * Internal dependencies
  */
-import { useNotifyCopy } from '../copy-handler';
+import { useNotifyCopy } from '../../utils/use-notify-copy';
 import usePasteStyles from '../use-paste-styles';
 import { store as blockEditorStore } from '../../store';
 
@@ -32,6 +32,15 @@ export default function BlockActions( {
 
 	const blocks = getBlocksByClientId( clientIds );
 	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+
+	const canCopyStyles = blocks.every( ( block ) => {
+		return (
+			!! block &&
+			( hasBlockSupport( block.name, 'color' ) ||
+				hasBlockSupport( block.name, 'typography' ) )
+		);
+	} );
+
 	const canDuplicate = blocks.every( ( block ) => {
 		return (
 			!! block &&
@@ -64,6 +73,7 @@ export default function BlockActions( {
 	const pasteStyles = usePasteStyles();
 
 	return children( {
+		canCopyStyles,
 		canDuplicate,
 		canInsertDefaultBlock,
 		canMove,

@@ -16,7 +16,11 @@ import useRegisterShortcuts from './use-register-shortcuts';
 import Header from './header';
 import Table from './table';
 import useTitle from '../routes/use-title';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../utils/constants';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -25,7 +29,9 @@ export default function List() {
 		params: { path },
 	} = useLocation();
 	const templateType =
-		path === '/wp_template/all' ? 'wp_template' : 'wp_template_part';
+		path === '/wp_template/all'
+			? TEMPLATE_POST_TYPE
+			: TEMPLATE_PART_POST_TYPE;
 
 	useRegisterShortcuts();
 

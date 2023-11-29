@@ -19,6 +19,15 @@ if ( class_exists( 'WP_Fonts' ) ) {
 class WP_Fonts extends WP_Dependencies {
 
 	/**
+	 * Registered "origin", indicating the font is registered in the API.
+	 *
+	 * @since X.X.X
+	 *
+	 * @var string
+	 */
+	const REGISTERED_ORIGIN = 'gutenberg_wp_fonts_api';
+
+	/**
 	 * An array of registered providers.
 	 *
 	 * @since X.X.X
@@ -106,8 +115,8 @@ class WP_Fonts extends WP_Dependencies {
 	 *     @type string $provider_id => array {
 	 *         An associate array of provider's class name and fonts.
 	 *
-	 *         @type string $class   Fully qualified name of the provider's class.
-	 *         @type string[] $fonts An array of enqueued font handles for this provider.
+	 *         @type string $class_name Fully qualified name of the provider's class.
+	 *         @type string[] $fonts    An array of enqueued font handles for this provider.
 	 *     }
 	 * }
 	 */
@@ -121,16 +130,16 @@ class WP_Fonts extends WP_Dependencies {
 	 * @since X.X.X
 	 *
 	 * @param string $provider_id The provider's unique ID.
-	 * @param string $class       The provider class name.
+	 * @param string $class_name  The provider class name.
 	 * @return bool True if successfully registered, else false.
 	 */
-	public function register_provider( $provider_id, $class ) {
-		if ( empty( $provider_id ) || empty( $class ) || ! class_exists( $class ) ) {
+	public function register_provider( $provider_id, $class_name ) {
+		if ( empty( $provider_id ) || empty( $class_name ) || ! class_exists( $class_name ) ) {
 			return false;
 		}
 
 		$this->providers[ $provider_id ] = array(
-			'class' => $class,
+			'class' => $class_name,
 			'fonts' => array(),
 		);
 		return true;
@@ -731,7 +740,7 @@ class WP_Fonts extends WP_Dependencies {
 			}
 
 			$variation_obj        = $this->registered[ $variation_handle ];
-			$variation_properties = array( 'origin' => 'gutenberg_wp_fonts_api' );
+			$variation_properties = array( 'origin' => static::REGISTERED_ORIGIN );
 			foreach ( $variation_obj->extra['font-properties'] as $property_name => $property_value ) {
 				$property_in_camelcase                          = lcfirst( str_replace( '-', '', ucwords( $property_name, '-' ) ) );
 				$variation_properties[ $property_in_camelcase ] = $property_value;

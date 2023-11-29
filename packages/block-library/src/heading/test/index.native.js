@@ -17,6 +17,7 @@ import {
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
+import { BACKSPACE, ENTER } from '@wordpress/keycodes';
 
 beforeAll( () => {
 	// Register all core blocks
@@ -71,6 +72,10 @@ describe( 'Heading block', () => {
 
 		// Tap one color
 		fireEvent.press( screen.getByLabelText( 'Pale pink' ) );
+		// TODO(jest-console): Fix the warning and remove the expect below.
+		expect( console ).toHaveWarnedWith(
+			`Non-serializable values were found in the navigation state. Check:\n\nColor > params.onColorChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
+		);
 
 		// Dismiss the Block Settings modal.
 		fireEvent( blockSettingsModal, 'backdropPress' );
@@ -108,6 +113,63 @@ describe( 'Heading block', () => {
 
 		// Dismiss the Block Settings modal.
 		fireEvent( blockSettingsModal, 'backdropPress' );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'change level dropdown displays active selection', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Heading' );
+		const headingBlock = await getBlock( screen, 'Heading' );
+
+		// Act
+		fireEvent.press( headingBlock );
+		fireEvent.press( screen.getByLabelText( 'Change level' ) );
+
+		// Assert
+		expect(
+			within( screen.getByLabelText( 'Heading 2' ) ).getByTestId(
+				'bottom-sheet-cell-selected-icon'
+			)
+		).toBeVisible();
+	} );
+
+	it( 'should merge with an empty Paragraph block and keep being the Heading block', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		fireEvent( paragraphTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+
+		await addBlock( screen, 'Heading' );
+		const headingBlock = getBlock( screen, 'Heading', { rowIndex: 2 } );
+		fireEvent.press( headingBlock );
+
+		const headingTextInput =
+			within( headingBlock ).getByPlaceholderText( 'Heading' );
+		typeInRichText(
+			headingTextInput,
+			'A quick brown fox jumps over the lazy dog.',
+			{ finalSelectionStart: 0, finalSelectionEnd: 0 }
+		);
+
+		fireEvent( headingTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: BACKSPACE,
+		} );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchSnapshot();

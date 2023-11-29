@@ -25,26 +25,16 @@ function WritingMenu() {
 		[]
 	);
 
-	const blocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks(),
-		[]
-	);
-
 	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
 		useDispatch( postEditorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 
-	const { selectBlock } = useDispatch( blockEditorStore );
-
 	const toggleDistractionFree = () => {
 		registry.batch( () => {
-			setPreference( 'core/edit-post', 'fixedToolbar', false );
+			setPreference( 'core/edit-post', 'fixedToolbar', true );
 			setIsInserterOpened( false );
 			setIsListViewOpened( false );
 			closeGeneralSidebar();
-			if ( ! isDistractionFree && !! blocks.length ) {
-				selectBlock( blocks[ 0 ].clientId );
-			}
 		} );
 	};
 

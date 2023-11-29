@@ -13,7 +13,8 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import Label from './label';
-import { useResizeLabel, Axis, Position, POSITIONS } from './utils';
+import type { Axis, Position } from './utils';
+import { useResizeLabel, POSITIONS } from './utils';
 import { Root } from './styles/resize-tooltip.styles';
 
 type ResizeTooltipProps = React.ComponentProps< typeof Root > & {

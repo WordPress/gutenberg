@@ -23,7 +23,7 @@ function MyCustomPostEditor() {
 Internal to the `@wordpress/block-editor` module, a component can access the [full Context object](https://reactjs.org/docs/context.html#api), typically for use in combination with [`useContext`](https://reactjs.org/docs/hooks-reference.html#usecontext).
 
 ```js
-import { useContext } from '@wordpress/element';
+import { useContext } from 'react';
 
 // Only available internally within `@wordpress/block-editor`!
 import BlockContext from '../block-context';

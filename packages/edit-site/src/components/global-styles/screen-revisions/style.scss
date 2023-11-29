@@ -1,0 +1,124 @@
+
+.edit-site-global-styles-screen-revisions {
+	margin: $grid-unit-20;
+}
+
+.edit-site-global-styles-screen-revisions__revisions-list {
+	list-style: none;
+	margin: 0;
+	li {
+		margin-bottom: 0;
+	}
+}
+
+.edit-site-global-styles-screen-revisions__revision-item {
+	position: relative;
+	padding-left: $grid-unit-20;
+	overflow: hidden;
+	cursor: pointer;
+
+	&:hover {
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+		.edit-site-global-styles-screen-revisions__date {
+			color: var(--wp-admin-theme-color);
+		}
+	}
+
+	&::before,
+	&::after {
+		position: absolute;
+		content: "\a";
+		display: block;
+	}
+
+	&::before {
+		background: $gray-300;
+		border-radius: 50%;
+		height: $grid-unit-10;
+		width: $grid-unit-10;
+		top: $grid-unit-20 + 2;
+		left: $grid-unit-20 + 1; // So the circle is centered on the line.
+		transform: translate(-50%, -50%);
+		z-index: 1;
+	}
+	&.is-selected::before {
+		background: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+	}
+
+	&::after {
+		height: 100%;
+		left: $grid-unit-20;
+		top: 0;
+		width: 0;
+		border: 0.5px solid $gray-300;
+	}
+
+	&:first-child::after {
+		top: $grid-unit-20 + 2;
+	}
+
+	&:last-child::after {
+		height: $grid-unit-20 + 2;
+	}
+
+	// Nested to override specificity of .components-button.
+	.edit-site-global-styles-screen-revisions__revision-button {
+		width: 100%;
+		height: auto;
+		display: block;
+		padding: $grid-unit-15 $grid-unit-15 $grid-unit-15 $grid-unit-30;
+		&:focus,
+		&:active {
+			outline: 0;
+			box-shadow: none;
+		}
+	}
+}
+
+.is-selected {
+	color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+	background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+	.edit-site-global-styles-screen-revisions__revision-button {
+		opacity: 1;
+	}
+	.edit-site-global-styles-screen-revisions__date {
+		color: var(--wp-admin-theme-color);
+	}
+}
+
+.edit-site-global-styles-screen-revisions__button {
+	justify-content: center;
+	width: 100%;
+}
+
+.edit-site-global-styles-screen-revisions__description {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: $grid-unit-10;
+	.edit-site-global-styles-screen-revisions__date {
+		text-transform: uppercase;
+		font-weight: 600;
+		font-size: 12px;
+	}
+}
+
+.edit-site-global-styles-screen-revisions__meta {
+	color: $gray-600;
+	display: flex;
+	justify-content: start;
+	width: 100%;
+	align-items: center;
+	font-size: 12px;
+
+	img {
+		width: $grid-unit-20;
+		height: $grid-unit-20;
+		border-radius: 100%;
+		margin-right: $grid-unit-10;
+	}
+}
+
+.edit-site-global-styles-screen-revisions__loading {
+	margin: $grid-unit-30 auto !important;
+}

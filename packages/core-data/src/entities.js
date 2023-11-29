@@ -13,10 +13,23 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { addEntities } from './actions';
+import { getSyncProvider } from './sync';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
+
+// A hardcoded list of post types that support revisions.
+// Reflects post types in Core's src/wp-includes/post.php.
+// @TODO: Ideally this should be fetched from the  `/types` REST API's view context.
+const POST_TYPE_ENTITIES_WITH_REVISIONS_SUPPORT = [
+	'post',
+	'page',
+	'wp_block',
+	'wp_navigation',
+	'wp_template',
+	'wp_template_part',
+];
 
 export const rootEntitiesConfig = [
 	{
@@ -37,6 +50,24 @@ export const rootEntitiesConfig = [
 				'url',
 			].join( ',' ),
 		},
+		syncConfig: {
+			fetch: async () => {
+				return apiFetch( { path: '/' } );
+			},
+			applyChangesToDoc: ( doc, changes ) => {
+				const document = doc.getMap( 'document' );
+				Object.entries( changes ).forEach( ( [ key, value ] ) => {
+					if ( document.get( key ) !== value ) {
+						document.set( key, value );
+					}
+				} );
+			},
+			fromCRDTDoc: ( doc ) => {
+				return doc.getMap( 'document' ).toJSON();
+			},
+		},
+		syncObjectType: 'root/base',
+		getSyncObjectId: () => 'index',
 	},
 	{
 		label: __( 'Site' ),
@@ -46,6 +77,24 @@ export const rootEntitiesConfig = [
 		getTitle: ( record ) => {
 			return record?.title ?? __( 'Site Title' );
 		},
+		syncConfig: {
+			fetch: async () => {
+				return apiFetch( { path: '/wp/v2/settings' } );
+			},
+			applyChangesToDoc: ( doc, changes ) => {
+				const document = doc.getMap( 'document' );
+				Object.entries( changes ).forEach( ( [ key, value ] ) => {
+					if ( document.get( key ) !== value ) {
+						document.set( key, value );
+					}
+				} );
+			},
+			fromCRDTDoc: ( doc ) => {
+				return doc.getMap( 'document' ).toJSON();
+			},
+		},
+		syncObjectType: 'root/site',
+		getSyncObjectId: () => 'index',
 	},
 	{
 		label: __( 'Post Type' ),
@@ -54,6 +103,26 @@ export const rootEntitiesConfig = [
 		key: 'slug',
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
+		syncConfig: {
+			fetch: async ( id ) => {
+				return apiFetch( {
+					path: `/wp/v2/types/${ id }?context=edit`,
+				} );
+			},
+			applyChangesToDoc: ( doc, changes ) => {
+				const document = doc.getMap( 'document' );
+				Object.entries( changes ).forEach( ( [ key, value ] ) => {
+					if ( document.get( key ) !== value ) {
+						document.set( key, value );
+					}
+				} );
+			},
+			fromCRDTDoc: ( doc ) => {
+				return doc.getMap( 'document' ).toJSON();
+			},
+		},
+		syncObjectType: 'root/postType',
+		getSyncObjectId: ( id ) => id,
 	},
 	{
 		name: 'media',
@@ -63,6 +132,7 @@ export const rootEntitiesConfig = [
 		plural: 'mediaItems',
 		label: __( 'Media' ),
 		rawAttributes: [ 'caption', 'title', 'description' ],
+		supportsPagination: true,
 	},
 	{
 		name: 'taxonomy',
@@ -147,8 +217,16 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/global-styles',
 		baseURLParams: { context: 'edit' },
-		plural: 'globalStylesVariations', // Should be different than name.
+		plural: 'globalStylesVariations', // Should be different from name.
 		getTitle: ( record ) => record?.title?.rendered || record?.title,
+		getRevisionsUrl: ( parentId, revisionId ) =>
+			`/wp/v2/global-styles/${ parentId }/revisions${
+				revisionId ? '/' + revisionId : ''
+			}`,
+		supports: {
+			revisions: true,
+		},
+		supportsPagination: true,
 	},
 	{
 		label: __( 'Themes' ),
@@ -165,6 +243,15 @@ export const rootEntitiesConfig = [
 		baseURL: '/wp/v2/plugins',
 		baseURLParams: { context: 'edit' },
 		key: 'plugin',
+	},
+	{
+		label: __( 'Status' ),
+		name: 'status',
+		kind: 'root',
+		baseURL: '/wp/v2/statuses',
+		baseURLParams: { context: 'edit' },
+		plural: 'statuses',
+		key: 'slug',
 	},
 ];
 
@@ -228,6 +315,11 @@ async function loadPostTypeEntities() {
 				selection: true,
 			},
 			mergedEdits: { meta: true },
+			supports: {
+				revisions: POST_TYPE_ENTITIES_WITH_REVISIONS_SUPPORT.includes(
+					postType?.slug
+				),
+			},
 			rawAttributes: POST_RAW_ATTRIBUTES,
 			getTitle: ( record ) =>
 				record?.title?.rendered ||
@@ -237,6 +329,37 @@ async function loadPostTypeEntities() {
 					: String( record.id ) ),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 			__unstable_rest_base: postType.rest_base,
+			syncConfig: {
+				fetch: async ( id ) => {
+					return apiFetch( {
+						path: `/${ namespace }/${ postType.rest_base }/${ id }?context=edit`,
+					} );
+				},
+				applyChangesToDoc: ( doc, changes ) => {
+					const document = doc.getMap( 'document' );
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						if (
+							document.get( key ) !== value &&
+							typeof value !== 'function'
+						) {
+							document.set( key, value );
+						}
+					} );
+				},
+				fromCRDTDoc: ( doc ) => {
+					return doc.getMap( 'document' ).toJSON();
+				},
+			},
+			syncObjectType: 'postType/' + postType.name,
+			getSyncObjectId: ( id ) => id,
+			supportsPagination: true,
+			getRevisionsUrl: ( parentId, revisionId ) =>
+				`/${ namespace }/${
+					postType.rest_base
+				}/${ parentId }/revisions${
+					revisionId ? '/' + revisionId : ''
+				}`,
+			revisionKey: isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 		};
 	} );
 }
@@ -299,6 +422,15 @@ export const getMethodName = (
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };
 
+function registerSyncConfigs( configs ) {
+	configs.forEach( ( { syncObjectType, syncConfig } ) => {
+		getSyncProvider().register( syncObjectType, syncConfig );
+		const editSyncConfig = { ...syncConfig };
+		delete editSyncConfig.fetch;
+		getSyncProvider().register( syncObjectType + '--edit', editSyncConfig );
+	} );
+}
+
 /**
  * Loads the kind entities into the store.
  *
@@ -311,6 +443,12 @@ export const getOrLoadEntitiesConfig =
 	async ( { select, dispatch } ) => {
 		let configs = select.getEntitiesConfig( kind );
 		if ( configs && configs.length !== 0 ) {
+			if ( window.__experimentalEnableSync ) {
+				if ( process.env.IS_GUTENBERG_PLUGIN ) {
+					registerSyncConfigs( configs );
+				}
+			}
+
 			return configs;
 		}
 
@@ -322,6 +460,12 @@ export const getOrLoadEntitiesConfig =
 		}
 
 		configs = await loader.loadEntities();
+		if ( window.__experimentalEnableSync ) {
+			if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				registerSyncConfigs( configs );
+			}
+		}
+
 		dispatch( addEntities( configs ) );
 
 		return configs;

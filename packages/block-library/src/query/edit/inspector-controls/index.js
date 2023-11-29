@@ -27,8 +27,9 @@ import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import { TaxonomyControls } from './taxonomy-controls';
 import StickyControl from './sticky-control';
+import EnhancedPaginationControl from './enhanced-pagination-control';
 import CreateNewPostLink from './create-new-post-link';
-import { unlock } from '../../../private-apis';
+import { unlock } from '../../../lock-unlock';
 import {
 	usePostTypes,
 	useIsPostTypeHierarchical,
@@ -40,8 +41,9 @@ import {
 const { BlockInfo } = unlock( blockEditorPrivateApis );
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, setDisplayLayout } = props;
-	const { query, displayLayout } = attributes;
+	const { attributes, setQuery, setDisplayLayout, setAttributes, clientId } =
+		props;
+	const { query, displayLayout, enhancedPagination } = attributes;
 	const {
 		order,
 		orderBy,
@@ -101,7 +103,7 @@ export default function QueryInspectorControls( props ) {
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
-	const showColumnsControl = displayLayout?.type === 'flex';
+	const showColumnsControl = false;
 	const showOrderControl =
 		! inherit && isControlAllowed( allowedControls, 'order' );
 	const showStickyControl =
@@ -169,7 +171,9 @@ export default function QueryInspectorControls( props ) {
 									label={ __( 'Columns' ) }
 									value={ displayLayout.columns }
 									onChange={ ( value ) =>
-										setDisplayLayout( { columns: value } )
+										setDisplayLayout( {
+											columns: value,
+										} )
 									}
 									min={ 2 }
 									max={ Math.max( 6, displayLayout.columns ) }
@@ -200,6 +204,11 @@ export default function QueryInspectorControls( props ) {
 								}
 							/>
 						) }
+						<EnhancedPaginationControl
+							enhancedPagination={ enhancedPagination }
+							setAttributes={ setAttributes }
+							clientId={ clientId }
+						/>
 					</PanelBody>
 				</InspectorControls>
 			) }

@@ -16,13 +16,13 @@ import { getFilesFromDataTransfer } from '@wordpress/dom';
  */
 import { store as blockEditorStore } from '../../store';
 
-/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
+/** @typedef {import('react').SyntheticEvent} SyntheticEvent */
 /** @typedef {import('./types').WPDropOperation} WPDropOperation */
 
 /**
  * Retrieve the data for a block drop event.
  *
- * @param {WPSyntheticEvent} event The drop event.
+ * @param {SyntheticEvent} event The drop event.
  *
  * @return {Object} An object with block drag and drop data.
  */

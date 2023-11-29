@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/columns",
 	"title": "Columns",
 	"category": "design",
@@ -26,6 +26,8 @@
 		"color": {
 			"gradients": true,
 			"link": true,
+			"heading": true,
+			"button": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
@@ -43,7 +45,7 @@
 				"blockGap": true
 			}
 		},
-		"__experimentalLayout": {
+		"layout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"allowEditing": false,

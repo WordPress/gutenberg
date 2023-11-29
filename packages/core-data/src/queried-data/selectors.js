@@ -33,7 +33,7 @@ function getQueriedItemsUncached( state, query ) {
 	let itemIds;
 
 	if ( state.queries?.[ context ]?.[ stableKey ] ) {
-		itemIds = state.queries[ context ][ stableKey ];
+		itemIds = state.queries[ context ][ stableKey ].itemIds;
 	}
 
 	if ( ! itemIds ) {
@@ -52,7 +52,9 @@ function getQueriedItemsUncached( state, query ) {
 		if ( Array.isArray( include ) && ! include.includes( itemId ) ) {
 			continue;
 		}
-
+		if ( itemId === undefined ) {
+			continue;
+		}
 		// Having a target item ID doesn't guarantee that this object has been queried.
 		if ( ! state.items[ context ]?.hasOwnProperty( itemId ) ) {
 			return null;
@@ -68,7 +70,7 @@ function getQueriedItemsUncached( state, query ) {
 				const field = fields[ f ].split( '.' );
 				let value = item;
 				field.forEach( ( fieldName ) => {
-					value = value[ fieldName ];
+					value = value?.[ fieldName ];
 				} );
 
 				setNestedValue( filteredItem, field, value );
@@ -118,3 +120,9 @@ export const getQueriedItems = createSelector( ( state, query = {} ) => {
 	queriedItemsCache.set( query, items );
 	return items;
 } );
+
+export function getQueriedTotalItems( state, query = {} ) {
+	const { stableKey, context } = getQueryParts( query );
+
+	return state.queries?.[ context ]?.[ stableKey ]?.meta?.totalItems ?? null;
+}

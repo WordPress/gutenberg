@@ -9,6 +9,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import {
 	PanelBody,
 	__experimentalVStack as VStack,
+	__experimentalHasSplitBorders as hasSplitBorders,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -17,9 +18,44 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import Subtitle from './subtitle';
 import { useBlockVariations, VariationsPanel } from './variations-panel';
+
+function applyFallbackStyle( border ) {
+	if ( ! border ) {
+		return border;
+	}
+
+	const hasColorOrWidth = border.color || border.width;
+
+	if ( ! border.style && hasColorOrWidth ) {
+		return { ...border, style: 'solid' };
+	}
+
+	if ( border.style && ! hasColorOrWidth ) {
+		return undefined;
+	}
+
+	return border;
+}
+
+function applyAllFallbackStyles( border ) {
+	if ( ! border ) {
+		return border;
+	}
+
+	if ( hasSplitBorders( border ) ) {
+		return {
+			top: applyFallbackStyle( border.top ),
+			right: applyFallbackStyle( border.right ),
+			bottom: applyFallbackStyle( border.bottom ),
+			left: applyFallbackStyle( border.left ),
+		};
+	}
+
+	return applyFallbackStyle( border );
+}
 
 const {
 	useHasDimensionsPanel,
@@ -30,6 +66,7 @@ const {
 	useHasColorPanel,
 	useHasEffectsPanel,
 	useHasFiltersPanel,
+	useHasImageSettingsPanel,
 	useGlobalStyle,
 	BorderPanel: StylesBorderPanel,
 	ColorPanel: StylesColorPanel,
@@ -37,6 +74,7 @@ const {
 	DimensionsPanel: StylesDimensionsPanel,
 	EffectsPanel: StylesEffectsPanel,
 	FiltersPanel: StylesFiltersPanel,
+	ImageSettingsPanel,
 	AdvancedPanel: StylesAdvancedPanel,
 } = unlock( blockEditorPrivateApis );
 
@@ -53,9 +91,24 @@ function ScreenBlock( { name, variation } ) {
 	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
 		shouldDecodeEncode: false,
 	} );
+	const [ userSettings ] = useGlobalSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const settings = useSettingsForBlockElement( rawSettings, name );
 	const blockType = getBlockType( name );
+
+	// Only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
+	if (
+		settings?.spacing?.blockGap &&
+		blockType?.supports?.spacing?.blockGap &&
+		( blockType?.supports?.spacing?.__experimentalSkipSerialization ===
+			true ||
+			blockType?.supports?.spacing?.__experimentalSkipSerialization?.some?.(
+				( spacingType ) => spacingType === 'blockGap'
+			) )
+	) {
+		settings.spacing.blockGap = false;
+	}
+
 	const blockVariations = useBlockVariations( name );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
@@ -63,6 +116,11 @@ function ScreenBlock( { name, variation } ) {
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasEffectsPanel = useHasEffectsPanel( settings );
 	const hasFiltersPanel = useHasFiltersPanel( settings );
+	const hasImageSettingsPanel = useHasImageSettingsPanel(
+		name,
+		userSettings,
+		settings
+	);
 	const hasVariationsPanel = !! blockVariations?.length && ! variation;
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
@@ -74,8 +132,7 @@ function ScreenBlock( { name, variation } ) {
 			: undefined;
 
 		return {
-			canEditCSS:
-				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
 	const currentBlockStyle = variation
@@ -93,20 +150,76 @@ function ScreenBlock( { name, variation } ) {
 	const styleWithLayout = useMemo( () => {
 		return {
 			...style,
-			layout: settings.layout,
+			layout: userSettings.layout,
 		};
-	}, [ style, settings.layout ] );
+	}, [ style, userSettings.layout ] );
 	const onChangeDimensions = ( newStyle ) => {
 		const updatedStyle = { ...newStyle };
 		delete updatedStyle.layout;
 		setStyle( updatedStyle );
 
-		if ( newStyle.layout !== settings.layout ) {
+		if ( newStyle.layout !== userSettings.layout ) {
 			setSettings( {
-				...rawSettings,
+				...userSettings,
 				layout: newStyle.layout,
 			} );
 		}
+	};
+	const onChangeLightbox = ( newSetting ) => {
+		// If the newSetting is undefined, this means that the user has deselected
+		// (reset) the lightbox setting.
+		if ( newSetting === undefined ) {
+			setSettings( {
+				...rawSettings,
+				lightbox: undefined,
+			} );
+
+			// Otherwise, we simply set the lightbox setting to the new value but
+			// taking care of not overriding the other lightbox settings.
+		} else {
+			setSettings( {
+				...rawSettings,
+				lightbox: {
+					...rawSettings.lightbox,
+					...newSetting,
+				},
+			} );
+		}
+	};
+	const onChangeBorders = ( newStyle ) => {
+		if ( ! newStyle?.border ) {
+			setStyle( newStyle );
+			return;
+		}
+
+		// As Global Styles can't conditionally generate styles based on if
+		// other style properties have been set, we need to force split
+		// border definitions for user set global border styles. Border
+		// radius is derived from the same property i.e. `border.radius` if
+		// it is a string that is used. The longhand border radii styles are
+		// only generated if that property is an object.
+		//
+		// For borders (color, style, and width) those are all properties on
+		// the `border` style property. This means if the theme.json defined
+		// split borders and the user condenses them into a flat border or
+		// vice-versa we'd get both sets of styles which would conflict.
+		const { radius, ...newBorder } = newStyle.border;
+		const border = applyAllFallbackStyles( newBorder );
+		const updatedBorder = ! hasSplitBorders( border )
+			? {
+					top: border,
+					right: border,
+					bottom: border,
+					left: border,
+			  }
+			: {
+					color: null,
+					style: null,
+					width: null,
+					...border,
+			  };
+
+		setStyle( { ...newStyle, border: { ...updatedBorder, radius } } );
 	};
 
 	return (
@@ -152,7 +265,7 @@ function ScreenBlock( { name, variation } ) {
 				<StylesBorderPanel
 					inheritedValue={ inheritedStyle }
 					value={ style }
-					onChange={ setStyle }
+					onChange={ onChangeBorders }
 					settings={ settings }
 				/>
 			) }
@@ -160,7 +273,7 @@ function ScreenBlock( { name, variation } ) {
 				<StylesEffectsPanel
 					inheritedValue={ inheritedStyleWithLayout }
 					value={ styleWithLayout }
-					onChange={ onChangeDimensions }
+					onChange={ setStyle }
 					settings={ settings }
 					includeLayoutControls
 				/>
@@ -169,24 +282,26 @@ function ScreenBlock( { name, variation } ) {
 				<StylesFiltersPanel
 					inheritedValue={ inheritedStyleWithLayout }
 					value={ styleWithLayout }
-					onChange={ onChangeDimensions }
-					settings={ {
-						...settings,
-						color: {
-							...settings.color,
-							customDuotone: false, //TO FIX: Custom duotone only works on the block level right now
-						},
-					} }
+					onChange={ setStyle }
+					settings={ settings }
 					includeLayoutControls
 				/>
 			) }
+			{ hasImageSettingsPanel && (
+				<ImageSettingsPanel
+					onChange={ onChangeLightbox }
+					value={ userSettings }
+					inheritedValue={ settings }
+				/>
+			) }
+
 			{ canEditCSS && (
 				<PanelBody title={ __( 'Advanced' ) } initialOpen={ false }>
 					<p>
 						{ sprintf(
 							// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
 							__(
-								'Add your own CSS to customize the appearance of the %s block.'
+								'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value.'
 							),
 							blockType?.title
 						) }

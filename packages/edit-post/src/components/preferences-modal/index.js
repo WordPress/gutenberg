@@ -18,6 +18,7 @@ import {
 	PreferencesModal,
 	PreferencesModalTabs,
 	PreferencesModalSection,
+	store as interfaceStore,
 } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -35,17 +36,18 @@ import MetaBoxesSection from './meta-boxes-section';
 import { store as editPostStore } from '../../store';
 import BlockManager from '../block-manager';
 
-const MODAL_NAME = 'edit-post/preferences';
+export const PREFERENCES_MODAL_NAME = 'edit-post/preferences';
 
 export default function EditPostPreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { closeModal } = useDispatch( editPostStore );
+	const { closeModal } = useDispatch( interfaceStore );
 	const [ isModalActive, showBlockBreadcrumbsOption ] = useSelect(
 		( select ) => {
 			const { getEditorSettings } = select( editorStore );
 			const { getEditorMode, isFeatureActive } = select( editPostStore );
-			const modalActive =
-				select( editPostStore ).isModalActive( MODAL_NAME );
+			const modalActive = select( interfaceStore ).isModalActive(
+				PREFERENCES_MODAL_NAME
+			);
 			const mode = getEditorMode();
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
 			const isDistractionFreeEnabled =
@@ -68,7 +70,7 @@ export default function EditPostPreferencesModal() {
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const toggleDistractionFree = () => {
-		setPreference( 'core/edit-post', 'fixedToolbar', false );
+		setPreference( 'core/edit-post', 'fixedToolbar', true );
 		setIsInserterOpened( false );
 		setIsListViewOpened( false );
 		closeGeneralSidebar();

@@ -2,6 +2,46 @@
 
 ## Unreleased
 
+## 7.30.0 (2023-11-16)
+
+## 7.29.0 (2023-11-02)
+
+## 7.28.0 (2023-10-18)
+
+## 7.27.0 (2023-10-05)
+
+### Internal
+
+-   The bundled `browserslist` dependency has been updated from requiring `^4.21.9` to requiring `^4.21.10` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+
+## Enhancements
+
+-   Use `react` as the default scope variable for JSX pragma instead of `@wordpress/element`.
+
+## 7.26.0 (2023-09-20)
+
+## 7.25.0 (2023-08-31)
+
+## 7.24.0 (2023-08-16)
+
+## 7.23.0 (2023-08-10)
+
+## 7.22.0 (2023-07-20)
+
+## 7.21.0 (2023-07-05)
+
+## 7.20.0 (2023-06-23)
+
+## 7.19.0 (2023-06-07)
+
+### Enhancement
+
+-   Enable the `bugfixes` option in `@babel/preset-env` to remove unneeded transpilation ([#50994](https://github.com/WordPress/gutenberg/pull/50994)).
+
+## 7.18.0 (2023-05-24)
+
+## 7.17.0 (2023-05-10)
+
 ## 7.16.0 (2023-04-26)
 
 ## 7.15.0 (2023-04-12)

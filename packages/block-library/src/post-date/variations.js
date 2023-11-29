@@ -7,7 +7,7 @@ import { postDate } from '@wordpress/icons';
 const variations = [
 	{
 		name: 'post-date-modified',
-		title: __( 'Post Modified Date' ),
+		title: __( 'Modified Date' ),
 		description: __( "Display a post's last updated date." ),
 		attributes: { displayType: 'modified' },
 		scope: [ 'block', 'inserter' ],

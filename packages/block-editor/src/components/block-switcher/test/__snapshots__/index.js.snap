@@ -48,7 +48,7 @@ exports[`BlockSwitcherDropdownMenu should render enabled block switcher with mul
         aria-describedby="components-button__description-2"
         aria-expanded="false"
         aria-haspopup="true"
-        aria-label="Block Name"
+        aria-label="Multiple blocks selected"
         class="components-button components-dropdown-menu__toggle has-icon"
         data-toolbar-item="true"
         type="button"
@@ -105,7 +105,7 @@ exports[`BlockSwitcherDropdownMenu should render switcher with blocks 1`] = `
         <span
           id="components-button__description-0"
         >
-          Block Name: Change block type or style
+          Change block type or style
         </span>
       </div>
     </div>

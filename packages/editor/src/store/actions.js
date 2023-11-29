@@ -11,6 +11,7 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { applyFilters } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -177,15 +178,26 @@ export const savePost =
 				edits,
 				options
 			);
-		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
-		const error = registry
+		let error = registry
 			.select( coreStore )
 			.getLastEntitySaveError(
 				'postType',
 				previousRecord.type,
 				previousRecord.id
 			);
+
+		if ( ! error ) {
+			await applyFilters(
+				'editor.__unstableSavePost',
+				Promise.resolve(),
+				options
+			).catch( ( err ) => {
+				error = err;
+			} );
+		}
+		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
+
 		if ( error ) {
 			const args = getNotificationArgumentsForSaveFail( {
 				post: previousRecord,
@@ -287,6 +299,26 @@ export const autosave =
 		} else {
 			await dispatch.savePost( { isAutosave: true, ...options } );
 		}
+	};
+
+export const __unstableSaveForPreview =
+	( { forceIsAutosaveable } = {} ) =>
+	async ( { select, dispatch } ) => {
+		if (
+			( forceIsAutosaveable || select.isEditedPostAutosaveable() ) &&
+			! select.isPostLocked()
+		) {
+			const isDraft = [ 'draft', 'auto-draft' ].includes(
+				select.getEditedPostAttribute( 'status' )
+			);
+			if ( isDraft ) {
+				await dispatch.savePost( { isPreview: true } );
+			} else {
+				await dispatch.autosave( { isPreview: true } );
+			}
+		}
+
+		return select.getEditedPostPreviewLink();
 	};
 
 /**
@@ -515,6 +547,27 @@ export function updateEditorSettings( settings ) {
 		settings,
 	};
 }
+
+/**
+ * Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
+ *
+ * -   `all`: This is the default mode. It renders the post editor with all the features available. If a template is provided, it's preferred over the post.
+ * -   `template-only`: This mode renders the editor with only the template blocks visible.
+ * -   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
+ * -   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
+ *
+ * @param {string} mode Mode (one of 'template-only', 'post-only', 'template-locked' or 'all').
+ */
+export const setRenderingMode =
+	( mode ) =>
+	( { dispatch, registry } ) => {
+		registry.dispatch( blockEditorStore ).clearSelectedBlock();
+
+		dispatch( {
+			type: 'SET_RENDERING_MODE',
+			mode,
+		} );
+	};
 
 /**
  * Backward compatibility

@@ -2,14 +2,20 @@
  * WordPress dependencies
  */
 import { usePrevious } from '@wordpress/compose';
-import { useCallback, useEffect, useMemo } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import * as styles from '../styles';
 import { useToolsPanelContext } from '../context';
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelItemProps } from '../types';
 
@@ -58,7 +64,11 @@ export function useToolsPanelItem(
 
 	// Registering the panel item allows the panel to include it in its
 	// automatically generated menu and determine its initial checked status.
-	useEffect( () => {
+	//
+	// This is performed in a layout effect to ensure that the panel item
+	// is registered before it is rendered preventing a rendering glitch.
+	// See: https://github.com/WordPress/gutenberg/issues/56470
+	useLayoutEffect( () => {
 		if ( hasMatchingPanel && previousPanelId !== null ) {
 			registerPanelItem( {
 				hasValue: hasValueCallback,
@@ -175,18 +185,16 @@ export function useToolsPanelItem(
 
 	const cx = useCx();
 	const classes = useMemo( () => {
-		const placeholderStyle =
-			shouldRenderPlaceholder &&
-			! isShown &&
-			styles.ToolsPanelItemPlaceholder;
+		const shouldApplyPlaceholderStyles =
+			shouldRenderPlaceholder && ! isShown;
 		const firstItemStyle =
 			firstDisplayedItem === label && __experimentalFirstVisibleItemClass;
 		const lastItemStyle =
 			lastDisplayedItem === label && __experimentalLastVisibleItemClass;
 		return cx(
 			styles.ToolsPanelItem,
-			placeholderStyle,
-			className,
+			shouldApplyPlaceholderStyles && styles.ToolsPanelItemPlaceholder,
+			! shouldApplyPlaceholderStyles && className,
 			firstItemStyle,
 			lastItemStyle
 		);

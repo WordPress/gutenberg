@@ -18,7 +18,7 @@ Through the Block editor, you create content modularly using Blocks. There are a
 
 A [Block](https://developer.wordpress.org/block-editor/explanations/architecture/key-concepts/#blocks) is a discrete element such as a Paragraph, Heading, Media element, or Embed. Each block is treated as a separate element with individual editing and format controls. When all these components are pieced together, they make up the content that is then [stored in the WordPress database](https://developer.wordpress.org/block-editor/explanations/architecture/data-flow/#serialization-and-parsing).
 
-The Block Editor is the result of the [work done on the **Gutenberg project**](https://developer.wordpress.org/block-editor/explanations/faq/#what-is-gutenberg) which is aimed to revolutionize the WordPress editing experience.
+The Block Editor is the result of the [work done on the **Gutenberg project**](https://developer.wordpress.org/block-editor/getting-started/faq/#what-is-gutenberg) which is aimed to revolutionize the WordPress editing experience.
 
 Besides offering an [enhanced editing experience](https://wordpress.org/gutenberg/) through visual content creation tools, the Block Editor is also a powerful developer platform with a [rich feature set of APIs](https://developer.wordpress.org/block-editor/reference-guides/) that allow it to be manipulated and extended in a multitude of different ways.
 
@@ -29,7 +29,7 @@ This handbook is focused on block development and is divided into five sections,
 
 **[Getting Started](https://developer.wordpress.org/block-editor/getting-started/)**
 
-For those just starting out with block development this is where you can get set up with a [development environment](https://developer.wordpress.org/block-editor/getting-started/devenv/) and learn the [fundamentals of block development](https://developer.wordpress.org/block-editor/getting-started/create-block/).
+For those just starting out with block development this is where you can get set up with a [development environment](https://developer.wordpress.org/block-editor/getting-started/devenv/) and learn the [fundamentals of block development](https://developer.wordpress.org/block-editor/getting-started/create-block/). Its [Glossary of terms](https://developer.wordpress.org/block-editor/getting-started/glossary/) and [FAQs](https://developer.wordpress.org/block-editor/getting-started/faq/) should answer any outstanding questions you may have.
 
 
 **[How-to Guides](https://developer.wordpress.org/block-editor/how-to-guides/)**
@@ -44,8 +44,7 @@ This section is the heart of the handbook and is where you can get down to the n
 
 **[Explanations](https://developer.wordpress.org/block-editor/explanations/)**
 
-This section enables you to go deeper and reinforce your practical knowledge with a theoretical understanding of the [Architecture](https://developer.wordpress.org/block-editor/explanations/architecture/) of the block editor. Its [Glossary of terms](https://developer.wordpress.org/block-editor/explanations/glossary/) and [FAQs](https://developer.wordpress.org/block-editor/explanations/faq/) should answer any outstanding questions you may have.
-
+This section enables you to go deeper and reinforce your practical knowledge with a theoretical understanding of the [Architecture](https://developer.wordpress.org/block-editor/explanations/architecture/) of the block editor.
 
 **[Contributor Guide](https://developer.wordpress.org/block-editor/contributors/)**
 
@@ -60,7 +59,7 @@ This handbook should be considered the canonical resource for all things related
 - [**Learn WordPress**](https://learn.wordpress.org/) - The WordPress hub for learning resources where you can find courses like [Introduction to Block Development: Build your first custom block](https://learn.wordpress.org/course/introduction-to-block-development-build-your-first-custom-block/), [Converting a Shortcode to a Block](https://learn.wordpress.org/course/converting-a-shortcode-to-a-block/) or [Using the WordPress Data Layer](https://learn.wordpress.org/course/using-the-wordpress-data-layer/)
 - [**WordPress.tv**](https://wordpress.tv/) - A hub of WordPress-related videos (from talks at WordCamps to recordings of online workshops) curated and moderated by the WordPress.org community. You’re sure to find something to aid your learning about [block development](https://wordpress.tv/?s=block%20development&sort=newest) or the [block-editor](https://wordpress.tv/?s=block%20editor&sort=relevance) here.
 - [**Gutenberg repository**](https://github.com/WordPress/gutenberg/) - Development of the block editor project is carried out in this GitHub repository. It contains the code of interesting packages such as [`block-library`](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src) (core blocks) or [`components`](https://github.com/WordPress/gutenberg/tree/trunk/packages/components) (common UI elements). _The [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository is another useful reference._
-
+- [**End User Documentation**](https://wordpress.org/documentation/) - Documentation site targeted to the end user (not developers) where you can also find documentation about the [Block Editor](https://wordpress.org/documentation/category/block-editor/) and [working with blocks](https://wordpress.org/documentation/article/work-with-blocks/).
 
 ## Are you in the right place?
 

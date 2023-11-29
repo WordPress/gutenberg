@@ -15,15 +15,12 @@ test.use( {
 } );
 
 test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
-	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
-	} );
-
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllPosts();
 	} );
 
 	test( 'inserts blocks by dragging and dropping from the global inserter', async ( {
+		admin,
 		page,
 		editor,
 		insertingBlocksUtils,
@@ -32,6 +29,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			testInfo.project.name === 'firefox',
 			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
 		);
+
+		await admin.createNewPost();
+		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -103,10 +103,14 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 	} );
 
 	test( 'cancels dragging blocks from the global inserter by pressing Escape', async ( {
+		admin,
 		page,
 		editor,
 		insertingBlocksUtils,
 	} ) => {
+		await admin.createNewPost();
+		await editor.switchToLegacyCanvas();
+
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
 		await editor.insertBlock( {
@@ -151,8 +155,8 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		await page.keyboard.press( 'Escape' );
 
-		await expect( insertingBlocksUtils.indicator ).not.toBeVisible();
-		await expect( insertingBlocksUtils.draggableChip ).not.toBeVisible();
+		await expect( insertingBlocksUtils.indicator ).toBeHidden();
+		await expect( insertingBlocksUtils.draggableChip ).toBeHidden();
 
 		await page.mouse.up();
 
@@ -160,6 +164,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 	} );
 
 	test( 'inserts patterns by dragging and dropping from the global inserter', async ( {
+		admin,
 		page,
 		editor,
 		insertingBlocksUtils,
@@ -168,6 +173,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			testInfo.project.name === 'firefox',
 			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
 		);
+
+		await admin.createNewPost();
+		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -231,10 +239,14 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 	} );
 
 	test( 'cancels dragging patterns from the global inserter by pressing Escape', async ( {
+		admin,
 		page,
 		editor,
 		insertingBlocksUtils,
 	} ) => {
+		await admin.createNewPost();
+		await editor.switchToLegacyCanvas();
+
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
 		await editor.insertBlock( {
@@ -282,8 +294,8 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		await page.keyboard.press( 'Escape' );
 
-		await expect( insertingBlocksUtils.indicator ).not.toBeVisible();
-		await expect( insertingBlocksUtils.draggableChip ).not.toBeVisible();
+		await expect( insertingBlocksUtils.indicator ).toBeHidden();
+		await expect( insertingBlocksUtils.draggableChip ).toBeHidden();
 
 		await page.mouse.up();
 
@@ -292,9 +304,12 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 	// A test for https://github.com/WordPress/gutenberg/issues/43090.
 	test( 'should close the inserter when clicking on the toggle button', async ( {
+		admin,
 		page,
 		editor,
 	} ) => {
+		await admin.createNewPost();
+
 		const inserterButton = page.getByRole( 'button', {
 			name: 'Toggle block inserter',
 		} );
@@ -333,13 +348,14 @@ test.describe( 'insert media from inserter', () => {
 			requestUtils.deleteAllPosts(),
 		] );
 	} );
-	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
-	} );
+
 	test( 'insert media from the global inserter', async ( {
+		admin,
 		page,
 		editor,
 	} ) => {
+		await admin.createNewPost();
+
 		await page.click(
 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
 		);

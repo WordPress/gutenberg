@@ -5,7 +5,13 @@
 	// Offset the customizer's sidebar padding.
 	margin-left: -$grid-unit-15;
 	margin-right: -$grid-unit-15;
-	width: calc(100% + #{ $grid-unit-30 });
+	// added important to override the inline style coming from
+	// the block-editor/block-contextual-toolbar component.
+	width: calc(100% + #{ $grid-unit-30 }) !important;
+
+	& > .block-editor-block-toolbar__group-collapse-fixed-toolbar {
+		display: none;
+	}
 
 	// Scroll sideways.
 	overflow-y: auto;

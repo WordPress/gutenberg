@@ -20,11 +20,13 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: ['14']
+                node: ['16']
                 os: [macos-latest, ubuntu-latest, windows-latest]
 
         steps:
-            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node

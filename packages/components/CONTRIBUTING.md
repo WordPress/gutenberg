@@ -20,6 +20,7 @@ For an example of a component that follows these requirements, take a look at [`
 - [README example](#README-example)
 - [Folder structure](#folder-structure)
 - [TypeScript migration guide](#refactoring-a-component-to-typescript)
+- [Using Radix UI primitives](#using-radix-ui-primitives)
 
 ## Introducing new components
 
@@ -327,7 +328,7 @@ An example of how this is used can be found in the [`Card` component family](/pa
 //=========================================================================
 // Simplified snippet from `packages/components/src/card/card/hook.ts`
 //=========================================================================
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem } from '../../context';
 
 export function useCard( props ) {
 	// Read any derived registered prop from the Context System in the `Card` namespace
@@ -341,7 +342,7 @@ export function useCard( props ) {
 //=========================================================================
 // Simplified snippet from `packages/components/src/card/card/component.ts`
 //=========================================================================
-import { contextConnect, ContextSystemProvider } from '../../ui/context';
+import { contextConnect, ContextSystemProvider } from '../../context';
 
 function Card( props, forwardedRef ) {
 	const {
@@ -378,7 +379,7 @@ export default ConnectedCard;
 //=========================================================================
 // Simplified snippet from `packages/components/src/card/card-body/hook.ts`
 //=========================================================================
-import { useContextSystem } from '../../ui/context';
+import { useContextSystem } from '../../context';
 
 export function useCardBody( props ) {
 	// Read any derived registered prop from the Context System in the `CardBody` namespace.
@@ -580,7 +581,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 	6. If the component forwards its `...restProps` to an underlying element/component, you should use the `WordPressComponentProps` type for the component's props:
 
 		```tsx
-		import type { WordPressComponentProps } from '../ui/context';
+		import type { WordPressComponentProps } from '../context';
 		import type { ComponentOwnProps } from './types';
 
 		function UnconnectedMyComponent(
@@ -618,10 +619,10 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 	3. Rewrite the `meta` story object, and export it as default. In particular, make sure you add the following settings under the `parameters` key:
 
 		```tsx
-		const meta: ComponentMeta< typeof MyComponent > = {
+		const meta: Meta< typeof MyComponent > = {
 			parameters: {
 				controls: { expanded: true },
-				docs: { source: { state: 'open' } },
+				docs: { canvas: { sourceState: 'shown' } },
 			},
 		};
 		```
@@ -639,3 +640,12 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
 11. Convert unit tests.
 	1. Rename test file extensions from `.js` to `.tsx`.
 	2. Fix all TypeScript errors.
+
+## Using Radix UI primitives
+
+Useful links:
+
+- [online docs](https://www.radix-ui.com/docs/primitives/overview/introduction)
+- [repo](https://github.com/radix-ui/primitives) — useful for:
+    - inspecting source code
+    - running storybook examples (`yarn install && yarn dev`)

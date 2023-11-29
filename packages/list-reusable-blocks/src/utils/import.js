@@ -27,9 +27,11 @@ async function importReusableBlock( file ) {
 		! parsedContent.title ||
 		! parsedContent.content ||
 		typeof parsedContent.title !== 'string' ||
-		typeof parsedContent.content !== 'string'
+		typeof parsedContent.content !== 'string' ||
+		( parsedContent.syncStatus &&
+			typeof parsedContent.syncStatus !== 'string' )
 	) {
-		throw new Error( 'Invalid Reusable block JSON file' );
+		throw new Error( 'Invalid pattern JSON file' );
 	}
 	const postType = await apiFetch( { path: `/wp/v2/types/wp_block` } );
 	const reusableBlock = await apiFetch( {
@@ -38,6 +40,10 @@ async function importReusableBlock( file ) {
 			title: parsedContent.title,
 			content: parsedContent.content,
 			status: 'publish',
+			meta:
+				parsedContent.syncStatus === 'unsynced'
+					? { wp_pattern_sync_status: parsedContent.syncStatus }
+					: undefined,
 		},
 		method: 'POST',
 	} );

@@ -14,21 +14,16 @@ import {
 } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import {
-	useContext,
-	useMemo,
-	createPortal,
-	Platform,
-} from '@wordpress/element';
+import { useMemo, Platform } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
-import BlockList from '../components/block-list';
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
-import { cleanEmptyObject } from './utils';
+import useBlockDisplayInformation from '../components/use-block-display-information';
+import { cleanEmptyObject, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 import { store as blockEditorStore } from '../store';
 
@@ -196,8 +191,10 @@ export function resetPosition( { attributes = {}, setAttributes } ) {
  * @return {boolean} Whether padding setting is disabled.
  */
 export function useIsPositionDisabled( { name: blockName } = {} ) {
-	const allowFixed = useSetting( 'position.fixed' );
-	const allowSticky = useSetting( 'position.sticky' );
+	const [ allowFixed, allowSticky ] = useSettings(
+		'position.fixed',
+		'position.sticky'
+	);
 	const isDisabled = ! allowFixed && ! allowSticky;
 
 	return ! hasPositionSupport( blockName ) || isDisabled;
@@ -208,7 +205,7 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
  *
  * @param {Object} props
  *
- * @return {WPElement} Position panel.
+ * @return {Element} Position panel.
  */
 export function PositionPanel( props ) {
 	const {
@@ -222,32 +219,39 @@ export function PositionPanel( props ) {
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
 
-	const { hasParents } = useSelect(
+	const { firstParentClientId } = useSelect(
 		( select ) => {
 			const { getBlockParents } = select( blockEditorStore );
 			const parents = getBlockParents( clientId );
-			return {
-				hasParents: parents.length,
-			};
+			return { firstParentClientId: parents[ parents.length - 1 ] };
 		},
 		[ clientId ]
 	);
 
+	const blockInformation = useBlockDisplayInformation( firstParentClientId );
+	const stickyHelpText =
+		allowSticky && value === STICKY_OPTION.value && blockInformation
+			? sprintf(
+					/* translators: %s: the name of the parent block. */
+					__(
+						'The block will stick to the scrollable area of the parent %s block.'
+					),
+					blockInformation.title
+			  )
+			: null;
+
 	const options = useMemo( () => {
 		const availableOptions = [ DEFAULT_OPTION ];
-		// Only display sticky option if the block has no parents (is at the root of the document),
-		// or if the block already has a sticky position value set.
-		if (
-			( allowSticky && ! hasParents ) ||
-			value === STICKY_OPTION.value
-		) {
+		// Display options if they are allowed, or if a block already has a valid value set.
+		// This allows for a block to be switched off from a position type that is not allowed.
+		if ( allowSticky || value === STICKY_OPTION.value ) {
 			availableOptions.push( STICKY_OPTION );
 		}
 		if ( allowFixed || value === FIXED_OPTION.value ) {
 			availableOptions.push( FIXED_OPTION );
 		}
 		return availableOptions;
-	}, [ allowFixed, allowSticky, hasParents, value ] );
+	}, [ allowFixed, allowSticky, value ] );
 
 	const onChangeType = ( next ) => {
 		// For now, use a hard-coded `0px` value for the position.
@@ -281,10 +285,14 @@ export function PositionPanel( props ) {
 		web:
 			options.length > 1 ? (
 				<InspectorControls group="position">
-					<BaseControl className="block-editor-hooks__position-selection">
+					<BaseControl
+						className="block-editor-hooks__position-selection"
+						__nextHasNoMarginBottom
+						help={ stickyHelpText }
+					>
 						<CustomSelectControl
 							__nextUnconstrainedWidth
-							__next36pxDefaultSize
+							__next40pxDefaultSize
 							className="block-editor-hooks__position-selection__select-control"
 							label={ __( 'Position' ) }
 							hideLabelFromVision
@@ -315,15 +323,15 @@ export function PositionPanel( props ) {
  *
  * @return {Function} Wrapped component.
  */
-export const withInspectorControls = createHigherOrderComponent(
+export const withPositionControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName } = props;
 		const positionSupport = hasBlockSupport(
 			blockName,
 			POSITION_SUPPORT_KEY
 		);
-		const showPositionControls =
-			positionSupport && ! useIsPositionDisabled( props );
+		const isPositionDisabled = useIsPositionDisabled( props );
+		const showPositionControls = positionSupport && ! isPositionDisabled;
 
 		return [
 			showPositionControls && (
@@ -332,7 +340,7 @@ export const withInspectorControls = createHigherOrderComponent(
 			<BlockEdit key="edit" { ...props } />,
 		];
 	},
-	'withInspectorControls'
+	'withPositionControls'
 );
 
 /**
@@ -349,11 +357,11 @@ export const withPositionStyles = createHigherOrderComponent(
 			name,
 			POSITION_SUPPORT_KEY
 		);
+		const isPositionDisabled = useIsPositionDisabled( props );
 		const allowPositionStyles =
-			hasPositionBlockSupport && ! useIsPositionDisabled( props );
+			hasPositionBlockSupport && ! isPositionDisabled;
 
 		const id = useInstanceId( BlockListBlock );
-		const element = useContext( BlockList.__unstableElementContext );
 
 		// Higher specificity to override defaults in editor UI.
 		const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;
@@ -377,16 +385,11 @@ export const withPositionStyles = createHigherOrderComponent(
 				!! attributes?.style?.position?.type,
 		} );
 
-		return (
-			<>
-				{ allowPositionStyles &&
-					element &&
-					!! css &&
-					createPortal( <style>{ css }</style>, element ) }
-				<BlockListBlock { ...props } className={ className } />
-			</>
-		);
-	}
+		useStyleOverride( { css } );
+
+		return <BlockListBlock { ...props } className={ className } />;
+	},
+	'withPositionStyles'
 );
 
 addFilter(
@@ -397,5 +400,5 @@ addFilter(
 addFilter(
 	'editor.BlockEdit',
 	'core/editor/position/with-inspector-controls',
-	withInspectorControls
+	withPositionControls
 );

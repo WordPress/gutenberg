@@ -19,15 +19,6 @@ import {
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
-// Mock debounce to prevent potentially belated state updates.
-jest.mock( 'lodash', () => ( {
-	...jest.requireActual( 'lodash' ),
-	debounce: ( fn ) => {
-		fn.cancel = jest.fn();
-		return fn;
-	},
-} ) );
-
 const BUTTONS_HTML = `<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button /--></div>
 <!-- /wp:buttons -->`;
@@ -63,9 +54,10 @@ describe( 'Buttons block', () => {
 
 			// onLayout event has to be explicitly dispatched in BlockList component,
 			// otherwise the inner blocks are not rendered.
-			const innerBlockListWrapper = await within(
-				buttonsBlock
-			).findByTestId( 'block-list-wrapper' );
+			const innerBlockListWrapper =
+				await within( buttonsBlock ).findByTestId(
+					'block-list-wrapper'
+				);
 			fireEvent( innerBlockListWrapper, 'layout', {
 				nativeEvent: {
 					layout: {
@@ -74,22 +66,22 @@ describe( 'Buttons block', () => {
 				},
 			} );
 
-			const [ buttonInnerBlock ] = await within(
-				buttonsBlock
-			).findAllByLabelText( /Button Block\. Row 1/ );
+			const [ buttonInnerBlock ] =
+				await within( buttonsBlock ).findAllByLabelText(
+					/Button Block\. Row 1/
+				);
 			fireEvent.press( buttonInnerBlock );
 
-			const settingsButton = await editor.findByLabelText(
-				'Open Settings'
-			);
+			const settingsButton =
+				await editor.findByLabelText( 'Open Settings' );
 			fireEvent.press( settingsButton );
 
-			const radiusStepper = await editor.findByLabelText(
-				/Border Radius/
-			);
+			const radiusStepper =
+				await editor.findByLabelText( /Border Radius/ );
 
 			const incrementButton = await within( radiusStepper ).findByTestId(
-				'Increment'
+				'Increment',
+				{ hidden: true }
 			);
 			fireEvent( incrementButton, 'onPressIn' );
 
@@ -105,9 +97,10 @@ describe( 'Buttons block', () => {
 			const buttonsBlock = await getBlock( screen, 'Buttons' );
 
 			// Trigger inner blocks layout
-			const innerBlockListWrapper = await within(
-				buttonsBlock
-			).findByTestId( 'block-list-wrapper' );
+			const innerBlockListWrapper =
+				await within( buttonsBlock ).findByTestId(
+					'block-list-wrapper'
+				);
 			fireEvent( innerBlockListWrapper, 'layout', {
 				nativeEvent: {
 					layout: {
@@ -126,9 +119,10 @@ describe( 'Buttons block', () => {
 			fireEvent.press( appenderButton );
 
 			// Check for new button
-			const [ secondButtonBlock ] = await within(
-				buttonsBlock
-			).findAllByLabelText( /Button Block\. Row 2/ );
+			const [ secondButtonBlock ] =
+				await within( buttonsBlock ).findAllByLabelText(
+					/Button Block\. Row 2/
+				);
 			expect( secondButtonBlock ).toBeVisible();
 
 			// Add a Paragraph block using the empty placeholder at the bottom
@@ -155,9 +149,10 @@ describe( 'Buttons block', () => {
 			fireEvent.press( buttonsBlock );
 
 			// Trigger inner blocks layout
-			const innerBlockListWrapper = await within(
-				buttonsBlock
-			).findByTestId( 'block-list-wrapper' );
+			const innerBlockListWrapper =
+				await within( buttonsBlock ).findByTestId(
+					'block-list-wrapper'
+				);
 			fireEvent( innerBlockListWrapper, 'layout', {
 				nativeEvent: {
 					layout: {
@@ -189,7 +184,7 @@ describe( 'Buttons block', () => {
 			expect( addBlockHerePlaceholders.length ).toBe( 0 );
 
 			// Add a new Button block
-			fireEvent.press( await screen.findByText( 'Button' ) );
+			fireEvent.press( within( blockList ).getByText( 'Button' ) );
 
 			// Get new button
 			const secondButtonBlock = await getBlock( screen, 'Button', {
@@ -214,9 +209,10 @@ describe( 'Buttons block', () => {
 				const buttonsBlock = await getBlock( screen, 'Buttons' );
 
 				// Trigger inner blocks layout
-				const innerBlockListWrapper = await within(
-					buttonsBlock
-				).findByTestId( 'block-list-wrapper' );
+				const innerBlockListWrapper =
+					await within( buttonsBlock ).findByTestId(
+						'block-list-wrapper'
+					);
 				fireEvent( innerBlockListWrapper, 'layout', {
 					nativeEvent: {
 						layout: {
@@ -305,6 +301,10 @@ describe( 'Buttons block', () => {
 
 			// Tap one color
 			fireEvent.press( screen.getByLabelText( 'Pale pink' ) );
+			// TODO(jest-console): Fix the warning and remove the expect below.
+			expect( console ).toHaveWarnedWith(
+				`Non-serializable values were found in the navigation state. Check:\n\nColor > params.onColorChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
+			);
 
 			// Dismiss the Block Settings modal.
 			fireEvent( blockSettingsModal, 'backdropPress' );

@@ -29,6 +29,11 @@ export const settings = {
 			/* eslint-enable @wordpress/i18n-no-collapsible-whitespace */
 		},
 	},
+	merge( attributes, attributesToMerge ) {
+		return {
+			content: attributes.content + '\n\n' + attributesToMerge.content,
+		};
+	},
 	transforms,
 	edit,
 	save,

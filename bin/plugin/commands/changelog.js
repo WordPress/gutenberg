@@ -72,9 +72,10 @@ const LABEL_TYPE_MAPPING = {
 	'[Type] Project Management': 'Tools',
 	'[Package] Scripts': 'Tools',
 	'[Type] Build Tooling': 'Tools',
-	'Automated Testing': 'Tools',
+	'[Type] Automated Testing': 'Tools',
 	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
 	'[Type] Code Quality': 'Code Quality',
+	'[Focus] Accessibility (a11y)': 'Accessibility',
 	'[Type] Performance': 'Performance',
 	'[Type] Security': 'Security',
 	'[Feature] Navigation Screen': 'Experiments',
@@ -125,14 +126,9 @@ const LABEL_FEATURE_MAPPING = {
 	'[Block] Legacy Widget': 'Widgets Editor',
 	'REST API Interaction': 'REST API',
 	'New Block': 'Block Library',
-	'Accessibility (a11y)': 'Accessibility',
-	'[a11y] Color Contrast': 'Accessibility',
-	'[a11y] Keyboard & Focus': 'Accessibility',
-	'[a11y] Labelling': 'Accessibility',
-	'[a11y] Zooming': 'Accessibility',
 	'[Package] E2E Tests': 'Testing',
 	'[Package] E2E Test Utils': 'Testing',
-	'Automated Testing': 'Testing',
+	'[Type] Automated Testing': 'Testing',
 	'CSS Styling': 'CSS & Styling',
 	'developer-docs': 'Documentation',
 	'[Type] Developer Documentation': 'Documentation',
@@ -153,6 +149,7 @@ const GROUP_TITLE_ORDER = [
 	'Enhancements',
 	'New APIs',
 	'Bug Fixes',
+	`Accessibility`,
 	'Performance',
 	'Experiments',
 	'Documentation',
@@ -473,6 +470,21 @@ const createOmitByLabel = ( labels ) => ( text, issue ) =>
 		: text;
 
 /**
+ * Higher-order function which returns a normalization function to omit by issue
+ * label starting with any of the given prefixes
+ *
+ * @param {string[]} prefixes Label prefixes from which to determine if given entry
+ *                            should be omitted.
+ *
+ * @return {WPChangelogNormalization} Normalization function.
+ */
+const createOmitByLabelPrefix = ( prefixes ) => ( text, issue ) =>
+	issue.labels.some( ( label ) =>
+		prefixes.some( ( prefix ) => label.name.startsWith( prefix ) )
+	)
+		? undefined
+		: text;
+/**
  * Given an issue title and issue, returns the title with redundant grouping
  * type details removed. The prefix is redundant since it would already be clear
  * enough by group assignment that the prefix would be inferred.
@@ -516,7 +528,7 @@ function removeFeaturePrefix( text ) {
  * @type {Array<WPChangelogNormalization>}
  */
 const TITLE_NORMALIZATIONS = [
-	createOmitByLabel( [ 'Mobile App Android/iOS' ] ),
+	createOmitByLabelPrefix( [ 'Mobile App' ] ),
 	createOmitByTitlePrefix( [ '[rnmobile]', '[mobile]', 'Mobile Release' ] ),
 	removeRedundantTypePrefix,
 	reword,
@@ -1043,6 +1055,7 @@ async function getReleaseChangelog( options ) {
 	capitalizeAfterColonSeparatedPrefix,
 	createOmitByTitlePrefix,
 	createOmitByLabel,
+	createOmitByLabelPrefix,
 	addTrailingPeriod,
 	getNormalizedTitle,
 	getReleaseChangelog,

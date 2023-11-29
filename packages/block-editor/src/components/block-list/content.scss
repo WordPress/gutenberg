@@ -85,7 +85,6 @@
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-highlighted ~ .is-multi-selected,
 	&.is-navigate-mode .block-editor-block-list__block.is-selected,
-	& .is-block-moving-mode.block-editor-block-list__block.has-child-selected,
 	.block-editor-block-list__block:not([contenteditable]):focus {
 		outline: none;
 
@@ -113,8 +112,6 @@
 
 	// Moving blocks using keyboard (Ellipsis > Move).
 	& .is-block-moving-mode.block-editor-block-list__block.is-selected {
-		box-shadow: none;
-		outline: none;
 
 		&::after {
 			content: "";
@@ -130,6 +127,8 @@
 			top: -$default-block-margin * 0.5;
 			border-radius: $radius-block-ui;
 			border-top: 4px solid $gray-400;
+			bottom: auto;
+			box-shadow: none;
 		}
 	}
 
@@ -161,15 +160,6 @@
 	padding: 0;
 }
 
-.is-content-locked {
-	.block-editor-block-list__block {
-		pointer-events: none;
-	}
-	.is-content-block {
-		pointer-events: initial;
-	}
-}
-
 .block-editor-block-list__layout .block-editor-block-list__block {
 	// With `position: static`, Safari marks a full-width selection rectangle, including margins.
 	// With `position: relative`, Safari marks an inline selection rectangle, similar to that of
@@ -178,11 +168,16 @@
 	// We choose relative, as that matches the multi-selection, which is limited to the block footprint.
 	position: relative;
 
-	// Re-enable text-selection on editable blocks.
-	user-select: text;
-
 	// Break long strings of text without spaces so they don't overflow the block.
 	overflow-wrap: break-word;
+
+	pointer-events: auto;
+	user-select: text;
+
+	&.is-editing-disabled {
+		pointer-events: none;
+		user-select: none;
+	}
 
 	.reusable-block-edit-panel * {
 		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");
@@ -431,7 +426,6 @@
 }
 
 .block-editor-iframe__body {
-	background-color: $white;
 	transition: all 0.3s;
 	transform-origin: top center;
 }

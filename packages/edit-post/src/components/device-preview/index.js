@@ -18,9 +18,9 @@ export default function DevicePreview() {
 	const {
 		hasActiveMetaboxes,
 		isPostSaveable,
-		isSaving,
 		isViewable,
 		deviceType,
+		showIconLabels,
 	} = useSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( editorStore );
 		const { getPostType } = select( coreStore );
@@ -28,11 +28,12 @@ export default function DevicePreview() {
 
 		return {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			isSaving: select( editPostStore ).isSavingMetaBoxes(),
 			isPostSaveable: select( editorStore ).isEditedPostSaveable(),
 			isViewable: postType?.viewable ?? false,
 			deviceType:
 				select( editPostStore ).__experimentalGetPreviewDeviceType(),
+			showIconLabels:
+				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
 		};
 	}, [] );
 	const { __experimentalSetPreviewDeviceType: setPreviewDeviceType } =
@@ -44,29 +45,29 @@ export default function DevicePreview() {
 			className="edit-post-post-preview-dropdown"
 			deviceType={ deviceType }
 			setDeviceType={ setPreviewDeviceType }
-			/* translators: button label text should, if possible, be under 16 characters. */
-			viewLabel={ __( 'Preview' ) }
+			label={ __( 'Preview' ) }
+			showIconLabels={ showIconLabels }
 		>
-			{ isViewable && (
-				<MenuGroup>
-					<div className="edit-post-header-preview__grouping-external">
-						<PostPreviewButton
-							className={
-								'edit-post-header-preview__button-external'
-							}
-							role="menuitem"
-							forceIsAutosaveable={ hasActiveMetaboxes }
-							forcePreviewLink={ isSaving ? null : undefined }
-							textContent={
-								<>
-									{ __( 'Preview in new tab' ) }
-									<Icon icon={ external } />
-								</>
-							}
-						/>
-					</div>
-				</MenuGroup>
-			) }
+			{ ( { onClose } ) =>
+				isViewable && (
+					<MenuGroup>
+						<div className="edit-post-header-preview__grouping-external">
+							<PostPreviewButton
+								className="edit-post-header-preview__button-external"
+								role="menuitem"
+								forceIsAutosaveable={ hasActiveMetaboxes }
+								textContent={
+									<>
+										{ __( 'Preview in new tab' ) }
+										<Icon icon={ external } />
+									</>
+								}
+								onPreview={ onClose }
+							/>
+						</div>
+					</MenuGroup>
+				)
+			}
 		</PreviewOptions>
 	);
 }

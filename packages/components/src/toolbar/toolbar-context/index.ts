@@ -1,14 +1,15 @@
 /**
  * External dependencies
  */
-import type { ToolbarStateReturn } from 'reakit/Toolbar';
+// eslint-disable-next-line no-restricted-imports
+import type * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
  */
 import { createContext } from '@wordpress/element';
 
-const ToolbarContext = createContext< ToolbarStateReturn | undefined >(
+const ToolbarContext = createContext< Ariakit.ToolbarStore | undefined >(
 	undefined
 );
 

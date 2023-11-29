@@ -3,6 +3,7 @@
  */
 import { __unstableGetInnerBlocksProps as getInnerBlocksProps } from '@wordpress/blocks';
 import { useRef } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -17,11 +18,13 @@ import useBlockContext from './use-block-context';
  * Internal dependencies
  */
 import BlockList from '../block-list';
-import BlockListCompact from '../block-list/block-list-compact';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
 import { defaultLayout, LayoutProvider } from '../block-list/layout';
+import { store as blockEditorStore } from '../../store';
+import WarningMaxDepthExceeded from './warning-max-depth-exceeded';
+import { MAX_NESTING_DEPTH } from './constants';
 
 /**
  * This hook is used to lightly mark an element as an inner blocks wrapper
@@ -73,9 +76,15 @@ function UncontrolledInnerBlocks( props ) {
 	const {
 		clientId,
 		allowedBlocks,
+		prioritizedInserterBlocks,
+		defaultBlock,
+		directInsert,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
 		template,
 		templateLock,
 		templateInsertUpdatesSelection,
+		__experimentalCaptureToolbars: captureToolbars,
 		orientation,
 		renderAppender,
 		renderFooterAppender,
@@ -90,14 +99,25 @@ function UncontrolledInnerBlocks( props ) {
 		horizontalAlignment,
 		filterInnerBlocks,
 		blockWidth,
-		__experimentalLayout: layout = defaultLayout,
+		layout = defaultLayout,
 		gridProperties,
-		useCompactList,
 	} = props;
 
 	const context = useBlockContext( clientId );
 
-	useNestedSettingsUpdate( clientId, allowedBlocks, templateLock );
+	useNestedSettingsUpdate(
+		clientId,
+		allowedBlocks,
+		prioritizedInserterBlocks,
+		defaultBlock,
+		directInsert,
+		__experimentalDefaultBlock,
+		__experimentalDirectInsert,
+		templateLock,
+		captureToolbars,
+		orientation,
+		layout
+	);
 
 	useInnerBlockTemplateSync(
 		clientId,
@@ -106,12 +126,21 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
-	const BlockListComponent = useCompactList ? BlockListCompact : BlockList;
+	const nestingLevel = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).getBlockParents( clientId )
+				?.length;
+		},
+		[ clientId ]
+	);
+	if ( nestingLevel >= MAX_NESTING_DEPTH ) {
+		return <WarningMaxDepthExceeded clientId={ clientId } />;
+	}
 
 	return (
 		<LayoutProvider value={ layout }>
 			<BlockContextProvider value={ context }>
-				<BlockListComponent
+				<BlockList
 					marginVertical={ marginVertical }
 					marginHorizontal={ marginHorizontal }
 					rootClientId={ clientId }

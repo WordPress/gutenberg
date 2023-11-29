@@ -126,6 +126,20 @@ _Returns_
 
 -   `any`: The current theme.
 
+### getCurrentThemeGlobalStylesRevisions
+
+> **Deprecated** since WordPress 6.5.0. Callers should use `select( 'core' ).getRevisions( 'root', 'globalStyles', ${ recordKey } )` instead, where `recordKey` is the id of the global styles parent post.
+
+Returns the revisions of the current global styles theme.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Array< object > | null`: The current global styles.
+
 ### getCurrentUser
 
 Returns the current user.
@@ -137,6 +151,19 @@ _Parameters_
 _Returns_
 
 -   `undefined< 'edit' >`: Current user object.
+
+### getDefaultTemplateId
+
+Returns the default template use to render a given query.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _query_ `TemplateQuery`: Query.
+
+_Returns_
+
+-   `string`: The default template id for the given query.
 
 ### getEditedEntityRecord
 
@@ -287,6 +314,36 @@ _Returns_
 
 -   `EntityRecord[] | null`: Records.
 
+### getEntityRecordsTotalItems
+
+Returns the Entity's total available records for a given query (ignoring pagination).
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+
+_Returns_
+
+-   `number | null`: number | null.
+
+### getEntityRecordsTotalPages
+
+Returns the number of available pages for the given query.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+
+_Returns_
+
+-   `number | null`: number | null.
+
 ### getLastEntityDeleteError
 
 Returns the specified entity record's last delete error.
@@ -317,18 +374,6 @@ _Returns_
 
 -   `any`: The entity record's save error.
 
-### getNavigationFallbackId
-
-Retrieve the fallback Navigation.
-
-_Parameters_
-
--   _state_ `State`: Data state.
-
-_Returns_
-
--   `EntityRecordKey | undefined`: The ID for the fallback Navigation post.
-
 ### getRawEntityRecord
 
 Returns the entity's record object by key, with its attributes mapped to their raw values.
@@ -345,6 +390,8 @@ _Returns_
 -   `EntityRecord | undefined`: Object with the entity's raw attributes.
 
 ### getRedoEdit
+
+> **Deprecated** since 6.3
 
 Returns the next edit from the current undo offset for the entity records edits history, if any.
 
@@ -369,11 +416,44 @@ _Usage_
 
 _Parameters_
 
--   _state_ `State`: Editor state.
+-   _state_ Editor state.
 
 _Returns_
 
 -   A value whose reference will change only when an edit occurs.
+
+### getRevision
+
+Returns a single, specific revision of a parent entity.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
+-   _revisionKey_ `EntityRecordKey`: The revision's key.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [entity kind]".
+
+_Returns_
+
+-   `RevisionRecord | Record< PropertyKey, never > | undefined`: Record.
+
+### getRevisions
+
+Returns an entity's revisions.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+
+_Returns_
+
+-   `RevisionRecord[] | null`: Record.
 
 ### getThemeSupports
 
@@ -389,6 +469,8 @@ _Returns_
 
 ### getUndoEdit
 
+> **Deprecated** since 6.3
+
 Returns the previous edit from the current undo offset for the entity records edits history, if any.
 
 _Parameters_
@@ -398,6 +480,18 @@ _Parameters_
 _Returns_
 
 -   `Optional< any >`: The edit.
+
+### getUserPatternCategories
+
+Retrieve the registered user pattern categories.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Array< UserPatternCategory >`: User patterns category array.
 
 ### getUserQueryResults
 
@@ -602,6 +696,19 @@ _Returns_
 
 -   `Object`: Action object.
 
+### receiveDefaultTemplateId
+
+Returns an action object used to set the template for a given query.
+
+_Parameters_
+
+-   _query_ `Object`: The lookup query.
+-   _templateId_ `string`: The resolved template id.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### receiveEntityRecords
 
 Returns an action object used in signalling that entity records have been received.
@@ -614,6 +721,7 @@ _Parameters_
 -   _query_ `?Object`: Query Object.
 -   _invalidateCache_ `?boolean`: Should invalidate query caches.
 -   _edits_ `?Object`: Edits to reset.
+-   _meta_ `?Object`: Meta information about pagination.
 
 _Returns_
 
@@ -630,6 +738,20 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
+
+### receiveRevisions
+
+Action triggered to receive revision items.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the received entity record revisions.
+-   _name_ `string`: Name of the received entity record revisions.
+-   _recordKey_ `number|string`: The key of the entity record whose revisions you want to fetch.
+-   _records_ `Array|Object`: Revisions received.
+-   _query_ `?Object`: Query Object.
+-   _invalidateCache_ `?boolean`: Should invalidate query caches.
+-   _meta_ `?Object`: Meta information about pagination.
 
 ### receiveThemeSupports
 

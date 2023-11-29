@@ -20,7 +20,9 @@ test.describe( 'Test Custom Post Types', () => {
 		page,
 	} ) => {
 		await admin.createNewPost( { postType: 'hierar-no-title' } );
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'Parent Post' );
 		await editor.publishPost();
 
@@ -35,17 +37,27 @@ test.describe( 'Test Custom Post Types', () => {
 			.click();
 
 		// Open the Document -> Page Attributes panel.
-		await page.getByRole( 'button', { name: 'Page Attributes' } ).click();
+		const pageAttributes = page.getByRole( 'button', {
+			name: 'Page Attributes',
+		} );
+		const isClosed =
+			( await pageAttributes.getAttribute( 'aria-expanded' ) ) ===
+			'false';
+		if ( isClosed ) {
+			await pageAttributes.click();
+		}
 
 		const parentPageLocator = page.getByRole( 'combobox', {
-			name: 'Parent Page',
+			name: 'Parent',
 		} );
 
 		await parentPageLocator.click();
 		await page.getByRole( 'listbox' ).getByRole( 'option' ).first().click();
 		const parentPage = await parentPageLocator.inputValue();
 
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'Child Post' );
 		await editor.publishPost();
 		await page.reload();
@@ -60,7 +72,9 @@ test.describe( 'Test Custom Post Types', () => {
 		page,
 	} ) => {
 		await admin.createNewPost( { postType: 'leg_block_in_tpl' } );
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'Hello there' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [

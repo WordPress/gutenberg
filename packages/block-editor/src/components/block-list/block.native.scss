@@ -3,29 +3,11 @@
 }
 
 .solidBorderColor {
-	border-color: $blue-wordpress;
+	border-color: $blue-40;
 }
 
 .solidBorderColorDark {
-	border-color: $blue-30;
-}
-
-.dashedBorderColor {
-	border-color: $gray;
-}
-
-.dashedBorderColorDark {
-	border-color: $gray-70;
-}
-
-.borderFullWidth {
-	left: 0;
-	right: 0;
-}
-
-.containerBorderFullWidth {
-	left: -$solid-border-space * 0.5;
-	right: -$solid-border-space * 0.5;
+	border-color: $blue-50;
 }
 
 .dimmed {
@@ -51,32 +33,28 @@
 	min-height: 50px;
 }
 
-.neutralToolbar {
-	margin-left: -$block-edge-to-content;
-	margin-right: -$block-edge-to-content;
-}
-
 .solidBorder {
 	position: absolute;
-	top: -$solid-border-space;
-	bottom: 0;
-	left: -$solid-border-space;
-	right: -$solid-border-space;
-	border-width: $block-selected-border-width;
-	border-radius: 4px;
+	top: -6px;
+	bottom: -6px;
+	left: -6px;
+	right: -6px;
+	border-width: 2px;
+	border-radius: 2px;
 	border-style: solid;
 	z-index: 1;
 }
 
-.dashedBorder {
-	position: absolute;
-	top: -$dashed-border-space;
-	bottom: -$dashed-border-space;
-	left: -$dashed-border-space;
-	right: -$dashed-border-space;
-	border-width: $block-selected-border-width;
-	border-radius: 2px;
-	border-style: dashed;
+.solidBorderCompact {
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.solidBorderTextContent {
+	left: 0;
+	right: 0;
 }
 
 .fullWidthPadding {

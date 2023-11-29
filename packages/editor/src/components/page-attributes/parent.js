@@ -43,7 +43,7 @@ export const getItemPriority = ( name, searchValue ) => {
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( editorStore );
 	const [ fieldValue, setFieldValue ] = useState( false );
-	const { isHierarchical, parentPost, parentPostId, items, postType } =
+	const { isHierarchical, parentPostId, parentPostTitle, pageItems } =
 		useSelect(
 			( select ) => {
 				const { getPostType, getEntityRecords, getEntityRecord } =
@@ -69,23 +69,21 @@ export function PageAttributesParent() {
 					query.search = fieldValue;
 				}
 
+				const parentPost = pageId
+					? getEntityRecord( 'postType', postTypeSlug, pageId )
+					: null;
+
 				return {
 					isHierarchical: postIsHierarchical,
 					parentPostId: pageId,
-					parentPost: pageId
-						? getEntityRecord( 'postType', postTypeSlug, pageId )
-						: null,
-					items: postIsHierarchical
+					parentPostTitle: parentPost ? getTitle( parentPost ) : '',
+					pageItems: postIsHierarchical
 						? getEntityRecords( 'postType', postTypeSlug, query )
-						: [],
-					postType: pType,
+						: null,
 				};
 			},
 			[ fieldValue ]
 		);
-
-	const parentPageLabel = postType?.labels?.parent_item_colon;
-	const pageItems = items || [];
 
 	const parentOptions = useMemo( () => {
 		const getOptionsFromTree = ( tree, level = 0 ) => {
@@ -108,6 +106,10 @@ export function PageAttributesParent() {
 			return sortedNodes.flat();
 		};
 
+		if ( ! pageItems ) {
+			return [];
+		}
+
 		let tree = pageItems.map( ( item ) => ( {
 			id: item.id,
 			parent: item.parent,
@@ -125,16 +127,16 @@ export function PageAttributesParent() {
 		const optsHasParent = opts.find(
 			( item ) => item.value === parentPostId
 		);
-		if ( parentPost && ! optsHasParent ) {
+		if ( parentPostTitle && ! optsHasParent ) {
 			opts.unshift( {
 				value: parentPostId,
-				label: getTitle( parentPost ),
+				label: parentPostTitle,
 			} );
 		}
 		return opts;
-	}, [ pageItems, fieldValue ] );
+	}, [ pageItems, fieldValue, parentPostTitle, parentPostId ] );
 
-	if ( ! isHierarchical || ! parentPageLabel ) {
+	if ( ! isHierarchical ) {
 		return null;
 	}
 	/**
@@ -158,8 +160,9 @@ export function PageAttributesParent() {
 	return (
 		<ComboboxControl
 			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			className="editor-page-attributes__parent"
-			label={ parentPageLabel }
+			label={ __( 'Parent' ) }
 			value={ parentPostId }
 			options={ parentOptions }
 			onFilterValueChange={ debounce( handleKeydown, 300 ) }

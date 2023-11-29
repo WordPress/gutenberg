@@ -22,7 +22,7 @@ import {
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 
 /**
@@ -54,13 +54,15 @@ function useMultiOriginColorPresets(
 }
 
 export function useHasFiltersPanel( settings ) {
-	const hasDuotone = useHasDuotoneControl( settings );
-
-	return hasDuotone;
+	return useHasDuotoneControl( settings );
 }
 
 function useHasDuotoneControl( settings ) {
-	return settings.color.customDuotone || settings.color.defaultDuotone;
+	return (
+		settings.color.customDuotone ||
+		settings.color.defaultDuotone ||
+		settings.color.duotone.length > 0
+	);
 }
 
 function FiltersToolsPanel( {
@@ -77,7 +79,7 @@ function FiltersToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ __( 'Filters' ) }
+			label={ _x( 'Filters', 'Name for applying graphical effects' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 		>
@@ -148,11 +150,6 @@ export default function FiltersPanel( {
 	const hasDuotone = () => !! value?.filter?.duotone;
 	const resetDuotone = () => setDuotone( undefined );
 
-	const disableCustomColors = ! settings?.color?.custom;
-	const disableCustomDuotone =
-		! settings?.color?.customDuotone ||
-		( colorPalette?.length === 0 && disableCustomColors );
-
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
@@ -210,12 +207,9 @@ export default function FiltersPanel( {
 									<DuotonePicker
 										colorPalette={ colorPalette }
 										duotonePalette={ duotonePalette }
-										disableCustomColors={
-											disableCustomColors
-										}
-										disableCustomDuotone={
-											disableCustomDuotone
-										}
+										// TODO: Re-enable both when custom colors are supported for block-level styles.
+										disableCustomColors
+										disableCustomDuotone
 										value={ duotone }
 										onChange={ setDuotone }
 									/>

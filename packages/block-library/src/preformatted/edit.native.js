@@ -28,12 +28,10 @@ export default function PreformattedEdit( props ) {
 		...( style?.fontSize && { fontSize: style.fontSize } ),
 		...( style?.color && { color: style.color } ),
 	};
-	const hasBaseColors =
-		style?.baseColors && Object.entries( style.baseColors ).length !== 0;
 	const containerStyles = [
 		wpBlockPreformatted,
 		style?.backgroundColor && { backgroundColor: style.backgroundColor },
-		hasBaseColors &&
+		style?.baseColors?.color &&
 			! style?.backgroundColor &&
 			styles[ 'wp-block-preformatted__no-background' ],
 	];

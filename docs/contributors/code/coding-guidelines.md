@@ -162,7 +162,7 @@ do so by opting-in to `@wordpress/private-apis`:
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
+		'I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.',
 		'@wordpress/block-editor' // Name of the package calling __dangerousOptInToUnstableAPIsOnlyForCoreModules,
 		// (not the name of the package whose APIs you want to access)
 	);
@@ -207,43 +207,45 @@ You can attach private selectors and actions to a public store:
 
 ```js
 // In packages/package1/store.js:
-import { privateHasContentRoleAttribute, ...selectors } from './selectors';
-import { privateToggleFeature, ...actions } from './selectors';
+import { privateHasContentRoleAttribute } from './private-selectors';
+import { privateToggleFeature } from './private-actions';
 // The `lock` function is exported from the internal private-apis.js file where
 // the opt-in function was called.
-import { lock, unlock } from './private-apis';
+import { lock, unlock } from './lock-unlock';
 
-export const store = registerStore(/* ... */);
+export const store = registerStore( /* ... */ );
 // Attach a private action to the exported store:
-unlock( store ).registerPrivateActions({
-	privateToggleFeature
+unlock( store ).registerPrivateActions( {
+	privateToggleFeature,
 } );
 
 // Attach a private action to the exported store:
-unlock( store ).registerPrivateSelectors({
-	privateHasContentRoleAttribute
+unlock( store ).registerPrivateSelectors( {
+	privateHasContentRoleAttribute,
 } );
+```
 
-
+```js
 // In packages/package2/MyComponent.js:
 import { store } from '@wordpress/package1';
 import { useSelect } from '@wordpress/data';
 // The `unlock` function is exported from the internal private-apis.js file where
 // the opt-in function was called.
-import { unlock } from './private-apis';
+import { unlock } from './lock-unlock';
 
 function MyComponent() {
-    const hasRole = useSelect( ( select ) => (
-		// Use the private selector:
-        unlock( select( store ) ).privateHasContentRoleAttribute()
+	const hasRole = useSelect(
+		( select ) =>
+			// Use the private selector:
+			unlock( select( store ) ).privateHasContentRoleAttribute()
 		// Note the unlock() is required. This line wouldn't work:
-        // select( store ).privateHasContentRoleAttribute()
-    ) );
+		// select( store ).privateHasContentRoleAttribute()
+	);
 
 	// Use the private action:
 	unlock( useDispatch( store ) ).privateToggleFeature();
 
-    // ...
+	// ...
 }
 ```
 
@@ -251,7 +253,7 @@ function MyComponent() {
 
 ```js
 // In packages/package1/index.js:
-import { lock } from './private-apis';
+import { lock } from './lock-unlock';
 
 export const privateApis = {};
 /* Attach private data to the exported object */
@@ -263,10 +265,12 @@ lock( privateApis, {
 	privateClass: class PrivateClass {},
 	privateVariable: 5,
 } );
+```
 
+```js
 // In packages/package2/index.js:
 import { privateApis } from '@wordpress/package1';
-import { unlock } from './private-apis';
+import { unlock } from './lock-unlock';
 
 const {
 	privateCallback,
@@ -314,7 +318,7 @@ inside it:
 
 ```js
 // In @wordpress/package1/index.js:
-import { lock } from './private-apis';
+import { lock } from './lock-unlock';
 
 // A private function contains all the logic
 function privateValidateBlocks( formula, privateIsStrict ) {
@@ -336,10 +340,12 @@ export function validateBlocks( blocks ) {
 
 export const privateApis = {};
 lock( privateApis, { privateValidateBlocks } );
+```
 
+```js
 // In @wordpress/package2/index.js:
 import { privateApis as package1PrivateApis } from '@wordpress/package1';
-import { unlock } from './private-apis';
+import { unlock } from './lock-unlock';
 
 // The private function may be "unlocked" given the stable function:
 const { privateValidateBlocks } = unlock( package1PrivateApis );
@@ -355,7 +361,7 @@ inside it:
 
 ```js
 // In @wordpress/package1/index.js:
-import { lock } from './private-apis';
+import { lock } from './lock-unlock';
 
 // The private component contains all the logic
 const PrivateMyButton = ( { title, privateShowIcon = true } ) => {
@@ -363,30 +369,30 @@ const PrivateMyButton = ( { title, privateShowIcon = true } ) => {
 
 	return (
 		<button>
-			{ privateShowIcon  && <Icon src={some icon} /> } { title }
+			{ privateShowIcon && <Icon src={ someIcon } /> } { title }
 		</button>
 	);
-}
+};
 
 // The stable public component is a thin wrapper that calls the
 // private component with the private features disabled
-export const MyButton = ( { title } ) =>
-    <PrivateMyButton title={ title } privateShowIcon={ false } />
+export const MyButton = ( { title } ) => (
+	<PrivateMyButton title={ title } privateShowIcon={ false } />
+);
 
 export const privateApis = {};
 lock( privateApis, { PrivateMyButton } );
+```
 
-
+```js
 // In @wordpress/package2/index.js:
 import { privateApis } from '@wordpress/package1';
-import { unlock } from './private-apis';
+import { unlock } from './lock-unlock';
 
 // The private component may be "unlocked" given the stable component:
-const { PrivateMyButton } = unlock(privateApis);
+const { PrivateMyButton } = unlock( privateApis );
 export function MyComponent() {
-	return (
-		<PrivateMyButton data={data} privateShowIcon={ true } />
-	)
+	return <PrivateMyButton data={ data } privateShowIcon={ true } />;
 }
 ```
 
@@ -438,13 +444,14 @@ function privateInCorePublicInPlugin() {}
 
 // Gutenberg treats both functions as private APIs internally:
 const privateApis = {};
-lock(privateApis, { privateEverywhere, privateInCorePublicInPlugin });
+lock( privateApis, { privateEverywhere, privateInCorePublicInPlugin } );
 
 // The privateInCorePublicInPlugin function is explicitly exported,
 // but this export will not be merged into WordPress core thanks to
 // the process.env.IS_GUTENBERG_PLUGIN check.
 if ( process.env.IS_GUTENBERG_PLUGIN ) {
-   export const privateInCorePublicInPlugin = unlock( privateApis ).privateInCorePublicInPlugin;
+	export const privateInCorePublicInPlugin =
+		unlock( privateApis ).privateInCorePublicInPlugin;
 }
 ```
 
@@ -459,7 +466,7 @@ const a = 10;
 // Bad:
 const object = {
 	a: a,
-	performAction: function() {
+	performAction: function () {
 		// ...
 	},
 };
@@ -522,7 +529,7 @@ alert( `My name is ${ name }.` );
     -   Example: `document.body.classList.toggle( 'has-focus', nodeRef.current?.contains( document.activeElement ) );` may wrongly _add_ the class, since [the second argument is optional](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle). If `undefined` is passed, it would not unset the class as it would when `false` is passed.
     -   Example: `<input value={ state.selected?.value.trim() } />` may inadvertently cause warnings in React by toggling between [controlled and uncontrolled inputs](https://reactjs.org/docs/uncontrolled-components.html). This is an easy trap to fall into when eagerly assuming that a result of `trim()` will always return a string value, overlooking the fact the optional chaining may have caused evaluation to abort earlier with a value of `undefined`.
 
-### `@wordpress/element` (React) Components
+### React Components
 
 It is preferred to implement all components as [function components](https://reactjs.org/docs/components-and-props.html), using [hooks](https://reactjs.org/docs/hooks-reference.html) to manage component state and lifecycle. With the exception of [error boundaries](https://reactjs.org/docs/error-boundaries.html), you should never encounter a situation where you must use a class component. Note that the [WordPress guidance on Code Refactoring](https://make.wordpress.org/core/handbook/contribute/code-refactoring/) applies here: There needn't be a concentrated effort to update class components in bulk. Instead, consider it as a good refactoring opportunity in combination with some other change.
 
@@ -749,7 +756,7 @@ When documenting an example, use the markdown <code>\`\`\`</code> code block to 
  */
 ````
 
-### Documenting `@wordpress/element` (React) Components
+### Documenting React Components
 
 When possible, all components should be implemented as [function components](https://reactjs.org/docs/components-and-props.html#function-and-class-components), using [hooks](https://reactjs.org/docs/hooks-intro.html) for managing component lifecycle and state.
 
@@ -773,7 +780,7 @@ Documenting a function component should be treated the same as any other functio
  */
 ````
 
-For class components, there is no recommendation for documenting the props of the component. Gutenberg does not use or endorse the [`propTypes` static class member](https://reactjs.org/docs/typechecking-with-proptypes.html).
+For class components, there is no recommendation for documenting the props of the component. Gutenberg does not use or endorse the [`propTypes` static class member](https://react.dev/reference/react/Component#static-proptypes).
 
 ## PHP
 

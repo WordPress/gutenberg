@@ -11,12 +11,14 @@ import {
 	__experimentalHStack as HStack,
 	FlexBlock,
 } from '@wordpress/components';
-import { chevronRightSmall, Icon } from '@wordpress/icons';
+import { isRTL } from '@wordpress/i18n';
+import { chevronRightSmall, chevronLeftSmall, Icon } from '@wordpress/icons';
 
 export default function SidebarNavigationItem( {
 	className,
 	icon,
 	withChevron = false,
+	suffix,
 	children,
 	...props
 } ) {
@@ -24,6 +26,7 @@ export default function SidebarNavigationItem( {
 		<Item
 			className={ classnames(
 				'edit-site-sidebar-navigation-item',
+				{ 'with-suffix': ! withChevron && suffix },
 				className
 			) }
 			{ ...props }
@@ -39,11 +42,12 @@ export default function SidebarNavigationItem( {
 				<FlexBlock>{ children }</FlexBlock>
 				{ withChevron && (
 					<Icon
-						icon={ chevronRightSmall }
+						icon={ isRTL() ? chevronLeftSmall : chevronRightSmall }
 						className="edit-site-sidebar-navigation-item__drilldown-indicator"
 						size={ 24 }
 					/>
 				) }
+				{ ! withChevron && suffix }
 			</HStack>
 		</Item>
 	);

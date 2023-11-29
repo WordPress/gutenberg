@@ -2,6 +2,40 @@
 
 ## Unreleased
 
+## 10.17.0 (2023-11-16)
+
+## 10.16.0 (2023-11-02)
+
+## 10.15.0 (2023-10-18)
+
+## 10.14.0 (2023-10-05)
+
+## 10.13.0 (2023-09-20)
+
+### Enhancement
+
+-    Update promise order in `loginUser` to avoid any flakiness in the tests.
+-    Update `activateTheme` to redirect to `themes.php` after theme activation, if theme redirects to some other page.
+-    Update `activatePlugin` to redirect to `plugins.php` after plugin activation, if plugin redirects to some other page.
+
+## 10.12.0 (2023-08-31)
+
+## 10.11.0 (2023-08-16)
+
+## 10.10.0 (2023-08-10)
+
+## 10.9.0 (2023-07-20)
+
+## 10.8.0 (2023-07-05)
+
+## 10.7.0 (2023-06-23)
+
+## 10.6.0 (2023-06-07)
+
+## 10.5.0 (2023-05-24)
+
+## 10.4.0 (2023-05-10)
+
 ## 10.3.0 (2023-04-26)
 
 ## 10.2.0 (2023-04-12)

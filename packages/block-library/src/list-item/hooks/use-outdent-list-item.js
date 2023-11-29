@@ -6,11 +6,6 @@ import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { cloneBlock } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { name as listItemName } from '../block.json';
-
 export default function useOutdentListItem( clientId ) {
 	const registry = useRegistry();
 	const { canOutdent } = useSelect(
@@ -21,7 +16,7 @@ export default function useOutdentListItem( clientId ) {
 				getBlockRootClientId( clientId )
 			);
 			const grandParentName = getBlockName( grandParentId );
-			const isListItem = grandParentName === listItemName;
+			const isListItem = grandParentName === 'core/list-item';
 
 			return {
 				canOutdent: isListItem,
@@ -49,7 +44,7 @@ export default function useOutdentListItem( clientId ) {
 		const listId = getBlockRootClientId( id );
 		const parentListItemId = getBlockRootClientId( listId );
 		if ( ! parentListItemId ) return;
-		if ( getBlockName( parentListItemId ) !== listItemName ) return;
+		if ( getBlockName( parentListItemId ) !== 'core/list-item' ) return;
 		return parentListItemId;
 	}
 
@@ -65,7 +60,7 @@ export default function useOutdentListItem( clientId ) {
 			const firstClientId = clientIds[ 0 ];
 
 			// Can't outdent if it's not a list item.
-			if ( getBlockName( firstClientId ) !== listItemName ) return;
+			if ( getBlockName( firstClientId ) !== 'core/list-item' ) return;
 
 			const parentListItemId = getParentListItemId( firstClientId );
 

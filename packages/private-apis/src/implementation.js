@@ -10,18 +10,22 @@
  * The list of core modules allowed to opt-in to the private APIs.
  */
 const CORE_MODULES_USING_PRIVATE_APIS = [
+	'@wordpress/block-directory',
 	'@wordpress/block-editor',
 	'@wordpress/block-library',
 	'@wordpress/blocks',
 	'@wordpress/commands',
 	'@wordpress/components',
 	'@wordpress/core-commands',
+	'@wordpress/core-data',
 	'@wordpress/customize-widgets',
 	'@wordpress/data',
 	'@wordpress/edit-post',
 	'@wordpress/edit-site',
 	'@wordpress/edit-widgets',
 	'@wordpress/editor',
+	'@wordpress/patterns',
+	'@wordpress/reusable-blocks',
 	'@wordpress/router',
 ];
 
@@ -48,7 +52,7 @@ const registeredPrivateApis = [];
  * CHANGE MAY OCCUR IN EITHER A MAJOR OR MINOR RELEASE.
  */
 const requiredConsent =
-	'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.';
+	'I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.';
 
 /** @type {boolean} */
 let allowReRegistration;

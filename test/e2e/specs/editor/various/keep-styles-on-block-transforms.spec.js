@@ -12,11 +12,13 @@ test.describe( 'Keep styles on block transforms', () => {
 		page,
 		editor,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
-		await page.keyboard.type( '## Heading' );
 		await editor.openDocumentSettingsSidebar();
-		await page.click( 'role=button[name="Text"i]' );
-		await page.click( 'role=button[name="Color: Luminous vivid orange"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '## Heading' );
+		await page.click( 'role=button[name="Color Text styles"i]' );
+		await page.click( 'role=option[name="Color: Luminous vivid orange"i]' );
 
 		await page.click( 'role=button[name="Heading"i]' );
 		await page.click( 'role=menuitem[name="Paragraph"i]' );
@@ -37,8 +39,10 @@ test.describe( 'Keep styles on block transforms', () => {
 		pageUtils,
 		editor,
 	} ) => {
-		// Create a paragraph block with some content.
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.openDocumentSettingsSidebar();
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'Line 1 to be made large' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Line 2 to be made large' );
@@ -47,7 +51,7 @@ test.describe( 'Keep styles on block transforms', () => {
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await page.click( 'role=radio[name="Large"i]' );
-		await page.click( 'role=button[name="Paragraph"i]' );
+		await page.click( 'role=button[name="Multiple blocks selected"i]' );
 		await page.click( 'role=menuitem[name="Heading"i]' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -70,8 +74,10 @@ test.describe( 'Keep styles on block transforms', () => {
 		page,
 		editor,
 	} ) => {
-		// Create a paragraph block with some content.
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.openDocumentSettingsSidebar();
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'Line 1 to be made large' );
 		await page.click( 'role=radio[name="Large"i]' );
 		await editor.showBlockToolbar();

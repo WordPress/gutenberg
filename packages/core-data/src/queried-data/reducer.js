@@ -56,10 +56,10 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 
 	for ( let i = 0; i < size; i++ ) {
 		// Preserve existing item ID except for subset of range of next items.
+		// We need to check against the possible maximum upper boundary because
+		// a page could receive fewer than what was previously stored.
 		const isInNextItemsRange =
-			i >= nextItemIdsStartIndex &&
-			i < nextItemIdsStartIndex + nextItemIds.length;
-
+			i >= nextItemIdsStartIndex && i < nextItemIdsStartIndex + perPage;
 		mergedItemIds[ i ] = isInNextItemsRange
 			? nextItemIds[ i - nextItemIdsStartIndex ]
 			: itemIds?.[ i ];
@@ -222,19 +222,22 @@ const receiveQueries = compose( [
 	// Queries shape is shared, but keyed by query `stableKey` part. Original
 	// reducer tracks only a single query object.
 	onSubKey( 'stableKey' ),
-] )( ( state = null, action ) => {
+] )( ( state = {}, action ) => {
 	const { type, page, perPage, key = DEFAULT_ENTITY_KEY } = action;
 
 	if ( type !== 'RECEIVE_ITEMS' ) {
 		return state;
 	}
 
-	return getMergedItemIds(
-		state || [],
-		action.items.map( ( item ) => item[ key ] ),
-		page,
-		perPage
-	);
+	return {
+		itemIds: getMergedItemIds(
+			state?.itemIds || [],
+			action.items.map( ( item ) => item[ key ] ),
+			page,
+			perPage
+		),
+		meta: action.meta,
+	};
 } );
 
 /**
@@ -263,9 +266,13 @@ const queries = ( state = {}, action ) => {
 							Object.entries( contextQueries ).map(
 								( [ query, queryItems ] ) => [
 									query,
-									queryItems.filter(
-										( queryId ) => ! removedItems[ queryId ]
-									),
+									{
+										...queryItems,
+										itemIds: queryItems.itemIds.filter(
+											( queryId ) =>
+												! removedItems[ queryId ]
+										),
+									},
 								]
 							)
 						),

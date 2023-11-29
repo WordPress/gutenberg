@@ -20,7 +20,11 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 	test( 'navigating through the Editor regions four times should land on the Editor top bar region', async ( {
 		page,
 		pageUtils,
+		editor,
 	} ) => {
+		// To do: run with iframe.
+		await editor.switchToLegacyCanvas();
+
 		// On a new post, initial focus is set on the Post title.
 		await expect(
 			page.locator( 'role=textbox[name=/Add title/i]' )
@@ -46,7 +50,11 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 	test( 'should constrain tabbing within a modal', async ( {
 		page,
 		pageUtils,
+		editor,
 	} ) => {
+		// To do: run with iframe.
+		await editor.switchToLegacyCanvas();
+
 		// Open keyboard shortcuts modal.
 		await pageUtils.pressKeys( 'access+h' );
 

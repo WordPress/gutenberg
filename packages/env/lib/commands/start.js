@@ -28,10 +28,11 @@ const {
 	configureWordPress,
 	setupWordPressDirectories,
 	readWordPressVersion,
+	canAccessWPORG,
 } = require( '../wordpress' );
 const { didCacheChange, setCache } = require( '../cache' );
 const md5 = require( '../md5' );
-const { executeAfterSetup } = require( '../execute-after-setup' );
+const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
 
 /**
  * @typedef {import('../config').WPConfig} WPConfig
@@ -77,15 +78,23 @@ module.exports = async function start( {
 	const configHash = md5( config );
 	const { workDirectoryPath, dockerComposeConfigPath } = config;
 	const shouldConfigureWp =
-		update ||
-		( await didCacheChange( CONFIG_CACHE_KEY, configHash, {
-			workDirectoryPath,
-		} ) );
+		( update ||
+			( await didCacheChange( CONFIG_CACHE_KEY, configHash, {
+				workDirectoryPath,
+			} ) ) ) &&
+		// Don't reconfigure everything when we can't connect to the internet because
+		// the majority of update tasks involve connecting to the internet. (Such
+		// as downloading sources and pulling docker images.)
+		( await canAccessWPORG() );
 
 	const dockerComposeConfig = {
 		config: dockerComposeConfigPath,
 		log: config.debug,
 	};
+
+	if ( ! ( await canAccessWPORG() ) ) {
+		spinner.info( 'wp-env is offline' );
+	}
 
 	/**
 	 * If the Docker image is already running and the `wp-env` files have been
@@ -203,15 +212,14 @@ module.exports = async function start( {
 			} ),
 		] );
 
-		// Execute any configured command that should run after the environment has finished being set up.
-		if ( scripts ) {
-			executeAfterSetup( config, spinner );
-		}
-
 		// Set the cache key once everything has been configured.
 		await setCache( CONFIG_CACHE_KEY, configHash, {
 			workDirectoryPath,
 		} );
+	}
+
+	if ( scripts ) {
+		await executeLifecycleScript( 'afterStart', config, spinner );
 	}
 
 	const siteUrl = config.env.development.config.WP_SITEURL;
