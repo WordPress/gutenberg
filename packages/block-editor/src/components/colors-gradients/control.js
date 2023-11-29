@@ -61,7 +61,7 @@ function ColorGradientControlInner( {
 	}
 
 	const tabPanels = {
-		color: (
+		[ TAB_IDS.color ]: (
 			<ColorPalette
 				value={ colorValue }
 				onChange={
@@ -81,7 +81,7 @@ function ColorGradientControlInner( {
 				headingLevel={ headingLevel }
 			/>
 		),
-		gradient: (
+		[ TAB_IDS.gradient ]: (
 			<GradientPicker
 				__nextHasNoMargin
 				value={ gradientValue }
