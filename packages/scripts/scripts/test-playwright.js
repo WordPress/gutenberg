@@ -24,9 +24,10 @@ const {
 	hasProjectFile,
 	hasArgInCLI,
 	getArgsFromCLI,
+	getAsBooleanFromENV,
 } = require( '../utils' );
 
-if ( process.env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD !== '1' ) {
+if ( ! getAsBooleanFromENV( 'PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD' ) ) {
 	const result = spawn(
 		'node',
 		[
