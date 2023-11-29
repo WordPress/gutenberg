@@ -4,12 +4,17 @@
 	 */
 	const {
 		store,
+		getContext,
 		directive,
 		deepSignal,
-		useContext,
 		useEffect,
 		createElement: h
 	} = wp.interactivity;
+
+	/**
+	 * Namespace used in custom directives and store.
+	 */
+	const namespace = 'directive-priorities';
 
 	/**
 	 * Util to check that render calls happen in order.
@@ -32,10 +37,14 @@
 		'test-context',
 		( { context: { Provider }, props: { children } } ) => {
 			executionProof( 'context' );
-			const value = deepSignal( {
-				attribute: 'from context',
-				text: 'from context',
-			} );
+			const value = deepSignal(
+				{
+					[namespace]: {
+						attribute: 'from context',
+						text: 'from context',
+					}
+				}
+			);
 			return h( Provider, { value }, children );
 		},
 		{ priority: 8 }
@@ -45,12 +54,11 @@
 	 * Simple attribute directive, for testing purposes. It reads the value of
 	 * `attribute` from context and populates `data-attribute` with it.
 	 */
-	directive( 'test-attribute', ( { context, evaluate, element } ) => {
+	directive( 'test-attribute', ( { evaluate, element } ) => {
 		executionProof( 'attribute' );
-		const contextValue = useContext( context );
-		const attributeValue = evaluate( 'context.attribute', {
-			context: contextValue,
-		} );
+		const attributeValue = evaluate(
+			{ namespace, value: 'context.attribute' }
+		);
 		useEffect( () => {
 			element.ref.current.setAttribute(
 				'data-attribute',
@@ -66,12 +74,11 @@
 	 */
 	directive(
 		'test-text',
-		( { context, evaluate, element } ) => {
+		( { evaluate, element } ) => {
 			executionProof( 'text' );
-			const contextValue = useContext( context );
-			const textValue = evaluate( 'context.text', {
-				context: contextValue,
-			} );
+			const textValue = evaluate(
+				{ namespace, value: 'context.text' }
+			);
 			element.props.children =
 				h( 'p', { 'data-testid': 'text' }, textValue );
 		},
@@ -85,17 +92,13 @@
 	 */
 	directive(
 		'test-children',
-		( { context, evaluate, element } ) => {
+		( { evaluate, element } ) => {
 			executionProof( 'children' );
-			const contextValue = useContext( context );
 			const updateAttribute = () => {
-				evaluate(
-					'actions.updateAttribute',
-					{ context: contextValue }
-				);
+				evaluate( { namespace, value: 'actions.updateAttribute' } );
 			};
 			const updateText = () => {
-				evaluate( 'actions.updateText', { context: contextValue } );
+				evaluate( { namespace, value: 'actions.updateText' } );
 			};
 			element.props.children = h(
 				'div',
@@ -108,12 +111,14 @@
 		{ priority: 14 }
 	);
 
-	store( {
+	store( 'directive-priorities', {
 		actions: {
-			updateText( { context } ) {
+			updateText() {
+				const context = getContext();
 				context.text = 'updated';
 			},
-			updateAttribute( { context } ) {
+			updateAttribute() {
+				const context = getContext();
 				context.attribute = 'updated';
 			},
 		},

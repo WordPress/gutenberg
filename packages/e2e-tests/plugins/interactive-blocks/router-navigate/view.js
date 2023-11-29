@@ -4,38 +4,34 @@
 	 */
 	const { store, navigate } = wp.interactivity;
 
-	store( {
+	const { state } = store( 'router', {
 		state: {
-			router: {
-				status: 'idle',
-				navigations: 0,
-				timeout: 10000,
-			}
+			status: 'idle',
+			navigations: 0,
+			timeout: 10000,
 		},
 		actions: {
-			router: {
-				navigate: async ( { state, event: e } ) => {
-					e.preventDefault();
+			* navigate( e ) {
+				e.preventDefault();
 
-					state.router.navigations += 1;
-					state.router.status = 'busy';
+				state.navigations += 1;
+				state.status = 'busy';
 
-					const force = e.target.dataset.forceNavigation === 'true';
-					const { timeout } = state.router;
+				const force = e.target.dataset.forceNavigation === 'true';
+				const { timeout } = state;
 
-					await navigate( e.target.href, { force, timeout } );
+				yield navigate( e.target.href, { force, timeout } );
 
-					state.router.navigations -= 1;
+				state.navigations -= 1;
 
-					if ( state.router.navigations === 0) {
-						state.router.status = 'idle';
-					}
-				},
-				toggleTimeout: ( { state }) => {
-					state.router.timeout =
-						state.router.timeout === 10000 ? 0 : 10000;
+				if ( state.navigations === 0) {
+					state.status = 'idle';
 				}
 			},
+			toggleTimeout() {
+				state.timeout =
+					state.timeout === 10000 ? 0 : 10000;
+			}
 		},
 	} );
 } )( window );

@@ -6,7 +6,7 @@
  */
 
 ?>
-<div data-wp-interactive>
+<div data-wp-interactive='{ "namespace": "directive-bind" }'>
 	<a
 		data-wp-bind--href="state.url"
 		data-testid="add missing href at hydration"

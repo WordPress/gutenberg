@@ -4,17 +4,15 @@
 	 */
 	const { store } = wp.interactivity;
 
-	store( {
-		selectors: {
-			active: ( { state } ) => {
+	const { state } = store( 'negation-operator', {
+		state: {
+			active: false,
+			get isActive() {
 				return state.active;
 			},
 		},
-		state: {
-			active: false,
-		},
 		actions: {
-			toggle: ( { state } ) => {
+			toggle() {
 				state.active = ! state.active;
 			},
 		},

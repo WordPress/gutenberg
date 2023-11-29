@@ -7,7 +7,7 @@
 
 ?>
 <div
-	data-wp-interactive
+	data-wp-interactive='{ "namespace": "directive-slots" }'
 	data-wp-slot-provider
 	data-wp-context='{ "text": "fill" }'
 >

@@ -2,7 +2,10 @@
 	const { store, navigate } = wp.interactivity;
 
 	const html = `
-		<div data-wp-interactive data-wp-navigation-id="some-id">
+		<div
+			data-wp-interactive='{ "namespace": "directive-key" }'
+			data-wp-navigation-id="some-id"
+		>
 			<ul>
 				<li data-wp-key="id-1">1</li>
 				<li data-wp-key="id-2" data-testid="second-item">2</li>
@@ -10,9 +13,9 @@
 			</ul>
 		</div>`;
 
-	store( {
+	store( 'directive-key', {
 		actions: {
-			navigate: () => {
+			navigate() {
 				navigate( window.location, {
 					force: true,
 					html,

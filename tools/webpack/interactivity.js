@@ -36,6 +36,9 @@ module.exports = {
 	externals: {
 		'@wordpress/interactivity': '@wordpress/interactivity',
 	},
+	resolve: {
+		extensions: [ '.js', '.ts', '.tsx' ],
+	},
 	module: {
 		rules: [
 			{
@@ -50,6 +53,7 @@ module.exports = {
 							babelrc: false,
 							configFile: false,
 							presets: [
+								'@babel/preset-typescript',
 								[
 									'@babel/preset-react',
 									{
