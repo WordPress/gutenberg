@@ -88,7 +88,7 @@ export default function EditorStyles( { styles, scope } ) {
 		return [
 			transformStyles(
 				_styles.filter( ( style ) => style?.css ),
-				scope
+				scope ? `:where(${ scope })` : undefined
 			),
 			_styles
 				.filter( ( style ) => style.__unstableType === 'svgs' )
