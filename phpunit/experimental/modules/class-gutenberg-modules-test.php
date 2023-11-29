@@ -55,11 +55,11 @@ class Gutenberg_Modules_Test extends WP_UnitTestCase {
 		$this->assertEquals( 2, count( $new_src_stack ) );
 		$this->assertEquals( 'interactivity-api-1.js?ver=' . $wp_version, $new_src_stack[0] );
 		$this->assertEquals( 'interactivity-api-2.js?ver=' . $wp_version, $new_src_stack[1] );
-		// We test that there is 1 <script type="importmap"> added to the markup.
+		// Test that there is 1 <script type="importmap"> added to the markup.
 		$tags = new WP_HTML_Tag_Processor( $import_map_markup );
 		$this->assertEquals( true, $tags->next_tag( array( 'rel' => 'importmap' ) ) );
 
-		// We test that there is 1 <link type="modulepreload"> added to the markup.
+		// Test that there is 1 <link type="modulepreload"> added to the markup.
 		$tags = new WP_HTML_Tag_Processor( $preload_markup );
 		$this->assertEquals( true, $tags->next_tag( array( 'rel' => 'modulepreload' ) ) );
 	}
