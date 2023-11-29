@@ -46,24 +46,21 @@ export function kebabCase( str ) {
  */
 export function setImmutably( object, path, value ) {
 	// Normalize path
-	path = Array.isArray( path ) ? path : [ path ];
+	path = Array.isArray( path ) ? [ ...path ] : [ path ];
 
 	// Shallowly clone the base of the object
 	object = Array.isArray( object ) ? [ ...object ] : { ...object };
 
+	const leaf = path.pop();
+
 	// Traverse object from root to leaf, shallowly cloning at each level
 	let prev = object;
-	for ( const i in path ) {
-		const branch = path[ i ];
-		if ( i < path.length - 1 ) {
-			prev[ branch ] = Array.isArray( prev[ branch ] )
-				? [ ...prev[ branch ] ]
-				: { ...prev[ branch ] };
-		} else {
-			prev[ branch ] = value;
-		}
-		prev = prev[ branch ];
+	for ( const key of path ) {
+		const lvl = prev[ key ];
+		prev = prev[ key ] = Array.isArray( lvl ) ? [ ...lvl ] : { ...lvl };
 	}
+
+	prev[ leaf ] = value;
 
 	return object;
 }
