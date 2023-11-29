@@ -127,11 +127,7 @@ function Header( {
 								}
 							) }
 						>
-							<BlockToolbar
-								isFixed
-								hideDragHandle
-								variant="unstyled"
-							/>
+							<BlockToolbar hideDragHandle variant="unstyled" />
 						</div>
 						<Popover.Slot
 							ref={ blockToolbarRef }

@@ -54,7 +54,6 @@ function Header( { setListViewToggleElement } ) {
 						<>
 							<div className="selected-block-tools-wrapper">
 								<BlockToolbar
-									isFixed
 									hideDragHandle
 									variant="unstyled"
 								/>

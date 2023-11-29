@@ -162,7 +162,6 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 								) }
 							>
 								<BlockToolbar
-									isFixed
 									hideDragHandle
 									variant="unstyled"
 								/>
