@@ -116,6 +116,7 @@ function ListViewBranch( props ) {
 	);
 
 	const {
+		blockDropPosition,
 		blockDropTargetIndex,
 		blockIndexes,
 		expandedState,
@@ -149,6 +150,7 @@ function ListViewBranch( props ) {
 				}
 
 				let displacement;
+				let isNesting;
 
 				if ( blockDropTargetIndex !== undefined ) {
 					const thisBlockIndex = blockIndexes[ clientId ];
@@ -165,6 +167,10 @@ function ListViewBranch( props ) {
 						// then the block is being dragged above the first block.
 						displacement = 'below';
 					}
+
+					isNesting =
+						blockDropTargetIndex - 1 === thisBlockIndex &&
+						blockDropPosition === 'inside';
 				}
 
 				const { itemInView } = fixedListWindow;
@@ -224,6 +230,7 @@ function ListViewBranch( props ) {
 								selectedClientIds={ selectedClientIds }
 								isSyncedBranch={ syncedBranch }
 								displacement={ displacement }
+								isNesting={ isNesting }
 							/>
 						) }
 						{ ! showBlock && (
@@ -246,7 +253,6 @@ function ListViewBranch( props ) {
 								selectedClientIds={ selectedClientIds }
 								isExpanded={ isExpanded }
 								isSyncedBranch={ syncedBranch }
-								displacement={ displacement }
 							/>
 						) }
 					</AsyncModeProvider>

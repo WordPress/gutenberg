@@ -214,25 +214,28 @@ function ListViewComponent(
 		[ updateBlockSelection ]
 	);
 
-	const blockDropTargetIndex = useMemo( () => {
-		if ( ! blockDropTarget?.clientId ) {
-			return undefined;
-		}
-		const foundBlockIndex = blockIndexes[ blockDropTarget.clientId ];
+	const { blockDropTargetIndex, blockDropPosition } = useMemo( () => {
+		let _blockDropTargetIndex;
 
-		if (
-			foundBlockIndex === undefined ||
-			blockDropTarget?.dropPosition === 'top'
-		) {
-			return foundBlockIndex;
+		if ( blockDropTarget?.clientId ) {
+			const foundBlockIndex = blockIndexes[ blockDropTarget.clientId ];
+			// If dragging below or inside the block, treat the drop target as the next block.
+			_blockDropTargetIndex =
+				foundBlockIndex === undefined ||
+				blockDropTarget?.dropPosition === 'top'
+					? foundBlockIndex
+					: foundBlockIndex + 1;
 		}
 
-		// If dragging below or inside the block, treat the drop target as the next block.
-		return foundBlockIndex + 1;
+		return {
+			blockDropTargetIndex: _blockDropTargetIndex,
+			blockDropPosition: blockDropTarget?.dropPosition,
+		};
 	}, [ blockDropTarget, blockIndexes ] );
 
 	const contextValue = useMemo(
 		() => ( {
+			blockDropPosition,
 			blockDropTargetIndex,
 			blockIndexes,
 			draggedClientIds,
@@ -248,6 +251,7 @@ function ListViewComponent(
 			rootClientId,
 		} ),
 		[
+			blockDropPosition,
 			blockDropTargetIndex,
 			blockIndexes,
 			draggedClientIds,
