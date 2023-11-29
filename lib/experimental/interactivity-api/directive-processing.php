@@ -39,11 +39,12 @@ function gutenberg_process_directives_in_root_blocks( $block_content, $block ) {
 	if ( WP_Directive_Processor::is_marked_as_root_block( $block ) ) {
 		WP_Directive_Processor::unmark_root_block();
 		$directives = array(
-			'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
-			'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
-			'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
-			'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
-			'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
+			'data-wp-interactive' => 'gutenberg_interactivity_process_wp_interactive',
+			'data-wp-bind'        => 'gutenberg_interactivity_process_wp_bind',
+			'data-wp-context'     => 'gutenberg_interactivity_process_wp_context',
+			'data-wp-class'       => 'gutenberg_interactivity_process_wp_class',
+			'data-wp-style'       => 'gutenberg_interactivity_process_wp_style',
+			'data-wp-text'        => 'gutenberg_interactivity_process_wp_text',
 		);
 
 		$tags = new WP_Directive_Processor( $block_content );

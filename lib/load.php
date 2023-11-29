@@ -124,6 +124,7 @@ require __DIR__ . '/experimental/interactivity-api/directives/wp-context.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-class.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-style.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-text.php';
+require __DIR__ . '/experimental/interactivity-api/directives/wp-interactive.php';
 
 require __DIR__ . '/experimental/modules/class-gutenberg-modules.php';
 
