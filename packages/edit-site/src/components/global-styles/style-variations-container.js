@@ -73,6 +73,41 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
+const getFontFamilyNames = ( themeJson ) => {
+	const headingFontFamilyCSS =
+		themeJson?.styles?.elements?.heading?.typography?.fontFamily;
+	const headingFontFamilyVariable =
+		headingFontFamilyCSS &&
+		headingFontFamilyCSS.replace( 'var(', '' ).replace( ')', '' );
+	const headingFontFamilySlug = headingFontFamilyVariable
+		?.split( '--' )
+		.slice( -1 )[ 0 ];
+
+	const bodyFontFamilyVariable = themeJson?.styles?.typography?.fontFamily
+		.replace( 'var(', '' )
+		.replace( ')', '' );
+
+	const bodyFontFamilySlug = bodyFontFamilyVariable
+		?.split( '--' )
+		.slice( -1 )[ 0 ];
+
+	const fontFamilies = themeJson?.settings?.typography?.fontFamilies?.theme; // TODO this could not be under theme.
+
+	const bodyFontFamily = fontFamilies.find(
+		( fontFamily ) => fontFamily.slug === bodyFontFamilySlug
+	);
+
+	let headingFontFamily = fontFamilies.find(
+		( fontFamily ) => fontFamily.slug === headingFontFamilySlug
+	);
+
+	if ( ! headingFontFamily ) {
+		headingFontFamily = bodyFontFamily;
+	}
+
+	return [ bodyFontFamily?.name, headingFontFamily?.name ];
+};
+
 function Variation( { variation, isColor, isFont } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
@@ -199,7 +234,8 @@ export default function StyleVariationsContainer() {
 		];
 	}, [ variations ] );
 
-	const { user } = useContext( GlobalStylesContext );
+	const { base, user } = useContext( GlobalStylesContext );
+
 	const typographyVariations =
 		variations && getVariationsByType( user, variations, 'typography' );
 
@@ -222,13 +258,27 @@ export default function StyleVariationsContainer() {
 				className="edit-site-global-styles-style-variations-container"
 			>
 				{ typographyVariations &&
-					typographyVariations.map( ( variation, index ) => (
-						<Variation
-							key={ index }
-							variation={ variation }
-							isColor={ false }
-						/>
-					) ) }
+					typographyVariations.map( ( variation, index ) => {
+						const [ bodyFontFamilyName, headingFontFamilyName ] =
+							getFontFamilyNames(
+								mergeBaseAndUserConfigs( base, variation )
+							);
+						return (
+							<>
+								<Variation
+									key={ index }
+									variation={ variation }
+									isColor={ false }
+								/>
+								<div key={ index + '1' }>
+									<Heading level={ 3 }>
+										{ headingFontFamilyName }
+									</Heading>
+									<p>{ bodyFontFamilyName }</p>
+								</div>
+							</>
+						);
+					} ) }
 			</Grid>
 		</>
 	);
