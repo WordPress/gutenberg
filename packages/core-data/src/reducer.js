@@ -238,8 +238,8 @@ function entity( entityConfig ) {
 		// Inject the entity config into the action.
 		replaceAction( ( action ) => {
 			return {
-				...action,
 				key: entityConfig.key || DEFAULT_ENTITY_KEY,
+				...action,
 			};
 		} ),
 	] )(
