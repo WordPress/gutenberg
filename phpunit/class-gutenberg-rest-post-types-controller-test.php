@@ -64,6 +64,13 @@ class Gutenberg_Test_REST_Post_Types_Controller extends WP_Test_REST_Controller_
 	/**
 	 * @doesNotPerformAssertions
 	 */
+	public function test_get_items() {
+		// Controller does not implement this method.
+	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_context_param() {
 		// Controller does not implement this method.
 	}
