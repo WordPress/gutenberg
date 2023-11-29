@@ -1,5 +1,5 @@
 ( ( { wp } ) => {
 	const { store } = wp.interactivity;
 
-	store( {} );
+	store( 'tovdom', {} );
 } )( window );

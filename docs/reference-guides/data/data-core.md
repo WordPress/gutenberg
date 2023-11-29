@@ -128,6 +128,8 @@ _Returns_
 
 ### getCurrentThemeGlobalStylesRevisions
 
+> **Deprecated** since WordPress 6.5.0. Callers should use `select( 'core' ).getRevisions( 'root', 'globalStyles', ${ recordKey } )` instead, where `recordKey` is the id of the global styles parent post.
+
 Returns the revisions of the current global styles theme.
 
 _Parameters_
@@ -420,6 +422,39 @@ _Returns_
 
 -   A value whose reference will change only when an edit occurs.
 
+### getRevision
+
+Returns a single, specific revision of a parent entity.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
+-   _revisionKey_ `EntityRecordKey`: The revision's key.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [entity kind]".
+
+_Returns_
+
+-   `RevisionRecord | Record< PropertyKey, never > | undefined`: Record.
+
+### getRevisions
+
+Returns an entity's revisions.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+
+_Returns_
+
+-   `RevisionRecord[] | null`: Record.
+
 ### getThemeSupports
 
 Return theme supports data in the index.
@@ -703,6 +738,20 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
+
+### receiveRevisions
+
+Action triggered to receive revision items.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the received entity record revisions.
+-   _name_ `string`: Name of the received entity record revisions.
+-   _recordKey_ `number|string`: The key of the entity record whose revisions you want to fetch.
+-   _records_ `Array|Object`: Revisions received.
+-   _query_ `?Object`: Query Object.
+-   _invalidateCache_ `?boolean`: Should invalidate query caches.
+-   _meta_ `?Object`: Meta information about pagination.
 
 ### receiveThemeSupports
 

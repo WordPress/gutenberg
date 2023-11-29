@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   The bundled `jest-dev-server` dependency has been updated from `^6.0.2` to `^9.0.1` ([#33287](https://github.com/WordPress/gutenberg/pull/33287)).
+
+## 26.17.0 (2023-11-16)
+
 ## 26.16.0 (2023-11-02)
 
 ## 26.15.0 (2023-10-18)

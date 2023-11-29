@@ -46,6 +46,25 @@
 					}
 				]
 			},
+			{
+				"docs/getting-started/fundamentals/README.md": [
+					{
+						"docs/getting-started/fundamentals/file-structure-of-a-block.md": []
+					},
+					{
+						"docs/getting-started/fundamentals/block-json.md": []
+					},
+					{
+						"docs/getting-started/fundamentals/registration-of-a-block.md": []
+					},
+					{
+						"docs/getting-started/fundamentals/block-wrapper.md": []
+					},
+					{
+						"docs/getting-started/fundamentals/javascript-in-the-block-editor.md": []
+					}
+				]
+			},
 			{ "docs/getting-started/glossary.md": [] },
 			{ "docs/getting-started/faq.md": [] }
 		]

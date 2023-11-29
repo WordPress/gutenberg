@@ -1,20 +1,17 @@
 ( ( { wp } ) => {
-	const { store, directive, useContext } = wp.interactivity;
+	const { store, directive, getContext } = wp.interactivity;
 
 	// Mock `data-wp-show` directive to test when things are removed from the
 	// DOM.  Replace with `data-wp-show` when it's ready.
 	directive(
 		'show-mock',
 		( {
-			directives: {
-				'show-mock': { default: showMock },
-			},
+			directives: { 'show-mock': showMock },
 			element,
 			evaluate,
-			context,
 		} ) => {
-			const contextValue = useContext( context );
-			if ( ! evaluate( showMock, { context: contextValue } ) ) {
+			const entry = showMock.find( ( { suffix} ) => suffix === 'default');
+			if ( ! evaluate( entry ) ) {
 				return null;
 			}
 			return element;
@@ -22,41 +19,49 @@
 	);
 
 
-	store( {
-		selector: {
-			isReady: ({ context: { isReady } }) => {
+	store( 'directive-init', {
+		state: {
+			get isReady() {
+				const { isReady } = getContext();
 				return isReady
-				.map(v => v ? 'true': 'false')
-				.join(',');
+					.map(v => v ? 'true': 'false')
+					.join(',');
 			},
-			calls: ({ context: { calls } }) => {
+			get calls() {
+				const { calls } = getContext();
 				return calls.join(',');
 			},
-			isMounted: ({ context }) => {
-				return context.isMounted ? 'true' : 'false';
+			get isMounted() {
+				const { isMounted } = getContext();
+				return isMounted ? 'true' : 'false';
 			},
 		},
 		actions: {
-			initOne: ( { context: { isReady, calls } } ) => {
+			initOne() {
+				const { isReady, calls } = getContext();
 				isReady[0] = true;
 				// Subscribe to changes in that prop.
 				calls[0]++;
 			},
-			initTwo: ( { context: { isReady, calls } } ) => {
+			initTwo() {
+				const { isReady, calls } = getContext();
 				isReady[1] = true;
 				calls[1]++;
 			},
-			initMount: ( { context } ) => {
-				context.isMounted = true;
+			initMount() {
+				const ctx = getContext();
+				ctx.isMounted = true;
 				return () => {
-					context.isMounted = false;
+					ctx.isMounted = false;
 				}
 			},
-			reset: ( { context: { isReady } } ) => {
+			reset() {
+				const { isReady } = getContext();
 				isReady.fill(false);
 			},
-			toggle: ( { context } ) => {
-				context.isVisible = ! context.isVisible;
+			toggle() {
+				const ctx = getContext();
+				ctx.isVisible = ! ctx.isVisible;
 			},
 		},
 	} );

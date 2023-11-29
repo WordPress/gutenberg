@@ -6,13 +6,13 @@
  */
 
 ?>
-<div data-wp-interactive>
+<div data-wp-interactive='{"namespace": "directive-context"}'>
 	<div
 		data-wp-context='{ "prop1":"parent","prop2":"parent","obj":{"prop4":"parent","prop5":"parent"},"array":[1,2,3] }'
 	>
 		<pre
 			data-testid="parent context"
-			data-wp-bind--children="derived.renderContext"
+			data-wp-bind--children="state.renderContext"
 		>
 			<!-- rendered during hydration -->
 		</pre>
@@ -53,7 +53,7 @@
 		>
 			<pre
 				data-testid="child context"
-				data-wp-bind--children="derived.renderContext"
+				data-wp-bind--children="state.renderContext"
 			>
 				<!-- rendered during hydration -->
 			</pre>
@@ -121,7 +121,7 @@
 </div>
 
 <div
-	data-wp-interactive
+	data-wp-interactive='{"namespace": "directive-context-navigate"}'
 	data-wp-navigation-id="navigation"
 	data-wp-context='{ "text": "first page" }'
 >

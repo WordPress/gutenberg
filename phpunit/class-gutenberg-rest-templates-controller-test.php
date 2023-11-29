@@ -99,7 +99,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertCount( 15, $properties );
+		$this->assertCount( 17, $properties );
 		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
 		$this->assertArrayHasKey( 'slug', $properties );
@@ -131,23 +131,25 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 		$this->assertSame(
 			array(
-				'id'             => 'emptytheme//my_template',
-				'theme'          => 'emptytheme',
-				'slug'           => 'my_template',
-				'source'         => 'custom',
-				'origin'         => null,
-				'type'           => 'wp_template',
-				'description'    => 'Description of my template.',
-				'title'          => array(
+				'id'              => 'emptytheme//my_template',
+				'theme'           => 'emptytheme',
+				'slug'            => 'my_template',
+				'source'          => 'custom',
+				'origin'          => null,
+				'type'            => 'wp_template',
+				'description'     => 'Description of my template.',
+				'title'           => array(
 					'raw'      => 'My Template',
 					'rendered' => 'My Template',
 				),
-				'status'         => 'publish',
-				'wp_id'          => self::$post->ID,
-				'has_theme_file' => false,
-				'is_custom'      => true,
-				'author'         => 0,
-				'modified'       => mysql_to_rfc3339( self::$post->post_modified ),
+				'status'          => 'publish',
+				'wp_id'           => self::$post->ID,
+				'has_theme_file'  => false,
+				'is_custom'       => true,
+				'author'          => 0,
+				'modified'        => mysql_to_rfc3339( self::$post->post_modified ),
+				'author_text'     => 'Test Blog',
+				'original_source' => 'site',
 			),
 			$data
 		);
@@ -164,23 +166,25 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 		$this->assertSame(
 			array(
-				'id'             => 'emptytheme//my_template',
-				'theme'          => 'emptytheme',
-				'slug'           => 'my_template',
-				'source'         => 'custom',
-				'origin'         => null,
-				'type'           => 'wp_template',
-				'description'    => 'Description of my template.',
-				'title'          => array(
+				'id'              => 'emptytheme//my_template',
+				'theme'           => 'emptytheme',
+				'slug'            => 'my_template',
+				'source'          => 'custom',
+				'origin'          => null,
+				'type'            => 'wp_template',
+				'description'     => 'Description of my template.',
+				'title'           => array(
 					'raw'      => 'My Template',
 					'rendered' => 'My Template',
 				),
-				'status'         => 'publish',
-				'wp_id'          => self::$post->ID,
-				'has_theme_file' => false,
-				'is_custom'      => true,
-				'author'         => 0,
-				'modified'       => mysql_to_rfc3339( self::$post->post_modified ),
+				'status'          => 'publish',
+				'wp_id'           => self::$post->ID,
+				'has_theme_file'  => false,
+				'is_custom'       => true,
+				'author'          => 0,
+				'modified'        => mysql_to_rfc3339( self::$post->post_modified ),
+				'author_text'     => 'Test Blog',
+				'original_source' => 'site',
 			),
 			$this->find_and_normalize_template_by_id( $data, 'emptytheme//my_template' )
 		);
@@ -225,27 +229,31 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		unset( $data['_links'] );
 		unset( $data['wp_id'] );
 
+		$author_name = get_user_by( 'id', self::$admin_id )->get( 'display_name' );
+
 		$this->assertSame(
 			array(
-				'id'             => 'emptytheme//my_custom_template',
-				'theme'          => 'emptytheme',
-				'content'        => array(
+				'id'              => 'emptytheme//my_custom_template',
+				'theme'           => 'emptytheme',
+				'content'         => array(
 					'raw' => 'Content',
 				),
-				'slug'           => 'my_custom_template',
-				'source'         => 'custom',
-				'origin'         => null,
-				'type'           => 'wp_template',
-				'description'    => 'Just a description',
-				'title'          => array(
+				'slug'            => 'my_custom_template',
+				'source'          => 'custom',
+				'origin'          => null,
+				'type'            => 'wp_template',
+				'description'     => 'Just a description',
+				'title'           => array(
 					'raw'      => 'My Template',
 					'rendered' => 'My Template',
 				),
-				'status'         => 'publish',
-				'has_theme_file' => false,
-				'is_custom'      => true,
-				'author'         => self::$admin_id,
-				'modified'       => $data['modified'],
+				'status'          => 'publish',
+				'has_theme_file'  => false,
+				'is_custom'       => true,
+				'author'          => self::$admin_id,
+				'modified'        => $data['modified'],
+				'author_text'     => $author_name,
+				'original_source' => 'user',
 			),
 			$data
 		);

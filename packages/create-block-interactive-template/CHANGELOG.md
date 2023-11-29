@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Update `view.js` and `render.php` templates to the new `store()` API. [#56613](https://github.com/WordPress/gutenberg/pull/56613)
+
+## 1.9.0 (2023-11-16)
+
 ## 1.8.0 (2023-11-02)
 
 ## 1.7.0 (2023-10-18)

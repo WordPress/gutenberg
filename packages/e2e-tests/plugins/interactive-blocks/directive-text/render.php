@@ -6,7 +6,7 @@
  */
 
 ?>
-<div data-wp-interactive>
+<div data-wp-interactive='{ "namespace": "directive-context" }'>
 	<div>
 		<span
 			data-wp-text="state.text"
