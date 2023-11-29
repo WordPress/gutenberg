@@ -3,8 +3,7 @@ $toggle-height: 18px;
 $toggle-border-width: 1px;
 $thumb-size:  $toggle-height - ($toggle-border-width * 6);
 
-$transition-duration-color: 0.2s;
-$transition-duration-position: 0.1s;
+$transition-duration: 0.2s;
 
 .components-form-toggle {
 	position: relative;
@@ -23,8 +22,8 @@ $transition-duration-position: 0.1s;
 		height: $toggle-height;
 		border-radius: $toggle-height * 0.5;
 		transition:
-			$transition-duration-color background-color ease,
-			$transition-duration-color border-color ease;
+			$transition-duration background-color ease,
+			$transition-duration border-color ease;
 		@include reduce-motion("transition");
 		overflow: hidden;
 
@@ -37,7 +36,7 @@ $transition-duration-position: 0.1s;
 			// Expand the border to fake a solid in Windows High Contrast Mode.
 			border-top: #{ $toggle-height } solid transparent;
 
-			transition: $transition-duration-color opacity ease;
+			transition: $transition-duration opacity ease;
 			@include reduce-motion("transition");
 
 			opacity: 0;
@@ -54,8 +53,8 @@ $transition-duration-position: 0.1s;
 		height: $thumb-size;
 		border-radius: 50%;
 		transition:
-			$transition-duration-position transform ease,
-			$transition-duration-color background-color ease-out;
+			$transition-duration transform ease,
+			$transition-duration background-color ease-out;
 		@include reduce-motion("transition");
 		background-color: $gray-900;
 
