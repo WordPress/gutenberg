@@ -98,7 +98,7 @@ function useToolbarFocus( {
 	shouldUseKeyboardFocusShortcut,
 	focusEditorOnEscape,
 } ) {
-	// Make sure we don't use modified versions of this prop.
+	// Deprecated in 6.5.0
 	const [ initialFocusOnMount ] = useState( focusOnMount );
 	const { stopTyping } = useDispatch( blockEditorStore );
 
@@ -116,7 +116,7 @@ function useToolbarFocus( {
 	// Focus on toolbar when pressing alt+F10 when the toolbar is visible.
 	useShortcut( 'core/block-editor/focus-toolbar', focusToolbarViaShortcut );
 
-	// Unused in codebase. Do we need to keep it for backwards compatability?
+	// Deprecated in 6.5.0
 	useEffect( () => {
 		if ( initialFocusOnMount ) {
 			focusToolbar();
@@ -163,6 +163,14 @@ export default function NavigableToolbar( {
 } ) {
 	const toolbarRef = useRef();
 	const isAccessibleToolbar = useIsAccessibleToolbar( toolbarRef );
+
+	if ( focusOnMount ) {
+		deprecated( 'The focusOnMount prop', {
+			since: '6.5',
+			version: '6.6',
+		} );
+	}
+
 	useToolbarFocus( {
 		toolbarRef,
 		focusOnMount,
