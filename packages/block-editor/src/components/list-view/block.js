@@ -43,6 +43,7 @@ import AriaReferencedText from './aria-referenced-text';
 
 function ListViewBlock( {
 	block: { clientId },
+	displacement,
 	isDragged,
 	isSelected,
 	isBranchSelected,
@@ -270,6 +271,8 @@ function ListViewBlock( {
 		'has-single-cell': ! showBlockActions,
 		'is-synced': blockInformation?.isSynced,
 		'is-draggable': canMove,
+		'is-above': displacement === 'above',
+		'is-below': displacement === 'below',
 	} );
 
 	// Only include all selected blocks if the currently clicked on block

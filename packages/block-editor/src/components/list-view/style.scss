@@ -14,6 +14,8 @@
 .block-editor-list-view-leaf {
 	// Use position relative for row animation.
 	position: relative;
+	transition: transform 0.2s;
+	transform: translateY(0);
 
 	&.is-draggable,
 	&.is-draggable .block-editor-list-view-block-contents {
@@ -126,6 +128,20 @@
 	}
 	&.is-branch-selected:not(.is-selected) td {
 		border-radius: 0;
+	}
+
+	&.is-above {
+		transition: transform 0.2s;
+		transform: translateY(-18px) !important;
+	}
+
+	&.is-below {
+		transition: transform 0.2s;
+		transform: translateY(18px) !important;
+	}
+
+	&.is-dragging {
+		display: none;
 	}
 
 	// List View renders a fixed number of items and relies on each item having a fixed height of 36px.
@@ -376,7 +392,7 @@
 		background: $white;
 		border: 1px solid $gray-400;
 		border-radius: $radius-block-ui;
-		opacity: 0.75;
+		opacity: 1;
 
 		.block-editor-list-view-block__contents-cell {
 			flex: 1;

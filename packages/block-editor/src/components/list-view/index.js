@@ -30,6 +30,7 @@ import ListViewBranch from './branch';
 import { ListViewContext } from './context';
 import ListViewDropIndicator from './drop-indicator';
 import useBlockSelection from './use-block-selection';
+import useListViewBlockIndexes from './use-list-view-block-indexes';
 import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
@@ -68,6 +69,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {?boolean}       props.showBlockMovers        Flag to enable block movers. Defaults to `false`.
  * @param {?boolean}       props.isExpanded             Flag to determine whether nested levels are expanded by default. Defaults to `false`.
  * @param {?boolean}       props.showAppender           Flag to show or hide the block appender. Defaults to `false`.
+ * @param {?boolean}       props.showDropIndicator      Flag to show or hide the drop indicator line. Defaults to `false`.
  * @param {?ComponentType} props.blockSettingsMenu      Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component.
  * @param {string}         props.rootClientId           The client id of the root block from which we determine the blocks to show in the list.
  * @param {string}         props.description            Optional accessible description for the tree grid component.
@@ -83,6 +85,7 @@ function ListViewComponent(
 		showBlockMovers = false,
 		isExpanded = false,
 		showAppender = false,
+		showDropIndicator = false,
 		blockSettingsMenu: BlockSettingsMenu = BlockSettingsDropdown,
 		rootClientId,
 		description,
@@ -105,6 +108,7 @@ function ListViewComponent(
 	const instanceId = useInstanceId( ListViewComponent );
 	const { clientIdsTree, draggedClientIds, selectedClientIds } =
 		useListViewClientIds( { blocks, rootClientId } );
+	const blockIndexes = useListViewBlockIndexes( clientIdsTree );
 
 	const { getBlock } = useSelect( blockEditorStore );
 	const { visibleBlockCount, shouldShowInnerBlocks } = useSelect(
@@ -210,8 +214,27 @@ function ListViewComponent(
 		[ updateBlockSelection ]
 	);
 
+	const blockDropTargetIndex = useMemo( () => {
+		if ( ! blockDropTarget?.clientId ) {
+			return undefined;
+		}
+		const foundBlockIndex = blockIndexes[ blockDropTarget.clientId ];
+
+		if (
+			foundBlockIndex === undefined ||
+			blockDropTarget?.dropPosition === 'top'
+		) {
+			return foundBlockIndex;
+		}
+
+		// If dragging below or inside the block, treat the drop target as the next block.
+		return foundBlockIndex + 1;
+	}, [ blockDropTarget, blockIndexes ] );
+
 	const contextValue = useMemo(
 		() => ( {
+			blockDropTargetIndex,
+			blockIndexes,
 			draggedClientIds,
 			expandedState,
 			expand,
@@ -225,6 +248,8 @@ function ListViewComponent(
 			rootClientId,
 		} ),
 		[
+			blockDropTargetIndex,
+			blockIndexes,
 			draggedClientIds,
 			expandedState,
 			expand,
@@ -267,10 +292,12 @@ function ListViewComponent(
 
 	return (
 		<AsyncModeProvider value={ true }>
-			<ListViewDropIndicator
-				listViewRef={ elementRef }
-				blockDropTarget={ blockDropTarget }
-			/>
+			{ showDropIndicator && (
+				<ListViewDropIndicator
+					listViewRef={ elementRef }
+					blockDropTarget={ blockDropTarget }
+				/>
+			) }
 			{ description && (
 				<VisuallyHidden id={ describedById }>
 					{ description }
