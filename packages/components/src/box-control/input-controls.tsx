@@ -4,9 +4,11 @@
 import UnitControl from './unit-control';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import { ALL_SIDES, LABELS } from './utils';
+import { FlexItem } from '../flex';
 import { LayoutContainer, Layout } from './styles/box-control-styles';
 import type { BoxControlInputControlProps, BoxControlValue } from './types';
 import type { UnitControlProps } from '../unit-control/types';
+import BoxControlIcon from './icon';
 
 const noop = () => {};
 
@@ -100,6 +102,7 @@ export default function BoxInputControls( {
 				gap={ 0 }
 				align="top"
 				className="component-box-control__input-controls"
+				direction="column"
 			>
 				{ filteredSides.map( ( side ) => {
 					const [ parsedQuantity, parsedUnit ] =
@@ -110,22 +113,34 @@ export default function BoxInputControls( {
 						: selectedUnits[ side ];
 
 					return (
-						<UnitControl
-							{ ...props }
-							isFirst={ first === side }
-							isLast={ last === side }
-							isOnly={ only === side }
-							value={ [ parsedQuantity, computedUnit ].join(
-								''
-							) }
-							onChange={ createHandleOnChange( side ) }
-							onUnitChange={ createHandleOnUnitChange( side ) }
-							onFocus={ createHandleOnFocus( side ) }
-							onHoverOn={ createHandleOnHoverOn( side ) }
-							onHoverOff={ createHandleOnHoverOff( side ) }
-							label={ LABELS[ side ] }
-							key={ `box-control-${ side }` }
-						/>
+						<Layout key={ `box-control-${ side }` }>
+							<FlexItem>
+								<BoxControlIcon side={ side } sides={ sides } />
+							</FlexItem>
+							<FlexItem>
+								<UnitControl
+									{ ...props }
+									isFirst={ first === side }
+									isLast={ last === side }
+									isOnly={ only === side }
+									value={ [
+										parsedQuantity,
+										computedUnit,
+									].join( '' ) }
+									onChange={ createHandleOnChange( side ) }
+									onUnitChange={ createHandleOnUnitChange(
+										side
+									) }
+									onFocus={ createHandleOnFocus( side ) }
+									onHoverOn={ createHandleOnHoverOn( side ) }
+									onHoverOff={ createHandleOnHoverOff(
+										side
+									) }
+									label={ LABELS[ side ] }
+									__next40pxDefaultSize
+								/>
+							</FlexItem>
+						</Layout>
 					);
 				} ) }
 			</Layout>

@@ -13,7 +13,6 @@ import type { BoxUnitControlProps } from '../types';
 
 export const Root = styled.div`
 	box-sizing: border-box;
-	max-width: 235px;
 	padding-bottom: 12px;
 	width: 100%;
 `;
@@ -74,7 +73,6 @@ const unitControlMarginStyles = ( {
 };
 
 export const UnitControl = styled( BaseUnitControl )`
-	max-width: 60px;
 	${ unitControlBorderRadiusStyles };
 	${ unitControlMarginStyles };
 `;
