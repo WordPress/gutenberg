@@ -176,17 +176,23 @@ function BoxControl( {
 					</FlexItem>
 				) }
 			</Header>
-			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
-				<FlexItem>
-					<BoxControlIcon side={ side } sides={ sides } />
-				</FlexItem>
+			<HeaderControlWrapper
+				className="component-box-control__header-control-wrapper"
+				gap={ 0 }
+				justify="flex-end"
+			>
 				{ isLinked && (
-					<FlexBlock>
-						<AllInputControl
-							aria-label={ label }
-							{ ...inputControlProps }
-						/>
-					</FlexBlock>
+					<>
+						<FlexItem>
+							<BoxControlIcon side={ side } sides={ sides } />
+						</FlexItem>
+						<FlexBlock>
+							<AllInputControl
+								aria-label={ label }
+								{ ...inputControlProps }
+							/>
+						</FlexBlock>
+					</>
 				) }
 				{ ! isLinked && splitOnAxis && (
 					<FlexBlock>

@@ -23,7 +23,6 @@ export const Header = styled( Flex )`
 
 export const HeaderControlWrapper = styled( Flex )`
 	min-height: 30px;
-	gap: 0;
 `;
 
 export const UnitControlWrapper = styled.div`
