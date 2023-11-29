@@ -56,6 +56,65 @@ function gutenberg_process_directives_in_root_blocks( $block_content, $block ) {
 }
 add_filter( 'render_block', 'gutenberg_process_directives_in_root_blocks', 10, 2 );
 
+/**
+ * Creates a stack of interactive block children.
+ *
+ * @param array    $parsed_block The parsed block.
+ * @param array    $source_block The source block.
+ * @param WP_Block $parent_block The parent block.
+ */
+function gutenberg_mark_interactive_block_children( $parsed_block, $source_block, $parent_block ) {
+	if (
+			isset( $parent_block ) &&
+			isset( $parent_block->block_type->supports['interactivity'] ) &&
+			$parent_block->block_type->supports['interactivity']
+		) {
+		WP_Directive_Processor::mark_children_of_interactive_block( $source_block );
+	}
+	return $parsed_block;
+}
+add_filter( 'render_block_data', 'gutenberg_mark_interactive_block_children', 100, 3 );
+
+/**
+ * Add a marker indicating if the block is interactive or not.
+ * core/interactivity-wrapper if it is interactive.
+ * core/non-interactivity-wrapper if it is not interactive.
+ *
+ * @param string   $block_content The block content.
+ * @param array    $block The full block, including name and attributes.
+ * @param WP_Block $block_instance The block instance.
+ */
+function gutenberg_mark_block_interactivity( $block_content, $block, $block_instance ) {
+	if (
+		isset( $block_instance->block_type->supports['interactivity'] ) &&
+		$block_instance->block_type->supports['interactivity']
+	) {
+		// Mark interactive blocks so we can process them later.
+		return get_comment_delimited_block_content(
+			'core/interactivity-wrapper',
+			array(
+				'blockName' => $block['blockName'],
+			// We can put extra information about the block here.
+			),
+			$block_content
+		);
+	} elseif ( WP_Directive_Processor::is_marked_as_children_of_interactive_block( $block ) ) {
+		WP_Directive_Processor::unmark_children_of_interactive_block( $block );
+		// Mark children of interactive blocks that are not interactive themselves
+		// to so we can skip them later.
+		return get_comment_delimited_block_content(
+			'core/non-interactivity-wrapper',
+			array(
+				'blockName' => $block['blockName'],
+				// We can put extra information about the block here.
+			),
+			$block_content
+		);
+	}
+	return $block_content;
+}
+
+add_filter( 'render_block', 'gutenberg_mark_block_interactivity', 10, 3 );
 
 /**
  * Resolve the reference using the store and the context from the provided path.
@@ -76,10 +135,9 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
 	 * passed context) using the subsequent path should be negated.
 	 */
 	$should_negate_value = '!' === $path[0];
-
-	$path          = $should_negate_value ? substr( $path, 1 ) : $path;
-	$path_segments = explode( '.', $path );
-	$current       = $store;
+	$path                = $should_negate_value ? substr( $path, 1 ) : $path;
+	$path_segments       = explode( '.', $path );
+	$current             = $store;
 	foreach ( $path_segments as $p ) {
 		if ( isset( $current[ $p ] ) ) {
 			$current = $current[ $p ];
