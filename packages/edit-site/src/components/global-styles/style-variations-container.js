@@ -44,7 +44,10 @@ function Variation( { variation } ) {
 		setUserConfig( () => {
 			return {
 				settings: variation.settings,
-				styles: variation.styles,
+				styles: {
+					...variation.styles,
+					...( user?.styles?.css ? { css: user.styles.css } : {} ),
+				},
 			};
 		} );
 	};
