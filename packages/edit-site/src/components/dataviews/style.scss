@@ -34,9 +34,15 @@
 	}
 	th {
 		text-align: left;
-		font-weight: normal;
-		padding: 0 $grid-unit-20 $grid-unit-20;
-		color: $gray-700;
+		/*
+		 * This makes the Actions column header to use the same styles as the other ones.
+		 * The other column headers use the .components-button styles.
+		 */
+		&[data-field-id="actions"] {
+			color: #1e1e1e;
+			font-weight: normal;
+			font-size: 13px;
+		}
 	}
 	td,
 	th {
