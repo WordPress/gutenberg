@@ -8,15 +8,12 @@ import classnames from 'classnames';
  */
 import {
 	useEntityBlockEditor,
-	useEntityProp,
 	useEntityRecord,
 	store as coreStore,
 } from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner,
-	TextControl,
-	PanelBody,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -26,7 +23,6 @@ import {
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
 	InnerBlocks,
-	InspectorControls,
 	useBlockProps,
 	Warning,
 	privateApis as blockEditorPrivateApis,
@@ -152,13 +148,6 @@ export default function ReusableBlockEdit( {
 		{ id: ref }
 	);
 
-	const [ title, setTitle ] = useEntityProp(
-		'postType',
-		'wp_block',
-		'title',
-		ref
-	);
-
 	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
 	const layoutClasses = useLayoutClasses( { layout }, name );
 
@@ -216,17 +205,6 @@ export default function ReusableBlockEdit( {
 					</ToolbarGroup>
 				</BlockControls>
 			) }
-			<InspectorControls>
-				<PanelBody>
-					<TextControl
-						label={ __( 'Name' ) }
-						value={ title }
-						onChange={ setTitle }
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-					/>
-				</PanelBody>
-			</InspectorControls>
 			{ children === null ? (
 				<div { ...innerBlocksProps } />
 			) : (
