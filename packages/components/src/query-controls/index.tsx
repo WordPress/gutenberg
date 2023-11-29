@@ -182,7 +182,7 @@ export function QueryControls( {
 				onNumberOfItemsChange && (
 					<RangeControl
 						__nextHasNoMarginBottom
-						__next40pxDefaultSize
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 						key="query-controls-range-control"
 						label={ __( 'Number of items' ) }
 						value={ numberOfItems }
