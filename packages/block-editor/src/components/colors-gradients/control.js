@@ -129,42 +129,40 @@ function ColorGradientControlInner( {
 						</legend>
 					) }
 					{ canChooseAColor && canChooseAGradient && (
-						<div className="block-editor-color-gradient-control__tabs">
-							<Tabs
-								initialTabId={
-									gradientValue
-										? TAB_IDS.gradient
-										: !! canChooseAColor && TAB_IDS.color
+						<Tabs
+							initialTabId={
+								gradientValue
+									? TAB_IDS.gradient
+									: !! canChooseAColor && TAB_IDS.color
+							}
+						>
+							<Tabs.TabList>
+								<Tabs.Tab id={ TAB_IDS.color }>
+									{ __( 'Solid' ) }
+								</Tabs.Tab>
+								<Tabs.Tab id={ TAB_IDS.gradient }>
+									{ __( 'Gradient' ) }
+								</Tabs.Tab>
+							</Tabs.TabList>
+							<Tabs.TabPanel
+								id={ TAB_IDS.color }
+								className={
+									'block-editor-color-gradient-control__panel'
 								}
+								focusable={ false }
 							>
-								<Tabs.TabList>
-									<Tabs.Tab id={ TAB_IDS.color }>
-										{ __( 'Solid' ) }
-									</Tabs.Tab>
-									<Tabs.Tab id={ TAB_IDS.gradient }>
-										{ __( 'Gradient' ) }
-									</Tabs.Tab>
-								</Tabs.TabList>
-								<Tabs.TabPanel
-									id={ TAB_IDS.color }
-									className={
-										'block-editor-color-gradient-control__panel'
-									}
-									focusable={ false }
-								>
-									{ tabPanels.color }
-								</Tabs.TabPanel>
-								<Tabs.TabPanel
-									id={ TAB_IDS.gradient }
-									className={
-										'block-editor-color-gradient-control__panel'
-									}
-									focusable={ false }
-								>
-									{ tabPanels.gradient }
-								</Tabs.TabPanel>
-							</Tabs>
-						</div>
+								{ tabPanels.color }
+							</Tabs.TabPanel>
+							<Tabs.TabPanel
+								id={ TAB_IDS.gradient }
+								className={
+									'block-editor-color-gradient-control__panel'
+								}
+								focusable={ false }
+							>
+								{ tabPanels.gradient }
+							</Tabs.TabPanel>
+						</Tabs>
 					) }
 
 					{ ! canChooseAGradient && renderPanelType( TAB_IDS.color ) }
