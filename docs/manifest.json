@@ -108,6 +108,12 @@
 		"parent": "fundamentals"
 	},
 	{
+		"title": "`block.json`",
+		"slug": "block-json",
+		"markdown_source": "../docs/getting-started/fundamentals/block-json.md",
+		"parent": "fundamentals"
+	},
+	{
 		"title": "Registration of a block",
 		"slug": "registration-of-a-block",
 		"markdown_source": "../docs/getting-started/fundamentals/registration-of-a-block.md",
