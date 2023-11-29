@@ -45,20 +45,27 @@ export function kebabCase( str ) {
  * @return {Object} Cloned object with the new value set.
  */
 export function setImmutably( object, path, value ) {
+	// Normalize path
 	path = Array.isArray( path ) ? path : [ path ];
 
-	if ( path.length === 0 ) {
-		return value;
+	// Shallowly clone the base of the object
+	object = Array.isArray( object ) ? [ ...object ] : { ...object };
+
+	// Traverse object from root to leaf, shallowly cloning at each level
+	let prev = object;
+	for ( const i in path ) {
+		const branch = path[ i ];
+		if ( i < path.length - 1 ) {
+			prev[ branch ] = Array.isArray( prev[ branch ] )
+				? [ ...prev[ branch ] ]
+				: { ...prev[ branch ] };
+		} else {
+			prev[ branch ] = value;
+		}
+		prev = prev[ branch ];
 	}
 
-	const shallowClone = Array.isArray( object )
-		? [ ...object ]
-		: { ...object };
-	const [ first, ...rest ] = path;
-
-	shallowClone[ first ] = setImmutably( shallowClone[ first ], rest, value );
-
-	return shallowClone;
+	return object;
 }
 
 const stringToPath = memoize( ( path ) => path.split( '.' ) );
