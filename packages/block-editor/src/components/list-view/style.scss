@@ -368,6 +368,29 @@
 			box-shadow: 0 0 0 $radius-block-ui var(--wp-admin-theme-color);
 		}
 	}
+
+	&[id^="clone-"] {
+		align-items: center;
+		display: flex;
+		height: 36px;
+		background: $white;
+		border: 1px solid $gray-400;
+		border-radius: $radius-block-ui;
+		opacity: 0.75;
+
+		.block-editor-list-view-block__contents-cell {
+			flex: 1;
+		}
+
+		&.is-selected td {
+			background: $white;
+
+			.block-editor-list-view-block-select-button,
+			.components-button.has-icon {
+				color: inherit;
+			}
+		}
+	}
 }
 
 .block-editor-list-view-block__contents-cell,
