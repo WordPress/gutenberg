@@ -650,6 +650,40 @@ export class RichText extends Component {
 		return shouldDrop;
 	}
 
+	/**
+	 * Determines whether the text input should receive focus after an update.
+	 * For cases where a RichText with a value is merged with an empty one.
+	 *
+	 * @param {Object} prevProps - The previous props of the component.
+	 * @return {boolean} True if the text input should receive focus, false otherwise.
+	 */
+	shouldFocusTextInputAfterMerge( prevProps ) {
+		const {
+			__unstableIsSelected: isSelected,
+			blockIsSelected,
+			selectionStart,
+			selectionEnd,
+			__unstableMobileNoFocusOnMount,
+		} = this.props;
+
+		const {
+			__unstableIsSelected: prevIsSelected,
+			blockIsSelected: prevBlockIsSelected,
+		} = prevProps;
+
+		const noSelectionValues =
+			selectionStart === undefined && selectionEnd === undefined;
+		const textInputWasNotFocused = ! prevIsSelected && ! isSelected;
+
+		return (
+			! __unstableMobileNoFocusOnMount &&
+			noSelectionValues &&
+			textInputWasNotFocused &&
+			! prevBlockIsSelected &&
+			blockIsSelected
+		);
+	}
+
 	onSelectionChangeFromAztec( start, end, text, event ) {
 		if ( this.shouldDropEventFromAztec( event, 'onSelectionChange' ) ) {
 			return;
@@ -843,9 +877,8 @@ export class RichText extends Component {
 		if ( this.props.value !== this.value ) {
 			this.value = this.props.value;
 		}
-		const { __unstableIsSelected: isSelected } = this.props;
-
 		const { __unstableIsSelected: prevIsSelected } = prevProps;
+		const { __unstableIsSelected: isSelected } = this.props;
 
 		if ( isSelected && ! prevIsSelected ) {
 			this._editor.focus();
@@ -854,6 +887,16 @@ export class RichText extends Component {
 			this.onSelectionChange(
 				this.props.selectionStart || 0,
 				this.props.selectionEnd || 0
+			);
+		} else if ( this.shouldFocusTextInputAfterMerge( prevProps ) ) {
+			// Since this is happening when merging blocks, the selection should be at the last character position.
+			// As a fallback the internal selectionEnd value is used.
+			const lastCharacterPosition =
+				this.value?.length ?? this.selectionEnd;
+			this._editor.focus();
+			this.props.onSelectionChange(
+				lastCharacterPosition,
+				lastCharacterPosition
 			);
 		} else if ( ! isSelected && prevIsSelected ) {
 			this._editor.blur();

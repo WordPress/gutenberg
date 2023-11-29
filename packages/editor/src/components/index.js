@@ -26,6 +26,7 @@ export { default as PageAttributesParent } from './page-attributes/parent';
 export { default as PageTemplate } from './post-template';
 export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
+export { default as PostAuthorPanel } from './post-author/panel';
 export { default as PostComments } from './post-comments';
 export { default as PostExcerpt } from './post-excerpt';
 export { default as PostExcerptCheck } from './post-excerpt/check';
@@ -50,6 +51,7 @@ export {
 	default as PostScheduleLabel,
 	usePostScheduleLabel,
 } from './post-schedule/label';
+export { default as PostSchedulePanel } from './post-schedule/panel';
 export { default as PostSlug } from './post-slug';
 export { default as PostSlugCheck } from './post-slug/check';
 export { default as PostSticky } from './post-sticky';
@@ -65,6 +67,7 @@ export { HierarchicalTermSelector as PostTaxonomiesHierarchicalTermSelector } fr
 export { default as PostTaxonomiesCheck } from './post-taxonomies/check';
 export { default as PostTextEditor } from './post-text-editor';
 export { default as PostTitle } from './post-title';
+export { default as PostTitleRaw } from './post-title/post-title-raw';
 export { default as PostTrash } from './post-trash';
 export { default as PostTrashCheck } from './post-trash/check';
 export { default as PostTypeSupportCheck } from './post-type-support-check';

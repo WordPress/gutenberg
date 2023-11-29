@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import postcss from 'postcss';
+import postcss, { CssSyntaxError } from 'postcss';
 import wrap from 'postcss-prefixwrap';
 import rebaseUrl from 'postcss-urlrebase';
 
@@ -19,18 +19,44 @@ import rebaseUrl from 'postcss-urlrebase';
  */
 const transformStyles = ( styles, wrapperSelector = '' ) => {
 	return styles.map( ( { css, ignoredSelectors = [], baseURL } ) => {
-		return postcss(
-			[
-				wrapperSelector &&
-					wrap( wrapperSelector, {
-						ignoredSelectors: [
-							...ignoredSelectors,
-							wrapperSelector,
-						],
-					} ),
-				baseURL && rebaseUrl( { rootUrl: baseURL } ),
-			].filter( Boolean )
-		).process( css, {} ).css; // use sync PostCSS API
+		// When there is no wrapper selector or base URL, there is no need
+		// to transform the CSS. This is most cases because in the default
+		// iframed editor, no wrapping is needed, and not many styles
+		// provide a base URL.
+		if ( ! wrapperSelector && ! baseURL ) {
+			return css;
+		}
+
+		try {
+			return postcss(
+				[
+					wrapperSelector &&
+						wrap( wrapperSelector, {
+							ignoredSelectors: [
+								...ignoredSelectors,
+								wrapperSelector,
+							],
+						} ),
+					baseURL && rebaseUrl( { rootUrl: baseURL } ),
+				].filter( Boolean )
+			).process( css, {} ).css; // use sync PostCSS API
+		} catch ( error ) {
+			if ( error instanceof CssSyntaxError ) {
+				// eslint-disable-next-line no-console
+				console.warn(
+					'wp.blockEditor.transformStyles Failed to transform CSS.',
+					error.message + '\n' + error.showSourceCode( false )
+				);
+			} else {
+				// eslint-disable-next-line no-console
+				console.warn(
+					'wp.blockEditor.transformStyles Failed to transform CSS.',
+					error
+				);
+			}
+
+			return null;
+		}
 	} );
 };
 

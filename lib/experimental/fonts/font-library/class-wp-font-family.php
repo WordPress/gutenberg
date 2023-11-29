@@ -300,18 +300,27 @@ class WP_Font_Family {
 			'version'  => '2',
 			'settings' => array(
 				'typography' => array(
-					'fontFamilies' => array( $this->data ),
+					'fontFamilies' => array(
+						'custom' => array(
+							$this->data,
+						),
+					),
 				),
 			),
 		);
+
 		// Creates a new WP_Theme_JSON object with the new fonts to
 		// leverage sanitization and validation.
+		$fonts_json     = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $fonts_json );
 		$theme_json     = new WP_Theme_JSON_Gutenberg( $fonts_json );
 		$theme_data     = $theme_json->get_data();
 		$sanitized_font = ! empty( $theme_data['settings']['typography']['fontFamilies'] )
 			? $theme_data['settings']['typography']['fontFamilies'][0]
 			: array();
-		$this->data     = $sanitized_font;
+
+		$sanitized_font['slug']       = _wp_to_kebab_case( $sanitized_font['slug'] );
+		$sanitized_font['fontFamily'] = WP_Font_Family_Utils::format_font_family( $sanitized_font['fontFamily'] );
+		$this->data                   = $sanitized_font;
 		return $this->data;
 	}
 
