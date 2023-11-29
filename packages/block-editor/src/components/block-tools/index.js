@@ -29,6 +29,7 @@ function selector( select ) {
 		getFirstMultiSelectedBlockClientId,
 		getBlock,
 		getSettings,
+		hasMultiSelection,
 		__unstableGetEditorMode,
 		isTyping,
 	} = select( blockEditorStore );
@@ -37,7 +38,7 @@ function selector( select ) {
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
 	const { name = '', attributes = {} } = getBlock( clientId ) || {};
-
+	const editorMode = __unstableGetEditorMode();
 	return {
 		clientId,
 		hasFixedToolbar: getSettings().hasFixedToolbar,
@@ -46,12 +47,15 @@ function selector( select ) {
 			getBlock( clientId ) || {}
 		),
 		isTyping: isTyping(),
-		isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+		isZoomOutMode: editorMode === 'zoom-out',
 		showEmptyBlockSideInserter:
 			clientId &&
 			! isTyping() &&
-			__unstableGetEditorMode() === 'edit' &&
+			editorMode === 'edit' &&
 			isUnmodifiedDefaultBlock( { name, attributes } ),
+		shouldShowBreadcrumb:
+			! hasMultiSelection() &&
+			( editorMode === 'navigation' || editorMode === 'zoom-out' ),
 	};
 }
 
@@ -78,6 +82,7 @@ export default function BlockTools( {
 		isTyping,
 		isZoomOutMode,
 		showEmptyBlockSideInserter,
+		shouldShowBreadcrumb,
 	} = useSelect( selector, [] );
 	const isMatch = useShortcutEventMatch();
 	const { getSelectedBlockClientIds, getBlockRootClientId } =
@@ -199,19 +204,22 @@ export default function BlockTools( {
 					isLargeViewport &&
 					! showEmptyBlockSideInserter &&
 					hasSelectedBlock &&
-					! isEmptyDefaultBlock && (
+					! isEmptyDefaultBlock &&
+					! shouldShowBreadcrumb && (
 						<BlockToolbarPopover
 							__unstableContentRef={ __unstableContentRef }
 							clientId={ clientId }
 						/>
 					) }
 
-				{ ! showEmptyBlockSideInserter && hasSelectedBlock && (
-					<BlockToolbarBreadcrumb
-						__unstableContentRef={ __unstableContentRef }
-						clientId={ clientId }
-					/>
-				) }
+				{ ! showEmptyBlockSideInserter &&
+					hasSelectedBlock &&
+					shouldShowBreadcrumb && (
+						<BlockToolbarBreadcrumb
+							__unstableContentRef={ __unstableContentRef }
+							clientId={ clientId }
+						/>
+					) }
 
 				{ /* Used for the inline rich text toolbar. */ }
 				{ ! isTopToolbar && (

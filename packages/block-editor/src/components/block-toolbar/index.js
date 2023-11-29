@@ -47,7 +47,6 @@ const BlockToolbar = ( {
 		blockEditingMode,
 		blockType,
 		hasParents,
-		isKeyboardFocusShortcutActive,
 		isValid,
 		isVisual,
 		showParentSelector,
@@ -58,7 +57,6 @@ const BlockToolbar = ( {
 			getBlockParents,
 			getSelectedBlockClientIds,
 			isBlockValid,
-			isNavigationMode,
 			getBlockRootClientId,
 			getBlockEditingMode,
 		} = select( blockEditorStore );
@@ -78,8 +76,6 @@ const BlockToolbar = ( {
 				getBlockType( getBlockName( selectedBlockClientId ) ),
 
 			hasParents: parents.length,
-			isKeyboardFocusShortcutActive:
-				isFixed || ( ! isFixed && ! isNavigationMode() ),
 			isValid: selectedBlockClientIds.every( ( id ) =>
 				isBlockValid( id )
 			),
@@ -137,10 +133,10 @@ const BlockToolbar = ( {
 	const innerClasses = classnames( 'block-editor-block-toolbar', {
 		'is-synced': isSynced,
 	} );
+
 	return (
 		<NavigableToolbar
 			focusEditorOnEscape
-			shouldUseKeyboardFocusShortcut={ isKeyboardFocusShortcutActive }
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
