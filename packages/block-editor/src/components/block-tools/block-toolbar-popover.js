@@ -26,7 +26,6 @@ export default function BlockToolbarPopover( {
 
 	const { shouldShowContextualToolbar } = useShouldContextualToolbarShow();
 
-	// There shouldn't be an idea of focus on mount. It's just "Does the shortcut work or not". If there are block tools it can be focused. If the block tools have been accessed, the same tabindex will be persisted until it is remounted via a block change.
 	return (
 		<BlockPopover
 			clientId={ capturingClientId || clientId }
