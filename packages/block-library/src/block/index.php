@@ -83,7 +83,7 @@ function register_block_core_block() {
 add_action( 'init', 'register_block_core_block' );
 
 $gutenberg_experiments = get_option( 'gutenberg-experiments' );
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ) {
+if ( $gutenberg_experiments && array_key_exists( 'gutenberg-pattern-partial-syncing', $gutenberg_experiments ) ) {
 	/**
 	 * Registers the overrides attribute for core/block.
 	 *

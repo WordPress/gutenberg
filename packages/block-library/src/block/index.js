@@ -16,7 +16,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	edit: window.__experimentalConnections ? editV2 : editV1,
+	edit: window.__experimentalPatternPartialSyncing ? editV2 : editV1,
 	icon,
 };
 
