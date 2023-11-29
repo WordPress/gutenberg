@@ -30,7 +30,7 @@ With the [proper `package.json` scripts](https://developer.wordpress.org/block-e
 
 Using Javascript without a build process may be another good option for code developments with few requirements (especially those not requiring JSX). 
 
-Without a build process, you access the methods directly from the `wp` global object and must enqueue the script manually. [WordPress Javascript](https://developer.wordpress.org/block-editor/reference-guides/packages/) packages](https://developer.wordpress.org/block-editor/reference-guides/packages/) can be accessed through the `wp` [global variable](https://developer.mozilla.org/en-US/docs/Glossary/Global_variable) but every script that wants to use them through this `wp` object is responsible for adding [the handle of that package](https://developer.wordpress.org/block-editor/contributors/code/scripts/) to the dependency array when registered.
+Without a build process, you access the methods directly from the `wp` global object and must enqueue the script manually. [WordPress Javascript packages](https://developer.wordpress.org/block-editor/reference-guides/packages/) can be accessed through the `wp` [global variable](https://developer.mozilla.org/en-US/docs/Glossary/Global_variable) but every script that wants to use them through this `wp` object is responsible for adding [the handle of that package](https://developer.wordpress.org/block-editor/contributors/code/scripts/) to the dependency array when registered.
 
 So, for example if a script wants to register a block variation using the `registerBlockVariation` method out of the ["blocks" package](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/), the `wp-blocks` handle would need to get added to the dependency array to ensure that `wp.blocks.registerBlockVariation` is defined when the script tries to access it (see [example](https://github.com/wptrainingteam/block-theme-examples/blob/master/example-block-variation/functions.php)). 
 
@@ -42,10 +42,10 @@ Use [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/ho
 
 ## Additional resources
 
+- [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/) 
+- [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) 
+- [Wordpress Packages handles](https://developer.wordpress.org/block-editor/contributors/code/scripts/) 
 - [Javascript Reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript) | MDN Web Docs
 - [block-development-examples](https://github.com/WordPress/block-development-examples) | GitHub repository
 - [block-theme-examples](https://github.com/wptrainingteam/block-theme-examples) | GitHub repository
-- [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/) | Block Editor Handbook
-- [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) | Block Editor Handbook
-- [Wordpress Packages handles](https://developer.wordpress.org/block-editor/contributors/code/scripts/) | Block Editor Handbook
 - [How webpack and WordPress packages interact](https://developer.wordpress.org/news/2023/04/how-webpack-and-wordpress-packages-interact/) | Developer Blog

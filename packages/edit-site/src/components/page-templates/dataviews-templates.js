@@ -12,6 +12,7 @@ import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
@@ -31,6 +32,7 @@ import Link from '../routes/link';
 import { useAddedBy, AvatarImage } from '../list/added-by';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { DataViews } from '../dataviews';
+import { ENUMERATION_TYPE, OPERATOR_IN } from '../dataviews/constants';
 import {
 	useResetTemplateAction,
 	deleteTemplateAction,
@@ -39,7 +41,9 @@ import {
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
+	blockEditorPrivateApis
+);
 
 const EMPTY_ARRAY = [];
 
@@ -47,6 +51,7 @@ const defaultConfigPerViewType = {
 	list: {},
 	grid: {
 		mediaField: 'preview',
+		primaryField: 'title',
 	},
 };
 
@@ -59,6 +64,7 @@ const DEFAULT_VIEW = {
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'preview' ],
 	layout: {},
+	filters: [],
 };
 
 function normalizeSearchInput( input = '' ) {
@@ -112,6 +118,7 @@ function AuthorField( { item } ) {
 
 function TemplatePreview( { content, viewType } ) {
 	const settings = usePatternSettings();
+	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
 	const blocks = useMemo( () => {
 		return parse( content );
 	}, [ content ] );
@@ -129,6 +136,7 @@ function TemplatePreview( { content, viewType } ) {
 		<ExperimentalBlockEditorProvider settings={ settings }>
 			<div
 				className={ `page-templates-preview-field is-viewtype-${ viewType }` }
+				style={ { backgroundColor } }
 			>
 				<BlockPreview blocks={ blocks } />
 			</div>
@@ -142,6 +150,20 @@ export default function DataviewsTemplates() {
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
+
+	const authors = useMemo( () => {
+		if ( ! allTemplates ) {
+			return EMPTY_ARRAY;
+		}
+		const authorsSet = new Set();
+		allTemplates.forEach( ( template ) => {
+			authorsSet.add( template.author_text );
+		} );
+		return Array.from( authorsSet ).map( ( author ) => ( {
+			value: author,
+			label: author,
+		} ) );
+	}, [ allTemplates ] );
 
 	const fields = useMemo(
 		() => [
@@ -173,12 +195,17 @@ export default function DataviewsTemplates() {
 				id: 'description',
 				getValue: ( { item } ) => item.description,
 				render: ( { item } ) => {
-					return (
-						item.description && (
-							<Text variant="muted">
-								{ decodeEntities( item.description ) }
+					return item.description ? (
+						decodeEntities( item.description )
+					) : (
+						<>
+							<Text variant="muted" aria-hidden="true">
+								&#8212;
 							</Text>
-						)
+							<VisuallyHidden>
+								{ __( 'No description.' ) }
+							</VisuallyHidden>
+						</>
 					);
 				},
 				maxWidth: 200,
@@ -192,9 +219,11 @@ export default function DataviewsTemplates() {
 					return <AuthorField item={ item } />;
 				},
 				enableHiding: false,
+				type: ENUMERATION_TYPE,
+				elements: authors,
 			},
 		],
-		[]
+		[ authors ]
 	);
 
 	const { shownTemplates, paginationInfo } = useMemo( () => {
@@ -218,6 +247,21 @@ export default function DataviewsTemplates() {
 						normalizedSearch
 					)
 				);
+			} );
+		}
+
+		// Handle filters.
+		if ( view.filters.length > 0 ) {
+			view.filters.forEach( ( filter ) => {
+				if (
+					filter.field === 'author' &&
+					filter.operator === OPERATOR_IN &&
+					!! filter.value
+				) {
+					filteredTemplates = filteredTemplates.filter( ( item ) => {
+						return item.author_text === filter.value;
+					} );
+				}
 			} );
 		}
 

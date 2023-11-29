@@ -755,7 +755,7 @@ export const getRevisions =
 					...new Set( [
 						...( getNormalizedCommaSeparable( query._fields ) ||
 							[] ),
-						DEFAULT_ENTITY_KEY,
+						entityConfig.revisionKey || DEFAULT_ENTITY_KEY,
 					] ),
 				].join(),
 			};
@@ -868,7 +868,7 @@ export const getRevision =
 					...new Set( [
 						...( getNormalizedCommaSeparable( query._fields ) ||
 							[] ),
-						DEFAULT_ENTITY_KEY,
+						entityConfig.revisionKey || DEFAULT_ENTITY_KEY,
 					] ),
 				].join(),
 			};

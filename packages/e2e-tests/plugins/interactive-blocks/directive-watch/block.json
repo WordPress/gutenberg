@@ -1,7 +1,7 @@
 {
 	"apiVersion": 2,
-	"name": "test/store-afterload",
-	"title": "E2E Interactivity tests - store afterload",
+	"name": "test/directive-watch",
+	"title": "E2E Interactivity tests - directive watch",
 	"category": "text",
 	"icon": "heart",
 	"description": "",
@@ -9,6 +9,6 @@
 		"interactivity": true
 	},
 	"textdomain": "e2e-interactivity",
-	"viewScript": "store-afterload-view",
+	"viewScript": "directive-watch-view",
 	"render": "file:./render.php"
 }

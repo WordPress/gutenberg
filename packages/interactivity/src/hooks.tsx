@@ -1,12 +1,15 @@
+// @ts-nocheck
+
 /**
  * External dependencies
  */
 import { h, options, createContext, cloneElement } from 'preact';
-import { useRef, useCallback } from 'preact/hooks';
+import { useRef, useCallback, useContext } from 'preact/hooks';
+import { deepSignal } from 'deepsignal';
 /**
  * Internal dependencies
  */
-import { rawStore as store } from './store';
+import { stores } from './store';
 
 /** @typedef {import('preact').VNode} VNode */
 /** @typedef {typeof context} Context */
@@ -36,6 +39,67 @@ import { rawStore as store } from './store';
 
 // Main context.
 const context = createContext( {} );
+
+// Wrap the element props to prevent modifications.
+const immutableMap = new WeakMap();
+const immutableError = () => {
+	throw new Error(
+		'Please use `data-wp-bind` to modify the attributes of an element.'
+	);
+};
+const immutableHandlers = {
+	get( target, key, receiver ) {
+		const value = Reflect.get( target, key, receiver );
+		return !! value && typeof value === 'object'
+			? deepImmutable( value )
+			: value;
+	},
+	set: immutableError,
+	deleteProperty: immutableError,
+};
+const deepImmutable = < T extends Object = {} >( target: T ): T => {
+	if ( ! immutableMap.has( target ) )
+		immutableMap.set( target, new Proxy( target, immutableHandlers ) );
+	return immutableMap.get( target );
+};
+
+// Store stacks for the current scope and the default namespaces and export APIs
+// to interact with them.
+const scopeStack: any[] = [];
+const namespaceStack: string[] = [];
+
+export const getContext = < T extends object >( namespace?: string ): T =>
+	getScope()?.context[ namespace || namespaceStack.slice( -1 )[ 0 ] ];
+
+export const getElement = () => {
+	if ( ! getScope() ) {
+		throw Error(
+			'Cannot call `getElement()` outside getters and actions used by directives.'
+		);
+	}
+	const { ref, state, props } = getScope();
+	return Object.freeze( {
+		ref: ref.current,
+		state,
+		props: deepImmutable( props ),
+	} );
+};
+
+export const getScope = () => scopeStack.slice( -1 )[ 0 ];
+
+export const setScope = ( scope ) => {
+	scopeStack.push( scope );
+};
+export const resetScope = () => {
+	scopeStack.pop();
+};
+
+export const setNamespace = ( namespace: string ) => {
+	namespaceStack.push( namespace );
+};
+export const resetNamespace = () => {
+	namespaceStack.pop();
+};
 
 // WordPress Directives.
 const directiveCallbacks = {};
@@ -112,29 +176,28 @@ export const directive = ( name, callback, { priority = 10 } = {} ) => {
 };
 
 // Resolve the path to some property of the store object.
-const resolve = ( path, ctx ) => {
-	let current = { ...store, context: ctx };
+const resolve = ( path, namespace ) => {
+	let current = {
+		...stores.get( namespace ),
+		context: getScope().context[ namespace ],
+	};
 	path.split( '.' ).forEach( ( p ) => ( current = current[ p ] ) );
 	return current;
 };
 
 // Generate the evaluate function.
 const getEvaluate =
-	( { ref } = {} ) =>
-	( path, extraArgs = {} ) => {
+	( { scope } = {} ) =>
+	( entry, ...args ) => {
+		let { value: path, namespace } = entry;
 		// If path starts with !, remove it and save a flag.
 		const hasNegationOperator =
 			path[ 0 ] === '!' && !! ( path = path.slice( 1 ) );
-		const value = resolve( path, extraArgs.context );
-		const returnValue =
-			typeof value === 'function'
-				? value( {
-						ref: ref.current,
-						...store,
-						...extraArgs,
-				  } )
-				: value;
-		return hasNegationOperator ? ! returnValue : returnValue;
+		setScope( scope );
+		const value = resolve( path, namespace );
+		const result = typeof value === 'function' ? value( ...args ) : value;
+		resetScope();
+		return hasNegationOperator ? ! result : result;
 	};
 
 // Separate directives by priority. The resulting array contains objects
@@ -153,25 +216,28 @@ const getPriorityLevels = ( directives ) => {
 		.map( ( [ , arr ] ) => arr );
 };
 
-// Priority level wrapper.
+// Component that wraps each priority level of directives of an element.
 const Directives = ( {
 	directives,
 	priorityLevels: [ currentPriorityLevel, ...nextPriorityLevels ],
 	element,
-	evaluate,
 	originalProps,
-	elemRef,
+	previousScope = {},
 } ) => {
-	// Initialize the DOM reference.
-	// eslint-disable-next-line react-hooks/rules-of-hooks
-	elemRef = elemRef || useRef( null );
+	// Initialize the scope of this element. These scopes are different per each
+	// level because each level has a different context, but they share the same
+	// element ref, state and props.
+	const scope = useRef( {} ).current;
+	scope.evaluate = useCallback( getEvaluate( { scope } ), [] );
+	scope.context = useContext( context );
+	/* eslint-disable react-hooks/rules-of-hooks */
+	scope.ref = previousScope.ref || useRef( null );
+	scope.state = previousScope.state || useRef( deepSignal( {} ) ).current;
+	/* eslint-enable react-hooks/rules-of-hooks */
 
-	// Create a reference to the evaluate function using the DOM reference.
-	// eslint-disable-next-line react-hooks/rules-of-hooks, react-hooks/exhaustive-deps
-	evaluate = evaluate || useCallback( getEvaluate( { ref: elemRef } ), [] );
-
-	// Create a fresh copy of the vnode element.
-	element = cloneElement( element, { ref: elemRef } );
+	// Create a fresh copy of the vnode element and add the props to the scope.
+	element = cloneElement( element, { ref: scope.ref } );
+	scope.props = element.props;
 
 	// Recursively render the wrapper for the next priority level.
 	const children =
@@ -180,21 +246,30 @@ const Directives = ( {
 				directives={ directives }
 				priorityLevels={ nextPriorityLevels }
 				element={ element }
-				evaluate={ evaluate }
 				originalProps={ originalProps }
-				elemRef={ elemRef }
+				previousScope={ scope }
 			/>
 		) : (
 			element
 		);
 
 	const props = { ...originalProps, children };
-	const directiveArgs = { directives, props, element, context, evaluate };
+	const directiveArgs = {
+		directives,
+		props,
+		element,
+		context,
+		evaluate: scope.evaluate,
+	};
+
+	setScope( scope );
 
 	for ( const directiveName of currentPriorityLevel ) {
 		const wrapper = directiveCallbacks[ directiveName ]?.( directiveArgs );
 		if ( wrapper !== undefined ) props.children = wrapper;
 	}
+
+	resetScope();
 
 	return props.children;
 };
@@ -205,7 +280,10 @@ options.vnode = ( vnode ) => {
 	if ( vnode.props.__directives ) {
 		const props = vnode.props;
 		const directives = props.__directives;
-		if ( directives.key ) vnode.key = directives.key.default;
+		if ( directives.key )
+			vnode.key = directives.key.find(
+				( { suffix } ) => suffix === 'default'
+			).value;
 		delete props.__directives;
 		const priorityLevels = getPriorityLevels( directives );
 		if ( priorityLevels.length > 0 ) {

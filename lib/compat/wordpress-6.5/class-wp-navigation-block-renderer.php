@@ -429,25 +429,25 @@ class WP_Navigation_Block_Renderer {
 		$close_button_directives         = '';
 		if ( $should_load_view_script ) {
 			$open_button_directives          = '
-				data-wp-on--click="actions.core.navigation.openMenuOnClick"
-				data-wp-on--keydown="actions.core.navigation.handleMenuKeydown"
+				data-wp-on--click="actions.openMenuOnClick"
+				data-wp-on--keydown="actions.handleMenuKeydown"
 			';
 			$responsive_container_directives = '
-				data-wp-class--has-modal-open="selectors.core.navigation.isMenuOpen"
-				data-wp-class--is-menu-open="selectors.core.navigation.isMenuOpen"
-				data-wp-effect="effects.core.navigation.initMenu"
-				data-wp-on--keydown="actions.core.navigation.handleMenuKeydown"
-				data-wp-on--focusout="actions.core.navigation.handleMenuFocusout"
+				data-wp-class--has-modal-open="state.isMenuOpen"
+				data-wp-class--is-menu-open="state.isMenuOpen"
+				data-wp-watch="callbacks.initMenu"
+				data-wp-on--keydown="actions.handleMenuKeydown"
+				data-wp-on--focusout="actions.handleMenuFocusout"
 				tabindex="-1"
 			';
 			$responsive_dialog_directives    = '
-				data-wp-bind--aria-modal="selectors.core.navigation.ariaModal"
-				data-wp-bind--aria-label="selectors.core.navigation.ariaLabel"
-				data-wp-bind--role="selectors.core.navigation.roleAttribute"
-				data-wp-effect="effects.core.navigation.focusFirstElement"
+				data-wp-bind--aria-modal="state.ariaModal"
+				data-wp-bind--aria-label="state.ariaLabel"
+				data-wp-bind--role="state.roleAttribute"
+				data-wp-watch="callbacks.focusFirstElement"
 			';
 			$close_button_directives         = '
-				data-wp-on--click="actions.core.navigation.closeMenuOnClick"
+				data-wp-on--click="actions.closeMenuOnClick"
 			';
 		}
 
@@ -521,19 +521,15 @@ class WP_Navigation_Block_Renderer {
 		// When adding to this array be mindful of security concerns.
 		$nav_element_context = wp_json_encode(
 			array(
-				'core' => array(
-					'navigation' => array(
-						'overlayOpenedBy' => array(),
-						'type'            => 'overlay',
-						'roleAttribute'   => '',
-						'ariaLabel'       => __( 'Menu' ),
-					),
-				),
+				'overlayOpenedBy' => array(),
+				'type'            => 'overlay',
+				'roleAttribute'   => '',
+				'ariaLabel'       => __( 'Menu' ),
 			),
 			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
 		);
 		return '
-			data-wp-interactive
+			data-wp-interactive=\'{"namespace":"core/navigation"}\'
 			data-wp-context=\'' . $nav_element_context . '\'
 		';
 	}
