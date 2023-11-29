@@ -39,9 +39,13 @@
 	// here to the original button styles
 	.edit-post-header-toolbar__left > .components-button.has-icon,
 	.edit-post-header-toolbar__left > .components-dropdown > .components-button.has-icon {
-		height: $button-size;
-		min-width: $button-size;
-		padding: 6px;
+		// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
+		// This is best fixed by making the mover control area a proper single toolbar group.
+		// It needs specificity due to style inherited from .components-accessible-toolbar .components-button.has-icon.has-icon.
+		height: 32px;
+		min-width: 32px;
+		padding: 4px;
+
 
 		&.is-pressed {
 			background: $gray-900;
