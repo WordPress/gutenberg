@@ -47,8 +47,12 @@ const ListViewBlockContents = forwardRef(
 			[]
 		);
 
-		const { AdditionalBlockContent, insertedBlock, setInsertedBlock } =
-			useListViewContext();
+		const {
+			AdditionalBlockContent,
+			insertedBlock,
+			listViewInstanceId,
+			setInsertedBlock,
+		} = useListViewContext();
 
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
@@ -74,7 +78,12 @@ const ListViewBlockContents = forwardRef(
 						setInsertedBlock={ setInsertedBlock }
 					/>
 				) }
-				<BlockDraggable clientIds={ draggableClientIds }>
+				<BlockDraggable
+					appendToOwnerDocument
+					clientIds={ draggableClientIds }
+					dragComponent={ null }
+					elementId={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
+				>
 					{ ( { draggable, onDragStart, onDragEnd } ) => (
 						<ListViewBlockSelectButton
 							ref={ ref }
