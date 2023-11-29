@@ -105,10 +105,10 @@ _(check the [example](https://github.com/WordPress/block-development-examples/tr
 
 ## The server-side render markup
 
-Any markup in the server-side render definition for the block can use the [`get_block_wrapper_attributes()`](https://developer.wordpress.org/reference/functions/get_block_wrapper_attributes/) to generate the string of attributes required to reflect the block settings. function (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/render.php#L31)). 
+Any markup in the server-side render definition for the block can use the [`get_block_wrapper_attributes()`](https://developer.wordpress.org/reference/functions/get_block_wrapper_attributes/) function to generate the string of attributes required to reflect the block settings (see [example](https://github.com/WordPress/block-development-examples/blob/f68640f42d993f0866d1879f67c73910285ca114/plugins/block-dynamic-rendering-64756b/src/render.php#L11)). 
 
 ```php
 <p <?php echo get_block_wrapper_attributes(); ?>>
-	<?php esc_html_e( 'Block with Dynamic Rendering – hello!!!', '01-block-dynamic' ); ?>
+	<?php esc_html_e( 'Block with Dynamic Rendering – hello!!!', 'block-development-examples' ); ?>
 </p>
 ```
