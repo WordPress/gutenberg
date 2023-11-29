@@ -196,7 +196,7 @@ export function useIsConnected() {
 	useEffect( () => {
 		let isCurrent = true;
 
-		RNReactNativeGutenbergBridge.getConnectionStatus(
+		RNReactNativeGutenbergBridge.requestConnectionStatus(
 			( isBridgeConnected ) => {
 				if ( ! isCurrent ) {
 					return;

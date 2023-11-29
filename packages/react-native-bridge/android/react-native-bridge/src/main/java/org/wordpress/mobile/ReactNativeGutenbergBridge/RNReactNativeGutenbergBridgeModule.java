@@ -23,6 +23,7 @@ import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ConnectionStatusCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.OtherMediaOptionsReceivedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.FocalPointPickerTooltipShownCallback;
@@ -534,5 +535,19 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
                 vibrator.vibrate(tickEffect);
             }
         }
+    }
+
+    @ReactMethod
+    public void requestConnectionStatus(final Callback jsCallback) {
+        ConnectionStatusCallback connectionStatusCallback = requestConnectionStatusCallback(jsCallback);
+        mGutenbergBridgeJS2Parent.requestConnectionStatus(connectionStatusCallback);
+    }
+
+    private ConnectionStatusCallback requestConnectionStatusCallback(final Callback jsCallback) {
+        return new GutenbergBridgeJS2Parent.ConnectionStatusCallback() {
+            @Override public void onRequestConnectionStatus(boolean isConnected) {
+                jsCallback.invoke(isConnected);
+            }
+        };
     }
 }
