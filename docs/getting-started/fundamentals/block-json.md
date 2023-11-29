@@ -10,7 +10,7 @@ Click <a href="https://github.com/WordPress/block-development-examples/tree/trun
 
 Besides simplifying a block's registration, using a `block.json` has [several benefits](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#benefits-using-the-metadata-file), including improved performance and development.
 
-At [**Metadata in block.json**](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#benefits-using-the-metadata-file) you can find a detailed explanation of all the properties you can set in a `block.json` for a block. With these properties you can define things such as:
+At [**Metadata in block.json**](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/) you can find a detailed explanation of all the properties you can set in a `block.json` for a block. With these properties you can define things such as:
 
 - Basic metadata of the block
 - Files for the block's behavior, style, or output
