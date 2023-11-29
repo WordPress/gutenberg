@@ -8,7 +8,7 @@
 $gutenberg_experiments = get_option( 'gutenberg-experiments' );
 if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ) {
 	/**
-	 * Registers the dynamicContent context for block types that support it.
+	 * Registers the overrides context for block types that support it.
 	 *
 	 * @param WP_Block_Type $block_type Block Type.
 	 */
@@ -20,8 +20,8 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 				$block_type->uses_context = array();
 			}
 
-			if ( ! in_array( 'dynamicContent', $block_type->uses_context, true ) ) {
-				$block_type->uses_context[] = 'dynamicContent';
+			if ( ! in_array( 'overrides', $block_type->uses_context, true ) ) {
+				$block_type->uses_context[] = 'overrides';
 			}
 		}
 	}

@@ -87,15 +87,11 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 	}, [ blocks, parentLayout ] );
 };
 
-function applyInitialDynamicContent(
-	blocks,
-	dynamicContent = {},
-	defaultValues
-) {
+function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 	return blocks.map( ( block ) => {
-		const innerBlocks = applyInitialDynamicContent(
+		const innerBlocks = applyInitialOverrides(
 			block.innerBlocks,
-			dynamicContent,
+			overrides,
 			defaultValues
 		);
 		if ( ! isPartiallySynced( block ) ) return { ...block, innerBlocks };
@@ -103,8 +99,8 @@ function applyInitialDynamicContent(
 		const newAttributes = { ...block.attributes };
 		for ( const [ attributeKey, id ] of Object.entries( attributes ) ) {
 			defaultValues[ id ] = block.attributes[ attributeKey ];
-			if ( dynamicContent[ id ] ) {
-				newAttributes[ attributeKey ] = dynamicContent[ id ];
+			if ( overrides[ id ] ) {
+				newAttributes[ attributeKey ] = overrides[ id ];
 			}
 		}
 		return {
@@ -115,30 +111,28 @@ function applyInitialDynamicContent(
 	} );
 }
 
-function getDynamicContentFromBlocks( blocks, defaultValues ) {
+function getOverridesFromBlocks( blocks, defaultValues ) {
 	/** @type {Record<string, unknown>} */
-	const dynamicContent = {};
+	const overrides = {};
 	for ( const block of blocks ) {
 		Object.assign(
-			dynamicContent,
-			getDynamicContentFromBlocks( block.innerBlocks, defaultValues )
+			overrides,
+			getOverridesFromBlocks( block.innerBlocks, defaultValues )
 		);
 		if ( ! isPartiallySynced( block ) ) continue;
 		const attributes = getPartiallySyncedAttributes( block );
 		for ( const [ attributeKey, id ] of Object.entries( attributes ) ) {
 			if ( block.attributes[ attributeKey ] !== defaultValues[ id ] ) {
-				dynamicContent[ id ] = block.attributes[ attributeKey ];
+				overrides[ id ] = block.attributes[ attributeKey ];
 			}
 		}
 	}
-	return Object.keys( dynamicContent ).length > 0
-		? dynamicContent
-		: undefined;
+	return Object.keys( overrides ).length > 0 ? overrides : undefined;
 }
 
 export default function ReusableBlockEdit( {
 	name,
-	attributes: { ref, dynamicContent },
+	attributes: { ref, overrides },
 	__unstableParentLayout: parentLayout,
 	clientId: patternClientId,
 } ) {
@@ -150,7 +144,7 @@ export default function ReusableBlockEdit( {
 		ref
 	);
 	const isMissing = hasResolved && ! record;
-	const initialDynamicContent = useRef( dynamicContent );
+	const initialOverrides = useRef( overrides );
 	const defaultValuesRef = useRef( {} );
 	const {
 		replaceInnerBlocks,
@@ -169,9 +163,9 @@ export default function ReusableBlockEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 			replaceInnerBlocks(
 				patternClientId,
-				applyInitialDynamicContent(
+				applyInitialOverrides(
 					initialBlocks,
-					initialDynamicContent.current,
+					initialOverrides.current,
 					defaultValuesRef.current
 				)
 			);
@@ -220,7 +214,7 @@ export default function ReusableBlockEdit( {
 			: InnerBlocks.ButtonBlockAppender,
 	} );
 
-	// Sync the `dynamicContent` attribute from the updated blocks.
+	// Sync the `overrides` attribute from the updated blocks.
 	// `syncDerivedBlockAttributes` is an action that just like `updateBlockAttributes`
 	// but won't create an undo level.
 	// This can be abstracted into a `useSyncDerivedAttributes` hook if needed.
@@ -235,7 +229,7 @@ export default function ReusableBlockEdit( {
 			if ( blocks !== prevBlocks ) {
 				prevBlocks = blocks;
 				syncDerivedBlockAttributes( patternClientId, {
-					dynamicContent: getDynamicContentFromBlocks(
+					overrides: getOverridesFromBlocks(
 						blocks,
 						defaultValuesRef.current
 					),
