@@ -10,7 +10,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
-import { __experimentalGrid as Grid } from '@wordpress/components';
+import {
+	__experimentalHeading as Heading,
+	__experimentalGrid as Grid,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -25,7 +28,7 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
-function Variation( { variation } ) {
+function Variation( { variation, isColor, isFont } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo( () => {
@@ -93,6 +96,8 @@ function Variation( { variation } ) {
 						label={ variation?.title }
 						isFocused={ isFocused }
 						withHoverView
+						isColor={ isColor }
+						isFont={ isFont }
 					/>
 				</div>
 			</div>
@@ -122,14 +127,113 @@ export default function StyleVariationsContainer() {
 		];
 	}, [ variations ] );
 
+	const { user } = useContext( GlobalStylesContext );
+
+	const filterObjectByProperty = ( object, property ) => {
+		const newObject = {};
+		Object.keys( object ).forEach( ( key ) => {
+			if ( key === property ) {
+				newObject[ key ] = object[ key ];
+			} else if ( typeof object[ key ] === 'object' ) {
+				const newFilter = filterObjectByProperty(
+					object[ key ],
+					property
+				);
+				if ( Object.keys( newFilter ).length ) {
+					newObject[ key ] = newFilter;
+				}
+			}
+		} );
+		return newObject;
+	};
+
+	const removePropertyFromObject = ( object, property ) => {
+		for ( const key in object ) {
+			if ( key === property ) {
+				delete object[ key ];
+			} else if ( typeof object[ key ] === 'object' ) {
+				removePropertyFromObject( object[ key ], property );
+			}
+		}
+		return object;
+	};
+
+	const variationsWithOnlyTypography =
+		variations &&
+		variations.map( ( variation ) => {
+			return filterObjectByProperty( variation, 'typography' );
+		} );
+
+	const userSettingsWithoutTypography = removePropertyFromObject(
+		JSON.parse( JSON.stringify( user ) ),
+		'typography'
+	);
+
+	const userSettingsWithoutColor = removePropertyFromObject(
+		JSON.parse( JSON.stringify( user ) ),
+		'color'
+	);
+
+	const typographyVariations =
+		variationsWithOnlyTypography &&
+		variationsWithOnlyTypography.map( ( variation ) =>
+			mergeBaseAndUserConfigs( userSettingsWithoutTypography, variation )
+		);
+
+	const variationsWithOnlyColor =
+		variations &&
+		variations.map( ( variation ) => {
+			return filterObjectByProperty( variation, 'color' );
+		} );
+
+	const colorVariations =
+		variationsWithOnlyColor &&
+		variationsWithOnlyColor.map( ( variation ) =>
+			mergeBaseAndUserConfigs( userSettingsWithoutColor, variation )
+		);
+
 	return (
-		<Grid
-			columns={ 2 }
-			className="edit-site-global-styles-style-variations-container"
-		>
-			{ withEmptyVariation.map( ( variation, index ) => (
-				<Variation key={ index } variation={ variation } />
-			) ) }
-		</Grid>
+		<>
+			<Grid
+				columns={ 2 }
+				className="edit-site-global-styles-style-variations-container"
+			>
+				{ withEmptyVariation.map( ( variation, index ) => (
+					<Variation key={ index } variation={ variation } />
+				) ) }
+			</Grid>
+			<div className="edit-site-sidebar-navigation-screen-styles__group-header">
+				<Heading level={ 2 }>{ __( 'Colors' ) }</Heading>
+			</div>
+			<Grid
+				columns={ 2 }
+				className="edit-site-global-styles-style-variations-container"
+			>
+				{ colorVariations &&
+					colorVariations.map( ( variation, index ) => (
+						<Variation
+							key={ index }
+							variation={ variation }
+							isFont={ false }
+						/>
+					) ) }
+			</Grid>
+			<div className="edit-site-sidebar-navigation-screen-styles__group-header">
+				<Heading level={ 2 }>{ __( 'Typography' ) }</Heading>
+			</div>
+			<Grid
+				columns={ 2 }
+				className="edit-site-global-styles-style-variations-container"
+			>
+				{ typographyVariations &&
+					typographyVariations.map( ( variation, index ) => (
+						<Variation
+							key={ index }
+							variation={ variation }
+							isColor={ false }
+						/>
+					) ) }
+			</Grid>
+		</>
 	);
 }

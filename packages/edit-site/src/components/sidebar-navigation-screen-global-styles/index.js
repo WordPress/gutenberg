@@ -157,7 +157,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 	return (
 		<>
 			<SidebarNavigationScreen
-				title={ __( 'Styles' ) }
+				title={ __( 'Styles2' ) }
 				description={ __(
 					'Choose a different style combination for the theme styles.'
 				) }

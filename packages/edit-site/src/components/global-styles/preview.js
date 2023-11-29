@@ -71,7 +71,13 @@ const THROTTLE_OPTIONS = {
 	trailing: true,
 };
 
-const StylesPreview = ( { label, isFocused, withHoverView } ) => {
+const StylesPreview = ( {
+	label,
+	isFocused,
+	withHoverView,
+	isColor = true,
+	isFont = true,
+} ) => {
 	const [ fontWeight ] = useGlobalStyle( 'typography.fontWeight' );
 	const [ fontFamily = 'serif' ] = useGlobalStyle( 'typography.fontFamily' );
 	const [ headingFontFamily = fontFamily ] = useGlobalStyle(
@@ -198,53 +204,62 @@ const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 									overflow: 'hidden',
 								} }
 							>
-								<motion.div
-									style={ {
-										fontFamily: headingFontFamily,
-										fontSize: 65 * ratio,
-										color: headingColor,
-										fontWeight: headingFontWeight,
-									} }
-									animate={ { scale: 1, opacity: 1 } }
-									initial={ { scale: 0.1, opacity: 0 } }
-									transition={ { delay: 0.3, type: 'tween' } }
-								>
-									Aa
-								</motion.div>
-								<VStack spacing={ 4 * ratio }>
-									{ highlightedColors.map(
-										( { slug, color }, index ) => (
-											<motion.div
-												key={ slug }
-												style={ {
-													height:
-														normalizedColorSwatchSize *
-														ratio,
-													width:
-														normalizedColorSwatchSize *
-														ratio,
-													background: color,
-													borderRadius:
-														( normalizedColorSwatchSize *
-															ratio ) /
-														2,
-												} }
-												animate={ {
-													scale: 1,
-													opacity: 1,
-												} }
-												initial={ {
-													scale: 0.1,
-													opacity: 0,
-												} }
-												transition={ {
-													delay:
-														index === 1 ? 0.2 : 0.1,
-												} }
-											/>
-										)
-									) }
-								</VStack>
+								{ isFont && (
+									<motion.div
+										style={ {
+											fontFamily: headingFontFamily,
+											fontSize: 65 * ratio,
+											color: headingColor,
+											fontWeight: headingFontWeight,
+										} }
+										animate={ { scale: 1, opacity: 1 } }
+										initial={ { scale: 0.1, opacity: 0 } }
+										transition={ {
+											delay: 0.3,
+											type: 'tween',
+										} }
+									>
+										Aa
+									</motion.div>
+								) }
+								{ isColor && (
+									<VStack spacing={ 4 * ratio }>
+										{ highlightedColors.map(
+											( { slug, color }, index ) => (
+												<motion.div
+													key={ slug }
+													style={ {
+														height:
+															normalizedColorSwatchSize *
+															ratio,
+														width:
+															normalizedColorSwatchSize *
+															ratio,
+														background: color,
+														borderRadius:
+															( normalizedColorSwatchSize *
+																ratio ) /
+															2,
+													} }
+													animate={ {
+														scale: 1,
+														opacity: 1,
+													} }
+													initial={ {
+														scale: 0.1,
+														opacity: 0,
+													} }
+													transition={ {
+														delay:
+															index === 1
+																? 0.2
+																: 0.1,
+													} }
+												/>
+											)
+										) }
+									</VStack>
+								) }
 							</HStack>
 						</motion.div>
 						<motion.div
