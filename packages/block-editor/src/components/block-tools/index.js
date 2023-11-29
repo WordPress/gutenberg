@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
@@ -28,7 +27,6 @@ function selector( select ) {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
 		getBlock,
-		getSettings,
 		hasMultiSelection,
 		__unstableGetEditorMode,
 		isTyping,
@@ -41,7 +39,6 @@ function selector( select ) {
 	const editorMode = __unstableGetEditorMode();
 	return {
 		clientId,
-		hasFixedToolbar: getSettings().hasFixedToolbar,
 		hasSelectedBlock: clientId && name,
 		isEmptyDefaultBlock: isUnmodifiedDefaultBlock(
 			getBlock( clientId ) || {}
@@ -64,19 +61,19 @@ function selector( select ) {
  * insertion point and a slot for the inline rich text toolbar). Must be wrapped
  * around the block content and editor styles wrapper or iframe.
  *
- * @param {Object} $0                      Props.
- * @param {Object} $0.children             The block content and style container.
- * @param {Object} $0.__unstableContentRef Ref holding the content scroll container.
+ * @param {Object} $0                                   Props.
+ * @param {Object} $0.children                          The block content and style container.
+ * @param {Object} $0.__unstableContentRef              Ref holding the content scroll container.
+ * @param {string} $0.__experimentalBlockToolbarDisplay The display mode for the block toolbar.
  */
 export default function BlockTools( {
 	children,
 	__unstableContentRef,
+	__experimentalBlockToolbarDisplay = 'popover',
 	...props
 } ) {
-	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		clientId,
-		hasFixedToolbar,
 		hasSelectedBlock,
 		isEmptyDefaultBlock,
 		isTyping,
@@ -172,12 +169,6 @@ export default function BlockTools( {
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
 
-	// Conditions for fixed toolbar
-	// 1. Not zoom out mode
-	// 2. It's a large viewport. If it's a smaller viewport, let the floating toolbar handle it as it already has styles attached to make it render that way.
-	// 3. Fixed toolbar is enabled
-	const isTopToolbar = ! isZoomOutMode && hasFixedToolbar && isLargeViewport;
-
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div { ...props } onKeyDown={ onKeyDown }>
@@ -187,10 +178,8 @@ export default function BlockTools( {
 						__unstableContentRef={ __unstableContentRef }
 					/>
 				) }
-				{ /* If there is no slot available, such as in the standalone block editor, render within the editor */ }
-
-				{ ! isLargeViewport && ( // Small viewports always get a fixed toolbar
-					<BlockToolbar isFixed hideDragHandle variant="unstyled" />
+				{ __experimentalBlockToolbarDisplay === 'sticky' && (
+					<BlockToolbar hideDragHandle variant="unstyled" />
 				) }
 
 				{ showEmptyBlockSideInserter && (
@@ -200,8 +189,7 @@ export default function BlockTools( {
 					/>
 				) }
 
-				{ ! hasFixedToolbar &&
-					isLargeViewport &&
+				{ __experimentalBlockToolbarDisplay === 'popover' &&
 					! showEmptyBlockSideInserter &&
 					hasSelectedBlock &&
 					! isEmptyDefaultBlock &&
@@ -222,12 +210,13 @@ export default function BlockTools( {
 					) }
 
 				{ /* Used for the inline rich text toolbar. */ }
-				{ ! isTopToolbar && (
-					<Popover.Slot
-						name="block-toolbar"
-						ref={ blockToolbarRef }
-					/>
-				) }
+				{ ! isZoomOutMode &&
+					__experimentalBlockToolbarDisplay === 'popover' && (
+						<Popover.Slot
+							name="block-toolbar"
+							ref={ blockToolbarRef }
+						/>
+					) }
 				{ children }
 				{ /* Used for inline rich text popovers. */ }
 				<Popover.Slot
