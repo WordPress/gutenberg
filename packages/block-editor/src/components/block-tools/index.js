@@ -179,7 +179,7 @@ export default function BlockTools( {
 					/>
 				) }
 				{ __experimentalBlockToolbarDisplay === 'sticky' && (
-					<BlockToolbar hideDragHandle variant="unstyled" />
+					<BlockToolbar isFixed hideDragHandle variant="unstyled" />
 				) }
 
 				{ showEmptyBlockSideInserter && (
