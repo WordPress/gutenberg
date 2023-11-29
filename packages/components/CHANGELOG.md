@@ -20,10 +20,11 @@
 ### Internal
 
 -   `Slot`: add `style` prop to `bubblesVirtually` version ([#56428](https://github.com/WordPress/gutenberg/pull/56428))
-
-### Internal
-
 -   Introduce experimental new version of `CustomSelectControl` based on `ariakit` ([#55790](https://github.com/WordPress/gutenberg/pull/55790))
+
+### Code Quality
+
+-   `Composite`: add unit tests for `useCompositeState` ([#56645](https://github.com/WordPress/gutenberg/pull/56645)).
 
 ## 25.12.0 (2023-11-16)
 
