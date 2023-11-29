@@ -14,6 +14,8 @@
 .block-editor-list-view-leaf {
 	// Use position relative for row animation.
 	position: relative;
+	// Set the transition so that once dragged items are dropped, the other items
+	// smoothly return to their original positions.
 	transition: transform 0.2s;
 	transform: translateY(0);
 
@@ -128,6 +130,20 @@
 	}
 	&.is-branch-selected:not(.is-selected) td {
 		border-radius: 0;
+	}
+
+	&.is-nesting td {
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.5);
+	}
+
+	&.is-nesting td:first-child {
+		border-top-left-radius: $radius-block-ui;
+		border-bottom-left-radius: $radius-block-ui;
+	}
+
+	&.is-nesting td:last-child {
+		border-top-right-radius: $radius-block-ui;
+		border-bottom-right-radius: $radius-block-ui;
 	}
 
 	&.is-above {

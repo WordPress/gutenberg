@@ -45,6 +45,7 @@ function ListViewBlock( {
 	block: { clientId },
 	displacement,
 	isDragged,
+	isNesting,
 	isSelected,
 	isBranchSelected,
 	selectBlock,
@@ -273,6 +274,7 @@ function ListViewBlock( {
 		'is-draggable': canMove,
 		'is-above': displacement === 'above',
 		'is-below': displacement === 'below',
+		'is-nesting': isNesting,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block
