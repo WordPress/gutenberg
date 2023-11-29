@@ -141,14 +141,28 @@ function _gutenberg_register_wp_templates_additional_fields() {
 
 add_action( 'rest_api_init', '_gutenberg_register_wp_templates_additional_fields' );
 
-function gutenberg_rest_prepare_post_type_add_support( $response, $post_type ) {
-	$supports = get_all_post_type_supports( $post_type->name );
-	// should it be restricted to an author or source? (e.g., site editor)?
-	if ( isset( $supports['revisions'] ) && true === $supports['revisions'] ) {
-		$response->data['supports']['revisions'] = true;
-	}
 
+/**
+ * Returns post type supports data in the request's view context.
+ *
+ * @since 6.5.0
+ *
+ * @param WP_REST_Response $response  The response object.
+ * @param WP_Post_Type     $post_type The original post type object.
+ * @param WP_REST_Request  $request   Request used to generate the response.
+ */
+function gutenberg_rest_prepare_post_type_add_support( $response, $post_type, $request ) {
+	/*
+	 * Path to Core migration: modify  `get_item_schema()` and allow the field `supports => array( 'revisions' => true )` in view context always
+	 * when the post type supports revisions.
+	 */
+	if ( 'view' === $request['context'] ) {
+		$supports = get_all_post_type_supports( $post_type->name );
+		if ( isset( $supports['revisions'] ) && true === $supports['revisions'] ) {
+			$response->data['supports']['revisions'] = true;
+		}
+	}
 	return $response;
 }
 
-add_filter( 'rest_prepare_post_type', 'gutenberg_rest_prepare_post_type_add_support', 10, 2 );
+add_filter( 'rest_prepare_post_type', 'gutenberg_rest_prepare_post_type_add_support', 10, 3 );
