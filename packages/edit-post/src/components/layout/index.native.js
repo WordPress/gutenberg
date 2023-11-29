@@ -33,6 +33,7 @@ import headerToolbarStyles from '../header/header-toolbar/style.scss';
 import Header from '../header';
 import VisualEditor from '../visual-editor';
 import { store as editPostStore } from '../../store';
+import OfflineStatus from './offline-status';
 
 class Layout extends Component {
 	constructor() {
@@ -147,6 +148,7 @@ class Layout extends Component {
 					style={ containerStyles }
 					onLayout={ this.onRootViewLayout }
 				>
+					<OfflineStatus />
 					<AutosaveMonitor disableIntervalChecks />
 					<View style={ editorStyles }>
 						{ isHtmlView ? this.renderHTML() : this.renderVisual() }

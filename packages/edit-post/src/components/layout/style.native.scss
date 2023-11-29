@@ -24,3 +24,15 @@
 	right: 0;
 	left: 0;
 }
+
+.offlineStatusContainer {
+	background-color: $light-ultra-dim;
+	padding: $grid-unit;
+	justify-content: center;
+	flex-direction: row;
+}
+
+.offlineText {
+	padding-left: 3;
+	padding-top: 2;
+}
