@@ -304,6 +304,7 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 
 		return {
 			rootClientId: candidateBlockData.clientId,
+			clientId: candidateBlockData.clientId,
 			blockIndex: newBlockIndex,
 			dropPosition: 'inside',
 		};
