@@ -26,7 +26,7 @@ const {
 	getArgsFromCLI,
 } = require( '../utils' );
 
-if ( ! process.env.CI ) {
+if ( process.env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD !== '1' ) {
 	const result = spawn(
 		'node',
 		[
