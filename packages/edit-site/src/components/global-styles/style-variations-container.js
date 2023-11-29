@@ -150,6 +150,33 @@ function Variation( { variation, isColor, isFont } ) {
 	);
 }
 
+function ColorVariations( { variations } ) {
+	const { user } = useContext( GlobalStylesContext );
+	const colorVariations =
+		variations && getVariationsByType( user, variations, 'color' );
+
+	return (
+		<>
+			<div className="edit-site-sidebar-navigation-screen-styles__group-header">
+				<Heading level={ 2 }>{ __( 'Colors' ) }</Heading>
+			</div>
+			<Grid
+				columns={ 2 }
+				className="edit-site-global-styles-style-variations-container"
+			>
+				{ colorVariations &&
+					colorVariations.map( ( variation, index ) => (
+						<Variation
+							key={ index }
+							variation={ variation }
+							isFont={ false }
+						/>
+					) ) }
+			</Grid>
+		</>
+	);
+}
+
 export default function StyleVariationsContainer() {
 	const variations = useSelect( ( select ) => {
 		return select(
@@ -173,11 +200,8 @@ export default function StyleVariationsContainer() {
 	}, [ variations ] );
 
 	const { user } = useContext( GlobalStylesContext );
-
 	const typographyVariations =
 		variations && getVariationsByType( user, variations, 'typography' );
-	const colorVariations =
-		variations && getVariationsByType( user, variations, 'color' );
 
 	return (
 		<>
@@ -189,22 +213,7 @@ export default function StyleVariationsContainer() {
 					<Variation key={ index } variation={ variation } />
 				) ) }
 			</Grid>
-			<div className="edit-site-sidebar-navigation-screen-styles__group-header">
-				<Heading level={ 2 }>{ __( 'Colors' ) }</Heading>
-			</div>
-			<Grid
-				columns={ 2 }
-				className="edit-site-global-styles-style-variations-container"
-			>
-				{ colorVariations &&
-					colorVariations.map( ( variation, index ) => (
-						<Variation
-							key={ index }
-							variation={ variation }
-							isFont={ false }
-						/>
-					) ) }
-			</Grid>
+			<ColorVariations variations={ variations } />
 			<div className="edit-site-sidebar-navigation-screen-styles__group-header">
 				<Heading level={ 2 }>{ __( 'Typography' ) }</Heading>
 			</div>
