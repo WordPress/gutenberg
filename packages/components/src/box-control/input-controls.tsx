@@ -4,11 +4,12 @@
 import UnitControl from './unit-control';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import { ALL_SIDES, LABELS } from './utils';
-import { FlexItem } from '../flex';
+import { FlexBlock, FlexItem } from '../flex';
 import { LayoutContainer, Layout } from './styles/box-control-styles';
 import type { BoxControlInputControlProps, BoxControlValue } from './types';
 import type { UnitControlProps } from '../unit-control/types';
 import BoxControlIcon from './icon';
+import RangeControl from '../range-control';
 
 const noop = () => {};
 
@@ -39,6 +40,15 @@ export default function BoxInputControls( {
 
 	const handleOnChange = ( nextValues: BoxControlValue ) => {
 		onChange( nextValues );
+	};
+
+	const createSliderOnChange = (
+		side: keyof BoxControlValue,
+		next: string
+	) => {
+		const nextValues = { ...values };
+		nextValues[ side ] = next;
+		handleOnChange( nextValues );
 	};
 
 	const createHandleOnChange: (
@@ -140,6 +150,23 @@ export default function BoxInputControls( {
 									__next40pxDefaultSize
 								/>
 							</FlexItem>
+							<FlexBlock>
+								<RangeControl
+									__nextHasNoMarginBottom
+									hideLabelFromVision
+									initialPosition={ 0 }
+									onChange={ ( newValue ) => {
+										createSliderOnChange?.(
+											side,
+											[ newValue, computedUnit ].join(
+												''
+											)
+										);
+									} }
+									value={ parsedQuantity }
+									withInputField={ false }
+								/>
+							</FlexBlock>
 						</Layout>
 					);
 				} ) }
