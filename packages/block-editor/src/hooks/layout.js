@@ -467,7 +467,8 @@ export const withChildLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const layout = props.attributes.style?.layout ?? {};
 		const { selfStretch, flexSize } = layout;
-		const hasChildLayout = selfStretch || flexSize;
+		const hasChildLayout =
+			selfStretch === 'fill' || ( selfStretch === 'fixed' && flexSize );
 
 		const shouldRenderChildLayoutStyles = useSelect(
 			( select ) => {
