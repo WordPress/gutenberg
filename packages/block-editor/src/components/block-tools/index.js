@@ -209,9 +209,10 @@ export default function BlockTools( {
 						/>
 					) }
 
-				{ /* Used for the inline rich text toolbar. */ }
+				{ /* Used for the inline rich text toolbar. Until this toolbar is combined into BlockToolbar, someone implementing their own BlockToolbar will also need to use this to see the image caption toolbar. */ }
 				{ ! isZoomOutMode &&
-					__experimentalBlockToolbarDisplay === 'popover' && (
+					( __experimentalBlockToolbarDisplay === 'popover' ||
+						__experimentalBlockToolbarDisplay === 'sticky' ) && (
 						<Popover.Slot
 							name="block-toolbar"
 							ref={ blockToolbarRef }
