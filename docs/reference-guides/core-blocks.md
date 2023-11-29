@@ -605,6 +605,15 @@ Displays the contents of a post or page. ([Source](https://github.com/WordPress/
 -	**Supports:** align (full, wide), color (background, gradients, link, text), dimensions (minHeight), layout, spacing (blockGap), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** 
 
+## Content
+
+Displays the contents of a post or page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-content-internal))
+
+-	**Name:** core/post-content-internal
+-	**Category:** theme
+-	**Supports:** align (full, wide), color (background, gradients, link, text), dimensions (minHeight), layout, spacing (blockGap), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~
+-	**Attributes:** registry
+
 ## Date
 
 Display the publish date for an entry such as a post or page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-date))

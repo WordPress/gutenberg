@@ -82,6 +82,7 @@ import * as postCommentsCount from './post-comments-count';
 import * as postCommentsForm from './post-comments-form';
 import * as postCommentsLink from './post-comments-link';
 import * as postContent from './post-content';
+import * as postContentInternal from './post-content-internal';
 import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
@@ -196,6 +197,7 @@ const getAllBlocks = () => {
 		postExcerpt,
 		postFeaturedImage,
 		postContent,
+		postContentInternal,
 		postAuthor,
 		postAuthorName,
 		postComment,

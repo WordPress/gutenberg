@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useLayoutEffect, useMemo } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { EntityProvider, useEntityBlockEditor } from '@wordpress/core-data';
 import {
@@ -130,12 +130,14 @@ function extractPageContentBlockTypesFromTemplateBlocks( blocks ) {
  * Depending on the post, template and template mode,
  * returns the appropriate blocks and change handlers for the block editor provider.
  *
- * @param {Array}   post     Block list.
- * @param {boolean} template Whether the page content has focus (and the surrounding template is inert). If `true` return page content blocks. Default `false`.
- * @param {string}  mode     Rendering mode.
+ * @param {Array}   post           Block list.
+ * @param {boolean} template       Whether the page content has focus (and the surrounding template is inert). If `true` return page content blocks. Default `false`.
+ * @param {string}  mode           Rendering mode.
+ * @param {Object}  globalRegistry Global registry.
+ *
  * @return {Array} Block editor props.
  */
-function useBlockEditorProps( post, template, mode ) {
+function useBlockEditorProps( post, template, mode, globalRegistry ) {
 	const rootLevelPost =
 		mode === 'post-only' || ! template ? 'post' : 'template';
 	const [ postBlocks, onInput, onChange ] = useEntityBlockEditor(
@@ -192,6 +194,21 @@ function useBlockEditorProps( post, template, mode ) {
 				[ block ]
 			);
 		} );
+		const swappedPostContentBlocks = innerBlocksWithLayout.map(
+			( block ) => {
+				if ( block.name === 'core/post-content' ) {
+					return createBlock( 'core/post-content-internal', {
+						...block.attributes,
+						// For backwards compatibility reasons, we need to keep
+						// the global registry's core/block-editor store
+						// pointing to the store containing only the post blocks.
+						registry: globalRegistry,
+					} );
+				}
+
+				return block;
+			}
+		);
 
 		// This group block is only here to leave some space at the top of the canvas.
 		return [
@@ -206,7 +223,7 @@ function useBlockEditorProps( post, template, mode ) {
 						},
 					},
 				},
-				innerBlocksWithLayout
+				swappedPostContentBlocks
 			),
 		];
 	}, [ mode, templateBlocks, postContentLayout ] );
@@ -263,6 +280,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
 	} ) => {
+		const registry = useRegistry();
 		const mode = useSelect(
 			( select ) => select( editorStore ).getRenderingMode(),
 			[]
@@ -315,7 +333,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const [ blocks, onInput, onChange ] = useBlockEditorProps(
 			post,
 			template,
-			mode
+			mode,
+			registry
 		);
 
 		const {
@@ -376,12 +395,15 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				>
 					<BlockContextProvider value={ defaultBlockContext }>
 						<BlockEditorProviderComponent
+							key={ mode }
 							value={ blocks }
 							onChange={ onChange }
 							onInput={ onInput }
 							selection={ selection }
 							settings={ blockEditorSettings }
-							useSubRegistry={ false }
+							useSubRegistry={
+								mode === 'post-only' ? true : false
+							}
 						>
 							{ children }
 							<PatternsMenuItems />

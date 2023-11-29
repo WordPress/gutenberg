@@ -18,22 +18,41 @@ import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
 const withRegistryProvider = createHigherOrderComponent(
 	( WrappedComponent ) => {
 		return withRegistry(
-			( { useSubRegistry = true, registry, ...props } ) => {
-				if ( ! useSubRegistry ) {
-					return (
-						<WrappedComponent registry={ registry } { ...props } />
-					);
-				}
-
+			( {
+				useSubRegistry = true,
+				forceRegistry,
+				registry,
+				...props
+			} ) => {
 				const [ subRegistry, setSubRegistry ] = useState( null );
 				useEffect( () => {
+					if ( forceRegistry || ! useSubRegistry ) {
+						return;
+					}
 					const newRegistry = createRegistry( {}, registry );
 					newRegistry.registerStore(
 						blockEditorStoreName,
 						storeConfig
 					);
 					setSubRegistry( newRegistry );
-				}, [ registry ] );
+				}, [ registry, useSubRegistry, forceRegistry ] );
+
+				if ( forceRegistry ) {
+					return (
+						<RegistryProvider value={ forceRegistry }>
+							<WrappedComponent
+								registry={ forceRegistry }
+								{ ...props }
+							/>
+						</RegistryProvider>
+					);
+				}
+
+				if ( ! useSubRegistry ) {
+					return (
+						<WrappedComponent registry={ registry } { ...props } />
+					);
+				}
 
 				if ( ! subRegistry ) {
 					return null;
