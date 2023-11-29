@@ -56,56 +56,85 @@
 	}
 }
 
-.block-editor-block-contextual-toolbar.is-fixed {
+.block-editor-block-contextual-toolbar {
 	position: sticky;
 	top: 0;
 	z-index: z-index(".block-editor-block-popover");
 	display: block;
 	width: 100%;
-}
 
-// on desktop browsers the fixed toolbar has tweaked borders
-@include break-medium() {
-	.block-editor-block-contextual-toolbar.is-fixed {
-		.block-editor-block-toolbar {
-			.components-toolbar-group,
-			.components-toolbar {
-				border-right: none;
+	// Block UI appearance.
+	background-color: $white;
+	flex-shrink: 3;
 
-				&::after {
-					content: "";
-					width: $border-width;
-					margin-top: $grid-unit + $grid-unit-05;
-					margin-bottom: $grid-unit + $grid-unit-05;
-					background-color: $gray-300;
-					margin-left: $grid-unit;
-				}
+	// Raise the specificity.
+	&.components-accessible-toolbar {
+		border-bottom: $border-width solid $gray-200;
+		border-radius: 0;
+	}
 
-				& .components-toolbar-group.components-toolbar-group {
-					&::after {
-						display: none;
-					}
-				}
+	.block-editor-block-toolbar {
+		overflow: auto;
+		overflow-y: hidden;
+
+		> :last-child,
+		> :last-child .components-toolbar-group,
+		> :last-child .components-toolbar {
+			&::after {
+				display: none;
 			}
+		}
+	}
 
-			> :last-child,
-			> :last-child .components-toolbar-group,
-			> :last-child .components-toolbar {
-				&::after {
-					display: none;
-				}
+	.block-editor-block-toolbar .components-toolbar-group,
+	.block-editor-block-toolbar .components-toolbar {
+		border-right-color: $gray-200;
+	}
+
+	& > .block-editor-block-toolbar {
+		flex-grow: initial;
+		width: initial;
+	}
+
+	.show-icon-labels & {
+		.block-editor-block-parent-selector .block-editor-block-parent-selector__button::after {
+			left: 0;
+		}
+
+		.block-editor-block-toolbar__block-controls .block-editor-block-mover {
+			border-left: none;
+			&::before {
+				content: "";
+				width: $border-width;
+				margin-top: $grid-unit + $grid-unit-05;
+				margin-bottom: $grid-unit + $grid-unit-05;
+				background-color: $gray-300;
+				position: relative;
+			}
+		}
+	}
+
+	.block-editor-block-parent-selector {
+
+		.block-editor-block-parent-selector__button {
+			position: relative;
+			top: -1px;
+			border: 0;
+			padding-right: 6px;
+			padding-left: 6px;
+
+			&::after {
+				content: "\00B7";
+				font-size: 16px;
+				line-height: $grid-unit-40 + $grid-unit-10;
+				position: absolute;
+				left: $grid-unit-40 + $grid-unit-15 + 2px;
+				bottom: $grid-unit-05;
 			}
 		}
 	}
 }
 
-.block-editor-block-contextual-toolbar.has-parent:not(.is-fixed) {
-	margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
-
-	.show-icon-labels & {
-		margin-left: 0;
-	}
-}
 
 // Block controls.
 .block-editor-block-toolbar__block-controls {

@@ -36,11 +36,7 @@ import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 
-const BlockToolbar = ( {
-	hideDragHandle,
-	isFixed, // TODO: Remove isFixed. That is a temporary prop to support the old fixed toolbar. All toolbars will be "fixed"/don't care about this distinction.
-	variant,
-} ) => {
+const BlockToolbar = ( { hideDragHandle, variant } ) => {
 	const {
 		blockClientId,
 		blockClientIds,
@@ -127,7 +123,6 @@ const BlockToolbar = ( {
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = classnames( 'block-editor-block-contextual-toolbar', {
 		'has-parent': hasParents && showParentSelector,
-		'is-fixed': isFixed,
 	} );
 
 	const innerClasses = classnames( 'block-editor-block-toolbar', {
