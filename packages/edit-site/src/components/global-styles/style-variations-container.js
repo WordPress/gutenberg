@@ -41,12 +41,27 @@ function Variation( { variation } ) {
 	}, [ variation, base ] );
 
 	const selectVariation = () => {
+		const blockCSS = {};
+		if ( user?.styles?.blocks ) {
+			Object.keys( user.styles.blocks ).forEach( ( blockName ) => {
+				if ( user.styles.blocks[ blockName ].css ) {
+					blockCSS[ blockName ] = {
+						css: user.styles.blocks[ blockName ].css,
+					};
+				}
+			} );
+		}
+
 		setUserConfig( () => {
 			return {
 				settings: variation.settings,
 				styles: {
 					...variation.styles,
 					...( user?.styles?.css ? { css: user.styles.css } : {} ),
+					blocks: {
+						...variation.styles.blocks,
+						...blockCSS,
+					},
 				},
 			};
 		} );
