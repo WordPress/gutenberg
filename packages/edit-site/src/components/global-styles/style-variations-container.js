@@ -24,6 +24,51 @@ import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import StylesPreview from './preview';
 import { unlock } from '../../lock-unlock';
 
+function cloneDeep( object ) {
+	return ! object ? {} : JSON.parse( JSON.stringify( object ) );
+}
+
+const filterObjectByProperty = ( object, property ) => {
+	const newObject = {};
+	Object.keys( object ).forEach( ( key ) => {
+		if ( key === property ) {
+			newObject[ key ] = object[ key ];
+		} else if ( typeof object[ key ] === 'object' ) {
+			const newFilter = filterObjectByProperty( object[ key ], property );
+			if ( Object.keys( newFilter ).length ) {
+				newObject[ key ] = newFilter;
+			}
+		}
+	} );
+	return newObject;
+};
+
+const removePropertyFromObject = ( object, property ) => {
+	for ( const key in object ) {
+		if ( key === property ) {
+			delete object[ key ];
+		} else if ( typeof object[ key ] === 'object' ) {
+			removePropertyFromObject( object[ key ], property );
+		}
+	}
+	return object;
+};
+
+const getVariationsByType = ( user, variations, type ) => {
+	const userSettingsWithoutType = removePropertyFromObject(
+		cloneDeep( user ),
+		type
+	);
+
+	const variationsWithOnlyType = variations.map( ( variation ) => {
+		return filterObjectByProperty( variation, type );
+	} );
+
+	return variationsWithOnlyType.map( ( variation ) =>
+		mergeBaseAndUserConfigs( userSettingsWithoutType, variation )
+	);
+};
+
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
@@ -129,68 +174,10 @@ export default function StyleVariationsContainer() {
 
 	const { user } = useContext( GlobalStylesContext );
 
-	const filterObjectByProperty = ( object, property ) => {
-		const newObject = {};
-		Object.keys( object ).forEach( ( key ) => {
-			if ( key === property ) {
-				newObject[ key ] = object[ key ];
-			} else if ( typeof object[ key ] === 'object' ) {
-				const newFilter = filterObjectByProperty(
-					object[ key ],
-					property
-				);
-				if ( Object.keys( newFilter ).length ) {
-					newObject[ key ] = newFilter;
-				}
-			}
-		} );
-		return newObject;
-	};
-
-	const removePropertyFromObject = ( object, property ) => {
-		for ( const key in object ) {
-			if ( key === property ) {
-				delete object[ key ];
-			} else if ( typeof object[ key ] === 'object' ) {
-				removePropertyFromObject( object[ key ], property );
-			}
-		}
-		return object;
-	};
-
-	const variationsWithOnlyTypography =
-		variations &&
-		variations.map( ( variation ) => {
-			return filterObjectByProperty( variation, 'typography' );
-		} );
-
-	const userSettingsWithoutTypography = removePropertyFromObject(
-		JSON.parse( JSON.stringify( user ) ),
-		'typography'
-	);
-
-	const userSettingsWithoutColor = removePropertyFromObject(
-		JSON.parse( JSON.stringify( user ) ),
-		'color'
-	);
-
 	const typographyVariations =
-		variationsWithOnlyTypography &&
-		variationsWithOnlyTypography.map( ( variation ) =>
-			mergeBaseAndUserConfigs( userSettingsWithoutTypography, variation )
-		);
-
-	const variationsWithOnlyColor =
-		variations &&
-		variations.map( ( variation ) => {
-			return filterObjectByProperty( variation, 'color' );
-		} );
-
+		variations && getVariationsByType( user, variations, 'typography' );
 	const colorVariations =
-		variationsWithOnlyColor &&
-		variationsWithOnlyColor.map( ( variation ) =>
-			mergeBaseAndUserConfigs( userSettingsWithoutColor, variation )
-		);
+		variations && getVariationsByType( user, variations, 'color' );
 
 	return (
 		<>
