@@ -50,7 +50,7 @@ test.describe( 'isTyping', () => {
 		// Moving the mouse shows the toolbar.
 		await editor.showBlockToolbar();
 		// Open the dropdown.
-		await page.getByLabel( 'Display settings' ).click();
+		await page.getByRole( 'button', { name: 'Display settings' } ).click();
 
 		const itemsPerPageInput = page.getByLabel( 'Items per Page' );
 		// Make sure we're where we think we are
