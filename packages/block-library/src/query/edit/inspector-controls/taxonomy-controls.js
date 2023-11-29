@@ -6,6 +6,7 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useEffect } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -17,15 +18,6 @@ const BASE_QUERY = {
 	order: 'asc',
 	_fields: 'id,name',
 	context: 'view',
-};
-
-const replaceAmpInTermName = ( name ) => name.replace( '&amp;', '&' );
-const decodeTermName = ( term ) => {
-	const { name, ...rest } = term;
-	return {
-		name: replaceAmpInTermName( name ),
-		...rest,
-	};
 };
 
 // Helper function to get the term id based on user input in terms `FormTokenField`.
@@ -118,9 +110,7 @@ function TaxonomyItem( { taxonomy, termIds, onChange } ) {
 				},
 			];
 			return {
-				searchResults: (
-					getEntityRecords( ...selectorArgs ) || []
-				).map( decodeTermName ),
+				searchResults: getEntityRecords( ...selectorArgs ),
 				searchHasResolved: hasFinishedResolution(
 					'getEntityRecords',
 					selectorArgs
@@ -136,13 +126,11 @@ function TaxonomyItem( { taxonomy, termIds, onChange } ) {
 		( select ) => {
 			if ( ! termIds?.length ) return EMPTY_ARRAY;
 			const { getEntityRecords } = select( coreStore );
-			return (
-				getEntityRecords( 'taxonomy', taxonomy.slug, {
-					...BASE_QUERY,
-					include: termIds,
-					per_page: termIds.length,
-				} ) || []
-			).map( decodeTermName );
+			return getEntityRecords( 'taxonomy', taxonomy.slug, {
+				...BASE_QUERY,
+				include: termIds,
+				per_page: termIds.length,
+			} );
 		},
 		[ termIds ]
 	);
@@ -190,6 +178,7 @@ function TaxonomyItem( { taxonomy, termIds, onChange } ) {
 				value={ value }
 				onInputChange={ debouncedSearch }
 				suggestions={ suggestions }
+				displayTransform={ decodeEntities }
 				onChange={ onTermsChange }
 				__experimentalShowHowTo={ false }
 			/>
