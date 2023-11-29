@@ -27,7 +27,7 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { useRef, useState, useEffect } from '@wordpress/element';
-import { getQueryArgs } from '@wordpress/url';
+import { getQueryArgs, addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -147,9 +147,12 @@ function TemplateDocumentActions( { className, onBack } ) {
 
 	const { refererId } = getQueryArgs( window.location.href );
 
-	if ( ! onBack && refererId ) {
-		onBack = () =>
-			( document.location = `post.php?post=${ refererId }&action=edit` );
+	if ( ! onBack && ! isNaN( refererId ) ) {
+		const url = addQueryArgs( 'post.php', {
+			action: 'edit',
+			post: refererId,
+		} );
+		onBack = () => ( document.location = url );
 	}
 
 	return (

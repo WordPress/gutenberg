@@ -27,7 +27,7 @@ import {
 	Warning,
 	privateApis as blockEditorPrivateApis,
 	BlockControls,
-	store as editorStore,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useRef, useMemo, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -50,12 +50,14 @@ function isPartiallySynced( block ) {
 	);
 }
 
-function setBlockEditMode( setEditMode, block ) {
-	const editMode = isPartiallySynced( block ) ? 'contentOnly' : 'disabled';
-	setEditMode( block.clientId, editMode );
-	block.innerBlocks.forEach( ( innerBlock ) =>
-		setBlockEditMode( setEditMode, innerBlock )
-	);
+function setBlockEditMode( setEditMode, blocks ) {
+	blocks.forEach( ( block ) => {
+		const editMode = isPartiallySynced( block )
+			? 'contentOnly'
+			: 'disabled';
+		setEditMode( block.clientId, editMode );
+		setBlockEditMode( setEditMode, block.innerBlocks );
+	} );
 }
 
 const useInferredLayout = ( blocks, parentLayout ) => {
@@ -94,11 +96,11 @@ export default function ReusableBlockEdit( {
 	context: { postId },
 	clientId: patternClientId,
 } ) {
-	const { setBlockEditingMode } = useDispatch( editorStore );
+	const { setBlockEditingMode } = useDispatch( blockEditorStore );
 	const { editUrl, innerBlocks, userCanEdit } = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
-			const { getSettings, getBlocks } = select( editorStore );
+			const { getSettings, getBlocks } = select( blockEditorStore );
 			const blocks = getBlocks( patternClientId );
 			const isBlockTheme = getSettings().__unstableIsBlockBasedTheme;
 			const canEdit = canUser( 'update', 'blocks', ref );
@@ -127,11 +129,10 @@ export default function ReusableBlockEdit( {
 		[ patternClientId, postId, ref ]
 	);
 
-	useEffect( () => {
-		innerBlocks.forEach( ( block ) =>
-			setBlockEditMode( setBlockEditingMode, block )
-		);
-	}, [ innerBlocks, setBlockEditingMode ] );
+	useEffect(
+		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
+		[ innerBlocks, setBlockEditingMode ]
+	);
 
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
