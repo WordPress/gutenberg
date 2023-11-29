@@ -21,7 +21,7 @@ function gutenberg_register_interactivity_module() {
 	// TODO: Load only if the browser doesn't support import maps (https://github.com/guybedford/es-module-shims/issues/371).
 	wp_enqueue_script(
 		'es-module-shims',
-		gutenberg_url( '/build/importmap-polyfill.min.js' ),
+		gutenberg_url( '/build/modules/importmap-polyfill.min.js' ),
 		array(),
 		null,
 		array(

@@ -75,7 +75,7 @@ module.exports = {
 			patterns: [
 				{
 					from: './node_modules/es-module-shims/dist/es-module-shims.wasm.js',
-					to: './build/importmap-polyfill.min.js',
+					to: './build/modules/importmap-polyfill.min.js',
 				},
 			],
 		} ),
