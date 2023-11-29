@@ -66,8 +66,8 @@ Example:
 -   `hiddenFields`: the `id` of the fields that are hidden in the UI.
 -   `layout`: config that is specific to a particular layout type.
     -   `grid`: config for the `grid` layout
-        -   `mediaField`: the field name to be used for rendering each card's media.
-        -   `primaryField`: the field name to be used for rendering each card's title.
+        -   `mediaField`: the `id` of the field to be used for rendering each card's media.
+        -   `primaryField`: the `id` of the field to be used for rendering each card's title.
 
 ### View <=> data
 
