@@ -32,8 +32,8 @@ const {
 
 const availableViews = [
 	{
-		id: 'list',
-		label: __( 'List' ),
+		id: 'table',
+		label: __( 'Table' ),
 	},
 	{
 		id: 'grid',
@@ -277,7 +277,7 @@ function SortMenu( { fields, view, onChangeView } ) {
 }
 
 const VIEW_TYPE_ICONS = {
-	list: formatListBullets,
+	table: formatListBullets,
 	grid: category,
 	'side-by-side': columns,
 };
@@ -295,7 +295,7 @@ export default function ViewActions( {
 					variant="tertiary"
 					size="compact"
 					icon={
-						VIEW_TYPE_ICONS[ view.type ] || VIEW_TYPE_ICONS.list
+						VIEW_TYPE_ICONS[ view.type ] || VIEW_TYPE_ICONS.table
 					}
 					label={ __( 'View options' ) }
 				/>
