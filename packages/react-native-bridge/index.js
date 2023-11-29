@@ -213,7 +213,7 @@ export function useIsConnected() {
 
 	useEffect( () => {
 		const subscription = subscribeConnectionStatus(
-			( isBridgeConnected ) => {
+			( { isConnected: isBridgeConnected } ) => {
 				setIsConnected( isBridgeConnected );
 			}
 		);

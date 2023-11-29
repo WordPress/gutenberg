@@ -1149,6 +1149,10 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.sendToJSFeaturedImageId(mediaId);
     }
 
+    public void connectionStatusChange(boolean isConnected) {
+        mDeferredEventEmitter.onConnectionStatusChange(isConnected);
+    }
+
     public void replaceUnsupportedBlock(String content, String blockId) {
         if (mReplaceUnsupportedBlockCallback != null) {
             mReplaceUnsupportedBlockCallback.replaceUnsupportedBlock(content, blockId);
