@@ -1,7 +1,7 @@
 ( ( { wp } ) => {
-	const { store } = wp.interactivity;
+	const { store, getContext } = wp.interactivity;
 
-	store( {
+	const { state, foo } = store( 'directive-bind', {
 		state: {
 			url: '/some-url',
 			checked: true,
@@ -12,13 +12,14 @@
 			bar: 1,
 		},
 		actions: {
-			toggle: ( { state, foo } ) => {
+			toggle: () => {
 				state.url = '/some-other-url';
 				state.checked = ! state.checked;
 				state.show = ! state.show;
 				state.width += foo.bar;
 			},
-			toggleValue: ( { context } ) => {
+			toggleValue: () => {
+				const context = getContext();
 				const previousValue = ( 'previousValue' in context )
 					? context.previousValue
 					// Any string works here; we just want to toggle the value

@@ -38,16 +38,6 @@ export const FOCUSABLE_ENTITIES = [
 	PATTERN_TYPES.user,
 ];
 
-/**
- * Block types that are considered to be page content. These are the only blocks
- * editable when the page is focused.
- */
-export const PAGE_CONTENT_BLOCK_TYPES = {
-	'core/post-title': true,
-	'core/post-featured-image': true,
-	'core/post-content': true,
-};
-
 export const POST_TYPE_LABELS = {
 	[ TEMPLATE_POST_TYPE ]: __( 'Template' ),
 	[ TEMPLATE_PART_POST_TYPE ]: __( 'Template part' ),

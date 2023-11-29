@@ -1,15 +1,16 @@
 ( ( { wp } ) => {
-	const { store } = wp.interactivity;
+	const { store, getContext } = wp.interactivity;
 
-	store( {
+	const { state } = store( 'directive-slots', {
 		state: {
 			slot: ''
 		},
 		actions: {
-			changeSlot: ( { state, event } ) => {
+			changeSlot( event ) {
 				state.slot = event.target.dataset.slot;
 			},
-			updateSlotText: ( { context } ) => {
+			updateSlotText() {
+				const context = getContext();
 				const n = context.text[1];
 				context.text = `[${n} updated]`;
 			},
