@@ -105,7 +105,7 @@ function CustomFieldsControl( props ) {
  */
 const withCustomFieldsControls = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
-		const hasCustomFieldsSupport = hasBlockSupport(
+		const hasConnectionsSupport = hasBlockSupport(
 			props.name,
 			'__experimentalConnections',
 			false
@@ -120,7 +120,7 @@ const withCustomFieldsControls = createHigherOrderComponent( ( BlockEdit ) => {
 		return (
 			<>
 				<BlockEdit key="edit" { ...props } />
-				{ hasCustomFieldsSupport && props.isSelected && (
+				{ hasConnectionsSupport && props.isSelected && (
 					<CustomFieldsControl { ...props } />
 				) }
 			</>
