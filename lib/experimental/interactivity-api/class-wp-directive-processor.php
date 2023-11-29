@@ -109,6 +109,38 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	}
 
 	/**
+	 * Stack of namespaces.
+	 *
+	 * @var string[]
+	 */
+	private $ns_stack = array();
+
+	/**
+	 * Push a new namespace onto the namespace stack.
+	 *
+	 * @param string $ns The new namespace.
+	 */
+	public function push_namespace( string $ns ) {
+		$this->ns_stack[] = $ns;
+	}
+
+	/**
+	 * Discard the current namespace.
+	 */
+	public function pop_namespace() {
+		array_pop( $this->ns_stack );
+	}
+
+	/**
+	 * Return the current namespace, or false if no namespace is set.
+	 *
+	 * @return string|bool
+	 */
+	public function get_namespace() {
+		return end( $this->ns_stack );
+	}
+
+	/**
 	 * Find the matching closing tag for an opening tag.
 	 *
 	 * When called while on an open tag, traverse the HTML until we find the
