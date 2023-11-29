@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.13.0 (2023-11-29)
+
 ### Enhancements
 
 -   `FormToggle`: refine animation and improve high contrast styles ([#56515](https://github.com/WordPress/gutenberg/pull/56515)).
