@@ -5,7 +5,9 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+gutenberg_enqueue_module( 'directive-context-view' );
 ?>
+
 <div data-wp-interactive='{"namespace": "directive-context"}'>
 	<div
 		data-wp-context='{ "prop1":"parent","prop2":"parent","obj":{"prop4":"parent","prop5":"parent"},"array":[1,2,3] }'

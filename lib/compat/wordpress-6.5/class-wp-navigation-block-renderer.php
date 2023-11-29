@@ -543,20 +543,28 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function handle_view_script_loading( $attributes, $block, $inner_blocks ) {
 		$should_load_view_script = static::should_load_view_script( $attributes, $inner_blocks );
+		$is_gutenberg_plugin     = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
+		$view_js_file            = 'wp-block-navigation-view';
+		$script_handles          = $block->block_type->view_script_handles;
 
-		$view_js_file = 'wp-block-navigation-view';
-
-		// If the script already exists, there is no point in removing it from viewScript.
-		if ( ! wp_script_is( $view_js_file ) ) {
-			$script_handles = $block->block_type->view_script_handles;
-
-			// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-			if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
-				$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+		if ( $is_gutenberg_plugin ) {
+			if ( $should_load_view_script ) {
+				gutenberg_enqueue_module( '@wordpress/block-library/navigation-block' );
 			}
-			// If the script is needed, but it was previously removed, add it again.
-			if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
-				$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
+			// Remove the view script because we are using the module.
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+		} else {
+			// If the script already exists, there is no point in removing it from viewScript.
+			if ( ! wp_script_is( $view_js_file ) ) {
+
+				// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+				if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
+					$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+				}
+				// If the script is needed, but it was previously removed, add it again.
+				if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
+					$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
+				}
 			}
 		}
 	}
