@@ -17,7 +17,10 @@ export type HeadingSize =
 	| '5'
 	| '6';
 
-export type HeadingProps = Omit< TextProps, 'size' > & {
+export type HeadingProps = Omit<
+	TextProps,
+	'size' | 'isBlock' | 'color' | 'weight'
+> & {
 	/**
 	 * Passing any of the heading levels to `level` will both render the correct
 	 * typographic text size as well as the semantic element corresponding to

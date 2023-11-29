@@ -80,7 +80,7 @@ export interface Props extends TruncateProps {
 	 */
 	size?: CSSProperties[ 'fontSize' ] | TextSize;
 	/**
-	 * Enables text truncation. When `truncate` is set,we are able to truncate the long text in a variety of ways. Note: text truncation won't work if the `isBlock` property is set to `true`
+	 * Enables text truncation. When `truncate` is set, we are able to truncate the long text in a variety of ways. Note: text truncation won't work if the `isBlock` property is set to `true`
 	 *
 	 * @default false
 	 */
