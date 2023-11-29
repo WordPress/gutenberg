@@ -39,7 +39,7 @@
 		 * The other column headers use the .components-button styles.
 		 */
 		&[data-field-id="actions"] {
-			color: #1e1e1e;
+			color: var(--wp-components-color-foreground, $gray-900);
 			font-weight: normal;
 			font-size: $default-font-size;
 		}
