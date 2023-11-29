@@ -39,6 +39,7 @@ const defaultConfigPerViewType = {
 	list: {},
 	grid: {
 		mediaField: 'featured-image',
+		primaryField: 'title',
 	},
 };
 
