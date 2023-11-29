@@ -42,10 +42,20 @@ function Tabs( {
 		selectedId: selectedTabId && `${ instanceId }-${ selectedTabId }`,
 	} );
 
-	const isControlled = selectedTabId !== undefined;
+	const isControlled = useMemo(
+		() => selectedTabId !== undefined,
+		[ selectedTabId ]
+	);
 
 	const { items, selectedId } = store.useState();
-	const { setSelectedId } = store;
+	const { setSelectedId, move } = store;
+
+	const tabsRef = useRef< HTMLDivElement >( null );
+	const tabsHasFocus =
+		!! tabsRef.current?.ownerDocument.activeElement &&
+		items
+			.map( ( item ) => item.id )
+			.includes( tabsRef.current?.ownerDocument.activeElement.id );
 
 	// Keep track of whether tabs have been populated. This is used to prevent
 	// certain effects from firing too early while tab data and relevant
@@ -154,6 +164,22 @@ function Tabs( {
 		setSelectedId,
 	] );
 
+	// In controlled mode, make sure browser focus follows the selected tab if
+	// the selection is changed while a tab is already being focused.
+	useLayoutEffect( () => {
+		if ( ! isControlled ) {
+			return;
+		}
+
+		if (
+			tabsHasFocus &&
+			tabsRef.current?.ownerDocument.activeElement !== null &&
+			selectedId !== tabsRef.current?.ownerDocument.activeElement.id
+		) {
+			move( selectedId );
+		}
+	}, [ isControlled, move, selectedId, tabsHasFocus ] );
+
 	const contextValue = useMemo(
 		() => ( {
 			store,
@@ -163,9 +189,11 @@ function Tabs( {
 	);
 
 	return (
-		<TabsContext.Provider value={ contextValue }>
-			{ children }
-		</TabsContext.Provider>
+		<div ref={ tabsRef }>
+			<TabsContext.Provider value={ contextValue }>
+				{ children }
+			</TabsContext.Provider>
+		</div>
 	);
 }
 
