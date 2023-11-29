@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useViewportMatch } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo, createPortal } from '@wordpress/element';
@@ -89,6 +90,9 @@ export default function SidebarBlockEditor( {
 		setIsInserterOpened,
 	] );
 
+	// This should be a small viewport, but the display of the toolbar is tied to the CSS, so it's not visible at small screens. Once the CSS tying the toolbar display to vieweport size is removed, we can change this to be a small viewport check.
+	const isLargeViewport = useViewportMatch( 'medium' );
+
 	if ( isWelcomeGuideActive ) {
 		return <WelcomeGuide sidebar={ sidebar } />;
 	}
@@ -109,10 +113,18 @@ export default function SidebarBlockEditor( {
 					inserter={ inserter }
 					isInserterOpened={ isInserterOpened }
 					setIsInserterOpened={ setIsInserterOpened }
-					isFixedToolbarActive={ isFixedToolbarActive }
+					isFixedToolbarActive={
+						isFixedToolbarActive || ! isLargeViewport
+					}
 				/>
 
-				<BlockTools>
+				<BlockTools
+					__experimentalBlockToolbarDisplay={
+						isFixedToolbarActive || ! isLargeViewport
+							? 'sticky'
+							: 'popover'
+					}
+				>
 					<BlockCanvas
 						shouldIframe={ false }
 						styles={ settings.defaultEditorStyles }
