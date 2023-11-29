@@ -6,6 +6,7 @@
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
+gutenberg_enqueue_module( 'router-regions-view' );
 ?>
 
 <section>

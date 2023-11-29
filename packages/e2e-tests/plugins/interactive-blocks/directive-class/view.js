@@ -1,22 +1,23 @@
-( ( { wp } ) => {
-	const { store, getContext } = wp.interactivity;
+/**
+ * WordPress dependencies
+ */
+import { store, getContext } from '@wordpress/interactivity';
 
-	const { state } = store( "directive-class", {
-		state: {
-			trueValue: true,
-			falseValue: false,
+const { state } = store( 'directive-class', {
+	state: {
+		trueValue: true,
+		falseValue: false,
+	},
+	actions: {
+		toggleTrueValue: () => {
+			state.trueValue = ! state.trueValue;
 		},
-		actions: {
-			toggleTrueValue: () => {
-				state.trueValue = ! state.trueValue;
-			},
-			toggleFalseValue: () => {
-				state.falseValue = ! state.falseValue;
-			},
-			toggleContextFalseValue: () => {
-				const context = getContext();
-				context.falseValue = ! context.falseValue;
-			},
+		toggleFalseValue: () => {
+			state.falseValue = ! state.falseValue;
 		},
-	} );
-} )( window );
+		toggleContextFalseValue: () => {
+			const context = getContext();
+			context.falseValue = ! context.falseValue;
+		},
+	},
+} );
