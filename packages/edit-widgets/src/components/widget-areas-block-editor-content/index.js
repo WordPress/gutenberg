@@ -8,6 +8,7 @@ import {
 	WritingFlow,
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
+import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -21,14 +22,26 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 export default function WidgetAreasBlockEditorContent( {
 	blockEditorSettings,
 } ) {
-	const hasThemeStyles = useSelect(
-		( select ) =>
-			!! select( preferencesStore ).get(
+	const { hasTopToolbar, hasThemeStyles } = useSelect( ( select ) => {
+		return {
+			hasTopToolbar: !! select( preferencesStore ).get(
+				'core/edit-widgets',
+				'fixedToolbar'
+			),
+			hasThemeStyles: !! select( preferencesStore ).get(
 				'core/edit-widgets',
 				'themeStyles'
 			),
-		[]
-	);
+		};
+	}, [] );
+	const isLargeViewport = useViewportMatch( 'medium' );
+	let blockToolbarDisplay = 'popover';
+
+	if ( ! isLargeViewport ) {
+		blockToolbarDisplay = 'sticky';
+	} else if ( hasTopToolbar ) {
+		blockToolbarDisplay = 'none';
+	}
 
 	const styles = useMemo( () => {
 		return hasThemeStyles ? blockEditorSettings.styles : [];
@@ -37,7 +50,9 @@ export default function WidgetAreasBlockEditorContent( {
 	return (
 		<div className="edit-widgets-block-editor">
 			<Notices />
-			<BlockTools>
+			<BlockTools
+				__experimentalBlockToolbarDisplay={ blockToolbarDisplay }
+			>
 				<KeyboardShortcuts />
 				<EditorStyles
 					styles={ styles }
