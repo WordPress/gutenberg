@@ -211,7 +211,8 @@ public class Gutenberg: UIResponder {
     }
 
     public func connectionStatusChange(isConnected: Bool) {
-        bridgeModule.sendEventIfNeeded(.connectionStatusChange, body: isConnected)
+        var data: [String: Any] = ["isConnected": isConnected]
+        bridgeModule.sendEventIfNeeded(.connectionStatusChange, body: data)
     }
 
     private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {

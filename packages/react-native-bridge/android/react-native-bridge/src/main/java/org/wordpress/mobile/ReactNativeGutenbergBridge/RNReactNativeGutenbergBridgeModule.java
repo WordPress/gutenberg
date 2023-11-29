@@ -85,6 +85,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     public static final String MAP_KEY_FEATURED_IMAGE_ID = "featuredImageId";
 
+    public static final String MAP_KEY_IS_CONNECTED = "isConnected";
+
     private boolean mIsDarkMode;
 
     public RNReactNativeGutenbergBridgeModule(ReactApplicationContext reactContext,
