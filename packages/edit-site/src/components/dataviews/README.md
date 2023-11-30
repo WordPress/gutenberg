@@ -36,7 +36,7 @@ Example:
 
 ```js
 {
-	type: 'table',
+	type: LAYOUT_TABLE,
 	perPage: 5,
 	page: 1,
 	sort: {
@@ -77,7 +77,7 @@ The following example shows how a view object is used to query the WordPress RES
 ```js
 function MyCustomPageTable() {
 	const [ view, setView ] = useState( {
-		type: 'table',
+		type: TABLE_LAYOUT,
 		perPage: 5,
 		page: 1,
 		sort: {

@@ -21,6 +21,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { LAYOUT_GRID, LAYOUT_SIDE_BY_SIDE, LAYOUT_TABLE } from './constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -32,15 +33,15 @@ const {
 
 const availableViews = [
 	{
-		id: 'table',
+		id: LAYOUT_TABLE,
 		label: __( 'Table' ),
 	},
 	{
-		id: 'grid',
+		id: LAYOUT_GRID,
 		label: __( 'Grid' ),
 	},
 	{
-		id: 'side-by-side',
+		id: LAYOUT_SIDE_BY_SIDE,
 		label: __( 'Side by side' ),
 	},
 ];

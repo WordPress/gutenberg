@@ -17,20 +17,21 @@ import Search from './search';
 import ViewList from './view-list';
 import ViewGrid from './view-grid';
 import ViewSideBySide from './view-side-by-side';
+import { LAYOUT_GRID, LAYOUT_SIDE_BY_SIDE, LAYOUT_TABLE } from './constants';
 
 // To do: convert to view type registry.
 export const viewTypeSupportsMap = {
-	table: {},
-	grid: {},
-	'side-by-side': {
+	[ LAYOUT_TABLE ]: {},
+	[ LAYOUT_GRID ]: {},
+	[ LAYOUT_SIDE_BY_SIDE ]: {
 		preview: true,
 	},
 };
 
 const viewTypeMap = {
-	table: ViewList,
-	grid: ViewGrid,
-	'side-by-side': ViewSideBySide,
+	[ LAYOUT_TABLE ]: ViewList,
+	[ LAYOUT_GRID ]: ViewGrid,
+	[ LAYOUT_SIDE_BY_SIDE ]: ViewSideBySide,
 };
 
 export default function DataViews( {
