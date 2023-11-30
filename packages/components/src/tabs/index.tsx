@@ -170,7 +170,6 @@ function Tabs( {
 
 		if (
 			tabsHasFocus &&
-			tabsRef.current?.ownerDocument.activeElement !== null &&
 			selectedId !== tabsRef.current?.ownerDocument.activeElement.id
 		) {
 			move( selectedId );
