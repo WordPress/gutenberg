@@ -34,9 +34,9 @@
 	}
 	th {
 		text-align: left;
+		color: var(--wp-components-color-foreground, $gray-900);
 		font-weight: normal;
-		padding: 0 $grid-unit-20 $grid-unit-20;
-		color: $gray-700;
+		font-size: $default-font-size;
 	}
 	td,
 	th {

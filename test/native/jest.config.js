@@ -24,7 +24,6 @@ const transpiledPackageNames = glob( 'packages/*/src/index.{js,ts}' ).map(
 const RAW_HANDLING_UNSUPPORTED_UNIT_TESTS = [
 	'html-formatting-remover',
 	'phrasing-content-reducer',
-	'ms-list-converter',
 	'figure-content-reducer',
 	'special-comment-converter',
 	'normalise-blocks',
