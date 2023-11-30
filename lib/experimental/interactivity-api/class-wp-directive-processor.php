@@ -407,7 +407,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	 */
 	public static function parse_value_ns( $value ) {
 		$matches = array();
-		$has_ns  = preg_match( '/^([\w-_\/]+)::(.+)$/', $value, $matches );
+		$has_ns  = preg_match( '/^([\w\-_\/]+)::(.+)$/', $value, $matches );
 
 		if ( $has_ns ) {
 			return array_slice( $matches, 1 );
