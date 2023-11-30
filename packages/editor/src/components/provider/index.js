@@ -111,7 +111,7 @@ function useBlockEditorProps( post, template, mode ) {
 		useEntityBlockEditor( 'postType', template?.type, {
 			id: template?.id,
 		} );
-	const blocks = useMemo( () => {
+	const overriddenBlocks = useMemo( () => {
 		if ( post.type === 'wp_navigation' ) {
 			return [
 				createBlock( 'core/navigation', {
@@ -156,15 +156,13 @@ function useBlockEditorProps( post, template, mode ) {
 			return templateBlocks;
 		}
 
-		return postBlocks;
-	}, [
-		templateBlocks,
-		postBlocks,
-		rootLevelPost,
-		post.type,
-		post.id,
-		mode,
-	] );
+		return null;
+	}, [ templateBlocks, rootLevelPost, post.type, post.id, mode ] );
+
+	// Handle fallback to postBlocks outside of the above useMemo, to ensure
+	// that constructed block templates that call `createBlock` are not generated
+	// too frequently. This ensures that clientIds are stable.
+	const blocks = overriddenBlocks !== null ? overriddenBlocks : postBlocks;
 	const disableRootLevelChanges =
 		( !! template && mode === 'template-locked' ) ||
 		post.type === 'wp_navigation' ||
