@@ -254,7 +254,7 @@ export default function EditorCanvas( {
 	const observeTypingRef = useTypingObserver();
 	const titleRef = useRef();
 	useEffect( () => {
-		if ( autoFocus || ! isCleanNewPost() ) {
+		if ( ! autoFocus || ! isCleanNewPost() ) {
 			return;
 		}
 		titleRef?.current?.focus();
