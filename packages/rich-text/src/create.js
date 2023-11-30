@@ -11,6 +11,7 @@ import { createElement } from './create-element';
 import { mergePair } from './concat';
 import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
 import { toHTMLString } from './to-html-string';
+import { getTextContent } from './get-text-content';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
@@ -148,6 +149,9 @@ export class RichTextData {
 	static empty() {
 		return new RichTextData();
 	}
+	static fromPlainText( text ) {
+		return new RichTextData( create( { text } ) );
+	}
 	static fromHTMLString( html ) {
 		return new RichTextData( create( { html } ) );
 	}
@@ -164,9 +168,6 @@ export class RichTextData {
 		} );
 		return richTextData;
 	}
-	static fromPlainText( text ) {
-		return new RichTextData( create( { text } ) );
-	}
 	constructor( init = createEmptyValue() ) {
 		// Setting text, formats, and replacements as enumerable properties
 		// unfortunately visualises these in the e2e tests. As long as the class
@@ -174,6 +175,11 @@ export class RichTextData {
 		// visualised as a string.
 		Object.defineProperty( this, RichTextInternalData, { value: init } );
 	}
+	toPlainText() {
+		return getTextContent( this[ RichTextInternalData ] );
+	}
+	// We could expose `toHTMLElement` at some point as well, but we'd only use
+	// it internally.
 	toHTMLString() {
 		return (
 			this.originalHTML ||
