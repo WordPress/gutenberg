@@ -398,4 +398,21 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	public static function parse_attribute_name( $name ) {
 		return explode( '--', $name, 2 );
 	}
+
+	/**
+	 * Extract and return the namespace from the given directive value.
+	 *
+	 * @param string $value The directive value.
+	 * @return array The resulting array
+	 */
+	public static function parse_value_ns( $value ) {
+		$matches = array();
+		$has_ns  = preg_match( '/^([\w-_\/]+)::(.+)$/', $value, $matches );
+
+		if ( $has_ns ) {
+			return array_slice( $matches, 1 );
+		} else {
+			return array( null, $value );
+		}
+	}
 }

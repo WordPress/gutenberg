@@ -127,6 +127,12 @@ add_filter( 'render_block', 'gutenberg_mark_block_interactivity', 10, 3 );
  * @return mixed
  */
 function gutenberg_interactivity_evaluate_reference( $path, array $context = array(), $ns ) {
+	// Separate the namespace from the path value (if present).
+	list( $path_ns, $path ) = WP_Directive_Processor::parse_value_ns( $path );
+
+	// Overwrite namespace if path value contains one.
+	$ns = $path_ns ?? $ns;
+
 	$store = array_merge(
 		WP_Interactivity_Initial_State::get_state( $ns ),
 		array( 'context' => $context[ $ns ] )

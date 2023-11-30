@@ -19,11 +19,17 @@ function gutenberg_interactivity_process_wp_context( $tags, $context ) {
 
 	$value = $tags->get_attribute( 'data-wp-context' );
 
-	$new_context = json_decode(
-		is_string( $value ) && ! empty( $value ) ? $value : '{}',
-		true
+	/**
+	 * Separate namespace and value from the context directive attribute. A
+	 * check to ensure it's a non-empty string in order to avoid exceptions.
+	 */
+	list( $ns, $value ) = WP_Directive_Processor::parse_value_ns(
+		is_string( $value ) && ! empty( $value ) ? $value : '{}'
 	);
 
-	$ns = $tags->get_namespace();
+	// If there's no directive namespace, use the inherited one.
+	$ns = $ns ?? $tags->get_namespace();
+
+	$new_context = json_decode( $value, true );
 	$context->set_context( array( $ns => $new_context ?? array() ) );
 }
