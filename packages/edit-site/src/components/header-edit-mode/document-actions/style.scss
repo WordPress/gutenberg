@@ -1,7 +1,7 @@
 .edit-site-document-actions {
 	display: flex;
 	align-items: center;
-	height: 32px;
+	height: $button-size-compact;
 	justify-content: space-between;
 	// Flex items will, by default, refuse to shrink below a minimum
 	// intrinsic width. In order to shrink this flexbox item, and

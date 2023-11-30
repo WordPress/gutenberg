@@ -42,8 +42,8 @@
 		// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
 		// This is best fixed by making the mover control area a proper single toolbar group.
 		// It needs specificity due to style inherited from .components-accessible-toolbar .components-button.has-icon.has-icon.
-		height: 32px;
-		min-width: 32px;
+		height: $button-size-compact;
+		min-width: $button-size-compact;
 		padding: 4px;
 
 		&.is-pressed {
@@ -100,9 +100,9 @@
 .edit-post-header-toolbar .edit-post-header-toolbar__left > .edit-post-header-toolbar__inserter-toggle.has-icon {
 	margin-right: $grid-unit-10;
 	// Special dimensions for this button.
-	min-width: 32px;
-	width: 32px;
-	height: 32px;
+	min-width: $button-size-compact;
+	width: $button-size-compact;
+	height: $button-size-compact;
 	padding: 0;
 
 	.show-icon-labels & {
