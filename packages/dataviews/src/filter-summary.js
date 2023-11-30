@@ -6,8 +6,13 @@ import {
 	privateApis as componentsPrivateApis,
 	Icon,
 } from '@wordpress/components';
-import { chevronDown, chevronRightSmall, check } from '@wordpress/icons';
-import { __, sprintf } from '@wordpress/i18n';
+import {
+	chevronDown,
+	chevronRightSmall,
+	check,
+	chevronLeftSmall,
+} from '@wordpress/icons';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { Children, Fragment } from '@wordpress/element';
 
 /**
@@ -145,7 +150,13 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 										{ filterInView.operator === OPERATOR_IN
 											? __( 'Is' )
 											: __( 'Is not' ) }
-										<Icon icon={ chevronRightSmall } />{ ' ' }
+										<Icon
+											icon={
+												isRTL()
+													? chevronRightSmall
+													: chevronLeftSmall
+											}
+										/>{ ' ' }
 									</>
 								}
 							>
