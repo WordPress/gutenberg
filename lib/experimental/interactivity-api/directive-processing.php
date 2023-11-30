@@ -40,8 +40,8 @@ function gutenberg_process_directives_in_root_blocks( $block_content, $block ) {
 		WP_Directive_Processor::unmark_root_block();
 		$directives = array(
 			'data-wp-interactive' => 'gutenberg_interactivity_process_wp_interactive',
-			'data-wp-bind'        => 'gutenberg_interactivity_process_wp_bind',
 			'data-wp-context'     => 'gutenberg_interactivity_process_wp_context',
+			'data-wp-bind'        => 'gutenberg_interactivity_process_wp_bind',
 			'data-wp-class'       => 'gutenberg_interactivity_process_wp_class',
 			'data-wp-style'       => 'gutenberg_interactivity_process_wp_style',
 			'data-wp-text'        => 'gutenberg_interactivity_process_wp_text',

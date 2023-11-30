@@ -194,6 +194,10 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 		$context   = new WP_Directive_Context();
 		$tag_stack = array();
 
+		// Extract all directive names. They'll be used later on.
+		$directive_names     = array_keys( $directives );
+		$directive_names_rev = array_reverse( $directive_names );
+
 		while ( $this->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
 			$tag_name = $this->get_tag();
 
@@ -240,7 +244,20 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 				}
 			}
 
-			foreach ( $attributes as $attribute ) {
+			/*
+			 * Sort attributes by the order they appear in the `$directives`
+			 * argument, considering it as the priority order in which
+			 * directives should be processed. Note that the order is reversed
+			 * for tag closers.
+			 */
+			$sorted_attrs = array_intersect(
+				$this->is_tag_closer()
+					? $directive_names_rev
+					: $directive_names,
+				$attributes
+			);
+
+			foreach ( $sorted_attrs as $attribute ) {
 				call_user_func( $directives[ $attribute ], $this, $context );
 			}
 		}
