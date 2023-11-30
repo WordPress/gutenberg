@@ -129,28 +129,25 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 class Tests_Utils_Evaluate extends WP_UnitTestCase {
 	public function test_evaluate_function_should_access_state() {
 		// Init a simple store.
-		wp_store(
+		wp_initial_state(
+			'test',
 			array(
-				'state' => array(
-					'core' => array(
-						'number' => 1,
-						'bool'   => true,
-						'nested' => array(
-							'string' => 'hi',
-						),
-					),
+				'number' => 1,
+				'bool'   => true,
+				'nested' => array(
+					'string' => 'hi',
 				),
 			)
 		);
-		$this->assertSame( 1, gutenberg_interactivity_evaluate_reference( 'state.core.number' ) );
-		$this->assertTrue( gutenberg_interactivity_evaluate_reference( 'state.core.bool' ) );
-		$this->assertSame( 'hi', gutenberg_interactivity_evaluate_reference( 'state.core.nested.string' ) );
-		$this->assertFalse( gutenberg_interactivity_evaluate_reference( '!state.core.bool' ) );
+		$this->assertSame( 1, gutenberg_interactivity_evaluate_reference( 'state.number', 'test' ) );
+		$this->assertTrue( gutenberg_interactivity_evaluate_reference( 'state.bool', 'test' ) );
+		$this->assertSame( 'hi', gutenberg_interactivity_evaluate_reference( 'state.nested.string', 'test' ) );
+		$this->assertFalse( gutenberg_interactivity_evaluate_reference( '!state.bool', 'test' ) );
 	}
 
 	public function test_evaluate_function_should_access_passed_context() {
 		$context = array(
-			'local' => array(
+			'test' => array(
 				'number' => 2,
 				'bool'   => false,
 				'nested' => array(
@@ -158,58 +155,55 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 				),
 			),
 		);
-		$this->assertSame( 2, gutenberg_interactivity_evaluate_reference( 'context.local.number', $context ) );
-		$this->assertFalse( gutenberg_interactivity_evaluate_reference( 'context.local.bool', $context ) );
-		$this->assertTrue( gutenberg_interactivity_evaluate_reference( '!context.local.bool', $context ) );
-		$this->assertSame( 'bye', gutenberg_interactivity_evaluate_reference( 'context.local.nested.string', $context ) );
+		$this->assertSame( 2, gutenberg_interactivity_evaluate_reference( 'context.number', 'test', $context ) );
+		$this->assertFalse( gutenberg_interactivity_evaluate_reference( 'context.bool', 'test', $context ) );
+		$this->assertTrue( gutenberg_interactivity_evaluate_reference( '!context.bool', 'test', $context ) );
+		$this->assertSame( 'bye', gutenberg_interactivity_evaluate_reference( 'context.nested.string', 'test', $context ) );
 		// Previously defined state is also accessible.
-		$this->assertSame( 1, gutenberg_interactivity_evaluate_reference( 'state.core.number' ) );
-		$this->assertTrue( gutenberg_interactivity_evaluate_reference( 'state.core.bool' ) );
-		$this->assertSame( 'hi', gutenberg_interactivity_evaluate_reference( 'state.core.nested.string' ) );
+		$this->assertSame( 1, gutenberg_interactivity_evaluate_reference( 'state.number', 'test', $context ) );
+		$this->assertTrue( gutenberg_interactivity_evaluate_reference( 'state.bool', 'test', $context ) );
+		$this->assertSame( 'hi', gutenberg_interactivity_evaluate_reference( 'state.nested.string', 'test', $context ) );
 	}
 
 	public function test_evaluate_function_should_return_null_for_unresolved_paths() {
-		$this->assertNull( gutenberg_interactivity_evaluate_reference( 'this.property.doesnt.exist' ) );
+		$this->assertNull( gutenberg_interactivity_evaluate_reference( 'this.property.doesnt.exist', 'test' ) );
 	}
 
 	public function test_evaluate_function_should_execute_anonymous_functions() {
-		$context = new WP_Directive_Context( array( 'count' => 2 ) );
+		$context = new WP_Directive_Context( array( 'test' => array( 'count' => 2 ) ) );
 		$helper  = new Helper_Class();
 
-		wp_store(
+		wp_initial_state(
+			'test',
 			array(
-				'state'     => array(
-					'count' => 3,
-				),
-				'selectors' => array(
-					'anonymous_function'           => function ( $store ) {
-						return $store['state']['count'] + $store['context']['count'];
-					},
-					// Other types of callables should not be executed.
-					'function_name'                => 'gutenberg_test_process_directives_helper_increment',
-					'class_method'                 => array( $helper, 'increment' ),
-					'class_static_method'          => 'Helper_Class::static_increment',
-					'class_static_method_as_array' => array( 'Helper_Class', 'static_increment' ),
-				),
+				'count'                        => 3,
+				'anonymous_function'           => function ( $store ) {
+					return $store['state']['count'] + $store['context']['count'];
+				},
+				// Other types of callables should not be executed.
+				'function_name'                => 'gutenberg_test_process_directives_helper_increment',
+				'class_method'                 => array( $helper, 'increment' ),
+				'class_static_method'          => 'Helper_Class::static_increment',
+				'class_static_method_as_array' => array( 'Helper_Class', 'static_increment' ),
 			)
 		);
 
-		$this->assertSame( 5, gutenberg_interactivity_evaluate_reference( 'selectors.anonymous_function', $context->get_context() ) );
+		$this->assertSame( 5, gutenberg_interactivity_evaluate_reference( 'state.anonymous_function', 'test', $context->get_context() ) );
 		$this->assertSame(
 			'gutenberg_test_process_directives_helper_increment',
-			gutenberg_interactivity_evaluate_reference( 'selectors.function_name', $context->get_context() )
+			gutenberg_interactivity_evaluate_reference( 'state.function_name', 'test', $context->get_context() )
 		);
 		$this->assertSame(
 			array( $helper, 'increment' ),
-			gutenberg_interactivity_evaluate_reference( 'selectors.class_method', $context->get_context() )
+			gutenberg_interactivity_evaluate_reference( 'state.class_method', 'test', $context->get_context() )
 		);
 		$this->assertSame(
 			'Helper_Class::static_increment',
-			gutenberg_interactivity_evaluate_reference( 'selectors.class_static_method', $context->get_context() )
+			gutenberg_interactivity_evaluate_reference( 'state.class_static_method', 'test', $context->get_context() )
 		);
 		$this->assertSame(
 			array( 'Helper_Class', 'static_increment' ),
-			gutenberg_interactivity_evaluate_reference( 'selectors.class_static_method_as_array', $context->get_context() )
+			gutenberg_interactivity_evaluate_reference( 'state.class_static_method_as_array', 'test', $context->get_context() )
 		);
 	}
 }
