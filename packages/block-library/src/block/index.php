@@ -46,12 +46,17 @@ function render_block_core_block( $attributes ) {
 	$content = $wp_embed->run_shortcode( $reusable_block->post_content );
 	$content = $wp_embed->autoembed( $content );
 
+	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+	$has_partial_synced_overrides = $gutenberg_experiments
+		&& array_key_exists( 'gutenberg-pattern-partial-syncing', $gutenberg_experiments )
+		&& isset( $attributes['overrides'] );
+
 	/**
 	 * We set the `overrides` context through the `render_block_context`
 	 * filter so that it is available when a pattern's inner blocks are
 	 * rendering via do_blocks given it only receives the inner content.
 	 */
-	if ( isset( $attributes['overrides'] ) ) {
+	if ( $has_partial_synced_overrides ) {
 		$filter_block_context = static function ( $context ) use ( $attributes ) {
 			$context['overrides'] = $attributes['overrides'];
 			return $context;
@@ -62,7 +67,7 @@ function render_block_core_block( $attributes ) {
 	$content = do_blocks( $content );
 	unset( $seen_refs[ $attributes['ref'] ] );
 
-	if ( isset( $attributes['overrides'] ) ) {
+	if ( $has_partial_synced_overrides ) {
 		remove_filter( 'render_block_context', $filter_block_context, 1 );
 	}
 

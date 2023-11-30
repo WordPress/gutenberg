@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { privateApis } from '@wordpress/patterns';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useBlockEditingMode } from '@wordpress/block-editor';
 import { hasBlockSupport } from '@wordpress/blocks';
@@ -18,7 +18,7 @@ const {
 	PartialSyncingControls,
 	PATTERN_TYPES,
 	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
-} = unlock( privateApis );
+} = unlock( patternsPrivateApis );
 
 /**
  * Override the default edit UI to include a new block inspector control for
