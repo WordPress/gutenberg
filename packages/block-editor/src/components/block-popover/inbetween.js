@@ -68,7 +68,7 @@ function BlockPopoverInbetween( {
 	);
 	const previousElement = useBlockElement( previousClientId );
 	const nextElement = useBlockElement( nextClientId );
-	const isVertical = operation !== 'group' && orientation === 'vertical';
+	const isVertical = orientation === 'vertical';
 
 	const popoverAnchor = useMemo( () => {
 		if (
@@ -99,7 +99,14 @@ function BlockPopoverInbetween( {
 				let width = 0;
 				let height = 0;
 
-				if ( isVertical ) {
+				if ( operation === 'group' ) {
+					// If the operation is group, nextRect is the target to be grouped.
+					// Not sure if previousRect is needed here.
+					top = nextRect ? nextRect.top : previousRect.top;
+					width = nextRect ? nextRect.width : previousRect.width;
+					height = nextRect ? nextRect.bottom - nextRect.top : 0;
+					left = nextRect ? nextRect.left : previousRect.left;
+				} else if ( isVertical ) {
 					// vertical
 					top = previousRect ? previousRect.bottom : nextRect.top;
 					width = previousRect ? previousRect.width : nextRect.width;
