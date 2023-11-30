@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useContext, useState } from '@wordpress/element';
+import { useMemo, useContext, useState, useEffect } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import {
 	__experimentalGrid as Grid,
@@ -28,9 +28,9 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
-function Variation( { variation } ) {
+function Variation( { variation, setCurrentVariation, variationId } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
-	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
+	const { base, user } = useContext( GlobalStylesContext );
 	const context = useMemo( () => {
 		return {
 			user: {
@@ -44,12 +44,7 @@ function Variation( { variation } ) {
 	}, [ variation, base ] );
 
 	const selectVariation = () => {
-		setUserConfig( () => {
-			return {
-				settings: variation.settings,
-				styles: variation.styles,
-			};
-		} );
+		setCurrentVariation( variationId );
 	};
 
 	const selectOnEnter = ( event ) => {
@@ -104,8 +99,9 @@ function Variation( { variation } ) {
 }
 
 export default function StyleVariationsContainer() {
-	const { user } = useContext( GlobalStylesContext );
+	const { user, setUserConfig } = useContext( GlobalStylesContext );
 	const [ currentUserStyles ] = useState( { ...user } );
+	const [ currentVariation, setCurrentVariation ] = useState();
 
 	const [ preserveAdditionalCSS, setPreserveAdditionalCSS ] =
 		useState( true );
@@ -182,6 +178,22 @@ export default function StyleVariationsContainer() {
 		preserveAdditionalCSS,
 	] );
 
+	useEffect( () => {
+		if ( currentVariation ) {
+			setUserConfig( () => {
+				return {
+					settings: withEmptyVariation[ currentVariation ]?.settings,
+					styles: withEmptyVariation[ currentVariation ]?.styles,
+				};
+			} );
+		}
+	}, [
+		currentVariation,
+		preserveAdditionalCSS,
+		setUserConfig,
+		withEmptyVariation,
+	] );
+
 	return (
 		<>
 			<Grid
@@ -192,7 +204,8 @@ export default function StyleVariationsContainer() {
 					<Variation
 						key={ index }
 						variation={ variation }
-						preserveAdditionalCSS={ preserveAdditionalCSS }
+						variationId={ index }
+						setCurrentVariation={ setCurrentVariation }
 					/>
 				) ) }
 			</Grid>
