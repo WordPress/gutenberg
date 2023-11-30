@@ -42,10 +42,7 @@ function Tabs( {
 		selectedId: selectedTabId && `${ instanceId }-${ selectedTabId }`,
 	} );
 
-	const isControlled = useMemo(
-		() => selectedTabId !== undefined,
-		[ selectedTabId ]
-	);
+	const isControlled = selectedTabId !== undefined;
 
 	const { items, selectedId } = store.useState();
 	const { setSelectedId, move } = store;
