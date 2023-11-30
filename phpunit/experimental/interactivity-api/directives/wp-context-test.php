@@ -21,8 +21,9 @@ class Tests_Directives_Attributes_WpContext extends WP_UnitTestCase {
 			)
 		);
 
-		$markup = '<div data-wp-context=\'{ "myblock": { "open": true } }\'>';
-		$tags   = new WP_HTML_Tag_Processor( $markup );
+		$markup = '<div data-wp-context=\'{ "open": true }\'>';
+		$tags   = new WP_Directive_Processor( $markup );
+		$tags->push_namespace( 'myblock' );
 		$tags->next_tag();
 
 		gutenberg_interactivity_process_wp_context( $tags, $context );
@@ -38,38 +39,40 @@ class Tests_Directives_Attributes_WpContext extends WP_UnitTestCase {
 
 	public function test_directive_resets_context_correctly_upon_closing_tag() {
 		$context = new WP_Directive_Context(
-			array( 'my-key' => 'original-value' )
+			array( 'myblock' => array( 'my-key' => 'original-value' ) )
 		);
 
 		$context->set_context(
-			array( 'my-key' => 'new-value' )
+			array( 'myblock' => array( 'my-key' => 'new-value' ) )
 		);
 
 		$markup = '</div>';
-		$tags   = new WP_HTML_Tag_Processor( $markup );
+		$tags   = new WP_Directive_Processor( $markup );
 		$tags->next_tag( array( 'tag_closers' => 'visit' ) );
+		$tags->push_namespace( 'myblock' );
 
 		gutenberg_interactivity_process_wp_context( $tags, $context );
 
 		$this->assertSame(
-			array( 'my-key' => 'original-value' ),
+			array( 'myblock' => array( 'my-key' => 'original-value' ) ),
 			$context->get_context()
 		);
 	}
 
 	public function test_directive_doesnt_throw_on_malformed_context_objects() {
 		$context = new WP_Directive_Context(
-			array( 'my-key' => 'some-value' )
+			array( 'myblock' => array( 'my-key' => 'some-value' ) )
 		);
 
 		$markup = '<div data-wp-context=\'{ "wrong_json_object: }\'>';
-		$tags   = new WP_HTML_Tag_Processor( $markup );
+		$tags   = new WP_Directive_Processor( $markup );
 		$tags->next_tag();
+		$tags->push_namespace( 'myblock' );
 
 		gutenberg_interactivity_process_wp_context( $tags, $context );
 
 		$this->assertSame(
-			array( 'my-key' => 'some-value' ),
+			array( 'myblock' => array( 'my-key' => 'some-value' ) ),
 			$context->get_context()
 		);
 	}
@@ -83,14 +86,15 @@ class Tests_Directives_Attributes_WpContext extends WP_UnitTestCase {
 				</div>
 			</div>
 		';
-		$tags   = new WP_HTML_Tag_Processor( $markup );
+		$tags   = new WP_Directive_Processor( $markup );
 
 		// Parent div.
 		$tags->next_tag( array( 'tag_closers' => 'visit' ) );
+		$tags->push_namespace( 'myblock' );
 		gutenberg_interactivity_process_wp_context( $tags, $context );
 
 		$this->assertSame(
-			array( 'my-key' => 'some-value' ),
+			array( 'myblock' => array( 'my-key' => 'some-value' ) ),
 			$context->get_context()
 		);
 
@@ -100,7 +104,7 @@ class Tests_Directives_Attributes_WpContext extends WP_UnitTestCase {
 
 		// Still the same context.
 		$this->assertSame(
-			array( 'my-key' => 'some-value' ),
+			array( 'myblock' => array( 'my-key' => 'some-value' ) ),
 			$context->get_context()
 		);
 
@@ -110,7 +114,7 @@ class Tests_Directives_Attributes_WpContext extends WP_UnitTestCase {
 
 		// Still the same context.
 		$this->assertSame(
-			array( 'my-key' => 'some-value' ),
+			array( 'myblock' => array( 'my-key' => 'some-value' ) ),
 			$context->get_context()
 		);
 
@@ -134,14 +138,15 @@ class Tests_Directives_Attributes_WpContext extends WP_UnitTestCase {
 				</div>
 			</div>
 		';
-		$tags   = new WP_HTML_Tag_Processor( $markup );
+		$tags   = new WP_Directive_Processor( $markup );
+		$tags->push_namespace( 'myblock' );
 
 		// Parent div.
 		$tags->next_tag( array( 'tag_closers' => 'visit' ) );
 		gutenberg_interactivity_process_wp_context( $tags, $context );
 
 		$this->assertSame(
-			array( 'my-key' => 'some-value' ),
+			array( 'myblock' => array( 'my-key' => 'some-value' ) ),
 			$context->get_context()
 		);
 
@@ -151,7 +156,7 @@ class Tests_Directives_Attributes_WpContext extends WP_UnitTestCase {
 
 		// Still the same context.
 		$this->assertSame(
-			array( 'my-key' => 'some-value' ),
+			array( 'myblock' => array( 'my-key' => 'some-value' ) ),
 			$context->get_context()
 		);
 
@@ -161,7 +166,7 @@ class Tests_Directives_Attributes_WpContext extends WP_UnitTestCase {
 
 		// Still the same context.
 		$this->assertSame(
-			array( 'my-key' => 'some-value' ),
+			array( 'myblock' => array( 'my-key' => 'some-value' ) ),
 			$context->get_context()
 		);
 
@@ -185,14 +190,15 @@ class Tests_Directives_Attributes_WpContext extends WP_UnitTestCase {
 				</div>
 			</div>
 		';
-		$tags   = new WP_HTML_Tag_Processor( $markup );
+		$tags   = new WP_Directive_Processor( $markup );
+		$tags->push_namespace( 'myblock' );
 
 		// Parent div.
 		$tags->next_tag( array( 'tag_closers' => 'visit' ) );
 		gutenberg_interactivity_process_wp_context( $tags, $context );
 
 		$this->assertSame(
-			array( 'my-key' => 'some-value' ),
+			array( 'myblock' => array( 'my-key' => 'some-value' ) ),
 			$context->get_context()
 		);
 
@@ -202,7 +208,7 @@ class Tests_Directives_Attributes_WpContext extends WP_UnitTestCase {
 
 		// Still the same context.
 		$this->assertSame(
-			array( 'my-key' => 'some-value' ),
+			array( 'myblock' => array( 'my-key' => 'some-value' ) ),
 			$context->get_context()
 		);
 
@@ -212,7 +218,7 @@ class Tests_Directives_Attributes_WpContext extends WP_UnitTestCase {
 
 		// Still the same context.
 		$this->assertSame(
-			array( 'my-key' => 'some-value' ),
+			array( 'myblock' => array( 'my-key' => 'some-value' ) ),
 			$context->get_context()
 		);
 
