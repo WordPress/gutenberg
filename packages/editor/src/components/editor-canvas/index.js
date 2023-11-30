@@ -128,7 +128,6 @@ export default function EditorCanvas( {
 	const { isCleanNewPost } = useSelect( editorStore );
 	const {
 		hasRootPaddingAwareAlignments,
-		isFocusMode,
 		themeHasDisabledLayoutStyles,
 		themeSupportsLayout,
 	} = useSelect( ( select ) => {
@@ -136,7 +135,6 @@ export default function EditorCanvas( {
 		return {
 			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
 			themeSupportsLayout: _settings.supportsLayout,
-			isFocusMode: _settings.focusMode,
 			hasRootPaddingAwareAlignments:
 				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
 		};
@@ -273,7 +271,7 @@ export default function EditorCanvas( {
 				renderingMode === 'post-only' && (
 					<>
 						<LayoutStyle
-							selector=".edit-post-visual-editor__post-title-wrapper"
+							selector=".editor-editor-canvas__post-title-wrapper"
 							layout={ fallbackLayout }
 						/>
 						<LayoutStyle
@@ -292,14 +290,18 @@ export default function EditorCanvas( {
 			{ renderingMode === 'post-only' && (
 				<div
 					className={ classnames(
-						'edit-post-visual-editor__post-title-wrapper',
+						'editor-editor-canvas__post-title-wrapper',
 						{
-							'is-focus-mode': isFocusMode,
 							'has-global-padding': hasRootPaddingAwareAlignments,
 						}
 					) }
 					contentEditable={ false }
 					ref={ observeTypingRef }
+					style={ {
+						// This is using inline styles
+						// so it's applied for both iframed and non iframed editors.
+						marginTop: '4em',
+					} }
 				>
 					<PostTitle ref={ titleRef } />
 				</div>

@@ -111,11 +111,9 @@ export default function VisualEditor( { styles } ) {
 			...styles,
 			{
 				// We should move this in to future to the body.
-				css:
-					`.edit-post-visual-editor__post-title-wrapper{margin-top:4rem}` +
-					( paddingBottom
-						? `body{padding-bottom:${ paddingBottom }}`
-						: '' ),
+				css: paddingBottom
+					? `body{padding-bottom:${ paddingBottom }}`
+					: '',
 			},
 		],
 		[ styles ]
