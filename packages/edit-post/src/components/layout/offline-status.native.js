@@ -13,13 +13,13 @@ import Animated, {
  */
 import { Icon } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
+import { offline as offlineIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import offlineIcon from './offline-icon';
 
 const OfflineStatus = () => {
 	const translateY = useSharedValue( -10 );
@@ -28,7 +28,9 @@ const OfflineStatus = () => {
 	};
 
 	useEffect( () => {
-		slideIn();
+		return () => {
+			slideIn();
+		};
 	}, [] );
 
 	const animatedStyle = useAnimatedStyle( () => {
