@@ -15,8 +15,6 @@ export function getFormatColors( formats, colors ) {
 		format.forEach( ( currentFormat ) => {
 			if ( currentFormat?.type === FORMAT_TYPE ) {
 				const className = currentFormat?.attributes?.class;
-				currentFormat.attributes.style =
-					currentFormat.attributes.style.replace( / /g, '' );
 
 				className?.split( ' ' ).forEach( ( currentClass ) => {
 					const match = currentClass.match( REGEX_TO_MATCH );
