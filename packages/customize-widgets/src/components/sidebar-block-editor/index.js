@@ -90,8 +90,7 @@ export default function SidebarBlockEditor( {
 		setIsInserterOpened,
 	] );
 
-	// This should be a small viewport, but the display of the toolbar is tied to the CSS, so it's not visible at small screens. Once the CSS tying the toolbar display to vieweport size is removed, we can change this to be a small viewport check.
-	const isLargeViewport = useViewportMatch( 'medium' );
+	const isMediumViewport = useViewportMatch( 'small' );
 
 	if ( isWelcomeGuideActive ) {
 		return <WelcomeGuide sidebar={ sidebar } />;
@@ -114,13 +113,13 @@ export default function SidebarBlockEditor( {
 					isInserterOpened={ isInserterOpened }
 					setIsInserterOpened={ setIsInserterOpened }
 					isFixedToolbarActive={
-						isFixedToolbarActive || ! isLargeViewport
+						isFixedToolbarActive || ! isMediumViewport
 					}
 				/>
 
 				<BlockTools
 					__experimentalBlockToolbarDisplay={
-						isFixedToolbarActive || ! isLargeViewport
+						isFixedToolbarActive || ! isMediumViewport
 							? 'sticky'
 							: 'popover'
 					}
