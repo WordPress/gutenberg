@@ -32,11 +32,8 @@ export default function EditorBox() {
 				value={ blocks }
 				onInput={ updateBlocks }
 				onChange={ updateBlocks }
-				settings={ {
-					hasFixedToolbar: true,
-				} }
 			>
-				<BlockTools />
+				<BlockTools __experimentalBlockToolbarDisplay="sticky" />
 				<BlockCanvas height="100%" styles={ editorStyles } />
 			</BlockEditorProvider>
 		</div>
