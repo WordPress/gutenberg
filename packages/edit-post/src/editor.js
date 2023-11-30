@@ -36,7 +36,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		hiddenBlockTypes,
 		blockTypes,
 		keepCaretInsideBlock,
-		hasTemplate,
 		template,
 	} = useSelect(
 		( select ) => {
@@ -67,8 +66,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				getEditorSettings().supportsTemplateMode;
 			const isViewable = getPostType( postType )?.viewable ?? false;
 			const canEditTemplate = canUser( 'create', 'templates' );
-			const _hasTemplate =
-				supportsTemplateMode && isViewable && canEditTemplate;
 
 			return {
 				hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
@@ -82,8 +79,10 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
-				hasTemplate: _hasTemplate,
-				template: _hasTemplate ? getEditedPostTemplate() : null,
+				template:
+					supportsTemplateMode && isViewable && canEditTemplate
+						? getEditedPostTemplate()
+						: null,
 				post: postObject,
 			};
 		},
@@ -143,7 +142,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		keepCaretInsideBlock,
 	] );
 
-	if ( ! post || ( hasTemplate && ! template ) ) {
+	if ( ! post ) {
 		return null;
 	}
 
