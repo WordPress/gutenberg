@@ -21,6 +21,8 @@ if ( function_exists( 'register_block_bindings_source' ) ) {
 		} else {
 			$meta_type = 'post';
 		}
+
+		// TODO: Add a filter/mechanism to limit the meta keys that can be used.
 		return get_metadata( $meta_type, $post_id, $source_attrs['value'], true );
 	};
 	register_block_bindings_source( 'metadata', $metadata_source_callback );
