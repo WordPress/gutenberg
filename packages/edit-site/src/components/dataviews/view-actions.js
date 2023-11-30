@@ -139,7 +139,8 @@ function PageSizeMenu( { view, onChangeView } ) {
 
 function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 	const hidableFields = fields.filter(
-		( field ) => field.enableHiding !== false
+		( field ) =>
+			field.enableHiding !== false && field.id !== view.layout.mediaField
 	);
 	if ( ! hidableFields?.length ) {
 		return null;

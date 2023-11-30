@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+## 25.13.0 (2023-11-29)
+
 ### Enhancements
 
+-   `FormToggle`: refine animation and improve high contrast styles ([#56515](https://github.com/WordPress/gutenberg/pull/56515)).
 -   `Button`: Add focus rings to focusable disabled buttons ([#56383](https://github.com/WordPress/gutenberg/pull/56383)).
+-   `InserterButton`: Move mobile InserterButton from components package to block-editor package ([#56494](https://github.com/WordPress/gutenberg/pull/56494))
 
 ### Bug Fix
 
@@ -17,12 +21,13 @@
 -   `Tabs`: Memoize and expose the component context ([#56224](https://github.com/WordPress/gutenberg/pull/56224)).
 -   `DropdownMenuV2`: Design tweaks ([#56041](https://github.com/WordPress/gutenberg/pull/56041))
 
+### Documentation
+
+-  `Text` and `Heading`: improve docs around default values and truncation logic ([#56518](https://github.com/WordPress/gutenberg/pull/56518))
+
 ### Internal
 
 -   `Slot`: add `style` prop to `bubblesVirtually` version ([#56428](https://github.com/WordPress/gutenberg/pull/56428))
-
-### Internal
-
 -   Introduce experimental new version of `CustomSelectControl` based on `ariakit` ([#55790](https://github.com/WordPress/gutenberg/pull/55790))
 
 ## 25.12.0 (2023-11-16)

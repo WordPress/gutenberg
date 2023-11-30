@@ -5,8 +5,6 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	FlexBlock,
-	Placeholder,
 } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 
@@ -19,10 +17,15 @@ export function ViewGrid( { data, fields, view, actions, getItemId } ) {
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout.mediaField
 	);
+	const primaryField = fields.find(
+		( field ) => field.id === view.layout.primaryField
+	);
 	const visibleFields = fields.filter(
 		( field ) =>
 			! view.hiddenFields.includes( field.id ) &&
-			field.id !== view.layout.mediaField
+			! [ view.layout.mediaField, view.layout.primaryField ].includes(
+				field.id
+			)
 	);
 	const shownData = useAsyncList( data, { step: 3 } );
 	return (
@@ -32,42 +35,56 @@ export function ViewGrid( { data, fields, view, actions, getItemId } ) {
 			alignment="top"
 			className="dataviews-grid-view"
 		>
-			{ shownData.map( ( item, index ) => {
-				return (
-					<VStack key={ getItemId?.( item ) || index }>
-						<div className="dataviews-view-grid__media">
-							{ mediaField?.render( { item, view } ) || (
-								<Placeholder
-									withIllustration
-									style={ {
-										width: '100%',
-										minHeight: '200px',
-									} }
-								/>
-							) }
-						</div>
-
-						<HStack justify="space-between" alignment="top">
-							<FlexBlock>
-								<VStack>
-									{ visibleFields.map( ( field ) => (
-										<div key={ field.id }>
-											{ field.render( { item, view } ) }
-										</div>
-									) ) }
+			{ shownData.map( ( item, index ) => (
+				<VStack
+					spacing={ 3 }
+					key={ getItemId?.( item ) || index }
+					className="dataviews-view-grid__card"
+				>
+					<div className="dataviews-view-grid__media">
+						{ mediaField?.render( { item, view } ) }
+					</div>
+					<HStack
+						className="dataviews-view-grid__title"
+						justify="space-between"
+					>
+						{ primaryField?.render( { item, view } ) }
+						<ItemActions
+							item={ item }
+							actions={ actions }
+							isCompact
+						/>
+					</HStack>
+					<VStack
+						className="dataviews-view-grid__fields"
+						spacing={ 3 }
+					>
+						{ visibleFields.map( ( field ) => {
+							const renderedValue = field.render( {
+								item,
+								view,
+							} );
+							if ( ! renderedValue ) {
+								return null;
+							}
+							return (
+								<VStack
+									className="dataviews-view-grid__field"
+									key={ field.id }
+									spacing={ 1 }
+								>
+									<div className="dataviews-view-grid__field-header">
+										{ field.header }
+									</div>
+									<div className="dataviews-view-grid__field-value">
+										{ field.render( { item, view } ) }
+									</div>
 								</VStack>
-							</FlexBlock>
-							<FlexBlock style={ { maxWidth: 'min-content' } }>
-								<ItemActions
-									item={ item }
-									actions={ actions }
-									isCompact
-								/>
-							</FlexBlock>
-						</HStack>
+							);
+						} ) }
 					</VStack>
-				);
-			} ) }
+				</VStack>
+			) ) }
 		</Grid>
 	);
 }

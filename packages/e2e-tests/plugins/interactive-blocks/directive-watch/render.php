@@ -1,29 +1,31 @@
 <?php
 /**
- * HTML for testing the directive `data-wp-effect`.
+ * HTML for testing the directive `data-wp-watch`.
  *
  * @package gutenberg-test-interactive-blocks
  */
 
+gutenberg_enqueue_module( 'directive-watch-view' );
 ?>
-<div data-wp-interactive>
+
+<div data-wp-interactive='{ "namespace": "directive-watch" }'>
 	<div data-wp-show-mock="state.isOpen">
 		<input
 			data-testid="input"
-			data-wp-effect="effects.elementAddedToTheDOM"
+			data-wp-watch="callbacks.elementAddedToTheDOM"
 		/>
 	</div>
 
 	<div
-		data-wp-text="selectors.elementInTheDOM"
+		data-wp-text="state.elementInTheDOM"
 		data-testid="element in the DOM"
 	></div>
 
-	<div data-wp-effect="effects.changeFocus"></div>
+	<div data-wp-watch="callbacks.changeFocus"></div>
 
 	<div
 		data-testid="short-circuit infinite loops"
-		data-wp-effect="effects.infiniteLoop"
+		data-wp-watch="callbacks.infiniteLoop"
 		data-wp-text="state.counter"
 	>
 		0
