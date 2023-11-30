@@ -184,22 +184,21 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	 * Traverses the HTML searching for Interactivity API directives and processing
 	 * them.
 	 *
-	 * @param WP_Directive_Processor $tags An instance of the WP_Directive_Processor.
-	 * @param string                 $prefix Attribute prefix.
-	 * @param string[]               $directives Directives.
+	 * @param string   $prefix Attribute prefix.
+	 * @param string[] $directives Directives.
 	 *
 	 * @return WP_Directive_Processor The modified instance of the
 	 * WP_Directive_Processor.
 	 */
-	public function process_rendered_html( $tags, $prefix, $directives ) {
+	public function process_rendered_html( $prefix, $directives ) {
 		$context   = new WP_Directive_Context();
 		$tag_stack = array();
 
-		while ( $tags->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
-			$tag_name = $tags->get_tag();
+		while ( $this->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
+			$tag_name = $this->get_tag();
 
 			// Is this a tag that closes the latest opening tag?
-			if ( $tags->is_tag_closer() ) {
+			if ( $this->is_tag_closer() ) {
 				if ( 0 === count( $tag_stack ) ) {
 					continue;
 				}
@@ -215,7 +214,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 				}
 			} else {
 				$attributes = array();
-				foreach ( $tags->get_attribute_names_with_prefix( $prefix ) as $name ) {
+				foreach ( $this->get_attribute_names_with_prefix( $prefix ) as $name ) {
 					/*
 					 * Removes the part after the double hyphen before looking for
 					 * the directive processor inside `$directives`, e.g., "wp-bind"
@@ -234,7 +233,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 				 * encounter the matching closing tag.
 				 */
 				if (
-				! WP_Directive_Processor::is_html_void_element( $tags->get_tag() ) &&
+				! WP_Directive_Processor::is_html_void_element( $this->get_tag() ) &&
 				( 0 !== count( $attributes ) || 0 !== count( $tag_stack ) )
 				) {
 					$tag_stack[] = array( $tag_name, $attributes );
@@ -242,11 +241,11 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 			}
 
 			foreach ( $attributes as $attribute ) {
-				call_user_func( $directives[ $attribute ], $tags, $context );
+				call_user_func( $directives[ $attribute ], $this, $context );
 			}
 		}
 
-		return $tags;
+		return $this;
 	}
 
 	/**

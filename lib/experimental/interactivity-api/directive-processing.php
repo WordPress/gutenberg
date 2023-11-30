@@ -48,8 +48,9 @@ function gutenberg_process_directives_in_root_blocks( $block_content, $block ) {
 		);
 
 		$tags = new WP_Directive_Processor( $block_content );
-		$tags = $tags->process_rendered_html( $tags, 'data-wp-', $directives );
-		return $tags->get_updated_html();
+		return $tags
+			->process_rendered_html( 'data-wp-', $directives )
+			->get_updated_html();
 
 	}
 
