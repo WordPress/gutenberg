@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] [internal] Move InserterButton from components package to block-editor package [#56494]
 -   [***] Fix issue when backspacing in an empty Paragraph block [#56496]
 
 ## 1.109.0
