@@ -15,7 +15,7 @@ import { __experimentalHStack as HStack } from '@wordpress/components';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { unlock } from '../../lock-unlock';
-import { VIEW_LAYOUTS } from '../dataviews/constants';
+import { VIEW_LAYOUTS } from '../dataviews';
 const { useLocation } = unlock( routerPrivateApis );
 
 export default function DataViewItem( {

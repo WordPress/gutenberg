@@ -31,13 +31,13 @@ import Page from '../page';
 import Link from '../routes/link';
 import { useAddedBy, AvatarImage } from '../list/added-by';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
-import { DataViews } from '../dataviews';
 import {
+	DataViews,
 	ENUMERATION_TYPE,
 	OPERATOR_IN,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
-} from '../dataviews/constants';
+} from '../dataviews';
 import {
 	useResetTemplateAction,
 	deleteTemplateAction,

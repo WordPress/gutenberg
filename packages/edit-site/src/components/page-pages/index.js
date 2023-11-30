@@ -18,7 +18,14 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import Page from '../page';
 import Link from '../routes/link';
-import { DataViews, VIEW_LAYOUTS } from '../dataviews';
+import {
+	DataViews,
+	VIEW_LAYOUTS,
+	ENUMERATION_TYPE,
+	LAYOUT_GRID,
+	LAYOUT_TABLE,
+	OPERATOR_IN,
+} from '../dataviews';
 import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
 import {
 	trashPostAction,
@@ -31,12 +38,6 @@ import {
 import SideEditor from './side-editor';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
-import {
-	ENUMERATION_TYPE,
-	LAYOUT_GRID,
-	LAYOUT_TABLE,
-	OPERATOR_IN,
-} from '../dataviews/constants';
 const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];

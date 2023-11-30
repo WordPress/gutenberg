@@ -7,7 +7,7 @@ import { trash } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { LAYOUT_TABLE, OPERATOR_IN } from '../dataviews/constants';
+import { LAYOUT_TABLE, OPERATOR_IN } from '../dataviews';
 
 const DEFAULT_PAGE_BASE = {
 	type: LAYOUT_TABLE,
