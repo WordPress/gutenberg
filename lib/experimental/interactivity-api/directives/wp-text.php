@@ -22,6 +22,6 @@ function gutenberg_interactivity_process_wp_text( $tags, $context ) {
 		return;
 	}
 
-	$text = gutenberg_interactivity_evaluate_reference( $value, $context->get_context(), $tags->get_namespace() );
+	$text = gutenberg_interactivity_evaluate_reference( $value, $tags->get_namespace(), $context->get_context() );
 	$tags->set_inner_html( esc_html( $text ) );
 }

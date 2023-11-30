@@ -26,7 +26,7 @@ function gutenberg_interactivity_process_wp_style( $tags, $context ) {
 		}
 
 		$expr        = $tags->get_attribute( $attr );
-		$style_value = gutenberg_interactivity_evaluate_reference( $expr, $context->get_context(), $tags->get_namespace() );
+		$style_value = gutenberg_interactivity_evaluate_reference( $expr, $tags->get_namespace(), $context->get_context() );
 		if ( $style_value ) {
 			$style_attr = $tags->get_attribute( 'style' );
 			$style_attr = gutenberg_interactivity_set_style( $style_attr, $style_name, $style_value );

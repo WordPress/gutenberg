@@ -121,12 +121,12 @@ add_filter( 'render_block', 'gutenberg_mark_block_interactivity', 10, 3 );
 /**
  * Resolve the reference using the store and the context from the provided path.
  *
- * @param string $path Path.
+ * @param string $path    Path.
+ * @param string $ns      Current namespace.
  * @param array  $context Context data.
- * @param string $ns Current namespace.
  * @return mixed
  */
-function gutenberg_interactivity_evaluate_reference( $path, array $context = array(), $ns ) {
+function gutenberg_interactivity_evaluate_reference( $path, $ns, array $context = array() ) {
 	// Separate the namespace from the path value (if present).
 	list( $path_ns, $path ) = WP_Directive_Processor::parse_value_ns( $path );
 
