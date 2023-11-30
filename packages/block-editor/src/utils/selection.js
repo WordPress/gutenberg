@@ -25,6 +25,8 @@ export function retrieveSelectedAttribute( blockAttributes ) {
 		const value = blockAttributes[ name ];
 		return (
 			( typeof value === 'string' || value instanceof RichTextData ) &&
+			// To do: refactor this to use rich text's selection instead, so we
+			// no longer have to use on this hack inserting a special character.
 			value.toString().indexOf( START_OF_SELECTED_AREA ) !== -1
 		);
 	} );

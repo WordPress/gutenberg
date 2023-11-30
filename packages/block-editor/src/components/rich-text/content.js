@@ -4,6 +4,7 @@
 import { RawHTML } from '@wordpress/element';
 import { children as childrenSource } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -29,7 +30,11 @@ export const Content = ( { value, tagName: Tag, multiline, ...props } ) => {
 		value = `<${ MultilineTag }></${ MultilineTag }>`;
 	}
 
-	const content = <RawHTML>{ value?.toString() }</RawHTML>;
+	const content = (
+		<RawHTML>
+			{ value instanceof RichTextData ? value.toHTMLString() : value }
+		</RawHTML>
+	);
 
 	if ( Tag ) {
 		const { format, ...restProps } = props;
