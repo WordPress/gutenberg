@@ -19,7 +19,7 @@ import LinkedButton from './linked-button';
 import {
 	Root,
 	Header,
-	HeaderControlWrapper,
+	AllInputControlWrapper,
 } from './styles/box-control-styles';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
@@ -157,11 +157,11 @@ function BoxControl( {
 	return (
 		<Root id={ id } role="group" aria-labelledby={ headingId }>
 			<Header className="component-box-control__header">
-				<FlexItem>
+				<FlexBlock>
 					<BaseControl.VisualLabel id={ headingId }>
 						{ label }
 					</BaseControl.VisualLabel>
-				</FlexItem>
+				</FlexBlock>
 				{ allowReset && (
 					<FlexItem>
 						<Button
@@ -175,30 +175,6 @@ function BoxControl( {
 						</Button>
 					</FlexItem>
 				) }
-			</Header>
-			<HeaderControlWrapper
-				className="component-box-control__header-control-wrapper"
-				gap={ 0 }
-				justify="flex-end"
-			>
-				{ isLinked && (
-					<>
-						<FlexItem>
-							<BoxControlIcon side={ side } sides={ sides } />
-						</FlexItem>
-						<FlexBlock>
-							<AllInputControl
-								aria-label={ label }
-								{ ...inputControlProps }
-							/>
-						</FlexBlock>
-					</>
-				) }
-				{ ! isLinked && splitOnAxis && (
-					<FlexBlock>
-						<AxialInputControls { ...inputControlProps } />
-					</FlexBlock>
-				) }
 				{ ! hasOneSide && (
 					<FlexItem>
 						<LinkedButton
@@ -207,7 +183,27 @@ function BoxControl( {
 						/>
 					</FlexItem>
 				) }
-			</HeaderControlWrapper>
+			</Header>
+			{ isLinked && (
+				<AllInputControlWrapper
+					className="component-box-control__header-control-wrapper"
+					gap={ 0 }
+					justify="flex-end"
+				>
+					<FlexItem>
+						<BoxControlIcon side={ side } sides={ sides } />
+					</FlexItem>
+					<FlexBlock>
+						<AllInputControl
+							aria-label={ label }
+							{ ...inputControlProps }
+						/>
+					</FlexBlock>
+				</AllInputControlWrapper>
+			) }
+			{ ! isLinked && splitOnAxis && (
+				<AxialInputControls { ...inputControlProps } />
+			) }
 			{ ! isLinked && ! splitOnAxis && (
 				<InputControls { ...inputControlProps } />
 			) }

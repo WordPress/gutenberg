@@ -1,7 +1,10 @@
 /**
  * Internal dependencies
  */
+import { FlexBlock, FlexItem } from '../flex';
+import RangeControl from '../range-control';
 import type { UnitControlProps } from '../unit-control/types';
+import { Layout } from './styles/box-control-styles';
 import type { BoxControlInputControlProps } from './types';
 import UnitControl from './unit-control';
 import {
@@ -34,6 +37,11 @@ export default function AllInputControl( {
 		event
 	) => {
 		onFocus( event, { side: 'all' } );
+	};
+
+	const createSliderOnChange = ( next: number | undefined ) => {
+		const nextValues = applyValueToSides( values, String( next ), sides );
+		onChange( nextValues );
 	};
 
 	const handleOnChange: UnitControlProps[ 'onChange' ] = ( next ) => {
@@ -70,17 +78,33 @@ export default function AllInputControl( {
 	};
 
 	return (
-		<UnitControl
-			{ ...props }
-			disableUnits={ isMixed }
-			isOnly
-			value={ allValue }
-			onChange={ handleOnChange }
-			onUnitChange={ handleOnUnitChange }
-			onFocus={ handleOnFocus }
-			onHoverOn={ handleOnHoverOn }
-			onHoverOff={ handleOnHoverOff }
-			placeholder={ allPlaceholder }
-		/>
+		<Layout>
+			<FlexItem>
+				<UnitControl
+					{ ...props }
+					disableUnits={ isMixed }
+					isOnly
+					value={ allValue }
+					onChange={ handleOnChange }
+					onUnitChange={ handleOnUnitChange }
+					onFocus={ handleOnFocus }
+					onHoverOn={ handleOnHoverOn }
+					onHoverOff={ handleOnHoverOff }
+					placeholder={ allPlaceholder }
+				/>
+			</FlexItem>
+			<FlexBlock>
+				<RangeControl
+					__nextHasNoMarginBottom
+					hideLabelFromVision
+					initialPosition={ 0 }
+					onChange={ ( newValue ) => {
+						createSliderOnChange?.( newValue );
+					} }
+					value={ Number( allValue ) }
+					withInputField={ false }
+				/>
+			</FlexBlock>
+		</Layout>
 	);
 }

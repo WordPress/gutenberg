@@ -21,7 +21,7 @@ export const Header = styled( Flex )`
 	margin-bottom: 8px;
 `;
 
-export const HeaderControlWrapper = styled( Flex )`
+export const AllInputControlWrapper = styled( Flex )`
 	min-height: 30px;
 `;
 
@@ -36,8 +36,6 @@ export const LayoutContainer = styled( Flex )`
 `;
 
 export const Layout = styled( Flex )`
-	position: relative;
-	height: 100%;
 	width: 100%;
 	justify-content: flex-start;
 `;
