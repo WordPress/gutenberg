@@ -125,7 +125,7 @@ export function CheckboxControl(
 					/>
 				) : null }
 			</span>
-			{ label !== false && (
+			{ label && (
 				<label
 					className="components-checkbox-control__label"
 					htmlFor={ id }
