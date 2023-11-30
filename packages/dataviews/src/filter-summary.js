@@ -172,7 +172,7 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 								} ) )
 							}
 						>
-							{ __( 'Show matches' ) }
+							{ __( 'Is' ) }
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							key="not-in-filter"
@@ -202,7 +202,7 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 								} ) )
 							}
 						>
-							{ __( 'Hide matches' ) }
+							{ __( 'Is not' ) }
 						</DropdownMenuItem>
 					</DropdownSubMenu>
 				) }
