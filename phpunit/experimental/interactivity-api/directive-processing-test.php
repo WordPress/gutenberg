@@ -165,6 +165,40 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 		$this->assertSame( 'hi', gutenberg_interactivity_evaluate_reference( 'state.nested.string', 'test', $context ) );
 	}
 
+	public function test_evaluate_function_should_access_state_using_path_ns() {
+		// Add a new namespace to the store.
+		wp_initial_state(
+			'test/other',
+			array(
+				'number' => 3,
+				'bool'   => true,
+				'nested' => array(
+					'string' => 'bonjour',
+				),
+			)
+		);
+		$this->assertSame( 3, gutenberg_interactivity_evaluate_reference( 'test/other::state.number', 'test' ) );
+		$this->assertTrue( gutenberg_interactivity_evaluate_reference( 'test/other::state.bool', 'test' ) );
+		$this->assertFalse( gutenberg_interactivity_evaluate_reference( 'test/other::!state.bool', 'test' ) );
+		$this->assertSame( 'bonjour', gutenberg_interactivity_evaluate_reference( 'test/other::state.nested.string', 'test' ) );
+	}
+
+	public function test_evaluate_function_should_access_passed_context_using_path_ns() {
+		$context = array(
+			'test/other' => array(
+				'number' => 4,
+				'bool'   => false,
+				'nested' => array(
+					'string' => 'adieu',
+				),
+			),
+		);
+		$this->assertSame( 4, gutenberg_interactivity_evaluate_reference( 'test/other::context.number', 'test', $context ) );
+		$this->assertFalse( gutenberg_interactivity_evaluate_reference( 'test/other::context.bool', 'test', $context ) );
+		$this->assertTrue( gutenberg_interactivity_evaluate_reference( 'test/other::!context.bool', 'test', $context ) );
+		$this->assertSame( 'adieu', gutenberg_interactivity_evaluate_reference( 'test/other::context.nested.string', 'test', $context ) );
+	}
+
 	public function test_evaluate_function_should_return_null_for_unresolved_paths() {
 		$this->assertNull( gutenberg_interactivity_evaluate_reference( 'this.property.doesnt.exist', 'test' ) );
 	}
