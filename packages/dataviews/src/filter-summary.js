@@ -6,7 +6,7 @@ import {
 	privateApis as componentsPrivateApis,
 	Icon,
 } from '@wordpress/components';
-import { chevronDown, check } from '@wordpress/icons';
+import { chevronDown, chevronRightSmall, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { Children, Fragment } from '@wordpress/element';
 
@@ -139,7 +139,16 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 				{ filter.operators.length > 1 && (
 					<DropdownSubMenu
 						trigger={
-							<DropdownSubMenuTrigger>
+							<DropdownSubMenuTrigger
+								suffix={
+									<>
+										{ filterInView.operator === OPERATOR_IN
+											? __( 'Is' )
+											: __( 'Is not' ) }
+										<Icon icon={ chevronRightSmall } />{ ' ' }
+									</>
+								}
+							>
 								{ __( 'Conditions' ) }
 							</DropdownSubMenuTrigger>
 						}
