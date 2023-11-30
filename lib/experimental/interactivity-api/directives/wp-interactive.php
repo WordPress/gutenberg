@@ -17,7 +17,7 @@ function gutenberg_interactivity_process_wp_interactive( $tags ) {
 	}
 
 	$value  = $tags->get_attribute( 'data-wp-interactive' );
-	$island = json_decode( $value );
+	$island = json_decode( $value, true );
 
 	$tags->push_namespace( $island['namespace'] );
 }
