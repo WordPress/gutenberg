@@ -1,0 +1,26 @@
+// TODO: Change the styles.
+.block-bindings-ui-popover {
+	margin-top: 12px;
+	.block-bindings-metadata-source-ui {
+		min-width: 300px;
+
+		li {
+			margin: 20px 32px;
+			cursor: pointer;
+		}
+		.selected-meta-field {
+			font-weight: bold;
+		}
+		.selected-meta-field::before {
+			content: "✔  ";
+			margin-left: -16px;
+		}
+	}
+	.block-bindings-clear-button {
+		margin: 10px;
+		background: transparent;
+		border: none;
+		color: var(--wp-admin-theme-color, #3858e9);
+		cursor: pointer;
+	}
+}
