@@ -133,9 +133,9 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
 	// Overwrite namespace if path value contains one.
 	$ns = $path_ns ?? $ns;
 
-	$store = array_merge(
-		WP_Interactivity_Initial_State::get_state( $ns ),
-		array( 'context' => $context[ $ns ] )
+	$store = array(
+		'state'   => WP_Interactivity_Initial_State::get_state( $ns ),
+		'context' => $context[ $ns ] ?? array(),
 	);
 
 	/*
