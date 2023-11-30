@@ -23,6 +23,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import StylesPreview from './preview';
 import { unlock } from '../../lock-unlock';
+import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
 
 function cloneDeep( object ) {
 	return ! object ? {} : JSON.parse( JSON.stringify( object ) );
@@ -73,7 +74,7 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
-const getFontFamilyNames = ( themeJson ) => {
+const getFontFamilies = ( themeJson ) => {
 	const headingFontFamilyCSS =
 		themeJson?.styles?.elements?.heading?.typography?.fontFamily;
 	const headingFontFamilyVariable =
@@ -105,6 +106,10 @@ const getFontFamilyNames = ( themeJson ) => {
 		headingFontFamily = bodyFontFamily;
 	}
 
+	return [ bodyFontFamily, headingFontFamily ];
+};
+const getFontFamilyNames = ( themeJson ) => {
+	const [ bodyFontFamily, headingFontFamily ] = getFontFamilies( themeJson );
 	return [ bodyFontFamily?.name, headingFontFamily?.name ];
 };
 
@@ -185,6 +190,95 @@ function Variation( { variation, isColor, isFont } ) {
 	);
 }
 
+function TypographyVariation( { variation } ) {
+	const [ isFocused, setIsFocused ] = useState( false );
+	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
+	const context = useMemo( () => {
+		return {
+			user: {
+				settings: variation.settings ?? {},
+				styles: variation.styles ?? {},
+			},
+			base,
+			merged: mergeBaseAndUserConfigs( base, variation ),
+			setUserConfig: () => {},
+		};
+	}, [ variation, base ] );
+
+	const selectVariation = () => {
+		setUserConfig( () => {
+			return {
+				settings: variation.settings,
+				styles: variation.styles,
+			};
+		} );
+	};
+
+	const selectOnEnter = ( event ) => {
+		if ( event.keyCode === ENTER ) {
+			event.preventDefault();
+			selectVariation();
+		}
+	};
+
+	const isActive = useMemo( () => {
+		return areGlobalStyleConfigsEqual( user, variation );
+	}, [ user, variation ] );
+
+	let label = variation?.title;
+	if ( variation?.description ) {
+		label = sprintf(
+			/* translators: %1$s: variation title. %2$s variation description. */
+			__( '%1$s (%2$s)' ),
+			variation?.title,
+			variation?.description
+		);
+	}
+
+	const [ bodyFontFamilies, headingFontFamilies ] = getFontFamilies(
+		mergeBaseAndUserConfigs( base, variation )
+	);
+
+	const bodyPreviewStyle = getFamilyPreviewStyle( bodyFontFamilies );
+	const headingPreviewStyle = {
+		...getFamilyPreviewStyle( headingFontFamilies ),
+		fontSize: '1.5rem',
+	};
+
+	return (
+		<GlobalStylesContext.Provider value={ context }>
+			<div
+				className={ classnames(
+					'edit-site-global-styles-variations_item',
+					{
+						'is-active': isActive,
+					}
+				) }
+				role="button"
+				onClick={ selectVariation }
+				onKeyDown={ selectOnEnter }
+				tabIndex="0"
+				aria-label={ label }
+				aria-current={ isActive }
+				onFocus={ () => setIsFocused( true ) }
+				onBlur={ () => setIsFocused( false ) }
+			>
+				<div
+					className="edit-site-global-styles-variations_item-preview"
+					isFocused={ isFocused }
+				>
+					<div style={ headingPreviewStyle }>
+						{ headingFontFamilies.name }
+					</div>
+					<div style={ bodyPreviewStyle }>
+						{ bodyFontFamilies.name }
+					</div>
+				</div>
+			</div>
+		</GlobalStylesContext.Provider>
+	);
+}
+
 function ColorVariations( { variations } ) {
 	const { user } = useContext( GlobalStylesContext );
 	const colorVariations =
@@ -239,6 +333,26 @@ export default function StyleVariationsContainer() {
 	const typographyVariations =
 		variations && getVariationsByType( user, variations, 'typography' );
 
+	const uniqueTypographyVariations = [];
+	const uniqueTypographyNames = [];
+	const isDup = ( x, y ) => {
+		return uniqueTypographyNames.find( ( it ) => {
+			return JSON.stringify( it ) === JSON.stringify( [ x, y ] );
+		} );
+	};
+
+	typographyVariations?.forEach( ( variation ) => {
+		const [ bodyFontFamilyName, headingFontFamilyName ] =
+			getFontFamilyNames( mergeBaseAndUserConfigs( base, variation ) );
+		if ( ! isDup( bodyFontFamilyName, headingFontFamilyName ) ) {
+			uniqueTypographyVariations.push( variation );
+			uniqueTypographyNames.push( [
+				bodyFontFamilyName,
+				headingFontFamilyName,
+			] );
+		}
+	} );
+
 	return (
 		<>
 			<Grid
@@ -253,33 +367,20 @@ export default function StyleVariationsContainer() {
 			<div className="edit-site-sidebar-navigation-screen-styles__group-header">
 				<Heading level={ 2 }>{ __( 'Typography' ) }</Heading>
 			</div>
-			<Grid
-				columns={ 2 }
-				className="edit-site-global-styles-style-variations-container"
-			>
-				{ typographyVariations &&
-					typographyVariations.map( ( variation, index ) => {
-						const [ bodyFontFamilyName, headingFontFamilyName ] =
-							getFontFamilyNames(
-								mergeBaseAndUserConfigs( base, variation )
-							);
+			<div className="edit-site-global-styles-style-variations-container">
+				{ uniqueTypographyVariations &&
+					uniqueTypographyVariations.map( ( variation, index ) => {
 						return (
 							<>
-								<Variation
+								<TypographyVariation
 									key={ index }
 									variation={ variation }
 									isColor={ false }
 								/>
-								<div key={ index + '1' }>
-									<Heading level={ 3 }>
-										{ headingFontFamilyName }
-									</Heading>
-									<p>{ bodyFontFamilyName }</p>
-								</div>
 							</>
 						);
 					} ) }
-			</Grid>
+			</div>
 		</>
 	);
 }
