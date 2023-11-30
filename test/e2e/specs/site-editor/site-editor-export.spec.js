@@ -18,14 +18,13 @@ test.describe( 'Site Editor Templates Export', () => {
 
 	test( 'clicking export should download emptytheme.zip file', async ( {
 		admin,
-		editor,
 		page,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Options' } )
