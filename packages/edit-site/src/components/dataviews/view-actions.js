@@ -21,7 +21,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { LAYOUT_GRID, LAYOUT_SIDE_BY_SIDE, LAYOUT_TABLE } from './constants';
+import { VIEW_LAYOUTS } from './constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -31,32 +31,17 @@ const {
 	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
 } = unlock( componentsPrivateApis );
 
-const availableViews = [
-	{
-		id: LAYOUT_TABLE,
-		label: __( 'Table' ),
-	},
-	{
-		id: LAYOUT_GRID,
-		label: __( 'Grid' ),
-	},
-	{
-		id: LAYOUT_SIDE_BY_SIDE,
-		label: __( 'Side by side' ),
-	},
-];
-
 function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
-	let _availableViews = availableViews;
+	let _availableViews = VIEW_LAYOUTS;
 	if ( supportedLayouts ) {
 		_availableViews = _availableViews.filter( ( _view ) =>
-			supportedLayouts.includes( _view.id )
+			supportedLayouts.includes( _view.type )
 		);
 	}
 	if ( _availableViews.length === 1 ) {
 		return null;
 	}
-	const activeView = _availableViews.find( ( v ) => view.type === v.id );
+	const activeView = _availableViews.find( ( v ) => view.type === v.type );
 	return (
 		<DropdownSubMenu
 			trigger={
@@ -75,16 +60,19 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 			{ _availableViews.map( ( availableView ) => {
 				return (
 					<DropdownMenuItem
-						key={ availableView.id }
+						key={ availableView.type }
 						prefix={
-							availableView.id === view.type && (
+							availableView.type === view.type && (
 								<Icon icon={ check } />
 							)
 						}
 						onSelect={ ( event ) => {
 							// We need to handle this on DropDown component probably..
 							event.preventDefault();
-							onChangeView( { ...view, type: availableView.id } );
+							onChangeView( {
+								...view,
+								type: availableView.type,
+							} );
 						} }
 						// TODO: check about role and a11y.
 						role="menuitemcheckbox"

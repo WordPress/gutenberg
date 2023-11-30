@@ -18,7 +18,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import Page from '../page';
 import Link from '../routes/link';
-import { DataViews, viewTypeSupportsMap } from '../dataviews';
+import { DataViews, VIEW_SUPPORTS } from '../dataviews';
 import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
 import {
 	trashPostAction,
@@ -31,13 +31,18 @@ import {
 import SideEditor from './side-editor';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
-import { ENUMERATION_TYPE, OPERATOR_IN } from '../dataviews/constants';
+import {
+	ENUMERATION_TYPE,
+	LAYOUT_GRID,
+	LAYOUT_TABLE,
+	OPERATOR_IN,
+} from '../dataviews/constants';
 const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
-	table: {},
-	grid: {
+	[ LAYOUT_TABLE ]: {},
+	[ LAYOUT_GRID ]: {
 		mediaField: 'featured-image',
 		primaryField: 'title',
 	},
@@ -204,9 +209,7 @@ export default function PagePages() {
 										canvas: 'edit',
 									} }
 									onClick={ ( event ) => {
-										if (
-											viewTypeSupportsMap[ type ].preview
-										) {
+										if ( VIEW_SUPPORTS[ type ].preview ) {
 											event.preventDefault();
 											setSelection( [ item.id ] );
 										}
@@ -309,7 +312,7 @@ export default function PagePages() {
 					onChangeView={ onChangeView }
 				/>
 			</Page>
-			{ viewTypeSupportsMap[ view.type ].preview && (
+			{ VIEW_SUPPORTS[ view.type ].preview && (
 				<Page>
 					<div className="edit-site-page-pages-preview">
 						{ selection.length === 1 && (
