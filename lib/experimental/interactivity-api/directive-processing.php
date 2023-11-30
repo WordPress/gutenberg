@@ -37,8 +37,8 @@ add_filter( 'render_block_data', 'gutenberg_interactivity_mark_root_blocks', 10,
  */
 function gutenberg_process_directives_in_root_blocks( $block_content, $block ) {
 	static $directives = array(
-		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
 		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
+		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
 		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
 		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
 		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
@@ -263,7 +263,24 @@ function gutenberg_process_interactive_html( $html, $context, $directives, $inne
 			}
 		}
 
-		foreach ( $attributes as $attribute ) {
+		// Extract all directive names. They'll be used later on.
+		$directive_names     = array_keys( $directives );
+		$directive_names_rev = array_reverse( $directive_names );
+
+		/*
+		 * Sort attributes by the order they appear in the `$directives`
+		 * argument, considering it as the priority order in which
+		 * directives should be processed. Note that the order is reversed
+		 * for tag closers.
+		 */
+		$sorted_attrs = array_intersect(
+			$tags->is_tag_closer()
+				? $directive_names_rev
+				: $directive_names,
+			$attributes
+		);
+
+		foreach ( $sorted_attrs as $attribute ) {
 			call_user_func( $directives[ $attribute ], $tags, $context );
 		}
 	}
