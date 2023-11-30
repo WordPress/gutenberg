@@ -99,6 +99,9 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 							<DropdownMenuItem
 								key={ element.value }
 								role="menuitemradio"
+								aria-checked={
+									activeElement?.value === element.value
+								}
 								prefix={
 									activeElement?.value === element.value && (
 										<Icon icon={ check } />
@@ -144,6 +147,9 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 						<DropdownMenuItem
 							key="in-filter"
 							role="menuitemradio"
+							aria-checked={
+								filterInView?.operator === OPERATOR_IN
+							}
 							prefix={
 								filterInView?.operator === OPERATOR_IN && (
 									<Icon icon={ check } />
@@ -171,6 +177,9 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 						<DropdownMenuItem
 							key="not-in-filter"
 							role="menuitemradio"
+							aria-checked={
+								filterInView?.operator === OPERATOR_NOT_IN
+							}
 							prefix={
 								filterInView?.operator === OPERATOR_NOT_IN && (
 									<Icon icon={ check } />
