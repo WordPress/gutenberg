@@ -54,6 +54,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 					<DropdownMenuItem
 						key={ availableView.type }
 						role="menuitemradio"
+						aria-checked={ availableView.id === view.type }
 						prefix={
 							availableView.type === view.type && (
 								<Icon icon={ check } />
@@ -97,8 +98,9 @@ function PageSizeMenu( { view, onChangeView } ) {
 			{ PAGE_SIZE_VALUES.map( ( size ) => {
 				return (
 					<DropdownMenuItem
-						role="menuitemradio"
 						key={ size }
+						role="menuitemradio"
+						aria-checked={ view.perPage === size }
 						prefix={
 							view.perPage === size && <Icon icon={ check } />
 						}
@@ -220,6 +222,7 @@ function SortMenu( { fields, view, onChangeView } ) {
 									<DropdownMenuItem
 										key={ direction }
 										role="menuitemradio"
+										aria-checked={ isActive }
 										prefix={ <Icon icon={ info.icon } /> }
 										suffix={
 											isActive && <Icon icon={ check } />

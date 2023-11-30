@@ -68,6 +68,9 @@ function HeaderMenu( { dataView, header } ) {
 								<DropdownMenuItem
 									key={ direction }
 									role="menuitemradio"
+									aria-checked={
+										sortedDirection === direction
+									}
 									prefix={ <Icon icon={ info.icon } /> }
 									suffix={
 										sortedDirection === direction && (
@@ -96,8 +99,9 @@ function HeaderMenu( { dataView, header } ) {
 				) }
 				{ isHidable && (
 					<DropdownMenuItem
-						prefix={ <Icon icon={ unseen } /> }
 						role="menuitemradio"
+						aria-checked={ header.column.getIsHidden() }
+						prefix={ <Icon icon={ unseen } /> }
 						onSelect={ ( event ) => {
 							event.preventDefault();
 							header.column.getToggleVisibilityHandler()( event );
@@ -144,6 +148,7 @@ function HeaderMenu( { dataView, header } ) {
 									<DropdownMenuItem
 										key={ element.value }
 										role="menuitemradio"
+										aria-checked={ isActive }
 										suffix={
 											isActive && <Icon icon={ check } />
 										}
