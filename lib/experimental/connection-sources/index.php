@@ -14,6 +14,6 @@ return array(
 	},
 	'pattern_attributes' => function ( $block_instance ) {
 		$block_id = $block_instance->attributes['metadata']['id'];
-		return _wp_array_get( $block_instance->context, array( 'overrides', $block_id ), false );
+		return _wp_array_get( $block_instance->context, array( 'pattern/overrides', $block_id ), false );
 	},
 );

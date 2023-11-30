@@ -20,8 +20,8 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-pattern-partial-sync
 				$block_type->uses_context = array();
 			}
 
-			if ( ! in_array( 'overrides', $block_type->uses_context, true ) ) {
-				$block_type->uses_context[] = 'overrides';
+			if ( ! in_array( 'pattern/overrides', $block_type->uses_context, true ) ) {
+				$block_type->uses_context[] = 'pattern/overrides';
 			}
 		}
 	}

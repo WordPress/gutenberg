@@ -52,13 +52,13 @@ function render_block_core_block( $attributes ) {
 		&& isset( $attributes['overrides'] );
 
 	/**
-	 * We set the `overrides` context through the `render_block_context`
+	 * We set the `pattern/overrides` context through the `render_block_context`
 	 * filter so that it is available when a pattern's inner blocks are
 	 * rendering via do_blocks given it only receives the inner content.
 	 */
 	if ( $has_partial_synced_overrides ) {
 		$filter_block_context = static function ( $context ) use ( $attributes ) {
-			$context['overrides'] = $attributes['overrides'];
+			$context['pattern/overrides'] = $attributes['overrides'];
 			return $context;
 		};
 		add_filter( 'render_block_context', $filter_block_context, 1 );
