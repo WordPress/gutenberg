@@ -24,5 +24,6 @@ function gutenberg_interactivity_process_wp_context( $tags, $context ) {
 		true
 	);
 
-	$context->set_context( $new_context ?? array() );
+	$ns = $tags->get_namespace();
+	$context->set_context( array( $ns => $new_context ?? array() ) );
 }
