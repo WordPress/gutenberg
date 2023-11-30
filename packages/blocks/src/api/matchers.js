@@ -51,5 +51,5 @@ export const richText = ( selector, preserveWhiteSpace ) => ( el ) => {
 	const target = selector ? el.querySelector( selector ) : el;
 	return target
 		? RichTextData.fromHTMLElement( target, { preserveWhiteSpace } )
-		: new RichTextData();
+		: RichTextData.empty();
 };

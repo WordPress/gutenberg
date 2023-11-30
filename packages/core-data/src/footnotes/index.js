@@ -63,7 +63,7 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 
 			const richTextValue =
 				typeof value === 'string'
-					? RichTextData.fromHTMLElement( value )
+					? RichTextData.fromHTMLString( value )
 					: value;
 
 			richTextValue.replacements.forEach( ( replacement ) => {

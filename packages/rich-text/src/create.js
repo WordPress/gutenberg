@@ -145,6 +145,9 @@ const RichTextInternalData = Symbol( 'RichTextInternalData' );
  * @todo Add methods to manipulate the data, such as applyFormat, slice etc.
  */
 export class RichTextData {
+	static empty() {
+		return new RichTextData();
+	}
 	static fromHTMLString( html ) {
 		return new RichTextData( create( { html } ) );
 	}
