@@ -23,7 +23,7 @@ To get started with the Interactivity API, you can follow this [**Quick Start Gu
 We can scaffold a WordPress plugin that registers an interactive block (using the Interactivity API) by using a [template](https://www.npmjs.com/package/@wordpress/create-block-interactive-template) with the `@wordpress/create-block` command.
 
 ```
-npx @wordpress/create-block my-first-interactive-block --template @wordpress/create-block-interactive-template
+npx @wordpress/create-block@latest my-first-interactive-block --template @wordpress/create-block-interactive-template
 ```
 
 #### 2. Generate the build 
