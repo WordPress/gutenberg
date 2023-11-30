@@ -28,25 +28,26 @@ export const VIEW_LAYOUTS = [
 		label: __( 'Table' ),
 		component: ViewList,
 		icon: formatListBullets,
+		supports: {
+			preview: false,
+		},
 	},
 	{
 		type: LAYOUT_GRID,
 		label: __( 'Grid' ),
 		component: ViewGrid,
 		icon: category,
+		supports: {
+			preview: false,
+		},
 	},
 	{
 		type: LAYOUT_SIDE_BY_SIDE,
 		label: __( 'Side by side' ),
 		component: ViewSideBySide,
 		icon: drawerLeft,
+		supports: {
+			preview: true,
+		},
 	},
 ];
-
-export const VIEW_SUPPORTS = {
-	[ LAYOUT_TABLE ]: {},
-	[ LAYOUT_GRID ]: {},
-	[ LAYOUT_SIDE_BY_SIDE ]: {
-		preview: true,
-	},
-};

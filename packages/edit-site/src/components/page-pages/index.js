@@ -18,7 +18,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import Page from '../page';
 import Link from '../routes/link';
-import { DataViews, VIEW_SUPPORTS } from '../dataviews';
+import { DataViews, VIEW_LAYOUTS } from '../dataviews';
 import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
 import {
 	trashPostAction,
@@ -209,7 +209,11 @@ export default function PagePages() {
 										canvas: 'edit',
 									} }
 									onClick={ ( event ) => {
-										if ( VIEW_SUPPORTS[ type ].preview ) {
+										if (
+											VIEW_LAYOUTS.find(
+												( v ) => v.type === type
+											)?.supports?.preview
+										) {
 											event.preventDefault();
 											setSelection( [ item.id ] );
 										}
@@ -312,7 +316,8 @@ export default function PagePages() {
 					onChangeView={ onChangeView }
 				/>
 			</Page>
-			{ VIEW_SUPPORTS[ view.type ].preview && (
+			{ VIEW_LAYOUTS.find( ( v ) => v.type === view.type )?.supports
+				?.preview && (
 				<Page>
 					<div className="edit-site-page-pages-preview">
 						{ selection.length === 1 && (
