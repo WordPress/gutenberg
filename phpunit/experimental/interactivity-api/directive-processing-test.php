@@ -60,7 +60,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 
 		$markup = '<div>Example: <div foo-test="abc"><img><span>This is a test></span><div>Here is a nested div</div></div></div>';
 		$tags   = new WP_Directive_Processor( $markup );
-		$tags->process_rendered_html( $tags, 'foo-', $directives );
+		$tags->process_rendered_html( 'foo-', $directives );
 	}
 
 	public function test_directives_with_double_hyphen_processed_correctly() {
@@ -74,7 +74,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 
 		$markup = '<div foo-test--value="abc"></div>';
 		$tags   = new WP_Directive_Processor( $markup );
-		$tags->process_rendered_html( $tags, 'foo-', $directives );
+		$tags->process_rendered_html( 'foo-', $directives );
 	}
 
 	public function test_interactivity_process_directives_in_root_blocks() {
