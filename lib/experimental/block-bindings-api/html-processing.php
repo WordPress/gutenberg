@@ -21,6 +21,7 @@ if ( ! function_exists( 'block_bindings_replace_html' ) ) {
 		}
 
 		// Depending on the attribute source, the processing will be different.
+		// TODO: Get the type from the block attribute definition and modify/validate the value returned by the source if needed.
 		switch ( $block_type->attributes[ $block_attr ]['source'] ) {
 			case 'html':
 				$p = new WP_HTML_Tag_Processor( $block_content );

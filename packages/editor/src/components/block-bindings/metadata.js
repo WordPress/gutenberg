@@ -7,42 +7,55 @@ import { SearchControl } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 
 export default function MetadataSourceUI( props ) {
-	const { setAttributes, setIsActiveAttribute } = props;
-	// Fetching the REST API to get the available custom fields.
-	//
-	// Ensure we have the full context.
-	// Check if it is a page, a post, a CPT, a taxonomy...
-	// Ensure that context is available in all the blocks. It is not in the images.
-	// TODO: This is not working yet. Hardcoded to a post.
-	// TODO: Only run the fetch once. Right now it is triggered each time I click the button.
+	const { setAttributes, setIsActiveAttribute, context } = props;
+
 	const [ metadata, setMetadata ] = useState( [] );
 	useEffect( () => {
+		// Fetching the REST API to get the available custom fields.
+		// TODO: Only run the fetch once. Right now it is triggered each time I click the button.
+		// TODO: Review if we can avoid the first fetch. Using it right now to get the rest_base and the rest_namespace.
+		// TODO: Review if it works with taxonomies.
 		apiFetch( {
-			path: '/wp/v2/posts/1',
-		} ).then( ( posts ) => {
-			// TODO: Add filter in case plugins want to add/remove/modify fields.
-			// metadataaa = posts.meta;
-			let fetchedMetadata = [];
-			Object.entries( posts.meta ).forEach( ( [ key, value ] ) => {
-				// Prettifying the name. But I guess it is not necessary.
-				// Plugins could provide it somehow.
-				const prettyName = key
-					.split( '_' )
-					.map(
-						( word ) =>
-							word.charAt( 0 ).toUpperCase() + word.slice( 1 )
-					)
-					.join( ' ' );
-				fetchedMetadata = [
-					...fetchedMetadata,
-					{
-						name: prettyName,
-						key,
-						value,
-					},
-				];
+			path: '/wp/v2/types/' + context.postType,
+		} ).then( ( type ) => {
+			apiFetch( {
+				path:
+					'/' +
+					type.rest_namespace +
+					'/' +
+					type.rest_base +
+					'/' +
+					context.postId,
+			} ).then( ( posts ) => {
+				let fetchedMetadata = [];
+				function addMetadata( array, newData ) {
+					Object.entries( newData ).forEach( ( [ key, value ] ) => {
+						// Prettifying the name. But I guess it is not necessary.
+						// Plugins could provide it somehow.
+						const prettyName = key
+							.split( '_' )
+							.map(
+								( word ) =>
+									word.charAt( 0 ).toUpperCase() +
+									word.slice( 1 )
+							)
+							.join( ' ' );
+						array.push( {
+							name: prettyName,
+							key,
+							value,
+						} );
+						return array;
+					} );
+				}
+				addMetadata( fetchedMetadata, posts.meta );
+
+				// TODO: Add filter in case plugins want to add/remove/modify fields.
+				// For example, ACF has its own field named "acf". Adding it manually.
+				addMetadata( fetchedMetadata, posts.acf );
+
+				setMetadata( fetchedMetadata );
 			} );
-			setMetadata( fetchedMetadata );
 		} );
 	}, [] );
 
@@ -54,6 +67,8 @@ export default function MetadataSourceUI( props ) {
 
 		const newAttributes = {};
 		// Modify the attribute we are binding.
+		// TODO: Not sure if we should do this. We might need to process the bindings attribute somehow in the editor to modify the content with context.
+		// TODO: Get the type from the block attribute definition and modify/validate the value returned by the source if needed.
 		newAttributes[ currentAttribute ] = item.value;
 
 		// If the attribute exists in the bindings, update it.
