@@ -13,7 +13,7 @@ import { useAsyncList } from '@wordpress/compose';
  */
 import ItemActions from './item-actions';
 
-export function ViewGrid( { data, fields, view, actions, getItemId } ) {
+export default function ViewGrid( { data, fields, view, actions, getItemId } ) {
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout.mediaField
 	);
