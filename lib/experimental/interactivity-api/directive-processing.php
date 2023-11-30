@@ -122,12 +122,13 @@ add_filter( 'render_block', 'gutenberg_mark_block_interactivity', 10, 3 );
  *
  * @param string $path Path.
  * @param array  $context Context data.
+ * @param string $ns Current namespace.
  * @return mixed
  */
-function gutenberg_interactivity_evaluate_reference( $path, array $context = array() ) {
+function gutenberg_interactivity_evaluate_reference( $path, array $context = array(), $ns ) {
 	$store = array_merge(
-		WP_Interactivity_Initial_State::get_state(),
-		array( 'context' => $context )
+		WP_Interactivity_Initial_State::get_state( $ns ),
+		array( 'context' => $context[ $ns ] )
 	);
 
 	/*
