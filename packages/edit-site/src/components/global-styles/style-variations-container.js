@@ -14,6 +14,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 	__experimentalZStack as ZStack,
 	ColorIndicator,
 } from '@wordpress/components';
@@ -116,6 +117,9 @@ const getFontFamilyNames = ( themeJson ) => {
 	const [ bodyFontFamily, headingFontFamily ] = getFontFamilies( themeJson );
 	return [ bodyFontFamily?.name, headingFontFamily?.name ];
 };
+
+const normalizedHeight = 100;
+const ratio = 1;
 
 function Variation( { variation, isColor, isFont } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
@@ -244,12 +248,9 @@ function ColorVariation( { variation } ) {
 	return (
 		<GlobalStylesContext.Provider value={ context }>
 			<div
-				className={ classnames(
-					'edit-site-global-styles-variations_item',
-					{
-						'is-active': isActive,
-					}
-				) }
+				className={ classnames( {
+					'is-active': isActive,
+				} ) }
 				role="button"
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }
@@ -336,7 +337,7 @@ function TypographyVariation( { variation } ) {
 	const bodyPreviewStyle = getFamilyPreviewStyle( bodyFontFamilies );
 	const headingPreviewStyle = {
 		...getFamilyPreviewStyle( headingFontFamilies ),
-		fontSize: '1.5rem',
+		fontSize: '1.2rem',
 	};
 
 	return (
@@ -357,9 +358,14 @@ function TypographyVariation( { variation } ) {
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
 			>
-				<div
+				<VStack
 					className="edit-site-global-styles-variations_item-preview"
 					isFocused={ isFocused }
+					style={ {
+						height: normalizedHeight * ratio,
+						lineHeight: 1.2,
+						textAlign: 'center',
+					} }
 				>
 					<div style={ headingPreviewStyle }>
 						{ headingFontFamilies.name }
@@ -367,7 +373,7 @@ function TypographyVariation( { variation } ) {
 					<div style={ bodyPreviewStyle }>
 						{ bodyFontFamilies.name }
 					</div>
-				</div>
+				</VStack>
 			</div>
 		</GlobalStylesContext.Provider>
 	);
@@ -376,7 +382,7 @@ function TypographyVariation( { variation } ) {
 function ColorVariations( { variations } ) {
 	const { user } = useContext( GlobalStylesContext );
 	const colorVariations =
-		variations && getVariationsByType( user, variations, 'color' );
+		variations && getVariationsByType( user, variations, 'color' ); // should also get filter?
 
 	return (
 		<>
