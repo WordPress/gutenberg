@@ -164,7 +164,7 @@ function Tabs( {
 	// In controlled mode, make sure browser focus follows the selected tab if
 	// the selection is changed while a tab is already being focused.
 	useLayoutEffect( () => {
-		if ( ! isControlled ) {
+		if ( ! isControlled || ! selectOnMove ) {
 			return;
 		}
 
@@ -174,7 +174,7 @@ function Tabs( {
 		) {
 			move( selectedId );
 		}
-	}, [ isControlled, move, selectedId, tabsHasFocus ] );
+	}, [ isControlled, move, selectOnMove, selectedId, tabsHasFocus ] );
 
 	const contextValue = useMemo(
 		() => ( {
