@@ -1,3 +1,5 @@
+@use "sass:math";
+
 $toggle-width: 36px;
 $toggle-height: 18px;
 $toggle-border-width: 1px;
@@ -20,7 +22,7 @@ $transition-duration: 0.2s;
 		border: $toggle-border-width solid $gray-900;
 		width: $toggle-width;
 		height: $toggle-height;
-		border-radius: $toggle-height * 0.5;
+		border-radius: math.div($toggle-height, 2);
 		transition:
 			$transition-duration background-color ease,
 			$transition-duration border-color ease;
@@ -59,7 +61,7 @@ $transition-duration: 0.2s;
 		background-color: $gray-900;
 
 		// Transparent border acts as a fill in Windows High Contrast Mode.
-		border: $thumb-size / 2 solid transparent;
+		border: math.div($thumb-size, 2) solid transparent;
 	}
 
 	// Checked state.
