@@ -27,12 +27,6 @@ export default function useListViewExpandSelectedItem( {
 		[ firstSelectedBlockClientId ]
 	);
 
-	const parentClientIds =
-		Array.isArray( selectedBlockParentClientIds ) &&
-		selectedBlockParentClientIds.length
-			? selectedBlockParentClientIds
-			: null;
-
 	// Expand tree when a block is selected.
 	useEffect( () => {
 		// If the selectedTreeId is the same as the selected block,
@@ -42,7 +36,7 @@ export default function useListViewExpandSelectedItem( {
 		}
 
 		// If the selected block has parents, get the top-level parent.
-		if ( parentClientIds ) {
+		if ( selectedBlockParentClientIds?.length ) {
 			// If the selected block has parents,
 			// expand the tree branch.
 			setExpandedState( {
@@ -50,7 +44,12 @@ export default function useListViewExpandSelectedItem( {
 				clientIds: selectedBlockParentClientIds,
 			} );
 		}
-	}, [ firstSelectedBlockClientId ] );
+	}, [
+		firstSelectedBlockClientId,
+		selectedBlockParentClientIds,
+		selectedTreeId,
+		setExpandedState,
+	] );
 
 	return {
 		setSelectedTreeId,

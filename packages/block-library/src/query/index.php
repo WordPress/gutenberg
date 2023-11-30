@@ -21,19 +21,15 @@ function render_block_core_query( $attributes, $content, $block ) {
 		$p = new WP_HTML_Tag_Processor( $content );
 		if ( $p->next_tag() ) {
 			// Add the necessary directives.
-			$p->set_attribute( 'data-wp-interactive', true );
+			$p->set_attribute( 'data-wp-interactive', '{"namespace":"core/query"}' );
 			$p->set_attribute( 'data-wp-navigation-id', 'query-' . $attributes['queryId'] );
 			// Use context to send translated strings.
 			$p->set_attribute(
 				'data-wp-context',
 				wp_json_encode(
 					array(
-						'core' => array(
-							'query' => array(
-								'loadingText' => __( 'Loading page, please wait.' ),
-								'loadedText'  => __( 'Page Loaded.' ),
-							),
-						),
+						'loadingText' => __( 'Loading page, please wait.' ),
+						'loadedText'  => __( 'Page Loaded.' ),
 					),
 					JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
 				)
@@ -54,12 +50,12 @@ function render_block_core_query( $attributes, $content, $block ) {
 				'<div
 					class="screen-reader-text"
 					aria-live="polite"
-					data-wp-text="context.core.query.message"
+					data-wp-text="context.message"
 				></div>
 				<div
 					class="wp-block-query__enhanced-pagination-animation"
-					data-wp-class--start-animation="selectors.core.query.startAnimation"
-					data-wp-class--finish-animation="selectors.core.query.finishAnimation"
+					data-wp-class--start-animation="state.startAnimation"
+					data-wp-class--finish-animation="state.finishAnimation"
 				></div>',
 				$last_tag_position,
 				0
@@ -67,19 +63,28 @@ function render_block_core_query( $attributes, $content, $block ) {
 		}
 	}
 
-	$view_asset = 'wp-block-query-view';
-	if ( ! wp_script_is( $view_asset ) ) {
-		$script_handles = $block->block_type->view_script_handles;
-		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if (
-			( ! $attributes['enhancedPagination'] || ! isset( $attributes['queryId'] ) )
-			&& in_array( $view_asset, $script_handles, true )
-		) {
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
+	$is_gutenberg_plugin     = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
+	$should_load_view_script = $attributes['enhancedPagination'] && isset( $attributes['queryId'] );
+	$view_asset              = 'wp-block-query-view';
+	$script_handles          = $block->block_type->view_script_handles;
+
+	if ( $is_gutenberg_plugin ) {
+		if ( $should_load_view_script ) {
+			gutenberg_enqueue_module( '@wordpress/block-library/query' );
 		}
-		// If the script is needed, but it was previously removed, add it again.
-		if ( $attributes['enhancedPagination'] && isset( $attributes['queryId'] ) && ! in_array( $view_asset, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_asset ) );
+		// Remove the view script because we are using the module.
+		$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
+	} else {
+		if ( ! wp_script_is( $view_asset ) ) {
+			// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+			if ( ! $should_load_view_script && in_array( $view_asset, $script_handles, true )
+			) {
+				$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
+			}
+			// If the script is needed, but it was previously removed, add it again.
+			if ( $should_load_view_script && ! in_array( $view_asset, $script_handles, true ) ) {
+				$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_asset ) );
+			}
 		}
 	}
 
@@ -131,6 +136,15 @@ function register_block_core_query() {
 			'render_callback' => 'render_block_core_query',
 		)
 	);
+
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		gutenberg_register_module(
+			'@wordpress/block-library/query',
+			'/wp-content/plugins/gutenberg/build/interactivity/query.min.js',
+			array( '@wordpress/interactivity' ),
+			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+		);
+	}
 }
 add_action( 'init', 'register_block_core_query' );
 

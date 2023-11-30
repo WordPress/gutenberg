@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { default as InFilter } from './in-filter';
+import FilterSummary from './filter-summary';
 import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
 import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
@@ -33,7 +33,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 		}
 
 		return (
-			<InFilter
+			<FilterSummary
 				key={ filter.field + '.' + filter.operator }
 				filter={ filter }
 				view={ view }

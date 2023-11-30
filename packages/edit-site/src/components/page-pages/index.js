@@ -21,7 +21,7 @@ import Link from '../routes/link';
 import { DataViews, viewTypeSupportsMap } from '../dataviews';
 import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
 import {
-	useTrashPostAction,
+	trashPostAction,
 	usePermanentlyDeletePostAction,
 	useRestorePostAction,
 	postRevisionsAction,
@@ -39,6 +39,7 @@ const defaultConfigPerViewType = {
 	list: {},
 	grid: {
 		mediaField: 'featured-image',
+		primaryField: 'title',
 	},
 };
 
@@ -259,7 +260,6 @@ export default function PagePages() {
 		[ authors ]
 	);
 
-	const trashPostAction = useTrashPostAction();
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
 	const restorePostAction = useRestorePostAction();
 	const editPostAction = useEditPostAction();
@@ -272,12 +272,7 @@ export default function PagePages() {
 			editPostAction,
 			postRevisionsAction,
 		],
-		[
-			trashPostAction,
-			permanentlyDeletePostAction,
-			restorePostAction,
-			editPostAction,
-		]
+		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]
 	);
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
