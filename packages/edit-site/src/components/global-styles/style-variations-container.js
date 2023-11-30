@@ -463,20 +463,20 @@ export default function StyleVariationsContainer() {
 			<div className="edit-site-sidebar-navigation-screen-styles__group-header">
 				<Heading level={ 2 }>{ __( 'Typography' ) }</Heading>
 			</div>
-			<div className="edit-site-global-styles-style-variations-container">
+			<Grid
+				columns={ 2 }
+				className="edit-site-global-styles-style-variations-container"
+			>
 				{ uniqueTypographyVariations &&
 					uniqueTypographyVariations.map( ( variation, index ) => {
 						return (
-							<Grid columns={ 2 } key={ index }>
-								<TypographyVariation
-									key={ index }
-									variation={ variation }
-									isColor={ false }
-								/>
-							</Grid>
+							<TypographyVariation
+								key={ index }
+								variation={ variation }
+							/>
 						);
 					} ) }
-			</div>
+			</Grid>
 		</>
 	);
 }
