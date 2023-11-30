@@ -12,9 +12,6 @@
 		"align": {
 			"type": "string"
 		},
-		"bindings": {
-			"type": "object"
-		},
 		"content": {
 			"type": "string",
 			"source": "html",

@@ -24,9 +24,6 @@
 			"default": "",
 			"__experimentalRole": "content"
 		},
-		"bindings": {
-			"type": "object"
-		},
 		"caption": {
 			"type": "string",
 			"source": "html",
