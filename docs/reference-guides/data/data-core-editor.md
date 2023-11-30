@@ -547,10 +547,6 @@ Returns state object prior to a specified optimist transaction ID, or `null` if 
 
 Returns a suggested post format for the current post, inferred only if there is a single block within the post and it is of a type known to match a default post format. Returns null if the format cannot be determined.
 
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
 _Returns_
 
 -   `?string`: Suggested post format.
