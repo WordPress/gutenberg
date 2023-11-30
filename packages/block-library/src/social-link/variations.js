@@ -19,6 +19,7 @@ import {
 	GoodreadsIcon,
 	GoogleIcon,
 	GitHubIcon,
+	GravatarIcon,
 	InstagramIcon,
 	LastfmIcon,
 	LinkedInIcon,
@@ -159,6 +160,12 @@ const variations = [
 		attributes: { service: 'github' },
 		title: 'GitHub',
 		icon: GitHubIcon,
+	},
+	{
+		name: 'gravatar',
+		attributes: { service: 'gravatar' },
+		title: 'Gravatar',
+		icon: GravatarIcon,
 	},
 	{
 		name: 'instagram',
