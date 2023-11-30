@@ -19,8 +19,15 @@ test.describe( 'Templates', () => {
 	test( 'Sorting', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( { path: '/wp_template/all' } );
 		// Descending by title.
-		await page.getByRole( 'button', { name: 'Template' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Sort descending' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Template', exact: true } )
+			.click();
+		await page
+			.getByRole( 'menuitemradio', {
+				name: 'Sort descending',
+				exact: true,
+			} )
+			.click();
 		const firstTitle = page
 			.getByRole( 'region', {
 				name: 'Template',
@@ -33,7 +40,9 @@ test.describe( 'Templates', () => {
 			.first();
 		await expect( firstTitle ).toHaveText( 'Tag Archives' );
 		// Ascending by title.
-		await page.getByRole( 'menuitem', { name: 'Sort ascending' } ).click();
+		await page
+			.getByRole( 'menuitemradio', { name: 'Sort ascending' } )
+			.click();
 		await expect( firstTitle ).toHaveText( 'Category Archives' );
 	} );
 	test( 'Filtering', async ( { requestUtils, admin, page } ) => {
