@@ -81,6 +81,7 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 						{ filter.elements.map( ( element ) => (
 							<DropdownMenuItem
 								key={ element.value }
+								role="menuitemradio"
 								onSelect={ () => {
 									onChangeView( ( currentView ) => ( {
 										...currentView,
@@ -95,7 +96,6 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 										],
 									} ) );
 								} }
-								role="menuitemcheckbox"
 							>
 								{ element.label }
 							</DropdownMenuItem>
