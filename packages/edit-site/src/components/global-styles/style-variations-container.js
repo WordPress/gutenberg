@@ -28,7 +28,7 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
-function Variation( { variation, preserveAdditionalCSS } ) {
+function Variation( { variation } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo( () => {
@@ -44,33 +44,10 @@ function Variation( { variation, preserveAdditionalCSS } ) {
 	}, [ variation, base ] );
 
 	const selectVariation = () => {
-		const blockStyles = { ...variation?.styles?.blocks } || {};
-		if ( user?.styles?.blocks && preserveAdditionalCSS ) {
-			Object.keys( user.styles.blocks ).forEach( ( blockName ) => {
-				if ( user.styles.blocks[ blockName ].css ) {
-					blockStyles[ blockName ] = {
-						...( blockStyles[ blockName ]
-							? blockStyles[ blockName ]
-							: {} ),
-						css: user.styles.blocks[ blockName ].css,
-					};
-				}
-			} );
-		}
-		const styles = preserveAdditionalCSS
-			? {
-					...variation.styles,
-					...( user?.styles?.css ? { css: user.styles.css } : {} ),
-					blocks: {
-						...blockStyles,
-					},
-			  }
-			: variation.styles;
-
 		setUserConfig( () => {
 			return {
 				settings: variation.settings,
-				styles,
+				styles: variation.styles,
 			};
 		} );
 	};
@@ -127,6 +104,9 @@ function Variation( { variation, preserveAdditionalCSS } ) {
 }
 
 export default function StyleVariationsContainer() {
+	const { user } = useContext( GlobalStylesContext );
+	const [ currentUserStyles ] = useState( { ...user } );
+
 	const [ preserveAdditionalCSS, setPreserveAdditionalCSS ] =
 		useState( true );
 
@@ -143,13 +123,64 @@ export default function StyleVariationsContainer() {
 				settings: {},
 				styles: {},
 			},
-			...( variations ?? [] ).map( ( variation ) => ( {
-				...variation,
-				settings: variation.settings ?? {},
-				styles: variation.styles ?? {},
-			} ) ),
+			...( variations ?? [] ).map( ( variation ) => {
+				const blockStyles = { ...variation?.styles?.blocks } || {};
+				if (
+					currentUserStyles?.styles?.blocks &&
+					preserveAdditionalCSS
+				) {
+					Object.keys( currentUserStyles.styles.blocks ).forEach(
+						( blockName ) => {
+							if (
+								currentUserStyles.styles.blocks[ blockName ].css
+							) {
+								blockStyles[ blockName ] = {
+									...( blockStyles[ blockName ]
+										? blockStyles[ blockName ]
+										: {} ),
+									css: `${
+										blockStyles[ blockName ]?.css || ''
+									} ${
+										currentUserStyles.styles.blocks[
+											blockName
+										].css
+									}`,
+								};
+							}
+						}
+					);
+				}
+
+				const styles = preserveAdditionalCSS
+					? {
+							...variation.styles,
+							...( currentUserStyles?.styles?.css ||
+							variation?.styles?.css
+								? {
+										css: `${
+											variation.styles?.css || ''
+										} ${ currentUserStyles.styles.css }`,
+								  }
+								: {} ),
+							blocks: {
+								...blockStyles,
+							},
+					  }
+					: variation.styles;
+
+				return {
+					...variation,
+					settings: variation.settings ?? {},
+					styles: styles ?? {},
+				};
+			} ),
 		];
-	}, [ variations ] );
+	}, [
+		variations,
+		currentUserStyles.styles.blocks,
+		currentUserStyles.styles.css,
+		preserveAdditionalCSS,
+	] );
 
 	return (
 		<>
