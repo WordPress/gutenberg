@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `FormToggle`: fix sass deprecation warning ([#56672](https://github.com/WordPress/gutenberg/pull/56672)).
 -   `QueryControls`: Add opt-in prop for 40px default size ([#56576](https://github.com/WordPress/gutenberg/pull/56576)).
 
 ## 25.13.0 (2023-11-29)
