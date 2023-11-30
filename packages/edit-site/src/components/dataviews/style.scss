@@ -34,15 +34,9 @@
 	}
 	th {
 		text-align: left;
-		/*
-		 * This makes the Actions column header to use the same styles as the other ones.
-		 * The other column headers use the .components-button styles.
-		 */
-		&[data-field-id="actions"] {
-			color: var(--wp-components-color-foreground, $gray-900);
-			font-weight: normal;
-			font-size: $default-font-size;
-		}
+		color: var(--wp-components-color-foreground, $gray-900);
+		font-weight: normal;
+		font-size: $default-font-size;
 	}
 	td,
 	th {
