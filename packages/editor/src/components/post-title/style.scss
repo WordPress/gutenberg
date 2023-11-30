@@ -1,4 +1,5 @@
-.edit-post-text-editor__body .is-raw-text textarea {
-	font-size: inherit;
-	line-height: inherit;
+// Raw Text Variant
+.edit-post-text-editor__body .editor-post-title.is-raw-text {
+	margin-bottom: $grid-unit-30;
+	margin-top: 2px; // space for focus outline to appear.
 }

@@ -9,10 +9,10 @@ import {
 import {
 	chevronRightSmall,
 	check,
-	blockTable,
+	formatListBullets,
 	arrowUp,
 	arrowDown,
-	grid,
+	category,
 	columns,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -139,7 +139,8 @@ function PageSizeMenu( { view, onChangeView } ) {
 
 function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 	const hidableFields = fields.filter(
-		( field ) => field.enableHiding !== false
+		( field ) =>
+			field.enableHiding !== false && field.id !== view.layout.mediaField
 	);
 	if ( ! hidableFields?.length ) {
 		return null;
@@ -275,7 +276,11 @@ function SortMenu( { fields, view, onChangeView } ) {
 	);
 }
 
-const VIEW_TYPE_ICONS = { list: blockTable, grid, 'side-by-side': columns };
+const VIEW_TYPE_ICONS = {
+	list: formatListBullets,
+	grid: category,
+	'side-by-side': columns,
+};
 
 export default function ViewActions( {
 	fields,

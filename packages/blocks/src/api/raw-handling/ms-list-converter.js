@@ -1,9 +1,4 @@
 /**
- * Browser dependencies
- */
-const { parseInt } = window;
-
-/**
  * Internal dependencies
  */
 import { deepFilterHTML } from './utils';

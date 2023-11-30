@@ -3,7 +3,7 @@
  */
 import ViewList from './view-list';
 
-export function ViewSideBySide( props ) {
+export default function ViewSideBySide( props ) {
 	// To do: change to email-like preview list.
 	return <ViewList { ...props } />;
 }

@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { page, columns, pullRight } from '@wordpress/icons';
+import { formatListBullets, category, drawerLeft } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __experimentalHStack as HStack } from '@wordpress/components';
 
@@ -19,7 +19,11 @@ import { unlock } from '../../lock-unlock';
 const { useLocation } = unlock( routerPrivateApis );
 
 function getDataViewIcon( type ) {
-	const icons = { list: page, grid: columns, 'side-by-side': pullRight };
+	const icons = {
+		list: formatListBullets,
+		grid: category,
+		'side-by-side': drawerLeft,
+	};
 	return icons[ type ];
 }
 
