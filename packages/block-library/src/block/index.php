@@ -46,7 +46,7 @@ function render_block_core_block( $attributes ) {
 	$content = $wp_embed->run_shortcode( $reusable_block->post_content );
 	$content = $wp_embed->autoembed( $content );
 
-	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+	$gutenberg_experiments        = get_option( 'gutenberg-experiments' );
 	$has_partial_synced_overrides = $gutenberg_experiments
 		&& array_key_exists( 'gutenberg-pattern-partial-syncing', $gutenberg_experiments )
 		&& isset( $attributes['overrides'] );
