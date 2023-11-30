@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [***] Fix issue when backspacing in an empty Paragraph block [#56496]
+-   [**] Fix issue related to text color format and recieving in rare cases an undefined ref from `RichText` component [#56686]
 
 ## 1.109.0
 -   [*] Audio block: Improve legibility of audio file details on various background colors [#55627]
