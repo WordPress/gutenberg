@@ -14,7 +14,7 @@ const translationMap = {
 	'color.background': __( 'background colors' ),
 	'spacing.margin': __( 'margin styles' ),
 	'spacing.padding': __( 'padding styles' ),
-	'spacing.blockGap': __( 'block gap' ),
+	'spacing.blockGap': __( 'block spacing' ),
 	'settings.layout': __( 'layout settings' ),
 	'typography.fontStyle': __( 'font style' ),
 	'typography.fontSize': __( 'font size' ),
@@ -69,15 +69,6 @@ function getTranslation( key, blockNames ) {
 	}
 }
 
-function shuffle( array ) {
-	for ( let i = array.length - 1; i > 0; i-- ) {
-		// eslint-disable-next-line no-restricted-syntax
-		const j = Math.floor( Math.random() * ( i + 1 ) );
-		[ array[ i ], array[ j ] ] = [ array[ j ], array[ i ] ];
-	}
-	return array;
-}
-
 const cache = new Map();
 
 export function getRevisionChanges(
@@ -109,10 +100,11 @@ export function getRevisionChanges(
 		}
 	);
 
-	// Remove dupes and shuffle results.
-	const result = shuffle( [ ...new Set( changedValueTree ) ] )
+	// Remove duplicate results.
+	const result = [ ...new Set( changedValueTree ) ]
 		// Translate the keys.
 		.map( ( key ) => getTranslation( key, blockNames ) )
+		// Remove duplicate or empty translations.
 		.reduce( ( acc, curr ) => {
 			if ( curr && ! acc.includes( curr ) ) {
 				acc.push( curr );
