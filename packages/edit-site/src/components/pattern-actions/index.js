@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { paramCase as kebabCase } from 'change-case';
+
+/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -15,6 +20,8 @@ import { moreVertical } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { downloadBlob } from '@wordpress/blob';
+import { getQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -23,11 +30,13 @@ import { store as editSiteStore } from '../../store';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import RenameMenuItem from './rename-menu-item';
+import DuplicateMenuItem from './duplicate-menu-item';
 import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	POST_TYPE_LABELS,
 	PATTERN_TYPES,
+	PATTERN_DEFAULT_CATEGORY,
 } from '../../utils/constants';
 
 export default function PatternActions( {
@@ -53,6 +62,9 @@ export default function PatternActions( {
 	const isUserPattern = record?.type === PATTERN_TYPES.user;
 	const isTemplate = record?.type === TEMPLATE_POST_TYPE;
 	const isTemplatePart = record?.type === TEMPLATE_PART_POST_TYPE;
+	const { categoryType, categoryId } = getQueryArgs( window.location.href );
+	const type = categoryType || PATTERN_TYPES.theme;
+	const category = categoryId || PATTERN_DEFAULT_CATEGORY;
 
 	if (
 		! isRemovable &&
@@ -67,6 +79,21 @@ export default function PatternActions( {
 	const decodedTitle = decodeEntities(
 		record?.title?.rendered || record?.title?.raw
 	);
+
+	const exportAsJSON = ( pattern ) => {
+		const json = {
+			__file: pattern.type,
+			title: pattern.title || pattern.name,
+			content: pattern.patternBlock.content.raw,
+			syncStatus: pattern.patternBlock.wp_pattern_sync_status,
+		};
+
+		return downloadBlob(
+			`${ kebabCase( pattern.title || pattern.name ) }.json`,
+			JSON.stringify( json, null, 2 ),
+			'application/json'
+		);
+	};
 
 	const deletePattern = async ( pattern ) => {
 		try {
@@ -153,6 +180,17 @@ export default function PatternActions( {
 								postType={ postType }
 								onClose={ onClose }
 							/>
+							<DuplicateMenuItem
+								categoryId={ categoryId }
+								item={ record }
+								onClose={ onClose }
+								label={ __( 'Duplicate' ) }
+							/>
+							{ isUserPattern && (
+								<MenuItem onClick={ () => exportAsJSON() }>
+									{ __( 'Export as JSON' ) }
+								</MenuItem>
+							) }
 							<DeleteMenuItem
 								isDestructive={ true }
 								onRemove={ () => {
