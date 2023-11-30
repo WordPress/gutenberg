@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `QueryControls`: Add opt-in prop for 40px default size ([#56576](https://github.com/WordPress/gutenberg/pull/56576)).
+
 ## 25.13.0 (2023-11-29)
 
 ### Enhancements
@@ -23,7 +27,7 @@
 
 ### Documentation
 
--  `Text` and `Heading`: improve docs around default values and truncation logic ([#56518](https://github.com/WordPress/gutenberg/pull/56518))
+-   `Text` and `Heading`: improve docs around default values and truncation logic ([#56518](https://github.com/WordPress/gutenberg/pull/56518))
 
 ### Internal
 
