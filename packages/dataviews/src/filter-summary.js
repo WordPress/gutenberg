@@ -6,7 +6,7 @@ import {
 	privateApis as componentsPrivateApis,
 	Icon,
 } from '@wordpress/components';
-import { chevronDown } from '@wordpress/icons';
+import { chevronDown, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { Children, Fragment } from '@wordpress/element';
 
@@ -19,7 +19,7 @@ import { unlock } from '../../lock-unlock';
 const {
 	DropdownMenuV2: DropdownMenu,
 	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
+	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	DropdownSubMenuV2: DropdownSubMenu,
 	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
@@ -96,11 +96,13 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 				<DropdownMenuGroup>
 					{ filter.elements.map( ( element ) => {
 						return (
-							<DropdownMenuCheckboxItem
+							<DropdownMenuItem
 								key={ element.value }
-								value={ element.value }
-								checked={
-									activeElement?.value === element.value
+								role="menuitemradio"
+								prefix={
+									activeElement?.value === element.value && (
+										<Icon icon={ check } />
+									)
 								}
 								onSelect={ () =>
 									onChangeView( ( currentView ) => ( {
@@ -127,7 +129,7 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 								}
 							>
 								{ element.label }
-							</DropdownMenuCheckboxItem>
+							</DropdownMenuItem>
 						);
 					} ) }
 				</DropdownMenuGroup>
@@ -139,10 +141,14 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 							</DropdownSubMenuTrigger>
 						}
 					>
-						<DropdownMenuCheckboxItem
+						<DropdownMenuItem
 							key="in-filter"
-							value={ OPERATOR_IN }
-							checked={ filterInView?.operator === OPERATOR_IN }
+							role="menuitemradio"
+							prefix={
+								filterInView?.operator === OPERATOR_IN && (
+									<Icon icon={ check } />
+								)
+							}
 							onSelect={ () =>
 								onChangeView( ( currentView ) => ( {
 									...currentView,
@@ -161,12 +167,14 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 							}
 						>
 							{ __( 'Show matches' ) }
-						</DropdownMenuCheckboxItem>
-						<DropdownMenuCheckboxItem
+						</DropdownMenuItem>
+						<DropdownMenuItem
 							key="not-in-filter"
-							value={ OPERATOR_NOT_IN }
-							checked={
-								filterInView?.operator === OPERATOR_NOT_IN
+							role="menuitemradio"
+							prefix={
+								filterInView?.operator === OPERATOR_NOT_IN && (
+									<Icon icon={ check } />
+								)
 							}
 							onSelect={ () =>
 								onChangeView( ( currentView ) => ( {
@@ -186,7 +194,7 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 							}
 						>
 							{ __( 'Hide matches' ) }
-						</DropdownMenuCheckboxItem>
+						</DropdownMenuItem>
 					</DropdownSubMenu>
 				) }
 			</WithSeparators>
