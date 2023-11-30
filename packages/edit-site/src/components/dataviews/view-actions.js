@@ -9,7 +9,7 @@ import {
 import {
 	chevronRightSmall,
 	check,
-	list,
+	formatListBullets,
 	arrowUp,
 	arrowDown,
 	category,
@@ -276,7 +276,7 @@ function SortMenu( { fields, view, onChangeView } ) {
 }
 
 const VIEW_TYPE_ICONS = {
-	list,
+	list: formatListBullets,
 	grid: category,
 	'side-by-side': columns,
 };
