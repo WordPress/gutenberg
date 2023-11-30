@@ -4,37 +4,18 @@
 import { __, sprintf } from '@wordpress/i18n';
 
 const translationMap = {
-	elements: __( 'elements' ),
-	variations: __( 'variations' ),
-	css: __( 'CSS' ),
-	filter: __( 'filter' ),
-	border: __( 'border' ),
-	color: __( 'color' ),
-	spacing: __( 'spacing' ),
-	typography: __( 'typography' ),
 	caption: __( 'caption' ),
 	link: __( 'link' ),
 	button: __( 'button' ),
 	heading: __( 'heading' ),
-	':hover': __( 'hover' ),
-	'settings.color.palette': __( 'color palette' ),
-	'settings.color.gradients': __( 'gradients' ),
-	'settings.color.duotone': __( 'duotone colors' ),
-	'settings.typography.fontFamilies': __( 'font family settings' ),
-	'settings.typography.fontSizes': __( 'font size settings' ),
-	'color.text': __( 'text color' ),
-	'color.background': __( 'background color' ),
-	'spacing.margin.top': __( 'margin top' ),
-	'spacing.margin.bottom': __( 'margin bottom' ),
-	'spacing.margin.left': __( 'margin left' ),
-	'spacing.margin.right': __( 'margin right' ),
-	'spacing.padding.top': __( 'padding top' ),
-	'spacing.padding.bottom': __( 'padding bottom' ),
-	'spacing.padding.left': __( 'padding left' ),
-	'spacing.padding.right': __( 'padding right' ),
+	'settings.color': __( 'color settings' ),
+	'settings.typography': __( 'typography settings' ),
+	'color.text': __( 'text colors' ),
+	'color.background': __( 'background colors' ),
+	'spacing.margin': __( 'margin styles' ),
+	'spacing.padding': __( 'padding styles' ),
 	'spacing.blockGap': __( 'block gap' ),
-	'settings.layout.contentSize': __( 'content size' ),
-	'settings.layout.wideSize': __( 'wide size' ),
+	'settings.layout': __( 'layout settings' ),
 	'typography.fontStyle': __( 'font style' ),
 	'typography.fontSize': __( 'font size' ),
 	'typography.lineHeight': __( 'line height' ),
@@ -73,19 +54,17 @@ function getTranslation( key, blockNames ) {
 	if ( keyArray?.[ 0 ] === 'blocks' ) {
 		const blockName = blockNames[ keyArray[ 1 ] ];
 		return sprintf(
-			// translators: %1$s: block name, %2$s: changed property.
-			__( '%1$s block %2$s' ),
-			blockName,
-			translationMap[ keyArray[ 2 ] ]
+			// translators: %s: block name.
+			__( '%s block' ),
+			blockName
 		);
 	}
 
 	if ( keyArray?.[ 0 ] === 'elements' ) {
 		return sprintf(
-			// translators: %1$s: block name, %2$s: changed property.
-			__( '%1$s element %2$s' ),
-			translationMap[ keyArray[ 1 ] ],
-			translationMap[ keyArray[ 2 ] ]
+			// translators: %s: element name, e.g., heading button, link, caption.
+			__( '%s element' ),
+			translationMap[ keyArray[ 1 ] ]
 		);
 	}
 }
@@ -105,7 +84,7 @@ export function getRevisionChanges(
 	revision,
 	previousRevision,
 	blockNames,
-	maxResults = 4
+	maxResults = 5
 ) {
 	if ( cache.has( revision.id ) ) {
 		return cache.get( revision.id );
@@ -129,23 +108,28 @@ export function getRevisionChanges(
 			settings: previousRevision?.settings,
 		}
 	);
-	const hasMore = changedValueTree.length > maxResults;
+
 	// Remove dupes and shuffle results.
-	let result = shuffle( [ ...new Set( changedValueTree ) ] )
-		// Limit to max results.
-		.slice( 0, maxResults )
+	const result = shuffle( [ ...new Set( changedValueTree ) ] )
 		// Translate the keys.
 		.map( ( key ) => getTranslation( key, blockNames ) )
-		.filter( ( str ) => !! str )
-		.join( ', ' );
+		.reduce( ( acc, curr ) => {
+			if ( curr && ! acc.includes( curr ) ) {
+				acc.push( curr );
+			}
+			return acc;
+		}, [] );
+
+	let joined = result.slice( 0, maxResults ).join( ', ' );
+	const hasMore = result.length > maxResults;
 
 	if ( hasMore ) {
-		result += '…';
+		joined += '…';
 	}
 
-	cache.set( revision.id, result );
+	cache.set( revision.id, joined );
 
-	return result;
+	return joined;
 }
 
 function isObject( obj ) {
@@ -160,9 +144,9 @@ function deepCompare(
 ) {
 	if ( ! isObject( changedObject ) && ! isObject( originalObject ) ) {
 		// Only return a path if the value has changed.
-		// And then only the path name up to 3 levels deep.
+		// And then only the path name up to 2 levels deep.
 		return changedObject !== originalObject
-			? parentPath.split( '.' ).slice( 0, 3 ).join( '.' )
+			? parentPath.split( '.' ).slice( 0, 2 ).join( '.' )
 			: undefined;
 	}
 

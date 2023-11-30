@@ -50,16 +50,16 @@ function ChangedSummary( { revision, previousRevision } ) {
  * Returns a button label for the revision.
  *
  * @param {string|number} id                    A revision object.
- * @param {boolean}       isLatest              Whether the revision is the most current.
  * @param {string}        authorDisplayName     Author name.
  * @param {string}        formattedModifiedDate Revision modified date formatted.
+ * @param {boolean}       areStylesEqual        Whether the revision matches the current editor styles.
  * @return {string} Translated label.
  */
 function getRevisionLabel(
 	id,
-	isLatest,
 	authorDisplayName,
-	formattedModifiedDate
+	formattedModifiedDate,
+	areStylesEqual
 ) {
 	if ( 'parent' === id ) {
 		return __( 'Reset the styles to the theme defaults' );
@@ -73,10 +73,12 @@ function getRevisionLabel(
 		);
 	}
 
-	return isLatest
+	return areStylesEqual
 		? sprintf(
 				/* translators: %1$s author display name, %2$s: revision creation date */
-				__( 'Changes saved by %1$s on %2$s (current)' ),
+				__(
+					'Changes saved by %1$s on %2$s. This revision matches current editor styles.'
+				),
 				authorDisplayName,
 				formattedModifiedDate
 		  )
@@ -103,7 +105,6 @@ function RevisionsButtons( {
 	userRevisions,
 	selectedRevisionId,
 	onChange,
-	onSelect,
 	canApplyRevision,
 } ) {
 	const { currentThemeName, currentUser } = useSelect( ( select ) => {
@@ -125,7 +126,7 @@ function RevisionsButtons( {
 			role="group"
 		>
 			{ userRevisions.map( ( revision, index ) => {
-				const { id, isLatest, author, modified } = revision;
+				const { id, author, modified } = revision;
 				const isUnsaved = 'unsaved' === id;
 				// Unsaved changes are created by the current user.
 				const revisionAuthor = isUnsaved ? currentUser : author;
@@ -135,6 +136,7 @@ function RevisionsButtons( {
 				const isSelected = selectedRevisionId
 					? selectedRevisionId === id
 					: isFirstItem;
+				const areStylesEqual = ! canApplyRevision && isSelected;
 				const isReset = 'parent' === id;
 				const modifiedDate = getDate( modified );
 				const displayDate =
@@ -144,9 +146,9 @@ function RevisionsButtons( {
 						: humanTimeDiff( modified );
 				const revisionLabel = getRevisionLabel(
 					id,
-					isLatest,
 					authorDisplayName,
-					dateI18n( datetimeAbbreviated, modifiedDate )
+					dateI18n( datetimeAbbreviated, modifiedDate ),
+					areStylesEqual
 				);
 
 				return (
@@ -155,6 +157,7 @@ function RevisionsButtons( {
 							'edit-site-global-styles-screen-revisions__revision-item',
 							{
 								'is-selected': isSelected,
+								'is-active': areStylesEqual,
 								'is-reset': isReset,
 							}
 						) }
@@ -166,7 +169,7 @@ function RevisionsButtons( {
 							onClick={ () => {
 								onChange( revision );
 							} }
-							label={ revisionLabel }
+							aria-label={ revisionLabel }
 						>
 							{ isReset ? (
 								<span className="edit-site-global-styles-screen-revisions__description">
@@ -200,34 +203,14 @@ function RevisionsButtons( {
 							) }
 						</Button>
 						{ isSelected && (
-							<>
-								<ChangedSummary
-									revision={ revision }
-									previousRevision={
-										index < userRevisions.length
-											? userRevisions[ index + 1 ]
-											: {}
-									}
-								/>
-								{ /* eslint-disable-next-line no-nested-ternary */ }
-								{ canApplyRevision ? (
-									<Button
-										variant="secondary"
-										className="edit-site-global-styles-screen-revision__button"
-										onClick={ onSelect }
-									>
-										{ isReset
-											? __( 'Reset to defaults' )
-											: __( 'Apply' ) }
-									</Button>
-								) : (
-									<span className="edit-site-global-styles-screen-revision__matches">
-										{ __(
-											'Revision matches current editor styles.'
-										) }
-									</span>
-								) }
-							</>
+							<ChangedSummary
+								revision={ revision }
+								previousRevision={
+									index < userRevisions.length
+										? userRevisions[ index + 1 ]
+										: {}
+								}
+							/>
 						) }
 					</li>
 				);
