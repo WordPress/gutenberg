@@ -23,5 +23,4 @@ export const PATTERN_SYNC_TYPES = {
 // TODO: This should not be hardcoded. Maybe there should be a config and/or an UI.
 export const PARTIAL_SYNCING_SUPPORTED_BLOCKS = {
 	'core/paragraph': { content: __( 'Content' ) },
-	'core/button': { text: __( 'Text' ) },
 };

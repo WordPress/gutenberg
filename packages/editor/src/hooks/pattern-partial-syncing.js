@@ -64,7 +64,7 @@ const withPartialSyncingControls = createHigherOrderComponent(
 	}
 );
 
-if ( window.__experimentalConnections ) {
+if ( window.__experimentalPatternPartialSyncing ) {
 	addFilter(
 		'editor.BlockEdit',
 		'core/editor/with-partial-syncing-controls',

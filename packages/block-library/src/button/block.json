@@ -118,8 +118,7 @@
 				"width": true
 			}
 		},
-		"__experimentalSelector": ".wp-block-button .wp-block-button__link",
-		"__experimentalConnections": true
+		"__experimentalSelector": ".wp-block-button .wp-block-button__link"
 	},
 	"styles": [
 		{ "name": "fill", "label": "Fill", "isDefault": true },
