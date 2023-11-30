@@ -36,19 +36,24 @@ add_filter( 'render_block_data', 'gutenberg_interactivity_mark_root_blocks', 10,
  * @return string Filtered block content.
  */
 function gutenberg_process_directives_in_root_blocks( $block_content, $block ) {
+
 	if ( WP_Directive_Processor::is_marked_as_root_block( $block ) ) {
 		WP_Directive_Processor::unmark_root_block();
-		$directives = array(
-			'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
-			'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
-			'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
-			'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
-			'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
-		);
+		$processed_content = '';
+		$p                 = WP_HTML_Processor::create_fragment( '' );
+		$parsed_blocks     = parse_blocks( $block_content );
+		foreach ( $parsed_blocks as $parsed_block ) {
+			if ( 'core/interactivity-wrapper' === $parsed_block['blockName'] ) {
+				$processed_content .= gutenberg_process_interactive_block( $parsed_block, $p );
+			} elseif ( 'core/non-interactivity-wrapper' === $parsed_block['blockName'] ) {
+				$processed_content .= gutenberg_process_non_interactive_block( $parsed_block, $p );
+			}
+		}
+		if ( null === $p->get_last_error() ) {
+			$content = $processed_content;
+		}
 
-		$tags = new WP_Directive_Processor( $block_content );
-		$tags = $tags->process_rendered_html( $tags, 'data-wp-', $directives );
-		return $tags->get_updated_html();
+		return $content;
 
 	}
 
@@ -160,4 +165,63 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
 
 	// Return the opposite if it has a negator operator (!).
 	return $should_negate_value ? ! $current : $current;
+}
+
+
+function gutenberg_process_interactive_block( $interactive_block, $p ) {
+	$block_index = 0;
+	$content     = '';
+	$directives  = array(
+		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
+		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
+		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
+		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
+		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
+	);
+
+	foreach ( $interactive_block['innerContent'] as $inner_content ) {
+		if ( is_string( $inner_content ) ) {
+			// This content belongs to an interactive block and therefore can contain
+			// directives.
+			$tags = new WP_Directive_Processor( $inner_content );
+			$tags->process_rendered_html( $p, 'data-wp-', $directives );
+			$content .= $tags->get_updated_html();
+		} else {
+			// This is an inner block. It may be an interactive block or a
+			// non-interactive block.
+			$inner_block  = $interactive_block['innerBlocks'][ $block_index ];
+			$block_index += 1;
+
+			if ( 'core/interactivity-wrapper' === $inner_block['blockName'] ) {
+				$content .= gutenberg_process_interactive_block( $inner_block, $p );
+			} elseif ( 'core/non-interactivity-wrapper' === $inner_block['blockName'] ) {
+				$content .= gutenberg_process_non_interactive_block( $inner_block, $p );
+			}
+		}
+	}
+	return $content;
+}
+
+function gutenberg_process_non_interactive_block( $non_interactive_block, $p ) {
+	$block_index = 0;
+	$content     = '';
+	foreach ( $non_interactive_block['innerContent'] as $inner_content ) {
+		if ( is_string( $inner_content ) ) {
+			// This content belongs to a non interactive block and therefore it cannot
+			// contain directives. We add the HTML directly to the final output.
+			$content .= $inner_content;
+		} else {
+			// This is an inner block. It may be an interactive block or a
+			// non-interactive block.
+			$inner_block  = $non_interactive_block['innerBlocks'][ $block_index ];
+			$block_index += 1;
+
+			if ( 'core/interactivity-wrapper' === $inner_block['blockName'] ) {
+				$content .= gutenberg_process_interactive_block( $inner_block, $p );
+			} elseif ( 'core/non-interactivity-wrapper' === $inner_block['blockName'] ) {
+				$content .= gutenberg_process_non_interactive_block( $inner_block, $p );
+			}
+		}
+	}
+	return $content;
 }
