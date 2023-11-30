@@ -465,6 +465,15 @@ function BlockWithChildLayoutStyles( { block: BlockListBlock, props } ) {
  */
 export const withChildLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
+		const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
+			return ! select( blockEditorStore ).getSettings()
+				.disableLayoutStyles;
+		} );
+
+		if ( ! shouldRenderChildLayoutStyles ) {
+			return <BlockListBlock { ...props } />;
+		}
+
 		return (
 			<BlockWithChildLayoutStyles
 				block={ BlockListBlock }
