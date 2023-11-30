@@ -11,6 +11,7 @@ import PageTemplateParts from '../page-template-parts';
 import PageTemplates from '../page-templates';
 import DataviewsTemplates from '../page-templates/dataviews-templates';
 import PagePages from '../page-pages';
+import PageMedia from '../page-media';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
@@ -20,17 +21,27 @@ export default function PageMain() {
 		params: { path },
 	} = useLocation();
 
+	if ( path === '/media/all' ) {
+		return <PageMedia />;
+	}
+
 	if ( path === '/wp_template/all' ) {
 		return window?.__experimentalAdminViews ? (
 			<DataviewsTemplates />
 		) : (
 			<PageTemplates />
 		);
-	} else if ( path === '/wp_template_part/all' ) {
+	}
+
+	if ( path === '/wp_template_part/all' ) {
 		return <PageTemplateParts />;
-	} else if ( path === '/patterns' ) {
+	}
+
+	if ( path === '/patterns' ) {
 		return <PagePatterns />;
-	} else if ( window?.__experimentalAdminViews && path === '/pages' ) {
+	}
+
+	if ( window?.__experimentalAdminViews && path === '/pages' ) {
 		return <PagePages />;
 	}
 

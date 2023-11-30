@@ -30,6 +30,7 @@ import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import DataViewsSidebarContent from '../sidebar-dataviews';
+import MediaSidebarContent from '../page-media/sidebar-content';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -79,6 +80,13 @@ function SidebarScreens() {
 			</NavigatorScreen>
 			<NavigatorScreen path="/:postType(wp_template)/:postId">
 				<SidebarNavigationScreenTemplate />
+			</NavigatorScreen>
+			<NavigatorScreen path="/media/all">
+				<SidebarNavigationScreen
+					title={ __( 'Media' ) }
+					backPath="/"
+					content={ <MediaSidebarContent /> }
+				/>
 			</NavigatorScreen>
 		</>
 	);
