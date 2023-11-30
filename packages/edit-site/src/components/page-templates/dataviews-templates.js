@@ -48,7 +48,7 @@ const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 const EMPTY_ARRAY = [];
 
 const defaultConfigPerViewType = {
-	list: {},
+	table: {},
 	grid: {
 		mediaField: 'preview',
 		primaryField: 'title',
@@ -56,7 +56,7 @@ const defaultConfigPerViewType = {
 };
 
 const DEFAULT_VIEW = {
-	type: 'list',
+	type: 'table',
 	search: '',
 	page: 1,
 	perPage: 20,
@@ -338,7 +338,7 @@ export default function DataviewsTemplates() {
 				isLoading={ isLoadingData }
 				view={ view }
 				onChangeView={ onChangeView }
-				supportedLayouts={ [ 'list', 'grid' ] }
+				supportedLayouts={ [ 'table', 'grid' ] }
 			/>
 		</Page>
 	);

@@ -36,7 +36,7 @@ const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
-	list: {},
+	table: {},
 	grid: {
 		mediaField: 'featured-image',
 		primaryField: 'title',

@@ -10,7 +10,7 @@ import { trash } from '@wordpress/icons';
 import { OPERATOR_IN } from '../dataviews/constants';
 
 const DEFAULT_PAGE_BASE = {
-	type: 'list',
+	type: 'table',
 	search: '',
 	filters: [],
 	page: 1,
