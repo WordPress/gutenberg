@@ -140,7 +140,7 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 					<DropdownSubMenu
 						trigger={
 							<DropdownSubMenuTrigger>
-								{ __( 'Settings' ) }
+								{ __( 'Conditions' ) }
 							</DropdownSubMenuTrigger>
 						}
 					>
