@@ -27,7 +27,7 @@ export default function MetadataSourceUI( props ) {
 					'/' +
 					context.postId,
 			} ).then( ( posts ) => {
-				let fetchedMetadata = [];
+				const fetchedMetadata = [];
 				function addMetadata( array, newData ) {
 					Object.entries( newData ).forEach( ( [ key, value ] ) => {
 						// Prettifying the name. But I guess it is not necessary.

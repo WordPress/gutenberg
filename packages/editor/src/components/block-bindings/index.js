@@ -157,7 +157,7 @@ if ( window.__experimentalConnections ) {
 			// TODO: Review the implications of this and the code.
 			// Add the necessary context to the block.
 			const contextItems = [ 'postId', 'postType', 'queryId' ];
-			let usesContextArray = settings.usesContext;
+			const usesContextArray = settings.usesContext;
 			const oldUsesContextArray = new Set( usesContextArray );
 			contextItems.forEach( ( item ) => {
 				if ( ! oldUsesContextArray.has( item ) ) {
