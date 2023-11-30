@@ -215,4 +215,4 @@ add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_enqueued_modules' ) );
 add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_module_preloads' ) );
 
 // Prints the script that loads the import map polyfill in the footer.
-add_action( 'wp_footer', array( 'Gutenberg_Modules', 'print_import_map_polyfill' ), 11 );
+// add_action( 'wp_footer', array( 'Gutenberg_Modules', 'print_import_map_polyfill' ), 11 );
