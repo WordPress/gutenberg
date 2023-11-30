@@ -3,8 +3,12 @@
  */
 import { useState } from '@wordpress/element';
 import { BlockControls } from '@wordpress/block-editor';
-import { Button, Popover } from '@wordpress/components';
-import { plugins as pluginsIcon } from '@wordpress/icons';
+import { Button, MenuItem, MenuGroup, Popover } from '@wordpress/components';
+import {
+	plugins as pluginsIcon,
+	chevronDown,
+	chevronUp,
+} from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
@@ -20,6 +24,7 @@ export default function BlockBindingsButton( props ) {
 	const { setAttributes } = props;
 
 	const [ addingBinding, setAddingBinding ] = useState( false );
+	// TODO: Triage why it is reloading after selecting a binding.
 	function BindingsUI() {
 		return (
 			<Popover
@@ -35,35 +40,83 @@ export default function BlockBindingsButton( props ) {
 				className="block-bindings-ui-popover"
 				{ ...props }
 			>
-				{ /* TODO: Add logic to select the attribute to bind */ }
-
-				{ /* TODO: This component could potentially be defined by each source. */ }
-				<MetadataSourceUI
-					{ ...props }
-					setAddingBinding={ setAddingBinding }
-				/>
-
-				{ /*
-                        TODO: Add a better way to "clear" the binding.
-                        We don't have to remove the whole bindings attribute but just the one we are binding.
-                        We can explore if we can get back to the previous content or keep the value of the custom field.
-                    */ }
-				<button
-					className="block-bindings-clear-button"
-					onClick={ () => {
-						if ( props.attributes.bindings ) {
-							setAttributes( {
-								content: '',
-								url: '',
-								bindings: {},
-							} );
-						}
-						setAddingBinding( false );
-					} }
-				>
-					Clear bindings
-				</button>
+				<AttributesLayer { ...props } />
 			</Popover>
+		);
+	}
+
+	function AttributesLayer( props ) {
+		const [ activeAttribute, setIsActiveAttribute ] = useState( false );
+		return (
+			<MenuGroup>
+				{ blockBindingsWhitelist[ props.name ].map( ( attribute ) => (
+					<div
+						key={ attribute }
+						className="block-bindings-attribute-picker-container"
+					>
+						<MenuItem
+							icon={
+								activeAttribute === attribute
+									? chevronUp
+									: chevronDown
+							}
+							isSelected={ activeAttribute === attribute }
+							onClick={ () =>
+								setIsActiveAttribute(
+									activeAttribute === attribute
+										? false
+										: attribute
+								)
+							}
+							className="block-bindings-attribute-picker-button"
+						>
+							{ attribute }
+						</MenuItem>
+						{ activeAttribute === attribute && (
+							<>
+								{ /* TODO: This component could potentially be defined by each source. */ }
+								<MetadataSourceUI
+									{ ...props }
+									currentAttribute={ attribute }
+									setIsActiveAttribute={
+										setIsActiveAttribute
+									}
+								/>
+								<RemoveBindingButton
+									{ ...props }
+									currentAttribute={ attribute }
+									setIsActiveAttribute={
+										setIsActiveAttribute
+									}
+								/>
+							</>
+						) }
+					</div>
+				) ) }
+			</MenuGroup>
+		);
+	}
+
+	function RemoveBindingButton( props ) {
+		return (
+			<Button
+				className="block-bindings-remove-button"
+				onClick={ () => {
+					if ( ! props.attributes.bindings ) {
+						return;
+					}
+					const { currentAttribute } = props;
+					const newAttributes = {};
+					newAttributes[ currentAttribute ] = '';
+					const newBindings = props.attributes.bindings.filter(
+						( item ) => item.attribute !== currentAttribute
+					);
+					newAttributes.bindings = newBindings;
+					setAttributes( newAttributes );
+				} }
+			>
+				Remove binding
+			</Button>
 		);
 	}
 
@@ -97,7 +150,7 @@ if ( window.__experimentalConnections ) {
 			// Add "bindings" attribute.
 			if ( ! settings.attributes.bindings ) {
 				settings.attributes.bindings = {
-					type: 'object',
+					type: 'array',
 				};
 			}
 

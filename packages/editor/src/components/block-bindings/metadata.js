@@ -7,7 +7,7 @@ import { SearchControl } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 
 export default function MetadataSourceUI( props ) {
-	const { setAttributes, setAddingBinding } = props;
+	const { setAttributes, setIsActiveAttribute } = props;
 	// Fetching the REST API to get the available custom fields.
 	//
 	// Ensure we have the full context.
@@ -48,49 +48,47 @@ export default function MetadataSourceUI( props ) {
 
 	const [ selectedField, setSelectedField ] = useState( null );
 	// TODO: Try to abstract this function to be reused across all the sources.
-	function selectItem( item ) {
+	function selectItem( item, props ) {
+		const { currentAttribute } = props;
 		setSelectedField( item );
-		// TODO: Add the ability to select the attribute instead of hardcoding it and check it exists for the block.
 
-		// TODO: Add a better way to "clear" the binding.
-		// We don't have to remove the whole bindings attribte but just the one we are binding.
-		switch ( props.name ) {
-			case 'core/paragraph':
-				setAttributes( {
-					content: item.value,
-					bindings: [
-						{
-							attribute: 'content',
-							source: {
-								name: 'metadata',
-								params: { value: item.value },
-							},
-						},
-					],
-				} );
-				break;
-			case 'core/image':
-				setAttributes( {
-					url: item.value,
-					bindings: [
-						{
-							attribute: 'url',
-							source: {
-								name: 'metadata',
-								params: { value: item.value },
-							},
-						},
-					],
-				} );
-				break;
+		const newAttributes = {};
+		// Modify the attribute we are binding.
+		newAttributes[ currentAttribute ] = item.value;
+
+		// If the attribute exists in the bindings, update it.
+		// Otherwise, add it.
+		const newBindings = props.attributes.bindings
+			? props.attributes.bindings
+			: [];
+		let attributeExists = false;
+		newBindings.forEach( ( binding ) => {
+			if ( binding.attribute === currentAttribute ) {
+				binding.source.name = 'metadata';
+				binding.source.params.value = item.key;
+				attributeExists = true;
+			}
+		} );
+		if ( ! attributeExists ) {
+			newBindings.push( {
+				attribute: currentAttribute,
+				source: {
+					name: 'metadata',
+					params: { value: item.key },
+				},
+			} );
 		}
-		setAddingBinding( false );
+		newAttributes.bindings = newBindings;
+		setAttributes( newAttributes );
+
+		setIsActiveAttribute( false );
 	}
 
 	const [ searchInput, setSearchInput ] = useState( '' );
 
 	return (
 		<div className="block-bindings-metadata-source-ui">
+			{ /* TODO: Implement the Search logic. */ }
 			<SearchControl
 				label={ __( 'Search metadata' ) }
 				value={ searchInput }

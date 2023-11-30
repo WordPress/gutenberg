@@ -1,11 +1,19 @@
 // TODO: Change the styles.
 .block-bindings-ui-popover {
 	margin-top: 12px;
-	.block-bindings-metadata-source-ui {
-		min-width: 300px;
+	width: 300px;
+	.components-popover__content {
+		width: 100%;
+	}
 
+	.block-bindings-attribute-picker-container {
+		border-bottom: 1px solid #0002;
+	}
+
+	.block-bindings-metadata-source-ui {
+		padding: 12px;
 		li {
-			margin: 20px 32px;
+			margin: 20px 8px;
 			cursor: pointer;
 		}
 		.selected-meta-field {
@@ -16,11 +24,7 @@
 			margin-left: -16px;
 		}
 	}
-	.block-bindings-clear-button {
-		margin: 10px;
-		background: transparent;
-		border: none;
+	.block-bindings-remove-button {
 		color: var(--wp-admin-theme-color, #3858e9);
-		cursor: pointer;
 	}
 }
