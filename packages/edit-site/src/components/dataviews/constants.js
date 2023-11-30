@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { formatListBullets, category, drawerLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -26,16 +27,19 @@ export const VIEW_LAYOUTS = [
 		type: LAYOUT_TABLE,
 		label: __( 'Table' ),
 		component: ViewList,
+		icon: formatListBullets,
 	},
 	{
 		type: LAYOUT_GRID,
 		label: __( 'Grid' ),
 		component: ViewGrid,
+		icon: category,
 	},
 	{
 		type: LAYOUT_SIDE_BY_SIDE,
 		label: __( 'Side by side' ),
 		component: ViewSideBySide,
+		icon: drawerLeft,
 	},
 ];
 

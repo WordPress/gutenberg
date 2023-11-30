@@ -9,11 +9,9 @@ import {
 import {
 	chevronRightSmall,
 	check,
-	formatListBullets,
 	arrowUp,
 	arrowDown,
-	category,
-	columns,
+	formatListBullets,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -265,12 +263,6 @@ function SortMenu( { fields, view, onChangeView } ) {
 	);
 }
 
-const VIEW_TYPE_ICONS = {
-	table: formatListBullets,
-	grid: category,
-	'side-by-side': columns,
-};
-
 export default function ViewActions( {
 	fields,
 	view,
@@ -284,7 +276,8 @@ export default function ViewActions( {
 					variant="tertiary"
 					size="compact"
 					icon={
-						VIEW_TYPE_ICONS[ view.type ] || VIEW_TYPE_ICONS.table
+						VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
+							?.icon || formatListBullets
 					}
 					label={ __( 'View options' ) }
 				/>
