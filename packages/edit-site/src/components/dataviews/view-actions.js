@@ -6,20 +6,14 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import {
-	chevronRightSmall,
-	check,
-	arrowUp,
-	arrowDown,
-	formatListBullets,
-} from '@wordpress/icons';
+import { chevronRightSmall, check, arrowUp, arrowDown } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { VIEW_LAYOUTS } from './constants';
+import { VIEW_LAYOUTS, LAYOUT_TABLE } from './constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -277,7 +271,9 @@ export default function ViewActions( {
 					size="compact"
 					icon={
 						VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
-							?.icon || formatListBullets
+							?.icon ||
+						VIEW_LAYOUTS.find( ( v ) => v.type === LAYOUT_TABLE )
+							.icon
 					}
 					label={ __( 'View options' ) }
 				/>
