@@ -39,7 +39,7 @@ export default function DuplicateMenuItem( {
 			sprintf(
 				// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
 				__( '"%s" duplicated.' ),
-				item.title
+				item.title.rendered
 			),
 			{
 				type: 'snackbar',
@@ -89,11 +89,11 @@ export default function DuplicateMenuItem( {
 					blocks={ item.blocks }
 					closeModal={ closeModal }
 					confirmLabel={ __( 'Duplicate' ) }
-					defaultArea={ item.templatePart.area }
+					defaultArea={ item.area }
 					defaultTitle={ sprintf(
 						/* translators: %s: Existing template part title */
 						__( '%s (Copy)' ),
-						item.title
+						item.title.rendered
 					) }
 					modalTitle={ __( 'Duplicate template part' ) }
 					onCreate={ onTemplatePartSuccess }

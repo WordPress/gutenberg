@@ -51,6 +51,9 @@ export default function PatternActions( {
 			select( coreStore ).getEntityRecord( 'postType', postType, postId ),
 		[ postType, postId ]
 	);
+
+	console.log( 'record', record );
+
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
 	const { saveEditedEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
@@ -65,6 +68,8 @@ export default function PatternActions( {
 	const { categoryType, categoryId } = getQueryArgs( window.location.href );
 	const type = categoryType || PATTERN_TYPES.theme;
 	const category = categoryId || PATTERN_DEFAULT_CATEGORY;
+
+	console.log( 'type, category', { type, category } );
 
 	if (
 		! isRemovable &&
