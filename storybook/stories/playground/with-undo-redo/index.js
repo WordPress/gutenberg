@@ -7,6 +7,7 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 import {
 	BlockEditorProvider,
 	BlockCanvas,
+	BlockToolbar,
 	BlockTools,
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
@@ -41,6 +42,9 @@ export default function EditorWithUndoRedo() {
 				onChange={ ( blocks, { selection } ) =>
 					setValue( { blocks, selection }, false )
 				}
+				settings={ {
+					hasFixedToolbar: true,
+				} }
 			>
 				<div className="editor-with-undo-redo__toolbar">
 					<Button
@@ -55,7 +59,8 @@ export default function EditorWithUndoRedo() {
 						icon={ redoIcon }
 						label="Redo"
 					/>
-					<BlockTools __experimentalBlockToolbarDisplay="sticky" />
+					<BlockToolbar />
+					<BlockTools />
 				</div>
 				<BlockCanvas height="100%" styles={ editorStyles } />
 			</BlockEditorProvider>

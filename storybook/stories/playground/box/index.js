@@ -6,6 +6,7 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 import {
 	BlockEditorProvider,
 	BlockCanvas,
+	BlockToolbar,
 	BlockTools,
 } from '@wordpress/block-editor';
 
@@ -32,8 +33,12 @@ export default function EditorBox() {
 				value={ blocks }
 				onInput={ updateBlocks }
 				onChange={ updateBlocks }
+				settings={ {
+					hasFixedToolbar: true,
+				} }
 			>
-				<BlockTools __experimentalBlockToolbarDisplay="sticky" />
+				<BlockToolbar />
+				<BlockTools />
 				<BlockCanvas height="100%" styles={ editorStyles } />
 			</BlockEditorProvider>
 		</div>
