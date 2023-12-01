@@ -1,13 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalHeading as Heading } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import Link from '../routes/link';
+import { Icon,
+	__experimentalHStack as HStack,} from '@wordpress/components';
+import { chevronRight } from '@wordpress/icons';
 
 export default function ViewList( {
 	view,
@@ -21,25 +18,16 @@ export default function ViewList( {
 		( field ) => field.id === view.layout.previewField
 	);
 	return (
-		<ul>
+		<ul className="dataviews-list-view">
 			{ shownData.map( ( item, index ) => {
 				return (
-					<li key={ getItemId?.( item ) || index }>
-						<Heading as="h3" level={ 5 }>
-							<Link
-								params={ {
-									postId: item.id,
-									postType: item.type,
-									canvas: 'edit',
-								} }
-								onClick={ ( event ) => {
-									event.preventDefault();
-									onClickPreviewField( item );
-								} }
-							>
-								{ previewField.getValue( { item } ) }
-							</Link>
-						</Heading>
+					<li key={ getItemId?.( item ) || index } onClick={ () => {
+						onClickPreviewField( item );
+					}}>
+						<HStack>
+						{ previewField?.render( { item } ) }
+						<Icon icon={ chevronRight } />
+						</HStack>
 					</li>
 				);
 			} ) }
