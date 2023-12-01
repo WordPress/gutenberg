@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -309,7 +314,11 @@ function ListViewComponent(
 			) }
 			<TreeGrid
 				id={ id }
-				className="block-editor-list-view-tree"
+				className={ classnames( 'block-editor-list-view-tree', {
+					'is-dragging':
+						draggedClientIds?.length > 0 &&
+						blockDropTargetIndex !== undefined,
+				} ) }
 				aria-label={ __( 'Block navigation structure' ) }
 				ref={ treeGridRef }
 				onCollapseRow={ collapseRow }

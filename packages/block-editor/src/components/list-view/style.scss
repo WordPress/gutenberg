@@ -9,6 +9,13 @@
 		margin: (-$grid-unit-15) (-$grid-unit-15 * 0.5) 0;
 		width: calc(100% + #{ $grid-unit-15 });
 	}
+
+	transition: transform 0.2s;
+
+	&.is-dragging {
+		transition: transform 0.2s;
+		transform: translateY(18px) !important;
+	}
 }
 
 .block-editor-list-view-leaf {
