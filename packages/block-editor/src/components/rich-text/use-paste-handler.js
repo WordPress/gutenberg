@@ -8,7 +8,7 @@ import {
 	findTransform,
 	getBlockTransforms,
 } from '@wordpress/blocks';
-import { isEmpty, insert, create, RichTextData } from '@wordpress/rich-text';
+import { isEmpty, insert, create } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
 
 /**
@@ -134,10 +134,7 @@ export function usePasteHandler( props ) {
 				tagName,
 			} );
 
-			if (
-				typeof content === 'string' ||
-				content instanceof RichTextData
-			) {
+			if ( typeof content === 'string' ) {
 				const transformed = formatTypes.reduce(
 					( accumlator, { __unstablePasteRule } ) => {
 						// Only allow one transform.
