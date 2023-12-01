@@ -4,10 +4,10 @@
 		"isValid": true,
 		"attributes": {
 			"value": "pullquote",
+			"citation": "before block supports",
+			"textAlign": "left",
 			"className": "is-style-solid-color",
 			"backgroundColor": "black",
-			"textAlign": "left",
-			"citation": "before block supports",
 			"textColor": "white"
 		},
 		"innerBlocks": []

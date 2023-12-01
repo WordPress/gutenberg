@@ -18,6 +18,7 @@
 				"inherit": true
 			},
 			"tagName": "div",
+			"enhancedPagination": false,
 			"layout": {
 				"type": "constrained"
 			}

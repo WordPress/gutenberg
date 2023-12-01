@@ -3,6 +3,7 @@
 		"name": "core/quote",
 		"isValid": true,
 		"attributes": {
+			"value": "",
 			"citation": "...with a caption"
 		},
 		"innerBlocks": [

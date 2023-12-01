@@ -3,6 +3,8 @@
 		"name": "core/button",
 		"isValid": true,
 		"attributes": {
+			"tagName": "a",
+			"type": "button",
 			"text": "Where We Are",
 			"className": "is-style-outline",
 			"style": {

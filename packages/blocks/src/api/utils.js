@@ -247,16 +247,19 @@ export function getAccessibleBlockLabel(
  * Ensure attributes contains only values defined by block type, and merge
  * default values for missing attributes.
  *
- * @param {string} name       The block's name.
- * @param {Object} attributes The block's attributes.
+ * @param {string|Object} blockTypeOrName The block's type or name.
+ * @param {Object}        attributes      The block's attributes.
  * @return {Object} The sanitized attributes.
  */
-export function __experimentalSanitizeBlockAttributes( name, attributes ) {
+export function __experimentalSanitizeBlockAttributes(
+	blockTypeOrName,
+	attributes
+) {
 	// Get the type definition associated with a registered block.
-	const blockType = getBlockType( name );
+	const blockType = normalizeBlockType( blockTypeOrName );
 
 	if ( undefined === blockType ) {
-		throw new Error( `Block type '${ name }' is not registered.` );
+		throw new Error( `Block type '${ blockType }' is not registered.` );
 	}
 
 	return Object.entries( blockType.attributes ).reduce(
