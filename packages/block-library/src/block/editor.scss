@@ -31,3 +31,9 @@
 		}
 	}
 }
+
+.block-library-block__reusable-block-container.is-editing-source {
+	box-shadow:
+		0 0 0 var(--wp-admin-border-width-focus)
+		var(--wp-block-synced-color);
+}

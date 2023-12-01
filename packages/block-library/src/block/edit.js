@@ -8,12 +8,15 @@ import classnames from 'classnames';
  */
 import {
 	useEntityBlockEditor,
+	useEntityProp,
 	useEntityRecord,
 	store as coreStore,
 } from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner,
+	TextControl,
+	PanelBody,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -23,15 +26,15 @@ import {
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
 	InnerBlocks,
+	InspectorControls,
 	useBlockProps,
 	Warning,
 	privateApis as blockEditorPrivateApis,
 	BlockControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useRef, useMemo, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { addQueryArgs } from '@wordpress/url';
+import { useRef, useMemo, useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -50,8 +53,13 @@ function isPartiallySynced( block ) {
 	);
 }
 
-function setBlockEditMode( setEditMode, blocks ) {
+function setBlockEditMode( setEditMode, blocks, isEditingSourcePattern ) {
 	blocks.forEach( ( block ) => {
+		if ( isEditingSourcePattern ) {
+			setEditMode( block.clientId, 'default' );
+			setBlockEditMode( setEditMode, block.innerBlocks );
+			return;
+		}
 		const editMode = isPartiallySynced( block )
 			? 'contentOnly'
 			: 'disabled';
@@ -93,46 +101,33 @@ export default function ReusableBlockEdit( {
 	name,
 	attributes: { ref },
 	__unstableParentLayout: parentLayout,
-	context: { postId },
 	clientId: patternClientId,
 } ) {
+	const [ isEditingSourcePattern, setIsEditingSourcePattern ] =
+		useState( false );
 	const { setBlockEditingMode } = useDispatch( blockEditorStore );
-	const { editUrl, innerBlocks, userCanEdit } = useSelect(
+	const { innerBlocks, userCanEdit } = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
-			const { getSettings, getBlocks } = select( blockEditorStore );
+			const { getBlocks } = select( blockEditorStore );
 			const blocks = getBlocks( patternClientId );
-			const isBlockTheme = getSettings().__unstableIsBlockBasedTheme;
 			const canEdit = canUser( 'update', 'blocks', ref );
-			const defaultUrl = addQueryArgs( 'post.php', {
-				action: 'edit',
-				post: ref,
-			} );
-			const siteEditorUrl = addQueryArgs( 'site-editor.php', {
-				postType: 'wp_block',
-				postId: ref,
-				categoryType: 'pattern',
-				canvas: 'edit',
-				refererId: postId,
-			} );
 
-			// For editing link to the site editor if the theme and user permissions support it.
 			return {
 				innerBlocks: blocks,
-				editUrl:
-					canUser( 'read', 'templates' ) && isBlockTheme
-						? siteEditorUrl
-						: defaultUrl,
 				userCanEdit: canEdit,
 			};
 		},
-		[ patternClientId, postId, ref ]
+		[ patternClientId, ref ]
 	);
 
-	useEffect(
-		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
-		[ innerBlocks, setBlockEditingMode ]
-	);
+	useEffect( () => {
+		setBlockEditMode(
+			setBlockEditingMode,
+			innerBlocks,
+			isEditingSourcePattern
+		);
+	}, [ innerBlocks, setBlockEditingMode, isEditingSourcePattern ] );
 
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
@@ -140,13 +135,19 @@ export default function ReusableBlockEdit( {
 		'wp_block',
 		ref
 	);
-
 	const isMissing = hasResolved && ! record;
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_block',
 		{ id: ref }
+	);
+
+	const [ title, setTitle ] = useEntityProp(
+		'postType',
+		'wp_block',
+		'title',
+		ref
 	);
 
 	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
@@ -156,7 +157,10 @@ export default function ReusableBlockEdit( {
 		className: classnames(
 			'block-library-block__reusable-block-container',
 			layout && layoutClasses,
-			{ [ `align${ alignment }` ]: alignment }
+			{
+				[ `align${ alignment }` ]: alignment,
+				'is-editing-source': isEditingSourcePattern,
+			}
 		),
 	} );
 
@@ -200,12 +204,31 @@ export default function ReusableBlockEdit( {
 			{ userCanEdit && (
 				<BlockControls>
 					<ToolbarGroup>
-						<ToolbarButton href={ editUrl }>
-							{ __( 'Edit' ) }
+						<ToolbarButton
+							onClick={ () =>
+								setIsEditingSourcePattern(
+									! isEditingSourcePattern
+								)
+							}
+						>
+							{ isEditingSourcePattern
+								? __( 'Stop editing parent' )
+								: __( 'Edit parent pattern' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
 				</BlockControls>
 			) }
+			<InspectorControls>
+				<PanelBody>
+					<TextControl
+						label={ __( 'Name' ) }
+						value={ title }
+						onChange={ setTitle }
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+					/>
+				</PanelBody>
+			</InspectorControls>
 			{ children === null ? (
 				<div { ...innerBlocksProps } />
 			) : (
