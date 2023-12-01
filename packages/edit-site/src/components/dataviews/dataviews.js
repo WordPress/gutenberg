@@ -14,24 +14,7 @@ import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
-import ViewList from './view-list';
-import ViewGrid from './view-grid';
-import ViewSideBySide from './view-side-by-side';
-
-// To do: convert to view type registry.
-export const viewTypeSupportsMap = {
-	list: {},
-	grid: {},
-	'side-by-side': {
-		preview: true,
-	},
-};
-
-const viewTypeMap = {
-	list: ViewList,
-	grid: ViewGrid,
-	'side-by-side': ViewSideBySide,
-};
+import { VIEW_LAYOUTS } from './constants';
 
 export default function DataViews( {
 	view,
@@ -46,7 +29,9 @@ export default function DataViews( {
 	paginationInfo,
 	supportedLayouts,
 } ) {
-	const ViewComponent = viewTypeMap[ view.type ];
+	const ViewComponent = VIEW_LAYOUTS.find(
+		( v ) => v.type === view.type
+	).component;
 	const _fields = useMemo( () => {
 		return fields.map( ( field ) => ( {
 			...field,

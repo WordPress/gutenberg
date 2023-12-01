@@ -443,9 +443,9 @@ function ViewList( {
 		return <h3>{ __( 'Loading' ) }</h3>;
 	}
 	return (
-		<div className="dataviews-list-view-wrapper">
+		<div className="dataviews-table-view-wrapper">
 			{ hasRows && (
-				<table className="dataviews-list-view">
+				<table className="dataviews-table-view">
 					<thead>
 						{ dataView.getHeaderGroups().map( ( headerGroup ) => (
 							<tr key={ headerGroup.id }>
