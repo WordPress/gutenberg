@@ -90,6 +90,7 @@ export { default as BlockStyles } from './block-styles';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
+export { default as InserterButton } from './inserter-button';
 export { useBlockProps } from './block-list/use-block-props';
 export { default as FloatingToolbar } from './floating-toolbar';
 

@@ -16,10 +16,10 @@ import { unlock } from '../../lock-unlock';
 import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
 
 const {
-	DropdownMenuV2,
-	DropdownSubMenuV2,
-	DropdownSubMenuTriggerV2,
-	DropdownMenuItemV2,
+	DropdownMenuV2: DropdownMenu,
+	DropdownSubMenuV2: DropdownSubMenu,
+	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
+	DropdownMenuItemV2: DropdownMenuItem,
 } = unlock( componentsPrivateApis );
 
 export default function AddFilter( { fields, view, onChangeView } ) {
@@ -48,7 +48,7 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 	}
 
 	return (
-		<DropdownMenuV2
+		<DropdownMenu
 			label={ __( 'Add filter' ) }
 			trigger={
 				<Button
@@ -68,19 +68,21 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 				}
 
 				return (
-					<DropdownSubMenuV2
+					<DropdownSubMenu
 						key={ filter.field }
 						trigger={
-							<DropdownSubMenuTriggerV2
+							<DropdownSubMenuTrigger
 								suffix={ <Icon icon={ chevronRightSmall } /> }
 							>
 								{ filter.name }
-							</DropdownSubMenuTriggerV2>
+							</DropdownSubMenuTrigger>
 						}
 					>
 						{ filter.elements.map( ( element ) => (
-							<DropdownMenuItemV2
+							<DropdownMenuItem
 								key={ element.value }
+								role="menuitemradio"
+								aria-checked={ false }
 								onSelect={ () => {
 									onChangeView( ( currentView ) => ( {
 										...currentView,
@@ -95,14 +97,13 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 										],
 									} ) );
 								} }
-								role="menuitemcheckbox"
 							>
 								{ element.label }
-							</DropdownMenuItemV2>
+							</DropdownMenuItem>
 						) ) }
-					</DropdownSubMenuV2>
+					</DropdownSubMenu>
 				);
 			} ) }
-		</DropdownMenuV2>
+		</DropdownMenu>
 	);
 }

@@ -25,6 +25,7 @@ Similar requirements apply to releasing WordPress's [npm packages](https://devel
             -   [Automated cherry-picking](#automated-cherry-picking)
             -   [Manual cherry-picking](#manual-cherry-picking)
         -   [Publishing the release](#publishing-the-release)
+        -   [Troubleshooting the release](#troubleshooting-the-release)
     -   [Documenting the release](#documenting-the-release)
         -   [Selecting the release highlights](#selecting-the-release-highlights)
         -   [Requesting release assets](#requesting-release-assets)
@@ -252,6 +253,41 @@ The last step needs approval by a member of either the [Gutenberg Release](https
 Once approved, the new Gutenberg version will be available to WordPress users all over the globe. Once uploaded, confirm that the latest version can be downloaded and updated from the WordPress plugin dashboard.
 
 The final step is to write a release post on [make.wordpress.org/core](https://make.wordpress.org/core/). You can find some tips on that below.
+
+#### Troubleshooting the release
+
+> The plugin was published to the WordPress.org plugin directory but the workflow failed.
+
+This has happened ocassionally, see [this one](https://github.com/WordPress/gutenberg/actions/runs/6955409957/job/18924124118) for example.
+
+It's important to check that:
+
+- the plugin from the directory works as expected
+- the ZIP contents (see [Downloads](https://plugins.trac.wordpress.org/browser/gutenberg/)) looks correct (doesn't have anything obvious missing)
+- the [Gutenberg SVN repo](https://plugins.trac.wordpress.org/browser/gutenberg/) has two new commits (see [the log](https://plugins.trac.wordpress.org/browser/gutenberg/)):
+  - the `trunk` folder should have "Commiting version X.Y.Z"
+  - there is a new `tags/X.Y.Z` folder with the same contents as `trunk` whose latest commit is "Tagging version X.Y.Z"
+
+Most likely, the tag folder couldn't be created. This is a [known issue](https://plugins.trac.wordpress.org/browser/gutenberg/) that [can be fixed manually](https://github.com/WordPress/gutenberg/issues/55295#issuecomment-1759292978).
+
+Either substitute SVN_USERNAME, SVN_PASSWORD, and VERSION for the proper values or set them as global environment variables first:
+
+```sh
+# CHECKOUT THE REPOSITORY
+svn checkout https://plugins.svn.wordpress.org/gutenberg/trunk --username "$SVN_USERNAME" --password "$SVN_PASSWORD" gutenberg-svn
+
+# MOVE TO THE LOCAL FOLDER
+cd gutenberg-svn
+
+# IF YOU HAPPEN TO HAVE ALREADY THE REPO LOCALLY
+# AND DIDN'T CHECKOUT, MAKE SURE IT IS UPDATED
+# svn up .
+
+# COPY CURRENT TRUNK INTO THE NEW TAGS FOLDER
+svn copy https://plugins.svn.wordpress.org/gutenberg/trunk https://plugins.svn.wordpress.org/gutenberg/tags/$VERSION -m 'Tagging version $VERSION' --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+```
+
+Ask around if you need help with any of this.
 
 ### Documenting the release
 

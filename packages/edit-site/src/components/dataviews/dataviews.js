@@ -10,28 +10,11 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ViewList from './view-list';
 import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
-import { ViewGrid } from './view-grid';
-import { ViewSideBySide } from './view-side-by-side';
-
-// To do: convert to view type registry.
-export const viewTypeSupportsMap = {
-	list: {},
-	grid: {},
-	'side-by-side': {
-		preview: true,
-	},
-};
-
-const viewTypeMap = {
-	list: ViewList,
-	grid: ViewGrid,
-	'side-by-side': ViewSideBySide,
-};
+import { VIEW_LAYOUTS } from './constants';
 
 export default function DataViews( {
 	view,
@@ -46,7 +29,9 @@ export default function DataViews( {
 	paginationInfo,
 	supportedLayouts,
 } ) {
-	const ViewComponent = viewTypeMap[ view.type ];
+	const ViewComponent = VIEW_LAYOUTS.find(
+		( v ) => v.type === view.type
+	).component;
 	const _fields = useMemo( () => {
 		return fields.map( ( field ) => ( {
 			...field,
@@ -56,8 +41,8 @@ export default function DataViews( {
 	return (
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 4 } justify="flex-start">
-				<HStack>
-					<HStack justify="start">
+				<HStack alignment="flex-start">
+					<HStack justify="start" wrap>
 						{ search && (
 							<Search
 								label={ searchLabel }
@@ -71,14 +56,12 @@ export default function DataViews( {
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
-					<HStack justify="end" expanded={ false }>
-						<ViewActions
-							fields={ fields }
-							view={ view }
-							onChangeView={ onChangeView }
-							supportedLayouts={ supportedLayouts }
-						/>
-					</HStack>
+					<ViewActions
+						fields={ fields }
+						view={ view }
+						onChangeView={ onChangeView }
+						supportedLayouts={ supportedLayouts }
+					/>
 				</HStack>
 				<ViewComponent
 					fields={ _fields }

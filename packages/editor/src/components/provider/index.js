@@ -22,16 +22,13 @@ import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
+import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
+import { PAGE_CONTENT_BLOCK_TYPES } from './constants';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 const noop = () => {};
-export const PAGE_CONTENT_BLOCK_TYPES = [
-	'core/post-title',
-	'core/post-featured-image',
-	'core/post-content',
-];
 
 /**
  * For the Navigation block editor, we need to force the block editor to contentOnly for that block.
@@ -114,7 +111,7 @@ function useBlockEditorProps( post, template, mode ) {
 		useEntityBlockEditor( 'postType', template?.type, {
 			id: template?.id,
 		} );
-	const blocks = useMemo( () => {
+	const maybeNavigationBlocks = useMemo( () => {
 		if ( post.type === 'wp_navigation' ) {
 			return [
 				createBlock( 'core/navigation', {
@@ -126,8 +123,14 @@ function useBlockEditorProps( post, template, mode ) {
 				} ),
 			];
 		}
+	}, [ post.type, post.id ] );
 
+	const maybePostOnlyBlocks = useMemo( () => {
 		if ( mode === 'post-only' ) {
+			const postContentBlocks =
+				extractPageContentBlockTypesFromTemplateBlocks(
+					templateBlocks
+				);
 			return [
 				createBlock(
 					'core/group',
@@ -141,11 +144,26 @@ function useBlockEditorProps( post, template, mode ) {
 							},
 						},
 					},
-					extractPageContentBlockTypesFromTemplateBlocks(
-						templateBlocks
-					)
+					postContentBlocks.length
+						? postContentBlocks
+						: [
+								createBlock( 'core/post-title' ),
+								createBlock( 'core/post-content' ),
+						  ]
 				),
 			];
+		}
+	}, [ templateBlocks, mode ] );
+
+	// It is important that we don't create a new instance of blocks on every change
+	// We should only create a new instance if the blocks them selves change, not a dependency of them.
+	const blocks = useMemo( () => {
+		if ( maybeNavigationBlocks ) {
+			return maybeNavigationBlocks;
+		}
+
+		if ( maybePostOnlyBlocks ) {
+			return maybePostOnlyBlocks;
 		}
 
 		if ( rootLevelPost === 'template' ) {
@@ -154,13 +172,16 @@ function useBlockEditorProps( post, template, mode ) {
 
 		return postBlocks;
 	}, [
+		maybeNavigationBlocks,
+		maybePostOnlyBlocks,
+		rootLevelPost,
 		templateBlocks,
 		postBlocks,
-		rootLevelPost,
-		post.type,
-		post.id,
-		mode,
 	] );
+
+	// Handle fallback to postBlocks outside of the above useMemo, to ensure
+	// that constructed block templates that call `createBlock` are not generated
+	// too frequently. This ensures that clientIds are stable.
 	const disableRootLevelChanges =
 		( !! template && mode === 'template-locked' ) ||
 		post.type === 'wp_navigation' ||
@@ -181,7 +202,6 @@ function useBlockEditorProps( post, template, mode ) {
 
 export const ExperimentalEditorProvider = withRegistryProvider(
 	( {
-		mode = 'all',
 		post,
 		settings,
 		recovery,
@@ -190,6 +210,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
 	} ) => {
+		const mode = useSelect(
+			( select ) => select( editorStore ).getRenderingMode(),
+			[]
+		);
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
@@ -308,6 +332,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						>
 							{ children }
 							<PatternsMenuItems />
+							{ [ 'post-only', 'template-locked' ].includes(
+								mode
+							) && <DisableNonPageContentBlocks /> }
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</EntityProvider>
