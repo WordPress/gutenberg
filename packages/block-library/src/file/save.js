@@ -27,7 +27,7 @@ export default function save( { attributes } ) {
 
 	const pdfEmbedLabel = RichText.isEmpty( fileName )
 		? 'PDF embed'
-		: fileName.toPlainText();
+		: fileName.toString();
 
 	const hasFilename = ! RichText.isEmpty( fileName );
 
