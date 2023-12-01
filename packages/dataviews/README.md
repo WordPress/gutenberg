@@ -1,6 +1,6 @@
 # DataViews
 
-Data Views are an improved and reusable UI that deal with collections of things.
+DataViews is a component that provides an API to render datasets using different types of layouts (table, grid, list, etc.).
 
 ## Installation
 
