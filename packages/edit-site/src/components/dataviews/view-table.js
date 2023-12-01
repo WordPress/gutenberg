@@ -131,7 +131,7 @@ function HeaderMenu( { dataView, header } ) {
 				{ isHidable && (
 					<DropdownMenuItem
 						role="menuitemradio"
-						aria-checked={ header.column.getIsHidden() }
+						aria-checked={ ! header.column.getIsVisible() }
 						prefix={ <Icon icon={ unseen } /> }
 						onSelect={ ( event ) => {
 							event.preventDefault();
