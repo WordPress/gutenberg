@@ -64,7 +64,7 @@ An `editor` file with any of the extensions `.css`, `.scss` or `.sass`, contains
 
 ### `render.php`
 
-The `render.php` file (or any other file defined in the [`render`]([`render`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#render)) property of `block.json`) defines the server side process that returns the markup for the block when there is a request from the frontend. If this file is defined, it will take precedence over any other ways to render the block's markup for the frontend.
+The `render.php` file (or any other file defined in the [`render`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#render) property of `block.json`) defines the server side process that returns the markup for the block when there is a request from the frontend. If this file is defined, it will take precedence over any other ways to render the block's markup for the frontend.
 
 ### `view.js`
 
