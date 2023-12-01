@@ -189,7 +189,7 @@ For example, a button block, deeply nested in several levels of block `X` that u
 ### `defaultBlock`
 
 - **Type:** `Array`
-- **Default:** - `undefined`. Determines which block type should be inserted by default and any attributes that should be set by default when the block is inserted. Takes an array in the form of `[ blockname, {blockAttributes} ]`.
+- **Default:** - `undefined`. Determines which block type should be inserted by default and any attributes that should be set by default when the block is inserted. Takes an array in the form of `[ name: blockname, attributes: {blockAttributes} ]`.
 
 ### `directInsert`
 
