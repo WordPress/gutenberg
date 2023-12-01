@@ -1,0 +1,31 @@
+[
+	{
+		"name": "core/form-submission-notification",
+		"isValid": true,
+		"attributes": {
+			"type": "success"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "Your form has been submitted successfully.",
+					"dropCap": false,
+					"backgroundColor": "#00D084",
+					"textColor": "#000000",
+					"style": {
+						"elements": {
+							"link": {
+								"color": {
+									"text": "#000000"
+								}
+							}
+						}
+					}
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]
