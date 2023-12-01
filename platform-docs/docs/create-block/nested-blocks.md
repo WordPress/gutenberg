@@ -64,7 +64,7 @@ By default this behavior is disabled until the `directInsert` prop is set to `tr
 
 ## Template
 
-Use the template property to define a set of blocks that prefill the InnerBlocks component when inserted. You can set attributes on the blocks to define their use. The example below shows a book review template using InnerBlocks component and setting placeholders values to show the block usage.
+Use the template property to define a set of blocks that prefill the InnerBlocks component when inserted. You can set attributes on the blocks to define their use. The example below shows a book review template using the InnerBlocks component and setting placeholder values to show the block usage.
 
 ```js
 const MY_TEMPLATE = [
@@ -89,12 +89,12 @@ Use the `templateLock` property to lock down the template. Using `all` locks the
 
 ## Using Parent and Ancestor Relationships in Blocks
 
-A common pattern for using InnerBlocks is to create a custom block that will be only be available if its parent block is inserted. This allows builders to establish a relationship between blocks, while limiting a nested block's discoverability. Currently, there are two relationships builders can use: `parent` and `ancestor`. The differences are:
+A common pattern for using InnerBlocks is to create a custom block that will only be available if its parent block is inserted. This allows builders to establish a relationship between blocks while limiting a nested block's discoverability. Currently, there are two relationships builders can use: `parent` and `ancestor`. The differences are:
 
 -   If you assign a `parent` then you’re stating that the nested block can only be used and inserted as a **direct descendant of the parent**.
 -   If you assign an `ancestor` then you’re stating that the nested block can only be used and inserted as a **descendent of the parent**.
 
-The key difference between `parent` and `ancestor` is `parent` has finer specificity, while an `ancestor` has greater flexibility in its nested hierarchy.
+The key difference between `parent` and `ancestor` is that `parent` has finer specificity, while an `ancestor` has greater flexibility in its nested hierarchy.
 
 ### Defining Parent Block Relationship
 
@@ -198,7 +198,7 @@ The above code will render to the following markup in the editor:
 </div>
 ```
 
-Another benefit to using the hook approach is using the returned value, which is just an object, and deconstruct to get the react children from the object. This property contains the actual child inner blocks thus we can place elements on the same level as our inner blocks.
+Another benefit of the hook approach is using the returned value, which is just an object, and deconstructing to get the react children from the object. This property contains the actual child inner blocks thus we can place elements on the same level as our inner blocks.
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
