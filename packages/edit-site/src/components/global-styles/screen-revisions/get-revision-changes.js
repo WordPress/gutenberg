@@ -77,8 +77,8 @@ export function getRevisionChanges(
 	blockNames,
 	maxResults = 5
 ) {
-	if ( cache.has( revision.id ) ) {
-		return cache.get( revision.id );
+	if ( cache.has( revision ) ) {
+		return cache.get( revision );
 	}
 
 	const changedValueTree = deepCompare(
@@ -119,7 +119,7 @@ export function getRevisionChanges(
 		joined += '…';
 	}
 
-	cache.set( revision.id, joined );
+	cache.set( revision, joined );
 
 	return joined;
 }
