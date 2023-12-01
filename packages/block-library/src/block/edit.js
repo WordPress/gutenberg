@@ -39,18 +39,16 @@ const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 function isPartiallySynced( block ) {
 	return (
 		!! getBlockSupport( block.name, '__experimentalConnections', false ) &&
-		!! block.attributes.connections?.attributes &&
-		Object.values( block.attributes.connections.attributes ).some(
-			( connection ) => connection.source === 'pattern_attributes'
+		!! block.attributes.metadata?.bindings &&
+		block.attributes.metadata?.bindings.some(
+			( binding ) => binding.source.name === 'pattern_attributes'
 		)
 	);
 }
 function getPartiallySyncedAttributes( block ) {
-	return Object.entries( block.attributes.connections.attributes )
-		.filter(
-			( [ , connection ] ) => connection.source === 'pattern_attributes'
-		)
-		.map( ( [ attributeKey ] ) => attributeKey );
+	return block.attributes.metadata?.bindings
+		?.filter( ( binding ) => binding.source.name === 'pattern_attributes' )
+		.map( ( binding ) => binding.attribute );
 }
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];

@@ -6,7 +6,10 @@ import { nanoid } from 'nanoid';
 /**
  * WordPress dependencies
  */
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	updateBlockBindingsAttribute,
+} from '@wordpress/block-editor';
 import { BaseControl, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -18,50 +21,42 @@ import { PARTIAL_SYNCING_SUPPORTED_BLOCKS } from '../constants';
 function PartialSyncingControls( { name, attributes, setAttributes } ) {
 	const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
 
-	function updateConnections( attributeName, isChecked ) {
+	function updateBindings( attributeName, isChecked ) {
 		if ( ! isChecked ) {
-			let updatedConnections = {
-				...attributes.connections,
-				attributes: {
-					...attributes.connections?.attributes,
-					[ attributeName ]: undefined,
-				},
-			};
-			if ( Object.keys( updatedConnections.attributes ).length === 1 ) {
-				updatedConnections.attributes = undefined;
-			}
-			if (
-				Object.keys( updatedConnections ).length === 1 &&
-				updateConnections.attributes === undefined
-			) {
-				updatedConnections = undefined;
-			}
-			setAttributes( {
-				connections: updatedConnections,
-			} );
+			// Update the bindings property.
+			updateBlockBindingsAttribute(
+				attributes,
+				setAttributes,
+				attributeName,
+				null,
+				null
+			);
 			return;
 		}
 
-		const updatedConnections = {
-			...attributes.connections,
-			attributes: {
-				...attributes.connections?.attributes,
-				[ attributeName ]: {
-					source: 'pattern_attributes',
-				},
-			},
-		};
-
 		if ( typeof attributes.metadata?.id === 'string' ) {
-			setAttributes( { connections: updatedConnections } );
+			updateBlockBindingsAttribute(
+				attributes,
+				setAttributes,
+				attributeName,
+				'pattern_attributes',
+				null
+			);
 			return;
 		}
 
 		const id = nanoid( 6 );
+		const newMetadata = updateBlockBindingsAttribute(
+			attributes,
+			setAttributes,
+			attributeName,
+			'pattern_attributes',
+			null
+		);
+
 		setAttributes( {
-			connections: updatedConnections,
 			metadata: {
-				...attributes.metadata,
+				...newMetadata,
 				id,
 			},
 		} );
@@ -80,12 +75,14 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 							__nextHasNoMarginBottom
 							label={ label }
 							checked={
-								attributes.connections?.attributes?.[
-									attributeName
-								]?.source === 'pattern_attributes'
+								attributes.metadata?.bindings?.filter(
+									( item ) => item.attribute === attributeName
+								)[ 0 ]?.source?.name === 'pattern_attributes'
 							}
 							onChange={ ( isChecked ) => {
-								updateConnections( attributeName, isChecked );
+								// TODO: REVIEW WHY THE CHECKED IS NOT UPDATED.
+								// The attributes are updated but the checkbox is not.
+								updateBindings( attributeName, isChecked );
 							} }
 						/>
 					)

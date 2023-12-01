@@ -32,17 +32,28 @@ export const updateBlockBindingsAttribute = (
 		? blockAttributes.metadata
 		: {};
 
-	let bindingsArray;
+	// If no sourceName is provided, remove the attribute from the bindings.
 	if ( sourceName === null ) {
-		// Remove the attribute from the bindings if there is no source.
-		bindingsArray = metadataAttribute.bindings.filter(
+		if ( ! metadataAttribute.bindings ) {
+			return metadataAttribute;
+		}
+		const bindingsArray = metadataAttribute.bindings.filter(
 			( item ) => item.attribute !== updatingAttribute
 		);
-	} else {
-		bindingsArray = metadataAttribute.bindings
-			? metadataAttribute.bindings
-			: [];
+		if ( bindingsArray.length > 0 ) {
+			metadataAttribute.bindings = bindingsArray;
+		} else {
+			delete metadataAttribute.bindings;
+		}
+		setAttributes( {
+			metadata: metadataAttribute,
+		} );
+		return metadataAttribute;
 	}
+
+	const bindingsArray = metadataAttribute.bindings
+		? metadataAttribute.bindings
+		: [];
 
 	// If the attribute exists in the bindings, update it.
 	// Otherwise, add it.
@@ -54,6 +65,7 @@ export const updateBlockBindingsAttribute = (
 			attributeExists = true;
 		}
 	} );
+
 	if ( ! attributeExists ) {
 		bindingsArray.push( {
 			attribute: updatingAttribute,
@@ -63,8 +75,13 @@ export const updateBlockBindingsAttribute = (
 			},
 		} );
 	}
+
 	metadataAttribute.bindings = bindingsArray;
+	// TODO: Decide if we want to include the setAttributes call here.
 	setAttributes( {
 		metadata: metadataAttribute,
 	} );
+
+	// TODO: Not sure if we need to return the updated attributes.
+	return metadataAttribute;
 };
