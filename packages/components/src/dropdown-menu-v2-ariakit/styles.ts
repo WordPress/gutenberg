@@ -218,10 +218,12 @@ export const ItemPrefixWrapper = styled.span`
 	 */
 	${ DropdownMenuCheckboxItem } > &,
 	${ DropdownMenuRadioItem } > & {
+		/* Same width as the check icons */
 		min-width: ${ space( 6 ) };
-		margin-inline-end: ${ space( 2 ) };
 	}
 
+	${ DropdownMenuCheckboxItem } > &,
+	${ DropdownMenuRadioItem } > &,
 	&:not( :empty ) {
 		margin-inline-end: ${ space( 2 ) };
 	}
