@@ -159,7 +159,11 @@ export default function EditorCanvas( {
 	}, [ renderingMode, themeSupportsLayout, globalLayoutSettings ] );
 
 	const newestPostContentAttributes = useMemo( () => {
-		if ( ! editedPostTemplate?.content && ! editedPostTemplate?.blocks ) {
+		if (
+			! editedPostTemplate?.content &&
+			! editedPostTemplate?.blocks &&
+			postContentAttributes
+		) {
 			return postContentAttributes;
 		}
 		// When in template editing mode, we can access the blocks directly.
