@@ -1,41 +1,74 @@
-// @ts-nocheck
-
 /**
  * External dependencies
  */
 import { h, options, createContext, cloneElement } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
 import { deepSignal } from 'deepsignal';
+import type { VNode, Context, RefObject } from 'preact';
+
 /**
  * Internal dependencies
  */
 import { stores } from './store';
+interface DirectiveEntry {
+	value: string | Object;
+	namespace: string;
+	suffix: string;
+}
 
-/** @typedef {import('preact').VNode} VNode */
-/** @typedef {typeof context} Context */
-/** @typedef {ReturnType<typeof getEvaluate>} Evaluate */
+type DirectiveEntries = Record< string, DirectiveEntry[] >;
 
-/**
- * @typedef {Object} DirectiveCallbackParams Callback parameters.
- * @property {Object}   directives Object map with the defined directives of the element being evaluated.
- * @property {Object}   props      Props present in the current element.
- * @property {VNode}    element    Virtual node representing the original element.
- * @property {Context}  context    The inherited context.
- * @property {Evaluate} evaluate   Function that resolves a given path to a value either in the store or the context.
- */
+interface DirectiveArgs {
+	directives: DirectiveEntries;
+	props: Object;
+	element: VNode;
+	context: Context< any >;
+	evaluate: Evaluate;
+}
 
-/**
- * @callback DirectiveCallback Callback that runs the directive logic.
- * @param {DirectiveCallbackParams} params Callback parameters.
- */
+interface DirectiveCallback {
+	( params: DirectiveArgs ): VNode | void;
+}
 
-/**
- * @typedef DirectiveOptions Options object.
- * @property {number} [priority=10] Value that specifies the priority to
- *                                  evaluate directives of this type. Lower
- *                                  numbers correspond with earlier execution.
- *                                  Default is `10`.
- */
+interface DirectiveOptions {
+	/**
+	 * Value that specifies the priority to evaluate directives of this type.
+	 * Lower numbers correspond with earlier execution.
+	 *
+	 * @default 10
+	 */
+	priority?: number;
+}
+
+interface Scope {
+	evaluate: Evaluate;
+	context: Context< any >;
+	ref: RefObject< HTMLElement >;
+	state: any;
+	props: any;
+}
+
+interface Evaluate {
+	( entry: DirectiveEntry, ...args: any[] ): any;
+}
+
+interface GetEvaluate {
+	( args: { scope: Scope } ): Evaluate;
+}
+
+type PriorityLevel = string[];
+
+interface GetPriorityLevels {
+	( directives: DirectiveEntries ): PriorityLevel[];
+}
+
+interface DirectivesProps {
+	directives: DirectiveEntries;
+	priorityLevels: PriorityLevel[];
+	element: VNode;
+	originalProps: any;
+	previousScope?: Scope;
+}
 
 // Main context.
 const context = createContext( {} );
@@ -65,7 +98,7 @@ const deepImmutable = < T extends Object = {} >( target: T ): T => {
 
 // Store stacks for the current scope and the default namespaces and export APIs
 // to interact with them.
-const scopeStack: any[] = [];
+const scopeStack: Scope[] = [];
 const namespaceStack: string[] = [];
 
 export const getContext = < T extends object >( namespace?: string ): T =>
@@ -87,7 +120,7 @@ export const getElement = () => {
 
 export const getScope = () => scopeStack.slice( -1 )[ 0 ];
 
-export const setScope = ( scope ) => {
+export const setScope = ( scope: Scope ) => {
 	scopeStack.push( scope );
 };
 export const resetScope = () => {
@@ -102,8 +135,8 @@ export const resetNamespace = () => {
 };
 
 // WordPress Directives.
-const directiveCallbacks = {};
-const directivePriorities = {};
+const directiveCallbacks: Record< string, DirectiveCallback > = {};
+const directivePriorities: Record< string, number > = {};
 
 /**
  * Register a new directive type in the Interactivity API runtime.
@@ -111,10 +144,9 @@ const directivePriorities = {};
  * @example
  * ```js
  * directive(
- *   'alert', // Name without the `data-wp-` prefix.
- *   ( { directives: { alert }, element, evaluate }) => {
- *     element.props.onclick = () => {
- *       alert( evaluate( alert.default ) );
+ *   'alert', // Name without the `data-wp-` prefix. ( {
+ *   directives: { alert }, element, evaluate }) => { element.props.onclick = ()
+ *   => { alert( evaluate( alert.default ) );
  *     }
  *   }
  * )
@@ -151,7 +183,7 @@ const directivePriorities = {};
  *   'color', // Name without prefix and suffix.
  *   ( { directives: { color }, ref, evaluate }) => {
  *     if ( color.text ) {
- * 	     ref.style.setProperty(
+ *       ref.style.setProperty(
  *         'color',
  *         evaluate( color.text )
  *       );
@@ -166,11 +198,17 @@ const directivePriorities = {};
  * )
  * ```
  *
- * @param {string}            name     Directive name, without the `data-wp-` prefix.
- * @param {DirectiveCallback} callback Function that runs the directive logic.
- * @param {DirectiveOptions=} options  Options object.
+ * @param name             Directive name, without the `data-wp-` prefix.
+ * @param callback         Function that runs the directive logic.
+ * @param options          Options object.
+ * @param options.priority Option to control the directive execution order. The
+ *                         lesser, the highest priority. Default is `10`.
  */
-export const directive = ( name, callback, { priority = 10 } = {} ) => {
+export const directive = (
+	name: string,
+	callback: DirectiveCallback,
+	{ priority = 10 }: DirectiveOptions = {}
+) => {
 	directiveCallbacks[ name ] = callback;
 	directivePriorities[ name ] = priority;
 };
@@ -186,13 +224,16 @@ const resolve = ( path, namespace ) => {
 };
 
 // Generate the evaluate function.
-const getEvaluate =
-	( { scope } = {} ) =>
+const getEvaluate: GetEvaluate =
+	( { scope } ) =>
 	( entry, ...args ) => {
 		let { value: path, namespace } = entry;
+		if ( typeof path !== 'string' ) {
+			throw new Error( 'The `value` prop should be a string path' );
+		}
 		// If path starts with !, remove it and save a flag.
 		const hasNegationOperator =
-			path[ 0 ] === '!' && !! ( path = path.slice( 1 ) );
+			path[ 0 ] === '!' && !! ( path = path!.slice( 1 ) );
 		setScope( scope );
 		const value = resolve( path, namespace );
 		const result = typeof value === 'function' ? value( ...args ) : value;
@@ -202,8 +243,10 @@ const getEvaluate =
 
 // Separate directives by priority. The resulting array contains objects
 // of directives grouped by same priority, and sorted in ascending order.
-const getPriorityLevels = ( directives ) => {
-	const byPriority = Object.keys( directives ).reduce( ( obj, name ) => {
+const getPriorityLevels: GetPriorityLevels = ( directives ) => {
+	const byPriority = Object.keys( directives ).reduce<
+		Record< number, string[] >
+	>( ( obj, name ) => {
 		if ( directiveCallbacks[ name ] ) {
 			const priority = directivePriorities[ name ];
 			( obj[ priority ] = obj[ priority ] || [] ).push( name );
@@ -212,7 +255,7 @@ const getPriorityLevels = ( directives ) => {
 	}, {} );
 
 	return Object.entries( byPriority )
-		.sort( ( [ p1 ], [ p2 ] ) => p1 - p2 )
+		.sort( ( [ p1 ], [ p2 ] ) => parseInt( p1 ) - parseInt( p2 ) )
 		.map( ( [ , arr ] ) => arr );
 };
 
@@ -222,14 +265,14 @@ const Directives = ( {
 	priorityLevels: [ currentPriorityLevel, ...nextPriorityLevels ],
 	element,
 	originalProps,
-	previousScope = {},
-} ) => {
+	previousScope,
+}: DirectivesProps ) => {
 	// Initialize the scope of this element. These scopes are different per each
 	// level because each level has a different context, but they share the same
 	// element ref, state and props.
-	const scope = useRef( {} ).current;
+	const scope = useRef< Scope >( {} as Scope ).current;
 	scope.evaluate = useCallback( getEvaluate( { scope } ), [] );
-	scope.context = useContext( context );
+	scope.context = useContext< any >( context );
 	/* eslint-disable react-hooks/rules-of-hooks */
 	scope.ref = previousScope.ref || useRef( null );
 	scope.state = previousScope.state || useRef( deepSignal( {} ) ).current;
@@ -276,7 +319,7 @@ const Directives = ( {
 
 // Preact Options Hook called each time a vnode is created.
 const old = options.vnode;
-options.vnode = ( vnode ) => {
+options.vnode = ( vnode: VNode< any > ) => {
 	if ( vnode.props.__directives ) {
 		const props = vnode.props;
 		const directives = props.__directives;
@@ -292,7 +335,7 @@ options.vnode = ( vnode ) => {
 				priorityLevels,
 				originalProps: props,
 				type: vnode.type,
-				element: h( vnode.type, props ),
+				element: h( vnode.type as any, props ),
 				top: true,
 			};
 			vnode.type = Directives;
