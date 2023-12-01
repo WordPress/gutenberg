@@ -71,7 +71,7 @@ interface DirectivesProps {
 }
 
 // Main context.
-const context = createContext( {} );
+const context = createContext< any >( {} );
 
 // Wrap the element props to prevent modifications.
 const immutableMap = new WeakMap();
@@ -272,7 +272,7 @@ const Directives = ( {
 	// element ref, state and props.
 	const scope = useRef< Scope >( {} as Scope ).current;
 	scope.evaluate = useCallback( getEvaluate( { scope } ), [] );
-	scope.context = useContext< any >( context );
+	scope.context = useContext( context );
 	/* eslint-disable react-hooks/rules-of-hooks */
 	scope.ref = previousScope.ref || useRef( null );
 	scope.state = previousScope.state || useRef( deepSignal( {} ) ).current;
