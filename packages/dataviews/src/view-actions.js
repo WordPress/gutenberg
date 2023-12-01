@@ -6,7 +6,7 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { chevronRightSmall, arrowUp, arrowDown } from '@wordpress/icons';
+import { arrowUp, arrowDown } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -37,14 +37,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 	return (
 		<DropdownMenu
 			trigger={
-				<DropdownMenuItem
-					suffix={
-						<>
-							{ activeView.label }
-							<Icon icon={ chevronRightSmall } />
-						</>
-					}
-				>
+				<DropdownMenuItem suffix={ activeView.label }>
 					{ __( 'Layout' ) }
 				</DropdownMenuItem>
 			}
@@ -77,14 +70,7 @@ function PageSizeMenu( { view, onChangeView } ) {
 	return (
 		<DropdownMenu
 			trigger={
-				<DropdownMenuItem
-					suffix={
-						<>
-							{ view.perPage }
-							<Icon icon={ chevronRightSmall } />
-						</>
-					}
-				>
+				<DropdownMenuItem suffix={ view.perPage }>
 					{ /* TODO: probably label per view type. */ }
 					{ __( 'Rows per page' ) }
 				</DropdownMenuItem>
@@ -120,13 +106,7 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 	}
 	return (
 		<DropdownMenu
-			trigger={
-				<DropdownMenuItem
-					suffix={ <Icon icon={ chevronRightSmall } /> }
-				>
-					{ __( 'Fields' ) }
-				</DropdownMenuItem>
-			}
+			trigger={ <DropdownMenuItem>{ __( 'Fields' ) }</DropdownMenuItem> }
 			placement="left-start"
 		>
 			{ hidableFields?.map( ( field ) => {
@@ -177,14 +157,7 @@ function SortMenu( { fields, view, onChangeView } ) {
 	return (
 		<DropdownMenu
 			trigger={
-				<DropdownMenuItem
-					suffix={
-						<>
-							{ currentSortedField?.header }
-							<Icon icon={ chevronRightSmall } />
-						</>
-					}
-				>
+				<DropdownMenuItem suffix={ currentSortedField?.header }>
 					{ __( 'Sort by' ) }
 				</DropdownMenuItem>
 			}
@@ -196,9 +169,7 @@ function SortMenu( { fields, view, onChangeView } ) {
 					<DropdownMenu
 						key={ field.id }
 						trigger={
-							<DropdownMenuItem
-								suffix={ <Icon icon={ chevronRightSmall } /> }
-							>
+							<DropdownMenuItem>
 								{ field.header }
 							</DropdownMenuItem>
 						}
