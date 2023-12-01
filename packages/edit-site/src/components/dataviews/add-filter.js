@@ -81,8 +81,6 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 						{ filter.elements.map( ( element ) => (
 							<DropdownMenuItem
 								key={ element.value }
-								role="menuitemradio"
-								aria-checked={ false }
 								onSelect={ () => {
 									onChangeView( ( currentView ) => ( {
 										...currentView,
