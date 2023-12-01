@@ -18,7 +18,6 @@ import {
 import BlockToolbarPopover from './block-toolbar-popover';
 import BlockToolbarBreadcrumb from './block-toolbar-breadcrumb';
 import { store as blockEditorStore } from '../../store';
-import BlockToolbar from '../block-toolbar';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 
@@ -27,6 +26,7 @@ function selector( select ) {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
 		getBlock,
+		getSettings,
 		hasMultiSelection,
 		__unstableGetEditorMode,
 		isTyping,
@@ -39,6 +39,7 @@ function selector( select ) {
 	const editorMode = __unstableGetEditorMode();
 	return {
 		clientId,
+		hasFixedToolbar: getSettings().hasFixedToolbar,
 		hasSelectedBlock: clientId && name,
 		isEmptyDefaultBlock: isUnmodifiedDefaultBlock(
 			getBlock( clientId ) || {}
@@ -61,19 +62,18 @@ function selector( select ) {
  * insertion point and a slot for the inline rich text toolbar). Must be wrapped
  * around the block content and editor styles wrapper or iframe.
  *
- * @param {Object} $0                                   Props.
- * @param {Object} $0.children                          The block content and style container.
- * @param {Object} $0.__unstableContentRef              Ref holding the content scroll container.
- * @param {string} $0.__experimentalBlockToolbarDisplay The display mode for the block toolbar.
+ * @param {Object} $0                      Props.
+ * @param {Object} $0.children             The block content and style container.
+ * @param {Object} $0.__unstableContentRef Ref holding the content scroll container.
  */
 export default function BlockTools( {
 	children,
 	__unstableContentRef,
-	__experimentalBlockToolbarDisplay = 'popover',
 	...props
 } ) {
 	const {
 		clientId,
+		hasFixedToolbar,
 		hasSelectedBlock,
 		isEmptyDefaultBlock,
 		isTyping,
@@ -178,9 +178,6 @@ export default function BlockTools( {
 						__unstableContentRef={ __unstableContentRef }
 					/>
 				) }
-				{ __experimentalBlockToolbarDisplay === 'sticky' && (
-					<BlockToolbar hideDragHandle variant="unstyled" />
-				) }
 
 				{ showEmptyBlockSideInserter && (
 					<EmptyBlockInserter
@@ -189,7 +186,7 @@ export default function BlockTools( {
 					/>
 				) }
 
-				{ __experimentalBlockToolbarDisplay === 'popover' &&
+				{ ! hasFixedToolbar &&
 					! showEmptyBlockSideInserter &&
 					hasSelectedBlock &&
 					! isEmptyDefaultBlock &&
@@ -210,14 +207,12 @@ export default function BlockTools( {
 					) }
 
 				{ /* Used for the inline rich text toolbar. Until this toolbar is combined into BlockToolbar, someone implementing their own BlockToolbar will also need to use this to see the image caption toolbar. */ }
-				{ ! isZoomOutMode &&
-					( __experimentalBlockToolbarDisplay === 'popover' ||
-						__experimentalBlockToolbarDisplay === 'sticky' ) && (
-						<Popover.Slot
-							name="block-toolbar"
-							ref={ blockToolbarRef }
-						/>
-					) }
+				{ ! isZoomOutMode && ! hasFixedToolbar && (
+					<Popover.Slot
+						name="block-toolbar"
+						ref={ blockToolbarRef }
+					/>
+				) }
 				{ children }
 				{ /* Used for inline rich text popovers. */ }
 				<Popover.Slot
