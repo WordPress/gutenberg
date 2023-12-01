@@ -25,7 +25,6 @@ test.describe( 'Templates', () => {
 		await page
 			.getByRole( 'menuitemradio', {
 				name: 'Sort descending',
-				exact: true,
 			} )
 			.click();
 		const firstTitle = page
