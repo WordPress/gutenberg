@@ -79,7 +79,11 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 }
 
 $gutenberg_experiments = get_option( 'gutenberg-experiments' );
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ) {
+if ( $gutenberg_experiments && (
+	array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ||
+	array_key_exists( 'gutenberg-pattern-partial-syncing', $gutenberg_experiments )
+) ) {
+
 	require_once __DIR__ . '/block-bindings-api/index.php';
 	// Whitelist of blocks that support block bindings.
 	// We should look for a mechanism to opt-in for this. Maybe adding a property to block attributes?
@@ -128,7 +132,13 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 				// Get the value based on the source.
 				// We might want to move this to its own function if it gets more complex.
 				// We pass $block_content, $block, $block_instance to the source callback in case sources want to use them.
+				if ( ! isset( $block_bindings_sources[ $binding['source']['name'] ]['apply_source'] ) ) {
+					return $block_content;
+				}
 				$source_value = $block_bindings_sources[ $binding['source']['name'] ]['apply_source']( $binding['source']['params'], $block_content, $block, $block_instance );
+				if ( false === $source_value ) {
+					return $block_content;
+				}
 
 				// Process the HTML based on the block and the attribute.
 				$modified_block_content = block_bindings_replace_html( $modified_block_content, $block['blockName'], $binding['attribute'], $source_value );
