@@ -186,7 +186,7 @@ describe( 'BorderControl', () => {
 				render( <BorderControl { ...props } /> );
 
 				expect(
-					screen.getByLabelText( 'Border color and style picker.' )
+					screen.getByText( 'Select a border color and style.' )
 				).toBeInTheDocument();
 			} );
 
@@ -195,8 +195,8 @@ describe( 'BorderControl', () => {
 				render( <BorderControl { ...props } /> );
 
 				expect(
-					screen.getByLabelText(
-						'Border color and style picker. The currently selected color is called "Blue" and has a value of "#72aee6".'
+					screen.getByText(
+						'The currently selected color is called "Blue" and has a value of "#72aee6".'
 					)
 				).toBeInTheDocument();
 			} );
@@ -206,8 +206,8 @@ describe( 'BorderControl', () => {
 				render( <BorderControl { ...props } /> );
 
 				expect(
-					screen.getByLabelText(
-						'Border color and style picker. The currently selected color has a value of "#4b1d80".'
+					screen.getByText(
+						'The currently selected color has a value of "#4b1d80".'
 					)
 				).toBeInTheDocument();
 			} );
@@ -219,8 +219,8 @@ describe( 'BorderControl', () => {
 				render( <BorderControl { ...props } /> );
 
 				expect(
-					screen.getByLabelText(
-						'Border color and style picker. The currently selected color is called "Blue" and has a value of "#72aee6". The currently selected style is "dotted".'
+					screen.getByText(
+						'The currently selected color is called "Blue" and has a value of "#72aee6". The currently selected style is "dotted".'
 					)
 				).toBeInTheDocument();
 			} );
@@ -232,8 +232,8 @@ describe( 'BorderControl', () => {
 				render( <BorderControl { ...props } /> );
 
 				expect(
-					screen.getByLabelText(
-						'Border color and style picker. The currently selected color has a value of "#4b1d80". The currently selected style is "dashed".'
+					screen.getByText(
+						'The currently selected color has a value of "#4b1d80". The currently selected style is "dashed".'
 					)
 				).toBeInTheDocument();
 			} );
@@ -248,7 +248,7 @@ describe( 'BorderControl', () => {
 				render( <BorderControl { ...props } /> );
 
 				expect(
-					screen.getByLabelText( 'Border color picker.' )
+					screen.getByText( 'Select a border color and style.' )
 				).toBeInTheDocument();
 			} );
 
@@ -260,8 +260,8 @@ describe( 'BorderControl', () => {
 				render( <BorderControl { ...props } /> );
 
 				expect(
-					screen.getByLabelText(
-						'Border color picker. The currently selected color is called "Blue" and has a value of "#72aee6".'
+					screen.getByText(
+						'The currently selected color is called "Blue" and has a value of "#72aee6".'
 					)
 				).toBeInTheDocument();
 			} );
@@ -274,8 +274,8 @@ describe( 'BorderControl', () => {
 				render( <BorderControl { ...props } /> );
 
 				expect(
-					screen.getByLabelText(
-						'Border color picker. The currently selected color has a value of "#4b1d80".'
+					screen.getByText(
+						'The currently selected color has a value of "#4b1d80".'
 					)
 				).toBeInTheDocument();
 			} );
