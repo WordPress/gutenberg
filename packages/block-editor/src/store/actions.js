@@ -640,13 +640,15 @@ export function showInsertionPoint(
 	index,
 	__unstableOptions = {}
 ) {
-	const { __unstableWithInserter, operation } = __unstableOptions;
+	const { __unstableWithInserter, operation, nearestSide } =
+		__unstableOptions;
 	return {
 		type: 'SHOW_INSERTION_POINT',
 		rootClientId,
 		index,
 		__unstableWithInserter,
 		operation,
+		nearestSide,
 	};
 }
 /**

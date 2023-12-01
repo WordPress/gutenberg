@@ -25,6 +25,7 @@ function InbetweenInsertionPointPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 	operation = 'insert',
+	nearestSide = 'right',
 } ) {
 	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
@@ -156,6 +157,7 @@ function InbetweenInsertionPointPopover( {
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }
 			operation={ operation }
+			nearestSide={ nearestSide }
 		>
 			<motion.div
 				layout={ ! disableMotion }
@@ -245,6 +247,7 @@ export default function InsertionPoint( props ) {
 	) : (
 		<InbetweenInsertionPointPopover
 			operation={ insertionPoint.operation }
+			nearestSide={ insertionPoint.nearestSide }
 			{ ...props }
 		/>
 	);

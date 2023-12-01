@@ -34,6 +34,7 @@ function BlockPopoverInbetween( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 	operation = 'insert',
+	nearestSide = 'right',
 	...props
 } ) {
 	// This is a temporary hack to get the inbetween inserter to recompute properly.
@@ -82,7 +83,10 @@ function BlockPopoverInbetween( {
 			return undefined;
 		}
 
-		const contextElement = previousElement || nextElement;
+		const contextElement =
+			operation === 'group'
+				? nextElement || previousElement
+				: previousElement || nextElement;
 
 		return {
 			contextElement,
@@ -100,12 +104,16 @@ function BlockPopoverInbetween( {
 				let height = 0;
 
 				if ( operation === 'group' ) {
-					// If the operation is group, nextRect is the target to be grouped.
-					// Not sure if previousRect is needed here.
-					top = nextRect ? nextRect.top : previousRect.top;
-					width = nextRect ? nextRect.width : previousRect.width;
-					height = nextRect ? nextRect.bottom - nextRect.top : 0;
-					left = nextRect ? nextRect.left : previousRect.left;
+					const targetRect = nextRect || previousRect;
+					top = targetRect.top;
+					width = targetRect.width;
+					height = targetRect.bottom - targetRect.top;
+					// Popover calculates its distance from mid-block so some
+					// adjustments are needed to make it appear in the right place.
+					left =
+						nearestSide === 'left'
+							? -targetRect.width / 2 + targetRect.left
+							: targetRect.width / 2 + targetRect.left;
 				} else if ( isVertical ) {
 					// vertical
 					top = previousRect ? previousRect.bottom : nextRect.top;
@@ -149,6 +157,8 @@ function BlockPopoverInbetween( {
 		popoverRecomputeCounter,
 		isVertical,
 		isVisible,
+		operation,
+		nearestSide,
 	] );
 
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );

@@ -222,7 +222,7 @@ export default function useOnBlockDrop(
 	targetBlockIndex,
 	options = {}
 ) {
-	const { operation = 'insert' } = options;
+	const { operation = 'insert', nearestSide = 'right' } = options;
 	const {
 		canInsertBlockType,
 		getBlockIndex,
@@ -255,7 +255,11 @@ export default function useOnBlockDrop(
 				replaceBlocks( clientId, blocks, undefined, initialPosition );
 			} else if ( operation === 'group' ) {
 				const targetBlock = getBlock( clientId );
-				blocks.unshift( targetBlock );
+				if ( nearestSide === 'left' ) {
+					blocks.push( targetBlock );
+				} else {
+					blocks.unshift( targetBlock );
+				}
 
 				const groupInnerBlocks = blocks.map( ( block ) => {
 					return createBlock(
@@ -268,7 +272,7 @@ export default function useOnBlockDrop(
 				const wrappedBlocks = createBlock(
 					'core/group',
 					{
-						layout: { type: 'flex' },
+						layout: { type: 'flex', flexWrap: 'nowrap' },
 					},
 					groupInnerBlocks
 				);
