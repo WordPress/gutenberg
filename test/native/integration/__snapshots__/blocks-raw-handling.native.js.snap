@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Blocks raw handling pasteHandler google-docs-list-only 1`] = `"<br />My first list item<br />A sub list item<br />A second sub list item<br />My second list item<br />My third list item"`;
+
+exports[`Blocks raw handling pasteHandler gutenberg 1`] = `"Test"`;
+
+exports[`Blocks raw handling pasteHandler iframe-embed 1`] = `""`;
+
+exports[`Blocks raw handling pasteHandler ms-word-styled 1`] = `"<br /><strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit&nbsp;</strong><br /><br /><br />Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque aliquet hendrerit auctor. Nam lobortis, est vel lacinia tincidunt, purus tellus vehicula ex, nec pharetra justo dui sed lorem. Nam congue laoreet massa, quis varius est tincidunt ut."`;
+
+exports[`Blocks raw handling pasteHandler one-image 1`] = `"<img class="alignnone wp-image-5114 size-medium" src="http://localhost/wp-content/uploads/2018/01/Dec-08-2017-15-12-24-17-300x137.gif" alt="" width="300" height="137" />"`;
+
+exports[`Blocks raw handling pasteHandler should remove extra blank lines 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Blocks raw handling pasteHandler should strip HTML formatting space from inline text 1`] = `""`;
+
+exports[`Blocks raw handling pasteHandler should strip some text-level elements 1`] = `
+"<!-- wp:paragraph -->
+<p>This is ncorect</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Blocks raw handling pasteHandler should strip windows data 1`] = `
+"<!-- wp:heading -->
+<h2 class="wp-block-heading">Heading Win</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Paragraph Win</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Blocks raw handling pasteHandler two-images 1`] = `"<img class="alignnone wp-image-5114 size-medium" src="http://localhost/wp-content/uploads/2018/01/Dec-08-2017-15-12-24-17-300x137.gif" alt="" width="300" height="137" /> <img class="alignnone wp-image-5109 size-medium" src="http://localhost/wp-content/uploads/2018/01/Dec-05-2017-17-52-09-9-300x248.gif" alt="" width="300" height="248" />"`;
+
+exports[`Blocks raw handling should correctly handle quotes with mixed content 1`] = `
+"<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:heading {"level":1} -->
+<h1 class="wp-block-heading">chicken</h1>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>ribs</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`rawHandler should convert HTML post to blocks with minimal content changes 1`] = `""`;
+
+exports[`rawHandler should convert a caption shortcode 1`] = `""`;
+
+exports[`rawHandler should convert a caption shortcode with caption 1`] = `""`;
+
+exports[`rawHandler should convert a caption shortcode with link 1`] = `""`;
+
+exports[`rawHandler should convert a list with attributes 1`] = `""`;
+
+exports[`rawHandler should convert to unsupported HTML block when no transformation is available 1`] = `
+"<!-- wp:html -->
+<div><p>Hello world!</p></div>
+<!-- /wp:html -->"
+`;
+
+exports[`rawHandler should not strip any text-level elements 1`] = `""`;
+
+exports[`rawHandler should preserve alignment 1`] = `""`;
