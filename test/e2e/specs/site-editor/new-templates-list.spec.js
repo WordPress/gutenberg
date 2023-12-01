@@ -66,7 +66,7 @@ test.describe( 'Templates', () => {
 		// Filter by author.
 		await page.getByRole( 'button', { name: 'Add filter' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Author' } ).hover();
-		await page.getByRole( 'menuitemradio', { name: 'admin' } ).click();
+		await page.getByRole( 'menuitem', { name: 'admin' } ).click();
 		await expect( titles ).toHaveCount( 1 );
 		await expect( titles.first() ).toHaveText( 'Date Archives' );
 
@@ -77,7 +77,7 @@ test.describe( 'Templates', () => {
 		await expect( titles ).toHaveCount( 3 );
 		await page.getByRole( 'button', { name: 'Add filter' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Author' } ).hover();
-		await page.getByRole( 'menuitemradio', { name: 'Emptytheme' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Emptytheme' } ).click();
 		await expect( titles ).toHaveCount( 2 );
 	} );
 	test( 'Field visibility', async ( { admin, page } ) => {
