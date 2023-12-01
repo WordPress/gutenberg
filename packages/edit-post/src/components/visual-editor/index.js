@@ -16,9 +16,9 @@ import {
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useRef, useMemo, useEffect } from '@wordpress/element';
+import { useRef, useMemo } from '@wordpress/element';
 import { __unstableMotion as motion } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
 import { store as blocksStore } from '@wordpress/blocks';
 
@@ -43,20 +43,16 @@ export default function VisualEditor( { styles } ) {
 		isBlockBasedTheme,
 		hasV3BlocksOnly,
 	} = useSelect( ( select ) => {
-		const {
-			isFeatureActive,
-			isEditingTemplate,
-			__experimentalGetPreviewDeviceType,
-		} = select( editPostStore );
-		const { getEditorSettings } = select( editorStore );
+		const { isFeatureActive, __experimentalGetPreviewDeviceType } =
+			select( editPostStore );
+		const { getEditorSettings, getRenderingMode } = select( editorStore );
 		const { getBlockTypes } = select( blocksStore );
-		const _isTemplateMode = isEditingTemplate();
 		const editorSettings = getEditorSettings();
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
-			isTemplateMode: _isTemplateMode,
+			isTemplateMode: getRenderingMode() !== 'post-only',
 			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
 			hasV3BlocksOnly: getBlockTypes().every( ( type ) => {
 				return type.apiVersion >= 3;
@@ -67,7 +63,6 @@ export default function VisualEditor( { styles } ) {
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
-	const { setRenderingMode } = useDispatch( editorStore );
 	const desktopCanvasStyles = {
 		height: '100%',
 		width: '100%',
@@ -125,14 +120,6 @@ export default function VisualEditor( { styles } ) {
 		isTemplateMode ||
 		deviceType === 'Tablet' ||
 		deviceType === 'Mobile';
-
-	useEffect( () => {
-		if ( isTemplateMode ) {
-			setRenderingMode( 'all' );
-		} else {
-			setRenderingMode( 'post-only' );
-		}
-	}, [ isTemplateMode, setRenderingMode ] );
 
 	return (
 		<BlockTools

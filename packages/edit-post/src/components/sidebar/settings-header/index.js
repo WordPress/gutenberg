@@ -18,12 +18,12 @@ const SettingsHeader = ( { sidebarName } ) => {
 	const openBlockSettings = () => openGeneralSidebar( 'edit-post/block' );
 
 	const { documentLabel, isTemplateMode } = useSelect( ( select ) => {
-		const postTypeLabel = select( editorStore ).getPostTypeLabel();
+		const { getPostTypeLabel, getRenderingMode } = select( editorStore );
 
 		return {
 			// translators: Default label for the Document sidebar tab, not selected.
-			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
-			isTemplateMode: select( editPostStore ).isEditingTemplate(),
+			documentLabel: getPostTypeLabel() || _x( 'Document', 'noun' ),
+			isTemplateMode: getRenderingMode() !== 'post-only',
 		};
 	}, [] );
 

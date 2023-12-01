@@ -10,7 +10,11 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
+import {
+	PostSavedState,
+	PostPreviewButton,
+	store as editorStore,
+} from '@wordpress/editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -73,7 +77,8 @@ function Header( {
 			blockSelectionStart:
 				select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			isEditingTemplate: select( editPostStore ).isEditingTemplate(),
+			isEditingTemplate:
+				select( editorStore ).getRenderingMode() !== 'post-only',
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core/edit-post', 'fixedToolbar' ),

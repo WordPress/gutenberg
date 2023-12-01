@@ -154,20 +154,6 @@ export function listViewPanel( state = false, action ) {
 }
 
 /**
- * Reducer tracking whether template editing is on or off.
- *
- * @param {boolean} state
- * @param {Object}  action
- */
-function isEditingTemplate( state = false, action ) {
-	switch ( action.type ) {
-		case 'SET_IS_EDITING_TEMPLATE':
-			return action.value;
-	}
-	return state;
-}
-
-/**
  * Reducer tracking whether meta boxes are initialized.
  *
  * @param {boolean} state
@@ -196,5 +182,4 @@ export default combineReducers( {
 	deviceType,
 	blockInserterPanel,
 	listViewPanel,
-	isEditingTemplate,
 } );
