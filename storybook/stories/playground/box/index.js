@@ -37,7 +37,7 @@ export default function EditorBox() {
 					hasFixedToolbar: true,
 				} }
 			>
-				<BlockToolbar />
+				<BlockToolbar hideDragHandle variant="unstyled" />
 				<BlockTools />
 				<BlockCanvas height="100%" styles={ editorStyles } />
 			</BlockEditorProvider>

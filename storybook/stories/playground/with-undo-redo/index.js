@@ -59,7 +59,7 @@ export default function EditorWithUndoRedo() {
 						icon={ redoIcon }
 						label="Redo"
 					/>
-					<BlockToolbar />
+					<BlockToolbar hideDragHandle variant="unstyled" />
 					<BlockTools />
 				</div>
 				<BlockCanvas height="100%" styles={ editorStyles } />
