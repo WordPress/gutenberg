@@ -102,16 +102,20 @@ export default function BlockBindingsButton( props ) {
 			<Button
 				className="block-bindings-remove-button"
 				onClick={ () => {
-					if ( ! props.attributes.bindings ) {
+					if ( ! props.attributes?.metadata.bindings ) {
 						return;
 					}
+
 					const { currentAttribute } = props;
 					const newAttributes = {};
 					newAttributes[ currentAttribute ] = '';
-					const newBindings = props.attributes.bindings.filter(
-						( item ) => item.attribute !== currentAttribute
-					);
-					newAttributes.bindings = newBindings;
+					const metadataAttribute = props.attributes.metadata;
+					const bindingsArray =
+						props.attributes.metadata.bindings.filter(
+							( item ) => item.attribute !== currentAttribute
+						);
+					metadataAttribute.bindings = bindingsArray;
+					newAttributes.metadata = metadataAttribute;
 					setAttributes( newAttributes );
 				} }
 			>
@@ -145,13 +149,6 @@ if ( window.__experimentalConnections ) {
 		( settings, name ) => {
 			if ( ! ( name in blockBindingsWhitelist ) ) {
 				return settings;
-			}
-
-			// Add "bindings" attribute.
-			if ( ! settings.attributes.bindings ) {
-				settings.attributes.bindings = {
-					type: 'array',
-				};
 			}
 
 			// TODO: Review the implications of this and the code.

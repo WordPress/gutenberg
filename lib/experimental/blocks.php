@@ -97,12 +97,12 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 		 * @param WP_Block $block_instance The block instance.
 		 */
 		function process_block_bindings( $block_content, $block, $block_instance ) {
-			// If the block doesn't have the bindings attribute, return.
-			if ( ! isset( $block['attrs']['bindings'] ) ) {
+			// If the block doesn't have the bindings property, return.
+			if ( ! isset( $block['attrs']['metadata']['bindings'] ) ) {
 				return $block_content;
 			}
 
-			// Assuming the following format for the bindings attribute:
+			// Assuming the following format for the bindings property of the "metadata" attribute:
 			//
 			// "bindings": [
 			// {
@@ -118,7 +118,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 			global $block_bindings_whitelist;
 			global $block_bindings_sources;
 			$modified_block_content = $block_content;
-			foreach ( $block['attrs']['bindings'] as $binding ) {
+			foreach ( $block['attrs']['metadata']['bindings'] as $binding ) {
 				if ( ! isset( $block_bindings_whitelist[ $block['blockName'] ] ) ) {
 					continue;
 				}

@@ -71,13 +71,18 @@ export default function MetadataSourceUI( props ) {
 		// TODO: Get the type from the block attribute definition and modify/validate the value returned by the source if needed.
 		newAttributes[ currentAttribute ] = item.value;
 
+		// TODO: Review this logic and simplify the code.
+		const metadataAttribute = props.attributes.metadata
+			? props.attributes.metadata
+			: {};
+		const bindingsArray = metadataAttribute.bindings
+			? metadataAttribute.bindings
+			: [];
+
 		// If the attribute exists in the bindings, update it.
 		// Otherwise, add it.
-		const newBindings = props.attributes.bindings
-			? props.attributes.bindings
-			: [];
 		let attributeExists = false;
-		newBindings.forEach( ( binding ) => {
+		bindingsArray.forEach( ( binding ) => {
 			if ( binding.attribute === currentAttribute ) {
 				binding.source.name = 'metadata';
 				binding.source.params.value = item.key;
@@ -85,7 +90,7 @@ export default function MetadataSourceUI( props ) {
 			}
 		} );
 		if ( ! attributeExists ) {
-			newBindings.push( {
+			bindingsArray.push( {
 				attribute: currentAttribute,
 				source: {
 					name: 'metadata',
@@ -93,7 +98,8 @@ export default function MetadataSourceUI( props ) {
 				},
 			} );
 		}
-		newAttributes.bindings = newBindings;
+		metadataAttribute.bindings = bindingsArray;
+		newAttributes.metadata = metadataAttribute;
 		setAttributes( newAttributes );
 
 		setIsActiveAttribute( false );
