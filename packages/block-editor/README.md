@@ -810,6 +810,18 @@ _Properties_
 
 Ensures that the text selection keeps the same vertical distance from the viewport during keyboard events within this component. The vertical distance can vary. It is the last clicked or scrolled to position.
 
+### updateBlockBindingsAttribute
+
+Helper to update the bindings attribute used by the Block Bindings API.
+
+_Parameters_
+
+-   _blockAttributes_ `Object`: - The original block attributes.
+-   _setAttributes_ `Function`: - setAttributes function to modify the bindings property.
+-   _updatingAttribute_ `string`: - The attribute in the bindings object to update.
+-   _sourceName_ `string`: - The source name added to the bindings property.
+-   _sourceParams_ `string`: - The source params added to the bindings property.
+
 ### URLInput
 
 _Related_
