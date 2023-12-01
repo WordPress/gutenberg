@@ -76,9 +76,7 @@ test.describe( 'Templates', () => {
 		await expect( titles ).toHaveCount( 3 );
 		await page.getByRole( 'button', { name: 'Add filter' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Author' } ).hover();
-		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Emptytheme' } )
-			.click();
+		await page.getByRole( 'menuitemradio', { name: 'Emptytheme' } ).click();
 		await expect( titles ).toHaveCount( 2 );
 
 		await requestUtils.deleteAllTemplates( 'wp_template' );
