@@ -118,24 +118,13 @@ function HeaderMenu( { field, view, onChangeView } ) {
 										}
 										onSelect={ ( event ) => {
 											event.preventDefault();
-											if (
-												isSorted &&
-												view.sort.direction ===
-													direction
-											) {
-												onChangeView( {
-													...view,
-													sort: undefined,
-												} );
-											} else {
-												onChangeView( {
-													...view,
-													sort: {
-														field: field.id,
-														direction,
-													},
-												} );
-											}
+											onChangeView( {
+												...view,
+												sort: {
+													field: field.id,
+													direction,
+												},
+											} );
 										} }
 									>
 										{ info.label }
