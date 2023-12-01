@@ -1,7 +1,7 @@
 [
 	{
 		"name": "core/embed",
-		"isValid": false,
+		"isValid": true,
 		"attributes": {
 			"url": "https://example.com/",
 			"caption": "Embedded content from an example URL",
