@@ -27,7 +27,7 @@ interface DirectiveArgs {
 }
 
 interface DirectiveCallback {
-	( params: DirectiveArgs ): VNode | void;
+	( args: DirectiveArgs ): VNode | void;
 }
 
 interface DirectiveOptions {
@@ -145,9 +145,9 @@ const directivePriorities: Record< string, number > = {};
  * ```js
  * directive(
  *   'alert', // Name without the `data-wp-` prefix. ( {
- *   directives: { alert }, element, evaluate }) => { element.props.onclick = ()
- *   => { alert( evaluate( alert.default ) );
- *     }
+ *   directives: { alert }, element, evaluate }) => {
+ *     const defaultEntry = alert.find( entry => entry.suffix === 'default' );
+ *     element.props.onclick = () => { alert( evaluate( defaultEntry ) ); }
  *   }
  * )
  * ```
@@ -160,18 +160,22 @@ const directivePriorities: Record< string, number > = {};
  * the `data-wp-alert` directive will have the `onclick` event handler, e.g.,
  *
  * ```html
- * <button data-wp-alert="state.messages.alert">Click me!</button>
+ * <div data-wp-interactive='{ "namespace": "messages" }'>
+ *   <button data-wp-alert="state.alert">Click me!</button>
+ * </div>
  * ```
  * Note that, in the previous example, you access `alert.default` in order to
- * retrieve the `state.messages.alert` value passed to the directive. You can
+ * retrieve the `state.alert` value passed to the directive. You can
  * also define custom names by appending `--` to the directive attribute,
  * followed by a suffix, like in the following HTML snippet:
  *
  * ```html
- * <button
- *   data-wp-color--text="state.theme.text"
- *   data-wp-color--background="state.theme.background"
- * >Click me!</button>
+ * <div data-wp-interactive='{ "namespace": "myblock" }'>
+ *   <button
+ *     data-wp-color--text="state.text"
+ *     data-wp-color--background="state.background"
+ *   >Click me!</button>
+ * </div>
  * ```
  *
  * This could be an hypothetical implementation of the custom directive used in
