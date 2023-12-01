@@ -29,6 +29,7 @@ import {
 	VIDEO_ASPECT_RATIO,
 	VideoPlayer,
 	InspectorControls,
+	RichText,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
@@ -366,7 +367,7 @@ class VideoEdit extends Component {
 					<BlockCaption
 						accessible={ true }
 						accessibilityLabelCreator={ ( caption ) =>
-							! caption
+							RichText.isEmpty( caption )
 								? /* translators: accessibility text. Empty video caption. */
 								  __( 'Video caption. Empty' )
 								: sprintf(
