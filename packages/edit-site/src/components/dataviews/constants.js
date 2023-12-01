@@ -9,7 +9,7 @@ import { blockTable, category, drawerLeft } from '@wordpress/icons';
  */
 import ViewTable from './view-table';
 import ViewGrid from './view-grid';
-import ViewSideBySide from './view-side-by-side';
+import ViewList from './view-list';
 
 // Field types.
 export const ENUMERATION_TYPE = 'enumeration';
@@ -44,7 +44,7 @@ export const VIEW_LAYOUTS = [
 	{
 		type: LAYOUT_LIST,
 		label: __( 'List' ),
-		component: ViewSideBySide,
+		component: ViewList,
 		icon: drawerLeft,
 		supports: {
 			preview: true,
