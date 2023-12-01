@@ -62,13 +62,13 @@
 	z-index: z-index(".block-editor-block-popover");
 	display: block;
 	width: 100%;
-
 	// Block UI appearance.
 	background-color: $white;
 	flex-shrink: 3;
 
 	// Raise the specificity.
 	&.components-accessible-toolbar {
+		border: none;
 		border-bottom: $border-width solid $gray-200;
 		border-radius: 0;
 	}
