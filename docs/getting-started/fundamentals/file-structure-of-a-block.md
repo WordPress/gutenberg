@@ -68,7 +68,7 @@ The `render.php` file (or any other file defined in the [`render`](https://devel
 
 ### `view.js`
 
-The `view.js` file (or any other file defined in the [`viewScript`]([`viewScript`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script) ) property of `block.json`) will be loaded in the front-end when the block is displayed.
+The `view.js` file (or any other file defined in the [`viewScript`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script) property of `block.json`) will be loaded in the front-end when the block is displayed.
 
 ### `build` folder
 
