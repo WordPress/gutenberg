@@ -19,10 +19,8 @@ import {
 	chevronDown,
 	chevronUp,
 	unseen,
-	check,
 	arrowUp,
 	arrowDown,
-	chevronRightSmall,
 	funnel,
 } from '@wordpress/icons';
 import {
@@ -45,9 +43,6 @@ const {
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
 	DropdownMenuRadioItemV2Ariakit: DropdownMenuRadioItem,
 	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
-	// TODO: check if we should use menus & items, like in view-actions.
-	DropdownSubMenuV2: DropdownSubMenu,
-	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
 } = unlock( componentsPrivateApis );
 
 const EMPTY_OBJECT = {};
@@ -138,17 +133,14 @@ function HeaderMenu( { dataView, header } ) {
 				) }
 				{ isFilterable && (
 					<DropdownMenuGroup>
-						<DropdownSubMenu
+						<DropdownMenu
 							key={ filter.field }
 							trigger={
-								<DropdownSubMenuTrigger
+								<DropdownMenuItem
 									prefix={ <Icon icon={ funnel } /> }
-									suffix={
-										<Icon icon={ chevronRightSmall } />
-									}
 								>
 									{ __( 'Filter by' ) }
-								</DropdownSubMenuTrigger>
+								</DropdownMenuItem>
 							}
 						>
 							{ filter.elements.map( ( element ) => {
@@ -171,14 +163,12 @@ function HeaderMenu( { dataView, header } ) {
 								}
 
 								return (
-									<DropdownMenuItem
+									<DropdownMenuRadioItem
 										key={ element.value }
-										role="menuitemradio"
-										aria-checked={ isActive }
-										suffix={
-											isActive && <Icon icon={ check } />
-										}
-										onSelect={ () => {
+										value={ element.value }
+										name="view-table-column-filter-item"
+										checked={ isActive }
+										onChange={ () => {
 											const otherFilters =
 												columnFilters?.filter(
 													( f ) => {
@@ -210,10 +200,10 @@ function HeaderMenu( { dataView, header } ) {
 										} }
 									>
 										{ element.label }
-									</DropdownMenuItem>
+									</DropdownMenuRadioItem>
 								);
 							} ) }
-						</DropdownSubMenu>
+						</DropdownMenu>
 					</DropdownMenuGroup>
 				) }
 			</WithSeparators>
