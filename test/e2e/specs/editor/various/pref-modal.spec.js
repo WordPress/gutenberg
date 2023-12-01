@@ -16,23 +16,14 @@ test.describe( 'Preferences modal', () => {
 		test( 'Enable pre-publish flow is visible on desktop ', async ( {
 			page,
 		} ) => {
-			const optionsButton = page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'buton', {
-					name: 'Options',
-				} );
+			await page.click(
+				'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
+			);
+			await page.click( 'role=menuitem[name="Preferences"i]' );
 
-			await optionsButton.click();
-
-			const preferencesButton = page.getByRole( 'menuitem', {
-				name: 'Preferences',
-			} );
-
-			await preferencesButton.click();
-
-			const prePublishToggle = page.getByRole( 'label', {
-				name: 'Enable pre-publish flow',
-			} );
+			const prePublishToggle = page.locator(
+				'role=label[name="Enable pre-publish flow"i]'
+			);
 
 			await expect( prePublishToggle ).toBeVisible();
 		} );
