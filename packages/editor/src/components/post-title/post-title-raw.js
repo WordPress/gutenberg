@@ -73,6 +73,7 @@ function PostTitleRaw( _, forwardedRef ) {
 			hideLabelFromVision={ true }
 			autoComplete="off"
 			dir="auto"
+			rows={ 1 }
 			__nextHasNoMarginBottom
 		/>
 	);

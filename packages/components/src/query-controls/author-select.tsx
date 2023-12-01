@@ -6,6 +6,7 @@ import TreeSelect from '../tree-select';
 import type { AuthorSelectProps } from './types';
 
 export default function AuthorSelect( {
+	__next40pxDefaultSize,
 	label,
 	noOptionLabel,
 	authorList,
@@ -28,6 +29,7 @@ export default function AuthorSelect( {
 					: undefined
 			}
 			__nextHasNoMarginBottom
+			__next40pxDefaultSize={ __next40pxDefaultSize }
 		/>
 	);
 }

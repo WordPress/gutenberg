@@ -8,14 +8,15 @@ import { symbol as icon } from '@wordpress/icons';
  */
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
-import edit from './edit';
+import editV1 from './v1/edit';
+import editV2 from './edit';
 
 const { name } = metadata;
 
 export { metadata, name };
 
 export const settings = {
-	edit,
+	edit: window.__experimentalPatternPartialSyncing ? editV2 : editV1,
 	icon,
 };
 

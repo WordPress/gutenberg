@@ -46,10 +46,14 @@ export interface Props extends TruncateProps {
 	isDestructive?: boolean;
 	/**
 	 * Escape characters in `highlightWords` which are meaningful in regular expressions.
+	 *
+	 * @default false
 	 */
 	highlightEscape?: boolean;
 	/**
 	 * Determines if `highlightWords` should be case sensitive.
+	 *
+	 * @default false
 	 */
 	highlightCaseSensitive?: boolean;
 	/**
@@ -57,7 +61,10 @@ export interface Props extends TruncateProps {
 	 */
 	highlightSanitize?: FindAllArgs[ 'sanitize' ];
 	/**
-	 * Sets `Text` to have `display: block`.
+	 * Sets `Text` to have `display: block`. Note: text truncation only works
+	 * when `isBlock` is `false`.
+	 *
+	 * @default false
 	 */
 	isBlock?: boolean;
 	/**
@@ -73,11 +80,15 @@ export interface Props extends TruncateProps {
 	 */
 	size?: CSSProperties[ 'fontSize' ] | TextSize;
 	/**
-	 * Enables text truncation. When `truncate` is set,we are able to truncate the long text in a variety of ways.
+	 * Enables text truncation. When `truncate` is set, we are able to truncate the long text in a variety of ways. Note: text truncation won't work if the `isBlock` property is set to `true`
+	 *
+	 * @default false
 	 */
 	truncate?: boolean;
 	/**
 	 * Uppercases the text content.
+	 *
+	 * @default false
 	 */
 	upperCase?: boolean;
 	/**
@@ -86,6 +97,8 @@ export interface Props extends TruncateProps {
 	variant?: TextVariant;
 	/**
 	 * Adjusts font-weight of the text.
+	 *
+	 * @default 'normal'
 	 */
 	weight?: CSSProperties[ 'fontWeight' ] | TextWeight;
 	/**
