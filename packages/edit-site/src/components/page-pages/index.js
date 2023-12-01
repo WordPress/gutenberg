@@ -12,7 +12,7 @@ import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { DataViews, VIEW_LAYOUTS } from '@wordpress/dataviews';
+import { DataViews } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -127,9 +127,9 @@ const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'tra
 export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
-	const [ selection, setSelection ] = useState( [] );
+	const [ previewItem, setPreview ] = useState();
 
-	const onClickPreviewField = ( item ) => setSelection( [ item.id ] );
+	const onClickPreviewField = ( item ) => setPreview( item.id );
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -322,17 +322,16 @@ export default function PagePages() {
 					onClickPreviewField={ onClickPreviewField }
 				/>
 			</Page>
-			{ VIEW_LAYOUTS.find( ( v ) => v.type === view.type )?.supports
-				?.preview && (
+			{ view.layout.previewField && (
 				<Page>
 					<div className="edit-site-page-pages-preview">
-						{ selection.length === 1 && (
+						{ previewItem && (
 							<SideEditor
-								postId={ selection[ 0 ] }
+								postId={ previewItem }
 								postType={ postType }
 							/>
 						) }
-						{ selection.length !== 1 && (
+						{ ! previewItem && (
 							<div
 								style={ {
 									display: 'flex',

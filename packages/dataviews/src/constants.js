@@ -29,26 +29,17 @@ export const VIEW_LAYOUTS = [
 		label: __( 'Table' ),
 		component: ViewTable,
 		icon: blockTable,
-		supports: {
-			preview: false,
-		},
 	},
 	{
 		type: LAYOUT_GRID,
 		label: __( 'Grid' ),
 		component: ViewGrid,
 		icon: category,
-		supports: {
-			preview: false,
-		},
 	},
 	{
 		type: LAYOUT_LIST,
 		label: __( 'List' ),
 		component: ViewList,
 		icon: drawerLeft,
-		supports: {
-			preview: true,
-		},
 	},
 ];
