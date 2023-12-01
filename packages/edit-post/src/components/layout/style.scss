@@ -99,9 +99,3 @@
 .edit-post-layout .entities-saved-states__panel-header {
 	height: $header-height + $border-width;
 }
-
-@media ( max-width: $break-medium ) {
-	.block-editor-block-contextual-toolbar.components-accessible-toolbar {
-		border-top: none;
-	}
-}
