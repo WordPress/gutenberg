@@ -101,9 +101,25 @@ const deepImmutable = < T extends Object = {} >( target: T ): T => {
 const scopeStack: Scope[] = [];
 const namespaceStack: string[] = [];
 
+/**
+ * Retrieves the context inherited by the element evaluating a function from the
+ * store. The returned value depends on the element and the namespace where the
+ * function calling `getContext()` exists.
+ *
+ * @param namespace Store namespace. By default, the namespace where the calling
+ *                  function exists is used.
+ * @return The context content.
+ */
 export const getContext = < T extends object >( namespace?: string ): T =>
 	getScope()?.context[ namespace || namespaceStack.slice( -1 )[ 0 ] ];
 
+/**
+ * Retrieves a representation of the element where a function from the store
+ * is being evalutated. Such representation is read-only, and contains a
+ * reference to the DOM element, its props and a local reactive state.
+ *
+ * @return Element representation.
+ */
 export const getElement = () => {
 	if ( ! getScope() ) {
 		throw Error(
