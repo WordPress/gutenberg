@@ -7,6 +7,7 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, createPortal } from '@wordpress/element';
 import {
 	BlockList,
+	BlockToolbar,
 	BlockTools,
 	BlockInspector,
 	privateApis as blockEditorPrivateApis,
@@ -38,6 +39,7 @@ export default function SidebarBlockEditor( {
 	inspector,
 } ) {
 	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
+	const isMediumViewport = useViewportMatch( 'small' );
 	const {
 		hasUploadPermissions,
 		isFixedToolbarActive,
@@ -78,7 +80,7 @@ export default function SidebarBlockEditor( {
 			...blockEditorSettings,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			mediaUpload: mediaUploadBlockEditor,
-			hasFixedToolbar: isFixedToolbarActive,
+			hasFixedToolbar: isFixedToolbarActive || ! isMediumViewport,
 			keepCaretInsideBlock,
 			__unstableHasCustomAppender: true,
 		};
@@ -86,11 +88,10 @@ export default function SidebarBlockEditor( {
 		hasUploadPermissions,
 		blockEditorSettings,
 		isFixedToolbarActive,
+		isMediumViewport,
 		keepCaretInsideBlock,
 		setIsInserterOpened,
 	] );
-
-	const isMediumViewport = useViewportMatch( 'small' );
 
 	if ( isWelcomeGuideActive ) {
 		return <WelcomeGuide sidebar={ sidebar } />;
@@ -116,14 +117,10 @@ export default function SidebarBlockEditor( {
 						isFixedToolbarActive || ! isMediumViewport
 					}
 				/>
-
-				<BlockTools
-					__experimentalBlockToolbarDisplay={
-						isFixedToolbarActive || ! isMediumViewport
-							? 'sticky'
-							: 'popover'
-					}
-				>
+				{ ( isFixedToolbarActive || ! isMediumViewport ) && (
+					<BlockToolbar />
+				) }
+				<BlockTools>
 					<BlockCanvas
 						shouldIframe={ false }
 						styles={ settings.defaultEditorStyles }
