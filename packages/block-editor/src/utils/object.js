@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { paramCase } from 'change-case';
-import memoize from 'memize';
 
 /**
  * Converts any string to kebab case.
@@ -65,8 +64,6 @@ export function setImmutably( object, path, value ) {
 	return object;
 }
 
-const stringToPath = memoize( ( path ) => path.split( '.' ) );
-
 /**
  * Helper util to return a value from a certain path of the object.
  * Path is specified as either:
@@ -80,9 +77,9 @@ const stringToPath = memoize( ( path ) => path.split( '.' ) );
  * @return {*} Value of the object property at the specified path.
  */
 export const getValueFromObjectPath = ( object, path, defaultValue ) => {
-	const normalizedPath = Array.isArray( path ) ? path : stringToPath( path );
+	const arrayPath = Array.isArray( path ) ? path : path.split( '.' );
 	let value = object;
-	normalizedPath.forEach( ( fieldName ) => {
+	arrayPath.forEach( ( fieldName ) => {
 		value = value?.[ fieldName ];
 	} );
 	return value ?? defaultValue;
