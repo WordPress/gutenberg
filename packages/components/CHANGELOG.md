@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 25.13.0 (2023-11-29)
+- `BorderControlDropdown`: Switches from appending state to the aria-label and adds an aria-describedBy attribute with hidden text (via display: none;, as the text will be read via focus on the button and doesn't need to announced otherwise ([#54469](https://github.com/WordPress/gutenberg/pull/54469)).
 
 ### Enhancements
 

@@ -46,8 +46,8 @@ const props = {
 	value: undefined,
 };
 
-const toggleLabelRegex = /Border color( and style)* picker/;
-const colorPickerRegex = /Border color picker/;
+const toggleLabelRegex = /The currently selected color has/;
+const colorPickerRegex = /The currently selected color is called/;
 
 describe( 'BorderBoxControl', () => {
 	describe( 'Linked view rendering', () => {
