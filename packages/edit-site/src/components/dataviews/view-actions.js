@@ -53,6 +53,8 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 				return (
 					<DropdownMenuItem
 						key={ availableView.type }
+						role="menuitemradio"
+						aria-checked={ availableView.id === view.type }
 						prefix={
 							availableView.type === view.type && (
 								<Icon icon={ check } />
@@ -66,8 +68,6 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 								type: availableView.type,
 							} );
 						} }
-						// TODO: check about role and a11y.
-						role="menuitemcheckbox"
 					>
 						{ availableView.label }
 					</DropdownMenuItem>
@@ -99,6 +99,8 @@ function PageSizeMenu( { view, onChangeView } ) {
 				return (
 					<DropdownMenuItem
 						key={ size }
+						role="menuitemradio"
+						aria-checked={ view.perPage === size }
 						prefix={
 							view.perPage === size && <Icon icon={ check } />
 						}
@@ -107,8 +109,6 @@ function PageSizeMenu( { view, onChangeView } ) {
 							event.preventDefault();
 							onChangeView( { ...view, perPage: size, page: 1 } );
 						} }
-						// TODO: check about role and a11y.
-						role="menuitemcheckbox"
 					>
 						{ size }
 					</DropdownMenuItem>
@@ -140,6 +140,7 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 				return (
 					<DropdownMenuItem
 						key={ field.id }
+						role="menuitemcheckbox"
 						prefix={
 							! view.hiddenFields?.includes( field.id ) && (
 								<Icon icon={ check } />
@@ -158,7 +159,6 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 									: [ ...view.hiddenFields, field.id ],
 							} );
 						} }
-						role="menuitemcheckbox"
 					>
 						{ field.header }
 					</DropdownMenuItem>
@@ -221,6 +221,8 @@ function SortMenu( { fields, view, onChangeView } ) {
 								return (
 									<DropdownMenuItem
 										key={ direction }
+										role="menuitemradio"
+										aria-checked={ isActive }
 										prefix={ <Icon icon={ info.icon } /> }
 										suffix={
 											isActive && <Icon icon={ check } />
