@@ -18,7 +18,7 @@ const { attributes: blockAttributes } = metadata;
 // In #41140 support was added to global styles for caption elements which added a `wp-element-caption` classname
 // to the embed figcaption element.
 const v2 = {
-	attributes: { ...blockAttributes },
+	attributes: blockAttributes,
 	save( { attributes } ) {
 		const { url, caption, type, providerNameSlug } = attributes;
 
@@ -46,7 +46,7 @@ const v2 = {
 };
 
 const v1 = {
-	attributes: { ...blockAttributes },
+	attributes: blockAttributes,
 	save( { attributes: { url, caption, type, providerNameSlug } } ) {
 		if ( ! url ) {
 			return null;

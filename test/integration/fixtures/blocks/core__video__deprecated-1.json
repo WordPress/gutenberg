@@ -1,7 +1,7 @@
 [
 	{
 		"name": "core/video",
-		"isValid": false,
+		"isValid": true,
 		"attributes": {
 			"autoplay": false,
 			"caption": "My video",
