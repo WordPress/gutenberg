@@ -42,8 +42,8 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import styles from './editor.scss';
-import EditTitle from './edit-title';
+import styles from '../editor.scss';
+import EditTitle from '../edit-title';
 
 export default function ReusableBlockEdit( {
 	attributes: { ref },
