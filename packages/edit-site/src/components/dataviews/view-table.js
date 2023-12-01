@@ -97,22 +97,15 @@ function HeaderMenu( { dataView, header } ) {
 									key={ direction }
 									value={ direction }
 									name="view-table-column-sorting"
-									// Note: there is currently a limitation from the DropdownMenu
-									// component where the radio won't unselect when all related
-									// radios are set to false.
 									checked={ sortedDirection === direction }
 									suffix={ <Icon icon={ info.icon } /> }
 									onChange={ () => {
-										if ( sortedDirection === direction ) {
-											dataView.resetSorting();
-										} else {
-											dataView.setSorting( [
-												{
-													id: header.column.id,
-													desc: direction === 'desc',
-												},
-											] );
-										}
+										dataView.setSorting( [
+											{
+												id: header.column.id,
+												desc: direction === 'desc',
+											},
+										] );
 									} }
 								>
 									{ info.label }

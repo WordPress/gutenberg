@@ -190,8 +190,8 @@ function SortMenu( { fields, view, onChangeView } ) {
 										suffix={ <Icon icon={ info.icon } /> }
 										// Note: there is currently a limitation from the DropdownMenu
 										// component where the radio won't unselect when all related
-										// radios are set to false.
-										checked={ isActive }
+										// radios are set to false.										
+										checked={ isChecked }
 										onChange={ ( event ) => {
 											event.preventDefault();
 											onChangeView( {
