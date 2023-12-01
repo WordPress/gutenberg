@@ -6,7 +6,7 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { PlainText } from '@wordpress/block-editor';
+import { RichText } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
@@ -47,11 +47,10 @@ export function CodeEdit( props ) {
 
 	return (
 		<View>
-			<PlainText
+			<RichText
 				value={ attributes.content }
 				identifier="content"
 				style={ codeStyle }
-				multiline={ true }
 				underlineColorAndroid="transparent"
 				onChange={ ( content ) => setAttributes( { content } ) }
 				onMerge={ mergeBlocks }
