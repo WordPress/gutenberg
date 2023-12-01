@@ -40,7 +40,9 @@ export default function WidgetAreasBlockEditorContent( {
 	return (
 		<div className="edit-widgets-block-editor">
 			<Notices />
-			{ ! isLargeViewport && <BlockToolbar /> }
+			{ ! isLargeViewport && (
+				<BlockToolbar hideDragHandle variant="unstyled" />
+			) }
 			<BlockTools>
 				<KeyboardShortcuts />
 				<EditorStyles
