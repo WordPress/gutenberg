@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __experimentalHStack as HStack } from '@wordpress/components';
+import { VIEW_LAYOUTS } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -15,7 +16,6 @@ import { __experimentalHStack as HStack } from '@wordpress/components';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { unlock } from '../../lock-unlock';
-import { VIEW_LAYOUTS } from '../dataviews';
 const { useLocation } = unlock( routerPrivateApis );
 
 export default function DataViewItem( {

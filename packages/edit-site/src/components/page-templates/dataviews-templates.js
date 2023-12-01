@@ -23,6 +23,13 @@ import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
+import {
+	DataViews,
+	ENUMERATION_TYPE,
+	OPERATOR_IN,
+	LAYOUT_GRID,
+	LAYOUT_TABLE,
+} from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -31,13 +38,6 @@ import Page from '../page';
 import Link from '../routes/link';
 import { useAddedBy, AvatarImage } from '../list/added-by';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
-import {
-	DataViews,
-	ENUMERATION_TYPE,
-	OPERATOR_IN,
-	LAYOUT_GRID,
-	LAYOUT_TABLE,
-} from '../dataviews';
 import {
 	useResetTemplateAction,
 	deleteTemplateAction,
