@@ -10,13 +10,13 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ViewList from './view-list';
 import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
-import { ViewGrid } from './view-grid';
-import { ViewSideBySide } from './view-side-by-side';
+import ViewList from './view-list';
+import ViewGrid from './view-grid';
+import ViewSideBySide from './view-side-by-side';
 
 // To do: convert to view type registry.
 export const viewTypeSupportsMap = {
@@ -71,14 +71,12 @@ export default function DataViews( {
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
-					<HStack justify="end" expanded={ false }>
-						<ViewActions
-							fields={ fields }
-							view={ view }
-							onChangeView={ onChangeView }
-							supportedLayouts={ supportedLayouts }
-						/>
-					</HStack>
+					<ViewActions
+						fields={ fields }
+						view={ view }
+						onChangeView={ onChangeView }
+						supportedLayouts={ supportedLayouts }
+					/>
 				</HStack>
 				<ViewComponent
 					fields={ _fields }

@@ -13,6 +13,7 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { mergeOrigins, hasMergedOrigins } from '../use-settings';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
@@ -51,25 +52,14 @@ export function useHasTypographyPanel( settings ) {
 }
 
 function useHasFontSizeControl( settings ) {
-	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
-	const fontSizes = []
-		.concat( fontSizesPerOrigin?.custom ?? [] )
-		.concat( fontSizesPerOrigin?.theme ?? [] )
-		.concat( fontSizesPerOrigin.default ?? [] );
-	return !! fontSizes?.length || ! disableCustomFontSizes;
+	return (
+		hasMergedOrigins( settings?.typography?.fontSizes ) ||
+		settings?.typography?.customFontSize
+	);
 }
 
 function useHasFontFamilyControl( settings ) {
-	const fontFamiliesPerOrigin = settings?.typography?.fontFamilies;
-	const fontFamilies = []
-		.concat( fontFamiliesPerOrigin?.custom ?? [] )
-		.concat( fontFamiliesPerOrigin?.theme ?? [] )
-		.concat( fontFamiliesPerOrigin?.default ?? [] )
-		.sort( ( a, b ) =>
-			( a?.name || a?.slug )?.localeCompare( b?.name || a?.slug )
-		);
-	return !! fontFamilies?.length;
+	return hasMergedOrigins( settings?.typography?.fontFamilies );
 }
 
 function useHasLineHeightControl( settings ) {
@@ -77,18 +67,14 @@ function useHasLineHeightControl( settings ) {
 }
 
 function useHasAppearanceControl( settings ) {
-	const hasFontStyles = settings?.typography?.fontStyle;
-	const hasFontWeights = settings?.typography?.fontWeight;
-	return hasFontStyles || hasFontWeights;
+	return settings?.typography?.fontStyle || settings?.typography?.fontWeight;
 }
 
 function useAppearanceControlLabel( settings ) {
-	const hasFontStyles = settings?.typography?.fontStyle;
-	const hasFontWeights = settings?.typography?.fontWeight;
-	if ( ! hasFontStyles ) {
+	if ( ! settings?.typography?.fontStyle ) {
 		return __( 'Font weight' );
 	}
-	if ( ! hasFontWeights ) {
+	if ( ! settings?.typography?.fontWeight ) {
 		return __( 'Font style' );
 	}
 	return __( 'Appearance' );
@@ -115,18 +101,15 @@ function useHasTextColumnsControl( settings ) {
 }
 
 function getUniqueFontSizesBySlug( settings ) {
-	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
-	const fontSizes = []
-		.concat( fontSizesPerOrigin?.custom ?? [] )
-		.concat( fontSizesPerOrigin?.theme ?? [] )
-		.concat( fontSizesPerOrigin.default ?? [] );
-
-	return fontSizes.reduce( ( acc, currentSize ) => {
-		if ( ! acc.some( ( { slug } ) => slug === currentSize.slug ) ) {
-			acc.push( currentSize );
+	const fontSizes = settings?.typography?.fontSizes;
+	const mergedFontSizes = fontSizes ? mergeOrigins( fontSizes ) : [];
+	const uniqueSizes = [];
+	for ( const currentSize of mergedFontSizes ) {
+		if ( ! uniqueSizes.some( ( { slug } ) => slug === currentSize.slug ) ) {
+			uniqueSizes.push( currentSize );
 		}
-		return acc;
-	}, [] );
+	}
+	return uniqueSizes;
 }
 
 function TypographyToolsPanel( {
@@ -178,14 +161,11 @@ export default function TypographyPanel( {
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
-	const fontFamiliesPerOrigin = settings?.typography?.fontFamilies;
-	const fontFamilies = []
-		.concat( fontFamiliesPerOrigin?.custom ?? [] )
-		.concat( fontFamiliesPerOrigin?.theme ?? [] )
-		.concat( fontFamiliesPerOrigin?.default ?? [] );
+	const fontFamilies = settings?.typography?.fontFamilies;
+	const mergedFontFamilies = fontFamilies ? mergeOrigins( fontFamilies ) : [];
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
-		const slug = fontFamilies?.find(
+		const slug = mergedFontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
 		)?.slug;
 		onChange(
@@ -204,7 +184,7 @@ export default function TypographyPanel( {
 	// Font Size
 	const hasFontSizeEnabled = useHasFontSizeControl( settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-	const fontSizes = getUniqueFontSizesBySlug( settings );
+	const mergedFontSizes = getUniqueFontSizesBySlug( settings );
 
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {
@@ -368,7 +348,7 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				>
 					<FontFamilyControl
-						fontFamilies={ fontFamilies }
+						fontFamilies={ mergedFontFamilies }
 						value={ fontFamily }
 						onChange={ setFontFamily }
 						size="__unstable-large"
@@ -387,7 +367,7 @@ export default function TypographyPanel( {
 					<FontSizePicker
 						value={ fontSize }
 						onChange={ setFontSize }
-						fontSizes={ fontSizes }
+						fontSizes={ mergedFontSizes }
 						disableCustomFontSizes={ disableCustomFontSizes }
 						withReset={ false }
 						withSlider

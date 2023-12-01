@@ -5,7 +5,9 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+gutenberg_enqueue_module( 'directive-body-view' );
 ?>
+
 <div
 	data-wp-interactive='{ "namespace":"directive-body" }'
 	data-wp-context='{"text":"text-1"}'

@@ -37,6 +37,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 	$lightbox_settings = block_core_image_get_lightbox_settings( $block->parsed_block );
 
+	$is_gutenberg_plugin = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
 	$view_js_file_handle = 'wp-block-image-view';
 	$script_handles      = $block->block_type->view_script_handles;
 
@@ -50,9 +51,11 @@ function render_block_core_image( $attributes, $content, $block ) {
 		isset( $lightbox_settings['enabled'] ) &&
 		true === $lightbox_settings['enabled']
 	) {
-		$block->block_type->supports['interactivity'] = true;
-
-		if ( ! in_array( $view_js_file_handle, $script_handles, true ) ) {
+		if ( $is_gutenberg_plugin ) {
+			gutenberg_enqueue_module( '@wordpress/block-library/image' );
+			// Remove the view script because we are using the module.
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file_handle ) );
+		} elseif ( ! in_array( $view_js_file_handle, $script_handles, true ) ) {
 			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file_handle ) );
 		}
 
@@ -71,6 +74,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 		 * other Image blocks.
 		 */
 		remove_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15 );
+
 		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
 		if ( in_array( $view_js_file_handle, $script_handles, true ) ) {
 			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file_handle ) );
@@ -358,5 +362,14 @@ function register_block_core_image() {
 			'render_callback' => 'render_block_core_image',
 		)
 	);
+
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		gutenberg_register_module(
+			'@wordpress/block-library/image',
+			gutenberg_url( '/build/interactivity/image.min.js' ),
+			array( '@wordpress/interactivity' ),
+			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+		);
+	}
 }
 add_action( 'init', 'register_block_core_image' );

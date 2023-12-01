@@ -5,7 +5,9 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+gutenberg_enqueue_module( 'tovdom-islands-view' );
 ?>
+
 <div>
 	<div data-wp-show-mock="state.falseValue">
 		<span data-testid="not inside an island">

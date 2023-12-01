@@ -63,19 +63,28 @@ function render_block_core_query( $attributes, $content, $block ) {
 		}
 	}
 
-	$view_asset = 'wp-block-query-view';
-	if ( ! wp_script_is( $view_asset ) ) {
-		$script_handles = $block->block_type->view_script_handles;
-		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if (
-			( ! $attributes['enhancedPagination'] || ! isset( $attributes['queryId'] ) )
-			&& in_array( $view_asset, $script_handles, true )
-		) {
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
+	$is_gutenberg_plugin     = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
+	$should_load_view_script = $attributes['enhancedPagination'] && isset( $attributes['queryId'] );
+	$view_asset              = 'wp-block-query-view';
+	$script_handles          = $block->block_type->view_script_handles;
+
+	if ( $is_gutenberg_plugin ) {
+		if ( $should_load_view_script ) {
+			gutenberg_enqueue_module( '@wordpress/block-library/query' );
 		}
-		// If the script is needed, but it was previously removed, add it again.
-		if ( $attributes['enhancedPagination'] && isset( $attributes['queryId'] ) && ! in_array( $view_asset, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_asset ) );
+		// Remove the view script because we are using the module.
+		$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
+	} else {
+		if ( ! wp_script_is( $view_asset ) ) {
+			// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+			if ( ! $should_load_view_script && in_array( $view_asset, $script_handles, true )
+			) {
+				$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
+			}
+			// If the script is needed, but it was previously removed, add it again.
+			if ( $should_load_view_script && ! in_array( $view_asset, $script_handles, true ) ) {
+				$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_asset ) );
+			}
 		}
 	}
 
@@ -127,6 +136,15 @@ function register_block_core_query() {
 			'render_callback' => 'render_block_core_query',
 		)
 	);
+
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		gutenberg_register_module(
+			'@wordpress/block-library/query',
+			'/wp-content/plugins/gutenberg/build/interactivity/query.min.js',
+			array( '@wordpress/interactivity' ),
+			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+		);
+	}
 }
 add_action( 'init', 'register_block_core_query' );
 
