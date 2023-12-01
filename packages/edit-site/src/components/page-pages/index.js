@@ -48,6 +48,9 @@ const defaultConfigPerViewType = {
 		mediaField: 'featured-image',
 		primaryField: 'title',
 	},
+	[ LAYOUT_LIST ]: {
+		previewField: 'title',
+	},
 };
 
 function useView( type ) {
@@ -125,6 +128,8 @@ export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
 	const [ selection, setSelection ] = useState( [] );
+
+	const onClickPreviewField = ( item ) => setSelection( [ item.id ] );
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -205,7 +210,7 @@ export default function PagePages() {
 				header: __( 'Title' ),
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered || item.slug,
-				render: ( { item, view: { type } } ) => {
+				render: ( { item } ) => {
 					return (
 						<VStack spacing={ 1 }>
 							<Heading as="h3" level={ 5 }>
@@ -214,16 +219,6 @@ export default function PagePages() {
 										postId: item.id,
 										postType: item.type,
 										canvas: 'edit',
-									} }
-									onClick={ ( event ) => {
-										if (
-											VIEW_LAYOUTS.find(
-												( v ) => v.type === type
-											)?.supports?.preview
-										) {
-											event.preventDefault();
-											setSelection( [ item.id ] );
-										}
 									} }
 								>
 									{ decodeEntities(
@@ -324,6 +319,7 @@ export default function PagePages() {
 					isLoading={ isLoadingPages || isLoadingAuthors }
 					view={ view }
 					onChangeView={ onChangeView }
+					onClickPreviewField={ onClickPreviewField }
 				/>
 			</Page>
 			{ VIEW_LAYOUTS.find( ( v ) => v.type === view.type )?.supports
