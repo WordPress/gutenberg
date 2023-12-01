@@ -22,6 +22,7 @@ npm install @wordpress/dataviews --save
 	fields={ fields }
 	actions={ [ trashPostAction ] }
 	paginationInfo={ { totalItems, totalPages } }
+	onClickPreviewField={ ( item ) => { /* handle preview */ } }
 />
 ```
 
@@ -77,6 +78,7 @@ Example:
 -   `layout`: config that is specific to a particular layout type.
     -   `mediaField`: used by the `grid` layout. The `id` of the field to be used for rendering each card's media.
     -   `primaryField`: used by the `grid` layout. The `id` of the field to be used for rendering each card's title.
+    -   `previewField`: used by the `list` layout. The `id` of the field to be used for triggering the preview.
 
 ### View <=> data
 
