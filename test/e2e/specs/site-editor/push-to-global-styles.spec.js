@@ -53,6 +53,16 @@ test.describe( 'Push to Global Styles button', () => {
 			} )
 		).toBeDisabled();
 
+		// Enable letter case.
+		const typographyOptions = page.getByRole( 'button', {
+			name: 'Typography options',
+		} );
+		await typographyOptions.click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Letter case' } )
+			.click();
+		await typographyOptions.click();
+
 		// Make the Heading block uppercase
 		await page.getByRole( 'button', { name: 'Uppercase' } ).click();
 
