@@ -188,8 +188,21 @@ For example, a button block, deeply nested in several levels of block `X` that u
 
 ### `defaultBlock`
 
-- **Type:** `Array`
-- **Default:** - `undefined`. Determines which block type should be inserted by default and any attributes that should be set by default when the block is inserted. Takes an array in the form of `[ blockname, {blockAttributes} ]`.
+- **Type:** `Object`
+- **Default:** - `undefined`. Determines which block type should be inserted by default and any attributes that should be set by default when the block is inserted. Takes an array in the form of `{ name: 'namespace/block-name', attributes: {} }`.
+
+#### Example usage
+
+```jsx
+// Define a specific block and it's attributes as the default block for initialh insertion
+<InnerBlocks
+	defaultBlock={{name: 'core/paragraph', attributes: {placeholder: 'Hello World!'}}}
+	directInsert={true}
+/>
+```
+
+![defaultBlock-api-example](https://github.com/WordPress/gutenberg/assets/180264/fceaf2bb-a412-4a4b-8031-c431dbe8bb36)
+
 
 ### `directInsert`
 
