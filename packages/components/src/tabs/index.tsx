@@ -47,13 +47,6 @@ function Tabs( {
 	const { items, selectedId } = store.useState();
 	const { setSelectedId, move } = store;
 
-	const tabsRef = useRef< HTMLDivElement >( null );
-	const tabsHasFocus =
-		!! tabsRef.current?.ownerDocument.activeElement &&
-		items
-			.map( ( item ) => item.id )
-			.includes( tabsRef.current?.ownerDocument.activeElement.id );
-
 	// Keep track of whether tabs have been populated. This is used to prevent
 	// certain effects from firing too early while tab data and relevant
 	// variables are undefined during the initial render.
@@ -167,14 +160,20 @@ function Tabs( {
 		if ( ! isControlled || ! selectOnMove ) {
 			return;
 		}
+		const currentItem = items.find( ( item ) => item.id === selectedId );
+		const activeElement = currentItem?.element?.ownerDocument.activeElement;
+		const tabsHasFocus = items.some( ( item ) => {
+			return activeElement && activeElement === item.element;
+		} );
 
 		if (
+			activeElement &&
 			tabsHasFocus &&
-			selectedId !== tabsRef.current?.ownerDocument.activeElement.id
+			selectedId !== activeElement.id
 		) {
 			move( selectedId );
 		}
-	}, [ isControlled, move, selectOnMove, selectedId, tabsHasFocus ] );
+	}, [ isControlled, items, move, selectOnMove, selectedId ] );
 
 	const contextValue = useMemo(
 		() => ( {
@@ -185,11 +184,9 @@ function Tabs( {
 	);
 
 	return (
-		<div ref={ tabsRef }>
-			<TabsContext.Provider value={ contextValue }>
-				{ children }
-			</TabsContext.Provider>
-		</div>
+		<TabsContext.Provider value={ contextValue }>
+			{ children }
+		</TabsContext.Provider>
 	);
 }
 
