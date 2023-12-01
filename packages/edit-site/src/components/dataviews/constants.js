@@ -20,7 +20,7 @@ export const OPERATOR_IN = 'in';
 // View layouts.
 export const LAYOUT_TABLE = 'table';
 export const LAYOUT_GRID = 'grid';
-export const LAYOUT_SIDE_BY_SIDE = 'side-by-side';
+export const LAYOUT_LIST = 'list';
 
 export const VIEW_LAYOUTS = [
 	{
@@ -42,8 +42,8 @@ export const VIEW_LAYOUTS = [
 		},
 	},
 	{
-		type: LAYOUT_SIDE_BY_SIDE,
-		label: __( 'Side by side' ),
+		type: LAYOUT_LIST,
+		label: __( 'List' ),
 		component: ViewSideBySide,
 		icon: drawerLeft,
 		supports: {
