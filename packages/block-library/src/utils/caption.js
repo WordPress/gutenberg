@@ -31,8 +31,8 @@ export function Caption( {
 } ) {
 	const caption = attributes[ key ];
 	const prevCaption = usePrevious( caption );
-	const isCaptionEmpty = ! caption?.length;
-	const isPrevCaptionEmpty = ! prevCaption?.length;
+	const isCaptionEmpty = RichText.isEmpty( caption );
+	const isPrevCaptionEmpty = RichText.isEmpty( prevCaption );
 	const [ showCaption, setShowCaption ] = useState( ! isCaptionEmpty );
 
 	// We need to show the caption when changes come from
