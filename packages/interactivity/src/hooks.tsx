@@ -154,7 +154,7 @@ const directivePriorities: Record< string, number > = {};
  *
  * The previous code registers a custom directive type for displaying an alert
  * message whenever an element using it is clicked. The message text is obtained
- * from the store using `evaluate`.
+ * from the store under the inherited namespace, using `evaluate`.
  *
  * When the HTML is processed by the Interactivity API, any element containing
  * the `data-wp-alert` directive will have the `onclick` event handler, e.g.,
@@ -164,10 +164,10 @@ const directivePriorities: Record< string, number > = {};
  *   <button data-wp-alert="state.alert">Click me!</button>
  * </div>
  * ```
- * Note that, in the previous example, you access `alert.default` in order to
- * retrieve the `state.alert` value passed to the directive. You can
- * also define custom names by appending `--` to the directive attribute,
- * followed by a suffix, like in the following HTML snippet:
+ * Note that, in the previous example, the directive callback gets the path
+ * value (`state.alert`) from the directive entry with suffix `default`. A
+ * custom suffix can also be specified by appending `--` to the directive
+ * attribute, followed by the suffix, like in the following HTML snippet:
  *
  * ```html
  * <div data-wp-interactive='{ "namespace": "myblock" }'>
@@ -185,19 +185,21 @@ const directivePriorities: Record< string, number > = {};
  * ```js
  * directive(
  *   'color', // Name without prefix and suffix.
- *   ( { directives: { color }, ref, evaluate }) => {
- *     if ( color.text ) {
- *       ref.style.setProperty(
- *         'color',
- *         evaluate( color.text )
- *       );
- *     }
- *     if ( color.background ) {
- *       ref.style.setProperty(
- *         'background-color',
- *         evaluate( color.background )
- *       );
- *     }
+ *   ( { directives: { color }, ref, evaluate } ) =>
+ *     colors.forEach( ( color ) => {
+ *       if ( color.suffix = 'text' ) {
+ *         ref.style.setProperty(
+ *           'color',
+ *           evaluate( color.text )
+ *         );
+ *       }
+ *       if ( color.suffix = 'background' ) {
+ *         ref.style.setProperty(
+ *           'background-color',
+ *           evaluate( color.background )
+ *         );
+ *       }
+ *     } );
  *   }
  * )
  * ```
