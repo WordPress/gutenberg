@@ -155,10 +155,10 @@ function ParagraphBlock( {
 				onRemove={ onRemove }
 				aria-label={
 					RichText.isEmpty( content )
-						? __( 'Block: Paragraph' )
-						: __(
+						? __(
 								'Empty block; start writing or type forward slash to choose a block'
 						  )
+						: __( 'Block: Paragraph' )
 				}
 				data-empty={ RichText.isEmpty( content ) }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }
