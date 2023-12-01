@@ -8,36 +8,38 @@ import styled from '@emotion/styled';
  */
 import { Flex } from '../../flex';
 import BaseUnitControl from '../../unit-control';
+import BoxControlIcon from '../icon';
+import { HStack } from '../../h-stack';
+import RangeControl from '../../range-control';
 import { rtl } from '../../utils';
+import { space } from '../../utils/space';
 import type { BoxUnitControlProps } from '../types';
 
 export const Root = styled.div`
 	box-sizing: border-box;
-	padding-bottom: 12px;
 	width: 100%;
-`;
-
-export const Header = styled( Flex )`
-	margin-bottom: 8px;
-`;
-
-export const AllInputControlWrapper = styled( Flex )`
-	min-height: 30px;
 `;
 
 export const UnitControlWrapper = styled.div`
 	box-sizing: border-box;
-	max-width: 80px;
+	flex: 1;
 `;
 
-export const LayoutContainer = styled( Flex )`
-	justify-content: center;
-	padding-top: 8px;
+export const ButtonWrapper = styled( HStack )`
+	margin-bottom: ${ space( 2 ) };
+`;
+
+export const FlexedBoxControlIcon = styled( BoxControlIcon )`
+	flex: 0 0 auto;
 `;
 
 export const Layout = styled( Flex )`
 	width: 100%;
 	justify-content: flex-start;
+`;
+
+export const FlexedRangeControl = styled( RangeControl )`
+	flex: 1;
 `;
 
 const unitControlBorderRadiusStyles = ( {
@@ -60,16 +62,6 @@ const unitControlBorderRadiusStyles = ( {
 	} );
 };
 
-const unitControlMarginStyles = ( {
-	isFirst,
-	isOnly,
-}: Pick< BoxUnitControlProps, 'isFirst' | 'isOnly' > ) => {
-	const marginLeft = isFirst || isOnly ? 0 : -1;
-
-	return rtl( { marginLeft } )();
-};
-
 export const UnitControl = styled( BaseUnitControl )`
 	${ unitControlBorderRadiusStyles };
-	${ unitControlMarginStyles };
 `;

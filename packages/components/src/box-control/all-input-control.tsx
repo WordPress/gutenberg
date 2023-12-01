@@ -1,10 +1,9 @@
 /**
  * Internal dependencies
  */
-import { FlexBlock, FlexItem } from '../flex';
-import RangeControl from '../range-control';
 import type { UnitControlProps } from '../unit-control/types';
-import { Layout } from './styles/box-control-styles';
+import { FlexedRangeControl } from './styles/box-control-styles';
+import { HStack } from '../h-stack';
 import type { BoxControlInputControlProps } from './types';
 import UnitControl from './unit-control';
 import {
@@ -78,33 +77,30 @@ export default function AllInputControl( {
 	};
 
 	return (
-		<Layout>
-			<FlexItem>
-				<UnitControl
-					{ ...props }
-					disableUnits={ isMixed }
-					isOnly
-					value={ allValue }
-					onChange={ handleOnChange }
-					onUnitChange={ handleOnUnitChange }
-					onFocus={ handleOnFocus }
-					onHoverOn={ handleOnHoverOn }
-					onHoverOff={ handleOnHoverOff }
-					placeholder={ allPlaceholder }
-				/>
-			</FlexItem>
-			<FlexBlock>
-				<RangeControl
-					__nextHasNoMarginBottom
-					hideLabelFromVision
-					initialPosition={ 0 }
-					onChange={ ( newValue ) => {
-						createSliderOnChange?.( newValue );
-					} }
-					value={ Number( allValue ) }
-					withInputField={ false }
-				/>
-			</FlexBlock>
-		</Layout>
+		<HStack>
+			<UnitControl
+				{ ...props }
+				disableUnits={ isMixed }
+				isOnly
+				value={ allValue }
+				onChange={ handleOnChange }
+				onUnitChange={ handleOnUnitChange }
+				onFocus={ handleOnFocus }
+				onHoverOn={ handleOnHoverOn }
+				onHoverOff={ handleOnHoverOff }
+				placeholder={ allPlaceholder }
+			/>
+
+			<FlexedRangeControl
+				__nextHasNoMarginBottom
+				hideLabelFromVision
+				initialPosition={ 0 }
+				onChange={ ( newValue ) => {
+					createSliderOnChange?.( newValue );
+				} }
+				value={ Number( allValue ) }
+				withInputField={ false }
+			/>
+		</HStack>
 	);
 }

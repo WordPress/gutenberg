@@ -10,17 +10,17 @@ import { __ } from '@wordpress/i18n';
  */
 import { BaseControl } from '../base-control';
 import Button from '../button';
-import { FlexItem, FlexBlock } from '../flex';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import AxialInputControls from './axial-input-controls';
-import BoxControlIcon from './icon';
 import LinkedButton from './linked-button';
 import {
 	Root,
-	Header,
-	AllInputControlWrapper,
+	FlexedBoxControlIcon,
+	ButtonWrapper,
 } from './styles/box-control-styles';
+import { HStack } from '../h-stack';
+import { Spacer } from '../spacer';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
 	DEFAULT_VALUES,
@@ -156,50 +156,42 @@ function BoxControl( {
 
 	return (
 		<Root id={ id } role="group" aria-labelledby={ headingId }>
-			<Header className="component-box-control__header">
-				<FlexBlock>
-					<BaseControl.VisualLabel id={ headingId }>
-						{ label }
-					</BaseControl.VisualLabel>
-				</FlexBlock>
-				{ allowReset && (
-					<FlexItem>
-						<Button
-							className="component-box-control__reset-button"
-							variant="secondary"
-							size="small"
-							onClick={ handleOnReset }
-							disabled={ ! isDirty }
-						>
-							{ __( 'Reset' ) }
-						</Button>
-					</FlexItem>
+			<HStack className="component-box-control__header" justify="start">
+				<BaseControl.VisualLabel id={ headingId }>
+					{ label }
+				</BaseControl.VisualLabel>
+				{ ( allowReset || ! hasOneSide ) && (
+					<ButtonWrapper justify="end">
+						{ allowReset && (
+							<Button
+								className="component-box-control__reset-button"
+								variant="secondary"
+								size="small"
+								onClick={ handleOnReset }
+								disabled={ ! isDirty }
+							>
+								{ __( 'Reset' ) }
+							</Button>
+						) }
+						{ ! hasOneSide && (
+							<LinkedButton
+								onClick={ toggleLinked }
+								isLinked={ isLinked }
+							/>
+						) }
+					</ButtonWrapper>
 				) }
-				{ ! hasOneSide && (
-					<FlexItem>
-						<LinkedButton
-							onClick={ toggleLinked }
-							isLinked={ isLinked }
-						/>
-					</FlexItem>
-				) }
-			</Header>
+			</HStack>
+			<Spacer />
 			{ isLinked && (
-				<AllInputControlWrapper
-					className="component-box-control__header-control-wrapper"
-					gap={ 0 }
-					justify="flex-end"
-				>
-					<FlexItem>
-						<BoxControlIcon side={ side } sides={ sides } />
-					</FlexItem>
-					<FlexBlock>
-						<AllInputControl
-							aria-label={ label }
-							{ ...inputControlProps }
-						/>
-					</FlexBlock>
-				</AllInputControlWrapper>
+				<HStack>
+					<FlexedBoxControlIcon side={ side } sides={ sides } />
+
+					<AllInputControl
+						aria-label={ label }
+						{ ...inputControlProps }
+					/>
+				</HStack>
 			) }
 			{ ! isLinked && splitOnAxis && (
 				<AxialInputControls { ...inputControlProps } />

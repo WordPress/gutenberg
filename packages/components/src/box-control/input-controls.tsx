@@ -4,12 +4,14 @@
 import UnitControl from './unit-control';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import { ALL_SIDES, LABELS } from './utils';
-import { FlexBlock, FlexItem } from '../flex';
-import { LayoutContainer, Layout } from './styles/box-control-styles';
+import {
+	FlexedBoxControlIcon,
+	FlexedRangeControl,
+} from './styles/box-control-styles';
+import { HStack } from '../h-stack';
+import { VStack } from '../v-stack';
 import type { BoxControlInputControlProps, BoxControlValue } from './types';
 import type { UnitControlProps } from '../unit-control/types';
-import BoxControlIcon from './icon';
-import RangeControl from '../range-control';
 
 const noop = () => {};
 
@@ -107,70 +109,50 @@ export default function BoxInputControls( {
 	const only = first === last && first;
 
 	return (
-		<LayoutContainer className="component-box-control__input-controls-wrapper">
-			<Layout
-				gap={ 0 }
-				align="top"
-				className="component-box-control__input-controls"
-				direction="column"
-			>
-				{ filteredSides.map( ( side ) => {
-					const [ parsedQuantity, parsedUnit ] =
-						parseQuantityAndUnitFromRawValue( values[ side ] );
+		<VStack className="component-box-control__input-controls" spacing={ 0 }>
+			{ filteredSides.map( ( side ) => {
+				const [ parsedQuantity, parsedUnit ] =
+					parseQuantityAndUnitFromRawValue( values[ side ] );
 
-					const computedUnit = values[ side ]
-						? parsedUnit
-						: selectedUnits[ side ];
+				const computedUnit = values[ side ]
+					? parsedUnit
+					: selectedUnits[ side ];
 
-					return (
-						<Layout key={ `box-control-${ side }` }>
-							<FlexItem>
-								<BoxControlIcon side={ side } sides={ sides } />
-							</FlexItem>
-							<FlexItem>
-								<UnitControl
-									{ ...props }
-									isFirst={ first === side }
-									isLast={ last === side }
-									isOnly={ only === side }
-									value={ [
-										parsedQuantity,
-										computedUnit,
-									].join( '' ) }
-									onChange={ createHandleOnChange( side ) }
-									onUnitChange={ createHandleOnUnitChange(
-										side
-									) }
-									onFocus={ createHandleOnFocus( side ) }
-									onHoverOn={ createHandleOnHoverOn( side ) }
-									onHoverOff={ createHandleOnHoverOff(
-										side
-									) }
-									label={ LABELS[ side ] }
-									__next40pxDefaultSize
-								/>
-							</FlexItem>
-							<FlexBlock>
-								<RangeControl
-									__nextHasNoMarginBottom
-									hideLabelFromVision
-									initialPosition={ 0 }
-									onChange={ ( newValue ) => {
-										createSliderOnChange?.(
-											side,
-											[ newValue, computedUnit ].join(
-												''
-											)
-										);
-									} }
-									value={ parsedQuantity }
-									withInputField={ false }
-								/>
-							</FlexBlock>
-						</Layout>
-					);
-				} ) }
-			</Layout>
-		</LayoutContainer>
+				return (
+					<HStack key={ `box-control-${ side }` } expanded>
+						<FlexedBoxControlIcon side={ side } sides={ sides } />
+						<UnitControl
+							{ ...props }
+							isFirst={ first === side }
+							isLast={ last === side }
+							isOnly={ only === side }
+							value={ [ parsedQuantity, computedUnit ].join(
+								''
+							) }
+							onChange={ createHandleOnChange( side ) }
+							onUnitChange={ createHandleOnUnitChange( side ) }
+							onFocus={ createHandleOnFocus( side ) }
+							onHoverOn={ createHandleOnHoverOn( side ) }
+							onHoverOff={ createHandleOnHoverOff( side ) }
+							label={ LABELS[ side ] }
+						/>
+
+						<FlexedRangeControl
+							__nextHasNoMarginBottom
+							hideLabelFromVision
+							initialPosition={ 0 }
+							onChange={ ( newValue ) => {
+								createSliderOnChange?.(
+									side,
+									[ newValue, computedUnit ].join( '' )
+								);
+							} }
+							value={ parsedQuantity }
+							withInputField={ false }
+						/>
+					</HStack>
+				);
+			} ) }
+		</VStack>
 	);
 }
