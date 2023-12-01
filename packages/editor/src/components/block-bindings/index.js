@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { BlockControls } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	updateBlockBindingsAttribute,
+} from '@wordpress/block-editor';
 import { Button, MenuItem, MenuGroup, Popover } from '@wordpress/components';
 import {
 	plugins as pluginsIcon,
@@ -107,16 +110,18 @@ export default function BlockBindingsButton( props ) {
 					}
 
 					const { currentAttribute } = props;
+					// Modify the attribute we are binding.
 					const newAttributes = {};
 					newAttributes[ currentAttribute ] = '';
-					const metadataAttribute = props.attributes.metadata;
-					const bindingsArray =
-						props.attributes.metadata.bindings.filter(
-							( item ) => item.attribute !== currentAttribute
-						);
-					metadataAttribute.bindings = bindingsArray;
-					newAttributes.metadata = metadataAttribute;
 					setAttributes( newAttributes );
+
+					// Update the bindings property.
+					updateBlockBindingsAttribute(
+						props.attributes,
+						setAttributes,
+						currentAttribute,
+						null
+					);
 				} }
 			>
 				Remove binding
@@ -142,6 +147,7 @@ export default function BlockBindingsButton( props ) {
 	);
 }
 
+// TODO: Review if this is needed for other sources or just the metadata.
 if ( window.__experimentalConnections ) {
 	addFilter(
 		'blocks.registerBlockType',
