@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import ViewList from './view-list';
+import ViewTable from './view-table';
 
 export default function ViewSideBySide( props ) {
 	// To do: change to email-like preview list.
-	return <ViewList { ...props } />;
+	return <ViewTable { ...props } />;
 }

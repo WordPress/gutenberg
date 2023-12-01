@@ -7,7 +7,7 @@ import { blockTable, category, drawerLeft } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import ViewList from './view-list';
+import ViewTable from './view-table';
 import ViewGrid from './view-grid';
 import ViewSideBySide from './view-side-by-side';
 
@@ -26,7 +26,7 @@ export const VIEW_LAYOUTS = [
 	{
 		type: LAYOUT_TABLE,
 		label: __( 'Table' ),
-		component: ViewList,
+		component: ViewTable,
 		icon: blockTable,
 		supports: {
 			preview: false,

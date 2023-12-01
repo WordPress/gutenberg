@@ -229,7 +229,7 @@ function WithSeparators( { children } ) {
 		) );
 }
 
-function ViewList( {
+function ViewTable( {
 	view,
 	onChangeView,
 	fields,
@@ -509,4 +509,4 @@ function ViewList( {
 	);
 }
 
-export default ViewList;
+export default ViewTable;
