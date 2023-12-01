@@ -100,14 +100,17 @@ if ( $gutenberg_experiments && (
 		// Allowlist of blocks that support block connections.
 		// Currently, we only allow the following blocks and attributes:
 		// - Paragraph: content.
+		// - Heading: content.
+		// - Button: text.
 		// - Image: url.
 		$blocks_attributes_allowlist = array(
 			'core/paragraph' => array( 'content' ),
+			'core/heading'   => array( 'content' ),
+			'core/button'    => array( 'text' ),
 			'core/image'     => array( 'url' ),
 		);
 
 		// Whitelist of the block types that support block connections.
-		// Currently, we only allow the Paragraph and Image blocks to use block connections.
 		if ( ! in_array( $block['blockName'], array_keys( $blocks_attributes_allowlist ), true ) ) {
 			return $block_content;
 		}
@@ -168,14 +171,14 @@ if ( $gutenberg_experiments && (
 				continue;
 			}
 
-			$tags  = new WP_HTML_Tag_Processor( $block_content );
-			$found = $tags->next_tag(
-				array(
-					// TODO: In the future, when blocks other than Paragraph and Image are
-					// supported, we should build the full query from CSS selector.
-					'tag_name' => $block_type->attributes[ $attribute_name ]['selector'],
-				)
-			);
+			$selectors = explode( ',', $block_type->attributes[ $attribute_name ]['selector'] );
+			$found     = false;
+			while ( ! $found && count( $selectors ) > 0 ) {
+				$tags = new WP_HTML_Tag_Processor( $block_content );
+				// TODO: In the future, when blocks are supported,
+				// we should build the full query from CSS selector.
+				$found = $tags->next_tag( trim( array_shift( $selectors ) ) );
+			}
 			if ( ! $found ) {
 				return $block_content;
 			}
