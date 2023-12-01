@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { formatListBullets, category, drawerLeft } from '@wordpress/icons';
+import { blockTable, category, drawerLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -27,7 +27,7 @@ export const VIEW_LAYOUTS = [
 		type: LAYOUT_TABLE,
 		label: __( 'Table' ),
 		component: ViewList,
-		icon: formatListBullets,
+		icon: blockTable,
 		supports: {
 			preview: false,
 		},
