@@ -3,6 +3,7 @@
  */
 import {
 	BlockList,
+	BlockToolbar,
 	BlockTools,
 	BlockSelectionClearer,
 	WritingFlow,
@@ -22,26 +23,15 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 export default function WidgetAreasBlockEditorContent( {
 	blockEditorSettings,
 } ) {
-	const { hasTopToolbar, hasThemeStyles } = useSelect( ( select ) => {
-		return {
-			hasTopToolbar: !! select( preferencesStore ).get(
-				'core/edit-widgets',
-				'fixedToolbar'
-			),
-			hasThemeStyles: !! select( preferencesStore ).get(
+	const hasThemeStyles = useSelect(
+		( select ) =>
+			!! select( preferencesStore ).get(
 				'core/edit-widgets',
 				'themeStyles'
 			),
-		};
-	}, [] );
+		[]
+	);
 	const isLargeViewport = useViewportMatch( 'medium' );
-	let blockToolbarDisplay = 'popover';
-
-	if ( ! isLargeViewport ) {
-		blockToolbarDisplay = 'sticky';
-	} else if ( hasTopToolbar ) {
-		blockToolbarDisplay = 'none';
-	}
 
 	const styles = useMemo( () => {
 		return hasThemeStyles ? blockEditorSettings.styles : [];
@@ -50,9 +40,8 @@ export default function WidgetAreasBlockEditorContent( {
 	return (
 		<div className="edit-widgets-block-editor">
 			<Notices />
-			<BlockTools
-				__experimentalBlockToolbarDisplay={ blockToolbarDisplay }
-			>
+			{ ! isLargeViewport && <BlockToolbar /> }
+			<BlockTools>
 				<KeyboardShortcuts />
 				<EditorStyles
 					styles={ styles }
