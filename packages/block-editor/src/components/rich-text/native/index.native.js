@@ -196,7 +196,7 @@ export class RichText extends Component {
 
 		const { formats, replacements, text } = currentValue;
 		const { activeFormats } = this.state;
-		const newFormats = getFormatColors( value, formats, colorPalette );
+		const newFormats = getFormatColors( formats, colorPalette );
 
 		return {
 			formats: newFormats,

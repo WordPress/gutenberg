@@ -737,11 +737,7 @@ export const getRevisions =
 			( config ) => config.name === name && config.kind === kind
 		);
 
-		if (
-			! entityConfig ||
-			entityConfig?.__experimentalNoFetch ||
-			! entityConfig?.supports?.revisions
-		) {
+		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
 
@@ -766,60 +762,76 @@ export const getRevisions =
 			query
 		);
 
-		let records, meta;
-		if ( entityConfig.supportsPagination && query.per_page !== -1 ) {
-			const response = await apiFetch( { path, parse: false } );
-			records = Object.values( await response.json() );
-			meta = {
-				totalItems: parseInt( response.headers.get( 'X-WP-Total' ) ),
-			};
-		} else {
-			records = Object.values( await apiFetch( { path } ) );
+		let records, response;
+		const meta = {};
+		const isPaginated =
+			entityConfig.supportsPagination && query.per_page !== -1;
+		try {
+			response = await apiFetch( { path, parse: ! isPaginated } );
+		} catch ( error ) {
+			// Do nothing if our request comes back with an API error.
+			return;
 		}
 
-		// If we request fields but the result doesn't contain the fields,
-		// explicitly set these fields as "undefined"
-		// that way we consider the query "fulfilled".
-		if ( query._fields ) {
-			records = records.map( ( record ) => {
-				query._fields.split( ',' ).forEach( ( field ) => {
-					if ( ! record.hasOwnProperty( field ) ) {
-						record[ field ] = undefined;
-					}
+		if ( response ) {
+			if ( isPaginated ) {
+				records = Object.values( await response.json() );
+				meta.totalItems = parseInt(
+					response.headers.get( 'X-WP-Total' )
+				);
+			} else {
+				records = Object.values( response );
+			}
+
+			// If we request fields but the result doesn't contain the fields,
+			// explicitly set these fields as "undefined"
+			// that way we consider the query "fulfilled".
+			if ( query._fields ) {
+				records = records.map( ( record ) => {
+					query._fields.split( ',' ).forEach( ( field ) => {
+						if ( ! record.hasOwnProperty( field ) ) {
+							record[ field ] = undefined;
+						}
+					} );
+
+					return record;
 				} );
+			}
 
-				return record;
-			} );
-		}
+			dispatch.receiveRevisions(
+				kind,
+				name,
+				recordKey,
+				records,
+				query,
+				false,
+				meta
+			);
 
-		dispatch.receiveRevisions(
-			kind,
-			name,
-			recordKey,
-			records,
-			query,
-			false,
-			meta
-		);
+			// When requesting all fields, the list of results can be used to
+			// resolve the `getRevision` selector in addition to `getRevisions`.
+			if ( ! query?._fields && ! query.context ) {
+				const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+				const resolutionsArgs = records
+					.filter( ( record ) => record[ key ] )
+					.map( ( record ) => [
+						kind,
+						name,
+						recordKey,
+						record[ key ],
+					] );
 
-		// When requesting all fields, the list of results can be used to
-		// resolve the `getRevision` selector in addition to `getRevisions`.
-		if ( ! query?._fields && ! query.context ) {
-			const key = entityConfig.key || DEFAULT_ENTITY_KEY;
-			const resolutionsArgs = records
-				.filter( ( record ) => record[ key ] )
-				.map( ( record ) => [ kind, name, recordKey, record[ key ] ] );
-
-			dispatch( {
-				type: 'START_RESOLUTIONS',
-				selectorName: 'getRevision',
-				args: resolutionsArgs,
-			} );
-			dispatch( {
-				type: 'FINISH_RESOLUTIONS',
-				selectorName: 'getRevision',
-				args: resolutionsArgs,
-			} );
+				dispatch( {
+					type: 'START_RESOLUTIONS',
+					selectorName: 'getRevision',
+					args: resolutionsArgs,
+				} );
+				dispatch( {
+					type: 'FINISH_RESOLUTIONS',
+					selectorName: 'getRevision',
+					args: resolutionsArgs,
+				} );
+			}
 		}
 	};
 
@@ -850,11 +862,7 @@ export const getRevision =
 			( config ) => config.name === name && config.kind === kind
 		);
 
-		if (
-			! entityConfig ||
-			entityConfig?.__experimentalNoFetch ||
-			! entityConfig?.supports?.revisions
-		) {
+		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
 
@@ -878,6 +886,15 @@ export const getRevision =
 			query
 		);
 
-		const record = await apiFetch( { path } );
-		dispatch.receiveRevisions( kind, name, recordKey, record, query );
+		let record;
+		try {
+			record = await apiFetch( { path } );
+		} catch ( error ) {
+			// Do nothing if our request comes back with an API error.
+			return;
+		}
+
+		if ( record ) {
+			dispatch.receiveRevisions( kind, name, recordKey, record, query );
+		}
 	};

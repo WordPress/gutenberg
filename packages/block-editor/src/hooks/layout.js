@@ -465,22 +465,10 @@ function BlockWithChildLayoutStyles( { block: BlockListBlock, props } ) {
  */
 export const withChildLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const layout = props.attributes.style?.layout ?? {};
-		const { selfStretch, flexSize } = layout;
-		const hasChildLayout = selfStretch || flexSize;
-
-		const shouldRenderChildLayoutStyles = useSelect(
-			( select ) => {
-				// The callback returns early to avoid block editor subscription.
-				if ( ! hasChildLayout ) {
-					return false;
-				}
-
-				return ! select( blockEditorStore ).getSettings()
-					.disableLayoutStyles;
-			},
-			[ hasChildLayout ]
-		);
+		const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
+			return ! select( blockEditorStore ).getSettings()
+				.disableLayoutStyles;
+		} );
 
 		if ( ! shouldRenderChildLayoutStyles ) {
 			return <BlockListBlock { ...props } />;

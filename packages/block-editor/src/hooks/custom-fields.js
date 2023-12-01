@@ -128,12 +128,17 @@ const withCustomFieldsControls = createHigherOrderComponent( ( BlockEdit ) => {
 	};
 }, 'withCustomFieldsControls' );
 
-if ( window.__experimentalConnections ) {
+if (
+	window.__experimentalConnections ||
+	window.__experimentalPatternPartialSyncing
+) {
 	addFilter(
 		'blocks.registerBlockType',
 		'core/editor/connections/attribute',
 		addAttribute
 	);
+}
+if ( window.__experimentalConnections ) {
 	addFilter(
 		'editor.BlockEdit',
 		'core/editor/connections/with-inspector-controls',

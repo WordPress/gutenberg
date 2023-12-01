@@ -31,8 +31,13 @@ import Page from '../page';
 import Link from '../routes/link';
 import { useAddedBy, AvatarImage } from '../list/added-by';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
-import { DataViews } from '../dataviews';
-import { ENUMERATION_TYPE, OPERATOR_IN } from '../dataviews/constants';
+import {
+	DataViews,
+	ENUMERATION_TYPE,
+	OPERATOR_IN,
+	LAYOUT_GRID,
+	LAYOUT_TABLE,
+} from '../dataviews';
 import {
 	useResetTemplateAction,
 	deleteTemplateAction,
@@ -48,15 +53,15 @@ const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 const EMPTY_ARRAY = [];
 
 const defaultConfigPerViewType = {
-	list: {},
-	grid: {
+	[ LAYOUT_TABLE ]: {},
+	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
 	},
 };
 
 const DEFAULT_VIEW = {
-	type: 'list',
+	type: LAYOUT_TABLE,
 	search: '',
 	page: 1,
 	perPage: 20,
@@ -338,7 +343,7 @@ export default function DataviewsTemplates() {
 				isLoading={ isLoadingData }
 				view={ view }
 				onChangeView={ onChangeView }
-				supportedLayouts={ [ 'list', 'grid' ] }
+				supportedLayouts={ [ LAYOUT_TABLE, LAYOUT_GRID ] }
 			/>
 		</Page>
 	);

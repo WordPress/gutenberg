@@ -36,6 +36,7 @@ export default function PreviewOptions( {
 		disabled: ! isEnabled,
 		__experimentalIsFocusable: ! isEnabled,
 		children: viewLabel,
+		size: 'compact',
 		showTooltip: ! showIconLabels,
 	};
 	const menuProps = {

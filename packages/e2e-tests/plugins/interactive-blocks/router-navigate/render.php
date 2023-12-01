@@ -6,8 +6,8 @@
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
+gutenberg_enqueue_module( 'router-navigate-view' );
 ?>
-
 
 <div
 	data-wp-interactive='{ "namespace": "router" }'

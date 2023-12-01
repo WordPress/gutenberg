@@ -5,7 +5,9 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+gutenberg_enqueue_module( 'directive-priorities-view' );
 ?>
+
 <div data-wp-interactive='{ "namespace": "directive-priorities" }'>
 	<pre data-testid="execution order"></pre>
 

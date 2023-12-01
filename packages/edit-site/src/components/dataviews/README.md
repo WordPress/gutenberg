@@ -36,7 +36,7 @@ Example:
 
 ```js
 {
-	type: 'list',
+	type: LAYOUT_TABLE,
 	perPage: 5,
 	page: 1,
 	sort: {
@@ -53,7 +53,7 @@ Example:
 }
 ```
 
--   `type`: view type, one of `list` or `grid`.
+-   `type`: view type, one of `table`, `grid`, or `side-by-side`.
 -   `perPage`: number of records to show per page.
 -   `page`: the page that is visible.
 -   `sort.field`: field used for sorting the dataset.
@@ -75,9 +75,9 @@ The view is a representation of the visible state of the dataset. Note, however,
 The following example shows how a view object is used to query the WordPress REST API via the entities abstraction. The same can be done with any other data provider.
 
 ```js
-function MyCustomPageList() {
+function MyCustomPageTable() {
 	const [ view, setView ] = useState( {
-		type: 'list',
+		type: TABLE_LAYOUT,
 		perPage: 5,
 		page: 1,
 		sort: {

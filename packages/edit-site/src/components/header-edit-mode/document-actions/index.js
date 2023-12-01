@@ -184,6 +184,7 @@ function BaseDocumentActions( { className, icon, children, onBack } ) {
 			<Button
 				className="edit-site-document-actions__command"
 				onClick={ () => openCommandCenter() }
+				size="compact"
 			>
 				<HStack
 					className="edit-site-document-actions__title"
