@@ -15,10 +15,15 @@ import RichText from './';
  */
 import { getMultilineTag } from './utils';
 
-export const Content = ( { value, tagName: Tag, multiline, ...props } ) => {
-	const MultilineTag = getMultilineTag( multiline );
-
+export function Content( {
+	value,
+	tagName: Tag,
+	multiline,
+	format,
+	...props
+} ) {
 	if ( RichText.isEmpty( value ) ) {
+		const MultilineTag = getMultilineTag( multiline );
 		value = MultilineTag ? <MultilineTag /> : null;
 	} else if ( Array.isArray( value ) ) {
 		deprecated( 'wp.blockEditor.RichText value prop as children type', {
@@ -38,10 +43,5 @@ export const Content = ( { value, tagName: Tag, multiline, ...props } ) => {
 		value = <RawHTML>{ value.toHTMLString() }</RawHTML>;
 	}
 
-	if ( Tag ) {
-		const { format, ...restProps } = props;
-		return <Tag { ...restProps }>{ value }</Tag>;
-	}
-
-	return value;
-};
+	return Tag ? <Tag { ...props }>{ value }</Tag> : value;
+}
