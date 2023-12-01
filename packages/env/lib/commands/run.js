@@ -46,15 +46,7 @@ module.exports = async function run( {
 	const joinedCommand = command.join( ' ' );
 	showCommandTips( joinedCommand, container, spinner );
 
-	const trimmedEnvCwd = envCwd.trim().replace( /^'|'$/g, '' );
-
-	await spawnCommandDirectly(
-		config,
-		container,
-		command,
-		trimmedEnvCwd,
-		spinner
-	);
+	await spawnCommandDirectly( config, container, command, envCwd, spinner );
 
 	spinner.text = `Ran \`${ joinedCommand }\` in '${ container }'.`;
 };
@@ -82,7 +74,7 @@ function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
 		container === 'mysql' || container === 'tests-mysql'
 			? '/'
 			: '/var/www/html',
-		envCwd
+		envCwd.trim().replace( /^'|'$/g, '' )
 	);
 
 	const composeCommand = [
