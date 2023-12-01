@@ -212,6 +212,16 @@ export const ItemPrefixWrapper = styled.span`
 	/* Always occupy the first column, even when auto-collapsing */
 	grid-column: 1;
 
+	/*
+	 * Even when the item is not checked, occupy the same screen space to avoid
+	 * the space collapside when no items are checked.
+	 */
+	${ DropdownMenuCheckboxItem } > &,
+	${ DropdownMenuRadioItem } > & {
+		min-width: ${ space( 6 ) };
+		margin-inline-end: ${ space( 2 ) };
+	}
+
 	&:not( :empty ) {
 		margin-inline-end: ${ space( 2 ) };
 	}
