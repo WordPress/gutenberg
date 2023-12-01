@@ -14,6 +14,7 @@ test.describe( 'Templates', () => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
 			requestUtils.deactivatePlugin( 'gutenberg-test-dataviews' ),
+			requestUtils.deleteAllTemplates( 'wp_template' ),
 		] );
 	} );
 	test( 'Sorting', async ( { admin, page } ) => {
@@ -78,8 +79,6 @@ test.describe( 'Templates', () => {
 		await page.getByRole( 'menuitem', { name: 'Author' } ).hover();
 		await page.getByRole( 'menuitemradio', { name: 'Emptytheme' } ).click();
 		await expect( titles ).toHaveCount( 2 );
-
-		await requestUtils.deleteAllTemplates( 'wp_template' );
 	} );
 	test( 'Field visibility', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( { path: '/wp_template/all' } );
