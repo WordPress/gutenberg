@@ -11,15 +11,15 @@ import CustomSelectControl from '..';
 
 const options = [
 	{
-		key: 'violets',
+		key: 'flower1',
 		name: 'violets',
 	},
 	{
-		key: 'crimson clover',
+		key: 'flower2',
 		name: 'crimson clover',
 	},
 	{
-		key: 'poppy',
+		key: 'flower3',
 		name: 'poppy',
 	},
 ];
@@ -89,13 +89,15 @@ describe( 'CustomSelectControl', () => {
 		).toHaveTextContent( 'Hint' );
 	} );
 
-	it( 'Initial value should be replaced when a new item is selected', async () => {
+	it( 'Should replace the initial value when a new item is selected', async () => {
 		const user = userEvent.setup();
-		const mock = jest.fn();
+		const onChangeMock = jest.fn();
 
 		render(
 			<CustomSelectControl
-				onChange={ ( { selectedItem } ) => mock( selectedItem ) }
+				onChange={ ( { selectedItem } ) =>
+					onChangeMock( selectedItem )
+				}
 				options={ options }
 				__nextUnconstrainedWidth
 			/>
@@ -103,18 +105,21 @@ describe( 'CustomSelectControl', () => {
 
 		const currentValue = screen.getByRole( 'button' );
 
-		expect( currentValue ).toHaveTextContent( /violets/i );
+		expect( currentValue ).toHaveTextContent( 'violets' );
+
+		expect( onChangeMock ).toHaveBeenCalledTimes( 0 );
 
 		await user.click( currentValue );
 
 		const newValue = screen.getByRole( 'option', {
-			name: /poppy/i,
+			name: 'poppy',
 		} );
 
 		await user.click( newValue );
 
-		expect( currentValue ).toHaveTextContent( /poppy/i );
-		expect( mock ).toHaveBeenCalled();
+		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
+
+		expect( currentValue ).toHaveTextContent( 'poppy' );
 	} );
 
 	it( 'Should be able to change selection using keyboard', async () => {
@@ -125,7 +130,7 @@ describe( 'CustomSelectControl', () => {
 		);
 
 		const currentValue = screen.getByRole( 'button' );
-		expect( currentValue ).toHaveTextContent( /violets/i );
+		expect( currentValue ).toHaveTextContent( 'violets' );
 
 		await user.tab();
 		expect( currentValue ).toHaveFocus();
@@ -134,7 +139,7 @@ describe( 'CustomSelectControl', () => {
 		await user.keyboard( '{arrowdown}' );
 		await user.keyboard( '{enter}' );
 
-		expect( currentValue ).toHaveTextContent( /crimson clover/i );
+		expect( currentValue ).toHaveTextContent( 'crimson clover' );
 	} );
 
 	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
@@ -145,7 +150,7 @@ describe( 'CustomSelectControl', () => {
 		);
 
 		const currentValue = screen.getByRole( 'button' );
-		expect( currentValue ).toHaveTextContent( /violets/i );
+		expect( currentValue ).toHaveTextContent( 'violets' );
 
 		await user.tab();
 		await user.keyboard( '{enter}' );
@@ -154,10 +159,11 @@ describe( 'CustomSelectControl', () => {
 			'aria-hidden',
 			'false'
 		);
+
 		await user.keyboard( '{escape}' );
 		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 
-		expect( currentValue ).toHaveTextContent( /violets/i );
+		expect( currentValue ).toHaveTextContent( 'violets' );
 	} );
 
 	it( 'Should be able to type characters to select matching options', async () => {
@@ -168,14 +174,14 @@ describe( 'CustomSelectControl', () => {
 		);
 
 		const currentValue = screen.getByRole( 'button' );
-		expect( currentValue ).toHaveTextContent( /violets/i );
+		expect( currentValue ).toHaveTextContent( 'violets' );
 
 		await user.tab();
 		await user.keyboard( '{enter}' );
 		await user.keyboard( '{p}' );
 		await user.keyboard( '{enter}' );
 
-		expect( currentValue ).toHaveTextContent( /poppy/i );
+		expect( currentValue ).toHaveTextContent( 'poppy' );
 	} );
 
 	it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
@@ -186,29 +192,59 @@ describe( 'CustomSelectControl', () => {
 		);
 
 		const currentValue = screen.getByRole( 'button' );
-		expect( currentValue ).toHaveTextContent( /violets/i );
+		expect( currentValue ).toHaveTextContent( 'violets' );
 
 		await user.tab();
 		await user.keyboard( '{c}' );
 		await user.keyboard( '{enter}' );
 
-		expect( currentValue ).toHaveTextContent( /crimson clover/i );
+		expect( currentValue ).toHaveTextContent( 'crimson clover' );
 	} );
 
-	it( 'Current selection has attribute: aria-selected="true"', async () => {
+	it( 'Should have correct aria-selected value for selections', async () => {
 		const user = userEvent.setup();
 
 		render(
 			<CustomSelectControl options={ options } __nextUnconstrainedWidth />
 		);
 
-		await user.tab();
-		await user.keyboard( '{enter}' );
+		const currentValue = screen.getByRole( 'button' );
+
+		await user.click( currentValue );
 
 		expect(
 			screen.getByRole( 'option', {
-				name: /violets/i,
+				name: 'poppy',
+				selected: false,
 			} )
-		).toHaveAttribute( 'aria-selected', 'true' );
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'option', {
+				name: 'crimson clover',
+				selected: false,
+			} )
+		).toBeVisible();
+
+		expect(
+			screen.getByRole( 'option', {
+				name: 'violets',
+				selected: true,
+			} )
+		).toBeVisible();
+
+		await user.click( screen.getByRole( 'option', { name: 'poppy' } ) );
+		await user.click( currentValue );
+		expect(
+			screen.getByRole( 'option', {
+				name: 'violets',
+				selected: false,
+			} )
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'option', {
+				name: 'poppy',
+				selected: true,
+			} )
+		).toBeVisible();
 	} );
 } );
