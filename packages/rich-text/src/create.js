@@ -98,39 +98,6 @@ function toFormat( { tagName, attributes } ) {
 	};
 }
 
-function collapseWhiteSpaceElement( element, isRoot = true ) {
-	const clone = element.cloneNode( true );
-	clone.normalize();
-	Array.from( clone.childNodes ).forEach( ( node, i, nodes ) => {
-		if ( node.nodeType === node.TEXT_NODE ) {
-			let newNodeValue = node.nodeValue;
-
-			if ( /[\n\t\r\f]/.test( newNodeValue ) ) {
-				newNodeValue = newNodeValue.replace( /[\n\t\r\f]+/g, ' ' );
-			}
-
-			if ( newNodeValue.indexOf( '  ' ) !== -1 ) {
-				newNodeValue = newNodeValue.replace( / {2,}/g, ' ' );
-			}
-
-			if ( i === 0 && newNodeValue.startsWith( ' ' ) ) {
-				newNodeValue = newNodeValue.slice( 1 );
-			} else if (
-				isRoot &&
-				i === nodes.length - 1 &&
-				newNodeValue.endsWith( ' ' )
-			) {
-				newNodeValue = newNodeValue.slice( 0, -1 );
-			}
-
-			node.nodeValue = newNodeValue;
-		} else if ( node.nodeType === node.ELEMENT_NODE ) {
-			collapseWhiteSpaceElement( node, false );
-		}
-	} );
-	return clone;
-}
-
 // Ideally we use a private property.
 const RichTextInternalData = Symbol( 'RichTextInternalData' );
 
@@ -163,7 +130,7 @@ export class RichTextData {
 		const { preserveWhiteSpace = false } = options;
 		const element =
 			preserveWhiteSpace === false
-				? collapseWhiteSpaceElement( htmlElement )
+				? collapseWhiteSpace( htmlElement )
 				: htmlElement;
 		const richTextData = new RichTextData( create( { element } ) );
 		Object.defineProperty( richTextData, 'originalHTML', {
@@ -391,10 +358,42 @@ function filterRange( node, range, filter ) {
  * @see
  * https://developer.mozilla.org/en-US/docs/Web/CSS/white-space-collapse#collapsing_of_white_space
  *
- * @param {string} string
+ * @param {HTMLElement} element
+ * @param {boolean}     isRoot
+ *
+ * @return {HTMLElement} New element with collapsed whitespace.
  */
-export function collapseWhiteSpace( string ) {
-	return string.replace( /[\n\r\t]+/g, ' ' );
+function collapseWhiteSpace( element, isRoot = true ) {
+	const clone = element.cloneNode( true );
+	clone.normalize();
+	Array.from( clone.childNodes ).forEach( ( node, i, nodes ) => {
+		if ( node.nodeType === node.TEXT_NODE ) {
+			let newNodeValue = node.nodeValue;
+
+			if ( /[\n\t\r\f]/.test( newNodeValue ) ) {
+				newNodeValue = newNodeValue.replace( /[\n\t\r\f]+/g, ' ' );
+			}
+
+			if ( newNodeValue.indexOf( '  ' ) !== -1 ) {
+				newNodeValue = newNodeValue.replace( / {2,}/g, ' ' );
+			}
+
+			if ( i === 0 && newNodeValue.startsWith( ' ' ) ) {
+				newNodeValue = newNodeValue.slice( 1 );
+			} else if (
+				isRoot &&
+				i === nodes.length - 1 &&
+				newNodeValue.endsWith( ' ' )
+			) {
+				newNodeValue = newNodeValue.slice( 0, -1 );
+			}
+
+			node.nodeValue = newNodeValue;
+		} else if ( node.nodeType === node.ELEMENT_NODE ) {
+			collapseWhiteSpace( node, false );
+		}
+	} );
+	return clone;
 }
 
 /**
