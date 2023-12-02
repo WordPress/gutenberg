@@ -128,10 +128,9 @@ export class RichTextData {
 	}
 	static fromHTMLElement( htmlElement, options = {} ) {
 		const { preserveWhiteSpace = false } = options;
-		const element =
-			preserveWhiteSpace === false
-				? collapseWhiteSpace( htmlElement )
-				: htmlElement;
+		const element = preserveWhiteSpace
+			? htmlElement
+			: collapseWhiteSpace( htmlElement );
 		const richTextData = new RichTextData( create( { element } ) );
 		Object.defineProperty( richTextData, 'originalHTML', {
 			value: htmlElement.innerHTML,

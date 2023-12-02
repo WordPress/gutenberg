@@ -70,17 +70,17 @@ export function useRichText( {
 
 	function setRecordFromProps() {
 		_value.current = value;
-		if ( ! value?.length ) {
-			record.current = RichTextData.empty();
-		} else if ( typeof value === 'string' ) {
-			record.current = RichTextData.fromHTMLString( value, {
-				preserveWhiteSpace,
-			} );
+		record.current = value;
+		if ( ! ( value instanceof RichTextData ) ) {
+			record.current = value
+				? RichTextData.fromHTMLString( value, { preserveWhiteSpace } )
+				: RichTextData.empty();
 		}
+		// To do: make rich text internally work with RichTextData.
 		record.current = {
-			text: value.text,
-			formats: value.formats,
-			replacements: value.replacements,
+			text: record.current.text,
+			formats: record.current.formats,
+			replacements: record.current.replacements,
 		};
 		if ( disableFormats ) {
 			record.current.formats = Array( value.length );
