@@ -7,6 +7,7 @@
 	// The preview component measures the pixel width of this item, so as to calculate the scale factor.
 	// But without this baseline width, it collapses to 0.
 	width: 100%;
+	height: 100%;
 
 	overflow: hidden;
 
