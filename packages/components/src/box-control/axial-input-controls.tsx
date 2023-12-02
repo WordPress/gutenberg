@@ -168,6 +168,7 @@ export default function AxialInputControls( {
 							__nextHasNoMarginBottom
 							hideLabelFromVision
 							initialPosition={ 0 }
+							label={ LABELS[ side ] }
 							onChange={ ( newValue ) => {
 								createSliderOnChange?.(
 									side,

@@ -141,6 +141,7 @@ export default function BoxInputControls( {
 							__nextHasNoMarginBottom
 							hideLabelFromVision
 							initialPosition={ 0 }
+							label={ LABELS[ side ] }
 							onChange={ ( newValue ) => {
 								createSliderOnChange?.(
 									side,

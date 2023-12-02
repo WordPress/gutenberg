@@ -99,6 +99,7 @@ export default function AllInputControl( {
 				__nextHasNoMarginBottom
 				hideLabelFromVision
 				initialPosition={ 0 }
+				label={ LABELS.all }
 				onChange={ ( newValue ) => {
 					createSliderOnChange?.(
 						[ newValue, parsedUnit ].join( '' )
