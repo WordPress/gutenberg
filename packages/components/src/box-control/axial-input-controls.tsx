@@ -4,7 +4,12 @@
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import UnitControl from './unit-control';
 import { LABELS } from './utils';
-import { Layout } from './styles/box-control-styles';
+import {
+	FlexedBoxControlIcon,
+	FlexedRangeControl,
+} from './styles/box-control-styles';
+import { HStack } from '../h-stack';
+import { VStack } from '../v-stack';
 import type { BoxControlInputControlProps } from './types';
 
 const groupedSides = [ 'vertical', 'horizontal' ] as const;
@@ -66,6 +71,21 @@ export default function AxialInputControls( {
 		}
 	};
 
+	const createSliderOnChange = ( side: GroupedSide, next: string ) => {
+		const nextValues = { ...values };
+
+		if ( side === 'vertical' ) {
+			nextValues.top = next;
+			nextValues.bottom = next;
+		}
+
+		if ( side === 'horizontal' ) {
+			nextValues.left = next;
+			nextValues.right = next;
+		}
+		onChange?.( nextValues );
+	};
+
 	const createHandleOnChange = ( side: GroupedSide ) => ( next?: string ) => {
 		if ( ! onChange ) {
 			return;
@@ -114,11 +134,7 @@ export default function AxialInputControls( {
 	const only = first === last && first;
 
 	return (
-		<Layout
-			gap={ 0 }
-			align="top"
-			className="component-box-control__vertical-horizontal-input-controls"
-		>
+		<VStack className="component-box-control__vertical-horizontal-input-controls">
 			{ filteredSides.map( ( side ) => {
 				const [ parsedQuantity, parsedUnit ] =
 					parseQuantityAndUnitFromRawValue(
@@ -129,25 +145,44 @@ export default function AxialInputControls( {
 						? selectedUnits.top
 						: selectedUnits.left;
 				return (
-					<UnitControl
-						{ ...props }
-						isFirst={ first === side }
-						isLast={ last === side }
-						isOnly={ only === side }
-						value={ [
-							parsedQuantity,
-							selectedUnit ?? parsedUnit,
-						].join( '' ) }
-						onChange={ createHandleOnChange( side ) }
-						onUnitChange={ createHandleOnUnitChange( side ) }
-						onFocus={ createHandleOnFocus( side ) }
-						onHoverOn={ createHandleOnHoverOn( side ) }
-						onHoverOff={ createHandleOnHoverOff( side ) }
-						label={ LABELS[ side ] }
-						key={ side }
-					/>
+					<HStack key={ `box-control-${ side }` }>
+						<FlexedBoxControlIcon side={ side } sides={ sides } />
+						<UnitControl
+							{ ...props }
+							isFirst={ first === side }
+							isLast={ last === side }
+							isOnly={ only === side }
+							value={ [
+								parsedQuantity,
+								selectedUnit ?? parsedUnit,
+							].join( '' ) }
+							onChange={ createHandleOnChange( side ) }
+							onUnitChange={ createHandleOnUnitChange( side ) }
+							onFocus={ createHandleOnFocus( side ) }
+							onHoverOn={ createHandleOnHoverOn( side ) }
+							onHoverOff={ createHandleOnHoverOff( side ) }
+							label={ LABELS[ side ] }
+							key={ side }
+						/>
+						<FlexedRangeControl
+							__nextHasNoMarginBottom
+							hideLabelFromVision
+							initialPosition={ 0 }
+							onChange={ ( newValue ) => {
+								createSliderOnChange?.(
+									side,
+									[
+										newValue,
+										selectedUnit ?? parsedUnit,
+									].join( '' )
+								);
+							} }
+							value={ parsedQuantity }
+							withInputField={ false }
+						/>
+					</HStack>
 				);
 			} ) }
-		</Layout>
+		</VStack>
 	);
 }
