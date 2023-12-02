@@ -35,7 +35,7 @@ import { useMemo, Children, Fragment } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
+import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
 import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
 

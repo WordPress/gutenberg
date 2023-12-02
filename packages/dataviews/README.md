@@ -1,6 +1,16 @@
-# DataView
+# DataViews
 
-This file documents the DataViews UI component, which provides an API to render datasets using different view types (table, grid, etc.).
+DataViews is a component that provides an API to render datasets using different types of layouts (table, grid, list, etc.).
+
+## Installation
+
+Install the module
+
+```bash
+npm install @wordpress/dataviews --save
+```
+
+## Usage
 
 ```js
 <DataViews
@@ -189,3 +199,11 @@ Array of operations that can be performed upon each record. Each action is an ob
 -   `callback`: function, required unless `RenderModal` is provided. Callback function that takes the record as input and performs the required action.
 -   `RenderModal`: ReactElement, optional. If an action requires that some UI be rendered in a modal, it can provide a component which takes as props the record as `item` and a `closeModal` function. When this prop is provided, the `callback` property is ignored.
 -   `hideModalHeader`: boolean, optional. This property is used in combination with `RenderModal` and controls the visibility of the modal's header. If the action renders a modal and doesn't hide the header, the action's label is going to be used in the modal's header.
+
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

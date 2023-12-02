@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
+import { unlock } from './lock-unlock';
 import { VIEW_LAYOUTS, LAYOUT_TABLE } from './constants';
 
 const {

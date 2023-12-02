@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
+import { unlock } from './lock-unlock';
 import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
 
 const {

@@ -12,20 +12,20 @@ import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
+import {
+	DataViews,
+	ENUMERATION_TYPE,
+	VIEW_LAYOUTS,
+	OPERATOR_IN,
+	LAYOUT_GRID,
+	LAYOUT_TABLE,
+} from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
  */
 import Page from '../page';
 import Link from '../routes/link';
-import {
-	DataViews,
-	VIEW_LAYOUTS,
-	ENUMERATION_TYPE,
-	LAYOUT_GRID,
-	LAYOUT_TABLE,
-	OPERATOR_IN,
-} from '../dataviews';
 import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
 import {
 	trashPostAction,

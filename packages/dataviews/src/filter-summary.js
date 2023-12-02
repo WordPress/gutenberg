@@ -13,7 +13,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { OPERATOR_IN } from './constants';
-import { unlock } from '../../lock-unlock';
+import { unlock } from './lock-unlock';
 
 const {
 	DropdownMenuV2: DropdownMenu,
