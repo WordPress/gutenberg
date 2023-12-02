@@ -198,7 +198,7 @@ const BorderControlDropdown = (
 						<HStack>
 							<StyledLabel>{ __( 'Border color' ) }</StyledLabel>
 							<Button
-								isSmall
+								size="small"
 								label={ __( 'Close border color' ) }
 								icon={ closeSmall }
 								onClick={ onClose }
