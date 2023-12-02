@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -50,6 +50,36 @@ describe( 'BoxControl', () => {
 			await user.keyboard( '{Enter}' );
 
 			expect( input ).toHaveValue( '100' );
+		} );
+
+		it( 'should update input values when interacting with slider', () => {
+			render( <BoxControl onChange={ () => {} } /> );
+
+			const slider = screen.getByRole( 'slider' );
+
+			fireEvent.change( slider, { target: { value: 50 } } );
+
+			expect( slider ).toHaveValue( '50' );
+			expect(
+				screen.getByRole( 'textbox', {
+					name: 'Box Control',
+				} )
+			).toHaveValue( '50' );
+		} );
+
+		it( 'should update slider values when interacting with input', async () => {
+			const user = userEvent.setup();
+			render( <BoxControl onChange={ () => {} } /> );
+
+			const input = screen.getByRole( 'textbox', {
+				name: 'Box Control',
+			} );
+
+			await user.type( input, '50' );
+			await user.keyboard( '{Enter}' );
+
+			expect( input ).toHaveValue( '50' );
+			expect( screen.getByRole( 'slider' ) ).toHaveValue( '50' );
 		} );
 	} );
 
@@ -170,6 +200,34 @@ describe( 'BoxControl', () => {
 			).not.toHaveValue();
 		} );
 
+		it( 'should update a single side value when using slider unlinked', async () => {
+			const user = userEvent.setup();
+
+			render( <Example /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
+			);
+
+			const slider = screen.getByRole( 'slider', { name: 'Right' } );
+
+			fireEvent.change( slider, { target: { value: 50 } } );
+
+			expect( slider ).toHaveValue( '50' );
+			expect(
+				screen.getByRole( 'textbox', { name: 'Top' } )
+			).not.toHaveValue();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Right' } )
+			).toHaveValue( '50' );
+			expect(
+				screen.getByRole( 'textbox', { name: 'Bottom' } )
+			).not.toHaveValue();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Left' } )
+			).not.toHaveValue();
+		} );
+
 		it( 'should update a whole axis when value is changed when unlinked', async () => {
 			const user = userEvent.setup();
 
@@ -192,6 +250,28 @@ describe( 'BoxControl', () => {
 			expect(
 				screen.getByRole( 'textbox', { name: 'Horizontal' } )
 			).not.toHaveValue();
+		} );
+
+		it( 'should update a whole axis using a slider when value is changed when unlinked', async () => {
+			const user = userEvent.setup();
+
+			render( <Example splitOnAxis /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
+			);
+
+			const slider = screen.getByRole( 'slider', { name: 'Horizontal' } );
+
+			fireEvent.change( slider, { target: { value: 50 } } );
+
+			expect( slider ).toHaveValue( '50' );
+			expect(
+				screen.getByRole( 'textbox', { name: 'Vertical' } )
+			).not.toHaveValue();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Horizontal' } )
+			).toHaveValue( '50' );
 		} );
 	} );
 
