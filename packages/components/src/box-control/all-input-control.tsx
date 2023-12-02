@@ -13,6 +13,7 @@ import {
 	isValuesMixed,
 	isValuesDefined,
 } from './utils';
+import { parseQuantityAndUnitFromRawValue } from '../unit-control';
 
 const noop = () => {};
 
@@ -38,7 +39,7 @@ export default function AllInputControl( {
 		onFocus( event, { side: 'all' } );
 	};
 
-	const createSliderOnChange = ( next: number | undefined ) => {
+	const createSliderOnChange = ( next: string ) => {
 		const nextValues = applyValueToSides( values, String( next ), sides );
 		onChange( nextValues );
 	};
@@ -76,13 +77,16 @@ export default function AllInputControl( {
 		} );
 	};
 
+	const [ parsedQuantity, parsedUnit ] =
+		parseQuantityAndUnitFromRawValue( allValue );
+
 	return (
 		<HStack>
 			<UnitControl
 				{ ...props }
 				disableUnits={ isMixed }
 				isOnly
-				value={ allValue }
+				value={ parsedQuantity }
 				onChange={ handleOnChange }
 				onUnitChange={ handleOnUnitChange }
 				onFocus={ handleOnFocus }
@@ -96,9 +100,11 @@ export default function AllInputControl( {
 				hideLabelFromVision
 				initialPosition={ 0 }
 				onChange={ ( newValue ) => {
-					createSliderOnChange?.( newValue );
+					createSliderOnChange?.(
+						[ newValue, parsedUnit ].join( '' )
+					);
 				} }
-				value={ Number( allValue ) }
+				value={ parsedQuantity }
 				withInputField={ false }
 			/>
 		</HStack>
