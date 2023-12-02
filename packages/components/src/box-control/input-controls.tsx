@@ -109,7 +109,7 @@ export default function BoxInputControls( {
 	const only = first === last && first;
 
 	return (
-		<VStack className="component-box-control__input-controls" spacing={ 0 }>
+		<VStack className="component-box-control__input-controls">
 			{ filteredSides.map( ( side ) => {
 				const [ parsedQuantity, parsedUnit ] =
 					parseQuantityAndUnitFromRawValue( values[ side ] );

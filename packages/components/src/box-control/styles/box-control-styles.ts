@@ -6,7 +6,6 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { Flex } from '../../flex';
 import BaseUnitControl from '../../unit-control';
 import BoxControlIcon from '../icon';
 import { HStack } from '../../h-stack';
@@ -23,6 +22,7 @@ export const Root = styled.div`
 export const UnitControlWrapper = styled.div`
 	box-sizing: border-box;
 	flex: 1;
+	max-width: 90px;
 `;
 
 export const ButtonWrapper = styled( HStack )`
@@ -31,11 +31,6 @@ export const ButtonWrapper = styled( HStack )`
 
 export const FlexedBoxControlIcon = styled( BoxControlIcon )`
 	flex: 0 0 auto;
-`;
-
-export const Layout = styled( Flex )`
-	width: 100%;
-	justify-content: flex-start;
 `;
 
 export const FlexedRangeControl = styled( RangeControl )`
