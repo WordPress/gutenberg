@@ -212,7 +212,7 @@ export const viewPostAction = {
 		return post.status !== 'trash';
 	},
 	callback( post ) {
-		document.location.href = post.link;
+		window.open( post.link, '_blank' );
 	},
 };
 
