@@ -9,7 +9,13 @@ import { __ } from '@wordpress/i18n';
 import { SearchControl } from '@wordpress/components';
 
 export default function MetadataSourceUI( props ) {
-	const { setAttributes, setIsActiveAttribute, context } = props;
+	const {
+		attributes,
+		setAttributes,
+		setIsActiveAttribute,
+		currentAttribute,
+		context,
+	} = props;
 
 	// Fetching the REST API to get the available custom fields.
 	// TODO: Review if it works with taxonomies.
@@ -50,12 +56,8 @@ export default function MetadataSourceUI( props ) {
 	// Other example could be post meta (Post Title) not included in "meta".
 	addMetadata( metadata, data.acf );
 
-	const [ selectedField, setSelectedField ] = useState( null );
 	// TODO: Try to abstract this function to be reused across all the sources.
-	function selectItem( item, props ) {
-		setSelectedField( item );
-
-		const { currentAttribute } = props;
+	function selectItem( item ) {
 		// Modify the attribute we are binding.
 		// TODO: Not sure if we should do this. We might need to process the bindings attribute somehow in the editor to modify the content with context.
 		// TODO: Get the type from the block attribute definition and modify/validate the value returned by the source if needed.
@@ -65,7 +67,7 @@ export default function MetadataSourceUI( props ) {
 
 		// Update the bindings property.
 		updateBlockBindingsAttribute(
-			props.attributes,
+			attributes,
 			setAttributes,
 			currentAttribute,
 			'metadata',
@@ -90,9 +92,12 @@ export default function MetadataSourceUI( props ) {
 				{ metadata.map( ( item ) => (
 					<li
 						key={ item.key }
-						onClick={ () => selectItem( item, props ) }
+						onClick={ () => selectItem( item ) }
 						className={
-							selectedField?.key === item.key
+							attributes.metadata?.bindings?.[ currentAttribute ]
+								?.source_id === 'metadata' &&
+							attributes.metadata?.bindings?.[ currentAttribute ]
+								?.source_params.value === item.key
 								? 'selected-meta-field'
 								: ''
 						}
