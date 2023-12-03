@@ -103,23 +103,24 @@ export function getRevisionChanges(
 	// Remove duplicate results.
 	const result = [ ...new Set( changedValueTree ) ]
 		// Translate the keys.
-		.map( ( key ) => getTranslation( key, blockNames ) )
 		// Remove duplicate or empty translations.
 		.reduce( ( acc, curr ) => {
-			if ( curr && ! acc.includes( curr ) ) {
-				acc.push( curr );
+			const translation = getTranslation( curr, blockNames );
+			if ( translation && ! acc.includes( translation ) ) {
+				acc.push( translation );
 			}
 			return acc;
 		}, [] );
 
-	let joined = result.slice( 0, maxResults ).join( ', ' );
+	const slicedResult = result.slice( 0, maxResults );
 
 	if ( result.length > maxResults ) {
-		joined += '…';
+		// translators: follows comma-separated list of changed styles.
+		slicedResult.push( __( 'and more.' ) );
 	}
 
+	const joined = slicedResult.join( ', ' );
 	cache.set( revision, joined );
-
 	return joined;
 }
 
