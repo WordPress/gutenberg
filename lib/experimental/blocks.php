@@ -108,40 +108,41 @@ if ( $gutenberg_experiments && (
 
 			// Assuming the following format for the bindings property of the "metadata" attribute:
 			//
-			// "bindings": [
-			// {
-			// "attribute": "title",
-			// "source": { "name": "metadata", "params": "custom_field_1" }
+			// "bindings": {
+			// "title": {
+			// "source_id": "metadata",
+			// "source_params": { "value": "text_custom_field" }
 			// },
-			// {
-			// "attribute": "url",
-			// "source": { "name": "metadata", "params": "custom_field_2" }
+			// "url": {
+			// "source_id": "metadata",
+			// "source_params": { "value": "url_custom_field" }
+			// }
 			// },
-			// ]
 			// .
 			global $block_bindings_whitelist;
 			global $block_bindings_sources;
 			$modified_block_content = $block_content;
-			foreach ( $block['attrs']['metadata']['bindings'] as $binding ) {
+			foreach ( $block['attrs']['metadata']['bindings'] as $binding_attribute => $binding_source ) {
 				if ( ! isset( $block_bindings_whitelist[ $block['blockName'] ] ) ) {
 					continue;
 				}
-				if ( ! in_array( $binding['attribute'], $block_bindings_whitelist[ $block['blockName'] ], true ) ) {
+				if ( ! in_array( $binding_attribute, $block_bindings_whitelist[ $block['blockName'] ], true ) ) {
 					continue;
 				}
+
 				// Get the value based on the source.
 				// We might want to move this to its own function if it gets more complex.
 				// We pass $block_content, $block, $block_instance to the source callback in case sources want to use them.
-				if ( ! isset( $block_bindings_sources[ $binding['source']['name'] ]['apply_source'] ) ) {
+				if ( ! isset( $block_bindings_sources[ $binding_source['source_id'] ]['apply_source'] ) ) {
 					return $block_content;
 				}
-				$source_value = $block_bindings_sources[ $binding['source']['name'] ]['apply_source']( $binding['source']['params'], $block_content, $block, $block_instance );
+				$source_value = $block_bindings_sources[ $binding_source['source_id'] ]['apply_source']( $binding_source['source_params'], $block_content, $block, $block_instance );
 				if ( false === $source_value ) {
 					return $block_content;
 				}
 
 				// Process the HTML based on the block and the attribute.
-				$modified_block_content = block_bindings_replace_html( $modified_block_content, $block['blockName'], $binding['attribute'], $source_value );
+				$modified_block_content = block_bindings_replace_html( $modified_block_content, $block['blockName'], $binding_attribute, $source_value );
 			}
 			return $modified_block_content;
 		}

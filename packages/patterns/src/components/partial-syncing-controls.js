@@ -75,13 +75,14 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 							__nextHasNoMarginBottom
 							label={ label }
 							checked={
-								attributes.metadata?.bindings?.filter(
-									( item ) => item.attribute === attributeName
-								)[ 0 ]?.source?.name === 'pattern_attributes'
+								attributes?.metadata?.bindings?.[
+									attributeName
+								]?.source_id === 'pattern_attributes'
 							}
 							onChange={ ( isChecked ) => {
 								// TODO: REVIEW WHY THE CHECKED IS NOT UPDATED.
 								// The attributes are updated but the checkbox is not.
+								// It works fine when I switch from Visual Editor -> Code Editor -> Visual Editor.
 								updateBindings( attributeName, isChecked );
 							} }
 						/>

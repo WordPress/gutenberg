@@ -15,17 +15,19 @@ export const updateBlockBindingsAttribute = (
 	sourceParams
 ) => {
 	// TODO: Review the bindings syntax.
-	// For now, I'm adding a new property to the "metadata" attribute with this syntax:
-	// [
-	// 	{
-	// 	  "attribute": "url",
-	// 	  "source": { "name": "metadata", "params": { "value": "custom_field_1" } }
-	// 	},
-	// 	{
-	// 	  "attribute": "title",
-	// 	  "source": { "name": "metadata", "params": { "value": "custom_field_2" } }
-	// 	}
-	// ]
+	// Assuming the following format for the bindings property of the "metadata" attribute:
+	//
+	// "bindings": {
+	//   "title": {
+	//     "source_id": "metadata",
+	//     "source_params": { "value": "text_custom_field" }
+	//   },
+	//   "url": {
+	//     "source_id": "metadata",
+	//     "source_params": { "value": "url_custom_field" }
+	//   }
+	// },
+	// .
 
 	// Only modify the bindings property of the metadata attribute
 	const metadataAttribute = blockAttributes.metadata
@@ -37,12 +39,9 @@ export const updateBlockBindingsAttribute = (
 		if ( ! metadataAttribute.bindings ) {
 			return metadataAttribute;
 		}
-		const bindingsArray = metadataAttribute.bindings.filter(
-			( item ) => item.attribute !== updatingAttribute
-		);
-		if ( bindingsArray.length > 0 ) {
-			metadataAttribute.bindings = bindingsArray;
-		} else {
+		delete metadataAttribute.bindings[ updatingAttribute ];
+		// If bindings is empty, remove the bindings property.
+		if ( Object.keys( metadataAttribute.bindings ).length === 0 ) {
 			delete metadataAttribute.bindings;
 		}
 		setAttributes( {
@@ -51,32 +50,15 @@ export const updateBlockBindingsAttribute = (
 		return metadataAttribute;
 	}
 
-	const bindingsArray = metadataAttribute.bindings
+	const bindingsProperty = metadataAttribute.bindings
 		? metadataAttribute.bindings
-		: [];
+		: {};
 
-	// If the attribute exists in the bindings, update it.
-	// Otherwise, add it.
-	let attributeExists = false;
-	bindingsArray.forEach( ( binding ) => {
-		if ( binding.attribute === updatingAttribute ) {
-			binding.source.name = sourceName;
-			binding.source.params = sourceParams;
-			attributeExists = true;
-		}
-	} );
+	bindingsProperty[ updatingAttribute ] = {};
+	bindingsProperty[ updatingAttribute ].source_id = sourceName;
+	bindingsProperty[ updatingAttribute ].source_params = sourceParams;
 
-	if ( ! attributeExists ) {
-		bindingsArray.push( {
-			attribute: updatingAttribute,
-			source: {
-				name: sourceName,
-				params: sourceParams,
-			},
-		} );
-	}
-
-	metadataAttribute.bindings = bindingsArray;
+	metadataAttribute.bindings = bindingsProperty;
 	// TODO: Decide if we want to include the setAttributes call here.
 	setAttributes( {
 		metadata: metadataAttribute,

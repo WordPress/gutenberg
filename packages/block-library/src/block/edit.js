@@ -40,15 +40,17 @@ function isPartiallySynced( block ) {
 	return (
 		!! getBlockSupport( block.name, '__experimentalConnections', false ) &&
 		!! block.attributes.metadata?.bindings &&
-		block.attributes.metadata?.bindings.some(
-			( binding ) => binding.source.name === 'pattern_attributes'
+		Object.values( block.attributes.metadata.bindings ).some(
+			( binding ) => binding.source_id === 'pattern_attributes'
 		)
 	);
 }
 function getPartiallySyncedAttributes( block ) {
-	return block.attributes.metadata?.bindings
-		?.filter( ( binding ) => binding.source.name === 'pattern_attributes' )
-		.map( ( binding ) => binding.attribute );
+	return Object.entries( block.attributes.metadata.bindings )
+		.filter(
+			( [ , binding ] ) => binding.source_id === 'pattern_attributes'
+		)
+		.map( ( [ attributeKey ] ) => attributeKey );
 }
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
