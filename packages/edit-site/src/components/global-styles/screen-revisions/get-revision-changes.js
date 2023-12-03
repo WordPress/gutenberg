@@ -69,7 +69,7 @@ function getTranslation( key, blockNames ) {
 	}
 }
 
-const cache = new Map();
+const cache = new WeakMap();
 
 export function getRevisionChanges(
 	revision,
