@@ -113,9 +113,8 @@ export function getRevisionChanges(
 		}, [] );
 
 	let joined = result.slice( 0, maxResults ).join( ', ' );
-	const hasMore = result.length > maxResults;
 
-	if ( hasMore ) {
+	if ( result.length > maxResults ) {
 		joined += '…';
 	}
 
