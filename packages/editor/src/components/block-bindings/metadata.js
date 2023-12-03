@@ -95,9 +95,9 @@ export default function MetadataSourceUI( props ) {
 						onClick={ () => selectItem( item ) }
 						className={
 							attributes.metadata?.bindings?.[ currentAttribute ]
-								?.source_id === 'metadata' &&
+								?.source?.id === 'metadata' &&
 							attributes.metadata?.bindings?.[ currentAttribute ]
-								?.source_params.value === item.key
+								?.source?.params?.value === item.key
 								? 'selected-meta-field'
 								: ''
 						}

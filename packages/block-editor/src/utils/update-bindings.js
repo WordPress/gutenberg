@@ -19,12 +19,16 @@ export const updateBlockBindingsAttribute = (
 	//
 	// "bindings": {
 	//   "title": {
-	//     "source_id": "metadata",
-	//     "source_params": { "value": "text_custom_field" }
+	//       "source": {
+	//         "id": "metadata",
+	//         "params": { "value": "text_custom_field" }
+	//       }
 	//   },
 	//   "url": {
-	//     "source_id": "metadata",
-	//     "source_params": { "value": "url_custom_field" }
+	//       "source": {
+	//         "id": "metadata",
+	//         "params": { "value": "text_custom_field" }
+	//       }
 	//   }
 	// },
 	// .
@@ -54,9 +58,9 @@ export const updateBlockBindingsAttribute = (
 		? metadataAttribute.bindings
 		: {};
 
-	bindingsProperty[ updatingAttribute ] = {};
-	bindingsProperty[ updatingAttribute ].source_id = sourceName;
-	bindingsProperty[ updatingAttribute ].source_params = sourceParams;
+	bindingsProperty[ updatingAttribute ] = {
+		source: { id: sourceName, params: sourceParams },
+	};
 
 	metadataAttribute.bindings = bindingsProperty;
 	// TODO: Decide if we want to include the setAttributes call here.

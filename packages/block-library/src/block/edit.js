@@ -41,14 +41,14 @@ function isPartiallySynced( block ) {
 		!! getBlockSupport( block.name, '__experimentalConnections', false ) &&
 		!! block.attributes.metadata?.bindings &&
 		Object.values( block.attributes.metadata.bindings ).some(
-			( binding ) => binding.source_id === 'pattern_attributes'
+			( binding ) => binding.source.id === 'pattern_attributes'
 		)
 	);
 }
 function getPartiallySyncedAttributes( block ) {
 	return Object.entries( block.attributes.metadata.bindings )
 		.filter(
-			( [ , binding ] ) => binding.source_id === 'pattern_attributes'
+			( [ , binding ] ) => binding.source.id === 'pattern_attributes'
 		)
 		.map( ( [ attributeKey ] ) => attributeKey );
 }

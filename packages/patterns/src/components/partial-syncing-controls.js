@@ -77,7 +77,7 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 							checked={
 								attributes?.metadata?.bindings?.[
 									attributeName
-								]?.source_id === 'pattern_attributes'
+								]?.source?.id === 'pattern_attributes'
 							}
 							onChange={ ( isChecked ) => {
 								// TODO: REVIEW WHY THE CHECKED IS NOT UPDATED.
