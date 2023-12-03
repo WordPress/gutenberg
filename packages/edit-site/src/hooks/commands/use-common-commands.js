@@ -244,11 +244,17 @@ function useGlobalStylesOpenRevisionsCommands() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isEditorPage = ! getIsListPage( params, isMobileViewport );
 	const history = useHistory();
-	const hasRevisions = useSelect(
-		( select ) =>
-			select( coreStore ).getCurrentThemeGlobalStylesRevisions()?.length,
-		[]
-	);
+	const hasRevisions = useSelect( ( select ) => {
+		const { getRevisions, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+		const globalStylesRevisions = getRevisions(
+			'root',
+			'globalStyles',
+			__experimentalGetCurrentGlobalStylesId()
+		);
+		return !! globalStylesRevisions?.length;
+	}, [] );
+
 	const commands = useMemo( () => {
 		if ( ! hasRevisions ) {
 			return [];
