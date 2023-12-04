@@ -142,3 +142,6 @@ export {
 	useMobileGlobalStylesColors,
 	useEditorColorScheme,
 } from './mobile/global-styles-context/utils';
+
+// Private APIs.
+export { privateApis } from './private-apis';
