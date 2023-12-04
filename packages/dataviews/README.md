@@ -22,7 +22,7 @@ npm install @wordpress/dataviews --save
 	fields={ fields }
 	actions={ [ trashPostAction ] }
 	paginationInfo={ { totalItems, totalPages } }
-	onClickPreview={ ( item ) => { /* handle preview */ } }
+	onSelectionChange={ ( items ) => { /* ... */ } }
 />
 ```
 

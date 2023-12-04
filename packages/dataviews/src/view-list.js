@@ -10,7 +10,7 @@ export default function ViewList( {
 	fields,
 	data,
 	getItemId,
-	onClickPreview,
+	onSelectionChange,
 } ) {
 	const shownData = useAsyncList( data, { step: 3 } );
 	const primaryField = fields.find(
@@ -26,7 +26,7 @@ export default function ViewList( {
 					<li
 						key={ getItemId?.( item ) || index }
 						onClick={ () => {
-							onClickPreview( item );
+							onSelectionChange( [ item ] );
 						} }
 					>
 						<HStack>

@@ -129,7 +129,7 @@ export default function PagePages() {
 	const [ view, setView ] = useView( postType );
 	const [ previewItem, setPreview ] = useState();
 
-	const onClickPreview = ( item ) => setPreview( item.id );
+	const onSelectionChange = ( item ) => setPreview( item.id );
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -319,7 +319,7 @@ export default function PagePages() {
 					isLoading={ isLoadingPages || isLoadingAuthors }
 					view={ view }
 					onChangeView={ onChangeView }
-					onClickPreview={ onClickPreview }
+					onSelectionChange={ onSelectionChange }
 				/>
 			</Page>
 			{ view.type === LAYOUT_LIST && (
