@@ -83,6 +83,7 @@ export default function PatternActions( {
 	const isRemovable = isTemplateRemovable( record );
 	const isRevertable = isTemplateRevertable( record );
 	const isEditable = isUserPattern || isRemovable;
+	const isDuplicable = isUserPattern || isNonUserPattern || isRemovable;
 	const decodedTitle = decodeEntities(
 		record?.title?.rendered || record?.title?.raw
 	);
@@ -191,12 +192,14 @@ export default function PatternActions( {
 							onClose={ onClose }
 						/>
 					) }
-					<DuplicateMenuItem
-						categoryId={ categoryId }
-						item={ record || item }
-						onClose={ onClose }
-						label={ __( 'Duplicate' ) }
-					/>
+					{ isDuplicable && (
+						<DuplicateMenuItem
+							categoryId={ categoryId }
+							item={ record || item }
+							onClose={ onClose }
+							label={ __( 'Duplicate' ) }
+						/>
+					) }
 					{ isUserPattern && (
 						<MenuItem onClick={ () => exportAsJSON( record ) }>
 							{ __( 'Export as JSON' ) }
