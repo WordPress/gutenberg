@@ -96,6 +96,11 @@
 	}
 }
 
+.is-distraction-free .edit-site-visual-editor__back-button {
+	top: auto;
+	bottom: $grid-unit-10;
+}
+
 .resizable-editor__drag-handle {
 	position: absolute;
 	top: 0;
