@@ -344,8 +344,7 @@ function ViewTable( {
 	const columns = useMemo( () => {
 		const _columns = fields.map( ( field ) => {
 			const { render, getValue, ...column } = field;
-			column.cell = ( props ) =>
-				render( { item: props.row.original, view } );
+			column.cell = ( props ) => render( { item: props.row.original } );
 			if ( getValue ) {
 				column.accessorFn = ( item ) => getValue( { item } );
 			}

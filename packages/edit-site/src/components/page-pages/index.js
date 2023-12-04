@@ -194,13 +194,13 @@ export default function PagePages() {
 				id: 'featured-image',
 				header: __( 'Featured Image' ),
 				getValue: ( { item } ) => item.featured_media,
-				render: ( { item, view: currentView } ) =>
+				render: ( { item } ) =>
 					!! item.featured_media ? (
 						<Media
 							className="edit-site-page-pages__featured-image"
 							id={ item.featured_media }
 							size={
-								currentView.type === 'list'
+								view.type === 'list'
 									? [ 'thumbnail', 'medium', 'large', 'full' ]
 									: [ 'large', 'full', 'medium', 'thumbnail' ]
 							}
@@ -271,7 +271,7 @@ export default function PagePages() {
 				},
 			},
 		],
-		[ authors ]
+		[ authors, view ]
 	);
 
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
