@@ -295,6 +295,9 @@ export default function EditorCanvas( {
 				<div
 					className={ classnames(
 						'editor-editor-canvas__post-title-wrapper',
+						// The following class is only hear for backward comapatibility
+						// some themes might be using it to style the post title.
+						'edit-post-visual-editor__post-title-wrapper',
 						{
 							'has-global-padding': hasRootPaddingAwareAlignments,
 						}
