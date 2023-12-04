@@ -194,8 +194,7 @@ const DEFAULT_CONTROLS = {
 	childLayout: true,
 };
 
-export default function DimensionsPanel( {
-	as: Wrapper = DimensionsToolsPanel,
+function DimensionsPanelWithinWrapper( {
 	value,
 	onChange,
 	inheritedValue = value,
@@ -376,39 +375,10 @@ export default function DimensionsPanel( {
 		} );
 	};
 	const hasChildLayoutValue = () => !! value?.layout;
-
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			layout: cleanEmptyObject( {
-				...previousValue?.layout,
-				contentSize: undefined,
-				wideSize: undefined,
-				selfStretch: undefined,
-				flexSize: undefined,
-			} ),
-			spacing: {
-				...previousValue?.spacing,
-				padding: undefined,
-				margin: undefined,
-				blockGap: undefined,
-			},
-			dimensions: {
-				...previousValue?.dimensions,
-				minHeight: undefined,
-			},
-		};
-	}, [] );
-
 	const onMouseLeaveControls = () => onVisualize( false );
 
 	return (
-		<Wrapper
-			resetAllFilter={ resetAllFilter }
-			value={ value }
-			onChange={ onChange }
-			panelId={ panelId }
-		>
+		<>
 			{ ( showContentSizeControl || showWideSizeControl ) && (
 				<span className="span-columns">
 					{ __( 'Set the width of the main content area.' ) }
@@ -636,6 +606,64 @@ export default function DimensionsPanel( {
 					/>
 				</VStack>
 			) }
+		</>
+	);
+}
+
+export default function DimensionsPanel( {
+	as: Wrapper = DimensionsToolsPanel,
+	value,
+	onChange,
+	inheritedValue = value,
+	settings,
+	panelId,
+	defaultControls = DEFAULT_CONTROLS,
+	onVisualize = () => {},
+	// Special case because the layout controls are not part of the dimensions panel
+	// in global styles but not in block inspector.
+	includeLayoutControls = false,
+} ) {
+	const resetAllFilter = useCallback( ( previousValue ) => {
+		return {
+			...previousValue,
+			layout: cleanEmptyObject( {
+				...previousValue?.layout,
+				contentSize: undefined,
+				wideSize: undefined,
+				selfStretch: undefined,
+				flexSize: undefined,
+			} ),
+			spacing: {
+				...previousValue?.spacing,
+				padding: undefined,
+				margin: undefined,
+				blockGap: undefined,
+			},
+			dimensions: {
+				...previousValue?.dimensions,
+				minHeight: undefined,
+			},
+		};
+	}, [] );
+
+	return (
+		<Wrapper
+			resetAllFilter={ resetAllFilter }
+			value={ value }
+			onChange={ onChange }
+			panelId={ panelId }
+		>
+			<DimensionsPanelWithinWrapper
+				as={ Wrapper }
+				value={ value }
+				onChange={ onChange }
+				inheritedValue={ inheritedValue }
+				settings={ settings }
+				panelId={ panelId }
+				defaultControls={ defaultControls }
+				onVisualize={ onVisualize }
+				includeLayoutControls={ includeLayoutControls }
+			/>
 		</Wrapper>
 	);
 }
