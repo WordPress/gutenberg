@@ -18,6 +18,8 @@ defined( 'GUTENBERG_DEVELOPMENT_MODE' ) or define( 'GUTENBERG_DEVELOPMENT_MODE',
 
 gutenberg_pre_init();
 
+/** linter should complain about this comment. */
+
 /**
  * Display a version notice and deactivate the Gutenberg plugin.
  *

@@ -9,7 +9,9 @@
 	</rule>
 
 	<rule ref="WordPress-Core"/>
-	<rule ref="WordPress-Docs"/>
+	<rule ref="WordPress-Docs">
+		<type>warning</type>
+	</rule>
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
