@@ -43,7 +43,7 @@ import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls
  * @param {boolean} props.hideDragHandle Show or hide the Drag Handle for drag and drop functionality.
  * @param {string}  props.variant        Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
  */
-const BlockToolbar = ( { hideDragHandle, variant } ) => {
+const BlockToolbar = ( { hideDragHandle, variant = 'unstyled' } ) => {
 	const {
 		blockClientId,
 		blockClientIds,
@@ -142,7 +142,8 @@ const BlockToolbar = ( { hideDragHandle, variant } ) => {
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
-			variant={ variant }
+			// The variant is applied as "toolbar" when undefined, which is the black border style of the dropdown from the toolbar popover.
+			variant={ variant === 'highContrast' ? undefined : variant }
 			// Resets the index whenever the active block changes so
 			// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
 			key={ blockClientId }

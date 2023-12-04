@@ -53,10 +53,7 @@ function Header( { setListViewToggleElement } ) {
 					{ hasFixedToolbar && isLargeViewport && (
 						<>
 							<div className="selected-block-tools-wrapper">
-								<BlockToolbar
-									hideDragHandle
-									variant="unstyled"
-								/>
+								<BlockToolbar hideDragHandle />
 							</div>
 							<Popover.Slot
 								ref={ blockToolbarRef }
