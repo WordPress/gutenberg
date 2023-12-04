@@ -92,6 +92,7 @@ function BlockListBlock( {
 	toggleSelection,
 } ) {
 	const {
+		themeSupportsAppearanceTools,
 		themeSupportsLayout,
 		isTemporarilyEditingAsBlocks,
 		blockEditingMode,
@@ -103,6 +104,8 @@ function BlockListBlock( {
 				getBlockEditingMode,
 			} = select( blockEditorStore );
 			return {
+				themeSupportsAppearanceTools:
+					getSettings().themeSupportsAppearanceTools,
 				themeSupportsLayout: getSettings().supportsLayout,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
@@ -161,6 +164,10 @@ function BlockListBlock( {
 		!! wrapperProps[ 'data-align' ] &&
 		! themeSupportsLayout;
 
+	// Support for sticky position in classic themes with alignment wrappers.
+
+	const isSticky = className?.includes( 'is-position-sticky' );
+
 	// For aligned blocks, provide a wrapper element so the block can be
 	// positioned relative to the block column.
 	// This is only kept for classic themes that don't support layout
@@ -172,7 +179,11 @@ function BlockListBlock( {
 	if ( isAligned ) {
 		blockEdit = (
 			<div
-				className="wp-block"
+				className={ `wp-block${
+					themeSupportsAppearanceTools && isSticky
+						? ' ' + className
+						: ''
+				}` }
 				data-align={ wrapperProps[ 'data-align' ] }
 			>
 				{ blockEdit }
@@ -221,7 +232,7 @@ function BlockListBlock( {
 					isTemporarilyEditingAsBlocks,
 			},
 			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
-			className
+			! ( dataAlign && isSticky ) && className
 		),
 		wrapperProps: restWrapperProps,
 		isAligned,
