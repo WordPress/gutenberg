@@ -52,11 +52,9 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function BlockEditAnchorControl( { blockName, attributes, setAttributes } ) {
-	const blockEditingMode = useBlockEditingMode();
-
+function BlockEditAnchorControl( { attributes, setAttributes } ) {
 	const isWeb = Platform.OS === 'web';
-	const textControl = (
+	return (
 		<TextControl
 			__nextHasNoMarginBottom
 			__next40pxDefaultSize
@@ -91,12 +89,19 @@ function BlockEditAnchorControl( { blockName, attributes, setAttributes } ) {
 			autoComplete="off"
 		/>
 	);
+}
 
+function BlockEditAnchor( { blockName, attributes, setAttributes } ) {
+	const blockEditingMode = useBlockEditingMode();
+	const isWeb = Platform.OS === 'web';
 	return (
 		<>
 			{ isWeb && blockEditingMode === 'default' && (
 				<InspectorControls group="advanced">
-					{ textControl }
+					<BlockEditAnchorControl
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+					/>
 				</InspectorControls>
 			) }
 			{ /*
@@ -108,7 +113,10 @@ function BlockEditAnchorControl( { blockName, attributes, setAttributes } ) {
 			{ ! isWeb && blockName === 'core/heading' && (
 				<InspectorControls>
 					<PanelBody title={ __( 'Heading settings' ) }>
-						{ textControl }
+						<BlockEditAnchorControl
+							attributes={ attributes }
+							setAttributes={ setAttributes }
+						/>
 					</PanelBody>
 				</InspectorControls>
 			) }
@@ -131,7 +139,7 @@ export const withAnchorControls = createHigherOrderComponent( ( BlockEdit ) => {
 				<BlockEdit { ...props } />
 				{ props.isSelected &&
 					hasBlockSupport( props.name, 'anchor' ) && (
-						<BlockEditAnchorControl
+						<BlockEditAnchor
 							blockName={ props.name }
 							attributes={ props.attributes }
 							setAttributes={ props.setAttributes }

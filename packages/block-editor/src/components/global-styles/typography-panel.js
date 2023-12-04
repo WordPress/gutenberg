@@ -147,8 +147,7 @@ const DEFAULT_CONTROLS = {
 	textColumns: true,
 };
 
-export default function TypographyPanel( {
-	as: Wrapper = TypographyToolsPanel,
+function TypographyPanelWithinWrapper( {
 	value,
 	onChange,
 	inheritedValue = value,
@@ -325,20 +324,8 @@ export default function TypographyPanel( {
 	const hasWritingMode = () => !! value?.typography?.writingMode;
 	const resetWritingMode = () => setWritingMode( undefined );
 
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			typography: {},
-		};
-	}, [] );
-
 	return (
-		<Wrapper
-			resetAllFilter={ resetAllFilter }
-			value={ value }
-			onChange={ onChange }
-			panelId={ panelId }
-		>
+		<>
 			{ hasFontFamilyEnabled && (
 				<ToolsPanelItem
 					label={ __( 'Font family' ) }
@@ -506,6 +493,41 @@ export default function TypographyPanel( {
 					/>
 				</ToolsPanelItem>
 			) }
+		</>
+	);
+}
+
+export default function TypographyPanel( {
+	as: Wrapper = TypographyToolsPanel,
+	value,
+	onChange,
+	inheritedValue = value,
+	settings,
+	panelId,
+	defaultControls = DEFAULT_CONTROLS,
+} ) {
+	const resetAllFilter = useCallback( ( previousValue ) => {
+		return {
+			...previousValue,
+			typography: {},
+		};
+	}, [] );
+
+	return (
+		<Wrapper
+			resetAllFilter={ resetAllFilter }
+			value={ value }
+			onChange={ onChange }
+			panelId={ panelId }
+		>
+			<TypographyPanelWithinWrapper
+				value={ value }
+				onChange={ onChange }
+				inheritedValue={ inheritedValue }
+				settings={ settings }
+				defaultControls={ defaultControls }
+				panelId={ panelId }
+			/>
 		</Wrapper>
 	);
 }
