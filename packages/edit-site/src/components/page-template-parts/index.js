@@ -77,12 +77,7 @@ export default function PageTemplateParts() {
 		},
 		{
 			header: <VisuallyHidden>{ __( 'Actions' ) }</VisuallyHidden>,
-			cell: ( templatePart ) => (
-				<PatternActions
-					postType={ templatePart.type }
-					postId={ templatePart.id }
-				/>
-			),
+			cell: ( templatePart ) => <PatternActions item={ templatePart } />,
 		},
 	];
 

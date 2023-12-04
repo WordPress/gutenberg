@@ -39,8 +39,7 @@ import {
 } from '../../utils/constants';
 
 export default function PatternActions( {
-	postType,
-	postId,
+	item,
 	className,
 	toggleProps = {},
 	popoverProps = {},
@@ -48,11 +47,18 @@ export default function PatternActions( {
 	icon = moreVertical,
 } ) {
 	const record = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecord( 'postType', postType, postId ),
-		[ postType, postId ]
+		( select ) => {
+			if ( item?.type && item?.id ) {
+				return select( coreStore ).getEntityRecord(
+					'postType',
+					item?.type,
+					item?.id
+				);
+			}
+			return null;
+		},
+		[ item?.type, item?.id ]
 	);
-
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
 	const { saveEditedEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
@@ -61,10 +67,16 @@ export default function PatternActions( {
 		useDispatch( reusableBlocksStore );
 	// Only custom patterns or custom template parts can be renamed or deleted.
 	const isUserPattern = record?.type === PATTERN_TYPES.user;
+	const isNonUserPattern = item?.type === PATTERN_TYPES.theme;
 	const isTemplate = record?.type === TEMPLATE_POST_TYPE;
 	const isTemplatePart = record?.type === TEMPLATE_PART_POST_TYPE;
 
-	if ( ! isTemplatePart && ! isTemplate && ! isUserPattern ) {
+	if (
+		! isTemplatePart &&
+		! isTemplate &&
+		! isUserPattern &&
+		! isNonUserPattern
+	) {
 		return null;
 	}
 
@@ -113,18 +125,18 @@ export default function PatternActions( {
 		}
 	};
 
-	const deleteItem = async ( item ) => {
-		if ( isTemplateRemovable( item ) ) {
-			removeTemplate( item );
+	const deleteItem = async () => {
+		if ( isTemplateRemovable( record ) ) {
+			removeTemplate( record );
 		} else if ( isUserPattern ) {
-			deletePattern( item );
+			deletePattern( record );
 		}
 	};
 
-	async function revertAndSaveTemplate( item ) {
+	async function revertAndSaveTemplate() {
 		try {
 			await revertTemplate( record, { allowUndo: false } );
-			await saveEditedEntityRecord( 'postType', item.type, item.id );
+			await saveEditedEntityRecord( 'postType', record.type, record.id );
 
 			createSuccessNotice(
 				sprintf(
@@ -141,7 +153,7 @@ export default function PatternActions( {
 			const fallbackErrorMessage = sprintf(
 				// translators: %s: a post type label, e.g., Template, Template Part or Pattern.
 				__( 'An error occurred while reverting the %s.' ),
-				POST_TYPE_LABELS[ postType ] ??
+				POST_TYPE_LABELS[ record?.type ] ??
 					POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ]
 			);
 			const errorMessage =
@@ -151,12 +163,6 @@ export default function PatternActions( {
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
-	}
-
-	const shouldDisplayMenu = isEditable || isRevertable;
-
-	if ( ! shouldDisplayMenu ) {
-		return null;
 	}
 
 	const { categoryId } = getQueryArgs( window.location.href );
@@ -179,43 +185,38 @@ export default function PatternActions( {
 			{ ( { onClose } ) => (
 				<MenuGroup>
 					{ isEditable && (
-						<>
-							<RenameMenuItem
-								postId={ postId }
-								postType={ postType }
-								onClose={ onClose }
-							/>
-							{ isUserPattern && (
-								<>
-									<DuplicateMenuItem
-										categoryId={ categoryId }
-										item={ record }
-										onClose={ onClose }
-										label={ __( 'Duplicate' ) }
-									/>
-									<MenuItem
-										onClick={ () => exportAsJSON( record ) }
-									>
-										{ __( 'Export as JSON' ) }
-									</MenuItem>
-								</>
-							) }
-							<DeleteMenuItem
-								postType={ postType }
-								onRemove={ () => {
-									deleteItem( record );
-									onRemove?.( record );
-									onClose();
-								} }
-								title={ decodedTitle }
-							/>
-						</>
+						<RenameMenuItem
+							postId={ record?.id }
+							postType={ record?.type }
+							onClose={ onClose }
+						/>
 					) }
-
+					<DuplicateMenuItem
+						categoryId={ categoryId }
+						item={ record || item }
+						onClose={ onClose }
+						label={ __( 'Duplicate' ) }
+					/>
+					{ isUserPattern && (
+						<MenuItem onClick={ () => exportAsJSON( record ) }>
+							{ __( 'Export as JSON' ) }
+						</MenuItem>
+					) }
+					{ isEditable && (
+						<DeleteMenuItem
+							postType={ record?.type }
+							onRemove={ () => {
+								deleteItem();
+								onRemove?.( record );
+								onClose();
+							} }
+							title={ decodedTitle }
+						/>
+					) }
 					{ isRevertable && (
 						<RevertMenuItem
 							onRemove={ () => {
-								revertAndSaveTemplate( record );
+								revertAndSaveTemplate();
 								onClose();
 							} }
 						/>

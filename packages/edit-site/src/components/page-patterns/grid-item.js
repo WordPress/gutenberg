@@ -196,7 +196,7 @@ function GridItem( { categoryId, item, ...props } ) {
 						) }
 					</Flex>
 				</HStack>
-				<PatternActions postType={ item.type } postId={ item.id } />
+				<PatternActions item={ item } />
 			</HStack>
 		</li>
 	);

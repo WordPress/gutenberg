@@ -44,8 +44,7 @@ export default function SidebarNavigationScreenPattern() {
 			actions={
 				<>
 					<PatternActions
-						postType={ postType }
-						postId={ postId }
+						item={ { id: postId, type: postType } }
 						toggleProps={ { as: SidebarButton } }
 						onRemove={ () => {
 							navigator.goTo( backPath );
