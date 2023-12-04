@@ -37,8 +37,9 @@ export function CodeEdit( props ) {
 			styles.blockCode,
 			styles.blockCodeDark
 		),
-		...( style?.fontSize && { fontSize: style.fontSize } ),
 	};
+
+	const textStyle = style?.fontSize ? { fontSize: style.fontSize } : {};
 
 	const placeholderStyle = usePreferredColorSchemeStyle(
 		styles.placeholder,
@@ -46,20 +47,21 @@ export function CodeEdit( props ) {
 	);
 
 	return (
-		<View>
+		<View style={ codeStyle }>
 			<RichText
 				value={ attributes.content }
 				identifier="content"
-				style={ codeStyle }
+				style={ textStyle }
 				underlineColorAndroid="transparent"
 				onChange={ ( content ) => setAttributes( { content } ) }
 				onMerge={ mergeBlocks }
 				placeholder={ __( 'Write code…' ) }
 				aria-label={ __( 'Code' ) }
-				isSelected={ props.isSelected }
 				onFocus={ onFocus }
 				onBlur={ onBlur }
 				placeholderTextColor={ placeholderStyle.color }
+				preserveWhiteSpace
+				__unstablePastePlainText
 				__unstableOnSplitAtDoubleLineEnd={ () =>
 					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
 				}
