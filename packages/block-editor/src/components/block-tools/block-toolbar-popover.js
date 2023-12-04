@@ -45,7 +45,7 @@ export default function BlockToolbarPopover( {
 			resize={ false }
 			{ ...popoverProps }
 		>
-			<BlockToolbar />
+			<BlockToolbar variant="highContrast" />
 		</BlockPopover>
 	);
 }

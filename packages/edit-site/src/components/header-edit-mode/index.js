@@ -161,10 +161,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 									}
 								) }
 							>
-								<BlockToolbar
-									hideDragHandle
-									variant="unstyled"
-								/>
+								<BlockToolbar hideDragHandle />
 							</div>
 							<Popover.Slot
 								ref={ blockToolbarRef }

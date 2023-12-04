@@ -248,10 +248,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 											<BlockInspector />
 										</SidebarInspectorFill>
 										{ ! isLargeViewport && (
-											<BlockToolbar
-												hideDragHandle
-												variant="unstyled"
-											/>
+											<BlockToolbar hideDragHandle />
 										) }
 										<SiteEditorCanvas />
 										<BlockRemovalWarningModal

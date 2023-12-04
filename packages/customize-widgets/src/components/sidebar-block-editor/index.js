@@ -118,7 +118,7 @@ export default function SidebarBlockEditor( {
 					}
 				/>
 				{ ( isFixedToolbarActive || ! isMediumViewport ) && (
-					<BlockToolbar hideDragHandle variant="unstyled" />
+					<BlockToolbar hideDragHandle />
 				) }
 				<BlockTools>
 					<BlockCanvas
