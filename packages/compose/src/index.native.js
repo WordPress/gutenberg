@@ -33,6 +33,7 @@ export { default as usePreferredColorScheme } from './hooks/use-preferred-color-
 export { default as usePreferredColorSchemeStyle } from './hooks/use-preferred-color-scheme-style';
 export { default as useResizeObserver } from './hooks/use-resize-observer';
 export { default as useDebounce } from './hooks/use-debounce';
+export { default as useDebouncedInput } from './hooks/use-debounced-input';
 export { default as useThrottle } from './hooks/use-throttle';
 export { default as useMergeRefs } from './hooks/use-merge-refs';
 export { default as useRefEffect } from './hooks/use-ref-effect';
