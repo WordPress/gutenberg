@@ -528,7 +528,7 @@ describe( 'rawHandler', () => {
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
-	it.skip( 'should convert a caption shortcode', () => {
+	it( 'should convert a caption shortcode', () => {
 		const HTML = readFile(
 			path.join(
 				fixturesPath,
@@ -538,7 +538,7 @@ describe( 'rawHandler', () => {
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
-	it.skip( 'should convert a caption shortcode with link', () => {
+	it( 'should convert a caption shortcode with link', () => {
 		const HTML = readFile(
 			path.join(
 				fixturesPath,
@@ -548,7 +548,7 @@ describe( 'rawHandler', () => {
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
-	it.skip( 'should convert a caption shortcode with caption', () => {
+	it( 'should convert a caption shortcode with caption', () => {
 		const HTML = readFile(
 			path.join(
 				fixturesPath,
@@ -558,7 +558,7 @@ describe( 'rawHandler', () => {
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
-	it.skip( 'should convert a list with attributes', () => {
+	it( 'should convert a list with attributes', () => {
 		const HTML = readFile(
 			path.join(
 				fixturesPath,
@@ -568,12 +568,12 @@ describe( 'rawHandler', () => {
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
-	it.skip( 'should not strip any text-level elements', () => {
+	it( 'should not strip any text-level elements', () => {
 		const HTML = '<p>This is <u>ncorect</u></p>';
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
-	it.skip( 'should preserve alignment', () => {
+	it( 'should preserve alignment', () => {
 		const HTML = '<p style="text-align:center">center</p>';
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
