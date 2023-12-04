@@ -117,6 +117,61 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		gutenberg_process_directives_in_root_blocks( $rendered_content, $parsed_block );
 		$this->assertEmpty( WP_Directive_Processor::$root_block );
 	}
+
+	public function test_directive_processing_of_interactive_block() {
+		register_block_type(
+			'gutenberg/test-context',
+			array(
+				'render_callback' => function () {
+					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "hello" }\'><p data-wp-text=\'context.MyText\'></p></div>';
+				},
+				'supports'        => array(
+					'interactivity' => true,
+				),
+			)
+		);
+		$args = array(
+			'post_content' => '<!-- wp:gutenberg/test-context /-->',
+			'post_excerpt' => '',
+		);
+		$post = $this->factory()->post->create_and_get( $args );
+		setup_postdata( $post );
+
+		$content         = get_the_content( null, false, $post );
+		$rendered_blocks = do_blocks( $content );
+		$expected        = '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "hello" }\'><p data-wp-text=\'context.MyText\'>hello</p></div>';
+		$this->assertSame( $expected, $rendered_blocks );
+
+		unregister_block_type( 'gutenberg/test-context' );
+		wp_delete_post( $post->ID, true );
+	}
+	public function test_directive_processing_child_blocks() {
+		register_block_type(
+			'gutenberg/test-context',
+			array(
+				'render_callback' => function () {
+					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "hello" }\'><p data-wp-text=\'context.MyText\'></p></div>';
+				},
+				'supports'        => array(
+					'interactivity' => true,
+				),
+			)
+		);
+		$args = array(
+			'post_content' => '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group"><!-- wp:gutenberg/test-context /--></div><!-- /wp:group -->',
+			'post_excerpt' => '',
+		);
+		$post = $this->factory()->post->create_and_get( $args );
+		setup_postdata( $post );
+
+		$content         = get_the_content( null, false, $post );
+		$rendered_blocks = do_blocks( $content );
+		$expected        = '<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained"><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "hello" }\'><p data-wp-text=\'context.MyText\'>hello</p></div></div></div>';
+		$this->assertSame( $expected, $rendered_blocks );
+
+		unregister_block_type( 'gutenberg/test-context' );
+		wp_delete_post( $post->ID, true );
+	}
 }
 
 
