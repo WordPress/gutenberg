@@ -516,9 +516,9 @@ export const setIsListViewOpened =
  * @deprecated
  */
 export function setIsEditingTemplate() {
-	deprecated( "select( 'core/edit-post' ).setIsEditingTemplate", {
+	deprecated( "dispatch( 'core/edit-post' ).setIsEditingTemplate", {
 		since: '6.5',
-		alternative: "select( 'core/editor').setRenderingMode",
+		alternative: "dispatch( 'core/editor').setRenderingMode",
 	} );
 	return { type: 'NOTHING' };
 }
