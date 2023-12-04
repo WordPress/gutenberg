@@ -185,18 +185,20 @@ export default function PatternActions( {
 								postType={ postType }
 								onClose={ onClose }
 							/>
-							<DuplicateMenuItem
-								categoryId={ categoryId }
-								item={ record }
-								onClose={ onClose }
-								label={ __( 'Duplicate' ) }
-							/>
 							{ isUserPattern && (
-								<MenuItem
-									onClick={ () => exportAsJSON( record ) }
-								>
-									{ __( 'Export as JSON' ) }
-								</MenuItem>
+								<>
+									<DuplicateMenuItem
+										categoryId={ categoryId }
+										item={ record }
+										onClose={ onClose }
+										label={ __( 'Duplicate' ) }
+									/>
+									<MenuItem
+										onClick={ () => exportAsJSON( record ) }
+									>
+										{ __( 'Export as JSON' ) }
+									</MenuItem>
+								</>
 							) }
 							<DeleteMenuItem
 								postType={ postType }
