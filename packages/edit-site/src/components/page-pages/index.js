@@ -200,9 +200,9 @@ export default function PagePages() {
 							className="edit-site-page-pages__featured-image"
 							id={ item.featured_media }
 							size={
-								view.type === 'list'
-									? [ 'thumbnail', 'medium', 'large', 'full' ]
-									: [ 'large', 'full', 'medium', 'thumbnail' ]
+								view.type === LAYOUT_GRID
+									? [ 'large', 'full', 'medium', 'thumbnail' ]
+									: [ 'thumbnail', 'medium', 'large', 'full' ]
 							}
 						/>
 					) : null,
