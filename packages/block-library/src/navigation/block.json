@@ -33,6 +33,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"flexibleBreakpoint": {
+			"type": "boolean",
+			"default": false
+		},
 		"openSubmenusOnClick": {
 			"type": "boolean",
 			"default": false

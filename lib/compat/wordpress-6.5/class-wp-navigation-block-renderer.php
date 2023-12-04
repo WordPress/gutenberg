@@ -495,6 +495,8 @@ class WP_Navigation_Block_Renderer {
 		$is_responsive_menu      = static::is_responsive( $attributes );
 		$style                   = static::get_styles( $attributes );
 		$class                   = static::get_classes( $attributes );
+		$has_flexible_breakpoint = $attributes['flexibleBreakpoint'] ? 'true' : 'false';
+
 		$wrapper_attributes      = get_block_wrapper_attributes(
 			array(
 				'class'      => $class,
@@ -504,7 +506,7 @@ class WP_Navigation_Block_Renderer {
 		);
 
 		if ( $is_responsive_menu ) {
-			$nav_element_directives = static::get_nav_element_directives( $should_load_view_script );
+			$nav_element_directives = static::get_nav_element_directives( $should_load_view_script, $has_flexible_breakpoint );
 			$wrapper_attributes    .= ' ' . $nav_element_directives;
 		}
 
@@ -517,7 +519,7 @@ class WP_Navigation_Block_Renderer {
 	 * @param bool $should_load_view_script Whether or not the view script should be loaded.
 	 * @return string the directives for the navigation element.
 	 */
-	private static function get_nav_element_directives( $should_load_view_script ) {
+	private static function get_nav_element_directives( $should_load_view_script, $has_flexible_breakpoint ) {
 		if ( ! $should_load_view_script ) {
 			return '';
 		}
@@ -528,6 +530,7 @@ class WP_Navigation_Block_Renderer {
 				'type'            => 'overlay',
 				'roleAttribute'   => '',
 				'ariaLabel'       => __( 'Menu' ),
+				'has_flexible_breakpoint'   => $has_flexible_breakpoint,
 			),
 			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
 		);

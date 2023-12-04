@@ -98,6 +98,7 @@ function Navigation( {
 		openSubmenusOnClick,
 		overlayMenu,
 		showSubmenuIcon,
+		flexibleBreakpoint,
 		templateLock,
 		layout: {
 			justifyContent,
@@ -522,6 +523,8 @@ function Navigation( {
 		`overlay-menu-preview`
 	);
 
+	const needsBreakpoint = isResponsive && 'mobile' === overlayMenu;
+
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	const stylingInspectorControls = (
 		<>
@@ -621,6 +624,22 @@ function Navigation( {
 									disabled={ attributes.openSubmenusOnClick }
 									label={ __( 'Show arrow' ) }
 								/>
+
+								{ needsBreakpoint && (
+									<ToggleControl
+										__nextHasNoMarginBottom
+										checked={ flexibleBreakpoint }
+										onChange={ ( value ) => {
+											setAttributes( {
+												flexibleBreakpoint: value,
+											} );
+										} }
+										disabled={
+											attributes.openSubmenusOnClick
+										}
+										label={ __( 'Flexible breakpoint' ) }
+									/>
+								) }
 
 								{ submenuAccessibilityNotice && (
 									<div>
