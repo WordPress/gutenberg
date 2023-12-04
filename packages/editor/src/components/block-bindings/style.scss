@@ -1,0 +1,30 @@
+// TODO: Change the styles.
+.block-bindings-ui-popover {
+	margin-top: 12px;
+	width: 300px;
+	.components-popover__content {
+		width: 100%;
+	}
+
+	.block-bindings-attribute-picker-container {
+		border-bottom: 1px solid #0002;
+	}
+
+	.block-bindings-metadata-source-ui {
+		padding: 12px;
+		li {
+			margin: 20px 8px;
+			cursor: pointer;
+		}
+		.selected-meta-field {
+			font-weight: bold;
+		}
+		.selected-meta-field::before {
+			content: "✔  ";
+			margin-left: -16px;
+		}
+	}
+	.block-bindings-remove-button {
+		color: var(--wp-admin-theme-color, #3858e9);
+	}
+}
