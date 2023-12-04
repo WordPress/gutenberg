@@ -245,14 +245,13 @@ function useGlobalStylesOpenRevisionsCommands() {
 	const isEditorPage = ! getIsListPage( params, isMobileViewport );
 	const history = useHistory();
 	const hasRevisions = useSelect( ( select ) => {
-		const { getRevisions, __experimentalGetCurrentGlobalStylesId } =
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
 			select( coreStore );
-		const globalStylesRevisions = getRevisions(
-			'root',
-			'globalStyles',
-			__experimentalGetCurrentGlobalStylesId()
-		);
-		return !! globalStylesRevisions?.length;
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+		return !! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count;
 	}, [] );
 
 	const commands = useMemo( () => {
