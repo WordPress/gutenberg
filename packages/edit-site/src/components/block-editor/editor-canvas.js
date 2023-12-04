@@ -102,7 +102,11 @@ function EditorCanvas( {
 					canvasMode === 'view'
 						? 'cursor: pointer; min-height: 100vh;'
 						: ''
-				}}}`
+				} ${
+					// In zoomed out mode, hide the normal canvas scrollbar,
+					// as this results in a double-scrollbar
+					isZoomOutMode ? 'overflow: hidden;' : ''
+				}}`
 			}</style>
 			{ children }
 		</BlockCanvas>
