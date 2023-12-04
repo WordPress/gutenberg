@@ -20,9 +20,8 @@
 	justify-content: center;
 	align-items: center;
 	gap: 2rem;
-	width: fit-content;
 }
 
-.col {
-	max-width: 20%;
+.col > img {
+	filter: grayscale(1);
 }

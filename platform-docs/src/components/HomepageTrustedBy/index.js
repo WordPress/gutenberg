@@ -10,23 +10,26 @@ import styles from './styles.module.css';
 
 const Users = [
 	{
-		title: 'Tumblr',
-		img: require( '@site/static/img/tumblr.png' ).default,
-	},
-	{
 		title: 'WordPress',
 		img: require( '@site/static/img/wordpress.png' ).default,
+		height: 60,
+	},
+	{
+		title: 'Tumblr',
+		img: require( '@site/static/img/tumblr.png' ).default,
+		height: 18,
 	},
 	{
 		title: 'Day One',
 		img: require( '@site/static/img/dayone.png' ).default,
+		height: 100,
 	},
 ];
 
-function User( { img, title } ) {
+function User( { img, title, height } ) {
 	return (
 		<div className={ styles.col }>
-			<img src={ img } alt={ title } />
+			<img src={ img } alt={ title } style={ { height } } />
 		</div>
 	);
 }
