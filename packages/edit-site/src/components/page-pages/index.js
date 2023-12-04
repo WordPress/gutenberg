@@ -128,9 +128,10 @@ const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'tra
 export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
-	const [ previewItem, setPreview ] = useState();
+	const [ pageId, setPageId ] = useState( null );
 
-	const onSelectionChange = ( item ) => setPreview( item.id );
+	const onSelectionChange = ( items ) =>
+		setPageId( items?.length === 1 ? items[ 0 ].id : null );
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -326,13 +327,12 @@ export default function PagePages() {
 			{ view.type === LAYOUT_LIST && (
 				<Page>
 					<div className="edit-site-page-pages-preview">
-						{ previewItem && (
+						{ pageId !== null ? (
 							<SideEditor
-								postId={ previewItem }
+								postId={ pageId }
 								postType={ postType }
 							/>
-						) }
-						{ ! previewItem && (
+						) : (
 							<div
 								style={ {
 									display: 'flex',
