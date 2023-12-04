@@ -7,10 +7,6 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	InspectorControls,
-	__experimentalUseBorderProps as useBorderProps,
-	__experimentalUseColorProps as useColorProps,
-	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
-	getTypographyClassesAndStyles as useTypographyProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { TextControl, SelectControl, PanelBody } from '@wordpress/components';
@@ -23,11 +19,6 @@ import {
 	formSubmissionNotificationSuccess,
 	formSubmissionNotificationError,
 } from './utils.js';
-
-/**
- * External dependencies
- */
-import classNames from 'classnames';
 
 const ALLOWED_BLOCKS = [
 	'core/paragraph',
@@ -69,7 +60,7 @@ const TEMPLATE = [
 	[ 'core/form-submit-button', {} ],
 ];
 
-const Edit = ( { attributes, setAttributes, className, clientId } ) => {
+const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const { action, method, email, submissionMethod } = attributes;
 	const blockProps = useBlockProps();
 
@@ -91,11 +82,6 @@ const Edit = ( { attributes, setAttributes, className, clientId } ) => {
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,
 	} );
-
-	const borderProps = useBorderProps( attributes );
-	const colorProps = useColorProps( attributes );
-	const spacingProps = useSpacingProps( attributes );
-	const typographyProps = useTypographyProps( attributes );
 
 	return (
 		<>
@@ -186,20 +172,6 @@ const Edit = ( { attributes, setAttributes, className, clientId } ) => {
 			) }
 			<form
 				{ ...innerBlocksProps }
-				style={ {
-					...borderProps.style,
-					...colorProps.style,
-					...spacingProps.style,
-					...typographyProps.style,
-				} }
-				className={ classNames(
-					className,
-					'wp-block-form',
-					colorProps.className,
-					borderProps.className,
-					spacingProps.className,
-					typographyProps.className
-				) }
 				encType={ submissionMethod === 'email' ? 'text/plain' : null }
 			/>
 		</>
