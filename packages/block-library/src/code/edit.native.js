@@ -26,8 +26,7 @@ export function CodeEdit( props ) {
 	const {
 		attributes,
 		setAttributes,
-		onFocus,
-		onBlur,
+		onRemove,
 		style,
 		insertBlocksAfter,
 		mergeBlocks,
@@ -49,16 +48,16 @@ export function CodeEdit( props ) {
 	return (
 		<View style={ codeStyle }>
 			<RichText
+				tagName="pre"
 				value={ attributes.content }
 				identifier="content"
 				style={ textStyle }
 				underlineColorAndroid="transparent"
 				onChange={ ( content ) => setAttributes( { content } ) }
 				onMerge={ mergeBlocks }
+				onRemove={ onRemove }
 				placeholder={ __( 'Write code…' ) }
 				aria-label={ __( 'Code' ) }
-				onFocus={ onFocus }
-				onBlur={ onBlur }
 				placeholderTextColor={ placeholderStyle.color }
 				preserveWhiteSpace
 				__unstablePastePlainText
