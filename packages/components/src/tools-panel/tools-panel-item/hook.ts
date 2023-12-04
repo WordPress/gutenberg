@@ -54,10 +54,8 @@ export function useToolsPanelItem(
 
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const hasValueCallback = useCallback( hasValue, [ panelId ] );
-	const resetAllFilterCallback = useCallback( resetAllFilter, [
-		panelId,
-		resetAllFilter,
-	] );
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
 	const previousPanelId = usePrevious( currentPanelId );
 
 	const hasMatchingPanel =
