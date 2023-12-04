@@ -19,6 +19,8 @@ export default function MetadataSourceUI( props ) {
 
 	// Fetching the REST API to get the available custom fields.
 	// TODO: Review if it works with taxonomies.
+	// TODO: Explore how it should work in templates.
+	// TODO: Explore if it makes sense to create a custom endpoint for this.
 	const data = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
@@ -49,12 +51,31 @@ export default function MetadataSourceUI( props ) {
 			return array;
 		} );
 	}
+
 	addMetadata( metadata, data.meta );
 
-	// TODO: Add filter in case plugins want to add/remove/modify fields.
-	// For example, ACF has its own field named "acf". Adding it manually.
-	// Other example could be post meta (Post Title) not included in "meta".
+	// TODO: Decide if these should be added here or as a separate source.
+	// Example 1: Extend the list with the ACF fields.
 	addMetadata( metadata, data.acf );
+
+	// Example 2: Add post data
+	addMetadata( metadata, {
+		post_title: data.title.rendered,
+		post_date: data.date,
+	} );
+
+	// Example 3: Add site data
+	const siteData = useSelect(
+		( select ) => {
+			const { getEntityRecord } = select( coreStore );
+			return getEntityRecord( 'root', 'site' );
+		},
+		[ context.postType, context.postId ]
+	);
+	addMetadata( metadata, {
+		site_title: siteData.title,
+		site_url: siteData.url,
+	} );
 
 	// TODO: Try to abstract this function to be reused across all the sources.
 	function selectItem( item ) {
