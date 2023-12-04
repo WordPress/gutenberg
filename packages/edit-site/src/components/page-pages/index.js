@@ -49,7 +49,8 @@ const defaultConfigPerViewType = {
 		primaryField: 'title',
 	},
 	[ LAYOUT_LIST ]: {
-		previewField: 'title',
+		primaryField: 'title',
+		preview: true,
 	},
 };
 
@@ -129,7 +130,7 @@ export default function PagePages() {
 	const [ view, setView ] = useView( postType );
 	const [ previewItem, setPreview ] = useState();
 
-	const onClickPreviewField = ( item ) => setPreview( item.id );
+	const onClickPreview = ( item ) => setPreview( item.id );
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -319,10 +320,10 @@ export default function PagePages() {
 					isLoading={ isLoadingPages || isLoadingAuthors }
 					view={ view }
 					onChangeView={ onChangeView }
-					onClickPreviewField={ onClickPreviewField }
+					onClickPreview={ onClickPreview }
 				/>
 			</Page>
-			{ view.layout.previewField && (
+			{ view.layout.preview && (
 				<Page>
 					<div className="edit-site-page-pages-preview">
 						{ previewItem && (

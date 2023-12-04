@@ -11,21 +11,23 @@ export default function ViewList( {
 	fields,
 	data,
 	getItemId,
-	onClickPreviewField,
+	onClickPreview,
 } ) {
 	const shownData = useAsyncList( data, { step: 3 } );
-	const previewField = fields.find(
-		( field ) => field.id === view.layout.previewField
+	const primaryField = fields.find(
+		( field ) => field.id === view.layout.primaryField
 	);
 	return (
 		<ul className="dataviews-list-view">
 			{ shownData.map( ( item, index ) => {
 				return (
+					// TODO: make li interactive.
+					// fix jsx-a11y/click-events-have-key-events and jsx-a11y/no-noninteractive-element-interactions
 					<li key={ getItemId?.( item ) || index } onClick={ () => {
-						onClickPreviewField( item );
+						onClickPreview( item );
 					}}>
 						<HStack>
-						{ previewField?.render( { item } ) }
+						{ primaryField?.render( { item } ) }
 						<Icon icon={ chevronRight } />
 						</HStack>
 					</li>

@@ -28,7 +28,7 @@ export default function DataViews( {
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
-	onClickPreviewField,
+	onClickPreview,
 } ) {
 	const ViewComponent = VIEW_LAYOUTS.find(
 		( v ) => v.type === view.type
@@ -73,7 +73,7 @@ export default function DataViews( {
 					data={ data }
 					getItemId={ getItemId }
 					isLoading={ isLoading }
-					onClickPreviewField={ onClickPreviewField }
+					onClickPreview={ onClickPreview }
 				/>
 				<Pagination
 					view={ view }
