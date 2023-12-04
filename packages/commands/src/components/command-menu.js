@@ -46,34 +46,29 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 
 	return (
 		<>
-			<Command.List>
-				{ commands.map( ( command ) => (
-					<Command.Item
-						key={ command.name }
-						value={ command.searchLabel ?? command.label }
-						onSelect={ () => command.callback( { close } ) }
-						id={ command.name }
+			{ commands.map( ( command ) => (
+				<Command.Item
+					key={ command.name }
+					value={ command.searchLabel ?? command.label }
+					onSelect={ () => command.callback( { close } ) }
+					id={ command.name }
+				>
+					<HStack
+						alignment="left"
+						className={ classnames( 'commands-command-menu__item', {
+							'has-icon': command.icon,
+						} ) }
 					>
-						<HStack
-							alignment="left"
-							className={ classnames(
-								'commands-command-menu__item',
-								{
-									'has-icon': command.icon,
-								}
-							) }
-						>
-							{ command.icon && <Icon icon={ command.icon } /> }
-							<span>
-								<TextHighlight
-									text={ command.label }
-									highlight={ search }
-								/>
-							</span>
-						</HStack>
-					</Command.Item>
-				) ) }
-			</Command.List>
+						{ command.icon && <Icon icon={ command.icon } /> }
+						<span>
+							<TextHighlight
+								text={ command.label }
+								highlight={ search }
+							/>
+						</span>
+					</HStack>
+				</Command.Item>
+			) ) }
 		</>
 	);
 }
