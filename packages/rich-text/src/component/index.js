@@ -124,10 +124,10 @@ export function useRichText( {
 		if ( disableFormats ) {
 			_value.current = newRecord.text;
 		} else {
-			const newFormas = __unstableBeforeSerialize
+			const newFormats = __unstableBeforeSerialize
 				? __unstableBeforeSerialize( newRecord )
 				: newRecord.formats;
-			newRecord = { ...newRecord, formats: newFormas };
+			newRecord = { ...newRecord, formats: newFormats };
 			if ( typeof value === 'string' ) {
 				_value.current = toHTMLString( { value: newRecord } );
 			} else {
@@ -135,7 +135,7 @@ export function useRichText( {
 			}
 		}
 
-		const { start, end, formats, text } = newRecord;
+		const { start, end, formats, text } = record.current;
 
 		// Selection must be updated first, so it is recorded in history when
 		// the content change happens.
