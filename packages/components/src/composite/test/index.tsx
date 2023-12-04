@@ -651,6 +651,71 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 				await key( 'Home', 'ControlLeft' );
 				expect( itemA1 ).toHaveFocus();
 			} );
+
+			test( 'Ignores disabled items', async () => {
+				const Test = () => {
+					const composite = useCompositeState();
+					return (
+						<Composite { ...composite } aria-label="composite">
+							<CompositeItem { ...composite }>
+								Item 1
+							</CompositeItem>
+							<CompositeItem { ...composite } disabled>
+								Item 2
+							</CompositeItem>
+							<CompositeItem { ...composite }>
+								Item 3
+							</CompositeItem>
+						</Composite>
+					);
+				};
+				render( <Test /> );
+
+				const item1 = screen.getByText( 'Item 1' );
+				const item2 = screen.getByText( 'Item 2' );
+				const item3 = screen.getByText( 'Item 3' );
+
+				expect( item2 ).toBeDisabled();
+
+				await userEvent.tab();
+				expect( item1 ).toHaveFocus();
+				await key( 'ArrowDown' );
+				expect( item2 ).not.toHaveFocus();
+				expect( item3 ).toHaveFocus();
+			} );
+
+			test( 'Includes focusable disabled items', async () => {
+				const Test = () => {
+					const composite = useCompositeState();
+					return (
+						<Composite { ...composite } aria-label="composite">
+							<CompositeItem { ...composite }>
+								Item 1
+							</CompositeItem>
+							<CompositeItem { ...composite } disabled focusable>
+								Item 2
+							</CompositeItem>
+							<CompositeItem { ...composite }>
+								Item 3
+							</CompositeItem>
+						</Composite>
+					);
+				};
+				render( <Test /> );
+
+				const item1 = screen.getByText( 'Item 1' );
+				const item2 = screen.getByText( 'Item 2' );
+				const item3 = screen.getByText( 'Item 3' );
+
+				expect( item2 ).toBeEnabled();
+				expect( item2 ).toHaveAttribute( 'aria-disabled', 'true' );
+
+				await userEvent.tab();
+				expect( item1 ).toHaveFocus();
+				await key( 'ArrowDown' );
+				expect( item2 ).toHaveFocus();
+				expect( item3 ).not.toHaveFocus();
+			} );
 		} );
 	}
 );
