@@ -12,15 +12,7 @@ import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	DataViews,
-	ENUMERATION_TYPE,
-	LAYOUT_GRID,
-	LAYOUT_TABLE,
-	OPERATOR_IN,
-	OPERATOR_NOT_IN,
-	VIEW_LAYOUTS,
-} from '@wordpress/dataviews';
+import { DataViews, VIEW_LAYOUTS } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -28,6 +20,14 @@ import {
 import Page from '../page';
 import Link from '../routes/link';
 import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
+import {
+	ENUMERATION_TYPE,
+	LAYOUT_GRID,
+	LAYOUT_TABLE,
+	OPERATOR_IN,
+	OPERATOR_NOT_IN,
+} from '../../utils/constants';
+
 import {
 	trashPostAction,
 	usePermanentlyDeletePostAction,
