@@ -52,7 +52,8 @@ export function useToolsPanelItem(
 		__experimentalLastVisibleItemClass,
 	} = useToolsPanelContext();
 
-	const hasValueCallback = useCallback( hasValue, [ panelId, hasValue ] );
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	const hasValueCallback = useCallback( hasValue, [ panelId ] );
 	const resetAllFilterCallback = useCallback( resetAllFilter, [
 		panelId,
 		resetAllFilter,
