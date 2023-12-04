@@ -17,6 +17,7 @@ export default function ViewList( {
 	const primaryField = fields.find(
 		( field ) => field.id === view.layout.primaryField
 	);
+
 	return (
 		<ul className="dataviews-list-view">
 			{ shownData.map( ( item, index ) => {
@@ -24,11 +25,13 @@ export default function ViewList( {
 					// TODO: make li interactive.
 					// fix jsx-a11y/click-events-have-key-events and jsx-a11y/no-noninteractive-element-interactions
 					<li key={ getItemId?.( item ) || index } onClick={ () => {
-						onClickPreview( item );
+						if (view.layout.preview) {
+							onClickPreview( item );
+						}
 					}}>
 						<HStack>
 						{ primaryField?.render( { item } ) }
-						<Icon icon={ chevronRight } />
+						{ view.layout.preview && <Icon icon={ chevronRight } /> }
 						</HStack>
 					</li>
 				);
