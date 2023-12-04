@@ -15,10 +15,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	DataViews,
 	ENUMERATION_TYPE,
-	VIEW_LAYOUTS,
-	OPERATOR_IN,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
+	OPERATOR_IN,
+	OPERATOR_NOT_IN,
+	VIEW_LAYOUTS,
 } from '@wordpress/dataviews';
 
 /**
@@ -26,15 +27,6 @@ import {
  */
 import Page from '../page';
 import Link from '../routes/link';
-import {
-	DataViews,
-	VIEW_LAYOUTS,
-	ENUMERATION_TYPE,
-	LAYOUT_GRID,
-	LAYOUT_TABLE,
-	OPERATOR_IN,
-	OPERATOR_NOT_IN,
-} from '../dataviews';
 import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
 import {
 	trashPostAction,

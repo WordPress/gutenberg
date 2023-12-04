@@ -14,7 +14,7 @@ import { Children, Fragment } from '@wordpress/element';
  * Internal dependencies
  */
 import { OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
-import { unlock } from '../../lock-unlock';
+import { unlock } from './lock-unlock';
 
 const {
 	DropdownMenuV2: DropdownMenu,
