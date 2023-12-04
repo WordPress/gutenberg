@@ -8,13 +8,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __experimentalTreeGridRow as TreeGridRow } from '@wordpress/components';
-import { useMergeRefs } from '@wordpress/compose';
+// import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import useMovingAnimation from '../use-moving-animation';
+// import useMovingAnimation from '../use-moving-animation';
 
 const AnimatedTreeGridRow = animated( TreeGridRow );
 
@@ -32,18 +32,18 @@ const ListViewLeaf = forwardRef(
 		},
 		ref
 	) => {
-		const animationRef = useMovingAnimation( {
-			isSelected,
-			adjustScrolling: false,
-			enableAnimation: true,
-			triggerAnimationOnChange: path,
-		} );
+		// const animationRef = useMovingAnimation( {
+		// 	isSelected,
+		// 	adjustScrolling: false,
+		// 	enableAnimation: true,
+		// 	triggerAnimationOnChange: path,
+		// } );
 
-		const mergedRef = useMergeRefs( [ ref, animationRef ] );
+		// const mergedRef = useMergeRefs( [ ref, animationRef ] );
 
 		return (
 			<AnimatedTreeGridRow
-				ref={ mergedRef }
+				ref={ ref }
 				className={ classnames(
 					'block-editor-list-view-leaf',
 					className

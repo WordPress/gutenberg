@@ -9,13 +9,6 @@
 		margin: (-$grid-unit-15) (-$grid-unit-15 * 0.5) 0;
 		width: calc(100% + #{ $grid-unit-15 });
 	}
-
-	transition: transform 0.2s;
-
-	&.is-dragging {
-		transition: transform 0.2s;
-		transform: translateY(18px) !important;
-	}
 }
 
 .block-editor-list-view-leaf {
@@ -155,16 +148,17 @@
 
 	&.is-above {
 		transition: transform 0.2s;
-		transform: translateY(-18px) !important;
+		transform: translateY(-36px) !important;
 	}
 
 	&.is-below {
 		transition: transform 0.2s;
-		transform: translateY(18px) !important;
+		transform: translateY(36px) !important;
 	}
 
 	&.is-dragging {
-		display: none;
+		opacity: 0;
+		left: -9999px;
 	}
 
 	// List View renders a fixed number of items and relies on each item having a fixed height of 36px.
