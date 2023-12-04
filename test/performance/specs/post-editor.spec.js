@@ -22,6 +22,7 @@ const results = {
 	firstContentfulPaint: [],
 	firstBlock: [],
 	type: [],
+	typeWithoutInspector: [],
 	typeContainer: [],
 	focus: [],
 	listViewOpen: [],
@@ -91,6 +92,40 @@ test.describe( 'Post Editor Performance', () => {
 		}
 	} );
 
+	async function type( target, metrics, key ) {
+		// The first character typed triggers a longer time (isTyping change).
+		// It can impact the stability of the metric, so we exclude it. It
+		// probably deserves a dedicated metric itself, though.
+		const samples = 10;
+		const throwaway = 1;
+		const iterations = samples + throwaway;
+
+		// Start tracing.
+		await metrics.startTracing();
+
+		// Type the testing sequence into the empty paragraph.
+		await target.type( 'x'.repeat( iterations ), {
+			delay: BROWSER_IDLE_WAIT,
+			// The extended timeout is needed because the typing is very slow
+			// and the `delay` value itself does not extend it.
+			timeout: iterations * BROWSER_IDLE_WAIT * 2, // 2x the total time to be safe.
+		} );
+
+		// Stop tracing.
+		await metrics.stopTracing();
+
+		// Get the durations.
+		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+			metrics.getTypingEventDurations();
+
+		// Save the results.
+		for ( let i = throwaway; i < iterations; i++ ) {
+			results[ key ].push(
+				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
+			);
+		}
+	}
+
 	test.describe( 'Typing', () => {
 		let draftId = null;
 
@@ -110,37 +145,34 @@ test.describe( 'Post Editor Performance', () => {
 				name: /Empty block/i,
 			} );
 
-			// The first character typed triggers a longer time (isTyping change).
-			// It can impact the stability of the metric, so we exclude it. It
-			// probably deserves a dedicated metric itself, though.
-			const samples = 10;
-			const throwaway = 1;
-			const iterations = samples + throwaway;
+			await type( paragraph, metrics, 'type' );
+		} );
+	} );
 
-			// Start tracing.
-			await metrics.startTracing();
+	test.describe( 'Typing (without inspector)', () => {
+		let draftId = null;
 
-			// Type the testing sequence into the empty paragraph.
-			await paragraph.type( 'x'.repeat( iterations ), {
-				delay: BROWSER_IDLE_WAIT,
-				// The extended timeout is needed because the typing is very slow
-				// and the `delay` value itself does not extend it.
-				timeout: iterations * BROWSER_IDLE_WAIT * 2, // 2x the total time to be safe.
+		test( 'Setup the test post', async ( { admin, perfUtils, editor } ) => {
+			await admin.createNewPost();
+			await perfUtils.loadBlocksForLargePost();
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { admin, perfUtils, metrics, page } ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			const toggleButton = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Close Settings' } );
+			await toggleButton.click();
+			const canvas = await perfUtils.getCanvas();
+
+			const paragraph = canvas.getByRole( 'document', {
+				name: /Empty block/i,
 			} );
 
-			// Stop tracing.
-			await metrics.stopTracing();
-
-			// Get the durations.
-			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-				metrics.getTypingEventDurations();
-
-			// Save the results.
-			for ( let i = throwaway; i < iterations; i++ ) {
-				results.type.push(
-					keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
-				);
-			}
+			await type( paragraph, metrics, 'typeWithoutInspector' );
 		} );
 	} );
 
@@ -166,37 +198,7 @@ test.describe( 'Post Editor Performance', () => {
 				.first();
 			await firstParagraph.click();
 
-			// The first character typed triggers a longer time (isTyping change).
-			// It can impact the stability of the metric, so we exclude it. It
-			// probably deserves a dedicated metric itself, though.
-			const samples = 10;
-			const throwaway = 1;
-			const iterations = samples + throwaway;
-
-			// Start tracing.
-			await metrics.startTracing();
-
-			// Start typing in the middle of the text.
-			await firstParagraph.type( 'x'.repeat( iterations ), {
-				delay: BROWSER_IDLE_WAIT,
-				// The extended timeout is needed because the typing is very slow
-				// and the `delay` value itself does not extend it.
-				timeout: iterations * BROWSER_IDLE_WAIT * 2, // 2x the total time to be safe.
-			} );
-
-			// Stop tracing.
-			await metrics.stopTracing();
-
-			// Get the durations.
-			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-				metrics.getTypingEventDurations();
-
-			// Save the results.
-			for ( let i = throwaway; i < iterations; i++ ) {
-				results.typeContainer.push(
-					keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
-				);
-			}
+			await type( firstParagraph, metrics, 'typeContainer' );
 		} );
 	} );
 
