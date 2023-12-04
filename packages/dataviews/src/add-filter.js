@@ -36,8 +36,7 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 					name: field.header,
 					elements: field.elements || [],
 					isVisible: view.filters.some(
-						( f ) =>
-							f.field === field.id && f.operator === OPERATOR_IN
+						( f ) => f.field === field.id
 					),
 				} );
 		}

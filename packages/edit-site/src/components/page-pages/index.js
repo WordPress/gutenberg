@@ -15,10 +15,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	DataViews,
 	ENUMERATION_TYPE,
-	VIEW_LAYOUTS,
-	OPERATOR_IN,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
+	OPERATOR_IN,
+	OPERATOR_NOT_IN,
+	VIEW_LAYOUTS,
 } from '@wordpress/dataviews';
 
 /**
@@ -139,6 +140,11 @@ export default function PagePages() {
 				filter.operator === OPERATOR_IN
 			) {
 				filters.author = filter.value;
+			} else if (
+				filter.field === 'author' &&
+				filter.operator === OPERATOR_NOT_IN
+			) {
+				filters.author_exclude = filter.value;
 			}
 		} );
 		// We want to provide a different default item for the status filter
@@ -251,6 +257,9 @@ export default function PagePages() {
 				type: ENUMERATION_TYPE,
 				elements: STATUSES,
 				enableSorting: false,
+				filterBy: {
+					operators: [ OPERATOR_IN ],
+				},
 			},
 			{
 				header: __( 'Date' ),

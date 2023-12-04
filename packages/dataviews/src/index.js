@@ -6,4 +6,5 @@ export {
 	LAYOUT_LIST,
 	ENUMERATION_TYPE,
 	OPERATOR_IN,
+	OPERATOR_NOT_IN,
 } from './constants';

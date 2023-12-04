@@ -16,6 +16,7 @@ export const ENUMERATION_TYPE = 'enumeration';
 
 // Filter operators.
 export const OPERATOR_IN = 'in';
+export const OPERATOR_NOT_IN = 'notIn';
 
 // View layouts.
 export const LAYOUT_TABLE = 'table';
