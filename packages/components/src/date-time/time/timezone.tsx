@@ -40,10 +40,12 @@ const TimeZone = () => {
 			? __( 'Coordinated Universal Time' )
 			: `(${ zoneAbbr }) ${ prettyTimezoneString }`;
 
-	const isAbbrSameAsDetails =
-		`${ zoneAbbr } ${ prettyTimezoneString }`.trim() === zoneAbbr;
+	// When the prettyTimezoneString is empty, there is no additional timezone
+	// detail information to show in a Tooltip.
+	const hasNoAdditionalTimezoneDetail =
+		prettyTimezoneString.trim().length === 0;
 
-	return isAbbrSameAsDetails ? (
+	return hasNoAdditionalTimezoneDetail ? (
 		<StyledComponent className="components-datetime__timezone">
 			{ zoneAbbr }
 		</StyledComponent>
