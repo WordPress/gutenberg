@@ -287,15 +287,52 @@ function ColorPanelDropdown( {
 	);
 }
 
-export default function ColorPanel( {
-	as: Wrapper = ColorToolsPanel,
+const elements = [
+	{
+		name: 'caption',
+		label: __( 'Captions' ),
+	},
+	{
+		name: 'button',
+		label: __( 'Button' ),
+	},
+	{
+		name: 'heading',
+		label: __( 'Heading' ),
+	},
+	{
+		name: 'h1',
+		label: __( 'H1' ),
+	},
+	{
+		name: 'h2',
+		label: __( 'H2' ),
+	},
+	{
+		name: 'h3',
+		label: __( 'H3' ),
+	},
+	{
+		name: 'h4',
+		label: __( 'H4' ),
+	},
+	{
+		name: 'h5',
+		label: __( 'H5' ),
+	},
+	{
+		name: 'h6',
+		label: __( 'H6' ),
+	},
+];
+
+function ColorPanelWithinWrapper( {
 	value,
 	onChange,
 	inheritedValue = value,
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
-	children,
 } ) {
 	const colors = useColorsPerOrigin( settings );
 	const gradients = useGradientsPerOrigin( settings );
@@ -431,81 +468,6 @@ export default function ColorPanel( {
 	};
 	const resetTextColor = () => setTextColor( undefined );
 
-	// Elements
-	const elements = [
-		{
-			name: 'caption',
-			label: __( 'Captions' ),
-			showPanel: useHasCaptionPanel( settings ),
-		},
-		{
-			name: 'button',
-			label: __( 'Button' ),
-			showPanel: useHasButtonPanel( settings ),
-		},
-		{
-			name: 'heading',
-			label: __( 'Heading' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h1',
-			label: __( 'H1' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h2',
-			label: __( 'H2' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h3',
-			label: __( 'H3' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h4',
-			label: __( 'H4' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h5',
-			label: __( 'H5' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h6',
-			label: __( 'H6' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-	];
-
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			color: undefined,
-			elements: {
-				...previousValue?.elements,
-				link: {
-					...previousValue?.elements?.link,
-					color: undefined,
-					':hover': {
-						color: undefined,
-					},
-				},
-				...elements.reduce( ( acc, element ) => {
-					return {
-						...acc,
-						[ element.name ]: {
-							...previousValue?.elements?.[ element.name ],
-							color: undefined,
-						},
-					};
-				}, {} ),
-			},
-		};
-	}, [] );
-
 	const items = [
 		showTextPanel && {
 			key: 'text',
@@ -575,8 +537,26 @@ export default function ColorPanel( {
 		},
 	].filter( Boolean );
 
-	elements.forEach( ( { name, label, showPanel } ) => {
-		if ( ! showPanel ) return;
+	const hasCaptionPanel = useHasCaptionPanel( settings );
+	const hasButtonPanel = useHasButtonPanel( settings );
+	const hasHeadingPanel = useHasHeadingPanel( settings );
+
+	const showPanelMap = {
+		caption: hasCaptionPanel,
+		button: hasButtonPanel,
+		heading: hasHeadingPanel,
+		h1: hasHeadingPanel,
+		h2: hasHeadingPanel,
+		h3: hasHeadingPanel,
+		h4: hasHeadingPanel,
+		h5: hasHeadingPanel,
+		h6: hasHeadingPanel,
+	};
+
+	elements.forEach( ( { name, label } ) => {
+		if ( ! showPanelMap[ name ] ) {
+			return;
+		}
 
 		const elementBackgroundColor = decodeValue(
 			inheritedValue?.elements?.[ name ]?.color?.background
@@ -692,6 +672,61 @@ export default function ColorPanel( {
 		} );
 	} );
 
+	return items.map( ( item ) => (
+		<ColorPanelDropdown
+			key={ item.key }
+			{ ...item }
+			colorGradientControlSettings={ {
+				colors,
+				disableCustomColors: ! areCustomSolidsEnabled,
+				gradients,
+				disableCustomGradients: ! areCustomGradientsEnabled,
+			} }
+			panelId={ panelId }
+		/>
+	) );
+}
+
+export default function ColorPanel( {
+	as: Wrapper = ColorToolsPanel,
+	value,
+	onChange,
+	inheritedValue = value,
+	settings,
+	panelId,
+	defaultControls = DEFAULT_CONTROLS,
+	children,
+} ) {
+	const resetAllFilter = useCallback( ( previousValue ) => {
+		return {
+			...previousValue,
+			color: undefined,
+			elements: {
+				...previousValue?.elements,
+				link: {
+					...previousValue?.elements?.link,
+					color: undefined,
+					':hover': {
+						color: undefined,
+					},
+				},
+				...elements.reduce( ( acc, element ) => {
+					return {
+						...acc,
+						[ element.name ]: {
+							...previousValue?.elements?.[ element.name ],
+							color: undefined,
+						},
+					};
+				}, {} ),
+			},
+		};
+	}, [] );
+
+	// WARNING: logic should be moved as much as possible to the
+	// `ColorPanelWithinWrapper` component, which only renders when the
+	// inspector controls are visible!
+
 	return (
 		<Wrapper
 			resetAllFilter={ resetAllFilter }
@@ -699,19 +734,14 @@ export default function ColorPanel( {
 			onChange={ onChange }
 			panelId={ panelId }
 		>
-			{ items.map( ( item ) => (
-				<ColorPanelDropdown
-					key={ item.key }
-					{ ...item }
-					colorGradientControlSettings={ {
-						colors,
-						disableCustomColors: ! areCustomSolidsEnabled,
-						gradients,
-						disableCustomGradients: ! areCustomGradientsEnabled,
-					} }
-					panelId={ panelId }
-				/>
-			) ) }
+			<ColorPanelWithinWrapper
+				value={ value }
+				onChange={ onChange }
+				inheritedValue={ inheritedValue }
+				settings={ settings }
+				panelId={ panelId }
+				defaultControls={ defaultControls }
+			/>
 			{ children }
 		</Wrapper>
 	);

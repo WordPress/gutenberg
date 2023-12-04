@@ -341,13 +341,6 @@ export function ColorEdit( props ) {
 			value={ value }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
-			enableContrastChecker={
-				false !==
-				getBlockSupport( props.name, [
-					COLOR_SUPPORT_KEY,
-					'enableContrastChecker',
-				] )
-			}
 		>
 			{ enableContrastChecking && (
 				<BlockColorContrastChecker clientId={ clientId } />
