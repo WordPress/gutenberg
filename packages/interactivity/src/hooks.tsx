@@ -296,8 +296,8 @@ const Directives = ( {
 	scope.evaluate = useCallback( getEvaluate( { scope } ), [] );
 	scope.context = useContext( context );
 	/* eslint-disable react-hooks/rules-of-hooks */
-	scope.ref = previousScope.ref || useRef( null );
-	scope.state = previousScope.state || useRef( deepSignal( {} ) ).current;
+	scope.ref = previousScope?.ref || useRef( null );
+	scope.state = previousScope?.state || useRef( deepSignal( {} ) ).current;
 	/* eslint-enable react-hooks/rules-of-hooks */
 
 	// Create a fresh copy of the vnode element and add the props to the scope.
