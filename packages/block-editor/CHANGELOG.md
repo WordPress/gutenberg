@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Added option to allow switching between AA/AAA color-constrast checks ([41363](https://github.com/WordPress/gutenberg/pull/41363)).
+
 ## 12.15.0 (2023-11-29)
 
 ## 12.14.0 (2023-11-16)

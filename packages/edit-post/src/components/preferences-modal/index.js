@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -76,6 +76,10 @@ export default function EditPostPreferencesModal() {
 		closeGeneralSidebar();
 	};
 
+	const colorContrastCheckAAA = useSelect( ( select ) => {
+		const { isFeatureActive } = select( editPostStore );
+		return isFeatureActive( 'strictColorContrastChecks' );
+	}, [] );
 	const sections = useMemo(
 		() => [
 			{
@@ -152,6 +156,14 @@ export default function EditPostPreferencesModal() {
 									label={ __( 'Display block breadcrumbs' ) }
 								/>
 							) }
+							<EnableFeature
+								featureName="strictColorContrastChecks"
+								help={ sprintf(
+									'Switches the color contrast checker to be comply with WCAG AAA guidelines instead of WCAG AA. Currently checking for: %s.',
+									colorContrastCheckAAA ? 'AAA' : 'AA'
+								) }
+								label={ __( 'Strict color-contrast checker' ) }
+							/>
 						</PreferencesModalSection>
 					</>
 				),

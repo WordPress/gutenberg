@@ -11,6 +11,8 @@ import { colord, extend } from 'colord';
 import { __, sprintf } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
+import { useSelect } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -26,6 +28,16 @@ function ContrastChecker( {
 	enableAlphaChecker = false,
 } ) {
 	const currentBackgroundColor = backgroundColor || fallbackBackgroundColor;
+
+	const { strictContrastCheck } = useSelect(
+		( select ) => ( {
+			strictContrastCheck: select( preferencesStore ).get(
+				'core/edit-post',
+				'strictColorContrastChecks'
+			),
+		} ),
+		[]
+	);
 
 	// Must have a background color.
 	if ( ! currentBackgroundColor ) {
@@ -52,9 +64,9 @@ function ContrastChecker( {
 	];
 	const colordBackgroundColor = colord( currentBackgroundColor );
 	const backgroundColorHasTransparency = colordBackgroundColor.alpha() < 1;
-	const backgroundColorBrightness = colordBackgroundColor.brightness();
+	const backgroundColorLuminance = colordBackgroundColor.luminance();
 	const isReadableOptions = {
-		level: 'AA',
+		level: strictContrastCheck ? 'AAA' : 'AA',
 		size:
 			isLargeText || ( isLargeText !== false && fontSize >= 24 )
 				? 'large'
@@ -82,7 +94,7 @@ function ContrastChecker( {
 				continue;
 			}
 			message =
-				backgroundColorBrightness < colordTextColor.brightness()
+				backgroundColorLuminance < colordTextColor.luminance()
 					? sprintf(
 							// translators: %s is a type of text color, e.g., "text color" or "link color".
 							__(
