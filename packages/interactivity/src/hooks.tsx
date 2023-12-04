@@ -255,7 +255,7 @@ const getEvaluate: GetEvaluate =
 		}
 		// If path starts with !, remove it and save a flag.
 		const hasNegationOperator =
-			path[ 0 ] === '!' && !! ( path = path!.slice( 1 ) );
+			path[ 0 ] === '!' && !! ( path = path.slice( 1 ) );
 		setScope( scope );
 		const value = resolve( path, namespace );
 		const result = typeof value === 'function' ? value( ...args ) : value;
