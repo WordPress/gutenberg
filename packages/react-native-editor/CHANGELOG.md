@@ -16,6 +16,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [***] Fix issue when backspacing in an empty Paragraph block [#56496]
 -   [**] Fix issue related to text color format and receiving in rare cases an undefined ref from `RichText` component [#56686]
 -   [**] Fixes a crash on pasting MS Word list markup [#56653]
+-   [**] Address rare cases where a null value is passed to a heading block, causing a crash [#56757]
 
 ## 1.109.0
 -   [*] Audio block: Improve legibility of audio file details on various background colors [#55627]
