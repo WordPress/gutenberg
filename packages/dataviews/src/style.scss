@@ -3,6 +3,7 @@
 	height: calc(100% - #{$grid-unit-40} * 2);
 	overflow: auto;
 	padding: $grid-unit-40 $grid-unit-40 0;
+	box-sizing: border-box;
 
 	> div {
 		min-height: 100%;
@@ -100,7 +101,7 @@
 		}
 	}
 
-	.dataviews-view-grid__title {
+	.dataviews-view-grid__primary-field {
 		min-height: $grid-unit-30;
 
 		a {
