@@ -98,7 +98,7 @@ function useToolbarFocus( {
 	shouldUseKeyboardFocusShortcut,
 	focusEditorOnEscape,
 } ) {
-	// Deprecated in 6.5.0
+	// focusOnMount deprecated in 6.5.0
 	const [ initialFocusOnMount ] = useState( focusOnMount );
 	const { stopTyping } = useDispatch( blockEditorStore );
 
@@ -116,7 +116,7 @@ function useToolbarFocus( {
 	// Focus on toolbar when pressing alt+F10 when the toolbar is visible.
 	useShortcut( 'core/block-editor/focus-toolbar', focusToolbarViaShortcut );
 
-	// Deprecated in 6.5.0
+	// Force toolbar focus on mount deprecated in 6.5.0
 	useEffect( () => {
 		if ( initialFocusOnMount ) {
 			focusToolbar();
