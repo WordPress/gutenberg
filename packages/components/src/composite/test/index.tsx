@@ -581,6 +581,46 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 				return getTwoDimensionalItems();
 			};
 
+			const initialiseShiftTest = ( shift: boolean ) => {
+				const Test = () => {
+					const composite = useCompositeState( { shift } );
+
+					return (
+						<Composite { ...composite } aria-label="composite">
+							<CompositeGroup { ...composite }>
+								<CompositeItem { ...composite }>
+									Item A1
+								</CompositeItem>
+							</CompositeGroup>
+							<CompositeGroup { ...composite }>
+								<CompositeItem { ...composite }>
+									Item B1
+								</CompositeItem>
+								<CompositeItem { ...composite }>
+									Item B2
+								</CompositeItem>
+							</CompositeGroup>
+							<CompositeGroup { ...composite }>
+								<CompositeItem { ...composite }>
+									Item C1
+								</CompositeItem>
+								<CompositeItem { ...composite } disabled>
+									Item C2
+								</CompositeItem>
+							</CompositeGroup>
+						</Composite>
+					);
+				};
+				render( <Test /> );
+				return {
+					itemA1: screen.getByText( 'Item A1' ),
+					itemB1: screen.getByText( 'Item B1' ),
+					itemB2: screen.getByText( 'Item B2' ),
+					itemC1: screen.getByText( 'Item C1' ),
+					itemC2: screen.getByText( 'Item C2' ),
+				};
+			};
+
 			test( 'Renders as a single tab stop', async () => {
 				const Test = () => (
 					<>
@@ -895,6 +935,46 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 					expect( itemC3 ).toHaveFocus();
 					await key( 'ArrowRight' );
 					expect( itemA1 ).toHaveFocus();
+				} );
+
+				test( 'Focus shifts if vertical neighbour unavailable when shift enabled', async () => {
+					const { itemA1, itemB1, itemB2, itemC1 } =
+						initialiseShiftTest( true );
+
+					await userEvent.tab();
+					expect( itemA1 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( itemB1 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( itemB2 ).toHaveFocus();
+					await key( 'ArrowUp' );
+					// A2 doesn't exist
+					expect( itemA1 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( itemB1 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( itemB2 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					// C2 is disabled
+					expect( itemC1 ).toHaveFocus();
+				} );
+
+				test( 'Focus does not shift if vertical neighbour unavailable when shift not enabled', async () => {
+					const { itemA1, itemB1, itemB2 } =
+						initialiseShiftTest( false );
+
+					await userEvent.tab();
+					expect( itemA1 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( itemB1 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( itemB2 ).toHaveFocus();
+					await key( 'ArrowUp' );
+					// A2 doesn't exist
+					expect( itemB2 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					// C2 is disabled
+					expect( itemB2 ).toHaveFocus();
 				} );
 			} );
 		} );
