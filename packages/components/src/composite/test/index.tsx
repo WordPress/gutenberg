@@ -88,62 +88,6 @@ const DEFAULT_STATE = {
 	...DEFAULT_ACTIONS,
 };
 
-function createItemRef( index: number ) {
-	const node = document.createElement( 'div' );
-	node.id = '' + index;
-	node.compareDocumentPosition = ( other ): number => {
-		return ( other as HTMLElement ).id < node.id
-			? node.DOCUMENT_POSITION_PRECEDING
-			: node.DOCUMENT_POSITION_FOLLOWING;
-	};
-	const ref: React.MutableRefObject< HTMLElement | null > = createRef();
-	ref.current = node;
-	return ref;
-}
-
-function createItem( stem: string, index: number, groupId?: string ) {
-	return {
-		id: `${ stem }-${ index }`,
-		ref: createItemRef( index ),
-		groupId,
-	};
-}
-
-function initialiseItems(
-	context: CompositeStateReturn,
-	stem = 'test',
-	count = 3
-) {
-	act( () => {
-		for ( let index = 1; index <= count; index++ ) {
-			context.registerItem( createItem( stem, index ) );
-		}
-	} );
-}
-
-function initialiseGroups(
-	context: CompositeStateReturn,
-	stem = 'test',
-	count = 3
-) {
-	act( () => {
-		for ( let index = 1; index <= count; index++ ) {
-			const id = `${ stem }-group-${ index }`;
-			context.registerGroup( { id, ref: createRef() } );
-			context.registerItem( createItem( stem, index, id ) );
-		}
-	} );
-}
-
-async function key( code: string, modifier?: string ) {
-	if ( modifier ) {
-		return await userEvent.keyboard(
-			`[${ modifier }>][${ code }][/${ code }]`
-		);
-	}
-	return await userEvent.keyboard( `[${ code }]` );
-}
-
 describe.each( Object.entries( COMPOSITE_SUITES ) )(
 	'Validate %s implementation',
 	( _, { Composite, CompositeGroup, CompositeItem, useCompositeState } ) => {
@@ -156,6 +100,58 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 		}
 
 		describe( 'API', () => {
+			function createItemRef( index: number ) {
+				const node = document.createElement( 'div' );
+				node.id = '' + index;
+				node.compareDocumentPosition = ( other ): number => {
+					return ( other as HTMLElement ).id < node.id
+						? node.DOCUMENT_POSITION_PRECEDING
+						: node.DOCUMENT_POSITION_FOLLOWING;
+				};
+				const ref: React.MutableRefObject< HTMLElement | null > =
+					createRef();
+				ref.current = node;
+				return ref;
+			}
+
+			function createItem(
+				stem: string,
+				index: number,
+				groupId?: string
+			) {
+				return {
+					id: `${ stem }-${ index }`,
+					ref: createItemRef( index ),
+					groupId,
+				};
+			}
+
+			function initialiseItems(
+				context: CompositeStateReturn,
+				stem = 'test',
+				count = 3
+			) {
+				act( () => {
+					for ( let index = 1; index <= count; index++ ) {
+						context.registerItem( createItem( stem, index ) );
+					}
+				} );
+			}
+
+			function initialiseGroups(
+				context: CompositeStateReturn,
+				stem = 'test',
+				count = 3
+			) {
+				act( () => {
+					for ( let index = 1; index <= count; index++ ) {
+						const id = `${ stem }-group-${ index }`;
+						context.registerGroup( { id, ref: createRef() } );
+						context.registerItem( createItem( stem, index, id ) );
+					}
+				} );
+			}
+
 			describe( 'State', () => {
 				test( 'No initial state', () => {
 					const state = renderState();
@@ -488,9 +484,18 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 		} );
 
 		describe( 'Usage', () => {
-			const OneDimensionalTest = (
+			async function key( code: string, modifier?: string ) {
+				if ( modifier ) {
+					return await userEvent.keyboard(
+						`[${ modifier }>][${ code }][/${ code }]`
+					);
+				}
+				return await userEvent.keyboard( `[${ code }]` );
+			}
+
+			function OneDimensionalTest(
 				initialState?: CompositeInitialState
-			) => {
+			) {
 				const composite = useCompositeState( initialState );
 				return (
 					<Composite { ...composite } aria-label="composite">
@@ -499,26 +504,26 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 						<CompositeItem { ...composite }>Item 3</CompositeItem>
 					</Composite>
 				);
-			};
+			}
 
-			const getOneDimensionalItems = () => {
+			function getOneDimensionalItems() {
 				return {
 					item1: screen.getByText( 'Item 1' ),
 					item2: screen.getByText( 'Item 2' ),
 					item3: screen.getByText( 'Item 3' ),
 				};
-			};
+			}
 
-			const initialiseOneDimensionalTest = (
+			function initialiseOneDimensionalTest(
 				initialState?: CompositeInitialState
-			) => {
+			) {
 				render( <OneDimensionalTest { ...initialState } /> );
 				return getOneDimensionalItems();
-			};
+			}
 
-			const TwoDimensionalTest = (
+			function TwoDimensionalTest(
 				initialState?: CompositeInitialState
-			) => {
+			) {
 				const composite = useCompositeState( initialState );
 
 				return (
@@ -558,9 +563,9 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 						</CompositeGroup>
 					</Composite>
 				);
-			};
+			}
 
-			const getTwoDimensionalItems = () => {
+			function getTwoDimensionalItems() {
 				return {
 					itemA1: screen.getByText( 'Item A1' ),
 					itemA2: screen.getByText( 'Item A2' ),
@@ -572,16 +577,16 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 					itemC2: screen.getByText( 'Item C2' ),
 					itemC3: screen.getByText( 'Item C3' ),
 				};
-			};
+			}
 
-			const initialiseTwoDimensionalTest = (
+			function initialiseTwoDimensionalTest(
 				initialState?: CompositeInitialState
-			) => {
+			) {
 				render( <TwoDimensionalTest { ...initialState } /> );
 				return getTwoDimensionalItems();
-			};
+			}
 
-			const initialiseShiftTest = ( shift: boolean ) => {
+			function initialiseShiftTest( shift: boolean ) {
 				const Test = () => {
 					const composite = useCompositeState( { shift } );
 
@@ -619,7 +624,7 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 					itemC1: screen.getByText( 'Item C1' ),
 					itemC2: screen.getByText( 'Item C2' ),
 				};
-			};
+			}
 
 			test( 'Renders as a single tab stop', async () => {
 				const Test = () => (
