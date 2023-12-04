@@ -272,8 +272,8 @@ function ListViewBlock( {
 		'has-single-cell': ! showBlockActions,
 		'is-synced': blockInformation?.isSynced,
 		'is-draggable': canMove,
-		'is-above': displacement === 'above',
-		'is-below': displacement === 'below',
+		'is-displacement-up': displacement === 'up',
+		'is-displacement-down': displacement === 'down',
 		'is-nesting': isNesting,
 	} );
 
