@@ -36,15 +36,16 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	POST_TYPE_LABELS,
 	PATTERN_TYPES,
-	PATTERN_DEFAULT_CATEGORY,
 } from '../../utils/constants';
 
 export default function PatternActions( {
 	postType,
 	postId,
 	className,
-	toggleProps,
+	toggleProps = {},
+	popoverProps = {},
 	onRemove,
+	icon = moreVertical,
 } ) {
 	const record = useSelect(
 		( select ) =>
@@ -52,34 +53,23 @@ export default function PatternActions( {
 		[ postType, postId ]
 	);
 
-	console.log( 'record', record );
-
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
 	const { saveEditedEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const { __experimentalDeleteReusableBlock } =
 		useDispatch( reusableBlocksStore );
-	const isRemovable = isTemplateRemovable( record );
 	// Only custom patterns or custom template parts can be renamed or deleted.
 	const isUserPattern = record?.type === PATTERN_TYPES.user;
 	const isTemplate = record?.type === TEMPLATE_POST_TYPE;
 	const isTemplatePart = record?.type === TEMPLATE_PART_POST_TYPE;
-	const { categoryType, categoryId } = getQueryArgs( window.location.href );
-	const type = categoryType || PATTERN_TYPES.theme;
-	const category = categoryId || PATTERN_DEFAULT_CATEGORY;
 
-	console.log( 'type, category', { type, category } );
-
-	if (
-		! isRemovable &&
-		! isTemplatePart &&
-		! isTemplate &&
-		! isUserPattern
-	) {
+	if ( ! isTemplatePart && ! isTemplate && ! isUserPattern ) {
 		return null;
 	}
 
+	const isRemovable = isTemplateRemovable( record );
+	const isRevertable = isTemplateRevertable( record );
 	const isEditable = isUserPattern || isRemovable;
 	const decodedTitle = decodeEntities(
 		record?.title?.rendered || record?.title?.raw
@@ -88,13 +78,13 @@ export default function PatternActions( {
 	const exportAsJSON = ( pattern ) => {
 		const json = {
 			__file: pattern.type,
-			title: pattern.title || pattern.name,
-			content: pattern.patternBlock.content.raw,
-			syncStatus: pattern.patternBlock.wp_pattern_sync_status,
+			title: pattern?.title?.raw || pattern.slug,
+			content: pattern.content.raw,
+			syncStatus: pattern.wp_pattern_sync_status,
 		};
 
 		return downloadBlob(
-			`${ kebabCase( pattern.title || pattern.name ) }.json`,
+			`${ kebabCase( json.title ) }.json`,
 			JSON.stringify( json, null, 2 ),
 			'application/json'
 		);
@@ -138,7 +128,7 @@ export default function PatternActions( {
 
 			createSuccessNotice(
 				sprintf(
-					/* translators: The template/part's name. */
+					// translators: %s: the pattern, template/part's title.
 					__( '"%s" reverted.' ),
 					decodedTitle
 				),
@@ -149,7 +139,7 @@ export default function PatternActions( {
 			);
 		} catch ( error ) {
 			const fallbackErrorMessage = sprintf(
-				// translators: %s is a post type label, e.g., Template, Template Part or Pattern.
+				// translators: %s: a post type label, e.g., Template, Template Part or Pattern.
 				__( 'An error occurred while reverting the %s.' ),
 				POST_TYPE_LABELS[ postType ] ??
 					POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ]
@@ -163,18 +153,28 @@ export default function PatternActions( {
 		}
 	}
 
-	const shouldDisplayMenu = isEditable || isTemplateRevertable( record );
+	const shouldDisplayMenu = isEditable || isRevertable;
 
 	if ( ! shouldDisplayMenu ) {
 		return null;
 	}
 
+	const { categoryId } = getQueryArgs( window.location.href );
+
 	return (
 		<DropdownMenu
-			icon={ moreVertical }
+			icon={ icon }
 			label={ __( 'Actions' ) }
 			className={ className }
-			toggleProps={ toggleProps }
+			popoverProps={ { placement: 'bottom-end', ...popoverProps } }
+			toggleProps={ {
+				describedBy: sprintf(
+					// translators: %s: the pattern, template/part's title.
+					__( 'Action menu for "%s"' ),
+					decodedTitle
+				),
+				...toggleProps,
+			} }
 		>
 			{ ( { onClose } ) => (
 				<MenuGroup>
@@ -192,15 +192,17 @@ export default function PatternActions( {
 								label={ __( 'Duplicate' ) }
 							/>
 							{ isUserPattern && (
-								<MenuItem onClick={ () => exportAsJSON() }>
+								<MenuItem
+									onClick={ () => exportAsJSON( record ) }
+								>
 									{ __( 'Export as JSON' ) }
 								</MenuItem>
 							) }
 							<DeleteMenuItem
-								isDestructive={ true }
+								postType={ postType }
 								onRemove={ () => {
 									deleteItem( record );
-									onRemove?.();
+									onRemove?.( record );
 									onClose();
 								} }
 								title={ decodedTitle }
@@ -208,18 +210,13 @@ export default function PatternActions( {
 						</>
 					) }
 
-					{ isTemplateRevertable( record ) && (
-						<MenuItem
-							info={ __(
-								'Use the template as supplied by the theme.'
-							) }
-							onClick={ () => {
+					{ isRevertable && (
+						<RevertMenuItem
+							onRemove={ () => {
 								revertAndSaveTemplate( record );
 								onClose();
 							} }
-						>
-							{ __( 'Clear customizations' ) }
-						</MenuItem>
+						/>
 					) }
 				</MenuGroup>
 			) }
@@ -231,7 +228,10 @@ function DeleteMenuItem( { onRemove, title } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	return (
 		<>
-			<MenuItem isDestructive onClick={ () => setIsModalOpen( true ) }>
+			<MenuItem
+				isDestructive={ true }
+				onClick={ () => setIsModalOpen( true ) }
+			>
 				{ __( 'Delete' ) }
 			</MenuItem>
 			<ConfirmDialog
@@ -245,6 +245,29 @@ function DeleteMenuItem( { onRemove, title } ) {
 					__( 'Are you sure you want to delete "%s"?' ),
 					decodeEntities( title )
 				) }
+			</ConfirmDialog>
+		</>
+	);
+}
+
+function RevertMenuItem( { onRemove } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	return (
+		<>
+			<MenuItem
+				info={ __( 'Use the template as supplied by the theme.' ) }
+				onClick={ () => setIsModalOpen( true ) }
+			>
+				{ __( 'Clear customizations' ) }
+			</MenuItem>
+			<ConfirmDialog
+				info={ __( 'Use the template as supplied by the theme.' ) }
+				isOpen={ isModalOpen }
+				onConfirm={ onRemove }
+				onCancel={ () => setIsModalOpen( false ) }
+				confirmButtonText={ __( 'Clear' ) }
+			>
+				{ __( 'Are you sure you want to clear these customizations?' ) }
 			</ConfirmDialog>
 		</>
 	);

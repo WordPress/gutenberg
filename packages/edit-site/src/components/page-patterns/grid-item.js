@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { paramCase as kebabCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -13,59 +12,40 @@ import {
 } from '@wordpress/block-editor';
 import {
 	Button,
-	__experimentalConfirmDialog as ConfirmDialog,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
 	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	Tooltip,
 	Flex,
 } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
-import { useState, useId, memo } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { useId, memo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import {
 	Icon,
 	header,
 	footer,
 	symbolFilled as uncategorized,
 	symbol,
-	moreVertical,
 	lockSmall,
 } from '@wordpress/icons';
-import { store as noticesStore } from '@wordpress/notices';
-import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
-import { downloadBlob } from '@wordpress/blob';
 
 /**
  * Internal dependencies
  */
-import DuplicateMenuItem from './duplicate-menu-item';
 import {
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_SYNC_TYPES,
 } from '../../utils/constants';
-import { store as editSiteStore } from '../../store';
 import { useLink } from '../routes/link';
 import { unlock } from '../../lock-unlock';
-import RenameMenuItem from '../pattern-actions/rename-menu-item';
+import PatternActions from '../pattern-actions';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
-
 const templatePartIcons = { header, footer, uncategorized };
 
 function GridItem( { categoryId, item, ...props } ) {
 	const descriptionId = useId();
-	const [ isDeleteDialogOpen, setIsDeleteDialogOpen ] = useState( false );
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
-
-	const { removeTemplate } = useDispatch( editSiteStore );
-	const { __experimentalDeleteReusableBlock } =
-		useDispatch( reusableBlocksStore );
-	const { createErrorNotice, createSuccessNotice } =
-		useDispatch( noticesStore );
 
 	const isUserPattern = item.type === PATTERN_TYPES.user;
 	const isNonUserPattern = item.type === PATTERN_TYPES.theme;
@@ -86,49 +66,9 @@ function GridItem( { categoryId, item, ...props } ) {
 		'is-inactive': isNonUserPattern,
 	} );
 
-	const deletePattern = async () => {
-		try {
-			await __experimentalDeleteReusableBlock( item.id );
-			createSuccessNotice(
-				sprintf(
-					// translators: %s: The pattern's title e.g. 'Call to action'.
-					__( '"%s" deleted.' ),
-					item.title
-				),
-				{ type: 'snackbar', id: 'edit-site-patterns-success' }
-			);
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while deleting the pattern.' );
-			createErrorNotice( errorMessage, {
-				type: 'snackbar',
-				id: 'edit-site-patterns-error',
-			} );
-		}
-	};
-	const deleteItem = () =>
-		isTemplatePart ? removeTemplate( item ) : deletePattern();
-	const exportAsJSON = () => {
-		const json = {
-			__file: item.type,
-			title: item.title || item.name,
-			content: item.patternBlock.content.raw,
-			syncStatus: item.patternBlock.wp_pattern_sync_status,
-		};
-
-		return downloadBlob(
-			`${ kebabCase( item.title || item.name ) }.json`,
-			JSON.stringify( json, null, 2 ),
-			'application/json'
-		);
-	};
-
 	// Only custom patterns or custom template parts can be renamed or deleted.
 	const isCustomPattern =
 		isUserPattern || ( isTemplatePart && item.isCustom );
-	const hasThemeFile = isTemplatePart && item.templatePart.has_theme_file;
 	const ariaDescriptions = [];
 
 	if ( isCustomPattern ) {
@@ -153,15 +93,6 @@ function GridItem( { categoryId, item, ...props } ) {
 		itemIcon =
 			item.syncStatus === PATTERN_SYNC_TYPES.full ? symbol : undefined;
 	}
-
-	const confirmButtonText = hasThemeFile ? __( 'Clear' ) : __( 'Delete' );
-	const confirmPrompt = hasThemeFile
-		? __( 'Are you sure you want to clear these customizations?' )
-		: sprintf(
-				// translators: %s: The pattern or template part's title e.g. 'Call to action'.
-				__( 'Are you sure you want to delete "%s"?' ),
-				item.title || item.name
-		  );
 
 	const additionalStyles = ! backgroundColor
 		? [ { css: 'body { background: #fff; }' } ]
@@ -265,67 +196,8 @@ function GridItem( { categoryId, item, ...props } ) {
 						) }
 					</Flex>
 				</HStack>
-				<DropdownMenu
-					icon={ moreVertical }
-					label={ __( 'Actions' ) }
-					className="edit-site-patterns__dropdown"
-					popoverProps={ { placement: 'bottom-end' } }
-					toggleProps={ {
-						className: 'edit-site-patterns__button',
-						describedBy: sprintf(
-							/* translators: %s: pattern name */
-							__( 'Action menu for %s pattern' ),
-							item.title
-						),
-					} }
-				>
-					{ ( { onClose } ) => (
-						<MenuGroup>
-							{ isCustomPattern && ! hasThemeFile && (
-								<RenameMenuItem
-									postId={ item.id }
-									postType={ item.type }
-									onClose={ onClose }
-								/>
-							) }
-							<DuplicateMenuItem
-								categoryId={ categoryId }
-								item={ item }
-								onClose={ onClose }
-								label={ __( 'Duplicate' ) }
-							/>
-							{ item.type === PATTERN_TYPES.user && (
-								<MenuItem onClick={ () => exportAsJSON() }>
-									{ __( 'Export as JSON' ) }
-								</MenuItem>
-							) }
-
-							{ isCustomPattern && (
-								<MenuItem
-									isDestructive={ ! hasThemeFile }
-									onClick={ () =>
-										setIsDeleteDialogOpen( true )
-									}
-								>
-									{ hasThemeFile
-										? __( 'Clear customizations' )
-										: __( 'Delete' ) }
-								</MenuItem>
-							) }
-						</MenuGroup>
-					) }
-				</DropdownMenu>
+				<PatternActions postType={ item.type } postId={ item.id } />
 			</HStack>
-
-			{ isDeleteDialogOpen && (
-				<ConfirmDialog
-					confirmButtonText={ confirmButtonText }
-					onConfirm={ deleteItem }
-					onCancel={ () => setIsDeleteDialogOpen( false ) }
-				>
-					{ confirmPrompt }
-				</ConfirmDialog>
-			) }
 		</li>
 	);
 }

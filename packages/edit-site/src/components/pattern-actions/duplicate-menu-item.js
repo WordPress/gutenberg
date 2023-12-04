@@ -8,6 +8,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -28,11 +29,8 @@ export default function DuplicateMenuItem( {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const history = useHistory();
-
 	const closeModal = () => setIsModalOpen( false );
-
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-	const isThemePattern = item.type === PATTERN_TYPES.theme;
 
 	async function onTemplatePartSuccess( templatePart ) {
 		createSuccessNotice(
@@ -81,12 +79,14 @@ export default function DuplicateMenuItem( {
 				<DuplicatePatternModal
 					onClose={ closeModal }
 					onSuccess={ onPatternSuccess }
-					pattern={ isThemePattern ? item : item.patternBlock }
+					pattern={ item }
 				/>
 			) }
 			{ isModalOpen && isTemplatePart && (
 				<CreateTemplatePartModal
-					blocks={ item.blocks }
+					blocks={ parse( item.content.raw, {
+						__unstableSkipMigrationLogs: true,
+					} ) }
 					closeModal={ closeModal }
 					confirmLabel={ __( 'Duplicate' ) }
 					defaultArea={ item.area }
