@@ -497,6 +497,9 @@ export default function useListViewDropZone( { dropZoneElement } ) {
 		},
 		onDragLeave() {
 			throttled.cancel();
+			// Use `null` value to indicate that the drop target is not valid,
+			// but that the drag is still active. This allows for styling rules
+			// that are active only when a user drags outside of the list view.
 			setTarget( null );
 		},
 		onDragOver( event ) {
@@ -507,7 +510,10 @@ export default function useListViewDropZone( { dropZoneElement } ) {
 		},
 		onDragEnd() {
 			throttled.cancel();
-			setTarget( null );
+			// Use `undefined` value to indicate that the drag has concluded.
+			// This allows styling rules that are active only when a user is
+			// dragging to be removed.
+			setTarget( undefined );
 		},
 	} );
 

@@ -146,12 +146,12 @@
 		border-bottom-right-radius: $radius-block-ui;
 	}
 
-	&.is-above {
+	&.is-displacement-up {
 		transition: transform 0.2s;
 		transform: translateY(-36px) !important;
 	}
 
-	&.is-below {
+	&.is-displacement-down {
 		transition: transform 0.2s;
 		transform: translateY(36px) !important;
 	}

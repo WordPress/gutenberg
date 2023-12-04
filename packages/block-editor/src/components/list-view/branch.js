@@ -153,35 +153,61 @@ function ListViewBranch( props ) {
 				let displacement;
 				let isNesting;
 
+				// Determine where to displace the position of the current block, relative
+				// to the blocks being dragged (in their original position) and the drop target
+				// (the position where a user is currently dragging the blocks to).
 				if (
 					blockDropTargetIndex !== undefined &&
+					blockDropTargetIndex !== null &&
 					firstDraggedBlockIndex !== undefined
 				) {
+					// If the block is being dragged and there is a valid drop target,
+					// determine if the block being rendered should be displaced up or down.
 					const thisBlockIndex = blockIndexes[ clientId ];
 
 					if ( thisBlockIndex !== undefined ) {
+						// If the current block appears after the set of dragged blocks
+						// (in their original position), but is before the drop target,
+						// then the current block should be displaced up.
 						if (
 							thisBlockIndex >= firstDraggedBlockIndex &&
 							thisBlockIndex < blockDropTargetIndex
 						) {
-							displacement = 'above';
+							displacement = 'up';
 						}
 
+						// If the current block appears before the set of dragged blocks
+						// (in their original position), but is after the drop target,
+						// then the current block should be displaced down.
 						if (
 							thisBlockIndex < firstDraggedBlockIndex &&
 							thisBlockIndex >= blockDropTargetIndex
 						) {
-							displacement = 'below';
+							displacement = 'down';
 						}
 					}
 
 					isNesting =
 						blockDropTargetIndex - 1 === thisBlockIndex &&
 						blockDropPosition === 'inside';
-				}
+				} else if (
+					blockDropTargetIndex === null &&
+					firstDraggedBlockIndex !== undefined
+				) {
+					// A `null` value for `blockDropTargetIndex` indicates that the
+					// drop target is outside of the valid areas within the list view.
+					// In this case, the drag is still active, but as there is no
+					// valid drop target, we should remove the gap indicating where
+					// the block would be inserted.
+					const thisBlockIndex = blockIndexes[ clientId ];
 
-				// TODO: Ensure above / below classes are output when dragging outside of the list view,
-				// otherwise a gap appears.
+					if (
+						thisBlockIndex !== undefined &&
+						thisBlockIndex >= firstDraggedBlockIndex
+					) {
+						displacement = 'up';
+					}
+				}
 
 				const { itemInView } = fixedListWindow;
 				const blockInView = itemInView( nextPosition );

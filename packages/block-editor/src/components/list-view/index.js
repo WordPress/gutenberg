@@ -234,6 +234,8 @@ function ListViewComponent(
 					blockDropTarget?.dropPosition === 'top'
 						? foundBlockIndex
 						: foundBlockIndex + 1;
+			} else if ( blockDropTarget === null ) {
+				_blockDropTargetIndex = null;
 			}
 
 			if ( firstDraggedBlockClientId ) {
