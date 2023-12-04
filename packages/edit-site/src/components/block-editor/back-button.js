@@ -27,18 +27,19 @@ function BackButton() {
 	// Only show the back button when editing a template part or navigation menu.
 	const canShowBackButton = isTemplatePart || isNavigationMenu;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const onClickHandler = () => {
+		if ( location.state?.fromTemplateId ) {
+			history.back();
+		} else {
+			setCanvasMode( 'view' );
+		}
+	};
 
 	return canShowBackButton ? (
 		<Button
 			className="edit-site-visual-editor__back-button"
 			icon={ arrowLeft }
-			onClick={ () => {
-				if ( location.state?.fromTemplateId ) {
-					history.back();
-				} else {
-					setCanvasMode( 'view' );
-				}
-			} }
+			onClick={ onClickHandler }
 		>
 			{ __( 'Back' ) }
 		</Button>
