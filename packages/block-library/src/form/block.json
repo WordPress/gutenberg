@@ -27,7 +27,6 @@
 	},
 	"supports": {
 		"anchor": true,
-		"className": false,
 		"color": {
 			"gradients": true,
 			"link": true,
