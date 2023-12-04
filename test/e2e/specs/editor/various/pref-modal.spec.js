@@ -8,10 +8,6 @@ test.describe( 'Preferences modal', () => {
 		await admin.createNewPost();
 	} );
 
-	test.afterEach( async ( { admin } ) => {
-		await admin.trashPost();
-	} );
-
 	test.describe( 'Preferences modal adaps to viewport', () => {
 		test( 'Enable pre-publish flow is visible on desktop ', async ( {
 			page,
@@ -22,10 +18,38 @@ test.describe( 'Preferences modal', () => {
 			await page.click( 'role=menuitem[name="Preferences"i]' );
 
 			const prePublishToggle = page.locator(
-				'role=label[name="Enable pre-publish flow"i]'
+				'role=checkbox[name="Enable pre-publish flow"i]'
 			);
 
 			await expect( prePublishToggle ).toBeVisible();
+		} );
+	} );
+	test.describe( 'Preferences modal adaps to viewport', () => {
+		test( 'Enable pre-publish flow is not visible on mobile ', async ( {
+			page,
+		} ) => {
+			await page.setViewportSize( { width: 500, height: 800 } );
+
+			await page.click(
+				'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
+			);
+			await page.click( 'role=menuitem[name="Preferences"i]' );
+
+			const generalButton = page.locator(
+				'role=button[name="General"i]'
+			);
+
+			const generalTabPanel = page.locator(
+				'role=tabPanel[name="General"i]'
+			);
+
+			const prePublishToggle = page.locator(
+				'role=checkbox[name="Enable pre-publish flow"i]'
+			);
+
+			await expect( generalButton ).toBeVisible();
+			await expect( generalTabPanel ).toBeHidden();
+			await expect( prePublishToggle ).toBeHidden();
 		} );
 	} );
 } );
