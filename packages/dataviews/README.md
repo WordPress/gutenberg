@@ -78,7 +78,6 @@ Example:
 -   `layout`: config that is specific to a particular layout type.
     -   `mediaField`: used by the `grid` layout. The `id` of the field to be used for rendering each card's media.
     -   `primaryField`: used by the `grid` and `list` layouts. The `id` of the field to be highlighted in each card/list item.
-    -   `preview`: boolean. Only supported by the `list` view. Whether or not previews are supported.
 
 ### View <=> data
 

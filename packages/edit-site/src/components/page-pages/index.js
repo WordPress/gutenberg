@@ -50,7 +50,6 @@ const defaultConfigPerViewType = {
 	},
 	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
-		preview: true,
 	},
 };
 
@@ -323,7 +322,7 @@ export default function PagePages() {
 					onClickPreview={ onClickPreview }
 				/>
 			</Page>
-			{ view.layout.preview && (
+			{ view.type === LAYOUT_LIST && (
 				<Page>
 					<div className="edit-site-page-pages-preview">
 						{ previewItem && (
