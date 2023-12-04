@@ -50,8 +50,6 @@ export interface WPPerformanceResults {
 	minType?: number;
 	maxType?: number;
 	typeWithoutInspector?: number;
-	minTypeWithoutInspector?: number;
-	maxTypeWithoutInspector?: number;
 	typeContainer?: number;
 	minTypeContainer?: number;
 	maxTypeContainer?: number;
@@ -97,8 +95,6 @@ export function curateResults(
 		minType: minimum( results.type ),
 		maxType: maximum( results.type ),
 		typeWithoutInspector: average( results.typeWithoutInspector ),
-		minTypeWithoutInspector: minimum( results.typeWithoutInspector ),
-		maxTypeWithoutInspector: maximum( results.typeWithoutInspector ),
 		typeContainer: average( results.typeContainer ),
 		minTypeContainer: minimum( results.typeContainer ),
 		maxTypeContainer: maximum( results.typeContainer ),
