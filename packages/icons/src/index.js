@@ -238,6 +238,7 @@ export { default as swatch } from './library/swatch';
 export { default as tableColumnAfter } from './library/table-column-after';
 export { default as tableColumnBefore } from './library/table-column-before';
 export { default as tableColumnDelete } from './library/table-column-delete';
+export { default as tableOfContents } from './library/table-of-contents';
 export { default as tableRowAfter } from './library/table-row-after';
 export { default as tableRowBefore } from './library/table-row-before';
 export { default as tableRowDelete } from './library/table-row-delete';

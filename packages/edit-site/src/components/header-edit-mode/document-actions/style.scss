@@ -1,7 +1,7 @@
 .edit-site-document-actions {
 	display: flex;
 	align-items: center;
-	height: $button-size;
+	height: $button-size-compact;
 	justify-content: space-between;
 	// Flex items will, by default, refuse to shrink below a minimum
 	// intrinsic width. In order to shrink this flexbox item, and
@@ -11,11 +11,6 @@
 	background: $gray-100;
 	border-radius: $grid-unit-05;
 	width: min(100%, 450px);
-
-	// Make the document title shorter in top-toolbar mode, as it has to be covered.
-	.has-fixed-toolbar & {
-		width: min(100%, 380px);
-	}
 
 	&:hover {
 		background-color: $gray-200;

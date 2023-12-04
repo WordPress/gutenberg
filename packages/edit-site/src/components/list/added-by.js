@@ -22,19 +22,9 @@ import { _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_ORIGINS,
-} from '../../utils/constants';
+import { TEMPLATE_POST_TYPE, TEMPLATE_ORIGINS } from '../../utils/constants';
 
 /** @typedef {'wp_template'|'wp_template_part'} TemplateType */
-
-/** @type {TemplateType} */
-const TEMPLATE_POST_TYPE_NAMES = [
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-];
 
 /**
  * @typedef {'theme'|'plugin'|'site'|'user'} AddedByType
@@ -55,8 +45,6 @@ export function useAddedBy( postType, postId ) {
 	return useSelect(
 		( select ) => {
 			const {
-				getTheme,
-				getPlugin,
 				getEntityRecord,
 				getMedia,
 				getUser,
@@ -67,82 +55,54 @@ export function useAddedBy( postType, postId ) {
 				postType,
 				postId
 			);
+			const originalSource = template?.original_source;
+			const authorText = template?.author_text;
 
-			if ( TEMPLATE_POST_TYPE_NAMES.includes( template.type ) ) {
-				// Added by theme.
-				// Template originally provided by a theme, but customized by a user.
-				// Templates originally didn't have the 'origin' field so identify
-				// older customized templates by checking for no origin and a 'theme'
-				// or 'custom' source.
-				if (
-					template.has_theme_file &&
-					( template.origin === TEMPLATE_ORIGINS.theme ||
-						( ! template.origin &&
-							[
-								TEMPLATE_ORIGINS.theme,
-								TEMPLATE_ORIGINS.custom,
-							].includes( template.source ) ) )
-				) {
+			switch ( originalSource ) {
+				case 'theme': {
 					return {
-						type: 'theme',
+						type: originalSource,
 						icon: themeIcon,
-						text:
-							getTheme( template.theme )?.name?.rendered ||
-							template.theme,
+						text: authorText,
 						isCustomized:
 							template.source === TEMPLATE_ORIGINS.custom,
 					};
 				}
-
-				// Added by plugin.
-				if (
-					template.has_theme_file &&
-					template.origin === TEMPLATE_ORIGINS.plugin
-				) {
+				case 'plugin': {
 					return {
-						type: TEMPLATE_ORIGINS.plugin,
+						type: originalSource,
 						icon: pluginIcon,
-						text:
-							getPlugin( template.theme )?.name || template.theme,
+						text: authorText,
 						isCustomized:
 							template.source === TEMPLATE_ORIGINS.custom,
 					};
 				}
-
-				// Added by site.
-				// Template was created from scratch, but has no author. Author support
-				// was only added to templates in WordPress 5.9. Fallback to showing the
-				// site logo and title.
-				if (
-					! template.has_theme_file &&
-					template.source === TEMPLATE_ORIGINS.custom &&
-					! template.author
-				) {
+				case 'site': {
 					const siteData = getEntityRecord(
 						'root',
 						'__unstableBase'
 					);
 					return {
-						type: 'site',
+						type: originalSource,
 						icon: globeIcon,
 						imageUrl: siteData?.site_logo
 							? getMedia( siteData.site_logo )?.source_url
 							: undefined,
-						text: siteData?.name,
+						text: authorText,
+						isCustomized: false,
+					};
+				}
+				default: {
+					const user = getUser( template.author );
+					return {
+						type: 'user',
+						icon: authorIcon,
+						imageUrl: user?.avatar_urls?.[ 48 ],
+						text: authorText,
 						isCustomized: false,
 					};
 				}
 			}
-
-			// Added by user.
-			const user = getUser( template.author );
-			return {
-				type: 'user',
-				icon: authorIcon,
-				imageUrl: user?.avatar_urls?.[ 48 ],
-				text: user?.nickname,
-				isCustomized: false,
-			};
 		},
 		[ postType, postId ]
 	);

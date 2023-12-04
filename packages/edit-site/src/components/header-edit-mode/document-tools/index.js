@@ -130,6 +130,7 @@ export default function DocumentTools( {
 						label={ showIconLabels ? shortLabel : longLabel }
 						showTooltip={ ! showIconLabels }
 						aria-expanded={ isInserterOpen }
+						size="compact"
 					/>
 				) }
 				{ isLargeViewport && (
@@ -142,17 +143,20 @@ export default function DocumentTools( {
 									showIconLabels ? 'tertiary' : undefined
 								}
 								disabled={ ! isVisualMode }
+								size="compact"
 							/>
 						) }
 						<ToolbarItem
 							as={ UndoButton }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
+							size="compact"
 						/>
 						<ToolbarItem
 							as={ RedoButton }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
+							size="compact"
 						/>
 						{ ! isDistractionFree && (
 							<ToolbarItem
@@ -171,6 +175,7 @@ export default function DocumentTools( {
 									showIconLabels ? 'tertiary' : undefined
 								}
 								aria-expanded={ isListViewOpen }
+								size="compact"
 							/>
 						) }
 						{ isZoomedOutViewExperimentEnabled &&
@@ -191,6 +196,7 @@ export default function DocumentTools( {
 												: 'zoom-out'
 										);
 									} }
+									size="compact"
 								/>
 							) }
 					</>

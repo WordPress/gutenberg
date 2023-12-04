@@ -14,7 +14,7 @@ import {
 	useImperativeHandle,
 	useRef,
 } from '@wordpress/element';
-import { VisuallyHidden, SearchControl } from '@wordpress/components';
+import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
@@ -293,7 +293,15 @@ function InserterMenu(
 				/>
 			) }
 			{ showInserterHelpPanel && hoveredItem && (
-				<InserterPreviewPanel item={ hoveredItem } />
+				<Popover
+					className="block-editor-inserter__preview-container__popover"
+					placement="right-start"
+					offset={ 16 }
+					focusOnMount={ false }
+					animate={ false }
+				>
+					<InserterPreviewPanel item={ hoveredItem } />
+				</Popover>
 			) }
 			{ showPatternPanel && (
 				<PatternCategoryPreviewPanel

@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "17.1.2",
+	"version": "17.2.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -41,6 +41,7 @@
 		"@wordpress/customize-widgets": "file:packages/customize-widgets",
 		"@wordpress/data": "file:packages/data",
 		"@wordpress/data-controls": "file:packages/data-controls",
+		"@wordpress/dataviews": "file:packages/dataviews",
 		"@wordpress/date": "file:packages/date",
 		"@wordpress/deprecated": "file:packages/deprecated",
 		"@wordpress/dom": "file:packages/dom",
@@ -91,6 +92,7 @@
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
 		"@wordpress/wordcount": "file:packages/wordcount",
+		"es-module-shims": "^1.8.2",
 		"wicg-inert": "3.1.2"
 	},
 	"devDependencies": {
