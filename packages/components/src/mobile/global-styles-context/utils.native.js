@@ -248,6 +248,20 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 			const customValuesData = customValues ?? JSON.parse( stylesBase );
 			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
 				const path = $2.split( '--' );
+
+				// Supports cases for variables like var(--wp--custom--color--background)
+				if ( path[ 0 ] === 'color' ) {
+					const colorKey = path[ path.length - 1 ];
+					if ( mappedValues?.color ) {
+						const matchedValue = mappedValues.color?.values?.find(
+							( { slug } ) => slug === colorKey
+						);
+						if ( matchedValue ) {
+							return `${ matchedValue?.color }`;
+						}
+					}
+				}
+
 				if (
 					path.reduce(
 						( prev, curr ) => prev && prev[ curr ],
