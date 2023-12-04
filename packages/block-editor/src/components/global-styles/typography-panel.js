@@ -8,7 +8,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,7 +22,7 @@ import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
 import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
-import { setImmutably } from '../../utils/object';
+import { setImmutably, uniqByProperty } from '../../utils/object';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -51,10 +51,10 @@ export function useHasTypographyPanel( settings ) {
 	);
 }
 
-function useHasFontSizeControl( settings ) {
+function useHasFontSizeControl( mergedSettings ) {
 	return (
-		hasMergedOrigins( settings?.typography?.fontSizes ) ||
-		settings?.typography?.customFontSize
+		mergedSettings?.typography?.fontSizes?.length ||
+		mergedSettings?.typography?.customFontSize
 	);
 }
 
@@ -100,18 +100,6 @@ function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
 }
 
-function getUniqueFontSizesBySlug( settings ) {
-	const fontSizes = settings?.typography?.fontSizes;
-	const mergedFontSizes = fontSizes ? mergeOrigins( fontSizes ) : [];
-	const uniqueSizes = [];
-	for ( const currentSize of mergedFontSizes ) {
-		if ( ! uniqueSizes.some( ( { slug } ) => slug === currentSize.slug ) ) {
-			uniqueSizes.push( currentSize );
-		}
-	}
-	return uniqueSizes;
-}
-
 function TypographyToolsPanel( {
 	resetAllFilter,
 	onChange,
@@ -148,6 +136,39 @@ const DEFAULT_CONTROLS = {
 	textColumns: true,
 };
 
+function useMergedSettings( parentSettings ) {
+	return useMemo( () => {
+		const updatedSettings = { ...parentSettings };
+
+		// Remove default font sizes if disabled.
+		if (
+			updatedSettings?.typography?.defaultFontSizes === false &&
+			updatedSettings?.typography?.fontSizes?.default
+		) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				fontSizes: {
+					custom: updatedSettings.typography.fontSizes.custom,
+					theme: updatedSettings.typography.fontSizes.theme,
+				},
+			};
+		}
+
+		// Merge origins and remove duplicates.
+		if ( updatedSettings?.typography?.fontSizes ) {
+			updatedSettings.typography.fontSizes = mergeOrigins(
+				updatedSettings.typography.fontSizes
+			);
+			updatedSettings.typography.fontSizes = uniqByProperty(
+				updatedSettings.typography.fontSizes,
+				'slug'
+			);
+		}
+
+		return updatedSettings;
+	}, [ parentSettings ] );
+}
+
 export default function TypographyPanel( {
 	as: Wrapper = TypographyToolsPanel,
 	value,
@@ -159,6 +180,8 @@ export default function TypographyPanel( {
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
+
+	const mergedSettings = useMergedSettings( settings );
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
@@ -183,9 +206,9 @@ export default function TypographyPanel( {
 	const resetFontFamily = () => setFontFamily( undefined );
 
 	// Font Size
-	const hasFontSizeEnabled = useHasFontSizeControl( settings );
-	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-	const mergedFontSizes = getUniqueFontSizesBySlug( settings );
+	const hasFontSizeEnabled = useHasFontSizeControl( mergedSettings );
+	const disableCustomFontSizes = ! mergedSettings?.typography?.customFontSize;
+	const fontSizes = mergedSettings?.typography?.fontSizes;
 
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {
@@ -368,7 +391,7 @@ export default function TypographyPanel( {
 					<FontSizePicker
 						value={ fontSize }
 						onChange={ setFontSize }
-						fontSizes={ mergedFontSizes }
+						fontSizes={ fontSizes }
 						disableCustomFontSizes={ disableCustomFontSizes }
 						withReset={ false }
 						withSlider
