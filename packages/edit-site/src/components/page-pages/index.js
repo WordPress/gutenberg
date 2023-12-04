@@ -24,6 +24,7 @@ import {
 	ENUMERATION_TYPE,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
+	LAYOUT_LIST,
 	OPERATOR_IN,
 	OPERATOR_NOT_IN,
 } from '../../utils/constants';
