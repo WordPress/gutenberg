@@ -42,6 +42,7 @@ import {
 import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
 import Tabs from './tabs';
+import { kebabCase } from './utils/strings';
 
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -81,4 +82,5 @@ lock( privateApis, {
 	DropdownMenuSeparatorV2Ariakit,
 	DropdownMenuItemLabelV2Ariakit,
 	DropdownMenuItemHelpTextV2Ariakit,
+	kebabCase,
 } );
