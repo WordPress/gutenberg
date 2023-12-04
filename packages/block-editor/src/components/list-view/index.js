@@ -219,24 +219,39 @@ function ListViewComponent(
 		[ updateBlockSelection ]
 	);
 
-	const { blockDropTargetIndex, blockDropPosition } = useMemo( () => {
-		let _blockDropTargetIndex;
+	const firstDraggedBlockClientId = draggedClientIds?.[ 0 ];
 
-		if ( blockDropTarget?.clientId ) {
-			const foundBlockIndex = blockIndexes[ blockDropTarget.clientId ];
-			// If dragging below or inside the block, treat the drop target as the next block.
-			_blockDropTargetIndex =
-				foundBlockIndex === undefined ||
-				blockDropTarget?.dropPosition === 'top'
-					? foundBlockIndex
-					: foundBlockIndex + 1;
-		}
+	const { blockDropTargetIndex, blockDropPosition, firstDraggedBlockIndex } =
+		useMemo( () => {
+			let _blockDropTargetIndex, _firstDraggedBlockIndex;
 
-		return {
-			blockDropTargetIndex: _blockDropTargetIndex,
-			blockDropPosition: blockDropTarget?.dropPosition,
-		};
-	}, [ blockDropTarget, blockIndexes ] );
+			if ( blockDropTarget?.clientId ) {
+				const foundBlockIndex =
+					blockIndexes[ blockDropTarget.clientId ];
+				// If dragging below or inside the block, treat the drop target as the next block.
+				_blockDropTargetIndex =
+					foundBlockIndex === undefined ||
+					blockDropTarget?.dropPosition === 'top'
+						? foundBlockIndex
+						: foundBlockIndex + 1;
+			}
+
+			if ( firstDraggedBlockClientId ) {
+				const foundBlockIndex =
+					blockIndexes[ firstDraggedBlockClientId ];
+				_firstDraggedBlockIndex =
+					foundBlockIndex === undefined ||
+					blockDropTarget?.dropPosition === 'top'
+						? foundBlockIndex
+						: foundBlockIndex + 1;
+			}
+
+			return {
+				blockDropTargetIndex: _blockDropTargetIndex,
+				blockDropPosition: blockDropTarget?.dropPosition,
+				firstDraggedBlockIndex: _firstDraggedBlockIndex,
+			};
+		}, [ blockDropTarget, blockIndexes, firstDraggedBlockClientId ] );
 
 	const contextValue = useMemo(
 		() => ( {
@@ -246,6 +261,7 @@ function ListViewComponent(
 			draggedClientIds,
 			expandedState,
 			expand,
+			firstDraggedBlockIndex,
 			collapse,
 			BlockSettingsMenu,
 			listViewInstanceId: instanceId,
@@ -262,6 +278,7 @@ function ListViewComponent(
 			draggedClientIds,
 			expandedState,
 			expand,
+			firstDraggedBlockIndex,
 			collapse,
 			BlockSettingsMenu,
 			instanceId,

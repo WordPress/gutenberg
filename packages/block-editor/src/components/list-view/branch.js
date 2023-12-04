@@ -118,6 +118,7 @@ function ListViewBranch( props ) {
 	const {
 		blockDropPosition,
 		blockDropTargetIndex,
+		firstDraggedBlockIndex,
 		blockIndexes,
 		expandedState,
 		draggedClientIds,
@@ -152,26 +153,35 @@ function ListViewBranch( props ) {
 				let displacement;
 				let isNesting;
 
-				if ( blockDropTargetIndex !== undefined ) {
+				if (
+					blockDropTargetIndex !== undefined &&
+					firstDraggedBlockIndex !== undefined
+				) {
 					const thisBlockIndex = blockIndexes[ clientId ];
 
 					if ( thisBlockIndex !== undefined ) {
-						displacement =
+						if (
+							thisBlockIndex >= firstDraggedBlockIndex &&
 							thisBlockIndex < blockDropTargetIndex
-								? 'above'
-								: 'below';
-					}
+						) {
+							displacement = 'above';
+						}
 
-					if ( thisBlockIndex === 0 && blockDropTargetIndex === 0 ) {
-						// If the block is the first block and the drop target is also the first block,
-						// then the block is being dragged above the first block.
-						displacement = 'below';
+						if (
+							thisBlockIndex < firstDraggedBlockIndex &&
+							thisBlockIndex >= blockDropTargetIndex
+						) {
+							displacement = 'below';
+						}
 					}
 
 					isNesting =
 						blockDropTargetIndex - 1 === thisBlockIndex &&
 						blockDropPosition === 'inside';
 				}
+
+				// TODO: Ensure above / below classes are output when dragging outside of the list view,
+				// otherwise a gap appears.
 
 				const { itemInView } = fixedListWindow;
 				const blockInView = itemInView( nextPosition );
