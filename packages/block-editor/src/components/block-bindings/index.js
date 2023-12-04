@@ -14,7 +14,7 @@ export const AVAILABLE_BINDINGS = {
 	'core/image': 'url',
 };
 
-export function useAvailableBlockBindings( name ) {
+export function useAvailableBlockAttributes( name ) {
 	return AVAILABLE_BINDINGS[ name ];
 }
 

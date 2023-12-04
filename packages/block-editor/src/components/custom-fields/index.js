@@ -8,11 +8,11 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { InspectorControls } from '../../components';
-import { useAvailableBlockBindings } from '../block-bindings';
+import { useAvailableBlockAttributes } from '../block-bindings';
 
 export function CustomFieldsControl( props ) {
 	// TODO: Discuss if this is the best way to get the availabe block bindings.
-	const attributeName = useAvailableBlockBindings( props.name );
+	const attributeName = useAvailableBlockAttributes( props.name );
 
 	return (
 		<InspectorControls>
