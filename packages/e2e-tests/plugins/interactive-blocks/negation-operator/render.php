@@ -5,8 +5,10 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+gutenberg_enqueue_module( 'negation-operator-view' );
 ?>
-<div data-wp-interactive>
+
+<div data-wp-interactive='{ "namespace": "negation-operator" }'>
 	<button
 		data-wp-on--click="actions.toggle"
 		data-testid="toggle active value"
@@ -20,7 +22,7 @@
 	></div>
 
 	<div
-		data-wp-bind--hidden="!selectors.active"
+		data-wp-bind--hidden="!state.isActive"
 		data-testid="add hidden attribute if selector is not active"
 	></div>
 </div>

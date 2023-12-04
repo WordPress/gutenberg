@@ -290,3 +290,11 @@ export function deleteStyleOverride( id ) {
 		id,
 	};
 }
+
+export function syncDerivedBlockAttributes( clientId, attributes ) {
+	return {
+		type: 'SYNC_DERIVED_BLOCK_ATTRIBUTES',
+		clientIds: [ clientId ],
+		attributes,
+	};
+}

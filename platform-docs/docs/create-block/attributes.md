@@ -38,7 +38,7 @@ function Save( { attributes } ) {
 	// ...
 }
 
-registerBlockType( 'gutenpride/gutenpride-block', {
+registerBlockType( 'create-block/gutenpride', {
     // ...
     attributes,
     edit: Edit,
@@ -46,29 +46,29 @@ registerBlockType( 'gutenpride/gutenpride-block', {
 } );
 ```
 
-## TextControl Component
+## PlainText Component
 
-For our example block, the component we are going to use is the **TextControl** component, which is similar to an HTML text input field. You can see [the documentation for the `TextControl` component](https://developer.wordpress.org/block-editor/reference-guides/components/text-control/). You can browse an [interactive set of components in this Storybook](https://wordpress.github.io/gutenberg/).
+For our example block, the component we are going to use is the **PlainText** component, which allows the user to type some unformatted text. The **PlainText** component is imported from the `@wordpress/block-editor` package.
 
-The component is added similar to an HTML tag, setting a label, the `value` is set to the `attributes.message` and the `onChange` function uses the `setAttributes` to update the message attribute value.
+The component is added similar to an HTML tag, the `value` is set to the `attributes.message` and the `onChange` function uses the `setAttributes` to update the message attribute value.
 
 The save function will simply write the `attributes.message` as a `div` tag since that is how we defined it to be parsed. Update the `edit.js` and `save.js` files to the following, replacing the existing functions.
 
 **edit.js** file:
 
 ```js
-import { useBlockProps } from '@wordpress/block-editor';
-import { TextControl } from '@wordpress/components';
+import { useBlockProps, PlainText } from '@wordpress/block-editor';
 
 function Edit( { attributes, setAttributes } ) {
+	const blockProps = useBlockProps();
 	return (
-		<div { ...useBlockProps() }>
-			<TextControl
-				label="Message"
-				value={ attributes.message }
-				onChange={ ( val ) => setAttributes( { message: val } ) }
-			/>
-		</div>
+		<PlainText
+			{ ...blockProps }
+			tagName="div"
+			value={ attributes.message }
+			onChange={ ( val ) => setAttributes( { message: val } ) }
+			__experimentalVersion={ 2 }
+		/>
 	);
 }
 ```

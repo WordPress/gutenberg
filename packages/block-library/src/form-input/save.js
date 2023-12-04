@@ -13,6 +13,7 @@ import {
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Get the name attribute from a content string.
@@ -22,11 +23,8 @@ import {
  * @return {string} Returns the slug.
  */
 const getNameFromLabel = ( content ) => {
-	const dummyElement = document.createElement( 'div' );
-	dummyElement.innerHTML = content;
-	// Get the slug.
 	return (
-		removeAccents( dummyElement.innerText )
+		removeAccents( stripHTML( content ) )
 			// Convert anything that's not a letter or number to a hyphen.
 			.replace( /[^\p{L}\p{N}]+/gu, '-' )
 			// Convert to lowercase

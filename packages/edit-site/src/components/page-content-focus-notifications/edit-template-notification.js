@@ -6,11 +6,7 @@ import { useEffect, useState, useRef } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../store';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Component that:
@@ -27,14 +23,14 @@ import { store as editSiteStore } from '../../store';
  *                                                                  editor iframe canvas.
  */
 export default function EditTemplateNotification( { contentRef } ) {
-	const hasPageContentFocus = useSelect(
-		( select ) => select( editSiteStore ).hasPageContentFocus(),
+	const renderingMode = useSelect(
+		( select ) => select( editorStore ).getRenderingMode(),
 		[]
 	);
 	const { getNotices } = useSelect( noticesStore );
 
 	const { createInfoNotice, removeNotice } = useDispatch( noticesStore );
-	const { setHasPageContentFocus } = useDispatch( editSiteStore );
+	const { setRenderingMode } = useDispatch( editorStore );
 
 	const [ isDialogOpen, setIsDialogOpen ] = useState( false );
 
@@ -42,7 +38,7 @@ export default function EditTemplateNotification( { contentRef } ) {
 
 	useEffect( () => {
 		const handleClick = async ( event ) => {
-			if ( ! hasPageContentFocus ) {
+			if ( renderingMode === 'template-only' ) {
 				return;
 			}
 			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
@@ -62,7 +58,7 @@ export default function EditTemplateNotification( { contentRef } ) {
 					actions: [
 						{
 							label: __( 'Edit template' ),
-							onClick: () => setHasPageContentFocus( false ),
+							onClick: () => setRenderingMode( 'template-only' ),
 						},
 					],
 				}
@@ -71,7 +67,7 @@ export default function EditTemplateNotification( { contentRef } ) {
 		};
 
 		const handleDblClick = ( event ) => {
-			if ( ! hasPageContentFocus ) {
+			if ( renderingMode === 'template-only' ) {
 				return;
 			}
 			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
@@ -90,7 +86,7 @@ export default function EditTemplateNotification( { contentRef } ) {
 			canvas?.removeEventListener( 'click', handleClick );
 			canvas?.removeEventListener( 'dblclick', handleDblClick );
 		};
-	}, [ lastNoticeId, hasPageContentFocus, contentRef.current ] );
+	}, [ lastNoticeId, renderingMode, contentRef.current ] );
 
 	return (
 		<ConfirmDialog
@@ -98,7 +94,7 @@ export default function EditTemplateNotification( { contentRef } ) {
 			confirmButtonText={ __( 'Edit template' ) }
 			onConfirm={ () => {
 				setIsDialogOpen( false );
-				setHasPageContentFocus( false );
+				setRenderingMode( 'template-only' );
 			} }
 			onCancel={ () => setIsDialogOpen( false ) }
 		>

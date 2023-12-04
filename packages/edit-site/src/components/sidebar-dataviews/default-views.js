@@ -3,14 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import { OPERATOR_IN } from '../dataviews/constants';
+import { LAYOUT_TABLE, OPERATOR_IN } from '@wordpress/dataviews';
 
 const DEFAULT_PAGE_BASE = {
-	type: 'list',
+	type: LAYOUT_TABLE,
 	search: '',
 	filters: [],
 	page: 1,
