@@ -40,7 +40,7 @@ $header-toolbar-min-width: 335px;
 		align-items: center;
 		height: 100%;
 		flex-grow: 1;
-		margin: 0 $grid-unit-10;
+		margin: 0 $grid-unit-20;
 		justify-content: center;
 		// Flex items will, by default, refuse to shrink below a minimum
 		// intrinsic width. In order to shrink this flexbox item, and
@@ -89,7 +89,7 @@ $header-toolbar-min-width: 335px;
 .edit-site-header-edit-mode__actions {
 	display: inline-flex;
 	align-items: center;
-	padding-right: $grid-unit-20 - ($grid-unit-15 * 0.5);
+	padding-right: $grid-unit-10;
 	gap: $grid-unit-10;
 }
 
