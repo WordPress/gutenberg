@@ -93,7 +93,8 @@
 	color: $gray-800;
 	min-width: $grid-unit-40;
 	display: none;
-	@include break-small() {
+
+	@include break-medium() {
 		display: initial;
 	}
 }
