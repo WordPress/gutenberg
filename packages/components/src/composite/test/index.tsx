@@ -488,27 +488,107 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 		} );
 
 		describe( 'Usage', () => {
-			test( 'Renders as a single tab stop', async () => {
-				const Test = () => {
-					const composite = useCompositeState();
-					return (
-						<>
-							<button>Before</button>
-							<Composite { ...composite } aria-label="composite">
-								<CompositeItem { ...composite }>
-									Item 1
-								</CompositeItem>
-								<CompositeItem { ...composite }>
-									Item 2
-								</CompositeItem>
-								<CompositeItem { ...composite }>
-									Item 3
-								</CompositeItem>
-							</Composite>
-							<button>After</button>
-						</>
-					);
+			const OneDimensionalTest = (
+				initialState?: CompositeInitialState
+			) => {
+				const composite = useCompositeState( initialState );
+				return (
+					<Composite { ...composite } aria-label="composite">
+						<CompositeItem { ...composite }>Item 1</CompositeItem>
+						<CompositeItem { ...composite }>Item 2</CompositeItem>
+						<CompositeItem { ...composite }>Item 3</CompositeItem>
+					</Composite>
+				);
+			};
+
+			const getOneDimensionalItems = () => {
+				return {
+					item1: screen.getByText( 'Item 1' ),
+					item2: screen.getByText( 'Item 2' ),
+					item3: screen.getByText( 'Item 3' ),
 				};
+			};
+
+			const initialiseOneDimensionalTest = (
+				initialState?: CompositeInitialState
+			) => {
+				render( <OneDimensionalTest { ...initialState } /> );
+				return getOneDimensionalItems();
+			};
+
+			const TwoDimensionalTest = (
+				initialState?: CompositeInitialState
+			) => {
+				const composite = useCompositeState( initialState );
+
+				return (
+					<Composite { ...composite } aria-label="composite">
+						<CompositeGroup { ...composite }>
+							<CompositeItem { ...composite }>
+								Item A1
+							</CompositeItem>
+							<CompositeItem { ...composite }>
+								Item A2
+							</CompositeItem>
+							<CompositeItem { ...composite }>
+								Item A3
+							</CompositeItem>
+						</CompositeGroup>
+						<CompositeGroup { ...composite }>
+							<CompositeItem { ...composite }>
+								Item B1
+							</CompositeItem>
+							<CompositeItem { ...composite }>
+								Item B2
+							</CompositeItem>
+							<CompositeItem { ...composite }>
+								Item B3
+							</CompositeItem>
+						</CompositeGroup>
+						<CompositeGroup { ...composite }>
+							<CompositeItem { ...composite }>
+								Item C1
+							</CompositeItem>
+							<CompositeItem { ...composite }>
+								Item C2
+							</CompositeItem>
+							<CompositeItem { ...composite }>
+								Item C3
+							</CompositeItem>
+						</CompositeGroup>
+					</Composite>
+				);
+			};
+
+			const getTwoDimensionalItems = () => {
+				return {
+					itemA1: screen.getByText( 'Item A1' ),
+					itemA2: screen.getByText( 'Item A2' ),
+					itemA3: screen.getByText( 'Item A3' ),
+					itemB1: screen.getByText( 'Item B1' ),
+					itemB2: screen.getByText( 'Item B2' ),
+					itemB3: screen.getByText( 'Item B3' ),
+					itemC1: screen.getByText( 'Item C1' ),
+					itemC2: screen.getByText( 'Item C2' ),
+					itemC3: screen.getByText( 'Item C3' ),
+				};
+			};
+
+			const initialiseTwoDimensionalTest = (
+				initialState?: CompositeInitialState
+			) => {
+				render( <TwoDimensionalTest { ...initialState } /> );
+				return getTwoDimensionalItems();
+			};
+
+			test( 'Renders as a single tab stop', async () => {
+				const Test = () => (
+					<>
+						<button>Before</button>
+						<OneDimensionalTest />
+						<button>After</button>
+					</>
+				);
 				render( <Test /> );
 
 				await userEvent.tab();
@@ -521,138 +601,7 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 				expect( screen.getByText( 'Item 1' ) ).toHaveFocus();
 			} );
 
-			test( 'Works in one dimension', async () => {
-				const Test = () => {
-					const composite = useCompositeState();
-					return (
-						<Composite { ...composite } aria-label="composite">
-							<CompositeItem { ...composite }>
-								Item 1
-							</CompositeItem>
-							<CompositeItem { ...composite }>
-								Item 2
-							</CompositeItem>
-							<CompositeItem { ...composite }>
-								Item 3
-							</CompositeItem>
-						</Composite>
-					);
-				};
-				render( <Test /> );
-
-				const item1 = screen.getByText( 'Item 1' );
-				const item2 = screen.getByText( 'Item 2' );
-				const item3 = screen.getByText( 'Item 3' );
-
-				await userEvent.tab();
-				expect( item1 ).toHaveFocus();
-				await key( 'ArrowDown' );
-				expect( item2 ).toHaveFocus();
-				await key( 'ArrowDown' );
-				expect( item3 ).toHaveFocus();
-				await key( 'ArrowDown' );
-				expect( item3 ).toHaveFocus();
-				await key( 'ArrowUp' );
-				expect( item2 ).toHaveFocus();
-				await key( 'ArrowUp' );
-				expect( item1 ).toHaveFocus();
-				await key( 'ArrowUp' );
-				expect( item1 ).toHaveFocus();
-				await key( 'ArrowRight' );
-				expect( item2 ).toHaveFocus();
-				await key( 'ArrowRight' );
-				expect( item3 ).toHaveFocus();
-				await key( 'ArrowLeft' );
-				expect( item2 ).toHaveFocus();
-				await key( 'ArrowLeft' );
-				expect( item1 ).toHaveFocus();
-				await key( 'End' );
-				expect( item3 ).toHaveFocus();
-				await key( 'Home' );
-				expect( item1 ).toHaveFocus();
-				await key( 'PageDown' );
-				expect( item3 ).toHaveFocus();
-				await key( 'PageUp' );
-				expect( item1 ).toHaveFocus();
-			} );
-
-			test( 'Works in two dimensions', async () => {
-				const Test = () => {
-					const composite = useCompositeState();
-
-					return (
-						<Composite { ...composite } aria-label="composite">
-							<CompositeGroup { ...composite }>
-								<CompositeItem { ...composite }>
-									Item A1
-								</CompositeItem>
-								<CompositeItem { ...composite }>
-									Item A2
-								</CompositeItem>
-								<CompositeItem { ...composite }>
-									Item A3
-								</CompositeItem>
-							</CompositeGroup>
-							<CompositeGroup { ...composite }>
-								<CompositeItem { ...composite }>
-									Item B1
-								</CompositeItem>
-								<CompositeItem { ...composite }>
-									Item B2
-								</CompositeItem>
-								<CompositeItem { ...composite }>
-									Item B3
-								</CompositeItem>
-							</CompositeGroup>
-							<CompositeGroup { ...composite }>
-								<CompositeItem { ...composite }>
-									Item C1
-								</CompositeItem>
-								<CompositeItem { ...composite }>
-									Item C2
-								</CompositeItem>
-								<CompositeItem { ...composite }>
-									Item C3
-								</CompositeItem>
-							</CompositeGroup>
-						</Composite>
-					);
-				};
-				render( <Test /> );
-
-				const itemA1 = screen.getByText( 'Item A1' );
-				const itemA2 = screen.getByText( 'Item A2' );
-				const itemA3 = screen.getByText( 'Item A3' );
-				const itemB1 = screen.getByText( 'Item B1' );
-				const itemB2 = screen.getByText( 'Item B2' );
-				const itemC1 = screen.getByText( 'Item C1' );
-				const itemC3 = screen.getByText( 'Item C3' );
-
-				await userEvent.tab();
-				expect( itemA1 ).toHaveFocus();
-				await key( 'ArrowDown' );
-				expect( itemB1 ).toHaveFocus();
-				await key( 'ArrowRight' );
-				expect( itemB2 ).toHaveFocus();
-				await key( 'ArrowUp' );
-				expect( itemA2 ).toHaveFocus();
-				await key( 'ArrowLeft' );
-				expect( itemA1 ).toHaveFocus();
-				await key( 'End' );
-				expect( itemA3 ).toHaveFocus();
-				await key( 'PageDown' );
-				expect( itemC3 ).toHaveFocus();
-				await key( 'Home' );
-				expect( itemC1 ).toHaveFocus();
-				await key( 'PageUp' );
-				expect( itemA1 ).toHaveFocus();
-				await key( 'End', 'ControlLeft' );
-				expect( itemC3 ).toHaveFocus();
-				await key( 'Home', 'ControlLeft' );
-				expect( itemA1 ).toHaveFocus();
-			} );
-
-			test( 'Ignores disabled items', async () => {
+			test( 'Excludes disabled items', async () => {
 				const Test = () => {
 					const composite = useCompositeState();
 					return (
@@ -671,9 +620,7 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 				};
 				render( <Test /> );
 
-				const item1 = screen.getByText( 'Item 1' );
-				const item2 = screen.getByText( 'Item 2' );
-				const item3 = screen.getByText( 'Item 3' );
+				const { item1, item2, item3 } = getOneDimensionalItems();
 
 				expect( item2 ).toBeDisabled();
 
@@ -702,10 +649,7 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 					);
 				};
 				render( <Test /> );
-
-				const item1 = screen.getByText( 'Item 1' );
-				const item2 = screen.getByText( 'Item 2' );
-				const item3 = screen.getByText( 'Item 3' );
+				const { item1, item2, item3 } = getOneDimensionalItems();
 
 				expect( item2 ).toBeEnabled();
 				expect( item2 ).toHaveAttribute( 'aria-disabled', 'true' );
@@ -715,6 +659,243 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 				await key( 'ArrowDown' );
 				expect( item2 ).toHaveFocus();
 				expect( item3 ).not.toHaveFocus();
+			} );
+
+			describe( 'In one dimension', () => {
+				test( 'All directions work with no orientation', async () => {
+					const { item1, item2, item3 } =
+						initialiseOneDimensionalTest();
+
+					await userEvent.tab();
+					expect( item1 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( item2 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( item3 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( item3 ).toHaveFocus();
+					await key( 'ArrowUp' );
+					expect( item2 ).toHaveFocus();
+					await key( 'ArrowUp' );
+					expect( item1 ).toHaveFocus();
+					await key( 'ArrowUp' );
+					expect( item1 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( item2 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( item3 ).toHaveFocus();
+					await key( 'ArrowLeft' );
+					expect( item2 ).toHaveFocus();
+					await key( 'ArrowLeft' );
+					expect( item1 ).toHaveFocus();
+					await key( 'End' );
+					expect( item3 ).toHaveFocus();
+					await key( 'Home' );
+					expect( item1 ).toHaveFocus();
+					await key( 'PageDown' );
+					expect( item3 ).toHaveFocus();
+					await key( 'PageUp' );
+					expect( item1 ).toHaveFocus();
+				} );
+
+				test( 'Only left/right work with horizontal orientation', async () => {
+					const { item1, item2, item3 } =
+						initialiseOneDimensionalTest( {
+							orientation: 'horizontal',
+						} );
+
+					await userEvent.tab();
+					expect( item1 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( item1 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( item2 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( item3 ).toHaveFocus();
+					await key( 'ArrowUp' );
+					expect( item3 ).toHaveFocus();
+					await key( 'ArrowLeft' );
+					expect( item2 ).toHaveFocus();
+					await key( 'ArrowLeft' );
+					expect( item1 ).toHaveFocus();
+					await key( 'End' );
+					expect( item3 ).toHaveFocus();
+					await key( 'Home' );
+					expect( item1 ).toHaveFocus();
+					await key( 'PageDown' );
+					expect( item3 ).toHaveFocus();
+					await key( 'PageUp' );
+					expect( item1 ).toHaveFocus();
+				} );
+
+				test( 'Only up/down work with vertical orientation', async () => {
+					const { item1, item2, item3 } =
+						initialiseOneDimensionalTest( {
+							orientation: 'vertical',
+						} );
+
+					await userEvent.tab();
+					expect( item1 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( item1 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( item2 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( item3 ).toHaveFocus();
+					await key( 'ArrowLeft' );
+					expect( item3 ).toHaveFocus();
+					await key( 'ArrowUp' );
+					expect( item2 ).toHaveFocus();
+					await key( 'ArrowUp' );
+					expect( item1 ).toHaveFocus();
+					await key( 'End' );
+					expect( item3 ).toHaveFocus();
+					await key( 'Home' );
+					expect( item1 ).toHaveFocus();
+					await key( 'PageDown' );
+					expect( item3 ).toHaveFocus();
+					await key( 'PageUp' );
+					expect( item1 ).toHaveFocus();
+				} );
+
+				test( 'Focus wraps with loop enabled', async () => {
+					const { item1, item2, item3 } =
+						initialiseOneDimensionalTest( {
+							loop: true,
+						} );
+
+					await userEvent.tab();
+					expect( item1 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( item2 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( item3 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( item1 ).toHaveFocus();
+					await key( 'ArrowUp' );
+					expect( item3 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( item1 ).toHaveFocus();
+					await key( 'ArrowLeft' );
+					expect( item3 ).toHaveFocus();
+				} );
+			} );
+
+			describe( 'In two dimensions', () => {
+				test( 'All directions work as standard', async () => {
+					const {
+						itemA1,
+						itemA2,
+						itemA3,
+						itemB1,
+						itemB2,
+						itemC1,
+						itemC3,
+					} = initialiseTwoDimensionalTest();
+
+					await userEvent.tab();
+					expect( itemA1 ).toHaveFocus();
+					await key( 'ArrowUp' );
+					expect( itemA1 ).toHaveFocus();
+					await key( 'ArrowLeft' );
+					expect( itemA1 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( itemB1 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( itemB2 ).toHaveFocus();
+					await key( 'ArrowUp' );
+					expect( itemA2 ).toHaveFocus();
+					await key( 'ArrowLeft' );
+					expect( itemA1 ).toHaveFocus();
+					await key( 'End' );
+					expect( itemA3 ).toHaveFocus();
+					await key( 'PageDown' );
+					expect( itemC3 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( itemC3 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( itemC3 ).toHaveFocus();
+					await key( 'Home' );
+					expect( itemC1 ).toHaveFocus();
+					await key( 'PageUp' );
+					expect( itemA1 ).toHaveFocus();
+					await key( 'End', 'ControlLeft' );
+					expect( itemC3 ).toHaveFocus();
+					await key( 'Home', 'ControlLeft' );
+					expect( itemA1 ).toHaveFocus();
+				} );
+
+				test( 'Focus wraps around rows/columns with loop enabled', async () => {
+					const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
+						initialiseTwoDimensionalTest( { loop: true } );
+
+					await userEvent.tab();
+					expect( itemA1 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( itemA2 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( itemA3 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( itemA1 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( itemB1 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( itemC1 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( itemA1 ).toHaveFocus();
+					await key( 'ArrowLeft' );
+					expect( itemA3 ).toHaveFocus();
+					await key( 'ArrowUp' );
+					expect( itemC3 ).toHaveFocus();
+				} );
+
+				test( 'Focus moves between rows/columns with wrap enabled', async () => {
+					const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
+						initialiseTwoDimensionalTest( { wrap: true } );
+
+					await userEvent.tab();
+					expect( itemA1 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( itemA2 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( itemA3 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( itemB1 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( itemC1 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( itemA2 ).toHaveFocus();
+					await key( 'ArrowLeft' );
+					expect( itemA1 ).toHaveFocus();
+					await key( 'ArrowLeft' );
+					expect( itemA1 ).toHaveFocus();
+					await key( 'ArrowUp' );
+					expect( itemA1 ).toHaveFocus();
+					await key( 'End', 'ControlLeft' );
+					expect( itemC3 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( itemC3 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( itemC3 ).toHaveFocus();
+				} );
+
+				test( 'Focus wraps around start/end with loop and wrap enabled', async () => {
+					const { itemA1, itemC3 } = initialiseTwoDimensionalTest( {
+						loop: true,
+						wrap: true,
+					} );
+
+					await userEvent.tab();
+					expect( itemA1 ).toHaveFocus();
+					await key( 'ArrowLeft' );
+					expect( itemC3 ).toHaveFocus();
+					await key( 'ArrowDown' );
+					expect( itemA1 ).toHaveFocus();
+					await key( 'ArrowUp' );
+					expect( itemC3 ).toHaveFocus();
+					await key( 'ArrowRight' );
+					expect( itemA1 ).toHaveFocus();
+				} );
 			} );
 		} );
 	}
