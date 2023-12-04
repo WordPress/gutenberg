@@ -90,7 +90,9 @@ if ( $gutenberg_experiments && (
 	global $block_bindings_whitelist;
 	$block_bindings_whitelist = array(
 		'core/paragraph' => array( 'content' ),
+		'core/heading'   => array( 'content' ),
 		'core/image'     => array( 'url', 'title' ),
+		'core/button'    => array( 'url', 'text' ),
 	);
 	if ( ! function_exists( 'process_block_bindings' ) ) {
 		/**

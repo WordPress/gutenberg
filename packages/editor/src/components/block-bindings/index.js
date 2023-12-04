@@ -20,7 +20,9 @@ import MetadataSourceUI from './metadata.js';
 
 const blockBindingsWhitelist = {
 	'core/paragraph': [ 'content' ],
+	'core/heading': [ 'content' ],
 	'core/image': [ 'url', 'title' ],
+	'core/button': [ 'url', 'text' ],
 };
 
 export default function BlockBindingsButton( props ) {
