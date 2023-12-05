@@ -6,6 +6,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { ENTER } from '@wordpress/keycodes';
 
 export default function ViewList( {
 	view,
@@ -29,40 +30,51 @@ export default function ViewList( {
 			)
 	);
 
+	const onEnter = ( item ) => ( event ) => {
+		const { keyCode } = event;
+		if ( keyCode === ENTER ) {
+			onSelectionChange( [ item ] );
+		}
+	};
+
 	return (
 		<ul className="dataviews-list-view">
 			{ shownData.map( ( item, index ) => {
 				return (
-					// TODO: make li interactive.
-					/* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */
-					<li
-						key={ getItemId?.( item ) || index }
-						onClick={ () => onSelectionChange( [ item ] ) }
-					>
-						<HStack spacing={ 3 }>
-							{ mediaField?.render( { item } ) || (
-								<div className="dataviews-list-view__media-placeholder"></div>
-							) }
-							<HStack>
-								<VStack spacing={ 1 }>
-									{ primaryField?.render( { item } ) }
-									<div className="dataviews-list-view__fields">
-										{ visibleFields.map( ( field ) => {
-											return (
-												<span
-													key={ field.id }
-													className="dataviews-list-view__field"
-												>
-													{ field.render( { item } ) }
-												</span>
-											);
-										} ) }
-									</div>
-								</VStack>
+					<li key={ getItemId?.( item ) || index }>
+						<div
+							role="button"
+							tabIndex={ 0 }
+							onKeyDown={ onEnter( item ) }
+							className="dataviews-list-view__item"
+							onClick={ () => onSelectionChange( [ item ] ) }
+						>
+							<HStack spacing={ 3 }>
+								{ mediaField?.render( { item } ) || (
+									<div className="dataviews-list-view__media-placeholder"></div>
+								) }
+								<HStack>
+									<VStack spacing={ 1 }>
+										{ primaryField?.render( { item } ) }
+										<div className="dataviews-list-view__fields">
+											{ visibleFields.map( ( field ) => {
+												return (
+													<span
+														key={ field.id }
+														className="dataviews-list-view__field"
+													>
+														{ field.render( {
+															item,
+														} ) }
+													</span>
+												);
+											} ) }
+										</div>
+									</VStack>
+								</HStack>
 							</HStack>
-						</HStack>
+						</div>
 					</li>
-					/* eslint-enable jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */
 				);
 			} ) }
 		</ul>
