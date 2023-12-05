@@ -51,6 +51,7 @@ export default function ViewList( {
 						<div
 							role="button"
 							tabIndex={ 0 }
+							aria-pressed={ selection.includes( item.id ) }
 							onKeyDown={ onEnter( item ) }
 							className={ classNames(
 								'dataviews-list-view__item',
