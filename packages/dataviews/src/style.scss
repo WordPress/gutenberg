@@ -138,9 +138,9 @@
 
 	.dataviews-list-view__item {
 		padding: $grid-unit-15 $grid-unit-40;
-		&:hover,
-		&:focus {
-			background-color: $gray-100;
+		cursor: default;
+		&:hover {
+			background-color: lighten($gray-100,3%);
 		}
 		h3 {
 			overflow: hidden;
@@ -149,8 +149,9 @@
 		}
 	}
 
-	.dataviews-list-view__item-selected {
-		background-color: $gray-200;
+	.dataviews-list-view__item-selected,
+	.dataviews-list-view__item-selected:hover {
+		background-color: $gray-100;
 	}
 
 	.dataviews-list-view__media-wrapper {
