@@ -626,6 +626,9 @@ const { state } = store( "myPlugin", {
 } );
 ```
 
+> **Note**
+> All `store()` calls with the same namespace return the same references, i.e., the same `state`, `actions`, etc., containing the result of merging all the store parts passed.
+
 - To access the context inside an action, derived state, or side effect, you can use the `getContext` function. 
 - To access the reference, you can use the `getElement` function.
 
