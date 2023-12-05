@@ -138,7 +138,12 @@
 			background-color: $gray-100;
 		}
 	}
+
+	.dataviews-list-view__fields {
+		color: $gray-700;
+	}
 }
+
 .dataviews-action-modal {
 	z-index: z-index(".dataviews-action-modal");
 }
