@@ -83,7 +83,8 @@ export default function PatternActions( {
 	const isRemovable = isTemplateRemovable( record );
 	const isRevertable = isTemplateRevertable( record );
 	const isEditable = isUserPattern || isRemovable;
-	const isDuplicable = isUserPattern || isNonUserPattern || isRemovable;
+	// Only patterns and template parts can be duplicated for now.
+	const isDuplicable = isUserPattern || isNonUserPattern || isTemplatePart;
 	const decodedTitle = decodeEntities(
 		record?.title?.rendered || record?.title?.raw
 	);
