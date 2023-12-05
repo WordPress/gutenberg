@@ -18,7 +18,8 @@ import { useEffect, useRef } from '@wordpress/element';
 import { store as editSiteStore } from '../../store';
 
 export default function InserterSidebar() {
-	const { setIsInserterOpened } = useDispatch( editSiteStore );
+	const { closeGeneralSidebar, setIsInserterOpened } =
+		useDispatch( editSiteStore );
 	const insertionPoint = useSelect(
 		( select ) => select( editSiteStore ).__experimentalGetInsertionPoint(),
 		[]
@@ -58,6 +59,10 @@ export default function InserterSidebar() {
 						insertionPoint.insertionIndex
 					}
 					__experimentalFilterValue={ insertionPoint.filterValue }
+					__experimentalOnPatternCategorySelection={
+						closeGeneralSidebar
+					}
+					__experimentalShouldZoomPatterns
 					ref={ libraryRef }
 				/>
 			</div>

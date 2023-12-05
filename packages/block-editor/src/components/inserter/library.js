@@ -21,6 +21,8 @@ function InserterLibrary(
 		showMostUsedBlocks = false,
 		__experimentalInsertionIndex,
 		__experimentalFilterValue,
+		__experimentalOnPatternCategorySelection,
+		__experimentalShouldZoomPatterns = false,
 		onSelect = noop,
 		shouldFocusBlock = false,
 	},
@@ -53,6 +55,12 @@ function InserterLibrary(
 			showMostUsedBlocks={ showMostUsedBlocks }
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
 			__experimentalFilterValue={ __experimentalFilterValue }
+			__experimentalOnPatternCategorySelection={
+				__experimentalOnPatternCategorySelection
+			}
+			__experimentalShouldZoomPatterns={
+				__experimentalShouldZoomPatterns
+			}
 			shouldFocusBlock={ shouldFocusBlock }
 			prioritizePatterns={ prioritizePatterns }
 			ref={ ref }

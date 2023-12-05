@@ -92,6 +92,14 @@ $block-inserter-tabs-height: 44px;
 	overflow: visible;
 }
 
+.block-editor-inserter__menu.has-inline-patterns {
+	display: flex;
+
+	.block-editor-inserter__patterns-category-dialog {
+		position: static;
+	}
+}
+
 .block-editor-inserter__inline-elements {
 	margin-top: -1px;
 }
