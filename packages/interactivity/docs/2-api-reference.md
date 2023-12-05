@@ -5,7 +5,7 @@ To add interactivity to blocks using the Interactivity API, developers can use:
 - **Directives** - added to the markup to add specific behavior to the DOM elements of the block.
 - **Store** - that contains the logic and data (state, actions, or side effects, among others) needed for the behavior.
 
-DOM elements are connected to data stored in the state and context through directives. If data in the state or context change directives will react to those changes, updating the DOM accordingly (see [diagram](https://excalidraw.com/#json=rEg5d71O_jy3NrgYJUIVd,yjOUmMvxzNf6alqFjElvIw)).
+DOM elements are connected to data stored in the state and context through directives. If data in the state or context change directives will react to those changes, updating the DOM accordingly (see [diagram](https://excalidraw.com/#json=T4meh6lltJh6TCX51NTIu,DmIhxYSGFTL_ywZFbsmuSw)).
 
 ![State & Directives](assets/state-directives.png)
 
