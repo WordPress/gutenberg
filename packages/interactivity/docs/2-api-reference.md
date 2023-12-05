@@ -69,7 +69,7 @@ With directives, we can directly manage behavior related to things such as side 
 
 #### `wp-interactive` 
 
-The `wp-interactive` directive "activates" the interactivity for the DOM element and its children through the Interactivity API (directives and store). It includes the a namespace to reference a specific store.
+The `wp-interactive` directive "activates" the interactivity for the DOM element and its children through the Interactivity API (directives and store). It includes a namespace to reference a specific store.
 
 ```html
 <!-- Let's make this element and its children interactive and set the namespace -->
@@ -399,7 +399,7 @@ store( "myPlugin", {
       const context = getContext();
       context.counter--;
     },
-  }
+  },
   callbacks: {
     logCounter: () => {
       const { counter } = getContext(); 
@@ -502,7 +502,7 @@ The value assigned to a directive is a string pointing to a specific state, acti
 In the following example, we use a getter to define the `state.isPlaying` derived value.
 
 ```js
-store( "myPlugin", {
+const { state } = store( "myPlugin", {
   state: {
     currentVideo: '',
     get isPlaying() {
@@ -681,7 +681,7 @@ store( "myPlugin", {
       context.isOpen = !context.isOpen;
     },
   },
-  effects: {
+  callbacks: {
     logIsOpen: () => {
       const { isOpen } = getContext();
       // Log the value of `isOpen` each time it changes.
