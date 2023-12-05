@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	FlexBlock,
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -45,10 +46,12 @@ export default function ViewGrid( { data, fields, view, actions, getItemId } ) {
 						{ mediaField?.render( { item, view } ) }
 					</div>
 					<HStack
-						className="dataviews-view-grid__title"
+						className="dataviews-view-grid__primary-field"
 						justify="space-between"
 					>
-						{ primaryField?.render( { item, view } ) }
+						<FlexBlock>
+							{ primaryField?.render( { item, view } ) }
+						</FlexBlock>
 						<ItemActions
 							item={ item }
 							actions={ actions }
