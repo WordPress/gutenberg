@@ -143,6 +143,9 @@
 		&:hover {
 			background-color: lighten($gray-100, 3%);
 		}
+		&:focus {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
 		h3 {
 			overflow: hidden;
 			text-overflow: ellipsis;
@@ -151,9 +154,12 @@
 	}
 
 	.dataviews-list-view__item-selected,
-	.dataviews-list-view__item-selected:hover,
-	.dataviews-list-view__item-selected:focus {
+	.dataviews-list-view__item-selected:hover {
 		background-color: $gray-100;
+
+		&:focus {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
 	}
 
 	.dataviews-list-view__media-wrapper {
