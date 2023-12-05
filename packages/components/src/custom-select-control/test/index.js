@@ -111,13 +111,24 @@ describe( 'CustomSelectControl', () => {
 
 		await user.click( currentSelectedItem );
 
-		const nextSelectedItem = screen.getByRole( 'option', {
-			name: 'poppy',
-		} );
-
-		await user.click( nextSelectedItem );
+		await user.click(
+			screen.getByRole( 'option', {
+				name: 'crimson clover',
+			} )
+		);
 
 		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
+		expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
+
+		await user.click( currentSelectedItem );
+
+		await user.click(
+			screen.getByRole( 'option', {
+				name: 'poppy',
+			} )
+		);
+
+		expect( onChangeMock ).toHaveBeenCalledTimes( 2 );
 
 		expect( currentSelectedItem ).toHaveTextContent( 'poppy' );
 	} );
