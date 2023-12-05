@@ -92,7 +92,6 @@ function BlockListBlock( {
 	toggleSelection,
 } ) {
 	const {
-		themeSupportsAppearanceTools,
 		themeSupportsLayout,
 		isTemporarilyEditingAsBlocks,
 		blockEditingMode,
@@ -104,8 +103,6 @@ function BlockListBlock( {
 				getBlockEditingMode,
 			} = select( blockEditorStore );
 			return {
-				themeSupportsAppearanceTools:
-					getSettings().themeSupportsAppearanceTools,
 				themeSupportsLayout: getSettings().supportsLayout,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
@@ -179,11 +176,7 @@ function BlockListBlock( {
 	if ( isAligned ) {
 		blockEdit = (
 			<div
-				className={ `wp-block${
-					themeSupportsAppearanceTools && isSticky
-						? ' ' + className
-						: ''
-				}` }
+				className={ classnames( 'wp-block', isSticky && className ) }
 				data-align={ wrapperProps[ 'data-align' ] }
 			>
 				{ blockEdit }

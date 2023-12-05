@@ -68,7 +68,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'readOnly',
 	'styles',
 	'titlePlaceholder',
-	'themeSupportsAppearanceTools',
 	'supportsLayout',
 	'widgetTypesToHideFromLegacyWidgetBlock',
 	'__unstableHasCustomAppender',
