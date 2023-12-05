@@ -205,17 +205,17 @@ It adds or removes a class to an HTML element, depending on a boolean value.
 
 _Example of `wp-class` directive_ 
 
-```php
+```html
 <div>
   <li 
-    data-wp-context='{ "isSelected": false } '
+    data-wp-context='{ "isSelected": false }'
     data-wp-on--click="actions.toggleSelection"
     data-wp-class--selected="context.isSelected"
   >
     Option 1
   </li>
   <li 
-    data-wp-context='{ "isSelected": false } '
+    data-wp-context='{ "isSelected": false }'
     data-wp-on--click="actions.toggleSelection"
     data-wp-class--selected="context.isSelected"
   >
