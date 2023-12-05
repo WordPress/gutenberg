@@ -37,6 +37,7 @@ const animationEnterDelay = 0;
 const animationEnterDuration = 0.14;
 const animationExitDuration = 0.14;
 const animationExitDelay = 0;
+const DISABLE_ANIMATIONS = true;
 
 // Props specific to `framer-motion` can't be currently passed to `NavigatorScreen`,
 // as some of them would overlap with HTML props (e.g. `onAnimationStart`, ...)
@@ -153,7 +154,7 @@ function UnconnectedNavigatorScreen(
 		return null;
 	}
 
-	if ( prefersReducedMotion ) {
+	if ( prefersReducedMotion || DISABLE_ANIMATIONS ) {
 		return (
 			<View
 				ref={ mergedWrapperRef }
