@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { useAsyncList } from '@wordpress/compose';
-import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
-import { chevronRight } from '@wordpress/icons';
+import { __experimentalHStack as HStack } from '@wordpress/components';
 
 export default function ViewList( {
 	view,
@@ -27,10 +26,7 @@ export default function ViewList( {
 						key={ getItemId?.( item ) || index }
 						onClick={ () => onSelectionChange( [ item ] ) }
 					>
-						<HStack>
-							{ primaryField?.render( { item } ) }
-							<Icon icon={ chevronRight } />
-						</HStack>
+						<HStack>{ primaryField?.render( { item } ) }</HStack>
 					</li>
 					/* eslint-enable jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */
 				);
