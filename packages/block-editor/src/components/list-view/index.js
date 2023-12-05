@@ -141,6 +141,8 @@ function ListViewComponent(
 
 	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone( {
 		dropZoneElement,
+		expandedState,
+		setExpandedState,
 	} );
 	const elementRef = useRef();
 	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
