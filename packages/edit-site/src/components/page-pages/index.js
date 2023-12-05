@@ -12,16 +12,24 @@ import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { DataViews, VIEW_LAYOUTS } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
  */
 import Page from '../page';
 import Link from '../routes/link';
-import { DataViews, viewTypeSupportsMap } from '../dataviews';
 import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
 import {
-	useTrashPostAction,
+	ENUMERATION_TYPE,
+	LAYOUT_GRID,
+	LAYOUT_TABLE,
+	OPERATOR_IN,
+	OPERATOR_NOT_IN,
+} from '../../utils/constants';
+
+import {
+	trashPostAction,
 	usePermanentlyDeletePostAction,
 	useRestorePostAction,
 	postRevisionsAction,
@@ -31,14 +39,14 @@ import {
 import SideEditor from './side-editor';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
-import { ENUMERATION_TYPE, OPERATOR_IN } from '../dataviews/constants';
 const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
-	list: {},
-	grid: {
+	[ LAYOUT_TABLE ]: {},
+	[ LAYOUT_GRID ]: {
 		mediaField: 'featured-image',
+		primaryField: 'title',
 	},
 };
 
@@ -132,6 +140,11 @@ export default function PagePages() {
 				filter.operator === OPERATOR_IN
 			) {
 				filters.author = filter.value;
+			} else if (
+				filter.field === 'author' &&
+				filter.operator === OPERATOR_NOT_IN
+			) {
+				filters.author_exclude = filter.value;
 			}
 		} );
 		// We want to provide a different default item for the status filter
@@ -204,7 +217,9 @@ export default function PagePages() {
 									} }
 									onClick={ ( event ) => {
 										if (
-											viewTypeSupportsMap[ type ].preview
+											VIEW_LAYOUTS.find(
+												( v ) => v.type === type
+											)?.supports?.preview
 										) {
 											event.preventDefault();
 											setSelection( [ item.id ] );
@@ -242,6 +257,9 @@ export default function PagePages() {
 				type: ENUMERATION_TYPE,
 				elements: STATUSES,
 				enableSorting: false,
+				filterBy: {
+					operators: [ OPERATOR_IN ],
+				},
 			},
 			{
 				header: __( 'Date' ),
@@ -259,7 +277,6 @@ export default function PagePages() {
 		[ authors ]
 	);
 
-	const trashPostAction = useTrashPostAction();
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
 	const restorePostAction = useRestorePostAction();
 	const editPostAction = useEditPostAction();
@@ -272,12 +289,7 @@ export default function PagePages() {
 			editPostAction,
 			postRevisionsAction,
 		],
-		[
-			trashPostAction,
-			permanentlyDeletePostAction,
-			restorePostAction,
-			editPostAction,
-		]
+		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]
 	);
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
@@ -314,7 +326,8 @@ export default function PagePages() {
 					onChangeView={ onChangeView }
 				/>
 			</Page>
-			{ viewTypeSupportsMap[ view.type ].preview && (
+			{ VIEW_LAYOUTS.find( ( v ) => v.type === view.type )?.supports
+				?.preview && (
 				<Page>
 					<div className="edit-site-page-pages-preview">
 						{ selection.length === 1 && (

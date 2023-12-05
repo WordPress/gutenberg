@@ -62,7 +62,7 @@ class WP_Interactivity_Store {
 			return;
 		}
 		echo sprintf(
-			'<script id="wp-interactivity-store-data" type="application/json">%s</script>',
+			'<script id="wp-interactivity-initial-state" type="application/json">%s</script>',
 			wp_json_encode( self::$store, JSON_HEX_TAG | JSON_HEX_AMP )
 		);
 	}

@@ -214,15 +214,14 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__preview-container__popover {
+	top: $grid-unit-20 !important;
+}
+
 .block-editor-inserter__preview-container {
 	display: none;
-	width: 300px;
-	background: $white;
-	border-radius: $radius-block-ui;
-	border: $border-width solid $gray-300;
-	position: absolute;
-	top: $grid-unit-20;
-	left: calc(100% + #{$grid-unit-20});
+	width: $sidebar-width;
+	padding: $grid-unit-20;
 	max-height: calc(100% - #{$grid-unit-40});
 	overflow-y: hidden;
 
@@ -231,11 +230,9 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	.block-editor-block-card {
-		padding: $grid-unit-20;
-	}
-
-	.block-editor-block-card__title {
-		font-size: $default-font-size;
+		padding-left: 0;
+		padding-right: 0;
+		padding-bottom: $grid-unit-05;
 	}
 }
 
@@ -366,6 +363,7 @@ $block-inserter-tabs-height: 44px;
 	min-height: $grid-unit-60 * 3;
 	color: $gray-700;
 	background: $gray-100;
+	border-radius: $radius-block-ui;
 }
 
 .block-editor-inserter__tips {

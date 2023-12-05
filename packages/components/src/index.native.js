@@ -110,7 +110,6 @@ export { default as ImageLinkDestinationsScreen } from './mobile/link-settings/i
 export { default as SegmentedControl } from './mobile/segmented-control';
 export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';
-export { default as InserterButton } from './mobile/inserter-button';
 export { setClipboard, getClipboard } from './mobile/clipboard';
 export { default as AudioPlayer } from './mobile/audio-player';
 export { default as Badge } from './mobile/badge';

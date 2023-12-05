@@ -12,6 +12,7 @@ import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
@@ -22,6 +23,7 @@ import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
+import { DataViews } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -29,8 +31,13 @@ import {
 import Page from '../page';
 import Link from '../routes/link';
 import { useAddedBy, AvatarImage } from '../list/added-by';
-import { TEMPLATE_POST_TYPE } from '../../utils/constants';
-import { DataViews } from '../dataviews';
+import {
+	TEMPLATE_POST_TYPE,
+	ENUMERATION_TYPE,
+	OPERATOR_IN,
+	LAYOUT_GRID,
+	LAYOUT_TABLE,
+} from '../../utils/constants';
 import {
 	useResetTemplateAction,
 	deleteTemplateAction,
@@ -39,19 +46,22 @@ import {
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
+	blockEditorPrivateApis
+);
 
 const EMPTY_ARRAY = [];
 
 const defaultConfigPerViewType = {
-	list: {},
-	grid: {
+	[ LAYOUT_TABLE ]: {},
+	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
+		primaryField: 'title',
 	},
 };
 
 const DEFAULT_VIEW = {
-	type: 'list',
+	type: LAYOUT_TABLE,
 	search: '',
 	page: 1,
 	perPage: 20,
@@ -59,6 +69,7 @@ const DEFAULT_VIEW = {
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'preview' ],
 	layout: {},
+	filters: [],
 };
 
 function normalizeSearchInput( input = '' ) {
@@ -97,7 +108,7 @@ function TemplateTitle( { item } ) {
 function AuthorField( { item } ) {
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
 	return (
-		<HStack alignment="left">
+		<HStack alignment="left" spacing={ 1 }>
 			{ imageUrl ? (
 				<AvatarImage imageUrl={ imageUrl } />
 			) : (
@@ -112,6 +123,7 @@ function AuthorField( { item } ) {
 
 function TemplatePreview( { content, viewType } ) {
 	const settings = usePatternSettings();
+	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
 	const blocks = useMemo( () => {
 		return parse( content );
 	}, [ content ] );
@@ -129,6 +141,7 @@ function TemplatePreview( { content, viewType } ) {
 		<ExperimentalBlockEditorProvider settings={ settings }>
 			<div
 				className={ `page-templates-preview-field is-viewtype-${ viewType }` }
+				style={ { backgroundColor } }
 			>
 				<BlockPreview blocks={ blocks } />
 			</div>
@@ -142,57 +155,21 @@ export default function DataviewsTemplates() {
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
-	const { shownTemplates, paginationInfo } = useMemo( () => {
+
+	const authors = useMemo( () => {
 		if ( ! allTemplates ) {
-			return {
-				shownTemplates: EMPTY_ARRAY,
-				paginationInfo: { totalItems: 0, totalPages: 0 },
-			};
+			return EMPTY_ARRAY;
 		}
-		let filteredTemplates = [ ...allTemplates ];
-		// Handle global search.
-		if ( view.search ) {
-			const normalizedSearch = normalizeSearchInput( view.search );
-			filteredTemplates = filteredTemplates.filter( ( item ) => {
-				const title = item.title?.rendered || item.slug;
-				return (
-					normalizeSearchInput( title ).includes(
-						normalizedSearch
-					) ||
-					normalizeSearchInput( item.description ).includes(
-						normalizedSearch
-					)
-				);
-			} );
-		}
-		// Handle sorting.
-		// TODO: Explore how this can be more dynamic..
-		if ( view.sort ) {
-			if ( view.sort.field === 'title' ) {
-				filteredTemplates.sort( ( a, b ) => {
-					const titleA = a.title?.rendered || a.slug;
-					const titleB = b.title?.rendered || b.slug;
-					return view.sort.direction === 'asc'
-						? titleA.localeCompare( titleB )
-						: titleB.localeCompare( titleA );
-				} );
-			}
-		}
-		// Handle pagination.
-		const start = ( view.page - 1 ) * view.perPage;
-		const totalItems = filteredTemplates?.length || 0;
-		filteredTemplates = filteredTemplates?.slice(
-			start,
-			start + view.perPage
-		);
-		return {
-			shownTemplates: filteredTemplates,
-			paginationInfo: {
-				totalItems,
-				totalPages: Math.ceil( totalItems / view.perPage ),
-			},
-		};
-	}, [ allTemplates, view ] );
+		const authorsSet = new Set();
+		allTemplates.forEach( ( template ) => {
+			authorsSet.add( template.author_text );
+		} );
+		return Array.from( authorsSet ).map( ( author ) => ( {
+			value: author,
+			label: author,
+		} ) );
+	}, [ allTemplates ] );
+
 	const fields = useMemo(
 		() => [
 			{
@@ -223,12 +200,17 @@ export default function DataviewsTemplates() {
 				id: 'description',
 				getValue: ( { item } ) => item.description,
 				render: ( { item } ) => {
-					return (
-						item.description && (
-							<Text variant="muted">
-								{ decodeEntities( item.description ) }
+					return item.description ? (
+						decodeEntities( item.description )
+					) : (
+						<>
+							<Text variant="muted" aria-hidden="true">
+								&#8212;
 							</Text>
-						)
+							<VisuallyHidden>
+								{ __( 'No description.' ) }
+							</VisuallyHidden>
+						</>
 					);
 				},
 				maxWidth: 200,
@@ -237,13 +219,91 @@ export default function DataviewsTemplates() {
 			{
 				header: __( 'Author' ),
 				id: 'author',
-				render: ( { item } ) => <AuthorField item={ item } />,
+				getValue: ( { item } ) => item.author_text,
+				render: ( { item } ) => {
+					return <AuthorField item={ item } />;
+				},
 				enableHiding: false,
-				enableSorting: false,
+				type: ENUMERATION_TYPE,
+				elements: authors,
 			},
 		],
-		[]
+		[ authors ]
 	);
+
+	const { shownTemplates, paginationInfo } = useMemo( () => {
+		if ( ! allTemplates ) {
+			return {
+				shownTemplates: EMPTY_ARRAY,
+				paginationInfo: { totalItems: 0, totalPages: 0 },
+			};
+		}
+		let filteredTemplates = [ ...allTemplates ];
+		// Handle global search.
+		if ( view.search ) {
+			const normalizedSearch = normalizeSearchInput( view.search );
+			filteredTemplates = filteredTemplates.filter( ( item ) => {
+				const title = item.title?.rendered || item.slug;
+				return (
+					normalizeSearchInput( title ).includes(
+						normalizedSearch
+					) ||
+					normalizeSearchInput( item.description ).includes(
+						normalizedSearch
+					)
+				);
+			} );
+		}
+
+		// Handle filters.
+		if ( view.filters.length > 0 ) {
+			view.filters.forEach( ( filter ) => {
+				if (
+					filter.field === 'author' &&
+					filter.operator === OPERATOR_IN &&
+					!! filter.value
+				) {
+					filteredTemplates = filteredTemplates.filter( ( item ) => {
+						return item.author_text === filter.value;
+					} );
+				}
+			} );
+		}
+
+		// Handle sorting.
+		if ( view.sort ) {
+			const stringSortingFields = [ 'title', 'author' ];
+			const fieldId = view.sort.field;
+			if ( stringSortingFields.includes( fieldId ) ) {
+				const fieldToSort = fields.find( ( field ) => {
+					return field.id === fieldId;
+				} );
+				filteredTemplates.sort( ( a, b ) => {
+					const valueA = fieldToSort.getValue( { item: a } ) ?? '';
+					const valueB = fieldToSort.getValue( { item: b } ) ?? '';
+					return view.sort.direction === 'asc'
+						? valueA.localeCompare( valueB )
+						: valueB.localeCompare( valueA );
+				} );
+			}
+		}
+
+		// Handle pagination.
+		const start = ( view.page - 1 ) * view.perPage;
+		const totalItems = filteredTemplates?.length || 0;
+		filteredTemplates = filteredTemplates?.slice(
+			start,
+			start + view.perPage
+		);
+		return {
+			shownTemplates: filteredTemplates,
+			paginationInfo: {
+				totalItems,
+				totalPages: Math.ceil( totalItems / view.perPage ),
+			},
+		};
+	}, [ allTemplates, view, fields ] );
+
 	const resetTemplateAction = useResetTemplateAction();
 	const actions = useMemo(
 		() => [
@@ -283,7 +343,7 @@ export default function DataviewsTemplates() {
 				isLoading={ isLoadingData }
 				view={ view }
 				onChangeView={ onChangeView }
-				supportedLayouts={ [ 'list', 'grid' ] }
+				supportedLayouts={ [ LAYOUT_TABLE, LAYOUT_GRID ] }
 			/>
 		</Page>
 	);

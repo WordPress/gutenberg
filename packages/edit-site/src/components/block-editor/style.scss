@@ -96,6 +96,11 @@
 	}
 }
 
+// The toolbar header in distraction mode sits over the back button, which renders it unreachable.
+.is-distraction-free .edit-site-visual-editor__back-button {
+	display: none;
+}
+
 .resizable-editor__drag-handle {
 	position: absolute;
 	top: 0;
