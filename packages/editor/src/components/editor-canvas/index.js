@@ -295,7 +295,7 @@ export default function EditorCanvas( {
 				<div
 					className={ classnames(
 						'editor-editor-canvas__post-title-wrapper',
-						// The following class is only hear for backward comapatibility
+						// The following class is only here for backward comapatibility
 						// some themes might be using it to style the post title.
 						'edit-post-visual-editor__post-title-wrapper',
 						{
@@ -307,7 +307,7 @@ export default function EditorCanvas( {
 					style={ {
 						// This is using inline styles
 						// so it's applied for both iframed and non iframed editors.
-						marginTop: '4em',
+						marginTop: '4rem',
 					} }
 				>
 					<PostTitle ref={ titleRef } />
