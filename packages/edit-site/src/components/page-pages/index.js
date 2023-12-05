@@ -216,7 +216,7 @@ export default function PagePages() {
 				render: ( { item } ) => {
 					return (
 						<VStack spacing={ 1 }>
-							<Heading as="h3" level={ 5 }>
+							<Heading as="h3" level={ 5 } weight={ 500 }>
 								{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
 									view.type
 								) ? (
