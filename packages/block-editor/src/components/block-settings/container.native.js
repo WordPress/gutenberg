@@ -3,13 +3,13 @@
  */
 import {
 	InspectorControls,
+	ImageLinkDestinationsScreen,
 	useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import {
 	BottomSheet,
 	ColorSettings,
 	FocalPointSettingsPanel,
-	ImageLinkDestinationsScreen,
 	LinkPickerScreen,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
