@@ -90,10 +90,22 @@ function BaseDocumentActions( { postType, postId, onBack } ) {
 		postType,
 		postId
 	);
+	const { templateIcon, templateTitle } = useSelect( ( select ) => {
+		const { __experimentalGetTemplateInfo: getTemplateInfo } =
+			select( editorStore );
+		const templateInfo = getTemplateInfo( document );
+		return {
+			templateIcon: templateInfo.icon,
+			templateTitle: templateInfo.title,
+		};
+	} );
 	const isNotFound = ! document && ! isResolving;
 	const icon = icons[ postType ] ?? pageIcon;
 	const [ isAnimated, setIsAnimated ] = useState( false );
 	const isMounting = useRef( true );
+	const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
+		postType
+	);
 
 	useEffect( () => {
 		if ( ! isMounting.current ) {
@@ -134,14 +146,14 @@ function BaseDocumentActions( { postType, postId, onBack } ) {
 						spacing={ 1 }
 						justify="center"
 					>
-						<BlockIcon icon={ icon } />
+						<BlockIcon icon={ isTemplate ? templateIcon : icon } />
 						<Text size="body" as="h1">
 							{ typeLabels[ postType ] && (
 								<VisuallyHidden as="span">
 									{ typeLabels[ postType ] }
 								</VisuallyHidden>
 							) }
-							{ document.title }
+							{ isTemplate ? templateTitle : document.title }
 						</Text>
 					</HStack>
 					<span className="edit-site-document-actions__shortcut">
