@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -13,13 +18,14 @@ export default function Pagination( {
 	numPages,
 	changePage,
 	totalItems,
+	className,
 } ) {
 	return (
 		<HStack
 			expanded={ false }
 			spacing={ 3 }
 			justify="flex-start"
-			className="edit-site-patterns__grid-pagination"
+			className={ classnames( 'edit-site--pagination', className ) }
 		>
 			<Text variant="muted">
 				{

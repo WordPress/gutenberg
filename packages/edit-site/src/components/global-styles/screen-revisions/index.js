@@ -3,13 +3,11 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	Button,
 	__experimentalUseNavigator as useNavigator,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Spinner,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import { useContext, useState, useEffect } from '@wordpress/element';
 import {
 	privateApis as blockEditorPrivateApis,
@@ -27,47 +25,39 @@ import { store as editSiteStore } from '../../../store';
 import useGlobalStylesRevisions from './use-global-styles-revisions';
 import RevisionsButtons from './revisions-buttons';
 import StyleBook from '../../style-book';
+import Pagination from '../../pagination';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
+const PAGE_SIZE = 10;
+
 function ScreenRevisions() {
 	const { goTo } = useNavigator();
 	const { user: currentEditorGlobalStyles, setUserConfig } =
 		useContext( GlobalStylesContext );
-	const { blocks, editorCanvasContainerView, revisionsCount } = useSelect(
-		( select ) => {
-			const {
-				getEntityRecord,
-				__experimentalGetCurrentGlobalStylesId,
-				__experimentalGetDirtyEntityRecords,
-			} = select( coreStore );
-			const isDirty = __experimentalGetDirtyEntityRecords().length > 0;
-			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-			const globalStyles = globalStylesId
-				? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-				: undefined;
-			let _revisionsCount =
-				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count || 0;
-			// one for the reset item.
-			_revisionsCount++;
-			// one for any dirty changes (unsaved).
-			if ( isDirty ) {
-				_revisionsCount++;
-			}
-			return {
-				editorCanvasContainerView: unlock(
-					select( editSiteStore )
-				).getEditorCanvasContainerView(),
-				blocks: select( blockEditorStore ).getBlocks(),
-				revisionsCount: _revisionsCount,
-			};
-		},
+	const { blocks, editorCanvasContainerView } = useSelect(
+		( select ) => ( {
+			editorCanvasContainerView: unlock(
+				select( editSiteStore )
+			).getEditorCanvasContainerView(),
+			blocks: select( blockEditorStore ).getBlocks(),
+		} ),
 		[]
 	);
-	const { revisions, isLoading, hasUnsavedChanges } =
-		useGlobalStylesRevisions();
+	const [ currentPage, setCurrentPage ] = useState( 1 );
+	const [ currentRevisions, setCurrentRevisions ] = useState( [] );
+	const { revisions, isLoading, hasUnsavedChanges, revisionsCount } =
+		useGlobalStylesRevisions( {
+			query: {
+				per_page: PAGE_SIZE,
+				page: currentPage,
+			},
+		} );
+
+	const numPages = Math.ceil( revisionsCount / PAGE_SIZE );
+
 	const [ currentlySelectedRevision, setCurrentlySelectedRevision ] =
 		useState( currentEditorGlobalStyles );
 	const [
@@ -114,6 +104,12 @@ function ScreenRevisions() {
 		}
 	}, [ editorCanvasContainerView ] );
 
+	useEffect( () => {
+		if ( ! isLoading && revisions.length ) {
+			setCurrentRevisions( revisions );
+		}
+	}, [ revisions, isLoading ] );
+
 	const firstRevision = revisions[ 0 ];
 	const currentlySelectedRevisionId = currentlySelectedRevision?.id;
 	const shouldSelectFirstItem =
@@ -141,8 +137,10 @@ function ScreenRevisions() {
 	// Only display load button if there is a revision to load,
 	// and it is different from the current editor styles.
 	const isLoadButtonEnabled =
-		!! currentlySelectedRevisionId && ! selectedRevisionMatchesEditorStyles;
-	const shouldShowRevisions = ! isLoading && revisions.length;
+		!! currentlySelectedRevisionId &&
+		currentlySelectedRevisionId !== 'unsaved' &&
+		! selectedRevisionMatchesEditorStyles;
+	const hasRevisions = !! currentRevisions.length;
 
 	return (
 		<>
@@ -157,83 +155,74 @@ function ScreenRevisions() {
 				) }
 				onBack={ onCloseRevisions }
 			/>
-			{ isLoading && (
+			{ ! hasRevisions && (
 				<Spinner className="edit-site-global-styles-screen-revisions__loading" />
 			) }
-			{ editorCanvasContainerView ===
-			'global-styles-revisions:style-book' ? (
-				<StyleBook
-					userConfig={ currentlySelectedRevision }
-					isSelected={ () => {} }
-					onClose={ () => {
-						setEditorCanvasContainerView(
-							'global-styles-revisions'
-						);
-					} }
-				/>
-			) : (
-				<Revisions
-					blocks={ blocks }
-					userConfig={ currentlySelectedRevision }
-					closeButtonLabel={ __( 'Close revisions' ) }
-				/>
-			) }
-			{ shouldShowRevisions && (
-				<>
-					<div className="edit-site-global-styles-screen-revisions">
-						<RevisionsButtons
-							onChange={ selectRevision }
-							selectedRevisionId={ currentlySelectedRevisionId }
-							userRevisions={ revisions }
-							canApplyRevision={ isLoadButtonEnabled }
+			<>
+				{ hasRevisions &&
+					( editorCanvasContainerView ===
+					'global-styles-revisions:style-book' ? (
+						<StyleBook
+							userConfig={ currentlySelectedRevision }
+							isSelected={ () => {} }
+							onClose={ () => {
+								setEditorCanvasContainerView(
+									'global-styles-revisions'
+								);
+							} }
 						/>
-						{ isLoadButtonEnabled && (
-							<SidebarFixedBottom>
-								<Button
-									variant="primary"
-									className="edit-site-global-styles-screen-revisions__button"
-									disabled={
-										! currentlySelectedRevisionId ||
-										currentlySelectedRevisionId ===
-											'unsaved'
-									}
-									onClick={ () => {
-										if ( hasUnsavedChanges ) {
-											setIsLoadingRevisionWithUnsavedChanges(
-												true
-											);
-										} else {
-											restoreRevision(
-												currentlySelectedRevision
-											);
-										}
-									} }
-								>
-									{ currentlySelectedRevisionId === 'parent'
-										? __( 'Reset to defaults' )
-										: __( 'Apply' ) }
-								</Button>
-							</SidebarFixedBottom>
-						) }
-					</div>
-					{ isLoadingRevisionWithUnsavedChanges && (
-						<ConfirmDialog
-							isOpen={ isLoadingRevisionWithUnsavedChanges }
-							confirmButtonText={ __( 'Apply' ) }
-							onConfirm={ () =>
-								restoreRevision( currentlySelectedRevision )
-							}
-							onCancel={ () =>
-								setIsLoadingRevisionWithUnsavedChanges( false )
-							}
-						>
-							{ __(
-								'Any unsaved changes will be lost when you apply this revision.'
+					) : (
+						<Revisions
+							blocks={ blocks }
+							userConfig={ currentlySelectedRevision }
+							closeButtonLabel={ __( 'Close revisions' ) }
+						/>
+					) ) }
+				<div className="edit-site-global-styles-screen-revisions">
+					<RevisionsButtons
+						onChange={ selectRevision }
+						selectedRevisionId={ currentlySelectedRevisionId }
+						userRevisions={ currentRevisions }
+						canApplyRevision={ isLoadButtonEnabled }
+						onApplyRevision={ () =>
+							hasUnsavedChanges
+								? setIsLoadingRevisionWithUnsavedChanges( true )
+								: restoreRevision( currentlySelectedRevision )
+						}
+					/>
+				</div>
+				{ numPages > 1 && (
+					<SidebarFixedBottom className="edit-site-global-styles-screen-revisions__footer">
+						<Pagination
+							className="edit-site-global-styles-screen-revisions__pagination"
+							currentPage={ currentPage }
+							numPages={ numPages }
+							changePage={ setCurrentPage }
+							totalItems={ revisionsCount }
+							disabled={ isLoading }
+							label={ __(
+								'Global Styles pagination navigation'
 							) }
-						</ConfirmDialog>
-					) }
-				</>
-			) }
+						/>
+					</SidebarFixedBottom>
+				) }
+				{ isLoadingRevisionWithUnsavedChanges && (
+					<ConfirmDialog
+						isOpen={ isLoadingRevisionWithUnsavedChanges }
+						confirmButtonText={ __( 'Apply' ) }
+						onConfirm={ () =>
+							restoreRevision( currentlySelectedRevision )
+						}
+						onCancel={ () =>
+							setIsLoadingRevisionWithUnsavedChanges( false )
+						}
+					>
+						{ __(
+							'Any unsaved changes will be lost when you apply this revision.'
+						) }
+					</ConfirmDialog>
+				) }
+			</>
 		</>
 	);
 }

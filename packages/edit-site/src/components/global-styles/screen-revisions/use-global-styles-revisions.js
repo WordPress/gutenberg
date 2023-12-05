@@ -19,7 +19,9 @@ const SITE_EDITOR_AUTHORS_QUERY = {
 };
 const EMPTY_ARRAY = [];
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
-export default function useGlobalStylesRevisions() {
+export default function useGlobalStylesRevisions( {
+	query = { per_page: 100, page: 1 },
+} ) {
 	const { user: userConfig } = useContext( GlobalStylesContext );
 	const {
 		authors,
@@ -27,47 +29,64 @@ export default function useGlobalStylesRevisions() {
 		isDirty,
 		revisions,
 		isLoadingGlobalStylesRevisions,
-	} = useSelect( ( select ) => {
-		const {
-			__experimentalGetDirtyEntityRecords,
-			getCurrentUser,
-			getUsers,
-			getRevisions,
-			__experimentalGetCurrentGlobalStylesId,
-			isResolving,
-		} = select( coreStore );
-		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
-		const _currentUser = getCurrentUser();
-		const _isDirty = dirtyEntityRecords.length > 0;
-		const query = {
-			per_page: 100,
-		};
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		const globalStylesRevisions =
-			getRevisions( 'root', 'globalStyles', globalStylesId, query ) ||
-			EMPTY_ARRAY;
-		const _authors = getUsers( SITE_EDITOR_AUTHORS_QUERY ) || EMPTY_ARRAY;
-		const _isResolving = isResolving( 'getRevisions', [
-			'root',
-			'globalStyles',
-			globalStylesId,
-			query,
-		] );
-		return {
-			authors: _authors,
-			currentUser: _currentUser,
-			isDirty: _isDirty,
-			revisions: globalStylesRevisions,
-			isLoadingGlobalStylesRevisions: _isResolving,
-		};
-	}, [] );
+		revisionsCount,
+	} = useSelect(
+		( select ) => {
+			const {
+				__experimentalGetDirtyEntityRecords,
+				getCurrentUser,
+				getUsers,
+				getRevisions,
+				__experimentalGetCurrentGlobalStylesId,
+				getEntityRecord,
+				isResolving,
+			} = select( coreStore );
+			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+			const _currentUser = getCurrentUser();
+			const _isDirty = dirtyEntityRecords.length > 0;
+			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+			const globalStyles = globalStylesId
+				? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+				: undefined;
+			let _revisionsCount =
+				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
+			// one for the reset item.
+			_revisionsCount++;
+			// one for any dirty changes (unsaved).
+			if ( _isDirty ) {
+				_revisionsCount++;
+			}
+			const globalStylesRevisions =
+				getRevisions( 'root', 'globalStyles', globalStylesId, query ) ||
+				EMPTY_ARRAY;
+			const _authors =
+				getUsers( SITE_EDITOR_AUTHORS_QUERY ) || EMPTY_ARRAY;
+			const _isResolving = isResolving( 'getRevisions', [
+				'root',
+				'globalStyles',
+				globalStylesId,
+				query,
+			] );
+			return {
+				authors: _authors,
+				currentUser: _currentUser,
+				isDirty: _isDirty,
+				revisions: globalStylesRevisions,
+				isLoadingGlobalStylesRevisions: _isResolving,
+				revisionsCount: _revisionsCount,
+			};
+		},
+		[ query ]
+	);
 	return useMemo( () => {
 		let _modifiedRevisions = [];
+		// Add 1 for the "reset to theme defaults" revision we tack onto the last page.
 		if ( ! authors.length || isLoadingGlobalStylesRevisions ) {
 			return {
 				revisions: _modifiedRevisions,
 				hasUnsavedChanges: isDirty,
 				isLoading: true,
+				revisionsCount: 0,
 			};
 		}
 
@@ -81,9 +100,14 @@ export default function useGlobalStylesRevisions() {
 			};
 		} );
 
-		if ( _modifiedRevisions.length ) {
+		const fetchedRevisionsCount = revisions.length;
+
+		if ( fetchedRevisionsCount ) {
 			// Flags the most current saved revision.
-			if ( _modifiedRevisions[ 0 ].id !== 'unsaved' ) {
+			if (
+				_modifiedRevisions[ 0 ].id !== 'unsaved' &&
+				query.page === 1
+			) {
 				_modifiedRevisions[ 0 ].isLatest = true;
 			}
 
@@ -92,7 +116,8 @@ export default function useGlobalStylesRevisions() {
 				isDirty &&
 				userConfig &&
 				Object.keys( userConfig ).length > 0 &&
-				currentUser
+				currentUser &&
+				query.page === 1
 			) {
 				const unsavedRevision = {
 					id: 'unsaved',
@@ -108,17 +133,21 @@ export default function useGlobalStylesRevisions() {
 				_modifiedRevisions.unshift( unsavedRevision );
 			}
 
-			_modifiedRevisions.push( {
-				id: 'parent',
-				styles: {},
-				settings: {},
-			} );
+			if ( query.page === Math.ceil( revisionsCount / query.per_page ) ) {
+				// Adds an item for the default theme styles.
+				_modifiedRevisions.push( {
+					id: 'parent',
+					styles: {},
+					settings: {},
+				} );
+			}
 		}
 
 		return {
 			revisions: _modifiedRevisions,
 			hasUnsavedChanges: isDirty,
 			isLoading: false,
+			revisionsCount,
 		};
 	}, [
 		isDirty,
