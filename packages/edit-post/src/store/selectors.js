@@ -498,13 +498,15 @@ export function isListViewOpened( state ) {
 /**
  * Returns true if the template editing mode is enabled.
  *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether we're editing the template.
+ * @deprecated
  */
-export function isEditingTemplate( state ) {
-	return state.isEditingTemplate;
-}
+export const isEditingTemplate = createRegistrySelector( ( select ) => () => {
+	deprecated( `select( 'core/edit-post' ).isEditingTemplate`, {
+		since: '6.5',
+		alternative: `select( 'core/editor' ).getRenderingMode`,
+	} );
+	return select( editorStore ).getRenderingMode() !== 'post-only';
+} );
 
 /**
  * Returns true if meta boxes are initialized.

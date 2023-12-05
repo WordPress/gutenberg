@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import EditorCanvas from './components/editor-canvas';
 import { ExperimentalEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
@@ -9,6 +10,7 @@ import PostPanelRow from './components/post-panel-row';
 
 export const privateApis = {};
 lock( privateApis, {
+	EditorCanvas,
 	ExperimentalEditorProvider,
 	EntitiesSavedStatesExtensible,
 	PostPanelRow,

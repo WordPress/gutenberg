@@ -11,6 +11,7 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -63,7 +64,8 @@ const SettingsSidebar = () => {
 			return {
 				sidebarName: sidebar,
 				keyboardShortcut: shortcut,
-				isTemplateMode: select( editPostStore ).isEditingTemplate(),
+				isTemplateMode:
+					select( editorStore ).getRenderingMode() !== 'post-only',
 			};
 		},
 		[]

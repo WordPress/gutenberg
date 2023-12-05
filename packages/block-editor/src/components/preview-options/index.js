@@ -21,7 +21,7 @@ export default function PreviewOptions( {
 	label,
 	showIconLabels,
 } ) {
-	const isMobile = useViewportMatch( 'small', '<' );
+	const isMobile = useViewportMatch( 'medium', '<' );
 	if ( isMobile ) return null;
 
 	const popoverProps = {

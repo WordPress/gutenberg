@@ -23,13 +23,7 @@ import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import {
-	DataViews,
-	ENUMERATION_TYPE,
-	OPERATOR_IN,
-	LAYOUT_GRID,
-	LAYOUT_TABLE,
-} from '@wordpress/dataviews';
+import { DataViews } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -37,7 +31,14 @@ import {
 import Page from '../page';
 import Link from '../routes/link';
 import { useAddedBy, AvatarImage } from '../list/added-by';
-import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import {
+	TEMPLATE_POST_TYPE,
+	ENUMERATION_TYPE,
+	OPERATOR_IN,
+	OPERATOR_NOT_IN,
+	LAYOUT_GRID,
+	LAYOUT_TABLE,
+} from '../../utils/constants';
 import {
 	useResetTemplateAction,
 	deleteTemplateAction,
@@ -265,6 +266,14 @@ export default function DataviewsTemplates() {
 				) {
 					filteredTemplates = filteredTemplates.filter( ( item ) => {
 						return item.author_text === filter.value;
+					} );
+				} else if (
+					filter.field === 'author' &&
+					filter.operator === OPERATOR_NOT_IN &&
+					!! filter.value
+				) {
+					filteredTemplates = filteredTemplates.filter( ( item ) => {
+						return item.author_text !== filter.value;
 					} );
 				}
 			} );

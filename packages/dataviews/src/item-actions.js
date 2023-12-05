@@ -37,7 +37,10 @@ function ButtonTrigger( { action, onClick } ) {
 
 function DropdownMenuItemTrigger( { action, onClick } ) {
 	return (
-		<DropdownMenuItem onClick={ onClick }>
+		<DropdownMenuItem
+			onClick={ onClick }
+			hideOnClick={ ! action.RenderModal }
+		>
 			<DropdownMenuItemLabel>{ action.label }</DropdownMenuItemLabel>
 		</DropdownMenuItem>
 	);

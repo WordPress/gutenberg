@@ -13,6 +13,7 @@ import {
 import { layout, chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
 import { displayShortcut } from '@wordpress/keycodes';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -28,7 +29,7 @@ function DocumentActions() {
 		};
 	}, [] );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-	const { setIsEditingTemplate } = useDispatch( editPostStore );
+	const { setRenderingMode } = useDispatch( editorStore );
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 
 	if ( ! template ) {
@@ -48,7 +49,7 @@ function DocumentActions() {
 				className="edit-post-document-actions__back"
 				onClick={ () => {
 					clearSelectedBlock();
-					setIsEditingTemplate( false );
+					setRenderingMode( 'post-only' );
 				} }
 				icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
 			>
