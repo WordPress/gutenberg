@@ -132,20 +132,6 @@
 		border-radius: 0;
 	}
 
-	&.is-nesting td {
-		background: rgba(var(--wp-admin-theme-color--rgb), 0.5);
-	}
-
-	&.is-nesting td:first-child {
-		border-top-left-radius: $radius-block-ui;
-		border-bottom-left-radius: $radius-block-ui;
-	}
-
-	&.is-nesting td:last-child {
-		border-top-right-radius: $radius-block-ui;
-		border-bottom-right-radius: $radius-block-ui;
-	}
-
 	&.is-displacement-up {
 		transition: transform 0.2s;
 		transform: translateY(-36px) !important;
@@ -192,6 +178,7 @@
 		}
 	}
 
+	&.is-nesting .block-editor-list-view-block-contents,
 	.block-editor-list-view-block-contents:focus {
 		box-shadow: none;
 
@@ -206,11 +193,6 @@
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 			z-index: 2;
 			pointer-events: none;
-
-			// Hide focus styles while a user is dragging blocks/files etc.
-			.is-dragging-components-draggable & {
-				box-shadow: none;
-			}
 		}
 	}
 
@@ -219,14 +201,10 @@
 		right: 0;
 	}
 
+	&.is-nesting .block-editor-list-view__menu,
 	.block-editor-list-view-block__menu:focus {
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		z-index: 1;
-
-		// Hide focus styles while a user is dragging blocks/files etc.
-		.is-dragging-components-draggable & {
-			box-shadow: none;
-		}
 	}
 
 	&.is-visible .block-editor-list-view-block-contents {
