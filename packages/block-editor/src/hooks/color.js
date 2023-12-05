@@ -291,8 +291,7 @@ function ColorInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-function ColorEditPure( props ) {
-	const { clientId, name, setAttributes } = props;
+function ColorEditPure( { clientId, name, setAttributes } ) {
 	const settings = useBlockSettings( name );
 	const isEnabled = useHasColorPanel( settings );
 	function selector( select ) {
@@ -321,7 +320,7 @@ function ColorEditPure( props ) {
 		return null;
 	}
 
-	const defaultControls = getBlockSupport( props.name, [
+	const defaultControls = getBlockSupport( name, [
 		COLOR_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
@@ -334,7 +333,7 @@ function ColorEditPure( props ) {
 		// Deactivating it requires `enableContrastChecker` to have
 		// an explicit value of `false`.
 		false !==
-			getBlockSupport( props.name, [
+			getBlockSupport( name, [
 				COLOR_SUPPORT_KEY,
 				'enableContrastChecker',
 			] );
@@ -349,7 +348,7 @@ function ColorEditPure( props ) {
 			defaultControls={ defaultControls }
 			enableContrastChecker={
 				false !==
-				getBlockSupport( props.name, [
+				getBlockSupport( name, [
 					COLOR_SUPPORT_KEY,
 					'enableContrastChecker',
 				] )

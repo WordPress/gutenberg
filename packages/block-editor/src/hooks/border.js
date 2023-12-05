@@ -137,8 +137,7 @@ function BordersInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-function BorderPanelPure( props ) {
-	const { clientId, name, setAttributes } = props;
+function BorderPanelPure( { clientId, name, setAttributes } ) {
 	const settings = useBlockSettings( name );
 	const isEnabled = useHasBorderPanel( settings );
 	function selector( select ) {
@@ -148,10 +147,7 @@ function BorderPanelPure( props ) {
 	}
 	const { style, borderColor } = useSelect( selector, [ clientId ] );
 	const value = useMemo( () => {
-		return attributesToStyle( {
-			style,
-			borderColor,
-		} );
+		return attributesToStyle( { style, borderColor } );
 	}, [ style, borderColor ] );
 
 	const onChange = ( newStyle ) => {
@@ -162,7 +158,7 @@ function BorderPanelPure( props ) {
 		return null;
 	}
 
-	const defaultControls = getBlockSupport( props.name, [
+	const defaultControls = getBlockSupport( name, [
 		BORDER_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );

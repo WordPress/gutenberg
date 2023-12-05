@@ -66,8 +66,12 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-function DimensionsPanelPure( props ) {
-	const { clientId, name, setAttributes, __unstableParentLayout } = props;
+function DimensionsPanelPure( {
+	clientId,
+	name,
+	setAttributes,
+	__unstableParentLayout,
+} ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const isEnabled = useHasDimensionsPanel( settings );
 	const value = useSelect(
@@ -86,11 +90,11 @@ function DimensionsPanelPure( props ) {
 		return null;
 	}
 
-	const defaultDimensionsControls = getBlockSupport( props.name, [
+	const defaultDimensionsControls = getBlockSupport( name, [
 		DIMENSIONS_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
-	const defaultSpacingControls = getBlockSupport( props.name, [
+	const defaultSpacingControls = getBlockSupport( name, [
 		SPACING_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
@@ -113,13 +117,15 @@ function DimensionsPanelPure( props ) {
 			{ !! settings?.spacing?.padding && (
 				<PaddingVisualizer
 					forceShow={ visualizedProperty === 'padding' }
-					{ ...props }
+					clientId={ clientId }
+					value={ value }
 				/>
 			) }
 			{ !! settings?.spacing?.margin && (
 				<MarginVisualizer
 					forceShow={ visualizedProperty === 'margin' }
-					{ ...props }
+					clientId={ clientId }
+					value={ value }
 				/>
 			) }
 		</>

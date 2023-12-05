@@ -42,13 +42,13 @@ export const IMAGE_BACKGROUND_TYPE = 'image';
  * Checks if there is a current value in the background image block support
  * attributes.
  *
- * @param {Object} props Block props.
+ * @param {Object} style Style attribute.
  * @return {boolean}     Whether or not the block has a background image value set.
  */
-export function hasBackgroundImageValue( props ) {
+export function hasBackgroundImageValue( style ) {
 	const hasValue =
-		!! props.attributes.style?.background?.backgroundImage?.id ||
-		!! props.attributes.style?.background?.backgroundImage?.url;
+		!! style?.background?.backgroundImage?.id ||
+		!! style?.background?.backgroundImage?.url;
 
 	return hasValue;
 }
@@ -83,13 +83,10 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
  * Resets the background image block support attributes. This can be used when disabling
  * the background image controls for a block via a `ToolsPanel`.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param {Object}   style         Style attribute.
+ * @param {Function} setAttributes Function to set block's attributes.
  */
-export function resetBackgroundImage( { attributes = {}, setAttributes } ) {
-	const { style = {} } = attributes;
-
+export function resetBackgroundImage( style = {}, setAttributes ) {
 	setAttributes( {
 		style: cleanEmptyObject( {
 			...style,
@@ -146,8 +143,7 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 	);
 }
 
-function BackgroundImagePanelItem( props ) {
-	const { clientId, setAttributes } = props;
+function BackgroundImagePanelItem( { clientId, setAttributes } ) {
 	const style = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
@@ -248,14 +244,14 @@ function BackgroundImagePanelItem( props ) {
 		};
 	}, [] );
 
-	const hasValue = hasBackgroundImageValue( props );
+	const hasValue = hasBackgroundImageValue( style );
 
 	return (
 		<ToolsPanelItem
 			className="single-column"
 			hasValue={ () => hasValue }
 			label={ __( 'Background image' ) }
-			onDeselect={ () => resetBackgroundImage( props ) }
+			onDeselect={ () => resetBackgroundImage( style, setAttributes ) }
 			isShownByDefault={ true }
 			resetAllFilter={ resetAllFilter }
 			panelId={ clientId }
@@ -290,7 +286,7 @@ function BackgroundImagePanelItem( props ) {
 								// closed and focus is redirected to the dropdown toggle button.
 								toggleButton?.focus();
 								toggleButton?.click();
-								resetBackgroundImage( props );
+								resetBackgroundImage( style, setAttributes );
 							} }
 						>
 							{ __( 'Reset ' ) }
