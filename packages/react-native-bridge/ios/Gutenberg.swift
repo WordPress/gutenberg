@@ -241,6 +241,10 @@ public class Gutenberg: UIResponder {
         if let gradients = editorSettings?.gradients {
             settingsUpdates["gradients"] = gradients
         }
+        
+        if let gutenbergVersion = editorSettings?.gutenbergVersion {
+            settingsUpdates["gutenbergVersion"] = gutenbergVersion
+        }
 
         return settingsUpdates
     }

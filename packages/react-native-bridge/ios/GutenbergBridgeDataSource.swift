@@ -89,4 +89,5 @@ public protocol GutenbergEditorSettings {
     var rawFeatures: String? { get }
     var colors: [[String: String]]? { get }
     var gradients: [[String: String]]? { get }
+    var gutenbergVersion: String? { get }
 }

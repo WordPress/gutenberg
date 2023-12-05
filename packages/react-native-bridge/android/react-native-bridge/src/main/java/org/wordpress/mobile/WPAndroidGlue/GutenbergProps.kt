@@ -60,6 +60,8 @@ data class GutenbergProps @JvmOverloads constructor(
                     ?.let { putSerializable(PROP_QUOTE_BLOCK_V2, it) }
             theme.getSerializable(PROP_LIST_BLOCK_V2)
                     ?.let { putSerializable(PROP_LIST_BLOCK_V2, it) }
+            theme.getSerializable(PROP_GUTENBERG_VERSION)
+                ?.let { putSerializable(PROP_GUTENBERG_VERSION, it) }
         }
     }
 
@@ -104,6 +106,7 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_GALLERY_WITH_IMAGE_BLOCKS = "galleryWithImageBlocks"
         private const val PROP_QUOTE_BLOCK_V2 = "quoteBlockV2"
         private const val PROP_LIST_BLOCK_V2 = "listBlockV2"
+        private const val PROP_GUTENBERG_VERSION = "gutenbergVersion"
 
         const val PROP_INITIAL_DATA = "initialData"
         const val PROP_STYLES = "rawStyles"

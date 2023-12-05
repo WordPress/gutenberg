@@ -94,6 +94,7 @@ class NativeEditorProvider extends Component {
 	componentDidMount() {
 		const {
 			capabilities,
+			gutenbergVersion,
 			locale,
 			hostAppNamespace,
 			updateEditorSettings,
@@ -105,6 +106,7 @@ class NativeEditorProvider extends Component {
 			...this.getThemeColors( this.props ),
 			locale,
 			hostAppNamespace,
+			gutenbergVersion,
 		} );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
@@ -152,14 +154,19 @@ class NativeEditorProvider extends Component {
 
 		this.subscriptionParentUpdateEditorSettings =
 			subscribeUpdateEditorSettings(
-				( { galleryWithImageBlocks, ...editorSettings } ) => {
+				( {
+					galleryWithImageBlocks,
+					gutenbergVersion: updatedGutenbergVersion,
+					...editorSettings
+				} ) => {
 					if ( typeof galleryWithImageBlocks === 'boolean' ) {
 						window.wp.galleryBlockV2Enabled =
 							galleryWithImageBlocks;
 					}
-					updateEditorSettings(
-						this.getThemeColors( editorSettings )
-					);
+					updateEditorSettings( {
+						gutenbergVersion: updatedGutenbergVersion,
+						...this.getThemeColors( editorSettings ),
+					} );
 				}
 			);
 
