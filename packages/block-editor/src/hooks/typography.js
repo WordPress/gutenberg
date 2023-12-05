@@ -3,6 +3,8 @@
  */
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useMemo, useCallback } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -17,6 +19,7 @@ import { LINE_HEIGHT_SUPPORT_KEY } from './line-height';
 import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { cleanEmptyObject, useBlockSettings } from './utils';
+import { store as blockEditorStore } from '../store';
 
 function omit( object, keys ) {
 	return Object.fromEntries(
@@ -106,22 +109,24 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function TypographyPanel( {
+function TypographyPanelPure( {
 	clientId,
 	name,
-	attributes,
 	setAttributes,
 	__unstableParentLayout,
 } ) {
+	function selector( select ) {
+		const { style, fontFamily, fontSize } =
+			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+		return { style, fontFamily, fontSize };
+	}
+	const { style, fontFamily, fontSize } = useSelect( selector, [ clientId ] );
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const isEnabled = useHasTypographyPanel( settings );
-	const value = useMemo( () => {
-		return attributesToStyle( {
-			style: attributes.style,
-			fontFamily: attributes.fontFamily,
-			fontSize: attributes.fontSize,
-		} );
-	}, [ attributes.style, attributes.fontSize, attributes.fontFamily ] );
+	const value = useMemo(
+		() => attributesToStyle( { style, fontFamily, fontSize } ),
+		[ style, fontSize, fontFamily ]
+	);
 
 	const onChange = ( newStyle ) => {
 		setAttributes( styleToAttributes( newStyle ) );
@@ -147,6 +152,8 @@ export function TypographyPanel( {
 		/>
 	);
 }
+
+export const TypographyPanel = pure( TypographyPanelPure );
 
 export const hasTypographySupport = ( blockName ) => {
 	return TYPOGRAPHY_SUPPORT_KEYS.some( ( key ) =>

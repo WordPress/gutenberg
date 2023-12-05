@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import { useState, useEffect, useCallback } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
+import { pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -65,17 +66,19 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function DimensionsPanel( props ) {
-	const {
-		clientId,
-		name,
-		attributes,
-		setAttributes,
-		__unstableParentLayout,
-	} = props;
+function DimensionsPanelPure( {
+	clientId,
+	name,
+	setAttributes,
+	__unstableParentLayout,
+} ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const isEnabled = useHasDimensionsPanel( settings );
-	const value = attributes.style;
+	const value = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
+		[ clientId ]
+	);
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const onChange = ( newStyle ) => {
 		setAttributes( {
@@ -87,11 +90,11 @@ export function DimensionsPanel( props ) {
 		return null;
 	}
 
-	const defaultDimensionsControls = getBlockSupport( props.name, [
+	const defaultDimensionsControls = getBlockSupport( name, [
 		DIMENSIONS_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
-	const defaultSpacingControls = getBlockSupport( props.name, [
+	const defaultSpacingControls = getBlockSupport( name, [
 		SPACING_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
@@ -114,18 +117,22 @@ export function DimensionsPanel( props ) {
 			{ !! settings?.spacing?.padding && (
 				<PaddingVisualizer
 					forceShow={ visualizedProperty === 'padding' }
-					{ ...props }
+					clientId={ clientId }
+					value={ value }
 				/>
 			) }
 			{ !! settings?.spacing?.margin && (
 				<MarginVisualizer
 					forceShow={ visualizedProperty === 'margin' }
-					{ ...props }
+					clientId={ clientId }
+					value={ value }
 				/>
 			) }
 		</>
 	);
 }
+
+export const DimensionsPanel = pure( DimensionsPanelPure );
 
 /**
  * @deprecated
