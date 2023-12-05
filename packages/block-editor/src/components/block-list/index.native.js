@@ -15,6 +15,7 @@ import {
 	alignmentHelpers,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useIsConnected } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -30,6 +31,7 @@ import {
 import { BlockDraggableWrapper } from '../block-draggable';
 import { useEditorWrapperStyles } from '../../hooks/use-editor-wrapper-styles';
 import { store as blockEditorStore } from '../../store';
+import { OfflineStatus } from '@wordpress/editor';
 
 const identity = ( x ) => x;
 
@@ -227,6 +229,7 @@ export default function BlockList( {
 		headerToolbar.height +
 		blockToolbar.height +
 		( isFloatingToolbarVisible ? floatingToolbar.height : 0 );
+	const { isConnected } = useIsConnected();
 
 	return (
 		<View
@@ -235,6 +238,7 @@ export default function BlockList( {
 			onLayout={ onLayout }
 			testID="block-list-wrapper"
 		>
+			{ ! isConnected && <OfflineStatus /> }
 			{ isRootList ? (
 				<BlockListProvider
 					value={ {
