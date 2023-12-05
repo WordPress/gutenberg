@@ -95,6 +95,7 @@ export function useBorderControlDropdown(
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonClassName,
+		size,
 		__experimentalIsRenderedInSidebar,
 	};
 }

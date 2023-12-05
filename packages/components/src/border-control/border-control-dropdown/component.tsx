@@ -149,6 +149,7 @@ const BorderControlDropdown = (
 		popoverControlsClassName,
 		resetButtonClassName,
 		showDropdownHeader,
+		size,
 		__unstablePopoverProps,
 		...otherProps
 	} = useBorderControlDropdown( props );
@@ -170,23 +171,28 @@ const BorderControlDropdown = (
 
 	const renderToggle: DropdownComponentProps[ 'renderToggle' ] = ( {
 		onToggle,
-	} ) => (
-		<Button
-			onClick={ onToggle }
-			variant="tertiary"
-			aria-label={ toggleAriaLabel }
-			tooltipPosition={ dropdownPosition }
-			label={ __( 'Border color and style picker' ) }
-			showTooltip={ true }
-		>
-			<span className={ indicatorWrapperClassName }>
-				<ColorIndicator
-					className={ indicatorClassName }
-					colorValue={ color }
-				/>
-			</span>
-		</Button>
-	);
+	} ) => {
+		return (
+			<Button
+				onClick={ onToggle }
+				variant="tertiary"
+				aria-label={ toggleAriaLabel }
+				tooltipPosition={ dropdownPosition }
+				label={ __( 'Border color and style picker' ) }
+				showTooltip={ true }
+				__next40pxDefaultSize={
+					size === '__unstable-large' ? true : false
+				}
+			>
+				<span className={ indicatorWrapperClassName }>
+					<ColorIndicator
+						className={ indicatorClassName }
+						colorValue={ color }
+					/>
+				</span>
+			</Button>
+		);
+	};
 
 	const renderContent: DropdownComponentProps[ 'renderContent' ] = ( {
 		onClose,
