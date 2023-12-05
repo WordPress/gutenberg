@@ -347,6 +347,15 @@ function ListViewComponent(
 				onFocusRow={ focusRow }
 				applicationAriaLabel={ __( 'Block navigation structure' ) }
 				aria-describedby={ describedById }
+				style={ {
+					'--wp-admin--list-view-dragged-items-height':
+						draggedClientIds?.length
+							? `${
+									BLOCK_LIST_ITEM_HEIGHT *
+									( draggedClientIds.length - 1 )
+							  }px`
+							: null,
+				} }
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch
