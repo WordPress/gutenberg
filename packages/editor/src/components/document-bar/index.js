@@ -117,6 +117,7 @@ function BaseDocumentActions( { postType, postId, onBack } ) {
 						event.stopPropagation();
 						onBack();
 					} }
+					size="compact"
 				>
 					{ __( 'Back' ) }
 				</Button>
@@ -126,6 +127,7 @@ function BaseDocumentActions( { postType, postId, onBack } ) {
 				<Button
 					className="editor-document-bar__command"
 					onClick={ () => openCommandCenter() }
+					size="compact"
 				>
 					<HStack
 						className="editor-document-bar__title"
