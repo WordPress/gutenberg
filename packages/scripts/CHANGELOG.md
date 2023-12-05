@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Fix CSS imports not minified ([#56516](https://github.com/WordPress/gutenberg/pull/56516)).
+
 ## 26.17.0 (2023-11-16)
 
 ## 26.16.0 (2023-11-02)
