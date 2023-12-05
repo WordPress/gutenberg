@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
+import { pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -65,7 +66,7 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function DimensionsPanel( props ) {
+function DimensionsPanelPure( props ) {
 	const { clientId, name, setAttributes, __unstableParentLayout } = props;
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const isEnabled = useHasDimensionsPanel( settings );
@@ -124,6 +125,8 @@ export function DimensionsPanel( props ) {
 		</>
 	);
 }
+
+export const DimensionsPanel = pure( DimensionsPanelPure );
 
 /**
  * @deprecated
