@@ -33,7 +33,6 @@ $swatch-gap: 12px;
 		.components-circular-option-picker__swatches {
 			display: grid;
 			grid-template-columns: repeat(6, $swatch-size);
-			justify-content: space-between;
 		}
 	}
 
