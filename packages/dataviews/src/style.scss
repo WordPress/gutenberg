@@ -139,6 +139,7 @@
 	.dataviews-list-view__item {
 		padding: $grid-unit-15 $grid-unit-40;
 		cursor: default;
+		&:focus,
 		&:hover {
 			background-color: lighten($gray-100, 3%);
 		}
@@ -150,7 +151,8 @@
 	}
 
 	.dataviews-list-view__item-selected,
-	.dataviews-list-view__item-selected:hover {
+	.dataviews-list-view__item-selected:hover,
+	.dataviews-list-view__item-selected:focus {
 		background-color: $gray-100;
 	}
 
