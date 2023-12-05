@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { useMergeRefs } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,6 +14,39 @@ import Iframe from '../iframe';
 import WritingFlow from '../writing-flow';
 import { useMouseMoveTypingReset } from '../observe-typing';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
+import { store as blockEditorStore } from '../../store';
+
+/**
+ * This component is for rendering block assets when the editor canvas is not
+ * iframed. It might include assets that have already been enqueued for the
+ * editor, so we need to filter them out.
+ */
+function UnIframedBlockAssets() {
+	const blockAssets = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings()
+			.__unstableResolvedAssets;
+	}, [] );
+	const { styles: _styles = '', scripts: _scripts = '' } = blockAssets || {};
+	const assetsHtml = _styles + _scripts;
+	const filteredAssetsHtml = useMemo( () => {
+		if ( ! assetsHtml ) return '';
+		const doc = document.implementation.createHTMLDocument( '' );
+		doc.body.innerHTML = assetsHtml;
+		// Remove assets already enqueued in the editor document.
+		doc.querySelectorAll( '[id]' ).forEach( ( node ) => {
+			if ( document.getElementById( node.id ) ) {
+				node.remove();
+			}
+		} );
+		return doc.body.innerHTML;
+	}, [ assetsHtml ] );
+
+	if ( ! filteredAssetsHtml ) return null;
+
+	return (
+		<div dangerouslySetInnerHTML={ { __html: filteredAssetsHtml } }></div>
+	);
+}
 
 export function ExperimentalBlockCanvas( {
 	shouldIframe = true,
@@ -28,6 +63,7 @@ export function ExperimentalBlockCanvas( {
 	if ( ! shouldIframe ) {
 		return (
 			<>
+				<UnIframedBlockAssets />
 				<EditorStyles
 					styles={ styles }
 					scope=".editor-styles-wrapper"

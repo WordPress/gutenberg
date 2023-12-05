@@ -24,4 +24,4 @@ function enqueue_inner_blocks_allowed_blocks_script() {
 		true
 	);
 }
-add_action( 'enqueue_block_assets', 'enqueue_inner_blocks_allowed_blocks_script' );
+add_action( 'enqueue_block_editor_assets', 'enqueue_inner_blocks_allowed_blocks_script' );
