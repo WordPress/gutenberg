@@ -719,7 +719,7 @@
 													"type": "string"
 												},
 												"preview": {
-													"description": "URL to a preview image of the font family.",
+													"description": "URL to a preview image of the font face.",
 													"type": "string"
 												}
 											},
