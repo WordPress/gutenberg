@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useAsyncList } from '@wordpress/compose';
@@ -14,6 +19,7 @@ export default function ViewList( {
 	data,
 	getItemId,
 	onSelectionChange,
+	selection,
 } ) {
 	const shownData = useAsyncList( data, { step: 3 } );
 	const mediaField = fields.find(
@@ -46,7 +52,13 @@ export default function ViewList( {
 							role="button"
 							tabIndex={ 0 }
 							onKeyDown={ onEnter( item ) }
-							className="dataviews-list-view__item"
+							className={ classNames(
+								'dataviews-list-view__item',
+								{
+									'dataviews-list-view__item-selected':
+										selection.includes( item.id ),
+								}
+							) }
 							onClick={ () => onSelectionChange( [ item ] ) }
 						>
 							<HStack spacing={ 3 }>

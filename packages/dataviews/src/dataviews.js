@@ -5,7 +5,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,6 +30,13 @@ export default function DataViews( {
 	supportedLayouts,
 	onSelectionChange,
 } ) {
+	const [ selection, setSelection ] = useState( [] );
+
+	const onSetSelection = ( items ) => {
+		setSelection( items.map( ( item ) => item.id ) );
+		onSelectionChange( items );
+	};
+
 	const ViewComponent = VIEW_LAYOUTS.find(
 		( v ) => v.type === view.type
 	).component;
@@ -73,7 +80,8 @@ export default function DataViews( {
 					data={ data }
 					getItemId={ getItemId }
 					isLoading={ isLoading }
-					onSelectionChange={ onSelectionChange }
+					onSelectionChange={ onSetSelection }
+					selection={ selection }
 				/>
 				<Pagination
 					view={ view }
