@@ -18,6 +18,7 @@ export default function save( { attributes } ) {
 		url,
 		alt,
 		caption,
+		align,
 		href,
 		rel,
 		linkClass,
@@ -35,6 +36,7 @@ export default function save( { attributes } ) {
 	const borderProps = getBorderClassesAndStyles( attributes );
 
 	const classes = classnames( {
+		alignnone: 'none' === align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
 		'has-custom-border':
