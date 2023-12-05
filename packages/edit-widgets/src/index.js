@@ -104,7 +104,6 @@ export const initialize = initializeEditor;
 export function reinitializeEditor() {
 	deprecated( 'wp.editWidgets.reinitializeEditor', {
 		since: '6.2',
-		version: '6.3',
 	} );
 }
 

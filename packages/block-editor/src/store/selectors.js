@@ -201,7 +201,6 @@ export const __unstableGetClientIdWithClientIdsTree = createSelector(
 			"wp.data.select( 'core/block-editor' ).__unstableGetClientIdWithClientIdsTree",
 			{
 				since: '6.3',
-				version: '6.5',
 			}
 		);
 		return {
@@ -230,7 +229,6 @@ export const __unstableGetClientIdsTree = createSelector(
 			"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree",
 			{
 				since: '6.3',
-				version: '6.5',
 			}
 		);
 		return getBlockOrder( state, rootClientId ).map( ( clientId ) =>
@@ -1386,7 +1384,6 @@ export function isCaretWithinFormattedText() {
 		'wp.data.select( "core/block-editor" ).isCaretWithinFormattedText',
 		{
 			since: '6.1',
-			version: '6.3',
 		}
 	);
 
@@ -2182,7 +2179,6 @@ export const __experimentalGetAllowedBlocks = createSelector(
 				alternative:
 					'wp.data.select( "core/block-editor" ).getAllowedBlocks',
 				since: '6.2',
-				version: '6.4',
 			}
 		);
 		return getAllowedBlocks( state, rootClientId );
@@ -2238,7 +2234,6 @@ export const __experimentalGetDirectInsertBlock = createSelector(
 				alternative:
 					'wp.data.select( "core/block-editor" ).getDirectInsertBlock',
 				since: '6.3',
-				version: '6.4',
 			}
 		);
 		return getDirectInsertBlock( state, rootClientId );
@@ -2437,7 +2432,6 @@ export const __experimentalGetPatternsByBlockTypes = createSelector(
 				alternative:
 					'wp.data.select( "core/block-editor" ).getPatternsByBlockTypes',
 				since: '6.2',
-				version: '6.4',
 			}
 		);
 		return getPatternsByBlockTypes( state, blockNames, rootClientId );

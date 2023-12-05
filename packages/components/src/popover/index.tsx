@@ -160,7 +160,6 @@ const UnconnectedPopover = (
 	if ( __unstableForcePosition !== undefined ) {
 		deprecated( '`__unstableForcePosition` prop in wp.components.Popover', {
 			since: '6.1',
-			version: '6.3',
 			alternative: '`flip={ false }` and  `resize={ false }`',
 		} );
 

@@ -75,7 +75,6 @@ export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
 		"select( 'core/core' ).getEntityRecords( 'postType', 'wp_block' )",
 		{
 			since: '6.5',
-			version: '6.8',
 		}
 	);
 	const isWeb = Platform.OS === 'web';
@@ -106,7 +105,6 @@ export function getSettings( state ) {
 export function getHomeTemplateId() {
 	deprecated( "select( 'core/edit-site' ).getHomeTemplateId", {
 		since: '6.2',
-		version: '6.4',
 	} );
 }
 
@@ -273,7 +271,6 @@ export function getCurrentTemplateNavigationPanelSubMenu() {
 		"dispatch( 'core/edit-site' ).getCurrentTemplateNavigationPanelSubMenu",
 		{
 			since: '6.2',
-			version: '6.4',
 		}
 	);
 }
@@ -284,7 +281,6 @@ export function getCurrentTemplateNavigationPanelSubMenu() {
 export function getNavigationPanelActiveMenu() {
 	deprecated( "dispatch( 'core/edit-site' ).getNavigationPanelActiveMenu", {
 		since: '6.2',
-		version: '6.4',
 	} );
 }
 
@@ -294,7 +290,6 @@ export function getNavigationPanelActiveMenu() {
 export function isNavigationOpened() {
 	deprecated( "dispatch( 'core/edit-site' ).isNavigationOpened", {
 		since: '6.2',
-		version: '6.4',
 	} );
 }
 

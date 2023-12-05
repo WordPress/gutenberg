@@ -82,7 +82,6 @@ const BlockColorsStyleSelector = ( { children, ...other } ) => {
 	deprecated( `wp.blockEditor.BlockColorsStyleSelector`, {
 		alternative: 'block supports API',
 		since: '6.1',
-		version: '6.3',
 	} );
 
 	return (

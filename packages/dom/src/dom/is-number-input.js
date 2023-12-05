@@ -19,7 +19,6 @@ import isHTMLInputElement from './is-html-input-element';
 export default function isNumberInput( node ) {
 	deprecated( 'wp.dom.isNumberInput', {
 		since: '6.1',
-		version: '6.5',
 	} );
 	/* eslint-enable jsdoc/valid-types */
 	return (

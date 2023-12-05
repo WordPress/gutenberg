@@ -192,7 +192,6 @@ export function initializeEditor(
 export function reinitializeEditor() {
 	deprecated( 'wp.editPost.reinitializeEditor', {
 		since: '6.2',
-		version: '6.3',
 	} );
 }
 

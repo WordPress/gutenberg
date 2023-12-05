@@ -77,7 +77,6 @@ const LineHeightControl = ( {
 			'Bottom margin styles for wp.blockEditor.LineHeightControl',
 			{
 				since: '6.0',
-				version: '6.4',
 				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version',
 			}
 		);

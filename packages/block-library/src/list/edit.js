@@ -56,7 +56,6 @@ function useMigrateOnLoad( attributes, clientId ) {
 
 		deprecated( 'Value attribute on the list block', {
 			since: '6.0',
-			version: '6.5',
 			alternative: 'inner blocks',
 		} );
 

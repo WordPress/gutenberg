@@ -231,7 +231,6 @@ export function GradientPicker( {
 	if ( ! __nextHasNoMargin ) {
 		deprecated( 'Outer margin styles for wp.components.GradientPicker', {
 			since: '6.1',
-			version: '6.4',
 			hint: 'Set the `__nextHasNoMargin` prop to true to start opting into the new styles, which will become the default in a future version',
 		} );
 	}
