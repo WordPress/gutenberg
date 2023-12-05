@@ -34,6 +34,7 @@ import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
+import { useBlockScreenReaderDescription } from './use-block-screen-reader-description';
 import { store as blockEditorStore } from '../../../store';
 import useBlockOverlayActive from '../../block-content-overlay';
 import { unlock } from '../../../lock-unlock';
@@ -185,6 +186,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		id: `block-${ clientId }${ htmlSuffix }`,
 		role: 'document',
 		'aria-label': blockLabel,
+		'aria-description': useBlockScreenReaderDescription( clientId ),
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
