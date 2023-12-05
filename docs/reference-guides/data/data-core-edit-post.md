@@ -138,15 +138,9 @@ _Returns_
 
 ### isEditingTemplate
 
+> **Deprecated**
+
 Returns true if the template editing mode is enabled.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: Whether we're editing the template.
 
 ### isEditorPanelEnabled
 
@@ -438,15 +432,9 @@ _Parameters_
 
 ### setIsEditingTemplate
 
+> **Deprecated**
+
 Returns an action object used to switch to template editing.
-
-_Parameters_
-
--   _value_ `boolean`: Is editing template.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### setIsInserterOpened
 
