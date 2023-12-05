@@ -322,6 +322,7 @@
 		"test:e2e:storybook": "playwright test --config test/storybook-playwright/playwright.config.ts",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
 		"test:native": "cross-env NODE_ENV=test jest --config test/native/jest.config.js",
+		"test:native:watch": "npm run test:native -- --watch",
 		"test:native:clean": "jest --clearCache --config test/native/jest.config.js; rm -rf $TMPDIR/jest_*",
 		"test:native:debug": "cross-env NODE_ENV=test node --inspect-brk node_modules/.bin/jest --runInBand --verbose --config test/native/jest.config.js",
 		"test:native:perf": "cross-env TEST_RUNNER_ARGS='--runInBand --config test/native/jest.config.js --testMatch \"**/performance/*.native.[jt]s?(x)\"' reassure",
