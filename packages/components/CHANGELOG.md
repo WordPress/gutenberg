@@ -17,6 +17,7 @@
 -   `ToggleGroupControl`: react correctly to external controlled updates ([#56678](https://github.com/WordPress/gutenberg/pull/56678)).
 -   `ToolsPanel`: fix a performance issue ([#56770](https://github.com/WordPress/gutenberg/pull/56770)).
 -   `BorderControl`: adjust `BorderControlDropdown` Button size to fix misaligned border ([#56730](https://github.com/WordPress/gutenberg/pull/56730)).
+-   `SlotFillProvider`: Restore contextual Slot/Fills within SlotFillProvider ([#56779](https://github.com/WordPress/gutenberg/pull/56779)).
 
 ### Internal
 
