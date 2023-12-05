@@ -4,7 +4,7 @@
 	"name": "core/query-pagination",
 	"title": "Pagination",
 	"category": "theme",
-	"parent": [ "core/query" ],
+	"ancestor": [ "core/query" ],
 	"description": "Displays a paginated navigation to next/previous set of posts, when applicable.",
 	"textdomain": "default",
 	"attributes": {
