@@ -226,17 +226,15 @@
 		position: absolute;
 		left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
 
+		&::before {
+			content: "";
+		}
+
 		.block-editor-block-parent-selector__button {
-			position: relative;
 			border: 1px solid $gray-900;
 			padding-right: 6px;
 			padding-left: 6px;
 			background-color: $white;
-			top: -1px;
-
-			&::after {
-				content: "";
-			}
 		}
 	}
 
