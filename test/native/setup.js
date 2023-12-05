@@ -117,6 +117,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		requestImageUploadCancelDialog: jest.fn(),
 		requestMediaEditor: jest.fn(),
 		requestMediaPicker: jest.fn(),
+		requestMediaImport: jest.fn(),
 		requestUnsupportedBlockFallback: jest.fn(),
 		subscribeReplaceBlock: jest.fn(),
 		mediaSources: {
