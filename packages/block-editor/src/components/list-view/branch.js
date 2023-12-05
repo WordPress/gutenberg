@@ -91,7 +91,6 @@ function ListViewBranch( props ) {
 		selectedClientIds,
 		level = 1,
 		path = '',
-		isBranchDragged = false,
 		isBranchSelected = false,
 		listPosition = 0,
 		fixedListWindow,
@@ -150,62 +149,64 @@ function ListViewBranch( props ) {
 					);
 				}
 
+				const isDragged = !! draggedClientIds?.includes( clientId );
+
 				let displacement;
 				let isNesting;
+				let isAfterDraggedBlocks;
 
-				// Determine where to displace the position of the current block, relative
-				// to the blocks being dragged (in their original position) and the drop target
-				// (the position where a user is currently dragging the blocks to).
-				if (
-					blockDropTargetIndex !== undefined &&
-					blockDropTargetIndex !== null &&
-					firstDraggedBlockIndex !== undefined
-				) {
-					// If the block is being dragged and there is a valid drop target,
-					// determine if the block being rendered should be displaced up or down.
+				if ( firstDraggedBlockIndex !== undefined ) {
 					const thisBlockIndex = blockIndexes[ clientId ];
+					isAfterDraggedBlocks =
+						thisBlockIndex > firstDraggedBlockIndex && ! isDragged;
 
-					if ( thisBlockIndex !== undefined ) {
-						// If the current block appears after the set of dragged blocks
-						// (in their original position), but is before the drop target,
-						// then the current block should be displaced up.
+					// Determine where to displace the position of the current block, relative
+					// to the blocks being dragged (in their original position) and the drop target
+					// (the position where a user is currently dragging the blocks to).
+					if (
+						blockDropTargetIndex !== undefined &&
+						blockDropTargetIndex !== null
+					) {
+						// If the block is being dragged and there is a valid drop target,
+						// determine if the block being rendered should be displaced up or down.
+
+						if ( thisBlockIndex !== undefined ) {
+							// If the current block appears after the set of dragged blocks
+							// (in their original position), but is before the drop target,
+							// then the current block should be displaced up.
+							if (
+								thisBlockIndex >= firstDraggedBlockIndex &&
+								thisBlockIndex < blockDropTargetIndex
+							) {
+								displacement = 'up';
+							}
+
+							// If the current block appears before the set of dragged blocks
+							// (in their original position), but is after the drop target,
+							// then the current block should be displaced down.
+							if (
+								thisBlockIndex < firstDraggedBlockIndex &&
+								thisBlockIndex >= blockDropTargetIndex
+							) {
+								displacement = 'down';
+							}
+						}
+
+						isNesting =
+							blockDropTargetIndex - 1 === thisBlockIndex &&
+							blockDropPosition === 'inside';
+					} else if ( blockDropTargetIndex === null ) {
+						// A `null` value for `blockDropTargetIndex` indicates that the
+						// drop target is outside of the valid areas within the list view.
+						// In this case, the drag is still active, but as there is no
+						// valid drop target, we should remove the gap indicating where
+						// the block would be inserted.
 						if (
-							thisBlockIndex >= firstDraggedBlockIndex &&
-							thisBlockIndex < blockDropTargetIndex
+							thisBlockIndex !== undefined &&
+							thisBlockIndex >= firstDraggedBlockIndex
 						) {
 							displacement = 'up';
 						}
-
-						// If the current block appears before the set of dragged blocks
-						// (in their original position), but is after the drop target,
-						// then the current block should be displaced down.
-						if (
-							thisBlockIndex < firstDraggedBlockIndex &&
-							thisBlockIndex >= blockDropTargetIndex
-						) {
-							displacement = 'down';
-						}
-					}
-
-					isNesting =
-						blockDropTargetIndex - 1 === thisBlockIndex &&
-						blockDropPosition === 'inside';
-				} else if (
-					blockDropTargetIndex === null &&
-					firstDraggedBlockIndex !== undefined
-				) {
-					// A `null` value for `blockDropTargetIndex` indicates that the
-					// drop target is outside of the valid areas within the list view.
-					// In this case, the drag is still active, but as there is no
-					// valid drop target, we should remove the gap indicating where
-					// the block would be inserted.
-					const thisBlockIndex = blockIndexes[ clientId ];
-
-					if (
-						thisBlockIndex !== undefined &&
-						thisBlockIndex >= firstDraggedBlockIndex
-					) {
-						displacement = 'up';
 					}
 				}
 
@@ -223,8 +224,6 @@ function ListViewBranch( props ) {
 					hasNestedBlocks && shouldShowInnerBlocks
 						? expandedState[ clientId ] ?? isExpanded
 						: undefined;
-
-				const isDragged = !! draggedClientIds?.includes( clientId );
 
 				// Make updates to the selected or dragged blocks synchronous,
 				// but asynchronous for any other block.
@@ -244,7 +243,6 @@ function ListViewBranch( props ) {
 				const showBlock =
 					isDragged ||
 					blockInView ||
-					isBranchDragged ||
 					( isSelected && clientId === selectedClientIds[ 0 ] );
 				return (
 					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
@@ -254,18 +252,19 @@ function ListViewBranch( props ) {
 								selectBlock={ selectBlock }
 								isSelected={ isSelected }
 								isBranchSelected={ isSelectedBranch }
-								isDragged={ isDragged || isBranchDragged }
+								isDragged={ isDragged }
 								level={ level }
 								position={ position }
 								rowCount={ rowCount }
 								siblingBlockCount={ blockCount }
 								showBlockMovers={ showBlockMovers }
 								path={ updatedPath }
-								isExpanded={ shouldExpand }
+								isExpanded={ isDragged ? false : shouldExpand }
 								listPosition={ nextPosition }
 								selectedClientIds={ selectedClientIds }
 								isSyncedBranch={ syncedBranch }
 								displacement={ displacement }
+								isAfterDraggedBlocks={ isAfterDraggedBlocks }
 								isNesting={ isNesting }
 							/>
 						) }
@@ -274,7 +273,7 @@ function ListViewBranch( props ) {
 								<td className="block-editor-list-view-placeholder" />
 							</tr>
 						) }
-						{ hasNestedBlocks && shouldExpand && (
+						{ hasNestedBlocks && shouldExpand && ! isDragged && (
 							<ListViewBranch
 								parentId={ clientId }
 								blocks={ innerBlocks }
@@ -285,7 +284,6 @@ function ListViewBranch( props ) {
 								listPosition={ nextPosition + 1 }
 								fixedListWindow={ fixedListWindow }
 								isBranchSelected={ isSelectedBranch }
-								isBranchDragged={ isDragged || isBranchDragged }
 								selectedClientIds={ selectedClientIds }
 								isExpanded={ isExpanded }
 								isSyncedBranch={ syncedBranch }
