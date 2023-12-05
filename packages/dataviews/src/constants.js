@@ -1,8 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { blockTable, category, drawerLeft } from '@wordpress/icons';
+import { __, isRTL } from '@wordpress/i18n';
+import {
+	blockTable,
+	category,
+	formatListBullets,
+	formatListBulletsRTL,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -40,6 +45,6 @@ export const VIEW_LAYOUTS = [
 		type: LAYOUT_LIST,
 		label: __( 'List' ),
 		component: ViewList,
-		icon: drawerLeft,
+		icon: isRTL() ? formatListBulletsRTL : formatListBullets,
 	},
 ];
