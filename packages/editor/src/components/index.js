@@ -8,6 +8,7 @@ export * from './autocompleters';
 
 // Post Related Components.
 export { default as AutosaveMonitor } from './autosave-monitor';
+export { default as DocumentBar } from './document-bar';
 export { default as DocumentOutline } from './document-outline';
 export { default as DocumentOutlineCheck } from './document-outline/check';
 export { EditorKeyboardShortcuts };

@@ -97,10 +97,12 @@ export function useSpecificEditorSettings() {
 		keepCaretInsideBlock,
 		canvasMode,
 		settings,
+		postWithTemplate,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostType,
 			getEditedPostId,
+			getEditedPostContext,
 			getCanvasMode,
 			getSettings,
 		} = unlock( select( editSiteStore ) );
@@ -113,6 +115,7 @@ export function useSpecificEditorSettings() {
 			usedPostType,
 			usedPostId
 		);
+		const _context = getEditedPostContext();
 		return {
 			templateSlug: _record.slug,
 			focusMode: !! getPreference( 'core/edit-site', 'focusMode' ),
@@ -130,9 +133,13 @@ export function useSpecificEditorSettings() {
 			),
 			canvasMode: getCanvasMode(),
 			settings: getSettings(),
+			postWithTemplate: _context?.postId,
 		};
 	}, [] );
 	const archiveLabels = useArchiveLabel( templateSlug );
+	const defaultRenderingMode = useMemo( () => {
+		return postWithTemplate ? 'template-locked' : 'all';
+	}, [ postWithTemplate ] );
 
 	const defaultEditorSettings = useMemo( () => {
 		return {
@@ -144,6 +151,7 @@ export function useSpecificEditorSettings() {
 			isDistractionFree,
 			hasFixedToolbar,
 			keepCaretInsideBlock,
+			defaultRenderingMode,
 
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
@@ -159,6 +167,7 @@ export function useSpecificEditorSettings() {
 		canvasMode,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
+		defaultRenderingMode,
 	] );
 
 	return defaultEditorSettings;
