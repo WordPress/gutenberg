@@ -173,35 +173,36 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
  * @return string The processed HTML.
  */
 function gutenberg_process_interactive_block( $interactive_block ) {
-	$block_index = 0;
-	$content     = '';
-	$directives  = array(
+	$block_index  = 0;
+	$content      = '';
+	$directives   = array(
 		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
 		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
 		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
 		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
 		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
 	);
+	$inner_blocks = array();
 
 	foreach ( $interactive_block['innerContent'] as $inner_content ) {
 		if ( is_string( $inner_content ) ) {
-			// This content belongs to an interactive block and therefore can contain
-			// directives.
-			$tags = new WP_Directive_Processor( $inner_content );
-			$tags->process_rendered_html( $tags, 'data-wp-', $directives );
-			$content .= $tags->get_updated_html();
+			$content .= $inner_content;
 		} else {
 			// This is an inner block. It may be an interactive block or a
 			// non-interactive block.
-			$inner_block  = $interactive_block['innerBlocks'][ $block_index ];
-			$block_index += 1;
-			if ( 'core/interactivity-wrapper' === $inner_block['blockName'] ) {
-				$content .= gutenberg_process_interactive_block( $inner_block );
-			} elseif ( 'core/non-interactivity-wrapper' === $inner_block['blockName'] ) {
-				$content .= gutenberg_process_non_interactive_block( $inner_block );
-			}
+			$content       .= '<wp-inner-blocks-' . $block_index . '></wp-inner-blocks-' . $block_index . '>';
+			$inner_blocks[] = $interactive_block['innerBlocks'][ $block_index ];
+			$block_index   += 1;
 		}
 	}
+	$tags = new WP_Directive_Processor( $content );
+	$tags->process_rendered_html( $tags, 'data-wp-', $directives );
+	$content = $tags->get_updated_html();
+	if ( ! empty( $inner_blocks ) ) {
+		$content = str_replace( '<wp-inner-blocks-' . ( $block_index - 1 ) . '></wp-inner-blocks-' . ( $block_index - 1 ) . '>', gutenberg_process_interactive_block( $inner_blocks[0] ), $content );
+		array_shift( $inner_blocks );
+	}
+
 	return $content;
 }
 

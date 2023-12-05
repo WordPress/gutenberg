@@ -166,7 +166,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 
 		$content         = get_the_content( null, false, $post );
 		$rendered_blocks = do_blocks( $content );
-		$expected        = '<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained"><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "hello" }\'><p data-wp-text=\'context.MyText\'>hello</p></div></div></div>';
+		$expected        = '<div class="wp-block-group is-layout-constrained wp-block-group-is-layout-constrained"><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "hello" }\'><p data-wp-text=\'context.MyText\'>hello</p></div></div>';
 		$this->assertSame( $expected, $rendered_blocks );
 
 		unregister_block_type( 'gutenberg/test-context' );
