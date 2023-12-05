@@ -256,5 +256,32 @@ describe.each( [
 				} )
 			).toBeVisible();
 		} );
+
+		it( 'Should call custom event handlers', async () => {
+			const user = userEvent.setup();
+			const onFocusMock = jest.fn();
+			const onBlurMock = jest.fn();
+
+			render(
+				<CustomSelectControl
+					{ ...props }
+					onFocus={ onFocusMock }
+					onBlur={ onBlurMock }
+				/>
+			);
+
+			const currentSelectedItem = screen.getByRole( 'button', {
+				text: 'violets',
+			} );
+
+			await user.tab();
+
+			expect( currentSelectedItem ).toHaveFocus();
+			expect( onFocusMock ).toHaveBeenCalledTimes( 1 );
+
+			await user.tab();
+			expect( currentSelectedItem ).not.toHaveFocus();
+			expect( onBlurMock ).toHaveBeenCalledTimes( 1 );
+		} );
 	} );
 } );
