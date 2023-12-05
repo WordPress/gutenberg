@@ -159,7 +159,13 @@ test.describe( 'Post Editor Performance', () => {
 			draftId = await perfUtils.saveDraft();
 		} );
 
-		test( 'Run the test', async ( { admin, perfUtils, metrics, page } ) => {
+		test( 'Run the test', async ( {
+			admin,
+			perfUtils,
+			metrics,
+			page,
+			editor,
+		} ) => {
 			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 			const toggleButton = page
@@ -173,6 +179,9 @@ test.describe( 'Post Editor Performance', () => {
 			} );
 
 			await type( paragraph, metrics, 'typeWithoutInspector' );
+
+			// Open the inspector again.
+			await editor.openDocumentSettingsSidebar();
 		} );
 	} );
 
