@@ -122,6 +122,7 @@ function HeaderMenu( { dataView, header } ) {
 					iconPosition="right"
 					text={ text }
 					style={ { padding: 0 } }
+					size="compact"
 				/>
 			}
 		>

@@ -20,6 +20,7 @@ export default function Header( { title, subTitle, actions } ) {
 				<Heading
 					as="h2"
 					level={ 3 }
+					weight={ 500 }
 					className="edit-site-page-header__title"
 				>
 					{ title }
