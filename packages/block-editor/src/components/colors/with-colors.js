@@ -3,6 +3,7 @@
  */
 import { useMemo, Component } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -14,7 +15,7 @@ import {
 	getMostReadableColor,
 } from './utils';
 import { useSettings } from '../use-settings';
-import { kebabCase } from '../../utils/object';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Capitalizes the first letter in a string.
@@ -79,6 +80,7 @@ const withEditorColorPalette = () =>
  * @return {Component} The component that can be used as a HOC.
  */
 function createColorHOC( colorTypes, withColorPalette ) {
+	const { kebabCase } = unlock( componentsPrivateApis );
 	const colorMap = colorTypes.reduce( ( colorObject, colorType ) => {
 		return {
 			...colorObject,

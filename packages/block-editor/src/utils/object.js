@@ -1,16 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
-
-export const { kebabCase } = unlock( componentsPrivateApis );
-
-/**
  * Immutably sets a value inside an object. Like `lodash#set`, but returning a
  * new object. Treats nullish initial values as empty objects. Clones any
  * nested objects. Supports arrays, too.

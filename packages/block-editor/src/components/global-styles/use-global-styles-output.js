@@ -11,6 +11,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -32,12 +33,9 @@ import { getDuotoneFilter } from '../duotone/utils';
 import { getGapCSSValue } from '../../hooks/gap';
 import { store as blockEditorStore } from '../../store';
 import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
-import {
-	getValueFromObjectPath,
-	kebabCase,
-	setImmutably,
-} from '../../utils/object';
+import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import BlockContext from '../block-context';
+import { unlock } from '../../lock-unlock';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -72,6 +70,8 @@ function compileStyleValue( uncompiledValue ) {
  * @return {Array<Object>} An array of style declarations.
  */
 function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
+	const { kebabCase } = unlock( componentsPrivateApis );
+
 	return PRESET_METADATA.reduce(
 		( declarations, { path, valueKey, valueFunc, cssVarInfix } ) => {
 			const presetByOrigin = getValueFromObjectPath(
@@ -116,6 +116,8 @@ function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
  * @return {string} CSS declarations for the preset classes.
  */
 function getPresetsClasses( blockSelector = '*', blockPresets = {} ) {
+	const { kebabCase } = unlock( componentsPrivateApis );
+
 	return PRESET_METADATA.reduce(
 		( declarations, { path, cssVarInfix, classes } ) => {
 			if ( ! classes ) {
@@ -180,6 +182,7 @@ function getPresetsSvgFilters( blockPresets = {} ) {
 }
 
 function flattenTree( input = {}, prefix, token ) {
+	const { kebabCase } = unlock( componentsPrivateApis );
 	let result = [];
 	Object.keys( input ).forEach( ( key ) => {
 		const newKey = prefix + kebabCase( key.replace( '/', '-' ) );
@@ -321,6 +324,7 @@ export function getStylesDeclarations(
 	tree = {},
 	isTemplate = true
 ) {
+	const { kebabCase } = unlock( componentsPrivateApis );
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
 	const output = Object.entries( STYLE_PROPERTY ).reduce(
 		(
