@@ -39,11 +39,16 @@ import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls
 /**
  * Renders the block toolbar.
  *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md
+ *
  * @param {Object}  props                Components props.
  * @param {boolean} props.hideDragHandle Show or hide the Drag Handle for drag and drop functionality.
  * @param {string}  props.variant        Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
  */
-const BlockToolbar = ( { hideDragHandle, variant = 'unstyled' } ) => {
+export default function BlockToolbar( {
+	hideDragHandle,
+	variant = 'unstyled',
+} ) {
 	const {
 		blockClientId,
 		blockClientIds,
@@ -209,9 +214,4 @@ const BlockToolbar = ( { hideDragHandle, variant = 'unstyled' } ) => {
 			</div>
 		</NavigableToolbar>
 	);
-};
-
-/**
- * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md
- */
-export default BlockToolbar;
+}
