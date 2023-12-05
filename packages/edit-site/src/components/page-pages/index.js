@@ -217,17 +217,25 @@ export default function PagePages() {
 					return (
 						<VStack spacing={ 1 }>
 							<Heading as="h3" level={ 5 }>
-								<Link
-									params={ {
-										postId: item.id,
-										postType: item.type,
-										canvas: 'edit',
-									} }
-								>
-									{ decodeEntities(
+								{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
+									view.type
+								) ? (
+									<Link
+										params={ {
+											postId: item.id,
+											postType: item.type,
+											canvas: 'edit',
+										} }
+									>
+										{ decodeEntities(
+											item.title?.rendered || item.slug
+										) || __( '(no title)' ) }
+									</Link>
+								) : (
+									decodeEntities(
 										item.title?.rendered || item.slug
-									) || __( '(no title)' ) }
-								</Link>
+									) || __( '(no title)' )
+								) }
 							</Heading>
 						</VStack>
 					);
