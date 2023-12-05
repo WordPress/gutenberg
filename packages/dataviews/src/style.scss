@@ -139,6 +139,18 @@
 		}
 	}
 
+	.edit-site-page-pages__featured-image,
+	.dataviews-list-view__media-placeholder {
+		width: 45px;
+		height: 45px;
+		margin-right: 1em;
+	}
+
+	.dataviews-list-view__media-placeholder {
+		background-color: $gray-200;
+		border-radius: $radius-block-ui;
+	}
+
 	.dataviews-list-view__fields {
 		color: $gray-700;
 	}

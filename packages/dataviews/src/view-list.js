@@ -15,13 +15,18 @@ export default function ViewList( {
 	onSelectionChange,
 } ) {
 	const shownData = useAsyncList( data, { step: 3 } );
+	const mediaField = fields.find(
+		( field ) => field.id === view.layout.mediaField
+	);
 	const primaryField = fields.find(
 		( field ) => field.id === view.layout.primaryField
 	);
 	const visibleFields = fields.filter(
 		( field ) =>
 			! view.hiddenFields.includes( field.id ) &&
-			view.layout.primaryField !== field.id
+			! [ view.layout.primaryField, view.layout.mediaField ].includes(
+				field.id
+			)
 	);
 
 	return (
@@ -34,21 +39,28 @@ export default function ViewList( {
 						key={ getItemId?.( item ) || index }
 						onClick={ () => onSelectionChange( [ item ] ) }
 					>
-						<VStack>
-							{ primaryField?.render( { item } ) }
-							<HStack
-								alignment="left"
-								className="dataviews-list-view__fields"
-							>
-								{ visibleFields.map( ( field ) => {
-									return (
-										<span key={ field.id }>
-											{ field.render( { item } ) }
-										</span>
-									);
-								} ) }
+						<HStack>
+							{ mediaField?.render( { item } ) || (
+								<div className="dataviews-list-view__media-placeholder"></div>
+							) }
+							<HStack>
+								<VStack>
+									{ primaryField?.render( { item } ) }
+									<HStack
+										alignment="left"
+										className="dataviews-list-view__fields"
+									>
+										{ visibleFields.map( ( field ) => {
+											return (
+												<span key={ field.id }>
+													{ field.render( { item } ) }
+												</span>
+											);
+										} ) }
+									</HStack>
+								</VStack>
 							</HStack>
-						</VStack>
+						</HStack>
 					</li>
 					/* eslint-enable jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */
 				);

@@ -51,6 +51,7 @@ const defaultConfigPerViewType = {
 	},
 	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
+		mediaField: 'featured-image',
 	},
 };
 
