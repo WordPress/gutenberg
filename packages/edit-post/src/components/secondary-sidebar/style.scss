@@ -90,22 +90,30 @@
 }
 
 .edit-post-editor__list-view-overview {
-	display: flex;
-	flex-direction: column;
-	gap: $grid-unit-10;
-	border-bottom: $border-width solid $gray-300;
-	padding: $grid-unit-20;
+	display: grid;
+	gap: $grid-unit-20;
+	grid-template-columns: 1fr 1fr;
+	list-style: none;
+	margin-bottom: 0;
+	margin-left: 0;
+	margin-right: 0;
+	margin-top: $grid-unit-20;
+	padding: 0;
 
-	& > div > span:first-child {
-		// Width of the text information fields.
-		width: 90px;
-		display: inline-block;
+	&__item {
+		margin-bottom: 0;
+
+		> .components-text {
+			display: block;
+
+			&:first-of-type {
+				margin-bottom: $grid-unit-10;
+			}
+		}
 	}
 
-	& > div > span {
-		font-size: $helptext-font-size;
-		line-height: $default-line-height;
-		color: $gray-700;
+	&__container {
+		padding: 8px 6px;
 	}
 }
 
