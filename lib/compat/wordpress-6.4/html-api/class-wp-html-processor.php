@@ -103,12 +103,16 @@ if ( class_exists( 'WP_HTML_Processor' ) ) {
  *
  * The following list specifies the HTML tags that _are_ supported:
  *
+ *  - Containers: ADDRESS, BLOCKQUOTE, DETAILS, DIALOG, DIV, FOOTER, HEADER, MAIN, MENU, SPAN, SUMMARY.
+ *  - Form elements: BUTTON, FIELDSET, SEARCH.
+ *  - Formatting elements: B, BIG, CODE, EM, FONT, I, SMALL, STRIKE, STRONG, TT, U.
+ *  - Heading elements: HGROUP.
  *  - Links: A.
- *  - The formatting elements: B, BIG, CODE, EM, FONT, I, SMALL, STRIKE, STRONG, TT, U.
- *  - Containers: DIV, FIGCAPTION, FIGURE, SPAN.
- *  - Form elements: BUTTON.
+ *  - Lists: DL.
+ *  - Media elements: FIGCAPTION, FIGURE, IMG.
  *  - Paragraph: P.
- *  - Void elements: IMG.
+ *  - Sectioning elements: ARTICLE, ASIDE, NAV, SECTION
+ *  - Deprecated elements: CENTER, DIR
  *
  * ### Supported markup
  *
@@ -346,7 +350,7 @@ class WP_HTML_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	/**
 	 * Finds the next tag matching the $query.
 	 *
-	 * @TODO: Support matching the class name and tag name.
+	 * @todo Support matching the class name and tag name.
 	 *
 	 * @since 6.4.0
 	 *
@@ -555,9 +559,9 @@ class WP_HTML_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 	 * Breadcrumbs start at the outermost parent and descend toward the matched element.
 	 * They always include the entire path from the root HTML node to the matched element.
 	 *
-	 * @TODO: It could be more efficient to expose a generator-based version of this function
-	 *        to avoid creating the array copy on tag iteration. If this is done, it would likely
-	 *        be more useful to walk up the stack when yielding instead of starting at the top.
+	 * @todo It could be more efficient to expose a generator-based version of this function
+	 *       to avoid creating the array copy on tag iteration. If this is done, it would likely
+	 *       be more useful to walk up the stack when yielding instead of starting at the top.
 	 *
 	 * Example
 	 *
@@ -625,11 +629,29 @@ class WP_HTML_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 			 * > "fieldset", "figcaption", "figure", "footer", "header", "hgroup",
 			 * > "main", "menu", "nav", "ol", "p", "search", "section", "summary", "ul"
 			 */
+			case '+ADDRESS':
+			case '+ARTICLE':
+			case '+ASIDE':
 			case '+BLOCKQUOTE':
+			case '+CENTER':
+			case '+DETAILS':
+			case '+DIALOG':
+			case '+DIR':
 			case '+DIV':
+			case '+DL':
+			case '+FIELDSET':
 			case '+FIGCAPTION':
 			case '+FIGURE':
+			case '+FOOTER':
+			case '+HEADER':
+			case '+HGROUP':
+			case '+MAIN':
+			case '+MENU':
+			case '+NAV':
 			case '+P':
+			case '+SEARCH':
+			case '+SECTION':
+			case '+SUMMARY':
 				if ( $this->state->stack_of_open_elements->has_p_in_button_scope() ) {
 					$this->close_a_p_element();
 				}
@@ -643,11 +665,29 @@ class WP_HTML_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 			 * > "figcaption", "figure", "footer", "header", "hgroup", "listing", "main",
 			 * > "menu", "nav", "ol", "pre", "search", "section", "summary", "ul"
 			 */
+			case '-ADDRESS':
+			case '-ARTICLE':
+			case '-ASIDE':
 			case '-BLOCKQUOTE':
 			case '-BUTTON':
+			case '-CENTER':
+			case '-DETAILS':
+			case '-DIALOG':
+			case '-DIR':
 			case '-DIV':
+			case '-DL':
+			case '-FIELDSET':
 			case '-FIGCAPTION':
 			case '-FIGURE':
+			case '-FOOTER':
+			case '-HEADER':
+			case '-HGROUP':
+			case '-MAIN':
+			case '-MENU':
+			case '-NAV':
+			case '-SEARCH':
+			case '-SECTION':
+			case '-SUMMARY':
 				if ( ! $this->state->stack_of_open_elements->has_element_in_scope( $tag_name ) ) {
 					// @TODO: Report parse error.
 					// Ignore the token.

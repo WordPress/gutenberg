@@ -78,12 +78,19 @@ function NonDefaultControls( { format, onChange } ) {
 	// formats.
 	const suggestedFormats = [
 		...new Set( [
+			/* translators: See https://www.php.net/manual/datetime.format.php */
 			'Y-m-d',
+			/* translators: See https://www.php.net/manual/datetime.format.php */
 			_x( 'n/j/Y', 'short date format' ),
+			/* translators: See https://www.php.net/manual/datetime.format.php */
 			_x( 'n/j/Y g:i A', 'short date format with time' ),
+			/* translators: See https://www.php.net/manual/datetime.format.php */
 			_x( 'M j, Y', 'medium date format' ),
+			/* translators: See https://www.php.net/manual/datetime.format.php */
 			_x( 'M j, Y g:i A', 'medium date format with time' ),
+			/* translators: See https://www.php.net/manual/datetime.format.php */
 			_x( 'F j, Y', 'long date format' ),
+			/* translators: See https://www.php.net/manual/datetime.format.php */
 			_x( 'M j', 'short date format without the year' ),
 		] ),
 	];

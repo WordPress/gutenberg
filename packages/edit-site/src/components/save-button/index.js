@@ -98,11 +98,12 @@ export default function SaveButton( {
 			 * Displaying the keyboard shortcut conditionally makes the tooltip
 			 * itself show conditionally. This would trigger a full-rerendering
 			 * of the button that we want to avoid. By setting `showTooltip`,
-			 & the tooltip is always rendered even when there's no keyboard shortcut.
+			 * the tooltip is always rendered even when there's no keyboard shortcut.
 			 */
 			showTooltip={ showTooltip }
 			icon={ icon }
 			__next40pxDefaultSize={ __next40pxDefaultSize }
+			size="compact"
 		>
 			{ label }
 		</Button>

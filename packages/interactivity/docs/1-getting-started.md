@@ -83,7 +83,7 @@ To "activate" the Interactivity API in a DOM element (and its children) we add t
 
 
 ```html
-<div data-wp-interactive>
+<div data-wp-interactive='{ "namespace": "myPlugin" }'>
     <!-- Interactivity API zone -->
 </div>
 ```

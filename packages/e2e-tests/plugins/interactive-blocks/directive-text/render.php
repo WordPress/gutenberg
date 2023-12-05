@@ -5,8 +5,10 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+gutenberg_enqueue_module( 'directive-text-view' );
 ?>
-<div data-wp-interactive>
+
+<div data-wp-interactive='{ "namespace": "directive-context" }'>
 	<div>
 		<span
 			data-wp-text="state.text"

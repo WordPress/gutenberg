@@ -38,21 +38,6 @@
 	// See also https://www.w3.org/TR/CSS22/visudet.html#the-height-property.
 }
 
-// Ideally this wrapper div is not needed but if we want to match the positioning of blocks
-// .block-editor-block-list__layout and block-editor-block-list__block
-// We need to have two DOM elements.
-.edit-post-visual-editor__post-title-wrapper {
-	.editor-post-title {
-		// Center.
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	// Add extra margin at the top, to push down the Title area in the post editor.
-	margin-top: 4rem;
-	margin-bottom: var(--wp--style--block-gap);
-}
-
 .edit-post-visual-editor__content-area {
 	width: 100%;
 	height: 100%;

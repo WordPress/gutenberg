@@ -229,7 +229,7 @@ function FontLibraryProvider( { children } ) {
 			// Uninstall the font (remove the font files from the server and the post from the database).
 			const response = await fetchUninstallFonts( [ font ] );
 			// Deactivate the font family (remove the font family from the global styles).
-			if ( ! response.errors ) {
+			if ( 0 === response.errors.length ) {
 				deactivateFontFamily( font );
 				// Save the global styles to the database.
 				await saveSpecifiedEntityEdits(

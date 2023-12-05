@@ -132,11 +132,9 @@ _Returns_
 
 ### hasPageContentFocus
 
+> **Deprecated**
+
 Whether or not the editor allows only page content to be edited.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
 
 _Returns_
 

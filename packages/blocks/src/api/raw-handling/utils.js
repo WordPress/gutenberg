@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import deepmerge from 'deepmerge';
-
-/**
  * WordPress dependencies
  */
 import { isPhrasingContent, getPhrasingContentSchema } from '@wordpress/dom';
@@ -13,41 +8,6 @@ import { isPhrasingContent, getPhrasingContentSchema } from '@wordpress/dom';
  */
 import { hasBlockSupport } from '..';
 import { getRawTransforms } from './get-raw-transforms';
-
-const customMerge = ( key ) => {
-	return ( srcValue, objValue ) => {
-		switch ( key ) {
-			case 'children': {
-				if ( objValue === '*' || srcValue === '*' ) {
-					return '*';
-				}
-
-				return { ...objValue, ...srcValue };
-			}
-			case 'attributes':
-			case 'require': {
-				return [ ...( objValue || [] ), ...( srcValue || [] ) ];
-			}
-			case 'isMatch': {
-				// If one of the values being merge is undefined (matches everything),
-				// the result of the merge will be undefined.
-				if ( ! objValue || ! srcValue ) {
-					return undefined;
-				}
-				// When merging two isMatch functions, the result is a new function
-				// that returns if one of the source functions returns true.
-				return ( ...args ) => {
-					return objValue( ...args ) || srcValue( ...args );
-				};
-			}
-		}
-
-		return deepmerge( objValue, srcValue, {
-			customMerge,
-			clone: false,
-		} );
-	};
-};
 
 export function getBlockContentSchemaFromTransforms( transforms, context ) {
 	const phrasingContentSchema = getPhrasingContentSchema( context );
@@ -86,10 +46,56 @@ export function getBlockContentSchemaFromTransforms( transforms, context ) {
 		);
 	} );
 
-	return deepmerge.all( schemas, {
-		customMerge,
-		clone: false,
-	} );
+	function mergeTagNameSchemaProperties( objValue, srcValue, key ) {
+		switch ( key ) {
+			case 'children': {
+				if ( objValue === '*' || srcValue === '*' ) {
+					return '*';
+				}
+
+				return { ...objValue, ...srcValue };
+			}
+			case 'attributes':
+			case 'require': {
+				return [ ...( objValue || [] ), ...( srcValue || [] ) ];
+			}
+			case 'isMatch': {
+				// If one of the values being merge is undefined (matches everything),
+				// the result of the merge will be undefined.
+				if ( ! objValue || ! srcValue ) {
+					return undefined;
+				}
+				// When merging two isMatch functions, the result is a new function
+				// that returns if one of the source functions returns true.
+				return ( ...args ) => {
+					return objValue( ...args ) || srcValue( ...args );
+				};
+			}
+		}
+	}
+
+	// A tagName schema is an object with children, attributes, require, and
+	// isMatch properties.
+	function mergeTagNameSchemas( a, b ) {
+		for ( const key in b ) {
+			a[ key ] = a[ key ]
+				? mergeTagNameSchemaProperties( a[ key ], b[ key ], key )
+				: { ...b[ key ] };
+		}
+		return a;
+	}
+
+	// A schema is an object with tagName schemas by tag name.
+	function mergeSchemas( a, b ) {
+		for ( const key in b ) {
+			a[ key ] = a[ key ]
+				? mergeTagNameSchemas( a[ key ], b[ key ] )
+				: { ...b[ key ] };
+		}
+		return a;
+	}
+
+	return schemas.reduce( mergeSchemas, {} );
 }
 
 /**

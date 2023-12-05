@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "12.23.0",
+	"version": "12.24.0",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -45,7 +45,6 @@
 		"@wordpress/shortcode": "file:../shortcode",
 		"change-case": "^4.1.2",
 		"colord": "^2.7.0",
-		"deepmerge": "^4.3.0",
 		"fast-deep-equal": "^3.1.3",
 		"hpq": "^1.3.0",
 		"is-plain-object": "^5.0.0",

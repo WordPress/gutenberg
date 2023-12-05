@@ -55,7 +55,7 @@
 	} );
 
 	registerBlockType( 'test/test-dash-icon', {
-		title: 'TestDashIcon',
+		title: 'TestSimpleDashIcon',
 		icon: 'cart',
 		category: 'text',
 

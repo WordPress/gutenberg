@@ -764,7 +764,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z"
+                d="M11 12.5V17.5H12.5V12.5H17.5V11H12.5V6H11V11H6V12.5H11Z"
               />
             </svg>
             Margin
@@ -1057,7 +1057,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z"
+                d="M11 12.5V17.5H12.5V12.5H17.5V11H12.5V6H11V11H6V12.5H11Z"
               />
             </svg>
             Margin

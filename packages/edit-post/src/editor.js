@@ -9,7 +9,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { useMemo } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -36,13 +36,11 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		hiddenBlockTypes,
 		blockTypes,
 		keepCaretInsideBlock,
-		isTemplateMode,
 		template,
 	} = useSelect(
 		( select ) => {
 			const {
 				isFeatureActive,
-				isEditingTemplate,
 				getEditedPostTemplate,
 				getHiddenBlockTypes,
 			} = select( editPostStore );
@@ -81,7 +79,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
-				isTemplateMode: isEditingTemplate(),
 				template:
 					supportsTemplateMode && isViewable && canEditTemplate
 						? getEditedPostTemplate()
@@ -145,6 +142,12 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		keepCaretInsideBlock,
 	] );
 
+	// The default mode of the post editor is "post-only" mode.
+	const { setRenderingMode } = useDispatch( editorStore );
+	useEffect( () => {
+		setRenderingMode( 'post-only' );
+	}, [ setRenderingMode ] );
+
 	if ( ! post ) {
 		return null;
 	}
@@ -156,7 +159,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				post={ post }
 				initialEdits={ initialEdits }
 				useSubRegistry={ false }
-				__unstableTemplate={ isTemplateMode ? template : undefined }
+				__unstableTemplate={ template }
 				{ ...props }
 			>
 				<ErrorBoundary>

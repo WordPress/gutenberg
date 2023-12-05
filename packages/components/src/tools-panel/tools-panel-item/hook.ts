@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { usePrevious } from '@wordpress/compose';
-import { useCallback, useEffect, useMemo } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -59,7 +64,11 @@ export function useToolsPanelItem(
 
 	// Registering the panel item allows the panel to include it in its
 	// automatically generated menu and determine its initial checked status.
-	useEffect( () => {
+	//
+	// This is performed in a layout effect to ensure that the panel item
+	// is registered before it is rendered preventing a rendering glitch.
+	// See: https://github.com/WordPress/gutenberg/issues/56470
+	useLayoutEffect( () => {
 		if ( hasMatchingPanel && previousPanelId !== null ) {
 			registerPanelItem( {
 				hasValue: hasValueCallback,

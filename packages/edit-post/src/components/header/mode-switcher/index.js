@@ -44,7 +44,8 @@ function ModeSwitcher() {
 				select( editorStore ).getEditorSettings().richEditingEnabled,
 			isCodeEditingEnabled:
 				select( editorStore ).getEditorSettings().codeEditingEnabled,
-			isEditingTemplate: select( editPostStore ).isEditingTemplate(),
+			isEditingTemplate:
+				select( editorStore ).getRenderingMode() !== 'post-only',
 			mode: select( editPostStore ).getEditorMode(),
 		} ),
 		[]

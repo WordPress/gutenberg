@@ -935,7 +935,7 @@ export function receiveDefaultTemplateId( query, templateId ) {
 }
 
 /**
- * Returns an action object used in signalling that revisions have been received.
+ * Action triggered to receive revision items.
  *
  * @param {string}        kind            Kind of the received entity record revisions.
  * @param {string}        name            Name of the received entity record revisions.
@@ -944,25 +944,28 @@ export function receiveDefaultTemplateId( query, templateId ) {
  * @param {?Object}       query           Query Object.
  * @param {?boolean}      invalidateCache Should invalidate query caches.
  * @param {?Object}       meta            Meta information about pagination.
- * @return {Object} Action object.
  */
-export function receiveRevisions(
-	kind,
-	name,
-	recordKey,
-	records,
-	query,
-	invalidateCache = false,
-	meta
-) {
-	return {
-		type: 'RECEIVE_ITEM_REVISIONS',
-		items: Array.isArray( records ) ? records : [ records ],
-		recordKey,
-		meta,
-		query,
-		kind,
-		name,
-		invalidateCache,
+export const receiveRevisions =
+	( kind, name, recordKey, records, query, invalidateCache = false, meta ) =>
+	async ( { dispatch } ) => {
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
+		const key =
+			entityConfig && entityConfig?.revisionKey
+				? entityConfig.revisionKey
+				: DEFAULT_ENTITY_KEY;
+
+		dispatch( {
+			type: 'RECEIVE_ITEM_REVISIONS',
+			key,
+			items: Array.isArray( records ) ? records : [ records ],
+			recordKey,
+			meta,
+			query,
+			kind,
+			name,
+			invalidateCache,
+		} );
 	};
-}

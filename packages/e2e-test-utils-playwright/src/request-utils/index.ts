@@ -16,7 +16,7 @@ import { listMedia, uploadMedia, deleteMedia, deleteAllMedia } from './media';
 import { createUser, deleteAllUsers } from './users';
 import { setupRest, rest, getMaxBatchSize, batchRest } from './rest';
 import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
-import { deleteAllTemplates } from './templates';
+import { deleteAllTemplates, createTemplate } from './templates';
 import {
 	activateTheme,
 	getCurrentThemeGlobalStylesPostId,
@@ -172,6 +172,8 @@ class RequestUtils {
 	/** @borrows deleteAllTemplates as this.deleteAllTemplates */
 	deleteAllTemplates: typeof deleteAllTemplates =
 		deleteAllTemplates.bind( this );
+	/** @borrows createTemplate as this.createTemplate */
+	createTemplate: typeof createTemplate = createTemplate.bind( this );
 	/** @borrows resetPreferences as this.resetPreferences */
 	resetPreferences: typeof resetPreferences = resetPreferences.bind( this );
 	/** @borrows listMedia as this.listMedia */

@@ -513,14 +513,14 @@ export const setIsListViewOpened =
 /**
  * Returns an action object used to switch to template editing.
  *
- * @param {boolean} value Is editing template.
- * @return {Object} Action object.
+ * @deprecated
  */
-export function setIsEditingTemplate( value ) {
-	return {
-		type: 'SET_IS_EDITING_TEMPLATE',
-		value,
-	};
+export function setIsEditingTemplate() {
+	deprecated( "dispatch( 'core/edit-post' ).setIsEditingTemplate", {
+		since: '6.5',
+		alternative: "dispatch( 'core/editor').setRenderingMode",
+	} );
+	return { type: 'NOTHING' };
 }
 
 /**
@@ -530,8 +530,8 @@ export function setIsEditingTemplate( value ) {
  */
 export const __unstableSwitchToTemplateMode =
 	( newTemplate = false ) =>
-	( { registry, select, dispatch } ) => {
-		dispatch( setIsEditingTemplate( true ) );
+	( { registry, select } ) => {
+		registry.dispatch( editorStore ).setRenderingMode( 'all' );
 		const isWelcomeGuideActive = select.isFeatureActive(
 			'welcomeGuideTemplate'
 		);

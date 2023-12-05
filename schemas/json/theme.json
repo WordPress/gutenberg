@@ -300,6 +300,11 @@
 							"description": "Disable the layout UI controls.",
 							"type": "boolean",
 							"default": true
+						},
+						"allowCustomContentAndWideSize": {
+							"description": "Enable or disable the custom content and wide size controls.",
+							"type": "boolean",
+							"default": true
 						}
 					},
 					"additionalProperties": false
