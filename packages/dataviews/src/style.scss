@@ -130,6 +130,7 @@
 .dataviews-list-view {
 	li {
 		border-bottom: $border-width solid $gray-100;
+		margin: 0;
 		&:last-child {
 			border-bottom: 0;
 		}
@@ -137,7 +138,6 @@
 
 	.dataviews-list-view__item {
 		padding: $grid-unit-15 $grid-unit-40;
-		margin: 0;
 		&:hover,
 		&:focus {
 			background-color: $gray-100;
