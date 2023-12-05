@@ -19,10 +19,26 @@ interface DirectiveEntry {
 type DirectiveEntries = Record< string, DirectiveEntry[] >;
 
 interface DirectiveArgs {
+	/**
+	 * Object map with the defined directives of the element being evaluated.
+	 */
 	directives: DirectiveEntries;
+	/**
+	 * Props present in the current element.
+	 */
 	props: Object;
+	/**
+	 * Virtual node representing the element.
+	 */
 	element: VNode;
+	/**
+	 * The inherited context.
+	 */
 	context: Context< any >;
+	/**
+	 * Function that resolves a given path to a value either in the store or the
+	 * context.
+	 */
 	evaluate: Evaluate;
 }
 
