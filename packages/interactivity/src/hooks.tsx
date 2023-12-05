@@ -176,8 +176,8 @@ const directivePriorities: Record< string, number > = {};
  * @example
  * ```js
  * directive(
- *   'alert', // Name without the `data-wp-` prefix. ( {
- *   directives: { alert }, element, evaluate }) => {
+ *   'alert', // Name without the `data-wp-` prefix.
+ *   ( { directives: { alert }, element, evaluate } ) => {
  *     const defaultEntry = alert.find( entry => entry.suffix === 'default' );
  *     element.props.onclick = () => { alert( evaluate( defaultEntry ) ); }
  *   }
