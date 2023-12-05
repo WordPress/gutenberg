@@ -729,3 +729,30 @@ wp_store(
 );
 ```
 
+### Private stores
+
+A given store namespace can be marked as private, thus preventing its content to be accessed from other namespaces. The mechanism to do so is by adding a `lock` option to the `store()` call, like shown in the example below. This way, further executions of `store()` with the same locked namespace will throw an error, meaning that the namespace can only be accessed where its reference was returned from the first `store()` call. This is specially useful for developers that want to hide part of their plugin stores so it doesn't become accessible for extenders.
+
+```js
+const { state } = store(
+	"myPlugin/private",
+	{ state: { messages: [ "private message" ] } },
+	{ lock: true }
+);
+
+// The following call throws an Error!
+store( "myPlugin/private", { /* store part */ } );
+```
+
+There is also a way to unlock private stores: instead of passing a boolean, you can use a string as the `lock` value. Such a string can then be used in subsequent `store()` calls to the same namespace to unlock its content. Only the code knowing the string lock will be able to unlock the protected store namespaced. This is useful for complex stores defined in multiple JS modules.
+
+```js
+const { state } = store(
+	"myPlugin/private",
+	{ state: { messages: [ "private message" ] } },
+	{ lock: PRIVATE_LOCK }
+);
+
+// The following call works as expected.
+store( "myPlugin/private", { /* store part */ }, { lock: PRIVATE_LOCK } );
+```
