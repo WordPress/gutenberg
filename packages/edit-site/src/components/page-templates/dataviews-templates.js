@@ -35,6 +35,7 @@ import {
 	TEMPLATE_POST_TYPE,
 	ENUMERATION_TYPE,
 	OPERATOR_IN,
+	OPERATOR_NOT_IN,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 } from '../../utils/constants';
@@ -265,6 +266,14 @@ export default function DataviewsTemplates() {
 				) {
 					filteredTemplates = filteredTemplates.filter( ( item ) => {
 						return item.author_text === filter.value;
+					} );
+				} else if (
+					filter.field === 'author' &&
+					filter.operator === OPERATOR_NOT_IN &&
+					!! filter.value
+				) {
+					filteredTemplates = filteredTemplates.filter( ( item ) => {
+						return item.author_text !== filter.value;
 					} );
 				}
 			} );
