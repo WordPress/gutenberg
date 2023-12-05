@@ -231,19 +231,31 @@
 			border: 1px solid $gray-900;
 			padding-right: 6px;
 			padding-left: 6px;
+			background-color: $white;
+			top: -1px;
 
 			&::after {
 				content: "";
 			}
 		}
+	}
 
-		.show-icon-labels & {
-			position: relative;
-			left: auto;
-			top: auto;
+	// Show Icon Label Styles
+	.show-icon-labels & {
+
+		.block-editor-block-parent-selector {
+			position: static;
 			margin-top: -$border-width;
 			margin-left: -$border-width;
 			margin-bottom: -$border-width;
+
+			.block-editor-block-parent-selector__button {
+				position: static;
+			}
+		}
+		.block-editor-block-mover__move-button-container,
+		.block-editor-block-toolbar__block-controls .block-editor-block-mover {
+			border-left: 1px solid $gray-900;
 		}
 	}
 }
