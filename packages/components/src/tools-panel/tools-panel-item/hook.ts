@@ -52,8 +52,12 @@ export function useToolsPanelItem(
 		__experimentalLastVisibleItemClass,
 	} = useToolsPanelContext();
 
+	// hasValue is a new function on every render, so do not add it as a
+	// dependency to the useCallback hook! If needed, we should use a ref.
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const hasValueCallback = useCallback( hasValue, [ panelId ] );
+	// resetAllFilter is a new function on every render, so do not add it as a
+	// dependency to the useCallback hook! If needed, we should use a ref.
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
 	const previousPanelId = usePrevious( currentPanelId );
@@ -135,17 +139,8 @@ export function useToolsPanelItem(
 			return;
 		}
 
-		if ( isShownByDefault || currentPanelId === null ) {
-			flagItemCustomization( label, menuGroup );
-		}
-	}, [
-		currentPanelId,
-		newValueSet,
-		isShownByDefault,
-		menuGroup,
-		label,
-		flagItemCustomization,
-	] );
+		flagItemCustomization( label, menuGroup );
+	}, [ newValueSet, menuGroup, label, flagItemCustomization ] );
 
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
