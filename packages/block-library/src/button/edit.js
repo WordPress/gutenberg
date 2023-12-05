@@ -312,7 +312,6 @@ function ButtonEdit( props ) {
 					} }
 					anchor={ popoverAnchor }
 					focusOnMount={ isEditingURL ? 'firstElement' : false }
-					__unstableSlotName={ '__unstable-block-tools-after' }
 					shift
 				>
 					<LinkControl
