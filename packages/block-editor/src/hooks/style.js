@@ -361,41 +361,38 @@ export const withBlockStyleControls = createHigherOrderComponent(
 
 		const shouldDisplayControls = useDisplayBlockControls();
 		const blockEditingMode = useBlockEditingMode();
+		const { clientId, name, setAttributes, __unstableParentLayout } = props;
 
 		return (
 			<>
 				{ shouldDisplayControls && blockEditingMode === 'default' && (
 					<>
 						<ColorEdit
-							clientId={ props.clientId }
-							name={ props.name }
-							setAttributes={ props.setAttributes }
+							clientId={ clientId }
+							name={ name }
+							setAttributes={ setAttributes }
 						/>
 						<BackgroundImagePanel
-							clientId={ props.clientId }
-							name={ props.name }
-							setAttributes={ props.setAttributes }
+							clientId={ clientId }
+							name={ name }
+							setAttributes={ setAttributes }
 						/>
 						<TypographyPanel
-							clientId={ props.clientId }
-							name={ props.name }
-							setAttributes={ props.setAttributes }
-							__unstableParentLayout={
-								props.__unstableParentLayout
-							}
+							clientId={ clientId }
+							name={ name }
+							setAttributes={ setAttributes }
+							__unstableParentLayout={ __unstableParentLayout }
 						/>
 						<BorderPanel
-							clientId={ props.clientId }
-							name={ props.name }
-							setAttributes={ props.setAttributes }
+							clientId={ clientId }
+							name={ name }
+							setAttributes={ setAttributes }
 						/>
 						<DimensionsPanel
-							clientId={ props.clientId }
-							name={ props.name }
-							setAttributes={ props.setAttributes }
-							__unstableParentLayout={
-								props.__unstableParentLayout
-							}
+							clientId={ clientId }
+							name={ name }
+							setAttributes={ setAttributes }
+							__unstableParentLayout={ __unstableParentLayout }
 						/>
 					</>
 				) }
