@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Update template to use modules instead of scripts. [#56694](https://github.com/WordPress/gutenberg/pull/56694)
+
 ## 1.10.0 (2023-11-29)
 
 ### Enhancement
