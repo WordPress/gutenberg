@@ -28,6 +28,14 @@ const props = {
 			key: 'flower3',
 			name: 'poppy',
 		},
+		{
+			key: 'color1',
+			name: 'amber',
+		},
+		{
+			key: 'color2',
+			name: 'aquamarine',
+		},
 	],
 	__nextUnconstrainedWidth: true,
 };
@@ -191,10 +199,10 @@ describe.each( [
 
 			await user.tab();
 			await user.keyboard( '{enter}' );
-			await user.keyboard( '{p}' );
+			await user.keyboard( '{a}' );
 			await user.keyboard( '{enter}' );
 
-			expect( currentSelectedItem ).toHaveTextContent( 'poppy' );
+			expect( currentSelectedItem ).toHaveTextContent( 'amber' );
 		} );
 
 		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
@@ -206,10 +214,11 @@ describe.each( [
 			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
 
 			await user.tab();
-			await user.keyboard( '{c}' );
+			await user.keyboard( '{a}' );
+			await user.keyboard( '{q}' );
 			await user.keyboard( '{enter}' );
 
-			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
+			expect( currentSelectedItem ).toHaveTextContent( 'aquamarine' );
 		} );
 
 		it( 'Should have correct aria-selected value for selections', async () => {
