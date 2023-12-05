@@ -11,7 +11,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { ENTER } from '@wordpress/keycodes';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 
 export default function ViewList( {
 	view,
@@ -38,7 +38,7 @@ export default function ViewList( {
 
 	const onEnter = ( item ) => ( event ) => {
 		const { keyCode } = event;
-		if ( keyCode === ENTER ) {
+		if ( [ ENTER, SPACE ].includes( keyCode ) ) {
 			onSelectionChange( [ item ] );
 		}
 	};
