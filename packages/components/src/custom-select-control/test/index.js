@@ -5,109 +5,58 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import CustomSelectControl from '..';
 
-const options = [
-	{
-		key: 'flower1',
-		name: 'violets',
-	},
-	{
-		key: 'flower2',
-		name: 'crimson clover',
-	},
-	{
-		key: 'flower3',
-		name: 'poppy',
-	},
-];
+const props = {
+	options: [
+		{
+			key: 'flower1',
+			name: 'violets',
+		},
+		{
+			key: 'flower2',
+			name: 'crimson clover',
+		},
+		{
+			key: 'flower3',
+			name: 'poppy',
+		},
+	],
+	__nextUnconstrainedWidth: true,
+};
 
-describe( 'CustomSelectControl', () => {
-	it( 'Captures the keypress event and does not let it propagate', async () => {
-		const user = userEvent.setup();
-		const onKeyDown = jest.fn();
+const ControlledCustomSelectControl = ( { options } ) => {
+	const [ value, setValue ] = useState( options[ 0 ] );
+	return (
+		<CustomSelectControl
+			{ ...props }
+			onChange={ ( { selectedItem } ) => setValue( selectedItem ) }
+			value={ options.find( ( option ) => option.key === value.key ) }
+		/>
+	);
+};
 
-		render(
-			<div
-				// This role="none" is required to prevent an eslint warning about accessibility.
-				role="none"
-				onKeyDown={ onKeyDown }
-			>
-				<CustomSelectControl
-					options={ options }
-					__nextUnconstrainedWidth
-				/>
-			</div>
-		);
-		const toggleButton = screen.getByRole( 'button' );
-		await user.click( toggleButton );
-
-		const customSelect = screen.getByRole( 'listbox' );
-		await user.type( customSelect, '{enter}' );
-
-		expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
-	} );
-
-	it( 'does not show selected hint by default', () => {
-		render(
-			<CustomSelectControl
-				label="Custom select"
-				options={ [
-					{
-						key: 'one',
-						name: 'One',
-						__experimentalHint: 'Hint',
-					},
-				] }
-				__nextUnconstrainedWidth
-			/>
-		);
-		expect(
-			screen.getByRole( 'button', { name: 'Custom select' } )
-		).not.toHaveTextContent( 'Hint' );
-	} );
-
-	it( 'shows selected hint when __experimentalShowSelectedHint is set', () => {
-		render(
-			<CustomSelectControl
-				label="Custom select"
-				options={ [
-					{
-						key: 'one',
-						name: 'One',
-						__experimentalHint: 'Hint',
-					},
-				] }
-				__experimentalShowSelectedHint
-				__nextUnconstrainedWidth
-			/>
-		);
-		expect(
-			screen.getByRole( 'button', { name: 'Custom select' } )
-		).toHaveTextContent( 'Hint' );
-	} );
+describe.each( [
+	[ 'uncontrolled', CustomSelectControl ],
+	[ 'controlled', ControlledCustomSelectControl ],
+] )( 'CustomSelectControl %s', ( ...modeAndComponent ) => {
+	const [ , Component ] = modeAndComponent;
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
 		const user = userEvent.setup();
-		const onChangeMock = jest.fn();
 
-		render(
-			<CustomSelectControl
-				onChange={ ( { selectedItem } ) =>
-					onChangeMock( selectedItem )
-				}
-				options={ options }
-				__nextUnconstrainedWidth
-			/>
-		);
+		render( <Component { ...props } /> );
 
 		const currentSelectedItem = screen.getByRole( 'button' );
 
 		expect( currentSelectedItem ).toHaveTextContent( 'violets' );
-
-		expect( onChangeMock ).toHaveBeenCalledTimes( 0 );
 
 		await user.click( currentSelectedItem );
 
@@ -117,7 +66,6 @@ describe( 'CustomSelectControl', () => {
 			} )
 		);
 
-		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
 		expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
 
 		await user.click( currentSelectedItem );
@@ -128,37 +76,13 @@ describe( 'CustomSelectControl', () => {
 			} )
 		);
 
-		expect( onChangeMock ).toHaveBeenCalledTimes( 2 );
-
 		expect( currentSelectedItem ).toHaveTextContent( 'poppy' );
-	} );
-
-	it( 'Should be able to change selection using keyboard', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<CustomSelectControl options={ options } __nextUnconstrainedWidth />
-		);
-
-		const currentSelectedItem = screen.getByRole( 'button' );
-		expect( currentSelectedItem ).toHaveTextContent( 'violets' );
-
-		await user.tab();
-		expect( currentSelectedItem ).toHaveFocus();
-
-		await user.keyboard( '{enter}' );
-		await user.keyboard( '{arrowdown}' );
-		await user.keyboard( '{enter}' );
-
-		expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
 	} );
 
 	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
 		const user = userEvent.setup();
 
-		render(
-			<CustomSelectControl options={ options } __nextUnconstrainedWidth />
-		);
+		render( <CustomSelectControl { ...props } /> );
 
 		const currentSelectedItem = screen.getByRole( 'button' );
 		expect( currentSelectedItem ).toHaveTextContent( 'violets' );
@@ -177,85 +101,160 @@ describe( 'CustomSelectControl', () => {
 		expect( currentSelectedItem ).toHaveTextContent( 'violets' );
 	} );
 
-	it( 'Should be able to type characters to select matching options', async () => {
-		const user = userEvent.setup();
-
+	it( 'does not show selected hint by default', () => {
 		render(
-			<CustomSelectControl options={ options } __nextUnconstrainedWidth />
+			<CustomSelectControl
+				{ ...props }
+				label="Custom select"
+				options={ [
+					{
+						key: 'one',
+						name: 'One',
+						__experimentalHint: 'Hint',
+					},
+				] }
+			/>
 		);
-
-		const currentSelectedItem = screen.getByRole( 'button' );
-		expect( currentSelectedItem ).toHaveTextContent( 'violets' );
-
-		await user.tab();
-		await user.keyboard( '{enter}' );
-		await user.keyboard( '{p}' );
-		await user.keyboard( '{enter}' );
-
-		expect( currentSelectedItem ).toHaveTextContent( 'poppy' );
+		expect(
+			screen.getByRole( 'button', { name: 'Custom select' } )
+		).not.toHaveTextContent( 'Hint' );
 	} );
 
-	it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
-		const user = userEvent.setup();
-
+	it( 'shows selected hint when __experimentalShowSelectedHint is set', () => {
 		render(
-			<CustomSelectControl options={ options } __nextUnconstrainedWidth />
+			<CustomSelectControl
+				{ ...props }
+				label="Custom select"
+				options={ [
+					{
+						key: 'one',
+						name: 'One',
+						__experimentalHint: 'Hint',
+					},
+				] }
+				__experimentalShowSelectedHint
+			/>
 		);
-
-		const currentSelectedItem = screen.getByRole( 'button' );
-		expect( currentSelectedItem ).toHaveTextContent( 'violets' );
-
-		await user.tab();
-		await user.keyboard( '{c}' );
-		await user.keyboard( '{enter}' );
-
-		expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
+		expect(
+			screen.getByRole( 'button', { name: 'Custom select' } )
+		).toHaveTextContent( 'Hint' );
 	} );
 
-	it( 'Should have correct aria-selected value for selections', async () => {
-		const user = userEvent.setup();
+	describe( 'Keyboard behavior and accessibility', () => {
+		it( 'Captures the keypress event and does not let it propagate', async () => {
+			const user = userEvent.setup();
+			const onKeyDown = jest.fn();
 
-		render(
-			<CustomSelectControl options={ options } __nextUnconstrainedWidth />
-		);
+			render(
+				<div
+					// This role="none" is required to prevent an eslint warning about accessibility.
+					role="none"
+					onKeyDown={ onKeyDown }
+				>
+					<CustomSelectControl { ...props } />
+				</div>
+			);
+			const toggleButton = screen.getByRole( 'button' );
+			await user.click( toggleButton );
 
-		const currentSelectedItem = screen.getByRole( 'button' );
+			const customSelect = screen.getByRole( 'listbox' );
+			await user.type( customSelect, '{enter}' );
 
-		await user.click( currentSelectedItem );
+			expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
+		} );
 
-		expect(
-			screen.getByRole( 'option', {
-				name: 'poppy',
-				selected: false,
-			} )
-		).toBeVisible();
-		expect(
-			screen.getByRole( 'option', {
-				name: 'crimson clover',
-				selected: false,
-			} )
-		).toBeVisible();
+		it( 'Should be able to change selection using keyboard', async () => {
+			const user = userEvent.setup();
 
-		expect(
-			screen.getByRole( 'option', {
-				name: 'violets',
-				selected: true,
-			} )
-		).toBeVisible();
+			render( <CustomSelectControl { ...props } /> );
 
-		await user.click( screen.getByRole( 'option', { name: 'poppy' } ) );
-		await user.click( currentSelectedItem );
-		expect(
-			screen.getByRole( 'option', {
-				name: 'violets',
-				selected: false,
-			} )
-		).toBeVisible();
-		expect(
-			screen.getByRole( 'option', {
-				name: 'poppy',
-				selected: true,
-			} )
-		).toBeVisible();
+			const currentSelectedItem = screen.getByRole( 'button' );
+			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+
+			await user.tab();
+			expect( currentSelectedItem ).toHaveFocus();
+
+			await user.keyboard( '{enter}' );
+			await user.keyboard( '{arrowdown}' );
+			await user.keyboard( '{enter}' );
+
+			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
+		} );
+
+		it( 'Should be able to type characters to select matching options', async () => {
+			const user = userEvent.setup();
+
+			render( <CustomSelectControl { ...props } /> );
+
+			const currentSelectedItem = screen.getByRole( 'button' );
+			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+
+			await user.tab();
+			await user.keyboard( '{enter}' );
+			await user.keyboard( '{p}' );
+			await user.keyboard( '{enter}' );
+
+			expect( currentSelectedItem ).toHaveTextContent( 'poppy' );
+		} );
+
+		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
+			const user = userEvent.setup();
+
+			render( <CustomSelectControl { ...props } /> );
+
+			const currentSelectedItem = screen.getByRole( 'button' );
+			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+
+			await user.tab();
+			await user.keyboard( '{c}' );
+			await user.keyboard( '{enter}' );
+
+			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
+		} );
+
+		it( 'Should have correct aria-selected value for selections', async () => {
+			const user = userEvent.setup();
+
+			render( <CustomSelectControl { ...props } /> );
+
+			const currentSelectedItem = screen.getByRole( 'button' );
+
+			await user.click( currentSelectedItem );
+
+			expect(
+				screen.getByRole( 'option', {
+					name: 'poppy',
+					selected: false,
+				} )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'option', {
+					name: 'crimson clover',
+					selected: false,
+				} )
+			).toBeVisible();
+
+			expect(
+				screen.getByRole( 'option', {
+					name: 'violets',
+					selected: true,
+				} )
+			).toBeVisible();
+
+			await user.click( screen.getByRole( 'option', { name: 'poppy' } ) );
+			await user.click( currentSelectedItem );
+			expect(
+				screen.getByRole( 'option', {
+					name: 'violets',
+					selected: false,
+				} )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'option', {
+					name: 'poppy',
+					selected: true,
+				} )
+			).toBeVisible();
+		} );
 	} );
 } );
