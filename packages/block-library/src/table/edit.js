@@ -57,6 +57,7 @@ import {
 	toggleSection,
 	isEmptyTableSection,
 } from './state';
+import { TableDimensionsPreview } from './components/table-dimensions-preview';
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -549,6 +550,10 @@ function TableEdit( {
 					icon={ <BlockIcon icon={ icon } showColors /> }
 					instructions={ __( 'Insert a table for sharing data.' ) }
 				>
+					<TableDimensionsPreview
+						columnCount={ initialColumnCount }
+						rowCount={ initialRowCount }
+					/>
 					<form
 						className="blocks-table__placeholder-form"
 						onSubmit={ onCreateTable }
