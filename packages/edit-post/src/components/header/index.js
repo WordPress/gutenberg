@@ -153,6 +153,7 @@ function Header( {
 					className={ classnames( 'edit-post-header__center', {
 						'is-collapsed':
 							isEditingTemplate &&
+							hasBlockSelected &&
 							! isBlockToolsCollapsed &&
 							hasFixedToolbar &&
 							isLargeViewport,
