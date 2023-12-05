@@ -6,6 +6,46 @@
  */
 
 /**
+ * Helper function to trim text to a certain number of characters while preserving whole words.
+ *
+ * @param string $to_trim The text to trim.
+ * @param int    $character_count The maximum number of characters to return.
+ * @param string $more The string to append to the trimmed text.
+ */
+function trim_to_word_boundary( $to_trim, $character_count, $more = ' [&hellip;]' ) {
+	// Strip tags to mimic behavior of `wp_trim_words`.
+	$to_trim = wp_strip_all_tags( $to_trim );
+
+	if ( strlen( $to_trim ) <= $character_count ) {
+		return $to_trim;
+	}
+
+	preg_match( '/^.{0,' . $character_count . '}\s/', $to_trim, $parts );
+	return $parts[0] . $more;
+}
+
+/**
+ * Helper funtion to trim text up to the first period (.) followed by a space.
+ * If no period is found, the text is trimmed to the nearest word boundary.
+ * If multiple periods are found, the last one within $title_length is used.
+ *
+ * @param string $to_trim The text to trim.
+ * @param int    $title_length The maximum number of characters to return.
+ */
+function trim_title_from_excerpt( $to_trim, $title_length ) {
+	$to_trim = trim_to_word_boundary( $to_trim, $title_length, '' );
+
+	// Match to the first period followed by a space.
+	preg_match( '/^.{0,' . $title_length . '}\.\s/', $to_trim, $parts );
+
+	if ( empty( $parts[0] ) ) {
+		return $to_trim;
+	}
+
+	return $parts[0];
+}
+
+/**
  * Renders the `core/rss` block on server.
  *
  * @param array $attributes The block attributes.
@@ -30,10 +70,27 @@ function render_block_core_rss( $attributes ) {
 	$rss_items  = $rss->get_items( 0, $attributes['itemsToShow'] );
 	$list_items = '';
 	foreach ( $rss_items as $item ) {
+		$excerpt_decoded = html_entity_decode( $item->get_description(), ENT_QUOTES, get_option( 'blog_charset' ) );
+		$excerpt_trimmed = esc_attr( wp_trim_words( $excerpt_decoded, $attributes['excerptLength'], ' [&hellip;]' ) );
+
 		$title = esc_html( trim( strip_tags( $item->get_title() ) ) );
+		// $excerpt_trimmed and $title are now sanitized
+
 		if ( empty( $title ) ) {
-			$title = __( '(no title)' );
+			// If the title is empty, use the begining of the excerpt instead.
+			$title = trim_title_from_excerpt( $excerpt_trimmed, $attributes['titleLength'] );
+			if ( $attributes['displayExcerpt'] ) {
+				// Trim out the words that were used for the title.
+				$excerpt_trimmed = trim( substr( $excerpt_trimmed, strlen( $title ) ) );
+			} else {
+				// If the excerpt is not displayed, append an ellipsis.
+				$title = $title . ' [&hellip;]';
+			}
+		} else {
+			// If the title is too long, trim it.
+			$title = trim_to_word_boundary( $title, $attributes['titleLength'], ' [&hellip;]' );
 		}
+
 		$link = $item->get_link();
 		$link = esc_url( $link );
 		if ( $link ) {
@@ -69,9 +126,7 @@ function render_block_core_rss( $attributes ) {
 
 		$excerpt = '';
 		if ( $attributes['displayExcerpt'] ) {
-			$excerpt = html_entity_decode( $item->get_description(), ENT_QUOTES, get_option( 'blog_charset' ) );
-			$excerpt = esc_attr( wp_trim_words( $excerpt, $attributes['excerptLength'], ' [&hellip;]' ) );
-
+			$excerpt = $excerpt_trimmed;
 			// Change existing [...] to [&hellip;].
 			if ( '[...]' === substr( $excerpt, -5 ) ) {
 				$excerpt = substr( $excerpt, 0, -5 ) . '[&hellip;]';

@@ -39,6 +39,10 @@
 		"excerptLength": {
 			"type": "number",
 			"default": 55
+		},
+		"titleLength": {
+			"type": "number",
+			"default": 75
 		}
 	},
 	"supports": {
