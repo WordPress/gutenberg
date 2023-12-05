@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { external, trash, backup } from '@wordpress/icons';
+import { external, trash, backup, edit } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -225,6 +225,7 @@ export function useEditPostAction() {
 			isEligible( { status } ) {
 				return status !== 'trash';
 			},
+			icon: edit,
 			callback( post ) {
 				history.push( {
 					postId: post.id,
