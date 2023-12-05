@@ -29,16 +29,20 @@ import { useSelect } from '@wordpress/data';
 import { useResizeObserver } from '@wordpress/compose';
 import { useMemo, useState, memo } from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
+import { mergeBaseAndUserConfigs } from '../global-styles/global-styles-provider';
 
-const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	ExperimentalBlockEditorProvider,
+	useGlobalStyle,
+	useGlobalStylesOutputWithConfig,
+} = unlock( blockEditorPrivateApis );
 
 const {
 	CompositeV2: Composite,
@@ -118,6 +122,10 @@ const STYLE_BOOK_IFRAME_STYLES = `
 	}
 `;
 
+function isObjectEmpty( object ) {
+	return ! object || Object.keys( object ).length === 0;
+}
+
 function getExamples() {
 	// Use our own example for the Heading block so that we can show multiple
 	// heading levels.
@@ -175,6 +183,7 @@ function StyleBook( {
 	onSelect,
 	showCloseButton = true,
 	showTabs = true,
+	userConfig = {},
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ textColor ] = useGlobalStyle( 'color.text' );
@@ -196,14 +205,42 @@ function StyleBook( {
 		[ examples ]
 	);
 
+	const { baseConfig } = useSelect(
+		( select ) => ( {
+			baseConfig:
+				select(
+					coreStore
+				).__experimentalGetCurrentThemeBaseGlobalStyles(),
+		} ),
+		[]
+	);
+
+	const mergedConfig = useMemo( () => {
+		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
+			return mergeBaseAndUserConfigs( baseConfig, userConfig );
+		}
+		return {};
+	}, [ baseConfig, userConfig ] );
+
+
+	// Copied from packages/edit-site/src/components/revisions/index.js
+	// could we create a shared hook?
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
 	);
+
 	const settings = useMemo(
 		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
 		[ originalSettings ]
 	);
+
+	const [ globalStyles ] = useGlobalStylesOutputWithConfig( mergedConfig );
+
+	settings.styles =
+		! isObjectEmpty( globalStyles ) && ! isObjectEmpty( userConfig )
+			? globalStyles
+			: settings.styles;
 
 	return (
 		<EditorCanvasContainer

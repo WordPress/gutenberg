@@ -26,6 +26,7 @@ import SidebarFixedBottom from '../../sidebar-edit-mode/sidebar-fixed-bottom';
 import { store as editSiteStore } from '../../../store';
 import useGlobalStylesRevisions from './use-global-styles-revisions';
 import RevisionsButtons from './revisions-buttons';
+import StyleBook from '../../style-book';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
@@ -158,10 +159,14 @@ function ScreenRevisions() {
 			) }
 			{ shouldShowRevisions && (
 				<>
-					<Revisions
+					{ /*					<Revisions
 						blocks={ blocks }
 						userConfig={ currentlySelectedRevision }
 						onClose={ onCloseRevisions }
+					/>*/ }
+					<StyleBook
+						userConfig={ currentlySelectedRevision }
+						isSelected={ () => {} }
 					/>
 					<div className="edit-site-global-styles-screen-revisions">
 						<RevisionsButtons
