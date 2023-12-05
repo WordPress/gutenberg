@@ -150,7 +150,7 @@ function BackgroundImagePanelItem( props ) {
 	const { clientId, setAttributes } = props;
 	const style = useSelect(
 		( select ) =>
-			select( blockEditorStore ).getBlockAttributes( clientId ).style,
+			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
 		[ clientId ]
 	);
 	const { id, title, url } = style?.background?.backgroundImage || {};

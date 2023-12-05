@@ -71,7 +71,7 @@ export function DimensionsPanel( props ) {
 	const isEnabled = useHasDimensionsPanel( settings );
 	const value = useSelect(
 		( select ) =>
-			select( blockEditorStore ).getBlockAttributes( clientId ).style,
+			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
 		[ clientId ]
 	);
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();

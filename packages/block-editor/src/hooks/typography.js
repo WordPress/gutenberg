@@ -117,7 +117,7 @@ function TypographyPanelPure( {
 } ) {
 	function selector( select ) {
 		const { style, fontFamily, fontSize } =
-			select( blockEditorStore ).getBlockAttributes( clientId );
+			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
 		return { style, fontFamily, fontSize };
 	}
 	const { style, fontFamily, fontSize } = useSelect( selector, [ clientId ] );

@@ -143,7 +143,7 @@ function BorderPanelPure( props ) {
 	const isEnabled = useHasBorderPanel( settings );
 	function selector( select ) {
 		const { style, borderColor } =
-			select( blockEditorStore ).getBlockAttributes( clientId );
+			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
 		return { style, borderColor };
 	}
 	const { style, borderColor } = useSelect( selector, [ clientId ] );

@@ -297,7 +297,7 @@ function ColorEditPure( props ) {
 	const isEnabled = useHasColorPanel( settings );
 	function selector( select ) {
 		const { style, textColor, backgroundColor, gradient } =
-			select( blockEditorStore ).getBlockAttributes( clientId );
+			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
 		return { style, textColor, backgroundColor, gradient };
 	}
 	const { style, textColor, backgroundColor, gradient } = useSelect(
