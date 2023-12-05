@@ -43,7 +43,7 @@ function EditTemplatePartMenuItem( { attributes } ) {
 			canvas: 'edit',
 		},
 		{
-			fromTemplateId: params.postId,
+			fromTemplateId: params.postId || templatePart?.id,
 		}
 	);
 

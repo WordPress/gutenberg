@@ -103,6 +103,7 @@ export default function SaveButton( {
 			showTooltip={ showTooltip }
 			icon={ icon }
 			__next40pxDefaultSize={ __next40pxDefaultSize }
+			size="compact"
 		>
 			{ label }
 		</Button>

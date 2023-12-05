@@ -115,6 +115,26 @@ class Gutenberg_Modules {
 	}
 
 	/**
+	 * Prints the necessary script to load import map polyfill for browsers that
+	 * do not support import maps.
+	 *
+	 * TODO: Replace the polyfill with a simpler version that only provides
+	 * support for import maps and load it only when the browser doesn't support
+	 * import maps (https://github.com/guybedford/es-module-shims/issues/371).
+	 */
+	public static function print_import_map_polyfill() {
+		$import_map = self::get_import_map();
+		if ( ! empty( $import_map['imports'] ) ) {
+			wp_print_script_tag(
+				array(
+					'src'   => gutenberg_url( '/build/modules/importmap-polyfill.min.js' ),
+					'defer' => true,
+				)
+			);
+		}
+	}
+
+	/**
 	 * Gets the module's version. It either returns a timestamp (if SCRIPT_DEBUG
 	 * is true), the explicit version of the module if it is set and not false, or
 	 * an empty string if none of the above conditions are met.
@@ -193,3 +213,6 @@ add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_enqueued_modules' ) );
 
 // Prints the preloaded modules in the head tag.
 add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_module_preloads' ) );
+
+// Prints the script that loads the import map polyfill in the footer.
+add_action( 'wp_footer', array( 'Gutenberg_Modules', 'print_import_map_polyfill' ), 11 );

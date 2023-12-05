@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
+import { unlock } from './lock-unlock';
 import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
 
 const {
@@ -36,8 +36,7 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 					name: field.header,
 					elements: field.elements || [],
 					isVisible: view.filters.some(
-						( f ) =>
-							f.field === field.id && f.operator === OPERATOR_IN
+						( f ) => f.field === field.id
 					),
 				} );
 		}
@@ -95,7 +94,6 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 										],
 									} ) );
 								} }
-								role="menuitemcheckbox"
 							>
 								{ element.label }
 							</DropdownMenuItem>

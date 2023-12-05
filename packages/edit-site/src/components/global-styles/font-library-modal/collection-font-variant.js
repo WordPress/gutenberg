@@ -2,15 +2,13 @@
  * WordPress dependencies
  */
 import { CheckboxControl, Flex } from '@wordpress/components';
-/**
- * Internal dependencies
- */
-import { getFontFaceVariantName } from './utils';
 
 /**
  * Internal dependencies
  */
+import { getFontFaceVariantName } from './utils';
 import FontFaceDemo from './font-demo';
+import { kebabCase } from '../../../../../block-editor/src/utils/object';
 
 function CollectionFontVariant( {
 	face,
@@ -27,18 +25,26 @@ function CollectionFontVariant( {
 	};
 
 	const displayName = font.name + ' ' + getFontFaceVariantName( face );
+	const checkboxId = kebabCase(
+		`${ font.slug }-${ getFontFaceVariantName( face ) }`
+	);
 
 	return (
-		<div className="font-library-modal__library-font-variant">
+		<label
+			className="font-library-modal__library-font-variant"
+			htmlFor={ checkboxId }
+		>
 			<Flex justify="space-between" align="center" gap="1rem">
 				<FontFaceDemo fontFace={ face } text={ displayName } />
 				<CheckboxControl
 					checked={ selected }
 					onChange={ handleToggleActivation }
 					__nextHasNoMarginBottom={ true }
+					id={ checkboxId }
+					label={ false }
 				/>
 			</Flex>
-		</div>
+		</label>
 	);
 }
 

@@ -25,8 +25,11 @@ import cleanupTooltip from '../../tooltip/test/utils';
 const ControlledToggleGroupControl = ( {
 	value: valueProp,
 	onChange,
+	extraButtonOptions,
 	...props
-}: ToggleGroupControlProps ) => {
+}: ToggleGroupControlProps & {
+	extraButtonOptions?: { name: string; value: string }[];
+} ) => {
 	const [ value, setValue ] = useState( valueProp );
 
 	return (
@@ -40,6 +43,14 @@ const ControlledToggleGroupControl = ( {
 				value={ value }
 			/>
 			<Button onClick={ () => setValue( undefined ) }>Reset</Button>
+			{ extraButtonOptions?.map( ( obj ) => (
+				<Button
+					key={ obj.value }
+					onClick={ () => setValue( obj.value ) }
+				>
+					{ obj.name }
+				</Button>
+			) ) }
 		</>
 	);
 };
@@ -191,6 +202,48 @@ describe.each( [
 
 			expect( rigasOption ).not.toBeChecked();
 			expect( jackOption ).not.toBeChecked();
+		} );
+
+		it( 'should update correctly when triggered by external updates', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Component
+					value="rigas"
+					label="Test Toggle Group Control"
+					extraButtonOptions={ [
+						{ name: 'Rigas', value: 'rigas' },
+						{ name: 'Jack', value: 'jack' },
+					] }
+				>
+					{ options }
+				</Component>
+			);
+
+			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
+			expect(
+				screen.getByRole( 'radio', { name: 'J' } )
+			).not.toBeChecked();
+
+			await user.click( screen.getByRole( 'button', { name: 'Jack' } ) );
+			expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
+			expect(
+				screen.getByRole( 'radio', { name: 'R' } )
+			).not.toBeChecked();
+
+			await user.click( screen.getByRole( 'button', { name: 'Rigas' } ) );
+			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
+			expect(
+				screen.getByRole( 'radio', { name: 'J' } )
+			).not.toBeChecked();
+
+			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+			expect(
+				screen.getByRole( 'radio', { name: 'R' } )
+			).not.toBeChecked();
+			expect(
+				screen.getByRole( 'radio', { name: 'J' } )
+			).not.toBeChecked();
 		} );
 	}
 

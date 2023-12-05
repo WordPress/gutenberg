@@ -6,21 +6,14 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import {
-	chevronRightSmall,
-	check,
-	formatListBullets,
-	arrowUp,
-	arrowDown,
-	category,
-	columns,
-} from '@wordpress/icons';
+import { chevronRightSmall, check, arrowUp, arrowDown } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
+import { unlock } from './lock-unlock';
+import { VIEW_LAYOUTS, LAYOUT_TABLE } from './constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -30,32 +23,17 @@ const {
 	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
 } = unlock( componentsPrivateApis );
 
-const availableViews = [
-	{
-		id: 'list',
-		label: __( 'List' ),
-	},
-	{
-		id: 'grid',
-		label: __( 'Grid' ),
-	},
-	{
-		id: 'side-by-side',
-		label: __( 'Side by side' ),
-	},
-];
-
 function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
-	let _availableViews = availableViews;
+	let _availableViews = VIEW_LAYOUTS;
 	if ( supportedLayouts ) {
 		_availableViews = _availableViews.filter( ( _view ) =>
-			supportedLayouts.includes( _view.id )
+			supportedLayouts.includes( _view.type )
 		);
 	}
 	if ( _availableViews.length === 1 ) {
 		return null;
 	}
-	const activeView = _availableViews.find( ( v ) => view.type === v.id );
+	const activeView = _availableViews.find( ( v ) => view.type === v.type );
 	return (
 		<DropdownSubMenu
 			trigger={
@@ -74,19 +52,22 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 			{ _availableViews.map( ( availableView ) => {
 				return (
 					<DropdownMenuItem
-						key={ availableView.id }
+						key={ availableView.type }
+						role="menuitemradio"
+						aria-checked={ availableView.id === view.type }
 						prefix={
-							availableView.id === view.type && (
+							availableView.type === view.type && (
 								<Icon icon={ check } />
 							)
 						}
 						onSelect={ ( event ) => {
 							// We need to handle this on DropDown component probably..
 							event.preventDefault();
-							onChangeView( { ...view, type: availableView.id } );
+							onChangeView( {
+								...view,
+								type: availableView.type,
+							} );
 						} }
-						// TODO: check about role and a11y.
-						role="menuitemcheckbox"
 					>
 						{ availableView.label }
 					</DropdownMenuItem>
@@ -118,6 +99,8 @@ function PageSizeMenu( { view, onChangeView } ) {
 				return (
 					<DropdownMenuItem
 						key={ size }
+						role="menuitemradio"
+						aria-checked={ view.perPage === size }
 						prefix={
 							view.perPage === size && <Icon icon={ check } />
 						}
@@ -126,8 +109,6 @@ function PageSizeMenu( { view, onChangeView } ) {
 							event.preventDefault();
 							onChangeView( { ...view, perPage: size, page: 1 } );
 						} }
-						// TODO: check about role and a11y.
-						role="menuitemcheckbox"
 					>
 						{ size }
 					</DropdownMenuItem>
@@ -159,6 +140,7 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 				return (
 					<DropdownMenuItem
 						key={ field.id }
+						role="menuitemcheckbox"
 						prefix={
 							! view.hiddenFields?.includes( field.id ) && (
 								<Icon icon={ check } />
@@ -177,7 +159,6 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 									: [ ...view.hiddenFields, field.id ],
 							} );
 						} }
-						role="menuitemcheckbox"
 					>
 						{ field.header }
 					</DropdownMenuItem>
@@ -240,6 +221,8 @@ function SortMenu( { fields, view, onChangeView } ) {
 								return (
 									<DropdownMenuItem
 										key={ direction }
+										role="menuitemradio"
+										aria-checked={ isActive }
 										prefix={ <Icon icon={ info.icon } /> }
 										suffix={
 											isActive && <Icon icon={ check } />
@@ -276,12 +259,6 @@ function SortMenu( { fields, view, onChangeView } ) {
 	);
 }
 
-const VIEW_TYPE_ICONS = {
-	list: formatListBullets,
-	grid: category,
-	'side-by-side': columns,
-};
-
 export default function ViewActions( {
 	fields,
 	view,
@@ -295,7 +272,10 @@ export default function ViewActions( {
 					variant="tertiary"
 					size="compact"
 					icon={
-						VIEW_TYPE_ICONS[ view.type ] || VIEW_TYPE_ICONS.list
+						VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
+							?.icon ||
+						VIEW_LAYOUTS.find( ( v ) => v.type === LAYOUT_TABLE )
+							.icon
 					}
 					label={ __( 'View options' ) }
 				/>

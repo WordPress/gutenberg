@@ -169,8 +169,8 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 	let title;
 	if ( hasLoadedPost ) {
 		title = sprintf(
-			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
-			__( '%1$s ‹ %2$s ‹ Editor' ),
+			// translators: A breadcrumb trail for the Admin document title. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
+			__( '%1$s ‹ %2$s' ),
 			getTitle(),
 			POST_TYPE_LABELS[ editedPostType ] ??
 				POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ]

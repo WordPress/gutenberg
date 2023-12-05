@@ -1,5 +1,21 @@
 == Changelog ==
 
+= 17.1.4 =
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Library
+- Post Template: Fix incorrect offset query. ([56440](https://github.com/WordPress/gutenberg/pull/56440))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@t-hamano
+
+
 = 17.2.0-rc.1 =
 
 

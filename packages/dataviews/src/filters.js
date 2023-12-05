@@ -4,12 +4,27 @@
 import FilterSummary from './filter-summary';
 import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
-import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
+import { ENUMERATION_TYPE, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
+
+const operatorsFromField = ( field ) => {
+	let operators = field.filterBy?.operators;
+	if ( ! operators || ! Array.isArray( operators ) ) {
+		operators = [ OPERATOR_IN, OPERATOR_NOT_IN ];
+	}
+	return operators.filter( ( operator ) =>
+		[ OPERATOR_IN, OPERATOR_NOT_IN ].includes( operator )
+	);
+};
 
 export default function Filters( { fields, view, onChangeView } ) {
 	const filters = [];
 	fields.forEach( ( field ) => {
 		if ( ! field.type ) {
+			return;
+		}
+
+		const operators = operatorsFromField( field );
+		if ( operators.length === 0 ) {
 			return;
 		}
 
@@ -19,9 +34,13 @@ export default function Filters( { fields, view, onChangeView } ) {
 					field: field.id,
 					name: field.header,
 					elements: field.elements || [],
+					operators,
 					isVisible: view.filters.some(
 						( f ) =>
-							f.field === field.id && f.operator === OPERATOR_IN
+							f.field === field.id &&
+							[ OPERATOR_IN, OPERATOR_NOT_IN ].includes(
+								f.operator
+							)
 					),
 				} );
 		}

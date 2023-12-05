@@ -8,10 +8,6 @@ import { toggleMoreMenu } from './toggle-more-menu';
  * Enables Pre-publish checks.
  */
 export async function enablePrePublishChecks() {
-	await togglePreferencesOption(
-		'General',
-		'Include pre-publish checklist',
-		true
-	);
+	await togglePreferencesOption( 'General', 'Enable pre-publish flow', true );
 	await toggleMoreMenu( 'close' );
 }

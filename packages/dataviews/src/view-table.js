@@ -35,9 +35,9 @@ import { useMemo, Children, Fragment } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
+import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
-import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
+import { ENUMERATION_TYPE, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -70,14 +70,48 @@ function HeaderMenu( { dataView, header } ) {
 	}
 	const sortedDirection = header.column.getIsSorted();
 
-	let filter;
+	let filter, filterInView;
+	const otherFilters = [];
 	if ( header.column.columnDef.type === ENUMERATION_TYPE ) {
-		filter = {
-			field: header.column.columnDef.id,
-			elements: header.column.columnDef.elements || [],
-		};
+		let columnOperators = header.column.columnDef.filterBy?.operators;
+		if ( ! columnOperators || ! Array.isArray( columnOperators ) ) {
+			columnOperators = [ OPERATOR_IN, OPERATOR_NOT_IN ];
+		}
+		const operators = columnOperators.filter( ( operator ) =>
+			[ OPERATOR_IN, OPERATOR_NOT_IN ].includes( operator )
+		);
+		if ( operators.length >= 0 ) {
+			filter = {
+				field: header.column.columnDef.id,
+				operators,
+				elements: header.column.columnDef.elements || [],
+			};
+			filterInView = {
+				field: filter.field,
+				operator: filter.operators[ 0 ],
+				value: undefined,
+			};
+		}
 	}
 	const isFilterable = !! filter;
+
+	if ( isFilterable ) {
+		const columnFilters = dataView.getState().columnFilters;
+		columnFilters.forEach( ( columnFilter ) => {
+			const [ field, operator ] =
+				Object.keys( columnFilter )[ 0 ].split( ':' );
+			const value = Object.values( columnFilter )[ 0 ];
+			if ( field === filter.field ) {
+				filterInView = {
+					field,
+					operator,
+					value,
+				};
+			} else {
+				otherFilters.push( columnFilter );
+			}
+		} );
+	}
 
 	return (
 		<DropdownMenu
@@ -98,6 +132,10 @@ function HeaderMenu( { dataView, header } ) {
 							( [ direction, info ] ) => (
 								<DropdownMenuItem
 									key={ direction }
+									role="menuitemradio"
+									aria-checked={
+										sortedDirection === direction
+									}
 									prefix={ <Icon icon={ info.icon } /> }
 									suffix={
 										sortedDirection === direction && (
@@ -126,6 +164,8 @@ function HeaderMenu( { dataView, header } ) {
 				) }
 				{ isHidable && (
 					<DropdownMenuItem
+						role="menuitemradio"
+						aria-checked={ ! header.column.getIsVisible() }
 						prefix={ <Icon icon={ unseen } /> }
 						onSelect={ ( event ) => {
 							event.preventDefault();
@@ -150,66 +190,128 @@ function HeaderMenu( { dataView, header } ) {
 								</DropdownSubMenuTrigger>
 							}
 						>
-							{ filter.elements.map( ( element ) => {
-								let isActive = false;
-								const columnFilters =
-									dataView.getState().columnFilters;
-								const columnFilter = columnFilters.find(
-									( f ) =>
-										Object.keys( f )[ 0 ].split(
-											':'
-										)[ 0 ] === filter.field
-								);
-
-								if ( columnFilter ) {
-									const value =
-										Object.values( columnFilter )[ 0 ];
-									// Intentionally use loose comparison, so it does type conversion.
-									// This covers the case where a top-level filter for the same field converts a number into a string.
-									isActive = element.value == value; // eslint-disable-line eqeqeq
-								}
-
-								return (
-									<DropdownMenuItem
-										key={ element.value }
-										suffix={
-											isActive && <Icon icon={ check } />
+							<WithSeparators>
+								<DropdownMenuGroup>
+									{ filter.elements.map( ( element ) => {
+										let isActive = false;
+										if ( filterInView ) {
+											// Intentionally use loose comparison, so it does type conversion.
+											// This covers the case where a top-level filter for the same field converts a number into a string.
+											/* eslint-disable eqeqeq */
+											isActive =
+												element.value ==
+												filterInView.value;
+											/* eslint-enable eqeqeq */
 										}
-										onSelect={ () => {
-											const otherFilters =
-												columnFilters?.filter(
-													( f ) => {
-														const [
-															field,
-															operator,
-														] =
-															Object.keys(
-																f
-															)[ 0 ].split( ':' );
-														return (
-															field !==
-																filter.field ||
-															operator !==
-																OPERATOR_IN
-														);
-													}
-												);
 
-											dataView.setColumnFilters( [
-												...otherFilters,
-												{
-													[ filter.field + ':in' ]:
-														isActive
-															? undefined
-															: element.value,
-												},
-											] );
-										} }
+										return (
+											<DropdownMenuItem
+												key={ element.value }
+												role="menuitemradio"
+												aria-checked={ isActive }
+												prefix={
+													isActive && (
+														<Icon icon={ check } />
+													)
+												}
+												onSelect={ () => {
+													dataView.setColumnFilters( [
+														...otherFilters,
+														{
+															[ filter.field +
+															':' +
+															filterInView?.operator ]:
+																isActive
+																	? undefined
+																	: element.value,
+														},
+													] );
+												} }
+											>
+												{ element.label }
+											</DropdownMenuItem>
+										);
+									} ) }
+								</DropdownMenuGroup>
+								{ filter.operators.length > 1 && (
+									<DropdownSubMenu
+										trigger={
+											<DropdownSubMenuTrigger
+												suffix={
+													<>
+														{ filterInView.operator ===
+														OPERATOR_IN
+															? __( 'Is' )
+															: __( 'Is not' ) }
+														<Icon
+															icon={
+																chevronRightSmall
+															}
+														/>{ ' ' }
+													</>
+												}
+											>
+												{ __( 'Conditions' ) }
+											</DropdownSubMenuTrigger>
+										}
 									>
-										{ element.label }
-									</DropdownMenuItem>
-								);
-							} ) }
+										<DropdownMenuItem
+											key="in-filter"
+											role="menuitemradio"
+											aria-checked={
+												filterInView?.operator ===
+												OPERATOR_IN
+											}
+											prefix={
+												filterInView?.operator ===
+													OPERATOR_IN && (
+													<Icon icon={ check } />
+												)
+											}
+											onSelect={ () =>
+												dataView.setColumnFilters( [
+													...otherFilters,
+													{
+														[ filter.field +
+														':' +
+														OPERATOR_IN ]:
+															filterInView?.value,
+													},
+												] )
+											}
+										>
+											{ __( 'Is' ) }
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											key="not-in-filter"
+											role="menuitemradio"
+											aria-checked={
+												filterInView?.operator ===
+												OPERATOR_NOT_IN
+											}
+											prefix={
+												filterInView?.operator ===
+													OPERATOR_NOT_IN && (
+													<Icon icon={ check } />
+												)
+											}
+											onSelect={ () =>
+												dataView.setColumnFilters( [
+													...otherFilters,
+													{
+														[ filter.field +
+														':' +
+														OPERATOR_NOT_IN ]:
+															filterInView?.value,
+													},
+												] )
+											}
+										>
+											{ __( 'Is not' ) }
+										</DropdownMenuItem>
+									</DropdownSubMenu>
+								) }
+							</WithSeparators>
 						</DropdownSubMenu>
 					</DropdownMenuGroup>
 				) }
@@ -229,7 +331,7 @@ function WithSeparators( { children } ) {
 		) );
 }
 
-function ViewList( {
+function ViewTable( {
 	view,
 	onChangeView,
 	fields,
@@ -443,9 +545,9 @@ function ViewList( {
 		return <h3>{ __( 'Loading' ) }</h3>;
 	}
 	return (
-		<div className="dataviews-list-view-wrapper">
+		<div className="dataviews-table-view-wrapper">
 			{ hasRows && (
-				<table className="dataviews-list-view">
+				<table className="dataviews-table-view">
 					<thead>
 						{ dataView.getHeaderGroups().map( ( headerGroup ) => (
 							<tr key={ headerGroup.id }>
@@ -509,4 +611,4 @@ function ViewList( {
 	);
 }
 
-export default ViewList;
+export default ViewTable;

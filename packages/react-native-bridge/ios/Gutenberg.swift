@@ -210,6 +210,11 @@ public class Gutenberg: UIResponder {
         bridgeModule.sendEventIfNeeded(.onRedoPressed, body: nil)
     }
 
+    public func connectionStatusChange(isConnected: Bool) {
+        var data: [String: Any] = ["isConnected": isConnected]
+        bridgeModule.sendEventIfNeeded(.connectionStatusChange, body: data)
+    }
+
     private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {
         var settingsUpdates = [String : Any]()
         settingsUpdates["isFSETheme"] = editorSettings?.isFSETheme ?? false

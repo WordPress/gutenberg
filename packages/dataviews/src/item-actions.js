@@ -14,7 +14,7 @@ import { moreVertical } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
+import { unlock } from './lock-unlock';
 
 const {
 	DropdownMenuV2Ariakit: DropdownMenu,
