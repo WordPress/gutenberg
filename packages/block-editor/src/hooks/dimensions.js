@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useState, useEffect, useCallback } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 
@@ -66,16 +66,14 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 }
 
 export function DimensionsPanel( props ) {
-	const {
-		clientId,
-		name,
-		attributes,
-		setAttributes,
-		__unstableParentLayout,
-	} = props;
+	const { clientId, name, setAttributes, __unstableParentLayout } = props;
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const isEnabled = useHasDimensionsPanel( settings );
-	const value = attributes.style;
+	const value = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockAttributes( clientId ).style,
+		[ clientId ]
+	);
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const onChange = ( newStyle ) => {
 		setAttributes( {

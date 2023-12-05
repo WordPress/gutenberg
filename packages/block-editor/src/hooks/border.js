@@ -8,9 +8,10 @@ import classnames from 'classnames';
  */
 import { getBlockSupport } from '@wordpress/blocks';
 import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, pure } from '@wordpress/compose';
 import { Platform, useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -27,6 +28,7 @@ import {
 	useHasBorderPanel,
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
+import { store as blockEditorStore } from '../store';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 
@@ -135,16 +137,22 @@ function BordersInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function BorderPanel( props ) {
-	const { clientId, name, attributes, setAttributes } = props;
+function BorderPanelPure( props ) {
+	const { clientId, name, setAttributes } = props;
 	const settings = useBlockSettings( name );
 	const isEnabled = useHasBorderPanel( settings );
+	function selector( select ) {
+		const { style, borderColor } =
+			select( blockEditorStore ).getBlockAttributes( clientId );
+		return { style, borderColor };
+	}
+	const { style, borderColor } = useSelect( selector, [ clientId ] );
 	const value = useMemo( () => {
 		return attributesToStyle( {
-			style: attributes.style,
-			borderColor: attributes.borderColor,
+			style,
+			borderColor,
 		} );
-	}, [ attributes.style, attributes.borderColor ] );
+	}, [ style, borderColor ] );
 
 	const onChange = ( newStyle ) => {
 		setAttributes( styleToAttributes( newStyle ) );
@@ -170,6 +178,8 @@ export function BorderPanel( props ) {
 		/>
 	);
 }
+
+export const BorderPanel = pure( BorderPanelPure );
 
 /**
  * Determine whether there is block support for border properties.

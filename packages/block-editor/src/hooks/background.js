@@ -24,6 +24,7 @@ import { Platform, useCallback, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
+import { pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -146,10 +147,13 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 }
 
 function BackgroundImagePanelItem( props ) {
-	const { attributes, clientId, setAttributes } = props;
-
-	const { id, title, url } =
-		attributes.style?.background?.backgroundImage || {};
+	const { clientId, setAttributes } = props;
+	const style = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockAttributes( clientId ).style,
+		[ clientId ]
+	);
+	const { id, title, url } = style?.background?.backgroundImage || {};
 
 	const replaceContainerRef = useRef();
 
@@ -167,9 +171,9 @@ function BackgroundImagePanelItem( props ) {
 	const onSelectMedia = ( media ) => {
 		if ( ! media || ! media.url ) {
 			const newStyle = {
-				...attributes.style,
+				...style,
 				background: {
-					...attributes.style?.background,
+					...style?.background,
 					backgroundImage: undefined,
 				},
 			};
@@ -201,9 +205,9 @@ function BackgroundImagePanelItem( props ) {
 		}
 
 		const newStyle = {
-			...attributes.style,
+			...style,
 			background: {
-				...attributes.style?.background,
+				...style?.background,
 				backgroundImage: {
 					url: media.url,
 					id: media.id,
@@ -302,7 +306,7 @@ function BackgroundImagePanelItem( props ) {
 	);
 }
 
-export function BackgroundImagePanel( props ) {
+function BackgroundImagePanelPure( props ) {
 	const [ backgroundImage ] = useSettings( 'background.backgroundImage' );
 	if (
 		! backgroundImage ||
@@ -317,3 +321,5 @@ export function BackgroundImagePanel( props ) {
 		</InspectorControls>
 	);
 }
+
+export const BackgroundImagePanel = pure( BackgroundImagePanelPure );
