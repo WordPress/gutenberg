@@ -522,6 +522,18 @@ And then, we use the string value `"state.isPlaying"` to assign the result of th
 
 These values assigned to directives are **references** to a particular property in the store. They are wired to the directives automatically so that each directive “knows” what store element refers to, without any additional configuration.
 
+Note that, by default, references point to properties in the current namespace, which is the one specified by the closest ancestor with a `data-wp-interactive` attribute. If you need to access a property from a different namespace, you can explicitly set the namespace where the property we want to access is defined. The syntax is `namespace::reference`, replacing `namespace` with the appropriate value.
+
+In the example below, we get `state.isPlaying` from `otherPlugin` instead of `myPlugin`:
+
+```html
+<div data-wp-interactive='{ "namespace": "myPlugin" }'>
+	<div data-bind--hidden="otherPlugin::!state.isPlaying" ... >
+		<iframe ...></iframe>
+	</div>
+</div>
+```
+
 ## The store
 
 The store is used to create the logic (actions, side effects…) linked to the directives and the data used inside that logic (state, derived state…).
