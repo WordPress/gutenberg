@@ -256,6 +256,18 @@ _Returns_
 
 -   `string`: Post type.
 
+### getCurrentTemplateId
+
+Returns the template ID currently being rendered/edited
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string?`: Template ID.
+
 ### getEditedPostAttribute
 
 Returns a single attribute of the post being edited, preferring the unsaved edit if one exists, but falling back to the attribute for the last known saved state of the post.

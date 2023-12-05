@@ -138,6 +138,7 @@ export function useSpecificEditorSettings() {
 		return {
 			...settings,
 
+			supportsTemplateMode: true,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
 			isDistractionFree,
