@@ -26,7 +26,7 @@ import BlockVariationTransformations from './block-variation-transformations';
  * @param {Object[]} possibleBlockTransformations The available block transformations.
  * @return {Record<string, Object[]>} The grouped block transformations.
  */
-function useGroupedTransforms( possibleBlockTransformations ) {
+export function useGroupedTransforms( possibleBlockTransformations ) {
 	const priorityContentTranformationBlocks = {
 		'core/paragraph': 1,
 		'core/heading': 2,

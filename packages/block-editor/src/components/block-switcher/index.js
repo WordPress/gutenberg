@@ -23,7 +23,10 @@ import { copy } from '@wordpress/icons';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
-import BlockTransformationsMenu from './block-transformations-menu';
+import {
+	useGroupedTransforms,
+	default as BlockTransformationsMenu,
+} from './block-transformations-menu';
 import { useBlockVariationTransforms } from './block-variation-transformations';
 import BlockStylesMenu from './block-styles-menu';
 import PatternTransformationsMenu from './pattern-transformations-menu';
@@ -288,5 +291,71 @@ export const BlockSwitcher = ( { clientIds } ) => {
 		<BlockSwitcherDropdownMenu clientIds={ clientIds } blocks={ blocks } />
 	);
 };
+
+export function BlockPriorityTransforms( { clientIds } ) {
+	const { replaceBlocks, multiSelect } = useDispatch( blockEditorStore );
+	const { possibleBlockTransformations, blocks } = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				getBlockTransformItems,
+				getBlocksByClientId,
+			} = select( blockEditorStore );
+			const rootClientId = getBlockRootClientId(
+				Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
+			);
+			const _blocks = getBlocksByClientId( clientIds );
+			return {
+				possibleBlockTransformations: getBlockTransformItems(
+					_blocks,
+					rootClientId
+				),
+				blocks: _blocks,
+			};
+		},
+		[ clientIds ]
+	);
+	const { priorityTextTransformations } = useGroupedTransforms(
+		possibleBlockTransformations
+	);
+	function selectForMultipleBlocks( insertedBlocks ) {
+		if ( insertedBlocks.length > 1 ) {
+			multiSelect(
+				insertedBlocks[ 0 ].clientId,
+				insertedBlocks[ insertedBlocks.length - 1 ].clientId
+			);
+		}
+	}
+	function onBlockTransform( name ) {
+		const newBlocks = switchToBlockType( blocks, name );
+		replaceBlocks( clientIds, newBlocks );
+		selectForMultipleBlocks( newBlocks );
+	}
+
+	if ( ! priorityTextTransformations.length ) {
+		return null;
+	}
+
+	// Only show the priority transforms if all blocks are of the same type.
+	if ( new Set( blocks.map( ( { name } ) => name ) ).size !== 1 ) {
+		return;
+	}
+
+	return (
+		<ToolbarGroup>
+			{ priorityTextTransformations.map( ( item ) => (
+				<ToolbarButton
+					key={ item.name }
+					title={ item.title }
+					icon={ <BlockIcon icon={ item.icon } showColors /> }
+					onClick={ ( event ) => {
+						event.preventDefault();
+						onBlockTransform( item.name );
+					} }
+				/>
+			) ) }
+		</ToolbarGroup>
+	);
+}
 
 export default BlockSwitcher;

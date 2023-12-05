@@ -12,7 +12,6 @@ const transforms = {
 	from: [
 		{
 			type: 'block',
-			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
 				attributes.map( ( { content, anchor, align: textAlign } ) =>
