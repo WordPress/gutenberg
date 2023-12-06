@@ -8,6 +8,8 @@ SearchControl components let users display a search control.
 1. [Development guidelines](#development-guidelines)
 2. [Related components](#related-components)
 
+Check out also the [Storybook page for this component](https://wordpress.github.io/gutenberg/?path=/docs/components-searchcontrol--docs) a visual exploration
+
 ## Development guidelines
 
 ### Usage
