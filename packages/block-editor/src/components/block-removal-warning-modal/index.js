@@ -70,7 +70,7 @@ export function BlockRemovalWarningModal( { rules } ) {
 					<p>
 						{ ' ' }
 						{ __(
-							"Only proceed to remove these blocks if you're absolutely sure of what you're doing."
+							"Be careful! Post or page content will not be displayed if you delete these blocks.."
 						) }
 					</p>
 				</>
