@@ -129,15 +129,21 @@ describe( 'getRevisionChanges', () => {
 	const blockNames = {
 		'core/paragraph': 'Paragraph',
 	};
-	it( 'returns a comma-separated list of changes and caches them', () => {
+	it( 'returns a list of changes and caches them', () => {
 		const resultA = getRevisionChanges(
 			revision,
 			previousRevision,
 			blockNames
 		);
-		expect( resultA ).toEqual(
-			'Paragraph block, background colors, font size, font family, caption element, link element, color settings'
-		);
+		expect( resultA ).toEqual( [
+			'Paragraph block',
+			'background colors',
+			'font size',
+			'font family',
+			'caption element',
+			'link element',
+			'color settings',
+		] );
 
 		const resultB = getRevisionChanges(
 			revision,
@@ -145,17 +151,7 @@ describe( 'getRevisionChanges', () => {
 			blockNames
 		);
 
-		expect( resultA ).toBe( resultB );
-	} );
-
-	it( 'returns a comma-separated list of changes with max results', () => {
-		const result = getRevisionChanges(
-			revision,
-			previousRevision,
-			blockNames,
-			2
-		);
-		expect( result ).toEqual( 'Paragraph block, background colors' );
+		expect( resultA ).toStrictEqual( resultB );
 	} );
 
 	it( 'skips unknown keys', () => {
@@ -191,6 +187,6 @@ describe( 'getRevisionChanges', () => {
 				},
 			}
 		);
-		expect( result ).toEqual( '' );
+		expect( result ).toEqual( [] );
 	} );
 } );

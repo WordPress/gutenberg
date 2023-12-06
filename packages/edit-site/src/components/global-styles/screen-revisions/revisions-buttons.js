@@ -20,6 +20,7 @@ import { getBlockTypes } from '@wordpress/blocks';
 import getRevisionChanges from './get-revision-changes';
 
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
+const MAX_CHANGES = 7;
 
 function ChangedSummary( { revision, previousRevision } ) {
 	const blockNames = useMemo( () => {
@@ -29,19 +30,26 @@ function ChangedSummary( { revision, previousRevision } ) {
 			return accumulator;
 		}, {} );
 	}, [] );
-	const summary = getRevisionChanges(
+	const changes = getRevisionChanges(
 		revision,
 		previousRevision,
 		blockNames
 	);
 
-	if ( ! summary ) {
+	const changesLength = changes.length;
+
+	if ( ! changesLength ) {
 		return null;
+	}
+
+	// Truncate to `n` results.
+	if ( changesLength > MAX_CHANGES ) {
+		changes.splice( MAX_CHANGES, changesLength - MAX_CHANGES, __( '…' ) );
 	}
 
 	return (
 		<span className="edit-site-global-styles-screen-revision__changes">
-			{ summary }
+			{ changes.join( ', ' ) }
 		</span>
 	);
 }

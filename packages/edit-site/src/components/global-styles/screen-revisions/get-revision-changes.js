@@ -104,40 +104,23 @@ function deepCompare( changedObject, originalObject, parentPath = '' ) {
 }
 
 /**
- * Get a concatenated summary of translated global styles changes.
+ * Get an array of translated summarized global styles changes.
  * Results are cached using a WeakMap key of `{ revision, previousRevision }`.
  *
  * @param {Object}                revision         The changed object to compare.
  * @param {Object}                previousRevision The original object to compare against.
  * @param {Record<string,string>} blockNames       A key/value pair object of block names and their rendered titles.
- * @param {number?}               maxResults       The maximum number of changed items to feature in the returned summary.
- * @return {string}                                A comma-separated list of changes.
+ * @return {string[]}                              An array of translated changes.
  */
 export default function getRevisionChanges(
 	revision,
 	previousRevision,
-	blockNames,
-	maxResults
+	blockNames
 ) {
 	const cacheKey = { revision, previousRevision };
 
 	if ( globalStylesChangesCache.has( cacheKey ) ) {
-		const cachedResult = globalStylesChangesCache.get( cacheKey );
-		if ( ! maxResults ) {
-			return cachedResult;
-		}
-
-		// We may need to update the cache if a new maxResults is passed.
-		const cachedResultArray = cachedResult.split( ', ' );
-		const cachedResultArrayLength = cachedResultArray.length;
-		if ( maxResults === cachedResultArrayLength ) {
-			return cachedResult;
-		}
-
-		// If the cached result has more results than the max results, return a spliced cached result.
-		if ( maxResults < cachedResultArrayLength ) {
-			return cachedResultArray.slice( 0, maxResults ).join( ', ' );
-		}
+		return globalStylesChangesCache.get( cacheKey );
 	}
 
 	// Compare the two revisions with normalized keys.
@@ -172,8 +155,7 @@ export default function getRevisionChanges(
 			return acc;
 		}, [] );
 
-	const changes = maxResults ? result.slice( 0, maxResults ) : result;
-	const joined = changes.join( ', ' );
-	globalStylesChangesCache.set( cacheKey, joined );
-	return joined;
+	globalStylesChangesCache.set( cacheKey, result );
+
+	return result;
 }
