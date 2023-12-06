@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	getBlockType,
@@ -36,6 +36,49 @@ import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
 
+function selector( select ) {
+	const {
+		getBlockName,
+		getBlockMode,
+		getBlockParents,
+		getSelectedBlockClientIds,
+		isBlockValid,
+		getBlockRootClientId,
+		getBlockEditingMode,
+	} = select( blockEditorStore );
+	const selectedBlockClientIds = getSelectedBlockClientIds();
+	const selectedBlockClientId = selectedBlockClientIds[ 0 ];
+	const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
+	const parents = getBlockParents( selectedBlockClientId );
+	const firstParentClientId = parents[ parents.length - 1 ];
+	const parentBlockName = getBlockName( firstParentClientId );
+	const parentBlockType = getBlockType( parentBlockName );
+	return {
+		blockClientId: selectedBlockClientId,
+		blockClientIds: selectedBlockClientIds,
+		blockEditingMode: getBlockEditingMode( selectedBlockClientId ),
+		blockType:
+			selectedBlockClientId &&
+			getBlockType( getBlockName( selectedBlockClientId ) ),
+
+		hasParents: parents.length,
+		isValid: selectedBlockClientIds.every( ( id ) => isBlockValid( id ) ),
+		isVisual: selectedBlockClientIds.every(
+			( id ) => getBlockMode( id ) === 'visual'
+		),
+		rootClientId: blockRootClientId,
+		showParentSelector:
+			parentBlockType &&
+			getBlockEditingMode( firstParentClientId ) === 'default' &&
+			hasBlockSupport(
+				parentBlockType,
+				'__experimentalParentSelector',
+				true
+			) &&
+			selectedBlockClientIds.length <= 1 &&
+			getBlockEditingMode( selectedBlockClientId ) === 'default',
+	};
+}
 /**
  * Renders the block toolbar.
  *
@@ -47,6 +90,7 @@ import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls
  */
 export default function BlockToolbar( {
 	hideDragHandle,
+	isTyping,
 	variant = 'unstyled',
 } ) {
 	const {
@@ -58,51 +102,10 @@ export default function BlockToolbar( {
 		isValid,
 		isVisual,
 		showParentSelector,
-	} = useSelect( ( select ) => {
-		const {
-			getBlockName,
-			getBlockMode,
-			getBlockParents,
-			getSelectedBlockClientIds,
-			isBlockValid,
-			getBlockRootClientId,
-			getBlockEditingMode,
-		} = select( blockEditorStore );
-		const selectedBlockClientIds = getSelectedBlockClientIds();
-		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
-		const parents = getBlockParents( selectedBlockClientId );
-		const firstParentClientId = parents[ parents.length - 1 ];
-		const parentBlockName = getBlockName( firstParentClientId );
-		const parentBlockType = getBlockType( parentBlockName );
-		return {
-			blockClientId: selectedBlockClientId,
-			blockClientIds: selectedBlockClientIds,
-			blockEditingMode: getBlockEditingMode( selectedBlockClientId ),
-			blockType:
-				selectedBlockClientId &&
-				getBlockType( getBlockName( selectedBlockClientId ) ),
-
-			hasParents: parents.length,
-			isValid: selectedBlockClientIds.every( ( id ) =>
-				isBlockValid( id )
-			),
-			isVisual: selectedBlockClientIds.every(
-				( id ) => getBlockMode( id ) === 'visual'
-			),
-			rootClientId: blockRootClientId,
-			showParentSelector:
-				parentBlockType &&
-				getBlockEditingMode( firstParentClientId ) === 'default' &&
-				hasBlockSupport(
-					parentBlockType,
-					'__experimentalParentSelector',
-					true
-				) &&
-				selectedBlockClientIds.length <= 1 &&
-				getBlockEditingMode( selectedBlockClientId ) === 'default',
-		};
-	}, [] );
+	} = useSelect(
+		useCallback( ( select ) => selector( select ), [ isTyping ] ),
+		[]
+	);
 
 	const toolbarWrapperRef = useRef( null );
 
@@ -152,6 +155,7 @@ export default function BlockToolbar( {
 			// Resets the index whenever the active block changes so
 			// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
 			key={ blockClientId }
+			__experimentalInitialIndex={ 0 }
 		>
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
 				{ ! isMultiToolbar &&

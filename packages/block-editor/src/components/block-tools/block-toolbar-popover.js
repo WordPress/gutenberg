@@ -6,12 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../store';
 import BlockToolbar from '../block-toolbar';
 import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
@@ -19,13 +18,9 @@ import useSelectedBlockToolProps from './use-selected-block-tool-props';
 
 export default function BlockToolbarPopover( {
 	clientId,
+	isTyping,
 	__unstableContentRef,
 } ) {
-	const isTyping = useSelect(
-		( select ) => select( blockEditorStore ).isTyping(),
-		[]
-	);
-
 	const { capturingClientId, isInsertionPointVisible, lastClientId } =
 		useSelectedBlockToolProps( clientId );
 
@@ -34,18 +29,44 @@ export default function BlockToolbarPopover( {
 		clientId,
 	} );
 
+	const hasStoppedTyping = useRef( false );
+
+	useEffect( () => {
+		if ( hasStoppedTyping.current ) {
+			return;
+		}
+
+		if ( ! hasStoppedTyping.current && ! isTyping ) {
+			hasStoppedTyping.current = true;
+		}
+	}, [ isTyping ] );
+
+	if ( ! isTyping || hasStoppedTyping.current ) {
+		console.log( 'will mount' );
+	}
+
+	// ff the clientID changes, unmount the popover
+	// useEffect( () => {
+	// 	hasStoppedTyping.current = false;
+	// }, [ clientId ] );
+
 	return (
-		<BlockPopover
-			clientId={ capturingClientId || clientId }
-			bottomClientId={ lastClientId }
-			className={ classnames( 'block-editor-block-list__block-popover', {
-				'is-insertion-point-visible': isInsertionPointVisible,
-				'is-hidden': isTyping, // Leave the toolbar in the DOM so it can be focused at the same roving tabindex it was previously at
-			} ) }
-			resize={ false }
-			{ ...popoverProps }
-		>
-			<BlockToolbar variant="highContrast" />
-		</BlockPopover>
+		( ! isTyping || hasStoppedTyping.current ) && (
+			<BlockPopover
+				clientId={ capturingClientId || clientId }
+				bottomClientId={ lastClientId }
+				className={ classnames(
+					'block-editor-block-list__block-popover',
+					{
+						'is-insertion-point-visible': isInsertionPointVisible,
+						'is-hidden': isTyping, // Leave the toolbar in the DOM so it can be focused at the same roving tabindex it was previously at
+					}
+				) }
+				resize={ false }
+				{ ...popoverProps }
+			>
+				<BlockToolbar isTyping={ isTyping } variant="highContrast" />
+			</BlockPopover>
+		)
 	);
 }

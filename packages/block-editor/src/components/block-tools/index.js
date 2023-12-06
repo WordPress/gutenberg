@@ -194,6 +194,7 @@ export default function BlockTools( {
 						<BlockToolbarPopover
 							__unstableContentRef={ __unstableContentRef }
 							clientId={ clientId }
+							isTyping={ isTyping }
 						/>
 					) }
 

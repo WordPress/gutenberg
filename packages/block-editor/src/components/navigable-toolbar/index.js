@@ -20,6 +20,14 @@ import { ESCAPE } from '@wordpress/keycodes';
  */
 import { store as blockEditorStore } from '../../store';
 
+function getAllToolbarItemsIn( container ) {
+	return Array.from( container.querySelectorAll( '[data-toolbar-item]' ) );
+}
+
+function hasFocusWithin( container ) {
+	return container.contains( container.ownerDocument.activeElement );
+}
+
 function hasOnlyToolbarItem( elements ) {
 	const dataProp = 'toolbarItem';
 	return ! elements.some( ( element ) => ! ( dataProp in element.dataset ) );
@@ -94,16 +102,39 @@ function useIsAccessibleToolbar( toolbarRef ) {
 function useToolbarFocus( {
 	toolbarRef,
 	focusOnMount,
+	defaultIndex,
 	isAccessibleToolbar,
 	shouldUseKeyboardFocusShortcut,
 	focusEditorOnEscape,
 } ) {
 	// focusOnMount deprecated in 6.5.0
 	const [ initialFocusOnMount ] = useState( focusOnMount );
+	const [ initialIndex ] = useState( defaultIndex );
 	const { stopTyping } = useDispatch( blockEditorStore );
 
 	const focusToolbar = useCallback( () => {
 		focusFirstTabbableIn( toolbarRef.current );
+	}, [ toolbarRef ] );
+
+	useEffect( () => {
+		// Store ref so we have access on useEffect cleanup: https://legacy.reactjs.org/blog/2020/08/10/react-v17-rc.html#effect-cleanup-timing
+		const navigableToolbarRef = toolbarRef.current;
+		// If initialIndex is passed, we focus on that toolbar item when the
+		// toolbar gets mounted and initial focus is not forced.
+		// We have to wait for the next browser paint because block controls aren't
+		// rendered right away when the toolbar gets mounted.
+		window.requestAnimationFrame( () => {
+			const items = getAllToolbarItemsIn( navigableToolbarRef );
+			const index = 0;
+			if ( items[ index ] && hasFocusWithin( navigableToolbarRef ) ) {
+				items[ index ].focus( {
+					// When focusing newly mounted toolbars,
+					// the position of the popover is often not right on the first render
+					// This prevents the layout shifts when focusing the dialogs.
+					preventScroll: true,
+				} );
+			}
+		} );
 	}, [ toolbarRef ] );
 
 	const focusToolbarViaShortcut = () => {
@@ -119,6 +150,7 @@ function useToolbarFocus( {
 	// Force toolbar focus on mount deprecated in 6.5.0
 	useEffect( () => {
 		if ( initialFocusOnMount ) {
+			console.log( 'focusing toolbar' );
 			focusToolbar();
 		}
 	}, [ isAccessibleToolbar, initialFocusOnMount, focusToolbar ] );
@@ -159,6 +191,7 @@ export default function NavigableToolbar( {
 	focusOnMount,
 	focusEditorOnEscape = false,
 	shouldUseKeyboardFocusShortcut = true,
+	__experimentalInitialIndex: initialIndex,
 	...props
 } ) {
 	const toolbarRef = useRef();
@@ -174,6 +207,7 @@ export default function NavigableToolbar( {
 	useToolbarFocus( {
 		toolbarRef,
 		focusOnMount,
+		defaultIndex: initialIndex,
 		isAccessibleToolbar,
 		shouldUseKeyboardFocusShortcut,
 		focusEditorOnEscape,
