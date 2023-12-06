@@ -26,7 +26,7 @@ export default function ResetDefaultTemplate( { onClick } ) {
 	}
 	return (
 		<MenuItem
-			onClick={ async () => {
+			onClick={ () => {
 				editEntityRecord(
 					'postType',
 					postType,
