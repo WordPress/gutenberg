@@ -16,8 +16,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 import {
-	chevronDown,
-	chevronUp,
 	unseen,
 	check,
 	arrowUp,
@@ -53,7 +51,7 @@ const sortingItemsInfo = {
 	asc: { icon: arrowUp, label: __( 'Sort ascending' ) },
 	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
 };
-const sortIcons = { asc: chevronUp, desc: chevronDown };
+const sortArrows = { asc: '↑', desc: '↓', false: '' };
 
 function HeaderMenu( { dataView, header } ) {
 	if ( header.isPlaceholder ) {
@@ -118,11 +116,12 @@ function HeaderMenu( { dataView, header } ) {
 			align="start"
 			trigger={
 				<Button
-					icon={ sortIcons[ header.column.getIsSorted() ] }
-					iconPosition="right"
-					text={ text }
-					style={ { padding: 0 } }
-				/>
+					size="compact"
+					className="dataviews-table-header-button"
+				>
+					{ text }
+					<span>{ sortArrows[ header.column.getIsSorted() ] }</span>
+				</Button>
 			}
 		>
 			<WithSeparators>
