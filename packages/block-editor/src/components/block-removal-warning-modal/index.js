@@ -55,7 +55,7 @@ export function BlockRemovalWarningModal( { rules } ) {
 				<p>
 					{ rules[ blockNamesForPrompt[ 0 ] ] }{ ' ' }
 					{ __(
-						"Only proceed to remove this block if you're absolutely sure of what you're doing."
+						"Be careful! Post or page content will not be displayed if you delete this block."
 					) }{ ' ' }
 				</p>
 			) : (
