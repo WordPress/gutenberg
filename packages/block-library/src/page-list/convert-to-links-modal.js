@@ -4,8 +4,15 @@
 import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export const convertDescription = __(
-	'This page list is synced with the published pages on your site. Detach the page list to add, delete, or reorder pages yourself.'
+import { createInterpolateElement } from '@wordpress/element';
+
+export const convertDescription = createInterpolateElement(
+	__(
+		"The page list displays your site's published pages. If you choose to independently edit, your navigation will no longer <em>automatically</em> update when your pages change."
+	),
+	{
+		em: <em />,
+	}
 );
 
 export function ConvertToLinksModal( { onClick, onClose, disabled } ) {
