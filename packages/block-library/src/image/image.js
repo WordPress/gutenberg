@@ -380,6 +380,7 @@ export default function Image( {
 
 	const resetAll = () => {
 		setAttributes( {
+			alt: undefined,
 			width: undefined,
 			height: undefined,
 			scale: undefined,
@@ -463,7 +464,7 @@ export default function Image( {
 						>
 							<TextareaControl
 								label={ __( 'Alternative text' ) }
-								value={ alt }
+								value={ alt || '' }
 								onChange={ updateAlt }
 								help={
 									<>
@@ -481,11 +482,13 @@ export default function Image( {
 						</ToolsPanelItem>
 					) }
 					{ isResizable && dimensionsControl }
-					<ResolutionTool
-						value={ sizeSlug }
-						onChange={ updateImage }
-						options={ imageSizeOptions }
-					/>
+					{ !! imageSizeOptions.length && (
+						<ResolutionTool
+							value={ sizeSlug }
+							onChange={ updateImage }
+							options={ imageSizeOptions }
+						/>
+					) }
 					{ showLightboxToggle && (
 						<ToolsPanelItem
 							hasValue={ () => !! lightbox }
