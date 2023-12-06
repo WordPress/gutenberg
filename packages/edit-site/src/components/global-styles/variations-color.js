@@ -6,6 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import {
@@ -161,19 +163,22 @@ function ColorVariation( { variation } ) {
 	);
 }
 
-export default function ColorVariations( { variations } ) {
+export default function ColorVariations() {
 	const { user } = useContext( GlobalStylesContext );
+	const variations = useSelect( ( select ) => {
+		return select(
+			coreStore
+		).__experimentalGetCurrentThemeGlobalStylesVariations();
+	}, [] );
 	const colorVariations =
 		variations && getVariationsByType( user, variations, 'color' ); // should also get filter?
 
 	return (
 		<>
-			<div className="edit-site-sidebar-navigation-screen-styles__group-header">
-				<Heading level={ 2 }>{ __( 'Colors' ) }</Heading>
-			</div>
+			<Heading level={ 3 }>{ __( 'Presets' ) }</Heading>
 			<Grid
 				columns={ 2 }
-				className="edit-site-global-styles-style-variations-container"
+				className="edit-site-global-styles-color-variations"
 			>
 				{ colorVariations &&
 					colorVariations.map( ( variation, index ) => {
@@ -181,7 +186,6 @@ export default function ColorVariations( { variations } ) {
 							<ColorVariation
 								key={ index }
 								variation={ variation }
-								isFont={ false }
 							/>
 						);
 					} ) }

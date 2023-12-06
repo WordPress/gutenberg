@@ -13,6 +13,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import ColorVariations from './variations-color';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 const mobilePopoverProps = { placement: 'bottom-start', offset: 8 };
@@ -89,6 +90,7 @@ export default function ColorPalettePanel( { name } ) {
 				slugPrefix="custom-"
 				popoverProps={ popoverProps }
 			/>
+			<ColorVariations />
 		</VStack>
 	);
 }

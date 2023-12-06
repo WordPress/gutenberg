@@ -12,6 +12,7 @@ import { useSelect } from '@wordpress/data';
 import TypographyElements from './typography-elements';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
+import TypographyVariations from './variations-typography';
 
 function ScreenTypography() {
 	const fontLibraryEnabled = useSelect(
@@ -32,6 +33,7 @@ function ScreenTypography() {
 				<VStack spacing={ 6 }>
 					{ fontLibraryEnabled && <FontFamilies /> }
 					<TypographyElements />
+					<TypographyVariations />
 				</VStack>
 			</div>
 		</>
