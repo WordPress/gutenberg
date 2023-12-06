@@ -3,7 +3,7 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 
-const globalStylesChangesCache = new WeakMap();
+const globalStylesChangesCache = new Map();
 
 const translationMap = {
 	caption: __( 'caption' ),
@@ -117,7 +117,7 @@ export default function getRevisionChanges(
 	previousRevision,
 	blockNames
 ) {
-	const cacheKey = { revision, previousRevision };
+	const cacheKey = JSON.stringify( { revision, previousRevision } );
 
 	if ( globalStylesChangesCache.has( cacheKey ) ) {
 		return globalStylesChangesCache.get( cacheKey );

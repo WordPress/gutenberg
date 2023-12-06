@@ -151,7 +151,7 @@ describe( 'getRevisionChanges', () => {
 			blockNames
 		);
 
-		expect( resultA ).toStrictEqual( resultB );
+		expect( resultA ).toBe( resultB );
 	} );
 
 	it( 'skips unknown keys', () => {
