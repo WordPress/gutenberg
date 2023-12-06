@@ -41,12 +41,18 @@ import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md
  *
- * @param {Object}  props                Components props.
- * @param {boolean} props.hideDragHandle Show or hide the Drag Handle for drag and drop functionality.
- * @param {string}  props.variant        Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
+ * @param {Object}   props                             Components props.
+ * @param {boolean}  props.hideDragHandle              Show or hide the Drag Handle for drag and drop functionality.
+ * @param {boolean}  props.focusOnMount                Focus the toolbar when mounted.
+ * @param {number}   props.__experimentalInitialIndex  The initial index of the toolbar item to focus.
+ * @param {Function} props.__experimentalOnIndexChange Callback function to be called when the index of the focused toolbar item changes.
+ * @param {string}   props.variant                     Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
  */
-export default function BlockToolbar( {
+export function PrivateBlockToolbar( {
 	hideDragHandle,
+	focusOnMount,
+	__experimentalInitialIndex,
+	__experimentalOnIndexChange,
 	variant = 'unstyled',
 } ) {
 	const {
@@ -149,6 +155,9 @@ export default function BlockToolbar( {
 			aria-label={ __( 'Block tools' ) }
 			// The variant is applied as "toolbar" when undefined, which is the black border style of the dropdown from the toolbar popover.
 			variant={ variant === 'toolbar' ? undefined : variant }
+			focusOnMount={ focusOnMount }
+			__experimentalInitialIndex={ __experimentalInitialIndex }
+			__experimentalOnIndexChange={ __experimentalOnIndexChange }
 			// Resets the index whenever the active block changes so
 			// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
 			key={ blockClientId }
@@ -213,5 +222,26 @@ export default function BlockToolbar( {
 				) }
 			</div>
 		</NavigableToolbar>
+	);
+}
+
+/**
+ * Renders the block toolbar.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md
+ *
+ * @param {Object}  props                Components props.
+ * @param {boolean} props.hideDragHandle Show or hide the Drag Handle for drag and drop functionality.
+ * @param {string}  props.variant        Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
+ */
+export default function BlockToolbar( { hideDragHandle, variant } ) {
+	return (
+		<PrivateBlockToolbar
+			hideDragHandle={ hideDragHandle }
+			variant={ variant }
+			focusOnMount={ undefined }
+			__experimentalInitialIndex={ undefined }
+			__experimentalOnIndexChange={ undefined }
+		/>
 	);
 }

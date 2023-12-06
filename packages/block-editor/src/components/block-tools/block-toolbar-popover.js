@@ -2,32 +2,59 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-
+import { useDispatch } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../store';
-import BlockToolbar from '../block-toolbar';
+import { unlock } from '../../lock-unlock';
 import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
+import { store as blockEditorStore } from '../../store';
+import { privateApis as blockEditorPrivateApis } from '../../private-apis';
+
+const { PrivateBlockToolbar } = unlock( blockEditorPrivateApis );
 
 export default function BlockToolbarPopover( {
 	clientId,
+	isTyping,
 	__unstableContentRef,
 } ) {
-	const isTyping = useSelect(
-		( select ) => select( blockEditorStore ).isTyping(),
-		[]
-	);
-
 	const { capturingClientId, isInsertionPointVisible, lastClientId } =
 		useSelectedBlockToolProps( clientId );
+
+	// Stores the active toolbar item index so the block toolbar can return focus
+	// to it when re-mounting.
+	const initialToolbarItemIndexRef = useRef();
+
+	useEffect( () => {
+		// Resets the index whenever the active block changes so this is not
+		// persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+		initialToolbarItemIndexRef.current = undefined;
+	}, [ clientId ] );
+
+	const { stopTyping } = useDispatch( blockEditorStore );
+	const isToolbarForced = useRef( false );
+
+	useShortcut(
+		'core/block-editor/focus-toolbar',
+		() => {
+			isToolbarForced.current = true;
+			stopTyping( true );
+		},
+		{
+			isDisabled: false,
+		}
+	);
+
+	useEffect( () => {
+		isToolbarForced.current = false;
+	} );
 
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
@@ -35,17 +62,32 @@ export default function BlockToolbarPopover( {
 	} );
 
 	return (
-		<BlockPopover
-			clientId={ capturingClientId || clientId }
-			bottomClientId={ lastClientId }
-			className={ classnames( 'block-editor-block-list__block-popover', {
-				'is-insertion-point-visible': isInsertionPointVisible,
-				'is-hidden': isTyping, // Leave the toolbar in the DOM so it can be focused at the same roving tabindex it was previously at
-			} ) }
-			resize={ false }
-			{ ...popoverProps }
-		>
-			<BlockToolbar variant="highContrast" />
-		</BlockPopover>
+		! isTyping && (
+			<BlockPopover
+				clientId={ capturingClientId || clientId }
+				bottomClientId={ lastClientId }
+				className={ classnames(
+					'block-editor-block-list__block-popover',
+					{
+						'is-insertion-point-visible': isInsertionPointVisible,
+					}
+				) }
+				resize={ false }
+				{ ...popoverProps }
+			>
+				<PrivateBlockToolbar
+					// If the toolbar is being shown because of being forced
+					// it should focus the toolbar right after the mount.
+					focusOnMount={ isToolbarForced.current }
+					__experimentalInitialIndex={
+						initialToolbarItemIndexRef.current
+					}
+					__experimentalOnIndexChange={ ( index ) => {
+						initialToolbarItemIndexRef.current = index;
+					} }
+					variant="toolbar"
+				/>
+			</BlockPopover>
+		)
 	);
 }

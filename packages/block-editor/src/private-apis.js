@@ -8,6 +8,7 @@ import { getRichTextValues } from './components/rich-text/get-rich-text-values';
 import { kebabCase } from './utils/object';
 import ResizableBoxPopover from './components/resizable-box-popover';
 import { ComposedPrivateInserter as PrivateInserter } from './components/inserter';
+import { PrivateBlockToolbar } from './components/block-toolbar';
 import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
 import { useShouldContextualToolbarShow } from './utils/use-should-contextual-toolbar-show';
@@ -37,6 +38,7 @@ lock( privateApis, {
 	getDuotoneFilter,
 	getRichTextValues,
 	kebabCase,
+	PrivateBlockToolbar,
 	PrivateInserter,
 	PrivateListView,
 	ResizableBoxPopover,
