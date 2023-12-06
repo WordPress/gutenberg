@@ -73,6 +73,7 @@ const DefaultControlsGroup = ( {
 				return (
 					<MenuItem
 						key={ label }
+						icon={ check }
 						className={ itemClassName }
 						role="menuitemcheckbox"
 						isSelected
