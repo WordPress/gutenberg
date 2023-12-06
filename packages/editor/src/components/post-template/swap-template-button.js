@@ -47,10 +47,10 @@ export default function SwapTemplateButton( { onClick } ) {
 				<Modal
 					title={ __( 'Choose a template' ) }
 					onRequestClose={ onClose }
-					overlayClassName="edit-site-swap-template-modal"
+					overlayClassName="editor-post-template__swap-template-modal"
 					isFullScreen
 				>
-					<div className="edit-site-page-panels__swap-template__modal-content">
+					<div className="editor-post-template__swap-template-modal-content">
 						<TemplatesList onSelect={ onTemplateSelect } />
 					</div>
 				</Modal>

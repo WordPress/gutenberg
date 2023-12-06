@@ -11,7 +11,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 
-export function PostTemplate() {
+function ClassicThemeControl() {
 	const { availableTemplates, selectedTemplate, isViewable } = useSelect(
 		( select ) => {
 			const {
@@ -43,6 +43,7 @@ export function PostTemplate() {
 
 	return (
 		<SelectControl
+			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			label={ __( 'Template:' ) }
 			value={ selectedTemplate }
@@ -61,4 +62,4 @@ export function PostTemplate() {
 	);
 }
 
-export default PostTemplate;
+export default ClassicThemeControl;
