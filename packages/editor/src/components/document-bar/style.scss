@@ -50,6 +50,10 @@
 		color: var(--wp-block-synced-color);
 	}
 
+	.editor-document-bar.is-global & {
+		color: var(--wp-block-synced-color);
+	}
+
 	.block-editor-block-icon {
 		min-width: $grid-unit-30;
 		flex-shrink: 0;

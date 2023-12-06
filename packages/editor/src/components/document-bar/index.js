@@ -109,6 +109,12 @@ function BaseDocumentActions( { postType, postId, onBack } ) {
 	const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 		postType
 	);
+	const isGlobalEntity = [
+		'wp_template',
+		'wp_navigation',
+		'wp_template_part',
+		'wp_block',
+	].includes( postType );
 
 	useEffect( () => {
 		if ( ! isMounting.current ) {
@@ -124,6 +130,7 @@ function BaseDocumentActions( { postType, postId, onBack } ) {
 			className={ classnames( 'editor-document-bar', {
 				'has-back-button': !! onBack,
 				'is-animated': isAnimated,
+				'is-global': isGlobalEntity,
 			} ) }
 		>
 			{ onBack && (
