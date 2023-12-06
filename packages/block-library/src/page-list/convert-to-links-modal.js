@@ -37,7 +37,7 @@ export function ConvertToLinksModal( { onClick, onClose, disabled } ) {
 					disabled={ disabled }
 					onClick={ onClick }
 				>
-					{ __( 'Detach' ) }
+					{ __( 'Edit' ) }
 				</Button>
 			</div>
 		</Modal>
