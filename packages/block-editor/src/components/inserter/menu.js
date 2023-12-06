@@ -16,7 +16,7 @@ import {
 } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useDebouncedInput } from '@wordpress/compose';
 
 /**
@@ -57,6 +57,8 @@ function InserterMenu(
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
 	const [ selectedTab, setSelectedTab ] = useState( null );
+	const { __unstableGetEditorMode } = useSelect( blockEditorStore );
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
@@ -228,6 +230,14 @@ function InserterMenu(
 		if ( value !== 'patterns' ) {
 			setSelectedPatternCategory( null );
 		}
+
+		// Enter the zoom-out mode when selecting the patterns tab and exit otherwise.
+		if ( value === 'patterns' ) {
+			__unstableSetEditorMode( 'zoom-out' );
+		} else if ( __unstableGetEditorMode() === 'zoom-out' ) {
+			__unstableSetEditorMode( 'edit' );
+		}
+
 		setSelectedTab( value );
 	};
 

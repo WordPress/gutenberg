@@ -29,6 +29,14 @@ export default function InserterSidebar() {
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 		focusOnMount: null,
+		// Don't close the inserter on focus outside.
+		// This is a temporary hack as we figure out the expected interactions
+		// in the zoom-out mode.
+		__unstableOnClose: ( eventName ) => {
+			if ( eventName === 'focus-outside' ) {
+				// Do nothing.
+			}
+		},
 	} );
 
 	const libraryRef = useRef();

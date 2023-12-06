@@ -150,6 +150,10 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		};
 	}, [] );
 	const { setRenderingMode } = useDispatch( editorStore );
+	const { __unstableGetEditorMode: getBlockEditorMode } =
+		useSelect( blockEditorStore );
+	const { __unstableSetEditorMode: setBlockEditorMode } =
+		useDispatch( blockEditorStore );
 
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
@@ -201,6 +205,15 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 			setRenderingMode( 'all' );
 		}
 	}, [ canvasMode, postWithTemplate, setRenderingMode ] );
+
+	useEffect(
+		function ExitZoomOutModeWhenInserterClosed() {
+			if ( ! shouldShowInserter && getBlockEditorMode() === 'zoom-out' ) {
+				setBlockEditorMode( 'edit' );
+			}
+		},
+		[ getBlockEditorMode, setBlockEditorMode, shouldShowInserter ]
+	);
 
 	return (
 		<>
