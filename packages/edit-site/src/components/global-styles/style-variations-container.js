@@ -25,7 +25,7 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
-function Variation( { variation, isColor, isFont } ) {
+function Variation( { variation } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo( () => {
@@ -93,8 +93,6 @@ function Variation( { variation, isColor, isFont } ) {
 						label={ variation?.title }
 						isFocused={ isFocused }
 						withHoverView
-						isColor={ isColor }
-						isFont={ isFont }
 					/>
 				</div>
 			</div>
@@ -125,15 +123,13 @@ export default function StyleVariationsContainer() {
 	}, [ variations ] );
 
 	return (
-		<>
-			<Grid
-				columns={ 2 }
-				className="edit-site-global-styles-style-variations-container"
-			>
-				{ withEmptyVariation.map( ( variation, index ) => (
-					<Variation key={ index } variation={ variation } />
-				) ) }
-			</Grid>
-		</>
+		<Grid
+			columns={ 2 }
+			className="edit-site-global-styles-style-variations-container"
+		>
+			{ withEmptyVariation.map( ( variation, index ) => (
+				<Variation key={ index } variation={ variation } />
+			) ) }
+		</Grid>
 	);
 }
