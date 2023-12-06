@@ -210,7 +210,7 @@ export default function useOnBlockDrop(
 	targetBlockIndex,
 	options = {}
 ) {
-	const { operation = 'insert', moveBeforeOrAfter } = options;
+	const { operation = 'insert' } = options;
 	const hasUploadPermissions = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
 		[]
@@ -280,43 +280,44 @@ export default function useOnBlockDrop(
 						0
 					);
 				} );
-			} else {
-				if ( moveBeforeOrAfter ) {
-					const parentBlock = getBlockParents(
-						targetRootClientId,
-						true
-					)[ 0 ];
-					// const targetBlockClientIds = getBlockOrder( parentBlock );
-					let blockIndex = getBlockIndex( targetRootClientId );
-					if ( moveBeforeOrAfter === 'after' ) {
-						++blockIndex;
-					}
-					// const targetBlockClientId =
-					// 	targetBlockClientIds[ blockIndex ];
-					moveBlocksToPosition(
-						sourceClientIds,
-						sourceRootClientId,
-						parentBlock,
-						blockIndex
-					);
-					return;
+			} else if ( [ 'after', 'before' ].includes( operation ) ) {
+				const parentBlock = getBlockParents(
+					targetRootClientId,
+					true
+				)[ 0 ];
+				// const targetBlockClientIds = getBlockOrder( parentBlock );
+				let blockIndex = getBlockIndex( targetRootClientId );
+
+				if ( operation === 'after' ) {
+					++blockIndex;
 				}
+				// const targetBlockClientId =
+				// 	targetBlockClientIds[ blockIndex ];
 				moveBlocksToPosition(
 					sourceClientIds,
 					sourceRootClientId,
-					targetRootClientId,
-					insertIndex
+					parentBlock,
+					blockIndex
 				);
+				return;
 			}
+			moveBlocksToPosition(
+				sourceClientIds,
+				sourceRootClientId,
+				targetRootClientId,
+				insertIndex
+			);
 		},
 		[
 			operation,
+			getBlockIndex,
+			getBlockParents,
 			getBlockOrder,
 			getBlocksByClientId,
-			insertBlocks,
-			moveBeforeOrAfter,
 			moveBlocksToPosition,
+			registry,
 			removeBlocks,
+			replaceBlocks,
 			targetBlockIndex,
 			targetRootClientId,
 		]

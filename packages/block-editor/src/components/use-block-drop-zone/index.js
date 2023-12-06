@@ -81,10 +81,10 @@ export function getDropTargetPosition(
 		// TODO: Check if the parent block is horizontal / vertical orientation.
 		if ( distance < THRESHOLD_DISTANCE ) {
 			if ( edge === 'top' ) {
-				return [ rootBlockIndex, 'insert', 'before' ];
+				return [ rootBlockIndex, 'before' ];
 			}
 			if ( edge === 'bottom' ) {
-				return [ rootBlockIndex + 1, 'insert', 'after' ];
+				return [ rootBlockIndex + 1, 'after' ];
 			}
 		}
 	}
@@ -205,7 +205,6 @@ export default function useBlockDropZone( {
 		useDispatch( blockEditorStore );
 
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, dropTarget.index, {
-		moveBeforeOrAfter: dropTarget.moveBeforeOrAfter,
 		operation: dropTarget.operation,
 	} );
 	const throttled = useThrottle(
@@ -241,32 +240,31 @@ export default function useBlockDropZone( {
 					};
 				} );
 
-				const [ targetIndex, operation, moveBeforeOrAfter ] =
-					getDropTargetPosition(
-						blocksData,
-						{ x: event.clientX, y: event.clientY },
-						getBlockListSettings( targetRootClientId )?.orientation,
-						{
-							dropZoneElement,
-							parentBlock,
-							rootBlockIndex,
-						}
-					);
+				const [ targetIndex, operation ] = getDropTargetPosition(
+					blocksData,
+					{ x: event.clientX, y: event.clientY },
+					getBlockListSettings( targetRootClientId )?.orientation,
+					{
+						dropZoneElement,
+						parentBlock,
+						rootBlockIndex,
+					}
+				);
 
 				registry.batch( () => {
 					setDropTarget( {
-						moveBeforeOrAfter,
 						index: targetIndex,
 						operation,
 					} );
 
-					const insertionPointClientId = moveBeforeOrAfter
+					const insertionPointClientId = [
+						'before',
+						'after',
+					].includes( operation )
 						? parentBlock
 						: targetRootClientId;
 
-					// TODO: Fix display of insertion point, so that it matches onBlockDrop logic.
 					showInsertionPoint( insertionPointClientId, targetIndex, {
-						moveBeforeOrAfter,
 						operation,
 					} );
 				} );
