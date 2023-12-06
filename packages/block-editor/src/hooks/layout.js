@@ -348,6 +348,7 @@ export const withLayoutControls = createHigherOrderComponent(
 			supportLayout && (
 				<LayoutPanel
 					key="layout"
+					// This component is pure, so only pass needed props!
 					layout={ props.attributes.layout }
 					setAttributes={ props.setAttributes }
 					name={ props.name }

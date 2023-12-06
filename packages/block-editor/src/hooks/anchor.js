@@ -137,7 +137,7 @@ export const withAnchorControls = createHigherOrderComponent( ( BlockEdit ) => {
 							blockName={ props.name }
 							// This component is pure, so only pass needed
 							// props!
-							attributes={ props.attributes.anchor }
+							anchor={ props.attributes.anchor }
 							setAttributes={ props.setAttributes }
 						/>
 					) }

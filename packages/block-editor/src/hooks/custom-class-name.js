@@ -91,7 +91,7 @@ export const withCustomClassNameControls = createHigherOrderComponent(
 						<CustomClassNameControls
 							// This component is pure, so only pass needed
 							// props!
-							attributes={ props.attributes.className }
+							className={ props.attributes.className }
 							setAttributes={ props.setAttributes }
 						/>
 					) }
