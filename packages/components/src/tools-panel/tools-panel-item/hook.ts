@@ -129,11 +129,6 @@ export function useToolsPanelItem(
 	const newValueSet = isValueSet && ! wasValueSet;
 
 	// Notify the panel when an item's value has been set.
-	//
-	// 1. For default controls, this is so "reset" appears beside its menu item.
-	// 2. For optional controls, when the panel ID is `null`, it allows the
-	// panel to ensure the item is toggled on for display in the menu, given the
-	// value has been set external to the control.
 	useEffect( () => {
 		if ( ! newValueSet ) {
 			return;
