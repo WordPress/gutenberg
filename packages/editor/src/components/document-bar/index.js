@@ -165,7 +165,7 @@ function BaseDocumentActions( { postType, postId, onBack } ) {
 							{ title }
 						</Text>
 					</HStack>
-					<span className="edit-site-document-actions__shortcut">
+					<span className="editor-document-bar__shortcut">
 						{ displayShortcut.primary( 'k' ) }
 					</span>
 				</Button>
