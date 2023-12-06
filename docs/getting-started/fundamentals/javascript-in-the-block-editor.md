@@ -44,7 +44,7 @@ Use [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/ho
 
 - [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/) 
 - [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) 
-- [Wordpress Packages handles](https://developer.wordpress.org/block-editor/contributors/code/scripts/) 
+- [WordPress Packages handles](https://developer.wordpress.org/block-editor/contributors/code/scripts/) 
 - [Javascript Reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript) | MDN Web Docs
 - [block-development-examples](https://github.com/WordPress/block-development-examples) | GitHub repository
 - [block-theme-examples](https://github.com/wptrainingteam/block-theme-examples) | GitHub repository
