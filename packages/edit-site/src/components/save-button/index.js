@@ -56,26 +56,33 @@ export default function SaveButton( {
 		}, [] );
 
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
-	const { customizedSaveButtonAction, customizedSaveButtonLabel } = useSelect( ( select ) => {
-		const { getSettings } = unlock(select( editSiteStore ));
-		return {
-			customizedSaveButtonAction: getSettings().__experimentalSaveButtonAction,
-			customizedSaveButtonLabel: getSettings().__experimentalSaveButtonLabel,
-		};
-	}, []);
+	const { customizedSaveButtonAction, customizedSaveButtonLabel } = useSelect(
+		( select ) => {
+			const { getSettings } = unlock( select( editSiteStore ) );
+			return {
+				customizedSaveButtonAction:
+					getSettings().__experimentalSaveButtonAction,
+				customizedSaveButtonLabel:
+					getSettings().__experimentalSaveButtonLabel,
+			};
+		},
+		[]
+	);
 	const onClick = useCallback( () => {
 		if ( customizedSaveButtonAction ) {
 			customizedSaveButtonAction();
 			return;
 		}
 		setIsSaveViewOpened( true );
-	}, [ customizedSaveButtonAction, setIsSaveViewOpened ]);
+	}, [ customizedSaveButtonAction, setIsSaveViewOpened ] );
 
 	// For testing
 	const { updateSettings } = useDispatch( editSiteStore );
 	useEffect( () => {
 		updateSettings( {
-			__experimentalSaveButtonAction: () => console.log('Customized Action'),
+			__experimentalSaveButtonAction: () =>
+				// eslint-disable-next-line no-console
+				console.log( 'Customized Action' ),
 			__experimentalSaveButtonLabel: 'Customized Action',
 		} );
 	}, [ updateSettings ] );
