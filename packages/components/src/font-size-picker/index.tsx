@@ -283,9 +283,10 @@ const UnforwardedFontSizePicker = (
 									variant="secondary"
 									__next40pxDefaultSize
 									size={
-										size !== '__unstable-large'
-											? 'small'
-											: 'default'
+										size === '__unstable-large' ||
+										props.__next40pxDefaultSize
+											? 'default'
+											: 'small'
 									}
 								>
 									{ __( 'Reset' ) }
