@@ -1,5 +1,39 @@
 == Changelog ==
 
+= 17.2.0 =
+
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Post Editor
+- Editor: Fix issue where createBlock in block template caused list view collapse. ([56666](https://github.com/WordPress/gutenberg/pull/56666))
+
+#### Modules API
+- Modules: Fix import map polyfill not being copied on the generated plugin ZIP. ([56655](https://github.com/WordPress/gutenberg/pull/56655))
+
+
+### Documentation
+
+- Interactivity API: New store() API documentation. ([56764](https://github.com/WordPress/gutenberg/pull/56764))
+- Interactivity API: Update TS/JSDocs after migrating to the new `store()` API. ([56748](https://github.com/WordPress/gutenberg/pull/56748))
+
+
+### Tools
+
+#### Build Tooling
+- Add missing labels to changelog script, and enhance mapping function. ([55066](https://github.com/WordPress/gutenberg/pull/55066))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@andrewserong @DAreRodz @luisherranz @vcanales
 = 17.2.0-rc.1 =
 
 
@@ -309,6 +343,8 @@
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @afercia @andrewhayward @andrewserong @annezazu @apeatling @arthur791004 @bph @brookewp @chad1008 @chiilog @ciampo @DAreRodz @dmsnell @draganescu @ellatrix @fabiankaegy @flootr @fluiddot @fullofcaffeine @geriux @getdave @glendaviesnz @jameskoster @jasmussen @jeryj @jffng @jorgefilipecosta @juanmaguitar @kevin940726 @luisherranz @MaggieCabrera @Mamaduka @matiasbenedetto @megane9988 @NekoJonez @ntsekouras @oandregal @ramonjd @richtabor @ryanwelcher @SavPhill @Soean @t-hamano @talldan @tellthemachines @youknowriad @zaguiini
+
+
 
 
 = 17.1.3 =
