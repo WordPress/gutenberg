@@ -308,11 +308,6 @@ public class MainApplication extends Application implements ReactApplication, Gu
                     mainActivity.updateRedoItem(isDisabled);
                 }
             }
-
-            @Override
-            public void requestConnectionStatus(ConnectionStatusCallback connectionStatusCallback) {
-                connectionStatusCallback.onRequestConnectionStatus(true);
-            }
         }, isDarkMode());
 
         return new DefaultReactNativeHost(this) {
