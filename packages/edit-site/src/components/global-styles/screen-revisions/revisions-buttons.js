@@ -22,14 +22,7 @@ import getRevisionChanges from './get-revision-changes';
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 const MAX_CHANGES = 7;
 
-function ChangedSummary( { revision, previousRevision } ) {
-	const blockNames = useMemo( () => {
-		const blockTypes = getBlockTypes();
-		return blockTypes.reduce( ( accumulator, { name, title } ) => {
-			accumulator[ name ] = title;
-			return accumulator;
-		}, {} );
-	}, [] );
+function ChangedSummary( { revision, previousRevision, blockNames } ) {
 	const changes = getRevisionChanges(
 		revision,
 		previousRevision,
@@ -124,6 +117,13 @@ function RevisionsButtons( {
 			currentUser: getCurrentUser(),
 		};
 	}, [] );
+	const blockNames = useMemo( () => {
+		const blockTypes = getBlockTypes();
+		return blockTypes.reduce( ( accumulator, { name, title } ) => {
+			accumulator[ name ] = title;
+			return accumulator;
+		}, {} );
+	}, [] );
 	const dateNowInMs = getDate().getTime();
 	const { datetimeAbbreviated } = getSettings().formats;
 
@@ -212,6 +212,7 @@ function RevisionsButtons( {
 						</Button>
 						{ isSelected && (
 							<ChangedSummary
+								blockNames={ blockNames }
 								revision={ revision }
 								previousRevision={
 									index < userRevisions.length
