@@ -12,12 +12,12 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
-	TabPanel,
 	ColorIndicator,
 	Flex,
 	FlexItem,
 	Dropdown,
 	Button,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -29,6 +29,9 @@ import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
 import { getValueFromVariable } from './utils';
 import { setImmutably } from '../../utils/object';
+import { unlock } from '../../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
@@ -203,13 +206,6 @@ function ColorPanelDropdown( {
 	colorGradientControlSettings,
 	panelId,
 } ) {
-	const tabConfigs = tabs.map( ( { key, label: tabLabel } ) => {
-		return {
-			name: key,
-			title: tabLabel,
-		};
-	} );
-
 	return (
 		<ToolsPanelItem
 			className="block-editor-tools-panel-color-gradient-settings__item"
@@ -258,26 +254,34 @@ function ColorPanelDropdown( {
 								/>
 							) }
 							{ tabs.length > 1 && (
-								<TabPanel tabs={ tabConfigs }>
-									{ ( tab ) => {
-										const selectedTab = tabs.find(
-											( t ) => t.key === tab.name
-										);
+								<Tabs>
+									<Tabs.TabList>
+										{ tabs.map( ( tab ) => (
+											<Tabs.Tab
+												key={ tab.key }
+												id={ tab.key }
+											>
+												{ tab.label }
+											</Tabs.Tab>
+										) ) }
+									</Tabs.TabList>
 
-										if ( ! selectedTab ) {
-											return null;
-										}
-
+									{ tabs.map( ( tab ) => {
 										return (
-											<ColorPanelTab
-												{ ...selectedTab }
-												colorGradientControlSettings={
-													colorGradientControlSettings
-												}
-											/>
+											<Tabs.TabPanel
+												key={ tab.key }
+												id={ tab.key }
+											>
+												<ColorPanelTab
+													{ ...tab }
+													colorGradientControlSettings={
+														colorGradientControlSettings
+													}
+												/>
+											</Tabs.TabPanel>
 										);
-									} }
-								</TabPanel>
+									} ) }
+								</Tabs>
 							) }
 						</div>
 					</DropdownContentWrapper>
