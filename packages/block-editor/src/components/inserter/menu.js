@@ -45,6 +45,8 @@ function InserterMenu(
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
 		prioritizePatterns,
+		__experimentalOnPatternCategorySelection,
+		__experimentalShouldZoomPatterns = false,
 	},
 	ref
 ) {
@@ -125,8 +127,9 @@ function InserterMenu(
 		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
 			setPatternFilter( filter );
+			__experimentalOnPatternCategorySelection?.();
 		},
-		[ setSelectedPatternCategory ]
+		[ setSelectedPatternCategory, __experimentalOnPatternCategorySelection ]
 	);
 
 	const blocksTab = useMemo(
@@ -241,8 +244,12 @@ function InserterMenu(
 		setSelectedTab( value );
 	};
 
+	const className = classnames( 'block-editor-inserter__menu', {
+		'has-inline-patterns': __experimentalShouldZoomPatterns,
+	} );
+
 	return (
-		<div className="block-editor-inserter__menu">
+		<div className={ className }>
 			<div
 				className={ classnames( 'block-editor-inserter__main-area', {
 					'show-as-tabs': showAsTabs,
