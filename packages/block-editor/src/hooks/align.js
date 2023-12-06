@@ -152,6 +152,9 @@ function BlockEditAlignmentToolbarControlsPure( {
 	);
 }
 
+// We don't want block controls to re-render when typing inside a block. `pure`
+// will prevent re-renders unless props change, so only pass the needed props
+// and not the whole attributes object.
 const BlockEditAlignmentToolbarControls = pure(
 	BlockEditAlignmentToolbarControlsPure
 );
