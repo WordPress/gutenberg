@@ -147,9 +147,11 @@ class PostEditorTemplateMode {
 			'role=button[name="Dismiss this notice"] >> text=Editing template. Changes made here affect all posts and pages that use the template.'
 		);
 
-		await expect(
-			this.editorTopBar.getByRole( 'heading[level=1]' )
-		).toHaveText( 'Editing template: Single Entries' );
+		const title = this.editorTopBar.getByRole( 'heading', {
+			name: 'Editing template: Single Entries',
+		} );
+
+		await expect( title ).toBeVisible();
 	}
 
 	async createPostAndSaveDraft() {

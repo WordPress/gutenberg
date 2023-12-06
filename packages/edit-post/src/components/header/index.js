@@ -14,6 +14,7 @@ import {
 	PostSavedState,
 	PostPreviewButton,
 	store as editorStore,
+	DocumentBar,
 } from '@wordpress/editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -39,7 +40,6 @@ import { default as DevicePreview } from '../device-preview';
 import ViewLink from '../view-link';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
-import DocumentActions from './document-actions';
 import { unlock } from '../../lock-unlock';
 
 const { BlockContextualToolbar } = unlock( blockEditorPrivateApis );
@@ -164,7 +164,7 @@ function Header( {
 							isLargeViewport,
 					} ) }
 				>
-					{ isEditingTemplate && <DocumentActions /> }
+					{ isEditingTemplate && <DocumentBar /> }
 				</div>
 			</motion.div>
 			<motion.div

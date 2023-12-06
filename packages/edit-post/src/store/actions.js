@@ -531,7 +531,7 @@ export function setIsEditingTemplate() {
 export const __unstableSwitchToTemplateMode =
 	( newTemplate = false ) =>
 	( { registry, select } ) => {
-		registry.dispatch( editorStore ).setRenderingMode( 'all' );
+		registry.dispatch( editorStore ).setRenderingMode( 'template-only' );
 		const isWelcomeGuideActive = select.isFeatureActive(
 			'welcomeGuideTemplate'
 		);
