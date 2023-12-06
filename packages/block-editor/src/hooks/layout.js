@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import {
+	createHigherOrderComponent,
+	pure,
+	useInstanceId,
+} from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
@@ -133,12 +137,11 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 	return css;
 }
 
-function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
+function LayoutPanelPure( { layout, setAttributes, name: blockName } ) {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
 	const { layout: layoutSettings } = settings;
 	// Layout comes from block attributes.
-	const { layout } = attributes;
 	const [ defaultThemeLayout ] = useSettings( 'layout' );
 	const { themeSupportsLayout } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -287,6 +290,8 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	);
 }
 
+const LayoutPanel = pure( LayoutPanelPure );
+
 function LayoutTypeSwitcher( { type, onChange } ) {
 	return (
 		<ButtonGroup>
@@ -340,7 +345,14 @@ export const withLayoutControls = createHigherOrderComponent(
 		const supportLayout = hasLayoutBlockSupport( props.name );
 
 		return [
-			supportLayout && <LayoutPanel key="layout" { ...props } />,
+			supportLayout && (
+				<LayoutPanel
+					key="layout"
+					layout={ props.attributes.layout }
+					setAttributes={ props.setAttributes }
+					name={ props.name }
+				/>
+			),
 			<BlockEdit key="edit" { ...props } />,
 		];
 	},
