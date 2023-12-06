@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { dragHandle } from '@wordpress/icons';
+import { dragHandle, pencil } from '@wordpress/icons';
 import { Button, Flex, FlexItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -29,6 +29,7 @@ import {
 import { speak } from '@wordpress/a11y';
 import { focus } from '@wordpress/dom';
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -293,6 +294,20 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 						/>
 					</Button>
 				</FlexItem>
+				{ editorMode === 'zoom-out' &&
+					blockType.name === 'core/template-part' && (
+						<FlexItem>
+							<Button
+								icon={ pencil }
+								className="block-selection-button_edit-button"
+								label={ __( 'Edit' ) }
+								href={ addQueryArgs( 'site-editor.php', {
+									postType: 'wp_template_part',
+									postId: `${ attributes.theme }//${ attributes.slug }`,
+								} ) }
+							/>
+						</FlexItem>
+					) }
 			</Flex>
 		</div>
 	);
