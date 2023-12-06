@@ -198,15 +198,15 @@ export function onHTMLDrop(
 /**
  * A React hook for handling block drop events.
  *
- * @param {string}          targetRootClientId  The root client id where the block(s) will be inserted.
- * @param {number}          targetBlockIndex    The index where the block(s) will be inserted.
- * @param {Object}          options             The optional options.
- * @param {WPDropOperation} [options.operation] The type of operation to perform on drop. Could be `insert` or `replace` for now.
+ * @param {string}          originalTargetRootClientId The root client id where the block(s) will be inserted.
+ * @param {number}          targetBlockIndex           The index where the block(s) will be inserted.
+ * @param {Object}          options                    The optional options.
+ * @param {WPDropOperation} [options.operation]        The type of operation to perform on drop. Could be `insert` or `replace` for now.
  *
  * @return {Function} A function to be passed to the onDrop handler.
  */
 export default function useOnBlockDrop(
-	targetRootClientId,
+	originalTargetRootClientId,
 	targetBlockIndex,
 	options = {}
 ) {
@@ -220,7 +220,6 @@ export default function useOnBlockDrop(
 		getBlockIndex,
 		getClientIdsOfDescendants,
 		getBlockOrder,
-		getBlockParents,
 		getBlocksByClientId,
 	} = useSelect( blockEditorStore );
 	const {
@@ -232,6 +231,21 @@ export default function useOnBlockDrop(
 		removeBlocks,
 	} = useDispatch( blockEditorStore );
 	const registry = useRegistry();
+
+	const { targetRootClientId } = useSelect(
+		( select ) => {
+			const firstParent = select( blockEditorStore ).getBlockParents(
+				originalTargetRootClientId,
+				true
+			)[ 0 ];
+			return {
+				targetRootClientId: [ 'before', 'after' ].includes( operation )
+					? firstParent
+					: originalTargetRootClientId,
+			};
+		},
+		[ originalTargetRootClientId, operation ]
+	);
 
 	const insertOrReplaceBlocks = useCallback(
 		( blocks, updateSelection = true, initialPosition = 0 ) => {
@@ -280,38 +294,17 @@ export default function useOnBlockDrop(
 						0
 					);
 				} );
-			} else if ( [ 'after', 'before' ].includes( operation ) ) {
-				const parentBlock = getBlockParents(
-					targetRootClientId,
-					true
-				)[ 0 ];
-				// const targetBlockClientIds = getBlockOrder( parentBlock );
-				let blockIndex = getBlockIndex( targetRootClientId );
-
-				if ( operation === 'after' ) {
-					++blockIndex;
-				}
-				// const targetBlockClientId =
-				// 	targetBlockClientIds[ blockIndex ];
+			} else {
 				moveBlocksToPosition(
 					sourceClientIds,
 					sourceRootClientId,
-					parentBlock,
-					blockIndex
+					targetRootClientId,
+					insertIndex
 				);
-				return;
 			}
-			moveBlocksToPosition(
-				sourceClientIds,
-				sourceRootClientId,
-				targetRootClientId,
-				insertIndex
-			);
 		},
 		[
 			operation,
-			getBlockIndex,
-			getBlockParents,
 			getBlockOrder,
 			getBlocksByClientId,
 			moveBlocksToPosition,
