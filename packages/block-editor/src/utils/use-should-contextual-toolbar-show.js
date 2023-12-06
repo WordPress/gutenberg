@@ -38,6 +38,7 @@ export function useShouldContextualToolbarShow() {
 			} = unlock( select( blockEditorStore ) );
 
 			const isEditMode = __unstableGetEditorMode() === 'edit';
+			const isZoomOutMode = __unstableGetEditorMode() === 'zoom-out';
 			const hasFixedToolbar = getSettings().hasFixedToolbar;
 			const isDistractionFree = getSettings().isDistractionFree;
 			const selectedBlockId =
@@ -49,7 +50,7 @@ export function useShouldContextualToolbarShow() {
 			);
 
 			const _shouldShowContextualToolbar =
-				isEditMode &&
+				( isEditMode || isZoomOutMode ) &&
 				! hasFixedToolbar &&
 				( ! isDistractionFree || isNavigationMode() ) &&
 				isLargeViewport &&

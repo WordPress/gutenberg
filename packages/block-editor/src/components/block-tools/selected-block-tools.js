@@ -100,7 +100,7 @@ export default function SelectedBlockTools( {
 				resize={ false }
 				{ ...popoverProps }
 			>
-				{ shouldShowContextualToolbar && (
+				{ shouldShowContextualToolbar ? (
 					<BlockContextualToolbar
 						// If the toolbar is being shown because of being forced
 						// it should focus the toolbar right after the mount.
@@ -112,12 +112,13 @@ export default function SelectedBlockTools( {
 							initialToolbarItemIndexRef.current = index;
 						} }
 					/>
-				) }
-				{ shouldShowBreadcrumb && (
-					<BlockSelectionButton
-						clientId={ clientId }
-						rootClientId={ rootClientId }
-					/>
+				) : (
+					shouldShowBreadcrumb && (
+						<BlockSelectionButton
+							clientId={ clientId }
+							rootClientId={ rootClientId }
+						/>
+					)
 				) }
 			</BlockPopover>
 		);
