@@ -10,7 +10,7 @@ import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -39,7 +39,7 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function CustomClassNameControls( { attributes, setAttributes } ) {
+function CustomClassNameControlsPure( { className, setAttributes } ) {
 	const blockEditingMode = useBlockEditingMode();
 	if ( blockEditingMode !== 'default' ) {
 		return null;
@@ -52,7 +52,7 @@ function CustomClassNameControls( { attributes, setAttributes } ) {
 				__next40pxDefaultSize
 				autoComplete="off"
 				label={ __( 'Additional CSS class(es)' ) }
-				value={ attributes.className || '' }
+				value={ className || '' }
 				onChange={ ( nextValue ) => {
 					setAttributes( {
 						className: nextValue !== '' ? nextValue : undefined,
@@ -63,6 +63,8 @@ function CustomClassNameControls( { attributes, setAttributes } ) {
 		</InspectorControls>
 	);
 }
+
+const CustomClassNameControls = pure( CustomClassNameControlsPure );
 
 /**
  * Override the default edit UI to include a new block inspector control for
@@ -87,7 +89,9 @@ export const withCustomClassNameControls = createHigherOrderComponent(
 					<BlockEdit { ...props } />
 					{ hasCustomClassName && props.isSelected && (
 						<CustomClassNameControls
-							attributes={ props.attributes }
+							// This component is pure, so only pass needed
+							// props!
+							attributes={ props.attributes.className }
 							setAttributes={ props.setAttributes }
 						/>
 					) }

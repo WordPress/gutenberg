@@ -13,7 +13,11 @@ import {
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import {
+	createHigherOrderComponent,
+	useInstanceId,
+	pure,
+} from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useEffect } from '@wordpress/element';
 
@@ -95,8 +99,7 @@ export function getDuotonePresetFromColors( colors, duotonePalette ) {
 	return preset ? `var:preset|duotone|${ preset.slug }` : undefined;
 }
 
-function DuotonePanel( { attributes, setAttributes, name } ) {
-	const style = attributes?.style;
+function DuotonePanelPure( { style, setAttributes, name } ) {
 	const duotoneStyle = style?.color?.duotone;
 	const settings = useBlockSettings( name );
 	const blockEditingMode = useBlockEditingMode();
@@ -176,6 +179,8 @@ function DuotonePanel( { attributes, setAttributes, name } ) {
 	);
 }
 
+const DuotonePanel = pure( DuotonePanelPure );
+
 /**
  * Filters registered block settings, extending attributes to include
  * the `duotone` attribute.
@@ -227,7 +232,14 @@ const withDuotoneControls = createHigherOrderComponent(
 		// performance.
 		return (
 			<>
-				{ hasDuotoneSupport && <DuotonePanel { ...props } /> }
+				{ hasDuotoneSupport && (
+					<DuotonePanel
+						// This component is pure, so only pass needed props!
+						style={ props.attributes.style }
+						setAttributes={ props.setAttributes }
+						name={ props.name }
+					/>
+				) }
 				<BlockEdit { ...props } />
 			</>
 		);
