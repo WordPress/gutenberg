@@ -11,7 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [*] [internal] Move InserterButton from components package to block-editor package [#56494]
--   [**] Editor displays user of network connection status when offline [#56627]
+-   [**] Editor displays network status when offline [#56627]
 -   [**] Fixes a crash on pasting MS Word list markup [#56653]
 
 ## 1.109.1
