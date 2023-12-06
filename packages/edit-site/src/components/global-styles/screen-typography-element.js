@@ -23,19 +23,19 @@ const elements = {
 	},
 	link: {
 		description: __( 'Manage the fonts and typography used on the links.' ),
-		title: __( 'Links' ),
+		title: __( 'Link' ),
 	},
 	heading: {
 		description: __( 'Manage the fonts and typography used on headings.' ),
-		title: __( 'Headings' ),
+		title: __( 'Heading' ),
 	},
 	caption: {
 		description: __( 'Manage the fonts and typography used on captions.' ),
-		title: __( 'Captions' ),
+		title: __( 'Caption' ),
 	},
 	button: {
 		description: __( 'Manage the fonts and typography used on buttons.' ),
-		title: __( 'Buttons' ),
+		title: __( 'Button' ),
 	},
 };
 
