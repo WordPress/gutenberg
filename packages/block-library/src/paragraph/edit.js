@@ -37,7 +37,13 @@ function ParagraphBlock( {
 
 	return (
 		<>
-			<Controls clientId={ clientId } setAttributes={ setAttributes } />
+			<Controls
+				align={ align }
+				direction={ direction }
+				dropCap={ dropCap }
+				clientId={ clientId }
+				setAttributes={ setAttributes }
+			/>
 			<RichText
 				identifier="content"
 				tagName="p"

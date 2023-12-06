@@ -12,10 +12,8 @@ import {
 	BlockControls,
 	InspectorControls,
 	useSettings,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { formatLtr } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
 import { pure } from '@wordpress/compose';
 
 function ParagraphRTLControl( { direction, setDirection } ) {
@@ -37,15 +35,8 @@ export function hasDropCapDisabled( align ) {
 	return align === ( isRTL() ? 'left' : 'right' ) || align === 'center';
 }
 
-function Controls( { clientId, setAttributes } ) {
+function Controls( { align, direction, dropCap, clientId, setAttributes } ) {
 	const [ isDropCapFeatureEnabled ] = useSettings( 'typography.dropCap' );
-
-	function selector( select ) {
-		const { align, direction, dropCap } =
-			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-		return { align, direction, dropCap };
-	}
-	const { align, direction, dropCap } = useSelect( selector, [ clientId ] );
 
 	let helpText;
 	if ( hasDropCapDisabled( align ) ) {
