@@ -229,6 +229,10 @@ $block-inserter-tabs-height: 44px;
 		display: block;
 	}
 
+	.block-editor-block-preview__container {
+		height: 100%;
+	}
+
 	.block-editor-block-card {
 		padding-left: 0;
 		padding-right: 0;
