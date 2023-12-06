@@ -256,6 +256,18 @@ _Returns_
 
 -   `string`: Post type.
 
+### getCurrentTemplateId
+
+Returns the template ID currently being rendered/edited
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string?`: Template ID.
+
 ### getEditedPostAttribute
 
 Returns a single attribute of the post being edited, preferring the unsaved edit if one exists, but falling back to the attribute for the last known saved state of the post.
@@ -546,10 +558,6 @@ Returns state object prior to a specified optimist transaction ID, or `null` if 
 ### getSuggestedPostFormat
 
 Returns a suggested post format for the current post, inferred only if there is a single block within the post and it is of a type known to match a default post format. Returns null if the format cannot be determined.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
 
 _Returns_
 

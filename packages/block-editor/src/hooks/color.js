@@ -9,7 +9,8 @@ import classnames from 'classnames';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
 import { useMemo, Platform, useCallback } from '@wordpress/element';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, pure } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -32,6 +33,7 @@ import {
 	default as StylesColorPanel,
 } from '../components/global-styles/color-panel';
 import BlockColorContrastChecker from './contrast-checker';
+import { store as blockEditorStore } from '../store';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
@@ -289,23 +291,26 @@ function ColorInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function ColorEdit( props ) {
-	const { clientId, name, attributes, setAttributes } = props;
+function ColorEditPure( { clientId, name, setAttributes } ) {
 	const settings = useBlockSettings( name );
 	const isEnabled = useHasColorPanel( settings );
+	function selector( select ) {
+		const { style, textColor, backgroundColor, gradient } =
+			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+		return { style, textColor, backgroundColor, gradient };
+	}
+	const { style, textColor, backgroundColor, gradient } = useSelect(
+		selector,
+		[ clientId ]
+	);
 	const value = useMemo( () => {
 		return attributesToStyle( {
-			style: attributes.style,
-			textColor: attributes.textColor,
-			backgroundColor: attributes.backgroundColor,
-			gradient: attributes.gradient,
+			style,
+			textColor,
+			backgroundColor,
+			gradient,
 		} );
-	}, [
-		attributes.style,
-		attributes.textColor,
-		attributes.backgroundColor,
-		attributes.gradient,
-	] );
+	}, [ style, textColor, backgroundColor, gradient ] );
 
 	const onChange = ( newStyle ) => {
 		setAttributes( styleToAttributes( newStyle ) );
@@ -315,7 +320,7 @@ export function ColorEdit( props ) {
 		return null;
 	}
 
-	const defaultControls = getBlockSupport( props.name, [
+	const defaultControls = getBlockSupport( name, [
 		COLOR_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
@@ -328,7 +333,7 @@ export function ColorEdit( props ) {
 		// Deactivating it requires `enableContrastChecker` to have
 		// an explicit value of `false`.
 		false !==
-			getBlockSupport( props.name, [
+			getBlockSupport( name, [
 				COLOR_SUPPORT_KEY,
 				'enableContrastChecker',
 			] );
@@ -343,7 +348,7 @@ export function ColorEdit( props ) {
 			defaultControls={ defaultControls }
 			enableContrastChecker={
 				false !==
-				getBlockSupport( props.name, [
+				getBlockSupport( name, [
 					COLOR_SUPPORT_KEY,
 					'enableContrastChecker',
 				] )
@@ -355,6 +360,8 @@ export function ColorEdit( props ) {
 		</StylesColorPanel>
 	);
 }
+
+export const ColorEdit = pure( ColorEditPure );
 
 /**
  * This adds inline styles for color palette colors.

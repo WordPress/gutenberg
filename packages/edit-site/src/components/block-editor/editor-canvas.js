@@ -15,16 +15,22 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import {
+	FOCUSABLE_ENTITIES,
+	NAVIGATION_POST_TYPE,
+} from '../../utils/constants';
 
 const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
 	blockEditorPrivateApis
 );
+const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
 
 function EditorCanvas( {
 	enableResizing,
@@ -33,17 +39,32 @@ function EditorCanvas( {
 	contentRef,
 	...props
 } ) {
-	const { canvasMode, deviceType, isZoomOutMode } = useSelect(
-		( select ) => ( {
-			deviceType:
-				select( editSiteStore ).__experimentalGetPreviewDeviceType(),
-			isZoomOutMode:
-				select( blockEditorStore ).__unstableGetEditorMode() ===
-				'zoom-out',
-			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
-		} ),
-		[]
-	);
+	const {
+		hasBlocks,
+		isFocusMode,
+		templateType,
+		canvasMode,
+		deviceType,
+		isZoomOutMode,
+	} = useSelect( ( select ) => {
+		const { getBlockCount, __unstableGetEditorMode } =
+			select( blockEditorStore );
+		const {
+			getEditedPostType,
+			__experimentalGetPreviewDeviceType,
+			getCanvasMode,
+		} = unlock( select( editSiteStore ) );
+		const _templateType = getEditedPostType();
+
+		return {
+			templateType: _templateType,
+			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
+			deviceType: __experimentalGetPreviewDeviceType(),
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			canvasMode: getCanvasMode(),
+			hasBlocks: !! getBlockCount(),
+		};
+	}, [] );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const deviceStyles = useResizeCanvas( deviceType );
 	const [ isFocused, setIsFocused ] = useState( false );
@@ -70,6 +91,15 @@ function EditorCanvas( {
 		onClick: () => setCanvasMode( 'edit' ),
 		readonly: true,
 	};
+	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
+	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
+	// Hide the appender when:
+	// - In navigation focus mode (should only allow the root Nav block).
+	// - In view mode (i.e. not editing).
+	const showBlockAppender =
+		( isNavigationFocusMode && hasBlocks ) || canvasMode === 'view'
+			? false
+			: undefined;
 
 	return (
 		<BlockCanvas
@@ -104,6 +134,13 @@ function EditorCanvas( {
 						: ''
 				}}}`
 			}</style>
+			<EditorCanvasRoot
+				dropZoneElement={ contentRef.current?.parentNode }
+				className={ classnames( 'edit-site-editor-canvas__block-list', {
+					'is-navigation-block': isTemplateTypeNavigation,
+				} ) }
+				renderAppender={ showBlockAppender }
+			/>
 			{ children }
 		</BlockCanvas>
 	);

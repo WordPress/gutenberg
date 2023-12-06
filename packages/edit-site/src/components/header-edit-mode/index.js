@@ -27,13 +27,13 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { DocumentBar } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import MoreMenu from './more-menu';
 import SaveButton from '../save-button';
-import DocumentActions from './document-actions';
 import DocumentTools from './document-tools';
 import { store as editSiteStore } from '../../store';
 import {
@@ -205,7 +205,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 					{ ! hasDefaultEditorCanvasView ? (
 						getEditorCanvasContainerTitle( editorCanvasView )
 					) : (
-						<DocumentActions />
+						<DocumentBar />
 					) }
 				</div>
 			) }
@@ -216,41 +216,43 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 					variants={ toolbarVariants }
 					transition={ toolbarTransition }
 				>
-					<div
-						className={ classnames(
-							'edit-site-header-edit-mode__preview-options',
-							{ 'is-zoomed-out': isZoomedOutView }
-						) }
-					>
-						<PreviewOptions
-							deviceType={ deviceType }
-							setDeviceType={ setPreviewDeviceType }
-							label={ __( 'View' ) }
-							isEnabled={
-								! isFocusMode && hasDefaultEditorCanvasView
-							}
-							showIconLabels={ showIconLabels }
-						>
-							{ ( { onClose } ) => (
-								<MenuGroup>
-									<MenuItem
-										href={ homeUrl }
-										target="_blank"
-										icon={ external }
-										onClick={ onClose }
-									>
-										{ __( 'View site' ) }
-										<VisuallyHidden as="span">
-											{
-												/* translators: accessibility text */
-												__( '(opens in a new tab)' )
-											}
-										</VisuallyHidden>
-									</MenuItem>
-								</MenuGroup>
+					{ isLargeViewport && (
+						<div
+							className={ classnames(
+								'edit-site-header-edit-mode__preview-options',
+								{ 'is-zoomed-out': isZoomedOutView }
 							) }
-						</PreviewOptions>
-					</div>
+						>
+							<PreviewOptions
+								deviceType={ deviceType }
+								setDeviceType={ setPreviewDeviceType }
+								label={ __( 'View' ) }
+								isEnabled={
+									! isFocusMode && hasDefaultEditorCanvasView
+								}
+								showIconLabels={ showIconLabels }
+							>
+								{ ( { onClose } ) => (
+									<MenuGroup>
+										<MenuItem
+											href={ homeUrl }
+											target="_blank"
+											icon={ external }
+											onClick={ onClose }
+										>
+											{ __( 'View site' ) }
+											<VisuallyHidden as="span">
+												{
+													/* translators: accessibility text */
+													__( '(opens in a new tab)' )
+												}
+											</VisuallyHidden>
+										</MenuItem>
+									</MenuGroup>
+								) }
+							</PreviewOptions>
+						</div>
+					) }
 					<SaveButton />
 					{ ! isDistractionFree && (
 						<PinnedItems.Slot scope="core/edit-site" />

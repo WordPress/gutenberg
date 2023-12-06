@@ -359,8 +359,9 @@ function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
 			: layout || defaultBlockLayout || {};
 	const layoutClasses = useLayoutClasses( attributes, name );
 
+	const selectorPrefix = `wp-container-${ kebabCase( name ) }-layout-`;
 	// Higher specificity to override defaults from theme.json.
-	const selector = `.wp-container-${ id }.wp-container-${ id }`;
+	const selector = `.${ selectorPrefix }${ id }.${ selectorPrefix }${ id }`;
 	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGapSupport !== null;
 
@@ -378,7 +379,7 @@ function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
 	// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
 	const layoutClassNames = classnames(
 		{
-			[ `wp-container-${ id }` ]: !! css, // Only attach a container class if there is generated CSS to be attached.
+			[ `${ selectorPrefix }${ id }` ]: !! css, // Only attach a container class if there is generated CSS to be attached.
 		},
 		layoutClasses
 	);
@@ -465,22 +466,10 @@ function BlockWithChildLayoutStyles( { block: BlockListBlock, props } ) {
  */
 export const withChildLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const layout = props.attributes.style?.layout ?? {};
-		const { selfStretch, flexSize } = layout;
-		const hasChildLayout = selfStretch || flexSize;
-
-		const shouldRenderChildLayoutStyles = useSelect(
-			( select ) => {
-				// The callback returns early to avoid block editor subscription.
-				if ( ! hasChildLayout ) {
-					return false;
-				}
-
-				return ! select( blockEditorStore ).getSettings()
-					.disableLayoutStyles;
-			},
-			[ hasChildLayout ]
-		);
+		const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
+			return ! select( blockEditorStore ).getSettings()
+				.disableLayoutStyles;
+		} );
 
 		if ( ! shouldRenderChildLayoutStyles ) {
 			return <BlockListBlock { ...props } />;

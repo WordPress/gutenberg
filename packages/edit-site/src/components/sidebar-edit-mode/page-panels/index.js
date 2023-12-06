@@ -12,6 +12,7 @@ import { humanTimeDiff } from '@wordpress/date';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -22,28 +23,39 @@ import PageContent from './page-content';
 import PageSummary from './page-summary';
 
 export default function PagePanels() {
-	const { id, type, hasResolved, status, date, password, title, modified } =
-		useSelect( ( select ) => {
-			const { getEditedPostContext } = select( editSiteStore );
-			const { getEditedEntityRecord, hasFinishedResolution } =
-				select( coreStore );
-			const context = getEditedPostContext();
-			const queryArgs = [ 'postType', context.postType, context.postId ];
-			const page = getEditedEntityRecord( ...queryArgs );
-			return {
-				hasResolved: hasFinishedResolution(
-					'getEditedEntityRecord',
-					queryArgs
-				),
-				title: page?.title,
-				id: page?.id,
-				type: page?.type,
-				status: page?.status,
-				date: page?.date,
-				password: page?.password,
-				modified: page?.modified,
-			};
-		}, [] );
+	const {
+		id,
+		type,
+		hasResolved,
+		status,
+		date,
+		password,
+		title,
+		modified,
+		renderingMode,
+	} = useSelect( ( select ) => {
+		const { getEditedPostContext } = select( editSiteStore );
+		const { getEditedEntityRecord, hasFinishedResolution } =
+			select( coreStore );
+		const { getRenderingMode } = select( editorStore );
+		const context = getEditedPostContext();
+		const queryArgs = [ 'postType', context.postType, context.postId ];
+		const page = getEditedEntityRecord( ...queryArgs );
+		return {
+			hasResolved: hasFinishedResolution(
+				'getEditedEntityRecord',
+				queryArgs
+			),
+			title: page?.title,
+			id: page?.id,
+			type: page?.type,
+			status: page?.status,
+			date: page?.date,
+			password: page?.password,
+			modified: page?.modified,
+			renderingMode: getRenderingMode(),
+		};
+	}, [] );
 
 	if ( ! hasResolved ) {
 		return null;
@@ -77,9 +89,11 @@ export default function PagePanels() {
 					postType={ type }
 				/>
 			</PanelBody>
-			<PanelBody title={ __( 'Content' ) }>
-				<PageContent />
-			</PanelBody>
+			{ renderingMode !== 'post-only' && (
+				<PanelBody title={ __( 'Content' ) }>
+					<PageContent />
+				</PanelBody>
+			) }
 		</>
 	);
 }

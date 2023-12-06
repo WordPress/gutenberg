@@ -102,7 +102,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			revokeBlobURL( href );
 		}
 
-		if ( downloadButtonText === undefined ) {
+		if ( RichText.isEmpty( downloadButtonText ) ) {
 			setAttributes( {
 				downloadButtonText: _x( 'Download', 'button label' ),
 			} );

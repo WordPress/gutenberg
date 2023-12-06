@@ -361,16 +361,39 @@ export const withBlockStyleControls = createHigherOrderComponent(
 
 		const shouldDisplayControls = useDisplayBlockControls();
 		const blockEditingMode = useBlockEditingMode();
+		const { clientId, name, setAttributes, __unstableParentLayout } = props;
 
 		return (
 			<>
 				{ shouldDisplayControls && blockEditingMode === 'default' && (
 					<>
-						<ColorEdit { ...props } />
-						<BackgroundImagePanel { ...props } />
-						<TypographyPanel { ...props } />
-						<BorderPanel { ...props } />
-						<DimensionsPanel { ...props } />
+						<ColorEdit
+							clientId={ clientId }
+							name={ name }
+							setAttributes={ setAttributes }
+						/>
+						<BackgroundImagePanel
+							clientId={ clientId }
+							name={ name }
+							setAttributes={ setAttributes }
+						/>
+						<TypographyPanel
+							clientId={ clientId }
+							name={ name }
+							setAttributes={ setAttributes }
+							__unstableParentLayout={ __unstableParentLayout }
+						/>
+						<BorderPanel
+							clientId={ clientId }
+							name={ name }
+							setAttributes={ setAttributes }
+						/>
+						<DimensionsPanel
+							clientId={ clientId }
+							name={ name }
+							setAttributes={ setAttributes }
+							__unstableParentLayout={ __unstableParentLayout }
+						/>
 					</>
 				) }
 				<BlockEdit key="edit" { ...props } />

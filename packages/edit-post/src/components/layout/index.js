@@ -165,7 +165,8 @@ function Layout() {
 		const postTypeLabel = getPostTypeLabel();
 
 		return {
-			isTemplateMode: select( editPostStore ).isEditingTemplate(),
+			isTemplateMode:
+				select( editorStore ).getRenderingMode() !== 'post-only',
 			hasFixedToolbar:
 				select( editPostStore ).isFeatureActive( 'fixedToolbar' ),
 			sidebarIsOpened: !! (
