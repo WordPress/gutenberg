@@ -6,11 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
+import { __, isRTL, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
-	VisuallyHidden,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
@@ -33,10 +32,14 @@ import { useState, useEffect, useRef } from '@wordpress/element';
 import { store as editorStore } from '../../store';
 
 const typeLabels = {
-	wp_pattern: __( 'Editing pattern:' ),
-	wp_navigation: __( 'Editing navigation menu:' ),
-	wp_template: __( 'Editing template:' ),
-	wp_template_part: __( 'Editing template part:' ),
+	// translators: 1: Pattern title.
+	wp_pattern: __( 'Editing pattern: %s' ),
+	// translators: 1: Navigation menu title.
+	wp_navigation: __( 'Editing navigation menu: %s' ),
+	// translators: 1: Template title.
+	wp_template: __( 'Editing template: %s' ),
+	// translators: 1: Template part title.
+	wp_template_part: __( 'Editing template part: %s' ),
 };
 
 const icons = {
@@ -114,6 +117,8 @@ function BaseDocumentActions( { postType, postId, onBack } ) {
 		isMounting.current = false;
 	}, [ postType, postId ] );
 
+	const title = isTemplate ? templateTitle : document.title;
+
 	return (
 		<div
 			className={ classnames( 'editor-document-bar', {
@@ -147,13 +152,17 @@ function BaseDocumentActions( { postType, postId, onBack } ) {
 						justify="center"
 					>
 						<BlockIcon icon={ isTemplate ? templateIcon : icon } />
-						<Text size="body" as="h1">
-							{ typeLabels[ postType ] && (
-								<VisuallyHidden as="span">
-									{ typeLabels[ postType ] }
-								</VisuallyHidden>
-							) }
-							{ isTemplate ? templateTitle : document.title }
+						<Text
+							size="body"
+							as="h1"
+							aria-label={
+								typeLabels[ postType ]
+									? // eslint-disable-next-line @wordpress/valid-sprintf
+									  sprintf( typeLabels[ postType ], title )
+									: undefined
+							}
+						>
+							{ title }
 						</Text>
 					</HStack>
 					<span className="edit-site-document-actions__shortcut">
