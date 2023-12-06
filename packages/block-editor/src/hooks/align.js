@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, pure } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -108,9 +108,9 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function BlockEditAlignmentToolbarControls( {
+function BlockEditAlignmentToolbarControlsPure( {
 	blockName,
-	attributes,
+	align,
 	setAttributes,
 } ) {
 	// Compute the block valid alignments by taking into account,
@@ -144,13 +144,20 @@ function BlockEditAlignmentToolbarControls( {
 	return (
 		<BlockControls group="block" __experimentalShareWithChildBlocks>
 			<BlockAlignmentControl
-				value={ attributes.align }
+				value={ align }
 				onChange={ updateAlignment }
 				controls={ validAlignments }
 			/>
 		</BlockControls>
 	);
 }
+
+// We don't want block controls to re-render when typing inside a block. `pure`
+// will prevent re-renders unless props change, so only pass the needed props
+// and not the whole attributes object.
+const BlockEditAlignmentToolbarControls = pure(
+	BlockEditAlignmentToolbarControlsPure
+);
 
 /**
  * Override the default edit UI to include new toolbar controls for block
@@ -173,7 +180,8 @@ export const withAlignmentControls = createHigherOrderComponent(
 				{ hasAlignmentSupport && (
 					<BlockEditAlignmentToolbarControls
 						blockName={ props.name }
-						attributes={ props.attributes }
+						// This component is pure, so only pass needed props!
+						align={ props.attributes.align }
 						setAttributes={ props.setAttributes }
 					/>
 				) }

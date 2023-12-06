@@ -12,7 +12,11 @@ import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import {
+	createHigherOrderComponent,
+	pure,
+	useInstanceId,
+} from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo, Platform } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
@@ -207,14 +211,12 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
  *
  * @return {Element} Position panel.
  */
-export function PositionPanel( props ) {
-	const {
-		attributes: { style = {} },
-		clientId,
-		name: blockName,
-		setAttributes,
-	} = props;
-
+export function PositionPanelPure( {
+	style = {},
+	clientId,
+	name: blockName,
+	setAttributes,
+} ) {
 	const allowFixed = hasFixedPositionSupport( blockName );
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
@@ -316,6 +318,11 @@ export function PositionPanel( props ) {
 	} );
 }
 
+// We don't want block controls to re-render when typing inside a block. `pure`
+// will prevent re-renders unless props change, so only pass the needed props
+// and not the whole attributes object.
+const PositionPanel = pure( PositionPanelPure );
+
 /**
  * Override the default edit UI to include position controls.
  *
@@ -335,7 +342,14 @@ export const withPositionControls = createHigherOrderComponent(
 
 		return [
 			showPositionControls && (
-				<PositionPanel key="position" { ...props } />
+				<PositionPanel
+					key="position"
+					// This component is pure, so only pass needed props!
+					style={ props.attributes.style }
+					name={ blockName }
+					setAttributes={ props.setAttributes }
+					clientId={ props.clientId }
+				/>
 			),
 			<BlockEdit key="edit" { ...props } />,
 		];
