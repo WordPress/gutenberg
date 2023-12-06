@@ -10,6 +10,7 @@
 -   `PaletteEdit`: Gradient pickers to use same width as color pickers ([#56801](https://github.com/WordPress/gutenberg/pull/56801)).
 -   `FocalPointPicker`: Add opt-in prop for 40px default size ([#56021](https://github.com/WordPress/gutenberg/pull/56021)).
 -   `DimensionControl`: Add opt-in prop for 40px default size ([#56805](https://github.com/WordPress/gutenberg/pull/56805)).
+-   `FontSizePicker`: Add opt-in prop for 40px default size ([#56804](https://github.com/WordPress/gutenberg/pull/56804)).
 
 ### Bug Fix
 
