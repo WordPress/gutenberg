@@ -128,6 +128,45 @@ function useBlockEditorProps( post, template, mode ) {
 	];
 }
 
+function BlockEditorProviderFromPost( {
+	post,
+	rootLevelPost,
+	template,
+	mode,
+	Component,
+	children,
+} ) {
+	const { editorSettings, selection } = useSelect( ( select ) => {
+		const { getEditorSettings, getEditorSelection } = select( editorStore );
+		return {
+			editorSettings: getEditorSettings(),
+			selection: getEditorSelection(),
+		};
+	}, [] );
+	const [ blocks, onInput, onChange ] = useBlockEditorProps(
+		post,
+		template,
+		mode
+	);
+	const blockEditorSettings = useBlockEditorSettings(
+		editorSettings,
+		rootLevelPost.type,
+		rootLevelPost.id
+	);
+	return (
+		<Component
+			value={ blocks }
+			onChange={ onChange }
+			onInput={ onInput }
+			selection={ selection }
+			settings={ blockEditorSettings }
+			useSubRegistry={ false }
+		>
+			{ children }
+		</Component>
+	);
+}
+
 export const ExperimentalEditorProvider = withRegistryProvider(
 	( {
 		post,
@@ -138,10 +177,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
 	} ) => {
-		const mode = useSelect(
-			( select ) => select( editorStore ).getRenderingMode(),
-			[]
-		);
+		const { mode, isReady } = useSelect( ( select ) => {
+			const { __unstableIsEditorReady, getRenderingMode } =
+				select( editorStore );
+			return {
+				mode: getRenderingMode(),
+				isReady: __unstableIsEditorReady(),
+			};
+		}, [] );
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
@@ -166,32 +209,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			rootLevelPost?.slug,
 			shouldRenderTemplate,
 		] );
-		const { editorSettings, selection, isReady } = useSelect(
-			( select ) => {
-				const {
-					getEditorSettings,
-					getEditorSelection,
-					__unstableIsEditorReady,
-				} = select( editorStore );
-				return {
-					editorSettings: getEditorSettings(),
-					isReady: __unstableIsEditorReady(),
-					selection: getEditorSelection(),
-				};
-			},
-			[]
-		);
-		const { id, type } = rootLevelPost;
-		const blockEditorSettings = useBlockEditorSettings(
-			editorSettings,
-			type,
-			id
-		);
-		const [ blocks, onInput, onChange ] = useBlockEditorProps(
-			post,
-			template,
-			mode
-		);
 
 		const {
 			updatePostLock,
@@ -261,20 +278,19 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					id={ post.id }
 				>
 					<BlockContextProvider value={ defaultBlockContext }>
-						<BlockEditorProviderComponent
-							value={ blocks }
-							onChange={ onChange }
-							onInput={ onInput }
-							selection={ selection }
-							settings={ blockEditorSettings }
-							useSubRegistry={ false }
+						<BlockEditorProviderFromPost
+							post={ post }
+							rootLevelPost={ rootLevelPost }
+							template={ template }
+							mode={ mode }
+							Component={ BlockEditorProviderComponent }
 						>
 							{ children }
 							<PatternsMenuItems />
 							{ mode === 'template-locked' && (
 								<DisableNonPageContentBlocks />
 							) }
-						</BlockEditorProviderComponent>
+						</BlockEditorProviderFromPost>
 					</BlockContextProvider>
 				</EntityProvider>
 			</EntityProvider>
