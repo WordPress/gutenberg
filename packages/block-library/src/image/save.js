@@ -36,6 +36,8 @@ export default function save( { attributes } ) {
 	const borderProps = getBorderClassesAndStyles( attributes );
 
 	const classes = classnames( {
+		// All other align classes are handled by block supports.
+		// `{ align: 'none' }` is unique to transforms for the image block.
 		alignnone: 'none' === align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
