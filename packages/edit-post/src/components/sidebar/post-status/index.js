@@ -62,14 +62,14 @@ export default function PostStatus() {
 					<>
 						<PostVisibility />
 						<PostSchedulePanel />
+						<PostTemplatePanel />
 						<PostURLPanel />
 						<PostSyncStatus />
-						<PostFormat />
-						<PostSlug />
-						<PostTemplatePanel />
-						<PostAuthorPanel />
 						<PostSticky />
 						<PostPendingStatus />
+						<PostFormat />
+						<PostSlug />
+						<PostAuthorPanel />
 						{ fills }
 						<HStack
 							style={ {
