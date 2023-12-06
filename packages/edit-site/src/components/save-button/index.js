@@ -6,6 +6,7 @@ import { Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { displayShortcut } from '@wordpress/keycodes';
+import { useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,6 +16,7 @@ import {
 	currentlyPreviewingTheme,
 	isPreviewingTheme,
 } from '../../utils/is-previewing-theme';
+import { unlock } from '../../lock-unlock';
 
 export default function SaveButton( {
 	className = 'edit-site-save-button__button',
@@ -52,12 +54,31 @@ export default function SaveButton( {
 				previewingThemeName: previewingTheme?.name?.rendered,
 			};
 		}, [] );
+
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
+	const { customizedSaveButtonAction, customizedSaveButtonLabel } = useSelect( ( select ) => {
+		const { getSettings } = unlock(select( editSiteStore ));
+		return {
+			customizedSaveButtonAction: getSettings().__experimentalSaveButtonAction,
+			customizedSaveButtonLabel: getSettings().__experimentalSaveButtonLabel,
+		};
+	}, []);
+	const onClick = useCallback( () => {
+		if ( customizedSaveButtonAction ) {
+			customizedSaveButtonAction();
+			return;
+		}
+		setIsSaveViewOpened( true );
+	}, [ customizedSaveButtonAction, setIsSaveViewOpened ]);
 
 	const activateSaveEnabled = isPreviewingTheme() || isDirty;
 	const disabled = isSaving || ! activateSaveEnabled;
 
 	const getLabel = () => {
+		if ( customizedSaveButtonLabel ) {
+			return customizedSaveButtonLabel;
+		}
+
 		if ( isPreviewingTheme() ) {
 			if ( isSaving ) {
 				return sprintf( 'Activating %s', previewingThemeName );
@@ -87,7 +108,7 @@ export default function SaveButton( {
 			aria-disabled={ disabled }
 			aria-expanded={ isSaveViewOpen }
 			isBusy={ isSaving }
-			onClick={ disabled ? undefined : () => setIsSaveViewOpened( true ) }
+			onClick={ disabled ? undefined : onClick }
 			label={ label }
 			/*
 			 * We want the tooltip to show the keyboard shortcut only when the
