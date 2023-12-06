@@ -71,6 +71,15 @@ export default function SaveButton( {
 		setIsSaveViewOpened( true );
 	}, [ customizedSaveButtonAction, setIsSaveViewOpened ]);
 
+	// For testing
+	const { updateSettings } = useDispatch( editSiteStore );
+	useEffect( () => {
+		updateSettings( {
+			__experimentalSaveButtonAction: () => console.log('Customized Action'),
+			__experimentalSaveButtonLabel: 'Customized Action',
+		} );
+	}, [ updateSettings ] );
+
 	const activateSaveEnabled = isPreviewingTheme() || isDirty;
 	const disabled = isSaving || ! activateSaveEnabled;
 
