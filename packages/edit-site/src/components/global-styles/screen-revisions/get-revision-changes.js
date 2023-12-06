@@ -3,6 +3,8 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 
+const globalStylesChangesCache = new WeakMap();
+
 const translationMap = {
 	caption: __( 'caption' ),
 	link: __( 'link' ),
@@ -23,19 +25,30 @@ const translationMap = {
 	'typography.fontWeight': __( 'font weight' ),
 };
 
+const isObject = ( obj ) => obj !== null && typeof obj === 'object';
+
+/**
+ * Get the translation for a given global styles key.
+ * @param {string}                key        A key representing a path to a global style property or setting.
+ * @param {Record<string,string>} blockNames A key/value pair object of block names and their rendered titles.
+ * @return {string|undefined}                A translated key or undefined if no translation exists.
+ */
 function getTranslation( key, blockNames ) {
 	if ( translationMap[ key ] ) {
 		return translationMap[ key ];
 	}
+
 	const keyArray = key.split( '.' );
 
 	if ( keyArray?.[ 0 ] === 'blocks' ) {
 		const blockName = blockNames[ keyArray[ 1 ] ];
-		return sprintf(
-			// translators: %s: block name.
-			__( '%s block' ),
-			blockName
-		);
+		return blockName
+			? sprintf(
+					// translators: %s: block name.
+					__( '%s block' ),
+					blockName
+			  )
+			: keyArray[ 1 ];
 	}
 
 	if ( keyArray?.[ 0 ] === 'elements' ) {
@@ -45,20 +58,89 @@ function getTranslation( key, blockNames ) {
 			translationMap[ keyArray[ 1 ] ]
 		);
 	}
+
+	return undefined;
 }
 
-const cache = new WeakMap();
+/**
+ * A deep comparison of two objects, optimized for comparing global styles.
+ * @param {Object} changedObject  The changed object to compare.
+ * @param {Object} originalObject The original object to compare against.
+ * @param {string} parentPath     A key/value pair object of block names and their rendered titles.
+ * @return {string[]}             An array of paths whose values have changed.
+ */
+function deepCompare( changedObject, originalObject, parentPath = '' ) {
+	// We have two non-object values to compare.
+	if ( ! isObject( changedObject ) && ! isObject( originalObject ) ) {
+		// Only return a path if the value has changed.
+		// And then only the path name up to 2 levels deep.
+		return changedObject !== originalObject
+			? parentPath.split( '.' ).slice( 0, 2 ).join( '.' )
+			: undefined;
+	}
 
-export function getRevisionChanges(
+	// Enable comparison when an object doesn't have a corresponding property to compare.
+	changedObject = isObject( changedObject ) ? changedObject : {};
+	originalObject = isObject( originalObject ) ? originalObject : {};
+
+	const allKeys = new Set( [
+		...Object.keys( changedObject ),
+		...Object.keys( originalObject ),
+	] );
+
+	let diffs = [];
+	for ( const key of allKeys ) {
+		const path = parentPath ? parentPath + '.' + key : key;
+		const changedPath = deepCompare(
+			changedObject[ key ],
+			originalObject[ key ],
+			path
+		);
+		if ( changedPath ) {
+			diffs = diffs.concat( changedPath );
+		}
+	}
+	return diffs;
+}
+
+/**
+ * Get a concatenated summary of translated global styles changes.
+ * Results are cached using a WeakMap key of `{ revision, previousRevision }`.
+ *
+ * @param {Object}                revision         The changed object to compare.
+ * @param {Object}                previousRevision The original object to compare against.
+ * @param {Record<string,string>} blockNames       A key/value pair object of block names and their rendered titles.
+ * @param {number?}               maxResults       The maximum number of changed items to feature in the returned summary.
+ * @return {string}                                A comma-separated list of changes.
+ */
+export default function getRevisionChanges(
 	revision,
 	previousRevision,
 	blockNames,
-	maxResults = 5
+	maxResults
 ) {
-	if ( cache.has( revision ) ) {
-		return cache.get( revision );
+	const cacheKey = { revision, previousRevision };
+
+	if ( globalStylesChangesCache.has( cacheKey ) ) {
+		const cachedResult = globalStylesChangesCache.get( cacheKey );
+		if ( ! maxResults ) {
+			return cachedResult;
+		}
+
+		// We may need to update the cache if a new maxResults is passed.
+		const cachedResultArray = cachedResult.split( ', ' );
+		const cachedResultArrayLength = cachedResultArray.length;
+		if ( maxResults === cachedResultArrayLength ) {
+			return cachedResult;
+		}
+
+		// If the cached result has more results than the max results, return a spliced cached result.
+		if ( maxResults < cachedResultArrayLength ) {
+			return cachedResultArray.slice( 0, maxResults ).join( ', ' );
+		}
 	}
 
+	// Compare the two revisions with normalized keys.
 	const changedValueTree = deepCompare(
 		{
 			blocks: revision?.styles?.blocks,
@@ -90,55 +172,8 @@ export function getRevisionChanges(
 			return acc;
 		}, [] );
 
-	const slicedResult = result.slice( 0, maxResults );
-
-	if ( result.length > maxResults ) {
-		// translators: follows comma-separated list of changed styles.
-		slicedResult.push( __( 'and more.' ) );
-	}
-
-	const joined = slicedResult.join( ', ' );
-	cache.set( revision, joined );
+	const changes = maxResults ? result.slice( 0, maxResults ) : result;
+	const joined = changes.join( ', ' );
+	globalStylesChangesCache.set( cacheKey, joined );
 	return joined;
-}
-
-function isObject( obj ) {
-	return obj !== null && typeof obj === 'object';
-}
-
-function deepCompare(
-	changedObject,
-	originalObject,
-	depth = 0,
-	parentPath = ''
-) {
-	if ( ! isObject( changedObject ) && ! isObject( originalObject ) ) {
-		// Only return a path if the value has changed.
-		// And then only the path name up to 2 levels deep.
-		return changedObject !== originalObject
-			? parentPath.split( '.' ).slice( 0, 2 ).join( '.' )
-			: undefined;
-	}
-
-	changedObject = isObject( changedObject ) ? changedObject : {};
-	originalObject = isObject( originalObject ) ? originalObject : {};
-
-	const changedKeys = Object.keys( changedObject );
-	const originalKeys = Object.keys( originalObject );
-	const allKeys = new Set( [ ...changedKeys, ...originalKeys ] );
-
-	let diffs = [];
-	for ( const key of allKeys ) {
-		const path = parentPath ? parentPath + '.' + key : key;
-		const changedPath = deepCompare(
-			changedObject[ key ],
-			originalObject[ key ],
-			depth + 1,
-			path
-		);
-		if ( changedPath ) {
-			diffs = diffs.concat( changedPath );
-		}
-	}
-	return diffs;
 }

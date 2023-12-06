@@ -17,7 +17,7 @@ import { getBlockTypes } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { getRevisionChanges } from './get-revision-changes';
+import getRevisionChanges from './get-revision-changes';
 
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 
