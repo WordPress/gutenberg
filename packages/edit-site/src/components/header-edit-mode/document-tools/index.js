@@ -6,12 +6,11 @@ import { useViewportMatch } from '@wordpress/compose';
 import {
 	ToolSelector,
 	NavigableToolbar,
-	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { _x, __ } from '@wordpress/i18n';
-import { listView, plus, chevronUpDown } from '@wordpress/icons';
+import { listView, plus } from '@wordpress/icons';
 import { Button, ToolbarItem } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
@@ -60,12 +59,8 @@ export default function DocumentTools( {
 			};
 		}, [] );
 
-	const {
-		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-		setIsInserterOpened,
-		setIsListViewOpened,
-	} = useDispatch( editSiteStore );
-	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const { setIsInserterOpened, setIsListViewOpened } =
+		useDispatch( editSiteStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
@@ -105,8 +100,6 @@ export default function DocumentTools( {
 	);
 	const shortLabel = ! isInserterOpen ? __( 'Add' ) : __( 'Close' );
 
-	const isZoomedOutViewExperimentEnabled =
-		window?.__experimentalEnableZoomedOutView && isVisualMode;
 	const isZoomedOutView = blockEditorMode === 'zoom-out';
 
 	return (
@@ -178,27 +171,6 @@ export default function DocumentTools( {
 								size="compact"
 							/>
 						) }
-						{ isZoomedOutViewExperimentEnabled &&
-							! isDistractionFree &&
-							! hasFixedToolbar && (
-								<ToolbarItem
-									as={ Button }
-									className="edit-site-header-edit-mode__zoom-out-view-toggle"
-									icon={ chevronUpDown }
-									isPressed={ isZoomedOutView }
-									/* translators: button label text should, if possible, be under 16 characters. */
-									label={ __( 'Zoom-out View' ) }
-									onClick={ () => {
-										setPreviewDeviceType( 'Desktop' );
-										__unstableSetEditorMode(
-											isZoomedOutView
-												? 'edit'
-												: 'zoom-out'
-										);
-									} }
-									size="compact"
-								/>
-							) }
 					</>
 				) }
 			</div>
