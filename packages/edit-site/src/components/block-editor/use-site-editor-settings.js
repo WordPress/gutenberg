@@ -137,10 +137,7 @@ export function useSpecificEditorSettings() {
 		};
 	}, [] );
 	const archiveLabels = useArchiveLabel( templateSlug );
-	const defaultRenderingMode = useMemo( () => {
-		return postWithTemplate ? 'template-locked' : 'all';
-	}, [ postWithTemplate ] );
-
+	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
 	const defaultEditorSettings = useMemo( () => {
 		return {
 			...settings,
