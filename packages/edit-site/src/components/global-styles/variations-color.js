@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useContext, useState } from '@wordpress/element';
+import { useMemo, useContext } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import {
 	__experimentalHeading as Heading,
@@ -26,58 +26,13 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { unlock } from '../../lock-unlock';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
+import { getVariationsByProperty } from './utils';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
-function cloneDeep( object ) {
-	return ! object ? {} : JSON.parse( JSON.stringify( object ) );
-}
-
-const filterObjectByProperty = ( object, property ) => {
-	const newObject = {};
-	Object.keys( object ).forEach( ( key ) => {
-		if ( key === property ) {
-			newObject[ key ] = object[ key ];
-		} else if ( typeof object[ key ] === 'object' ) {
-			const newFilter = filterObjectByProperty( object[ key ], property );
-			if ( Object.keys( newFilter ).length ) {
-				newObject[ key ] = newFilter;
-			}
-		}
-	} );
-	return newObject;
-};
-
-const removePropertyFromObject = ( object, property ) => {
-	for ( const key in object ) {
-		if ( key === property ) {
-			delete object[ key ];
-		} else if ( typeof object[ key ] === 'object' ) {
-			removePropertyFromObject( object[ key ], property );
-		}
-	}
-	return object;
-};
-
-const getVariationsByType = ( user, variations, type ) => {
-	const userSettingsWithoutType = removePropertyFromObject(
-		cloneDeep( user ),
-		type
-	);
-
-	const variationsWithOnlyType = variations.map( ( variation ) => {
-		return filterObjectByProperty( variation, type );
-	} );
-
-	return variationsWithOnlyType.map( ( variation ) =>
-		mergeBaseAndUserConfigs( userSettingsWithoutType, variation )
-	);
-};
-
 function ColorVariation( { variation } ) {
-	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo( () => {
 		return {
@@ -135,9 +90,6 @@ function ColorVariation( { variation } ) {
 				tabIndex="0"
 				aria-label={ label }
 				aria-current={ isActive }
-				isFocused={ isFocused }
-				onFocus={ () => setIsFocused( true ) }
-				onBlur={ () => setIsFocused( false ) }
 			>
 				<div className="edit-site-global-styles-variations_item-preview">
 					<HStack
@@ -171,7 +123,7 @@ export default function ColorVariations() {
 		).__experimentalGetCurrentThemeGlobalStylesVariations();
 	}, [] );
 	const colorVariations =
-		variations && getVariationsByType( user, variations, 'color' ); // should also get filter?
+		variations && getVariationsByProperty( user, variations, 'color' ); // should also get filter?
 
 	return (
 		<>

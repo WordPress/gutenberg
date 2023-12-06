@@ -24,51 +24,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { unlock } from '../../lock-unlock';
 import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
-
-function cloneDeep( object ) {
-	return ! object ? {} : JSON.parse( JSON.stringify( object ) );
-}
-
-const filterObjectByProperty = ( object, property ) => {
-	const newObject = {};
-	Object.keys( object ).forEach( ( key ) => {
-		if ( key === property ) {
-			newObject[ key ] = object[ key ];
-		} else if ( typeof object[ key ] === 'object' ) {
-			const newFilter = filterObjectByProperty( object[ key ], property );
-			if ( Object.keys( newFilter ).length ) {
-				newObject[ key ] = newFilter;
-			}
-		}
-	} );
-	return newObject;
-};
-
-const removePropertyFromObject = ( object, property ) => {
-	for ( const key in object ) {
-		if ( key === property ) {
-			delete object[ key ];
-		} else if ( typeof object[ key ] === 'object' ) {
-			removePropertyFromObject( object[ key ], property );
-		}
-	}
-	return object;
-};
-
-const getVariationsByType = ( user, variations, type ) => {
-	const userSettingsWithoutType = removePropertyFromObject(
-		cloneDeep( user ),
-		type
-	);
-
-	const variationsWithOnlyType = variations.map( ( variation ) => {
-		return filterObjectByProperty( variation, type );
-	} );
-
-	return variationsWithOnlyType.map( ( variation ) =>
-		mergeBaseAndUserConfigs( userSettingsWithoutType, variation )
-	);
-};
+import { getVariationsByProperty } from './utils';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
@@ -220,7 +176,7 @@ export default function TypographyVariations() {
 	const { base, user } = useContext( GlobalStylesContext );
 
 	const typographyVariations =
-		variations && getVariationsByType( user, variations, 'typography' );
+		variations && getVariationsByProperty( user, variations, 'typography' );
 
 	const uniqueTypographyVariations = [];
 	const uniqueTypographyNames = [];
