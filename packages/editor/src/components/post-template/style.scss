@@ -41,15 +41,6 @@
 	}
 }
 
-.editor-post-template__panel-classic {
-	padding-top: $grid-unit-10;
-}
-
-.editor-post-template__panel-classic .editor-post-panel__row-control > div {
-	width: 100%;
-}
-
-
 .editor-post-template__create-form {
 	@include break-medium() {
 		width: $grid-unit * 40;

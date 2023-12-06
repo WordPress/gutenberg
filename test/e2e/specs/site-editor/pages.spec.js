@@ -129,7 +129,7 @@ test.describe( 'Pages', () => {
 		);
 		await expect(
 			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text="You are editing a template."'
+				'role=button[name="Dismiss this notice"i] >> text="Editing template. Changes made here affect all posts and pages that use the template."'
 			)
 		).toBeVisible();
 

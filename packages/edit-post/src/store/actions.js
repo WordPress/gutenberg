@@ -524,26 +524,11 @@ export function setIsEditingTemplate() {
 
 /**
  * Switches to the template mode.
- *
- * @param {boolean} newTemplate Is new template.
  */
 export const __unstableSwitchToTemplateMode =
-	( newTemplate = false ) =>
-	( { registry, select } ) => {
+	() =>
+	( { registry } ) => {
 		registry.dispatch( editorStore ).setRenderingMode( 'template-only' );
-		const isWelcomeGuideActive = select.isFeatureActive(
-			'welcomeGuideTemplate'
-		);
-		if ( ! isWelcomeGuideActive ) {
-			const message = newTemplate
-				? __( "Custom template created. You're in template mode now." )
-				: __(
-						'Editing template. Changes made here affect all posts and pages that use the template.'
-				  );
-			registry.dispatch( noticesStore ).createSuccessNotice( message, {
-				type: 'snackbar',
-			} );
-		}
 	};
 
 /**

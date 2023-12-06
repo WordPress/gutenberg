@@ -7,6 +7,7 @@ import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecord } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -34,7 +35,8 @@ export default function BlockThemeControl( { id } ) {
 		'wp_template',
 		id
 	);
-
+	const { getEditorSettings } = useSelect( editorStore );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { setRenderingMode } = useDispatch( editorStore );
 
 	if ( ! hasResolved ) {
@@ -47,7 +49,6 @@ export default function BlockThemeControl( { id } ) {
 			focusOnMount
 			toggleProps={ {
 				variant: 'tertiary',
-				className: 'edit-site-summary-field__trigger',
 			} }
 			label={ __( 'Template options' ) }
 			text={ decodeEntities( template.title ) }
@@ -60,6 +61,24 @@ export default function BlockThemeControl( { id } ) {
 							onClick={ () => {
 								setRenderingMode( 'template-only' );
 								onClose();
+								createSuccessNotice(
+									__(
+										'Editing template. Changes made here affect all posts and pages that use the template.'
+									),
+									{
+										type: 'snackbar',
+										actions: [
+											{
+												label: __( 'Go back' ),
+												onClick: () =>
+													setRenderingMode(
+														getEditorSettings()
+															.defaultRenderingMode
+													),
+											},
+										],
+									}
+								);
 							} }
 						>
 							{ __( 'Edit template' ) }

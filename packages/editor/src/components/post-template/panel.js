@@ -14,12 +14,17 @@ import BlockThemeControl from './block-theme';
 import PostPanelRow from '../post-panel-row';
 
 export default function PostTemplatePanel() {
-	const templateId = useSelect(
-		( select ) => select( editorStore ).getCurrentTemplateId(),
-		[]
-	);
+	const { templateId, isBlockTheme } = useSelect( ( select ) => {
+		const { getCurrentTemplateId, getEditorSettings } =
+			select( editorStore );
+		return {
+			templateId: getCurrentTemplateId(),
+			isBlockTheme: getEditorSettings().__unstableIsBlockBasedTheme,
+		};
+	}, [] );
 
-	const isVisible = useSelect( ( select ) => {
+	const isVisible = true;
+	useSelect( ( select ) => {
 		const postTypeSlug = select( editorStore ).getCurrentPostType();
 		const postType = select( coreStore ).getPostType( postTypeSlug );
 		if ( ! postType?.viewable ) {
@@ -34,26 +39,29 @@ export default function PostTemplatePanel() {
 			return true;
 		}
 
-		return false;
+		if ( ! settings.supportsTemplateMode ) {
+			return false;
+		}
+
+		const canCreateTemplates =
+			select( coreStore ).canUser( 'create', 'templates' ) ?? false;
+		return canCreateTemplates;
 	}, [] );
 
-	if ( ! isVisible && ! templateId ) {
-		return null;
-	}
-
-	const isBlockTheme = !! templateId;
-
-	if ( ! isBlockTheme ) {
+	if ( ! isBlockTheme && isVisible ) {
 		return (
-			<PostPanelRow className="editor-post-template__panel-classic">
+			<PostPanelRow label={ __( 'Template' ) }>
 				<ClassicThemeControl />
 			</PostPanelRow>
 		);
 	}
 
-	return (
-		<PostPanelRow label={ __( 'Template' ) }>
-			<BlockThemeControl id={ templateId } />
-		</PostPanelRow>
-	);
+	if ( isBlockTheme && !! templateId ) {
+		return (
+			<PostPanelRow label={ __( 'Template' ) }>
+				<BlockThemeControl id={ templateId } />
+			</PostPanelRow>
+		);
+	}
+	return null;
 }
