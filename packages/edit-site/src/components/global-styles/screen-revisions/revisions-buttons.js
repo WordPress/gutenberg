@@ -23,11 +23,7 @@ const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 const MAX_CHANGES = 7;
 
 function ChangedSummary( { revision, previousRevision, blockNames } ) {
-	const changes = getRevisionChanges(
-		revision,
-		previousRevision,
-		blockNames
-	);
+	let changes = getRevisionChanges( revision, previousRevision, blockNames );
 
 	const changesLength = changes.length;
 
@@ -37,12 +33,14 @@ function ChangedSummary( { revision, previousRevision, blockNames } ) {
 
 	// Truncate to `n` results.
 	if ( changesLength > MAX_CHANGES ) {
-		changes.splice( MAX_CHANGES, changesLength - MAX_CHANGES, __( '…' ) );
+		changes = changes.slice( 0, MAX_CHANGES ).join( ', ' ) + __( '…' );
+	} else {
+		changes = changes.join( ', ' );
 	}
 
 	return (
 		<span className="edit-site-global-styles-screen-revision__changes">
-			{ changes.join( ', ' ) }
+			{ changes }
 		</span>
 	);
 }
