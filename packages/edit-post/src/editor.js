@@ -9,7 +9,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -141,12 +141,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		updatePreferredStyleVariations,
 		keepCaretInsideBlock,
 	] );
-
-	// The default mode of the post editor is "post-only" mode.
-	const { setRenderingMode } = useDispatch( editorStore );
-	useEffect( () => {
-		setRenderingMode( 'post-only' );
-	}, [ setRenderingMode ] );
 
 	if ( ! post ) {
 		return null;
