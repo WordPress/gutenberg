@@ -70,21 +70,21 @@ const removePropertyFromObject = ( object, property ) => {
  *
  * @param {Object} user       The user variation.
  * @param {Array}  variations The other style variations.
- * @param {string} type       The property to filter by.
+ * @param {string} property   The property to filter by.
  *
  * @return {Array} The style variation with only the specified property filtered.
  */
-export const getVariationsByProperty = ( user, variations, type ) => {
-	const userSettingsWithoutType = removePropertyFromObject(
+export const getVariationsByProperty = ( user, variations, property ) => {
+	const userSettingsWithoutProperty = removePropertyFromObject(
 		cloneDeep( user ),
-		type
+		property
 	);
 
-	const variationsWithOnlyType = variations.map( ( variation ) => {
-		return filterObjectByProperty( variation, type );
+	const variationsWithOnlyProperty = variations.map( ( variation ) => {
+		return filterObjectByProperty( variation, property );
 	} );
 
-	return variationsWithOnlyType.map( ( variation ) =>
-		mergeBaseAndUserConfigs( userSettingsWithoutType, variation )
+	return variationsWithOnlyProperty.map( ( variation ) =>
+		mergeBaseAndUserConfigs( userSettingsWithoutProperty, variation )
 	);
 };

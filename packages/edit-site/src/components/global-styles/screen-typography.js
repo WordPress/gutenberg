@@ -13,6 +13,7 @@ import TypographyElements from './typography-elements';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
 import TypographyVariations from './variations-typography';
+import Typeset from './typeset';
 
 function ScreenTypography() {
 	const fontLibraryEnabled = useSelect(
@@ -31,6 +32,7 @@ function ScreenTypography() {
 			/>
 			<div className="edit-site-global-styles-screen-typography">
 				<VStack spacing={ 6 }>
+					<Typeset />
 					{ fontLibraryEnabled && <FontFamilies /> }
 					<TypographyElements />
 					<TypographyVariations />
