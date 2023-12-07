@@ -13,6 +13,8 @@ import { DataViews } from '@wordpress/dataviews';
  * Internal dependencies
  */
 import Page from '../page';
+import { useLink } from '../routes/link';
+
 import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
 import {
 	ENUMERATION_TYPE,
@@ -50,6 +52,15 @@ const defaultConfigPerViewType = {
 		mediaField: 'featured-image',
 	},
 };
+
+const LinkFormat = ( { item } ) =>
+	useLink( {
+		params: {
+			postId: item.id,
+			postType: item.type,
+			canvas: 'edit',
+		},
+	} );
 
 function useView( type ) {
 	const {
@@ -212,6 +223,12 @@ export default function PagePages() {
 				getValue: ( { item } ) =>
 					decodeEntities( item.title?.rendered || item.slug ) ||
 					__( '(no title)' ),
+				formats: [
+					{
+						type: 'link',
+						renderProps: LinkFormat,
+					},
+				],
 				maxWidth: 400,
 				enableHiding: false,
 			},
