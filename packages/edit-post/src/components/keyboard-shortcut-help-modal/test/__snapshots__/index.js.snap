@@ -898,7 +898,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
               class="edit-post-keyboard-shortcut-help-modal__shortcut-term"
             >
               <kbd
-                aria-label="Shift + Alt + 1 6"
+                aria-label="Shift + Alt + 1-6"
                 class="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
               >
                 <kbd
