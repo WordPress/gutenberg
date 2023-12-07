@@ -175,16 +175,13 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 	);
 }
 
-export const attributeKeys = [ 'style' ];
-
-export function hasSupport( name ) {
-	return hasBlockSupport( name, 'filter.duotone' );
-}
-
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-export const BlockEdit = DuotonePanelPure;
+export default {
+	edit: DuotonePanelPure,
+	attributeKeys: [ 'style' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'filter.duotone' );
+	},
+};
 
 /**
  * Filters registered block settings, extending attributes to include

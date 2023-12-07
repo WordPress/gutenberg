@@ -63,11 +63,13 @@ function CustomClassNameControlsPure( { className, setAttributes } ) {
 	);
 }
 
-export const BlockEdit = CustomClassNameControlsPure;
-export const attributeKeys = [ 'className' ];
-export function hasSupport( name ) {
-	return hasBlockSupport( name, 'customClassName', true );
-}
+export default {
+	edit: CustomClassNameControlsPure,
+	attributeKeys: [ 'className' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'customClassName', true );
+	},
+};
 
 /**
  * Override props assigned to save component to inject the className, if block

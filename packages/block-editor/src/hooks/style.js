@@ -376,10 +376,10 @@ function BlockStyleControls( {
 	);
 }
 
-export const BlockEdit = BlockStyleControls;
-export function hasSupport( name ) {
-	return hasStyleSupport( name );
-}
+export default {
+	edit: BlockStyleControls,
+	hasSupport: hasStyleSupport,
+};
 
 // Defines which element types are supported, including their hover styles or
 // any other elements that have been included under a single element type

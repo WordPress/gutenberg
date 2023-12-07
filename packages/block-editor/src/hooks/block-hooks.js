@@ -233,7 +233,9 @@ function BlockHooksControlPure( props ) {
 	);
 }
 
-export const BlockEdit = BlockHooksControlPure;
-export function hasSupport() {
-	return true;
-}
+export default {
+	edit: BlockHooksControlPure,
+	hasSupport() {
+		return true;
+	},
+};

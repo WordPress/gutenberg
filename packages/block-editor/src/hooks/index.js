@@ -9,43 +9,44 @@ import { addFilter } from '@wordpress/hooks';
  */
 import useDisplayBlockControls from '../components/use-display-block-controls';
 import './compat';
+import align from './align';
 import './lock';
-import './anchor';
+import anchor from './anchor';
 import './aria-label';
-import './custom-class-name';
+import customClassName from './custom-class-name';
 import './generated-class-name';
-import './style';
+import style from './style';
 import './settings';
 import './color';
+import duotone from './duotone';
 import './font-family';
 import './font-size';
 import './border';
-import './position';
+import position from './position';
+import layout from './layout';
 import './content-lock-ui';
 import './metadata';
-import './custom-fields';
-import './block-hooks';
-import './block-renaming';
+import customFields from './custom-fields';
+import blockHooks from './block-hooks';
+import blockRenaming from './block-renaming';
 
 const features = [
-	'layout',
-	'duotone',
-	'align',
-	'anchor',
-	'block-hooks',
-	'block-renaming',
-	'custom-class-name',
-	window.__experimentalConnections ? 'custom-fields' : null,
-	'position',
-	'style',
+	align,
+	anchor,
+	customClassName,
+	style,
+	duotone,
+	position,
+	layout,
+	window.__experimentalConnections ? customFields : null,
+	blockHooks,
+	blockRenaming,
 ]
 	.filter( Boolean )
-	.map( ( feature ) => {
-		const settings = require( `./${ feature }` );
+	.map( ( settings ) => {
 		return {
 			...settings,
-			name: feature,
-			BlockEdit: pure( settings.BlockEdit ),
+			Edit: pure( settings.edit ),
 		};
 	} );
 
@@ -63,7 +64,7 @@ export const withBlockEditHooks = createHigherOrderComponent(
 		const shouldDisplayControls = useDisplayBlockControls();
 		return [
 			...features.map(
-				( { name, BlockEdit, hasSupport, attributeKeys = [] } ) => {
+				( { Edit, hasSupport, attributeKeys = [] }, i ) => {
 					if (
 						! shouldDisplayControls ||
 						! hasSupport( props.name )
@@ -77,8 +78,8 @@ export const withBlockEditHooks = createHigherOrderComponent(
 						}
 					}
 					return (
-						<BlockEdit
-							key={ name }
+						<Edit
+							key={ i }
 							name={ props.name }
 							clientId={ props.clientId }
 							setAttributes={ props.setAttributes }

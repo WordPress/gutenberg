@@ -90,16 +90,18 @@ function CustomFieldsControlPure( { name, connections, setAttributes } ) {
 	);
 }
 
-export const BlockEdit = CustomFieldsControlPure;
-export const attributeKeys = [ 'connections' ];
-export function hasSupport( name ) {
-	return (
-		hasBlockSupport( name, '__experimentalConnections', false ) &&
-		// Check if the current block is a paragraph or image block.
-		// Currently, only these two blocks are supported.
-		[ 'core/paragraph', 'core/image' ].includes( name )
-	);
-}
+export default {
+	edit: CustomFieldsControlPure,
+	attributeKeys: [ 'connections' ],
+	hasSupport( name ) {
+		return (
+			hasBlockSupport( name, '__experimentalConnections', false ) &&
+			// Check if the current block is a paragraph or image block.
+			// Currently, only these two blocks are supported.
+			[ 'core/paragraph', 'core/image' ].includes( name )
+		);
+	},
+};
 
 if (
 	window.__experimentalConnections ||

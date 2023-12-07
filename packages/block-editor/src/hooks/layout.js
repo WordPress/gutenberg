@@ -286,16 +286,13 @@ function LayoutPanelPure( { layout, setAttributes, name: blockName } ) {
 	);
 }
 
-export const attributeKeys = [ 'layout' ];
-
-export function hasSupport( name ) {
-	return hasLayoutBlockSupport( name, layoutBlockSupportKey );
-}
-
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-export const BlockEdit = LayoutPanelPure;
+export default {
+	edit: LayoutPanelPure,
+	attributeKeys: [ 'layout' ],
+	hasSupport( name ) {
+		return hasLayoutBlockSupport( name );
+	},
+};
 
 function LayoutTypeSwitcher( { type, onChange } ) {
 	return (

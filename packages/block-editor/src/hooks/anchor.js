@@ -115,11 +115,13 @@ function BlockEditAnchorControlPure( { blockName, anchor, setAttributes } ) {
 	);
 }
 
-export const BlockEdit = BlockEditAnchorControlPure;
-export const attributeKeys = [ 'anchor' ];
-export function hasSupport( name ) {
-	return hasBlockSupport( name, 'anchor' );
-}
+export default {
+	edit: BlockEditAnchorControlPure,
+	attributeKeys: [ 'anchor' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'anchor' );
+	},
+};
 
 /**
  * Override props assigned to save component to inject anchor ID, if block

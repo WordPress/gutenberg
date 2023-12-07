@@ -62,11 +62,13 @@ function BlockRenameControlPure( { metadata, setAttributes } ) {
 	);
 }
 
-export const BlockEdit = BlockRenameControlPure;
-export const attributeKeys = [ 'metadata' ];
-export function hasSupport( name ) {
-	return hasBlockSupport( name, 'renaming', true );
-}
+export default {
+	edit: BlockRenameControlPure,
+	attributeKeys: [ 'metadata' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'renaming', true );
+	},
+};
 
 addFilter(
 	'blocks.registerBlockType',

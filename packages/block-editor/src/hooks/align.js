@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, pure } from '@wordpress/compose';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -152,18 +152,13 @@ function BlockEditAlignmentToolbarControlsPure( {
 	);
 }
 
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-const BlockEditAlignmentToolbarControls = pure(
-	BlockEditAlignmentToolbarControlsPure
-);
-
-export const BlockEdit = BlockEditAlignmentToolbarControls;
-export const attributeKeys = [ 'align' ];
-export function hasSupport( blockName ) {
-	return hasBlockSupport( blockName, 'align', false );
-}
+export default {
+	edit: BlockEditAlignmentToolbarControlsPure,
+	attributeKeys: [ 'align' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'align', false );
+	},
+};
 
 function BlockListBlockWithDataAlign( { block: BlockListBlock, props } ) {
 	const { name, attributes } = props;

@@ -318,17 +318,19 @@ export function PositionPanelPure( {
 	} );
 }
 
-export const BlockEdit = ( props ) => {
-	const isPositionDisabled = useIsPositionDisabled( props );
-	if ( isPositionDisabled ) {
-		return;
-	}
-	return <PositionPanel { ...props } />;
+export default {
+	edit: function Edit( props ) {
+		const isPositionDisabled = useIsPositionDisabled( props );
+		if ( isPositionDisabled ) {
+			return;
+		}
+		return <PositionPanel { ...props } />;
+	},
+	attributeKeys: [ 'style' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, POSITION_SUPPORT_KEY );
+	},
 };
-export const attributeKeys = [ 'style' ];
-export function hasSupport( name ) {
-	return hasBlockSupport( name, POSITION_SUPPORT_KEY );
-}
 
 // We don't want block controls to re-render when typing inside a block. `pure`
 // will prevent re-renders unless props change, so only pass the needed props
