@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createBlockEditFilter } from './utils';
+import { createBlockEditFilter, createBlockListBlockFilter } from './utils';
 import './compat';
 import align from './align';
 import './lock';
@@ -38,6 +38,7 @@ createBlockEditFilter(
 		blockRenaming,
 	].filter( Boolean )
 );
+createBlockListBlockFilter( [ duotone, position ] );
 
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';

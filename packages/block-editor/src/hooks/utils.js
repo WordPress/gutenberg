@@ -16,6 +16,10 @@ import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
 
 /**
  * Removed falsy values from nested object.
@@ -429,4 +433,76 @@ export function createBlockEditFilter( features ) {
 		'withBlockEditHooks'
 	);
 	addFilter( 'editor.BlockEdit', 'core/editor/hooks', withBlockEditHooks );
+}
+
+function BlockListBlockWrapper( {
+	Component,
+	useBlockProps,
+	attributeKeys,
+	...props
+} ) {
+	const neededProps = { name: props.name };
+	for ( const key of attributeKeys ) {
+		if ( props.attributes[ key ] ) {
+			neededProps[ key ] = props.attributes[ key ];
+		}
+	}
+	const wrapperProps = useBlockProps( neededProps );
+	return (
+		<Component
+			{ ...props }
+			wrapperProps={ {
+				...props.wrapperProps,
+				className: classnames(
+					props.wrapperProps?.className,
+					wrapperProps.className
+				),
+				style: {
+					...props.wrapperProps?.style,
+					...wrapperProps.style,
+				},
+			} }
+		/>
+	);
+}
+
+export function createBlockListBlockFilter( features ) {
+	const HoCs = features.map(
+		( { hasSupport, useBlockProps, attributeKeys } ) => {
+			return createHigherOrderComponent(
+				( BlockListBlock ) => ( props ) => {
+					const neededAttributeValues = [];
+					for ( const key of attributeKeys ) {
+						if ( props.attributes[ key ] ) {
+							neededAttributeValues.push(
+								props.attributes[ key ]
+							);
+						}
+					}
+					if (
+						! hasSupport( props.name ) ||
+						// Skip rendering if none of the needed attributes are
+						// set.
+						! neededAttributeValues.length
+					) {
+						return <BlockListBlock { ...props } />;
+					}
+					return (
+						<BlockListBlockWrapper
+							Component={ BlockListBlock }
+							useBlockProps={ useBlockProps }
+							attributeKeys={ attributeKeys }
+							{ ...props }
+						/>
+					);
+				}
+			);
+		}
+	);
+	addFilter(
+		'editor.BlockListBlock',
+		'core/editor/hooks',
+		( BlockListBlock ) =>
+			HoCs.reduce( ( acc, HoC ) => HoC( acc ), BlockListBlock )
+	);
 }
