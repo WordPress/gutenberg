@@ -38,6 +38,7 @@ import {
 	OPERATOR_NOT_IN,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
+	LAYOUT_LIST,
 } from '../../utils/constants';
 import {
 	useResetTemplateAction,
@@ -57,6 +58,9 @@ const defaultConfigPerViewType = {
 	[ LAYOUT_TABLE ]: {},
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
+		primaryField: 'title',
+	},
+	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
 	},
 };
@@ -79,8 +83,32 @@ function normalizeSearchInput( input = '' ) {
 
 // TODO: these are going to be reused in the template part list.
 // That's the reason for leaving the template parts code for now.
-function TemplateTitle( { item } ) {
+const Customized = ( { item, isCustomized } ) => {
+	if ( ! isCustomized ) {
+		return null;
+	}
+	return (
+		<span className="edit-site-list-added-by__customized-info">
+			{ item.type === TEMPLATE_POST_TYPE
+				? _x( 'Customized', 'template' )
+				: _x( 'Customized', 'template part' ) }
+		</span>
+	);
+};
+
+function TemplateTitle( { item, view } ) {
 	const { isCustomized } = useAddedBy( item.type, item.id );
+
+	if ( view.type === LAYOUT_LIST ) {
+		return (
+			<>
+				{ decodeEntities( item.title?.rendered || item.slug ) ||
+					__( '(no title)' ) }
+				<Customized item={ item } isCustomized={ isCustomized } />
+			</>
+		);
+	}
+
 	return (
 		<VStack spacing={ 1 }>
 			<View as="span" className="edit-site-list-title__customized-info">
@@ -95,13 +123,7 @@ function TemplateTitle( { item } ) {
 						__( '(no title)' ) }
 				</Link>
 			</View>
-			{ isCustomized && (
-				<span className="edit-site-list-added-by__customized-info">
-					{ item.type === TEMPLATE_POST_TYPE
-						? _x( 'Customized', 'template' )
-						: _x( 'Customized', 'template part' ) }
-				</span>
-			) }
+			<Customized item={ item } isCustomized={ isCustomized } />
 		</VStack>
 	);
 }
@@ -192,7 +214,9 @@ export default function DataviewsTemplates() {
 				header: __( 'Template' ),
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered || item.slug,
-				render: ( { item } ) => <TemplateTitle item={ item } />,
+				render: ( { item } ) => (
+					<TemplateTitle item={ item } view={ view } />
+				),
 				maxWidth: 400,
 				enableHiding: false,
 			},
@@ -352,7 +376,6 @@ export default function DataviewsTemplates() {
 				isLoading={ isLoadingData }
 				view={ view }
 				onChangeView={ onChangeView }
-				supportedLayouts={ [ LAYOUT_TABLE, LAYOUT_GRID ] }
 				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
 			/>
 		</Page>
