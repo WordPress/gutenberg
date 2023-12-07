@@ -37,23 +37,34 @@ function selector( select ) {
 
 	const { name = '', attributes = {} } = getBlock( clientId ) || {};
 	const editorMode = __unstableGetEditorMode();
+	const hasSelectedBlock = clientId && name;
+	const isEmptyDefaultBlock = isUnmodifiedDefaultBlock( {
+		name,
+		attributes,
+	} );
+	const _showEmptyBlockSideInserter =
+		clientId &&
+		! isTyping() &&
+		editorMode === 'edit' &&
+		isUnmodifiedDefaultBlock( { name, attributes } );
+	const maybeShowBreadcrumb =
+		hasSelectedBlock &&
+		! hasMultiSelection() &&
+		( editorMode === 'navigation' || editorMode === 'zoom-out' );
+
 	return {
 		clientId,
 		hasFixedToolbar: getSettings().hasFixedToolbar,
-		hasSelectedBlock: clientId && name,
-		isEmptyDefaultBlock: isUnmodifiedDefaultBlock(
-			getBlock( clientId ) || {}
-		),
 		isTyping: isTyping(),
 		isZoomOutMode: editorMode === 'zoom-out',
-		showEmptyBlockSideInserter:
-			clientId &&
-			! isTyping() &&
-			editorMode === 'edit' &&
-			isUnmodifiedDefaultBlock( { name, attributes } ),
-		shouldShowBreadcrumb:
-			! hasMultiSelection() &&
-			( editorMode === 'navigation' || editorMode === 'zoom-out' ),
+		showEmptyBlockSideInserter: _showEmptyBlockSideInserter,
+		showBreadcrumb: ! _showEmptyBlockSideInserter && maybeShowBreadcrumb,
+		showBlockToolbar:
+			! getSettings().hasFixedToolbar &&
+			! _showEmptyBlockSideInserter &&
+			hasSelectedBlock &&
+			! isEmptyDefaultBlock &&
+			! maybeShowBreadcrumb,
 	};
 }
 
@@ -74,12 +85,11 @@ export default function BlockTools( {
 	const {
 		clientId,
 		hasFixedToolbar,
-		hasSelectedBlock,
-		isEmptyDefaultBlock,
 		isTyping,
 		isZoomOutMode,
 		showEmptyBlockSideInserter,
-		shouldShowBreadcrumb,
+		showBreadcrumb,
+		showBlockToolbar,
 	} = useSelect( selector, [] );
 	const isMatch = useShortcutEventMatch();
 	const { getSelectedBlockClientIds, getBlockRootClientId } =
@@ -186,26 +196,20 @@ export default function BlockTools( {
 					/>
 				) }
 
-				{ ! hasFixedToolbar &&
-					! showEmptyBlockSideInserter &&
-					hasSelectedBlock &&
-					! isEmptyDefaultBlock &&
-					! shouldShowBreadcrumb && (
-						<BlockToolbarPopover
-							__unstableContentRef={ __unstableContentRef }
-							clientId={ clientId }
-							isTyping={ isTyping }
-						/>
-					) }
+				{ showBlockToolbar && (
+					<BlockToolbarPopover
+						__unstableContentRef={ __unstableContentRef }
+						clientId={ clientId }
+						isTyping={ isTyping }
+					/>
+				) }
 
-				{ ! showEmptyBlockSideInserter &&
-					hasSelectedBlock &&
-					shouldShowBreadcrumb && (
-						<BlockToolbarBreadcrumb
-							__unstableContentRef={ __unstableContentRef }
-							clientId={ clientId }
-						/>
-					) }
+				{ showBreadcrumb && (
+					<BlockToolbarBreadcrumb
+						__unstableContentRef={ __unstableContentRef }
+						clientId={ clientId }
+					/>
+				) }
 
 				{ /* Used for the inline rich text toolbar. Until this toolbar is combined into BlockToolbar, someone implementing their own BlockToolbar will also need to use this to see the image caption toolbar. */ }
 				{ ! isZoomOutMode && ! hasFixedToolbar && (
