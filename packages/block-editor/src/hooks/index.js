@@ -1,13 +1,7 @@
 /**
- * WordPress dependencies
- */
-import { createHigherOrderComponent, pure } from '@wordpress/compose';
-import { addFilter } from '@wordpress/hooks';
-
-/**
  * Internal dependencies
  */
-import useDisplayBlockControls from '../components/use-display-block-controls';
+import { createBlockEditFilter } from './utils';
 import './compat';
 import align from './align';
 import './lock';
@@ -30,25 +24,20 @@ import customFields from './custom-fields';
 import blockHooks from './block-hooks';
 import blockRenaming from './block-renaming';
 
-const features = [
-	align,
-	anchor,
-	customClassName,
-	style,
-	duotone,
-	position,
-	layout,
-	window.__experimentalConnections ? customFields : null,
-	blockHooks,
-	blockRenaming,
-]
-	.filter( Boolean )
-	.map( ( settings ) => {
-		return {
-			...settings,
-			Edit: pure( settings.edit ),
-		};
-	} );
+createBlockEditFilter(
+	[
+		align,
+		anchor,
+		customClassName,
+		style,
+		duotone,
+		position,
+		layout,
+		window.__experimentalConnections ? customFields : null,
+		blockHooks,
+		blockRenaming,
+	].filter( Boolean )
+);
 
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';
@@ -58,43 +47,3 @@ export { getSpacingClassesAndStyles } from './use-spacing-props';
 export { getTypographyClassesAndStyles } from './use-typography-props';
 export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
-
-export const withBlockEditHooks = createHigherOrderComponent(
-	( OriginalBlockEdit ) => ( props ) => {
-		const shouldDisplayControls = useDisplayBlockControls();
-		return [
-			...features.map(
-				( { Edit, hasSupport, attributeKeys = [] }, i ) => {
-					if (
-						! shouldDisplayControls ||
-						! hasSupport( props.name )
-					) {
-						return null;
-					}
-					const neededProps = {};
-					for ( const key of attributeKeys ) {
-						if ( props.attributes[ key ] ) {
-							neededProps[ key ] = props.attributes[ key ];
-						}
-					}
-					return (
-						<Edit
-							key={ i }
-							name={ props.name }
-							clientId={ props.clientId }
-							setAttributes={ props.setAttributes }
-							__unstableParentLayout={
-								props.__unstableParentLayout
-							}
-							{ ...neededProps }
-						/>
-					);
-				}
-			),
-			<OriginalBlockEdit key="edit" { ...props } />,
-		];
-	},
-	'withBlockEditHooks'
-);
-
-addFilter( 'editor.BlockEdit', 'core/editor/hooks', withBlockEditHooks );
