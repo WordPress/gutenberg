@@ -102,6 +102,10 @@
 		box-shadow: 0 0 0 $border-width $gray-200;
 		// Shown in Windows 10 high contrast mode.
 		outline: 1px solid transparent;
+
+		&.is-color-variation {
+			padding: $grid-unit-30;
+		}
 	}
 
 	&.is-active .edit-site-global-styles-variations_item-preview {

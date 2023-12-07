@@ -11,9 +11,9 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, useContext } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import {
-	__experimentalHeading as Heading,
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 	__experimentalZStack as ZStack,
 	ColorIndicator,
 } from '@wordpress/components';
@@ -27,6 +27,7 @@ import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { unlock } from '../../lock-unlock';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
 import { getVariationsByProperty } from './utils';
+import Subtitle from './subtitle';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
@@ -81,9 +82,12 @@ function ColorVariation( { variation } ) {
 	return (
 		<GlobalStylesContext.Provider value={ context }>
 			<div
-				className={ classnames( {
-					'is-active': isActive,
-				} ) }
+				className={ classnames(
+					'edit-site-global-styles-variations_item',
+					{
+						'is-active': isActive,
+					}
+				) }
 				role="button"
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }
@@ -91,11 +95,12 @@ function ColorVariation( { variation } ) {
 				aria-label={ label }
 				aria-current={ isActive }
 			>
-				<div className="edit-site-global-styles-variations_item-preview">
+				<div className="edit-site-global-styles-variations_item-preview is-color-variation">
 					<HStack
 						direction={
 							colors.length === 0 ? 'row-reverse' : 'row'
 						}
+						justify="center"
 					>
 						<ZStack isLayered={ false } offset={ -8 }>
 							{ colors
@@ -126,8 +131,8 @@ export default function ColorVariations() {
 		variations && getVariationsByProperty( user, variations, 'color' ); // should also get filter?
 
 	return (
-		<>
-			<Heading level={ 3 }>{ __( 'Presets' ) }</Heading>
+		<VStack spacing={ 3 }>
+			<Subtitle level={ 3 }>{ __( 'Presets' ) }</Subtitle>
 			<Grid
 				columns={ 2 }
 				className="edit-site-global-styles-color-variations"
@@ -142,6 +147,6 @@ export default function ColorVariations() {
 						);
 					} ) }
 			</Grid>
-		</>
+		</VStack>
 	);
 }
