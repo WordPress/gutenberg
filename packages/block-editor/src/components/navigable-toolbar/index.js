@@ -25,14 +25,6 @@ function hasOnlyToolbarItem( elements ) {
 	return ! elements.some( ( element ) => ! ( dataProp in element.dataset ) );
 }
 
-function getAllToolbarItemsIn( container ) {
-	return Array.from( container.querySelectorAll( '[data-toolbar-item]' ) );
-}
-
-function hasFocusWithin( container ) {
-	return container.contains( container.ownerDocument.activeElement );
-}
-
 function focusFirstTabbableIn( container ) {
 	const [ firstTabbable ] = focus.tabbable.find( container );
 
@@ -103,14 +95,11 @@ function useToolbarFocus( {
 	toolbarRef,
 	focusOnMount,
 	isAccessibleToolbar,
-	defaultIndex,
-	onIndexChange,
 	shouldUseKeyboardFocusShortcut,
 	focusEditorOnEscape,
 } ) {
-	// Make sure we don't use modified versions of this prop.
+	// focusOnMount deprecated in 6.5.0
 	const [ initialFocusOnMount ] = useState( focusOnMount );
-	const [ initialIndex ] = useState( defaultIndex );
 	const { stopTyping } = useDispatch( blockEditorStore );
 
 	const focusToolbar = useCallback( () => {
@@ -127,44 +116,12 @@ function useToolbarFocus( {
 	// Focus on toolbar when pressing alt+F10 when the toolbar is visible.
 	useShortcut( 'core/block-editor/focus-toolbar', focusToolbarViaShortcut );
 
+	// Force toolbar focus on mount deprecated in 6.5.0
 	useEffect( () => {
 		if ( initialFocusOnMount ) {
 			focusToolbar();
 		}
 	}, [ isAccessibleToolbar, initialFocusOnMount, focusToolbar ] );
-
-	useEffect( () => {
-		// Store ref so we have access on useEffect cleanup: https://legacy.reactjs.org/blog/2020/08/10/react-v17-rc.html#effect-cleanup-timing
-		const navigableToolbarRef = toolbarRef.current;
-		// If initialIndex is passed, we focus on that toolbar item when the
-		// toolbar gets mounted and initial focus is not forced.
-		// We have to wait for the next browser paint because block controls aren't
-		// rendered right away when the toolbar gets mounted.
-		let raf = 0;
-		if ( ! initialFocusOnMount ) {
-			raf = window.requestAnimationFrame( () => {
-				const items = getAllToolbarItemsIn( navigableToolbarRef );
-				const index = initialIndex || 0;
-				if ( items[ index ] && hasFocusWithin( navigableToolbarRef ) ) {
-					items[ index ].focus( {
-						// When focusing newly mounted toolbars,
-						// the position of the popover is often not right on the first render
-						// This prevents the layout shifts when focusing the dialogs.
-						preventScroll: true,
-					} );
-				}
-			} );
-		}
-		return () => {
-			window.cancelAnimationFrame( raf );
-			if ( ! onIndexChange || ! navigableToolbarRef ) return;
-			// When the toolbar element is unmounted and onIndexChange is passed, we
-			// pass the focused toolbar item index so it can be hydrated later.
-			const items = getAllToolbarItemsIn( navigableToolbarRef );
-			const index = items.findIndex( ( item ) => item.tabIndex === 0 );
-			onIndexChange( index );
-		};
-	}, [ initialIndex, initialFocusOnMount, onIndexChange, toolbarRef ] );
 
 	const { lastFocus } = useSelect( ( select ) => {
 		const { getLastFocus } = select( blockEditorStore );
@@ -212,7 +169,6 @@ export default function NavigableToolbar( {
 	useToolbarFocus( {
 		toolbarRef,
 		focusOnMount,
-		defaultIndex: initialIndex,
 		onIndexChange,
 		isAccessibleToolbar,
 		shouldUseKeyboardFocusShortcut,
