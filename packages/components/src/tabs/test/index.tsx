@@ -801,17 +801,15 @@ describe( 'Tabs', () => {
 
 		describe( 'When `selectOnMove` is `true`', () => {
 			it( 'should automatically select a newly focused tab', async () => {
-				const user = userEvent.setup();
-
 				render( <UncontrolledTabs tabs={ TABS } /> );
 
 				// Tab should focus the currently selected tab, which is Alpha.
-				await user.keyboard( '[Tab]' );
+				await press.Tab();
 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 				expect( await getSelectedTab() ).toHaveFocus();
 
 				// Arrow keys should select and move focus to the next tab.
-				await user.keyboard( '[ArrowRight]' );
+				await press.ArrowRight();
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 				expect( await getSelectedTab() ).toHaveFocus();
 			} );
@@ -819,37 +817,35 @@ describe( 'Tabs', () => {
 
 		describe( 'When `selectOnMove` is `false`', () => {
 			it( 'should apply focus without automatically changing the selected tab', async () => {
-				const user = userEvent.setup();
-
 				render(
 					<UncontrolledTabs tabs={ TABS } selectOnMove={ false } />
 				);
 
 				// Tab should focus the currently selected tab, which is Alpha.
-				await user.keyboard( '[Tab]' );
+				await press.Tab();
 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 				expect( await getSelectedTab() ).toHaveFocus();
 
 				// Arrow key should move focus but not automatically change the selected tab.
-				await user.keyboard( '[ArrowRight]' );
+				await press.ArrowRight();
 				expect(
 					screen.getByRole( 'tab', { name: 'Beta' } )
 				).toHaveFocus();
 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 
 				// Pressing the spacebar should select the focused tab.
-				await user.keyboard( '[Space]' );
+				await press.Space();
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 				// Arrow key should move focus but not automatically change the selected tab.
-				await user.keyboard( '[ArrowRight]' );
+				await press.ArrowRight();
 				expect(
 					screen.getByRole( 'tab', { name: 'Gamma' } )
 				).toHaveFocus();
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 				// Pressing the enter/return should select the focused tab.
-				await user.keyboard( '[Enter]' );
+				await press.Enter();
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			} );
 		} );
@@ -1230,48 +1226,26 @@ describe( 'Tabs', () => {
 
 		describe( 'When `selectOnMove` is `true`', () => {
 			it( 'should automatically select a newly focused tab', async () => {
-				const user = userEvent.setup();
-
 				render( <ControlledTabs tabs={ TABS } selectedTabId="beta" /> );
 
-				// This assertion ensures the component has had time to fully
-				// render, preventing flakiness.
-				// see https://github.com/WordPress/gutenberg/pull/55950
-				await waitFor( async () =>
-					expect(
-						await screen.findByRole( 'tab', { name: 'Beta' } )
-					).toHaveAttribute( 'aria-selected', 'true' )
-				);
-
-				await user.keyboard( '[Tab]' );
+				await press.Tab();
 
 				// Tab key should focus the currently selected tab, which is Beta.
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 				expect( await getSelectedTab() ).toHaveFocus();
 
 				// Arrow keys should select and move focus to the next tab.
-				await user.keyboard( '[ArrowRight]' );
+				await press.ArrowRight();
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 				expect( await getSelectedTab() ).toHaveFocus();
 			} );
 			it( 'should automatically update focus when the selected tab is changed by the controlling component', async () => {
-				const user = userEvent.setup();
-
 				const { rerender } = render(
 					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
 				);
 
-				// This assertion ensures the component has had time to fully
-				// render, preventing flakiness.
-				// see https://github.com/WordPress/gutenberg/pull/55950
-				await waitFor( async () =>
-					expect(
-						await screen.findByRole( 'tab', { name: 'Beta' } )
-					).toHaveAttribute( 'aria-selected', 'true' )
-				);
-
 				// Tab key should focus the currently selected tab, which is Beta.
-				await user.keyboard( '[Tab]' );
+				await press.Tab();
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 				expect( await getSelectedTab() ).toHaveFocus();
 
@@ -1286,8 +1260,6 @@ describe( 'Tabs', () => {
 		} );
 		describe( 'When `selectOnMove` is `false`', () => {
 			it( 'should apply focus without automatically changing the selected tab', async () => {
-				const user = userEvent.setup();
-
 				render(
 					<ControlledTabs
 						tabs={ TABS }
@@ -1296,48 +1268,37 @@ describe( 'Tabs', () => {
 					/>
 				);
 
-				// This assertion ensures the component has had time to fully
-				// render, preventing flakiness.
-				// see https://github.com/WordPress/gutenberg/pull/55950
-				await waitFor( async () =>
-					expect(
-						await screen.findByRole( 'tab', { name: 'Beta' } )
-					).toHaveAttribute( 'aria-selected', 'true' )
-				);
-
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 				// Tab key should focus the currently selected tab, which is Beta.
-				await user.keyboard( '[Tab]' );
+				await press.Tab();
 				expect(
 					await screen.findByRole( 'tab', { name: 'Beta' } )
 				).toHaveFocus();
 
 				// Arrow key should move focus but not automatically change the selected tab.
-				await user.keyboard( '[ArrowRight]' );
+				await press.ArrowRight();
 				expect(
 					screen.getByRole( 'tab', { name: 'Gamma' } )
 				).toHaveFocus();
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 				// Pressing the spacebar should select the focused tab.
-				await user.keyboard( '[Space]' );
+				await press.Space();
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 
 				// Arrow key should move focus but not automatically change the selected tab.
-				await user.keyboard( '[ArrowRight]' );
+				await press.ArrowRight();
 				expect(
 					screen.getByRole( 'tab', { name: 'Alpha' } )
 				).toHaveFocus();
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 
 				// Pressing the enter/return should select the focused tab.
-				await user.keyboard( '[Enter]' );
+				await press.Enter();
 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			} );
 			it( 'should not automatically update focus when the selected tab is changed by the controlling component', async () => {
-				const user = userEvent.setup();
-
 				const { rerender } = render(
 					<ControlledTabs
 						tabs={ TABS }
@@ -1346,19 +1307,10 @@ describe( 'Tabs', () => {
 					/>
 				);
 
-				// This assertion ensures the component has had time to fully
-				// render, preventing flakiness.
-				// see https://github.com/WordPress/gutenberg/pull/55950
-				await waitFor( async () =>
-					expect(
-						await screen.findByRole( 'tab', { name: 'Beta' } )
-					).toHaveAttribute( 'aria-selected', 'true' )
-				);
-
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 				// Tab key should focus the currently selected tab, which is Beta.
-				await user.keyboard( '[Tab]' );
+				await press.Tab();
 				expect( await getSelectedTab() ).toHaveFocus();
 
 				rerender(
@@ -1371,13 +1323,9 @@ describe( 'Tabs', () => {
 
 				// When the selected tab is changed, it should not automatically receive focus.
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-				// `waitFor` is needed here to prevent testing library from
-				// throwing a 'not wrapped in `act()`' error.
-				await waitFor( () =>
-					expect(
-						screen.getByRole( 'tab', { name: 'Beta' } )
-					).toHaveFocus()
-				);
+				expect(
+					screen.getByRole( 'tab', { name: 'Beta' } )
+				).toHaveFocus();
 			} );
 		} );
 	} );
