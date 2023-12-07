@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	privateApis as blockEditorPrivateApis,
+	BlockToolbar,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
@@ -40,9 +40,6 @@ import { default as DevicePreview } from '../device-preview';
 import ViewLink from '../view-link';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-
-const { BlockContextualToolbar } = unlock( blockEditorPrivateApis );
 
 const slideY = {
 	hidden: { y: '-50px' },
@@ -130,7 +127,7 @@ function Header( {
 								}
 							) }
 						>
-							<BlockContextualToolbar isFixed />
+							<BlockToolbar hideDragHandle />
 						</div>
 						<Popover.Slot
 							ref={ blockToolbarRef }

@@ -8,10 +8,11 @@ import classnames from 'classnames';
  */
 import { useSelect } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockBreadcrumb,
+	BlockToolbar,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 	BlockInspector,
@@ -91,6 +92,8 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 	} = useEditedEntityRecord();
 
 	const { type: editedPostType } = editedPost;
+
+	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const {
 		context,
@@ -232,6 +235,9 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 										<SidebarInspectorFill>
 											<BlockInspector />
 										</SidebarInspectorFill>
+										{ ! isLargeViewport && (
+											<BlockToolbar hideDragHandle />
+										) }
 										<SiteEditorCanvas />
 										<BlockRemovalWarningModal
 											rules={ blockRemovalRules }

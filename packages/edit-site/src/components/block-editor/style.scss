@@ -69,17 +69,6 @@
 
 	&.is-view-mode {
 		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
-
-		/*
-			Temporary to hide the contextual toolbar in view mode.
-			See: https://github.com/WordPress/gutenberg/pull/46298
-			This rule can possibly be removed once the
-			contextual toolbar has been redesigned.
-			See: https://github.com/WordPress/gutenberg/issues/40450
-		*/
-		.block-editor-block-contextual-toolbar.is-fixed {
-			display: none;
-		}
 	}
 }
 
