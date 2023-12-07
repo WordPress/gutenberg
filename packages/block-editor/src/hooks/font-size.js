@@ -66,6 +66,10 @@ function addAttributes( settings ) {
  * @return {Object} Filtered props applied to save element.
  */
 function addSaveProps( props, blockType, attributes ) {
+	if ( ! attributes.fontSize ) {
+		return props;
+	}
+
 	if ( ! hasBlockSupport( blockType, FONT_SIZE_SUPPORT_KEY ) ) {
 		return props;
 	}
@@ -285,6 +289,10 @@ function addEditPropsForFluidCustomFontSizes( blockType ) {
 
 		const fontSize = wrapperProps?.style?.fontSize;
 
+		if ( ! fontSize ) {
+			return wrapperProps;
+		}
+
 		// TODO: This sucks! We should be using useSetting( 'typography.fluid' )
 		// or even useSelect( blockEditorStore ). We can't do either here
 		// because getEditWrapperProps is a plain JavaScript function called by
@@ -295,12 +303,10 @@ function addEditPropsForFluidCustomFontSizes( blockType ) {
 		const fluidTypographySettings = getFluidTypographyOptionsFromSettings(
 			select( blockEditorStore ).getSettings().__experimentalFeatures
 		);
-		const newFontSize = fontSize
-			? getTypographyFontSizeValue(
-					{ size: fontSize },
-					fluidTypographySettings
-			  )
-			: null;
+		const newFontSize = getTypographyFontSizeValue(
+			{ size: fontSize },
+			fluidTypographySettings
+		);
 
 		if ( newFontSize === null ) {
 			return wrapperProps;

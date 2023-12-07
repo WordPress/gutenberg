@@ -133,6 +133,13 @@ function addAttributes( settings ) {
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( props, blockType, attributes ) {
+	// I'd have preferred to avoid the "style" attribute usage here
+	const { backgroundColor, textColor, gradient, style } = attributes;
+
+	if ( ! backgroundColor && ! textColor && ! gradient && ! style ) {
+		return props;
+	}
+
 	if (
 		! hasColorSupport( blockType ) ||
 		shouldSkipSerialization( blockType, COLOR_SUPPORT_KEY )
@@ -141,9 +148,6 @@ export function addSaveProps( props, blockType, attributes ) {
 	}
 
 	const hasGradient = hasGradientSupport( blockType );
-
-	// I'd have preferred to avoid the "style" attribute usage here
-	const { backgroundColor, textColor, gradient, style } = attributes;
 
 	const shouldSerialize = ( feature ) =>
 		! shouldSkipSerialization( blockType, COLOR_SUPPORT_KEY, feature );

@@ -292,6 +292,11 @@ export function addSaveProps(
 	}
 
 	let { style } = attributes;
+
+	if ( ! style ) {
+		return props;
+	}
+
 	Object.entries( skipPaths ).forEach( ( [ indicator, path ] ) => {
 		const skipSerialization =
 			skipSerializationPathsSaveChecks[ indicator ] ||

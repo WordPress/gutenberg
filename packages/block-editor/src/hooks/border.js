@@ -265,6 +265,12 @@ function addAttributes( settings ) {
  * @return {Object} Filtered props to apply to save element.
  */
 function addSaveProps( props, blockType, attributes ) {
+	const { borderColor, style } = attributes;
+
+	if ( ! borderColor && ! style?.border?.color ) {
+		return props;
+	}
+
 	if (
 		! hasBorderSupport( blockType, 'color' ) ||
 		shouldSkipSerialization( blockType, BORDER_SUPPORT_KEY, 'color' )
