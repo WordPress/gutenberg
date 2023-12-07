@@ -20,7 +20,7 @@ import { PaddingVisualizer } from './padding';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
-import { cleanEmptyObject, useBlockSettings } from './utils';
+import { cleanEmptyObject } from './utils';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -66,13 +66,7 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-function DimensionsPanelPure( {
-	clientId,
-	name,
-	setAttributes,
-	__unstableParentLayout,
-} ) {
-	const settings = useBlockSettings( name, __unstableParentLayout );
+function DimensionsPanelPure( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasDimensionsPanel( settings );
 	const value = useSelect(
 		( select ) =>

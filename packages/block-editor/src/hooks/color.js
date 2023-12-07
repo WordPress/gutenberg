@@ -24,7 +24,6 @@ import {
 	cleanEmptyObject,
 	transformStyles,
 	shouldSkipSerialization,
-	useBlockSettings,
 } from './utils';
 import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
@@ -291,8 +290,7 @@ function ColorInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-function ColorEditPure( { clientId, name, setAttributes } ) {
-	const settings = useBlockSettings( name );
+function ColorEditPure( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasColorPanel( settings );
 	function selector( select ) {
 		const { style, textColor, backgroundColor, gradient } =
