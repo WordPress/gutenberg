@@ -14,6 +14,8 @@ import { useState } from '@wordpress/element';
  */
 import CustomSelectControl from '..';
 
+const customClass = 'amber-skies';
+
 const props = {
 	options: [
 		{
@@ -23,6 +25,7 @@ const props = {
 		{
 			key: 'flower2',
 			name: 'crimson clover',
+			className: customClass,
 		},
 		{
 			key: 'flower3',
@@ -31,7 +34,7 @@ const props = {
 		{
 			key: 'color1',
 			name: 'amber',
-			className: 'amber-skies',
+			className: customClass,
 		},
 		{
 			key: 'color2',
@@ -116,26 +119,33 @@ describe.each( [
 
 	it( 'Should apply class only to options that have a className defined', async () => {
 		const user = userEvent.setup();
-		const customClass = 'amber-skies';
 
 		render( <CustomSelectControl { ...props } /> );
 
 		await user.click( screen.getByRole( 'button', { text: 'violets' } ) );
 
-		// return an array of items without a className added
-		const classlessItems = props.options.filter(
-			( option ) => option.className === undefined
+		// return an array of items _with_ a className added
+		const itemsWithClass = props.options.filter(
+			( option ) => option.className !== undefined
 		);
 
 		// assert against filtered array
-		classlessItems.map( ( { name } ) =>
-			expect( screen.getByRole( 'option', { name } ) ).not.toHaveClass(
+		itemsWithClass.map( ( { name } ) =>
+			expect( screen.getByRole( 'option', { name } ) ).toHaveClass(
 				customClass
 			)
 		);
 
-		expect( screen.getByRole( 'option', { name: 'amber' } ) ).toHaveClass(
-			customClass
+		// return an array of items _without_ a className added
+		const itemsWithoutClass = props.options.filter(
+			( option ) => option.className === undefined
+		);
+
+		// assert against filtered array
+		itemsWithoutClass.map( ( { name } ) =>
+			expect( screen.getByRole( 'option', { name } ) ).not.toHaveClass(
+				customClass
+			)
 		);
 	} );
 
@@ -148,7 +158,19 @@ describe.each( [
 
 		await user.click( screen.getByRole( 'button', { text: 'violets' } ) );
 
-		// return an array of items without styles added
+		// return an array of items _with_ styles added
+		const styledItems = props.options.filter(
+			( option ) => option.style !== undefined
+		);
+
+		// assert against filtered array
+		styledItems.map( ( { name } ) =>
+			expect( screen.getByRole( 'option', { name } ) ).toHaveStyle(
+				customStyles
+			)
+		);
+
+		// return an array of items _without_ styles added
 		const unstyledItems = props.options.filter(
 			( option ) => option.style === undefined
 		);
@@ -159,12 +181,6 @@ describe.each( [
 				customStyles
 			)
 		);
-
-		expect(
-			screen.getByRole( 'option', {
-				name: 'aquamarine',
-			} )
-		).toHaveStyle( customStyles );
 	} );
 
 	it( 'does not show selected hint by default', () => {
