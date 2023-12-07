@@ -53,7 +53,7 @@
 	&.is-selected.is-synced td {
 		background: var(--wp-block-synced-color);
 	}
-	&.is-synced:not(.is-selected) .block-editor-list-view-block-contents {
+	&.is-synced:not(.is-selected):not([id^="clone-"]) .block-editor-list-view-block-contents {
 		&:hover,
 		&:focus,
 		.block-editor-block-icon {
@@ -89,15 +89,19 @@
 	}
 
 	// Border radius for corners of the selected item.
+	&[id^="clone-"] td:first-child,
 	&.is-first-selected td:first-child {
 		border-top-left-radius: $radius-block-ui;
 	}
+	&[id^="clone-"] td:last-child,
 	&.is-first-selected td:last-child {
 		border-top-right-radius: $radius-block-ui;
 	}
+	&[id^="clone-"] td:first-child,
 	&.is-last-selected td:first-child {
 		border-bottom-left-radius: $radius-block-ui;
 	}
+	&[id^="clone-"] td:last-child,
 	&.is-last-selected td:last-child {
 		border-bottom-right-radius: $radius-block-ui;
 	}
@@ -396,20 +400,22 @@
 	}
 
 	&[id^="clone-"] {
-		align-items: center;
 		display: flex;
 		height: 36px;
-		background: $white;
-		border: 1px solid $gray-400;
-		border-radius: $radius-block-ui;
 		opacity: 1;
 
 		.block-editor-list-view-block__contents-cell {
 			flex: 1;
 		}
 
-		&.is-selected td {
-			background: $white;
+		.block-editor-list-view-block__menu-cell {
+			display: flex;
+			align-items: center;
+		}
+
+		td {
+			background: var(--wp-admin-theme-color);
+			color: $white;
 
 			.block-editor-list-view-block-select-button,
 			.components-button.has-icon {
