@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
-import { decodeEntities } from '@wordpress/html-entities';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -218,13 +217,15 @@ export default function PagePages() {
 				header: __( 'Title' ),
 				id: 'title',
 				type: TEXT_TYPE,
-				getValue: ( { item } ) =>
-					decodeEntities( item.title?.rendered || item.slug ) ||
-					__( '(no title)' ),
+				getValue: ( { item } ) => item.title?.rendered, // TODO: see styles for pages without title (link).
 				formats: [
 					{
 						type: 'link',
 						renderProps: LinkFormat,
+					},
+					{
+						type: 'empty',
+						renderChildren: () => __( '(no title)' ),
 					},
 				],
 				maxWidth: 400,

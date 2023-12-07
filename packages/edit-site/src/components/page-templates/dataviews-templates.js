@@ -6,16 +6,10 @@ import removeAccents from 'remove-accents';
 /**
  * WordPress dependencies
  */
-import {
-	Icon,
-	__experimentalText as Text,
-	__experimentalHStack as HStack,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
-import { decodeEntities } from '@wordpress/html-entities';
 import { parse } from '@wordpress/blocks';
 import {
 	BlockPreview,
@@ -182,15 +176,17 @@ export default function DataviewsTemplates() {
 				header: __( 'Template' ),
 				id: 'title',
 				type: TEXT_TYPE,
-				getValue: ( { item } ) =>
-					decodeEntities( item.title?.rendered || item.slug ) ||
-					__( '(no title)' ),
+				getValue: ( { item } ) => item.title?.rendered,
 				formats: [
 					{ type: 'link', renderProps: LinkFormat },
 					{
 						type: 'after',
 						renderProps: AfterFormatProps,
 						renderChildren: AfterFormatChildren,
+					},
+					{
+						type: 'empty',
+						renderChildren: () => __( '(no title)' ),
 					},
 				],
 				maxWidth: 400,
@@ -199,21 +195,8 @@ export default function DataviewsTemplates() {
 			{
 				header: __( 'Description' ),
 				id: 'description',
+				type: TEXT_TYPE,
 				getValue: ( { item } ) => item.description,
-				render: ( { item } ) => {
-					return item.description ? (
-						decodeEntities( item.description )
-					) : (
-						<>
-							<Text variant="muted" aria-hidden="true">
-								&#8212;
-							</Text>
-							<VisuallyHidden>
-								{ __( 'No description.' ) }
-							</VisuallyHidden>
-						</>
-					);
-				},
 				maxWidth: 200,
 				enableSorting: false,
 			},
