@@ -1,4 +1,11 @@
 /**
+ * Internal dependencies
+ */
+import { FOCUSABLE_ENTITIES } from '../utils/constants';
+
+import { getEditedPostType } from './selectors';
+
+/**
  * Returns the current canvas mode.
  *
  * @param {Object} state Global application state.
@@ -18,4 +25,9 @@ export function getCanvasMode( state ) {
  */
 export function getEditorCanvasContainerView( state ) {
 	return state.editorCanvasContainerView;
+}
+
+export function isEntityFocusMode( state ) {
+	const postType = getEditedPostType( state );
+	return FOCUSABLE_ENTITIES.includes( postType );
 }

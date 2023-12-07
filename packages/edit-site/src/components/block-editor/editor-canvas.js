@@ -22,10 +22,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import {
-	FOCUSABLE_ENTITIES,
-	NAVIGATION_POST_TYPE,
-} from '../../utils/constants';
+import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 
 const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
 	blockEditorPrivateApis
@@ -53,12 +50,13 @@ function EditorCanvas( {
 			getEditedPostType,
 			__experimentalGetPreviewDeviceType,
 			getCanvasMode,
+			isEntityFocusMode,
 		} = unlock( select( editSiteStore ) );
 		const _templateType = getEditedPostType();
 
 		return {
 			templateType: _templateType,
-			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
+			isFocusMode: isEntityFocusMode(),
 			deviceType: __experimentalGetPreviewDeviceType(),
 			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 			canvasMode: getCanvasMode(),
@@ -93,6 +91,7 @@ function EditorCanvas( {
 	};
 	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
+
 	// Hide the appender when:
 	// - In navigation focus mode (should only allow the root Nav block).
 	// - In view mode (i.e. not editing).

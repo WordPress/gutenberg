@@ -41,14 +41,12 @@ import {
 	useHasEditorCanvasContainer,
 } from '../editor-canvas-container';
 import { unlock } from '../../lock-unlock';
-import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { BlockContextualToolbar } = unlock( blockEditorPrivateApis );
 
 export default function HeaderEditMode( { setListViewToggleElement } ) {
 	const {
 		deviceType,
-		templateType,
 		isDistractionFree,
 		blockEditorMode,
 		blockSelectionStart,
@@ -57,11 +55,14 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		editorCanvasView,
 		hasFixedToolbar,
 		isZoomOutMode,
+		isFocusMode,
 	} = useSelect( ( select ) => {
 		const { __experimentalGetPreviewDeviceType, getEditedPostType } =
 			select( editSiteStore );
 		const { getBlockSelectionStart, __unstableGetEditorMode } =
 			select( blockEditorStore );
+
+		const { isEntityFocusMode } = unlock( select( editSiteStore ) );
 
 		const postType = getEditedPostType();
 
@@ -93,6 +94,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 				'distractionFree'
 			),
 			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			isFocusMode: isEntityFocusMode(),
 		};
 	}, [] );
 
@@ -105,8 +107,6 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 	const disableMotion = useReducedMotion();
 
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
-
-	const isFocusMode = FOCUSABLE_ENTITIES.includes( templateType );
 
 	const isZoomedOutView = blockEditorMode === 'zoom-out';
 

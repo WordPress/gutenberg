@@ -5,26 +5,29 @@ import { Button } from '@wordpress/components';
 import { arrowLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import {
-	TEMPLATE_PART_POST_TYPE,
-	NAVIGATION_POST_TYPE,
-} from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
+import { store as editSiteStore } from '../../store';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 function BackButton() {
 	const location = useLocation();
 	const history = useHistory();
-	const isTemplatePart = location.params.postType === TEMPLATE_PART_POST_TYPE;
-	const isNavigationMenu = location.params.postType === NAVIGATION_POST_TYPE;
+
 	const previousTemplateId = location.state?.fromTemplateId;
 
-	const isFocusMode = isTemplatePart || isNavigationMenu;
+	const { isFocusMode } = useSelect( ( select ) => {
+		const { isEntityFocusMode } = unlock( select( editSiteStore ) );
+
+		return {
+			isFocusMode: isEntityFocusMode(),
+		};
+	}, [] );
 
 	if ( ! isFocusMode || ! previousTemplateId ) {
 		return null;
