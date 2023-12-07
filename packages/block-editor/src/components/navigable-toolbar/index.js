@@ -9,7 +9,7 @@ import {
 	useEffect,
 	useCallback,
 } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -111,6 +111,7 @@ function useToolbarFocus( {
 	// Make sure we don't use modified versions of this prop.
 	const [ initialFocusOnMount ] = useState( focusOnMount );
 	const [ initialIndex ] = useState( defaultIndex );
+	const { stopTyping } = useDispatch( blockEditorStore );
 
 	const focusToolbar = useCallback( () => {
 		focusFirstTabbableIn( toolbarRef.current );
@@ -118,6 +119,7 @@ function useToolbarFocus( {
 
 	const focusToolbarViaShortcut = () => {
 		if ( shouldUseKeyboardFocusShortcut ) {
+			stopTyping( true ); // This matches the behavior of the Tab/Escape observe typing to stopTyping. Should we add this shortcut there?
 			focusToolbar();
 		}
 	};
