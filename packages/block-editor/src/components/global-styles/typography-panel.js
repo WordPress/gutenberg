@@ -138,39 +138,25 @@ const DEFAULT_CONTROLS = {
 
 function useMergedSettings( parentSettings ) {
 	return useMemo( () => {
-		// Deep clone relevant parts of parent settings.
-		const updatedSettings = {
+		const newFontSizes = uniqByProperty(
+			mergeOrigins( {
+				default:
+					parentSettings?.typography?.defaultFontSizes !== false
+						? parentSettings?.typography?.fontSizes?.default
+						: undefined,
+				theme: parentSettings?.typography?.fontSizes?.theme,
+				custom: parentSettings?.typography?.fontSizes?.custom,
+			} ),
+			'slug'
+		);
+
+		return {
 			...parentSettings,
 			typography: {
 				...parentSettings?.typography,
-				fontSizes: {
-					default: parentSettings?.typography?.fontSizes?.default,
-					theme: parentSettings?.typography?.fontSizes?.theme,
-					custom: parentSettings?.typography?.fontSizes?.custom,
-				},
+				fontSizes: newFontSizes,
 			},
 		};
-
-		// Remove default font sizes if disabled.
-		if (
-			updatedSettings?.typography?.defaultFontSizes === false &&
-			updatedSettings?.typography?.fontSizes?.default
-		) {
-			delete updatedSettings.typography.fontSizes.default;
-		}
-
-		// Merge origins and remove duplicates.
-		if ( updatedSettings?.typography?.fontSizes ) {
-			updatedSettings.typography.fontSizes = mergeOrigins(
-				updatedSettings.typography.fontSizes
-			);
-			updatedSettings.typography.fontSizes = uniqByProperty(
-				updatedSettings.typography.fontSizes,
-				'slug'
-			);
-		}
-
-		return updatedSettings;
 	}, [ parentSettings ] );
 }
 
