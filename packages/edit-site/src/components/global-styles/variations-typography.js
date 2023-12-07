@@ -69,9 +69,6 @@ const getFontFamilyNames = ( themeJson ) => {
 	return [ bodyFontFamily?.name, headingFontFamily?.name ];
 };
 
-const normalizedHeight = 100;
-const ratio = 1;
-
 function TypographyVariation( { variation } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
@@ -149,7 +146,7 @@ function TypographyVariation( { variation } ) {
 					className="edit-site-global-styles-variations_item-preview"
 					isFocused={ isFocused }
 					style={ {
-						height: normalizedHeight * ratio,
+						height: 70,
 						lineHeight: 1.2,
 						textAlign: 'center',
 					} }

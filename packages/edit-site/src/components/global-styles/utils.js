@@ -32,7 +32,11 @@ function cloneDeep( object ) {
  * @param {Object} property The property to filter by
  * @return {Object} The merged object.
  */
-const filterObjectByProperty = ( object, property ) => {
+export const filterObjectByProperty = ( object, property ) => {
+	if ( ! object ) {
+		return {};
+	}
+
 	const newObject = {};
 	Object.keys( object ).forEach( ( key ) => {
 		if ( key === property ) {
