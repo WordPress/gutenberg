@@ -12,14 +12,11 @@ import {
 } from '@wordpress/editor';
 import {
 	BlockTools,
-	__unstableUseTypewriter as useTypewriter,
 	__experimentalUseResizeCanvas as useResizeCanvas,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useRef, useMemo } from '@wordpress/element';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useMergeRefs } from '@wordpress/compose';
 import { store as blocksStore } from '@wordpress/blocks';
 
 /**
@@ -28,9 +25,6 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
-	blockEditorPrivateApis
-);
 const { EditorCanvas } = unlock( editorPrivateApis );
 
 const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
@@ -104,7 +98,6 @@ export default function VisualEditor( { styles } ) {
 	}
 
 	const ref = useRef();
-	const contentRef = useMergeRefs( [ ref, useTypewriter() ] );
 
 	styles = useMemo(
 		() => [
@@ -146,25 +139,14 @@ export default function VisualEditor( { styles } ) {
 					initial={ desktopCanvasStyles }
 					className={ previewMode }
 				>
-					<BlockCanvas
-						shouldIframe={ isToBeIframed }
-						contentRef={ contentRef }
+					<EditorCanvas
+						ref={ ref }
+						disableIframe={ ! isToBeIframed }
 						styles={ styles }
-						height="100%"
-					>
-						<EditorCanvas
-							dropZoneElement={
-								// When iframed, pass in the html element of the iframe to
-								// ensure the drop zone extends to the edges of the iframe.
-								isToBeIframed
-									? ref.current?.parentNode
-									: ref.current
-							}
-							// We should auto-focus the canvas (title) on load.
-							// eslint-disable-next-line jsx-a11y/no-autofocus
-							autoFocus={ ! isWelcomeGuideVisible }
-						/>
-					</BlockCanvas>
+						// We should auto-focus the canvas (title) on load.
+						// eslint-disable-next-line jsx-a11y/no-autofocus
+						autoFocus={ ! isWelcomeGuideVisible }
+					/>
 				</motion.div>
 			</motion.div>
 		</BlockTools>

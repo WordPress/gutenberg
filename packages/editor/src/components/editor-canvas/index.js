@@ -9,15 +9,17 @@ import classnames from 'classnames';
 import {
 	BlockList,
 	store as blockEditorStore,
+	__unstableUseTypewriter as useTypewriter,
 	__unstableUseTypingObserver as useTypingObserver,
 	useSettings,
 	__experimentalRecursionProvider as RecursionProvider,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useEffect, useRef, useMemo } from '@wordpress/element';
+import { useEffect, useRef, useMemo, forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -26,9 +28,12 @@ import PostTitle from '../post-title';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { LayoutStyle, useLayoutClasses, useLayoutStyles } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	LayoutStyle,
+	useLayoutClasses,
+	useLayoutStyles,
+	ExperimentalBlockCanvas: BlockCanvas,
+} = unlock( blockEditorPrivateApis );
 
 /**
  * Given an array of nested blocks, find the first Post Content
@@ -65,13 +70,19 @@ function checkForPostContentAtRootLevel( blocks ) {
 	return false;
 }
 
-export default function EditorCanvas( {
-	// Ideally as we unify post and site editors, we won't need these props.
-	autoFocus,
-	dropZoneElement,
-	className,
-	renderAppender,
-} ) {
+function EditorCanvas(
+	{
+		// Ideally as we unify post and site editors, we won't need these props.
+		autoFocus,
+		className,
+		renderAppender,
+		styles,
+		disableIframe = false,
+		iframeProps,
+		children,
+	},
+	ref
+) {
 	const {
 		renderingMode,
 		postContentAttributes,
@@ -268,8 +279,24 @@ export default function EditorCanvas( {
 		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
 		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
+	const localRef = useRef();
+	const typewriterRef = useTypewriter();
+	const contentRef = useMergeRefs(
+		[
+			ref,
+			localRef,
+			renderingMode === 'post-only' ? typewriterRef : undefined,
+		].filter( ( r ) => !! r )
+	);
+
 	return (
-		<>
+		<BlockCanvas
+			shouldIframe={ ! disableIframe }
+			contentRef={ contentRef }
+			styles={ styles }
+			height="100%"
+			iframeProps={ iframeProps }
+		>
 			{ themeSupportsLayout &&
 				! themeHasDisabledLayoutStyles &&
 				renderingMode === 'post-only' && (
@@ -325,10 +352,19 @@ export default function EditorCanvas( {
 							: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
 					) }
 					layout={ blockListLayout }
-					dropZoneElement={ dropZoneElement }
+					dropZoneElement={
+						// When iframed, pass in the html element of the iframe to
+						// ensure the drop zone extends to the edges of the iframe.
+						disableIframe
+							? localRef.current
+							: localRef.current?.parentNode
+					}
 					renderAppender={ renderAppender }
 				/>
 			</RecursionProvider>
-		</>
+			{ children }
+		</BlockCanvas>
 	);
 }
+
+export default forwardRef( EditorCanvas );

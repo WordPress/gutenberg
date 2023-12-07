@@ -8,12 +8,11 @@ import classnames from 'classnames';
  */
 import {
 	__experimentalUseResizeCanvas as useResizeCanvas,
-	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
@@ -27,9 +26,6 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../utils/constants';
 
-const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
-	blockEditorPrivateApis
-);
 const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
 
 function EditorCanvas( {
@@ -101,9 +97,35 @@ function EditorCanvas( {
 			? false
 			: undefined;
 
+	const styles = useMemo(
+		() => [
+			...settings.styles,
+			{
+				// Forming a "block formatting context" to prevent margin collapsing.
+				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+
+				css: `.is-root-container{display:flow-root;${
+					// Some themes will have `min-height: 100vh` for the root container,
+					// which isn't a requirement in auto resize mode.
+					enableResizing ? 'min-height:0!important;' : ''
+				}}body{position:relative; ${
+					canvasMode === 'view'
+						? 'cursor: pointer; min-height: 100vh;'
+						: ''
+				}}}`,
+			},
+		],
+		[ settings.styles, enableResizing, canvasMode ]
+	);
+
 	return (
-		<BlockCanvas
-			height="100%"
+		<EditorCanvasRoot
+			ref={ contentRef }
+			className={ classnames( 'edit-site-editor-canvas__block-list', {
+				'is-navigation-block': isTemplateTypeNavigation,
+			} ) }
+			renderAppender={ showBlockAppender }
+			styles={ styles }
 			iframeProps={ {
 				expand: isZoomOutMode,
 				scale: isZoomOutMode ? 0.45 : undefined,
@@ -118,31 +140,9 @@ function EditorCanvas( {
 				...props,
 				...( canvasMode === 'view' ? viewModeProps : {} ),
 			} }
-			styles={ settings.styles }
-			contentRef={ contentRef }
 		>
-			<style>{
-				// Forming a "block formatting context" to prevent margin collapsing.
-				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-				`.is-root-container{display:flow-root;${
-					// Some themes will have `min-height: 100vh` for the root container,
-					// which isn't a requirement in auto resize mode.
-					enableResizing ? 'min-height:0!important;' : ''
-				}}body{position:relative; ${
-					canvasMode === 'view'
-						? 'cursor: pointer; min-height: 100vh;'
-						: ''
-				}}}`
-			}</style>
-			<EditorCanvasRoot
-				dropZoneElement={ contentRef.current?.parentNode }
-				className={ classnames( 'edit-site-editor-canvas__block-list', {
-					'is-navigation-block': isTemplateTypeNavigation,
-				} ) }
-				renderAppender={ showBlockAppender }
-			/>
 			{ children }
-		</BlockCanvas>
+		</EditorCanvasRoot>
 	);
 }
 
