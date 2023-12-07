@@ -68,9 +68,13 @@ export function getDropTargetPosition(
 	let insertPosition = 'before';
 	let minDistance = Infinity;
 
-	const { dropZoneElement, parentBlock, rootBlockIndex = 0 } = options;
+	const {
+		dropZoneElement,
+		parentBlockOrientation,
+		rootBlockIndex = 0,
+	} = options;
 
-	if ( dropZoneElement && parentBlock ) {
+	if ( dropZoneElement && parentBlockOrientation !== 'horizontal' ) {
 		const rect = dropZoneElement.getBoundingClientRect();
 
 		const [ distance, edge ] = getDistanceToNearestEdge( position, rect, [
@@ -78,7 +82,9 @@ export function getDropTargetPosition(
 			'bottom',
 		] );
 
-		// TODO: Check if the parent block is horizontal / vertical orientation.
+		// If dragging over the top or bottom of the drop zone, insert the block
+		// before or after the parent block. This only applies to blocks that use
+		// a drop zone element, typically container blocks such as Group or Cover.
 		if ( distance < THRESHOLD_DISTANCE ) {
 			if ( edge === 'top' ) {
 				return [ rootBlockIndex, 'before' ];
@@ -175,7 +181,7 @@ export default function useBlockDropZone( {
 		operation: 'insert',
 	} );
 
-	const { isDisabled, parentBlock, rootBlockIndex } = useSelect(
+	const { isDisabled, parentBlockClientId, rootBlockIndex } = useSelect(
 		( select ) => {
 			const {
 				__unstableIsWithinBlockOverlay,
@@ -186,7 +192,8 @@ export default function useBlockDropZone( {
 			} = select( blockEditorStore );
 			const blockEditingMode = getBlockEditingMode( targetRootClientId );
 			return {
-				parentBlock: getBlockParents( targetRootClientId, true )[ 0 ],
+				parentBlockClientId:
+					getBlockParents( targetRootClientId, true )[ 0 ] || '',
 				rootBlockIndex: getBlockIndex( targetRootClientId ),
 				isDisabled:
 					blockEditingMode !== 'default' ||
@@ -206,7 +213,7 @@ export default function useBlockDropZone( {
 
 	const onBlockDrop = useOnBlockDrop(
 		dropTarget.operation === 'before' || dropTarget.operation === 'after'
-			? parentBlock
+			? parentBlockClientId
 			: targetRootClientId,
 		dropTarget.index,
 		{
@@ -252,7 +259,11 @@ export default function useBlockDropZone( {
 					getBlockListSettings( targetRootClientId )?.orientation,
 					{
 						dropZoneElement,
-						parentBlock,
+						parentBlockClientId,
+						parentBlockOrientation: parentBlockClientId
+							? getBlockListSettings( parentBlockClientId )
+									?.orientation
+							: undefined,
 						rootBlockIndex,
 					}
 				);
@@ -267,7 +278,7 @@ export default function useBlockDropZone( {
 						'before',
 						'after',
 					].includes( operation )
-						? parentBlock
+						? parentBlockClientId
 						: targetRootClientId;
 
 					showInsertionPoint( insertionPointClientId, targetIndex, {
@@ -283,7 +294,7 @@ export default function useBlockDropZone( {
 				registry,
 				showInsertionPoint,
 				getBlockIndex,
-				parentBlock,
+				parentBlockClientId,
 				rootBlockIndex,
 			]
 		),
