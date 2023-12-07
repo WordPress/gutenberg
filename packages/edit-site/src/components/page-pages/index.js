@@ -197,6 +197,7 @@ export default function PagePages() {
 		() => [
 			{
 				id: 'featured-image',
+				// type: 'media', // TODO: add media type.
 				header: __( 'Featured Image' ),
 				getValue: ( { item } ) => item.featured_media,
 				render: ( { item } ) =>

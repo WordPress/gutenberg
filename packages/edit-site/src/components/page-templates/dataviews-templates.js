@@ -160,6 +160,7 @@ export default function DataviewsTemplates() {
 			{
 				header: __( 'Preview' ),
 				id: 'preview',
+				// type: 'media', // TODO: add media type.
 				render: ( { item } ) => {
 					return (
 						<TemplatePreview
