@@ -1,10 +1,6 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalHeading as Heading,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -17,11 +13,11 @@ import { DataViews } from '@wordpress/dataviews';
  * Internal dependencies
  */
 import Page from '../page';
-import Link from '../routes/link';
 import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
 import {
 	ENUMERATION_TYPE,
 	DATE_TYPE,
+	TEXT_TYPE,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
@@ -212,34 +208,10 @@ export default function PagePages() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
-				getValue: ( { item } ) => item.title?.rendered || item.slug,
-				render: ( { item } ) => {
-					return (
-						<VStack spacing={ 1 }>
-							<Heading as="h3" level={ 5 } weight={ 500 }>
-								{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
-									view.type
-								) ? (
-									<Link
-										params={ {
-											postId: item.id,
-											postType: item.type,
-											canvas: 'edit',
-										} }
-									>
-										{ decodeEntities(
-											item.title?.rendered || item.slug
-										) || __( '(no title)' ) }
-									</Link>
-								) : (
-									decodeEntities(
-										item.title?.rendered || item.slug
-									) || __( '(no title)' )
-								) }
-							</Heading>
-						</VStack>
-					);
-				},
+				type: TEXT_TYPE,
+				getValue: ( { item } ) =>
+					decodeEntities( item.title?.rendered || item.slug ) ||
+					__( '(no title)' ),
 				maxWidth: 400,
 				enableHiding: false,
 			},

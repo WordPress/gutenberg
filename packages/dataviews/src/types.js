@@ -11,8 +11,6 @@ export const renderDate = ( { field, item } ) => {
 	return <time>{ formattedDate }</time>;
 };
 
-export const renderText = ( { field, item } ) => {
-	return field.getValue( { item } );
-};
+export const renderText = ( { field, item } ) => field.getValue( { item } );
 
 export const renderEnumeration = renderText;

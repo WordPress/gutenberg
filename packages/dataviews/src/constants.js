@@ -19,6 +19,7 @@ import ViewList from './view-list';
 // Field types.
 export const ENUMERATION_TYPE = 'enumeration';
 export const DATE_TYPE = 'date';
+export const TEXT_TYPE = 'text';
 
 // Filter operators.
 export const OPERATOR_IN = 'in';

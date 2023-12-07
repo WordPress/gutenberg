@@ -72,7 +72,9 @@ export default function ViewList( {
 								</div>
 								<HStack>
 									<VStack spacing={ 1 }>
-										{ primaryField?.render( { item } ) }
+										<span>
+											{ primaryField?.render( { item } ) }
+										</span>
 										<div className="dataviews-list-view__fields">
 											{ visibleFields.map( ( field ) => {
 												return (
