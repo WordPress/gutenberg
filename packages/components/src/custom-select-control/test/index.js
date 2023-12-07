@@ -349,34 +349,41 @@ describe.each( [
 
 			await user.click( currentSelectedItem );
 
-			expect(
-				screen.getByRole( 'option', {
-					name: 'poppy',
-					selected: false,
-				} )
-			).toBeVisible();
-			expect(
-				screen.getByRole( 'option', {
-					name: 'crimson clover',
-					selected: false,
-				} )
-			).toBeVisible();
+			// get all items except for first option
+			const unselectedItems = props.options.filter(
+				( { name } ) => name !== props.options[ 0 ].name
+			);
 
+			// assert that all other items have aria-selected="false"
+			unselectedItems.map( ( { name } ) =>
+				expect(
+					screen.getByRole( 'option', { name, selected: false } )
+				).toBeVisible()
+			);
+
+			// assert that first item has aria-selected="true"
 			expect(
 				screen.getByRole( 'option', {
-					name: 'violets',
+					name: props.options[ 0 ].name,
 					selected: true,
 				} )
 			).toBeVisible();
 
+			// change the current selection
 			await user.click( screen.getByRole( 'option', { name: 'poppy' } ) );
+
+			// click button to mount listbox with options again
 			await user.click( currentSelectedItem );
+
+			// check that first item is has aria-selected="false" after new selection
 			expect(
 				screen.getByRole( 'option', {
-					name: 'violets',
+					name: props.options[ 0 ].name,
 					selected: false,
 				} )
 			).toBeVisible();
+
+			// check that new selected item now has aria-selected="true"
 			expect(
 				screen.getByRole( 'option', {
 					name: 'poppy',
