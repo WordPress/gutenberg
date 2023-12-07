@@ -13,7 +13,7 @@ const { createPrivateSlotFill } = unlock( componentsPrivateApis );
 const { Fill, Slot } = createPrivateSlotFill( 'BlockInformation' );
 
 const BlockInfo = ( props ) => {
-	const isDisplayed = useDisplayBlockControls();
+	const { isDisplayed } = useDisplayBlockControls();
 	if ( ! isDisplayed ) {
 		return null;
 	}

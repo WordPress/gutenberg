@@ -375,45 +375,54 @@ export function createBlockEditFilter( features ) {
 	} );
 	const withBlockEditHooks = createHigherOrderComponent(
 		( OriginalBlockEdit ) => ( props ) => {
-			const shouldDisplayControls = useDisplayBlockControls();
+			const { isDisplayed, isParentDisplayed } =
+				useDisplayBlockControls();
 			// CAUTION: code added before this line will be executed for all
 			// blocks, not just those that support the feature! Code added
 			// above this line should be carefully evaluated for its impact on
 			// performance.
 			return [
-				...features.map(
-					( { Edit, hasSupport, attributeKeys = [] }, i ) => {
-						if (
-							! shouldDisplayControls ||
-							! hasSupport( props.name )
-						) {
-							return null;
-						}
+				...features.map( ( feature, i ) => {
+					const {
+						Edit,
+						hasSupport,
+						attributeKeys = [],
+						shareWithChildBlocks,
+					} = feature;
+					const shouldDisplayControls =
+						isDisplayed ||
+						( isParentDisplayed && shareWithChildBlocks );
 
-						const neededProps = {};
-						for ( const key of attributeKeys ) {
-							if ( props.attributes[ key ] ) {
-								neededProps[ key ] = props.attributes[ key ];
-							}
-						}
-						return (
-							<Edit
-								// We can use the index because the array length
-								// is fixed per page load right now.
-								key={ i }
-								name={ props.name }
-								clientId={ props.clientId }
-								setAttributes={ props.setAttributes }
-								__unstableParentLayout={
-									props.__unstableParentLayout
-								}
-								// This component is pure, so only pass needed
-								// props!!!
-								{ ...neededProps }
-							/>
-						);
+					if (
+						! shouldDisplayControls ||
+						! hasSupport( props.name )
+					) {
+						return null;
 					}
-				),
+
+					const neededProps = {};
+					for ( const key of attributeKeys ) {
+						if ( props.attributes[ key ] ) {
+							neededProps[ key ] = props.attributes[ key ];
+						}
+					}
+					return (
+						<Edit
+							// We can use the index because the array length
+							// is fixed per page load right now.
+							key={ i }
+							name={ props.name }
+							clientId={ props.clientId }
+							setAttributes={ props.setAttributes }
+							__unstableParentLayout={
+								props.__unstableParentLayout
+							}
+							// This component is pure, so only pass needed
+							// props!!!
+							{ ...neededProps }
+						/>
+					);
+				} ),
 				<OriginalBlockEdit key="edit" { ...props } />,
 			];
 		},

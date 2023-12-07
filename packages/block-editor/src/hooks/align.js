@@ -153,6 +153,7 @@ function BlockEditAlignmentToolbarControlsPure( {
 }
 
 export default {
+	shareWithChildBlocks: true,
 	edit: BlockEditAlignmentToolbarControlsPure,
 	attributeKeys: [ 'align' ],
 	hasSupport( name ) {

@@ -176,6 +176,7 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 }
 
 export default {
+	shareWithChildBlocks: true,
 	edit: DuotonePanelPure,
 	attributeKeys: [ 'style' ],
 	hasSupport( name ) {

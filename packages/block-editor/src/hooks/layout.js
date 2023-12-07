@@ -287,6 +287,7 @@ function LayoutPanelPure( { layout, setAttributes, name: blockName } ) {
 }
 
 export default {
+	shareWithChildBlocks: true,
 	edit: LayoutPanelPure,
 	attributeKeys: [ 'layout' ],
 	hasSupport( name ) {
