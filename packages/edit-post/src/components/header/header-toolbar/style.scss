@@ -82,14 +82,15 @@
 .edit-post-header-toolbar__left {
 	display: inline-flex;
 	align-items: center;
-	padding-left: $grid-unit-10;
+	padding-left: $grid-unit-20;
+	gap: $grid-unit-10;
 
 	// Some plugins add buttons here despite best practices.
 	// Push them a bit rightwards to fit the top toolbar.
 	margin-right: $grid-unit-10;
 
-	@include break-small() {
-		padding-left: $grid-unit-30;
+	@include break-medium() {
+		padding-left: $grid-unit-50 * 0.5;
 	}
 
 	@include break-wide() {
@@ -98,8 +99,6 @@
 }
 
 .edit-post-header-toolbar .edit-post-header-toolbar__left > .edit-post-header-toolbar__inserter-toggle.has-icon {
-	margin-right: $grid-unit-10;
-	// Special dimensions for this button.
 	min-width: $button-size-compact;
 	width: $button-size-compact;
 	height: $button-size-compact;
@@ -107,7 +106,7 @@
 
 	.show-icon-labels & {
 		width: auto;
-		height: 36px;
+		height: $button-size-compact;
 		padding: 0 $grid-unit-10;
 	}
 }

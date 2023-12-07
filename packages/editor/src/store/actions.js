@@ -560,14 +560,32 @@ export function updateEditorSettings( settings ) {
  */
 export const setRenderingMode =
 	( mode ) =>
-	( { dispatch, registry } ) => {
-		registry.dispatch( blockEditorStore ).clearSelectedBlock();
+	( { dispatch, registry, select } ) => {
+		if ( select.__unstableIsEditorReady() ) {
+			// We clear the block selection but we also need to clear the selection from the core store.
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+			dispatch.editPost( { selection: undefined }, { undoIgnore: true } );
+		}
 
 		dispatch( {
 			type: 'SET_RENDERING_MODE',
 			mode,
 		} );
 	};
+
+/**
+ * Action that changes the width of the editing canvas.
+ *
+ * @param {string} deviceType
+ *
+ * @return {Object} Action object.
+ */
+export function setDeviceType( deviceType ) {
+	return {
+		type: 'SET_DEVICE_TYPE',
+		deviceType,
+	};
+}
 
 /**
  * Backward compatibility

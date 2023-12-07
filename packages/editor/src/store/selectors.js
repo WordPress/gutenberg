@@ -206,6 +206,17 @@ export function getCurrentPostId( state ) {
 }
 
 /**
+ * Returns the template ID currently being rendered/edited
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string?} Template ID.
+ */
+export function getCurrentTemplateId( state ) {
+	return state.templateId;
+}
+
+/**
  * Returns the number of revisions of the post currently being edited.
  *
  * @param {Object} state Global application state.
@@ -1197,6 +1208,17 @@ export function getEditorSettings( state ) {
  */
 export function getRenderingMode( state ) {
 	return state.renderingMode;
+}
+
+/**
+ * Returns the current editing canvas device type.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Device type.
+ */
+export function getDeviceType( state ) {
+	return state.deviceType;
 }
 
 /*

@@ -57,9 +57,7 @@
 			"__experimentalTextDecoration": true,
 			"__experimentalWritingMode": true,
 			"__experimentalDefaultControls": {
-				"fontSize": true,
-				"fontAppearance": true,
-				"textTransform": true
+				"fontSize": true
 			}
 		},
 		"__unstablePasteTextInline": true,

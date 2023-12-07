@@ -5,7 +5,7 @@ import { addFilter } from '@wordpress/hooks';
 import { PanelBody, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -34,7 +34,7 @@ function addAttribute( settings ) {
 	return settings;
 }
 
-function CustomFieldsControl( props ) {
+function CustomFieldsControlPure( { name, connections, setAttributes } ) {
 	const blockEditingMode = useBlockEditingMode();
 	if ( blockEditingMode !== 'default' ) {
 		return null;
@@ -44,8 +44,8 @@ function CustomFieldsControl( props ) {
 	// attribute to use for the connection. Only the `content` attribute
 	// of the paragraph block and the `url` attribute of the image block are supported.
 	let attributeName;
-	if ( props.name === 'core/paragraph' ) attributeName = 'content';
-	if ( props.name === 'core/image' ) attributeName = 'url';
+	if ( name === 'core/paragraph' ) attributeName = 'content';
+	if ( name === 'core/image' ) attributeName = 'url';
 
 	return (
 		<InspectorControls>
@@ -55,19 +55,17 @@ function CustomFieldsControl( props ) {
 					autoComplete="off"
 					label={ __( 'Custom field meta_key' ) }
 					value={
-						props.attributes?.connections?.attributes?.[
-							attributeName
-						]?.value || ''
+						connections?.attributes?.[ attributeName ]?.value || ''
 					}
 					onChange={ ( nextValue ) => {
 						if ( nextValue === '' ) {
-							props.setAttributes( {
+							setAttributes( {
 								connections: undefined,
 								[ attributeName ]: undefined,
 								placeholder: undefined,
 							} );
 						} else {
-							props.setAttributes( {
+							setAttributes( {
 								connections: {
 									attributes: {
 										// The attributeName will be either `content` or `url`.
@@ -92,6 +90,11 @@ function CustomFieldsControl( props ) {
 		</InspectorControls>
 	);
 }
+
+// We don't want block controls to re-render when typing inside a block. `pure`
+// will prevent re-renders unless props change, so only pass the needed props
+// and not the whole attributes object.
+const CustomFieldsControl = pure( CustomFieldsControlPure );
 
 /**
  * Override the default edit UI to include a new block inspector control for
@@ -121,7 +124,12 @@ const withCustomFieldsControls = createHigherOrderComponent( ( BlockEdit ) => {
 			<>
 				<BlockEdit key="edit" { ...props } />
 				{ hasCustomFieldsSupport && props.isSelected && (
-					<CustomFieldsControl { ...props } />
+					<CustomFieldsControl
+						name={ props.name }
+						// This component is pure, so only pass needed props!
+						connections={ props.attributes.connections }
+						setAttributes={ props.setAttributes }
+					/>
 				) }
 			</>
 		);

@@ -25,7 +25,9 @@ $header-toolbar-min-width: 335px;
 		// is visible on toolbar buttons.
 		height: 100%;
 		// Allow focus ring to be fully visible on furthest right button.
-		padding-right: 2px;
+		@include break-medium() {
+			padding-right: 2px;
+		}
 	}
 
 	.edit-site-header-edit-mode__end {
@@ -38,7 +40,7 @@ $header-toolbar-min-width: 335px;
 		align-items: center;
 		height: 100%;
 		flex-grow: 1;
-		margin: 0 $grid-unit-10;
+		margin: 0 $grid-unit-20;
 		justify-content: center;
 		// Flex items will, by default, refuse to shrink below a minimum
 		// intrinsic width. In order to shrink this flexbox item, and
@@ -55,10 +57,11 @@ $header-toolbar-min-width: 335px;
 .edit-site-header-edit-mode__toolbar {
 	display: flex;
 	align-items: center;
-	padding-left: $grid-unit-10;
+	padding-left: $grid-unit-20;
+	gap: $grid-unit-10;
 
-	@include break-small() {
-		padding-left: $grid-unit-30;
+	@include break-medium() {
+		padding-left: $grid-unit-50 * 0.5;
 	}
 
 	@include break-wide() {
@@ -66,12 +69,6 @@ $header-toolbar-min-width: 335px;
 	}
 
 	.edit-site-header-edit-mode__inserter-toggle {
-		margin-right: $grid-unit-10;
-		min-width: $grid-unit-40;
-		width: $grid-unit-40;
-		height: $grid-unit-40;
-		padding: 0;
-
 		svg {
 			transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
 			@include reduce-motion("transition");
@@ -92,17 +89,8 @@ $header-toolbar-min-width: 335px;
 .edit-site-header-edit-mode__actions {
 	display: inline-flex;
 	align-items: center;
-	padding-right: $grid-unit-05;
-
-	@include break-small () {
-		padding-right: $grid-unit-20 - ($grid-unit-15 * 0.5);
-	}
-
-	gap: $grid-unit-05;
-
-	@include break-small() {
-		gap: $grid-unit-10;
-	}
+	padding-right: $grid-unit-10;
+	gap: $grid-unit-10;
 }
 
 .edit-site-header-edit-mode__preview-options {
@@ -144,7 +132,6 @@ $header-toolbar-min-width: 335px;
 	}
 
 	.edit-site-header-edit-mode__toolbar > .edit-site-header-edit-mode__inserter-toggle.has-icon {
-		margin-right: $grid-unit-10;
 		// Special dimensions for this button.
 		min-width: $button-size-compact;
 		width: $button-size-compact;

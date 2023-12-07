@@ -36,13 +36,11 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		hiddenBlockTypes,
 		blockTypes,
 		keepCaretInsideBlock,
-		isTemplateMode,
 		template,
 	} = useSelect(
 		( select ) => {
 			const {
 				isFeatureActive,
-				isEditingTemplate,
 				getEditedPostTemplate,
 				getHiddenBlockTypes,
 			} = select( editPostStore );
@@ -81,7 +79,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
-				isTemplateMode: isEditingTemplate(),
 				template:
 					supportsTemplateMode && isViewable && canEditTemplate
 						? getEditedPostTemplate()
@@ -156,7 +153,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				post={ post }
 				initialEdits={ initialEdits }
 				useSubRegistry={ false }
-				__unstableTemplate={ isTemplateMode ? template : undefined }
+				__unstableTemplate={ template }
 				{ ...props }
 			>
 				<ErrorBoundary>

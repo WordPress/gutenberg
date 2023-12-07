@@ -93,11 +93,7 @@
 		padding-right: $grid-unit-20 - ($grid-unit-15 * 0.5);
 	}
 
-	gap: $grid-unit-05;
-
-	@include break-small() {
-		gap: $grid-unit-10;
-	}
+	gap: $grid-unit-10;
 }
 
 .edit-post-header-preview__grouping-external {

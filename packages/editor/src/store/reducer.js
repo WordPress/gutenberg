@@ -90,6 +90,15 @@ export function postId( state = null, action ) {
 	return state;
 }
 
+export function templateId( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_CURRENT_TEMPLATE_ID':
+			return action.id;
+	}
+
+	return state;
+}
+
 export function postType( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
@@ -288,9 +297,27 @@ export function renderingMode( state = 'all', action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the editing canvas device type.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function deviceType( state = 'Desktop', action ) {
+	switch ( action.type ) {
+		case 'SET_DEVICE_TYPE':
+			return action.deviceType;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
+	templateId,
 	saving,
 	deleting,
 	postLock,
@@ -300,4 +327,5 @@ export default combineReducers( {
 	editorSettings,
 	postAutosavingLock,
 	renderingMode,
+	deviceType,
 } );

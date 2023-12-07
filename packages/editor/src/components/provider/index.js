@@ -9,7 +9,6 @@ import {
 	BlockEditorProvider,
 	BlockContextProvider,
 	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
@@ -23,72 +22,12 @@ import { store as editorStore } from '../../store';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
-import { PAGE_CONTENT_BLOCK_TYPES } from './constants';
+import NavigationBlockEditingMode from './navigation-block-editing-mode';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 const noop = () => {};
-
-/**
- * For the Navigation block editor, we need to force the block editor to contentOnly for that block.
- *
- * Set block editing mode to contentOnly when entering Navigation focus mode.
- * this ensures that non-content controls on the block will be hidden and thus
- * the user can focus on editing the Navigation Menu content only.
- *
- * @param {string} navigationBlockClientId ClientId.
- */
-function useForceFocusModeForNavigation( navigationBlockClientId ) {
-	const { setBlockEditingMode, unsetBlockEditingMode } =
-		useDispatch( blockEditorStore );
-
-	useEffect( () => {
-		if ( ! navigationBlockClientId ) {
-			return;
-		}
-
-		setBlockEditingMode( navigationBlockClientId, 'contentOnly' );
-
-		return () => {
-			unsetBlockEditingMode( navigationBlockClientId );
-		};
-	}, [
-		navigationBlockClientId,
-		unsetBlockEditingMode,
-		setBlockEditingMode,
-	] );
-}
-
-/**
- * Helper method to extract the post content block types from a template.
- *
- * @param {Array} blocks Template blocks.
- *
- * @return {Array} Flattened object.
- */
-function extractPageContentBlockTypesFromTemplateBlocks( blocks ) {
-	const result = [];
-	for ( let i = 0; i < blocks.length; i++ ) {
-		// Since the Query Block could contain PAGE_CONTENT_BLOCK_TYPES block types,
-		// we skip it because we only want to render stand-alone page content blocks in the block list.
-		if ( blocks[ i ].name === 'core/query' ) {
-			continue;
-		}
-		if ( PAGE_CONTENT_BLOCK_TYPES.includes( blocks[ i ].name ) ) {
-			result.push( createBlock( blocks[ i ].name ) );
-		}
-		if ( blocks[ i ].innerBlocks.length ) {
-			result.push(
-				...extractPageContentBlockTypesFromTemplateBlocks(
-					blocks[ i ].innerBlocks
-				)
-			);
-		}
-	}
-
-	return result;
-}
 
 /**
  * Depending on the post, template and template mode,
@@ -125,36 +64,6 @@ function useBlockEditorProps( post, template, mode ) {
 		}
 	}, [ post.type, post.id ] );
 
-	const maybePostOnlyBlocks = useMemo( () => {
-		if ( mode === 'post-only' ) {
-			const postContentBlocks =
-				extractPageContentBlockTypesFromTemplateBlocks(
-					templateBlocks
-				);
-			return [
-				createBlock(
-					'core/group',
-					{
-						layout: { type: 'constrained' },
-						style: {
-							spacing: {
-								margin: {
-									top: '4em', // Mimics the post editor.
-								},
-							},
-						},
-					},
-					postContentBlocks.length
-						? postContentBlocks
-						: [
-								createBlock( 'core/post-title' ),
-								createBlock( 'core/post-content' ),
-						  ]
-				),
-			];
-		}
-	}, [ templateBlocks, mode ] );
-
 	// It is important that we don't create a new instance of blocks on every change
 	// We should only create a new instance if the blocks them selves change, not a dependency of them.
 	const blocks = useMemo( () => {
@@ -162,33 +71,19 @@ function useBlockEditorProps( post, template, mode ) {
 			return maybeNavigationBlocks;
 		}
 
-		if ( maybePostOnlyBlocks ) {
-			return maybePostOnlyBlocks;
-		}
-
 		if ( rootLevelPost === 'template' ) {
 			return templateBlocks;
 		}
 
 		return postBlocks;
-	}, [
-		maybeNavigationBlocks,
-		maybePostOnlyBlocks,
-		rootLevelPost,
-		templateBlocks,
-		postBlocks,
-	] );
+	}, [ maybeNavigationBlocks, rootLevelPost, templateBlocks, postBlocks ] );
 
 	// Handle fallback to postBlocks outside of the above useMemo, to ensure
 	// that constructed block templates that call `createBlock` are not generated
 	// too frequently. This ensures that clientIds are stable.
 	const disableRootLevelChanges =
 		( !! template && mode === 'template-locked' ) ||
-		post.type === 'wp_navigation' ||
-		mode === 'post-only';
-	const navigationBlockClientId =
-		post.type === 'wp_navigation' && blocks && blocks[ 0 ]?.clientId;
-	useForceFocusModeForNavigation( navigationBlockClientId );
+		post.type === 'wp_navigation';
 	if ( disableRootLevelChanges ) {
 		return [ blocks, noop, noop ];
 	}
@@ -270,7 +165,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setupEditor,
 			updateEditorSettings,
 			__experimentalTearDownEditor,
-		} = useDispatch( editorStore );
+			setCurrentTemplateId,
+			setRenderingMode,
+		} = unlock( useDispatch( editorStore ) );
 		const { createWarningNotice } = useDispatch( noticesStore );
 
 		// Initialize and tear down the editor.
@@ -310,6 +207,15 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			updateEditorSettings( settings );
 		}, [ settings, updateEditorSettings ] );
 
+		useEffect( () => {
+			setCurrentTemplateId( template?.id );
+		}, [ template?.id, setCurrentTemplateId ] );
+
+		// Sets the right rendering mode when loading the editor.
+		useEffect( () => {
+			setRenderingMode( settings.defaultRenderingMode ?? 'post-only' );
+		}, [ settings.defaultRenderingMode, setRenderingMode ] );
+
 		if ( ! isReady ) {
 			return null;
 		}
@@ -332,9 +238,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						>
 							{ children }
 							<PatternsMenuItems />
-							{ [ 'post-only', 'template-locked' ].includes(
-								mode
-							) && <DisableNonPageContentBlocks /> }
+							{ mode === 'template-locked' && (
+								<DisableNonPageContentBlocks />
+							) }
+							{ type === 'wp_navigation' && (
+								<NavigationBlockEditingMode />
+							) }
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</EntityProvider>

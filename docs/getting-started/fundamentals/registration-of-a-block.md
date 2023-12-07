@@ -65,10 +65,10 @@ The function takes two params:
 -   `$settings` (`Object`) – client-side block settings.
 
 <div class="callout callout-tip">
-The content of <code>block.json</code> (or any other <code>.json</code> file) can be imported directly in Javascript files when using <a href="/docs/getting-started/devenv/get-started-with-wp-scripts/#the-build-process-with-wp-scripts">a build process like the one available with <code>wp-scripts</code></a>
+The content of <code>block.json</code> (or any other <code>.json</code> file) can be imported directly into Javascript files when using <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/#the-build-process-with-wp-scripts">a build process like the one available with <code>wp-scripts</code></a>
 </div>
 
-The client-side block settings object passed as a second parameter include two properties that are especially relevant:
+The client-side block settings object passed as a second parameter includes two especially relevant properties:
 - `edit`: The React component that gets used in the editor for our block.
 - `save`: The function that returns the static HTML markup that gets saved to the Database. 
 

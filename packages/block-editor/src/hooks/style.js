@@ -33,7 +33,11 @@ import {
 	DimensionsPanel,
 } from './dimensions';
 import useDisplayBlockControls from '../components/use-display-block-controls';
-import { shouldSkipSerialization, useStyleOverride } from './utils';
+import {
+	shouldSkipSerialization,
+	useStyleOverride,
+	useBlockSettings,
+} from './utils';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
@@ -345,6 +349,30 @@ export function addEditProps( settings ) {
 	return settings;
 }
 
+function BlockStyleControls( {
+	clientId,
+	name,
+	setAttributes,
+	__unstableParentLayout,
+} ) {
+	const settings = useBlockSettings( name, __unstableParentLayout );
+	const passedProps = {
+		clientId,
+		name,
+		setAttributes,
+		settings,
+	};
+	return (
+		<>
+			<ColorEdit { ...passedProps } />
+			<BackgroundImagePanel { ...passedProps } />
+			<TypographyPanel { ...passedProps } />
+			<BorderPanel { ...passedProps } />
+			<DimensionsPanel { ...passedProps } />
+		</>
+	);
+}
+
 /**
  * Override the default edit UI to include new inspector controls for
  * all the custom styles configs.
@@ -365,13 +393,7 @@ export const withBlockStyleControls = createHigherOrderComponent(
 		return (
 			<>
 				{ shouldDisplayControls && blockEditingMode === 'default' && (
-					<>
-						<ColorEdit { ...props } />
-						<BackgroundImagePanel { ...props } />
-						<TypographyPanel { ...props } />
-						<BorderPanel { ...props } />
-						<DimensionsPanel { ...props } />
-					</>
+					<BlockStyleControls { ...props } />
 				) }
 				<BlockEdit key="edit" { ...props } />
 			</>

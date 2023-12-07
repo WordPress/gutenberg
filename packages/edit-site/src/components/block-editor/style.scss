@@ -14,7 +14,7 @@
 
 // Navigation focus mode requires padding around the root Navigation block
 // for presentational purposes.
-.edit-site-block-editor__block-list.is-navigation-block {
+.edit-site-editor-canvas__block-list.is-navigation-block {
 	padding: $grid-unit-30;
 }
 
@@ -94,6 +94,11 @@
 	&:hover {
 		color: $gray-100;
 	}
+}
+
+// The toolbar header in distraction mode sits over the back button, which renders it unreachable.
+.is-distraction-free .edit-site-visual-editor__back-button {
+	display: none;
 }
 
 .resizable-editor__drag-handle {

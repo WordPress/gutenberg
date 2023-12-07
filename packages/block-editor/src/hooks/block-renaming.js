@@ -3,7 +3,7 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, pure } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { TextControl } from '@wordpress/components';
 
@@ -47,30 +47,46 @@ export function addLabelCallback( settings ) {
 	return settings;
 }
 
+function BlockRenameControlPure( { name, metadata, setAttributes } ) {
+	const { canRename } = useBlockRename( name );
+
+	if ( ! canRename ) {
+		return null;
+	}
+
+	return (
+		<InspectorControls group="advanced">
+			<TextControl
+				__nextHasNoMarginBottom
+				label={ __( 'Block name' ) }
+				value={ metadata?.name || '' }
+				onChange={ ( newName ) => {
+					setAttributes( {
+						metadata: { ...metadata, name: newName },
+					} );
+				} }
+			/>
+		</InspectorControls>
+	);
+}
+
+// We don't want block controls to re-render when typing inside a block. `pure`
+// will prevent re-renders unless props change, so only pass the needed props
+// and not the whole attributes object.
+const BlockRenameControl = pure( BlockRenameControlPure );
+
 export const withBlockRenameControl = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name, attributes, setAttributes, isSelected } = props;
-
-		const { canRename } = useBlockRename( name );
-
 		return (
 			<>
-				{ isSelected && canRename && (
-					<InspectorControls group="advanced">
-						<TextControl
-							__nextHasNoMarginBottom
-							label={ __( 'Block name' ) }
-							value={ attributes?.metadata?.name || '' }
-							onChange={ ( newName ) => {
-								setAttributes( {
-									metadata: {
-										...attributes?.metadata,
-										name: newName,
-									},
-								} );
-							} }
-						/>
-					</InspectorControls>
+				{ isSelected && (
+					<BlockRenameControl
+						name={ name }
+						// This component is pure, so only pass needed props!
+						metadata={ attributes.metadata }
+						setAttributes={ setAttributes }
+					/>
 				) }
 				<BlockEdit key="edit" { ...props } />
 			</>
