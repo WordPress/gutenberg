@@ -30,36 +30,38 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
+function getFontFamilyFromSetting( fontFamilies, setting ) {
+	if ( ! setting ) {
+		return null;
+	}
+
+	const fontFamilyVariable = setting.replace( 'var(', '' ).replace( ')', '' );
+	const fontFamilySlug = fontFamilyVariable?.split( '--' ).slice( -1 )[ 0 ];
+
+	return fontFamilies.find(
+		( fontFamily ) => fontFamily.slug === fontFamilySlug
+	);
+}
+
 const getFontFamilies = ( themeJson ) => {
-	const headingFontFamilyCSS =
-		themeJson?.styles?.elements?.heading?.typography?.fontFamily;
-	const headingFontFamilyVariable =
-		headingFontFamilyCSS &&
-		headingFontFamilyCSS.replace( 'var(', '' ).replace( ')', '' );
-	const headingFontFamilySlug = headingFontFamilyVariable
-		?.split( '--' )
-		.slice( -1 )[ 0 ];
-
-	const bodyFontFamilyVariable = themeJson?.styles?.typography?.fontFamily
-		.replace( 'var(', '' )
-		.replace( ')', '' );
-
-	const bodyFontFamilySlug = bodyFontFamilyVariable
-		?.split( '--' )
-		.slice( -1 )[ 0 ];
-
 	const fontFamilies = themeJson?.settings?.typography?.fontFamilies?.theme; // TODO this could not be under theme.
-
-	const bodyFontFamily = fontFamilies.find(
-		( fontFamily ) => fontFamily.slug === bodyFontFamilySlug
+	const bodyFontFamilySetting = themeJson?.styles?.typography?.fontFamily;
+	const bodyFontFamily = getFontFamilyFromSetting(
+		fontFamilies,
+		bodyFontFamilySetting
 	);
 
-	let headingFontFamily = fontFamilies.find(
-		( fontFamily ) => fontFamily.slug === headingFontFamilySlug
-	);
+	const headingFontFamilySetting =
+		themeJson?.styles?.elements?.heading?.typography?.fontFamily;
 
-	if ( ! headingFontFamily ) {
+	let headingFontFamily;
+	if ( ! headingFontFamilySetting ) {
 		headingFontFamily = bodyFontFamily;
+	} else {
+		headingFontFamily = getFontFamilyFromSetting(
+			fontFamilies,
+			themeJson?.styles?.elements?.heading?.typography?.fontFamily
+		);
 	}
 
 	return [ bodyFontFamily, headingFontFamily ];
