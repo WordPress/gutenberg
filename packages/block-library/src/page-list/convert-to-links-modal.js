@@ -8,7 +8,7 @@ import { createInterpolateElement } from '@wordpress/element';
 
 export const convertDescription = createInterpolateElement(
 	__(
-		"The page list displays your site's published pages. If you choose to independently edit, your navigation will no longer <em>automatically</em> update when your pages change."
+		"This menu is currently displaying your website's pages. Editing it will allow you to add, delete, or reorder pages, but new pages will no longer be <em>automatically</em> added to this navigation."
 	),
 	{
 		em: <em />,
