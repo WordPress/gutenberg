@@ -20,7 +20,7 @@ export default function ViewGrid( {
 	view,
 	actions,
 	getItemId,
-	isRenderedAsync,
+	deferredRendering,
 } ) {
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout.mediaField
@@ -36,7 +36,7 @@ export default function ViewGrid( {
 			)
 	);
 	const shownData = useAsyncList( data, { step: 3 } );
-	const usedData = isRenderedAsync ? shownData : data;
+	const usedData = deferredRendering ? shownData : data;
 	return (
 		<Grid
 			gap={ 8 }

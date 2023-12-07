@@ -340,7 +340,7 @@ function ViewTable( {
 	getItemId,
 	isLoading = false,
 	paginationInfo,
-	isRenderedAsync,
+	deferredRendering,
 } ) {
 	const columns = useMemo( () => {
 		const _columns = fields.map( ( field ) => {
@@ -436,7 +436,7 @@ function ViewTable( {
 		} );
 
 	const shownData = useAsyncList( data );
-	const usedData = isRenderedAsync ? shownData : data;
+	const usedData = deferredRendering ? shownData : data;
 	const dataView = useReactTable( {
 		data: usedData,
 		columns,

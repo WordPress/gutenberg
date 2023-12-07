@@ -20,10 +20,10 @@ export default function ViewList( {
 	getItemId,
 	onSelectionChange,
 	selection,
-	isRenderedAsync,
+	deferredRendering,
 } ) {
 	const shownData = useAsyncList( data, { step: 3 } );
-	const usedData = isRenderedAsync ? shownData : data;
+	const usedData = deferredRendering ? shownData : data;
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout.mediaField
 	);

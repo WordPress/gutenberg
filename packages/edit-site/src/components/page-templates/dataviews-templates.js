@@ -353,7 +353,7 @@ export default function DataviewsTemplates() {
 				view={ view }
 				onChangeView={ onChangeView }
 				supportedLayouts={ [ LAYOUT_TABLE, LAYOUT_GRID ] }
-				isRenderedAsync={ ! view.hiddenFields?.includes( 'preview' ) }
+				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
 			/>
 		</Page>
 	);
