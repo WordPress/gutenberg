@@ -22,7 +22,7 @@ This component is generated automatically by its parent
 
 The dropdown menu props to configure the panel's `DropdownMenu`.
 
--   Type: `Object`
+-   Type: `DropdownMenuProps`
 -   Required: No
 
 ### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
