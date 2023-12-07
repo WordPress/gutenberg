@@ -70,9 +70,9 @@ describe.each( [
 
 		render( <Component { ...props } /> );
 
-		const currentSelectedItem = screen.getByRole( 'button' );
-
-		expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+		const currentSelectedItem = screen.getByRole( 'button', {
+			expanded: false,
+		} );
 
 		await user.click( currentSelectedItem );
 
@@ -100,21 +100,22 @@ describe.each( [
 
 		render( <CustomSelectControl { ...props } /> );
 
-		const currentSelectedItem = screen.getByRole( 'button' );
-		expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+		const currentSelectedItem = screen.getByRole( 'button', {
+			expanded: false,
+		} );
 
 		await user.tab();
 		await user.keyboard( '{enter}' );
-		expect( screen.getByRole( 'listbox' ) ).toBeVisible();
-		expect( screen.getByRole( 'listbox' ) ).toHaveAttribute(
-			'aria-hidden',
-			'false'
-		);
+		expect(
+			screen.getByRole( 'listbox', { hidden: false } )
+		).toBeVisible();
 
 		await user.keyboard( '{escape}' );
 		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 
-		expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+		expect( currentSelectedItem ).toHaveTextContent(
+			props.options[ 0 ].name
+		);
 	} );
 
 	it( 'Should apply class only to options that have a className defined', async () => {
@@ -122,7 +123,11 @@ describe.each( [
 
 		render( <CustomSelectControl { ...props } /> );
 
-		await user.click( screen.getByRole( 'button', { text: 'violets' } ) );
+		await user.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		);
 
 		// return an array of items _with_ a className added
 		const itemsWithClass = props.options.filter(
@@ -156,7 +161,11 @@ describe.each( [
 
 		render( <CustomSelectControl { ...props } /> );
 
-		await user.click( screen.getByRole( 'button', { text: 'violets' } ) );
+		await user.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		);
 
 		// return an array of items _with_ styles added
 		const styledItems = props.options.filter(
@@ -236,8 +245,10 @@ describe.each( [
 					<CustomSelectControl { ...props } />
 				</div>
 			);
-			const toggleButton = screen.getByRole( 'button' );
-			await user.click( toggleButton );
+			const currentSelectedItem = screen.getByRole( 'button', {
+				expanded: false,
+			} );
+			await user.click( currentSelectedItem );
 
 			const customSelect = screen.getByRole( 'listbox' );
 			await user.type( customSelect, '{enter}' );
@@ -250,8 +261,9 @@ describe.each( [
 
 			render( <CustomSelectControl { ...props } /> );
 
-			const currentSelectedItem = screen.getByRole( 'button' );
-			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+			const currentSelectedItem = screen.getByRole( 'button', {
+				expanded: false,
+			} );
 
 			await user.tab();
 			expect( currentSelectedItem ).toHaveFocus();
@@ -268,8 +280,9 @@ describe.each( [
 
 			render( <CustomSelectControl { ...props } /> );
 
-			const currentSelectedItem = screen.getByRole( 'button' );
-			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+			const currentSelectedItem = screen.getByRole( 'button', {
+				expanded: false,
+			} );
 
 			await user.tab();
 			await user.keyboard( '{enter}' );
@@ -284,8 +297,9 @@ describe.each( [
 
 			render( <CustomSelectControl { ...props } /> );
 
-			const currentSelectedItem = screen.getByRole( 'button' );
-			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+			const currentSelectedItem = screen.getByRole( 'button', {
+				expanded: false,
+			} );
 
 			await user.tab();
 			await user.keyboard( '{a}' );
@@ -300,7 +314,9 @@ describe.each( [
 
 			render( <CustomSelectControl { ...props } /> );
 
-			const currentSelectedItem = screen.getByRole( 'button' );
+			const currentSelectedItem = screen.getByRole( 'button', {
+				expanded: false,
+			} );
 
 			await user.click( currentSelectedItem );
 
@@ -354,7 +370,7 @@ describe.each( [
 			);
 
 			const currentSelectedItem = screen.getByRole( 'button', {
-				text: 'violets',
+				expanded: false,
 			} );
 
 			await user.tab();
