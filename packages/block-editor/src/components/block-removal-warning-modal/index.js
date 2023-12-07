@@ -59,13 +59,6 @@ export function BlockRemovalWarningModal( { rules } ) {
 				</p>
 			) : (
 				<>
-					<ul
-						style={ { listStyleType: 'disc', paddingLeft: '1rem' } }
-					>
-						{ blockNamesForPrompt.map( ( name ) => (
-							<li key={ name }>{ rules[ name ] }</li>
-						) ) }
-					</ul>
 					<p>
 						{ ' ' }
 						{ __(
