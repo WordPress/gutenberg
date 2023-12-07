@@ -1,8 +1,7 @@
 .dataviews-wrapper {
 	width: 100%;
-	height: calc(100% - #{$grid-unit-40} * 2);
+	height: 100%;
 	overflow: auto;
-	padding: $grid-unit-40 $grid-unit-40 0;
 	box-sizing: border-box;
 
 	> div {
@@ -10,13 +9,18 @@
 	}
 }
 
+.dataviews__filters-view-actions {
+	padding: $grid-unit-15 $grid-unit-40;
+}
+
 .dataviews-pagination {
 	margin-top: auto;
 	position: sticky;
 	bottom: 0;
 	background-color: $white;
-	padding: $grid-unit-20 0;
-	border-top: $border-width solid $gray-200;
+	padding: $grid-unit-15 $grid-unit-40;
+	border-top: $border-width solid $gray-100;
+	color: $gray-700;
 }
 
 .dataviews-filters-options {
@@ -29,9 +33,12 @@
 	border-color: inherit;
 	border-collapse: collapse;
 	position: relative;
+	color: $gray-700;
 
 	a {
 		text-decoration: none;
+		color: $gray-900;
+		font-weight: 500;
 	}
 	th {
 		text-align: left;
@@ -42,12 +49,23 @@
 	td,
 	th {
 		padding: $grid-unit-15;
+		min-width: 160px;
 		&[data-field-id="actions"] {
 			text-align: right;
 		}
 	}
 	tr {
 		border-bottom: 1px solid $gray-100;
+
+		td:first-child,
+		th:first-child {
+			padding-left: $grid-unit-40;
+		}
+
+		td:last-child,
+		th:last-child {
+			padding-right: $grid-unit-40;
+		}
 
 		&:last-child {
 			border-bottom: 0;
@@ -59,9 +77,12 @@
 		}
 		th {
 			position: sticky;
-			top: - #{$grid-unit-40}; // Offset the container padding
-			background-color: $white;
-			box-shadow: inset 0 -#{$border-width} 0 $gray-200;
+			top: -1px;
+			background-color: lighten($gray-100, 4%);
+			box-shadow: inset 0 -#{$border-width} 0 $gray-100;
+			border-top: 1px solid $gray-100;
+			padding-top: $grid-unit-05;
+			padding-bottom: $grid-unit-05;
 		}
 	}
 }
@@ -69,6 +90,7 @@
 .dataviews-grid-view {
 	margin-bottom: $grid-unit-30;
 	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+	padding: 0 $grid-unit-40;
 
 	@include break-xlarge() {
 		grid-template-columns: repeat(3, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
@@ -128,9 +150,14 @@
 }
 
 .dataviews-list-view {
+	margin: 0;
+
 	li {
 		border-bottom: $border-width solid $gray-100;
 		margin: 0;
+		&:first-child {
+			border-top: $border-width solid $gray-100;
+		}
 		&:last-child {
 			border-bottom: 0;
 		}
@@ -209,4 +236,9 @@
 
 .dataviews-action-modal {
 	z-index: z-index(".dataviews-action-modal");
+}
+
+.dataviews-no-results,
+.dataviews-loading {
+	padding: 0 $grid-unit-40;
 }

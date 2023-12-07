@@ -122,6 +122,7 @@ function HeaderMenu( { dataView, header } ) {
 					iconPosition="right"
 					text={ text }
 					style={ { padding: 0 } }
+					size="compact"
 				/>
 			}
 		>
@@ -543,7 +544,11 @@ function ViewTable( {
 	const hasRows = !! rows?.length;
 	if ( isLoading ) {
 		// TODO:Add spinner or progress bar..
-		return <h3>{ __( 'Loading' ) }</h3>;
+		return (
+			<div className="dataviews-loading">
+				<h3>{ __( 'Loading' ) }</h3>
+			</div>
+		);
 	}
 
 	const sortValues = { asc: 'ascending', desc: 'descending' };
@@ -615,7 +620,11 @@ function ViewTable( {
 					</tbody>
 				</table>
 			) }
-			{ ! hasRows && <p>{ __( 'no results' ) }</p> }
+			{ ! hasRows && (
+				<div className="dataviews-no-results">
+					<p>{ __( 'No results' ) }</p>
+				</div>
+			) }
 		</div>
 	);
 }
