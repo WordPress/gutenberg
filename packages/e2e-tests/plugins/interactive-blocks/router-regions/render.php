@@ -6,11 +6,15 @@
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
+gutenberg_enqueue_module( 'router-regions-view' );
 ?>
 
 <section>
 	<h2>Region 1</h2>
-	<div data-wp-interactive data-wp-navigation-id="region-1">
+	<div
+		data-wp-interactive='{"namespace": "router-regions"}'
+		data-wp-navigation-id="region-1"
+	>
 		<p
 			data-testid="region-1-text"
 			data-wp-text="state.region1.text"
@@ -51,7 +55,10 @@
 
 <section>
 	<h2>Region 2</h2>
-	<div data-wp-interactive data-wp-navigation-id="region-2">
+	<div
+		data-wp-interactive='{"namespace": "router-regions"}'
+		data-wp-navigation-id="region-2"
+	>
 		<p
 			data-testid="region-2-text"
 			data-wp-text="state.region2.text"
@@ -78,7 +85,10 @@
 
 			<section>
 				<h2>Nested region</h2>
-				<div data-wp-interactive data-wp-navigation-id="nested-region">
+				<div
+					data-wp-interactive='{"namespace": "router-regions"}'
+					data-wp-navigation-id="nested-region"
+				>
 					<p
 						data-testid="nested-region-ssr"
 					>content from page <?php echo $attributes['page']; ?></p>

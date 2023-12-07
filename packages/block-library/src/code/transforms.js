@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
+import { create, toHTMLString } from '@wordpress/rich-text';
 
 const transforms = {
 	from: [
@@ -12,10 +13,18 @@ const transforms = {
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/html', 'core/paragraph' ],
-			transform: ( { content } ) => {
+			blocks: [ 'core/paragraph' ],
+			transform: ( { content } ) =>
+				createBlock( 'core/code', { content } ),
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/html' ],
+			transform: ( { content: text } ) => {
 				return createBlock( 'core/code', {
-					content,
+					// The HTML is plain text (with plain line breaks), so
+					// convert it to rich text.
+					content: toHTMLString( { value: create( { text } ) } ),
 				} );
 			},
 		},
@@ -42,11 +51,8 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( { content } ) => {
-				return createBlock( 'core/paragraph', {
-					content: content.replace( /\n/g, '<br>' ),
-				} );
-			},
+			transform: ( { content } ) =>
+				createBlock( 'core/paragraph', { content } ),
 		},
 	],
 };

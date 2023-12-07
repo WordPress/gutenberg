@@ -295,7 +295,10 @@ test.describe( 'Preview with private custom post type', () => {
 		admin,
 		page,
 	} ) => {
-		await admin.createNewPost( { postType: 'not_public', title: 'aaaaa' } );
+		await admin.createNewPost( {
+			postType: 'not_public',
+			title: 'aaaaa',
+		} );
 
 		// Open the view menu.
 		await page.click( 'role=button[name="Preview"i]' );
@@ -332,9 +335,9 @@ class PreviewUtils {
 		);
 		await this.page.click( 'role=menuitem[name="Preferences"i]' );
 
-		// Navigate to panels section.
+		// Navigate to general section.
 		await this.page.click(
-			'role=dialog[name="Preferences"i] >> role=tab[name="Panels"i]'
+			'role=dialog[name="Preferences"i] >> role=tab[name="General"i]'
 		);
 
 		// Find custom fields checkbox.

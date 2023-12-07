@@ -9,9 +9,6 @@
 	"keywords": [ "img", "photo", "picture" ],
 	"textdomain": "default",
 	"attributes": {
-		"align": {
-			"type": "string"
-		},
 		"url": {
 			"type": "string",
 			"source": "attribute",
@@ -95,6 +92,8 @@
 		}
 	},
 	"supports": {
+		"interactivity": true,
+		"align": [ "left", "center", "right", "wide", "full" ],
 		"anchor": true,
 		"color": {
 			"text": false,

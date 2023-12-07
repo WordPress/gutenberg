@@ -6,11 +6,14 @@
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
+gutenberg_enqueue_module( 'store-tag-view' );
+
 // These variables simulates SSR.
 $test_store_tag_counter = 'ok' === $attributes['condition'] ? 3 : 0;
 $test_store_tag_double  = $test_store_tag_counter * 2;
 ?>
-<div data-wp-interactive>
+
+<div data-wp-interactive='{ "namespace": "store-tag" }'>
 	<div>
 		Counter:
 		<span
@@ -45,7 +48,7 @@ $test_store_tag_double  = $test_store_tag_counter * 2;
 if ( 'missing' !== $attributes['condition'] ) {
 
 	if ( 'ok' === $attributes['condition'] ) {
-		$test_store_tag_json = '{ "state": { "counter": { "value": 3 } } }';
+		$test_store_tag_json = '{ "store-tag": { "counter": { "value": 3 } } }';
 	}
 
 	if ( 'corrupted-json' === $attributes['condition'] ) {
@@ -53,11 +56,11 @@ if ( 'missing' !== $attributes['condition'] ) {
 	}
 
 	if ( 'invalid-state' === $attributes['condition'] ) {
-		$test_store_tag_json = '{ "state": null }';
+		$test_store_tag_json = 'null';
 	}
 
 	echo <<<HTML
-	<script type="application/json" id="wp-interactivity-store-data">
+	<script type="application/json" id="wp-interactivity-initial-state">
 		$test_store_tag_json
 	</script>
 HTML;

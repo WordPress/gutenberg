@@ -8,7 +8,7 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useLayoutEffect, useRef } from '@wordpress/element';
+import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -154,8 +154,16 @@ function Tabs( {
 		setSelectedId,
 	] );
 
+	const contextValue = useMemo(
+		() => ( {
+			store,
+			instanceId,
+		} ),
+		[ store, instanceId ]
+	);
+
 	return (
-		<TabsContext.Provider value={ { store, instanceId } }>
+		<TabsContext.Provider value={ contextValue }>
 			{ children }
 		</TabsContext.Provider>
 	);
@@ -164,4 +172,6 @@ function Tabs( {
 Tabs.TabList = TabList;
 Tabs.Tab = Tab;
 Tabs.TabPanel = TabPanel;
+Tabs.Context = TabsContext;
+
 export default Tabs;

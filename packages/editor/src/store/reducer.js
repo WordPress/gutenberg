@@ -90,6 +90,15 @@ export function postId( state = null, action ) {
 	return state;
 }
 
+export function templateId( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_CURRENT_TEMPLATE_ID':
+			return action.id;
+	}
+
+	return state;
+}
+
 export function postType( state = null, action ) {
 	switch ( action.type ) {
 		case 'SETUP_EDITOR_STATE':
@@ -279,9 +288,19 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 	return state;
 }
 
+export function renderingMode( state = 'all', action ) {
+	switch ( action.type ) {
+		case 'SET_RENDERING_MODE':
+			return action.mode;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
+	templateId,
 	saving,
 	deleting,
 	postLock,
@@ -290,4 +309,5 @@ export default combineReducers( {
 	isReady,
 	editorSettings,
 	postAutosavingLock,
+	renderingMode,
 } );

@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useContext, useMemo, createPortal } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -19,7 +19,6 @@ import { getCSSRules, compileCSS } from '@wordpress/style-engine';
 /**
  * Internal dependencies
  */
-import BlockList from '../components/block-list';
 import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
 import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
@@ -34,7 +33,11 @@ import {
 	DimensionsPanel,
 } from './dimensions';
 import useDisplayBlockControls from '../components/use-display-block-controls';
-import { shouldSkipSerialization } from './utils';
+import {
+	shouldSkipSerialization,
+	useStyleOverride,
+	useBlockSettings,
+} from './utils';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
@@ -346,6 +349,30 @@ export function addEditProps( settings ) {
 	return settings;
 }
 
+function BlockStyleControls( {
+	clientId,
+	name,
+	setAttributes,
+	__unstableParentLayout,
+} ) {
+	const settings = useBlockSettings( name, __unstableParentLayout );
+	const passedProps = {
+		clientId,
+		name,
+		setAttributes,
+		settings,
+	};
+	return (
+		<>
+			<ColorEdit { ...passedProps } />
+			<BackgroundImagePanel { ...passedProps } />
+			<TypographyPanel { ...passedProps } />
+			<BorderPanel { ...passedProps } />
+			<DimensionsPanel { ...passedProps } />
+		</>
+	);
+}
+
 /**
  * Override the default edit UI to include new inspector controls for
  * all the custom styles configs.
@@ -366,13 +393,7 @@ export const withBlockStyleControls = createHigherOrderComponent(
 		return (
 			<>
 				{ shouldDisplayControls && blockEditingMode === 'default' && (
-					<>
-						<ColorEdit { ...props } />
-						<BackgroundImagePanel { ...props } />
-						<TypographyPanel { ...props } />
-						<BorderPanel { ...props } />
-						<DimensionsPanel { ...props } />
-					</>
+					<BlockStyleControls { ...props } />
 				) }
 				<BlockEdit key="edit" { ...props } />
 			</>
@@ -484,33 +505,20 @@ const withElementsStyles = createHigherOrderComponent(
 				: undefined;
 		}, [ baseElementSelector, blockElementStyles, props.name ] );
 
-		const element = useContext( BlockList.__unstableElementContext );
+		useStyleOverride( { css: styles } );
 
 		return (
-			<>
-				{ styles &&
-					element &&
-					createPortal(
-						<style
-							dangerouslySetInnerHTML={ {
-								__html: styles,
-							} }
-						/>,
-						element
-					) }
-
-				<BlockListBlock
-					{ ...props }
-					className={
-						props.attributes.style?.elements
-							? classnames(
-									props.className,
-									blockElementsContainerIdentifier
-							  )
-							: props.className
-					}
-				/>
-			</>
+			<BlockListBlock
+				{ ...props }
+				className={
+					props.attributes.style?.elements
+						? classnames(
+								props.className,
+								blockElementsContainerIdentifier
+						  )
+						: props.className
+				}
+			/>
 		);
 	},
 	'withElementsStyles'

@@ -22,7 +22,6 @@ import './metadata';
 import './custom-fields';
 import './block-hooks';
 import './block-renaming';
-import './block-rename-ui';
 
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';

@@ -42,8 +42,7 @@
 			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
-				"fontSize": true,
-				"fontAppearance": true
+				"fontSize": true
 			}
 		},
 		"color": {
@@ -54,6 +53,12 @@
 				"background": true,
 				"text": true
 			}
+		},
+		"layout": {
+			"allowEditing": false
+		},
+		"spacing": {
+			"blockGap": true
 		}
 	},
 	"styles": [

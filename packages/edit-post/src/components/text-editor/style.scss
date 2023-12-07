@@ -5,7 +5,8 @@
 	flex-grow: 1;
 
 	// Post title.
-	.editor-post-title {
+	.editor-post-title:not(.is-raw-text),
+	.editor-post-title.is-raw-text textarea {
 		max-width: none;
 		line-height: $default-line-height;
 
@@ -14,6 +15,7 @@
 		font-weight: normal;
 
 		border: $border-width solid $gray-600;
+		border-radius: 0;
 
 		// Same padding as body.
 		padding: $grid-unit-20;

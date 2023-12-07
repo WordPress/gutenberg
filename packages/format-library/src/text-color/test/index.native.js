@@ -2,17 +2,29 @@
  * External dependencies
  */
 import {
+	fireEvent,
 	getEditorHtml,
 	initializeEditor,
-	fireEvent,
+	render,
 	waitFor,
 } from 'test/helpers';
 
 /**
  * WordPress dependencies
  */
-import { setDefaultBlockName, unregisterBlockType } from '@wordpress/blocks';
+import {
+	registerBlockType,
+	setDefaultBlockName,
+	unregisterBlockType,
+} from '@wordpress/blocks';
 import { coreBlocks } from '@wordpress/block-library';
+import { BlockControls, BlockEdit } from '@wordpress/block-editor';
+import { SlotFillProvider } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { textColor } from '..';
 
 const COLOR_PINK = '#f78da7';
 const paragraph = coreBlocks[ 'core/paragraph' ];
@@ -163,5 +175,53 @@ describe( 'Text color', () => {
 		} );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'renders when "contentRef" is undefined', () => {
+		registerBlockType( 'core/test-block', {
+			save: () => {},
+			category: 'text',
+			title: 'block title',
+			edit: ( { children } ) => <>{ children }</>,
+		} );
+		const TextColorEdit = textColor.edit;
+		// Empty text with black color set as the text color
+		const textValue = {
+			formats: [],
+			replacements: [],
+			text: '',
+			start: 0,
+			end: 0,
+			activeFormats: [
+				{
+					type: 'core/text-color',
+					attributes: {
+						style: 'background-color:rgba(0, 0, 0, 0);color:#111111',
+						class: 'has-contrast-color',
+					},
+				},
+			],
+		};
+
+		const { getByLabelText } = render(
+			<SlotFillProvider>
+				<BlockEdit name="core/test-block" isSelected>
+					<TextColorEdit
+						isActive={ true }
+						activeAttributes={ {} }
+						value={ textValue }
+						onChange={ jest.fn() }
+						// This ref is usually defined by the `RichText` component.
+						// However, there are rare cases (probably related to slow performance
+						// in low-end devices) where it's undefined upon mounting.
+						contentRef={ undefined }
+					/>
+				</BlockEdit>
+				<BlockControls.Slot />
+			</SlotFillProvider>
+		);
+
+		const textColorButton = getByLabelText( 'Text color' );
+		expect( textColorButton ).toBeDefined();
 	} );
 } );

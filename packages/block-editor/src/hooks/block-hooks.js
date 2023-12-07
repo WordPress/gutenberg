@@ -9,7 +9,7 @@ import {
 	PanelBody,
 	ToggleControl,
 } from '@wordpress/components';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, pure } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 
@@ -21,7 +21,7 @@ import { store as blockEditorStore } from '../store';
 
 const EMPTY_OBJECT = {};
 
-function BlockHooksControl( props ) {
+function BlockHooksControlPure( props ) {
 	const blockTypes = useSelect(
 		( select ) => select( blocksStore ).getBlockTypes(),
 		[]
@@ -235,17 +235,23 @@ function BlockHooksControl( props ) {
 	);
 }
 
+// We don't want block controls to re-render when typing inside a block. `pure`
+// will prevent re-renders unless props change, so only pass the needed props
+// and not the whole attributes object.
+const BlockHooksControl = pure( BlockHooksControlPure );
+
 export const withBlockHooksControls = createHigherOrderComponent(
 	( BlockEdit ) => {
 		return ( props ) => {
-			const blockEdit = <BlockEdit key="edit" { ...props } />;
 			return (
 				<>
-					{ blockEdit }
-					<BlockHooksControl
-						blockName={ props.name }
-						clientId={ props.clientId }
-					/>
+					<BlockEdit key="edit" { ...props } />
+					{ props.isSelected && (
+						<BlockHooksControl
+							blockName={ props.name }
+							clientId={ props.clientId }
+						/>
+					) }
 				</>
 			);
 		};

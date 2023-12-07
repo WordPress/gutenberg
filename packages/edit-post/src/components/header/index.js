@@ -1,11 +1,33 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import {
+	PostSavedState,
+	PostPreviewButton,
+	store as editorStore,
+	DocumentBar,
+} from '@wordpress/editor';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { next, previous } from '@wordpress/icons';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import { __unstableMotion as motion } from '@wordpress/components';
+import {
+	Button,
+	__unstableMotion as motion,
+	Popover,
+} from '@wordpress/components';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -18,7 +40,9 @@ import { default as DevicePreview } from '../device-preview';
 import ViewLink from '../view-link';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
-import DocumentActions from './document-actions';
+import { unlock } from '../../lock-unlock';
+
+const { BlockContextualToolbar } = unlock( blockEditorPrivateApis );
 
 const slideY = {
 	hidden: { y: '-50px' },
@@ -36,18 +60,44 @@ function Header( {
 	setEntitiesSavedStatesCallback,
 	setListViewToggleElement,
 } ) {
-	const isLargeViewport = useViewportMatch( 'large' );
-	const { hasActiveMetaboxes, isPublishSidebarOpened, showIconLabels } =
-		useSelect(
-			( select ) => ( {
-				hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-				isPublishSidebarOpened:
-					select( editPostStore ).isPublishSidebarOpened(),
-				showIconLabels:
-					select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			} ),
-			[]
-		);
+	const isWideViewport = useViewportMatch( 'large' );
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const blockToolbarRef = useRef();
+	const {
+		blockSelectionStart,
+		hasActiveMetaboxes,
+		hasFixedToolbar,
+		isEditingTemplate,
+		isPublishSidebarOpened,
+		showIconLabels,
+	} = useSelect( ( select ) => {
+		const { get: getPreference } = select( preferencesStore );
+
+		return {
+			blockSelectionStart:
+				select( blockEditorStore ).getBlockSelectionStart(),
+			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+			isEditingTemplate:
+				select( editorStore ).getRenderingMode() === 'template-only',
+			isPublishSidebarOpened:
+				select( editPostStore ).isPublishSidebarOpened(),
+			hasFixedToolbar: getPreference( 'core/edit-post', 'fixedToolbar' ),
+			showIconLabels:
+				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
+		};
+	}, [] );
+
+	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
+		useState( true );
+
+	const hasBlockSelected = !! blockSelectionStart;
+
+	useEffect( () => {
+		// If we have a new block selection, show the block tools
+		if ( blockSelectionStart ) {
+			setIsBlockToolsCollapsed( false );
+		}
+	}, [ blockSelectionStart ] );
 
 	return (
 		<div className="edit-post-header">
@@ -65,10 +115,56 @@ function Header( {
 				className="edit-post-header__toolbar"
 			>
 				<HeaderToolbar
+					hasFixedToolbar={ hasFixedToolbar }
 					setListViewToggleElement={ setListViewToggleElement }
 				/>
-				<div className="edit-post-header__center">
-					<DocumentActions />
+				{ hasFixedToolbar && isLargeViewport && (
+					<>
+						<div
+							className={ classnames(
+								'selected-block-tools-wrapper',
+								{
+									'is-collapsed':
+										isEditingTemplate &&
+										isBlockToolsCollapsed,
+								}
+							) }
+						>
+							<BlockContextualToolbar isFixed />
+						</div>
+						<Popover.Slot
+							ref={ blockToolbarRef }
+							name="block-toolbar"
+						/>
+						{ isEditingTemplate && hasBlockSelected && (
+							<Button
+								className="edit-post-header__block-tools-toggle"
+								icon={ isBlockToolsCollapsed ? next : previous }
+								onClick={ () => {
+									setIsBlockToolsCollapsed(
+										( collapsed ) => ! collapsed
+									);
+								} }
+								label={
+									isBlockToolsCollapsed
+										? __( 'Show block tools' )
+										: __( 'Hide block tools' )
+								}
+							/>
+						) }
+					</>
+				) }
+				<div
+					className={ classnames( 'edit-post-header__center', {
+						'is-collapsed':
+							isEditingTemplate &&
+							hasBlockSelected &&
+							! isBlockToolsCollapsed &&
+							hasFixedToolbar &&
+							isLargeViewport,
+					} ) }
+				>
+					{ isEditingTemplate && <DocumentBar /> }
 				</div>
 			</motion.div>
 			<motion.div
@@ -96,13 +192,13 @@ function Header( {
 						setEntitiesSavedStatesCallback
 					}
 				/>
-				{ ( isLargeViewport || ! showIconLabels ) && (
+				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
 						<PinnedItems.Slot scope="core/edit-post" />
 						<MoreMenu showIconLabels={ showIconLabels } />
 					</>
 				) }
-				{ showIconLabels && ! isLargeViewport && (
+				{ showIconLabels && ! isWideViewport && (
 					<MoreMenu showIconLabels={ showIconLabels } />
 				) }
 			</motion.div>

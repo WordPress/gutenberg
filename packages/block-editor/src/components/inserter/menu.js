@@ -14,9 +14,10 @@ import {
 	useImperativeHandle,
 	useRef,
 } from '@wordpress/element';
-import { VisuallyHidden, SearchControl } from '@wordpress/components';
+import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { useDebouncedInput } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -24,12 +25,10 @@ import { useSelect } from '@wordpress/data';
 import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
-import BlockPatternsTabs, {
-	BlockPatternsCategoryDialog,
-} from './block-patterns-tab';
+import BlockPatternsTab from './block-patterns-tab';
+import { PatternCategoryPreviewPanel } from './block-patterns-tab/pattern-category-preview-panel';
 import { MediaTab, MediaCategoryDialog, useMediaCategories } from './media-tab';
 import InserterSearchResults from './search-results';
-import useDebouncedInput from './hooks/use-debounced-input';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 import { store as blockEditorStore } from '../../store';
@@ -160,7 +159,7 @@ function InserterMenu(
 
 	const patternsTab = useMemo(
 		() => (
-			<BlockPatternsTabs
+			<BlockPatternsTab
 				rootClientId={ destinationRootClientId }
 				onInsert={ onInsertPattern }
 				onSelectCategory={ onClickPatternCategory }
@@ -294,10 +293,18 @@ function InserterMenu(
 				/>
 			) }
 			{ showInserterHelpPanel && hoveredItem && (
-				<InserterPreviewPanel item={ hoveredItem } />
+				<Popover
+					className="block-editor-inserter__preview-container__popover"
+					placement="right-start"
+					offset={ 16 }
+					focusOnMount={ false }
+					animate={ false }
+				>
+					<InserterPreviewPanel item={ hoveredItem } />
+				</Popover>
 			) }
 			{ showPatternPanel && (
-				<BlockPatternsCategoryDialog
+				<PatternCategoryPreviewPanel
 					rootClientId={ destinationRootClientId }
 					onInsert={ onInsertPattern }
 					onHover={ onHoverPattern }

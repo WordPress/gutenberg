@@ -5,7 +5,7 @@ import { addFilter } from '@wordpress/hooks';
 import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, pure } from '@wordpress/compose';
 import { Platform } from '@wordpress/element';
 
 /**
@@ -52,13 +52,14 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function BlockEditAnchorControl( { blockName, attributes, setAttributes } ) {
+function BlockEditAnchorControlPure( { blockName, anchor, setAttributes } ) {
 	const blockEditingMode = useBlockEditingMode();
 
 	const isWeb = Platform.OS === 'web';
 	const textControl = (
 		<TextControl
 			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			className="html-anchor-control"
 			label={ __( 'HTML anchor' ) }
 			help={
@@ -78,7 +79,7 @@ function BlockEditAnchorControl( { blockName, attributes, setAttributes } ) {
 					) }
 				</>
 			}
-			value={ attributes.anchor || '' }
+			value={ anchor || '' }
 			placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
 			onChange={ ( nextValue ) => {
 				nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
@@ -115,6 +116,11 @@ function BlockEditAnchorControl( { blockName, attributes, setAttributes } ) {
 	);
 }
 
+// We don't want block controls to re-render when typing inside a block. `pure`
+// will prevent re-renders unless props change, so only pass the needed props
+// and not the whole attributes object.
+const BlockEditAnchorControl = pure( BlockEditAnchorControlPure );
+
 /**
  * Override the default edit UI to include a new block inspector control for
  * assigning the anchor ID, if block supports anchor.
@@ -132,7 +138,9 @@ export const withAnchorControls = createHigherOrderComponent( ( BlockEdit ) => {
 					hasBlockSupport( props.name, 'anchor' ) && (
 						<BlockEditAnchorControl
 							blockName={ props.name }
-							attributes={ props.attributes }
+							// This component is pure, so only pass needed
+							// props!
+							anchor={ props.attributes.anchor }
 							setAttributes={ props.setAttributes }
 						/>
 					) }

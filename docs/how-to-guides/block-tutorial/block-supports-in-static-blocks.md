@@ -8,8 +8,6 @@ Let's take the block we wrote in the previous chapter (example 3) and with just 
 
 Here's the exact same code we used to register the block previously.
 
-{% codetabs %}
-{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -63,65 +61,6 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 	},
 } );
 ```
-
-{% Plain %}
-
-```js
-( function ( blocks, blockEditor, React ) {
-	var el = React.createElement;
-	var RichText = blockEditor.RichText;
-	var useBlockProps = blockEditor.useBlockProps;
-
-	blocks.registerBlockType( 'gutenberg-examples/example-03-editable', {
-		apiVersion: 3,
-		title: 'Example: Basic with block supports',
-		icon: 'universal-access-alt',
-		category: 'design',
-
-		attributes: {
-			content: {
-				type: 'string',
-				source: 'html',
-				selector: 'p',
-			},
-		},
-		example: {
-			attributes: {
-				content: 'Hello World',
-			},
-		},
-		edit: function ( props ) {
-			var blockProps = useBlockProps();
-			var content = props.attributes.content;
-			function onChangeContent( newContent ) {
-				props.setAttributes( { content: newContent } );
-			}
-
-			return el(
-				RichText,
-				Object.assign( blockProps, {
-					tagName: 'p',
-					onChange: onChangeContent,
-					value: content,
-				} )
-			);
-		},
-
-		save: function ( props ) {
-			var blockProps = useBlockProps.save();
-			return el(
-				RichText.Content,
-				Object.assign( blockProps, {
-					tagName: 'p',
-					value: props.attributes.content,
-				} )
-			);
-		},
-	} );
-} )( window.wp.blocks, window.wp.blockEditor, window.React );
-```
-
-{% end %}
 
 Now, let's alter the block.json file for that block, and add the supports key. (If you're not using a block.json file, you can also add the key to the `registerBlockType` function call)
 

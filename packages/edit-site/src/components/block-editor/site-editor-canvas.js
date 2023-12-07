@@ -7,12 +7,9 @@ import classnames from 'classnames';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
-import {
-	BlockList,
-	BlockTools,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { BlockTools, store as blockEditorStore } from '@wordpress/block-editor';
 import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */
@@ -27,13 +24,7 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
-import PageContentFocusManager from '../page-content-focus-manager';
-
-const LAYOUT = {
-	type: 'default',
-	// At the root level of the site editor, no alignments should be allowed.
-	alignments: [],
-};
+import PageContentFocusNotifications from '../page-content-focus-notifications';
 
 export default function SiteEditorCanvas() {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
@@ -56,16 +47,6 @@ export default function SiteEditorCanvas() {
 
 	const settings = useSiteEditorSettings();
 
-	const { hasBlocks } = useSelect( ( select ) => {
-		const { getBlockCount } = select( blockEditorStore );
-
-		const blocks = getBlockCount();
-
-		return {
-			hasBlocks: !! blocks,
-		};
-	}, [] );
-
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const enableResizing =
 		isFocusMode &&
@@ -75,17 +56,7 @@ export default function SiteEditorCanvas() {
 
 	const contentRef = useRef();
 	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
-
 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
-
-	// Hide the appender when:
-	// - In navigation focus mode (should only allow the root Nav block).
-	// - In view mode (i.e. not editing).
-	const showBlockAppender =
-		( isNavigationFocusMode && hasBlocks ) || isViewMode
-			? false
-			: undefined;
-
 	const forceFullHeight = isNavigationFocusMode;
 
 	return (
@@ -126,24 +97,13 @@ export default function SiteEditorCanvas() {
 									contentRef={ contentRef }
 								>
 									{ resizeObserver }
-									<BlockList
-										className={ classnames(
-											'edit-site-block-editor__block-list wp-site-blocks',
-											{
-												'is-navigation-block':
-													isTemplateTypeNavigation,
-											}
-										) }
-										layout={ LAYOUT }
-										renderAppender={ showBlockAppender }
-									/>
 								</EditorCanvas>
 							</ResizableEditor>
 						</BlockTools>
 					)
 				}
 			</EditorCanvasContainer.Slot>
-			<PageContentFocusManager contentRef={ contentRef } />
+			<PageContentFocusNotifications contentRef={ contentRef } />
 		</>
 	);
 }

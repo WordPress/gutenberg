@@ -22,6 +22,14 @@
 	"supports": {
 		"className": false,
 		"__experimentalSelector": "li",
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,

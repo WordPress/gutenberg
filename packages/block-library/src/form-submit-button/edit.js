@@ -14,6 +14,7 @@ const TEMPLATE = [
 				{
 					text: __( 'Submit' ),
 					tagName: 'button',
+					type: 'submit',
 				},
 			],
 		],

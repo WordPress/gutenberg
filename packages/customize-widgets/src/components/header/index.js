@@ -6,11 +6,15 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createPortal, useState, useEffect } from '@wordpress/element';
-import { __, _x, isRTL } from '@wordpress/i18n';
-import { ToolbarButton } from '@wordpress/components';
-import { NavigableToolbar } from '@wordpress/block-editor';
+import { Popover, ToolbarButton } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
+import {
+	NavigableToolbar,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
+import { createPortal, useEffect, useRef, useState } from '@wordpress/element';
 import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import { plus, undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
 
 /**
@@ -18,6 +22,9 @@ import { plus, undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
  */
 import Inserter from '../inserter';
 import MoreMenu from '../more-menu';
+import { unlock } from '../../lock-unlock';
+
+const { BlockContextualToolbar } = unlock( blockEditorPrivateApis );
 
 function Header( {
 	sidebar,
@@ -26,6 +33,8 @@ function Header( {
 	setIsInserterOpened,
 	isFixedToolbarActive,
 } ) {
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const blockToolbarRef = useRef();
 	const [ [ hasUndo, hasRedo ], setUndoRedo ] = useState( [
 		sidebar.hasUndo(),
 		sidebar.hasRedo(),
@@ -97,6 +106,18 @@ function Header( {
 			{ createPortal(
 				<Inserter setIsOpened={ setIsInserterOpened } />,
 				inserter.contentContainer[ 0 ]
+			) }
+
+			{ isFixedToolbarActive && isLargeViewport && (
+				<>
+					<div className="selected-block-tools-wrapper">
+						<BlockContextualToolbar isFixed />
+					</div>
+					<Popover.Slot
+						ref={ blockToolbarRef }
+						name="block-toolbar"
+					/>
+				</>
 			) }
 		</>
 	);

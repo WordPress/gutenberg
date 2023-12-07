@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -55,6 +50,7 @@ const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
 	createSlotFill( SLOT_FILL_NAME );
 
 function GlobalStylesActionMenu() {
+	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { toggle } = useDispatch( preferencesStore );
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
@@ -69,49 +65,56 @@ function GlobalStylesActionMenu() {
 			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
+	const { setEditorCanvasContainerView } = unlock(
+		useDispatch( editSiteStore )
+	);
 	const { goTo } = useNavigator();
-	const loadCustomCSS = () => goTo( '/css' );
+	const loadCustomCSS = () => {
+		setEditorCanvasContainerView( 'global-styles-css' );
+		goTo( '/css' );
+	};
 
 	return (
 		<GlobalStylesMenuFill>
 			<DropdownMenu icon={ moreVertical } label={ __( 'More' ) }>
 				{ ( { onClose } ) => (
-					<MenuGroup>
-						{ canEditCSS && (
-							<MenuItem onClick={ loadCustomCSS }>
-								{ __( 'Additional CSS' ) }
+					<>
+						<MenuGroup>
+							{ canEditCSS && (
+								<MenuItem onClick={ loadCustomCSS }>
+									{ __( 'Additional CSS' ) }
+								</MenuItem>
+							) }
+							<MenuItem
+								onClick={ () => {
+									toggle(
+										'core/edit-site',
+										'welcomeGuideStyles'
+									);
+									onClose();
+								} }
+							>
+								{ __( 'Welcome Guide' ) }
 							</MenuItem>
-						) }
-						<MenuItem
-							onClick={ () => {
-								toggle(
-									'core/edit-site',
-									'welcomeGuideStyles'
-								);
-								onClose();
-							} }
-						>
-							{ __( 'Welcome Guide' ) }
-						</MenuItem>
-					</MenuGroup>
+						</MenuGroup>
+						<MenuGroup>
+							<MenuItem
+								onClick={ () => {
+									onReset();
+									onClose();
+								} }
+								disabled={ ! canReset }
+							>
+								{ __( 'Reset styles' ) }
+							</MenuItem>
+						</MenuGroup>
+					</>
 				) }
 			</DropdownMenu>
 		</GlobalStylesMenuFill>
 	);
 }
 
-function RevisionsCountBadge( { className, children } ) {
-	return (
-		<span
-			className={ classnames(
-				className,
-				'edit-site-global-styles-sidebar__revisions-count-badge'
-			) }
-		>
-			{ children }
-		</span>
-	);
-}
 function GlobalStylesRevisionsMenu() {
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
 	const { revisionsCount } = useSelect( ( select ) => {
@@ -128,56 +131,38 @@ function GlobalStylesRevisionsMenu() {
 				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0,
 		};
 	}, [] );
-	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { goTo } = useNavigator();
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
+	const isRevisionsOpened = useSelect(
+		( select ) =>
+			'global-styles-revisions' ===
+			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
+		[]
+	);
 	const loadRevisions = () => {
 		setIsListViewOpened( false );
-		goTo( '/revisions' );
-		setEditorCanvasContainerView( 'global-styles-revisions' );
+
+		if ( ! isRevisionsOpened ) {
+			goTo( '/revisions' );
+			setEditorCanvasContainerView( 'global-styles-revisions' );
+		} else {
+			goTo( '/' );
+			setEditorCanvasContainerView( undefined );
+		}
 	};
 	const hasRevisions = revisionsCount > 0;
 
 	return (
 		<GlobalStylesMenuFill>
-			{ canReset || hasRevisions ? (
-				<DropdownMenu icon={ backup } label={ __( 'Revisions' ) }>
-					{ ( { onClose } ) => (
-						<MenuGroup>
-							{ hasRevisions && (
-								<MenuItem
-									onClick={ loadRevisions }
-									icon={
-										<RevisionsCountBadge>
-											{ revisionsCount }
-										</RevisionsCountBadge>
-									}
-								>
-									{ __( 'Revision history' ) }
-								</MenuItem>
-							) }
-							<MenuItem
-								onClick={ () => {
-									onReset();
-									onClose();
-								} }
-								disabled={ ! canReset }
-							>
-								{ __( 'Reset to defaults' ) }
-							</MenuItem>
-						</MenuGroup>
-					) }
-				</DropdownMenu>
-			) : (
-				<Button
-					label={ __( 'Revisions' ) }
-					icon={ backup }
-					disabled
-					__experimentalIsFocusable
-				/>
-			) }
+			<Button
+				label={ __( 'Revisions' ) }
+				icon={ backup }
+				onClick={ loadRevisions }
+				disabled={ ! hasRevisions }
+				isPressed={ isRevisionsOpened }
+			/>
 		</GlobalStylesMenuFill>
 	);
 }

@@ -17,7 +17,6 @@ import {
 } from '@wordpress/blocks';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
-	__experimentalRichText as RichText,
 	__unstableCreateElement,
 	isEmpty,
 	insert,
@@ -46,6 +45,7 @@ import {
 } from './utils';
 import EmbedHandlerPicker from './embed-handler-picker';
 import { Content } from './content';
+import RichText from './native';
 
 const classes = 'block-editor-rich-text__editable';
 
@@ -223,7 +223,7 @@ function RichTextWrapper(
 			// an intentional user interaction distinguishing between Backspace and
 			// Delete to remove the empty field, but also to avoid merge & remove
 			// causing destruction of two fields (merge, then removed merged).
-			if ( onRemove && isEmpty( value ) && isReverse ) {
+			else if ( onRemove && isEmpty( value ) && isReverse ) {
 				onRemove( ! isReverse );
 			}
 		},
@@ -687,6 +687,8 @@ ForwardedRichTextContainer.Content.defaultProps = {
 	format: 'string',
 	value: '',
 };
+
+ForwardedRichTextContainer.Raw = RichText;
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md

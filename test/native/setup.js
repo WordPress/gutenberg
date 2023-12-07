@@ -151,6 +151,7 @@ jest.mock( 'react-native-svg', () => {
 		G: () => 'G',
 		Polygon: () => 'Polygon',
 		Rect: () => 'Rect',
+		SvgXml: jest.fn(),
 	};
 } );
 

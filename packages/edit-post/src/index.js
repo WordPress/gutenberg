@@ -15,6 +15,7 @@ import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -93,7 +94,7 @@ export function initializeEditor(
 		'removeTemplatePartsFromInserter',
 		( canInsert, blockType ) => {
 			if (
-				! select( editPostStore ).isEditingTemplate() &&
+				select( editorStore ).getRenderingMode() === 'post-only' &&
 				blockType.name === 'core/template-part'
 			) {
 				return false;
@@ -118,7 +119,7 @@ export function initializeEditor(
 			{ getBlockParentsByBlockName }
 		) => {
 			if (
-				! select( editPostStore ).isEditingTemplate() &&
+				select( editorStore ).getRenderingMode() === 'post-only' &&
 				blockType.name === 'core/post-content'
 			) {
 				return (

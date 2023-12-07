@@ -7,18 +7,14 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import {
-	__experimentalRichText as RichText,
-	create,
-	insert,
-} from '@wordpress/rich-text';
+import { create, insert } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { pasteHandler } from '@wordpress/blocks';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as blockEditorStore, RichText } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 
 /**
@@ -152,7 +148,7 @@ class PostTitle extends Component {
 				accessibilityLabel={ this.getTitle( title, postType ) }
 				accessibilityHint={ __( 'Updates the title.' ) }
 			>
-				<RichText
+				<RichText.Raw
 					setRef={ this.setRef }
 					accessibilityLabel={ this.getTitle( title, postType ) }
 					tagName={ 'p' }
@@ -177,7 +173,7 @@ class PostTitle extends Component {
 					disableEditingMenu={ true }
 					__unstableIsSelected={ this.props.isSelected }
 					__unstableOnCreateUndoLevel={ () => {} }
-				></RichText>
+				/>
 			</View>
 		);
 	}

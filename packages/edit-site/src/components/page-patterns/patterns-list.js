@@ -12,10 +12,14 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { __, isRTL } from '@wordpress/i18n';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useAsyncList, useViewportMatch } from '@wordpress/compose';
+import {
+	useAsyncList,
+	useViewportMatch,
+	useDebouncedInput,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,7 +29,6 @@ import Grid from './grid';
 import NoPatterns from './no-patterns';
 import usePatterns from './use-patterns';
 import SidebarButton from '../sidebar-button';
-import useDebouncedInput from '../../utils/use-debounced-input';
 import { unlock } from '../../lock-unlock';
 import { PATTERN_SYNC_TYPES, PATTERN_TYPES } from '../../utils/constants';
 import Pagination from './pagination';
@@ -33,9 +36,15 @@ import Pagination from './pagination';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const SYNC_FILTERS = {
-	all: __( 'All' ),
-	[ PATTERN_SYNC_TYPES.full ]: __( 'Synced' ),
-	[ PATTERN_SYNC_TYPES.unsynced ]: __( 'Not synced' ),
+	all: _x( 'All', 'Option that shows all patterns' ),
+	[ PATTERN_SYNC_TYPES.full ]: _x(
+		'Synced',
+		'Option that shows all synchronized patterns'
+	),
+	[ PATTERN_SYNC_TYPES.unsynced ]: _x(
+		'Not synced',
+		'Option that shows all patterns that are not synchronized'
+	),
 };
 
 const SYNC_DESCRIPTIONS = {

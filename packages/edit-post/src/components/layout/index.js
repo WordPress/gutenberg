@@ -157,7 +157,7 @@ function Layout() {
 		showIconLabels,
 		isDistractionFree,
 		showBlockBreadcrumbs,
-		isTemplateMode,
+		showMetaBoxes,
 		documentLabel,
 	} = useSelect( ( select ) => {
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
@@ -165,7 +165,8 @@ function Layout() {
 		const postTypeLabel = getPostTypeLabel();
 
 		return {
-			isTemplateMode: select( editPostStore ).isEditingTemplate(),
+			showMetaBoxes:
+				select( editorStore ).getRenderingMode() === 'post-only',
 			hasFixedToolbar:
 				select( editPostStore ).isFeatureActive( 'fixedToolbar' ),
 			sidebarIsOpened: !! (
@@ -348,7 +349,7 @@ function Layout() {
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditor styles={ styles } />
 						) }
-						{ ! isDistractionFree && ! isTemplateMode && (
+						{ ! isDistractionFree && showMetaBoxes && (
 							<div className="edit-post-layout__metaboxes">
 								<MetaBoxes location="normal" />
 								<MetaBoxes location="advanced" />

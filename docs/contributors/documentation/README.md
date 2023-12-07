@@ -25,14 +25,14 @@ The block editor handbook is a mix of markdown files in the `/docs/` directory o
 
 An automated job publishes the docs every 15 minutes to the [block editor handbook site](https://developer.wordpress.org/block-editor/).
 
-See [the Git Workflow](/docs/contributors/code/git-workflow.md) documentation for how to use git to deploy changes using pull requests. Additionally, see the [video walk-through](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [slides for contributing documentation to Gutenberg](https://mkaz.blog/wordpress/contribute-documentation-to-gutenberg/).
+See [the Git Workflow](/docs/contributors/code/git-workflow.md) documentation for how to use git to deploy changes using pull requests. Additionally, see the [video walk-through](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [slides for contributing documentation to Gutenberg](https://mkaz.blog/wordpress/contribute-developer-documentation-to-gutenberg/).
 
 ### Handbook structure
 
 The handbook is organized into four sections based on the functional types of documents. [The Documentation System](https://documentation.divio.com/) does a great job explaining the needs and functions of each type, but in short they are:
 
 -   **Getting started tutorials** - full lessons that take learners step by step to complete an objective, for example the [create a block tutorial](/docs/getting-started/create-block/README.md).
--   **How to guides** - short lessons specific to completing a small specific task, for example [how to add a button to the block toolbar](/docshow-to-guides/format-api/README.md).
+-   **How to guides** - short lessons specific to completing a small specific task, for example [how to add a button to the block toolbar](/docs/how-to-guides/format-api.md).
 -   **Reference guides** - API documentation, purely functional descriptions,
 -   **Explanations** - longer documentation focused on learning, not a specific task.
 

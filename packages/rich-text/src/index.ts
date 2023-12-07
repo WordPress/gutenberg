@@ -30,7 +30,6 @@ export {
 	default as __experimentalRichText,
 	useRichText as __unstableUseRichText,
 } from './component';
-export { default as __unstableFormatEdit } from './component/format-edit';
 
 /**
  * An object which represents a formatted string. See main `@wordpress/rich-text`

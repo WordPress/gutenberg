@@ -7,7 +7,6 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
-import { wordpress, category, media } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 
 /**
@@ -15,7 +14,6 @@ import { useState } from '@wordpress/element';
  */
 import Tabs from '..';
 import type { TabsProps } from '../types';
-import type { IconType } from '../../icon';
 
 type Tab = {
 	id: string;
@@ -23,8 +21,10 @@ type Tab = {
 	content: React.ReactNode;
 	tab: {
 		className?: string;
-		icon?: IconType;
 		disabled?: boolean;
+	};
+	tabpanel?: {
+		focusable?: boolean;
 	};
 };
 
@@ -33,19 +33,19 @@ const TABS: Tab[] = [
 		id: 'alpha',
 		title: 'Alpha',
 		content: 'Selected tab: Alpha',
-		tab: { className: 'alpha-class', icon: wordpress },
+		tab: { className: 'alpha-class' },
 	},
 	{
 		id: 'beta',
 		title: 'Beta',
 		content: 'Selected tab: Beta',
-		tab: { className: 'beta-class', icon: category },
+		tab: { className: 'beta-class' },
 	},
 	{
 		id: 'gamma',
 		title: 'Gamma',
 		content: 'Selected tab: Gamma',
-		tab: { className: 'gamma-class', icon: media },
+		tab: { className: 'gamma-class' },
 	},
 ];
 
@@ -55,17 +55,15 @@ const TABS_WITH_DELTA: Tab[] = [
 		id: 'delta',
 		title: 'Delta',
 		content: 'Selected tab: Delta',
-		tab: { className: 'delta-class', icon: media },
+		tab: { className: 'delta-class' },
 	},
 ];
 
 const UncontrolledTabs = ( {
 	tabs,
-	showTabIcons = false,
 	...props
 }: Omit< TabsProps, 'children' > & {
 	tabs: Tab[];
-	showTabIcons?: boolean;
 } ) => {
 	return (
 		<Tabs { ...props }>
@@ -76,14 +74,17 @@ const UncontrolledTabs = ( {
 						id={ tabObj.id }
 						className={ tabObj.tab.className }
 						disabled={ tabObj.tab.disabled }
-						icon={ showTabIcons ? tabObj.tab.icon : undefined }
 					>
-						{ showTabIcons ? null : tabObj.title }
+						{ tabObj.title }
 					</Tabs.Tab>
 				) ) }
 			</Tabs.TabList>
 			{ tabs.map( ( tabObj ) => (
-				<Tabs.TabPanel key={ tabObj.id } id={ tabObj.id }>
+				<Tabs.TabPanel
+					key={ tabObj.id }
+					id={ tabObj.id }
+					focusable={ tabObj.tabpanel?.focusable }
+				>
 					{ tabObj.content }
 				</Tabs.TabPanel>
 			) ) }
@@ -93,11 +94,9 @@ const UncontrolledTabs = ( {
 
 const ControlledTabs = ( {
 	tabs,
-	showTabIcons = false,
 	...props
 }: Omit< TabsProps, 'children' > & {
 	tabs: Tab[];
-	showTabIcons?: boolean;
 } ) => {
 	const [ selectedTabId, setSelectedTabId ] = useState<
 		string | undefined | null
@@ -119,9 +118,8 @@ const ControlledTabs = ( {
 						id={ tabObj.id }
 						className={ tabObj.tab.className }
 						disabled={ tabObj.tab.disabled }
-						icon={ showTabIcons ? tabObj.tab.icon : undefined }
 					>
-						{ showTabIcons ? null : tabObj.title }
+						{ tabObj.title }
 					</Tabs.Tab>
 				) ) }
 			</Tabs.TabList>
@@ -182,6 +180,63 @@ describe( 'Tabs', () => {
 				'aria-labelledby',
 				allTabs[ 0 ].getAttribute( 'id' )
 			);
+		} );
+	} );
+	describe( 'Focus Behavior', () => {
+		it( 'should focus on the related TabPanel when pressing the Tab key', async () => {
+			const user = userEvent.setup();
+
+			render( <UncontrolledTabs tabs={ TABS } /> );
+
+			const selectedTabPanel = await screen.findByRole( 'tabpanel' );
+
+			// Tab should initially focus the first tab in the tablist, which
+			// is Alpha.
+			await user.keyboard( '[Tab]' );
+			expect(
+				await screen.findByRole( 'tab', { name: 'Alpha' } )
+			).toHaveFocus();
+
+			// By default the tabpanel should receive focus
+			await user.keyboard( '[Tab]' );
+			expect( selectedTabPanel ).toHaveFocus();
+		} );
+		it( 'should not focus on the related TabPanel when pressing the Tab key if `focusable: false` is set', async () => {
+			const user = userEvent.setup();
+
+			const TABS_WITH_ALPHA_FOCUSABLE_FALSE = TABS.map( ( tabObj ) =>
+				tabObj.id === 'alpha'
+					? {
+							...tabObj,
+							content: (
+								<>
+									Selected Tab: Alpha
+									<button>Alpha Button</button>
+								</>
+							),
+							tabpanel: { focusable: false },
+					  }
+					: tabObj
+			);
+
+			render(
+				<UncontrolledTabs tabs={ TABS_WITH_ALPHA_FOCUSABLE_FALSE } />
+			);
+
+			const alphaButton = await screen.findByRole( 'button', {
+				name: /alpha button/i,
+			} );
+
+			// Tab should initially focus the first tab in the tablist, which
+			// is Alpha.
+			await user.keyboard( '[Tab]' );
+			expect(
+				await screen.findByRole( 'tab', { name: 'Alpha' } )
+			).toHaveFocus();
+			// Because the alpha tabpanel is set to `focusable: false`, pressing
+			// the Tab key should focus the button, not the tabpanel
+			await user.keyboard( '[Tab]' );
+			expect( alphaButton ).toHaveFocus();
 		} );
 	} );
 
@@ -468,6 +523,15 @@ describe( 'Tabs', () => {
 			expect(
 				await screen.findByRole( 'tab', { name: 'Alpha' } )
 			).toHaveFocus();
+
+			// This assertion ensures the component has had time to fully
+			// render, preventing flakiness.
+			// see https://github.com/WordPress/gutenberg/pull/55950
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'tab', { name: 'Beta' } )
+				).toHaveAttribute( 'tabindex', '-1' )
+			);
 
 			// Because all other tabs should have `tabindex=-1`, pressing Tab
 			// should NOT move the focus to the next tab, which is Beta.
@@ -792,6 +856,16 @@ describe( 'Tabs', () => {
 				// onSelect should not be called since the disabled tab is
 				// highlighted, but not selected.
 				await user.keyboard( '[Tab]' );
+
+				// This assertion ensures focus has time to move to the first
+				// tab before the test proceeds, preventing flakiness.
+				// see https://github.com/WordPress/gutenberg/pull/55950
+				await waitFor( () =>
+					expect(
+						screen.getByRole( 'tab', { name: 'Alpha' } )
+					).toHaveFocus()
+				);
+
 				await user.keyboard( '[ArrowLeft]' );
 				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 

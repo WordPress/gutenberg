@@ -1,10 +1,14 @@
 /**
  * WordPress dependencies
  */
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { VisuallyHidden } from '@wordpress/components';
+import { Popover, VisuallyHidden } from '@wordpress/components';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -12,20 +16,33 @@ import { useViewportMatch } from '@wordpress/compose';
 import DocumentTools from './document-tools';
 import SaveButton from '../save-button';
 import MoreMenu from '../more-menu';
+import { unlock } from '../../lock-unlock';
+
+const { BlockContextualToolbar } = unlock( blockEditorPrivateApis );
 
 function Header( { setListViewToggleElement } ) {
-	const isMediumViewport = useViewportMatch( 'medium' );
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const blockToolbarRef = useRef();
+	const { hasFixedToolbar } = useSelect(
+		( select ) => ( {
+			hasFixedToolbar: !! select( preferencesStore ).get(
+				'core/edit-widgets',
+				'fixedToolbar'
+			),
+		} ),
+		[]
+	);
 
 	return (
 		<>
 			<div className="edit-widgets-header">
 				<div className="edit-widgets-header__navigable-toolbar-wrapper">
-					{ isMediumViewport && (
+					{ isLargeViewport && (
 						<h1 className="edit-widgets-header__title">
 							{ __( 'Widgets' ) }
 						</h1>
 					) }
-					{ ! isMediumViewport && (
+					{ ! isLargeViewport && (
 						<VisuallyHidden
 							as="h1"
 							className="edit-widgets-header__title"
@@ -36,6 +53,17 @@ function Header( { setListViewToggleElement } ) {
 					<DocumentTools
 						setListViewToggleElement={ setListViewToggleElement }
 					/>
+					{ hasFixedToolbar && isLargeViewport && (
+						<>
+							<div className="selected-block-tools-wrapper">
+								<BlockContextualToolbar isFixed />
+							</div>
+							<Popover.Slot
+								ref={ blockToolbarRef }
+								name="block-toolbar"
+							/>
+						</>
+					) }
 				</div>
 				<div className="edit-widgets-header__actions">
 					<SaveButton />

@@ -12,24 +12,22 @@ import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
 import {
-	useContext,
-	useMemo,
-	createPortal,
-	Platform,
-} from '@wordpress/element';
+	createHigherOrderComponent,
+	pure,
+	useInstanceId,
+} from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
+import { useMemo, Platform } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
-import BlockList from '../components/block-list';
 import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
 import useBlockDisplayInformation from '../components/use-block-display-information';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 import { store as blockEditorStore } from '../store';
 
@@ -213,14 +211,12 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
  *
  * @return {Element} Position panel.
  */
-export function PositionPanel( props ) {
-	const {
-		attributes: { style = {} },
-		clientId,
-		name: blockName,
-		setAttributes,
-	} = props;
-
+export function PositionPanelPure( {
+	style = {},
+	clientId,
+	name: blockName,
+	setAttributes,
+} ) {
 	const allowFixed = hasFixedPositionSupport( blockName );
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
@@ -322,6 +318,11 @@ export function PositionPanel( props ) {
 	} );
 }
 
+// We don't want block controls to re-render when typing inside a block. `pure`
+// will prevent re-renders unless props change, so only pass the needed props
+// and not the whole attributes object.
+const PositionPanel = pure( PositionPanelPure );
+
 /**
  * Override the default edit UI to include position controls.
  *
@@ -341,7 +342,14 @@ export const withPositionControls = createHigherOrderComponent(
 
 		return [
 			showPositionControls && (
-				<PositionPanel key="position" { ...props } />
+				<PositionPanel
+					key="position"
+					// This component is pure, so only pass needed props!
+					style={ props.attributes.style }
+					name={ blockName }
+					setAttributes={ props.setAttributes }
+					clientId={ props.clientId }
+				/>
 			),
 			<BlockEdit key="edit" { ...props } />,
 		];
@@ -368,7 +376,6 @@ export const withPositionStyles = createHigherOrderComponent(
 			hasPositionBlockSupport && ! isPositionDisabled;
 
 		const id = useInstanceId( BlockListBlock );
-		const element = useContext( BlockList.__unstableElementContext );
 
 		// Higher specificity to override defaults in editor UI.
 		const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;
@@ -392,15 +399,9 @@ export const withPositionStyles = createHigherOrderComponent(
 				!! attributes?.style?.position?.type,
 		} );
 
-		return (
-			<>
-				{ allowPositionStyles &&
-					element &&
-					!! css &&
-					createPortal( <style>{ css }</style>, element ) }
-				<BlockListBlock { ...props } className={ className } />
-			</>
-		);
+		useStyleOverride( { css } );
+
+		return <BlockListBlock { ...props } className={ className } />;
 	},
 	'withPositionStyles'
 );

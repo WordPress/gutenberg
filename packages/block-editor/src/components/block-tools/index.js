@@ -88,8 +88,6 @@ export default function BlockTools( {
 		moveBlocksDown,
 	} = useDispatch( blockEditorStore );
 
-	const selectedBlockToolsRef = useRef( null );
-
 	function onKeyDown( event ) {
 		if ( event.defaultPrevented ) return;
 
@@ -132,7 +130,7 @@ export default function BlockTools( {
 				insertBeforeBlock( clientIds[ 0 ] );
 			}
 		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
-			if ( selectedBlockToolsRef?.current?.contains( event.target ) ) {
+			if ( event.target.closest( '[role=toolbar]' ) ) {
 				// This shouldn't be necessary, but we have a combination of a few things all combining to create a situation where:
 				// - Because the block toolbar uses createPortal to populate the block toolbar fills, we can't rely on the React event bubbling to hit the onKeyDown listener for the block toolbar
 				// - Since we can't use the React tree, we use the DOM tree which _should_ handle the event bubbling correctly from a `createPortal` element.
@@ -164,6 +162,12 @@ export default function BlockTools( {
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
 
+	// Conditions for fixed toolbar
+	// 1. Not zoom out mode
+	// 2. It's a large viewport. If it's a smaller viewport, let the floating toolbar handle it as it already has styles attached to make it render that way.
+	// 3. Fixed toolbar is enabled
+	const isTopToolbar = ! isZoomOutMode && hasFixedToolbar && isLargeViewport;
+
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div { ...props } onKeyDown={ onKeyDown }>
@@ -173,13 +177,11 @@ export default function BlockTools( {
 						__unstableContentRef={ __unstableContentRef }
 					/>
 				) }
-				{ ! isZoomOutMode &&
-					( hasFixedToolbar || ! isLargeViewport ) && (
-						<BlockContextualToolbar
-							ref={ selectedBlockToolsRef }
-							isFixed
-						/>
-					) }
+				{ /* If there is no slot available, such as in the standalone block editor, render within the editor */ }
+
+				{ ! isLargeViewport && ( // Small viewports always get a fixed toolbar
+					<BlockContextualToolbar isFixed />
+				) }
 
 				{ showEmptyBlockSideInserter && (
 					<EmptyBlockInserter
@@ -191,14 +193,18 @@ export default function BlockTools( {
 					needed for navigation and zoom-out mode. */ }
 				{ ! showEmptyBlockSideInserter && hasSelectedBlock && (
 					<SelectedBlockTools
-						ref={ selectedBlockToolsRef }
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 					/>
 				) }
 
 				{ /* Used for the inline rich text toolbar. */ }
-				<Popover.Slot name="block-toolbar" ref={ blockToolbarRef } />
+				{ ! isTopToolbar && (
+					<Popover.Slot
+						name="block-toolbar"
+						ref={ blockToolbarRef }
+					/>
+				) }
 				{ children }
 				{ /* Used for inline rich text popovers. */ }
 				<Popover.Slot

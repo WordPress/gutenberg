@@ -31,6 +31,7 @@ function UnconnectedToggleGroupControl(
 ) {
 	const {
 		__nextHasNoMarginBottom = false,
+		__next40pxDefaultSize = false,
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,
@@ -52,11 +53,16 @@ function UnconnectedToggleGroupControl(
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.toggleGroupControl( { isBlock, isDeselectable, size } ),
+				styles.toggleGroupControl( {
+					isBlock,
+					isDeselectable,
+					size,
+					__next40pxDefaultSize,
+				} ),
 				isBlock && styles.block,
 				className
 			),
-		[ className, cx, isBlock, isDeselectable, size ]
+		[ className, cx, isBlock, isDeselectable, size, __next40pxDefaultSize ]
 	);
 
 	const MainControl = isDeselectable

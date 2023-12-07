@@ -18,7 +18,7 @@ import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { forwardRef } from '@wordpress/element';
+import { memo } from '@wordpress/element';
 import { search, external } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
 import { displayShortcut } from '@wordpress/keycodes';
@@ -32,7 +32,7 @@ import { unlock } from '../../lock-unlock';
 
 const HUB_ANIMATION_DURATION = 0.3;
 
-const SiteHub = forwardRef( ( { isTransparent, ...restProps }, ref ) => {
+const SiteHub = memo( ( { isTransparent, className } ) => {
 	const { canvasMode, dashboardLink, homeUrl, siteTitle } = useSelect(
 		( select ) => {
 			const { getCanvasMode, getSettings } = unlock(
@@ -84,12 +84,13 @@ const SiteHub = forwardRef( ( { isTransparent, ...restProps }, ref ) => {
 
 	return (
 		<motion.div
-			ref={ ref }
-			{ ...restProps }
-			className={ classnames(
-				'edit-site-site-hub',
-				restProps.className
-			) }
+			className={ classnames( 'edit-site-site-hub', className ) }
+			variants={ {
+				isDistractionFree: { x: '-100%' },
+				isDistractionFreeHovering: { x: 0 },
+				view: { x: 0 },
+				edit: { x: 0 },
+			} }
 			initial={ false }
 			transition={ {
 				type: 'tween',

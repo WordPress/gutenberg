@@ -954,7 +954,7 @@ _Parameters_
 
 ### useSetting
 
-> **Deprecated** 6.4.0 Use useSettings instead.
+> **Deprecated** 6.5.0 Use useSettings instead.
 
 Hook that retrieves the given setting for the block instance in use.
 

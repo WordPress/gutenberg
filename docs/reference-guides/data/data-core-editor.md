@@ -256,6 +256,18 @@ _Returns_
 
 -   `string`: Post type.
 
+### getCurrentTemplateId
+
+Returns the template ID currently being rendered/edited
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string?`: Template ID.
+
 ### getEditedPostAttribute
 
 Returns a single attribute of the post being edited, preferring the unsaved edit if one exists, but falling back to the attribute for the last known saved state of the post.
@@ -501,6 +513,18 @@ _Related_
 
 -   getPreviousBlockClientId in core/block-editor store.
 
+### getRenderingMode
+
+Returns the post editor's rendering mode.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `string`: Rendering mode.
+
 ### getSelectedBlock
 
 _Related_
@@ -534,10 +558,6 @@ Returns state object prior to a specified optimist transaction ID, or `null` if 
 ### getSuggestedPostFormat
 
 Returns a suggested post format for the current post, inferred only if there is a single block within the post and it is of a type known to match a default post format. Returns null if the format cannot be determined.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
 
 _Returns_
 
@@ -1240,6 +1260,19 @@ _Parameters_
 _Related_
 
 -   selectBlock in core/block-editor store.
+
+### setRenderingMode
+
+Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
+
+-   `all`: This is the default mode. It renders the post editor with all the features available. If a template is provided, it's preferred over the post.
+-   `template-only`: This mode renders the editor with only the template blocks visible.
+-   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
+-   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
+
+_Parameters_
+
+-   _mode_ `string`: Mode (one of 'template-only', 'post-only', 'template-locked' or 'all').
 
 ### setTemplateValidity
 

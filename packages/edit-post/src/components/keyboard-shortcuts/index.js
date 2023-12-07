@@ -18,7 +18,6 @@ import { createBlock } from '@wordpress/blocks';
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { getBlockSelectionStart } = useSelect( blockEditorStore );
 	const { getEditorMode, isEditorSidebarOpened, isListViewOpened } =
 		useSelect( editPostStore );
 	const isModeToggleDisabled = useSelect( ( select ) => {
@@ -38,8 +37,12 @@ function KeyboardShortcuts() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 
 	const { replaceBlocks } = useDispatch( blockEditorStore );
-	const { getBlockName, getSelectedBlockClientId, getBlockAttributes } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockName,
+		getSelectedBlockClientId,
+		getBlockAttributes,
+		getBlockSelectionStart,
+	} = useSelect( blockEditorStore );
 
 	const handleTextLevelShortcut = ( event, level ) => {
 		event.preventDefault();

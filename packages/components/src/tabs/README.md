@@ -159,19 +159,6 @@ The children elements, which should be a series of `Tabs.TabPanel` components.
 
 -   Required: No
 
-###### `className`: `string`
-
-The class name to apply to the tablist.
-
--   Required: No
--   Default: ''
-
-###### `style`: `React.CSSProperties`
-
-Custom CSS styles for the tablist.
-
-- Required: No
-
 #### Tab
 
 ##### Props
@@ -182,21 +169,9 @@ The id of the tab, which is prepended with the `Tabs` instance ID.
 
 - Required: Yes
 
-###### `style`: `React.CSSProperties`
-
-Custom CSS styles for the tab.
-
-- Required: No
-
 ###### `children`: `React.ReactNode`
 
 The children elements, generally the text to display on the tab.
-
-- Required: No
-
-###### `className`: `string`
-
-The class name to apply to the tab.
 
 - Required: No
 
@@ -229,14 +204,9 @@ The id of the tabpanel, which is combined with the `Tabs` instance ID and the su
 
 - Required: Yes
 
-###### `className`: `string`
+###### `focusable`: `boolean`
 
-The class name to apply to the tabpanel.
-
-- Required: No
-
-###### `style`: `React.CSSProperties`
-
-Custom CSS styles for the tab.
+Determines whether or not the tabpanel element should be focusable. If `false`, pressing the tab key will skip over the tabpanel, and instead focus on the first focusable element in the panel (if there is one).
 
 - Required: No
+- Default: `true`

@@ -46,8 +46,7 @@
 			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
-				"fontSize": true,
-				"fontAppearance": true
+				"fontSize": true
 			}
 		},
 		"__experimentalBorder": {
