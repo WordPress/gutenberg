@@ -31,8 +31,6 @@ import { getValueFromVariable } from './utils';
 import { setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
 
-const { Tabs } = unlock( componentsPrivateApis );
-
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
 	const hasBackgroundPanel = useHasBackgroundPanel( settings );
@@ -207,6 +205,11 @@ function ColorPanelDropdown( {
 	panelId,
 } ) {
 	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
+	// Unlocking `Tabs` too early causes the `unlock` method to receive an empty
+	// object, due to circular dependencies.
+	// See https://github.com/WordPress/gutenberg/issues/52692
+	const { Tabs } = unlock( componentsPrivateApis );
+
 	return (
 		<ToolsPanelItem
 			className="block-editor-tools-panel-color-gradient-settings__item"
