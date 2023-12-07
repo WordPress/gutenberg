@@ -14,7 +14,14 @@ import { useAsyncList } from '@wordpress/compose';
  */
 import ItemActions from './item-actions';
 
-export default function ViewGrid( { data, fields, view, actions, getItemId } ) {
+export default function ViewGrid( {
+	data,
+	fields,
+	view,
+	actions,
+	getItemId,
+	deferredRendering,
+} ) {
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout.mediaField
 	);
@@ -29,6 +36,7 @@ export default function ViewGrid( { data, fields, view, actions, getItemId } ) {
 			)
 	);
 	const shownData = useAsyncList( data, { step: 3 } );
+	const usedData = deferredRendering ? shownData : data;
 	return (
 		<Grid
 			gap={ 8 }
@@ -36,7 +44,7 @@ export default function ViewGrid( { data, fields, view, actions, getItemId } ) {
 			alignment="top"
 			className="dataviews-grid-view"
 		>
-			{ shownData.map( ( item, index ) => (
+			{ usedData.map( ( item, index ) => (
 				<VStack
 					spacing={ 3 }
 					key={ getItemId?.( item ) || index }

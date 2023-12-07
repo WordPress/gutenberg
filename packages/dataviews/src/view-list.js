@@ -20,8 +20,10 @@ export default function ViewList( {
 	getItemId,
 	onSelectionChange,
 	selection,
+	deferredRendering,
 } ) {
 	const shownData = useAsyncList( data, { step: 3 } );
+	const usedData = deferredRendering ? shownData : data;
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout.mediaField
 	);
@@ -45,7 +47,7 @@ export default function ViewList( {
 
 	return (
 		<ul className="dataviews-list-view">
-			{ shownData.map( ( item, index ) => {
+			{ usedData.map( ( item, index ) => {
 				return (
 					<li key={ getItemId?.( item ) || index }>
 						<div
