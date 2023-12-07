@@ -88,7 +88,7 @@ export default function DocumentBar() {
 
 function BaseDocumentActions( { postType, postId, onBack } ) {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
-	const { editedRecord: document, isResolving } = useEntityRecord(
+	const { editedRecord: doc, isResolving } = useEntityRecord(
 		'postType',
 		postType,
 		postId
@@ -96,13 +96,13 @@ function BaseDocumentActions( { postType, postId, onBack } ) {
 	const { templateIcon, templateTitle } = useSelect( ( select ) => {
 		const { __experimentalGetTemplateInfo: getTemplateInfo } =
 			select( editorStore );
-		const templateInfo = getTemplateInfo( document );
+		const templateInfo = getTemplateInfo( doc );
 		return {
 			templateIcon: templateInfo.icon,
 			templateTitle: templateInfo.title,
 		};
 	} );
-	const isNotFound = ! document && ! isResolving;
+	const isNotFound = ! doc && ! isResolving;
 	const icon = icons[ postType ] ?? pageIcon;
 	const [ isAnimated, setIsAnimated ] = useState( false );
 	const isMounting = useRef( true );
@@ -123,7 +123,7 @@ function BaseDocumentActions( { postType, postId, onBack } ) {
 		isMounting.current = false;
 	}, [ postType, postId ] );
 
-	const title = isTemplate ? templateTitle : document.title;
+	const title = isTemplate ? templateTitle : doc.title;
 
 	return (
 		<div

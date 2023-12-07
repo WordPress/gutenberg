@@ -1185,7 +1185,7 @@ export function getEditorSelection( state ) {
  * @return {boolean} is Ready.
  */
 export function __unstableIsEditorReady( state ) {
-	return state.isReady;
+	return !! state.postId;
 }
 
 /**

@@ -164,13 +164,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			updatePostLock,
 			setupEditor,
 			updateEditorSettings,
-			__experimentalTearDownEditor,
 			setCurrentTemplateId,
+			setEditedPost,
 			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
 		const { createWarningNotice } = useDispatch( noticesStore );
 
-		// Initialize and tear down the editor.
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
 			// Assume that we don't need to initialize in the case of an error recovery.
@@ -196,17 +195,19 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					}
 				);
 			}
-
-			return () => {
-				__experimentalTearDownEditor();
-			};
 		}, [] );
+
+		// Synchronizes the active post with the state
+		useEffect( () => {
+			setEditedPost( post.type, post.id );
+		}, [ post.type, post.id ] );
 
 		// Synchronize the editor settings as they change.
 		useEffect( () => {
 			updateEditorSettings( settings );
 		}, [ settings, updateEditorSettings ] );
 
+		// Synchronizes the active template with the state.
 		useEffect( () => {
 			setCurrentTemplateId( template?.id );
 		}, [ template?.id, setCurrentTemplateId ] );
