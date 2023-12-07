@@ -55,11 +55,9 @@ const defaultConfigPerViewType = {
 
 const LinkFormat = ( { item } ) =>
 	useLink( {
-		params: {
-			postId: item.id,
-			postType: item.type,
-			canvas: 'edit',
-		},
+		postId: item.id,
+		postType: item.type,
+		canvas: 'edit',
 	} );
 
 function useView( type ) {
