@@ -21,6 +21,7 @@ import {
 import { store as blockEditorStore } from '../../store';
 
 const THRESHOLD_DISTANCE = 30;
+const MINIMUM_HEIGHT_FOR_THRESHOLD = 120;
 
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
 /** @typedef {import('../use-on-block-drop/types').WPDropOperation} WPDropOperation */
@@ -85,7 +86,10 @@ export function getDropTargetPosition(
 		// If dragging over the top or bottom of the drop zone, insert the block
 		// before or after the parent block. This only applies to blocks that use
 		// a drop zone element, typically container blocks such as Group or Cover.
-		if ( distance < THRESHOLD_DISTANCE ) {
+		if (
+			rect.height > MINIMUM_HEIGHT_FOR_THRESHOLD &&
+			distance < THRESHOLD_DISTANCE
+		) {
 			if ( edge === 'top' ) {
 				return [ rootBlockIndex, 'before' ];
 			}
