@@ -1,13 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as richTextStore } from '@wordpress/rich-text';
-
-function formatTypesSelector( select ) {
-	return select( richTextStore ).getFormatTypes();
-}
 
 /**
  * Set of all interactive content tags.
@@ -64,45 +59,50 @@ export function useFormatTypes( {
 	withoutInteractiveFormatting,
 	allowedFormats,
 } ) {
-	const allFormatTypes = useSelect( formatTypesSelector, [] );
-	const formatTypes = useMemo( () => {
-		return allFormatTypes.filter( ( { name, interactive, tagName } ) => {
-			if ( allowedFormats && ! allowedFormats.includes( name ) ) {
-				return false;
-			}
+	const { formatTypes, ...keyedSelected } = useSelect(
+		( select ) => {
+			const _formatTypes = select( richTextStore )
+				.getFormatTypes()
+				.filter( ( { name, interactive, tagName } ) => {
+					if ( allowedFormats && ! allowedFormats.includes( name ) ) {
+						return false;
+					}
 
-			if (
-				withoutInteractiveFormatting &&
-				( interactive || interactiveContentTags.has( tagName ) )
-			) {
-				return false;
-			}
+					if (
+						withoutInteractiveFormatting &&
+						( interactive || interactiveContentTags.has( tagName ) )
+					) {
+						return false;
+					}
 
-			return true;
-		} );
-	}, [ allFormatTypes, allowedFormats, withoutInteractiveFormatting ] );
-	const keyedSelected = useSelect(
-		( select ) =>
-			formatTypes.reduce( ( accumulator, type ) => {
-				if ( ! type.__experimentalGetPropsForEditableTreePreparation ) {
-					return accumulator;
-				}
+					return true;
+				} );
+			return _formatTypes.reduce(
+				( accumulator, type ) => {
+					if (
+						! type.__experimentalGetPropsForEditableTreePreparation
+					) {
+						return accumulator;
+					}
 
-				return {
-					...accumulator,
-					...prefixSelectKeys(
-						type.__experimentalGetPropsForEditableTreePreparation(
-							select,
-							{
-								richTextIdentifier: identifier,
-								blockClientId: clientId,
-							}
+					return {
+						...accumulator,
+						...prefixSelectKeys(
+							type.__experimentalGetPropsForEditableTreePreparation(
+								select,
+								{
+									richTextIdentifier: identifier,
+									blockClientId: clientId,
+								}
+							),
+							type.name
 						),
-						type.name
-					),
-				};
-			}, {} ),
-		[ formatTypes, clientId, identifier ]
+					};
+				},
+				{ formatTypes: _formatTypes }
+			);
+		},
+		[ clientId, identifier, allowedFormats, withoutInteractiveFormatting ]
 	);
 	const dispatch = useDispatch();
 	const prepareHandlers = [];
