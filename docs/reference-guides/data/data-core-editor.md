@@ -1285,6 +1285,19 @@ _Returns_
 
 -   `Object`: Action object.
 
+### setEditedPost
+
+Returns an action that sets the current post Type and post ID.
+
+_Parameters_
+
+-   _postType_ `string`: Post Type.
+-   _postId_ `string`: Post ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### setRenderingMode
 
 Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
@@ -1316,15 +1329,13 @@ _Parameters_
 
 ### setupEditorState
 
-Returns an action object used to setup the editor state when first opening an editor.
+> **Deprecated**
+
+Setup the editor state.
 
 _Parameters_
 
 -   _post_ `Object`: Post object.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### showInsertionPoint
 
