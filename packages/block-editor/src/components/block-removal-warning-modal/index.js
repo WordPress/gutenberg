@@ -55,7 +55,7 @@ export function BlockRemovalWarningModal( { rules } ) {
 				<p>
 					{ __(
 						"Be careful! Post or page content will not be displayed if you delete this block."
-					) }{ ' ' }
+					) }
 				</p>
 			) : (
 				<p>
