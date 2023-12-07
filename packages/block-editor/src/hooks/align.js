@@ -109,7 +109,7 @@ export function addAttribute( settings ) {
 }
 
 function BlockEditAlignmentToolbarControlsPure( {
-	blockName,
+	name: blockName,
 	align,
 	setAttributes,
 } ) {

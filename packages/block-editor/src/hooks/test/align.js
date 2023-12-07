@@ -12,20 +12,12 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-import { SlotFillProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import BlockControls from '../../components/block-controls';
-import BlockEdit from '../../components/block-edit';
 import BlockEditorProvider from '../../components/provider';
-import {
-	getValidAlignments,
-	withAlignmentControls,
-	withDataAlign,
-	addAssignedAlign,
-} from '../align';
+import { getValidAlignments, withDataAlign, addAssignedAlign } from '../align';
 
 const noop = () => {};
 
@@ -154,68 +146,6 @@ describe( 'align', () => {
 					false
 				)
 			).toEqual( [ 'left', 'right' ] );
-		} );
-	} );
-
-	describe( 'withAlignControls', () => {
-		const componentProps = {
-			name: 'core/foo',
-			attributes: {},
-			isSelected: true,
-		};
-
-		it( 'should do nothing if no valid alignments', () => {
-			registerBlockType( 'core/foo', blockSettings );
-
-			const EnhancedComponent = withAlignmentControls(
-				( { wrapperProps } ) => <div { ...wrapperProps } />
-			);
-
-			render(
-				<SlotFillProvider>
-					<BlockEdit { ...componentProps }>
-						<EnhancedComponent { ...componentProps } />
-					</BlockEdit>
-					<BlockControls.Slot group="block" />
-				</SlotFillProvider>
-			);
-
-			expect(
-				screen.queryByRole( 'button', {
-					name: 'Align',
-					expanded: false,
-				} )
-			).not.toBeInTheDocument();
-		} );
-
-		it( 'should render toolbar controls if valid alignments', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: true,
-					alignWide: false,
-				},
-			} );
-
-			const EnhancedComponent = withAlignmentControls(
-				( { wrapperProps } ) => <div { ...wrapperProps } />
-			);
-
-			render(
-				<SlotFillProvider>
-					<BlockEdit { ...componentProps }>
-						<EnhancedComponent { ...componentProps } />
-					</BlockEdit>
-					<BlockControls.Slot group="block" />
-				</SlotFillProvider>
-			);
-
-			expect(
-				screen.getAllByRole( 'button', {
-					name: 'Align',
-					expanded: false,
-				} )
-			).toHaveLength( 2 );
 		} );
 	} );
 

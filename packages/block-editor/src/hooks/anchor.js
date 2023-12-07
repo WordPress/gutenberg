@@ -51,7 +51,11 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function BlockEditAnchorControlPure( { blockName, anchor, setAttributes } ) {
+function BlockEditAnchorControlPure( {
+	name: blockName,
+	anchor,
+	setAttributes,
+} ) {
 	const blockEditingMode = useBlockEditingMode();
 
 	const isWeb = Platform.OS === 'web';

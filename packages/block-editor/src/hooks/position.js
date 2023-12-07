@@ -12,11 +12,7 @@ import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import {
-	createHigherOrderComponent,
-	pure,
-	useInstanceId,
-} from '@wordpress/compose';
+import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo, Platform } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
@@ -324,18 +320,13 @@ export default {
 		if ( isPositionDisabled ) {
 			return null;
 		}
-		return <PositionPanel { ...props } />;
+		return <PositionPanelPure { ...props } />;
 	},
 	attributeKeys: [ 'style' ],
 	hasSupport( name ) {
 		return hasBlockSupport( name, POSITION_SUPPORT_KEY );
 	},
 };
-
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-const PositionPanel = pure( PositionPanelPure );
 
 /**
  * Override the default block element to add the position styles.
