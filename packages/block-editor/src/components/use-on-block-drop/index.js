@@ -198,15 +198,15 @@ export function onHTMLDrop(
 /**
  * A React hook for handling block drop events.
  *
- * @param {string}          originalTargetRootClientId The root client id where the block(s) will be inserted.
- * @param {number}          targetBlockIndex           The index where the block(s) will be inserted.
- * @param {Object}          options                    The optional options.
- * @param {WPDropOperation} [options.operation]        The type of operation to perform on drop. Could be `insert` or `replace` for now.
+ * @param {string}          targetRootClientId  The root client id where the block(s) will be inserted.
+ * @param {number}          targetBlockIndex    The index where the block(s) will be inserted.
+ * @param {Object}          options             The optional options.
+ * @param {WPDropOperation} [options.operation] The type of operation to perform on drop. Could be `insert` or `replace` for now.
  *
  * @return {Function} A function to be passed to the onDrop handler.
  */
 export default function useOnBlockDrop(
-	originalTargetRootClientId,
+	targetRootClientId,
 	targetBlockIndex,
 	options = {}
 ) {
@@ -231,21 +231,6 @@ export default function useOnBlockDrop(
 		removeBlocks,
 	} = useDispatch( blockEditorStore );
 	const registry = useRegistry();
-
-	const { targetRootClientId } = useSelect(
-		( select ) => {
-			const firstParent = select( blockEditorStore ).getBlockParents(
-				originalTargetRootClientId,
-				true
-			)[ 0 ];
-			return {
-				targetRootClientId: [ 'before', 'after' ].includes( operation )
-					? firstParent
-					: originalTargetRootClientId,
-			};
-		},
-		[ originalTargetRootClientId, operation ]
-	);
 
 	const insertOrReplaceBlocks = useCallback(
 		( blocks, updateSelection = true, initialPosition = 0 ) => {

@@ -204,9 +204,15 @@ export default function useBlockDropZone( {
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
-	const onBlockDrop = useOnBlockDrop( targetRootClientId, dropTarget.index, {
-		operation: dropTarget.operation,
-	} );
+	const onBlockDrop = useOnBlockDrop(
+		dropTarget.operation === 'before' || dropTarget.operation === 'after'
+			? parentBlock
+			: targetRootClientId,
+		dropTarget.index,
+		{
+			operation: dropTarget.operation,
+		}
+	);
 	const throttled = useThrottle(
 		useCallback(
 			( event, ownerDocument ) => {
