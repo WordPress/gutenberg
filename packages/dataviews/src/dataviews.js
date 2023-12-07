@@ -14,8 +14,8 @@ import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
-import { VIEW_LAYOUTS, DATE_TYPE } from './constants';
-import { renderDate } from './types';
+import { VIEW_LAYOUTS, DATE_TYPE, ENUMERATION_TYPE } from './constants';
+import { renderDate, renderEnumeration } from './types';
 
 export default function DataViews( {
 	view,
@@ -47,6 +47,9 @@ export default function DataViews( {
 			let render = field.render || field.getValue;
 			if ( field.type === DATE_TYPE ) {
 				render = ( { item } ) => renderDate( { field, item } );
+			}
+			if ( field.type === ENUMERATION_TYPE ) {
+				render = ( { item } ) => renderEnumeration( { field, item } );
 			}
 			return {
 				...field,
