@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 import {
-	__experimentalHeading as Heading,
+	FlexItem,
+	__experimentalHStack as HStack,
 	__experimentalItemGroup as ItemGroup,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _n } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -16,8 +16,9 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { unlock } from '../../lock-unlock';
-import { getVariationsByProperty } from './utils';
 import { NavigationButtonAsItem } from './navigation-button';
+import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
+import Subtitle from './subtitle';
 
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
@@ -61,50 +62,40 @@ const getFontFamilyNames = ( themeJson ) => {
 };
 
 export default function Typeset() {
-	const variations = useSelect( ( select ) => {
-		return select(
-			coreStore
-		).__experimentalGetCurrentThemeGlobalStylesVariations();
-	}, [] );
-
 	const { base, user } = useContext( GlobalStylesContext );
+	const [ bodyFont, headingFont ] = getFontFamilies(
+		mergeBaseAndUserConfigs( base, user )
+	);
+	const [ bodyFontFamily, headingFontFamily ] = getFontFamilyNames(
+		mergeBaseAndUserConfigs( base, user )
+	);
 
-	const typographyVariations =
-		variations && getVariationsByProperty( user, variations, 'typography' );
-
-	const uniqueTypographyVariations = [];
-	const uniqueTypographyNames = [];
-	const isDup = ( x, y ) => {
-		return uniqueTypographyNames.find( ( it ) => {
-			return JSON.stringify( it ) === JSON.stringify( [ x, y ] );
-		} );
-	};
-
-	typographyVariations?.forEach( ( variation ) => {
-		const [ bodyFontFamilyName, headingFontFamilyName ] =
-			getFontFamilyNames( mergeBaseAndUserConfigs( base, variation ) );
-		if ( ! isDup( bodyFontFamilyName, headingFontFamilyName ) ) {
-			uniqueTypographyVariations.push( variation );
-			uniqueTypographyNames.push( [
-				bodyFontFamilyName,
-				headingFontFamilyName,
-			] );
-		}
-	} );
-
+	const bodyPreviewStyle = getFamilyPreviewStyle( bodyFont );
+	const headingPreviewStyle = getFamilyPreviewStyle( headingFont );
+	const fontsCount = 2; // TODO
 	return (
-		<>
-			<div className="edit-site-sidebar-navigation-screen-styles__group-header">
-				<Heading level={ 3 }>{ __( 'Typeset' ) }</Heading>
-			</div>
-			<ItemGroup>
+		<VStack spacing={ 3 }>
+			<Subtitle level={ 3 }>{ __( 'Typeset' ) }</Subtitle>
+			<ItemGroup className="edit-site-global-styles-screen-typography-typeset__button">
 				<NavigationButtonAsItem
 					path="/typography/typesets"
 					aria-label={ __( 'Typesets' ) }
 				>
-					{ __( 'Typesets' ) }
+					<HStack justify="space-between">
+						<VStack>
+							<FlexItem style={ headingPreviewStyle }>
+								{ headingFontFamily }
+							</FlexItem>
+							<FlexItem style={ bodyPreviewStyle }>
+								{ bodyFontFamily }
+							</FlexItem>
+						</VStack>
+						<FlexItem style={ { color: '#9e9e9e' } }>
+							{ fontsCount } { _n( 'font', 'fonts', fontsCount ) }
+						</FlexItem>
+					</HStack>
 				</NavigationButtonAsItem>
 			</ItemGroup>
-		</>
+		</VStack>
 	);
 }
