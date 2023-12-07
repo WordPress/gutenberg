@@ -150,9 +150,14 @@
 }
 
 .dataviews-list-view {
+	margin-top: 0;
+
 	li {
 		border-bottom: $border-width solid $gray-100;
 		margin: 0;
+		&:first-child {
+			border-top: $border-width solid $gray-100;
+		}
 		&:last-child {
 			border-bottom: 0;
 		}
