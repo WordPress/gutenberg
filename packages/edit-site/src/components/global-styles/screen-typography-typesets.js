@@ -97,8 +97,9 @@ export default function ScreenTypographyTypesets() {
 					'Manage typography of different global elements on your site.'
 				) }
 			/>
-			<div className="edit-site-global-styles-screen-typography"></div>
-			<TypographyVariations />
+			<div className="edit-site-global-styles-screen-typography">
+				<TypographyVariations />
+			</div>
 		</>
 	);
 }
