@@ -71,7 +71,7 @@ const UncontrolledTabs = ( {
 				{ tabs.map( ( tabObj ) => (
 					<Tabs.Tab
 						key={ tabObj.id }
-						id={ tabObj.id }
+						tabId={ tabObj.id }
 						className={ tabObj.tab.className }
 						disabled={ tabObj.tab.disabled }
 					>
@@ -82,7 +82,7 @@ const UncontrolledTabs = ( {
 			{ tabs.map( ( tabObj ) => (
 				<Tabs.TabPanel
 					key={ tabObj.id }
-					id={ tabObj.id }
+					tabId={ tabObj.id }
 					focusable={ tabObj.tabpanel?.focusable }
 				>
 					{ tabObj.content }
@@ -115,7 +115,7 @@ const ControlledTabs = ( {
 				{ tabs.map( ( tabObj ) => (
 					<Tabs.Tab
 						key={ tabObj.id }
-						id={ tabObj.id }
+						tabId={ tabObj.id }
 						className={ tabObj.tab.className }
 						disabled={ tabObj.tab.disabled }
 					>
@@ -124,7 +124,7 @@ const ControlledTabs = ( {
 				) ) }
 			</Tabs.TabList>
 			{ tabs.map( ( tabObj ) => (
-				<Tabs.TabPanel key={ tabObj.id } id={ tabObj.id }>
+				<Tabs.TabPanel key={ tabObj.id } tabId={ tabObj.id }>
 					{ tabObj.content }
 				</Tabs.TabPanel>
 			) ) }
