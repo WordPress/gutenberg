@@ -30,6 +30,10 @@
 	.components-heading {
 		margin-bottom: $grid-unit-10;
 	}
+
+	.edit-site-sidebar-navigation-screen-navigation-menus__content {
+		margin-left: -$grid-unit-20;
+	}
 }
 
 .edit-site-sidebar-navigation-screen__meta {
@@ -62,6 +66,7 @@
 	padding-top: $grid-unit-60 + $header-height;
 	margin-bottom: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
+	padding-right: $grid-unit-10;
 	z-index: z-index(".edit-site-sidebar-navigation-screen__title-icon");
 }
 

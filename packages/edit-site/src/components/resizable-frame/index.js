@@ -203,11 +203,11 @@ function ResizableFrame( {
 		},
 		visible: {
 			opacity: 1,
-			left: -16,
+			left: -12,
 		},
 		active: {
 			opacity: 1,
-			left: -16,
+			left: -12,
 			scaleY: 1.3,
 		},
 	};
