@@ -14,9 +14,8 @@
 .block-editor-list-view-leaf {
 	// Use position relative for row animation.
 	position: relative;
-	// Set the transition so that once dragged items are dropped, the other items
-	// smoothly return to their original positions.
-	transition: transform 0.2s;
+	// Set the initial translate position to ensure the UI in Safari doesn't jump
+	// when rows later receive the is-displacement-up or is-displacement-down class.
 	transform: translateY(0);
 
 	&.is-draggable,
