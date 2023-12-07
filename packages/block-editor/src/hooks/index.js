@@ -38,7 +38,7 @@ createBlockEditFilter(
 		blockRenaming,
 	].filter( Boolean )
 );
-createBlockListBlockFilter( [ duotone, position ] );
+createBlockListBlockFilter( [ align, duotone, position ] );
 
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';

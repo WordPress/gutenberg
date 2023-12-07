@@ -453,6 +453,7 @@ function BlockListBlockWrapper( {
 			{ ...props }
 			wrapperProps={ {
 				...props.wrapperProps,
+				...wrapperProps,
 				className: classnames(
 					props.wrapperProps?.className,
 					wrapperProps.className
