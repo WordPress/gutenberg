@@ -23,6 +23,7 @@ import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
 import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably, uniqByProperty } from '../../utils/object';
+import { use } from '@wordpress/data';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -51,10 +52,13 @@ export function useHasTypographyPanel( settings ) {
 	);
 }
 
-function useHasFontSizeControl( mergedSettings ) {
+function useHasFontSizeControl( settings ) {
 	return (
-		mergedSettings?.typography?.fontSizes?.length ||
-		mergedSettings?.typography?.customFontSize
+		( settings?.typography?.defaultFontSizes !== false &&
+			settings?.typography?.fontSizes?.default?.length ) ||
+		settings?.typography?.fontSizes?.theme?.length ||
+		settings?.typography?.fontSizes?.custom?.length ||
+		settings?.typography?.customFontSize
 	);
 }
 
@@ -136,28 +140,20 @@ const DEFAULT_CONTROLS = {
 	textColumns: true,
 };
 
-function useMergedSettings( parentSettings ) {
+function useMergedFontSizes( settings ) {
 	return useMemo( () => {
-		const newFontSizes = uniqByProperty(
+		return uniqByProperty(
 			mergeOrigins( {
 				default:
-					parentSettings?.typography?.defaultFontSizes !== false
-						? parentSettings?.typography?.fontSizes?.default
+					settings?.typography?.defaultFontSizes !== false
+						? settings?.typography?.fontSizes?.default
 						: undefined,
-				theme: parentSettings?.typography?.fontSizes?.theme,
-				custom: parentSettings?.typography?.fontSizes?.custom,
+				theme: settings?.typography?.fontSizes?.theme,
+				custom: settings?.typography?.fontSizes?.custom,
 			} ),
 			'slug'
 		);
-
-		return {
-			...parentSettings,
-			typography: {
-				...parentSettings?.typography,
-				fontSizes: newFontSizes,
-			},
-		};
-	}, [ parentSettings ] );
+	}, [ settings ] );
 }
 
 export default function TypographyPanel( {
@@ -171,8 +167,6 @@ export default function TypographyPanel( {
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
-
-	const mergedSettings = useMergedSettings( settings );
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
@@ -197,9 +191,9 @@ export default function TypographyPanel( {
 	const resetFontFamily = () => setFontFamily( undefined );
 
 	// Font Size
-	const hasFontSizeEnabled = useHasFontSizeControl( mergedSettings );
-	const disableCustomFontSizes = ! mergedSettings?.typography?.customFontSize;
-	const fontSizes = mergedSettings?.typography?.fontSizes;
+	const hasFontSizeEnabled = useHasFontSizeControl( settings );
+	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
+	const fontSizes = useMergedFontSizes( settings );
 
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {
