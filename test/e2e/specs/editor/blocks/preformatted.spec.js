@@ -30,6 +30,7 @@ test.describe( 'Preformatted', () => {
 		page,
 	} ) => {
 		await editor.insertBlock( { name: 'core/preformatted' } );
+		await editor.canvas.locator( 'pre' ).isVisible();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );

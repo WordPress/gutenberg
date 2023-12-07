@@ -15,6 +15,9 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 			page,
 		} ) => {
 			await editor.insertBlock( { name: blockName } );
+
+			await editor.canvas.locator( 'pre' ).isVisible();
+
 			await page.keyboard.type( 'a' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.press( 'Enter' );
