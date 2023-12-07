@@ -164,7 +164,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isSubtreeDisabled: isBlockSubtreeDisabled( clientId ),
 				isOutlineEnabled: outlineMode,
 				classNames: classnames( {
-					'is-selected': isSelected,
+					'is-selected': _isSelected,
 					'is-highlighted': isBlockHighlighted( clientId ),
 					'is-multi-selected': isMultiSelected,
 					'is-partially-selected':
@@ -174,7 +174,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					'is-reusable': isReusableBlock( blockType ),
 					'is-dragging': isBlockBeingDragged( clientId ),
 					'has-child-selected': isAncestorOfSelectedBlock,
-					'remove-outline': isSelected && outlineMode && typing,
+					'remove-outline': _isSelected && outlineMode && typing,
 					'is-block-moving-mode': !! movingClientId,
 					'can-insert-moving-block':
 						movingClientId &&
@@ -183,7 +183,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 							getBlockRootClientId( clientId )
 						),
 					[ attributes.className ]: hasLightBlockWrapper,
-					[ getBlockDefaultClassName( name ) ]: hasLightBlockWrapper,
+					[ getBlockDefaultClassName( blockName ) ]:
+						hasLightBlockWrapper,
 				} ),
 			};
 		},
