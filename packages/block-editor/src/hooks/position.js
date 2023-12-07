@@ -322,7 +322,7 @@ export default {
 	edit: function Edit( props ) {
 		const isPositionDisabled = useIsPositionDisabled( props );
 		if ( isPositionDisabled ) {
-			return;
+			return null;
 		}
 		return <PositionPanel { ...props } />;
 	},
