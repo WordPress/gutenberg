@@ -209,16 +209,6 @@ export default function PostFeaturedImageEdit( {
 							/>
 						</>
 					) }
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Use first image from post' ) }
-						onChange={ ( value ) =>
-							setAttributes( {
-								useFirstImageFromPost: value,
-							} )
-						}
-						checked={ useFirstImageFromPost }
-					/>
 				</PanelBody>
 			</InspectorControls>
 		</>
