@@ -119,7 +119,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 	const [ isCreateModalOpen, setIsCreateModalOpen ] = useState( false );
 
 	return (
-		<div className="edit-post-post-template__form">
+		<div className="editor-post-template__classic-theme-dropdown">
 			<InspectorPopoverHeader
 				title={ __( 'Template' ) }
 				help={ __(
@@ -139,11 +139,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 				onClose={ onClose }
 			/>
 			{ ! allowSwitchingTemplate ? (
-				<Notice
-					className="edit-post-post-template__notice"
-					status="warning"
-					isDismissible={ false }
-				>
+				<Notice status="warning" isDismissible={ false }>
 					{ __( 'The posts page template cannot be changed.' ) }
 				</Notice>
 			) : (
@@ -203,7 +199,6 @@ function ClassicThemeControl() {
 	return (
 		<Dropdown
 			popoverProps={ POPOVER_PROPS }
-			contentClassName="edit-post-post-template__dialog"
 			focusOnMount
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<PostTemplateToggle isOpen={ isOpen } onClick={ onToggle } />
