@@ -8,7 +8,7 @@ import { createInterpolateElement } from '@wordpress/element';
 
 export const convertDescription = createInterpolateElement(
 	__(
-		"This menu is currently displaying your website's pages. Editing it will allow you to add, delete, or reorder pages, but new pages will no longer be <em>automatically</em> added to this navigation."
+		"This navigation menu is currently displaying your website's pages. Editing it will allow you to add, delete, or reorder pages, but new pages will no longer be <em>automatically</em> added."
 	),
 	{
 		em: <em />,
