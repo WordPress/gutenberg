@@ -4,6 +4,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 
 const globalStylesChangesCache = new Map();
+const EMPTY_ARRAY = [];
 
 const translationMap = {
 	caption: __( 'caption' ),
@@ -142,6 +143,11 @@ export default function getRevisionChanges(
 			settings: previousRevision?.settings,
 		}
 	);
+
+	if ( ! changedValueTree.length ) {
+		globalStylesChangesCache.set( cacheKey, EMPTY_ARRAY );
+		return EMPTY_ARRAY;
+	}
 
 	// Remove duplicate results.
 	const result = [ ...new Set( changedValueTree ) ]
