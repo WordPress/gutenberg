@@ -29,6 +29,7 @@ export default function DataViews( {
 	paginationInfo,
 	supportedLayouts,
 	onSelectionChange,
+	isRenderedAsync,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
 
@@ -82,6 +83,7 @@ export default function DataViews( {
 					isLoading={ isLoading }
 					onSelectionChange={ onSetSelection }
 					selection={ selection }
+					isRenderedAsync={ isRenderedAsync }
 				/>
 				<Pagination
 					view={ view }

@@ -340,6 +340,7 @@ function ViewTable( {
 	getItemId,
 	isLoading = false,
 	paginationInfo,
+	isRenderedAsync,
 } ) {
 	const columns = useMemo( () => {
 		const _columns = fields.map( ( field ) => {
@@ -367,7 +368,7 @@ function ViewTable( {
 		}
 
 		return _columns;
-	}, [ fields, actions, view ] );
+	}, [ fields, actions ] );
 
 	const columnVisibility = useMemo( () => {
 		if ( ! view.hiddenFields?.length ) {
@@ -435,8 +436,9 @@ function ViewTable( {
 		} );
 
 	const shownData = useAsyncList( data );
+	const usedData = isRenderedAsync ? shownData : data;
 	const dataView = useReactTable( {
-		data: shownData,
+		data: usedData,
 		columns,
 		manualSorting: true,
 		manualFiltering: true,

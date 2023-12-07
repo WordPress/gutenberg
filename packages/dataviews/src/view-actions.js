@@ -156,7 +156,10 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 									? view.hiddenFields.filter(
 											( id ) => id !== field.id
 									  )
-									: [ ...view.hiddenFields, field.id ],
+									: [
+											...( view.hiddenFields || [] ),
+											field.id,
+									  ],
 							} );
 						} }
 					>
