@@ -9,7 +9,6 @@ import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
-import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
@@ -22,6 +21,7 @@ import Link from '../routes/link';
 import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
 import {
 	ENUMERATION_TYPE,
+	DATE_TYPE,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
@@ -270,14 +270,8 @@ export default function PagePages() {
 			{
 				header: __( 'Date' ),
 				id: 'date',
+				type: DATE_TYPE,
 				getValue: ( { item } ) => item.date,
-				render: ( { item } ) => {
-					const formattedDate = dateI18n(
-						getSettings().formats.datetimeAbbreviated,
-						getDate( item.date )
-					);
-					return <time>{ formattedDate }</time>;
-				},
 			},
 		],
 		[ authors, view ]

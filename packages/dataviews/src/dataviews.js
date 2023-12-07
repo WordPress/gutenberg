@@ -14,7 +14,8 @@ import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
-import { VIEW_LAYOUTS } from './constants';
+import { VIEW_LAYOUTS, DATE_TYPE } from './constants';
+import { renderDate } from './types';
 
 export default function DataViews( {
 	view,
@@ -42,11 +43,18 @@ export default function DataViews( {
 		( v ) => v.type === view.type
 	).component;
 	const _fields = useMemo( () => {
-		return fields.map( ( field ) => ( {
-			...field,
-			render: field.render || field.getValue,
-		} ) );
+		return fields.map( ( field ) => {
+			let render = field.render || field.getValue;
+			if ( field.type === DATE_TYPE ) {
+				render = ( { item } ) => renderDate( { field, item } );
+			}
+			return {
+				...field,
+				render,
+			};
+		} );
 	}, [ fields ] );
+
 	return (
 		<div className="dataviews-wrapper">
 			<VStack spacing={ 0 } justify="flex-start">
@@ -63,13 +71,13 @@ export default function DataViews( {
 							/>
 						) }
 						<Filters
-							fields={ fields }
+							fields={ _fields }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
 					<ViewActions
-						fields={ fields }
+						fields={ _fields }
 						view={ view }
 						onChangeView={ onChangeView }
 						supportedLayouts={ supportedLayouts }
