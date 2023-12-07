@@ -53,7 +53,6 @@ export function BlockRemovalWarningModal( { rules } ) {
 		>
 			{ blockNamesForPrompt.length === 1 ? (
 				<p>
-					{ rules[ blockNamesForPrompt[ 0 ] ] }{ ' ' }
 					{ __(
 						"Be careful! Post or page content will not be displayed if you delete this block."
 					) }{ ' ' }
