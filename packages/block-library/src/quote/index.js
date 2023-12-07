@@ -7,7 +7,7 @@ import { quote as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import edit from './edit';
+import lazyLoad from '../utils/lazy-load';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 
@@ -35,7 +35,9 @@ export const settings = {
 		],
 	},
 	transforms,
-	edit,
+	edit: lazyLoad( () =>
+		import( /* webpackChunkName: "quote/editor" */ './edit' )
+	),
 	save,
 	deprecated,
 };
