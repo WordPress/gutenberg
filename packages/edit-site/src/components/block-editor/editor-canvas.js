@@ -14,7 +14,10 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	privateApis as editorPrivateApis,
+	store as editorStore,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -45,17 +48,16 @@ function EditorCanvas( {
 	} = useSelect( ( select ) => {
 		const { getBlockCount, __unstableGetEditorMode } =
 			select( blockEditorStore );
-		const {
-			getEditedPostType,
-			__experimentalGetPreviewDeviceType,
-			getCanvasMode,
-		} = unlock( select( editSiteStore ) );
+		const { getEditedPostType, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
+		const { getDeviceType } = select( editorStore );
 		const _templateType = getEditedPostType();
 
 		return {
 			templateType: _templateType,
 			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
-			deviceType: __experimentalGetPreviewDeviceType(),
+			deviceType: getDeviceType(),
 			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 			canvasMode: getCanvasMode(),
 			hasBlocks: !! getBlockCount(),

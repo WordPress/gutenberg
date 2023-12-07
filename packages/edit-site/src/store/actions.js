@@ -10,6 +10,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 import { speak } from '@wordpress/a11y';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -49,16 +50,25 @@ export function toggleFeature( featureName ) {
 /**
  * Action that changes the width of the editing canvas.
  *
+ * @deprecated
+ *
  * @param {string} deviceType
  *
  * @return {Object} Action object.
  */
-export function __experimentalSetPreviewDeviceType( deviceType ) {
-	return {
-		type: 'SET_PREVIEW_DEVICE_TYPE',
-		deviceType,
+export const __experimentalSetPreviewDeviceType =
+	( deviceType ) =>
+	( { registry } ) => {
+		deprecated(
+			"dispatch( 'core/edit-site' ).__experimentalSetPreviewDeviceType",
+			{
+				since: '6.5',
+				version: '6.7',
+				hint: 'registry.dispatch( editorStore ).setDeviceType',
+			}
+		);
+		registry.dispatch( editorStore ).setDeviceType( deviceType );
 	};
-}
 
 /**
  * Action that sets a template, optionally fetching it from REST API.

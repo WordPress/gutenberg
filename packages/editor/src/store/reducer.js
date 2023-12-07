@@ -297,6 +297,23 @@ export function renderingMode( state = 'all', action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the editing canvas device type.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function deviceType( state = 'Desktop', action ) {
+	switch ( action.type ) {
+		case 'SET_DEVICE_TYPE':
+			return action.deviceType;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -310,4 +327,5 @@ export default combineReducers( {
 	editorSettings,
 	postAutosavingLock,
 	renderingMode,
+	deviceType,
 } );

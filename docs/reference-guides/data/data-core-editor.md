@@ -268,6 +268,18 @@ _Returns_
 
 -   `string?`: Template ID.
 
+### getDeviceType
+
+Returns the current editing canvas device type.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Device type.
+
 ### getEditedPostAttribute
 
 Returns a single attribute of the post being edited, preferring the unsaved edit if one exists, but falling back to the attribute for the last known saved state of the post.
@@ -1260,6 +1272,18 @@ _Parameters_
 _Related_
 
 -   selectBlock in core/block-editor store.
+
+### setDeviceType
+
+Action that changes the width of the editing canvas.
+
+_Parameters_
+
+-   _deviceType_ `string`:
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### setRenderingMode
 

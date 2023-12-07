@@ -44,13 +44,25 @@ export const isFeatureActive = createRegistrySelector(
 /**
  * Returns the current editing canvas device type.
  *
+ * @deprecated
+ *
  * @param {Object} state Global application state.
  *
  * @return {string} Device type.
  */
-export function __experimentalGetPreviewDeviceType( state ) {
-	return state.deviceType;
-}
+export const __experimentalGetPreviewDeviceType = createRegistrySelector(
+	( select ) => () => {
+		deprecated(
+			`select( 'core/edit-site' ).__experimentalGetPreviewDeviceType`,
+			{
+				since: '6.5',
+				version: '6.7',
+				alternative: `select( 'core/editor' ).getDeviceType`,
+			}
+		);
+		return select( editorStore ).getDeviceType();
+	}
+);
 
 /**
  * Returns whether the current user can create media or not.

@@ -99,23 +99,6 @@ export function metaBoxLocations( state = {}, action ) {
 }
 
 /**
- * Reducer returning the editing canvas device type.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function deviceType( state = 'Desktop', action ) {
-	switch ( action.type ) {
-		case 'SET_PREVIEW_DEVICE_TYPE':
-			return action.deviceType;
-	}
-
-	return state;
-}
-
-/**
  * Reducer to set the block inserter panel open or closed.
  *
  * Note: this reducer interacts with the list view panel reducer
@@ -179,7 +162,6 @@ export default combineReducers( {
 	metaBoxes,
 	publishSidebarActive,
 	removedPanels,
-	deviceType,
 	blockInserterPanel,
 	listViewPanel,
 } );

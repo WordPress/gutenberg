@@ -4,23 +4,6 @@
 import { combineReducers } from '@wordpress/data';
 
 /**
- * Reducer returning the editing canvas device type.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function deviceType( state = 'Desktop', action ) {
-	switch ( action.type ) {
-		case 'SET_PREVIEW_DEVICE_TYPE':
-			return action.deviceType;
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning the settings.
  *
  * @param {Object} state  Current state.
@@ -158,7 +141,6 @@ function editorCanvasContainerView( state = undefined, action ) {
 }
 
 export default combineReducers( {
-	deviceType,
 	settings,
 	editedPost,
 	blockInserterPanel,

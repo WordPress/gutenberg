@@ -17,6 +17,7 @@ import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { memo } from '@wordpress/element';
 import { search, external } from '@wordpress/icons';
@@ -57,11 +58,9 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 
 	const disableMotion = useReducedMotion();
-	const {
-		setCanvasMode,
-		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-	} = unlock( useDispatch( editSiteStore ) );
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const { setDeviceType } = useDispatch( editorStore );
 	const isBackToDashboardButton = canvasMode === 'view';
 	const siteIconButtonProps = isBackToDashboardButton
 		? {
@@ -76,7 +75,7 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 					event.preventDefault();
 					if ( canvasMode === 'edit' ) {
 						clearSelectedBlock();
-						setPreviewDeviceType( 'Desktop' );
+						setDeviceType( 'Desktop' );
 						setCanvasMode( 'view' );
 					}
 				},
