@@ -581,6 +581,7 @@ function ViewTable( {
 												header.column.getIsSorted()
 											]
 										}
+										scope="col"
 									>
 										<HeaderMenu
 											dataView={ dataView }
