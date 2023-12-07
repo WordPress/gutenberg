@@ -103,6 +103,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isSubtreeDisabled,
 		isOutlineEnabled,
 		hasOverlay,
+		initialPosition,
 		classNames,
 	} = useSelect(
 		( select ) => {
@@ -128,6 +129,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				canInsertBlockType,
 				getBlockRootClientId,
 				__unstableHasActiveBlockOverlayActive,
+				__unstableGetEditorMode,
+				getSelectedBlocksInitialCaretPosition,
 			} = unlock( select( blockEditorStore ) );
 			const { getActiveBlockVariation } = select( blocksStore );
 			const _isSelected = isBlockSelected( clientId );
@@ -165,6 +168,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isSubtreeDisabled: isBlockSubtreeDisabled( clientId ),
 				isOutlineEnabled: outlineMode,
 				hasOverlay: __unstableHasActiveBlockOverlayActive( clientId ),
+				initialPosition:
+					_isSelected && __unstableGetEditorMode() === 'edit'
+						? getSelectedBlocksInitialCaretPosition()
+						: undefined,
 				classNames: classnames( {
 					'is-selected': _isSelected,
 					'is-highlighted': isBlockHighlighted( clientId ),
@@ -198,7 +205,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const mergedRefs = useMergeRefs( [
 		props.ref,
-		useFocusFirstElement( clientId ),
+		useFocusFirstElement( { clientId, initialPosition } ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
 		useEventHandlers( { clientId, isSelected } ),
