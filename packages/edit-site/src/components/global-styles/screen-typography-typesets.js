@@ -4,10 +4,7 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
-import {
-	__experimentalHeading as Heading,
-	__experimentalItemGroup as ItemGroup,
-} from '@wordpress/components';
+import { __experimentalVStack as VStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -17,7 +14,9 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { unlock } from '../../lock-unlock';
 import { getVariationsByProperty } from './utils';
-import { NavigationButtonAsItem } from './navigation-button';
+import TypographyVariations from './variations-typography';
+import FontFamilies from './font-families';
+import ScreenHeader from './header';
 
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
@@ -60,7 +59,7 @@ const getFontFamilyNames = ( themeJson ) => {
 	return [ bodyFontFamily?.name, headingFontFamily?.name ];
 };
 
-export default function Typeset() {
+export default function ScreenTypographyTypesets() {
 	const variations = useSelect( ( select ) => {
 		return select(
 			coreStore
@@ -94,17 +93,20 @@ export default function Typeset() {
 
 	return (
 		<>
-			<div className="edit-site-sidebar-navigation-screen-styles__group-header">
-				<Heading level={ 3 }>{ __( 'Typeset' ) }</Heading>
+			<ScreenHeader
+				title={ __( 'Typeset' ) }
+				description={ __(
+					'Manage typography of different global elements on your site.'
+				) }
+			/>
+			<div className="edit-site-global-styles-screen-typography">
+				<VStack spacing={ 6 }>
+					{ ! window.__experimentalDisableFontLibrary && (
+						<FontFamilies />
+					) }
+					<TypographyVariations />
+				</VStack>
 			</div>
-			<ItemGroup>
-				<NavigationButtonAsItem
-					path="/typography/typesets"
-					aria-label={ __( 'Typesets' ) }
-				>
-					{ __( 'Typesets' ) }
-				</NavigationButtonAsItem>
-			</ItemGroup>
 		</>
 	);
 }

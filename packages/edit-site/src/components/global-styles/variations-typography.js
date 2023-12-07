@@ -11,7 +11,6 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import {
-	__experimentalHeading as Heading,
 	__experimentalGrid as Grid,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -25,6 +24,7 @@ import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { unlock } from '../../lock-unlock';
 import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
 import { getVariationsByProperty } from './utils';
+import Subtitle from './subtitle';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
@@ -199,10 +199,8 @@ export default function TypographyVariations() {
 	} );
 
 	return (
-		<>
-			<div className="edit-site-sidebar-navigation-screen-styles__group-header">
-				<Heading level={ 3 }>{ __( 'Typography' ) }</Heading>
-			</div>
+		<VStack spacing={ 3 }>
+			<Subtitle level={ 3 }>{ __( 'Presets' ) }</Subtitle>
 			<Grid
 				columns={ 2 }
 				className="edit-site-global-styles-style-variations-container"
@@ -217,6 +215,6 @@ export default function TypographyVariations() {
 						);
 					} ) }
 			</Grid>
-		</>
+		</VStack>
 	);
 }
