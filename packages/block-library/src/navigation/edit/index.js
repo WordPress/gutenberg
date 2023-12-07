@@ -24,7 +24,6 @@ import {
 	getColorClassName,
 	Warning,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
-	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
@@ -290,7 +289,13 @@ function Navigation( {
 
 	const textDecoration = attributes.style?.typography?.textDecoration;
 
-	const hasBlockOverlay = useBlockOverlayActive( clientId );
+	const hasBlockOverlay = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__unstableHasActiveBlockOverlayActive(
+				clientId
+			),
+		[ clientId ]
+	);
 	const isResponsive = 'never' !== overlayMenu;
 	const blockProps = useBlockProps( {
 		ref: navRef,

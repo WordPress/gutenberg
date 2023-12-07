@@ -33,7 +33,6 @@ import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { store as blockEditorStore } from '../../../store';
-import useBlockOverlayActive from '../../block-content-overlay';
 import { unlock } from '../../../lock-unlock';
 
 /**
@@ -103,6 +102,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		enableAnimation,
 		isSubtreeDisabled,
 		isOutlineEnabled,
+		hasOverlay,
 		classNames,
 	} = useSelect(
 		( select ) => {
@@ -127,6 +127,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				hasBlockMovingClientId,
 				canInsertBlockType,
 				getBlockRootClientId,
+				__unstableHasActiveBlockOverlayActive,
 			} = unlock( select( blockEditorStore ) );
 			const { getActiveBlockVariation } = select( blocksStore );
 			const _isSelected = isBlockSelected( clientId );
@@ -163,6 +164,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 				isSubtreeDisabled: isBlockSubtreeDisabled( clientId ),
 				isOutlineEnabled: outlineMode,
+				hasOverlay: __unstableHasActiveBlockOverlayActive( clientId ),
 				classNames: classnames( {
 					'is-selected': _isSelected,
 					'is-highlighted': isBlockHighlighted( clientId ),
@@ -190,8 +192,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		},
 		[ clientId ]
 	);
-
-	const hasOverlay = useBlockOverlayActive( clientId );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
