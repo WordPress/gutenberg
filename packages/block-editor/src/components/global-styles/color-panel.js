@@ -272,6 +272,7 @@ function ColorPanelDropdown( {
 											<Tabs.TabPanel
 												key={ tab.key }
 												id={ tab.key }
+												focusable={ false }
 											>
 												<ColorPanelTab
 													{ ...tab }
