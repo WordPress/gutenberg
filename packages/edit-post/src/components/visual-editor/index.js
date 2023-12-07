@@ -116,7 +116,7 @@ export default function VisualEditor( { styles } ) {
 					: '',
 			},
 		],
-		[ styles ]
+		[ styles, paddingBottom ]
 	);
 
 	const isToBeIframed =
