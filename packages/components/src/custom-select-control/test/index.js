@@ -17,6 +17,7 @@ import CustomSelectControl from '..';
 const customClass = 'amber-skies';
 
 const props = {
+	label: 'label!',
 	options: [
 		{
 			key: 'flower1',
@@ -107,11 +108,17 @@ describe.each( [
 		await user.tab();
 		await user.keyboard( '{enter}' );
 		expect(
-			screen.getByRole( 'listbox', { hidden: false } )
+			screen.getByRole( 'listbox', {
+				name: 'label!',
+			} )
 		).toBeVisible();
 
 		await user.keyboard( '{escape}' );
-		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'listbox', {
+				name: 'label!',
+			} )
+		).not.toBeInTheDocument();
 
 		expect( currentSelectedItem ).toHaveTextContent(
 			props.options[ 0 ].name
@@ -250,7 +257,9 @@ describe.each( [
 			} );
 			await user.click( currentSelectedItem );
 
-			const customSelect = screen.getByRole( 'listbox' );
+			const customSelect = screen.getByRole( 'listbox', {
+				name: 'label!',
+			} );
 			await user.type( customSelect, '{enter}' );
 
 			expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
