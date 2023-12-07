@@ -545,6 +545,9 @@ function ViewTable( {
 		// TODO:Add spinner or progress bar..
 		return <h3>{ __( 'Loading' ) }</h3>;
 	}
+
+	const sortValues = { asc: 'ascending', desc: 'descending' };
+
 	return (
 		<div className="dataviews-table-view-wrapper">
 			{ hasRows && (
@@ -568,6 +571,11 @@ function ViewTable( {
 													.maxWidth || undefined,
 										} }
 										data-field-id={ header.id }
+										aria-sort={
+											sortValues[
+												header.column.getIsSorted()
+											]
+										}
 									>
 										<HeaderMenu
 											dataView={ dataView }
