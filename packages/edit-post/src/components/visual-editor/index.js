@@ -141,7 +141,7 @@ export default function VisualEditor( { styles } ) {
 				>
 					<EditorCanvas
 						ref={ ref }
-						disableIframe={ isToBeIframed }
+						disableIframe={ ! isToBeIframed }
 						styles={ styles }
 						// We should auto-focus the canvas (title) on load.
 						// eslint-disable-next-line jsx-a11y/no-autofocus
