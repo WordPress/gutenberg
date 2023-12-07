@@ -11,14 +11,11 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
 import BlockPopover from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import { store as blockEditorStore } from '../../store';
-import { privateApis as blockEditorPrivateApis } from '../../private-apis';
-
-const { PrivateBlockToolbar } = unlock( blockEditorPrivateApis );
+import { PrivateBlockToolbar } from '../block-toolbar';
 
 export default function BlockToolbarPopover( {
 	clientId,
