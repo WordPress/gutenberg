@@ -58,14 +58,12 @@ export function BlockRemovalWarningModal( { rules } ) {
 					) }{ ' ' }
 				</p>
 			) : (
-				<>
-					<p>
-						{ ' ' }
-						{ __(
-							"Be careful! Post or page content will not be displayed if you delete these blocks."
-						) }
-					</p>
-				</>
+				<p>
+					{ ' ' }
+					{ __(
+						"Be careful! Post or page content will not be displayed if you delete these blocks."
+					) }
+				</p>
 			) }
 
 			<HStack justify="right">
