@@ -136,13 +136,13 @@ describe( 'getRevisionChanges', () => {
 			blockNames
 		);
 		expect( resultA ).toEqual( [
-			'Paragraph block',
-			'background colors',
-			'font size',
-			'font family',
-			'caption element',
-			'link element',
-			'color settings',
+			[ 'Blocks', 'Paragraph' ],
+			[ 'Styles', 'Background' ],
+			[ 'Styles', 'Font size' ],
+			[ 'Styles', 'Font family' ],
+			[ 'Elements', 'Caption' ],
+			[ 'Elements', 'Link' ],
+			[ 'Settings', 'Color' ],
 		] );
 
 		const resultB = getRevisionChanges(

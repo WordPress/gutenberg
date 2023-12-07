@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { store as coreStore } from '@wordpress/core-data';
@@ -23,11 +23,7 @@ const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 const MAX_CHANGES = 7;
 
 function ChangedSummary( { revision, previousRevision, blockNames } ) {
-	const changes = getRevisionChanges(
-		revision,
-		previousRevision,
-		blockNames
-	);
+	let changes = getRevisionChanges( revision, previousRevision, blockNames );
 
 	const changesLength = changes.length;
 
@@ -37,29 +33,47 @@ function ChangedSummary( { revision, previousRevision, blockNames } ) {
 
 	// Truncate to `n` results.
 	if ( changesLength > MAX_CHANGES ) {
-		const deleteCount = changesLength - MAX_CHANGES;
-		changes.splice(
-			MAX_CHANGES,
-			deleteCount,
-			sprintf(
-				/* translators: %d remaining changes that aren't displayed */
-				__( 'and %d more…' ),
-				deleteCount
-			)
-		);
+		changes = changes.slice( 0, MAX_CHANGES );
 	}
 
+	const moreChanges = changesLength - changes.length;
+
+	changes = changes.reduce( ( acc, curr ) => {
+		acc[ curr[ 0 ] ] = ! acc[ curr[ 0 ] ]
+			? [ curr[ 1 ] ]
+			: [ ...acc[ curr[ 0 ] ], curr[ 1 ] ];
+		return acc;
+	}, {} );
+
 	return (
-		<span className="edit-site-global-styles-screen-revision__changes">
-			<div className="edit-site-global-styles-screen-revision__changes-title">
-				{ __( 'Changes:' ) }
-			</div>
-			<ul className="edit-site-global-styles-screen-revision__changes-list">
-				{ changes.map( ( change ) => (
-					<li key={ change }>{ change }</li>
-				) ) }
-			</ul>
-		</span>
+		<div className="edit-site-global-styles-screen-revision__changes">
+			{ Object.entries( changes )?.map( ( [ key, changeValues ] ) => (
+				<div
+					key={ key }
+					className="edit-site-global-styles-screen-revision__changes-group"
+				>
+					<span className="edit-site-global-styles-screen-revision__changes-title">
+						{ key }:
+					</span>
+					<span className="edit-site-global-styles-screen-revision__changes-list">
+						{ changeValues.join( ', ' ) }
+					</span>
+				</div>
+			) ) }
+			{ moreChanges > 0 ? (
+				<span className="edit-site-global-styles-screen-revision__more">
+					{ sprintf(
+						// translators: %d: number of global styles changes that are not displayed in the UI.
+						_n(
+							'…and %d more change.',
+							'…and %d more changes.',
+							moreChanges
+						),
+						moreChanges
+					) }
+				</span>
+			) : null }
+		</div>
 	);
 }
 
