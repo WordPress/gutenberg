@@ -4,6 +4,7 @@
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import {
 	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 	__experimentalText as Text,
 	VisuallyHidden,
 } from '@wordpress/components';
@@ -51,6 +52,15 @@ const renderEmptyFormat = ( { format, item, field } ) => {
 	);
 };
 
+const renderPrefixFormat = ( { format, item, children } ) => {
+	return (
+		<HStack alignment="left" spacing={ 1 }>
+			{ format.renderChildren( { item } ) }
+			<span>{ children }</span>
+		</HStack>
+	);
+};
+
 export const renderDate = ( { field, item } ) => {
 	field.formats.unshift( { type: 'date' } );
 
@@ -75,6 +85,17 @@ export const renderText = ( { field, item } ) => {
 		}
 		return acc;
 	}, value );
+
+	const prefixFormat = field.formats.find(
+		( format ) => format.type === 'prefix'
+	);
+	if ( prefixFormat ) {
+		return renderPrefixFormat( {
+			format: prefixFormat,
+			item,
+			children: result,
+		} );
+	}
 
 	const afterFormat = field.formats.find(
 		( format ) => format.type === 'after'

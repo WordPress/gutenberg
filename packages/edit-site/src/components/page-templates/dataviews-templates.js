@@ -6,7 +6,7 @@ import removeAccents from 'remove-accents';
 /**
  * WordPress dependencies
  */
-import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
@@ -90,19 +90,14 @@ const AfterFormatChildren = ( { item } ) => {
 	return _x( 'Customized', 'template' );
 };
 
-function AuthorField( { item } ) {
-	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
-	return (
-		<HStack alignment="left" spacing={ 1 }>
-			{ imageUrl ? (
-				<AvatarImage imageUrl={ imageUrl } />
-			) : (
-				<div className="edit-site-list-added-by__icon">
-					<Icon icon={ icon } />
-				</div>
-			) }
-			<span>{ text }</span>
-		</HStack>
+function AuthorFormat( { item } ) {
+	const { icon, imageUrl } = useAddedBy( item.type, item.id );
+	return imageUrl ? (
+		<AvatarImage imageUrl={ imageUrl } />
+	) : (
+		<div className="edit-site-list-added-by__icon">
+			<Icon icon={ icon } />
+		</div>
 	);
 }
 
@@ -205,9 +200,7 @@ export default function DataviewsTemplates() {
 				header: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item.author_text,
-				render: ( { item } ) => {
-					return <AuthorField item={ item } />;
-				},
+				formats: [ { type: 'prefix', renderChildren: AuthorFormat } ],
 				enableHiding: false,
 				type: ENUMERATION_TYPE,
 				elements: authors,
