@@ -60,9 +60,7 @@ export function PrivateBlockToolbar( {
 		blockClientIds,
 		isDefaultEditingMode,
 		blockType,
-		hasParents,
-		isValid,
-		isVisual,
+		shouldShowVisualToolbar,
 		showParentSelector,
 	} = useSelect( ( select ) => {
 		const {
@@ -83,6 +81,12 @@ export function PrivateBlockToolbar( {
 		const parentBlockType = getBlockType( parentBlockName );
 		const _isDefaultEditingMode =
 			getBlockEditingMode( selectedBlockClientId ) === 'default';
+		const isValid = selectedBlockClientIds.every( ( id ) =>
+			isBlockValid( id )
+		);
+		const isVisual = selectedBlockClientIds.every(
+			( id ) => getBlockMode( id ) === 'visual'
+		);
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
@@ -91,13 +95,7 @@ export function PrivateBlockToolbar( {
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
 
-			hasParents: parents.length,
-			isValid: selectedBlockClientIds.every( ( id ) =>
-				isBlockValid( id )
-			),
-			isVisual: selectedBlockClientIds.every(
-				( id ) => getBlockMode( id ) === 'visual'
-			),
+			shouldShowVisualToolbar: isValid && isVisual,
 			rootClientId: blockRootClientId,
 			showParentSelector:
 				parentBlockType &&
@@ -135,14 +133,13 @@ export function PrivateBlockToolbar( {
 		return null;
 	}
 
-	const shouldShowVisualToolbar = isValid && isVisual;
 	const isMultiToolbar = blockClientIds.length > 1;
 	const isSynced =
 		isReusableBlock( blockType ) || isTemplatePart( blockType );
 
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = classnames( 'block-editor-block-contextual-toolbar', {
-		'has-parent': hasParents && showParentSelector,
+		'has-parent': showParentSelector,
 	} );
 
 	const innerClasses = classnames( 'block-editor-block-toolbar', {
