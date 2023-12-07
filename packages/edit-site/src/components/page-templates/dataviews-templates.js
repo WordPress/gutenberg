@@ -8,10 +8,8 @@ import removeAccents from 'remove-accents';
  */
 import {
 	Icon,
-	__experimentalView as View,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	VisuallyHidden,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
@@ -29,11 +27,12 @@ import { DataViews } from '@wordpress/dataviews';
  * Internal dependencies
  */
 import Page from '../page';
-import Link from '../routes/link';
+import { useLink } from '../routes/link';
 import { useAddedBy, AvatarImage } from '../list/added-by';
 import {
 	TEMPLATE_POST_TYPE,
 	ENUMERATION_TYPE,
+	TEXT_TYPE,
 	OPERATOR_IN,
 	OPERATOR_NOT_IN,
 	LAYOUT_GRID,
@@ -77,34 +76,25 @@ function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
 }
 
-// TODO: these are going to be reused in the template part list.
-// That's the reason for leaving the template parts code for now.
-function TemplateTitle( { item } ) {
+const LinkFormat = ( { item } ) =>
+	useLink( {
+		postId: item.id,
+		postType: item.type,
+		canvas: 'edit',
+	} );
+
+const AfterFormatProps = () => ( {
+	className: 'edit-site-list-added-by__customized-info',
+} );
+
+const AfterFormatChildren = ( { item } ) => {
 	const { isCustomized } = useAddedBy( item.type, item.id );
-	return (
-		<VStack spacing={ 1 }>
-			<View as="h3">
-				<Link
-					params={ {
-						postId: item.id,
-						postType: item.type,
-						canvas: 'edit',
-					} }
-				>
-					{ decodeEntities( item.title?.rendered || item.slug ) ||
-						__( '(no title)' ) }
-				</Link>
-			</View>
-			{ isCustomized && (
-				<span className="edit-site-list-added-by__customized-info">
-					{ item.type === TEMPLATE_POST_TYPE
-						? _x( 'Customized', 'template' )
-						: _x( 'Customized', 'template part' ) }
-				</span>
-			) }
-		</VStack>
-	);
-}
+	if ( ! isCustomized ) {
+		return null;
+	}
+
+	return _x( 'Customized', 'template' );
+};
 
 function AuthorField( { item } ) {
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
@@ -191,8 +181,18 @@ export default function DataviewsTemplates() {
 			{
 				header: __( 'Template' ),
 				id: 'title',
-				getValue: ( { item } ) => item.title?.rendered || item.slug,
-				render: ( { item } ) => <TemplateTitle item={ item } />,
+				type: TEXT_TYPE,
+				getValue: ( { item } ) =>
+					decodeEntities( item.title?.rendered || item.slug ) ||
+					__( '(no title)' ),
+				formats: [
+					{ type: 'link', renderProps: LinkFormat },
+					{
+						type: 'after',
+						renderProps: AfterFormatProps,
+						renderChildren: AfterFormatChildren,
+					},
+				],
 				maxWidth: 400,
 				enableHiding: false,
 			},
