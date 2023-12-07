@@ -22,19 +22,19 @@ test.describe( 'isTyping', () => {
 		);
 
 		// Toolbar Popover should not be showing
-		await expect( blockToolbarPopover ).toBeHidden();
+		await expect( blockToolbarPopover ).toHaveCSS( 'opacity', '0' );
 
 		// Moving the mouse shows the toolbar.
 		await editor.showBlockToolbar();
 
 		// Toolbar Popover is visible.
-		await expect( blockToolbarPopover ).toBeVisible();
+		await expect( blockToolbarPopover ).toHaveCSS( 'opacity', '1' );
 
 		// Typing again hides the toolbar
 		await page.keyboard.type( ' and continue' );
 
 		// Toolbar Popover is hidden again
-		await expect( blockToolbarPopover ).toBeHidden();
+		await expect( blockToolbarPopover ).toHaveCSS( 'opacity', '0' );
 	} );
 
 	test( 'should not close the dropdown when typing in it', async ( {
