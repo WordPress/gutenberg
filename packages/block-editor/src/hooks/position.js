@@ -318,44 +318,22 @@ export function PositionPanelPure( {
 	} );
 }
 
+export const BlockEdit = ( props ) => {
+	const isPositionDisabled = useIsPositionDisabled( props );
+	if ( isPositionDisabled ) {
+		return;
+	}
+	return <PositionPanel { ...props } />;
+};
+export const attributeKeys = [ 'style' ];
+export function hasSupport( name ) {
+	return hasBlockSupport( name, POSITION_SUPPORT_KEY );
+}
+
 // We don't want block controls to re-render when typing inside a block. `pure`
 // will prevent re-renders unless props change, so only pass the needed props
 // and not the whole attributes object.
 const PositionPanel = pure( PositionPanelPure );
-
-/**
- * Override the default edit UI to include position controls.
- *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withPositionControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { name: blockName } = props;
-		const positionSupport = hasBlockSupport(
-			blockName,
-			POSITION_SUPPORT_KEY
-		);
-		const isPositionDisabled = useIsPositionDisabled( props );
-		const showPositionControls = positionSupport && ! isPositionDisabled;
-
-		return [
-			showPositionControls && (
-				<PositionPanel
-					key="position"
-					// This component is pure, so only pass needed props!
-					style={ props.attributes.style }
-					name={ blockName }
-					setAttributes={ props.setAttributes }
-					clientId={ props.clientId }
-				/>
-			),
-			<BlockEdit key="edit" { ...props } />,
-		];
-	},
-	'withPositionControls'
-);
 
 /**
  * Override the default block element to add the position styles.
@@ -410,9 +388,4 @@ addFilter(
 	'editor.BlockListBlock',
 	'core/editor/position/with-position-styles',
 	withPositionStyles
-);
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/position/with-inspector-controls',
-	withPositionControls
 );

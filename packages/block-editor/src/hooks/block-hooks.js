@@ -2,14 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { addFilter } from '@wordpress/hooks';
 import { Fragment, useMemo } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	PanelBody,
 	ToggleControl,
 } from '@wordpress/components';
-import { createHigherOrderComponent, pure } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 
@@ -235,32 +233,7 @@ function BlockHooksControlPure( props ) {
 	);
 }
 
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-const BlockHooksControl = pure( BlockHooksControlPure );
-
-export const withBlockHooksControls = createHigherOrderComponent(
-	( BlockEdit ) => {
-		return ( props ) => {
-			return (
-				<>
-					<BlockEdit key="edit" { ...props } />
-					{ props.isSelected && (
-						<BlockHooksControl
-							blockName={ props.name }
-							clientId={ props.clientId }
-						/>
-					) }
-				</>
-			);
-		};
-	},
-	'withBlockHooksControls'
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/block-hooks/with-inspector-controls',
-	withBlockHooksControls
-);
+export const BlockEdit = BlockHooksControlPure;
+export function hasSupport() {
+	return true;
+}

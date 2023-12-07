@@ -27,16 +27,26 @@ import './custom-fields';
 import './block-hooks';
 import './block-renaming';
 
-const features = [ 'layout', 'duotone', 'align', 'anchor' ].map(
-	( feature ) => {
+const features = [
+	'layout',
+	'duotone',
+	'align',
+	'anchor',
+	'block-hooks',
+	'block-renaming',
+	'custom-class-name',
+	window.__experimentalConnections ? 'custom-fields' : null,
+	'position',
+]
+	.filter( Boolean )
+	.map( ( feature ) => {
 		const settings = require( `./${ feature }` );
 		return {
 			...settings,
 			name: feature,
 			BlockEdit: pure( settings.BlockEdit ),
 		};
-	}
-);
+	} );
 
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';
@@ -69,6 +79,7 @@ export const withBlockEditHooks = createHigherOrderComponent(
 						<BlockEdit
 							key={ name }
 							name={ props.name }
+							clientId={ props.clientId }
 							setAttributes={ props.setAttributes }
 							{ ...neededProps }
 						/>
@@ -78,7 +89,7 @@ export const withBlockEditHooks = createHigherOrderComponent(
 			<OriginalBlockEdit key="edit" { ...props } />,
 		];
 	},
-	'withLayoutControls'
+	'withBlockEditHooks'
 );
 
 addFilter( 'editor.BlockEdit', 'core/editor/hooks', withBlockEditHooks );
