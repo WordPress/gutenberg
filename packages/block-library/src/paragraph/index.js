@@ -7,7 +7,7 @@ import { paragraph as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
+import edit from './edit';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import metadata from './block.json';
@@ -52,9 +52,7 @@ export const settings = {
 				( attributesToMerge.content || '' ),
 		};
 	},
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "paragraph/editor" */ './edit' )
-	),
+	edit,
 	save,
 };
 

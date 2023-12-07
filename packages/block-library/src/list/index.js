@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import lazyLoad from '../utils/lazy-load';
+import edit from './edit';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 
@@ -46,9 +46,7 @@ const settings = {
 		],
 	},
 	transforms,
-	edit: lazyLoad( () =>
-		import( /* webpackChunkName: "list/editor" */ './edit' )
-	),
+	edit,
 	save,
 	deprecated,
 };
