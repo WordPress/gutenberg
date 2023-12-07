@@ -200,3 +200,16 @@
 .edit-site-patterns__delete-modal {
 	width: $modal-width-small;
 }
+
+.edit-site-patterns__pagination {
+	padding: $grid-unit-30 $grid-unit-40;
+	border-top: 1px solid $gray-800;
+	background: $gray-900;
+	position: sticky;
+	bottom: 0;
+	color: $gray-100;
+	z-index: z-index(".edit-site-patterns__grid-pagination");
+	.components-button.is-tertiary {
+		background-color: $gray-800;
+	}
+}

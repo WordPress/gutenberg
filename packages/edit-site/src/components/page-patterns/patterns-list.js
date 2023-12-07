@@ -217,6 +217,7 @@ export default function PatternsList( { categoryId, type } ) {
 			</VStack>
 			{ numPages > 1 && (
 				<Pagination
+					className="edit-site-patterns__pagination"
 					currentPage={ currentPage }
 					numPages={ numPages }
 					changePage={ changePage }

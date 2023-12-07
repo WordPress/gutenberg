@@ -79,11 +79,12 @@ export default function useGlobalStylesRevisions( {
 		[ query ]
 	);
 	return useMemo( () => {
-		let _modifiedRevisions = [];
-		// Add 1 for the "reset to theme defaults" revision we tack onto the last page.
-		if ( ! authors.length || isLoadingGlobalStylesRevisions ) {
+		if (
+			! authors.length ||
+			( isLoadingGlobalStylesRevisions && ! revisions?.length )
+		) {
 			return {
-				revisions: _modifiedRevisions,
+				revisions: EMPTY_ARRAY,
 				hasUnsavedChanges: isDirty,
 				isLoading: true,
 				revisionsCount: 0,
@@ -91,7 +92,7 @@ export default function useGlobalStylesRevisions( {
 		}
 
 		// Adds author details to each revision.
-		_modifiedRevisions = revisions.map( ( revision ) => {
+		const _modifiedRevisions = revisions.map( ( revision ) => {
 			return {
 				...revision,
 				author: authors.find(

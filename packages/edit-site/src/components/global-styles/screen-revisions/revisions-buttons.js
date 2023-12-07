@@ -114,7 +114,8 @@ function RevisionsButtons( {
 	userRevisions,
 	selectedRevisionId,
 	onChange,
-	canApplyRevision,
+	canSelectedRevisionBeRestored,
+	onApplyRevision,
 } ) {
 	const { currentThemeName, currentUser } = useSelect( ( select ) => {
 		const { getCurrentTheme, getCurrentUser } = select( coreStore );
@@ -148,22 +149,26 @@ function RevisionsButtons( {
 				const revisionAuthor = isUnsaved ? currentUser : author;
 				const authorDisplayName = revisionAuthor?.name || __( 'User' );
 				const authorAvatar = revisionAuthor?.avatar_urls?.[ '48' ];
-				const isFirstItem = index === 0;
 				const isSelected = selectedRevisionId
 					? selectedRevisionId === id
-					: isFirstItem;
-				const areStylesEqual = ! canApplyRevision && isSelected;
-				const isReset = 'parent' === id;
+					: index === 0;
+				const areStylesEqual =
+					! canSelectedRevisionBeRestored && isSelected;
+				const isParent = 'parent' === id;
 				const modifiedDate = getDate( modified );
+				const formattedModifiedDate = dateI18n(
+					datetimeAbbreviated,
+					modifiedDate
+				);
 				const displayDate =
 					modified &&
 					dateNowInMs - modifiedDate.getTime() > DAY_IN_MILLISECONDS
-						? dateI18n( datetimeAbbreviated, modifiedDate )
+						? formattedModifiedDate
 						: humanTimeDiff( modified );
 				const revisionLabel = getRevisionLabel(
 					id,
 					authorDisplayName,
-					dateI18n( datetimeAbbreviated, modifiedDate ),
+					formattedModifiedDate,
 					areStylesEqual
 				);
 
@@ -174,7 +179,7 @@ function RevisionsButtons( {
 							{
 								'is-selected': isSelected,
 								'is-active': areStylesEqual,
-								'is-reset': isReset,
+								'is-reset': isParent,
 							}
 						) }
 						key={ id }
@@ -187,7 +192,7 @@ function RevisionsButtons( {
 							} }
 							aria-label={ revisionLabel }
 						>
-							{ isReset ? (
+							{ isParent ? (
 								<span className="edit-site-global-styles-screen-revisions__description">
 									{ __( 'Default styles' ) }
 									<span className="edit-site-global-styles-screen-revisions__meta">
@@ -229,6 +234,17 @@ function RevisionsButtons( {
 								</span>
 							) }
 						</Button>
+						{ isSelected && canSelectedRevisionBeRestored && (
+							<Button
+								variant="primary"
+								className="edit-site-global-styles-screen-revisions__button"
+								onClick={ onApplyRevision }
+							>
+								{ isParent
+									? __( 'Reset to defaults' )
+									: __( 'Apply' ) }
+							</Button>
+						) }
 					</li>
 				);
 			} ) }
