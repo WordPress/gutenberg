@@ -38,7 +38,7 @@ function BlockPatternsTab( {
 			{ ! isMobile && (
 				<div className="block-editor-inserter__block-patterns-tabs-container">
 					<nav
-						aria-label={ __( 'Block pattern categories' ) }
+						aria-label={ __( 'Pattern categories' ) }
 						className="block-editor-inserter__block-patterns-tabs"
 					>
 						<ItemGroup role="list">
