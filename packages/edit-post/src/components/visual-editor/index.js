@@ -39,7 +39,7 @@ export default function VisualEditor( { styles } ) {
 	const {
 		deviceType,
 		isWelcomeGuideVisible,
-		isTemplateMode,
+		renderingMode,
 		isBlockBasedTheme,
 		hasV3BlocksOnly,
 	} = useSelect( ( select ) => {
@@ -52,7 +52,7 @@ export default function VisualEditor( { styles } ) {
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
-			isTemplateMode: getRenderingMode() !== 'post-only',
+			renderingMode: getRenderingMode(),
 			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
 			hasV3BlocksOnly: getBlockTypes().every( ( type ) => {
 				return type.apiVersion >= 3;
@@ -80,12 +80,13 @@ export default function VisualEditor( { styles } ) {
 		border: '1px solid #ddd',
 		borderBottom: 0,
 	};
-	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
+	const resizedCanvasStyles = useResizeCanvas( deviceType );
 	const previewMode = 'is-' + deviceType.toLowerCase() + '-preview';
 
-	let animatedStyles = isTemplateMode
-		? templateModeStyles
-		: desktopCanvasStyles;
+	let animatedStyles =
+		renderingMode === 'template-only'
+			? templateModeStyles
+			: desktopCanvasStyles;
 	if ( resizedCanvasStyles ) {
 		animatedStyles = resizedCanvasStyles;
 	}
@@ -94,7 +95,11 @@ export default function VisualEditor( { styles } ) {
 
 	// Add a constant padding for the typewritter effect. When typing at the
 	// bottom, there needs to be room to scroll up.
-	if ( ! hasMetaBoxes && ! resizedCanvasStyles && ! isTemplateMode ) {
+	if (
+		! hasMetaBoxes &&
+		! resizedCanvasStyles &&
+		renderingMode === 'post-only'
+	) {
 		paddingBottom = '40vh';
 	}
 
@@ -111,13 +116,13 @@ export default function VisualEditor( { styles } ) {
 					: '',
 			},
 		],
-		[ styles ]
+		[ styles, paddingBottom ]
 	);
 
 	const isToBeIframed =
 		( ( hasV3BlocksOnly || ( isGutenbergPlugin && isBlockBasedTheme ) ) &&
 			! hasMetaBoxes ) ||
-		isTemplateMode ||
+		renderingMode === 'template-only' ||
 		deviceType === 'Tablet' ||
 		deviceType === 'Mobile';
 
@@ -125,14 +130,15 @@ export default function VisualEditor( { styles } ) {
 		<BlockTools
 			__unstableContentRef={ ref }
 			className={ classnames( 'edit-post-visual-editor', {
-				'is-template-mode': isTemplateMode,
+				'is-template-mode': renderingMode === 'template-only',
 				'has-inline-canvas': ! isToBeIframed,
 			} ) }
 		>
 			<motion.div
 				className="edit-post-visual-editor__content-area"
 				animate={ {
-					padding: isTemplateMode ? '48px 48px 0' : 0,
+					padding:
+						renderingMode === 'template-only' ? '48px 48px 0' : 0,
 				} }
 			>
 				<motion.div

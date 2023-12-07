@@ -8,50 +8,46 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../../store';
-import { TEMPLATE_POST_TYPE } from '../../../utils/constants';
+import { store as editorStore } from '../../store';
 
 export function useEditedPostContext() {
-	return useSelect(
-		( select ) => select( editSiteStore ).getEditedPostContext(),
-		[]
-	);
+	return useSelect( ( select ) => {
+		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+		return {
+			postId: getCurrentPostId(),
+			postType: getCurrentPostType(),
+		};
+	}, [] );
 }
-
 export function useAllowSwitchingTemplates() {
-	const { postId } = useEditedPostContext();
+	const { postType, postId } = useEditedPostContext();
 	return useSelect(
 		( select ) => {
 			const { getEntityRecord, getEntityRecords } = select( coreStore );
 			const siteSettings = getEntityRecord( 'root', 'site' );
-			const templates = getEntityRecords(
-				'postType',
-				TEMPLATE_POST_TYPE,
-				{ per_page: -1 }
-			);
+			const templates = getEntityRecords( 'postType', 'wp_template', {
+				per_page: -1,
+			} );
 			const isPostsPage = +postId === siteSettings?.page_for_posts;
 			// If current page is set front page or posts page, we also need
 			// to check if the current theme has a template for it. If not
 			const isFrontPage =
+				postType === 'page' &&
 				+postId === siteSettings?.page_on_front &&
 				templates?.some( ( { slug } ) => slug === 'front-page' );
 			return ! isPostsPage && ! isFrontPage;
 		},
-		[ postId ]
+		[ postId, postType ]
 	);
 }
 
 function useTemplates() {
 	return useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecords(
-				'postType',
-				TEMPLATE_POST_TYPE,
-				{
-					per_page: -1,
-					post_type: 'page',
-				}
-			),
+			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
+				per_page: -1,
+				post_type: 'page',
+			} ),
 		[]
 	);
 }
