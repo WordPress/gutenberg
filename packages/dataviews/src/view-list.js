@@ -30,6 +30,9 @@ export default function ViewList( {
 	const primaryField = fields.find(
 		( field ) => field.id === view.layout.primaryField
 	);
+	primaryField.formats = primaryField.formats.filter(
+		( format ) => format.type !== 'link'
+	);
 	const visibleFields = fields.filter(
 		( field ) =>
 			! view.hiddenFields.includes( field.id ) &&

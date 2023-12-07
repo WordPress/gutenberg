@@ -49,20 +49,28 @@ export default function DataViews( {
 	).component;
 	const _fields = useMemo( () => {
 		return fields.map( ( field ) => {
-			let render = field.render || field.getValue;
-			if ( field.type === DATE_TYPE ) {
-				render = ( { item } ) => renderDate( { field, item } );
+			// Normalize formats.
+			field.formats = field.formats || [];
+
+			// Normalize render.
+			switch ( field.type ) {
+				case DATE_TYPE:
+					field.render = ( { item } ) =>
+						renderDate( { field, item } );
+					break;
+				case ENUMERATION_TYPE:
+					field.render = ( { item } ) =>
+						renderEnumeration( { field, item } );
+					break;
+				case TEXT_TYPE:
+					field.render = ( { item } ) =>
+						renderText( { field, item } );
+					break;
+				default:
+					field.render = field.render || field.getValue;
 			}
-			if ( field.type === ENUMERATION_TYPE ) {
-				render = ( { item } ) => renderEnumeration( { field, item } );
-			}
-			if ( field.type === TEXT_TYPE ) {
-				render = ( { item } ) => renderText( { field, item } );
-			}
-			return {
-				...field,
-				render,
-			};
+
+			return field;
 		} );
 	}, [ fields ] );
 

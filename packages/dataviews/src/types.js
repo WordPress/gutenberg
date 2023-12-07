@@ -17,21 +17,12 @@ const renderDateFormat = ( { children } ) => {
 };
 
 export const renderDate = ( { field, item } ) => {
-	if ( field.formats === undefined ) {
-		field.formats = [];
-	}
-
-	// We want the date format to be the first applied.
 	field.formats.unshift( { type: 'date' } );
 
 	return renderText( { field, item } );
 };
 
 export const renderText = ( { field, item } ) => {
-	if ( field.formats === undefined ) {
-		field.formats = [];
-	}
-
 	const value = field.getValue( { item } );
 	return field.formats.reduce( ( acc, format ) => {
 		if ( format.type === 'link' ) {
