@@ -34,7 +34,6 @@ import {
 	getActiveFormat,
 	getActiveFormats,
 	insert,
-	getTextContent,
 	isEmpty,
 	create,
 	toHTMLString,
@@ -478,14 +477,14 @@ export class RichText extends Component {
 
 		if ( triggeredOption ) {
 			const record = this.getRecord();
-			const text = getTextContent( record );
+			const { text, start } = record;
 			// Only respond to the trigger if the selection is on the start of text or line
 			// or if the character before is a space.
 			const useTrigger =
 				text.length === 0 ||
-				record.start === 0 ||
-				text.charAt( record.start - 1 ) === '\n' ||
-				text.charAt( record.start - 1 ) === ' ';
+				start === 0 ||
+				text.charAt( start - 1 ) === '\n' ||
+				text.charAt( start - 1 ) === ' ';
 
 			if ( useTrigger && triggeredOption.onClick ) {
 				triggeredOption.onClick();

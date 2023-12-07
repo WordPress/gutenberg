@@ -3,7 +3,6 @@
  */
 
 import { insert } from './insert';
-import { OBJECT_REPLACEMENT_CHARACTER } from './special-characters';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 /** @typedef {import('./types').RichTextFormat} RichTextFormat */
@@ -24,7 +23,7 @@ export function insertObject( value, formatToInsert, startIndex, endIndex ) {
 	const valueToInsert = {
 		formats: [ , ],
 		replacements: [ formatToInsert ],
-		text: OBJECT_REPLACEMENT_CHARACTER,
+		text: ' ',
 	};
 
 	return insert( value, valueToInsert, startIndex, endIndex );

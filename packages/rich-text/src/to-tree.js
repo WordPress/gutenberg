@@ -4,7 +4,7 @@
 
 import { getActiveFormats } from './get-active-formats';
 import { getFormatType } from './get-format-type';
-import { OBJECT_REPLACEMENT_CHARACTER, ZWNBSP } from './special-characters';
+import { ZWNBSP } from './special-characters';
 
 function restoreOnAttributes( attributes, isEditableTree ) {
 	if ( isEditableTree ) {
@@ -220,9 +220,9 @@ export function toTree( {
 			}
 		}
 
-		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
-			const replacement = replacements[ i ];
-			if ( ! replacement ) continue;
+		const replacement = replacements[ i ];
+
+		if ( replacement ) {
 			const { type, attributes, innerHTML } = replacement;
 			const formatType = getFormatType( type );
 

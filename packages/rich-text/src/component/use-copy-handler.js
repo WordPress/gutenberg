@@ -10,7 +10,6 @@ import { useRefEffect } from '@wordpress/compose';
 import { toHTMLString } from '../to-html-string';
 import { isCollapsed } from '../is-collapsed';
 import { slice } from '../slice';
-import { getTextContent } from '../get-text-content';
 
 export function useCopyHandler( props ) {
 	const propsRef = useRef( props );
@@ -27,7 +26,7 @@ export function useCopyHandler( props ) {
 			}
 
 			const selectedRecord = slice( record.current );
-			const plainText = getTextContent( selectedRecord );
+			const plainText = selectedRecord.text;
 			const html = toHTMLString( { value: selectedRecord } );
 			event.clipboardData.setData( 'text/plain', plainText );
 			event.clipboardData.setData( 'text/html', html );
