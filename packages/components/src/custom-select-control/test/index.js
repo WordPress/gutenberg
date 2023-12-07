@@ -278,6 +278,12 @@ describe.each( [
 			expect( currentSelectedItem ).toHaveFocus();
 
 			await user.keyboard( '{enter}' );
+			expect(
+				screen.getByRole( 'listbox', {
+					name: 'label!',
+				} )
+			).toHaveFocus();
+
 			await user.keyboard( '{arrowdown}' );
 			await user.keyboard( '{enter}' );
 
@@ -295,9 +301,14 @@ describe.each( [
 
 			await user.tab();
 			await user.keyboard( '{enter}' );
+			expect(
+				screen.getByRole( 'listbox', {
+					name: 'label!',
+				} )
+			).toHaveFocus();
+
 			await user.keyboard( '{a}' );
 			await user.keyboard( '{enter}' );
-
 			expect( currentSelectedItem ).toHaveTextContent( 'amber' );
 		} );
 
@@ -311,10 +322,19 @@ describe.each( [
 			} );
 
 			await user.tab();
+			expect( currentSelectedItem ).toHaveFocus();
+
 			await user.keyboard( '{a}' );
 			await user.keyboard( '{q}' );
-			await user.keyboard( '{enter}' );
 
+			expect(
+				screen.queryByRole( 'listbox', {
+					name: 'label!',
+					hidden: true,
+				} )
+			).not.toBeInTheDocument();
+
+			await user.keyboard( '{enter}' );
 			expect( currentSelectedItem ).toHaveTextContent( 'aquamarine' );
 		} );
 
