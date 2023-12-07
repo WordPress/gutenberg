@@ -33,7 +33,11 @@ import {
 	DimensionsPanel,
 } from './dimensions';
 import useDisplayBlockControls from '../components/use-display-block-controls';
-import { shouldSkipSerialization, useStyleOverride } from './utils';
+import {
+	shouldSkipSerialization,
+	useStyleOverride,
+	useBlockSettings,
+} from './utils';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
@@ -345,6 +349,30 @@ export function addEditProps( settings ) {
 	return settings;
 }
 
+function BlockStyleControls( {
+	clientId,
+	name,
+	setAttributes,
+	__unstableParentLayout,
+} ) {
+	const settings = useBlockSettings( name, __unstableParentLayout );
+	const passedProps = {
+		clientId,
+		name,
+		setAttributes,
+		settings,
+	};
+	return (
+		<>
+			<ColorEdit { ...passedProps } />
+			<BackgroundImagePanel { ...passedProps } />
+			<TypographyPanel { ...passedProps } />
+			<BorderPanel { ...passedProps } />
+			<DimensionsPanel { ...passedProps } />
+		</>
+	);
+}
+
 /**
  * Override the default edit UI to include new inspector controls for
  * all the custom styles configs.
@@ -361,40 +389,11 @@ export const withBlockStyleControls = createHigherOrderComponent(
 
 		const shouldDisplayControls = useDisplayBlockControls();
 		const blockEditingMode = useBlockEditingMode();
-		const { clientId, name, setAttributes, __unstableParentLayout } = props;
 
 		return (
 			<>
 				{ shouldDisplayControls && blockEditingMode === 'default' && (
-					<>
-						<ColorEdit
-							clientId={ clientId }
-							name={ name }
-							setAttributes={ setAttributes }
-						/>
-						<BackgroundImagePanel
-							clientId={ clientId }
-							name={ name }
-							setAttributes={ setAttributes }
-						/>
-						<TypographyPanel
-							clientId={ clientId }
-							name={ name }
-							setAttributes={ setAttributes }
-							__unstableParentLayout={ __unstableParentLayout }
-						/>
-						<BorderPanel
-							clientId={ clientId }
-							name={ name }
-							setAttributes={ setAttributes }
-						/>
-						<DimensionsPanel
-							clientId={ clientId }
-							name={ name }
-							setAttributes={ setAttributes }
-							__unstableParentLayout={ __unstableParentLayout }
-						/>
-					</>
+					<BlockStyleControls { ...props } />
 				) }
 				<BlockEdit key="edit" { ...props } />
 			</>
