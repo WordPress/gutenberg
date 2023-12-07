@@ -138,20 +138,25 @@ const DEFAULT_CONTROLS = {
 
 function useMergedSettings( parentSettings ) {
 	return useMemo( () => {
-		const updatedSettings = { ...parentSettings };
+		// Deep clone relevant parts of parent settings.
+		const updatedSettings = {
+			...parentSettings,
+			typography: {
+				...parentSettings?.typography,
+				fontSizes: {
+					default: parentSettings?.typography?.fontSizes?.default,
+					theme: parentSettings?.typography?.fontSizes?.theme,
+					custom: parentSettings?.typography?.fontSizes?.custom,
+				},
+			},
+		};
 
 		// Remove default font sizes if disabled.
 		if (
 			updatedSettings?.typography?.defaultFontSizes === false &&
 			updatedSettings?.typography?.fontSizes?.default
 		) {
-			updatedSettings.typography = {
-				...updatedSettings.typography,
-				fontSizes: {
-					custom: updatedSettings.typography.fontSizes.custom,
-					theme: updatedSettings.typography.fontSizes.theme,
-				},
-			};
+			delete updatedSettings.typography.fontSizes.default;
 		}
 
 		// Merge origins and remove duplicates.
