@@ -152,3 +152,8 @@
 .dataviews-action-modal {
 	z-index: z-index(".dataviews-action-modal");
 }
+
+.dataviews-no-results,
+.dataviews-loading {
+	padding: 0 $grid-unit-40;
+}

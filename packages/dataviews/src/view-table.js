@@ -543,7 +543,11 @@ function ViewTable( {
 	const hasRows = !! rows?.length;
 	if ( isLoading ) {
 		// TODO:Add spinner or progress bar..
-		return <h3>{ __( 'Loading' ) }</h3>;
+		return (
+			<div className="dataviews-loading">
+				<h3>{ __( 'Loading' ) }</h3>
+			</div>
+		);
 	}
 	return (
 		<div className="dataviews-table-view-wrapper">
@@ -607,7 +611,11 @@ function ViewTable( {
 					</tbody>
 				</table>
 			) }
-			{ ! hasRows && <p>{ __( 'no results' ) }</p> }
+			{ ! hasRows && (
+				<div className="dataviews-no-results">
+					<p>{ __( 'No results' ) }</p>
+				</div>
+			) }
 		</div>
 	);
 }
