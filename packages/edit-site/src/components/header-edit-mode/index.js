@@ -27,7 +27,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { DocumentBar } from '@wordpress/editor';
+import { DocumentBar, store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -58,22 +58,18 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		hasFixedToolbar,
 		isZoomOutMode,
 	} = useSelect( ( select ) => {
-		const { __experimentalGetPreviewDeviceType, getEditedPostType } =
-			select( editSiteStore );
+		const { getEditedPostType } = select( editSiteStore );
 		const { getBlockSelectionStart, __unstableGetEditorMode } =
 			select( blockEditorStore );
-
-		const postType = getEditedPostType();
-
 		const {
 			getUnstableBase, // Site index.
 		} = select( coreStore );
-
 		const { get: getPreference } = select( preferencesStore );
+		const { getDeviceType } = select( editorStore );
 
 		return {
-			deviceType: __experimentalGetPreviewDeviceType(),
-			templateType: postType,
+			deviceType: getDeviceType(),
+			templateType: getEditedPostType(),
 			blockEditorMode: __unstableGetEditorMode(),
 			blockSelectionStart: getBlockSelectionStart(),
 			homeUrl: getUnstableBase()?.home,
@@ -99,9 +95,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isTopToolbar = ! isZoomOutMode && hasFixedToolbar && isLargeViewport;
 	const blockToolbarRef = useRef();
-
-	const { __experimentalSetPreviewDeviceType: setPreviewDeviceType } =
-		useDispatch( editSiteStore );
+	const { setDeviceType } = useDispatch( editorStore );
 	const disableMotion = useReducedMotion();
 
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
@@ -225,7 +219,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 						>
 							<PreviewOptions
 								deviceType={ deviceType }
-								setDeviceType={ setPreviewDeviceType }
+								setDeviceType={ setDeviceType }
 								label={ __( 'View' ) }
 								isEnabled={
 									! isFocusMode && hasDefaultEditorCanvasView

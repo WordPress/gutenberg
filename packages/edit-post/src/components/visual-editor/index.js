@@ -37,14 +37,14 @@ export default function VisualEditor( { styles } ) {
 		isBlockBasedTheme,
 		hasV3BlocksOnly,
 	} = useSelect( ( select ) => {
-		const { isFeatureActive, __experimentalGetPreviewDeviceType } =
-			select( editPostStore );
-		const { getEditorSettings, getRenderingMode } = select( editorStore );
+		const { isFeatureActive } = select( editPostStore );
+		const { getEditorSettings, getRenderingMode, getDeviceType } =
+			select( editorStore );
 		const { getBlockTypes } = select( blocksStore );
 		const editorSettings = getEditorSettings();
 
 		return {
-			deviceType: __experimentalGetPreviewDeviceType(),
+			deviceType: getDeviceType(),
 			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 			renderingMode: getRenderingMode(),
 			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
