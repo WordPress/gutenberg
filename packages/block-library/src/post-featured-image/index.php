@@ -58,8 +58,9 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	// Get the first image from the post.
 	if ( $attributes['useFirstImageFromPost'] && ! $featured_image ) {
 		$content_post = get_post( $post_ID );
-		$content = $content_post->post_content;
-		$processor = new WP_HTML_Tag_Processor( $content );
+		$content      = $content_post->post_content;
+		$processor    = new WP_HTML_Tag_Processor( $content );
+
 		/*
 		 * Transfer the image tag from the post into a new text snippet.
 		 * Because the HTML API doesn't currently expose a way to extract
