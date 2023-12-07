@@ -4,7 +4,6 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
-import { __experimentalVStack as VStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -15,7 +14,6 @@ import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { unlock } from '../../lock-unlock';
 import { getVariationsByProperty } from './utils';
 import TypographyVariations from './variations-typography';
-import FontFamilies from './font-families';
 import ScreenHeader from './header';
 
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
@@ -99,14 +97,8 @@ export default function ScreenTypographyTypesets() {
 					'Manage typography of different global elements on your site.'
 				) }
 			/>
-			<div className="edit-site-global-styles-screen-typography">
-				<VStack spacing={ 6 }>
-					{ ! window.__experimentalDisableFontLibrary && (
-						<FontFamilies />
-					) }
-					<TypographyVariations />
-				</VStack>
-			</div>
+			<div className="edit-site-global-styles-screen-typography"></div>
+			<TypographyVariations />
 		</>
 	);
 }
