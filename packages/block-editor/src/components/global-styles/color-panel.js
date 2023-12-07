@@ -206,6 +206,7 @@ function ColorPanelDropdown( {
 	colorGradientControlSettings,
 	panelId,
 } ) {
+	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
 	return (
 		<ToolsPanelItem
 			className="block-editor-tools-panel-color-gradient-settings__item"
@@ -254,7 +255,7 @@ function ColorPanelDropdown( {
 								/>
 							) }
 							{ tabs.length > 1 && (
-								<Tabs>
+								<Tabs initialTabId={ currentTab?.key }>
 									<Tabs.TabList>
 										{ tabs.map( ( tab ) => (
 											<Tabs.Tab
