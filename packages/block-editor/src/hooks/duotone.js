@@ -13,11 +13,7 @@ import {
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
-import {
-	createHigherOrderComponent,
-	useInstanceId,
-	pure,
-} from '@wordpress/compose';
+import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useEffect } from '@wordpress/element';
 
@@ -179,10 +175,14 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 	);
 }
 
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-const DuotonePanel = pure( DuotonePanelPure );
+export default {
+	shareWithChildBlocks: true,
+	edit: DuotonePanelPure,
+	attributeKeys: [ 'style' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'filter.duotone' );
+	},
+};
 
 /**
  * Filters registered block settings, extending attributes to include
@@ -211,44 +211,6 @@ function addDuotoneAttributes( settings ) {
 
 	return settings;
 }
-
-/**
- * Override the default edit UI to include toolbar controls for duotone if the
- * block supports duotone.
- *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
- */
-const withDuotoneControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		// Previous `color.__experimentalDuotone` support flag is migrated via
-		// block_type_metadata_settings filter in `lib/block-supports/duotone.php`.
-		const hasDuotoneSupport = hasBlockSupport(
-			props.name,
-			'filter.duotone'
-		);
-
-		// CAUTION: code added before this line will be executed
-		// for all blocks, not just those that support duotone. Code added
-		// above this line should be carefully evaluated for its impact on
-		// performance.
-		return (
-			<>
-				{ hasDuotoneSupport && (
-					<DuotonePanel
-						// This component is pure, so only pass needed props!
-						style={ props.attributes.style }
-						setAttributes={ props.setAttributes }
-						name={ props.name }
-					/>
-				) }
-				<BlockEdit { ...props } />
-			</>
-		);
-	},
-	'withDuotoneControls'
-);
 
 function DuotoneStyles( {
 	clientId,
@@ -437,11 +399,6 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/editor/duotone/add-attributes',
 	addDuotoneAttributes
-);
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/duotone/with-editor-controls',
-	withDuotoneControls
 );
 addFilter(
 	'editor.BlockListBlock',

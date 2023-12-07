@@ -12,11 +12,7 @@ import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import {
-	createHigherOrderComponent,
-	pure,
-	useInstanceId,
-} from '@wordpress/compose';
+import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo, Platform } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
@@ -318,44 +314,19 @@ export function PositionPanelPure( {
 	} );
 }
 
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-const PositionPanel = pure( PositionPanelPure );
-
-/**
- * Override the default edit UI to include position controls.
- *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withPositionControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { name: blockName } = props;
-		const positionSupport = hasBlockSupport(
-			blockName,
-			POSITION_SUPPORT_KEY
-		);
+export default {
+	edit: function Edit( props ) {
 		const isPositionDisabled = useIsPositionDisabled( props );
-		const showPositionControls = positionSupport && ! isPositionDisabled;
-
-		return [
-			showPositionControls && (
-				<PositionPanel
-					key="position"
-					// This component is pure, so only pass needed props!
-					style={ props.attributes.style }
-					name={ blockName }
-					setAttributes={ props.setAttributes }
-					clientId={ props.clientId }
-				/>
-			),
-			<BlockEdit key="edit" { ...props } />,
-		];
+		if ( isPositionDisabled ) {
+			return null;
+		}
+		return <PositionPanelPure { ...props } />;
 	},
-	'withPositionControls'
-);
+	attributeKeys: [ 'style' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, POSITION_SUPPORT_KEY );
+	},
+};
 
 /**
  * Override the default block element to add the position styles.
@@ -410,9 +381,4 @@ addFilter(
 	'editor.BlockListBlock',
 	'core/editor/position/with-position-styles',
 	withPositionStyles
-);
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/position/with-inspector-controls',
-	withPositionControls
 );

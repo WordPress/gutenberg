@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, pure } from '@wordpress/compose';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -109,7 +109,7 @@ export function addAttribute( settings ) {
 }
 
 function BlockEditAlignmentToolbarControlsPure( {
-	blockName,
+	name: blockName,
 	align,
 	setAttributes,
 } ) {
@@ -152,45 +152,14 @@ function BlockEditAlignmentToolbarControlsPure( {
 	);
 }
 
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-const BlockEditAlignmentToolbarControls = pure(
-	BlockEditAlignmentToolbarControlsPure
-);
-
-/**
- * Override the default edit UI to include new toolbar controls for block
- * alignment, if block defines support.
- *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withAlignmentControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const hasAlignmentSupport = hasBlockSupport(
-			props.name,
-			'align',
-			false
-		);
-
-		return (
-			<>
-				{ hasAlignmentSupport && (
-					<BlockEditAlignmentToolbarControls
-						blockName={ props.name }
-						// This component is pure, so only pass needed props!
-						align={ props.attributes.align }
-						setAttributes={ props.setAttributes }
-					/>
-				) }
-				<BlockEdit key="edit" { ...props } />
-			</>
-		);
+export default {
+	shareWithChildBlocks: true,
+	edit: BlockEditAlignmentToolbarControlsPure,
+	attributeKeys: [ 'align' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'align', false );
 	},
-	'withAlignmentControls'
-);
+};
 
 function BlockListBlockWithDataAlign( { block: BlockListBlock, props } ) {
 	const { name, attributes } = props;
@@ -272,11 +241,6 @@ addFilter(
 	'editor.BlockListBlock',
 	'core/editor/align/with-data-align',
 	withDataAlign
-);
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/align/with-toolbar-controls',
-	withAlignmentControls
 );
 addFilter(
 	'blocks.getSaveContent.extraProps',

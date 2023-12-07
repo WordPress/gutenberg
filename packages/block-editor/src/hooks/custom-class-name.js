@@ -10,7 +10,6 @@ import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent, pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -64,46 +63,13 @@ function CustomClassNameControlsPure( { className, setAttributes } ) {
 	);
 }
 
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-const CustomClassNameControls = pure( CustomClassNameControlsPure );
-
-/**
- * Override the default edit UI to include a new block inspector control for
- * assigning the custom class name, if block supports custom class name.
- * The control is displayed within the Advanced panel in the block inspector.
- *
- * @param {Component} BlockEdit Original component.
- *
- * @return {Component} Wrapped component.
- */
-export const withCustomClassNameControls = createHigherOrderComponent(
-	( BlockEdit ) => {
-		return ( props ) => {
-			const hasCustomClassName = hasBlockSupport(
-				props.name,
-				'customClassName',
-				true
-			);
-
-			return (
-				<>
-					<BlockEdit { ...props } />
-					{ hasCustomClassName && props.isSelected && (
-						<CustomClassNameControls
-							// This component is pure, so only pass needed
-							// props!
-							className={ props.attributes.className }
-							setAttributes={ props.setAttributes }
-						/>
-					) }
-				</>
-			);
-		};
+export default {
+	edit: CustomClassNameControlsPure,
+	attributeKeys: [ 'className' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'customClassName', true );
 	},
-	'withCustomClassNameControls'
-);
+};
 
 /**
  * Override props assigned to save component to inject the className, if block
@@ -173,11 +139,6 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/editor/custom-class-name/attribute',
 	addAttribute
-);
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/custom-class-name/with-inspector-controls',
-	withCustomClassNameControls
 );
 addFilter(
 	'blocks.getSaveContent.extraProps',

@@ -35,7 +35,7 @@ export default function InspectorControlsFill( {
 		);
 		group = __experimentalGroup;
 	}
-	const isDisplayed = useDisplayBlockControls();
+	const { isDisplayed } = useDisplayBlockControls();
 
 	const Fill = groups[ group ]?.Fill;
 	if ( ! Fill ) {

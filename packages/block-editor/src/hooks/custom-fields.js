@@ -5,7 +5,6 @@ import { addFilter } from '@wordpress/hooks';
 import { PanelBody, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent, pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -91,50 +90,18 @@ function CustomFieldsControlPure( { name, connections, setAttributes } ) {
 	);
 }
 
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-const CustomFieldsControl = pure( CustomFieldsControlPure );
-
-/**
- * Override the default edit UI to include a new block inspector control for
- * assigning a connection to blocks that has support for connections.
- * Currently, only the `core/paragraph` block is supported and there is only a relation
- * between paragraph content and a custom field.
- *
- * @param {Component} BlockEdit Original component.
- *
- * @return {Component} Wrapped component.
- */
-const withCustomFieldsControls = createHigherOrderComponent( ( BlockEdit ) => {
-	return ( props ) => {
-		const hasCustomFieldsSupport = hasBlockSupport(
-			props.name,
-			'__experimentalConnections',
-			false
-		);
-
-		// Check if the current block is a paragraph or image block.
-		// Currently, only these two blocks are supported.
-		if ( ! [ 'core/paragraph', 'core/image' ].includes( props.name ) ) {
-			return <BlockEdit key="edit" { ...props } />;
-		}
-
+export default {
+	edit: CustomFieldsControlPure,
+	attributeKeys: [ 'connections' ],
+	hasSupport( name ) {
 		return (
-			<>
-				<BlockEdit key="edit" { ...props } />
-				{ hasCustomFieldsSupport && props.isSelected && (
-					<CustomFieldsControl
-						name={ props.name }
-						// This component is pure, so only pass needed props!
-						connections={ props.attributes.connections }
-						setAttributes={ props.setAttributes }
-					/>
-				) }
-			</>
+			hasBlockSupport( name, '__experimentalConnections', false ) &&
+			// Check if the current block is a paragraph or image block.
+			// Currently, only these two blocks are supported.
+			[ 'core/paragraph', 'core/image' ].includes( name )
 		);
-	};
-}, 'withCustomFieldsControls' );
+	},
+};
 
 if (
 	window.__experimentalConnections ||
@@ -144,12 +111,5 @@ if (
 		'blocks.registerBlockType',
 		'core/editor/connections/attribute',
 		addAttribute
-	);
-}
-if ( window.__experimentalConnections ) {
-	addFilter(
-		'editor.BlockEdit',
-		'core/editor/connections/with-inspector-controls',
-		withCustomFieldsControls
 	);
 }

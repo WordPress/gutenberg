@@ -3,7 +3,6 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent, pure } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { TextControl } from '@wordpress/components';
 
@@ -11,7 +10,6 @@ import { TextControl } from '@wordpress/components';
  * Internal dependencies
  */
 import { InspectorControls } from '../components';
-import { useBlockRename } from '../components/block-rename';
 
 /**
  * Filters registered block settings, adding an `__experimentalLabel` callback if one does not already exist.
@@ -47,13 +45,7 @@ export function addLabelCallback( settings ) {
 	return settings;
 }
 
-function BlockRenameControlPure( { name, metadata, setAttributes } ) {
-	const { canRename } = useBlockRename( name );
-
-	if ( ! canRename ) {
-		return null;
-	}
-
+function BlockRenameControlPure( { metadata, setAttributes } ) {
 	return (
 		<InspectorControls group="advanced">
 			<TextControl
@@ -70,36 +62,13 @@ function BlockRenameControlPure( { name, metadata, setAttributes } ) {
 	);
 }
 
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-const BlockRenameControl = pure( BlockRenameControlPure );
-
-export const withBlockRenameControl = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { name, attributes, setAttributes, isSelected } = props;
-		return (
-			<>
-				{ isSelected && (
-					<BlockRenameControl
-						name={ name }
-						// This component is pure, so only pass needed props!
-						metadata={ attributes.metadata }
-						setAttributes={ setAttributes }
-					/>
-				) }
-				<BlockEdit key="edit" { ...props } />
-			</>
-		);
+export default {
+	edit: BlockRenameControlPure,
+	attributeKeys: [ 'metadata' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'renaming', true );
 	},
-	'withToolbarControls'
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'core/block-rename-ui/with-block-rename-control',
-	withBlockRenameControl
-);
+};
 
 addFilter(
 	'blocks.registerBlockType',
