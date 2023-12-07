@@ -176,17 +176,42 @@ export default function TypographyPanel( {
 	// Font Size
 	const hasFontSizeEnabled = useHasFontSizeControl( settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-	const mergedFontSizes = uniqByProperty(
-		mergeOrigins( {
-			default:
-				settings?.typography?.defaultFontSizes !== false
-					? settings?.typography?.fontSizes?.default
-					: undefined,
-			theme: settings?.typography?.fontSizes?.theme,
-			custom: settings?.typography?.fontSizes?.custom,
-		} ),
+
+	/**
+	 * TODO: Doing some hacky things here so the global styles CSS matches what
+	 * is shown in the dropdown.
+	 *
+	 * Global styles PRESETS_METADATA includes a `prevent_override` option
+	 * that's supposed to handle this. But it isn't working as expected.
+	 *
+	 * Ideally, global styles would be fixed to handle overrides and duplicates
+	 * better. But at least with these hacks, the thing you select matches the
+	 * styles that get applied.
+	 */
+
+	// The font size presets are merged in reverse order so that the duplicates
+	// that may defined later in the array have higher priority to match the CSS.
+	const mergedFontSizesAll = uniqByProperty(
+		[
+			settings?.typography?.fontSizes?.custom,
+			settings?.typography?.fontSizes?.theme,
+			settings?.typography?.fontSizes?.default,
+		].flatMap( ( presets ) => presets?.toReversed() ?? [] ),
 		'slug'
-	);
+	).toReversed();
+
+	// Default presets exist in the global styles CSS no matter the setting, so
+	// filtering them out in the UI has to be done after merging.
+	const mergedFontSizes =
+		settings?.typography?.defaultFontSizes === false
+			? mergedFontSizesAll.filter(
+					( { slug } ) =>
+						! [ 'small', 'medium', 'large', 'x-large' ].includes(
+							slug
+						)
+			  )
+			: mergedFontSizesAll;
+
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {
 		const actualValue = !! metadata?.slug
