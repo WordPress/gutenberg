@@ -59,8 +59,18 @@ const regionsToVdom = ( dom ) => {
 	return { regions, title };
 };
 
-// Prefetch a page. We store the promise to avoid triggering a second fetch for
-// a page if a fetching has already started.
+/**
+ * Prefetchs the page with the passed URL.
+ *
+ * The function normalizes the URL and stores internally the fetch promise, to
+ * avoid triggering a second fetch for an ongoing request.
+ *
+ * @param {string}  url             The page URL.
+ * @param {Object}  [options]       Options object.
+ * @param {boolean} [options.force] Force fetching the URL again.
+ * @param {string}  [options.html]  HTML string to be used instead of fetching
+ *                                  the requested URL.
+ */
 export const prefetch = ( url, options = {} ) => {
 	url = cleanUrl( url );
 	if ( options.force || ! pages.has( url ) ) {
@@ -84,7 +94,26 @@ const renderRegions = ( page ) => {
 // Variable to store the current navigation.
 let navigatingTo = '';
 
-// Navigate to a new page.
+/**
+ * Navigates to the specified page.
+ *
+ * This function normalizes the passed href, fetchs the page HTML if needed, and
+ * updates any interactive regions whose contents have changed. It also creates
+ * a new entry in the browser session history.
+ *
+ * @param {string}  href              The page href.
+ * @param {Object}  [options]         Options object.
+ * @param {boolean} [options.force]   If true, it forces re-fetching the URL.
+ * @param {string}  [options.html]    HTML string to be used instead of fetching
+ *                                    the requested URL.
+ * @param {boolean} [options.replace] If true, it replaces the current entry in
+ *                                    the browser session history.
+ * @param {number}  [options.timeout] Time until the navigation is aborted, in
+ *                                    milliseconds. Default is 10000.
+ *
+ * @return {Promise} Promise that resolves once the navigation is completed or
+ *                   aborted.
+ */
 export const navigate = async ( href, options = {} ) => {
 	const url = cleanUrl( href );
 	navigatingTo = href;

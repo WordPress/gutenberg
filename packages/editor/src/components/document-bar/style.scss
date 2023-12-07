@@ -1,4 +1,4 @@
-.edit-site-document-actions {
+.editor-document-bar {
 	display: flex;
 	align-items: center;
 	height: $button-size-compact;
@@ -28,26 +28,18 @@
 	@include break-large() {
 		width: min(100%, 450px);
 	}
-
-	&.is-synced-entity {
-		.edit-site-document-actions__title {
-			color: var(--wp-block-synced-color);
-			h1 {
-				color: var(--wp-block-synced-color);
-			}
-		}
-	}
 }
 
-.edit-site-document-actions__command {
+.editor-document-bar__command {
 	flex-grow: 1;
 	color: var(--wp-block-synced-color);
 	overflow: hidden;
 }
 
-.edit-site-document-actions__title {
+.editor-document-bar__title {
 	flex-grow: 1;
 	overflow: hidden;
+	color: $gray-800;
 
 	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
 	@include break-small() {
@@ -55,6 +47,10 @@
 	}
 
 	&:hover {
+		color: var(--wp-block-synced-color);
+	}
+
+	.editor-document-bar.is-global & {
 		color: var(--wp-block-synced-color);
 	}
 
@@ -68,28 +64,21 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		max-width: 50%;
+		color: currentColor;
 	}
 
-	.edit-site-document-actions.is-page & {
-		color: $gray-800;
-
-		h1 {
-			color: $gray-800;
-		}
-	}
-
-	.edit-site-document-actions.is-animated & {
-		animation: edit-site-document-actions__slide-in-left 0.3s;
+	.editor-document-bar.is-animated.has-back-button & {
+		animation: editor-document-bar__slide-in-left 0.3s;
 		@include reduce-motion("animation");
 	}
 
-	.edit-site-document-actions.is-animated.is-page & {
-		animation: edit-site-document-actions__slide-in-right 0.3s;
+	.editor-document-bar.is-animated & {
+		animation: editor-document-bar__slide-in-right 0.3s;
 		@include reduce-motion("animation");
 	}
 }
 
-.edit-site-document-actions__shortcut {
+.editor-document-bar__shortcut {
 	color: $gray-800;
 	min-width: $grid-unit-40;
 	display: none;
@@ -99,7 +88,7 @@
 	}
 }
 
-.edit-site-document-actions__back.components-button.has-icon.has-text {
+.editor-document-bar__back.components-button.has-icon.has-text {
 	min-width: $button-size;
 	flex-shrink: 0;
 	color: $gray-700;
@@ -108,17 +97,17 @@
 	position: absolute;
 
 	&:hover {
-		color: currentColor;
+		color: var(--wp-block-synced-color);
 		background-color: transparent;
 	}
 
-	.edit-site-document-actions.is-animated & {
-		animation: edit-site-document-actions__slide-in-left 0.3s;
+	.editor-document-bar.is-animated & {
+		animation: editor-document-bar__slide-in-left 0.3s;
 		@include reduce-motion("animation");
 	}
 }
 
-@keyframes edit-site-document-actions__slide-in-right {
+@keyframes editor-document-bar__slide-in-right {
 	from {
 		transform: translateX(-15%);
 		opacity: 0;
@@ -129,7 +118,7 @@
 	}
 }
 
-@keyframes edit-site-document-actions__slide-in-left {
+@keyframes editor-document-bar__slide-in-left {
 	from {
 		transform: translateX(15%);
 		opacity: 0;

@@ -7,7 +7,6 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
@@ -525,46 +524,24 @@ export function setIsEditingTemplate() {
 
 /**
  * Switches to the template mode.
- *
- * @param {boolean} newTemplate Is new template.
  */
 export const __unstableSwitchToTemplateMode =
-	( newTemplate = false ) =>
-	( { registry, select } ) => {
-		registry.dispatch( editorStore ).setRenderingMode( 'all' );
-		const isWelcomeGuideActive = select.isFeatureActive(
-			'welcomeGuideTemplate'
-		);
-		if ( ! isWelcomeGuideActive ) {
-			const message = newTemplate
-				? __( "Custom template created. You're in template mode now." )
-				: __(
-						'Editing template. Changes made here affect all posts and pages that use the template.'
-				  );
-			registry.dispatch( noticesStore ).createSuccessNotice( message, {
-				type: 'snackbar',
-			} );
-		}
+	() =>
+	( { registry } ) => {
+		registry.dispatch( editorStore ).setRenderingMode( 'template-only' );
 	};
 
 /**
  * Create a block based template.
  *
- * @param {Object?} template Template to create and assign.
+ * @deprecated
  */
-export const __unstableCreateTemplate =
-	( template ) =>
-	async ( { registry } ) => {
-		const savedTemplate = await registry
-			.dispatch( coreStore )
-			.saveEntityRecord( 'postType', 'wp_template', template );
-		const post = registry.select( editorStore ).getCurrentPost();
-		registry
-			.dispatch( coreStore )
-			.editEntityRecord( 'postType', post.type, post.id, {
-				template: savedTemplate.slug,
-			} );
-	};
+export function __unstableCreateTemplate() {
+	deprecated( "dispatch( 'core/edit-post' ).__unstableCreateTemplate", {
+		since: '6.5',
+	} );
+	return { type: 'NOTHING' };
+}
 
 let metaBoxesInitialized = false;
 

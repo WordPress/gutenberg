@@ -49,7 +49,7 @@ export default function PostSchedulePanel() {
 								label
 							) }
 							label={ fullLabel }
-							showTooltip
+							showTooltip={ label !== fullLabel }
 							aria-expanded={ isOpen }
 						>
 							{ label }

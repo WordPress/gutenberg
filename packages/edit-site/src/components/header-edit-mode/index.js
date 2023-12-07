@@ -27,13 +27,13 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { DocumentBar } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import MoreMenu from './more-menu';
 import SaveButton from '../save-button';
-import DocumentActions from './document-actions';
 import DocumentTools from './document-tools';
 import { store as editSiteStore } from '../../store';
 import {
@@ -205,7 +205,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 					{ ! hasDefaultEditorCanvasView ? (
 						getEditorCanvasContainerTitle( editorCanvasView )
 					) : (
-						<DocumentActions />
+						<DocumentBar />
 					) }
 				</div>
 			) }

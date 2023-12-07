@@ -9,15 +9,14 @@ import { StyleSheet } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Icon, check, chevronRight } from '@wordpress/icons';
-import { blockSettingsScreens } from '@wordpress/block-editor';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { BottomSheet, PanelBody } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
-import PanelBody from '../../panel/body';
-import BottomSheet from '../bottom-sheet';
+import styles from './style.native.scss';
+import { blockSettingsScreens } from '../block-settings';
 
 const LINK_DESTINATION_NONE = 'none';
 const LINK_DESTINATION_MEDIA = 'media';
@@ -36,6 +35,7 @@ function LinkDestination( {
 		styles.optionIcon,
 		styles.optionIconDark
 	);
+
 	return (
 		<BottomSheet.Cell
 			icon={ check }

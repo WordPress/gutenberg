@@ -15,7 +15,7 @@ export default function WelcomeGuide() {
 	const { isActive, isTemplateMode } = useSelect( ( select ) => {
 		const { isFeatureActive } = select( editPostStore );
 		const { getRenderingMode } = select( editorStore );
-		const _isTemplateMode = getRenderingMode() !== 'post-only';
+		const _isTemplateMode = getRenderingMode() === 'template-only';
 		const feature = _isTemplateMode
 			? 'welcomeGuideTemplate'
 			: 'welcomeGuide';

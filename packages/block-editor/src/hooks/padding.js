@@ -16,11 +16,11 @@ function getComputedCSS( element, property ) {
 		.getPropertyValue( property );
 }
 
-export function PaddingVisualizer( { clientId, attributes, forceShow } ) {
+export function PaddingVisualizer( { clientId, value, forceShow } ) {
 	const blockElement = useBlockElement( clientId );
 	const [ style, setStyle ] = useState();
 
-	const padding = attributes?.style?.spacing?.padding;
+	const padding = value?.spacing?.padding;
 
 	useEffect( () => {
 		if (

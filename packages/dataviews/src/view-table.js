@@ -341,12 +341,12 @@ function ViewTable( {
 	getItemId,
 	isLoading = false,
 	paginationInfo,
+	deferredRendering,
 } ) {
 	const columns = useMemo( () => {
 		const _columns = fields.map( ( field ) => {
 			const { render, getValue, ...column } = field;
-			column.cell = ( props ) =>
-				render( { item: props.row.original, view } );
+			column.cell = ( props ) => render( { item: props.row.original } );
 			if ( getValue ) {
 				column.accessorFn = ( item ) => getValue( { item } );
 			}
@@ -369,7 +369,7 @@ function ViewTable( {
 		}
 
 		return _columns;
-	}, [ fields, actions, view ] );
+	}, [ fields, actions ] );
 
 	const columnVisibility = useMemo( () => {
 		if ( ! view.hiddenFields?.length ) {
@@ -437,8 +437,9 @@ function ViewTable( {
 		} );
 
 	const shownData = useAsyncList( data );
+	const usedData = deferredRendering ? shownData : data;
 	const dataView = useReactTable( {
-		data: shownData,
+		data: usedData,
 		columns,
 		manualSorting: true,
 		manualFiltering: true,

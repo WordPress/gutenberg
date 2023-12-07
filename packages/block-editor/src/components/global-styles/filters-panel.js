@@ -12,9 +12,9 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
-	__experimentalVStack as VStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
+	MenuGroup,
 	ColorIndicator,
 	DuotonePicker,
 	DuotoneSwatch,
@@ -82,6 +82,10 @@ function FiltersToolsPanel( {
 			label={ _x( 'Filters', 'Name for applying graphical effects' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			dropdownMenuProps={ {
+				placement: 'left-start',
+				offset: 258, // sidebar width (280px) - button width (24px) + border (2px)
+			} }
 		>
 			{ children }
 		</ToolsPanel>
@@ -197,8 +201,8 @@ export default function FiltersPanel( {
 							);
 						} }
 						renderContent={ () => (
-							<DropdownContentWrapper paddingSize="medium">
-								<VStack>
+							<DropdownContentWrapper paddingSize="small">
+								<MenuGroup label={ __( 'Duotone' ) }>
 									<p>
 										{ __(
 											'Create a two-tone color effect without losing your original image.'
@@ -213,7 +217,7 @@ export default function FiltersPanel( {
 										value={ duotone }
 										onChange={ setDuotone }
 									/>
-								</VStack>
+								</MenuGroup>
 							</DropdownContentWrapper>
 						) }
 					/>

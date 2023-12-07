@@ -199,6 +199,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			updateEditorSettings,
 			__experimentalTearDownEditor,
 			setCurrentTemplateId,
+			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
 		const { createWarningNotice } = useDispatch( noticesStore );
 
@@ -242,6 +243,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		useEffect( () => {
 			setCurrentTemplateId( template?.id );
 		}, [ template?.id, setCurrentTemplateId ] );
+
+		// Sets the right rendering mode when loading the editor.
+		useEffect( () => {
+			setRenderingMode( settings.defaultRenderingMode ?? 'post-only' );
+		}, [ settings.defaultRenderingMode, setRenderingMode ] );
 
 		if ( ! isReady ) {
 			return null;
