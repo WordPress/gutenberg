@@ -32,7 +32,6 @@ import {
 	SPACING_SUPPORT_KEY,
 	DimensionsPanel,
 } from './dimensions';
-import useDisplayBlockControls from '../components/use-display-block-controls';
 import {
 	shouldSkipSerialization,
 	useStyleOverride,
@@ -356,12 +355,16 @@ function BlockStyleControls( {
 	__unstableParentLayout,
 } ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
+	const blockEditingMode = useBlockEditingMode();
 	const passedProps = {
 		clientId,
 		name,
 		setAttributes,
 		settings,
 	};
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
 	return (
 		<>
 			<ColorEdit { ...passedProps } />
@@ -373,34 +376,10 @@ function BlockStyleControls( {
 	);
 }
 
-/**
- * Override the default edit UI to include new inspector controls for
- * all the custom styles configs.
- *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withBlockStyleControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		if ( ! hasStyleSupport( props.name ) ) {
-			return <BlockEdit key="edit" { ...props } />;
-		}
-
-		const shouldDisplayControls = useDisplayBlockControls();
-		const blockEditingMode = useBlockEditingMode();
-
-		return (
-			<>
-				{ shouldDisplayControls && blockEditingMode === 'default' && (
-					<BlockStyleControls { ...props } />
-				) }
-				<BlockEdit key="edit" { ...props } />
-			</>
-		);
-	},
-	'withBlockStyleControls'
-);
+export const BlockEdit = BlockStyleControls;
+export function hasSupport( name ) {
+	return hasStyleSupport( name );
+}
 
 // Defines which element types are supported, including their hover styles or
 // any other elements that have been included under a single element type
@@ -540,12 +519,6 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/style/addEditProps',
 	addEditProps
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'core/style/with-block-controls',
-	withBlockStyleControls
 );
 
 addFilter(

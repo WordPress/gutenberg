@@ -37,6 +37,7 @@ const features = [
 	'custom-class-name',
 	window.__experimentalConnections ? 'custom-fields' : null,
 	'position',
+	'style',
 ]
 	.filter( Boolean )
 	.map( ( feature ) => {
@@ -62,7 +63,7 @@ export const withBlockEditHooks = createHigherOrderComponent(
 		const shouldDisplayControls = useDisplayBlockControls();
 		return [
 			...features.map(
-				( { name, BlockEdit, hasSupport, attributeKeys } ) => {
+				( { name, BlockEdit, hasSupport, attributeKeys = [] } ) => {
 					if (
 						! shouldDisplayControls ||
 						! hasSupport( props.name )
@@ -81,6 +82,9 @@ export const withBlockEditHooks = createHigherOrderComponent(
 							name={ props.name }
 							clientId={ props.clientId }
 							setAttributes={ props.setAttributes }
+							__unstableParentLayout={
+								props.__unstableParentLayout
+							}
 							{ ...neededProps }
 						/>
 					);
