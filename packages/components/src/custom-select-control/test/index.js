@@ -31,10 +31,15 @@ const props = {
 		{
 			key: 'color1',
 			name: 'amber',
+			className: 'amber-skies',
 		},
 		{
 			key: 'color2',
 			name: 'aquamarine',
+			style: {
+				backgroundColor: 'rgb(127, 255, 212)',
+				rotate: '13deg',
+			},
 		},
 	],
 	__nextUnconstrainedWidth: true,
@@ -107,6 +112,59 @@ describe.each( [
 		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 
 		expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+	} );
+
+	it( 'Should apply class only to options that have a className defined', async () => {
+		const user = userEvent.setup();
+		const customClass = 'amber-skies';
+
+		render( <CustomSelectControl { ...props } /> );
+
+		await user.click( screen.getByRole( 'button', { text: 'violets' } ) );
+
+		// return an array of items without a className added
+		const classlessItems = props.options.filter(
+			( option ) => option.className === undefined
+		);
+
+		// assert against filtered array
+		classlessItems.map( ( { name } ) =>
+			expect( screen.getByRole( 'option', { name } ) ).not.toHaveClass(
+				customClass
+			)
+		);
+
+		expect( screen.getByRole( 'option', { name: 'amber' } ) ).toHaveClass(
+			customClass
+		);
+	} );
+
+	it( 'Should apply styles only to options that have styles defined', async () => {
+		const user = userEvent.setup();
+		const customStyles =
+			'background-color: rgb(127, 255, 212); rotate: 13deg;';
+
+		render( <CustomSelectControl { ...props } /> );
+
+		await user.click( screen.getByRole( 'button', { text: 'violets' } ) );
+
+		// return an array of items without styles added
+		const unstyledItems = props.options.filter(
+			( option ) => option.style === undefined
+		);
+
+		// assert against filtered array
+		unstyledItems.map( ( { name } ) =>
+			expect( screen.getByRole( 'option', { name } ) ).not.toHaveStyle(
+				customStyles
+			)
+		);
+
+		expect(
+			screen.getByRole( 'option', {
+				name: 'aquamarine',
+			} )
+		).toHaveStyle( customStyles );
 	} );
 
 	it( 'does not show selected hint by default', () => {
