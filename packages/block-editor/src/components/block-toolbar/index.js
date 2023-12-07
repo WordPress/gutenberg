@@ -58,7 +58,7 @@ export function PrivateBlockToolbar( {
 	const {
 		blockClientId,
 		blockClientIds,
-		blockEditingMode,
+		isDefaultEditingMode,
 		blockType,
 		hasParents,
 		isValid,
@@ -81,10 +81,12 @@ export function PrivateBlockToolbar( {
 		const firstParentClientId = parents[ parents.length - 1 ];
 		const parentBlockName = getBlockName( firstParentClientId );
 		const parentBlockType = getBlockType( parentBlockName );
+		const _isDefaultEditingMode =
+			getBlockEditingMode( selectedBlockClientId ) === 'default';
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
-			blockEditingMode: getBlockEditingMode( selectedBlockClientId ),
+			isDefaultEditingMode: _isDefaultEditingMode,
 			blockType:
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
@@ -105,8 +107,8 @@ export function PrivateBlockToolbar( {
 					'__experimentalParentSelector',
 					true
 				) &&
-				selectedBlockClientIds.length <= 1 &&
-				getBlockEditingMode( selectedBlockClientId ) === 'default',
+				selectedBlockClientIds.length === 1 &&
+				_isDefaultEditingMode,
 		};
 	}, [] );
 
@@ -128,7 +130,7 @@ export function PrivateBlockToolbar( {
 
 	if (
 		! isToolbarEnabled ||
-		( blockEditingMode !== 'default' && ! hasAnyBlockControls )
+		( ! isDefaultEditingMode && ! hasAnyBlockControls )
 	) {
 		return null;
 	}
@@ -165,9 +167,9 @@ export function PrivateBlockToolbar( {
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
 				{ ! isMultiToolbar &&
 					isLargeViewport &&
-					blockEditingMode === 'default' && <BlockParentSelector /> }
+					isDefaultEditingMode && <BlockParentSelector /> }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-					blockEditingMode === 'default' && (
+					isDefaultEditingMode && (
 						<div
 							ref={ nodeRef }
 							{ ...showHoveredOrFocusedGestures }
@@ -217,7 +219,7 @@ export function PrivateBlockToolbar( {
 					</>
 				) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
-				{ blockEditingMode === 'default' && (
+				{ isDefaultEditingMode && (
 					<BlockSettingsMenu clientIds={ blockClientIds } />
 				) }
 			</div>
