@@ -312,12 +312,10 @@ async function runPerformanceTests( branches, options ) {
 
 	const testSuites = getFilesFromDir(
 		path.join( testRunnerDir, 'test/performance/specs' )
-	)
-		.map( ( file ) => {
-			logAtIndent( 1, 'Found:', formats.success( file ) );
-			return path.basename( file, '.spec.js' );
-		} )
-		.filter( ( file ) => file.includes( 'post-editor' ) ); // tmp: run only post-editor suite
+	).map( ( file ) => {
+		logAtIndent( 1, 'Found:', formats.success( file ) );
+		return path.basename( file, '.spec.js' );
+	} );
 
 	logAtIndent( 0, 'Running tests' );
 
