@@ -11,11 +11,11 @@ import customClassName from './custom-class-name';
 import './generated-class-name';
 import style from './style';
 import './settings';
-import './color';
+import color from './color';
 import duotone from './duotone';
 import './font-family';
 import './font-size';
-import './border';
+import border from './border';
 import position from './position';
 import layout from './layout';
 import './content-lock-ui';
@@ -38,7 +38,7 @@ createBlockEditFilter(
 		blockRenaming,
 	].filter( Boolean )
 );
-createBlockListBlockFilter( [ align, duotone, position ] );
+createBlockListBlockFilter( [ align, color, duotone, border, position ] );
 
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';

@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { getBlockSupport } from '@wordpress/blocks';
 import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
-import { createHigherOrderComponent, pure } from '@wordpress/compose';
+import { pure } from '@wordpress/compose';
 import { Platform, useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
@@ -330,72 +330,55 @@ function addEditProps( settings ) {
 	return settings;
 }
 
-/**
- * This adds inline styles for color palette colors.
- * Ideally, this is not needed and themes should load their palettes on the editor.
- *
- * @param {Function} BlockListBlock Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withBorderColorPaletteStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const { name, attributes } = props;
-		const { borderColor, style } = attributes;
-		const { colors } = useMultipleOriginColorsAndGradients();
+function useBlockProps( { name, borderColor, style } ) {
+	const { colors } = useMultipleOriginColorsAndGradients();
 
-		if (
-			! hasBorderSupport( name, 'color' ) ||
-			shouldSkipSerialization( name, BORDER_SUPPORT_KEY, 'color' )
-		) {
-			return <BlockListBlock { ...props } />;
-		}
+	if (
+		! hasBorderSupport( name, 'color' ) ||
+		shouldSkipSerialization( name, BORDER_SUPPORT_KEY, 'color' )
+	) {
+		return {};
+	}
 
-		const { color: borderColorValue } = getMultiOriginColor( {
-			colors,
-			namedColor: borderColor,
-		} );
-		const { color: borderTopColor } = getMultiOriginColor( {
-			colors,
-			namedColor: getColorSlugFromVariable( style?.border?.top?.color ),
-		} );
-		const { color: borderRightColor } = getMultiOriginColor( {
-			colors,
-			namedColor: getColorSlugFromVariable( style?.border?.right?.color ),
-		} );
+	const { color: borderColorValue } = getMultiOriginColor( {
+		colors,
+		namedColor: borderColor,
+	} );
+	const { color: borderTopColor } = getMultiOriginColor( {
+		colors,
+		namedColor: getColorSlugFromVariable( style?.border?.top?.color ),
+	} );
+	const { color: borderRightColor } = getMultiOriginColor( {
+		colors,
+		namedColor: getColorSlugFromVariable( style?.border?.right?.color ),
+	} );
 
-		const { color: borderBottomColor } = getMultiOriginColor( {
-			colors,
-			namedColor: getColorSlugFromVariable(
-				style?.border?.bottom?.color
-			),
-		} );
-		const { color: borderLeftColor } = getMultiOriginColor( {
-			colors,
-			namedColor: getColorSlugFromVariable( style?.border?.left?.color ),
-		} );
+	const { color: borderBottomColor } = getMultiOriginColor( {
+		colors,
+		namedColor: getColorSlugFromVariable( style?.border?.bottom?.color ),
+	} );
+	const { color: borderLeftColor } = getMultiOriginColor( {
+		colors,
+		namedColor: getColorSlugFromVariable( style?.border?.left?.color ),
+	} );
 
-		const extraStyles = {
-			borderTopColor: borderTopColor || borderColorValue,
-			borderRightColor: borderRightColor || borderColorValue,
-			borderBottomColor: borderBottomColor || borderColorValue,
-			borderLeftColor: borderLeftColor || borderColorValue,
-		};
-		const cleanedExtraStyles = cleanEmptyObject( extraStyles ) || {};
+	const extraStyles = {
+		borderTopColor: borderTopColor || borderColorValue,
+		borderRightColor: borderRightColor || borderColorValue,
+		borderBottomColor: borderBottomColor || borderColorValue,
+		borderLeftColor: borderLeftColor || borderColorValue,
+	};
 
-		let wrapperProps = props.wrapperProps;
-		wrapperProps = {
-			...props.wrapperProps,
-			style: {
-				...props.wrapperProps?.style,
-				...cleanedExtraStyles,
-			},
-		};
+	return { style: cleanEmptyObject( extraStyles ) || {} };
+}
 
-		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+export default {
+	useBlockProps,
+	attributeKeys: [ 'borderColor', 'style' ],
+	hasSupport( name ) {
+		return hasBorderSupport( name, 'color' );
 	},
-	'withBorderColorPaletteStyles'
-);
+};
 
 addFilter(
 	'blocks.registerBlockType',
@@ -413,10 +396,4 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/border/addEditProps',
 	addEditProps
-);
-
-addFilter(
-	'editor.BlockListBlock',
-	'core/border/with-border-color-palette-styles',
-	withBorderColorPaletteStyles
 );
