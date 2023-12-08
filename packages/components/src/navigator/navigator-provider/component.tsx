@@ -2,7 +2,6 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
