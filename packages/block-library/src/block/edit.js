@@ -14,6 +14,8 @@ import {
 	Spinner,
 	TextControl,
 	PanelBody,
+	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -26,6 +28,7 @@ import {
 	Warning,
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
+	BlockControls,
 } from '@wordpress/block-editor';
 import { getBlockSupport, parse } from '@wordpress/blocks';
 
@@ -268,6 +271,13 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
+			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarButton href={ editUrl }>
+						{ __( 'Edit' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
+			</BlockControls>
 			<InspectorControls>
 				<PanelBody>
 					<TextControl
