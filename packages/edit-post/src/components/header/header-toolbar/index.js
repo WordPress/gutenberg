@@ -26,7 +26,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editPostStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
+const { useCanBlockToolbarBeFocused } = unlock( blockEditorPrivateApis );
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -71,17 +71,8 @@ function HeaderToolbar( { hasFixedToolbar, setListViewToggleElement } ) {
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
-	const {
-		shouldShowContextualToolbar,
-		canFocusHiddenToolbar,
-		fixedToolbarCanBeFocused,
-	} = useShouldContextualToolbarShow();
-	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
-	// There's a fixed block toolbar when the fixed toolbar option is enabled or when the browser width is less than the large viewport.
-	const blockToolbarCanBeFocused =
-		shouldShowContextualToolbar ||
-		canFocusHiddenToolbar ||
-		fixedToolbarCanBeFocused;
+	const blockToolbarCanBeFocused = useCanBlockToolbarBeFocused();
+
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
