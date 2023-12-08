@@ -239,13 +239,6 @@ export default function ReusableBlockEdit( {
 		setBlockEditingMode,
 	] );
 
-	// const [ title, setTitle ] = useEntityProp(
-	// 	'postType',
-	// 	'wp_block',
-	// 	'title',
-	// 	ref
-	// );
-
 	const { alignment, layout } = useInferredLayout(
 		innerBlocks,
 		parentLayout
