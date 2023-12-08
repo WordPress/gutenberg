@@ -14,7 +14,7 @@ import './settings';
 import color from './color';
 import duotone from './duotone';
 import './font-family';
-import './font-size';
+import fontSize from './font-size';
 import border from './border';
 import position from './position';
 import layout from './layout';
@@ -38,7 +38,14 @@ createBlockEditFilter(
 		blockRenaming,
 	].filter( Boolean )
 );
-createBlockListBlockFilter( [ align, color, duotone, border, position ] );
+createBlockListBlockFilter( [
+	align,
+	color,
+	duotone,
+	fontSize,
+	border,
+	position,
+] );
 
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';
