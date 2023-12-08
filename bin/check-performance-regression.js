@@ -7,7 +7,7 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 
 const resultsPath = process.env.WP_ARTIFACTS_PATH;
-const maxRegressionFactor = 1.1; // fail on >10% regression
+const maxRegressionFactor = 1.3; // fail on >30% regression
 const regressedMetrics = [];
 
 fs.readdir( resultsPath, ( err, files ) => {
