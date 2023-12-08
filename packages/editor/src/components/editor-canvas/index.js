@@ -27,6 +27,7 @@ import { useMergeRefs } from '@wordpress/compose';
 import PostTitle from '../post-title';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 
 const {
 	LayoutStyle,
@@ -361,6 +362,7 @@ function EditorCanvas(
 					}
 					renderAppender={ renderAppender }
 				/>
+				<EditTemplateBlocksNotification contentRef={ localRef } />
 			</RecursionProvider>
 			{ children }
 		</BlockCanvas>
