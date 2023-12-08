@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { useRegistry, useSelect, useDispatch } from '@wordpress/data';
 import { useRef, useMemo, useEffect } from '@wordpress/element';
-import { useEntityProp, useEntityRecord } from '@wordpress/core-data';
+import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner,
@@ -28,6 +28,7 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { getBlockSupport, parse } from '@wordpress/blocks';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -147,6 +148,7 @@ export default function ReusableBlockEdit( {
 	attributes: { ref, overrides },
 	__unstableParentLayout: parentLayout,
 	clientId: patternClientId,
+	context: { postId },
 } ) {
 	const registry = useRegistry();
 	const hasAlreadyRendered = useHasRecursion( ref );
@@ -164,7 +166,50 @@ export default function ReusableBlockEdit( {
 		__unstableMarkNextChangeAsNotPersistent,
 		setBlockEditingMode,
 	} = useDispatch( blockEditorStore );
-	const { getBlockEditingMode } = useSelect( blockEditorStore );
+
+	const { editUrl, innerBlocks, userCanEdit, getBlockEditingMode } =
+		useSelect(
+			( select ) => {
+				const { canUser } = select( coreStore );
+				const {
+					getSettings,
+					getBlocks,
+					getBlockEditingMode: editingMode,
+				} = select( blockEditorStore );
+
+				const blocks = getBlocks( patternClientId );
+				const isBlockTheme = getSettings().__unstableIsBlockBasedTheme;
+				const canEdit = canUser( 'update', 'blocks', ref );
+				const defaultUrl = addQueryArgs( 'post.php', {
+					action: 'edit',
+					post: ref,
+				} );
+				const siteEditorUrl = addQueryArgs( 'site-editor.php', {
+					postType: 'wp_block',
+					postId: ref,
+					categoryType: 'pattern',
+					canvas: 'edit',
+					refererId: postId,
+				} );
+
+				// For editing link to the site editor if the theme and user permissions support it.
+				return {
+					innerBlocks: blocks,
+					editUrl:
+						canUser( 'read', 'templates' ) && isBlockTheme
+							? siteEditorUrl
+							: defaultUrl,
+					userCanEdit: canEdit,
+					getBlockEditingMode: editingMode,
+				};
+			},
+			[ patternClientId, postId, ref ]
+		);
+
+	useEffect(
+		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
+		[ innerBlocks, setBlockEditingMode ]
+	);
 
 	useEffect( () => {
 		if ( ! record?.content?.raw ) return;
@@ -194,17 +239,12 @@ export default function ReusableBlockEdit( {
 		setBlockEditingMode,
 	] );
 
-	const innerBlocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks( patternClientId ),
-		[ patternClientId ]
-	);
-
-	const [ title, setTitle ] = useEntityProp(
-		'postType',
-		'wp_block',
-		'title',
-		ref
-	);
+	// const [ title, setTitle ] = useEntityProp(
+	// 	'postType',
+	// 	'wp_block',
+	// 	'title',
+	// 	ref
+	// );
 
 	const { alignment, layout } = useInferredLayout(
 		innerBlocks,
