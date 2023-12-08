@@ -120,7 +120,7 @@ function HeaderMenu( { dataView, header } ) {
 					className="dataviews-table-header-button"
 				>
 					{ text }
-					<span>{ sortArrows[ header.column.getIsSorted() ] }</span>
+					<span aria-hidden="true">{ sortArrows[ header.column.getIsSorted() ] }</span>
 				</Button>
 			}
 		>
