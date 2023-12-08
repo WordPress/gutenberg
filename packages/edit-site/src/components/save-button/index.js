@@ -57,13 +57,6 @@ export default function SaveButton( {
 
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 
-	const onClick = useCallback( () => {
-		const callback = applyFilters( 'edit-site.SaveButton.onClick', () =>
-			setIsSaveViewOpened( true )
-		);
-		callback();
-	}, [ setIsSaveViewOpened ] );
-
 	const activateSaveEnabled = isPreviewingTheme() || isDirty;
 	const disabled = isSaving || ! activateSaveEnabled;
 
@@ -88,6 +81,18 @@ export default function SaveButton( {
 		}
 		return __( 'Save' );
 	};
+
+	/**
+	 * We focus on adding the customization to the SaveButton's `onClick` and `label` for now.
+	 * We will provide the customization to the other entry points (e.g., SavePanel, SaveHub) in the future if needed.
+	 * @see https://github.com/WordPress/gutenberg/pull/56807
+	 */
+	const onClick = useCallback( () => {
+		const callback = applyFilters( 'edit-site.SaveButton.onClick', () =>
+			setIsSaveViewOpened( true )
+		);
+		callback();
+	}, [ setIsSaveViewOpened ] );
 	const label = useMemo( () => {
 		return applyFilters( 'edit-site.SaveButton.label', getLabel(), {
 			isSaving,
