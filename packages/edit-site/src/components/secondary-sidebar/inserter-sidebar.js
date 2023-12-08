@@ -15,6 +15,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useCallback } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -38,6 +39,13 @@ export default function InserterSidebar() {
 			select( editSiteStore ).getEditedPostType()
 		)
 	);
+	const isRightSidebarOpen = useSelect(
+		( select ) =>
+			!! select( interfaceStore ).getActiveComplementaryArea(
+				editSiteStore.name
+			),
+		[]
+	);
 	const { __unstableSetEditorMode: setEditorMode } =
 		useDispatch( blockEditorStore );
 	const { __unstableGetEditorMode: getEditorMode } =
@@ -59,6 +67,15 @@ export default function InserterSidebar() {
 			}
 		},
 	} );
+
+	const onSelectPatternCategory = useCallback(
+		( category ) => {
+			if ( !! category ) {
+				closeGeneralSidebar();
+			}
+		},
+		[ closeGeneralSidebar ]
+	);
 
 	const libraryRef = useRef();
 	useEffect( () => {
@@ -91,6 +108,19 @@ export default function InserterSidebar() {
 		[ location, setIsInserterOpened ]
 	);
 
+	useEffect(
+		function closePatternCategoryOnRightSidebarOpenInZoomOut() {
+			if (
+				getEditorMode() === 'zoom-out' &&
+				isRightSidebarOpen &&
+				!! libraryRef.current.getSelectedPatternCategory()
+			) {
+				libraryRef.current.selectPatternCategory( null );
+			}
+		},
+		[ getEditorMode, isRightSidebarOpen ]
+	);
+
 	return (
 		<div
 			ref={ inserterDialogRef }
@@ -114,7 +144,7 @@ export default function InserterSidebar() {
 					}
 					__experimentalFilterValue={ insertionPoint.filterValue }
 					__experimentalOnPatternCategorySelection={
-						closeGeneralSidebar
+						onSelectPatternCategory
 					}
 					__experimentalShouldZoomPatterns
 					ref={ libraryRef }

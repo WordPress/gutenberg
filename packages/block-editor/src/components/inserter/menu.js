@@ -126,7 +126,7 @@ function InserterMenu(
 		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
 			setPatternFilter( filter );
-			__experimentalOnPatternCategorySelection?.();
+			__experimentalOnPatternCategorySelection?.( patternCategory );
 		},
 		[ setSelectedPatternCategory, __experimentalOnPatternCategorySelection ]
 	);
@@ -213,6 +213,8 @@ function InserterMenu(
 		focusSearch: () => {
 			searchRef.current.focus();
 		},
+		getSelectedPatternCategory: () => selectedPatternCategory,
+		selectPatternCategory: onClickPatternCategory,
 	} ) );
 
 	const showPatternPanel =
