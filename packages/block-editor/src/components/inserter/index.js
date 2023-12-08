@@ -46,7 +46,7 @@ const defaultRenderToggle = ( {
 			blockTitle
 		);
 	} else if ( ! label && prioritizePatterns ) {
-		label = __( 'Add pattern' );
+		label = __( 'Add section' );
 	} else if ( ! label ) {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
