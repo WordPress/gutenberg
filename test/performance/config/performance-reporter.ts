@@ -26,6 +26,7 @@ export interface WPRawPerformanceResults {
 	firstContentfulPaint: number[];
 	firstBlock: number[];
 	type: number[];
+	typeWithTopToolbar: number[];
 	typeWithoutInspector: number[];
 	typeContainer: number[];
 	focus: number[];
@@ -49,6 +50,7 @@ export interface WPPerformanceResults {
 	type?: number;
 	minType?: number;
 	maxType?: number;
+	typeWithTopToolbar: number;
 	typeWithoutInspector?: number;
 	typeContainer?: number;
 	minTypeContainer?: number;
@@ -94,6 +96,9 @@ export function curateResults(
 		type: average( results.type ),
 		minType: minimum( results.type ),
 		maxType: maximum( results.type ),
+		typeWithTopToolbar: average( results.typeWithTopToolbar ),
+		minWithTopToolbarType: minimum( results.typeWithTopToolbar ),
+		maxWithTopToolbarType: maximum( results.typeWithTopToolbar ),
 		typeWithoutInspector: average( results.typeWithoutInspector ),
 		typeContainer: average( results.typeContainer ),
 		minTypeContainer: minimum( results.typeContainer ),
