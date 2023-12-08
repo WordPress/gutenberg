@@ -9,7 +9,7 @@ import {
 	useEffect,
 	useCallback,
 } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -23,6 +23,14 @@ import { store as blockEditorStore } from '../../store';
 function hasOnlyToolbarItem( elements ) {
 	const dataProp = 'toolbarItem';
 	return ! elements.some( ( element ) => ! ( dataProp in element.dataset ) );
+}
+
+function getAllToolbarItemsIn( container ) {
+	return Array.from( container.querySelectorAll( '[data-toolbar-item]' ) );
+}
+
+function hasFocusWithin( container ) {
+	return container.contains( container.ownerDocument.activeElement );
 }
 
 function focusFirstTabbableIn( container ) {
@@ -100,7 +108,6 @@ function useToolbarFocus( {
 } ) {
 	// focusOnMount deprecated in 6.5.0
 	const [ initialFocusOnMount ] = useState( focusOnMount );
-	const { stopTyping } = useDispatch( blockEditorStore );
 
 	const focusToolbar = useCallback( () => {
 		focusFirstTabbableIn( toolbarRef.current );
@@ -108,7 +115,6 @@ function useToolbarFocus( {
 
 	const focusToolbarViaShortcut = () => {
 		if ( shouldUseKeyboardFocusShortcut ) {
-			stopTyping( true ); // This matches the behavior of the Tab/Escape observe typing to stopTyping. Should we add this shortcut there?
 			focusToolbar();
 		}
 	};
@@ -122,6 +128,23 @@ function useToolbarFocus( {
 			focusToolbar();
 		}
 	}, [ isAccessibleToolbar, initialFocusOnMount, focusToolbar ] );
+
+	// Focus the first toolbar item when the toolbar is mounted and attempting to be focused (such as via alt+f10 shortcut).
+	useEffect( () => {
+		// We have to wait for the next browser paint because block controls aren't
+		// rendered right away when the toolbar gets mounted.
+		window.requestAnimationFrame( () => {
+			const items = getAllToolbarItemsIn( toolbarRef.current );
+			if ( items[ 0 ] && hasFocusWithin( toolbarRef.current ) ) {
+				items[ 0 ].focus( {
+					// When focusing newly mounted toolbars,
+					// the position of the popover is often not right on the first render
+					// This prevents the layout shifts when focusing the dialogs.
+					preventScroll: true,
+				} );
+			}
+		} );
+	}, [ toolbarRef ] );
 
 	const { lastFocus } = useSelect( ( select ) => {
 		const { getLastFocus } = select( blockEditorStore );
