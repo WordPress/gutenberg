@@ -84,10 +84,17 @@ export default function PostFeaturedImageEdit( {
 	);
 
 	if ( ! featuredImage && useFirstImageFromPost && postContent ) {
-		const blocks = parse( postContent );
-		const imageBlock = blocks.find(
-			( block ) => block.name === 'core/image'
+		const firstImageCloser = /<!--\s+\/wp:(?:core\/)?image\s+-->/.exec(
+			postContent
 		);
+		const content = firstImageCloser
+			? postContent.slice(
+					0,
+					firstImageCloser.index + firstImageCloser[ 0 ].length
+			  )
+			: '';
+		const blocks = parse( content );
+		const imageBlock = blocks.find( ( { name } ) => name === 'core/image' );
 		if ( imageBlock?.attributes?.id ) {
 			featuredImage = imageBlock.attributes.id;
 		}
