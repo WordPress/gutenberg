@@ -50,8 +50,13 @@ fs.readdir( resultsPath, ( err, files ) => {
 		console.log( 'Performance regression detected:' );
 		regressedMetrics.forEach(
 			( { file, metric, branchValue, trunkValue } ) => {
+				const percent = (
+					( ( branchValue - trunkValue ) / trunkValue ) *
+					100
+				).toFixed( 2 );
+
 				console.log(
-					`- In ${ file }: ${ metric } increased from ${ trunkValue } to ${ branchValue }`
+					`- In ${ file }: ${ metric } increased by ${ percent }% (from ${ trunkValue } to ${ branchValue })`
 				);
 			}
 		);
