@@ -20,7 +20,13 @@ import { BlockEditContextProvider, useBlockEditContext } from './context';
  */
 export { useBlockEditContext };
 
-export default function BlockEdit( props ) {
+export default function BlockEdit( {
+	mayDisplayControls,
+	mayDisplayParentControls,
+	// The remaining props are passed through the BlockEdit filters and are thus
+	// public API!
+	...props
+} ) {
 	const {
 		name,
 		isSelected,
@@ -38,6 +44,8 @@ export default function BlockEdit( props ) {
 		clientId,
 		layout: layoutSupport ? layout : null,
 		__unstableLayoutClassNames,
+		mayDisplayControls,
+		mayDisplayParentControls,
 	};
 	return (
 		<BlockEditContextProvider

@@ -12,7 +12,7 @@ import { useEffect, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useDisplayBlockControls from '../use-display-block-controls';
+import { useBlockEditContext } from '../block-edit/context';
 import groups from './groups';
 
 export default function InspectorControlsFill( {
@@ -33,13 +33,13 @@ export default function InspectorControlsFill( {
 		group = __experimentalGroup;
 	}
 
-	const { isDisplayed } = useDisplayBlockControls();
+	const { mayDisplayControls } = useBlockEditContext();
 	const Fill = groups[ group ]?.Fill;
 	if ( ! Fill ) {
 		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
-	if ( ! isDisplayed ) {
+	if ( ! mayDisplayControls ) {
 		return null;
 	}
 

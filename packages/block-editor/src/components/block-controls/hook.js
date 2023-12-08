@@ -6,14 +6,15 @@
  * Internal dependencies
  */
 import groups from './groups';
-import useDisplayBlockControls from '../use-display-block-controls';
+import { useBlockEditContext } from '../block-edit/context';
 
 export default function useBlockControlsFill( group, shareWithChildBlocks ) {
-	const { isDisplayed, isParentDisplayed } = useDisplayBlockControls();
-	if ( isDisplayed ) {
+	const { mayDisplayControls, mayDisplayParentControls } =
+		useBlockEditContext();
+	if ( mayDisplayControls ) {
 		return groups[ group ]?.Fill;
 	}
-	if ( isParentDisplayed && shareWithChildBlocks ) {
+	if ( mayDisplayParentControls && shareWithChildBlocks ) {
 		return groups.parent.Fill;
 	}
 	return null;

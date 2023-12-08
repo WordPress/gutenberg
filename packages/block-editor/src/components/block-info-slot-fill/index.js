@@ -7,14 +7,14 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import useDisplayBlockControls from '../use-display-block-controls';
+import { useBlockEditContext } from '../block-edit/context';
 
 const { createPrivateSlotFill } = unlock( componentsPrivateApis );
 const { Fill, Slot } = createPrivateSlotFill( 'BlockInformation' );
 
 const BlockInfo = ( props ) => {
-	const { isDisplayed } = useDisplayBlockControls();
-	if ( ! isDisplayed ) {
+	const { mayDisplayControls } = useBlockEditContext();
+	if ( ! mayDisplayControls ) {
 		return null;
 	}
 	return <Fill { ...props } />;
