@@ -15,20 +15,18 @@ fs.readdir( resultsPath, ( err, files ) => {
 		console.error( 'Error reading directory:', err );
 		process.exit( 1 );
 	}
-
-	// Only get the curated results.
-	files.filter(
+	const curatedResults = files.filter(
 		( file ) =>
 			file.endsWith( '.performance-results.json' ) &&
 			! file.includes( '_round-' )
 	);
 
-	if ( files.length === 0 ) {
+	if ( curatedResults.length === 0 ) {
 		console.error( 'No performance results found.' );
 		process.exit( 1 );
 	}
 
-	files.forEach( ( file ) => {
+	curatedResults.forEach( ( file ) => {
 		const data = JSON.parse(
 			fs.readFileSync( path.join( resultsPath, file ), 'utf8' )
 		);
