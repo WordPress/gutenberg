@@ -34,36 +34,42 @@ import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 
 const BlockToolbar = ( { hideDragHandle } ) => {
-	const { blockClientIds, blockType, isValid, isVisual, blockEditingMode } =
-		useSelect( ( select ) => {
-			const {
-				getBlockName,
-				getBlockMode,
-				getSelectedBlockClientIds,
-				isBlockValid,
-				getBlockRootClientId,
-				getBlockEditingMode,
-			} = select( blockEditorStore );
-			const selectedBlockClientIds = getSelectedBlockClientIds();
-			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-			const blockRootClientId = getBlockRootClientId(
-				selectedBlockClientId
-			);
-			return {
-				blockClientIds: selectedBlockClientIds,
-				blockType:
-					selectedBlockClientId &&
-					getBlockType( getBlockName( selectedBlockClientId ) ),
-				rootClientId: blockRootClientId,
-				isValid: selectedBlockClientIds.every( ( id ) =>
-					isBlockValid( id )
-				),
-				isVisual: selectedBlockClientIds.every(
-					( id ) => getBlockMode( id ) === 'visual'
-				),
-				blockEditingMode: getBlockEditingMode( selectedBlockClientId ),
-			};
-		}, [] );
+	const {
+		blockClientIds,
+		blockType,
+		isValid,
+		isVisual,
+		isZoomOutMode,
+		blockEditingMode,
+	} = useSelect( ( select ) => {
+		const {
+			getBlockName,
+			getBlockMode,
+			getSelectedBlockClientIds,
+			isBlockValid,
+			getBlockRootClientId,
+			getBlockEditingMode,
+			__unstableGetEditorMode,
+		} = select( blockEditorStore );
+		const selectedBlockClientIds = getSelectedBlockClientIds();
+		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
+		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
+		return {
+			blockClientIds: selectedBlockClientIds,
+			blockType:
+				selectedBlockClientId &&
+				getBlockType( getBlockName( selectedBlockClientId ) ),
+			rootClientId: blockRootClientId,
+			isValid: selectedBlockClientIds.every( ( id ) =>
+				isBlockValid( id )
+			),
+			isVisual: selectedBlockClientIds.every(
+				( id ) => getBlockMode( id ) === 'visual'
+			),
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			blockEditingMode: getBlockEditingMode( selectedBlockClientId ),
+		};
+	}, [] );
 
 	const toolbarWrapperRef = useRef( null );
 
@@ -136,6 +142,12 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 						group="inline"
 						className="block-editor-block-toolbar__slot"
 					/>
+					{ isZoomOutMode && (
+						<BlockControls.Slot
+							group="zoom"
+							className="block-editor-block-toolbar__slot"
+						/>
+					) }
 					<BlockControls.Slot
 						group="other"
 						className="block-editor-block-toolbar__slot"
