@@ -8,10 +8,12 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
+	PostAuthorPanel,
 	PostSchedulePanel,
 	PostSwitchToDraftButton,
 	PostSyncStatus,
 	PostURLPanel,
+	PostTemplatePanel,
 } from '@wordpress/editor';
 
 /**
@@ -20,13 +22,11 @@ import {
 import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
 import PostSticky from '../post-sticky';
-import PostAuthor from '../post-author';
 import PostSlug from '../post-slug';
 import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
 import PluginPostStatusInfo from '../plugin-post-status-info';
 import { store as editPostStore } from '../../../store';
-import PostTemplate from '../post-template';
 
 /**
  * Module Constants
@@ -62,14 +62,14 @@ export default function PostStatus() {
 					<>
 						<PostVisibility />
 						<PostSchedulePanel />
-						<PostTemplate />
+						<PostTemplatePanel />
 						<PostURLPanel />
 						<PostSyncStatus />
 						<PostSticky />
 						<PostPendingStatus />
 						<PostFormat />
 						<PostSlug />
-						<PostAuthor />
+						<PostAuthorPanel />
 						{ fills }
 						<HStack
 							style={ {

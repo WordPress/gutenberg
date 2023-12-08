@@ -283,6 +283,7 @@ const withBlockTree =
 					false
 				);
 				break;
+			case 'SYNC_DERIVED_BLOCK_ATTRIBUTES':
 			case 'UPDATE_BLOCK_ATTRIBUTES': {
 				newState.tree = new Map( newState.tree );
 				action.clientIds.forEach( ( clientId ) => {
@@ -455,6 +456,12 @@ function withPersistentBlockChange( reducer ) {
 
 	return ( state, action ) => {
 		let nextState = reducer( state, action );
+
+		if ( action.type === 'SYNC_DERIVED_BLOCK_ATTRIBUTES' ) {
+			return nextState.isPersistentChange
+				? { ...nextState, isPersistentChange: false }
+				: nextState;
+		}
 
 		const isExplicitPersistentChange =
 			action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' ||
@@ -860,6 +867,7 @@ export const blocks = pipe(
 				return newState;
 			}
 
+			case 'SYNC_DERIVED_BLOCK_ATTRIBUTES':
 			case 'UPDATE_BLOCK_ATTRIBUTES': {
 				// Avoid a state change if none of the block IDs are known.
 				if ( action.clientIds.every( ( id ) => ! state.get( id ) ) ) {

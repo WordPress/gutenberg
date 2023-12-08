@@ -27,6 +27,7 @@ import { createRegistrySelector } from '@wordpress/data';
  * Internal dependencies
  */
 import { orderBy } from '../utils/sorting';
+import { PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 
 /**
  * A block selection object.
@@ -2287,6 +2288,7 @@ function getUserPatterns( state ) {
 		return {
 			name: `core/block/${ userPattern.id }`,
 			id: userPattern.id,
+			type: PATTERN_TYPES.user,
 			title: userPattern.title.raw,
 			categories: userPattern.wp_pattern_category.map( ( catId ) =>
 				categories && categories.get( catId )

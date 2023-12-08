@@ -172,6 +172,18 @@ Element.prototype.closest = function ( selector ) {
 };
 
 /**
+ * Implementation of Element.prototype.remove based on polyfills:
+ * - https://github.com/chenzhenxi/element-remove/blob/master/index.js
+ * (referenced in https://developer.mozilla.org/en-US/docs/Web/API/Element/remove#see_also)
+ * - https://github.com/JakeChampion/polyfill-library/blob/master/polyfills/Element/prototype/remove/polyfill.js
+ */
+Element.prototype.remove = function () {
+	if ( this.parentNode ) {
+		this.parentNode.removeChild( this );
+	}
+};
+
+/**
  * Helper function to check if a node implements the NonDocumentTypeChildNode
  * interface
  *

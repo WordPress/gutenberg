@@ -7,10 +7,15 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	privateApis as blockEditorPrivateApis,
+	BlockToolbar,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
+import {
+	PostSavedState,
+	PostPreviewButton,
+	store as editorStore,
+	DocumentBar,
+} from '@wordpress/editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -35,10 +40,6 @@ import { default as DevicePreview } from '../device-preview';
 import ViewLink from '../view-link';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
-import DocumentActions from './document-actions';
-import { unlock } from '../../lock-unlock';
-
-const { BlockContextualToolbar } = unlock( blockEditorPrivateApis );
 
 const slideY = {
 	hidden: { y: '-50px' },
@@ -73,7 +74,8 @@ function Header( {
 			blockSelectionStart:
 				select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			isEditingTemplate: select( editPostStore ).isEditingTemplate(),
+			isEditingTemplate:
+				select( editorStore ).getRenderingMode() === 'template-only',
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core/edit-post', 'fixedToolbar' ),
@@ -119,11 +121,13 @@ function Header( {
 							className={ classnames(
 								'selected-block-tools-wrapper',
 								{
-									'is-collapsed': isBlockToolsCollapsed,
+									'is-collapsed':
+										isEditingTemplate &&
+										isBlockToolsCollapsed,
 								}
 							) }
 						>
-							<BlockContextualToolbar isFixed />
+							<BlockToolbar hideDragHandle />
 						</div>
 						<Popover.Slot
 							ref={ blockToolbarRef }
@@ -150,12 +154,14 @@ function Header( {
 				<div
 					className={ classnames( 'edit-post-header__center', {
 						'is-collapsed':
+							isEditingTemplate &&
+							hasBlockSelected &&
 							! isBlockToolsCollapsed &&
-							isLargeViewport &&
-							isEditingTemplate,
+							hasFixedToolbar &&
+							isLargeViewport,
 					} ) }
 				>
-					{ isEditingTemplate && <DocumentActions /> }
+					{ isEditingTemplate && <DocumentBar /> }
 				</div>
 			</motion.div>
 			<motion.div

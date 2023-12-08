@@ -139,7 +139,7 @@ export default function SpacingInputControl( {
 		useMemo(
 			() => parseQuantityAndUnitFromRawValue( currentValue ),
 			[ currentValue ]
-		)[ 1 ] || units[ 0 ].value;
+		)[ 1 ] || units[ 0 ]?.value;
 
 	const setInitialValue = () => {
 		if ( value === undefined ) {

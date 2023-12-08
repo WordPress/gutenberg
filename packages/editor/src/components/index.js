@@ -8,6 +8,7 @@ export * from './autocompleters';
 
 // Post Related Components.
 export { default as AutosaveMonitor } from './autosave-monitor';
+export { default as DocumentBar } from './document-bar';
 export { default as DocumentOutline } from './document-outline';
 export { default as DocumentOutlineCheck } from './document-outline/check';
 export { EditorKeyboardShortcuts };
@@ -23,9 +24,11 @@ export { default as LocalAutosaveMonitor } from './local-autosave-monitor';
 export { default as PageAttributesCheck } from './page-attributes/check';
 export { default as PageAttributesOrder } from './page-attributes/order';
 export { default as PageAttributesParent } from './page-attributes/parent';
-export { default as PageTemplate } from './post-template';
+export { default as PageTemplate } from './post-template/classic-theme';
+export { default as PostTemplatePanel } from './post-template/panel';
 export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
+export { default as PostAuthorPanel } from './post-author/panel';
 export { default as PostComments } from './post-comments';
 export { default as PostExcerpt } from './post-excerpt';
 export { default as PostExcerptCheck } from './post-excerpt/check';
@@ -66,6 +69,7 @@ export { HierarchicalTermSelector as PostTaxonomiesHierarchicalTermSelector } fr
 export { default as PostTaxonomiesCheck } from './post-taxonomies/check';
 export { default as PostTextEditor } from './post-text-editor';
 export { default as PostTitle } from './post-title';
+export { default as PostTitleRaw } from './post-title/post-title-raw';
 export { default as PostTrash } from './post-trash';
 export { default as PostTrashCheck } from './post-trash/check';
 export { default as PostTypeSupportCheck } from './post-type-support-check';

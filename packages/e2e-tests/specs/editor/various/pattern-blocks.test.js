@@ -350,7 +350,7 @@ describe( 'Pattern blocks', () => {
 		expect( reusableBlockWithParagraph ).toBeTruthy();
 
 		// Convert back to regular blocks.
-		await clickBlockToolbarButton( 'Select Edited block' );
+		await clickBlockToolbarButton( 'Select parent block: Edited block' );
 		await clickBlockToolbarButton( 'Options' );
 		await clickMenuItem( 'Detach' );
 		await page.waitForXPath( selector, {

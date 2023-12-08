@@ -103,7 +103,7 @@ _Required._ Called when the value changes. The second parameter is `null` unless
 }
 ```
 
-### `onKeydown`: `( event: KeyboardEvent ) => void`
+### `onKeyDown`: `( event: KeyboardEvent ) => void`
 
 A callback invoked on the keydown event.
 

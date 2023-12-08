@@ -256,6 +256,30 @@ _Returns_
 
 -   `string`: Post type.
 
+### getCurrentTemplateId
+
+Returns the template ID currently being rendered/edited
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string?`: Template ID.
+
+### getDeviceType
+
+Returns the current editing canvas device type.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Device type.
+
 ### getEditedPostAttribute
 
 Returns a single attribute of the post being edited, preferring the unsaved edit if one exists, but falling back to the attribute for the last known saved state of the post.
@@ -501,6 +525,18 @@ _Related_
 
 -   getPreviousBlockClientId in core/block-editor store.
 
+### getRenderingMode
+
+Returns the post editor's rendering mode.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `string`: Rendering mode.
+
 ### getSelectedBlock
 
 _Related_
@@ -534,10 +570,6 @@ Returns state object prior to a specified optimist transaction ID, or `null` if 
 ### getSuggestedPostFormat
 
 Returns a suggested post format for the current post, inferred only if there is a single block within the post and it is of a type known to match a default post format. Returns null if the format cannot be determined.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
 
 _Returns_
 
@@ -1241,6 +1273,44 @@ _Related_
 
 -   selectBlock in core/block-editor store.
 
+### setDeviceType
+
+Action that changes the width of the editing canvas.
+
+_Parameters_
+
+-   _deviceType_ `string`:
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setEditedPost
+
+Returns an action that sets the current post Type and post ID.
+
+_Parameters_
+
+-   _postType_ `string`: Post Type.
+-   _postId_ `string`: Post ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setRenderingMode
+
+Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
+
+-   `all`: This is the default mode. It renders the post editor with all the features available. If a template is provided, it's preferred over the post.
+-   `template-only`: This mode renders the editor with only the template blocks visible.
+-   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
+-   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
+
+_Parameters_
+
+-   _mode_ `string`: Mode (one of 'template-only', 'post-only', 'template-locked' or 'all').
+
 ### setTemplateValidity
 
 _Related_
@@ -1259,15 +1329,13 @@ _Parameters_
 
 ### setupEditorState
 
-Returns an action object used to setup the editor state when first opening an editor.
+> **Deprecated**
+
+Setup the editor state.
 
 _Parameters_
 
 -   _post_ `Object`: Post object.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### showInsertionPoint
 

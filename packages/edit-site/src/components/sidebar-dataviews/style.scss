@@ -8,6 +8,13 @@
 }
 
 .edit-site-sidebar-dataviews-dataview-item {
+	border-radius: $radius-block-ui;
+	padding-right: $grid-unit-10;
+
+	.edit-site-sidebar-dataviews-dataview-item__dropdown-menu {
+		min-width: initial;
+	}
+
 	&:hover,
 	&:focus,
 	&[aria-current] {

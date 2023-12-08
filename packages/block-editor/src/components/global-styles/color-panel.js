@@ -12,12 +12,12 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
-	TabPanel,
 	ColorIndicator,
 	Flex,
 	FlexItem,
 	Dropdown,
 	Button,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -29,6 +29,7 @@ import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
 import { getValueFromVariable } from './utils';
 import { setImmutably } from '../../utils/object';
+import { unlock } from '../../lock-unlock';
 
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
@@ -203,12 +204,11 @@ function ColorPanelDropdown( {
 	colorGradientControlSettings,
 	panelId,
 } ) {
-	const tabConfigs = tabs.map( ( { key, label: tabLabel } ) => {
-		return {
-			name: key,
-			title: tabLabel,
-		};
-	} );
+	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
+	// Unlocking `Tabs` too early causes the `unlock` method to receive an empty
+	// object, due to circular dependencies.
+	// See https://github.com/WordPress/gutenberg/issues/52692
+	const { Tabs } = unlock( componentsPrivateApis );
 
 	return (
 		<ToolsPanelItem
@@ -258,26 +258,35 @@ function ColorPanelDropdown( {
 								/>
 							) }
 							{ tabs.length > 1 && (
-								<TabPanel tabs={ tabConfigs }>
-									{ ( tab ) => {
-										const selectedTab = tabs.find(
-											( t ) => t.key === tab.name
-										);
+								<Tabs initialTabId={ currentTab?.key }>
+									<Tabs.TabList>
+										{ tabs.map( ( tab ) => (
+											<Tabs.Tab
+												key={ tab.key }
+												tabId={ tab.key }
+											>
+												{ tab.label }
+											</Tabs.Tab>
+										) ) }
+									</Tabs.TabList>
 
-										if ( ! selectedTab ) {
-											return null;
-										}
-
+									{ tabs.map( ( tab ) => {
 										return (
-											<ColorPanelTab
-												{ ...selectedTab }
-												colorGradientControlSettings={
-													colorGradientControlSettings
-												}
-											/>
+											<Tabs.TabPanel
+												key={ tab.key }
+												tabId={ tab.key }
+												focusable={ false }
+											>
+												<ColorPanelTab
+													{ ...tab }
+													colorGradientControlSettings={
+														colorGradientControlSettings
+													}
+												/>
+											</Tabs.TabPanel>
 										);
-									} }
-								</TabPanel>
+									} ) }
+								</Tabs>
 							) }
 						</div>
 					</DropdownContentWrapper>

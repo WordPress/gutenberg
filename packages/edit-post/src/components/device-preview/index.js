@@ -15,32 +15,36 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editPostStore } from '../../store';
 
 export default function DevicePreview() {
-	const { hasActiveMetaboxes, isPostSaveable, isViewable, deviceType } =
-		useSelect( ( select ) => {
-			const { getEditedPostAttribute } = select( editorStore );
-			const { getPostType } = select( coreStore );
-			const postType = getPostType( getEditedPostAttribute( 'type' ) );
+	const {
+		hasActiveMetaboxes,
+		isPostSaveable,
+		isViewable,
+		deviceType,
+		showIconLabels,
+	} = useSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( editorStore );
+		const { getPostType } = select( coreStore );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
-			return {
-				hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-				isPostSaveable: select( editorStore ).isEditedPostSaveable(),
-				isViewable: postType?.viewable ?? false,
-				deviceType:
-					select(
-						editPostStore
-					).__experimentalGetPreviewDeviceType(),
-			};
-		}, [] );
-	const { __experimentalSetPreviewDeviceType: setPreviewDeviceType } =
-		useDispatch( editPostStore );
+		return {
+			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+			isPostSaveable: select( editorStore ).isEditedPostSaveable(),
+			isViewable: postType?.viewable ?? false,
+			deviceType: select( editorStore ).getDeviceType(),
+			showIconLabels:
+				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
+		};
+	}, [] );
+	const { setDeviceType } = useDispatch( editorStore );
 
 	return (
 		<PreviewOptions
 			isEnabled={ isPostSaveable }
 			className="edit-post-post-preview-dropdown"
 			deviceType={ deviceType }
-			setDeviceType={ setPreviewDeviceType }
+			setDeviceType={ setDeviceType }
 			label={ __( 'Preview' ) }
+			showIconLabels={ showIconLabels }
 		>
 			{ ( { onClose } ) =>
 				isViewable && (

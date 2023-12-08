@@ -8,18 +8,28 @@ import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
-export default function ViewLink() {
-	const { permalink, isPublished, label } = useSelect( ( select ) => {
-		// Grab post type to retrieve the view_item label.
-		const postTypeSlug = select( editorStore ).getCurrentPostType();
-		const postType = select( coreStore ).getPostType( postTypeSlug );
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../store';
 
-		return {
-			permalink: select( editorStore ).getPermalink(),
-			isPublished: select( editorStore ).isCurrentPostPublished(),
-			label: postType?.labels.view_item,
-		};
-	}, [] );
+export default function ViewLink() {
+	const { permalink, isPublished, label, showIconLabels } = useSelect(
+		( select ) => {
+			// Grab post type to retrieve the view_item label.
+			const postTypeSlug = select( editorStore ).getCurrentPostType();
+			const postType = select( coreStore ).getPostType( postTypeSlug );
+
+			return {
+				permalink: select( editorStore ).getPermalink(),
+				isPublished: select( editorStore ).isCurrentPostPublished(),
+				label: postType?.labels.view_item,
+				showIconLabels:
+					select( editPostStore ).isFeatureActive( 'showIconLabels' ),
+			};
+		},
+		[]
+	);
 
 	// Only render the view button if the post is published and has a permalink.
 	if ( ! isPublished || ! permalink ) {
@@ -32,6 +42,7 @@ export default function ViewLink() {
 			label={ label || __( 'View post' ) }
 			href={ permalink }
 			target="_blank"
+			showTooltip={ ! showIconLabels }
 		/>
 	);
 }
