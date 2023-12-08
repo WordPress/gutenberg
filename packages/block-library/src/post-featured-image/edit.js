@@ -26,6 +26,7 @@ import {
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
+import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -67,7 +68,8 @@ export default function PostFeaturedImageEdit( {
 		linkTarget,
 		useFirstImageFromPost,
 	} = attributes;
-	let [ featuredImage, setFeaturedImage ] = useEntityProp(
+
+	const [ storedFeaturedImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postTypeSlug,
 		'featured_media',
@@ -83,22 +85,32 @@ export default function PostFeaturedImageEdit( {
 		postId
 	);
 
-	if ( ! featuredImage && useFirstImageFromPost && postContent ) {
+	const featuredImage = useMemo( () => {
+		if ( storedFeaturedImage ) {
+			return storedFeaturedImage;
+		}
+
+		if ( ! useFirstImageFromPost ) {
+			return;
+		}
+
 		const firstImageCloser = /<!--\s+\/wp:(?:core\/)?image\s+-->/.exec(
 			postContent
 		);
-		const content = firstImageCloser
-			? postContent.slice(
-					0,
-					firstImageCloser.index + firstImageCloser[ 0 ].length
-			  )
-			: '';
+
+		if ( ! firstImageCloser ) {
+			return;
+		}
+
+		const content = postContent.slice(
+			0,
+			firstImageCloser.index + firstImageCloser[ 0 ].length
+		);
+
 		const blocks = parse( content );
 		const imageBlock = blocks.find( ( { name } ) => name === 'core/image' );
-		if ( imageBlock?.attributes?.id ) {
-			featuredImage = imageBlock.attributes.id;
-		}
-	}
+		return imageBlock?.attributes?.id;
+	}, [ storedFeaturedImage, useFirstImageFromPost, postContent ] );
 
 	const { media, postType, postPermalink } = useSelect(
 		( select ) => {
