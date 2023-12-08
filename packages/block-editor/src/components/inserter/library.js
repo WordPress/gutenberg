@@ -25,6 +25,7 @@ function InserterLibrary(
 		__experimentalShouldZoomPatterns = false,
 		onSelect = noop,
 		shouldFocusBlock = false,
+		onSelectTab,
 	},
 	ref
 ) {
@@ -48,6 +49,7 @@ function InserterLibrary(
 	return (
 		<InserterMenu
 			onSelect={ onSelect }
+			onSelectTab={ onSelectTab }
 			rootClientId={ destinationRootClientId }
 			clientId={ clientId }
 			isAppender={ isAppender }
