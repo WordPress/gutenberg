@@ -105,12 +105,17 @@ function ListViewBranch( props ) {
 	const parentBlockInformation = useBlockDisplayInformation( parentId );
 	const syncedBranch = isSyncedBranch || !! parentBlockInformation?.isSynced;
 
-	const canParentExpand = useSelect(
+	const { canParentExpand, getBlockById } = useSelect(
 		( select ) => {
-			if ( ! parentId ) {
-				return true;
-			}
-			return select( blockEditorStore ).canEditBlock( parentId );
+			const { canEditBlock, getBlockParents, getBlockName, getBlock } =
+				select( blockEditorStore );
+
+			return {
+				canParentExpand: canEditBlock( parentId ),
+				getBlocksParents: getBlockParents,
+				getName: getBlockName,
+				getBlockById: getBlock,
+			};
 		},
 		[ parentId ]
 	);
@@ -132,6 +137,10 @@ function ListViewBranch( props ) {
 	return (
 		<>
 			{ filteredBlocks.map( ( block, index ) => {
+				const isContentSection =
+					getBlockById( block.clientId )?.attributes?.tagName ===
+					'main';
+
 				const { clientId, innerBlocks } = block;
 
 				if ( index > 0 ) {
@@ -154,7 +163,8 @@ function ListViewBranch( props ) {
 				const hasNestedBlocks = !! innerBlocks?.length;
 
 				const shouldExpand =
-					hasNestedBlocks && shouldShowInnerBlocks
+					hasNestedBlocks &&
+					( shouldShowInnerBlocks || isContentSection )
 						? expandedState[ clientId ] ?? isExpanded
 						: undefined;
 
@@ -221,6 +231,7 @@ function ListViewBranch( props ) {
 								selectedClientIds={ selectedClientIds }
 								isExpanded={ isExpanded }
 								isSyncedBranch={ syncedBranch }
+								shouldShowInnerBlocks={ shouldShowInnerBlocks }
 							/>
 						) }
 					</AsyncModeProvider>

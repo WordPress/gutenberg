@@ -290,6 +290,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 						<BlockTitle
 							clientId={ clientId }
 							maximumLength={ 35 }
+							context="list-view"
 						/>
 					</Button>
 				</FlexItem>
