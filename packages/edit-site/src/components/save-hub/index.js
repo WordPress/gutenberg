@@ -9,6 +9,8 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { check } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as noticesStore } from '@wordpress/notices';
+import { addFilter, removeFilter } from '@wordpress/hooks';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -112,6 +114,32 @@ export default function SaveHub() {
 		} = select( coreStore );
 		return {
 			homeUrl: getUnstableBase()?.home,
+		};
+	}, [] );
+
+	// This is only for testing purposes.
+	useEffect( () => {
+		addFilter(
+			'edit-site.SaveButton.onClick',
+			'my-plugin',
+			( originalFunction ) => {
+				return () => {
+					// eslint-disable-next-line no-alert
+					window.alert( 'Custom action' );
+					originalFunction();
+				};
+			}
+		);
+		addFilter(
+			'edit-site.SaveButton.label',
+			'my-plugin',
+			( originalLabel ) => {
+				return `Custom ${ originalLabel }`;
+			}
+		);
+		return () => {
+			removeFilter( 'edit-site.SaveButton.onClick', 'my-plugin' );
+			removeFilter( 'edit-site.SaveButton.label', 'my-plugin' );
 		};
 	}, [] );
 
