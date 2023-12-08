@@ -8,6 +8,7 @@ const path = require( 'path' );
 
 const resultsPath = process.env.WP_ARTIFACTS_PATH;
 const maxRegressionFactor = 1.1; // fail on 10% regression
+const regressedMetrics = [];
 
 fs.readdir( resultsPath, ( err, files ) => {
 	if ( err ) {
@@ -35,13 +36,27 @@ fs.readdir( resultsPath, ( err, files ) => {
 				const branchValue = branchMetrics[ metric ];
 
 				if ( branchValue > trunkValue * maxRegressionFactor ) {
-					console.error(
-						`Performance regression detected in ${ metric } for ${ file }: ${ branchValue } vs ${ trunkValue } (trunk)`
-					);
-					process.exit( 1 );
+					regressedMetrics.push( {
+						file,
+						metric,
+						branchValue,
+						trunkValue,
+					} );
 				}
 			} );
 		} );
 
-	console.log( 'No significant performance regression detected.' );
+	if ( regressedMetrics.length > 0 ) {
+		console.log( 'Performance regression detected:' );
+		regressedMetrics.forEach(
+			( { file, metric, branchValue, trunkValue } ) => {
+				console.log(
+					`- In ${ file }: ${ metric } increased from ${ trunkValue } to ${ branchValue }`
+				);
+			}
+		);
+		process.exit( 1 );
+	} else {
+		console.log( 'No significant performance regression detected.' );
+	}
 } );
