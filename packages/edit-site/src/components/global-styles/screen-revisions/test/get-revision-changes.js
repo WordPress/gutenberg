@@ -136,13 +136,12 @@ describe( 'getRevisionChanges', () => {
 			blockNames
 		);
 		expect( resultA ).toEqual( [
-			[ 'Blocks', 'Paragraph' ],
-			[ 'Styles', 'Background' ],
-			[ 'Styles', 'Font size' ],
-			[ 'Styles', 'Font family' ],
-			[ 'Elements', 'Caption' ],
-			[ 'Elements', 'Link' ],
-			[ 'Settings', 'Color' ],
+			'Colors',
+			'Typography',
+			'Paragraph block',
+			'Caption element',
+			'Link element',
+			'Color settings',
 		] );
 
 		const resultB = getRevisionChanges(
@@ -154,7 +153,7 @@ describe( 'getRevisionChanges', () => {
 		expect( resultA ).toBe( resultB );
 	} );
 
-	it( 'skips unknown keys', () => {
+	it( 'skips unknown and unchanged keys', () => {
 		const result = getRevisionChanges(
 			{
 				styles: {
@@ -162,7 +161,7 @@ describe( 'getRevisionChanges', () => {
 						legs: 'green',
 					},
 					typography: {
-						owl: 'hoot',
+						fontSize: '1rem',
 					},
 					settings: {
 						'': {
@@ -177,7 +176,7 @@ describe( 'getRevisionChanges', () => {
 						legs: 'yellow',
 					},
 					typography: {
-						cat: 'meow',
+						fontSize: '1rem',
 					},
 					settings: {
 						'': {

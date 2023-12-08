@@ -23,57 +23,35 @@ const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 const MAX_CHANGES = 7;
 
 function ChangedSummary( { revision, previousRevision, blockNames } ) {
-	let changes = getRevisionChanges( revision, previousRevision, blockNames );
-
+	const changes = getRevisionChanges(
+		revision,
+		previousRevision,
+		blockNames
+	);
 	const changesLength = changes.length;
 
 	if ( ! changesLength ) {
 		return null;
 	}
 
-	// Truncate to `n` results.
+	// Truncate to `n` results if necessary.
 	if ( changesLength > MAX_CHANGES ) {
-		changes = changes.slice( 0, MAX_CHANGES );
+		const deleteCount = changesLength - MAX_CHANGES;
+		const andMoreText = sprintf(
+			// translators: %d: number of global styles changes that are not displayed in the UI.
+			_n( '…and %d more change.', '…and %d more changes.', deleteCount ),
+			deleteCount
+		);
+		changes.splice( MAX_CHANGES, deleteCount, andMoreText );
 	}
 
-	const moreChanges = changesLength - changes.length;
-
-	changes = changes.reduce( ( acc, curr ) => {
-		acc[ curr[ 0 ] ] = ! acc[ curr[ 0 ] ]
-			? [ curr[ 1 ] ]
-			: [ ...acc[ curr[ 0 ] ], curr[ 1 ] ];
-		return acc;
-	}, {} );
-
 	return (
-		<div className="edit-site-global-styles-screen-revision__changes">
-			{ Object.entries( changes )?.map( ( [ key, changeValues ] ) => (
-				<div
-					key={ key }
-					className="edit-site-global-styles-screen-revision__changes-group"
-				>
-					<span className="edit-site-global-styles-screen-revision__changes-title">
-						{ key }:
-					</span>
-					<span className="edit-site-global-styles-screen-revision__changes-list">
-						{ changeValues.join( ', ' ) }
-					</span>
-				</div>
-			) ) }
-			{ moreChanges > 0 ? (
-				<span className="edit-site-global-styles-screen-revision__more">
-					{ sprintf(
-						// translators: %d: number of global styles changes that are not displayed in the UI.
-						_n(
-							'…and %d more change.',
-							'…and %d more changes.',
-							moreChanges
-						),
-						moreChanges
-					) }
-				</span>
-			) : null }
-		</div>
+		<span
+			data-testid="global-styles-revision-changes"
+			className="edit-site-global-styles-screen-revision__changes"
+		>
+			{ changes.join( ', ' ) }
+		</span>
 	);
 }
 
@@ -98,7 +76,7 @@ function getRevisionLabel(
 
 	if ( 'unsaved' === id ) {
 		return sprintf(
-			/* translators: %s author display name */
+			/* translators: %s: author display name */
 			__( 'Unsaved changes by %s' ),
 			authorDisplayName
 		);
@@ -106,7 +84,7 @@ function getRevisionLabel(
 
 	return areStylesEqual
 		? sprintf(
-				/* translators: %1$s author display name, %2$s: revision creation date */
+				// translators: %1$s: author display name, %2$s: revision creation date.
 				__(
 					'Changes saved by %1$s on %2$s. This revision matches current editor styles.'
 				),
@@ -114,7 +92,7 @@ function getRevisionLabel(
 				formattedModifiedDate
 		  )
 		: sprintf(
-				/* translators: %1$s author display name, %2$s: revision creation date */
+				// translators: %1$s: author display name, %2$s: revision creation date.
 				__( 'Changes saved by %1$s on %2$s' ),
 				authorDisplayName,
 				formattedModifiedDate

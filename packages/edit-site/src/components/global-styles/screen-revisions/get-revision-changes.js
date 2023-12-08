@@ -1,33 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 const globalStylesChangesCache = new Map();
 const EMPTY_ARRAY = [];
 
 const translationMap = {
-	blocks: __( 'Blocks' ),
-	elements: __( 'Elements' ),
-	'elements.caption': __( 'Caption' ),
-	'elements.link': __( 'Link' ),
-	'elements.button': __( 'Button' ),
-	'elements.heading': __( 'Heading' ),
-	settings: __( 'Settings' ),
-	'settings.color': __( 'Color' ),
-	'settings.typography': __( 'Typography' ),
-	'settings.layout': __( 'Layout' ),
-	styles: __( 'Styles' ),
-	'styles.color.text': __( 'Text' ),
-	'styles.color.background': __( 'Background' ),
-	'styles.spacing.margin': __( 'Margin' ),
-	'styles.spacing.padding': __( 'Padding' ),
-	'styles.spacing.blockGap': __( 'Block spacing' ),
-	'styles.typography.fontStyle': __( 'Font style' ),
-	'styles.typography.fontSize': __( 'Font size' ),
-	'styles.typography.lineHeight': __( 'Line height' ),
-	'styles.typography.fontFamily': __( 'Font family' ),
-	'styles.typography.fontWeight': __( 'Font weight' ),
+	caption: __( 'Caption' ),
+	link: __( 'Link' ),
+	button: __( 'Button' ),
+	heading: __( 'Heading' ),
+	'settings.color': __( 'Color settings' ),
+	'settings.typography': __( 'Typography settings' ),
+	'styles.color': __( 'Colors' ),
+	'styles.spacing': __( 'Spacing' ),
+	'styles.typography': __( 'Typography' ),
 };
 
 const isObject = ( obj ) => obj !== null && typeof obj === 'object';
@@ -42,9 +30,26 @@ function getTranslation( key, blockNames ) {
 	if ( translationMap[ key ] ) {
 		return translationMap[ key ];
 	}
-	if ( key.startsWith( 'blocks.' ) ) {
-		const keyArray = key.split( '.' );
-		return blockNames[ keyArray[ 1 ] ] || keyArray[ 1 ];
+
+	const keyArray = key.split( '.' );
+
+	if ( keyArray?.[ 0 ] === 'blocks' ) {
+		const blockName = blockNames[ keyArray[ 1 ] ];
+		return blockName
+			? sprintf(
+					// translators: %s: block name.
+					__( '%s block' ),
+					blockName
+			  )
+			: keyArray[ 1 ];
+	}
+
+	if ( keyArray?.[ 0 ] === 'elements' ) {
+		return sprintf(
+			// translators: %s: element name, e.g., heading button, link, caption.
+			__( '%s element' ),
+			translationMap[ keyArray[ 1 ] ]
+		);
 	}
 
 	return undefined;
@@ -60,12 +65,12 @@ function getTranslation( key, blockNames ) {
 function deepCompare( changedObject, originalObject, parentPath = '' ) {
 	// We have two non-object values to compare.
 	if ( ! isObject( changedObject ) && ! isObject( originalObject ) ) {
-		// Only return a path if the value has changed.
-		// And then only the path name up to `n` levels deep to reduce the results.
-		const splitKeys = parentPath.split( '.' );
-		const depth = 'styles' === splitKeys[ 0 ] ? 3 : 2;
+		/*
+		 * Only return a path if the value has changed.
+		 * And then only the path name up to 2 levels deep.
+		 */
 		return changedObject !== originalObject
-			? splitKeys.slice( 0, depth ).join( '.' )
+			? parentPath.split( '.' ).slice( 0, 2 ).join( '.' )
 			: undefined;
 	}
 
@@ -100,7 +105,7 @@ function deepCompare( changedObject, originalObject, parentPath = '' ) {
  * @param {Object}                revision         The changed object to compare.
  * @param {Object}                previousRevision The original object to compare against.
  * @param {Record<string,string>} blockNames       A key/value pair object of block names and their rendered titles.
- * @return {Array[]}                               An 2-dimensional array of tuples: [ "group", "translated change" ].
+ * @return {string[]}                              An array of translated changes.
  */
 export default function getRevisionChanges(
 	revision,
@@ -113,25 +118,29 @@ export default function getRevisionChanges(
 		return globalStylesChangesCache.get( cacheKey );
 	}
 
-	// Compare the two revisions with normalized keys.
+	/*
+	 * Compare the two revisions with normalized keys.
+	 * The order of these keys determines the order in which
+	 * they'll appear in the results.
+	 */
 	const changedValueTree = deepCompare(
 		{
-			blocks: revision?.styles?.blocks,
 			styles: {
 				color: revision?.styles?.color,
 				typography: revision?.styles?.typography,
 				spacing: revision?.styles?.spacing,
 			},
+			blocks: revision?.styles?.blocks,
 			elements: revision?.styles?.elements,
 			settings: revision?.settings,
 		},
 		{
-			blocks: previousRevision?.styles?.blocks,
 			styles: {
 				color: previousRevision?.styles?.color,
 				typography: previousRevision?.styles?.typography,
 				spacing: previousRevision?.styles?.spacing,
 			},
+			blocks: previousRevision?.styles?.blocks,
 			elements: previousRevision?.styles?.elements,
 			settings: previousRevision?.settings,
 		}
@@ -144,15 +153,14 @@ export default function getRevisionChanges(
 
 	// Remove duplicate results.
 	const result = [ ...new Set( changedValueTree ) ]
-		// Translate the keys.
-		// Remove duplicate or empty translations.
+		/*
+		 * Translate the keys.
+		 * Remove duplicate or empty translations.
+		 */
 		.reduce( ( acc, curr ) => {
 			const translation = getTranslation( curr, blockNames );
 			if ( translation && ! acc.includes( translation ) ) {
-				acc.push( [
-					translationMap[ curr.split( '.' )[ 0 ] ],
-					translation,
-				] );
+				acc.push( translation );
 			}
 			return acc;
 		}, [] );

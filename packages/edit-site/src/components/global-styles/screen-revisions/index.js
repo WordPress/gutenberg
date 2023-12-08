@@ -7,7 +7,6 @@ import {
 	__experimentalUseNavigator as useNavigator,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Spinner,
-	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -157,7 +156,7 @@ function ScreenRevisions() {
 			{ isLoading && (
 				<Spinner className="edit-site-global-styles-screen-revisions__loading" />
 			) }
-			{ shouldShowRevisions ? (
+			{ shouldShowRevisions && (
 				<>
 					<Revisions
 						blocks={ blocks }
@@ -217,14 +216,6 @@ function ScreenRevisions() {
 						</ConfirmDialog>
 					) }
 				</>
-			) : (
-				<Spacer marginX={ 4 } data-testid="global-styles-no-revisions">
-					{
-						// Adding an existing translation here in case these changes are shipped to WordPress 6.3.
-						// Later we could update to something better, e.g., "There are currently no style revisions.".
-						__( 'No results found.' )
-					}
-				</Spacer>
 			) }
 		</>
 	);
