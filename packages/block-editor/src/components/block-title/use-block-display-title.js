@@ -72,12 +72,14 @@ export default function useBlockDisplayTitle( {
 		? getBlockLabel( blockType, attributes, context )
 		: null;
 
+	const blockCustomName = attributes.metadata?.name;
 	const label = reusableBlockTitle || blockLabel;
 	// Label will fallback to the title if no label is defined for the current
 	// label context. If the label is defined we prioritize it over a
 	// possible block variation title match.
 	const blockTitle =
-		label && label !== blockType.title ? label : blockInformation.title;
+		blockCustomName ||
+		( label && label !== blockType.title ? label : blockInformation.title );
 
 	if (
 		maximumLength &&

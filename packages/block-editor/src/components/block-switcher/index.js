@@ -100,6 +100,8 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const isSingleBlock = blocks.length === 1;
 	const isReusable = isSingleBlock && isReusableBlock( blocks[ 0 ] );
 	const isTemplate = isSingleBlock && isTemplatePart( blocks[ 0 ] );
+	const hasCustomName =
+		isSingleBlock && !! blocks[ 0 ].attributes.metadata?.name;
 
 	function selectForMultipleBlocks( insertedBlocks ) {
 		if ( insertedBlocks.length > 1 ) {
@@ -156,7 +158,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					icon={
 						<>
 							<BlockIcon icon={ icon } showColors />
-							{ ( isReusable || isTemplate ) && (
+							{ ( isReusable || isTemplate || hasCustomName ) && (
 								<span className="block-editor-block-switcher__toggle-text">
 									{ blockTitle }
 								</span>
@@ -209,7 +211,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 									className="block-editor-block-switcher__toggle"
 									showColors
 								/>
-								{ ( isReusable || isTemplate ) && (
+								{ ( isReusable ||
+									isTemplate ||
+									hasCustomName ) && (
 									<span className="block-editor-block-switcher__toggle-text">
 										{ blockTitle }
 									</span>
