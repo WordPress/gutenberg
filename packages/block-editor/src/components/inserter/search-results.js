@@ -205,8 +205,7 @@ function InserterSearchResults( {
 	if ( isZoomOutMode ) {
 		return (
 			<InserterListbox>
-				{ ! hasItems && <InserterNoResults /> }
-				{ patternsUI }
+				{ patternsUI || <InserterNoResults /> }
 			</InserterListbox>
 		);
 	}
