@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
 import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -94,6 +94,20 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 	const { type: editedPostType } = editedPost;
 
 	const isLargeViewport = useViewportMatch( 'medium' );
+
+	// used to show bar at bottom if editing global
+	const { isEditingTemplate } = useSelect( ( select ) => {
+		const { getRenderingMode, getCurrentTemplateId } =
+			select( editorStore );
+		const _templateId = getCurrentTemplateId();
+		return {
+			isEditingTemplate:
+				!! _templateId && getRenderingMode() === 'template-only',
+		};
+	}, [] );
+
+	const { getEditorSettings } = useSelect( editorStore );
+	const { setRenderingMode } = useDispatch( editorStore );
 
 	const {
 		context,
@@ -274,6 +288,22 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 						footer={
 							shouldShowBlockBreadcrumbs && (
 								<BlockBreadcrumb
+									isHighlighted={ isEditingTemplate }
+									onBackClick={
+										isEditingTemplate
+											? () =>
+													setRenderingMode(
+														getEditorSettings()
+															.defaultRenderingMode
+													)
+											: undefined
+									}
+									backLabel={
+										isEditingTemplate
+											? contextPost?.title?.rendered ||
+											  'Back'
+											: undefined
+									}
 									rootLabelText={
 										postWithTemplate &&
 										renderingMode !== 'template-only'
