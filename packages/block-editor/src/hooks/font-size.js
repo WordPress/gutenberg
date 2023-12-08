@@ -79,7 +79,7 @@ function addSaveProps( props, blockType, attributes ) {
 	const classes = new TokenList( props.className );
 	classes.add( getFontSizeClass( attributes.fontSize ) );
 	const newClassName = classes.value;
-	props.className = newClassName ? newClassName : undefined;
+	props.className = newClassName ? newClassName : props.className;
 
 	return props;
 }
