@@ -16,6 +16,10 @@ export type BoxControlValue = {
 	left?: string;
 };
 
+export type CustomValueUnits = {
+	[ index: string ]: { max: number; steps: number };
+};
+
 type UnitControlPassthroughProps = Omit<
 	UnitControlProps,
 	'label' | 'onChange' | 'onFocus' | 'onMouseOver' | 'onMouseOut' | 'units'

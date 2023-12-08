@@ -12,6 +12,7 @@ import {
 	getAllValue,
 	isValuesMixed,
 	isValuesDefined,
+	CUSTOM_VALUE_SETTINGS,
 } from './utils';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control';
 
@@ -39,7 +40,7 @@ export default function AllInputControl( {
 		onFocus( event, { side: 'all' } );
 	};
 
-	const createSliderOnChange = ( next: string ) => {
+	const sliderOnChange = ( next: string ) => {
 		const nextValues = applyValueToSides( values, String( next ), sides );
 		onChange( nextValues );
 	};
@@ -101,10 +102,13 @@ export default function AllInputControl( {
 				initialPosition={ 0 }
 				label={ LABELS.all }
 				onChange={ ( newValue ) => {
-					createSliderOnChange?.(
-						[ newValue, parsedUnit ].join( '' )
-					);
+					sliderOnChange( [ newValue, parsedUnit ].join( '' ) );
 				} }
+				min={ 0 }
+				max={ CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]?.max ?? 10 }
+				step={
+					CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]?.steps ?? 0.1
+				}
 				value={ parsedQuantity }
 				withInputField={ false }
 			/>

@@ -3,7 +3,7 @@
  */
 import UnitControl from './unit-control';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
-import { ALL_SIDES, LABELS } from './utils';
+import { ALL_SIDES, CUSTOM_VALUE_SETTINGS, LABELS } from './utils';
 import {
 	FlexedBoxControlIcon,
 	FlexedRangeControl,
@@ -44,10 +44,7 @@ export default function BoxInputControls( {
 		onChange( nextValues );
 	};
 
-	const createSliderOnChange = (
-		side: keyof BoxControlValue,
-		next: string
-	) => {
+	const sliderOnChange = ( side: keyof BoxControlValue, next: string ) => {
 		const nextValues = { ...values };
 		nextValues[ side ] = next;
 		handleOnChange( nextValues );
@@ -143,11 +140,20 @@ export default function BoxInputControls( {
 							initialPosition={ 0 }
 							label={ LABELS[ side ] }
 							onChange={ ( newValue ) => {
-								createSliderOnChange?.(
+								sliderOnChange(
 									side,
 									[ newValue, computedUnit ].join( '' )
 								);
 							} }
+							min={ 0 }
+							max={
+								CUSTOM_VALUE_SETTINGS[ computedUnit ?? 'px' ]
+									?.max ?? 10
+							}
+							step={
+								CUSTOM_VALUE_SETTINGS[ computedUnit ?? 'px' ]
+									?.steps ?? 0.1
+							}
 							value={ parsedQuantity }
 							withInputField={ false }
 						/>

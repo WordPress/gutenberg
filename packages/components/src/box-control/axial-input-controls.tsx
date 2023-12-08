@@ -3,7 +3,7 @@
  */
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import UnitControl from './unit-control';
-import { LABELS } from './utils';
+import { CUSTOM_VALUE_SETTINGS, LABELS } from './utils';
 import {
 	FlexedBoxControlIcon,
 	FlexedRangeControl,
@@ -71,7 +71,7 @@ export default function AxialInputControls( {
 		}
 	};
 
-	const createSliderOnChange = ( side: GroupedSide, next: string ) => {
+	const sliderOnChange = ( side: GroupedSide, next: string ) => {
 		const nextValues = { ...values };
 
 		if ( side === 'vertical' ) {
@@ -170,7 +170,7 @@ export default function AxialInputControls( {
 							initialPosition={ 0 }
 							label={ LABELS[ side ] }
 							onChange={ ( newValue ) => {
-								createSliderOnChange?.(
+								sliderOnChange(
 									side,
 									[
 										newValue,
@@ -178,6 +178,15 @@ export default function AxialInputControls( {
 									].join( '' )
 								);
 							} }
+							min={ 0 }
+							max={
+								CUSTOM_VALUE_SETTINGS[ selectedUnit ?? 'px' ]
+									?.max ?? 10
+							}
+							step={
+								CUSTOM_VALUE_SETTINGS[ selectedUnit ?? 'px' ]
+									?.steps ?? 0.1
+							}
 							value={ parsedQuantity }
 							withInputField={ false }
 						/>
