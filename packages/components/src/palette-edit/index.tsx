@@ -266,11 +266,22 @@ function isTemporaryElement(
 	{ slug, color, gradient }: Color | Gradient
 ) {
 	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
-	return (
-		regex.test( slug ) &&
-		( ( !! color && color === DEFAULT_COLOR ) ||
-			( !! gradient && gradient === DEFAULT_GRADIENT ) )
-	);
+
+	if ( ! regex.test( slug ) ) {
+		return true;
+	}
+
+	// The order is important as gradient elements
+	// contain a color property.
+	if ( !! gradient ) {
+		return gradient === DEFAULT_GRADIENT;
+	}
+
+	if ( !! color ) {
+		return color === DEFAULT_COLOR;
+	}
+
+	return true;
 }
 
 function PaletteEditListView< T extends Color | Gradient >( {
