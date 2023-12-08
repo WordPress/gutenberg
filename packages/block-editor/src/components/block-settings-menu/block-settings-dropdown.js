@@ -96,6 +96,7 @@ export function BlockSettingsDropdown( {
 	const firstBlockClientId = blockClientIds[ 0 ];
 	const {
 		firstParentClientId,
+		isZoomOutMode,
 		onlyBlock,
 		parentBlockType,
 		previousBlockClientId,
@@ -109,6 +110,7 @@ export function BlockSettingsDropdown( {
 				getPreviousBlockClientId,
 				getSelectedBlockClientIds,
 				getBlockAttributes,
+				__unstableGetEditorMode,
 			} = select( blockEditorStore );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -120,6 +122,7 @@ export function BlockSettingsDropdown( {
 
 			return {
 				firstParentClientId: _firstParentClientId,
+				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 				onlyBlock: 1 === getBlockCount( _firstParentClientId ),
 				parentBlockType:
 					_firstParentClientId &&
@@ -291,7 +294,8 @@ export function BlockSettingsDropdown( {
 									'core/block-editor/insert-after',
 									event
 								) &&
-								canInsertDefaultBlock
+								canInsertDefaultBlock &&
+								! isZoomOutMode
 							) {
 								event.preventDefault();
 								setOpenedBlockSettingsMenu( undefined );
@@ -301,7 +305,8 @@ export function BlockSettingsDropdown( {
 									'core/block-editor/insert-before',
 									event
 								) &&
-								canInsertDefaultBlock
+								canInsertDefaultBlock &&
+								! isZoomOutMode
 							) {
 								event.preventDefault();
 								setOpenedBlockSettingsMenu( undefined );
@@ -347,7 +352,7 @@ export function BlockSettingsDropdown( {
 										{ __( 'Duplicate' ) }
 									</MenuItem>
 								) }
-								{ canInsertDefaultBlock && (
+								{ canInsertDefaultBlock && ! isZoomOutMode && (
 									<>
 										<MenuItem
 											onClick={ pipe(
@@ -382,25 +387,31 @@ export function BlockSettingsDropdown( {
 									</MenuItem>
 								</MenuGroup>
 							) }
-							<BlockSettingsMenuControls.Slot
-								fillProps={ {
-									onClose,
-									canMove,
-									onMoveTo,
-									onlyBlock,
-									count,
-									firstBlockClientId,
-								} }
-								clientIds={ clientIds }
-								__unstableDisplayLocation={
-									__unstableDisplayLocation
-								}
-							/>
-							{ typeof children === 'function'
-								? children( { onClose } )
-								: Children.map( ( child ) =>
-										cloneElement( child, { onClose } )
-								  ) }
+							{ ! isZoomOutMode && (
+								<>
+									<BlockSettingsMenuControls.Slot
+										fillProps={ {
+											onClose,
+											canMove,
+											onMoveTo,
+											onlyBlock,
+											count,
+											firstBlockClientId,
+										} }
+										clientIds={ clientIds }
+										__unstableDisplayLocation={
+											__unstableDisplayLocation
+										}
+									/>
+									{ typeof children === 'function'
+										? children( { onClose } )
+										: Children.map( ( child ) =>
+												cloneElement( child, {
+													onClose,
+												} )
+										  ) }
+								</>
+							) }
 							{ canRemove && (
 								<MenuGroup>
 									<MenuItem
