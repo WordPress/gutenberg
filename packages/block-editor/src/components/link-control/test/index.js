@@ -2140,7 +2140,7 @@ describe( 'Post types', () => {
 describe( 'Rich link previews', () => {
 	const selectedLink = {
 		id: '1',
-		title: 'Wordpress.org', // Customize this for differentiation in assertions.
+		title: 'WordPress.org', // Customize this for differentiation in assertions.
 		url: 'https://www.wordpress.org',
 		type: 'URL',
 	};
