@@ -263,7 +263,7 @@ function ColorPanelDropdown( {
 										{ tabs.map( ( tab ) => (
 											<Tabs.Tab
 												key={ tab.key }
-												id={ tab.key }
+												tabId={ tab.key }
 											>
 												{ tab.label }
 											</Tabs.Tab>
@@ -274,7 +274,7 @@ function ColorPanelDropdown( {
 										return (
 											<Tabs.TabPanel
 												key={ tab.key }
-												id={ tab.key }
+												tabId={ tab.key }
 												focusable={ false }
 											>
 												<ColorPanelTab
