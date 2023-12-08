@@ -38,6 +38,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		canRemove,
 		hasBlockStyles,
 		icon,
+		isZoomOutMode,
 		patterns,
 	} = useSelect(
 		( select ) => {
@@ -48,6 +49,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				canRemoveBlocks,
 			} = select( blockEditorStore );
 			const { getBlockStyles, getBlockType } = select( blocksStore );
+			const { __unstableGetEditorMode } = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId(
 				Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
 			);
@@ -75,6 +77,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				canRemove: canRemoveBlocks( clientIds, rootClientId ),
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
+				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 				patterns: __experimentalGetPatternTransformItems(
 					blocks,
 					rootClientId
@@ -138,11 +141,12 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const hasPossibleBlockVariationTransformations =
 		!! blockVariationTransformations?.length;
 	const hasPatternTransformation = !! patterns?.length && canRemove;
-	if (
+	const hasNoMenu =
 		! hasBlockStyles &&
 		! hasPossibleBlockTransformations &&
-		! hasPossibleBlockVariationTransformations
-	) {
+		! hasPossibleBlockVariationTransformations;
+
+	if ( hasNoMenu || isZoomOutMode ) {
 		return (
 			<ToolbarGroup>
 				<ToolbarButton
