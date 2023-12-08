@@ -9,6 +9,7 @@ import {
 	__experimentalUseHasRecursion as useHasRecursion,
 	Warning,
 } from '@wordpress/block-editor';
+import { Placeholder } from '@wordpress/components';
 import {
 	useEntityProp,
 	useEntityBlockEditor,
@@ -104,25 +105,18 @@ function Content( props ) {
 	);
 }
 
-function Placeholder( { layoutClassNames } ) {
+function ContentPlaceholder( { layoutClassNames } ) {
 	const blockProps = useBlockProps( { className: layoutClassNames } );
 	return (
 		<div { ...blockProps }>
-			<p>
-				{ __(
-					'This is the Content block, it will display all the blocks in any single post or page.'
-				) }
-			</p>
-			<p>
-				{ __(
-					'That might be a simple arrangement like consecutive paragraphs in a blog post, or a more elaborate composition that includes image galleries, videos, tables, columns, and any other block types.'
-				) }
-			</p>
-			<p>
-				{ __(
-					'If there are any Custom Post Types registered at your site, the Content block can display the contents of those entries as well.'
-				) }
-			</p>
+			<Placeholder
+				className="block-editor-media-placeholder"
+				withIllustration={ true }
+			>
+				<p>
+					{ __( 'This is where your post or page content will go.' ) }
+				</p>
+			</Placeholder>
 		</div>
 	);
 }
@@ -157,7 +151,7 @@ export default function PostContentEdit( {
 					layoutClassNames={ layoutClassNames }
 				/>
 			) : (
-				<Placeholder layoutClassNames={ layoutClassNames } />
+				<ContentPlaceholder layoutClassNames={ layoutClassNames } />
 			) }
 		</RecursionProvider>
 	);
