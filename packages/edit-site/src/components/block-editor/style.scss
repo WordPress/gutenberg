@@ -23,7 +23,7 @@
 	height: 100%;
 	display: block;
 	overflow: hidden;
-	background-color: $gray-900;
+	background-color: $gray-800;
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;
 
@@ -46,7 +46,7 @@
 
 	&.is-focus-mode {
 		.edit-site-layout.is-full-canvas & {
-			padding: $grid-unit-60;
+			padding: $grid-unit-40;
 		}
 
 		.edit-site-visual-editor__editor-canvas {

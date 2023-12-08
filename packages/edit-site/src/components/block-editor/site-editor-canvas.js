@@ -9,6 +9,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { BlockTools, store as blockEditorStore } from '@wordpress/block-editor';
 import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -29,19 +30,25 @@ import PageContentFocusNotifications from '../page-content-focus-notifications';
 export default function SiteEditorCanvas() {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
-	const { templateType, isFocusMode, isViewMode } = useSelect( ( select ) => {
-		const { getEditedPostType, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
+	const { templateType, isFocusMode, isViewMode, isEditingTemplate } =
+		useSelect( ( select ) => {
+			const { getEditedPostType, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
 
-		const _templateType = getEditedPostType();
+			const { getRenderingMode, getCurrentTemplateId } =
+				select( editorStore );
+			const _templateId = getCurrentTemplateId();
+			const _templateType = getEditedPostType();
 
-		return {
-			templateType: _templateType,
-			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
-			isViewMode: getCanvasMode() === 'view',
-		};
-	}, [] );
+			return {
+				isEditingTemplate:
+					!! _templateId && getRenderingMode() === 'template-only',
+				templateType: _templateType,
+				isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
+				isViewMode: getCanvasMode() === 'view',
+			};
+		}, [] );
 
 	const [ resizeObserver, sizes ] = useResizeObserver();
 
@@ -71,7 +78,9 @@ export default function SiteEditorCanvas() {
 						<BlockTools
 							className={ classnames( 'edit-site-visual-editor', {
 								'is-focus-mode':
-									isFocusMode || !! editorCanvasView,
+									isFocusMode ||
+									!! editorCanvasView ||
+									isEditingTemplate,
 								'is-view-mode': isViewMode,
 							} ) }
 							__unstableContentRef={ contentRef }
