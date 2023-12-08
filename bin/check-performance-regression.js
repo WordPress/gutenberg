@@ -35,6 +35,11 @@ fs.readdir( resultsPath, ( err, files ) => {
 		const branchMetrics =
 			data[ Object.keys( data ).find( ( key ) => key !== 'trunk' ) ];
 
+		if ( ! trunkMetrics || ! branchMetrics ) {
+			console.error( `No trunk or branch metrics found.` );
+			process.exit( 1 );
+		}
+
 		Object.keys( trunkMetrics ).forEach( ( metric ) => {
 			const trunkValue = trunkMetrics[ metric ];
 			const branchValue = branchMetrics[ metric ];
