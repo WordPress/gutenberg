@@ -5,6 +5,7 @@ import { Button } from '@wordpress/components';
 import { arrowLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { getQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -24,9 +25,10 @@ function BackButton() {
 	const isNavigationMenu = location.params.postType === NAVIGATION_POST_TYPE;
 	const previousTemplateId = location.state?.fromTemplateId;
 
-	const isFocusMode = isTemplatePart || isNavigationMenu;
+	const { syncedPatternId } = getQueryArgs( window.location.href );
+	const isFocusMode = isTemplatePart || isNavigationMenu || syncedPatternId;
 
-	if ( ! isFocusMode || ! previousTemplateId ) {
+	if ( ! isFocusMode || ( ! previousTemplateId && ! syncedPatternId ) ) {
 		return null;
 	}
 
