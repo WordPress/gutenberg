@@ -54,9 +54,47 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );
 
+	// Allow `first_child` and `last_child` insertion.
+	// As the Post Content block simply renders the markup returned by the
+	// `get_the_content()` function (wrapped in a `<div>` block wrapper),
+	// Limitations:
+	// - Changes to anchor block by get_hooked_block_markup() aren't respected.
+	// - No $context available.
+
+	$context              = null;
+	$anchor_block_type    = 'core/post-content';
+	$anchor_block         = array(
+		'blockName'  => $anchor_block_type,
+		'attributes' => $attributes
+	);
+	$hooked_blocks        = get_hooked_blocks();
+
+	$first_child_markup = '';
+	$hooked_block_types_first_child = isset( $hooked_blocks[ $anchor_block_type ]['first_child'] )
+		? $hooked_blocks[ $anchor_block_type ]['first_child']
+		: array();
+
+	$hooked_block_types_first_child = apply_filters( 'hooked_block_types', $hooked_block_types_first_child, 'first_child', $anchor_block_type, $context );
+	foreach ( $hooked_block_types_first_child as $hooked_block_type_first_child ) {
+		$first_child_markup .= get_hooked_block_markup( $anchor_block, $hooked_block_type_first_child );
+	}
+
+	// TODO: Should run `get_the_content` and apply `the_content` filter here.
+
+	$last_child_markup = '';
+	$hooked_block_types_last_child = isset( $hooked_blocks[ $anchor_block_type ]['last_child'] )
+		? $hooked_blocks[ $anchor_block_type ]['last_child']
+		: array();
+
+	$hooked_block_types_last_child = apply_filters( 'hooked_block_types', $hooked_block_types_last_child, 'last_child', $anchor_block_type, $context );
+	foreach ( $hooked_block_types_last_child as $hooked_block_type_last_child ) {
+		// $parent_block should be a reference. That's an array. Tricky.
+		$last_child_markup .= get_hooked_block_markup( $anchor_block, $hooked_block_type_last_child );
+	}
+
 	return (
 		'<div ' . $wrapper_attributes . '>' .
-			$content .
+			$first_child_markup . $content . $last_child_markup .
 		'</div>'
 	);
 }
