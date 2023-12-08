@@ -136,7 +136,6 @@ export function PrivateBlockToolbar( {
 	const isMultiToolbar = blockClientIds.length > 1;
 	const isSynced =
 		isReusableBlock( blockType ) || isTemplatePart( blockType );
-	const isSyncedUserPattern = isReusableBlock( blockType );
 
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = classnames( 'block-editor-block-contextual-toolbar', {
