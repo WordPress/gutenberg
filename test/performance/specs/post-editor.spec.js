@@ -22,6 +22,7 @@ const results = {
 	firstContentfulPaint: [],
 	firstBlock: [],
 	type: [],
+	typeWithTopToolbar: [],
 	typeWithoutInspector: [],
 	typeContainer: [],
 	focus: [],
@@ -146,6 +147,30 @@ test.describe( 'Post Editor Performance', () => {
 			} );
 
 			await type( paragraph, metrics, 'type' );
+		} );
+	} );
+
+	test.describe( 'Typing with Top Toolbar', () => {
+		let draftId = null;
+
+		test( 'Setup the test post', async ( { admin, perfUtils, editor } ) => {
+			await admin.createNewPost();
+			await editor.setIsFixedToolbar( true );
+			await perfUtils.loadBlocksForLargePost();
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { admin, perfUtils, metrics } ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			const canvas = await perfUtils.getCanvas();
+
+			const paragraph = canvas.getByRole( 'document', {
+				name: /Empty block/i,
+			} );
+
+			await type( paragraph, metrics, 'typeWithTopToolbar' );
 		} );
 	} );
 
