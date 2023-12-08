@@ -74,7 +74,7 @@ const SidebarContent = ( {
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
-				<Tabs.TabPanel id={ sidebars.document } focusable={ false }>
+				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
 					{ ! isTemplateMode && (
 						<>
 							<PostStatus />
@@ -90,7 +90,7 @@ const SidebarContent = ( {
 					) }
 					{ isTemplateMode && <TemplateSummary /> }
 				</Tabs.TabPanel>
-				<Tabs.TabPanel id={ sidebars.block } focusable={ false }>
+				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
 					<BlockInspector />
 				</Tabs.TabPanel>
 			</Tabs.Context.Provider>

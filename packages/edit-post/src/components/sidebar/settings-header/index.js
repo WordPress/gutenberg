@@ -28,10 +28,10 @@ const SettingsHeader = () => {
 
 	return (
 		<Tabs.TabList>
-			<Tabs.Tab id={ sidebars.document }>
+			<Tabs.Tab tabId={ sidebars.document }>
 				{ isTemplateMode ? __( 'Template' ) : documentLabel }
 			</Tabs.Tab>
-			<Tabs.Tab id={ sidebars.block }>
+			<Tabs.Tab tabId={ sidebars.block }>
 				{ /* translators: Text label for the Block Settings Sidebar tab. */ }
 				{ __( 'Block' ) }
 			</Tabs.Tab>
