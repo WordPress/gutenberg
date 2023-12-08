@@ -31,6 +31,15 @@ const results = {
 	inserterSearch: [],
 };
 
+function simulateRegression( duration ) {
+	const minIncrease = 0.1;
+	const maxIncrease = 2;
+	const randomIncrease =
+		minIncrease + Math.random() * ( maxIncrease - minIncrease );
+
+	return duration * ( 1 + randomIncrease );
+}
+
 test.describe( 'Post Editor Performance', () => {
 	test.use( {
 		perfUtils: async ( { page }, use ) => {
@@ -80,10 +89,16 @@ test.describe( 'Post Editor Performance', () => {
 				if ( i > throwaway ) {
 					Object.entries( loadingDurations ).forEach(
 						( [ metric, duration ] ) => {
+							const dur = process.env.RESULTS_ID.includes(
+								'trunk'
+							)
+								? duration
+								: simulateRegression( duration );
+
 							if ( metric === 'timeSinceResponseEnd' ) {
-								results.firstBlock.push( duration );
+								results.firstBlock.push( dur );
 							} else {
-								results[ metric ].push( duration );
+								results[ metric ].push( dur );
 							}
 						}
 					);
