@@ -3,6 +3,7 @@
  * HTML for testing the router navigate function.
  *
  * @package gutenberg-test-interactive-blocks
+ *
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
