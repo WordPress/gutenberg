@@ -18,6 +18,7 @@ import fontSize from './font-size';
 import border from './border';
 import position from './position';
 import layout from './layout';
+import childLayout from './layout-child';
 import './content-lock-ui';
 import './metadata';
 import customFields from './custom-fields';
@@ -45,6 +46,7 @@ createBlockListBlockFilter( [
 	fontSize,
 	border,
 	position,
+	childLayout,
 ] );
 
 export { useCustomSides } from './dimensions';
