@@ -64,7 +64,7 @@ const linkOptions = [
 	},
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const allowedBlocks = [ 'core/image' ];
+const allowedBlocks = [ 'core/image', 'core/spacer' ];
 
 const PLACEHOLDER_TEXT = Platform.isNative
 	? __( 'Add media' )
@@ -108,6 +108,7 @@ function GalleryEdit( props ) {
 		};
 	}, [] );
 
+	// TODO: filter images only
 	const innerBlockImages = useSelect(
 		( select ) => {
 			const innerBlocks =

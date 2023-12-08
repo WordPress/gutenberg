@@ -97,12 +97,18 @@
 		"allowResize": {
 			"type": "boolean",
 			"default": false
+		},
+		"spacerMode": {
+			"type": "string",
+			"default": "horizontal"
 		}
 	},
 	"providesContext": {
 		"allowResize": "allowResize",
 		"imageCrop": "imageCrop",
-		"fixedHeight": "fixedHeight"
+		"fixedHeight": "fixedHeight",
+		"orientation": "spacerMode",
+		"columns": "columns"
 	},
 	"supports": {
 		"anchor": true,
