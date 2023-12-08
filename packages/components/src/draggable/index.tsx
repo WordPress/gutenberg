@@ -19,6 +19,45 @@ const cloneWrapperClass = 'components-draggable__clone';
 const clonePadding = 0;
 const bodyClass = 'is-dragging-components-draggable';
 
+export const getFrameScale = (
+	frameElement: HTMLElement
+): {
+	x: number;
+	y: number;
+} => {
+	if ( ! frameElement ) {
+		return { x: 1, y: 1 };
+	}
+	const rect = frameElement.getBoundingClientRect();
+	return {
+		x: rect.width / frameElement.offsetWidth,
+		y: rect.height / frameElement.offsetHeight,
+	};
+};
+
+const getScaledMousePosition = (
+	mousePosition: { x: number; y: number },
+	scale: { x: number; y: number },
+	frameElement: HTMLElement
+): { x: number; y: number } => {
+	const rect = frameElement?.getBoundingClientRect();
+
+	// Only the distance traveled over the iframe is affected by scaling.
+	// Subtract off the position of the iframe to get that distance,
+	// then multiply by the scale factor to normalize the scaling.
+	const normalizedScaledPortion = {
+		x: ( mousePosition.x - rect.x ) * scale.x,
+		y: ( mousePosition.y - rect.y ) * scale.y,
+	};
+
+	// Add back on the position of the iframe to get the fully adjusted mouse
+	// position.
+	return {
+		x: normalizedScaledPortion.x + rect.x,
+		y: normalizedScaledPortion.y + rect.y,
+	};
+};
+
 /**
  * `Draggable` is a Component that provides a way to set up a cross-browser
  * (including IE) customizable drag image and the transfer data for the drag
@@ -190,11 +229,29 @@ export function Draggable( {
 			if ( cursorLeft === e.clientX && cursorTop === e.clientY ) {
 				return;
 			}
-			const nextX = x + e.clientX - cursorLeft;
-			const nextY = y + e.clientY - cursorTop;
+
+			const targetElement = e.target as HTMLElement;
+			let newX = e.clientX;
+			let newY = e.clientY;
+
+			// When hovering an iframe, take any scaling of the iframe into account.
+			// i.e. in Zoomed out mode.
+			if ( targetElement.nodeName === 'IFRAME' ) {
+				const scale = getFrameScale( targetElement );
+				const scaledMousePosition = getScaledMousePosition(
+					{ x: e.clientX, y: e.clientY },
+					scale,
+					targetElement
+				);
+				newX = scaledMousePosition.x;
+				newY = scaledMousePosition.y;
+			}
+
+			const nextX = x + newX - cursorLeft;
+			const nextY = y + newY - cursorTop;
 			cloneWrapper.style.transform = `translate( ${ nextX }px, ${ nextY }px )`;
-			cursorLeft = e.clientX;
-			cursorTop = e.clientY;
+			cursorLeft = newX;
+			cursorTop = newY;
 			x = nextX;
 			y = nextY;
 			if ( onDragOver ) {
