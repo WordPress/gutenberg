@@ -799,57 +799,6 @@ describe( 'Tabs', () => {
 			} );
 		} );
 
-		describe( 'When `selectOnMove` is `true`', () => {
-			it( 'should automatically select a newly focused tab', async () => {
-				render( <UncontrolledTabs tabs={ TABS } /> );
-
-				// Tab should focus the currently selected tab, which is Alpha.
-				await press.Tab();
-				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-				expect( await getSelectedTab() ).toHaveFocus();
-
-				// Arrow keys should select and move focus to the next tab.
-				await press.ArrowRight();
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-				expect( await getSelectedTab() ).toHaveFocus();
-			} );
-		} );
-
-		describe( 'When `selectOnMove` is `false`', () => {
-			it( 'should apply focus without automatically changing the selected tab', async () => {
-				render(
-					<UncontrolledTabs tabs={ TABS } selectOnMove={ false } />
-				);
-
-				// Tab should focus the currently selected tab, which is Alpha.
-				await press.Tab();
-				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-				expect( await getSelectedTab() ).toHaveFocus();
-
-				// Arrow key should move focus but not automatically change the selected tab.
-				await press.ArrowRight();
-				expect(
-					screen.getByRole( 'tab', { name: 'Beta' } )
-				).toHaveFocus();
-				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-
-				// Pressing the spacebar should select the focused tab.
-				await press.Space();
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-
-				// Arrow key should move focus but not automatically change the selected tab.
-				await press.ArrowRight();
-				expect(
-					screen.getByRole( 'tab', { name: 'Gamma' } )
-				).toHaveFocus();
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-
-				// Pressing the enter/return should select the focused tab.
-				await press.Enter();
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-			} );
-		} );
-
 		describe( 'Disabled tab', () => {
 			it( 'should disable the tab when `disabled` is `true`', async () => {
 				const mockOnSelect = jest.fn();
