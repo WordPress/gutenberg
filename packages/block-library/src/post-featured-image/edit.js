@@ -82,14 +82,15 @@ export default function PostFeaturedImageEdit( {
 		'content',
 		postId
 	);
-	const blocks = parse( postContent );
-	const imageBlock = blocks.find( ( block ) => block.name === 'core/image' );
-	if (
-		! featuredImage &&
-		useFirstImageFromPost &&
-		imageBlock?.attributes?.id
-	) {
-		featuredImage = imageBlock.attributes.id;
+
+	if ( ! featuredImage && useFirstImageFromPost && postContent ) {
+		const blocks = parse( postContent );
+		const imageBlock = blocks.find(
+			( block ) => block.name === 'core/image'
+		);
+		if ( imageBlock?.attributes?.id ) {
+			featuredImage = imageBlock.attributes.id;
+		}
 	}
 
 	const { media, postType, postPermalink } = useSelect(
