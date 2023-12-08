@@ -156,6 +156,7 @@ export default function ReusableBlockEdit( {
 		'wp_block',
 		ref
 	);
+
 	const isMissing = hasResolved && ! record;
 	const initialOverrides = useRef( overrides );
 	const defaultValuesRef = useRef( {} );
@@ -279,13 +280,15 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarButton href={ editUrl }>
-						{ __( 'Edit' ) }
-					</ToolbarButton>
-				</ToolbarGroup>
-			</BlockControls>
+			{ userCanEdit && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton href={ editUrl }>
+							{ __( 'Edit' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody>
 					<TextControl
