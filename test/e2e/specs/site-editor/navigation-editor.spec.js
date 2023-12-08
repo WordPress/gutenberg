@@ -33,7 +33,7 @@ test.describe( 'Editing Navigation Menus', () => {
 		//
 		await admin.visitSiteEditor();
 
-		// create a Navigation Menu called "Test Menu" usinf the REST API helpers
+		// create a Navigation Menu called "Test Menu" using the REST API helpers
 		const createdMenu = await requestUtils.createNavigationMenu( {
 			title: 'Primary Menu',
 			content:
