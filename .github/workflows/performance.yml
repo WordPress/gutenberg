@@ -91,6 +91,10 @@ jobs:
                   name: performance-results
                   path: ${{ env.WP_ARTIFACTS_PATH }}/*.performance-results*.json
 
+            - name: Compare performance results
+              if: github.event_name == 'pull_request'
+              run: node ./bin/compare-performance-results.js
+
             - name: Publish performance results
               if: github.event_name == 'push'
               env:
