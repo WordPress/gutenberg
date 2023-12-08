@@ -61,7 +61,7 @@ Prompt visitors to take action with a group of button-style links. ([Source](htt
 -	**Name:** core/buttons
 -	**Category:** design
 -	**Supports:** align (full, wide), anchor, layout (default, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** 
+-	**Attributes:**
 
 ## Calendar
 
@@ -172,7 +172,7 @@ Contains the block elements used to display a comment, like the title, date, aut
 -	**Category:** design
 -	**Parent:** core/comments
 -	**Supports:** align, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** 
+-	**Attributes:**
 
 ## Comments
 
@@ -211,7 +211,7 @@ Displays a list of page numbers for comments pagination. ([Source](https://githu
 -	**Category:** theme
 -	**Parent:** core/comments-pagination
 -	**Supports:** color (background, gradients, ~~text~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** 
+-	**Attributes:**
 
 ## Comments Previous Page
 
@@ -238,7 +238,7 @@ Add an image or video with a text overlay. ([Source](https://github.com/WordPres
 
 -	**Name:** core/cover
 -	**Category:** media
--	**Supports:** align, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), layout (~~allowJustification~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio), layout (~~allowJustification~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, tagName, templateLock, url, useFeaturedImage
 
 ## Details
@@ -275,7 +275,7 @@ Display footnotes added to the page. ([Source](https://github.com/WordPress/gute
 -	**Name:** core/footnotes
 -	**Category:** text
 -	**Supports:** color (background, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~, ~~multiple~~, ~~reusable~~
--	**Attributes:** 
+-	**Attributes:**
 
 ## Form
 
@@ -304,7 +304,7 @@ Provide a notification message after the form has been submitted. ([Source](http
 -	**Name:** core/form-submission-notification
 -	**Experimental:** true
 -	**Category:** common
--	**Supports:** 
+-	**Supports:**
 -	**Attributes:** type
 
 ## Form Submit Button
@@ -314,8 +314,8 @@ A submission button for forms. ([Source](https://github.com/WordPress/gutenberg/
 -	**Name:** core/form-submit-button
 -	**Experimental:** true
 -	**Category:** common
--	**Supports:** 
--	**Attributes:** 
+-	**Supports:**
+-	**Attributes:**
 
 ## Classic
 
@@ -341,7 +341,7 @@ Gather blocks in a layout container. ([Source](https://github.com/WordPress/gute
 
 -	**Name:** core/group
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, button, gradients, heading, link, text), dimensions (minHeight), layout (allowSizingOnChildren), position (sticky), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, button, gradients, heading, link, text), dimensions (aspectRatio, minHeight), layout (allowSizingOnChildren), position (sticky), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** allowedBlocks, tagName, templateLock
 
 ## Heading
@@ -491,7 +491,7 @@ Separate your content into a multi-page experience. ([Source](https://github.com
 -	**Category:** design
 -	**Parent:** core/post-content
 -	**Supports:** ~~className~~, ~~customClassName~~, ~~html~~
--	**Attributes:** 
+-	**Attributes:**
 
 ## Page List
 
@@ -603,7 +603,7 @@ Displays the contents of a post or page. ([Source](https://github.com/WordPress/
 -	**Name:** core/post-content
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), dimensions (minHeight), layout, spacing (blockGap), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** 
+-	**Attributes:**
 
 ## Date
 
@@ -649,7 +649,7 @@ Contains the block elements used to render a post, like the title, date, feature
 -	**Category:** theme
 -	**Parent:** core/query
 -	**Supports:** align (full, wide), color (background, gradients, link, text), layout, spacing (blockGap), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** 
+-	**Attributes:**
 
 ## Post Terms
 
@@ -714,7 +714,7 @@ Contains the block elements used to render content when no query results are fou
 -	**Category:** theme
 -	**Parent:** core/query
 -	**Supports:** align, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** 
+-	**Attributes:**
 
 ## Pagination
 

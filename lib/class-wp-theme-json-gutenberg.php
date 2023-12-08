@@ -381,7 +381,8 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'custom'                        => null,
 		'dimensions'                    => array(
-			'minHeight' => null,
+			'aspectRatio' => null,
+			'minHeight'   => null,
 		),
 		'layout'                        => array(
 			'contentSize'                   => null,
@@ -486,7 +487,8 @@ class WP_Theme_JSON_Gutenberg {
 			'text'       => null,
 		),
 		'dimensions' => array(
-			'minHeight' => null,
+			'aspectRatio' => null,
+			'minHeight'   => null,
 		),
 		'filter'     => array(
 			'duotone' => null,
@@ -661,6 +663,7 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'color', 'heading' ),
 		array( 'color', 'button' ),
 		array( 'color', 'caption' ),
+		array( 'dimensions', 'aspectRatio' ),
 		array( 'dimensions', 'minHeight' ),
 		// BEGIN EXPERIMENTAL.
 		// Allow `position.fixed` to be opted-in by default.

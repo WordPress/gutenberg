@@ -98,6 +98,7 @@ export default function AspectRatioTool( {
 	onChange = () => {},
 	options = DEFAULT_ASPECT_RATIO_OPTIONS,
 	defaultValue = DEFAULT_ASPECT_RATIO_OPTIONS[ 0 ].value,
+	hasValue,
 	isShownByDefault = true,
 } ) {
 	// Match the CSS default so if the value is used directly in CSS it will look correct in the control.
@@ -105,7 +106,9 @@ export default function AspectRatioTool( {
 
 	return (
 		<ToolsPanelItem
-			hasValue={ () => displayValue !== defaultValue }
+			hasValue={
+				hasValue ? hasValue : () => displayValue !== defaultValue
+			}
 			label={ __( 'Aspect ratio' ) }
 			onDeselect={ () => onChange( undefined ) }
 			isShownByDefault={ isShownByDefault }
