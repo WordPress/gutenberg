@@ -58,6 +58,14 @@ function getPartiallySyncedAttributes( block ) {
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
+function setBlockEditMode( setEditMode, block ) {
+	const editMode = isPartiallySynced( block ) ? 'contentOnly' : 'disabled';
+	setEditMode( block.clientId, editMode );
+	block.innerBlocks.forEach( ( innerBlock ) =>
+		setBlockEditMode( setEditMode, innerBlock )
+	);
+}
+
 const useInferredLayout = ( blocks, parentLayout ) => {
 	const initialInferredAlignmentRef = useRef();
 
