@@ -160,6 +160,7 @@ export function Draggable( {
 
 			const clone = element.cloneNode( true ) as HTMLElement;
 			clone.id = `clone-${ elementId }`;
+			clone.classList.add( 'components-draggable-cloned-element' );
 
 			// Position clone right over the original element (20px padding).
 			x = elementLeftOffset - clonePadding;

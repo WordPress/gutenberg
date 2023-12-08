@@ -163,7 +163,13 @@
 
 	&.is-dragging {
 		opacity: 0;
-		left: -9999px;
+		// The row's left position is set to 0 to ensure that the animation
+		// when dropping a block animates from the correct position.
+		left: 0;
+		// Ensure the dragged element does not otherwise affect dropping to
+		// other positions.
+		pointer-events: none;
+		z-index: -9999;
 	}
 
 	// List View renders a fixed number of items and relies on each item having a fixed height of 36px.
