@@ -65,7 +65,8 @@ const SettingsSidebar = () => {
 				sidebarName: sidebar,
 				keyboardShortcut: shortcut,
 				isTemplateMode:
-					select( editorStore ).getRenderingMode() !== 'post-only',
+					select( editorStore ).getRenderingMode() ===
+					'template-only',
 			};
 		},
 		[]

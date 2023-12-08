@@ -1,11 +1,13 @@
 /**
  * WordPress dependencies
  */
+import { useViewportMatch } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo, createPortal } from '@wordpress/element';
 import {
 	BlockList,
+	BlockToolbar,
 	BlockTools,
 	BlockInspector,
 	privateApis as blockEditorPrivateApis,
@@ -37,6 +39,7 @@ export default function SidebarBlockEditor( {
 	inspector,
 } ) {
 	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
+	const isMediumViewport = useViewportMatch( 'small' );
 	const {
 		hasUploadPermissions,
 		isFixedToolbarActive,
@@ -77,7 +80,7 @@ export default function SidebarBlockEditor( {
 			...blockEditorSettings,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			mediaUpload: mediaUploadBlockEditor,
-			hasFixedToolbar: isFixedToolbarActive,
+			hasFixedToolbar: isFixedToolbarActive || ! isMediumViewport,
 			keepCaretInsideBlock,
 			__unstableHasCustomAppender: true,
 		};
@@ -85,6 +88,7 @@ export default function SidebarBlockEditor( {
 		hasUploadPermissions,
 		blockEditorSettings,
 		isFixedToolbarActive,
+		isMediumViewport,
 		keepCaretInsideBlock,
 		setIsInserterOpened,
 	] );
@@ -109,9 +113,13 @@ export default function SidebarBlockEditor( {
 					inserter={ inserter }
 					isInserterOpened={ isInserterOpened }
 					setIsInserterOpened={ setIsInserterOpened }
-					isFixedToolbarActive={ isFixedToolbarActive }
+					isFixedToolbarActive={
+						isFixedToolbarActive || ! isMediumViewport
+					}
 				/>
-
+				{ ( isFixedToolbarActive || ! isMediumViewport ) && (
+					<BlockToolbar hideDragHandle />
+				) }
 				<BlockTools>
 					<BlockCanvas
 						shouldIframe={ false }

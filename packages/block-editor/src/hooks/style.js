@@ -32,8 +32,11 @@ import {
 	SPACING_SUPPORT_KEY,
 	DimensionsPanel,
 } from './dimensions';
-import useDisplayBlockControls from '../components/use-display-block-controls';
-import { shouldSkipSerialization, useStyleOverride } from './utils';
+import {
+	shouldSkipSerialization,
+	useStyleOverride,
+	useBlockSettings,
+} from './utils';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
@@ -345,63 +348,38 @@ export function addEditProps( settings ) {
 	return settings;
 }
 
-/**
- * Override the default edit UI to include new inspector controls for
- * all the custom styles configs.
- *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withBlockStyleControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		if ( ! hasStyleSupport( props.name ) ) {
-			return <BlockEdit key="edit" { ...props } />;
-		}
+function BlockStyleControls( {
+	clientId,
+	name,
+	setAttributes,
+	__unstableParentLayout,
+} ) {
+	const settings = useBlockSettings( name, __unstableParentLayout );
+	const blockEditingMode = useBlockEditingMode();
+	const passedProps = {
+		clientId,
+		name,
+		setAttributes,
+		settings,
+	};
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
+	return (
+		<>
+			<ColorEdit { ...passedProps } />
+			<BackgroundImagePanel { ...passedProps } />
+			<TypographyPanel { ...passedProps } />
+			<BorderPanel { ...passedProps } />
+			<DimensionsPanel { ...passedProps } />
+		</>
+	);
+}
 
-		const shouldDisplayControls = useDisplayBlockControls();
-		const blockEditingMode = useBlockEditingMode();
-		const { clientId, name, setAttributes, __unstableParentLayout } = props;
-
-		return (
-			<>
-				{ shouldDisplayControls && blockEditingMode === 'default' && (
-					<>
-						<ColorEdit
-							clientId={ clientId }
-							name={ name }
-							setAttributes={ setAttributes }
-						/>
-						<BackgroundImagePanel
-							clientId={ clientId }
-							name={ name }
-							setAttributes={ setAttributes }
-						/>
-						<TypographyPanel
-							clientId={ clientId }
-							name={ name }
-							setAttributes={ setAttributes }
-							__unstableParentLayout={ __unstableParentLayout }
-						/>
-						<BorderPanel
-							clientId={ clientId }
-							name={ name }
-							setAttributes={ setAttributes }
-						/>
-						<DimensionsPanel
-							clientId={ clientId }
-							name={ name }
-							setAttributes={ setAttributes }
-							__unstableParentLayout={ __unstableParentLayout }
-						/>
-					</>
-				) }
-				<BlockEdit key="edit" { ...props } />
-			</>
-		);
-	},
-	'withBlockStyleControls'
-);
+export default {
+	edit: BlockStyleControls,
+	hasSupport: hasStyleSupport,
+};
 
 // Defines which element types are supported, including their hover styles or
 // any other elements that have been included under a single element type
@@ -541,12 +519,6 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/style/addEditProps',
 	addEditProps
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'core/style/with-block-controls',
-	withBlockStyleControls
 );
 
 addFilter(

@@ -176,11 +176,11 @@ export default function DataviewsTemplates() {
 			{
 				header: __( 'Preview' ),
 				id: 'preview',
-				render: ( { item, view: { type: viewType } } ) => {
+				render: ( { item } ) => {
 					return (
 						<TemplatePreview
 							content={ item.content.raw }
-							viewType={ viewType }
+							viewType={ view.type }
 						/>
 					);
 				},
@@ -229,7 +229,7 @@ export default function DataviewsTemplates() {
 				elements: authors,
 			},
 		],
-		[ authors ]
+		[ authors, view ]
 	);
 
 	const { shownTemplates, paginationInfo } = useMemo( () => {
@@ -353,6 +353,7 @@ export default function DataviewsTemplates() {
 				view={ view }
 				onChangeView={ onChangeView }
 				supportedLayouts={ [ LAYOUT_TABLE, LAYOUT_GRID ] }
+				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
 			/>
 		</Page>
 	);

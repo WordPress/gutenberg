@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -13,23 +14,28 @@ export default function useDisplayBlockControls() {
 	const { isSelected, clientId, name } = useBlockEditContext();
 	return useSelect(
 		( select ) => {
-			if ( isSelected ) {
-				return true;
-			}
-
 			const {
 				getBlockName,
 				isFirstMultiSelectedBlock,
 				getMultiSelectedBlockClientIds,
+				hasSelectedInnerBlock,
 			} = select( blockEditorStore );
+			const { hasBlockSupport } = select( blocksStore );
 
-			if ( isFirstMultiSelectedBlock( clientId ) ) {
-				return getMultiSelectedBlockClientIds().every(
-					( id ) => getBlockName( id ) === name
-				);
-			}
-
-			return false;
+			return {
+				isDisplayed:
+					isSelected ||
+					( isFirstMultiSelectedBlock( clientId ) &&
+						getMultiSelectedBlockClientIds().every(
+							( id ) => getBlockName( id ) === name
+						) ),
+				isParentDisplayed:
+					hasBlockSupport(
+						getBlockName( clientId ),
+						'__experimentalExposeControlsToChildren',
+						false
+					) && hasSelectedInnerBlock( clientId ),
+			};
 		},
 		[ clientId, isSelected, name ]
 	);

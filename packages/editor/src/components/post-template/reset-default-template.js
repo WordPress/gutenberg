@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { MenuGroup, MenuItem } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -25,21 +25,19 @@ export default function ResetDefaultTemplate( { onClick } ) {
 		return null;
 	}
 	return (
-		<MenuGroup>
-			<MenuItem
-				onClick={ async () => {
-					editEntityRecord(
-						'postType',
-						postType,
-						postId,
-						{ template: '' },
-						{ undoIgnore: true }
-					);
-					onClick();
-				} }
-			>
-				{ __( 'Use default template' ) }
-			</MenuItem>
-		</MenuGroup>
+		<MenuItem
+			onClick={ () => {
+				editEntityRecord(
+					'postType',
+					postType,
+					postId,
+					{ template: '' },
+					{ undoIgnore: true }
+				);
+				onClick();
+			} }
+		>
+			{ __( 'Use default template' ) }
+		</MenuItem>
 	);
 }

@@ -133,12 +133,11 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 	return css;
 }
 
-function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
+function LayoutPanelPure( { layout, setAttributes, name: blockName } ) {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
 	const { layout: layoutSettings } = settings;
 	// Layout comes from block attributes.
-	const { layout } = attributes;
 	const [ defaultThemeLayout ] = useSettings( 'layout' );
 	const { themeSupportsLayout } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -287,6 +286,15 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	);
 }
 
+export default {
+	shareWithChildBlocks: true,
+	edit: LayoutPanelPure,
+	attributeKeys: [ 'layout' ],
+	hasSupport( name ) {
+		return hasLayoutBlockSupport( name );
+	},
+};
+
 function LayoutTypeSwitcher( { type, onChange } ) {
 	return (
 		<ButtonGroup>
@@ -327,25 +335,6 @@ export function addAttribute( settings ) {
 
 	return settings;
 }
-
-/**
- * Override the default edit UI to include layout controls
- *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withLayoutControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const supportLayout = hasLayoutBlockSupport( props.name );
-
-		return [
-			supportLayout && <LayoutPanel key="layout" { ...props } />,
-			<BlockEdit key="edit" { ...props } />,
-		];
-	},
-	'withLayoutControls'
-);
 
 function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
 	const { name, attributes } = props;
@@ -499,9 +488,4 @@ addFilter(
 	'editor.BlockListBlock',
 	'core/editor/layout/with-child-layout-styles',
 	withChildLayoutStyles
-);
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/layout/with-inspector-controls',
-	withLayoutControls
 );

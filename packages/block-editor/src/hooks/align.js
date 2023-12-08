@@ -108,9 +108,9 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function BlockEditAlignmentToolbarControls( {
-	blockName,
-	attributes,
+function BlockEditAlignmentToolbarControlsPure( {
+	name: blockName,
+	align,
 	setAttributes,
 } ) {
 	// Compute the block valid alignments by taking into account,
@@ -144,7 +144,7 @@ function BlockEditAlignmentToolbarControls( {
 	return (
 		<BlockControls group="block" __experimentalShareWithChildBlocks>
 			<BlockAlignmentControl
-				value={ attributes.align }
+				value={ align }
 				onChange={ updateAlignment }
 				controls={ validAlignments }
 			/>
@@ -152,37 +152,14 @@ function BlockEditAlignmentToolbarControls( {
 	);
 }
 
-/**
- * Override the default edit UI to include new toolbar controls for block
- * alignment, if block defines support.
- *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withAlignmentControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const hasAlignmentSupport = hasBlockSupport(
-			props.name,
-			'align',
-			false
-		);
-
-		return (
-			<>
-				{ hasAlignmentSupport && (
-					<BlockEditAlignmentToolbarControls
-						blockName={ props.name }
-						attributes={ props.attributes }
-						setAttributes={ props.setAttributes }
-					/>
-				) }
-				<BlockEdit key="edit" { ...props } />
-			</>
-		);
+export default {
+	shareWithChildBlocks: true,
+	edit: BlockEditAlignmentToolbarControlsPure,
+	attributeKeys: [ 'align' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'align', false );
 	},
-	'withAlignmentControls'
-);
+};
 
 function BlockListBlockWithDataAlign( { block: BlockListBlock, props } ) {
 	const { name, attributes } = props;
@@ -264,11 +241,6 @@ addFilter(
 	'editor.BlockListBlock',
 	'core/editor/align/with-data-align',
 	withDataAlign
-);
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/align/with-toolbar-controls',
-	withAlignmentControls
 );
 addFilter(
 	'blocks.getSaveContent.extraProps',

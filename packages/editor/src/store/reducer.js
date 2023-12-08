@@ -83,8 +83,8 @@ export function shouldOverwriteState( action, previousAction ) {
 
 export function postId( state = null, action ) {
 	switch ( action.type ) {
-		case 'SETUP_EDITOR_STATE':
-			return action.post.id;
+		case 'SET_EDITED_POST':
+			return action.postId;
 	}
 
 	return state;
@@ -101,8 +101,8 @@ export function templateId( state = null, action ) {
 
 export function postType( state = null, action ) {
 	switch ( action.type ) {
-		case 'SETUP_EDITOR_STATE':
-			return action.post.type;
+		case 'SET_EDITED_POST':
+			return action.postType;
 	}
 
 	return state;
@@ -247,28 +247,6 @@ export function postAutosavingLock( state = {}, action ) {
 }
 
 /**
- * Reducer returning whether the editor is ready to be rendered.
- * The editor is considered ready to be rendered once
- * the post object is loaded properly and the initial blocks parsed.
- *
- * @param {boolean} state
- * @param {Object}  action
- *
- * @return {boolean} Updated state.
- */
-export function isReady( state = false, action ) {
-	switch ( action.type ) {
-		case 'SETUP_EDITOR_STATE':
-			return true;
-
-		case 'TEAR_DOWN_EDITOR':
-			return false;
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning the post editor setting.
  *
  * @param {Object} state  Current state.
@@ -297,6 +275,23 @@ export function renderingMode( state = 'all', action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the editing canvas device type.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function deviceType( state = 'Desktop', action ) {
+	switch ( action.type ) {
+		case 'SET_DEVICE_TYPE':
+			return action.deviceType;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -306,8 +301,8 @@ export default combineReducers( {
 	postLock,
 	template,
 	postSavingLock,
-	isReady,
 	editorSettings,
 	postAutosavingLock,
 	renderingMode,
+	deviceType,
 } );

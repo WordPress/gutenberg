@@ -9,8 +9,8 @@ import classnames from 'classnames';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import {
+	BlockToolbar,
 	__experimentalPreviewOptions as PreviewOptions,
-	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -27,7 +27,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { DocumentBar } from '@wordpress/editor';
+import { DocumentBar, store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -43,8 +43,6 @@ import {
 import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
-const { BlockContextualToolbar } = unlock( blockEditorPrivateApis );
-
 export default function HeaderEditMode( { setListViewToggleElement } ) {
 	const {
 		deviceType,
@@ -58,22 +56,18 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		hasFixedToolbar,
 		isZoomOutMode,
 	} = useSelect( ( select ) => {
-		const { __experimentalGetPreviewDeviceType, getEditedPostType } =
-			select( editSiteStore );
+		const { getEditedPostType } = select( editSiteStore );
 		const { getBlockSelectionStart, __unstableGetEditorMode } =
 			select( blockEditorStore );
-
-		const postType = getEditedPostType();
-
 		const {
 			getUnstableBase, // Site index.
 		} = select( coreStore );
-
 		const { get: getPreference } = select( preferencesStore );
+		const { getDeviceType } = select( editorStore );
 
 		return {
-			deviceType: __experimentalGetPreviewDeviceType(),
-			templateType: postType,
+			deviceType: getDeviceType(),
+			templateType: getEditedPostType(),
 			blockEditorMode: __unstableGetEditorMode(),
 			blockSelectionStart: getBlockSelectionStart(),
 			homeUrl: getUnstableBase()?.home,
@@ -99,9 +93,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isTopToolbar = ! isZoomOutMode && hasFixedToolbar && isLargeViewport;
 	const blockToolbarRef = useRef();
-
-	const { __experimentalSetPreviewDeviceType: setPreviewDeviceType } =
-		useDispatch( editSiteStore );
+	const { setDeviceType } = useDispatch( editorStore );
 	const disableMotion = useReducedMotion();
 
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
@@ -163,7 +155,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 									}
 								) }
 							>
-								<BlockContextualToolbar isFixed />
+								<BlockToolbar hideDragHandle />
 							</div>
 							<Popover.Slot
 								ref={ blockToolbarRef }
@@ -225,7 +217,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 						>
 							<PreviewOptions
 								deviceType={ deviceType }
-								setDeviceType={ setPreviewDeviceType }
+								setDeviceType={ setDeviceType }
 								label={ __( 'View' ) }
 								isEnabled={
 									! isFocusMode && hasDefaultEditorCanvasView

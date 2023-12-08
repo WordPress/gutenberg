@@ -9,7 +9,6 @@ import {
 	BlockEditorProvider,
 	BlockContextProvider,
 	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
@@ -23,41 +22,12 @@ import { store as editorStore } from '../../store';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
+import NavigationBlockEditingMode from './navigation-block-editing-mode';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 const noop = () => {};
-
-/**
- * For the Navigation block editor, we need to force the block editor to contentOnly for that block.
- *
- * Set block editing mode to contentOnly when entering Navigation focus mode.
- * this ensures that non-content controls on the block will be hidden and thus
- * the user can focus on editing the Navigation Menu content only.
- *
- * @param {string} navigationBlockClientId ClientId.
- */
-function useForceFocusModeForNavigation( navigationBlockClientId ) {
-	const { setBlockEditingMode, unsetBlockEditingMode } =
-		useDispatch( blockEditorStore );
-
-	useEffect( () => {
-		if ( ! navigationBlockClientId ) {
-			return;
-		}
-
-		setBlockEditingMode( navigationBlockClientId, 'contentOnly' );
-
-		return () => {
-			unsetBlockEditingMode( navigationBlockClientId );
-		};
-	}, [
-		navigationBlockClientId,
-		unsetBlockEditingMode,
-		setBlockEditingMode,
-	] );
-}
 
 /**
  * Depending on the post, template and template mode,
@@ -114,9 +84,6 @@ function useBlockEditorProps( post, template, mode ) {
 	const disableRootLevelChanges =
 		( !! template && mode === 'template-locked' ) ||
 		post.type === 'wp_navigation';
-	const navigationBlockClientId =
-		post.type === 'wp_navigation' && blocks && blocks[ 0 ]?.clientId;
-	useForceFocusModeForNavigation( navigationBlockClientId );
 	if ( disableRootLevelChanges ) {
 		return [ blocks, noop, noop ];
 	}
@@ -197,13 +164,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			updatePostLock,
 			setupEditor,
 			updateEditorSettings,
-			__experimentalTearDownEditor,
 			setCurrentTemplateId,
+			setEditedPost,
 			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
 		const { createWarningNotice } = useDispatch( noticesStore );
 
-		// Initialize and tear down the editor.
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
 			// Assume that we don't need to initialize in the case of an error recovery.
@@ -229,17 +195,19 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					}
 				);
 			}
-
-			return () => {
-				__experimentalTearDownEditor();
-			};
 		}, [] );
+
+		// Synchronizes the active post with the state
+		useEffect( () => {
+			setEditedPost( post.type, post.id );
+		}, [ post.type, post.id ] );
 
 		// Synchronize the editor settings as they change.
 		useEffect( () => {
 			updateEditorSettings( settings );
 		}, [ settings, updateEditorSettings ] );
 
+		// Synchronizes the active template with the state.
 		useEffect( () => {
 			setCurrentTemplateId( template?.id );
 		}, [ template?.id, setCurrentTemplateId ] );
@@ -273,6 +241,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							<PatternsMenuItems />
 							{ mode === 'template-locked' && (
 								<DisableNonPageContentBlocks />
+							) }
+							{ type === 'wp_navigation' && (
+								<NavigationBlockEditingMode />
 							) }
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>

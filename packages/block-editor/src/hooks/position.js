@@ -207,14 +207,12 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
  *
  * @return {Element} Position panel.
  */
-export function PositionPanel( props ) {
-	const {
-		attributes: { style = {} },
-		clientId,
-		name: blockName,
-		setAttributes,
-	} = props;
-
+export function PositionPanelPure( {
+	style = {},
+	clientId,
+	name: blockName,
+	setAttributes,
+} ) {
 	const allowFixed = hasFixedPositionSupport( blockName );
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
@@ -316,32 +314,19 @@ export function PositionPanel( props ) {
 	} );
 }
 
-/**
- * Override the default edit UI to include position controls.
- *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withPositionControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { name: blockName } = props;
-		const positionSupport = hasBlockSupport(
-			blockName,
-			POSITION_SUPPORT_KEY
-		);
+export default {
+	edit: function Edit( props ) {
 		const isPositionDisabled = useIsPositionDisabled( props );
-		const showPositionControls = positionSupport && ! isPositionDisabled;
-
-		return [
-			showPositionControls && (
-				<PositionPanel key="position" { ...props } />
-			),
-			<BlockEdit key="edit" { ...props } />,
-		];
+		if ( isPositionDisabled ) {
+			return null;
+		}
+		return <PositionPanelPure { ...props } />;
 	},
-	'withPositionControls'
-);
+	attributeKeys: [ 'style' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, POSITION_SUPPORT_KEY );
+	},
+};
 
 /**
  * Override the default block element to add the position styles.
@@ -396,9 +381,4 @@ addFilter(
 	'editor.BlockListBlock',
 	'core/editor/position/with-position-styles',
 	withPositionStyles
-);
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/position/with-inspector-controls',
-	withPositionControls
 );

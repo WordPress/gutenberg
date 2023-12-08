@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
 import { useState } from '@wordpress/element';
 import { serialize, createBlock } from '@wordpress/blocks';
 import {
@@ -18,19 +17,21 @@ import { cleanForSlug } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { store as editPostStore } from '../../../store';
+import { unlock } from '../../lock-unlock';
+import { store as editorStore } from '../../store';
 
 const DEFAULT_TITLE = __( 'Custom Template' );
 
-export default function PostTemplateCreateModal( { onClose } ) {
+export default function CreateNewTemplateModal( { onClose } ) {
 	const defaultBlockTemplate = useSelect(
 		( select ) =>
 			select( editorStore ).getEditorSettings().defaultBlockTemplate,
 		[]
 	);
 
-	const { __unstableCreateTemplate, __unstableSwitchToTemplateMode } =
-		useDispatch( editPostStore );
+	const { createTemplate, setRenderingMode } = unlock(
+		useDispatch( editorStore )
+	);
 
 	const [ title, setTitle ] = useState( '' );
 
@@ -85,7 +86,7 @@ export default function PostTemplateCreateModal( { onClose } ) {
 				),
 			] );
 
-		await __unstableCreateTemplate( {
+		await createTemplate( {
 			slug: cleanForSlug( title || DEFAULT_TITLE ),
 			content: newTemplateContent,
 			title: title || DEFAULT_TITLE,
@@ -93,18 +94,16 @@ export default function PostTemplateCreateModal( { onClose } ) {
 
 		setIsBusy( false );
 		cancel();
-
-		__unstableSwitchToTemplateMode( true );
+		setRenderingMode( 'template-only' );
 	};
 
 	return (
 		<Modal
 			title={ __( 'Create custom template' ) }
 			onRequestClose={ cancel }
-			className="edit-post-post-template__create-modal"
 		>
 			<form
-				className="edit-post-post-template__create-form"
+				className="editor-post-template__create-form"
 				onSubmit={ submit }
 			>
 				<VStack spacing="3">

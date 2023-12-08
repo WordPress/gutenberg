@@ -19,11 +19,7 @@ import { useSelect } from '@wordpress/data';
 import { getColorClassName } from '../components/colors';
 import InspectorControls from '../components/inspector-controls';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
-import {
-	cleanEmptyObject,
-	shouldSkipSerialization,
-	useBlockSettings,
-} from './utils';
+import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 import {
 	useHasBorderPanel,
 	BorderPanel as StylesBorderPanel,
@@ -137,8 +133,7 @@ function BordersInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-function BorderPanelPure( { clientId, name, setAttributes } ) {
-	const settings = useBlockSettings( name );
+function BorderPanelPure( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasBorderPanel( settings );
 	function selector( select ) {
 		const { style, borderColor } =
@@ -175,6 +170,9 @@ function BorderPanelPure( { clientId, name, setAttributes } ) {
 	);
 }
 
+// We don't want block controls to re-render when typing inside a block. `pure`
+// will prevent re-renders unless props change, so only pass the needed props
+// and not the whole attributes object.
 export const BorderPanel = pure( BorderPanelPure );
 
 /**

@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [*] [internal] Move InserterButton from components package to block-editor package [#56494]
+-   [*] [internal] Move ImageLinkDestinationsScreen from components package to block-editor package [#56775]
 
 ## 1.109.2
 -   [**] Fix issue related to text color format and receiving in rare cases an undefined ref from `RichText` component [#56686]

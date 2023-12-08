@@ -7,7 +7,6 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
@@ -457,18 +456,27 @@ export function metaBoxUpdatesFailure() {
 }
 
 /**
- * Returns an action object used to toggle the width of the editing canvas.
+ * Action that changes the width of the editing canvas.
+ *
+ * @deprecated
  *
  * @param {string} deviceType
  *
  * @return {Object} Action object.
  */
-export function __experimentalSetPreviewDeviceType( deviceType ) {
-	return {
-		type: 'SET_PREVIEW_DEVICE_TYPE',
-		deviceType,
+export const __experimentalSetPreviewDeviceType =
+	( deviceType ) =>
+	( { registry } ) => {
+		deprecated(
+			"dispatch( 'core/edit-post' ).__experimentalSetPreviewDeviceType",
+			{
+				since: '6.5',
+				version: '6.7',
+				hint: 'registry.dispatch( editorStore ).setDeviceType',
+			}
+		);
+		registry.dispatch( editorStore ).setDeviceType( deviceType );
 	};
-}
 
 /**
  * Returns an action object used to open/close the inserter.
@@ -525,46 +533,24 @@ export function setIsEditingTemplate() {
 
 /**
  * Switches to the template mode.
- *
- * @param {boolean} newTemplate Is new template.
  */
 export const __unstableSwitchToTemplateMode =
-	( newTemplate = false ) =>
-	( { registry, select } ) => {
+	() =>
+	( { registry } ) => {
 		registry.dispatch( editorStore ).setRenderingMode( 'template-only' );
-		const isWelcomeGuideActive = select.isFeatureActive(
-			'welcomeGuideTemplate'
-		);
-		if ( ! isWelcomeGuideActive ) {
-			const message = newTemplate
-				? __( "Custom template created. You're in template mode now." )
-				: __(
-						'Editing template. Changes made here affect all posts and pages that use the template.'
-				  );
-			registry.dispatch( noticesStore ).createSuccessNotice( message, {
-				type: 'snackbar',
-			} );
-		}
 	};
 
 /**
  * Create a block based template.
  *
- * @param {Object?} template Template to create and assign.
+ * @deprecated
  */
-export const __unstableCreateTemplate =
-	( template ) =>
-	async ( { registry } ) => {
-		const savedTemplate = await registry
-			.dispatch( coreStore )
-			.saveEntityRecord( 'postType', 'wp_template', template );
-		const post = registry.select( editorStore ).getCurrentPost();
-		registry
-			.dispatch( coreStore )
-			.editEntityRecord( 'postType', post.type, post.id, {
-				template: savedTemplate.slug,
-			} );
-	};
+export function __unstableCreateTemplate() {
+	deprecated( "dispatch( 'core/edit-post' ).__unstableCreateTemplate", {
+		since: '6.5',
+	} );
+	return { type: 'NOTHING' };
+}
 
 let metaBoxesInitialized = false;
 

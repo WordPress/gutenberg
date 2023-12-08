@@ -95,8 +95,7 @@ export function getDuotonePresetFromColors( colors, duotonePalette ) {
 	return preset ? `var:preset|duotone|${ preset.slug }` : undefined;
 }
 
-function DuotonePanel( { attributes, setAttributes, name } ) {
-	const style = attributes?.style;
+function DuotonePanelPure( { style, setAttributes, name } ) {
 	const duotoneStyle = style?.color?.duotone;
 	const settings = useBlockSettings( name );
 	const blockEditingMode = useBlockEditingMode();
@@ -176,6 +175,15 @@ function DuotonePanel( { attributes, setAttributes, name } ) {
 	);
 }
 
+export default {
+	shareWithChildBlocks: true,
+	edit: DuotonePanelPure,
+	attributeKeys: [ 'style' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'filter.duotone' );
+	},
+};
+
 /**
  * Filters registered block settings, extending attributes to include
  * the `duotone` attribute.
@@ -203,37 +211,6 @@ function addDuotoneAttributes( settings ) {
 
 	return settings;
 }
-
-/**
- * Override the default edit UI to include toolbar controls for duotone if the
- * block supports duotone.
- *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
- */
-const withDuotoneControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		// Previous `color.__experimentalDuotone` support flag is migrated via
-		// block_type_metadata_settings filter in `lib/block-supports/duotone.php`.
-		const hasDuotoneSupport = hasBlockSupport(
-			props.name,
-			'filter.duotone'
-		);
-
-		// CAUTION: code added before this line will be executed
-		// for all blocks, not just those that support duotone. Code added
-		// above this line should be carefully evaluated for its impact on
-		// performance.
-		return (
-			<>
-				{ hasDuotoneSupport && <DuotonePanel { ...props } /> }
-				<BlockEdit { ...props } />
-			</>
-		);
-	},
-	'withDuotoneControls'
-);
 
 function DuotoneStyles( {
 	clientId,
@@ -422,11 +399,6 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/editor/duotone/add-attributes',
 	addDuotoneAttributes
-);
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/duotone/with-editor-controls',
-	withDuotoneControls
 );
 addFilter(
 	'editor.BlockListBlock',

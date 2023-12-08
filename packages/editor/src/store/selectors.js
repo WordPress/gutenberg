@@ -1185,7 +1185,7 @@ export function getEditorSelection( state ) {
  * @return {boolean} is Ready.
  */
 export function __unstableIsEditorReady( state ) {
-	return state.isReady;
+	return !! state.postId;
 }
 
 /**
@@ -1208,6 +1208,17 @@ export function getEditorSettings( state ) {
  */
 export function getRenderingMode( state ) {
 	return state.renderingMode;
+}
+
+/**
+ * Returns the current editing canvas device type.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Device type.
+ */
+export function getDeviceType( state ) {
+	return state.deviceType;
 }
 
 /*

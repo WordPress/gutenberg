@@ -4,10 +4,13 @@
 import { getBlockSupport } from '@wordpress/blocks';
 import { useMemo, useEffect, useId } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { createHigherOrderComponent, pure } from '@wordpress/compose';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
+import useDisplayBlockControls from '../components/use-display-block-controls';
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
@@ -361,4 +364,69 @@ export function useBlockSettings( name, parentLayout ) {
 	] );
 
 	return useSettingsForBlockElement( rawSettings, name );
+}
+
+export function createBlockEditFilter( features ) {
+	// We don't want block controls to re-render when typing inside a block.
+	// `pure` will prevent re-renders unless props change, so only pass the
+	// needed props and not the whole attributes object.
+	features = features.map( ( settings ) => {
+		return { ...settings, Edit: pure( settings.edit ) };
+	} );
+	const withBlockEditHooks = createHigherOrderComponent(
+		( OriginalBlockEdit ) => ( props ) => {
+			const { isDisplayed, isParentDisplayed } =
+				useDisplayBlockControls();
+			// CAUTION: code added before this line will be executed for all
+			// blocks, not just those that support the feature! Code added
+			// above this line should be carefully evaluated for its impact on
+			// performance.
+			return [
+				...features.map( ( feature, i ) => {
+					const {
+						Edit,
+						hasSupport,
+						attributeKeys = [],
+						shareWithChildBlocks,
+					} = feature;
+					const shouldDisplayControls =
+						isDisplayed ||
+						( isParentDisplayed && shareWithChildBlocks );
+
+					if (
+						! shouldDisplayControls ||
+						! hasSupport( props.name )
+					) {
+						return null;
+					}
+
+					const neededProps = {};
+					for ( const key of attributeKeys ) {
+						if ( props.attributes[ key ] ) {
+							neededProps[ key ] = props.attributes[ key ];
+						}
+					}
+					return (
+						<Edit
+							// We can use the index because the array length
+							// is fixed per page load right now.
+							key={ i }
+							name={ props.name }
+							clientId={ props.clientId }
+							setAttributes={ props.setAttributes }
+							__unstableParentLayout={
+								props.__unstableParentLayout
+							}
+							// This component is pure, so only pass needed
+							// props!!!
+							{ ...neededProps }
+						/>
+					);
+				} ),
+				<OriginalBlockEdit key="edit" { ...props } />,
+			];
+		},
+		'withBlockEditHooks'
+	);
+	addFilter( 'editor.BlockEdit', 'core/editor/hooks', withBlockEditHooks );
 }
