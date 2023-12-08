@@ -9,7 +9,6 @@ import { store as editorStore } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import { store as editPostStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 import { sidebars } from '../settings-sidebar';
 
