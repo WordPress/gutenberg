@@ -7,7 +7,7 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 
 const resultsPath = process.env.WP_ARTIFACTS_PATH;
-const maxRegressionFactor = 1.1; // fail on 10% regression
+const maxRegressionFactor = 1.1; // fail on >10% regression
 const regressedMetrics = [];
 
 fs.readdir( resultsPath, ( err, files ) => {
@@ -16,35 +16,41 @@ fs.readdir( resultsPath, ( err, files ) => {
 		process.exit( 1 );
 	}
 
-	files
-		.filter(
-			( file ) =>
-				file.endsWith( '.performance-results.json' ) &&
-				! file.includes( '_round-' )
-		)
-		.forEach( ( file ) => {
-			const data = JSON.parse(
-				fs.readFileSync( path.join( resultsPath, file ), 'utf8' )
-			);
+	// Only get the curated results.
+	files.filter(
+		( file ) =>
+			file.endsWith( '.performance-results.json' ) &&
+			! file.includes( '_round-' )
+	);
 
-			const trunkMetrics = data.trunk;
-			const branchMetrics =
-				data[ Object.keys( data ).find( ( key ) => key !== 'trunk' ) ];
+	if ( files.length === 0 ) {
+		console.error( 'No performance results found.' );
+		process.exit( 1 );
+	}
 
-			Object.keys( trunkMetrics ).forEach( ( metric ) => {
-				const trunkValue = trunkMetrics[ metric ];
-				const branchValue = branchMetrics[ metric ];
+	files.forEach( ( file ) => {
+		const data = JSON.parse(
+			fs.readFileSync( path.join( resultsPath, file ), 'utf8' )
+		);
 
-				if ( branchValue > trunkValue * maxRegressionFactor ) {
-					regressedMetrics.push( {
-						file,
-						metric,
-						branchValue,
-						trunkValue,
-					} );
-				}
-			} );
+		const trunkMetrics = data.trunk;
+		const branchMetrics =
+			data[ Object.keys( data ).find( ( key ) => key !== 'trunk' ) ];
+
+		Object.keys( trunkMetrics ).forEach( ( metric ) => {
+			const trunkValue = trunkMetrics[ metric ];
+			const branchValue = branchMetrics[ metric ];
+
+			if ( branchValue > trunkValue * maxRegressionFactor ) {
+				regressedMetrics.push( {
+					file,
+					metric,
+					branchValue,
+					trunkValue,
+				} );
+			}
 		} );
+	} );
 
 	if ( regressedMetrics.length > 0 ) {
 		console.log( 'Performance regression detected:' );
