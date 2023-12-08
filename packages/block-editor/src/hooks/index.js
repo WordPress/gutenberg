@@ -13,7 +13,7 @@ import style from './style';
 import './settings';
 import color from './color';
 import duotone from './duotone';
-import './font-family';
+import fontFamily from './font-family';
 import fontSize from './font-size';
 import border from './border';
 import position from './position';
@@ -43,6 +43,7 @@ createBlockListBlockFilter( [
 	align,
 	color,
 	duotone,
+	fontFamily,
 	fontSize,
 	border,
 	position,
