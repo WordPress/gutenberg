@@ -35,7 +35,7 @@ test.describe( 'Site editor block removal prompt', () => {
 		// Expect the block removal prompt to have appeared
 		await expect(
 			page.getByText(
-				'Post or page content will not be displayed if you delete this block.'
+				'Post or page content will not be displayed if you delete these blocks.'
 			)
 		).toBeVisible();
 	} );
