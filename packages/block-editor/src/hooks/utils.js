@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { useMemo, useEffect, useId } from '@wordpress/element';
+import { useMemo, useEffect, useId, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { createHigherOrderComponent, pure } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
@@ -435,75 +435,103 @@ export function createBlockEditFilter( features ) {
 	addFilter( 'editor.BlockEdit', 'core/editor/hooks', withBlockEditHooks );
 }
 
-function BlockListBlockWrapper( {
-	Component,
-	useBlockProps,
-	attributeKeys,
-	...props
-} ) {
-	const neededProps = { name: props.name };
-	for ( const key of attributeKeys ) {
-		if ( props.attributes[ key ] ) {
-			neededProps[ key ] = props.attributes[ key ];
-		}
-	}
-	const wrapperProps = useBlockProps( neededProps );
-	return (
-		<Component
-			{ ...props }
-			wrapperProps={ {
-				...props.wrapperProps,
-				...wrapperProps,
-				className: classnames(
-					props.wrapperProps?.className,
-					wrapperProps.className
-				),
-				style: {
-					...props.wrapperProps?.style,
-					...wrapperProps.style,
-				},
-			} }
-		/>
-	);
+function BlockProps( { index, useBlockProps, setAllWrapperProps, ...props } ) {
+	const wrapperProps = useBlockProps( props );
+	const setWrapperProps = ( next ) =>
+		setAllWrapperProps( ( prev ) => {
+			const nextAll = [ ...prev ];
+			nextAll[ index ] = next;
+			return nextAll;
+		} );
+	// Setting state after every render is fine because this component is
+	// pure and will only re-render when needed props change.
+	useEffect( () => {
+		// We could shallow compare the props, but since this component only
+		// changes when needed attributes change, the benefit is probably small.
+		setWrapperProps( wrapperProps );
+		return () => {
+			setWrapperProps( undefined );
+		};
+	} );
+	return null;
 }
 
+const BlockPropsPure = pure( BlockProps );
+
 export function createBlockListBlockFilter( features ) {
-	const HoCs = features.map(
-		( { hasSupport, useBlockProps, attributeKeys } ) => {
-			return createHigherOrderComponent(
-				( BlockListBlock ) => ( props ) => {
-					const neededAttributeValues = [];
+	const withBlockListBlockHooks = createHigherOrderComponent(
+		( BlockListBlock ) => ( props ) => {
+			const [ allWrapperProps, setAllWrapperProps ] = useState(
+				Array( features.length ).fill( undefined )
+			);
+			return [
+				...features.map( ( feature, i ) => {
+					const {
+						hasSupport,
+						attributeKeys = [],
+						useBlockProps,
+					} = feature;
+
+					const neededProps = {};
 					for ( const key of attributeKeys ) {
 						if ( props.attributes[ key ] ) {
-							neededAttributeValues.push(
-								props.attributes[ key ]
-							);
+							neededProps[ key ] = props.attributes[ key ];
 						}
 					}
+
 					if (
 						! hasSupport( props.name ) ||
 						// Skip rendering if none of the needed attributes are
 						// set.
-						! neededAttributeValues.length
+						! Object.keys( neededProps ).length
 					) {
-						return <BlockListBlock { ...props } />;
+						return null;
 					}
+
 					return (
-						<BlockListBlockWrapper
-							Component={ BlockListBlock }
+						<BlockPropsPure
+							// We can use the index because the array length
+							// is fixed per page load right now.
+							key={ i }
+							index={ i }
 							useBlockProps={ useBlockProps }
-							attributeKeys={ attributeKeys }
-							{ ...props }
+							// This component is pure, so we must pass a stable
+							// function reference.
+							setAllWrapperProps={ setAllWrapperProps }
+							name={ props.name }
+							// This component is pure, so only pass needed
+							// props!!!
+							{ ...neededProps }
 						/>
 					);
-				}
-			);
-		}
+				} ),
+				<BlockListBlock
+					key="edit"
+					{ ...props }
+					wrapperProps={ allWrapperProps
+						.filter( Boolean )
+						.reduce( ( acc, wrapperProps ) => {
+							return {
+								...acc,
+								...wrapperProps,
+								className: classnames(
+									acc.className,
+									wrapperProps.className
+								),
+								style: {
+									...acc.style,
+									...wrapperProps.style,
+								},
+							};
+						}, props.wrapperProps || {} ) }
+				/>,
+			];
+		},
+		'withBlockListBlockHooks'
 	);
 	addFilter(
 		'editor.BlockListBlock',
 		'core/editor/hooks',
-		( BlockListBlock ) =>
-			HoCs.reduce( ( acc, HoC ) => HoC( acc ), BlockListBlock )
+		withBlockListBlockHooks
 	);
 }
