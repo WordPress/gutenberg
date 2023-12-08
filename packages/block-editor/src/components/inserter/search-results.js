@@ -53,14 +53,17 @@ function InserterSearchResults( {
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
-	const { prioritizedBlocks } = useSelect(
+	const { prioritizedBlocks, isZoomOutMode } = useSelect(
 		( select ) => {
 			const blockListSettings =
 				select( blockEditorStore ).getBlockListSettings( rootClientId );
+			const editorMode =
+				select( blockEditorStore ).__unstableGetEditorMode();
 
 			return {
 				prioritizedBlocks:
 					blockListSettings?.prioritizedInserterBlocks || EMPTY_ARRAY,
+				isZoomOutMode: editorMode === 'zoom-out',
 			};
 		},
 		[ rootClientId ]
@@ -198,6 +201,15 @@ function InserterSearchResults( {
 			</div>
 		</InserterPanel>
 	);
+
+	if ( isZoomOutMode ) {
+		return (
+			<InserterListbox>
+				{ ! hasItems && <InserterNoResults /> }
+				{ patternsUI }
+			</InserterListbox>
+		);
+	}
 
 	return (
 		<InserterListbox>
