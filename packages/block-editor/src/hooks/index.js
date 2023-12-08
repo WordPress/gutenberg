@@ -41,6 +41,7 @@ createBlockEditFilter(
 );
 createBlockListBlockFilter( [
 	align,
+	style,
 	color,
 	duotone,
 	fontFamily,
