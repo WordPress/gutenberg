@@ -191,7 +191,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 							getBlockName( movingClientId ),
 							getBlockRootClientId( clientId )
 						),
-					[ attributes.className ]: hasLightBlockWrapper,
+					[ attributes.className ]:
+						attributes.className && hasLightBlockWrapper,
 					[ getBlockDefaultClassName( blockName ) ]:
 						hasLightBlockWrapper,
 				} ),
