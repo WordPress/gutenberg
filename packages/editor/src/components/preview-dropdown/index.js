@@ -46,6 +46,7 @@ export default function PreviewDropdown( {
 		placement: 'bottom-end',
 	};
 	const toggleProps = {
+		className: 'editor-preview-dropdown__toggle',
 		size: 'compact',
 		showTooltip: ! showIconLabels,
 	};
