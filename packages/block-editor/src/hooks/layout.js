@@ -350,6 +350,7 @@ function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
 			: layout || defaultBlockLayout || {};
 	const layoutClasses = useLayoutClasses( attributes, name );
 
+	const { kebabCase } = unlock( componentsPrivateApis );
 	const selectorPrefix = `wp-container-${ kebabCase( name ) }-layout-`;
 	// Higher specificity to override defaults from theme.json.
 	const selector = `.${ selectorPrefix }${ id }.${ selectorPrefix }${ id }`;
