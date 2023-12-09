@@ -67,7 +67,7 @@ function InserterTabs( {
 						tabId={ tab.name }
 						focusable={ false }
 					>
-						{ children( tab ) }
+						{ children[ tab.name ] }
 					</Tabs.TabPanel>
 				) ) }
 			</Tabs>
