@@ -83,11 +83,8 @@ export const normalizeTextString = ( value: string ): string => {
  * @param {string} str String to convert.
  * @return {string} Kebab-cased string
  */
-export function kebabCase( str: any ) {
-	let input = str;
-	if ( typeof str !== 'string' ) {
-		input = str?.toString?.() ?? '';
-	}
+export function kebabCase( str: unknown ) {
+	let input = str?.toString?.() ?? '';
 
 	// See https://github.com/lodash/lodash/blob/b185fcee26b2133bd071f4aaca14b455c2ed1008/lodash.js#L4970
 	input = input.replace( /['\u2019]/, '' );
