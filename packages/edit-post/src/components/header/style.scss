@@ -251,6 +251,12 @@
 	}
 }
 
+.edit-post-header__post-preview-button {
+	@include break-small {
+		display: none;
+	}
+}
+
 .is-distraction-free {
 	.interface-interface-skeleton__header {
 		border-bottom: none;
@@ -265,7 +271,7 @@
 
 
 		// hide some parts
-		& > .edit-post-header__settings > .editor-post-preview {
+		& > .edit-post-header__settings > .edit-post-header__post-preview-button {
 			visibility: hidden;
 		}
 

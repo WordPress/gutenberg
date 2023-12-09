@@ -187,7 +187,10 @@ function Header( {
 					showIconLabels={ showIconLabels }
 					forceIsAutosaveable={ hasActiveMetaboxes }
 				/>
-				<PostPreviewButton forceIsAutosaveable={ hasActiveMetaboxes } />
+				<PostPreviewButton
+					className="edit-post-header__post-preview-button"
+					forceIsAutosaveable={ hasActiveMetaboxes }
+				/>
 				<ViewLink />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
