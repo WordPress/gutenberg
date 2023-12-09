@@ -4,11 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef } from '@wordpress/element';
 import { SearchControl } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import useDebouncedInput from './utils/use-debounced-input';
+import { useDebouncedInput } from '@wordpress/compose';
 
 export default function Search( { label, view, onChangeView } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput(

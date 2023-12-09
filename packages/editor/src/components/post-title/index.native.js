@@ -155,7 +155,6 @@ class PostTitle extends Component {
 					tagsToEliminate={ [ 'strong' ] }
 					unstableOnFocus={ this.props.onSelect }
 					onBlur={ this.props.onBlur } // Always assign onBlur as a props.
-					multiline={ false }
 					style={ titleStyles }
 					styles={ styles }
 					fontSize={ 24 }

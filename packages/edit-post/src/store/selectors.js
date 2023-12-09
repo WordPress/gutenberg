@@ -450,13 +450,25 @@ export function isSavingMetaBoxes( state ) {
 /**
  * Returns the current editing canvas device type.
  *
+ * @deprecated
+ *
  * @param {Object} state Global application state.
  *
  * @return {string} Device type.
  */
-export function __experimentalGetPreviewDeviceType( state ) {
-	return state.deviceType;
-}
+export const __experimentalGetPreviewDeviceType = createRegistrySelector(
+	( select ) => () => {
+		deprecated(
+			`select( 'core/edit-site' ).__experimentalGetPreviewDeviceType`,
+			{
+				since: '6.5',
+				version: '6.7',
+				alternative: `select( 'core/editor' ).getDeviceType`,
+			}
+		);
+		return select( editorStore ).getDeviceType();
+	}
+);
 
 /**
  * Returns true if the inserter is opened.
@@ -498,13 +510,15 @@ export function isListViewOpened( state ) {
 /**
  * Returns true if the template editing mode is enabled.
  *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether we're editing the template.
+ * @deprecated
  */
-export function isEditingTemplate( state ) {
-	return state.isEditingTemplate;
-}
+export const isEditingTemplate = createRegistrySelector( ( select ) => () => {
+	deprecated( `select( 'core/edit-post' ).isEditingTemplate`, {
+		since: '6.5',
+		alternative: `select( 'core/editor' ).getRenderingMode`,
+	} );
+	return select( editorStore ).getRenderingMode() !== 'post-only';
+} );
 
 /**
  * Returns true if meta boxes are initialized.

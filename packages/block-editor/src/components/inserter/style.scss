@@ -229,6 +229,10 @@ $block-inserter-tabs-height: 44px;
 		display: block;
 	}
 
+	.block-editor-block-preview__container {
+		height: 100%;
+	}
+
 	.block-editor-block-card {
 		padding-left: 0;
 		padding-right: 0;
@@ -268,14 +272,10 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__block-patterns-tabs-container,
-.block-editor-block-patterns-explorer__sidebar {
+.block-editor-inserter__block-patterns-tabs-container {
 	height: 100%;
 	nav {
 		height: 100%;
-	}
-	.block-editor-block-patterns__source-filter select.components-select-control__input {
-		height: 40px;
 	}
 }
 
@@ -445,7 +445,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-block-patterns-explorer {
 	&__sidebar {
 		position: absolute;
-		top: $header-height + $grid-unit-20;
+		top: $header-height + $grid-unit-15;
 		left: 0;
 		bottom: 0;
 		width: $sidebar-width;

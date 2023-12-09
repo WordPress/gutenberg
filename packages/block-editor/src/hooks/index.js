@@ -1,27 +1,53 @@
 /**
  * Internal dependencies
  */
+import { createBlockEditFilter, createBlockListBlockFilter } from './utils';
 import './compat';
-import './align';
+import align from './align';
 import './lock';
-import './anchor';
+import anchor from './anchor';
 import './aria-label';
-import './custom-class-name';
+import customClassName from './custom-class-name';
 import './generated-class-name';
-import './style';
+import style from './style';
 import './settings';
-import './color';
-import './duotone';
+import color from './color';
+import duotone from './duotone';
 import './font-family';
-import './font-size';
-import './border';
-import './position';
-import './layout';
+import fontSize from './font-size';
+import border from './border';
+import position from './position';
+import layout from './layout';
+import childLayout from './layout-child';
 import './content-lock-ui';
 import './metadata';
-import './custom-fields';
-import './block-hooks';
-import './block-renaming';
+import customFields from './custom-fields';
+import blockHooks from './block-hooks';
+import blockRenaming from './block-renaming';
+
+createBlockEditFilter(
+	[
+		align,
+		anchor,
+		customClassName,
+		style,
+		duotone,
+		position,
+		layout,
+		window.__experimentalConnections ? customFields : null,
+		blockHooks,
+		blockRenaming,
+	].filter( Boolean )
+);
+createBlockListBlockFilter( [
+	align,
+	color,
+	duotone,
+	fontSize,
+	border,
+	position,
+	childLayout,
+] );
 
 export { useCustomSides } from './dimensions';
 export { useLayoutClasses, useLayoutStyles } from './layout';

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	FlexBlock,
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -13,7 +14,14 @@ import { useAsyncList } from '@wordpress/compose';
  */
 import ItemActions from './item-actions';
 
-export default function ViewGrid( { data, fields, view, actions, getItemId } ) {
+export default function ViewGrid( {
+	data,
+	fields,
+	view,
+	actions,
+	getItemId,
+	deferredRendering,
+} ) {
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout.mediaField
 	);
@@ -28,6 +36,7 @@ export default function ViewGrid( { data, fields, view, actions, getItemId } ) {
 			)
 	);
 	const shownData = useAsyncList( data, { step: 3 } );
+	const usedData = deferredRendering ? shownData : data;
 	return (
 		<Grid
 			gap={ 8 }
@@ -35,20 +44,22 @@ export default function ViewGrid( { data, fields, view, actions, getItemId } ) {
 			alignment="top"
 			className="dataviews-grid-view"
 		>
-			{ shownData.map( ( item, index ) => (
+			{ usedData.map( ( item, index ) => (
 				<VStack
 					spacing={ 3 }
 					key={ getItemId?.( item ) || index }
 					className="dataviews-view-grid__card"
 				>
 					<div className="dataviews-view-grid__media">
-						{ mediaField?.render( { item, view } ) }
+						{ mediaField?.render( { item } ) }
 					</div>
 					<HStack
-						className="dataviews-view-grid__title"
+						className="dataviews-view-grid__primary-field"
 						justify="space-between"
 					>
-						{ primaryField?.render( { item, view } ) }
+						<FlexBlock>
+							{ primaryField?.render( { item } ) }
+						</FlexBlock>
 						<ItemActions
 							item={ item }
 							actions={ actions }
@@ -62,7 +73,6 @@ export default function ViewGrid( { data, fields, view, actions, getItemId } ) {
 						{ visibleFields.map( ( field ) => {
 							const renderedValue = field.render( {
 								item,
-								view,
 							} );
 							if ( ! renderedValue ) {
 								return null;
@@ -77,7 +87,7 @@ export default function ViewGrid( { data, fields, view, actions, getItemId } ) {
 										{ field.header }
 									</div>
 									<div className="dataviews-view-grid__field-value">
-										{ field.render( { item, view } ) }
+										{ field.render( { item } ) }
 									</div>
 								</VStack>
 							);

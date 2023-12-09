@@ -3,7 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
-import { LAYOUT_TABLE, OPERATOR_IN } from '@wordpress/dataviews';
+
+/**
+ * Internal dependencies
+ */
+import { LAYOUT_TABLE, OPERATOR_IN } from '../../utils/constants';
 
 const DEFAULT_PAGE_BASE = {
 	type: LAYOUT_TABLE,

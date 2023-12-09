@@ -39,17 +39,17 @@ import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import {
 	addActiveFormats,
-	getMultilineTag,
 	getAllowedFormats,
 	createLinkInParagraph,
 } from './utils';
 import EmbedHandlerPicker from './embed-handler-picker';
 import { Content } from './content';
 import RichText from './native';
+import { withDeprecations } from './with-deprecations';
 
 const classes = 'block-editor-rich-text__editable';
 
-function RichTextWrapper(
+export function RichTextWrapper(
 	{
 		children,
 		tagName,
@@ -58,7 +58,6 @@ function RichTextWrapper(
 		value: originalValue,
 		onChange: originalOnChange,
 		isSelected: originalIsSelected,
-		multiline,
 		inlineToolbar,
 		wrapperClassName,
 		autocompleters,
@@ -80,7 +79,6 @@ function RichTextWrapper(
 		disableLineBreaks,
 		unstableOnFocus,
 		__unstableAllowPrefixTransformations,
-		__unstableMultilineRootTag,
 		// Native props.
 		__unstableMobileNoFocusOnMount,
 		deleteEnter,
@@ -179,7 +177,6 @@ function RichTextWrapper(
 		selectionChange,
 		__unstableMarkAutomaticChange,
 	} = useDispatch( blockEditorStore );
-	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
 		disableFormats,
@@ -261,10 +258,7 @@ function RichTextWrapper(
 			if ( ! hasPastedBlocks || ! isEmpty( before ) ) {
 				blocks.push(
 					onSplit(
-						toHTMLString( {
-							value: before,
-							multilineTag,
-						} ),
+						toHTMLString( { value: before } ),
 						! isAfterOriginal
 					)
 				);
@@ -288,13 +282,7 @@ function RichTextWrapper(
 					: ! onSplitMiddle || ! isEmpty( after )
 			) {
 				blocks.push(
-					onSplit(
-						toHTMLString( {
-							value: after,
-							multilineTag,
-						} ),
-						isAfterOriginal
-					)
+					onSplit( toHTMLString( { value: after } ), isAfterOriginal )
 				);
 			}
 
@@ -308,7 +296,7 @@ function RichTextWrapper(
 
 			onReplace( blocks, indexToSelect, initialPosition );
 		},
-		[ onReplace, onSplit, multilineTag, onSplitMiddle ]
+		[ onReplace, onSplit, onSplitMiddle ]
 	);
 
 	const onEnter = useCallback(
@@ -370,7 +358,6 @@ function RichTextWrapper(
 			onReplace,
 			onSplit,
 			__unstableMarkAutomaticChange,
-			multiline,
 			splitValue,
 			onSplitAtEnd,
 		]
@@ -392,9 +379,6 @@ function RichTextWrapper(
 			if ( isInternal ) {
 				const pastedValue = create( {
 					html,
-					multilineTag,
-					multilineWrapperTags:
-						multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
 					preserveWhiteSpace,
 				} );
 				addActiveFormats( pastedValue, activeFormats );
@@ -496,7 +480,6 @@ function RichTextWrapper(
 			onSplit,
 			splitValue,
 			__unstableEmbedURLOnPaste,
-			multilineTag,
 			preserveWhiteSpace,
 			pastePlainText,
 		]
@@ -568,7 +551,6 @@ function RichTextWrapper(
 			onPaste={ onPaste }
 			__unstableIsSelected={ isSelected }
 			__unstableInputRule={ inputRule }
-			__unstableMultilineTag={ multilineTag }
 			__unstableOnEnterFormattedText={ enterFormattedText }
 			__unstableOnExitFormattedText={ exitFormattedText }
 			__unstableOnCreateUndoLevel={ __unstableMarkLastChangeAsPersistent }
@@ -582,7 +564,6 @@ function RichTextWrapper(
 			__unstableAllowPrefixTransformations={
 				__unstableAllowPrefixTransformations
 			}
-			__unstableMultilineRootTag={ __unstableMultilineRootTag }
 			// Native props.
 			blockIsSelected={
 				originalIsSelected !== undefined
@@ -675,7 +656,9 @@ function RichTextWrapper(
 	);
 }
 
-const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
+const ForwardedRichTextContainer = withDeprecations(
+	forwardRef( RichTextWrapper )
+);
 
 ForwardedRichTextContainer.Content = Content;
 

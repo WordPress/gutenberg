@@ -119,7 +119,7 @@ test.describe( 'Pages', () => {
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Template options' } )
 			.click();
-		await page.getByRole( 'button', { name: 'Edit template' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
 		await expect(
 			editor.canvas.getByRole( 'document', {
 				name: 'Block: Content',
@@ -129,7 +129,7 @@ test.describe( 'Pages', () => {
 		);
 		await expect(
 			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text="You are editing a template."'
+				'role=button[name="Dismiss this notice"i] >> text="Editing template. Changes made here affect all posts and pages that use the template."'
 			)
 		).toBeVisible();
 
@@ -215,23 +215,12 @@ test.describe( 'Pages', () => {
 			} )
 		).toBeHidden();
 
-		// Content blocks are wrapped in a Group block by default.
+		// Ensure post title component to be visible.
 		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Group',
-				} )
-				.getByRole( 'document', {
-					name: 'Block: Content',
-				} )
+			editor.canvas.getByRole( 'textbox', {
+				name: 'Add Title',
+			} )
 		).toBeVisible();
-
-		// Ensure order is preserved between toggling.
-		await page
-			.locator(
-				'[aria-label="Block: Content"] + [aria-label="Block: Title"]'
-			)
-			.isVisible();
 
 		// Remove focus from templateOptionsButton button.
 		await editor.canvas.locator( 'body' ).click();

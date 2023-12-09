@@ -30,21 +30,19 @@ export default function DevicePreview() {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			isPostSaveable: select( editorStore ).isEditedPostSaveable(),
 			isViewable: postType?.viewable ?? false,
-			deviceType:
-				select( editPostStore ).__experimentalGetPreviewDeviceType(),
+			deviceType: select( editorStore ).getDeviceType(),
 			showIconLabels:
 				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
 		};
 	}, [] );
-	const { __experimentalSetPreviewDeviceType: setPreviewDeviceType } =
-		useDispatch( editPostStore );
+	const { setDeviceType } = useDispatch( editorStore );
 
 	return (
 		<PreviewOptions
 			isEnabled={ isPostSaveable }
 			className="edit-post-post-preview-dropdown"
 			deviceType={ deviceType }
-			setDeviceType={ setPreviewDeviceType }
+			setDeviceType={ setDeviceType }
 			label={ __( 'Preview' ) }
 			showIconLabels={ showIconLabels }
 		>

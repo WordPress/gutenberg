@@ -105,27 +105,11 @@ const DEFAULT_FONT_SIZE = 16;
 const MIN_LINE_HEIGHT = 1;
 
 export class RichText extends Component {
-	constructor( {
-		value,
-		selectionStart,
-		selectionEnd,
-		__unstableMultilineTag: multiline,
-	} ) {
+	constructor( { value, selectionStart, selectionEnd } ) {
 		super( ...arguments );
-
-		this.isMultiline = false;
-		if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
-			this.multilineTag = multiline === true ? 'p' : multiline;
-			this.isMultiline = true;
-		}
-
-		if ( this.multilineTag === 'li' ) {
-			this.multilineWrapperTags = [ 'ul', 'ol' ];
-		}
 
 		this.isIOS = Platform.OS === 'ios';
 		this.createRecord = this.createRecord.bind( this );
-		this.restoreParagraphTags = this.restoreParagraphTags.bind( this );
 		this.onChangeFromAztec = this.onChangeFromAztec.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.handleEnter = this.handleEnter.bind( this );
@@ -223,8 +207,6 @@ export class RichText extends Component {
 			...create( {
 				html: this.value,
 				range: null,
-				multilineTag: this.multilineTag,
-				multilineWrapperTags: this.multilineWrapperTags,
 				preserveWhiteSpace,
 			} ),
 		};
@@ -235,12 +217,7 @@ export class RichText extends Component {
 
 	valueToFormat( value ) {
 		// Remove the outer root tags.
-		return this.removeRootTagsProducedByAztec(
-			toHTMLString( {
-				value,
-				multilineTag: this.multilineTag,
-			} )
-		);
+		return this.removeRootTagsProducedByAztec( toHTMLString( { value } ) );
 	}
 
 	getActiveFormatNames( record ) {
@@ -357,29 +334,15 @@ export class RichText extends Component {
 		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
-		let formattedContent = contentWithoutRootTag;
-		if ( ! this.isIOS ) {
-			formattedContent = this.restoreParagraphTags(
-				contentWithoutRootTag,
-				this.multilineTag
-			);
-		}
 
 		this.debounceCreateUndoLevel();
-		const refresh = this.value !== formattedContent;
-		this.value = formattedContent;
+		const refresh = this.value !== contentWithoutRootTag;
+		this.value = contentWithoutRootTag;
 
 		// We don't want to refresh if our goal is just to create a record.
 		if ( refresh ) {
-			this.props.onChange( formattedContent );
+			this.props.onChange( contentWithoutRootTag );
 		}
-	}
-
-	restoreParagraphTags( value, tag ) {
-		if ( tag === 'p' && ( ! value || ! value.startsWith( '<p>' ) ) ) {
-			return '<p>' + value + '</p>';
-		}
-		return value;
 	}
 
 	/*
@@ -739,8 +702,6 @@ export class RichText extends Component {
 		if ( Array.isArray( value ) ) {
 			return create( {
 				html: childrenBlock.toHTML( value ),
-				multilineTag: this.multilineTag,
-				multilineWrapperTags: this.multilineWrapperTags,
 				preserveWhiteSpace,
 			} );
 		}
@@ -748,8 +709,6 @@ export class RichText extends Component {
 		if ( this.props.format === 'string' ) {
 			return create( {
 				html: value,
-				multilineTag: this.multilineTag,
-				multilineWrapperTags: this.multilineWrapperTags,
 				preserveWhiteSpace,
 			} );
 		}
@@ -1323,7 +1282,7 @@ export class RichText extends Component {
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
 					disableEditingMenu={ disableEditingMenu }
-					isMultiline={ this.isMultiline }
+					isMultiline={ false }
 					textAlign={ this.props.textAlign }
 					{ ...( this.isIOS ? { maxWidth } : {} ) }
 					minWidth={ minWidth }

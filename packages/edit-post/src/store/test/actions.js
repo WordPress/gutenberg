@@ -146,34 +146,6 @@ describe( 'actions', () => {
 		).toBe( true );
 	} );
 
-	describe( '__unstableSwitchToTemplateMode', () => {
-		it( 'welcome guide is active', () => {
-			// Activate `welcomeGuideTemplate` feature.
-			registry
-				.dispatch( editPostStore )
-				.toggleFeature( 'welcomeGuideTemplate' );
-			registry.dispatch( editPostStore ).__unstableSwitchToTemplateMode();
-			expect(
-				registry.select( editPostStore ).isEditingTemplate()
-			).toBeTruthy();
-			const notices = registry.select( noticesStore ).getNotices();
-			expect( notices ).toHaveLength( 0 );
-		} );
-
-		it( 'welcome guide is inactive', () => {
-			expect(
-				registry.select( editPostStore ).isEditingTemplate()
-			).toBeFalsy();
-			registry.dispatch( editPostStore ).__unstableSwitchToTemplateMode();
-			expect(
-				registry.select( editPostStore ).isEditingTemplate()
-			).toBeTruthy();
-			const notices = registry.select( noticesStore ).getNotices();
-			expect( notices ).toHaveLength( 1 );
-			expect( notices[ 0 ].content ).toMatch( 'template' );
-		} );
-	} );
-
 	describe( 'hideBlockTypes', () => {
 		it( 'adds the hidden block type to the preferences', () => {
 			registry

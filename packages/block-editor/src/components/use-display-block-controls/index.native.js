@@ -26,11 +26,7 @@ export default function useDisplayBlockControls() {
 				false
 			);
 
-			if ( ! hideControls && isSelected ) {
-				return true;
-			}
-
-			return false;
+			return { isDisplayed: ! hideControls && isSelected };
 		},
 		[ clientId, isSelected, name ]
 	);
