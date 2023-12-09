@@ -62,7 +62,11 @@ function InserterTabs( {
 					) ) }
 				</Tabs.TabList>
 				{ tabs.map( ( tab ) => (
-					<Tabs.TabPanel key={ tab.name } tabId={ tab.name }>
+					<Tabs.TabPanel
+						key={ tab.name }
+						tabId={ tab.name }
+						focusable={ false }
+					>
 						{ children( tab ) }
 					</Tabs.TabPanel>
 				) ) }
