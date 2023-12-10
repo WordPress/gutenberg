@@ -152,6 +152,14 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20 $grid-unit-20 0;
 }
 
+.block-editor-inserter__hidden-panel-header {
+	&:first-of-type + .block-editor-inserter__panel-content {
+		// "Remove" top padding from the first element.
+		// Search term might only return patterns which have hover effect (box-shadow) which will become invisible on top side if padding is set to zero
+		padding-top: 2px;
+	}
+}
+
 .block-editor-inserter__panel-content {
 	padding: $grid-unit-20;
 }
