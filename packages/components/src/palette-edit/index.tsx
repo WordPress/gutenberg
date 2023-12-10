@@ -264,15 +264,17 @@ function Option< T extends Color | Gradient >( {
 /**
  * Checks if a color or gradient is a temporary element by testing against default values.
  */
-export function isTemporaryElement(
+export function isDefaultElement(
 	slugPrefix: string,
-	{ slug, color, gradient }: Color | Gradient
+	{ slug, color, gradient }: Color | Gradient,
+	index: number = -1
 ): Boolean {
 	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
-
+	const [ , slugIndex ] = slug.match( regex ) || [];
+	const hasSameIndex = index === ( slugIndex ? Number( slugIndex ) : null );
 	// If the slug matches the temporary name regex,
 	// check if the color or gradient matches the default value.
-	if ( regex.test( slug ) ) {
+	if ( hasSameIndex && regex.test( slug ) ) {
 		// The order is important as gradient elements
 		// contain a color property.
 		if ( !! gradient ) {
@@ -305,12 +307,13 @@ function PaletteEditListView< T extends Color | Gradient >( {
 	useEffect( () => {
 		return () => {
 			if (
-				elementsReference.current?.some( ( element ) =>
-					isTemporaryElement( slugPrefix, element )
+				elementsReference.current?.some( ( element, index ) =>
+					isDefaultElement( slugPrefix, element, index + 1 )
 				)
 			) {
 				const newElements = elementsReference.current.filter(
-					( element ) => ! isTemporaryElement( slugPrefix, element )
+					( element, index ) =>
+						! isDefaultElement( slugPrefix, element, index + 1 )
 				);
 				onChange( newElements.length ? newElements : undefined );
 			}
