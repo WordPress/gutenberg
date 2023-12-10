@@ -48,52 +48,10 @@
 		"parent": "getting-started"
 	},
 	{
-		"title": "Create a Block Tutorial",
-		"slug": "create-block",
-		"markdown_source": "../docs/getting-started/create-block/README.md",
+		"title": "Tutorial: Build your first block",
+		"slug": "tutorial",
+		"markdown_source": "../docs/getting-started/tutorial.md",
 		"parent": "getting-started"
-	},
-	{
-		"title": "WordPress Plugin",
-		"slug": "wp-plugin",
-		"markdown_source": "../docs/getting-started/create-block/wp-plugin.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Anatomy of a Block",
-		"slug": "block-anatomy",
-		"markdown_source": "../docs/getting-started/create-block/block-anatomy.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Block Attributes",
-		"slug": "attributes",
-		"markdown_source": "../docs/getting-started/create-block/attributes.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Code Implementation",
-		"slug": "block-code",
-		"markdown_source": "../docs/getting-started/create-block/block-code.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Authoring Experience",
-		"slug": "author-experience",
-		"markdown_source": "../docs/getting-started/create-block/author-experience.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Finishing Touches",
-		"slug": "finishing",
-		"markdown_source": "../docs/getting-started/create-block/finishing.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Share your Block with the World",
-		"slug": "submitting-to-block-directory",
-		"markdown_source": "../docs/getting-started/create-block/submitting-to-block-directory.md",
-		"parent": "create-block"
 	},
 	{
 		"title": "Fundamentals of Block Development",
