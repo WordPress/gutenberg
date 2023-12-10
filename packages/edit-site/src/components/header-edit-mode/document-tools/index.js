@@ -14,6 +14,7 @@ import { _x, __ } from '@wordpress/i18n';
 import { listView, plus, chevronUpDown } from '@wordpress/icons';
 import { Button, ToolbarItem } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -39,18 +40,13 @@ export default function DocumentTools( {
 	const inserterButton = useRef();
 	const { isInserterOpen, isListViewOpen, listViewShortcut, isVisualMode } =
 		useSelect( ( select ) => {
-			const {
-				__experimentalGetPreviewDeviceType,
-				isInserterOpened,
-				isListViewOpened,
-				getEditorMode,
-			} = select( editSiteStore );
+			const { isInserterOpened, isListViewOpened, getEditorMode } =
+				select( editSiteStore );
 			const { getShortcutRepresentation } = select(
 				keyboardShortcutsStore
 			);
 
 			return {
-				deviceType: __experimentalGetPreviewDeviceType(),
 				isInserterOpen: isInserterOpened(),
 				isListViewOpen: isListViewOpened(),
 				listViewShortcut: getShortcutRepresentation(
@@ -60,12 +56,10 @@ export default function DocumentTools( {
 			};
 		}, [] );
 
-	const {
-		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-		setIsInserterOpened,
-		setIsListViewOpened,
-	} = useDispatch( editSiteStore );
+	const { setIsInserterOpened, setIsListViewOpened } =
+		useDispatch( editSiteStore );
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const { setDeviceType } = useDispatch( editorStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
@@ -130,6 +124,7 @@ export default function DocumentTools( {
 						label={ showIconLabels ? shortLabel : longLabel }
 						showTooltip={ ! showIconLabels }
 						aria-expanded={ isInserterOpen }
+						size="compact"
 					/>
 				) }
 				{ isLargeViewport && (
@@ -142,17 +137,20 @@ export default function DocumentTools( {
 									showIconLabels ? 'tertiary' : undefined
 								}
 								disabled={ ! isVisualMode }
+								size="compact"
 							/>
 						) }
 						<ToolbarItem
 							as={ UndoButton }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
+							size="compact"
 						/>
 						<ToolbarItem
 							as={ RedoButton }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
+							size="compact"
 						/>
 						{ ! isDistractionFree && (
 							<ToolbarItem
@@ -171,6 +169,7 @@ export default function DocumentTools( {
 									showIconLabels ? 'tertiary' : undefined
 								}
 								aria-expanded={ isListViewOpen }
+								size="compact"
 							/>
 						) }
 						{ isZoomedOutViewExperimentEnabled &&
@@ -184,13 +183,14 @@ export default function DocumentTools( {
 									/* translators: button label text should, if possible, be under 16 characters. */
 									label={ __( 'Zoom-out View' ) }
 									onClick={ () => {
-										setPreviewDeviceType( 'Desktop' );
+										setDeviceType( 'Desktop' );
 										__unstableSetEditorMode(
 											isZoomedOutView
 												? 'edit'
 												: 'zoom-out'
 										);
 									} }
+									size="compact"
 								/>
 							) }
 					</>

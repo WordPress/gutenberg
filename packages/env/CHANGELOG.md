@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Change
+
+- Update Docker usage to `docker compose` V2 following [deprecation](https://docs.docker.com/compose/migrate/) of `docker-compose` V1.
+
 ## 8.13.0 (2023-11-29)
 
 ## 8.12.0 (2023-11-16)

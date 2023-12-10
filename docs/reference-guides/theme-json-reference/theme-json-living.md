@@ -188,7 +188,7 @@ Settings related to typography.
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
 | fontSizes | array |  | fluid, name, size, slug |
-| fontFamilies | array |  | fontFace, fontFamily, name, slug |
+| fontFamilies | array |  | fontFace, fontFamily, name, preview, slug |
 
 ---
 

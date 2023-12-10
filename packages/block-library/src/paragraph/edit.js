@@ -154,13 +154,13 @@ function ParagraphBlock( {
 				onReplace={ onReplace }
 				onRemove={ onRemove }
 				aria-label={
-					content
-						? __( 'Block: Paragraph' )
-						: __(
+					RichText.isEmpty( content )
+						? __(
 								'Empty block; start writing or type forward slash to choose a block'
 						  )
+						: __( 'Block: Paragraph' )
 				}
-				data-empty={ content ? false : true }
+				data-empty={ RichText.isEmpty( content ) }
 				placeholder={ placeholder || __( 'Type / to choose a block' ) }
 				data-custom-placeholder={ placeholder ? true : undefined }
 				__unstableEmbedURLOnPaste

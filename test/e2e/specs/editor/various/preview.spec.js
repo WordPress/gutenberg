@@ -335,9 +335,9 @@ class PreviewUtils {
 		);
 		await this.page.click( 'role=menuitem[name="Preferences"i]' );
 
-		// Navigate to panels section.
+		// Navigate to general section.
 		await this.page.click(
-			'role=dialog[name="Preferences"i] >> role=tab[name="Panels"i]'
+			'role=dialog[name="Preferences"i] >> role=tab[name="General"i]'
 		);
 
 		// Find custom fields checkbox.

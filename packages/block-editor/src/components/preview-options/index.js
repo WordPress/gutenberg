@@ -21,7 +21,7 @@ export default function PreviewOptions( {
 	label,
 	showIconLabels,
 } ) {
-	const isMobile = useViewportMatch( 'small', '<' );
+	const isMobile = useViewportMatch( 'medium', '<' );
 	if ( isMobile ) return null;
 
 	const popoverProps = {
@@ -36,6 +36,7 @@ export default function PreviewOptions( {
 		disabled: ! isEnabled,
 		__experimentalIsFocusable: ! isEnabled,
 		children: viewLabel,
+		size: 'compact',
 		showTooltip: ! showIconLabels,
 	};
 	const menuProps = {

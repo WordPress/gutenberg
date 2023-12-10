@@ -96,6 +96,8 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		pageOnFront,
 		pageForPosts,
 		userPatternCategories,
+		restBlockPatterns,
+		restBlockPatternCategories,
 	} = useSelect(
 		( select ) => {
 			const isWeb = Platform.OS === 'web';
@@ -105,6 +107,8 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				getEntityRecord,
 				getUserPatternCategories,
 				getEntityRecords,
+				getBlockPatterns,
+				getBlockPatternCategories,
 			} = select( coreStore );
 
 			const siteSettings = canUser( 'read', 'settings' )
@@ -127,6 +131,8 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
 				userPatternCategories: getUserPatternCategories(),
+				restBlockPatterns: getBlockPatterns(),
+				restBlockPatternCategories: getBlockPatternCategories(),
 			};
 		},
 		[ postType, postId ]
@@ -138,15 +144,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 	const settingsBlockPatternCategories =
 		settings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
 		settings.__experimentalBlockPatternCategories; // WP 5.9
-
-	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
-		( select ) => ( {
-			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories:
-				select( coreStore ).getBlockPatternCategories(),
-		} ),
-		[]
-	);
 
 	const blockPatterns = useMemo(
 		() =>

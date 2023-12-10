@@ -8,6 +8,7 @@ export * from './autocompleters';
 
 // Post Related Components.
 export { default as AutosaveMonitor } from './autosave-monitor';
+export { default as DocumentBar } from './document-bar';
 export { default as DocumentOutline } from './document-outline';
 export { default as DocumentOutlineCheck } from './document-outline/check';
 export { EditorKeyboardShortcuts };
@@ -23,7 +24,8 @@ export { default as LocalAutosaveMonitor } from './local-autosave-monitor';
 export { default as PageAttributesCheck } from './page-attributes/check';
 export { default as PageAttributesOrder } from './page-attributes/order';
 export { default as PageAttributesParent } from './page-attributes/parent';
-export { default as PageTemplate } from './post-template';
+export { default as PageTemplate } from './post-template/classic-theme';
+export { default as PostTemplatePanel } from './post-template/panel';
 export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
 export { default as PostAuthorPanel } from './post-author/panel';

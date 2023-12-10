@@ -21,30 +21,30 @@ At [**Metadata in block.json**](https://developer.wordpress.org/block-editor/ref
 
 Through properties of the `block.json`, we can define how the block will be uniquely identified, how it can be found, and the info displayed for the block in the Block Editor. Some of these properties are:
 
-- `apiVersion`: the version of [the API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/) used by the block (current version is 2).
-- `name`:  a unique identifier for a block, including a namespace.
-- `title`:  a display title for a block.
-- `category`:  a block category for the block in the Inserter panel.
-- `icon`:  a [Dashicon](https://developer.wordpress.org/resource/dashicons) slug or a custom SVG icon.
-- `description`:  a short description visible in the block inspector.
-- `keywords`: to locate the block in the inserter.
-- `textdomain`: the plugin text-domain (important for things such as translations).
+- [`apiVersion`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#api-version): the version of [the API](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/) used by the block (current version is 2).
+- [`name`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#name):  a unique identifier for a block, including a namespace.
+- [`title`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#title):  a display title for a block.
+- [`category`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#category):  a block category for the block in the Inserter panel.
+- [`icon`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#icon):  a [Dashicon](https://developer.wordpress.org/resource/dashicons) slug or a custom SVG icon.
+- [`description`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#description):  a short description visible in the block inspector.
+- [`keywords`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#keywords): to locate the block in the inserter.
+- [`textdomain`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#text-domain): the plugin text-domain (important for things such as translations).
 
 ## Files for the block's behavior, output, or style 
 
-The `editorScript` and `editorStyle` properties allow defining Javascript and CSS files to be enqueued and loaded **only in the editor**.
+The [`editorScript`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-script) and [`editorStyle`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style) properties allow defining Javascript and CSS files to be enqueued and loaded **only in the editor**.
 
-The `script` and `style` properties allow the definition of Javascript and CSS files to be enqueued and loaded **in both the editor and the front end**.
+The [`script`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#script) and [`style`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) properties allow the definition of Javascript and CSS files to be enqueued and loaded **in both the editor and the front end**.
 
-The `viewScript` property allow us to define the Javascript file or files to be enqueued and loaded **only in the front end**.
+The [`viewScript`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script) property allow us to define the Javascript file or files to be enqueued and loaded **only in the front end**.
 
-All these properties (`editorScript`, `editorStyle`, `script` `style`,`viewScript`) accept as a value a path for the file, a handle registered with `wp_register_script` or `wp_register_style`, or an array with a mix of both. Paths values in `block.json` are prefixed with `file:`.
+All these properties (`editorScript`, `editorStyle`, `script` `style`,`viewScript`) accept as a value a [path for the file](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#wpdefinedpath) (prefixed with `file:`), a [handle registered with `wp_register_script` or `wp_register_style`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#wpdefinedasset), or an array with a mix of both.
 
-The `render` property ([introduced on WordPress 6.1](https://make.wordpress.org/core/2022/10/12/block-api-changes-in-wordpress-6-1/)) sets the path of a `.php` template file that will render the markup returned to the front end. This only method will be used to return the markup for the block on request only if `$render_callback` function has not been passed to the `register_block_type` function.
+The [`render`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#render) property ([introduced on WordPress 6.1](https://make.wordpress.org/core/2022/10/12/block-api-changes-in-wordpress-6-1/)) sets the path of a `.php` template file that will render the markup returned to the front end. This only method will be used to return the markup for the block on request only if `$render_callback` function has not been passed to the `register_block_type` function.
 
 ## Data Storage in the Block with `attributes`
 
-The [`attributes` property](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) allows a block to declare "variables" that store data or content for the block.
+The [`attributes` property](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#attributes) allows a block to declare "variables" that store data or content for the block.
 
 _Example: Attributes as defined in block.json_
 ```json
@@ -69,9 +69,9 @@ _Example: Atributes stored in the Markup representation of the block_
 <!-- /wp:block-development-examples/copyright-date-block-09aac3 -->x
 ```
 
-These attributes are passed to the React component `Edit`(to display in the Block Editor) and the `save` function (to return the markup saved to the DB) of the block, and to any server-side render definition for the block (see `render` prop above). 
+These [`attributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#attributes) are passed to the React component `Edit`(to display in the Block Editor) and the `save` function (to return the markup saved to the DB) of the block, and to any server-side render definition for the block (see `render` prop above). 
 
-The `Edit` component receives exclusively the capability of updating the attributes via the `setAttributes` function.
+The `Edit` component receives exclusively the capability of updating the attributes via the [`setAttributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#setattributes) function.
 
 _See how the attributes are passed to the [`Edit` component](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/edit.js), [the `save` function](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/save.js) and [the `render.php`](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/render.php) in this [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/copyright-date-block-09aac3) of the  code above_
 
@@ -84,7 +84,7 @@ Check the <a href="https://developer.wordpress.org/block-editor/reference-guides
 
 ## Enable UI settings panels for the block with `supports`
 
-The `supports` property allows a block to declare support for certain features, enabling users to customize specific settings (like colors or margins) from the Settings Sidebar.
+The [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#supports) property allows a block to declare support for certain features, enabling users to customize specific settings (like colors or margins) from the Settings Sidebar.
 
 _Example: Supports as defined in block.json_
 
