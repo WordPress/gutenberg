@@ -205,7 +205,7 @@ describe( 'Text color', () => {
 
 		const { getByLabelText } = render(
 			<SlotFillProvider>
-				<BlockEdit name="core/test-block" isSelected>
+				<BlockEdit name="core/test-block" isSelected hasDisplayControls>
 					<TextColorEdit
 						isActive={ true }
 						activeAttributes={ {} }

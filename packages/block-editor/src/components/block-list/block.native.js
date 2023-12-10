@@ -148,6 +148,7 @@ function BlockListBlock( {
 		isDescendentBlockSelected,
 		isParentSelected,
 		order,
+		mayDisplayControls,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -158,6 +159,9 @@ function BlockListBlock( {
 				getSelectedBlockClientId,
 				getSettings,
 				hasSelectedInnerBlock,
+				getBlockName,
+				isFirstMultiSelectedBlock,
+				getMultiSelectedBlockClientIds,
 			} = select( blockEditorStore );
 			const currentBlockType = getBlockType( name || 'core/missing' );
 			const currentBlockCategory = currentBlockType?.category;
@@ -205,6 +209,12 @@ function BlockListBlock( {
 				isDescendentBlockSelected: descendentBlockSelected,
 				isParentSelected: parentSelected,
 				order: blockOrder,
+				mayDisplayControls:
+					isSelected ||
+					( isFirstMultiSelectedBlock( clientId ) &&
+						getMultiSelectedBlockClientIds().every(
+							( id ) => getBlockName( id ) === name
+						) ),
 			};
 		},
 		[ clientId, isSelected, name, rootClientId ]
@@ -346,6 +356,7 @@ function BlockListBlock( {
 									: undefined
 							}
 							wrapperProps={ wrapperProps }
+							mayDisplayControls={ mayDisplayControls }
 						/>
 						<View onLayout={ onLayout } />
 					</GlobalStylesContext.Provider>
