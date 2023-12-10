@@ -232,7 +232,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
-		// Create an unsynced pattern from the paragraph block.
+		// Create a synced pattern from the paragraph block.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'A useful paragraph to reuse' },
