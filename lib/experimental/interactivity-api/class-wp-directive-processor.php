@@ -20,7 +20,7 @@ if ( class_exists( 'WP_Directive_Processor' ) ) {
  * available.  Please restrain from investing unnecessary time and effort trying
  * to improve this code.
  */
-class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
+class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 
 	/**
 	 * An array of root blocks.
@@ -232,7 +232,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 		$this->release_bookmark( $start_name );
 		$this->release_bookmark( $end_name );
 
-		$this->lexical_updates[] = new WP_HTML_Text_Replacement( $start, $end - $start, $new_html );
+		$this->lexical_updates[] = new Gutenberg_HTML_Text_Replacement_6_5( $start, $end - $start, $new_html );
 		return true;
 	}
 
