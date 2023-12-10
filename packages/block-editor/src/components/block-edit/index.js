@@ -8,7 +8,12 @@ import { hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import Edit from './edit';
-import { BlockEditContextProvider, useBlockEditContext } from './context';
+import {
+	BlockEditContextProvider,
+	useBlockEditContext,
+	mayDisplayControlsKey,
+	mayDisplayParentControlsKey,
+} from './context';
 
 /**
  * The `useBlockEditContext` hook provides information about the block this hook is being used in.
@@ -38,21 +43,32 @@ export default function BlockEdit( {
 	const layoutSupport =
 		hasBlockSupport( name, 'layout', false ) ||
 		hasBlockSupport( name, '__experimentalLayout', false );
-	const context = {
-		name,
-		isSelected,
-		clientId,
-		layout: layoutSupport ? layout : null,
-		__unstableLayoutClassNames,
-		mayDisplayControls,
-		mayDisplayParentControls,
-	};
 	return (
 		<BlockEditContextProvider
 			// It is important to return the same object if props haven't
 			// changed to avoid  unnecessary rerenders.
 			// See https://reactjs.org/docs/context.html#caveats.
-			value={ useMemo( () => context, Object.values( context ) ) }
+			value={ useMemo(
+				() => ( {
+					name,
+					isSelected,
+					clientId,
+					layout: layoutSupport ? layout : null,
+					__unstableLayoutClassNames,
+					[ mayDisplayControlsKey ]: mayDisplayControls,
+					[ mayDisplayParentControlsKey ]: mayDisplayParentControls,
+				} ),
+				[
+					name,
+					isSelected,
+					clientId,
+					layoutSupport,
+					layout,
+					__unstableLayoutClassNames,
+					mayDisplayControls,
+					mayDisplayParentControls,
+				]
+			) }
 		>
 			<Edit { ...props } />
 		</BlockEditContextProvider>

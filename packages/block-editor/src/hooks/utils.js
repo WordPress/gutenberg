@@ -10,7 +10,11 @@ import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { useBlockEditContext } from '../components/block-edit/context';
+import {
+	useBlockEditContext,
+	mayDisplayControlsKey,
+	mayDisplayParentControlsKey,
+} from '../components/block-edit/context';
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
@@ -379,8 +383,7 @@ export function createBlockEditFilter( features ) {
 	} );
 	const withBlockEditHooks = createHigherOrderComponent(
 		( OriginalBlockEdit ) => ( props ) => {
-			const { mayDisplayControls, mayDisplayParentControls } =
-				useBlockEditContext();
+			const context = useBlockEditContext();
 			// CAUTION: code added before this line will be executed for all
 			// blocks, not just those that support the feature! Code added
 			// above this line should be carefully evaluated for its impact on
@@ -394,8 +397,9 @@ export function createBlockEditFilter( features ) {
 						shareWithChildBlocks,
 					} = feature;
 					const shouldDisplayControls =
-						mayDisplayControls ||
-						( mayDisplayParentControls && shareWithChildBlocks );
+						context[ mayDisplayControlsKey ] ||
+						( context[ mayDisplayParentControlsKey ] &&
+							shareWithChildBlocks );
 
 					if (
 						! shouldDisplayControls ||
