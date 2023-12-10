@@ -1,12 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
+import { Icon, VisuallyHidden } from '@wordpress/components';
 
 function InserterPanel( { title, icon, children } ) {
+	const isVisuallyHidden = title.type && title.type === VisuallyHidden;
 	return (
 		<>
-			<div className="block-editor-inserter__panel-header">
+			<div
+				className={
+					isVisuallyHidden === true
+						? 'block-editor-inserter__hidden-panel-header'
+						: 'block-editor-inserter__panel-header'
+				}
+			>
 				<h2 className="block-editor-inserter__panel-title">
 					{ title }
 				</h2>
