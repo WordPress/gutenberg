@@ -172,29 +172,32 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					_isSelected && __unstableGetEditorMode() === 'edit'
 						? getSelectedBlocksInitialCaretPosition()
 						: undefined,
-				classNames: classnames( {
-					'is-selected': _isSelected,
-					'is-highlighted': isBlockHighlighted( clientId ),
-					'is-multi-selected': isMultiSelected,
-					'is-partially-selected':
-						isMultiSelected &&
-						! __unstableIsFullySelected() &&
-						! __unstableSelectionHasUnmergeableBlock(),
-					'is-reusable': isReusableBlock( blockType ),
-					'is-dragging': isBlockBeingDragged( clientId ),
-					'has-child-selected': isAncestorOfSelectedBlock,
-					'remove-outline': _isSelected && outlineMode && typing,
-					'is-block-moving-mode': !! movingClientId,
-					'can-insert-moving-block':
-						movingClientId &&
-						canInsertBlockType(
-							getBlockName( movingClientId ),
-							getBlockRootClientId( clientId )
-						),
-					[ attributes.className ]: hasLightBlockWrapper,
-					[ getBlockDefaultClassName( blockName ) ]:
-						hasLightBlockWrapper,
-				} ),
+				classNames: classnames(
+					{
+						'is-selected': _isSelected,
+						'is-highlighted': isBlockHighlighted( clientId ),
+						'is-multi-selected': isMultiSelected,
+						'is-partially-selected':
+							isMultiSelected &&
+							! __unstableIsFullySelected() &&
+							! __unstableSelectionHasUnmergeableBlock(),
+						'is-reusable': isReusableBlock( blockType ),
+						'is-dragging': isBlockBeingDragged( clientId ),
+						'has-child-selected': isAncestorOfSelectedBlock,
+						'remove-outline': _isSelected && outlineMode && typing,
+						'is-block-moving-mode': !! movingClientId,
+						'can-insert-moving-block':
+							movingClientId &&
+							canInsertBlockType(
+								getBlockName( movingClientId ),
+								getBlockRootClientId( clientId )
+							),
+					},
+					hasLightBlockWrapper ? attributes.className : undefined,
+					hasLightBlockWrapper
+						? getBlockDefaultClassName( blockName )
+						: undefined
+				),
 			};
 		},
 		[ clientId ]
