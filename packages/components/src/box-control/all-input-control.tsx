@@ -99,7 +99,7 @@ export default function AllInputControl( {
 			<FlexedRangeControl
 				__nextHasNoMarginBottom
 				hideLabelFromVision
-				initialPosition={ 0 }
+				initialPosition={ parsedQuantity ?? 0 }
 				label={ LABELS.all }
 				onChange={ ( newValue ) => {
 					sliderOnChange( [ newValue, parsedUnit ].join( '' ) );

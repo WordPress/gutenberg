@@ -167,7 +167,7 @@ export default function AxialInputControls( {
 						<FlexedRangeControl
 							__nextHasNoMarginBottom
 							hideLabelFromVision
-							initialPosition={ 0 }
+							initialPosition={ parsedQuantity ?? 0 }
 							label={ LABELS[ side ] }
 							onChange={ ( newValue ) => {
 								sliderOnChange(
