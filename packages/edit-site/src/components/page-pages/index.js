@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	__experimentalHeading as Heading,
+	__experimentalView as View,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -216,7 +216,10 @@ export default function PagePages() {
 				render: ( { item } ) => {
 					return (
 						<VStack spacing={ 1 }>
-							<Heading as="h3" level={ 5 } weight={ 500 }>
+							<View
+								as="span"
+								className="edit-site-page-pages__list-view-title-field"
+							>
 								{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
 									view.type
 								) ? (
@@ -236,7 +239,7 @@ export default function PagePages() {
 										item.title?.rendered || item.slug
 									) || __( '(no title)' )
 								) }
-							</Heading>
+							</View>
 						</VStack>
 					);
 				},
