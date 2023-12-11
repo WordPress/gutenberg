@@ -128,6 +128,12 @@ export function useInputAndSelection( props ) {
 
 			// Ensure the active element is the rich text element.
 			if ( ownerDocument.activeElement !== element ) {
+				// If it is not, we can stop listening for selection changes.
+				// We resume listening when the element is focused.
+				ownerDocument.removeEventListener(
+					'selectionchange',
+					handleSelectionChange
+				);
 				return;
 			}
 
@@ -238,16 +244,18 @@ export function useInputAndSelection( props ) {
 				applyRecord( record.current );
 				onSelectionChange( record.current.start, record.current.end );
 			}
+
+			ownerDocument.addEventListener(
+				'selectionchange',
+				handleSelectionChange
+			);
 		}
 
 		element.addEventListener( 'input', onInput );
 		element.addEventListener( 'compositionstart', onCompositionStart );
 		element.addEventListener( 'compositionend', onCompositionEnd );
 		element.addEventListener( 'focus', onFocus );
-		ownerDocument.addEventListener(
-			'selectionchange',
-			handleSelectionChange
-		);
+
 		return () => {
 			element.removeEventListener( 'input', onInput );
 			element.removeEventListener(
@@ -256,10 +264,6 @@ export function useInputAndSelection( props ) {
 			);
 			element.removeEventListener( 'compositionend', onCompositionEnd );
 			element.removeEventListener( 'focus', onFocus );
-			ownerDocument.removeEventListener(
-				'selectionchange',
-				handleSelectionChange
-			);
 		};
 	}, [] );
 }

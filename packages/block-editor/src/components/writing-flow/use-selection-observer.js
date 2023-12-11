@@ -82,15 +82,6 @@ function setContentEditableWrapper( node, value ) {
 		// Firefox doesn't automatically move focus.
 		if ( value ) {
 			node.focus();
-		} else {
-			const { ownerDocument } = node;
-			const { defaultView } = ownerDocument;
-			const selection = defaultView.getSelection();
-			node = extractSelectionStartNode( selection );
-			let element =
-				node.nodeType === node.ELEMENT_NODE ? node : node.parentElement;
-			element = element?.closest( '[contenteditable]' );
-			element?.focus();
 		}
 	}
 }
@@ -121,6 +112,16 @@ export default function useSelectionObserver() {
 					return;
 				}
 
+				const startNode = extractSelectionStartNode( selection );
+				const endNode = extractSelectionEndNode( selection );
+
+				if (
+					! node.contains( startNode ) ||
+					! node.contains( endNode )
+				) {
+					return;
+				}
+
 				// If selection is collapsed and we haven't used `shift+click`,
 				// end multi selection and disable the contentEditable wrapper.
 				// We have to check about `shift+click` case because elements
@@ -129,13 +130,19 @@ export default function useSelectionObserver() {
 				// For now we check if the event is a `mouse` event.
 				const isClickShift = event.shiftKey && event.type === 'mouseup';
 				if ( selection.isCollapsed && ! isClickShift ) {
-					setContentEditableWrapper( node, false );
+					if ( node.contentEditable === 'true' ) {
+						setContentEditableWrapper( node, false );
+						let element =
+							startNode.nodeType === startNode.ELEMENT_NODE
+								? startNode
+								: startNode.parentElement;
+						element = element?.closest( '[contenteditable]' );
+						element?.focus();
+					}
 					return;
 				}
 
-				const startNode = extractSelectionStartNode( selection );
 				let startClientId = getBlockClientId( startNode );
-				const endNode = extractSelectionEndNode( selection );
 				let endClientId = getBlockClientId( endNode );
 
 				// If the selection has changed and we had pressed `shift+click`,
