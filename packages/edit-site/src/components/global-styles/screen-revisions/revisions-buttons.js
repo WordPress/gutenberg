@@ -22,7 +22,7 @@ import getRevisionChanges from './get-revision-changes';
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 const MAX_CHANGES = 7;
 
-function ChangedSummary( { revision, previousRevision, blockNames } ) {
+function ChangesSummary( { revision, previousRevision, blockNames } ) {
 	const changes = getRevisionChanges(
 		revision,
 		previousRevision,
@@ -209,7 +209,7 @@ function RevisionsButtons( {
 										</time>
 									) }
 									{ isSelected && (
-										<ChangedSummary
+										<ChangesSummary
 											blockNames={ blockNames }
 											revision={ revision }
 											previousRevision={
