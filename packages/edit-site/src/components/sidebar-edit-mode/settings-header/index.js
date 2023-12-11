@@ -1,81 +1,30 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from '../../../store/constants';
 import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from '../constants';
+import { unlock } from '../../../lock-unlock';
 
-const SettingsHeader = ( { sidebarName } ) => {
+const { Tabs } = unlock( componentsPrivateApis );
+
+const SettingsHeader = () => {
 	const postTypeLabel = useSelect(
 		( select ) => select( editorStore ).getPostTypeLabel(),
 		[]
 	);
 
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const openTemplateSettings = () =>
-		enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
-	const openBlockSettings = () =>
-		enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
-
-	const documentAriaLabel =
-		sidebarName === SIDEBAR_TEMPLATE
-			? // translators: ARIA label for the Template sidebar tab, selected.
-			  sprintf( __( '%s (selected)' ), postTypeLabel )
-			: postTypeLabel;
-
-	/* Use a list so screen readers will announce how many tabs there are. */
 	return (
-		<ul>
-			<li>
-				<Button
-					onClick={ openTemplateSettings }
-					className={ classnames(
-						'edit-site-sidebar-edit-mode__panel-tab',
-						{
-							'is-active': sidebarName === SIDEBAR_TEMPLATE,
-						}
-					) }
-					aria-label={ documentAriaLabel }
-					data-label={ postTypeLabel }
-				>
-					{ postTypeLabel }
-				</Button>
-			</li>
-			<li>
-				<Button
-					onClick={ openBlockSettings }
-					className={ classnames(
-						'edit-site-sidebar-edit-mode__panel-tab',
-						{
-							'is-active': sidebarName === SIDEBAR_BLOCK,
-						}
-					) }
-					aria-label={
-						sidebarName === SIDEBAR_BLOCK
-							? // translators: ARIA label for the Block Settings Sidebar tab, selected.
-							  __( 'Block (selected)' )
-							: // translators: ARIA label for the Block Settings Sidebar tab, not selected.
-							  __( 'Block' )
-					}
-					data-label={ __( 'Block' ) }
-				>
-					{ __( 'Block' ) }
-				</Button>
-			</li>
-		</ul>
+		<Tabs.TabList>
+			<Tabs.Tab tabId={ SIDEBAR_TEMPLATE }>{ postTypeLabel }</Tabs.Tab>
+			<Tabs.Tab tabId={ SIDEBAR_BLOCK }>{ __( 'Block' ) }</Tabs.Tab>
+		</Tabs.TabList>
 	);
 };
 
