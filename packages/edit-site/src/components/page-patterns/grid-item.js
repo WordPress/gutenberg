@@ -196,7 +196,10 @@ function GridItem( { categoryId, item, ...props } ) {
 						) }
 					</Flex>
 				</HStack>
-				<PatternActions item={ item } />
+				<PatternActions
+					item={ item }
+					toggleProps={ { className: 'edit-site-patterns__button' } }
+				/>
 			</HStack>
 		</li>
 	);

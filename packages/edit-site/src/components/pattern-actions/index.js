@@ -71,6 +71,7 @@ export default function PatternActions( {
 	const isTemplate = record?.type === TEMPLATE_POST_TYPE;
 	const isTemplatePart = record?.type === TEMPLATE_PART_POST_TYPE;
 
+	// Type check to make sure we're dealing with a pattern or template.
 	if (
 		! isTemplatePart &&
 		! isTemplate &&
@@ -82,9 +83,15 @@ export default function PatternActions( {
 
 	const isRemovable = isTemplateRemovable( record );
 	const isRevertable = isTemplateRevertable( record );
-	const isEditable = isUserPattern || isRemovable;
 	// Only patterns and template parts can be duplicated for now.
 	const isDuplicable = isUserPattern || isNonUserPattern || isTemplatePart;
+
+	// If the pattern is not editable or duplicable, don't show the menu.
+	if ( ! isRemovable && ! isRevertable && ! isDuplicable ) {
+		return null;
+	}
+
+	const isEditable = isUserPattern || isRemovable;
 	const decodedTitle = decodeEntities(
 		record?.title?.rendered || record?.title?.raw
 	);
