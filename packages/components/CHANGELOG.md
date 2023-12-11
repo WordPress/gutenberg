@@ -30,6 +30,11 @@
 
 -   `Tabs`: improve focus handling in controlled mode ([#56658](https://github.com/WordPress/gutenberg/pull/56658)).
 
+### Documentation
+
+-	`Search`: Added links to storybook for more infomation on usage. ([#56815](https://github.com/WordPress/gutenberg/pull/56815)).
+-	`Spinner`: Added links to storybook for more information on usage. ([#56953](https://github.com/WordPress/gutenberg/pull/56953)).
+
 ## 25.13.0 (2023-11-29)
 
 ### Enhancements
