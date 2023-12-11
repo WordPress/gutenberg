@@ -2,7 +2,6 @@
 .wp-block-cover {
 	position: relative;
 	background-position: center center;
-	min-height: 430px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -16,6 +15,16 @@
 	box-sizing: border-box;
 	// Keep the flex layout direction to the physical direction (LTR) in RTL languages.
 	/*rtl:raw: direction: ltr; */
+
+	// When an aspect ratio is set, the height is calculated based on the width, so don't
+	// manually set a min-height.
+	&:where(:not(.has-aspect-ratio)) {
+		min-height: 430px;
+	}
+
+	&:where(.has-aspect-ratio) {
+		width: 100%;
+	}
 
 	/**
 	 * Set a default background color for has-background-dim _unless_ it includes another

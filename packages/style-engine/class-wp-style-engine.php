@@ -185,7 +185,16 @@ final class WP_Style_Engine {
 			),
 		),
 		'dimensions' => array(
-			'minHeight' => array(
+			'aspectRatio' => array(
+				'property_keys' => array(
+					'default' => 'aspect-ratio',
+				),
+				'path'          => array( 'dimensions', 'aspectRatio' ),
+				'classnames'    => array(
+					'has-aspect-ratio' => true,
+				),
+			),
+			'minHeight'   => array(
 				'property_keys' => array(
 					'default' => 'min-height',
 				),
