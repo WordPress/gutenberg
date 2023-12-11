@@ -1,0 +1,27 @@
+.container {
+	background-color: $light-ultra-dim;
+	padding: $grid-unit;
+	justify-content: center;
+	flex-direction: row;
+}
+
+.container--dark {
+	background-color: $dark-dim;
+}
+
+.text {
+	padding-left: 3;
+	padding-top: 2;
+}
+
+.text--dark {
+	color: $white;
+}
+
+.icon {
+	fill: $light-secondary;
+}
+
+.icon--dark {
+	fill: $dark-tertiary;
+}
