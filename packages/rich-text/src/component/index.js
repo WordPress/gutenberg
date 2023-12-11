@@ -46,12 +46,7 @@ export function useRichText( {
 		const selection = defaultView.getSelection();
 		const range =
 			selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
-
-		return create( {
-			element: ref.current,
-			range,
-			__unstableIsEditableTree: true,
-		} );
+		return create( { element: ref.current, range } );
 	}
 
 	function applyRecord( newRecord, { domOnly } = {} ) {

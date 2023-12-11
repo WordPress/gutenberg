@@ -204,21 +204,14 @@ export class RichTextData {
  * `start` and `end` state which text indices are selected. They are only
  * provided if a `Range` was given.
  *
- * @param {Object}  [$1]                          Optional named arguments.
- * @param {Element} [$1.element]                  Element to create value from.
- * @param {string}  [$1.text]                     Text to create value from.
- * @param {string}  [$1.html]                     HTML to create value from.
- * @param {Range}   [$1.range]                    Range to create value from.
- * @param {boolean} [$1.__unstableIsEditableTree]
+ * @param {Object}  [$1]         Optional named arguments.
+ * @param {Element} [$1.element] Element to create value from.
+ * @param {string}  [$1.text]    Text to create value from.
+ * @param {string}  [$1.html]    HTML to create value from.
+ * @param {Range}   [$1.range]   Range to create value from.
  * @return {RichTextValue} A rich text value.
  */
-export function create( {
-	element,
-	text,
-	html,
-	range,
-	__unstableIsEditableTree: isEditableTree,
-} = {} ) {
+export function create( { element, text, html, range } = {} ) {
 	if ( html instanceof RichTextData ) {
 		return {
 			text: html.text,
@@ -245,11 +238,7 @@ export function create( {
 		return createEmptyValue();
 	}
 
-	return createFromElement( {
-		element,
-		range,
-		isEditableTree,
-	} );
+	return createFromElement( { element, range } );
 }
 
 /**
@@ -411,14 +400,13 @@ export function removeReservedCharacters( string ) {
 /**
  * Creates a Rich Text value from a DOM element and range.
  *
- * @param {Object}  $1                  Named argements.
- * @param {Element} [$1.element]        Element to create value from.
- * @param {Range}   [$1.range]          Range to create value from.
- * @param {boolean} [$1.isEditableTree]
+ * @param {Object}  $1           Named argements.
+ * @param {Element} [$1.element] Element to create value from.
+ * @param {Range}   [$1.range]   Range to create value from.
  *
  * @return {RichTextValue} A rich text value.
  */
-function createFromElement( { element, range, isEditableTree } ) {
+function createFromElement( { element, range } ) {
 	const accumulator = createEmptyValue();
 
 	if ( ! element ) {
@@ -454,12 +442,11 @@ function createFromElement( { element, range, isEditableTree } ) {
 		}
 
 		if (
-			isEditableTree &&
 			// Ignore any placeholders.
-			( node.getAttribute( 'data-rich-text-placeholder' ) ||
-				// Ignore any line breaks that are not inserted by us.
-				( tagName === 'br' &&
-					! node.getAttribute( 'data-rich-text-line-break' ) ) )
+			node.getAttribute( 'data-rich-text-placeholder' ) ||
+			// Ignore any line breaks that are not inserted by us.
+			( tagName === 'br' &&
+				! node.getAttribute( 'data-rich-text-line-break' ) )
 		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
@@ -516,11 +503,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 
 		if ( format ) delete format.formatType;
 
-		const value = createFromElement( {
-			element: node,
-			range,
-			isEditableTree,
-		} );
+		const value = createFromElement( { element: node, range } );
 
 		accumulateSelection( accumulator, node, range, value );
 

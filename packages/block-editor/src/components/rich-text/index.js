@@ -379,6 +379,7 @@ export function RichTextWrapper(
 				// tabIndex because Safari will focus the element. However,
 				// Safari will correctly ignore nested contentEditable elements.
 				tabIndex={ props.tabIndex === 0 ? null : props.tabIndex }
+				data-wp-block-attribute-key={ identifier }
 			/>
 		</>
 	);
