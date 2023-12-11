@@ -57,6 +57,10 @@ const FillContents = ( {
 					</Tabs.Context.Provider>
 				}
 				headerClassName="edit-site-sidebar-edit-mode__panel-tabs"
+				// This classname is added so we can apply a corrective negative
+				// margin to the panel.
+				// see https://github.com/WordPress/gutenberg/pull/55360#pullrequestreview-1737671049
+				className="edit-site-sidebar__panel"
 			>
 				<Tabs.Context.Provider value={ tabsContextValue }>
 					<Tabs.TabPanel id={ SIDEBAR_BLOCK } focusable={ false }>
