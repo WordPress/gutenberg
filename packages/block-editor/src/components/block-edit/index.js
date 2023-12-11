@@ -55,6 +55,8 @@ export default function BlockEdit( {
 					clientId,
 					layout: layoutSupport ? layout : null,
 					__unstableLayoutClassNames,
+					// We use symbols in favour of an __unstable prefix to avoid
+					// usage outside of the package (this context is exposed).
 					[ mayDisplayControlsKey ]: mayDisplayControls,
 					[ mayDisplayParentControlsKey ]: mayDisplayParentControls,
 				} ),
