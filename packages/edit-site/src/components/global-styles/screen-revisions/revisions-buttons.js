@@ -48,7 +48,7 @@ function ChangedSummary( { revision, previousRevision, blockNames } ) {
 	return (
 		<span
 			data-testid="global-styles-revision-changes"
-			className="edit-site-global-styles-screen-revision__changes"
+			className="edit-site-global-styles-screen-revisions__changes"
 		>
 			{ changes.join( ', ' ) }
 		</span>
@@ -208,6 +208,17 @@ function RevisionsButtons( {
 											{ displayDate }
 										</time>
 									) }
+									{ isSelected && (
+										<ChangedSummary
+											blockNames={ blockNames }
+											revision={ revision }
+											previousRevision={
+												index < userRevisions.length
+													? userRevisions[ index + 1 ]
+													: {}
+											}
+										/>
+									) }
 									<span className="edit-site-global-styles-screen-revisions__meta">
 										<img
 											alt={ authorDisplayName }
@@ -218,17 +229,6 @@ function RevisionsButtons( {
 								</span>
 							) }
 						</Button>
-						{ isSelected && (
-							<ChangedSummary
-								blockNames={ blockNames }
-								revision={ revision }
-								previousRevision={
-									index < userRevisions.length
-										? userRevisions[ index + 1 ]
-										: {}
-								}
-							/>
-						) }
 					</li>
 				);
 			} ) }

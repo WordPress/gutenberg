@@ -17,10 +17,6 @@
 	overflow: hidden;
 	cursor: pointer;
 
-	&.is-active {
-		box-shadow: inset 5px 0 $black;
-	}
-
 	&:hover {
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 		.edit-site-global-styles-screen-revisions__date {
@@ -70,7 +66,7 @@
 		width: 100%;
 		height: auto;
 		display: block;
-		padding: $grid-unit-15 $grid-unit-15 $grid-unit-15 $grid-unit-30;
+		padding: $grid-unit-15 $grid-unit-15 $grid-unit-10 $grid-unit-30;
 		&:focus,
 		&:active {
 			outline: 0;
@@ -107,6 +103,7 @@
 	}
 }
 
+.edit-site-global-styles-screen-revisions__changes,
 .edit-site-global-styles-screen-revisions__meta {
 	color: $gray-600;
 	display: flex;
@@ -114,7 +111,6 @@
 	width: 100%;
 	align-items: center;
 	font-size: 12px;
-
 	img {
 		width: $grid-unit-20;
 		height: $grid-unit-20;
@@ -127,11 +123,10 @@
 	margin: $grid-unit-30 auto !important;
 }
 
-.edit-site-global-styles-screen-revision__changes {
-	margin: 0 $grid-unit-20 $grid-unit-20 $grid-unit-30;
+.edit-site-global-styles-screen-revisions__changes {
+	margin-bottom: $grid-unit-05;
+	text-align: left;
 	color: $gray-900;
-	display: block;
-	&::first-letter {
-		text-transform: uppercase;
-	}
+	line-height: $default-line-height;
 }
+
