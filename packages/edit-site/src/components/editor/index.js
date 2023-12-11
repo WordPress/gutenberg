@@ -6,12 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockBreadcrumb,
+	BlockToolbar,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 	BlockInspector,
@@ -29,7 +30,6 @@ import {
 } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -93,6 +93,8 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 
 	const { type: editedPostType } = editedPost;
 
+	const isLargeViewport = useViewportMatch( 'medium' );
+
 	const {
 		context,
 		contextPost,
@@ -149,7 +151,6 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 			),
 		};
 	}, [] );
-	const { setRenderingMode } = useDispatch( editorStore );
 
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
@@ -191,16 +192,6 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		! isLoading &&
 		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
 			( ! postWithTemplate && !! editedPost ) );
-
-	// This is the only reliable way I've found to reinitialize the rendering mode
-	// when the canvas mode or the edited entity changes.
-	useEffect( () => {
-		if ( canvasMode === 'edit' && postWithTemplate ) {
-			setRenderingMode( 'template-locked' );
-		} else {
-			setRenderingMode( 'all' );
-		}
-	}, [ canvasMode, postWithTemplate, setRenderingMode ] );
 
 	return (
 		<>
@@ -244,6 +235,9 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 										<SidebarInspectorFill>
 											<BlockInspector />
 										</SidebarInspectorFill>
+										{ ! isLargeViewport && (
+											<BlockToolbar hideDragHandle />
+										) }
 										<SiteEditorCanvas />
 										<BlockRemovalWarningModal
 											rules={ blockRemovalRules }

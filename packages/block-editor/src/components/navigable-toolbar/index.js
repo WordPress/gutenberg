@@ -162,7 +162,7 @@ function useToolbarFocus( {
 			const index = items.findIndex( ( item ) => item.tabIndex === 0 );
 			onIndexChange( index );
 		};
-	}, [ initialIndex, initialFocusOnMount, toolbarRef ] );
+	}, [ initialIndex, initialFocusOnMount, onIndexChange, toolbarRef ] );
 
 	const { lastFocus } = useSelect( ( select ) => {
 		const { getLastFocus } = select( blockEditorStore );
@@ -210,9 +210,9 @@ export default function NavigableToolbar( {
 	useToolbarFocus( {
 		toolbarRef,
 		focusOnMount,
-		isAccessibleToolbar,
 		defaultIndex: initialIndex,
 		onIndexChange,
+		isAccessibleToolbar,
 		shouldUseKeyboardFocusShortcut,
 		focusEditorOnEscape,
 	} );

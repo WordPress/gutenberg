@@ -623,6 +623,10 @@
 										"description": "CSS font-family value.",
 										"type": "string"
 									},
+									"preview": {
+										"description": "URL to a preview image of the font family.",
+										"type": "string"
+									},
 									"fontFace": {
 										"description": "Array of font-face declarations.",
 										"type": "array",
@@ -712,6 +716,10 @@
 												},
 												"unicodeRange": {
 													"description": "CSS unicode-range value.",
+													"type": "string"
+												},
+												"preview": {
+													"description": "URL to a preview image of the font face.",
 													"type": "string"
 												}
 											},

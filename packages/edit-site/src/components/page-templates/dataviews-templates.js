@@ -8,7 +8,7 @@ import removeAccents from 'remove-accents';
  */
 import {
 	Icon,
-	__experimentalHeading as Heading,
+	__experimentalView as View,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -83,7 +83,7 @@ function TemplateTitle( { item } ) {
 	const { isCustomized } = useAddedBy( item.type, item.id );
 	return (
 		<VStack spacing={ 1 }>
-			<Heading as="h3" level={ 5 }>
+			<View as="h3">
 				<Link
 					params={ {
 						postId: item.id,
@@ -94,7 +94,7 @@ function TemplateTitle( { item } ) {
 					{ decodeEntities( item.title?.rendered || item.slug ) ||
 						__( '(no title)' ) }
 				</Link>
-			</Heading>
+			</View>
 			{ isCustomized && (
 				<span className="edit-site-list-added-by__customized-info">
 					{ item.type === TEMPLATE_POST_TYPE
@@ -176,11 +176,11 @@ export default function DataviewsTemplates() {
 			{
 				header: __( 'Preview' ),
 				id: 'preview',
-				render: ( { item, view: { type: viewType } } ) => {
+				render: ( { item } ) => {
 					return (
 						<TemplatePreview
 							content={ item.content.raw }
-							viewType={ viewType }
+							viewType={ view.type }
 						/>
 					);
 				},
@@ -229,7 +229,7 @@ export default function DataviewsTemplates() {
 				elements: authors,
 			},
 		],
-		[ authors ]
+		[ authors, view ]
 	);
 
 	const { shownTemplates, paginationInfo } = useMemo( () => {
@@ -353,6 +353,7 @@ export default function DataviewsTemplates() {
 				view={ view }
 				onChangeView={ onChangeView }
 				supportedLayouts={ [ LAYOUT_TABLE, LAYOUT_GRID ] }
+				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
 			/>
 		</Page>
 	);

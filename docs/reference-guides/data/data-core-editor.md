@@ -268,6 +268,18 @@ _Returns_
 
 -   `string?`: Template ID.
 
+### getDeviceType
+
+Returns the current editing canvas device type.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Device type.
+
 ### getEditedPostAttribute
 
 Returns a single attribute of the post being edited, preferring the unsaved edit if one exists, but falling back to the attribute for the last known saved state of the post.
@@ -1261,6 +1273,31 @@ _Related_
 
 -   selectBlock in core/block-editor store.
 
+### setDeviceType
+
+Action that changes the width of the editing canvas.
+
+_Parameters_
+
+-   _deviceType_ `string`:
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setEditedPost
+
+Returns an action that sets the current post Type and post ID.
+
+_Parameters_
+
+-   _postType_ `string`: Post Type.
+-   _postId_ `string`: Post ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### setRenderingMode
 
 Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
@@ -1292,15 +1329,13 @@ _Parameters_
 
 ### setupEditorState
 
-Returns an action object used to setup the editor state when first opening an editor.
+> **Deprecated**
+
+Setup the editor state.
 
 _Parameters_
 
 -   _post_ `Object`: Post object.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### showInsertionPoint
 

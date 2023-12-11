@@ -2,17 +2,28 @@
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { useMemo, useEffect, useId } from '@wordpress/element';
+import { useMemo, useEffect, useId, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { createHigherOrderComponent, pure } from '@wordpress/compose';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
+import {
+	useBlockEditContext,
+	mayDisplayControlsKey,
+	mayDisplayParentControlsKey,
+} from '../components/block-edit/context';
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
 
 /**
  * Removed falsy values from nested object.
@@ -361,4 +372,170 @@ export function useBlockSettings( name, parentLayout ) {
 	] );
 
 	return useSettingsForBlockElement( rawSettings, name );
+}
+
+export function createBlockEditFilter( features ) {
+	// We don't want block controls to re-render when typing inside a block.
+	// `pure` will prevent re-renders unless props change, so only pass the
+	// needed props and not the whole attributes object.
+	features = features.map( ( settings ) => {
+		return { ...settings, Edit: pure( settings.edit ) };
+	} );
+	const withBlockEditHooks = createHigherOrderComponent(
+		( OriginalBlockEdit ) => ( props ) => {
+			const context = useBlockEditContext();
+			// CAUTION: code added before this line will be executed for all
+			// blocks, not just those that support the feature! Code added
+			// above this line should be carefully evaluated for its impact on
+			// performance.
+			return [
+				...features.map( ( feature, i ) => {
+					const {
+						Edit,
+						hasSupport,
+						attributeKeys = [],
+						shareWithChildBlocks,
+					} = feature;
+					const shouldDisplayControls =
+						context[ mayDisplayControlsKey ] ||
+						( context[ mayDisplayParentControlsKey ] &&
+							shareWithChildBlocks );
+
+					if (
+						! shouldDisplayControls ||
+						! hasSupport( props.name )
+					) {
+						return null;
+					}
+
+					const neededProps = {};
+					for ( const key of attributeKeys ) {
+						if ( props.attributes[ key ] ) {
+							neededProps[ key ] = props.attributes[ key ];
+						}
+					}
+					return (
+						<Edit
+							// We can use the index because the array length
+							// is fixed per page load right now.
+							key={ i }
+							name={ props.name }
+							clientId={ props.clientId }
+							setAttributes={ props.setAttributes }
+							__unstableParentLayout={
+								props.__unstableParentLayout
+							}
+							// This component is pure, so only pass needed
+							// props!!!
+							{ ...neededProps }
+						/>
+					);
+				} ),
+				<OriginalBlockEdit key="edit" { ...props } />,
+			];
+		},
+		'withBlockEditHooks'
+	);
+	addFilter( 'editor.BlockEdit', 'core/editor/hooks', withBlockEditHooks );
+}
+
+function BlockProps( { index, useBlockProps, setAllWrapperProps, ...props } ) {
+	const wrapperProps = useBlockProps( props );
+	const setWrapperProps = ( next ) =>
+		setAllWrapperProps( ( prev ) => {
+			const nextAll = [ ...prev ];
+			nextAll[ index ] = next;
+			return nextAll;
+		} );
+	// Setting state after every render is fine because this component is
+	// pure and will only re-render when needed props change.
+	useEffect( () => {
+		// We could shallow compare the props, but since this component only
+		// changes when needed attributes change, the benefit is probably small.
+		setWrapperProps( wrapperProps );
+		return () => {
+			setWrapperProps( undefined );
+		};
+	} );
+	return null;
+}
+
+const BlockPropsPure = pure( BlockProps );
+
+export function createBlockListBlockFilter( features ) {
+	const withBlockListBlockHooks = createHigherOrderComponent(
+		( BlockListBlock ) => ( props ) => {
+			const [ allWrapperProps, setAllWrapperProps ] = useState(
+				Array( features.length ).fill( undefined )
+			);
+			return [
+				...features.map( ( feature, i ) => {
+					const {
+						hasSupport,
+						attributeKeys = [],
+						useBlockProps,
+					} = feature;
+
+					const neededProps = {};
+					for ( const key of attributeKeys ) {
+						if ( props.attributes[ key ] ) {
+							neededProps[ key ] = props.attributes[ key ];
+						}
+					}
+
+					if (
+						! hasSupport( props.name ) ||
+						// Skip rendering if none of the needed attributes are
+						// set.
+						! Object.keys( neededProps ).length
+					) {
+						return null;
+					}
+
+					return (
+						<BlockPropsPure
+							// We can use the index because the array length
+							// is fixed per page load right now.
+							key={ i }
+							index={ i }
+							useBlockProps={ useBlockProps }
+							// This component is pure, so we must pass a stable
+							// function reference.
+							setAllWrapperProps={ setAllWrapperProps }
+							name={ props.name }
+							// This component is pure, so only pass needed
+							// props!!!
+							{ ...neededProps }
+						/>
+					);
+				} ),
+				<BlockListBlock
+					key="edit"
+					{ ...props }
+					wrapperProps={ allWrapperProps
+						.filter( Boolean )
+						.reduce( ( acc, wrapperProps ) => {
+							return {
+								...acc,
+								...wrapperProps,
+								className: classnames(
+									acc.className,
+									wrapperProps.className
+								),
+								style: {
+									...acc.style,
+									...wrapperProps.style,
+								},
+							};
+						}, props.wrapperProps || {} ) }
+				/>,
+			];
+		},
+		'withBlockListBlockHooks'
+	);
+	addFilter(
+		'editor.BlockListBlock',
+		'core/editor/hooks',
+		withBlockListBlockHooks
+	);
 }

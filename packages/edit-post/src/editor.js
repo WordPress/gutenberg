@@ -9,11 +9,12 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { CommandMenu } from '@wordpress/commands';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -26,6 +27,8 @@ import { unlock } from './lock-unlock';
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
 function Editor( { postId, postType, settings, initialEdits, ...props } ) {
+	const isLargeViewport = useViewportMatch( 'medium' );
+
 	const {
 		hasFixedToolbar,
 		focusMode,
@@ -66,9 +69,9 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				getEditorSettings().supportsTemplateMode;
 			const isViewable = getPostType( postType )?.viewable ?? false;
 			const canEditTemplate = canUser( 'create', 'templates' );
-
 			return {
-				hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+				hasFixedToolbar:
+					isFeatureActive( 'fixedToolbar' ) || ! isLargeViewport,
 				focusMode: isFeatureActive( 'focusMode' ),
 				isDistractionFree: isFeatureActive( 'distractionFree' ),
 				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
@@ -86,7 +89,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				post: postObject,
 			};
 		},
-		[ postType, postId ]
+		[ postType, postId, isLargeViewport ]
 	);
 
 	const { updatePreferredStyleVariations, setIsInserterOpened } =
@@ -141,12 +144,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		updatePreferredStyleVariations,
 		keepCaretInsideBlock,
 	] );
-
-	// The default mode of the post editor is "post-only" mode.
-	const { setRenderingMode } = useDispatch( editorStore );
-	useEffect( () => {
-		setRenderingMode( 'post-only' );
-	}, [ setRenderingMode ] );
 
 	if ( ! post ) {
 		return null;

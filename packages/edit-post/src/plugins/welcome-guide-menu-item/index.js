@@ -8,7 +8,8 @@ import { store as editorStore } from '@wordpress/editor';
 
 export default function WelcomeGuideMenuItem() {
 	const isTemplateMode = useSelect(
-		( select ) => select( editorStore ).getRenderingMode() !== 'post-only',
+		( select ) =>
+			select( editorStore ).getRenderingMode() === 'template-only',
 		[]
 	);
 
