@@ -195,6 +195,65 @@ export function getDropTargetPosition(
 }
 
 /**
+ * A Rect hook that takes an array of dragged block client ids and a target client id
+ * and determines if the dragged blocks can be dropped on the target.
+ *
+ * @param {string[]} draggedBlockClientIds The client ids of the dragged blocks.
+ * @param {string}   targetClientId        The client id of the target.
+ * @return {boolean} Whether the dragged blocks can be dropped on the target.
+ */
+export function useIsDropTargetValid( draggedBlockClientIds, targetClientId ) {
+	const { getBlockType, allowedBlocks, draggedBlockNames, targetBlockName } =
+		useSelect(
+			( select ) => {
+				const { getBlockType: _getBlockType } = select( blocksStore );
+				const { getBlockNamesByClientId, getAllowedBlocks } =
+					select( blockEditorStore );
+
+				return {
+					getBlockType: _getBlockType,
+					allowedBlocks: getAllowedBlocks( targetClientId ),
+					draggedBlockNames: getBlockNamesByClientId(
+						draggedBlockClientIds
+					),
+					targetBlockName: getBlockNamesByClientId( [
+						targetClientId,
+					] )[ 0 ],
+				};
+			},
+			[ draggedBlockClientIds, targetClientId ]
+		);
+
+	// At root level allowedBlocks is undefined and all blocks are allowed.
+	// Otherwise, check if all dragged blocks are allowed.
+	let areBlocksAllowed = true;
+	if ( allowedBlocks ) {
+		const allowedBlockNames = allowedBlocks?.map( ( { name } ) => name );
+
+		areBlocksAllowed = draggedBlockNames.every( ( name ) =>
+			allowedBlockNames?.includes( name )
+		);
+	}
+
+	// Work out if dragged blocks have an allowed parent and if so
+	// check target block matches the allowed parent.
+	const draggedBlockTypes = draggedBlockNames.map( ( name ) =>
+		getBlockType( name )
+	);
+	const targetMatchesDraggedBlockParents = draggedBlockTypes.every(
+		( block ) => {
+			const [ allowedParentName ] = block?.parent || [];
+			if ( ! allowedParentName ) {
+				return true;
+			}
+
+			return allowedParentName === targetBlockName;
+		}
+	);
+	return areBlocksAllowed && targetMatchesDraggedBlockParents;
+}
+
+/**
  * @typedef  {Object} WPBlockDropZoneConfig
  * @property {?HTMLElement} dropZoneElement Optional element to be used as the drop zone.
  * @property {string}       rootClientId    The root client id for the block list.
@@ -223,10 +282,7 @@ export default function useBlockDropZone( {
 		parentBlockClientId,
 		rootBlockIndex,
 		isDisabled,
-		allowedBlocks,
-		draggedBlockNames,
-		getBlockType,
-		targetBlockName,
+		draggedBlockClientIds,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -236,10 +292,8 @@ export default function useBlockDropZone( {
 				getBlockParents,
 				getBlockEditingMode,
 				getDraggedBlockClientIds,
-				getBlockNamesByClientId,
-				getAllowedBlocks,
 			} = select( blockEditorStore );
-			const { getBlockType: _getBlockType } = select( blocksStore );
+
 			const blockEditingMode = getBlockEditingMode( targetRootClientId );
 			return {
 				parentBlockClientId:
@@ -251,44 +305,17 @@ export default function useBlockDropZone( {
 						targetRootClientId
 					) ||
 					__unstableIsWithinBlockOverlay( targetRootClientId ),
-				allowedBlocks: getAllowedBlocks( targetRootClientId ),
-				draggedBlockNames: getBlockNamesByClientId(
-					getDraggedBlockClientIds()
-				),
-				getBlockType: _getBlockType,
-				targetBlockName: getBlockNamesByClientId( [
-					targetRootClientId,
-				] )[ 0 ],
+				draggedBlockClientIds: getDraggedBlockClientIds(),
 			};
 		},
 		[ targetRootClientId ]
 	);
 
-	// At root level allowedBlocks is undefined and all blocks are allowed.
-	// Otherwise, check if all dragged blocks are allowed.
-	let areBlocksAllowed = true;
-	if ( allowedBlocks ) {
-		const allowedBlockNames = allowedBlocks?.map( ( { name } ) => name );
-
-		areBlocksAllowed = draggedBlockNames.every( ( name ) =>
-			allowedBlockNames?.includes( name )
-		);
-	}
-
-	// Work out if dragged blocks have an allowed parent and if so
-	// check target block matches the allowed parent.
-	const draggedBlockTypes = draggedBlockNames.map( ( name ) =>
-		getBlockType( name )
+	const isBlockDroppingAllowed = useIsDropTargetValid(
+		draggedBlockClientIds,
+		targetRootClientId
 	);
-	const targetMatchesDraggedBlockParents = draggedBlockTypes.every(
-		( block ) => {
-			const [ allowedParentName ] = block?.parent || [];
-			if ( ! allowedParentName ) {
-				return true;
-			}
-			return allowedParentName === targetBlockName;
-		}
-	);
+
 	const { getBlockListSettings, getBlocks, getBlockIndex } =
 		useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } =
@@ -386,10 +413,7 @@ export default function useBlockDropZone( {
 
 	return useDropZone( {
 		dropZoneElement,
-		isDisabled:
-			isDisabled ||
-			! areBlocksAllowed ||
-			! targetMatchesDraggedBlockParents,
+		isDisabled: isDisabled || ! isBlockDroppingAllowed,
 		onDrop: onBlockDrop,
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being
