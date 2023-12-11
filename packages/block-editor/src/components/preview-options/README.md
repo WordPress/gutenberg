@@ -27,7 +27,7 @@ const MyPreviewOptions = () => (
 		isEnabled={ true }
 		className="edit-post-post-preview-dropdown"
 		deviceType={ deviceType }
-		setDeviceType={ setPreviewDeviceType }
+		setDeviceType={ setDeviceType }
 	> { ( { onClose } ) => (
 			<MenuGroup>
 				<div className="edit-post-header-preview__grouping-external">

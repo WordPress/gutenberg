@@ -192,6 +192,7 @@ export default function Layout() {
 						'is-full-canvas': isFullCanvas,
 						'is-edit-mode': isEditing,
 						'has-fixed-toolbar': hasFixedToolbar,
+						'is-block-toolbar-visible': hasBlockSelected,
 					}
 				) }
 			>

@@ -9,7 +9,8 @@ import classnames from 'classnames';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
 import { useMemo, Platform, useCallback } from '@wordpress/element';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { pure } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -23,7 +24,6 @@ import {
 	cleanEmptyObject,
 	transformStyles,
 	shouldSkipSerialization,
-	useBlockSettings,
 } from './utils';
 import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
@@ -32,6 +32,7 @@ import {
 	default as StylesColorPanel,
 } from '../components/global-styles/color-panel';
 import BlockColorContrastChecker from './contrast-checker';
+import { store as blockEditorStore } from '../store';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
@@ -289,23 +290,25 @@ function ColorInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function ColorEdit( props ) {
-	const { clientId, name, attributes, setAttributes } = props;
-	const settings = useBlockSettings( name );
+function ColorEditPure( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasColorPanel( settings );
+	function selector( select ) {
+		const { style, textColor, backgroundColor, gradient } =
+			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+		return { style, textColor, backgroundColor, gradient };
+	}
+	const { style, textColor, backgroundColor, gradient } = useSelect(
+		selector,
+		[ clientId ]
+	);
 	const value = useMemo( () => {
 		return attributesToStyle( {
-			style: attributes.style,
-			textColor: attributes.textColor,
-			backgroundColor: attributes.backgroundColor,
-			gradient: attributes.gradient,
+			style,
+			textColor,
+			backgroundColor,
+			gradient,
 		} );
-	}, [
-		attributes.style,
-		attributes.textColor,
-		attributes.backgroundColor,
-		attributes.gradient,
-	] );
+	}, [ style, textColor, backgroundColor, gradient ] );
 
 	const onChange = ( newStyle ) => {
 		setAttributes( styleToAttributes( newStyle ) );
@@ -315,7 +318,7 @@ export function ColorEdit( props ) {
 		return null;
 	}
 
-	const defaultControls = getBlockSupport( props.name, [
+	const defaultControls = getBlockSupport( name, [
 		COLOR_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
@@ -328,7 +331,7 @@ export function ColorEdit( props ) {
 		// Deactivating it requires `enableContrastChecker` to have
 		// an explicit value of `false`.
 		false !==
-			getBlockSupport( props.name, [
+			getBlockSupport( name, [
 				COLOR_SUPPORT_KEY,
 				'enableContrastChecker',
 			] );
@@ -343,7 +346,7 @@ export function ColorEdit( props ) {
 			defaultControls={ defaultControls }
 			enableContrastChecker={
 				false !==
-				getBlockSupport( props.name, [
+				getBlockSupport( name, [
 					COLOR_SUPPORT_KEY,
 					'enableContrastChecker',
 				] )
@@ -356,72 +359,61 @@ export function ColorEdit( props ) {
 	);
 }
 
-/**
- * This adds inline styles for color palette colors.
- * Ideally, this is not needed and themes should load their palettes on the editor.
- *
- * @param {Function} BlockListBlock Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withColorPaletteStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const { name, attributes } = props;
-		const { backgroundColor, textColor } = attributes;
-		const [ userPalette, themePalette, defaultPalette ] = useSettings(
-			'color.palette.custom',
-			'color.palette.theme',
-			'color.palette.default'
-		);
+// We don't want block controls to re-render when typing inside a block. `pure`
+// will prevent re-renders unless props change, so only pass the needed props
+// and not the whole attributes object.
+export const ColorEdit = pure( ColorEditPure );
 
-		const colors = useMemo(
-			() => [
-				...( userPalette || [] ),
-				...( themePalette || [] ),
-				...( defaultPalette || [] ),
-			],
-			[ userPalette, themePalette, defaultPalette ]
-		);
-		if (
-			! hasColorSupport( name ) ||
-			shouldSkipSerialization( name, COLOR_SUPPORT_KEY )
-		) {
-			return <BlockListBlock { ...props } />;
-		}
-		const extraStyles = {};
+function useBlockProps( { name, backgroundColor, textColor } ) {
+	const [ userPalette, themePalette, defaultPalette ] = useSettings(
+		'color.palette.custom',
+		'color.palette.theme',
+		'color.palette.default'
+	);
 
-		if (
-			textColor &&
-			! shouldSkipSerialization( name, COLOR_SUPPORT_KEY, 'text' )
-		) {
-			extraStyles.color = getColorObjectByAttributeValues(
-				colors,
-				textColor
-			)?.color;
-		}
-		if (
-			backgroundColor &&
-			! shouldSkipSerialization( name, COLOR_SUPPORT_KEY, 'background' )
-		) {
-			extraStyles.backgroundColor = getColorObjectByAttributeValues(
-				colors,
-				backgroundColor
-			)?.color;
-		}
+	const colors = useMemo(
+		() => [
+			...( userPalette || [] ),
+			...( themePalette || [] ),
+			...( defaultPalette || [] ),
+		],
+		[ userPalette, themePalette, defaultPalette ]
+	);
+	if (
+		! hasColorSupport( name ) ||
+		shouldSkipSerialization( name, COLOR_SUPPORT_KEY )
+	) {
+		return {};
+	}
+	const extraStyles = {};
 
-		let wrapperProps = props.wrapperProps;
-		wrapperProps = {
-			...props.wrapperProps,
-			style: {
-				...extraStyles,
-				...props.wrapperProps?.style,
-			},
-		};
+	if (
+		textColor &&
+		! shouldSkipSerialization( name, COLOR_SUPPORT_KEY, 'text' )
+	) {
+		extraStyles.color = getColorObjectByAttributeValues(
+			colors,
+			textColor
+		)?.color;
+	}
+	if (
+		backgroundColor &&
+		! shouldSkipSerialization( name, COLOR_SUPPORT_KEY, 'background' )
+	) {
+		extraStyles.backgroundColor = getColorObjectByAttributeValues(
+			colors,
+			backgroundColor
+		)?.color;
+	}
 
-		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
-	},
-	'withColorPaletteStyles'
-);
+	return { style: extraStyles };
+}
+
+export default {
+	useBlockProps,
+	attributeKeys: [ 'backgroundColor', 'textColor' ],
+	hasSupport: hasColorSupport,
+};
 
 const MIGRATION_PATHS = {
 	linkColor: [ [ 'style', 'elements', 'link', 'color', 'text' ] ],
@@ -467,12 +459,6 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/color/addEditProps',
 	addEditProps
-);
-
-addFilter(
-	'editor.BlockListBlock',
-	'core/color/with-color-palette-styles',
-	withColorPaletteStyles
 );
 
 addFilter(

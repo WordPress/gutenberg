@@ -3,7 +3,6 @@
  */
 import { NavigableMenu, Toolbar } from '@wordpress/components';
 import {
-	forwardRef,
 	useState,
 	useRef,
 	useLayoutEffect,
@@ -163,7 +162,7 @@ function useToolbarFocus( {
 			const index = items.findIndex( ( item ) => item.tabIndex === 0 );
 			onIndexChange( index );
 		};
-	}, [ initialIndex, initialFocusOnMount, toolbarRef ] );
+	}, [ initialIndex, initialFocusOnMount, onIndexChange, toolbarRef ] );
 
 	const { lastFocus } = useSelect( ( select ) => {
 		const { getLastFocus } = select( blockEditorStore );
@@ -196,29 +195,24 @@ function useToolbarFocus( {
 	}, [ focusEditorOnEscape, lastFocus, toolbarRef ] );
 }
 
-function UnforwardedNavigableToolbar(
-	{
-		children,
-		focusOnMount,
-		focusEditorOnEscape = false,
-		shouldUseKeyboardFocusShortcut = true,
-		__experimentalInitialIndex: initialIndex,
-		__experimentalOnIndexChange: onIndexChange,
-		...props
-	},
-	ref
-) {
-	const maybeRef = useRef();
-	// If a ref was not forwarded, we create one.
-	const toolbarRef = ref || maybeRef;
+export default function NavigableToolbar( {
+	children,
+	focusOnMount,
+	focusEditorOnEscape = false,
+	shouldUseKeyboardFocusShortcut = true,
+	__experimentalInitialIndex: initialIndex,
+	__experimentalOnIndexChange: onIndexChange,
+	...props
+} ) {
+	const toolbarRef = useRef();
 	const isAccessibleToolbar = useIsAccessibleToolbar( toolbarRef );
 
 	useToolbarFocus( {
 		toolbarRef,
 		focusOnMount,
-		isAccessibleToolbar,
 		defaultIndex: initialIndex,
 		onIndexChange,
+		isAccessibleToolbar,
 		shouldUseKeyboardFocusShortcut,
 		focusEditorOnEscape,
 	} );
@@ -246,7 +240,3 @@ function UnforwardedNavigableToolbar(
 		</NavigableMenu>
 	);
 }
-
-export const NavigableToolbar = forwardRef( UnforwardedNavigableToolbar );
-
-export default NavigableToolbar;

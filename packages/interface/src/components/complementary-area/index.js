@@ -182,6 +182,7 @@ function ComplementaryArea( {
 							icon={ showIconLabels ? check : icon }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
+							size="compact"
 						/>
 					) }
 				</PinnedItems>

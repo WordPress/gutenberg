@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 9.38.0 (2023-11-29)
+
+## 9.37.0 (2023-11-16)
+
 ### New features
 
 - Add new `funnel` icon.

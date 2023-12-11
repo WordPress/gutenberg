@@ -32,10 +32,11 @@ export const settings = {
 			return;
 		}
 
-		const entity = select( coreDataStore ).getEntityRecord(
+		const { getCurrentTheme, getEntityRecord } = select( coreDataStore );
+		const entity = getEntityRecord(
 			'postType',
 			'wp_template_part',
-			theme + '//' + slug
+			( theme || getCurrentTheme()?.stylesheet ) + '//' + slug
 		);
 		if ( ! entity ) {
 			return;

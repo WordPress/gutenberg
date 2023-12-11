@@ -10,11 +10,11 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import CreatePatternModal from './create-pattern-modal';
-import { PATTERN_SYNC_TYPES } from '../constants';
+import { PATTERN_SYNC_TYPES, PATTERN_TYPES } from '../constants';
 
 function getTermLabels( pattern, categories ) {
-	// Theme patterns don't have an id and rely on core pattern categories.
-	if ( ! pattern.id ) {
+	// Theme patterns rely on core pattern categories.
+	if ( pattern.type !== PATTERN_TYPES.user ) {
 		return categories.core
 			?.filter( ( category ) =>
 				pattern.categories.includes( category.name )
@@ -52,9 +52,10 @@ export default function DuplicatePatternModal( {
 	const duplicatedProps = {
 		content: pattern.content,
 		defaultCategories: getTermLabels( pattern, categories ),
-		defaultSyncType: ! pattern.id // Theme patterns don't have an ID.
-			? PATTERN_SYNC_TYPES.unsynced
-			: pattern.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
+		defaultSyncType:
+			pattern.type !== PATTERN_TYPES.user // Theme patterns are unsynced by default.
+				? PATTERN_SYNC_TYPES.unsynced
+				: pattern.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
 		defaultTitle: sprintf(
 			/* translators: %s: Existing pattern title */
 			__( '%s (Copy)' ),

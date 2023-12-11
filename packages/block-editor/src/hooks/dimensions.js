@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import { useState, useEffect, useCallback } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
+import { pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -19,7 +20,7 @@ import { PaddingVisualizer } from './padding';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
-import { cleanEmptyObject, useBlockSettings } from './utils';
+import { cleanEmptyObject } from './utils';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -65,17 +66,13 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function DimensionsPanel( props ) {
-	const {
-		clientId,
-		name,
-		attributes,
-		setAttributes,
-		__unstableParentLayout,
-	} = props;
-	const settings = useBlockSettings( name, __unstableParentLayout );
+function DimensionsPanelPure( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasDimensionsPanel( settings );
-	const value = attributes.style;
+	const value = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
+		[ clientId ]
+	);
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const onChange = ( newStyle ) => {
 		setAttributes( {
@@ -87,11 +84,11 @@ export function DimensionsPanel( props ) {
 		return null;
 	}
 
-	const defaultDimensionsControls = getBlockSupport( props.name, [
+	const defaultDimensionsControls = getBlockSupport( name, [
 		DIMENSIONS_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
-	const defaultSpacingControls = getBlockSupport( props.name, [
+	const defaultSpacingControls = getBlockSupport( name, [
 		SPACING_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
@@ -114,18 +111,25 @@ export function DimensionsPanel( props ) {
 			{ !! settings?.spacing?.padding && (
 				<PaddingVisualizer
 					forceShow={ visualizedProperty === 'padding' }
-					{ ...props }
+					clientId={ clientId }
+					value={ value }
 				/>
 			) }
 			{ !! settings?.spacing?.margin && (
 				<MarginVisualizer
 					forceShow={ visualizedProperty === 'margin' }
-					{ ...props }
+					clientId={ clientId }
+					value={ value }
 				/>
 			) }
 		</>
 	);
 }
+
+// We don't want block controls to re-render when typing inside a block. `pure`
+// will prevent re-renders unless props change, so only pass the needed props
+// and not the whole attributes object.
+export const DimensionsPanel = pure( DimensionsPanelPure );
 
 /**
  * @deprecated
