@@ -1,11 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { Circle, Rect, SVG } from '@wordpress/primitives';
+import { Path, SVG } from '@wordpress/primitives';
 
 export const PatreonIcon = () => (
-	<SVG width="24" height="24" viewBox="0 0 569 546" version="1.1">
-		<Circle cx="363" cy="205" r="205" />
-		<Rect width="100" height="546" x="0" y="0" />
+	<SVG width="24" height="24" viewBox="0 0 24 24" version="1.1">
+		<Path d="M20 7.40755C19.9969 5.10922 18.2543 3.22555 16.2097 2.54588C13.6708 1.70188 10.3222 1.82421 7.89775 2.99921C4.95932 4.42355 4.03626 7.54355 4.00186 10.6552C3.97363 13.2136 4.2222 19.9517 7.92225 19.9997C10.6715 20.0356 11.0809 16.3967 12.3529 14.6442C13.258 13.3974 14.4233 13.0452 15.8578 12.6806C18.3233 12.0537 20.0036 10.0551 20 7.40755Z" />
 	</SVG>
 );
