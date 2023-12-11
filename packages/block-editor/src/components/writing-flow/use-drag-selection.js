@@ -27,8 +27,12 @@ function setContentEditableWrapper( node, value ) {
 export default function useDragSelection() {
 	const { startMultiSelect, stopMultiSelect } =
 		useDispatch( blockEditorStore );
-	const { isSelectionEnabled, hasMultiSelection, isDraggingBlocks } =
-		useSelect( blockEditorStore );
+	const {
+		isSelectionEnabled,
+		hasMultiSelection,
+		isDraggingBlocks,
+		isMultiSelecting,
+	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -84,6 +88,12 @@ export default function useDragSelection() {
 					return;
 				}
 
+				// Abort if we are already multi-selecting.
+				if ( isMultiSelecting() ) {
+					return;
+				}
+
+				// Abort if selection is leaving writing flow.
 				if ( node === target ) {
 					return;
 				}

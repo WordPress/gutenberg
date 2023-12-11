@@ -98,7 +98,7 @@ function getRichTextElement( node ) {
 export default function useSelectionObserver() {
 	const { multiSelect, selectBlock, selectionChange } =
 		useDispatch( blockEditorStore );
-	const { getBlockParents, getBlockSelectionStart } =
+	const { getBlockParents, getBlockSelectionStart, isMultiSelecting } =
 		useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
@@ -130,7 +130,10 @@ export default function useSelectionObserver() {
 				// For now we check if the event is a `mouse` event.
 				const isClickShift = event.shiftKey && event.type === 'mouseup';
 				if ( selection.isCollapsed && ! isClickShift ) {
-					if ( node.contentEditable === 'true' ) {
+					if (
+						node.contentEditable === 'true' &&
+						! isMultiSelecting()
+					) {
 						setContentEditableWrapper( node, false );
 						let element =
 							startNode.nodeType === startNode.ELEMENT_NODE
