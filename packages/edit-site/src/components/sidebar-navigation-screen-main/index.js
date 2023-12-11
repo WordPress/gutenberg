@@ -17,7 +17,7 @@ import { useEffect } from '@wordpress/element';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
-import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
+import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles/navigation-item';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import TemplatePartHint from './template-part-hint';

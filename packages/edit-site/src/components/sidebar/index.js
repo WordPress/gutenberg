@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { memo, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { memo, useRef, lazy, Suspense, Fragment } from '@wordpress/element';
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
@@ -12,75 +11,130 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
-import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
-import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
-import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
-import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
 import useSyncPathWithURL, {
 	getPathFromURL,
 } from '../sync-state-with-url/use-sync-path-with-url';
-import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
-import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
-import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
-import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
+// import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
 import SaveHub from '../save-hub';
 import { unlock } from '../../lock-unlock';
-import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
-import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
-import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import DataViewsSidebarContent from '../sidebar-dataviews';
 
 const { useLocation } = unlock( routerPrivateApis );
+
+function lazyScreen( cb ) {
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const Load = lazy( cb );
+	return function Screen( props ) {
+		return <Load { ...props } />;
+	};
+}
+
+const screens = [
+	{
+		path: '/',
+		component: () =>
+			import(
+				/* webpackChunkName: "sidebar-screen-main" */ '../sidebar-navigation-screen-main'
+			),
+	},
+	{
+		path: '/navigation',
+		component: () =>
+			import(
+				/* webpackChunkName: "sidebar-screen-navigation-menus" */ '../sidebar-navigation-screen-navigation-menus'
+			),
+	},
+	{
+		path: '/navigation/:postType/:postId',
+		component: () =>
+			import(
+				/* webpackChunkName: "sidebar-screen-navigation-menu" */ '../sidebar-navigation-screen-navigation-menu'
+			),
+	},
+	{
+		path: '/wp_global_styles',
+		component: () =>
+			import(
+				/* webpackChunkName: "sidebar-screen-global-styles" */ '../sidebar-navigation-screen-global-styles'
+			),
+	},
+	{
+		path: '/page',
+		component: () =>
+			import(
+				/* webpackChunkName: "sidebar-screen-pages" */ '../sidebar-navigation-screen-pages'
+			),
+	},
+	{
+		path: '/page/:postId',
+		component: () =>
+			import(
+				/* webpackChunkName: "sidebar-screen-page" */ '../sidebar-navigation-screen-page'
+			),
+	},
+	{
+		path: '/pages',
+		condition: () => window?.__experimentalAdminViews,
+		component: () =>
+			import(
+				/* webpackChunkName: "sidebar-screen-dataviews" */ '../sidebar-dataviews'
+			),
+	},
+	{
+		path: '/:postType(wp_template)',
+		component: () =>
+			import(
+				/* webpackChunkName: "sidebar-screen-templates" */ '../sidebar-navigation-screen-templates'
+			),
+	},
+	{
+		path: '/patterns',
+		component: () =>
+			import(
+				/* webpackChunkName: "sidebar-screen-patterns" */ '../sidebar-navigation-screen-patterns'
+			),
+	},
+	{
+		path: '/:postType(wp_template|wp_template_part)/all',
+		component: () =>
+			import(
+				/* webpackChunkName: "sidebar-screen-templates-browse" */ '../sidebar-navigation-screen-templates-browse'
+			),
+	},
+	{
+		path: '/:postType(wp_template_part|wp_block)/:postId',
+		component: () =>
+			import(
+				/* webpackChunkName: "sidebar-screen-pattern" */ '../sidebar-navigation-screen-pattern'
+			),
+	},
+	{
+		path: '/:postType(wp_template)/:postId',
+		component: () =>
+			import(
+				/* webpackChunkName: "sidebar-screen-template" */ '../sidebar-navigation-screen-template'
+			),
+	},
+];
 
 function SidebarScreens() {
 	useSyncPathWithURL();
 
 	return (
-		<>
-			<NavigatorScreen path="/">
-				<SidebarNavigationScreenMain />
-			</NavigatorScreen>
-			<NavigatorScreen path="/navigation">
-				<SidebarNavigationScreenNavigationMenus />
-			</NavigatorScreen>
-			<NavigatorScreen path="/navigation/:postType/:postId">
-				<SidebarNavigationScreenNavigationMenu />
-			</NavigatorScreen>
-			<NavigatorScreen path="/wp_global_styles">
-				<SidebarNavigationScreenGlobalStyles />
-			</NavigatorScreen>
-			<NavigatorScreen path="/page">
-				<SidebarNavigationScreenPages />
-			</NavigatorScreen>
-			<NavigatorScreen path="/page/:postId">
-				<SidebarNavigationScreenPage />
-			</NavigatorScreen>
-			{ window?.__experimentalAdminViews && (
-				<NavigatorScreen path="/pages">
-					<SidebarNavigationScreen
-						title={ __( 'Pages' ) }
-						backPath="/page"
-						content={ <DataViewsSidebarContent /> }
-					/>
-				</NavigatorScreen>
-			) }
-			<NavigatorScreen path="/:postType(wp_template)">
-				<SidebarNavigationScreenTemplates />
-			</NavigatorScreen>
-			<NavigatorScreen path="/patterns">
-				<SidebarNavigationScreenPatterns />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
-				<SidebarNavigationScreenTemplatesBrowse />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template_part|wp_block)/:postId">
-				<SidebarNavigationScreenPattern />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template)/:postId">
-				<SidebarNavigationScreenTemplate />
-			</NavigatorScreen>
-		</>
+		<Suspense fallback={ null }>
+			{ screens.map( ( { path, component, condition } ) => {
+				if ( condition !== undefined && ! condition?.() ) {
+					return null;
+				}
+
+				const Screen = lazyScreen( component );
+
+				return (
+					<NavigatorScreen key={ path } path={ path }>
+						<Screen />
+					</NavigatorScreen>
+				);
+			} ) }
+		</Suspense>
 	);
 }
 
