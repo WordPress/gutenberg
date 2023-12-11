@@ -276,7 +276,7 @@ function register_block_core_template_part() {
 		__DIR__ . '/template-part',
 		array(
 			'render_callback' => 'render_block_core_template_part',
-			'variations'      => build_template_part_block_variations(),
+			'variations'      => 'build_template_part_block_variations',
 		)
 	);
 }

@@ -79,6 +79,11 @@ function gutenberg_add_hooked_blocks( $settings, $metadata ) {
 
 	$exposed_settings = array_intersect_key( $settings, $fields_to_pick );
 
+	// If the block has a variations callback, call it and add the variations to the block.
+	if ( isset( $exposed_settings['variations'] ) && is_callable( $exposed_settings['variations'] ) ) {
+		$exposed_settings['variations'] = call_user_func( $exposed_settings['variations'] );
+	}
+
 	// TODO: Make work for blocks registered via direct call to gutenberg_add_hooked_block().
 	wp_add_inline_script(
 		'wp-blocks',
