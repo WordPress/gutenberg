@@ -9,7 +9,10 @@ import { View } from 'react-native';
 import { Component } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
+import {
+	subscribeMediaUpload,
+	subscribeConnectionStatus,
+} from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -36,10 +39,18 @@ export class MediaUploadProgress extends Component {
 
 	componentDidMount() {
 		this.addMediaUploadListener();
+
+		this.subscription = subscribeConnectionStatus(
+			this.handleConnectionStatusChange
+		);
 	}
 
 	componentWillUnmount() {
 		this.removeMediaUploadListener();
+
+		if ( this.subscription ) {
+			this.subscription.remove();
+		}
 	}
 
 	mediaUpload( payload ) {
@@ -114,6 +125,11 @@ export class MediaUploadProgress extends Component {
 			this.subscriptionParentMediaUpload.remove();
 		}
 	}
+
+	handleConnectionStatusChange = ( { isConnected } ) => {
+		// eslint-disable-next-line no-console
+		console.log( 'isConnected:', isConnected );
+	};
 
 	render() {
 		const { renderContent = () => null } = this.props;
