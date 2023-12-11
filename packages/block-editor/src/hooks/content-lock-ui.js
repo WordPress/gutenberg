@@ -2,9 +2,7 @@
  * WordPress dependencies
  */
 import { ToolbarButton, MenuItem } from '@wordpress/components';
-import { createHigherOrderComponent, pure } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useCallback } from '@wordpress/element';
 
@@ -147,28 +145,9 @@ function ContentLockControlsPure( { clientId, isSelected } ) {
 	);
 }
 
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-const ContentLockControls = pure( ContentLockControlsPure );
-
-export const withContentLockControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		return (
-			<>
-				<ContentLockControls
-					clientId={ props.clientId }
-					isSelected={ props.isSelected }
-				/>
-				<BlockEdit key="edit" { ...props } />
-			</>
-		);
+export default {
+	edit: ContentLockControlsPure,
+	hasSupport() {
+		return true;
 	},
-	'withContentLockControls'
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'core/content-lock-ui/with-block-controls',
-	withContentLockControls
-);
+};
