@@ -316,7 +316,7 @@ class MediaUpload extends Component {
 	}
 
 	componentWillUnmount() {
-		this.frame.remove();
+		this.frame?.remove();
 	}
 
 	onUpdate( selections ) {
