@@ -1,7 +1,11 @@
 /**
+ * External dependencies
+ */
+import { v4 as uuid } from 'uuid';
+/**
  * WordPress dependencies
  */
-import { select } from '@wordpress/data';
+import { select, dispatch } from '@wordpress/data';
 import { uploadMedia } from '@wordpress/media-utils';
 
 /**
@@ -32,20 +36,51 @@ export default function mediaUpload( {
 	onFileChange,
 } ) {
 	const { getCurrentPostId, getEditorSettings } = select( editorStore );
+	const {
+		lockPostAutosaving,
+		unlockPostAutosaving,
+		lockPostSaving,
+		unlockPostSaving,
+	} = dispatch( editorStore );
+
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
+	const lockKey = `image-upload-${ uuid() }`;
+	let imageIsUploading = false;
 	maxUploadFileSize =
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
+
+	const setUploadLock = () => {
+		lockPostSaving( lockKey );
+		lockPostAutosaving( lockKey );
+		imageIsUploading = true;
+	};
+
+	const clearUploadLock = () => {
+		unlockPostSaving( lockKey );
+		unlockPostAutosaving( lockKey );
+		imageIsUploading = false;
+	};
 
 	uploadMedia( {
 		allowedTypes,
 		filesList,
-		onFileChange,
+		onFileChange: ( file ) => {
+			if ( ! imageIsUploading ) {
+				setUploadLock();
+			} else {
+				clearUploadLock();
+			}
+			onFileChange( file );
+		},
 		additionalData: {
 			post: getCurrentPostId(),
 			...additionalData,
 		},
 		maxUploadFileSize,
-		onError: ( { message } ) => onError( message ),
+		onError: ( { message } ) => {
+			clearUploadLock();
+			onError( message );
+		},
 		wpAllowedMimeTypes,
 	} );
 }
