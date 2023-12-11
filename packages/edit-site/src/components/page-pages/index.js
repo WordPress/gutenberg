@@ -9,7 +9,6 @@ import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
-import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
@@ -117,12 +116,12 @@ function useView( type ) {
 // See https://github.com/WordPress/gutenberg/issues/55886
 // We do not support custom statutes at the moment.
 const STATUSES = [
-	{ value: 'draft', label: __( 'Draft' ) },
-	{ value: 'future', label: __( 'Scheduled' ) },
-	{ value: 'pending', label: __( 'Pending Review' ) },
-	{ value: 'private', label: __( 'Private' ) },
-	{ value: 'publish', label: __( 'Published' ) },
-	{ value: 'trash', label: __( 'Trash' ) },
+	{ value: 'draft', label: __( 'Draft' ), color: 'white' },
+	{ value: 'future', label: __( 'Scheduled' ), color: '#60a45b' },
+	{ value: 'pending', label: __( 'Pending Review' ), color: '#dbb124' },
+	{ value: 'private', label: __( 'Private' ), color: 'gray' },
+	{ value: 'publish', label: __( 'Published' ), color: '#5b96a4' },
+	{ value: 'trash', label: __( 'Trash' ), color: 'red' },
 ];
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
@@ -130,6 +129,8 @@ export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
 	const [ pageId, setPageId ] = useState( null );
+	const { editEntityRecord, saveEditedEntityRecord } =
+		useDispatch( coreStore );
 
 	const onSelectionChange = ( items ) =>
 		setPageId( items?.length === 1 ? items[ 0 ].id : null );
@@ -212,7 +213,14 @@ export default function PagePages() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
+				fieldType: 'string',
 				getValue: ( { item } ) => item.title?.rendered || item.slug,
+				setValue: ( { value, item } ) => {
+					editEntityRecord( 'postType', 'page', item.id, {
+						title: value,
+					} );
+					saveEditedEntityRecord( 'postType', 'page', item.id );
+				},
 				render: ( { item } ) => {
 					return (
 						<VStack spacing={ 1 }>
@@ -257,11 +265,25 @@ export default function PagePages() {
 			{
 				header: __( 'Status' ),
 				id: 'status',
-				getValue: ( { item } ) =>
+				fieldType: ENUMERATION_TYPE,
+				// TODO: we need to clarify what `getValue` returns.
+				// Probably it should just return the raw data connection with the item,
+				// So in `author` probably return the `userId`..
+				getValue: ( { item } ) => item.status,
+				setValue: ( { value, item } ) => {
+					editEntityRecord( 'postType', 'page', item.id, {
+						status: value,
+					} );
+					saveEditedEntityRecord( 'postType', 'page', item.id );
+				},
+				render: ( { item } ) =>
 					STATUSES.find( ( { value } ) => value === item.status )
 						?.label ?? item.status,
 				type: ENUMERATION_TYPE,
 				elements: STATUSES,
+				editElements: STATUSES.filter( ( { value } ) =>
+					[ 'pending', 'draft', 'publish' ].includes( value )
+				),
 				enableSorting: false,
 				filterBy: {
 					operators: [ OPERATOR_IN ],
@@ -271,13 +293,14 @@ export default function PagePages() {
 				header: __( 'Date' ),
 				id: 'date',
 				getValue: ( { item } ) => item.date,
-				render: ( { item } ) => {
-					const formattedDate = dateI18n(
-						getSettings().formats.datetimeAbbreviated,
-						getDate( item.date )
-					);
-					return <time>{ formattedDate }</time>;
-				},
+				fieldType: 'date',
+			},
+			{
+				header: __( 'Modified' ),
+				id: 'modified-date',
+				getValue: ( { item } ) => item.modified,
+				fieldType: 'date',
+				enableSorting: false,
 			},
 		],
 		[ authors, view ]

@@ -12,13 +12,17 @@ import {
 	arrowDown,
 	chevronRightSmall,
 	funnel,
+	edit,
 } from '@wordpress/icons';
 import {
+	Popover,
 	Button,
 	Icon,
+	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
+	FlexBlock,
 } from '@wordpress/components';
-import { Children, Fragment } from '@wordpress/element';
+import { useState, useRef, Children, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -396,20 +400,11 @@ function ViewTable( {
 						{ usedData.map( ( item, index ) => (
 							<tr key={ getItemId?.( item ) || index }>
 								{ visibleFields.map( ( field ) => (
-									<td
+									<SingleCell
 										key={ field.id }
-										style={ {
-											width: field.width || undefined,
-											minWidth:
-												field.minWidth || undefined,
-											maxWidth:
-												field.maxWidth || undefined,
-										} }
-									>
-										{ field.render( {
-											item,
-										} ) }
-									</td>
+										field={ field }
+										item={ item }
+									/>
 								) ) }
 								{ !! actions?.length && (
 									<td>
@@ -430,6 +425,77 @@ function ViewTable( {
 				</div>
 			) }
 		</div>
+	);
+}
+
+function SingleCell( { item, field } ) {
+	const ref = useRef();
+	const [ isHovered, setIsHovered ] = useState( false );
+	const [ isViewMode, setIsViewMode ] = useState( true );
+	// TODO: we probably need an `isEligible` function too..
+	// TODO: we need an `edit` function and a `setValue` function.. Can we simplify/combine?
+	const isEditable = !! field.edit;
+	return (
+		<td
+			style={ {
+				width: field.width || undefined,
+				minWidth: field.minWidth || undefined,
+				maxWidth: field.maxWidth || undefined,
+			} }
+			onMouseLeave={ () => setIsHovered( false ) }
+			onMouseEnter={ () => setIsHovered( true ) }
+		>
+			<>
+				<HStack>
+					<FlexBlock ref={ ref }>
+						{ field.render( { item, field } ) }
+					</FlexBlock>
+					<Button
+						icon={ edit }
+						onClick={ () => isViewMode && setIsViewMode( false ) }
+						style={ {
+							padding: 0,
+							visibility:
+								( isEditable && isHovered ) || ! isViewMode
+									? 'visible'
+									: 'hidden',
+						} }
+						disabled={ ! isViewMode }
+						size="compact"
+					/>
+				</HStack>
+				<EditPopover
+					field={ field }
+					item={ item }
+					isViewMode={ isViewMode }
+					setIsViewMode={ setIsViewMode }
+					fieldRef={ ref }
+				/>
+			</>
+		</td>
+	);
+}
+
+function EditPopover( { field, item, isViewMode, setIsViewMode, fieldRef } ) {
+	return (
+		<>
+			{ ! isViewMode && (
+				<Popover
+					placement="bottom-start"
+					className="edit-field-popover"
+					role="dialog"
+					// TODO: check
+					// The anchor element should be stored in local state rather than a plain React ref to ensure reactive updating when it changes.
+					anchor={ fieldRef?.current }
+					onFocusOutside={ () => {
+						setIsViewMode( true );
+					} }
+					animate={ false }
+				>
+					{ field.edit( { item, field } ) }
+				</Popover>
+			) }
+		</>
 	);
 }
 

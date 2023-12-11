@@ -15,6 +15,7 @@ import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
 import { VIEW_LAYOUTS } from './constants';
+import { FIELD_TYPES } from './field-types';
 
 export default function DataViews( {
 	view,
@@ -44,7 +45,11 @@ export default function DataViews( {
 	const _fields = useMemo( () => {
 		return fields.map( ( field ) => ( {
 			...field,
-			render: field.render || field.getValue,
+			render:
+				field.render ||
+				FIELD_TYPES[ field.fieldType ]?.render ||
+				field.getValue,
+			edit: field.edit || FIELD_TYPES[ field.fieldType ]?.edit,
 		} ) );
 	}, [ fields ] );
 	return (

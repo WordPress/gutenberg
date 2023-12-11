@@ -21,7 +21,7 @@ const DEFAULT_PAGE_BASE = {
 	},
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
-	hiddenFields: [ 'date', 'featured-image' ],
+	hiddenFields: [ 'date', 'modified-date', 'featured-image' ],
 	layout: {},
 };
 

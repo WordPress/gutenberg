@@ -242,3 +242,15 @@
 .dataviews-loading {
 	padding: 0 $grid-unit-40;
 }
+
+
+// TODO: change names/tidy
+.edit-field-popover {
+	.components-popover__content {
+		// TODO: check if this the best way to do it..
+		width: max-content;
+	}
+	.enumeration-field-edit-wrapper {
+		padding: $grid-unit-15;
+	}
+}
