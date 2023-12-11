@@ -150,25 +150,16 @@ Example:
 [
 	{
 		id: 'date',
+		type: 'date',
 		header: __( 'Date' ),
 		getValue: ( { item } ) => item.date,
-		render: ( { item } ) => {
-			return (
-				<time>{ getFormattedDate( item.date ) }</time>
-			);
-		},
 		enableHiding: false
 	},
 	{
 		id: 'author',
+		type: 'enumeration',
 		header: __( 'Author' ),
 		getValue: ( { item } ) => item.author,
-		render: ( { item } ) => {
-			return (
-				<a href="...">{ item.author }</a>
-			);
-		},
-		type: 'enumeration',
 		elements: [
 			{ value: 1, label: 'Admin' }
 			{ value: 2, label: 'User' }
@@ -179,11 +170,11 @@ Example:
 ```
 
 -   `id`: identifier for the field. Unique.
+-   `type`: the type of the field. Used to render the field and generate the proper filters. See "Field types".
 -   `header`: the field's name to be shown in the UI.
 -   `getValue`: function that returns the value of the field.
--   `render`: function that renders the field.
+-   `formats`: a list of modifications to the default render provided for the field. See "Format".
 -   `elements`: the set of valid values for the field's value.
--   `type`: the type of the field. Used to generate the proper filters. Only `enumeration` available at the moment. See "Field types".
 -   `enableSorting`: whether the data can be sorted by the given field. True by default.
 -   `enableHiding`: whether the field can be hidden. True by default.
 -   `filterBy`: configuration for the filters.
@@ -211,9 +202,63 @@ Array of operations that can be performed upon each record. Each action is an ob
     - `list`: the view uses a list layout.
 - Field types:
     - `enumeration`: the field value should be taken and can be filtered from a closed list of elements.
+    - `date`: the field value is a date.
+    - `text`: the field value is a string.
+    - `img`: the field value is an image.
 - Operator types:
     - `in`: operator to be used in filters for fields of type `enumeration`.
     - `notIn`: operator to be used in filters for fields of type `enumeration`.
+
+## Formats
+
+Each format is an object whose shape is:
+
+```js
+{
+	type: 'format-type',
+	renderProps: ( { item } ) => { return { newProp: '...' }; },
+	renderChildren: ( { item } ) => { return Component; }
+}
+```
+
+Existing formats are:
+
+- `link`: format that declares the field should contain a link with the given props (href, etc.).
+
+```js
+{
+	type: 'link',
+	renderProps: ( { item } ) => ({ href: 'new-url-based-on-item' }),
+},
+```
+
+- `empty`: format that declares the field wants to render an empty state different from the default.
+
+```js
+{
+	type: 'empty',
+	renderChildren: ( { item } ) => { return __( '(no title)' ); },
+},
+```
+
+- `prefix`: format that renders a component as a prefix to the default render. Example: used to render an icon before.
+
+```js
+{
+	type: 'prefix',
+	renderChildren: ( { item } ) => { return <Icon icon={ iconBasedOnItem } >; },
+}
+```
+
+- `after`: format that renders a component. Similar to CSS pseudo-element `::after`.
+
+```js
+{
+	type: 'after',
+	renderProps: ( { item } ) => ({ className: '...' }),
+	renderChildren: ( { item }) => { return <Label item={item}>; },
+}
+```
 
 ## Contributing to this package
 
