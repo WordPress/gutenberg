@@ -88,6 +88,7 @@ export default function BlockRenameModal( {
 				<VStack spacing="3">
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ editedBlockName }
 						label={ __( 'Block name' ) }
 						hideLabelFromVision={ true }

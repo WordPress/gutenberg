@@ -107,6 +107,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 						<VStack spacing="5">
 							<TextControl
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								label={ __( 'Name' ) }
 								value={ editedTitle }
 								onChange={ setEditedTitle }

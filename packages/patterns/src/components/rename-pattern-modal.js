@@ -93,6 +93,7 @@ export default function RenamePatternModal( {
 				<VStack spacing="5">
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Name' ) }
 						value={ name }
 						onChange={ setName }

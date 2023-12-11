@@ -138,6 +138,7 @@ export default function RenamePatternCategoryModal( {
 						<TextControl
 							ref={ textControlRef }
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Name' ) }
 							value={ name }
 							onChange={ onChange }
