@@ -38,7 +38,7 @@ const sortingItemsInfo = {
 	asc: { icon: arrowUp, label: __( 'Sort ascending' ) },
 	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
 };
-const sortArrows = { asc: '↑', desc: '↓', false: '' };
+const sortArrows = { asc: '↑', desc: '↓' };
 
 function HeaderMenu( { field, view, onChangeView } ) {
 	const isSortable = field.enableSorting !== false;
