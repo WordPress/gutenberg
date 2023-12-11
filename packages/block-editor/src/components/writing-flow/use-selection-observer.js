@@ -82,15 +82,6 @@ function setContentEditableWrapper( node, value ) {
 		// Firefox doesn't automatically move focus.
 		if ( value ) {
 			node.focus();
-		} else {
-			const { ownerDocument } = node;
-			const { defaultView } = ownerDocument;
-			const selection = defaultView.getSelection();
-			node = extractSelectionStartNode( selection );
-			let element =
-				node.nodeType === node.ELEMENT_NODE ? node : node.parentElement;
-			element = element?.closest( '[contenteditable]' );
-			element?.focus();
 		}
 	}
 }

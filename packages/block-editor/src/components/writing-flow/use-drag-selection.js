@@ -84,6 +84,10 @@ export default function useDragSelection() {
 					return;
 				}
 
+				if ( node === target ) {
+					return;
+				}
+
 				// Check the attribute, not the contentEditable attribute. All
 				// child elements of the content editable wrapper are editable
 				// and return true for this property. We only want to start
