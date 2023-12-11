@@ -209,11 +209,12 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 								{ 'is-zoomed-out': isZoomedOutView }
 							) }
 						>
-							{ ! isFocusMode && hasDefaultEditorCanvasView && (
-								<PreviewDropdown
-									showIconLabels={ showIconLabels }
-								/>
-							) }
+							<PreviewDropdown
+								showIconLabels={ showIconLabels }
+								disabled={
+									isFocusMode || ! hasDefaultEditorCanvasView
+								}
+							/>
 						</div>
 					) }
 					<SaveButton />

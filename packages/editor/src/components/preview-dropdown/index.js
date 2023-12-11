@@ -23,6 +23,7 @@ import PostPreviewButton from '../post-preview-button';
 export default function PreviewDropdown( {
 	showIconLabels,
 	forceIsAutosaveable,
+	disabled,
 } ) {
 	const { deviceType, homeUrl, isTemplate, isViewable } = useSelect(
 		( select ) => {
@@ -49,6 +50,8 @@ export default function PreviewDropdown( {
 		className: 'editor-preview-dropdown__toggle',
 		size: 'compact',
 		showTooltip: ! showIconLabels,
+		disabled,
+		__experimentalIsFocusable: disabled,
 	};
 	const menuProps = {
 		'aria-label': __( 'View options' ),
@@ -68,6 +71,7 @@ export default function PreviewDropdown( {
 			menuProps={ menuProps }
 			icon={ deviceIcons[ deviceType.toLowerCase() ] }
 			label={ __( 'View' ) }
+			disableOpenOnArrowDown={ disabled }
 		>
 			{ ( { onClose } ) => (
 				<>
