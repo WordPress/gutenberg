@@ -97,11 +97,16 @@ export default function BlockRenameModal( {
 						onFocus={ autoSelectInputText }
 					/>
 					<HStack justify="right">
-						<Button variant="tertiary" onClick={ onClose }>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ onClose }
+						>
 							{ __( 'Cancel' ) }
 						</Button>
 
 						<Button
+							__next40pxDefaultSize
 							aria-disabled={ ! isNameValid }
 							variant="primary"
 							type="submit"

@@ -155,10 +155,15 @@ export default function RenamePatternCategoryModal( {
 						) }
 					</VStack>
 					<HStack justify="right">
-						<Button variant="tertiary" onClick={ onRequestClose }>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ onRequestClose }
+						>
 							{ __( 'Cancel' ) }
 						</Button>
 						<Button
+							__next40pxDefaultSize
 							variant="primary"
 							type="submit"
 							aria-disabled={

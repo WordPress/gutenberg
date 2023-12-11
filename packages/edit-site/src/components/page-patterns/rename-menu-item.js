@@ -105,6 +105,7 @@ export default function RenameMenuItem( { item, onClose } ) {
 
 							<HStack justify="right">
 								<Button
+									__next40pxDefaultSize
 									variant="tertiary"
 									onClick={ () => {
 										setIsModalOpen( false );
@@ -114,7 +115,11 @@ export default function RenameMenuItem( { item, onClose } ) {
 									{ __( 'Cancel' ) }
 								</Button>
 
-								<Button variant="primary" type="submit">
+								<Button
+									__next40pxDefaultSize
+									variant="primary"
+									type="submit"
+								>
 									{ __( 'Save' ) }
 								</Button>
 							</HStack>

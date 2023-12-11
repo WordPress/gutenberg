@@ -101,11 +101,19 @@ export default function RenamePatternModal( {
 					/>
 
 					<HStack justify="right">
-						<Button variant="tertiary" onClick={ onRequestClose }>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ onRequestClose }
+						>
 							{ __( 'Cancel' ) }
 						</Button>
 
-						<Button variant="primary" type="submit">
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							type="submit"
+						>
 							{ __( 'Save' ) }
 						</Button>
 					</HStack>

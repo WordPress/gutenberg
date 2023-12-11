@@ -33,11 +33,16 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
 						onChange={ setEditedMenuTitle }
 					/>
 					<HStack justify="right">
-						<Button variant="tertiary" onClick={ onClose }>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ onClose }
+						>
 							{ __( 'Cancel' ) }
 						</Button>
 
 						<Button
+							__next40pxDefaultSize
 							disabled={ ! isEditedMenuTitleValid }
 							variant="primary"
 							type="submit"
