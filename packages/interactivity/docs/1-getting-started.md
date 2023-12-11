@@ -26,18 +26,6 @@ We can scaffold a WordPress plugin that registers an interactive block (using th
 npx @wordpress/create-block@latest my-first-interactive-block --template @wordpress/create-block-interactive-template
 ```
 
-> **Note**
-> The Interactivity API recently switched from [using modules instead of scripts in the frontend](https://github.com/WordPress/gutenberg/pull/56143). Therefore, in order to test this scaffolded block, you will need to add the following line to the `package.json` file of the generated plugin:
-
-```json
-"files": [
-	"src/view.js"
-]
-```
-> This should be updated in the [scripts package](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) soon.
-
-
-
 #### 2. Generate the build
 
 When the plugin folder is generated, we should launch the build process to get the final version of the interactive block that can be used from WordPress.
