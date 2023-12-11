@@ -21,18 +21,18 @@ const OfflineStatus = () => {
 	const { isConnected } = useIsConnected();
 
 	const containerStyle = usePreferredColorSchemeStyle(
-		styles.container,
-		styles[ 'container--dark' ]
+		styles.offline,
+		styles.offline__dark
 	);
 
 	const textStyle = usePreferredColorSchemeStyle(
-		styles.text,
-		styles[ 'text--dark' ]
+		styles[ 'offline--text' ],
+		styles[ 'offline--text__dark' ]
 	);
 
 	const iconStyle = usePreferredColorSchemeStyle(
-		styles.icon,
-		styles[ 'icon--dark' ]
+		styles[ 'offline--icon' ],
+		styles[ 'offline--icon__dark' ]
 	);
 
 	return ! isConnected ? (

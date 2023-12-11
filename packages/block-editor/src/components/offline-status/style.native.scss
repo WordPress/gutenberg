@@ -1,4 +1,4 @@
-.container {
+.offline {
 	background-color: $light-ultra-dim;
 	padding: $grid-unit;
 	justify-content: center;
@@ -6,22 +6,23 @@
 	flex-direction: row;
 }
 
-.container--dark {
+.offline__dark {
 	background-color: $dark-dim;
 }
 
-.text {
+.offline--text {
+	color: $light-primary;
 	padding-left: 3;
 }
 
-.text--dark {
-	color: $white;
+.offline--text__dark {
+	color: $dark-primary;
 }
 
-.icon {
+.offline--icon {
 	fill: $light-secondary;
 }
 
-.icon--dark {
+.offline--icon__dark {
 	fill: $dark-tertiary;
 }
