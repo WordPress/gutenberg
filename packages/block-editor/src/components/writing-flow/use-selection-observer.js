@@ -203,10 +203,12 @@ export default function useSelectionObserver() {
 						const richTextDataStart = create( {
 							element: richTextElementStart,
 							range,
+							__unstableIsEditableTree: true,
 						} );
 						const richTextDataEnd = create( {
 							element: richTextElementEnd,
 							range,
+							__unstableIsEditableTree: true,
 						} );
 
 						const startOffset =

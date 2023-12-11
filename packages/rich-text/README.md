@@ -174,6 +174,7 @@ _Parameters_
 -   _$1.text_ `[string]`: Text to create value from.
 -   _$1.html_ `[string]`: HTML to create value from.
 -   _$1.range_ `[Range]`: Range to create value from.
+-   _$1.\_\_unstableIsEditableTree_ `[boolean]`:
 
 _Returns_
 
