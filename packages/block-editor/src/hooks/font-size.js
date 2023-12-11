@@ -4,7 +4,6 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
-import { createHigherOrderComponent } from '@wordpress/compose';
 import { select } from '@wordpress/data';
 
 /**
@@ -175,62 +174,38 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
 	);
 }
 
-/**
- * Add inline styles for font sizes.
- * Ideally, this is not needed and themes load the font-size classes on the
- * editor.
- *
- * @param {Function} BlockListBlock Original component.
- *
- * @return {Function} Wrapped component.
- */
-const withFontSizeInlineStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const [ fontSizes ] = useSettings( 'typography.fontSizes' );
-		const {
-			name: blockName,
-			attributes: { fontSize, style },
-			wrapperProps,
-		} = props;
+function useBlockProps( { name, fontSize, style } ) {
+	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
 
-		// Only add inline styles if the block supports font sizes,
-		// doesn't skip serialization of font sizes,
-		// doesn't already have an inline font size,
-		// and does have a class to extract the font size from.
-		if (
-			! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) ||
-			shouldSkipSerialization(
-				blockName,
-				TYPOGRAPHY_SUPPORT_KEY,
-				'fontSize'
-			) ||
-			! fontSize ||
-			style?.typography?.fontSize
-		) {
-			return <BlockListBlock { ...props } />;
-		}
+	// Only add inline styles if the block supports font sizes,
+	// doesn't skip serialization of font sizes,
+	// doesn't already have an inline font size,
+	// and does have a class to extract the font size from.
+	if (
+		! hasBlockSupport( name, FONT_SIZE_SUPPORT_KEY ) ||
+		shouldSkipSerialization( name, TYPOGRAPHY_SUPPORT_KEY, 'fontSize' ) ||
+		! fontSize ||
+		style?.typography?.fontSize
+	) {
+		return;
+	}
 
-		const fontSizeValue = getFontSize(
-			fontSizes,
-			fontSize,
-			style?.typography?.fontSize
-		).size;
+	const fontSizeValue = getFontSize(
+		fontSizes,
+		fontSize,
+		style?.typography?.fontSize
+	).size;
 
-		const newProps = {
-			...props,
-			wrapperProps: {
-				...wrapperProps,
-				style: {
-					fontSize: fontSizeValue,
-					...wrapperProps?.style,
-				},
-			},
-		};
+	return { style: { fontSize: fontSizeValue } };
+}
 
-		return <BlockListBlock { ...newProps } />;
+export default {
+	useBlockProps,
+	attributeKeys: [ 'fontSize', 'style' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, FONT_SIZE_SUPPORT_KEY );
 	},
-	'withFontSizeInlineStyles'
-);
+};
 
 const MIGRATION_PATHS = {
 	fontSize: [ [ 'fontSize' ], [ 'style', 'typography', 'fontSize' ] ],
@@ -331,12 +306,6 @@ addFilter(
 );
 
 addFilter( 'blocks.registerBlockType', 'core/font/addEditProps', addEditProps );
-
-addFilter(
-	'editor.BlockListBlock',
-	'core/font-size/with-font-size-inline-styles',
-	withFontSizeInlineStyles
-);
 
 addFilter(
 	'blocks.switchToBlockType.transformedBlock',

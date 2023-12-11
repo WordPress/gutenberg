@@ -6,18 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalUseResizeCanvas as useResizeCanvas,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	privateApis as editorPrivateApis,
-	store as editorStore,
-} from '@wordpress/editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -38,33 +32,24 @@ function EditorCanvas( {
 	contentRef,
 	...props
 } ) {
-	const {
-		hasBlocks,
-		isFocusMode,
-		templateType,
-		canvasMode,
-		deviceType,
-		isZoomOutMode,
-	} = useSelect( ( select ) => {
-		const { getBlockCount, __unstableGetEditorMode } =
-			select( blockEditorStore );
-		const { getEditedPostType, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
-		const { getDeviceType } = select( editorStore );
-		const _templateType = getEditedPostType();
+	const { hasBlocks, isFocusMode, templateType, canvasMode, isZoomOutMode } =
+		useSelect( ( select ) => {
+			const { getBlockCount, __unstableGetEditorMode } =
+				select( blockEditorStore );
+			const { getEditedPostType, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
+			const _templateType = getEditedPostType();
 
-		return {
-			templateType: _templateType,
-			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
-			deviceType: getDeviceType(),
-			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
-			canvasMode: getCanvasMode(),
-			hasBlocks: !! getBlockCount(),
-		};
-	}, [] );
+			return {
+				templateType: _templateType,
+				isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
+				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+				canvasMode: getCanvasMode(),
+				hasBlocks: !! getBlockCount(),
+			};
+		}, [] );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const deviceStyles = useResizeCanvas( deviceType );
 	const [ isFocused, setIsFocused ] = useState( false );
 
 	useEffect( () => {
@@ -132,7 +117,6 @@ function EditorCanvas( {
 				expand: isZoomOutMode,
 				scale: isZoomOutMode ? 0.45 : undefined,
 				frameSize: isZoomOutMode ? 100 : undefined,
-				style: enableResizing ? {} : deviceStyles,
 				className: classnames(
 					'edit-site-visual-editor__editor-canvas',
 					{

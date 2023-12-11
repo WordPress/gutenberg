@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { render, screen } from '@testing-library/react';
-
-/**
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
@@ -16,8 +11,7 @@ import {
 /**
  * Internal dependencies
  */
-import BlockEditorProvider from '../../components/provider';
-import { getValidAlignments, withDataAlign, addAssignedAlign } from '../align';
+import { getValidAlignments, addAssignedAlign } from '../align';
 
 const noop = () => {};
 
@@ -146,107 +140,6 @@ describe( 'align', () => {
 					false
 				)
 			).toEqual( [ 'left', 'right' ] );
-		} );
-	} );
-
-	describe( 'withDataAlign', () => {
-		it( 'should render with wrapper props', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: true,
-					alignWide: true,
-				},
-			} );
-
-			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
-				<button { ...wrapperProps } />
-			) );
-
-			render(
-				<BlockEditorProvider
-					settings={ { alignWide: true, supportsLayout: false } }
-					value={ [] }
-				>
-					<EnhancedComponent
-						attributes={ {
-							align: 'wide',
-						} }
-						name="core/foo"
-					/>
-				</BlockEditorProvider>
-			);
-
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
-				'data-align',
-				'wide'
-			);
-		} );
-
-		it( 'should not render wide/full wrapper props if wide controls are not enabled', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: true,
-					alignWide: true,
-				},
-			} );
-
-			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
-				<button { ...wrapperProps } />
-			) );
-
-			render(
-				<BlockEditorProvider
-					settings={ { alignWide: false } }
-					value={ [] }
-				>
-					<EnhancedComponent
-						name="core/foo"
-						attributes={ {
-							align: 'wide',
-						} }
-					/>
-				</BlockEditorProvider>
-			);
-
-			expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
-				'data-align',
-				'wide'
-			);
-		} );
-
-		it( 'should not render invalid align', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: true,
-					alignWide: false,
-				},
-			} );
-
-			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
-				<button { ...wrapperProps } />
-			) );
-
-			render(
-				<BlockEditorProvider
-					settings={ { alignWide: true } }
-					value={ [] }
-				>
-					<EnhancedComponent
-						name="core/foo"
-						attributes={ {
-							align: 'wide',
-						} }
-					/>
-				</BlockEditorProvider>
-			);
-
-			expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
-				'data-align',
-				'wide'
-			);
 		} );
 	} );
 

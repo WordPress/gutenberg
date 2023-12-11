@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -13,7 +8,7 @@ import {
 	hasBlockSupport,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { getCSSRules, compileCSS } from '@wordpress/style-engine';
 
 /**
@@ -379,6 +374,8 @@ function BlockStyleControls( {
 export default {
 	edit: BlockStyleControls,
 	hasSupport: hasStyleSupport,
+	attributeKeys: [ 'style' ],
+	useBlockProps,
 };
 
 // Defines which element types are supported, including their hover styles or
@@ -393,115 +390,90 @@ const elementTypes = [
 	},
 ];
 
-/**
- * Override the default block element to include elements styles.
- *
- * @param {Function} BlockListBlock Original component
- * @return {Function}                Wrapped component
- */
-const withElementsStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
-			BlockListBlock
-		) }`;
+function useBlockProps( { name, style } ) {
+	const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
+		useBlockProps
+	) }`;
 
-		// The .editor-styles-wrapper selector is required on elements styles. As it is
-		// added to all other editor styles, not providing it causes reset and global
-		// styles to override element styles because of higher specificity.
-		const baseElementSelector = `.editor-styles-wrapper .${ blockElementsContainerIdentifier }`;
-		const blockElementStyles = props.attributes.style?.elements;
+	// The .editor-styles-wrapper selector is required on elements styles. As it is
+	// added to all other editor styles, not providing it causes reset and global
+	// styles to override element styles because of higher specificity.
+	const baseElementSelector = `.editor-styles-wrapper .${ blockElementsContainerIdentifier }`;
+	const blockElementStyles = style?.elements;
 
-		const styles = useMemo( () => {
-			if ( ! blockElementStyles ) {
+	const styles = useMemo( () => {
+		if ( ! blockElementStyles ) {
+			return;
+		}
+
+		const elementCSSRules = [];
+
+		elementTypes.forEach( ( { elementType, pseudo, elements } ) => {
+			const skipSerialization = shouldSkipSerialization(
+				name,
+				COLOR_SUPPORT_KEY,
+				elementType
+			);
+
+			if ( skipSerialization ) {
 				return;
 			}
 
-			const elementCSSRules = [];
+			const elementStyles = blockElementStyles?.[ elementType ];
 
-			elementTypes.forEach( ( { elementType, pseudo, elements } ) => {
-				const skipSerialization = shouldSkipSerialization(
-					props.name,
-					COLOR_SUPPORT_KEY,
-					elementType
+			// Process primary element type styles.
+			if ( elementStyles ) {
+				const selector = scopeSelector(
+					baseElementSelector,
+					ELEMENTS[ elementType ]
 				);
 
-				if ( skipSerialization ) {
-					return;
-				}
+				elementCSSRules.push(
+					compileCSS( elementStyles, { selector } )
+				);
 
-				const elementStyles = blockElementStyles?.[ elementType ];
-
-				// Process primary element type styles.
-				if ( elementStyles ) {
-					const selector = scopeSelector(
-						baseElementSelector,
-						ELEMENTS[ elementType ]
-					);
-
-					elementCSSRules.push(
-						compileCSS( elementStyles, { selector } )
-					);
-
-					// Process any interactive states for the element type.
-					if ( pseudo ) {
-						pseudo.forEach( ( pseudoSelector ) => {
-							if ( elementStyles[ pseudoSelector ] ) {
-								elementCSSRules.push(
-									compileCSS(
-										elementStyles[ pseudoSelector ],
-										{
-											selector: scopeSelector(
-												baseElementSelector,
-												`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
-											),
-										}
-									)
-								);
-							}
-						} );
-					}
-				}
-
-				// Process related elements e.g. h1-h6 for headings
-				if ( elements ) {
-					elements.forEach( ( element ) => {
-						if ( blockElementStyles[ element ] ) {
+				// Process any interactive states for the element type.
+				if ( pseudo ) {
+					pseudo.forEach( ( pseudoSelector ) => {
+						if ( elementStyles[ pseudoSelector ] ) {
 							elementCSSRules.push(
-								compileCSS( blockElementStyles[ element ], {
+								compileCSS( elementStyles[ pseudoSelector ], {
 									selector: scopeSelector(
 										baseElementSelector,
-										ELEMENTS[ element ]
+										`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
 									),
 								} )
 							);
 						}
 					} );
 				}
-			} );
+			}
 
-			return elementCSSRules.length > 0
-				? elementCSSRules.join( '' )
-				: undefined;
-		}, [ baseElementSelector, blockElementStyles, props.name ] );
+			// Process related elements e.g. h1-h6 for headings
+			if ( elements ) {
+				elements.forEach( ( element ) => {
+					if ( blockElementStyles[ element ] ) {
+						elementCSSRules.push(
+							compileCSS( blockElementStyles[ element ], {
+								selector: scopeSelector(
+									baseElementSelector,
+									ELEMENTS[ element ]
+								),
+							} )
+						);
+					}
+				} );
+			}
+		} );
 
-		useStyleOverride( { css: styles } );
+		return elementCSSRules.length > 0
+			? elementCSSRules.join( '' )
+			: undefined;
+	}, [ baseElementSelector, blockElementStyles, name ] );
 
-		return (
-			<BlockListBlock
-				{ ...props }
-				className={
-					props.attributes.style?.elements
-						? classnames(
-								props.className,
-								blockElementsContainerIdentifier
-						  )
-						: props.className
-				}
-			/>
-		);
-	},
-	'withElementsStyles'
-);
+	useStyleOverride( { css: styles } );
+	return { className: blockElementsContainerIdentifier };
+}
 
 addFilter(
 	'blocks.registerBlockType',
@@ -519,10 +491,4 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/style/addEditProps',
 	addEditProps
-);
-
-addFilter(
-	'editor.BlockListBlock',
-	'core/editor/with-elements-styles',
-	withElementsStyles
 );
