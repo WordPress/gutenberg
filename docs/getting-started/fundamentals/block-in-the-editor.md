@@ -1,12 +1,15 @@
 # The block in the Editor
 
-The Block Editor is a React Single Page Application (SPA) and every block in the editor is displayed through a React component. Every update in the Block Editor triggers an action that updates a store that ultimately updates the blocks in the Block Editor to reflect its updated state.
+The Block Editor is a React Single Page Application (SPA) and every block in the editor is displayed through a React component defined in the `Edit` property of the settings object used to register the block on the client. 
 
-Every block sets an `Edit` React component that defines how the block is displayed in the Block Editor and its behavior. This `Edit` React component of a block receives a `props` object, which includes `attributes` and `setAttributes` 
+The `props` object received by the block's `Edit` React component includes `attributes` and `setAttributes`. Custom settings controls for the block in the Editor (in the `Block Toolbar` or in the `Settings Sidebar`) can also be defined through this `Edit` React component.
 
-This "edit" interface can also define custom setting controls for the block in the Editor:  `Block Toolbar` and `Settings Sidebar`
+WordPress provides a lot of built-in components that can be used to define the interface of the block in the editor. These built-in components are available via NPM packages such as `@wordpress/components` or `@wordpress/block-editor`.
 
-Wordpress offers a lot of built-in components via NPM packages to define the interface of the block in the editor, like `@wordpress/components` or `@wordpress/block-editor`
+<!-- BEGIN fix class -->
+<div class="callout">
+The WordPress Gutenberg project uses <a href="https://wordpress.github.io/gutenberg/?path=/docs/docs-introduction--page">Storybook</a> to document the UI components available from WordPress packages.
+</div>
 
 ```js
 import { useBlockProps, RichText } from '@wordpress/block-editor';
@@ -39,19 +42,23 @@ _See the [full block example](https://github.com/WordPress/block-development-exa
 
 ## Built-in components
 
-Use as much core stuff as possible - Check core UIs before building something custom
-
-The WordPress Gutenberg project uses [Storybook](https://wordpress.github.io/gutenberg/?path=/docs/docs-introduction--page) to view and work with the UI components developed in WordPress packages, especially 
-
-`@wordpress/components` includes a library of generic WordPress components to be used for creating common UI elements shared between screens and features of the WordPress dashboard.
-- `TextControl`
+The package `@wordpress/components` includes a library of generic WordPress components to create common UI elements for the Block Editor and the WordPress dashboard. Some of the components most commonly used from this package are:
+- `TextControl` 
 - `PanelBody` & `PanelRow`
 - `ToggleControl`
 - `ExternalLink`
 
-`@wordpress/block-editor` includes a library of components and hooks for the Block Editor. This module allows you to create and use standalone block editors.
+The package `@wordpress/block-editor` includes a library of components and hooks for the Block Editor, including those to define custom settings controls for the block in the Editor. Some of the components most commonly used from this package are:
 - `RichText`
 - `BlockControls`
 - `InspectorControls`
 - `InnerBlocks`
 - `PanelColorSettings`
+
+
+The package `@wordpress/block-editor` also provide the tools to create and use standalone block editors.
+
+------
+
+
+Use as much core stuff as possible - Check core UIs before building something custom
