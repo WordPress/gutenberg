@@ -446,7 +446,7 @@ function useBlockProps( { name, style } ) {
 		{ className: blockElementsContainerIdentifier },
 		name,
 		{ style },
-		skipSerializationPathsSave
+		skipSerializationPathsEdit
 	);
 }
 
