@@ -6,7 +6,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
 import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
 
 /**
@@ -50,7 +49,6 @@ export default function SiteEditorCanvas() {
 		// Disable resizing in mobile viewport.
 		! isMobileViewport;
 
-	const contentRef = useRef();
 	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
 	const forceFullHeight = isNavigationFocusMode;
@@ -81,7 +79,6 @@ export default function SiteEditorCanvas() {
 							<EditorCanvas
 								enableResizing={ enableResizing }
 								settings={ settings }
-								contentRef={ contentRef }
 							>
 								{ resizeObserver }
 							</EditorCanvas>
