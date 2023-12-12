@@ -326,11 +326,17 @@ function PaletteEditListView< T extends Color | Gradient >( {
 					.map( ( element, index, arr ) => {
 						element.name =
 							element?.name ||
-							sprintf(
-								/* translators: %s: is a temporary id for a custom color */
-								__( 'Color %s' ),
-								index + 1
-							);
+							( !! element.gradient
+								? sprintf(
+										/* translators: %s: is a temporary id for a custom gradient */
+										__( 'Gradient %s' ),
+										index + 1
+								  )
+								: sprintf(
+										/* translators: %s: is a temporary id for a custom color */
+										__( 'Color %s' ),
+										index + 1
+								  ) );
 						return element;
 					} );
 				onChange( newElements.length ? newElements : undefined );
