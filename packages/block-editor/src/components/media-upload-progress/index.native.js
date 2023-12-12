@@ -9,10 +9,8 @@ import { View } from 'react-native';
 import { Component } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	subscribeMediaUpload,
-	subscribeConnectionStatus,
-} from '@wordpress/react-native-bridge';
+import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
+import { withIsConnected } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -35,22 +33,15 @@ export class MediaUploadProgress extends Component {
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
+		this.getRetryMessage = this.getRetryMessage.bind( this );
 	}
 
 	componentDidMount() {
 		this.addMediaUploadListener();
-
-		this.subscription = subscribeConnectionStatus(
-			this.handleConnectionStatusChange
-		);
 	}
 
 	componentWillUnmount() {
 		this.removeMediaUploadListener();
-
-		if ( this.subscription ) {
-			this.subscription.remove();
-		}
 	}
 
 	mediaUpload( payload ) {
@@ -126,24 +117,26 @@ export class MediaUploadProgress extends Component {
 		}
 	}
 
-	handleConnectionStatusChange = ( { isConnected } ) => {
-		// eslint-disable-next-line no-console
-		console.log( 'isConnected:', isConnected );
-	};
+	getRetryMessage() {
+		if ( this.props.isConnected === true ) {
+			// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
+			return __( 'Failed to insert media.\nTap for more info.' );
+		}
+		return __( 'You are currently offline.' );
+	}
 
 	render() {
 		const { renderContent = () => null } = this.props;
 		const { isUploadInProgress, isUploadFailed } = this.state;
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
-		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
-		const retryMessage = __(
-			'Failed to insert media.\nTap for more info.'
-		);
+		const retryMessage = this.getRetryMessage();
 
 		const progressBarStyle = [
 			styles.progressBar,
-			showSpinner || styles.progressBarHidden,
+			showSpinner && this.props.isConnected
+				? styles.progressBarHidden
+				: null,
 			this.props.progressBarStyle,
 		];
 
@@ -174,4 +167,4 @@ export class MediaUploadProgress extends Component {
 	}
 }
 
-export default MediaUploadProgress;
+export default withIsConnected( MediaUploadProgress );
