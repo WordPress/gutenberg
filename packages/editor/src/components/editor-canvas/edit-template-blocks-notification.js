@@ -42,7 +42,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 
 	useEffect( () => {
 		const handleClick = async ( event ) => {
-			if ( renderingMode === 'template-only' ) {
+			if ( renderingMode !== 'template-locked' ) {
 				return;
 			}
 			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
@@ -71,7 +71,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 		};
 
 		const handleDblClick = ( event ) => {
-			if ( renderingMode === 'template-only' ) {
+			if ( renderingMode !== 'template-locked' ) {
 				return;
 			}
 			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
