@@ -250,7 +250,7 @@ At this point, the block's icon and description are correct, and block supports 
 
 ### Updating edit.js
 
-The [`edit.js`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/file-structure-of-a-block/#edit-js) file controls how the block functions and appears in the Editor. Right now, the user sees the message “ Copyright Date Block – hello from the editor!”. Let's change that.
+The [`edit.js`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/file-structure-of-a-block/#edit-js) file controls how the block functions and appears in the Editor. Right now, the user sees the message " Copyright Date Block – hello from the editor!". Let's change that.
 
 Open the file and see that the `Edit()` function returns a paragraph tag with the default message.
 
@@ -273,7 +273,7 @@ It looks a bit more complicated than it is.
 - [`__()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-i18n/) is used for the internationalization of text strings
 
 <div class="callout callout-info">
-	Review the [block wrapper](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-wrapper/) documentation for an introductory guide on how to ensure the block's markup wrapper has the proper attributes.
+	Review the <a href="https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-wrapper/">block wrapper</a> documentation for an introductory guide on how to ensure the block's markup wrapper has the proper attributes.
 </div>
 
 As a reminder, the main purpose of this block is to display the copyright symbol (©) and the current year. So, you first need to get the current year in string form, which can be done with the following code.
@@ -323,14 +323,14 @@ You can use `date( "Y" )` to get the current year in PHP, and your `render.php` 
 <p <?php echo get_block_wrapper_attributes(); ?>>© <?php echo date( "Y" ); ?></p>
 ```
 
-Save the file and confirm that the block is appearing correctly in the Editor and on the front end.
+Save the file and confirm that the block appears correctly in the Editor and on the front end.
 
 ### Cleaning up
 
-When you use the `create-block` package to scaffold a block, it might include files that you don't need. In the case of this tutorial, the block doesn't use stylesheets or font end JavaScipt. You can clean up the plugin's `src/` folder with the following actions.
+When you use the `create-block` package to scaffold a block, it might include files that you don't need. In the case of this tutorial, the block doesn't use stylesheets or font end JavaScipt. Clean up the plugin's `src/` folder with the following actions.
 
-1. In the `edit.js` file, remove lines 16-22 that import `editor.scss`
-2. In the `index.js` file, remove lines 8-15 that import `style.scss`
+1. In the `edit.js` file, remove the lines that import `editor.scss`
+2. In the `index.js` file, remove the lines that import `style.scss`
 3. Delete the editor.scss, style.scss, and view.js files
 
 Finally, make sure that there are no unsaved changes and then terminate the `npm run start` command. Run `npm run build` to optimize your code and make it production-ready.
@@ -345,7 +345,7 @@ The Copyright Date Block you have built shows the current year, but what if you 
 
 This functionality would require users to enter their starting year somewhere on the block. They should also have the ability to toggle it on or off.
 
-You could implement this in different ways, but all of them would require [block attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/). Attributes allow you to store custom data for the block that can then be used to modify the block's markup.
+You could implement this in different ways, but all would require [block attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/). Attributes allow you to store custom data for the block that can then be used to modify the block's markup.
 
 To enable this starting year functionality, you will need one attribute to store the starting year and another that will be used to tell WordPress whether the starting year should be displayed or not.
 
@@ -387,7 +387,7 @@ The `InspectorControls` belongs to the [`@wordpress/block-editor`](https://devel
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 ```
 
-Next, update the Edit function to return the current block content as well as an `InspectorControls` component that includes the text “Testing.” You must wrap everything in a [Fragment](https://react.dev/reference/react/Fragment) (`<></>`) to ensure proper JSX syntax. The result should look like this.
+Next, update the Edit function to return the current block content and an `InspectorControls` component that includes the text "Testing." You can wrap everything in a [Fragment](https://react.dev/reference/react/Fragment) (`<></>`) to ensure proper JSX syntax. The result should look like this.
 
 ```js
 export default function Edit() {
@@ -403,7 +403,7 @@ const currentYear = new Date().getFullYear().toString();
 	);
 }
 ```
-Save the file and refresh the Editor. When selecting the block, you should see the “Testing” message in the Settings Sidebar.
+Save the file and refresh the Editor. When selecting the block, you should see the "Testing" message in the Settings Sidebar.
 
 ![The Setting Sidebar now displays the message](https://developer.wordpress.org/files/2023/12/block-tutorial-9.png)
 
@@ -417,7 +417,7 @@ Add the following line below the other imports in the `edit.js` file.
 import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
 ```
 
-Then wrap the “Testing” message in the `PanelBody` component and set the `title` parameter to “Settings”. Refer to the [component documentation](https://developer.wordpress.org/block-editor/reference-guides/components/panel/#panelbody) for additional parameter options.
+Then wrap the "Testing" message in the `PanelBody` component and set the `title` parameter to "Settings". Refer to the [component documentation](https://developer.wordpress.org/block-editor/reference-guides/components/panel/#panelbody) for additional parameter options.
 
 ```js
 export default function Edit() {
@@ -442,7 +442,7 @@ Save the file and refresh the Editor. You should now see the new Settings panel.
 
 ##### Text control
 
-The next step is to replace the “Testing” message with a `TextControl` component that allows the user to set the `startingYear` attribute. However, you must include two parameters in the `Edit()` function before doing so.
+The next step is to replace the "Testing" message with a `TextControl` component that allows the user to set the `startingYear` attribute. However, you must include two parameters in the `Edit()` function before doing so.
 
 - `attributes` is an object that contains all the attributes for the block
 - `setAttributes` is a function that allows you to update the value of an attribute
@@ -461,9 +461,9 @@ export default function Edit( { attributes, setAttributes } ) {
 	To see all the attributes associated with the Copyright Date Block, add <code>console.log( attributes );</code> at the top of the <code>Edit()</code> function. This can be useful when building and testing a custom block.
 </div>
 
-Now you can remove the “Testing” message and add a `TextControl`. It should include:
+Now, you can remove the "Testing" message and add a `TextControl`. It should include:
 
-1. A `label` property set to “Starting year”
+1. A `label` property set to "Starting year"
 2. A `value` property set to the attribute `startingYear`
 3. An `onChange` property that updates the `startingYear` attribute whenever the value changes
 
@@ -504,11 +504,11 @@ Save the file and refresh the Editor. Confirm that a text field now exists in th
 
 Next, let's add a toggle that will turn the starting year functionality on or off. You can do this with a `ToggleControl` component that sets the `showStartingYear` attribute. It should include:
 
-1. A `label` property set to “Show starting year”
+1. A `label` property set to "Show starting year"
 2. A `checked` property set to the attribute `showStartingYear`
 3. An `onChange` property that updates the `showStartingYear` attribute whenever the toggle is checked or unchecked
 
-You can also update the “Starting year” text input so it's only displayed when `showStartingYear` is `true`, which can be done using the `&&` logical operator.
+You can also update the "Starting year" text input so it's only displayed when `showStartingYear` is `true`, which can be done using the `&&` logical operator.
 
 The `Edit()` function should look like the following.
 
@@ -772,7 +772,7 @@ This block validation error occurs because the `save()` function returns block c
 <!-- wp:create-block/copyright-date-block {"showStartingYear":true,"startingYear":"2017"} /-->
 ```
 
-You will see more of these errors as you update the `save()` function in subsequent steps. Just click “Attempt Block Recovery” and update the page.
+You will see more of these errors as you update the `save()` function in subsequent steps. Just click "Attempt Block Recovery" and update the page.
 
 After preforming block recovery, open the Code editor and you will see the markup now looks like this.
 
@@ -814,7 +814,7 @@ export default function save( { attributes } ) {
 }
 ```
 
-Save the file and refresh the Editor. Click “Attempt Block Recovery” and update the page. Check the Code editor, and the block markup should now look something like this.
+Save the file and refresh the Editor. Click "Attempt Block Recovery" and update the page. Check the Code editor, and the block markup should now look something like this.
 
 ```html
 <!-- wp:create-block/copyright-date-block {"showStartingYear":true,"startingYear":"2017"} -->
@@ -830,7 +830,7 @@ Let's fix this in the next section.
 
 ### Handling dynamic content in statically rendered blocks
 
-Generally, you want to avoid dynamic content in statically rendered blocks. This is part of the reason why the term “dynamic” is used when referring to dynamic rendering.
+Generally, you want to avoid dynamic content in statically rendered blocks. This is part of the reason why the term "dynamic" is used when referring to dynamic rendering.
 
 That said, in this tutorial, you are combining both rendering methods, and you just need a bit more code to avoid any block validation errors when the year changes.
 
