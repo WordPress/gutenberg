@@ -13,7 +13,10 @@ import BlockIcon from '../block-icon';
 export default function BlockDraggableChip( { count, icon, isPattern } ) {
 	const patternLabel = isPattern && __( 'Pattern' );
 	return (
-		<div className="block-editor-block-draggable-chip-wrapper">
+		<div
+			className="block-editor-block-draggable-chip-wrapper"
+			style={ { opacity: 'var(--wp--block-draggable-valid-opacity)' } }
+		>
 			<div
 				className="block-editor-block-draggable-chip"
 				data-testid="block-draggable-chip"

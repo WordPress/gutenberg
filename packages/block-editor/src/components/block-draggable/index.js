@@ -72,7 +72,7 @@ const BlockDraggable = ( {
 	}, [] );
 
 	const blockRef = useBlockRef( clientIds[ 0 ] );
-	const editorRoot = blockRef.current?.closest( '.is-root-container' );
+	const editorRoot = blockRef.current?.closest( 'body' );
 
 	// Add a dragover event listener to the editor root to track the blocks being dragged over.
 	// The listener has to be inside the editor iframe otherwise the target isn't accessible.
@@ -97,6 +97,18 @@ const BlockDraggable = ( {
 				getBlockListSettings( newTargetClientId )
 			) {
 				setTargetClientId( newTargetClientId );
+			}
+			// Update the body class to reflect if drop target is valid.
+			// This has to be done on the document body because the draggable
+			// chip is rendered outside of the editor iframe.
+			if ( isDropTargetValid ) {
+				window?.document?.body?.classList?.remove(
+					'block-draggable-invalid-drag-token'
+				);
+			} else {
+				window?.document?.body?.classList?.add(
+					'block-draggable-invalid-drag-token'
+				);
 			}
 		};
 
@@ -151,9 +163,11 @@ const BlockDraggable = ( {
 				<BlockDraggableChip
 					count={ clientIds.length }
 					icon={ icon }
-					isValid={ isDropTargetValid }
+					clientIds={ clientIds }
+					targetClientId={ targetClientId }
 				/>
 			}
+			isValid={ isDropTargetValid }
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {
