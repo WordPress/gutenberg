@@ -13,7 +13,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import { OPERATOR_IN } from './constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -81,8 +80,14 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 											),
 											{
 												field: filter.field,
-												operator: OPERATOR_IN,
-												value: element.value,
+												operator:
+													filterInView?.operator ||
+													filter.operators[ 0 ],
+												value:
+													activeElement?.value ===
+													element.value
+														? undefined
+														: element.value,
 											},
 										],
 									} ) );
