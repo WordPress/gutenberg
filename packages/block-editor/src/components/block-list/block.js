@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback, RawHTML } from '@wordpress/element';
+import { useMemo, useCallback, RawHTML, useContext } from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -15,30 +15,49 @@ import {
 	switchToBlockType,
 	getDefaultBlockName,
 	isUnmodifiedBlock,
+	isReusableBlock,
+	getBlockDefaultClassName,
+	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import {
-	withDispatch,
-	withSelect,
-	useDispatch,
-	useSelect,
-} from '@wordpress/data';
-import { compose, pure, ifCondition } from '@wordpress/compose';
+import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
+import { compose, pure, useMergeRefs, useDisabled } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BlockEdit from '../block-edit';
+import {
+	BlockEditContextProvider,
+	mayDisplayControlsKey,
+	mayDisplayParentControlsKey,
+} from '../block-edit/context';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
-import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { BlockListBlockContext } from './block-list-block-context';
+
+import useMovingAnimation from '../use-moving-animation';
+import { useFocusFirstElement } from './use-block-props/use-focus-first-element';
+import { useIsHovered } from './use-block-props/use-is-hovered';
+import { useFocusHandler } from './use-block-props/use-focus-handler';
+import { useEventHandlers } from './use-block-props/use-selected-block-event-handlers';
+import { useNavModeExit } from './use-block-props/use-nav-mode-exit';
+import { useBlockRefProvider } from './use-block-props/use-block-refs';
+import { useIntersectionObserver } from './use-block-props/use-intersection-observer';
+import { unlock } from '../../lock-unlock';
+
+/**
+ * If the block count exceeds the threshold, we disable the reordering animation
+ * to avoid laginess.
+ */
+const BLOCK_ANIMATION_THRESHOLD = 200;
 
 /**
  * Merges wrapper props with special handling for classNames and styles.
@@ -72,9 +91,15 @@ function mergeWrapperProps( propsA, propsB ) {
 	return newProps;
 }
 
-function Block( { children, isHtml, ...props } ) {
+function Block( { children, mode, isHtml, className } ) {
+	const blockProps = useContext( BlockListBlockContext );
+	const htmlSuffix = mode === 'html' && ! isHtml ? '-visual' : '';
 	return (
-		<div { ...useBlockProps( props, { __unstableIsHtml: isHtml } ) }>
+		<div
+			{ ...blockProps }
+			id={ blockProps.id + htmlSuffix }
+			className={ classnames( className, blockProps.className ) }
+		>
 			{ children }
 		</div>
 	);
@@ -88,67 +113,24 @@ function BlockListBlock( {
 	clientId,
 	isSelected,
 	isSelectionEnabled,
-	className,
-	__unstableLayoutClassNames: layoutClassNames,
 	name,
 	isValid,
 	attributes,
-	wrapperProps,
 	setAttributes,
 	onReplace,
 	onInsertBlocksAfter,
 	onMerge,
 	toggleSelection,
 } ) {
-	const {
-		themeSupportsLayout,
-		isTemporarilyEditingAsBlocks,
-		blockEditingMode,
-		mayDisplayControls,
-		mayDisplayParentControls,
-	} = useSelect(
-		( select ) => {
-			const {
-				getSettings,
-				__unstableGetTemporarilyEditingAsBlocks,
-				getBlockEditingMode,
-				getBlockName,
-				isFirstMultiSelectedBlock,
-				getMultiSelectedBlockClientIds,
-				hasSelectedInnerBlock,
-			} = select( blockEditorStore );
-			const { hasBlockSupport } = select( blocksStore );
-			return {
-				themeSupportsLayout: getSettings().supportsLayout,
-				isTemporarilyEditingAsBlocks:
-					__unstableGetTemporarilyEditingAsBlocks() === clientId,
-				blockEditingMode: getBlockEditingMode( clientId ),
-				mayDisplayControls:
-					isSelected ||
-					( isFirstMultiSelectedBlock( clientId ) &&
-						getMultiSelectedBlockClientIds().every(
-							( id ) => getBlockName( id ) === name
-						) ),
-				mayDisplayParentControls:
-					hasBlockSupport(
-						getBlockName( clientId ),
-						'__experimentalExposeControlsToChildren',
-						false
-					) && hasSelectedInnerBlock( clientId ),
-			};
-		},
-		[ clientId, isSelected, name ]
-	);
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
-
 	const parentLayout = useLayout() || {};
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
 	// (InspectorControls, etc.) which are inside `BlockEdit` but not
 	// `BlockHTML`, even in HTML mode.
-	let blockEdit = (
+	const blockEdit = (
 		<BlockEdit
 			name={ name }
 			isSelected={ isSelected }
@@ -161,59 +143,13 @@ function BlockListBlock( {
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
-			__unstableLayoutClassNames={ layoutClassNames }
 			__unstableParentLayout={
 				Object.keys( parentLayout ).length ? parentLayout : undefined
 			}
-			mayDisplayControls={ mayDisplayControls }
-			mayDisplayParentControls={ mayDisplayParentControls }
 		/>
 	);
 
 	const blockType = getBlockType( name );
-
-	if ( blockEditingMode === 'disabled' ) {
-		wrapperProps = {
-			...wrapperProps,
-			tabIndex: -1,
-		};
-	}
-	// Determine whether the block has props to apply to the wrapper.
-	if ( blockType?.getEditWrapperProps ) {
-		wrapperProps = mergeWrapperProps(
-			wrapperProps,
-			blockType.getEditWrapperProps( attributes )
-		);
-	}
-
-	const isAligned =
-		wrapperProps &&
-		!! wrapperProps[ 'data-align' ] &&
-		! themeSupportsLayout;
-
-	// Support for sticky position in classic themes with alignment wrappers.
-
-	const isSticky = className?.includes( 'is-position-sticky' );
-
-	// For aligned blocks, provide a wrapper element so the block can be
-	// positioned relative to the block column.
-	// This is only kept for classic themes that don't support layout
-	// Historically we used to rely on extra divs and data-align to
-	// provide the alignments styles in the editor.
-	// Due to the differences between frontend and backend, we migrated
-	// to the layout feature, and we're now aligning the markup of frontend
-	// and backend.
-	if ( isAligned ) {
-		blockEdit = (
-			<div
-				className={ classnames( 'wp-block', isSticky && className ) }
-				data-align={ wrapperProps[ 'data-align' ] }
-			>
-				{ blockEdit }
-			</div>
-		);
-	}
-
 	let block;
 
 	if ( ! isValid ) {
@@ -241,84 +177,368 @@ function BlockListBlock( {
 	} else if ( blockType?.apiVersion > 1 ) {
 		block = blockEdit;
 	} else {
-		block = <Block { ...wrapperProps }>{ blockEdit }</Block>;
+		block = <Block>{ blockEdit }</Block>;
 	}
 
-	const { 'data-align': dataAlign, ...restWrapperProps } = wrapperProps ?? {};
-
-	const value = {
-		clientId,
-		className: classnames(
-			{
-				'is-editing-disabled': blockEditingMode === 'disabled',
-				'is-content-locked-temporarily-editing-as-blocks':
-					isTemporarilyEditingAsBlocks,
-			},
-			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
-			! ( dataAlign && isSticky ) && className
-		),
-		wrapperProps: restWrapperProps,
-		isAligned,
-	};
-
-	const memoizedValue = useMemo( () => value, Object.values( value ) );
-
 	return (
-		<BlockListBlockContext.Provider value={ memoizedValue }>
-			<BlockCrashBoundary
-				fallback={
-					<Block className="has-warning">
-						<BlockCrashWarning />
-					</Block>
-				}
-			>
-				{ block }
-			</BlockCrashBoundary>
-		</BlockListBlockContext.Provider>
+		<BlockCrashBoundary
+			fallback={
+				<Block className="has-warning">
+					<BlockCrashWarning />
+				</Block>
+			}
+		>
+			{ block }
+		</BlockCrashBoundary>
 	);
 }
 
-const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
-	const {
-		isBlockSelected,
-		getBlockMode,
-		isSelectionEnabled,
-		getTemplateLock,
-		__unstableGetBlockWithoutInnerBlocks,
-		canRemoveBlock,
-		canMoveBlock,
-	} = select( blockEditorStore );
-	const block = __unstableGetBlockWithoutInnerBlocks( clientId );
-	const isSelected = isBlockSelected( clientId );
-	const templateLock = getTemplateLock( rootClientId );
-	const canRemove = canRemoveBlock( clientId, rootClientId );
-	const canMove = canMoveBlock( clientId, rootClientId );
+const applyWithSelect = ( Component ) => {
+	return ( props ) => {
+		const { clientId, rootClientId, __unstableLayoutClassNames } = props;
+		let { wrapperProps, className } = props;
+		const selectedProps = useSelect(
+			( select ) => {
+				const {
+					isBlockSelected,
+					getBlockMode,
+					isSelectionEnabled,
+					getTemplateLock,
+					__unstableGetBlockWithoutInnerBlocks,
+					canRemoveBlock,
+					canMoveBlock,
 
-	// The fallback to `{}` is a temporary fix.
-	// This function should never be called when a block is not present in
-	// the state. It happens now because the order in withSelect rendering
-	// is not correct.
-	const { name, attributes, isValid } = block || {};
+					getSettings,
+					__unstableGetTemporarilyEditingAsBlocks,
+					getBlockEditingMode,
+					getBlockName,
+					isFirstMultiSelectedBlock,
+					getMultiSelectedBlockClientIds,
+					hasSelectedInnerBlock,
 
-	// Do not add new properties here, use `useSelect` instead to avoid
-	// leaking new props to the public API (editor.BlockListBlock filter).
-	return {
-		mode: getBlockMode( clientId ),
-		isSelectionEnabled: isSelectionEnabled(),
-		isLocked: !! templateLock,
-		canRemove,
-		canMove,
-		// Users of the editor.BlockListBlock filter used to be able to
-		// access the block prop.
-		// Ideally these blocks would rely on the clientId prop only.
-		// This is kept for backward compatibility reasons.
-		block,
-		name,
-		attributes,
-		isValid,
-		isSelected,
+					getBlockIndex,
+					isTyping,
+					getGlobalBlockCount,
+					isBlockMultiSelected,
+					isAncestorMultiSelected,
+					isBlockSubtreeDisabled,
+					isBlockHighlighted,
+					__unstableIsFullySelected,
+					__unstableSelectionHasUnmergeableBlock,
+					isBlockBeingDragged,
+					hasBlockMovingClientId,
+					canInsertBlockType,
+					getBlockRootClientId,
+					__unstableHasActiveBlockOverlayActive,
+					__unstableGetEditorMode,
+					getSelectedBlocksInitialCaretPosition,
+				} = unlock( select( blockEditorStore ) );
+				const block = __unstableGetBlockWithoutInnerBlocks( clientId );
+
+				// This is a temporary fix.
+				// This function should never be called when a block is not
+				// present in the state. It happens now because the order in
+				// withSelect rendering is not correct.
+				if ( ! block ) {
+					return;
+				}
+
+				const _isSelected = isBlockSelected( clientId );
+				const templateLock = getTemplateLock( rootClientId );
+				const canRemove = canRemoveBlock( clientId, rootClientId );
+				const canMove = canMoveBlock( clientId, rootClientId );
+				const { name: blockName, attributes, isValid } = block;
+
+				const { hasBlockSupport: _hasBlockSupport } =
+					select( blocksStore );
+
+				const { getActiveBlockVariation } = select( blocksStore );
+				const isPartOfMultiSelection =
+					isBlockMultiSelected( clientId ) ||
+					isAncestorMultiSelected( clientId );
+				const blockType = getBlockType( blockName );
+				const match = getActiveBlockVariation( blockName, attributes );
+				const { outlineMode, supportsLayout } = getSettings();
+				const isMultiSelected = isBlockMultiSelected( clientId );
+				const checkDeep = true;
+				const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
+					clientId,
+					checkDeep
+				);
+				const typing = isTyping();
+				const hasLightBlockWrapper = blockType?.apiVersion > 1;
+				const movingClientId = hasBlockMovingClientId();
+
+				// Do not add new properties here, use `useSelect` instead to avoid
+				// leaking new props to the public API (editor.BlockListBlock filter).
+				return {
+					mode: getBlockMode( clientId ),
+					isSelectionEnabled: isSelectionEnabled(),
+					isLocked: !! templateLock,
+					canRemove,
+					canMove,
+					// Users of the editor.BlockListBlock filter used to be able to
+					// access the block prop.
+					// Ideally these blocks would rely on the clientId prop only.
+					// This is kept for backward compatibility reasons.
+					block,
+					name: blockName,
+					attributes,
+					isValid,
+					isSelected: _isSelected,
+
+					themeSupportsLayout: supportsLayout,
+					isTemporarilyEditingAsBlocks:
+						__unstableGetTemporarilyEditingAsBlocks() === clientId,
+					blockEditingMode: getBlockEditingMode( clientId ),
+					mayDisplayControls:
+						_isSelected ||
+						( isFirstMultiSelectedBlock( clientId ) &&
+							getMultiSelectedBlockClientIds().every(
+								( id ) => getBlockName( id ) === blockName
+							) ),
+					mayDisplayParentControls:
+						_hasBlockSupport(
+							getBlockName( clientId ),
+							'__experimentalExposeControlsToChildren',
+							false
+						) && hasSelectedInnerBlock( clientId ),
+
+					index: getBlockIndex( clientId ),
+					blockTitle: match?.title || blockType?.title,
+					blockType,
+					isPartOfSelection: _isSelected || isPartOfMultiSelection,
+					adjustScrolling:
+						_isSelected || isFirstMultiSelectedBlock( clientId ),
+					enableAnimation:
+						! typing &&
+						getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+					isSubtreeDisabled: isBlockSubtreeDisabled( clientId ),
+					isOutlineEnabled: outlineMode,
+					hasOverlay:
+						__unstableHasActiveBlockOverlayActive( clientId ),
+					initialPosition:
+						_isSelected && __unstableGetEditorMode() === 'edit'
+							? getSelectedBlocksInitialCaretPosition()
+							: undefined,
+					classNames: classnames(
+						{
+							'is-selected': _isSelected,
+							'is-highlighted': isBlockHighlighted( clientId ),
+							'is-multi-selected': isMultiSelected,
+							'is-partially-selected':
+								isMultiSelected &&
+								! __unstableIsFullySelected() &&
+								! __unstableSelectionHasUnmergeableBlock(),
+							'is-reusable': isReusableBlock( blockType ),
+							'is-dragging': isBlockBeingDragged( clientId ),
+							'has-child-selected': isAncestorOfSelectedBlock,
+							'remove-outline':
+								_isSelected && outlineMode && typing,
+							'is-block-moving-mode': !! movingClientId,
+							'can-insert-moving-block':
+								movingClientId &&
+								canInsertBlockType(
+									getBlockName( movingClientId ),
+									getBlockRootClientId( clientId )
+								),
+							'is-editing-disabled':
+								getBlockEditingMode( clientId ) === 'disabled',
+							'is-content-locked-temporarily-editing-as-blocks':
+								__unstableGetTemporarilyEditingAsBlocks() ===
+								clientId,
+						},
+						hasLightBlockWrapper ? attributes.className : undefined,
+						hasLightBlockWrapper
+							? getBlockDefaultClassName( blockName )
+							: undefined
+					),
+				};
+			},
+			[ clientId, rootClientId ]
+		);
+
+		const publicProps = {
+			mode: selectedProps.mode,
+			isSelectionEnabled: selectedProps.isSelectionEnabled,
+			isLocked: selectedProps.isLocked,
+			canRemove: selectedProps.canRemove,
+			canMove: selectedProps.canMove,
+			// Users of the editor.BlockListBlock filter used to be able to
+			// access the block prop.
+			// Ideally these blocks would rely on the clientId prop only.
+			// This is kept for backward compatibility reasons.
+			block: selectedProps.block,
+			name: selectedProps.name,
+			attributes: selectedProps.attributes,
+			isValid: selectedProps.isValid,
+			isSelected: selectedProps.isSelected,
+		};
+
+		const {
+			index,
+			name,
+			blockTitle,
+			isSelected,
+			isPartOfSelection,
+			adjustScrolling,
+			enableAnimation,
+			isSubtreeDisabled,
+			isOutlineEnabled,
+			hasOverlay,
+			initialPosition,
+			classNames,
+			themeSupportsLayout,
+			blockType,
+			attributes,
+			blockEditingMode,
+			mayDisplayControls,
+			mayDisplayParentControls,
+		} = selectedProps;
+
+		const mergedRefs = useMergeRefs( [
+			props.ref,
+			useFocusFirstElement( { clientId, initialPosition } ),
+			useBlockRefProvider( clientId ),
+			useFocusHandler( clientId ),
+			useEventHandlers( { clientId, isSelected } ),
+			useNavModeExit( clientId ),
+			useIsHovered( { isEnabled: isOutlineEnabled } ),
+			useIntersectionObserver(),
+			useMovingAnimation( {
+				isSelected: isPartOfSelection,
+				adjustScrolling,
+				enableAnimation,
+				triggerAnimationOnChange: index,
+			} ),
+			useDisabled( { isDisabled: ! hasOverlay } ),
+		] );
+
+		// Block is sometimes not mounted at the right time, causing it be
+		// undefined see issue for more info
+		// https://github.com/WordPress/gutenberg/issues/17013
+		if ( ! selectedProps ) {
+			return null;
+		}
+
+		// translators: %s: Type of block (i.e. Text, Image etc)
+		const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
+
+		// Determine whether the block has props to apply to the wrapper.
+		if ( blockType?.getEditWrapperProps ) {
+			wrapperProps = mergeWrapperProps(
+				wrapperProps,
+				blockType.getEditWrapperProps( attributes )
+			);
+		}
+
+		const isAligned =
+			wrapperProps &&
+			!! wrapperProps[ 'data-align' ] &&
+			! themeSupportsLayout;
+
+		// Support for sticky position in classic themes with alignment wrappers.
+
+		const isSticky = className?.includes( 'is-position-sticky' );
+		const { 'data-align': dataAlign, ...restWrapperProps } =
+			wrapperProps ?? {};
+
+		className = classnames(
+			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
+			! ( dataAlign && isSticky ) && className
+		);
+
+		const blockProps = {
+			tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
+			...restWrapperProps,
+			ref: mergedRefs,
+			id: `block-${ clientId }`,
+			role: 'document',
+			'aria-label': blockLabel,
+			'data-block': clientId,
+			'data-type': name,
+			'data-title': blockTitle,
+			inert: isSubtreeDisabled ? 'true' : undefined,
+			className: classnames(
+				'block-editor-block-list__block',
+				{
+					// The wp-block className is important for editor styles.
+					'wp-block': ! isAligned,
+					'has-block-overlay': hasOverlay,
+				},
+				className,
+				restWrapperProps.className,
+				classNames
+			),
+		};
+
+		const { layout = null } = attributes;
+		const layoutSupport =
+			hasBlockSupport( name, 'layout', false ) ||
+			hasBlockSupport( name, '__experimentalLayout', false );
+
+		const component = (
+			<BlockEditContextProvider
+				// It is important to return the same object if props haven't
+				// changed to avoid  unnecessary rerenders.
+				// See https://reactjs.org/docs/context.html#caveats.
+				value={ useMemo(
+					() => ( {
+						name,
+						isSelected,
+						clientId,
+						layout: layoutSupport ? layout : null,
+						__unstableLayoutClassNames,
+						// We use symbols in favour of an __unstable prefix to avoid
+						// usage outside of the package (this context is exposed).
+						[ mayDisplayControlsKey ]: mayDisplayControls,
+						[ mayDisplayParentControlsKey ]:
+							mayDisplayParentControls,
+					} ),
+					[
+						name,
+						isSelected,
+						clientId,
+						layoutSupport,
+						layout,
+						__unstableLayoutClassNames,
+						mayDisplayControls,
+						mayDisplayParentControls,
+					]
+				) }
+			>
+				{ /* To do: explain why it's ok to not memo */ }
+				<BlockListBlockContext.Provider value={ blockProps }>
+					<Component { ...props } { ...publicProps } />
+				</BlockListBlockContext.Provider>
+			</BlockEditContextProvider>
+		);
+
+		// For aligned blocks, provide a wrapper element so the block can be
+		// positioned relative to the block column.
+		// This is only kept for classic themes that don't support layout
+		// Historically we used to rely on extra divs and data-align to
+		// provide the alignments styles in the editor.
+		// Due to the differences between frontend and backend, we migrated
+		// to the layout feature, and we're now aligning the markup of frontend
+		// and backend.
+		if ( isAligned ) {
+			return (
+				<div
+					className={ classnames(
+						'wp-block',
+						isSticky && className
+					) }
+					data-align={ wrapperProps[ 'data-align' ] }
+				>
+					{ component }
+				</div>
+			);
+		}
+
+		return component;
 	};
-} );
+};
 
 const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 	const {
@@ -562,9 +782,5 @@ export default compose(
 	pure,
 	applyWithSelect,
 	applyWithDispatch,
-	// Block is sometimes not mounted at the right time, causing it be undefined
-	// see issue for more info
-	// https://github.com/WordPress/gutenberg/issues/17013
-	ifCondition( ( { block } ) => !! block ),
 	withFilters( 'editor.BlockListBlock' )
 )( BlockListBlock );
