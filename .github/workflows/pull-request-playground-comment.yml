@@ -3,7 +3,7 @@ name: OPTIONAL - Comment on a pull request with Playground details
 
 on:
     pull_request_target:
-        types: ['opened']
+        types: [opened]
         branches:
             - trunk
 
@@ -20,7 +20,6 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             issues: write
-            pull-requests: write
         if: ${{ github.repository  == 'WordPress/gutenberg' || github.event_name == 'pull_request_target' }}
         steps:
             - name: Find Comment
