@@ -23,7 +23,7 @@ const SettingsHeader = ( { sidebarName } ) => {
 		return {
 			// translators: Default label for the Document sidebar tab, not selected.
 			documentLabel: getPostTypeLabel() || _x( 'Document', 'noun' ),
-			isTemplateMode: getRenderingMode() !== 'post-only',
+			isTemplateMode: getRenderingMode() === 'template-only',
 		};
 	}, [] );
 

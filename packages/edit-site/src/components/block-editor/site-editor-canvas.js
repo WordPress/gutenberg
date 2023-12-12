@@ -24,7 +24,6 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
-import PageContentFocusNotifications from '../page-content-focus-notifications';
 
 export default function SiteEditorCanvas() {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
@@ -60,50 +59,46 @@ export default function SiteEditorCanvas() {
 	const forceFullHeight = isNavigationFocusMode;
 
 	return (
-		<>
-			<EditorCanvasContainer.Slot>
-				{ ( [ editorCanvasView ] ) =>
-					editorCanvasView ? (
-						<div className="edit-site-visual-editor is-focus-mode">
-							{ editorCanvasView }
-						</div>
-					) : (
-						<BlockTools
-							className={ classnames( 'edit-site-visual-editor', {
-								'is-focus-mode':
-									isFocusMode || !! editorCanvasView,
-								'is-view-mode': isViewMode,
-							} ) }
-							__unstableContentRef={ contentRef }
-							onClick={ ( event ) => {
-								// Clear selected block when clicking on the gray background.
-								if ( event.target === event.currentTarget ) {
-									clearSelectedBlock();
-								}
-							} }
+		<EditorCanvasContainer.Slot>
+			{ ( [ editorCanvasView ] ) =>
+				editorCanvasView ? (
+					<div className="edit-site-visual-editor is-focus-mode">
+						{ editorCanvasView }
+					</div>
+				) : (
+					<BlockTools
+						className={ classnames( 'edit-site-visual-editor', {
+							'is-focus-mode': isFocusMode || !! editorCanvasView,
+							'is-view-mode': isViewMode,
+						} ) }
+						__unstableContentRef={ contentRef }
+						onClick={ ( event ) => {
+							// Clear selected block when clicking on the gray background.
+							if ( event.target === event.currentTarget ) {
+								clearSelectedBlock();
+							}
+						} }
+					>
+						<BackButton />
+						<ResizableEditor
+							enableResizing={ enableResizing }
+							height={
+								sizes.height && ! forceFullHeight
+									? sizes.height
+									: '100%'
+							}
 						>
-							<BackButton />
-							<ResizableEditor
+							<EditorCanvas
 								enableResizing={ enableResizing }
-								height={
-									sizes.height && ! forceFullHeight
-										? sizes.height
-										: '100%'
-								}
+								settings={ settings }
+								contentRef={ contentRef }
 							>
-								<EditorCanvas
-									enableResizing={ enableResizing }
-									settings={ settings }
-									contentRef={ contentRef }
-								>
-									{ resizeObserver }
-								</EditorCanvas>
-							</ResizableEditor>
-						</BlockTools>
-					)
-				}
-			</EditorCanvasContainer.Slot>
-			<PageContentFocusNotifications contentRef={ contentRef } />
-		</>
+								{ resizeObserver }
+							</EditorCanvas>
+						</ResizableEditor>
+					</BlockTools>
+				)
+			}
+		</EditorCanvasContainer.Slot>
 	);
 }

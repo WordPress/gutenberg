@@ -34,7 +34,9 @@ test.describe( 'Site editor block removal prompt', () => {
 
 		// Expect the block removal prompt to have appeared
 		await expect(
-			page.getByText( 'Query Loop displays a list of posts or pages.' )
+			page.getByText(
+				'Post or page content will not be displayed if you delete these blocks.'
+			)
 		).toBeVisible();
 	} );
 
@@ -57,7 +59,7 @@ test.describe( 'Site editor block removal prompt', () => {
 		// Expect the block removal prompt to have appeared
 		await expect(
 			page.getByText(
-				'Post Template displays each post or page in a Query Loop.'
+				'Post or page content will not be displayed if you delete this block.'
 			)
 		).toBeVisible();
 	} );

@@ -36,7 +36,7 @@ import {
 export const setupEditor =
 	( post, edits, template ) =>
 	( { dispatch } ) => {
-		dispatch.setupEditorState( post );
+		dispatch.setEditedPost( post.type, post.id );
 		// Apply a template for new posts only, if exists.
 		const isNewPost = post.status === 'auto-draft';
 		if ( isNewPost && template ) {
@@ -70,10 +70,18 @@ export const setupEditor =
  * Returns an action object signalling that the editor is being destroyed and
  * that any necessary state or side-effect cleanup should occur.
  *
+ * @deprecated
+ *
  * @return {Object} Action object.
  */
 export function __experimentalTearDownEditor() {
-	return { type: 'TEAR_DOWN_EDITOR' };
+	deprecated(
+		"wp.data.dispatch( 'core/editor' ).__experimentalTearDownEditor",
+		{
+			since: '6.5',
+		}
+	);
+	return { type: 'DO_NOTHING' };
 }
 
 /**
@@ -109,17 +117,33 @@ export function updatePost() {
 }
 
 /**
- * Returns an action object used to setup the editor state when first opening
- * an editor.
+ * Setup the editor state.
+ *
+ * @deprecated
  *
  * @param {Object} post Post object.
+ */
+export function setupEditorState( post ) {
+	deprecated( "wp.data.dispatch( 'core/editor' ).setupEditorState", {
+		since: '6.5',
+		alternative: "wp.data.dispatch( 'core/editor' ).setEditedPost",
+	} );
+	return setEditedPost( post.type, post.id );
+}
+
+/**
+ * Returns an action that sets the current post Type and post ID.
+ *
+ * @param {string} postType Post Type.
+ * @param {string} postId   Post ID.
  *
  * @return {Object} Action object.
  */
-export function setupEditorState( post ) {
+export function setEditedPost( postType, postId ) {
 	return {
-		type: 'SETUP_EDITOR_STATE',
-		post,
+		type: 'SET_EDITED_POST',
+		postType,
+		postId,
 	};
 }
 
@@ -572,6 +596,20 @@ export const setRenderingMode =
 			mode,
 		} );
 	};
+
+/**
+ * Action that changes the width of the editing canvas.
+ *
+ * @param {string} deviceType
+ *
+ * @return {Object} Action object.
+ */
+export function setDeviceType( deviceType ) {
+	return {
+		type: 'SET_DEVICE_TYPE',
+		deviceType,
+	};
+}
 
 /**
  * Backward compatibility

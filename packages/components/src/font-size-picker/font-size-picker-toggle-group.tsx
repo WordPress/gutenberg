@@ -14,10 +14,18 @@ import { T_SHIRT_ABBREVIATIONS, T_SHIRT_NAMES } from './constants';
 import type { FontSizePickerToggleGroupProps } from './types';
 
 const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
-	const { fontSizes, value, __nextHasNoMarginBottom, size, onChange } = props;
+	const {
+		fontSizes,
+		value,
+		__nextHasNoMarginBottom,
+		__next40pxDefaultSize,
+		size,
+		onChange,
+	} = props;
 	return (
 		<ToggleGroupControl
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__next40pxDefaultSize={ __next40pxDefaultSize }
 			label={ __( 'Font size' ) }
 			hideLabelFromVision
 			value={ value }

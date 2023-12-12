@@ -119,7 +119,7 @@ test.describe( 'Pages', () => {
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Template options' } )
 			.click();
-		await page.getByRole( 'button', { name: 'Edit template' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
 		await expect(
 			editor.canvas.getByRole( 'document', {
 				name: 'Block: Content',
@@ -129,7 +129,7 @@ test.describe( 'Pages', () => {
 		);
 		await expect(
 			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text="You are editing a template."'
+				'role=button[name="Dismiss this notice"i] >> text="Editing template. Changes made here affect all posts and pages that use the template."'
 			)
 		).toBeVisible();
 

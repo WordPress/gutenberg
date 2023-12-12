@@ -131,7 +131,9 @@ class PostEditorTemplateMode {
 
 		// Only match the beginning of Select template: because it contains the template name or slug afterwards.
 		await this.editorSettingsSidebar
-			.locator( 'role=button[name^="Select template"i]' )
+			.getByRole( 'button', {
+				name: 'Template options',
+			} )
 			.click();
 	}
 
@@ -139,8 +141,11 @@ class PostEditorTemplateMode {
 		await this.disableTemplateWelcomeGuide();
 
 		await this.openTemplatePopover();
-
-		await this.page.locator( 'role=button[name="Edit template"i]' ).click();
+		await this.page
+			.getByRole( 'menuitem', {
+				name: 'Edit template',
+			} )
+			.click();
 
 		// Check that we switched properly to edit mode.
 		await this.page.waitForSelector(

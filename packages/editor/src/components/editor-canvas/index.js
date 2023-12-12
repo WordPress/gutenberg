@@ -9,15 +9,18 @@ import classnames from 'classnames';
 import {
 	BlockList,
 	store as blockEditorStore,
+	__unstableUseTypewriter as useTypewriter,
 	__unstableUseTypingObserver as useTypingObserver,
 	useSettings,
 	__experimentalRecursionProvider as RecursionProvider,
 	privateApis as blockEditorPrivateApis,
+	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
-import { useEffect, useRef, useMemo } from '@wordpress/element';
+import { useEffect, useRef, useMemo, forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,10 +28,14 @@ import { store as coreStore } from '@wordpress/core-data';
 import PostTitle from '../post-title';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 
-const { LayoutStyle, useLayoutClasses, useLayoutStyles } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	LayoutStyle,
+	useLayoutClasses,
+	useLayoutStyles,
+	ExperimentalBlockCanvas: BlockCanvas,
+} = unlock( blockEditorPrivateApis );
 
 /**
  * Given an array of nested blocks, find the first Post Content
@@ -65,19 +72,26 @@ function checkForPostContentAtRootLevel( blocks ) {
 	return false;
 }
 
-export default function EditorCanvas( {
-	// Ideally as we unify post and site editors, we won't need these props.
-	autoFocus,
-	dropZoneElement,
-	className,
-	renderAppender,
-} ) {
+function EditorCanvas(
+	{
+		// Ideally as we unify post and site editors, we won't need these props.
+		autoFocus,
+		className,
+		renderAppender,
+		styles,
+		disableIframe = false,
+		iframeProps,
+		children,
+	},
+	ref
+) {
 	const {
 		renderingMode,
 		postContentAttributes,
 		editedPostTemplate = {},
 		wrapperBlockName,
 		wrapperUniqueId,
+		deviceType,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -85,7 +99,10 @@ export default function EditorCanvas( {
 			getCurrentTemplateId,
 			getEditorSettings,
 			getRenderingMode,
+			getDeviceType,
 		} = select( editorStore );
+		const { getPostType, canUser, getEditedEntityRecord } =
+			select( coreStore );
 		const postTypeSlug = getCurrentPostType();
 		const _renderingMode = getRenderingMode();
 		let _wrapperBlockName;
@@ -98,14 +115,11 @@ export default function EditorCanvas( {
 
 		const editorSettings = getEditorSettings();
 		const supportsTemplateMode = editorSettings.supportsTemplateMode;
-		const postType = select( coreStore ).getPostType( postTypeSlug );
-		const canEditTemplate = select( coreStore ).canUser(
-			'create',
-			'templates'
-		);
+		const postType = getPostType( postTypeSlug );
+		const canEditTemplate = canUser( 'create', 'templates' );
 		const currentTemplateId = getCurrentTemplateId();
 		const template = currentTemplateId
-			? select( coreStore ).getEditedEntityRecord(
+			? getEditedEntityRecord(
 					'postType',
 					'wp_template',
 					currentTemplateId
@@ -123,6 +137,7 @@ export default function EditorCanvas( {
 					: undefined,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
+			deviceType: getDeviceType(),
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -140,6 +155,7 @@ export default function EditorCanvas( {
 		};
 	}, [] );
 
+	const deviceStyles = useResizeCanvas( deviceType );
 	const [ globalLayoutSettings ] = useSettings( 'layout' );
 
 	// fallbackLayout is used if there is no Post Content,
@@ -268,8 +284,29 @@ export default function EditorCanvas( {
 		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
 		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
+	const localRef = useRef();
+	const typewriterRef = useTypewriter();
+	const contentRef = useMergeRefs(
+		[
+			ref,
+			localRef,
+			renderingMode === 'post-only' ? typewriterRef : undefined,
+		].filter( ( r ) => !! r )
+	);
+
 	return (
-		<>
+		<BlockCanvas
+			shouldIframe={
+				! disableIframe || [ 'Tablet', 'Mobile' ].includes( deviceType )
+			}
+			contentRef={ contentRef }
+			styles={ styles }
+			height="100%"
+			iframeProps={ {
+				...iframeProps,
+				style: { ...iframeProps?.style, ...deviceStyles },
+			} }
+		>
 			{ themeSupportsLayout &&
 				! themeHasDisabledLayoutStyles &&
 				renderingMode === 'post-only' && (
@@ -320,15 +357,26 @@ export default function EditorCanvas( {
 				<BlockList
 					className={ classnames(
 						className,
+						'is-' + deviceType.toLowerCase() + '-preview',
 						renderingMode !== 'post-only'
 							? 'wp-site-blocks'
 							: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
 					) }
 					layout={ blockListLayout }
-					dropZoneElement={ dropZoneElement }
+					dropZoneElement={
+						// When iframed, pass in the html element of the iframe to
+						// ensure the drop zone extends to the edges of the iframe.
+						disableIframe
+							? localRef.current
+							: localRef.current?.parentNode
+					}
 					renderAppender={ renderAppender }
 				/>
+				<EditTemplateBlocksNotification contentRef={ localRef } />
 			</RecursionProvider>
-		</>
+			{ children }
+		</BlockCanvas>
 	);
 }
+
+export default forwardRef( EditorCanvas );
