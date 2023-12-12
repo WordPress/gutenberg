@@ -8,6 +8,10 @@
 	"keywords": [ "accordion", "summary", "toggle", "disclosure" ],
 	"textdomain": "default",
 	"attributes": {
+		"name": {
+			"type": "string",
+			"default": ""
+		},
 		"showContent": {
 			"type": "boolean",
 			"default": false
