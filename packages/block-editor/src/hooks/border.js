@@ -258,16 +258,16 @@ function addAttributes( settings ) {
 /**
  * Override props assigned to save component to inject border color.
  *
- * @param {Object} props      Additional props applied to save element.
- * @param {Object} blockType  Block type definition.
- * @param {Object} attributes Block's attributes.
+ * @param {Object}        props           Additional props applied to save element.
+ * @param {Object|string} blockNameOrType Block type definition.
+ * @param {Object}        attributes      Block's attributes.
  *
  * @return {Object} Filtered props to apply to save element.
  */
-function addSaveProps( props, blockType, attributes ) {
+function addSaveProps( props, blockNameOrType, attributes ) {
 	if (
-		! hasBorderSupport( blockType, 'color' ) ||
-		shouldSkipSerialization( blockType, BORDER_SUPPORT_KEY, 'color' )
+		! hasBorderSupport( blockNameOrType, 'color' ) ||
+		shouldSkipSerialization( blockNameOrType, BORDER_SUPPORT_KEY, 'color' )
 	) {
 		return props;
 	}
@@ -298,36 +298,6 @@ export function getBorderClasses( attributes ) {
 		'has-border-color': borderColor || style?.border?.color,
 		[ borderColorClass ]: !! borderColorClass,
 	} );
-}
-
-/**
- * Filters the registered block settings to apply border color styles and
- * classnames to the block edit wrapper.
- *
- * @param {Object} settings Original block settings.
- *
- * @return {Object} Filtered block settings.
- */
-function addEditProps( settings ) {
-	if (
-		! hasBorderSupport( settings, 'color' ) ||
-		shouldSkipSerialization( settings, BORDER_SUPPORT_KEY, 'color' )
-	) {
-		return settings;
-	}
-
-	const existingGetEditWrapperProps = settings.getEditWrapperProps;
-	settings.getEditWrapperProps = ( attributes ) => {
-		let props = {};
-
-		if ( existingGetEditWrapperProps ) {
-			props = existingGetEditWrapperProps( attributes );
-		}
-
-		return addSaveProps( props, settings, attributes );
-	};
-
-	return settings;
 }
 
 function useBlockProps( { name, borderColor, style } ) {
@@ -369,7 +339,11 @@ function useBlockProps( { name, borderColor, style } ) {
 		borderLeftColor: borderLeftColor || borderColorValue,
 	};
 
-	return { style: cleanEmptyObject( extraStyles ) || {} };
+	return addSaveProps(
+		{ style: cleanEmptyObject( extraStyles ) || {} },
+		name,
+		{ borderColor, style }
+	);
 }
 
 export default {
@@ -390,10 +364,4 @@ addFilter(
 	'blocks.getSaveContent.extraProps',
 	'core/border/addSaveProps',
 	addSaveProps
-);
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/border/addEditProps',
-	addEditProps
 );
