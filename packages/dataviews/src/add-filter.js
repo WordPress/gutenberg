@@ -7,7 +7,7 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { chevronRightSmall, funnel, check } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Children, Fragment } from '@wordpress/element';
 
 /**
@@ -240,6 +240,29 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 											</DropdownMenuItem>
 										</DropdownSubMenu>
 									) }
+									<DropdownMenuItem
+										key={ 'reset-filter-' + filter.name }
+										disabled={ ! activeElement }
+										onSelect={ ( event ) => {
+											event.preventDefault();
+											onChangeView( ( currentView ) => ( {
+												...currentView,
+												page: 1,
+												filters:
+													currentView.filters.filter(
+														( f ) =>
+															f.field !==
+															filter.field
+													),
+											} ) );
+										} }
+									>
+										{ sprintf(
+											/* translators: 1: Filter name. e.g.: "Reset Author". */
+											__( 'Reset %1$s' ),
+											filter.name.toLowerCase()
+										) }
+									</DropdownMenuItem>
 								</WithSeparators>
 							</DropdownSubMenu>
 						);
