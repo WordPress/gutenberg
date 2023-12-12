@@ -6,7 +6,7 @@ import {
 	Button,
 	Icon,
 } from '@wordpress/components';
-import { chevronRightSmall, funnel } from '@wordpress/icons';
+import { chevronRightSmall, funnel, check } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -22,7 +22,7 @@ const {
 	DropdownMenuItemV2: DropdownMenuItem,
 } = unlock( componentsPrivateApis );
 
-export default function AddFilter( { fields, onChangeView } ) {
+export default function AddFilter( { fields, view, onChangeView } ) {
 	const filters = [];
 	fields.forEach( ( field ) => {
 		if ( ! field.type ) {
@@ -57,6 +57,12 @@ export default function AddFilter( { fields, onChangeView } ) {
 			}
 		>
 			{ filters.map( ( filter ) => {
+				const filterInView = view.filters.find(
+					( f ) => f.field === filter.field
+				);
+				const activeElement = filter.elements.find(
+					( element ) => element.value === filterInView?.value
+				);
 				return (
 					<DropdownSubMenu
 						key={ filter.field }
@@ -71,6 +77,15 @@ export default function AddFilter( { fields, onChangeView } ) {
 						{ filter.elements.map( ( element ) => (
 							<DropdownMenuItem
 								key={ element.value }
+								role="menuitemradio"
+								aria-checked={
+									activeElement?.value === element.value
+								}
+								prefix={
+									activeElement?.value === element.value && (
+										<Icon icon={ check } />
+									)
+								}
 								onSelect={ () => {
 									onChangeView( ( currentView ) => ( {
 										...currentView,
