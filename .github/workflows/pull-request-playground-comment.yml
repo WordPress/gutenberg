@@ -3,7 +3,7 @@ name: OPTIONAL - Comment on a pull request with Playground details
 
 on:
     pull_request_target:
-        types: [opened, synchronize]
+        types: [opened]
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
     # The concurrency group contains the workflow name and the branch name for pull requests
