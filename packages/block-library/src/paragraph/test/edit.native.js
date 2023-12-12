@@ -687,6 +687,77 @@ describe( 'Paragraph block', () => {
 	` );
 	} );
 
+	it( 'should set a font size value', async () => {
+		// Arrange
+		const screen = await initializeEditor( { withGlobalStyles: true } );
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitFor( () => blockSettingsModal.props.isVisible );
+
+		// Open Font size settings
+		fireEvent.press( screen.getByLabelText( 'Font Size, Custom' ) );
+
+		// Tap one font size
+		fireEvent.press( screen.getByLabelText( 'Large' ) );
+
+		// Dismiss the Block Settings modal.
+		fireEvent( blockSettingsModal, 'backdropPress' );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should set a line height value', async () => {
+		// Arrange
+		const screen = await initializeEditor( { withGlobalStyles: true } );
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitFor( () => blockSettingsModal.props.isVisible );
+
+		const lineHeightControl = screen.getByLabelText( /Line Height/ );
+		fireEvent.press(
+			within( lineHeightControl ).getByText( '1.5', { hidden: true } )
+		);
+		const lineHeightTextInput = within(
+			lineHeightControl
+		).getByDisplayValue( '1.5', { hidden: true } );
+		fireEvent.changeText( lineHeightTextInput, '1.8' );
+
+		// Dismiss the Block Settings modal.
+		fireEvent( blockSettingsModal, 'backdropPress' );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
 	it( 'should focus on the previous Paragraph block when backspacing in an empty Paragraph block', async () => {
 		// Arrange
 		const screen = await initializeEditor();
