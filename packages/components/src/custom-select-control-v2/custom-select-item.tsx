@@ -11,10 +11,14 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import type { CustomSelectItemProps } from './types';
+import type { WordPressComponentProps } from '../context';
 import * as Styled from './styles';
 import { CustomSelectContext } from './custom-select';
 
-function CustomSelectItem( { children, ...props }: CustomSelectItemProps ) {
+export function CustomSelectItem( {
+	children,
+	...props
+}: WordPressComponentProps< CustomSelectItemProps, 'div', false > ) {
 	const customSelectContext = useContext( CustomSelectContext );
 	return (
 		<Styled.CustomSelectItem
