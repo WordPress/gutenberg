@@ -107,7 +107,8 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 														<Icon icon={ check } />
 													)
 												}
-												onSelect={ () => {
+												onSelect={ ( event ) => {
+													event.preventDefault();
 													onChangeView(
 														( currentView ) => ( {
 															...currentView,
@@ -174,7 +175,8 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 														<Icon icon={ check } />
 													)
 												}
-												onSelect={ () =>
+												onSelect={ ( event ) => {
+													event.preventDefault();
 													onChangeView(
 														( currentView ) => ( {
 															...currentView,
@@ -193,8 +195,8 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 																},
 															],
 														} )
-													)
-												}
+													);
+												} }
 											>
 												{ __( 'Is' ) }
 											</DropdownMenuItem>
@@ -211,7 +213,8 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 														<Icon icon={ check } />
 													)
 												}
-												onSelect={ () =>
+												onSelect={ ( event ) => {
+													event.preventDefault();
 													onChangeView(
 														( currentView ) => ( {
 															...currentView,
@@ -230,8 +233,8 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 																},
 															],
 														} )
-													)
-												}
+													);
+												} }
 											>
 												{ __( 'Is not' ) }
 											</DropdownMenuItem>
@@ -246,13 +249,14 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 					disabled={
 						view.search === '' && view.filters?.length === 0
 					}
-					onSelect={ () =>
+					onSelect={ ( event ) => {
+						event.preventDefault();
 						onChangeView( ( currentView ) => ( {
 							...currentView,
 							page: 1,
 							filters: [],
-						} ) )
-					}
+						} ) );
+					} }
 				>
 					{ __( 'Reset filters' ) }
 				</DropdownMenuItem>
