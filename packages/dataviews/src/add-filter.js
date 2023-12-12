@@ -76,7 +76,10 @@ export default function AddFilter( { fields, onChangeView } ) {
 										...currentView,
 										page: 1,
 										filters: [
-											...currentView.filters,
+											...currentView.filters.filter(
+												( f ) =>
+													f.field !== filter.field
+											),
 											{
 												field: filter.field,
 												operator: OPERATOR_IN,
