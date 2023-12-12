@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import CustomSelectControl from '..';
+import { CustomSelect } from '..';
 
 const customClass = 'amber-skies';
 
@@ -50,21 +50,23 @@ const props = {
 	__nextUnconstrainedWidth: true,
 };
 
-const ControlledCustomSelectControl = ( { options } ) => {
+const ControlledCustomSelect = ( { options }: any ) => {
 	const [ value, setValue ] = useState( options[ 0 ] );
 	return (
-		<CustomSelectControl
+		<CustomSelect
 			{ ...props }
-			onChange={ ( { selectedItem } ) => setValue( selectedItem ) }
-			value={ options.find( ( option ) => option.key === value.key ) }
+			onChange={ ( { selectedItem }: any ) => setValue( selectedItem ) }
+			value={ options.find(
+				( option: any ) => option.key === value.key
+			) }
 		/>
 	);
 };
 
 describe.each( [
-	[ 'uncontrolled', CustomSelectControl ],
-	[ 'controlled', ControlledCustomSelectControl ],
-] )( 'CustomSelectControl %s', ( ...modeAndComponent ) => {
+	[ 'uncontrolled', CustomSelect ],
+	[ 'controlled', ControlledCustomSelect ],
+] )( 'CustomSelect %s', ( ...modeAndComponent ) => {
 	const [ , Component ] = modeAndComponent;
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
@@ -72,7 +74,7 @@ describe.each( [
 
 		render( <Component { ...props } /> );
 
-		const currentSelectedItem = screen.getByRole( 'button', {
+		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
 		} );
 
@@ -100,9 +102,9 @@ describe.each( [
 	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
 		const user = userEvent.setup();
 
-		render( <CustomSelectControl { ...props } /> );
+		render( <CustomSelect { ...props } /> );
 
-		const currentSelectedItem = screen.getByRole( 'button', {
+		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
 		} );
 
@@ -129,10 +131,10 @@ describe.each( [
 	it( 'Should apply class only to options that have a className defined', async () => {
 		const user = userEvent.setup();
 
-		render( <CustomSelectControl { ...props } /> );
+		render( <CustomSelect { ...props } /> );
 
 		await user.click(
-			screen.getByRole( 'button', {
+			screen.getByRole( 'combobox', {
 				expanded: false,
 			} )
 		);
@@ -167,10 +169,10 @@ describe.each( [
 		const customStyles =
 			'background-color: rgb(127, 255, 212); rotate: 13deg;';
 
-		render( <CustomSelectControl { ...props } /> );
+		render( <CustomSelect { ...props } /> );
 
 		await user.click(
-			screen.getByRole( 'button', {
+			screen.getByRole( 'combobox', {
 				expanded: false,
 			} )
 		);
@@ -202,7 +204,7 @@ describe.each( [
 
 	it( 'does not show selected hint by default', () => {
 		render(
-			<CustomSelectControl
+			<CustomSelect
 				{ ...props }
 				label="Custom select"
 				options={ [
@@ -221,7 +223,7 @@ describe.each( [
 
 	it( 'shows selected hint when __experimentalShowSelectedHint is set', () => {
 		render(
-			<CustomSelectControl
+			<CustomSelect
 				{ ...props }
 				label="Custom select"
 				options={ [
@@ -240,38 +242,12 @@ describe.each( [
 	} );
 
 	describe( 'Keyboard behavior and accessibility', () => {
-		it( 'Captures the keypress event and does not let it propagate', async () => {
-			const user = userEvent.setup();
-			const onKeyDown = jest.fn();
-
-			render(
-				<div
-					// This role="none" is required to prevent an eslint warning about accessibility.
-					role="none"
-					onKeyDown={ onKeyDown }
-				>
-					<CustomSelectControl { ...props } />
-				</div>
-			);
-			const currentSelectedItem = screen.getByRole( 'button', {
-				expanded: false,
-			} );
-			await user.click( currentSelectedItem );
-
-			const customSelect = screen.getByRole( 'listbox', {
-				name: 'label!',
-			} );
-			await user.type( customSelect, '{enter}' );
-
-			expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
-		} );
-
 		it( 'Should be able to change selection using keyboard', async () => {
 			const user = userEvent.setup();
 
-			render( <CustomSelectControl { ...props } /> );
+			render( <CustomSelect { ...props } /> );
 
-			const currentSelectedItem = screen.getByRole( 'button', {
+			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
@@ -294,9 +270,9 @@ describe.each( [
 		it( 'Should be able to type characters to select matching options', async () => {
 			const user = userEvent.setup();
 
-			render( <CustomSelectControl { ...props } /> );
+			render( <CustomSelect { ...props } /> );
 
-			const currentSelectedItem = screen.getByRole( 'button', {
+			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
@@ -316,9 +292,9 @@ describe.each( [
 		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
 			const user = userEvent.setup();
 
-			render( <CustomSelectControl { ...props } /> );
+			render( <CustomSelect { ...props } /> );
 
-			const currentSelectedItem = screen.getByRole( 'button', {
+			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
@@ -342,9 +318,9 @@ describe.each( [
 		it( 'Should have correct aria-selected value for selections', async () => {
 			const user = userEvent.setup();
 
-			render( <CustomSelectControl { ...props } /> );
+			render( <CustomSelect { ...props } /> );
 
-			const currentSelectedItem = screen.getByRole( 'button', {
+			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
@@ -373,7 +349,7 @@ describe.each( [
 			// change the current selection
 			await user.click( screen.getByRole( 'option', { name: 'poppy' } ) );
 
-			// click button to mount listbox with options again
+			// click combobox to mount listbox with options again
 			await user.click( currentSelectedItem );
 
 			// check that first item is has aria-selected="false" after new selection
@@ -391,33 +367,6 @@ describe.each( [
 					selected: true,
 				} )
 			).toBeVisible();
-		} );
-
-		it( 'Should call custom event handlers', async () => {
-			const user = userEvent.setup();
-			const onFocusMock = jest.fn();
-			const onBlurMock = jest.fn();
-
-			render(
-				<CustomSelectControl
-					{ ...props }
-					onFocus={ onFocusMock }
-					onBlur={ onBlurMock }
-				/>
-			);
-
-			const currentSelectedItem = screen.getByRole( 'button', {
-				expanded: false,
-			} );
-
-			await user.tab();
-
-			expect( currentSelectedItem ).toHaveFocus();
-			expect( onFocusMock ).toHaveBeenCalledTimes( 1 );
-
-			await user.tab();
-			expect( currentSelectedItem ).not.toHaveFocus();
-			expect( onBlurMock ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );
