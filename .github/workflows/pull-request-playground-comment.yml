@@ -4,7 +4,7 @@ name: OPTIONAL - Comment on a pull request with Playground details
 # Only trigger, when the build workflow succeeded
 on:
     workflow_run:
-        workflows: ['Build Gutenberg Plugin Zip']
+        workflows: ['Build Release Artifact']
         types:
             - completed
 jobs:
