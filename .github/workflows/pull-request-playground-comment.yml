@@ -4,6 +4,12 @@ name: OPTIONAL - Comment on a pull request with Playground details
 on:
     pull_request_target:
         types: [opened]
+    workflow_dispatch:
+        inputs:
+            pr_number:
+                description: 'The pull request number to process.'
+                required: true
+                type: string
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
     # The concurrency group contains the workflow name and the branch name for pull requests
