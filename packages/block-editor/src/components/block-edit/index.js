@@ -8,7 +8,12 @@ import { hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import Edit from './edit';
-import { BlockEditContextProvider, useBlockEditContext } from './context';
+import {
+	BlockEditContextProvider,
+	useBlockEditContext,
+	mayDisplayControlsKey,
+	mayDisplayParentControlsKey,
+} from './context';
 
 /**
  * The `useBlockEditContext` hook provides information about the block this hook is being used in.
@@ -20,7 +25,13 @@ import { BlockEditContextProvider, useBlockEditContext } from './context';
  */
 export { useBlockEditContext };
 
-export default function BlockEdit( props ) {
+export default function BlockEdit( {
+	mayDisplayControls,
+	mayDisplayParentControls,
+	// The remaining props are passed through the BlockEdit filters and are thus
+	// public API!
+	...props
+} ) {
 	const {
 		name,
 		isSelected,
@@ -32,19 +43,34 @@ export default function BlockEdit( props ) {
 	const layoutSupport =
 		hasBlockSupport( name, 'layout', false ) ||
 		hasBlockSupport( name, '__experimentalLayout', false );
-	const context = {
-		name,
-		isSelected,
-		clientId,
-		layout: layoutSupport ? layout : null,
-		__unstableLayoutClassNames,
-	};
 	return (
 		<BlockEditContextProvider
 			// It is important to return the same object if props haven't
 			// changed to avoid  unnecessary rerenders.
 			// See https://reactjs.org/docs/context.html#caveats.
-			value={ useMemo( () => context, Object.values( context ) ) }
+			value={ useMemo(
+				() => ( {
+					name,
+					isSelected,
+					clientId,
+					layout: layoutSupport ? layout : null,
+					__unstableLayoutClassNames,
+					// We use symbols in favour of an __unstable prefix to avoid
+					// usage outside of the package (this context is exposed).
+					[ mayDisplayControlsKey ]: mayDisplayControls,
+					[ mayDisplayParentControlsKey ]: mayDisplayParentControls,
+				} ),
+				[
+					name,
+					isSelected,
+					clientId,
+					layoutSupport,
+					layout,
+					__unstableLayoutClassNames,
+					mayDisplayControls,
+					mayDisplayParentControls,
+				]
+			) }
 		>
 			<Edit { ...props } />
 		</BlockEditContextProvider>

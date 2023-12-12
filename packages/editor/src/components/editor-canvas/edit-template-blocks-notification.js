@@ -6,7 +6,11 @@ import { useEffect, useState, useRef } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
-import { store as editorStore } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
 
 /**
  * Component that:
@@ -22,7 +26,7 @@ import { store as editorStore } from '@wordpress/editor';
  * @param {import('react').RefObject<HTMLElement>} props.contentRef Ref to the block
  *                                                                  editor iframe canvas.
  */
-export default function EditTemplateNotification( { contentRef } ) {
+export default function EditTemplateBlocksNotification( { contentRef } ) {
 	const renderingMode = useSelect(
 		( select ) => select( editorStore ).getRenderingMode(),
 		[]

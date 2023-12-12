@@ -456,18 +456,27 @@ export function metaBoxUpdatesFailure() {
 }
 
 /**
- * Returns an action object used to toggle the width of the editing canvas.
+ * Action that changes the width of the editing canvas.
+ *
+ * @deprecated
  *
  * @param {string} deviceType
  *
  * @return {Object} Action object.
  */
-export function __experimentalSetPreviewDeviceType( deviceType ) {
-	return {
-		type: 'SET_PREVIEW_DEVICE_TYPE',
-		deviceType,
+export const __experimentalSetPreviewDeviceType =
+	( deviceType ) =>
+	( { registry } ) => {
+		deprecated(
+			"dispatch( 'core/edit-post' ).__experimentalSetPreviewDeviceType",
+			{
+				since: '6.5',
+				version: '6.7',
+				hint: 'registry.dispatch( editorStore ).setDeviceType',
+			}
+		);
+		registry.dispatch( editorStore ).setDeviceType( deviceType );
 	};
-}
 
 /**
  * Returns an action object used to open/close the inserter.

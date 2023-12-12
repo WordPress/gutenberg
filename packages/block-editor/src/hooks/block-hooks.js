@@ -2,14 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { addFilter } from '@wordpress/hooks';
 import { Fragment, useMemo } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	PanelBody,
 	ToggleControl,
 } from '@wordpress/components';
-import { createHigherOrderComponent, pure } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 
@@ -21,7 +19,7 @@ import { store as blockEditorStore } from '../store';
 
 const EMPTY_OBJECT = {};
 
-function BlockHooksControlPure( props ) {
+function BlockHooksControlPure( { name, clientId } ) {
 	const blockTypes = useSelect(
 		( select ) => select( blocksStore ).getBlockTypes(),
 		[]
@@ -30,10 +28,9 @@ function BlockHooksControlPure( props ) {
 	const hookedBlocksForCurrentBlock = useMemo(
 		() =>
 			blockTypes?.filter(
-				( { blockHooks } ) =>
-					blockHooks && props.blockName in blockHooks
+				( { blockHooks } ) => blockHooks && name in blockHooks
 			),
-		[ blockTypes, props.blockName ]
+		[ blockTypes, name ]
 	);
 
 	const { blockIndex, rootClientId, innerBlocksLength } = useSelect(
@@ -42,13 +39,12 @@ function BlockHooksControlPure( props ) {
 				select( blockEditorStore );
 
 			return {
-				blockIndex: getBlockIndex( props.clientId ),
-				innerBlocksLength: getBlock( props.clientId )?.innerBlocks
-					?.length,
-				rootClientId: getBlockRootClientId( props.clientId ),
+				blockIndex: getBlockIndex( clientId ),
+				innerBlocksLength: getBlock( clientId )?.innerBlocks?.length,
+				rootClientId: getBlockRootClientId( clientId ),
 			};
 		},
-		[ props.clientId ]
+		[ clientId ]
 	);
 
 	const hookedBlockClientIds = useSelect(
@@ -65,8 +61,7 @@ function BlockHooksControlPure( props ) {
 						return clientIds;
 					}
 
-					const relativePosition =
-						block?.blockHooks?.[ props.blockName ];
+					const relativePosition = block?.blockHooks?.[ name ];
 					let candidates;
 
 					switch ( relativePosition ) {
@@ -83,12 +78,12 @@ function BlockHooksControlPure( props ) {
 							// Any of the current block's child blocks (with the right block type) qualifies
 							// as a hooked first or last child block, as the block might've been automatically
 							// inserted and then moved around a bit by the user.
-							candidates = getBlock( props.clientId ).innerBlocks;
+							candidates = getBlock( clientId ).innerBlocks;
 							break;
 					}
 
 					const hookedBlock = candidates?.find(
-						( { name } ) => name === block.name
+						( candidate ) => name === candidate.name
 					);
 
 					// If the block exists in the designated location, we consider it hooked
@@ -118,12 +113,7 @@ function BlockHooksControlPure( props ) {
 
 			return EMPTY_OBJECT;
 		},
-		[
-			hookedBlocksForCurrentBlock,
-			props.blockName,
-			props.clientId,
-			rootClientId,
-		]
+		[ hookedBlocksForCurrentBlock, name, clientId, rootClientId ]
 	);
 
 	const { insertBlock, removeBlock } = useDispatch( blockEditorStore );
@@ -169,7 +159,7 @@ function BlockHooksControlPure( props ) {
 					block,
 					// TODO: It'd be great if insertBlock() would accept negative indices for insertion.
 					relativePosition === 'first_child' ? 0 : innerBlocksLength,
-					props.clientId, // Insert as a child of the current block.
+					clientId, // Insert as a child of the current block.
 					false
 				);
 				break;
@@ -207,9 +197,7 @@ function BlockHooksControlPure( props ) {
 											if ( ! checked ) {
 												// Create and insert block.
 												const relativePosition =
-													block.blockHooks[
-														props.blockName
-													];
+													block.blockHooks[ name ];
 												insertBlockIntoDesignatedLocation(
 													createBlock( block.name ),
 													relativePosition
@@ -218,11 +206,12 @@ function BlockHooksControlPure( props ) {
 											}
 
 											// Remove block.
-											const clientId =
+											removeBlock(
 												hookedBlockClientIds[
 													block.name
-												];
-											removeBlock( clientId, false );
+												],
+												false
+											);
 										} }
 									/>
 								);
@@ -235,32 +224,9 @@ function BlockHooksControlPure( props ) {
 	);
 }
 
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-const BlockHooksControl = pure( BlockHooksControlPure );
-
-export const withBlockHooksControls = createHigherOrderComponent(
-	( BlockEdit ) => {
-		return ( props ) => {
-			return (
-				<>
-					<BlockEdit key="edit" { ...props } />
-					{ props.isSelected && (
-						<BlockHooksControl
-							blockName={ props.name }
-							clientId={ props.clientId }
-						/>
-					) }
-				</>
-			);
-		};
+export default {
+	edit: BlockHooksControlPure,
+	hasSupport() {
+		return true;
 	},
-	'withBlockHooksControls'
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/block-hooks/with-inspector-controls',
-	withBlockHooksControls
-);
+};

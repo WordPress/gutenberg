@@ -14,6 +14,7 @@ import {
 	useSettings,
 	__experimentalRecursionProvider as RecursionProvider,
 	privateApis as blockEditorPrivateApis,
+	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo, forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -27,6 +28,7 @@ import { useMergeRefs } from '@wordpress/compose';
 import PostTitle from '../post-title';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 
 const {
 	LayoutStyle,
@@ -89,6 +91,7 @@ function EditorCanvas(
 		editedPostTemplate = {},
 		wrapperBlockName,
 		wrapperUniqueId,
+		deviceType,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -96,7 +99,10 @@ function EditorCanvas(
 			getCurrentTemplateId,
 			getEditorSettings,
 			getRenderingMode,
+			getDeviceType,
 		} = select( editorStore );
+		const { getPostType, canUser, getEditedEntityRecord } =
+			select( coreStore );
 		const postTypeSlug = getCurrentPostType();
 		const _renderingMode = getRenderingMode();
 		let _wrapperBlockName;
@@ -109,14 +115,11 @@ function EditorCanvas(
 
 		const editorSettings = getEditorSettings();
 		const supportsTemplateMode = editorSettings.supportsTemplateMode;
-		const postType = select( coreStore ).getPostType( postTypeSlug );
-		const canEditTemplate = select( coreStore ).canUser(
-			'create',
-			'templates'
-		);
+		const postType = getPostType( postTypeSlug );
+		const canEditTemplate = canUser( 'create', 'templates' );
 		const currentTemplateId = getCurrentTemplateId();
 		const template = currentTemplateId
-			? select( coreStore ).getEditedEntityRecord(
+			? getEditedEntityRecord(
 					'postType',
 					'wp_template',
 					currentTemplateId
@@ -134,6 +137,7 @@ function EditorCanvas(
 					: undefined,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
+			deviceType: getDeviceType(),
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -151,6 +155,7 @@ function EditorCanvas(
 		};
 	}, [] );
 
+	const deviceStyles = useResizeCanvas( deviceType );
 	const [ globalLayoutSettings ] = useSettings( 'layout' );
 
 	// fallbackLayout is used if there is no Post Content,
@@ -291,11 +296,16 @@ function EditorCanvas(
 
 	return (
 		<BlockCanvas
-			shouldIframe={ ! disableIframe }
+			shouldIframe={
+				! disableIframe || [ 'Tablet', 'Mobile' ].includes( deviceType )
+			}
 			contentRef={ contentRef }
 			styles={ styles }
 			height="100%"
-			iframeProps={ iframeProps }
+			iframeProps={ {
+				...iframeProps,
+				style: { ...iframeProps?.style, ...deviceStyles },
+			} }
 		>
 			{ themeSupportsLayout &&
 				! themeHasDisabledLayoutStyles &&
@@ -347,6 +357,7 @@ function EditorCanvas(
 				<BlockList
 					className={ classnames(
 						className,
+						'is-' + deviceType.toLowerCase() + '-preview',
 						renderingMode !== 'post-only'
 							? 'wp-site-blocks'
 							: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
@@ -361,6 +372,7 @@ function EditorCanvas(
 					}
 					renderAppender={ renderAppender }
 				/>
+				<EditTemplateBlocksNotification contentRef={ localRef } />
 			</RecursionProvider>
 			{ children }
 		</BlockCanvas>

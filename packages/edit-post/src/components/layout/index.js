@@ -21,6 +21,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useBlockCommands,
 	BlockBreadcrumb,
+	BlockToolbar,
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -138,7 +139,9 @@ function Layout() {
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
-	const isLargeViewport = useViewportMatch( 'large' );
+	const isWideViewport = useViewportMatch( 'large' );
+	const isLargeViewport = useViewportMatch( 'medium' );
+
 	const { openGeneralSidebar, closeGeneralSidebar, setIsInserterOpened } =
 		useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -148,7 +151,6 @@ function Layout() {
 		isRichEditingEnabled,
 		sidebarIsOpened,
 		hasActiveMetaboxes,
-		hasFixedToolbar,
 		previousShortcut,
 		nextShortcut,
 		hasBlockSelected,
@@ -167,8 +169,6 @@ function Layout() {
 		return {
 			showMetaBoxes:
 				select( editorStore ).getRenderingMode() === 'post-only',
-			hasFixedToolbar:
-				select( editPostStore ).isFeatureActive( 'fixedToolbar' ),
 			sidebarIsOpened: !! (
 				select( interfaceStore ).getActiveComplementaryArea(
 					editPostStore.name
@@ -219,12 +219,12 @@ function Layout() {
 		if ( sidebarIsOpened && ! isHugeViewport ) {
 			setIsInserterOpened( false );
 		}
-	}, [ sidebarIsOpened, isHugeViewport ] );
+	}, [ isHugeViewport, setIsInserterOpened, sidebarIsOpened ] );
 	useEffect( () => {
 		if ( isInserterOpened && ! isHugeViewport ) {
 			closeGeneralSidebar();
 		}
-	}, [ isInserterOpened, isHugeViewport ] );
+	}, [ closeGeneralSidebar, isInserterOpened, isHugeViewport ] );
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
@@ -253,9 +253,8 @@ function Layout() {
 
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
-		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
-		'is-distraction-free': isDistractionFree && isLargeViewport,
+		'is-distraction-free': isDistractionFree && isWideViewport,
 		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
 	} );
 
@@ -302,7 +301,7 @@ function Layout() {
 			<EditorKeyboardShortcuts />
 
 			<InterfaceSkeleton
-				isDistractionFree={ isDistractionFree && isLargeViewport }
+				isDistractionFree={ isDistractionFree && isWideViewport }
 				className={ className }
 				labels={ {
 					...interfaceLabels,
@@ -346,6 +345,7 @@ function Layout() {
 						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
 							<TextEditor />
 						) }
+						{ ! isLargeViewport && <BlockToolbar hideDragHandle /> }
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditor styles={ styles } />
 						) }

@@ -36,7 +36,7 @@ function Pagination( {
 					)
 				}
 			</Text>
-			{ !! totalItems && (
+			{ !! totalItems && totalPages !== 1 && (
 				<HStack expanded={ false } spacing={ 3 }>
 					<HStack
 						justify="flex-start"

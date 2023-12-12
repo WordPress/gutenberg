@@ -12,8 +12,8 @@
 }
 
 .edit-site-page-header {
-	padding: 0 $grid-unit-40;
-	min-height: $header-height;
+	padding: $grid-unit-20 $grid-unit-40;
+	min-height: $grid-unit * 9;
 	border-bottom: 1px solid $gray-100;
 	background: $white;
 	position: sticky;

@@ -20,20 +20,24 @@ import type { WordPressComponentProps } from '../context';
 
 export const TabPanel = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< TabPanelProps, 'div', false >
->( function TabPanel( { children, id, focusable = true, ...otherProps }, ref ) {
+	Omit< WordPressComponentProps< TabPanelProps, 'div', false >, 'id' >
+>( function TabPanel(
+	{ children, tabId, focusable = true, ...otherProps },
+	ref
+) {
 	const context = useTabsContext();
 	if ( ! context ) {
 		warning( '`Tabs.TabPanel` must be wrapped in a `Tabs` component.' );
 		return null;
 	}
 	const { store, instanceId } = context;
+	const instancedTabId = `${ instanceId }-${ tabId }`;
 
 	return (
 		<StyledTabPanel
 			ref={ ref }
 			store={ store }
-			id={ `${ instanceId }-${ id }-view` }
+			id={ instancedTabId }
 			focusable={ focusable }
 			{ ...otherProps }
 		>
