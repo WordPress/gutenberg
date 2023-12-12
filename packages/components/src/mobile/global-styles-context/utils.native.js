@@ -342,29 +342,38 @@ export function getMappedValues( features, palette ) {
  * @return {Object} normalized sizes.
  */
 function normalizeFontSizes( fontSizes ) {
-	// Adds normalized PX values for each of the different keys.
 	if ( ! fontSizes ) {
 		return fontSizes;
 	}
-	const normalizedFontSizes = {};
-	const dimensions = Dimensions.get( 'window' );
 
-	[ 'default', 'theme', 'custom' ].forEach( ( key ) => {
-		if ( fontSizes[ key ] ) {
-			normalizedFontSizes[ key ] = fontSizes[ key ]?.map(
-				( fontSizeObject ) => {
-					fontSizeObject.sizePx = getPxFromCssUnit(
-						fontSizeObject.size,
-						{
-							width: dimensions.width,
-							height: dimensions.height,
-							fontSize: DEFAULT_FONT_SIZE,
-						}
-					);
-					return fontSizeObject;
-				}
-			);
-		}
+	const dimensions = Dimensions.get( 'window' );
+	const normalizedFontSizes = {};
+	const keysToProcess = [];
+
+	// Check if 'theme' or 'custom' keys exist and add them to keysToProcess array
+	if ( fontSizes?.theme ) {
+		keysToProcess.push( 'theme' );
+	}
+	if ( fontSizes?.custom ) {
+		keysToProcess.push( 'custom' );
+	}
+
+	// If neither 'theme' nor 'custom' exist, add 'default' if it exists
+	if ( keysToProcess.length === 0 && fontSizes?.default ) {
+		keysToProcess.push( 'default' );
+	}
+
+	keysToProcess.forEach( ( key ) => {
+		normalizedFontSizes[ key ] = fontSizes[ key ].map(
+			( fontSizeObject ) => {
+				fontSizeObject.sizePx = getPxFromCssUnit( fontSizeObject.size, {
+					width: dimensions.width,
+					height: dimensions.height,
+					fontSize: DEFAULT_FONT_SIZE,
+				} );
+				return fontSizeObject;
+			}
+		);
 	} );
 
 	return normalizedFontSizes;
