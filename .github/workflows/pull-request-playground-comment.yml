@@ -3,7 +3,7 @@ name: OPTIONAL - Comment on a pull request with Playground details
 
 on:
     pull_request:
-        types: [opened]
+        types: [opened, synchronize]
 jobs:
     test_using_wordpress_playground:
         name: Test using WordPress Playground
