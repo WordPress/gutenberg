@@ -117,6 +117,15 @@ function register_block_core_comments() {
 			'skip_inner_blocks' => true,
 		)
 	);
+
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		gutenberg_register_module(
+			'@wordpress/block-library/comments',
+			gutenberg_url( '/build/interactivity/comments.min.js' ),
+			array( '@wordpress/interactivity' ),
+			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+		);
+	}
 }
 add_action( 'init', 'register_block_core_comments' );
 
@@ -236,14 +245,5 @@ function register_legacy_post_comments_block() {
 	$metadata = apply_filters( 'block_type_metadata', $metadata );
 
 	register_block_type( 'core/post-comments', $metadata );
-
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		gutenberg_register_module(
-			'@wordpress/block-library/comments',
-			gutenberg_url( '/build/interactivity/comments.min.js' ),
-			array( '@wordpress/interactivity' ),
-			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
-		);
-	}
 }
 add_action( 'init', 'register_legacy_post_comments_block', 21 );
