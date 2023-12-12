@@ -54,7 +54,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	public function register() {
 		$this->onRegisterEvent();
 
-		return array( T_FUNCTION );
+		return array( T_FUNCTION, T_STRING );
 	}
 
 	/**
@@ -71,10 +71,11 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 		$token  = $tokens[ $stackPtr ];
 
 		if ( 'T_FUNCTION' !== $token['type'] ) {
+			$this->processFunctionToken( $phpcsFile, $stackPtr );
 			return;
 		}
 
-		$this->processFunctionToken( $phpcsFile, $stackPtr );
+		$this->processFunctionCallToken( $phpcsFile, $stackPtr );
 	}
 
 	/**
@@ -138,6 +139,10 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 		. ' In this file, PHP function names must either match one of the allowed prefixes exactly or begin with one of them, followed by an underscore.'
 		. " The allowed prefixes are: '" . implode( "', '", $allowed_function_prefixes ) . "'.";
 		$phpcsFile->addError( $error_message, $function_token, 'FunctionNameInvalid' );
+	}
+
+	public function processFunctionCallToken() {
+
 	}
 
 	/**
