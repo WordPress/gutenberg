@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
+import { OPERATOR_IN } from './constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -22,23 +22,7 @@ const {
 	DropdownMenuItemV2: DropdownMenuItem,
 } = unlock( componentsPrivateApis );
 
-export default function AddFilter( { fields, view, onChangeView } ) {
-	const filters = [];
-	fields.forEach( ( field ) => {
-		if ( ! field.type ) {
-			return;
-		}
-
-		switch ( field.type ) {
-			case ENUMERATION_TYPE:
-				filters.push( {
-					field: field.id,
-					name: field.header,
-					elements: field.elements || [],
-				} );
-		}
-	} );
-
+export default function AddFilter( { filters, view, onChangeView } ) {
 	if ( filters.length === 0 ) {
 		return null;
 	}

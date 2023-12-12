@@ -49,7 +49,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 	const addFilter = (
 		<AddFilter
 			key="add-filter"
-			fields={ fields }
+			filters={ filters }
 			view={ view }
 			onChangeView={ onChangeView }
 		/>
