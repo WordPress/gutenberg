@@ -44,11 +44,24 @@ export type NavigatorProviderProps = {
 	/**
 	 * The initial active path.
 	 */
-	initialPath: string;
+	initialPath?: string;
+
 	/**
 	 * The children elements.
 	 */
 	children: ReactNode;
+
+	/**
+	 * The current path. When provided the navigator will be controlled.
+	 */
+	location?: NavigatorLocation;
+
+	/**
+	 * Navigates to a new path.
+	 *
+	 * @param path The path to navigate to.
+	 */
+	onChange?: ( location: NavigatorLocation ) => void;
 };
 
 export type NavigatorScreenProps = {
