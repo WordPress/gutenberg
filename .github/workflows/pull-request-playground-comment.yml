@@ -60,7 +60,7 @@ jobs:
                       | ------------- |
 
                       > [!TIP]
-                      > _WordPress Playground uses the latest build of Gutenberg from this pull request. If your changes are not reflected in the Playground instance, it's likely that the most recent build isn't complete or has failed. Check the [list of workflow runs to be sure](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml)._
+                      > _WordPress Playground uses the latest build of Gutenberg from this pull request. If your changes are not reflected in the Playground instance, it's likely that the most recent build isn't complete or has failed. Check the [build workflow runs to be sure](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml)._
 
                       ### About WordPress Playground
 
