@@ -284,7 +284,7 @@ function BlockListBlock( {
 		return getMergedGlobalStyles(
 			baseGlobalStyles,
 			globalStyle,
-			wrapperProps.style,
+			wrapperProps?.style,
 			attributes,
 			defaultColors,
 			name,
@@ -302,7 +302,7 @@ function BlockListBlock( {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		JSON.stringify( globalStyle ),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		JSON.stringify( wrapperProps.style ),
+		JSON.stringify( wrapperProps?.style ),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		JSON.stringify(
 			Object.fromEntries(
