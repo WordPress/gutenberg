@@ -140,12 +140,8 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 			// announce the spoken notices.
 			wp_store(
 				array(
-					'state' => array(
-						'core' => array(
-							'comments' => array(
-								'submittedNotice' => __( 'Comment submitted.' ),
-							),
-						),
+					'core/comments' => array(
+						'submittedNotice' => __( 'Comment submitted.' ),
 					),
 				)
 			);
