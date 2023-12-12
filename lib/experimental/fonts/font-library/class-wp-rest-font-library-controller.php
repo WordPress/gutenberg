@@ -39,7 +39,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\/\w-]+)',
+			'/' . $this->rest_base . '/(?P<slug>[\/\w-]+)',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
@@ -164,10 +164,9 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	}
 
 	public function get_item( $request ) {
-		$id_or_slug = $request->get_param( 'id' );
+		$slug = $request->get_param( 'slug' );
 
-		$font_family = WP_Font_Family::get_font_family_by_slug( $id_or_slug );
-
+		$font_family = WP_Font_Family::get_font_family_by_slug( $slug );
 
 		if($font_family) {
 			return new WP_REST_Response( $font_family->get_data() );

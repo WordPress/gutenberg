@@ -22,7 +22,7 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 		// $this->assertArrayHasKey( 'GET', $routes['/wp/v2/fonts/collections/(?P<id>[\/\w-]+)'][0]['methods'], 'Rest server has not the GET method for collection intialized.' );
 
 		$this->assertArrayHasKey( 'POST', $routes['/wp/v2/font-families'][0]['methods'], 'No route to create font families' );
-		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/font-families/(?P<id>[\/\w-]+)'][0]['methods'], 'No route to get a font family' );
+		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/font-families/(?P<slug>[\/\w-]+)'][0]['methods'], 'No route to get a font family' );
 		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/all-font-families'][0]['methods'], 'No route to get font families' );
 	}
 	/**
@@ -139,7 +139,10 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 		$response_data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
-		$this->assertSame( $expected_response, $response_data, 'The response did not match expected.' );
+		$this->assertSame( $expected_response['slug'], $response_data['slug'], 'The slug response did not match expected.' );
+		$this->assertSame( $expected_response['name'], $response_data['name'], 'The name response did not match expected.' );
+		$this->assertSame( $expected_response['font_family'], $response_data['font_family'], 'The font_family response did not match expected.' );
+		$this->assertIsInt( $response_data['id'], 'The id response did not match expected.' );
 	}
 
 	/**
@@ -161,9 +164,13 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 		$verify_data     = $verify_response->get_data();
 
 		$this->assertSame( 200, $verify_response->get_status(), 'The response status is not 200.' );
-		$this->assertSame( $expected_response, $verify_data, 'The response did not match expected.' );
+		$this->assertSame( $expected_response['slug'], $verify_data['slug'], 'The slug response did not match expected.' );
+		$this->assertSame( $expected_response['name'], $verify_data['name'], 'The name response did not match expected.' );
+		$this->assertSame( $expected_response['font_family'], $verify_data['font_family'], 'The font_family response did not match expected.' );
+		$this->assertIsInt( $verify_data['id'], 'The id response did not match expected.' );
 
 	}
+
 	/**
 	 * Data provider for test_install_fonts
 	 */
@@ -185,9 +192,6 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 			),
 		);
 	}
-
-
-
 
 	/**
 	 *
@@ -219,7 +223,13 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 		$verify_data     = $verify_response->get_data();
 
 		$this->assertSame(200, $verify_response->get_status(), 'The response status is not 200.');
-		$this->assertSame($sample_fonts, $verify_data, 'The response did not match expected.');
+
+		for ( $i = 0; $i < count( $sample_fonts ); $i++ ) {
+			$this->assertSame( $sample_fonts[ $i ]['slug'], $verify_data[ $i ]['slug'], 'The slug response did not match expected.' );
+			$this->assertSame( $sample_fonts[ $i ]['name'], $verify_data[ $i ]['name'], 'The name response did not match expected.' );
+			$this->assertSame( $sample_fonts[ $i ]['font_family'], $verify_data[ $i ]['font_family'], 'The font_family response did not match expected.' );
+			$this->assertIsInt( $verify_data[ $i ]['id'], 'The id response did not match expected.' );
+		}
 	}
 
 

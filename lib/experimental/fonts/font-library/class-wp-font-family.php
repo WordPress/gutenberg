@@ -48,6 +48,9 @@ class WP_Font_Family {
 		$this->slug = $font_data['slug'];
 		$this->name = $font_data['name'];
 		$this->font_family = $font_data['font_family'];
+		if( isset( $font_data['id'] ) ) {
+			$this->id = $font_data['id'];
+		}
 	}
 
 	public static function get_font_families () {
@@ -64,6 +67,7 @@ class WP_Font_Family {
 		$font_families = array();
 		foreach( $posts_query->posts as $post ) {
 			$post_data = json_decode( $post->post_content, true );
+			$post_data['id'] = $post->ID;
 			$font_families[] = new WP_Font_Family( $post_data );
 		}
 
@@ -87,6 +91,7 @@ class WP_Font_Family {
 
 		$post = $posts_query->posts[0];
 		$post_data = json_decode( $post->post_content, true );
+		$post_data['id'] = $post->ID;
 		return new WP_Font_Family( $post_data );
 	}
 
@@ -99,6 +104,7 @@ class WP_Font_Family {
 	 */
 	public function get_data() {
 		return array(
+			'id'   => $this->id,
 			'slug' => $this->slug,
 			'name' => $this->name,
 			'font_family' => $this->font_family,
