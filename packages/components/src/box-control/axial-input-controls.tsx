@@ -1,4 +1,8 @@
 /**
+ * WordPress dependencies
+ */
+import { useInstanceId } from '@wordpress/compose';
+/**
  * Internal dependencies
  */
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
@@ -25,6 +29,7 @@ export default function AxialInputControls( {
 	sides,
 	...props
 }: BoxControlInputControlProps ) {
+	const inputId = useInstanceId( AxialInputControls, 'box-control-input' );
 	const createHandleOnFocus =
 		( side: GroupedSide ) =>
 		( event: React.FocusEvent< HTMLInputElement > ) => {
@@ -148,6 +153,7 @@ export default function AxialInputControls( {
 						<FlexedBoxControlIcon side={ side } sides={ sides } />
 						<UnitControl
 							{ ...props }
+							id={ inputId }
 							isFirst={ first === side }
 							isLast={ last === side }
 							isOnly={ only === side }
@@ -165,6 +171,8 @@ export default function AxialInputControls( {
 						/>
 						<FlexedRangeControl
 							__nextHasNoMarginBottom
+							aria-controls={ inputId }
+							aria-labelledby={ inputId }
 							hideLabelFromVision
 							initialPosition={ parsedQuantity ?? 0 }
 							label={ LABELS[ side ] }

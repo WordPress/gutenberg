@@ -1,4 +1,8 @@
 /**
+ * WordPress dependencies
+ */
+import { useInstanceId } from '@wordpress/compose';
+/**
  * Internal dependencies
  */
 import type { UnitControlProps } from '../unit-control/types';
@@ -29,6 +33,7 @@ export default function AllInputControl( {
 	setSelectedUnits,
 	...props
 }: BoxControlInputControlProps ) {
+	const inputId = useInstanceId( AllInputControl, 'box-control-input' );
 	const allValue = getAllValue( values, selectedUnits, sides );
 	const hasValues = isValuesDefined( values );
 	const isMixed = hasValues && isValuesMixed( values, selectedUnits, sides );
@@ -86,6 +91,7 @@ export default function AllInputControl( {
 			<UnitControl
 				{ ...props }
 				disableUnits={ isMixed }
+				id={ inputId }
 				isOnly
 				value={ parsedQuantity }
 				onChange={ handleOnChange }
@@ -98,6 +104,8 @@ export default function AllInputControl( {
 
 			<FlexedRangeControl
 				__nextHasNoMarginBottom
+				aria-controls={ inputId }
+				aria-labelledby={ inputId }
 				hideLabelFromVision
 				initialPosition={ parsedQuantity ?? 0 }
 				label={ LABELS.all }

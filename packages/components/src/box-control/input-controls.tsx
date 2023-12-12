@@ -1,4 +1,8 @@
 /**
+ * WordPress dependencies
+ */
+import { useInstanceId } from '@wordpress/compose';
+/**
  * Internal dependencies
  */
 import UnitControl from './unit-control';
@@ -25,6 +29,8 @@ export default function BoxInputControls( {
 	sides,
 	...props
 }: BoxControlInputControlProps ) {
+	const inputId = useInstanceId( BoxInputControls, 'box-control-input' );
+
 	const createHandleOnFocus =
 		( side: keyof BoxControlValue ) =>
 		( event: React.FocusEvent< HTMLInputElement > ) => {
@@ -122,6 +128,7 @@ export default function BoxInputControls( {
 							isFirst={ first === side }
 							isLast={ last === side }
 							isOnly={ only === side }
+							id={ inputId }
 							value={ [ parsedQuantity, computedUnit ].join(
 								''
 							) }
@@ -134,10 +141,11 @@ export default function BoxInputControls( {
 						/>
 
 						<FlexedRangeControl
+							aria-controls={ inputId }
+							aria-labelledby={ inputId }
 							__nextHasNoMarginBottom
 							hideLabelFromVision
 							initialPosition={ parsedQuantity ?? 0 }
-							label={ LABELS[ side ] }
 							onChange={ ( newValue ) => {
 								sliderOnChange(
 									side,
