@@ -47,6 +47,7 @@ import {
 } from './template-actions';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
+import SideEditor from '../page-pages/side-editor';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
@@ -173,11 +174,15 @@ function TemplatePreview( { content, viewType } ) {
 }
 
 export default function DataviewsTemplates() {
+	const [ templateId, setTemplateId ] = useState( null );
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 	const { records: allTemplates, isResolving: isLoadingData } =
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
+
+	const onSelectionChange = ( items ) =>
+		setTemplateId( items?.length === 1 ? items[ 0 ].id : null );
 
 	const authors = useMemo( () => {
 		if ( ! allTemplates ) {
@@ -366,18 +371,47 @@ export default function DataviewsTemplates() {
 		[ view, setView ]
 	);
 	return (
-		<Page title={ __( 'Templates' ) }>
-			<DataViews
-				paginationInfo={ paginationInfo }
-				fields={ fields }
-				actions={ actions }
-				data={ shownTemplates }
-				getItemId={ ( item ) => item.id }
-				isLoading={ isLoadingData }
-				view={ view }
-				onChangeView={ onChangeView }
-				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
-			/>
-		</Page>
+		<>
+			<Page title={ __( 'Templates' ) }>
+				<DataViews
+					paginationInfo={ paginationInfo }
+					fields={ fields }
+					actions={ actions }
+					data={ shownTemplates }
+					getItemId={ ( item ) => item.id }
+					isLoading={ isLoadingData }
+					view={ view }
+					onChangeView={ onChangeView }
+					onSelectionChange={ onSelectionChange }
+					deferredRendering={
+						! view.hiddenFields?.includes( 'preview' )
+					}
+				/>
+			</Page>
+			{ view.type === LAYOUT_LIST && (
+				<Page>
+					<div className="edit-site-template-pages-preview">
+						{ templateId !== null ? (
+							<SideEditor
+								postId={ templateId }
+								postType={ TEMPLATE_POST_TYPE }
+							/>
+						) : (
+							<div
+								style={ {
+									display: 'flex',
+									flexDirection: 'column',
+									justifyContent: 'center',
+									textAlign: 'center',
+									height: '100%',
+								} }
+							>
+								<p>{ __( 'Select a template to preview' ) }</p>
+							</div>
+						) }
+					</div>
+				</Page>
+			) }
+		</>
 	);
 }
