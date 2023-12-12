@@ -103,7 +103,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 				// on submission. This is optional.
 				if ( 'INPUT' === $tag && 'submit' === $type ) {
 					// Add the necessary directives.
-					$p->set_attribute( 'data-wp-bind--value', 'state.submitText' );
+					$p->set_attribute( 'data-wp-bind--value', 'state.submitButtonText' );
 					$p->set_attribute( 'data-wp-bind--disabled', 'context.isSubmitting' );
 
 					// Add translated strings to the state.

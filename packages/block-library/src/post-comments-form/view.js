@@ -22,8 +22,9 @@ const { state } = store( 'core/comments', {
 		get showError() {
 			return state.error ? 'flex' : 'none';
 		},
-		get submitText() {
-			const { isSubmitting, loadingText, submitText } = getContext();
+		get submitButtonText() {
+			const { isSubmitting } = getContext();
+			const { loadingText, submitText } = state;
 			return isSubmitting ? loadingText : submitText;
 		},
 		get displayCancelReply() {
