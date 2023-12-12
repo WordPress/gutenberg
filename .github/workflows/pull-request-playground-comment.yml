@@ -27,11 +27,40 @@ jobs:
                   issue-number: ${{ github.event.pull_request.number }}
                   body: |
                       <!-- pr-test-using=wordpress-playground -->
-                      ## Test using WordPress Playground
+                      ## Test this pull request with WordPress Playground
 
-                      :link: [Test this pull request with WordPress Playground](https://playground.wordpress.net/gutenberg.html?pr=${{ github.event.number }}).
+                      | :arrow_forward: **[Click here to load this PR into WordPress Playground](https://playground.wordpress.net/gutenberg.html?pr=56964)**  |
+                      | ------------- |
 
-                      _WordPress Playground uses the latest build of Gutenberg from this pull request. If your changes are not reflected in the Playground instance, it's likely that the most recent build isn't complete or has failed. Check the [list of workflow runs to be sure](https://github.com/WordPress/gutenberg/actions/workflows/pull-request-playground-comment.yml)._
+                      > [!TIP]
+                      > _WordPress Playground uses the latest build of Gutenberg from this pull request. If your changes are not reflected in the Playground instance, it's likely that the most recent build isn't complete or has failed. Check the [list of workflow runs to be sure](https://github.com/WordPress/gutenberg/actions/workflows/pull-request-playground-comment.yml)._
+
+                      ### About WordPress Playground
+
+                      [WordPress Playground](https://developer.wordpress.org/playground/) is an experimental project that creates a full WordPress instance entirely within the browser.
+
+                      #### Please note:
+                      - A fresh instance is created each time you open Playground in the browser.
+                      - **All changes will be lost** when when refreshing the page or closing the window/tab running a Playground instance.
+                      - The Plugin and Theme Directories cannot be accessed within Playground.
+
+                      For more details about these limitations and more, check out [WordPress playground limitations](https://wordpress.github.io/wordpress-playground/limitations/) in the documentation.
+            - name: Update comment
+              if: steps.find-comment.outputs.comment-id != ''
+              uses: peter-evans/create-or-update-comment@v3
+              with:
+                  comment-id: ${{ steps.find-comment.outputs.comment-id }}
+                  issue-number: ${{ github.event.pull_request.number }}
+                  edit-mode: replace
+                  body: |
+                      <!-- pr-test-using=wordpress-playground -->
+                      ## Test this pull request with WordPress Playground
+
+                      | :arrow_forward: **[Click here to load this PR into WordPress Playground](https://playground.wordpress.net/gutenberg.html?pr=56964)**  |
+                      | ------------- |
+
+                      > [!TIP]
+                      > _WordPress Playground uses the latest build of Gutenberg from this pull request. If your changes are not reflected in the Playground instance, it's likely that the most recent build isn't complete or has failed. Check the [list of workflow runs to be sure](https://github.com/WordPress/gutenberg/actions/workflows/pull-request-playground-comment.yml)._
 
                       ### About WordPress Playground
 
