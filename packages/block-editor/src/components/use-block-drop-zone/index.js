@@ -22,6 +22,7 @@ import { store as blockEditorStore } from '../../store';
 
 const THRESHOLD_DISTANCE = 30;
 const MINIMUM_HEIGHT_FOR_THRESHOLD = 120;
+const MINIMUM_WIDTH_FOR_THRESHOLD = 120;
 
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
 /** @typedef {import('../use-on-block-drop/types').WPDropOperation} WPDropOperation */
@@ -75,9 +76,9 @@ export function getDropTargetPosition(
 		rootBlockIndex = 0,
 	} = options;
 
+	// Allow before/after when dragging over the top/bottom edges of the drop zone.
 	if ( dropZoneElement && parentBlockOrientation !== 'horizontal' ) {
 		const rect = dropZoneElement.getBoundingClientRect();
-
 		const [ distance, edge ] = getDistanceToNearestEdge( position, rect, [
 			'top',
 			'bottom',
@@ -100,6 +101,36 @@ export function getDropTargetPosition(
 	}
 
 	const isRightToLeft = isRTL();
+
+	// Allow before/after when dragging over the left/right edges of the drop zone.
+	if ( dropZoneElement && parentBlockOrientation === 'horizontal' ) {
+		const rect = dropZoneElement.getBoundingClientRect();
+		const [ distance, edge ] = getDistanceToNearestEdge( position, rect, [
+			'left',
+			'right',
+		] );
+
+		// If dragging over the left or right of the drop zone, insert the block
+		// before or after the parent block. This only applies to blocks that use
+		// a drop zone element, typically container blocks such as Group.
+		if (
+			rect.width > MINIMUM_WIDTH_FOR_THRESHOLD &&
+			distance < THRESHOLD_DISTANCE
+		) {
+			if (
+				( isRightToLeft && edge === 'right' ) ||
+				( ! isRightToLeft && edge === 'left' )
+			) {
+				return [ rootBlockIndex, 'before' ];
+			}
+			if (
+				( isRightToLeft && edge === 'left' ) ||
+				( ! isRightToLeft && edge === 'right' )
+			) {
+				return [ rootBlockIndex + 1, 'after' ];
+			}
+		}
+	}
 
 	blocksData.forEach(
 		( { isUnmodifiedDefaultBlock, getBoundingClientRect, blockIndex } ) => {
