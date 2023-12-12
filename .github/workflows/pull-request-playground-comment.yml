@@ -1,0 +1,51 @@
+# Leaves a comment on a pull request with a link to test the changes in a WordPress Playground instance.
+name: OPTIONAL - Comment on a pull request with Playground details
+
+on:
+    pull_request:
+        types: [opened]
+jobs:
+    test_using_wordpress_playground:
+        name: Test using WordPress Playground
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' && github.event_name == 'pull_request_target' }}
+        steps:
+            - uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
+              with:
+                  script: |
+                      // Check for the presence of a comment and bail early.
+                      const commentInfo = {
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: ${{ github.event.number }}
+                      };
+                      const comments = ( await github.rest.issues.listComments( commentInfo ) ).data;
+
+                      for ( const currentComment of comments ) {
+                        if ( currentComment.user.type === 'Bot' && currentComment.body.includes( '<!-- pr-test-using=wordpress-playground -->' ) ) {
+                          return;
+                        }
+                      };
+
+                      // No comment was found. Create one.
+                      commentInfo.body = `<!-- pr-test-using=wordpress-playground -->
+                      ## Test using WordPress Playground
+
+                      :link: [Test this pull request with WordPress Playground](https://playground.wordpress.net/gutenberg.html?pr=${{ github.event.number }}).
+
+                      ### About WordPress playground
+
+                      [WordPress Playground](https://developer.wordpress.org/playground/) is an experimental project that creates a full WordPress instance entirely within the browser.
+
+                      #### Please note:
+
+                      - The Plugin and Theme Directories cannot be accessed within Playground.
+                      - **All changes will be lost** when when refreshing the page or closing the window/tab running a Playground instance.
+                      - A fresh instance is created each time the link below is clicked.
+                      - Every time this pull request is updated, a new ZIP file containing all changes is created. If your changes are not reflected in the Playground instance,
+                      it's possible that the most recent build failed, or has not completed. Check the [list of workflow runs to be sure](https://github.com/WordPress/gutenberg/actions/workflows/pull-request-playground-comment.yml).
+
+                      For more details about these limitations and more, check out [WordPress playground limitations](https://wordpress.github.io/wordpress-playground/limitations/) in the documentation.
+                      `;
+
+                      github.rest.issues.createComment( commentInfo );
