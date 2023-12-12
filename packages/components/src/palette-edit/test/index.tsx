@@ -8,7 +8,7 @@ import { render, fireEvent, screen } from '@testing-library/react';
  */
 import PaletteEdit, {
 	getNameForPosition,
-	isTemporaryElement,
+	isDefaultElement,
 	DEFAULT_COLOR,
 } from '..';
 import type { PaletteElement } from '../types';
@@ -85,11 +85,12 @@ describe( 'getNameForPosition', () => {
 	} );
 } );
 
-describe( 'isTemporaryElement', () => {
+describe( 'isDefaultElement', () => {
 	[
 		{
-			message: 'identifies temporary color',
+			message: 'identify temporary color',
 			slug: 'test-',
+			index: 1,
 			obj: {
 				name: '',
 				slug: 'test-color-1',
@@ -98,8 +99,9 @@ describe( 'isTemporaryElement', () => {
 			expected: true,
 		},
 		{
-			message: 'identifies temporary gradient',
+			message: 'identify default gradient',
 			slug: 'test-',
+			index: 1,
 			obj: {
 				name: '',
 				slug: 'test-color-1',
@@ -108,7 +110,28 @@ describe( 'isTemporaryElement', () => {
 			expected: true,
 		},
 		{
-			message: 'identifies custom color slug',
+			message: 'not match default color with missing index arg',
+			slug: 'test-',
+			obj: {
+				name: '',
+				slug: 'test-color-1',
+				color: DEFAULT_COLOR,
+			},
+			expected: false,
+		},
+		{
+			message: 'identify custom color with mismatching index in name',
+			slug: 'test-',
+			index: 1,
+			obj: {
+				name: '',
+				slug: 'test-color-11',
+				color: DEFAULT_COLOR,
+			},
+			expected: false,
+		},
+		{
+			message: 'identify custom color slug',
 			slug: 'test-',
 			obj: {
 				name: '',
@@ -118,7 +141,7 @@ describe( 'isTemporaryElement', () => {
 			expected: false,
 		},
 		{
-			message: 'identifies custom color value',
+			message: 'identify custom color value',
 			slug: 'test-',
 			obj: {
 				name: '',
@@ -128,7 +151,7 @@ describe( 'isTemporaryElement', () => {
 			expected: false,
 		},
 		{
-			message: 'identifies custom gradient slug',
+			message: 'identify custom gradient slug',
 			slug: 'test-',
 			obj: {
 				name: '',
@@ -138,7 +161,7 @@ describe( 'isTemporaryElement', () => {
 			expected: false,
 		},
 		{
-			message: 'identifies custom gradient value',
+			message: 'identify custom gradient value',
 			slug: 'test-',
 			obj: {
 				name: '',
@@ -147,9 +170,9 @@ describe( 'isTemporaryElement', () => {
 			},
 			expected: false,
 		},
-	].forEach( ( { message, slug, obj, expected } ) => {
+	].forEach( ( { message, slug, index, obj, expected } ) => {
 		it( `should ${ message }`, () => {
-			expect( isTemporaryElement( slug, obj ) ).toBe( expected );
+			expect( isDefaultElement( slug, obj, index ) ).toBe( expected );
 		} );
 	} );
 } );

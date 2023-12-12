@@ -262,7 +262,7 @@ function Option< T extends Color | Gradient >( {
 }
 
 /**
- * Checks if a color or gradient is a temporary element by testing against default values.
+ * Checks if a color or gradient is a default element by testing against default values.
  */
 export function isDefaultElement(
 	slugPrefix: string,
@@ -272,6 +272,7 @@ export function isDefaultElement(
 	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 	const [ , slugIndex ] = slug.match( regex ) || [];
 	const hasSameIndex = index === ( slugIndex ? Number( slugIndex ) : null );
+
 	// If the slug matches the temporary name regex,
 	// check if the color or gradient matches the default value.
 	if ( hasSameIndex && regex.test( slug ) ) {
