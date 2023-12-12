@@ -210,36 +210,6 @@ jobs:
                   name: release-notes
                   path: ./release-notes.txt
 
-    # Calls the Pull Request Commenting workflow to leave a comment detailing how to test the PR within WordPress Playground.
-    playground-comment:
-        name: Leave WordPress Playground details
-        runs-on: ubuntu-latest
-        permissions:
-            actions: write
-        needs: [build]
-        if: |
-            always() && (
-              github.event_name == 'pull_request' ||
-              github.event_name == 'workflow_dispatch' ||
-              github.repository == 'WordPress/gutenberg'
-            )
-        steps:
-            - name: Dispatch workflow run
-              uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
-              with:
-                  retries: 2
-                  retry-exempt-status-codes: 418
-                  script: |
-                      github.rest.actions.createWorkflowDispatch({
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        workflow_id: 'pull-request-playground-comment.yml',
-                        ref: 'trunk',
-                        inputs: {
-                          pr_number: '${{ github.event.number }}'
-                        }
-                      });
-
     revert-version-bump:
         name: Revert version bump if build failed
         needs: [bump-version, build]
