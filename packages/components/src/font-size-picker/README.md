@@ -3,6 +3,14 @@
 FontSizePicker is a React component that renders a UI that allows users to select a font size.
 The component renders a user interface that allows the user to select predefined (common) font sizes and contains an option that allows users to select custom font sizes (by choosing the value) if that functionality is enabled.
 
+## Storybook tool
+
+Try out the FontSizePicker component interactively.
+
+The Gutenberg [Storybook tool](https://wordpress.github.io/gutenberg/) enables you to interactively set various options for individual components and then copy the code for use in your project.
+
+[View the FontSizePicker component on Storybook](https://wordpress.github.io/gutenberg/?path=/docs/components-fontsizepicker--default).
+
 ## Usage
 
 ```jsx

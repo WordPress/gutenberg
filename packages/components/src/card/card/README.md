@@ -2,6 +2,14 @@
 
 `Card` provides a flexible and extensible content container.
 
+## Storybook tool
+
+Try out the Card component interactively.
+
+The Gutenberg [Storybook tool](https://wordpress.github.io/gutenberg/) enables you to interactively set various options for individual components and then copy the code for use in your project.
+
+[View the Card component on Storybook](https://wordpress.github.io/gutenberg/?path=/story/components-card--default).
+
 ## Usage
 
 `Card` also provides a convenient set of [sub-components](#sub-components) such as `CardBody`, `CardHeader`, `CardFooter`, and more (see below).
