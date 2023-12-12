@@ -64,7 +64,7 @@ jobs:
 
                       ### About WordPress Playground
 
-                      [WordPress Playground](https://developer.wordpress.org/playground/) is an experimental project that creates a full WordPress instance entirely within the browser.
+                      [WordPress Playground](https://developer.wordpress.org/playground/) is an experimental project allows you to run a full WordPress instance entirely in the browser.
 
                       #### Please note:
                       - A fresh instance is created each time you open Playground in the browser.
