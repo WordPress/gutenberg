@@ -2,7 +2,7 @@
 name: OPTIONAL - Comment on a pull request with Playground details
 
 on:
-    pull_request_target:
+    pull_request:
         types: [opened, synchronize]
 jobs:
     test_using_wordpress_playground:
@@ -10,13 +10,13 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             pull-requests: write
-        if: ${{ github.repository  == 'WordPress/gutenberg' || github.event_name == 'pull_request_target' }}
+        if: ${{ github.repository  == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         steps:
             - name: Find Comment
               uses: peter-evans/find-comment@v2
               id: find-comment
               with:
-                  issue-number: ${{ github.event.number }}
+                  issue-number: ${{ github.event.pull_request.number }}
                   comment-author: 'github-actions[bot]'
                   body-includes: '<!-- pr-test-using=wordpress-playground -->'
 
@@ -24,7 +24,7 @@ jobs:
               if: steps.find-comment.outputs.comment-id == ''
               uses: peter-evans/create-or-update-comment@v3
               with:
-                  issue-number: ${{ github.event.number }}
+                  issue-number: ${{ github.event.pull_request.number }}
                   body: |
                       <!-- pr-test-using=wordpress-playground -->
                       ## Test this pull request with WordPress Playground
@@ -50,7 +50,7 @@ jobs:
               uses: peter-evans/create-or-update-comment@v3
               with:
                   comment-id: ${{ steps.find-comment.outputs.comment-id }}
-                  issue-number: ${{ github.event.number }}
+                  issue-number: ${{ github.event.pull_request.number }}
                   edit-mode: replace
                   body: |
                       <!-- pr-test-using=wordpress-playground -->
