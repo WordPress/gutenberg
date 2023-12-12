@@ -63,6 +63,7 @@ const defaultConfigPerViewType = {
 	},
 	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
+		mediaField: 'preview',
 	},
 };
 
