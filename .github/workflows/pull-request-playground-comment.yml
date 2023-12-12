@@ -10,7 +10,6 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             pull-requests: write
-        needs: [build]
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         steps:
             - name: Find Comment
