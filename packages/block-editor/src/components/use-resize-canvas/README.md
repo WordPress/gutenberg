@@ -1,6 +1,6 @@
 # useResizeCanvas
 
-This React hook generates inline CSS suitable for resizing a container to fit a device's dimensions. It adjusts the CSS according to the current device dimensions. It has no effect on desktop.
+This React hook generates inline CSS suitable for resizing a container to fit a device's dimensions. It adjusts the CSS according to the current device dimensions.
 
 On-page CSS media queries are also updated to match the width of the device.
 

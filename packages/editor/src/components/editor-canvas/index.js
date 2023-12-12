@@ -306,8 +306,6 @@ function EditorCanvas(
 				...iframeProps,
 				style: {
 					...iframeProps?.style,
-					marginLeft: 'auto',
-					marginRight: 'auto',
 					...deviceStyles,
 				},
 			} }
