@@ -69,12 +69,13 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
 			hideLabelFromVision
 			value={ value }
 			onChange={ onChange }
+			placeholder={ __( 'Enter a name' ) }
 		/>
 	);
 }
 
 /**
- * Returns a temporary name for a palette item in the format "Color + id".
+ * Returns a temporary id for a palette item in the format "slugPrefix + color- + id".
  * To ensure there are no duplicate ids, this function checks all slugs for temporary names.
  * It expects slugs to be in the format: slugPrefix + color- + number.
  * It then sets the id component of the new name based on the incremented id of the highest existing slug id.
@@ -82,11 +83,11 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
  * @param elements   An array of color palette items.
  * @param slugPrefix The slug prefix used to match the element slug.
  *
- * @return A unique name for a palette item.
+ * @return A unique id for a palette item.
  */
-export function getNameForPosition(
+export function getIdForPosition(
 	elements: PaletteElement[],
-	slugPrefix: string
+	slugPrefix?: string
 ) {
 	const temporaryNameRegex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 	const position = elements.reduce( ( previousValue, currentValue ) => {
@@ -102,11 +103,7 @@ export function getNameForPosition(
 		return previousValue;
 	}, 1 );
 
-	return sprintf(
-		/* translators: %s: is a temporary id for a custom color */
-		__( 'Color %s' ),
-		position
-	);
+	return `${ slugPrefix }color-${ position }`;
 }
 
 function ColorPickerPopover< T extends Color | Gradient >( {
@@ -209,7 +206,7 @@ function Option< T extends Color | Gradient >( {
 						},
 				  } ) }
 		>
-			<HStack justify="flex-start">
+			<HStack justify="flex-start" style={ { minHeight: 'calc(4px * 8)' } }>
 				<FlexItem>
 					<IndicatorStyled
 						style={ { background: value, color: 'transparent' } }
@@ -224,15 +221,18 @@ function Option< T extends Color | Gradient >( {
 									: __( 'Color name' )
 							}
 							value={ element.name }
-							onChange={ ( nextName?: string ) =>
+							onChange={ ( nextName?: string ) => {
+								if ( ! nextName ) {
+									return;
+								}
 								onChange( {
 									...element,
 									name: nextName,
 									slug:
 										slugPrefix +
 										kebabCase( nextName ?? '' ),
-								} )
-							}
+								} );
+							} }
 						/>
 					) : (
 						<NameContainer>{ element.name }</NameContainer>
@@ -266,16 +266,13 @@ function Option< T extends Color | Gradient >( {
  */
 export function isDefaultElement(
 	slugPrefix: string,
-	{ slug, color, gradient }: Color | Gradient,
-	index: number = -1
+	{ slug, name, color, gradient }: Color | Gradient
 ): Boolean {
 	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
-	const [ , slugIndex ] = slug.match( regex ) || [];
-	const hasSameIndex = index === ( slugIndex ? Number( slugIndex ) : null );
 
 	// If the slug matches the temporary name regex,
 	// check if the color or gradient matches the default value.
-	if ( hasSameIndex && regex.test( slug ) ) {
+	if ( ! name && regex.test( slug ) ) {
 		// The order is important as gradient elements
 		// contain a color property.
 		if ( !! gradient ) {
@@ -305,17 +302,34 @@ function PaletteEditListView< T extends Color | Gradient >( {
 	useEffect( () => {
 		elementsReference.current = elements;
 	}, [ elements ] );
+
+	// On unmount, remove nameless elements with the default color.
 	useEffect( () => {
 		return () => {
+			// if there are elements with the default color, remove them.
+			// if there are elements with non-default color and no name, update name.
 			if (
-				elementsReference.current?.some( ( element, index ) =>
-					isDefaultElement( slugPrefix, element, index + 1 )
-				)
+				elementsReference.current?.some( ( element ) => {
+					const isDefault = isDefaultElement( slugPrefix, element );
+					return isDefault || ( ! element.name && ! isDefault );
+				} )
 			) {
-				const newElements = elementsReference.current.filter(
-					( element, index ) =>
-						! isDefaultElement( slugPrefix, element, index + 1 )
-				);
+				const newElements = elementsReference.current
+					.filter(
+						( element ) => ! isDefaultElement( slugPrefix, element )
+					)
+					.map( ( element, index, arr ) => {
+						return {
+							...element,
+							name:
+								element?.name ||
+								sprintf(
+									/* translators: %s: is a temporary id for a custom color */
+									__( 'Color %s' ),
+									index + 1
+								),
+						};
+					} );
 				onChange( newElements.length ? newElements : undefined );
 			}
 		};
@@ -478,7 +492,7 @@ export function PaletteEdit( {
 									: __( 'Add color' )
 							}
 							onClick={ () => {
-								const tempOptionName = getNameForPosition(
+								const tempOptionId = getIdForPosition(
 									elements,
 									slugPrefix
 								);
@@ -488,10 +502,8 @@ export function PaletteEdit( {
 										...gradients,
 										{
 											gradient: DEFAULT_GRADIENT,
-											name: tempOptionName,
-											slug:
-												slugPrefix +
-												kebabCase( tempOptionName ),
+											name: '',
+											slug: tempOptionId,
 										},
 									] );
 								} else {
@@ -499,10 +511,8 @@ export function PaletteEdit( {
 										...colors,
 										{
 											color: DEFAULT_COLOR,
-											name: tempOptionName,
-											slug:
-												slugPrefix +
-												kebabCase( tempOptionName ),
+											name: '',
+											slug: tempOptionId,
 										},
 									] );
 								}

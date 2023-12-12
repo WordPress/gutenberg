@@ -7,7 +7,7 @@ import { render, fireEvent, screen } from '@testing-library/react';
  * Internal dependencies
  */
 import PaletteEdit, {
-	getNameForPosition,
+	getIdForPosition,
 	isDefaultElement,
 	DEFAULT_COLOR,
 } from '..';
@@ -19,8 +19,8 @@ describe( 'getNameForPosition', () => {
 		const slugPrefix = 'test-';
 		const elements: PaletteElement[] = [];
 
-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
-			'Color 1'
+		expect( getIdForPosition( elements, slugPrefix ) ).toEqual(
+			'test-color-1'
 		);
 	} );
 
@@ -34,8 +34,8 @@ describe( 'getNameForPosition', () => {
 			},
 		];
 
-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
-			'Color 2'
+		expect( getIdForPosition( elements, slugPrefix ) ).toEqual(
+			'test-color-2'
 		);
 	} );
 
@@ -49,8 +49,8 @@ describe( 'getNameForPosition', () => {
 			},
 		];
 
-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
-			'Color 1'
+		expect( getIdForPosition( elements, slugPrefix ) ).toEqual(
+			'test-color-1'
 		);
 	} );
 
@@ -79,8 +79,8 @@ describe( 'getNameForPosition', () => {
 			},
 		];
 
-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
-			'Color 151'
+		expect( getIdForPosition( elements, slugPrefix ) ).toEqual(
+			'test-color-151'
 		);
 	} );
 } );
@@ -90,7 +90,6 @@ describe( 'isDefaultElement', () => {
 		{
 			message: 'identify temporary color',
 			slug: 'test-',
-			index: 1,
 			obj: {
 				name: '',
 				slug: 'test-color-1',
@@ -101,34 +100,12 @@ describe( 'isDefaultElement', () => {
 		{
 			message: 'identify default gradient',
 			slug: 'test-',
-			index: 1,
 			obj: {
 				name: '',
 				slug: 'test-color-1',
 				gradient: DEFAULT_GRADIENT,
 			},
 			expected: true,
-		},
-		{
-			message: 'not match default color with missing index arg',
-			slug: 'test-',
-			obj: {
-				name: '',
-				slug: 'test-color-1',
-				color: DEFAULT_COLOR,
-			},
-			expected: false,
-		},
-		{
-			message: 'identify custom color with mismatching index in name',
-			slug: 'test-',
-			index: 1,
-			obj: {
-				name: '',
-				slug: 'test-color-11',
-				color: DEFAULT_COLOR,
-			},
-			expected: false,
 		},
 		{
 			message: 'identify custom color slug',
@@ -170,9 +147,9 @@ describe( 'isDefaultElement', () => {
 			},
 			expected: false,
 		},
-	].forEach( ( { message, slug, index, obj, expected } ) => {
+	].forEach( ( { message, slug, obj, expected } ) => {
 		it( `should ${ message }`, () => {
-			expect( isDefaultElement( slug, obj, index ) ).toBe( expected );
+			expect( isDefaultElement( slug, obj ) ).toBe( expected );
 		} );
 	} );
 } );
