@@ -31,9 +31,9 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	}
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'class'          => implode( ' ', $classes ),
-			'data-wp-fill'   => 'context.core.comments.formSlot',
-			'data-wp-effect' => 'effects.core.comments.scrollOnReply',
+			'class'         => implode( ' ', $classes ),
+			'data-wp-fill'  => 'context.formSlot',
+			'data-wp-watch' => 'callbacks.scrollOnReply',
 		)
 	);
 
@@ -72,7 +72,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 			)
 		) ) {
 			// Add the necessary directives.
-			$p->set_attribute( 'data-wp-on--submit', 'actions.core.comments.submit' );
+			$p->set_attribute( 'data-wp-on--submit', 'actions.submit' );
 
 			while ( $p->next_tag() ) {
 				$tag  = $p->get_tag();
@@ -83,47 +83,36 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 				// context so it can be restored when the form is moved around. This is
 				// optional.
 				if ( 'TEXTAREA' === $tag && 'comment' === $name ) {
-					$p->set_attribute( 'data-wp-bind--value', 'context.core.comments.fields.' . $name );
-					$p->set_attribute( 'data-wp-on--change', 'actions.core.comments.updateField' );
+					$p->set_attribute( 'data-wp-bind--value', 'context.fields.' . $name );
+					$p->set_attribute( 'data-wp-on--change', 'actions.updateField' );
 				}
 
 				if (
 					'INPUT' === $tag &&
 					in_array( $name, array( 'author', 'email', 'url' ), true )
 				) {
-					$p->set_attribute( 'data-wp-bind--value', 'context.core.comments.fields.' . $name );
-					$p->set_attribute( 'data-wp-on--input', 'actions.core.comments.updateField' );
+					$p->set_attribute( 'data-wp-bind--value', 'context.fields.' . $name );
+					$p->set_attribute( 'data-wp-on--input', 'actions.updateField' );
 				}
 
 				if ( 'INPUT' === $tag && 'comment_parent' === $name ) {
-					$p->set_attribute( 'data-wp-bind--value', 'context.core.comments.fields.' . $name );
+					$p->set_attribute( 'data-wp-bind--value', 'context.fields.' . $name );
 				}
 
 				// Try to find the submit button and add directives to change its value
 				// on submission. This is optional.
 				if ( 'INPUT' === $tag && 'submit' === $type ) {
 					// Add the necessary directives.
-					$p->set_attribute( 'data-wp-bind--value', 'selectors.core.comments.submitText' );
-					$p->set_attribute( 'data-wp-bind--disabled', 'context.core.comments.isSubmitting' );
+					$p->set_attribute( 'data-wp-bind--value', 'state.submitText' );
+					$p->set_attribute( 'data-wp-bind--disabled', 'context.isSubmitting' );
 
 					// Add translated strings to the state.
 					$submit_text = $p->get_attribute( 'value' );
 					wp_store(
 						array(
-							'state'     => array(
-								'core' => array(
-									'comments' => array(
-										'submitText'  => $submit_text,
-										'loadingText' => __( 'Submitting…' ),
-									),
-								),
-							),
-							'selectors' => array(
-								'core' => array(
-									'comments' => array(
-										'submitText' => $submit_text,
-									),
-								),
+							'core/comments' => array(
+								'submitText'  => $submit_text,
+								'loadingText' => __( 'Submitting…' ),
 							),
 						)
 					);
@@ -133,13 +122,13 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 			// Start again to add directives to the reply title elements.
 			$p->seek( 'first-tag' );
 			if ( $p->next_tag( array( 'class_name' => 'comment-reply-title' ) ) ) {
-				$p->set_attribute( 'data-wp-effect', 'actions.core.comments.updateReplyTitle' );
+				$p->set_attribute( 'data-wp-watch', 'actions.updateReplyTitle' );
 			}
 
 			while ( $p->next_tag( array( 'tag_name' => 'a' ) ) ) {
 				if ( 'cancel-comment-reply-link' === $p->get_attribute( 'id' ) ) {
-					$p->set_attribute( 'data-wp-style--display', 'selectors.core.comments.displayCancelReply' );
-					$p->set_attribute( 'data-wp-on--click', 'actions.core.comments.cancelReply' );
+					$p->set_attribute( 'data-wp-style--display', 'state.displayCancelReply' );
+					$p->set_attribute( 'data-wp-on--click', 'actions.cancelReply' );
 					break;
 				}
 			}
@@ -166,21 +155,21 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 				$enhanced_form,
 				'<div
 					class="wp-block-post-comments-form__error"
-					data-wp-style--display="selectors.core.comments.showError"
-					data-wp-effect="effects.core.comments.scrollToError"
+					data-wp-style--display="state.showError"
+					data-wp-watch="callbacks.scrollToError"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
 						<path d="M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-6h-2v6zm0-8h2V7h-2v2z"></path>
 					</svg>
 					<span
-						data-wp-text="state.core.comments.error"
+						data-wp-text="state.error"
 						aria-live="polite"
 					></span>
 				</div>
 				<div
 					style="position:absolute;clip:rect(0,0,0,0);width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;border:0;"
 					aria-live="polite"
-					data-wp-text="context.core.comments.notice"
+					data-wp-text="context.notice"
 				></div>
 				</form>',
 				$last_div_position,
