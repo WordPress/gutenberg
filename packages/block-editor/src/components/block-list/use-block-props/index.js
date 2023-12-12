@@ -11,6 +11,7 @@ import {
 	__unstableGetBlockProps as getBlockProps,
 	getBlockType,
 } from '@wordpress/blocks';
+import { useMergeRefs } from '@wordpress/compose';
 import warning from '@wordpress/warning';
 
 /**
@@ -75,6 +76,7 @@ export function useBlockProps( props = {} ) {
 	return {
 		...blockProps,
 		...props,
+		ref: useMergeRefs( [ blockProps.ref, props.ref ] ),
 		className: classnames( props.className, blockProps.className ),
 		style: { ...blockProps.style, ...props.style },
 	};
