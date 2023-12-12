@@ -12,7 +12,7 @@ Here's a quick look at what you're going to build.
 
 ![What you're going to build](https://developer.wordpress.org/files/2023/12/block-tutorial-1.png)
 
-You can also interact with the finished project in [WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/WordPress/block-development-examples/trunk/plugins/copyright-date-block-09aac3/_playground/blueprint.json) or use the [Quick Start Guide](https://developer.wordpress.org/redesign-test/block-editor/getting-started/quick-start-guide/) to install the complete block plugin in your local WordPress environment.
+You can also interact with the finished project in [WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/WordPress/block-development-examples/trunk/plugins/copyright-date-block-09aac3/_playground/blueprint.json) or use the [Quick Start Guide](https://developer.wordpress.org/block-editor/getting-started/quick-start-guide/) to install the complete block plugin in your local WordPress environment.
 
 ## Prerequisites
 
