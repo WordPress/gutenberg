@@ -76,6 +76,20 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 			)
 		);
 
+		register_rest_route(
+			$this->namespace,
+			'/' . 'all-' . $this->rest_base,
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
+					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
+				),
+			),
+		);
+
+
+
 
 
 
@@ -138,6 +152,15 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 		// 		),
 		// 	)
 		// );
+	}
+
+	public function get_items( $request ) {
+ 		$font_families = WP_Font_Family::get_font_families();
+		$font_family_data = array();
+		foreach ( $font_families as $font_family) {
+			$font_family_data[] = $font_family->get_data();
+		}
+		return new WP_REST_Response( $font_family_data );
 	}
 
 	public function get_item( $request ) {

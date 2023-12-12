@@ -50,6 +50,27 @@ class WP_Font_Family {
 		$this->font_family = $font_data['font_family'];
 	}
 
+	public static function get_font_families () {
+		$args = array(
+			'post_type'      => 'wp_font_family',
+		);
+
+		$posts_query = new WP_Query( $args );
+
+		if ( ! $posts_query->have_posts() ) {
+			return array();
+		}
+
+		$font_families = array();
+		foreach( $posts_query->posts as $post ) {
+			$post_data = json_decode( $post->post_content, true );
+			$font_families[] = new WP_Font_Family( $post_data );
+		}
+
+		return $font_families;
+	}
+
+
 	public static function get_font_family_by_slug ( $slug ) {
 		$args = array(
 			'post_type'      => 'wp_font_family',
