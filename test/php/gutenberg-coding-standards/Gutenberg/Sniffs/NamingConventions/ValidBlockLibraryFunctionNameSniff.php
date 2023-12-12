@@ -40,6 +40,13 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	public $allowed_functions = array();
 
 	/**
+	 * Contains prefixes for functions that are not allowed to be called.
+	 *
+	 * @var array
+	 */
+	public $disallowed_function_calls = array();
+
+	/**
 	 * Registers the tokens that this sniff wants to listen for.
 	 *
 	 * @return array
@@ -138,8 +145,9 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	 * after the class properties have been set.
 	 */
 	private function onRegisterEvent() {
-		$this->prefixes          = self::sanitize( $this->prefixes );
-		$this->allowed_functions = self::sanitize( $this->allowed_functions );
+		$this->prefixes                  = self::sanitize( $this->prefixes );
+		$this->allowed_functions         = self::sanitize( $this->allowed_functions );
+		$this->disallowed_function_calls = self::sanitize( $this->disallowed_function_calls );
 	}
 
 	/**
