@@ -71,6 +71,7 @@ const BlockDraggable = ( {
 		};
 	}, [] );
 
+	// Find the root of the editor iframe.
 	const blockRef = useBlockRef( clientIds[ 0 ] );
 	const editorRoot = blockRef.current?.closest( 'body' );
 
@@ -167,7 +168,6 @@ const BlockDraggable = ( {
 					targetClientId={ targetClientId }
 				/>
 			}
-			isValid={ isDropTargetValid }
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {
