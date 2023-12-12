@@ -6,5 +6,6 @@
 		"checkJs": false,
 		"strict": false
 	},
-	"include": [ "src/**/*" ]
+	"include": [ "src/**/*" ],
+	"references": [ { "path": "../dom-ready" } ]
 }
