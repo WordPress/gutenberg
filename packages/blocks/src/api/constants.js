@@ -20,6 +20,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'color', 'link' ],
 		support: [ 'color', 'link' ],
 	},
+	aspectRatio: {
+		value: [ 'dimensions', 'aspectRatio' ],
+		support: [ 'dimensions', 'aspectRatio' ],
+		useEngine: true,
+	},
 	background: {
 		value: [ 'color', 'gradient' ],
 		support: [ 'color', 'gradients' ],
