@@ -58,9 +58,11 @@ import type {
 	PaletteEditListViewProps,
 	PaletteEditProps,
 	PaletteElement,
+	OnChangeDebouncedFunction,
 } from './types';
 
 export const DEFAULT_COLOR = '#000';
+const EMPTY_ARRAY = [];
 
 function NameInput( { value, onChange, label }: NameInputProps ) {
 	return (
@@ -206,7 +208,10 @@ function Option< T extends Color | Gradient >( {
 						},
 				  } ) }
 		>
-			<HStack justify="flex-start" style={ { minHeight: 'calc(4px * 8)' } }>
+			<HStack
+				justify="flex-start"
+				className="components-palette-edit__item-column"
+			>
 				<FlexItem>
 					<IndicatorStyled
 						style={ { background: value, color: 'transparent' } }
@@ -267,7 +272,7 @@ function Option< T extends Color | Gradient >( {
 export function isDefaultElement(
 	slugPrefix: string,
 	{ slug, name, color, gradient }: Color | Gradient
-): Boolean {
+): boolean {
 	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
 
 	// If the slug matches the temporary name regex,
@@ -306,8 +311,8 @@ function PaletteEditListView< T extends Color | Gradient >( {
 	// On unmount, remove nameless elements with the default color.
 	useEffect( () => {
 		return () => {
-			// if there are elements with the default color, remove them.
-			// if there are elements with non-default color and no name, update name.
+			// If there are elements with the default color, remove them.
+			// If there are elements with non-default color and no name, update name.
 			if (
 				elementsReference.current?.some( ( element ) => {
 					const isDefault = isDefaultElement( slugPrefix, element );
@@ -319,16 +324,14 @@ function PaletteEditListView< T extends Color | Gradient >( {
 						( element ) => ! isDefaultElement( slugPrefix, element )
 					)
 					.map( ( element, index, arr ) => {
-						return {
-							...element,
-							name:
-								element?.name ||
-								sprintf(
-									/* translators: %s: is a temporary id for a custom color */
-									__( 'Color %s' ),
-									index + 1
-								),
-						};
+						element.name =
+							element?.name ||
+							sprintf(
+								/* translators: %s: is a temporary id for a custom color */
+								__( 'Color %s' ),
+								index + 1
+							);
+						return element;
 					} );
 				onChange( newElements.length ? newElements : undefined );
 			}
@@ -337,8 +340,10 @@ function PaletteEditListView< T extends Color | Gradient >( {
 		// a heavier refactor to avoid. See https://github.com/WordPress/gutenberg/pull/43911
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
-
-	const debounceOnChange = useDebounce( onChange, 100 );
+	const debounceOnChange: OnChangeDebouncedFunction = useDebounce(
+		onChange,
+		100
+	);
 
 	return (
 		<VStack spacing={ 3 }>
@@ -355,16 +360,13 @@ function PaletteEditListView< T extends Color | Gradient >( {
 							}
 						} }
 						onChange={ ( newElement ) => {
-							debounceOnChange(
-								elements.map(
-									( currentElement, currentIndex ) => {
-										if ( currentIndex === index ) {
-											return newElement;
-										}
-										return currentElement;
-									}
-								)
+							const newElements = elements.map(
+								( currentElement, currentIndex ) =>
+									currentIndex === index
+										? newElement
+										: currentElement
 							);
+							debounceOnChange( newElements );
 						} }
 						onRemove={ () => {
 							setEditingElement( null );
@@ -394,8 +396,6 @@ function PaletteEditListView< T extends Color | Gradient >( {
 		</VStack>
 	);
 }
-
-const EMPTY_ARRAY: Color[] = [];
 
 /**
  * Allows editing a palette of colors or gradients.
@@ -493,7 +493,7 @@ export function PaletteEdit( {
 							}
 							onClick={ () => {
 								const tempOptionId = getIdForPosition(
-									elements,
+									elements || EMPTY_ARRAY,
 									slugPrefix
 								);
 
