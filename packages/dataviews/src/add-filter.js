@@ -22,7 +22,7 @@ const {
 	DropdownMenuItemV2: DropdownMenuItem,
 } = unlock( componentsPrivateApis );
 
-export default function AddFilter( { fields, view, onChangeView } ) {
+export default function AddFilter( { fields, onChangeView } ) {
 	const filters = [];
 	fields.forEach( ( field ) => {
 		if ( ! field.type ) {
@@ -35,9 +35,6 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 					field: field.id,
 					name: field.header,
 					elements: field.elements || [],
-					isVisible: view.filters.some(
-						( f ) => f.field === field.id
-					),
 				} );
 		}
 	} );
@@ -51,7 +48,6 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 			label={ __( 'Filters' ) }
 			trigger={
 				<Button
-					disabled={ filters.length === view.filters?.length }
 					__experimentalIsFocusable
 					variant="tertiary"
 					size="compact"
@@ -61,10 +57,6 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 			}
 		>
 			{ filters.map( ( filter ) => {
-				if ( filter.isVisible ) {
-					return null;
-				}
-
 				return (
 					<DropdownSubMenu
 						key={ filter.field }
