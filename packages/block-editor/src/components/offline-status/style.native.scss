@@ -1,5 +1,5 @@
 .offline {
-	background-color: $light-ultra-dim;
+	background-color: $gray-lighten-30;
 	padding: $grid-unit;
 	justify-content: center;
 	align-items: center;
@@ -7,22 +7,22 @@
 }
 
 .offline__dark {
-	background-color: $dark-dim;
+	background-color: $gray-70;
 }
 
 .offline--text {
-	color: $light-primary;
+	color: $black;
 	padding-left: 3;
 }
 
 .offline--text__dark {
-	color: $dark-primary;
+	color: $white;
 }
 
 .offline--icon {
-	fill: $light-secondary;
+	fill: $gray-70;
 }
 
 .offline--icon__dark {
-	fill: $dark-tertiary;
+	fill: $gray-10;
 }
