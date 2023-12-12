@@ -1,9 +1,12 @@
 # Leaves a comment on a pull request with a link to test the changes in a WordPress Playground instance.
 name: OPTIONAL - Comment on a pull request with Playground details
 
+# Only trigger, when the build workflow succeeded
 on:
-    pull_request:
-        types: [opened, synchronize]
+    workflow_run:
+        workflows: ['Build Gutenberg Plugin Zip']
+        types:
+            - completed
 jobs:
     test_using_wordpress_playground:
         name: Test using WordPress Playground
