@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { Pressable, View } from 'react-native';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -12,6 +13,7 @@ import {
 	getMergedGlobalStyles,
 	useMobileGlobalStylesColors,
 	useGlobalStyles,
+	withFilters,
 } from '@wordpress/components';
 import {
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
@@ -42,20 +44,36 @@ import { useSettings } from '../use-settings';
 
 const EMPTY_ARRAY = [];
 
-// Helper function to memoize the wrapperProps since getEditWrapperProps always returns a new reference.
-const wrapperPropsCache = new WeakMap();
-const emptyObj = {};
-function getWrapperProps( value, getWrapperPropsFunction ) {
-	if ( ! getWrapperPropsFunction ) {
-		return emptyObj;
+/**
+ * Merges wrapper props with special handling for classNames and styles.
+ *
+ * @param {Object} propsA
+ * @param {Object} propsB
+ *
+ * @return {Object} Merged props.
+ */
+function mergeWrapperProps( propsA, propsB ) {
+	const newProps = {
+		...propsA,
+		...propsB,
+	};
+
+	// May be set to undefined, so check if the property is set!
+	if (
+		propsA?.hasOwnProperty( 'className' ) &&
+		propsB?.hasOwnProperty( 'className' )
+	) {
+		newProps.className = classnames( propsA.className, propsB.className );
 	}
-	const cachedValue = wrapperPropsCache.get( value );
-	if ( ! cachedValue ) {
-		const wrapperProps = getWrapperPropsFunction( value );
-		wrapperPropsCache.set( value, wrapperProps );
-		return wrapperProps;
+
+	if (
+		propsA?.hasOwnProperty( 'style' ) &&
+		propsB?.hasOwnProperty( 'style' )
+	) {
+		newProps.style = { ...propsA.style, ...propsB.style };
 	}
-	return cachedValue;
+
+	return newProps;
 }
 
 function BlockWrapper( {
@@ -136,6 +154,7 @@ function BlockListBlock( {
 	rootClientId,
 	setAttributes,
 	toggleSelection,
+	wrapperProps,
 } ) {
 	const {
 		baseGlobalStyles,
@@ -252,12 +271,11 @@ function BlockListBlock( {
 		[ blockWidth, setBlockWidth ]
 	);
 
-	// Block level styles.
-	let wrapperProps = {};
+	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType?.getEditWrapperProps ) {
-		wrapperProps = getWrapperProps(
-			attributes,
-			blockType.getEditWrapperProps
+		wrapperProps = mergeWrapperProps(
+			wrapperProps,
+			blockType.getEditWrapperProps( attributes )
 		);
 	}
 
@@ -651,5 +669,6 @@ export default compose(
 	// Block is sometimes not mounted at the right time, causing it be undefined
 	// see issue for more info
 	// https://github.com/WordPress/gutenberg/issues/17013
-	ifCondition( ( { block } ) => !! block )
+	ifCondition( ( { block } ) => !! block ),
+	withFilters( 'editor.BlockListBlock' )
 )( BlockListBlock );
