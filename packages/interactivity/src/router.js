@@ -24,6 +24,12 @@ const getRegionRootFragment = ( region ) => {
 	return regionRootFragments.get( region );
 };
 
+// Helper to check if a page can do client-side navigation.
+export const canDoClientSideNavigation = ( dom ) =>
+	dom
+		.querySelector( `meta[itemprop='wp-client-side-navigation']` )
+		?.getAttribute( 'content' ) === 'active';
+
 // Helper to remove domain and hash from the URL. We are only interesting in
 // caching the path and the query.
 const cleanUrl = ( url ) => {
@@ -40,7 +46,9 @@ const fetchPage = async ( url, { html } ) => {
 			html = await res.text();
 		}
 		const dom = new window.DOMParser().parseFromString( html, 'text/html' );
-		return regionsToVdom( dom );
+		return canDoClientSideNavigation( dom )
+			? bodyToVdom( dom )
+			: regionsToVdom( dom );
 	} catch ( e ) {
 		return false;
 	}
@@ -57,6 +65,13 @@ const regionsToVdom = ( dom ) => {
 	} );
 	const title = dom.querySelector( 'title' )?.innerText;
 	return { regions, title };
+};
+
+const bodyToVdom = ( dom ) => {
+	return {
+		body: toVdom( dom.querySelector( 'body' ) ),
+		title: dom.querySelector( 'title' )?.innerText,
+	};
 };
 
 /**
@@ -81,11 +96,17 @@ export const prefetch = ( url, options = {} ) => {
 // Render all interactive regions contained in the given page.
 const renderRegions = ( page ) => {
 	const attrName = `data-${ directivePrefix }-navigation-id`;
-	document.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
-		const id = region.getAttribute( attrName );
-		const fragment = getRegionRootFragment( region );
-		render( page.regions[ id ], fragment );
-	} );
+	if ( page.body ) {
+		const fragment = getRegionRootFragment( document.body );
+		render( page.body, fragment );
+	} else {
+		document.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
+			const id = region.getAttribute( attrName );
+			const fragment = getRegionRootFragment( region );
+			render( page.regions[ id ], fragment );
+		} );
+	}
+
 	if ( page.title ) {
 		document.title = page.title;
 	}
@@ -159,19 +180,30 @@ window.addEventListener( 'popstate', async () => {
 
 // Initialize the router with the initial DOM.
 export const init = async () => {
-	document
-		.querySelectorAll( `[data-${ directivePrefix }-interactive]` )
-		.forEach( ( node ) => {
-			if ( ! hydratedIslands.has( node ) ) {
-				const fragment = getRegionRootFragment( node );
-				const vdom = toVdom( node );
-				hydrate( vdom, fragment );
-			}
-		} );
+	if ( canDoClientSideNavigation( document ) ) {
+		const fragment = getRegionRootFragment( document.body );
+		const vdom = toVdom( document.body );
+		hydrate( vdom, fragment );
 
-	// Cache the current regions.
-	pages.set(
-		cleanUrl( window.location ),
-		Promise.resolve( regionsToVdom( document ) )
-	);
+		pages.set(
+			cleanUrl( window.location ),
+			Promise.resolve( bodyToVdom( document ) )
+		);
+	} else {
+		document
+			.querySelectorAll( `[data-${ directivePrefix }-interactive]` )
+			.forEach( ( node ) => {
+				if ( ! hydratedIslands.has( node ) ) {
+					const fragment = getRegionRootFragment( node );
+					const vdom = toVdom( node );
+					hydrate( vdom, fragment );
+				}
+			} );
+
+		// Cache the current regions.
+		pages.set(
+			cleanUrl( window.location ),
+			Promise.resolve( regionsToVdom( document ) )
+		);
+	}
 };
