@@ -1,0 +1,45 @@
+# Leaves a comment on a pull request with a link to test the changes in a WordPress Playground instance.
+name: OPTIONAL - Comment on a pull request with Playground details
+
+on:
+    pull_request:
+        types: [opened, synchronize]
+jobs:
+    test_using_wordpress_playground:
+        name: Test using WordPress Playground
+        runs-on: ubuntu-latest
+        permissions:
+            pull-requests: write
+        if: ${{ github.repository  == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        steps:
+            - name: Find Comment
+              uses: peter-evans/find-comment@v2
+              id: find-comment
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  comment-author: 'github-actions[bot]'
+                  body-includes: '<!-- pr-test-using=wordpress-playground -->'
+
+            - name: Create comment
+              if: steps.find-comment.outputs.comment-id == ''
+              uses: peter-evans/create-or-update-comment@v3
+              with:
+                  issue-number: ${{ github.event.pull_request.number }}
+                  body: |
+                      <!-- pr-test-using=wordpress-playground -->
+                      ## Test using WordPress Playground
+
+                      :link: [Test this pull request with WordPress Playground](https://playground.wordpress.net/gutenberg.html?pr=${{ github.event.number }}).
+
+                      _WordPress Playground uses the latest build of Gutenberg from this pull request. If your changes are not reflected in the Playground instance, it's likely that the most recent build isn't complete or has failed. Check the [list of workflow runs to be sure](https://github.com/WordPress/gutenberg/actions/workflows/pull-request-playground-comment.yml)._
+
+                      ### About WordPress Playground
+
+                      [WordPress Playground](https://developer.wordpress.org/playground/) is an experimental project that creates a full WordPress instance entirely within the browser.
+
+                      #### Please note:
+                      - A fresh instance is created each time you open Playground in the browser.
+                      - **All changes will be lost** when when refreshing the page or closing the window/tab running a Playground instance.
+                      - The Plugin and Theme Directories cannot be accessed within Playground.
+
+                      For more details about these limitations and more, check out [WordPress playground limitations](https://wordpress.github.io/wordpress-playground/limitations/) in the documentation.
