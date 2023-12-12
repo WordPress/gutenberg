@@ -27,7 +27,7 @@ const getNameFromLabelV1 = ( content ) => {
 };
 
 // Version without wrapper div in saved markup
-// See: https://github.com/WordPress/gutenberg/pull/XXXXX
+// See: https://github.com/WordPress/gutenberg/pull/56507
 const v1 = {
 	attributes: {
 		type: {
