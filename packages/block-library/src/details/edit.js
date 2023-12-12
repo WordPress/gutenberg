@@ -57,7 +57,7 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 						}
 					/>
 					<TextControl
-						label="Name"
+						label={ __( 'Name' ) }
 						value={ name }
 						onChange={ ( newName ) =>
 							setAttributes( { name: newName } )
