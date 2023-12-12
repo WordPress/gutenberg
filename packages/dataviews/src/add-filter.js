@@ -49,9 +49,8 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 					__experimentalIsFocusable
 					variant="tertiary"
 					size="compact"
-				>
-					<Icon icon={ funnel } style={ { flexShrink: 0 } } />
-				</Button>
+					icon={ funnel }
+				/>
 			}
 		>
 			<WithSeparators>
