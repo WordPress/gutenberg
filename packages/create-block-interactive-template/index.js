@@ -10,6 +10,7 @@ module.exports = {
 		description: 'An interactive block with the Interactivity API',
 		dashicon: 'media-interactive',
 		npmDependencies: [ '@wordpress/interactivity' ],
+		customPackageJSON: { files: [ '[^.]*' ] },
 		supports: {
 			interactivity: true,
 		},
