@@ -2,21 +2,28 @@
 name: OPTIONAL - Comment on a pull request with Playground details
 
 on:
-    pull_request:
+    pull_request_target:
         types: [opened, synchronize]
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.event_name == 'workflow_dispatch' && github.event.number || github.sha }}
+
+    cancel-in-progress: true
 jobs:
     test_using_wordpress_playground:
         name: Test using WordPress Playground
         runs-on: ubuntu-latest
         permissions:
             pull-requests: write
-        if: ${{ github.repository  == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ github.repository  == 'WordPress/gutenberg' || github.event_name == 'pull_request_target' }}
         steps:
             - name: Find Comment
               uses: peter-evans/find-comment@v2
               id: find-comment
               with:
-                  issue-number: ${{ github.event.pull_request.number }}
+                  issue-number: ${{ github.event.number }}
                   comment-author: 'github-actions[bot]'
                   body-includes: '<!-- pr-test-using=wordpress-playground -->'
 
@@ -24,7 +31,7 @@ jobs:
               if: steps.find-comment.outputs.comment-id == ''
               uses: peter-evans/create-or-update-comment@v3
               with:
-                  issue-number: ${{ github.event.pull_request.number }}
+                  issue-number: ${{ github.event.number }}
                   body: |
                       <!-- pr-test-using=wordpress-playground -->
                       ## Test this pull request with WordPress Playground
@@ -41,7 +48,7 @@ jobs:
 
                       #### Please note:
                       - A fresh instance is created each time you open Playground in the browser.
-                      - **All changes will be lost** when when refreshing the page or closing the window/tab running a Playground instance.
+                      - **All changes will be lost** when refreshing the page or closing the window/tab running a Playground instance.
                       - The Plugin and Theme Directories cannot be accessed within Playground.
 
                       For more details about these limitations and more, check out [WordPress playground limitations](https://wordpress.github.io/wordpress-playground/limitations/) in the documentation.
@@ -50,7 +57,7 @@ jobs:
               uses: peter-evans/create-or-update-comment@v3
               with:
                   comment-id: ${{ steps.find-comment.outputs.comment-id }}
-                  issue-number: ${{ github.event.pull_request.number }}
+                  issue-number: ${{ github.event.number }}
                   edit-mode: replace
                   body: |
                       <!-- pr-test-using=wordpress-playground -->
@@ -68,7 +75,7 @@ jobs:
 
                       #### Please note:
                       - A fresh instance is created each time you open Playground in the browser.
-                      - **All changes will be lost** when when refreshing the page or closing the window/tab running a Playground instance.
+                      - **All changes will be lost** when refreshing the page or closing the window/tab running a Playground instance.
                       - The Plugin and Theme Directories cannot be accessed within Playground.
 
                       For more details about these limitations and more, check out [WordPress playground limitations](https://wordpress.github.io/wordpress-playground/limitations/) in the documentation.
