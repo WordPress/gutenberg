@@ -7,6 +7,7 @@ import {
 	useInnerBlocksProps,
 	store as blockEditorStore,
 	InspectorControls,
+	InspectorAdvancedControls,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
@@ -56,18 +57,20 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 							} )
 						}
 					/>
-					<TextControl
-						label={ __( 'Name' ) }
-						value={ name }
-						onChange={ ( newName ) =>
-							setAttributes( { name: newName } )
-						}
-						help={ __(
-							'When using the name attribute to assign the same name to a group of detail elements, only one element in the set is opened at a time.'
-						) }
-					/>
 				</PanelBody>
 			</InspectorControls>
+			<InspectorAdvancedControls>
+				<TextControl
+					label={ __( 'Name attribute' ) }
+					value={ name }
+					onChange={ ( newName ) =>
+						setAttributes( { name: newName } )
+					}
+					help={ __(
+						'When using the name attribute to assign the same name to a group of detail elements, only one element in the set is opened at a time.'
+					) }
+				/>
+			</InspectorAdvancedControls>
 			<details
 				{ ...innerBlocksProps }
 				open={ hasSelection || showContent }
