@@ -7,9 +7,8 @@ import { CUSTOM_VALUE_SETTINGS, LABELS } from './utils';
 import {
 	FlexedBoxControlIcon,
 	FlexedRangeControl,
+	InputWrapper,
 } from './styles/box-control-styles';
-import { HStack } from '../h-stack';
-import { VStack } from '../v-stack';
 import type { BoxControlInputControlProps } from './types';
 
 const groupedSides = [ 'vertical', 'horizontal' ] as const;
@@ -134,7 +133,7 @@ export default function AxialInputControls( {
 	const only = first === last && first;
 
 	return (
-		<VStack className="component-box-control__vertical-horizontal-input-controls">
+		<>
 			{ filteredSides.map( ( side ) => {
 				const [ parsedQuantity, parsedUnit ] =
 					parseQuantityAndUnitFromRawValue(
@@ -145,7 +144,7 @@ export default function AxialInputControls( {
 						? selectedUnits.top
 						: selectedUnits.left;
 				return (
-					<HStack key={ `box-control-${ side }` }>
+					<InputWrapper key={ `box-control-${ side }` }>
 						<FlexedBoxControlIcon side={ side } sides={ sides } />
 						<UnitControl
 							{ ...props }
@@ -190,9 +189,9 @@ export default function AxialInputControls( {
 							value={ parsedQuantity }
 							withInputField={ false }
 						/>
-					</HStack>
+					</InputWrapper>
 				);
 			} ) }
-		</VStack>
+		</>
 	);
 }

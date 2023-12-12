@@ -7,9 +7,8 @@ import { ALL_SIDES, CUSTOM_VALUE_SETTINGS, LABELS } from './utils';
 import {
 	FlexedBoxControlIcon,
 	FlexedRangeControl,
+	InputWrapper,
 } from './styles/box-control-styles';
-import { HStack } from '../h-stack';
-import { VStack } from '../v-stack';
 import type { BoxControlInputControlProps, BoxControlValue } from './types';
 import type { UnitControlProps } from '../unit-control/types';
 
@@ -106,7 +105,7 @@ export default function BoxInputControls( {
 	const only = first === last && first;
 
 	return (
-		<VStack className="component-box-control__input-controls">
+		<>
 			{ filteredSides.map( ( side ) => {
 				const [ parsedQuantity, parsedUnit ] =
 					parseQuantityAndUnitFromRawValue( values[ side ] );
@@ -116,7 +115,7 @@ export default function BoxInputControls( {
 					: selectedUnits[ side ];
 
 				return (
-					<HStack key={ `box-control-${ side }` } expanded>
+					<InputWrapper key={ `box-control-${ side }` } expanded>
 						<FlexedBoxControlIcon side={ side } sides={ sides } />
 						<UnitControl
 							{ ...props }
@@ -157,9 +156,9 @@ export default function BoxInputControls( {
 							value={ parsedQuantity }
 							withInputField={ false }
 						/>
-					</HStack>
+					</InputWrapper>
 				);
 			} ) }
-		</VStack>
+		</>
 	);
 }

@@ -8,16 +8,12 @@ import styled from '@emotion/styled';
  */
 import BaseUnitControl from '../../unit-control';
 import BoxControlIcon from '../icon';
+import Button from '../../button';
 import { HStack } from '../../h-stack';
 import RangeControl from '../../range-control';
 import { rtl } from '../../utils';
 import { space } from '../../utils/space';
 import type { BoxUnitControlProps } from '../types';
-
-export const Root = styled.div`
-	box-sizing: border-box;
-	width: 100%;
-`;
 
 export const UnitControlWrapper = styled.div`
 	box-sizing: border-box;
@@ -25,8 +21,18 @@ export const UnitControlWrapper = styled.div`
 	max-width: 90px;
 `;
 
-export const ButtonWrapper = styled( HStack )`
-	margin-bottom: ${ space( 2 ) };
+export const InputWrapper = styled( HStack )`
+	grid-column: 1 / span 4;
+`;
+
+export const ResetButton = styled( Button )`
+	grid-area: 1 / 3;
+	justify-self: end;
+`;
+
+export const LinkedButtonWrapper = styled.div`
+	grid-area: 1 / 4;
+	justify-self: end;
 `;
 
 export const FlexedBoxControlIcon = styled( BoxControlIcon )`

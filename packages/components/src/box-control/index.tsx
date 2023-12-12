@@ -9,18 +9,17 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { BaseControl } from '../base-control';
-import Button from '../button';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import AxialInputControls from './axial-input-controls';
 import LinkedButton from './linked-button';
+import { Grid } from '../grid';
 import {
-	Root,
 	FlexedBoxControlIcon,
-	ButtonWrapper,
+	InputWrapper,
+	ResetButton,
+	LinkedButtonWrapper,
 } from './styles/box-control-styles';
-import { HStack } from '../h-stack';
-import { Spacer } from '../spacer';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
 	DEFAULT_VALUES,
@@ -155,51 +154,51 @@ function BoxControl( {
 	};
 
 	return (
-		<Root id={ id } role="group" aria-labelledby={ headingId }>
-			<HStack className="component-box-control__header" justify="start">
-				<BaseControl.VisualLabel id={ headingId }>
-					{ label }
-				</BaseControl.VisualLabel>
-				{ ( allowReset || ! hasOneSide ) && (
-					<ButtonWrapper justify="end">
-						{ allowReset && (
-							<Button
-								className="component-box-control__reset-button"
-								variant="secondary"
-								size="small"
-								onClick={ handleOnReset }
-								disabled={ ! isDirty }
-							>
-								{ __( 'Reset' ) }
-							</Button>
-						) }
-						{ ! hasOneSide && (
-							<LinkedButton
-								onClick={ toggleLinked }
-								isLinked={ isLinked }
-							/>
-						) }
-					</ButtonWrapper>
-				) }
-			</HStack>
-			<Spacer />
+		<Grid
+			id={ id }
+			columns={ 3 }
+			role="group"
+			aria-labelledby={ headingId }
+		>
+			<BaseControl.VisualLabel id={ headingId }>
+				{ label }
+			</BaseControl.VisualLabel>
 			{ isLinked && (
-				<HStack>
+				<InputWrapper>
 					<FlexedBoxControlIcon side={ side } sides={ sides } />
-
 					<AllInputControl
 						aria-label={ label }
 						{ ...inputControlProps }
 					/>
-				</HStack>
+				</InputWrapper>
 			) }
+			{ ! hasOneSide && (
+				<LinkedButtonWrapper>
+					<LinkedButton
+						onClick={ toggleLinked }
+						isLinked={ isLinked }
+					/>
+				</LinkedButtonWrapper>
+			) }
+
 			{ ! isLinked && splitOnAxis && (
 				<AxialInputControls { ...inputControlProps } />
 			) }
 			{ ! isLinked && ! splitOnAxis && (
 				<InputControls { ...inputControlProps } />
 			) }
-		</Root>
+			{ allowReset && (
+				<ResetButton
+					className="component-box-control__reset-button"
+					variant="secondary"
+					size="small"
+					onClick={ handleOnReset }
+					disabled={ ! isDirty }
+				>
+					{ __( 'Reset' ) }
+				</ResetButton>
+			) }
+		</Grid>
 	);
 }
 
