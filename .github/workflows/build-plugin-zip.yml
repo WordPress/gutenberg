@@ -229,16 +229,16 @@ jobs:
               with:
                   retries: 2
                   retry-exempt-status-codes: 418
-              script: |
-                  github.rest.actions.createWorkflowDispatch({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    workflow_id: 'pull-request-playground-comment.yml',
-                    ref: 'trunk',
-                    inputs: {
-                      pr_number: '${{ github.event.number }}'
-                    }
-                  });
+                  script: |
+                      github.rest.actions.createWorkflowDispatch({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        workflow_id: 'pull-request-playground-comment.yml',
+                        ref: 'trunk',
+                        inputs: {
+                          pr_number: '${{ github.event.number }}'
+                        }
+                      });
 
     revert-version-bump:
         name: Revert version bump if build failed
