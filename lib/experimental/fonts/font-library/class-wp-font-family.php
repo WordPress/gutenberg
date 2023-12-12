@@ -27,11 +27,9 @@ class WP_Font_Family {
 	 *
 	 * @var array
 	 */
-	// private $data;
-	public $slug;
-	public $name;
+
 	public $id;
-	public $font_family;
+	private $data;
 
 	/**
 	 * WP_Font_Family constructor.
@@ -45,9 +43,9 @@ class WP_Font_Family {
 		if ( empty( $font_data['slug'] ) ) {
 			throw new Exception( 'Font family data is missing the slug.' );
 		}
-		$this->slug = $font_data['slug'];
-		$this->name = $font_data['name'];
-		$this->font_family = $font_data['font_family'];
+
+		$this->data = $font_data;
+
 		if( isset( $font_data['id'] ) ) {
 			$this->id = $font_data['id'];
 		}
@@ -75,21 +73,13 @@ class WP_Font_Family {
 	}
 
 
-	public static function get_font_family_by_slug ( $slug ) {
-		$args = array(
-			'post_type'      => 'wp_font_family',
-			'post_name'      => $slug,
-			'name'           => $slug,
-			'posts_per_page' => 1,
-		);
+	public static function get_font_family_by_id ( $id ) {
+		$post = get_post( $id );
 
-		$posts_query = new WP_Query( $args );
-
-		if ( ! $posts_query->have_posts() ) {
+		if ( ! $post ) {
 			return null;
 		}
 
-		$post = $posts_query->posts[0];
 		$post_data = json_decode( $post->post_content, true );
 		$post_data['id'] = $post->ID;
 		return new WP_Font_Family( $post_data );
@@ -103,12 +93,7 @@ class WP_Font_Family {
 	 * @return array An array in fontFamily theme.json format.
 	 */
 	public function get_data() {
-		return array(
-			'id'   => $this->id,
-			'slug' => $this->slug,
-			'name' => $this->name,
-			'font_family' => $this->font_family,
-		);
+		return $this->data;
 	}
 
 	/**
@@ -516,8 +501,8 @@ class WP_Font_Family {
 	public function get_font_post() {
 		$args = array(
 			'post_type'      => 'wp_font_family',
-			'post_name'      => $this->slug,
-			'name'           => $this->slug,
+			'post_name'      => $this->data['slug'],
+			'name'           => $this->data['slug'],
 			'posts_per_page' => 1,
 		);
 
@@ -558,8 +543,8 @@ class WP_Font_Family {
 	 */
 	private function create_font_post() {
 		$post = array(
-			'post_title'   => $this->slug,
-			'post_name'    => $this->slug,
+			'post_title'   => $this->data['slug'],
+			'post_name'    => $this->data['slug'],
 			'post_type'    => 'wp_font_family',
 			'post_content' => $this->get_data_as_json(),
 			'post_status'  => 'publish',

@@ -39,7 +39,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<slug>[\/\w-]+)',
+			'/' . $this->rest_base . '/(?P<id>[\d]+)',
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
@@ -55,21 +55,28 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 			array(
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => array( $this, 'create_item' ),
-					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
+					'callback'            => array($this, 'create_item'),
+					'permission_callback' => array($this, 'update_font_library_permissions_check'),
 					'args'                => array(
-						'slug'       => array(
+						'data'	=> array(
 							'required' => true,
-							'type'     => 'string',
-						),
-						'name'       => array(
-							'required' => true,
-							'type'     => 'string',
-						),
-						'font_family' => array(
-							'required' => true,
-							'type'     => 'string',
-						),
+							'type'     => 'object',
+							'properties' => array(
+								'name'  => array(
+									'required' => true,
+									'type' => 'string',
+								),
+								'slug'  => array(
+									'required' => true,
+									'type' => 'string',
+								),
+								'fontFamily'  => array(
+									'required' => true,
+									'type' => 'string',
+								),
+							),
+
+						)
 					),
 				),
 				// 'schema' => array( $this, 'get_items_schema' ),
@@ -158,18 +165,24 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
  		$font_families = WP_Font_Family::get_font_families();
 		$font_family_data = array();
 		foreach ( $font_families as $font_family) {
-			$font_family_data[] = $font_family->get_data();
+			$font_family_data[] = array (
+				'id' => $font_family->id,
+				'data' => $font_family->get_data(),
+			);
 		}
 		return new WP_REST_Response( $font_family_data );
 	}
 
 	public function get_item( $request ) {
-		$slug = $request->get_param( 'slug' );
+		$id = $request->get_param( 'id' );
 
-		$font_family = WP_Font_Family::get_font_family_by_slug( $slug );
+		$font_family = WP_Font_Family::get_font_family_by_id( $id );
 
 		if($font_family) {
-			return new WP_REST_Response( $font_family->get_data() );
+			return new WP_REST_Response( array(
+				'id' => $font_family->id,
+				'data' => $font_family->get_data(),
+			) );
 		}
 
 		return new WP_Error(
@@ -193,19 +206,15 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error The updated Font Library post content.
 	 */
 	public function create_item( $request ) {
-		$slug = $request->get_param( 'slug' );
-		$name = $request->get_param( 'name' );
-		$font_family = $request->get_param( 'font_family' );
+		$font_family_data = $request->get_param( 'data' );
 
-		$font_data = array(
-			'slug' => $slug,
-			'name' => $name,
-			'font_family' => $font_family,
-		);
+		$font_family = new WP_Font_Family( $font_family_data );
+		$font_family->persist();
 
-		$font_family = new WP_Font_Family( $font_data );
-		$persist_response = $font_family->persist();
-		return new WP_REST_Response( $persist_response );
+		return new WP_REST_Response( array(
+			'id' => $font_family->id,
+			'data' => $font_family->get_data(),
+		) );
 	}
 
 

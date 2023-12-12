@@ -22,7 +22,7 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 		// $this->assertArrayHasKey( 'GET', $routes['/wp/v2/fonts/collections/(?P<id>[\/\w-]+)'][0]['methods'], 'Rest server has not the GET method for collection intialized.' );
 
 		$this->assertArrayHasKey( 'POST', $routes['/wp/v2/font-families'][0]['methods'], 'No route to create font families' );
-		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/font-families/(?P<slug>[\/\w-]+)'][0]['methods'], 'No route to get a font family' );
+		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/font-families/(?P<id>[\d]+)'][0]['methods'], 'No route to get a font family' );
 		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/all-font-families'][0]['methods'], 'No route to get font families' );
 	}
 	/**
@@ -48,14 +48,8 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 	 */
 	public function test_create_font_family_errors( $request, $expected_response ) {
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
-		if( array_key_exists( 'slug', $request ) ){
-			$install_request->set_param( 'slug', $request['slug'] );
-		}
-		if( array_key_exists( 'name', $request ) ){
-			$install_request->set_param( 'name', $request['name'] );
-		}
-		if( array_key_exists( 'font_family', $request ) ){
-			$install_request->set_param( 'font_family', $request['font_family'] );
+		if( array_key_exists( 'data', $request ) ){
+			$install_request->set_param( 'data', $request['data'] );
 		}
 
 		$response = rest_get_server()->dispatch( $install_request );
@@ -75,7 +69,7 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 				),
 				'expected_response' => array(
 					'code'    => 'rest_missing_callback_param',
-					'message' => __( 'Missing parameter(s): slug, name, font_family', 'wp-font-library' ),
+					'message' => __( 'Missing parameter(s): data', 'wp-font-library' ),
 					'data'    => array(
 						'status' => 400,
 					),
@@ -83,12 +77,14 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 			),
 			'missing slug'        => array(
 				'request' => array(
-					'name' => 'Name',
-					'font_family' => 'Font Family',
+					'data' => array(
+						'name' => 'Name',
+						'fontFamily' => 'Font Family',
+					)
 				),
 				'expected_response' => array(
-					'code'    => 'rest_missing_callback_param',
-					'message' => __( 'Missing parameter(s): slug', 'wp-font-library' ),
+					'code'    => 'rest_invalid_param',
+					'message' => __( 'Invalid parameter(s): data', 'wp-font-library' ),
 					'data'    => array(
 						'status' => 400,
 					),
@@ -96,25 +92,29 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 			),
 			'missing name'        => array(
 				'request' => array(
-					'slug' => 'slug',
-					'font_family' => 'Font Family',
+					'data' => array(
+						'slug' => 'slug',
+						'fontFamily' => 'Font Family',
+					),
 				),
 				'expected_response' => array(
-					'code'    => 'rest_missing_callback_param',
-					'message' => __( 'Missing parameter(s): name', 'wp-font-library' ),
+					'code'    => 'rest_invalid_param',
+					'message' => __( 'Invalid parameter(s): data', 'wp-font-library' ),
 					'data'    => array(
 						'status' => 400,
 					),
 				),
 			),
-			'missing font_family'        => array(
+			'missing fontFamily'        => array(
 				'request' => array(
-					'slug' => 'slug',
-					'name' => 'Name',
+					'data' => array(
+						'slug' => 'slug',
+						'name' => 'Name',
+					),
 				),
 				'expected_response' => array(
-					'code'    => 'rest_missing_callback_param',
-					'message' => __( 'Missing parameter(s): font_family', 'wp-font-library' ),
+					'code'    => 'rest_invalid_param',
+					'message' => __( 'Invalid parameter(s): data', 'wp-font-library' ),
 					'data'    => array(
 						'status' => 400,
 					),
@@ -132,16 +132,15 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 	 */
 	public function test_create_font_family( $request, $expected_response ) {
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
-		$install_request->set_param( 'slug', $request['slug'] );
-		$install_request->set_param( 'name', $request['name'] );
-		$install_request->set_param( 'font_family', $request['font_family'] );
+		$install_request->set_param( 'data', $request['data'] );
 		$response = rest_get_server()->dispatch( $install_request );
 		$response_data     = $response->get_data();
 
+
 		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
-		$this->assertSame( $expected_response['slug'], $response_data['slug'], 'The slug response did not match expected.' );
-		$this->assertSame( $expected_response['name'], $response_data['name'], 'The name response did not match expected.' );
-		$this->assertSame( $expected_response['font_family'], $response_data['font_family'], 'The font_family response did not match expected.' );
+		$this->assertSame( $expected_response['data']['slug'], $response_data['data']['slug'], 'The slug response did not match expected.' );
+		$this->assertSame( $expected_response['data']['name'], $response_data['data']['name'], 'The name response did not match expected.' );
+		$this->assertSame( $expected_response['data']['fontFamily'], $response_data['data']['fontFamily'], 'The font_family response did not match expected.' );
 		$this->assertIsInt( $response_data['id'], 'The id response did not match expected.' );
 	}
 
@@ -154,19 +153,20 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 	 */
 	public function test_get_font_family( $request, $expected_response ) {
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
-		$install_request->set_param( 'slug', $request['slug'] );
-		$install_request->set_param( 'name', $request['name'] );
-		$install_request->set_param( 'font_family', $request['font_family'] );
-	 	rest_get_server()->dispatch( $install_request );
+		$install_request->set_param( 'data', $request['data'] );
+	 	$install_response = rest_get_server()->dispatch( $install_request );
+		$install_data     = $install_response->get_data();
+		$installed_font_id = $install_data['id'];
 
-		$verify_request  = new WP_REST_Request( 'GET', '/wp/v2/font-families/' . $request['slug'] );
+		$verify_request  = new WP_REST_Request( 'GET', '/wp/v2/font-families/' . $installed_font_id );
 		$verify_response = rest_get_server()->dispatch( $verify_request );
 		$verify_data     = $verify_response->get_data();
 
+
 		$this->assertSame( 200, $verify_response->get_status(), 'The response status is not 200.' );
-		$this->assertSame( $expected_response['slug'], $verify_data['slug'], 'The slug response did not match expected.' );
-		$this->assertSame( $expected_response['name'], $verify_data['name'], 'The name response did not match expected.' );
-		$this->assertSame( $expected_response['font_family'], $verify_data['font_family'], 'The font_family response did not match expected.' );
+		$this->assertSame( $expected_response['data']['slug'], $verify_data['data']['slug'], 'The slug response did not match expected.' );
+		$this->assertSame( $expected_response['data']['name'], $verify_data['data']['name'], 'The name response did not match expected.' );
+		$this->assertSame( $expected_response['data']['fontFamily'], $verify_data['data']['fontFamily'], 'The font_family response did not match expected.' );
 		$this->assertIsInt( $verify_data['id'], 'The id response did not match expected.' );
 
 	}
@@ -180,14 +180,18 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 
 			'A Font with No Faces'      => array(
 				'request' 	    => array(
+					'data' => array(
 					'slug'      => 'arial',
 					'name'        => 'Arial',
-					'font_family' => 'Arial',
+					'fontFamily' => 'Arial',
+				)
 				),
 				'expected_response' => array(
+					'data' => array(
 					'slug'      => 'arial',
 					'name'      => 'Arial',
-					'font_family' => 'Arial',
+					'fontFamily' => 'Arial',
+					),
 				),
 			),
 		);
@@ -199,23 +203,26 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 	public function test_get_font_families() {
 		$sample_fonts = array(
 			array(
+			'data' => array(
 				'slug'      => 'arial',
 				'name'        => 'Arial',
-				'font_family' => 'Arial',
+				'fontFamily' => 'Arial',
+			),
 			),
 			array(
+			'data' => array(
 				'slug'      => 'sebastian',
 				'name'        => 'Sebastian',
-				'font_family' => 'Sebastian',
+				'fontFamily' => 'Sebastian',
+			),
 			),
 		);
 
 		foreach ($sample_fonts as $font_family) {
 			$install_request    = new WP_REST_Request('POST', '/wp/v2/font-families');
-			$install_request->set_param('slug', $font_family['slug']);
-			$install_request->set_param('name', $font_family['name']);
-			$install_request->set_param('font_family', $font_family['font_family']);
-			rest_get_server()->dispatch($install_request);
+			$install_request->set_param('data', $font_family['data']);
+			$response = rest_get_server()->dispatch($install_request);
+			$pickels = $response;
 		}
 
 		$verify_request  = new WP_REST_Request('GET', '/wp/v2/all-font-families');
@@ -225,9 +232,9 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 		$this->assertSame(200, $verify_response->get_status(), 'The response status is not 200.');
 
 		for ( $i = 0; $i < count( $sample_fonts ); $i++ ) {
-			$this->assertSame( $sample_fonts[ $i ]['slug'], $verify_data[ $i ]['slug'], 'The slug response did not match expected.' );
-			$this->assertSame( $sample_fonts[ $i ]['name'], $verify_data[ $i ]['name'], 'The name response did not match expected.' );
-			$this->assertSame( $sample_fonts[ $i ]['font_family'], $verify_data[ $i ]['font_family'], 'The font_family response did not match expected.' );
+			$this->assertSame( $sample_fonts[ $i ]['data']['slug'], $verify_data[ $i ]['data']['slug'], 'The slug response did not match expected.' );
+			$this->assertSame( $sample_fonts[ $i ]['data']['name'], $verify_data[ $i ]['data']['name'], 'The name response did not match expected.' );
+			$this->assertSame( $sample_fonts[ $i ]['data']['fontFamily'], $verify_data[ $i ]['data']['fontFamily'], 'The font_family response did not match expected.' );
 			$this->assertIsInt( $verify_data[ $i ]['id'], 'The id response did not match expected.' );
 		}
 	}
