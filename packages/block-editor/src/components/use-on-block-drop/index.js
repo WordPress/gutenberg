@@ -292,9 +292,10 @@ export default function useOnBlockDrop(
 			operation,
 			getBlockOrder,
 			getBlocksByClientId,
-			insertBlocks,
 			moveBlocksToPosition,
+			registry,
 			removeBlocks,
+			replaceBlocks,
 			targetBlockIndex,
 			targetRootClientId,
 		]
