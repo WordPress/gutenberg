@@ -6,7 +6,7 @@ import {
 	Button,
 	Icon,
 } from '@wordpress/components';
-import { chevronRightSmall, plus } from '@wordpress/icons';
+import { chevronRightSmall, funnel } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -48,7 +48,7 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 
 	return (
 		<DropdownMenu
-			label={ __( 'Add filter' ) }
+			label={ __( 'Filters' ) }
 			trigger={
 				<Button
 					disabled={ filters.length === view.filters?.length }
@@ -56,8 +56,7 @@ export default function AddFilter( { fields, view, onChangeView } ) {
 					variant="tertiary"
 					size="compact"
 				>
-					<Icon icon={ plus } style={ { flexShrink: 0 } } />
-					{ __( 'Add filter' ) }
+					<Icon icon={ funnel } style={ { flexShrink: 0 } } />
 				</Button>
 			}
 		>
