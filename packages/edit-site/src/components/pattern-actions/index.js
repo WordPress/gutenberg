@@ -59,12 +59,21 @@ export default function PatternActions( {
 		},
 		[ item?.type, item?.id ]
 	);
+	const isBlockBasedTheme = useSelect( ( select ) => {
+		return select( coreStore ).getCurrentTheme()?.is_block_theme;
+	}, [] );
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
 	const { saveEditedEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const { __experimentalDeleteReusableBlock } =
 		useDispatch( reusableBlocksStore );
+
+	// Don't show pattern actions for non-block based or hybrid themes.
+	if ( ! isBlockBasedTheme ) {
+		return null;
+	}
+
 	// Only custom patterns or custom template parts can be renamed or deleted.
 	const isUserPattern = record?.type === PATTERN_TYPES.user;
 	const isNonUserPattern = item?.type === PATTERN_TYPES.theme;
