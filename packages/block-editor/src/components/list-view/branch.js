@@ -155,10 +155,10 @@ function ListViewBranch( props ) {
 				let isNesting;
 				let isAfterDraggedBlocks;
 
-				if ( firstDraggedBlockIndex !== undefined ) {
+				if ( firstDraggedBlockIndex !== undefined && ! isDragged ) {
 					const thisBlockIndex = blockIndexes[ clientId ];
 					isAfterDraggedBlocks =
-						thisBlockIndex > firstDraggedBlockIndex && ! isDragged;
+						thisBlockIndex > firstDraggedBlockIndex;
 
 					// Determine where to displace the position of the current block, relative
 					// to the blocks being dragged (in their original position) and the drop target
@@ -171,24 +171,24 @@ function ListViewBranch( props ) {
 						// determine if the block being rendered should be displaced up or down.
 
 						if ( thisBlockIndex !== undefined ) {
-							// If the current block appears after the set of dragged blocks
-							// (in their original position), but is before the drop target,
-							// then the current block should be displaced up.
 							if (
 								thisBlockIndex >= firstDraggedBlockIndex &&
 								thisBlockIndex < blockDropTargetIndex
 							) {
+								// If the current block appears after the set of dragged blocks
+								// (in their original position), but is before the drop target,
+								// then the current block should be displaced up.
 								displacement = 'up';
-							}
-
-							// If the current block appears before the set of dragged blocks
-							// (in their original position), but is after the drop target,
-							// then the current block should be displaced down.
-							if (
+							} else if (
 								thisBlockIndex < firstDraggedBlockIndex &&
 								thisBlockIndex >= blockDropTargetIndex
 							) {
+								// If the current block appears before the set of dragged blocks
+								// (in their original position), but is after the drop target,
+								// then the current block should be displaced down.
 								displacement = 'down';
+							} else {
+								displacement = 'normal';
 							}
 						}
 
@@ -206,6 +206,8 @@ function ListViewBranch( props ) {
 							thisBlockIndex >= firstDraggedBlockIndex
 						) {
 							displacement = 'up';
+						} else {
+							displacement = 'normal';
 						}
 					}
 				}

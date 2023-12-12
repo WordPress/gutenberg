@@ -135,6 +135,11 @@
 		border-radius: 0;
 	}
 
+	&.is-displacement-normal {
+		transition: transform 0.2s;
+		transform: translateY(0);
+	}
+
 	&.is-displacement-up {
 		transition: transform 0.2s;
 		transform: translateY(-36px);
