@@ -93,7 +93,8 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			topLevelLockedBlock:
 				__unstableGetContentLockingParent( _selectedBlockClientId ) ||
 				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly' ||
-				_selectedBlockName === 'core/block'
+				( _selectedBlockName === 'core/block' &&
+					window.__experimentalPatternPartialSyncing )
 					? _selectedBlockClientId
 					: undefined ),
 		};
