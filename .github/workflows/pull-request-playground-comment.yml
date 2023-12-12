@@ -2,7 +2,7 @@
 name: OPTIONAL - Comment on a pull request with Playground details
 
 on:
-    pull_request:
+    pull_request_target:
         types: [opened, synchronize]
 jobs:
     test_using_wordpress_playground:
@@ -10,7 +10,7 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             pull-requests: write
-        if: ${{ github.repository  == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ github.repository  == 'WordPress/gutenberg' || github.event_name == 'pull_request_target' }}
         steps:
             - name: Find Comment
               uses: peter-evans/find-comment@v2
