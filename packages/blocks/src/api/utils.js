@@ -40,13 +40,22 @@ const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
 export function isUnmodifiedBlock( block ) {
 	return Object.entries( getBlockType( block.name )?.attributes ?? {} ).every(
 		( [ key, definition ] ) => {
+			const value = block.attributes[ key ];
+
 			// Every attribute that has a default must match the default.
 			if ( definition.hasOwnProperty( 'default' ) ) {
-				return block.attributes[ key ] === definition.default;
+				return value === definition.default;
 			}
 
-			// Every attribute that does not have a default must be empty.
-			return ! block.attributes[ key ]?.length;
+			// The rich text type is a bit different from the rest because it
+			// has an implicit default value of an empty RichTextData instance,
+			// so check the length of the value.
+			if ( definition.type === 'rich-text' ) {
+				return ! value?.length;
+			}
+
+			// Every attribute that doesn't have a default should be undefined.
+			return value === undefined;
 		}
 	);
 }
