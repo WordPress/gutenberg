@@ -11,6 +11,7 @@ import { useUnsupportedBlocks } from '../../utils';
 
 export default function EnhancedPaginationControl( {
 	enhancedPagination,
+	infiniteScroll,
 	setAttributes,
 	clientId,
 } ) {
@@ -40,6 +41,18 @@ export default function EnhancedPaginationControl( {
 					} );
 				} }
 			/>
+			{ enhancedPagination && (
+				<ToggleControl
+					label={ __( 'Infinite scroll' ) }
+					checked={ infiniteScroll }
+					disabled={ hasUnsupportedBlocks }
+					onChange={ ( value ) => {
+						setAttributes( {
+							infiniteScroll: value,
+						} );
+					} }
+				/>
+			) }
 		</>
 	);
 }

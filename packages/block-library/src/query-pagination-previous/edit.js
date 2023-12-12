@@ -13,14 +13,24 @@ const arrowMap = {
 export default function QueryPaginationPreviousEdit( {
 	attributes: { label },
 	setAttributes,
-	context: { paginationArrow, showLabel },
+	context: {
+		'query/infiniteScroll': hasInfiniteScroll,
+		paginationArrow,
+		showLabel,
+	},
 } ) {
+	const blockProps = useBlockProps();
+
+	if ( hasInfiniteScroll ) {
+		return null;
+	}
+
 	const displayArrow = arrowMap[ paginationArrow ];
 	return (
 		<a
 			href="#pagination-previous-pseudo-link"
 			onClick={ ( event ) => event.preventDefault() }
-			{ ...useBlockProps() }
+			{ ...blockProps }
 		>
 			{ displayArrow && (
 				<span

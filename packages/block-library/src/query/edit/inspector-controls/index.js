@@ -43,7 +43,8 @@ const { BlockInfo } = unlock( blockEditorPrivateApis );
 export default function QueryInspectorControls( props ) {
 	const { attributes, setQuery, setDisplayLayout, setAttributes, clientId } =
 		props;
-	const { query, displayLayout, enhancedPagination } = attributes;
+	const { query, displayLayout, enhancedPagination, infiniteScroll } =
+		attributes;
 	const {
 		order,
 		orderBy,
@@ -206,6 +207,7 @@ export default function QueryInspectorControls( props ) {
 						) }
 						<EnhancedPaginationControl
 							enhancedPagination={ enhancedPagination }
+							infiniteScroll={ infiniteScroll }
 							setAttributes={ setAttributes }
 							clientId={ clientId }
 						/>

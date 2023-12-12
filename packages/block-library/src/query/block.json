@@ -38,13 +38,18 @@
 		"enhancedPagination": {
 			"type": "boolean",
 			"default": false
+		},
+		"infiniteScroll": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"providesContext": {
 		"queryId": "queryId",
 		"query": "query",
 		"displayLayout": "displayLayout",
-		"enhancedPagination": "enhancedPagination"
+		"enhancedPagination": "enhancedPagination",
+		"query/infiniteScroll": "infiniteScroll"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],

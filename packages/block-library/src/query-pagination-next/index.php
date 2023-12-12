@@ -17,22 +17,29 @@
 function render_block_core_query_pagination_next( $attributes, $content, $block ) {
 	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
+	$infinite_scroll     = ! empty( $block->context['query/infiniteScroll'] );
 	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 	$max_page            = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
 
 	$wrapper_attributes = get_block_wrapper_attributes();
-	$show_label         = isset( $block->context['showLabel'] ) ? (bool) $block->context['showLabel'] : true;
-	$default_label      = __( 'Next Page' );
-	$label_text         = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? esc_html( $attributes['label'] ) : $default_label;
-	$label              = $show_label ? $label_text : '';
-	$pagination_arrow   = get_query_pagination_arrow( $block, true );
 
-	if ( ! $label ) {
-		$wrapper_attributes .= ' aria-label="' . $label_text . '"';
+	if ( $infinite_scroll ) {
+		$label = __( 'Load more' );
+	} else {
+		$show_label         = isset( $block->context['showLabel'] ) ? (bool) $block->context['showLabel'] : true;
+		$default_label      = __( 'Next Page' );
+		$label_text         = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? esc_html( $attributes['label'] ) : $default_label;
+		$label              = $show_label ? $label_text : '';
+		$pagination_arrow   = get_query_pagination_arrow( $block, true );
+
+		if ( ! $label ) {
+			$wrapper_attributes .= ' aria-label="' . $label_text . '"';
+		}
+		if ( $pagination_arrow ) {
+			$label .= $pagination_arrow;
+		}
 	}
-	if ( $pagination_arrow ) {
-		$label .= $pagination_arrow;
-	}
+
 	$content = '';
 
 	// Check if the pagination is for Query that inherits the global context.
@@ -72,7 +79,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 			)
 		) ) {
 			$p->set_attribute( 'data-wp-key', 'query-pagination-next' );
-			$p->set_attribute( 'data-wp-on--click', 'core/query::actions.navigate' );
+			$p->set_attribute( 'data-wp-on--click', $infinite_scroll ? 'core/query::actions.appendResults' : 'core/query::actions.navigate' );
 			$p->set_attribute( 'data-wp-on--mouseenter', 'core/query::actions.prefetch' );
 			$p->set_attribute( 'data-wp-watch', 'core/query::callbacks.prefetch' );
 			$content = $p->get_updated_html();

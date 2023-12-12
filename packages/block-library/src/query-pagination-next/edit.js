@@ -13,7 +13,11 @@ const arrowMap = {
 export default function QueryPaginationNextEdit( {
 	attributes: { label },
 	setAttributes,
-	context: { paginationArrow, showLabel },
+	context: {
+		'query/infiniteScroll': hasInfiniteScroll,
+		paginationArrow,
+		showLabel,
+	},
 } ) {
 	const displayArrow = arrowMap[ paginationArrow ];
 	return (
@@ -22,7 +26,8 @@ export default function QueryPaginationNextEdit( {
 			onClick={ ( event ) => event.preventDefault() }
 			{ ...useBlockProps() }
 		>
-			{ showLabel && (
+			{ hasInfiniteScroll && __( 'Load more link' ) }
+			{ ! hasInfiniteScroll && showLabel && (
 				<PlainText
 					__experimentalVersion={ 2 }
 					tagName="span"
@@ -34,7 +39,7 @@ export default function QueryPaginationNextEdit( {
 					}
 				/>
 			) }
-			{ displayArrow && (
+			{ ! hasInfiniteScroll && displayArrow && (
 				<span
 					className={ `wp-block-query-pagination-next-arrow is-arrow-${ paginationArrow }` }
 					aria-hidden={ true }

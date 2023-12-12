@@ -17,7 +17,8 @@
 		"query",
 		"paginationArrow",
 		"showLabel",
-		"enhancedPagination"
+		"enhancedPagination",
+		"query/infiniteScroll"
 	],
 	"supports": {
 		"reusable": false,

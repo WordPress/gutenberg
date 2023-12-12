@@ -13,7 +13,12 @@
 			"default": 2
 		}
 	},
-	"usesContext": [ "queryId", "query", "enhancedPagination" ],
+	"usesContext": [
+		"queryId",
+		"query",
+		"enhancedPagination",
+		"query/infiniteScroll"
+	],
 	"supports": {
 		"reusable": false,
 		"html": false,

@@ -41,8 +41,16 @@ const previewPaginationNumbers = ( midSize ) => {
 export default function QueryPaginationNumbersEdit( {
 	attributes,
 	setAttributes,
+	context,
 } ) {
+	const blockProps = useBlockProps();
+
+	if ( context[ 'query/infiniteScroll' ] ) {
+		return null;
+	}
+
 	const { midSize } = attributes;
+
 	const paginationNumbers = previewPaginationNumbers(
 		parseInt( midSize, 10 )
 	);
@@ -67,7 +75,7 @@ export default function QueryPaginationNumbersEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...useBlockProps() }>{ paginationNumbers }</div>
+			<div { ...blockProps }>{ paginationNumbers }</div>
 		</>
 	);
 }

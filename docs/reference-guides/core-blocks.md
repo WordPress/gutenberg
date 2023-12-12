@@ -704,7 +704,7 @@ An advanced block that allows displaying post types based on different query par
 -	**Name:** core/query
 -	**Category:** theme
 -	**Supports:** align (full, wide), layout, ~~html~~
--	**Attributes:** enhancedPagination, namespace, query, queryId, tagName
+-	**Attributes:** enhancedPagination, infiniteScroll, namespace, query, queryId, tagName
 
 ## No results
 

@@ -15,6 +15,10 @@
  * @return string Returns the previous posts link for the query.
  */
 function render_block_core_query_pagination_previous( $attributes, $content, $block ) {
+	if ( ! empty( $block->context['query/infiniteScroll'] ) ) {
+		return '';
+	}
+
 	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
 	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
