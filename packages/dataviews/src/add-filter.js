@@ -68,7 +68,20 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 						key={ filter.field }
 						trigger={
 							<DropdownSubMenuTrigger
-								suffix={ <Icon icon={ chevronRightSmall } /> }
+								suffix={
+									<>
+										{ activeElement &&
+											activeOperator === OPERATOR_IN &&
+											__( 'Is' ) }
+										{ activeElement &&
+											activeOperator ===
+												OPERATOR_NOT_IN &&
+											__( 'Is not' ) }
+										{ activeElement && ' ' }
+										{ activeElement?.label }
+										<Icon icon={ chevronRightSmall } />
+									</>
+								}
 							>
 								{ filter.name }
 							</DropdownSubMenuTrigger>
