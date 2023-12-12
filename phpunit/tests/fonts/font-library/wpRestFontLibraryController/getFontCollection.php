@@ -13,6 +13,7 @@
 
 class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_Font_Library_Controller_UnitTestCase {
 
+
 	/**
 	 * Register mock collections.
 	 */

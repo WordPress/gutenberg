@@ -26,7 +26,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	 * @since 6.5.0
 	 */
 	public function __construct() {
-		$this->rest_base = 'fonts';
+		$this->rest_base = 'font-families';
 		$this->namespace = 'wp/v2';
 	}
 
@@ -36,62 +36,156 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	 * @since 6.5.0
 	 */
 	public function register_routes() {
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\/\w-]+)',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
+					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
+				),
+			),
+		);
+
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base,
 			array(
 				array(
-					'methods'             => WP_REST_Server::EDITABLE,
-					'callback'            => array( $this, 'install_fonts' ),
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'create_item' ),
 					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
 					'args'                => array(
-						'font_families' => array(
-							'required'          => true,
-							'type'              => 'string',
-							'validate_callback' => array( $this, 'validate_install_font_families' ),
+						'slug'       => array(
+							'required' => true,
+							'type'     => 'string',
+						),
+						'name'       => array(
+							'required' => true,
+							'type'     => 'string',
+						),
+						'font_family' => array(
+							'required' => true,
+							'type'     => 'string',
 						),
 					),
 				),
+				// 'schema' => array( $this, 'get_items_schema' ),
 			)
 		);
 
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base,
-			array(
-				array(
-					'methods'             => WP_REST_Server::DELETABLE,
-					'callback'            => array( $this, 'uninstall_fonts' ),
-					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
-					'args'                => $this->uninstall_schema(),
-				),
-			)
-		);
 
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/collections',
-			array(
-				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_font_collections' ),
-					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
-				),
-			)
-		);
 
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/collections' . '/(?P<id>[\/\w-]+)',
-			array(
-				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_font_collection' ),
-					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
-				),
-			)
-		);
+
+
+
+
+
+		// register_rest_route(
+		// 	$this->namespace,
+		// 	'/' . $this->rest_base,
+		// 	array(
+		// 		array(
+		// 			'methods'             => WP_REST_Server::EDITABLE,
+		// 			'callback'            => array( $this, 'install_fonts' ),
+		// 			'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
+		// 			'args'                => array(
+		// 				'font_families' => array(
+		// 					'required'          => true,
+		// 					'type'              => 'string',
+		// 					'validate_callback' => array( $this, 'validate_install_font_families' ),
+		// 				),
+		// 			),
+		// 		),
+		// 	)
+		// );
+
+		// register_rest_route(
+		// 	$this->namespace,
+		// 	'/' . $this->rest_base,
+		// 	array(
+		// 		array(
+		// 			'methods'             => WP_REST_Server::DELETABLE,
+		// 			'callback'            => array( $this, 'uninstall_fonts' ),
+		// 			'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
+		// 			'args'                => $this->uninstall_schema(),
+		// 		),
+		// 	)
+		// );
+
+		// register_rest_route(
+		// 	$this->namespace,
+		// 	'/' . $this->rest_base . '/collections',
+		// 	array(
+		// 		array(
+		// 			'methods'             => WP_REST_Server::READABLE,
+		// 			'callback'            => array( $this, 'get_font_collections' ),
+		// 			'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
+		// 		),
+		// 	)
+		// );
+
+		// register_rest_route(
+		// 	$this->namespace,
+		// 	'/' . $this->rest_base . '/collections' . '/(?P<id>[\/\w-]+)',
+		// 	array(
+		// 		array(
+		// 			'methods'             => WP_REST_Server::READABLE,
+		// 			'callback'            => array( $this, 'get_font_collection' ),
+		// 			'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
+		// 		),
+		// 	)
+		// );
 	}
+
+	public function get_item( $request ) {
+		$id_or_slug = $request->get_param( 'id' );
+
+		$font_family = WP_Font_Family::get_font_family_by_slug( $id_or_slug );
+
+
+		if($font_family) {
+			return new WP_REST_Response( $font_family->get_data() );
+		}
+
+		return new WP_Error(
+			'rest_font_family_not_found',
+			__( 'Font Family not found.', 'gutenberg' ),
+			array( 'status' => 404 )
+		);
+
+	}
+
+	/**
+	 * Installs new fonts.
+	 *
+	 * Takes a request containing new fonts to install, downloads their assets, and adds them
+	 * to the Font Library.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_REST_Request $request The request object containing the new fonts to install
+	 *                                 in the request parameters.
+	 * @return WP_REST_Response|WP_Error The updated Font Library post content.
+	 */
+	public function create_item( $request ) {
+		$slug = $request->get_param( 'slug' );
+		$name = $request->get_param( 'name' );
+		$font_family = $request->get_param( 'font_family' );
+
+		$font_data = array(
+			'slug' => $slug,
+			'name' => $name,
+			'font_family' => $font_family,
+		);
+
+		$font_family = new WP_Font_Family( $font_data );
+		$persist_response = $font_family->persist();
+		return new WP_REST_Response( $persist_response );
+	}
+
 
 	/**
 	 * Gets a font collection.
