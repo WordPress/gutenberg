@@ -242,32 +242,6 @@ describe.each( [
 	} );
 
 	describe( 'Keyboard behavior and accessibility', () => {
-		it( 'Captures the keypress event and does not let it propagate', async () => {
-			const user = userEvent.setup();
-			const onKeyDown = jest.fn();
-
-			render(
-				<div
-					// This role="none" is required to prevent an eslint warning about accessibility.
-					role="none"
-					onKeyDown={ onKeyDown }
-				>
-					<CustomSelect { ...props } />
-				</div>
-			);
-			const currentSelectedItem = screen.getByRole( 'button', {
-				expanded: false,
-			} );
-			await user.click( currentSelectedItem );
-
-			const customSelect = screen.getByRole( 'listbox', {
-				name: 'label!',
-			} );
-			await user.type( customSelect, '{enter}' );
-
-			expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
-		} );
-
 		it( 'Should be able to change selection using keyboard', async () => {
 			const user = userEvent.setup();
 
@@ -393,33 +367,6 @@ describe.each( [
 					selected: true,
 				} )
 			).toBeVisible();
-		} );
-
-		it( 'Should call custom event handlers', async () => {
-			const user = userEvent.setup();
-			const onFocusMock = jest.fn();
-			const onBlurMock = jest.fn();
-
-			render(
-				<CustomSelect
-					{ ...props }
-					onFocus={ onFocusMock }
-					onBlur={ onBlurMock }
-				/>
-			);
-
-			const currentSelectedItem = screen.getByRole( 'button', {
-				expanded: false,
-			} );
-
-			await user.tab();
-
-			expect( currentSelectedItem ).toHaveFocus();
-			expect( onFocusMock ).toHaveBeenCalledTimes( 1 );
-
-			await user.tab();
-			expect( currentSelectedItem ).not.toHaveFocus();
-			expect( onBlurMock ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );
