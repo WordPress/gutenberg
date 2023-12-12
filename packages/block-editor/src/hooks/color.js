@@ -36,8 +36,8 @@ import { store as blockEditorStore } from '../store';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
-const hasColorSupport = ( blockType ) => {
-	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+const hasColorSupport = ( blockNameOrType ) => {
+	const colorSupport = getBlockSupport( blockNameOrType, COLOR_SUPPORT_KEY );
 	return (
 		colorSupport &&
 		( colorSupport.link === true ||
@@ -61,8 +61,8 @@ const hasLinkColorSupport = ( blockType ) => {
 	);
 };
 
-const hasGradientSupport = ( blockType ) => {
-	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+const hasGradientSupport = ( blockNameOrType ) => {
+	const colorSupport = getBlockSupport( blockNameOrType, COLOR_SUPPORT_KEY );
 
 	return (
 		colorSupport !== null &&
@@ -126,27 +126,31 @@ function addAttributes( settings ) {
 /**
  * Override props assigned to save component to inject colors classnames.
  *
- * @param {Object} props      Additional props applied to save element.
- * @param {Object} blockType  Block type.
- * @param {Object} attributes Block attributes.
+ * @param {Object}        props           Additional props applied to save element.
+ * @param {Object|string} blockNameOrType Block type.
+ * @param {Object}        attributes      Block attributes.
  *
  * @return {Object} Filtered props applied to save element.
  */
-export function addSaveProps( props, blockType, attributes ) {
+export function addSaveProps( props, blockNameOrType, attributes ) {
 	if (
-		! hasColorSupport( blockType ) ||
-		shouldSkipSerialization( blockType, COLOR_SUPPORT_KEY )
+		! hasColorSupport( blockNameOrType ) ||
+		shouldSkipSerialization( blockNameOrType, COLOR_SUPPORT_KEY )
 	) {
 		return props;
 	}
 
-	const hasGradient = hasGradientSupport( blockType );
+	const hasGradient = hasGradientSupport( blockNameOrType );
 
 	// I'd have preferred to avoid the "style" attribute usage here
 	const { backgroundColor, textColor, gradient, style } = attributes;
 
 	const shouldSerialize = ( feature ) =>
-		! shouldSkipSerialization( blockType, COLOR_SUPPORT_KEY, feature );
+		! shouldSkipSerialization(
+			blockNameOrType,
+			COLOR_SUPPORT_KEY,
+			feature
+		);
 
 	// Primary color classes must come before the `has-text-color`,
 	// `has-background` and `has-link-color` classes to maintain backwards
@@ -190,33 +194,6 @@ export function addSaveProps( props, blockType, attributes ) {
 	props.className = newClassName ? newClassName : undefined;
 
 	return props;
-}
-
-/**
- * Filters registered block settings to extend the block edit wrapper
- * to apply the desired styles and classnames properly.
- *
- * @param {Object} settings Original block settings.
- *
- * @return {Object} Filtered block settings.
- */
-export function addEditProps( settings ) {
-	if (
-		! hasColorSupport( settings ) ||
-		shouldSkipSerialization( settings, COLOR_SUPPORT_KEY )
-	) {
-		return settings;
-	}
-	const existingGetEditWrapperProps = settings.getEditWrapperProps;
-	settings.getEditWrapperProps = ( attributes ) => {
-		let props = {};
-		if ( existingGetEditWrapperProps ) {
-			props = existingGetEditWrapperProps( attributes );
-		}
-		return addSaveProps( props, settings, attributes );
-	};
-
-	return settings;
 }
 
 function styleToAttributes( style ) {
@@ -364,7 +341,13 @@ function ColorEditPure( { clientId, name, setAttributes, settings } ) {
 // and not the whole attributes object.
 export const ColorEdit = pure( ColorEditPure );
 
-function useBlockProps( { name, backgroundColor, textColor } ) {
+function useBlockProps( {
+	name,
+	backgroundColor,
+	textColor,
+	gradient,
+	style,
+} ) {
 	const [ userPalette, themePalette, defaultPalette ] = useSettings(
 		'color.palette.custom',
 		'color.palette.theme',
@@ -406,12 +389,17 @@ function useBlockProps( { name, backgroundColor, textColor } ) {
 		)?.color;
 	}
 
-	return { style: extraStyles };
+	return addSaveProps( { style: extraStyles }, name, {
+		textColor,
+		backgroundColor,
+		gradient,
+		style,
+	} );
 }
 
 export default {
 	useBlockProps,
-	attributeKeys: [ 'backgroundColor', 'textColor' ],
+	attributeKeys: [ 'backgroundColor', 'textColor', 'gradient', 'style' ],
 	hasSupport: hasColorSupport,
 };
 
@@ -453,12 +441,6 @@ addFilter(
 	'blocks.getSaveContent.extraProps',
 	'core/color/addSaveProps',
 	addSaveProps
-);
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/color/addEditProps',
-	addEditProps
 );
 
 addFilter(

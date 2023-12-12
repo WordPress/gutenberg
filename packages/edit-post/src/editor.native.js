@@ -9,7 +9,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { EditorProvider, store as editorStore } from '@wordpress/editor';
+import { EditorProvider } from '@wordpress/editor';
 import { parse, serialize, store as blocksStore } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -195,12 +195,9 @@ export default compose( [
 		const { isFeatureActive, getEditorMode, getHiddenBlockTypes } =
 			select( editPostStore );
 		const { getBlockTypes } = select( blocksStore );
-		const { getDeviceType } = select( editorStore );
 
 		return {
-			hasFixedToolbar:
-				isFeatureActive( 'fixedToolbar' ) ||
-				getDeviceType() !== 'Desktop',
+			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 			focusMode: isFeatureActive( 'focusMode' ),
 			mode: getEditorMode(),
 			hiddenBlockTypes: getHiddenBlockTypes(),

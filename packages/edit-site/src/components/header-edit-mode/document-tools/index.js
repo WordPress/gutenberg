@@ -42,13 +42,11 @@ export default function DocumentTools( {
 		useSelect( ( select ) => {
 			const { isInserterOpened, isListViewOpened, getEditorMode } =
 				select( editSiteStore );
-			const { getDeviceType } = select( editorStore );
 			const { getShortcutRepresentation } = select(
 				keyboardShortcutsStore
 			);
 
 			return {
-				deviceType: getDeviceType(),
 				isInserterOpen: isInserterOpened(),
 				isListViewOpen: isListViewOpened(),
 				listViewShortcut: getShortcutRepresentation(
