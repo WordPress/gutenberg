@@ -28,7 +28,7 @@ The `value` property is handled in a manner similar to controlled form component
 	onMouseLeave: '(function) Function to call when onMouseLeave is triggered on token.'
 }
 ```
-
+-   `label` - If this property is added, a label will be generated using label property as the content.
 -   `displayTransform` - Function to call to transform tokens for display. (In
     the editor, this is needed to decode HTML entities embedded in tags -
     otherwise entities like `&` in tag names are double-encoded like `&amp;`,
