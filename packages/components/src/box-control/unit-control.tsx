@@ -6,7 +6,7 @@ import { useHover } from '@use-gesture/react';
 /**
  * Internal dependencies
  */
-import BaseTooltip from '../tooltip';
+import Tooltip from '../tooltip';
 import { UnitControlWrapper, UnitControl } from './styles/box-control-styles';
 import type { BoxUnitControlProps } from './types';
 
@@ -32,7 +32,7 @@ export default function BoxUnitControl( {
 
 	return (
 		<UnitControlWrapper { ...bindHoverGesture() }>
-			<Tooltip text={ label }>
+			<Tooltip placement="top" text={ label }>
 				<UnitControl
 					aria-label={ label }
 					className="component-box-control__unit-control"
@@ -46,29 +46,5 @@ export default function BoxUnitControl( {
 				/>
 			</Tooltip>
 		</UnitControlWrapper>
-	);
-}
-
-function Tooltip( {
-	children,
-	text,
-}: {
-	children: JSX.Element;
-	text?: string;
-} ) {
-	if ( ! text ) return children;
-
-	/**
-	 * Wrapping the children in a `<div />` as Tooltip as it attempts
-	 * to render the <UnitControl />. Using a plain `<div />` appears to
-	 * resolve this issue.
-	 *
-	 * Originally discovered and referenced here:
-	 * https://github.com/WordPress/gutenberg/pull/24966#issuecomment-685875026
-	 */
-	return (
-		<BaseTooltip text={ text } placement="top">
-			<div>{ children }</div>
-		</BaseTooltip>
 	);
 }
