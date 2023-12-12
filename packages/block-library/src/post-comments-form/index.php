@@ -174,9 +174,15 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 		}
 	}
 
-	$view_asset = 'wp-block-post-comments-form-view';
-	if ( ! wp_script_is( $view_asset ) ) {
-		$script_handles = $block->block_type->view_script_handles;
+	$is_gutenberg_plugin = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
+	$view_asset          = 'wp-block-post-comments-form-view';
+	$script_handles      = $block->block_type->view_script_handles;
+
+	if ( $is_gutenberg_plugin ) {
+		gutenberg_enqueue_module( '@wordpress/block-library/post-comments-form' );
+		// Remove the view script because we are using the module.
+		$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
+	} elseif ( ! wp_script_is( $view_asset ) ) {
 		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
 		if ( ! $enhanced_submission && in_array( $view_asset, $script_handles, true ) ) {
 			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
@@ -207,6 +213,15 @@ function register_block_core_post_comments_form() {
 			'render_callback' => 'render_block_core_post_comments_form',
 		)
 	);
+
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		gutenberg_register_module(
+			'@wordpress/block-library/post-comments-form',
+			'/wp-content/plugins/gutenberg/build/interactivity/comments.min.js',
+			array( '@wordpress/interactivity' ),
+			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+		);
+	}
 }
 add_action( 'init', 'register_block_core_post_comments_form' );
 
