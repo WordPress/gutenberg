@@ -35,6 +35,7 @@ function InstalledFonts() {
 		refreshLibrary,
 		uninstallFont,
 		isResolvingLibrary,
+		getActivatedNotInstalledFonts,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
 
@@ -75,6 +76,8 @@ function InstalledFonts() {
 
 	const shouldDisplayDeleteButton =
 		!! libraryFontSelected && libraryFontSelected?.source !== 'theme';
+
+	const activatedNotInstalledFonts = getActivatedNotInstalledFonts();
 
 	useEffect( () => {
 		refreshLibrary();
@@ -129,10 +132,27 @@ function InstalledFonts() {
 			{ ! libraryFontSelected && (
 				<>
 					{ isResolvingLibrary && <Spinner /> }
+					{ activatedNotInstalledFonts.length > 0 && (
+						<>
+							<Spacer margin={ 2 } />
+							<FontsGrid title="Fonts missing variants">
+								{ activatedNotInstalledFonts.map( ( font ) => (
+									<LibraryFontCard
+										font={ font }
+										key={ font.slug }
+										onClick={ () => {
+											handleSelectFont( font );
+										} }
+									/>
+								) ) }
+							</FontsGrid>
+							<Spacer margin={ 8 } />
+						</>
+					) }
 					{ baseCustomFonts.length > 0 && (
 						<>
 							<Spacer margin={ 2 } />
-							<FontsGrid>
+							<FontsGrid title="Custom Fonts">
 								{ baseCustomFonts.map( ( font ) => (
 									<LibraryFontCard
 										font={ font }
