@@ -3,6 +3,11 @@
  */
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
+/**
+ * WordPress dependencies
+ */
+import { useEffect, useState } from '@wordpress/element';
+
 const { RNReactNativeGutenbergBridge } = NativeModules;
 const isIOS = Platform.OS === 'ios';
 const isAndroid = Platform.OS === 'android';
@@ -183,6 +188,49 @@ export function subscribeOnUndoPressed( callback ) {
 
 export function subscribeOnRedoPressed( callback ) {
 	return gutenbergBridgeEvents.addListener( 'onRedoPressed', callback );
+}
+
+export function useIsConnected() {
+	const [ isConnected, setIsConnected ] = useState( null );
+
+	useEffect( () => {
+		let isCurrent = true;
+
+		RNReactNativeGutenbergBridge.requestConnectionStatus(
+			( isBridgeConnected ) => {
+				if ( ! isCurrent ) {
+					return;
+				}
+
+				setIsConnected( isBridgeConnected );
+			}
+		);
+
+		return () => {
+			isCurrent = false;
+		};
+	}, [] );
+
+	useEffect( () => {
+		const subscription = subscribeConnectionStatus(
+			( { isConnected: isBridgeConnected } ) => {
+				setIsConnected( isBridgeConnected );
+			}
+		);
+
+		return () => {
+			subscription.remove();
+		};
+	}, [] );
+
+	return { isConnected };
+}
+
+function subscribeConnectionStatus( callback ) {
+	return gutenbergBridgeEvents.addListener(
+		'connectionStatusChange',
+		callback
+	);
 }
 
 /**

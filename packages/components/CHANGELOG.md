@@ -13,7 +13,7 @@
 -   `FontSizePicker`: Add opt-in prop for 40px default size ([#56804](https://github.com/WordPress/gutenberg/pull/56804)).
 
 ### Bug Fix
-
+-   `PaletteEdit`: temporary custom gradient not saving ([#56896](https://github.com/WordPress/gutenberg/pull/56896)).
 -   `ToggleGroupControl`: react correctly to external controlled updates ([#56678](https://github.com/WordPress/gutenberg/pull/56678)).
 -   `ToolsPanel`: fix a performance issue ([#56770](https://github.com/WordPress/gutenberg/pull/56770)).
 -   `BorderControl`: adjust `BorderControlDropdown` Button size to fix misaligned border ([#56730](https://github.com/WordPress/gutenberg/pull/56730)).
@@ -29,6 +29,11 @@
 ### Experimental
 
 -   `Tabs`: improve focus handling in controlled mode ([#56658](https://github.com/WordPress/gutenberg/pull/56658)).
+
+### Documentation
+
+-   `Search`: Added links to storybook for more information on usage. ([#56815](https://github.com/WordPress/gutenberg/pull/56815)).
+-   `Spinner`: Added links to storybook for more information on usage. ([#56953](https://github.com/WordPress/gutenberg/pull/56953)).
 
 ## 25.13.0 (2023-11-29)
 

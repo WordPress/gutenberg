@@ -269,20 +269,20 @@ export function omitStyle( style, paths, preserveReference = false ) {
 /**
  * Override props assigned to save component to inject the CSS variables definition.
  *
- * @param {Object}                    props      Additional props applied to save element.
- * @param {Object}                    blockType  Block type.
- * @param {Object}                    attributes Block attributes.
- * @param {?Record<string, string[]>} skipPaths  An object of keys and paths to skip serialization.
+ * @param {Object}                    props           Additional props applied to save element.
+ * @param {Object|string}             blockNameOrType Block type.
+ * @param {Object}                    attributes      Block attributes.
+ * @param {?Record<string, string[]>} skipPaths       An object of keys and paths to skip serialization.
  *
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps(
 	props,
-	blockType,
+	blockNameOrType,
 	attributes,
 	skipPaths = skipSerializationPathsSave
 ) {
-	if ( ! hasStyleSupport( blockType ) ) {
+	if ( ! hasStyleSupport( blockNameOrType ) ) {
 		return props;
 	}
 
@@ -290,7 +290,7 @@ export function addSaveProps(
 	Object.entries( skipPaths ).forEach( ( [ indicator, path ] ) => {
 		const skipSerialization =
 			skipSerializationPathsSaveChecks[ indicator ] ||
-			getBlockSupport( blockType, indicator );
+			getBlockSupport( blockNameOrType, indicator );
 
 		if ( skipSerialization === true ) {
 			style = omitStyle( style, path );
@@ -310,37 +310,6 @@ export function addSaveProps(
 	};
 
 	return props;
-}
-
-/**
- * Filters registered block settings to extend the block edit wrapper
- * to apply the desired styles and classnames properly.
- *
- * @param {Object} settings Original block settings.
- *
- * @return {Object}.Filtered block settings.
- */
-export function addEditProps( settings ) {
-	if ( ! hasStyleSupport( settings ) ) {
-		return settings;
-	}
-
-	const existingGetEditWrapperProps = settings.getEditWrapperProps;
-	settings.getEditWrapperProps = ( attributes ) => {
-		let props = {};
-		if ( existingGetEditWrapperProps ) {
-			props = existingGetEditWrapperProps( attributes );
-		}
-
-		return addSaveProps(
-			props,
-			settings,
-			attributes,
-			skipSerializationPathsEdit
-		);
-	};
-
-	return settings;
 }
 
 function BlockStyleControls( {
@@ -472,7 +441,13 @@ function useBlockProps( { name, style } ) {
 	}, [ baseElementSelector, blockElementStyles, name ] );
 
 	useStyleOverride( { css: styles } );
-	return { className: blockElementsContainerIdentifier };
+
+	return addSaveProps(
+		{ className: blockElementsContainerIdentifier },
+		name,
+		{ style },
+		skipSerializationPathsEdit
+	);
 }
 
 addFilter(
@@ -485,10 +460,4 @@ addFilter(
 	'blocks.getSaveContent.extraProps',
 	'core/style/addSaveProps',
 	addSaveProps
-);
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/style/addEditProps',
-	addEditProps
 );

@@ -253,10 +253,13 @@ function BlockListBlock( {
 	);
 
 	// Block level styles.
-	const wrapperProps = getWrapperProps(
-		attributes,
-		blockType.getEditWrapperProps
-	);
+	let wrapperProps = {};
+	if ( blockType?.getEditWrapperProps ) {
+		wrapperProps = getWrapperProps(
+			attributes,
+			blockType.getEditWrapperProps
+		);
+	}
 
 	// Inherited styles merged with block level styles.
 	const mergedStyle = useMemo( () => {

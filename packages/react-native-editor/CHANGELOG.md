@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 -   [*] [internal] Move InserterButton from components package to block-editor package [#56494]
 -   [*] [internal] Move ImageLinkDestinationsScreen from components package to block-editor package [#56775]
+-   [*] Fix crash when blockType wrapperProps are not defined [#56846]
 -   [*] Guard against an Image block styles crash due to null block values [#56903]
 -   [**] Fix crash when sharing unsupported media types on Android [#56791]
 

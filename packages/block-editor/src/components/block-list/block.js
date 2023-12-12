@@ -54,10 +54,18 @@ function mergeWrapperProps( propsA, propsB ) {
 		...propsB,
 	};
 
-	if ( propsA?.className && propsB?.className ) {
+	// May be set to undefined, so check if the property is set!
+	if (
+		propsA?.hasOwnProperty( 'className' ) &&
+		propsB?.hasOwnProperty( 'className' )
+	) {
 		newProps.className = classnames( propsA.className, propsB.className );
 	}
-	if ( propsA?.style && propsB?.style ) {
+
+	if (
+		propsA?.hasOwnProperty( 'style' ) &&
+		propsB?.hasOwnProperty( 'style' )
+	) {
 		newProps.style = { ...propsA.style, ...propsB.style };
 	}
 
