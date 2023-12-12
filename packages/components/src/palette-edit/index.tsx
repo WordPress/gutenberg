@@ -58,11 +58,10 @@ import type {
 	PaletteEditListViewProps,
 	PaletteEditProps,
 	PaletteElement,
-	OnChangeDebouncedFunction,
 } from './types';
 
 export const DEFAULT_COLOR = '#000';
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: Color[] = [];
 
 function NameInput( { value, onChange, label }: NameInputProps ) {
 	return (
@@ -323,7 +322,7 @@ function PaletteEditListView< T extends Color | Gradient >( {
 					.filter(
 						( element ) => ! isDefaultElement( slugPrefix, element )
 					)
-					.map( ( element, index, arr ) => {
+					.map( ( element, index ) => {
 						element.name =
 							element?.name ||
 							( !! element.gradient
@@ -346,10 +345,8 @@ function PaletteEditListView< T extends Color | Gradient >( {
 		// a heavier refactor to avoid. See https://github.com/WordPress/gutenberg/pull/43911
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
-	const debounceOnChange: OnChangeDebouncedFunction = useDebounce(
-		onChange,
-		100
-	);
+
+	const debounceOnChange = useDebounce( onChange, 100 );
 
 	return (
 		<VStack spacing={ 3 }>
@@ -499,7 +496,7 @@ export function PaletteEdit( {
 							}
 							onClick={ () => {
 								const tempOptionId = getIdForPosition(
-									elements || EMPTY_ARRAY,
+									elements || [],
 									slugPrefix
 								);
 

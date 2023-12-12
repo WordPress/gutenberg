@@ -127,7 +127,7 @@ export type OptionProps< T extends Color | Gradient > = {
 
 export type PaletteEditListViewProps< T extends Color | Gradient > = {
 	elements: T[];
-	onChange: ( newElements: T[] ) => void;
+	onChange: ( newElements: T[] | undefined ) => void;
 	isGradient: T extends Gradient ? true : false;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	editingElement?: EditingElement;
@@ -135,5 +135,3 @@ export type PaletteEditListViewProps< T extends Color | Gradient > = {
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
 	slugPrefix: string;
 };
-
-export type OnChangeDebouncedFunction = ( arr: PaletteElement[] ) => void;
