@@ -271,9 +271,8 @@ function InserterMenu(
 						showMedia={ showMedia }
 						prioritizePatterns={ prioritizePatterns }
 						onSelect={ handleSetSelectedTab }
-					>
-						{ inserterTabsContents }
-					</InserterTabs>
+						tabsContents={ inserterTabsContents }
+					/>
 				) }
 				{ ! delayedFilterValue && ! showAsTabs && (
 					<div className="block-editor-inserter__no-tab-container">

@@ -30,11 +30,11 @@ const mediaTab = {
 };
 
 function InserterTabs( {
-	children,
 	showPatterns = false,
 	showMedia = false,
 	onSelect,
 	prioritizePatterns,
+	tabsContents,
 } ) {
 	const tabs = useMemo( () => {
 		const tempTabs = [];
@@ -67,7 +67,7 @@ function InserterTabs( {
 						tabId={ tab.name }
 						focusable={ false }
 					>
-						{ children[ tab.name ] }
+						{ tabsContents[ tab.name ] }
 					</Tabs.TabPanel>
 				) ) }
 			</Tabs>
