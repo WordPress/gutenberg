@@ -397,9 +397,9 @@ function BackgroundSizePanelItem( { clientId, setAttributes } ) {
 					label={ __( 'Contain' ) }
 				/>
 				<ToggleGroupControlOption
-					key={ 'fixed' }
-					value={ 'fixed' }
-					label={ __( 'Fixed' ) }
+					key={ 'repeat' }
+					value={ 'auto' }
+					label={ __( 'Repeat' ) }
 				/>
 			</ToggleGroupControl>
 		</ToolsPanelItem>
