@@ -55,6 +55,11 @@ test.describe( 'Global styles revisions', () => {
 			name: /^Changes saved by /,
 		} );
 
+		// Shows changes made in the revision.
+		await expect(
+			page.getByTestId( 'global-styles-revision-changes' )
+		).toHaveText( 'Colors' );
+
 		// There should be 2 revisions not including the reset to theme defaults button.
 		await expect( revisionButtons ).toHaveCount(
 			currentRevisions.length + 1

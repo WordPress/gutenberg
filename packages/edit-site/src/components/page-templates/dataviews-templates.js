@@ -83,7 +83,7 @@ function TemplateTitle( { item } ) {
 	const { isCustomized } = useAddedBy( item.type, item.id );
 	return (
 		<VStack spacing={ 1 }>
-			<View as="h3">
+			<View as="span" className="edit-site-list-title__customized-info">
 				<Link
 					params={ {
 						postId: item.id,
