@@ -242,12 +242,14 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 	 */
 	public function delete_item( $request ) {
 		$id = $request->get_param( 'id' );
+		$force = $request->get_param( 'force' ) || true;
 
 		$font_family = WP_Font_Family::get_font_family_by_id( $id );
 
 		if($font_family) {
-			$font_family->uninstall();
+			$font_family->uninstall( $force );
 			return new WP_REST_Response( array(
+				'deleted' => $force,
 				'previous' => array(
 					'id' => $font_family->id,
 					'data' => $font_family->get_data(),

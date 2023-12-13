@@ -164,12 +164,14 @@ class WP_Font_Family {
 	 *
 	 * @since 6.5.0
 	 *
+	 * @param bool $force Whether to force the deletion and bypass trass.
+	 *
 	 * @return bool|WP_Error True if the font family was uninstalled, WP_Error otherwise.
 	 */
-	public function uninstall() {
+	public function uninstall( $force ) {
 		if (
 			! $this->remove_font_family_assets() ||
-			! wp_delete_post( $this->id, true )
+			! wp_delete_post( $this->id, $force )
 		) {
 			return new WP_Error(
 				'font_family_not_deleted',

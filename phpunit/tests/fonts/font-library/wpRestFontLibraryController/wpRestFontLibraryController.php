@@ -196,7 +196,8 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 		$install_data     = $install_response->get_data();
 		$installed_font_id = $install_data['id'];
 
-		$delete_request  = new WP_REST_Request( 'DELETE', '/wp/v2/delete-font-families/' . $installed_font_id );
+		//TODO: adding  . '?force=true' to the end doesn't work like it is supposed to.
+		$delete_request  = new WP_REST_Request( 'DELETE', '/wp/v2/delete-font-families/' . $installed_font_id);
 		$delete_response = rest_get_server()->dispatch( $delete_request );
 		$delete_data     = $delete_response->get_data();
 
@@ -205,6 +206,7 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 		$this->assertSame( $font_family['name'], $delete_data['previous']['data']['name'], 'The name response did not match expected.' );
 		$this->assertSame( $font_family['fontFamily'], $delete_data['previous']['data']['fontFamily'], 'The font_family response did not match expected.' );
 		$this->assertIsInt( $delete_data['previous']['id'], 'The id response did not match expected.' );
+		$this->assertTrue( $delete_data['deleted'], 'The response did not flag deleted status as expected.' );
 
 		$verify_request  = new WP_REST_Request( 'GET', '/wp/v2/font-families/' . $installed_font_id );
 		$verify_response = rest_get_server()->dispatch( $verify_request );
@@ -212,6 +214,7 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 		$this->assertSame( 404, $verify_response->get_status(), 'The response status is not 200.' );
 
 	}
+
 	/**
 	 * Data provider for test_install_fonts
 	 */
