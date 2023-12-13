@@ -88,6 +88,7 @@ export type LegacyCustomSelectProps = {
 	 * Can be used to externally control the value of the control.
 	 */
 	value?: Option;
+	__experimentalShowSelectedHint?: boolean;
 };
 
 export type CustomSelectItemProps = {

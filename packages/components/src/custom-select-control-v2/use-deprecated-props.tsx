@@ -10,19 +10,40 @@ import { CustomSelectItem } from '.';
 import type { CustomSelectProps, LegacyCustomSelectProps } from './types';
 
 function isLegacyProps( props: any ): props is LegacyCustomSelectProps {
-	return typeof props.options !== 'undefined';
+	return (
+		typeof props.options !== 'undefined' ||
+		props.__experimentalShowSelectedHint !== undefined
+	);
 }
 
-const transformOptionsToChildren = (
-	options: LegacyCustomSelectProps[ 'options' ]
-) => {
-	if ( options === undefined ) {
+const transformOptionsToChildren = ( props: LegacyCustomSelectProps ) => {
+	if ( props.options === undefined ) {
 		return;
 	}
 
-	return options.map( ( { name, key, ...rest }: any ) => (
-		<CustomSelectItem value={ name } key={ key } { ...rest } />
-	) );
+	return props.options.map(
+		( { name, key, __experimentalHint, ...rest }: any ) => {
+			const withHint = (
+				<>
+					<span>{ name }</span>
+					<span className="components-custom-select-control__item-hint">
+						{ __experimentalHint }
+					</span>
+				</>
+			);
+
+			return (
+				<CustomSelectItem
+					{ ...rest }
+					key={ key }
+					value={ name }
+					children={
+						props.__experimentalShowSelectedHint ? withHint : name
+					}
+				/>
+			);
+		}
+	);
 };
 
 export function useDeprecatedProps(
@@ -37,9 +58,10 @@ export function useDeprecatedProps(
 		},
 		[ onChangeLegacy ]
 	);
+
 	if ( isLegacyProps( props ) ) {
 		return {
-			children: transformOptionsToChildren( props.options ),
+			children: transformOptionsToChildren( props ),
 			label: props.label ?? '',
 			onChange: legacyChangeHandler,
 		};

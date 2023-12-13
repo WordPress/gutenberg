@@ -217,11 +217,13 @@ describe.each( [
 			/>
 		);
 		expect(
-			screen.getByRole( 'button', { name: 'Custom select' } )
+			screen.getByRole( 'combobox', { name: 'Custom select' } )
 		).not.toHaveTextContent( 'Hint' );
 	} );
 
-	it( 'shows selected hint when __experimentalShowSelectedHint is set', () => {
+	it( 'shows selected hint when __experimentalShowSelectedHint is set', async () => {
+		const user = userEvent.setup();
+
 		render(
 			<CustomSelect
 				{ ...props }
@@ -236,9 +238,12 @@ describe.each( [
 				__experimentalShowSelectedHint
 			/>
 		);
-		expect(
-			screen.getByRole( 'button', { name: 'Custom select' } )
-		).toHaveTextContent( 'Hint' );
+
+		await user.click(
+			screen.getByRole( 'combobox', { name: 'Custom select' } )
+		);
+
+		expect( screen.getByText( 'Hint' ) ).toBeVisible();
 	} );
 
 	describe( 'Keyboard behavior and accessibility', () => {
