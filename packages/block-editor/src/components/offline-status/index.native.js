@@ -15,7 +15,7 @@ import { useIsConnected } from '@wordpress/react-native-bridge';
 /**
  * Internal dependencies
  */
-import styles from './style';
+import styles from './style.native.scss';
 
 const OfflineStatus = () => {
 	const { isConnected } = useIsConnected();
