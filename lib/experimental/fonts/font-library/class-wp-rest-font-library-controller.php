@@ -115,7 +115,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 		);
 		register_rest_route(
 			$this->namespace,
-			'/' . 'all-' . $this->rest_base,
+			'/' . $this->rest_base,
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
@@ -127,7 +127,7 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . 'delete-' . $this->rest_base . '/(?P<id>[\d]+)',
+			'/' . $this->rest_base . '/(?P<id>[\d]+)',
 			array(
 				array(
 					'methods'             => WP_REST_Server::DELETABLE,

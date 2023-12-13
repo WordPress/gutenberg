@@ -15,18 +15,6 @@
 class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_UnitTestCase {
 
 	/**
-	 * Test that the routes are registered.
-	 */
-	public function test_register_routes() {
-		$routes = rest_get_server()->get_routes();
-		$this->assertArrayHasKey( 'POST', $routes['/wp/v2/font-families'][0]['methods'], 'No route to create font families' );
-		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/font-families/(?P<id>[\d]+)'][0]['methods'], 'No route to get a font family' );
-		//TODO: remove 'all-' and 'delete-' from routes
-		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/all-font-families'][0]['methods'], 'No route to get font families' );
-		$this->assertArrayHasKey( 'DELETE', $routes['/wp/v2/delete-font-families/(?P<id>[\d]+)'][0]['methods'], 'No route to delete a font family' );
-	}
-
-	/**
 	 * Tests failure when getting a font family that does not exist
 	 */
 	public function test_get_font_family_not_exist() {
@@ -175,7 +163,7 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 	 */
 	public function test_delete_font_family_not_exist() {
 
-		$request    = new WP_REST_Request( 'DELETE', '/wp/v2/delete-font-families/8888888' );
+		$request    = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/8888888' );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 404, $response->get_status() );
@@ -197,7 +185,7 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 		$installed_font_id = $install_data['id'];
 
 		//TODO: adding  . '?force=true' to the end doesn't work like it is supposed to.
-		$delete_request  = new WP_REST_Request( 'DELETE', '/wp/v2/delete-font-families/' . $installed_font_id);
+		$delete_request  = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . $installed_font_id);
 		$delete_response = rest_get_server()->dispatch( $delete_request );
 		$delete_data     = $delete_response->get_data();
 
@@ -292,7 +280,7 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 			rest_get_server()->dispatch($install_request);
 		}
 
-		$verify_request  = new WP_REST_Request('GET', '/wp/v2/all-font-families');
+		$verify_request  = new WP_REST_Request('GET', '/wp/v2/font-families');
 		$verify_response = rest_get_server()->dispatch($verify_request);
 		$verify_data     = $verify_response->get_data();
 
