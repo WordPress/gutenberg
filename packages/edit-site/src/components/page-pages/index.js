@@ -37,7 +37,7 @@ import {
 	viewPostAction,
 	useEditPostAction,
 } from '../actions';
-import SideEditor from './side-editor';
+import PostPreview from '../post-preview';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 const { useLocation } = unlock( routerPrivateApis );
@@ -338,7 +338,7 @@ export default function PagePages() {
 				<Page>
 					<div className="edit-site-page-pages-preview">
 						{ pageId !== null ? (
-							<SideEditor
+							<PostPreview
 								postId={ pageId }
 								postType={ postType }
 							/>

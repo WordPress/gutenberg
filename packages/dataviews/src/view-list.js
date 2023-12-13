@@ -64,7 +64,7 @@ export default function ViewList( {
 							) }
 							onClick={ () => onSelectionChange( [ item ] ) }
 						>
-							<HStack spacing={ 3 }>
+							<HStack spacing={ 3 } alignment="flex-start">
 								<div className="dataviews-list-view__media-wrapper">
 									{ mediaField?.render( { item } ) || (
 										<div className="dataviews-list-view__media-placeholder"></div>
