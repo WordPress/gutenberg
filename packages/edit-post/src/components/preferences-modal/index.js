@@ -95,7 +95,7 @@ export default function EditPostPreferencesModal() {
 									help={ __(
 										'Review settings, such as visibility and tags.'
 									) }
-									label={ __( 'Enable pre-publish flow' ) }
+									label={ __( 'Enable pre-publish checks' ) }
 								/>
 							</PreferencesModalSection>
 						) }
