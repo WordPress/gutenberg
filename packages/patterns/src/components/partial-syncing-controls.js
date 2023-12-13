@@ -18,22 +18,20 @@ import { PARTIAL_SYNCING_SUPPORTED_BLOCKS } from '../constants';
 function PartialSyncingControls( { name, attributes, setAttributes } ) {
 	const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
 
-	function updateConnections( attributeName, isChecked ) {
+	function updateConnections( isChecked ) {
+		let updatedConnections = {
+			...attributes.connections,
+			attributes: { ...attributes.connections?.attributes },
+		};
+
 		if ( ! isChecked ) {
-			let updatedConnections = {
-				...attributes.connections,
-				attributes: {
-					...attributes.connections?.attributes,
-					[ attributeName ]: undefined,
-				},
-			};
-			if ( Object.keys( updatedConnections.attributes ).length === 1 ) {
-				updatedConnections.attributes = undefined;
+			for ( const attributeName of Object.keys( syncedAttributes ) ) {
+				delete updatedConnections.attributes[ attributeName ];
 			}
-			if (
-				Object.keys( updatedConnections ).length === 1 &&
-				updateConnections.attributes === undefined
-			) {
+			if ( ! Object.keys( updatedConnections.attributes ).length ) {
+				delete updatedConnections.attributes;
+			}
+			if ( ! Object.keys( updatedConnections ).length ) {
 				updatedConnections = undefined;
 			}
 			setAttributes( {
@@ -42,15 +40,11 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 			return;
 		}
 
-		const updatedConnections = {
-			...attributes.connections,
-			attributes: {
-				...attributes.connections?.attributes,
-				[ attributeName ]: {
-					source: 'pattern_attributes',
-				},
-			},
-		};
+		for ( const attributeName of Object.keys( syncedAttributes ) ) {
+			updatedConnections.attributes[ attributeName ] = {
+				source: 'pattern_attributes',
+			};
+		}
 
 		if ( typeof attributes.metadata?.id === 'string' ) {
 			setAttributes( { connections: updatedConnections } );
@@ -71,25 +65,21 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 		<InspectorControls group="advanced">
 			<BaseControl __nextHasNoMarginBottom>
 				<BaseControl.VisualLabel>
-					{ __( 'Synced attributes' ) }
+					{ __( 'Pattern overrides' ) }
 				</BaseControl.VisualLabel>
-				{ Object.entries( syncedAttributes ).map(
-					( [ attributeName, label ] ) => (
-						<CheckboxControl
-							key={ attributeName }
-							__nextHasNoMarginBottom
-							label={ label }
-							checked={
-								attributes.connections?.attributes?.[
-									attributeName
-								]?.source === 'pattern_attributes'
-							}
-							onChange={ ( isChecked ) => {
-								updateConnections( attributeName, isChecked );
-							} }
-						/>
-					)
-				) }
+				<CheckboxControl
+					__nextHasNoMarginBottom
+					label={ __( 'Allow instance overrides' ) }
+					checked={ Object.keys( syncedAttributes ).some(
+						( attributeName ) =>
+							attributes.connections?.attributes?.[
+								attributeName
+							]?.source === 'pattern_attributes'
+					) }
+					onChange={ ( isChecked ) => {
+						updateConnections( isChecked );
+					} }
+				/>
 			</BaseControl>
 		</InspectorControls>
 	);
