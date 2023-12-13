@@ -74,6 +74,7 @@ function Pagination( {
 						icon={ chevronLeft }
 						showTooltip
 						size="compact"
+						tooltipPosition="top"
 					/>
 					<Button
 						onClick={ () =>
@@ -85,6 +86,7 @@ function Pagination( {
 						icon={ chevronRight }
 						showTooltip
 						size="compact"
+						tooltipPosition="top"
 					/>
 				</HStack>
 			) }
