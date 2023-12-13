@@ -47,7 +47,7 @@ import {
 } from './template-actions';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
-import SideEditor from '../page-pages/side-editor';
+import PostPreview from '../post-preview';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
@@ -400,7 +400,7 @@ export default function DataviewsTemplates() {
 				<Page>
 					<div className="edit-site-template-pages-preview">
 						{ templateId !== null ? (
-							<SideEditor
+							<PostPreview
 								postId={ templateId }
 								postType={ TEMPLATE_POST_TYPE }
 							/>
