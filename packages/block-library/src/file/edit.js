@@ -125,7 +125,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 				fileName: newMedia.title,
 				textLinkHref: newMedia.url,
 				id: newMedia.id,
-				displayPreview: isPdf ? true : undefined,
+				displayPreview: isPdf ? false : undefined,
 				previewHeight: isPdf ? 600 : undefined,
 			} );
 		}
