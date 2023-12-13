@@ -68,8 +68,8 @@ store( 'core/query', {
 				ctx.url = ref.href;
 
 				// Focus the first anchor of the Query block.
-				const firstAnchor = `[data-wp-navigation-id=${ id }] .wp-block-post-template a[href]`;
-				document.querySelector( firstAnchor )?.focus();
+				// const firstAnchor = `[data-wp-navigation-id=${ id }] .wp-block-post-template a[href]`;
+				// document.querySelector( firstAnchor )?.focus();
 			}
 		},
 		*prefetch() {

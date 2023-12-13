@@ -135,9 +135,10 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	wp_reset_postdata();
 
 	return sprintf(
-		'<ul %1$s>%2$s</ul>',
+		'<ul %1$s data-wp-infinite-scroll="%3$s">%2$s</ul>',
 		$wrapper_attributes,
-		$content
+		$content,
+		$page_key . '-' . ( $use_global_query ? $query->query_vars['paged'] : $page )
 	);
 }
 

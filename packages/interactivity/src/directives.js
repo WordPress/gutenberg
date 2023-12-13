@@ -390,4 +390,25 @@ export default () => {
 		),
 		{ priority: 4 }
 	);
+
+	const InfiniteScroll = ( {
+		elementType: Type,
+		pageId,
+		children,
+		...props
+	} ) => {
+		const { current: pages } = useRef( new Map() );
+		if ( ! pages.has( pageId ) ) pages.set( pageId, children );
+		return <Type { ...props }>{ [ ...pages.values() ] }</Type>;
+	};
+
+	directive(
+		'infinite-scroll',
+		( { directives: { 'infinite-scroll': isr }, element } ) => {
+			const { value } = isr.find( ( e ) => e.suffix === 'default' );
+			element.props.elementType = element.type;
+			element.props.pageId = value;
+			element.type = InfiniteScroll;
+		}
+	);
 };
