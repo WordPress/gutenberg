@@ -145,6 +145,29 @@ test.describe( 'Global styles revisions', () => {
 			page.getByLabel( 'Global styles revisions list' )
 		).toBeVisible();
 	} );
+
+	test( 'should allow switching to style book view', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.locator( 'body' ).click();
+		await userGlobalStylesRevisions.openStylesPanel();
+		await userGlobalStylesRevisions.openRevisions();
+		const toggleStyleBook = page.getByLabel( 'Toggle Style Book' );
+		await expect( toggleStyleBook ).toBeVisible();
+		await expect(
+			page.locator( 'iframe[name="revisions"]' )
+		).toBeVisible();
+		await expect(
+			page.locator( 'iframe[name="style-book-canvas"]' )
+		).toBeHidden();
+		await toggleStyleBook.click();
+		await expect(
+			page.locator( 'iframe[name="style-book-canvas"]' )
+		).toBeVisible();
+		await expect( page.locator( 'iframe[name="revisions"]' ) ).toBeHidden();
+	} );
 } );
 
 class UserGlobalStylesRevisions {

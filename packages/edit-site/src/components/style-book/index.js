@@ -223,7 +223,6 @@ function StyleBook( {
 		return {};
 	}, [ baseConfig, userConfig ] );
 
-
 	// Copied from packages/edit-site/src/components/revisions/index.js
 	// could we create a shared hook?
 	const originalSettings = useSelect(
