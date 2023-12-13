@@ -4,6 +4,7 @@
 import {
 	act,
 	addBlock,
+	dismissModal,
 	getBlock,
 	typeInRichText,
 	fireEvent,
@@ -15,6 +16,7 @@ import {
 	within,
 	withFakeTimers,
 	waitForElementToBeRemoved,
+	waitForModalVisible,
 } from 'test/helpers';
 import Clipboard from '@react-native-clipboard/clipboard';
 import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
@@ -706,7 +708,7 @@ describe( 'Paragraph block', () => {
 
 		// Wait for Block Settings to be visible.
 		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
-		await waitFor( () => blockSettingsModal.props.isVisible );
+		await waitForModalVisible( blockSettingsModal );
 
 		// Open Font size settings
 		fireEvent.press( screen.getByLabelText( 'Font Size, Custom' ) );
@@ -715,7 +717,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.press( screen.getByLabelText( 'Large' ) );
 
 		// Dismiss the Block Settings modal.
-		fireEvent( blockSettingsModal, 'backdropPress' );
+		await dismissModal( blockSettingsModal );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -740,7 +742,7 @@ describe( 'Paragraph block', () => {
 
 		// Wait for Block Settings to be visible.
 		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
-		await waitFor( () => blockSettingsModal.props.isVisible );
+		await waitForModalVisible( blockSettingsModal );
 
 		const lineHeightControl = screen.getByLabelText( /Line Height/ );
 		fireEvent.press(
@@ -752,7 +754,7 @@ describe( 'Paragraph block', () => {
 		fireEvent.changeText( lineHeightTextInput, '1.8' );
 
 		// Dismiss the Block Settings modal.
-		fireEvent( blockSettingsModal, 'backdropPress' );
+		await dismissModal( blockSettingsModal );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchSnapshot();
