@@ -13,7 +13,7 @@ export const navigatorProviderWrapper = css`
 const fadeInFromRight = keyframes( {
 	'0%': {
 		opacity: 0,
-		transform: `translateX(50px)`,
+		transform: `translateX( 50px )`,
 	},
 	'100%': { opacity: 1, transform: 'none' },
 } );
@@ -21,7 +21,7 @@ const fadeInFromRight = keyframes( {
 const fadeInFromLeft = keyframes( {
 	'0%': {
 		opacity: 0,
-		transform: `translateX(-50px)`,
+		transform: `translateX( -50px )`,
 	},
 	'100%': { opacity: 1, transform: 'none' },
 } );
