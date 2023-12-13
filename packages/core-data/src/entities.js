@@ -8,6 +8,7 @@ import { capitalCase, pascalCase } from 'change-case';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -275,6 +276,27 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
 	return newEdits;
 };
 
+function makeBlockAttributesSerializable( attributes ) {
+	const newAttributes = { ...attributes };
+	for ( const [ key, value ] of Object.entries( attributes ) ) {
+		if ( value instanceof RichTextData ) {
+			newAttributes[ key ] = value.valueOf();
+		}
+	}
+	return newAttributes;
+}
+
+function makeBlocksSerializable( blocks ) {
+	return blocks.map( ( block ) => {
+		const { innerBlocks, attributes, ...rest } = block;
+		return {
+			...rest,
+			attributes: makeBlockAttributesSerializable( attributes ),
+			innerBlocks: makeBlocksSerializable( innerBlocks ),
+		};
+	} );
+}
+
 /**
  * Returns the list of post type entities.
  *
@@ -317,11 +339,15 @@ async function loadPostTypeEntities() {
 				},
 				applyChangesToDoc: ( doc, changes ) => {
 					const document = doc.getMap( 'document' );
+
 					Object.entries( changes ).forEach( ( [ key, value ] ) => {
 						if (
 							document.get( key ) !== value &&
 							typeof value !== 'function'
 						) {
+							if ( key === 'blocks' ) {
+								value = makeBlocksSerializable( value );
+							}
 							document.set( key, value );
 						}
 					} );
