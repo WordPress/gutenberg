@@ -49,7 +49,7 @@ const navigatorScreenAnimation = ( {
 	return css`
 		animation-duration: 0.14s;
 		/* easeInOutCubic */
-		animation-timing-function: cubic-bezier( 0.65, 0, 0.35, 1 );
+		animation-timing-function: ease-in-out;
 		will-change: transform, opacity;
 		/* Default animation.*/
 		animation-name: ${ animationName };
