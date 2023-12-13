@@ -18,6 +18,7 @@ import type {
 	CustomSelectItemProps,
 	CustomSelectContext as CustomSelectContextType,
 } from './types';
+import type { WordPressComponentProps } from '../context';
 
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
@@ -85,7 +86,7 @@ export function CustomSelect( props: CustomSelectProps ) {
 export function CustomSelectItem( {
 	children,
 	...props
-}: CustomSelectItemProps ) {
+}: WordPressComponentProps< CustomSelectItemProps, 'div', false > ) {
 	const customSelectContext = useContext( CustomSelectContext );
 	return (
 		<Styled.CustomSelectItem
