@@ -7,18 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useContext } from '@wordpress/element';
-import {
-	__unstableGetBlockProps as getBlockProps,
-	getBlockType,
-} from '@wordpress/blocks';
+import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs } from '@wordpress/compose';
-import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
  */
 import { BlockListBlockContext } from '../block-list-block-context';
-import { useBlockEditContext } from '../../block-edit/context';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -64,18 +59,6 @@ export function useBlockProps( props = {} ) {
 	const { essentialProps, wrapperProps, refs } = useContext(
 		BlockListBlockContext
 	);
-	const { name } = useBlockEditContext();
-
-	// Ensures it warns only inside the `edit` implementation for the block.
-	if ( name ) {
-		const _blockType = getBlockType( name );
-		const blockApiVersion = _blockType?.apiVersion || 1;
-		if ( blockApiVersion < 2 ) {
-			warning(
-				`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
-			);
-		}
-	}
 
 	return {
 		...wrapperProps,
