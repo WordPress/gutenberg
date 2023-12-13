@@ -48,10 +48,8 @@ const navigatorScreenAnimation = ( {
 
 	return css`
 		animation-duration: 0.14s;
-		/* easeInOutCubic */
 		animation-timing-function: ease-in-out;
 		will-change: transform, opacity;
-		/* Default animation.*/
 		animation-name: ${ animationName };
 
 		@media ( prefers-reduced-motion ) {
