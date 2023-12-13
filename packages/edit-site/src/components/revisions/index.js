@@ -29,7 +29,7 @@ function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
 }
 
-function Revisions( { onClose, userConfig, blocks } ) {
+function Revisions( { actions, userConfig, blocks } ) {
 	const { baseConfig } = useSelect(
 		( select ) => ( {
 			baseConfig:
@@ -71,9 +71,9 @@ function Revisions( { onClose, userConfig, blocks } ) {
 	return (
 		<EditorCanvasContainer
 			title={ __( 'Revisions' ) }
-			onClose={ onClose }
 			closeButtonLabel={ __( 'Close revisions' ) }
 			enableResizing={ true }
+			actions={ actions }
 		>
 			<Iframe
 				className="edit-site-revisions__iframe"

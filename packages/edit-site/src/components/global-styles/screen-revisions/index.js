@@ -15,6 +15,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { seen } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -70,6 +71,7 @@ function ScreenRevisions() {
 		useGlobalStylesRevisions();
 	const [ currentlySelectedRevision, setCurrentlySelectedRevision ] =
 		useState( currentEditorGlobalStyles );
+	const [ currentView, setCurrentView ] = useState( 'editor' );
 	const [
 		isLoadingRevisionWithUnsavedChanges,
 		setIsLoadingRevisionWithUnsavedChanges,
@@ -141,6 +143,19 @@ function ScreenRevisions() {
 		!! currentlySelectedRevisionId && ! selectedRevisionMatchesEditorStyles;
 	const shouldShowRevisions = ! isLoading && revisions.length;
 
+	const editorCanvasContainerActions = [
+		{
+			label: __( 'Toggle Style Book' ),
+			onClick: () => {
+				setCurrentView(
+					currentView === 'editor' ? 'style-book' : 'editor'
+				);
+			},
+			icon: seen,
+			isPressed: currentView === 'style-book',
+		},
+	];
+
 	return (
 		<>
 			<ScreenHeader
@@ -159,15 +174,22 @@ function ScreenRevisions() {
 			) }
 			{ shouldShowRevisions && (
 				<>
-					{ /*					<Revisions
-						blocks={ blocks }
-						userConfig={ currentlySelectedRevision }
-						onClose={ onCloseRevisions }
-					/>*/ }
-					<StyleBook
-						userConfig={ currentlySelectedRevision }
-						isSelected={ () => {} }
-					/>
+					{ currentView === 'editor' ? (
+						<Revisions
+							blocks={ blocks }
+							userConfig={ currentlySelectedRevision }
+							closeButtonLabel={ __( 'Close revisions' ) }
+							onClose={ onCloseRevisions }
+							actions={ editorCanvasContainerActions }
+						/>
+					) : (
+						<StyleBook
+							userConfig={ currentlySelectedRevision }
+							actions={ editorCanvasContainerActions }
+							isSelected={ () => {} }
+						/>
+					) }
+
 					<div className="edit-site-global-styles-screen-revisions">
 						<RevisionsButtons
 							onChange={ selectRevision }

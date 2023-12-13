@@ -10,10 +10,14 @@
 	transition: all 0.3s; // Match .block-editor-iframe__body transition.
 }
 
-.edit-site-editor-canvas-container__close-button {
+.edit-site-editor-canvas-container__actions {
 	position: absolute;
 	right: $grid-unit-10;
 	top: math.div($grid-unit-60 - $button-size, 2); // ( tab height - button size ) / 2
 	z-index: 1;
+}
+.edit-site-editor-canvas-container__action-button {
 	background: $white;
+	margin-left: $grid-unit-05;
+	border: 1px solid $gray-300;
 }

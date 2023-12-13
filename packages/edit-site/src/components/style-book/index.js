@@ -184,6 +184,7 @@ function StyleBook( {
 	showCloseButton = true,
 	showTabs = true,
 	userConfig = {},
+	actions,
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ textColor ] = useGlobalStyle( 'color.text' );
@@ -245,6 +246,7 @@ function StyleBook( {
 	return (
 		<EditorCanvasContainer
 			enableResizing={ enableResizing }
+			actions={ actions }
 			closeButtonLabel={
 				showCloseButton ? __( 'Close Style Book' ) : null
 			}
