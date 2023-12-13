@@ -77,9 +77,11 @@ require __DIR__ . '/compat/plugin/footnotes.php';
  */
 require __DIR__ . '/compat/wordpress-6.4/html-api/class-gutenberg-html-tag-processor-6-4.php';
 require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-attribute-token-6-5.php';
+require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-open-elements-6-5.php';
 require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-span-6-5.php';
 require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-text-replacement-6-5.php';
 require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-tag-processor-6-5.php';
+require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-processor-6-5.php';
 
 /*
  * The HTML Processor appeared after WordPress 6.3. If Gutenberg is running on a version of
