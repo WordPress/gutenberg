@@ -373,7 +373,14 @@ export default function DataviewsTemplates() {
 	);
 	return (
 		<>
-			<Page title={ __( 'Templates' ) }>
+			<Page
+				className={
+					view.type === LAYOUT_LIST
+						? 'edit-site-template-pages-list-view'
+						: null
+				}
+				title={ __( 'Templates' ) }
+			>
 				<DataViews
 					paginationInfo={ paginationInfo }
 					fields={ fields }

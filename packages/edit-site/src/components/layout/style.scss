@@ -156,6 +156,10 @@
 	}
 }
 
+.edit-site-template-pages-list-view {
+	max-width: $nav-sidebar-width;
+}
+
 // This shouldn't be necessary (we should have a way to say that a skeletton is relative
 .edit-site-layout__canvas .interface-interface-skeleton,
 .edit-site-page-pages-preview .interface-interface-skeleton,
