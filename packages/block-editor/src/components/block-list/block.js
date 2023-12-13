@@ -116,9 +116,6 @@ function BlockListBlock( {
 	onMerge,
 	toggleSelection,
 } ) {
-	const { removeBlock } = useDispatch( blockEditorStore );
-	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
-	const parentLayout = useLayout() || {};
 	const {
 		essentialProps,
 		mayDisplayControls,
@@ -126,6 +123,10 @@ function BlockListBlock( {
 		themeSupportsLayout,
 		refs,
 	} = useContext( BlockListBlockContext );
+	const { removeBlock } = useDispatch( blockEditorStore );
+	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
+
+	const parentLayout = useLayout() || {};
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
@@ -153,13 +154,13 @@ function BlockListBlock( {
 		/>
 	);
 
-	const _blockType = getBlockType( name );
+	const blockType = getBlockType( name );
 
 	// Determine whether the block has props to apply to the wrapper.
-	if ( _blockType?.getEditWrapperProps ) {
+	if ( blockType?.getEditWrapperProps ) {
 		wrapperProps = mergeWrapperProps(
 			wrapperProps,
-			_blockType.getEditWrapperProps( attributes )
+			blockType.getEditWrapperProps( attributes )
 		);
 	}
 
@@ -169,17 +170,8 @@ function BlockListBlock( {
 		! themeSupportsLayout;
 
 	// Support for sticky position in classic themes with alignment wrappers.
-	const isSticky = className?.includes( 'is-position-sticky' );
-	const { 'data-align': dataAlign, ...restWrapperProps } = wrapperProps ?? {};
 
-	restWrapperProps.className = classnames(
-		restWrapperProps.className,
-		dataAlign && themeSupportsLayout && `align${ dataAlign }`,
-		! ( dataAlign && isSticky ) && className,
-		{
-			'wp-block': ! isAligned,
-		}
-	);
+	const isSticky = className?.includes( 'is-position-sticky' );
 
 	// For aligned blocks, provide a wrapper element so the block can be
 	// positioned relative to the block column.
@@ -205,7 +197,7 @@ function BlockListBlock( {
 	if ( ! isValid ) {
 		const saveContent = __unstableBlockSource
 			? serializeRawBlock( __unstableBlockSource )
-			: getSaveContent( _blockType, attributes );
+			: getSaveContent( blockType, attributes );
 
 		block = (
 			<Block className="has-warning">
@@ -224,11 +216,22 @@ function BlockListBlock( {
 				</Block>
 			</>
 		);
-	} else if ( _blockType?.apiVersion > 1 ) {
+	} else if ( blockType?.apiVersion > 1 ) {
 		block = blockEdit;
 	} else {
 		block = <Block>{ blockEdit }</Block>;
 	}
+
+	const { 'data-align': dataAlign, ...restWrapperProps } = wrapperProps ?? {};
+
+	restWrapperProps.className = classnames(
+		restWrapperProps.className,
+		dataAlign && themeSupportsLayout && `align${ dataAlign }`,
+		! ( dataAlign && isSticky ) && className,
+		{
+			'wp-block': ! isAligned,
+		}
+	);
 
 	return (
 		<BlockListBlockContext.Provider
@@ -542,19 +545,19 @@ function BlockListBlockProvider( props ) {
 				return;
 			}
 
+			const {
+				hasBlockSupport: _hasBlockSupport,
+				getActiveBlockVariation,
+			} = select( blocksStore );
 			const _isSelected = isBlockSelected( clientId );
 			const templateLock = getTemplateLock( rootClientId );
 			const canRemove = canRemoveBlock( clientId, rootClientId );
 			const canMove = canMoveBlock( clientId, rootClientId );
 			const { name: blockName, attributes, isValid } = block;
-
-			const { hasBlockSupport: _hasBlockSupport } = select( blocksStore );
-
-			const { getActiveBlockVariation } = select( blocksStore );
 			const isPartOfMultiSelection =
 				isBlockMultiSelected( clientId ) ||
 				isAncestorMultiSelected( clientId );
-			const _blockType = getBlockType( blockName );
+			const blockType = getBlockType( blockName );
 			const match = getActiveBlockVariation( blockName, attributes );
 			const { outlineMode, supportsLayout } = getSettings();
 			const isMultiSelected = isBlockMultiSelected( clientId );
@@ -564,10 +567,8 @@ function BlockListBlockProvider( props ) {
 				checkDeep
 			);
 			const typing = isTyping();
-			const hasLightBlockWrapper = _blockType?.apiVersion > 1;
+			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const movingClientId = hasBlockMovingClientId();
-			const _hasOverlay =
-				__unstableHasActiveBlockOverlayActive( clientId );
 
 			// Do not add new properties here, use `useSelect` instead to avoid
 			// leaking new props to the public API (editor.BlockListBlock filter).
@@ -586,7 +587,6 @@ function BlockListBlockProvider( props ) {
 				attributes,
 				isValid,
 				isSelected: _isSelected,
-
 				themeSupportsLayout: supportsLayout,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
@@ -603,9 +603,8 @@ function BlockListBlockProvider( props ) {
 						'__experimentalExposeControlsToChildren',
 						false
 					) && hasSelectedInnerBlock( clientId ),
-
 				index: getBlockIndex( clientId ),
-				blockTitle: match?.title || _blockType?.title,
+				blockTitle: match?.title || blockType?.title,
 				isPartOfSelection: _isSelected || isPartOfMultiSelection,
 				adjustScrolling:
 					_isSelected || isFirstMultiSelectedBlock( clientId ),
@@ -614,44 +613,36 @@ function BlockListBlockProvider( props ) {
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 				isSubtreeDisabled: isBlockSubtreeDisabled( clientId ),
 				isOutlineEnabled: outlineMode,
-				hasOverlay: _hasOverlay,
+				hasOverlay: __unstableHasActiveBlockOverlayActive( clientId ),
 				initialPosition:
 					_isSelected && __unstableGetEditorMode() === 'edit'
 						? getSelectedBlocksInitialCaretPosition()
 						: undefined,
-				classNames: classnames(
-					'block-editor-block-list__block',
-					{
-						'is-selected': _isSelected,
-						'is-highlighted': isBlockHighlighted( clientId ),
-						'is-multi-selected': isMultiSelected,
-						'is-partially-selected':
-							isMultiSelected &&
-							! __unstableIsFullySelected() &&
-							! __unstableSelectionHasUnmergeableBlock(),
-						'is-reusable': isReusableBlock( _blockType ),
-						'is-dragging': isBlockBeingDragged( clientId ),
-						'has-child-selected': isAncestorOfSelectedBlock,
-						'remove-outline': _isSelected && outlineMode && typing,
-						'is-block-moving-mode': !! movingClientId,
-						'can-insert-moving-block':
-							movingClientId &&
-							canInsertBlockType(
-								getBlockName( movingClientId ),
-								getBlockRootClientId( clientId )
-							),
-						'has-block-overlay': _hasOverlay,
-						'is-editing-disabled':
-							getBlockEditingMode( clientId ) === 'disabled',
-						'is-content-locked-temporarily-editing-as-blocks':
-							__unstableGetTemporarilyEditingAsBlocks() ===
-							clientId,
-					},
-					hasLightBlockWrapper ? attributes.className : undefined,
-					hasLightBlockWrapper
-						? getBlockDefaultClassName( blockName )
-						: undefined
-				),
+				isHighlighted: isBlockHighlighted( clientId ),
+				isMultiSelected,
+				isPartiallySelected:
+					isMultiSelected &&
+					! __unstableIsFullySelected() &&
+					! __unstableSelectionHasUnmergeableBlock(),
+				isReusable: isReusableBlock( blockType ),
+				isDragging: isBlockBeingDragged( clientId ),
+				hasChildSelected: isAncestorOfSelectedBlock,
+				removeOutline: _isSelected && outlineMode && typing,
+				isBlockMovingMode: !! movingClientId,
+				canInsertMovingBlock:
+					movingClientId &&
+					canInsertBlockType(
+						getBlockName( movingClientId ),
+						getBlockRootClientId( clientId )
+					),
+				isEditingDisabled:
+					getBlockEditingMode( clientId ) === 'disabled',
+				className: hasLightBlockWrapper
+					? attributes.className
+					: undefined,
+				defaultClassName: hasLightBlockWrapper
+					? getBlockDefaultClassName( blockName )
+					: undefined,
 			};
 		},
 		[ clientId, rootClientId ]
@@ -669,9 +660,21 @@ function BlockListBlockProvider( props ) {
 		isOutlineEnabled,
 		hasOverlay,
 		initialPosition,
-		classNames,
 		themeSupportsLayout,
 		blockEditingMode,
+		isHighlighted,
+		isMultiSelected,
+		isPartiallySelected,
+		isReusable,
+		isDragging,
+		hasChildSelected,
+		removeOutline,
+		isBlockMovingMode,
+		canInsertMovingBlock,
+		isEditingDisabled,
+		isTemporarilyEditingAsBlocks,
+		className,
+		defaultClassName,
 	} = selectedProps;
 
 	const refs = [
@@ -710,7 +713,27 @@ function BlockListBlockProvider( props ) {
 		'data-type': name,
 		'data-title': blockTitle,
 		inert: isSubtreeDisabled ? 'true' : undefined,
-		className: classNames,
+		className: classnames(
+			'block-editor-block-list__block',
+			{
+				'is-selected': isSelected,
+				'is-highlighted': isHighlighted,
+				'is-multi-selected': isMultiSelected,
+				'is-partially-selected': isPartiallySelected,
+				'is-reusable': isReusable,
+				'is-dragging': isDragging,
+				'has-child-selected': hasChildSelected,
+				'remove-outline': removeOutline,
+				'is-block-moving-mode': isBlockMovingMode,
+				'can-insert-moving-block': canInsertMovingBlock,
+				'has-block-overlay': hasOverlay,
+				'is-editing-disabled': isEditingDisabled,
+				'is-content-locked-temporarily-editing-as-blocks':
+					isTemporarilyEditingAsBlocks,
+			},
+			className,
+			defaultClassName
+		),
 	};
 
 	const publicProps = {
