@@ -141,8 +141,9 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 		$phpcsFile->addError( $error_message, $function_token, 'FunctionNameInvalid' );
 	}
 
-	public function processFunctionCallToken() {
-
+	private function processFunctionCallToken( File $phpcsFile, $stackPointer ) {
+		$tokens         = $phpcsFile->getTokens();
+		$function_token = $tokens[$stackPointer];
 	}
 
 	/**
