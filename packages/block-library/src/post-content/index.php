@@ -61,15 +61,15 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 	// - Changes to anchor block by get_hooked_block_markup() aren't respected.
 	// - No $context available.
 
-	$context              = null;
-	$anchor_block_type    = 'core/post-content';
-	$anchor_block         = array(
+	$context           = null;
+	$anchor_block_type = 'core/post-content';
+	$anchor_block      = array(
 		'blockName'  => $anchor_block_type,
-		'attributes' => $attributes
+		'attributes' => $attributes,
 	);
-	$hooked_blocks        = get_hooked_blocks();
+	$hooked_blocks     = get_hooked_blocks();
 
-	$first_child_markup = '';
+	$first_child_markup             = '';
 	$hooked_block_types_first_child = isset( $hooked_blocks[ $anchor_block_type ]['first_child'] )
 		? $hooked_blocks[ $anchor_block_type ]['first_child']
 		: array();
@@ -81,7 +81,7 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 
 	// TODO: Should run `get_the_content` and apply `the_content` filter here.
 
-	$last_child_markup = '';
+	$last_child_markup             = '';
 	$hooked_block_types_last_child = isset( $hooked_blocks[ $anchor_block_type ]['last_child'] )
 		? $hooked_blocks[ $anchor_block_type ]['last_child']
 		: array();
