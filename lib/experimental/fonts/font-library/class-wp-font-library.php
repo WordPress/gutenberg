@@ -64,11 +64,11 @@ class WP_Font_Library {
 	public static function register_font_collection( $config ) {
 		$new_collection = new WP_Font_Collection( $config );
 
-		if ( isset( self::$collections[ $config['id'] ] ) ) {
+		if ( isset( self::$collections[ $config['slug'] ] ) ) {
 			return new WP_Error( 'font_collection_registration_error', 'Font collection already registered.' );
 		}
 
-		self::$collections[ $config['id'] ] = $new_collection;
+		self::$collections[ $config['slug'] ] = $new_collection;
 		return $new_collection;
 	}
 
@@ -89,13 +89,13 @@ class WP_Font_Library {
 	 * @since 6.5.0
 	 *
 	 * @param string $id Font collection id.
-	 * @return array List of font collections.
+	 * @return array WP_Font_Collection|null Font Collection Object or null if not found.
 	 */
-	public static function get_font_collection( $id ) {
-		if ( array_key_exists( $id, self::$collections ) ) {
-			return self::$collections[ $id ];
+	public static function get_font_collection( $slug ) {
+		if ( array_key_exists( $slug, self::$collections ) ) {
+			return self::$collections[ $slug ];
 		}
-		return new WP_Error( 'font_collection_not_found', 'Font collection not found.' );
+		return null;
 	}
 
 	/**

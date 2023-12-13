@@ -30,6 +30,8 @@ function gutenberg_init_font_library_routes() {
 	register_post_type( 'wp_font_family', $args );
 
 	// @core-merge: This code will go into Core's `create_initial_rest_routes()`.
+	$font_collection_controller = new WP_REST_Font_Collection_Controller();
+	$font_collection_controller->register_routes();
 	$font_library_controller = new WP_REST_Font_Family_Controller();
 	$font_library_controller->register_routes();
 }
@@ -57,12 +59,15 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	}
 }
 
+// This would be a great plugin for wordpress.org to offer...
+// Having this installed as part of the library (instead of a plugin) is making testing tricky.
+// Taking this out for now
 
-$default_font_collection = array(
-	'id'          => 'default-font-collection',
-	'name'        => 'Google Fonts',
-	'description' => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
-	'src'         => 'https://s.w.org/images/fonts/16.7/collections/google-fonts-with-preview.json',
-);
+// $default_font_collection = array(
+// 	'slug'        => 'default-font-collection',
+// 	'name'        => 'Google Fonts',
+// 	'description' => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
+// 	'src'         => 'https://s.w.org/images/fonts/16.7/collections/google-fonts-with-preview.json',
+// );
 
-wp_register_font_collection( $default_font_collection );
+// wp_register_font_collection( $default_font_collection );

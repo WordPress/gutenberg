@@ -149,6 +149,7 @@ if (
 		require __DIR__ . '/experimental/fonts/font-library/class-wp-font-library.php';
 		require __DIR__ . '/experimental/fonts/font-library/class-wp-font-family-utils.php';
 		require __DIR__ . '/experimental/fonts/font-library/class-wp-font-family.php';
+		require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-font-collection-controller.php';
 		require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-font-family-controller.php';
 		require __DIR__ . '/experimental/fonts/font-library/font-library.php';
 	}

@@ -12,7 +12,7 @@
  * @covers WP_REST_Font_Family_Controller
  */
 
-class Tests_Fonts_FontFamilyController extends WP_REST_Font_Library_Controller_UnitTestCase {
+class Tests_Fonts_Font_Family_Controller extends WP_REST_Font_Library_Controller_UnitTestCase {
 
 	/**
 	 * Tests failure when getting a font family that does not exist
