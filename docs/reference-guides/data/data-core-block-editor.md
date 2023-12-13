@@ -846,19 +846,6 @@ _Returns_
 
 -   `string|false`: Block Template Lock
 
-### hasAllowedPatterns
-
-Returns whether there is at least one allowed pattern for inner blocks children. This is useful for deferring the parsing of all patterns until needed.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
--   _rootClientId_ `?string`: Optional target root client ID.
-
-_Returns_
-
--   `boolean`: If there is at least one allowed pattern.
-
 ### hasBlockMovingClientId
 
 Returns whether block moving mode is enabled.
