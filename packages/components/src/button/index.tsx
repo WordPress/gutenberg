@@ -109,6 +109,8 @@ export function UnforwardedButton(
 		variant,
 		__experimentalIsFocusable: isFocusable,
 		describedBy,
+		tooltipPortal,
+		tooltipPortalElement,
 		...buttonOrAnchorProps
 	} = useDeprecatedProps( props );
 
@@ -280,6 +282,8 @@ export function UnforwardedButton(
 				}
 				shortcut={ shortcut }
 				placement={ computedPlacement }
+				portal={ tooltipPortal }
+				portalElement={ tooltipPortalElement }
 			>
 				{ element }
 			</Tooltip>
