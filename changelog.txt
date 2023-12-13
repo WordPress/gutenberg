@@ -1,5 +1,20 @@
 == Changelog ==
 
+= 17.2.1 =
+
+## Changelog
+
+### Bug Fixes
+
+- Fix: Fatal php error if a template was created by an author that was deleted ([56990](https://github.com/WordPress/gutenberg/pull/56990))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@jorgefilipecosta 
+
+
 = 17.2.0 =
 
 

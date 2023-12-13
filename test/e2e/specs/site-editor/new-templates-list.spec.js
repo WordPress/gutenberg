@@ -33,10 +33,7 @@ test.describe( 'Templates', () => {
 				name: 'Template',
 				includeHidden: true,
 			} )
-			.getByRole( 'heading', {
-				level: 3,
-				includeHidden: true,
-			} )
+			.getByRole( 'link', { includeHidden: true } )
 			.first();
 		await expect( firstTitle ).toHaveText( 'Tag Archives' );
 		// Ascending by title.
@@ -57,7 +54,7 @@ test.describe( 'Templates', () => {
 		await page.keyboard.type( 'tag' );
 		const titles = page
 			.getByRole( 'region', { name: 'Template' } )
-			.getByRole( 'heading', { level: 3 } );
+			.getByRole( 'link' );
 		await expect( titles ).toHaveCount( 1 );
 		await expect( titles.first() ).toHaveText( 'Tag Archives' );
 		await page.getByRole( 'button', { name: 'Reset filters' } ).click();

@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -155,53 +154,26 @@ function BlockEditAlignmentToolbarControlsPure( {
 export default {
 	shareWithChildBlocks: true,
 	edit: BlockEditAlignmentToolbarControlsPure,
+	useBlockProps,
 	attributeKeys: [ 'align' ],
 	hasSupport( name ) {
 		return hasBlockSupport( name, 'align', false );
 	},
 };
 
-function BlockListBlockWithDataAlign( { block: BlockListBlock, props } ) {
-	const { name, attributes } = props;
-	const { align } = attributes;
+function useBlockProps( { name, align } ) {
 	const blockAllowedAlignments = getValidAlignments(
 		getBlockSupport( name, 'align' ),
 		hasBlockSupport( name, 'alignWide', true )
 	);
 	const validAlignments = useAvailableAlignments( blockAllowedAlignments );
 
-	let wrapperProps = props.wrapperProps;
 	if ( validAlignments.some( ( alignment ) => alignment.name === align ) ) {
-		wrapperProps = { ...wrapperProps, 'data-align': align };
+		return { 'data-align': align };
 	}
 
-	return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+	return {};
 }
-
-/**
- * Override the default block element to add alignment wrapper props.
- *
- * @param {Function} BlockListBlock Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withDataAlign = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		// If an alignment is not assigned, there's no need to go through the
-		// effort to validate or assign its value.
-		if ( props.attributes.align === undefined ) {
-			return <BlockListBlock { ...props } />;
-		}
-
-		return (
-			<BlockListBlockWithDataAlign
-				block={ BlockListBlock }
-				props={ props }
-			/>
-		);
-	},
-	'withDataAlign'
-);
 
 /**
  * Override props assigned to save component to inject alignment class name if
@@ -236,11 +208,6 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/editor/align/addAttribute',
 	addAttribute
-);
-addFilter(
-	'editor.BlockListBlock',
-	'core/editor/align/with-data-align',
-	withDataAlign
 );
 addFilter(
 	'blocks.getSaveContent.extraProps',

@@ -50,6 +50,7 @@ function BlockRenameControlPure( { metadata, setAttributes } ) {
 		<InspectorControls group="advanced">
 			<TextControl
 				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				label={ __( 'Block name' ) }
 				value={ metadata?.name || '' }
 				onChange={ ( newName ) => {

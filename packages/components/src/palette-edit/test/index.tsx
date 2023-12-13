@@ -6,8 +6,13 @@ import { render, fireEvent, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import PaletteEdit, { getNameForPosition } from '..';
+import PaletteEdit, {
+	getNameForPosition,
+	isTemporaryElement,
+	DEFAULT_COLOR,
+} from '..';
 import type { PaletteElement } from '../types';
+import { DEFAULT_GRADIENT } from '../../custom-gradient-picker/constants';
 
 describe( 'getNameForPosition', () => {
 	test( 'should return 1 by default', () => {
@@ -77,6 +82,75 @@ describe( 'getNameForPosition', () => {
 		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
 			'Color 151'
 		);
+	} );
+} );
+
+describe( 'isTemporaryElement', () => {
+	[
+		{
+			message: 'identifies temporary color',
+			slug: 'test-',
+			obj: {
+				name: '',
+				slug: 'test-color-1',
+				color: DEFAULT_COLOR,
+			},
+			expected: true,
+		},
+		{
+			message: 'identifies temporary gradient',
+			slug: 'test-',
+			obj: {
+				name: '',
+				slug: 'test-color-1',
+				gradient: DEFAULT_GRADIENT,
+			},
+			expected: true,
+		},
+		{
+			message: 'identifies custom color slug',
+			slug: 'test-',
+			obj: {
+				name: '',
+				slug: 'test-color-happy',
+				color: DEFAULT_COLOR,
+			},
+			expected: false,
+		},
+		{
+			message: 'identifies custom color value',
+			slug: 'test-',
+			obj: {
+				name: '',
+				slug: 'test-color-1',
+				color: '#ccc',
+			},
+			expected: false,
+		},
+		{
+			message: 'identifies custom gradient slug',
+			slug: 'test-',
+			obj: {
+				name: '',
+				slug: 'test-gradient-joy',
+				color: DEFAULT_GRADIENT,
+			},
+			expected: false,
+		},
+		{
+			message: 'identifies custom gradient value',
+			slug: 'test-',
+			obj: {
+				name: '',
+				slug: 'test-color-3',
+				color: 'linear-gradient(90deg, rgba(22, 22, 22, 1) 0%, rgb(155, 81, 224) 100%)',
+			},
+			expected: false,
+		},
+	].forEach( ( { message, slug, obj, expected } ) => {
+		it( `should ${ message }`, () => {
+			expect( isTemporaryElement( slug, obj ) ).toBe( expected );
+		} );
 	} );
 } );
 

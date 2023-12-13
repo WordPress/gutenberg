@@ -15,7 +15,9 @@
 $unique_id = wp_unique_id( 'p-' );
 
 // Enqueue the view file.
-gutenberg_enqueue_module( '{{namespace}}-view' );
+if (function_exists('gutenberg_enqueue_module')) {
+	gutenberg_enqueue_module( '{{namespace}}-view' );
+}
 ?>
 
 <div

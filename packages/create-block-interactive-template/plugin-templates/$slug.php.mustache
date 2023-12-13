@@ -44,11 +44,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 	register_block_type( __DIR__ . '/build' );
 
-	gutenberg_register_module(
-		'{{namespace}}-view',
-		plugin_dir_url( __FILE__ ) . 'src/view.js',
-		array( '@wordpress/interactivity' ),
-		'{{version}}'
-	);
+	if (function_exists('gutenberg_register_module')) {
+		gutenberg_register_module(
+			'{{namespace}}-view',
+			plugin_dir_url( __FILE__ ) . 'src/view.js',
+			array( '@wordpress/interactivity' ),
+			'{{version}}'
+		);
+	}
 }
 add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );

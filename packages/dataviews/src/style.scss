@@ -3,6 +3,7 @@
 	height: 100%;
 	overflow: auto;
 	box-sizing: border-box;
+	scroll-padding-bottom: $grid-unit-80;
 
 	> div {
 		min-height: 100%;

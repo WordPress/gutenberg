@@ -15,6 +15,7 @@ import {
 	switchToBlockType,
 	getDefaultBlockName,
 	isUnmodifiedBlock,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import {
@@ -53,10 +54,18 @@ function mergeWrapperProps( propsA, propsB ) {
 		...propsB,
 	};
 
-	if ( propsA?.className && propsB?.className ) {
+	// May be set to undefined, so check if the property is set!
+	if (
+		propsA?.hasOwnProperty( 'className' ) &&
+		propsB?.hasOwnProperty( 'className' )
+	) {
 		newProps.className = classnames( propsA.className, propsB.className );
 	}
-	if ( propsA?.style && propsB?.style ) {
+
+	if (
+		propsA?.hasOwnProperty( 'style' ) &&
+		propsB?.hasOwnProperty( 'style' )
+	) {
 		newProps.style = { ...propsA.style, ...propsB.style };
 	}
 
@@ -95,21 +104,40 @@ function BlockListBlock( {
 		themeSupportsLayout,
 		isTemporarilyEditingAsBlocks,
 		blockEditingMode,
+		mayDisplayControls,
+		mayDisplayParentControls,
 	} = useSelect(
 		( select ) => {
 			const {
 				getSettings,
 				__unstableGetTemporarilyEditingAsBlocks,
 				getBlockEditingMode,
+				getBlockName,
+				isFirstMultiSelectedBlock,
+				getMultiSelectedBlockClientIds,
+				hasSelectedInnerBlock,
 			} = select( blockEditorStore );
+			const { hasBlockSupport } = select( blocksStore );
 			return {
 				themeSupportsLayout: getSettings().supportsLayout,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
 				blockEditingMode: getBlockEditingMode( clientId ),
+				mayDisplayControls:
+					isSelected ||
+					( isFirstMultiSelectedBlock( clientId ) &&
+						getMultiSelectedBlockClientIds().every(
+							( id ) => getBlockName( id ) === name
+						) ),
+				mayDisplayParentControls:
+					hasBlockSupport(
+						getBlockName( clientId ),
+						'__experimentalExposeControlsToChildren',
+						false
+					) && hasSelectedInnerBlock( clientId ),
 			};
 		},
-		[ clientId ]
+		[ clientId, isSelected, name ]
 	);
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
@@ -137,6 +165,8 @@ function BlockListBlock( {
 			__unstableParentLayout={
 				Object.keys( parentLayout ).length ? parentLayout : undefined
 			}
+			mayDisplayControls={ mayDisplayControls }
+			mayDisplayParentControls={ mayDisplayParentControls }
 		/>
 	);
 
