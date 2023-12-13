@@ -1,0 +1,69 @@
+# Leaves a comment on a pull request with a link to test the changes in a WordPress Playground instance.
+name: OPTIONAL - Comment on a pull request with Playground details
+
+on:
+  pull_request_target:
+    types:
+      - opened
+
+jobs:
+  test_using_wordpress_playground:
+    name: Test using WordPress Playground
+    runs-on: ubuntu-latest
+    permissions:
+        issues: write
+    if: ${{ github.repository  == 'WordPress/gutenberg' || github.event_name == 'pull_request_target' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Update PR Description
+        uses: actions/github-script@v6
+        with:
+          script: |
+            // Extract information about the pull request
+            const prNumber = github.event.number;
+
+            // Fetch the current PR description
+            const currentDescription = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            }).then(response => response.data.body);
+
+            // Define the start and end comments
+            const startComment = '<!-- AUTO-GENERATED-WORDPRESS-PLAYGROUND-LINK -->';
+            const endComment = '<!-- end: AUTO-GENERATED-WORDPRESS-PLAYGROUND-LINK -->;
+
+            // Find the positions of the start and end comments
+            const startIndex = currentDescription.indexOf(startComment);
+            const endIndex = currentDescription.indexOf(endComment);
+
+            // Check if both start and end comments are present
+            if (startIndex !== -1 && endIndex !== -1) {
+              // Extract the content between the start and end comments
+              const placeholderContent = currentDescription.slice(startIndex + startComment.length, endIndex);
+
+              // Replace the content with your updated content
+              const newContent = `## Test this pull request with WordPress Playground
+              | :arrow_forward: **[Click here to load this PR into WordPress Playground](https://playground.wordpress.net/gutenberg.html?pr=56964)** |
+              | ------------- |
+
+              > [!TIP]
+              > _WordPress Playground uses the latest build of Gutenberg from this pull request. If your changes are not reflected in WordPress Playground , it's likely that the most recent build isn't complete or has failed. Check the [build workflow runs to be sure](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml)._
+
+              Read more about [WordPress Playground](https://developer.wordpress.org/playground/) and its [limitations](https://wordpress.github.io/wordpress-playground/limitations/).
+              `;
+
+              const newDescription = currentDescription.replace(`${startComment}${placeholderContent}${endComment}`, `${startComment}${newContent}${endComment}`);
+
+              // Update PR description using GitHub API
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                body: newDescription,
+              });
+            } else {
+              console.log("Start or end comment not found in the PR description.");
+            }

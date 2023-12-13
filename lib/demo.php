@@ -61,4 +61,5 @@ function gutenberg_default_demo_title( $title ) {
 
 	return $title;
 }
+
 add_filter( 'default_title', 'gutenberg_default_demo_title' );
