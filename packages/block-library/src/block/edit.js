@@ -29,13 +29,12 @@ import {
 } from '@wordpress/block-editor';
 import { getBlockSupport, parse } from '@wordpress/blocks';
 import { store as editorStore } from '@wordpress/editor';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
-const { useHistory } = unlock( routerPrivateApis );
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 
@@ -145,14 +144,26 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 	return Object.keys( overrides ).length > 0 ? overrides : undefined;
 }
 
+function editSourcePattern( setRenderingMode, patternId ) {
+	const currentArgs = getQueryArgs( window.location.href );
+	const currentUrlWithoutArgs = removeQueryArgs(
+		window.location.href,
+		...Object.keys( currentArgs )
+	);
+	const newUrl = addQueryArgs( currentUrlWithoutArgs, {
+		...currentArgs,
+		patternId,
+	} );
+	window.history.pushState( null, '', newUrl );
+	setRenderingMode( 'pattern-only' );
+}
+
 export default function ReusableBlockEdit( {
 	name,
 	attributes: { ref, overrides },
 	__unstableParentLayout: parentLayout,
 	clientId: patternClientId,
-	context: { postId },
 } ) {
-	const history = useHistory();
 	const { setRenderingMode } = useDispatch( editorStore );
 
 	const registry = useRegistry();
@@ -190,17 +201,7 @@ export default function ReusableBlockEdit( {
 		},
 		[ patternClientId, ref ]
 	);
-	function editParentPattern( event ) {
-		event.preventDefault();
 
-		history.push( {
-			post: postId,
-			action: 'edit',
-			patternId: ref,
-		} );
-
-		setRenderingMode( 'pattern-only' );
-	}
 	useEffect(
 		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
 		[ innerBlocks, setBlockEditingMode ]
@@ -310,7 +311,11 @@ export default function ReusableBlockEdit( {
 			{ userCanEdit && (
 				<BlockControls>
 					<ToolbarGroup>
-						<ToolbarButton onClick={ editParentPattern }>
+						<ToolbarButton
+							onClick={ () =>
+								editSourcePattern( setRenderingMode, ref )
+							}
+						>
 							{ __( 'Edit' ) }
 						</ToolbarButton>
 					</ToolbarGroup>

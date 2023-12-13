@@ -22,10 +22,11 @@ import {
 	symbol,
 } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
-import { useEntityRecord } from '@wordpress/core-data';
+import { useEntityRecord, store as coreDataStore } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { getQueryArg } from '@wordpress/url';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -49,13 +50,17 @@ const icons = {
 };
 
 export default function DocumentBar() {
-	const patternId = getQueryArg( window.location.href, 'patternId' );
+	const patternId = parseInt(
+		getQueryArg( window.location.href, 'patternId' )
+	);
+
 	const {
 		isEditingTemplate,
 		templateId,
 		postType,
 		postId,
 		isEditingPattern,
+		dirtyEntityRecords,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -64,6 +69,9 @@ export default function DocumentBar() {
 				getCurrentPostId,
 				getCurrentPostType,
 			} = select( editorStore );
+			const { __experimentalGetDirtyEntityRecords } =
+				select( coreDataStore );
+
 			const _templateId = getCurrentTemplateId();
 			const renderingMode = getRenderingMode();
 			return {
@@ -79,6 +87,7 @@ export default function DocumentBar() {
 					renderingMode !== 'pattern-only'
 						? getCurrentPostId()
 						: patternId,
+				dirtyEntityRecords: __experimentalGetDirtyEntityRecords(),
 			};
 		},
 		[ patternId ]
@@ -86,18 +95,31 @@ export default function DocumentBar() {
 
 	const { getEditorSettings } = useSelect( editorStore );
 	const { setRenderingMode } = useDispatch( editorStore );
+	const { createWarningNotice } = useDispatch( noticesStore );
 
+	function handleOnBack() {
+		if (
+			patternId &&
+			dirtyEntityRecords.length > 0 &&
+			dirtyEntityRecords.find( ( record ) => record.key === patternId )
+		) {
+			createWarningNotice(
+				__(
+					'Your pattern changes will not show in the post until they are saved'
+				),
+				{
+					type: 'snackbar',
+				}
+			);
+		}
+		setRenderingMode( getEditorSettings().defaultRenderingMode );
+	}
 	return (
 		<BaseDocumentActions
 			postType={ isEditingTemplate ? 'wp_template' : postType }
 			postId={ isEditingTemplate ? templateId : postId }
 			onBack={
-				isEditingTemplate || isEditingPattern
-					? () =>
-							setRenderingMode(
-								getEditorSettings().defaultRenderingMode
-							)
-					: undefined
+				isEditingTemplate || isEditingPattern ? handleOnBack : undefined
 			}
 		/>
 	);
