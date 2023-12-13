@@ -195,35 +195,19 @@ export function getDropTargetPosition(
 }
 
 /**
- * A Rect hook that takes an array of dragged block client ids and a target client id
- * and determines if the dragged blocks can be dropped on the target.
- *
- * @param {string[]} draggedBlockClientIds The client ids of the dragged blocks.
- * @param {string}   targetClientId        The client id of the target.
+ * Check if the dragged blocks can be dropped on the target.
+ * @param {Function} getBlockType
+ * @param {Object[]} allowedBlocks
+ * @param {string[]} draggedBlockNames
+ * @param {string}   targetBlockName
  * @return {boolean} Whether the dragged blocks can be dropped on the target.
  */
-export function useIsDropTargetValid( draggedBlockClientIds, targetClientId ) {
-	const { getBlockType, allowedBlocks, draggedBlockNames, targetBlockName } =
-		useSelect(
-			( select ) => {
-				const { getBlockType: _getBlockType } = select( blocksStore );
-				const { getBlockNamesByClientId, getAllowedBlocks } =
-					select( blockEditorStore );
-
-				return {
-					getBlockType: _getBlockType,
-					allowedBlocks: getAllowedBlocks( targetClientId ),
-					draggedBlockNames: getBlockNamesByClientId(
-						draggedBlockClientIds
-					),
-					targetBlockName: getBlockNamesByClientId( [
-						targetClientId,
-					] )[ 0 ],
-				};
-			},
-			[ draggedBlockClientIds, targetClientId ]
-		);
-
+export function isDropTargetValid(
+	getBlockType,
+	allowedBlocks,
+	draggedBlockNames,
+	targetBlockName
+) {
 	// At root level allowedBlocks is undefined and all blocks are allowed.
 	// Otherwise, check if all dragged blocks are allowed.
 	let areBlocksAllowed = true;
@@ -250,6 +234,7 @@ export function useIsDropTargetValid( draggedBlockClientIds, targetClientId ) {
 			return allowedParentName === targetBlockName;
 		}
 	);
+
 	return areBlocksAllowed && targetMatchesDraggedBlockParents;
 }
 
@@ -282,7 +267,10 @@ export default function useBlockDropZone( {
 		parentBlockClientId,
 		rootBlockIndex,
 		isDisabled,
-		draggedBlockClientIds,
+		getBlockType,
+		allowedBlocks,
+		draggedBlockNames,
+		targetBlockName,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -292,8 +280,10 @@ export default function useBlockDropZone( {
 				getBlockParents,
 				getBlockEditingMode,
 				getDraggedBlockClientIds,
+				getBlockNamesByClientId,
+				getAllowedBlocks,
 			} = select( blockEditorStore );
-
+			const { getBlockType: _getBlockType } = select( blocksStore );
 			const blockEditingMode = getBlockEditingMode( targetRootClientId );
 			return {
 				parentBlockClientId:
@@ -305,15 +295,18 @@ export default function useBlockDropZone( {
 						targetRootClientId
 					) ||
 					__unstableIsWithinBlockOverlay( targetRootClientId ),
-				draggedBlockClientIds: getDraggedBlockClientIds(),
+
+				getBlockType: _getBlockType,
+				allowedBlocks: getAllowedBlocks( targetRootClientId ),
+				draggedBlockNames: getBlockNamesByClientId(
+					getDraggedBlockClientIds()
+				),
+				targetBlockName: getBlockNamesByClientId( [
+					targetRootClientId,
+				] )[ 0 ],
 			};
 		},
 		[ targetRootClientId ]
-	);
-
-	const isBlockDroppingAllowed = useIsDropTargetValid(
-		draggedBlockClientIds,
-		targetRootClientId
 	);
 
 	const { getBlockListSettings, getBlocks, getBlockIndex } =
@@ -333,6 +326,16 @@ export default function useBlockDropZone( {
 	const throttled = useThrottle(
 		useCallback(
 			( event, ownerDocument ) => {
+				const isBlockDroppingAllowed = isDropTargetValid(
+					getBlockType,
+					allowedBlocks,
+					draggedBlockNames,
+					targetBlockName
+				);
+				if ( ! isBlockDroppingAllowed ) {
+					return;
+				}
+
 				const blocks = getBlocks( targetRootClientId );
 
 				// The block list is empty, don't show the insertion point but still allow dropping.
@@ -406,6 +409,10 @@ export default function useBlockDropZone( {
 				getBlockIndex,
 				parentBlockClientId,
 				rootBlockIndex,
+				getBlockType,
+				allowedBlocks,
+				draggedBlockNames,
+				targetBlockName,
 			]
 		),
 		200
@@ -413,7 +420,7 @@ export default function useBlockDropZone( {
 
 	return useDropZone( {
 		dropZoneElement,
-		isDisabled: isDisabled || ! isBlockDroppingAllowed,
+		isDisabled,
 		onDrop: onBlockDrop,
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being

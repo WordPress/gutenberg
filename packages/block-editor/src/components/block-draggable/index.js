@@ -13,7 +13,7 @@ import BlockDraggableChip from './draggable-chip';
 import useScrollWhenDragging from './use-scroll-when-dragging';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
-import { useIsDropTargetValid } from '../use-block-drop-zone';
+import { isDropTargetValid } from '../use-block-drop-zone';
 
 const BlockDraggable = ( {
 	children,
@@ -26,8 +26,11 @@ const BlockDraggable = ( {
 		srcRootClientId,
 		isDraggable,
 		icon,
-		getBlockListSettings,
 		visibleInserter,
+		getBlockType,
+		getAllowedBlocks,
+		draggedBlockNames,
+		getBlockNamesByClientId,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -35,10 +38,12 @@ const BlockDraggable = ( {
 				getBlockRootClientId,
 				getBlockName,
 				getBlockAttributes,
-				getBlockListSettings: _getBlockListSettings,
 				isBlockInsertionPointVisible,
+				getDraggedBlockClientIds,
+				getBlockNamesByClientId: _getBlockNamesByClientId,
+				getAllowedBlocks: _getAllowedBlocks,
 			} = select( blockEditorStore );
-			const { getBlockType, getActiveBlockVariation } =
+			const { getBlockType: _getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 			const blockName = getBlockName( clientIds[ 0 ] );
@@ -50,17 +55,20 @@ const BlockDraggable = ( {
 			return {
 				srcRootClientId: rootClientId,
 				isDraggable: canMoveBlocks( clientIds, rootClientId ),
-				icon: variation?.icon || getBlockType( blockName )?.icon,
-				getBlockListSettings: _getBlockListSettings,
+				icon: variation?.icon || _getBlockType( blockName )?.icon,
 				visibleInserter: isBlockInsertionPointVisible(),
+				getBlockType: _getBlockType,
+				getAllowedBlocks: _getAllowedBlocks,
+				draggedBlockNames: _getBlockNamesByClientId(
+					getDraggedBlockClientIds()
+				),
+				getBlockNamesByClientId: _getBlockNamesByClientId,
 			};
 		},
 		[ clientIds ]
 	);
 
 	const [ targetClientId, setTargetClientId ] = useState( null );
-
-	const isDropTargetValid = useIsDropTargetValid( clientIds, targetClientId );
 
 	const isDragging = useRef( false );
 	const [ startScrolling, scrollOnDragOver, stopScrolling ] =
@@ -100,16 +108,25 @@ const BlockDraggable = ( {
 				.getAttribute( 'data-block' );
 			//Only update targetClientId if it has changed
 			// and if it's a container block
-			if (
-				targetClientId !== newTargetClientId &&
-				getBlockListSettings( newTargetClientId )
-			) {
+			if ( targetClientId !== newTargetClientId ) {
 				setTargetClientId( newTargetClientId );
 			}
+
+			const allowedBlocks = getAllowedBlocks( targetClientId );
+			const targetBlockName = getBlockNamesByClientId( [
+				targetClientId,
+			] )[ 0 ];
+			const dropTargetValid = isDropTargetValid(
+				getBlockType,
+				allowedBlocks,
+				draggedBlockNames,
+				targetBlockName
+			);
+
 			// Update the body class to reflect if drop target is valid.
 			// This has to be done on the document body because the draggable
 			// chip is rendered outside of the editor iframe.
-			if ( ! isDropTargetValid && ! visibleInserter ) {
+			if ( ! dropTargetValid && ! visibleInserter ) {
 				window?.document?.body?.classList?.add(
 					'block-draggable-invalid-drag-token'
 				);
@@ -168,12 +185,7 @@ const BlockDraggable = ( {
 				}
 			} }
 			__experimentalDragComponent={
-				<BlockDraggableChip
-					count={ clientIds.length }
-					icon={ icon }
-					clientIds={ clientIds }
-					targetClientId={ targetClientId }
-				/>
+				<BlockDraggableChip count={ clientIds.length } icon={ icon } />
 			}
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
