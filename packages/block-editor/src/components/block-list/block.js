@@ -21,7 +21,7 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
-import { compose, pure, useMergeRefs, useDisabled } from '@wordpress/compose';
+import { compose, pure, useDisabled } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -33,6 +33,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
+import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { BlockListBlockContext } from './block-list-block-context';
@@ -85,15 +86,11 @@ function mergeWrapperProps( propsA, propsB ) {
 	return newProps;
 }
 
-function Block( { children, mode, isHtml, className } ) {
-	const blockProps = useContext( BlockListBlockContext );
+function Block( { children, mode, isHtml, ...props } ) {
+	const blockProps = useBlockProps( props );
 	const htmlSuffix = mode === 'html' && ! isHtml ? '-visual' : '';
 	return (
-		<div
-			{ ...blockProps }
-			id={ blockProps.id + htmlSuffix }
-			className={ classnames( className, blockProps.className ) }
-		>
+		<div { ...blockProps } id={ blockProps.id + htmlSuffix }>
 			{ children }
 		</div>
 	);
@@ -127,6 +124,7 @@ function BlockListBlock( {
 		mayDisplayControls,
 		mayDisplayParentControls,
 		themeSupportsLayout,
+		refs,
 	} = useContext( BlockListBlockContext );
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
@@ -237,6 +235,7 @@ function BlockListBlock( {
 			value={ {
 				essentialProps,
 				wrapperProps: restWrapperProps,
+				refs,
 			} }
 		>
 			<BlockCrashBoundary
@@ -675,8 +674,7 @@ function BlockListBlockProvider( props ) {
 		blockEditingMode,
 	} = selectedProps;
 
-	const mergedRefs = useMergeRefs( [
-		props.ref,
+	const refs = [
 		useFocusFirstElement( { clientId, initialPosition } ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
@@ -691,7 +689,7 @@ function BlockListBlockProvider( props ) {
 			triggerAnimationOnChange: index,
 		} ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
-	] );
+	];
 
 	// Block is sometimes not mounted at the right time, causing it be
 	// undefined see issue for more info
@@ -705,7 +703,6 @@ function BlockListBlockProvider( props ) {
 
 	const blockProps = {
 		tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
-		ref: mergedRefs,
 		id: `block-${ clientId }`,
 		role: 'document',
 		'aria-label': blockLabel,
@@ -741,6 +738,7 @@ function BlockListBlockProvider( props ) {
 				mayDisplayParentControls:
 					selectedProps.mayDisplayParentControls,
 				themeSupportsLayout,
+				refs,
 			} }
 		>
 			<BlockListBlock { ...props } { ...publicProps } />

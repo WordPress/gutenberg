@@ -61,18 +61,20 @@ import { useBlockEditContext } from '../../block-edit/context';
  * @return {Object} Props to pass to the element to mark as a block.
  */
 export function useBlockProps( props = {} ) {
-	const { essentialProps, wrapperProps } = useContext(
+	const { essentialProps, wrapperProps, refs } = useContext(
 		BlockListBlockContext
 	);
 	const { name } = useBlockEditContext();
-	const blockType = getBlockType( name );
-	const blockApiVersion = blockType?.apiVersion || 1;
 
 	// Ensures it warns only inside the `edit` implementation for the block.
-	if ( blockApiVersion < 2 ) {
-		warning(
-			`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
-		);
+	if ( name ) {
+		const blockType = getBlockType( name );
+		const blockApiVersion = blockType?.apiVersion || 1;
+		if ( blockApiVersion < 2 ) {
+			warning(
+				`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
+			);
+		}
 	}
 
 	return {
@@ -83,7 +85,7 @@ export function useBlockProps( props = {} ) {
 		...essentialProps,
 		// wrapperProps has never been able to pass a ref, so let's not add that
 		// since it's an API we're likely to deprecate in the future.
-		ref: useMergeRefs( [ props.ref, essentialProps.ref ] ),
+		ref: useMergeRefs( [ props.ref, ...refs ] ),
 		className: classnames(
 			wrapperProps.className,
 			props.className,
