@@ -15,6 +15,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Fix crash when blockType wrapperProps are not defined [#56846]
 -   [*] Guard against an Image block styles crash due to null block values [#56903]
 -   [**] Fix crash when sharing unsupported media types on Android [#56791]
+-   [**] Fix regressions with wrapper props and font size customization [#56985]
 
 ## 1.109.2
 -   [**] Fix issue related to text color format and receiving in rare cases an undefined ref from `RichText` component [#56686]
