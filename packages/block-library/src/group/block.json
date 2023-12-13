@@ -29,7 +29,8 @@
 		"ariaLabel": true,
 		"html": false,
 		"background": {
-			"backgroundImage": true
+			"backgroundImage": true,
+			"backgroundSize": true
 		},
 		"color": {
 			"gradients": true,

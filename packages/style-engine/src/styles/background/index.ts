@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { GeneratedCSSRule, Style, StyleOptions } from '../../types';
-import { safeDecodeURI } from '../utils';
+import { generateRule, safeDecodeURI } from '../utils';
 
 const backgroundImage = {
 	name: 'backgroundImage',
@@ -40,4 +40,16 @@ const backgroundImage = {
 	},
 };
 
-export default [ backgroundImage ];
+const backgroundSize = {
+	name: 'backgroundSize',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'background', 'backgroundSize' ],
+			'backgroundSize'
+		);
+	},
+};
+
+export default [ backgroundImage, backgroundSize ];

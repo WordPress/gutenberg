@@ -10,6 +10,8 @@ import { isBlobURL } from '@wordpress/blob';
 import { getBlockSupport } from '@wordpress/blocks';
 import { focus } from '@wordpress/dom';
 import {
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	DropZone,
 	FlexItem,
@@ -53,6 +55,17 @@ export function hasBackgroundImageValue( style ) {
 }
 
 /**
+ * Checks if there is a current value in the background size block support
+ * attributes.
+ *
+ * @param {Object} style Style attribute.
+ * @return {boolean}     Whether or not the block has a background size value set.
+ */
+export function hasBackgroundSizeValue( style ) {
+	return !! style?.background?.backgroundSize;
+}
+
+/**
  * Determine whether there is block support for background.
  *
  * @param {string} blockName Block name.
@@ -72,7 +85,7 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 	}
 
 	if ( feature === 'any' ) {
-		return !! support?.backgroundImage;
+		return !! support?.backgroundImage || !! support?.backgroundSize;
 	}
 
 	return !! support?.[ feature ];
@@ -92,6 +105,25 @@ export function resetBackgroundImage( style = {}, setAttributes ) {
 			background: {
 				...style?.background,
 				backgroundImage: undefined,
+			},
+		} ),
+	} );
+}
+
+/**
+ * Resets the background size block support attributes. This can be used when disabling
+ * the background size controls for a block via a `ToolsPanel`.
+ *
+ * @param {Object}   style         Style attribute.
+ * @param {Function} setAttributes Function to set block's attributes.
+ */
+export function resetBackgroundSize( style = {}, setAttributes ) {
+	setAttributes( {
+		style: cleanEmptyObject( {
+			...style,
+			background: {
+				...style?.background,
+				backgroundSize: undefined,
 			},
 		} ),
 	} );
@@ -302,8 +334,84 @@ function BackgroundImagePanelItem( { clientId, setAttributes } ) {
 	);
 }
 
+function BackgroundSizePanelItem( { clientId, setAttributes } ) {
+	const style = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
+		[ clientId ]
+	);
+
+	const value = style?.background?.backgroundSize;
+
+	const hasValue = hasBackgroundSizeValue( style );
+
+	const resetAllFilter = useCallback( ( previousValue ) => {
+		return {
+			...previousValue,
+			style: {
+				...previousValue.style,
+				background: {
+					...previousValue.style?.background,
+					backgroundSize: undefined,
+				},
+			},
+		};
+	}, [] );
+
+	return (
+		<ToolsPanelItem
+			className="single-column"
+			hasValue={ () => hasValue }
+			label={ __( 'Background size' ) }
+			onDeselect={ () => resetBackgroundImage( style, setAttributes ) }
+			isShownByDefault={ true }
+			resetAllFilter={ resetAllFilter }
+			panelId={ clientId }
+		>
+			<ToggleGroupControl
+				__nextHasNoMarginBottom
+				size={ '__unstable-large' }
+				label={ __( 'Background size' ) }
+				value={ value || 'cover' }
+				onChange={ ( next ) => {
+					setAttributes( {
+						style: cleanEmptyObject( {
+							...style,
+							background: {
+								...style?.background,
+								backgroundSize: next,
+							},
+						} ),
+					} );
+				} }
+				isBlock={ true }
+			>
+				<ToggleGroupControlOption
+					key={ 'cover' }
+					value={ 'cover' }
+					label={ __( 'Cover' ) }
+				/>
+				<ToggleGroupControlOption
+					key={ 'contain' }
+					value={ 'contain' }
+					label={ __( 'Contain' ) }
+				/>
+				<ToggleGroupControlOption
+					key={ 'fixed' }
+					value={ 'fixed' }
+					label={ __( 'Fixed' ) }
+				/>
+			</ToggleGroupControl>
+		</ToolsPanelItem>
+	);
+}
+
 export function BackgroundImagePanel( props ) {
-	const [ backgroundImage ] = useSettings( 'background.backgroundImage' );
+	const [ backgroundImage, backgroundSize ] = useSettings(
+		'background.backgroundImage',
+		'background.backgroundSize'
+	);
+
 	if (
 		! backgroundImage ||
 		! hasBackgroundSupport( props.name, 'backgroundImage' )
@@ -311,9 +419,14 @@ export function BackgroundImagePanel( props ) {
 		return null;
 	}
 
+	const showBackgroundSize = !! (
+		backgroundSize && hasBackgroundSupport( props.name, 'backgroundSize' )
+	);
+
 	return (
 		<InspectorControls group="background">
 			<BackgroundImagePanelItem { ...props } />
+			{ showBackgroundSize && <BackgroundSizePanelItem { ...props } /> }
 		</InspectorControls>
 	);
 }
