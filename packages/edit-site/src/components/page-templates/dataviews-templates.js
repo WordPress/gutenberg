@@ -130,13 +130,14 @@ function TemplateTitle( { item, view } ) {
 	);
 }
 
-function AuthorField( { item } ) {
+function AuthorField( { item, view } ) {
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
+	const withIcon = view.type !== LAYOUT_LIST;
+
 	return (
 		<HStack alignment="left" spacing={ 1 }>
-			{ imageUrl ? (
-				<AvatarImage imageUrl={ imageUrl } />
-			) : (
+			{ withIcon && imageUrl && <AvatarImage imageUrl={ imageUrl } /> }
+			{ withIcon && ! imageUrl && (
 				<div className="edit-site-list-added-by__icon">
 					<Icon icon={ icon } />
 				</div>
@@ -252,7 +253,7 @@ export default function DataviewsTemplates() {
 				id: 'author',
 				getValue: ( { item } ) => item.author_text,
 				render: ( { item } ) => {
-					return <AuthorField item={ item } />;
+					return <AuthorField view={ view } item={ item } />;
 				},
 				enableHiding: false,
 				type: ENUMERATION_TYPE,
