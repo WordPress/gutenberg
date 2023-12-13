@@ -66,6 +66,10 @@ test.describe( 'Editing Navigation Menus', () => {
 				} )
 			).toBeVisible();
 
+			await expect( page ).toHaveURL(
+				`wp-admin/site-editor.php?path=%2Fnavigation`
+			);
+
 			await editorSidebar
 				.getByRole( 'button', {
 					name: 'Primary Menu',
