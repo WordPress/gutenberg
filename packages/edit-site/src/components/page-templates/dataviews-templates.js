@@ -106,7 +106,6 @@ function TemplateTitle( { item, view } ) {
 			<>
 				{ decodeEntities( item.title?.rendered || item.slug ) ||
 					__( '(no title)' ) }
-				<Customized item={ item } isCustomized={ isCustomized } />
 			</>
 		);
 	}
