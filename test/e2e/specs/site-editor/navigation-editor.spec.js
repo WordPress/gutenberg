@@ -77,10 +77,12 @@ test.describe( 'Editing Navigation Menus', () => {
 			);
 
 			// Wait for list of Navigations to appear.
-			editorSidebar.getByRole( 'heading', {
-				name: 'Primary Menu',
-				level: 1,
-			} );
+			await expect(
+				editorSidebar.getByRole( 'heading', {
+					name: 'Primary Menu',
+					level: 1,
+				} )
+			).toBeVisible();
 
 			// Switch to editing the Navigation Menu
 			await editorSidebar
