@@ -304,7 +304,10 @@ function EditorCanvas(
 			height="100%"
 			iframeProps={ {
 				...iframeProps,
-				style: { ...iframeProps?.style, ...deviceStyles },
+				style: {
+					...iframeProps?.style,
+					...deviceStyles,
+				},
 			} }
 		>
 			{ themeSupportsLayout &&
