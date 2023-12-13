@@ -17,15 +17,20 @@ const SettingsHeader = ( { sidebarName } ) => {
 		openGeneralSidebar( 'edit-post/document' );
 	const openBlockSettings = () => openGeneralSidebar( 'edit-post/block' );
 
-	const { documentLabel, isTemplateMode } = useSelect( ( select ) => {
-		const { getPostTypeLabel, getRenderingMode } = select( editorStore );
-
-		return {
-			// translators: Default label for the Document sidebar tab, not selected.
-			documentLabel: getPostTypeLabel() || _x( 'Document', 'noun' ),
-			isTemplateMode: getRenderingMode() === 'template-only',
-		};
-	}, [] );
+	const { documentLabel, isTemplateMode, isPatternMode } = useSelect(
+		( select ) => {
+			const { getPostTypeLabel, getRenderingMode } =
+				select( editorStore );
+			const renderingMode = getRenderingMode();
+			return {
+				// translators: Default label for the Document sidebar tab, not selected.
+				documentLabel: getPostTypeLabel() || _x( 'Document', 'noun' ),
+				isTemplateMode: renderingMode === 'template-only',
+				isPatternMode: renderingMode === 'pattern-only',
+			};
+		},
+		[]
+	);
 
 	const [ documentAriaLabel, documentActiveClass ] =
 		sidebarName === 'edit-post/document'
@@ -48,7 +53,7 @@ const SettingsHeader = ( { sidebarName } ) => {
 	/* Use a list so screen readers will announce how many tabs there are. */
 	return (
 		<ul>
-			{ ! isTemplateMode && (
+			{ ! isTemplateMode && ! isPatternMode && (
 				<li>
 					<Button
 						onClick={ openDocumentSettings }
@@ -69,6 +74,18 @@ const SettingsHeader = ( { sidebarName } ) => {
 						data-label={ __( 'Template' ) }
 					>
 						{ __( 'Template' ) }
+					</Button>
+				</li>
+			) }
+			{ isPatternMode && (
+				<li>
+					<Button
+						onClick={ openDocumentSettings }
+						className={ `edit-post-sidebar__panel-tab ${ templateActiveClass }` }
+						aria-label={ templateAriaLabel }
+						data-label={ __( 'Pattern' ) }
+					>
+						{ __( 'Pattern' ) }
 					</Button>
 				</li>
 			) }

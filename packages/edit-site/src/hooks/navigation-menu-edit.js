@@ -62,7 +62,7 @@ function NavigationMenuEdit( { attributes } ) {
 					linkProps.onClick( event );
 				} }
 			>
-				{ __( 'Edit' ) }
+				{ __( 'Editx' ) }
 			</ToolbarButton>
 		</BlockControls>
 	);

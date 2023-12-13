@@ -78,7 +78,7 @@ export default function VisualEditor( { styles } ) {
 	const previewMode = 'is-' + deviceType.toLowerCase() + '-preview';
 
 	let animatedStyles =
-		renderingMode === 'template-only'
+		renderingMode === 'template-only' || renderingMode === 'pattern-only'
 			? templateModeStyles
 			: desktopCanvasStyles;
 	if ( resizedCanvasStyles ) {
@@ -116,6 +116,7 @@ export default function VisualEditor( { styles } ) {
 		( ( hasV3BlocksOnly || ( isGutenbergPlugin && isBlockBasedTheme ) ) &&
 			! hasMetaBoxes ) ||
 		renderingMode === 'template-only' ||
+		renderingMode === 'pattern-only' ||
 		deviceType === 'Tablet' ||
 		deviceType === 'Mobile';
 
@@ -123,7 +124,9 @@ export default function VisualEditor( { styles } ) {
 		<BlockTools
 			__unstableContentRef={ ref }
 			className={ classnames( 'edit-post-visual-editor', {
-				'is-template-mode': renderingMode === 'template-only',
+				'is-template-mode':
+					renderingMode === 'template-only' ||
+					renderingMode === 'pattern-only',
 				'has-inline-canvas': ! isToBeIframed,
 			} ) }
 		>
@@ -131,7 +134,10 @@ export default function VisualEditor( { styles } ) {
 				className="edit-post-visual-editor__content-area"
 				animate={ {
 					padding:
-						renderingMode === 'template-only' ? '48px 48px 0' : 0,
+						renderingMode === 'template-only' ||
+						renderingMode === 'pattern-only'
+							? '48px 48px 0'
+							: 0,
 				} }
 			>
 				<motion.div

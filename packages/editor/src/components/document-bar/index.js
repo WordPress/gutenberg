@@ -48,25 +48,31 @@ const icons = {
 };
 
 export default function DocumentBar() {
-	const { isEditingTemplate, templateId, postType, postId } = useSelect(
-		( select ) => {
-			const {
-				getRenderingMode,
-				getCurrentTemplateId,
-				getCurrentPostId,
-				getCurrentPostType,
-			} = select( editorStore );
-			const _templateId = getCurrentTemplateId();
-			return {
-				isEditingTemplate:
-					!! _templateId && getRenderingMode() === 'template-only',
-				templateId: _templateId,
-				postType: getCurrentPostType(),
-				postId: getCurrentPostId(),
-			};
-		},
-		[]
-	);
+	const {
+		isEditingTemplate,
+		templateId,
+		postType,
+		postId,
+		isEditingPattern,
+	} = useSelect( ( select ) => {
+		const {
+			getRenderingMode,
+			getCurrentTemplateId,
+			getCurrentPostId,
+			getCurrentPostType,
+		} = select( editorStore );
+		const _templateId = getCurrentTemplateId();
+
+		return {
+			isEditingTemplate:
+				!! _templateId && getRenderingMode() === 'template-only',
+			isEditingPattern: getRenderingMode() === 'pattern-only',
+			templateId: _templateId,
+			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
+		};
+	}, [] );
+
 	const { getEditorSettings } = useSelect( editorStore );
 	const { setRenderingMode } = useDispatch( editorStore );
 
@@ -75,7 +81,7 @@ export default function DocumentBar() {
 			postType={ isEditingTemplate ? 'wp_template' : postType }
 			postId={ isEditingTemplate ? templateId : postId }
 			onBack={
-				isEditingTemplate
+				isEditingTemplate || isEditingPattern
 					? () =>
 							setRenderingMode(
 								getEditorSettings().defaultRenderingMode

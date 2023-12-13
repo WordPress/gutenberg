@@ -7,8 +7,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useRegistry, useSelect, useDispatch } from '@wordpress/data';
-import { useRef, useMemo, useEffect } from '@wordpress/element';
-import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
+import { useRef, useMemo, useEffect, useState } from '@wordpress/element';
+import {
+	useEntityRecord,
+	store as coreStore,
+	useEntityBlockEditor,
+} from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner,
@@ -29,11 +33,14 @@ import {
 } from '@wordpress/block-editor';
 import { getBlockSupport, parse } from '@wordpress/blocks';
 import { addQueryArgs } from '@wordpress/url';
+import { store as editorStore } from '@wordpress/editor';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
+const { useHistory } = unlock( routerPrivateApis );
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 
@@ -150,6 +157,18 @@ export default function ReusableBlockEdit( {
 	clientId: patternClientId,
 	context: { postId },
 } ) {
+	const history = useHistory();
+	const { setRenderingMode, setEditedPost } = useDispatch( editorStore );
+	function editParentPattern( event ) {
+		event.preventDefault();
+		setRenderingMode( 'pattern-only' );
+		setEditedPost( 'wp_block', ref );
+		history.push( {
+			post: ref,
+			action: 'edit',
+		} );
+	}
+
 	const registry = useRegistry();
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
@@ -315,7 +334,7 @@ export default function ReusableBlockEdit( {
 			{ userCanEdit && (
 				<BlockControls>
 					<ToolbarGroup>
-						<ToolbarButton href={ editUrl }>
+						<ToolbarButton onClick={ editParentPattern }>
 							{ __( 'Edit' ) }
 						</ToolbarButton>
 					</ToolbarGroup>

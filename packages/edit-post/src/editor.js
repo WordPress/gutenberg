@@ -15,6 +15,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { CommandMenu } from '@wordpress/commands';
 import { useViewportMatch } from '@wordpress/compose';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -25,6 +26,7 @@ import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
+const { RouterProvider } = unlock( routerPrivateApis );
 
 function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -151,21 +153,23 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 
 	return (
 		<SlotFillProvider>
-			<ExperimentalEditorProvider
-				settings={ editorSettings }
-				post={ post }
-				initialEdits={ initialEdits }
-				useSubRegistry={ false }
-				__unstableTemplate={ template }
-				{ ...props }
-			>
-				<ErrorBoundary>
-					<CommandMenu />
-					<EditorInitialization postId={ postId } />
-					<Layout />
-				</ErrorBoundary>
-				<PostLockedModal />
-			</ExperimentalEditorProvider>
+			<RouterProvider>
+				<ExperimentalEditorProvider
+					settings={ editorSettings }
+					post={ post }
+					initialEdits={ initialEdits }
+					useSubRegistry={ false }
+					__unstableTemplate={ template }
+					{ ...props }
+				>
+					<ErrorBoundary>
+						<CommandMenu />
+						<EditorInitialization postId={ postId } />
+						<Layout />
+					</ErrorBoundary>
+					<PostLockedModal />
+				</ExperimentalEditorProvider>
+			</RouterProvider>
 		</SlotFillProvider>
 	);
 }

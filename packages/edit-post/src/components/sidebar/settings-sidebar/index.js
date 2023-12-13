@@ -36,8 +36,8 @@ const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 } );
 
 const SettingsSidebar = () => {
-	const { sidebarName, keyboardShortcut, isTemplateMode } = useSelect(
-		( select ) => {
+	const { sidebarName, keyboardShortcut, isTemplateMode, isPatternMode } =
+		useSelect( ( select ) => {
 			// The settings sidebar is used by the edit-post/document and edit-post/block sidebars.
 			// sidebarName represents the sidebar that is active or that should be active when the SettingsSidebar toggle button is pressed.
 			// If one of the two sidebars is active the component will contain the content of that sidebar.
@@ -61,16 +61,14 @@ const SettingsSidebar = () => {
 			const shortcut = select(
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
+			const renderingMode = select( editorStore ).getRenderingMode();
 			return {
 				sidebarName: sidebar,
 				keyboardShortcut: shortcut,
-				isTemplateMode:
-					select( editorStore ).getRenderingMode() ===
-					'template-only',
+				isTemplateMode: renderingMode === 'template-only',
+				isPatternMode: renderingMode === 'pattern-only',
 			};
-		},
-		[]
-	);
+		}, [] );
 
 	return (
 		<PluginSidebarEditPost
@@ -84,22 +82,23 @@ const SettingsSidebar = () => {
 			icon={ isRTL() ? drawerLeft : drawerRight }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
-			{ ! isTemplateMode && sidebarName === 'edit-post/document' && (
-				<>
-					<PostStatus />
-					<PluginDocumentSettingPanel.Slot />
-					<LastRevision />
-					<PostTaxonomies />
-					<FeaturedImage />
-					<PostExcerpt />
-					<DiscussionPanel />
-					<PageAttributes />
-					<MetaBoxes location="side" />
-				</>
-			) }
-			{ isTemplateMode && sidebarName === 'edit-post/document' && (
-				<TemplateSummary />
-			) }
+			{ ! isTemplateMode &&
+				! isPatternMode &&
+				sidebarName === 'edit-post/document' && (
+					<>
+						<PostStatus />
+						<PluginDocumentSettingPanel.Slot />
+						<LastRevision />
+						<PostTaxonomies />
+						<FeaturedImage />
+						<PostExcerpt />
+						<DiscussionPanel />
+						<PageAttributes />
+						<MetaBoxes location="side" />
+					</>
+				) }
+			{ ( isTemplateMode || isPatternMode ) &&
+				sidebarName === 'edit-post/document' && <TemplateSummary /> }
 			{ sidebarName === 'edit-post/block' && <BlockInspector /> }
 		</PluginSidebarEditPost>
 	);
