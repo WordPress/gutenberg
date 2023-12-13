@@ -196,6 +196,7 @@
 		border-radius: $grid-unit-05;
 		overflow: hidden;
 		position: relative;
+		margin-top: $grid-unit-05;
 
 		&::after {
 			content: "";
