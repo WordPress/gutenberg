@@ -68,12 +68,10 @@ function InserterMenu(
 		} );
 	const { showPatterns, inserterItems } = useSelect(
 		( select ) => {
-			const { __experimentalGetAllowedPatterns, getInserterItems } =
+			const { hasAllowedPatterns, getInserterItems } =
 				select( blockEditorStore );
 			return {
-				showPatterns: !! __experimentalGetAllowedPatterns(
-					destinationRootClientId
-				).length,
+				showPatterns: hasAllowedPatterns( destinationRootClientId ),
 				inserterItems: getInserterItems( destinationRootClientId ),
 			};
 		},
