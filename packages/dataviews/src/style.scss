@@ -12,6 +12,10 @@
 
 .dataviews__filters-view-actions {
 	padding: $grid-unit-15 $grid-unit-40;
+	.components-search-control {
+		flex-grow: 1;
+		max-width: 240px;
+	}
 }
 
 .dataviews-filters-button {
