@@ -14,7 +14,7 @@ import {
 	__experimentalVStack as VStack,
 	VisuallyHidden,
 } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -83,24 +83,7 @@ function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
 }
 
-// TODO: these are going to be reused in the template part list.
-// That's the reason for leaving the template parts code for now.
-const Customized = ( { item, isCustomized } ) => {
-	if ( ! isCustomized ) {
-		return null;
-	}
-	return (
-		<span className="edit-site-list-added-by__customized-info">
-			{ item.type === TEMPLATE_POST_TYPE
-				? _x( 'Customized', 'template' )
-				: _x( 'Customized', 'template part' ) }
-		</span>
-	);
-};
-
 function TemplateTitle( { item, view } ) {
-	const { isCustomized } = useAddedBy( item.type, item.id );
-
 	if ( view.type === LAYOUT_LIST ) {
 		return (
 			<>
@@ -124,7 +107,6 @@ function TemplateTitle( { item, view } ) {
 						__( '(no title)' ) }
 				</Link>
 			</View>
-			<Customized item={ item } isCustomized={ isCustomized } />
 		</VStack>
 	);
 }
