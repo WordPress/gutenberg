@@ -5,8 +5,8 @@ import {
 	BlockInspector,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import { Platform } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { Platform, useCallback, useContext } from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -29,54 +29,43 @@ import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebarEditPost from '../plugin-sidebar';
 import TemplateSummary from '../template-summary';
 import { store as editPostStore } from '../../../store';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { unlock } from '../../../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	web: true,
 	native: false,
 } );
+export const sidebars = {
+	document: 'edit-post/document',
+	block: 'edit-post/block',
+};
 
-const SettingsSidebar = () => {
-	const { sidebarName, keyboardShortcut, isTemplateMode } = useSelect(
-		( select ) => {
-			// The settings sidebar is used by the edit-post/document and edit-post/block sidebars.
-			// sidebarName represents the sidebar that is active or that should be active when the SettingsSidebar toggle button is pressed.
-			// If one of the two sidebars is active the component will contain the content of that sidebar.
-			// When neither of the two sidebars is active we can not simply return null, because the PluginSidebarEditPost
-			// component, besides being used to render the sidebar, also renders the toggle button. In that case sidebarName
-			// should contain the sidebar that will be active when the toggle button is pressed. If a block
-			// is selected, that should be edit-post/block otherwise it's edit-post/document.
-			let sidebar = select( interfaceStore ).getActiveComplementaryArea(
-				editPostStore.name
-			);
-			if (
-				! [ 'edit-post/document', 'edit-post/block' ].includes(
-					sidebar
-				)
-			) {
-				if ( select( blockEditorStore ).getBlockSelectionStart() ) {
-					sidebar = 'edit-post/block';
-				}
-				sidebar = 'edit-post/document';
-			}
-			const shortcut = select(
-				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
-			return {
-				sidebarName: sidebar,
-				keyboardShortcut: shortcut,
-				isTemplateMode:
-					select( editorStore ).getRenderingMode() ===
-					'template-only',
-			};
-		},
-		[]
-	);
+const SidebarContent = ( {
+	sidebarName,
+	keyboardShortcut,
+	isTemplateMode,
+} ) => {
+	// Because `PluginSidebarEditPost` renders a `ComplementaryArea`, we
+	// need to forward the `Tabs` context so it can be passed through the
+	// underlying slot/fill.
+	const tabsContextValue = useContext( Tabs.Context );
 
 	return (
 		<PluginSidebarEditPost
 			identifier={ sidebarName }
-			header={ <SettingsHeader sidebarName={ sidebarName } /> }
+			header={
+				<Tabs.Context.Provider value={ tabsContextValue }>
+					<SettingsHeader />
+				</Tabs.Context.Provider>
+			}
 			closeLabel={ __( 'Close Settings' ) }
+			// This classname is added so we can apply a corrective negative
+			// margin to the panel.
+			// see https://github.com/WordPress/gutenberg/pull/55360#pullrequestreview-1737671049
+			className="edit-post-sidebar__panel"
 			headerClassName="edit-post-sidebar__panel-tabs"
 			/* translators: button label text should, if possible, be under 16 characters. */
 			title={ __( 'Settings' ) }
@@ -84,24 +73,95 @@ const SettingsSidebar = () => {
 			icon={ isRTL() ? drawerLeft : drawerRight }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
-			{ ! isTemplateMode && sidebarName === 'edit-post/document' && (
-				<>
-					<PostStatus />
-					<PluginDocumentSettingPanel.Slot />
-					<LastRevision />
-					<PostTaxonomies />
-					<FeaturedImage />
-					<PostExcerpt />
-					<DiscussionPanel />
-					<PageAttributes />
-					<MetaBoxes location="side" />
-				</>
-			) }
-			{ isTemplateMode && sidebarName === 'edit-post/document' && (
-				<TemplateSummary />
-			) }
-			{ sidebarName === 'edit-post/block' && <BlockInspector /> }
+			<Tabs.Context.Provider value={ tabsContextValue }>
+				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
+					{ ! isTemplateMode && (
+						<>
+							<PostStatus />
+							<PluginDocumentSettingPanel.Slot />
+							<LastRevision />
+							<PostTaxonomies />
+							<FeaturedImage />
+							<PostExcerpt />
+							<DiscussionPanel />
+							<PageAttributes />
+							<MetaBoxes location="side" />
+						</>
+					) }
+					{ isTemplateMode && <TemplateSummary /> }
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
+					<BlockInspector />
+				</Tabs.TabPanel>
+			</Tabs.Context.Provider>
 		</PluginSidebarEditPost>
+	);
+};
+
+const SettingsSidebar = () => {
+	const {
+		sidebarName,
+		isSettingsSidebarActive,
+		keyboardShortcut,
+		isTemplateMode,
+	} = useSelect( ( select ) => {
+		// The settings sidebar is used by the edit-post/document and edit-post/block sidebars.
+		// sidebarName represents the sidebar that is active or that should be active when the SettingsSidebar toggle button is pressed.
+		// If one of the two sidebars is active the component will contain the content of that sidebar.
+		// When neither of the two sidebars is active we can not simply return null, because the PluginSidebarEditPost
+		// component, besides being used to render the sidebar, also renders the toggle button. In that case sidebarName
+		// should contain the sidebar that will be active when the toggle button is pressed. If a block
+		// is selected, that should be edit-post/block otherwise it's edit-post/document.
+		let sidebar = select( interfaceStore ).getActiveComplementaryArea(
+			editPostStore.name
+		);
+		let isSettingsSidebar = true;
+		if ( ! [ sidebars.document, sidebars.block ].includes( sidebar ) ) {
+			isSettingsSidebar = false;
+			if ( select( blockEditorStore ).getBlockSelectionStart() ) {
+				sidebar = sidebars.block;
+			}
+			sidebar = sidebars.document;
+		}
+		const shortcut = select(
+			keyboardShortcutsStore
+		).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
+		return {
+			sidebarName: sidebar,
+			isSettingsSidebarActive: isSettingsSidebar,
+			keyboardShortcut: shortcut,
+			isTemplateMode:
+				select( editorStore ).getRenderingMode() === 'template-only',
+		};
+	}, [] );
+
+	const { openGeneralSidebar } = useDispatch( editPostStore );
+
+	const onTabSelect = useCallback(
+		( newSelectedTabId ) => {
+			if ( !! newSelectedTabId ) {
+				openGeneralSidebar( newSelectedTabId );
+			}
+		},
+		[ openGeneralSidebar ]
+	);
+
+	return (
+		<Tabs
+			// Due to how this component is controlled (via a value from the
+			// `interfaceStore`), when the sidebar closes the currently selected
+			// tab can't be found. This causes the component to continuously reset
+			// the selection to `null` in an infinite loop.Proactively setting
+			// the selected tab to `null` avoids that.
+			selectedTabId={ isSettingsSidebarActive ? sidebarName : null }
+			onSelect={ onTabSelect }
+		>
+			<SidebarContent
+				sidebarName={ sidebarName }
+				keyboardShortcut={ keyboardShortcut }
+				isTemplateMode={ isTemplateMode }
+			/>
+		</Tabs>
 	);
 };
 

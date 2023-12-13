@@ -232,22 +232,13 @@ function SortMenu( { fields, view, onChangeView } ) {
 										}
 										onSelect={ ( event ) => {
 											event.preventDefault();
-											if (
-												sortedDirection === direction
-											) {
-												onChangeView( {
-													...view,
-													sort: undefined,
-												} );
-											} else {
-												onChangeView( {
-													...view,
-													sort: {
-														field: field.id,
-														direction,
-													},
-												} );
-											}
+											onChangeView( {
+												...view,
+												sort: {
+													field: field.id,
+													direction,
+												},
+											} );
 										} }
 									>
 										{ info.label }

@@ -19,7 +19,6 @@ import { useState } from 'react';
 import {
 	BlockEditorProvider,
 	BlockList,
-	BlockTools,
 	WritingFlow,
 } from '@wordpress/block-editor';
 
@@ -32,9 +31,7 @@ function MyEditorComponent() {
 			onInput={ ( blocks ) => updateBlocks( blocks ) }
 			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
-			<BlockTools>
-				<BlockCanvas height="400px" />
-			</BlockTools>
+			<BlockCanvas height="400px" />
 		</BlockEditorProvider>
 	);
 }
