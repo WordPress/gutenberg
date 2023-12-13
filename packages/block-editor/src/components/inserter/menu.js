@@ -22,6 +22,7 @@ import { useDebouncedInput } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
@@ -68,12 +69,11 @@ function InserterMenu(
 		} );
 	const { showPatterns, inserterItems } = useSelect(
 		( select ) => {
-			const { __experimentalGetAllowedPatterns, getInserterItems } =
-				select( blockEditorStore );
+			const { hasAllowedPatterns, getInserterItems } = unlock(
+				select( blockEditorStore )
+			);
 			return {
-				showPatterns: !! __experimentalGetAllowedPatterns(
-					destinationRootClientId
-				).length,
+				showPatterns: hasAllowedPatterns( destinationRootClientId ),
 				inserterItems: getInserterItems( destinationRootClientId ),
 			};
 		},
