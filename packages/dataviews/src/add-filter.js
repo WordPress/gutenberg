@@ -53,7 +53,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 					icon={ funnel }
 					className="dataviews-filters-button"
 				>
-					{ view.type === LAYOUT_LIST ? (
+					{ view.type === LAYOUT_LIST && view.filters.length > 0 ? (
 						<span className="dataviews-filters-count">
 							{ view.filters.length }
 						</span>
