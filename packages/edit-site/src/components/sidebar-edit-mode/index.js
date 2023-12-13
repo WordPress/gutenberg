@@ -85,13 +85,17 @@ export function SidebarComplementaryAreaFills() {
 		hasBlockSelection,
 		supportsGlobalStyles,
 		isEditingPage,
+		isEditorOpen,
 	} = useSelect( ( select ) => {
 		const _sidebar =
 			select( interfaceStore ).getActiveComplementaryArea( STORE_NAME );
+
 		const _isEditorSidebarOpened = [
 			SIDEBAR_BLOCK,
 			SIDEBAR_TEMPLATE,
 		].includes( _sidebar );
+		const { getCanvasMode } = unlock( select( editSiteStore ) );
+
 		return {
 			sidebar: _sidebar,
 			isEditorSidebarOpened: _isEditorSidebarOpened,
@@ -100,6 +104,7 @@ export function SidebarComplementaryAreaFills() {
 			supportsGlobalStyles:
 				select( coreStore ).getCurrentTheme()?.is_block_theme,
 			isEditingPage: select( editSiteStore ).isPage(),
+			isEditorOpen: getCanvasMode() === 'edit',
 		};
 	}, [] );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
@@ -143,7 +148,9 @@ export function SidebarComplementaryAreaFills() {
 			// tab can't be found. This causes the component to continuously reset
 			// the selection to `null` in an infinite loop. Proactively setting
 			// the selected tab to `null` avoids that.
-			selectedTabId={ isEditorSidebarOpened ? sidebarName : null }
+			selectedTabId={
+				isEditorOpen && isEditorSidebarOpened ? sidebarName : null
+			}
 			onSelect={ onTabSelect }
 		>
 			<FillContents
