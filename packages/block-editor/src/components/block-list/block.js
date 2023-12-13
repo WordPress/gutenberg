@@ -153,13 +153,13 @@ function BlockListBlock( {
 		/>
 	);
 
-	const blockType = getBlockType( name );
+	const _blockType = getBlockType( name );
 
 	// Determine whether the block has props to apply to the wrapper.
-	if ( blockType?.getEditWrapperProps ) {
+	if ( _blockType?.getEditWrapperProps ) {
 		wrapperProps = mergeWrapperProps(
 			wrapperProps,
-			blockType.getEditWrapperProps( attributes )
+			_blockType.getEditWrapperProps( attributes )
 		);
 	}
 
@@ -205,7 +205,7 @@ function BlockListBlock( {
 	if ( ! isValid ) {
 		const saveContent = __unstableBlockSource
 			? serializeRawBlock( __unstableBlockSource )
-			: getSaveContent( blockType, attributes );
+			: getSaveContent( _blockType, attributes );
 
 		block = (
 			<Block className="has-warning">
@@ -224,7 +224,7 @@ function BlockListBlock( {
 				</Block>
 			</>
 		);
-	} else if ( blockType?.apiVersion > 1 ) {
+	} else if ( _blockType?.apiVersion > 1 ) {
 		block = blockEdit;
 	} else {
 		block = <Block>{ blockEdit }</Block>;
@@ -554,7 +554,7 @@ function BlockListBlockProvider( props ) {
 			const isPartOfMultiSelection =
 				isBlockMultiSelected( clientId ) ||
 				isAncestorMultiSelected( clientId );
-			const blockType = getBlockType( blockName );
+			const _blockType = getBlockType( blockName );
 			const match = getActiveBlockVariation( blockName, attributes );
 			const { outlineMode, supportsLayout } = getSettings();
 			const isMultiSelected = isBlockMultiSelected( clientId );
@@ -564,7 +564,7 @@ function BlockListBlockProvider( props ) {
 				checkDeep
 			);
 			const typing = isTyping();
-			const hasLightBlockWrapper = blockType?.apiVersion > 1;
+			const hasLightBlockWrapper = _blockType?.apiVersion > 1;
 			const movingClientId = hasBlockMovingClientId();
 			const _hasOverlay =
 				__unstableHasActiveBlockOverlayActive( clientId );
@@ -605,7 +605,7 @@ function BlockListBlockProvider( props ) {
 					) && hasSelectedInnerBlock( clientId ),
 
 				index: getBlockIndex( clientId ),
-				blockTitle: match?.title || blockType?.title,
+				blockTitle: match?.title || _blockType?.title,
 				isPartOfSelection: _isSelected || isPartOfMultiSelection,
 				adjustScrolling:
 					_isSelected || isFirstMultiSelectedBlock( clientId ),
@@ -629,7 +629,7 @@ function BlockListBlockProvider( props ) {
 							isMultiSelected &&
 							! __unstableIsFullySelected() &&
 							! __unstableSelectionHasUnmergeableBlock(),
-						'is-reusable': isReusableBlock( blockType ),
+						'is-reusable': isReusableBlock( _blockType ),
 						'is-dragging': isBlockBeingDragged( clientId ),
 						'has-child-selected': isAncestorOfSelectedBlock,
 						'remove-outline': _isSelected && outlineMode && typing,

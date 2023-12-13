@@ -68,8 +68,8 @@ export function useBlockProps( props = {} ) {
 
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( name ) {
-		const blockType = getBlockType( name );
-		const blockApiVersion = blockType?.apiVersion || 1;
+		const _blockType = getBlockType( name );
+		const blockApiVersion = _blockType?.apiVersion || 1;
 		if ( blockApiVersion < 2 ) {
 			warning(
 				`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
