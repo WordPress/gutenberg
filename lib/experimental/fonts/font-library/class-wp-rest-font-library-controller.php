@@ -95,6 +95,18 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 			),
 		);
 
+		register_rest_route(
+			$this->namespace,
+			'/' . 'delete-' . $this->rest_base . '/(?P<id>[\d]+)',
+			array(
+				array(
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'delete_item' ),
+					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
+				),
+			),
+		);
+
 
 
 
@@ -217,6 +229,38 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 		) );
 	}
 
+	/**
+	 * Deletes an existing font family.
+	 *
+	 * Takes a font family id and deletes it from the Font Library.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_REST_Request $request The request object containing the new fonts to install
+	 *                                 in the request parameters.
+	 * @return WP_REST_Response|WP_Error The updated Font Library post content.
+	 */
+	public function delete_item( $request ) {
+		$id = $request->get_param( 'id' );
+
+		$font_family = WP_Font_Family::get_font_family_by_id( $id );
+
+		if($font_family) {
+			$font_family->uninstall();
+			return new WP_REST_Response( array(
+				'previous' => array(
+					'id' => $font_family->id,
+					'data' => $font_family->get_data(),
+				)
+			) );
+		}
+
+		return new WP_Error(
+			'rest_font_family_not_found',
+			__( 'Font Family not found.', 'gutenberg' ),
+			array( 'status' => 404 )
+		);
+	}
 
 	/**
 	 * Gets a font collection.

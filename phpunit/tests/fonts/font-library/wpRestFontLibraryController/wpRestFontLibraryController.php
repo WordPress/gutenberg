@@ -14,17 +14,18 @@
 
 class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_UnitTestCase {
 
+	/**
+	 * Test that the routes are registered.
+	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
-		// $this->assertArrayHasKey( 'POST', $routes['/wp/v2/fonts'][0]['methods'], 'Rest server has not the POST method for fonts intialized.' );
-		// $this->assertArrayHasKey( 'DELETE', $routes['/wp/v2/fonts'][1]['methods'], 'Rest server has not the DELETE method for fonts intialized.' );
-		// $this->assertArrayHasKey( 'GET', $routes['/wp/v2/fonts/collections'][0]['methods'], 'Rest server has not the GET method for collections intialized.' );
-		// $this->assertArrayHasKey( 'GET', $routes['/wp/v2/fonts/collections/(?P<id>[\/\w-]+)'][0]['methods'], 'Rest server has not the GET method for collection intialized.' );
-
 		$this->assertArrayHasKey( 'POST', $routes['/wp/v2/font-families'][0]['methods'], 'No route to create font families' );
 		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/font-families/(?P<id>[\d]+)'][0]['methods'], 'No route to get a font family' );
+		//TODO: remove 'all-' and 'delete-' from routes
 		$this->assertArrayHasKey( 'GET', $routes['/wp/v2/all-font-families'][0]['methods'], 'No route to get font families' );
+		$this->assertArrayHasKey( 'DELETE', $routes['/wp/v2/delete-font-families/(?P<id>[\d]+)'][0]['methods'], 'No route to delete a font family' );
 	}
+
 	/**
 	 * Tests failure when getting a font family that does not exist
 	 */
@@ -34,10 +35,7 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 404, $response->get_status() );
-
 	}
-
-
 
 	/**
 	 * Tests failure when fonfaces has improper inputs
@@ -124,36 +122,38 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 	}
 
 	/**
+	 * Tests responses when sucessfully creating Font Families
 	 *
 	 * @dataProvider data_create_font_family
 	 *
-	 * @param array $font_families     Font families to install in theme.json format.
+	 * @param array $font_family     Font families to install in theme.json format.
 	 * @param array $expected_response Expected response data.
 	 */
-	public function test_create_font_family( $request, $expected_response ) {
+	public function test_create_font_family( $font_family ) {
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
-		$install_request->set_param( 'data', $request['data'] );
+		$install_request->set_param( 'data', $font_family );
 		$response = rest_get_server()->dispatch( $install_request );
 		$response_data     = $response->get_data();
 
 
 		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
-		$this->assertSame( $expected_response['data']['slug'], $response_data['data']['slug'], 'The slug response did not match expected.' );
-		$this->assertSame( $expected_response['data']['name'], $response_data['data']['name'], 'The name response did not match expected.' );
-		$this->assertSame( $expected_response['data']['fontFamily'], $response_data['data']['fontFamily'], 'The font_family response did not match expected.' );
+		$this->assertSame( $font_family['slug'], $response_data['data']['slug'], 'The slug response did not match expected.' );
+		$this->assertSame( $font_family['name'], $response_data['data']['name'], 'The name response did not match expected.' );
+		$this->assertSame( $font_family['fontFamily'], $response_data['data']['fontFamily'], 'The font_family response did not match expected.' );
 		$this->assertIsInt( $response_data['id'], 'The id response did not match expected.' );
 	}
 
 	/**
+	 * Tests responses when getting existing Font Families
 	 *
 	 * @dataProvider data_create_font_family
 	 *
 	 * @param array $font_families     Font families to install in theme.json format.
 	 * @param array $expected_response Expected response data.
 	 */
-	public function test_get_font_family( $request, $expected_response ) {
+	public function test_get_font_family( $font_family ) {
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
-		$install_request->set_param( 'data', $request['data'] );
+		$install_request->set_param( 'data', $font_family );
 	 	$install_response = rest_get_server()->dispatch( $install_request );
 		$install_data     = $install_response->get_data();
 		$installed_font_id = $install_data['id'];
@@ -162,67 +162,94 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 		$verify_response = rest_get_server()->dispatch( $verify_request );
 		$verify_data     = $verify_response->get_data();
 
-
 		$this->assertSame( 200, $verify_response->get_status(), 'The response status is not 200.' );
-		$this->assertSame( $expected_response['data']['slug'], $verify_data['data']['slug'], 'The slug response did not match expected.' );
-		$this->assertSame( $expected_response['data']['name'], $verify_data['data']['name'], 'The name response did not match expected.' );
-		$this->assertSame( $expected_response['data']['fontFamily'], $verify_data['data']['fontFamily'], 'The font_family response did not match expected.' );
+		$this->assertSame( $font_family['slug'], $verify_data['data']['slug'], 'The slug response did not match expected.' );
+		$this->assertSame( $font_family['name'], $verify_data['data']['name'], 'The name response did not match expected.' );
+		$this->assertSame( $font_family['fontFamily'], $verify_data['data']['fontFamily'], 'The font_family response did not match expected.' );
 		$this->assertIsInt( $verify_data['id'], 'The id response did not match expected.' );
 
 	}
 
 	/**
+	 * Tests failure when deleting a font family that does not exist
+	 */
+	public function test_delete_font_family_not_exist() {
+
+		$request    = new WP_REST_Request( 'DELETE', '/wp/v2/delete-font-families/8888888' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 404, $response->get_status() );
+	}
+
+	/**
+	 * Tests deleting existing Font Families.  First creates a font family, then deletes it, then gets it to make sure it's gone.
+	 *
+	 * @dataProvider data_create_font_family
+	 *
+	 * @param array $font_family     Font families to install in theme.json format.
+	 * @param array $expected_response Expected response data.
+	 */
+	public function test_delete_font_family( $font_family ) {
+		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
+		$install_request->set_param( 'data', $font_family );
+	 	$install_response = rest_get_server()->dispatch( $install_request );
+		$install_data     = $install_response->get_data();
+		$installed_font_id = $install_data['id'];
+
+		$delete_request  = new WP_REST_Request( 'DELETE', '/wp/v2/delete-font-families/' . $installed_font_id );
+		$delete_response = rest_get_server()->dispatch( $delete_request );
+		$delete_data     = $delete_response->get_data();
+
+		$this->assertSame( 200, $delete_response->get_status(), 'The response status is not 200.' );
+		$this->assertSame( $font_family['slug'], $delete_data['previous']['data']['slug'], 'The slug response did not match expected.' );
+		$this->assertSame( $font_family['name'], $delete_data['previous']['data']['name'], 'The name response did not match expected.' );
+		$this->assertSame( $font_family['fontFamily'], $delete_data['previous']['data']['fontFamily'], 'The font_family response did not match expected.' );
+		$this->assertIsInt( $delete_data['previous']['id'], 'The id response did not match expected.' );
+
+		$verify_request  = new WP_REST_Request( 'GET', '/wp/v2/font-families/' . $installed_font_id );
+		$verify_response = rest_get_server()->dispatch( $verify_request );
+
+		$this->assertSame( 404, $verify_response->get_status(), 'The response status is not 200.' );
+
+	}
+	/**
 	 * Data provider for test_install_fonts
 	 */
 	public function data_create_font_family() {
-
 		return array(
-
-			'A Font with No Faces'      => array(
-				'request' 	    => array(
-					'data' => array(
-					'slug'      => 'arial',
-					'name'        => 'Arial',
-					'fontFamily' => 'Arial',
-				)
-				),
-				'expected_response' => array(
-					'data' => array(
-					'slug'      => 'arial',
-					'name'      => 'Arial',
-					'fontFamily' => 'Arial',
-					),
-				),
-			),
+			'Arial'      => array( array(
+				'slug'      => 'arial',
+				'name'        => 'Arial',
+				'fontFamily' => 'Arial',
+			)),
 		);
 	}
 
 	/**
-	 *
+	 * Test getting a collection of all created font families
 	 */
 	public function test_get_font_families() {
 		$sample_fonts = array(
 			array(
-			'data' => array(
-				'slug'      => 'arial',
-				'name'        => 'Arial',
-				'fontFamily' => 'Arial',
-			),
+				'data' => array(
+					'slug'      => 'arial',
+					'name'        => 'Arial',
+					'fontFamily' => 'Arial',
+				),
 			),
 			array(
-			'data' => array(
-				'slug'      => 'sebastian',
-				'name'        => 'Sebastian',
-				'fontFamily' => 'Sebastian',
-			),
+				'data' => array(
+					'slug'      => 'sebastian',
+					'name'        => 'Sebastian',
+					'fontFamily' => 'Sebastian',
+				),
 			),
 		);
 
 		foreach ($sample_fonts as $font_family) {
 			$install_request    = new WP_REST_Request('POST', '/wp/v2/font-families');
 			$install_request->set_param('data', $font_family['data']);
-			$response = rest_get_server()->dispatch($install_request);
-			$pickels = $response;
+			rest_get_server()->dispatch($install_request);
 		}
 
 		$verify_request  = new WP_REST_Request('GET', '/wp/v2/all-font-families');

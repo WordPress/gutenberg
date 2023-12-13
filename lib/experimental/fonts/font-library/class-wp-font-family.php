@@ -51,6 +51,13 @@ class WP_Font_Family {
 		}
 	}
 
+	/**
+	 * Gets the font family objects that have been persisted.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return WP_Font_Family The Font Family objects that have been persisted
+	 */
 	public static function get_font_families () {
 		$args = array(
 			'post_type'      => 'wp_font_family',
@@ -72,7 +79,13 @@ class WP_Font_Family {
 		return $font_families;
 	}
 
-
+	/**
+	 * Gets the font family object that has been persisted.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return null|WP_Font_Family The Font Family object or null if the font family does not exist.
+	 */
 	public static function get_font_family_by_id ( $id ) {
 		$post = get_post( $id );
 
@@ -154,17 +167,9 @@ class WP_Font_Family {
 	 * @return bool|WP_Error True if the font family was uninstalled, WP_Error otherwise.
 	 */
 	public function uninstall() {
-		$post = $this->get_data_from_post();
-		if ( null === $post ) {
-			return new WP_Error(
-				'font_family_not_found',
-				__( 'The font family could not be found.', 'gutenberg' )
-			);
-		}
-
 		if (
 			! $this->remove_font_family_assets() ||
-			! wp_delete_post( $post->ID, true )
+			! wp_delete_post( $this->id, true )
 		) {
 			return new WP_Error(
 				'font_family_not_deleted',
