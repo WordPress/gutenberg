@@ -52,17 +52,17 @@ export default function InspectorControlsTabs( {
 						/>
 					) ) }
 				</Tabs.TabList>
-				<Tabs.TabPanel tabId={ TAB_SETTINGS.name }>
+				<Tabs.TabPanel tabId={ TAB_SETTINGS.name } focusable={ false }>
 					<SettingsTab showAdvancedControls={ !! blockName } />
 				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ TAB_STYLES.name }>
+				<Tabs.TabPanel tabId={ TAB_STYLES.name } focusable={ false }>
 					<StylesTab
 						blockName={ blockName }
 						clientId={ clientId }
 						hasBlockStyles={ hasBlockStyles }
 					/>
 				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ TAB_LIST_VIEW.name }>
+				<Tabs.TabPanel tabId={ TAB_LIST_VIEW.name } focusable={ false }>
 					<InspectorControls.Slot group="list" />
 				</Tabs.TabPanel>
 			</Tabs>
