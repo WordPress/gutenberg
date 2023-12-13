@@ -62,24 +62,26 @@ class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 							'required' => true,
 							'type'     => 'object',
 							'properties' => array(
-								'name'  => array(
+								'name' => array(
 									'required' => true,
 									'type' => 'string',
 								),
-								'slug'  => array(
+								'slug' => array(
 									'required' => true,
 									'type' => 'string',
 								),
-								'fontFamily'  => array(
+								'fontFamily' => array(
 									'required' => true,
 									'type' => 'string',
 								),
+								'fontFace' => array(
+									'type' => 'array',
+								)
 							),
 
 						)
 					),
 				),
-				// 'schema' => array( $this, 'get_items_schema' ),
 			)
 		);
 
@@ -105,14 +107,17 @@ class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 								'fontFamily'  => array(
 									'type' => 'string',
 								),
+								'fontFace' => array(
+									'type' => 'array',
+								),
 							),
 
 						)
 					),
 				),
-				// 'schema' => array( $this, 'get_items_schema' ),
 			)
 		);
+
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base,
@@ -136,40 +141,6 @@ class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 				),
 			),
 		);
-
-
-
-		// register_rest_route(
-		// 	$this->namespace,
-		// 	'/' . $this->rest_base,
-		// 	array(
-		// 		array(
-		// 			'methods'             => WP_REST_Server::EDITABLE,
-		// 			'callback'            => array( $this, 'install_fonts' ),
-		// 			'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
-		// 			'args'                => array(
-		// 				'font_families' => array(
-		// 					'required'          => true,
-		// 					'type'              => 'string',
-		// 					'validate_callback' => array( $this, 'validate_install_font_families' ),
-		// 				),
-		// 			),
-		// 		),
-		// 	)
-		// );
-
-		// register_rest_route(
-		// 	$this->namespace,
-		// 	'/' . $this->rest_base,
-		// 	array(
-		// 		array(
-		// 			'methods'             => WP_REST_Server::DELETABLE,
-		// 			'callback'            => array( $this, 'uninstall_fonts' ),
-		// 			'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
-		// 			'args'                => $this->uninstall_schema(),
-		// 		),
-		// 	)
-		// );
 
 	}
 

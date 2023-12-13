@@ -123,12 +123,14 @@ class Tests_Fonts_Font_Family_Controller extends WP_REST_Font_Library_Controller
 		$response = rest_get_server()->dispatch( $install_request );
 		$response_data     = $response->get_data();
 
-
 		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
 		$this->assertSame( $font_family['slug'], $response_data['data']['slug'], 'The slug response did not match expected.' );
 		$this->assertSame( $font_family['name'], $response_data['data']['name'], 'The name response did not match expected.' );
 		$this->assertSame( $font_family['fontFamily'], $response_data['data']['fontFamily'], 'The font_family response did not match expected.' );
 		$this->assertIsInt( $response_data['id'], 'The id response did not match expected.' );
+		if ( array_key_exists( 'fontFace', $font_family ) ) {
+			$this->assertSame( $font_family['fontFace'], $response_data['data']['fontFace'], 'The font_family response did not match expected.' );
+		}
 	}
 
 	/**
@@ -212,6 +214,27 @@ class Tests_Fonts_Font_Family_Controller extends WP_REST_Font_Library_Controller
 				'slug'      => 'arial',
 				'name'        => 'Arial',
 				'fontFamily' => 'Arial',
+			)),
+			'Hosted Font Face'      => array( array(
+				'slug'      => 'abeezee',
+				'name'        => 'ABeeZee',
+				'fontFamily' => 'ABeeZee',
+				'fontFace' => array(
+					array(
+						'fontFamily'      => 'ABeeZee',
+						'fontStyle'       => 'normal',
+						'fontWeight'      => '400',
+						'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
+						'preview'	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-normal.svg',
+					),
+					array(
+						'fontFamily'      => 'ABeeZee',
+						'fontStyle'       => 'italic',
+						'fontWeight'      => '400',
+						'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf',
+						'preview' 	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-italic.svg',
+					),
+				),
 			)),
 		);
 	}

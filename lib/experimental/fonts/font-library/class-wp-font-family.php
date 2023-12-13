@@ -44,11 +44,13 @@ class WP_Font_Family {
 			throw new Exception( 'Font family data is missing the slug.' );
 		}
 
-		$this->data = $font_data;
+		$this->data = array();
 
 		if( isset( $font_data['id'] ) ) {
 			$this->id = $font_data['id'];
 		}
+
+		$this->update( $font_data );
 	}
 
 	/**
@@ -109,36 +111,132 @@ class WP_Font_Family {
 		return $this->data;
 	}
 
+	/**
+	 * Update and sanitize the font family data.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return array An array in fontFamily theme.json format.
+	 */
 	public function update( $data ) {
 		//TODO: Sanitize incoming data
+
+		// $this->sanitize();
+		// $post_font_data = json_decode( $post->post_content, true );
+		// $new_data       = WP_Font_Family_Utils::merge_fonts_data( $post_font_data, $this->data );
+		// if ( isset( $post_font_data['fontFace'] ) && ! empty( $post_font_data['fontFace'] ) ) {
+		// 	$intersecting = $this->get_intersecting_font_faces( $post_font_data['fontFace'], $new_data['fontFace'] );
+		// }
+
+		// if ( isset( $intersecting ) && ! empty( $intersecting ) ) {
+		// 	$serialized_font_faces   = array_map( 'serialize', $new_data['fontFace'] );
+		// 	$serialized_intersecting = array_map( 'serialize', $intersecting );
+
+		// 	$diff = array_diff( $serialized_font_faces, $serialized_intersecting );
+
+		// 	$new_data['fontFace'] = array_values( array_map( 'unserialize', $diff ) );
+
+		// 	foreach ( $intersecting as $intersect ) {
+		// 		$this->delete_font_face_assets( $intersect );
+		// 	}
+		// }
+		// $this->data = $new_data;
+
+
 		$this->data = array_merge( $this->data, $data);
 		return $this->get_data();
 	}
 
+	public function persist() {
+		if ( ! empty( $this->id ) ) {
+			return $this->update_font_post( $this->id, wp_json_encode( $this->get_data() ) );
+		}
+		return $this->create_font_post( wp_json_encode( $this->get_data() ) );
+	}
+
 	/**
-	 * Gets the font family data.
+	 * Creates a post for a font family.
 	 *
 	 * @since 6.5.0
 	 *
-	 * @return string fontFamily in theme.json format as stringified JSON.
+	 * @return int|WP_Error Post ID if the post was created, WP_Error otherwise.
 	 */
-	public function get_data_as_json() {
-		return wp_json_encode( $this->get_data() );
-	}
+	private function create_font_post( $post_content ) {
+		$post = array(
+			'post_title'   => $this->data['slug'],
+			'post_name'    => $this->data['slug'],
+			'post_type'    => 'wp_font_family',
+			'post_content' => $post_content,
+			'post_status'  => 'publish',
+		);
 
-	public function persist() {
-		$post_id = $this->create_or_update_font_post();
-
-		if ( is_wp_error( $post_id ) ) {
-			return $post_id;
+		$post_id = wp_insert_post( $post );
+		if ( 0 === $post_id || is_wp_error( $post_id ) ) {
+			return new WP_Error(
+				'font_post_creation_failed',
+				__( 'Font post creation failed', 'gutenberg' )
+			);
 		}
+
 		$this->id = $post_id;
-		return $this->get_data();
+
+		return $post_id;
 	}
 
-	public function add_font_face( $font_face ) {
-		$this->data['fontFace'][] = $font_face;
+	/**
+	 * Updates a post for a font family.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_Post $post The post to update.
+	 * @return int|WP_Error Post ID if the update was successful, WP_Error otherwise.
+	 */
+	private function update_font_post( $id, $post_content ) {
+
+		$post = array(
+			'ID'           => $id,
+			'post_content' => $post_content,
+		);
+
+		$post_id = wp_update_post( $post );
+
+		if ( 0 === $post_id || is_wp_error( $post_id ) ) {
+			return new WP_Error(
+				'font_post_update_failed',
+				__( 'Font post update failed', 'gutenberg' )
+			);
+		}
+
+		return $post_id;
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	/**
 	 * Checks whether the font family has font faces defined.
@@ -552,32 +650,7 @@ class WP_Font_Family {
 		return null;
 	}
 
-	/**
-	 * Creates a post for a font family.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return int|WP_Error Post ID if the post was created, WP_Error otherwise.
-	 */
-	private function create_font_post() {
-		$post = array(
-			'post_title'   => $this->data['slug'],
-			'post_name'    => $this->data['slug'],
-			'post_type'    => 'wp_font_family',
-			'post_content' => $this->get_data_as_json(),
-			'post_status'  => 'publish',
-		);
 
-		$post_id = wp_insert_post( $post );
-		if ( 0 === $post_id || is_wp_error( $post_id ) ) {
-			return new WP_Error(
-				'font_post_creation_failed',
-				__( 'Font post creation failed', 'gutenberg' )
-			);
-		}
-
-		return $post_id;
-	}
 
 	/**
 	 * Gets the font faces that are in both the existing and incoming font families.
@@ -602,72 +675,6 @@ class WP_Font_Family {
 		return $intersecting;
 	}
 
-	/**
-	 * Updates a post for a font family.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param WP_Post $post The post to update.
-	 * @return int|WP_Error Post ID if the update was successful, WP_Error otherwise.
-	 */
-	private function update_font_post( $post ) {
-		$post_font_data = json_decode( $post->post_content, true );
-		$new_data       = WP_Font_Family_Utils::merge_fonts_data( $post_font_data, $this->data );
-		if ( isset( $post_font_data['fontFace'] ) && ! empty( $post_font_data['fontFace'] ) ) {
-			$intersecting = $this->get_intersecting_font_faces( $post_font_data['fontFace'], $new_data['fontFace'] );
-		}
-
-		if ( isset( $intersecting ) && ! empty( $intersecting ) ) {
-			$serialized_font_faces   = array_map( 'serialize', $new_data['fontFace'] );
-			$serialized_intersecting = array_map( 'serialize', $intersecting );
-
-			$diff = array_diff( $serialized_font_faces, $serialized_intersecting );
-
-			$new_data['fontFace'] = array_values( array_map( 'unserialize', $diff ) );
-
-			foreach ( $intersecting as $intersect ) {
-				$this->delete_font_face_assets( $intersect );
-			}
-		}
-		$this->data = $new_data;
-
-		$post = array(
-			'ID'           => $post->ID,
-			'post_content' => $this->get_data_as_json(),
-		);
-
-		$post_id = wp_update_post( $post );
-
-		if ( 0 === $post_id || is_wp_error( $post_id ) ) {
-			return new WP_Error(
-				'font_post_update_failed',
-				__( 'Font post update failed', 'gutenberg' )
-			);
-		}
-
-		return $post_id;
-	}
-
-	/**
-	 * Creates a post for a font in the Font Library if it doesn't exist,
-	 * or updates it if it does.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return int|WP_Error Post id if the post was created or updated successfully,
-	 *                      WP_Error otherwise.
-	 */
-	private function create_or_update_font_post() {
-		// $this->sanitize();
-
-
-		$post = $this->get_font_post();
-		if ( $post ) {
-			return $this->update_font_post( $post );
-		}
-
-		return $this->create_font_post();
-	}
 
 	/**
 	 * Installs the font family into the library.
@@ -691,11 +698,11 @@ class WP_Font_Family {
 			);
 		}
 
-		$post_id = $this->create_or_update_font_post();
+		// $post_id = $this->create_or_update_font_post();
 
-		if ( is_wp_error( $post_id ) ) {
-			return $post_id;
-		}
+		// if ( is_wp_error( $post_id ) ) {
+		// 	return $post_id;
+		// }
 
 		return $this->get_data();
 	}
