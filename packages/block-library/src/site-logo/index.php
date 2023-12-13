@@ -129,6 +129,7 @@ add_filter( 'theme_mod_custom_logo', '_override_custom_logo_theme_mod' );
  * @return mixed
  */
 function _sync_custom_logo_to_site_logo( $value ) {
+	blablabla();
 	if ( empty( $value ) ) {
 		delete_option( 'site_logo' );
 	} else {
