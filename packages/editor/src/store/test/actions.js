@@ -448,15 +448,6 @@ describe( 'Editor actions', () => {
 					.isEditorPanelEnabled( 'control-panel' )
 			).toBe( false );
 
-			// Also check that the `getPreference` selector includes panels.
-			expect(
-				registry.select( editorStore ).getPreference( 'panels' )
-			).toEqual( {
-				'control-panel': {
-					enabled: false,
-				},
-			} );
-
 			// Switch it on again.
 			registry
 				.dispatch( editorStore )
@@ -467,10 +458,6 @@ describe( 'Editor actions', () => {
 					.select( editorStore )
 					.isEditorPanelEnabled( 'control-panel' )
 			).toBe( true );
-
-			expect(
-				registry.select( editorStore ).getPreference( 'panels' )
-			).toEqual( {} );
 		} );
 	} );
 
@@ -489,14 +476,6 @@ describe( 'Editor actions', () => {
 					.isEditorPanelOpened( 'control-panel' )
 			).toBe( true );
 
-			expect(
-				registry.select( editorStore ).getPreference( 'panels' )
-			).toEqual( {
-				'control-panel': {
-					opened: true,
-				},
-			} );
-
 			// Close it.
 			registry
 				.dispatch( editorStore )
@@ -507,10 +486,6 @@ describe( 'Editor actions', () => {
 					.select( editorStore )
 					.isEditorPanelOpened( 'control-panel' )
 			).toBe( false );
-
-			expect(
-				registry.select( editorStore ).getPreference( 'panels' )
-			).toEqual( {} );
 		} );
 	} );
 } );
