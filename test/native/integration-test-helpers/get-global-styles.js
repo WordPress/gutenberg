@@ -43,6 +43,28 @@ const GLOBAL_STYLES_RAW_FEATURES = {
 	},
 	typography: {
 		fontSizes: {
+			default: [
+				{
+					name: 'Small',
+					size: '13px',
+					slug: 'small',
+				},
+				{
+					name: 'Medium',
+					size: '20px',
+					slug: 'medium',
+				},
+				{
+					name: 'Large',
+					size: '36px',
+					slug: 'large',
+				},
+				{
+					name: 'Extra Large',
+					size: '42px',
+					slug: 'x-large',
+				},
+			],
 			theme: [
 				{
 					fluid: false,

@@ -689,6 +689,47 @@ describe( 'Paragraph block', () => {
 	` );
 	} );
 
+	it( 'should show the expected font sizes values', async () => {
+		// Arrange
+		const screen = await initializeEditor( { withGlobalStyles: true } );
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
+
+		// Open Font size settings
+		fireEvent.press( screen.getByLabelText( 'Font Size, Custom' ) );
+		await waitFor( () => screen.getByLabelText( 'Selected: Default' ) );
+
+		// Assert
+		const modalContent = within( blockSettingsModal );
+		expect( modalContent.getByLabelText( 'Small' ) ).toBeVisible();
+		expect( modalContent.getByText( '14px' ) ).toBeVisible();
+		expect( modalContent.getByLabelText( 'Medium' ) ).toBeVisible();
+		expect( modalContent.getByText( '17px' ) ).toBeVisible();
+		expect( modalContent.getByLabelText( 'Large' ) ).toBeVisible();
+		expect( modalContent.getByText( '30px' ) ).toBeVisible();
+		expect( modalContent.getByLabelText( 'Extra Large' ) ).toBeVisible();
+		expect( modalContent.getByText( '40px' ) ).toBeVisible();
+		expect(
+			modalContent.getByLabelText( 'Extra Extra Large' )
+		).toBeVisible();
+		expect( modalContent.getByText( '52px' ) ).toBeVisible();
+	} );
+
 	it( 'should set a font size value', async () => {
 		// Arrange
 		const screen = await initializeEditor( { withGlobalStyles: true } );
