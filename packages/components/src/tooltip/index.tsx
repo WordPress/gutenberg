@@ -29,9 +29,13 @@ function Tooltip( props: TooltipProps ) {
 		delay = TOOLTIP_DELAY,
 		hideOnClick = true,
 		placement,
-		position,
 		shortcut,
 		text,
+		portal = true,
+		portalElement,
+
+		// Deprecated props
+		position,
 	} = props;
 
 	const baseId = useInstanceId( Tooltip, 'tooltip' );
@@ -86,6 +90,8 @@ function Tooltip( props: TooltipProps ) {
 					id={ describedById }
 					overflowPadding={ 0.5 }
 					store={ tooltipStore }
+					portal={ portal }
+					portalElement={ portalElement }
 				>
 					{ text }
 					{ shortcut && (

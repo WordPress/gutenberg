@@ -58,4 +58,9 @@ export type TooltipProps = {
 	 * The text shown in the tooltip when anchor element is focused or hovered.
 	 */
 	text?: string;
+	portal?: boolean;
+	portalElement?:
+		| HTMLElement
+		| ( ( element: HTMLElement ) => HTMLElement | null )
+		| null;
 };
