@@ -123,7 +123,9 @@ test.describe( 'Editing Navigation Menus', () => {
 		// Open the document settings sidebar
 		await editor.openDocumentSettingsSidebar();
 
-		const sidebar = page.getByLabel( 'Editor settings' );
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
 
 		await expect( sidebar ).toBeVisible();
 
