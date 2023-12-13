@@ -60,9 +60,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 								<Icon icon={ check } />
 							)
 						}
-						onSelect={ ( event ) => {
-							// We need to handle this on DropDown component probably..
-							event.preventDefault();
+						onSelect={ () => {
 							onChangeView( {
 								...view,
 								type: availableView.type,
