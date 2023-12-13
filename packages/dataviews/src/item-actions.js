@@ -23,7 +23,7 @@ const {
 	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
-function ButtonTrigger( { action, onClick } ) {
+function ButtonTrigger( { action, onClick, disabled } ) {
 	return (
 		<Button
 			label={ action.label }
@@ -31,6 +31,7 @@ function ButtonTrigger( { action, onClick } ) {
 			isDestructive={ action.isDestructive }
 			size="compact"
 			onClick={ onClick }
+			disabled={ disabled }
 		/>
 	);
 }
@@ -51,6 +52,7 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 	const actionTriggerProps = {
 		action,
 		onClick: () => setIsModalOpen( true ),
+		disabled: action.isEnabled && ! action.isEnabled( item ),
 	};
 	const { RenderModal, hideModalHeader } = action;
 	return (
@@ -79,6 +81,9 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 	return (
 		<DropdownMenuGroup>
 			{ actions.map( ( action ) => {
+				if ( action.isEnabled && ! action.isEnabled( item ) ) {
+					return null;
+				}
 				if ( !! action.RenderModal ) {
 					return (
 						<ActionWithModal
@@ -158,6 +163,9 @@ export default function ItemActions( { item, actions, isCompact } ) {
 							key={ action.id }
 							action={ action }
 							onClick={ () => action.callback( item ) }
+							disabled={
+								action.isEnabled && ! action.isEnabled( item )
+							}
 						/>
 					);
 				} ) }

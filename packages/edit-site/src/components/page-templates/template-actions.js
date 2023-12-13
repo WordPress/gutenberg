@@ -24,6 +24,10 @@ import isTemplateRevertable from '../../utils/is-template-revertable';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
+function hasThemeFile( template ) {
+	return !! template?.has_theme_file;
+}
+
 export function useResetTemplateAction() {
 	const { revertTemplate } = useDispatch( editSiteStore );
 	const { saveEditedEntityRecord } = useDispatch( coreStore );
@@ -35,7 +39,8 @@ export function useResetTemplateAction() {
 			label: __( 'Reset template' ),
 			isPrimary: true,
 			icon: backup,
-			isEligible: isTemplateRevertable,
+			isEligible: hasThemeFile,
+			isEnabled: isTemplateRevertable,
 			async callback( template ) {
 				try {
 					await revertTemplate( template, { allowUndo: false } );
