@@ -63,15 +63,6 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 			[ 'With `state` prop', useStateProps ],
 			[ 'With custom props', useCustomProps ],
 		] )( '%s', ( __, useProps ) => {
-			async function key( code: string, modifier?: string ) {
-				if ( modifier ) {
-					return await userEvent.keyboard(
-						`[${ modifier }>][${ code }][/${ code }]`
-					);
-				}
-				return await userEvent.keyboard( `[${ code }]` );
-			}
-
 			function OneDimensionalTest( initialState?: InitialState ) {
 				const props = useProps( initialState );
 				return (
@@ -184,6 +175,7 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 			}
 
 			test( 'Renders as a single tab stop', async () => {
+				const user = userEvent.setup();
 				const Test = () => (
 					<>
 						<button>Before</button>
@@ -193,17 +185,18 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 				);
 				render( <Test /> );
 
-				await userEvent.tab();
+				await user.tab();
 				expect( screen.getByText( 'Before' ) ).toHaveFocus();
-				await userEvent.tab();
+				await user.tab();
 				expect( screen.getByText( 'Item 1' ) ).toHaveFocus();
-				await userEvent.tab();
+				await user.tab();
 				expect( screen.getByText( 'After' ) ).toHaveFocus();
-				await userEvent.tab( { shift: true } );
+				await user.tab( { shift: true } );
 				expect( screen.getByText( 'Item 1' ) ).toHaveFocus();
 			} );
 
 			test( 'Excludes disabled items', async () => {
+				const user = userEvent.setup();
 				const Test = () => {
 					const props = useProps();
 					return (
@@ -222,14 +215,15 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 
 				expect( item2 ).toBeDisabled();
 
-				await userEvent.tab();
+				await user.tab();
 				expect( item1 ).toHaveFocus();
-				await key( 'ArrowDown' );
+				await user.keyboard( '[ArrowDown]' );
 				expect( item2 ).not.toHaveFocus();
 				expect( item3 ).toHaveFocus();
 			} );
 
 			test( 'Includes focusable disabled items', async () => {
+				const user = userEvent.setup();
 				const Test = () => {
 					const props = useProps();
 					return (
@@ -248,135 +242,140 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 				expect( item2 ).toBeEnabled();
 				expect( item2 ).toHaveAttribute( 'aria-disabled', 'true' );
 
-				await userEvent.tab();
+				await user.tab();
 				expect( item1 ).toHaveFocus();
-				await key( 'ArrowDown' );
+				await user.keyboard( '[ArrowDown]' );
 				expect( item2 ).toHaveFocus();
 				expect( item3 ).not.toHaveFocus();
 			} );
 
 			describe( 'In one dimension', () => {
 				test( 'All directions work with no orientation', async () => {
+					const user = userEvent.setup();
 					const { item1, item2, item3 } =
 						initialiseOneDimensionalTest();
 
-					await userEvent.tab();
+					await user.tab();
 					expect( item1 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( item2 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( item3 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( item3 ).toHaveFocus();
-					await key( 'ArrowUp' );
+					await user.keyboard( '[ArrowUp]' );
 					expect( item2 ).toHaveFocus();
-					await key( 'ArrowUp' );
+					await user.keyboard( '[ArrowUp]' );
 					expect( item1 ).toHaveFocus();
-					await key( 'ArrowUp' );
+					await user.keyboard( '[ArrowUp]' );
 					expect( item1 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( item2 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( item3 ).toHaveFocus();
-					await key( 'ArrowLeft' );
+					await user.keyboard( '[ArrowLeft]' );
 					expect( item2 ).toHaveFocus();
-					await key( 'ArrowLeft' );
+					await user.keyboard( '[ArrowLeft]' );
 					expect( item1 ).toHaveFocus();
-					await key( 'End' );
+					await user.keyboard( '[End]' );
 					expect( item3 ).toHaveFocus();
-					await key( 'Home' );
+					await user.keyboard( '[Home]' );
 					expect( item1 ).toHaveFocus();
-					await key( 'PageDown' );
+					await user.keyboard( '[PageDown]' );
 					expect( item3 ).toHaveFocus();
-					await key( 'PageUp' );
+					await user.keyboard( '[PageUp]' );
 					expect( item1 ).toHaveFocus();
 				} );
 
 				test( 'Only left/right work with horizontal orientation', async () => {
+					const user = userEvent.setup();
 					const { item1, item2, item3 } =
 						initialiseOneDimensionalTest( {
 							orientation: 'horizontal',
 						} );
 
-					await userEvent.tab();
+					await user.tab();
 					expect( item1 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( item1 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( item2 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( item3 ).toHaveFocus();
-					await key( 'ArrowUp' );
+					await user.keyboard( '[ArrowUp]' );
 					expect( item3 ).toHaveFocus();
-					await key( 'ArrowLeft' );
+					await user.keyboard( '[ArrowLeft]' );
 					expect( item2 ).toHaveFocus();
-					await key( 'ArrowLeft' );
+					await user.keyboard( '[ArrowLeft]' );
 					expect( item1 ).toHaveFocus();
-					await key( 'End' );
+					await user.keyboard( '[End]' );
 					expect( item3 ).toHaveFocus();
-					await key( 'Home' );
+					await user.keyboard( '[Home]' );
 					expect( item1 ).toHaveFocus();
-					await key( 'PageDown' );
+					await user.keyboard( '[PageDown]' );
 					expect( item3 ).toHaveFocus();
-					await key( 'PageUp' );
+					await user.keyboard( '[PageUp]' );
 					expect( item1 ).toHaveFocus();
 				} );
 
 				test( 'Only up/down work with vertical orientation', async () => {
+					const user = userEvent.setup();
 					const { item1, item2, item3 } =
 						initialiseOneDimensionalTest( {
 							orientation: 'vertical',
 						} );
 
-					await userEvent.tab();
+					await user.tab();
 					expect( item1 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( item1 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( item2 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( item3 ).toHaveFocus();
-					await key( 'ArrowLeft' );
+					await user.keyboard( '[ArrowLeft]' );
 					expect( item3 ).toHaveFocus();
-					await key( 'ArrowUp' );
+					await user.keyboard( '[ArrowUp]' );
 					expect( item2 ).toHaveFocus();
-					await key( 'ArrowUp' );
+					await user.keyboard( '[ArrowUp]' );
 					expect( item1 ).toHaveFocus();
-					await key( 'End' );
+					await user.keyboard( '[End]' );
 					expect( item3 ).toHaveFocus();
-					await key( 'Home' );
+					await user.keyboard( '[Home]' );
 					expect( item1 ).toHaveFocus();
-					await key( 'PageDown' );
+					await user.keyboard( '[PageDown]' );
 					expect( item3 ).toHaveFocus();
-					await key( 'PageUp' );
+					await user.keyboard( '[PageUp]' );
 					expect( item1 ).toHaveFocus();
 				} );
 
 				test( 'Focus wraps with loop enabled', async () => {
+					const user = userEvent.setup();
 					const { item1, item2, item3 } =
 						initialiseOneDimensionalTest( {
 							loop: true,
 						} );
 
-					await userEvent.tab();
+					await user.tab();
 					expect( item1 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( item2 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( item3 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( item1 ).toHaveFocus();
-					await key( 'ArrowUp' );
+					await user.keyboard( '[ArrowUp]' );
 					expect( item3 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( item1 ).toHaveFocus();
-					await key( 'ArrowLeft' );
+					await user.keyboard( '[ArrowLeft]' );
 					expect( item3 ).toHaveFocus();
 				} );
 			} );
 
 			describe( 'In two dimensions', () => {
 				test( 'All directions work as standard', async () => {
+					const user = userEvent.setup();
 					const {
 						itemA1,
 						itemA2,
@@ -387,146 +386,151 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 						itemC3,
 					} = initialiseTwoDimensionalTest();
 
-					await userEvent.tab();
+					await user.tab();
 					expect( itemA1 ).toHaveFocus();
-					await key( 'ArrowUp' );
+					await user.keyboard( '[ArrowUp]' );
 					expect( itemA1 ).toHaveFocus();
-					await key( 'ArrowLeft' );
+					await user.keyboard( '[ArrowLeft]' );
 					expect( itemA1 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( itemB1 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( itemB2 ).toHaveFocus();
-					await key( 'ArrowUp' );
+					await user.keyboard( '[ArrowUp]' );
 					expect( itemA2 ).toHaveFocus();
-					await key( 'ArrowLeft' );
+					await user.keyboard( '[ArrowLeft]' );
 					expect( itemA1 ).toHaveFocus();
-					await key( 'End' );
+					await user.keyboard( '[End]' );
 					expect( itemA3 ).toHaveFocus();
-					await key( 'PageDown' );
+					await user.keyboard( '[PageDown]' );
 					expect( itemC3 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( itemC3 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( itemC3 ).toHaveFocus();
-					await key( 'Home' );
+					await user.keyboard( '[Home]' );
 					expect( itemC1 ).toHaveFocus();
-					await key( 'PageUp' );
+					await user.keyboard( '[PageUp]' );
 					expect( itemA1 ).toHaveFocus();
-					await key( 'End', 'ControlLeft' );
+					await user.keyboard( '{Control>}[End]{/Control}' );
 					expect( itemC3 ).toHaveFocus();
-					await key( 'Home', 'ControlLeft' );
+					await user.keyboard( '{Control>}[Home]{/Control}' );
 					expect( itemA1 ).toHaveFocus();
 				} );
 
 				test( 'Focus wraps around rows/columns with loop enabled', async () => {
+					const user = userEvent.setup();
 					const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
 						initialiseTwoDimensionalTest( { loop: true } );
 
-					await userEvent.tab();
+					await user.tab();
 					expect( itemA1 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( itemA2 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( itemA3 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( itemA1 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( itemB1 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( itemC1 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( itemA1 ).toHaveFocus();
-					await key( 'ArrowLeft' );
+					await user.keyboard( '[ArrowLeft]' );
 					expect( itemA3 ).toHaveFocus();
-					await key( 'ArrowUp' );
+					await user.keyboard( '[ArrowUp]' );
 					expect( itemC3 ).toHaveFocus();
 				} );
 
 				test( 'Focus moves between rows/columns with wrap enabled', async () => {
+					const user = userEvent.setup();
 					const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
 						initialiseTwoDimensionalTest( { wrap: true } );
 
-					await userEvent.tab();
+					await user.tab();
 					expect( itemA1 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( itemA2 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( itemA3 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( itemB1 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( itemC1 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( itemA2 ).toHaveFocus();
-					await key( 'ArrowLeft' );
+					await user.keyboard( '[ArrowLeft]' );
 					expect( itemA1 ).toHaveFocus();
-					await key( 'ArrowLeft' );
+					await user.keyboard( '[ArrowLeft]' );
 					expect( itemA1 ).toHaveFocus();
-					await key( 'ArrowUp' );
+					await user.keyboard( '[ArrowUp]' );
 					expect( itemA1 ).toHaveFocus();
-					await key( 'End', 'ControlLeft' );
+					await user.keyboard( '{Control>}[End]{/Control}' );
 					expect( itemC3 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( itemC3 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( itemC3 ).toHaveFocus();
 				} );
 
 				test( 'Focus wraps around start/end with loop and wrap enabled', async () => {
+					const user = userEvent.setup();
 					const { itemA1, itemC3 } = initialiseTwoDimensionalTest( {
 						loop: true,
 						wrap: true,
 					} );
 
-					await userEvent.tab();
+					await user.tab();
 					expect( itemA1 ).toHaveFocus();
-					await key( 'ArrowLeft' );
+					await user.keyboard( '[ArrowLeft]' );
 					expect( itemC3 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( itemA1 ).toHaveFocus();
-					await key( 'ArrowUp' );
+					await user.keyboard( '[ArrowUp]' );
 					expect( itemC3 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( itemA1 ).toHaveFocus();
 				} );
 
 				test( 'Focus shifts if vertical neighbour unavailable when shift enabled', async () => {
+					const user = userEvent.setup();
 					const { itemA1, itemB1, itemB2, itemC1 } =
 						initialiseShiftTest( true );
 
-					await userEvent.tab();
+					await user.tab();
 					expect( itemA1 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( itemB1 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( itemB2 ).toHaveFocus();
-					await key( 'ArrowUp' );
+					await user.keyboard( '[ArrowUp]' );
 					// A2 doesn't exist
 					expect( itemA1 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( itemB1 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( itemB2 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					// C2 is disabled
 					expect( itemC1 ).toHaveFocus();
 				} );
 
 				test( 'Focus does not shift if vertical neighbour unavailable when shift not enabled', async () => {
+					const user = userEvent.setup();
 					const { itemA1, itemB1, itemB2 } =
 						initialiseShiftTest( false );
 
-					await userEvent.tab();
+					await user.tab();
 					expect( itemA1 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					expect( itemB1 ).toHaveFocus();
-					await key( 'ArrowRight' );
+					await user.keyboard( '[ArrowRight]' );
 					expect( itemB2 ).toHaveFocus();
-					await key( 'ArrowUp' );
+					await user.keyboard( '[ArrowUp]' );
 					// A2 doesn't exist
 					expect( itemB2 ).toHaveFocus();
-					await key( 'ArrowDown' );
+					await user.keyboard( '[ArrowDown]' );
 					// C2 is disabled
 					expect( itemB2 ).toHaveFocus();
 				} );
