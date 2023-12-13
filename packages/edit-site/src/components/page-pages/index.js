@@ -320,7 +320,14 @@ export default function PagePages() {
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
 		<>
-			<Page title={ __( 'Pages' ) }>
+			<Page
+				className={
+					view.type === LAYOUT_LIST
+						? 'edit-site-page-pages-list-view'
+						: null
+				}
+				title={ __( 'Pages' ) }
+			>
 				<DataViews
 					paginationInfo={ paginationInfo }
 					fields={ fields }
