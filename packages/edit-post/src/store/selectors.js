@@ -250,18 +250,28 @@ export function isPublishSidebarOpened( state ) {
  * Returns true if the given panel was programmatically removed, or false otherwise.
  * All panels are not removed by default.
  *
+ * @deprecated
+ *
  * @param {Object} state     Global application state.
  * @param {string} panelName A string that identifies the panel.
  *
  * @return {boolean} Whether or not the panel is removed.
  */
-export function isEditorPanelRemoved( state, panelName ) {
-	return state.removedPanels.includes( panelName );
-}
+export const isEditorPanelRemoved = createRegistrySelector(
+	( select ) => ( state, panelName ) => {
+		deprecated( `select( 'core/edit-post' ).isEditorPanelRemoved`, {
+			since: '6.5',
+			alternative: `select( 'core/editor' ).isEditorPanelRemoved`,
+		} );
+		return select( editorStore ).isEditorPanelRemoved( panelName );
+	}
+);
 
 /**
  * Returns true if the given panel is enabled, or false otherwise. Panels are
  * enabled by default.
+ *
+ * @deprecated
  *
  * @param {Object} state     Global application state.
  * @param {string} panelName A string that identifies the panel.
@@ -270,20 +280,19 @@ export function isEditorPanelRemoved( state, panelName ) {
  */
 export const isEditorPanelEnabled = createRegistrySelector(
 	( select ) => ( state, panelName ) => {
-		const inactivePanels = select( preferencesStore ).get(
-			'core/edit-post',
-			'inactivePanels'
-		);
-		return (
-			! isEditorPanelRemoved( state, panelName ) &&
-			! inactivePanels?.includes( panelName )
-		);
+		deprecated( `select( 'core/edit-post' ).isEditorPanelEnabled`, {
+			since: '6.5',
+			alternative: `select( 'core/editor' ).isEditorPanelEnabled`,
+		} );
+		return select( editorStore ).isEditorPanelEnabled( panelName );
 	}
 );
 
 /**
  * Returns true if the given panel is open, or false otherwise. Panels are
  * closed by default.
+ *
+ * @deprecated
  *
  * @param {Object} state     Global application state.
  * @param {string} panelName A string that identifies the panel.
@@ -292,11 +301,11 @@ export const isEditorPanelEnabled = createRegistrySelector(
  */
 export const isEditorPanelOpened = createRegistrySelector(
 	( select ) => ( state, panelName ) => {
-		const openPanels = select( preferencesStore ).get(
-			'core/edit-post',
-			'openPanels'
-		);
-		return !! openPanels?.includes( panelName );
+		deprecated( `select( 'core/edit-post' ).isEditorPanelOpened`, {
+			since: '6.5',
+			alternative: `select( 'core/editor' ).isEditorPanelOpened`,
+		} );
+		return select( editorStore ).isEditorPanelOpened( panelName );
 	}
 );
 
@@ -376,14 +385,19 @@ export const getActiveMetaBoxLocations = createSelector(
  *
  * @return {boolean} Whether the meta box location is active and visible.
  */
-export function isMetaBoxLocationVisible( state, location ) {
-	return (
-		isMetaBoxLocationActive( state, location ) &&
-		getMetaBoxesPerLocation( state, location )?.some( ( { id } ) => {
-			return isEditorPanelEnabled( state, `meta-box-${ id }` );
-		} )
-	);
-}
+export const isMetaBoxLocationVisible = createRegistrySelector(
+	( select ) => ( state, location ) => {
+		return (
+			isMetaBoxLocationActive( state, location ) &&
+			getMetaBoxesPerLocation( state, location )?.some( ( { id } ) => {
+				return select( editorStore ).isEditorPanelEnabled(
+					state,
+					`meta-box-${ id }`
+				);
+			} )
+		);
+	}
+);
 
 /**
  * Returns true if there is an active meta box in the given location, or false

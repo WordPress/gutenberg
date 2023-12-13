@@ -432,4 +432,85 @@ describe( 'Editor actions', () => {
 			).toBe( false );
 		} );
 	} );
+
+	describe( 'toggleEditorPanelEnabled', () => {
+		it( 'toggles panels to be enabled and not enabled', () => {
+			const registry = createRegistryWithStores();
+
+			// This will switch it off, since the default is on.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelEnabled( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelEnabled( 'control-panel' )
+			).toBe( false );
+
+			// Also check that the `getPreference` selector includes panels.
+			expect(
+				registry.select( editorStore ).getPreference( 'panels' )
+			).toEqual( {
+				'control-panel': {
+					enabled: false,
+				},
+			} );
+
+			// Switch it on again.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelEnabled( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelEnabled( 'control-panel' )
+			).toBe( true );
+
+			expect(
+				registry.select( editorStore ).getPreference( 'panels' )
+			).toEqual( {} );
+		} );
+	} );
+
+	describe( 'toggleEditorPanelOpened', () => {
+		it( 'toggles panels open and closed', () => {
+			const registry = createRegistryWithStores();
+
+			// This will open it, since the default is closed.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelOpened( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelOpened( 'control-panel' )
+			).toBe( true );
+
+			expect(
+				registry.select( editorStore ).getPreference( 'panels' )
+			).toEqual( {
+				'control-panel': {
+					opened: true,
+				},
+			} );
+
+			// Close it.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelOpened( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelOpened( 'control-panel' )
+			).toBe( false );
+
+			expect(
+				registry.select( editorStore ).getPreference( 'panels' )
+			).toEqual( {} );
+		} );
+	} );
 } );

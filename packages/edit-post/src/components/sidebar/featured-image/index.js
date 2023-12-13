@@ -13,11 +13,6 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
- * Internal dependencies
- */
-import { store as editPostStore } from '../../../store';
-
-/**
  * Module Constants
  */
 const PANEL_NAME = 'featured-image';
@@ -43,10 +38,12 @@ function FeaturedImage( { isEnabled, isOpened, postType, onTogglePanel } ) {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( editorStore );
+	const {
+		getEditedPostAttribute,
+		isEditorPanelEnabled,
+		isEditorPanelOpened,
+	} = select( editorStore );
 	const { getPostType } = select( coreStore );
-	const { isEditorPanelEnabled, isEditorPanelOpened } =
-		select( editPostStore );
 
 	return {
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),
@@ -56,7 +53,7 @@ const applyWithSelect = withSelect( ( select ) => {
 } );
 
 const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const { toggleEditorPanelOpened } = dispatch( editPostStore );
+	const { toggleEditorPanelOpened } = dispatch( editorStore );
 
 	return {
 		onTogglePanel: ( ...args ) =>

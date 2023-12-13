@@ -135,7 +135,7 @@ describe( 'Sidebar', () => {
 		expect( await findSidebarPanelWithTitle( 'Summary' ) ).toBeDefined();
 
 		await page.evaluate( () => {
-			const { removeEditorPanel } = wp.data.dispatch( 'core/edit-post' );
+			const { removeEditorPanel } = wp.data.dispatch( 'core/editor' );
 
 			removeEditorPanel( 'taxonomy-panel-category' );
 			removeEditorPanel( 'taxonomy-panel-post_tag' );
