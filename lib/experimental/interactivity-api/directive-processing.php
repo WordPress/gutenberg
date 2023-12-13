@@ -172,38 +172,50 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
  *
  * @return string The processed HTML.
  */
-function gutenberg_process_interactive_block( $interactive_block ) {
-	$block_index  = 0;
-	$content      = '';
-	$directives   = array(
+function gutenberg_process_interactive_block( $interactive_block, $previous_html = null ) {
+	$block_index              = 0;
+	$content                  = '';
+	$directives               = array(
 		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
 		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
 		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
 		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
 		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
 	);
-	$inner_blocks = array();
+	$interactive_inner_blocks = array();
 
 	foreach ( $interactive_block['innerContent'] as $inner_content ) {
 		if ( is_string( $inner_content ) ) {
 			$content .= $inner_content;
 		} else {
 			// This is an inner block. It may be an interactive block or a
-			// non-interactive block.
-			$content       .= '<wp-inner-blocks-' . $block_index . '></wp-inner-blocks-' . $block_index . '>';
-			$inner_blocks[] = $interactive_block['innerBlocks'][ $block_index ];
-			$block_index   += 1;
+			// non-interactive block. Not sure if autoclosed custom tags are supported in HTML_Tag_Processor.
+			$content                   .= '<wp-inner-blocks-' . $block_index . '/>';
+			$interactive_inner_blocks[] = $interactive_block['innerBlocks'][ $block_index ];
+			$block_index               += 1;
 		}
 	}
-	$tags = new WP_Directive_Processor( $content );
-	$tags->process_rendered_html( $tags, 'data-wp-', $directives );
-	$content = $tags->get_updated_html();
-	if ( ! empty( $inner_blocks ) ) {
-		$content = str_replace( '<wp-inner-blocks-' . ( $block_index - 1 ) . '></wp-inner-blocks-' . ( $block_index - 1 ) . '>', gutenberg_process_interactive_block( $inner_blocks[0] ), $content );
-		array_shift( $inner_blocks );
+	// If we are processing an interactive inner block, we need to update the instance with the new HTML.
+	// If we create a new instance, we lose the previous context. So the next lines are wrong.
+	if ( isset( $previous_html ) ) {
+		$complete_content = str_replace( '<wp-inner-blocks-' . $block_index . '/>', $content, $previous_html );
+		$inner_tags       = new WP_Directive_Processor( $complete_content );
+		$inner_tags       = $inner_tags->process_rendered_html( $inner_tags, 'data-wp-', $directives );
+		return $inner_tags->get_updated_html();
+	} else {
+		$tags = new WP_Directive_Processor( $content );
 	}
 
-	return $content;
+	// Process inner blocks.
+	if ( ! empty( $interactive_inner_blocks ) ) {
+		foreach ( $interactive_inner_blocks as $inner_block ) {
+			$inner_block_content = gutenberg_process_interactive_block( $inner_block, $tags->get_updated_html() );
+		}
+		array_shift( $interactive_inner_blocks );
+		return $inner_block_content;
+	}
+	$tags = $tags->process_rendered_html( $tags, 'data-wp-', $directives );
+	return $tags->get_updated_html();
 }
 
 /**
@@ -216,7 +228,7 @@ function gutenberg_process_interactive_block( $interactive_block ) {
  *
  * @return string The processed HTML.
  */
-function gutenberg_process_non_interactive_block( $non_interactive_block ) {
+function gutenberg_process_non_interactive_block( $non_interactive_block, $tags = null ) {
 	$block_index = 0;
 	$content     = '';
 	foreach ( $non_interactive_block['innerContent'] as $inner_content ) {
@@ -231,9 +243,9 @@ function gutenberg_process_non_interactive_block( $non_interactive_block ) {
 			$block_index += 1;
 
 			if ( 'core/interactivity-wrapper' === $inner_block['blockName'] ) {
-				$content .= gutenberg_process_interactive_block( $inner_block );
+				$content .= gutenberg_process_interactive_block( $inner_block, $tags );
 			} elseif ( 'core/non-interactivity-wrapper' === $inner_block['blockName'] ) {
-				$content .= gutenberg_process_non_interactive_block( $inner_block );
+				$content .= gutenberg_process_non_interactive_block( $inner_block, $tags );
 			}
 		}
 	}

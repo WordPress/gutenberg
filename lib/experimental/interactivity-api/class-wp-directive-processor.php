@@ -166,6 +166,11 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 		while ( $tags->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
 			$tag_name = $tags->get_tag();
 
+			if ( str_contains( $tag_name, 'WP-INNER-BLOCKS' ) ) {
+				// Should we process the inner blocks here or just shut.
+				return $tags;
+			}
+
 			// Is this a tag that closes the latest opening tag?
 			if ( $tags->is_tag_closer() ) {
 				if ( 0 === count( $tag_stack ) ) {
