@@ -159,8 +159,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	 * @return WP_Directive_Processor The modified instance of the
 	 * WP_Directive_Processor.
 	 */
-	public function process_rendered_html( $tags, $prefix, $directives ) {
-		$context   = new WP_Directive_Context();
+	public function process_rendered_html( $tags, $prefix, $directives, $context ) {
 		$tag_stack = array();
 
 		while ( $tags->next_tag( array( 'tag_closers' => 'visit' ) ) ) {

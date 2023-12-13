@@ -41,11 +41,12 @@ function gutenberg_process_directives_in_root_blocks( $block_content, $block ) {
 		WP_Directive_Processor::unmark_root_block();
 		$processed_content = '';
 		$parsed_blocks     = parse_blocks( $block_content );
+		$context           = new WP_Directive_Context();
 		foreach ( $parsed_blocks as $parsed_block ) {
 			if ( 'core/interactivity-wrapper' === $parsed_block['blockName'] ) {
-				$processed_content .= gutenberg_process_interactive_block( $parsed_block );
+				$processed_content .= gutenberg_process_interactive_block( $parsed_block, $context );
 			} elseif ( 'core/non-interactivity-wrapper' === $parsed_block['blockName'] ) {
-				$processed_content .= gutenberg_process_non_interactive_block( $parsed_block );
+				$processed_content .= gutenberg_process_non_interactive_block( $parsed_block, $context );
 			} else {
 				$processed_content .= $parsed_block['innerHTML'];
 			}
@@ -172,18 +173,10 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
  *
  * @return string The processed HTML.
  */
-function gutenberg_process_interactive_block( $interactive_block, $previous_html = null ) {
+function gutenberg_process_interactive_block( $interactive_block, $context, $interactive_inner_blocks_processed = array() ) {
 	$block_index              = 0;
 	$content                  = '';
-	$directives               = array(
-		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
-		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
-		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
-		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
-		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
-	);
 	$interactive_inner_blocks = array();
-
 	foreach ( $interactive_block['innerContent'] as $inner_content ) {
 		if ( is_string( $inner_content ) ) {
 			$content .= $inner_content;
@@ -195,27 +188,33 @@ function gutenberg_process_interactive_block( $interactive_block, $previous_html
 			$block_index               += 1;
 		}
 	}
-	// If we are processing an interactive inner block, we need to update the instance with the new HTML.
-	// If we create a new instance, we lose the previous context. So the next lines are wrong.
-	if ( isset( $previous_html ) ) {
-		$complete_content = str_replace( '<wp-inner-blocks-' . $block_index . '/>', $content, $previous_html );
-		$inner_tags       = new WP_Directive_Processor( $complete_content );
-		$inner_tags       = $inner_tags->process_rendered_html( $inner_tags, 'data-wp-', $directives );
-		return $inner_tags->get_updated_html();
-	} else {
-		$tags = new WP_Directive_Processor( $content );
-	}
-
-	// Process inner blocks.
+	$tags       = new WP_Directive_Processor( $content );
+	$directives = array(
+		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
+		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
+		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
+		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
+		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
+	);
+	$tags       = $tags->process_rendered_html( $tags, 'data-wp-', $directives, $context );
 	if ( ! empty( $interactive_inner_blocks ) ) {
+		$inner_index = 0;
 		foreach ( $interactive_inner_blocks as $inner_block ) {
-			$inner_block_content = gutenberg_process_interactive_block( $inner_block, $tags->get_updated_html() );
+			$inner_block_content = gutenberg_process_interactive_block( $inner_block, $context, $interactive_inner_blocks_processed );
+			$interactive_inner_blocks_processed[ '<wp-inner-blocks-' . $inner_index . '/>' ] = $inner_block_content;
+			$inner_index += 1;
 		}
-		array_shift( $interactive_inner_blocks );
-		return $inner_block_content;
 	}
-	$tags = $tags->process_rendered_html( $tags, 'data-wp-', $directives );
-	return $tags->get_updated_html();
+	$previous_content = $tags->get_updated_html();
+	if ( ! empty( $interactive_inner_blocks_processed ) ) {
+		foreach ( $interactive_inner_blocks_processed as $inner_block_tag => $inner_blockcontent ) {
+			if ( str_contains( $previous_content, $inner_block_tag ) ) {
+				$previous_content = str_replace( $inner_block_tag, $inner_blockcontent, $previous_content );
+				unset( $inner_block_tag, $interactive_inner_blocks_processed );
+			}
+		}
+	}
+	return $previous_content;
 }
 
 /**
@@ -228,7 +227,7 @@ function gutenberg_process_interactive_block( $interactive_block, $previous_html
  *
  * @return string The processed HTML.
  */
-function gutenberg_process_non_interactive_block( $non_interactive_block, $tags = null ) {
+function gutenberg_process_non_interactive_block( $non_interactive_block, $context ) {
 	$block_index = 0;
 	$content     = '';
 	foreach ( $non_interactive_block['innerContent'] as $inner_content ) {
@@ -243,9 +242,9 @@ function gutenberg_process_non_interactive_block( $non_interactive_block, $tags 
 			$block_index += 1;
 
 			if ( 'core/interactivity-wrapper' === $inner_block['blockName'] ) {
-				$content .= gutenberg_process_interactive_block( $inner_block, $tags );
+				$content .= gutenberg_process_interactive_block( $inner_block, $context );
 			} elseif ( 'core/non-interactivity-wrapper' === $inner_block['blockName'] ) {
-				$content .= gutenberg_process_non_interactive_block( $inner_block, $tags );
+				$content .= gutenberg_process_non_interactive_block( $inner_block, $context );
 			}
 		}
 	}
