@@ -22,7 +22,7 @@ class Tests_Fonts_WpFontFamily_GetFontPost extends WP_Font_Family_UnitTestCase {
 			'post_title'   => $this->merriweather['font_data']['name'],
 			'post_name'    => $this->merriweather['font_data']['slug'],
 			'post_type'    => 'wp_font_family',
-			'post_content' => '',
+			'post_content' => json_encode( $this->merriweather['font_data'] ),
 			'post_status'  => 'publish',
 		);
 		$post_id = wp_insert_post( $post );
