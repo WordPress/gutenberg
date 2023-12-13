@@ -19,18 +19,6 @@ export const DEFAULT_ENTITY_KEY = 'id';
 
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
-// A hardcoded list of post types that support revisions.
-// Reflects post types in Core's src/wp-includes/post.php.
-// @TODO: Ideally this should be fetched from the  `/types` REST API's view context.
-const POST_TYPE_ENTITIES_WITH_REVISIONS_SUPPORT = [
-	'post',
-	'page',
-	'wp_block',
-	'wp_navigation',
-	'wp_template',
-	'wp_template_part',
-];
-
 export const rootEntitiesConfig = [
 	{
 		label: __( 'Base' ),
@@ -223,9 +211,6 @@ export const rootEntitiesConfig = [
 			`/wp/v2/global-styles/${ parentId }/revisions${
 				revisionId ? '/' + revisionId : ''
 			}`,
-		supports: {
-			revisions: true,
-		},
 		supportsPagination: true,
 	},
 	{
@@ -315,11 +300,6 @@ async function loadPostTypeEntities() {
 				selection: true,
 			},
 			mergedEdits: { meta: true },
-			supports: {
-				revisions: POST_TYPE_ENTITIES_WITH_REVISIONS_SUPPORT.includes(
-					postType?.slug
-				),
-			},
 			rawAttributes: POST_RAW_ATTRIBUTES,
 			getTitle: ( record ) =>
 				record?.title?.rendered ||

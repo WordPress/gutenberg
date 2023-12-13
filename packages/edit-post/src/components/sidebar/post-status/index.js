@@ -13,6 +13,7 @@ import {
 	PostSwitchToDraftButton,
 	PostSyncStatus,
 	PostURLPanel,
+	PostTemplatePanel,
 } from '@wordpress/editor';
 
 /**
@@ -26,7 +27,6 @@ import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
 import PluginPostStatusInfo from '../plugin-post-status-info';
 import { store as editPostStore } from '../../../store';
-import PostTemplate from '../post-template';
 
 /**
  * Module Constants
@@ -62,7 +62,7 @@ export default function PostStatus() {
 					<>
 						<PostVisibility />
 						<PostSchedulePanel />
-						<PostTemplate />
+						<PostTemplatePanel />
 						<PostURLPanel />
 						<PostSyncStatus />
 						<PostSticky />

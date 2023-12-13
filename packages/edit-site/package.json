@@ -27,7 +27,6 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@tanstack/react-table": "^8.10.3",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
@@ -40,6 +39,7 @@
 		"@wordpress/core-commands": "file:../core-commands",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
+		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/date": "file:../date",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",

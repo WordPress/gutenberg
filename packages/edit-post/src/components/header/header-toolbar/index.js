@@ -105,6 +105,7 @@ function HeaderToolbar( { hasFixedToolbar, setListViewToggleElement } ) {
 				variant={ showIconLabels ? 'tertiary' : undefined }
 				aria-expanded={ isListViewOpen }
 				ref={ setListViewToggleElement }
+				size="compact"
 			/>
 		</>
 	);
@@ -159,17 +160,20 @@ function HeaderToolbar( { hasFixedToolbar, setListViewToggleElement } ) {
 									showIconLabels ? 'tertiary' : undefined
 								}
 								disabled={ isTextModeEnabled }
+								size="compact"
 							/>
 						) }
 						<ToolbarItem
 							as={ EditorHistoryUndo }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
+							size="compact"
 						/>
 						<ToolbarItem
 							as={ EditorHistoryRedo }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
+							size="compact"
 						/>
 						{ overflowItems }
 					</>

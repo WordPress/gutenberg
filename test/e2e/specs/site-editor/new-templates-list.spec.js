@@ -14,26 +14,32 @@ test.describe( 'Templates', () => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
 			requestUtils.deactivatePlugin( 'gutenberg-test-dataviews' ),
+			requestUtils.deleteAllTemplates( 'wp_template' ),
 		] );
 	} );
 	test( 'Sorting', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( { path: '/wp_template/all' } );
 		// Descending by title.
-		await page.getByRole( 'button', { name: 'Template' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Sort descending' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Template', exact: true } )
+			.click();
+		await page
+			.getByRole( 'menuitemradio', {
+				name: 'Sort descending',
+			} )
+			.click();
 		const firstTitle = page
 			.getByRole( 'region', {
 				name: 'Template',
 				includeHidden: true,
 			} )
-			.getByRole( 'heading', {
-				level: 3,
-				includeHidden: true,
-			} )
+			.getByRole( 'link', { includeHidden: true } )
 			.first();
 		await expect( firstTitle ).toHaveText( 'Tag Archives' );
 		// Ascending by title.
-		await page.getByRole( 'menuitem', { name: 'Sort ascending' } ).click();
+		await page
+			.getByRole( 'menuitemradio', { name: 'Sort ascending' } )
+			.click();
 		await expect( firstTitle ).toHaveText( 'Category Archives' );
 	} );
 	test( 'Filtering', async ( { requestUtils, admin, page } ) => {
@@ -48,7 +54,7 @@ test.describe( 'Templates', () => {
 		await page.keyboard.type( 'tag' );
 		const titles = page
 			.getByRole( 'region', { name: 'Template' } )
-			.getByRole( 'heading', { level: 3 } );
+			.getByRole( 'link' );
 		await expect( titles ).toHaveCount( 1 );
 		await expect( titles.first() ).toHaveText( 'Tag Archives' );
 		await page.getByRole( 'button', { name: 'Reset filters' } ).click();
@@ -57,7 +63,7 @@ test.describe( 'Templates', () => {
 		// Filter by author.
 		await page.getByRole( 'button', { name: 'Add filter' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Author' } ).hover();
-		await page.getByRole( 'menuitemcheckbox', { name: 'admin' } ).click();
+		await page.getByRole( 'menuitem', { name: 'admin' } ).click();
 		await expect( titles ).toHaveCount( 1 );
 		await expect( titles.first() ).toHaveText( 'Date Archives' );
 
@@ -68,17 +74,13 @@ test.describe( 'Templates', () => {
 		await expect( titles ).toHaveCount( 3 );
 		await page.getByRole( 'button', { name: 'Add filter' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Author' } ).hover();
-		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Emptytheme' } )
-			.click();
+		await page.getByRole( 'menuitem', { name: 'Emptytheme' } ).click();
 		await expect( titles ).toHaveCount( 2 );
-
-		await requestUtils.deleteAllTemplates( 'wp_template' );
 	} );
 	test( 'Field visibility', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( { path: '/wp_template/all' } );
 		await page.getByRole( 'button', { name: 'Description' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Hide' } ).click();
 		await expect(
 			page.getByRole( 'button', { name: 'Description' } )
 		).toBeHidden();

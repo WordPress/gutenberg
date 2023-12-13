@@ -112,6 +112,7 @@ public class WPAndroidGlueCode {
     private OnToggleUndoButtonListener mOnToggleUndoButtonListener;
 
     private OnToggleRedoButtonListener mOnToggleRedoButtonListener;
+    private OnConnectionStatusEventListener mOnConnectionStatusEventListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -257,6 +258,10 @@ public class WPAndroidGlueCode {
 
     public interface OnToggleRedoButtonListener {
         void onToggleRedoButton(boolean isDisabled);
+    }
+
+    public interface OnConnectionStatusEventListener {
+        boolean onRequestConnectionStatus();
     }
 
     public void mediaSelectionCancelled() {
@@ -594,6 +599,12 @@ public class WPAndroidGlueCode {
             public void toggleRedoButton(boolean isDisabled) {
                 mOnToggleRedoButtonListener.onToggleRedoButton(isDisabled);
             }
+
+            @Override
+            public void requestConnectionStatus(ConnectionStatusCallback connectionStatusCallback) {
+                boolean isConnected = mOnConnectionStatusEventListener.onRequestConnectionStatus();
+                connectionStatusCallback.onRequestConnectionStatus(isConnected);
+            }
         }, mIsDarkMode);
 
         return Arrays.asList(
@@ -688,6 +699,7 @@ public class WPAndroidGlueCode {
                                   OnSendEventToHostListener onSendEventToHostListener,
                                   OnToggleUndoButtonListener onToggleUndoButtonListener,
                                   OnToggleRedoButtonListener onToggleRedoButtonListener,
+                                  OnConnectionStatusEventListener onConnectionStatusEventListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -713,6 +725,7 @@ public class WPAndroidGlueCode {
         mOnSendEventToHostListener = onSendEventToHostListener;
         mOnToggleUndoButtonListener = onToggleUndoButtonListener;
         mOnToggleRedoButtonListener = onToggleRedoButtonListener;
+        mOnConnectionStatusEventListener = onConnectionStatusEventListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
@@ -1147,6 +1160,10 @@ public class WPAndroidGlueCode {
 
     public void sendToJSFeaturedImageId(int mediaId) {
         mDeferredEventEmitter.sendToJSFeaturedImageId(mediaId);
+    }
+
+    public void connectionStatusChange(boolean isConnected) {
+        mDeferredEventEmitter.onConnectionStatusChange(isConnected);
     }
 
     public void replaceUnsupportedBlock(String content, String blockId) {
