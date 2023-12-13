@@ -167,7 +167,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 
 			if ( str_contains( $tag_name, 'WP-INNER-BLOCKS' ) ) {
 				// Should we process the inner blocks here or just shut.
-				return $tags;
+				// return $tags;
 			}
 
 			// Is this a tag that closes the latest opening tag?
