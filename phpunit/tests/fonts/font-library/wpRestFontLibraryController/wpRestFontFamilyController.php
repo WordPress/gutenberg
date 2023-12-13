@@ -1,6 +1,6 @@
 <?php
 /**
- * Test WP_REST_Font_Library_Controller::get_font_collection().
+ * Test WP_REST_Font_Family_Controller
  *
  * @package WordPress
  * @subpackage Font Library
@@ -9,10 +9,10 @@
  * @group font-library
  * @group font-library-refactor
  *
- * @covers WP_REST_Font_Library_Controller
+ * @covers WP_REST_Font_Family_Controller
  */
 
-class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_UnitTestCase {
+class Tests_Fonts_FontFamilyController extends WP_REST_Font_Library_Controller_UnitTestCase {
 
 	/**
 	 * Tests failure when getting a font family that does not exist

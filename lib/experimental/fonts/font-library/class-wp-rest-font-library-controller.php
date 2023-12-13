@@ -1,15 +1,15 @@
 <?php
 /**
- * Rest Font Library Controller.
+ * Rest Font Family Controller.
  *
- * This file contains the class for the REST API Font Library Controller.
+ * This file contains the class for the REST API Font Family Controller.
  *
  * @package    WordPress
  * @subpackage Font Library
  * @since      6.5.0
  */
 
-if ( class_exists( 'WP_REST_Font_Library_Controller' ) ) {
+if ( class_exists( 'WP_REST_Font_Family_Controller' ) ) {
 	return;
 }
 
@@ -18,7 +18,7 @@ if ( class_exists( 'WP_REST_Font_Library_Controller' ) ) {
  *
  * @since 6.5.0
  */
-class WP_REST_Font_Library_Controller extends WP_REST_Controller {
+class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 
 	/**
 	 * Constructor.

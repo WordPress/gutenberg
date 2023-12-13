@@ -30,7 +30,7 @@ function gutenberg_init_font_library_routes() {
 	register_post_type( 'wp_font_family', $args );
 
 	// @core-merge: This code will go into Core's `create_initial_rest_routes()`.
-	$font_library_controller = new WP_REST_Font_Library_Controller();
+	$font_library_controller = new WP_REST_Font_Family_Controller();
 	$font_library_controller->register_routes();
 }
 
