@@ -61,7 +61,9 @@ import { useBlockEditContext } from '../../block-edit/context';
  * @return {Object} Props to pass to the element to mark as a block.
  */
 export function useBlockProps( props = {} ) {
-	const blockProps = useContext( BlockListBlockContext );
+	const { essentialProps, wrapperProps } = useContext(
+		BlockListBlockContext
+	);
 	const { name } = useBlockEditContext();
 	const blockType = getBlockType( name );
 	const blockApiVersion = blockType?.apiVersion || 1;
@@ -74,11 +76,24 @@ export function useBlockProps( props = {} ) {
 	}
 
 	return {
-		...blockProps,
+		...wrapperProps,
+		// Individual block props can override wrapper props.
 		...props,
-		ref: useMergeRefs( [ blockProps.ref, props.ref ] ),
-		className: classnames( props.className, blockProps.className ),
-		style: { ...blockProps.style, ...props.style },
+		// Essential props are always passed through.
+		...essentialProps,
+		// wrapperProps has never been able to pass a ref, so let's not add that
+		// since it's an API we're likely to deprecate in the future.
+		ref: useMergeRefs( [ props.ref, essentialProps.ref ] ),
+		className: classnames(
+			wrapperProps.className,
+			props.className,
+			essentialProps.className
+		),
+		style: {
+			...wrapperProps.style,
+			...props.style,
+			...essentialProps.style,
+		},
 	};
 }
 

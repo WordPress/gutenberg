@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback, RawHTML, useContext } from '@wordpress/element';
+import { useCallback, RawHTML, useContext } from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -17,7 +17,6 @@ import {
 	isUnmodifiedBlock,
 	isReusableBlock,
 	getBlockDefaultClassName,
-	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
@@ -30,11 +29,6 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockEdit from '../block-edit';
-import {
-	BlockEditContextProvider,
-	mayDisplayControlsKey,
-	mayDisplayParentControlsKey,
-} from '../block-edit/context';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
@@ -113,9 +107,12 @@ function BlockListBlock( {
 	clientId,
 	isSelected,
 	isSelectionEnabled,
+	className,
+	__unstableLayoutClassNames: layoutClassNames,
 	name,
 	isValid,
 	attributes,
+	wrapperProps,
 	setAttributes,
 	onReplace,
 	onInsertBlocksAfter,
@@ -125,12 +122,18 @@ function BlockListBlock( {
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 	const parentLayout = useLayout() || {};
+	const {
+		essentialProps,
+		mayDisplayControls,
+		mayDisplayParentControls,
+		themeSupportsLayout,
+	} = useContext( BlockListBlockContext );
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
 	// (InspectorControls, etc.) which are inside `BlockEdit` but not
 	// `BlockHTML`, even in HTML mode.
-	const blockEdit = (
+	let blockEdit = (
 		<BlockEdit
 			name={ name }
 			isSelected={ isSelected }
@@ -143,13 +146,62 @@ function BlockListBlock( {
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
+			__unstableLayoutClassNames={ layoutClassNames }
 			__unstableParentLayout={
 				Object.keys( parentLayout ).length ? parentLayout : undefined
 			}
+			mayDisplayControls={ mayDisplayControls }
+			mayDisplayParentControls={ mayDisplayParentControls }
 		/>
 	);
 
 	const blockType = getBlockType( name );
+
+	// Determine whether the block has props to apply to the wrapper.
+	if ( blockType?.getEditWrapperProps ) {
+		wrapperProps = mergeWrapperProps(
+			wrapperProps,
+			blockType.getEditWrapperProps( attributes )
+		);
+	}
+
+	const isAligned =
+		wrapperProps &&
+		!! wrapperProps[ 'data-align' ] &&
+		! themeSupportsLayout;
+
+	// Support for sticky position in classic themes with alignment wrappers.
+	const isSticky = className?.includes( 'is-position-sticky' );
+	const { 'data-align': dataAlign, ...restWrapperProps } = wrapperProps ?? {};
+
+	restWrapperProps.className = classnames(
+		restWrapperProps.className,
+		dataAlign && themeSupportsLayout && `align${ dataAlign }`,
+		! ( dataAlign && isSticky ) && className,
+		{
+			'wp-block': ! isAligned,
+		}
+	);
+
+	// For aligned blocks, provide a wrapper element so the block can be
+	// positioned relative to the block column.
+	// This is only kept for classic themes that don't support layout
+	// Historically we used to rely on extra divs and data-align to
+	// provide the alignments styles in the editor.
+	// Due to the differences between frontend and backend, we migrated
+	// to the layout feature, and we're now aligning the markup of frontend
+	// and backend.
+	if ( isAligned ) {
+		blockEdit = (
+			<div
+				className={ classnames( 'wp-block', isSticky && className ) }
+				data-align={ wrapperProps[ 'data-align' ] }
+			>
+				{ blockEdit }
+			</div>
+		);
+	}
+
 	let block;
 
 	if ( ! isValid ) {
@@ -181,15 +233,22 @@ function BlockListBlock( {
 	}
 
 	return (
-		<BlockCrashBoundary
-			fallback={
-				<Block className="has-warning">
-					<BlockCrashWarning />
-				</Block>
-			}
+		<BlockListBlockContext.Provider
+			value={ {
+				essentialProps,
+				wrapperProps: restWrapperProps,
+			} }
 		>
-			{ block }
-		</BlockCrashBoundary>
+			<BlockCrashBoundary
+				fallback={
+					<Block className="has-warning">
+						<BlockCrashWarning />
+					</Block>
+				}
+			>
+				{ block }
+			</BlockCrashBoundary>
+		</BlockListBlockContext.Provider>
 	);
 }
 
@@ -437,8 +496,7 @@ BlockListBlock = compose(
 )( BlockListBlock );
 
 function BlockListBlockProvider( props ) {
-	const { clientId, rootClientId, __unstableLayoutClassNames } = props;
-	let { wrapperProps, className } = props;
+	const { clientId, rootClientId } = props;
 	const selectedProps = useSelect(
 		( select ) => {
 			const {
@@ -509,6 +567,8 @@ function BlockListBlockProvider( props ) {
 			const typing = isTyping();
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const movingClientId = hasBlockMovingClientId();
+			const _hasOverlay =
+				__unstableHasActiveBlockOverlayActive( clientId );
 
 			// Do not add new properties here, use `useSelect` instead to avoid
 			// leaking new props to the public API (editor.BlockListBlock filter).
@@ -547,7 +607,6 @@ function BlockListBlockProvider( props ) {
 
 				index: getBlockIndex( clientId ),
 				blockTitle: match?.title || blockType?.title,
-				blockType,
 				isPartOfSelection: _isSelected || isPartOfMultiSelection,
 				adjustScrolling:
 					_isSelected || isFirstMultiSelectedBlock( clientId ),
@@ -556,12 +615,13 @@ function BlockListBlockProvider( props ) {
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 				isSubtreeDisabled: isBlockSubtreeDisabled( clientId ),
 				isOutlineEnabled: outlineMode,
-				hasOverlay: __unstableHasActiveBlockOverlayActive( clientId ),
+				hasOverlay: _hasOverlay,
 				initialPosition:
 					_isSelected && __unstableGetEditorMode() === 'edit'
 						? getSelectedBlocksInitialCaretPosition()
 						: undefined,
 				classNames: classnames(
+					'block-editor-block-list__block',
 					{
 						'is-selected': _isSelected,
 						'is-highlighted': isBlockHighlighted( clientId ),
@@ -581,6 +641,7 @@ function BlockListBlockProvider( props ) {
 								getBlockName( movingClientId ),
 								getBlockRootClientId( clientId )
 							),
+						'has-block-overlay': _hasOverlay,
 						'is-editing-disabled':
 							getBlockEditingMode( clientId ) === 'disabled',
 						'is-content-locked-temporarily-editing-as-blocks':
@@ -597,23 +658,6 @@ function BlockListBlockProvider( props ) {
 		[ clientId, rootClientId ]
 	);
 
-	const publicProps = {
-		mode: selectedProps.mode,
-		isSelectionEnabled: selectedProps.isSelectionEnabled,
-		isLocked: selectedProps.isLocked,
-		canRemove: selectedProps.canRemove,
-		canMove: selectedProps.canMove,
-		// Users of the editor.BlockListBlock filter used to be able to
-		// access the block prop.
-		// Ideally these blocks would rely on the clientId prop only.
-		// This is kept for backward compatibility reasons.
-		block: selectedProps.block,
-		name: selectedProps.name,
-		attributes: selectedProps.attributes,
-		isValid: selectedProps.isValid,
-		isSelected: selectedProps.isSelected,
-	};
-
 	const {
 		index,
 		name,
@@ -628,11 +672,7 @@ function BlockListBlockProvider( props ) {
 		initialPosition,
 		classNames,
 		themeSupportsLayout,
-		blockType,
-		attributes,
 		blockEditingMode,
-		mayDisplayControls,
-		mayDisplayParentControls,
 	} = selectedProps;
 
 	const mergedRefs = useMergeRefs( [
@@ -653,34 +693,6 @@ function BlockListBlockProvider( props ) {
 		useDisabled( { isDisabled: ! hasOverlay } ),
 	] );
 
-	const { layout = null } = attributes;
-	const layoutSupport =
-		hasBlockSupport( name, 'layout', false ) ||
-		hasBlockSupport( name, '__experimentalLayout', false );
-	const blockEditContext = useMemo(
-		() => ( {
-			name,
-			isSelected,
-			clientId,
-			layout: layoutSupport ? layout : null,
-			__unstableLayoutClassNames,
-			// We use symbols in favour of an __unstable prefix to avoid
-			// usage outside of the package (this context is exposed).
-			[ mayDisplayControlsKey ]: mayDisplayControls,
-			[ mayDisplayParentControlsKey ]: mayDisplayParentControls,
-		} ),
-		[
-			name,
-			isSelected,
-			clientId,
-			layoutSupport,
-			layout,
-			__unstableLayoutClassNames,
-			mayDisplayControls,
-			mayDisplayParentControls,
-		]
-	);
-
 	// Block is sometimes not mounted at the right time, causing it be
 	// undefined see issue for more info
 	// https://github.com/WordPress/gutenberg/issues/17013
@@ -691,31 +703,8 @@ function BlockListBlockProvider( props ) {
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 
-	// Determine whether the block has props to apply to the wrapper.
-	if ( blockType?.getEditWrapperProps ) {
-		wrapperProps = mergeWrapperProps(
-			wrapperProps,
-			blockType.getEditWrapperProps( attributes )
-		);
-	}
-
-	const isAligned =
-		wrapperProps &&
-		!! wrapperProps[ 'data-align' ] &&
-		! themeSupportsLayout;
-
-	// Support for sticky position in classic themes with alignment wrappers.
-	const isSticky = className?.includes( 'is-position-sticky' );
-	const { 'data-align': dataAlign, ...restWrapperProps } = wrapperProps ?? {};
-
-	className = classnames(
-		dataAlign && themeSupportsLayout && `align${ dataAlign }`,
-		! ( dataAlign && isSticky ) && className
-	);
-
 	const blockProps = {
 		tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
-		...restWrapperProps,
 		ref: mergedRefs,
 		id: `block-${ clientId }`,
 		role: 'document',
@@ -724,53 +713,39 @@ function BlockListBlockProvider( props ) {
 		'data-type': name,
 		'data-title': blockTitle,
 		inert: isSubtreeDisabled ? 'true' : undefined,
-		className: classnames(
-			'block-editor-block-list__block',
-			{
-				// The wp-block className is important for editor styles.
-				'wp-block': ! isAligned,
-				'has-block-overlay': hasOverlay,
-			},
-			className,
-			restWrapperProps.className,
-			classNames
-		),
+		className: classNames,
 	};
 
-	const component = (
-		<BlockEditContextProvider
-			// It is important to return the same object if props haven't
-			// changed to avoid  unnecessary rerenders.
-			// See https://reactjs.org/docs/context.html#caveats.
-			value={ blockEditContext }
+	const publicProps = {
+		mode: selectedProps.mode,
+		isSelectionEnabled: selectedProps.isSelectionEnabled,
+		isLocked: selectedProps.isLocked,
+		canRemove: selectedProps.canRemove,
+		canMove: selectedProps.canMove,
+		// Users of the editor.BlockListBlock filter used to be able to
+		// access the block prop.
+		// Ideally these blocks would rely on the clientId prop only.
+		// This is kept for backward compatibility reasons.
+		block: selectedProps.block,
+		name: selectedProps.name,
+		attributes: selectedProps.attributes,
+		isValid: selectedProps.isValid,
+		isSelected: selectedProps.isSelected,
+	};
+
+	return (
+		<BlockListBlockContext.Provider
+			value={ {
+				essentialProps: blockProps,
+				mayDisplayControls: selectedProps.mayDisplayControls,
+				mayDisplayParentControls:
+					selectedProps.mayDisplayParentControls,
+				themeSupportsLayout,
+			} }
 		>
-			{ /* To do: explain why it's ok to not memo */ }
-			<BlockListBlockContext.Provider value={ blockProps }>
-				<BlockListBlock { ...props } { ...publicProps } />
-			</BlockListBlockContext.Provider>
-		</BlockEditContextProvider>
+			<BlockListBlock { ...props } { ...publicProps } />
+		</BlockListBlockContext.Provider>
 	);
-
-	// For aligned blocks, provide a wrapper element so the block can be
-	// positioned relative to the block column.
-	// This is only kept for classic themes that don't support layout
-	// Historically we used to rely on extra divs and data-align to
-	// provide the alignments styles in the editor.
-	// Due to the differences between frontend and backend, we migrated
-	// to the layout feature, and we're now aligning the markup of frontend
-	// and backend.
-	if ( isAligned ) {
-		return (
-			<div
-				className={ classnames( 'wp-block', isSticky && className ) }
-				data-align={ wrapperProps[ 'data-align' ] }
-			>
-				{ component }
-			</div>
-		);
-	}
-
-	return component;
 }
 
 export default pure( BlockListBlockProvider );
