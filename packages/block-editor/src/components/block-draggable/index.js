@@ -22,34 +22,41 @@ const BlockDraggable = ( {
 	onDragStart,
 	onDragEnd,
 } ) => {
-	const { srcRootClientId, isDraggable, icon, getBlockListSettings } =
-		useSelect(
-			( select ) => {
-				const {
-					canMoveBlocks,
-					getBlockRootClientId,
-					getBlockName,
-					getBlockAttributes,
-					getBlockListSettings: _getBlockListSettings,
-				} = select( blockEditorStore );
-				const { getBlockType, getActiveBlockVariation } =
-					select( blocksStore );
-				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-				const blockName = getBlockName( clientIds[ 0 ] );
-				const variation = getActiveBlockVariation(
-					blockName,
-					getBlockAttributes( clientIds[ 0 ] )
-				);
+	const {
+		srcRootClientId,
+		isDraggable,
+		icon,
+		getBlockListSettings,
+		visibleInserter,
+	} = useSelect(
+		( select ) => {
+			const {
+				canMoveBlocks,
+				getBlockRootClientId,
+				getBlockName,
+				getBlockAttributes,
+				getBlockListSettings: _getBlockListSettings,
+				isBlockInsertionPointVisible,
+			} = select( blockEditorStore );
+			const { getBlockType, getActiveBlockVariation } =
+				select( blocksStore );
+			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+			const blockName = getBlockName( clientIds[ 0 ] );
+			const variation = getActiveBlockVariation(
+				blockName,
+				getBlockAttributes( clientIds[ 0 ] )
+			);
 
-				return {
-					srcRootClientId: rootClientId,
-					isDraggable: canMoveBlocks( clientIds, rootClientId ),
-					icon: variation?.icon || getBlockType( blockName )?.icon,
-					getBlockListSettings: _getBlockListSettings,
-				};
-			},
-			[ clientIds ]
-		);
+			return {
+				srcRootClientId: rootClientId,
+				isDraggable: canMoveBlocks( clientIds, rootClientId ),
+				icon: variation?.icon || getBlockType( blockName )?.icon,
+				getBlockListSettings: _getBlockListSettings,
+				visibleInserter: isBlockInsertionPointVisible(),
+			};
+		},
+		[ clientIds ]
+	);
 
 	const [ targetClientId, setTargetClientId ] = useState( null );
 
@@ -102,12 +109,12 @@ const BlockDraggable = ( {
 			// Update the body class to reflect if drop target is valid.
 			// This has to be done on the document body because the draggable
 			// chip is rendered outside of the editor iframe.
-			if ( isDropTargetValid ) {
-				window?.document?.body?.classList?.remove(
+			if ( ! isDropTargetValid && ! visibleInserter ) {
+				window?.document?.body?.classList?.add(
 					'block-draggable-invalid-drag-token'
 				);
 			} else {
-				window?.document?.body?.classList?.add(
+				window?.document?.body?.classList?.remove(
 					'block-draggable-invalid-drag-token'
 				);
 			}
