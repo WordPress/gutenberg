@@ -5,9 +5,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
-import { BlockTools, store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
 
 /**
@@ -26,8 +24,6 @@ import {
 import { unlock } from '../../lock-unlock';
 
 export default function SiteEditorCanvas() {
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-
 	const { templateType, isFocusMode, isViewMode } = useSelect( ( select ) => {
 		const { getEditedPostType, getCanvasMode } = unlock(
 			select( editSiteStore )
@@ -53,7 +49,6 @@ export default function SiteEditorCanvas() {
 		// Disable resizing in mobile viewport.
 		! isMobileViewport;
 
-	const contentRef = useRef();
 	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
 	const forceFullHeight = isNavigationFocusMode;
@@ -66,18 +61,11 @@ export default function SiteEditorCanvas() {
 						{ editorCanvasView }
 					</div>
 				) : (
-					<BlockTools
+					<div
 						className={ classnames( 'edit-site-visual-editor', {
 							'is-focus-mode': isFocusMode || !! editorCanvasView,
 							'is-view-mode': isViewMode,
 						} ) }
-						__unstableContentRef={ contentRef }
-						onClick={ ( event ) => {
-							// Clear selected block when clicking on the gray background.
-							if ( event.target === event.currentTarget ) {
-								clearSelectedBlock();
-							}
-						} }
 					>
 						<BackButton />
 						<ResizableEditor
@@ -91,12 +79,11 @@ export default function SiteEditorCanvas() {
 							<EditorCanvas
 								enableResizing={ enableResizing }
 								settings={ settings }
-								contentRef={ contentRef }
 							>
 								{ resizeObserver }
 							</EditorCanvas>
 						</ResizableEditor>
-					</BlockTools>
+					</div>
 				)
 			}
 		</EditorCanvasContainer.Slot>

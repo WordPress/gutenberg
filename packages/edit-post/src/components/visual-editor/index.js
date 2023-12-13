@@ -10,8 +10,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { BlockTools } from '@wordpress/block-editor';
-import { useRef, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 
@@ -59,8 +58,6 @@ export default function VisualEditor( { styles } ) {
 		paddingBottom = '40vh';
 	}
 
-	const ref = useRef();
-
 	styles = useMemo(
 		() => [
 			...styles,
@@ -80,21 +77,19 @@ export default function VisualEditor( { styles } ) {
 		renderingMode === 'template-only';
 
 	return (
-		<BlockTools
-			__unstableContentRef={ ref }
+		<div
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': renderingMode === 'template-only',
 				'has-inline-canvas': ! isToBeIframed,
 			} ) }
 		>
 			<EditorCanvas
-				ref={ ref }
 				disableIframe={ ! isToBeIframed }
 				styles={ styles }
 				// We should auto-focus the canvas (title) on load.
 				// eslint-disable-next-line jsx-a11y/no-autofocus
 				autoFocus={ ! isWelcomeGuideVisible }
 			/>
-		</BlockTools>
+		</div>
 	);
 }

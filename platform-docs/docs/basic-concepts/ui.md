@@ -17,7 +17,7 @@ The Gutenberg platform allows you to render these pieces separately and lay them
 
 ## The Block Toolbar
 
-Wrapping your `BlockCanvas` component within the `BlockTools` wrapper allows the editor to render a block toolbar adjacent to the selected block.
+The block toolbar is rendered automatically next to the selected block by default. But if you set the flag `hasFixedToolbar` to true in your `BlockEditorProvider` settings, you will be able to use the `BlockToolbar` component to render the block toolbar in your place of choice.
 
 ## The Block Inspector
 
