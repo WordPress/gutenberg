@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.14.0 (2023-12-13)
+
 ### Enhancements
 
 -   `FormToggle`: fix sass deprecation warning ([#56672](https://github.com/WordPress/gutenberg/pull/56672)).
