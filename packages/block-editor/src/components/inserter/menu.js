@@ -191,17 +191,13 @@ function InserterMenu(
 		]
 	);
 
-	const getCurrentTab = useCallback(
-		( tab ) => {
-			if ( tab.name === 'blocks' ) {
-				return blocksTab;
-			} else if ( tab.name === 'patterns' ) {
-				return patternsTab;
-			} else if ( tab.name === 'media' ) {
-				return mediaTab;
-			}
-		},
-		[ blocksTab, patternsTab, mediaTab ]
+	const inserterTabsContents = useMemo(
+		() => ( {
+			blocks: blocksTab,
+			patterns: patternsTab,
+			media: mediaTab,
+		} ),
+		[ blocksTab, mediaTab, patternsTab ]
 	);
 
 	const searchRef = useRef();
@@ -275,9 +271,8 @@ function InserterMenu(
 						showMedia={ showMedia }
 						prioritizePatterns={ prioritizePatterns }
 						onSelect={ handleSetSelectedTab }
-					>
-						{ getCurrentTab }
-					</InserterTabs>
+						tabsContents={ inserterTabsContents }
+					/>
 				) }
 				{ ! delayedFilterValue && ! showAsTabs && (
 					<div className="block-editor-inserter__no-tab-container">
