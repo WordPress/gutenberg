@@ -3,7 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
-import { store as editorStore } from '@wordpress/editor';
+import { PostLastRevisionPanel, store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { navigation, symbol } from '@wordpress/icons';
@@ -14,7 +14,6 @@ import { navigation, symbol } from '@wordpress/icons';
 import { store as editSiteStore } from '../../../store';
 import TemplateActions from './template-actions';
 import TemplateAreas from './template-areas';
-import LastRevision from './last-revision';
 import SidebarCard from '../sidebar-card';
 import PatternCategories from './pattern-categories';
 import { PATTERN_TYPES } from '../../../utils/constants';
@@ -54,20 +53,24 @@ export default function TemplatePanel() {
 	}
 
 	return (
-		<PanelBody className="edit-site-template-panel">
-			<SidebarCard
-				className="edit-site-template-card"
-				title={ decodeEntities( title ) }
-				icon={ CARD_ICONS[ record?.type ] ?? icon }
-				description={ decodeEntities( description ) }
-				actions={ <TemplateActions template={ record } /> }
-			>
-				<TemplateAreas />
-			</SidebarCard>
-			<LastRevision />
-			{ postType === PATTERN_TYPES.user && (
-				<PatternCategories post={ record } />
-			) }
-		</PanelBody>
+		<>
+			<PanelBody>
+				<SidebarCard
+					className="edit-site-template-card"
+					title={ decodeEntities( title ) }
+					icon={ CARD_ICONS[ record?.type ] ?? icon }
+					description={ decodeEntities( description ) }
+					actions={ <TemplateActions template={ record } /> }
+				>
+					<TemplateAreas />
+				</SidebarCard>
+			</PanelBody>
+			<PostLastRevisionPanel />
+			<PanelBody>
+				{ postType === PATTERN_TYPES.user && (
+					<PatternCategories post={ record } />
+				) }
+			</PanelBody>
+		</>
 	);
 }
