@@ -16,7 +16,7 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import useMovingAnimation from '../../use-moving-animation';
-import { BlockListBlockContext } from '../block-list-block-context';
+import { PrivateBlockContext } from '../private-block-context';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
 import { useBlockEditContext } from '../../block-edit/context';
@@ -100,7 +100,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isEditingDisabled,
 		isTemporarilyEditingAsBlocks,
 		defaultClassName,
-	} = useContext( BlockListBlockContext );
+	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );

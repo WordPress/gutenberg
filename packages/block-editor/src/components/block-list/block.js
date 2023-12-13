@@ -35,7 +35,7 @@ import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
-import { BlockListBlockContext } from './block-list-block-context';
+import { PrivateBlockContext } from './private-block-context';
 
 import { unlock } from '../../lock-unlock';
 
@@ -110,7 +110,7 @@ function BlockListBlock( {
 		mayDisplayParentControls,
 		themeSupportsLayout,
 		...context
-	} = useContext( BlockListBlockContext );
+	} = useContext( PrivateBlockContext );
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
@@ -218,8 +218,11 @@ function BlockListBlock( {
 		! ( dataAlign && isSticky ) && className
 	);
 
+	// We set a new context with the adjusted and filtered wrapperProps (through
+	// `editor.BlockListBlock`), which the `BlockListBlockProvider` did not have
+	// access to.
 	return (
-		<BlockListBlockContext.Provider
+		<PrivateBlockContext.Provider
 			value={ {
 				wrapperProps: restWrapperProps,
 				isAligned,
@@ -235,7 +238,7 @@ function BlockListBlock( {
 			>
 				{ block }
 			</BlockCrashBoundary>
-		</BlockListBlockContext.Provider>
+		</PrivateBlockContext.Provider>
 	);
 }
 
@@ -477,11 +480,19 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 	};
 } );
 
+// This component is used by the BlockListBlockProvider component below. It will
+// add the props necessary for the `editor.BlockListBlock` filters.
 BlockListBlock = compose(
 	applyWithDispatch,
 	withFilters( 'editor.BlockListBlock' )
 )( BlockListBlock );
 
+// This component provides all the information we need through a single store
+// subscription (useSelect mapping). Only the necesssary props are passed down
+// to the BlockListBlock component, which is a filtered component, so these
+// props are public API. To avoid adding to the public API, we use a private
+// context to pass the rest of the information to the filtered BlockListBlock
+// component, and useBlockProps.
 function BlockListBlockProvider( props ) {
 	const { clientId, rootClientId } = props;
 	const selectedProps = useSelect(
@@ -681,23 +692,6 @@ function BlockListBlockProvider( props ) {
 		return null;
 	}
 
-	const publicAPI = {
-		mode,
-		isSelectionEnabled,
-		isLocked,
-		canRemove,
-		canMove,
-		// Users of the editor.BlockListBlock filter used to be able to
-		// access the block prop.
-		// Ideally these blocks would rely on the clientId prop only.
-		// This is kept for backward compatibility reasons.
-		block,
-		name,
-		attributes,
-		isValid,
-		isSelected,
-	};
-
 	const privateContext = {
 		clientId,
 		className,
@@ -732,10 +726,40 @@ function BlockListBlockProvider( props ) {
 		themeSupportsLayout,
 	};
 
+	// Here we separate between the props passed to BlockListBlock and any other
+	// information we selected for internal use. BlockListBlock is a filtered
+	// component and thus ALL the props are PUBLIC API.
+
+	// Note that the context value doesn't have to be memoized in this case
+	// because when it changes, this component will be re-rendered anyway, and
+	// none of the consumers (BlockListBlock and useBlockProps) are memoized or
+	// "pure". This is different from the public BlockEditContext, where
+	// consumers might be memoized or "pure".
 	return (
-		<BlockListBlockContext.Provider value={ privateContext }>
-			<BlockListBlock { ...props } { ...publicAPI } />
-		</BlockListBlockContext.Provider>
+		<PrivateBlockContext.Provider value={ privateContext }>
+			<BlockListBlock
+				{ ...props }
+				// WARNING: all the following props are public API (through the
+				// editor.BlockListBlock filter) and normally nothing new should
+				// be added to it.
+				{ ...{
+					mode,
+					isSelectionEnabled,
+					isLocked,
+					canRemove,
+					canMove,
+					// Users of the editor.BlockListBlock filter used to be able
+					// to access the block prop. Ideally these blocks would rely
+					// on the clientId prop only. This is kept for backward
+					// compatibility reasons.
+					block,
+					name,
+					attributes,
+					isValid,
+					isSelected,
+				} }
+			/>
+		</PrivateBlockContext.Provider>
 	);
 }
 
