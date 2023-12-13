@@ -6,3 +6,6 @@ watch:
 notifications:
   passingTests: false
   failingTests: false
+
+phpunit:
+  arguments: '--group font-library-refactor'

@@ -318,13 +318,14 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 		$create_data     = $create_response->get_data();
 		$installed_font_id = $create_data['id'];
 
-		$add_font_face_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . $installed_font_id . '/font-faces' );
-		$add_font_face_request->set_param( 'data', array(
+		$add_font_face_request    = new WP_REST_Request( 'PUT', '/wp/v2/font-families/' . $installed_font_id );
+		$add_font_face_request->set_param( 'data', array( 'fontFace' => array( array(
 			'fontFamily'      => 'Piazzolla',
 			'fontStyle'       => 'normal',
 			'fontWeight'      => '400',
 			'src'             => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
-		));
+
+		))));
 		$add_font_face_response = rest_get_server()->dispatch( $add_font_face_request );
 		$add_font_face_data     = $add_font_face_response->get_data();
 

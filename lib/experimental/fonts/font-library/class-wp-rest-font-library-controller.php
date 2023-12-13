@@ -137,44 +137,6 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 			),
 		);
 
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\d]+)/font-faces',
-			array(
-				array(
-					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => array($this, 'install_font_face'),
-					'permission_callback' => array($this, 'update_font_library_permissions_check'),
-					'args'                => array(
-						'data'	=> array(
-							'required' => true,
-							'type'     => 'object',
-							'properties' => array(
-								'fontWeight'  => array(
-									'required' => true,
-									'type' => 'string',
-								),
-								'fontStyle'  => array(
-									'required' => true,
-									'type' => 'string',
-								),
-								'fontFamily'  => array(
-									'required' => true,
-									'type' => 'string',
-								),
-							),
-
-						)
-					),
-				),
-			)
-		);
-
-
-
-
-
-
 
 
 		// register_rest_route(
@@ -327,6 +289,17 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 
 	}
 
+	/**
+	 * Updates an existing Font Family
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_REST_Request $request The request object containing the information of the font family to update
+	 *                                 in the request parameters and ID of the font family to update.
+	 *
+	 * @return WP_REST_Response|WP_Error The updated Font Library post content.
+
+	 */
 	public function update_item( $request ) {
 
 		$id = $request->get_param( 'id' );
@@ -349,32 +322,6 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 			'data' => $font_family->get_data(),
 		) );
 	}
-
-	public function install_font_face ( $request ) {
-
-		$id = $request->get_param( 'id' );
-		$font_face_data = $request->get_param( 'data' );
-
-		$font_family = WP_Font_Family::get_font_family_by_id( $id );
-
-		if( ! $font_family) {
-			return new WP_Error(
-				'rest_font_family_not_found',
-				__( 'Font Family not found.', 'gutenberg' ),
-				array( 'status' => 404 )
-			);
-		}
-
-		$font_family->add_font_face( $font_face_data );
-		$font_family->persist();
-
-		return new WP_REST_Response( array(
-			'id' => $font_family->id,
-			'data' => $font_family->get_data(),
-		) );
-	}
-
-
 
 
 
