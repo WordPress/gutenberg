@@ -128,7 +128,7 @@ class WP_Font_Family_Utils {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param array $data data structure to sanitize.
+	 * @param string $data string to sanitize.
 	 * @return array A sanitized font family definition.
 	 */
 	public static function sanitize( $data ) {
@@ -139,7 +139,7 @@ class WP_Font_Family_Utils {
 				'typography' => array(
 					'fontFamilies' => array(
 						'custom' => array(
-							$data,
+							json_decode( $data, true ),
 						),
 					),
 				),
@@ -157,6 +157,6 @@ class WP_Font_Family_Utils {
 
 		$sanitized['slug']       = _wp_to_kebab_case( $sanitized['slug'] );
 		$sanitized['fontFamily'] = WP_Font_Family_Utils::format_font_family( $sanitized['fontFamily'] );
-		return $sanitized;
+		return json_encode( $sanitized );
 	}
 }
