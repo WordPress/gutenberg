@@ -10,7 +10,7 @@ import { useIsConnected } from '@wordpress/react-native-bridge';
 
 const withIsConnected = createHigherOrderComponent( ( WrappedComponent ) => {
 	return ( props ) => {
-		const isConnected = useIsConnected();
+		const { isConnected } = useIsConnected();
 		return <WrappedComponent { ...props } isConnected={ isConnected } />;
 	};
 }, 'withIsConnected' );
