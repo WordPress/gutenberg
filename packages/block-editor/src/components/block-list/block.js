@@ -566,8 +566,6 @@ function BlockListBlockProvider( props ) {
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const movingClientId = hasBlockMovingClientId();
 
-			// Do not add new properties here, use `useSelect` instead to avoid
-			// leaking new props to the public API (editor.BlockListBlock filter).
 			return {
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
