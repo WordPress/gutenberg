@@ -25,6 +25,7 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { useEntityRecord } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
 import { useState, useEffect, useRef } from '@wordpress/element';
+import { getQueryArg } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -48,30 +49,40 @@ const icons = {
 };
 
 export default function DocumentBar() {
+	const patternId = getQueryArg( window.location.href, 'patternId' );
 	const {
 		isEditingTemplate,
 		templateId,
 		postType,
 		postId,
 		isEditingPattern,
-	} = useSelect( ( select ) => {
-		const {
-			getRenderingMode,
-			getCurrentTemplateId,
-			getCurrentPostId,
-			getCurrentPostType,
-		} = select( editorStore );
-		const _templateId = getCurrentTemplateId();
-
-		return {
-			isEditingTemplate:
-				!! _templateId && getRenderingMode() === 'template-only',
-			isEditingPattern: getRenderingMode() === 'pattern-only',
-			templateId: _templateId,
-			postType: getCurrentPostType(),
-			postId: getCurrentPostId(),
-		};
-	}, [] );
+	} = useSelect(
+		( select ) => {
+			const {
+				getRenderingMode,
+				getCurrentTemplateId,
+				getCurrentPostId,
+				getCurrentPostType,
+			} = select( editorStore );
+			const _templateId = getCurrentTemplateId();
+			const renderingMode = getRenderingMode();
+			return {
+				isEditingTemplate:
+					!! _templateId && renderingMode === 'template-only',
+				isEditingPattern: renderingMode === 'pattern-only',
+				templateId: _templateId,
+				postType:
+					renderingMode !== 'pattern-only'
+						? getCurrentPostType()
+						: 'wp_block',
+				postId:
+					renderingMode !== 'pattern-only'
+						? getCurrentPostId()
+						: patternId,
+			};
+		},
+		[ patternId ]
+	);
 
 	const { getEditorSettings } = useSelect( editorStore );
 	const { setRenderingMode } = useDispatch( editorStore );

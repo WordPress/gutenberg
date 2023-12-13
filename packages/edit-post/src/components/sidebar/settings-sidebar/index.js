@@ -97,8 +97,9 @@ const SettingsSidebar = () => {
 						<MetaBoxes location="side" />
 					</>
 				) }
-			{ ( isTemplateMode || isPatternMode ) &&
-				sidebarName === 'edit-post/document' && <TemplateSummary /> }
+			{ isTemplateMode && sidebarName === 'edit-post/document' && (
+				<TemplateSummary />
+			) }
 			{ sidebarName === 'edit-post/block' && <BlockInspector /> }
 		</PluginSidebarEditPost>
 	);

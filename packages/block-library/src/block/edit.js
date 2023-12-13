@@ -7,12 +7,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useRegistry, useSelect, useDispatch } from '@wordpress/data';
-import { useRef, useMemo, useEffect, useState } from '@wordpress/element';
-import {
-	useEntityRecord,
-	store as coreStore,
-	useEntityBlockEditor,
-} from '@wordpress/core-data';
+import { useRef, useMemo, useEffect } from '@wordpress/element';
+import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner,
@@ -32,7 +28,6 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { getBlockSupport, parse } from '@wordpress/blocks';
-import { addQueryArgs } from '@wordpress/url';
 import { store as editorStore } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -158,16 +153,7 @@ export default function ReusableBlockEdit( {
 	context: { postId },
 } ) {
 	const history = useHistory();
-	const { setRenderingMode, setEditedPost } = useDispatch( editorStore );
-	function editParentPattern( event ) {
-		event.preventDefault();
-		setRenderingMode( 'pattern-only' );
-		setEditedPost( 'wp_block', ref );
-		history.push( {
-			post: ref,
-			action: 'edit',
-		} );
-	}
+	const { setRenderingMode } = useDispatch( editorStore );
 
 	const registry = useRegistry();
 	const hasAlreadyRendered = useHasRecursion( ref );
@@ -186,45 +172,35 @@ export default function ReusableBlockEdit( {
 		setBlockEditingMode,
 	} = useDispatch( blockEditorStore );
 
-	const { editUrl, innerBlocks, userCanEdit, getBlockEditingMode } =
-		useSelect(
-			( select ) => {
-				const { canUser } = select( coreStore );
-				const {
-					getSettings,
-					getBlocks,
-					getBlockEditingMode: editingMode,
-				} = select( blockEditorStore );
+	const { innerBlocks, userCanEdit, getBlockEditingMode } = useSelect(
+		( select ) => {
+			const { canUser } = select( coreStore );
+			const { getBlocks, getBlockEditingMode: editingMode } =
+				select( blockEditorStore );
 
-				const blocks = getBlocks( patternClientId );
-				const isBlockTheme = getSettings().__unstableIsBlockBasedTheme;
-				const canEdit = canUser( 'update', 'blocks', ref );
-				const defaultUrl = addQueryArgs( 'post.php', {
-					action: 'edit',
-					post: ref,
-				} );
-				const siteEditorUrl = addQueryArgs( 'site-editor.php', {
-					postType: 'wp_block',
-					postId: ref,
-					categoryType: 'pattern',
-					canvas: 'edit',
-					syncedPatternId: postId,
-				} );
+			const blocks = getBlocks( patternClientId );
+			const canEdit = canUser( 'update', 'blocks', ref );
 
-				// For editing link to the site editor if the theme and user permissions support it.
-				return {
-					innerBlocks: blocks,
-					editUrl:
-						canUser( 'read', 'templates' ) && isBlockTheme
-							? siteEditorUrl
-							: defaultUrl,
-					userCanEdit: canEdit,
-					getBlockEditingMode: editingMode,
-				};
-			},
-			[ patternClientId, postId, ref ]
-		);
+			// For editing link to the site editor if the theme and user permissions support it.
+			return {
+				innerBlocks: blocks,
+				userCanEdit: canEdit,
+				getBlockEditingMode: editingMode,
+			};
+		},
+		[ patternClientId, ref ]
+	);
+	function editParentPattern( event ) {
+		event.preventDefault();
 
+		history.push( {
+			post: postId,
+			action: 'edit',
+			patternId: ref,
+		} );
+
+		setRenderingMode( 'pattern-only' );
+	}
 	useEffect(
 		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
 		[ innerBlocks, setBlockEditingMode ]
