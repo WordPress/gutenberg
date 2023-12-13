@@ -1,8 +1,12 @@
 /**
+ * WordPress dependencies
+ */
+import { useIsConnected } from '@wordpress/react-native-bridge';
+
+/**
  * Internal dependencies
  */
 import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
-import { useIsConnected } from '@wordpress/react-native-bridge';
 
 const withIsConnected = createHigherOrderComponent( ( WrappedComponent ) => {
 	return ( props ) => {
