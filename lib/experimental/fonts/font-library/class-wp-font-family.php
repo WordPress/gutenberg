@@ -109,6 +109,12 @@ class WP_Font_Family {
 		return $this->data;
 	}
 
+	public function update( $data ) {
+		//TODO: Sanitize incoming data
+		$this->data = array_merge( $this->data, $data);
+		return $this->get_data();
+	}
+
 	/**
 	 * Gets the font family data.
 	 *
@@ -129,6 +135,11 @@ class WP_Font_Family {
 		$this->id = $post_id;
 		return $this->get_data();
 	}
+
+	public function add_font_face( $font_face ) {
+		$this->data['fontFace'][] = $font_face;
+	}
+
 	/**
 	 * Checks whether the font family has font faces defined.
 	 *

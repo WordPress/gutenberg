@@ -85,6 +85,36 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\d]+)',
+			array(
+				array(
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => array($this, 'update_item'),
+					'permission_callback' => array($this, 'update_font_library_permissions_check'),
+					'args'                => array(
+						'data'	=> array(
+							'required' => true,
+							'type'     => 'object',
+							'properties' => array(
+								'name'  => array(
+									'type' => 'string',
+								),
+								'slug'  => array(
+									'type' => 'string',
+								),
+								'fontFamily'  => array(
+									'type' => 'string',
+								),
+							),
+
+						)
+					),
+				),
+				// 'schema' => array( $this, 'get_items_schema' ),
+			)
+		);
+		register_rest_route(
+			$this->namespace,
 			'/' . 'all-' . $this->rest_base,
 			array(
 				array(
@@ -107,7 +137,38 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 			),
 		);
 
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\d]+)/font-faces',
+			array(
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array($this, 'install_font_face'),
+					'permission_callback' => array($this, 'update_font_library_permissions_check'),
+					'args'                => array(
+						'data'	=> array(
+							'required' => true,
+							'type'     => 'object',
+							'properties' => array(
+								'fontWeight'  => array(
+									'required' => true,
+									'type' => 'string',
+								),
+								'fontStyle'  => array(
+									'required' => true,
+									'type' => 'string',
+								),
+								'fontFamily'  => array(
+									'required' => true,
+									'type' => 'string',
+								),
+							),
 
+						)
+					),
+				),
+			)
+		);
 
 
 
@@ -246,23 +307,87 @@ class WP_REST_Font_Library_Controller extends WP_REST_Controller {
 
 		$font_family = WP_Font_Family::get_font_family_by_id( $id );
 
-		if($font_family) {
-			$font_family->uninstall( $force );
-			return new WP_REST_Response( array(
-				'deleted' => $force,
-				'previous' => array(
-					'id' => $font_family->id,
-					'data' => $font_family->get_data(),
-				)
-			) );
+		if( ! $font_family) {
+			return new WP_Error(
+				'rest_font_family_not_found',
+				__( 'Font Family not found.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
 		}
 
-		return new WP_Error(
-			'rest_font_family_not_found',
-			__( 'Font Family not found.', 'gutenberg' ),
-			array( 'status' => 404 )
-		);
+		$font_family->uninstall( $force );
+
+		return new WP_REST_Response( array(
+			'deleted' => $force,
+			'previous' => array(
+				'id' => $font_family->id,
+				'data' => $font_family->get_data(),
+			)
+		) );
+
 	}
+
+	public function update_item( $request ) {
+
+		$id = $request->get_param( 'id' );
+		$font_family_data = $request->get_param( 'data' );
+		$font_family = WP_Font_Family::get_font_family_by_id( $id );
+
+		if( ! $font_family) {
+			return new WP_Error(
+				'rest_font_family_not_found',
+				__( 'Font Family not found.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$font_family->update( $font_family_data );
+		$font_family->persist();
+
+		return new WP_REST_Response( array(
+			'id' => $font_family->id,
+			'data' => $font_family->get_data(),
+		) );
+	}
+
+	public function install_font_face ( $request ) {
+
+		$id = $request->get_param( 'id' );
+		$font_face_data = $request->get_param( 'data' );
+
+		$font_family = WP_Font_Family::get_font_family_by_id( $id );
+
+		if( ! $font_family) {
+			return new WP_Error(
+				'rest_font_family_not_found',
+				__( 'Font Family not found.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		$font_family->add_font_face( $font_face_data );
+		$font_family->persist();
+
+		return new WP_REST_Response( array(
+			'id' => $font_family->id,
+			'data' => $font_family->get_data(),
+		) );
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	/**
 	 * Gets a font collection.

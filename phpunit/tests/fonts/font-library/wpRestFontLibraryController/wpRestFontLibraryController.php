@@ -228,6 +228,43 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 		);
 	}
 
+	public function test_update_font_family() {
+
+		$create_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
+		$create_request->set_param( 'data', array(
+			'fontFamily' => 'Piazzolla',
+			'slug'       => 'piazzolla',
+			'name'       => 'Piazzolla',
+		));
+		$create_response = rest_get_server()->dispatch( $create_request );
+		$create_data     = $create_response->get_data();
+		$installed_font_id = $create_data['id'];
+
+		$update_request    = new WP_REST_Request( 'PUT', '/wp/v2/font-families/' . $installed_font_id );
+		$update_request->set_param( 'data', array(
+			'fontFamily' => 'Piazzolla, serif',
+		));
+		$update_response = rest_get_server()->dispatch( $update_request );
+		$update_data     = $update_response->get_data();
+
+		$this->assertSame( 200, $update_response->get_status(), 'The response status is not 200.' );
+		$this->assertSame( 'piazzolla', $update_data['data']['slug'], 'The slug response did not match expected.' );
+		$this->assertSame( 'Piazzolla', $update_data['data']['name'], 'The name response did not match expected.' );
+		$this->assertSame( 'Piazzolla, serif', $update_data['data']['fontFamily'], 'The font_family response did not match expected.' );
+		$this->assertSame( $installed_font_id, $update_data['id'], 'The id response did not match expected.' );
+
+		$verify_request  = new WP_REST_Request( 'GET', '/wp/v2/font-families/' . $installed_font_id );
+		$verify_response = rest_get_server()->dispatch( $verify_request );
+		$verify_data     = $verify_response->get_data();
+
+		$this->assertSame( 200, $verify_response->get_status(), 'The response status is not 200.' );
+		$this->assertSame( 'piazzolla', $verify_data['data']['slug'], 'The slug response did not match expected.' );
+		$this->assertSame( 'Piazzolla', $verify_data['data']['name'], 'The name response did not match expected.' );
+		$this->assertSame( 'Piazzolla, serif', $verify_data['data']['fontFamily'], 'The font_family response did not match expected.' );
+		$this->assertSame( $installed_font_id, $verify_data['id'], 'The id response did not match expected.' );
+
+	}
+
 	/**
 	 * Test getting a collection of all created font families
 	 */
@@ -269,5 +306,43 @@ class Tests_Fonts_FontLibraryController extends WP_REST_Font_Library_Controller_
 		}
 	}
 
+	public function test_add_font_face() {
 
+		$create_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
+		$create_request->set_param( 'data', array(
+			'fontFamily' => 'Piazzolla',
+			'slug'       => 'piazzolla',
+			'name'       => 'Piazzolla',
+		));
+		$create_response = rest_get_server()->dispatch( $create_request );
+		$create_data     = $create_response->get_data();
+		$installed_font_id = $create_data['id'];
+
+		$add_font_face_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . $installed_font_id . '/font-faces' );
+		$add_font_face_request->set_param( 'data', array(
+			'fontFamily'      => 'Piazzolla',
+			'fontStyle'       => 'normal',
+			'fontWeight'      => '400',
+			'src'             => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
+		));
+		$add_font_face_response = rest_get_server()->dispatch( $add_font_face_request );
+		$add_font_face_data     = $add_font_face_response->get_data();
+
+		$this->assertSame( 200, $add_font_face_response->get_status(), 'The response status is not 200.' );
+		$this->assertSame( 'Piazzolla', $add_font_face_data['data']['fontFace'][0]['fontFamily'], 'The font_family response did not match expected.' );
+		$this->assertSame( 'normal', $add_font_face_data['data']['fontFace'][0]['fontStyle'], 'The font_family response did not match expected.' );
+		$this->assertSame( '400', $add_font_face_data['data']['fontFace'][0]['fontWeight'], 'The font_family response did not match expected.' );
+		$this->assertSame( 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf', $add_font_face_data['data']['fontFace'][0]['src'], 'The font_family response did not match expected.' );
+
+		$verify_request  = new WP_REST_Request( 'GET', '/wp/v2/font-families/' . $installed_font_id );
+		$verify_response = rest_get_server()->dispatch( $verify_request );
+		$verify_data     = $verify_response->get_data();
+
+		$this->assertSame( 200, $verify_response->get_status(), 'The response status is not 200.' );
+		$this->assertSame( 'Piazzolla', $verify_data['data']['fontFace'][0]['fontFamily'], 'The font_family response did not match expected.' );
+		$this->assertSame( 'normal', $verify_data['data']['fontFace'][0]['fontStyle'], 'The font_family response did not match expected.' );
+		$this->assertSame( '400', $verify_data['data']['fontFace'][0]['fontWeight'], 'The font_family response did not match expected.' );
+		$this->assertSame( 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf', $verify_data['data']['fontFace'][0]['src'], 'The font_family response did not match expected.' );
+
+	}
 }
