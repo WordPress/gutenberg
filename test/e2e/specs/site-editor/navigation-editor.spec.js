@@ -58,10 +58,12 @@ test.describe( 'Editing Navigation Menus', () => {
 			.click();
 
 		// Wait for list of Navigations to appear.
-		editorSidebar.getByRole( 'heading', {
-			name: 'Navigation',
-			level: 1,
-		} );
+		await expect(
+			editorSidebar.getByRole( 'heading', {
+				name: 'Navigation',
+				level: 1,
+			} )
+		).toBeVisible();
 
 		await editorSidebar
 			.getByRole( 'button', {
