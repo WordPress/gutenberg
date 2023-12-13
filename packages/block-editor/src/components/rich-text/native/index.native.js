@@ -336,7 +336,7 @@ export class RichText extends Component {
 		);
 
 		this.debounceCreateUndoLevel();
-		const refresh = this.value !== contentWithoutRootTag;
+		const refresh = this.value.toString() !== contentWithoutRootTag;
 		this.value = contentWithoutRootTag;
 
 		// We don't want to refresh if our goal is just to create a record.
