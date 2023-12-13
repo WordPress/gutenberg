@@ -276,6 +276,8 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
 	return newEdits;
 };
 
+const serialisableBlocksCache = new WeakMap();
+
 function makeBlockAttributesSerializable( attributes ) {
 	const newAttributes = { ...attributes };
 	for ( const [ key, value ] of Object.entries( attributes ) ) {
@@ -341,14 +343,21 @@ async function loadPostTypeEntities() {
 					const document = doc.getMap( 'document' );
 
 					Object.entries( changes ).forEach( ( [ key, value ] ) => {
-						if (
-							document.get( key ) !== value &&
-							typeof value !== 'function'
-						) {
+						if ( typeof value !== 'function' ) {
 							if ( key === 'blocks' ) {
-								value = makeBlocksSerializable( value );
+								if ( ! serialisableBlocksCache.has( value ) ) {
+									serialisableBlocksCache.set(
+										value,
+										makeBlocksSerializable( value )
+									);
+								}
+
+								value = serialisableBlocksCache.get( value );
 							}
-							document.set( key, value );
+
+							if ( document.get( key ) !== value ) {
+								document.set( key, value );
+							}
 						}
 					} );
 				},
