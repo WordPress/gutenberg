@@ -37,7 +37,7 @@ import {
 	viewPostAction,
 	useEditPostAction,
 } from '../actions';
-import SideEditor from './side-editor';
+import PostPreview from '../post-preview';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 const { useLocation } = unlock( routerPrivateApis );
@@ -320,7 +320,14 @@ export default function PagePages() {
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
 		<>
-			<Page title={ __( 'Pages' ) }>
+			<Page
+				className={
+					view.type === LAYOUT_LIST
+						? 'edit-site-page-pages-list-view'
+						: null
+				}
+				title={ __( 'Pages' ) }
+			>
 				<DataViews
 					paginationInfo={ paginationInfo }
 					fields={ fields }
@@ -338,7 +345,7 @@ export default function PagePages() {
 				<Page>
 					<div className="edit-site-page-pages-preview">
 						{ pageId !== null ? (
-							<SideEditor
+							<PostPreview
 								postId={ pageId }
 								postType={ postType }
 							/>

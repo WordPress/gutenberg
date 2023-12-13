@@ -14,7 +14,7 @@ import {
 	__experimentalVStack as VStack,
 	VisuallyHidden,
 } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -38,6 +38,7 @@ import {
 	OPERATOR_NOT_IN,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
+	LAYOUT_LIST,
 } from '../../utils/constants';
 import {
 	useResetTemplateAction,
@@ -46,6 +47,7 @@ import {
 } from './template-actions';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
+import PostPreview from '../post-preview';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
@@ -58,6 +60,10 @@ const defaultConfigPerViewType = {
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
+	},
+	[ LAYOUT_LIST ]: {
+		primaryField: 'title',
+		mediaField: 'preview',
 	},
 };
 
@@ -77,10 +83,16 @@ function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
 }
 
-// TODO: these are going to be reused in the template part list.
-// That's the reason for leaving the template parts code for now.
-function TemplateTitle( { item } ) {
-	const { isCustomized } = useAddedBy( item.type, item.id );
+function TemplateTitle( { item, view } ) {
+	if ( view.type === LAYOUT_LIST ) {
+		return (
+			<>
+				{ decodeEntities( item.title?.rendered || item.slug ) ||
+					__( '(no title)' ) }
+			</>
+		);
+	}
+
 	return (
 		<VStack spacing={ 1 }>
 			<View as="span" className="edit-site-list-title__customized-info">
@@ -95,24 +107,18 @@ function TemplateTitle( { item } ) {
 						__( '(no title)' ) }
 				</Link>
 			</View>
-			{ isCustomized && (
-				<span className="edit-site-list-added-by__customized-info">
-					{ item.type === TEMPLATE_POST_TYPE
-						? _x( 'Customized', 'template' )
-						: _x( 'Customized', 'template part' ) }
-				</span>
-			) }
 		</VStack>
 	);
 }
 
-function AuthorField( { item } ) {
+function AuthorField( { item, view } ) {
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
+	const withIcon = view.type !== LAYOUT_LIST;
+
 	return (
 		<HStack alignment="left" spacing={ 1 }>
-			{ imageUrl ? (
-				<AvatarImage imageUrl={ imageUrl } />
-			) : (
+			{ withIcon && imageUrl && <AvatarImage imageUrl={ imageUrl } /> }
+			{ withIcon && ! imageUrl && (
 				<div className="edit-site-list-added-by__icon">
 					<Icon icon={ icon } />
 				</div>
@@ -151,11 +157,15 @@ function TemplatePreview( { content, viewType } ) {
 }
 
 export default function DataviewsTemplates() {
+	const [ templateId, setTemplateId ] = useState( null );
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 	const { records: allTemplates, isResolving: isLoadingData } =
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
+
+	const onSelectionChange = ( items ) =>
+		setTemplateId( items?.length === 1 ? items[ 0 ].id : null );
 
 	const authors = useMemo( () => {
 		if ( ! allTemplates ) {
@@ -192,7 +202,9 @@ export default function DataviewsTemplates() {
 				header: __( 'Template' ),
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered || item.slug,
-				render: ( { item } ) => <TemplateTitle item={ item } />,
+				render: ( { item } ) => (
+					<TemplateTitle item={ item } view={ view } />
+				),
 				maxWidth: 400,
 				enableHiding: false,
 			},
@@ -222,7 +234,7 @@ export default function DataviewsTemplates() {
 				id: 'author',
 				getValue: ( { item } ) => item.author_text,
 				render: ( { item } ) => {
-					return <AuthorField item={ item } />;
+					return <AuthorField view={ view } item={ item } />;
 				},
 				enableHiding: false,
 				type: ENUMERATION_TYPE,
@@ -342,19 +354,54 @@ export default function DataviewsTemplates() {
 		[ view, setView ]
 	);
 	return (
-		<Page title={ __( 'Templates' ) }>
-			<DataViews
-				paginationInfo={ paginationInfo }
-				fields={ fields }
-				actions={ actions }
-				data={ shownTemplates }
-				getItemId={ ( item ) => item.id }
-				isLoading={ isLoadingData }
-				view={ view }
-				onChangeView={ onChangeView }
-				supportedLayouts={ [ LAYOUT_TABLE, LAYOUT_GRID ] }
-				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
-			/>
-		</Page>
+		<>
+			<Page
+				className={
+					view.type === LAYOUT_LIST
+						? 'edit-site-template-pages-list-view'
+						: null
+				}
+				title={ __( 'Templates' ) }
+			>
+				<DataViews
+					paginationInfo={ paginationInfo }
+					fields={ fields }
+					actions={ actions }
+					data={ shownTemplates }
+					getItemId={ ( item ) => item.id }
+					isLoading={ isLoadingData }
+					view={ view }
+					onChangeView={ onChangeView }
+					onSelectionChange={ onSelectionChange }
+					deferredRendering={
+						! view.hiddenFields?.includes( 'preview' )
+					}
+				/>
+			</Page>
+			{ view.type === LAYOUT_LIST && (
+				<Page>
+					<div className="edit-site-template-pages-preview">
+						{ templateId !== null ? (
+							<PostPreview
+								postId={ templateId }
+								postType={ TEMPLATE_POST_TYPE }
+							/>
+						) : (
+							<div
+								style={ {
+									display: 'flex',
+									flexDirection: 'column',
+									justifyContent: 'center',
+									textAlign: 'center',
+									height: '100%',
+								} }
+							>
+								<p>{ __( 'Select a template to preview' ) }</p>
+							</div>
+						) }
+					</div>
+				</Page>
+			) }
+		</>
 	);
 }

@@ -67,7 +67,10 @@ export default function useResizeCanvas( deviceType ) {
 					overflowY: 'auto',
 				};
 			default:
-				return null;
+				return {
+					marginLeft: marginHorizontal,
+					marginRight: marginHorizontal,
+				};
 		}
 	};
 

@@ -13,7 +13,8 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 const SIDEBAR_SELECTOR = '.edit-post-sidebar';
-const ACTIVE_SIDEBAR_TAB_SELECTOR = '.edit-post-sidebar__panel-tab.is-active';
+const ACTIVE_SIDEBAR_TAB_SELECTOR =
+	'div[aria-label="Editor settings"] [role="tab"][aria-selected="true"]';
 const ACTIVE_SIDEBAR_BUTTON_TEXT = 'Post';
 
 describe( 'Sidebar', () => {
@@ -99,22 +100,24 @@ describe( 'Sidebar', () => {
 
 		// Tab lands at first (presumed selected) option "Post".
 		await page.keyboard.press( 'Tab' );
-		const isActiveDocumentTab = await page.evaluate(
-			() =>
-				document.activeElement.textContent === 'Post' &&
-				document.activeElement.classList.contains( 'is-active' )
-		);
-		expect( isActiveDocumentTab ).toBe( true );
 
-		// Tab into and activate "Block".
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
-		const isActiveBlockTab = await page.evaluate(
-			() =>
-				document.activeElement.textContent === 'Block' &&
-				document.activeElement.classList.contains( 'is-active' )
+		// The Post tab should be focused and selected.
+		const [ documentInspectorTab ] = await page.$x(
+			'//button[@role="tab"][@aria-selected="true"][contains(text(), "Post")]'
 		);
-		expect( isActiveBlockTab ).toBe( true );
+		expect( documentInspectorTab ).toBeDefined();
+		expect( documentInspectorTab ).toHaveFocus();
+
+		// Arrow key into and activate "Block".
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Space' );
+
+		// The Block tab should be focused and selected.
+		const [ blockInspectorTab ] = await page.$x(
+			'//button[@role="tab"][@aria-selected="true"][contains(text(), "Block")]'
+		);
+		expect( blockInspectorTab ).toBeDefined();
+		expect( blockInspectorTab ).toHaveFocus();
 	} );
 
 	it( 'should be possible to programmatically remove Document Settings panels', async () => {

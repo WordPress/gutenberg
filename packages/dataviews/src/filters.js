@@ -46,29 +46,31 @@ export default function Filters( { fields, view, onChangeView } ) {
 		}
 	} );
 
-	const filterComponents = filters.map( ( filter ) => {
-		if ( ! filter.isVisible ) {
-			return null;
-		}
-
-		return (
-			<FilterSummary
-				key={ filter.field + '.' + filter.operator }
-				filter={ filter }
-				view={ view }
-				onChangeView={ onChangeView }
-			/>
-		);
-	} );
-
-	filterComponents.push(
+	const addFilter = (
 		<AddFilter
 			key="add-filter"
-			fields={ fields }
+			filters={ filters }
 			view={ view }
 			onChangeView={ onChangeView }
 		/>
 	);
+	const filterComponents = [
+		addFilter,
+		...filters.map( ( filter ) => {
+			if ( ! filter.isVisible ) {
+				return null;
+			}
+
+			return (
+				<FilterSummary
+					key={ filter.field + '.' + filter.operator }
+					filter={ filter }
+					view={ view }
+					onChangeView={ onChangeView }
+				/>
+			);
+		} ),
+	];
 
 	if ( filterComponents.length > 1 ) {
 		filterComponents.push(

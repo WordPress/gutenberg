@@ -20,6 +20,10 @@ import {
 } from '../../utils/math';
 import { store as blockEditorStore } from '../../store';
 
+const THRESHOLD_DISTANCE = 30;
+const MINIMUM_HEIGHT_FOR_THRESHOLD = 120;
+const MINIMUM_WIDTH_FOR_THRESHOLD = 120;
+
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
 /** @typedef {import('../use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -48,23 +52,85 @@ import { store as blockEditorStore } from '../../store';
  * @param {WPBlockData[]}          blocksData  The block data list.
  * @param {WPPoint}                position    The position of the item being dragged.
  * @param {WPBlockListOrientation} orientation The orientation of the block list.
+ * @param {Object}                 options     Additional options.
  * @return {[number, WPDropOperation]} The drop target position.
  */
 export function getDropTargetPosition(
 	blocksData,
 	position,
-	orientation = 'vertical'
+	orientation = 'vertical',
+	options = {}
 ) {
 	const allowedEdges =
 		orientation === 'horizontal'
 			? [ 'left', 'right' ]
 			: [ 'top', 'bottom' ];
 
-	const isRightToLeft = isRTL();
-
 	let nearestIndex = 0;
 	let insertPosition = 'before';
 	let minDistance = Infinity;
+
+	const {
+		dropZoneElement,
+		parentBlockOrientation,
+		rootBlockIndex = 0,
+	} = options;
+
+	// Allow before/after when dragging over the top/bottom edges of the drop zone.
+	if ( dropZoneElement && parentBlockOrientation !== 'horizontal' ) {
+		const rect = dropZoneElement.getBoundingClientRect();
+		const [ distance, edge ] = getDistanceToNearestEdge( position, rect, [
+			'top',
+			'bottom',
+		] );
+
+		// If dragging over the top or bottom of the drop zone, insert the block
+		// before or after the parent block. This only applies to blocks that use
+		// a drop zone element, typically container blocks such as Group or Cover.
+		if (
+			rect.height > MINIMUM_HEIGHT_FOR_THRESHOLD &&
+			distance < THRESHOLD_DISTANCE
+		) {
+			if ( edge === 'top' ) {
+				return [ rootBlockIndex, 'before' ];
+			}
+			if ( edge === 'bottom' ) {
+				return [ rootBlockIndex + 1, 'after' ];
+			}
+		}
+	}
+
+	const isRightToLeft = isRTL();
+
+	// Allow before/after when dragging over the left/right edges of the drop zone.
+	if ( dropZoneElement && parentBlockOrientation === 'horizontal' ) {
+		const rect = dropZoneElement.getBoundingClientRect();
+		const [ distance, edge ] = getDistanceToNearestEdge( position, rect, [
+			'left',
+			'right',
+		] );
+
+		// If dragging over the left or right of the drop zone, insert the block
+		// before or after the parent block. This only applies to blocks that use
+		// a drop zone element, typically container blocks such as Group.
+		if (
+			rect.width > MINIMUM_WIDTH_FOR_THRESHOLD &&
+			distance < THRESHOLD_DISTANCE
+		) {
+			if (
+				( isRightToLeft && edge === 'right' ) ||
+				( ! isRightToLeft && edge === 'left' )
+			) {
+				return [ rootBlockIndex, 'before' ];
+			}
+			if (
+				( isRightToLeft && edge === 'left' ) ||
+				( ! isRightToLeft && edge === 'right' )
+			) {
+				return [ rootBlockIndex + 1, 'after' ];
+			}
+		}
+	}
 
 	blocksData.forEach(
 		( { isUnmodifiedDefaultBlock, getBoundingClientRect, blockIndex } ) => {
@@ -150,19 +216,27 @@ export default function useBlockDropZone( {
 		operation: 'insert',
 	} );
 
-	const isDisabled = useSelect(
+	const { isDisabled, parentBlockClientId, rootBlockIndex } = useSelect(
 		( select ) => {
 			const {
 				__unstableIsWithinBlockOverlay,
 				__unstableHasActiveBlockOverlayActive,
+				getBlockIndex,
+				getBlockParents,
 				getBlockEditingMode,
 			} = select( blockEditorStore );
 			const blockEditingMode = getBlockEditingMode( targetRootClientId );
-			return (
-				blockEditingMode !== 'default' ||
-				__unstableHasActiveBlockOverlayActive( targetRootClientId ) ||
-				__unstableIsWithinBlockOverlay( targetRootClientId )
-			);
+			return {
+				parentBlockClientId:
+					getBlockParents( targetRootClientId, true )[ 0 ] || '',
+				rootBlockIndex: getBlockIndex( targetRootClientId ),
+				isDisabled:
+					blockEditingMode !== 'default' ||
+					__unstableHasActiveBlockOverlayActive(
+						targetRootClientId
+					) ||
+					__unstableIsWithinBlockOverlay( targetRootClientId ),
+			};
 		},
 		[ targetRootClientId ]
 	);
@@ -172,9 +246,15 @@ export default function useBlockDropZone( {
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
-	const onBlockDrop = useOnBlockDrop( targetRootClientId, dropTarget.index, {
-		operation: dropTarget.operation,
-	} );
+	const onBlockDrop = useOnBlockDrop(
+		dropTarget.operation === 'before' || dropTarget.operation === 'after'
+			? parentBlockClientId
+			: targetRootClientId,
+		dropTarget.index,
+		{
+			operation: dropTarget.operation,
+		}
+	);
 	const throttled = useThrottle(
 		useCallback(
 			( event, ownerDocument ) => {
@@ -211,7 +291,16 @@ export default function useBlockDropZone( {
 				const [ targetIndex, operation ] = getDropTargetPosition(
 					blocksData,
 					{ x: event.clientX, y: event.clientY },
-					getBlockListSettings( targetRootClientId )?.orientation
+					getBlockListSettings( targetRootClientId )?.orientation,
+					{
+						dropZoneElement,
+						parentBlockClientId,
+						parentBlockOrientation: parentBlockClientId
+							? getBlockListSettings( parentBlockClientId )
+									?.orientation
+							: undefined,
+						rootBlockIndex,
+					}
 				);
 
 				registry.batch( () => {
@@ -219,18 +308,29 @@ export default function useBlockDropZone( {
 						index: targetIndex,
 						operation,
 					} );
-					showInsertionPoint( targetRootClientId, targetIndex, {
+
+					const insertionPointClientId = [
+						'before',
+						'after',
+					].includes( operation )
+						? parentBlockClientId
+						: targetRootClientId;
+
+					showInsertionPoint( insertionPointClientId, targetIndex, {
 						operation,
 					} );
 				} );
 			},
 			[
+				dropZoneElement,
 				getBlocks,
 				targetRootClientId,
 				getBlockListSettings,
 				registry,
 				showInsertionPoint,
 				getBlockIndex,
+				parentBlockClientId,
+				rootBlockIndex,
 			]
 		),
 		200
