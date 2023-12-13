@@ -14,7 +14,7 @@ import { Children, Fragment } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import { OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
+import { LAYOUT_LIST, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -51,7 +51,14 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 					variant="tertiary"
 					size="compact"
 					icon={ funnel }
-				/>
+					className="dataviews-filters-button"
+				>
+					{ view.type === LAYOUT_LIST ? (
+						<span className="dataviews-filters-count">
+							{ view.filters.length }
+						</span>
+					) : null }
+				</Button>
 			}
 		>
 			<WithSeparators>

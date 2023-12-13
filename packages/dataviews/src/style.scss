@@ -14,6 +14,21 @@
 	padding: $grid-unit-15 $grid-unit-40;
 }
 
+.dataviews-filters-button {
+	position: relative;
+}
+
+.dataviews-filters-count {
+	position: absolute;
+	top: -7px;
+	right: -7px;
+	color: $white;
+	background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+	border-radius: 50%;
+	padding: 2px 5px;
+	font-size: 12px;
+}
+
 .dataviews-pagination {
 	margin-top: auto;
 	position: sticky;
