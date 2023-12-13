@@ -80,8 +80,8 @@ export const normalizeTextString = ( value: string ): string => {
  * @see https://lodash.com/docs/4.17.15#kebabCase
  * @see https://developer.wordpress.org/reference/functions/_wp_to_kebab_case/
  *
- * @param {string} str String to convert.
- * @return {string} Kebab-cased string
+ * @param str String to convert.
+ * @return Kebab-cased string
  */
 export function kebabCase( str: unknown ) {
 	let input = str?.toString?.() ?? '';
@@ -102,9 +102,9 @@ export function kebabCase( str: unknown ) {
 /**
  * Escapes the RegExp special characters.
  *
- * @param {string} string Input string.
+ * @param string Input string.
  *
- * @return {string} Regex-escaped string.
+ * @return Regex-escaped string.
  */
 export function escapeRegExp( string: string ): string {
 	return string.replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' );
