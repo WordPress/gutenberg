@@ -41,7 +41,7 @@ const navigatorScreenAnimation = ( {
 	isRTL,
 }: NavigatorScreenAnimationProps ) => {
 	if ( isInitial && ! isBack ) {
-		return css``;
+		return;
 	}
 
 	const animationName =
