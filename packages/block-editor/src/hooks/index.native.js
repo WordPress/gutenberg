@@ -18,7 +18,7 @@ import './layout';
 
 createBlockEditFilter( [ align, anchor, style ] );
 createBlockListBlockFilter( [ align, style, color, fontSize ] );
-createBlockSaveFilter( [ align, anchor, style, color, fontSize ] );
+createBlockSaveFilter( [ align, anchor, color, style, fontSize ] );
 
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';
