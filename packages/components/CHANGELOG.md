@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Experimental
+
+-   `TabPanel`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
+
 ## 25.14.0 (2023-12-13)
 
 ### Enhancements

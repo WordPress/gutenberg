@@ -120,7 +120,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 			'//button[@role="tab"][contains(text(), "Block")]'
 		);
 		inactiveBlockInspectorTab.click();
-		const noBlocksElement = await page.$(
+		const noBlocksElement = page.waitForSelector(
 			'.block-editor-block-inspector__no-blocks'
 		);
 		expect( noBlocksElement ).not.toBeNull();
