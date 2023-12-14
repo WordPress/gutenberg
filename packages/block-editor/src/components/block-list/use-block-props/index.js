@@ -8,7 +8,10 @@ import classnames from 'classnames';
  */
 import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
+import {
+	__unstableGetBlockProps as getBlockProps,
+	getBlockDefaultClassName,
+} from '@wordpress/blocks';
 import { useMergeRefs, useDisabled } from '@wordpress/compose';
 import warning from '@wordpress/warning';
 
@@ -99,7 +102,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		canInsertMovingBlock,
 		isEditingDisabled,
 		isTemporarilyEditingAsBlocks,
-		defaultClassName,
 	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
@@ -166,7 +168,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			className,
 			props.className,
 			wrapperProps.className,
-			defaultClassName
+			getBlockDefaultClassName( name )
 		),
 		style: { ...wrapperProps.style, ...props.style },
 	};

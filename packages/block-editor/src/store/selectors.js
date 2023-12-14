@@ -735,11 +735,11 @@ export function getSelectedBlocksInitialCaretPosition( state ) {
  */
 export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
-		const { selectionStart, selectionEnd } = state.selection;
-
-		if ( ! selectionStart.clientId || ! selectionEnd.clientId ) {
+		if ( ! hasSelection( state ) ) {
 			return EMPTY_ARRAY;
 		}
+
+		const { selectionStart, selectionEnd } = state.selection;
 
 		if ( selectionStart.clientId === selectionEnd.clientId ) {
 			return [ selectionStart.clientId ];
@@ -1208,6 +1208,9 @@ export function isBlockSelected( state, clientId ) {
  * @return {boolean} Whether the block has an inner block selected
  */
 export function hasSelectedInnerBlock( state, clientId, deep = false ) {
+	if ( ! hasSelection( state ) ) {
+		return false;
+	}
 	return getBlockOrder( state, clientId ).some(
 		( innerClientId ) =>
 			isBlockSelected( state, innerClientId ) ||
@@ -1253,6 +1256,13 @@ export function isBlockWithinSelection( state, clientId ) {
 	const clientIds = getMultiSelectedBlockClientIds( state );
 	const index = clientIds.indexOf( clientId );
 	return index > -1 && index < clientIds.length - 1;
+}
+
+function hasSelection( state ) {
+	return (
+		state.selection.selectionStart.clientId &&
+		state.selection.selectionEnd.clientId
+	);
 }
 
 /**
