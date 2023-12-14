@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import { createBlockEditFilter, createBlockListBlockFilter } from './utils';
+import {
+	createBlockEditFilter,
+	createBlockListBlockFilter,
+	createBlockSaveFilter,
+} from './utils';
 import './compat';
 import align from './align';
 import anchor from './anchor';
@@ -14,6 +18,7 @@ import './layout';
 
 createBlockEditFilter( [ align, anchor, style ] );
 createBlockListBlockFilter( [ align, style, color, fontSize ] );
+createBlockSaveFilter( [ align, anchor, style, color, fontSize ] );
 
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';

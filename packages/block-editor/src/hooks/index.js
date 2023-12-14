@@ -59,11 +59,11 @@ createBlockSaveFilter( [
 	anchor,
 	ariaLabel,
 	customClassName,
-	style,
+	border,
 	color,
+	style,
 	fontFamily,
 	fontSize,
-	border,
 ] );
 
 export { useCustomSides } from './dimensions';
