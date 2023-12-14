@@ -1,9 +1,39 @@
-.block-editor-media-placeholder .components-placeholder__fieldset {
-	font-size: inherit;
-	font-family: inherit;
-	p {
+.block-editor-content-placeholder {
+	&.has-illustration::before {
+		border: 1px solid currentColor;
+		background: none;
+	}
+	.components-placeholder__illustration {
+		opacity: 0.1;
+	}
+	.components-placeholder__fieldset {
 		font-size: inherit;
 		font-family: inherit;
-
+		p {
+			font-size: inherit;
+			font-family: inherit;
+		}
 	}
+}
+
+.block-editor-content-empty {
+	padding: $grid-unit-50 $grid-unit-20;
+	h3 {
+		margin-bottom: $grid-unit-20;
+	}
+	&::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		border: 1px solid currentColor;
+		opacity: 0.1;
+		border-radius: $radius-block-ui;
+	}
+}
+
+.block-editor-content-action {
+	margin-top: 8px;
 }

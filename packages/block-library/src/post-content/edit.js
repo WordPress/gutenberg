@@ -8,14 +8,17 @@ import {
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
 	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Placeholder } from '@wordpress/components';
+import { createBlock } from '@wordpress/blocks';
+import { Placeholder, Button } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { page } from '@wordpress/icons';
 import {
 	useEntityProp,
 	useEntityBlockEditor,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
@@ -55,6 +58,8 @@ function EditableContent( { context = {} } ) {
 		{ id: postId }
 	);
 
+	const { insertBlock } = useDispatch( blockEditorStore );
+
 	const entityRecord = useSelect(
 		( select ) => {
 			return select( coreStore ).getEntityRecord(
@@ -68,18 +73,42 @@ function EditableContent( { context = {} } ) {
 
 	const hasInnerBlocks = !! entityRecord?.content?.raw || blocks?.length;
 
-	const initialInnerBlocks = [ [ 'core/paragraph' ] ];
-
-	const props = useInnerBlocksProps(
+	const { children, ...props } = useInnerBlocksProps(
 		useBlockProps( { className: 'entry-content' } ),
 		{
 			value: blocks,
 			onInput,
 			onChange,
-			template: ! hasInnerBlocks ? initialInnerBlocks : undefined,
 		}
 	);
-	return <div { ...props } />;
+
+	return (
+		<div { ...props }>
+			{ children }
+			{ ! hasInnerBlocks && (
+				<Placeholder
+					icon={ page }
+					label={ __( 'This page is empty' ) }
+					instructions={ __(
+						'Add your first block or pattern to get started'
+					) }
+				>
+					<Button variant="primary">
+						{ __( 'Choose a pattern' ) }
+					</Button>
+
+					<Button
+						variant="secondary"
+						onClick={ () =>
+							insertBlock( createBlock( 'core/paragraph' ), 0 )
+						}
+					>
+						{ __( 'Start blank' ) }
+					</Button>
+				</Placeholder>
+			) }
+		</div>
+	);
 }
 
 function Content( props ) {
@@ -110,11 +139,11 @@ function ContentPlaceholder( { layoutClassNames } ) {
 	return (
 		<div { ...blockProps }>
 			<Placeholder
-				className="block-editor-media-placeholder"
+				className="block-editor-content-placeholder"
 				withIllustration={ true }
 			>
 				<p>
-					{ __( 'This is where your post or page content will go.' ) }
+					{ __( 'This block will be replaced with your content.' ) }
 				</p>
 			</Placeholder>
 		</div>
