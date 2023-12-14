@@ -47,6 +47,7 @@ export function initializeEditor(
 	const root = createRoot( target );
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
+		allowRightClickOverrides: true,
 		editorMode: 'visual',
 		fixedToolbar: false,
 		fullscreenMode: true,
