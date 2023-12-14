@@ -110,14 +110,14 @@ class Tests_Fonts_Font_Family_Controller extends WP_REST_Font_Library_Controller
 	}
 
 	/**
-	 * Tests responses when sucessfully creating Font Families
+	 * Tests responses when sucessfully creating Font Families with hosted (or absent) assets
 	 *
-	 * @dataProvider data_create_font_family
+	 * @dataProvider data_create_hosted_font_family
 	 *
 	 * @param array $font_family     Font families to install in theme.json format.
 	 * @param array $expected_response Expected response data.
 	 */
-	public function test_create_font_family( $font_family ) {
+	public function test_create_hosted_font_family( $font_family ) {
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
 		$install_request->set_param( 'data', $font_family );
 		$response = rest_get_server()->dispatch( $install_request );
@@ -134,9 +134,36 @@ class Tests_Fonts_Font_Family_Controller extends WP_REST_Font_Library_Controller
 	}
 
 	/**
+	 * Tests responses when sucessfully creating Font Families with downloaded assets
+	 *
+	 * @dataProvider data_create_downloaded_font_family
+	 *
+	 * @param array $font_family     Font families to install in theme.json format.
+	 * @param array $expected_response Expected response data.
+	 */
+	public function test_create_downloaded_font_family( $font_family ) {
+		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
+		$install_request->set_param( 'data', $font_family );
+		$response = rest_get_server()->dispatch( $install_request );
+		$response_data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
+		$this->assertSame( $font_family['slug'], $response_data['data']['slug'], 'The slug response did not match expected.' );
+		$this->assertSame( $font_family['name'], $response_data['data']['name'], 'The name response did not match expected.' );
+		$this->assertSame( $font_family['fontFamily'], $response_data['data']['fontFamily'], 'The font_family response did not match expected.' );
+		$this->assertIsInt( $response_data['id'], 'The id response did not match expected.' );
+
+		$this->assertIsString( $response_data['data']['fontFace'][0]['src'], 'The font_family response did not match expected.' );
+		$this->assertArrayNotHasKey('downloadFromUrl', $response_data['data']['fontFace'][0], 'The font_family response did not match expected.' );
+
+		$this->assertIsString( $response_data['data']['fontFace'][1]['src'], 'The font_family response did not match expected.' );
+		$this->assertArrayNotHasKey('downloadFromUrl', $response_data['data']['fontFace'][1], 'The font_family response did not match expected.' );
+	}
+
+	/**
 	 * Tests responses when getting existing Font Families
 	 *
-	 * @dataProvider data_create_font_family
+	 * @dataProvider data_create_hosted_font_family
 	 *
 	 * @param array $font_families     Font families to install in theme.json format.
 	 * @param array $expected_response Expected response data.
@@ -174,7 +201,7 @@ class Tests_Fonts_Font_Family_Controller extends WP_REST_Font_Library_Controller
 	/**
 	 * Tests deleting existing Font Families.  First creates a font family, then deletes it, then gets it to make sure it's gone.
 	 *
-	 * @dataProvider data_create_font_family
+	 * @dataProvider data_create_hosted_font_family
 	 *
 	 * @param array $font_family     Font families to install in theme.json format.
 	 * @param array $expected_response Expected response data.
@@ -206,9 +233,9 @@ class Tests_Fonts_Font_Family_Controller extends WP_REST_Font_Library_Controller
 	}
 
 	/**
-	 * Data provider for test_install_fonts
+	 * Data provider for test_install_hosted_fonts
 	 */
-	public function data_create_font_family() {
+	public function data_create_hosted_font_family() {
 		return array(
 			'Arial'      => array( array(
 				'slug'      => 'arial',
@@ -225,16 +252,43 @@ class Tests_Fonts_Font_Family_Controller extends WP_REST_Font_Library_Controller
 						'fontStyle'       => 'normal',
 						'fontWeight'      => '400',
 						'preview'	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-normal.svg',
-						//'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
-						'downloadFromUrl'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
+						'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
 					),
 					array(
 						'fontFamily'      => 'ABeeZee',
 						'fontStyle'       => 'italic',
 						'fontWeight'      => '400',
 						'preview' 	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-italic.svg',
-						//'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf',
-						'downloadFromUrl'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf',
+						'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf',
+					),
+				),
+			)),
+		);
+	}
+
+	/**
+	 * Data provider for test_install_hosted_fonts
+	 */
+	public function data_create_downloaded_font_family() {
+		return array(
+			'Downloaded Font Face'      => array( array(
+				'slug'      => 'abeezee',
+				'name'        => 'ABeeZee',
+				'fontFamily' => 'ABeeZee',
+				'fontFace' => array(
+					array(
+						'fontFamily'      => 'ABeeZee',
+						'fontStyle'       => 'normal',
+						'fontWeight'      => '400',
+						'preview'	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-normal.svg',
+						'downloadFromUrl' => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
+					),
+					array(
+						'fontFamily'      => 'ABeeZee',
+						'fontStyle'       => 'italic',
+						'fontWeight'      => '400',
+						'preview' 	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-italic.svg',
+						'downloadFromUrl' => 'https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf',
 					),
 				),
 			)),
@@ -278,6 +332,7 @@ class Tests_Fonts_Font_Family_Controller extends WP_REST_Font_Library_Controller
 		$this->assertSame( $installed_font_id, $verify_data['id'], 'The id response did not match expected.' );
 
 	}
+
 
 	/**
 	 * Test getting a collection of all created font families
