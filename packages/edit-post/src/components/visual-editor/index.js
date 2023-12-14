@@ -80,9 +80,8 @@ export default function VisualEditor( { styles } ) {
 	return (
 		<div
 			className={ classnames( 'edit-post-visual-editor', {
-				'is-template-mode':
-					renderingMode === 'template-only' ||
-					renderingMode === 'pattern-only',
+				'is-template-mode': renderingMode === 'template-only',
+				'is-pattern-mode': renderingMode === 'pattern-only',
 				'has-inline-canvas': ! isToBeIframed,
 			} ) }
 		>

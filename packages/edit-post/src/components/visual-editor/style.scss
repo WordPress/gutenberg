@@ -36,6 +36,10 @@
 	// as align-items: stretch is inherited by default.Additionally due to older browser's flex height
 	// interpretation, any percentage value is likely going to cause issues, such as metaboxes overlapping.
 	// See also https://www.w3.org/TR/CSS22/visudet.html#the-height-property.
+
+	&.is-pattern-mode {
+		padding: 48px 48px 0;
+	}
 }
 
 .edit-post-visual-editor__content-area {
