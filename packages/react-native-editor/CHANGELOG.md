@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+
+## 1.109.3
 ## 1.109.2
 -   [**] Fix issue related to text color format and receiving in rare cases an undefined ref from `RichText` component [#56686]
 -   [**] Fixes a crash on pasting MS Word list markup [#56653]
