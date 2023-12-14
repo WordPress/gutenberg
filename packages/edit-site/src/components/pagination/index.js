@@ -19,15 +19,16 @@ export default function Pagination( {
 	changePage,
 	totalItems,
 	className,
+	disabled = false,
 } ) {
 	return (
 		<HStack
 			expanded={ false }
 			spacing={ 3 }
 			justify="flex-start"
-			className={ classnames( 'edit-site--pagination', className ) }
+			className={ classnames( 'edit-site-pagination', className ) }
 		>
-			<Text variant="muted">
+			<Text variant="muted" className="edit-site-pagination__total">
 				{
 					// translators: %s: Total number of patterns.
 					sprintf(
@@ -41,7 +42,7 @@ export default function Pagination( {
 				<Button
 					variant="tertiary"
 					onClick={ () => changePage( 1 ) }
-					disabled={ currentPage === 1 }
+					disabled={ disabled || currentPage === 1 }
 					aria-label={ __( 'First page' ) }
 				>
 					«
@@ -49,7 +50,7 @@ export default function Pagination( {
 				<Button
 					variant="tertiary"
 					onClick={ () => changePage( currentPage - 1 ) }
-					disabled={ currentPage === 1 }
+					disabled={ disabled || currentPage === 1 }
 					aria-label={ __( 'Previous page' ) }
 				>
 					‹
@@ -67,7 +68,7 @@ export default function Pagination( {
 				<Button
 					variant="tertiary"
 					onClick={ () => changePage( currentPage + 1 ) }
-					disabled={ currentPage === numPages }
+					disabled={ disabled || currentPage === numPages }
 					aria-label={ __( 'Next page' ) }
 				>
 					›
@@ -75,7 +76,7 @@ export default function Pagination( {
 				<Button
 					variant="tertiary"
 					onClick={ () => changePage( numPages ) }
-					disabled={ currentPage === numPages }
+					disabled={ disabled || currentPage === numPages }
 					aria-label={ __( 'Last page' ) }
 				>
 					»

@@ -1,16 +1,16 @@
-.edit-site--pagination {
-  .components-button.is-tertiary {
-	width: $button-size-compact;
-	height: $button-size-compact;
-	justify-content: center;
+.edit-site-pagination {
+	.components-button.is-tertiary {
+		width: $button-size-compact;
+		height: $button-size-compact;
+		justify-content: center;
 
-	&:disabled {
-	  color: $gray-600;
-	  background: none;
-	}
+		&:disabled {
+			color: $gray-600;
+			background: none;
+		}
 
-	&:hover:not(:disabled) {
-	  background-color: $gray-700;
+		&:hover:not(:disabled) {
+			background-color: $gray-700;
+		}
 	}
-  }
 }

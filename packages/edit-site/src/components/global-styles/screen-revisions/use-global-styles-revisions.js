@@ -87,7 +87,7 @@ export default function useGlobalStylesRevisions( {
 				revisions: EMPTY_ARRAY,
 				hasUnsavedChanges: isDirty,
 				isLoading: true,
-				revisionsCount: 0,
+				revisionsCount,
 			};
 		}
 

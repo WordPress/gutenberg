@@ -1,6 +1,6 @@
 
 .edit-site-global-styles-screen-revisions {
-	margin: $grid-unit-20;
+	margin: 0 $grid-unit-20 $grid-unit-20 $grid-unit-20;
 }
 
 .edit-site-global-styles-screen-revisions__revisions-list {
@@ -9,6 +9,10 @@
 	li {
 		margin-bottom: 0;
 	}
+}
+
+.edit-site-global-styles-header__description {
+	margin-bottom: 0;
 }
 
 .edit-site-global-styles-screen-revisions__revision-item {
@@ -138,4 +142,40 @@
 	color: $gray-900;
 	line-height: $default-line-height;
 }
+
+.edit-site-global-styles-screen-revisions__pagination.edit-site-global-styles-screen-revisions__pagination {
+	justify-content: space-between;
+	gap: 2px;
+	padding: $grid-unit-20 $grid-unit-20 $grid-unit-15 $grid-unit-20;
+	position: sticky;
+	top: 0;
+	background: $white;
+	z-index: 10;
+	border-bottom: 1px solid $gray-400;
+
+	.edit-site-pagination__total {
+		font-weight: 600;
+		font-color: $gray-900;
+	}
+
+	.components-text {
+		font-size: 12px;
+	}
+	.components-button.is-tertiary {
+		width: $button-size-small;
+		height: $button-size-small;
+		outline: 1px solid;
+
+		&:disabled {
+			color: $gray-600;
+			background: none;
+		}
+
+		&:hover:not(:disabled) {
+			background-color: $gray-700;
+		}
+	}
+}
+
+
 
