@@ -36,19 +36,17 @@ import { convertToListItems } from './utils';
 export function IndentUI( { clientId } ) {
 	const indentListItem = useIndentListItem( clientId );
 	const outdentListItem = useOutdentListItem();
-	const canIndent = useSelect(
-		( select ) => select( blockEditorStore ).getBlockIndex( clientId ) > 0,
-		[ clientId ]
-	);
-	const canOutdent = useSelect(
+	const { canIndent, canOutdent } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getBlockName } =
+			const { getBlockIndex, getBlockRootClientId, getBlockName } =
 				select( blockEditorStore );
-			return (
-				getBlockName(
-					getBlockRootClientId( getBlockRootClientId( clientId ) )
-				) === 'core/list-item'
-			);
+			return {
+				canIndent: getBlockIndex( clientId ) > 0,
+				canOutdent:
+					getBlockName(
+						getBlockRootClientId( getBlockRootClientId( clientId ) )
+					) === 'core/list-item',
+			};
 		},
 		[ clientId ]
 	);
