@@ -39,23 +39,31 @@ export default function AllInputControl( {
 	const isMixed = hasValues && isValuesMixed( values, selectedUnits, sides );
 	const allPlaceholder = isMixed ? LABELS.mixed : undefined;
 
+	const [ parsedQuantity, parsedUnit ] =
+		parseQuantityAndUnitFromRawValue( allValue );
+
 	const handleOnFocus: React.FocusEventHandler< HTMLInputElement > = (
 		event
 	) => {
 		onFocus( event, { side: 'all' } );
 	};
 
-	const sliderOnChange = ( next: string ) => {
-		const nextValues = applyValueToSides( values, String( next ), sides );
-		onChange( nextValues );
-	};
-
-	const handleOnChange: UnitControlProps[ 'onChange' ] = ( next ) => {
+	const onValueChange = ( next?: string ) => {
 		const isNumeric = next !== undefined && ! isNaN( parseFloat( next ) );
 		const nextValue = isNumeric ? next : undefined;
 		const nextValues = applyValueToSides( values, nextValue, sides );
 
 		onChange( nextValues );
+	};
+
+	const unitControlOnChange: UnitControlProps[ 'onChange' ] = ( next ) => {
+		onValueChange( next );
+	};
+
+	const sliderOnChange = ( next?: number ) => {
+		onValueChange(
+			next !== undefined ? [ next, parsedUnit ].join( '' ) : undefined
+		);
 	};
 
 	// Set selected unit so it can be used as fallback by unlinked controls
@@ -83,9 +91,6 @@ export default function AllInputControl( {
 		} );
 	};
 
-	const [ parsedQuantity, parsedUnit ] =
-		parseQuantityAndUnitFromRawValue( allValue );
-
 	return (
 		<HStack>
 			<UnitControl
@@ -94,7 +99,7 @@ export default function AllInputControl( {
 				id={ inputId }
 				isOnly
 				value={ parsedQuantity }
-				onChange={ handleOnChange }
+				onChange={ unitControlOnChange }
 				onUnitChange={ handleOnUnitChange }
 				onFocus={ handleOnFocus }
 				onHoverOn={ handleOnHoverOn }
@@ -107,17 +112,14 @@ export default function AllInputControl( {
 				aria-controls={ inputId }
 				aria-labelledby={ inputId }
 				hideLabelFromVision
-				initialPosition={ parsedQuantity ?? 0 }
 				label={ LABELS.all }
-				onChange={ ( newValue ) => {
-					sliderOnChange( [ newValue, parsedUnit ].join( '' ) );
-				} }
+				onChange={ sliderOnChange }
 				min={ 0 }
 				max={ CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]?.max ?? 10 }
 				step={
 					CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]?.steps ?? 0.1
 				}
-				value={ parsedQuantity }
+				value={ parsedQuantity ?? 0 }
 				withInputField={ false }
 			/>
 		</HStack>

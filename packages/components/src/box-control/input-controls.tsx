@@ -145,7 +145,6 @@ export default function BoxInputControls( {
 							aria-labelledby={ inputId }
 							__nextHasNoMarginBottom
 							hideLabelFromVision
-							initialPosition={ parsedQuantity ?? 0 }
 							onChange={ ( newValue ) => {
 								sliderOnChange(
 									side,
@@ -161,7 +160,7 @@ export default function BoxInputControls( {
 								CUSTOM_VALUE_SETTINGS[ computedUnit ?? 'px' ]
 									?.steps ?? 0.1
 							}
-							value={ parsedQuantity }
+							value={ parsedQuantity ?? 0 }
 							withInputField={ false }
 						/>
 					</InputWrapper>

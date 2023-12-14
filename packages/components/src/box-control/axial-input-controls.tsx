@@ -174,7 +174,6 @@ export default function AxialInputControls( {
 							aria-controls={ inputId }
 							aria-labelledby={ inputId }
 							hideLabelFromVision
-							initialPosition={ parsedQuantity ?? 0 }
 							label={ LABELS[ side ] }
 							onChange={ ( newValue ) => {
 								sliderOnChange(
@@ -194,7 +193,7 @@ export default function AxialInputControls( {
 								CUSTOM_VALUE_SETTINGS[ selectedUnit ?? 'px' ]
 									?.steps ?? 0.1
 							}
-							value={ parsedQuantity }
+							value={ parsedQuantity ?? 0 }
 							withInputField={ false }
 						/>
 					</InputWrapper>
