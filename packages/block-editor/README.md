@@ -111,9 +111,6 @@ _Parameters_
 
 -   _props_ `Object`: Component props.
 -   _props.rootLabelText_ `string`: Translated label for the root element of the breadcrumb trail.
--   _props.backLabel_ `string`: Translated label for the back button.
--   _props.onBackClick_ `Function`: Callback for the back button.
--   _props.isHighlighted_ `boolean`: Whether the breadcrumb should be highlighted.
 
 _Returns_
 

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
@@ -21,19 +16,11 @@ import { unlock } from '../../lock-unlock';
 /**
  * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
  *
- * @param {Object}   props               Component props.
- * @param {string}   props.rootLabelText Translated label for the root element of the breadcrumb trail.
- * @param {string}   props.backLabel     Translated label for the back button.
- * @param {Function} props.onBackClick   Callback for the back button.
- * @param {boolean}  props.isHighlighted Whether the breadcrumb should be highlighted.
+ * @param {Object} props               Component props.
+ * @param {string} props.rootLabelText Translated label for the root element of the breadcrumb trail.
  * @return {Element}                   Block Breadcrumb.
  */
-function BlockBreadcrumb( {
-	rootLabelText,
-	backLabel,
-	onBackClick,
-	isHighlighted = false,
-} ) {
+function BlockBreadcrumb( { rootLabelText } ) {
 	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { clientId, parents, hasSelection } = useSelect( ( select ) => {
 		const {
@@ -57,27 +44,10 @@ function BlockBreadcrumb( {
 	/* eslint-disable jsx-a11y/no-redundant-roles */
 	return (
 		<ul
-			className={ classnames( 'block-editor-block-breadcrumb', {
-				'is-highlighted': isHighlighted,
-			} ) }
+			className="block-editor-block-breadcrumb"
 			role="list"
 			aria-label={ __( 'Block breadcrumb' ) }
 		>
-			{ backLabel && (
-				<li>
-					<Button
-						className="block-editor-block-breadcrumb__button"
-						variant="tertiary"
-						onClick={ onBackClick }
-					>
-						{ backLabel }
-					</Button>
-					<Icon
-						icon={ chevronRightSmall }
-						className="block-editor-block-breadcrumb__separator"
-					/>
-				</li>
-			) }
 			<li
 				className={
 					! hasSelection
