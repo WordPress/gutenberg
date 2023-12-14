@@ -157,7 +157,7 @@ function BoxControl( {
 		<Grid
 			id={ id }
 			columns={ 3 }
-			templateColumns="auto 48px 24px"
+			templateColumns="1fr min-content min-content"
 			role="group"
 			aria-labelledby={ headingId }
 		>
