@@ -15,7 +15,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { parsePatternDependencies } from './recursion-detector';
+import { usePatternRecursionDetector } from './recursion-detector';
 
 const PatternEdit = ( { attributes, clientId } ) => {
 	const selectedPattern = useSelect(
@@ -40,6 +40,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 		useSelect( blockEditorStore );
 
 	const [ hasRecursionError, setHasRecursionError ] = useState( false );
+	const parsePatternDependencies = usePatternRecursionDetector();
 
 	// Duplicated in packages/edit-site/src/components/start-template-options/index.js.
 	function injectThemeAttributeInBlockTemplateContent( block ) {
