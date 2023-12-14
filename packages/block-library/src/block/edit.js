@@ -320,7 +320,7 @@ export default function ReusableBlockEdit( {
 								editSourcePattern( editInPatternOnlyMode, ref )
 							}
 						>
-							{ __( 'Edit' ) }
+							{ __( 'Edit original' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
 				</BlockControls>
