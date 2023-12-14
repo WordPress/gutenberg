@@ -27,9 +27,8 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useResizeObserver } from '@wordpress/compose';
-import { useMemo, useState, memo } from '@wordpress/element';
+import { useMemo, useState, memo, useContext } from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -41,6 +40,7 @@ import { mergeBaseAndUserConfigs } from '../global-styles/global-styles-provider
 const {
 	ExperimentalBlockEditorProvider,
 	useGlobalStyle,
+	GlobalStylesContext,
 	useGlobalStylesOutputWithConfig,
 } = unlock( blockEditorPrivateApis );
 
@@ -182,9 +182,9 @@ function StyleBook( {
 	onClick,
 	onSelect,
 	showCloseButton = true,
+	onClose,
 	showTabs = true,
 	userConfig = {},
-	actions,
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ textColor ] = useGlobalStyle( 'color.text' );
@@ -205,16 +205,7 @@ function StyleBook( {
 				} ) ),
 		[ examples ]
 	);
-
-	const { baseConfig } = useSelect(
-		( select ) => ( {
-			baseConfig:
-				select(
-					coreStore
-				).__experimentalGetCurrentThemeBaseGlobalStyles(),
-		} ),
-		[]
-	);
+	const { base: baseConfig } = useContext( GlobalStylesContext );
 
 	const mergedConfig = useMemo( () => {
 		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
@@ -244,8 +235,8 @@ function StyleBook( {
 
 	return (
 		<EditorCanvasContainer
+			onClose={ onClose }
 			enableResizing={ enableResizing }
-			actions={ actions }
 			closeButtonLabel={
 				showCloseButton ? __( 'Close Style Book' ) : null
 			}

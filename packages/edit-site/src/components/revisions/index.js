@@ -11,8 +11,7 @@ import {
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
+import { useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,23 +21,18 @@ import { unlock } from '../../lock-unlock';
 import { mergeBaseAndUserConfigs } from '../global-styles/global-styles-provider';
 import EditorCanvasContainer from '../editor-canvas-container';
 
-const { ExperimentalBlockEditorProvider, useGlobalStylesOutputWithConfig } =
-	unlock( blockEditorPrivateApis );
+const {
+	ExperimentalBlockEditorProvider,
+	GlobalStylesContext,
+	useGlobalStylesOutputWithConfig,
+} = unlock( blockEditorPrivateApis );
 
 function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
 }
 
-function Revisions( { actions, userConfig, blocks } ) {
-	const { baseConfig } = useSelect(
-		( select ) => ( {
-			baseConfig:
-				select(
-					coreStore
-				).__experimentalGetCurrentThemeBaseGlobalStyles(),
-		} ),
-		[]
-	);
+function Revisions( { userConfig, blocks } ) {
+	const { base: baseConfig } = useContext( GlobalStylesContext );
 
 	const mergedConfig = useMemo( () => {
 		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
@@ -73,7 +67,6 @@ function Revisions( { actions, userConfig, blocks } ) {
 			title={ __( 'Revisions' ) }
 			closeButtonLabel={ __( 'Close revisions' ) }
 			enableResizing={ true }
-			actions={ actions }
 		>
 			<Iframe
 				className="edit-site-revisions__iframe"
