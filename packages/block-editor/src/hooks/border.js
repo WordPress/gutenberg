@@ -348,6 +348,7 @@ function useBlockProps( { name, borderColor, style } ) {
 
 export default {
 	useBlockProps,
+	addSaveProps,
 	attributeKeys: [ 'borderColor', 'style' ],
 	hasSupport( name ) {
 		return hasBorderSupport( name, 'color' );
@@ -358,10 +359,4 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/border/addAttributes',
 	addAttributes
-);
-
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/border/addSaveProps',
-	addSaveProps
 );

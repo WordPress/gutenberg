@@ -1,14 +1,18 @@
 /**
  * Internal dependencies
  */
-import { createBlockEditFilter, createBlockListBlockFilter } from './utils';
+import {
+	createBlockEditFilter,
+	createBlockListBlockFilter,
+	createBlockSaveFilter,
+} from './utils';
 import './compat';
 import align from './align';
 import './lock';
 import anchor from './anchor';
-import './aria-label';
+import ariaLabel from './aria-label';
 import customClassName from './custom-class-name';
-import './generated-class-name';
+import generatedClassName from './generated-class-name';
 import style from './style';
 import './settings';
 import color from './color';
@@ -49,6 +53,18 @@ createBlockListBlockFilter( [
 	border,
 	position,
 	childLayout,
+] );
+createBlockSaveFilter( [
+	align,
+	anchor,
+	ariaLabel,
+	border,
+	color,
+	customClassName,
+	fontFamily,
+	fontSize,
+	generatedClassName,
+	style,
 ] );
 
 export { useCustomSides } from './dimensions';

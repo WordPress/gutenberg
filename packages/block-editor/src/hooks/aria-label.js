@@ -55,13 +55,13 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return extraProps;
 }
 
+export default {
+	addSaveProps,
+	attributeKeys: [ 'ariaLabel' ],
+};
+
 addFilter(
 	'blocks.registerBlockType',
 	'core/ariaLabel/attribute',
 	addAttribute
-);
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/ariaLabel/save-props',
-	addSaveProps
 );

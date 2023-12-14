@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport, getBlockDefaultClassName } from '@wordpress/blocks';
 
 /**
@@ -38,8 +37,10 @@ export function addGeneratedClassName( extraProps, blockType ) {
 	return extraProps;
 }
 
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/generated-class-name/save-props',
-	addGeneratedClassName
-);
+export default {
+	addSaveProps: addGeneratedClassName,
+	attributeKeys: [ 'className' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'className', true );
+	},
+};

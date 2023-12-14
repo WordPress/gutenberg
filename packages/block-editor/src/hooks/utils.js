@@ -488,10 +488,10 @@ export function createBlockListBlockFilter( features ) {
 					}
 
 					if (
-						! hasSupport( props.name ) ||
 						// Skip rendering if none of the needed attributes are
 						// set.
-						! Object.keys( neededProps ).length
+						! Object.keys( neededProps ).length ||
+						! hasSupport( props.name )
 					) {
 						return null;
 					}
@@ -541,5 +541,36 @@ export function createBlockListBlockFilter( features ) {
 		'editor.BlockListBlock',
 		'core/editor/hooks',
 		withBlockListBlockHooks
+	);
+}
+
+export function createBlockSaveFilter( features ) {
+	function extraPropsFromHooks( props ) {
+		features.reduce( ( accu, feature ) => {
+			const { hasSupport, attributeKeys = [], addSaveProps } = feature;
+
+			const neededProps = {};
+			for ( const key of attributeKeys ) {
+				if ( props.attributes[ key ] ) {
+					neededProps[ key ] = props.attributes[ key ];
+				}
+			}
+
+			if (
+				// Skip rendering if none of the needed attributes are
+				// set.
+				! Object.keys( neededProps ).length ||
+				! hasSupport( props.name )
+			) {
+				return accu;
+			}
+
+			return addSaveProps( accu, props.name, neededProps );
+		}, props );
+	}
+	addFilter(
+		'blocks.getSaveContent.extraProps',
+		'core/editor/hooks',
+		extraPropsFromHooks
 	);
 }
