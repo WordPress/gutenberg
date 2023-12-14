@@ -211,6 +211,7 @@ function useBlockProps( { name, fontSize, style } ) {
 
 export default {
 	useBlockProps,
+	addSaveProps,
 	attributeKeys: [ 'fontSize', 'style' ],
 	hasSupport( name ) {
 		return hasBlockSupport( name, FONT_SIZE_SUPPORT_KEY );
@@ -243,12 +244,6 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/font/addAttribute',
 	addAttributes
-);
-
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/font/addSaveProps',
-	addSaveProps
 );
 
 addFilter(
