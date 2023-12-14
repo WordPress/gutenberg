@@ -48,7 +48,12 @@ function render_block_core_pattern( $attributes ) {
 		$content = gutenberg_serialize_blocks( $blocks );
 	}
 
-	return do_blocks( $content );
+	$content = do_blocks( $content );
+
+	global $wp_embed;
+	$content = $wp_embed->autoembed( $content );
+
+	return $content;
 }
 
 add_action( 'init', 'register_block_core_pattern' );

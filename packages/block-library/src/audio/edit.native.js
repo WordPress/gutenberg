@@ -23,6 +23,7 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
+	RichText,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -227,7 +228,7 @@ function AudioEdit( {
 				<BlockCaption
 					accessible={ true }
 					accessibilityLabelCreator={ ( caption ) =>
-						! caption
+						RichText.isEmpty( caption )
 							? /* translators: accessibility text. Empty Audio caption. */
 							  __( 'Audio caption. Empty' )
 							: sprintf(

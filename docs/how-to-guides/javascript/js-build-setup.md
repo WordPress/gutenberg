@@ -22,7 +22,7 @@ The [@wordpress/scripts](https://www.npmjs.com/package/@wordpress/scripts) packa
 
 ## Quick Start
 
-If you prefer a quick start, you can use one of the examples from the [Gutenberg Examples repository](https://github.com/wordpress/gutenberg-examples/) and skip below. Each one of the `-esnext` directories in the examples repository contain the necessary files for working with ESNext and JSX.
+If you prefer a quick start, you can use one of the examples from the [Block Development Examples repository](https://github.com/wordpress/block-development-examples/) and skip below. Each one of the `-esnext` directories in the examples repository contain the necessary files for working with ESNext and JSX.
 
 ## Setup
 
@@ -168,7 +168,7 @@ wp_register_script(
 );
 ```
 
-See [ESNext blocks in gutenberg-examples repo](https://github.com/WordPress/gutenberg-examples) for full examples.
+See [blocks in the block-development-examples repo](https://github.com/WordPress/block-development-examples) for full examples.
 
 ## Summary
 

@@ -20,6 +20,7 @@
 					}
 				]
 			},
+			{ "docs/getting-started/quick-start-guide.md": [] },
 			{
 				"docs/getting-started/create-block/README.md": [
 					{
@@ -42,6 +43,25 @@
 					},
 					{
 						"docs/getting-started/create-block/submitting-to-block-directory.md": []
+					}
+				]
+			},
+			{
+				"docs/getting-started/fundamentals/README.md": [
+					{
+						"docs/getting-started/fundamentals/file-structure-of-a-block.md": []
+					},
+					{
+						"docs/getting-started/fundamentals/block-json.md": []
+					},
+					{
+						"docs/getting-started/fundamentals/registration-of-a-block.md": []
+					},
+					{
+						"docs/getting-started/fundamentals/block-wrapper.md": []
+					},
+					{
+						"docs/getting-started/fundamentals/javascript-in-the-block-editor.md": []
 					}
 				]
 			},

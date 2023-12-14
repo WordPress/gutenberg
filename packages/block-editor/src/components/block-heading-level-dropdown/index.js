@@ -56,7 +56,7 @@ export default function HeadingLevelDropdown( {
 								isPressed={ isActive }
 							/>
 						),
-						label:
+						title:
 							targetLevel === 0
 								? __( 'Paragraph' )
 								: sprintf(

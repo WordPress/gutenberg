@@ -43,10 +43,10 @@ function render_block_core_template_part( $attributes ) {
 		if ( $template_part_post ) {
 			// A published post might already exist if this template part was customized elsewhere
 			// or if it's part of a customized template.
-			$content    = $template_part_post->post_content;
-			$area_terms = get_the_terms( $template_part_post, 'wp_template_part_area' );
-			if ( ! is_wp_error( $area_terms ) && false !== $area_terms ) {
-				$area = $area_terms[0]->name;
+			$block_template = _build_block_template_result_from_post( $template_part_post );
+			$content        = $block_template->content;
+			if ( isset( $block_template->area ) ) {
+				$area = $block_template->area;
 			}
 			/**
 			 * Fires when a block template part is loaded from a template post stored in the database.

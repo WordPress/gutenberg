@@ -22,6 +22,8 @@ import {
 	getAutosave,
 	getAutosaves,
 	getCurrentUser,
+	getRevisions,
+	getRevision,
 } from '../selectors';
 // getEntityRecord and __experimentalGetEntityRecordNoResolver selectors share the same tests.
 describe.each( [
@@ -894,5 +896,99 @@ describe( 'getCurrentUser', () => {
 		};
 
 		expect( getCurrentUser( state ) ).toEqual( currentUser );
+	} );
+} );
+
+describe( 'getRevisions', () => {
+	it( 'should return revisions', () => {
+		const state = deepFreeze( {
+			entities: {
+				records: {
+					postType: {
+						post: {
+							revisions: {
+								1: {
+									items: {
+										default: {
+											10: {
+												id: 10,
+												content: 'chicken',
+												author: 'bob',
+												parent: 1,
+											},
+										},
+									},
+									itemIsComplete: {
+										default: {
+											10: true,
+										},
+									},
+									queries: {
+										default: {
+											'': { itemIds: [ 10 ] },
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+
+		expect( getRevisions( state, 'postType', 'post', 1 ) ).toEqual( [
+			{
+				id: 10,
+				content: 'chicken',
+				author: 'bob',
+				parent: 1,
+			},
+		] );
+	} );
+} );
+
+describe( 'getRevision', () => {
+	it( 'should return a specific revision', () => {
+		const state = deepFreeze( {
+			entities: {
+				records: {
+					postType: {
+						post: {
+							revisions: {
+								1: {
+									items: {
+										default: {
+											10: {
+												id: 10,
+												content: 'chicken',
+												author: 'bob',
+												parent: 1,
+											},
+										},
+									},
+									itemIsComplete: {
+										default: {
+											10: true,
+										},
+									},
+									queries: {
+										default: {
+											'': [ 10 ],
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+
+		expect( getRevision( state, 'postType', 'post', 1, 10 ) ).toEqual( {
+			id: 10,
+			content: 'chicken',
+			author: 'bob',
+			parent: 1,
+		} );
 	} );
 } );

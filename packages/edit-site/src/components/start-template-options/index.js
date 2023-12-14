@@ -3,7 +3,7 @@
  */
 import { Modal, Flex, FlexItem, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import {
 	__experimentalBlockPatternsList as BlockPatternsList,
 	store as blockEditorStore,
@@ -13,8 +13,6 @@ import { useAsyncList } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -23,18 +21,22 @@ import { store as editSiteStore } from '../../store';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 function useFallbackTemplateContent( slug, isCustom = false ) {
-	const [ templateContent, setTemplateContent ] = useState( '' );
-
-	useEffect( () => {
-		apiFetch( {
-			path: addQueryArgs( '/wp/v2/templates/lookup', {
+	return useSelect(
+		( select ) => {
+			const { getEntityRecord, getDefaultTemplateId } =
+				select( coreStore );
+			const templateId = getDefaultTemplateId( {
 				slug,
 				is_custom: isCustom,
 				ignore_empty: true,
-			} ),
-		} ).then( ( { content } ) => setTemplateContent( content.raw ) );
-	}, [ isCustom, slug ] );
-	return templateContent;
+			} );
+			return templateId
+				? getEntityRecord( 'postType', TEMPLATE_POST_TYPE, templateId )
+						?.content?.raw
+				: undefined;
+		},
+		[ slug, isCustom ]
+	);
 }
 
 function useStartPatterns( fallbackContent ) {

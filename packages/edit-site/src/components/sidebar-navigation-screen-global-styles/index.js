@@ -63,7 +63,7 @@ function SidebarNavigationScreenGlobalStylesContent() {
 		const { getSettings } = unlock( select( editSiteStore ) );
 
 		return {
-			storedSettings: getSettings( false ),
+			storedSettings: getSettings(),
 		};
 	}, [] );
 

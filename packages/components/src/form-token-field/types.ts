@@ -5,6 +5,7 @@ import type {
 	ComponentPropsWithRef,
 	MouseEventHandler,
 	ReactNode,
+	FocusEvent,
 } from 'react';
 
 type Messages = {

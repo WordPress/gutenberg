@@ -8,24 +8,6 @@ The tutorial includes setting up your development environment, tools, and gettin
 
 The first thing you need is a development environment and tools. This includes setting up your WordPress environment, Node, NPM, and your code editor. If you need help, see the [setting up your development environment documentation](/docs/getting-started/devenv/README.md).
 
-## Quick Start
-
-The `@wordpress/create-block` package exists to create the necessary block scaffolding to get you started. See [create-block package documentation](https://www.npmjs.com/package/@wordpress/create-block) for additional features. This quick start assumes you have a development environment with node installed, and a WordPress site.
-
-From your plugins directory, to create your block run:
-
-```sh
-npx @wordpress/create-block gutenpride --template @wordpress/create-block-tutorial-template
-```
-
-> Remember that you should use Node.js v14. Other versions may result in an error in the terminal. See [Node Development Tools](https://developer.wordpress.org/block-editor/getting-started/devenv/#node-development-tools) for more info.
-
-The [npx command](https://docs.npmjs.com/cli/v8/commands/npx) runs a command from a remote package, in this case our create-block package that will create a new directory called `gutenpride`, installs the necessary files, and builds the block plugin. If you want an interactive mode that prompts you for details, run the command without the `gutenpride` name.
-
-You now need to activate the plugin from inside wp-admin plugins page.
-
-After activation, go to the block editor and use the inserter to search and add your new block.
-
 ## Table of Contents
 
 The create a block tutorials breaks down to the following sections.

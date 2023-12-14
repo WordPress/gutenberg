@@ -19,7 +19,6 @@ import { useState } from 'react';
 import {
 	BlockEditorProvider,
 	BlockList,
-	BlockTools,
 	WritingFlow,
 } from '@wordpress/block-editor';
 
@@ -32,9 +31,7 @@ function MyEditorComponent() {
 			onInput={ ( blocks ) => updateBlocks( blocks ) }
 			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
-			<BlockTools>
-				<BlockCanvas height="400px" />
-			</BlockTools>
+			<BlockCanvas height="400px" />
 		</BlockEditorProvider>
 	);
 }
@@ -280,9 +277,17 @@ _Returns_
 
 ### BlockToolbar
 
+Renders the block toolbar.
+
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md>
+
+_Parameters_
+
+-   _props_ `Object`: Components props.
+-   _props.hideDragHandle_ `boolean`: Show or hide the Drag Handle for drag and drop functionality.
+-   _props.variant_ `string`: Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
 
 ### BlockTools
 
@@ -954,7 +959,7 @@ _Parameters_
 
 ### useSetting
 
-> **Deprecated** 6.4.0 Use useSettings instead.
+> **Deprecated** 6.5.0 Use useSettings instead.
 
 Hook that retrieves the given setting for the block instance in use.
 

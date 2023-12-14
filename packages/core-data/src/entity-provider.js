@@ -155,6 +155,9 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const id = _id ?? providerId;
 	const { content, editedBlocks, meta } = useSelect(
 		( select ) => {
+			if ( ! id ) {
+				return {};
+			}
 			const { getEditedEntityRecord } = select( STORE_NAME );
 			const editedRecord = getEditedEntityRecord( kind, name, id );
 			return {
@@ -169,6 +172,10 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		useDispatch( STORE_NAME );
 
 	const blocks = useMemo( () => {
+		if ( ! id ) {
+			return undefined;
+		}
+
 		if ( editedBlocks ) {
 			return editedBlocks;
 		}
@@ -176,7 +183,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		return content && typeof content !== 'function'
 			? parse( content )
 			: EMPTY_ARRAY;
-	}, [ editedBlocks, content ] );
+	}, [ id, editedBlocks, content ] );
 
 	const updateFootnotes = useCallback(
 		( _blocks ) => updateFootnotesFromMeta( _blocks, meta ),

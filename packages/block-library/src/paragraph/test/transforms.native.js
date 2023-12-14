@@ -23,6 +23,7 @@ const blockTransforms = [
 	'Preformatted',
 	'Pullquote',
 	'Verse',
+	'Code',
 	...transformsWithInnerBlocks,
 ];
 

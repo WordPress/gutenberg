@@ -8,7 +8,7 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useLayoutEffect, useRef } from '@wordpress/element';
+import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -45,7 +45,7 @@ function Tabs( {
 	const isControlled = selectedTabId !== undefined;
 
 	const { items, selectedId } = store.useState();
-	const { setSelectedId } = store;
+	const { setSelectedId, move } = store;
 
 	// Keep track of whether tabs have been populated. This is used to prevent
 	// certain effects from firing too early while tab data and relevant
@@ -154,8 +154,37 @@ function Tabs( {
 		setSelectedId,
 	] );
 
+	// In controlled mode, make sure browser focus follows the selected tab if
+	// the selection is changed while a tab is already being focused.
+	useLayoutEffect( () => {
+		if ( ! isControlled || ! selectOnMove ) {
+			return;
+		}
+		const currentItem = items.find( ( item ) => item.id === selectedId );
+		const activeElement = currentItem?.element?.ownerDocument.activeElement;
+		const tabsHasFocus = items.some( ( item ) => {
+			return activeElement && activeElement === item.element;
+		} );
+
+		if (
+			activeElement &&
+			tabsHasFocus &&
+			selectedId !== activeElement.id
+		) {
+			move( selectedId );
+		}
+	}, [ isControlled, items, move, selectOnMove, selectedId ] );
+
+	const contextValue = useMemo(
+		() => ( {
+			store,
+			instanceId,
+		} ),
+		[ store, instanceId ]
+	);
+
 	return (
-		<TabsContext.Provider value={ { store, instanceId } }>
+		<TabsContext.Provider value={ contextValue }>
 			{ children }
 		</TabsContext.Provider>
 	);
@@ -164,4 +193,6 @@ function Tabs( {
 Tabs.TabList = TabList;
 Tabs.Tab = Tab;
 Tabs.TabPanel = TabPanel;
+Tabs.Context = TabsContext;
+
 export default Tabs;

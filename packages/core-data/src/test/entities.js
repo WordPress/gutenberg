@@ -80,6 +80,9 @@ describe( 'getKindEntities', () => {
 				labels: {
 					singular_name: 'post',
 				},
+				supports: {
+					revisions: true,
+				},
 			},
 		];
 		const dispatch = jest.fn();
@@ -95,6 +98,12 @@ describe( 'getKindEntities', () => {
 		expect( dispatch.mock.calls[ 0 ][ 0 ].entities[ 0 ].baseURL ).toBe(
 			'/wp/v2/posts'
 		);
+		expect(
+			dispatch.mock.calls[ 0 ][ 0 ].entities[ 0 ].getRevisionsUrl( 1 )
+		).toBe( '/wp/v2/posts/1/revisions' );
+		expect(
+			dispatch.mock.calls[ 0 ][ 0 ].entities[ 0 ].getRevisionsUrl( 1, 2 )
+		).toBe( '/wp/v2/posts/1/revisions/2' );
 	} );
 } );
 

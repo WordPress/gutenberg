@@ -3,9 +3,9 @@
 	"apiVersion": 3,
 	"__experimental": true,
 	"name": "core/form-input",
-	"title": "Input field",
+	"title": "Input Field",
 	"category": "common",
-	"parent": [ "core/form" ],
+	"ancestor": [ "core/form" ],
 	"description": "The basic building block for forms.",
 	"keywords": [ "input", "form" ],
 	"textdomain": "default",
@@ -19,10 +19,10 @@
 			"type": "string"
 		},
 		"label": {
-			"type": "string",
+			"type": "rich-text",
 			"default": "Label",
 			"selector": ".wp-block-form-input__label-content",
-			"source": "html",
+			"source": "rich-text",
 			"__experimentalRole": "content"
 		},
 		"inlineLabel": {

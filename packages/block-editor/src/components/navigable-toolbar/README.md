@@ -8,6 +8,8 @@ The component accepts the following props. Props not included in this set will b
 
 ## `focusOnMount`
 
+_Note: this prop is deprecated._
+
 Whether to immediately focus when the component mounts.
 
 - Type: `Boolean`
