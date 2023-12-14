@@ -21,6 +21,7 @@ const {
 	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
 	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
+	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
 function WithSeparators( { children } ) {
@@ -98,7 +99,9 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 											</>
 										}
 									>
-										{ filter.name }
+										<DropdownMenuItemLabel>
+											{ filter.name }
+										</DropdownMenuItemLabel>
 									</DropdownMenuItem>
 								}
 							>
@@ -139,7 +142,9 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 														} );
 													} }
 												>
-													{ element.label }
+													<DropdownMenuItemLabel>
+														{ element.label }
+													</DropdownMenuItemLabel>
 												</DropdownMenuItem>
 											);
 										} ) }
@@ -161,7 +166,9 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 														</>
 													}
 												>
-													{ __( 'Conditions' ) }
+													<DropdownMenuItemLabel>
+														{ __( 'Conditions' ) }
+													</DropdownMenuItemLabel>
 												</DropdownMenuItem>
 											}
 										>
@@ -195,7 +202,9 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 													} );
 												} }
 											>
-												{ __( 'Is' ) }
+												<DropdownMenuItemLabel>
+													{ __( 'Is' ) }
+												</DropdownMenuItemLabel>
 											</DropdownMenuItem>
 											<DropdownMenuItem
 												key="not-in-filter"
@@ -227,7 +236,9 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 													} );
 												} }
 											>
-												{ __( 'Is not' ) }
+												<DropdownMenuItemLabel>
+													{ __( 'Is not' ) }
+												</DropdownMenuItemLabel>
 											</DropdownMenuItem>
 										</DropdownMenu>
 									) }
@@ -248,11 +259,13 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 											} ) );
 										} }
 									>
-										{ sprintf(
-											/* translators: 1: Filter name. e.g.: "Reset Author". */
-											__( 'Reset %1$s' ),
-											filter.name.toLowerCase()
-										) }
+										<DropdownMenuItemLabel>
+											{ sprintf(
+												/* translators: 1: Filter name. e.g.: "Reset Author". */
+												__( 'Reset %1$s' ),
+												filter.name.toLowerCase()
+											) }
+										</DropdownMenuItemLabel>
 									</DropdownMenuItem>
 								</WithSeparators>
 							</DropdownMenu>
@@ -272,7 +285,9 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 						} ) );
 					} }
 				>
-					{ __( 'Reset filters' ) }
+					<DropdownMenuItemLabel>
+						{ __( 'Reset filters' ) }
+					</DropdownMenuItemLabel>
 				</DropdownMenuItem>
 			</WithSeparators>
 		</DropdownMenu>

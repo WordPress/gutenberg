@@ -21,6 +21,7 @@ const {
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
 	DropdownMenuRadioItemV2Ariakit: DropdownMenuRadioItem,
 	DropdownMenuCheckboxItemV2Ariakit: DropdownMenuCheckboxItem,
+	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
 function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
@@ -38,7 +39,9 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 		<DropdownMenu
 			trigger={
 				<DropdownMenuItem suffix={ activeView.label }>
-					{ __( 'Layout' ) }
+					<DropdownMenuItemLabel>
+						{ __( 'Layout' ) }
+					</DropdownMenuItemLabel>
 				</DropdownMenuItem>
 			}
 			placement="left-start"
@@ -57,7 +60,9 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 							} );
 						} }
 					>
-						{ availableView.label }
+						<DropdownMenuItemLabel>
+							{ availableView.label }
+						</DropdownMenuItemLabel>
 					</DropdownMenuRadioItem>
 				);
 			} ) }
@@ -71,10 +76,13 @@ function PageSizeMenu( { view, onChangeView } ) {
 		<DropdownMenu
 			trigger={
 				<DropdownMenuItem suffix={ view.perPage }>
-					{ /* TODO: probably label per view type. */ }
-					{ __( 'Rows per page' ) }
+					<DropdownMenuItemLabel>
+						{ /* TODO: probably label per view type. */ }
+						{ __( 'Rows per page' ) }
+					</DropdownMenuItemLabel>
 				</DropdownMenuItem>
 			}
+			// TODO": remove?
 			placement="left-start"
 		>
 			{ PAGE_SIZE_VALUES.map( ( size ) => {
@@ -90,7 +98,7 @@ function PageSizeMenu( { view, onChangeView } ) {
 							onChangeView( { ...view, perPage: size, page: 1 } );
 						} }
 					>
-						{ size }
+						<DropdownMenuItemLabel>{ size }</DropdownMenuItemLabel>
 					</DropdownMenuRadioItem>
 				);
 			} ) }
@@ -108,7 +116,13 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 	}
 	return (
 		<DropdownMenu
-			trigger={ <DropdownMenuItem>{ __( 'Fields' ) }</DropdownMenuItem> }
+			trigger={
+				<DropdownMenuItem>
+					<DropdownMenuItemLabel>
+						{ __( 'Fields' ) }
+					</DropdownMenuItemLabel>
+				</DropdownMenuItem>
+			}
 			placement="left-start"
 		>
 			{ hidableFields?.map( ( field ) => {
@@ -134,7 +148,9 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 							} );
 						} }
 					>
-						{ field.header }
+						<DropdownMenuItemLabel>
+							{ field.header }
+						</DropdownMenuItemLabel>
 					</DropdownMenuCheckboxItem>
 				);
 			} ) }
@@ -161,7 +177,9 @@ function SortMenu( { fields, view, onChangeView } ) {
 		<DropdownMenu
 			trigger={
 				<DropdownMenuItem suffix={ currentSortedField?.header }>
-					{ __( 'Sort by' ) }
+					<DropdownMenuItemLabel>
+						{ __( 'Sort by' ) }
+					</DropdownMenuItemLabel>
 				</DropdownMenuItem>
 			}
 			placement="left-start"
@@ -173,7 +191,9 @@ function SortMenu( { fields, view, onChangeView } ) {
 						key={ field.id }
 						trigger={
 							<DropdownMenuItem>
-								{ field.header }
+								<DropdownMenuItemLabel>
+									{ field.header }
+								</DropdownMenuItemLabel>
 							</DropdownMenuItem>
 						}
 						placement="left-start"
@@ -206,7 +226,9 @@ function SortMenu( { fields, view, onChangeView } ) {
 											} );
 										} }
 									>
-										{ info.label }
+										<DropdownMenuItemLabel>
+											{ info.label }
+										</DropdownMenuItemLabel>
 									</DropdownMenuRadioItem>
 								);
 							}

@@ -23,6 +23,7 @@ const {
 	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
 	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
+	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
 const sortingItemsInfo = {
@@ -114,7 +115,9 @@ function HeaderMenu( { field, view, onChangeView } ) {
 											} );
 										} }
 									>
-										{ info.label }
+										<DropdownMenuItemLabel>
+											{ info.label }
+										</DropdownMenuItemLabel>
 									</DropdownMenuItem>
 								);
 							}
@@ -136,7 +139,9 @@ function HeaderMenu( { field, view, onChangeView } ) {
 							} );
 						} }
 					>
-						{ __( 'Hide' ) }
+						<DropdownMenuItemLabel>
+							{ __( 'Hide' ) }
+						</DropdownMenuItemLabel>
 					</DropdownMenuItem>
 				) }
 				{ isFilterable && (
@@ -161,7 +166,9 @@ function HeaderMenu( { field, view, onChangeView } ) {
 										</>
 									}
 								>
-									{ __( 'Filter by' ) }
+									<DropdownMenuItemLabel>
+										{ __( 'Filter by' ) }
+									</DropdownMenuItemLabel>
 								</DropdownMenuItem>
 							}
 						>
@@ -199,7 +206,9 @@ function HeaderMenu( { field, view, onChangeView } ) {
 													} );
 												} }
 											>
-												{ element.label }
+												<DropdownMenuItemLabel>
+													{ element.label }
+												</DropdownMenuItemLabel>
 											</DropdownMenuItem>
 										);
 									} ) }
@@ -221,7 +230,9 @@ function HeaderMenu( { field, view, onChangeView } ) {
 													</>
 												}
 											>
-												{ __( 'Conditions' ) }
+												<DropdownMenuItemLabel>
+													{ __( 'Conditions' ) }
+												</DropdownMenuItemLabel>
 											</DropdownMenuItem>
 										}
 									>
@@ -253,7 +264,9 @@ function HeaderMenu( { field, view, onChangeView } ) {
 												} )
 											}
 										>
-											{ __( 'Is' ) }
+											<DropdownMenuItemLabel>
+												{ __( 'Is' ) }
+											</DropdownMenuItemLabel>
 										</DropdownMenuItem>
 										<DropdownMenuItem
 											key="not-in-filter"
@@ -284,7 +297,9 @@ function HeaderMenu( { field, view, onChangeView } ) {
 												} )
 											}
 										>
-											{ __( 'Is not' ) }
+											<DropdownMenuItemLabel>
+												{ __( 'Is not' ) }
+											</DropdownMenuItemLabel>
 										</DropdownMenuItem>
 									</DropdownMenu>
 								) }

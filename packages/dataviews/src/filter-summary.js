@@ -21,6 +21,7 @@ const {
 	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
 	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
+	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
 const FilterText = ( { activeElement, filterInView, filter } ) => {
@@ -121,7 +122,9 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 									} )
 								}
 							>
-								{ element.label }
+								<DropdownMenuItemLabel>
+									{ element.label }
+								</DropdownMenuItemLabel>
 							</DropdownMenuItem>
 						);
 					} ) }
@@ -139,7 +142,9 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 									</>
 								}
 							>
-								{ __( 'Conditions' ) }
+								<DropdownMenuItemLabel>
+									{ __( 'Conditions' ) }
+								</DropdownMenuItemLabel>
 							</DropdownMenuItem>
 						}
 					>
@@ -167,7 +172,9 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 								} )
 							}
 						>
-							{ __( 'Is' ) }
+							<DropdownMenuItemLabel>
+								{ __( 'Is' ) }
+							</DropdownMenuItemLabel>
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							key="not-in-filter"
@@ -193,7 +200,9 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 								} )
 							}
 						>
-							{ __( 'Is not' ) }
+							<DropdownMenuItemLabel>
+								{ __( 'Is not' ) }
+							</DropdownMenuItemLabel>
 						</DropdownMenuItem>
 					</DropdownMenu>
 				) }
