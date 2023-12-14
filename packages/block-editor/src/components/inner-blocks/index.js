@@ -33,6 +33,15 @@ import { useSettings } from '../use-settings';
 
 const EMPTY_OBJECT = {};
 
+function BlockContext( { children, clientId } ) {
+	const context = useBlockContext( clientId );
+	return (
+		<BlockContextProvider value={ context }>
+			{ children }
+		</BlockContextProvider>
+	);
+}
+
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
  * as children. The UncontrolledInnerBlocks component is used whenever the inner
@@ -61,6 +70,7 @@ function UncontrolledInnerBlocks( props ) {
 		placeholder,
 		layout,
 		name,
+		blockType,
 		innerBlocks,
 		parentLock,
 	} = props;
@@ -88,8 +98,6 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
-	const context = useBlockContext( clientId );
-
 	const defaultLayoutBlockSupport =
 		getBlockSupport( name, 'layout' ) ||
 		getBlockSupport( name, '__experimentalLayout' ) ||
@@ -115,18 +123,22 @@ function UncontrolledInnerBlocks( props ) {
 
 	// This component needs to always be synchronous as it's the one changing
 	// the async mode depending on the block selection.
-	return (
-		<BlockContextProvider value={ context }>
-			<BlockListItems
-				rootClientId={ clientId }
-				renderAppender={ renderAppender }
-				__experimentalAppenderTagName={ __experimentalAppenderTagName }
-				layout={ memoedLayout }
-				wrapperRef={ wrapperRef }
-				placeholder={ placeholder }
-			/>
-		</BlockContextProvider>
+	const items = (
+		<BlockListItems
+			rootClientId={ clientId }
+			renderAppender={ renderAppender }
+			__experimentalAppenderTagName={ __experimentalAppenderTagName }
+			layout={ memoedLayout }
+			wrapperRef={ wrapperRef }
+			placeholder={ placeholder }
+		/>
 	);
+
+	if ( Object.keys( blockType.providesContext ).length === 0 ) {
+		return items;
+	}
+
+	return <BlockContext clientId={ clientId }>{ items }</BlockContext>;
 }
 
 /**
@@ -183,6 +195,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		__experimentalCaptureToolbars,
 		hasOverlay,
 		name,
+		blockType,
 		innerBlocks,
 		parentLock,
 		parentClientId,
@@ -205,7 +218,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				__unstableHasActiveBlockOverlayActive,
 				getBlockEditingMode,
 			} = select( blockEditorStore );
-			const { hasBlockSupport } = select( blocksStore );
+			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const enableClickThrough =
 				__unstableGetEditorMode() === 'navigation' || isSmallScreen;
@@ -223,6 +236,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 					! hasSelectedInnerBlock( clientId, true ) &&
 					enableClickThrough,
 				name: blockName,
+				blockType: getBlockType( blockName ),
 				innerBlocks: getBlocks( clientId ),
 				parentLock: getTemplateLock( _parentClientId ),
 				parentClientId: _parentClientId,
@@ -251,6 +265,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		__experimentalCaptureToolbars,
 		layout,
 		name,
+		blockType,
 		innerBlocks,
 		parentLock,
 		...options,
