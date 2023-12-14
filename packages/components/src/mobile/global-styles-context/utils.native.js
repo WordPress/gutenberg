@@ -9,7 +9,6 @@ import { colord } from 'colord';
  * WordPress dependencies
  */
 import {
-	getPxFromCssUnit,
 	useSettings,
 	useMultipleOriginColorsAndGradients,
 	SETTINGS_DEFAULTS,
@@ -19,6 +18,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { default as getPxFromCssUnit } from '../utils/get-px-from-css-unit';
 import { useGlobalStyles } from './index.native';
 
 export const BLOCK_STYLE_ATTRIBUTES = [
