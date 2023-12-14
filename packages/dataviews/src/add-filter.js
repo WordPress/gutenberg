@@ -17,12 +17,12 @@ import { unlock } from './lock-unlock';
 import { LAYOUT_LIST, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
 
 const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownSubMenuV2: DropdownSubMenu,
-	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
+	DropdownMenuV2Ariakit: DropdownMenu,
+	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
+	DropdownSubMenuV2Ariakit: DropdownSubMenu,
+	DropdownSubMenuTriggerV2Ariakit: DropdownSubMenuTrigger,
+	DropdownMenuItemV2Ariakit: DropdownMenuItem,
+	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
 function WithSeparators( { children } ) {
