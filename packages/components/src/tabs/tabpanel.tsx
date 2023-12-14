@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-
-/**
  * WordPress dependencies
  */
 
@@ -38,7 +34,11 @@ export const TabPanel = forwardRef<
 		<StyledTabPanel
 			ref={ ref }
 			store={ store }
-			id={ instancedTabId }
+			// For TabPanel, the id passed here is the id attribute of the DOM
+			// element.
+			// `tabId` is the id of the tab that controls this panel.
+			id={ `${ instancedTabId }-view` }
+			tabId={ instancedTabId }
 			focusable={ focusable }
 			{ ...otherProps }
 		>
