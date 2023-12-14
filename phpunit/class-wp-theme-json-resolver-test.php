@@ -226,6 +226,83 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( $color_palette, $settings['color']['palette']['theme'] );
 	}
 
+	public function test_add_registered_block_styles_to_theme_data() {
+		switch_theme( 'block-theme' );
+
+		$variation_styles_data = array(
+			'color'    => array(
+				'background' => 'darkslateblue',
+				'text'       => 'lavender',
+			),
+			'blocks'   => array(
+				'core/heading' => array(
+					'color' => array(
+						'text' => 'violet',
+					),
+				),
+			),
+			'elements' => array(
+				'link' => array(
+					'color'  => array(
+						'text' => 'fuchsia',
+					),
+					':hover' => array(
+						'color' => array(
+							'text' => 'deeppink',
+						),
+					),
+				),
+			),
+		);
+
+		register_block_style(
+			'core/group',
+			array(
+				'name'       => 'my-variation',
+				'style_data' => $variation_styles_data,
+			)
+		);
+
+		$theme_json   = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_raw_data();
+		$group_styles = $theme_json['styles']['blocks']['core/group'] ?? array();
+		$expected     = array(
+			'variations' => array(
+				'my-variation' => $variation_styles_data,
+			),
+		);
+
+		$this->assertSameSetsWithIndex( $group_styles, $expected );
+
+		unregister_block_style( 'core/group', 'my-variation' );
+	}
+
+	public function test_registered_block_styles_not_added_to_theme_data_when_option_is_false() {
+		switch_theme( 'block-theme' );
+
+		$variation_styles_data = array(
+			'color' => array(
+				'background' => 'darkslateblue',
+				'text'       => 'lavender',
+			),
+		);
+
+		register_block_style(
+			'core/group',
+			array(
+				'name'       => 'my-variation',
+				'style_data' => $variation_styles_data,
+			)
+		);
+
+		$options      = array( 'with_block_style_variations' => false );
+		$theme_json   = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data( null, $options )->get_raw_data();
+		$group_styles = $theme_json['styles']['blocks']['core/group'] ?? array();
+
+		$this->assertArrayNotHasKey( 'variations', $group_styles );
+
+		unregister_block_style( 'core/group', 'my-variation' );
+	}
+
 	/**
 	 * Recursively applies ksort to an array.
 	 */
