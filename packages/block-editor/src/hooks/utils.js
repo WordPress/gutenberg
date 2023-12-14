@@ -584,6 +584,7 @@ export function createBlockSaveFilter( features ) {
 	addFilter(
 		'blocks.getSaveContent.extraProps',
 		'core/editor/hooks',
-		extraPropsFromHooks
+		extraPropsFromHooks,
+		0
 	);
 }
