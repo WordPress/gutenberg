@@ -546,12 +546,6 @@ export function createBlockListBlockFilter( features ) {
 
 export function createBlockSaveFilter( features ) {
 	function extraPropsFromHooks( props, name, attributes ) {
-		// Previously we had a filter deleting the className if it was an empty
-		// string. That filter is no longer running, so now we need to delete it
-		// here.
-		if ( props.hasOwnProperty( 'className' ) && ! props.className ) {
-			delete props.className;
-		}
 		return features.reduce( ( accu, feature ) => {
 			const { hasSupport, attributeKeys = [], addSaveProps } = feature;
 
@@ -579,5 +573,19 @@ export function createBlockSaveFilter( features ) {
 		'core/editor/hooks',
 		extraPropsFromHooks,
 		0
+	);
+	addFilter(
+		'blocks.getSaveContent.extraProps',
+		'core/editor/hooks',
+		( props ) => {
+			// Previously we had a filter deleting the className if it was an empty
+			// string. That filter is no longer running, so now we need to delete it
+			// here.
+			if ( props.hasOwnProperty( 'className' ) && ! props.className ) {
+				delete props.className;
+			}
+
+			return props;
+		}
 	);
 }
