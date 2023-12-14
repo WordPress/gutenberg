@@ -4,7 +4,12 @@
 import FilterSummary from './filter-summary';
 import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
-import { ENUMERATION_TYPE, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
+import {
+	ENUMERATION_TYPE,
+	OPERATOR_IN,
+	OPERATOR_NOT_IN,
+	LAYOUT_LIST,
+} from './constants';
 
 const sanitizeOperators = ( field ) => {
 	let operators = field.filterBy?.operators;
@@ -57,7 +62,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 	const filterComponents = [
 		addFilter,
 		...filters.map( ( filter ) => {
-			if ( ! filter.isVisible ) {
+			if ( ! filter.isVisible || view.type === LAYOUT_LIST ) {
 				return null;
 			}
 
@@ -72,7 +77,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 		} ),
 	];
 
-	if ( filterComponents.length > 1 ) {
+	if ( filterComponents.length > 1 && view.type !== LAYOUT_LIST ) {
 		filterComponents.push(
 			<ResetFilters
 				key="reset-filters"
