@@ -6,6 +6,10 @@
 
 -   `TabPanel`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
 
+### Bug Fix
+
+-   `Button`: Fix logic of `has-text` class addition ([#56949](https://github.com/WordPress/gutenberg/pull/56949)).
+
 ## 25.14.0 (2023-12-13)
 
 ### Enhancements
