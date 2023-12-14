@@ -21,7 +21,7 @@ export default function useEnter( props, preventDefault ) {
 		useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
-	const outdentListItem = useOutdentListItem( propsRef.current.clientId );
+	const outdentListItem = useOutdentListItem();
 
 	return {
 		onEnter() {

@@ -23,7 +23,7 @@ export default function useEnter( props ) {
 		useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
-	const outdentListItem = useOutdentListItem( propsRef.current.clientId );
+	const outdentListItem = useOutdentListItem();
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
