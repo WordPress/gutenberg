@@ -50,7 +50,7 @@ function ReadOnlyContent( {
 	);
 }
 
-function EditableContent( { context = {} } ) {
+function EditableContent( { context = {}, clientId } ) {
 	const { postType, postId } = context;
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
@@ -61,13 +61,18 @@ function EditableContent( { context = {} } ) {
 
 	const { insertBlock } = useDispatch( blockEditorStore );
 
-	const entityRecord = useSelect(
+	const { entityRecord, setInserterIsOpened } = useSelect(
 		( select ) => {
-			return select( coreStore ).getEntityRecord(
-				'postType',
-				postType,
-				postId
-			);
+			return {
+				entityRecord: select( coreStore ).getEntityRecord(
+					'postType',
+					postType,
+					postId
+				),
+				setInserterIsOpened:
+					select( blockEditorStore ).getSettings()
+						.__experimentalSetIsInserterOpened,
+			};
 		},
 		[ postType, postId ]
 	);
@@ -96,7 +101,16 @@ function EditableContent( { context = {} } ) {
 						'Add your first block or pattern to get started'
 					) }
 				>
-					<Button variant="primary">
+					<Button
+						variant="primary"
+						onClick={ () => {
+							setHasPlaceholder( false );
+							setInserterIsOpened( {
+								rootClientId: clientId,
+								insertionIndex: 0,
+							} );
+						} }
+					>
 						{ __( 'Choose a pattern' ) }
 					</Button>
 
@@ -166,6 +180,7 @@ function RecursionError() {
 }
 
 export default function PostContentEdit( {
+	clientId,
 	context,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
@@ -180,6 +195,7 @@ export default function PostContentEdit( {
 		<RecursionProvider uniqueId={ contextPostId }>
 			{ contextPostId && contextPostType ? (
 				<Content
+					clientId={ clientId }
 					context={ context }
 					layoutClassNames={ layoutClassNames }
 				/>
