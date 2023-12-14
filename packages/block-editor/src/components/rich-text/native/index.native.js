@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { View, Platform, Dimensions, PixelRatio } from 'react-native';
+import { View, Platform, Dimensions } from 'react-native';
 import memize from 'memize';
 import { colord } from 'colord';
 
@@ -48,6 +48,7 @@ import {
 import { useFormatTypes } from './use-format-types';
 import FormatEdit from './format-edit';
 import { getFormatColors } from './get-format-colors';
+import { getScreenAdjustedFontSize } from './get-screen-adjusted-font-size';
 import styles from './style.scss';
 import ToolbarButtonWithOptions from './toolbar-button-with-options';
 
@@ -1123,10 +1124,7 @@ export class RichText extends Component {
 		const html = this.getHtmlToRender( record, tagName );
 		const editableProps = this.getEditableProps();
 		const blockUseDefaultFont = this.getBlockUseDefaultFont();
-
-		const fontScale = PixelRatio.getFontScale() || 1;
-		const scaledFontSize = currentFontSize * fontScale;
-		const fontSize = scaledFontSize;
+		const fontSize = getScreenAdjustedFontSize( currentFontSize );
 		const lineHeight = this.getLineHeight();
 
 		const {
