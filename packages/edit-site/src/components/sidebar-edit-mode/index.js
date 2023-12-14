@@ -63,12 +63,14 @@ const FillContents = ( {
 				className="edit-site-sidebar__panel"
 			>
 				<Tabs.Context.Provider value={ tabsContextValue }>
-					<Tabs.TabPanel id={ SIDEBAR_BLOCK } focusable={ false }>
+					<Tabs.TabPanel
+						tabId={ SIDEBAR_TEMPLATE }
+						focusable={ false }
+					>
 						{ isEditingPage ? <PagePanels /> : <TemplatePanel /> }
 						<PluginTemplateSettingPanel.Slot />
 					</Tabs.TabPanel>
-
-					<Tabs.TabPanel id={ SIDEBAR_TEMPLATE } focusable={ false }>
+					<Tabs.TabPanel tabId={ SIDEBAR_BLOCK } focusable={ false }>
 						<InspectorSlot bubblesVirtually />
 					</Tabs.TabPanel>
 				</Tabs.Context.Provider>
