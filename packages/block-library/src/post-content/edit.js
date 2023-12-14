@@ -19,6 +19,7 @@ import {
 	useEntityBlockEditor,
 	store as coreStore,
 } from '@wordpress/core-data';
+import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -73,6 +74,8 @@ function EditableContent( { context = {} } ) {
 
 	const hasInnerBlocks = !! entityRecord?.content?.raw || blocks?.length;
 
+	const [ hasPlaceholder, setHasPlaceholder ] = useState( ! hasInnerBlocks );
+
 	const { children, ...props } = useInnerBlocksProps(
 		useBlockProps( { className: 'entry-content' } ),
 		{
@@ -85,7 +88,7 @@ function EditableContent( { context = {} } ) {
 	return (
 		<div { ...props }>
 			{ children }
-			{ ! hasInnerBlocks && (
+			{ hasPlaceholder && (
 				<Placeholder
 					icon={ page }
 					label={ __( 'This page is empty' ) }
@@ -99,9 +102,10 @@ function EditableContent( { context = {} } ) {
 
 					<Button
 						variant="secondary"
-						onClick={ () =>
-							insertBlock( createBlock( 'core/paragraph' ), 0 )
-						}
+						onClick={ () => {
+							setHasPlaceholder( false );
+							insertBlock( createBlock( 'core/paragraph' ), 0 );
+						} }
 					>
 						{ __( 'Start blank' ) }
 					</Button>
