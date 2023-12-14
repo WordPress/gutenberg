@@ -2428,7 +2428,6 @@ class WP_Theme_JSON_Gutenberg {
 			$variation_selectors = array();
 			$variation_nodes     = array();
 
-			// TODO: Should we be supporting recursive variations and block type styles?
 			foreach ( $variations as $variation => $variation_node ) {
 				$variation_selector    = $selectors[ $name ]['styleVariations'][ $variation ];
 				$variation_selectors[] = array(
@@ -2468,10 +2467,6 @@ class WP_Theme_JSON_Gutenberg {
 				}
 
 				foreach ( $variation_elements as $variation_element => $variation_element_node ) {
-					// TODO: See if there is a way to clean up the generation of element selectors.
-					// The following code varies from standard block element selectors only to avoid
-					// that the $selectors[ $name ]['elements'][ $variation_element ] value would
-					// nest the block's root selector.
 					$nodes[] = array(
 						'path'     => array( 'styles', 'blocks', $name, 'variations', $variation, 'elements', $variation_element ),
 						'selector' => static::scope_selector( $variation_selector, static::ELEMENTS[ $variation_element ] ),

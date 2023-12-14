@@ -703,7 +703,6 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 											.featureSelectors
 									);
 
-								// TODO: Do we need to delay pushing these nodes so they come after the original block's node?
 								nodes.push( {
 									selector: variationBlockSelector,
 									duotoneSelector: variationDuotoneSelector,
