@@ -8,7 +8,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
-import { useEffect, forwardRef, renderToString } from '@wordpress/element';
+import {
+	useEffect,
+	forwardRef,
+	renderToString,
+	RawHTML,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
 
@@ -53,6 +58,7 @@ function UnforwardedSnackbar(
 		onRemove,
 		icon = null,
 		explicitDismiss = false,
+		__unstableHTML,
 		// onDismiss is a callback executed when the snackbar is dismissed.
 		// It is distinct from onRemove, which _looks_ like a callback but is
 		// actually the function to call to remove the snackbar from the UI.
@@ -118,6 +124,10 @@ function UnforwardedSnackbar(
 			'components-snackbar__content-with-icon': !! icon,
 		}
 	);
+
+	if ( __unstableHTML && typeof children === 'string' ) {
+		children = <RawHTML>{ children }</RawHTML>;
+	}
 
 	return (
 		<div

@@ -5,14 +5,13 @@
 ### Bug Fix
 
 -   `PaletteEdit`: Consider digits when generating kebab-cased slug ([#56713](https://github.com/WordPress/gutenberg/pull/56713)).
+-   `Button`: Fix logic of `has-text` class addition ([#56949](https://github.com/WordPress/gutenberg/pull/56949)).
+-   `Snackbar`: Fix `__unstableHTML` support ([#57067](https://github.com/WordPress/gutenberg/pull/57067)).
+
 
 ### Experimental
 
 -   `TabPanel`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
-
-### Bug Fix
-
--   `Button`: Fix logic of `has-text` class addition ([#56949](https://github.com/WordPress/gutenberg/pull/56949)).
 
 ## 25.14.0 (2023-12-13)
 
