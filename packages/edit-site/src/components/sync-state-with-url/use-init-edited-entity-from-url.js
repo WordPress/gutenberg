@@ -55,7 +55,9 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 				hasLoadedAllDependencies: !! base && !! siteData,
 				homepageId:
 					siteData?.show_on_front === 'page' &&
-					typeof siteData.page_on_front === 'string'
+					[ 'number', 'string' ].includes(
+						typeof siteData.page_on_front
+					)
 						? siteData.page_on_front.toString()
 						: null,
 				url: base?.home,
