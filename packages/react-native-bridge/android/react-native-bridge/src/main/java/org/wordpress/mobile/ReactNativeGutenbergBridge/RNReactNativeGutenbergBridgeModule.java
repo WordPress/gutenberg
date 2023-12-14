@@ -1,11 +1,14 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.provider.Settings;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.Nullable;
 
@@ -549,5 +552,18 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
                 jsCallback.invoke(isConnected);
             }
         };
+    }
+
+    @ReactMethod
+    public void hideAndroidSoftKeyboard() {
+        Activity currentActivity = mReactContext.getCurrentActivity();
+        if (currentActivity != null) {
+            View currentFocusedView = currentActivity.getCurrentFocus();
+            if (currentFocusedView != null) {
+                InputMethodManager imm =
+                        (InputMethodManager) mReactContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(currentFocusedView.getWindowToken(), 0);
+            }
+        }
     }
 }

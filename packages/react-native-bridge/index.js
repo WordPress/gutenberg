@@ -516,6 +516,21 @@ export function sendEventToHost( eventName, properties ) {
 }
 
 /**
+ * Hides Android's soft keyboard.
+ *
+ * @return {void}
+ */
+export function hideAndroidSoftKeyboard() {
+	if ( isIOS ) {
+		/* eslint-disable-next-line no-console */
+		console.warn( 'hideAndroidSoftKeyboard is not supported on iOS' );
+		return;
+	}
+
+	RNReactNativeGutenbergBridge.hideAndroidSoftKeyboard();
+}
+
+/**
  * Generate haptic feedback.
  */
 export function generateHapticFeedback() {
