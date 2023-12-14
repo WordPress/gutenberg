@@ -46,7 +46,7 @@ describe( 'Scheduling', () => {
 				await page.keyboard.press( 'ArrowUp' );
 
 				// Close the datepicker.
-				await page.click( '.edit-post-post-schedule__toggle' );
+				await page.click( '.editor-post-schedule__dialog-toggle' );
 
 				expect( await getPublishButtonText() ).toBe( 'Schedule…' );
 			} );

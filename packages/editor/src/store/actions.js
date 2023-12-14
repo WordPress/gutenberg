@@ -36,7 +36,7 @@ import {
 export const setupEditor =
 	( post, edits, template ) =>
 	( { dispatch } ) => {
-		dispatch.setupEditorState( post );
+		dispatch.setEditedPost( post.type, post.id );
 		// Apply a template for new posts only, if exists.
 		const isNewPost = post.status === 'auto-draft';
 		if ( isNewPost && template ) {
@@ -70,10 +70,18 @@ export const setupEditor =
  * Returns an action object signalling that the editor is being destroyed and
  * that any necessary state or side-effect cleanup should occur.
  *
+ * @deprecated
+ *
  * @return {Object} Action object.
  */
 export function __experimentalTearDownEditor() {
-	return { type: 'TEAR_DOWN_EDITOR' };
+	deprecated(
+		"wp.data.dispatch( 'core/editor' ).__experimentalTearDownEditor",
+		{
+			since: '6.5',
+		}
+	);
+	return { type: 'DO_NOTHING' };
 }
 
 /**
@@ -109,17 +117,33 @@ export function updatePost() {
 }
 
 /**
- * Returns an action object used to setup the editor state when first opening
- * an editor.
+ * Setup the editor state.
+ *
+ * @deprecated
  *
  * @param {Object} post Post object.
+ */
+export function setupEditorState( post ) {
+	deprecated( "wp.data.dispatch( 'core/editor' ).setupEditorState", {
+		since: '6.5',
+		alternative: "wp.data.dispatch( 'core/editor' ).setEditedPost",
+	} );
+	return setEditedPost( post.type, post.id );
+}
+
+/**
+ * Returns an action that sets the current post Type and post ID.
+ *
+ * @param {string} postType Post Type.
+ * @param {string} postId   Post ID.
  *
  * @return {Object} Action object.
  */
-export function setupEditorState( post ) {
+export function setEditedPost( postType, postId ) {
 	return {
-		type: 'SETUP_EDITOR_STATE',
-		post,
+		type: 'SET_EDITED_POST',
+		postType,
+		postId,
 	};
 }
 
@@ -545,6 +569,45 @@ export function updateEditorSettings( settings ) {
 	return {
 		type: 'UPDATE_EDITOR_SETTINGS',
 		settings,
+	};
+}
+
+/**
+ * Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
+ *
+ * -   `all`: This is the default mode. It renders the post editor with all the features available. If a template is provided, it's preferred over the post.
+ * -   `template-only`: This mode renders the editor with only the template blocks visible.
+ * -   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
+ * -   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
+ *
+ * @param {string} mode Mode (one of 'template-only', 'post-only', 'template-locked' or 'all').
+ */
+export const setRenderingMode =
+	( mode ) =>
+	( { dispatch, registry, select } ) => {
+		if ( select.__unstableIsEditorReady() ) {
+			// We clear the block selection but we also need to clear the selection from the core store.
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+			dispatch.editPost( { selection: undefined }, { undoIgnore: true } );
+		}
+
+		dispatch( {
+			type: 'SET_RENDERING_MODE',
+			mode,
+		} );
+	};
+
+/**
+ * Action that changes the width of the editing canvas.
+ *
+ * @param {string} deviceType
+ *
+ * @return {Object} Action object.
+ */
+export function setDeviceType( deviceType ) {
+	return {
+		type: 'SET_DEVICE_TYPE',
+		deviceType,
 	};
 }
 

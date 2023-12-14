@@ -16,7 +16,6 @@ import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
 	DropdownMenuItem,
-	DropdownMenuGroupLabel,
 	DropdownMenuRadioItem,
 	DropdownMenuSeparator,
 	DropdownMenuGroup,
@@ -134,8 +133,9 @@ describe( 'DropdownMenu', () => {
 			await press.ArrowDown();
 
 			// DropdownMenu open, focus is on the first focusable item
+			// (disabled items are still focusable and accessible)
 			expect(
-				screen.getByRole( 'menuitem', { name: 'Second item' } )
+				screen.getByRole( 'menuitem', { name: 'First item' } )
 			).toHaveFocus();
 		} );
 
@@ -163,8 +163,9 @@ describe( 'DropdownMenu', () => {
 			await press.Space();
 
 			// DropdownMenu open, focus is on the first focusable item
+			// (disabled items are still focusable and accessible
 			expect(
-				screen.getByRole( 'menuitem', { name: 'Second item' } )
+				screen.getByRole( 'menuitem', { name: 'First item' } )
 			).toHaveFocus();
 		} );
 
@@ -452,9 +453,6 @@ describe( 'DropdownMenu', () => {
 				return (
 					<DropdownMenu trigger={ <button>Open dropdown</button> }>
 						<DropdownMenuGroup>
-							<DropdownMenuGroupLabel>
-								Radio group label
-							</DropdownMenuGroupLabel>
 							<DropdownMenuRadioItem
 								name="radio-test"
 								value="radio-one"
@@ -532,9 +530,6 @@ describe( 'DropdownMenu', () => {
 			render(
 				<DropdownMenu trigger={ <button>Open dropdown</button> }>
 					<DropdownMenuGroup>
-						<DropdownMenuGroupLabel>
-							Radio group label
-						</DropdownMenuGroupLabel>
 						<DropdownMenuRadioItem
 							name="radio-test"
 							value="radio-one"
@@ -991,7 +986,7 @@ describe( 'DropdownMenu', () => {
 			// The contents of the suffix are rendered after the item's children
 			expect(
 				screen.getByRole( 'menuitemradio', {
-					name: 'Radio item oneRadio suffix',
+					name: 'Radio item one Radio suffix',
 				} )
 			).toBeInTheDocument();
 		} );

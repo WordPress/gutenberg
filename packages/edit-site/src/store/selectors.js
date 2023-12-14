@@ -7,6 +7,7 @@ import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -43,13 +44,25 @@ export const isFeatureActive = createRegistrySelector(
 /**
  * Returns the current editing canvas device type.
  *
+ * @deprecated
+ *
  * @param {Object} state Global application state.
  *
  * @return {string} Device type.
  */
-export function __experimentalGetPreviewDeviceType( state ) {
-	return state.deviceType;
-}
+export const __experimentalGetPreviewDeviceType = createRegistrySelector(
+	( select ) => () => {
+		deprecated(
+			`select( 'core/edit-site' ).__experimentalGetPreviewDeviceType`,
+			{
+				since: '6.5',
+				version: '6.7',
+				alternative: `select( 'core/editor' ).getDeviceType`,
+			}
+		);
+		return select( editorStore ).getDeviceType();
+	}
+);
 
 /**
  * Returns whether the current user can create media or not.
@@ -181,7 +194,10 @@ export const __experimentalGetInsertionPoint = createRegistrySelector(
 			return { rootClientId, insertionIndex, filterValue };
 		}
 
-		if ( hasPageContentFocus( state ) ) {
+		if (
+			isPage( state ) &&
+			select( editorStore ).getRenderingMode() !== 'template-only'
+		) {
 			const [ postContentClientId ] =
 				select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
 					'core/post-content'
@@ -310,10 +326,14 @@ export function isPage( state ) {
 /**
  * Whether or not the editor allows only page content to be edited.
  *
- * @param {Object} state Global application state.
+ * @deprecated
  *
  * @return {boolean} Whether or not focus is on editing page content.
  */
-export function hasPageContentFocus( state ) {
-	return isPage( state ) ? state.hasPageContentFocus : false;
+export function hasPageContentFocus() {
+	deprecated( `select( 'core/edit-site' ).hasPageContentFocus`, {
+		since: '6.5',
+	} );
+
+	return false;
 }

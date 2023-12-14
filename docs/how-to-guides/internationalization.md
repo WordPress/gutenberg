@@ -37,9 +37,6 @@ add_action( 'init', 'myguten_block_init' );
 
 In your code, you can include the i18n functions. The most common function is **\_\_** (a double underscore) which provides translation of a simple string. Here is a basic block example:
 
-{% codetabs %}
-{% JSX %}
-
 ```js
 import { __ } from '@wordpress/i18n';
 import { registerBlockType } from '@wordpress/blocks';
@@ -63,33 +60,6 @@ registerBlockType( 'myguten/simple', {
 	},
 } );
 ```
-
-{% Plain %}
-
-```js
-const el = React.createElement;
-const { __ } = wp.i18n;
-const { registerBlockType } = wp.blocks;
-const { useBlockProps } = wp.blockEditor;
-
-registerBlockType( 'myguten/simple', {
-	title: __( 'Simple Block', 'myguten' ),
-	category: 'widgets',
-
-	edit: function () {
-		const blockProps = useBlockProps( { style: { color: 'red' } } );
-
-		return el( 'p', blockProps, __( 'Hello World', 'myguten' ) );
-	},
-
-	save: function () {
-		const blockProps = useBlockProps.save( { style: { color: 'red' } } );
-		return el( 'p', blockProps, __( 'Hello World', 'myguten' ) );
-	},
-} );
-```
-
-{% end %}
 
 In the above example, the function will use the first argument for the string to be translated. The second argument is the text domain which must match the text domain slug specified by your plugin.
 

@@ -85,9 +85,9 @@ export function isBlobURL( url ) {
  * 		null,
  * 		2
  * 	);
- * 	const fileName = 'file.json';
+ * 	const filename = 'file.json';
  *
- * 	downloadBlob( 'file.json', fileContent, 'application/json' );
+ * 	downloadBlob( filename, fileContent, 'application/json' );
  * ```
  *
  * @param {string}   filename    File name.

@@ -215,7 +215,7 @@
 	left: 0;
 	z-index: 100000;
 	overflow: hidden;
-	width: 100vw;
+	width: 100%;
 	height: 100vh;
 	box-sizing: border-box;
 	visibility: hidden;
@@ -372,7 +372,7 @@
 
 @keyframes lightbox-zoom-in {
 	0% {
-		transform: translate(calc(-50vw + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
+		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 	100% {
 		transform: translate(-50%, -50%) scale(1, 1);
@@ -389,6 +389,6 @@
 	}
 	100% {
 		visibility: hidden;
-		transform: translate(calc(-50vw + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
+		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 }

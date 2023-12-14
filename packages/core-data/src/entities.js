@@ -205,8 +205,13 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/global-styles',
 		baseURLParams: { context: 'edit' },
-		plural: 'globalStylesVariations', // Should be different than name.
+		plural: 'globalStylesVariations', // Should be different from name.
 		getTitle: ( record ) => record?.title?.rendered || record?.title,
+		getRevisionsUrl: ( parentId, revisionId ) =>
+			`/wp/v2/global-styles/${ parentId }/revisions${
+				revisionId ? '/' + revisionId : ''
+			}`,
+		supportsPagination: true,
 	},
 	{
 		label: __( 'Themes' ),
@@ -328,6 +333,13 @@ async function loadPostTypeEntities() {
 			syncObjectType: 'postType/' + postType.name,
 			getSyncObjectId: ( id ) => id,
 			supportsPagination: true,
+			getRevisionsUrl: ( parentId, revisionId ) =>
+				`/${ namespace }/${
+					postType.rest_base
+				}/${ parentId }/revisions${
+					revisionId ? '/' + revisionId : ''
+				}`,
+			revisionKey: isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 		};
 	} );
 }

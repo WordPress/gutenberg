@@ -40,9 +40,9 @@ const fileContent = JSON.stringify(
 	null,
 	2
 );
-const fileName = 'file.json';
+const filename = 'file.json';
 
-downloadBlob( 'file.json', fileContent, 'application/json' );
+downloadBlob( filename, fileContent, 'application/json' );
 ```
 
 _Parameters_

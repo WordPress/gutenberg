@@ -74,30 +74,17 @@ function addSaveProps( props, blockType, attributes ) {
 	return props;
 }
 
-/**
- * Filters registered block settings to expand the block edit wrapper
- * by applying the desired styles and classnames.
- *
- * @param {Object} settings Original block settings.
- *
- * @return {Object} Filtered block settings.
- */
-function addEditProps( settings ) {
-	if ( ! hasBlockSupport( settings, FONT_FAMILY_SUPPORT_KEY ) ) {
-		return settings;
-	}
-
-	const existingGetEditWrapperProps = settings.getEditWrapperProps;
-	settings.getEditWrapperProps = ( attributes ) => {
-		let props = {};
-		if ( existingGetEditWrapperProps ) {
-			props = existingGetEditWrapperProps( attributes );
-		}
-		return addSaveProps( props, settings, attributes );
-	};
-
-	return settings;
+function useBlockProps( { name, fontFamily } ) {
+	return addSaveProps( {}, name, { fontFamily } );
 }
+
+export default {
+	useBlockProps,
+	attributeKeys: [ 'fontFamily' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, FONT_FAMILY_SUPPORT_KEY );
+	},
+};
 
 /**
  * Resets the font family block support attribute. This can be used when
@@ -121,10 +108,4 @@ addFilter(
 	'blocks.getSaveContent.extraProps',
 	'core/fontFamily/addSaveProps',
 	addSaveProps
-);
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/fontFamily/addEditProps',
-	addEditProps
 );

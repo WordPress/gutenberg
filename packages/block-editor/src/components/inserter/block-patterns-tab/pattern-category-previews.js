@@ -22,7 +22,7 @@ import {
  * Internal dependencies
  */
 import usePatternsState from '../hooks/use-patterns-state';
-import BlockPatternList from '../../block-patterns-list';
+import BlockPatternsList from '../../block-patterns-list';
 import usePatternsPaging from '../hooks/use-patterns-paging';
 import { PatternsFilter } from './patterns-filter';
 import { usePatternCategories } from './use-pattern-categories';
@@ -30,6 +30,7 @@ import {
 	isPatternFiltered,
 	allPatternsCategory,
 	myPatternsCategory,
+	PATTERN_TYPES,
 } from './utils';
 
 const noop = () => {};
@@ -69,7 +70,10 @@ export function PatternCategoryPreviews( {
 				if ( category.name === allPatternsCategory.name ) {
 					return true;
 				}
-				if ( category.name === myPatternsCategory.name && pattern.id ) {
+				if (
+					category.name === myPatternsCategory.name &&
+					pattern.type === PATTERN_TYPES.user
+				) {
 					return true;
 				}
 				if ( category.name !== 'uncategorized' ) {
@@ -155,7 +159,7 @@ export function PatternCategoryPreviews( {
 			</VStack>
 
 			{ currentCategoryPatterns.length > 0 && (
-				<BlockPatternList
+				<BlockPatternsList
 					ref={ scrollContainerRef }
 					shownPatterns={ pagingProps.categoryPatternsAsyncList }
 					blockPatterns={ pagingProps.categoryPatterns }

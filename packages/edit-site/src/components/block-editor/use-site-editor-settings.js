@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
@@ -87,8 +88,9 @@ function useArchiveLabel( templateSlug ) {
 	);
 }
 
-export default function useSiteEditorSettings() {
+export function useSpecificEditorSettings() {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		templateSlug,
 		focusMode,
@@ -97,56 +99,60 @@ export default function useSiteEditorSettings() {
 		keepCaretInsideBlock,
 		canvasMode,
 		settings,
-		postType,
-		postId,
-	} = useSelect( ( select ) => {
-		const {
-			getEditedPostType,
-			getEditedPostId,
-			getCanvasMode,
-			getSettings,
-		} = unlock( select( editSiteStore ) );
-		const { get: getPreference } = select( preferencesStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const usedPostType = getEditedPostType();
-		const usedPostId = getEditedPostId();
-		const _record = getEditedEntityRecord(
-			'postType',
-			usedPostType,
-			usedPostId
-		);
-		return {
-			templateSlug: _record.slug,
-			focusMode: !! getPreference( 'core/edit-site', 'focusMode' ),
-			isDistractionFree: !! getPreference(
-				'core/edit-site',
-				'distractionFree'
-			),
-			hasFixedToolbar: !! getPreference(
-				'core/edit-site',
-				'fixedToolbar'
-			),
-			keepCaretInsideBlock: !! getPreference(
-				'core/edit-site',
-				'keepCaretInsideBlock'
-			),
-			canvasMode: getCanvasMode(),
-			settings: getSettings(),
-			postType: usedPostType,
-			postId: usedPostId,
-		};
-	}, [] );
+		postWithTemplate,
+	} = useSelect(
+		( select ) => {
+			const {
+				getEditedPostType,
+				getEditedPostId,
+				getEditedPostContext,
+				getCanvasMode,
+				getSettings,
+			} = unlock( select( editSiteStore ) );
+			const { get: getPreference } = select( preferencesStore );
+			const { getEditedEntityRecord } = select( coreStore );
+			const usedPostType = getEditedPostType();
+			const usedPostId = getEditedPostId();
+			const _record = getEditedEntityRecord(
+				'postType',
+				usedPostType,
+				usedPostId
+			);
+			const _context = getEditedPostContext();
+			return {
+				templateSlug: _record.slug,
+				focusMode: !! getPreference( 'core/edit-site', 'focusMode' ),
+				isDistractionFree: !! getPreference(
+					'core/edit-site',
+					'distractionFree'
+				),
+				hasFixedToolbar:
+					!! getPreference( 'core/edit-site', 'fixedToolbar' ) ||
+					! isLargeViewport,
+				keepCaretInsideBlock: !! getPreference(
+					'core/edit-site',
+					'keepCaretInsideBlock'
+				),
+				canvasMode: getCanvasMode(),
+				settings: getSettings(),
+				postWithTemplate: _context?.postId,
+			};
+		},
+		[ isLargeViewport ]
+	);
 	const archiveLabels = useArchiveLabel( templateSlug );
-
+	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
 	const defaultEditorSettings = useMemo( () => {
 		return {
 			...settings,
 
+			supportsTemplateMode: true,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
 			isDistractionFree,
 			hasFixedToolbar,
 			keepCaretInsideBlock,
+			defaultRenderingMode,
 
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
@@ -162,7 +168,24 @@ export default function useSiteEditorSettings() {
 		canvasMode,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
+		defaultRenderingMode,
 	] );
 
+	return defaultEditorSettings;
+}
+
+export default function useSiteEditorSettings() {
+	const defaultEditorSettings = useSpecificEditorSettings();
+	const { postType, postId } = useSelect( ( select ) => {
+		const { getEditedPostType, getEditedPostId } = unlock(
+			select( editSiteStore )
+		);
+		const usedPostType = getEditedPostType();
+		const usedPostId = getEditedPostId();
+		return {
+			postType: usedPostType,
+			postId: usedPostId,
+		};
+	}, [] );
 	return useBlockEditorSettings( defaultEditorSettings, postType, postId );
 }

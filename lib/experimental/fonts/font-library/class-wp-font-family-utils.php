@@ -92,32 +92,79 @@ class WP_Font_Family_Utils {
 	}
 
 	/**
+	 * Format font family to make it valid CSS.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param string $font_family Font family attribute.
+	 * @return string The formatted font family attribute.
+	 */
+	public static function format_font_family( $font_family ) {
+		if ( $font_family ) {
+			$font_families         = explode( ',', $font_family );
+			$wrapped_font_families = array_map(
+				function ( $family ) {
+					$trimmed = trim( $family );
+					if ( ! empty( $trimmed ) && strpos( $trimmed, ' ' ) !== false && strpos( $trimmed, "'" ) === false && strpos( $trimmed, '"' ) === false ) {
+							return "'" . $trimmed . "'";
+					}
+					return $trimmed;
+				},
+				$font_families
+			);
+
+			if ( count( $wrapped_font_families ) === 1 ) {
+				$font_family = $wrapped_font_families[0];
+			} else {
+				$font_family = implode( ', ', $wrapped_font_families );
+			}
+		}
+
+		return $font_family;
+	}
+
+	/**
 	 * Sanitizes the font family data using WP_Theme_JSON.
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param string $data The font family JSON data as a string.
-	 * @return string The sanitized font family JSON data as a string.
+	 * @param string $data The string to sanitize.
+	 * @return array A sanitized font family definition.
 	 */
 	public static function sanitize( $data ) {
-		$data = json_decode( $data, true );
+		if ( empty( $data ) || ! is_string( $data ) ) {
+			return '';
+		}
 
 		// Creates the structure of theme.json array with the new fonts.
 		$fonts_json = array(
 			'version'  => '2',
 			'settings' => array(
 				'typography' => array(
-					'fontFamilies' => array( $data ),
+					'fontFamilies' => array(
+						'custom' => array(
+							json_decode( $data, true ),
+						),
+					),
 				),
 			),
 		);
+
 		// Creates a new WP_Theme_JSON object with the new fonts to
 		// leverage sanitization and validation.
-		$theme_json     = new WP_Theme_JSON_Gutenberg( $fonts_json );
-		$theme_data     = $theme_json->get_data();
-		$sanitized_font = ! empty( $theme_data['settings']['typography']['fontFamilies'] )
+		$fonts_json = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $fonts_json );
+		$theme_json = new WP_Theme_JSON_Gutenberg( $fonts_json );
+		$theme_data = $theme_json->get_data();
+		$sanitized  = ! empty( $theme_data['settings']['typography']['fontFamilies'] )
 			? $theme_data['settings']['typography']['fontFamilies'][0]
 			: array();
-		return wp_json_encode( $sanitized_font );
+
+		if ( ! empty( $sanitized['slug'] ) ) {
+			$sanitized['slug'] = sanitize_title( $sanitized['slug'] );
+		}
+		if ( ! empty( $sanitized['fontFamily'] ) ) {
+			$sanitized['fontFamily'] = sanitize_text_field( $sanitized['fontFamily'] );
+		}
+		return json_encode( $sanitized );
 	}
 }

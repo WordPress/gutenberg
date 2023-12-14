@@ -249,6 +249,18 @@ _Returns_
 
 -   `import('../../utils/debounce').DebouncedFunc<TFunc>`: Debounced function.
 
+### useDebouncedInput
+
+Helper hook for input fields that need to debounce the value before using it.
+
+_Parameters_
+
+-   _defaultValue_ `any`: The default value to use.
+
+_Returns_
+
+-   `[string, Function, string]`: The input value, the setter and the debounced input value.
+
 ### useDisabled
 
 In some circumstances, such as block previews, all focusable DOM elements (input fields, links, buttons, etc.) need to be disabled. This hook adds the behavior to disable nested DOM elements to the returned ref.

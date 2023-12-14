@@ -278,26 +278,27 @@ export default function Layout() {
 						ariaLabel={ __( 'Navigation' ) }
 						className="edit-site-layout__sidebar-region"
 					>
-						<motion.div
-							// The sidebar is needed for routing on mobile
-							// (https://github.com/WordPress/gutenberg/pull/51558/files#r1231763003),
-							// so we can't remove the element entirely. Using `inert` will make
-							// it inaccessible to screen readers and keyboard navigation.
-							inert={ showSidebar ? undefined : 'true' }
-							animate={ { opacity: showSidebar ? 1 : 0 } }
-							transition={ {
-								type: 'tween',
-								duration:
-									// Disable transition in mobile to emulate a full page transition.
-									disableMotion || isMobileViewport
-										? 0
-										: ANIMATION_DURATION,
-								ease: 'easeOut',
-							} }
-							className="edit-site-layout__sidebar"
-						>
-							<Sidebar />
-						</motion.div>
+						<AnimatePresence>
+							{ showSidebar && (
+								<motion.div
+									initial={ { opacity: 0 } }
+									animate={ { opacity: 1 } }
+									exit={ { opacity: 0 } }
+									transition={ {
+										type: 'tween',
+										duration:
+											// Disable transition in mobile to emulate a full page transition.
+											disableMotion || isMobileViewport
+												? 0
+												: ANIMATION_DURATION,
+										ease: 'easeOut',
+									} }
+									className="edit-site-layout__sidebar"
+								>
+									<Sidebar />
+								</motion.div>
+							) }
+						</AnimatePresence>
 					</NavigableRegion>
 
 					<SavePanel />

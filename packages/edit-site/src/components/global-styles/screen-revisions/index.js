@@ -1,15 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	__experimentalUseNavigator as useNavigator,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Spinner,
-	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useContext, useState, useEffect } from '@wordpress/element';
 import {
 	privateApis as blockEditorPrivateApis,
@@ -35,14 +35,36 @@ function ScreenRevisions() {
 	const { goTo } = useNavigator();
 	const { user: currentEditorGlobalStyles, setUserConfig } =
 		useContext( GlobalStylesContext );
-	const { blocks, editorCanvasContainerView } = useSelect( ( select ) => {
-		return {
-			editorCanvasContainerView: unlock(
-				select( editSiteStore )
-			).getEditorCanvasContainerView(),
-			blocks: select( blockEditorStore ).getBlocks(),
-		};
-	}, [] );
+	const { blocks, editorCanvasContainerView, revisionsCount } = useSelect(
+		( select ) => {
+			const {
+				getEntityRecord,
+				__experimentalGetCurrentGlobalStylesId,
+				__experimentalGetDirtyEntityRecords,
+			} = select( coreStore );
+			const isDirty = __experimentalGetDirtyEntityRecords().length > 0;
+			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+			const globalStyles = globalStylesId
+				? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+				: undefined;
+			let _revisionsCount =
+				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count || 0;
+			// one for the reset item.
+			_revisionsCount++;
+			// one for any dirty changes (unsaved).
+			if ( isDirty ) {
+				_revisionsCount++;
+			}
+			return {
+				editorCanvasContainerView: unlock(
+					select( editSiteStore )
+				).getEditorCanvasContainerView(),
+				blocks: select( blockEditorStore ).getBlocks(),
+				revisionsCount: _revisionsCount,
+			};
+		},
+		[]
+	);
 	const { revisions, isLoading, hasUnsavedChanges } =
 		useGlobalStylesRevisions();
 	const [ currentlySelectedRevision, setCurrentlySelectedRevision ] =
@@ -61,6 +83,7 @@ function ScreenRevisions() {
 
 	const onCloseRevisions = () => {
 		goTo( '/' ); // Return to global styles main panel.
+		setEditorCanvasContainerView( undefined );
 	};
 
 	const restoreRevision = ( revision ) => {
@@ -111,7 +134,8 @@ function ScreenRevisions() {
 		}
 	}, [ shouldSelectFirstItem, firstRevision ] );
 
-	// Only display load button if there is a revision to load and it is different from the current editor styles.
+	// Only display load button if there is a revision to load,
+	// and it is different from the current editor styles.
 	const isLoadButtonEnabled =
 		!! currentlySelectedRevisionId && ! selectedRevisionMatchesEditorStyles;
 	const shouldShowRevisions = ! isLoading && revisions.length;
@@ -119,15 +143,20 @@ function ScreenRevisions() {
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'Revisions' ) }
+				title={
+					revisionsCount &&
+					// translators: %s: number of revisions.
+					sprintf( __( 'Revisions (%s)' ), revisionsCount )
+				}
 				description={ __(
 					'Click on previously saved styles to preview them. To restore a selected version to the editor, hit "Apply." When you\'re ready, use the Save button to save your changes.'
 				) }
+				onBack={ onCloseRevisions }
 			/>
 			{ isLoading && (
 				<Spinner className="edit-site-global-styles-screen-revisions__loading" />
 			) }
-			{ shouldShowRevisions ? (
+			{ shouldShowRevisions && (
 				<>
 					<Revisions
 						blocks={ blocks }
@@ -139,6 +168,7 @@ function ScreenRevisions() {
 							onChange={ selectRevision }
 							selectedRevisionId={ currentlySelectedRevisionId }
 							userRevisions={ revisions }
+							canApplyRevision={ isLoadButtonEnabled }
 						/>
 						{ isLoadButtonEnabled && (
 							<SidebarFixedBottom>
@@ -186,14 +216,6 @@ function ScreenRevisions() {
 						</ConfirmDialog>
 					) }
 				</>
-			) : (
-				<Spacer marginX={ 4 } data-testid="global-styles-no-revisions">
-					{
-						// Adding an existing translation here in case these changes are shipped to WordPress 6.3.
-						// Later we could update to something better, e.g., "There are currently no style revisions.".
-						__( 'No results found.' )
-					}
-				</Spacer>
 			) }
 		</>
 	);
