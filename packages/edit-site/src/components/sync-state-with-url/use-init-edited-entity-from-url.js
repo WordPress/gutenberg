@@ -56,7 +56,7 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 				homepageId:
 					siteData?.show_on_front === 'page' &&
 					[ 'number', 'string' ].includes(
-						typeof siteData.page_on_front
+						typeof siteData?.page_on_front
 					)
 						? siteData.page_on_front.toString()
 						: null,
