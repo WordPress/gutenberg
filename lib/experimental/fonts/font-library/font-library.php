@@ -69,11 +69,7 @@ if ( ! function_exists( 'sanitize_font_family_content' ) ) {
 	 */
 	function sanitize_font_family_content( $data, $postarr, $unsanitized_postarr ) {
 		// Check if the post type is 'wp_font_family'.
-<<<<<<< HEAD
-		if ( isset( $postarr['post_type'] ) && 'wp_font_family' === $postarr['post_type'] ) {
-=======
 		if ( isset( $postarr['post_type'] ) && 'wp_font_family' === $postarr['post_type'] && isset( $unsanitized_postarr['post_content'] ) ) {
->>>>>>> 122b193bcac5b68a575284ae850afea32c2d1aaa
 			$data['post_content'] = WP_Font_Family_Utils::sanitize( $unsanitized_postarr['post_content'] );
 		}
 		// Return the (possibly modified) data.
