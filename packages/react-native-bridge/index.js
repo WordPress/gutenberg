@@ -538,6 +538,8 @@ export function showAndroidSoftKeyboard() {
  */
 export function hideAndroidSoftKeyboard() {
 	if ( isIOS ) {
+		/* eslint-disable-next-line no-console */
+		console.warn( 'hideAndroidSoftKeyboard is not supported on iOS' );
 		return;
 	}
 

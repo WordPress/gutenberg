@@ -592,7 +592,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
             View currentFocusedView = currentActivity.getCurrentFocus();
             if (currentFocusedView != null) {
                 InputMethodManager imm =
-                        (InputMethodManager) mReactContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    (InputMethodManager) mReactContext.getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(currentFocusedView.getWindowToken(), 0);
             }
         }
