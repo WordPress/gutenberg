@@ -523,8 +523,6 @@ export function sendEventToHost( eventName, properties ) {
  */
 export function showAndroidSoftKeyboard() {
 	if ( isIOS ) {
-		/* eslint-disable-next-line no-console */
-		console.warn( 'showAndroidSoftKeyboard is not supported on iOS' );
 		return;
 	}
 
@@ -538,8 +536,6 @@ export function showAndroidSoftKeyboard() {
  */
 export function hideAndroidSoftKeyboard() {
 	if ( isIOS ) {
-		/* eslint-disable-next-line no-console */
-		console.warn( 'hideAndroidSoftKeyboard is not supported on iOS' );
 		return;
 	}
 
