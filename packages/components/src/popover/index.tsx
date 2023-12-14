@@ -10,6 +10,7 @@ import {
 	limitShift,
 	autoUpdate,
 	arrow,
+	hide,
 	offset as offsetMiddleware,
 	size,
 } from '@floating-ui/react-dom';
@@ -245,6 +246,7 @@ const UnconnectedPopover = (
 				padding: 1, // Necessary to avoid flickering at the edge of the viewport.
 			} ),
 		arrow( { element: arrowRef } ),
+		hide(),
 	];
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
 	const slot = useSlot( slotName );
@@ -280,7 +282,7 @@ const UnconnectedPopover = (
 		strategy,
 		update,
 		placement: computedPlacement,
-		middlewareData: { arrow: arrowData },
+		middlewareData: { arrow: arrowData, hide: hideData },
 	} = useFloating( {
 		placement:
 			normalizedPlacementFromProps === 'overlay'
@@ -425,6 +427,7 @@ const UnconnectedPopover = (
 				className={ classnames( 'components-popover', className, {
 					'is-expanded': isExpanded,
 					'is-positioned': isPositioned,
+					'is-reference-hidden': hideData?.referenceHidden,
 					// Use the 'alternate' classname for 'toolbar' variant for back compat.
 					[ `is-${
 						computedVariant === 'toolbar'

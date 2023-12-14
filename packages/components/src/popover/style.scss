@@ -17,6 +17,10 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 		bottom: 0;
 		z-index: z-index(".components-popover") !important;
 	}
+
+	&.is-reference-hidden {
+		display: none;
+	}
 }
 
 .components-popover__content {

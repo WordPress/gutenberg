@@ -97,21 +97,30 @@ const Template: StoryFn< typeof Popover > = ( args ) => {
 	return (
 		<div
 			style={ {
-				width: '300vw',
-				height: '300vh',
-				display: 'flex',
-				alignItems: 'center',
-				justifyContent: 'center',
+				height: 300,
+				width: '100%',
+				border: '1px solid red',
+				overflow: 'auto',
 			} }
 		>
-			<Button
-				variant="secondary"
-				onClick={ toggleVisible }
-				ref={ buttonRef }
+			<div
+				style={ {
+					width: '300vw',
+					height: '300vh',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+				} }
 			>
-				Toggle Popover
-				{ isVisible && <Popover { ...args } /> }
-			</Button>
+				<Button
+					variant="secondary"
+					onClick={ toggleVisible }
+					ref={ buttonRef }
+				>
+					Toggle Popover
+					{ isVisible && <Popover { ...args } /> }
+				</Button>
+			</div>
 		</div>
 	);
 };
