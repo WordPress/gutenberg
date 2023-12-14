@@ -11,11 +11,11 @@ import { useState } from '@wordpress/element';
 import { Icon, chevronRight, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { BottomSheet } from '@wordpress/components';
-import { getPxFromCssUnit } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import { default as getPxFromCssUnit } from '../mobile/utils/get-px-from-css-unit';
 import { default as UnitControl, useCustomUnits } from '../unit-control';
 import styles from './style.scss';
 

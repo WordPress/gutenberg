@@ -4,7 +4,7 @@
 import {
 	default as memoizedGetPxFromCssUnit,
 	getPxFromCssUnit,
-} from '../parse-css-unit-to-px';
+} from '../get-px-from-css-unit';
 
 describe( 'getPxFromCssUnit', () => {
 	// Absolute units.
