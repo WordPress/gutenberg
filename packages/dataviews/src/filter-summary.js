@@ -105,7 +105,7 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 								role="menuitemradio"
 								aria-checked={ isActive }
 								prefix={ isActive && <Icon icon={ check } /> }
-								onSelect={ () =>
+								onClick={ () =>
 									onChangeView( {
 										...view,
 										page: 1,
@@ -154,7 +154,7 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 									<Icon icon={ check } />
 								)
 							}
-							onSelect={ () =>
+							onClick={ () =>
 								onChangeView( {
 									...view,
 									page: 1,
@@ -180,7 +180,7 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 									<Icon icon={ check } />
 								)
 							}
-							onSelect={ () =>
+							onClick={ () =>
 								onChangeView( {
 									...view,
 									page: 1,
