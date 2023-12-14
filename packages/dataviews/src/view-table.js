@@ -31,7 +31,6 @@ const {
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
 	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
 	DropdownSubMenuV2Ariakit: DropdownSubMenu,
-	DropdownSubMenuTriggerV2Ariakit: DropdownSubMenuTrigger,
 } = unlock( componentsPrivateApis );
 
 const sortingItemsInfo = {
@@ -153,7 +152,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 						<DropdownSubMenu
 							key={ filter.field }
 							trigger={
-								<DropdownSubMenuTrigger
+								<DropdownMenuItem
 									prefix={ <Icon icon={ funnel } /> }
 									suffix={
 										<>
@@ -172,7 +171,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 									}
 								>
 									{ __( 'Filter by' ) }
-								</DropdownSubMenuTrigger>
+								</DropdownMenuItem>
 							}
 						>
 							<WithSeparators>
@@ -217,7 +216,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 								{ filter.operators.length > 1 && (
 									<DropdownSubMenu
 										trigger={
-											<DropdownSubMenuTrigger
+											<DropdownMenuItem
 												suffix={
 													<>
 														{ activeOperator ===
@@ -235,7 +234,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 												}
 											>
 												{ __( 'Conditions' ) }
-											</DropdownSubMenuTrigger>
+											</DropdownMenuItem>
 										}
 									>
 										<DropdownMenuItem
