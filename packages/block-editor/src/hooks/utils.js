@@ -545,14 +545,14 @@ export function createBlockListBlockFilter( features ) {
 }
 
 export function createBlockSaveFilter( features ) {
-	function extraPropsFromHooks( props ) {
+	function extraPropsFromHooks( props, name, attributes ) {
 		features.reduce( ( accu, feature ) => {
 			const { hasSupport, attributeKeys = [], addSaveProps } = feature;
 
 			const neededProps = {};
 			for ( const key of attributeKeys ) {
-				if ( props.attributes[ key ] ) {
-					neededProps[ key ] = props.attributes[ key ];
+				if ( attributes[ key ] ) {
+					neededProps[ key ] = attributes[ key ];
 				}
 			}
 
@@ -560,12 +560,12 @@ export function createBlockSaveFilter( features ) {
 				// Skip rendering if none of the needed attributes are
 				// set.
 				! Object.keys( neededProps ).length ||
-				! hasSupport( props.name )
+				! hasSupport( name )
 			) {
 				return accu;
 			}
 
-			return addSaveProps( accu, props.name, neededProps );
+			return addSaveProps( accu, name, neededProps );
 		}, props );
 	}
 	addFilter(
