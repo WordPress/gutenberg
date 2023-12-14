@@ -17,21 +17,18 @@
 		background: $white;
 	}
 
-	// The TabPanel style overrides in the following blocks should be removed when the new TabPanel is available.
-	.components-tab-panel__tabs {
+	[role="tablist"] {
 		border-bottom: $border-width solid $gray-300;
-		box-sizing: border-box;
-		display: flex;
-		width: 100%;
 		padding-right: $grid-unit-70;
+		box-sizing: border-box;
 
-		.editor-list-view-sidebar__panel-tab {
+		[role="tab"] {
 			width: 50%;
 			margin-bottom: -$border-width;
 		}
 	}
 
-	.components-tab-panel__tab-content {
+	[role="tabpanel"] {
 		height: calc(100% - #{$grid-unit-60 - $border-width});
 	}
 }
