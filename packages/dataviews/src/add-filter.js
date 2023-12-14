@@ -48,7 +48,6 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 
 	return (
 		<DropdownMenu
-			label={ __( 'Filters' ) }
 			trigger={
 				<Button
 					__experimentalIsFocusable
