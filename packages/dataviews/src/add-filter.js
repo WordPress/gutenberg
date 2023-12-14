@@ -6,7 +6,7 @@ import {
 	Button,
 	Icon,
 } from '@wordpress/components';
-import { chevronRightSmall, funnel, check } from '@wordpress/icons';
+import { funnel, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { Children, Fragment } from '@wordpress/element';
 
@@ -96,9 +96,6 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 													__( 'Is not' ) }
 												{ activeElement && ' ' }
 												{ activeElement?.label }
-												<Icon
-													icon={ chevronRightSmall }
-												/>
 											</>
 										}
 									>
@@ -159,12 +156,9 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 																__( 'Is' ) }
 															{ activeOperator ===
 																OPERATOR_NOT_IN &&
-																__( 'Is not' ) }
-															<Icon
-																icon={
-																	chevronRightSmall
-																}
-															/>{ ' ' }
+																__(
+																	'Is not'
+																) }{ ' ' }
 														</>
 													}
 												>

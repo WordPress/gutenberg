@@ -3,14 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
-import {
-	unseen,
-	check,
-	arrowUp,
-	arrowDown,
-	chevronRightSmall,
-	funnel,
-} from '@wordpress/icons';
+import { unseen, check, arrowUp, arrowDown, funnel } from '@wordpress/icons';
 import {
 	Button,
 	Icon,
@@ -165,7 +158,6 @@ function HeaderMenu( { field, view, onChangeView } ) {
 												__( 'Is not' ) }
 											{ activeElement && ' ' }
 											{ activeElement?.label }
-											<Icon icon={ chevronRightSmall } />
 										</>
 									}
 								>
@@ -223,12 +215,9 @@ function HeaderMenu( { field, view, onChangeView } ) {
 															__( 'Is' ) }
 														{ activeOperator ===
 															OPERATOR_NOT_IN &&
-															__( 'Is not' ) }
-														<Icon
-															icon={
-																chevronRightSmall
-															}
-														/>{ ' ' }
+															__(
+																'Is not'
+															) }{ ' ' }
 													</>
 												}
 											>

@@ -6,7 +6,7 @@ import {
 	privateApis as componentsPrivateApis,
 	Icon,
 } from '@wordpress/components';
-import { chevronDown, chevronRightSmall, check } from '@wordpress/icons';
+import { chevronDown, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { Children, Fragment } from '@wordpress/element';
 
@@ -136,7 +136,6 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 											__( 'Is' ) }
 										{ activeOperator === OPERATOR_NOT_IN &&
 											__( 'Is not' ) }
-										<Icon icon={ chevronRightSmall } />{ ' ' }
 									</>
 								}
 							>
