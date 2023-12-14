@@ -6,7 +6,6 @@ import {
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalUseNavigator as useNavigator,
 	createSlotFill,
-	Button,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
@@ -19,7 +18,7 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { backup, moreVertical } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
 
@@ -111,58 +110,6 @@ function GlobalStylesActionMenu() {
 					</>
 				) }
 			</DropdownMenu>
-		</GlobalStylesMenuFill>
-	);
-}
-
-function GlobalStylesRevisionsMenu() {
-	const { setIsListViewOpened } = useDispatch( editSiteStore );
-	const { revisionsCount } = useSelect( ( select ) => {
-		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-			select( coreStore );
-
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		const globalStyles = globalStylesId
-			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-			: undefined;
-
-		return {
-			revisionsCount:
-				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0,
-		};
-	}, [] );
-	const { goTo } = useNavigator();
-	const { setEditorCanvasContainerView } = unlock(
-		useDispatch( editSiteStore )
-	);
-	const isRevisionsOpened = useSelect(
-		( select ) =>
-			'global-styles-revisions' ===
-			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
-		[]
-	);
-	const loadRevisions = () => {
-		setIsListViewOpened( false );
-
-		if ( ! isRevisionsOpened ) {
-			goTo( '/revisions' );
-			setEditorCanvasContainerView( 'global-styles-revisions' );
-		} else {
-			goTo( '/' );
-			setEditorCanvasContainerView( undefined );
-		}
-	};
-	const hasRevisions = revisionsCount > 0;
-
-	return (
-		<GlobalStylesMenuFill>
-			<Button
-				label={ __( 'Revisions' ) }
-				icon={ backup }
-				onClick={ loadRevisions }
-				disabled={ ! hasRevisions }
-				isPressed={ isRevisionsOpened }
-			/>
 		</GlobalStylesMenuFill>
 	);
 }
@@ -403,7 +350,6 @@ function GlobalStylesUI() {
 				<GlobalStylesStyleBook />
 			) }
 
-			<GlobalStylesRevisionsMenu />
 			<GlobalStylesActionMenu />
 			<GlobalStylesBlockLink />
 			<GlobalStylesEditorCanvasContainerLink />
