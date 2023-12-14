@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { View, Platform, Dimensions } from 'react-native';
+import { View, Platform, Dimensions, PixelRatio } from 'react-native';
 import memize from 'memize';
 import { colord } from 'colord';
 
@@ -1124,7 +1124,9 @@ export class RichText extends Component {
 		const editableProps = this.getEditableProps();
 		const blockUseDefaultFont = this.getBlockUseDefaultFont();
 
-		const fontSize = currentFontSize;
+		const fontScale = PixelRatio.getFontScale() || 1;
+		const scaledFontSize = currentFontSize * fontScale;
+		const fontSize = scaledFontSize;
 		const lineHeight = this.getLineHeight();
 
 		const {
