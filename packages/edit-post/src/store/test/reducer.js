@@ -1,15 +1,9 @@
 /**
- * External dependencies
- */
-import deepFreeze from 'deep-freeze';
-
-/**
  * Internal dependencies
  */
 import {
 	isSavingMetaBoxes,
 	metaBoxLocations,
-	removedPanels,
 	blockInserterPanel,
 	listViewPanel,
 } from '../reducer';
@@ -92,26 +86,6 @@ describe( 'state', () => {
 				advanced: [ { id: 'd', title: 'D' } ],
 				side: [ { id: 's', title: 'S' } ],
 			} );
-		} );
-	} );
-
-	describe( 'removedPanels', () => {
-		it( 'should remove panel', () => {
-			const original = deepFreeze( [] );
-			const state = removedPanels( original, {
-				type: 'REMOVE_PANEL',
-				panelName: 'post-status',
-			} );
-			expect( state ).toEqual( [ 'post-status' ] );
-		} );
-
-		it( 'should not remove already removed panel', () => {
-			const original = deepFreeze( [ 'post-status' ] );
-			const state = removedPanels( original, {
-				type: 'REMOVE_PANEL',
-				panelName: 'post-status',
-			} );
-			expect( state ).toBe( original );
 		} );
 	} );
 

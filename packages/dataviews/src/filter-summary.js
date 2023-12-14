@@ -13,7 +13,7 @@ import { Children, Fragment } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { OPERATOR_IN, OPERATOR_NOT_IN, LAYOUT_LIST } from './constants';
+import { OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
 import { unlock } from './lock-unlock';
 
 const {
@@ -73,10 +73,6 @@ function WithSeparators( { children } ) {
 }
 
 export default function FilterSummary( { filter, view, onChangeView } ) {
-	if ( view.type === LAYOUT_LIST ) {
-		return null;
-	}
-
 	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
 	const activeElement = filter.elements.find(
 		( element ) => element.value === filterInView?.value

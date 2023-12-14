@@ -2,8 +2,15 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
-import { TabPanel } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 const blocksTab = {
 	name: 'blocks',
@@ -23,11 +30,11 @@ const mediaTab = {
 };
 
 function InserterTabs( {
-	children,
 	showPatterns = false,
 	showMedia = false,
 	onSelect,
 	prioritizePatterns,
+	tabsContents,
 } ) {
 	const tabs = useMemo( () => {
 		const tempTabs = [];
@@ -45,13 +52,26 @@ function InserterTabs( {
 	}, [ prioritizePatterns, showPatterns, showMedia ] );
 
 	return (
-		<TabPanel
-			className="block-editor-inserter__tabs"
-			tabs={ tabs }
-			onSelect={ onSelect }
-		>
-			{ children }
-		</TabPanel>
+		<div className="block-editor-inserter__tabs">
+			<Tabs onSelect={ onSelect }>
+				<Tabs.TabList>
+					{ tabs.map( ( tab ) => (
+						<Tabs.Tab key={ tab.name } tabId={ tab.name }>
+							{ tab.title }
+						</Tabs.Tab>
+					) ) }
+				</Tabs.TabList>
+				{ tabs.map( ( tab ) => (
+					<Tabs.TabPanel
+						key={ tab.name }
+						tabId={ tab.name }
+						focusable={ false }
+					>
+						{ tabsContents[ tab.name ] }
+					</Tabs.TabPanel>
+				) ) }
+			</Tabs>
+		</div>
 	);
 }
 

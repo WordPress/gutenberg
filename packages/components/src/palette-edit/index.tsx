@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { paramCase as kebabCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -49,6 +48,7 @@ import {
 import { NavigableMenu } from '../navigable-container';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
+import { kebabCase } from '../utils/strings';
 import type {
 	Color,
 	ColorPickerPopoverProps,

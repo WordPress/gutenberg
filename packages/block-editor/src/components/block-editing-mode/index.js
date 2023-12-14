@@ -2,13 +2,13 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useContext, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { BlockListBlockContext } from '../block-list/block-list-block-context';
+import { useBlockEditContext } from '../block-edit/context';
 
 /**
  * @typedef {'disabled'|'contentOnly'|'default'} BlockEditingMode
@@ -45,7 +45,7 @@ import { BlockListBlockContext } from '../block-list/block-list-block-context';
  * @return {BlockEditingMode} The current editing mode.
  */
 export function useBlockEditingMode( mode ) {
-	const { clientId = '' } = useContext( BlockListBlockContext ) ?? {};
+	const { clientId = '' } = useBlockEditContext();
 	const blockEditingMode = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getBlockEditingMode( clientId ),

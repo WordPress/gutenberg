@@ -231,26 +231,6 @@ export const RAW_FEATURES = {
 	},
 	typography: {
 		fontSizes: {
-			default: [
-				{
-					name: 'Small',
-					slug: 'small',
-					size: '13px',
-					sizePx: '13px',
-				},
-				{
-					name: 'Normal',
-					slug: 'normal',
-					size: '16px',
-					sizePx: '16px',
-				},
-				{
-					name: 'Huge',
-					slug: 'huge',
-					size: '42px',
-					sizePx: '42px',
-				},
-			],
 			theme: [
 				{
 					name: 'Normal',
