@@ -20,7 +20,6 @@ const {
 	DropdownMenuV2Ariakit: DropdownMenu,
 	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
 	DropdownSubMenuV2Ariakit: DropdownSubMenu,
-	DropdownSubMenuTriggerV2Ariakit: DropdownSubMenuTrigger,
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
 	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
@@ -85,7 +84,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 							<DropdownSubMenu
 								key={ filter.field }
 								trigger={
-									<DropdownSubMenuTrigger
+									<DropdownMenuItem
 										suffix={
 											<>
 												{ activeElement &&
@@ -105,7 +104,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 										}
 									>
 										{ filter.name }
-									</DropdownSubMenuTrigger>
+									</DropdownMenuItem>
 								}
 							>
 								<WithSeparators>
@@ -153,7 +152,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 									{ filter.operators.length > 1 && (
 										<DropdownSubMenu
 											trigger={
-												<DropdownSubMenuTrigger
+												<DropdownMenuItem
 													suffix={
 														<>
 															{ activeOperator ===
@@ -171,7 +170,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 													}
 												>
 													{ __( 'Conditions' ) }
-												</DropdownSubMenuTrigger>
+												</DropdownMenuItem>
 											}
 										>
 											<DropdownMenuItem
