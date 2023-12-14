@@ -75,22 +75,7 @@ export default function AxialInputControls( {
 		}
 	};
 
-	const sliderOnChange = ( side: GroupedSide, next: string ) => {
-		const nextValues = { ...values };
-
-		if ( side === 'vertical' ) {
-			nextValues.top = next;
-			nextValues.bottom = next;
-		}
-
-		if ( side === 'horizontal' ) {
-			nextValues.left = next;
-			nextValues.right = next;
-		}
-		onChange?.( nextValues );
-	};
-
-	const createHandleOnChange = ( side: GroupedSide ) => ( next?: string ) => {
+	const handleOnValueChange = ( side: GroupedSide, next?: string ) => {
 		if ( ! onChange ) {
 			return;
 		}
@@ -161,7 +146,9 @@ export default function AxialInputControls( {
 								parsedQuantity,
 								selectedUnit ?? parsedUnit,
 							].join( '' ) }
-							onChange={ createHandleOnChange( side ) }
+							onChange={ ( newValue ) =>
+								handleOnValueChange( side, newValue )
+							}
 							onUnitChange={ createHandleOnUnitChange( side ) }
 							onFocus={ createHandleOnFocus( side ) }
 							onHoverOn={ createHandleOnHoverOn( side ) }
@@ -175,15 +162,17 @@ export default function AxialInputControls( {
 							aria-labelledby={ inputId }
 							hideLabelFromVision
 							label={ LABELS[ side ] }
-							onChange={ ( newValue ) => {
-								sliderOnChange(
+							onChange={ ( newValue ) =>
+								handleOnValueChange(
 									side,
-									[
-										newValue,
-										selectedUnit ?? parsedUnit,
-									].join( '' )
-								);
-							} }
+									newValue !== undefined
+										? [
+												newValue,
+												selectedUnit ?? parsedUnit,
+										  ].join( '' )
+										: undefined
+								)
+							}
 							min={ 0 }
 							max={
 								CUSTOM_VALUE_SETTINGS[ selectedUnit ?? 'px' ]

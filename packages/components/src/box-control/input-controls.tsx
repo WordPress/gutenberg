@@ -14,7 +14,6 @@ import {
 	InputWrapper,
 } from './styles/box-control-styles';
 import type { BoxControlInputControlProps, BoxControlValue } from './types';
-import type { UnitControlProps } from '../unit-control/types';
 
 const noop = () => {};
 
@@ -49,50 +48,43 @@ export default function BoxInputControls( {
 		onChange( nextValues );
 	};
 
-	const sliderOnChange = ( side: keyof BoxControlValue, next: string ) => {
+	const handleOnValueChange = (
+		side: keyof BoxControlValue,
+		next?: string,
+		extra?: { event: React.SyntheticEvent< Element, Event > }
+	) => {
 		const nextValues = { ...values };
-		nextValues[ side ] = next;
+		const isNumeric = next !== undefined && ! isNaN( parseFloat( next ) );
+		const nextValue = isNumeric ? next : undefined;
+
+		nextValues[ side ] = nextValue;
+
+		/**
+		 * Supports changing pair sides. For example, holding the ALT key
+		 * when changing the TOP will also update BOTTOM.
+		 */
+		// @ts-expect-error - TODO: event.altKey is only present when the change event was
+		// triggered by a keyboard event. Should this feature be implemented differently so
+		// it also works with drag events?
+		if ( extra?.event.altKey ) {
+			switch ( side ) {
+				case 'top':
+					nextValues.bottom = nextValue;
+					break;
+				case 'bottom':
+					nextValues.top = nextValue;
+					break;
+				case 'left':
+					nextValues.right = nextValue;
+					break;
+				case 'right':
+					nextValues.left = nextValue;
+					break;
+			}
+		}
+
 		handleOnChange( nextValues );
 	};
-
-	const createHandleOnChange: (
-		side: keyof BoxControlValue
-	) => UnitControlProps[ 'onChange' ] =
-		( side ) =>
-		( next, { event } ) => {
-			const nextValues = { ...values };
-			const isNumeric =
-				next !== undefined && ! isNaN( parseFloat( next ) );
-			const nextValue = isNumeric ? next : undefined;
-
-			nextValues[ side ] = nextValue;
-
-			/**
-			 * Supports changing pair sides. For example, holding the ALT key
-			 * when changing the TOP will also update BOTTOM.
-			 */
-			// @ts-expect-error - TODO: event.altKey is only present when the change event was
-			// triggered by a keyboard event. Should this feature be implemented differently so
-			// it also works with drag events?
-			if ( event.altKey ) {
-				switch ( side ) {
-					case 'top':
-						nextValues.bottom = nextValue;
-						break;
-					case 'bottom':
-						nextValues.top = nextValue;
-						break;
-					case 'left':
-						nextValues.right = nextValue;
-						break;
-					case 'right':
-						nextValues.left = nextValue;
-						break;
-				}
-			}
-
-			handleOnChange( nextValues );
-		};
 
 	const createHandleOnUnitChange =
 		( side: keyof BoxControlValue ) => ( next?: string ) => {
@@ -132,7 +124,9 @@ export default function BoxInputControls( {
 							value={ [ parsedQuantity, computedUnit ].join(
 								''
 							) }
-							onChange={ createHandleOnChange( side ) }
+							onChange={ ( nextValue, extra ) =>
+								handleOnValueChange( side, nextValue, extra )
+							}
 							onUnitChange={ createHandleOnUnitChange( side ) }
 							onFocus={ createHandleOnFocus( side ) }
 							onHoverOn={ createHandleOnHoverOn( side ) }
@@ -146,9 +140,11 @@ export default function BoxInputControls( {
 							__nextHasNoMarginBottom
 							hideLabelFromVision
 							onChange={ ( newValue ) => {
-								sliderOnChange(
+								handleOnValueChange(
 									side,
-									[ newValue, computedUnit ].join( '' )
+									newValue !== undefined
+										? [ newValue, computedUnit ].join( '' )
+										: undefined
 								);
 							} }
 							min={ 0 }
