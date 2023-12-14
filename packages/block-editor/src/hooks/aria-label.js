@@ -58,6 +58,9 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 export default {
 	addSaveProps,
 	attributeKeys: [ 'ariaLabel' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'ariaLabel' );
+	},
 };
 
 addFilter(

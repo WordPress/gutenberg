@@ -12,7 +12,7 @@ import './lock';
 import anchor from './anchor';
 import ariaLabel from './aria-label';
 import customClassName from './custom-class-name';
-import generatedClassName from './generated-class-name';
+import './generated-class-name';
 import style from './style';
 import './settings';
 import color from './color';
@@ -63,7 +63,6 @@ createBlockSaveFilter( [
 	customClassName,
 	fontFamily,
 	fontSize,
-	generatedClassName,
 	style,
 ] );
 
