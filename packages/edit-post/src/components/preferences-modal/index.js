@@ -119,7 +119,7 @@ export default function EditPostPreferencesModal() {
 							<EnableFeature
 								featureName="allowRightClickOverrides"
 								help={ __(
-									'Allows contextual menus via right-click, overriding browser defaults.'
+									'Allows contextual list view menus via right-click, overriding browser defaults.'
 								) }
 								label={ __(
 									'Allow right-click contextual menus'
