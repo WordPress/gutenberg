@@ -19,7 +19,10 @@ import SafeArea from 'react-native-safe-area';
 /**
  * WordPress dependencies
  */
-import { subscribeAndroidModalClosed } from '@wordpress/react-native-bridge';
+import {
+	subscribeAndroidModalClosed,
+	showAndroidSoftKeyboard,
+} from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
@@ -209,6 +212,9 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
+		// Restore Keyboard Visibility
+		showAndroidSoftKeyboard();
+
 		this.dimensionsChangeSubscription.remove();
 		this.keyboardShowListener.remove();
 		this.keyboardHideListener.remove();
@@ -353,6 +359,9 @@ class BottomSheet extends Component {
 			onClose();
 		}
 		this.onShouldSetBottomSheetMaxHeight( true );
+
+		// Restore Keyboard Visibility
+		showAndroidSoftKeyboard();
 	}
 
 	setIsFullScreen( isFullScreen ) {
@@ -368,6 +377,10 @@ class BottomSheet extends Component {
 	onHardwareButtonPress() {
 		const { onClose } = this.props;
 		const { handleHardwareButtonPress } = this.state;
+
+		// Restore Keyboard Visibility
+		showAndroidSoftKeyboard();
+
 		if ( handleHardwareButtonPress && handleHardwareButtonPress() ) {
 			return;
 		}
