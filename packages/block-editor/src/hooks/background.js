@@ -13,6 +13,8 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalUnitControl as UnitControl,
+	__experimentalVStack as VStack,
 	DropZone,
 	FlexItem,
 	MenuItem,
@@ -334,6 +336,16 @@ function BackgroundImagePanelItem( { clientId, setAttributes } ) {
 	);
 }
 
+function backgroundSizeHelpText( value ) {
+	if ( value === 'cover' ) {
+		return __( 'Stretch image to cover the block.' );
+	}
+	if ( value === 'contain' ) {
+		return __( 'Image is contained within the block.' );
+	}
+	return __( 'Repeat the image, and set a fixed size.' );
+}
+
 function BackgroundSizePanelItem( { clientId, setAttributes } ) {
 	const style = useSelect(
 		( select ) =>
@@ -358,12 +370,34 @@ function BackgroundSizePanelItem( { clientId, setAttributes } ) {
 		};
 	}, [] );
 
+	const updateBackgroundSize = ( next ) => {
+		setAttributes( {
+			style: cleanEmptyObject( {
+				...style,
+				background: {
+					...style?.background,
+					backgroundSize: next,
+				},
+			} ),
+		} );
+	};
+
+	const currentValueForToggle =
+		value !== undefined &&
+		value !== 'cover' &&
+		value !== 'contain' &&
+		value !== ''
+			? 'auto'
+			: value || 'cover';
+
 	return (
-		<ToolsPanelItem
+		<VStack
+			as={ ToolsPanelItem }
+			spacing={ 2 }
 			className="single-column"
 			hasValue={ () => hasValue }
 			label={ __( 'Background size' ) }
-			onDeselect={ () => resetBackgroundImage( style, setAttributes ) }
+			onDeselect={ () => resetBackgroundSize( style, setAttributes ) }
 			isShownByDefault={ true }
 			resetAllFilter={ resetAllFilter }
 			panelId={ clientId }
@@ -372,19 +406,10 @@ function BackgroundSizePanelItem( { clientId, setAttributes } ) {
 				__nextHasNoMarginBottom
 				size={ '__unstable-large' }
 				label={ __( 'Background size' ) }
-				value={ value || 'cover' }
-				onChange={ ( next ) => {
-					setAttributes( {
-						style: cleanEmptyObject( {
-							...style,
-							background: {
-								...style?.background,
-								backgroundSize: next,
-							},
-						} ),
-					} );
-				} }
+				value={ currentValueForToggle }
+				onChange={ updateBackgroundSize }
 				isBlock={ true }
+				help={ backgroundSizeHelpText( value ) }
 			>
 				<ToggleGroupControlOption
 					key={ 'cover' }
@@ -402,7 +427,16 @@ function BackgroundSizePanelItem( { clientId, setAttributes } ) {
 					label={ __( 'Repeat' ) }
 				/>
 			</ToggleGroupControl>
-		</ToolsPanelItem>
+			{ value !== undefined &&
+			value !== 'cover' &&
+			value !== 'contain' ? (
+				<UnitControl
+					size={ '__unstable-large' }
+					onChange={ updateBackgroundSize }
+					value={ value }
+				/>
+			) : null }
+		</VStack>
 	);
 }
 
