@@ -17,7 +17,7 @@ export { default as withInstanceId } from './higher-order/with-instance-id';
 export { default as withSafeTimeout } from './higher-order/with-safe-timeout';
 export { default as withState } from './higher-order/with-state';
 export { default as withPreferredColorScheme } from './higher-order/with-preferred-color-scheme';
-export { default as withIsConnected } from './higher-order/with-is-connected';
+export { default as withNetworkConnectivity } from './higher-order/with-network-connectivity';
 
 // Hooks.
 export { default as useConstrainedTabbing } from './hooks/use-constrained-tabbing';
