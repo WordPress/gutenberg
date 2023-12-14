@@ -46,10 +46,9 @@
 	}
 }
 
-:root {
-	--wp--block-draggable-valid-opacity: 1;
-}
-
 .block-draggable-invalid-drag-token {
-	--wp--block-draggable-valid-opacity: 0.6;
+	.block-editor-block-draggable-chip {
+		background-color: $gray-600;
+		opacity: 0.8;
+	}
 }
