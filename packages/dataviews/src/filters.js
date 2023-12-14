@@ -6,7 +6,7 @@ import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
 import { ENUMERATION_TYPE, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
 
-const operatorsFromField = ( field ) => {
+const sanitizeOperators = ( field ) => {
 	let operators = field.filterBy?.operators;
 	if ( ! operators || ! Array.isArray( operators ) ) {
 		operators = [ OPERATOR_IN, OPERATOR_NOT_IN ];
@@ -23,7 +23,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 			return;
 		}
 
-		const operators = operatorsFromField( field );
+		const operators = sanitizeOperators( field );
 		if ( operators.length === 0 ) {
 			return;
 		}
