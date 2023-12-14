@@ -201,7 +201,7 @@ class Tests_Fonts_Font_Family_Controller extends WP_REST_Font_Library_Controller
 		$verify_request  = new WP_REST_Request( 'GET', '/wp/v2/font-families/' . $installed_font_id );
 		$verify_response = rest_get_server()->dispatch( $verify_request );
 
-		$this->assertSame( 404, $verify_response->get_status(), 'The response status is not 200.' );
+		$this->assertSame( 404, $verify_response->get_status(), 'The deleted resource can still be found.' );
 
 	}
 
@@ -224,20 +224,23 @@ class Tests_Fonts_Font_Family_Controller extends WP_REST_Font_Library_Controller
 						'fontFamily'      => 'ABeeZee',
 						'fontStyle'       => 'normal',
 						'fontWeight'      => '400',
-						'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
 						'preview'	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-normal.svg',
+						//'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
+						'downloadFromUrl'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
 					),
 					array(
 						'fontFamily'      => 'ABeeZee',
 						'fontStyle'       => 'italic',
 						'fontWeight'      => '400',
-						'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf',
 						'preview' 	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-italic.svg',
+						//'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf',
+						'downloadFromUrl'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf',
 					),
 				),
 			)),
 		);
 	}
+
 
 	public function test_update_font_family() {
 

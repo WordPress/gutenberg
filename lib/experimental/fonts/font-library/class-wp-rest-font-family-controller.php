@@ -191,8 +191,18 @@ class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 	public function create_item( $request ) {
 		$font_family_data = $request->get_param( 'data' );
 
-		$font_family = new WP_Font_Family( $font_family_data );
-		$font_family->persist();
+
+		try {
+			$font_family = new WP_Font_Family( $font_family_data );
+			$font_family->persist();
+		}
+		catch ( Exception $exception ) {
+			return new WP_Error(
+				'rest_font_family_not_created',
+				__( 'Font Family not created. ' . $exception, 'gutenberg' ),
+				array( 'status' => 500 )
+			);
+		}
 
 		return new WP_REST_Response( array(
 			'id' => $font_family->id,
@@ -225,7 +235,11 @@ class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 			);
 		}
 
-		$font_family->uninstall( $force );
+		$uninstall_response = $font_family->uninstall( $force );
+
+		if ( is_wp_error( $uninstall_response ) ) {
+			return $uninstall_response;
+		}
 
 		return new WP_REST_Response( array(
 			'deleted' => $force,
@@ -234,7 +248,6 @@ class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 				'data' => $font_family->get_data(),
 			)
 		) );
-
 	}
 
 	/**
@@ -262,7 +275,11 @@ class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 			);
 		}
 
-		$font_family->update( $font_family_data );
+		$update_response = $font_family->update( $font_family_data );
+		if ( is_wp_error( $update_response ) ) {
+			return $update_response;
+		}
+
 		$font_family->persist();
 
 		return new WP_REST_Response( array(
