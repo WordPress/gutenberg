@@ -17,21 +17,20 @@ import type { BoxUnitControlProps } from '../types';
 
 export const UnitControlWrapper = styled.div`
 	box-sizing: border-box;
-	flex: 1;
 	max-width: 90px;
 `;
 
 export const InputWrapper = styled( HStack )`
-	grid-column: 1 / span 4;
+	grid-column: 1 / span 3;
 `;
 
 export const ResetButton = styled( Button )`
-	grid-area: 1 / 3;
+	grid-area: 1 / 2;
 	justify-self: end;
 `;
 
 export const LinkedButtonWrapper = styled.div`
-	grid-area: 1 / 4;
+	grid-area: 1 / 3;
 	justify-self: end;
 `;
 
@@ -40,7 +39,7 @@ export const FlexedBoxControlIcon = styled( BoxControlIcon )`
 `;
 
 export const FlexedRangeControl = styled( RangeControl )`
-	flex: 1;
+	width: 100%;
 	margin-right: ${ space( 2 ) };
 `;
 
