@@ -11,14 +11,17 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { store as editorStore, PostLastRevisionPanel } from '@wordpress/editor';
+import {
+	store as editorStore,
+	PostLastRevisionPanel,
+	PostTaxonomiesPanel,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import SettingsHeader from '../settings-header';
 import PostStatus from '../post-status';
-import PostTaxonomies from '../post-taxonomies';
 import FeaturedImage from '../featured-image';
 import PostExcerpt from '../post-excerpt';
 import DiscussionPanel from '../discussion-panel';
@@ -79,7 +82,7 @@ const SidebarContent = ( {
 							<PostStatus />
 							<PluginDocumentSettingPanel.Slot />
 							<PostLastRevisionPanel />
-							<PostTaxonomies />
+							<PostTaxonomiesPanel />
 							<FeaturedImage />
 							<PostExcerpt />
 							<DiscussionPanel />

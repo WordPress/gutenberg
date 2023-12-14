@@ -3,7 +3,13 @@
  */
 import { PanelBody } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+import PostTaxonomiesForm from './index';
+import PostTaxonomiesCheck from './check';
 
 function TaxonomyPanel( { taxonomy, children } ) {
 	const slug = taxonomy?.slug;
@@ -41,4 +47,20 @@ function TaxonomyPanel( { taxonomy, children } ) {
 	);
 }
 
-export default TaxonomyPanel;
+function PostTaxonomies() {
+	return (
+		<PostTaxonomiesCheck>
+			<PostTaxonomiesForm
+				taxonomyWrapper={ ( content, taxonomy ) => {
+					return (
+						<TaxonomyPanel taxonomy={ taxonomy }>
+							{ content }
+						</TaxonomyPanel>
+					);
+				} }
+			/>
+		</PostTaxonomiesCheck>
+	);
+}
+
+export default PostTaxonomies;
