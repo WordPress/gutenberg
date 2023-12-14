@@ -5,6 +5,7 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
+import { throttle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -137,10 +138,12 @@ const BlockDraggable = ( {
 			}
 		};
 
-		editorRoot.addEventListener( 'dragover', onDragOver );
+		const throttledOnDragOver = throttle( onDragOver, 16 );
+
+		editorRoot.addEventListener( 'dragover', throttledOnDragOver );
 
 		return () => {
-			editorRoot.removeEventListener( 'dragover', onDragOver );
+			editorRoot.removeEventListener( 'dragover', throttledOnDragOver );
 		};
 	} );
 
