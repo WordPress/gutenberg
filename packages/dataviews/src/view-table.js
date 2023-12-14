@@ -30,7 +30,6 @@ const {
 	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
 	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
-	DropdownSubMenuV2Ariakit: DropdownSubMenu,
 } = unlock( componentsPrivateApis );
 
 const sortingItemsInfo = {
@@ -149,7 +148,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 				) }
 				{ isFilterable && (
 					<DropdownMenuGroup>
-						<DropdownSubMenu
+						<DropdownMenu
 							key={ filter.field }
 							trigger={
 								<DropdownMenuItem
@@ -214,7 +213,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 									} ) }
 								</DropdownMenuGroup>
 								{ filter.operators.length > 1 && (
-									<DropdownSubMenu
+									<DropdownMenu
 										trigger={
 											<DropdownMenuItem
 												suffix={
@@ -298,10 +297,10 @@ function HeaderMenu( { field, view, onChangeView } ) {
 										>
 											{ __( 'Is not' ) }
 										</DropdownMenuItem>
-									</DropdownSubMenu>
+									</DropdownMenu>
 								) }
 							</WithSeparators>
-						</DropdownSubMenu>
+						</DropdownMenu>
 					</DropdownMenuGroup>
 				) }
 			</WithSeparators>

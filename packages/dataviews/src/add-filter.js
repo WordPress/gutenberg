@@ -19,7 +19,6 @@ import { LAYOUT_LIST, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
 const {
 	DropdownMenuV2Ariakit: DropdownMenu,
 	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
-	DropdownSubMenuV2Ariakit: DropdownSubMenu,
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
 	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
@@ -81,7 +80,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 						const activeOperator =
 							filterInView?.operator || filter.operators[ 0 ];
 						return (
-							<DropdownSubMenu
+							<DropdownMenu
 								key={ filter.field }
 								trigger={
 									<DropdownMenuItem
@@ -150,7 +149,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 										} ) }
 									</DropdownMenuGroup>
 									{ filter.operators.length > 1 && (
-										<DropdownSubMenu
+										<DropdownMenu
 											trigger={
 												<DropdownMenuItem
 													suffix={
@@ -237,7 +236,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 											>
 												{ __( 'Is not' ) }
 											</DropdownMenuItem>
-										</DropdownSubMenu>
+										</DropdownMenu>
 									) }
 									<DropdownMenuItem
 										key={ 'reset-filter-' + filter.name }
@@ -263,7 +262,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 										) }
 									</DropdownMenuItem>
 								</WithSeparators>
-							</DropdownSubMenu>
+							</DropdownMenu>
 						);
 					} ) }
 				</DropdownMenuGroup>

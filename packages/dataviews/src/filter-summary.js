@@ -21,7 +21,6 @@ const {
 	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
 	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
-	DropdownSubMenuV2Ariakit: DropdownSubMenu,
 } = unlock( componentsPrivateApis );
 
 const FilterText = ( { activeElement, filterInView, filter } ) => {
@@ -128,7 +127,7 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 					} ) }
 				</DropdownMenuGroup>
 				{ filter.operators.length > 1 && (
-					<DropdownSubMenu
+					<DropdownMenu
 						trigger={
 							<DropdownMenuItem
 								suffix={
@@ -197,7 +196,7 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 						>
 							{ __( 'Is not' ) }
 						</DropdownMenuItem>
-					</DropdownSubMenu>
+					</DropdownMenu>
 				) }
 			</WithSeparators>
 		</DropdownMenu>
