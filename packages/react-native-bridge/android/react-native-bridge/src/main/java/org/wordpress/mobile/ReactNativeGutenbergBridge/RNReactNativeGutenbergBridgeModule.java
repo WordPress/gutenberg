@@ -44,6 +44,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         DeferredEventEmitter.JSEventEmitter {
     private final ReactApplicationContext mReactContext;
     private final GutenbergBridgeJS2Parent mGutenbergBridgeJS2Parent;
+    private Runnable mKeyboardRunnable;
 
     private static final String EVENT_NAME_REQUEST_GET_HTML = "requestGetHtml";
     private static final String EVENT_NAME_UPDATE_HTML = "updateHtml";
@@ -552,6 +553,36 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
                 jsCallback.invoke(isConnected);
             }
         };
+    }
+
+    @ReactMethod
+    public void showAndroidSoftKeyboard() {
+        Activity currentActivity = mReactContext.getCurrentActivity();
+        if (currentActivity != null) {
+            // Define the delay in milliseconds to prevent trying to show the keyboard right when a UI change happened.
+            int delayMillis = 500;
+
+            // Cancel any previously scheduled Runnable
+            if (mKeyboardRunnable != null) {
+                currentActivity.getWindow().getDecorView().removeCallbacks(mKeyboardRunnable);
+            }
+
+            // Create a new Runnable
+            mKeyboardRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    View currentFocusedView = currentActivity.getCurrentFocus();
+                    if (currentFocusedView != null) {
+                        InputMethodManager imm =
+                            (InputMethodManager) mReactContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.showSoftInput(currentFocusedView, InputMethodManager.SHOW_IMPLICIT);
+                    }
+                }
+            };
+
+            // Schedule the new Runnable
+            currentActivity.getWindow().getDecorView().postDelayed(mKeyboardRunnable, delayMillis);
+        }
     }
 
     @ReactMethod
