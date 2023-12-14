@@ -32,6 +32,7 @@ export const TabPanel = forwardRef<
 	}
 	const { store, instanceId } = context;
 	const instancedTabId = `${ instanceId }-${ tabId }`;
+	const selectedId = store.useState( ( state ) => state.selectedId );
 
 	return (
 		<StyledTabPanel
@@ -41,7 +42,7 @@ export const TabPanel = forwardRef<
 			focusable={ focusable }
 			{ ...otherProps }
 		>
-			{ children }
+			{ selectedId === instancedTabId && children }
 		</StyledTabPanel>
 	);
 } );

@@ -3,25 +3,6 @@
  */
 import { combineReducers } from '@wordpress/data';
 
-/**
- * Reducer storing the list of all programmatically removed panels.
- *
- * @param {Array}  state  Current state.
- * @param {Object} action Action object.
- *
- * @return {Array} Updated state.
- */
-export function removedPanels( state = [], action ) {
-	switch ( action.type ) {
-		case 'REMOVE_PANEL':
-			if ( ! state.includes( action.panelName ) ) {
-				return [ ...state, action.panelName ];
-			}
-	}
-
-	return state;
-}
-
 export function publishSidebarActive( state = false, action ) {
 	switch ( action.type ) {
 		case 'OPEN_PUBLISH_SIDEBAR':
@@ -161,7 +142,6 @@ const metaBoxes = combineReducers( {
 export default combineReducers( {
 	metaBoxes,
 	publishSidebarActive,
-	removedPanels,
 	blockInserterPanel,
 	listViewPanel,
 } );
