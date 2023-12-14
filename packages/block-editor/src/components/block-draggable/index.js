@@ -4,7 +4,7 @@
 import { store as blocksStore } from '@wordpress/blocks';
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { throttle } from '@wordpress/compose';
 
 /**
@@ -69,8 +69,6 @@ const BlockDraggable = ( {
 		[ clientIds ]
 	);
 
-	const [ targetClientId, setTargetClientId ] = useState( null );
-
 	const isDragging = useRef( false );
 	const [ startScrolling, scrollOnDragOver, stopScrolling ] =
 		useScrollWhenDragging();
@@ -104,14 +102,9 @@ const BlockDraggable = ( {
 				return;
 			}
 
-			const newTargetClientId = event.target
+			const targetClientId = event.target
 				.closest( '[data-block]' )
 				.getAttribute( 'data-block' );
-			//Only update targetClientId if it has changed
-			// and if it's a container block
-			if ( targetClientId !== newTargetClientId ) {
-				setTargetClientId( newTargetClientId );
-			}
 
 			const allowedBlocks = getAllowedBlocks( targetClientId );
 			const targetBlockName = getBlockNamesByClientId( [
@@ -138,14 +131,21 @@ const BlockDraggable = ( {
 			}
 		};
 
-		const throttledOnDragOver = throttle( onDragOver, 16 );
+		const throttledOnDragOver = throttle( onDragOver, 200 );
 
 		editorRoot.addEventListener( 'dragover', throttledOnDragOver );
 
 		return () => {
 			editorRoot.removeEventListener( 'dragover', throttledOnDragOver );
 		};
-	} );
+	}, [
+		draggedBlockNames,
+		editorRoot,
+		getAllowedBlocks,
+		getBlockNamesByClientId,
+		getBlockType,
+		visibleInserter,
+	] );
 
 	if ( ! isDraggable ) {
 		return children( { draggable: false } );
