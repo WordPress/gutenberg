@@ -59,7 +59,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 		const operators = columnOperators.filter( ( operator ) =>
 			[ OPERATOR_IN, OPERATOR_NOT_IN ].includes( operator )
 		);
-		if ( operators.length >= 0 ) {
+		if ( operators.length > 0 ) {
 			filter = {
 				field: field.id,
 				operators,
