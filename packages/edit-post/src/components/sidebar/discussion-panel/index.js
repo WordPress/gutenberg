@@ -7,13 +7,9 @@ import {
 	PostComments,
 	PostPingbacks,
 	PostTypeSupportCheck,
+	store as editorStore,
 } from '@wordpress/editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { store as editPostStore } from '../../../store';
 
 /**
  * Module Constants
@@ -23,14 +19,14 @@ const PANEL_NAME = 'discussion-panel';
 function DiscussionPanel() {
 	const { isEnabled, isOpened } = useSelect( ( select ) => {
 		const { isEditorPanelEnabled, isEditorPanelOpened } =
-			select( editPostStore );
+			select( editorStore );
 		return {
 			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
 		};
 	}, [] );
 
-	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
+	const { toggleEditorPanelOpened } = useDispatch( editorStore );
 
 	if ( ! isEnabled ) {
 		return null;

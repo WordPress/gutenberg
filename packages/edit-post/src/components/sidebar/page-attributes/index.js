@@ -13,20 +13,17 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
- * Internal dependencies
- */
-import { store as editPostStore } from '../../../store';
-
-/**
  * Module Constants
  */
 const PANEL_NAME = 'page-attributes';
 
 export function PageAttributes() {
 	const { isEnabled, isOpened, postType } = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( editorStore );
-		const { isEditorPanelEnabled, isEditorPanelOpened } =
-			select( editPostStore );
+		const {
+			getEditedPostAttribute,
+			isEditorPanelEnabled,
+			isEditorPanelOpened,
+		} = select( editorStore );
 		const { getPostType } = select( coreStore );
 		return {
 			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
@@ -35,7 +32,7 @@ export function PageAttributes() {
 		};
 	}, [] );
 
-	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
+	const { toggleEditorPanelOpened } = useDispatch( editorStore );
 
 	if ( ! isEnabled || ! postType ) {
 		return null;

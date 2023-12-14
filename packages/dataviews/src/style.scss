@@ -97,6 +97,12 @@
 		&:last-child {
 			border-bottom: 0;
 		}
+
+		&:hover {
+			td {
+				background-color: #f8f8f8;
+			}
+		}
 	}
 	thead {
 		tr {

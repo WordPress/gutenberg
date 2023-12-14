@@ -45,9 +45,6 @@ const sortIcons = { asc: chevronUp, desc: chevronDown };
 function HeaderMenu( { field, view, onChangeView } ) {
 	const isSortable = field.enableSorting !== false;
 	const isHidable = field.enableHiding !== false;
-	if ( ! isSortable && ! isHidable ) {
-		return field.header;
-	}
 	const isSorted = view.sort?.field === field.id;
 	let filter, filterInView;
 	const otherFilters = [];
@@ -59,7 +56,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 		const operators = columnOperators.filter( ( operator ) =>
 			[ OPERATOR_IN, OPERATOR_NOT_IN ].includes( operator )
 		);
-		if ( operators.length >= 0 ) {
+		if ( operators.length > 0 ) {
 			filter = {
 				field: field.id,
 				operators,
@@ -73,6 +70,10 @@ function HeaderMenu( { field, view, onChangeView } ) {
 		}
 	}
 	const isFilterable = !! filter;
+
+	if ( ! isSortable && ! isHidable && ! isFilterable ) {
+		return field.header;
+	}
 
 	if ( isFilterable ) {
 		const columnFilters = view.filters;

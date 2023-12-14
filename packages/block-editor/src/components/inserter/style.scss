@@ -61,7 +61,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__popover .block-editor-inserter__menu {
 	margin: -$grid-unit-15;
 
-	.block-editor-inserter__tabs .components-tab-panel__tabs {
+	.block-editor-inserter__tabs div[role="tablist"] {
 		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60 - $grid-unit-15;
 	}
 
@@ -118,10 +118,10 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	overflow: hidden;
 
-	.components-tab-panel__tabs {
+	div[role="tablist"] {
 		border-bottom: $border-width solid $gray-300;
 
-		.components-tab-panel__tabs-item {
+		button[role="tab"] {
 			flex-grow: 1;
 			margin-bottom: -$border-width;
 			&[id$="reusable"] {
@@ -133,7 +133,7 @@ $block-inserter-tabs-height: 44px;
 		}
 	}
 
-	.components-tab-panel__tab-content {
+	div[role="tabpanel"] {
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;

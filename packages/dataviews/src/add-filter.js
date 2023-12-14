@@ -55,7 +55,6 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 				<Button
 					__experimentalIsFocusable
 					label={ __( 'Filters' ) }
-					variant="tertiary"
 					size="compact"
 					icon={ funnel }
 					className="dataviews-filters-button"

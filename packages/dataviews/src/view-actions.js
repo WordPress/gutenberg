@@ -261,7 +261,6 @@ export default function ViewActions( {
 		<DropdownMenu
 			trigger={
 				<Button
-					variant="tertiary"
 					size="compact"
 					icon={
 						VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
