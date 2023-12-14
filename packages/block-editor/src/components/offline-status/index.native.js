@@ -6,11 +6,13 @@ import { Text, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import {
+	usePreferredColorSchemeStyle,
+	useNetworkConnectivity,
+} from '@wordpress/compose';
 import { Icon } from '@wordpress/components';
 import { offline as offlineIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { useIsConnected } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -18,7 +20,7 @@ import { useIsConnected } from '@wordpress/react-native-bridge';
 import styles from './style.native.scss';
 
 const OfflineStatus = () => {
-	const { isConnected } = useIsConnected();
+	const { isConnected } = useNetworkConnectivity();
 
 	const containerStyle = usePreferredColorSchemeStyle(
 		styles.offline,

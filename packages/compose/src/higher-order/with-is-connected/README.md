@@ -1,8 +1,9 @@
 # withIsConnected
 
-`withIsConnected` provides a true/false mobile connectivity status based on the `useIsConnected` hook found in the [bridge](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-bridge/index.js).
+`withIsConnected` provides a true/false mobile connectivity status based on the `useNetworkConnectivity` hook.
 
 ## Usage
+
 ```jsx
 /**
  * WordPress dependencies

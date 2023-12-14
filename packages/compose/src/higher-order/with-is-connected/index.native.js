@@ -1,16 +1,12 @@
 /**
- * WordPress dependencies
- */
-import { useIsConnected } from '@wordpress/react-native-bridge';
-
-/**
  * Internal dependencies
  */
 import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
+import useNetworkConnectivity from '../../hooks/use-network-connectivity';
 
 const withIsConnected = createHigherOrderComponent( ( WrappedComponent ) => {
 	return ( props ) => {
-		const { isConnected } = useIsConnected();
+		const { isConnected } = useNetworkConnectivity();
 		return <WrappedComponent { ...props } isConnected={ isConnected } />;
 	};
 }, 'withIsConnected' );

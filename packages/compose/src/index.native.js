@@ -38,3 +38,4 @@ export { default as useDebouncedInput } from './hooks/use-debounced-input';
 export { default as useThrottle } from './hooks/use-throttle';
 export { default as useMergeRefs } from './hooks/use-merge-refs';
 export { default as useRefEffect } from './hooks/use-ref-effect';
+export { default as useNetworkConnectivity } from './hooks/use-network-connectivity';
