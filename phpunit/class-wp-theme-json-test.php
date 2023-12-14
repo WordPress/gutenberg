@@ -217,35 +217,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_get_stylesheet_skips_root_layout_styles() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
-					'blocks' => array(
-						'core/group' => array(
-							'color' => array(
-								'background' => 'deepskyblue',
-							),
-						),
-					),
-				),
-			),
-			'blocks'
-		);
-		$stylesheet = $theme_json->get_stylesheet(
-			array( 'styles' ),
-			array( 'custom' ),
-			array( 'skip_root_layout_styles' => true )
-		);
-
-		// All Layout styles should be skipped.
-		$this->assertEquals(
-			'.wp-block-group{background-color: deepskyblue;}',
-			$stylesheet
-		);
-	}
-
 	public function test_get_stylesheet() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

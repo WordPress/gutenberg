@@ -1232,8 +1232,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		if ( in_array( 'styles', $types, true ) ) {
-			$skip_root_layout_styles = $options['skip_root_layout_styles'] ?? false;
-			if ( false !== $root_style_key && ! $skip_root_layout_styles ) {
+			if ( false !== $root_style_key ) {
 				$stylesheet .= $this->get_root_layout_rules( $style_nodes[ $root_style_key ]['selector'], $style_nodes[ $root_style_key ] );
 			}
 			$stylesheet .= $this->get_block_classes( $style_nodes );
