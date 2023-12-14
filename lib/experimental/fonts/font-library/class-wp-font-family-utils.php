@@ -132,10 +132,10 @@ class WP_Font_Family_Utils {
 	 * @return array A sanitized font family definition.
 	 */
 	public static function sanitize( $data ) {
-		if ( empty( $data ) || ! is_string( $data )) {
+		if ( empty( $data ) || ! is_string( $data ) ) {
 			return '';
 		}
-		
+
 		// Creates the structure of theme.json array with the new fonts.
 		$fonts_json = array(
 			'version'  => '2',
