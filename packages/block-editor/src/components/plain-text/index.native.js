@@ -7,7 +7,8 @@ import { TextInput, Platform, Dimensions } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { RichText, getPxFromCssUnit } from '@wordpress/block-editor';
+import { RichText } from '@wordpress/block-editor';
+import { getPxFromCssUnit } from '@wordpress/components';
 
 /**
  * Internal dependencies
