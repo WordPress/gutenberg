@@ -132,6 +132,10 @@ class WP_Font_Family_Utils {
 	 * @return array A sanitized font family definition.
 	 */
 	public static function sanitize( $data ) {
+		if ( empty( $data ) || ! is_string( $data )) {
+			return '';
+		}
+		
 		// Creates the structure of theme.json array with the new fonts.
 		$fonts_json = array(
 			'version'  => '2',
@@ -155,8 +159,12 @@ class WP_Font_Family_Utils {
 			? $theme_data['settings']['typography']['fontFamilies'][0]
 			: array();
 
-		$sanitized['slug']       = _wp_to_kebab_case( $sanitized['slug'] );
-		$sanitized['fontFamily'] = WP_Font_Family_Utils::format_font_family( $sanitized['fontFamily'] );
+		if ( ! empty( $sanitized['slug'] ) ) {
+			$sanitized['slug'] = sanitize_title( $sanitized['slug'] );
+		}
+		if ( ! empty( $sanitized['fontFamily'] ) ) {
+			$sanitized['fontFamily'] = sanitize_text_field( $sanitized['fontFamily'] );
+		}
 		return json_encode( $sanitized );
 	}
 }
