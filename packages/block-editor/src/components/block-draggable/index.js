@@ -22,6 +22,7 @@ const BlockDraggable = ( {
 	cloneClassname,
 	onDragStart,
 	onDragEnd,
+	fadeWhenDisabled = false,
 } ) => {
 	const {
 		srcRootClientId,
@@ -188,7 +189,14 @@ const BlockDraggable = ( {
 				}
 			} }
 			__experimentalDragComponent={
-				<BlockDraggableChip count={ clientIds.length } icon={ icon } />
+				<BlockDraggableChip
+					count={ clientIds.length }
+					icon={ icon }
+					className={
+						fadeWhenDisabled &&
+						'block-editor-block-draggable-chip-fade'
+					}
+				/>
 			}
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -10,10 +15,20 @@ import { dragHandle } from '@wordpress/icons';
  */
 import BlockIcon from '../block-icon';
 
-export default function BlockDraggableChip( { count, icon, isPattern } ) {
+export default function BlockDraggableChip( {
+	count,
+	icon,
+	isPattern,
+	className,
+} ) {
 	const patternLabel = isPattern && __( 'Pattern' );
 	return (
-		<div className="block-editor-block-draggable-chip-wrapper">
+		<div
+			className={ classnames(
+				'block-editor-block-draggable-chip-wrapper',
+				className
+			) }
+		>
 			<div
 				className="block-editor-block-draggable-chip"
 				data-testid="block-draggable-chip"

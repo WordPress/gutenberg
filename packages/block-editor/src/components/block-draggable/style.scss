@@ -16,6 +16,9 @@
 	padding: 0 ( $grid-unit-15 + $border-width );
 	user-select: none;
 	width: max-content;
+	transition:
+		background-color 0.5s linear,
+		opacity 0.5s linear;
 
 	svg {
 		fill: currentColor;
@@ -47,7 +50,7 @@
 }
 
 .block-draggable-invalid-drag-token {
-	.block-editor-block-draggable-chip {
+	.block-editor-block-draggable-chip-fade .block-editor-block-draggable-chip {
 		background-color: $gray-600;
 		opacity: 0.8;
 	}
