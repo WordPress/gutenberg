@@ -15,7 +15,7 @@ import { BottomSheet } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { default as getPxFromCssUnit } from '../utils/get-px-from-css-unit';
+import { default as getPxFromCssUnit } from '../mobile/utils/get-px-from-css-unit';
 import { default as UnitControl, useCustomUnits } from '../unit-control';
 import styles from './style.scss';
 
