@@ -29,6 +29,7 @@
 ### Experimental
 
 -   `Tabs`: implement new `tabId` prop ([#56883](https://github.com/WordPress/gutenberg/pull/56883)).
+-   `CustomSelect`: add `WordPressComponentsProps` for more flexibility ([#56998](https://github.com/WordPress/gutenberg/pull/56998))
 
 ### Experimental
 
