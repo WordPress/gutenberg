@@ -108,7 +108,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeOnUndoPressed: jest.fn(),
 		subscribeOnRedoPressed: jest.fn(),
 		subscribeConnectionStatus: jest.fn( () => ( { remove: jest.fn() } ) ),
-		requestConnectionStatus: jest.fn(),
+		requestConnectionStatus: jest.fn( ( callback ) => callback( true ) ),
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
