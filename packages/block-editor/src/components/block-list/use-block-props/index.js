@@ -15,7 +15,6 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
-import useMovingAnimation from '../../use-moving-animation';
 import { PrivateBlockContext } from '../private-block-context';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
@@ -74,15 +73,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		className,
 		wrapperProps = {},
 		isAligned,
-		index,
 		mode,
 		name,
 		blockApiVersion,
 		blockTitle,
 		isSelected,
-		isPartOfSelection,
-		adjustScrolling,
-		enableAnimation,
 		isSubtreeDisabled,
 		isOutlineEnabled,
 		hasOverlay,
@@ -114,12 +109,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useNavModeExit( clientId ),
 		useIsHovered( { isEnabled: isOutlineEnabled } ),
 		useIntersectionObserver(),
-		useMovingAnimation( {
-			isSelected: isPartOfSelection,
-			adjustScrolling,
-			enableAnimation,
-			triggerAnimationOnChange: index,
-		} ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
 	] );
 
