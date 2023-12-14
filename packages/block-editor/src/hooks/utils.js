@@ -516,6 +516,14 @@ export function createBlockListBlockFilter( features ) {
 				<BlockListBlock
 					key="edit"
 					{ ...props }
+					__unstableLayoutClassNames={ allWrapperProps
+						.filter( Boolean )
+						.reduce( ( acc, wrapperProps ) =>
+							classnames(
+								acc,
+								wrapperProps.__unstableLayoutClassNames
+							)
+						) }
 					wrapperProps={ allWrapperProps
 						.filter( Boolean )
 						.reduce( ( acc, wrapperProps ) => {
