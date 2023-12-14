@@ -128,7 +128,7 @@ class WP_Font_Family_Utils {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param string $data string to sanitize.
+	 * @param string $data The string to sanitize.
 	 * @return array A sanitized font family definition.
 	 */
 	public static function sanitize( $data ) {
