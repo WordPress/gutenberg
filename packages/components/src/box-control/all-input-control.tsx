@@ -98,7 +98,7 @@ export default function AllInputControl( {
 				disableUnits={ isMixed }
 				id={ inputId }
 				isOnly
-				value={ parsedQuantity }
+				value={ allValue }
 				onChange={ unitControlOnChange }
 				onUnitChange={ handleOnUnitChange }
 				onFocus={ handleOnFocus }
