@@ -34,6 +34,7 @@ export { default as PostExcerpt } from './post-excerpt';
 export { default as PostExcerptCheck } from './post-excerpt/check';
 export { default as PostFeaturedImage } from './post-featured-image';
 export { default as PostFeaturedImageCheck } from './post-featured-image/check';
+export { default as PostFeaturedImagePanel } from './post-featured-image/panel';
 export { default as PostFormat } from './post-format';
 export { default as PostFormatCheck } from './post-format/check';
 export { default as PostLastRevision } from './post-last-revision';
