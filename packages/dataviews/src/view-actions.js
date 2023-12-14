@@ -49,7 +49,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 						key={ availableView.type }
 						value={ availableView.type }
 						name="view-actions-available-view"
-						checked={ availableView.type === view.type }
+						checked={ availableView.id === view.type }
 						onChange={ () => {
 							onChangeView( {
 								...view,
@@ -84,7 +84,9 @@ function PageSizeMenu( { view, onChangeView } ) {
 						value={ size }
 						name="view-actions-page-size"
 						checked={ view.perPage === size }
-						onChange={ () => {
+						onChange={ ( event ) => {
+							// We need to handle this on DropDown component probably..
+							event.preventDefault();
 							onChangeView( { ...view, perPage: size, page: 1 } );
 						} }
 					>
@@ -115,7 +117,8 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 						key={ field.id }
 						value={ field.id }
 						checked={ ! view.hiddenFields?.includes( field.id ) }
-						onChange={ () => {
+						onChange={ ( event ) => {
+							event.preventDefault();
 							onChangeView( {
 								...view,
 								hiddenFields: view.hiddenFields?.includes(
@@ -177,8 +180,8 @@ function SortMenu( { fields, view, onChangeView } ) {
 					>
 						{ Object.entries( sortingItemsInfo ).map(
 							( [ direction, info ] ) => {
-								const isChecked =
-									currentSortedField !== undefined &&
+								const isActive =
+									currentSortedField &&
 									sortedDirection === direction &&
 									field.id === currentSortedField.id;
 
@@ -190,8 +193,8 @@ function SortMenu( { fields, view, onChangeView } ) {
 										suffix={ <Icon icon={ info.icon } /> }
 										// Note: there is currently a limitation from the DropdownMenu
 										// component where the radio won't unselect when all related
-										// radios are set to false.										
-										checked={ isChecked }
+										// radios are set to false.
+										checked={ isActive }
 										onChange={ ( event ) => {
 											event.preventDefault();
 											onChangeView( {
