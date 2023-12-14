@@ -270,6 +270,7 @@
 
 		&.has-icon:not(.has-text) {
 			padding: 0;
+			width: $button-size-compact;
 			min-width: $button-size-compact;
 		}
 	}
@@ -282,6 +283,7 @@
 
 		&.has-icon:not(.has-text) {
 			padding: 0;
+			width: $button-size-small;
 			min-width: $button-size-small;
 		}
 	}
