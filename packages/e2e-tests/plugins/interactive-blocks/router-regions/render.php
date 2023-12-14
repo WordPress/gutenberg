@@ -3,6 +3,7 @@
  * HTML for testing the hydration of router regions.
  *
  * @package gutenberg-test-interactive-blocks
+ *
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 

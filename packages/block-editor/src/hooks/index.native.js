@@ -1,15 +1,19 @@
 /**
  * Internal dependencies
  */
+import { createBlockEditFilter, createBlockListBlockFilter } from './utils';
 import './compat';
-import './align';
-import './anchor';
+import align from './align';
+import anchor from './anchor';
 import './custom-class-name';
 import './generated-class-name';
-import './style';
-import './color';
-import './font-size';
+import style from './style';
+import color from './color';
+import fontSize from './font-size';
 import './layout';
+
+createBlockEditFilter( [ align, anchor, style ] );
+createBlockListBlockFilter( [ align, style, color, fontSize ] );
 
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';

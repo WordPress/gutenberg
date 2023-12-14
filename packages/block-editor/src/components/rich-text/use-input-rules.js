@@ -28,7 +28,12 @@ function findSelection( blocks ) {
 		if ( attributeKey ) {
 			blocks[ i ].attributes[ attributeKey ] = blocks[ i ].attributes[
 				attributeKey
-			].replace( START_OF_SELECTED_AREA, '' );
+			]
+				// To do: refactor this to use rich text's selection instead, so
+				// we no longer have to use on this hack inserting a special
+				// character.
+				.toString()
+				.replace( START_OF_SELECTED_AREA, '' );
 			return [ blocks[ i ].clientId, attributeKey, 0, 0 ];
 		}
 

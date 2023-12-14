@@ -73,28 +73,18 @@ export const normalizeTextString = ( value: string ): string => {
 };
 
 /**
- * Escapes the RegExp special characters.
- *
- * @param {string} string Input string.
- *
- * @return {string} Regex-escaped string.
- */
-export function escapeRegExp( string: string ): string {
-	return string.replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' );
-}
-
-/**
  * Converts any string to kebab case.
+ * Backwards compatible with Lodash's `_.kebabCase()`.
+ * Backwards compatible with `_wp_to_kebab_case()`.
  *
- * @param {string} str String to convert.
+ * @see https://lodash.com/docs/4.17.15#kebabCase
+ * @see https://developer.wordpress.org/reference/functions/_wp_to_kebab_case/
  *
- * @return {string} Kebab-cased string
+ * @param str String to convert.
+ * @return Kebab-cased string
  */
-export function kebabCase( str: any ) {
-	let input = str;
-	if ( typeof str !== 'string' ) {
-		input = str?.toString?.() ?? '';
-	}
+export function kebabCase( str: unknown ) {
+	let input = str?.toString?.() ?? '';
 
 	// See https://github.com/lodash/lodash/blob/b185fcee26b2133bd071f4aaca14b455c2ed1008/lodash.js#L4970
 	input = input.replace( /['\u2019]/, '' );
@@ -107,4 +97,15 @@ export function kebabCase( str: any ) {
 			/([A-Z])([A-Z][a-z])/g, // FOOBar => foo-bar
 		],
 	} );
+}
+
+/**
+ * Escapes the RegExp special characters.
+ *
+ * @param string Input string.
+ *
+ * @return Regex-escaped string.
+ */
+export function escapeRegExp( string: string ): string {
+	return string.replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' );
 }

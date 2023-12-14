@@ -45,6 +45,7 @@ const UnforwardedFontSizePicker = (
 	const {
 		/** Start opting into the new margin-free styles that will become the default in a future version. */
 		__nextHasNoMarginBottom = false,
+		__next40pxDefaultSize = false,
 		fallbackFontSize,
 		fontSizes = [],
 		disableCustomFontSizes = false,
@@ -165,6 +166,7 @@ const UnforwardedFontSizePicker = (
 					shouldUseSelectControl &&
 					! showCustomValueControl && (
 						<FontSizePickerSelect
+							__next40pxDefaultSize={ __next40pxDefaultSize }
 							fontSizes={ fontSizes }
 							value={ value }
 							disableCustomFontSizes={ disableCustomFontSizes }
@@ -194,6 +196,7 @@ const UnforwardedFontSizePicker = (
 						fontSizes={ fontSizes }
 						value={ value }
 						__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 						size={ size }
 						onChange={ ( newValue ) => {
 							if ( newValue === undefined ) {
@@ -214,6 +217,7 @@ const UnforwardedFontSizePicker = (
 					<Flex className="components-font-size-picker__custom-size-control">
 						<FlexItem isBlock>
 							<UnitControl
+								__next40pxDefaultSize={ __next40pxDefaultSize }
 								label={ __( 'Custom' ) }
 								labelPosition="top"
 								hideLabelFromVision
@@ -240,6 +244,9 @@ const UnforwardedFontSizePicker = (
 									<RangeControl
 										__nextHasNoMarginBottom={
 											__nextHasNoMarginBottom
+										}
+										__next40pxDefaultSize={
+											__next40pxDefaultSize
 										}
 										className="components-font-size-picker__custom-input"
 										label={ __( 'Custom Size' ) }
@@ -276,9 +283,10 @@ const UnforwardedFontSizePicker = (
 									variant="secondary"
 									__next40pxDefaultSize
 									size={
-										size !== '__unstable-large'
-											? 'small'
-											: 'default'
+										size === '__unstable-large' ||
+										props.__next40pxDefaultSize
+											? 'default'
+											: 'small'
 									}
 								>
 									{ __( 'Reset' ) }

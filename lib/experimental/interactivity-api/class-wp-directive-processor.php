@@ -20,7 +20,7 @@ if ( class_exists( 'WP_Directive_Processor' ) ) {
  * available.  Please restrain from investing unnecessary time and effort trying
  * to improve this code.
  */
-class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
+class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 
 	/**
 	 * An array of root blocks.
@@ -195,7 +195,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 		}
 		list( $start_name, $end_name ) = $bookmarks;
 
-		$start = $this->bookmarks[ $start_name ]->end + 1;
+		$start = $this->bookmarks[ $start_name ]->start + $this->bookmarks[ $start_name ]->length + 1;
 		$end   = $this->bookmarks[ $end_name ]->start;
 
 		$this->seek( $start_name ); // Return to original position.
@@ -225,14 +225,14 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_4 {
 		}
 		list( $start_name, $end_name ) = $bookmarks;
 
-		$start = $this->bookmarks[ $start_name ]->end + 1;
+		$start = $this->bookmarks[ $start_name ]->start + $this->bookmarks[ $start_name ]->length + 1;
 		$end   = $this->bookmarks[ $end_name ]->start;
 
 		$this->seek( $start_name ); // Return to original position.
 		$this->release_bookmark( $start_name );
 		$this->release_bookmark( $end_name );
 
-		$this->lexical_updates[] = new WP_HTML_Text_Replacement( $start, $end, $new_html );
+		$this->lexical_updates[] = new Gutenberg_HTML_Text_Replacement_6_5( $start, $end - $start, $new_html );
 		return true;
 	}
 

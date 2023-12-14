@@ -8,6 +8,7 @@ export * from './autocompleters';
 
 // Post Related Components.
 export { default as AutosaveMonitor } from './autosave-monitor';
+export { default as DocumentBar } from './document-bar';
 export { default as DocumentOutline } from './document-outline';
 export { default as DocumentOutlineCheck } from './document-outline/check';
 export { EditorKeyboardShortcuts };
@@ -23,7 +24,8 @@ export { default as LocalAutosaveMonitor } from './local-autosave-monitor';
 export { default as PageAttributesCheck } from './page-attributes/check';
 export { default as PageAttributesOrder } from './page-attributes/order';
 export { default as PageAttributesParent } from './page-attributes/parent';
-export { default as PageTemplate } from './post-template';
+export { default as PageTemplate } from './post-template/classic-theme';
+export { default as PostTemplatePanel } from './post-template/panel';
 export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
 export { default as PostAuthorPanel } from './post-author/panel';
@@ -36,6 +38,7 @@ export { default as PostFormat } from './post-format';
 export { default as PostFormatCheck } from './post-format/check';
 export { default as PostLastRevision } from './post-last-revision';
 export { default as PostLastRevisionCheck } from './post-last-revision/check';
+export { default as PostLastRevisionPanel } from './post-last-revision/panel';
 export { default as PostLockedModal } from './post-locked-modal';
 export { default as PostPendingStatus } from './post-pending-status';
 export { default as PostPendingStatusCheck } from './post-pending-status/check';

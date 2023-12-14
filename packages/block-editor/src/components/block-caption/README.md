@@ -16,7 +16,7 @@ The `BlockCaption` component renders block-level UI for adding and editing capti
 Renders an editable caption field designed specifically for block-level use.
 
 ```jsx
-import { BlockCaption } from '@wordpress/block-editor';
+import { BlockCaption, RichText } from '@wordpress/block-editor';
 
 const MyBlockCaption = (
 	clientId,
@@ -29,7 +29,7 @@ const MyBlockCaption = (
 		clientId={ clientId }
 		accessible={ true }
 		accessibilityLabelCreator={ ( caption ) =>
-			! caption
+			RichText.isEmpty( caption )
 				? /* translators: accessibility text. Empty caption. */
 				  'Caption. Empty'
 				: sprintf(

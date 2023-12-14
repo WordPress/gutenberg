@@ -1620,6 +1620,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/dataviews",
+		"slug": "packages-dataviews",
+		"markdown_source": "../packages/dataviews/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/date",
 		"slug": "packages-date",
 		"markdown_source": "../packages/date/README.md",

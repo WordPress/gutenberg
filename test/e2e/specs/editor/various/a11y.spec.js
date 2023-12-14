@@ -148,9 +148,6 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 		const blocksTab = preferencesModal.locator(
 			'role=tab[name="Blocks"i]'
 		);
-		const panelsTab = preferencesModal.locator(
-			'role=tab[name="Panels"i]'
-		);
 
 		// Check initial focus is on the modal dialog container.
 		await expect( preferencesModal ).toBeFocused();
@@ -200,14 +197,6 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 			'qwerty'
 		);
 		await clickAndFocusTab( blocksTab );
-		await pageUtils.pressKeys( 'Shift+Tab' );
-		await expect( closeButton ).toBeFocused();
-		await pageUtils.pressKeys( 'Shift+Tab' );
-		await expect( preferencesModalContent ).not.toBeFocused();
-
-		// The Panels tab panel content is short and not scrollable.
-		// Check it's not focusable.
-		await clickAndFocusTab( panelsTab );
 		await pageUtils.pressKeys( 'Shift+Tab' );
 		await expect( closeButton ).toBeFocused();
 		await pageUtils.pressKeys( 'Shift+Tab' );

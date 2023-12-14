@@ -42,12 +42,8 @@ import {
 import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
 import Tabs from './tabs';
-
-export const { lock, unlock } =
-	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.',
-		'@wordpress/components'
-	);
+import { kebabCase } from './utils/strings';
+import { lock } from './lock-unlock';
 
 export const privateApis = {};
 lock( privateApis, {
@@ -81,4 +77,5 @@ lock( privateApis, {
 	DropdownMenuSeparatorV2Ariakit,
 	DropdownMenuItemLabelV2Ariakit,
 	DropdownMenuItemHelpTextV2Ariakit,
+	kebabCase,
 } );

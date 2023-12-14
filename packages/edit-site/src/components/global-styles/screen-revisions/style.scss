@@ -66,7 +66,7 @@
 		width: 100%;
 		height: auto;
 		display: block;
-		padding: $grid-unit-15 $grid-unit-15 $grid-unit-15 $grid-unit-30;
+		padding: $grid-unit-15 $grid-unit-15 $grid-unit-10 $grid-unit-30;
 		&:focus,
 		&:active {
 			outline: 0;
@@ -103,6 +103,7 @@
 	}
 }
 
+.edit-site-global-styles-screen-revisions__changes,
 .edit-site-global-styles-screen-revisions__meta {
 	color: $gray-600;
 	display: flex;
@@ -110,7 +111,6 @@
 	width: 100%;
 	align-items: center;
 	font-size: 12px;
-
 	img {
 		width: $grid-unit-20;
 		height: $grid-unit-20;
@@ -122,3 +122,11 @@
 .edit-site-global-styles-screen-revisions__loading {
 	margin: $grid-unit-30 auto !important;
 }
+
+.edit-site-global-styles-screen-revisions__changes {
+	margin-bottom: $grid-unit-05;
+	text-align: left;
+	color: $gray-900;
+	line-height: $default-line-height;
+}
+
