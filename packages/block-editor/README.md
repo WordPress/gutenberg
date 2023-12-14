@@ -537,6 +537,16 @@ _Returns_
 
 -   `string`: Gradient value.
 
+### getPxFromCssUnit
+
+> **Deprecated**
+
+This function was accidentially exposed for mobile/native usage.
+
+_Returns_
+
+-   `string`: Empty string.
+
 ### getSpacingPresetCssVar
 
 Converts a spacing preset into a custom value.
