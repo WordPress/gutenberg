@@ -125,7 +125,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 															/>
 														)
 													}
-													onSelect={ ( event ) => {
+													onClick={ ( event ) => {
 														event.preventDefault();
 														onChangeView( {
 															...view,
@@ -186,7 +186,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 														<Icon icon={ check } />
 													)
 												}
-												onSelect={ ( event ) => {
+												onClick={ ( event ) => {
 													event.preventDefault();
 													onChangeView( {
 														...view,
@@ -218,7 +218,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 														<Icon icon={ check } />
 													)
 												}
-												onSelect={ ( event ) => {
+												onClick={ ( event ) => {
 													event.preventDefault();
 													onChangeView( {
 														...view,
@@ -242,7 +242,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 									<DropdownMenuItem
 										key={ 'reset-filter-' + filter.name }
 										disabled={ ! activeElement }
-										onSelect={ ( event ) => {
+										onClick={ ( event ) => {
 											event.preventDefault();
 											onChangeView( ( currentView ) => ( {
 												...currentView,
@@ -271,7 +271,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 					disabled={
 						view.search === '' && view.filters?.length === 0
 					}
-					onSelect={ ( event ) => {
+					onClick={ ( event ) => {
 						event.preventDefault();
 						onChangeView( ( currentView ) => ( {
 							...currentView,
