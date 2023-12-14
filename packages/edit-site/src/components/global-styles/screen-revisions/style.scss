@@ -11,10 +11,6 @@
 	}
 }
 
-.edit-site-global-styles-header__description {
-	margin-bottom: 0;
-}
-
 .edit-site-global-styles-screen-revisions__revision-item {
 	position: relative;
 	cursor: pointer;
@@ -99,9 +95,8 @@
 
 .edit-site-global-styles-screen-revisions__button {
 	justify-content: center;
-	width: 80%;
-	margin-left: 10%;
-	margin-bottom: $grid-unit-10;
+	width: 100%;
+	margin-bottom: $grid-unit-20;
 }
 
 .edit-site-global-styles-screen-revisions__description {
@@ -143,19 +138,24 @@
 	line-height: $default-line-height;
 }
 
+.edit-site-global-styles-screen-revisions__footer {
+	padding: $grid-unit-20 $grid-unit-20 $grid-unit-15 $grid-unit-20;
+	position: sticky;
+	bottom: 0;
+	background: $white;
+	z-index: 10;
+	border-top: 1px solid $gray-400;
+}
+
 .edit-site-global-styles-screen-revisions__pagination.edit-site-global-styles-screen-revisions__pagination {
 	justify-content: space-between;
 	gap: 2px;
-	padding: $grid-unit-20 $grid-unit-20 $grid-unit-15 $grid-unit-20;
-	position: sticky;
-	top: 0;
-	background: $white;
-	z-index: 10;
-	border-bottom: 1px solid $gray-400;
-
 	.edit-site-pagination__total {
-		font-weight: 600;
-		font-color: $gray-900;
+		position: absolute;
+		left: -1000px;
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
 	}
 
 	.components-text {
@@ -176,6 +176,3 @@
 		}
 	}
 }
-
-
-
