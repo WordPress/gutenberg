@@ -25,7 +25,7 @@ import {
  * @return {NetworkInformation} Network information.
  */
 export default function useNetworkConnectivity() {
-	const [ isConnected, setIsConnected ] = useState( null );
+	const [ isConnected, setIsConnected ] = useState( true );
 
 	useEffect( () => {
 		let isCurrent = true;

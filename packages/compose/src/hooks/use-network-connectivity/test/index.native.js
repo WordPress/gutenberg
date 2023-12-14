@@ -17,10 +17,10 @@ import {
 import useNetworkConnectivity from '../index';
 
 describe( 'useNetworkConnectivity', () => {
-	it( 'should return null when network connectivity is unknown', () => {
+	it( 'should optimisitically presume network connectivity', () => {
 		const { result } = renderHook( () => useNetworkConnectivity() );
 
-		expect( result.current.isConnected ).toBe( null );
+		expect( result.current.isConnected ).toBe( true );
 	} );
 
 	describe( 'when network connectivity is available', () => {
