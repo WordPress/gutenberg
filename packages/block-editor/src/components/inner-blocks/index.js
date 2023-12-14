@@ -121,8 +121,6 @@ function UncontrolledInnerBlocks( props ) {
 		[ defaultLayout, usedLayout, allowSizingOnChildren ]
 	);
 
-	// This component needs to always be synchronous as it's the one changing
-	// the async mode depending on the block selection.
 	const items = (
 		<BlockListItems
 			rootClientId={ clientId }
