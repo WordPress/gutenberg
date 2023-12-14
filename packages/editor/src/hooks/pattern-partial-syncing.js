@@ -6,7 +6,7 @@ import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useBlockEditingMode } from '@wordpress/block-editor';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -64,10 +64,39 @@ const withPartialSyncingControls = createHigherOrderComponent(
 	}
 );
 
+/**
+ * Adds an editInPatternOnlyMode prop which allows the block to switch between post and pattern
+ * editing modes.
+ *
+ * @param {Component} BlockEdit Original component.
+ *
+ * @return {Component} Wrapped component.
+ */
+const withPatternOnlyRenderMode = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => {
+		if ( props.name !== 'core/block' ) {
+			return <BlockEdit { ...props } />;
+		}
+
+		const { setRenderingMode } = useDispatch( editorStore );
+
+		const newProps = {
+			...props,
+			editInPatternOnlyMode: () => setRenderingMode( 'pattern-only' ),
+		};
+		return <BlockEdit { ...newProps } />;
+	}
+);
+
 if ( window.__experimentalPatternPartialSyncing ) {
 	addFilter(
 		'editor.BlockEdit',
 		'core/editor/with-partial-syncing-controls',
 		withPartialSyncingControls
+	);
+	addFilter(
+		'editor.BlockEdit',
+		'core/editor/with-pattern-only-render-mode',
+		withPatternOnlyRenderMode
 	);
 }
