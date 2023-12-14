@@ -3,6 +3,11 @@
  */
 import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
 
+/**
+ * WordPress dependencies
+ */
+import { debounce } from '@wordpress/compose';
+
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
 const focusChangeListeners = [];
@@ -131,20 +136,25 @@ export const focusInput = ( element ) => {
  * @param {RefObject} element Element to be focused.
  */
 export const focus = ( element ) => {
+	// If other blur events happen at the same time that focus is triggered, the focus event
+	// will take precedence and cancels pending blur events.
+	blur.cancel();
 	TextInputState.focusTextInput( element );
 	notifyInputChange();
 };
 
 /**
  * Unfocuses the specified element.
+ * This function uses debounce to avoid conflicts with the focus event when both are
+ * triggered at the same time. Focus events will take precedence.
  *
  * @param {RefObject} element Element to be unfocused.
  */
-export const blur = ( element ) => {
+export const blur = debounce( ( element ) => {
 	TextInputState.blurTextInput( element );
 	setCurrentCaretData( null );
 	notifyInputChange();
-};
+}, 0 );
 
 /**
  * Unfocuses the current focused element.
