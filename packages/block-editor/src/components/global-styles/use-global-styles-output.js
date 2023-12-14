@@ -611,6 +611,33 @@ function pickStyleKeys( treeToPickFrom ) {
 	return Object.fromEntries( clonedEntries );
 }
 
+function scopeFeatureSelectors( scope, selectors ) {
+	if ( ! scope || ! selectors ) {
+		return;
+	}
+
+	const featureSelectors = JSON.parse( JSON.stringify( selectors ) );
+
+	Object.entries( selectors ).forEach( ( [ feature, selector ] ) => {
+		if ( typeof selector === 'string' ) {
+			featureSelectors[ feature ] = scopeSelector( scope, selector );
+		}
+
+		if ( typeof selector === 'object' ) {
+			Object.entries( selector ).forEach(
+				( [ subfeature, subfeatureSelector ] ) => {
+					featureSelectors[ feature ][ subfeature ] = scopeSelector(
+						scope,
+						subfeatureSelector
+					);
+				}
+			);
+		}
+	} );
+
+	return featureSelectors;
+}
+
 export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	const nodes = [];
 
@@ -643,14 +670,78 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 
 			if ( node?.variations ) {
 				const variations = {};
-				Object.keys( node.variations ).forEach( ( variation ) => {
-					variations[ variation ] = pickStyleKeys(
-						node.variations[ variation ]
-					);
-				} );
+
+				Object.entries( node.variations ).forEach(
+					( [ variationName, variation ] ) => {
+						variations[ variationName ] =
+							pickStyleKeys( variation );
+						const variationSelector =
+							blockSelectors[ blockName ].styleVariationSelectors[
+								variationName
+							];
+
+						// Process the variations inner block type styles.
+						Object.entries( variation.blocks ?? {} ).forEach(
+							( [
+								variationBlockName,
+								variationBlockStyles,
+							] ) => {
+								const variationBlockSelector = scopeSelector(
+									variationSelector,
+									blockSelectors[ variationBlockName ]
+										.selector
+								);
+								const variationDuotoneSelector = scopeSelector(
+									variationSelector,
+									blockSelectors[ variationBlockName ]
+										.duotoneSelector
+								);
+								const variationFeatureSelectors =
+									scopeFeatureSelectors(
+										variationSelector,
+										blockSelectors[ variationBlockName ]
+											.featureSelectors
+									);
+
+								// TODO: Do we need to delay pushing these nodes so they come after the original block's node?
+								nodes.push( {
+									selector: variationBlockSelector,
+									duotoneSelector: variationDuotoneSelector,
+									featureSelectors: variationFeatureSelectors,
+									fallbackGapValue:
+										blockSelectors[ variationBlockName ]
+											.fallbackGapValue,
+									hasLayoutSupport:
+										blockSelectors[ variationBlockName ]
+											.hasLayoutSupport,
+									styles: pickStyleKeys(
+										variationBlockStyles
+									),
+								} );
+							}
+						);
+
+						// Process the variations inner element styles.
+						Object.entries( variation.elements ?? {} ).forEach(
+							( [ element, elementStyles ] ) => {
+								if ( elementStyles && ELEMENTS[ element ] ) {
+									nodes.push( {
+										styles: elementStyles,
+										selector: scopeSelector(
+											variationSelector,
+											ELEMENTS[ element ]
+										),
+									} );
+								}
+							}
+						);
+					}
+				);
+
 				blockStyles.variations = variations;
 			}
-			if ( blockStyles && blockSelectors?.[ blockName ]?.selector ) {
+
+			if ( blockSelectors?.[ blockName ]?.selector ) {
 				nodes.push( {
 					duotoneSelector:
 						blockSelectors[ blockName ].duotoneSelector,
@@ -843,6 +934,7 @@ export const toStyles = (
 					( [ styleVariationName, styleVariationSelector ] ) => {
 						const styleVariations =
 							styles?.variations?.[ styleVariationName ];
+
 						if ( styleVariations ) {
 							// If the block uses any custom selectors for block support, add those first.
 							if ( featureSelectors ) {
@@ -860,6 +952,7 @@ export const toStyles = (
 													baseSelector,
 													styleVariationSelector
 												);
+
 											const rules =
 												declarations.join( ';' );
 											ruleset += `${ cssSelector }{${ rules };}`;
@@ -876,6 +969,7 @@ export const toStyles = (
 									useRootPaddingAlign,
 									tree
 								);
+
 							if ( styleVariationDeclarations.length ) {
 								ruleset += `${ styleVariationSelector }{${ styleVariationDeclarations.join(
 									';'
@@ -1069,13 +1163,12 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 
 		const blockStyleVariations = getBlockStyles( name );
 		const styleVariationSelectors = {};
-		if ( blockStyleVariations?.length ) {
-			blockStyleVariations.forEach( ( variation ) => {
-				const styleVariationSelector = `.is-style-${ variation.name }${ selector }`;
-				styleVariationSelectors[ variation.name ] =
-					styleVariationSelector;
-			} );
-		}
+
+		blockStyleVariations?.forEach( ( variation ) => {
+			const styleVariationSelector = `.is-style-${ variation.name }${ selector }`;
+			styleVariationSelectors[ variation.name ] = styleVariationSelector;
+		} );
+
 		// For each block support feature add any custom selectors.
 		const featureSelectors = getSelectorsConfig( blockType, selector );
 
@@ -1088,8 +1181,7 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 			hasLayoutSupport,
 			name,
 			selector,
-			styleVariationSelectors: Object.keys( styleVariationSelectors )
-				.length
+			styleVariationSelectors: blockStyleVariations?.length
 				? styleVariationSelectors
 				: undefined,
 		};

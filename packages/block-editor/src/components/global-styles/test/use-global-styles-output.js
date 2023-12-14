@@ -28,6 +28,35 @@ describe( 'global styles renderer', () => {
 						text: 'red',
 					},
 					blocks: {
+						'core/group': {
+							color: {
+								background: 'linen',
+							},
+							variations: {
+								foo: {
+									color: 'aliceblue',
+									blocks: {
+										'core/heading': {
+											typography: {
+												fontSize: '3em',
+											},
+										},
+									},
+									elements: {
+										link: {
+											color: {
+												text: 'darkcyan',
+											},
+											':hover': {
+												color: {
+													text: 'darkturqoise',
+												},
+											},
+										},
+									},
+								},
+							},
+						},
 						'core/heading': {
 							color: {
 								background: 'blue',
@@ -89,6 +118,12 @@ describe( 'global styles renderer', () => {
 				},
 			};
 			const blockSelectors = {
+				'core/group': {
+					selector: '.my-group',
+					styleVariationSelectors: {
+						foo: '.is-style-foo.my-group',
+					},
+				},
 				'core/heading': {
 					selector: '.my-heading1, .my-heading2',
 				},
@@ -128,6 +163,44 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: ELEMENTS.link,
+				},
+				{
+					selector:
+						'.is-style-foo.my-group .my-heading1, .is-style-foo.my-group .my-heading2',
+					styles: {
+						typography: {
+							fontSize: '3em',
+						},
+					},
+				},
+				{
+					selector: '.is-style-foo.my-group a',
+					styles: {
+						color: {
+							text: 'darkcyan',
+						},
+						':hover': {
+							color: {
+								text: 'darkturqoise',
+							},
+						},
+					},
+				},
+				{
+					selector: '.my-group',
+					styles: {
+						color: {
+							background: 'linen',
+						},
+						variations: {
+							foo: {
+								color: 'aliceblue',
+							},
+						},
+					},
+					styleVariationSelectors: {
+						foo: '.is-style-foo.my-group',
+					},
 				},
 				{
 					styles: {
@@ -549,6 +622,44 @@ describe( 'global styles renderer', () => {
 								},
 							},
 						},
+						'core/group': {
+							variations: {
+								bar: {
+									color: {
+										background: 'midnightblue',
+										text: 'lightskyblue',
+									},
+									blocks: {
+										'core/heading': {
+											color: {
+												text: 'royalblue',
+											},
+										},
+										'core/image': {
+											border: {
+												color: 'darkcyan',
+												style: 'dashed',
+												width: '5px',
+											},
+										},
+									},
+									elements: {
+										h2: {
+											color: {
+												text: 'turquoise',
+											},
+										},
+										button: {
+											color: {
+												background: 'midnightblue',
+												text: 'powderblue',
+											},
+											':hover': {},
+										},
+									},
+								},
+							},
+						},
 					},
 				},
 			};
@@ -567,11 +678,21 @@ describe( 'global styles renderer', () => {
 						foo: '.is-style-foo.wp-image',
 					},
 				},
+				'core/group': {
+					selector: '.wp-group',
+					styleVariationSelectors: {
+						bar: '.is-style-bar.wp-group',
+					},
+				},
+				'core/heading': {
+					selector: '.wp-heading',
+				},
 			};
 
 			expect( toStyles( Object.freeze( tree ), blockSelectors ) ).toEqual(
 				'body {margin: 0;}body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }body .is-layout-grid { display:grid; }body .is-layout-grid > * { margin: 0; }' +
 					'.is-style-foo.wp-image.wp-image-spacing{padding-top: 2px;}.is-style-foo.wp-image.wp-image-border-color{border-color: blue;}.is-style-foo.wp-image{color: blue;}' +
+					'.is-style-bar.wp-group .wp-heading{color: royalblue;}.is-style-bar.wp-group .wp-image-border-color{border-color: darkcyan;}.is-style-bar.wp-group .wp-image-border{border-style: dashed;border-width: 5px;}.is-style-bar.wp-group h2{color: turquoise;}.is-style-bar.wp-group .wp-element-button, .is-style-bar.wp-group .wp-block-button__link{color: powderblue;background-color: midnightblue;}.is-style-bar.wp-group{color: lightskyblue;background-color: midnightblue;}' +
 					'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
 			);
 		} );
