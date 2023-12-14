@@ -1,9 +1,33 @@
-( ( { wp } ) => {
-	const { store, navigate } = wp.interactivity;
+/**
+ * WordPress dependencies
+ */
+import { store, navigate, getContext } from '@wordpress/interactivity';
 
-	const html = `
+store( 'directive-context', {
+	state: {
+		get renderContext() {
+			const ctx = getContext();
+			return JSON.stringify( ctx, undefined, 2 );
+		},
+	},
+	actions: {
+		updateContext( event ) {
+			const ctx = getContext();
+			const { name, value } = event.target;
+			const [ key, ...path ] = name.split( '.' ).reverse();
+			const obj = path.reduceRight( ( o, k ) => o[ k ], ctx );
+			obj[ key ] = value;
+		},
+		toggleContextText() {
+			const ctx = getContext();
+			ctx.text = ctx.text === 'Text 1' ? 'Text 2' : 'Text 1';
+		},
+	},
+} );
+
+const html = `
 		<div
-			data-wp-interactive
+			data-wp-interactive='{ "namespace": "directive-context-navigate" }'
 			data-wp-navigation-id="navigation"
 			data-wp-context='{ "text": "second page" }'
 		>
@@ -15,41 +39,26 @@
 			<button data-testid="async navigate" data-wp-on--click="actions.asyncNavigate">Async Navigate</button>
 		</div>`;
 
-	store( {
-		derived: {
-			renderContext: ( { context } ) => {
-				return JSON.stringify( context, undefined, 2 );
-			},
+const { actions } = store( 'directive-context-navigate', {
+	actions: {
+		toggleText() {
+			const ctx = getContext();
+			ctx.text = 'changed dynamically';
 		},
-		actions: {
-			updateContext: ( { context, event } ) => {
-				const { name, value } = event.target;
-				const [ key, ...path ] = name.split( '.' ).reverse();
-				const obj = path.reduceRight( ( o, k ) => o[ k ], context );
-				obj[ key ] = value;
-			},
-			toggleContextText: ( { context } ) => {
-				context.text = context.text === 'Text 1' ? 'Text 2' : 'Text 1';
-			},
-			toggleText: ( { context } ) => {
-				context.text = "changed dynamically";
-			},
-			addNewText: ( { context } ) => {
-				context.newText = 'some new text';
-			},
-			navigate: () => {
-				navigate( window.location, {
-					force: true,
-					html,
-				} );
-			},
-			asyncNavigate: async ({ context }) => {
-				await navigate( window.location, {
-					force: true,
-					html,
-				} );
-				context.newText = 'changed from async action';
-			}
+		addNewText() {
+			const ctx = getContext();
+			ctx.newText = 'some new text';
 		},
-	} );
-} )( window );
+		navigate() {
+			return navigate( window.location, {
+				force: true,
+				html,
+			} );
+		},
+		*asyncNavigate() {
+			yield actions.navigate();
+			const ctx = getContext();
+			ctx.newText = 'changed from async action';
+		},
+	},
+} );

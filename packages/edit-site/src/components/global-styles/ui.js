@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -11,7 +6,6 @@ import {
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalUseNavigator as useNavigator,
 	createSlotFill,
-	Button,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
@@ -24,7 +18,7 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { backup, moreVertical } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
 
@@ -55,6 +49,7 @@ const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
 	createSlotFill( SLOT_FILL_NAME );
 
 function GlobalStylesActionMenu() {
+	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { toggle } = useDispatch( preferencesStore );
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
@@ -69,95 +64,39 @@ function GlobalStylesActionMenu() {
 			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
+	const { setEditorCanvasContainerView } = unlock(
+		useDispatch( editSiteStore )
+	);
 	const { goTo } = useNavigator();
-	const loadCustomCSS = () => goTo( '/css' );
+	const loadCustomCSS = () => {
+		setEditorCanvasContainerView( 'global-styles-css' );
+		goTo( '/css' );
+	};
 
 	return (
 		<GlobalStylesMenuFill>
 			<DropdownMenu icon={ moreVertical } label={ __( 'More' ) }>
 				{ ( { onClose } ) => (
-					<MenuGroup>
-						{ canEditCSS && (
-							<MenuItem onClick={ loadCustomCSS }>
-								{ __( 'Additional CSS' ) }
-							</MenuItem>
-						) }
-						<MenuItem
-							onClick={ () => {
-								toggle(
-									'core/edit-site',
-									'welcomeGuideStyles'
-								);
-								onClose();
-							} }
-						>
-							{ __( 'Welcome Guide' ) }
-						</MenuItem>
-					</MenuGroup>
-				) }
-			</DropdownMenu>
-		</GlobalStylesMenuFill>
-	);
-}
-
-function RevisionsCountBadge( { className, children } ) {
-	return (
-		<span
-			className={ classnames(
-				className,
-				'edit-site-global-styles-sidebar__revisions-count-badge'
-			) }
-		>
-			{ children }
-		</span>
-	);
-}
-function GlobalStylesRevisionsMenu() {
-	const { setIsListViewOpened } = useDispatch( editSiteStore );
-	const { revisionsCount } = useSelect( ( select ) => {
-		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-			select( coreStore );
-
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		const globalStyles = globalStylesId
-			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-			: undefined;
-
-		return {
-			revisionsCount:
-				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0,
-		};
-	}, [] );
-	const [ canReset, onReset ] = useGlobalStylesReset();
-	const { goTo } = useNavigator();
-	const { setEditorCanvasContainerView } = unlock(
-		useDispatch( editSiteStore )
-	);
-	const loadRevisions = () => {
-		setIsListViewOpened( false );
-		goTo( '/revisions' );
-		setEditorCanvasContainerView( 'global-styles-revisions' );
-	};
-	const hasRevisions = revisionsCount > 0;
-
-	return (
-		<GlobalStylesMenuFill>
-			{ canReset || hasRevisions ? (
-				<DropdownMenu icon={ backup } label={ __( 'Revisions' ) }>
-					{ ( { onClose } ) => (
+					<>
 						<MenuGroup>
-							{ hasRevisions && (
-								<MenuItem
-									onClick={ loadRevisions }
-									icon={
-										<RevisionsCountBadge>
-											{ revisionsCount }
-										</RevisionsCountBadge>
-									}
-								>
-									{ __( 'Revision history' ) }
+							{ canEditCSS && (
+								<MenuItem onClick={ loadCustomCSS }>
+									{ __( 'Additional CSS' ) }
 								</MenuItem>
 							) }
+							<MenuItem
+								onClick={ () => {
+									toggle(
+										'core/edit-site',
+										'welcomeGuideStyles'
+									);
+									onClose();
+								} }
+							>
+								{ __( 'Welcome Guide' ) }
+							</MenuItem>
+						</MenuGroup>
+						<MenuGroup>
 							<MenuItem
 								onClick={ () => {
 									onReset();
@@ -165,19 +104,12 @@ function GlobalStylesRevisionsMenu() {
 								} }
 								disabled={ ! canReset }
 							>
-								{ __( 'Reset to defaults' ) }
+								{ __( 'Reset styles' ) }
 							</MenuItem>
 						</MenuGroup>
-					) }
-				</DropdownMenu>
-			) : (
-				<Button
-					label={ __( 'Revisions' ) }
-					icon={ backup }
-					disabled
-					__experimentalIsFocusable
-				/>
-			) }
+					</>
+				) }
+			</DropdownMenu>
 		</GlobalStylesMenuFill>
 	);
 }
@@ -418,7 +350,6 @@ function GlobalStylesUI() {
 				<GlobalStylesStyleBook />
 			) }
 
-			<GlobalStylesRevisionsMenu />
 			<GlobalStylesActionMenu />
 			<GlobalStylesBlockLink />
 			<GlobalStylesEditorCanvasContainerLink />

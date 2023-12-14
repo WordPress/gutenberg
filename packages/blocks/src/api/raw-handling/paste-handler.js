@@ -33,10 +33,7 @@ import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
 
-/**
- * Browser dependencies
- */
-const { console } = window;
+const log = ( ...args ) => window?.console?.log?.( ...args );
 
 /**
  * Filters HTML to only contain phrasing content.
@@ -60,7 +57,7 @@ function filterInlineHTML( HTML ) {
 	HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
 
 	// Allows us to ask for this information when we get a report.
-	console.log( 'Processed inline HTML:\n\n', HTML );
+	log( 'Processed inline HTML:\n\n', HTML );
 
 	return HTML;
 }
@@ -214,7 +211,7 @@ export function pasteHandler( {
 			);
 
 			// Allows us to ask for this information when we get a report.
-			console.log( 'Processed HTML piece:\n\n', piece );
+			log( 'Processed HTML piece:\n\n', piece );
 
 			return htmlToBlocks( piece, pasteHandler );
 		} )

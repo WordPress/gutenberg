@@ -7,32 +7,27 @@
 	}
 
 	.patterns-menu-items__convert-modal-categories {
-		width: 100%;
 		position: relative;
-		min-height: 40px;
 	}
-	.components-form-token-field__suggestions-list {
+
+	.components-form-token-field__suggestions-list:not(:empty) {
 		position: absolute;
+		border: $border-width solid var(--wp-admin-theme-color);
+		border-bottom-left-radius: $radius-block-ui;
+		border-bottom-right-radius: $radius-block-ui;
+		box-shadow: 0 0 0.5px 0.5px var(--wp-admin-theme-color);
 		box-sizing: border-box;
 		z-index: 1;
 		background-color: $white;
-		// Account for the border width of the token field.
-		width: calc(100% + 2px);
+		width: calc(100% + 2px); // Account for the border width of the token field.
 		left: -1px;
 		min-width: initial;
-		border: 1px solid var(--wp-admin-theme-color);
-		border-top: none;
-		box-shadow: 0 0 0 0.5px var(--wp-admin-theme-color);
-		border-bottom-left-radius: 2px;
-		border-bottom-right-radius: 2px;
+		max-height: $grid-unit-60 * 2; // Adjust to not cover the save button, showing three items.
 	}
 }
 
 .patterns-create-modal__name-input input[type="text"] {
-	// Match the minimal height of the category selector.
-	min-height: 40px;
-	// Override the default 1px margin-x.
-	margin: 0;
+	margin: 0; // Override the default 1px margin-x.
 }
 
 .patterns-rename-pattern-category-modal__validation-message {

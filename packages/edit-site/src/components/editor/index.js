@@ -8,10 +8,11 @@ import classnames from 'classnames';
  */
 import { useSelect } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockBreadcrumb,
+	BlockToolbar,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 	BlockInspector,
@@ -25,10 +26,10 @@ import {
 	EditorNotices,
 	EditorSnackbars,
 	privateApis as editorPrivateApis,
+	store as editorStore,
 } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -92,19 +93,20 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 
 	const { type: editedPostType } = editedPost;
 
+	const isLargeViewport = useViewportMatch( 'medium' );
+
 	const {
 		context,
 		contextPost,
 		editorMode,
 		canvasMode,
+		renderingMode,
 		blockEditorMode,
 		isRightSidebarOpen,
 		isInserterOpen,
 		isListViewOpen,
 		showIconLabels,
 		showBlockBreadcrumbs,
-		hasPageContentFocus,
-		pageContentFocusType,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostContext,
@@ -112,12 +114,11 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 			getCanvasMode,
 			isInserterOpened,
 			isListViewOpened,
-			hasPageContentFocus: _hasPageContentFocus,
-			getPageContentFocusType,
 		} = unlock( select( editSiteStore ) );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getEntityRecord } = select( coreDataStore );
+		const { getRenderingMode } = select( editorStore );
 		const _context = getEditedPostContext();
 
 		// The currently selected entity to display.
@@ -133,6 +134,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 				: undefined,
 			editorMode: getEditorMode(),
 			canvasMode: getCanvasMode(),
+			renderingMode: getRenderingMode(),
 			blockEditorMode: __unstableGetEditorMode(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
@@ -147,8 +149,6 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 				'core/edit-site',
 				'showBlockBreadcrumbs'
 			),
-			hasPageContentFocus: _hasPageContentFocus(),
-			pageContentFocusType: getPageContentFocusType(),
 		};
 	}, [] );
 
@@ -165,13 +165,13 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 	const secondarySidebarLabel = isListViewOpen
 		? __( 'List View' )
 		: __( 'Block Library' );
-	const postWithTemplate = context?.postId;
+	const postWithTemplate = !! context?.postId;
 
 	let title;
 	if ( hasLoadedPost ) {
 		title = sprintf(
-			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
-			__( '%1$s ‹ %2$s ‹ Editor' ),
+			// translators: A breadcrumb trail for the Admin document title. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
+			__( '%1$s ‹ %2$s' ),
 			getTitle(),
 			POST_TYPE_LABELS[ editedPostType ] ??
 				POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ]
@@ -192,31 +192,6 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		! isLoading &&
 		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
 			( ! postWithTemplate && !! editedPost ) );
-	const mode = useMemo( () => {
-		if ( isViewMode ) {
-			return postWithTemplate ? 'template-locked' : 'all';
-		}
-
-		if ( isEditMode && pageContentFocusType === 'hideTemplate' ) {
-			return 'post-only';
-		}
-
-		if ( postWithTemplate && hasPageContentFocus ) {
-			return 'template-locked';
-		}
-
-		if ( postWithTemplate && ! hasPageContentFocus ) {
-			return 'template-only';
-		}
-
-		return 'all';
-	}, [
-		isViewMode,
-		isEditMode,
-		postWithTemplate,
-		pageContentFocusType,
-		hasPageContentFocus,
-	] );
 
 	return (
 		<>
@@ -237,7 +212,6 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 					}
 					settings={ settings }
 					useSubRegistry={ false }
-					mode={ mode }
 				>
 					<SidebarComplementaryAreaFills />
 					{ isEditMode && <StartTemplateOptions /> }
@@ -261,6 +235,9 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 										<SidebarInspectorFill>
 											<BlockInspector />
 										</SidebarInspectorFill>
+										{ ! isLargeViewport && (
+											<BlockToolbar hideDragHandle />
+										) }
 										<SiteEditorCanvas />
 										<BlockRemovalWarningModal
 											rules={ blockRemovalRules }
@@ -298,7 +275,8 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 							shouldShowBlockBreadcrumbs && (
 								<BlockBreadcrumb
 									rootLabelText={
-										hasPageContentFocus
+										postWithTemplate &&
+										renderingMode !== 'template-only'
 											? __( 'Page' )
 											: __( 'Template' )
 									}

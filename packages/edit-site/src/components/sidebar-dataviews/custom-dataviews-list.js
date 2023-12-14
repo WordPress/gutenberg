@@ -116,10 +116,12 @@ function CustomDataViewItem( { dataviewId, isActive } ) {
 					<DropdownMenu
 						icon={ moreVertical }
 						label={ __( 'Actions' ) }
+						className="edit-site-sidebar-dataviews-dataview-item__dropdown-menu"
 						toggleProps={ {
 							style: {
 								color: 'inherit',
 							},
+							size: 'small',
 						} }
 					>
 						{ ( { onClose } ) => (

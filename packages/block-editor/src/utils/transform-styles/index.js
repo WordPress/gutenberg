@@ -19,6 +19,14 @@ import rebaseUrl from 'postcss-urlrebase';
  */
 const transformStyles = ( styles, wrapperSelector = '' ) => {
 	return styles.map( ( { css, ignoredSelectors = [], baseURL } ) => {
+		// When there is no wrapper selector or base URL, there is no need
+		// to transform the CSS. This is most cases because in the default
+		// iframed editor, no wrapping is needed, and not many styles
+		// provide a base URL.
+		if ( ! wrapperSelector && ! baseURL ) {
+			return css;
+		}
+
 		try {
 			return postcss(
 				[

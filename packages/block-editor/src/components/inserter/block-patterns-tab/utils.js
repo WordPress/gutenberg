@@ -21,7 +21,7 @@ export const SYNC_TYPES = {
 
 export const allPatternsCategory = {
 	name: 'allPatterns',
-	label: __( 'All patterns' ),
+	label: __( 'All' ),
 };
 
 export const myPatternsCategory = {

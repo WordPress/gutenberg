@@ -1,8 +1,12 @@
 /**
+ * External dependencies
+ */
+import { paramCase as kebabCase } from 'change-case';
+
+/**
  * Internal dependencies
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
-import { formatFontFamily } from './preview-styles';
 
 export function setUIValuesNeeded( font, extraValues = {} ) {
 	if ( ! font.name && ( font.fontFamily || font.slug ) ) {
@@ -85,14 +89,10 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 	}
 
 	// eslint-disable-next-line no-undef
-	const newFont = new FontFace(
-		formatFontFamily( fontFace.fontFamily ),
-		dataSource,
-		{
-			style: fontFace.fontStyle,
-			weight: fontFace.fontWeight,
-		}
-	);
+	const newFont = new FontFace( fontFace.fontFamily, dataSource, {
+		style: fontFace.fontStyle,
+		weight: fontFace.fontWeight,
+	} );
 
 	const loadedFace = await newFont.load();
 
@@ -129,9 +129,20 @@ export function getDisplaySrcFromFontFace( input, urlPrefix ) {
 	return src;
 }
 
+// This function replicates one behavior of _wp_to_kebab_case().
+// Additional context: https://github.com/WordPress/gutenberg/issues/53695
+export function wpKebabCase( str ) {
+	// If a string contains a digit followed by a number, insert a dash between them.
+	return kebabCase( str ).replace(
+		/([a-zA-Z])(\d)|(\d)([a-zA-Z])/g,
+		'$1$3-$2$4'
+	);
+}
+
 export function makeFormDataFromFontFamilies( fontFamilies ) {
 	const formData = new FormData();
 	const newFontFamilies = fontFamilies.map( ( family, familyIndex ) => {
+		family.slug = wpKebabCase( family.slug );
 		if ( family?.fontFace ) {
 			family.fontFace = family.fontFace.map( ( face, faceIndex ) => {
 				if ( face.file ) {

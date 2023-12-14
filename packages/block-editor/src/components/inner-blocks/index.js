@@ -33,6 +33,15 @@ import { useSettings } from '../use-settings';
 
 const EMPTY_OBJECT = {};
 
+function BlockContext( { children, clientId } ) {
+	const context = useBlockContext( clientId );
+	return (
+		<BlockContextProvider value={ context }>
+			{ children }
+		</BlockContextProvider>
+	);
+}
+
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
  * as children. The UncontrolledInnerBlocks component is used whenever the inner
@@ -60,10 +69,15 @@ function UncontrolledInnerBlocks( props ) {
 		orientation,
 		placeholder,
 		layout,
+		name,
+		blockType,
+		innerBlocks,
+		parentLock,
 	} = props;
 
 	useNestedSettingsUpdate(
 		clientId,
+		parentLock,
 		allowedBlocks,
 		prioritizedInserterBlocks,
 		defaultBlock,
@@ -78,17 +92,10 @@ function UncontrolledInnerBlocks( props ) {
 
 	useInnerBlockTemplateSync(
 		clientId,
+		innerBlocks,
 		template,
 		templateLock,
 		templateInsertUpdatesSelection
-	);
-
-	const context = useBlockContext( clientId );
-	const name = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).getBlock( clientId )?.name;
-		},
-		[ clientId ]
 	);
 
 	const defaultLayoutBlockSupport =
@@ -114,20 +121,22 @@ function UncontrolledInnerBlocks( props ) {
 		[ defaultLayout, usedLayout, allowSizingOnChildren ]
 	);
 
-	// This component needs to always be synchronous as it's the one changing
-	// the async mode depending on the block selection.
-	return (
-		<BlockContextProvider value={ context }>
-			<BlockListItems
-				rootClientId={ clientId }
-				renderAppender={ renderAppender }
-				__experimentalAppenderTagName={ __experimentalAppenderTagName }
-				layout={ memoedLayout }
-				wrapperRef={ wrapperRef }
-				placeholder={ placeholder }
-			/>
-		</BlockContextProvider>
+	const items = (
+		<BlockListItems
+			rootClientId={ clientId }
+			renderAppender={ renderAppender }
+			__experimentalAppenderTagName={ __experimentalAppenderTagName }
+			layout={ memoedLayout }
+			wrapperRef={ wrapperRef }
+			placeholder={ placeholder }
+		/>
 	);
+
+	if ( Object.keys( blockType.providesContext ).length === 0 ) {
+		return items;
+	}
+
+	return <BlockContext clientId={ clientId }>{ items }</BlockContext>;
 }
 
 /**
@@ -180,7 +189,16 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		__unstableLayoutClassNames: layoutClassNames = '',
 	} = useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
-	const { __experimentalCaptureToolbars, hasOverlay } = useSelect(
+	const {
+		__experimentalCaptureToolbars,
+		hasOverlay,
+		name,
+		blockType,
+		innerBlocks,
+		parentLock,
+		parentClientId,
+		isDropZoneDisabled,
+	} = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
 				return {};
@@ -191,14 +209,21 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				isBlockSelected,
 				hasSelectedInnerBlock,
 				__unstableGetEditorMode,
+				getBlocks,
+				getTemplateLock,
+				getBlockRootClientId,
+				__unstableIsWithinBlockOverlay,
+				__unstableHasActiveBlockOverlayActive,
+				getBlockEditingMode,
 			} = select( blockEditorStore );
+			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const enableClickThrough =
 				__unstableGetEditorMode() === 'navigation' || isSmallScreen;
+			const blockEditingMode = getBlockEditingMode( clientId );
+			const _parentClientId = getBlockRootClientId( clientId );
 			return {
-				__experimentalCaptureToolbars: select(
-					blocksStore
-				).hasBlockSupport(
+				__experimentalCaptureToolbars: hasBlockSupport(
 					blockName,
 					'__experimentalExposeControlsToChildren',
 					false
@@ -208,6 +233,15 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 					! isBlockSelected( clientId ) &&
 					! hasSelectedInnerBlock( clientId, true ) &&
 					enableClickThrough,
+				name: blockName,
+				blockType: getBlockType( blockName ),
+				innerBlocks: getBlocks( clientId ),
+				parentLock: getTemplateLock( _parentClientId ),
+				parentClientId: _parentClientId,
+				isDropZoneDisabled:
+					blockEditingMode !== 'default' ||
+					__unstableHasActiveBlockOverlayActive( clientId ) ||
+					__unstableIsWithinBlockOverlay( clientId ),
 			};
 		},
 		[ clientId, isSmallScreen ]
@@ -216,6 +250,8 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	const blockDropZoneRef = useBlockDropZone( {
 		dropZoneElement,
 		rootClientId: clientId,
+		parentClientId,
+		isDisabled: isDropZoneDisabled,
 	} );
 
 	const ref = useMergeRefs( [
@@ -226,6 +262,10 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	const innerBlocksProps = {
 		__experimentalCaptureToolbars,
 		layout,
+		name,
+		blockType,
+		innerBlocks,
+		parentLock,
 		...options,
 	};
 	const InnerBlocks =

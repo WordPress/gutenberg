@@ -284,9 +284,9 @@ Event handler called when the checked radio menu item changes.
 
 - Required: no
 
-### `DropdownMenuGroup`
+### `DropdownMenuItemLabel`
 
-Used to group menu items.
+Used to render the menu item's label.
 
 #### Props
 
@@ -294,13 +294,27 @@ The component accepts the following props:
 
 ##### `children`: `React.ReactNode`
 
-The contents of the group.
+The label contents.
 
 - Required: yes
 
-### `DropdownMenuGroupLabel`
+### `DropdownMenuItemHelpText`
 
-Used to render a group label.
+Used to render the menu item's help text.
+
+#### Props
+
+The component accepts the following props:
+
+##### `children`: `React.ReactNode`
+
+The help text contents.
+
+- Required: yes
+
+### `DropdownMenuGroup`
+
+Used to group menu items.
 
 #### Props
 

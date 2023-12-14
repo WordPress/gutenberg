@@ -210,6 +210,9 @@ final class WP_Style_Engine {
 				'property_keys' => array(
 					'default' => 'font-size',
 				),
+				'css_vars'      => array(
+					'font-size' => '--wp--preset--font-size--$slug',
+				),
 				'path'          => array( 'typography', 'fontSize' ),
 				'classnames'    => array(
 					'has-$slug-font-size' => 'font-size',
@@ -218,6 +221,9 @@ final class WP_Style_Engine {
 			'fontFamily'     => array(
 				'property_keys' => array(
 					'default' => 'font-family',
+				),
+				'css_vars'      => array(
+					'font-family' => '--wp--preset--font-family--$slug',
 				),
 				'path'          => array( 'typography', 'fontFamily' ),
 				'classnames'    => array(
