@@ -26,12 +26,12 @@ import ItemActions from './item-actions';
 import { ENUMERATION_TYPE, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
 
 const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
-	DropdownSubMenuV2: DropdownSubMenu,
-	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
+	DropdownMenuV2Ariakit: DropdownMenu,
+	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
+	DropdownMenuItemV2Ariakit: DropdownMenuItem,
+	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
+	DropdownSubMenuV2Ariakit: DropdownSubMenu,
+	DropdownSubMenuTriggerV2Ariakit: DropdownSubMenuTrigger,
 } = unlock( componentsPrivateApis );
 
 const sortingItemsInfo = {
