@@ -28,9 +28,7 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { getBlockSupport, parse } from '@wordpress/blocks';
-import { store as editorStore } from '@wordpress/editor';
 import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
-import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -145,12 +143,7 @@ function setBlockEditMode( setEditMode, blocks ) {
 	} );
 }
 
-function editSourcePattern(
-	setRenderingMode,
-	patternId,
-	createSuccessNotice,
-	defaultRenderingMode
-) {
+function editSourcePattern( editInPatternOnlyMode, patternId ) {
 	const currentArgs = getQueryArgs( window.location.href );
 	const currentUrlWithoutArgs = removeQueryArgs(
 		window.location.href,
@@ -161,21 +154,7 @@ function editSourcePattern(
 		patternId,
 	} );
 	window.history.pushState( null, '', newUrl );
-	setRenderingMode( 'pattern-only' );
-	createSuccessNotice(
-		__(
-			'Editing source pattern. Changes made here affect all posts and pages that use this pattern. Changes will not show in the post/page editor until you save the pattern.'
-		),
-		{
-			type: 'snackbar',
-			actions: [
-				{
-					label: __( 'Go back' ),
-					onClick: () => setRenderingMode( defaultRenderingMode ),
-				},
-			],
-		}
-	);
+	editInPatternOnlyMode();
 }
 
 export default function ReusableBlockEdit( {
@@ -183,8 +162,8 @@ export default function ReusableBlockEdit( {
 	attributes: { ref, overrides },
 	__unstableParentLayout: parentLayout,
 	clientId: patternClientId,
+	editInPatternOnlyMode,
 } ) {
-	const { setRenderingMode } = useDispatch( editorStore );
 	const registry = useRegistry();
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, hasResolved } = useEntityRecord(
@@ -200,29 +179,20 @@ export default function ReusableBlockEdit( {
 		__unstableMarkNextChangeAsNotPersistent,
 		setBlockEditingMode,
 	} = useDispatch( blockEditorStore );
-	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const {
-		innerBlocks,
-		userCanEdit,
-		getBlockEditingMode,
-		defaultRenderingMode,
-	} = useSelect(
+	const { innerBlocks, userCanEdit, getBlockEditingMode } = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
 			const { getBlocks, getBlockEditingMode: editingMode } =
 				select( blockEditorStore );
-			const { getEditorSettings } = select( editorStore );
 			const blocks = getBlocks( patternClientId );
 			const canEdit = canUser( 'update', 'blocks', ref );
-			const defaultRenderMode = getEditorSettings().defaultRenderingMode;
 
 			// For editing link to the site editor if the theme and user permissions support it.
 			return {
 				innerBlocks: blocks,
 				userCanEdit: canEdit,
 				getBlockEditingMode: editingMode,
-				defaultRenderingMode: defaultRenderMode,
 			};
 		},
 		[ patternClientId, ref ]
@@ -334,17 +304,12 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			{ userCanEdit && (
+			{ userCanEdit && editInPatternOnlyMode && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ () =>
-								editSourcePattern(
-									setRenderingMode,
-									ref,
-									createSuccessNotice,
-									defaultRenderingMode
-								)
+								editSourcePattern( editInPatternOnlyMode, ref )
 							}
 						>
 							{ __( 'Edit' ) }
