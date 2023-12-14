@@ -9,7 +9,7 @@ import {
 import './compat';
 import align from './align';
 import anchor from './anchor';
-import './custom-class-name';
+import customClassName from './custom-class-name';
 import './generated-class-name';
 import style from './style';
 import color from './color';
@@ -18,7 +18,14 @@ import './layout';
 
 createBlockEditFilter( [ align, anchor, style ] );
 createBlockListBlockFilter( [ align, style, color, fontSize ] );
-createBlockSaveFilter( [ align, anchor, color, style, fontSize ] );
+createBlockSaveFilter( [
+	align,
+	anchor,
+	customClassName,
+	color,
+	style,
+	fontSize,
+] );
 
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';
