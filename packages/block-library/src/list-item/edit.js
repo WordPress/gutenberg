@@ -6,6 +6,7 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	BlockControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { isRTL, __ } from '@wordpress/i18n';
 import { ToolbarButton } from '@wordpress/components';
@@ -16,6 +17,7 @@ import {
 	formatIndent,
 } from '@wordpress/icons';
 import { useMergeRefs } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -32,8 +34,24 @@ import {
 import { convertToListItems } from './utils';
 
 export function IndentUI( { clientId } ) {
-	const [ canIndent, indentListItem ] = useIndentListItem( clientId );
-	const [ canOutdent, outdentListItem ] = useOutdentListItem( clientId );
+	const indentListItem = useIndentListItem( clientId );
+	const outdentListItem = useOutdentListItem( clientId );
+	const canIndent = useSelect(
+		( select ) => select( blockEditorStore ).getBlockIndex( clientId ) > 0,
+		[ clientId ]
+	);
+	const canOutdent = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, getBlockName } =
+				select( blockEditorStore );
+			return (
+				getBlockName(
+					getBlockRootClientId( getBlockRootClientId( clientId ) )
+				) === 'core/list-item'
+			);
+		},
+		[ clientId ]
+	);
 
 	return (
 		<>
