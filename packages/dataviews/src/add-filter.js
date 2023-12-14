@@ -85,7 +85,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 								trigger={
 									<DropdownMenuItem
 										suffix={
-											<>
+											<span aria-hidden="true">
 												{ activeElement &&
 													activeOperator ===
 														OPERATOR_IN &&
@@ -96,7 +96,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 													__( 'Is not' ) }
 												{ activeElement && ' ' }
 												{ activeElement?.label }
-											</>
+											</span>
 										}
 									>
 										<DropdownMenuItemLabel>
@@ -154,16 +154,14 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 											trigger={
 												<DropdownMenuItem
 													suffix={
-														<>
+														<span aria-hidden="true">
 															{ activeOperator ===
 																OPERATOR_IN &&
 																__( 'Is' ) }
 															{ activeOperator ===
 																OPERATOR_NOT_IN &&
-																__(
-																	'Is not'
-																) }{ ' ' }
-														</>
+																__( 'Is not' ) }
+														</span>
 													}
 												>
 													<DropdownMenuItemLabel>
