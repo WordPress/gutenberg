@@ -111,7 +111,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 										suffix={
 											isActive && <Icon icon={ check } />
 										}
-										onSelect={ ( event ) => {
+										onClick={ ( event ) => {
 											event.preventDefault();
 											onChangeView( {
 												...view,
@@ -134,7 +134,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 						role="menuitemradio"
 						aria-checked={ false }
 						prefix={ <Icon icon={ unseen } /> }
-						onSelect={ ( event ) => {
+						onClick={ ( event ) => {
 							event.preventDefault();
 							onChangeView( {
 								...view,
@@ -190,7 +190,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 														<Icon icon={ check } />
 													)
 												}
-												onSelect={ () => {
+												onClick={ () => {
 													onChangeView( {
 														...view,
 														page: 1,
@@ -249,7 +249,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 													<Icon icon={ check } />
 												)
 											}
-											onSelect={ () =>
+											onClick={ () =>
 												onChangeView( {
 													...view,
 													page: 1,
@@ -280,7 +280,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 													<Icon icon={ check } />
 												)
 											}
-											onSelect={ () =>
+											onClick={ () =>
 												onChangeView( {
 													...view,
 													page: 1,
