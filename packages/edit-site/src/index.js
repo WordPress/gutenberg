@@ -52,6 +52,7 @@ export function initializeEditor( id, settings ) {
 	// We dispatch actions and update the store synchronously before rendering
 	// so that we won't trigger unnecessary re-renders with useEffect.
 	dispatch( preferencesStore ).setDefaults( 'core/edit-site', {
+		allowRightClickOverrides: true,
 		editorMode: 'visual',
 		fixedToolbar: false,
 		focusMode: false,
