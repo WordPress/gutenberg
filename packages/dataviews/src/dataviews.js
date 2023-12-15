@@ -68,12 +68,14 @@ export default function DataViews( {
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
-					<ViewActions
-						fields={ fields }
-						view={ view }
-						onChangeView={ onChangeView }
-						supportedLayouts={ supportedLayouts }
-					/>
+					{ window?.__experimentalAdminViews && (
+						<ViewActions
+							fields={ fields }
+							view={ view }
+							onChangeView={ onChangeView }
+							supportedLayouts={ supportedLayouts }
+						/>
+					) }
 				</HStack>
 				<ViewComponent
 					fields={ _fields }
