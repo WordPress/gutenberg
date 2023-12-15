@@ -232,6 +232,63 @@ class Tests_Fonts_Font_Family_Controller_update_item extends WP_REST_Font_Librar
 					)
 				),
 			),
+			'Remove a Font Face from Font Family' => array(
+				'request' => array(
+					'data' => array(
+						'slug'      => 'slug',
+						'name'        => 'Name',
+						'fontFamily' => 'Family',
+						'fontFace' => array(
+							array(
+								'fontFamily'      => 'Family',
+								'fontStyle'       => 'normal',
+								'fontWeight'      => '400',
+								'preview'	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-normal.svg',
+								'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
+							),
+							array(
+								'fontFamily'      => 'Family',
+								'fontStyle'       => 'italic',
+								'fontWeight'      => '400',
+								'preview' 	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-italic.svg',
+								'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf',
+							),
+						),
+					)
+				),
+				'update' => array(
+					'data' => array(
+						'slug'      => 'slug',
+						'name'        => 'New Name',
+						'fontFamily' => 'Family',
+						'fontFace' => array(
+							array(
+								'fontFamily'      => 'Family',
+								'fontStyle'       => 'normal',
+								'fontWeight'      => '400',
+								'preview'	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-normal.svg',
+								'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
+							),
+						),
+					)
+				),
+				'expected_response' => array(
+					'data' => array(
+						'slug'      => 'slug',
+						'name'        => 'New Name',
+						'fontFamily' => 'Family',
+						'fontFace' => array(
+							array(
+								'fontFamily'      => 'Family',
+								'fontStyle'       => 'normal',
+								'fontWeight'      => '400',
+								'preview'	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-normal.svg',
+								'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
+							),
+						),
+					)
+				),
+			),
 		);
 	}
 }
