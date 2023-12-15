@@ -26,6 +26,7 @@ function gutenberg_init_font_library_routes() {
 		'_builtin'     => true,  /* internal use only. don't use this when registering your own post type. */
 		'label'        => 'Font Library',
 		'show_in_rest' => true,
+		'rest_base'    => 'font-families',
 	);
 	register_post_type( 'wp_font_family', $args );
 
@@ -36,6 +37,30 @@ function gutenberg_init_font_library_routes() {
 
 add_action( 'rest_api_init', 'gutenberg_init_font_library_routes' );
 
+/**
+ * Removes some default endpoints for the Font Library added when registering the wp_font_family post type.
+ *
+ * @core-merge: This code needs to be removed after the Font Library API redesign.
+ *
+ * @param array $endpoints The default endpoints.
+ * @return array The modified endpoints.
+ */
+function remove_font_families_default_endpoints( $endpoints ) {
+	unset( $endpoints['/wp/v2/font-families/(?P<id>[\d]+)'] );
+	unset( $endpoints['/wp/v2/font-families/(?P<id>[\d]+)/autosaves'] );
+	unset( $endpoints['/wp/v2/font-families/(?P<parent>[\d]+)/autosaves/(?P<id>[\d]+)'] );
+
+	// Removes the default POST endpoint for the wp_font_family post type to use just the custom one.
+	foreach ( $endpoints['/wp/v2/font-families'] as $endpoint => $details ) {
+		if ( ! isset( $details['args']['font_families'] ) && isset( $details['methods'] ) && $details['methods'] === 'POST' ) {
+			unset( $endpoints['/wp/v2/font-families'][ $endpoint ] );
+		}
+	}
+
+	return $endpoints;
+}
+
+add_filter( 'rest_endpoints', 'remove_font_families_default_endpoints' );
 
 if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	/**
