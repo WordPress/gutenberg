@@ -164,14 +164,14 @@ export const blur = debounce( ( element ) => {
 /**
  * Unfocuses the specified element in case it's about to be unmounted.
  *
- * On iOS text inputs are automatically unfocused and keyboard dimissed when they
+ * On iOS text inputs are automatically unfocused and keyboard dismissed when they
  * are removed. However, this is not the case on Android, where text inputs are
  * unfocused but the keyboard remains open.
  *
- * For dismissing the keyboard we use debounce to avoid conflicts with the focus
+ * For dismissing the keyboard, we use debounce to avoid conflicts with the focus
  * event when both are triggered at the same time.
  *
- * Note that we can't trigger the blur event as it's likely that the Aztec view is no
+ * Note that we can't trigger the blur event, as it's likely that the Aztec view is no
  * longer available when the event is executed and will produce an exception.
  *
  * @param {RefObject} element Element to be unfocused.
