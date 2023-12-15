@@ -44,6 +44,7 @@ function Store( registry, suspense ) {
 	let lastIsAsync;
 	let subscriber;
 	let didWarnUnstableReference;
+	let storeStatesOnMount;
 
 	const createSubscriber = ( stores ) => {
 		// The set of stores the `subscribe` function is supposed to subscribe to. Here it is
@@ -61,13 +62,16 @@ function Store( registry, suspense ) {
 			// in the interval between the `getValue` call during render and creating
 			// the subscription, which is slightly delayed. We need to ensure that this
 			// second `getValue` call will compute a fresh value.
-
-			// Why? React subscribes after the component has rendered, and the
-			// by that time we already have a value. Marking it invalid means
-			// all selectors mappings have to be run at render, and right after
-			// render. Let's see what tests are failing.
-
-			// lastMapResultValid = false;
+			lastMapResultValid =
+				activeStores.length === storeStatesOnMount.length &&
+				activeStores.every(
+					( storeName, index ) =>
+						storeStatesOnMount[ index ] ===
+						// To do: figure out why it's sometimes not available in
+						// unit tests.
+						registry.stores[ storeName ]?.store?.getState?.()
+				);
+			storeStatesOnMount = null;
 
 			const onStoreChange = () => {
 				// Invalidate the value on store update, so that a fresh value is computed.
@@ -155,6 +159,9 @@ function Store( registry, suspense ) {
 			}
 
 			if ( ! subscriber ) {
+				storeStatesOnMount = listeningStores.current.map( ( name ) =>
+					registry.stores[ name ]?.store?.getState?.()
+				);
 				subscriber = createSubscriber( listeningStores.current );
 			} else {
 				subscriber.updateStores( listeningStores.current );
@@ -187,18 +194,8 @@ function Store( registry, suspense ) {
 
 		lastIsAsync = isAsync;
 
-		// Check if the store changed between the `updateValue` call above and
-		// the actual `subscribe` call.
-		const cleanup = subscriber.subscribe( () => {
-			lastMapResultValid = false;
-		} );
-		const subscribe = ( _listener ) => {
-			cleanup();
-			return subscriber.subscribe( _listener );
-		};
-
 		// Return a pair of functions that can be passed to `useSyncExternalStore`.
-		return { subscribe, getValue };
+		return { subscribe: subscriber.subscribe, getValue };
 	};
 }
 
