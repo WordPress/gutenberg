@@ -213,7 +213,7 @@ public protocol GutenbergBridgeDelegate: AnyObject {
     /// - Parameter path: The path to perform the request.
     /// - Parameter completion: Completion handler to be called with the result or an error.
     func gutenbergDidGetRequestFetch(path: String, completion: @escaping (Swift.Result<Any, NSError>) -> Void)
-    
+
     /// Tells the delegate that the editor needs to perform a POST request.
     /// The paths given to perform the request are from the WP ORG REST API.
     /// https://developer.wordpress.org/rest-api/reference/
@@ -279,9 +279,9 @@ public protocol GutenbergBridgeDelegate: AnyObject {
 
     /// Tells the delegate the editor requested sending an event
     func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any])
-    
+
     func gutenbergDidRequestToggleUndoButton(_ isDisabled: Bool)
-    
+
     func gutenbergDidRequestToggleRedoButton(_ isDisabled: Bool)
 
     func gutenbergDidRequestConnectionStatus() -> Bool

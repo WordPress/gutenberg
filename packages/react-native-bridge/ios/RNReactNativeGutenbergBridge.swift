@@ -256,7 +256,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             }
         })
     }
-    
+
     @objc
     func postRequest(_ path: String, data: [String: AnyObject]?, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
         self.delegate?.gutenbergDidPostRequestFetch(path: path, data: data, completion: { (result) in
@@ -411,12 +411,12 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     func generateHapticFeedback() {
         UISelectionFeedbackGenerator().selectionChanged()
     }
-    
+
     @objc
     func toggleUndoButton(_ isDisabled: Bool) {
         self.delegate?.gutenbergDidRequestToggleUndoButton(isDisabled)
     }
-    
+
     @objc
     func toggleRedoButton(_ isDisabled: Bool) {
         self.delegate?.gutenbergDidRequestToggleRedoButton(isDisabled)
