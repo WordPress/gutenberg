@@ -45,7 +45,9 @@ The [`render`](https://developer.wordpress.org/block-editor/reference-guides/blo
 
 ## Using `attributes` to store block data
 
-If the user changes a block, we need a way to persist these changes so they can be loaded and used by the block at a later time. To achieve this, the state of a block is maintained through `attributes` which content is stored in the DB and retrieved when needed. When registering a new block type, the `attributes` property of `block.json` describes the types of data included in the `attributes` object, and how they're stored in the DB so they can be read and passed to the `edit` and `save` functions.
+Block [attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#attributes) are settings or data assigned to blocks. They determine various aspects of a block, such as its content, layout, style, and other specific characteristics. If the user changes a block, such as modifying the font size, you need a way to persist these changes. Attributes are the solution. 
+
+When registering a new block type, the `attributes` property of `block.json` describes the custom settings that the block requires and how they're stored in the database. This allows the Editor to parse the attributes correctly and pass them to the block's `Edit` and `save` functions.
 
 Simply put, the [`attributes` property](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#attributes) allows a block to declare "variables" that store data or content for the block.
 
