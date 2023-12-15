@@ -8,7 +8,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import PagePatterns from '../page-patterns';
 import PageTemplateParts from '../page-template-parts';
-import DataviewsTemplates from '../page-templates/dataviews-templates';
+import PageTemplates from '../page-templates';
 import PagePages from '../page-pages';
 import { unlock } from '../../lock-unlock';
 
@@ -20,7 +20,7 @@ export default function PageMain() {
 	} = useLocation();
 
 	if ( path === '/wp_template/all' ) {
-		return <DataviewsTemplates />;
+		return <PageTemplates />;
 	} else if ( path === '/wp_template_part/all' ) {
 		return <PageTemplateParts />;
 	} else if ( path === '/patterns' ) {
