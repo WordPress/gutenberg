@@ -14,7 +14,11 @@ import {
 	FloatingToolbar,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import {
+	compose,
+	withPreferredColorScheme,
+	withNetworkConnectivity,
+} from '@wordpress/compose';
 import {
 	HTMLTextInput,
 	KeyboardAvoidingView,
@@ -23,7 +27,10 @@ import {
 	__unstableAutocompletionItemsSlot as AutocompletionItemsSlot,
 } from '@wordpress/components';
 import { AutosaveMonitor, store as editorStore } from '@wordpress/editor';
-import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
+import {
+	sendNativeEditorDidLayout,
+	requestMediaFilesFailedRetry,
+} from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -57,6 +64,15 @@ class Layout extends Component {
 			'safeAreaInsetsForRootViewDidChange',
 			this.onSafeAreaInsetsUpdate
 		);
+	}
+
+	componentDidUpdate( prevProps ) {
+		if (
+			this.props.isConnected &&
+			prevProps.isConnected !== this.props.isConnected
+		) {
+			requestMediaFilesFailedRetry();
+		}
 	}
 
 	componentWillUnmount() {
@@ -201,4 +217,5 @@ export default compose( [
 		};
 	} ),
 	withPreferredColorScheme,
+	withNetworkConnectivity,
 ] )( Layout );
