@@ -105,10 +105,9 @@ function getLatestHeadings( select, clientId ) {
 				latestHeadings.push( {
 					// Convert line breaks to spaces, and get rid of HTML tags in the headings.
 					content: stripHTML(
-						headingAttributes.content.replace(
-							/(<br *\/?>)+/g,
-							' '
-						)
+						headingAttributes.content
+							.toString()
+							.replace( /(<br *\/?>)+/g, ' ' )
 					),
 					level: headingAttributes.level,
 					link: canBeLinked
