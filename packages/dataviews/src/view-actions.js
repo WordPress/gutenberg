@@ -100,7 +100,11 @@ function PageSizeMenu( { view, onChangeView } ) {
 							onChangeView( { ...view, perPage: size, page: 1 } );
 						} }
 					>
-						<DropdownMenuItemLabel>{ size }</DropdownMenuItemLabel>
+						<DropdownMenuItemLabel>{
+							// The underlying `Truncate` element requires its children to be
+							// strings for the truncation to work propertly
+							`${ size }`
+						}</DropdownMenuItemLabel>
 					</DropdownMenuRadioItem>
 				);
 			} ) }
