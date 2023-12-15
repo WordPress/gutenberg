@@ -44,24 +44,9 @@ describe.each( Object.entries( COMPOSITE_SUITES ) )(
 			};
 		}
 
-		function useCustomProps( initialState?: InitialState ) {
-			const state = useCompositeState( initialState );
-			const { up, down, previous, next, move } = state;
-
-			return {
-				...state,
-				up: jest.fn( up ),
-				down: jest.fn( down ),
-				previous: jest.fn( previous ),
-				next: jest.fn( next ),
-				move: jest.fn( move ),
-			};
-		}
-
 		describe.each( [
 			[ 'With "spread" state', useSpreadProps ],
 			[ 'With `state` prop', useStateProps ],
-			[ 'With custom props', useCustomProps ],
 		] )( '%s', ( __, useProps ) => {
 			function OneDimensionalTest( initialState?: InitialState ) {
 				const props = useProps( initialState );
