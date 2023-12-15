@@ -6,7 +6,8 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const https = require( 'https' );
-const [ token, branch, hash, baseHash, timestamp ] = process.argv.slice( 2 );
+const [ token, branch, hash, baseHash, commitMessage, timestamp ] =
+	process.argv.slice( 2 );
 
 const resultsFiles = [
 	{
@@ -41,6 +42,7 @@ const data = new TextEncoder().encode(
 		branch,
 		hash,
 		baseHash,
+		commitMessage,
 		timestamp,
 		metrics: resultsFiles.reduce( ( result, { metricsPrefix }, index ) => {
 			return {
