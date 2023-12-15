@@ -44,7 +44,7 @@ function Store( registry, suspense ) {
 	let lastIsAsync;
 	let subscriber;
 	let didWarnUnstableReference;
-	let storeStatesOnMount;
+	const storeStatesOnMount = new Map();
 
 	function getStoreState( name ) {
 		// If there's no store property (custom generic store), return an empty
@@ -72,16 +72,16 @@ function Store( registry, suspense ) {
 			// compute a fresh value only if any of the store states have
 			// changed in the meantime.
 			if ( lastMapResultValid ) {
-				lastMapResultValid =
-					activeStores.length === storeStatesOnMount.length &&
-					activeStores.every(
-						( name, index ) =>
-							storeStatesOnMount[ index ] ===
-							getStoreState( name )
-					);
+				for ( const name of activeStores ) {
+					if (
+						storeStatesOnMount.get( name ) !== getStoreState( name )
+					) {
+						lastMapResultValid = false;
+					}
+				}
 			}
 
-			storeStatesOnMount = null;
+			storeStatesOnMount.clear();
 
 			const onStoreChange = () => {
 				// Invalidate the value on store update, so that a fresh value is computed.
@@ -169,8 +169,9 @@ function Store( registry, suspense ) {
 			}
 
 			if ( ! subscriber ) {
-				storeStatesOnMount =
-					listeningStores.current.map( getStoreState );
+				for ( const name of listeningStores.current ) {
+					storeStatesOnMount.set( name, getStoreState( name ) );
+				}
 				subscriber = createSubscriber( listeningStores.current );
 			} else {
 				subscriber.updateStores( listeningStores.current );

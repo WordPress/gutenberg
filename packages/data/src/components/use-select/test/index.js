@@ -61,9 +61,6 @@ describe( 'useSelect', () => {
 			</RegistryProvider>
 		);
 
-		// 2 selectSpy calls expected
-		// - 1 for initial mount
-		// - 1 for the subscription effect checking if value has changed
 		expect( selectSpy ).toHaveBeenCalledTimes( 1 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -525,8 +522,8 @@ describe( 'useSelect', () => {
 				</RegistryProvider>
 			);
 
-			// One select on initial render, and one in `checkIfSnapshotChanged` after subscribing.
-			// There's a third selector call on the second render, but that one returns a memoized value.
+			// One select on initial render.
+			// There's a second selector call on the second render, but that one returns a memoized value.
 			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
 
 			// Initial render and second render after counter increment (which is expected to be detected).
@@ -967,7 +964,7 @@ describe( 'useSelect', () => {
 				</AsyncModeProvider>
 			);
 
-			// initial render + missed update catcher in subscribing effect
+			// initial render
 			expect( selectSpy ).toHaveBeenCalledTimes( 1 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -1026,9 +1023,8 @@ describe( 'useSelect', () => {
 			// Ensure the async update was flushed during the rerender.
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
 
-			// initial render + subscription check + rerender with isAsync=false
-			expect( selectSpy ).toHaveBeenCalledTimes( 2 );
 			// initial render + rerender with isAsync=false
+			expect( selectSpy ).toHaveBeenCalledTimes( 2 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		} );
 

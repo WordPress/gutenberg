@@ -52,9 +52,6 @@ describe( 'withSelect', () => {
 			</RegistryProvider>
 		);
 
-		// Expected two times:
-		// - Once on initial render.
-		// - Once on effect before subscription set.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -107,9 +104,6 @@ describe( 'withSelect', () => {
 		);
 
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
-		// 2 times:
-		// - 1 on initial render
-		// - 1 on effect before subscription set.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( mapDispatchToProps ).toHaveBeenCalledTimes( 1 );
 
@@ -119,13 +113,11 @@ describe( 'withSelect', () => {
 		await user.click( button );
 
 		expect( button ).toHaveTextContent( '1' );
-		// 2 times =
-		//  1. Initial mount
+		// 1. Initial mount
 		// 2. When click handler is called.
 		expect( mapDispatchToProps ).toHaveBeenCalledTimes( 2 );
-		// 4 times
+		// 3 times
 		// - 1 on initial render
-		// - 1 on effect before subscription set.
 		// - 1 on click triggering subscription firing.
 		// - 1 on rerender.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
@@ -253,9 +245,6 @@ describe( 'withSelect', () => {
 			</RegistryProvider>
 		);
 
-		// 2 times:
-		// - 1 on initial render
-		// - 1 on effect before subscription set.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -296,9 +285,6 @@ describe( 'withSelect', () => {
 			</RegistryProvider>
 		);
 
-		// 2 times:
-		// - 1 on initial render
-		// - 1 on effect before subscription set.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -339,9 +325,6 @@ describe( 'withSelect', () => {
 			</RegistryProvider>
 		);
 
-		// 2 times:
-		// - 1 on initial render
-		// - 1 on effect before subscription set.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -373,9 +356,6 @@ describe( 'withSelect', () => {
 			</RegistryProvider>
 		);
 
-		// 2 times:
-		// - 1 on initial render
-		// - 1 on effect before subscription set.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -411,9 +391,6 @@ describe( 'withSelect', () => {
 			</RegistryProvider>
 		);
 
-		// 2 times:
-		// - 1 on initial render
-		// - 1 on effect before subscription set.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -451,9 +428,6 @@ describe( 'withSelect', () => {
 			</RegistryProvider>
 		);
 
-		// 2 times:
-		// - 1 on initial render
-		// - 1 on effect before subscription set.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -510,9 +484,6 @@ describe( 'withSelect', () => {
 			</RegistryProvider>
 		);
 
-		// 2 times:
-		// - 1 on initial render
-		// - 1 on effect before subscription set.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'Unknown' );
@@ -574,9 +545,6 @@ describe( 'withSelect', () => {
 			</RegistryProvider>
 		);
 
-		// 2 times:
-		// - 1 on initial render
-		// - 1 on effect before subscription set.
 		expect( childMapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( parentMapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
@@ -620,9 +588,6 @@ describe( 'withSelect', () => {
 			</RegistryProvider>
 		);
 
-		// 2 times:
-		// - 1 on initial render
-		// - 1 on effect before subscription set.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -642,11 +607,9 @@ describe( 'withSelect', () => {
 			</RegistryProvider>
 		);
 
-		// 4 times:
+		// 2 times:
 		// - 1 on initial render
-		// - 1 on effect before subscription set.
 		// - 1 on re-render
-		// - 1 on effect before new subscription set (because registry has changed)
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 		expect( screen.getByRole( 'status' ) ).toHaveTextContent( 'second' );

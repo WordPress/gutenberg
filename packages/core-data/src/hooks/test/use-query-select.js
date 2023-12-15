@@ -50,9 +50,7 @@ describe( 'useQuerySelect', () => {
 				<TestComponent keyName="foo" />
 			</RegistryProvider>
 		);
-		// 2 times expected
-		// - 1 for initial mount
-		// - 1 for after mount before subscription set.
+
 		expect( selectSpy ).toHaveBeenCalledTimes( 1 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
