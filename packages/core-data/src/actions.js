@@ -10,6 +10,7 @@ import { v4 as uuid } from 'uuid';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -20,6 +21,9 @@ import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
 import { getSyncProvider } from './sync';
+import { unlock } from './private-apis';
+
+const { undoIgnoreBlocks } = unlock( blockEditorPrivateApis );
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -405,7 +409,10 @@ export const editEntityRecord =
 				);
 			}
 		} else {
-			if ( ! options.undoIgnore ) {
+			if (
+				! options.undoIgnore &&
+				! undoIgnoreBlocks.has( edit.edits.blocks )
+			) {
 				select.getUndoManager().addRecord(
 					[
 						{

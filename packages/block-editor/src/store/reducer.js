@@ -453,13 +453,21 @@ const withBlockTree =
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
 	let markNextChangeAsNotPersistent = false;
+	let explicitPersistent;
 
 	return ( state, action ) => {
 		let nextState = reducer( state, action );
 
-		if ( action.type === 'SYNC_DERIVED_BLOCK_ATTRIBUTES' ) {
-			return nextState.isPersistentChange
-				? { ...nextState, isPersistentChange: false }
+		if ( action.type === 'SET_EXPLICIT_PERSISTENT' ) {
+			explicitPersistent = action.isPersistentChange;
+		}
+
+		if ( explicitPersistent !== undefined ) {
+			return explicitPersistent !== nextState.isPersistentChange
+				? {
+						...nextState,
+						isPersistentChange: explicitPersistent,
+				  }
 				: nextState;
 		}
 
