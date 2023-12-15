@@ -118,6 +118,19 @@
 			padding-bottom: $grid-unit-05;
 		}
 	}
+
+	.dataviews-table-header-button {
+		padding: 0;
+		gap: $grid-unit-05;
+
+		span {
+			speak: none;
+
+			&:empty {
+				display: none;
+			}
+		}
+	}
 }
 
 .dataviews-grid-view {
