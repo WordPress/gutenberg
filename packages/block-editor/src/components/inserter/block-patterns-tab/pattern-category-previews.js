@@ -70,27 +70,27 @@ export function PatternCategoryPreviews( {
 				if ( category.name === allPatternsCategory.name ) {
 					return true;
 				}
+
 				if (
 					category.name === myPatternsCategory.name &&
 					pattern.type === PATTERN_TYPES.user
 				) {
 					return true;
 				}
+
 				if ( category.name !== 'uncategorized' ) {
 					return pattern.categories?.includes( category.name );
 				}
 
 				// The uncategorized category should show all the patterns without any category
 				// or with no available category.
-				const availablePatternCategories =
-					pattern.categories?.filter( ( cat ) =>
-						availableCategories.find(
-							( availableCategory ) =>
-								availableCategory.name === cat
-						)
-					) ?? [];
+				if ( pattern.categories ) {
+					return true;
+				}
 
-				return availablePatternCategories.length === 0;
+				return ! pattern.categories.some( ( catName ) =>
+					availableCategories.some( ( cat ) => cat.name === catName )
+				);
 			} ),
 		[
 			allPatterns,

@@ -67,26 +67,23 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
-	const { showPatterns, inserterItems } = useSelect(
+	const { showPatterns, hasReusableBlocks } = useSelect(
 		( select ) => {
 			const { hasAllowedPatterns, getInserterItems } = unlock(
 				select( blockEditorStore )
 			);
 			return {
 				showPatterns: hasAllowedPatterns( destinationRootClientId ),
-				inserterItems: getInserterItems( destinationRootClientId ),
+				hasReusableBlocks: getInserterItems(
+					destinationRootClientId
+				).some( ( item ) => item.category === 'reusable' ),
 			};
 		},
 		[ destinationRootClientId ]
 	);
-	const hasReusableBlocks = useMemo( () => {
-		return inserterItems.some(
-			( { category } ) => category === 'reusable'
-		);
-	}, [ inserterItems ] );
 
 	const mediaCategories = useMediaCategories( destinationRootClientId );
-	const showMedia = !! mediaCategories.length;
+	const showMedia = mediaCategories.length > 0;
 
 	const onInsert = useCallback(
 		( blocks, meta, shouldForceFocusBlock ) => {
