@@ -190,7 +190,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 												} ) => (
 													<DropdownMenuRadioItem
 														key={ key }
-														name={ `add-filter-${ filter.field }-conditions` }
+														name={ `add-filter-${ filter.name }-conditions` }
 														value={ operator }
 														checked={
 															activeOperator ===
