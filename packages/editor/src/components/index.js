@@ -32,6 +32,7 @@ export { default as PostAuthorPanel } from './post-author/panel';
 export { default as PostComments } from './post-comments';
 export { default as PostExcerpt } from './post-excerpt';
 export { default as PostExcerptCheck } from './post-excerpt/check';
+export { default as PostExcerptPanel } from './post-excerpt/panel';
 export { default as PostFeaturedImage } from './post-featured-image';
 export { default as PostFeaturedImageCheck } from './post-featured-image/check';
 export { default as PostFeaturedImagePanel } from './post-featured-image/panel';
