@@ -259,6 +259,8 @@ public protocol GutenbergBridgeDelegate: AnyObject {
 
     func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]])
 
+    func gutenbergDidRequestMediaFilesFailedRetry() -> Bool
+
     func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]])
 
     func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]])
@@ -300,6 +302,7 @@ public extension GutenbergBridgeDelegate {
     func gutenbergDidRequestMediaSaveSync() {}
     func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [[String: Any]], blockId: String) { }
     func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]]) { }
+    func gutenbergDidRequestMediaFilesFailedRetry() { }
     func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]]) { }
     func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]]) { }
     func gutenbergDidRequestMediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {}

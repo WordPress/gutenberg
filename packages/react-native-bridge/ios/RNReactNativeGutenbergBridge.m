@@ -25,6 +25,7 @@ RCT_EXTERN_METHOD(showUserSuggestions:(RCTPromiseResolveBlock)resolve rejecter:(
 RCT_EXTERN_METHOD(showXpostSuggestions:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)rejecter)
 RCT_EXTERN_METHOD(requestMediaFilesEditorLoad:(NSArray<NSDictionary *> *)mediaFiles blockId:(NSString *)blockId)
 RCT_EXTERN_METHOD(requestMediaFilesFailedRetryDialog:(NSArray<NSDictionary *> *)mediaFiles)
+RCT_EXTERN_METHOD(requestMediaFilesFailedRetry)
 RCT_EXTERN_METHOD(requestMediaFilesUploadCancelDialog:(NSArray<NSDictionary *> *)mediaFiles)
 RCT_EXTERN_METHOD(requestMediaFilesSaveCancelDialog:(NSArray<NSDictionary *> *)mediaFiles)
 RCT_EXTERN_METHOD(onCancelUploadForMediaCollection:(NSArray<NSDictionary *> *)mediaFiles)

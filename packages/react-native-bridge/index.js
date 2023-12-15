@@ -379,6 +379,15 @@ export function requestMediaFilesFailedRetryDialog( mediaFiles ) {
 }
 
 /**
+ * Request the host app retry uploading all media for the post.
+ *
+ * @return {void}
+ */
+export function requestMediaFilesFailedRetry() {
+	RNReactNativeGutenbergBridge.requestMediaFilesFailedRetry();
+}
+
+/**
  * Request the host app to show a cancel dialog for mediaFiles arrays currently being uploaded
  *
  * For example, tapping on a block containing mediaFiles that are currently being uplaoded would trigger this request

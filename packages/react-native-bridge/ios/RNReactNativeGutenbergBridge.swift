@@ -320,6 +320,13 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
+    func requestMediaFilesFailedRetry() {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFilesFailedRetry()
+        }
+    }
+
+    @objc
     func requestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]]) {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestMediaFilesUploadCancelDialog(mediaFiles)
