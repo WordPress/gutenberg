@@ -38,7 +38,11 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 	return (
 		<DropdownMenu
 			trigger={
-				<DropdownMenuItem suffix={ activeView.label }>
+				<DropdownMenuItem
+					suffix={
+						<span aria-hidden="true">{ activeView.label }</span>
+					}
+				>
 					<DropdownMenuItemLabel>
 						{ __( 'Layout' ) }
 					</DropdownMenuItemLabel>
@@ -75,7 +79,9 @@ function PageSizeMenu( { view, onChangeView } ) {
 	return (
 		<DropdownMenu
 			trigger={
-				<DropdownMenuItem suffix={ view.perPage }>
+				<DropdownMenuItem
+					suffix={ <span aria-hidden="true">{ view.perPage }</span> }
+				>
 					<DropdownMenuItemLabel>
 						{ /* TODO: probably label per view type. */ }
 						{ __( 'Rows per page' ) }
@@ -176,7 +182,13 @@ function SortMenu( { fields, view, onChangeView } ) {
 	return (
 		<DropdownMenu
 			trigger={
-				<DropdownMenuItem suffix={ currentSortedField?.header }>
+				<DropdownMenuItem
+					suffix={
+						<span aria-hidden="true">
+							{ currentSortedField?.header }
+						</span>
+					}
+				>
 					<DropdownMenuItemLabel>
 						{ __( 'Sort by' ) }
 					</DropdownMenuItemLabel>
