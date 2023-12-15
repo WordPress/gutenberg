@@ -43,7 +43,7 @@ All these properties (`editorScript`, `editorStyle`, `script` `style`,`viewScrip
 
 The [`render`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#render) property ([introduced on WordPress 6.1](https://make.wordpress.org/core/2022/10/12/block-api-changes-in-wordpress-6-1/)) sets the path of a `.php` template file that will render the markup returned to the front end. This only method will be used to return the markup for the block on request only if `$render_callback` function has not been passed to the `register_block_type` function.
 
-## Data Storage in the Block with `attributes`
+## Using `attributes` to store block data
 
 If the user changes a block, we need a way to persist these changes so they can be loaded and used by the block at a later time. To achieve this, the state of a block is maintained through `attributes` which content is stored in the DB and retrieved when needed. When registering a new block type, the `attributes` property of `block.json` describes the types of data included in the `attributes` object, and how they're stored in the DB so they can be read and passed to the `edit` and `save` functions.
 
