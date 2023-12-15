@@ -4,6 +4,7 @@ The `block.json` file simplifies the processs of defining and registering a bloc
 
 [![Open block.json diagram image](https://developer.wordpress.org/files/2023/11/block-json.png)](https://developer.wordpress.org/files/2023/11/block-json.png "Open block.json diagram image")
 
+
 <div class="callout callout-tip">
 Click <a href="https://github.com/WordPress/block-development-examples/tree/trunk/plugins/block-supports-6aa4dd">here</a> to see a full block example and check <a href="https://github.com/WordPress/block-development-examples/blob/trunk/plugins/block-supports-6aa4dd/src/block.json">its <code>block.json</code></a>
 </div>
@@ -42,9 +43,12 @@ All these properties (`editorScript`, `editorStyle`, `script` `style`,`viewScrip
 
 The [`render`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#render) property ([introduced on WordPress 6.1](https://make.wordpress.org/core/2022/10/12/block-api-changes-in-wordpress-6-1/)) sets the path of a `.php` template file that will render the markup returned to the front end. This only method will be used to return the markup for the block on request only if `$render_callback` function has not been passed to the `register_block_type` function.
 
-## Data Storage in the Block with `attributes`
+## Using `attributes` to store block data
 
-The [`attributes` property](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#attributes) allows a block to declare "variables" that store data or content for the block.
+Block [attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#attributes) are settings or data assigned to blocks. They can determine various aspects of a block, such as its content, layout, style, and any other specific information you need to store along with your block's structure. If the user changes a block, such as modifying the font size, you need a way to persist these changes. Attributes are the solution. 
+
+When registering a new block type, the `attributes` property of `block.json` describes the custom data the block requires and how they're stored in the database. This allows the Editor to parse these values correctly and pass the `attributes` to the block's `Edit` and `save` functions.
+
 
 _Example: Attributes as defined in block.json_
 ```json
@@ -60,7 +64,7 @@ _Example: Attributes as defined in block.json_
 	}
 },
 ```
-By default `attributes` are serialized and stored in the block's delimiter but this [can be configured](https://developer.wordpress.org/news/2023/09/understanding-block-attributes/).
+By default, attributes are serialized and stored in the block's delimiter, but this [can be configured](https://developer.wordpress.org/news/2023/09/understanding-block-attributes/).
 
 _Example: Atributes stored in the Markup representation of the block_
 ```html
@@ -69,7 +73,7 @@ _Example: Atributes stored in the Markup representation of the block_
 <!-- /wp:block-development-examples/copyright-date-block-09aac3 -->x
 ```
 
-These [`attributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#attributes) are passed to the React component `Edit`(to display in the Block Editor) and the `save` function (to return the markup saved to the DB) of the block, and to any server-side render definition for the block (see `render` prop above). 
+These [attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#attributes) are passed to the React component `Edit`(to display in the Block Editor), and the `save` function (to return the markup saved to the database) of the block, and to any server-side render definition for the block (see the `render` property above).
 
 The `Edit` component receives exclusively the capability of updating the attributes via the [`setAttributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#setattributes) function.
 
@@ -84,7 +88,11 @@ Check the <a href="https://developer.wordpress.org/block-editor/reference-guides
 
 ## Enable UI settings panels for the block with `supports`
 
-The [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#supports) property allows a block to declare support for certain features, enabling users to customize specific settings (like colors or margins) from the Settings Sidebar.
+Many blocks, including core blocks, offer similar customization options, whether changing the background color, text color, or adding padding customization options.
+
+The [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#supports) property in `block.json` allows a block to declare support for certain features, enabling users to customize specific settings (like colors or margins) from the Settings Sidebar.
+
+Using the available block `supports` allows you to align your block's behavior with core blocks and avoid replicating the same functionality yourself.
 
 _Example: Supports as defined in block.json_
 
@@ -98,7 +106,7 @@ _Example: Supports as defined in block.json_
 }
 ```
 
-The use of `supports` generates a set of properties that need to be manually added to the wrapping element of the block so they're properly stored as part of the block data.
+The use of `supports` generates a set of properties that need to be manually added to the [wrapping element of the block](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-wrapper/). This ensures they're properly stored as part of the block data and taken into account when generating the markup of the block that will be delivered to the front end.
 
 _Example: Supports custom settings stored in the Markup representation of the block_
 
