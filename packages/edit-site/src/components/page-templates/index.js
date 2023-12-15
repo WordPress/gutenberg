@@ -368,12 +368,12 @@ export default function DataviewsTemplates() {
 				}
 				title={ __( 'Templates' ) }
 				actions={
-					                                       <AddNewTemplate
-					                                               templateType={ TEMPLATE_POST_TYPE }
-					                                               showIcon={ false }
-					                                               toggleProps={ { variant: 'primary' } }
-					                                       />
-					                               }
+					<AddNewTemplate
+						templateType={ TEMPLATE_POST_TYPE }
+						showIcon={ false }
+						toggleProps={ { variant: 'primary' } }
+					/>
+				}
 			>
 				<DataViews
 					paginationInfo={ paginationInfo }
