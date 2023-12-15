@@ -126,7 +126,6 @@ export default function Layout() {
 		( isMobileViewport && isListPage ) || ( isEditorPage && isEditing );
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer ] = useResizeObserver();
-	const [ isResizing ] = useState( false );
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
@@ -307,14 +306,7 @@ export default function Layout() {
 						<>
 							{ isListPage && <PageMain /> }
 							{ isEditorPage && (
-								<div
-									className={ classnames(
-										'edit-site-layout__canvas-container',
-										{
-											'is-resizing': isResizing,
-										}
-									) }
-								>
+								<div className="edit-site-layout__canvas-container">
 									{ canvasResizer }
 									{ !! canvasSize.width && (
 										<motion.div
@@ -325,8 +317,7 @@ export default function Layout() {
 															scale: 1.005,
 															transition: {
 																duration:
-																	disableMotion ||
-																	isResizing
+																	disableMotion
 																		? 0
 																		: 0.5,
 																ease: 'easeOut',
@@ -345,10 +336,9 @@ export default function Layout() {
 											) }
 											transition={ {
 												type: 'tween',
-												duration:
-													disableMotion || isResizing
-														? 0
-														: ANIMATION_DURATION,
+												duration: disableMotion
+													? 0
+													: ANIMATION_DURATION,
 												ease: 'easeOut',
 											} }
 										>
