@@ -2,15 +2,7 @@
 
 Checkboxes allow the user to select one or more items from a set.
 
-![](https://make.wordpress.org/design/files/2019/02/CheckboxControl.png)
-
-Selected and unselected checkboxes
-
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
+![Selected and unselected checkboxes](https://make.wordpress.org/design/files/2019/02/CheckboxControl.png)
 
 ## Design guidelines
 
