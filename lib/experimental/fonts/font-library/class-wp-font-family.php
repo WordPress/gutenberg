@@ -107,6 +107,33 @@ class WP_Font_Family {
 	}
 
 	/**
+	 * Gets the font family object that has been persisted.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return null|WP_Font_Family The Font Family object or null if the font family does not exist.
+	 */
+	public static function get_font_family_by_slug ( $slug ) {
+		$args = array(
+			'post_type'      => 'wp_font_family',
+			'post_name'      => $slug,
+			'name'           => $slug,
+			'posts_per_page' => 1,
+		);
+
+		$posts_query = new WP_Query( $args );
+
+		if ( ! $posts_query->have_posts() ) {
+			return null;
+		}
+
+		$post = $posts_query->posts[0];
+		$post_data = json_decode( $post->post_content, true );
+		$post_data['id'] = $post->ID;
+		return new WP_Font_Family( $post_data );
+	}
+
+	/**
 	 * Gets the font family data.
 	 *
 	 * @since 6.5.0

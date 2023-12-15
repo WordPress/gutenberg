@@ -245,22 +245,31 @@ class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 		$font_family_data = $request->get_param( 'data' );
 		$files          = $request->get_file_params();
 
-		try {
-			$font_family = new WP_Font_Family( array(
-				'slug' => $font_family_data['slug'],
-				'name' => $font_family_data['name'],
-				'fontFamily' => $font_family_data['fontFamily'],
-			) );
-		}
-		catch ( Exception $exception ) {
-			return new WP_Error(
-				'rest_font_family_not_created',
-				__( 'Font Family not created. ' . $exception, 'gutenberg' ),
-				array( 'status' => 500 )
-			);
+		// In addition to creating a new object this services has the potential to update an existing item.
+		// https://www.rfc-editor.org/rfc/rfc7231#section-4.3.3
+		// In that scenario the Font Family with a matching SLUG will be looked for and PATCHED with the included information.
+		// This allows the service to include ONLY THE FONT FACES that are to be ADDED, doing so won't remove existing Font Faces.
+		$font_family = WP_Font_Family::get_font_family_by_slug( $font_family_data['slug'] );
+
+
+		if ( ! $font_family ) {
+			// A new Font Family is to be created.
+			try {
+				$font_family = new WP_Font_Family(array(
+					'slug' => $font_family_data['slug'],
+					'name' => $font_family_data['name'],
+					'fontFamily' => $font_family_data['fontFamily'],
+				));
+			} catch (Exception $exception) {
+				return new WP_Error(
+					'rest_font_family_not_created',
+					__('Font Family not created. ' . $exception, 'gutenberg'),
+					array('status' => 500)
+				);
+			}
 		}
 
-		$update_response = $font_family->update( $font_family_data, $files );
+		$update_response = $font_family->update( $font_family_data, $files, true );
 		if ( is_wp_error( $update_response ) ) {
 			return $update_response;
 		}
