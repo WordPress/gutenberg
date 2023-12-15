@@ -64,7 +64,7 @@ _Example: Attributes as defined in block.json_
 	}
 },
 ```
-By default `attributes` are serialized and stored in the block's delimiter, but this [can be configured](https://developer.wordpress.org/news/2023/09/understanding-block-attributes/).
+By default, attributes are serialized and stored in the block's delimiter, but this [can be configured](https://developer.wordpress.org/news/2023/09/understanding-block-attributes/).
 
 _Example: Atributes stored in the Markup representation of the block_
 ```html
