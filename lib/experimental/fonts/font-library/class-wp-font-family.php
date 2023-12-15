@@ -233,7 +233,13 @@ class WP_Font_Family {
 		return $this->get_data();
 	}
 
-
+	/**
+	 * Given a font weight and style, find the font face in the collection.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return Object|null The Font Face object if it exists in the collection.  Otherwise null.
+	 */
 	private function get_font_face_from_collection ( $font_weight, $font_style, $collection ) {
 		if ( ! $collection ) {
 			return null;
@@ -289,6 +295,13 @@ class WP_Font_Family {
 		return $ready_font_faces;
 	}
 
+	/**
+	 * Store the Font Family information in the database.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return int|WP_Error Post ID if the post was created or updated sucessfully, WP_Error otherwise.
+	 */
 	public function persist() {
 		if ( ! empty( $this->id ) ) {
 			return $this->update_font_post( $this->id, wp_json_encode( $this->get_data() ) );
@@ -400,9 +413,19 @@ class WP_Font_Family {
 		// The update endpoints requires write access to the temp and the fonts directories.
 		$temp_dir   = get_temp_dir();
 		$upload_dir = WP_Font_Library::get_fonts_dir();
+
+		// The Fonts directory doesn't exists, so let's make it
+		if ( ! is_dir( $upload_dir ) ) {
+			if ( ! wp_mkdir_p( $upload_dir ) ) {
+				return false;
+			}
+		}
+
+		// Checks if the temp and fonts directories are writable.
 		if ( ! is_writable( $temp_dir ) || ! wp_is_writable( $upload_dir ) ) {
 			return false;
 		}
+
 		return true;
 	}
 
@@ -601,73 +624,6 @@ class WP_Font_Family {
 
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	/**
-	 * Checks whether the font family has font faces defined.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return bool True if the font family has font faces defined, false otherwise.
-	 */
-	public function has_font_faces() {
-		return ! empty( $this->data['fontFace'] ) && is_array( $this->data['fontFace'] );
-	}
-
-	/**
-	 * Removes font family assets.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return bool True if assets were removed, false otherwise.
-	 */
-	private function remove_font_family_assets() {
-		if ( $this->has_font_faces() ) {
-			foreach ( $this->data['fontFace'] as $font_face ) {
-				$were_assets_removed = $this->delete_font_face_assets( $font_face );
-				if ( false === $were_assets_removed ) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
 	/**
 	 * Removes a font family from the database and deletes its assets.
 	 *
@@ -678,10 +634,17 @@ class WP_Font_Family {
 	 * @return bool|WP_Error True if the font family was uninstalled, WP_Error otherwise.
 	 */
 	public function uninstall( $force ) {
-		if (
-			! $this->remove_font_family_assets() ||
-			! wp_delete_post( $this->id, $force )
-		) {
+
+		// Delete any font face assets.
+		if ( array_key_exists( 'fontFace', $this->data ) && ! empty( $this->data['fontFace'] ) ) {
+			foreach ( $this->data['fontFace'] as $font_face ) {
+				$this->delete_font_face_assets( $font_face );
+			}
+		}
+
+		$delete_post_response = wp_delete_post( $this->id, $force );
+
+		if ( ! $delete_post_response ) {
 			return new WP_Error(
 				'font_family_not_deleted',
 				__( 'The font family could not be deleted.', 'gutenberg' )
@@ -691,144 +654,4 @@ class WP_Font_Family {
 		return true;
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	/**
-	 * Downloads font face assets if the font family is a Google font,
-	 * or moves them if it is a local font.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param array $files An array of files to be installed.
-	 * @return bool True if the font faces were downloaded or moved successfully, false otherwise.
-	 */
-	private function download_or_move_font_faces( $files ) {
-		if ( ! $this->has_font_faces() ) {
-			return true;
-		}
-
-		$new_font_faces = array();
-		foreach ( $this->data['fontFace'] as $font_face ) {
-			// If the fonts are not meant to be downloaded or uploaded
-			// (for example to install fonts that use a remote url).
-			$new_font_face = $font_face;
-
-			$font_face_is_repeated = false;
-
-			// If the font face has the same fontStyle and fontWeight as an existing, continue.
-			foreach ( $new_font_faces as $font_to_compare ) {
-				if ( $new_font_face['fontStyle'] === $font_to_compare['fontStyle'] &&
-					$new_font_face['fontWeight'] === $font_to_compare['fontWeight'] ) {
-					$font_face_is_repeated = true;
-				}
-			}
-
-			if ( $font_face_is_repeated ) {
-				continue;
-			}
-
-			// If the font face requires the use of the filesystem, create the fonts dir if it doesn't exist.
-			if ( ! empty( $font_face['downloadFromUrl'] ) && ! empty( $font_face['uploadedFile'] ) ) {
-				wp_mkdir_p( WP_Font_Library::get_fonts_dir() );
-			}
-
-			// If installing google fonts, download the font face assets.
-			if ( ! empty( $font_face['downloadFromUrl'] ) ) {
-				$new_font_face = $this->download_font_face_assets( $new_font_face );
-			}
-
-			// If installing local fonts, move the font face assets from
-			// the temp folder to the wp fonts directory.
-			if ( ! empty( $font_face['uploadedFile'] ) && ! empty( $files ) ) {
-				$new_font_face = $this->move_font_face_asset(
-					$new_font_face,
-					$files[ $new_font_face['uploadedFile'] ]
-				);
-			}
-
-			/*
-			 * If the font face assets were successfully downloaded, add the font face
-			 * to the new font. Font faces with failed downloads are not added to the
-			 * new font.
-			 */
-			if ( ! empty( $new_font_face['src'] ) ) {
-				$new_font_faces[] = $new_font_face;
-			}
-		}
-
-		if ( ! empty( $new_font_faces ) ) {
-			$this->data['fontFace'] = $new_font_faces;
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Gets the font faces that are in both the existing and incoming font families.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param array $existing The existing font faces.
-	 * @param array $incoming The incoming font faces.
-	 * @return array The font faces that are in both the existing and incoming font families.
-	 */
-	private function get_intersecting_font_faces( $existing, $incoming ) {
-		$intersecting = array();
-		foreach ( $existing as $existing_face ) {
-			foreach ( $incoming as $incoming_face ) {
-				if ( $incoming_face['fontStyle'] === $existing_face['fontStyle'] &&
-					$incoming_face['fontWeight'] === $existing_face['fontWeight'] &&
-					$incoming_face['src'] !== $existing_face['src'] ) {
-					$intersecting[] = $existing_face;
-				}
-			}
-		}
-		return $intersecting;
-	}
-
-
-	/**
-	 * Installs the font family into the library.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param array $files Optional. An array of files to be installed. Default null.
-	 * @return array|WP_Error An array of font family data on success, WP_Error otherwise.
-	 */
-	public function install( $files = null ) {
-		add_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
-		add_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
-		$were_assets_written = $this->download_or_move_font_faces( $files );
-		remove_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
-		remove_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
-
-		if ( ! $were_assets_written ) {
-			return new WP_Error(
-				'font_face_download_failed',
-				__( 'The font face assets could not be written.', 'gutenberg' )
-			);
-		}
-
-		// $post_id = $this->create_or_update_font_post();
-
-		// if ( is_wp_error( $post_id ) ) {
-		// 	return $post_id;
-		// }
-
-		return $this->get_data();
-	}
 }

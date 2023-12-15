@@ -198,6 +198,14 @@ class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 		return true;
 	}
 
+	/**
+	 * Returns a collection of all Font Families.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_REST_Request $request The request object
+	 * @return WP_REST_Response|WP_Error A response with the collection of Font Families.
+	 */
 	public function get_items( $request ) {
  		$font_families = WP_Font_Family::get_font_families();
 		$font_family_data = array();
@@ -210,6 +218,14 @@ class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 		return new WP_REST_Response( $font_family_data );
 	}
 
+	/**
+	 * Returns a Font Family item.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_REST_Request $request The request object containing the id.
+	 * @return WP_REST_Response|WP_Error A response with the Font Family requested. Otherwise a WP_Error.
+	 */
 	public function get_item( $request ) {
 		$id = $request->get_param( 'id' );
 
@@ -407,6 +423,21 @@ class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/**
 	 * Returns validation errors in font families data for installation.
 	 *
@@ -524,218 +555,4 @@ class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 		return new WP_Error( 'rest_invalid_param', implode( ', ', $error_messages ), array( 'status' => 400 ) );
 	}
 
-	/**
-	 * Gets the schema for the uninstall endpoint.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return array Schema array.
-	 */
-	public function uninstall_schema() {
-		return array(
-			'font_families' => array(
-				'type'        => 'array',
-				'description' => __( 'The font families to install.', 'gutenberg' ),
-				'required'    => true,
-				'minItems'    => 1,
-				'items'       => array(
-					'required'   => true,
-					'type'       => 'object',
-					'properties' => array(
-						'slug' => array(
-							'type'        => 'string',
-							'description' => __( 'The font family slug.', 'gutenberg' ),
-							'required'    => true,
-						),
-					),
-				),
-			),
-		);
-	}
-
-	/**
-	 * Removes font families from the Font Library and all their assets.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
-	 */
-	public function uninstall_fonts( $request ) {
-		$fonts_to_uninstall = $request->get_param( 'font_families' );
-
-		$errors    = array();
-		$successes = array();
-
-		if ( empty( $fonts_to_uninstall ) ) {
-			$errors[] = new WP_Error(
-				'no_fonts_to_install',
-				__( 'No fonts to uninstall', 'gutenberg' )
-			);
-			$data     = array(
-				'successes' => $successes,
-				'errors'    => $errors,
-			);
-			$response = rest_ensure_response( $data );
-			$response->set_status( 400 );
-			return $response;
-		}
-
-		foreach ( $fonts_to_uninstall as $font_data ) {
-			$font   = new WP_Font_Family( $font_data );
-			$result = $font->uninstall();
-			if ( is_wp_error( $result ) ) {
-				$errors[] = $result;
-			} else {
-				$successes[] = $result;
-			}
-		}
-		$data = array(
-			'successes' => $successes,
-			'errors'    => $errors,
-		);
-		return rest_ensure_response( $data );
-	}
-
-
-
-	/**
-	 * Checks whether the font directory exists or not.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return bool Whether the font directory exists.
-	 */
-	private function has_upload_directory() {
-		$upload_dir = WP_Font_Library::get_fonts_dir();
-		return is_dir( $upload_dir );
-	}
-
-	/**
-	 * Checks whether the user has write permissions to the temp and fonts directories.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return true|WP_Error True if the user has write permissions, WP_Error object otherwise.
-	 */
-	private function has_write_permission() {
-		// The update endpoints requires write access to the temp and the fonts directories.
-		$temp_dir   = get_temp_dir();
-		$upload_dir = WP_Font_Library::get_fonts_dir();
-		if ( ! is_writable( $temp_dir ) || ! wp_is_writable( $upload_dir ) ) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Checks whether the request needs write permissions.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param array[] $font_families Font families to install.
-	 * @return bool Whether the request needs write permissions.
-	 */
-	private function needs_write_permission( $font_families ) {
-		foreach ( $font_families as $font ) {
-			if ( isset( $font['fontFace'] ) ) {
-				foreach ( $font['fontFace'] as $face ) {
-					// If the font is being downloaded from a URL or uploaded, it needs write permissions.
-					if ( isset( $face['downloadFromUrl'] ) || isset( $face['uploadedFile'] ) ) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Installs new fonts.
-	 *
-	 * Takes a request containing new fonts to install, downloads their assets, and adds them
-	 * to the Font Library.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param WP_REST_Request $request The request object containing the new fonts to install
-	 *                                 in the request parameters.
-	 * @return WP_REST_Response|WP_Error The updated Font Library post content.
-	 */
-	public function install_fonts( $request ) {
-		// Get new fonts to install.
-		$fonts_param = $request->get_param( 'font_families' );
-
-		/*
-		 * As this is receiving form data, the font families are encoded as a string.
-		 * The form data is used  because local fonts need to use that format to
-		 * attach the files in the request.
-		 */
-		$fonts_to_install = json_decode( $fonts_param, true );
-
-		$successes       = array();
-		$errors          = array();
-		$response_status = 200;
-
-		if ( empty( $fonts_to_install ) ) {
-			$errors[]        = new WP_Error(
-				'no_fonts_to_install',
-				__( 'No fonts to install', 'gutenberg' )
-			);
-			$response_status = 400;
-		}
-
-		if ( $this->needs_write_permission( $fonts_to_install ) ) {
-			$upload_dir = WP_Font_Library::get_fonts_dir();
-			if ( ! $this->has_upload_directory() ) {
-				if ( ! wp_mkdir_p( $upload_dir ) ) {
-					$errors[] = new WP_Error(
-						'cannot_create_fonts_folder',
-						sprintf(
-							/* translators: %s: Directory path. */
-							__( 'Error: Unable to create directory %s.', 'gutenberg' ),
-							esc_html( $upload_dir )
-						)
-					);
-					$response_status = 500;
-				}
-			}
-
-			if ( $this->has_upload_directory() && ! $this->has_write_permission() ) {
-				$errors[]        = new WP_Error(
-					'cannot_write_fonts_folder',
-					__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' )
-				);
-				$response_status = 500;
-			}
-		}
-
-		if ( ! empty( $errors ) ) {
-			$data     = array(
-				'successes' => $successes,
-				'errors'    => $errors,
-			);
-			$response = rest_ensure_response( $data );
-			$response->set_status( $response_status );
-			return $response;
-		}
-
-		// Get uploaded files (used when installing local fonts).
-		$files = $request->get_file_params();
-		foreach ( $fonts_to_install as $font_data ) {
-			$font   = new WP_Font_Family( $font_data );
-			$result = $font->install( $files );
-			if ( is_wp_error( $result ) ) {
-				$errors[] = $result;
-			} else {
-				$successes[] = $result;
-			}
-		}
-
-		$data = array(
-			'successes' => $successes,
-			'errors'    => $errors,
-		);
-		return rest_ensure_response( $data );
-	}
 }
