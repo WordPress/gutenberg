@@ -242,8 +242,9 @@ export function useInputAndSelection( props ) {
 				};
 			} else {
 				applyRecord( record.current );
-				onSelectionChange( record.current.start, record.current.end );
 			}
+
+			onSelectionChange( record.current.start, record.current.end );
 
 			ownerDocument.addEventListener(
 				'selectionchange',
