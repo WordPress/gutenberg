@@ -8,7 +8,7 @@ For example, to allow a block [to be styled via `theme.json`](https://developer.
 
 [![Open Block Registration diagram image](https://developer.wordpress.org/files/2023/11/block-registration-e1700493399839.png)](https://developer.wordpress.org/files/2023/11/block-registration-e1700493399839.png "Open Block Registration diagram image")
 
-### Registration of the block with PHP (server-side)
+## Registration of the block with PHP (server-side)
 
 Block registration on the server usually takes place in the main plugin PHP file with the `register_block_type` function called on the [init hook](https://developer.wordpress.org/reference/hooks/init/).
 
@@ -44,7 +44,7 @@ add_action( 'init', 'minimal_block_ca6eda___register_block' );
 ```
 _See the [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda) of the  [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/index.php)_
 
-### Registration of the block with JavaScript (client-side)
+## Registration of the block with JavaScript (client-side)
 
 When the block is registered on the server, you only need to register the client-side settings on the client using the same block’s name.
 
