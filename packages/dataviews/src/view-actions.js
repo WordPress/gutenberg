@@ -221,8 +221,6 @@ function SortMenu( { fields, view, onChangeView } ) {
 										key={ direction }
 										value={ direction }
 										name={ `view-actions-sorting-${ field.id }` }
-										// Note: radio items can't be unselected even when all items
-										// associated to same name are set as un-checked.
 										checked={ isChecked }
 										onChange={ () => {
 											onChangeView( {
