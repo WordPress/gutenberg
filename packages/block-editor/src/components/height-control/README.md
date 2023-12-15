@@ -4,11 +4,6 @@ The `HeightControl` component adds a linked unit control and slider component fo
 
 _Note:_ It is worth noting that the minimum height option is an opt-in feature. Themes need to declare support for it before it'll be available, and a convenient way to do that is via opting in to the [appearanceTools](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls) UI controls.
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage
