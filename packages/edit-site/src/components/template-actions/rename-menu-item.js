@@ -107,6 +107,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 						<VStack spacing="5">
 							<TextControl
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								label={ __( 'Name' ) }
 								value={ editedTitle }
 								onChange={ setEditedTitle }
@@ -115,6 +116,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 
 							<HStack justify="right">
 								<Button
+									__next40pxDefaultSize
 									variant="tertiary"
 									onClick={ () => {
 										setIsModalOpen( false );
@@ -123,7 +125,11 @@ export default function RenameMenuItem( { template, onClose } ) {
 									{ __( 'Cancel' ) }
 								</Button>
 
-								<Button variant="primary" type="submit">
+								<Button
+									__next40pxDefaultSize
+									variant="primary"
+									type="submit"
+								>
 									{ __( 'Save' ) }
 								</Button>
 							</HStack>

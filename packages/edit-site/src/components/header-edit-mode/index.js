@@ -7,27 +7,26 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
-import { store as coreStore } from '@wordpress/core-data';
 import {
 	BlockToolbar,
-	__experimentalPreviewOptions as PreviewOptions,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { PinnedItems } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
-import { external, next, previous } from '@wordpress/icons';
+import { next, previous } from '@wordpress/icons';
 import {
 	Button,
 	__unstableMotion as motion,
-	MenuGroup,
-	MenuItem,
 	Popover,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { DocumentBar, store as editorStore } from '@wordpress/editor';
+import {
+	DocumentBar,
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -43,14 +42,14 @@ import {
 import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
+const { PreviewDropdown } = unlock( editorPrivateApis );
+
 export default function HeaderEditMode( { setListViewToggleElement } ) {
 	const {
-		deviceType,
 		templateType,
 		isDistractionFree,
 		blockEditorMode,
 		blockSelectionStart,
-		homeUrl,
 		showIconLabels,
 		editorCanvasView,
 		hasFixedToolbar,
@@ -59,9 +58,6 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 		const { getEditedPostType } = select( editSiteStore );
 		const { getBlockSelectionStart, __unstableGetEditorMode } =
 			select( blockEditorStore );
-		const {
-			getUnstableBase, // Site index.
-		} = select( coreStore );
 		const { get: getPreference } = select( preferencesStore );
 		const { getDeviceType } = select( editorStore );
 
@@ -70,7 +66,6 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 			templateType: getEditedPostType(),
 			blockEditorMode: __unstableGetEditorMode(),
 			blockSelectionStart: getBlockSelectionStart(),
-			homeUrl: getUnstableBase()?.home,
 			showIconLabels: getPreference(
 				editSiteStore.name,
 				'showIconLabels'
@@ -93,7 +88,6 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isTopToolbar = ! isZoomOutMode && hasFixedToolbar && isLargeViewport;
 	const blockToolbarRef = useRef();
-	const { setDeviceType } = useDispatch( editorStore );
 	const disableMotion = useReducedMotion();
 
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
@@ -215,34 +209,12 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 								{ 'is-zoomed-out': isZoomedOutView }
 							) }
 						>
-							<PreviewOptions
-								deviceType={ deviceType }
-								setDeviceType={ setDeviceType }
-								label={ __( 'View' ) }
-								isEnabled={
-									! isFocusMode && hasDefaultEditorCanvasView
-								}
+							<PreviewDropdown
 								showIconLabels={ showIconLabels }
-							>
-								{ ( { onClose } ) => (
-									<MenuGroup>
-										<MenuItem
-											href={ homeUrl }
-											target="_blank"
-											icon={ external }
-											onClick={ onClose }
-										>
-											{ __( 'View site' ) }
-											<VisuallyHidden as="span">
-												{
-													/* translators: accessibility text */
-													__( '(opens in a new tab)' )
-												}
-											</VisuallyHidden>
-										</MenuItem>
-									</MenuGroup>
-								) }
-							</PreviewOptions>
+								disabled={
+									isFocusMode || ! hasDefaultEditorCanvasView
+								}
+							/>
 						</div>
 					) }
 					<SaveButton />

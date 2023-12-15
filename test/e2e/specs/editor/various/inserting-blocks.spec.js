@@ -17,6 +17,13 @@ test.use( {
 test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllPosts();
+		await requestUtils.deleteAllBlocks();
+		await requestUtils.deleteAllPatternCategories();
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllBlocks();
+		await requestUtils.deleteAllPatternCategories();
 	} );
 
 	test( 'inserts blocks by dragging and dropping from the global inserter', async ( {
@@ -58,34 +65,16 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
 
 		await expect( insertingBlocksUtils.indicator ).toBeVisible();
-		// Expect the indicator to be below the paragraph block.
-		await expect
-			.poll( () =>
-				insertingBlocksUtils.indicator
-					.boundingBox()
-					.then( ( { y } ) => y )
-			)
-			.toBeGreaterThan( paragraphBoundingBox.y );
+		await insertingBlocksUtils.expectIndicatorBelowParagraph(
+			paragraphBoundingBox
+		);
 
 		await page.mouse.down();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				// Hover on the right side of the block to avoid collapsing with the preview.
-				paragraphBoundingBox.x + paragraphBoundingBox.width - 1,
-				// Hover on the bottom of the paragraph block.
-				paragraphBoundingBox.y + paragraphBoundingBox.height - 1
-			);
-		}
-		// Expect the indicator to be below the paragraph block.
-		await expect
-			.poll( () =>
-				insertingBlocksUtils.indicator
-					.boundingBox()
-					.then( ( { y } ) => y )
-			)
-			.toBeGreaterThan( paragraphBoundingBox.y );
+
+		await insertingBlocksUtils.dragOver( paragraphBoundingBox );
+		await insertingBlocksUtils.expectIndicatorBelowParagraph(
+			paragraphBoundingBox
+		);
 
 		// Expect the draggable-chip to appear.
 		await expect( insertingBlocksUtils.draggableChip ).toBeVisible();
@@ -139,16 +128,8 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
 
 		await page.mouse.down();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				// Hover on the right side of the block to avoid collapsing with the preview.
-				paragraphBoundingBox.x + paragraphBoundingBox.width - 1,
-				// Hover on the bottom of the paragraph block.
-				paragraphBoundingBox.y + paragraphBoundingBox.height - 1
-			);
-		}
+
+		await insertingBlocksUtils.dragOver( paragraphBoundingBox );
 
 		await expect( insertingBlocksUtils.indicator ).toBeVisible();
 		await expect( insertingBlocksUtils.draggableChip ).toBeVisible();
@@ -210,32 +191,116 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
 
 		await page.mouse.down();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				// Hover on the right side of the block to avoid collapsing with the preview.
-				paragraphBoundingBox.x + paragraphBoundingBox.width - 1,
-				// Hover on the bottom of the paragraph block.
-				paragraphBoundingBox.y + paragraphBoundingBox.height - 1
-			);
-		}
+
+		await insertingBlocksUtils.dragOver( paragraphBoundingBox );
 
 		await expect( insertingBlocksUtils.indicator ).toBeVisible();
-		// Expect the indicator to be below the paragraph block.
-		await expect
-			.poll( () =>
-				insertingBlocksUtils.indicator
-					.boundingBox()
-					.then( ( { y } ) => y )
-			)
-			.toBeGreaterThan( paragraphBoundingBox.y );
+		await insertingBlocksUtils.expectIndicatorBelowParagraph(
+			paragraphBoundingBox
+		);
 
 		await expect( insertingBlocksUtils.draggableChip ).toBeVisible();
 
 		await page.mouse.up();
 
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	test( 'inserts synced patterns by dragging and dropping from the global inserter', async ( {
+		admin,
+		page,
+		editor,
+		insertingBlocksUtils,
+	}, testInfo ) => {
+		testInfo.fixme(
+			testInfo.project.name === 'firefox',
+			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
+		);
+		const PATTERN_NAME = 'My synced pattern';
+
+		await admin.createNewPost();
+		await editor.switchToLegacyCanvas();
+
+		// We need a dummy block in place to display the drop indicator due to a bug.
+		// @see https://github.com/WordPress/gutenberg/issues/44064
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Dummy text' },
+		} );
+
+		const paragraphBlock = page.locator(
+			'[data-type="core/paragraph"] >> text=Dummy text'
+		);
+
+		// Create a synced pattern from the paragraph block.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'A useful paragraph to reuse' },
+		} );
+		await editor.showBlockToolbar();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Create pattern' } ).click();
+		const createPatternDialog = page.getByRole( 'dialog', {
+			name: 'Create pattern',
+		} );
+		await createPatternDialog
+			.getByRole( 'textbox', { name: 'Name' } )
+			.fill( PATTERN_NAME );
+		await createPatternDialog
+			.getByRole( 'checkbox', { name: 'Synced' } )
+			.setChecked( true );
+		await createPatternDialog
+			.getByRole( 'button', { name: 'Create' } )
+			.click();
+		const patternBlock = page.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+		await expect( patternBlock ).toBeFocused();
+
+		// Insert a synced pattern.
+		await page.click(
+			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
+		);
+		await page.fill(
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			PATTERN_NAME
+		);
+		await page.hover(
+			`role=listbox[name="Block Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
+		);
+
+		const paragraphBoundingBox = await paragraphBlock.boundingBox();
+
+		await page.mouse.down();
+
+		await insertingBlocksUtils.dragOver( paragraphBoundingBox );
+		await expect( insertingBlocksUtils.indicator ).toBeVisible();
+		await insertingBlocksUtils.expectIndicatorBelowParagraph(
+			paragraphBoundingBox
+		);
+		await expect( insertingBlocksUtils.draggableChip ).toBeVisible();
+
+		await page.mouse.up();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Dummy text',
+				},
+			},
+			{
+				name: 'core/block',
+				attributes: { ref: expect.any( Number ) },
+			},
+			{
+				name: 'core/block',
+				attributes: { ref: expect.any( Number ) },
+			},
+		] );
 	} );
 
 	test( 'cancels dragging patterns from the global inserter by pressing Escape', async ( {
@@ -278,16 +343,8 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
 
 		await page.mouse.down();
-		// Call the move function twice to make sure the `dragOver` event is sent.
-		// @see https://github.com/microsoft/playwright/issues/17153
-		for ( let i = 0; i < 2; i += 1 ) {
-			await page.mouse.move(
-				// Hover on the right side of the block to avoid collapsing with the preview.
-				paragraphBoundingBox.x + paragraphBoundingBox.width - 1,
-				// Hover on the bottom of the paragraph block.
-				paragraphBoundingBox.y + paragraphBoundingBox.height - 1
-			);
-		}
+
+		await insertingBlocksUtils.dragOver( paragraphBoundingBox );
 
 		await expect( insertingBlocksUtils.indicator ).toBeVisible();
 		await expect( insertingBlocksUtils.draggableChip ).toBeVisible();
@@ -387,5 +444,24 @@ class InsertingBlocksUtils {
 		this.draggableChip = this.page.locator(
 			'data-testid=block-draggable-chip >> visible=true'
 		);
+	}
+	async dragOver( boundingBox ) {
+		// Call the move function twice to make sure the `dragOver` event is sent.
+		// @see https://github.com/microsoft/playwright/issues/17153
+		for ( let i = 0; i < 2; i += 1 ) {
+			await this.page.mouse.move(
+				// Hover on the right side of the block to avoid collapsing with the preview.
+				boundingBox.x + boundingBox.width - 1,
+				// Hover on the bottom of the paragraph block.
+				boundingBox.y + boundingBox.height - 1
+			);
+		}
+	}
+
+	async expectIndicatorBelowParagraph( paragraphBoundingBox ) {
+		// Expect the indicator to be below the paragraph block.
+		await expect
+			.poll( () => this.indicator.boundingBox().then( ( { y } ) => y ) )
+			.toBeGreaterThan( paragraphBoundingBox.y );
 	}
 }

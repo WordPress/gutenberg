@@ -60,9 +60,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 								<Icon icon={ check } />
 							)
 						}
-						onSelect={ ( event ) => {
-							// We need to handle this on DropDown component probably..
-							event.preventDefault();
+						onSelect={ () => {
 							onChangeView( {
 								...view,
 								type: availableView.type,
@@ -232,22 +230,13 @@ function SortMenu( { fields, view, onChangeView } ) {
 										}
 										onSelect={ ( event ) => {
 											event.preventDefault();
-											if (
-												sortedDirection === direction
-											) {
-												onChangeView( {
-													...view,
-													sort: undefined,
-												} );
-											} else {
-												onChangeView( {
-													...view,
-													sort: {
-														field: field.id,
-														direction,
-													},
-												} );
-											}
+											onChangeView( {
+												...view,
+												sort: {
+													field: field.id,
+													direction,
+												},
+											} );
 										} }
 									>
 										{ info.label }
@@ -272,7 +261,6 @@ export default function ViewActions( {
 		<DropdownMenu
 			trigger={
 				<Button
-					variant="tertiary"
 					size="compact"
 					icon={
 						VIEW_LAYOUTS.find( ( v ) => v.type === view.type )

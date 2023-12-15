@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-
-/**
  * WordPress dependencies
  */
 
@@ -32,16 +28,21 @@ export const TabPanel = forwardRef<
 	}
 	const { store, instanceId } = context;
 	const instancedTabId = `${ instanceId }-${ tabId }`;
+	const selectedId = store.useState( ( state ) => state.selectedId );
 
 	return (
 		<StyledTabPanel
 			ref={ ref }
 			store={ store }
-			id={ instancedTabId }
+			// For TabPanel, the id passed here is the id attribute of the DOM
+			// element.
+			// `tabId` is the id of the tab that controls this panel.
+			id={ `${ instancedTabId }-view` }
+			tabId={ instancedTabId }
 			focusable={ focusable }
 			{ ...otherProps }
 		>
-			{ children }
+			{ selectedId === instancedTabId && children }
 		</StyledTabPanel>
 	);
 } );

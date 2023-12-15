@@ -155,6 +155,7 @@ export default {
 	shareWithChildBlocks: true,
 	edit: BlockEditAlignmentToolbarControlsPure,
 	useBlockProps,
+	addSaveProps: addAssignedAlign,
 	attributeKeys: [ 'align' ],
 	hasSupport( name ) {
 		return hasBlockSupport( name, 'align', false );
@@ -208,9 +209,4 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/editor/align/addAttribute',
 	addAttribute
-);
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/editor/align/addAssignedAlign',
-	addAssignedAlign
 );

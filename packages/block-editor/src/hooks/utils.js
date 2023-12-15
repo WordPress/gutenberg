@@ -10,7 +10,11 @@ import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import useDisplayBlockControls from '../components/use-display-block-controls';
+import {
+	useBlockEditContext,
+	mayDisplayControlsKey,
+	mayDisplayParentControlsKey,
+} from '../components/block-edit/context';
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
@@ -108,14 +112,18 @@ export function transformStyles(
  * Check whether serialization of specific block support feature or set should
  * be skipped.
  *
- * @param {string|Object} blockType  Block name or block type object.
- * @param {string}        featureSet Name of block support feature set.
- * @param {string}        feature    Name of the individual feature to check.
+ * @param {string|Object} blockNameOrType Block name or block type object.
+ * @param {string}        featureSet      Name of block support feature set.
+ * @param {string}        feature         Name of the individual feature to check.
  *
  * @return {boolean} Whether serialization should occur.
  */
-export function shouldSkipSerialization( blockType, featureSet, feature ) {
-	const support = getBlockSupport( blockType, featureSet );
+export function shouldSkipSerialization(
+	blockNameOrType,
+	featureSet,
+	feature
+) {
+	const support = getBlockSupport( blockNameOrType, featureSet );
 	const skipSerialization = support?.__experimentalSkipSerialization;
 
 	if ( Array.isArray( skipSerialization ) ) {
@@ -379,8 +387,7 @@ export function createBlockEditFilter( features ) {
 	} );
 	const withBlockEditHooks = createHigherOrderComponent(
 		( OriginalBlockEdit ) => ( props ) => {
-			const { isDisplayed, isParentDisplayed } =
-				useDisplayBlockControls();
+			const context = useBlockEditContext();
 			// CAUTION: code added before this line will be executed for all
 			// blocks, not just those that support the feature! Code added
 			// above this line should be carefully evaluated for its impact on
@@ -394,8 +401,9 @@ export function createBlockEditFilter( features ) {
 						shareWithChildBlocks,
 					} = feature;
 					const shouldDisplayControls =
-						isDisplayed ||
-						( isParentDisplayed && shareWithChildBlocks );
+						context[ mayDisplayControlsKey ] ||
+						( context[ mayDisplayParentControlsKey ] &&
+							shareWithChildBlocks );
 
 					if (
 						! shouldDisplayControls ||
@@ -480,10 +488,10 @@ export function createBlockListBlockFilter( features ) {
 					}
 
 					if (
-						! hasSupport( props.name ) ||
 						// Skip rendering if none of the needed attributes are
 						// set.
-						! Object.keys( neededProps ).length
+						! Object.keys( neededProps ).length ||
+						! hasSupport( props.name )
 					) {
 						return null;
 					}
@@ -533,5 +541,51 @@ export function createBlockListBlockFilter( features ) {
 		'editor.BlockListBlock',
 		'core/editor/hooks',
 		withBlockListBlockHooks
+	);
+}
+
+export function createBlockSaveFilter( features ) {
+	function extraPropsFromHooks( props, name, attributes ) {
+		return features.reduce( ( accu, feature ) => {
+			const { hasSupport, attributeKeys = [], addSaveProps } = feature;
+
+			const neededAttributes = {};
+			for ( const key of attributeKeys ) {
+				if ( attributes[ key ] ) {
+					neededAttributes[ key ] = attributes[ key ];
+				}
+			}
+
+			if (
+				// Skip rendering if none of the needed attributes are
+				// set.
+				! Object.keys( neededAttributes ).length ||
+				! hasSupport( name )
+			) {
+				return accu;
+			}
+
+			return addSaveProps( accu, name, neededAttributes );
+		}, props );
+	}
+	addFilter(
+		'blocks.getSaveContent.extraProps',
+		'core/editor/hooks',
+		extraPropsFromHooks,
+		0
+	);
+	addFilter(
+		'blocks.getSaveContent.extraProps',
+		'core/editor/hooks',
+		( props ) => {
+			// Previously we had a filter deleting the className if it was an empty
+			// string. That filter is no longer running, so now we need to delete it
+			// here.
+			if ( props.hasOwnProperty( 'className' ) && ! props.className ) {
+				delete props.className;
+			}
+
+			return props;
+		}
 	);
 }

@@ -8,7 +8,6 @@ import {
 	BlockEditorProvider,
 	BlockCanvas,
 	BlockToolbar,
-	BlockTools,
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
@@ -60,7 +59,6 @@ export default function EditorWithUndoRedo() {
 						label="Redo"
 					/>
 					<BlockToolbar hideDragHandle />
-					<BlockTools />
 				</div>
 				<BlockCanvas height="100%" styles={ editorStyles } />
 			</BlockEditorProvider>
