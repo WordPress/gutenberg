@@ -88,7 +88,7 @@ Check the <a href="https://developer.wordpress.org/block-editor/reference-guides
 
 ## Enable UI settings panels for the block with `supports`
 
-A lot of blocks, including core blocks, offer similar customization option, whether that is to change the background color, text color, or to add padding customization options.
+Many blocks, including core blocks, offer similar customization options, whether changing the background color, text color, or adding padding customization options.
 
 To avoid duplicating the same logic over and over in your blocks and to align the behavior of your block with core blocks, you can make use of the different `supports` properties.
 
