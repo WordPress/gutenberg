@@ -28,6 +28,10 @@ export function getScreenAdjustedFontSize(
 	minFontSize = 12,
 	maxFontSize = 100
 ) {
+	if ( typeof currentFontSize !== 'number' || isNaN( currentFontSize ) ) {
+		return undefined;
+	}
+
 	const fontScale = PixelRatio.getFontScale() ?? 1;
 	const scaledFontSize = currentFontSize * fontScale;
 	const fontSize = clamp( scaledFontSize, minFontSize, maxFontSize );
