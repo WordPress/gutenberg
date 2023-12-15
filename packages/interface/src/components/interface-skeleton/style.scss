@@ -69,6 +69,12 @@ html.interface-interface-skeleton__html-container {
 			padding-bottom: $button-size-small + $border-width;
 		}
 	}
+
+	// Prevent unneccessary infinite empty scrolling when empty block canvas
+	// and attempting to insert a new block with inserter open and typing.
+	.is-inserter-opened & {
+		overflow: hidden;
+	}
 }
 
 .interface-interface-skeleton__content {
