@@ -69,6 +69,8 @@ _Example: Atributes stored in the Markup representation of the block_
 <!-- /wp:block-development-examples/copyright-date-block-09aac3 -->x
 ```
 
+### Reading and updating attributes 
+
 These [`attributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#attributes) are passed to the React component `Edit`(to display in the Block Editor) and the `save` function (to return the markup saved to the DB) of the block, and to any server-side render definition for the block (see `render` prop above). 
 
 The `Edit` component receives exclusively the capability of updating the attributes via the [`setAttributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#setattributes) function.
