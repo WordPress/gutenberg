@@ -87,9 +87,8 @@ function Block( { children, isHtml, ...props } ) {
 function BlockListBlock( {
 	block: { __unstableBlockSource },
 	mode,
-	isLocked,
-	canRemove,
 	clientId,
+	rootClientId,
 	isSelected,
 	isSelectionEnabled,
 	className,
@@ -110,8 +109,12 @@ function BlockListBlock( {
 		themeSupportsLayout,
 		...context
 	} = useContext( PrivateBlockContext );
-	const { removeBlock } = useDispatch( blockEditorStore );
-	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
+	const { removeBlock, canRemoveBlock } = useDispatch( blockEditorStore );
+	const onRemove = useCallback( () => {
+		if ( canRemoveBlock( clientId, rootClientId ) ) {
+			removeBlock( clientId );
+		}
+	}, [ clientId, rootClientId, canRemoveBlock, removeBlock ] );
 
 	const parentLayout = useLayout() || {};
 
@@ -125,10 +128,10 @@ function BlockListBlock( {
 			isSelected={ isSelected }
 			attributes={ attributes }
 			setAttributes={ setAttributes }
-			insertBlocksAfter={ isLocked ? undefined : onInsertBlocksAfter }
-			onReplace={ canRemove ? onReplace : undefined }
-			onRemove={ canRemove ? onRemove : undefined }
-			mergeBlocks={ canRemove ? onMerge : undefined }
+			insertBlocksAfter={ onInsertBlocksAfter }
+			onReplace={ onReplace }
+			onRemove={ onRemove }
+			mergeBlocks={ onMerge }
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
 			toggleSelection={ toggleSelection }
@@ -274,12 +277,20 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 		},
 		onInsertBlocksAfter( blocks ) {
 			const { clientId, rootClientId } = ownProps;
+			const { getTemplateLock } = registry.select( blockEditorStore );
+			if ( getTemplateLock( rootClientId ) ) {
+				return;
+			}
 			const { getBlockIndex } = registry.select( blockEditorStore );
 			const index = getBlockIndex( clientId );
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onMerge( forward ) {
 			const { clientId, rootClientId } = ownProps;
+			const { canRemoveBlock } = registry.select( blockEditorStore );
+			if ( ! canRemoveBlock( clientId, rootClientId ) ) {
+				return;
+			}
 			const {
 				getPreviousBlockClientId,
 				getNextBlockClientId,
@@ -455,6 +466,11 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 			}
 		},
 		onReplace( blocks, indexToSelect, initialPosition ) {
+			const { clientId, rootClientId } = ownProps;
+			const { canRemoveBlock } = registry.select( blockEditorStore );
+			if ( ! canRemoveBlock( clientId, rootClientId ) ) {
+				return;
+			}
 			if (
 				blocks.length &&
 				! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
@@ -493,18 +509,14 @@ BlockListBlock = compose(
 // context to pass the rest of the information to the filtered BlockListBlock
 // component, and useBlockProps.
 function BlockListBlockProvider( props ) {
-	const { clientId, rootClientId } = props;
+	const { clientId } = props;
 	const selectedProps = useSelect(
 		( select ) => {
 			const {
 				isBlockSelected,
 				getBlockMode,
 				isSelectionEnabled,
-				getTemplateLock,
 				__unstableGetBlockWithoutInnerBlocks,
-				canRemoveBlock,
-				canMoveBlock,
-
 				getSettings,
 				__unstableGetTemporarilyEditingAsBlocks,
 				getBlockEditingMode,
@@ -512,7 +524,6 @@ function BlockListBlockProvider( props ) {
 				isFirstMultiSelectedBlock,
 				getMultiSelectedBlockClientIds,
 				hasSelectedInnerBlock,
-
 				getBlockIndex,
 				isTyping,
 				getGlobalBlockCount,
@@ -543,7 +554,6 @@ function BlockListBlockProvider( props ) {
 			const { hasBlockSupport, getActiveBlockVariation } =
 				select( blocksStore );
 			const isSelected = isBlockSelected( clientId );
-			const templateLock = getTemplateLock( rootClientId );
 			const { name, attributes, isValid } = block;
 			const blockType = getBlockType( name );
 			const { outlineMode, supportsLayout } = getSettings();
@@ -556,9 +566,6 @@ function BlockListBlockProvider( props ) {
 			return {
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
-				isLocked: !! templateLock,
-				canRemove: canRemoveBlock( clientId, rootClientId ),
-				canMove: canMoveBlock( clientId, rootClientId ),
 				// Users of the editor.BlockListBlock filter used to be able to
 				// access the block prop.
 				// Ideally these blocks would rely on the clientId prop only.
@@ -632,15 +639,12 @@ function BlockListBlockProvider( props ) {
 				hasLightBlockWrapper,
 			};
 		},
-		[ clientId, rootClientId ]
+		[ clientId ]
 	);
 
 	const {
 		mode,
 		isSelectionEnabled,
-		isLocked,
-		canRemove,
-		canMove,
 		block,
 		name,
 		attributes,
@@ -735,9 +739,6 @@ function BlockListBlockProvider( props ) {
 				{ ...{
 					mode,
 					isSelectionEnabled,
-					isLocked,
-					canRemove,
-					canMove,
 					// Users of the editor.BlockListBlock filter used to be able
 					// to access the block prop. Ideally these blocks would rely
 					// on the clientId prop only. This is kept for backward
