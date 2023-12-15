@@ -33,7 +33,7 @@ class Tests_Fonts_Font_Family_Controller_update_item extends WP_REST_Font_Librar
 	 * @param array $font_family     Font families to install in theme.json format.
 	 * @param array $expected_response Expected response data.
 	 */
-	public function test_get_font_family_failure( $request, $update, $expected_response, $files=null ) {
+	public function test_update_font_family_failure( $request, $update, $expected_response, $files=null ) {
 
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
 		if( array_key_exists( 'data', $request ) ){
@@ -100,7 +100,7 @@ class Tests_Fonts_Font_Family_Controller_update_item extends WP_REST_Font_Librar
 	 * @param array $font_family     Font families to install in theme.json format.
 	 * @param array $expected_response Expected response data.
 	 */
-	public function test_get_font_family_success( $request, $update, $expected_response, $files=null ) {
+	public function test_update_font_family_success( $request, $update, $expected_response, $files=null ) {
 
 		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
 		if( array_key_exists( 'data', $request ) ){
@@ -126,7 +126,6 @@ class Tests_Fonts_Font_Family_Controller_update_item extends WP_REST_Font_Librar
 
 		$update_response = rest_get_server()->dispatch( $update_request );
 		$response_data     = $update_response->get_data();
-
 
 		$this->assertSame( $expected_response['data']['slug'], $response_data['data']['slug'], 'The slug response did not match expected.' );
 		$this->assertSame( $expected_response['data']['name'], $response_data['data']['name'], 'The name response did not match expected.' );
@@ -244,14 +243,14 @@ class Tests_Fonts_Font_Family_Controller_update_item extends WP_REST_Font_Librar
 								'fontStyle'       => 'normal',
 								'fontWeight'      => '400',
 								'preview'	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-normal.svg',
-								'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
+								'downloadFromUrl'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
 							),
 							array(
 								'fontFamily'      => 'Family',
 								'fontStyle'       => 'italic',
 								'fontWeight'      => '400',
 								'preview' 	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-italic.svg',
-								'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf',
+								'downloadFromUrl'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf',
 							),
 						),
 					)
@@ -267,7 +266,7 @@ class Tests_Fonts_Font_Family_Controller_update_item extends WP_REST_Font_Librar
 								'fontStyle'       => 'normal',
 								'fontWeight'      => '400',
 								'preview'	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-normal.svg',
-								'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
+								'downloadFromUrl'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
 							),
 						),
 					)
@@ -283,7 +282,7 @@ class Tests_Fonts_Font_Family_Controller_update_item extends WP_REST_Font_Librar
 								'fontStyle'       => 'normal',
 								'fontWeight'      => '400',
 								'preview'	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-normal.svg',
-								'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
+								'src'             => 'http://localhost:8889/wp-content/fonts/slug_normal_400.ttf',
 							),
 						),
 					)

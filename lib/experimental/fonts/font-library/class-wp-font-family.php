@@ -52,7 +52,7 @@ class WP_Font_Family {
 			$this->id = $font_data['id'];
 		}
 
-		$update_response = $this->update( $font_data );
+		$update_response = $this->update( $font_data, null, true );
 
 		if ( is_wp_error( $update_response ) ) {
 			throw new Exception( $update_response->get_error_message() );
@@ -124,16 +124,78 @@ class WP_Font_Family {
 	 *
 	 * @return array An array in fontFamily theme.json format.
 	 */
-	public function update( $data, $files=null ) {
+	public function update( $data, $files=null, $patch=false ) {
+
+		$current_font_faces = array();
+		$font_faces_to_add = array();
+		$font_faces_to_remove = array();
+
+		if ( array_key_exists( 'fontFace', $this->data ) && ! empty( $this->data['fontFace'] ) ) {
+			$current_font_faces = $this->data['fontFace'];
+		}
+
+		if ( array_key_exists( 'fontFace', $data ) && ! empty( $data['fontFace'] ) ) {
+			$font_faces_to_add = $data['fontFace'];
+		}
+
+		if ( false === $patch ) {
+			//If we are UPDATING this object then we need to remove any font faces that were not sent
+			foreach ( $current_font_faces as $font_face ) {
+				$existing_font_face = $this->get_font_face_from_collection( $font_face['fontWeight'], $font_face['fontStyle'], $font_faces_to_add );
+				if ( ! $existing_font_face ) {
+					$font_faces_to_remove[] = $font_face;
+				}
+			}
+		}
+
+		//Skip any font faces that are ALREADY installed
+		$non_redundant_font_faces_to_add = array();
+		$skipped_font_faces = array();
+		foreach ( $font_faces_to_add as $font_face ) {
+			$existing_font_face = $this->get_font_face_from_collection( $font_face['fontWeight'], $font_face['fontStyle'], $current_font_faces );
+			if ( $existing_font_face ) {
+				$skipped_font_faces[] = $existing_font_face;
+			}
+			else {
+				$non_redundant_font_faces_to_add[] = $font_face;
+			}
+		}
+		$font_faces_to_add = $non_redundant_font_faces_to_add;
+
 
 		// Install any assets needed by font faces.
-		//TODO: Skip any Font Faces that are already installed?
-		if ( ! empty( $data['fontFace'] ) ) {
-			$ready_font_faces = $this->prepare_font_faces( $data['fontFace'], $files);
-			if ( is_wp_error( $ready_font_faces ) ) {
-				return $ready_font_faces;
+		$prepared_font_faces = array();
+		if ( ! empty( $font_faces_to_add ) ) {
+			$prepared_font_faces = $this->prepare_font_faces( $font_faces_to_add, $files);
+			if ( is_wp_error( $prepared_font_faces ) ) {
+				return $prepared_font_faces;
 			}
-			$data['fontFace'] = $ready_font_faces;
+		}
+
+		// Remember to keep the font faces that were already installed that need to stay installed
+		$prepared_font_faces = array_merge( $skipped_font_faces, $prepared_font_faces );
+
+		if ( true === $patch ) {
+			//If we are PATCHING this object then we need to merge the collection
+			$data['fontFace'] = array_merge( $current_font_faces, $prepared_font_faces );
+		}
+		else {
+			//If we are UPDATING this object then we need to use only the items that were sent
+			$data['fontFace'] = $prepared_font_faces;
+		}
+
+		// If after all that installing and uninstalling our fontFace collection is empty just remove it.
+		if ( empty( $data['fontFace'] ) ) {
+			unset( $data['fontFace'] );
+		}
+
+		// Remove the assets for any font faces that were flagged to be removed.
+		//NOTE: This is a 'nice-to-have' operation.  If we got here we have ALREADY sucessfully installed the necessary font faces.
+		//If we fail deleting the assets (for some reason) failing the request isn't very nice.
+		if ( ! empty( $font_faces_to_remove ) ) {
+			foreach ( $font_faces_to_remove as $font_face ) {
+				$this->delete_font_face_assets( $font_face );
+			}
 		}
 
 		$merged_data = array_merge( $this->data, $data);
@@ -142,6 +204,19 @@ class WP_Font_Family {
 		$this->data = $sanitized_data;
 
 		return $this->get_data();
+	}
+
+
+	private function get_font_face_from_collection ( $font_weight, $font_style, $collection ) {
+		if ( ! $collection ) {
+			return null;
+		}
+		foreach ( $collection as $font_face ) {
+			if ( $font_weight === $font_face['fontWeight'] && $font_style === $font_face['fontStyle']) {
+				return $font_face;
+			}
+		}
+		return null;
 	}
 
 	private function prepare_font_faces( $font_faces, $files ) {
@@ -159,7 +234,6 @@ class WP_Font_Family {
 				}
 
 				if ( ! empty( $font_face['uploadedFile'] ) ) {
-					//TODO: Test to ensure the file referenced exists
 					if ( ! $files || ! array_key_exists( $font_face['uploadedFile'], $files )) {
 						return new WP_Error(
 							'font_face_upload_file_missing',
@@ -169,6 +243,7 @@ class WP_Font_Family {
 					$downloaded_font_face_src = $this->move_font_face_asset( $font_face, $files[ $font_face[ 'uploadedFile' ] ] );
 					unset( $font_face['uploadedFile'] );
 				}
+
 
 				if ( ! empty( $font_face['downloadFromUrl'] ) ) {
 					$downloaded_font_face_src = $this->download_font_face_assets( $font_face );
@@ -475,8 +550,29 @@ class WP_Font_Family {
 		);
 	}
 
+	/**
+	 * Deletes all font face asset files associated with a given font face.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array $font_face The font face array containing the 'src' attribute
+	 *                         with the file path(s) to be deleted.
+	 * @return bool True if delete was successful, otherwise false.
+	 */
+	private function delete_font_face_assets( $font_face ) {
+		$sources = (array) $font_face['src'];
+		foreach ( $sources as $src ) {
+			//Skip if it's remotely hosted
+			if( ! str_contains( $src, WP_Font_Library::get_fonts_dir() ) ){
+				continue;
+			}
 
+			$filename  = basename( $src );
+			$file_path = path_join( WP_Font_Library::get_fonts_dir(), $filename );
+			wp_delete_file( $file_path );
+		}
 
+	}
 
 
 
@@ -568,46 +664,9 @@ class WP_Font_Family {
 		return true;
 	}
 
-	/**
-	 * Deletes a specified font asset file from the fonts directory.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param string $src The path of the font asset file to delete.
-	 * @return bool Whether the file was deleted.
-	 */
-	private static function delete_asset( $src ) {
-		if( ! $src ) {
-			return true;
-		}
-		$filename  = basename( $src );
-		$file_path = path_join( WP_Font_Library::get_fonts_dir(), $filename );
 
-		wp_delete_file( $file_path );
 
-		return ! file_exists( $file_path );
-	}
 
-	/**
-	 * Deletes all font face asset files associated with a given font face.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param array $font_face The font face array containing the 'src' attribute
-	 *                         with the file path(s) to be deleted.
-	 * @return bool True if delete was successful, otherwise false.
-	 */
-	private static function delete_font_face_assets( $font_face ) {
-		$sources = (array) $font_face['src'];
-		foreach ( $sources as $src ) {
-			$was_asset_removed = self::delete_asset( $src );
-			if ( ! $was_asset_removed ) {
-				// Bail if any of the assets could not be removed.
-				return false;
-			}
-		}
-		return true;
-	}
 
 
 
