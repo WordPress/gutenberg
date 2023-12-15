@@ -1124,6 +1124,7 @@ export class RichText extends Component {
 		const html = this.getHtmlToRender( record, tagName );
 		const editableProps = this.getEditableProps();
 		const blockUseDefaultFont = this.getBlockUseDefaultFont();
+
 		const fontSize = getScreenAdjustedFontSize( currentFontSize );
 		const lineHeight = this.getLineHeight();
 
