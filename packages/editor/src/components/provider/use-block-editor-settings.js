@@ -1,14 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { Platform, useMemo, useCallback } from '@wordpress/element';
+import {
+	Platform,
+	useMemo,
+	// useCallback
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
+// import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -93,9 +97,9 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
-		userCanCreatePages,
-		pageOnFront,
-		pageForPosts,
+		// userCanCreatePages,
+		// pageOnFront,
+		// pageForPosts,
 		userPatternCategories,
 		restBlockPatterns,
 		restBlockPatternCategories,
@@ -180,7 +184,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 
 	const { undo } = useDispatch( editorStore );
 
-	const { saveEntityRecord } = useDispatch( coreStore );
+	// const { saveEntityRecord } = useDispatch( coreStore );
 
 	/**
 	 * Creates a Post entity.
@@ -189,19 +193,19 @@ function useBlockEditorSettings( settings, postType, postId ) {
 	 * @param {Object} options parameters for the post being created. These mirror those used on 3rd param of saveEntityRecord.
 	 * @return {Object} the post type object that was created.
 	 */
-	const createPageEntity = useCallback(
-		( options ) => {
-			if ( ! userCanCreatePages ) {
-				return Promise.reject( {
-					message: __(
-						'You do not have permission to create Pages.'
-					),
-				} );
-			}
-			return saveEntityRecord( 'postType', 'page', options );
-		},
-		[ saveEntityRecord, userCanCreatePages ]
-	);
+	// const createPageEntity = useCallback(
+	// 	( options ) => {
+	// 		if ( ! userCanCreatePages ) {
+	// 			return Promise.reject( {
+	// 				message: __(
+	// 					'You do not have permission to create Pages.'
+	// 				),
+	// 			} );
+	// 		}
+	// 		return saveEntityRecord( 'postType', 'page', options );
+	// 	},
+	// 	[ saveEntityRecord, userCanCreatePages ]
+	// );
 
 	return useMemo(
 		() => ( {
@@ -228,10 +232,10 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			// including the navigation / pattern / parts editors.
 			outlineMode: postType === 'wp_template',
 			// Check these two properties: they were not present in the site editor.
-			__experimentalCreatePageEntity: createPageEntity,
-			__experimentalUserCanCreatePages: userCanCreatePages,
-			pageOnFront,
-			pageForPosts,
+			// __experimentalCreatePageEntity: createPageEntity,
+			// __experimentalUserCanCreatePages: userCanCreatePages,
+			// pageOnFront,
+			// pageForPosts,
 			__experimentalPreferPatternsOnRoot: postType === 'wp_template',
 			templateLock:
 				postType === 'wp_navigation' ? 'insert' : settings.templateLock,
@@ -249,10 +253,10 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			blockPatternCategories,
 			canUseUnfilteredHTML,
 			undo,
-			createPageEntity,
-			userCanCreatePages,
-			pageOnFront,
-			pageForPosts,
+			// createPageEntity,
+			// userCanCreatePages,
+			// pageOnFront,
+			// pageForPosts,
 			postType,
 		]
 	);
