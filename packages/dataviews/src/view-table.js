@@ -92,17 +92,17 @@ function HeaderMenu( { field, view, onChangeView } ) {
 					<DropdownMenuGroup>
 						{ Object.entries( sortingItemsInfo ).map(
 							( [ direction, info ] ) => {
-								const isActive =
+								const isChecked =
 									isSorted &&
 									view.sort.direction === direction;
 								return (
 									<DropdownMenuItem
 										key={ direction }
 										role="menuitemradio"
-										aria-checked={ isActive }
+										aria-checked={ isChecked }
 										prefix={ <Icon icon={ info.icon } /> }
 										suffix={
-											isActive && <Icon icon={ check } />
+											isChecked && <Icon icon={ check } />
 										}
 										onClick={ ( event ) => {
 											event.preventDefault();
