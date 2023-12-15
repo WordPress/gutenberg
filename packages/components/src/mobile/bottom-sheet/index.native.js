@@ -212,8 +212,7 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
-		// Restore Keyboard Visibility
-		showAndroidSoftKeyboard();
+		const { isFullScreen } = this.props;
 
 		this.dimensionsChangeSubscription.remove();
 		this.keyboardShowListener.remove();
@@ -221,6 +220,13 @@ class BottomSheet extends Component {
 		if ( this.androidModalClosedSubscription ) {
 			this.androidModalClosedSubscription.remove();
 		}
+
+		if ( this.props.isVisible ) {
+			// For full screen modals we add a delay for the keyboard
+			const keyboardDelay = isFullScreen ? 500 : 0;
+			showAndroidSoftKeyboard( { delay: keyboardDelay } );
+		}
+
 		if ( this.safeAreaEventSubscription === null ) {
 			return;
 		}
@@ -321,6 +327,9 @@ class BottomSheet extends Component {
 	onDismiss() {
 		const { onDismiss } = this.props;
 
+		// Restore Keyboard Visibility
+		showAndroidSoftKeyboard();
+
 		if ( onDismiss ) {
 			onDismiss();
 		}
@@ -359,9 +368,6 @@ class BottomSheet extends Component {
 			onClose();
 		}
 		this.onShouldSetBottomSheetMaxHeight( true );
-
-		// Restore Keyboard Visibility
-		showAndroidSoftKeyboard();
 	}
 
 	setIsFullScreen( isFullScreen ) {
@@ -377,9 +383,6 @@ class BottomSheet extends Component {
 	onHardwareButtonPress() {
 		const { onClose } = this.props;
 		const { handleHardwareButtonPress } = this.state;
-
-		// Restore Keyboard Visibility
-		showAndroidSoftKeyboard();
 
 		if ( handleHardwareButtonPress && handleHardwareButtonPress() ) {
 			return;
