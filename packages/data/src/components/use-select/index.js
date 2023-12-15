@@ -187,8 +187,8 @@ function Store( registry, suspense ) {
 
 		lastIsAsync = isAsync;
 
-		// Check if the store changed between now the `updateValue` call above
-		// and the actual `subscribe` call.
+		// Check if the store changed between the `updateValue` call above and
+		// the actual `subscribe` call.
 		const cleanup = subscriber.subscribe( () => {
 			lastMapResultValid = false;
 		} );
