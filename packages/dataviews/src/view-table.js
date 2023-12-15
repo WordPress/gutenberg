@@ -44,6 +44,17 @@ const sanitizeOperators = ( field ) => {
 };
 
 function HeaderMenu( { field, view, onChangeView } ) {
+	const OPERATORS = {
+		[ OPERATOR_IN ]: {
+			key: 'in-filter',
+			label: __( 'Is' ),
+		},
+		[ OPERATOR_NOT_IN ]: {
+			key: 'not-in-filter',
+			label: __( 'Is not' ),
+		},
+	};
+
 	const isHidable = field.enableHiding !== false;
 
 	const isSortable = field.enableSorting !== false;
@@ -212,16 +223,13 @@ function HeaderMenu( { field, view, onChangeView } ) {
 										trigger={
 											<DropdownMenuItem
 												suffix={
-													<>
-														{ activeOperator ===
-															OPERATOR_IN &&
-															__( 'Is' ) }
-														{ activeOperator ===
-															OPERATOR_NOT_IN &&
-															__(
-																'Is not'
-															) }{ ' ' }
-													</>
+													<span aria-hidden="true">
+														{
+															OPERATORS[
+																activeOperator
+															]?.label
+														}
+													</span>
 												}
 											>
 												<DropdownMenuItemLabel>
@@ -230,45 +238,40 @@ function HeaderMenu( { field, view, onChangeView } ) {
 											</DropdownMenuItem>
 										}
 									>
-										{ [
-											{
-												key: 'in-filter',
-												operator: OPERATOR_IN,
-												label: __( 'Is' ),
-											},
-											{
-												key: 'not-in-filter',
-												operator: OPERATOR_NOT_IN,
-												label: __( 'Is not' ),
-											},
-										].map( ( { operator, label, key } ) => (
-											<DropdownMenuRadioItem
-												key={ key }
-												name={ `view-table-${ filter.name }-conditions` }
-												value={ operator }
-												checked={
-													activeOperator === operator
-												}
-												onClick={ () =>
-													onChangeView( {
-														...view,
-														page: 1,
-														filters: [
-															...otherFilters,
-															{
-																field: filter.field,
-																operator,
-																value: filterInView?.value,
-															},
-														],
-													} )
-												}
-											>
-												<DropdownMenuItemLabel>
-													{ label }
-												</DropdownMenuItemLabel>
-											</DropdownMenuRadioItem>
-										) ) }
+										{ Object.entries( OPERATORS ).map(
+											( [
+												operator,
+												{ label, key },
+											] ) => (
+												<DropdownMenuRadioItem
+													key={ key }
+													name={ `view-table-${ filter.name }-conditions` }
+													value={ operator }
+													checked={
+														activeOperator ===
+														operator
+													}
+													onClick={ () =>
+														onChangeView( {
+															...view,
+															page: 1,
+															filters: [
+																...otherFilters,
+																{
+																	field: filter.field,
+																	operator,
+																	value: filterInView?.value,
+																},
+															],
+														} )
+													}
+												>
+													<DropdownMenuItemLabel>
+														{ label }
+													</DropdownMenuItemLabel>
+												</DropdownMenuRadioItem>
+											)
+										) }
 									</DropdownMenu>
 								) }
 							</WithSeparators>
