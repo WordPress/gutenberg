@@ -3,7 +3,7 @@
  */
 import 'react-native-gesture-handler/jestSetup';
 import mockSafeAreaContext from 'react-native-safe-area-context/jest/mock';
-import { Image, Linking } from 'react-native';
+import { Image, Linking, PixelRatio } from 'react-native';
 
 // React Native sets up a global navigator, but that is not executed in the
 // testing environment: https://github.com/facebook/react-native/blob/6c19dc3266b84f47a076b647a1c93b3c3b69d2c5/Libraries/Core/setUpNavigator.js#L17
@@ -280,3 +280,7 @@ jest.mock( '@wordpress/compose', () => {
 jest.spyOn( Image, 'getSize' ).mockImplementation( ( url, success ) =>
 	success( 0, 0 )
 );
+
+// Jest's environment returns pixel ratio, not font scale, when getFontScale() is called.
+// It's necessary to mock this method to return 1, the standard default for most devices.
+jest.spyOn( PixelRatio, 'getFontScale' ).mockImplementation( () => 1 );
