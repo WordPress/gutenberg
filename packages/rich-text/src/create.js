@@ -171,6 +171,9 @@ export class RichTextData {
 	get formats() {
 		return this[ RichTextInternalData ].formats;
 	}
+	get _formats() {
+		return this[ RichTextInternalData ]._formats;
+	}
 	get replacements() {
 		return this[ RichTextInternalData ].replacements;
 	}
