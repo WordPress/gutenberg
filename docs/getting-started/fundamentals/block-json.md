@@ -49,7 +49,6 @@ Block [attributes](https://developer.wordpress.org/block-editor/reference-guides
 
 When registering a new block type, the `attributes` property of `block.json` describes the custom settings that the block requires and how they're stored in the database. This allows the Editor to parse the attributes correctly and pass them to the block's `Edit` and `save` functions.
 
-Simply put, the [`attributes` property](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#attributes) allows a block to declare "variables" that store data or content for the block.
 
 _Example: Attributes as defined in block.json_
 ```json
