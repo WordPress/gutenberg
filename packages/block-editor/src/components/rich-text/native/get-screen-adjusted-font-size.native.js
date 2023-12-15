@@ -25,7 +25,7 @@ const clamp = ( value, min, max ) => {
  */
 export function getScreenAdjustedFontSize(
 	currentFontSize,
-	minFontSize = 12,
+	minFontSize = 10,
 	maxFontSize = 100
 ) {
 	if ( typeof currentFontSize !== 'number' || isNaN( currentFontSize ) ) {
