@@ -1078,7 +1078,7 @@ describe( 'useSelect', () => {
 			await new Promise( setImmediate );
 
 			expect( selectA ).toHaveBeenCalledTimes( 1 );
-			expect( selectB ).toHaveBeenCalledTimes( 1 );
+			expect( selectB ).toHaveBeenCalledTimes( 2 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		} );
 
