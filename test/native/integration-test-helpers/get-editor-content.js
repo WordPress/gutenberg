@@ -8,7 +8,7 @@ import {
 
 // Set up the mocks for getting the HTML output of the editor
 let triggerHtmlSerialization;
-let serializedHtml;
+let serializedContent = {};
 subscribeParentGetHtml.mockImplementation( ( callback ) => {
 	if ( ! triggerHtmlSerialization ) {
 		triggerHtmlSerialization = callback;
@@ -19,9 +19,11 @@ subscribeParentGetHtml.mockImplementation( ( callback ) => {
 		};
 	}
 } );
-provideToNativeHtml.mockImplementation( ( html ) => {
-	serializedHtml = html;
-} );
+provideToNativeHtml.mockImplementation(
+	( html, title, hasChanges, contentInfo ) => {
+		serializedContent = { html, title, hasChanges, contentInfo };
+	}
+);
 
 /**
  * Gets the current HTML output of the editor.
@@ -33,5 +35,18 @@ export function getEditorHtml() {
 		throw new Error( 'HTML serialization trigger is not defined.' );
 	}
 	triggerHtmlSerialization();
-	return serializedHtml;
+	return serializedContent.html;
+}
+
+/**
+ * Gets the current title of the editor.
+ *
+ * @return {string} Title
+ */
+export function getEditorTitle() {
+	if ( ! triggerHtmlSerialization ) {
+		throw new Error( 'HTML serialization trigger is not defined.' );
+	}
+	triggerHtmlSerialization();
+	return serializedContent.title;
 }
