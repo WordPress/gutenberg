@@ -56,7 +56,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 						key={ availableView.type }
 						value={ availableView.type }
 						name="view-actions-available-view"
-						checked={ availableView.id === view.type }
+						checked={ availableView.type === view.type }
 						onChange={ () => {
 							onChangeView( {
 								...view,
