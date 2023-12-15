@@ -89,8 +89,7 @@ const StylesPreview = ( { label, isFocused, withHoverView } ) => {
 	const [ styles ] = useGlobalStylesOutput();
 	const disableMotion = useReducedMotion();
 	const [ isHovered, setIsHovered ] = useState( false );
-	const [ containerResizeListener, sizes ] = useResizeObserver();
-	const { width } = sizes || { width: 0, height: 0 };
+	const [ containerResizeListener, { width } ] = useResizeObserver();
 	const [ throttledWidth, setThrottledWidthState ] = useState( width );
 	const [ ratioState, setRatioState ] = useState();
 
