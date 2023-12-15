@@ -7,7 +7,9 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { store as editPostStore } from '../../../store';
+import { store as editorStore } from '../../store';
+import PostTaxonomiesForm from './index';
+import PostTaxonomiesCheck from './check';
 
 function TaxonomyPanel( { taxonomy, children } ) {
 	const slug = taxonomy?.slug;
@@ -15,7 +17,7 @@ function TaxonomyPanel( { taxonomy, children } ) {
 	const { isEnabled, isOpened } = useSelect(
 		( select ) => {
 			const { isEditorPanelEnabled, isEditorPanelOpened } =
-				select( editPostStore );
+				select( editorStore );
 			return {
 				isEnabled: slug ? isEditorPanelEnabled( panelName ) : false,
 				isOpened: slug ? isEditorPanelOpened( panelName ) : false,
@@ -23,7 +25,7 @@ function TaxonomyPanel( { taxonomy, children } ) {
 		},
 		[ panelName, slug ]
 	);
-	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
+	const { toggleEditorPanelOpened } = useDispatch( editorStore );
 
 	if ( ! isEnabled ) {
 		return null;
@@ -45,4 +47,20 @@ function TaxonomyPanel( { taxonomy, children } ) {
 	);
 }
 
-export default TaxonomyPanel;
+function PostTaxonomies() {
+	return (
+		<PostTaxonomiesCheck>
+			<PostTaxonomiesForm
+				taxonomyWrapper={ ( content, taxonomy ) => {
+					return (
+						<TaxonomyPanel taxonomy={ taxonomy }>
+							{ content }
+						</TaxonomyPanel>
+					);
+				} }
+			/>
+		</PostTaxonomiesCheck>
+	);
+}
+
+export default PostTaxonomies;

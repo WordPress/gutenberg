@@ -16,7 +16,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
-import { useEffect, useRef, useMemo, forwardRef } from '@wordpress/element';
+import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
@@ -72,19 +72,16 @@ function checkForPostContentAtRootLevel( blocks ) {
 	return false;
 }
 
-function EditorCanvas(
-	{
-		// Ideally as we unify post and site editors, we won't need these props.
-		autoFocus,
-		className,
-		renderAppender,
-		styles,
-		disableIframe = false,
-		iframeProps,
-		children,
-	},
-	ref
-) {
+function EditorCanvas( {
+	// Ideally as we unify post and site editors, we won't need these props.
+	autoFocus,
+	className,
+	renderAppender,
+	styles,
+	disableIframe = false,
+	iframeProps,
+	children,
+} ) {
 	const {
 		renderingMode,
 		postContentAttributes,
@@ -288,7 +285,6 @@ function EditorCanvas(
 	const typewriterRef = useTypewriter();
 	const contentRef = useMergeRefs(
 		[
-			ref,
 			localRef,
 			renderingMode === 'post-only' ? typewriterRef : undefined,
 		].filter( ( r ) => !! r )
@@ -304,7 +300,10 @@ function EditorCanvas(
 			height="100%"
 			iframeProps={ {
 				...iframeProps,
-				style: { ...iframeProps?.style, ...deviceStyles },
+				style: {
+					...iframeProps?.style,
+					...deviceStyles,
+				},
 			} }
 		>
 			{ themeSupportsLayout &&
@@ -379,4 +378,4 @@ function EditorCanvas(
 	);
 }
 
-export default forwardRef( EditorCanvas );
+export default EditorCanvas;

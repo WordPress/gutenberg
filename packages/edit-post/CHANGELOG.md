@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   Move the panels visibility actions and selectors to the editor package deprecating `toggleEditorPanelEnabled`, `toggleEditorPanelOpened`, `removeEditorPanel`, `isEditorPanelRemoved`, `isEditorPanelOpened` and `isEditorPanelEnabled`.
+
+## 7.25.0 (2023-12-13)
+
 ## 7.24.0 (2023-11-29)
 
 ## 7.23.0 (2023-11-16)

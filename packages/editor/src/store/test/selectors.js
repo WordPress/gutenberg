@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepFreeze from 'deep-freeze';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -187,6 +192,7 @@ const {
 	__experimentalGetDefaultTemplateTypes,
 	__experimentalGetTemplateInfo,
 	__experimentalGetDefaultTemplatePartAreas,
+	isEditorPanelRemoved,
 } = selectors;
 
 const defaultTemplateTypes = [
@@ -3008,6 +3014,25 @@ describe( 'selectors', () => {
 			postTypes.forEach( ( state ) =>
 				expect( getPostTypeLabel( state ) ).toBeUndefined()
 			);
+		} );
+	} );
+	describe( 'isEditorPanelRemoved', () => {
+		it( 'should return false by default', () => {
+			const state = deepFreeze( {
+				removedPanels: [],
+			} );
+
+			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should return true when panel was removed', () => {
+			const state = deepFreeze( {
+				removedPanels: [ 'post-status' ],
+			} );
+
+			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( true );
 		} );
 	} );
 } );

@@ -7,7 +7,6 @@ import {
 	BlockEditorProvider,
 	BlockCanvas,
 	BlockToolbar,
-	BlockTools,
 } from '@wordpress/block-editor';
 
 /**
@@ -38,7 +37,6 @@ export default function EditorBox() {
 				} }
 			>
 				<BlockToolbar hideDragHandle />
-				<BlockTools />
 				<BlockCanvas height="100%" styles={ editorStyles } />
 			</BlockEditorProvider>
 		</div>

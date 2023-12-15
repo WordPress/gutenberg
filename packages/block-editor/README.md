@@ -19,7 +19,6 @@ import { useState } from 'react';
 import {
 	BlockEditorProvider,
 	BlockList,
-	BlockTools,
 	WritingFlow,
 } from '@wordpress/block-editor';
 
@@ -32,9 +31,7 @@ function MyEditorComponent() {
 			onInput={ ( blocks ) => updateBlocks( blocks ) }
 			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
-			<BlockTools>
-				<BlockCanvas height="400px" />
-			</BlockTools>
+			<BlockCanvas height="400px" />
 		</BlockEditorProvider>
 	);
 }
@@ -542,16 +539,13 @@ _Returns_
 
 ### getPxFromCssUnit
 
-Returns the px value of a cssUnit. The memoized version of getPxFromCssUnit;
+> **Deprecated**
 
-_Parameters_
-
--   _cssUnit_ `string`:
--   _options_ `Object`:
+This function was accidentially exposed for mobile/native usage.
 
 _Returns_
 
--   `string`: returns the cssUnit value in a simple px format.
+-   `string`: Empty string.
 
 ### getSpacingPresetCssVar
 

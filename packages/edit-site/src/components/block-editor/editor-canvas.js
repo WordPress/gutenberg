@@ -25,13 +25,7 @@ import {
 
 const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
 
-function EditorCanvas( {
-	enableResizing,
-	settings,
-	children,
-	contentRef,
-	...props
-} ) {
+function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 	const { hasBlocks, isFocusMode, templateType, canvasMode, isZoomOutMode } =
 		useSelect( ( select ) => {
 			const { getBlockCount, __unstableGetEditorMode } =
@@ -107,7 +101,6 @@ function EditorCanvas( {
 
 	return (
 		<EditorCanvasRoot
-			ref={ contentRef }
 			className={ classnames( 'edit-site-editor-canvas__block-list', {
 				'is-navigation-block': isTemplateTypeNavigation,
 			} ) }

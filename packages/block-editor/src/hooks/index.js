@@ -1,19 +1,23 @@
 /**
  * Internal dependencies
  */
-import { createBlockEditFilter, createBlockListBlockFilter } from './utils';
+import {
+	createBlockEditFilter,
+	createBlockListBlockFilter,
+	createBlockSaveFilter,
+} from './utils';
 import './compat';
 import align from './align';
 import './lock';
 import anchor from './anchor';
-import './aria-label';
+import ariaLabel from './aria-label';
 import customClassName from './custom-class-name';
 import './generated-class-name';
 import style from './style';
 import './settings';
 import color from './color';
 import duotone from './duotone';
-import './font-family';
+import fontFamily from './font-family';
 import fontSize from './font-size';
 import border from './border';
 import position from './position';
@@ -41,12 +45,25 @@ createBlockEditFilter(
 );
 createBlockListBlockFilter( [
 	align,
+	style,
 	color,
 	duotone,
+	fontFamily,
 	fontSize,
 	border,
 	position,
 	childLayout,
+] );
+createBlockSaveFilter( [
+	align,
+	anchor,
+	ariaLabel,
+	customClassName,
+	border,
+	color,
+	style,
+	fontFamily,
+	fontSize,
 ] );
 
 export { useCustomSides } from './dimensions';

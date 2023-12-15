@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { paramCase as kebabCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -49,6 +48,7 @@ import {
 import { NavigableMenu } from '../navigable-container';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
+import { kebabCase } from '../utils/strings';
 import type {
 	Color,
 	ColorPickerPopoverProps,
@@ -60,7 +60,7 @@ import type {
 	PaletteElement,
 } from './types';
 
-const DEFAULT_COLOR = '#000';
+export const DEFAULT_COLOR = '#000';
 
 function NameInput( { value, onChange, label }: NameInputProps ) {
 	return (
@@ -261,16 +261,30 @@ function Option< T extends Color | Gradient >( {
 	);
 }
 
-function isTemporaryElement(
+/**
+ * Checks if a color or gradient is a temporary element by testing against default values.
+ */
+export function isTemporaryElement(
 	slugPrefix: string,
 	{ slug, color, gradient }: Color | Gradient
-) {
+): Boolean {
 	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
-	return (
-		regex.test( slug ) &&
-		( ( !! color && color === DEFAULT_COLOR ) ||
-			( !! gradient && gradient === DEFAULT_GRADIENT ) )
-	);
+
+	// If the slug matches the temporary name regex,
+	// check if the color or gradient matches the default value.
+	if ( regex.test( slug ) ) {
+		// The order is important as gradient elements
+		// contain a color property.
+		if ( !! gradient ) {
+			return gradient === DEFAULT_GRADIENT;
+		}
+
+		if ( !! color ) {
+			return color === DEFAULT_COLOR;
+		}
+	}
+
+	return false;
 }
 
 function PaletteEditListView< T extends Color | Gradient >( {

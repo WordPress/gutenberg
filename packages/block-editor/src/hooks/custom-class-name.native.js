@@ -60,8 +60,11 @@ addFilter(
 	'core/custom-class-name/attribute',
 	addAttribute
 );
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/custom-class-name/save-props',
-	addSaveProps
-);
+
+export default {
+	addSaveProps,
+	attributeKeys: [ 'className' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'customClassName', true );
+	},
+};

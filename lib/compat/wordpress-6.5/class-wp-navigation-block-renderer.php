@@ -185,7 +185,7 @@ class WP_Navigation_Block_Renderer {
 	private static function get_inner_blocks_from_navigation_post( $attributes ) {
 		$navigation_post = get_post( $attributes['ref'] );
 		if ( ! isset( $navigation_post ) ) {
-			return '';
+			return new WP_Block_List( array(), $attributes );
 		}
 
 		// Only published posts are valid. If this is changed then a corresponding change
@@ -214,7 +214,7 @@ class WP_Navigation_Block_Renderer {
 
 		// Fallback my have been filtered so do basic test for validity.
 		if ( empty( $fallback_blocks ) || ! is_array( $fallback_blocks ) ) {
-			return '';
+			return new WP_Block_List( array(), $attributes );
 		}
 
 		return new WP_Block_List( $fallback_blocks, $attributes );

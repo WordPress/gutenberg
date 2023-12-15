@@ -15,6 +15,7 @@ import {
 	PostPreviewButton,
 	store as editorStore,
 	DocumentBar,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -36,10 +37,12 @@ import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
-import { default as DevicePreview } from '../device-preview';
 import ViewLink from '../view-link';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { PreviewDropdown } = unlock( editorPrivateApis );
 
 const slideY = {
 	hidden: { y: '-50px' },
@@ -180,8 +183,14 @@ function Header( {
 						showIconLabels={ showIconLabels }
 					/>
 				) }
-				<DevicePreview />
-				<PostPreviewButton forceIsAutosaveable={ hasActiveMetaboxes } />
+				<PreviewDropdown
+					showIconLabels={ showIconLabels }
+					forceIsAutosaveable={ hasActiveMetaboxes }
+				/>
+				<PostPreviewButton
+					className="edit-post-header__post-preview-button"
+					forceIsAutosaveable={ hasActiveMetaboxes }
+				/>
 				<ViewLink />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }

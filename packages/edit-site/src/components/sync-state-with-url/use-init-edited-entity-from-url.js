@@ -54,7 +54,10 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 			return {
 				hasLoadedAllDependencies: !! base && !! siteData,
 				homepageId:
-					siteData?.show_on_front === 'page'
+					siteData?.show_on_front === 'page' &&
+					[ 'number', 'string' ].includes(
+						typeof siteData.page_on_front
+					)
 						? siteData.page_on_front.toString()
 						: null,
 				url: base?.home,

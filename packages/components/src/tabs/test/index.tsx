@@ -1278,4 +1278,60 @@ describe( 'Tabs', () => {
 			} );
 		} );
 	} );
+	it( 'should associate each `Tab` with the correct `TabPanel`, even if they are not rendered in the same order', async () => {
+		const TABS_WITH_DELTA_REVERSED = [ ...TABS_WITH_DELTA ].reverse();
+
+		render(
+			<Tabs>
+				<Tabs.TabList>
+					{ TABS_WITH_DELTA.map( ( tabObj ) => (
+						<Tabs.Tab
+							key={ tabObj.tabId }
+							tabId={ tabObj.tabId }
+							className={ tabObj.tab.className }
+							disabled={ tabObj.tab.disabled }
+						>
+							{ tabObj.title }
+						</Tabs.Tab>
+					) ) }
+				</Tabs.TabList>
+				{ TABS_WITH_DELTA_REVERSED.map( ( tabObj ) => (
+					<Tabs.TabPanel
+						key={ tabObj.tabId }
+						tabId={ tabObj.tabId }
+						focusable={ tabObj.tabpanel?.focusable }
+					>
+						{ tabObj.content }
+					</Tabs.TabPanel>
+				) ) }
+			</Tabs>
+		);
+
+		// Alpha is the initially selected tab,and should render the correct tabpanel
+		expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
+			'Selected tab: Alpha'
+		);
+
+		// Select Beta, make sure the correct tabpanel is rendered
+		await click( screen.getByRole( 'tab', { name: 'Beta' } ) );
+		expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
+		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
+			'Selected tab: Beta'
+		);
+
+		// Select Gamma, make sure the correct tabpanel is rendered
+		await click( screen.getByRole( 'tab', { name: 'Gamma' } ) );
+		expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
+			'Selected tab: Gamma'
+		);
+
+		// Select Delta, make sure the correct tabpanel is rendered
+		await click( screen.getByRole( 'tab', { name: 'Delta' } ) );
+		expect( await getSelectedTab() ).toHaveTextContent( 'Delta' );
+		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
+			'Selected tab: Delta'
+		);
+	} );
 } );

@@ -49,24 +49,18 @@ function hasDropCapDisabled( align ) {
 	return align === ( isRTL() ? 'left' : 'right' ) || align === 'center';
 }
 
-function ParagraphBlock( {
-	attributes,
-	mergeBlocks,
-	onReplace,
-	onRemove,
-	setAttributes,
-	clientId,
-} ) {
-	const { align, content, direction, dropCap, placeholder } = attributes;
+function DropCapControl( { clientId, attributes, setAttributes } ) {
+	// Please do no add a useSelect call to the paragraph block unconditionaly.
+	// Every useSelect added to a (frequestly used) block will degrade the load
+	// and type bit. By moving it within InspectorControls, the subscription is
+	// now only added for the selected block(s).
 	const [ isDropCapFeatureEnabled ] = useSettings( 'typography.dropCap' );
-	const blockProps = useBlockProps( {
-		ref: useOnEnter( { clientId, content } ),
-		className: classnames( {
-			'has-drop-cap': hasDropCapDisabled( align ) ? false : dropCap,
-			[ `has-text-align-${ align }` ]: align,
-		} ),
-		style: { direction },
-	} );
+
+	if ( ! isDropCapFeatureEnabled ) {
+		return null;
+	}
+
+	const { align, dropCap } = attributes;
 
 	let helpText;
 	if ( hasDropCapDisabled( align ) ) {
@@ -76,6 +70,44 @@ function ParagraphBlock( {
 	} else {
 		helpText = __( 'Toggle to show a large initial letter.' );
 	}
+
+	return (
+		<ToolsPanelItem
+			hasValue={ () => !! dropCap }
+			label={ __( 'Drop cap' ) }
+			onDeselect={ () => setAttributes( { dropCap: undefined } ) }
+			resetAllFilter={ () => ( { dropCap: undefined } ) }
+			panelId={ clientId }
+		>
+			<ToggleControl
+				__nextHasNoMarginBottom
+				label={ __( 'Drop cap' ) }
+				checked={ !! dropCap }
+				onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
+				help={ helpText }
+				disabled={ hasDropCapDisabled( align ) ? true : false }
+			/>
+		</ToolsPanelItem>
+	);
+}
+
+function ParagraphBlock( {
+	attributes,
+	mergeBlocks,
+	onReplace,
+	onRemove,
+	setAttributes,
+	clientId,
+} ) {
+	const { align, content, direction, dropCap, placeholder } = attributes;
+	const blockProps = useBlockProps( {
+		ref: useOnEnter( { clientId, content } ),
+		className: classnames( {
+			'has-drop-cap': hasDropCapDisabled( align ) ? false : dropCap,
+			[ `has-text-align-${ align }` ]: align,
+		} ),
+		style: { direction },
+	} );
 
 	return (
 		<>
@@ -98,32 +130,13 @@ function ParagraphBlock( {
 					}
 				/>
 			</BlockControls>
-			{ isDropCapFeatureEnabled && (
-				<InspectorControls group="typography">
-					<ToolsPanelItem
-						hasValue={ () => !! dropCap }
-						label={ __( 'Drop cap' ) }
-						onDeselect={ () =>
-							setAttributes( { dropCap: undefined } )
-						}
-						resetAllFilter={ () => ( { dropCap: undefined } ) }
-						panelId={ clientId }
-					>
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Drop cap' ) }
-							checked={ !! dropCap }
-							onChange={ () =>
-								setAttributes( { dropCap: ! dropCap } )
-							}
-							help={ helpText }
-							disabled={
-								hasDropCapDisabled( align ) ? true : false
-							}
-						/>
-					</ToolsPanelItem>
-				</InspectorControls>
-			) }
+			<InspectorControls group="typography">
+				<DropCapControl
+					clientId={ clientId }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+				/>
+			</InspectorControls>
 			<RichText
 				identifier="content"
 				tagName="p"

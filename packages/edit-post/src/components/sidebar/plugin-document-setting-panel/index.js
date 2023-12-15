@@ -5,12 +5,12 @@ import { createSlotFill, PanelBody } from '@wordpress/components';
 import { usePluginContext } from '@wordpress/plugins';
 import { useDispatch, useSelect } from '@wordpress/data';
 import warning from '@wordpress/warning';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { EnablePluginDocumentSettingPanelOption } from '../../preferences-modal/options';
-import { store as editPostStore } from '../../../store';
 
 const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
@@ -78,7 +78,7 @@ const PluginDocumentSettingPanel = ( {
 	const { opened, isEnabled } = useSelect(
 		( select ) => {
 			const { isEditorPanelOpened, isEditorPanelEnabled } =
-				select( editPostStore );
+				select( editorStore );
 
 			return {
 				opened: isEditorPanelOpened( panelName ),
@@ -87,7 +87,7 @@ const PluginDocumentSettingPanel = ( {
 		},
 		[ panelName ]
 	);
-	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
+	const { toggleEditorPanelOpened } = useDispatch( editorStore );
 
 	if ( undefined === name ) {
 		warning( 'PluginDocumentSettingPanel requires a name property.' );
