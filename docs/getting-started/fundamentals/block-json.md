@@ -106,7 +106,7 @@ _Example: Supports as defined in block.json_
 }
 ```
 
-The use of `supports` generates a set of properties that need to be [manually added to the wrapping element of the block](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-wrapper/) so they're properly stored as part of the block data and taken into account to generate the markup of the block that will be delivered to the front end.
+The use of `supports` generates a set of properties that need to be manually added to the [wrapping element of the block](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-wrapper/). This ensures they're properly stored as part of the block data and taken into account when generating the markup of the block that will be delivered to the front end.
 
 _Example: Supports custom settings stored in the Markup representation of the block_
 
