@@ -25,6 +25,19 @@ const {
 	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
+const OPERATORS = [
+	{
+		key: 'in-filter',
+		operator: OPERATOR_IN,
+		label: __( 'Is' ),
+	},
+	{
+		key: 'not-in-filter',
+		operator: OPERATOR_NOT_IN,
+		label: __( 'Is not' ),
+	},
+];
+
 function WithSeparators( { children } ) {
 	return Children.toArray( children )
 		.filter( Boolean )
@@ -155,14 +168,12 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 											trigger={
 												<DropdownMenuItem
 													suffix={
-														<span aria-hidden="true">
-															{ activeOperator ===
-																OPERATOR_IN &&
-																__( 'Is' ) }
-															{ activeOperator ===
-																OPERATOR_NOT_IN &&
-																__( 'Is not' ) }
-														</span>
+														activeOperator in
+															OPERATORS && (
+															<span aria-hidden="true">
+																OPERATORS[activeOperator].label
+															</span>
+														)
 													}
 												>
 													<DropdownMenuItemLabel>
@@ -171,18 +182,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 												</DropdownMenuItem>
 											}
 										>
-											{ [
-												{
-													key: 'in-filter',
-													operator: OPERATOR_IN,
-													label: __( 'Is' ),
-												},
-												{
-													key: 'not-in-filter',
-													operator: OPERATOR_NOT_IN,
-													label: __( 'Is not' ),
-												},
-											].map(
+											{ OPERATORS.map(
 												( {
 													operator,
 													label,
