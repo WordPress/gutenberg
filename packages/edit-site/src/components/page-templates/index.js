@@ -30,6 +30,7 @@ import { DataViews } from '@wordpress/dataviews';
  */
 import Page from '../page';
 import Link from '../routes/link';
+import AddNewTemplate from '../add-new-template';
 import { useAddedBy, AvatarImage } from '../list/added-by';
 import {
 	TEMPLATE_POST_TYPE,
@@ -362,6 +363,13 @@ export default function DataviewsTemplates() {
 						: null
 				}
 				title={ __( 'Templates' ) }
+				actions={
+					<AddNewTemplate
+						templateType={ TEMPLATE_POST_TYPE }
+						showIcon={ false }
+						toggleProps={ { variant: 'primary' } }
+					/>
+				}
 			>
 				<DataViews
 					paginationInfo={ paginationInfo }
