@@ -187,8 +187,18 @@ function Store( registry, suspense ) {
 
 		lastIsAsync = isAsync;
 
+		// Check if the store changed between now the `updateValue` call above
+		// and the actual `subscribe` call.
+		const cleanup = subscriber.subscribe( () => {
+			lastMapResultValid = false;
+		} );
+		const subscribe = ( _listener ) => {
+			cleanup();
+			return subscriber.subscribe( _listener );
+		};
+
 		// Return a pair of functions that can be passed to `useSyncExternalStore`.
-		return { subscribe: subscriber.subscribe, getValue };
+		return { subscribe, getValue };
 	};
 }
 
