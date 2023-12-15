@@ -61,7 +61,13 @@ function Store( registry, suspense ) {
 			// in the interval between the `getValue` call during render and creating
 			// the subscription, which is slightly delayed. We need to ensure that this
 			// second `getValue` call will compute a fresh value.
-			lastMapResultValid = false;
+
+			// Why? React subscribes after the component has rendered, and the
+			// by that time we already have a value. Marking it invalid means
+			// all selectors mappings have to be run at render, and right after
+			// render. Let's see what tests are failing.
+
+			// lastMapResultValid = false;
 
 			const onStoreChange = () => {
 				// Invalidate the value on store update, so that a fresh value is computed.
