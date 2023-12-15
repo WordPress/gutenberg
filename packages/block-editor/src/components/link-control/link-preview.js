@@ -11,6 +11,7 @@ import {
 	Button,
 	ExternalLink,
 	__experimentalText as Text,
+	Tooltip,
 } from '@wordpress/components';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
 import { Icon, globe, info, linkOff, edit } from '@wordpress/icons';
@@ -29,6 +30,7 @@ export default function LinkPreview( {
 	hasRichPreviews = false,
 	hasUnlinkControl = false,
 	onRemove,
+	additionalControls,
 } ) {
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
@@ -86,12 +88,17 @@ export default function LinkPreview( {
 					<span className="block-editor-link-control__search-item-details">
 						{ ! isEmptyURL ? (
 							<>
-								<ExternalLink
-									className="block-editor-link-control__search-item-title"
-									href={ value.url }
+								<Tooltip
+									text={ value.url }
+									placement="bottom-start"
 								>
-									{ displayTitle }
-								</ExternalLink>
+									<ExternalLink
+										className="block-editor-link-control__search-item-title"
+										href={ value.url }
+									>
+										{ displayTitle }
+									</ExternalLink>
+								</Tooltip>
 
 								{ value?.url && displayTitle !== displayURL && (
 									<span className="block-editor-link-control__search-item-info">
@@ -167,6 +174,8 @@ export default function LinkPreview( {
 					) }
 				</div>
 			) }
+
+			{ additionalControls && additionalControls() }
 		</div>
 	);
 }

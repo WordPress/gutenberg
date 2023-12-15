@@ -16,13 +16,14 @@ import { store as noticesStore } from '@wordpress/notices';
 import SaveButton from '../save-button';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 import { unlock } from '../../lock-unlock';
+import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 
 const { useLocation } = unlock( routerPrivateApis );
 
 const PUBLISH_ON_SAVE_ENTITIES = [
 	{
 		kind: 'postType',
-		name: 'wp_navigation',
+		name: NAVIGATION_POST_TYPE,
 	},
 ];
 
@@ -105,6 +106,15 @@ export default function SaveHub() {
 		label = __( 'Saving' );
 	}
 
+	const { homeUrl } = useSelect( ( select ) => {
+		const {
+			getUnstableBase, // Site index.
+		} = select( coreStore );
+		return {
+			homeUrl: getUnstableBase()?.home,
+		};
+	}, [] );
+
 	const saveCurrentEntity = async () => {
 		if ( ! dirtyCurrentEntity ) return;
 
@@ -134,6 +144,12 @@ export default function SaveHub() {
 
 			createSuccessNotice( __( 'Site updated.' ), {
 				type: 'snackbar',
+				actions: [
+					{
+						label: __( 'View site' ),
+						url: homeUrl,
+					},
+				],
 				id: saveNoticeId,
 			} );
 		} catch ( error ) {

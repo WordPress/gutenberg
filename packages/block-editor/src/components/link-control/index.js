@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Spinner, Notice, TextControl } from '@wordpress/components';
+import {
+	Button,
+	Spinner,
+	Notice,
+	TextControl,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
@@ -14,6 +20,7 @@ import { ENTER } from '@wordpress/keycodes';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { keyboardReturn } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -355,6 +362,7 @@ function LinkControl( {
 						className={ classnames( {
 							'block-editor-link-control__search-input-wrapper': true,
 							'has-text-control': showTextControl,
+							'has-actions': showActions,
 						} ) }
 					>
 						{ showTextControl && (
@@ -388,6 +396,17 @@ function LinkControl( {
 							}
 							hideLabelFromVision={ ! showTextControl }
 						/>
+						{ ! showActions && (
+							<div className="block-editor-link-control__search-enter">
+								<Button
+									onClick={ isDisabled ? noop : handleSubmit }
+									label={ __( 'Submit' ) }
+									icon={ keyboardReturn }
+									className="block-editor-link-control__search-submit"
+									aria-disabled={ isDisabled }
+								/>
+							</div>
+						) }
 					</div>
 					{ errorMessage && (
 						<Notice
@@ -408,6 +427,25 @@ function LinkControl( {
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
 					hasUnlinkControl={ shownUnlinkControl }
+					additionalControls={ () => {
+						// Expose the "Opens in new tab" settings in the preview
+						// as it is the most common setting to change.
+						if (
+							settings?.find(
+								( setting ) => setting.id === 'opensInNewTab'
+							)
+						) {
+							return (
+								<LinkSettings
+									value={ internalControlValue }
+									settings={ settings?.filter(
+										( { id } ) => id === 'opensInNewTab'
+									) }
+									onChange={ onChange }
+								/>
+							);
+						}
+					} }
 					onRemove={ () => {
 						onRemove();
 						setIsEditingLink( true );
@@ -435,7 +473,13 @@ function LinkControl( {
 			) }
 
 			{ showActions && (
-				<div className="block-editor-link-control__search-actions">
+				<HStack
+					justify="right"
+					className="block-editor-link-control__search-actions"
+				>
+					<Button variant="tertiary" onClick={ handleCancel }>
+						{ __( 'Cancel' ) }
+					</Button>
 					<Button
 						variant="primary"
 						onClick={ isDisabled ? noop : handleSubmit }
@@ -444,10 +488,7 @@ function LinkControl( {
 					>
 						{ __( 'Save' ) }
 					</Button>
-					<Button variant="tertiary" onClick={ handleCancel }>
-						{ __( 'Cancel' ) }
-					</Button>
-				</div>
+				</HStack>
 			) }
 
 			{ renderControlBottom && renderControlBottom() }
@@ -456,5 +497,6 @@ function LinkControl( {
 }
 
 LinkControl.ViewerFill = ViewerFill;
+LinkControl.DEFAULT_LINK_SETTINGS = DEFAULT_LINK_SETTINGS;
 
 export default LinkControl;

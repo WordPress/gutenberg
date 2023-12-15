@@ -15,6 +15,11 @@ import deprecated from '@wordpress/deprecated';
 
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
+const EMPTY_INSERTION_POINT = {
+	rootClientId: undefined,
+	insertionIndex: undefined,
+	filterValue: undefined,
+};
 
 /**
  * Returns the current editing mode.
@@ -245,18 +250,28 @@ export function isPublishSidebarOpened( state ) {
  * Returns true if the given panel was programmatically removed, or false otherwise.
  * All panels are not removed by default.
  *
+ * @deprecated
+ *
  * @param {Object} state     Global application state.
  * @param {string} panelName A string that identifies the panel.
  *
  * @return {boolean} Whether or not the panel is removed.
  */
-export function isEditorPanelRemoved( state, panelName ) {
-	return state.removedPanels.includes( panelName );
-}
+export const isEditorPanelRemoved = createRegistrySelector(
+	( select ) => ( state, panelName ) => {
+		deprecated( `select( 'core/edit-post' ).isEditorPanelRemoved`, {
+			since: '6.5',
+			alternative: `select( 'core/editor' ).isEditorPanelRemoved`,
+		} );
+		return select( editorStore ).isEditorPanelRemoved( panelName );
+	}
+);
 
 /**
  * Returns true if the given panel is enabled, or false otherwise. Panels are
  * enabled by default.
+ *
+ * @deprecated
  *
  * @param {Object} state     Global application state.
  * @param {string} panelName A string that identifies the panel.
@@ -265,20 +280,19 @@ export function isEditorPanelRemoved( state, panelName ) {
  */
 export const isEditorPanelEnabled = createRegistrySelector(
 	( select ) => ( state, panelName ) => {
-		const inactivePanels = select( preferencesStore ).get(
-			'core/edit-post',
-			'inactivePanels'
-		);
-		return (
-			! isEditorPanelRemoved( state, panelName ) &&
-			! inactivePanels?.includes( panelName )
-		);
+		deprecated( `select( 'core/edit-post' ).isEditorPanelEnabled`, {
+			since: '6.5',
+			alternative: `select( 'core/editor' ).isEditorPanelEnabled`,
+		} );
+		return select( editorStore ).isEditorPanelEnabled( panelName );
 	}
 );
 
 /**
  * Returns true if the given panel is open, or false otherwise. Panels are
  * closed by default.
+ *
+ * @deprecated
  *
  * @param {Object} state     Global application state.
  * @param {string} panelName A string that identifies the panel.
@@ -287,11 +301,11 @@ export const isEditorPanelEnabled = createRegistrySelector(
  */
 export const isEditorPanelOpened = createRegistrySelector(
 	( select ) => ( state, panelName ) => {
-		const openPanels = select( preferencesStore ).get(
-			'core/edit-post',
-			'openPanels'
-		);
-		return !! openPanels?.includes( panelName );
+		deprecated( `select( 'core/edit-post' ).isEditorPanelOpened`, {
+			since: '6.5',
+			alternative: `select( 'core/editor' ).isEditorPanelOpened`,
+		} );
+		return select( editorStore ).isEditorPanelOpened( panelName );
 	}
 );
 
@@ -371,14 +385,19 @@ export const getActiveMetaBoxLocations = createSelector(
  *
  * @return {boolean} Whether the meta box location is active and visible.
  */
-export function isMetaBoxLocationVisible( state, location ) {
-	return (
-		isMetaBoxLocationActive( state, location ) &&
-		getMetaBoxesPerLocation( state, location )?.some( ( { id } ) => {
-			return isEditorPanelEnabled( state, `meta-box-${ id }` );
-		} )
-	);
-}
+export const isMetaBoxLocationVisible = createRegistrySelector(
+	( select ) => ( state, location ) => {
+		return (
+			isMetaBoxLocationActive( state, location ) &&
+			getMetaBoxesPerLocation( state, location )?.some( ( { id } ) => {
+				return select( editorStore ).isEditorPanelEnabled(
+					state,
+					`meta-box-${ id }`
+				);
+			} )
+		);
+	}
+);
 
 /**
  * Returns true if there is an active meta box in the given location, or false
@@ -445,13 +464,25 @@ export function isSavingMetaBoxes( state ) {
 /**
  * Returns the current editing canvas device type.
  *
+ * @deprecated
+ *
  * @param {Object} state Global application state.
  *
  * @return {string} Device type.
  */
-export function __experimentalGetPreviewDeviceType( state ) {
-	return state.deviceType;
-}
+export const __experimentalGetPreviewDeviceType = createRegistrySelector(
+	( select ) => () => {
+		deprecated(
+			`select( 'core/edit-site' ).__experimentalGetPreviewDeviceType`,
+			{
+				since: '6.5',
+				version: '6.7',
+				alternative: `select( 'core/editor' ).getDeviceType`,
+			}
+		);
+		return select( editorStore ).getDeviceType();
+	}
+);
 
 /**
  * Returns true if the inserter is opened.
@@ -472,9 +503,11 @@ export function isInserterOpened( state ) {
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
 export function __experimentalGetInsertionPoint( state ) {
-	const { rootClientId, insertionIndex, filterValue } =
-		state.blockInserterPanel;
-	return { rootClientId, insertionIndex, filterValue };
+	if ( typeof state.blockInserterPanel === 'boolean' ) {
+		return EMPTY_INSERTION_POINT;
+	}
+
+	return state.blockInserterPanel;
 }
 
 /**
@@ -491,13 +524,15 @@ export function isListViewOpened( state ) {
 /**
  * Returns true if the template editing mode is enabled.
  *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether we're editing the template.
+ * @deprecated
  */
-export function isEditingTemplate( state ) {
-	return state.isEditingTemplate;
-}
+export const isEditingTemplate = createRegistrySelector( ( select ) => () => {
+	deprecated( `select( 'core/edit-post' ).isEditingTemplate`, {
+		since: '6.5',
+		alternative: `select( 'core/editor' ).getRenderingMode`,
+	} );
+	return select( editorStore ).getRenderingMode() !== 'post-only';
+} );
 
 /**
  * Returns true if meta boxes are initialized.

@@ -62,9 +62,11 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 			<BlockIcon icon={ icon } showColors />
 			<div className="block-editor-block-card__content">
 				<h2 className="block-editor-block-card__title">{ title }</h2>
-				<span className="block-editor-block-card__description">
-					{ description }
-				</span>
+				{ description && (
+					<span className="block-editor-block-card__description">
+						{ description }
+					</span>
+				) }
 			</div>
 		</div>
 	);

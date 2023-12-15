@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentStory, ComponentMeta } from '@storybook/react';
+import type { StoryFn, Meta } from '@storybook/react';
 /**
  * Internal dependencies
  */
@@ -40,7 +40,7 @@ const JUSTIFICATIONS = {
 	start: 'start',
 };
 
-const meta: ComponentMeta< typeof HStack > = {
+const meta: Meta< typeof HStack > = {
 	component: HStack,
 	title: 'Components (Experimental)/HStack',
 	argTypes: {
@@ -71,12 +71,12 @@ const meta: ComponentMeta< typeof HStack > = {
 	},
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof HStack > = ( args ) => (
+const Template: StoryFn< typeof HStack > = ( args ) => (
 	<HStack { ...args } style={ { background: '#eee', minHeight: '3rem' } }>
 		{ [ 'One', 'Two', 'Three', 'Four', 'Five' ].map( ( text ) => (
 			<View key={ text } style={ { background: '#b9f9ff' } }>
@@ -86,7 +86,7 @@ const Template: ComponentStory< typeof HStack > = ( args ) => (
 	</HStack>
 );
 
-export const Default: ComponentStory< typeof HStack > = Template.bind( {} );
+export const Default: StoryFn< typeof HStack > = Template.bind( {} );
 Default.args = {
 	spacing: '3',
 };

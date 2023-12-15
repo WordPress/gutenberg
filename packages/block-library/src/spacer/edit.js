@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import {
 	useBlockProps,
-	useSetting,
+	useSettings,
 	getCustomValueFromPreset,
 	getSpacingPresetCssVar,
 	store as blockEditorStore,
@@ -107,7 +107,7 @@ const SpacerEdit = ( {
 	const { layout = {} } = blockStyle;
 	const { selfStretch, flexSize } = layout;
 
-	const spacingSizes = useSetting( 'spacing.spacingSizes' );
+	const [ spacingSizes ] = useSettings( 'spacing.spacingSizes' );
 
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ temporaryHeight, setTemporaryHeight ] = useState( null );

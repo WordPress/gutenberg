@@ -13,6 +13,7 @@ import {
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
 	getBlockSupport,
+	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -22,7 +23,6 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { mapRichTextSettings } from './utils';
 import {
 	retrieveSelectedAttribute,
 	START_OF_SELECTED_AREA,
@@ -375,7 +375,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  */
 export const replaceBlocks =
 	( clientIds, blocks, indexToSelect, initialPosition = 0, meta ) =>
-	( { select, dispatch } ) => {
+	( { select, dispatch, registry } ) => {
 		/* eslint-enable jsdoc/valid-types */
 		clientIds = castArray( clientIds );
 		blocks = getBlocksWithDefaultStylesApplied(
@@ -394,16 +394,22 @@ export const replaceBlocks =
 				return;
 			}
 		}
-		dispatch( {
-			type: 'REPLACE_BLOCKS',
-			clientIds,
-			blocks,
-			time: Date.now(),
-			indexToSelect,
-			initialPosition,
-			meta,
+		// We're batching these two actions because an extra `undo/redo` step can
+		// be created, based on whether we insert a default block or not.
+		registry.batch( () => {
+			dispatch( {
+				type: 'REPLACE_BLOCKS',
+				clientIds,
+				blocks,
+				time: Date.now(),
+				indexToSelect,
+				initialPosition,
+				meta,
+			} );
+			// To avoid a focus loss when removing the last block, assure there is
+			// always a default block if the last of the blocks have been removed.
+			dispatch.ensureDefaultBlock();
 		} );
-		dispatch.ensureDefaultBlock();
 	};
 
 /**
@@ -752,43 +758,23 @@ export const __unstableDeleteSelection =
 		const selectionB = selectionEnd;
 
 		const blockA = select.getBlock( selectionA.clientId );
-		const blockAType = getBlockType( blockA.name );
-
 		const blockB = select.getBlock( selectionB.clientId );
-		const blockBType = getBlockType( blockB.name );
 
 		const htmlA = blockA.attributes[ selectionA.attributeKey ];
 		const htmlB = blockB.attributes[ selectionB.attributeKey ];
 
-		const attributeDefinitionA =
-			blockAType.attributes[ selectionA.attributeKey ];
-		const attributeDefinitionB =
-			blockBType.attributes[ selectionB.attributeKey ];
-
-		let valueA = create( {
-			html: htmlA,
-			...mapRichTextSettings( attributeDefinitionA ),
-		} );
-		let valueB = create( {
-			html: htmlB,
-			...mapRichTextSettings( attributeDefinitionB ),
-		} );
+		let valueA = create( { html: htmlA } );
+		let valueB = create( { html: htmlB } );
 
 		valueA = remove( valueA, selectionA.offset, valueA.text.length );
 		valueB = insert( valueB, START_OF_SELECTED_AREA, 0, selectionB.offset );
 
 		// Clone the blocks so we don't manipulate the original.
 		const cloneA = cloneBlock( blockA, {
-			[ selectionA.attributeKey ]: toHTMLString( {
-				value: valueA,
-				...mapRichTextSettings( attributeDefinitionA ),
-			} ),
+			[ selectionA.attributeKey ]: toHTMLString( { value: valueA } ),
 		} );
 		const cloneB = cloneBlock( blockB, {
-			[ selectionB.attributeKey ]: toHTMLString( {
-				value: valueB,
-				...mapRichTextSettings( attributeDefinitionB ),
-			} ),
+			[ selectionB.attributeKey ]: toHTMLString( { value: valueB } ),
 		} );
 
 		const followingBlock = isForward ? cloneA : cloneB;
@@ -824,20 +810,10 @@ export const __unstableDeleteSelection =
 		const newAttributeKey = retrieveSelectedAttribute( updatedAttributes );
 
 		const convertedHtml = updatedAttributes[ newAttributeKey ];
-		const convertedValue = create( {
-			html: convertedHtml,
-			...mapRichTextSettings(
-				targetBlockType.attributes[ newAttributeKey ]
-			),
-		} );
+		const convertedValue = create( { html: convertedHtml } );
 		const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
 		const newValue = remove( convertedValue, newOffset, newOffset + 1 );
-		const newHtml = toHTMLString( {
-			value: newValue,
-			...mapRichTextSettings(
-				targetBlockType.attributes[ newAttributeKey ]
-			),
-		} );
+		const newHtml = toHTMLString( { value: newValue } );
 
 		updatedAttributes[ newAttributeKey ] = newHtml;
 
@@ -924,27 +900,13 @@ export const __unstableSplitSelection =
 		const selectionB = selectionEnd;
 
 		const blockA = select.getBlock( selectionA.clientId );
-		const blockAType = getBlockType( blockA.name );
-
 		const blockB = select.getBlock( selectionB.clientId );
-		const blockBType = getBlockType( blockB.name );
 
 		const htmlA = blockA.attributes[ selectionA.attributeKey ];
 		const htmlB = blockB.attributes[ selectionB.attributeKey ];
 
-		const attributeDefinitionA =
-			blockAType.attributes[ selectionA.attributeKey ];
-		const attributeDefinitionB =
-			blockBType.attributes[ selectionB.attributeKey ];
-
-		let valueA = create( {
-			html: htmlA,
-			...mapRichTextSettings( attributeDefinitionA ),
-		} );
-		let valueB = create( {
-			html: htmlB,
-			...mapRichTextSettings( attributeDefinitionB ),
-		} );
+		let valueA = create( { html: htmlA } );
+		let valueB = create( { html: htmlB } );
 
 		valueA = remove( valueA, selectionA.offset, valueA.text.length );
 		valueB = remove( valueB, 0, selectionB.offset );
@@ -957,7 +919,6 @@ export const __unstableSplitSelection =
 					...blockA.attributes,
 					[ selectionA.attributeKey ]: toHTMLString( {
 						value: valueA,
-						...mapRichTextSettings( attributeDefinitionA ),
 					} ),
 				},
 			},
@@ -968,7 +929,6 @@ export const __unstableSplitSelection =
 					...blockB.attributes,
 					[ selectionB.attributeKey ]: toHTMLString( {
 						value: valueB,
-						...mapRichTextSettings( attributeDefinitionB ),
 					} ),
 				},
 			},
@@ -1007,17 +967,12 @@ export const mergeBlocks =
 
 		if ( ! blockAType ) return;
 
-		if (
-			! blockAType.merge &&
-			! getBlockSupport( blockA.name, '__experimentalOnMerge' )
-		) {
-			dispatch.selectBlock( blockA.clientId );
-			return;
-		}
-
 		const blockB = select.getBlock( clientIdB );
 
-		if ( ! blockAType.merge ) {
+		if (
+			! blockAType.merge &&
+			getBlockSupport( blockA.name, '__experimentalOnMerge' )
+		) {
 			// If there's no merge function defined, attempt merging inner
 			// blocks.
 			const blocksWithTheSameType = switchToBlockType(
@@ -1034,6 +989,7 @@ export const mergeBlocks =
 				dispatch.selectBlock( blockA.clientId );
 				return;
 			}
+
 			registry.batch( () => {
 				dispatch.insertBlocks(
 					blockWithSameType.innerBlocks,
@@ -1044,7 +1000,63 @@ export const mergeBlocks =
 				dispatch.selectBlock(
 					blockWithSameType.innerBlocks[ 0 ].clientId
 				);
+
+				// Attempt to merge the next block if it's the same type and
+				// same attributes. This is useful when merging a paragraph into
+				// a list, and the next block is also a list. If we don't merge,
+				// it looks like one list, but it's actually two lists. The same
+				// applies to other blocks such as a group with the same
+				// attributes.
+				const nextBlockClientId =
+					select.getNextBlockClientId( clientIdA );
+
+				if (
+					nextBlockClientId &&
+					select.getBlockName( clientIdA ) ===
+						select.getBlockName( nextBlockClientId )
+				) {
+					const rootAttributes =
+						select.getBlockAttributes( clientIdA );
+					const previousRootAttributes =
+						select.getBlockAttributes( nextBlockClientId );
+
+					if (
+						Object.keys( rootAttributes ).every(
+							( key ) =>
+								rootAttributes[ key ] ===
+								previousRootAttributes[ key ]
+						)
+					) {
+						dispatch.moveBlocksToPosition(
+							select.getBlockOrder( nextBlockClientId ),
+							nextBlockClientId,
+							clientIdA
+						);
+						dispatch.removeBlock( nextBlockClientId, false );
+					}
+				}
 			} );
+			return;
+		}
+
+		if ( isUnmodifiedDefaultBlock( blockA ) ) {
+			dispatch.removeBlock(
+				clientIdA,
+				select.isBlockSelected( clientIdA )
+			);
+			return;
+		}
+
+		if ( isUnmodifiedDefaultBlock( blockB ) ) {
+			dispatch.removeBlock(
+				clientIdB,
+				select.isBlockSelected( clientIdB )
+			);
+			return;
+		}
+
+		if ( ! blockAType.merge ) {
+			dispatch.selectBlock( blockA.clientId );
 			return;
 		}
 
@@ -1084,10 +1096,7 @@ export const mergeBlocks =
 			const selectedBlock = clientId === clientIdA ? cloneA : cloneB;
 			const html = selectedBlock.attributes[ attributeKey ];
 			const value = insert(
-				create( {
-					html,
-					...mapRichTextSettings( attributeDefinition ),
-				} ),
+				create( { html } ),
 				START_OF_SELECTED_AREA,
 				offset,
 				offset
@@ -1095,7 +1104,6 @@ export const mergeBlocks =
 
 			selectedBlock.attributes[ attributeKey ] = toHTMLString( {
 				value,
-				...mapRichTextSettings( attributeDefinition ),
 			} );
 		}
 
@@ -1121,22 +1129,12 @@ export const mergeBlocks =
 			const newAttributeKey =
 				retrieveSelectedAttribute( updatedAttributes );
 			const convertedHtml = updatedAttributes[ newAttributeKey ];
-			const convertedValue = create( {
-				html: convertedHtml,
-				...mapRichTextSettings(
-					blockAType.attributes[ newAttributeKey ]
-				),
-			} );
+			const convertedValue = create( { html: convertedHtml } );
 			const newOffset = convertedValue.text.indexOf(
 				START_OF_SELECTED_AREA
 			);
 			const newValue = remove( convertedValue, newOffset, newOffset + 1 );
-			const newHtml = toHTMLString( {
-				value: newValue,
-				...mapRichTextSettings(
-					blockAType.attributes[ newAttributeKey ]
-				),
-			} );
+			const newHtml = toHTMLString( { value: newValue } );
 
 			updatedAttributes[ newAttributeKey ] = newHtml;
 
@@ -1819,7 +1817,6 @@ export function __unstableSetTemporarilyEditingAsBlocks(
  *                                                                                                   the report url for the media item. It accepts the `InserterMediaItem` as an argument.
  * @property {boolean}                                                [isExternalResource]           If the media category is an external resource, this should be set to true.
  *                                                                                                   This is used to avoid making a request to the external resource when the user
- *
  */
 export const registerInserterMediaCategory =
 	( category ) =>
@@ -1852,9 +1849,10 @@ export const registerInserterMediaCategory =
 			);
 			return;
 		}
-		const { inserterMediaCategories = [] } = select.getSettings();
+		const registeredInserterMediaCategories =
+			select.getRegisteredInserterMediaCategories();
 		if (
-			inserterMediaCategories.some(
+			registeredInserterMediaCategories.some(
 				( { name } ) => name === category.name
 			)
 		) {
@@ -1864,8 +1862,8 @@ export const registerInserterMediaCategory =
 			return;
 		}
 		if (
-			inserterMediaCategories.some(
-				( { labels: { name } } ) => name === category.labels?.name
+			registeredInserterMediaCategories.some(
+				( { labels: { name } = {} } ) => name === category.labels?.name
 			)
 		) {
 			console.error(
@@ -1878,13 +1876,8 @@ export const registerInserterMediaCategory =
 		// private, so extenders can only add new inserter media categories and don't have any
 		// control over the core media categories.
 		dispatch( {
-			type: 'UPDATE_SETTINGS',
-			settings: {
-				inserterMediaCategories: [
-					...inserterMediaCategories,
-					{ ...category, isExternalResource: true },
-				],
-			},
+			type: 'REGISTER_INSERTER_MEDIA_CATEGORY',
+			category: { ...category, isExternalResource: true },
 		} );
 	};
 
@@ -1924,5 +1917,20 @@ export function unsetBlockEditingMode( clientId = '' ) {
 	return {
 		type: 'UNSET_BLOCK_EDITING_MODE',
 		clientId,
+	};
+}
+
+/**
+ * Action that sets the element that had focus when focus leaves the editor canvas.
+ *
+ * @param {Object} lastFocus The last focused element.
+ *
+ *
+ * @return {Object} Action object.
+ */
+export function setLastFocus( lastFocus = null ) {
+	return {
+		type: 'LAST_FOCUS',
+		lastFocus,
 	};
 }

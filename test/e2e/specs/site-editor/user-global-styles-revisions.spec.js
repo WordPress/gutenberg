@@ -31,7 +31,7 @@ test.describe( 'Global styles revisions', () => {
 		editor,
 		userGlobalStylesRevisions,
 	} ) => {
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 		const currentRevisions =
 			await userGlobalStylesRevisions.getGlobalStylesRevisions();
 		await userGlobalStylesRevisions.openStylesPanel();
@@ -43,7 +43,7 @@ test.describe( 'Global styles revisions', () => {
 			.getByRole( 'button', { name: 'Color Background styles' } )
 			.click();
 		await page
-			.getByRole( 'button', { name: 'Color: Cyan bluish gray' } )
+			.getByRole( 'option', { name: 'Color: Cyan bluish gray' } )
 			.click( { force: true } );
 
 		await editor.saveSiteEditorEntities();
@@ -54,6 +54,11 @@ test.describe( 'Global styles revisions', () => {
 		const revisionButtons = page.getByRole( 'button', {
 			name: /^Changes saved by /,
 		} );
+
+		// Shows changes made in the revision.
+		await expect(
+			page.getByTestId( 'global-styles-revision-changes' )
+		).toHaveText( 'Colors' );
 
 		// There should be 2 revisions not including the reset to theme defaults button.
 		await expect( revisionButtons ).toHaveCount(
@@ -66,14 +71,14 @@ test.describe( 'Global styles revisions', () => {
 		editor,
 		userGlobalStylesRevisions,
 	} ) => {
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Colors styles' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Color Background styles' } )
 			.click();
 		await page
-			.getByRole( 'button', { name: 'Color: Luminous vivid amber' } )
+			.getByRole( 'option', { name: 'Color: Luminous vivid amber' } )
 			.click( { force: true } );
 
 		await userGlobalStylesRevisions.openRevisions();
@@ -110,7 +115,7 @@ test.describe( 'Global styles revisions', () => {
 		editor,
 		userGlobalStylesRevisions,
 	} ) => {
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
 		await userGlobalStylesRevisions.openRevisions();
 		const lastRevisionButton = page
@@ -147,9 +152,6 @@ class UserGlobalStylesRevisions {
 			.getByRole( 'menubar', { name: 'Styles actions' } )
 			.click();
 		await this.page.getByRole( 'button', { name: 'Revisions' } ).click();
-		await this.page
-			.getByRole( 'menuitem', { name: /^Revision history/ } )
-			.click();
 	}
 
 	async openStylesPanel() {

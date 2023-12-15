@@ -75,6 +75,13 @@ export type NumberControlProps = Omit<
 	 */
 	step?: InputControlProps[ 'step' ];
 	/**
+	 * Optional multiplication factor in spin changes. i.e. A spin changes
+	 * by `spinFactor * step` (if `step` is "any", 1 is used instead).
+	 *
+	 * @default 1
+	 */
+	spinFactor?: number;
+	/**
 	 * The `type` attribute of the `input` element.
 	 *
 	 * @default 'number'

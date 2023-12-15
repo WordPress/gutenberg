@@ -18,7 +18,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '../animation';
 import type { SnackbarListProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 const SNACKBAR_VARIANTS = {
 	init: {

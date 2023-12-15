@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import RadioControl from '..';
 
-const meta: ComponentMeta< typeof RadioControl > = {
+const meta: Meta< typeof RadioControl > = {
 	component: RadioControl,
 	title: 'Components/RadioControl',
 	argTypes: {
@@ -34,12 +34,12 @@ const meta: ComponentMeta< typeof RadioControl > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof RadioControl > = ( {
+const Template: StoryFn< typeof RadioControl > = ( {
 	onChange,
 	options,
 	...args
@@ -59,9 +59,7 @@ const Template: ComponentStory< typeof RadioControl > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof RadioControl > = Template.bind(
-	{}
-);
+export const Default: StoryFn< typeof RadioControl > = Template.bind( {} );
 Default.args = {
 	label: 'Post visibility',
 	options: [

@@ -11,7 +11,7 @@ import {
 	canvas,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'Post Comments Form', () => {
+describe( 'Comments Form', () => {
 	let previousCommentStatus;
 
 	beforeAll( async () => {
@@ -42,7 +42,7 @@ describe( 'Post Comments Form', () => {
 			await enterEditMode();
 
 			// Insert post comments form
-			await insertBlock( 'Post Comments Form' );
+			await insertBlock( 'Comments Form' );
 
 			// Ensure the placeholder is there
 			await expect( canvas() ).toMatchElement(

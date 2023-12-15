@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import TextareaControl from '..';
 
-const meta: ComponentMeta< typeof TextareaControl > = {
+const meta: Meta< typeof TextareaControl > = {
 	component: TextareaControl,
 	title: 'Components/TextareaControl',
 	argTypes: {
@@ -26,12 +26,12 @@ const meta: ComponentMeta< typeof TextareaControl > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof TextareaControl > = ( {
+const Template: StoryFn< typeof TextareaControl > = ( {
 	onChange,
 	...args
 } ) => {
@@ -49,9 +49,7 @@ const Template: ComponentStory< typeof TextareaControl > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof TextareaControl > = Template.bind(
-	{}
-);
+export const Default: StoryFn< typeof TextareaControl > = Template.bind( {} );
 Default.args = {
 	label: 'Text',
 	help: 'Enter some text',

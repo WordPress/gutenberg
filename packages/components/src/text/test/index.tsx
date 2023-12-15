@@ -6,7 +6,7 @@ import { render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { getFontSize } from '../../ui/utils/font-size';
+import { getFontSize } from '../../utils/font-size';
 import { COLORS } from '../../utils';
 import { Text } from '../';
 
@@ -104,7 +104,7 @@ describe( 'Text', () => {
 			</Text>
 		);
 		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
-			color: 'orange',
+			color: 'rgb(255, 165, 0)',
 		} );
 	} );
 

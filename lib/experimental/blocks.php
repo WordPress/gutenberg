@@ -5,27 +5,6 @@
  * @package gutenberg
  */
 
-/**
- * Checks whether the experimental Interactivity API should be used for a block.
- *
- * Note: This function is located here instead of in interactivity-api/blocks.php because it has to be available earler.
- *
- * @param string $block_name Block name.
- * @return bool Whether Interactivity API is used for block.
- */
-function gutenberg_should_block_use_interactivity_api( $block_name ) {
-
-	/**
-	 * Filters whether the experimental Interactivity API should be used for a block.
-	 *
-	 * @since 6.3.0
-	 *
-	 * @param bool   $enabled    Whether Interactivity API is used for block.
-	 * @param string $block_name Block name.
-	 */
-	return (bool) apply_filters( 'gutenberg_should_block_use_interactivity_api', true, $block_name );
-}
-
 if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 	/**
 	 * Enqueues a frontend script for a specific block.
@@ -63,7 +42,7 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 		 *                        is to ensure the content exists.
 		 * @return string Block content.
 		 */
-		$callback = static function( $content, $block ) use ( $args, $block_name ) {
+		$callback = static function ( $content, $block ) use ( $args, $block_name ) {
 
 			// Sanity check.
 			if ( empty( $block['blockName'] ) || $block_name !== $block['blockName'] ) {
@@ -100,31 +79,13 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 }
 
 
-/**
- * Registers the metadata block attribute for block types.
- *
- * @param array $args Array of arguments for registering a block type.
- * @return array $args
- */
-function gutenberg_register_metadata_attribute( $args ) {
-	// Setup attributes if needed.
-	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
-		$args['attributes'] = array();
-	}
-
-	if ( ! array_key_exists( 'metadata', $args['attributes'] ) ) {
-		$args['attributes']['metadata'] = array(
-			'type' => 'object',
-		);
-	}
-
-	return $args;
-}
-add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );
 
 
 $gutenberg_experiments = get_option( 'gutenberg-experiments' );
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ) {
+if ( $gutenberg_experiments && (
+	array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ||
+	array_key_exists( 'gutenberg-pattern-partial-syncing', $gutenberg_experiments )
+) ) {
 	/**
 	 * Renders the block meta attributes.
 	 *
@@ -162,7 +123,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 		}
 
 		// Get all the attributes that have a connection.
-		$connected_attributes = _wp_array_get( $block['attrs'], array( 'connections', 'attributes' ), false );
+		$connected_attributes = $block['attrs']['connections']['attributes'] ?? false;
 		if ( ! $connected_attributes ) {
 			return $block_content;
 		}
@@ -174,9 +135,8 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 				continue;
 			}
 
-			// If the source value is not "meta_fields", skip it because the only supported
-			// connection source is meta (custom fields) for now.
-			if ( 'meta_fields' !== $attribute_value['source'] ) {
+			// Skip if the source value is not "meta_fields" or "pattern_attributes".
+			if ( 'meta_fields' !== $attribute_value['source'] && 'pattern_attributes' !== $attribute_value['source'] ) {
 				continue;
 			}
 
@@ -185,16 +145,28 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 				continue;
 			}
 
-			// If the attribute does not specify the name of the custom field, skip it.
-			if ( ! isset( $attribute_value['value'] ) ) {
-				continue;
+			if ( 'pattern_attributes' === $attribute_value['source'] ) {
+				if ( ! _wp_array_get( $block_instance->attributes, array( 'metadata', 'id' ), false ) ) {
+					continue;
+				}
+
+				$custom_value = $connection_sources[ $attribute_value['source'] ]( $block_instance );
+			} else {
+				// If the attribute does not specify the name of the custom field, skip it.
+				if ( ! isset( $attribute_value['value'] ) ) {
+					continue;
+				}
+
+				// Get the content from the connection source.
+				$custom_value = $connection_sources[ $attribute_value['source'] ](
+					$block_instance,
+					$attribute_value['value']
+				);
 			}
 
-			// Get the content from the connection source.
-			$custom_value = $connection_sources[ $attribute_value['source'] ](
-				$block_instance,
-				$attribute_value['value']
-			);
+			if ( false === $custom_value ) {
+				continue;
+			}
 
 			$tags  = new WP_HTML_Tag_Processor( $block_content );
 			$found = $tags->next_tag(
@@ -206,7 +178,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 			);
 			if ( ! $found ) {
 				return $block_content;
-			};
+			}
 			$tag_name     = $tags->get_tag();
 			$markup       = "<$tag_name>$custom_value</$tag_name>";
 			$updated_tags = new WP_HTML_Tag_Processor( $markup );
@@ -223,5 +195,6 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 
 		return $block_content;
 	}
+
 	add_filter( 'render_block', 'gutenberg_render_block_connections', 10, 3 );
 }

@@ -10,8 +10,6 @@ import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	BlockAlignmentControl,
-	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
 	useBlockProps,
@@ -77,18 +75,18 @@ const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
 
 /**
- * Checks if WP generated default image size. Size generation is skipped
+ * Checks if WP generated the specified image size. Size generation is skipped
  * when the image is smaller than the said size.
  *
  * @param {Object} image
- * @param {string} defaultSize
+ * @param {string} size
  *
  * @return {boolean} Whether or not it has default image size.
  */
-function hasDefaultSize( image, defaultSize ) {
+function hasSize( image, size ) {
 	return (
-		'url' in ( image?.sizes?.[ defaultSize ] ?? {} ) ||
-		'source_url' in ( image?.media_details?.sizes?.[ defaultSize ] ?? {} )
+		'url' in ( image?.sizes?.[ size ] ?? {} ) ||
+		'source_url' in ( image?.media_details?.sizes?.[ size ] ?? {} )
 	);
 }
 
@@ -106,11 +104,13 @@ export function ImageEdit( {
 		url = '',
 		alt,
 		caption,
-		align,
 		id,
 		width,
 		height,
 		sizeSlug,
+		aspectRatio,
+		scale,
+		align,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
@@ -123,6 +123,21 @@ export function ImageEdit( {
 	useEffect( () => {
 		captionRef.current = caption;
 	}, [ caption ] );
+
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		if ( [ 'wide', 'full' ].includes( align ) ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				width: undefined,
+				height: undefined,
+				aspectRatio: undefined,
+				scale: undefined,
+			} );
+		}
+	}, [ align ] );
 
 	const ref = useRef();
 	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
@@ -166,7 +181,16 @@ export function ImageEdit( {
 
 		setTemporaryURL();
 
-		let mediaAttributes = pickRelevantMediaFiles( media, imageDefaultSize );
+		// Try to use the previous selected image size if its available
+		// otherwise try the default image size or fallback to "full"
+		let newSize = 'full';
+		if ( sizeSlug && hasSize( media, sizeSlug ) ) {
+			newSize = sizeSlug;
+		} else if ( hasSize( media, imageDefaultSize ) ) {
+			newSize = imageDefaultSize;
+		}
+
+		let mediaAttributes = pickRelevantMediaFiles( media, newSize );
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
@@ -180,11 +204,7 @@ export function ImageEdit( {
 		// Reset the dimension attributes if changing to a different image.
 		if ( ! media.id || media.id !== id ) {
 			additionalAttributes = {
-				// Fallback to size "full" if there's no default image size.
-				// It means the image is smaller, and the block will use a full-size URL.
-				sizeSlug: hasDefaultSize( media, imageDefaultSize )
-					? imageDefaultSize
-					: 'full',
+				sizeSlug: newSize,
 			};
 		} else {
 			// Keep the same url when selecting the same file, so "Resolution"
@@ -246,16 +266,6 @@ export function ImageEdit( {
 				sizeSlug: imageDefaultSize,
 			} );
 		}
-	}
-
-	function updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
-			? { width: undefined, height: undefined }
-			: {};
-		setAttributes( {
-			...extraUpdatedAttributes,
-			align: nextAlign,
-		} );
 	}
 
 	let isTemp = isTemporaryImage( id, url );
@@ -335,7 +345,16 @@ export function ImageEdit( {
 				instructions={ __(
 					'Upload an image file, pick one from your media library, or add one with a URL.'
 				) }
-				style={ isSelected ? undefined : borderProps.style }
+				style={ {
+					aspectRatio:
+						! ( width && height ) && aspectRatio
+							? aspectRatio
+							: undefined,
+					width: height && aspectRatio ? '100%' : width,
+					height: width && aspectRatio ? '100%' : height,
+					objectFit: scale,
+					...borderProps.style,
+				} }
 			>
 				{ content }
 			</Placeholder>
@@ -344,31 +363,21 @@ export function ImageEdit( {
 
 	return (
 		<figure { ...blockProps }>
-			{ ( temporaryURL || url ) && (
-				<Image
-					temporaryURL={ temporaryURL }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					isSelected={ isSelected }
-					insertBlocksAfter={ insertBlocksAfter }
-					onReplace={ onReplace }
-					onSelectImage={ onSelectImage }
-					onSelectURL={ onSelectURL }
-					onUploadError={ onUploadError }
-					containerRef={ ref }
-					context={ context }
-					clientId={ clientId }
-					blockEditingMode={ blockEditingMode }
-				/>
-			) }
-			{ ! url && blockEditingMode === 'default' && (
-				<BlockControls group="block">
-					<BlockAlignmentControl
-						value={ align }
-						onChange={ updateAlignment }
-					/>
-				</BlockControls>
-			) }
+			<Image
+				temporaryURL={ temporaryURL }
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				isSelected={ isSelected }
+				insertBlocksAfter={ insertBlocksAfter }
+				onReplace={ onReplace }
+				onSelectImage={ onSelectImage }
+				onSelectURL={ onSelectURL }
+				onUploadError={ onUploadError }
+				containerRef={ ref }
+				context={ context }
+				clientId={ clientId }
+				blockEditingMode={ blockEditingMode }
+			/>
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
 				onSelect={ onSelectImage }

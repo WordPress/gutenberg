@@ -7,10 +7,14 @@ It is essentially a wrapper around the `PanelColorGradientSettings` component, b
 
 ```jsx
 /**
+ * External dependencies
+ */
+import { useState } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { PanelColorSettings } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 // ...

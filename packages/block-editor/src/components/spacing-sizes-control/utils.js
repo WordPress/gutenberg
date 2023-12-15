@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import {
 	sidesAll,
-	sidesAxial,
 	sidesBottom,
 	sidesHorizontal,
 	sidesLeft,
@@ -24,7 +23,7 @@ export const DEFAULT_VALUES = {
 
 export const ICONS = {
 	custom: sidesAll,
-	axial: sidesAxial,
+	axial: sidesAll,
 	horizontal: sidesHorizontal,
 	vertical: sidesVertical,
 	top: sidesTop,

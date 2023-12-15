@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 import classnames from 'classnames';
 import type { ForwardedRef } from 'react';
@@ -22,7 +23,7 @@ import { useInstanceId, usePrevious } from '@wordpress/compose';
 
 import Button from '../button';
 import type { TabPanelProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 // Separate the actual tab name from the instance ID. This is
 // necessary because Ariakit internally uses the element ID when

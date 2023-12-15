@@ -15,12 +15,16 @@ Welcome! Let's get started building with blocks. Blocks are at the core of exten
 
 [Create a Block Tutorial](/docs/getting-started/create-block/README.md) - Learn how to create your first block for the WordPress block editor.
 
-[Full Site Editing](/docs/getting-started/full-site-editing.md) - Full Site Editing (FSE) is an umbrella project name for the collection of features that bring the experience and extendability of blocks to all parts of your site—from settings and styles, to templates and themes, and more.
+## Learn WordPress Courses
 
--   Learn [about using theme.json](/docs/how-to-guides/themes/theme-json.md) to define settings and styles for your theme.
+At [Learn WordPress](https://learn.wordpress.org/), you can find [tutorials](https://learn.wordpress.org/tutorials/), [courses](https://learn.wordpress.org/courses/), and [online workshops](https://learn.wordpress.org/online-workshops/) to learn more about developing for the Block Editor. Here is a selection of current offerings.
 
--   [Create a Block Theme](/docs/how-to-guides/themes/create-block-theme.md) - Learn how block themes use blocks to build templates and the theme.json to provide styles.
--   [Convert a Classic Theme to a Block Theme](https://developer.wordpress.org/themes/block-themes/converting-a-classic-theme-to-a-block-theme/) - Learn how to adopt various pieces of full site editing in your classic theme.
+-   [Intro to Block Development: Build Your First Custom Block](https://learn.wordpress.org/course/introduction-to-block-development-build-your-first-custom-block/)
+-   [Converting a Shortcode to a Block](https://learn.wordpress.org/course/converting-a-shortcode-to-a-block/)
+-   [Using the WordPress Data Layer](https://learn.wordpress.org/course/using-the-wordpress-data-layer/)
+-   [Registering Block Patterns](https://learn.wordpress.org/workshop/registering-block-patterns/)
+-   [Intro to Gutenberg Block Development](https://learn.wordpress.org/workshop/intro-to-gutenberg-block-development/)
+-   [Intro to Publishing with the Block Editor](https://learn.wordpress.org/workshop/intro-to-publishing-with-the-block-editor/)
 
 ## Ways to Stay Informed
 
@@ -54,7 +58,7 @@ The [WordPress.org Roadmap](https://wordpress.org/about/roadmap/) with Four Phas
 
 Checking in on [issues](https://github.com/WordPress/gutenberg/issues) and [PRs](https://github.com/WordPress/gutenberg/pulls) on GitHub. This will give you a nearly real-time understanding of what’s being worked on by the developers and designers. 
 
--   [Glossary](/docs/explanations/glossary.md)
--   [Frequently Asked Questions](/docs/explanations/faq.md)
+-   [Glossary](/docs/getting-started/glossary.md)
+-   [Frequently Asked Questions](/docs/getting-started/faq.md)
 -   [Project History](/docs/explanations/history.md)
--   [Outreach](/docs/getting-started/outreach.md)
+-   [Gutenberg related Make posts](https://make.wordpress.org/core/handbook/references/keeping-up-with-gutenberg-index/)

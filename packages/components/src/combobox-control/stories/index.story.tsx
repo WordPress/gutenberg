@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -22,7 +22,7 @@ const countries = [
 	{ name: 'American Samoa', code: 'AS' },
 ];
 
-const meta: ComponentMeta< typeof ComboboxControl > = {
+const meta: Meta< typeof ComboboxControl > = {
 	title: 'Components/ComboboxControl',
 	component: ComboboxControl,
 	argTypes: {
@@ -31,7 +31,7 @@ const meta: ComponentMeta< typeof ComboboxControl > = {
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
@@ -43,7 +43,7 @@ const mapCountryOption = ( country: ( typeof countries )[ number ] ) => ( {
 
 const countryOptions = countries.map( mapCountryOption );
 
-const Template: ComponentStory< typeof ComboboxControl > = ( {
+const Template: StoryFn< typeof ComboboxControl > = ( {
 	onChange,
 	...args
 } ) => {

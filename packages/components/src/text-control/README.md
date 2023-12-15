@@ -4,12 +4,6 @@ TextControl components let users enter and edit text.
 
 ![Unfilled and filled TextControl components](https://make.wordpress.org/design/files/2019/03/TextControl.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -60,8 +54,8 @@ Don’t use unclear visual markers to indicate a text field.
 Render a user interface to input the name of an additional css class.
 
 ```js
+import { useState } from 'react';
 import { TextControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyTextControl = () => {
 	const [ className, setClassName ] = useState( '' );

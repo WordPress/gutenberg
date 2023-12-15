@@ -8,8 +8,8 @@ import type { ForwardedRef } from 'react';
  */
 import type { ItemProps } from '../types';
 import { useItem } from './hook';
-import type { WordPressComponentProps } from '../../ui/context';
-import { contextConnect } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { View } from '../../view';
 
 function UnconnectedItem(
@@ -29,7 +29,6 @@ function UnconnectedItem(
  * `Item` is used in combination with `ItemGroup` to display a list of items
  * grouped and styled together.
  *
- * @example
  * ```jsx
  * import {
  *   __experimentalItemGroup as ItemGroup,

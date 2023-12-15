@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../ui/context';
-import { contextConnect } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { useItemGroup } from './hook';
 import { ItemGroupContext, useItemGroupContext } from '../context';
 import { View } from '../../view';
@@ -44,7 +44,6 @@ function UnconnectedItemGroup(
 /**
  * `ItemGroup` displays a list of `Item`s grouped and styled together.
  *
- * @example
  * ```jsx
  * import {
  *   __experimentalItemGroup as ItemGroup,

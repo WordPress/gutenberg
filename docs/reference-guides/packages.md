@@ -12,7 +12,7 @@ If you wanted to use the `PlainText` component from the block editor module, fir
 wp_enqueue_script(
 	'my-custom-block',
 	plugins_url( $block_path, __FILE__ ),
-	array( 'wp-blocks', 'wp-block-editor', 'wp-element', 'wp-i18n' )
+	array( 'react', 'wp-blocks', 'wp-block-editor', 'wp-i18n' )
 );
 ```
 

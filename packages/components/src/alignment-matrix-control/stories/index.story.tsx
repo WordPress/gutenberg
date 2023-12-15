@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { Icon } from '@wordpress/icons';
 
 /**
@@ -16,32 +16,32 @@ import AlignmentMatrixControl from '..';
 import { HStack } from '../../h-stack';
 import type { AlignmentMatrixControlProps } from '../types';
 
-const meta: ComponentMeta< typeof AlignmentMatrixControl > = {
+const meta: Meta< typeof AlignmentMatrixControl > = {
 	title: 'Components (Experimental)/AlignmentMatrixControl',
 	component: AlignmentMatrixControl,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'AlignmentMatrixControl.Icon': AlignmentMatrixControl.Icon,
+	},
 	argTypes: {
-		onChange: { action: 'onChange', control: { type: null } },
+		onChange: { control: { type: null } },
 		value: { control: { type: null } },
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof AlignmentMatrixControl > = ( {
+const Template: StoryFn< typeof AlignmentMatrixControl > = ( {
 	defaultValue,
 	onChange,
 	...props
 } ) => {
 	const [ value, setValue ] =
 		useState< AlignmentMatrixControlProps[ 'value' ] >();
-
-	// Convenience handler for Canvas view so changes are reflected
-	useEffect( () => {
-		setValue( defaultValue );
-	}, [ defaultValue ] );
 
 	return (
 		<AlignmentMatrixControl

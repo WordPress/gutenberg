@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import TextControl from '..';
 
-const meta: ComponentMeta< typeof TextControl > = {
+const meta: Meta< typeof TextControl > = {
 	component: TextControl,
 	title: 'Components/TextControl',
 	argTypes: {
@@ -26,12 +26,12 @@ const meta: ComponentMeta< typeof TextControl > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const DefaultTemplate: ComponentStory< typeof TextControl > = ( {
+const DefaultTemplate: StoryFn< typeof TextControl > = ( {
 	onChange,
 	...args
 } ) => {
@@ -49,11 +49,12 @@ const DefaultTemplate: ComponentStory< typeof TextControl > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof TextControl > =
-	DefaultTemplate.bind( {} );
+export const Default: StoryFn< typeof TextControl > = DefaultTemplate.bind(
+	{}
+);
 Default.args = {};
 
-export const WithLabelAndHelpText: ComponentStory< typeof TextControl > =
+export const WithLabelAndHelpText: StoryFn< typeof TextControl > =
 	DefaultTemplate.bind( {} );
 WithLabelAndHelpText.args = {
 	...Default.args,

@@ -138,17 +138,13 @@ _Returns_
 
 ### isEditingTemplate
 
+> **Deprecated**
+
 Returns true if the template editing mode is enabled.
 
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: Whether we're editing the template.
-
 ### isEditorPanelEnabled
+
+> **Deprecated**
 
 Returns true if the given panel is enabled, or false otherwise. Panels are enabled by default.
 
@@ -163,6 +159,8 @@ _Returns_
 
 ### isEditorPanelOpened
 
+> **Deprecated**
+
 Returns true if the given panel is open, or false otherwise. Panels are closed by default.
 
 _Parameters_
@@ -175,6 +173,8 @@ _Returns_
 -   `boolean`: Whether or not the panel is open.
 
 ### isEditorPanelRemoved
+
+> **Deprecated**
 
 Returns true if the given panel was programmatically removed, or false otherwise. All panels are not removed by default.
 
@@ -414,6 +414,8 @@ _Returns_
 
 ### removeEditorPanel
 
+> **Deprecated**
+
 Returns an action object used to remove a panel from the editor.
 
 _Parameters_
@@ -438,15 +440,9 @@ _Parameters_
 
 ### setIsEditingTemplate
 
+> **Deprecated**
+
 Returns an action object used to switch to template editing.
-
-_Parameters_
-
--   _value_ `boolean`: Is editing template.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### setIsInserterOpened
 
@@ -490,7 +486,13 @@ _Parameters_
 
 -   _mode_ `string`: The editor mode.
 
+### toggleDistractionFree
+
+Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
+
 ### toggleEditorPanelEnabled
+
+> **Deprecated**
 
 Returns an action object used to enable or disable a panel in the editor.
 
@@ -503,6 +505,8 @@ _Returns_
 -   `Object`: Action object.
 
 ### toggleEditorPanelOpened
+
+> **Deprecated**
 
 Opens a closed panel and closes an open panel.
 

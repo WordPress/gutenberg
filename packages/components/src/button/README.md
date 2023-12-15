@@ -4,12 +4,6 @@ Buttons let users take actions and make choices with a single click or tap.
 
 ![Button components](https://make.wordpress.org/design/files/2019/03/button.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -145,12 +139,6 @@ Whether the button is disabled. If `true`, this will force a `button` element to
 
 -   Required: No
 
-#### `focus`: `boolean`
-
-Whether the button is focused.
-
--   Required: No
-
 #### `href`: `string`
 
 If provided, renders `a` instead of `button`.
@@ -191,6 +179,8 @@ Renders a red text-based button style to indicate destructive behavior.
 #### `isPressed`: `boolean`
 
 Renders a pressed button style.
+
+If the native `aria-pressed` attribute is also set, it will take precedence.
 
 -   Required: No
 

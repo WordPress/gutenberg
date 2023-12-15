@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -37,15 +37,29 @@ import {
 } from '..';
 import DropdownMenu from '../../dropdown-menu';
 
-const meta: ComponentMeta< typeof Toolbar > = {
+const meta: Meta< typeof Toolbar > = {
 	title: 'Components/Toolbar',
 	component: Toolbar,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		ToolbarButton,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		ToolbarGroup,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		ToolbarItem,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		ToolbarDropdownMenu,
+	},
 	argTypes: {
 		children: { control: { type: null } },
+		variant: {
+			options: [ undefined, 'unstyled' ],
+			control: { type: 'radio' },
+		},
 	},
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 
@@ -59,7 +73,7 @@ function InlineImageIcon() {
 	);
 }
 
-const Template: ComponentStory< typeof Toolbar > = ( props ) => (
+const Template: StoryFn< typeof Toolbar > = ( props ) => (
 	<div style={ { height: 280 } }>
 		<Toolbar { ...props } />
 	</div>
@@ -107,9 +121,8 @@ Default.args = {
 				<ToolbarButton icon={ link } label="Link" />
 				<ToolbarGroup
 					isCollapsed
-					// @ts-expect-error TODO: Remove when ToolbarGroup is typed
-					icon={ false }
-					label="More rich text controls"
+					icon={ null }
+					title="More rich text controls"
 					controls={ [
 						{ icon: code, title: 'Inline code' },
 						{ icon: <InlineImageIcon />, title: 'Inline image' },
@@ -121,9 +134,8 @@ Default.args = {
 				/>
 			</ToolbarGroup>
 			<ToolbarGroup
-				// @ts-expect-error TODO: Remove when ToolbarGroup is typed
 				icon={ more }
-				label="Align"
+				title="Align"
 				isCollapsed
 				controls={ [
 					{
@@ -172,4 +184,15 @@ WithoutGroup.args = {
 			<ToolbarButton icon={ link } label="Link" />
 		</>
 	),
+};
+
+/**
+ * Set the variant to `unstyled` to remove default border styles.
+ * Otherwise, leave it as `undefined` for default styles.
+ */
+
+export const Unstyled = Template.bind( {} );
+Unstyled.args = {
+	...Default.args,
+	variant: 'unstyled',
 };

@@ -24,7 +24,7 @@ import defaultRegistry from './default-registry';
  * @return Object containing the action creators.
  */
 export function dispatch<
-	StoreNameOrDescriptor extends StoreDescriptor< AnyConfig > | string
+	StoreNameOrDescriptor extends StoreDescriptor< AnyConfig > | string,
 >(
 	storeNameOrDescriptor: StoreNameOrDescriptor
 ): DispatchReturn< StoreNameOrDescriptor > {

@@ -87,7 +87,6 @@ class Gutenberg_REST_Navigation_Fallback_Controller_Test extends WP_Test_REST_Co
 		$navs_in_db = $this->get_navigations_in_database();
 
 		$this->assertCount( 1, $navs_in_db, 'Only a single Navigation menu should be present in the database.' );
-
 	}
 
 	/**

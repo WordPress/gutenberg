@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import Snackbar from '..';
 
-const meta: ComponentMeta< typeof Snackbar > = {
+const meta: Meta< typeof Snackbar > = {
 	title: 'Components/Snackbar',
 	component: Snackbar,
 	argTypes: {
@@ -29,28 +29,27 @@ const meta: ComponentMeta< typeof Snackbar > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const DefaultTemplate: ComponentStory< typeof Snackbar > = ( {
+const DefaultTemplate: StoryFn< typeof Snackbar > = ( {
 	children,
 	...props
 } ) => {
 	return <Snackbar { ...props }>{ children }</Snackbar>;
 };
 
-export const Default: ComponentStory< typeof Snackbar > = DefaultTemplate.bind(
-	{}
-);
+export const Default: StoryFn< typeof Snackbar > = DefaultTemplate.bind( {} );
 Default.args = {
 	children:
 		'Use Snackbars to communicate low priority, non-interruptive messages to the user.',
 };
 
-export const WithActions: ComponentStory< typeof Snackbar > =
-	DefaultTemplate.bind( {} );
+export const WithActions: StoryFn< typeof Snackbar > = DefaultTemplate.bind(
+	{}
+);
 WithActions.args = {
 	actions: [
 		{
@@ -61,9 +60,7 @@ WithActions.args = {
 	children: 'Use Snackbars with an action link to an external page.',
 };
 
-export const WithIcon: ComponentStory< typeof Snackbar > = DefaultTemplate.bind(
-	{}
-);
+export const WithIcon: StoryFn< typeof Snackbar > = DefaultTemplate.bind( {} );
 WithIcon.args = {
 	children: 'Add an icon to make your snackbar stand out',
 	icon: (
@@ -73,7 +70,7 @@ WithIcon.args = {
 	),
 };
 
-export const WithExplicitDismiss: ComponentStory< typeof Snackbar > =
+export const WithExplicitDismiss: StoryFn< typeof Snackbar > =
 	DefaultTemplate.bind( {} );
 WithExplicitDismiss.args = {
 	children:
@@ -81,7 +78,7 @@ WithExplicitDismiss.args = {
 	explicitDismiss: true,
 };
 
-export const WithActionAndExplicitDismiss: ComponentStory< typeof Snackbar > =
+export const WithActionAndExplicitDismiss: StoryFn< typeof Snackbar > =
 	DefaultTemplate.bind( {} );
 WithActionAndExplicitDismiss.args = {
 	actions: [

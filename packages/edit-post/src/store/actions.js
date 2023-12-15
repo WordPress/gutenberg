@@ -7,7 +7,6 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
@@ -26,10 +25,17 @@ import { store as editPostStore } from '.';
  */
 export const openGeneralSidebar =
 	( name ) =>
-	( { registry } ) =>
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'distractionFree' );
+		if ( isDistractionFree ) {
+			dispatch.toggleDistractionFree();
+		}
 		registry
 			.dispatch( interfaceStore )
 			.enableComplementaryArea( editPostStore.name, name );
+	};
 
 /**
  * Returns an action object signalling that the user closed the sidebar.
@@ -116,6 +122,8 @@ export function togglePublishSidebar() {
 /**
  * Returns an action object used to enable or disable a panel in the editor.
  *
+ * @deprecated
+ *
  * @param {string} panelName A string that identifies the panel to enable or disable.
  *
  * @return {Object} Action object.
@@ -123,73 +131,48 @@ export function togglePublishSidebar() {
 export const toggleEditorPanelEnabled =
 	( panelName ) =>
 	( { registry } ) => {
-		const inactivePanels =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'inactivePanels' ) ?? [];
-
-		const isPanelInactive = !! inactivePanels?.includes( panelName );
-
-		// If the panel is inactive, remove it to enable it, else add it to
-		// make it inactive.
-		let updatedInactivePanels;
-		if ( isPanelInactive ) {
-			updatedInactivePanels = inactivePanels.filter(
-				( invactivePanelName ) => invactivePanelName !== panelName
-			);
-		} else {
-			updatedInactivePanels = [ ...inactivePanels, panelName ];
-		}
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'inactivePanels', updatedInactivePanels );
+		deprecated( "dispatch( 'core/edit-post' ).toggleEditorPanelEnabled", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').toggleEditorPanelEnabled",
+		} );
+		registry.dispatch( editorStore ).toggleEditorPanelEnabled( panelName );
 	};
 
 /**
  * Opens a closed panel and closes an open panel.
+ *
+ * @deprecated
  *
  * @param {string} panelName A string that identifies the panel to open or close.
  */
 export const toggleEditorPanelOpened =
 	( panelName ) =>
 	( { registry } ) => {
-		const openPanels =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'openPanels' ) ?? [];
-
-		const isPanelOpen = !! openPanels?.includes( panelName );
-
-		// If the panel is open, remove it to close it, else add it to
-		// make it open.
-		let updatedOpenPanels;
-		if ( isPanelOpen ) {
-			updatedOpenPanels = openPanels.filter(
-				( openPanelName ) => openPanelName !== panelName
-			);
-		} else {
-			updatedOpenPanels = [ ...openPanels, panelName ];
-		}
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'openPanels', updatedOpenPanels );
+		deprecated( "dispatch( 'core/edit-post' ).toggleEditorPanelOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').toggleEditorPanelOpened",
+		} );
+		registry.dispatch( editorStore ).toggleEditorPanelOpened( panelName );
 	};
 
 /**
  * Returns an action object used to remove a panel from the editor.
  *
+ * @deprecated
+ *
  * @param {string} panelName A string that identifies the panel to remove.
  *
  * @return {Object} Action object.
  */
-export function removeEditorPanel( panelName ) {
-	return {
-		type: 'REMOVE_PANEL',
-		panelName,
+export const removeEditorPanel =
+	( panelName ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).removeEditorPanel", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').removeEditorPanel",
+		} );
+		registry.dispatch( editorStore ).removeEditorPanel( panelName );
 	};
-}
 
 /**
  * Triggers an action used to toggle a feature flag.
@@ -210,7 +193,7 @@ export const toggleFeature =
  */
 export const switchEditorMode =
 	( mode ) =>
-	( { registry } ) => {
+	( { dispatch, registry } ) => {
 		registry
 			.dispatch( preferencesStore )
 			.set( 'core/edit-post', 'editorMode', mode );
@@ -218,6 +201,15 @@ export const switchEditorMode =
 		// Unselect blocks when we switch to the code editor.
 		if ( mode !== 'visual' ) {
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+		}
+
+		if (
+			mode === 'text' &&
+			registry
+				.select( preferencesStore )
+				.get( 'core/edit-post', 'distractionFree' )
+		) {
+			dispatch.toggleDistractionFree();
 		}
 
 		const message =
@@ -441,18 +433,27 @@ export function metaBoxUpdatesFailure() {
 }
 
 /**
- * Returns an action object used to toggle the width of the editing canvas.
+ * Action that changes the width of the editing canvas.
+ *
+ * @deprecated
  *
  * @param {string} deviceType
  *
  * @return {Object} Action object.
  */
-export function __experimentalSetPreviewDeviceType( deviceType ) {
-	return {
-		type: 'SET_PREVIEW_DEVICE_TYPE',
-		deviceType,
+export const __experimentalSetPreviewDeviceType =
+	( deviceType ) =>
+	( { registry } ) => {
+		deprecated(
+			"dispatch( 'core/edit-post' ).__experimentalSetPreviewDeviceType",
+			{
+				since: '6.5',
+				version: '6.7',
+				hint: 'registry.dispatch( editorStore ).setDeviceType',
+			}
+		);
+		registry.dispatch( editorStore ).setDeviceType( deviceType );
 	};
-}
 
 /**
  * Returns an action object used to open/close the inserter.
@@ -479,68 +480,54 @@ export function setIsInserterOpened( value ) {
  * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
  * @return {Object} Action object.
  */
-export function setIsListViewOpened( isOpen ) {
-	return {
-		type: 'SET_IS_LIST_VIEW_OPENED',
-		isOpen,
+export const setIsListViewOpened =
+	( isOpen ) =>
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'distractionFree' );
+		if ( isDistractionFree && isOpen ) {
+			dispatch.toggleDistractionFree();
+		}
+		dispatch( {
+			type: 'SET_IS_LIST_VIEW_OPENED',
+			isOpen,
+		} );
 	};
-}
 
 /**
  * Returns an action object used to switch to template editing.
  *
- * @param {boolean} value Is editing template.
- * @return {Object} Action object.
+ * @deprecated
  */
-export function setIsEditingTemplate( value ) {
-	return {
-		type: 'SET_IS_EDITING_TEMPLATE',
-		value,
-	};
+export function setIsEditingTemplate() {
+	deprecated( "dispatch( 'core/edit-post' ).setIsEditingTemplate", {
+		since: '6.5',
+		alternative: "dispatch( 'core/editor').setRenderingMode",
+	} );
+	return { type: 'NOTHING' };
 }
 
 /**
  * Switches to the template mode.
- *
- * @param {boolean} newTemplate Is new template.
  */
 export const __unstableSwitchToTemplateMode =
-	( newTemplate = false ) =>
-	( { registry, select, dispatch } ) => {
-		dispatch( setIsEditingTemplate( true ) );
-		const isWelcomeGuideActive = select.isFeatureActive(
-			'welcomeGuideTemplate'
-		);
-		if ( ! isWelcomeGuideActive ) {
-			const message = newTemplate
-				? __( "Custom template created. You're in template mode now." )
-				: __(
-						'Editing template. Changes made here affect all posts and pages that use the template.'
-				  );
-			registry.dispatch( noticesStore ).createSuccessNotice( message, {
-				type: 'snackbar',
-			} );
-		}
+	() =>
+	( { registry } ) => {
+		registry.dispatch( editorStore ).setRenderingMode( 'template-only' );
 	};
 
 /**
  * Create a block based template.
  *
- * @param {Object?} template Template to create and assign.
+ * @deprecated
  */
-export const __unstableCreateTemplate =
-	( template ) =>
-	async ( { registry } ) => {
-		const savedTemplate = await registry
-			.dispatch( coreStore )
-			.saveEntityRecord( 'postType', 'wp_template', template );
-		const post = registry.select( editorStore ).getCurrentPost();
-		registry
-			.dispatch( coreStore )
-			.editEntityRecord( 'postType', post.type, post.id, {
-				template: savedTemplate.slug,
-			} );
-	};
+export function __unstableCreateTemplate() {
+	deprecated( "dispatch( 'core/edit-post' ).__unstableCreateTemplate", {
+		since: '6.5',
+	} );
+	return { type: 'NOTHING' };
+}
 
 let metaBoxesInitialized = false;
 
@@ -588,5 +575,48 @@ export const initializeMetaBoxes =
 
 		dispatch( {
 			type: 'META_BOXES_INITIALIZED',
+		} );
+	};
+
+/**
+ * Action that toggles Distraction free mode.
+ * Distraction free mode expects there are no sidebars, as due to the
+ * z-index values set, you can't close sidebars.
+ */
+export const toggleDistractionFree =
+	() =>
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'distractionFree' );
+		if ( ! isDistractionFree ) {
+			registry.batch( () => {
+				registry
+					.dispatch( preferencesStore )
+					.set( 'core/edit-post', 'fixedToolbar', true );
+				dispatch.setIsInserterOpened( false );
+				dispatch.setIsListViewOpened( false );
+				dispatch.closeGeneralSidebar();
+			} );
+		}
+		registry.batch( () => {
+			registry
+				.dispatch( preferencesStore )
+				.set(
+					'core/edit-post',
+					'distractionFree',
+					! isDistractionFree
+				);
+			registry
+				.dispatch( noticesStore )
+				.createInfoNotice(
+					isDistractionFree
+						? __( 'Distraction free off.' )
+						: __( 'Distraction free on.' ),
+					{
+						id: 'core/edit-post/distraction-free-mode/notice',
+						type: 'snackbar',
+					}
+				);
 		} );
 	};

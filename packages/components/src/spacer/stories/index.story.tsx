@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -29,7 +29,7 @@ const controls = [
 	{}
 );
 
-const meta: ComponentMeta< typeof Spacer > = {
+const meta: Meta< typeof Spacer > = {
 	component: Spacer,
 	title: 'Components (Experimental)/Spacer',
 	argTypes: {
@@ -43,7 +43,7 @@ const meta: ComponentMeta< typeof Spacer > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
@@ -54,7 +54,7 @@ const BlackBox = () => (
 	/>
 );
 
-const Template: ComponentStory< typeof Spacer > = ( { onChange, ...args } ) => {
+const Template: StoryFn< typeof Spacer > = ( { onChange, ...args } ) => {
 	return (
 		<>
 			<BlackBox />
@@ -64,7 +64,7 @@ const Template: ComponentStory< typeof Spacer > = ( { onChange, ...args } ) => {
 	);
 };
 
-export const Default: ComponentStory< typeof Spacer > = Template.bind( {} );
+export const Default: StoryFn< typeof Spacer > = Template.bind( {} );
 Default.args = {
 	children: 'This is the spacer',
 };

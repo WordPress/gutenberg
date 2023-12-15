@@ -4,7 +4,7 @@
 import { HStack } from '../h-stack';
 import { Text } from '../text';
 import { Spacer } from '../spacer';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import { RangeControl, NumberControlWrapper } from './styles';
 import { COLORS } from '../utils/colors-values';
 import type { InputWithSliderProps } from './types';
@@ -42,7 +42,7 @@ export const InputWithSlider = ( {
 					<Spacer
 						as={ Text }
 						paddingLeft={ space( 4 ) }
-						color={ COLORS.ui.theme }
+						color={ COLORS.theme.accent }
 						lineHeight={ 1 }
 					>
 						{ abbreviation }

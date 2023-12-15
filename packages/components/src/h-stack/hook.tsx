@@ -6,11 +6,11 @@ import type { ReactElement } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
-import { hasConnectNamespace, useContextSystem } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import { hasConnectNamespace, useContextSystem } from '../context';
 import { FlexItem, useFlex } from '../flex';
 import { getAlignmentProps } from './utils';
-import { getValidChildren } from '../ui/utils/get-valid-children';
+import { getValidChildren } from '../utils/get-valid-children';
 import type { Props } from './types';
 
 export function useHStack( props: WordPressComponentProps< Props, 'div' > ) {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -9,7 +9,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
 import { View } from '../../view';
 import { Grid } from '..';
 
-const meta: ComponentMeta< typeof Grid > = {
+const meta: Meta< typeof Grid > = {
 	component: Grid,
 	title: 'Components (Experimental)/Grid',
 	argTypes: {
@@ -34,7 +34,7 @@ const meta: ComponentMeta< typeof Grid > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
@@ -51,7 +51,7 @@ const Item = ( props: { children: string } ) => (
 	/>
 );
 
-const Template: ComponentStory< typeof Grid > = ( props ) => (
+const Template: StoryFn< typeof Grid > = ( props ) => (
 	<Grid { ...props }>
 		<Item>One</Item>
 		<Item>Two</Item>
@@ -64,7 +64,7 @@ const Template: ComponentStory< typeof Grid > = ( props ) => (
 	</Grid>
 );
 
-export const Default: ComponentStory< typeof Grid > = Template.bind( {} );
+export const Default: StoryFn< typeof Grid > = Template.bind( {} );
 Default.args = {
 	alignment: 'bottom',
 	columns: 4,

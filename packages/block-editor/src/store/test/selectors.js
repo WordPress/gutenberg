@@ -526,130 +526,131 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getClientIdsOfDescendants', () => {
+		const state = {
+			blocks: {
+				byClientId: new Map(
+					Object.entries( {
+						'uuid-2': {
+							clientId: 'uuid-2',
+							name: 'core/image',
+						},
+						'uuid-4': {
+							clientId: 'uuid-4',
+							name: 'core/paragraph',
+						},
+						'uuid-6': {
+							clientId: 'uuid-6',
+							name: 'core/paragraph',
+						},
+						'uuid-8': {
+							clientId: 'uuid-8',
+							name: 'core/block',
+						},
+						'uuid-10': {
+							clientId: 'uuid-10',
+							name: 'core/columns',
+						},
+						'uuid-12': {
+							clientId: 'uuid-12',
+							name: 'core/column',
+						},
+						'uuid-14': {
+							clientId: 'uuid-14',
+							name: 'core/column',
+						},
+						'uuid-16': {
+							clientId: 'uuid-16',
+							name: 'core/quote',
+						},
+						'uuid-18': {
+							clientId: 'uuid-18',
+							name: 'core/block',
+						},
+						'uuid-20': {
+							clientId: 'uuid-20',
+							name: 'core/gallery',
+						},
+						'uuid-22': {
+							clientId: 'uuid-22',
+							name: 'core/block',
+						},
+						'uuid-24': {
+							clientId: 'uuid-24',
+							name: 'core/columns',
+						},
+						'uuid-26': {
+							clientId: 'uuid-26',
+							name: 'core/column',
+						},
+						'uuid-28': {
+							clientId: 'uuid-28',
+							name: 'core/column',
+						},
+						'uuid-30': {
+							clientId: 'uuid-30',
+							name: 'core/paragraph',
+						},
+					} )
+				),
+				attributes: new Map(
+					Object.entries( {
+						'uuid-2': {},
+						'uuid-4': {},
+						'uuid-6': {},
+						'uuid-8': {},
+						'uuid-10': {},
+						'uuid-12': {},
+						'uuid-14': {},
+						'uuid-16': {},
+						'uuid-18': {},
+						'uuid-20': {},
+						'uuid-22': {},
+						'uuid-24': {},
+						'uuid-26': {},
+						'uuid-28': {},
+						'uuid-30': {},
+					} )
+				),
+				order: new Map(
+					Object.entries( {
+						'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
+						'uuid-2': [],
+						'uuid-4': [],
+						'uuid-6': [],
+						'uuid-8': [],
+						'uuid-10': [ 'uuid-12', 'uuid-14' ],
+						'uuid-12': [ 'uuid-16' ],
+						'uuid-14': [ 'uuid-18' ],
+						'uuid-16': [],
+						'uuid-18': [ 'uuid-24' ],
+						'uuid-20': [],
+						'uuid-22': [],
+						'uuid-24': [ 'uuid-26', 'uuid-28' ],
+						'uuid-26': [],
+						'uuid-28': [ 'uuid-30' ],
+					} )
+				),
+				parents: new Map(
+					Object.entries( {
+						'uuid-6': '',
+						'uuid-8': '',
+						'uuid-10': '',
+						'uuid-22': '',
+						'uuid-12': 'uuid-10',
+						'uuid-14': 'uuid-10',
+						'uuid-16': 'uuid-12',
+						'uuid-18': 'uuid-14',
+						'uuid-24': 'uuid-18',
+						'uuid-26': 'uuid-24',
+						'uuid-28': 'uuid-24',
+						'uuid-30': 'uuid-28',
+					} )
+				),
+				controlledInnerBlocks: {},
+			},
+		};
+
 		it( 'should return the ids of any descendants in sequential order, given an array of clientIds', () => {
-			const state = {
-				blocks: {
-					byClientId: new Map(
-						Object.entries( {
-							'uuid-2': {
-								clientId: 'uuid-2',
-								name: 'core/image',
-							},
-							'uuid-4': {
-								clientId: 'uuid-4',
-								name: 'core/paragraph',
-							},
-							'uuid-6': {
-								clientId: 'uuid-6',
-								name: 'core/paragraph',
-							},
-							'uuid-8': {
-								clientId: 'uuid-8',
-								name: 'core/block',
-							},
-							'uuid-10': {
-								clientId: 'uuid-10',
-								name: 'core/columns',
-							},
-							'uuid-12': {
-								clientId: 'uuid-12',
-								name: 'core/column',
-							},
-							'uuid-14': {
-								clientId: 'uuid-14',
-								name: 'core/column',
-							},
-							'uuid-16': {
-								clientId: 'uuid-16',
-								name: 'core/quote',
-							},
-							'uuid-18': {
-								clientId: 'uuid-18',
-								name: 'core/block',
-							},
-							'uuid-20': {
-								clientId: 'uuid-20',
-								name: 'core/gallery',
-							},
-							'uuid-22': {
-								clientId: 'uuid-22',
-								name: 'core/block',
-							},
-							'uuid-24': {
-								clientId: 'uuid-24',
-								name: 'core/columns',
-							},
-							'uuid-26': {
-								clientId: 'uuid-26',
-								name: 'core/column',
-							},
-							'uuid-28': {
-								clientId: 'uuid-28',
-								name: 'core/column',
-							},
-							'uuid-30': {
-								clientId: 'uuid-30',
-								name: 'core/paragraph',
-							},
-						} )
-					),
-					attributes: new Map(
-						Object.entries( {
-							'uuid-2': {},
-							'uuid-4': {},
-							'uuid-6': {},
-							'uuid-8': {},
-							'uuid-10': {},
-							'uuid-12': {},
-							'uuid-14': {},
-							'uuid-16': {},
-							'uuid-18': {},
-							'uuid-20': {},
-							'uuid-22': {},
-							'uuid-24': {},
-							'uuid-26': {},
-							'uuid-28': {},
-							'uuid-30': {},
-						} )
-					),
-					order: new Map(
-						Object.entries( {
-							'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
-							'uuid-2': [],
-							'uuid-4': [],
-							'uuid-6': [],
-							'uuid-8': [],
-							'uuid-10': [ 'uuid-12', 'uuid-14' ],
-							'uuid-12': [ 'uuid-16' ],
-							'uuid-14': [ 'uuid-18' ],
-							'uuid-16': [],
-							'uuid-18': [ 'uuid-24' ],
-							'uuid-20': [],
-							'uuid-22': [],
-							'uuid-24': [ 'uuid-26', 'uuid-28' ],
-							'uuid-26': [],
-							'uuid-28': [ 'uuid-30' ],
-						} )
-					),
-					parents: new Map(
-						Object.entries( {
-							'uuid-6': '',
-							'uuid-8': '',
-							'uuid-10': '',
-							'uuid-22': '',
-							'uuid-12': 'uuid-10',
-							'uuid-14': 'uuid-10',
-							'uuid-16': 'uuid-12',
-							'uuid-18': 'uuid-14',
-							'uuid-24': 'uuid-18',
-							'uuid-26': 'uuid-24',
-							'uuid-28': 'uuid-24',
-							'uuid-30': 'uuid-28',
-						} )
-					),
-					controlledInnerBlocks: {},
-				},
-			};
 			expect( getClientIdsOfDescendants( state, [ 'uuid-10' ] ) ).toEqual(
 				[
 					'uuid-12',
@@ -661,6 +662,12 @@ describe( 'selectors', () => {
 					'uuid-28',
 					'uuid-30',
 				]
+			);
+		} );
+
+		it( 'should return same value when called with same state and argument', () => {
+			expect( getClientIdsOfDescendants( state, 'uuid-10' ) ).toBe(
+				getClientIdsOfDescendants( state, 'uuid-10' )
 			);
 		} );
 	} );

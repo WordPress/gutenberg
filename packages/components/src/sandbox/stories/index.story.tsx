@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import SandBox from '..';
 
-const meta: ComponentMeta< typeof SandBox > = {
+const meta: Meta< typeof SandBox > = {
 	component: SandBox,
 	title: 'Components/SandBox',
 	argTypes: {
@@ -17,14 +17,12 @@ const meta: ComponentMeta< typeof SandBox > = {
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof SandBox > = ( args ) => (
-	<SandBox { ...args } />
-);
+const Template: StoryFn< typeof SandBox > = ( args ) => <SandBox { ...args } />;
 
 export const Default = Template.bind( {} );
 Default.args = {

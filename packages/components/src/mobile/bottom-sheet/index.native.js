@@ -527,6 +527,7 @@ class BottomSheet extends Component {
 					panResponder.panHandlers.onMoveShouldSetResponderCapture
 				}
 				onAccessibilityEscape={ this.onCloseBottomSheet }
+				testID="bottom-sheet"
 				{ ...rest }
 			>
 				<KeyboardAvoidingView

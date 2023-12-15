@@ -7,6 +7,15 @@
 	& > .components-toolbar-group:last-child {
 		border-right: none;
 	}
+
+	&.is-unstyled {
+		border: none;
+
+		& > .components-toolbar-group {
+			border-right: none;
+		}
+
+	}
 }
 
 .components-accessible-toolbar,

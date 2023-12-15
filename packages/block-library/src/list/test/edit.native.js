@@ -423,11 +423,9 @@ describe( 'List block', () => {
 
 		<!-- wp:list-item -->
 		<li>Two</li>
-		<!-- /wp:list-item --></ul>
-		<!-- /wp:list -->
+		<!-- /wp:list-item -->
 
-		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<!-- wp:list-item -->
 		<li>Three</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->"

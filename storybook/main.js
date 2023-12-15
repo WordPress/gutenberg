@@ -33,6 +33,7 @@ const stories = [
 	'../packages/components/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/edit-site/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
 ].filter( Boolean );
 
 module.exports = {
@@ -73,7 +74,7 @@ module.exports = {
 					...config.module.rules,
 					{
 						// Adds a `sourceLink` parameter to the story metadata, based on the file path
-						test: /\/stories\/.+\.(j|t)sx?$/,
+						test: /\/stories\/.+\.story\.(j|t)sx?$/,
 						loader: path.resolve(
 							__dirname,
 							'./webpack/source-link-loader.js'

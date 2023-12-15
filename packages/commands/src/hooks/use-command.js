@@ -10,9 +10,25 @@ import { useDispatch } from '@wordpress/data';
 import { store as commandsStore } from '../store';
 
 /**
- * Attach a command to the command palette.
+ * Attach a command to the command palette. Used for static commands.
  *
  * @param {import('../store/actions').WPCommandConfig} command command config.
+ *
+ * @example
+ * ```js
+ * import { useCommand } from '@wordpress/commands';
+ * import { plus } from '@wordpress/icons';
+ *
+ * useCommand( {
+ *     name: 'myplugin/my-command-name',
+ *     label: __( 'Add new post' ),
+ *	   icon: plus,
+ *     callback: ({ close }) => {
+ *         document.location.href = 'post-new.php';
+ *         close();
+ *     },
+ * } );
+ * ```
  */
 export default function useCommand( command ) {
 	const { registerCommand, unregisterCommand } = useDispatch( commandsStore );

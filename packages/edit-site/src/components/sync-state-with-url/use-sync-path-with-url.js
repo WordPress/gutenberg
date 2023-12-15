@@ -9,6 +9,11 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_TYPES,
+} from '../../utils/constants';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -18,9 +23,9 @@ export function getPathFromURL( urlParams ) {
 	// Compute the navigator path based on the URL params.
 	if ( urlParams?.postType && urlParams?.postId ) {
 		switch ( urlParams.postType ) {
-			case 'wp_block':
-			case 'wp_template':
-			case 'wp_template_part':
+			case PATTERN_TYPES.user:
+			case TEMPLATE_POST_TYPE:
+			case TEMPLATE_PART_POST_TYPE:
 			case 'page':
 				path = `/${ encodeURIComponent(
 					urlParams.postType

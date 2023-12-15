@@ -14,6 +14,7 @@ import {
 } from '@wordpress/blocks';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
+import '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -246,7 +247,7 @@ describe( 'useEntityBlockEditor', () => {
 				[
 					createBlock( 'core/test-block', {
 						content:
-							'A new paragraph<sup data-fn="xyz" class="xyz"><a href="#xyz" id="xyz-link">999</a></sup>',
+							'A new paragraph<sup data-fn="xyz" class="fn"><a href="#xyz" id="xyz-link">999</a></sup>',
 					} ),
 					...blocks,
 				],
@@ -263,7 +264,7 @@ describe( 'useEntityBlockEditor', () => {
 		// The newly inserted block should have the footnote number 1, and the
 		// existing footnote number 1 should be updated to 2.
 		expect( blocks[ 0 ].attributes.content ).toEqual(
-			'A new paragraph<sup data-fn="xyz" class="xyz"><a href="#xyz" id="xyz-link">1</a></sup>'
+			'A new paragraph<sup data-fn="xyz" class="fn"><a href="#xyz" id="xyz-link">1</a></sup>'
 		);
 		expect( blocks[ 1 ].attributes.content ).toEqual(
 			'A paragraph<sup data-fn="abcd" class="fn"><a href="#abcd" id="abcd-link">2</a></sup>'

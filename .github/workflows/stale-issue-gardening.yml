@@ -27,8 +27,8 @@ jobs:
                       remove-stale-when-updated: true
                       stale-issue-label: '[Status] Stale'
                     - name: 'Flaky test issues without activity'
-                      message: 'This issue has gone 30 days without any activity.'
-                      days-before-stale: 30
+                      message: 'This issue has gone 15 days without any activity.'
+                      days-before-stale: 15
                       days-before-close: 1
                       only-labels: '[Type] Flaky Test'
                       remove-stale-when-updated: true

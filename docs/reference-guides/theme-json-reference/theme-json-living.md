@@ -31,6 +31,7 @@ Code editors can pick up the schema and can provide helpful hints and suggestion
 
 Setting that enables the following UI tools:
 
+- background: backgroundImage
 - border: color, radius, style, width
 - color: link
 - dimensions: minHeight
@@ -94,6 +95,18 @@ Settings related to colors.
 | link | boolean | false |  |
 | palette | array |  | color, name, slug |
 | text | boolean | true |  |
+| heading | boolean | true |  |
+| button | boolean | true |  |
+
+---
+
+### background
+
+Settings related to background.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| backgroundImage | boolean | false |  |
 
 ---
 
@@ -116,6 +129,18 @@ Settings related to layout.
 | contentSize | string |  |  |
 | wideSize | string |  |  |
 | allowEditing | boolean | true |  |
+| allowCustomContentAndWideSize | boolean | true |  |
+
+---
+
+### lightbox
+
+Settings related to the lightbox.
+
+| Property  | Type   | Default | Props  |
+| ---       | ---    | ---    |---   |
+| enabled | boolean |  |  |
+| allowEditing | boolean |  |  |
 
 ---
 
@@ -163,7 +188,7 @@ Settings related to typography.
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
 | fontSizes | array |  | fluid, name, size, slug |
-| fontFamilies | array |  | fontFace, fontFamily, name, slug |
+| fontFamilies | array |  | fontFace, fontFamily, name, preview, slug |
 
 ---
 
@@ -171,16 +196,6 @@ Settings related to typography.
 
 Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.
 
-
----
-
-### behaviors
-
-Settings related to behaviors.
-
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
-| lightbox | boolean | false |  |
 
 ---
 ## Styles

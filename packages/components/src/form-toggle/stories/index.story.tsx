@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  */
 import { FormToggle } from '..';
 
-const meta: ComponentMeta< typeof FormToggle > = {
+const meta: Meta< typeof FormToggle > = {
 	component: FormToggle,
 	title: 'Components/FormToggle',
 	argTypes: {
@@ -25,15 +25,12 @@ const meta: ComponentMeta< typeof FormToggle > = {
 		controls: {
 			expanded: true,
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const Template: ComponentStory< typeof FormToggle > = ( {
-	onChange,
-	...args
-} ) => {
+const Template: StoryFn< typeof FormToggle > = ( { onChange, ...args } ) => {
 	const [ isChecked, setChecked ] = useState( true );
 
 	return (
@@ -48,5 +45,5 @@ const Template: ComponentStory< typeof FormToggle > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof FormToggle > = Template.bind( {} );
+export const Default: StoryFn< typeof FormToggle > = Template.bind( {} );
 Default.args = {};

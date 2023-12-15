@@ -15,10 +15,10 @@ import { cloneElement, forwardRef } from '@wordpress/element';
 import Shortcut from '../shortcut';
 import Button from '../button';
 import Icon from '../icon';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { MenuItemProps } from './types';
 
-export function MenuItem(
+function UnforwardedMenuItem(
 	props: WordPressComponentProps< MenuItemProps, 'button', false >,
 	ref: ForwardedRef< HTMLButtonElement >
 ) {
@@ -97,6 +97,7 @@ export function MenuItem(
  * 		<MenuItem
  * 			icon={ isActive ? 'yes' : 'no' }
  * 			isSelected={ isActive }
+ * 			role="menuitemcheckbox"
  * 			onClick={ () => setIsActive( ( state ) => ! state ) }
  * 		>
  * 			Toggle
@@ -105,4 +106,6 @@ export function MenuItem(
  * };
  * ```
  */
-export default forwardRef( MenuItem );
+export const MenuItem = forwardRef( UnforwardedMenuItem );
+
+export default MenuItem;

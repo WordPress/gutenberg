@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
 import CheckboxControl from '..';
 import { VStack } from '../../v-stack';
 
-const meta: ComponentMeta< typeof CheckboxControl > = {
+const meta: Meta< typeof CheckboxControl > = {
 	component: CheckboxControl,
 	title: 'Components/CheckboxControl',
 	argTypes: {
@@ -31,12 +31,12 @@ const meta: ComponentMeta< typeof CheckboxControl > = {
 			expanded: true,
 			exclude: [ 'heading' ],
 		},
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
 
-const DefaultTemplate: ComponentStory< typeof CheckboxControl > = ( {
+const DefaultTemplate: StoryFn< typeof CheckboxControl > = ( {
 	onChange,
 	...args
 } ) => {
@@ -54,14 +54,15 @@ const DefaultTemplate: ComponentStory< typeof CheckboxControl > = ( {
 	);
 };
 
-export const Default: ComponentStory< typeof CheckboxControl > =
-	DefaultTemplate.bind( {} );
+export const Default: StoryFn< typeof CheckboxControl > = DefaultTemplate.bind(
+	{}
+);
 Default.args = {
 	label: 'Is author',
 	help: 'Is the user an author or not?',
 };
 
-export const Indeterminate: ComponentStory< typeof CheckboxControl > = ( {
+export const Indeterminate: StoryFn< typeof CheckboxControl > = ( {
 	onChange,
 	...args
 } ) => {

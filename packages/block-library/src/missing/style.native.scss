@@ -1,13 +1,3 @@
-/** @format */
-.content {
-	padding-top: 8;
-	padding-bottom: 0;
-	padding-left: 24;
-	padding-right: 24;
-	align-items: center;
-	justify-content: space-evenly;
-}
-
 .helpIconContainer {
 	position: absolute;
 	top: 0;
@@ -20,12 +10,6 @@
 	align-items: flex-end;
 }
 
-.infoContainer {
-	flex-direction: column;
-	align-items: center;
-	justify-content: flex-end;
-}
-
 .infoIcon {
 	size: 36;
 	height: 36;
@@ -36,49 +20,6 @@
 
 .infoIconDark {
 	color: $dark-tertiary;
-}
-
-.infoSheetIcon {
-	size: 36;
-	height: 36;
-	padding-top: 8;
-	padding-bottom: 8;
-	color: $gray;
-}
-
-.infoSheetIconDark {
-	color: $gray-20;
-}
-
-.infoText {
-	text-align: center;
-	color: $gray-dark;
-}
-
-.infoTextDark {
-	color: $white;
-}
-
-.infoTitle {
-	padding-top: 8;
-	padding-bottom: 12;
-	font-size: 20;
-	font-weight: bold;
-	color: $gray-dark;
-}
-
-.infoTitleDark {
-	color: $white;
-}
-
-.infoDescription {
-	padding-bottom: 24;
-	font-size: 16;
-	color: $gray-darken-20;
-}
-
-.infoDescriptionDark {
-	color: $gray-20;
 }
 
 .unsupportedBlock {
@@ -135,12 +76,4 @@
 
 .unsupportedBlockSubtitleDark {
 	color: $gray-20;
-}
-
-.actionButton {
-	color: $blue-50;
-}
-
-.actionButtonDark {
-	color: $blue-30;
 }

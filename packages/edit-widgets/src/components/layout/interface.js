@@ -3,7 +3,7 @@
  */
 import { useViewportMatch } from '@wordpress/compose';
 import { BlockBreadcrumb } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	InterfaceSkeleton,
@@ -68,6 +68,9 @@ function Interface( { blockEditorSettings } ) {
 		[]
 	);
 
+	const [ listViewToggleElement, setListViewToggleElement ] =
+		useState( null );
+
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
 		if ( hasSidebarEnabled && ! isHugeViewport ) {
@@ -94,8 +97,16 @@ function Interface( { blockEditorSettings } ) {
 				...interfaceLabels,
 				secondarySidebar: secondarySidebarLabel,
 			} }
-			header={ <Header /> }
-			secondarySidebar={ hasSecondarySidebar && <SecondarySidebar /> }
+			header={
+				<Header setListViewToggleElement={ setListViewToggleElement } />
+			}
+			secondarySidebar={
+				hasSecondarySidebar && (
+					<SecondarySidebar
+						listViewToggleElement={ listViewToggleElement }
+					/>
+				)
+			}
 			sidebar={
 				hasSidebarEnabled && (
 					<ComplementaryArea.Slot scope="core/edit-widgets" />

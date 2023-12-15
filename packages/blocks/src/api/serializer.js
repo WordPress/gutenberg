@@ -174,9 +174,9 @@ export function getSaveElement(
 	/**
 	 * Filters the save result of a block during serialization.
 	 *
-	 * @param {WPElement} element    Block save result.
-	 * @param {WPBlock}   blockType  Block type definition.
-	 * @param {Object}    attributes Block attributes.
+	 * @param {Element} element    Block save result.
+	 * @param {WPBlock} blockType  Block type definition.
+	 * @param {Object}  attributes Block attributes.
 	 */
 	return applyFilters(
 		'blocks.getSaveElement',

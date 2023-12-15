@@ -307,12 +307,12 @@ describe( 'onFilesDrop', () => {
 		const insertOrReplaceBlocks = jest.fn();
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
-		const uploadPermissions = false;
+		const getSettings = jest.fn( () => ( {} ) );
 
 		const onFileDropHandler = onFilesDrop(
 			targetRootClientId,
 			targetBlockIndex,
-			uploadPermissions,
+			getSettings,
 			updateBlockAttributes,
 			canInsertBlockType,
 			insertOrReplaceBlocks
@@ -332,12 +332,14 @@ describe( 'onFilesDrop', () => {
 		const canInsertBlockType = noop;
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
-		const uploadPermissions = true;
+		const getSettings = jest.fn( () => ( {
+			mediaUpload: true,
+		} ) );
 
 		const onFileDropHandler = onFilesDrop(
 			targetRootClientId,
 			targetBlockIndex,
-			uploadPermissions,
+			getSettings,
 			updateBlockAttributes,
 			canInsertBlockType,
 			insertOrReplaceBlocks
@@ -360,12 +362,14 @@ describe( 'onFilesDrop', () => {
 		const insertOrReplaceBlocks = jest.fn();
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
-		const uploadPermissions = true;
+		const getSettings = jest.fn( () => ( {
+			mediaUpload: true,
+		} ) );
 
 		const onFileDropHandler = onFilesDrop(
 			targetRootClientId,
 			targetBlockIndex,
-			uploadPermissions,
+			getSettings,
 			updateBlockAttributes,
 			canInsertBlockType,
 			insertOrReplaceBlocks

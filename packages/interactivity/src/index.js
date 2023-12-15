@@ -2,20 +2,16 @@
  * Internal dependencies
  */
 import registerDirectives from './directives';
-import { init } from './hydration';
-import { rawStore, afterLoads } from './store';
+import { init } from './router';
+
 export { store } from './store';
-export { directive } from './hooks';
+export { directive, getContext, getElement } from './hooks';
+export { navigate, prefetch } from './router';
 export { h as createElement } from 'preact';
 export { useEffect, useContext, useMemo } from 'preact/hooks';
 export { deepSignal } from 'deepsignal';
 
-/**
- * Initialize the Interactivity API.
- */
-registerDirectives();
-
 document.addEventListener( 'DOMContentLoaded', async () => {
+	registerDirectives();
 	await init();
-	afterLoads.forEach( ( afterLoad ) => afterLoad( rawStore ) );
 } );

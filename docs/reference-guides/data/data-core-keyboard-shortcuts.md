@@ -350,9 +350,9 @@ Returns an action object used to register a new keyboard shortcut.
 _Usage_
 
 ```js
+import { useEffect } from 'react';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const ExampleComponent = () => {
@@ -401,9 +401,9 @@ Returns an action object used to unregister a keyboard shortcut.
 _Usage_
 
 ```js
+import { useEffect } from 'react';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const ExampleComponent = () => {

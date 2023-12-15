@@ -9,7 +9,6 @@ import deepFreeze from 'deep-freeze';
 import {
 	terms,
 	entities,
-	undo,
 	embedPreviews,
 	userPermissions,
 	autosaves,
@@ -140,237 +139,240 @@ describe( 'entities', () => {
 				.map( ( [ , cfg ] ) => cfg )
 		).toEqual( [ { kind: 'postType', name: 'posts' } ] );
 	} );
-} );
 
-describe( 'undo', () => {
-	let lastValues;
-	let undoState;
-	let expectedUndoState;
-
-	const createExpectedDiff = ( property, { from, to } ) => ( {
-		kind: 'someKind',
-		name: 'someName',
-		recordId: 'someRecordId',
-		property,
-		from,
-		to,
-	} );
-	const createNextEditAction = ( edits, isCached ) => {
-		let action = {
-			kind: 'someKind',
-			name: 'someName',
-			recordId: 'someRecordId',
-			edits,
-		};
-		action = {
-			type: 'EDIT_ENTITY_RECORD',
-			...action,
-			meta: {
-				undo: {
-					isCached,
-					edits: lastValues,
+	describe( 'entity revisions', () => {
+		const stateWithConfig = entities( undefined, {
+			type: 'ADD_ENTITIES',
+			entities: [
+				{
+					kind: 'root',
+					name: 'postType',
+					supports: { revisions: true },
 				},
-			},
-		};
-		lastValues = { ...lastValues, ...edits };
-		return action;
-	};
-	const createNextUndoState = ( ...args ) => {
-		let action = {};
-		if ( args[ 0 ] === 'isUndo' || args[ 0 ] === 'isRedo' ) {
-			// We need to "apply" the undo level here and build
-			// the action to move the offset.
-			const lastEdits =
-				undoState.list[
-					undoState.list.length -
-						( args[ 0 ] === 'isUndo' ? 1 : 0 ) +
-						undoState.offset
-				];
-			lastEdits.forEach( ( { property, from, to } ) => {
-				lastValues[ property ] = args[ 0 ] === 'isUndo' ? from : to;
-			} );
-			action = {
-				type: args[ 0 ] === 'isUndo' ? 'UNDO' : 'REDO',
-			};
-		} else if ( args[ 0 ] === 'isCreate' ) {
-			action = { type: 'CREATE_UNDO_LEVEL' };
-		} else if ( args.length ) {
-			action = createNextEditAction( ...args );
-		}
-		return deepFreeze( undo( undoState, action ) );
-	};
-	beforeEach( () => {
-		lastValues = {};
-		undoState = undefined;
-		expectedUndoState = { list: [], offset: 0 };
-	} );
-
-	it( 'initializes', () => {
-		expect( createNextUndoState() ).toEqual( expectedUndoState );
-	} );
-
-	it( 'stacks undo levels', () => {
-		undoState = createNextUndoState();
-
-		// Check that the first edit creates an undo level for the current state and
-		// one for the new one.
-		undoState = createNextUndoState( { value: 1 } );
-		expectedUndoState.list.push( [
-			createExpectedDiff( 'value', { from: undefined, to: 1 } ),
-		] );
-		expect( undoState ).toEqual( expectedUndoState );
-
-		// Check that the second and third edits just create an undo level for
-		// themselves.
-		undoState = createNextUndoState( { value: 2 } );
-		expectedUndoState.list.push( [
-			createExpectedDiff( 'value', { from: 1, to: 2 } ),
-		] );
-		expect( undoState ).toEqual( expectedUndoState );
-		undoState = createNextUndoState( { value: 3 } );
-		expectedUndoState.list.push( [
-			createExpectedDiff( 'value', { from: 2, to: 3 } ),
-		] );
-		expect( undoState ).toEqual( expectedUndoState );
-	} );
-
-	it( 'stacks multi-property undo levels', () => {
-		undoState = createNextUndoState();
-
-		undoState = createNextUndoState( { value: 1 } );
-		undoState = createNextUndoState( { value2: 2 } );
-		expectedUndoState.list.push(
-			[ createExpectedDiff( 'value', { from: undefined, to: 1 } ) ],
-			[ createExpectedDiff( 'value2', { from: undefined, to: 2 } ) ]
-		);
-		expect( undoState ).toEqual( expectedUndoState );
-
-		// Check that that creating another undo level merges the "edits"
-		undoState = createNextUndoState( { value: 2 } );
-		expectedUndoState.list.push( [
-			createExpectedDiff( 'value', { from: 1, to: 2 } ),
-		] );
-		expect( undoState ).toEqual( expectedUndoState );
-	} );
-
-	it( 'handles undos/redos', () => {
-		undoState = createNextUndoState();
-		undoState = createNextUndoState( { value: 1 } );
-		undoState = createNextUndoState( { value: 2 } );
-		undoState = createNextUndoState( { value: 3 } );
-		expectedUndoState.list.push(
-			[ createExpectedDiff( 'value', { from: undefined, to: 1 } ) ],
-			[ createExpectedDiff( 'value', { from: 1, to: 2 } ) ],
-			[ createExpectedDiff( 'value', { from: 2, to: 3 } ) ]
-		);
-		expect( undoState ).toEqual( expectedUndoState );
-
-		// Check that undoing and redoing an equal
-		// number of steps does not lose edits.
-		undoState = createNextUndoState( 'isUndo' );
-		expectedUndoState.offset--;
-		expect( undoState ).toEqual( expectedUndoState );
-		undoState = createNextUndoState( 'isUndo' );
-		expectedUndoState.offset--;
-		expect( undoState ).toEqual( expectedUndoState );
-		undoState = createNextUndoState( 'isRedo' );
-		expectedUndoState.offset++;
-		expect( undoState ).toEqual( expectedUndoState );
-		undoState = createNextUndoState( 'isRedo' );
-		expectedUndoState.offset++;
-		expect( undoState ).toEqual( expectedUndoState );
-
-		// Check that another edit will go on top when there
-		// is no undo level offset.
-		undoState = createNextUndoState( { value: 4 } );
-		expectedUndoState.list.push( [
-			createExpectedDiff( 'value', { from: 3, to: 4 } ),
-		] );
-		expect( undoState ).toEqual( expectedUndoState );
-
-		// Check that undoing and editing will slice of
-		// all the levels after the current one.
-		undoState = createNextUndoState( 'isUndo' );
-		undoState = createNextUndoState( 'isUndo' );
-
-		undoState = createNextUndoState( { value: 5 } );
-		expectedUndoState.list.pop();
-		expectedUndoState.list.pop();
-		expectedUndoState.list.push( [
-			createExpectedDiff( 'value', { from: 2, to: 5 } ),
-		] );
-		expect( undoState ).toEqual( expectedUndoState );
-	} );
-
-	it( 'handles flattened undos/redos', () => {
-		undoState = createNextUndoState();
-		undoState = createNextUndoState( { value: 1 } );
-		undoState = createNextUndoState( { transientValue: 2 }, true );
-		undoState = createNextUndoState( { value: 3 } );
-		expectedUndoState.list.push(
-			[
-				createExpectedDiff( 'value', { from: undefined, to: 1 } ),
-				createExpectedDiff( 'transientValue', {
-					from: undefined,
-					to: 2,
-				} ),
 			],
-			[ createExpectedDiff( 'value', { from: 1, to: 3 } ) ]
-		);
-		expect( undoState ).toEqual( expectedUndoState );
-	} );
+		} );
+		it( 'appends revisions state', () => {
+			expect( stateWithConfig.records.root.postType ).toHaveProperty(
+				'revisions',
+				{}
+			);
+		} );
 
-	it( 'handles explicit undo level creation', () => {
-		undoState = createNextUndoState();
+		it( 'returns with received revisions', () => {
+			const initialState = deepFreeze( {
+				config: stateWithConfig.config,
+				records: {},
+			} );
+			const state = entities( initialState, {
+				type: 'RECEIVE_ITEM_REVISIONS',
+				items: [ { id: 1, parent: 2 } ],
+				kind: 'root',
+				name: 'postType',
+				recordKey: 2,
+			} );
+			expect( state.records.root.postType.revisions ).toEqual( {
+				2: {
+					items: {
+						default: {
+							1: { id: 1, parent: 2 },
+						},
+					},
+					itemIsComplete: {
+						default: {
+							1: true,
+						},
+					},
+					queries: {},
+				},
+			} );
+		} );
 
-		// Check that nothing happens if there are no pending
-		// transient edits.
-		undoState = createNextUndoState( { value: 1 } );
-		undoState = createNextUndoState( 'isCreate' );
-		expectedUndoState.list.push( [
-			createExpectedDiff( 'value', { from: undefined, to: 1 } ),
-		] );
-		expect( undoState ).toEqual( expectedUndoState );
+		it( 'returns with appended received revisions at the parent level', () => {
+			const initialState = deepFreeze( {
+				config: stateWithConfig.config,
+				records: {
+					root: {
+						postType: {
+							revisions: {
+								2: {
+									items: {
+										default: {
+											1: { id: 1, parent: 2 },
+										},
+									},
+									itemIsComplete: {
+										default: {
+											1: true,
+										},
+									},
+									queries: {},
+								},
+							},
+						},
+					},
+				},
+			} );
+			const state = entities( initialState, {
+				type: 'RECEIVE_ITEM_REVISIONS',
+				items: [ { id: 3, parent: 4 } ],
+				kind: 'root',
+				name: 'postType',
+				recordKey: 4,
+			} );
+			expect( state.records.root.postType.revisions ).toEqual( {
+				2: {
+					items: {
+						default: {
+							1: { id: 1, parent: 2 },
+						},
+					},
+					itemIsComplete: {
+						default: {
+							1: true,
+						},
+					},
+					queries: {},
+				},
+				4: {
+					items: {
+						default: {
+							3: { id: 3, parent: 4 },
+						},
+					},
+					itemIsComplete: {
+						default: {
+							3: true,
+						},
+					},
+					queries: {},
+				},
+			} );
+		} );
 
-		// Check that transient edits are merged into the last
-		// edits.
-		undoState = createNextUndoState( { transientValue: 2 }, true );
-		undoState = createNextUndoState( 'isCreate' );
-		expectedUndoState.list[ expectedUndoState.list.length - 1 ].push(
-			createExpectedDiff( 'transientValue', { from: undefined, to: 2 } )
-		);
-		expect( undoState ).toEqual( expectedUndoState );
+		it( 'returns with appended received revision items', () => {
+			const initialState = deepFreeze( {
+				config: stateWithConfig.config,
+				records: {
+					root: {
+						postType: {
+							revisions: {
+								2: {
+									items: {
+										default: {
+											1: { id: 1, parent: 2 },
+										},
+									},
+									itemIsComplete: {
+										default: {
+											1: true,
+										},
+									},
+									queries: {},
+								},
+							},
+						},
+					},
+				},
+			} );
+			const state = entities( initialState, {
+				type: 'RECEIVE_ITEM_REVISIONS',
+				items: [ { id: 7, parent: 2 } ],
+				kind: 'root',
+				name: 'postType',
+				recordKey: 2,
+			} );
+			expect( state.records.root.postType.revisions ).toEqual( {
+				2: {
+					items: {
+						default: {
+							1: { id: 1, parent: 2 },
+							7: { id: 7, parent: 2 },
+						},
+					},
+					itemIsComplete: {
+						default: {
+							1: true,
+							7: true,
+						},
+					},
+					queries: {},
+				},
+			} );
+		} );
 
-		// Check that create after undo does nothing.
-		undoState = createNextUndoState( { value: 3 } );
-		undoState = createNextUndoState( 'isUndo' );
-		undoState = createNextUndoState( 'isCreate' );
-		expectedUndoState.list.push( [
-			createExpectedDiff( 'value', { from: 1, to: 3 } ),
-		] );
-		expectedUndoState.offset = -1;
-		expect( undoState ).toEqual( expectedUndoState );
-	} );
-
-	it( 'explicitly creates an undo level when undoing while there are pending transient edits', () => {
-		undoState = createNextUndoState();
-		undoState = createNextUndoState( { value: 1 } );
-		undoState = createNextUndoState( { transientValue: 2 }, true );
-		undoState = createNextUndoState( 'isUndo' );
-		expectedUndoState.list.push( [
-			createExpectedDiff( 'value', { from: undefined, to: 1 } ),
-			createExpectedDiff( 'transientValue', { from: undefined, to: 2 } ),
-		] );
-		expectedUndoState.offset--;
-		expect( undoState ).toEqual( expectedUndoState );
-	} );
-
-	it( 'does not create new levels for the same function edits', () => {
-		const value = () => {};
-		undoState = createNextUndoState();
-		undoState = createNextUndoState( { value } );
-		undoState = createNextUndoState( { value: () => {} } );
-		expect( undoState ).toEqual( expectedUndoState );
+		it( 'returns with removed revision items', () => {
+			const initialState = deepFreeze( {
+				config: stateWithConfig.config,
+				records: {
+					root: {
+						postType: {
+							revisions: {
+								2: {
+									items: {
+										default: {
+											1: { id: 1, parent: 2 },
+										},
+									},
+									itemIsComplete: {
+										default: {
+											1: true,
+										},
+									},
+									queries: {},
+								},
+								4: {
+									items: {
+										default: {
+											3: { id: 3, parent: 4 },
+										},
+									},
+									itemIsComplete: {
+										default: {
+											3: true,
+										},
+									},
+									queries: {},
+								},
+								6: {
+									items: {
+										default: {
+											9: { id: 11, parent: 6 },
+										},
+									},
+									itemIsComplete: {
+										default: {
+											9: true,
+										},
+									},
+									queries: {},
+								},
+							},
+						},
+					},
+				},
+			} );
+			const state = entities( initialState, {
+				type: 'REMOVE_ITEMS',
+				itemIds: [ 4, 6 ],
+				kind: 'root',
+				name: 'postType',
+			} );
+			expect( state.records.root.postType.revisions ).toEqual( {
+				2: {
+					items: {
+						default: {
+							1: { id: 1, parent: 2 },
+						},
+					},
+					itemIsComplete: {
+						default: {
+							1: true,
+						},
+					},
+					queries: {},
+				},
+			} );
+		} );
 	} );
 } );
 

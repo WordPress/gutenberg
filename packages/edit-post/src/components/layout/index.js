@@ -19,10 +19,13 @@ import {
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	useBlockCommands,
 	BlockBreadcrumb,
+	BlockToolbar,
 	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Button, ScrollLock, Popover } from '@wordpress/components';
+import { Button, ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -32,9 +35,15 @@ import {
 	InterfaceSkeleton,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
+
+import { privateApis as commandsPrivateApis } from '@wordpress/commands';
+import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
+
+const { useCommands } = unlock( coreCommandsPrivateApis );
+const { useCommandContext } = unlock( commandsPrivateApis );
 
 /**
  * Internal dependencies
@@ -55,6 +64,7 @@ import ActionsPanel from './actions-panel';
 import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import useCommonCommands from '../../hooks/commands/use-common-commands';
 
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 
@@ -71,59 +81,37 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-function Layout() {
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isHugeViewport = useViewportMatch( 'huge', '>=' );
-	const isLargeViewport = useViewportMatch( 'large' );
-	const { openGeneralSidebar, closeGeneralSidebar, setIsInserterOpened } =
-		useDispatch( editPostStore );
-	const { createErrorNotice } = useDispatch( noticesStore );
-	const {
-		mode,
-		isFullscreenActive,
-		isRichEditingEnabled,
-		sidebarIsOpened,
-		hasActiveMetaboxes,
-		hasFixedToolbar,
-		previousShortcut,
-		nextShortcut,
-		hasBlockSelected,
-		isInserterOpened,
-		isListViewOpened,
-		showIconLabels,
-		isDistractionFree,
-		showBlockBreadcrumbs,
-		isTemplateMode,
-		documentLabel,
-		styles,
-	} = useSelect( ( select ) => {
-		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
-		const { isFeatureActive } = select( editPostStore );
-		const editorSettings = getEditorSettings();
-		const postTypeLabel = getPostTypeLabel();
-		const hasThemeStyles = isFeatureActive( 'themeStyles' );
+function useEditorStyles() {
+	const { hasThemeStyleSupport, editorSettings } = useSelect(
+		( select ) => ( {
+			hasThemeStyleSupport:
+				select( editPostStore ).isFeatureActive( 'themeStyles' ),
+			editorSettings: select( editorStore ).getEditorSettings(),
+		} ),
+		[]
+	);
 
-		const themeStyles = [];
-		const presetStyles = [];
-		editorSettings.styles?.forEach( ( style ) => {
-			if ( ! style.__unstableType || style.__unstableType === 'theme' ) {
-				themeStyles.push( style );
-			} else {
-				presetStyles.push( style );
-			}
-		} );
+	// Compute the default styles.
+	return useMemo( () => {
+		const presetStyles =
+			editorSettings.styles?.filter(
+				( style ) =>
+					style.__unstableType && style.__unstableType !== 'theme'
+			) ?? [];
 
 		const defaultEditorStyles = [
 			...editorSettings.defaultEditorStyles,
 			...presetStyles,
 		];
 
+		// Has theme styles if the theme supports them and if some styles were not preset styles (in which case they're theme styles).
+		const hasThemeStyles =
+			hasThemeStyleSupport &&
+			presetStyles.length !== ( editorSettings.styles?.length ?? 0 );
+
 		// If theme styles are not present or displayed, ensure that
 		// base layout styles are still present in the editor.
-		if (
-			! editorSettings.disableLayoutStyles &&
-			! ( hasThemeStyles && themeStyles.length )
-		) {
+		if ( ! editorSettings.disableLayoutStyles && ! hasThemeStyles ) {
 			defaultEditorStyles.push( {
 				css: getLayoutStyles( {
 					style: {},
@@ -135,10 +123,52 @@ function Layout() {
 			} );
 		}
 
+		return hasThemeStyles ? editorSettings.styles : defaultEditorStyles;
+	}, [
+		editorSettings.defaultEditorStyles,
+		editorSettings.disableLayoutStyles,
+		editorSettings.styles,
+		hasThemeStyleSupport,
+	] );
+}
+
+function Layout() {
+	useCommands();
+	useCommonCommands();
+	useBlockCommands();
+
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isHugeViewport = useViewportMatch( 'huge', '>=' );
+	const isWideViewport = useViewportMatch( 'large' );
+	const isLargeViewport = useViewportMatch( 'medium' );
+
+	const { openGeneralSidebar, closeGeneralSidebar, setIsInserterOpened } =
+		useDispatch( editPostStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
+	const {
+		mode,
+		isFullscreenActive,
+		isRichEditingEnabled,
+		sidebarIsOpened,
+		hasActiveMetaboxes,
+		previousShortcut,
+		nextShortcut,
+		hasBlockSelected,
+		isInserterOpened,
+		isListViewOpened,
+		showIconLabels,
+		isDistractionFree,
+		showBlockBreadcrumbs,
+		showMetaBoxes,
+		documentLabel,
+	} = useSelect( ( select ) => {
+		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
+		const editorSettings = getEditorSettings();
+		const postTypeLabel = getPostTypeLabel();
+
 		return {
-			isTemplateMode: select( editPostStore ).isEditingTemplate(),
-			hasFixedToolbar:
-				select( editPostStore ).isFeatureActive( 'fixedToolbar' ),
+			showMetaBoxes:
+				select( editorStore ).getRenderingMode() === 'post-only',
 			sidebarIsOpened: !! (
 				select( interfaceStore ).getActiveComplementaryArea(
 					editPostStore.name
@@ -166,12 +196,18 @@ function Layout() {
 			),
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
-			styles:
-				hasThemeStyles && themeStyles.length
-					? editorSettings.styles
-					: defaultEditorStyles,
+			hasBlockSelected:
+				select( blockEditorStore ).getBlockSelectionStart(),
 		};
 	}, [] );
+
+	// Set the right context for the command palette
+	const commandContext = hasBlockSelected
+		? 'block-selection-edit'
+		: 'post-editor-edit';
+	useCommandContext( commandContext );
+
+	const styles = useEditorStyles();
 
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
@@ -183,17 +219,21 @@ function Layout() {
 		if ( sidebarIsOpened && ! isHugeViewport ) {
 			setIsInserterOpened( false );
 		}
-	}, [ sidebarIsOpened, isHugeViewport ] );
+	}, [ isHugeViewport, setIsInserterOpened, sidebarIsOpened ] );
 	useEffect( () => {
 		if ( isInserterOpened && ! isHugeViewport ) {
 			closeGeneralSidebar();
 		}
-	}, [ isInserterOpened, isHugeViewport ] );
+	}, [ closeGeneralSidebar, isInserterOpened, isHugeViewport ] );
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
 	const [ entitiesSavedStatesCallback, setEntitiesSavedStatesCallback ] =
 		useState( false );
+
+	const [ listViewToggleElement, setListViewToggleElement ] =
+		useState( null );
+
 	const closeEntitiesSavedStates = useCallback(
 		( arg ) => {
 			if ( typeof entitiesSavedStatesCallback === 'function' ) {
@@ -204,12 +244,17 @@ function Layout() {
 		[ entitiesSavedStatesCallback ]
 	);
 
+	// We need to add the show-icon-labels class to the body element so it is applied to modals.
+	if ( showIconLabels ) {
+		document.body.classList.add( 'show-icon-labels' );
+	} else {
+		document.body.classList.remove( 'show-icon-labels' );
+	}
+
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
-		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
-		'show-icon-labels': showIconLabels,
-		'is-distraction-free': isDistractionFree && isLargeViewport,
+		'is-distraction-free': isDistractionFree && isWideViewport,
 		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
 	} );
 
@@ -222,7 +267,11 @@ function Layout() {
 			return <InserterSidebar />;
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
-			return <ListViewSidebar />;
+			return (
+				<ListViewSidebar
+					listViewToggleElement={ listViewToggleElement }
+				/>
+			);
 		}
 
 		return null;
@@ -250,9 +299,9 @@ function Layout() {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<EditorKeyboardShortcuts />
-			<SettingsSidebar />
+
 			<InterfaceSkeleton
-				isDistractionFree={ isDistractionFree && isLargeViewport }
+				isDistractionFree={ isDistractionFree && isWideViewport }
 				className={ className }
 				labels={ {
 					...interfaceLabels,
@@ -263,6 +312,7 @@ function Layout() {
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
+						setListViewToggleElement={ setListViewToggleElement }
 					/>
 				}
 				editorNotices={ <EditorNotices /> }
@@ -295,10 +345,11 @@ function Layout() {
 						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
 							<TextEditor />
 						) }
+						{ ! isLargeViewport && <BlockToolbar hideDragHandle /> }
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditor styles={ styles } />
 						) }
-						{ ! isDistractionFree && ! isTemplateMode && (
+						{ ! isDistractionFree && showMetaBoxes && (
 							<div className="edit-post-layout__metaboxes">
 								<MetaBoxes location="normal" />
 								<MetaBoxes location="advanced" />
@@ -341,8 +392,8 @@ function Layout() {
 			<WelcomeGuide />
 			<PostSyncStatusModal />
 			<StartPageOptions />
-			<Popover.Slot />
 			<PluginArea onError={ onPluginAreaError } />
+			<SettingsSidebar />
 		</>
 	);
 }

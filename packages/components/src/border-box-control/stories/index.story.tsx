@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentMeta, ComponentStory } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react';
 import type { ComponentProps } from 'react';
 
 /**
@@ -13,11 +13,9 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../../button';
-import Popover from '../../popover';
 import { BorderBoxControl } from '../';
-import { Provider as SlotFillProvider } from '../../slot-fill';
 
-const meta: ComponentMeta< typeof BorderBoxControl > = {
+const meta: Meta< typeof BorderBoxControl > = {
 	title: 'Components (Experimental)/BorderBoxControl',
 	component: BorderBoxControl,
 	argTypes: {
@@ -26,7 +24,7 @@ const meta: ComponentMeta< typeof BorderBoxControl > = {
 	},
 	parameters: {
 		controls: { expanded: true },
-		docs: { source: { state: 'open' } },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
 export default meta;
@@ -41,7 +39,7 @@ const colors = [
 	{ name: 'Yellow 40', color: '#bd8600' },
 ];
 
-const Template: ComponentStory< typeof BorderBoxControl > = ( props ) => {
+const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
 	const { onChange, ...otherProps } = props;
 	const [ borders, setBorders ] = useState< ( typeof props )[ 'value' ] >();
 
@@ -53,7 +51,7 @@ const Template: ComponentStory< typeof BorderBoxControl > = ( props ) => {
 	};
 
 	return (
-		<SlotFillProvider>
+		<>
 			<BorderBoxControl
 				{ ...otherProps }
 				onChange={ onChangeMerged }
@@ -78,9 +76,7 @@ const Template: ComponentStory< typeof BorderBoxControl > = ( props ) => {
 			>
 				Reset
 			</Button>
-			{ /* @ts-expect-error Ignore until Popover.Slot is converted to TS */ }
-			<Popover.Slot />
-		</SlotFillProvider>
+		</>
 	);
 };
 export const Default = Template.bind( {} );

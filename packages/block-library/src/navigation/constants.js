@@ -13,6 +13,7 @@ export const ALLOWED_BLOCKS = [
 	'core/site-logo',
 	'core/navigation-submenu',
 	'core/loginout',
+	'core/buttons',
 ];
 
 export const PRIORITIZED_INSERTER_BLOCKS = [

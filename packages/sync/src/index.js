@@ -1,3 +1,3 @@
 export { connectIndexDb } from './connect-indexdb';
-export { connectWebRTC } from './connect-webrtc';
+export { createWebRTCConnection } from './create-webrtc-connection';
 export { createSyncProvider } from './provider';

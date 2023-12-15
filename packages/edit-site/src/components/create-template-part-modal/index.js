@@ -28,7 +28,10 @@ import { serialize } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_PART_AREA_GENERAL } from '../../store/constants';
+import {
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
+} from '../../utils/constants';
 import {
 	useExistingTemplateParts,
 	getUniqueTemplatePartTitle,
@@ -36,17 +39,21 @@ import {
 } from '../../utils/template-part-create';
 
 export default function CreateTemplatePartModal( {
-	closeModal,
+	defaultArea = TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 	blocks = [],
+	confirmLabel = __( 'Create' ),
+	closeModal,
+	modalTitle = __( 'Create template part' ),
 	onCreate,
 	onError,
+	defaultTitle = '',
 } ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const existingTemplateParts = useExistingTemplateParts();
 
-	const [ title, setTitle ] = useState( '' );
-	const [ area, setArea ] = useState( TEMPLATE_PART_AREA_GENERAL );
+	const [ title, setTitle ] = useState( defaultTitle );
+	const [ area, setArea ] = useState( defaultArea );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 	const instanceId = useInstanceId( CreateTemplatePartModal );
 
@@ -57,14 +64,12 @@ export default function CreateTemplatePartModal( {
 	);
 
 	async function createTemplatePart() {
-		if ( ! title ) {
-			createErrorNotice( __( 'Please enter a title.' ), {
-				type: 'snackbar',
-			} );
+		if ( ! title || isSubmitting ) {
 			return;
 		}
 
 		try {
+			setIsSubmitting( true );
 			const uniqueTitle = getUniqueTemplatePartTitle(
 				title,
 				existingTemplateParts
@@ -73,7 +78,7 @@ export default function CreateTemplatePartModal( {
 
 			const templatePart = await saveEntityRecord(
 				'postType',
-				'wp_template_part',
+				TEMPLATE_PART_POST_TYPE,
 				{
 					slug: cleanSlug,
 					title: uniqueTitle,
@@ -96,22 +101,20 @@ export default function CreateTemplatePartModal( {
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 
 			onError?.();
+		} finally {
+			setIsSubmitting( false );
 		}
 	}
 
 	return (
 		<Modal
-			title={ __( 'Create template part' ) }
+			title={ modalTitle }
 			onRequestClose={ closeModal }
 			overlayClassName="edit-site-create-template-part-modal"
 		>
 			<form
 				onSubmit={ async ( event ) => {
 					event.preventDefault();
-					if ( ! title ) {
-						return;
-					}
-					setIsSubmitting( true );
 					await createTemplatePart();
 				} }
 			>
@@ -179,10 +182,10 @@ export default function CreateTemplatePartModal( {
 						<Button
 							variant="primary"
 							type="submit"
-							disabled={ ! title }
+							aria-disabled={ ! title || isSubmitting }
 							isBusy={ isSubmitting }
 						>
-							{ __( 'Create' ) }
+							{ confirmLabel }
 						</Button>
 					</HStack>
 				</VStack>

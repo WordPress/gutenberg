@@ -49,10 +49,6 @@ function useAppender( rootClientId, CustomAppender ) {
 				getBlockEditingMode,
 			} = select( blockEditorStore );
 
-			if ( CustomAppender === false ) {
-				return false;
-			}
-
 			if ( ! CustomAppender ) {
 				const selectedBlockClientId = getSelectedBlockClientId();
 				const isParentSelected =
@@ -92,6 +88,26 @@ function BlockListAppender( {
 	renderAppender,
 	className,
 	tagName: TagName = 'div',
+} ) {
+	if ( renderAppender === false ) {
+		return null;
+	}
+
+	return (
+		<BlockListAppenderInner
+			rootClientId={ rootClientId }
+			renderAppender={ renderAppender }
+			className={ className }
+			tagName={ TagName }
+		/>
+	);
+}
+
+function BlockListAppenderInner( {
+	rootClientId,
+	renderAppender,
+	className,
+	tagName: TagName,
 } ) {
 	const appender = useAppender( rootClientId, renderAppender );
 	const isDragOver = useSelect(

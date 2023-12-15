@@ -107,6 +107,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeShowEditorHelp: jest.fn(),
 		subscribeOnUndoPressed: jest.fn(),
 		subscribeOnRedoPressed: jest.fn(),
+		useIsConnected: jest.fn( () => ( { isConnected: true } ) ),
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
@@ -117,6 +118,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		requestImageUploadCancelDialog: jest.fn(),
 		requestMediaEditor: jest.fn(),
 		requestMediaPicker: jest.fn(),
+		requestMediaImport: jest.fn(),
 		requestUnsupportedBlockFallback: jest.fn(),
 		subscribeReplaceBlock: jest.fn(),
 		mediaSources: {
@@ -129,6 +131,10 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		generateHapticFeedback: jest.fn(),
 		toggleUndoButton: jest.fn(),
 		toggleRedoButton: jest.fn(),
+		sendActionButtonPressedAction: jest.fn(),
+		actionButtons: {
+			missingBlockAlertActionButton: 'missing_block_alert_action_button',
+		},
 	};
 } );
 
@@ -147,6 +153,7 @@ jest.mock( 'react-native-svg', () => {
 		G: () => 'G',
 		Polygon: () => 'Polygon',
 		Rect: () => 'Rect',
+		SvgXml: jest.fn(),
 	};
 } );
 

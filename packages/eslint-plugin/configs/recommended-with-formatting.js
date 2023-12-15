@@ -16,6 +16,7 @@ const config = {
 	globals: {
 		window: true,
 		document: true,
+		SCRIPT_DEBUG: 'readonly',
 		wp: 'readonly',
 	},
 	settings: {

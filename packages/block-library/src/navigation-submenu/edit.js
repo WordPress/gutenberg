@@ -39,7 +39,6 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
  * Internal dependencies
  */
 import { ItemSubmenuIcon } from './icons';
-import { name } from './block.json';
 import { LinkUI } from '../navigation-link/link-ui';
 import { updateAttributes } from '../navigation-link/update-attributes';
 import {
@@ -155,8 +154,7 @@ export default function NavigationSubmenuEdit( {
 	const postsPermissions = useResourcePermissions( 'posts' );
 
 	const {
-		isAtMaxNesting,
-		isTopLevelItem,
+		parentCount,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
 		hasChildren,
@@ -191,11 +189,10 @@ export default function NavigationSubmenuEdit( {
 			}
 
 			return {
-				isAtMaxNesting:
-					getBlockParentsByBlockName( clientId, name ).length >=
-					maxNestingLevel,
-				isTopLevelItem:
-					getBlockParentsByBlockName( clientId, name ).length === 0,
+				parentCount: getBlockParentsByBlockName(
+					clientId,
+					'core/navigation-submenu'
+				).length,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
@@ -278,7 +275,7 @@ export default function NavigationSubmenuEdit( {
 		customTextColor,
 		backgroundColor,
 		customBackgroundColor,
-	} = getColors( context, ! isTopLevelItem );
+	} = getColors( context, parentCount > 0 );
 
 	function onKeyDown( event ) {
 		if ( isKeyboardEvent.primary( event, 'k' ) ) {
@@ -310,11 +307,12 @@ export default function NavigationSubmenuEdit( {
 	// Always use overlay colors for submenus.
 	const innerBlocksColors = getColors( context, true );
 
-	const allowedBlocks = isAtMaxNesting
-		? ALLOWED_BLOCKS.filter(
-				( blockName ) => blockName !== 'core/navigation-submenu'
-		  )
-		: ALLOWED_BLOCKS;
+	const allowedBlocks =
+		parentCount >= maxNestingLevel
+			? ALLOWED_BLOCKS.filter(
+					( blockName ) => blockName !== 'core/navigation-submenu'
+			  )
+			: ALLOWED_BLOCKS;
 
 	const navigationChildBlockProps =
 		getNavigationChildBlockProps( innerBlocksColors );

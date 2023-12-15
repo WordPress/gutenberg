@@ -4,23 +4,6 @@
 import { combineReducers } from '@wordpress/data';
 
 /**
- * Reducer returning the editing canvas device type.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function deviceType( state = 'Desktop', action ) {
-	switch ( action.type ) {
-		case 'SET_PREVIEW_DEVICE_TYPE':
-			return action.deviceType;
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning the settings.
  *
  * @param {Object} state  Current state.
@@ -157,28 +140,7 @@ function editorCanvasContainerView( state = undefined, action ) {
 	return state;
 }
 
-/**
- * Reducer used to track whether the editor allows only page content to be
- * edited.
- *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
- *
- * @return {boolean} Updated state.
- */
-export function hasPageContentFocus( state = false, action ) {
-	switch ( action.type ) {
-		case 'SET_EDITED_POST':
-			return !! action.context?.postId;
-		case 'SET_HAS_PAGE_CONTENT_FOCUS':
-			return action.hasPageContentFocus;
-	}
-
-	return state;
-}
-
 export default combineReducers( {
-	deviceType,
 	settings,
 	editedPost,
 	blockInserterPanel,
@@ -186,5 +148,4 @@ export default combineReducers( {
 	saveViewPanel,
 	canvasMode,
 	editorCanvasContainerView,
-	hasPageContentFocus,
 } );
