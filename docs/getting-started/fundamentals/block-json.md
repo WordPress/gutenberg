@@ -90,9 +90,9 @@ Check the <a href="https://developer.wordpress.org/block-editor/reference-guides
 
 Many blocks, including core blocks, offer similar customization options, whether changing the background color, text color, or adding padding customization options.
 
-To avoid duplicating the same logic over and over in your blocks and to align the behavior of your block with core blocks, you can make use of the different `supports` properties.
-
 The [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#supports) property in `block.json` allows a block to declare support for certain features, enabling users to customize specific settings (like colors or margins) from the Settings Sidebar.
+
+Using the available block `supports` allows you to align your block's behavior with core blocks and avoid replicating the same functionality yourself.
 
 _Example: Supports as defined in block.json_
 
