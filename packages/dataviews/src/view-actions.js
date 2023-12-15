@@ -98,9 +98,7 @@ function PageSizeMenu( { view, onChangeView } ) {
 						value={ size }
 						name="view-actions-page-size"
 						checked={ view.perPage === size }
-						onChange={ ( event ) => {
-							// We need to handle this on DropDown component probably..
-							event.preventDefault();
+						onChange={ () => {
 							onChangeView( { ...view, perPage: size, page: 1 } );
 						} }
 					>
@@ -137,8 +135,7 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 						key={ field.id }
 						value={ field.id }
 						checked={ ! view.hiddenFields?.includes( field.id ) }
-						onChange={ ( event ) => {
-							event.preventDefault();
+						onChange={ () => {
 							onChangeView( {
 								...view,
 								hiddenFields: view.hiddenFields?.includes(
