@@ -3,24 +3,22 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
-import {
-	PostExcerpt as PostExcerptForm,
-	PostExcerptCheck,
-	store as editorStore,
-} from '@wordpress/editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import PluginPostExcerpt from '../plugin-post-excerpt';
+import PostExcerptForm from './index';
+import PostExcerptCheck from './check';
+import PluginPostExcerpt from './plugin';
+import { store as editorStore } from '../../store';
 
 /**
  * Module Constants
  */
 const PANEL_NAME = 'post-excerpt';
 
-export default function PostExcerpt() {
+export default function PostExcerptPanel() {
 	const { isOpened, isEnabled } = useSelect( ( select ) => {
 		const { isEditorPanelOpened, isEditorPanelEnabled } =
 			select( editorStore );
