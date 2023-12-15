@@ -25,18 +25,16 @@ const {
 	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
-const OPERATORS = [
-	{
+const OPERATORS = {
+	[ OPERATOR_IN ]: {
 		key: 'in-filter',
-		operator: OPERATOR_IN,
 		label: __( 'Is' ),
 	},
-	{
+	[ OPERATOR_NOT_IN ]: {
 		key: 'not-in-filter',
-		operator: OPERATOR_NOT_IN,
 		label: __( 'Is not' ),
 	},
-];
+};
 
 function WithSeparators( { children } ) {
 	return Children.toArray( children )
@@ -99,18 +97,14 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 								trigger={
 									<DropdownMenuItem
 										suffix={
-											<span aria-hidden="true">
-												{ activeElement &&
-													activeOperator ===
-														OPERATOR_IN &&
-													__( 'Is' ) }
-												{ activeElement &&
-													activeOperator ===
-														OPERATOR_NOT_IN &&
-													__( 'Is not' ) }
-												{ activeElement && ' ' }
-												{ activeElement?.label }
-											</span>
+											activeElement && (
+												<span aria-hidden="true">
+													{ activeOperator in
+														OPERATORS &&
+														`${ OPERATORS[ activeOperator ].label } ` }
+													{ activeElement.label }
+												</span>
+											)
 										}
 									>
 										<DropdownMenuItemLabel>
@@ -168,12 +162,13 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 											trigger={
 												<DropdownMenuItem
 													suffix={
-														activeOperator in
-															OPERATORS && (
-															<span aria-hidden="true">
-																OPERATORS[activeOperator].label
-															</span>
-														)
+														<span aria-hidden="true">
+															{
+																OPERATORS[
+																	activeOperator
+																]?.label
+															}
+														</span>
 													}
 												>
 													<DropdownMenuItemLabel>
@@ -182,12 +177,11 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 												</DropdownMenuItem>
 											}
 										>
-											{ OPERATORS.map(
-												( {
+											{ Object.entries( OPERATORS ).map(
+												( [
 													operator,
-													label,
-													key,
-												} ) => (
+													{ label, key },
+												] ) => (
 													<DropdownMenuRadioItem
 														key={ key }
 														name={ `add-filter-${ filter.name }-conditions` }
