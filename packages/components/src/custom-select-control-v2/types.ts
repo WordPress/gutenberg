@@ -30,6 +30,12 @@ export type CustomSelectProps = {
 	 */
 	defaultValue?: string | string[];
 	/**
+	 * Used to visually hide the label. It will always be visible to screen readers.
+	 *
+	 * @default false
+	 */
+	hideLabelFromVision?: boolean;
+	/**
 	 * Label for the control.
 	 */
 	label: string;
@@ -66,6 +72,11 @@ export type Option =
 	| { selectedItem: string | string[] };
 
 export type LegacyCustomSelectProps = {
+	/**
+	 * Used to visually hide the label. It will always be visible to screen readers.
+	 *
+	 */
+	hideLabelFromVision?: boolean;
 	/**
 	 * Label for the control.
 	 */
