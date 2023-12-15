@@ -115,6 +115,10 @@ const SUPPORTED_STYLES = [ 'border', 'color', 'spacing', 'typography' ];
  * @return {*} Value of the object property at the specified path.
  */
 function getValueFromObjectPath( object, path, defaultValue ) {
+	if ( ! object ) {
+		return defaultValue;
+	}
+
 	if ( ! Array.isArray( path ) ) {
 		if ( path.indexOf( '.' ) === -1 ) {
 			return object[ path ] ?? defaultValue;

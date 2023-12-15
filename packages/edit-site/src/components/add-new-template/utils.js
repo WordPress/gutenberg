@@ -27,6 +27,10 @@ import { TEMPLATE_POST_TYPE } from '../../utils/constants';
  * @return {*} Value of the object property at the specified path.
  */
 function getValueFromObjectPath( object, path, defaultValue ) {
+	if ( ! object ) {
+		return defaultValue;
+	}
+
 	if ( ! Array.isArray( path ) ) {
 		if ( path.indexOf( '.' ) === -1 ) {
 			return object[ path ] ?? defaultValue;
