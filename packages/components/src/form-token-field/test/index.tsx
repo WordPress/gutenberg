@@ -741,6 +741,40 @@ describe( 'FormTokenField', () => {
 			] );
 		} );
 
+		it( 'should not render suggestions after the input is blurred', async () => {
+			const user = userEvent.setup();
+
+			const onFocusSpy = jest.fn();
+
+			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
+
+			render(
+				<>
+					<FormTokenFieldWithState
+						onFocus={ onFocusSpy }
+						suggestions={ suggestions }
+					/>
+				</>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'ee' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Green',
+				'Seaweed',
+			] );
+
+			// Select the first suggestion ("Green")
+			await user.keyboard( '[ArrowDown][Enter]' );
+
+			// Click the body, blurring the input.
+			await user.click( document.body );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
 		it( 'should not render suggestions if the text input is not matching any of the suggestions', async () => {
 			const user = userEvent.setup();
 
