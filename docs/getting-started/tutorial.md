@@ -991,7 +991,9 @@ That's it! You now have a block that utilizes both dynamic and static rendering.
 
 Congratulations on completing this tutorial and building your very own Copyright Date Block. Throughout this journey, you have gained a solid foundation in WordPress block development and are now ready to start building your own blocks.
 
-Whether you're now looking to refine your skills, tackle more advanced projects, or stay updated with the latest WordPress trends, the following resources will help you improve your block development skills:
+For final reference, the complete code for this tutorial is available in the [Block Development Examples](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/copyright-date-block-09aac3) repository on GitHub.
+
+Now, whether you're now looking to refine your skills, tackle more advanced projects, or stay updated with the latest WordPress trends, the following resources will help you improve your block development skills:
 
 - [Block Development Environment](https://developer.wordpress.org/block-editor/getting-started/devenv/)
 - [Fundamentals of Block Development](https://developer.wordpress.org/block-editor/getting-started/fundamentals/)
