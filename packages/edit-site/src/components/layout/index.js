@@ -306,11 +306,7 @@ export default function Layout() {
 						<>
 							{ isListPage && <PageMain /> }
 							{ isEditorPage && (
-								<div
-									className={ classnames(
-										'edit-site-layout__canvas-container'
-									) }
-								>
+								<div className="edit-site-layout__canvas-container">
 									{ canvasResizer }
 									{ !! canvasSize.width && (
 										<motion.div
