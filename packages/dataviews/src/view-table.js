@@ -126,11 +126,8 @@ function HeaderMenu( { field, view, onChangeView } ) {
 				) }
 				{ isHidable && (
 					<DropdownMenuItem
-						role="menuitemradio"
-						aria-checked={ false }
 						prefix={ <Icon icon={ unseen } /> }
-						onClick={ ( event ) => {
-							event.preventDefault();
+						onClick={ () => {
 							onChangeView( {
 								...view,
 								hiddenFields: view.hiddenFields.concat(
