@@ -169,13 +169,13 @@ describe( '<RichText/>', () => {
 		it( `should display rich text at the font size computed from the LOCAL \`style.fontSize\` CSS with HIGHEST PRIORITY
 		when CSS is provided ambiguously from ALL possible sources.`, () => {
 			// Arrange.
-			const expectedFontSize = 1;
+			const expectedFontSize = 10;
 			mockGlobalSettings( { fontSize: '0' } );
 			// Act.
 			const { getByLabelText } = render(
 				<RichText
 					accessibilityLabel={ 'editor' }
-					style={ { fontSize: '1' } }
+					style={ { fontSize: '10' } }
 					fontSize={ '2' }
 					tagName="p"
 				/>
@@ -188,13 +188,13 @@ describe( '<RichText/>', () => {
 		it( `should display rich text at the font size computed from the LOCAL \`style.fontSize\` CSS with
 		NEXT PRIORITY when CSS is provided ambiguously from MULTIPLE possible sources EXCLUDING \`fontSize\`.`, () => {
 			// Arrange.
-			const expectedFontSize = 1;
+			const expectedFontSize = 10;
 			mockGlobalSettings( { fontSize: '0' } );
 			// Act.
 			const { getByLabelText } = render(
 				<RichText
 					accessibilityLabel={ 'editor' }
-					style={ { fontSize: '1' } }
+					style={ { fontSize: '10' } }
 					tagName="p"
 				/>
 			);
@@ -205,8 +205,8 @@ describe( '<RichText/>', () => {
 
 		it( 'should display rich text at the font size computed from CSS relative to the VIEWPORT WIDTH.', () => {
 			// Arrange.
-			const expectedFontSize = 3;
-			Dimensions.set( { window: { ...window, width: 300 } } );
+			const expectedFontSize = 10;
+			Dimensions.set( { window: { ...window, width: 1000 } } );
 			// Act.
 			const { getByLabelText } = render(
 				<RichText accessibilityLabel={ 'editor' } fontSize={ '1vw' } />
@@ -218,8 +218,8 @@ describe( '<RichText/>', () => {
 
 		it( 'should display rich text at the font size computed from CSS relative to the VIEWPORT HEIGHT.', () => {
 			// Arrange.
-			const expectedFontSize = 3;
-			Dimensions.set( { window: { ...window, height: 300 } } );
+			const expectedFontSize = 10;
+			Dimensions.set( { window: { ...window, height: 1000 } } );
 			// Act.
 			const { getByLabelText } = render(
 				<RichText accessibilityLabel={ 'editor' } fontSize={ '1vh' } />
