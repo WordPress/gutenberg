@@ -33,7 +33,9 @@ export default function AllInputControl( {
 	setSelectedUnits,
 	...props
 }: BoxControlInputControlProps ) {
-	const inputId = useInstanceId( AllInputControl, 'box-control-input' );
+	const generatedId = useInstanceId( AllInputControl, 'box-control-input' );
+	const inputId = [ generatedId, LABELS.all ].join( '-' );
+
 	const allValue = getAllValue( values, selectedUnits, sides );
 	const hasValues = isValuesDefined( values );
 	const isMixed = hasValues && isValuesMixed( values, selectedUnits, sides );
@@ -111,8 +113,6 @@ export default function AllInputControl( {
 				__nextHasNoMarginBottom
 				aria-controls={ inputId }
 				aria-labelledby={ inputId }
-				hideLabelFromVision
-				label={ LABELS.all }
 				onChange={ sliderOnChange }
 				min={ 0 }
 				max={ CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]?.max ?? 10 }

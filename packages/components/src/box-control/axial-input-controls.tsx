@@ -29,7 +29,11 @@ export default function AxialInputControls( {
 	sides,
 	...props
 }: BoxControlInputControlProps ) {
-	const inputId = useInstanceId( AxialInputControls, 'box-control-input' );
+	const generatedId = useInstanceId(
+		AxialInputControls,
+		`box-control-input`
+	);
+
 	const createHandleOnFocus =
 		( side: GroupedSide ) =>
 		( event: React.FocusEvent< HTMLInputElement > ) => {
@@ -133,6 +137,9 @@ export default function AxialInputControls( {
 					side === 'vertical'
 						? selectedUnits.top
 						: selectedUnits.left;
+
+				const inputId = [ generatedId, side ].join( '-' );
+
 				return (
 					<InputWrapper key={ `box-control-${ side }` }>
 						<FlexedBoxControlIcon side={ side } sides={ sides } />
@@ -160,8 +167,6 @@ export default function AxialInputControls( {
 							__nextHasNoMarginBottom
 							aria-controls={ inputId }
 							aria-labelledby={ inputId }
-							hideLabelFromVision
-							label={ LABELS[ side ] }
 							onChange={ ( newValue ) =>
 								handleOnValueChange(
 									side,

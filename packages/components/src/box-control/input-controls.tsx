@@ -28,7 +28,7 @@ export default function BoxInputControls( {
 	sides,
 	...props
 }: BoxControlInputControlProps ) {
-	const inputId = useInstanceId( BoxInputControls, 'box-control-input' );
+	const generatedId = useInstanceId( BoxInputControls, 'box-control-input' );
 
 	const createHandleOnFocus =
 		( side: keyof BoxControlValue ) =>
@@ -112,6 +112,8 @@ export default function BoxInputControls( {
 					? parsedUnit
 					: selectedUnits[ side ];
 
+				const inputId = [ generatedId, side ].join( '-' );
+
 				return (
 					<InputWrapper key={ `box-control-${ side }` } expanded>
 						<FlexedBoxControlIcon side={ side } sides={ sides } />
@@ -138,7 +140,6 @@ export default function BoxInputControls( {
 							aria-controls={ inputId }
 							aria-labelledby={ inputId }
 							__nextHasNoMarginBottom
-							hideLabelFromVision
 							onChange={ ( newValue ) => {
 								handleOnValueChange(
 									side,
