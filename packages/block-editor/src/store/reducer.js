@@ -458,17 +458,20 @@ function withPersistentBlockChange( reducer ) {
 	return ( state, action ) => {
 		let nextState = reducer( state, action );
 
+		let nextIsPersistentChange;
 		if ( action.type === 'SET_EXPLICIT_PERSISTENT' ) {
 			explicitPersistent = action.isPersistentChange;
+			nextIsPersistentChange = state.isPersistentChange ?? true;
 		}
 
 		if ( explicitPersistent !== undefined ) {
-			return explicitPersistent !== nextState.isPersistentChange
-				? {
+			nextIsPersistentChange = explicitPersistent;
+			return nextIsPersistentChange === nextState.isPersistentChange
+				? nextState
+				: {
 						...nextState,
-						isPersistentChange: explicitPersistent,
-				  }
-				: nextState;
+						isPersistentChange: nextIsPersistentChange,
+				  };
 		}
 
 		const isExplicitPersistentChange =
@@ -481,7 +484,7 @@ function withPersistentBlockChange( reducer ) {
 			markNextChangeAsNotPersistent =
 				action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 
-			const nextIsPersistentChange = state?.isPersistentChange ?? true;
+			nextIsPersistentChange = state?.isPersistentChange ?? true;
 			if ( state.isPersistentChange === nextIsPersistentChange ) {
 				return state;
 			}
