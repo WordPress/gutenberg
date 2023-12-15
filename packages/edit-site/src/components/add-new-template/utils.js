@@ -15,18 +15,34 @@ import { blockMeta, post, archive } from '@wordpress/icons';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 /**
+ * Helper util to return a value from a certain path of the object.
+ * Path is specified as a string of properties, separated by dots,
+ * for example: "parent.child".
+ *
  * @typedef IHasNameAndId
- * @property {string|number} id   The entity's id.
- * @property {string}        name The entity's name.
+ *
+ * @param {Object} object       Input object.
+ * @param {string} path         Path to the object property.
+ * @param {*}      defaultValue Default value if the value at the specified path is nullish.
+ * @return {*} Value of the object property at the specified path.
  */
+function getValueFromObjectPath( object, path, defaultValue ) {
+	if ( ! Array.isArray( path ) ) {
+		if ( path.indexOf( '.' ) === -1 ) {
+			return object[ path ] ?? defaultValue;
+		}
 
-const getValueFromObjectPath = ( object, path ) => {
+		path = path.split( '.' );
+	}
+
 	let value = object;
-	path.split( '.' ).forEach( ( fieldName ) => {
-		value = value?.[ fieldName ];
-	} );
-	return value;
-};
+
+	for ( const key of path ) {
+		value = value?.[ key ];
+	}
+
+	return value ?? defaultValue;
+}
 
 /**
  * Helper util to map records to add a `name` prop from a

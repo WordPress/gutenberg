@@ -57,18 +57,28 @@ export const getEntitiesInfo = ( entities ) => {
  * Path is specified as a string of properties, separated by dots,
  * for example: "parent.child".
  *
- * @param {Object} object Input object.
- * @param {string} path   Path to the object property.
+ * @param {Object} object       Input object.
+ * @param {string} path         Path to the object property.
+ * @param {*}      defaultValue Default value if the value at the specified path is nullish.
  * @return {*} Value of the object property at the specified path.
  */
-export const getValueFromObjectPath = ( object, path ) => {
-	const normalizedPath = path.split( '.' );
+export function getValueFromObjectPath( object, path, defaultValue ) {
+	if ( ! Array.isArray( path ) ) {
+		if ( path.indexOf( '.' ) === -1 ) {
+			return object[ path ] ?? defaultValue;
+		}
+
+		path = path.split( '.' );
+	}
+
 	let value = object;
-	normalizedPath.forEach( ( fieldName ) => {
-		value = value?.[ fieldName ];
-	} );
-	return value;
-};
+
+	for ( const key of path ) {
+		value = value?.[ key ];
+	}
+
+	return value ?? defaultValue;
+}
 
 /**
  * Helper util to map records to add a `name` prop from a

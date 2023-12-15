@@ -10,11 +10,20 @@
  * @param {*}            defaultValue Default value if the value at the specified path is nullish.
  * @return {*} Value of the object property at the specified path.
  */
-export const getValueFromObjectPath = ( object, path, defaultValue ) => {
-	const normalizedPath = Array.isArray( path ) ? path : path.split( '.' );
+export function getValueFromObjectPath( object, path, defaultValue ) {
+	if ( ! Array.isArray( path ) ) {
+		if ( path.indexOf( '.' ) === -1 ) {
+			return object[ path ] ?? defaultValue;
+		}
+
+		path = path.split( '.' );
+	}
+
 	let value = object;
-	normalizedPath.forEach( ( fieldName ) => {
-		value = value?.[ fieldName ];
-	} );
+
+	for ( const key of path ) {
+		value = value?.[ key ];
+	}
+
 	return value ?? defaultValue;
-};
+}

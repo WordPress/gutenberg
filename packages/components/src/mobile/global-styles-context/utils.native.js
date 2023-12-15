@@ -202,17 +202,28 @@ export function getBlockTypography(
  * Return a value from a certain path of the object.
  * Path is specified as an array of properties, like: [ 'parent', 'child' ].
  *
- * @param {Object} object Input object.
- * @param {Array}  path   Path to the object property.
+ * @param {Object} object       Input object.
+ * @param {Array}  path         Path to the object property.
+ * @param {*}      defaultValue Default value if the value at the specified path is nullish.
  * @return {*} Value of the object property at the specified path.
  */
-const getValueFromObjectPath = ( object, path ) => {
+function getValueFromObjectPath( object, path, defaultValue ) {
+	if ( ! Array.isArray( path ) ) {
+		if ( path.indexOf( '.' ) === -1 ) {
+			return object[ path ] ?? defaultValue;
+		}
+
+		path = path.split( '.' );
+	}
+
 	let value = object;
-	path.forEach( ( fieldName ) => {
-		value = value?.[ fieldName ];
-	} );
-	return value;
-};
+
+	for ( const key of path ) {
+		value = value?.[ key ];
+	}
+
+	return value ?? defaultValue;
+}
 
 export function parseStylesVariables( styles, mappedValues, customValues ) {
 	let stylesBase = styles;
