@@ -10,7 +10,8 @@ import { directivePrefix as p } from './constants';
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
 const fullPrefix = `data-${ p }-`;
-let namespace = null;
+const namespaces = [];
+const currentNamespace = () => namespaces[ namespaces.length - 1 ] ?? null;
 
 // Regular expression for directive parsing.
 const directiveParser = new RegExp(
@@ -79,7 +80,7 @@ export function toVdom( root ) {
 					} catch ( e ) {}
 					if ( n === islandAttr ) {
 						island = true;
-						namespace = value?.namespace ?? null;
+						namespaces.push( value?.namespace ?? null );
 					} else {
 						directives.push( [ n, ns, value ] );
 					}
@@ -107,7 +108,7 @@ export function toVdom( root ) {
 						directiveParser.exec( name );
 					if ( ! obj[ prefix ] ) obj[ prefix ] = [];
 					obj[ prefix ].push( {
-						namespace: ns ?? namespace,
+						namespace: ns ?? currentNamespace(),
 						value,
 						suffix,
 					} );
@@ -126,6 +127,9 @@ export function toVdom( root ) {
 			}
 			treeWalker.parentNode();
 		}
+
+		// Restore previous namespace.
+		if ( island ) namespaces.pop();
 
 		return [ h( node.localName, props, children ) ];
 	}
