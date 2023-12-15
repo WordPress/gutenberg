@@ -48,14 +48,19 @@ export default function useGlobalStylesRevisions( {
 			const globalStyles = globalStylesId
 				? getEntityRecord( 'root', 'globalStyles', globalStylesId )
 				: undefined;
-			let _revisionsCount =
+			const _revisionsCount =
 				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
-			// one for the reset item.
-			_revisionsCount++;
-			// one for any dirty changes (unsaved).
-			if ( _isDirty ) {
-				_revisionsCount++;
-			}
+			// Commenting out for now as we need to ensure
+			// that the right revisionsCount is use to calculate numPages.
+			// E.g., there might be a single, trailing 'reset' item, tricking the
+			// pagination into thinking there's an extra page,
+			// but there are no more revisions in the database.
+			// // one for the reset item.
+			// _revisionsCount++;
+			// // one for any dirty changes (unsaved).
+			// if ( _isDirty ) {
+			// 	_revisionsCount++;
+			// }
 			const globalStylesRevisions =
 				getRevisions( 'root', 'globalStyles', globalStylesId, query ) ||
 				EMPTY_ARRAY;

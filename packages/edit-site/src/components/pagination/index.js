@@ -20,6 +20,7 @@ export default function Pagination( {
 	totalItems,
 	className,
 	disabled = false,
+	buttonVariant = 'tertiary',
 } ) {
 	return (
 		<HStack
@@ -40,7 +41,7 @@ export default function Pagination( {
 			</Text>
 			<HStack expanded={ false } spacing={ 1 }>
 				<Button
-					variant="tertiary"
+					variant={ buttonVariant }
 					onClick={ () => changePage( 1 ) }
 					disabled={ disabled || currentPage === 1 }
 					aria-label={ __( 'First page' ) }
@@ -48,7 +49,7 @@ export default function Pagination( {
 					«
 				</Button>
 				<Button
-					variant="tertiary"
+					variant={ buttonVariant }
 					onClick={ () => changePage( currentPage - 1 ) }
 					disabled={ disabled || currentPage === 1 }
 					aria-label={ __( 'Previous page' ) }
@@ -66,7 +67,7 @@ export default function Pagination( {
 			</Text>
 			<HStack expanded={ false } spacing={ 1 }>
 				<Button
-					variant="tertiary"
+					variant={ buttonVariant }
 					onClick={ () => changePage( currentPage + 1 ) }
 					disabled={ disabled || currentPage === numPages }
 					aria-label={ __( 'Next page' ) }
@@ -74,7 +75,7 @@ export default function Pagination( {
 					›
 				</Button>
 				<Button
-					variant="tertiary"
+					variant={ buttonVariant }
 					onClick={ () => changePage( numPages ) }
 					disabled={ disabled || currentPage === numPages }
 					aria-label={ __( 'Last page' ) }
