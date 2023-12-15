@@ -3,10 +3,8 @@
  */
 import {
 	Button,
-	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { arrowUp, arrowDown } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -163,8 +161,8 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 
 // This object is used to construct the sorting options per sortable field.
 const sortingItemsInfo = {
-	asc: { icon: arrowUp, label: __( 'Sort ascending' ) },
-	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
+	asc: { label: __( 'Sort ascending' ) },
+	desc: { label: __( 'Sort descending' ) },
 };
 function SortMenu( { fields, view, onChangeView } ) {
 	const sortableFields = fields.filter(
@@ -209,8 +207,8 @@ function SortMenu( { fields, view, onChangeView } ) {
 					>
 						{ Object.entries( sortingItemsInfo ).map(
 							( [ direction, info ] ) => {
-								const isActive =
-									currentSortedField &&
+								const isChecked =
+									currentSortedField !== undefined &&
 									sortedDirection === direction &&
 									field.id === currentSortedField.id;
 
@@ -219,13 +217,10 @@ function SortMenu( { fields, view, onChangeView } ) {
 										key={ direction }
 										value={ direction }
 										name={ `view-actions-sorting-${ field.id }` }
-										suffix={ <Icon icon={ info.icon } /> }
-										// Note: there is currently a limitation from the DropdownMenu
-										// component where the radio won't unselect when all related
-										// radios are set to false.
-										checked={ isActive }
-										onChange={ ( event ) => {
-											event.preventDefault();
+										// Note: radio items can't be unselected even when all items
+										// associated to same name are set as un-checked.
+										checked={ isChecked }
+										onChange={ () => {
 											onChangeView( {
 												...view,
 												sort: {

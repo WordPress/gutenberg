@@ -20,6 +20,7 @@ const {
 	DropdownMenuV2Ariakit: DropdownMenu,
 	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
+	DropdownMenuRadioItemV2Ariakit: DropdownMenuRadioItem,
 	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
 	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
