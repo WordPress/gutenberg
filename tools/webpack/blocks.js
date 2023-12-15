@@ -75,6 +75,25 @@ const createEntrypoints = () => {
 	}, {} );
 };
 
+const createEditorEntrypoints = () => {
+	const blockInitScriptPaths = fastGlob.sync(
+		'./packages/block-library/build-module/**/init.js'
+	);
+
+	const entrypoints = {};
+	for ( const scriptPath of blockInitScriptPaths ) {
+		const result = scriptPath.match(
+			/build-module\/(?<filename>.*)\/init\.js$/
+		);
+		if ( ! result ) {
+			continue;
+		}
+		entrypoints[ result.groups.filename + '/editor' ] = scriptPath;
+	}
+
+	return entrypoints;
+};
+
 module.exports = [
 	{
 		...baseConfig,
@@ -219,5 +238,18 @@ module.exports = [
 				),
 			} ),
 		].filter( Boolean ),
+	},
+	{
+		...baseConfig,
+		name: 'editor',
+		entry: createEditorEntrypoints(),
+		output: {
+			devtoolNamespace: 'wp',
+			filename: './build/block-library/blocks/[name].min.js',
+			path: join( __dirname, '..', '..' ),
+		},
+		plugins: [ ...plugins, new DependencyExtractionWebpackPlugin() ].filter(
+			Boolean
+		),
 	},
 ];
