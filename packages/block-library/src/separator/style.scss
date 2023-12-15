@@ -27,4 +27,7 @@
 			font-family: serif;
 		}
 	}
+	&:not(.is-style-wide):not(.is-style-dots) {
+		width: 100px;
+	}
 }
