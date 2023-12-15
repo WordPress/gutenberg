@@ -273,11 +273,13 @@ export default function ViewActions( {
 			}
 		>
 			<DropdownMenuGroup>
-				<ViewTypeMenu
-					view={ view }
-					onChangeView={ onChangeView }
-					supportedLayouts={ supportedLayouts }
-				/>
+				{ window?.__experimentalAdminViews && (
+					<ViewTypeMenu
+						view={ view }
+						onChangeView={ onChangeView }
+						supportedLayouts={ supportedLayouts }
+					/>
+				) }
 				<SortMenu
 					fields={ fields }
 					view={ view }
