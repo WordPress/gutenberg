@@ -154,18 +154,6 @@ export const getSupportedStyles = createSelector(
 );
 
 /**
- * Returns the bootstrapped block type metadata for a give block name.
- *
- * @param {Object} state Data state.
- * @param {string} name  Block name.
- *
- * @return {Object} Bootstrapped block type metadata for a block.
- */
-export function getBootstrappedBlockType( state, name ) {
-	return state.bootstrappedBlockTypes[ name ];
-}
-
-/**
  * Returns all the unprocessed (before applying the `registerBlockType` filter)
  * block type settings as passed during block registration.
  *

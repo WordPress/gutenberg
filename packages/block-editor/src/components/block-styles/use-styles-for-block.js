@@ -24,20 +24,13 @@ import { store as blockEditorStore } from '../../store';
  */
 function useGenericPreviewBlock( block, type ) {
 	return useMemo( () => {
-		const example = type?.example;
-		const blockName = type?.name;
-
-		if ( example && blockName ) {
-			return getBlockFromExample( blockName, {
-				attributes: example.attributes,
-				innerBlocks: example.innerBlocks,
-			} );
+		if ( type && type.blockName && type.example ) {
+			return getBlockFromExample( type.blockName, type.example );
 		}
-
 		if ( block ) {
 			return cloneBlock( block );
 		}
-	}, [ type?.example ? block?.name : block, type ] );
+	}, [ type, type?.example ? block?.name : block ] );
 }
 
 /**

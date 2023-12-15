@@ -112,13 +112,13 @@ function useAutosaveNotice() {
 				actions: [
 					{
 						label: __( 'Restore the backup' ),
-						onClick() {
+						async onClick() {
 							const {
 								content: editsContent,
 								...editsWithoutContent
 							} = edits;
 							editPost( editsWithoutContent );
-							resetEditorBlocks( parse( edits.content ) );
+							resetEditorBlocks( await parse( edits.content ) );
 							removeNotice( id );
 						},
 					},

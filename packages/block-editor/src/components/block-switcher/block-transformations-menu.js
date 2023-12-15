@@ -7,7 +7,7 @@ import {
 	getBlockMenuDefaultClassName,
 	switchToBlockType,
 } from '@wordpress/blocks';
-import { useState, useMemo } from '@wordpress/element';
+import { useEffect, useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -63,6 +63,21 @@ function useGroupedTransforms( possibleBlockTransformations ) {
 	return transformations;
 }
 
+function Preview( { blocks, transformName } ) {
+	const [ switched, setSwitched ] = useState( null );
+	useEffect( () => {
+		switchToBlockType( blocks, transformName ).then( ( result ) =>
+			setSwitched( result )
+		);
+	}, [ blocks, transformName ] );
+
+	if ( ! switched ) {
+		return null;
+	}
+
+	return <PreviewBlockPopover blocks={ blocks } />;
+}
+
 const BlockTransformationsMenu = ( {
 	className,
 	possibleBlockTransformations,
@@ -91,11 +106,10 @@ const BlockTransformationsMenu = ( {
 		<>
 			<MenuGroup label={ __( 'Transform to' ) } className={ className }>
 				{ hoveredTransformItemName && (
-					<PreviewBlockPopover
-						blocks={ switchToBlockType(
-							blocks,
-							hoveredTransformItemName
-						) }
+					<Preview
+						key={ hoveredTransformItemName }
+						blocks={ blocks }
+						transformName={ hoveredTransformItemName }
 					/>
 				) }
 				{ !! possibleBlockVariationTransformations?.length && (

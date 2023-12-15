@@ -23,9 +23,9 @@ function ConvertToGroupButton( {
 	onClose = () => {},
 } ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
-	const onConvertToGroup = () => {
+	const onConvertToGroup = async () => {
 		// Activate the `transform` on the Grouping Block which does the conversion.
-		const newBlocks = switchToBlockType(
+		const newBlocks = await switchToBlockType(
 			blocksSelection,
 			groupingBlockName
 		);

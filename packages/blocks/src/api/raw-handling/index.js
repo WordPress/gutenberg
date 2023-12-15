@@ -35,7 +35,7 @@ export function deprecatedGetPhrasingContentSchema( context ) {
  *
  * @return {Array} A list of blocks.
  */
-export function rawHandler( { HTML = '' } ) {
+export async function rawHandler( { HTML = '' } ) {
 	// If we detect block delimiters, parse entirely as blocks.
 	if ( HTML.indexOf( '<!-- wp:' ) !== -1 ) {
 		return parse( HTML );
@@ -43,7 +43,7 @@ export function rawHandler( { HTML = '' } ) {
 
 	// An array of HTML strings and block objects. The blocks replace matched
 	// shortcodes.
-	const pieces = shortcodeConverter( HTML );
+	const pieces = await shortcodeConverter( HTML );
 	const blockContentSchema = getBlockContentSchema();
 
 	return pieces

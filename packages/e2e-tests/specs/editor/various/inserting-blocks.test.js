@@ -159,6 +159,9 @@ describe( 'Inserting blocks', () => {
 
 	it( 'should insert block with the slash inserter when using multiple words', async () => {
 		await page.keyboard.press( 'Enter' );
+		await canvas().waitForSelector(
+			'[data-type="core/paragraph"][data-empty="true"'
+		);
 		await page.keyboard.type( '/tag cloud' );
 		await page.waitForXPath(
 			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Tag Cloud')]`

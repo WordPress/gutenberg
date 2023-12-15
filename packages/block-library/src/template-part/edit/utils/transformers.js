@@ -70,31 +70,31 @@ export function transformWidgetToBlock( widget ) {
  * @param {Object} block Legacy Widget block object
  * @return {Object|undefined} a block
  */
-function switchLegacyWidgetType( block ) {
-	const transforms = getPossibleBlockTransformations( [ block ] ).filter(
-		( item ) => {
-			// The block without any transformations can't be a wildcard.
-			if ( ! item.transforms ) {
-				return true;
-			}
-
-			const hasWildCardFrom = item.transforms?.from?.find(
-				( from ) => from.blocks && from.blocks.includes( '*' )
-			);
-			const hasWildCardTo = item.transforms?.to?.find(
-				( to ) => to.blocks && to.blocks.includes( '*' )
-			);
-
-			// Skip wildcard transformations.
-			return ! hasWildCardFrom && ! hasWildCardTo;
+async function switchLegacyWidgetType( block ) {
+	const transforms = (
+		await getPossibleBlockTransformations( [ block ] )
+	 ).filter( ( item ) => {
+		// The block without any transformations can't be a wildcard.
+		if ( ! item.transforms ) {
+			return true;
 		}
-	);
+
+		const hasWildCardFrom = item.transforms.from?.some( ( from ) =>
+			from.blocks?.includes( '*' )
+		);
+		const hasWildCardTo = item.transforms.to?.find(
+			( to ) => to.blocks && to.blocks.includes( '*' )
+		);
+
+		// Skip wildcard transformations.
+		return ! hasWildCardFrom && ! hasWildCardTo;
+	} );
 
 	if ( ! transforms.length ) {
 		return undefined;
 	}
 
-	return switchToBlockType( block, transforms[ 0 ].name );
+	return await switchToBlockType( block, transforms[ 0 ].name );
 }
 
 function transformInnerBlocks( innerBlocks = [] ) {

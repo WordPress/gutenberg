@@ -108,7 +108,7 @@ export function useAutocomplete( {
 		onChange( insert( record, toInsert, start, end ) );
 	}
 
-	function select( option: KeyedOption ) {
+	async function select( option: KeyedOption ) {
 		const { getOptionCompletion } = autocompleter || {};
 
 		if ( option.isDisabled ) {
@@ -116,7 +116,10 @@ export function useAutocomplete( {
 		}
 
 		if ( getOptionCompletion ) {
-			const completion = getOptionCompletion( option.value, filterValue );
+			const completion = await getOptionCompletion(
+				option.value,
+				filterValue
+			);
 
 			const isCompletionObject = (
 				obj: OptionCompletion

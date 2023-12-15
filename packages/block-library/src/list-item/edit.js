@@ -106,9 +106,9 @@ export default function ListItemEdit( {
 					onMerge={ onMerge }
 					onReplace={
 						onReplace
-							? ( blocks, ...args ) => {
+							? async ( blocks, ...args ) => {
 									onReplace(
-										convertToListItems( blocks ),
+										await convertToListItems( blocks ),
 										...args
 									);
 							  }

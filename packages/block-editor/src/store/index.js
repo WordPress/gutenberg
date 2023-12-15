@@ -11,6 +11,7 @@ import * as selectors from './selectors';
 import * as privateActions from './private-actions';
 import * as privateSelectors from './private-selectors';
 import * as actions from './actions';
+import * as resolvers from './resolvers';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 
@@ -23,6 +24,7 @@ export const storeConfig = {
 	reducer,
 	selectors,
 	actions,
+	resolvers,
 };
 
 /**

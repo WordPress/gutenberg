@@ -17,7 +17,11 @@ import { RichTextData } from '@wordpress/rich-text';
  * Internal dependencies
  */
 import { BLOCK_ICON_DEFAULT } from './constants';
-import { getBlockType, getDefaultBlockName } from './registration';
+import {
+	getBlockType,
+	getBootstrappedBlockType,
+	getDefaultBlockName,
+} from './registration';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -38,26 +42,26 @@ const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
  * @return {boolean} Whether the block is an unmodified block.
  */
 export function isUnmodifiedBlock( block ) {
-	return Object.entries( getBlockType( block.name )?.attributes ?? {} ).every(
-		( [ key, definition ] ) => {
-			const value = block.attributes[ key ];
+	return Object.entries(
+		getBootstrappedBlockType( block.name )?.attributes ?? {}
+	).every( ( [ key, definition ] ) => {
+		const value = block.attributes[ key ];
 
-			// Every attribute that has a default must match the default.
-			if ( definition.hasOwnProperty( 'default' ) ) {
-				return value === definition.default;
-			}
-
-			// The rich text type is a bit different from the rest because it
-			// has an implicit default value of an empty RichTextData instance,
-			// so check the length of the value.
-			if ( definition.type === 'rich-text' ) {
-				return ! value?.length;
-			}
-
-			// Every attribute that doesn't have a default should be undefined.
-			return value === undefined;
+		// Every attribute that has a default must match the default.
+		if ( definition.hasOwnProperty( 'default' ) ) {
+			return value === definition.default;
 		}
-	);
+
+		// The rich text type is a bit different from the rest because it
+		// has an implicit default value of an empty RichTextData instance,
+		// so check the length of the value.
+		if ( definition.type === 'rich-text' ) {
+			return ! value?.length;
+		}
+
+		// Every attribute that doesn't have a default should be undefined.
+		return value === undefined;
+	} );
 }
 
 /**
@@ -271,7 +275,7 @@ export function getDefault( attributeSchema ) {
  */
 export function __experimentalSanitizeBlockAttributes( name, attributes ) {
 	// Get the type definition associated with a registered block.
-	const blockType = getBlockType( name );
+	const blockType = getBootstrappedBlockType( name );
 
 	if ( undefined === blockType ) {
 		throw new Error( `Block type '${ name }' is not registered.` );

@@ -55,10 +55,10 @@ const BlockTransformationsMenu = ( {
 	const getAnchor = () =>
 		anchorNodeRef ? findNodeHandle( anchorNodeRef ) : undefined;
 
-	function onPickerSelect( value ) {
+	async function onPickerSelect( value ) {
 		replaceBlocks(
 			selectedBlockClientId,
-			switchToBlockType( selectedBlock, value )
+			await switchToBlockType( selectedBlock, value )
 		);
 
 		const selectedItem = pickerOptions().find(

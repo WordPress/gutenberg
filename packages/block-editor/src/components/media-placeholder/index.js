@@ -290,7 +290,7 @@ export function MediaPlaceholder( {
 	}
 
 	async function onHTMLDrop( HTML ) {
-		const blocks = pasteHandler( { HTML } );
+		const blocks = await pasteHandler( { HTML } );
 		return await handleBlocksDrop( blocks );
 	}
 

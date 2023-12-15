@@ -5,7 +5,8 @@ import {
 	createContext,
 	useContext,
 	useCallback,
-	useMemo,
+	useState,
+	useEffect,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
@@ -171,19 +172,30 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const { __unstableCreateUndoLevel, editEntityRecord } =
 		useDispatch( STORE_NAME );
 
-	const blocks = useMemo( () => {
-		if ( ! id ) {
-			return undefined;
-		}
+	const [ blocks, setBlocks ] = useState( EMPTY_ARRAY );
+	useEffect( () => {
+		let mounted = true;
 
 		if ( editedBlocks ) {
-			return editedBlocks;
+			setBlocks( editedBlocks );
 		}
 
-		return content && typeof content !== 'function'
-			? parse( content )
-			: EMPTY_ARRAY;
-	}, [ id, editedBlocks, content ] );
+		// Load the blocks from the content if not already in state
+		// Guard against other instances that might have
+		// set content to a function already or the blocks are already in state.
+		if ( content && typeof content !== 'function' ) {
+			parse( content ).then( ( parsedBlocks ) => {
+				// Don't set if another `editedBlocks` or `content` value arrived during parsing.
+				if ( mounted ) {
+					setBlocks( parsedBlocks );
+				}
+			} );
+		}
+
+		return () => {
+			mounted = false;
+		};
+	}, [ editedBlocks, content ] );
 
 	const updateFootnotes = useCallback(
 		( _blocks ) => updateFootnotesFromMeta( _blocks, meta ),

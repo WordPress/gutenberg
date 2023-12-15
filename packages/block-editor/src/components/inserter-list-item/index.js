@@ -6,8 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import { useMemo, useRef, memo } from '@wordpress/element';
 import {
+	store as blocksStore,
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	isReusableBlock,
@@ -26,29 +28,44 @@ import InserterDraggableBlocks from '../inserter-draggable-blocks';
 function InserterListItem( {
 	className,
 	isFirst,
-	item,
+	item: { name, isDisabled },
 	onSelect,
 	onHover,
 	isDraggable,
 	...props
 } ) {
 	const isDragging = useRef( false );
-	const itemIconStyle = item.icon
+
+	const { item } = useSelect(
+		( select ) => ( {
+			item: select( blocksStore ).getBlockType( name ),
+		} ),
+		[ name ]
+	);
+
+	const itemIconStyle = item?.icon
 		? {
 				backgroundColor: item.icon.background,
 				color: item.icon.foreground,
 		  }
 		: {};
-	const blocks = useMemo(
-		() => [
+
+	const blocks = useMemo( () => {
+		if ( ! item ) {
+			return [];
+		}
+		return [
 			createBlock(
 				item.name,
 				item.initialAttributes,
 				createBlocksFromInnerBlocksTemplate( item.innerBlocks )
 			),
-		],
-		[ item.name, item.initialAttributes, item.innerBlocks ]
-	);
+		];
+	}, [ item ] );
+
+	if ( ! item ) {
+		return null;
+	}
 
 	const isSynced =
 		( isReusableBlock( item ) && item.syncStatus !== 'unsynced' ) ||
@@ -89,7 +106,7 @@ function InserterListItem( {
 							'block-editor-block-types-list__item',
 							className
 						) }
-						disabled={ item.isDisabled }
+						disabled={ isDisabled }
 						onClick={ ( event ) => {
 							event.preventDefault();
 							onSelect(

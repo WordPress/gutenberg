@@ -76,7 +76,7 @@ function filterInlineHTML( HTML ) {
  *
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
-export function pasteHandler( {
+export async function pasteHandler( {
 	HTML = '',
 	plainText = '',
 	mode = 'AUTO',
@@ -100,7 +100,7 @@ export function pasteHandler( {
 		const content = HTML ? HTML : plainText;
 
 		if ( content.indexOf( '<!-- wp:' ) !== -1 ) {
-			return parse( content );
+			return await parse( content );
 		}
 	}
 
@@ -135,7 +135,7 @@ export function pasteHandler( {
 
 	// An array of HTML strings and block objects. The blocks replace matched
 	// shortcodes.
-	const pieces = shortcodeConverter( HTML );
+	const pieces = await shortcodeConverter( HTML );
 
 	// The call to shortcodeConverter will always return more than one element
 	// if shortcodes are matched. The reason is when shortcodes are matched

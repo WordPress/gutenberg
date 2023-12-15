@@ -130,12 +130,12 @@ export default function ListItemEdit( {
 		[ clientId, onSplit ]
 	);
 	const onReplaceList = useCallback(
-		( blocks, ...args ) => {
+		async ( blocks, ...args ) => {
 			if ( ! preventDefault.current ) {
-				onReplace( convertToListItems( blocks ), ...args );
+				onReplace( await convertToListItems( blocks ), ...args );
 			}
 		},
-		[ clientId, onReplace, convertToListItems ]
+		[ onReplace ]
 	);
 	const onLayout = useCallback( ( { nativeEvent } ) => {
 		setContentWidth( ( prevState ) => {

@@ -68,7 +68,7 @@ export default function QuickInserter( {
 	);
 
 	const showPatterns =
-		patterns.length && ( !! filterValue || prioritizePatterns );
+		patterns?.length && ( !! filterValue || prioritizePatterns );
 	const showSearch =
 		( showPatterns && patterns.length > SEARCH_THRESHOLD ) ||
 		blockTypes.length > SEARCH_THRESHOLD;
