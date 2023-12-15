@@ -12,6 +12,7 @@ import warning from '@wordpress/warning';
 import { useTabsContext } from './context';
 import { Tab as StyledTab } from './styles';
 import type { WordPressComponentProps } from '../context';
+import Button from '../button';
 
 export const Tab = forwardRef<
 	HTMLButtonElement,
@@ -30,7 +31,7 @@ export const Tab = forwardRef<
 			store={ store }
 			id={ instancedTabId }
 			disabled={ disabled }
-			render={ render }
+			render={ render ?? <Button /> }
 			{ ...otherProps }
 		>
 			{ children }
