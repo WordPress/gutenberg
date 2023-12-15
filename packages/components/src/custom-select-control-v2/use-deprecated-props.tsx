@@ -8,6 +8,7 @@ import { useCallback } from '@wordpress/element';
  */
 import { CustomSelectItem } from '.';
 import type { CustomSelectProps, LegacyCustomSelectProps } from './types';
+import deprecated from '@wordpress/deprecated';
 
 function isLegacyProps( props: any ): props is LegacyCustomSelectProps {
 	return (
@@ -60,7 +61,22 @@ export function useDeprecatedProps(
 	);
 
 	if ( isLegacyProps( props ) ) {
+		if ( props.__nextUnconstrainedWidth ) {
+			deprecated(
+				'Constrained width styles for wp.components.CustomSelectControl',
+				{
+					hint: 'This behaviour is now built-in.',
+					since: '6.4',
+				}
+			);
+		}
+
+		const legacyProps = {
+			'aria-describedby': props.describedBy,
+		};
+
 		return {
+			...legacyProps,
 			children: transformOptionsToChildren( props ),
 			label: props.label ?? '',
 			onChange: legacyChangeHandler,

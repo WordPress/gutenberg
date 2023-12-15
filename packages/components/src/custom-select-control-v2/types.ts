@@ -78,6 +78,12 @@ export type LegacyCustomSelectProps = {
 	 */
 	hideLabelFromVision?: boolean;
 	/**
+	 * Pass in a description that will be shown to screen readers associated with the
+	 * select trigger button. If no value is passed, the text "Currently selected:
+	 * selectedItem.name" will be used fully translated.
+	 */
+	describedBy?: string;
+	/**
 	 * Label for the control.
 	 */
 	label?: string;
@@ -100,6 +106,13 @@ export type LegacyCustomSelectProps = {
 	 */
 	value?: Option;
 	__experimentalShowSelectedHint?: boolean;
+	/**
+	 * Opt-in prop for an unconstrained width style which became the default in
+	 * WordPress 6.4. The prop is no longer needed and can be safely removed.
+	 *
+	 * @deprecated
+	 */
+	__nextUnconstrainedWidth?: boolean;
 };
 
 export type CustomSelectItemProps = {
