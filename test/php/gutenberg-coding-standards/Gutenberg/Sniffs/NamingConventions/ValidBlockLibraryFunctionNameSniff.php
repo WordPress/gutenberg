@@ -70,7 +70,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 		$tokens = $phpcsFile->getTokens();
 		$token  = $tokens[ $stackPtr ];
 
-		if ( 'T_FUNCTION' !== $token['type'] ) {
+		if ( 'T_FUNCTION' === $token['type'] ) {
 			$this->processFunctionToken( $phpcsFile, $stackPtr );
 			return;
 		}
@@ -90,7 +90,6 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	 * @return void
 	 */
 	private function processFunctionToken( File $phpcsFile, $stackPointer ) {
-
 		if ( empty( $this->prefixes ) ) {
 			// Nothing to process.
 			return;
@@ -141,9 +140,20 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 		$phpcsFile->addError( $error_message, $function_token, 'FunctionNameInvalid' );
 	}
 
-	private function processFunctionCallToken( File $phpcsFile, $stackPointer ) {
-		$tokens         = $phpcsFile->getTokens();
-		$function_token = $tokens[$stackPointer];
+	private function processFunctionCallToken( File $phpcs_file, $stack_pointer ) {
+		if ( empty( $this->disallowed_function_calls ) ) {
+			// Nothing to process.
+			return;
+		}
+
+		$tokens = $phpcs_file->getTokens();
+		$next_token = $phpcs_file->findNext(T_WHITESPACE, ($stack_pointer + 1), null, true, null, true);
+		if ( false === $next_token || ( $tokens[ $next_token ]['code'] !== T_OPEN_PARENTHESIS ) ) {
+			// Not a function call.
+			return;
+		}
+
+		$phpcs_file->addError( $tokens[$stack_pointer]['content'] . '()', $stack_pointer, 'CalledFunctionInvalid' );
 	}
 
 	/**
