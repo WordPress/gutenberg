@@ -31,103 +31,110 @@ export function useOnEnter( props ) {
 	} = useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
-	return useRefEffect( ( element ) => {
-		function onKeyDown( event ) {
-			if ( event.defaultPrevented ) {
+	return useRefEffect(
+		( element ) => {
+			if ( ! props.isSelected ) {
 				return;
 			}
 
-			if ( event.keyCode !== ENTER ) {
-				return;
-			}
+			function onKeyDown( event ) {
+				if ( event.defaultPrevented ) {
+					return;
+				}
 
-			const { content, clientId } = propsRef.current;
+				if ( event.keyCode !== ENTER ) {
+					return;
+				}
 
-			// The paragraph should be empty.
-			if ( content.length ) {
-				return;
-			}
+				const { content, clientId } = propsRef.current;
 
-			const wrapperClientId = getBlockRootClientId( clientId );
+				// The paragraph should be empty.
+				if ( content.length ) {
+					return;
+				}
 
-			if (
-				! hasBlockSupport(
-					getBlockName( wrapperClientId ),
-					'__experimentalOnEnter',
-					false
-				)
-			) {
-				return;
-			}
+				const wrapperClientId = getBlockRootClientId( clientId );
 
-			const order = getBlockOrder( wrapperClientId );
-			const position = order.indexOf( clientId );
-
-			// If it is the last block, exit.
-			if ( position === order.length - 1 ) {
-				let newWrapperClientId = wrapperClientId;
-
-				while (
-					! canInsertBlockType(
-						getBlockName( clientId ),
-						getBlockRootClientId( newWrapperClientId )
+				if (
+					! hasBlockSupport(
+						getBlockName( wrapperClientId ),
+						'__experimentalOnEnter',
+						false
 					)
 				) {
-					newWrapperClientId =
-						getBlockRootClientId( newWrapperClientId );
+					return;
 				}
 
-				if ( typeof newWrapperClientId === 'string' ) {
-					event.preventDefault();
-					moveBlocksToPosition(
-						[ clientId ],
+				const order = getBlockOrder( wrapperClientId );
+				const position = order.indexOf( clientId );
+
+				// If it is the last block, exit.
+				if ( position === order.length - 1 ) {
+					let newWrapperClientId = wrapperClientId;
+
+					while (
+						! canInsertBlockType(
+							getBlockName( clientId ),
+							getBlockRootClientId( newWrapperClientId )
+						)
+					) {
+						newWrapperClientId =
+							getBlockRootClientId( newWrapperClientId );
+					}
+
+					if ( typeof newWrapperClientId === 'string' ) {
+						event.preventDefault();
+						moveBlocksToPosition(
+							[ clientId ],
+							wrapperClientId,
+							getBlockRootClientId( newWrapperClientId ),
+							getBlockIndex( newWrapperClientId ) + 1
+						);
+					}
+					return;
+				}
+
+				const defaultBlockName = getDefaultBlockName();
+
+				if (
+					! canInsertBlockType(
+						defaultBlockName,
+						getBlockRootClientId( wrapperClientId )
+					)
+				) {
+					return;
+				}
+
+				event.preventDefault();
+
+				// If it is in the middle, split the block in two.
+				const wrapperBlock = getBlock( wrapperClientId );
+				batch( () => {
+					duplicateBlocks( [ wrapperClientId ] );
+					const blockIndex = getBlockIndex( wrapperClientId );
+
+					replaceInnerBlocks(
 						wrapperClientId,
-						getBlockRootClientId( newWrapperClientId ),
-						getBlockIndex( newWrapperClientId ) + 1
+						wrapperBlock.innerBlocks.slice( 0, position )
 					);
-				}
-				return;
+					replaceInnerBlocks(
+						getNextBlockClientId( wrapperClientId ),
+						wrapperBlock.innerBlocks.slice( position + 1 )
+					);
+					insertBlock(
+						createBlock( defaultBlockName ),
+						blockIndex + 1,
+						getBlockRootClientId( wrapperClientId ),
+						true
+					);
+				} );
 			}
 
-			const defaultBlockName = getDefaultBlockName();
-
-			if (
-				! canInsertBlockType(
-					defaultBlockName,
-					getBlockRootClientId( wrapperClientId )
-				)
-			) {
-				return;
-			}
-
-			event.preventDefault();
-
-			// If it is in the middle, split the block in two.
-			const wrapperBlock = getBlock( wrapperClientId );
-			batch( () => {
-				duplicateBlocks( [ wrapperClientId ] );
-				const blockIndex = getBlockIndex( wrapperClientId );
-
-				replaceInnerBlocks(
-					wrapperClientId,
-					wrapperBlock.innerBlocks.slice( 0, position )
-				);
-				replaceInnerBlocks(
-					getNextBlockClientId( wrapperClientId ),
-					wrapperBlock.innerBlocks.slice( position + 1 )
-				);
-				insertBlock(
-					createBlock( defaultBlockName ),
-					blockIndex + 1,
-					getBlockRootClientId( wrapperClientId ),
-					true
-				);
-			} );
-		}
-
-		element.addEventListener( 'keydown', onKeyDown );
-		return () => {
-			element.removeEventListener( 'keydown', onKeyDown );
-		};
-	}, [] );
+			element.addEventListener( 'keydown', onKeyDown );
+			return () => {
+				element.removeEventListener( 'keydown', onKeyDown );
+			};
+		},
+		[ props.isSelected ]
+	);
 }

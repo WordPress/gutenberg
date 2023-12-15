@@ -131,6 +131,16 @@ export function useInputAndSelection( props ) {
 			// for the rich text instance that contains the start or end of the
 			// selection.
 			if ( ownerDocument.activeElement !== element ) {
+				element.removeEventListener( 'input', onInput );
+				element.removeEventListener(
+					'compositionstart',
+					onCompositionStart
+				);
+				element.removeEventListener(
+					'compositionend',
+					onCompositionEnd
+				);
+
 				// Only process if the active elment is contentEditable, either
 				// this rich text instance or the writing flow parent. Fixes a
 				// bug in Firefox where it strangely selects the closest
@@ -278,23 +288,18 @@ export function useInputAndSelection( props ) {
 				applyRecord( record.current );
 				onSelectionChange( record.current.start, record.current.end );
 			}
+
+			element.addEventListener( 'input', onInput );
+			element.addEventListener( 'compositionstart', onCompositionStart );
+			element.addEventListener( 'compositionend', onCompositionEnd );
 		}
 
-		element.addEventListener( 'input', onInput );
-		element.addEventListener( 'compositionstart', onCompositionStart );
-		element.addEventListener( 'compositionend', onCompositionEnd );
 		element.addEventListener( 'focus', onFocus );
 		ownerDocument.addEventListener(
 			'selectionchange',
 			handleSelectionChange
 		);
 		return () => {
-			element.removeEventListener( 'input', onInput );
-			element.removeEventListener(
-				'compositionstart',
-				onCompositionStart
-			);
-			element.removeEventListener( 'compositionend', onCompositionEnd );
 			element.removeEventListener( 'focus', onFocus );
 			ownerDocument.removeEventListener(
 				'selectionchange',

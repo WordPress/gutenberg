@@ -317,10 +317,13 @@ export function RichTextWrapper(
 				{ ...props }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
+					// Rich text ref must be first because its focus listener
+					// must be set up before any other ref calls .focus() on
+					// mount.
+					richTextRef,
 					forwardedRef,
 					autocompleteProps.ref,
 					props.ref,
-					richTextRef,
 					useBeforeInputRules( { value, onChange } ),
 					useInputRules( {
 						getValue,

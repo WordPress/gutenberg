@@ -98,10 +98,11 @@ function ParagraphBlock( {
 	onRemove,
 	setAttributes,
 	clientId,
+	isSelected,
 } ) {
 	const { align, content, direction, dropCap, placeholder } = attributes;
 	const blockProps = useBlockProps( {
-		ref: useOnEnter( { clientId, content } ),
+		ref: useOnEnter( { clientId, content, isSelected } ),
 		className: classnames( {
 			'has-drop-cap': hasDropCapDisabled( align ) ? false : dropCap,
 			[ `has-text-align-${ align }` ]: align,
