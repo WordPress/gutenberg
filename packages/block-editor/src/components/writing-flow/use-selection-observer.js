@@ -184,7 +184,11 @@ export default function useSelectionObserver() {
 
 				const isSingularSelection = startClientId === endClientId;
 				if ( isSingularSelection ) {
-					selectBlock( startClientId );
+					if ( ! isMultiSelecting() ) {
+						selectBlock( startClientId );
+					} else {
+						multiSelect( startClientId, startClientId );
+					}
 				} else {
 					const startPath = [
 						...getBlockParents( startClientId ),

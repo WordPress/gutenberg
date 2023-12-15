@@ -29,7 +29,7 @@ export default function useDragSelection() {
 		useDispatch( blockEditorStore );
 	const {
 		isSelectionEnabled,
-		hasMultiSelection,
+		hasSelectedBlock,
 		isDraggingBlocks,
 		isMultiSelecting,
 	} = useSelect( blockEditorStore );
@@ -49,7 +49,7 @@ export default function useDragSelection() {
 				// so wait until the next animation frame to get the browser
 				// selection.
 				rafId = defaultView.requestAnimationFrame( () => {
-					if ( hasMultiSelection() ) {
+					if ( ! hasSelectedBlock() ) {
 						return;
 					}
 
@@ -141,7 +141,7 @@ export default function useDragSelection() {
 			startMultiSelect,
 			stopMultiSelect,
 			isSelectionEnabled,
-			hasMultiSelection,
+			hasSelectedBlock,
 		]
 	);
 }
