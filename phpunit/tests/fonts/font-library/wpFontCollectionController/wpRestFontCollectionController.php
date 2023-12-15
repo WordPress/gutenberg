@@ -12,15 +12,30 @@
  * @covers WP_REST_Font_Collection_Controller
  */
 
-class Tests_Fonts_Font_Collection_Controller extends WP_REST_Font_Library_Controller_UnitTestCase {
+class Tests_Fonts_Font_Collection_Controller extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
 		// Mock the wp_remote_request() function.
 		add_filter( 'pre_http_request', array( $this, 'mock_request' ), 10, 3 );
+
+		// Create a user with administrator role.
+		$admin_id = $this->factory->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+		wp_set_current_user( $admin_id );
 	}
 
 	public function tear_down() {
+
+		// Reset $collections static property of WP_Font_Library class.
+		$reflection = new ReflectionClass( 'WP_Font_Library' );
+		$property   = $reflection->getProperty( 'collections' );
+		$property->setAccessible( true );
+		$property->setValue( null, array() );
+
 		// Remove the mock to not affect other tests.
 		remove_filter( 'pre_http_request', array( $this, 'mock_request' ) );
 		parent::tear_down();

@@ -160,6 +160,12 @@ class WP_Font_Family {
 
 				if ( ! empty( $font_face['uploadedFile'] ) ) {
 					//TODO: Test to ensure the file referenced exists
+					if ( ! $files || ! array_key_exists( $font_face['uploadedFile'], $files )) {
+						return new WP_Error(
+							'font_face_upload_file_missing',
+							__( 'The font face assets was not provided.', 'gutenberg' )
+						);
+					}
 					$downloaded_font_face_src = $this->move_font_face_asset( $font_face, $files[ $font_face[ 'uploadedFile' ] ] );
 					unset( $font_face['uploadedFile'] );
 				}

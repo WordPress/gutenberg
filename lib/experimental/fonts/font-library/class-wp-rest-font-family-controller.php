@@ -99,12 +99,15 @@ class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 							'type'     => 'object',
 							'properties' => array(
 								'name'  => array(
+									'required' => true,
 									'type' => 'string',
 								),
 								'slug'  => array(
+									'required' => true,
 									'type' => 'string',
 								),
 								'fontFamily'  => array(
+									'required' => true,
 									'type' => 'string',
 								),
 								'fontFace' => array(
@@ -141,7 +144,26 @@ class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 				),
 			),
 		);
+	}
 
+	/**
+	 * Checks whether the user has permissions to update the Font Library.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
+	 */
+	public function update_font_library_permissions_check() {
+		if ( ! current_user_can( 'edit_theme_options' ) ) {
+			return new WP_Error(
+				'rest_cannot_update_font_library',
+				__( 'Sorry, you are not allowed to update the Font Library on this site.', 'gutenberg' ),
+				array(
+					'status' => rest_authorization_required_code(),
+				)
+			);
+		}
+		return true;
 	}
 
 	public function get_items( $request ) {
@@ -496,25 +518,7 @@ class WP_REST_Font_Family_Controller extends WP_REST_Controller {
 		return rest_ensure_response( $data );
 	}
 
-	/**
-	 * Checks whether the user has permissions to update the Font Library.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
-	 */
-	public function update_font_library_permissions_check() {
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
-			return new WP_Error(
-				'rest_cannot_update_font_library',
-				__( 'Sorry, you are not allowed to update the Font Library on this site.', 'gutenberg' ),
-				array(
-					'status' => rest_authorization_required_code(),
-				)
-			);
-		}
-		return true;
-	}
+
 
 	/**
 	 * Checks whether the font directory exists or not.
