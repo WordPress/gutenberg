@@ -108,7 +108,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const mergedRefs = useMergeRefs( [
 		props.ref,
 		useFocusFirstElement( { clientId, initialPosition } ),
-		useBlockRefProvider( clientId ),
+		useBlockRefProvider( { clientId, isSelected, isMultiSelected } ),
 		useFocusHandler( clientId ),
 		useEventHandlers( { clientId, isSelected } ),
 		useNavModeExit( clientId ),

@@ -7,8 +7,8 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	useCallback,
 } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,17 +25,25 @@ import { BlockRefs } from '../../provider/block-refs-provider';
  *
  * @return {RefCallback} Ref callback.
  */
-export function useBlockRefProvider( clientId ) {
+export function useBlockRefProvider( {
+	clientId,
+	isSelected,
+	isMultiSelected,
+} ) {
 	const { refs, callbacks } = useContext( BlockRefs );
 	const ref = useRef();
-	useLayoutEffect( () => {
-		refs.set( ref, clientId );
-		return () => {
-			refs.delete( ref );
-		};
-	}, [ clientId ] );
-	return useRefEffect(
+	return useCallback(
 		( element ) => {
+			if ( ! isSelected && ! isMultiSelected ) {
+				return;
+			}
+
+			if ( element ) {
+				refs.set( ref, clientId );
+			} else {
+				refs.delete( ref );
+			}
+
 			// Update the ref in the provider.
 			ref.current = element;
 			// Call any update functions.
@@ -45,7 +53,7 @@ export function useBlockRefProvider( clientId ) {
 				}
 			} );
 		},
-		[ clientId ]
+		[ callbacks, refs, clientId, isSelected, isMultiSelected ]
 	);
 }
 
