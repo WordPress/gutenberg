@@ -1,28 +1,14 @@
 /**
  * External dependencies
  */
-import { useSpring } from '@react-spring/web';
+import { Controller, SpringValue } from '@react-spring/web';
 
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	useLayoutEffect,
-	useReducer,
-	useMemo,
-	useRef,
-} from '@wordpress/element';
+import { useState, useLayoutEffect, useMemo, useRef } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { getScrollContainer } from '@wordpress/dom';
-
-/**
- * Simple reducer used to increment a counter.
- *
- * @param {number} state Previous counter value.
- * @return {number} New state value.
- */
-const counterReducer = ( state ) => state + 1;
 
 const getAbsolutePosition = ( element ) => {
 	return {
@@ -56,12 +42,6 @@ function useMovingAnimation( {
 } ) {
 	const ref = useRef();
 	const prefersReducedMotion = useReducedMotion() || ! enableAnimation;
-	const [ triggeredAnimation, triggerAnimation ] = useReducer(
-		counterReducer,
-		0
-	);
-	const [ finishedAnimation, endAnimation ] = useReducer( counterReducer, 0 );
-	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
 	const previous = useMemo(
 		() => ( ref.current ? getAbsolutePosition( ref.current ) : null ),
 		[ triggerAnimationOnChange ]
@@ -91,11 +71,36 @@ function useMovingAnimation( {
 		};
 	}, [ triggerAnimationOnChange, adjustScrolling ] );
 
+	// Initialize SpringValue and Controller
+	const [ controller, setController ] = useState( null );
+
 	useLayoutEffect( () => {
-		if ( triggeredAnimation ) {
-			endAnimation();
+		const springConfig = { mass: 5, tension: 2000, friction: 200 };
+		function onChange( { value } ) {
+			if ( ! ref.current ) {
+				return;
+			}
+			let { x, y } = value;
+			x = Math.round( x );
+			y = Math.round( y );
+			const finishedMoving = x === 0 && y === 0;
+			ref.current.style.transformOrigin = 'center center';
+			ref.current.style.transform = finishedMoving
+				? null // Set to `null` to explicitly remove the transform.
+				: `translate3d(${ x }px,${ y }px,0)`;
+			ref.current.style.zIndex = isSelected ? '1' : '';
+
+			preserveScrollPosition();
 		}
-	}, [ triggeredAnimation ] );
+		setController(
+			new Controller( {
+				x: new SpringValue( 0, springConfig ),
+				y: new SpringValue( 0, springConfig ),
+				onChange,
+			} )
+		);
+	}, [ isSelected, preserveScrollPosition ] );
+
 	useLayoutEffect( () => {
 		if ( ! previous ) {
 			return;
@@ -112,44 +117,17 @@ function useMovingAnimation( {
 		ref.current.style.transform = undefined;
 		const destination = getAbsolutePosition( ref.current );
 
-		triggerAnimation();
-		setTransform( {
-			x: Math.round( previous.left - destination.left ),
-			y: Math.round( previous.top - destination.top ),
-		} );
-	}, [ triggerAnimationOnChange ] );
+		const x = Math.round( previous.left - destination.left );
+		const y = Math.round( previous.top - destination.top );
 
-	function onChange( { value } ) {
-		if ( ! ref.current ) {
-			return;
-		}
-		let { x, y } = value;
-		x = Math.round( x );
-		y = Math.round( y );
-		const finishedMoving = x === 0 && y === 0;
-		ref.current.style.transformOrigin = 'center center';
-		ref.current.style.transform = finishedMoving
-			? null // Set to `null` to explicitly remove the transform.
-			: `translate3d(${ x }px,${ y }px,0)`;
-		ref.current.style.zIndex = isSelected ? '1' : '';
+		// ref.current.style.transformOrigin = 'center center';
+		// ref.current.style.transform = `translate3d(${ x }px,${ y }px,0)`;
 
-		preserveScrollPosition();
-	}
+		controller.start( { x: 0, y: 0, from: { x, y } } ).then( () => {} );
 
-	useSpring( {
-		from: {
-			x: transform.x,
-			y: transform.y,
-		},
-		to: {
-			x: 0,
-			y: 0,
-		},
-		reset: triggeredAnimation !== finishedAnimation,
-		config: { mass: 5, tension: 2000, friction: 200 },
-		immediate: prefersReducedMotion,
-		onChange,
-	} );
+		// controller.update( { x, y } );
+		// controller.start();
+	}, [ triggerAnimationOnChange, controller ] );
 
 	return ref;
 }
