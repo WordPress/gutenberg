@@ -86,11 +86,18 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 			}
 		}
 
-		if (
+		// We disable the animation if the user has a preference for reduced
+		// motion, if the user is typing (insertion by Enter), or if the block
+		// count exceeds the threshold (insertion caused all the blocks that
+		// follow to animate).
+		// To do: consider enableing the _moving_ animation even for large
+		// posts, while only disabling the _insertion_ animation?
+		const disableAnimation =
 			window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ||
 			isTyping() ||
-			getGlobalBlockCount() > BLOCK_ANIMATION_THRESHOLD
-		) {
+			getGlobalBlockCount() > BLOCK_ANIMATION_THRESHOLD;
+
+		if ( disableAnimation ) {
 			// If the animation is disabled and the scroll needs to be adjusted,
 			// just move directly to the final scroll position.
 			preserveScrollPosition();
@@ -101,6 +108,7 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 			isSelected ||
 			isBlockMultiSelected( clientId ) ||
 			isAncestorMultiSelected( clientId );
+		// Make sure the other blocks move under the selected block(s).
 		const zIndex = isPartOfSelection ? '1' : '';
 
 		const controller = new Controller( {
