@@ -173,7 +173,7 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
  *
  * @return string The processed HTML.
  */
-function gutenberg_process_interactive_block( $interactive_block, $context, $interactive_inner_blocks_processed = array() ) {
+function gutenberg_process_interactive_block( $interactive_block, $context ) {
 	$block_index              = 0;
 	$content                  = '';
 	$interactive_inner_blocks = array();
@@ -188,36 +188,8 @@ function gutenberg_process_interactive_block( $interactive_block, $context, $int
 			$block_index               += 1;
 		}
 	}
-	$tags       = new WP_Directive_Processor( $content );
-	$directives = array(
-		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
-		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
-		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
-		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
-		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
-	);
-	$tags       = $tags->process_rendered_html( $tags, 'data-wp-', $directives, $context );
-	if ( ! empty( $interactive_inner_blocks ) ) {
-		$inner_index = 0;
-		foreach ( $interactive_inner_blocks as $inner_block ) {
-			$inner_block_content = gutenberg_process_interactive_block( $inner_block, $context, $interactive_inner_blocks_processed );
-			$interactive_inner_blocks_processed[ '<wp-inner-blocks-' . $inner_index . '></wp-inner-blocks-' . $inner_index . '>' ] = $inner_block_content;
-			$inner_index += 1;
-		}
-		// Return to process after inner blocks.
-		$tags = $tags->process_rendered_html( $tags, 'data-wp-', $directives, $context, 'inner-blocks' );
-	}
-
-	$previous_content = $tags->get_updated_html();
-	if ( ! empty( $interactive_inner_blocks_processed ) ) {
-		foreach ( $interactive_inner_blocks_processed as $inner_block_tag => $inner_blockcontent ) {
-			if ( str_contains( $previous_content, $inner_block_tag ) ) {
-				$previous_content = str_replace( $inner_block_tag, $inner_blockcontent, $previous_content );
-				unset( $inner_block_tag, $interactive_inner_blocks_processed );
-			}
-		}
-	}
-	return $previous_content;
+	$content = gutenberg_process_interactive_html( $content, $interactive_inner_blocks, $context );
+	return $content;
 }
 
 /**
@@ -252,4 +224,87 @@ function gutenberg_process_non_interactive_block( $non_interactive_block, $conte
 		}
 	}
 	return $content;
+}
+
+
+function gutenberg_process_interactive_html( $html, $inner_blocks, $context ) {
+	$tags                   = new WP_Directive_Processor( $html );
+	$prefix                 = 'data-wp-';
+	$directives             = array(
+		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
+		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
+		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
+		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
+		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
+	);
+	$tag_stack              = array();
+	$inner_processed_blocks = array();
+
+	while ( $tags->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
+		$tag_name = $tags->get_tag();
+		if ( ! isset( $inner_blocks_index ) ) {
+			$inner_blocks_index = 0;
+		}
+		if ( str_contains( $tag_name, 'WP-INNER-BLOCKS' ) && ! empty( $inner_blocks ) && ! $tags->is_tag_closer() ) {
+			// Process the inner blocks.
+			$inner_block_content = '';
+			foreach ( $inner_blocks[ $inner_blocks_index ]['innerContent'] as $inner_content ) {
+				$inner_block_content = gutenberg_process_interactive_html( $inner_content, $inner_blocks[ $inner_blocks_index ]['innerBlocks'], $context );
+			}
+			$inner_processed_blocks[ strtolower( $tag_name ) ] = $inner_block_content;
+			$inner_blocks_index                               += 1;
+		}
+		if ( $tags->is_tag_closer() ) {
+			if ( 0 === count( $tag_stack ) ) {
+				continue;
+			}
+			list( $latest_opening_tag_name, $attributes ) = end( $tag_stack );
+			if ( $latest_opening_tag_name === $tag_name ) {
+				array_pop( $tag_stack );
+				// If the matching opening tag didn't have any directives, we move on.
+				if ( 0 === count( $attributes ) ) {
+					continue;
+				}
+			}
+		} else {
+			$attributes = array();
+			foreach ( $tags->get_attribute_names_with_prefix( $prefix ) as $name ) {
+				/*
+				 * Removes the part after the double hyphen before looking for
+				 * the directive processor inside `$directives`, e.g., "wp-bind"
+				 * from "wp-bind--src" and "wp-context" from "wp-context" etc...
+				 */
+				list( $type ) = $tags::parse_attribute_name( $name );
+				if ( array_key_exists( $type, $directives ) ) {
+					$attributes[] = $type;
+				}
+			}
+
+			/*
+			 * If this is an open tag, and if it either has directives, or if
+			 * we're inside a tag that does, take note of this tag and its
+			 * directives so we can call its directive processor once we
+			 * encounter the matching closing tag.
+			 */
+			if (
+			! $tags::is_html_void_element( $tags->get_tag() ) &&
+			( 0 !== count( $attributes ) || 0 !== count( $tag_stack ) )
+			) {
+				$tag_stack[] = array( $tag_name, $attributes );
+			}
+		}
+
+		foreach ( $attributes as $attribute ) {
+			call_user_func( $directives[ $attribute ], $tags, $context );
+		}
+	}
+	$processed_html = $tags->get_updated_html();
+	if ( ! empty( $inner_processed_blocks ) ) {
+		foreach ( $inner_processed_blocks as $inner_block_tag => $inner_block_content ) {
+			if ( str_contains( $processed_html, $inner_block_tag ) ) {
+				$processed_html = str_replace( '<' . $inner_block_tag . '></' . $inner_block_tag . '>', $inner_block_content, $processed_html );
+			}
+		}
+	}
+	return $processed_html;
 }
