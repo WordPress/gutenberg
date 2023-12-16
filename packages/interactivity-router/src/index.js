@@ -58,7 +58,7 @@ const regionsToVdom = ( dom, { vdom } = {} ) => {
 };
 
 // Render all interactive regions contained in the given page.
-const renderRegions = ( page ) =>
+const renderRegions = ( page ) => {
 	batch( () => {
 		populateInitialData( page.initialData );
 		const attrName = `data-${ directivePrefix }-router-region`;
@@ -71,6 +71,7 @@ const renderRegions = ( page ) =>
 			document.title = page.title;
 		}
 	} );
+};
 
 /**
  * Load the given page forcing a full page reload.
