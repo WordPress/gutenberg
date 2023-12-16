@@ -197,7 +197,7 @@ function Layout() {
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 			hasBlockSelected:
-				select( blockEditorStore ).getBlockSelectionStart(),
+				!! select( blockEditorStore ).getBlockSelectionStart(),
 		};
 	}, [] );
 
