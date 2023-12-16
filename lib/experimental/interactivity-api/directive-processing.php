@@ -183,7 +183,7 @@ function gutenberg_process_interactive_block( $interactive_block, $context, $int
 		} else {
 			// This is an inner block. It may be an interactive block or a
 			// non-interactive block. Not sure if autoclosed custom tags are supported in HTML_Tag_Processor.
-			$content                   .= '<wp-inner-blocks-' . $block_index . '/>';
+			$content                   .= '<wp-inner-blocks-' . $block_index . '></wp-inner-blocks-' . $block_index . '>';
 			$interactive_inner_blocks[] = $interactive_block['innerBlocks'][ $block_index ];
 			$block_index               += 1;
 		}
@@ -201,10 +201,13 @@ function gutenberg_process_interactive_block( $interactive_block, $context, $int
 		$inner_index = 0;
 		foreach ( $interactive_inner_blocks as $inner_block ) {
 			$inner_block_content = gutenberg_process_interactive_block( $inner_block, $context, $interactive_inner_blocks_processed );
-			$interactive_inner_blocks_processed[ '<wp-inner-blocks-' . $inner_index . '/>' ] = $inner_block_content;
+			$interactive_inner_blocks_processed[ '<wp-inner-blocks-' . $inner_index . '></wp-inner-blocks-' . $inner_index . '>' ] = $inner_block_content;
 			$inner_index += 1;
 		}
+		// Return to process after inner blocks.
+		$tags = $tags->process_rendered_html( $tags, 'data-wp-', $directives, $context, 'inner-blocks' );
 	}
+
 	$previous_content = $tags->get_updated_html();
 	if ( ! empty( $interactive_inner_blocks_processed ) ) {
 		foreach ( $interactive_inner_blocks_processed as $inner_block_tag => $inner_blockcontent ) {
