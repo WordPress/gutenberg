@@ -7,8 +7,19 @@ import { Controller } from '@react-spring/web';
  * WordPress dependencies
  */
 import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
-import { useReducedMotion } from '@wordpress/compose';
 import { getScrollContainer } from '@wordpress/dom';
+import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
+/**
+ * If the block count exceeds the threshold, we disable the reordering animation
+ * to avoid laginess.
+ */
+const BLOCK_ANIMATION_THRESHOLD = 200;
 
 function getAbsolutePosition( element ) {
 	return {
@@ -28,30 +39,20 @@ function getAbsolutePosition( element ) {
  *  - It uses the "resetAnimation" flag to reset the animation
  *    from the beginning in order to animate to the new destination point.
  *
- * @param {Object}  $1                          Options
- * @param {boolean} $1.isSelected               Whether it's the current block or not.
- * @param {boolean} $1.adjustScrolling          Adjust the scroll position to the current block.
- * @param {boolean} $1.enableAnimation          Enable/Disable animation.
- * @param {*}       $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
+ * @param {Object} $1                          Options
+ * @param {*}      $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
+ * @param {string} $1.clientId
  */
-function useMovingAnimation( {
-	isSelected,
-	adjustScrolling,
-	enableAnimation,
-	triggerAnimationOnChange,
-} ) {
+function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 	const ref = useRef();
-	const prefersReducedMotion = useReducedMotion() || ! enableAnimation;
-
-	// We do not want to trigger the animation when a block gets selected, so we
-	// use a ref to keep track of the value for use later in a callback.
-	const isSelectedRef = useRef( isSelected );
-	const adjustScrollingRef = useRef( adjustScrolling );
-
-	useLayoutEffect( () => {
-		isSelectedRef.current = isSelected;
-		adjustScrollingRef.current = adjustScrolling;
-	}, [ isSelected, adjustScrolling ] );
+	const {
+		isTyping,
+		getGlobalBlockCount,
+		isBlockSelected,
+		isFirstMultiSelectedBlock,
+		isBlockMultiSelected,
+		isAncestorMultiSelected,
+	} = useSelect( blockEditorStore );
 
 	// Whenever the trigger changes, we need to take a snapshot of the current
 	// position of the block to use it as a destination point for the animation.
@@ -70,9 +71,12 @@ function useMovingAnimation( {
 		}
 
 		const scrollContainer = getScrollContainer( ref.current );
+		const isSelected = isBlockSelected( clientId );
+		const adjustScrolling =
+			isSelected || isFirstMultiSelectedBlock( clientId );
 
 		function preserveScrollPosition() {
-			if ( adjustScrollingRef.current && prevRect ) {
+			if ( adjustScrolling && prevRect ) {
 				const blockRect = ref.current.getBoundingClientRect();
 				const diff = blockRect.top - prevRect.top;
 
@@ -82,12 +86,22 @@ function useMovingAnimation( {
 			}
 		}
 
-		if ( prefersReducedMotion ) {
+		if (
+			window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ||
+			isTyping() ||
+			getGlobalBlockCount() > BLOCK_ANIMATION_THRESHOLD
+		) {
 			// If the animation is disabled and the scroll needs to be adjusted,
 			// just move directly to the final scroll position.
 			preserveScrollPosition();
 			return;
 		}
+
+		const isPartOfSelection =
+			isSelected ||
+			isBlockMultiSelected( clientId ) ||
+			isAncestorMultiSelected( clientId );
+		const zIndex = isPartOfSelection ? '1' : '';
 
 		const controller = new Controller( {
 			x: 0,
@@ -105,7 +119,7 @@ function useMovingAnimation( {
 				ref.current.style.transform = finishedMoving
 					? null // Set to `null` to explicitly remove the transform.
 					: `translate3d(${ x }px,${ y }px,0)`;
-				ref.current.style.zIndex = isSelectedRef.current ? '1' : '';
+				ref.current.style.zIndex = zIndex;
 				preserveScrollPosition();
 			},
 		} );
@@ -121,7 +135,17 @@ function useMovingAnimation( {
 		return () => {
 			controller.stop();
 		};
-	}, [ previous, prevRect, prefersReducedMotion ] );
+	}, [
+		previous,
+		prevRect,
+		clientId,
+		isTyping,
+		getGlobalBlockCount,
+		isBlockSelected,
+		isFirstMultiSelectedBlock,
+		isBlockMultiSelected,
+		isAncestorMultiSelected,
+	] );
 
 	return ref;
 }
