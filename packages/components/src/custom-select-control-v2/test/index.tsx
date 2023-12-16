@@ -12,7 +12,11 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { CustomSelect as LegacyCustomSelectControl } from '..';
+import {
+	CustomSelect as LegacyCustomSelectControl,
+	CustomSelectItem,
+} from '..';
+import CustomSelect from '../custom-select';
 
 const customClass = 'amber-skies';
 
@@ -48,6 +52,9 @@ const props = {
 	],
 };
 
+// get names from array of objects above
+const optionNames = props.options.map( ( { name } ) => name );
+
 const LegacyControlledCustomSelect = ( { options }: any ) => {
 	const [ value, setValue ] = useState( options[ 0 ] );
 	return (
@@ -61,11 +68,44 @@ const LegacyControlledCustomSelect = ( { options }: any ) => {
 	);
 };
 
+const UncontrolledCustomSelect = () => {
+	return (
+		<CustomSelect label={ props.label }>
+			{ optionNames.map( ( option ) => (
+				<CustomSelectItem key={ option } value={ option }>
+					{ option }
+				</CustomSelectItem>
+			) ) }
+		</CustomSelect>
+	);
+};
+
+const ControlledCustomSelect = () => {
+	const [ value, setValue ] = useState< string | string[] >();
+	return (
+		<CustomSelect
+			label={ props.label }
+			onChange={ ( nextValue ) => {
+				setValue( nextValue );
+			} }
+			value={ value }
+		>
+			{ optionNames.map( ( option ) => (
+				<CustomSelectItem key={ option } value={ option }>
+					{ option }
+				</CustomSelectItem>
+			) ) }
+		</CustomSelect>
+	);
+};
+
 describe.each( [
-	[ 'uncontrolled', LegacyCustomSelectControl ],
-	[ 'controlled', LegacyControlledCustomSelect ],
+	[ 'legacy: uncontrolled', LegacyCustomSelectControl ],
+	[ 'legacy: controlled', LegacyControlledCustomSelect ],
+	[ 'uncontrolled', UncontrolledCustomSelect ],
+	[ 'controlled', ControlledCustomSelect ],
 ] )( 'CustomSelect %s', ( ...modeAndComponent ) => {
-	const [ , Component ] = modeAndComponent;
+	const [ mode, Component ] = modeAndComponent;
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
 		const user = userEvent.setup();
@@ -126,121 +166,125 @@ describe.each( [
 		);
 	} );
 
-	it( 'Should apply class only to options that have a className defined', async () => {
-		const user = userEvent.setup();
+	// Test against legacy component only
+	// For optional key value pairs of options prop ( style, className, and __experimentalHint )
+	if ( mode !== 'uncontrolled' && mode !== 'controlled' ) {
+		it( 'Should apply class only to options that have a className defined', async () => {
+			const user = userEvent.setup();
 
-		render( <Component { ...props } /> );
+			render( <Component { ...props } /> );
 
-		await user.click(
-			screen.getByRole( 'combobox', {
-				expanded: false,
-			} )
-		);
+			await user.click(
+				screen.getByRole( 'combobox', {
+					expanded: false,
+				} )
+			);
 
-		// return an array of items _with_ a className added
-		const itemsWithClass = props.options.filter(
-			( option ) => option.className !== undefined
-		);
+			// return an array of items _with_ a className added
+			const itemsWithClass = props.options.filter(
+				( option ) => option.className !== undefined
+			);
 
-		// assert against filtered array
-		itemsWithClass.map( ( { name } ) =>
-			expect( screen.getByRole( 'option', { name } ) ).toHaveClass(
-				customClass
-			)
-		);
+			// assert against filtered array
+			itemsWithClass.map( ( { name } ) =>
+				expect( screen.getByRole( 'option', { name } ) ).toHaveClass(
+					customClass
+				)
+			);
 
-		// return an array of items _without_ a className added
-		const itemsWithoutClass = props.options.filter(
-			( option ) => option.className === undefined
-		);
+			// return an array of items _without_ a className added
+			const itemsWithoutClass = props.options.filter(
+				( option ) => option.className === undefined
+			);
 
-		// assert against filtered array
-		itemsWithoutClass.map( ( { name } ) =>
-			expect( screen.getByRole( 'option', { name } ) ).not.toHaveClass(
-				customClass
-			)
-		);
-	} );
+			// assert against filtered array
+			itemsWithoutClass.map( ( { name } ) =>
+				expect(
+					screen.getByRole( 'option', { name } )
+				).not.toHaveClass( customClass )
+			);
+		} );
 
-	it( 'Should apply styles only to options that have styles defined', async () => {
-		const user = userEvent.setup();
-		const customStyles =
-			'background-color: rgb(127, 255, 212); rotate: 13deg;';
+		it( 'Should apply styles only to options that have styles defined', async () => {
+			const user = userEvent.setup();
+			const customStyles =
+				'background-color: rgb(127, 255, 212); rotate: 13deg;';
 
-		render( <Component { ...props } /> );
+			render( <Component { ...props } /> );
 
-		await user.click(
-			screen.getByRole( 'combobox', {
-				expanded: false,
-			} )
-		);
+			await user.click(
+				screen.getByRole( 'combobox', {
+					expanded: false,
+				} )
+			);
 
-		// return an array of items _with_ styles added
-		const styledItems = props.options.filter(
-			( option ) => option.style !== undefined
-		);
+			// return an array of items _with_ styles added
+			const styledItems = props.options.filter(
+				( option ) => option.style !== undefined
+			);
 
-		// assert against filtered array
-		styledItems.map( ( { name } ) =>
-			expect( screen.getByRole( 'option', { name } ) ).toHaveStyle(
-				customStyles
-			)
-		);
+			// assert against filtered array
+			styledItems.map( ( { name } ) =>
+				expect( screen.getByRole( 'option', { name } ) ).toHaveStyle(
+					customStyles
+				)
+			);
 
-		// return an array of items _without_ styles added
-		const unstyledItems = props.options.filter(
-			( option ) => option.style === undefined
-		);
+			// return an array of items _without_ styles added
+			const unstyledItems = props.options.filter(
+				( option ) => option.style === undefined
+			);
 
-		// assert against filtered array
-		unstyledItems.map( ( { name } ) =>
-			expect( screen.getByRole( 'option', { name } ) ).not.toHaveStyle(
-				customStyles
-			)
-		);
-	} );
+			// assert against filtered array
+			unstyledItems.map( ( { name } ) =>
+				expect(
+					screen.getByRole( 'option', { name } )
+				).not.toHaveStyle( customStyles )
+			);
+		} );
 
-	it( 'does not show selected hint by default', () => {
-		render(
-			<LegacyCustomSelectControl
-				label="Custom select"
-				options={ [
-					{
-						key: 'one',
-						name: 'One',
-						__experimentalHint: 'Hint',
-					},
-				] }
-			/>
-		);
-		expect(
-			screen.getByRole( 'combobox', { name: 'Custom select' } )
-		).not.toHaveTextContent( 'Hint' );
-	} );
+		it( 'does not show selected hint by default', () => {
+			render(
+				<LegacyCustomSelectControl
+					label="Custom select"
+					options={ [
+						{
+							key: 'one',
+							name: 'One',
+							__experimentalHint: 'Hint',
+						},
+					] }
+				/>
+			);
+			expect(
+				screen.getByRole( 'combobox', { name: 'Custom select' } )
+			).not.toHaveTextContent( 'Hint' );
+		} );
 
-	it( 'shows selected hint when __experimentalShowSelectedHint is set', async () => {
-		const user = userEvent.setup();
+		it( 'shows selected hint when __experimentalShowSelectedHint is set', async () => {
+			const user = userEvent.setup();
 
-		render(
-			<LegacyCustomSelectControl
-				label="Custom select"
-				options={ [
-					{
-						key: 'one',
-						name: 'One',
-						__experimentalHint: 'Hint',
-					},
-				] }
-				__experimentalShowSelectedHint
-			/>
-		);
+			render(
+				<LegacyCustomSelectControl
+					label="Custom select"
+					options={ [
+						{
+							key: 'one',
+							name: 'One',
+							__experimentalHint: 'Hint',
+						},
+					] }
+					__experimentalShowSelectedHint
+				/>
+			);
 
-		await user.click(
-			screen.getByRole( 'combobox', { name: 'Custom select' } )
-		);
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Custom select' } )
+			);
 
-		expect( screen.getByText( 'Hint' ) ).toBeVisible();
-	} );
+			expect( screen.getByText( 'Hint' ) ).toBeVisible();
+		} );
+	}
 
 	describe( 'Keyboard behavior and accessibility', () => {
 		it( 'Should be able to change selection using keyboard', async () => {
