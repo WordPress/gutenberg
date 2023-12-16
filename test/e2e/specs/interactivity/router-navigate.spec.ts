@@ -14,7 +14,7 @@ test.describe( 'Router navigate', () => {
 			alias: 'router navigate - link 1',
 			attributes: {
 				title: 'Link 1',
-				state: { prop1: 'link 1', prop3: 'link 1' },
+				data: { prop1: 'link 1', prop3: 'link 1' },
 			},
 		} );
 		await utils.addPostWithBlock( 'test/router-navigate', {
@@ -22,7 +22,7 @@ test.describe( 'Router navigate', () => {
 			attributes: {
 				title: 'Main',
 				links: [ link1, link2 ],
-				state: { prop1: 'main', prop2: 'main' },
+				data: { prop1: 'main', prop2: 'main' },
 			},
 		} );
 		await utils.addPostWithBlock( 'test/router-navigate', {
