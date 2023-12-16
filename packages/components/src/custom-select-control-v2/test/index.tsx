@@ -99,7 +99,7 @@ const ControlledCustomSelect = () => {
 	);
 };
 
-describe( 'Legacy tests', () => {
+describe( 'Legacy tests from CustomSelectControl', () => {
 	describe.each( [
 		[ 'legacy: uncontrolled', LegacyCustomSelectControl ],
 		[ 'legacy: controlled', LegacyControlledCustomSelect ],
@@ -419,5 +419,125 @@ describe( 'Legacy tests', () => {
 				).toBeVisible();
 			} );
 		} );
+	} );
+} );
+
+describe( 'CustomSelect', () => {
+	it( 'Should be able to select multiple items when provided an array', async () => {
+		const user = userEvent.setup();
+
+		const defaultValues = [
+			'incandescent glow',
+			'ultraviolet morning light',
+		];
+
+		render(
+			<CustomSelect defaultValue={ defaultValues } label="Light">
+				{ [
+					'aurora borealis green',
+					'flamingo pink sunrise',
+					'incandescent glow',
+					'rose blush',
+					'ultraviolet morning light',
+				].map( ( item ) => (
+					<CustomSelectItem key={ item } value={ item }>
+						{ item }
+					</CustomSelectItem>
+				) ) }
+			</CustomSelect>
+		);
+
+		const currentSelectedItem = screen.getByRole( 'combobox' );
+
+		expect( currentSelectedItem ).toHaveTextContent(
+			`${ defaultValues.length } items selected`
+		);
+
+		await user.click( currentSelectedItem );
+
+		expect( screen.getByRole( 'listbox' ) ).toHaveAttribute(
+			'aria-multiselectable'
+		);
+
+		defaultValues.map( ( value ) =>
+			expect(
+				screen.getByRole( 'option', { name: value, selected: true } )
+			).toBeVisible()
+		);
+
+		const nextSelection = screen.getByRole( 'option', {
+			name: 'rose blush',
+		} );
+
+		await user.click( nextSelection );
+
+		expect( nextSelection ).toHaveAttribute( 'aria-selected' );
+
+		expect( currentSelectedItem ).toHaveTextContent(
+			`${ defaultValues.length + 1 } items selected`
+		);
+	} );
+
+	it( 'Should be able to deselect items when provided an array', async () => {
+		const user = userEvent.setup();
+
+		const defaultValues = [
+			'aurora borealis green',
+			'incandescent glow',
+			'key lime green',
+			'rose blush',
+			'ultraviolet morning light',
+		];
+
+		render(
+			<CustomSelect defaultValue={ defaultValues } label="Light">
+				{ defaultValues.map( ( item ) => (
+					<CustomSelectItem key={ item } value={ item }>
+						{ item }
+					</CustomSelectItem>
+				) ) }
+			</CustomSelect>
+		);
+
+		const currentSelectedItem = screen.getByRole( 'combobox' );
+
+		expect( currentSelectedItem ).toHaveTextContent(
+			`${ defaultValues.length } items selected`
+		);
+
+		await user.click( currentSelectedItem );
+
+		expect( screen.getByRole( 'listbox' ) ).toHaveAttribute(
+			'aria-multiselectable'
+		);
+
+		defaultValues.map( ( option ) =>
+			expect(
+				screen.getByRole( 'option', { name: option, selected: true } )
+			).toBeVisible()
+		);
+
+		const nextSelection = [
+			'aurora borealis green',
+			'rose blush',
+			'incandescent glow',
+		];
+
+		for ( let i = 0; i < nextSelection.length; i++ ) {
+			await user.click(
+				screen.getByRole( 'option', { name: nextSelection[ i ] } )
+			);
+
+			expect(
+				screen.getByRole( 'option', {
+					name: nextSelection[ i ],
+					selected: false,
+				} )
+			).toBeVisible();
+		}
+
+		expect( currentSelectedItem ).toHaveTextContent(
+			`${ defaultValues.length - nextSelection.length } items selected`
+		);
 	} );
 } );
