@@ -35,7 +35,7 @@ const deepMerge = ( target: any, source: any ) => {
 	}
 };
 
-const parseInitialData = () => {
+export const parseInitialData = () => {
 	const storeTag = document.querySelector(
 		`script[type="application/json"]#wp-interactivity-data`
 	);
@@ -310,15 +310,22 @@ export function store(
 	return stores.get( namespace );
 }
 
+export const populateInitialData = ( data?: {
+	state?: Record< string, unknown >;
+	config?: Record< string, unknown >;
+} ) => {
+	if ( isObject( data?.state ) ) {
+		Object.entries( data.state ).forEach( ( [ namespace, state ] ) => {
+			store( namespace, { state }, { lock: universalUnlock } );
+		} );
+	}
+	if ( isObject( data?.config ) ) {
+		Object.entries( data.config ).forEach( ( [ namespace, config ] ) => {
+			storeConfigs.set( namespace, config );
+		} );
+	}
+};
+
 // Parse and populate the initial state and config.
 const data = parseInitialData();
-if ( isObject( data?.state ) ) {
-	Object.entries( data.state ).forEach( ( [ namespace, state ] ) => {
-		store( namespace, { state }, { lock: universalUnlock } );
-	} );
-}
-if ( isObject( data?.config ) ) {
-	Object.entries( data.config ).forEach( ( [ namespace, config ] ) => {
-		storeConfigs.set( namespace, config );
-	} );
-}
+populateInitialData( data );
