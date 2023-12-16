@@ -7,7 +7,7 @@
 	"ancestor": [ "core/comment-template" ],
 	"description": "Displays a link to reply to a comment.",
 	"textdomain": "default",
-	"usesContext": [ "commentId" ],
+	"usesContext": [ "commentId", "enhancedSubmission" ],
 	"attributes": {
 		"textAlign": {
 			"type": "string"

@@ -20,6 +20,7 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 	global $comment_depth;
 	$thread_comments       = get_option( 'thread_comments' );
 	$thread_comments_depth = get_option( 'thread_comments_depth' );
+	$enhanced_submission   = isset( $block->context['enhancedSubmission'] ) && $block->context['enhancedSubmission'];
 
 	if ( empty( $comment_depth ) ) {
 		$comment_depth = 1;
@@ -83,7 +84,15 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 			}
 		}
 
-		$content .= sprintf( '<li id="comment-%1$s" %2$s>%3$s</li>', $comment->comment_ID, $comment_classes, $block_content );
+		$comment_directives = $enhanced_submission ? ' data-wp-key="comment-' . $comment->comment_ID . '" data-wp-slot=\'{"name":"comment-' . $comment->comment_ID . '","position":"after"}\'' : '';
+
+		$content .= sprintf(
+			'<li id="comment-%1$s" %2$s%3$s>%4$s</li>',
+			$comment->comment_ID,
+			$comment_classes,
+			$comment_directives,
+			$block_content
+		);
 	}
 
 	return $content;
