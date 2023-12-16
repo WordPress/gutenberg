@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { CustomSelect } from '..';
+import { CustomSelect as LegacyCustomSelectControl } from '..';
 
 const customClass = 'amber-skies';
 
@@ -46,13 +46,12 @@ const props = {
 			},
 		},
 	],
-	__nextUnconstrainedWidth: true,
 };
 
-const ControlledCustomSelect = ( { options }: any ) => {
+const LegacyControlledCustomSelect = ( { options }: any ) => {
 	const [ value, setValue ] = useState( options[ 0 ] );
 	return (
-		<CustomSelect
+		<LegacyCustomSelectControl
 			{ ...props }
 			onChange={ ( { selectedItem }: any ) => setValue( selectedItem ) }
 			value={ options.find(
@@ -63,8 +62,8 @@ const ControlledCustomSelect = ( { options }: any ) => {
 };
 
 describe.each( [
-	[ 'uncontrolled', CustomSelect ],
-	[ 'controlled', ControlledCustomSelect ],
+	[ 'uncontrolled', LegacyCustomSelectControl ],
+	[ 'controlled', LegacyControlledCustomSelect ],
 ] )( 'CustomSelect %s', ( ...modeAndComponent ) => {
 	const [ , Component ] = modeAndComponent;
 
@@ -101,7 +100,7 @@ describe.each( [
 	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
 		const user = userEvent.setup();
 
-		render( <CustomSelect { ...props } /> );
+		render( <Component { ...props } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
@@ -130,7 +129,7 @@ describe.each( [
 	it( 'Should apply class only to options that have a className defined', async () => {
 		const user = userEvent.setup();
 
-		render( <CustomSelect { ...props } /> );
+		render( <Component { ...props } /> );
 
 		await user.click(
 			screen.getByRole( 'combobox', {
@@ -168,7 +167,7 @@ describe.each( [
 		const customStyles =
 			'background-color: rgb(127, 255, 212); rotate: 13deg;';
 
-		render( <CustomSelect { ...props } /> );
+		render( <Component { ...props } /> );
 
 		await user.click(
 			screen.getByRole( 'combobox', {
@@ -203,8 +202,7 @@ describe.each( [
 
 	it( 'does not show selected hint by default', () => {
 		render(
-			<CustomSelect
-				{ ...props }
+			<LegacyCustomSelectControl
 				label="Custom select"
 				options={ [
 					{
@@ -224,8 +222,7 @@ describe.each( [
 		const user = userEvent.setup();
 
 		render(
-			<CustomSelect
-				{ ...props }
+			<LegacyCustomSelectControl
 				label="Custom select"
 				options={ [
 					{
@@ -249,7 +246,7 @@ describe.each( [
 		it( 'Should be able to change selection using keyboard', async () => {
 			const user = userEvent.setup();
 
-			render( <CustomSelect { ...props } /> );
+			render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
@@ -274,7 +271,7 @@ describe.each( [
 		it( 'Should be able to type characters to select matching options', async () => {
 			const user = userEvent.setup();
 
-			render( <CustomSelect { ...props } /> );
+			render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
@@ -296,7 +293,7 @@ describe.each( [
 		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
 			const user = userEvent.setup();
 
-			render( <CustomSelect { ...props } /> );
+			render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
@@ -322,7 +319,7 @@ describe.each( [
 		it( 'Should have correct aria-selected value for selections', async () => {
 			const user = userEvent.setup();
 
-			render( <CustomSelect { ...props } /> );
+			render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
