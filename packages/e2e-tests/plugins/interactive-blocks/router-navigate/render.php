@@ -59,4 +59,11 @@ HTML;
 		}
 	}
 	?>
+	<div data-testid="prop1" data-wp-text="state.data.prop1"></div>
+	<div data-testid="prop2" data-wp-text="state.data.prop2"></div>
+	<div data-testid="prop3" data-wp-text="state.data.prop3"></div>
 </div>
+
+<script type="application/json" id="wp-interactivity-initial-state">
+	{ "router": { "data": <?php echo json_encode( $attributes['state'] ); ?> } }
+</script>

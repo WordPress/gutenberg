@@ -12,11 +12,18 @@ test.describe( 'Router navigate', () => {
 		} );
 		const link1 = await utils.addPostWithBlock( 'test/router-navigate', {
 			alias: 'router navigate - link 1',
-			attributes: { title: 'Link 1' },
+			attributes: {
+				title: 'Link 1',
+				state: { prop1: 'link 1', prop3: 'link 1' },
+			},
 		} );
 		await utils.addPostWithBlock( 'test/router-navigate', {
 			alias: 'router navigate - main',
-			attributes: { title: 'Main', links: [ link1, link2 ] },
+			attributes: {
+				title: 'Main',
+				links: [ link1, link2 ],
+				state: { prop1: 'main', prop2: 'main' },
+			},
 		} );
 		await utils.addPostWithBlock( 'test/router-navigate', {
 			alias: 'router navigate - disabled',
@@ -190,5 +197,33 @@ test.describe( 'Router navigate', () => {
 
 		// Check that client-navigations count has not increased.
 		await expect( navigations ).toHaveText( '0' );
+	} );
+
+	test( 'should overwrite the state with the one serialized in the new page', async ( {
+		page,
+	} ) => {
+		const prop1 = page.getByTestId( 'prop1' );
+		const prop2 = page.getByTestId( 'prop2' );
+		const prop3 = page.getByTestId( 'prop3' );
+
+		await expect( prop1 ).toHaveText( 'main' );
+		await expect( prop2 ).toHaveText( 'main' );
+		await expect( prop3 ).toBeEmpty();
+
+		await page.getByTestId( 'link 1' ).click();
+
+		// New values for existing properties should change.
+		// Old values not overwritten should remain the same.
+		// New properties should appear.
+		await expect( prop1 ).toHaveText( 'link 1' );
+		await expect( prop2 ).toHaveText( 'main' );
+		await expect( prop3 ).toHaveText( 'link 1' );
+
+		await page.goBack();
+
+		// New added properties are preserved.
+		await expect( prop1 ).toHaveText( 'main' );
+		await expect( prop2 ).toHaveText( 'main' );
+		await expect( prop3 ).toHaveText( 'link 1' );
 	} );
 } );
