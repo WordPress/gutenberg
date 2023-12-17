@@ -55,7 +55,7 @@ npm run native ios
 
 which will attempt to open your app in the iOS Simulator if you're on a Mac and have it installed.
 
-### Running on Other iOS Device Simulators
+### Running on other iOS device simulators
 
 To compile and run the app using a different device simulator, use the following, noting the double sets of `--` to pass the simulator option down to the `react-native` CLI.
 
@@ -71,7 +71,7 @@ npm run native ios -- -- --simulator="iPhone Xs Max"
 
 To see a list of all of your available iOS devices, use `xcrun simctl list devices`.
 
-### Customizing the Demo Editor
+### Customizing the demo Editor
 
 By default, the Demo editor renders most of the supported core blocks. This is helpful to showcase the editor's capabilities, but can be distracting when focusing on a specific block or feature. One can customize the editor's initial state by leveraging the `native.block_editor_props` hook in a `packages/react-native-editor/src/setup-local.js` file.
 
@@ -119,7 +119,7 @@ When you first open the project in Visual Studio, you will be prompted to instal
 
 One of the extensions we are using is the [React Native Tools](https://marketplace.visualstudio.com/items?itemName=vsmobile.vscode-react-native). This allows you to run the packager from VSCode or launch the application on iOS or Android. It also adds some debug configurations so you can set breakpoints and debug the application directly from VSCode. Take a look at the [extension documentation](https://marketplace.visualstudio.com/items?itemName=vsmobile.vscode-react-native) for more details.
 
-## Unit Tests
+## Unit tests
 
 Use the following command to run the test suite:
 
@@ -137,11 +137,11 @@ npm run test:native:debug
 
 Then, open `chrome://inspect` in Chrome to attach the debugger (look into the "Remote Target" section). While testing/developing, feel free to sprinkle `debugger` statements anywhere in the code that you'd like the debugger to break.
 
-## Writing and Running Unit Tests
+## Writing and running unit tests
 
 This project is set up to use [jest](https://jestjs.io/) for tests. You can configure whatever testing strategy you like, but jest works out of the box. Create test files in directories called `__tests__` or with the `.test.js` extension to have the files loaded by jest. See an example test [here](https://github.com/WordPress/gutenberg/blob/HEAD/packages/react-native-editor/src/test/api-fetch-setup.test.js). The [jest documentation](https://jestjs.io/docs/getting-started) is also a wonderful resource, as is the [React Native testing tutorial](https://jestjs.io/docs/tutorial-react-native).
 
-## End-to-End Tests
+## End-to-end tests
 
 In addition to unit tests, the Mobile Gutenberg (MG) project relies upon end-to-end (E2E) tests to automate testing critical flows in an environment similar to that of an end user. We generally prefer unit tests due to their speed and ease of maintenance. However, assertions that require OS-level features (e.g. complex gestures, text selection) or visual regression testing (e.g. dark mode, contrast levels) we use E2E tests.
 
