@@ -70,13 +70,14 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const { getEditorMode } = select( editPostStore );
-		const renderingMode = select( editorStore ).getRenderingMode();
+
 		return {
 			isTextEditor: getEditorMode() === 'text',
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			isEditingTemplate: renderingMode === 'template-only',
+			isEditingTemplate:
+				select( editorStore ).getRenderingMode() === 'template-only',
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core/edit-post', 'fixedToolbar' ),
