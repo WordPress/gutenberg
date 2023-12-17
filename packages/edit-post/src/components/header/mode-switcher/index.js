@@ -34,7 +34,6 @@ function ModeSwitcher() {
 		isRichEditingEnabled,
 		isCodeEditingEnabled,
 		isEditingTemplate,
-
 		mode,
 	} = useSelect(
 		( select ) => ( {
@@ -47,7 +46,6 @@ function ModeSwitcher() {
 				select( editorStore ).getEditorSettings().codeEditingEnabled,
 			isEditingTemplate:
 				select( editorStore ).getRenderingMode() === 'template-only',
-
 			mode: select( editPostStore ).getEditorMode(),
 		} ),
 		[]
