@@ -154,7 +154,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			type,
 			id
 		);
-
 		const [ blocks, onInput, onChange ] = useBlockEditorProps(
 			post,
 			template,

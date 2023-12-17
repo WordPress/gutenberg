@@ -17,6 +17,7 @@ const { Tabs } = unlock( componentsPrivateApis );
 const SettingsHeader = () => {
 	const { documentLabel, isTemplateMode } = useSelect( ( select ) => {
 		const { getPostTypeLabel, getRenderingMode } = select( editorStore );
+
 		return {
 			// translators: Default label for the Document sidebar tab, not selected.
 			documentLabel: getPostTypeLabel() || _x( 'Document', 'noun' ),
@@ -27,8 +28,7 @@ const SettingsHeader = () => {
 	return (
 		<Tabs.TabList>
 			<Tabs.Tab tabId={ sidebars.document }>
-				{ isTemplateMode && __( 'Template' ) }
-				{ ! isTemplateMode && documentLabel }
+				{ isTemplateMode ? __( 'Template' ) : documentLabel }
 			</Tabs.Tab>
 			<Tabs.Tab tabId={ sidebars.block }>
 				{ /* translators: Text label for the Block Settings Sidebar tab. */ }

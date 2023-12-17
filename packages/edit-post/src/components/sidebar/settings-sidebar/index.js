@@ -49,7 +49,6 @@ const SidebarContent = ( {
 	sidebarName,
 	keyboardShortcut,
 	isTemplateMode,
-	isPatternMode,
 } ) => {
 	// Because `PluginSidebarEditPost` renders a `ComplementaryArea`, we
 	// need to forward the `Tabs` context so it can be passed through the
@@ -78,7 +77,7 @@ const SidebarContent = ( {
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
-					{ ! isTemplateMode && ! isPatternMode && (
+					{ ! isTemplateMode && (
 						<>
 							<PostStatus />
 							<PluginDocumentSettingPanel.Slot />
@@ -129,7 +128,6 @@ const SettingsSidebar = () => {
 		const shortcut = select(
 			keyboardShortcutsStore
 		).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
-
 		return {
 			sidebarName: sidebar,
 			isSettingsSidebarActive: isSettingsSidebar,
