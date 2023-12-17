@@ -72,12 +72,12 @@ function Header( {
 		showIconLabels,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
-		const renderingMode = select( editorStore ).getRenderingMode();
 		return {
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			isEditingTemplate: renderingMode === 'template-only',
+			isEditingTemplate:
+				select( editorStore ).getRenderingMode() === 'template-only',
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core/edit-post', 'fixedToolbar' ),
