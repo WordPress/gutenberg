@@ -1,28 +1,6 @@
-# Styles in the editor
+# Styles in the Editor
 
 This document introduces the main concepts related to styles that affect the user content in the block editor. It points to the relevant reference guides and tutorials for readers to dig deeper into each one of the ideas presented. It's aimed to block authors and people working in the block editor project.
-
-1. [HTML and CSS](#html-and-css)
-2. [Block styles](#block-styles)
-
--   [From UI controls to HTML markup](#from-ui-controls-to-html-markup)
--   [Block Supports API](#block-supports-api)
--   [Current limitations of the Block Supports API](#current-limitations-of-the-block-supports-api)
-
-3. [Global styles](#global-styles)
-
--   [Gather data](#gather-data)
--   [Consolidate data](#consolidate-data)
--   [From data to styles](#from-data-to-styles)
--   [Current limitations of the Global Styles API](#current-limitations-of-the-global-styles-api)
-
-4. [Layout styles](#layout-styles)
-
--   [Base layout styles](#base-layout-styles)
--   [Individual layout styles](#individual-layout-styles)
--   [Available layout types](#available-layout-types)
--   [Targeting layout or container blocks from themes](#targeting-layout-or-container-blocks-from-themes)
--   [Opting out of generated layout styles](#opting-out-of-generated-layout-styles)
 
 ## HTML and CSS
 
