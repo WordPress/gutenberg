@@ -101,6 +101,54 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 	);
 }
 
+function PrimaryActions( { primaryActions, item } ) {
+	return primaryActions.map( ( action ) => {
+		if ( !! action.RenderModal ) {
+			return (
+				<ActionWithModal
+					key={ action.id }
+					action={ action }
+					item={ item }
+					ActionTrigger={ ButtonTrigger }
+				/>
+			);
+		}
+		return (
+			<ButtonTrigger
+				key={ action.id }
+				action={ action }
+				onClick={ () => action.callback( item ) }
+			/>
+		);
+	} );
+}
+
+function SecondaryActions( { secondaryActions, item } ) {
+	// If there is only one secondary action, it should be rendered as a primary action avoid an unnecessary dropdown.
+	if ( secondaryActions.length === 1 ) {
+		return (
+			<PrimaryActions primaryActions={ secondaryActions } item={ item } />
+		);
+	}
+	return (
+		<DropdownMenu
+			trigger={
+				<Button
+					size="compact"
+					icon={ moreVertical }
+					label={ __( 'Actions' ) }
+				/>
+			}
+			placement="bottom-end"
+		>
+			<ActionsDropdownMenuGroup
+				actions={ secondaryActions }
+				item={ item }
+			/>
+		</DropdownMenu>
+	);
+}
+
 export default function ItemActions( { item, actions, isCompact } ) {
 	const { primaryActions, secondaryActions } = useMemo( () => {
 		return actions.reduce(
@@ -141,42 +189,17 @@ export default function ItemActions( { item, actions, isCompact } ) {
 				width: 'auto',
 			} }
 		>
-			{ !! primaryActions.length &&
-				primaryActions.map( ( action ) => {
-					if ( !! action.RenderModal ) {
-						return (
-							<ActionWithModal
-								key={ action.id }
-								action={ action }
-								item={ item }
-								ActionTrigger={ ButtonTrigger }
-							/>
-						);
-					}
-					return (
-						<ButtonTrigger
-							key={ action.id }
-							action={ action }
-							onClick={ () => action.callback( item ) }
-						/>
-					);
-				} ) }
+			{ !! primaryActions.length && (
+				<PrimaryActions
+					primaryActions={ primaryActions }
+					item={ item }
+				/>
+			) }
 			{ !! secondaryActions.length && (
-				<DropdownMenu
-					trigger={
-						<Button
-							size="compact"
-							icon={ moreVertical }
-							label={ __( 'Actions' ) }
-						/>
-					}
-					placement="bottom-end"
-				>
-					<ActionsDropdownMenuGroup
-						actions={ secondaryActions }
-						item={ item }
-					/>
-				</DropdownMenu>
+				<SecondaryActions
+					item={ item }
+					secondaryActions={ secondaryActions }
+				/>
 			) }
 		</HStack>
 	);
