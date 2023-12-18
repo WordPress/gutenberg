@@ -118,6 +118,12 @@ type BaseButtonProps = {
 	 * Whether this is focusable.
 	 */
 	__experimentalIsFocusable?: boolean;
+
+	tooltipPortal?: boolean;
+	tooltipPortalElement?:
+		| HTMLElement
+		| ( ( element: HTMLElement ) => HTMLElement | null )
+		| null;
 };
 
 type _ButtonProps = {

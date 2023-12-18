@@ -31,6 +31,7 @@ function ButtonTrigger( { action, onClick } ) {
 			isDestructive={ action.isDestructive }
 			size="compact"
 			onClick={ onClick }
+			tooltipPortal={ false }
 		/>
 	);
 }
@@ -168,6 +169,7 @@ export default function ItemActions( { item, actions, isCompact } ) {
 							size="compact"
 							icon={ moreVertical }
 							label={ __( 'Actions' ) }
+							tooltipPortal={ false }
 						/>
 					}
 					placement="bottom-end"
@@ -190,6 +192,7 @@ function CompactItemActions( { item, primaryActions, secondaryActions } ) {
 					size="compact"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
+					tooltipPortal={ false }
 				/>
 			}
 			placement="bottom-end"
