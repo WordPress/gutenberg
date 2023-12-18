@@ -16,6 +16,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Guard against an Image block styles crash due to null block values [#56903]
 -   [**] Fix crash when sharing unsupported media types on Android [#56791]
 -   [**] Fix regressions with wrapper props and font size customization [#56985]
+-   [***] Avoid keyboard dismiss when interacting with text blocks [#57070]
 
 ## 1.109.3
 -   [**] Fix duplicate/unresponsive options in font size settings. [#56985]
