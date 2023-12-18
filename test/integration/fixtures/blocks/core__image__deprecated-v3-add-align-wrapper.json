@@ -7,8 +7,8 @@
 			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
 			"alt": "",
 			"caption": "",
-			"width": 100,
-			"height": 100
+			"width": "100px",
+			"height": "100px"
 		},
 		"innerBlocks": []
 	}
