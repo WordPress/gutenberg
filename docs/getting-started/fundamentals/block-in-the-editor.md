@@ -152,7 +152,7 @@ export default function Edit( { attributes, setAttributes } ) {
 	);
 }
 ```
-_See the [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/settings-sidebar-82c525) of the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/settings-sidebar-82c525/src/edit.js)_
+_See the [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/settings-sidebar-82c525) of the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/settings-sidebar-82c525/src/edit.js)._
 
 Block controls rendered in both the toolbar and sidebar will also be used when multiple blocks of the same type are selected.
 
