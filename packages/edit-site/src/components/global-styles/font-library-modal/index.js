@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Modal, TabPanel } from '@wordpress/components';
+import {
+	Modal,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -12,17 +15,18 @@ import InstalledFonts from './installed-fonts';
 import FontCollection from './font-collection';
 import UploadFonts from './upload-fonts';
 import { FontLibraryContext } from './context';
+import { unlock } from '../../../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 const DEFAULT_TABS = [
 	{
 		name: 'installed-fonts',
 		title: __( 'Library' ),
-		className: 'installed-fonts',
 	},
 	{
 		name: 'upload-fonts',
 		title: __( 'Upload' ),
-		className: 'upload-fonts',
 	},
 ];
 
@@ -33,7 +37,6 @@ const tabsFromCollections = ( collections ) =>
 			collections.length === 1 && id === 'default-font-collection'
 				? __( 'Install Fonts' )
 				: name,
-		className: 'collection',
 	} ) );
 
 function FontLibraryModal( {
@@ -54,22 +57,39 @@ function FontLibraryModal( {
 			isFullScreen
 			className="font-library-modal"
 		>
-			<TabPanel
-				className="font-library-modal__tab-panel"
-				initialTabName={ initialTabName }
-				tabs={ tabs }
-			>
-				{ ( tab ) => {
-					switch ( tab.name ) {
-						case 'upload-fonts':
-							return <UploadFonts />;
-						case 'installed-fonts':
-							return <InstalledFonts />;
-						default:
-							return <FontCollection id={ tab.name } />;
-					}
-				} }
-			</TabPanel>
+			<div className="font-library-modal__tab-panel">
+				<Tabs initialTabId={ initialTabName }>
+					<Tabs.TabList>
+						{ tabs.map( ( { name, title } ) => (
+							<Tabs.Tab key={ name } tabId={ name }>
+								{ title }
+							</Tabs.Tab>
+						) ) }
+					</Tabs.TabList>
+					{ tabs.map( ( { name } ) => {
+						let contents;
+						switch ( name ) {
+							case 'upload-fonts':
+								contents = <UploadFonts />;
+								break;
+							case 'installed-fonts':
+								contents = <InstalledFonts />;
+								break;
+							default:
+								contents = <FontCollection id={ name } />;
+						}
+						return (
+							<Tabs.TabPanel
+								key={ name }
+								tabId={ name }
+								focusable="false"
+							>
+								{ contents }
+							</Tabs.TabPanel>
+						);
+					} ) }
+				</Tabs>
+			</div>
 		</Modal>
 	);
 }
