@@ -14,6 +14,8 @@ import {
 	__experimentalGetParsedPattern,
 	canInsertBlockType,
 	__experimentalGetAllowedPatterns,
+	getSelectedBlockClientIds,
+	__unstableGetVisibleBlocks,
 } from './selectors';
 import { getAllPatterns, checkAllowListRecursive } from './utils';
 
@@ -286,3 +288,25 @@ export const hasAllowedPatterns = createSelector(
 export function getLastFocus( state ) {
 	return state.lastFocus;
 }
+
+export const getBlockOrderWithAsyncFlag = createSelector(
+	( state, rootClientId ) => {
+		const order = getBlockOrder( state, rootClientId );
+		const selectedBlocks = getSelectedBlockClientIds( state );
+		const visibleBlocks = __unstableGetVisibleBlocks( state );
+		return order.map( ( clientId ) => ( {
+			clientId,
+			// Only provide data asynchronously if the block is
+			// not visible and not selected.
+			isAsync:
+				! visibleBlocks?.has( clientId ) &&
+				! selectedBlocks?.includes( clientId ),
+		} ) );
+	},
+	( state ) => [
+		state.blocks.order,
+		state.selection.selectionStart.clientId,
+		state.selection.selectionEnd.clientId,
+		state.blockVisibility,
+	]
+);
