@@ -1,10 +1,5 @@
 # TextDecorationControl
 
-The Text Decoration Control component accepts the following props:
-
-- `value` (string, required): The current value of the text decoration. Possible values are `none`, `underline`, `line-through`.
-- `onChange` (function, required): A callback function called when the text decoration value changes. It receives the new value as an argument.
-
 ![TextDecorationControl Element in Inspector Control](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/text-decoration-component.png?raw=true)
 
 ## Table of Contents
