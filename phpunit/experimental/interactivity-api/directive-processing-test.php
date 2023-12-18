@@ -35,7 +35,7 @@ function gutenberg_test_process_directives_helper_increment( $store ) {
  */
 class Tests_Process_Directives extends WP_UnitTestCase {
 	public function test_correctly_call_attribute_directive_processor_on_closing_tag() {
-
+		$context = new WP_Directive_Context();
 		// PHPUnit cannot stub functions, only classes.
 		$test_helper = $this->createMock( Helper_Class::class );
 
@@ -59,11 +59,12 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		);
 
 		$markup = '<div>Example: <div foo-test="abc"><img><span>This is a test></span><div>Here is a nested div</div></div></div>';
-		$tags   = new WP_Directive_Processor( $markup );
-		$tags->process_rendered_html( $tags, 'foo-', $directives );
+
+		gutenberg_process_interactive_html( $markup, array(), $context, $directives );
 	}
 
 	public function test_directives_with_double_hyphen_processed_correctly() {
+		$context     = new WP_Directive_Context();
 		$test_helper = $this->createMock( Helper_Class::class );
 		$test_helper->expects( $this->atLeastOnce() )
 				->method( 'process_foo_test' );
@@ -73,8 +74,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		);
 
 		$markup = '<div foo-test--value="abc"></div>';
-		$tags   = new WP_Directive_Processor( $markup );
-		$tags->process_rendered_html( $tags, 'foo-', $directives );
+		gutenberg_process_interactive_html( $markup, array(), $context, $directives );
 	}
 
 	public function test_interactivity_process_directives_in_root_blocks() {
