@@ -78,19 +78,19 @@ export function PatternCategoryPreviews( {
 					return true;
 				}
 
-				if ( category.name !== 'uncategorized' ) {
-					return pattern.categories?.includes( category.name );
+				if ( category.name === 'uncategorized' ) {
+					// The uncategorized category should show all the patterns without any category...
+					if ( ! pattern.categories ) {
+						return true;
+					}
+
+					// ...or with no available category.
+					return ! pattern.categories.some( ( catName ) =>
+						availableCategories.some( ( c ) => c.name === catName )
+					);
 				}
 
-				// The uncategorized category should show all the patterns without any category
-				// or with no available category.
-				if ( ! pattern.categories ) {
-					return true;
-				}
-
-				return ! pattern.categories.some( ( catName ) =>
-					availableCategories.some( ( cat ) => cat.name === catName )
-				);
+				return pattern.categories?.includes( category.name );
 			} ),
 		[
 			allPatterns,
