@@ -30,6 +30,7 @@ export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
 export { default as PostAuthorPanel } from './post-author/panel';
 export { default as PostComments } from './post-comments';
+export { default as PostDiscussionPanel } from './post-discussion/panel';
 export { default as PostExcerpt } from './post-excerpt';
 export { default as PostExcerptCheck } from './post-excerpt/check';
 export { default as PostExcerptPanel } from './post-excerpt/panel';
