@@ -20,7 +20,9 @@ class Gutenberg_Modules {
 	private static $registered = array();
 
 	/**
+	 * An array of modules that were enqueued before they were registered.
 	 *
+	 * @var array
 	 */
 	private static $enqueued_modules_before_register = array();
 
@@ -34,7 +36,6 @@ class Gutenberg_Modules {
 	 * @param string|bool|null $version           Optional. Defaults to false. String specifying module version number. It is added to the URL as a query string for cache busting purposes. If SCRIPT_DEBUG is true, a timestamp is used. If it is set to false, a version number is automatically added equal to current installed WordPress version. If set to null, no version is added.
 	 */
 	public static function register( $module_identifier, $src, $dependencies = array(), $version = false ) {
-		// Register the module if it's not already registered.
 		if ( ! isset( self::$registered[ $module_identifier ] ) ) {
 			$deps = array();
 			foreach ( $dependencies as $dependency ) {
@@ -164,7 +165,12 @@ class Gutenberg_Modules {
 	}
 
 	/**
+	 * Retrieves an array of enqueued modules.
 	 *
+	 * Compiles an associative array of modules that have been enqueued for use on
+	 * the page, containing module information such as source and version.
+	 *
+	 * @return array Associative array of enqueued modules keyed by module identifier.
 	 */
 	private static function get_enqueued() {
 		$enqueued = array();
@@ -177,13 +183,15 @@ class Gutenberg_Modules {
 	}
 
 	/**
-	 * Returns all unique static and/or dynamic dependencies for the received
-	 * modules. It's recursive, so it will also get the static or dynamic
-	 * dependencies of the dependencies.
+	 * Retrieves all unique dependencies for given modules depending on type.
 	 *
-	 * @param array $modules The array of modules to get dependencies for.
-	 * @param array $types   The type of dependencies to retrieve. It can be `static`, `dynamic` or both.
-	 * @return array The array containing the unique dependencies of the modules.
+	 * This method is recursive to also retrieve dependencies of the dependencies.
+	 * It will consolidate an array containing unique dependencies based on the
+	 * requested types ('static' or 'dynamic').
+	 *
+	 * @param array $module_identifiers The identifiers of the modules for which to gather dependencies.
+	 * @param array $types              Optional. Types of dependencies to retrieve: 'static', 'dynamic', or both. Default is both.
+	 * @return array Associative array of modules keyed by module identifier.
 	 */
 	private static function get_dependencies( $module_identifiers, $types = array( 'static', 'dynamic' ) ) {
 		return array_reduce(
