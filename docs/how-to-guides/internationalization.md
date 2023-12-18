@@ -91,7 +91,7 @@ When you set script translations for a handle WordPress will automatically figur
 
 You can create and ship your own translations with your plugin, if you have sufficient knowledge of the language(s) you can ensure the translations are available.
 
-### Create atranslation file
+### Create the translation file
 
 The translation files must be in the JED 1.x JSON format.
 
