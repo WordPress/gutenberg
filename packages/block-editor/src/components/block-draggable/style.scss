@@ -14,11 +14,9 @@
 	display: inline-flex;
 	height: $block-toolbar-height;
 	padding: 0 ( $grid-unit-15 + $border-width );
+	position: relative;
 	user-select: none;
 	width: max-content;
-	transition:
-		background-color 0.5s linear,
-		opacity 0.5s linear;
 
 	svg {
 		fill: currentColor;
@@ -49,9 +47,33 @@
 	}
 }
 
+// Specificity bump to override native component style.
+.block-editor-block-draggable-chip__disabled.block-editor-block-draggable-chip__disabled {
+	opacity: 0;
+	position: absolute;
+	top: 0;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: transparent;
+	background-color: transparent;
+	transition: all 0.1s linear 0.1s;
+
+	.block-editor-block-icon {
+		color: inherit;
+
+	}
+}
+
 .block-draggable-invalid-drag-token {
-	.block-editor-block-draggable-chip-fade .block-editor-block-draggable-chip {
-		background-color: $gray-600;
-		opacity: 0.8;
+
+	.block-editor-block-draggable-chip__disabled.block-editor-block-draggable-chip__disabled {
+		background-color: $gray-700;
+		opacity: 1;
+		box-shadow: 0 4px 8px rgba($black, 0.2);
+		color: $white;
 	}
 }

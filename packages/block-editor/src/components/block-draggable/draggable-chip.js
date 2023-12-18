@@ -1,14 +1,9 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Flex, FlexItem } from '@wordpress/components';
-import { dragHandle } from '@wordpress/icons';
+import { dragHandle, cancelCircleFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -19,16 +14,11 @@ export default function BlockDraggableChip( {
 	count,
 	icon,
 	isPattern,
-	className,
+	fadeWhenDisabled,
 } ) {
 	const patternLabel = isPattern && __( 'Pattern' );
 	return (
-		<div
-			className={ classnames(
-				'block-editor-block-draggable-chip-wrapper',
-				className
-			) }
-		>
+		<div className="block-editor-block-draggable-chip-wrapper">
 			<div
 				className="block-editor-block-draggable-chip"
 				data-testid="block-draggable-chip"
@@ -52,6 +42,11 @@ export default function BlockDraggableChip( {
 					<FlexItem>
 						<BlockIcon icon={ dragHandle } />
 					</FlexItem>
+					{ fadeWhenDisabled && (
+						<FlexItem className="block-editor-block-draggable-chip__disabled">
+							<BlockIcon icon={ cancelCircleFilled } />
+						</FlexItem>
+					) }
 				</Flex>
 			</div>
 		</div>

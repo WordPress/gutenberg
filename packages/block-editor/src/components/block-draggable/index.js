@@ -94,7 +94,7 @@ const BlockDraggable = ( {
 	// The listener has to be inside the editor iframe otherwise the target isn't accessible.
 	// Check if the dragged blocks are allowed inside the target. If not, grey out the draggable.
 	useEffect( () => {
-		if ( ! editorRoot ) {
+		if ( ! editorRoot || ! fadeWhenDisabled ) {
 			return;
 		}
 
@@ -192,10 +192,7 @@ const BlockDraggable = ( {
 				<BlockDraggableChip
 					count={ clientIds.length }
 					icon={ icon }
-					className={
-						fadeWhenDisabled &&
-						'block-editor-block-draggable-chip-fade'
-					}
+					fadeWhenDisabled
 				/>
 			}
 		>
