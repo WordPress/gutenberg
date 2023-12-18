@@ -233,8 +233,9 @@ export function parseRawBlock( rawBlock, options ) {
 		normalizedBlock.blockName,
 		getBlockAttributes(
 			blockType,
-			normalizedBlock.innerDom,
-			normalizedBlock.attrs
+			normalizedBlock.innerHTML,
+			normalizedBlock.attrs,
+			normalizedBlock.innerDom
 		),
 		parsedInnerBlocks
 	);

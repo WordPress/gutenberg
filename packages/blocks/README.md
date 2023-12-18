@@ -97,6 +97,7 @@ _Parameters_
 -   _blockTypeOrName_ `string|Object`: Block type or name.
 -   _innerHTML_ `string|Node`: Raw block content.
 -   _attributes_ `?Object`: Known block attributes (from delimiters).
+-   _innerDom_ `?Node`: Raw block content parsed into DOM.
 
 _Returns_
 
