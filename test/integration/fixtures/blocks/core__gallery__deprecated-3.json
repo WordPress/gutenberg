@@ -3,10 +3,15 @@
 		"name": "core/gallery",
 		"isValid": true,
 		"attributes": {
+			"images": [],
+			"ids": [],
+			"shortCodeTransforms": [],
 			"imageCrop": true,
+			"fixedHeight": true,
 			"linkTo": "none",
-			"align": "wide",
-			"allowResize": false
+			"sizeSlug": "large",
+			"allowResize": false,
+			"align": "wide"
 		},
 		"innerBlocks": [
 			{

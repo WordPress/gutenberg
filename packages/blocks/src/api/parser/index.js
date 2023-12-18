@@ -20,6 +20,7 @@ import { serializeRawBlock } from './serialize-raw-block';
 import { getBlockAttributes } from './get-block-attributes';
 import { applyBlockDeprecatedVersions } from './apply-block-deprecated-versions';
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
+import { __experimentalSanitizeBlockAttributes } from '../utils';
 
 /**
  * The raw structure of a block includes its attributes, inner
@@ -252,6 +253,15 @@ export function parseRawBlock( rawBlock, options ) {
 		normalizedBlock,
 		blockType
 	);
+
+	if ( validateBlock !== updatedBlock ) {
+		// We want to ensure that new attributes get the correct defaults, and that
+		// types are correct. Any unmigrated attributes should also be deleted.
+		updatedBlock.attributes = __experimentalSanitizeBlockAttributes(
+			blockType,
+			updatedBlock.attributes
+		);
+	}
 
 	if ( ! updatedBlock.isValid ) {
 		// Preserve the original unprocessed version of the block

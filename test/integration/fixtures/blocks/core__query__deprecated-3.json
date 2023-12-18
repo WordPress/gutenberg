@@ -18,6 +18,7 @@
 				"inherit": false
 			},
 			"tagName": "div",
+			"enhancedPagination": false,
 			"align": "wide"
 		},
 		"innerBlocks": [

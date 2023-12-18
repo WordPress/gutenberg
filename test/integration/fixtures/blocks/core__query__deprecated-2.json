@@ -21,7 +21,8 @@
 					"post_tag": [ 6 ]
 				}
 			},
-			"tagName": "div"
+			"tagName": "div",
+			"enhancedPagination": false
 		},
 		"innerBlocks": [
 			{

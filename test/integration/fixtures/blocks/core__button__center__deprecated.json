@@ -3,6 +3,8 @@
 		"name": "core/button",
 		"isValid": true,
 		"attributes": {
+			"tagName": "a",
+			"type": "button",
 			"url": "https://github.com/WordPress/gutenberg",
 			"text": "Help build Gutenberg",
 			"className": "aligncenter"

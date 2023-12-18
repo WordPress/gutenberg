@@ -3,7 +3,6 @@
 		"name": "core/image",
 		"isValid": true,
 		"attributes": {
-			"align": "left",
 			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
 			"alt": "",
 			"caption": "",
@@ -11,7 +10,8 @@
 			"width": 358,
 			"height": 164,
 			"sizeSlug": "large",
-			"linkDestination": "none"
+			"linkDestination": "none",
+			"align": "left"
 		},
 		"innerBlocks": []
 	}

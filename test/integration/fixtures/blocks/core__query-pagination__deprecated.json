@@ -2,7 +2,10 @@
 	{
 		"name": "core/query-pagination",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"paginationArrow": "none",
+			"showLabel": true
+		},
 		"innerBlocks": []
 	}
 ]

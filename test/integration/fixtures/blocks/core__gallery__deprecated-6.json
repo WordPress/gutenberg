@@ -3,8 +3,12 @@
 		"name": "core/gallery",
 		"isValid": true,
 		"attributes": {
+			"images": [],
+			"ids": [],
+			"shortCodeTransforms": [],
 			"caption": "",
 			"imageCrop": true,
+			"fixedHeight": true,
 			"linkTo": "media",
 			"sizeSlug": "large",
 			"allowResize": false
