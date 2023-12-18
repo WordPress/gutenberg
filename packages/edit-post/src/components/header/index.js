@@ -37,12 +37,11 @@ import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
-import ViewLink from '../view-link';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { PreviewDropdown } = unlock( editorPrivateApis );
+const { PostViewLink, PreviewDropdown } = unlock( editorPrivateApis );
 
 const slideY = {
 	hidden: { y: '-50px' },
@@ -189,7 +188,7 @@ function Header( {
 					className="edit-post-header__post-preview-button"
 					forceIsAutosaveable={ hasActiveMetaboxes }
 				/>
-				<ViewLink />
+				<PostViewLink />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					setEntitiesSavedStatesCallback={
