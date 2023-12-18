@@ -14,7 +14,7 @@ import type {
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-import { forwardRef, useMemo } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -252,32 +252,21 @@ export function UnforwardedButton(
 	// In order to avoid some React reconciliation issues, we are always rendering
 	// the `Tooltip` component even when `shouldShowTooltip` is `false`.
 	// In order to make sure that the tooltip doesn't show when it shouldn't,
-	// we don't pass the props to the `Tooltip` componet.
-	const tooltipProps = useMemo(
-		() =>
-			( shouldShowTooltip
-				? {
-						text:
-							( children as string | ReactElement[] )?.length &&
-							describedBy
-								? describedBy
-								: label,
-						shortcut,
-						placement:
-							tooltipPosition &&
-							// Convert legacy `position` values to be used with the new `placement` prop
-							positionToPlacement( tooltipPosition ),
-				  }
-				: {} ) as Partial< React.ComponentProps< typeof Tooltip > >,
-		[
-			shouldShowTooltip,
-			children,
-			describedBy,
-			label,
-			shortcut,
-			tooltipPosition,
-		]
-	);
+	// we don't pass the props to the `Tooltip` component.
+	const tooltipProps = shouldShowTooltip
+		? {
+				text:
+					( children as string | ReactElement[] )?.length &&
+					describedBy
+						? describedBy
+						: label,
+				shortcut,
+				placement:
+					tooltipPosition &&
+					// Convert legacy `position` values to be used with the new `placement` prop
+					positionToPlacement( tooltipPosition ),
+		  }
+		: {};
 
 	return (
 		<>
