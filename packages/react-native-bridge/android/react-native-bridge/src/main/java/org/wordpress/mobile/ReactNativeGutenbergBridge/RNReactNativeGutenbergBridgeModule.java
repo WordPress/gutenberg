@@ -571,7 +571,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
                     @Override
                     public void onWindowFocusChanged(boolean hasFocus) {
                         if (hasFocus) {
-                            mKeyboardRunnable = createShowKeyboardRunnable(currentActivity);
+                            mKeyboardRunnable = createShowKeyboardRunnable();
                             currentActivity.getWindow().getDecorView().post(mKeyboardRunnable);
                             currentFocusedView.getViewTreeObserver().removeOnWindowFocusChangeListener(this);
                         }
@@ -581,13 +581,14 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         }
     }
 
-    private Runnable createShowKeyboardRunnable(final Activity currentActivity) {
+    private Runnable createShowKeyboardRunnable() {
         return new Runnable() {
             @Override
             public void run() {
                 try {
+                    Activity activity = mReactContext.getCurrentActivity();
                     View activeFocusedView = getCurrentFocusedView();
-                    if (activeFocusedView != null && currentActivity.getWindow().getDecorView().isShown()) {
+                    if (activeFocusedView != null && activity.getWindow().getDecorView().isShown()) {
                         InputMethodManager imm =
                             (InputMethodManager) mReactContext.getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.showSoftInput(activeFocusedView, InputMethodManager.SHOW_IMPLICIT);
