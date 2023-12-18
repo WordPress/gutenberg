@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
 import { useMemo, Platform, useCallback } from '@wordpress/element';
-import { pure } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -267,7 +266,7 @@ function ColorInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-function ColorEditPure( { clientId, name, setAttributes, settings } ) {
+export function ColorEdit( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasColorPanel( settings );
 	function selector( select ) {
 		const { style, textColor, backgroundColor, gradient } =
@@ -335,11 +334,6 @@ function ColorEditPure( { clientId, name, setAttributes, settings } ) {
 		</StylesColorPanel>
 	);
 }
-
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-export const ColorEdit = pure( ColorEditPure );
 
 function useBlockProps( {
 	name,

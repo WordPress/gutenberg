@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { getBlockSupport } from '@wordpress/blocks';
 import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
-import { pure } from '@wordpress/compose';
 import { Platform, useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
@@ -133,7 +132,7 @@ function BordersInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-function BorderPanelPure( { clientId, name, setAttributes, settings } ) {
+export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasBorderPanel( settings );
 	function selector( select ) {
 		const { style, borderColor } =
@@ -169,11 +168,6 @@ function BorderPanelPure( { clientId, name, setAttributes, settings } ) {
 		/>
 	);
 }
-
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-export const BorderPanel = pure( BorderPanelPure );
 
 /**
  * Determine whether there is block support for border properties.
