@@ -67,16 +67,11 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
-	const { showPatterns, hasReusableBlocks } = useSelect(
+	const { showPatterns } = useSelect(
 		( select ) => {
-			const { hasAllowedPatterns, getInserterItems } = unlock(
-				select( blockEditorStore )
-			);
+			const { hasAllowedPatterns } = unlock( select( blockEditorStore ) );
 			return {
 				showPatterns: hasAllowedPatterns( destinationRootClientId ),
-				hasReusableBlocks: getInserterItems(
-					destinationRootClientId
-				).some( ( item ) => item.category === 'reusable' ),
 			};
 		},
 		[ destinationRootClientId ]
@@ -208,9 +203,7 @@ function InserterMenu(
 		selectedTab === 'patterns' &&
 		! delayedFilterValue &&
 		selectedPatternCategory;
-	const showAsTabs =
-		! delayedFilterValue &&
-		( showPatterns || hasReusableBlocks || showMedia );
+	const showAsTabs = ! delayedFilterValue && ( showPatterns || showMedia );
 	const showMediaPanel =
 		selectedTab === 'media' &&
 		! delayedFilterValue &&
@@ -264,7 +257,6 @@ function InserterMenu(
 				{ showAsTabs && (
 					<InserterTabs
 						showPatterns={ showPatterns }
-						showReusableBlocks={ hasReusableBlocks }
 						showMedia={ showMedia }
 						prioritizePatterns={ prioritizePatterns }
 						onSelect={ handleSetSelectedTab }
