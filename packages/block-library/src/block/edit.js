@@ -8,12 +8,12 @@ import classnames from 'classnames';
  */
 import { useRegistry, useSelect, useDispatch } from '@wordpress/data';
 import { useRef, useMemo, useEffect } from '@wordpress/element';
-import { useEntityProp, useEntityRecord } from '@wordpress/core-data';
+import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner,
-	TextControl,
-	PanelBody,
+	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -21,13 +21,15 @@ import {
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
 	InnerBlocks,
-	InspectorControls,
 	useBlockProps,
 	Warning,
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
+	BlockControls,
 } from '@wordpress/block-editor';
 import { getBlockSupport, parse } from '@wordpress/blocks';
+import { store as editorStore } from '@wordpress/editor';
+import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -132,6 +134,30 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 	return Object.keys( overrides ).length > 0 ? overrides : undefined;
 }
 
+function setBlockEditMode( setEditMode, blocks ) {
+	blocks.forEach( ( block ) => {
+		const editMode = isPartiallySynced( block )
+			? 'contentOnly'
+			: 'disabled';
+		setEditMode( block.clientId, editMode );
+		setBlockEditMode( setEditMode, block.innerBlocks );
+	} );
+}
+
+function editSourcePattern( setRenderingMode, patternId ) {
+	const currentArgs = getQueryArgs( window.location.href );
+	const currentUrlWithoutArgs = removeQueryArgs(
+		window.location.href,
+		...Object.keys( currentArgs )
+	);
+	const newUrl = addQueryArgs( currentUrlWithoutArgs, {
+		...currentArgs,
+		patternId,
+	} );
+	window.history.pushState( null, '', newUrl );
+	setRenderingMode( 'pattern-only' );
+}
+
 export default function ReusableBlockEdit( {
 	name,
 	attributes: { ref, overrides },
@@ -139,6 +165,7 @@ export default function ReusableBlockEdit( {
 	clientId: patternClientId,
 	setAttributes,
 } ) {
+	const { setRenderingMode } = useDispatch( editorStore );
 	const registry = useRegistry();
 	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, editedRecord, hasResolved } = useEntityRecord(
@@ -149,13 +176,37 @@ export default function ReusableBlockEdit( {
 	const isMissing = hasResolved && ! record;
 	const initialOverrides = useRef( overrides );
 	const defaultValuesRef = useRef( {} );
+
 	const {
 		replaceInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 		setBlockEditingMode,
 	} = useDispatch( blockEditorStore );
-	const { getBlockEditingMode } = useSelect( blockEditorStore );
 	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
+
+	const { innerBlocks, userCanEdit, getBlockEditingMode } = useSelect(
+		( select ) => {
+			const { canUser } = select( coreStore );
+			const { getBlocks, getBlockEditingMode: editingMode } =
+				select( blockEditorStore );
+
+			const blocks = getBlocks( patternClientId );
+			const canEdit = canUser( 'update', 'blocks', ref );
+
+			// For editing link to the site editor if the theme and user permissions support it.
+			return {
+				innerBlocks: blocks,
+				userCanEdit: canEdit,
+				getBlockEditingMode: editingMode,
+			};
+		},
+		[ patternClientId, ref ]
+	);
+
+	useEffect(
+		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
+		[ innerBlocks, setBlockEditingMode ]
+	);
 
 	// Apply the initial overrides from the pattern block to the inner blocks.
 	useEffect( () => {
@@ -192,18 +243,6 @@ export default function ReusableBlockEdit( {
 		setBlockEditingMode,
 		syncDerivedUpdates,
 	] );
-
-	const innerBlocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks( patternClientId ),
-		[ patternClientId ]
-	);
-
-	const [ title, setTitle ] = useEntityProp(
-		'postType',
-		'wp_block',
-		'title',
-		ref
-	);
 
 	const { alignment, layout } = useInferredLayout(
 		innerBlocks,
@@ -275,17 +314,19 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			<InspectorControls>
-				<PanelBody>
-					<TextControl
-						label={ __( 'Name' ) }
-						value={ title }
-						onChange={ setTitle }
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-					/>
-				</PanelBody>
-			</InspectorControls>
+			{ userCanEdit && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ () =>
+								editSourcePattern( setRenderingMode, ref )
+							}
+						>
+							{ __( 'Edit' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
 			{ children === null ? (
 				<div { ...innerBlocksProps } />
 			) : (
