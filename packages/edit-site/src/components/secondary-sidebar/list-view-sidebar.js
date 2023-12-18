@@ -11,17 +11,17 @@ import { closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
 export default function ListViewSidebar( { listViewToggleElement } ) {
-	const { setIsListViewOpened } = useDispatch( editSiteStore );
+	const { setIsListViewOpened } = useDispatch( editorStore );
 
 	// This hook handles focus when the sidebar first renders.
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );

@@ -11,6 +11,7 @@ import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -28,8 +29,9 @@ export default function EditSitePreferencesModal() {
 	const toggleModal = () =>
 		isModalActive ? closeModal() : openModal( PREFERENCES_MODAL_NAME );
 	const registry = useRegistry();
-	const { closeGeneralSidebar, setIsListViewOpened, setIsInserterOpened } =
-		useDispatch( editSiteStore );
+	const { closeGeneralSidebar } = useDispatch( editSiteStore );
+	const { setIsListViewOpened, setIsInserterOpened } =
+		useDispatch( editorStore );
 
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const toggleDistractionFree = () => {
