@@ -129,10 +129,10 @@ const vendorsCopyConfig = Object.entries( vendors ).flatMap(
 module.exports = {
 	...baseConfig,
 	name: 'packages',
-	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
-		return {
-			...memo,
-			[ packageName ]: {
+	entry: Object.fromEntries(
+		gutenbergPackages.map( ( packageName ) => [
+			packageName,
+			{
 				import: `./packages/${ packageName }`,
 				library: {
 					name: [ 'wp', camelCaseDash( packageName ) ],
@@ -142,8 +142,8 @@ module.exports = {
 						: undefined,
 				},
 			},
-		};
-	}, {} ),
+		] )
+	),
 	output: {
 		devtoolNamespace: 'wp',
 		filename: './build/[name]/index.min.js',
