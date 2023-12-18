@@ -142,9 +142,10 @@ function Layout() {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const { openGeneralSidebar, closeGeneralSidebar, setIsInserterOpened } =
+	const { openGeneralSidebar, closeGeneralSidebar } =
 		useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { setIsInserterOpened } = useDispatch( editorStore );
 	const {
 		mode,
 		isFullscreenActive,
@@ -176,8 +177,8 @@ function Layout() {
 			),
 			isFullscreenActive:
 				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
-			isInserterOpened: select( editPostStore ).isInserterOpened(),
-			isListViewOpened: select( editPostStore ).isListViewOpened(),
+			isInserterOpened: select( editorStore ).isInserterOpened(),
+			isListViewOpened: select( editorStore ).isListViewOpened(),
 			mode: select( editPostStore ).getEditorMode(),
 			isRichEditingEnabled: editorSettings.richEditingEnabled,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),

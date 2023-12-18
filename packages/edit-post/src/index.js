@@ -79,7 +79,7 @@ export function initializeEditor(
 		select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) &&
 		! select( editPostStore ).isFeatureActive( 'distractionFree' )
 	) {
-		dispatch( editPostStore ).setIsListViewOpened( true );
+		dispatch( editorStore ).setIsListViewOpened( true );
 	}
 
 	registerCoreBlocks();

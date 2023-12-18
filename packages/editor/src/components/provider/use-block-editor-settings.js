@@ -25,7 +25,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
 	'__experimentalPreferredStyleVariations',
-	'__experimentalSetIsInserterOpened',
 	'__unstableGalleryWithImageBlocks',
 	'alignWide',
 	'allowedBlockTypes',
@@ -178,7 +177,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
-	const { undo } = useDispatch( editorStore );
+	const { undo, setIsInserterOpened } = useDispatch( editorStore );
 
 	const { saveEntityRecord } = useDispatch( coreStore );
 
@@ -239,6 +238,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				postType === 'wp_navigation'
 					? [ [ 'core/navigation', {}, [] ] ]
 					: settings.template,
+			__experimentalSetIsInserterOpened: setIsInserterOpened,
 		} ),
 		[
 			settings,
@@ -254,6 +254,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			pageOnFront,
 			pageForPosts,
 			postType,
+			setIsInserterOpened,
 		]
 	);
 }

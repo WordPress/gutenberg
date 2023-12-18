@@ -193,6 +193,8 @@ const {
 	__experimentalGetTemplateInfo,
 	__experimentalGetDefaultTemplatePartAreas,
 	isEditorPanelRemoved,
+	isInserterOpened,
+	isListViewOpened,
 } = selectors;
 
 const defaultTemplateTypes = [
@@ -3033,6 +3035,28 @@ describe( 'selectors', () => {
 			} );
 
 			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isInserterOpened', () => {
+		it( 'returns the block inserter panel isOpened state', () => {
+			const state = {
+				blockInserterPanel: true,
+			};
+			expect( isInserterOpened( state ) ).toBe( true );
+			state.blockInserterPanel = false;
+			expect( isInserterOpened( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isListViewOpened', () => {
+		it( 'returns the list view panel isOpened state', () => {
+			const state = {
+				listViewPanel: true,
+			};
+			expect( isListViewOpened( state ) ).toBe( true );
+			state.listViewPanel = false;
+			expect( isListViewOpened( state ) ).toBe( false );
 		} );
 	} );
 } );
