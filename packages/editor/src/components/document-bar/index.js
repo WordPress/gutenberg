@@ -59,38 +59,27 @@ export default function DocumentBar() {
 		templateId,
 		postType,
 		postId,
-		isEditingPattern,
+
 		dirtyEntityRecords,
-	} = useSelect(
-		( select ) => {
-			const {
-				getRenderingMode,
-				getCurrentTemplateId,
-				getCurrentPostId,
-				getCurrentPostType,
-			} = select( editorStore );
-			const { __experimentalGetDirtyEntityRecords } =
-				select( coreDataStore );
-			const _templateId = getCurrentTemplateId();
-			const renderingMode = getRenderingMode();
-			return {
-				isEditingTemplate:
-					!! _templateId && renderingMode === 'template-only',
-				isEditingPattern: renderingMode === 'pattern-only',
-				templateId: _templateId,
-				postType:
-					renderingMode !== 'pattern-only'
-						? getCurrentPostType()
-						: 'wp_block',
-				postId:
-					renderingMode !== 'pattern-only'
-						? getCurrentPostId()
-						: patternId,
-				dirtyEntityRecords: __experimentalGetDirtyEntityRecords(),
-			};
-		},
-		[ patternId ]
-	);
+	} = useSelect( ( select ) => {
+		const {
+			getRenderingMode,
+			getCurrentTemplateId,
+			getCurrentPostId,
+			getCurrentPostType,
+		} = select( editorStore );
+		const { __experimentalGetDirtyEntityRecords } = select( coreDataStore );
+		const _templateId = getCurrentTemplateId();
+
+		return {
+			isEditingTemplate:
+				!! _templateId && getRenderingMode() === 'template-only',
+			templateId: _templateId,
+			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
+			dirtyEntityRecords: __experimentalGetDirtyEntityRecords(),
+		};
+	}, [] );
 	const { getEditorSettings } = useSelect( editorStore );
 	const { setRenderingMode } = useDispatch( editorStore );
 	const { createWarningNotice } = useDispatch( noticesStore );
@@ -117,9 +106,7 @@ export default function DocumentBar() {
 		<BaseDocumentActions
 			postType={ isEditingTemplate ? 'wp_template' : postType }
 			postId={ isEditingTemplate ? templateId : postId }
-			onBack={
-				isEditingTemplate || isEditingPattern ? handleOnBack : undefined
-			}
+			onBack={ isEditingTemplate || patternId ? handleOnBack : undefined }
 		/>
 	);
 }

@@ -107,7 +107,6 @@ const SettingsSidebar = () => {
 		isSettingsSidebarActive,
 		keyboardShortcut,
 		isTemplateMode,
-		isPatternMode,
 	} = useSelect( ( select ) => {
 		// The settings sidebar is used by the edit-post/document and edit-post/block sidebars.
 		// sidebarName represents the sidebar that is active or that should be active when the SettingsSidebar toggle button is pressed.
@@ -130,13 +129,13 @@ const SettingsSidebar = () => {
 		const shortcut = select(
 			keyboardShortcutsStore
 		).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
-		const renderingMode = select( editorStore ).getRenderingMode();
+
 		return {
 			sidebarName: sidebar,
 			isSettingsSidebarActive: isSettingsSidebar,
 			keyboardShortcut: shortcut,
-			isTemplateMode: renderingMode === 'template-only',
-			isPatternMode: renderingMode === 'pattern-only',
+			isTemplateMode:
+				select( editorStore ).getRenderingMode() === 'template-only',
 		};
 	}, [] );
 
@@ -165,7 +164,6 @@ const SettingsSidebar = () => {
 				sidebarName={ sidebarName }
 				keyboardShortcut={ keyboardShortcut }
 				isTemplateMode={ isTemplateMode }
-				isPatternMode={ isPatternMode }
 			/>
 		</Tabs>
 	);
