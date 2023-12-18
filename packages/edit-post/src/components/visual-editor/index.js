@@ -14,7 +14,7 @@ import {
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
-
+import { getQueryArg } from '@wordpress/url';
 /**
  * Internal dependencies
  */
@@ -54,7 +54,10 @@ export default function VisualEditor( { styles } ) {
 		[]
 	);
 
-	const hasSurround = POST_TYPE_EDITOR_INTERFACE[ postType ]?.hasSurround;
+	const hasSurround =
+		POST_TYPE_EDITOR_INTERFACE[ postType ]?.hasSurround &&
+		getQueryArg( window.location.href, 'editMode' ) === 'focused';
+
 	let paddingBottom;
 
 	// Add a constant padding for the typewritter effect. When typing at the
