@@ -516,6 +516,33 @@ export function sendEventToHost( eventName, properties ) {
 }
 
 /**
+ * Shows Android's soft keyboard if there's a TextInput focused and
+ * the keyboard is hidden.
+ *
+ * @return {void}
+ */
+export function showAndroidSoftKeyboard() {
+	if ( isIOS ) {
+		return;
+	}
+
+	RNReactNativeGutenbergBridge.showAndroidSoftKeyboard();
+}
+
+/**
+ * Hides Android's soft keyboard.
+ *
+ * @return {void}
+ */
+export function hideAndroidSoftKeyboard() {
+	if ( isIOS ) {
+		return;
+	}
+
+	RNReactNativeGutenbergBridge.hideAndroidSoftKeyboard();
+}
+
+/**
  * Generate haptic feedback.
  */
 export function generateHapticFeedback() {
