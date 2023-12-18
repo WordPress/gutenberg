@@ -294,7 +294,8 @@ export function getBlockAttributes(
 	innerHTML,
 	attributes = {}
 ) {
-	const doc = parseHtml( innerHTML );
+	const doc =
+		typeof innerHTML === 'string' ? parseHtml( innerHTML ) : innerHTML;
 	const blockType = normalizeBlockType( blockTypeOrName );
 
 	const blockAttributes = Object.fromEntries(
