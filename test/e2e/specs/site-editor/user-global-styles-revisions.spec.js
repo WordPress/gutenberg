@@ -153,16 +153,14 @@ test.describe( 'Global styles revisions', () => {
 	} ) => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
-		await userGlobalStylesRevisions.openRevisions();
-		const toggleStyleBook = page.getByLabel( 'Toggle Style Book' );
-		await expect( toggleStyleBook ).toBeVisible();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
 		await expect(
 			page.locator( 'iframe[name="revisions"]' )
 		).toBeVisible();
 		await expect(
 			page.locator( 'iframe[name="style-book-canvas"]' )
 		).toBeHidden();
-		await toggleStyleBook.click();
+		await page.getByRole( 'button', { name: 'Style Book' } ).click();
 		await expect(
 			page.locator( 'iframe[name="style-book-canvas"]' )
 		).toBeVisible();
