@@ -38,7 +38,7 @@ The package <a href="https://developer.wordpress.org/block-editor/reference-guid
 
 A good workflow when using a component for the Block Editor is:
 - Import the component from a Wordpress package
-- Include the corresponding code for the component into the JSX code
+- Add the corresponding code for the component to your project in JSX format
 - If needed, define `attributes` in `block.json` and define event handlers to update those attributes with `setAttributes`
 - If needed, adapt the code to be serialized and stored in the database
 
