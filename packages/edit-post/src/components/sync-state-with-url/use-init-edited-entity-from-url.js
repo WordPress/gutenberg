@@ -12,5 +12,6 @@ const { useLocation } = unlock( routerPrivateApis );
 
 export default function useInitEditedEntityFromURL() {
 	const { params = {} } = useLocation();
-	return { postId: params.post, postType: params.postType };
+	const postId = params.post ? params.post : params.postId;
+	return { postId, postType: params.postType };
 }
