@@ -157,6 +157,9 @@ module.exports = {
 			return `webpack://${ info.namespace }/${ info.resourcePath }`;
 		},
 	},
+	performance: {
+		hints: false, // disable warnings about package sizes
+	},
 	plugins: [
 		...plugins,
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
