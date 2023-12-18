@@ -47,4 +47,19 @@ test.describe( 'Site editor command palette', () => {
 			'Index'
 		);
 	} );
+
+	test( 'Open the command palette and navigate to Customize CSS', async ( {
+		page,
+	} ) => {
+		await page
+			.getByRole( 'button', { name: 'Open command palette' } )
+			.click();
+		await page.keyboard.type( 'Customize' );
+		await page.getByRole( 'option', { name: 'customize css' } ).click();
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByLabel( 'Additional CSS' )
+		).toBeVisible();
+	} );
 } );
