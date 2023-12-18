@@ -3,7 +3,7 @@
 /**
  * WordPress dependencies
  */
-import { select, dispatch } from '@wordpress/data';
+import { select, resolveSelect, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 
 /**
@@ -234,20 +234,16 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		);
 		return;
 	}
-	if ( select( blocksStore ).getBlockType( name ) ) {
-		console.error( 'Block "' + name + '" is already registered.' );
-		return;
-	}
 
 	const { addBootstrappedBlockType, addUnprocessedBlockType } = unlock(
 		dispatch( blocksStore )
 	);
 
-	if ( isObject( blockNameOrMetadata ) ) {
-		const metadata = getBlockSettingsFromMetadata( blockNameOrMetadata );
-		addBootstrappedBlockType( name, metadata );
-	}
+	const metadata = isObject( blockNameOrMetadata )
+		? getBlockSettingsFromMetadata( blockNameOrMetadata )
+		: getBlockSettingsFromMetadata( settings );
 
+	addBootstrappedBlockType( name, metadata );
 	addUnprocessedBlockType( name, settings );
 
 	return select( blocksStore ).getBlockType( name );
@@ -501,9 +497,16 @@ export function getDefaultBlockName() {
  * @return {?Object} Block type.
  */
 export function getBlockType( name ) {
-	return select( blocksStore )?.getBlockType( name );
+	return select( blocksStore ).getBlockType( name );
 }
 
+export function getBootstrappedBlockType( name ) {
+	return select( blocksStore ).getBootstrappedBlockType( name );
+}
+
+export function loadBlockType( name ) {
+	return resolveSelect( blocksStore ).getBlockType( name );
+}
 /**
  * Returns all registered blocks.
  *
@@ -511,6 +514,17 @@ export function getBlockType( name ) {
  */
 export function getBlockTypes() {
 	return select( blocksStore ).getBlockTypes();
+}
+
+export function getBootstrappedBlockTypes() {
+	return select( blocksStore ).getBootstrappedBlockTypes();
+}
+
+export async function loadBlockTypes() {
+	await Promise.all(
+		getBootstrappedBlockTypes().map( ( { name } ) => loadBlockType( name ) )
+	);
+	return getBlockTypes();
 }
 
 /**

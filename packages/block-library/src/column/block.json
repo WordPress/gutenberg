@@ -69,5 +69,6 @@
 			}
 		},
 		"layout": true
-	}
+	},
+	"editorScript": "file:./editor.min.js"
 }

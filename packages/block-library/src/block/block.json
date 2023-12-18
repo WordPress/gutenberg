@@ -15,7 +15,9 @@
 	"supports": {
 		"customClassName": false,
 		"html": false,
-		"inserter": false,
-		"renaming": false
-	}
+	"inserter": false,
+	"renaming": false
+},
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css"
 }

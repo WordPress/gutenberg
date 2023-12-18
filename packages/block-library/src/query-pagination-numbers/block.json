@@ -38,5 +38,6 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-query-pagination-numbers-editor"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css"
 }

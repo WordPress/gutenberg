@@ -125,6 +125,7 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-media-text-editor",
-	"style": "wp-block-media-text"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

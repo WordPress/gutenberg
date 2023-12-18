@@ -90,6 +90,7 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-video-editor",
-	"style": "wp-block-video"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

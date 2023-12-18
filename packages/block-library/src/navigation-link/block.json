@@ -74,6 +74,7 @@
 		},
 		"renaming": false
 	},
-	"editorStyle": "wp-block-navigation-link-editor",
-	"style": "wp-block-navigation-link"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

@@ -246,6 +246,14 @@ _Returns_
 
 -   `(WPBlockVariation[]|void)`: Block variations.
 
+### getBootstrappedBlockType
+
+Undocumented declaration.
+
+### getBootstrappedBlockTypes
+
+Undocumented declaration.
+
 ### getCategories
 
 Returns all the available block categories.

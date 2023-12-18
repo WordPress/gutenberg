@@ -131,6 +131,7 @@
 			"allowJustification": false
 		}
 	},
-	"editorStyle": "wp-block-cover-editor",
-	"style": "wp-block-cover"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

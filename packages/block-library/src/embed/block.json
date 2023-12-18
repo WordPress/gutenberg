@@ -46,6 +46,7 @@
 			"margin": true
 		}
 	},
-	"editorStyle": "wp-block-embed-editor",
-	"style": "wp-block-embed"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

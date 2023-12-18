@@ -60,6 +60,6 @@
 		"reusable": false,
 		"html": false
 	},
-	"editorStyle": "wp-block-navigation-submenu-editor",
-	"style": "wp-block-navigation-submenu"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css"
 }

@@ -1991,6 +1991,17 @@ export function lastFocus( state = false, action ) {
 	return state;
 }
 
+export function parsedPatterns( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_PARSED_PATTERN':
+			return {
+				...state,
+				[ action.patternName ]: action.parsedPattern,
+			};
+	}
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
@@ -2020,6 +2031,7 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
+	parsedPatterns,
 } );
 
 function withAutomaticChangeReset( reducer ) {

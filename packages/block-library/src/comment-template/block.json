@@ -30,5 +30,7 @@
 			}
 		}
 	},
-	"style": "wp-block-comment-template"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

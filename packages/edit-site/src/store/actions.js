@@ -116,7 +116,7 @@ export const addTemplate =
 					'postType',
 					TEMPLATE_POST_TYPE,
 					newTemplate.id,
-					{ blocks: parse( template.content ) },
+					{ blocks: await parse( template.content ) },
 					{ undoIgnore: true }
 				);
 		}

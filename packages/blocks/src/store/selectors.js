@@ -29,7 +29,7 @@ import { getValueFromObjectPath } from './utils';
  */
 const getNormalizedBlockType = ( state, nameOrType ) =>
 	'string' === typeof nameOrType
-		? getBlockType( state, nameOrType )
+		? getBootstrappedBlockType( state, nameOrType )
 		: nameOrType;
 
 /**
@@ -64,6 +64,15 @@ export const getBlockTypes = createSelector(
 	( state ) => Object.values( state.blockTypes ),
 	( state ) => [ state.blockTypes ]
 );
+
+export const getBootstrappedBlockTypes = createSelector(
+	( state ) => Object.values( state.bootstrappedBlockTypes ),
+	( state ) => [ state.bootstrappedBlockTypes ]
+);
+
+export const getBootstrappedBlockType = ( state, name ) => {
+	return state.bootstrappedBlockTypes[ name ];
+};
 
 /**
  * Returns a block type by name.
@@ -301,11 +310,7 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 export function getDefaultBlockVariation( state, blockName, scope ) {
 	const variations = getBlockVariations( state, blockName, scope );
 
-	const defaultVariation = [ ...variations ]
-		.reverse()
-		.find( ( { isDefault } ) => !! isDefault );
-
-	return defaultVariation || variations[ 0 ];
+	return variations.findLast( ( v, i ) => v.isDefault || i === 0 );
 }
 
 /**

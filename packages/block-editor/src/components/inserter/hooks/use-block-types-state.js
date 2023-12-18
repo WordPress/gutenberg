@@ -36,19 +36,18 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 	}, [] );
 
 	const onSelectItem = useCallback(
-		(
-			{ name, initialAttributes, innerBlocks, syncStatus, content },
-			shouldFocusBlock
-		) => {
+		async ( item, shouldFocusBlock ) => {
 			const insertedBlock =
-				syncStatus === 'unsynced'
-					? parse( content, {
+				item.syncStatus === 'unsynced'
+					? await parse( item.content, {
 							__unstableSkipMigrationLogs: true,
 					  } )
 					: createBlock(
-							name,
-							initialAttributes,
-							createBlocksFromInnerBlocksTemplate( innerBlocks )
+							item.name,
+							item.initialAttributes,
+							createBlocksFromInnerBlocksTemplate(
+								item.innerBlocks
+							)
 					  );
 
 			onInsert( insertedBlock, undefined, shouldFocusBlock );

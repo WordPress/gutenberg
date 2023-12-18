@@ -31,6 +31,7 @@
 	"supports": {
 		"inserter": false
 	},
-	"editorStyle": "wp-block-text-columns-editor",
-	"style": "wp-block-text-columns"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

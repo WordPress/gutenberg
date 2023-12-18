@@ -227,6 +227,13 @@ function gutenberg_deregister_core_block_and_assets( $block_name ) {
 				}
 			}
 		}
+		if ( ! empty( $block_type->editor_script_handles ) ) {
+			foreach ( $block_type->editor_script_handles as $editor_script_handle ) {
+				if ( str_starts_with( $editor_script_handle, 'wp-block-' ) ) {
+					wp_deregister_script( $editor_script_handle );
+				}
+			}
+		}
 		$registry->unregister( $block_name );
 	}
 }

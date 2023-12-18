@@ -51,7 +51,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			const { getEntityRecord, getPostType, getEntityRecords, canUser } =
 				select( coreStore );
 			const { getEditorSettings } = select( editorStore );
-			const { getBlockTypes } = select( blocksStore );
+			const { getBootstrappedBlockTypes } = select( blocksStore );
 			const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 				postType
 			);
@@ -84,7 +84,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 					'preferredStyleVariations'
 				),
 				hiddenBlockTypes: getHiddenBlockTypes(),
-				blockTypes: getBlockTypes(),
+				blockTypes: getBootstrappedBlockTypes(),
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 				template:
 					supportsTemplateMode && isViewable && canEditTemplate

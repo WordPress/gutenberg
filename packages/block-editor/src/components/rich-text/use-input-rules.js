@@ -83,7 +83,7 @@ export function useInputRules( props ) {
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
-		function inputRule() {
+		async function inputRule() {
 			const { getValue, onReplace, selectionChange } = propsRef.current;
 
 			if ( ! onReplace ) {
@@ -102,14 +102,12 @@ export function useInputRules( props ) {
 			}
 
 			const trimmedTextBefore = text.slice( 0, start ).trim();
-			const prefixTransforms = getBlockTransforms( 'from' ).filter(
-				( { type } ) => type === 'prefix'
-			);
+			const prefixTransforms = (
+				await getBlockTransforms( 'from' )
+			 ).filter( ( { type } ) => type === 'prefix' );
 			const transformation = findTransform(
 				prefixTransforms,
-				( { prefix } ) => {
-					return trimmedTextBefore === prefix;
-				}
+				( { prefix } ) => trimmedTextBefore === prefix
 			);
 
 			if ( ! transformation ) {
@@ -128,7 +126,7 @@ export function useInputRules( props ) {
 			return true;
 		}
 
-		function onInput( event ) {
+		async function onInput( event ) {
 			const { inputType, type } = event;
 			const {
 				getValue,
@@ -142,8 +140,8 @@ export function useInputRules( props ) {
 				return;
 			}
 
-			if ( __unstableAllowPrefixTransformations && inputRule ) {
-				if ( inputRule() ) return;
+			if ( __unstableAllowPrefixTransformations ) {
+				if ( await inputRule() ) return;
 			}
 
 			const value = getValue();

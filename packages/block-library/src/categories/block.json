@@ -53,6 +53,7 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-categories-editor",
-	"style": "wp-block-categories"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

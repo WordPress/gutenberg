@@ -66,8 +66,11 @@
 			"label": "Default",
 			"isDefault": true
 		},
-		{ "name": "plain", "label": "Plain" }
+		{
+			"name": "plain",
+			"label": "Plain"
+		}
 	],
-	"editorStyle": "wp-block-quote-editor",
-	"style": "wp-block-quote"
+	"editorScript": "file:./editor.min.js",
+	"style": "file:./style.css"
 }

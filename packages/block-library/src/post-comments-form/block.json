@@ -39,10 +39,7 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-post-comments-form-editor",
-	"style": [
-		"wp-block-post-comments-form",
-		"wp-block-buttons",
-		"wp-block-button"
-	]
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": [ "file:./style.css", "wp-block-buttons", "wp-block-button" ]
 }

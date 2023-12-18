@@ -17,5 +17,6 @@
 		"customClassName": false,
 		"html": false
 	},
-	"editorStyle": "wp-block-shortcode-editor"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css"
 }

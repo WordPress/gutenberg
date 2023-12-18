@@ -47,5 +47,6 @@
 			}
 		}
 	},
-	"example": {}
+	"example": {},
+	"editorScript": "file:./editor.min.js"
 }

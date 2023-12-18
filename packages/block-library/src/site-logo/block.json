@@ -53,8 +53,12 @@
 			"label": "Default",
 			"isDefault": true
 		},
-		{ "name": "rounded", "label": "Rounded" }
+		{
+			"name": "rounded",
+			"label": "Rounded"
+		}
 	],
-	"editorStyle": "wp-block-site-logo-editor",
-	"style": "wp-block-site-logo"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

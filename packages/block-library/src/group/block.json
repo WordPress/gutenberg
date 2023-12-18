@@ -85,6 +85,7 @@
 			"allowSizingOnChildren": true
 		}
 	},
-	"editorStyle": "wp-block-group-editor",
-	"style": "wp-block-group"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

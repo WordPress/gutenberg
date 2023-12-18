@@ -48,6 +48,7 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-latest-comments-editor",
-	"style": "wp-block-latest-comments"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

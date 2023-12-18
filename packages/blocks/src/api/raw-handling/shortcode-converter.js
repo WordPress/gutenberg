@@ -14,19 +14,19 @@ import { applyBuiltInValidationFixes } from '../parser/apply-built-in-validation
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
-function segmentHTMLToShortcodeBlock(
+async function segmentHTMLToShortcodeBlock(
 	HTML,
 	lastIndex = 0,
 	excludedBlockNames = []
 ) {
 	// Get all matches.
-	const transformsFrom = getBlockTransforms( 'from' );
+	const transformsFrom = await getBlockTransforms( 'from' );
 
 	const transformation = findTransform(
 		transformsFrom,
 		( transform ) =>
-			excludedBlockNames.indexOf( transform.blockName ) === -1 &&
 			transform.type === 'shortcode' &&
+			! excludedBlockNames.includes( transform.blockName ) &&
 			castArray( transform.tag ).some( ( tag ) =>
 				regexp( tag ).test( HTML )
 			)
@@ -60,7 +60,7 @@ function segmentHTMLToShortcodeBlock(
 				/^\s*(\n|<\/p>)/.test( afterHTML )
 			)
 		) {
-			return segmentHTMLToShortcodeBlock( HTML, lastIndex );
+			return await segmentHTMLToShortcodeBlock( HTML, lastIndex );
 		}
 
 		// If a transformation's `isMatch` predicate fails for the inbound
@@ -75,7 +75,7 @@ function segmentHTMLToShortcodeBlock(
 			transformation.isMatch &&
 			! transformation.isMatch( match.shortcode.attrs )
 		) {
-			return segmentHTMLToShortcodeBlock( HTML, previousIndex, [
+			return await segmentHTMLToShortcodeBlock( HTML, previousIndex, [
 				...excludedBlockNames,
 				transformation.blockName,
 			] );
@@ -143,9 +143,9 @@ function segmentHTMLToShortcodeBlock(
 		}
 
 		return [
-			...segmentHTMLToShortcodeBlock( beforeHTML ),
+			...( await segmentHTMLToShortcodeBlock( beforeHTML ) ),
 			...blocks,
-			...segmentHTMLToShortcodeBlock( afterHTML ),
+			...( await segmentHTMLToShortcodeBlock( afterHTML ) ),
 		];
 	}
 

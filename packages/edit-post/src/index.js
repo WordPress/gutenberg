@@ -1,20 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
 import {
-	registerCoreBlocks,
-	__experimentalRegisterExperimentalCoreBlocks,
-} from '@wordpress/block-library';
+	store as blocksStore,
+	setDefaultBlockName,
+	setFreeformContentHandlerName,
+	setUnregisteredTypeHandlerName,
+	setGroupingBlockName,
+} from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import { createRoot } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
-import {
-	registerLegacyWidgetBlock,
-	registerWidgetGroupBlock,
-} from '@wordpress/widgets';
 import {
 	privateApis as editorPrivateApis,
 	store as editorStore,
@@ -82,14 +80,12 @@ export function initializeEditor(
 		dispatch( editorStore ).setIsListViewOpened( true );
 	}
 
-	registerCoreBlocks();
-	registerLegacyWidgetBlock( { inserter: false } );
-	registerWidgetGroupBlock( { inserter: false } );
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
-		__experimentalRegisterExperimentalCoreBlocks( {
-			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
-		} );
+	setDefaultBlockName( 'core/paragraph' );
+	if ( window.wp && window.wp.oldEditor ) {
+		setFreeformContentHandlerName( 'core/freeform' );
 	}
+	setUnregisteredTypeHandlerName( 'core/missing' );
+	setGroupingBlockName( 'core/group' );
 
 	/*
 	 * Prevent adding template part in the post editor.

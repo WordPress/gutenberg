@@ -132,10 +132,10 @@ export class PerfUtils {
 			() => window?.wp?.blocks && window?.wp?.data
 		);
 
-		return await this.page.evaluate( ( html: string ) => {
+		return await this.page.evaluate( async ( html: string ) => {
 			const { parse } = window.wp.blocks;
 			const { dispatch } = window.wp.data;
-			const blocks = parse( html );
+			const blocks = await parse( html );
 
 			blocks.forEach( ( block: any ) => {
 				if ( block.name === 'core/image' ) {

@@ -149,13 +149,13 @@ export function onFilesDrop(
 	canInsertBlockType,
 	insertOrReplaceBlocks
 ) {
-	return ( files ) => {
+	return async ( files ) => {
 		if ( ! getSettings().mediaUpload ) {
 			return;
 		}
 
 		const transformation = findTransform(
-			getBlockTransforms( 'from' ),
+			await getBlockTransforms( 'from' ),
 			( transform ) =>
 				transform.type === 'files' &&
 				canInsertBlockType( transform.blockName, targetRootClientId ) &&
@@ -186,8 +186,8 @@ export function onHTMLDrop(
 	targetBlockIndex,
 	insertOrReplaceBlocks
 ) {
-	return ( HTML ) => {
-		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
+	return async ( HTML ) => {
+		const blocks = await pasteHandler( { HTML, mode: 'BLOCKS' } );
 
 		if ( blocks.length ) {
 			insertOrReplaceBlocks( blocks );

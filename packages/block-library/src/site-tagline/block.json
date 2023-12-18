@@ -45,5 +45,6 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-site-tagline-editor"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css"
 }

@@ -41,5 +41,6 @@
 			}
 		},
 		"html": false
-	}
+	},
+	"editorScript": "file:./editor.min.js"
 }

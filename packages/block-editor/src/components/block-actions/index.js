@@ -103,7 +103,7 @@ export default function BlockActions( {
 			selectBlock( clientIds[ 0 ] );
 			setBlockMovingClientId( clientIds[ 0 ] );
 		},
-		onGroup() {
+		async onGroup() {
 			if ( ! blocks.length ) {
 				return;
 			}
@@ -111,7 +111,10 @@ export default function BlockActions( {
 			const groupingBlockName = getGroupingBlockName();
 
 			// Activate the `transform` on `core/group` which does the conversion.
-			const newBlocks = switchToBlockType( blocks, groupingBlockName );
+			const newBlocks = await switchToBlockType(
+				blocks,
+				groupingBlockName
+			);
 
 			if ( ! newBlocks ) {
 				return;

@@ -15,7 +15,7 @@ export async function transformBlockTo( this: Editor, name: string ) {
 	);
 
 	await this.page.evaluate(
-		( [ blockName ] ) => {
+		async ( [ blockName ] ) => {
 			const clientIds = window.wp.data
 				.select( 'core/block-editor' )
 				.getSelectedBlockClientIds();
@@ -26,7 +26,10 @@ export async function transformBlockTo( this: Editor, name: string ) {
 				.dispatch( 'core/block-editor' )
 				.replaceBlocks(
 					clientIds,
-					window.wp.blocks.switchToBlockType( blocks, blockName )
+					await window.wp.blocks.switchToBlockType(
+						blocks,
+						blockName
+					)
 				);
 		},
 		[ name ]

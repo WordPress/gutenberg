@@ -198,6 +198,14 @@ _Returns_
 
 -   `Array`: Block settings.
 
+### getBootstrappedBlockType
+
+Undocumented declaration.
+
+### getBootstrappedBlockTypes
+
+Undocumented declaration.
+
 ### getChildBlockNames
 
 Returns an array with the child blocks of a given block.
@@ -277,6 +285,10 @@ _Parameters_
 _Returns_
 
 -   `Object|string`: Save element or raw HTML string.
+
+### getTransformItemsForBlocks
+
+Undocumented declaration.
 
 ### getUnregisteredTypeHandlerName
 

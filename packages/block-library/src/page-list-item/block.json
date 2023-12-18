@@ -47,6 +47,5 @@
 		"inserter": false,
 		"__experimentalToolbar": false
 	},
-	"editorStyle": "wp-block-page-list-editor",
-	"style": "wp-block-page-list"
+	"editorScript": "file:./editor.min.js"
 }

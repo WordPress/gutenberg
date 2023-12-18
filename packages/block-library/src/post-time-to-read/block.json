@@ -43,5 +43,7 @@
 				"fontSize": true
 			}
 		}
-	}
+	},
+	"editorScript": "file:./editor.min.js",
+	"style": "file:./style.css"
 }

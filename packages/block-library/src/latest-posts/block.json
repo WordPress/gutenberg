@@ -112,6 +112,7 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-latest-posts-editor",
-	"style": "wp-block-latest-posts"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

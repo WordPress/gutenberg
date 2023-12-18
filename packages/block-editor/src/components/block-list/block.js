@@ -307,7 +307,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				) {
 					removeBlock( _clientId );
 				} else {
-					registry.batch( () => {
+					registry.batch( async () => {
 						if (
 							canInsertBlockType(
 								getBlockName( firstClientId ),
@@ -321,7 +321,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 								getBlockIndex( _clientId )
 							);
 						} else {
-							const replacement = switchToBlockType(
+							const replacement = await switchToBlockType(
 								getBlock( firstClientId ),
 								getDefaultBlockName()
 							);

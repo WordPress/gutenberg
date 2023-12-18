@@ -50,6 +50,7 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-comments-pagination-editor",
-	"style": "wp-block-comments-pagination"
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css"
 }

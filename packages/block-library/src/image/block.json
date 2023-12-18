@@ -128,7 +128,8 @@
 		},
 		{ "name": "rounded", "label": "Rounded" }
 	],
-	"editorStyle": "wp-block-image-editor",
-	"style": "wp-block-image",
+	"editorScript": "file:./editor.min.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style.css",
 	"viewScript": "file:./view.min.js"
 }

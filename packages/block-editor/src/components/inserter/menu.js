@@ -199,6 +199,8 @@ function InserterMenu(
 		},
 	} ) );
 
+	const readyToShow = showPatterns !== null;
+
 	const showPatternPanel =
 		selectedTab === 'patterns' &&
 		! delayedFilterValue &&
@@ -236,7 +238,7 @@ function InserterMenu(
 					placeholder={ __( 'Search' ) }
 					ref={ searchRef }
 				/>
-				{ !! delayedFilterValue && (
+				{ readyToShow && delayedFilterValue && (
 					<div className="block-editor-inserter__no-tab-container">
 						<InserterSearchResults
 							filterValue={ delayedFilterValue }
@@ -254,7 +256,7 @@ function InserterMenu(
 						/>
 					</div>
 				) }
-				{ showAsTabs && (
+				{ readyToShow && showAsTabs && (
 					<InserterTabs
 						showPatterns={ showPatterns }
 						showMedia={ showMedia }
@@ -263,7 +265,7 @@ function InserterMenu(
 						tabsContents={ inserterTabsContents }
 					/>
 				) }
-				{ ! delayedFilterValue && ! showAsTabs && (
+				{ readyToShow && ! delayedFilterValue && ! showAsTabs && (
 					<div className="block-editor-inserter__no-tab-container">
 						{ blocksTab }
 					</div>
