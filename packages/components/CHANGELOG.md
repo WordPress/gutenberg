@@ -5,6 +5,7 @@
 ### Bug Fix
 
 -   `PaletteEdit`: Consider digits when generating kebab-cased slug ([#56713](https://github.com/WordPress/gutenberg/pull/56713)).
+-   `FormTokenField`: Prevent focus being passed to internal buttons when component is disabled ([#57187](https://github.com/WordPress/gutenberg/pull/57187)).
 
 ### Experimental
 
