@@ -26,11 +26,11 @@ The package [`@wordpress/components`](https://developer.wordpress.org/block-edit
 - [`ExternalLink`](https://wordpress.github.io/gutenberg/?path=/docs/components-externallink--docs)
 
 The package [`@wordpress/block-editor`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/) includes a library of components and hooks for the Block Editor, including those to define custom settings controls for the block in the Editor. Some of the components most commonly used from this package are:
-- `RichText`
-- `BlockControls`
-- `InspectorControls`
-- `InnerBlocks`
-- `PanelColorSettings`
+- [`RichText`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md)
+- [`BlockControls`](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-editor/src/components/block-controls)
+- [`InspectorControls`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md)
+- [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md)
+- `PanelColorSettings` or `ColorPalette`
 
 <div class="callout callout-tip">
 The package <a href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/"><code>@wordpress/block-editor</code></a> also provide the tools to create and use standalone block editors.
@@ -134,8 +134,8 @@ export default function Edit( { attributes, setAttributes } ) {
 						<legend className="blocks-base-control__label">
 							{ __( 'Text color', 'block-development-examples' ) }
 						</legend>
-						<ColorPalette // Element Tag for Gutenberg standard colour selector
-							onChange={ onChangeTextColor } // onChange event callback
+						<ColorPalette
+							onChange={ onChangeTextColor }
 						/>
 					</fieldset>
 				</div>
