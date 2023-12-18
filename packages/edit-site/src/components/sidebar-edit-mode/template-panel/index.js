@@ -4,6 +4,7 @@
 import { useSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
 import {
+	PageAttributesPanel,
 	PostDiscussionPanel,
 	PostExcerptPanel,
 	PostFeaturedImagePanel,
@@ -70,6 +71,7 @@ export default function TemplatePanel() {
 			<PostFeaturedImagePanel />
 			<PostExcerptPanel />
 			<PostDiscussionPanel />
+			<PageAttributesPanel />
 		</>
 	);
 }
