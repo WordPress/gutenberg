@@ -166,3 +166,4 @@ For common customization settings including color, border, spacing customization
 - [@wordpress/block-editor](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/)
 - [@wordpress/components](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-components/)
 - [`Inspector Controls`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md)
+- [`BlockControls`](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-editor/src/components/block-controls)
