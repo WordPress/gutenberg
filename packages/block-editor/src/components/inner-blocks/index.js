@@ -72,12 +72,10 @@ function UncontrolledInnerBlocks( props ) {
 		name,
 		blockType,
 		innerBlocks,
-		parentLock,
 	} = props;
 
 	useNestedSettingsUpdate(
 		clientId,
-		parentLock,
 		allowedBlocks,
 		prioritizedInserterBlocks,
 		defaultBlock,
@@ -195,7 +193,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		name,
 		blockType,
 		innerBlocks,
-		parentLock,
 		parentClientId,
 		isDropZoneDisabled,
 	} = useSelect(
@@ -210,7 +207,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				hasSelectedInnerBlock,
 				__unstableGetEditorMode,
 				getBlocks,
-				getTemplateLock,
 				getBlockRootClientId,
 				__unstableIsWithinBlockOverlay,
 				__unstableHasActiveBlockOverlayActive,
@@ -225,9 +221,10 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			return {
 				__experimentalCaptureToolbars: hasBlockSupport(
 					blockName,
-					'__experimentalExposeControlsToChildren',
-					false
-				),
+					'__experimentalExposeControlsToChildren'
+				)
+					? true
+					: undefined,
 				hasOverlay:
 					blockName !== 'core/template' &&
 					! isBlockSelected( clientId ) &&
@@ -236,7 +233,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				name: blockName,
 				blockType: getBlockType( blockName ),
 				innerBlocks: getBlocks( clientId ),
-				parentLock: getTemplateLock( _parentClientId ),
 				parentClientId: _parentClientId,
 				isDropZoneDisabled:
 					blockEditingMode !== 'default' ||
@@ -265,7 +261,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		name,
 		blockType,
 		innerBlocks,
-		parentLock,
 		...options,
 	};
 	const InnerBlocks =

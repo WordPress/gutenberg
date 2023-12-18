@@ -39,11 +39,19 @@
  * @return {Function} Registry selector that can be registered with a store.
  */
 export function createRegistrySelector( registrySelector ) {
+	// Cache the registry selector so that memoized selectors created with
+	// `createSelector` work.
+	let cachedSelector;
+
 	// Create a selector function that is bound to the registry referenced by `selector.registry`
 	// and that has the same API as a regular selector. Binding it in such a way makes it
 	// possible to call the selector directly from another selector.
-	const selector = ( ...args ) =>
-		registrySelector( selector.registry.select )( ...args );
+	const selector = ( ...args ) => {
+		if ( ! cachedSelector ) {
+			cachedSelector = registrySelector( selector.registry.select );
+		}
+		return cachedSelector( ...args );
+	};
 
 	/**
 	 * Flag indicating that the selector is a registry selector that needs the correct registry

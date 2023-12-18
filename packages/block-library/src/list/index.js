@@ -19,6 +19,12 @@ const { name } = metadata;
 export { metadata, name };
 
 const settings = {
+	innerBlocks: {
+		allowedBlocks: [ 'core/list-item' ],
+		template: [ [ 'core/list-item' ] ],
+		templateLock: false,
+		__experimentalCaptureToolbars: true,
+	},
 	icon,
 	example: {
 		innerBlocks: [

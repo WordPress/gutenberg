@@ -32,7 +32,6 @@ function useShallowMemo( value ) {
  * came from props.
  *
  * @param {string}               clientId                   The client ID of the block to update.
- * @param {string}               parentLock
  * @param {string[]}             allowedBlocks              An array of block names which are permitted
  *                                                          in inner blocks.
  * @param {string[]}             prioritizedInserterBlocks  Block names and/or block variations to be prioritized in the inserter, in the format {blockName}/{variationName}.
@@ -54,7 +53,6 @@ function useShallowMemo( value ) {
  */
 export default function useNestedSettingsUpdate(
 	clientId,
-	parentLock,
 	allowedBlocks,
 	prioritizedInserterBlocks,
 	defaultBlock,
@@ -85,17 +83,22 @@ export default function useNestedSettingsUpdate(
 		prioritizedInserterBlocks
 	);
 
-	const _templateLock =
-		templateLock === undefined || parentLock === 'contentOnly'
-			? parentLock
-			: templateLock;
+	const _templateLock = templateLock;
 
 	useLayoutEffect( () => {
-		const newSettings = {
-			allowedBlocks: _allowedBlocks,
-			prioritizedInserterBlocks: _prioritizedInserterBlocks,
-			templateLock: _templateLock,
-		};
+		const newSettings = {};
+
+		if ( _templateLock !== undefined ) {
+			newSettings.templateLock = _templateLock;
+		}
+
+		if ( _allowedBlocks !== undefined ) {
+			newSettings.allowedBlocks = _allowedBlocks;
+		}
+
+		if ( prioritizedInserterBlocks !== undefined ) {
+			newSettings.prioritizedInserterBlocks = prioritizedInserterBlocks;
+		}
 
 		// These values are not defined for RN, so only include them if they
 		// are defined.
@@ -109,7 +112,11 @@ export default function useNestedSettingsUpdate(
 			newSettings.orientation = orientation;
 		} else {
 			const layoutType = getLayoutType( layout?.type );
-			newSettings.orientation = layoutType.getOrientation( layout );
+			const _orientation = layoutType.getOrientation( layout );
+
+			if ( _orientation !== 'vertical' ) {
+				newSettings.orientation = _orientation;
+			}
 		}
 
 		if ( __experimentalDefaultBlock !== undefined ) {
@@ -136,6 +143,10 @@ export default function useNestedSettingsUpdate(
 
 		if ( directInsert !== undefined ) {
 			newSettings.directInsert = directInsert;
+		}
+
+		if ( ! Object.keys( newSettings ).length ) {
+			return;
 		}
 
 		// Batch updates to block list settings to avoid triggering cascading renders
@@ -176,5 +187,6 @@ export default function useNestedSettingsUpdate(
 		updateBlockListSettings,
 		layout,
 		registry,
+		prioritizedInserterBlocks,
 	] );
 }

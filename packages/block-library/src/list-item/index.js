@@ -17,6 +17,9 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
+	innerBlocks: {
+		allowedBlocks: [ 'core/list' ],
+	},
 	icon,
 	edit,
 	save,

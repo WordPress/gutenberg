@@ -81,7 +81,6 @@ export default function ListItemEdit( {
 	const { placeholder, content } = attributes;
 	const blockProps = useBlockProps( { ref: useCopy( clientId ) } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/list' ],
 		renderAppender: false,
 		__unstableDisableDropZone: true,
 	} );
