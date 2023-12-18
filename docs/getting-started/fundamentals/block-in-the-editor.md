@@ -1,6 +1,6 @@
 # The block in the Editor
 
-The Block Editor is a React Single Page Application (SPA) and every block in the editor is displayed through a React component defined in the `Edit` property of the settings object used to [register the block on the client](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/#registration-of-the-block-with-javascript-client-side). 
+The Block Editor is a React Single Page Application (SPA) and every block in the editor is displayed through a React component defined in the `edit` property of the settings object used to [register the block on the client](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/#registration-of-the-block-with-javascript-client-side). 
 
 The `props` object received by the block's `Edit` React component includes:
 - [`attributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#attributes) - attributes object
