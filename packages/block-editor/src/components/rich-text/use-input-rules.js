@@ -142,7 +142,7 @@ export function useInputRules( props ) {
 				return;
 			}
 
-			if ( __unstableAllowPrefixTransformations && inputRule ) {
+			if ( __unstableAllowPrefixTransformations ) {
 				if ( inputRule() ) return;
 			}
 
