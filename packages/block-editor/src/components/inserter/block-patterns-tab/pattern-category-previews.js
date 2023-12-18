@@ -84,7 +84,7 @@ export function PatternCategoryPreviews( {
 
 				// The uncategorized category should show all the patterns without any category
 				// or with no available category.
-				if ( pattern.categories ) {
+				if ( ! pattern.categories ) {
 					return true;
 				}
 
