@@ -13,7 +13,7 @@ WordPress provides a lot of built-in standard components that can be used to def
 The WordPress Gutenberg project uses <a href="https://wordpress.github.io/gutenberg/?path=/docs/docs-introduction--page">Storybook</a> to document the UI components available from WordPress packages.
 </div>
 
-Custom settings controls for the block in the `Block Toolbar` or in the `Settings Sidebar` can also be defined through this `Edit` React component via built-in components such as:
+Custom settings controls for the block in the Block Toolbar or the Settings Sidebar can also be defined through this `Edit` React component via built-in components such as:
 - [`InspectorControls`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md) 
 - [`BlockControls`](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-editor/src/components/block-controls) 
 
