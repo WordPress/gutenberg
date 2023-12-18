@@ -83,6 +83,7 @@ const withPatternOnlyRenderMode = createHigherOrderComponent(
 			postId: props.attributes?.ref,
 			postType: 'wp_block',
 			canvas: 'edit',
+			editMode: 'focused',
 		} );
 
 		const newProps = {
