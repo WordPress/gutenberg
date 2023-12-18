@@ -10,9 +10,6 @@
 
 
 class Helper_Class {
-	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	public function process_foo_test( $markup, $inner_blocks, $context, $directives ) {
-	}
 
 	public function increment( $store ) {
 		return $store['state']['count'] + $store['context']['count'];
@@ -34,6 +31,30 @@ function gutenberg_test_process_directives_helper_increment( $store ) {
  * @covers gutenberg_interactivity_process_rendered_html
  */
 class Tests_Process_Directives extends WP_UnitTestCase {
+
+	public function set_up() {
+		parent::set_up();
+		register_block_type(
+			'gutenberg/test-context-level-1',
+			array(
+				'render_callback' => function ( $a, $b, $block ) {
+					$inner_blocks_html = '';
+					foreach ( $block->inner_blocks as $inner_block ) {
+						$inner_blocks_html .= $inner_block->render();
+					}
+					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'></p>' . $inner_blocks_html . '<p data-wp-text=\'context.MyText\'></p></div>';
+				},
+				'supports'        => array(
+					'interactivity' => true,
+				),
+			)
+		);
+	}
+
+	public function tear_down() {
+		unregister_block_type( 'gutenberg/test-context-level-1' );
+		parent::tear_down();
+	}
 
 	public function test_interactivity_process_directives_in_root_blocks() {
 
@@ -77,57 +98,41 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 	}
 
 	public function test_directive_processing_of_interactive_block() {
-		register_block_type(
-			'gutenberg/test-context',
-			array(
-				'render_callback' => function () {
-					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "hello" }\'><p data-wp-text=\'context.MyText\'></p></div>';
-				},
-				'supports'        => array(
-					'interactivity' => true,
-				),
-			)
-		);
 		$args = array(
-			'post_content' => '<!-- wp:gutenberg/test-context /-->',
-			'post_excerpt' => '',
+			'post_content' => '<!-- wp:gutenberg/test-context-level-1 /-->',
 		);
 		$post = $this->factory()->post->create_and_get( $args );
 		setup_postdata( $post );
 
 		$content         = get_the_content( null, false, $post );
 		$rendered_blocks = do_blocks( $content );
-		$expected        = '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "hello" }\'><p data-wp-text=\'context.MyText\'>hello</p></div>';
+		$expected        = '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p data-wp-text=\'context.MyText\'>level-1</p></div>';
 		$this->assertSame( $expected, $rendered_blocks );
-
-		unregister_block_type( 'gutenberg/test-context' );
 		wp_delete_post( $post->ID, true );
 	}
 	public function test_directive_processing_child_blocks() {
-		register_block_type(
-			'gutenberg/test-context',
-			array(
-				'render_callback' => function () {
-					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "hello" }\'><p data-wp-text=\'context.MyText\'></p></div>';
-				},
-				'supports'        => array(
-					'interactivity' => true,
-				),
-			)
-		);
 		$args = array(
-			'post_content' => '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group"><!-- wp:gutenberg/test-context /--></div><!-- /wp:group -->',
-			'post_excerpt' => '',
+			'post_content' => '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group"><!-- wp:gutenberg/test-context-level-1 /--></div><!-- /wp:group -->',
 		);
 		$post = $this->factory()->post->create_and_get( $args );
 		setup_postdata( $post );
 
 		$content         = get_the_content( null, false, $post );
 		$rendered_blocks = do_blocks( $content );
-		$expected        = '<div class="wp-block-group is-layout-constrained wp-block-group-is-layout-constrained"><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "hello" }\'><p data-wp-text=\'context.MyText\'>hello</p></div></div>';
+		$expected        = '<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained"><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p data-wp-text=\'context.MyText\'>level-1</p></div></div></div>';
 		$this->assertSame( $expected, $rendered_blocks );
-
-		unregister_block_type( 'gutenberg/test-context' );
+		wp_delete_post( $post->ID, true );
+	}
+	public function test_directive_processing_inner_non_interactive_blocks() {
+		$args = array(
+			'post_content' => '<!-- wp:gutenberg/test-context-level-1 --><div class="wp-block-create-block-context"><!-- wp:paragraph --><p>inner non interactive</p><!-- /wp:paragraph --></div><!--/wp:gutenberg/test-context-level-1 -->',
+		);
+		$post = $this->factory()->post->create_and_get( $args );
+		setup_postdata( $post );
+		$content         = get_the_content( null, false, $post );
+		$rendered_blocks = do_blocks( $content );
+		$expected        = '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p>inner non interactive</p><p data-wp-text=\'context.MyText\'>level-1</p></div>';
+		$this->assertSame( $expected, $rendered_blocks );
 		wp_delete_post( $post->ID, true );
 	}
 }
