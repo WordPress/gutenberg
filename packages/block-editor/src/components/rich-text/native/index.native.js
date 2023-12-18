@@ -48,7 +48,6 @@ import {
 import { useFormatTypes } from './use-format-types';
 import FormatEdit from './format-edit';
 import { getFormatColors } from './get-format-colors';
-import { getScreenAdjustedFontSize } from './get-screen-adjusted-font-size';
 import styles from './style.scss';
 import ToolbarButtonWithOptions from './toolbar-button-with-options';
 
@@ -1125,9 +1124,7 @@ export class RichText extends Component {
 		const editableProps = this.getEditableProps();
 		const blockUseDefaultFont = this.getBlockUseDefaultFont();
 
-		const fontSize = this.isIOS
-			? getScreenAdjustedFontSize( currentFontSize )
-			: currentFontSize;
+		const fontSize = currentFontSize;
 		const lineHeight = this.getLineHeight();
 
 		const {
