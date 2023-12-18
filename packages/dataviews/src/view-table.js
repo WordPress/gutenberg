@@ -189,8 +189,13 @@ function HeaderMenu( { field, view, onChangeView } ) {
 												role="menuitemradio"
 												aria-checked={ isActive }
 												prefix={
-													isActive && (
+													isActive ? (
 														<Icon icon={ check } />
+													) : (
+														<span
+															className="dataviews__filters-custom-menu-radio-item-prefix"
+															aria-hidden="true"
+														></span>
 													)
 												}
 												onClick={ () => {

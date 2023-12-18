@@ -116,7 +116,16 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 								key={ element.value }
 								role="menuitemradio"
 								aria-checked={ isActive }
-								prefix={ isActive && <Icon icon={ check } /> }
+								prefix={
+									isActive ? (
+										<Icon icon={ check } />
+									) : (
+										<span
+											className="dataviews__filters-custom-menu-radio-item-prefix"
+											aria-hidden="true"
+										></span>
+									)
+								}
 								onClick={ () =>
 									onChangeView( {
 										...view,

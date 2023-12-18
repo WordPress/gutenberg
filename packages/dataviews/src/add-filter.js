@@ -125,10 +125,15 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 													role="menuitemradio"
 													aria-checked={ isActive }
 													prefix={
-														isActive && (
+														isActive ? (
 															<Icon
 																icon={ check }
 															/>
+														) : (
+															<span
+																aria-hidden="true"
+																className="dataviews__filters-custom-menu-radio-item-prefix"
+															></span>
 														)
 													}
 													onClick={ ( event ) => {
