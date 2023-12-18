@@ -13,6 +13,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
 	store as editorStore,
+	PostDiscussionPanel,
 	PostExcerptPanel,
 	PostFeaturedImagePanel,
 	PostLastRevisionPanel,
@@ -24,7 +25,6 @@ import {
  */
 import SettingsHeader from '../settings-header';
 import PostStatus from '../post-status';
-import DiscussionPanel from '../discussion-panel';
 import PageAttributes from '../page-attributes';
 import MetaBoxes from '../../meta-boxes';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
@@ -85,7 +85,7 @@ const SidebarContent = ( {
 							<PostTaxonomiesPanel />
 							<PostFeaturedImagePanel />
 							<PostExcerptPanel />
-							<DiscussionPanel />
+							<PostDiscussionPanel />
 							<PageAttributes />
 							<MetaBoxes location="side" />
 						</>
