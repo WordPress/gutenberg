@@ -488,10 +488,10 @@ export function createBlockListBlockFilter( features ) {
 					}
 
 					if (
-						! hasSupport( props.name ) ||
 						// Skip rendering if none of the needed attributes are
 						// set.
-						! Object.keys( neededProps ).length
+						! Object.keys( neededProps ).length ||
+						! hasSupport( props.name )
 					) {
 						return null;
 					}
@@ -541,5 +541,51 @@ export function createBlockListBlockFilter( features ) {
 		'editor.BlockListBlock',
 		'core/editor/hooks',
 		withBlockListBlockHooks
+	);
+}
+
+export function createBlockSaveFilter( features ) {
+	function extraPropsFromHooks( props, name, attributes ) {
+		return features.reduce( ( accu, feature ) => {
+			const { hasSupport, attributeKeys = [], addSaveProps } = feature;
+
+			const neededAttributes = {};
+			for ( const key of attributeKeys ) {
+				if ( attributes[ key ] ) {
+					neededAttributes[ key ] = attributes[ key ];
+				}
+			}
+
+			if (
+				// Skip rendering if none of the needed attributes are
+				// set.
+				! Object.keys( neededAttributes ).length ||
+				! hasSupport( name )
+			) {
+				return accu;
+			}
+
+			return addSaveProps( accu, name, neededAttributes );
+		}, props );
+	}
+	addFilter(
+		'blocks.getSaveContent.extraProps',
+		'core/editor/hooks',
+		extraPropsFromHooks,
+		0
+	);
+	addFilter(
+		'blocks.getSaveContent.extraProps',
+		'core/editor/hooks',
+		( props ) => {
+			// Previously we had a filter deleting the className if it was an empty
+			// string. That filter is no longer running, so now we need to delete it
+			// here.
+			if ( props.hasOwnProperty( 'className' ) && ! props.className ) {
+				delete props.className;
+			}
+
+			return props;
+		}
 	);
 }

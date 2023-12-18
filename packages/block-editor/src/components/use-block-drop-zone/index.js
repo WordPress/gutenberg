@@ -256,6 +256,8 @@ export default function useBlockDropZone( {
 	// values returned by the `getRootBlockClientId` selector, which also uses
 	// an empty string to represent top-level blocks.
 	rootClientId: targetRootClientId = '',
+	parentClientId: parentBlockClientId = '',
+	isDisabled = false,
 } = {} ) {
 	const registry = useRegistry();
 	const [ dropTarget, setDropTarget ] = useState( {
@@ -263,54 +265,15 @@ export default function useBlockDropZone( {
 		operation: 'insert',
 	} );
 
+	const { getBlockType } = useSelect( blocksStore );
 	const {
-		parentBlockClientId,
-		rootBlockIndex,
-		isDisabled,
-		getBlockType,
-		allowedBlocks,
-		draggedBlockNames,
-		targetBlockName,
-	} = useSelect(
-		( select ) => {
-			const {
-				__unstableIsWithinBlockOverlay,
-				__unstableHasActiveBlockOverlayActive,
-				getBlockIndex,
-				getBlockParents,
-				getBlockEditingMode,
-				getDraggedBlockClientIds,
-				getBlockNamesByClientId,
-				getAllowedBlocks,
-			} = select( blockEditorStore );
-			const { getBlockType: _getBlockType } = select( blocksStore );
-			const blockEditingMode = getBlockEditingMode( targetRootClientId );
-			return {
-				parentBlockClientId:
-					getBlockParents( targetRootClientId, true )[ 0 ] || '',
-				rootBlockIndex: getBlockIndex( targetRootClientId ),
-				isDisabled:
-					blockEditingMode !== 'default' ||
-					__unstableHasActiveBlockOverlayActive(
-						targetRootClientId
-					) ||
-					__unstableIsWithinBlockOverlay( targetRootClientId ),
-
-				getBlockType: _getBlockType,
-				allowedBlocks: getAllowedBlocks( targetRootClientId ),
-				draggedBlockNames: getBlockNamesByClientId(
-					getDraggedBlockClientIds()
-				),
-				targetBlockName: getBlockNamesByClientId( [
-					targetRootClientId,
-				] )[ 0 ],
-			};
-		},
-		[ targetRootClientId ]
-	);
-
-	const { getBlockListSettings, getBlocks, getBlockIndex } =
-		useSelect( blockEditorStore );
+		getBlockListSettings,
+		getBlocks,
+		getBlockIndex,
+		getDraggedBlockClientIds,
+		getBlockNamesByClientId,
+		getAllowedBlocks,
+	} = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
@@ -326,6 +289,13 @@ export default function useBlockDropZone( {
 	const throttled = useThrottle(
 		useCallback(
 			( event, ownerDocument ) => {
+				const allowedBlocks = getAllowedBlocks( targetRootClientId );
+				const targetBlockName = getBlockNamesByClientId( [
+					targetRootClientId,
+				] )[ 0 ];
+				const draggedBlockNames = getBlockNamesByClientId(
+					getDraggedBlockClientIds()
+				);
 				const isBlockDroppingAllowed = isDropTargetValid(
 					getBlockType,
 					allowedBlocks,
@@ -377,7 +347,7 @@ export default function useBlockDropZone( {
 							? getBlockListSettings( parentBlockClientId )
 									?.orientation
 							: undefined,
-						rootBlockIndex,
+						rootBlockIndex: getBlockIndex( targetRootClientId ),
 					}
 				);
 
@@ -400,19 +370,18 @@ export default function useBlockDropZone( {
 				} );
 			},
 			[
-				dropZoneElement,
-				getBlocks,
+				getAllowedBlocks,
 				targetRootClientId,
+				getBlockNamesByClientId,
+				getDraggedBlockClientIds,
+				getBlockType,
+				getBlocks,
 				getBlockListSettings,
+				dropZoneElement,
+				parentBlockClientId,
+				getBlockIndex,
 				registry,
 				showInsertionPoint,
-				getBlockIndex,
-				parentBlockClientId,
-				rootBlockIndex,
-				getBlockType,
-				allowedBlocks,
-				draggedBlockNames,
-				targetBlockName,
 			]
 		),
 		200

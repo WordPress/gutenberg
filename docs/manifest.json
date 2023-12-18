@@ -48,52 +48,10 @@
 		"parent": "getting-started"
 	},
 	{
-		"title": "Create a Block Tutorial",
-		"slug": "create-block",
-		"markdown_source": "../docs/getting-started/create-block/README.md",
+		"title": "Tutorial: Build your first block",
+		"slug": "tutorial",
+		"markdown_source": "../docs/getting-started/tutorial.md",
 		"parent": "getting-started"
-	},
-	{
-		"title": "WordPress Plugin",
-		"slug": "wp-plugin",
-		"markdown_source": "../docs/getting-started/create-block/wp-plugin.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Anatomy of a Block",
-		"slug": "block-anatomy",
-		"markdown_source": "../docs/getting-started/create-block/block-anatomy.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Block Attributes",
-		"slug": "attributes",
-		"markdown_source": "../docs/getting-started/create-block/attributes.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Code Implementation",
-		"slug": "block-code",
-		"markdown_source": "../docs/getting-started/create-block/block-code.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Authoring Experience",
-		"slug": "author-experience",
-		"markdown_source": "../docs/getting-started/create-block/author-experience.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Finishing Touches",
-		"slug": "finishing",
-		"markdown_source": "../docs/getting-started/create-block/finishing.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Share your Block with the World",
-		"slug": "submitting-to-block-directory",
-		"markdown_source": "../docs/getting-started/create-block/submitting-to-block-directory.md",
-		"parent": "create-block"
 	},
 	{
 		"title": "Fundamentals of Block Development",
@@ -174,39 +132,15 @@
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Introducing Attributes and Editable Fields",
-		"slug": "introducing-attributes-and-editable-fields",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields.md",
-		"parent": "block-tutorial"
-	},
-	{
 		"title": "Block Controls: Block Toolbar and Settings Sidebar",
 		"slug": "block-controls-toolbar-and-sidebar",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md",
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Block Supports",
-		"slug": "block-supports-in-static-blocks",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports-in-static-blocks.md",
-		"parent": "block-tutorial"
-	},
-	{
 		"title": "Creating dynamic blocks",
 		"slug": "creating-dynamic-blocks",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Block Supports in dynamic blocks",
-		"slug": "block-supports-in-dynamic-blocks",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/block-supports-in-dynamic-blocks.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Generate Blocks with WP-CLI",
-		"slug": "generate-blocks-with-wp-cli",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/generate-blocks-with-wp-cli.md",
 		"parent": "block-tutorial"
 	},
 	{

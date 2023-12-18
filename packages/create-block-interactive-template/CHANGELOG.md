@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.11.0 (2023-12-13)
+
 -   Add all files to the generated plugin zip. [#56943](https://github.com/WordPress/gutenberg/pull/56943)
 -   Prevent crash when Gutenberg plugin is not installed. [#56941](https://github.com/WordPress/gutenberg/pull/56941)
 

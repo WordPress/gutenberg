@@ -122,6 +122,8 @@ export function togglePublishSidebar() {
 /**
  * Returns an action object used to enable or disable a panel in the editor.
  *
+ * @deprecated
+ *
  * @param {string} panelName A string that identifies the panel to enable or disable.
  *
  * @return {Object} Action object.
@@ -129,73 +131,48 @@ export function togglePublishSidebar() {
 export const toggleEditorPanelEnabled =
 	( panelName ) =>
 	( { registry } ) => {
-		const inactivePanels =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'inactivePanels' ) ?? [];
-
-		const isPanelInactive = !! inactivePanels?.includes( panelName );
-
-		// If the panel is inactive, remove it to enable it, else add it to
-		// make it inactive.
-		let updatedInactivePanels;
-		if ( isPanelInactive ) {
-			updatedInactivePanels = inactivePanels.filter(
-				( invactivePanelName ) => invactivePanelName !== panelName
-			);
-		} else {
-			updatedInactivePanels = [ ...inactivePanels, panelName ];
-		}
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'inactivePanels', updatedInactivePanels );
+		deprecated( "dispatch( 'core/edit-post' ).toggleEditorPanelEnabled", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').toggleEditorPanelEnabled",
+		} );
+		registry.dispatch( editorStore ).toggleEditorPanelEnabled( panelName );
 	};
 
 /**
  * Opens a closed panel and closes an open panel.
+ *
+ * @deprecated
  *
  * @param {string} panelName A string that identifies the panel to open or close.
  */
 export const toggleEditorPanelOpened =
 	( panelName ) =>
 	( { registry } ) => {
-		const openPanels =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'openPanels' ) ?? [];
-
-		const isPanelOpen = !! openPanels?.includes( panelName );
-
-		// If the panel is open, remove it to close it, else add it to
-		// make it open.
-		let updatedOpenPanels;
-		if ( isPanelOpen ) {
-			updatedOpenPanels = openPanels.filter(
-				( openPanelName ) => openPanelName !== panelName
-			);
-		} else {
-			updatedOpenPanels = [ ...openPanels, panelName ];
-		}
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'openPanels', updatedOpenPanels );
+		deprecated( "dispatch( 'core/edit-post' ).toggleEditorPanelOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').toggleEditorPanelOpened",
+		} );
+		registry.dispatch( editorStore ).toggleEditorPanelOpened( panelName );
 	};
 
 /**
  * Returns an action object used to remove a panel from the editor.
  *
+ * @deprecated
+ *
  * @param {string} panelName A string that identifies the panel to remove.
  *
  * @return {Object} Action object.
  */
-export function removeEditorPanel( panelName ) {
-	return {
-		type: 'REMOVE_PANEL',
-		panelName,
+export const removeEditorPanel =
+	( panelName ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).removeEditorPanel", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').removeEditorPanel",
+		} );
+		registry.dispatch( editorStore ).removeEditorPanel( panelName );
 	};
-}
 
 /**
  * Triggers an action used to toggle a feature flag.

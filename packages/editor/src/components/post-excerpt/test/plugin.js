@@ -11,7 +11,7 @@ import { SlotFillProvider } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import PluginPostExcerptPanel from '../';
+import PluginPostExcerptPanel from '../plugin';
 
 describe( 'PluginPostExcerptPanel', () => {
 	test( 'renders fill properly', () => {

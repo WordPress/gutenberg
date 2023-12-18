@@ -4,13 +4,14 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { shouldSkipSerialization } from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
-import { kebabCase } from '../utils/object';
+import { unlock } from '../lock-unlock';
 
 export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
 
@@ -67,6 +68,7 @@ function addSaveProps( props, blockType, attributes ) {
 
 	// Use TokenList to dedupe classes.
 	const classes = new TokenList( props.className );
+	const { kebabCase } = unlock( componentsPrivateApis );
 	classes.add( `has-${ kebabCase( attributes?.fontFamily ) }-font-family` );
 	const newClassName = classes.value;
 	props.className = newClassName ? newClassName : undefined;
@@ -80,6 +82,7 @@ function useBlockProps( { name, fontFamily } ) {
 
 export default {
 	useBlockProps,
+	addSaveProps,
 	attributeKeys: [ 'fontFamily' ],
 	hasSupport( name ) {
 		return hasBlockSupport( name, FONT_FAMILY_SUPPORT_KEY );
@@ -102,10 +105,4 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/fontFamily/addAttribute',
 	addAttributes
-);
-
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/fontFamily/addSaveProps',
-	addSaveProps
 );

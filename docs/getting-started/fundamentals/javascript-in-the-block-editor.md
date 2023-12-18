@@ -15,7 +15,7 @@ Browsers cannot interpret or run ESNext and JSX syntaxes, so a transformation st
 
 Among other things, with `wp-scripts` package you can use Javascript modules to distribute your code among different files and get a few bundled files at the end of the build process (see [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8)).
 
-[![Build Process Diagram](https://developer.wordpress.org/files/2023/11/build-process.png)](https://excalidraw.com/#json=4aNG9JUti3pMnsfoga35b,ihEAI8p5dwkpjWr6gQmjuw "Open Build Process Diagram in Excalidraw")
+[![Open Build Process diagram image](https://developer.wordpress.org/files/2023/11/build-process.png)](https://developer.wordpress.org/files/2023/11/build-process.png "Open Build Process diagram image")
 
 With the [proper `package.json` scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/#basic-usage) you can launch the build process with `wp-scripts` in production and development mode:
 
@@ -49,3 +49,4 @@ Use [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/ho
 - [block-development-examples](https://github.com/WordPress/block-development-examples) | GitHub repository
 - [block-theme-examples](https://github.com/wptrainingteam/block-theme-examples) | GitHub repository
 - [How webpack and WordPress packages interact](https://developer.wordpress.org/news/2023/04/how-webpack-and-wordpress-packages-interact/) | Developer Blog
+- [Build Process Diagram](https://excalidraw.com/#json=4aNG9JUti3pMnsfoga35b,ihEAI8p5dwkpjWr6gQmjuw)

@@ -18,7 +18,6 @@ import { RichTextData } from '@wordpress/rich-text';
  */
 import { BLOCK_ICON_DEFAULT } from './constants';
 import { getBlockType, getDefaultBlockName } from './registration';
-import { createBlock } from './factory';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -39,21 +38,25 @@ const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
  * @return {boolean} Whether the block is an unmodified block.
  */
 export function isUnmodifiedBlock( block ) {
-	// Cache a created default block if no cache exists or the default block
-	// name changed.
-	if ( ! isUnmodifiedBlock[ block.name ] ) {
-		isUnmodifiedBlock[ block.name ] = createBlock( block.name );
-	}
+	return Object.entries( getBlockType( block.name )?.attributes ?? {} ).every(
+		( [ key, definition ] ) => {
+			const value = block.attributes[ key ];
 
-	const newBlock = isUnmodifiedBlock[ block.name ];
-	const blockType = getBlockType( block.name );
+			// Every attribute that has a default must match the default.
+			if ( definition.hasOwnProperty( 'default' ) ) {
+				return value === definition.default;
+			}
 
-	function isEqual( a, b ) {
-		return ( a?.valueOf() ?? a ) === ( b?.valueOf() ?? b );
-	}
+			// The rich text type is a bit different from the rest because it
+			// has an implicit default value of an empty RichTextData instance,
+			// so check the length of the value.
+			if ( definition.type === 'rich-text' ) {
+				return ! value?.length;
+			}
 
-	return Object.keys( blockType?.attributes ?? {} ).every( ( key ) =>
-		isEqual( newBlock.attributes[ key ], block.attributes[ key ] )
+			// Every attribute that doesn't have a default should be undefined.
+			return value === undefined;
+		}
 	);
 }
 

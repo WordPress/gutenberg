@@ -60,9 +60,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 								<Icon icon={ check } />
 							)
 						}
-						onSelect={ ( event ) => {
-							// We need to handle this on DropDown component probably..
-							event.preventDefault();
+						onSelect={ () => {
 							onChangeView( {
 								...view,
 								type: availableView.type,
@@ -263,7 +261,6 @@ export default function ViewActions( {
 		<DropdownMenu
 			trigger={
 				<Button
-					variant="tertiary"
 					size="compact"
 					icon={
 						VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
@@ -276,11 +273,13 @@ export default function ViewActions( {
 			}
 		>
 			<DropdownMenuGroup>
-				<ViewTypeMenu
-					view={ view }
-					onChangeView={ onChangeView }
-					supportedLayouts={ supportedLayouts }
-				/>
+				{ window?.__experimentalAdminViews && (
+					<ViewTypeMenu
+						view={ view }
+						onChangeView={ onChangeView }
+						supportedLayouts={ supportedLayouts }
+					/>
+				) }
 				<SortMenu
 					fields={ fields }
 					view={ view }
