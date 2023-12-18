@@ -23,11 +23,12 @@ import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
-
+import useInitEditedEntityFromURL from './components/sync-state-with-url/use-init-edited-entity-from-url';
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
-function Editor( { postId, postType, settings, initialEdits, ...props } ) {
+function Editor( { settings, initialEdits, ...props } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const { postId, postType = 'post' } = useInitEditedEntityFromURL();
 
 	const {
 		allowRightClickOverrides,

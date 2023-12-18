@@ -142,16 +142,12 @@ function setBlockEditMode( setEditMode, blocks ) {
 	} );
 }
 
-function editSourcePattern( setEditedPost, patternId ) {
-	setEditedPost( 'wp_block', patternId );
-}
-
 export default function ReusableBlockEdit( {
 	name,
 	attributes: { ref, overrides },
 	__unstableParentLayout: parentLayout,
 	clientId: patternClientId,
-	setEditedPost,
+	editOriginalPattern,
 } ) {
 	const registry = useRegistry();
 	const hasAlreadyRendered = useHasRecursion( ref );
@@ -293,14 +289,10 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			{ userCanEdit && (
+			{ userCanEdit && editOriginalPattern && (
 				<BlockControls>
 					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ () =>
-								editSourcePattern( setEditedPost, ref )
-							}
-						>
+						<ToolbarButton onClick={ editOriginalPattern }>
 							{ __( 'Edit original' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
