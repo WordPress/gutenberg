@@ -42,6 +42,7 @@ Use [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/ho
 
 ## Additional resources
 
+- [Package Reference](https://developer.wordpress.org/block-editor/reference-guides/packages/)
 - [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/) 
 - [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) 
 - [WordPress Packages handles](https://developer.wordpress.org/block-editor/contributors/code/scripts/) 
