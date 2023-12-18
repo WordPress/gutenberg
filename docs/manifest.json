@@ -2076,7 +2076,7 @@
 		"parent": "architecture"
 	},
 	{
-		"title": "Styles",
+		"title": "Styles in the Editor",
 		"slug": "styles",
 		"markdown_source": "../docs/explanations/architecture/styles.md",
 		"parent": "architecture"

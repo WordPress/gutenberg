@@ -214,6 +214,8 @@ _Returns_
 
 ### isInserterOpened
 
+> **Deprecated**
+
 Returns true if the inserter is opened.
 
 _Parameters_
@@ -446,29 +448,23 @@ Returns an action object used to switch to template editing.
 
 ### setIsInserterOpened
 
+> **Deprecated**
+
 Returns an action object used to open/close the inserter.
 
 _Parameters_
 
--   _value_ `boolean|Object`: Whether the inserter should be opened (true) or closed (false). To specify an insertion point, use an object.
--   _value.rootClientId_ `string`: The root client ID to insert at.
--   _value.insertionIndex_ `number`: The index to insert at.
-
-_Returns_
-
--   `Object`: Action object.
+-   _value_ `boolean|Object`: Whether the inserter should be opened (true) or closed (false).
 
 ### setIsListViewOpened
+
+> **Deprecated**
 
 Returns an action object used to open/close the list view.
 
 _Parameters_
 
 -   _isOpen_ `boolean`: A boolean representing whether the list view should be opened or closed.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### showBlockTypes
 

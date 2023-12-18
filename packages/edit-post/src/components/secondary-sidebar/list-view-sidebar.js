@@ -11,15 +11,15 @@ import { __, _x } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { store as editPostStore } from '../../store';
 import ListViewOutline from './list-view-outline';
 
 export default function ListViewSidebar( { listViewToggleElement } ) {
-	const { setIsListViewOpened } = useDispatch( editPostStore );
+	const { setIsListViewOpened } = useDispatch( editorStore );
 
 	// This hook handles focus when the sidebar first renders.
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
