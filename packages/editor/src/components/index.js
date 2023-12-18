@@ -95,6 +95,5 @@ export * from './deprecated';
 export const VisualEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
 export const TextEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
 
-// Block Bindings Components
-
-export { default as BlockBindingsButton } from './block-bindings';
+// Block Bindings Components.
+export * from './block-bindings';
