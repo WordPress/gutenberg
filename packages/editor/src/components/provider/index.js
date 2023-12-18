@@ -13,6 +13,7 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { createBlock } from '@wordpress/blocks';
+import { getQueryArg } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -40,7 +41,9 @@ const noop = () => {};
  */
 function useBlockEditorProps( post, template, mode ) {
 	const rootLevelPost =
-		mode === 'post-only' || ! template ? 'post' : 'template';
+		mode === 'post-only' || mode === 'pattern-only' || ! template
+			? 'post'
+			: 'template';
 	const [ postBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		post.type,
@@ -109,7 +112,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			( select ) => select( editorStore ).getRenderingMode(),
 			[]
 		);
-		const shouldRenderTemplate = !! template && mode !== 'post-only';
+		const shouldRenderTemplate =
+			!! template && mode !== 'post-only' && mode !== 'pattern-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
 			const postContext =
@@ -154,8 +158,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			type,
 			id
 		);
+
+		const patternId = getQueryArg( window.location.href, 'patternId' );
+		const postData =
+			mode !== 'pattern-only'
+				? post
+				: { id: patternId, type: 'wp_block' };
 		const [ blocks, onInput, onChange ] = useBlockEditorProps(
-			post,
+			postData,
 			template,
 			mode
 		);

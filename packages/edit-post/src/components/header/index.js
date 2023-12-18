@@ -70,15 +70,16 @@ function Header( {
 		isEditingTemplate,
 		isPublishSidebarOpened,
 		showIconLabels,
+		isEditingPattern,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
-
+		const renderingMode = select( editorStore ).getRenderingMode();
 		return {
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			isEditingTemplate:
-				select( editorStore ).getRenderingMode() === 'template-only',
+			isEditingTemplate: renderingMode === 'template-only',
+			isEditingPattern: renderingMode === 'pattern-only',
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core/edit-post', 'fixedToolbar' ),
@@ -123,7 +124,8 @@ function Header( {
 								'selected-block-tools-wrapper',
 								{
 									'is-collapsed':
-										isEditingTemplate &&
+										( isEditingTemplate ||
+											isEditingPattern ) &&
 										isBlockToolsCollapsed,
 								}
 							) }
@@ -162,7 +164,9 @@ function Header( {
 							isLargeViewport,
 					} ) }
 				>
-					{ isEditingTemplate && <DocumentBar /> }
+					{ ( isEditingTemplate || isEditingPattern ) && (
+						<DocumentBar />
+					) }
 				</div>
 			</motion.div>
 			<motion.div

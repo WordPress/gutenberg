@@ -34,6 +34,7 @@ function ModeSwitcher() {
 		isRichEditingEnabled,
 		isCodeEditingEnabled,
 		isEditingTemplate,
+		isEditingPattern,
 		mode,
 	} = useSelect(
 		( select ) => ( {
@@ -46,13 +47,15 @@ function ModeSwitcher() {
 				select( editorStore ).getEditorSettings().codeEditingEnabled,
 			isEditingTemplate:
 				select( editorStore ).getRenderingMode() === 'template-only',
+			isEditingPattern:
+				select( editorStore ).getRenderingMode() === 'pattern-only',
 			mode: select( editPostStore ).getEditorMode(),
 		} ),
 		[]
 	);
 	const { switchEditorMode } = useDispatch( editPostStore );
 
-	if ( isEditingTemplate ) {
+	if ( isEditingTemplate || isEditingPattern ) {
 		return null;
 	}
 
