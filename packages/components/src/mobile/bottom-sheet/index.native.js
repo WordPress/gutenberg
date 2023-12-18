@@ -212,8 +212,6 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
-		const { isFullScreen } = this.props;
-
 		this.dimensionsChangeSubscription.remove();
 		this.keyboardShowListener.remove();
 		this.keyboardHideListener.remove();
@@ -222,9 +220,7 @@ class BottomSheet extends Component {
 		}
 
 		if ( this.props.isVisible ) {
-			// For full screen modals we add a delay for the keyboard
-			const keyboardDelay = isFullScreen ? 500 : 0;
-			showAndroidSoftKeyboard( { delay: keyboardDelay } );
+			showAndroidSoftKeyboard();
 		}
 
 		if ( this.safeAreaEventSubscription === null ) {

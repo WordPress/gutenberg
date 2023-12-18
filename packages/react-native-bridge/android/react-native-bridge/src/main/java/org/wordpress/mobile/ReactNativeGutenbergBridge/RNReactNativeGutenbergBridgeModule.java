@@ -557,44 +557,59 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void showAndroidSoftKeyboard(Integer delayMillis) {
+    public void showAndroidSoftKeyboard() {
         Activity currentActivity = mReactContext.getCurrentActivity();
-        if (currentActivity != null) {
-            View currentFocusedView = currentActivity.getCurrentFocus();
+        if (isAnyViewFocused()) {
+            // Cancel any previously scheduled Runnable
+            if (mKeyboardRunnable != null) {
+                currentActivity.getWindow().getDecorView().removeCallbacks(mKeyboardRunnable);
+            }
+
+            View currentFocusedView = getCurrentFocusedView();
             if (currentFocusedView != null) {
-                // Cancel any previously scheduled Runnable
-                if (mKeyboardRunnable != null) {
-                    currentActivity.getWindow().getDecorView().removeCallbacks(mKeyboardRunnable);
-                }
-
-                final Runnable showTheKeyboardNow = new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            View activeFocusedView = currentActivity.getCurrentFocus();
-                            if (activeFocusedView != null && currentActivity.getWindow().getDecorView().isShown()) {
-                                InputMethodManager imm =
-                                    (InputMethodManager) mReactContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-                                imm.showSoftInput(activeFocusedView, InputMethodManager.SHOW_IMPLICIT);
-                            }
-                        } catch (Exception e) {
-                            // Noop
-                        }
-                    }
-                };
-
-                // Schedule the keyboard showing with a delay
                 currentFocusedView.getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
                     @Override
                     public void onWindowFocusChanged(boolean hasFocus) {
                         if (hasFocus) {
-                            currentActivity.getWindow().getDecorView().postDelayed(showTheKeyboardNow, delayMillis);
+                            mKeyboardRunnable = createShowKeyboardRunnable(currentActivity);
+                            currentActivity.getWindow().getDecorView().post(mKeyboardRunnable);
                             currentFocusedView.getViewTreeObserver().removeOnWindowFocusChangeListener(this);
                         }
                     }
                 });
             }
         }
+    }
+
+    private Runnable createShowKeyboardRunnable(final Activity currentActivity) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    View activeFocusedView = getCurrentFocusedView();
+                    if (activeFocusedView != null && currentActivity.getWindow().getDecorView().isShown()) {
+                        InputMethodManager imm =
+                            (InputMethodManager) mReactContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.showSoftInput(activeFocusedView, InputMethodManager.SHOW_IMPLICIT);
+                    }
+                } catch (Exception e) {
+                    // Noop
+                }
+            }
+        };
+    }
+
+    private View getCurrentFocusedView() {
+        Activity activity = mReactContext.getCurrentActivity();
+        if (activity == null) {
+            return null;
+        }
+        return activity.getCurrentFocus();
+    }
+
+    private boolean isAnyViewFocused() {
+        View getCurrentFocusedView = getCurrentFocusedView();
+        return getCurrentFocusedView != null;
     }
 
     @ReactMethod
