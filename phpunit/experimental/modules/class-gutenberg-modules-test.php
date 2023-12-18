@@ -181,6 +181,19 @@ class Gutenberg_Modules_Test extends WP_UnitTestCase {
 		$this->assertEquals( false, isset( $import_map['@wordpress/some-nested-dynamic-dep'] ) );
 	}
 
-	// public function test_gutenberg_modules_get_version() {}.
+	public function test_get_version_query_string() {
+		$get_version_query_string = new ReflectionMethod( 'Gutenberg_Modules', 'get_version_query_string' );
+		$get_version_query_string->setAccessible( true );
+
+		$result = $get_version_query_string->invoke( null, '1.0' );
+		$this->assertEquals( '?ver=1.0', $result );
+
+		$result = $get_version_query_string->invoke( null, false );
+		$this->assertEquals( '?ver=' . get_bloginfo( 'version' ), $result );
+
+		$result = $get_version_query_string->invoke( null, null );
+		$this->assertEquals( '', $result );
+	}
+
 	// public function test_gutenberg_dont_crash_on_missing_dependency() {}.
 }
