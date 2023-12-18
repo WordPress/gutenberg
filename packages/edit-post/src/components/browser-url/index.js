@@ -82,7 +82,7 @@ export class BrowserURL extends Component {
 	 * @param {number} postId Post ID for which to generate post editor URL.
 	 */
 	setBrowserURL( postId ) {
-		if ( getQueryArg( window.location.href, 'editMode' ) ) {
+		if ( getQueryArg( window.location.href, 'editMode' ) === 'focused' ) {
 			return;
 		}
 		window.history.replaceState(
