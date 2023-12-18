@@ -120,9 +120,6 @@ export default function ItemActions( { item, actions, isCompact } ) {
 			{ primaryActions: [], secondaryActions: [] }
 		);
 	}, [ actions, item ] );
-	if ( ! primaryActions.length && ! secondaryActions.length ) {
-		return null;
-	}
 	if ( isCompact ) {
 		return (
 			<CompactItemActions
@@ -161,23 +158,22 @@ export default function ItemActions( { item, actions, isCompact } ) {
 						/>
 					);
 				} ) }
-			{ !! secondaryActions.length && (
-				<DropdownMenu
-					trigger={
-						<Button
-							size="compact"
-							icon={ moreVertical }
-							label={ __( 'Actions' ) }
-						/>
-					}
-					placement="bottom-end"
-				>
-					<ActionsDropdownMenuGroup
-						actions={ secondaryActions }
-						item={ item }
+			<DropdownMenu
+				trigger={
+					<Button
+						size="compact"
+						icon={ moreVertical }
+						label={ __( 'Actions' ) }
+						disabled={ ! secondaryActions.length }
 					/>
-				</DropdownMenu>
-			) }
+				}
+				placement="bottom-end"
+			>
+				<ActionsDropdownMenuGroup
+					actions={ secondaryActions }
+					item={ item }
+				/>
+			</DropdownMenu>
 		</HStack>
 	);
 }
