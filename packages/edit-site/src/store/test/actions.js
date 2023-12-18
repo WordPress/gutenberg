@@ -121,7 +121,7 @@ describe( 'actions', () => {
 			registry
 				.dispatch( preferencesStore )
 				.set( 'core/edit-site', 'fixedToolbar', true );
-			registry.dispatch( editSiteStore ).setIsListViewOpened( true );
+			registry.dispatch( editorStore ).setIsListViewOpened( true );
 			registry
 				.dispatch( editSiteStore )
 				.openGeneralSidebar( 'edit-site/global-styles' );

@@ -271,7 +271,7 @@ describe( 'actions', () => {
 					.select( preferencesStore )
 					.get( 'core/edit-post', 'fixedToolbar' )
 			).toBe( true );
-			expect( registry.select( editPostStore ).isListViewOpened() ).toBe(
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
 				false
 			);
 			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
