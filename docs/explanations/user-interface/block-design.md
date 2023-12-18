@@ -84,7 +84,7 @@ Use concise block names.
 **Don't:**
 Avoid long, multi-line block names.
 
-### Block iescription
+### Block description
 
 Every block should include a description that clearly explains the block's function. The description will display in the Settings Sidebar.
 
