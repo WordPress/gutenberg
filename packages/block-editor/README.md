@@ -820,7 +820,7 @@ _Parameters_
 -   _setAttributes_ `Function`: - setAttributes function to modify the bindings property.
 -   _updatingAttribute_ `string`: - The attribute in the bindings object to update.
 -   _sourceName_ `string`: - The source name added to the bindings property.
--   _sourceParams_ `string`: - The source params added to the bindings property.
+-   _sourceAttributes_ `string`: - The source attributes added to the bindings property.
 
 ### URLInput
 

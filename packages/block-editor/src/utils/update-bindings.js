@@ -5,14 +5,14 @@
  * @param {Function} setAttributes     - setAttributes function to modify the bindings property.
  * @param {string}   updatingAttribute - The attribute in the bindings object to update.
  * @param {string}   sourceName        - The source name added to the bindings property.
- * @param {string}   sourceParams      - The source params added to the bindings property.
+ * @param {string}   sourceAttributes  - The source attributes added to the bindings property.
  */
 export const updateBlockBindingsAttribute = (
 	blockAttributes,
 	setAttributes,
 	updatingAttribute,
 	sourceName,
-	sourceParams
+	sourceAttributes
 ) => {
 	// TODO: Review the bindings syntax.
 	// Assuming the following format for the bindings property of the "metadata" attribute:
@@ -20,14 +20,14 @@ export const updateBlockBindingsAttribute = (
 	// "bindings": {
 	//   "title": {
 	//       "source": {
-	//         "id": "metadata",
-	//         "params": { "value": "text_custom_field" }
+	//         "name": "metadata",
+	//         "attributes": { "value": "text_custom_field" }
 	//       }
 	//   },
 	//   "url": {
 	//       "source": {
-	//         "id": "metadata",
-	//         "params": { "value": "text_custom_field" }
+	//         "name": "metadata",
+	//         "attributes": { "value": "text_custom_field" }
 	//       }
 	//   }
 	// },
@@ -59,7 +59,7 @@ export const updateBlockBindingsAttribute = (
 		: {};
 
 	bindingsProperty[ updatingAttribute ] = {
-		source: { id: sourceName, params: sourceParams },
+		source: { name: sourceName, attributes: sourceAttributes },
 	};
 
 	metadataAttribute.bindings = bindingsProperty;

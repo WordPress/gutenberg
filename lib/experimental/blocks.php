@@ -114,14 +114,14 @@ if ( $gutenberg_experiments && (
 			// "bindings": {
 			// "title": {
 			// "source": {
-			// "id": "metadata",
-			// "params": { "value": "text_custom_field" }
+			// "name": "metadata",
+			// "attributes": { "value": "text_custom_field" }
 			// }
 			// },
 			// "url": {
 			// "source": {
-			// "id": "metadata",
-			// "params": { "value": "text_custom_field" }
+			// "name": "metadata",
+			// "attributes": { "value": "text_custom_field" }
 			// }
 			// }
 			// },
@@ -140,10 +140,10 @@ if ( $gutenberg_experiments && (
 				// Get the value based on the source.
 				// We might want to move this to its own function if it gets more complex.
 				// We pass $block_content, $block, $block_instance to the source callback in case sources want to use them.
-				if ( ! isset( $block_bindings_sources[ $binding_source['source']['id'] ]['apply_source'] ) ) {
+				if ( ! isset( $block_bindings_sources[ $binding_source['source']['name'] ]['apply_source'] ) ) {
 					return $block_content;
 				}
-				$source_value = $block_bindings_sources[ $binding_source['source']['id'] ]['apply_source']( $binding_source['source']['params'], $block_content, $block, $block_instance );
+				$source_value = $block_bindings_sources[ $binding_source['source']['name'] ]['apply_source']( $binding_source['source']['attributes'], $block_content, $block, $block_instance );
 				if ( false === $source_value ) {
 					return $block_content;
 				}
