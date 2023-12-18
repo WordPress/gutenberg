@@ -1,9 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { FlexItem, FlexBlock, Flex, Button } from '@wordpress/components';
+import {
+	FlexItem,
+	FlexBlock,
+	Flex,
+	Button,
+	__experimentalUseNavigator as useNavigator,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { styles, seen } from '@wordpress/icons';
+import { styles, seen, backup } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -17,17 +23,21 @@ import { GlobalStylesUI } from '../global-styles';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesMenuSlot } from '../global-styles/ui';
 import { unlock } from '../../lock-unlock';
+import { store as coreStore } from '@wordpress/core-data';
 
 export default function GlobalStylesSidebar() {
 	const {
 		shouldClearCanvasContainerView,
 		isStyleBookOpened,
 		showListViewByDefault,
+		hasRevisions,
+		isRevisionsOpened,
 	} = useSelect( ( select ) => {
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getEditorCanvasContainerView, getCanvasMode } = unlock(
 			select( editSiteStore )
 		);
+		const canvasContainerView = getEditorCanvasContainerView();
 		const _isVisualEditorMode =
 			'visual' === select( editSiteStore ).getEditorMode();
 		const _isEditCanvasMode = 'edit' === getCanvasMode();
@@ -35,15 +45,26 @@ export default function GlobalStylesSidebar() {
 			'core/edit-site',
 			'showListViewByDefault'
 		);
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
 
 		return {
-			isStyleBookOpened: 'style-book' === getEditorCanvasContainerView(),
+			isStyleBookOpened: 'style-book' === canvasContainerView,
 			shouldClearCanvasContainerView:
 				'edit-site/global-styles' !==
 					getActiveComplementaryArea( 'core/edit-site' ) ||
 				! _isVisualEditorMode ||
 				! _isEditCanvasMode,
 			showListViewByDefault: _showListViewByDefault,
+			hasRevisions:
+				!! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count,
+			isRevisionsOpened:
+				'global-styles-revisions' === canvasContainerView,
 		};
 	}, [] );
 	const { setEditorCanvasContainerView } = unlock(
@@ -57,6 +78,18 @@ export default function GlobalStylesSidebar() {
 	}, [ shouldClearCanvasContainerView ] );
 
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
+	const { goTo } = useNavigator();
+	const loadRevisions = () => {
+		setIsListViewOpened( false );
+
+		if ( ! isRevisionsOpened ) {
+			goTo( '/revisions' );
+			setEditorCanvasContainerView( 'global-styles-revisions' );
+		} else {
+			goTo( '/' );
+			setEditorCanvasContainerView( undefined );
+		}
+	};
 
 	return (
 		<DefaultSidebar
@@ -89,6 +122,15 @@ export default function GlobalStylesSidebar() {
 									isStyleBookOpened ? undefined : 'style-book'
 								);
 							} }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<Button
+							label={ __( 'Revisions' ) }
+							icon={ backup }
+							onClick={ loadRevisions }
+							disabled={ ! hasRevisions }
+							isPressed={ isRevisionsOpened }
 						/>
 					</FlexItem>
 					<GlobalStylesMenuSlot />

@@ -15,7 +15,8 @@ import {
 	showUserSuggestions,
 	showXpostSuggestions,
 } from '@wordpress/react-native-bridge';
-import { BlockFormatControls, getPxFromCssUnit } from '@wordpress/block-editor';
+import { BlockFormatControls } from '@wordpress/block-editor';
+import { getPxFromCssUnit } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import {
 	compose,
@@ -267,7 +268,7 @@ export class RichText extends Component {
 	onCreateUndoLevel() {
 		const { __unstableOnCreateUndoLevel: onCreateUndoLevel } = this.props;
 		// If the content is the same, no level needs to be created.
-		if ( this.lastHistoryValue === this.value ) {
+		if ( this.lastHistoryValue.toString() === this.value.toString() ) {
 			return;
 		}
 
@@ -320,7 +321,7 @@ export class RichText extends Component {
 			unescapeSpaces( event.nativeEvent.text )
 		);
 		// On iOS, onChange can be triggered after selection changes, even though there are no content changes.
-		if ( contentWithoutRootTag === this.value ) {
+		if ( contentWithoutRootTag === this.value.toString() ) {
 			return;
 		}
 		this.lastEventCount = event.nativeEvent.eventCount;
@@ -336,7 +337,7 @@ export class RichText extends Component {
 		);
 
 		this.debounceCreateUndoLevel();
-		const refresh = this.value !== contentWithoutRootTag;
+		const refresh = this.value.toString() !== contentWithoutRootTag;
 		this.value = contentWithoutRootTag;
 
 		// We don't want to refresh if our goal is just to create a record.
@@ -567,7 +568,7 @@ export class RichText extends Component {
 		// Check if value is up to date with latest state of native AztecView.
 		if (
 			event.nativeEvent.text &&
-			event.nativeEvent.text !== this.props.value
+			event.nativeEvent.text !== this.props.value.toString()
 		) {
 			this.onTextUpdate( event );
 		}
@@ -592,7 +593,7 @@ export class RichText extends Component {
 		// this approach is not perfectly reliable.
 		const isManual =
 			this.lastAztecEventType !== 'input' &&
-			this.props.value === this.value;
+			this.props.value.toString() === this.value.toString();
 		if ( hasChanged && isManual ) {
 			const value = this.createRecord();
 			const activeFormats = getActiveFormats( value );
@@ -662,7 +663,7 @@ export class RichText extends Component {
 			unescapeSpaces( event.nativeEvent.text )
 		);
 		if (
-			contentWithoutRootTag === this.value &&
+			contentWithoutRootTag === this.value.toString() &&
 			realStart === this.selectionStart &&
 			realEnd === this.selectionEnd
 		) {
@@ -759,7 +760,7 @@ export class RichText extends Component {
 			typeof nextProps.value !== 'undefined' &&
 			typeof this.props.value !== 'undefined' &&
 			( ! this.comesFromAztec || ! this.firedAfterTextChanged ) &&
-			nextProps.value !== this.props.value
+			nextProps.value.toString() !== this.props.value.toString()
 		) {
 			// Gutenberg seems to try to mirror the caret state even on events that only change the content so,
 			//  let's force caret update if state has selection set.
@@ -833,7 +834,7 @@ export class RichText extends Component {
 		const { style, tagName } = this.props;
 		const { currentFontSize } = this.state;
 
-		if ( this.props.value !== this.value ) {
+		if ( this.props.value.toString() !== this.value.toString() ) {
 			this.value = this.props.value;
 		}
 		const { __unstableIsSelected: prevIsSelected } = prevProps;
@@ -851,7 +852,7 @@ export class RichText extends Component {
 			// Since this is happening when merging blocks, the selection should be at the last character position.
 			// As a fallback the internal selectionEnd value is used.
 			const lastCharacterPosition =
-				this.value?.length ?? this.selectionEnd;
+				this.value?.toString().length ?? this.selectionEnd;
 			this._editor.focus();
 			this.props.onSelectionChange(
 				lastCharacterPosition,
@@ -893,7 +894,8 @@ export class RichText extends Component {
 		// On android if content is empty we need to send no content or else the placeholder will not show.
 		if (
 			! this.isIOS &&
-			( value === '' || value === EMPTY_PARAGRAPH_TAGS )
+			( value.toString() === '' ||
+				value.toString() === EMPTY_PARAGRAPH_TAGS )
 		) {
 			return '';
 		}

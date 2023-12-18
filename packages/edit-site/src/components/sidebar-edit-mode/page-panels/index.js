@@ -12,7 +12,13 @@ import { humanTimeDiff } from '@wordpress/date';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	PostExcerptPanel,
+	PostFeaturedImagePanel,
+	PostLastRevisionPanel,
+	PostTaxonomiesPanel,
+	store as editorStore,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -94,6 +100,10 @@ export default function PagePanels() {
 					<PageContent />
 				</PanelBody>
 			) }
+			<PostLastRevisionPanel />
+			<PostTaxonomiesPanel />
+			<PostFeaturedImagePanel />
+			<PostExcerptPanel />
 		</>
 	);
 }

@@ -1,5 +1,26 @@
 == Changelog ==
 
+= 17.2.3 =
+
+## Changelog
+
+### Bug Fixes
+
+#### Components
+-   `FormTokenField`: Fix a regression where the suggestion list would re-open after clicking away from the input ([#57002](https://github.com/WordPress/gutenberg/pull/57002)).
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@talldan
+
+
+= 17.2.2 =
+
+This patch release fixes a WSOD which could occur in the site editor. See https://github.com/WordPress/gutenberg/pull/57035.
+
+
 = 17.3.0-rc.1 =
 
 

@@ -399,6 +399,7 @@ function useBlockProps( {
 
 export default {
 	useBlockProps,
+	addSaveProps,
 	attributeKeys: [ 'backgroundColor', 'textColor', 'gradient', 'style' ],
 	hasSupport: hasColorSupport,
 };
@@ -435,12 +436,6 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/color/addAttribute',
 	addAttributes
-);
-
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/color/addSaveProps',
-	addSaveProps
 );
 
 addFilter(

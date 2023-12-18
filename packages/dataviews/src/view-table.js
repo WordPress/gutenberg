@@ -4,8 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 import {
-	chevronDown,
-	chevronUp,
 	unseen,
 	check,
 	arrowUp,
@@ -40,14 +38,11 @@ const sortingItemsInfo = {
 	asc: { icon: arrowUp, label: __( 'Sort ascending' ) },
 	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
 };
-const sortIcons = { asc: chevronUp, desc: chevronDown };
+const sortArrows = { asc: '↑', desc: '↓' };
 
 function HeaderMenu( { field, view, onChangeView } ) {
 	const isSortable = field.enableSorting !== false;
 	const isHidable = field.enableHiding !== false;
-	if ( ! isSortable && ! isHidable ) {
-		return field.header;
-	}
 	const isSorted = view.sort?.field === field.id;
 	let filter, filterInView;
 	const otherFilters = [];
@@ -59,7 +54,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 		const operators = columnOperators.filter( ( operator ) =>
 			[ OPERATOR_IN, OPERATOR_NOT_IN ].includes( operator )
 		);
-		if ( operators.length >= 0 ) {
+		if ( operators.length > 0 ) {
 			filter = {
 				field: field.id,
 				operators,
@@ -73,6 +68,10 @@ function HeaderMenu( { field, view, onChangeView } ) {
 		}
 	}
 	const isFilterable = !! filter;
+
+	if ( ! isSortable && ! isHidable && ! isFilterable ) {
+		return field.header;
+	}
 
 	if ( isFilterable ) {
 		const columnFilters = view.filters;
@@ -91,12 +90,17 @@ function HeaderMenu( { field, view, onChangeView } ) {
 			align="start"
 			trigger={
 				<Button
-					icon={ isSorted && sortIcons[ view.sort.direction ] }
-					iconPosition="right"
-					text={ field.header }
-					style={ { padding: 0 } }
 					size="compact"
-				/>
+					className="dataviews-table-header-button"
+					style={ { padding: 0 } }
+				>
+					{ field.header }
+					{ isSorted && (
+						<span aria-hidden="true">
+							{ isSorted && sortArrows[ view.sort.direction ] }
+						</span>
+					) }
+				</Button>
 			}
 		>
 			<WithSeparators>

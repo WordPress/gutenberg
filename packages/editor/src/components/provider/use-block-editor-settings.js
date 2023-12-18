@@ -29,6 +29,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableGalleryWithImageBlocks',
 	'alignWide',
 	'allowedBlockTypes',
+	'allowRightClickOverrides',
 	'blockInspectorTabs',
 	'allowedMimeTypes',
 	'bodyPlaceholder',

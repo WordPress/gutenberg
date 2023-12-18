@@ -21,31 +21,7 @@
 				]
 			},
 			{ "docs/getting-started/quick-start-guide.md": [] },
-			{
-				"docs/getting-started/create-block/README.md": [
-					{
-						"docs/getting-started/create-block/wp-plugin.md": []
-					},
-					{
-						"docs/getting-started/create-block/block-anatomy.md": []
-					},
-					{
-						"docs/getting-started/create-block/attributes.md": []
-					},
-					{
-						"docs/getting-started/create-block/block-code.md": []
-					},
-					{
-						"docs/getting-started/create-block/author-experience.md": []
-					},
-					{
-						"docs/getting-started/create-block/finishing.md": []
-					},
-					{
-						"docs/getting-started/create-block/submitting-to-block-directory.md": []
-					}
-				]
-			},
+			{ "docs/getting-started/tutorial.md": [] },
 			{
 				"docs/getting-started/fundamentals/README.md": [
 					{
@@ -81,22 +57,10 @@
 						"docs/how-to-guides/block-tutorial/applying-styles-with-stylesheets.md": []
 					},
 					{
-						"docs/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields.md": []
-					},
-					{
 						"docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md": []
 					},
 					{
-						"docs/how-to-guides/block-tutorial/block-supports-in-static-blocks.md": []
-					},
-					{
 						"docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md": []
-					},
-					{
-						"docs/how-to-guides/block-tutorial/block-supports-in-dynamic-blocks.md": []
-					},
-					{
-						"docs/how-to-guides/block-tutorial/generate-blocks-with-wp-cli.md": []
 					},
 					{
 						"docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md": []

@@ -15,7 +15,10 @@ import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	privateApis as editorPrivateApis,
+	store as editorStore,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -24,6 +27,10 @@ import './hooks';
 import './plugins';
 import Editor from './editor';
 import { store as editPostStore } from './store';
+import { unlock } from './lock-unlock';
+
+const { PluginPostExcerpt: __experimentalPluginPostExcerpt } =
+	unlock( editorPrivateApis );
 
 /**
  * Initializes and returns an instance of Editor.
@@ -47,6 +54,7 @@ export function initializeEditor(
 	const root = createRoot( target );
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
+		allowRightClickOverrides: true,
 		editorMode: 'visual',
 		fixedToolbar: false,
 		fullscreenMode: true,
@@ -207,5 +215,5 @@ export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
 export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
-export { default as __experimentalPluginPostExcerpt } from './components/sidebar/plugin-post-excerpt';
+export { __experimentalPluginPostExcerpt };
 export { store } from './store';
