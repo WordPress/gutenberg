@@ -11,7 +11,7 @@
 
 class Helper_Class {
 	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	public function process_foo_test( $tags, $context ) {
+	public function process_foo_test( $markup, $inner_blocks, $context, $directives ) {
 	}
 
 	public function increment( $store ) {
@@ -34,48 +34,6 @@ function gutenberg_test_process_directives_helper_increment( $store ) {
  * @covers gutenberg_interactivity_process_rendered_html
  */
 class Tests_Process_Directives extends WP_UnitTestCase {
-	public function test_correctly_call_attribute_directive_processor_on_closing_tag() {
-		$context = new WP_Directive_Context();
-		// PHPUnit cannot stub functions, only classes.
-		$test_helper = $this->createMock( Helper_Class::class );
-
-		$test_helper->expects( $this->exactly( 2 ) )
-				->method( 'process_foo_test' )
-				->with(
-					$this->callback(
-						function ( $p ) {
-							return 'DIV' === $p->get_tag() && (
-								// Either this is a closing tag...
-								$p->is_tag_closer() ||
-								// ...or it is an open tag, and has the directive attribute set.
-								( ! $p->is_tag_closer() && 'abc' === $p->get_attribute( 'foo-test' ) )
-							);
-						}
-					)
-				);
-
-		$directives = array(
-			'foo-test' => array( $test_helper, 'process_foo_test' ),
-		);
-
-		$markup = '<div>Example: <div foo-test="abc"><img><span>This is a test></span><div>Here is a nested div</div></div></div>';
-
-		gutenberg_process_interactive_html( $markup, array(), $context, $directives );
-	}
-
-	public function test_directives_with_double_hyphen_processed_correctly() {
-		$context     = new WP_Directive_Context();
-		$test_helper = $this->createMock( Helper_Class::class );
-		$test_helper->expects( $this->atLeastOnce() )
-				->method( 'process_foo_test' );
-
-		$directives = array(
-			'foo-test' => array( $test_helper, 'process_foo_test' ),
-		);
-
-		$markup = '<div foo-test--value="abc"></div>';
-		gutenberg_process_interactive_html( $markup, array(), $context, $directives );
-	}
 
 	public function test_interactivity_process_directives_in_root_blocks() {
 
