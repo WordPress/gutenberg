@@ -566,18 +566,16 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
             }
 
             View currentFocusedView = getCurrentFocusedView();
-            if (currentFocusedView != null) {
-                currentFocusedView.getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
-                    @Override
-                    public void onWindowFocusChanged(boolean hasFocus) {
-                        if (hasFocus) {
-                            mKeyboardRunnable = createShowKeyboardRunnable();
-                            currentActivity.getWindow().getDecorView().post(mKeyboardRunnable);
-                            currentFocusedView.getViewTreeObserver().removeOnWindowFocusChangeListener(this);
-                        }
+            currentFocusedView.getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
+                @Override
+                public void onWindowFocusChanged(boolean hasFocus) {
+                    if (hasFocus) {
+                        mKeyboardRunnable = createShowKeyboardRunnable();
+                        currentActivity.getWindow().getDecorView().post(mKeyboardRunnable);
+                        currentFocusedView.getViewTreeObserver().removeOnWindowFocusChangeListener(this);
                     }
-                });
-            }
+                }
+            });
         }
     }
 
