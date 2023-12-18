@@ -66,7 +66,7 @@ export default function NavigationMenuTitle( {
 
 							{ hasSearch && (
 								<Button
-									isSmall
+									size="small"
 									variant="tertiary"
 									label={ searchButtonLabel }
 									onClick={ () => setIsSearching( true ) }
