@@ -80,8 +80,9 @@ const withPatternOnlyRenderMode = createHigherOrderComponent(
 		}
 
 		const { onClick } = useLink( {
-			post: props.attributes?.ref,
+			postId: props.attributes?.ref,
 			postType: 'wp_block',
+			canvas: 'edit',
 		} );
 
 		const newProps = {
