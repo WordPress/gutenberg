@@ -21,18 +21,18 @@ const { Tabs } = unlock( componentsPrivateApis );
 
 const DEFAULT_TABS = [
 	{
-		name: 'installed-fonts',
+		id: 'installed-fonts',
 		title: __( 'Library' ),
 	},
 	{
-		name: 'upload-fonts',
+		id: 'upload-fonts',
 		title: __( 'Upload' ),
 	},
 ];
 
 const tabsFromCollections = ( collections ) =>
 	collections.map( ( { id, name } ) => ( {
-		name: id,
+		id,
 		title:
 			collections.length === 1 && id === 'default-font-collection'
 				? __( 'Install Fonts' )
@@ -41,7 +41,7 @@ const tabsFromCollections = ( collections ) =>
 
 function FontLibraryModal( {
 	onRequestClose,
-	initialTabName = 'installed-fonts',
+	initialTabId = 'installed-fonts',
 } ) {
 	const { collections } = useContext( FontLibraryContext );
 
@@ -58,17 +58,17 @@ function FontLibraryModal( {
 			className="font-library-modal"
 		>
 			<div className="font-library-modal__tabs">
-				<Tabs initialTabId={ initialTabName }>
+				<Tabs initialTabId={ initialTabId }>
 					<Tabs.TabList>
-						{ tabs.map( ( { name, title } ) => (
-							<Tabs.Tab key={ name } tabId={ name }>
+						{ tabs.map( ( { id, title } ) => (
+							<Tabs.Tab key={ id } tabId={ id }>
 								{ title }
 							</Tabs.Tab>
 						) ) }
 					</Tabs.TabList>
-					{ tabs.map( ( { name } ) => {
+					{ tabs.map( ( { id } ) => {
 						let contents;
-						switch ( name ) {
+						switch ( id ) {
 							case 'upload-fonts':
 								contents = <UploadFonts />;
 								break;
@@ -76,12 +76,12 @@ function FontLibraryModal( {
 								contents = <InstalledFonts />;
 								break;
 							default:
-								contents = <FontCollection id={ name } />;
+								contents = <FontCollection id={ id } />;
 						}
 						return (
 							<Tabs.TabPanel
-								key={ name }
-								tabId={ name }
+								key={ id }
+								tabId={ id }
 								focusable="false"
 							>
 								{ contents }
