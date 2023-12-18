@@ -68,7 +68,7 @@ The saved HTML will contain the `title` and `size` in the comment delimiter, and
 
 If an attributes change over time then a [block deprecation](/docs/reference-guides/block-api/block-deprecation.md) can help migrate from an older attribute, or remove it entirely.
 
-## Type Validation
+## Type validation
 
 The `type` indicates the type of data that is stored by the attribute. It does not indicate where the data is stored, which is defined by the `source` field.
 
@@ -86,7 +86,7 @@ The `type` field MUST be one of the following:
 
 Note that the validity of an `object` is determined by your `source`. For an example, see the `query` details below.
 
-## Enum Validation
+## Enum validation
 
 An attribute can be defined as one of a fixed set of values. This is specified by an `enum`, which contains an array of allowed values:
 
@@ -100,7 +100,7 @@ _Example_: Example `enum`.
 }
 ```
 
-## Value Source
+## Value source
 
 Attribute sources are used to define how the attribute values are extracted from saved post content. They provide a mechanism to map from the saved markup to a JavaScript representation of a block.
 
@@ -430,7 +430,7 @@ function onChange( event ) {
 }
 ```
 
-## Default Value
+## Default value
 
 A block attribute can contain a default value, which will be used if the `type` and `source` do not match anything within the block content.
 
