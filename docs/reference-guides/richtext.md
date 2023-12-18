@@ -65,7 +65,7 @@ registerBlockType( /* ... */, {
 } );
 ```
 
-## Common issues & solutions
+## Common issues and solutions
 
 While using the RichText component a number of common issues tend to appear.
 
