@@ -276,7 +276,7 @@ test.describe( 'Table', () => {
 			.click();
 
 		await editor.clickBlockToolbarButton( 'Add caption' );
-		const caption = page.locator(
+		const caption = editor.canvas.locator(
 			'role=textbox[name="Table caption text"i]'
 		);
 		await expect( caption ).toBeFocused();
