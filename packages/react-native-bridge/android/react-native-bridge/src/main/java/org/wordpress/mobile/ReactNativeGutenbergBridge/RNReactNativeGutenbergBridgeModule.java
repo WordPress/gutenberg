@@ -584,19 +584,15 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
                 };
 
                 // Schedule the keyboard showing with a delay
-                if (currentFocusedView.hasWindowFocus()) {
-                    currentActivity.getWindow().getDecorView().postDelayed(showTheKeyboardNow, delayMillis);
-                } else {
-                    currentFocusedView.getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
-                        @Override
-                        public void onWindowFocusChanged(boolean hasFocus) {
-                            if (hasFocus) {
-                                currentActivity.getWindow().getDecorView().postDelayed(showTheKeyboardNow, delayMillis);
-                                currentFocusedView.getViewTreeObserver().removeOnWindowFocusChangeListener(this);
-                            }
+                currentFocusedView.getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
+                    @Override
+                    public void onWindowFocusChanged(boolean hasFocus) {
+                        if (hasFocus) {
+                            currentActivity.getWindow().getDecorView().postDelayed(showTheKeyboardNow, delayMillis);
+                            currentFocusedView.getViewTreeObserver().removeOnWindowFocusChangeListener(this);
                         }
-                    });
-                }
+                    }
+                });
             }
         }
     }
