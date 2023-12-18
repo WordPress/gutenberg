@@ -49,7 +49,7 @@ test.describe( 'Global styles revisions', () => {
 		await editor.saveSiteEditorEntities();
 
 		// Now there should be enough revisions to show the revisions UI.
-		await userGlobalStylesRevisions.openRevisions();
+		await this.page.getByRole( 'button', { name: 'Revisions' } ).click();
 
 		const revisionButtons = page.getByRole( 'button', {
 			name: /^Changes saved by /,
@@ -81,7 +81,7 @@ test.describe( 'Global styles revisions', () => {
 			.getByRole( 'option', { name: 'Color: Luminous vivid amber' } )
 			.click( { force: true } );
 
-		await userGlobalStylesRevisions.openRevisions();
+		await this.page.getByRole( 'button', { name: 'Revisions' } ).click();
 
 		const unSavedButton = page.getByRole( 'button', {
 			name: /^Unsaved changes/,
@@ -117,7 +117,7 @@ test.describe( 'Global styles revisions', () => {
 	} ) => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
-		await userGlobalStylesRevisions.openRevisions();
+		await this.page.getByRole( 'button', { name: 'Revisions' } ).click();
 		const lastRevisionButton = page
 			.getByLabel( 'Global styles revisions' )
 			.getByRole( 'button' )
@@ -145,10 +145,6 @@ class UserGlobalStylesRevisions {
 			);
 		}
 		return [];
-	}
-
-	async openRevisions() {
-		await this.page.getByRole( 'button', { name: 'Revisions' } ).click();
 	}
 
 	async openStylesPanel() {
