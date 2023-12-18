@@ -64,9 +64,9 @@ export default function EditPostPreferencesModal() {
 		[ isLargeViewport ]
 	);
 
-	const { closeGeneralSidebar, setIsListViewOpened, setIsInserterOpened } =
-		useDispatch( editPostStore );
-
+	const { closeGeneralSidebar } = useDispatch( editPostStore );
+	const { setIsListViewOpened, setIsInserterOpened } =
+		useDispatch( editorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const toggleDistractionFree = () => {

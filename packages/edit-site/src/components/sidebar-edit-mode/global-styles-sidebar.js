@@ -14,6 +14,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -77,7 +78,7 @@ export default function GlobalStylesSidebar() {
 		}
 	}, [ shouldClearCanvasContainerView ] );
 
-	const { setIsListViewOpened } = useDispatch( editSiteStore );
+	const { setIsListViewOpened } = useDispatch( editorStore );
 	const { goTo } = useNavigator();
 	const loadRevisions = () => {
 		setIsListViewOpened( false );

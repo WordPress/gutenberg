@@ -108,17 +108,14 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		showIconLabels,
 		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
-		const {
-			getEditedPostContext,
-			getEditorMode,
-			getCanvasMode,
-			isInserterOpened,
-			isListViewOpened,
-		} = unlock( select( editSiteStore ) );
+		const { getEditedPostContext, getEditorMode, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getEntityRecord } = select( coreDataStore );
-		const { getRenderingMode } = select( editorStore );
+		const { getRenderingMode, isInserterOpened, isListViewOpened } =
+			select( editorStore );
 		const _context = getEditedPostContext();
 
 		// The currently selected entity to display.

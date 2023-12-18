@@ -40,11 +40,12 @@ export default function DocumentTools( {
 	const inserterButton = useRef();
 	const { isInserterOpen, isListViewOpen, listViewShortcut, isVisualMode } =
 		useSelect( ( select ) => {
-			const { isInserterOpened, isListViewOpened, getEditorMode } =
-				select( editSiteStore );
+			const { getEditorMode } = select( editSiteStore );
 			const { getShortcutRepresentation } = select(
 				keyboardShortcutsStore
 			);
+			const { isInserterOpened, isListViewOpened } =
+				select( editorStore );
 
 			return {
 				isInserterOpen: isInserterOpened(),
@@ -55,11 +56,9 @@ export default function DocumentTools( {
 				isVisualMode: getEditorMode() === 'visual',
 			};
 		}, [] );
-
-	const { setIsInserterOpened, setIsListViewOpened } =
-		useDispatch( editSiteStore );
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
-	const { setDeviceType } = useDispatch( editorStore );
+	const { setDeviceType, setIsInserterOpened, setIsListViewOpened } =
+		useDispatch( editorStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
