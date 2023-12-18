@@ -57,7 +57,7 @@ function FontLibraryModal( {
 			isFullScreen
 			className="font-library-modal"
 		>
-			<div className="font-library-modal__tab-panel">
+			<div className="font-library-modal__tabs">
 				<Tabs initialTabId={ initialTabName }>
 					<Tabs.TabList>
 						{ tabs.map( ( { name, title } ) => (
