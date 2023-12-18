@@ -64,7 +64,7 @@ function Header( {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const blockToolbarRef = useRef();
 	const {
-		blockSelectionStart,
+		hasBlockSelection,
 		hasActiveMetaboxes,
 		hasFixedToolbar,
 		isEditingTemplate,
@@ -74,8 +74,8 @@ function Header( {
 		const { get: getPreference } = select( preferencesStore );
 
 		return {
-			blockSelectionStart:
-				select( blockEditorStore ).getBlockSelectionStart(),
+			hasBlockSelection:
+				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			isEditingTemplate:
 				select( editorStore ).getRenderingMode() === 'template-only',
@@ -90,14 +90,12 @@ function Header( {
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
-	const hasBlockSelected = !! blockSelectionStart;
-
 	useEffect( () => {
 		// If we have a new block selection, show the block tools
-		if ( blockSelectionStart ) {
+		if ( hasBlockSelection ) {
 			setIsBlockToolsCollapsed( false );
 		}
-	}, [ blockSelectionStart ] );
+	}, [ hasBlockSelection ] );
 
 	return (
 		<div className="edit-post-header">
@@ -136,7 +134,7 @@ function Header( {
 							ref={ blockToolbarRef }
 							name="block-toolbar"
 						/>
-						{ isEditingTemplate && hasBlockSelected && (
+						{ isEditingTemplate && hasBlockSelection && (
 							<Button
 								className="edit-post-header__block-tools-toggle"
 								icon={ isBlockToolsCollapsed ? next : previous }
@@ -158,7 +156,7 @@ function Header( {
 					className={ classnames( 'edit-post-header__center', {
 						'is-collapsed':
 							isEditingTemplate &&
-							hasBlockSelected &&
+							hasBlockSelection &&
 							! isBlockToolsCollapsed &&
 							hasFixedToolbar &&
 							isLargeViewport,

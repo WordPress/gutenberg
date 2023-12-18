@@ -49,7 +49,7 @@ test.describe( 'Global styles revisions', () => {
 		await editor.saveSiteEditorEntities();
 
 		// Now there should be enough revisions to show the revisions UI.
-		await userGlobalStylesRevisions.openRevisions();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
 
 		const revisionButtons = page.getByRole( 'button', {
 			name: /^Changes saved by /,
@@ -81,7 +81,7 @@ test.describe( 'Global styles revisions', () => {
 			.getByRole( 'option', { name: 'Color: Luminous vivid amber' } )
 			.click( { force: true } );
 
-		await userGlobalStylesRevisions.openRevisions();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
 
 		const unSavedButton = page.getByRole( 'button', {
 			name: /^Unsaved changes/,
@@ -117,15 +117,32 @@ test.describe( 'Global styles revisions', () => {
 	} ) => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
-		await userGlobalStylesRevisions.openRevisions();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
 		const lastRevisionButton = page
-			.getByLabel( 'Global styles revisions' )
+			.getByLabel( 'Global styles revisions list' )
 			.getByRole( 'button' )
 			.last();
 		await expect( lastRevisionButton ).toContainText( 'Default styles' );
 		await lastRevisionButton.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Reset to defaults' } )
+		).toBeVisible();
+	} );
+
+	test( 'should access from the site editor sidebar', async ( { page } ) => {
+		const navigationContainer = page.getByRole( 'region', {
+			name: 'Navigation',
+		} );
+		await navigationContainer
+			.getByRole( 'button', { name: 'Styles' } )
+			.click();
+
+		await navigationContainer
+			.getByRole( 'button', { name: 'Revisions' } )
+			.click();
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
 		).toBeVisible();
 	} );
 } );
@@ -145,13 +162,6 @@ class UserGlobalStylesRevisions {
 			);
 		}
 		return [];
-	}
-
-	async openRevisions() {
-		await this.page
-			.getByRole( 'menubar', { name: 'Styles actions' } )
-			.click();
-		await this.page.getByRole( 'button', { name: 'Revisions' } ).click();
 	}
 
 	async openStylesPanel() {

@@ -87,7 +87,7 @@ export default function ImageSizeControl( {
 								return (
 									<Button
 										key={ scale }
-										isSmall
+										size="small"
 										variant={
 											isCurrent ? 'primary' : undefined
 										}
@@ -104,7 +104,10 @@ export default function ImageSizeControl( {
 								);
 							} ) }
 						</ButtonGroup>
-						<Button isSmall onClick={ () => updateDimensions() }>
+						<Button
+							size="small"
+							onClick={ () => updateDimensions() }
+						>
 							{ __( 'Reset' ) }
 						</Button>
 					</HStack>

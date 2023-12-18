@@ -13,6 +13,8 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import {
+	PostDiscussionPanel,
+	PostExcerptPanel,
 	PostFeaturedImagePanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
@@ -102,6 +104,8 @@ export default function PagePanels() {
 			<PostLastRevisionPanel />
 			<PostTaxonomiesPanel />
 			<PostFeaturedImagePanel />
+			<PostExcerptPanel />
+			<PostDiscussionPanel />
 		</>
 	);
 }
