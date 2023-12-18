@@ -28,7 +28,7 @@ const backgroundImage = {
 		}
 
 		// If no background size is set, but an image is, default to cover.
-		if ( ! _backgroundSize ) {
+		if ( _backgroundSize === undefined ) {
 			styleRules.push( {
 				selector: options.selector,
 				key: 'backgroundSize',

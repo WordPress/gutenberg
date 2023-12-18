@@ -64,7 +64,7 @@ export function hasBackgroundImageValue( style ) {
  * @return {boolean}     Whether or not the block has a background size value set.
  */
 export function hasBackgroundSizeValue( style ) {
-	return !! style?.background?.backgroundSize;
+	return style?.background?.backgroundSize !== undefined;
 }
 
 /**
@@ -341,7 +341,7 @@ function BackgroundImagePanelItem( {
 }
 
 function backgroundSizeHelpText( value ) {
-	if ( value === 'cover' ) {
+	if ( value === 'cover' || value === undefined ) {
 		return __( 'Stretch image to cover the block.' );
 	}
 	if ( value === 'contain' ) {
@@ -390,11 +390,13 @@ function BackgroundSizePanelItem( {
 		} );
 	};
 
+	// An `undefined` value is treated as `cover` by the toggle group control.
+	// An empty string is treated as `auto` by the toggle group control. This
+	// allows a user to select "Size" and then enter a custom value, with an
+	// empty value being treated as `auto`.
 	const currentValueForToggle =
-		value !== undefined &&
-		value !== 'cover' &&
-		value !== 'contain' &&
-		value !== ''
+		( value !== undefined && value !== 'cover' && value !== 'contain' ) ||
+		value === ''
 			? 'auto'
 			: value || 'cover';
 
@@ -430,9 +432,9 @@ function BackgroundSizePanelItem( {
 					label={ __( 'Contain' ) }
 				/>
 				<ToggleGroupControlOption
-					key={ 'repeat' }
+					key={ 'size' }
 					value={ 'auto' }
-					label={ __( 'Repeat' ) }
+					label={ __( 'Size' ) }
 				/>
 			</ToggleGroupControl>
 			{ value !== undefined &&
