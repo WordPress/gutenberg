@@ -26,10 +26,19 @@ import { unlock } from './lock-unlock';
 import useInitEditedEntityFromURL from './components/sync-state-with-url/use-init-edited-entity-from-url';
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
-function Editor( { settings, initialEdits, ...props } ) {
+function Editor( {
+	postId: postIdInit,
+	postType: postTypeInit,
+	settings,
+	initialEdits,
+	...props
+} ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { postId, postType = 'post' } = useInitEditedEntityFromURL();
+	const { postId: postIdUrl, postType: postTypeUrl } =
+		useInitEditedEntityFromURL();
 
+	const postId = postIdUrl || postIdInit;
+	const postType = postTypeUrl || postTypeInit;
 	const {
 		allowRightClickOverrides,
 		hasFixedToolbar,
