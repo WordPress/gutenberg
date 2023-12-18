@@ -28,7 +28,6 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { getBlockSupport, parse } from '@wordpress/blocks';
-import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -143,18 +142,8 @@ function setBlockEditMode( setEditMode, blocks ) {
 	} );
 }
 
-function editSourcePattern( editInPatternOnlyMode, patternId ) {
-	const currentArgs = getQueryArgs( window.location.href );
-	const currentUrlWithoutArgs = removeQueryArgs(
-		window.location.href,
-		...Object.keys( currentArgs )
-	);
-	const newUrl = addQueryArgs( currentUrlWithoutArgs, {
-		...currentArgs,
-		patternId,
-	} );
-	window.history.pushState( null, '', newUrl );
-	editInPatternOnlyMode();
+function editSourcePattern( setEditedPost, patternId ) {
+	setEditedPost( 'wp_block', patternId );
 }
 
 export default function ReusableBlockEdit( {
@@ -163,7 +152,7 @@ export default function ReusableBlockEdit( {
 	__unstableParentLayout: parentLayout,
 	clientId: patternClientId,
 	setAttributes,
-	editInPatternOnlyMode,
+	setEditedPost,
 } ) {
 	const registry = useRegistry();
 	const hasAlreadyRendered = useHasRecursion( ref );
@@ -312,12 +301,12 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			{ userCanEdit && editInPatternOnlyMode && (
+			{ userCanEdit && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ () =>
-								editSourcePattern( editInPatternOnlyMode, ref )
+								editSourcePattern( setEditedPost, ref )
 							}
 						>
 							{ __( 'Edit original' ) }

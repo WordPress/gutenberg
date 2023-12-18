@@ -77,12 +77,10 @@ const withPatternOnlyRenderMode = createHigherOrderComponent(
 		if ( props.name !== 'core/block' ) {
 			return <BlockEdit { ...props } />;
 		}
-
-		const { setRenderingMode } = useDispatch( editorStore );
-
+		const { setEditedPost } = useDispatch( editorStore );
 		const newProps = {
 			...props,
-			editInPatternOnlyMode: () => setRenderingMode( 'pattern-only' ),
+			setEditedPost,
 		};
 		return <BlockEdit { ...newProps } />;
 	}

@@ -67,7 +67,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isEditingTemplate,
 		isPublishSidebarOpened,
 		showIconLabels,
-		isEditingPattern,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const { getEditorMode } = select( editPostStore );
@@ -78,7 +77,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			isEditingTemplate: renderingMode === 'template-only',
-			isEditingPattern: renderingMode === 'pattern-only',
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core/edit-post', 'fixedToolbar' ),
@@ -123,8 +121,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 								'selected-block-tools-wrapper',
 								{
 									'is-collapsed':
-										( isEditingTemplate ||
-											isEditingPattern ) &&
+										isEditingTemplate &&
 										isBlockToolsCollapsed,
 								}
 							) }
@@ -163,9 +160,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 							isLargeViewport,
 					} ) }
 				>
-					{ ( isEditingTemplate || isEditingPattern ) && (
-						<DocumentBar />
-					) }
+					{ isEditingTemplate && <DocumentBar /> }
 				</div>
 			</motion.div>
 			<motion.div

@@ -74,14 +74,12 @@ export default function VisualEditor( { styles } ) {
 	const isToBeIframed =
 		( ( hasV3BlocksOnly || ( isGutenbergPlugin && isBlockBasedTheme ) ) &&
 			! hasMetaBoxes ) ||
-		renderingMode === 'template-only' ||
-		renderingMode === 'pattern-only';
+		renderingMode === 'template-only';
 
 	return (
 		<div
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': renderingMode === 'template-only',
-				'is-pattern-mode': renderingMode === 'pattern-only',
 				'has-inline-canvas': ! isToBeIframed,
 			} ) }
 		>
