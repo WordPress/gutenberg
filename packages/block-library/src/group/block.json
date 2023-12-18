@@ -30,7 +30,10 @@
 		"html": false,
 		"background": {
 			"backgroundImage": true,
-			"backgroundSize": true
+			"backgroundSize": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true
+			}
 		},
 		"color": {
 			"gradients": true,

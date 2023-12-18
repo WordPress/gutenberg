@@ -176,7 +176,11 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 	);
 }
 
-function BackgroundImagePanelItem( { clientId, setAttributes } ) {
+function BackgroundImagePanelItem( {
+	clientId,
+	isShownByDefault,
+	setAttributes,
+} ) {
 	const { style, mediaUpload } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getSettings } =
@@ -286,7 +290,7 @@ function BackgroundImagePanelItem( { clientId, setAttributes } ) {
 			hasValue={ () => hasValue }
 			label={ __( 'Background image' ) }
 			onDeselect={ () => resetBackgroundImage( style, setAttributes ) }
-			isShownByDefault={ true }
+			isShownByDefault={ isShownByDefault }
 			resetAllFilter={ resetAllFilter }
 			panelId={ clientId }
 		>
@@ -346,7 +350,11 @@ function backgroundSizeHelpText( value ) {
 	return __( 'Repeat the image, and set a fixed size.' );
 }
 
-function BackgroundSizePanelItem( { clientId, setAttributes } ) {
+function BackgroundSizePanelItem( {
+	clientId,
+	isShownByDefault,
+	setAttributes,
+} ) {
 	const style = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
@@ -398,7 +406,7 @@ function BackgroundSizePanelItem( { clientId, setAttributes } ) {
 			hasValue={ () => hasValue }
 			label={ __( 'Background size' ) }
 			onDeselect={ () => resetBackgroundSize( style, setAttributes ) }
-			isShownByDefault={ true }
+			isShownByDefault={ isShownByDefault }
 			resetAllFilter={ resetAllFilter }
 			panelId={ clientId }
 		>
@@ -457,10 +465,23 @@ export function BackgroundImagePanel( props ) {
 		backgroundSize && hasBackgroundSupport( props.name, 'backgroundSize' )
 	);
 
+	const defaultControls = getBlockSupport( props.name, [
+		BACKGROUND_SUPPORT_KEY,
+		'__experimentalDefaultControls',
+	] );
+
 	return (
 		<InspectorControls group="background">
-			<BackgroundImagePanelItem { ...props } />
-			{ showBackgroundSize && <BackgroundSizePanelItem { ...props } /> }
+			<BackgroundImagePanelItem
+				isShownByDefault={ defaultControls?.backgroundImage }
+				{ ...props }
+			/>
+			{ showBackgroundSize && (
+				<BackgroundSizePanelItem
+					isShownByDefault={ defaultControls?.backgroundSize }
+					{ ...props }
+				/>
+			) }
 		</InspectorControls>
 	);
 }
