@@ -188,7 +188,7 @@ function Header( {
 					className="edit-post-header__post-preview-button"
 					forceIsAutosaveable={ hasActiveMetaboxes }
 				/>
-				<PostViewLink />
+				<PostViewLink showIconLabels={ showIconLabels } />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					setEntitiesSavedStatesCallback={

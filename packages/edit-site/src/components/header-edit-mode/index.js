@@ -217,7 +217,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 							/>
 						</div>
 					) }
-					<PostViewLink />
+					<PostViewLink showIconLabels={ showIconLabels } />
 					<SaveButton />
 					{ ! isDistractionFree && (
 						<PinnedItems.Slot scope="core/edit-site" />
