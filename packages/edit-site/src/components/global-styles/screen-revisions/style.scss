@@ -14,6 +14,8 @@
 .edit-site-global-styles-screen-revisions__revision-item {
 	position: relative;
 	cursor: pointer;
+	display: flex;
+	flex-direction: column;
 
 	&:hover {
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
