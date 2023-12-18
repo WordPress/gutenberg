@@ -48,7 +48,7 @@ function useTemplates( postType ) {
 				per_page: -1,
 				post_type: postType,
 			} ),
-		[]
+		[ postType ]
 	);
 }
 
