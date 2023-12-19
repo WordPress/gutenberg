@@ -34,7 +34,6 @@ export default function BlockLockToolbar( { clientId, wrapperRef } ) {
 	useEffect( () => {
 		if ( isFirstRender.current ) {
 			isFirstRender.current = false;
-			hasModalOpened.current = false;
 			return;
 		}
 
@@ -42,7 +41,7 @@ export default function BlockLockToolbar( { clientId, wrapperRef } ) {
 			hasModalOpened.current = true;
 		}
 
-		// We only want to allow this effeect to happen if the modal has been opened.
+		// We only want to allow this effect to happen if the modal has been opened.
 		// The issue is when we're returning focus from the block lock modal to a toolbar,
 		// so it can only happen after a modal has been opened. Without this, the toolbar
 		// will steal focus on rerenders.
@@ -63,7 +62,7 @@ export default function BlockLockToolbar( { clientId, wrapperRef } ) {
 				?.focus();
 		}
 		// wrapperRef is a reference object and should be stable
-	}, [ isModalOpen, shouldHideBlockLockUI, hasModalOpened, wrapperRef ] );
+	}, [ isModalOpen, shouldHideBlockLockUI, wrapperRef ] );
 
 	if ( shouldHideBlockLockUI ) {
 		return null;
