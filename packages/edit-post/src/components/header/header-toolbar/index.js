@@ -32,7 +32,7 @@ const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-function HeaderToolbar( { hasFixedToolbar, setListViewToggleElement } ) {
+function HeaderToolbar( { hasFixedToolbar } ) {
 	const inserterButton = useRef();
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editorStore );
@@ -43,10 +43,12 @@ function HeaderToolbar( { hasFixedToolbar, setListViewToggleElement } ) {
 		showIconLabels,
 		isListViewOpen,
 		listViewShortcut,
+		listViewToggleRef,
 	} = useSelect( ( select ) => {
 		const { hasInserterItems, getBlockRootClientId, getBlockSelectionEnd } =
 			select( blockEditorStore );
-		const { getEditorSettings, isListViewOpened } = select( editorStore );
+		const { getEditorSettings, isListViewOpened, getListViewToggleRef } =
+			unlock( select( editorStore ) );
 		const { getEditorMode, isFeatureActive } = select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
@@ -65,6 +67,7 @@ function HeaderToolbar( { hasFixedToolbar, setListViewToggleElement } ) {
 			listViewShortcut: getShortcutRepresentation(
 				'core/edit-post/toggle-list-view'
 			),
+			listViewToggleRef: getListViewToggleRef(),
 		};
 	}, [] );
 
@@ -103,7 +106,7 @@ function HeaderToolbar( { hasFixedToolbar, setListViewToggleElement } ) {
 				showTooltip={ ! showIconLabels }
 				variant={ showIconLabels ? 'tertiary' : undefined }
 				aria-expanded={ isListViewOpen }
-				ref={ setListViewToggleElement }
+				ref={ listViewToggleRef }
 				size="compact"
 			/>
 		</>
