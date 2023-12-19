@@ -603,6 +603,10 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         if (activity == null) {
             return null;
         }
+
+        if (activity.getCurrentFocus() == null) {
+            activity.getWindow().setLocalFocus(true, false);
+        }
         return activity.getCurrentFocus();
     }
 
