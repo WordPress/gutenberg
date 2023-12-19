@@ -65,7 +65,7 @@ function HeaderToolbar( { hasFixedToolbar } ) {
 			showIconLabels: isFeatureActive( 'showIconLabels' ),
 			isListViewOpen: isListViewOpened(),
 			listViewShortcut: getShortcutRepresentation(
-				'core/edit-post/toggle-list-view'
+				'core/editor/toggle-list-view'
 			),
 			listViewToggleRef: getListViewToggleRef(),
 		};

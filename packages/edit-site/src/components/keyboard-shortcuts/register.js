@@ -54,16 +54,6 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
-			name: 'core/edit-site/toggle-list-view',
-			category: 'global',
-			description: __( 'Open the block list view.' ),
-			keyCombination: {
-				modifier: 'access',
-				character: 'o',
-			},
-		} );
-
-		registerShortcut( {
 			name: 'core/edit-site/toggle-block-settings-sidebar',
 			category: 'global',
 			description: __( 'Show or hide the Settings sidebar.' ),
