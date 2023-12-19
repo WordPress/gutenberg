@@ -119,7 +119,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 
 		$content         = get_the_content( null, false, $post );
 		$rendered_blocks = do_blocks( $content );
-		$expected        = '<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained"><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p data-wp-text=\'context.MyText\'>level-1</p></div></div></div>';
+		$expected        = '<div class="wp-block-group is-layout-constrained wp-block-group-is-layout-constrained"><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p data-wp-text=\'context.MyText\'>level-1</p></div></div>';
 		$this->assertSame( $expected, $rendered_blocks );
 		wp_delete_post( $post->ID, true );
 	}
