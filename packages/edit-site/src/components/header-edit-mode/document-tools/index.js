@@ -35,27 +35,30 @@ export default function DocumentTools( {
 	hasFixedToolbar,
 	isDistractionFree,
 	showIconLabels,
-	setListViewToggleElement,
 } ) {
 	const inserterButton = useRef();
-	const { isInserterOpen, isListViewOpen, listViewShortcut, isVisualMode } =
-		useSelect( ( select ) => {
-			const { getEditorMode } = select( editSiteStore );
-			const { getShortcutRepresentation } = select(
-				keyboardShortcutsStore
-			);
-			const { isInserterOpened, isListViewOpened } =
-				select( editorStore );
+	const {
+		isInserterOpen,
+		isListViewOpen,
+		listViewShortcut,
+		isVisualMode,
+		listViewToggleRef,
+	} = useSelect( ( select ) => {
+		const { getEditorMode } = select( editSiteStore );
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		const { isInserterOpened, isListViewOpened, getListViewToggleRef } =
+			unlock( select( editorStore ) );
 
-			return {
-				isInserterOpen: isInserterOpened(),
-				isListViewOpen: isListViewOpened(),
-				listViewShortcut: getShortcutRepresentation(
-					'core/edit-site/toggle-list-view'
-				),
-				isVisualMode: getEditorMode() === 'visual',
-			};
-		}, [] );
+		return {
+			isInserterOpen: isInserterOpened(),
+			isListViewOpen: isListViewOpened(),
+			listViewShortcut: getShortcutRepresentation(
+				'core/edit-site/toggle-list-view'
+			),
+			isVisualMode: getEditorMode() === 'visual',
+			listViewToggleRef: getListViewToggleRef(),
+		};
+	}, [] );
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 	const { setDeviceType, setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editorStore );
@@ -161,7 +164,7 @@ export default function DocumentTools( {
 								/* translators: button label text should, if possible, be under 16 characters. */
 								label={ __( 'List View' ) }
 								onClick={ toggleListView }
-								ref={ setListViewToggleElement }
+								ref={ listViewToggleRef }
 								shortcut={ listViewShortcut }
 								showTooltip={ ! showIconLabels }
 								variant={

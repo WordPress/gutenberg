@@ -55,10 +55,7 @@ const slideX = {
 	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
 };
 
-function Header( {
-	setEntitiesSavedStatesCallback,
-	setListViewToggleElement,
-} ) {
+function Header( { setEntitiesSavedStatesCallback } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const blockToolbarRef = useRef();
@@ -111,10 +108,7 @@ function Header( {
 				transition={ { type: 'tween', delay: 0.8 } }
 				className="edit-post-header__toolbar"
 			>
-				<HeaderToolbar
-					hasFixedToolbar={ hasFixedToolbar }
-					setListViewToggleElement={ setListViewToggleElement }
-				/>
+				<HeaderToolbar hasFixedToolbar={ hasFixedToolbar } />
 				{ hasFixedToolbar && isLargeViewport && (
 					<>
 						<div
