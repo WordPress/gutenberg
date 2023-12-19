@@ -80,9 +80,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		blockApiVersion,
 		blockTitle,
 		isSelected,
-		isPartOfSelection,
-		adjustScrolling,
-		enableAnimation,
 		isSubtreeDisabled,
 		isOutlineEnabled,
 		hasOverlay,
@@ -114,12 +111,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useNavModeExit( clientId ),
 		useIsHovered( { isEnabled: isOutlineEnabled } ),
 		useIntersectionObserver(),
-		useMovingAnimation( {
-			isSelected: isPartOfSelection,
-			adjustScrolling,
-			enableAnimation,
-			triggerAnimationOnChange: index,
-		} ),
+		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
 	] );
 

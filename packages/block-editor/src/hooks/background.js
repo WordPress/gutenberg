@@ -24,7 +24,6 @@ import { Platform, useCallback, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
-import { pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -144,20 +143,21 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 }
 
 function BackgroundImagePanelItem( { clientId, setAttributes } ) {
-	const style = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
+	const { style, mediaUpload } = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSettings } =
+				select( blockEditorStore );
+
+			return {
+				style: getBlockAttributes( clientId )?.style,
+				mediaUpload: getSettings().mediaUpload,
+			};
+		},
 		[ clientId ]
 	);
 	const { id, title, url } = style?.background?.backgroundImage || {};
 
 	const replaceContainerRef = useRef();
-
-	const { mediaUpload } = useSelect( ( select ) => {
-		return {
-			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
-		};
-	} );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
@@ -302,7 +302,7 @@ function BackgroundImagePanelItem( { clientId, setAttributes } ) {
 	);
 }
 
-function BackgroundImagePanelPure( props ) {
+export function BackgroundImagePanel( props ) {
 	const [ backgroundImage ] = useSettings( 'background.backgroundImage' );
 	if (
 		! backgroundImage ||
@@ -317,8 +317,3 @@ function BackgroundImagePanelPure( props ) {
 		</InspectorControls>
 	);
 }
-
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-export const BackgroundImagePanel = pure( BackgroundImagePanelPure );

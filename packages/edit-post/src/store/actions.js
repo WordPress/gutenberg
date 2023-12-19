@@ -438,8 +438,6 @@ export function metaBoxUpdatesFailure() {
  * @deprecated
  *
  * @param {string} deviceType
- *
- * @return {Object} Action object.
  */
 export const __experimentalSetPreviewDeviceType =
 	( deviceType ) =>
@@ -458,41 +456,35 @@ export const __experimentalSetPreviewDeviceType =
 /**
  * Returns an action object used to open/close the inserter.
  *
- * @param {boolean|Object} value                Whether the inserter should be
- *                                              opened (true) or closed (false).
- *                                              To specify an insertion point,
- *                                              use an object.
- * @param {string}         value.rootClientId   The root client ID to insert at.
- * @param {number}         value.insertionIndex The index to insert at.
+ * @deprecated
  *
- * @return {Object} Action object.
+ * @param {boolean|Object} value Whether the inserter should be opened (true) or closed (false).
  */
-export function setIsInserterOpened( value ) {
-	return {
-		type: 'SET_IS_INSERTER_OPENED',
-		value,
+export const setIsInserterOpened =
+	( value ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).setIsInserterOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsInserterOpened",
+		} );
+		registry.dispatch( editorStore ).setIsInserterOpened( value );
 	};
-}
 
 /**
  * Returns an action object used to open/close the list view.
  *
+ * @deprecated
+ *
  * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
- * @return {Object} Action object.
  */
 export const setIsListViewOpened =
 	( isOpen ) =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core/edit-post', 'distractionFree' );
-		if ( isDistractionFree && isOpen ) {
-			dispatch.toggleDistractionFree();
-		}
-		dispatch( {
-			type: 'SET_IS_LIST_VIEW_OPENED',
-			isOpen,
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).setIsListViewOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsListViewOpened",
 		} );
+		registry.dispatch( editorStore ).setIsListViewOpened( isOpen );
 	};
 
 /**
@@ -594,8 +586,8 @@ export const toggleDistractionFree =
 				registry
 					.dispatch( preferencesStore )
 					.set( 'core/edit-post', 'fixedToolbar', true );
-				dispatch.setIsInserterOpened( false );
-				dispatch.setIsListViewOpened( false );
+				registry.dispatch( editorStore ).setIsInserterOpened( false );
+				registry.dispatch( editorStore ).setIsListViewOpened( false );
 				dispatch.closeGeneralSidebar();
 			} );
 		}

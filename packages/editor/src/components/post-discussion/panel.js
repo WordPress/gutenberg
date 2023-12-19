@@ -3,20 +3,19 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, PanelRow } from '@wordpress/components';
-import {
-	PostComments,
-	PostPingbacks,
-	PostTypeSupportCheck,
-	store as editorStore,
-} from '@wordpress/editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
- * Module Constants
+ * Internal dependencies
  */
+import { store as editorStore } from '../../store';
+import PostTypeSupportCheck from '../post-type-support-check';
+import PostComments from '../post-comments';
+import PostPingbacks from '../post-pingbacks';
+
 const PANEL_NAME = 'discussion-panel';
 
-function DiscussionPanel() {
+function PostDiscussionPanel() {
 	const { isEnabled, isOpened } = useSelect( ( select ) => {
 		const { isEditorPanelEnabled, isEditorPanelOpened } =
 			select( editorStore );
@@ -55,4 +54,4 @@ function DiscussionPanel() {
 	);
 }
 
-export default DiscussionPanel;
+export default PostDiscussionPanel;

@@ -3,21 +3,21 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, PanelRow } from '@wordpress/components';
-import {
-	store as editorStore,
-	PageAttributesCheck,
-	PageAttributesOrder,
-	PageAttributesParent,
-} from '@wordpress/editor';
+
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
- * Module Constants
+ * Internal dependencies
  */
+import { store as editorStore } from '../../store';
+import PageAttributesCheck from './check';
+import PageAttributesOrder from './order';
+import PageAttributesParent from './parent';
+
 const PANEL_NAME = 'page-attributes';
 
-export function PageAttributes() {
+export function PageAttributesPanel() {
 	const { isEnabled, isOpened, postType } = useSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
@@ -59,4 +59,4 @@ export function PageAttributes() {
 	);
 }
 
-export default PageAttributes;
+export default PageAttributesPanel;
