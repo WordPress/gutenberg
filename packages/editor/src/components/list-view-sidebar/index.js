@@ -56,7 +56,7 @@ export default function ListViewSidebar() {
 	// This ref refers to the sidebar as a whole.
 	const sidebarRef = useRef();
 	// This ref refers to the tab panel.
-	const tabPanelRef = useRef();
+	const tabsRef = useRef();
 	// This ref refers to the list view application area.
 	const listViewRef = useRef();
 
@@ -76,7 +76,7 @@ export default function ListViewSidebar() {
 	 */
 	function handleSidebarFocus( currentTab ) {
 		// Tab panel focus.
-		const tabPanelFocus = focus.tabbable.find( tabPanelRef.current )[ 0 ];
+		const tabPanelFocus = focus.tabbable.find( tabsRef.current )[ 0 ];
 		// List view tab is selected.
 		if ( currentTab === 'list-view' ) {
 			// Either focus the list view or the tab panel. Must have a fallback because the list view does not render when there are no blocks.
@@ -120,45 +120,45 @@ export default function ListViewSidebar() {
 			onKeyDown={ closeOnEscape }
 			ref={ sidebarRef }
 		>
-			<div
-				className="editor-list-view-sidebar__tab-panel"
-				ref={ tabPanelRef }
+			<Tabs
+				selectOnMove={ false }
+				onSelect={ ( tabName ) => setTab( tabName ) }
 			>
-				<Tabs
-					selectOnMove={ false }
-					onSelect={ ( tabName ) => setTab( tabName ) }
+				<div className="edit-post-editor__document-overview-panel__header">
+					<Button
+						className="edit-post-editor__document-overview-panel__close-button"
+						icon={ closeSmall }
+						label={ __( 'Close' ) }
+						onClick={ closeListView }
+					/>
+					<Tabs.TabList ref={ tabsRef }>
+						<Tabs.Tab tabId="list-view">
+							{ _x( 'List View', 'Post overview' ) }
+						</Tabs.Tab>
+						<Tabs.Tab tabId="outline">
+							{ _x( 'Outline', 'Post overview' ) }
+						</Tabs.Tab>
+					</Tabs.TabList>
+				</div>
+
+				<Tabs.TabPanel
+					ref={ listViewContainerRef }
+					className="edit-post-editor__list-view-container"
+					tabId="list-view"
+					focusable={ false }
 				>
-					<div className="edit-post-editor__document-overview-panel__header">
-						<Button
-							className="edit-post-editor__document-overview-panel__close-button"
-							icon={ closeSmall }
-							label={ __( 'Close' ) }
-							onClick={ closeListView }
-						/>
-						<Tabs.TabList>
-							<Tabs.Tab tabId="list-view">
-								{ _x( 'List View', 'Post overview' ) }
-							</Tabs.Tab>
-							<Tabs.Tab tabId="outline">
-								{ _x( 'Outline', 'Post overview' ) }
-							</Tabs.Tab>
-						</Tabs.TabList>
+					<div className="edit-post-editor__list-view-panel-content">
+						<ListView dropZoneElement={ dropZoneElement } />
 					</div>
-					<div
-						className="editor-list-view-sidebar__list-view-container"
-						ref={ listViewContainerRef }
-					>
-						<Tabs.TabPanel tabId="list-view" focusable={ false }>
-							<div className="edit-post-editor__list-view-panel-content">
-								<ListView dropZoneElement={ dropZoneElement } />
-							</div>
-						</Tabs.TabPanel>
-						<Tabs.TabPanel tabId="outline" focusable={ false }>
-							<ListViewOutline />
-						</Tabs.TabPanel>
-					</div>
-				</Tabs>
-			</div>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel
+					className="editor-list-view-sidebar__list-view-container"
+					tabId="outline"
+					focusable={ false }
+				>
+					<ListViewOutline />
+				</Tabs.TabPanel>
+			</Tabs>
 		</div>
 	);
 }
