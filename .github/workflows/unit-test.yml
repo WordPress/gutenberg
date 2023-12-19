@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
     unit-js:
-        name: JavaScript (Node.js ${{ matrix.node }}
+        name: JavaScript (Node.js ${{ matrix.node }})
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         continue-on-error: ${{ matrix.node != '20' }}
