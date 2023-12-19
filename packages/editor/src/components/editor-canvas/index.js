@@ -136,7 +136,7 @@ function EditorCanvas( {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
-			hasHistory: getEditorSettings().postHistory?.length > 0,
+			hasHistory: !! getEditorSettings().goBack,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );

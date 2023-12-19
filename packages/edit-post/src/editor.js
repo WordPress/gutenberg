@@ -9,7 +9,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { useMemo, useState, useCallback, useRef } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -23,6 +23,7 @@ import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
+import usePostHistory from './hooks/use-post-history';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
@@ -34,30 +35,10 @@ function Editor( {
 	...props
 } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-
-	const postHistory = useRef( [] );
-	const [ currentPost, setCurrentPost ] = useState( {
-		postId: initialPostId,
-		postType: initialPostType,
-	} );
-
-	const onSelectPost = useCallback(
-		( postId, postType ) => {
-			postHistory.current.unshift( currentPost );
-			setCurrentPost( { postId, postType } );
-		},
-		[ currentPost ]
+	const { currentPost, onSelectPost, goBack } = usePostHistory(
+		initialPostId,
+		initialPostType
 	);
-
-	const goBack = () => {
-		const previousPost = postHistory.current.shift();
-		setCurrentPost( {
-			postId: previousPost.postId ? previousPost.postId : initialPostId,
-			postType: previousPost.postType
-				? previousPost.postType
-				: initialPostType,
-		} );
-	};
 
 	const {
 		allowRightClickOverrides,
@@ -143,7 +124,6 @@ function Editor( {
 			...settings,
 			onSelectPost,
 			goBack,
-			postHistory: postHistory.current,
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -181,6 +161,7 @@ function Editor( {
 	}, [
 		settings,
 		onSelectPost,
+		goBack,
 		preferredStyleVariations,
 		updatePreferredStyleVariations,
 		hasFixedToolbar,
