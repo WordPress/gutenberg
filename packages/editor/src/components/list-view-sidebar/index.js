@@ -120,10 +120,7 @@ export default function ListViewSidebar() {
 			onKeyDown={ closeOnEscape }
 			ref={ sidebarRef }
 		>
-			<Tabs
-				selectOnMove={ false }
-				onSelect={ ( tabName ) => setTab( tabName ) }
-			>
+			<Tabs onSelect={ ( tabName ) => setTab( tabName ) }>
 				<div className="edit-post-editor__document-overview-panel__header">
 					<Button
 						className="edit-post-editor__document-overview-panel__close-button"
