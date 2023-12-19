@@ -9,12 +9,11 @@ import classnames from 'classnames';
 import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
-	POST_TYPE_EDITOR_INTERFACE,
 } from '@wordpress/editor';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
-import { getQueryArg } from '@wordpress/url';
+
 /**
  * Internal dependencies
  */
@@ -31,11 +30,9 @@ export default function VisualEditor( { styles } ) {
 		renderingMode,
 		isBlockBasedTheme,
 		hasV3BlocksOnly,
-		postType,
 	} = useSelect( ( select ) => {
 		const { isFeatureActive } = select( editPostStore );
-		const { getEditorSettings, getRenderingMode, getEditedPostAttribute } =
-			select( editorStore );
+		const { getEditorSettings, getRenderingMode } = select( editorStore );
 		const { getBlockTypes } = select( blocksStore );
 		const editorSettings = getEditorSettings();
 
@@ -46,17 +43,12 @@ export default function VisualEditor( { styles } ) {
 			hasV3BlocksOnly: getBlockTypes().every( ( type ) => {
 				return type.apiVersion >= 3;
 			} ),
-			postType: getEditedPostAttribute( 'type' ),
 		};
 	}, [] );
 	const hasMetaBoxes = useSelect(
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
-
-	const hasSurround =
-		POST_TYPE_EDITOR_INTERFACE[ postType ]?.hasSurround &&
-		getQueryArg( window.location.href, 'editMode' ) === 'focused';
 
 	let paddingBottom;
 
@@ -89,7 +81,6 @@ export default function VisualEditor( { styles } ) {
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': renderingMode === 'template-only',
 				'has-inline-canvas': ! isToBeIframed,
-				'has-surround': hasSurround,
 			} ) }
 		>
 			<EditorCanvas

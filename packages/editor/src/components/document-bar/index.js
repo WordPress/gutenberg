@@ -30,7 +30,6 @@ import { useState, useEffect, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { POST_TYPE_EDITOR_INTERFACE } from '../../utils/editor-interface-config';
 
 const typeLabels = {
 	// translators: 1: Pattern title.
@@ -70,7 +69,6 @@ export default function DocumentBar() {
 	);
 	const { getEditorSettings } = useSelect( editorStore );
 	const { setRenderingMode } = useDispatch( editorStore );
-	const hasBackLink = POST_TYPE_EDITOR_INTERFACE[ postType ]?.hasBackLink;
 
 	const handleOnBack = () => {
 		if ( isEditingTemplate ) {
@@ -84,9 +82,7 @@ export default function DocumentBar() {
 		<BaseDocumentActions
 			postType={ isEditingTemplate ? 'wp_template' : postType }
 			postId={ isEditingTemplate ? templateId : postId }
-			onBack={
-				isEditingTemplate || hasBackLink ? handleOnBack : undefined
-			}
+			onBack={ isEditingTemplate ? handleOnBack : undefined }
 		/>
 	);
 }

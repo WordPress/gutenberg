@@ -3,7 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { addQueryArgs, getQueryArg } from '@wordpress/url';
+import { addQueryArgs } from '@wordpress/url';
 import { store as editorStore } from '@wordpress/editor';
 
 /**
@@ -82,9 +82,6 @@ export class BrowserURL extends Component {
 	 * @param {number} postId Post ID for which to generate post editor URL.
 	 */
 	setBrowserURL( postId ) {
-		if ( getQueryArg( window.location.href, 'editMode' ) === 'focused' ) {
-			return;
-		}
 		window.history.replaceState(
 			{ id: postId },
 			'Post ' + postId,

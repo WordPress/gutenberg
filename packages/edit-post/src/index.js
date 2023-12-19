@@ -19,8 +19,6 @@ import {
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
-
 /**
  * Internal dependencies
  */
@@ -32,7 +30,6 @@ import { unlock } from './lock-unlock';
 
 const { PluginPostExcerpt: __experimentalPluginPostExcerpt } =
 	unlock( editorPrivateApis );
-const { RouterProvider } = unlock( routerPrivateApis );
 
 /**
  * Initializes and returns an instance of Editor.
@@ -186,14 +183,12 @@ export function initializeEditor(
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
 	root.render(
-		<RouterProvider>
-			<Editor
-				settings={ settings }
-				postId={ postId }
-				postType={ postType }
-				initialEdits={ initialEdits }
-			/>
-		</RouterProvider>
+		<Editor
+			settings={ settings }
+			postId={ postId }
+			postType={ postType }
+			initialEdits={ initialEdits }
+		/>
 	);
 
 	return root;

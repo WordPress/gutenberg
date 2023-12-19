@@ -12,7 +12,6 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as editorStore } from '../store';
-import { useLink } from '../components/routes/link';
 import { unlock } from '../lock-unlock';
 
 const {
@@ -79,11 +78,11 @@ const withPatternOnlyRenderMode = createHigherOrderComponent(
 			return <BlockEdit { ...props } />;
 		}
 
-		const { onClick } = useLink( {
+		const {
+			onClick,
+		} = () => ( {
 			postId: props.attributes?.ref,
 			postType: 'wp_block',
-			canvas: 'edit',
-			editMode: 'focused',
 		} );
 
 		const newProps = {
