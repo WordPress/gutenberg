@@ -3,9 +3,9 @@
  */
 import {
 	createHigherOrderComponent,
-	pure,
 	useViewportMatch,
 } from '@wordpress/compose';
+import { memo } from '@wordpress/element';
 
 /**
  * Higher-order component creator, creating a new component which renders with
@@ -48,7 +48,7 @@ const withViewportMatch = ( queries ) => {
 			} )
 		);
 	return createHigherOrderComponent( ( WrappedComponent ) => {
-		return pure( ( props ) => {
+		return memo( ( props ) => {
 			const queriesResult = useViewPortQueriesResult();
 			return <WrappedComponent { ...props } { ...queriesResult } />;
 		} );

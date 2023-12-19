@@ -8,6 +8,7 @@ import type { ComponentType, ComponentClass } from 'react';
  */
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { Component } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -17,10 +18,17 @@ import { createHigherOrderComponent } from '../../utils/create-higher-order-comp
 /**
  * Given a component returns the enhanced component augmented with a component
  * only re-rendering when its props/state change
+ *
+ * @deprecated Use `memo` or `PureComponent` instead.
  */
 const pure = createHigherOrderComponent( function < Props extends {} >(
 	WrappedComponent: ComponentType< Props >
 ): ComponentType< Props > {
+	deprecated( 'wp.compose.pure', {
+		since: '6.5',
+		alternative: 'Use `memo` or `PureComponent` instead',
+	} );
+
 	if ( WrappedComponent.prototype instanceof Component ) {
 		return class extends ( WrappedComponent as ComponentClass< Props > ) {
 			shouldComponentUpdate( nextProps: Props, nextState: any ) {
