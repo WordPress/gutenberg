@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createRegistryControl } from './factory';
+import { createRegistryControl } from './utils';
 
 /** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
 

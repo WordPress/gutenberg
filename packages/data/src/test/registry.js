@@ -4,7 +4,7 @@
  * Internal dependencies
  */
 import { createRegistry } from '../registry';
-import { createRegistrySelector } from '../factory';
+import { createRegistrySelector } from '../utils';
 import createReduxStore from '../redux-store';
 import coreDataStore from '../store';
 

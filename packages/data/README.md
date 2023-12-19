@@ -853,6 +853,10 @@ _Returns_
 
 -   `Object`: Data object returned by the `mapSelect` function.
 
+### waitForTransition
+
+Undocumented declaration.
+
 ### withDispatch
 
 Higher-order component used to add dispatch props using registered action creators.
