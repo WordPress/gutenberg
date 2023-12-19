@@ -196,7 +196,8 @@ export default function Image( {
 	const isResizable =
 		allowResize &&
 		hasNonContentControls &&
-		! ( isWideAligned && isLargeViewport );
+		! isWideAligned &&
+		isLargeViewport;
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
