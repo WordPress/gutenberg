@@ -1,7 +1,14 @@
 /**
  * External dependencies
  */
+import { Platform } from 'react-native';
 import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
+
+/**
+ * WordPress dependencies
+ */
+import { debounce } from '@wordpress/compose';
+import { hideAndroidSoftKeyboard } from '@wordpress/react-native-bridge';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
@@ -131,20 +138,56 @@ export const focusInput = ( element ) => {
  * @param {RefObject} element Element to be focused.
  */
 export const focus = ( element ) => {
+	// If other blur events happen at the same time that focus is triggered, the focus event
+	// will take precedence and cancels pending blur events.
+	blur.cancel();
+	// Similar to blur events, we also need to cancel potential keyboard dismiss.
+	dismissKeyboardDebounce.cancel();
+
 	TextInputState.focusTextInput( element );
 	notifyInputChange();
 };
 
 /**
  * Unfocuses the specified element.
+ * This function uses debounce to avoid conflicts with the focus event when both are
+ * triggered at the same time. Focus events will take precedence.
  *
  * @param {RefObject} element Element to be unfocused.
  */
-export const blur = ( element ) => {
+export const blur = debounce( ( element ) => {
 	TextInputState.blurTextInput( element );
 	setCurrentCaretData( null );
 	notifyInputChange();
+}, 0 );
+
+/**
+ * Unfocuses the specified element in case it's about to be unmounted.
+ *
+ * On iOS text inputs are automatically unfocused and keyboard dismissed when they
+ * are removed. However, this is not the case on Android, where text inputs are
+ * unfocused but the keyboard remains open.
+ *
+ * For dismissing the keyboard, we use debounce to avoid conflicts with the focus
+ * event when both are triggered at the same time.
+ *
+ * Note that we can't trigger the blur event, as it's likely that the Aztec view is no
+ * longer available when the event is executed and will produce an exception.
+ *
+ * @param {RefObject} element Element to be unfocused.
+ */
+export const blurOnUnmount = ( element ) => {
+	if ( getCurrentFocusedElement() === element ) {
+		// If a blur event was triggered before unmount, we need to cancel them to avoid
+		// exceptions.
+		blur.cancel();
+		if ( Platform.OS === 'android' ) {
+			dismissKeyboardDebounce();
+		}
+	}
 };
+
+const dismissKeyboardDebounce = debounce( () => hideAndroidSoftKeyboard(), 0 );
 
 /**
  * Unfocuses the current focused element.

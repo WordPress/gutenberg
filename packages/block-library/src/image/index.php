@@ -37,6 +37,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 	$lightbox_settings = block_core_image_get_lightbox_settings( $block->parsed_block );
 
+	$is_gutenberg_plugin = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
 	$view_js_file_handle = 'wp-block-image-view';
 	$script_handles      = $block->block_type->view_script_handles;
 
@@ -50,9 +51,11 @@ function render_block_core_image( $attributes, $content, $block ) {
 		isset( $lightbox_settings['enabled'] ) &&
 		true === $lightbox_settings['enabled']
 	) {
-		$block->block_type->supports['interactivity'] = true;
-
-		if ( ! in_array( $view_js_file_handle, $script_handles, true ) ) {
+		if ( $is_gutenberg_plugin ) {
+			gutenberg_enqueue_module( '@wordpress/block-library/image' );
+			// Remove the view script because we are using the module.
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file_handle ) );
+		} elseif ( ! in_array( $view_js_file_handle, $script_handles, true ) ) {
 			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file_handle ) );
 		}
 
@@ -71,6 +74,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 		 * other Image blocks.
 		 */
 		remove_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15 );
+
 		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
 		if ( in_array( $view_js_file_handle, $script_handles, true ) ) {
 			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file_handle ) );
@@ -187,27 +191,23 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$w = new WP_HTML_Tag_Processor( $block_content );
 	$w->next_tag( 'figure' );
 	$w->add_class( 'wp-lightbox-container' );
-	$w->set_attribute( 'data-wp-interactive', true );
+	$w->set_attribute( 'data-wp-interactive', '{"namespace":"core/image"}' );
 
 	$w->set_attribute(
 		'data-wp-context',
 		sprintf(
-			'{ "core":
-				{ "image":
-					{   "imageLoaded": false,
-						"initialized": false,
-						"lightboxEnabled": false,
-						"hideAnimationEnabled": false,
-						"preloadInitialized": false,
-						"lightboxAnimation": "%s",
-						"imageUploadedSrc": "%s",
-						"imageCurrentSrc": "",
-						"targetWidth": "%s",
-						"targetHeight": "%s",
-						"scaleAttr": "%s",
-						"dialogLabel": "%s"
-					}
-				}
+			'{  "imageLoaded": false,
+				"initialized": false,
+				"lightboxEnabled": false,
+				"hideAnimationEnabled": false,
+				"preloadInitialized": false,
+				"lightboxAnimation": "%s",
+				"imageUploadedSrc": "%s",
+				"imageCurrentSrc": "",
+				"targetWidth": "%s",
+				"targetHeight": "%s",
+				"scaleAttr": "%s",
+				"dialogLabel": "%s"
 			}',
 			$lightbox_animation,
 			$img_uploaded_src,
@@ -218,14 +218,14 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		)
 	);
 	$w->next_tag( 'img' );
-	$w->set_attribute( 'data-wp-init', 'effects.core.image.initOriginImage' );
-	$w->set_attribute( 'data-wp-on--load', 'actions.core.image.handleLoad' );
-	$w->set_attribute( 'data-wp-effect', 'effects.core.image.setButtonStyles' );
+	$w->set_attribute( 'data-wp-init', 'callbacks.initOriginImage' );
+	$w->set_attribute( 'data-wp-on--load', 'actions.handleLoad' );
+	$w->set_attribute( 'data-wp-watch', 'callbacks.setButtonStyles' );
 	// We need to set an event callback on the `img` specifically
 	// because the `figure` element can also contain a caption, and
 	// we don't want to trigger the lightbox when the caption is clicked.
-	$w->set_attribute( 'data-wp-on--click', 'actions.core.image.showLightbox' );
-	$w->set_attribute( 'data-wp-effect--setStylesOnResize', 'effects.core.image.setStylesOnResize' );
+	$w->set_attribute( 'data-wp-on--click', 'actions.showLightbox' );
+	$w->set_attribute( 'data-wp-watch--setStylesOnResize', 'callbacks.setStylesOnResize' );
 	$body_content = $w->get_updated_html();
 
 	// Add a button alongside image in the body content.
@@ -239,13 +239,13 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			type="button"
 			aria-haspopup="dialog"
 			aria-label="' . esc_attr( $aria_label ) . '"
-			data-wp-on--click="actions.core.image.showLightbox"
-			data-wp-style--right="context.core.image.imageButtonRight"
-			data-wp-style--top="context.core.image.imageButtonTop"
-			style="background: #000"
+			data-wp-init="callbacks.initTriggerButton"
+			data-wp-on--click="actions.showLightbox"
+			data-wp-style--right="context.imageButtonRight"
+			data-wp-style--top="context.imageButtonTop"
 		>
-			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
-				<Path stroke="#FFFFFF" d="M6 4a2 2 0 0 0-2 2v3h1.5V6a.5.5 0 0 1 .5-.5h3V4H6Zm3 14.5H6a.5.5 0 0 1-.5-.5v-3H4v3a2 2 0 0 0 2 2h3v-1.5Zm6 1.5v-1.5h3a.5.5 0 0 0 .5-.5v-3H20v3a2 2 0 0 1-2 2h-3Zm3-16a2 2 0 0 1 2 2v3h-1.5V6a.5.5 0 0 0-.5-.5h-3V4h3Z" />
+			<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 12 12">
+				<path fill="#fff" d="M2 0a2 2 0 0 0-2 2v2h1.5V2a.5.5 0 0 1 .5-.5h2V0H2Zm2 10.5H2a.5.5 0 0 1-.5-.5V8H0v2a2 2 0 0 0 2 2h2v-1.5ZM8 12v-1.5h2a.5.5 0 0 0 .5-.5V8H12v2a2 2 0 0 1-2 2H8Zm2-12a2 2 0 0 1 2 2v2h-1.5V2a.5.5 0 0 0-.5-.5H8V0h2Z" />
 			</svg>
 		</button>';
 
@@ -268,8 +268,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// use the exact same image as in the content when the lightbox is first opened while
 	// we wait for the larger image to load.
 	$m->set_attribute( 'src', '' );
-	$m->set_attribute( 'data-wp-bind--src', 'context.core.image.imageCurrentSrc' );
-	$m->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
+	$m->set_attribute( 'data-wp-bind--src', 'context.imageCurrentSrc' );
+	$m->set_attribute( 'data-wp-style--object-fit', 'state.lightboxObjectFit' );
 	$initial_image_content = $m->get_updated_html();
 
 	$q = new WP_HTML_Tag_Processor( $block_content );
@@ -284,8 +284,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// and Chrome (see https://github.com/WordPress/gutenberg/pull/52765#issuecomment-1674008151). Until that
 	// is resolved, manually setting the 'src' seems to be the best solution to load the large image on demand.
 	$q->set_attribute( 'src', '' );
-	$q->set_attribute( 'data-wp-bind--src', 'selectors.core.image.enlargedImgSrc' );
-	$q->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
+	$q->set_attribute( 'data-wp-bind--src', 'state.enlargedImgSrc' );
+	$q->set_attribute( 'data-wp-style--object-fit', 'state.lightboxObjectFit' );
 	$enlarged_image_content = $q->get_updated_html();
 
 	// If the current theme does NOT have a `theme.json`, or the colors are not defined,
@@ -303,26 +303,26 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		}
 	}
 
-	$close_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
+	$close_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
 	$close_button_label = esc_attr__( 'Close' );
 
 	$lightbox_html = <<<HTML
         <div data-wp-body="" class="wp-lightbox-overlay $lightbox_animation"
-            data-wp-bind--role="selectors.core.image.roleAttribute"
-            data-wp-bind--aria-label="selectors.core.image.dialogLabel"
-            data-wp-class--initialized="context.core.image.initialized"
-            data-wp-class--active="context.core.image.lightboxEnabled"
-            data-wp-class--hideAnimationEnabled="context.core.image.hideAnimationEnabled"
-            data-wp-bind--aria-modal="selectors.core.image.ariaModal"
-            data-wp-effect="effects.core.image.initLightbox"
-            data-wp-on--keydown="actions.core.image.handleKeydown"
-            data-wp-on--touchstart="actions.core.image.handleTouchStart"
-            data-wp-on--touchmove="actions.core.image.handleTouchMove"
-            data-wp-on--touchend="actions.core.image.handleTouchEnd"
-            data-wp-on--click="actions.core.image.hideLightbox"
+            data-wp-bind--role="state.roleAttribute"
+            data-wp-bind--aria-label="state.dialogLabel"
+            data-wp-class--initialized="context.initialized"
+            data-wp-class--active="context.lightboxEnabled"
+            data-wp-class--hideAnimationEnabled="context.hideAnimationEnabled"
+            data-wp-bind--aria-modal="state.ariaModal"
+            data-wp-watch="callbacks.initLightbox"
+            data-wp-on--keydown="actions.handleKeydown"
+            data-wp-on--touchstart="actions.handleTouchStart"
+            data-wp-on--touchmove="actions.handleTouchMove"
+            data-wp-on--touchend="actions.handleTouchEnd"
+            data-wp-on--click="actions.hideLightbox"
             tabindex="-1"
             >
-                <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.core.image.hideLightbox">
+                <button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button" data-wp-on--click="actions.hideLightbox">
                     $close_button_icon
                 </button>
                 <div class="lightbox-image-container">$initial_image_content</div>
@@ -363,5 +363,14 @@ function register_block_core_image() {
 			'render_callback' => 'render_block_core_image',
 		)
 	);
+
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		gutenberg_register_module(
+			'@wordpress/block-library/image',
+			gutenberg_url( '/build/interactivity/image.min.js' ),
+			array( '@wordpress/interactivity' ),
+			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+		);
+	}
 }
 add_action( 'init', 'register_block_core_image' );

@@ -29,12 +29,6 @@
 	margin-bottom: 1em;
 }
 
-@media (max-width: 768px) {
-	.wp-block-file__embed {
-		display: none;
-	}
-}
-
 //This needs a low specificity so it won't override the rules from the button element if defined in theme.json.
 :where(.wp-block-file__button) {
 	border-radius: 2em;

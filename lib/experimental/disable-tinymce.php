@@ -54,7 +54,7 @@ function gutenberg_test_tinymce_access() {
 /**
  * Whether the current editor contains a classic block instance.
  *
- * @return bool True if the editor contains a classic block, false otherwse.
+ * @return bool True if the editor contains a classic block, false otherwise.
  */
 function gutenberg_post_being_edited_requires_classic_block() {
 	if ( ! is_admin() ) {

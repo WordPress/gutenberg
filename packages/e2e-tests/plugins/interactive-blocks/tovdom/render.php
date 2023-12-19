@@ -8,9 +8,11 @@
 $plugin_url   = plugin_dir_url( __DIR__ );
 $src_proc_ins = $plugin_url . 'tovdom/processing-instructions.js';
 $src_cdata    = $plugin_url . 'tovdom/cdata.js';
+
+gutenberg_enqueue_module( 'tovdom-view' );
 ?>
 
-<div data-wp-interactive>
+<div data-wp-interactive='{ "namespace": "tovdom" }'>
 	<div data-testid="it should delete comments">
 		<!-- ##1## -->
 		<div data-testid="it should keep this node between comments">

@@ -354,7 +354,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.transformBlockTo( 'core/paragraph' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -397,7 +397,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.transformBlockTo( 'core/quote' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -674,7 +674,7 @@ test.describe( 'List (@firefox)', () => {
 
 	test( 'should change the base list type', async ( { editor } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.clickBlockToolbarButton( 'Ordered' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
@@ -694,7 +694,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( '1' );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.clickBlockToolbarButton( 'Ordered' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -1232,7 +1232,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '3' );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.clickBlockToolbarButton( 'Ordered' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -1264,7 +1264,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'b' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'c' );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.clickBlockToolbarButton( 'Unordered' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(

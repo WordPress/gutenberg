@@ -22,6 +22,7 @@ import {
 /**
  * Internal dependencies
  */
+import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 
 export const useTransformCommands = () => {
@@ -100,7 +101,7 @@ export const useTransformCommands = () => {
 			name: 'core/block-editor/transform-to-' + name.replace( '/', '-' ),
 			// translators: %s: block title/name.
 			label: sprintf( __( 'Transform to %s' ), title ),
-			icon: icon.src,
+			icon: <BlockIcon icon={ icon } />,
 			callback: ( { close } ) => {
 				onBlockTransform( name );
 				close();

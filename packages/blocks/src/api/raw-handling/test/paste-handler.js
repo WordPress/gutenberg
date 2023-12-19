@@ -69,14 +69,13 @@ describe( 'pasteHandler', () => {
 		const [ result ] = pasteHandler( {
 			HTML: tableWithHeaderFooterAndBodyUsingColspan,
 			tagName: 'p',
-			preserveWhiteSpace: false,
 		} );
 
 		expect( console ).toHaveLogged();
 
+		delete result.attributes.caption;
 		expect( result.attributes ).toEqual( {
 			hasFixedLayout: false,
-			caption: '',
 			head: [
 				{
 					cells: [
@@ -110,14 +109,13 @@ describe( 'pasteHandler', () => {
 		const [ result ] = pasteHandler( {
 			HTML: tableWithHeaderFooterAndBodyUsingRowspan,
 			tagName: 'p',
-			preserveWhiteSpace: false,
 		} );
 
 		expect( console ).toHaveLogged();
 
+		delete result.attributes.caption;
 		expect( result.attributes ).toEqual( {
 			hasFixedLayout: false,
-			caption: '',
 			head: [
 				{
 					cells: [

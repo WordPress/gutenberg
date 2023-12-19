@@ -30,7 +30,7 @@ export default function save( { attributes, className } ) {
 		width,
 	} = attributes;
 
-	if ( ! text ) {
+	if ( RichText.isEmpty( text ) ) {
 		return null;
 	}
 

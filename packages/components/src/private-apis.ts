@@ -32,21 +32,18 @@ import {
 import {
 	DropdownMenu as DropdownMenuV2Ariakit,
 	DropdownMenuGroup as DropdownMenuGroupV2Ariakit,
-	DropdownMenuGroupLabel as DropdownMenuGroupLabelV2Ariakit,
 	DropdownMenuItem as DropdownMenuItemV2Ariakit,
 	DropdownMenuCheckboxItem as DropdownMenuCheckboxItemV2Ariakit,
 	DropdownMenuRadioItem as DropdownMenuRadioItemV2Ariakit,
 	DropdownMenuSeparator as DropdownMenuSeparatorV2Ariakit,
+	DropdownMenuItemLabel as DropdownMenuItemLabelV2Ariakit,
+	DropdownMenuItemHelpText as DropdownMenuItemHelpTextV2Ariakit,
 } from './dropdown-menu-v2-ariakit';
 import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
 import Tabs from './tabs';
-
-export const { lock, unlock } =
-	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.',
-		'@wordpress/components'
-	);
+import { kebabCase } from './utils/strings';
+import { lock } from './lock-unlock';
 
 export const privateApis = {};
 lock( privateApis, {
@@ -74,9 +71,11 @@ lock( privateApis, {
 	Theme,
 	DropdownMenuV2Ariakit,
 	DropdownMenuGroupV2Ariakit,
-	DropdownMenuGroupLabelV2Ariakit,
 	DropdownMenuItemV2Ariakit,
 	DropdownMenuCheckboxItemV2Ariakit,
 	DropdownMenuRadioItemV2Ariakit,
 	DropdownMenuSeparatorV2Ariakit,
+	DropdownMenuItemLabelV2Ariakit,
+	DropdownMenuItemHelpTextV2Ariakit,
+	kebabCase,
 } );

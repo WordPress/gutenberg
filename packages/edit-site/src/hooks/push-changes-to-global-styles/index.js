@@ -17,8 +17,9 @@ import {
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import { useContext, useMemo, useCallback } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -391,6 +392,10 @@ function PushChangesToGlobalStylesControl( {
 const withPushChangesToGlobalStyles = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const blockEditingMode = useBlockEditingMode();
+		const isBlockBasedTheme = useSelect(
+			( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
+			[]
+		);
 		const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
 			hasBlockSupport( props.name, feature )
 		);
@@ -398,11 +403,13 @@ const withPushChangesToGlobalStyles = createHigherOrderComponent(
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ blockEditingMode === 'default' && supportsStyles && (
-					<InspectorAdvancedControls>
-						<PushChangesToGlobalStylesControl { ...props } />
-					</InspectorAdvancedControls>
-				) }
+				{ blockEditingMode === 'default' &&
+					supportsStyles &&
+					isBlockBasedTheme && (
+						<InspectorAdvancedControls>
+							<PushChangesToGlobalStylesControl { ...props } />
+						</InspectorAdvancedControls>
+					) }
 			</>
 		);
 	}

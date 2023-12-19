@@ -346,29 +346,43 @@ export const usePatterns = ( clientId, name ) => {
 };
 
 /**
- * Hook that returns a list of unsupported blocks inside the Query Loop with the
- * given `clientId`.
+ * The object returned by useUnsupportedBlocks with info about the type of
+ * unsupported blocks present inside the Query block.
+ *
+ * @typedef  {Object}  UnsupportedBlocksInfo
+ * @property {boolean} hasBlocksFromPlugins True if blocks from plugins are present.
+ * @property {boolean} hasPostContentBlock  True if a 'core/post-content' block is present.
+ * @property {boolean} hasUnsupportedBlocks True if there are any unsupported blocks.
+ */
+
+/**
+ * Hook that returns an object with information about the unsupported blocks
+ * present inside a Query Loop with the given `clientId`. The returned object
+ * contains props that are true when a certain type of unsupported block is
+ * present.
  *
  * @param {string} clientId The block's client ID.
- * @return {string[]} List of block titles.
+ * @return {UnsupportedBlocksInfo} The object containing the information.
  */
-export const useUnsupportedBlockList = ( clientId ) => {
+export const useUnsupportedBlocks = ( clientId ) => {
 	return useSelect(
 		( select ) => {
 			const { getClientIdsOfDescendants, getBlockName } =
 				select( blockEditorStore );
-
-			return getClientIdsOfDescendants( clientId ).filter(
+			const blocks = {};
+			getClientIdsOfDescendants( clientId ).forEach(
 				( descendantClientId ) => {
 					const blockName = getBlockName( descendantClientId );
-					return (
-						! blockName.startsWith( 'core/' ) ||
-						blockName === 'core/post-content' ||
-						blockName === 'core/template-part' ||
-						blockName === 'core/block'
-					);
+					if ( ! blockName.startsWith( 'core/' ) ) {
+						blocks.hasBlocksFromPlugins = true;
+					} else if ( blockName === 'core/post-content' ) {
+						blocks.hasPostContentBlock = true;
+					}
 				}
 			);
+			blocks.hasUnsupportedBlocks =
+				blocks.hasBlocksFromPlugins || blocks.hasPostContentBlock;
+			return blocks;
 		},
 		[ clientId ]
 	);
