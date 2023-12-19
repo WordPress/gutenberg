@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
+import { useCallback, Platform } from '@wordpress/element';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 /** @typedef {import('react-native-reanimated').SharedValue} SharedValue */
@@ -42,11 +42,11 @@ export default function useScrollToSection(
 	 */
 	const scrollToSection = useCallback(
 		( sectionY, sectionHeight ) => {
-			if (
-				! scrollViewRef ||
-				! scrollEnabled ||
-				! scrollViewMeasurements
-			) {
+			const scrollRef = Platform.isAndroid
+				? scrollViewRef.current?.getNativeScrollRef()
+				: scrollViewRef.current;
+
+			if ( ! scrollRef || ! scrollEnabled || ! scrollViewMeasurements ) {
 				return;
 			}
 
@@ -57,7 +57,7 @@ export default function useScrollToSection(
 
 			// Scroll to the top of the section.
 			if ( sectionY < currentScrollViewYOffset ) {
-				scrollViewRef.current.scrollTo( {
+				scrollRef.scrollTo( {
 					y: sectionY,
 					animated: true,
 				} );
@@ -79,7 +79,7 @@ export default function useScrollToSection(
 
 			// Scroll to the bottom of the section.
 			if ( sectionY > maxOffset && ! isAtTheTop ) {
-				scrollViewRef.current.scrollTo( {
+				scrollRef.scrollTo( {
 					y: sectionY - availableScreenSpace,
 					animated: true,
 				} );

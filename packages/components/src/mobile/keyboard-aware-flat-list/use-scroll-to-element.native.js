@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
+import { useCallback, Platform } from '@wordpress/element';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 /**
@@ -20,12 +20,16 @@ export default function useScrollToElement( scrollViewRef, scrollToSection ) {
 	 */
 	const scrollToElement = useCallback(
 		( elementRef ) => {
-			if ( ! scrollViewRef || ! elementRef ) {
+			const scrollRef = Platform.isAndroid
+				? scrollViewRef.current?.getNativeScrollRef()
+				: scrollViewRef.current;
+
+			if ( ! scrollRef || ! elementRef ) {
 				return;
 			}
 
 			elementRef.current.measureLayout(
-				scrollViewRef.current,
+				scrollRef,
 				( _x, y, _width, height ) => {
 					if ( height || y ) {
 						scrollToSection( Math.round( y ), height );
