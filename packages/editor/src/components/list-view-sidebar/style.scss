@@ -8,19 +8,20 @@
 		// @see packages/block-editor/src/components/inserter/style.scss
 		width: 350px;
 	}
-
+	.edit-post-editor__document-overview-panel__header {
+		display: flex;
+		border-bottom: $border-width solid $gray-300;
+	}
 	.editor-list-view-sidebar__close-button {
-		position: absolute;
-		right: $grid-unit-10;
-		top: math.div($grid-unit-60 - $button-size, 2); // ( tab height - button size ) / 2
-		z-index: 1;
 		background: $white;
+		order: 1;
+		align-self: center;
+		margin-right: $grid-unit-10;
 	}
 
 	[role="tablist"] {
-		border-bottom: $border-width solid $gray-300;
-		padding-right: $grid-unit-70;
 		box-sizing: border-box;
+		flex-grow: 1;
 
 		[role="tab"] {
 			width: 50%;

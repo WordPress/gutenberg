@@ -128,21 +128,22 @@ export default function ListViewSidebar() {
 					selectOnMove={ false }
 					onSelect={ ( tabName ) => setTab( tabName ) }
 				>
-					<Tabs.TabList>
-						<Tabs.Tab tabId="list-view">
-							{ _x( 'List View', 'Post overview' ) }
-						</Tabs.Tab>
-						<Tabs.Tab tabId="outline">
-							{ _x( 'Outline', 'Post overview' ) }
-						</Tabs.Tab>
-					</Tabs.TabList>
-					<Button
-						className="editor-list-view-sidebar__close-button"
-						icon={ closeSmall }
-						label={ __( 'Close' ) }
-						onClick={ closeListView }
-					/>
-
+					<div className="edit-post-editor__document-overview-panel__header">
+						<Button
+							className="edit-post-editor__document-overview-panel__close-button"
+							icon={ closeSmall }
+							label={ __( 'Close' ) }
+							onClick={ closeListView }
+						/>
+						<Tabs.TabList>
+							<Tabs.Tab tabId="list-view">
+								{ _x( 'List View', 'Post overview' ) }
+							</Tabs.Tab>
+							<Tabs.Tab tabId="outline">
+								{ _x( 'Outline', 'Post overview' ) }
+							</Tabs.Tab>
+						</Tabs.TabList>
+					</div>
 					<div
 						className="editor-list-view-sidebar__list-view-container"
 						ref={ listViewContainerRef }
