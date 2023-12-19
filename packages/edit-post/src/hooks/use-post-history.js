@@ -1,29 +1,52 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useCallback, useReducer } from '@wordpress/element';
 
+/**
+ * A hook that records the 'entity' history in the post editor as a user
+ * navigates between editing a post and editing the post template or patterns.
+ *
+ * Implemented as a stack, so a little similar to the browser history API.
+ *
+ * Used to control displaying UI elements like the back button.
+ *
+ * @param {number} initialPostId   The post id of the post when the editor loaded.
+ * @param {string} initialPostType The post type of the post when the editor loaded.
+ *
+ * @return {Object} An object containing the `currentPost` variable and
+ *                 `onSelectPost` and `goBack` functions.
+ */
 export default function usePostHistory( initialPostId, initialPostType ) {
-	const postHistory = useRef( [
-		{ postId: initialPostId, postType: initialPostType },
-	] );
-	const [ currentPost, setCurrentPost ] = useState( {
-		postId: initialPostId,
-		postType: initialPostType,
-	} );
+	const [ postHistory, dispatch ] = useReducer(
+		( historyState, { type, post } ) => {
+			if ( type === 'push' ) {
+				return [ ...historyState, post ];
+			}
+			if ( type === 'pop' ) {
+				// Try to leave one item in the history.
+				if ( historyState.length > 1 ) {
+					return historyState.slice( 0, -1 );
+				}
+			}
+			return historyState;
+		},
+		[ { postId: initialPostId, postType: initialPostType } ]
+	);
 
 	const onSelectPost = useCallback( ( postId, postType ) => {
-		postHistory.current.push( { postId, postType } );
-		setCurrentPost( { postId, postType } );
+		dispatch( { type: 'push', post: { postId, postType } } );
 	}, [] );
 
-	const goBack =
-		postHistory.current.length > 1
-			? () => {
-					postHistory.current.pop();
-					setCurrentPost( [ ...postHistory.current ].pop() );
-			  }
-			: undefined;
+	const goBack = useCallback( () => {
+		dispatch( { type: 'pop' } );
+	}, [] );
 
-	return { currentPost, onSelectPost, goBack };
+	const currentPost = postHistory[ postHistory.length - 1 ];
+
+	return {
+		currentPost,
+		onSelectPost,
+		goBack: postHistory.length > 1 ? goBack : undefined,
+	};
 }
