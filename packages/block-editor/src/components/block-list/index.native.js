@@ -140,7 +140,7 @@ export default function BlockList( {
 		insertBlock( newBlock, blockCount );
 	};
 
-	const scrollViewRef = useRef( null );
+	const scrollRef = useRef( null );
 
 	const shouldFlatListPreventAutomaticScroll = () =>
 		blockInsertionPointIsVisible;
@@ -244,7 +244,7 @@ export default function BlockList( {
 				<BlockListProvider
 					value={ {
 						...DEFAULT_BLOCK_LIST_CONTEXT,
-						scrollRef: scrollViewRef.current,
+						scrollRef: scrollRef.current,
 					} }
 				>
 					<BlockDraggableWrapper isRTL={ isRTL }>
@@ -254,9 +254,7 @@ export default function BlockList( {
 									? { removeClippedSubviews: false }
 									: {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 								accessibilityLabel="block-list"
-								innerRef={ ( ref ) => {
-									scrollViewRef.current = ref;
-								} }
+								ref={ scrollRef }
 								extraScrollHeight={ extraScrollHeight }
 								keyboardShouldPersistTaps="always"
 								scrollViewStyle={ { flex: 1 } }
