@@ -347,7 +347,7 @@ function backgroundSizeHelpText( value ) {
 	if ( value === 'contain' ) {
 		return __( 'Image is contained within the block.' );
 	}
-	return __( 'Repeat the image, and set a fixed size.' );
+	return __( 'Repeat the image, and set a fixed width.' );
 }
 
 function BackgroundSizePanelItem( {
