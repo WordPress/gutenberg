@@ -1,6 +1,6 @@
 # TextDecorationControl
 
-Notice: This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+**Notice: This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.**
 
 ![TextDecorationControl Element in Inspector Control](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/text-decoration-component.png?raw=true)
 
