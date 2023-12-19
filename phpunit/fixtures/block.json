@@ -12,7 +12,7 @@
 	"icon": "star",
 	"description": "Shows warning, error or success notices…",
 	"keywords": [ "alert", "message" ],
-	"textDomain": "my-plugin",
+	"textdomain": "my-plugin",
 	"attributes": {
 		"message": {
 			"type": "string",
