@@ -45,8 +45,8 @@ import {
 	useResetTemplateAction,
 	deleteTemplateAction,
 	renameTemplateAction,
-	seeRevisionsAction,
 } from './template-actions';
+import { postRevisionsAction } from '../actions';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import PostPreview from '../post-preview';
@@ -333,7 +333,7 @@ export default function DataviewsTemplates() {
 			resetTemplateAction,
 			deleteTemplateAction,
 			renameTemplateAction,
-			seeRevisionsAction,
+			postRevisionsAction,
 		],
 		[ resetTemplateAction ]
 	);
