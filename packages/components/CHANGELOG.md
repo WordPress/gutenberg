@@ -4,6 +4,7 @@
 
 ### Bug Fix
 
+-   `ColorPicker`: Replace color copy button icon with visible text ([#57168](https://github.com/WordPress/gutenberg/pull/57168)).
 -   `PaletteEdit`: Consider digits when generating kebab-cased slug ([#56713](https://github.com/WordPress/gutenberg/pull/56713)).
 
 ### Experimental
