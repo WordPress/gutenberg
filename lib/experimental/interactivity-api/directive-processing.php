@@ -49,8 +49,9 @@ function gutenberg_process_directives_in_root_blocks( $block_content, $block ) {
 	if ( WP_Directive_Processor::is_marked_as_root_block( $block ) ) {
 		WP_Directive_Processor::unmark_root_block();
 		$processed_content = '';
-		$parsed_blocks     = parse_blocks( $block_content );
-		$context           = new WP_Directive_Context();
+		// We parse our own block delimiters for interactive and non-interactive blocks.
+		$parsed_blocks = parse_blocks( $block_content );
+		$context       = new WP_Directive_Context();
 		foreach ( $parsed_blocks as $parsed_block ) {
 			if ( 'core/interactivity-wrapper' === $parsed_block['blockName'] ) {
 				$processed_content .= gutenberg_process_interactive_block( $parsed_block, $context, $directives );
@@ -199,8 +200,7 @@ function gutenberg_process_interactive_block( $interactive_block, $context, $dir
 			$block_index               += 1;
 		}
 	}
-	$content = gutenberg_process_interactive_html( $content, $interactive_inner_blocks, $context, $directives );
-	return $content;
+	return gutenberg_process_interactive_html( $content, $interactive_inner_blocks, $context, $directives );
 }
 
 /**
@@ -269,10 +269,7 @@ function gutenberg_process_interactive_html( $html, $inner_blocks, $context, $di
 		}
 		// Process the inner blocks.
 		if ( str_contains( $tag_name, 'WP-INNER-BLOCKS' ) && ! empty( $inner_blocks ) && ! $tags->is_tag_closer() ) {
-			$inner_block_content                               = '';
-			$inner_block                                       = $inner_blocks[ $inner_blocks_index ];
-			$inner_block_content                              .= gutenberg_process_interactive_block( $inner_block, $context, $directives );
-			$inner_processed_blocks[ strtolower( $tag_name ) ] = $inner_block_content;
+			$inner_processed_blocks[ strtolower( $tag_name ) ] = gutenberg_process_interactive_block( $inner_blocks[ $inner_blocks_index ], $context, $directives );
 			$inner_blocks_index                               += 1;
 		}
 		if ( $tags->is_tag_closer() ) {
