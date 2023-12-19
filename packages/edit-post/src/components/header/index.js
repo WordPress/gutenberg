@@ -16,7 +16,6 @@ import {
 	store as editorStore,
 	DocumentBar,
 	privateApis as editorPrivateApis,
-	POST_TYPE_EDITOR_INTERFACE,
 } from '@wordpress/editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -69,7 +68,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isEditingTemplate,
 		isPublishSidebarOpened,
 		showIconLabels,
-		postType,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const { getEditorMode } = select( editPostStore );
@@ -79,7 +77,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			postType: select( editorStore ).getEditedPostAttribute( 'type' ),
+
 			isEditingTemplate:
 				select( editorStore ).getRenderingMode() === 'template-only',
 			isPublishSidebarOpened:
@@ -90,9 +88,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		};
 	}, [] );
 
-	const hasDocumentBar =
-		POST_TYPE_EDITOR_INTERFACE[ postType ]?.hasDocumentBar &&
-		getQueryArg( window.location.href, 'editMode' ) === 'focused';
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
@@ -168,9 +163,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 							isLargeViewport,
 					} ) }
 				>
-					{ ( isEditingTemplate || hasDocumentBar ) && (
-						<DocumentBar />
-					) }
+					{ isEditingTemplate && <DocumentBar /> }
 				</div>
 			</motion.div>
 			<motion.div
