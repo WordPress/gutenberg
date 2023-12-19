@@ -14,7 +14,6 @@ import {
 	MediaPlaceholder,
 	useBlockProps,
 	store as blockEditorStore,
-	__experimentalUseBorderProps as useBorderProps,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -314,16 +313,10 @@ export function ImageEdit( {
 		/>
 	);
 
-	const borderProps = useBorderProps( attributes );
-
 	const classes = classnames( className, {
 		'is-transient': temporaryURL,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
-		'has-custom-border':
-			!! borderProps.className ||
-			( borderProps.style &&
-				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
 	const blockProps = useBlockProps( {
@@ -335,10 +328,7 @@ export function ImageEdit( {
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
-				className={ classnames( 'block-editor-media-placeholder', {
-					[ borderProps.className ]:
-						!! borderProps.className && ! isSelected,
-				} ) }
+				className="block-editor-media-placeholder"
 				withIllustration={ true }
 				icon={ icon }
 				label={ __( 'Image' ) }
@@ -353,7 +343,6 @@ export function ImageEdit( {
 					width: height && aspectRatio ? '100%' : width,
 					height: width && aspectRatio ? '100%' : height,
 					objectFit: scale,
-					...borderProps.style,
 				} }
 			>
 				{ content }
