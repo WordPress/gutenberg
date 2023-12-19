@@ -1,11 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import { updateBlockBindingsAttribute } from '@wordpress/block-editor';
+import { MenuItem, MenuGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { SearchControl, MenuItem } from '@wordpress/components';
-import { chevronDown, chevronUp } from '@wordpress/icons';
 
 export default function BlockBindingsFieldsList( props ) {
 	const {
@@ -13,11 +11,8 @@ export default function BlockBindingsFieldsList( props ) {
 		setAttributes,
 		setIsActiveAttribute,
 		currentAttribute,
-		activeSource,
-		setIsActiveSource,
 		fields,
 		source,
-		label,
 	} = props;
 
 	// TODO: Try to abstract this function to be reused across all the sources.
@@ -41,51 +36,24 @@ export default function BlockBindingsFieldsList( props ) {
 		setIsActiveAttribute( false );
 	}
 
-	const [ searchInput, setSearchInput ] = useState( '' );
-
 	return (
-		<div className="block-bindings-fields-list-ui">
-			<MenuItem
-				icon={ activeSource === source ? chevronUp : chevronDown }
-				isSelected={ activeSource === source }
-				onClick={ () =>
-					setIsActiveSource(
-						activeSource === source ? false : source
-					)
-				}
-				className="block-bindings-source-picker-button"
-			>
-				{ label }
-			</MenuItem>
-			{ /* TODO: Implement the Search logic. */ }
-			{ /* <SearchControl
-				label={ __( 'Search metadata' ) }
-				value={ searchInput }
-				onChange={ setSearchInput }
-				size="compact"
-			/> */ }
-			{ activeSource === source && (
-				<ul>
-					{ fields.map( ( item ) => (
-						<li
-							key={ item.key }
-							onClick={ () => selectItem( item ) }
-							className={
-								attributes.metadata?.bindings?.[
-									currentAttribute
-								]?.source?.name === source &&
-								attributes.metadata?.bindings?.[
-									currentAttribute
-								]?.source?.attributes?.value === item.key
-									? 'selected-meta-field'
-									: ''
-							}
-						>
-							{ item.label }
-						</li>
-					) ) }
-				</ul>
-			) }
-		</div>
+		<MenuGroup className="block-bindings-fields-list-ui">
+			{ fields.map( ( item ) => (
+				<MenuItem
+					key={ item.key }
+					onClick={ () => selectItem( item ) }
+					className={
+						attributes.metadata?.bindings?.[ currentAttribute ]
+							?.source?.name === source &&
+						attributes.metadata?.bindings?.[ currentAttribute ]
+							?.source?.attributes?.value === item.key
+							? 'selected-meta-field'
+							: ''
+					}
+				>
+					{ item.label }
+				</MenuItem>
+			) ) }
+		</MenuGroup>
 	);
 }

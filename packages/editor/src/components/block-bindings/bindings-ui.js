@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, cloneElement } from '@wordpress/element';
+import { useState, cloneElement, Fragment } from '@wordpress/element';
 import {
 	BlockControls,
 	updateBlockBindingsAttribute,
@@ -29,11 +29,19 @@ const blockBindingsWhitelist = {
 
 const { Slot, Fill } = createSlotFill( 'BlockBindingsUI' );
 
-const BlockBindingsFill = ( { children } ) => {
+const BlockBindingsFill = ( { children, source, label } ) => {
 	return (
 		<Fill>
 			{ ( props ) => {
-				return <>{ cloneElement( children, props ) }</>;
+				return (
+					<>
+						{ cloneElement( children, {
+							source,
+							label,
+							...props,
+						} ) }
+					</>
+				);
 			} }
 		</Fill>
 	);
@@ -103,10 +111,70 @@ const BlockBindingsUI = ( props ) => {
 											...props,
 											currentAttribute: attribute,
 											setIsActiveAttribute,
-											activeSource,
-											setIsActiveSource,
 										} }
-									/>
+									>
+										{ ( fills ) => {
+											if ( ! fills.length ) {
+												return null;
+											}
+
+											return (
+												<>
+													{ fills.map(
+														( fill, index ) => {
+															// TODO: Check better way to get the source and label.
+															const source =
+																fill[ 0 ].props
+																	.children
+																	.props
+																	.source;
+															const sourceLabel =
+																fill[ 0 ].props
+																	.children
+																	.props
+																	.label;
+															const isSourceSelected =
+																activeSource ===
+																source;
+
+															return (
+																<Fragment
+																	key={
+																		index
+																	}
+																>
+																	<MenuItem
+																		icon={
+																			isSourceSelected
+																				? chevronUp
+																				: chevronDown
+																		}
+																		isSelected={
+																			isSourceSelected
+																		}
+																		onClick={ () =>
+																			setIsActiveSource(
+																				isSourceSelected
+																					? false
+																					: source
+																			)
+																		}
+																		className="block-bindings-source-picker-button"
+																	>
+																		{
+																			sourceLabel
+																		}
+																	</MenuItem>
+																	{ isSourceSelected &&
+																		fill }
+																</Fragment>
+															);
+														}
+													) }
+												</>
+											);
+										} }
+									</Slot>
 								</MenuGroup>
 								<RemoveBindingButton
 									{ ...props }

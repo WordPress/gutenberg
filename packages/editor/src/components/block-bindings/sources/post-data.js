@@ -52,7 +52,6 @@ const PostData = ( props ) => {
 		<BlockBindingsFieldsList
 			fields={ fields }
 			source="post_data"
-			label="Post data"
 			{ ...props }
 		/>
 	);
@@ -69,7 +68,10 @@ if ( window.__experimentalConnections ) {
 				<>
 					{ isSelected && (
 						<>
-							<BlockBindingsFill>
+							<BlockBindingsFill
+								source="post_data"
+								label="Post data"
+							>
 								<PostData />
 							</BlockBindingsFill>
 						</>

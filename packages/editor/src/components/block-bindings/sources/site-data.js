@@ -42,7 +42,6 @@ const SiteData = ( props ) => {
 		<BlockBindingsFieldsList
 			fields={ fields }
 			source="site_data"
-			label="Site data"
 			{ ...props }
 		/>
 	);
@@ -57,7 +56,10 @@ if ( window.__experimentalConnections ) {
 				<>
 					{ isSelected && (
 						<>
-							<BlockBindingsFill>
+							<BlockBindingsFill
+								source="site_data"
+								label="Site data"
+							>
 								<SiteData />
 							</BlockBindingsFill>
 						</>
