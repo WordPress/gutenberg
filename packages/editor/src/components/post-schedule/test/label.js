@@ -35,7 +35,7 @@ describe( 'getFullPostScheduleLabel', () => {
 
 		setSettings( {
 			...settings,
-			timezone: { formattedOffset: 10 },
+			timezone: { offsetFormatted: 10 },
 		} );
 
 		const label = getFullPostScheduleLabel( '2022-04-28T15:30:00' );

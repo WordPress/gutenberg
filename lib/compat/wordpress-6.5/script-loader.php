@@ -87,9 +87,9 @@ function gutenberg_update_wp_date_timezone_settings( $scripts ) {
 						),
 						'timezone' => array(
 							'offset'          => (float) $gmt_offset,
+							'offsetFormatted' => str_replace( array( '.25', '.5', '.75' ), array( ':15', ':30', ':45' ), (string) $gmt_offset ),
 							'string'          => $timezone_string,
 							'abbr'            => $timezone_abbr,
-							'formattedOffset' => str_replace( array( '.25', '.5', '.75' ), array( ':15', ':30', ':45' ), (string) $gmt_offset ),
 						),
 					)
 				)

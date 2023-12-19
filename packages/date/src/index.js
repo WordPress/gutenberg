@@ -32,9 +32,9 @@ import deprecated from '@wordpress/deprecated';
 /**
  * @typedef TimezoneConfig
  * @property {string} offset          Offset setting.
+ * @property {string} offsetFormatted Offset setting with decimals formatted to minutes.
  * @property {string} string          The timezone as a string (e.g., `'America/Los_Angeles'`).
  * @property {string} abbr            Abbreviation for the timezone.
- * @property {string} formattedOffset Offset setting with decimals formatted to minutes.
  */
 
 /* eslint-disable jsdoc/valid-types */
@@ -133,7 +133,7 @@ let settings = {
 		datetime: 'F j, Y g: i a',
 		datetimeAbbreviated: 'M j, Y g: i a',
 	},
-	timezone: { offset: '0', string: '', abbr: '', formattedOffset: '0' },
+	timezone: { offset: '0', offsetFormatted: '0', string: '', abbr: '' },
 };
 
 /**
