@@ -50,34 +50,55 @@ describe( 'Tooltip', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'should render the tooltip when focusing on the tooltip anchor via tab', async () => {
+	it( 'should show the tooltip when the tooltip anchor receives focus, and hide it when the anchor loses focus', async () => {
 		const user = userEvent.setup();
 
 		render( <Tooltip { ...props } /> );
 
+		const tooltipAnchor = screen.getByRole( 'button', { name: /Button/i } );
+
 		await user.tab();
 
-		expect(
-			screen.getByRole( 'button', { name: /Button/i } )
-		).toHaveFocus();
+		expect( tooltipAnchor ).toHaveFocus();
 
 		expect(
 			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
 		).toBeVisible();
 
+		await user.tab();
+		await user.tab();
+		await user.click( document.body );
+
+		expect( tooltipAnchor ).not.toHaveFocus();
+
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
+
 		await cleanupTooltip( user );
 	} );
 
-	it( 'should render the tooltip when the tooltip anchor is hovered', async () => {
+	it( 'should show the tooltip when the tooltip anchor is hovered, and hide it when the anchor is not hovered anymore', async () => {
 		const user = userEvent.setup();
 
-		render( <Tooltip { ...props } /> );
+		render(
+			<>
+				<Tooltip { ...props } />
+				<button>Hover me</button>
+			</>
+		);
 
 		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
 
 		expect(
 			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
 		).toBeVisible();
+
+		await user.hover( screen.getByRole( 'button', { name: /Hover me/i } ) );
+
+		expect(
+			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
+		).not.toBeInTheDocument();
 
 		await cleanupTooltip( user );
 	} );
@@ -263,7 +284,7 @@ describe( 'Tooltip', () => {
 		await cleanupTooltip( user );
 	} );
 
-	it( 'esc should close modal even when tooltip is visible', async () => {
+	it( 'should close a parent Modal even when tooltip is visible when pressing the Escape key', async () => {
 		const user = userEvent.setup();
 		const onRequestClose = jest.fn();
 		render(
