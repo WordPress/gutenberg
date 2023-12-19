@@ -83,6 +83,7 @@ function gutenberg_reregister_core_block_types() {
 				'navigation-submenu.php'           => 'core/navigation-submenu',
 				'page-list.php'                    => 'core/page-list',
 				'page-list-item.php'               => 'core/page-list-item',
+				'paragraph.php'                    => 'core/paragraph',
 				'pattern.php'                      => 'core/pattern',
 				'post-author.php'                  => 'core/post-author',
 				'post-author-name.php'             => 'core/post-author-name',
