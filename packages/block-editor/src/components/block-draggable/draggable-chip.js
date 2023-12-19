@@ -3,7 +3,7 @@
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Flex, FlexItem } from '@wordpress/components';
-import { dragHandle, cancelCircleFilled } from '@wordpress/icons';
+import { dragHandle } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -44,7 +44,7 @@ export default function BlockDraggableChip( {
 					</FlexItem>
 					{ fadeWhenDisabled && (
 						<FlexItem className="block-editor-block-draggable-chip__disabled">
-							<BlockIcon icon={ cancelCircleFilled } />
+							<span className="block-editor-block-draggable-chip__disabled-icon"></span>
 						</FlexItem>
 					) }
 				</Flex>

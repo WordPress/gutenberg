@@ -58,22 +58,25 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	color: transparent;
 	background-color: transparent;
 	transition: all 0.1s linear 0.1s;
 
-	.block-editor-block-icon {
-		color: inherit;
+	.block-editor-block-draggable-chip__disabled-icon {
+		width: $grid-unit-50 * 0.5;
+		height: $grid-unit-50 * 0.5;
+		box-shadow: inset 0 0 0 1.5px $white;
+		border-radius: 50%;
+		display: inline-block;
+		padding: 0;
+		background: transparent linear-gradient(-45deg, transparent 47.5%, $white 47.5%, $white 52.5%, transparent 52.5%);
 
 	}
 }
 
 .block-draggable-invalid-drag-token {
-
 	.block-editor-block-draggable-chip__disabled.block-editor-block-draggable-chip__disabled {
 		background-color: $gray-700;
 		opacity: 1;
 		box-shadow: 0 4px 8px rgba($black, 0.2);
-		color: $white;
 	}
 }
