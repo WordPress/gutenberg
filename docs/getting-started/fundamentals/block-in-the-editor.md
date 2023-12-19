@@ -48,7 +48,7 @@ A good workflow when using a component for the Block Editor is:
 
 To simplify block customization and ensure a consistent experience for users, there are a number of built-in UI patterns to help generate the editor preview. 
 
-![Diagram showing a Block Tookbar and a Settings Sidebar when a block is selected](https://developer.wordpress.org/files/2023/12/block-toolbar-settings-sidebar.png)
+![Diagram showing the Block Toolbar and the Settings Sidebar when a Paragraph block is selected](https://developer.wordpress.org/files/2023/12/block-toolbar-settings-sidebar.png)
 
 ### Block Toolbar
 
