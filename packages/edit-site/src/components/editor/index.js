@@ -219,7 +219,6 @@ export default function Editor( { isLoading } ) {
 							'edit-site-editor__interface-skeleton',
 							{
 								'show-icon-labels': showIconLabels,
-								'is-inserter-opened': isInserterOpen,
 							}
 						) }
 						notices={ <EditorSnackbars /> }

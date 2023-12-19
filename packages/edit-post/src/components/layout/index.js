@@ -251,7 +251,6 @@ function Layout() {
 
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
-		'is-inserter-opened': isInserterOpened,
 		'has-metaboxes': hasActiveMetaboxes,
 		'is-distraction-free': isDistractionFree && isWideViewport,
 		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
