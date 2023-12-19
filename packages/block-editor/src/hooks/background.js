@@ -517,9 +517,9 @@ function BackgroundSizePanelItem( {
 					label={ __( 'Contain' ) }
 				/>
 				<ToggleGroupControlOption
-					key={ 'size' }
+					key={ 'fixed' }
 					value={ 'auto' }
-					label={ __( 'Size' ) }
+					label={ __( 'Fixed' ) }
 				/>
 			</ToggleGroupControl>
 			{ value !== undefined &&
