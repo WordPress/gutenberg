@@ -4,32 +4,24 @@
 import { useCallback, useRef, useState } from '@wordpress/element';
 
 export default function usePostHistory( initialPostId, initialPostType ) {
-	const postHistory = useRef( [] );
+	const postHistory = useRef( [
+		{ postId: initialPostId, postType: initialPostType },
+	] );
 	const [ currentPost, setCurrentPost ] = useState( {
 		postId: initialPostId,
 		postType: initialPostType,
 	} );
 
-	const onSelectPost = useCallback(
-		( postId, postType ) => {
-			postHistory.current.unshift( currentPost );
-			setCurrentPost( { postId, postType } );
-		},
-		[ currentPost ]
-	);
+	const onSelectPost = useCallback( ( postId, postType ) => {
+		postHistory.current.push( { postId, postType } );
+		setCurrentPost( { postId, postType } );
+	}, [] );
 
 	const goBack =
-		postHistory.current.length > 0
+		postHistory.current.length > 1
 			? () => {
-					const previousPost = postHistory.current.shift();
-					setCurrentPost( {
-						postId: previousPost.postId
-							? previousPost.postId
-							: initialPostId,
-						postType: previousPost.postType
-							? previousPost.postType
-							: initialPostType,
-					} );
+					postHistory.current.pop();
+					setCurrentPost( [ ...postHistory.current ].pop() );
 			  }
 			: undefined;
 
