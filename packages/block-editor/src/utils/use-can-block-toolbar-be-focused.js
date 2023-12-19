@@ -36,7 +36,7 @@ export function useCanBlockToolbarBeFocused() {
 		// - fixed toolbar is on
 		// Block Toolbar Popover can be focused when:
 		// - a block is selected
-		// - we are in edit more
+		// - we are in edit mode
 		// - it is not an empty default block
 		return (
 			!! selectedBlockId &&
