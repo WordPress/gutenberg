@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -141,10 +136,6 @@ export default function GlobalStylesSidebar() {
 					</FlexBlock>
 					<FlexItem>
 						<Button
-							className={ classnames( {
-								'edit-site-global-styles-sidebar__button-alt':
-									isRevisionsStyleBookOpened,
-							} ) }
 							icon={ seen }
 							label={ __( 'Style Book' ) }
 							isPressed={
