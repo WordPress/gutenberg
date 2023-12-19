@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
@@ -10,11 +15,6 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import {
-	EditorHistoryRedo,
-	EditorHistoryUndo,
-	store as editorStore,
-} from '@wordpress/editor';
 import { Button, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useRef, useCallback } from '@wordpress/element';
@@ -23,8 +23,10 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
-import { store as editPostStore } from '../../../store';
-import { unlock } from '../../../lock-unlock';
+import { unlock } from '../../lock-unlock';
+import { store as editorStore } from '../../store';
+import EditorHistoryRedo from '../editor-history/redo';
+import EditorHistoryUndo from '../editor-history/undo';
 
 const { useCanBlockToolbarBeFocused } = unlock( blockEditorPrivateApis );
 
@@ -32,42 +34,47 @@ const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-function HeaderToolbar( { hasFixedToolbar } ) {
+function DocumentTools( {
+	className,
+	showIconLabels,
+	disableBlockTools = false,
+	children,
+} ) {
 	const inserterButton = useRef();
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editorStore );
 	const {
-		isInserterEnabled,
+		isInserterDisabled,
 		isInserterOpened,
-		isTextModeEnabled,
-		showIconLabels,
 		isListViewOpen,
 		listViewShortcut,
 		listViewToggleRef,
+		hasFixedToolbar,
 	} = useSelect( ( select ) => {
-		const { hasInserterItems, getBlockRootClientId, getBlockSelectionEnd } =
-			select( blockEditorStore );
+		const {
+			hasInserterItems,
+			getBlockRootClientId,
+			getBlockSelectionEnd,
+			getSettings,
+		} = select( blockEditorStore );
 		const { getEditorSettings, isListViewOpened, getListViewToggleRef } =
 			unlock( select( editorStore ) );
-		const { getEditorMode, isFeatureActive } = select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		return {
-			// This setting (richEditingEnabled) should not live in the block editor's setting.
-			isInserterEnabled:
-				getEditorMode() === 'visual' &&
-				getEditorSettings().richEditingEnabled &&
-				hasInserterItems(
+			isInserterDisabled:
+				! getEditorSettings().richEditingEnabled ||
+				// Todo change with insertion point
+				! hasInserterItems(
 					getBlockRootClientId( getBlockSelectionEnd() )
 				),
 			isInserterOpened: select( editorStore ).isInserterOpened(),
-			isTextModeEnabled: getEditorMode() === 'text',
-			showIconLabels: isFeatureActive( 'showIconLabels' ),
 			isListViewOpen: isListViewOpened(),
 			listViewShortcut: getShortcutRepresentation(
 				'core/editor/toggle-list-view'
 			),
 			listViewToggleRef: getListViewToggleRef(),
+			hasFixedToolbar: getSettings().hasFixedToolbar,
 		};
 	}, [] );
 
@@ -82,26 +89,7 @@ function HeaderToolbar( { hasFixedToolbar } ) {
 		() => setIsListViewOpened( ! isListViewOpen ),
 		[ setIsListViewOpened, isListViewOpen ]
 	);
-	const overflowItems = (
-		<>
-			<ToolbarItem
-				as={ Button }
-				className="edit-post-header-toolbar__document-overview-toggle"
-				icon={ listView }
-				disabled={ isTextModeEnabled }
-				isPressed={ isListViewOpen }
-				/* translators: button label text should, if possible, be under 16 characters. */
-				label={ __( 'Document Overview' ) }
-				onClick={ toggleListView }
-				shortcut={ listViewShortcut }
-				showTooltip={ ! showIconLabels }
-				variant={ showIconLabels ? 'tertiary' : undefined }
-				aria-expanded={ isListViewOpen }
-				ref={ listViewToggleRef }
-				size="compact"
-			/>
-		</>
-	);
+
 	const toggleInserter = useCallback( () => {
 		if ( isInserterOpened ) {
 			// Focusing the inserter button should close the inserter popover.
@@ -123,21 +111,21 @@ function HeaderToolbar( { hasFixedToolbar } ) {
 
 	return (
 		<NavigableToolbar
-			className="edit-post-header-toolbar"
+			className={ classnames( 'editor-document-tools', className ) }
 			aria-label={ toolbarAriaLabel }
 			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
 			variant="unstyled"
 		>
-			<div className="edit-post-header-toolbar__left">
+			<div className="editor-document-tools__left">
 				<ToolbarItem
 					ref={ inserterButton }
 					as={ Button }
-					className="edit-post-header-toolbar__inserter-toggle"
+					className="editor-document-tools__inserter-toggle"
 					variant="primary"
 					isPressed={ isInserterOpened }
 					onMouseDown={ preventDefault }
 					onClick={ toggleInserter }
-					disabled={ ! isInserterEnabled }
+					disabled={ disableBlockTools || isInserterDisabled }
 					icon={ plus }
 					label={ showIconLabels ? shortLabel : longLabel }
 					showTooltip={ ! showIconLabels }
@@ -152,7 +140,7 @@ function HeaderToolbar( { hasFixedToolbar } ) {
 								variant={
 									showIconLabels ? 'tertiary' : undefined
 								}
-								disabled={ isTextModeEnabled }
+								disabled={ disableBlockTools }
 								size="compact"
 							/>
 						) }
@@ -168,12 +156,28 @@ function HeaderToolbar( { hasFixedToolbar } ) {
 							variant={ showIconLabels ? 'tertiary' : undefined }
 							size="compact"
 						/>
-						{ overflowItems }
+						<ToolbarItem
+							as={ Button }
+							className="editor-document-tools__document-overview-toggle"
+							icon={ listView }
+							disabled={ disableBlockTools }
+							isPressed={ isListViewOpen }
+							/* translators: button label text should, if possible, be under 16 characters. */
+							label={ __( 'Document Overview' ) }
+							onClick={ toggleListView }
+							shortcut={ listViewShortcut }
+							showTooltip={ ! showIconLabels }
+							variant={ showIconLabels ? 'tertiary' : undefined }
+							aria-expanded={ isListViewOpen }
+							ref={ listViewToggleRef }
+							size="compact"
+						/>
 					</>
 				) }
+				{ children }
 			</div>
 		</NavigableToolbar>
 	);
 }
 
-export default HeaderToolbar;
+export default DocumentTools;
