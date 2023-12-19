@@ -34,8 +34,14 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 		[ { postId: initialPostId, postType: initialPostType } ]
 	);
 
-	const onSelectPost = useCallback( ( postId, postType ) => {
-		dispatch( { type: 'push', post: { postId, postType } } );
+	const onSelectPost = useCallback( ( params ) => {
+		return {
+			onClick: () =>
+				dispatch( {
+					type: 'push',
+					post: { postId: params.postId, postType: params.postType },
+				} ),
+		};
 	}, [] );
 
 	const goBack = useCallback( () => {
