@@ -22,7 +22,7 @@ import useLastSelectedWidgetArea from '../../../hooks/use-last-selected-widget-a
 import { store as editWidgetsStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
+const { useCanBlockToolbarBeFocused } = unlock( blockEditorPrivateApis );
 
 function DocumentTools() {
 	const isMediumViewport = useViewportMatch( 'medium' );
@@ -75,17 +75,8 @@ function DocumentTools() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	const {
-		shouldShowContextualToolbar,
-		canFocusHiddenToolbar,
-		fixedToolbarCanBeFocused,
-	} = useShouldContextualToolbarShow();
 	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
-	// There's a fixed block toolbar when the fixed toolbar option is enabled or when the browser width is less than the large viewport.
-	const blockToolbarCanBeFocused =
-		shouldShowContextualToolbar ||
-		canFocusHiddenToolbar ||
-		fixedToolbarCanBeFocused;
+	const blockToolbarCanBeFocused = useCanBlockToolbarBeFocused();
 
 	return (
 		<NavigableToolbar
