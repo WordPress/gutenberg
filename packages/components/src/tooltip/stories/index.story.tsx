@@ -30,7 +30,7 @@ const meta: Meta< typeof Tooltip > = {
 				'bottom right',
 			],
 		},
-		shortcut: { control: { type: 'text' } },
+		shortcut: { control: { type: 'object' } },
 	},
 	parameters: {
 		controls: { expanded: true },
