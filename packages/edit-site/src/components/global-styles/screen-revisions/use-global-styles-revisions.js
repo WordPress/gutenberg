@@ -17,12 +17,12 @@ const SITE_EDITOR_AUTHORS_QUERY = {
 	context: 'view',
 	capabilities: [ 'edit_theme_options' ],
 };
+const DEFAULT_QUERY = { per_page: 100, page: 1 };
 const EMPTY_ARRAY = [];
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
-export default function useGlobalStylesRevisions( {
-	query = { per_page: 100, page: 1 },
-} ) {
+export default function useGlobalStylesRevisions( { query } = {} ) {
 	const { user: userConfig } = useContext( GlobalStylesContext );
+	const _query = { ...DEFAULT_QUERY, ...query };
 	const {
 		authors,
 		currentUser,
@@ -50,27 +50,20 @@ export default function useGlobalStylesRevisions( {
 				: undefined;
 			const _revisionsCount =
 				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
-			// Commenting out for now as we need to ensure
-			// that the right revisionsCount is use to calculate numPages.
-			// E.g., there might be a single, trailing 'reset' item, tricking the
-			// pagination into thinking there's an extra page,
-			// but there are no more revisions in the database.
-			// // one for the reset item.
-			// _revisionsCount++;
-			// // one for any dirty changes (unsaved).
-			// if ( _isDirty ) {
-			// 	_revisionsCount++;
-			// }
 			const globalStylesRevisions =
-				getRevisions( 'root', 'globalStyles', globalStylesId, query ) ||
-				EMPTY_ARRAY;
+				getRevisions(
+					'root',
+					'globalStyles',
+					globalStylesId,
+					_query
+				) || EMPTY_ARRAY;
 			const _authors =
 				getUsers( SITE_EDITOR_AUTHORS_QUERY ) || EMPTY_ARRAY;
 			const _isResolving = isResolving( 'getRevisions', [
 				'root',
 				'globalStyles',
 				globalStylesId,
-				query,
+				_query,
 			] );
 			return {
 				authors: _authors,
@@ -84,10 +77,7 @@ export default function useGlobalStylesRevisions( {
 		[ query ]
 	);
 	return useMemo( () => {
-		if (
-			! authors.length ||
-			( isLoadingGlobalStylesRevisions && ! revisions?.length )
-		) {
+		if ( ! authors.length || isLoadingGlobalStylesRevisions ) {
 			return {
 				revisions: EMPTY_ARRAY,
 				hasUnsavedChanges: isDirty,
@@ -112,7 +102,7 @@ export default function useGlobalStylesRevisions( {
 			// Flags the most current saved revision.
 			if (
 				_modifiedRevisions[ 0 ].id !== 'unsaved' &&
-				query.page === 1
+				_query.page === 1
 			) {
 				_modifiedRevisions[ 0 ].isLatest = true;
 			}
@@ -123,7 +113,7 @@ export default function useGlobalStylesRevisions( {
 				userConfig &&
 				Object.keys( userConfig ).length > 0 &&
 				currentUser &&
-				query.page === 1
+				_query.page === 1
 			) {
 				const unsavedRevision = {
 					id: 'unsaved',
@@ -139,7 +129,9 @@ export default function useGlobalStylesRevisions( {
 				_modifiedRevisions.unshift( unsavedRevision );
 			}
 
-			if ( query.page === Math.ceil( revisionsCount / query.per_page ) ) {
+			if (
+				_query.page === Math.ceil( revisionsCount / _query.per_page )
+			) {
 				// Adds an item for the default theme styles.
 				_modifiedRevisions.push( {
 					id: 'parent',
