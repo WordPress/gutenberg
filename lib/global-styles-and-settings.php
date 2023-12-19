@@ -72,7 +72,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		 * @see wp_add_global_styles_for_blocks
 		 */
 		$origins = array( 'default', 'theme', 'custom' );
-		if ( ! $supports_theme_json ) {
+		if ( ! $supports_theme_json && ! current_theme_supports( 'appearance-tools' ) ) {
 			$origins = array( 'default' );
 		}
 		$styles_rest = $tree->get_stylesheet( $types, $origins );
