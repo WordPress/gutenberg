@@ -49,11 +49,13 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 
 		return {
 			href: newUrl,
-			onClick: () =>
+			onClick: ( event ) => {
+				event.preventDefault();
 				dispatch( {
 					type: 'push',
 					post: { postId: params.postId, postType: params.postType },
-				} ),
+				} );
+			},
 		};
 	}, [] );
 

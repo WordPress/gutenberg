@@ -187,7 +187,7 @@ export default function ReusableBlockEdit( {
 			[ patternClientId, ref ]
 		);
 
-	const editOriginal = onSelectPost
+	const editOriginalProps = onSelectPost
 		? onSelectPost( {
 				postId: ref,
 				postType: 'wp_block',
@@ -301,13 +301,10 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			{ userCanEdit && editOriginal && (
+			{ userCanEdit && editOriginalProps && (
 				<BlockControls>
 					<ToolbarGroup>
-						<ToolbarButton
-							href={ editOriginal.href }
-							onClick={ editOriginal.onClick }
-						>
+						<ToolbarButton { ...editOriginalProps }>
 							{ __( 'Edit original' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
