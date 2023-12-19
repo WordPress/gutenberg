@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
 	Button,
-	Tooltip,
 } from '@wordpress/components';
 import { usePrevious, useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
