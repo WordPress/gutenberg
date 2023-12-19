@@ -161,6 +161,9 @@
 
 	.components-text {
 		font-size: 12px;
+		// `will-change` is required because something about flex props prevents
+		// Safari from rendering the page / total text.
+		will-change: opacity;
 	}
 	.components-button.is-tertiary {
 		width: $button-size-small;
@@ -177,3 +180,4 @@
 		background: transparent;
 	}
 }
+
