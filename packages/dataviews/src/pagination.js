@@ -55,7 +55,7 @@ function Pagination( {
 											page: +newValue,
 										} );
 									} }
-									size={ 'small' }
+									size={ 'compact' }
 									__nextHasNoMarginBottom
 								/>
 							),
