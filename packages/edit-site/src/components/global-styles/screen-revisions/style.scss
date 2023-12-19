@@ -95,10 +95,17 @@
 	}
 }
 
-.edit-site-global-styles-screen-revisions__apply-button.is-primary {
+.edit-site-global-styles-screen-revisions__apply-button.is-primary,
+.edit-site-global-styles-screen-revisions__applied-text {
 	align-self: flex-start;
 	// Left margin = left padding of .edit-site-global-styles-screen-revisions__revision-button.
 	margin: 0 $grid-unit-15 $grid-unit-15 $grid-unit-50;
+}
+
+.edit-site-global-styles-screen-revisions__applied-text {
+	color: $gray-600;
+	font-size: 12px;
+	font-style: italic;
 }
 
 .edit-site-global-styles-screen-revisions__description {

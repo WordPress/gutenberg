@@ -231,17 +231,25 @@ function RevisionsButtons( {
 								</span>
 							) }
 						</Button>
-						{ canApplyRevision && isSelected && (
-							<Button
-								variant="primary"
-								className="edit-site-global-styles-screen-revisions__apply-button"
-								onClick={ onApplyRevision }
-							>
-								{ isReset
-									? __( 'Reset to defaults' )
-									: __( 'Apply' ) }
-							</Button>
-						) }
+						{ isSelected &&
+							( areStylesEqual ? (
+								<p className="edit-site-global-styles-screen-revisions__applied-text">
+									{ __(
+										'These styles are already applied to your site.'
+									) }
+								</p>
+							) : (
+								<Button
+									disabled={ areStylesEqual }
+									variant="primary"
+									className="edit-site-global-styles-screen-revisions__apply-button"
+									onClick={ onApplyRevision }
+								>
+									{ isReset
+										? __( 'Reset to defaults' )
+										: __( 'Apply' ) }
+								</Button>
+							) ) }
 					</li>
 				);
 			} ) }
