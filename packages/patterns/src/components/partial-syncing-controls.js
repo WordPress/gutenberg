@@ -17,6 +17,18 @@ import { PARTIAL_SYNCING_SUPPORTED_BLOCKS } from '../constants';
 
 function PartialSyncingControls( { name, attributes, setAttributes } ) {
 	const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
+	const attributeSources = Object.keys( syncedAttributes ).map(
+		( attributeName ) =>
+			attributes.connections?.attributes?.[ attributeName ]?.source
+	);
+	const isConnectedToOtherSources = attributeSources.every(
+		( source ) => source && source !== 'pattern_attributes'
+	);
+
+	// Render nothing if all supported attributes are connected to other sources.
+	if ( isConnectedToOtherSources ) {
+		return null;
+	}
 
 	function updateConnections( isChecked ) {
 		let updatedConnections = {
@@ -77,11 +89,8 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 				<CheckboxControl
 					__nextHasNoMarginBottom
 					label={ __( 'Allow instance overrides' ) }
-					checked={ Object.keys( syncedAttributes ).some(
-						( attributeName ) =>
-							attributes.connections?.attributes?.[
-								attributeName
-							]?.source === 'pattern_attributes'
+					checked={ attributeSources.some(
+						( source ) => source === 'pattern_attributes'
 					) }
 					onChange={ ( isChecked ) => {
 						updateConnections( isChecked );
