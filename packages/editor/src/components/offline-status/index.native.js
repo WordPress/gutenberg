@@ -38,11 +38,11 @@ function useAccessibilityLiveRegion( message, { isActive, inactiveMessage } ) {
 	const prevIsActive = usePrevious( isActive );
 
 	useEffect( () => {
-		const uncondtionalMessage = typeof isActive === 'undefined';
+		const unconditionalMessage = typeof isActive === 'undefined';
 		const initialRender = typeof prevIsActive === 'undefined';
 
 		if (
-			uncondtionalMessage ||
+			unconditionalMessage ||
 			( isActive && ! prevIsActive && ! initialRender )
 		) {
 			announceForAccessibility( message );
