@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback, useReducer } from '@wordpress/element';
+import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * A hook that records the 'entity' history in the post editor as a user
@@ -35,7 +36,19 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 	);
 
 	const onSelectPost = useCallback( ( params ) => {
+		const currentArgs = getQueryArgs( window.location.href );
+		const currentUrlWithoutArgs = removeQueryArgs(
+			window.location.href,
+			...Object.keys( currentArgs )
+		);
+
+		const newUrl = addQueryArgs( currentUrlWithoutArgs, {
+			post: params.postId,
+			action: 'edit',
+		} );
+
 		return {
+			href: newUrl,
 			onClick: () =>
 				dispatch( {
 					type: 'push',

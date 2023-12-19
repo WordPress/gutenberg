@@ -187,7 +187,7 @@ export default function ReusableBlockEdit( {
 			[ patternClientId, ref ]
 		);
 
-	const { onClick: editOriginal } = onSelectPost
+	const editOriginal = onSelectPost
 		? onSelectPost( {
 				postId: ref,
 				postType: 'wp_block',
@@ -304,7 +304,10 @@ export default function ReusableBlockEdit( {
 			{ userCanEdit && editOriginal && (
 				<BlockControls>
 					<ToolbarGroup>
-						<ToolbarButton onClick={ editOriginal }>
+						<ToolbarButton
+							href={ editOriginal.href }
+							onClick={ editOriginal.onClick }
+						>
 							{ __( 'Edit original' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
