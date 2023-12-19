@@ -74,20 +74,19 @@ const withPartialSyncingControls = createHigherOrderComponent(
  */
 const withPatternOnlyRenderMode = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		const onSelectPost = useSelect(
+			( select ) =>
+				select( editorStore ).getEditorSettings().onSelectPost,
+			[]
+		);
 		if ( props.name !== 'core/block' ) {
 			return <BlockEdit { ...props } />;
 		}
 
-		const {
-			onClick,
-		} = () => ( {
-			postId: props.attributes?.ref,
-			postType: 'wp_block',
-		} );
-
 		const newProps = {
 			...props,
-			editOriginalPattern: onClick,
+			editOriginalPattern:
+				typeof onSelectPost === 'function' ? onSelectPost : undefined,
 		};
 
 		return <BlockEdit { ...newProps } />;

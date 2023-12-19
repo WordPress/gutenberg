@@ -89,6 +89,7 @@ function EditorCanvas( {
 		wrapperBlockName,
 		wrapperUniqueId,
 		deviceType,
+		hasHistory,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -135,6 +136,7 @@ function EditorCanvas( {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
+			hasHistory: getEditorSettings().postHistory?.length > 0,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -299,6 +301,7 @@ function EditorCanvas( {
 			styles={ styles }
 			height="100%"
 			iframeProps={ {
+				className: classnames( { 'has-history': hasHistory } ),
 				...iframeProps,
 				style: {
 					...iframeProps?.style,

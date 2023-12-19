@@ -9,7 +9,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -26,8 +26,38 @@ import { unlock } from './lock-unlock';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
-function Editor( { postId, postType, settings, initialEdits, ...props } ) {
+const postHistory = [];
+
+function Editor( {
+	postId: initialPostId,
+	postType: initialPostType,
+	settings,
+	initialEdits,
+	...props
+} ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const [ currentPost, setCurrentPost ] = useState( {
+		postId: initialPostId,
+		postType: initialPostType,
+	} );
+
+	const onSelectPost = useCallback(
+		( postId, postType ) => {
+			postHistory.unshift( currentPost );
+			setCurrentPost( { postId, postType } );
+		},
+		[ currentPost ]
+	);
+
+	const goBack = () => {
+		const previousPost = postHistory.shift();
+		setCurrentPost( {
+			postId: previousPost.postId ? previousPost.postId : initialPostId,
+			postType: previousPost.postType
+				? previousPost.postType
+				: initialPostType,
+		} );
+	};
 
 	const {
 		allowRightClickOverrides,
@@ -53,22 +83,31 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			const { getEditorSettings } = select( editorStore );
 			const { getBlockTypes } = select( blocksStore );
 			const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
-				postType
+				currentPost.postType
 			);
 			// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
 			// to avoid the special case.
 			let postObject;
 			if ( isTemplate ) {
-				const posts = getEntityRecords( 'postType', postType, {
-					wp_id: postId,
-				} );
+				const posts = getEntityRecords(
+					'postType',
+					currentPost.postType,
+					{
+						wp_id: currentPost.postId,
+					}
+				);
 				postObject = posts?.[ 0 ];
 			} else {
-				postObject = getEntityRecord( 'postType', postType, postId );
+				postObject = getEntityRecord(
+					'postType',
+					currentPost.postType,
+					currentPost.postId
+				);
 			}
 			const supportsTemplateMode =
 				getEditorSettings().supportsTemplateMode;
-			const isViewable = getPostType( postType )?.viewable ?? false;
+			const isViewable =
+				getPostType( currentPost.postType )?.viewable ?? false;
 			const canEditTemplate = canUser( 'create', 'templates' );
 			return {
 				allowRightClickOverrides: isFeatureActive(
@@ -93,7 +132,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				post: postObject,
 			};
 		},
-		[ postType, postId, isLargeViewport ]
+		[ currentPost.postType, currentPost.postId, isLargeViewport ]
 	);
 
 	const { updatePreferredStyleVariations, setIsInserterOpened } =
@@ -102,6 +141,9 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 	const editorSettings = useMemo( () => {
 		const result = {
 			...settings,
+			onSelectPost,
+			goBack,
+			postHistory,
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -138,17 +180,18 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		return result;
 	}, [
 		settings,
-		allowRightClickOverrides,
+		onSelectPost,
+		preferredStyleVariations,
+		updatePreferredStyleVariations,
 		hasFixedToolbar,
-		hasInlineToolbar,
 		focusMode,
 		isDistractionFree,
+		hasInlineToolbar,
+		allowRightClickOverrides,
+		setIsInserterOpened,
+		keepCaretInsideBlock,
 		hiddenBlockTypes,
 		blockTypes,
-		preferredStyleVariations,
-		setIsInserterOpened,
-		updatePreferredStyleVariations,
-		keepCaretInsideBlock,
 	] );
 
 	if ( ! post ) {
@@ -167,7 +210,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			>
 				<ErrorBoundary>
 					<CommandMenu />
-					<EditorInitialization postId={ postId } />
+					<EditorInitialization postId={ currentPost.postId } />
 					<Layout />
 				</ErrorBoundary>
 				<PostLockedModal />
