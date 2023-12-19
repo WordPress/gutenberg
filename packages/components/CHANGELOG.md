@@ -4,6 +4,7 @@
 
 ### Bug Fix
 
+-   `FontSizePicker`: Use Button API for keeping focus on reset ([#57221](https://github.com/WordPress/gutenberg/pull/57221)).
 -   `FontSizePicker`: Fix Reset button focus loss ([#57196](https://github.com/WordPress/gutenberg/pull/57196)).
 -   `PaletteEdit`: Consider digits when generating kebab-cased slug ([#56713](https://github.com/WordPress/gutenberg/pull/56713)).
 -   `Button`: Fix logic of `has-text` class addition ([#56949](https://github.com/WordPress/gutenberg/pull/56949)).

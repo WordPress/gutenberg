@@ -277,14 +277,11 @@ const UnforwardedFontSizePicker = (
 						{ withReset && (
 							<FlexItem>
 								<Button
-									aria-disabled={ isDisabled }
-									onClick={
-										isDisabled
-											? undefined
-											: () => {
-													onChange?.( undefined );
-											  }
-									}
+									disabled={ isDisabled }
+									__experimentalIsFocusable
+									onClick={ () => {
+										onChange?.( undefined );
+									} }
 									variant="secondary"
 									__next40pxDefaultSize
 									size={
