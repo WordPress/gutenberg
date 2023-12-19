@@ -68,7 +68,6 @@ export default function SaveButton( {
 			} else if ( disabled ) {
 				return __( 'Saved' );
 			} else if ( isDirty ) {
-				
 				return sprintf(
 					/* translators: %s: The name of theme to be activated. */
 					__( 'Activate %s & Save' ),
