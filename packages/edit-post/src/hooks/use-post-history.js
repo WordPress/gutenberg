@@ -47,6 +47,9 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 			action: 'edit',
 		} );
 
+		// This return signature is matched to `useLink` in the site editor to allow the onSelectPost
+		// setting to be easily shared between edit-post and edit-site. In edit-site useLink is passed in
+		// as onSelectPost in order to use the existing edit-site client side routing to move between posts.
 		return {
 			href: newUrl,
 			onClick: ( event ) => {
