@@ -175,7 +175,7 @@ if ( $gutenberg_experiments && (
 			$found     = false;
 			while ( ! $found && count( $selectors ) > 0 ) {
 				$tags = new WP_HTML_Tag_Processor( $block_content );
-				// TODO: In the future, when blocks are supported,
+				// TODO: In the future, to support connecting more block attributes,
 				// we should build the full query from CSS selector.
 				$found = $tags->next_tag( trim( array_shift( $selectors ) ) );
 			}
