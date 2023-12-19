@@ -43,11 +43,9 @@ export default function InspectorControlsTabs( {
 							tabId={ tab.name }
 							render={
 								<Button
-									aria-label={ tab.title }
 									icon={ tab.icon }
 									label={ tab.title }
 									className={ tab.className }
-									showTooltip
 								/>
 							}
 						/>
