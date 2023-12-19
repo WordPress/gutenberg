@@ -143,9 +143,6 @@ export function RichTextWrapper(
 			isSelected,
 		};
 	};
-	// This selector must run on every render so the right selection state is
-	// retrieved from the store on merge.
-	// To do: fix this somehow.
 	const { selectionStart, selectionEnd, isSelected } = useSelect( selector, [
 		clientId,
 		identifier,
