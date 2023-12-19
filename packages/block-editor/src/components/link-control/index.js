@@ -17,7 +17,7 @@ import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
-import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { keyboardReturn } from '@wordpress/icons';
@@ -196,7 +196,7 @@ function LinkControl( {
 	] = useInternalValue( value );
 
 	const valueHasChanges =
-		value && ! isShallowEqualObjects( internalControlValue, value );
+		value && ! isShallowEqual( internalControlValue, value );
 
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined

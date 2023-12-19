@@ -21,13 +21,17 @@ export { default as isShallowEqualArrays } from './arrays';
  * @return {boolean} Whether the two values are shallow equal.
  */
 export default function isShallowEqual( a, b ) {
-	if ( a && b ) {
-		if ( a.constructor === Object && b.constructor === Object ) {
-			return isShallowEqualObjects( a, b );
-		} else if ( Array.isArray( a ) && Array.isArray( b ) ) {
-			return isShallowEqualArrays( a, b );
-		}
+	if ( a === b ) {
+		return true;
 	}
 
-	return a === b;
+	if ( a?.constructor === Object && b?.constructor === Object ) {
+		return isShallowEqualObjects( a, b );
+	}
+
+	if ( Array.isArray( a ) && Array.isArray( b ) ) {
+		return isShallowEqualArrays( a, b );
+	}
+
+	return false;
 }
