@@ -105,10 +105,7 @@ function gutenberg_mark_block_interactivity( $block_content, $block, $block_inst
 		// Mark interactive blocks so we can process them later.
 		return get_comment_delimited_block_content(
 			'core/interactivity-wrapper',
-			array(
-				'blockName' => $block['blockName'],
-			// We can put extra information about the block here.
-			),
+			array(),
 			$block_content
 		);
 	} elseif ( WP_Directive_Processor::is_marked_as_children_of_interactive_block( $block ) ) {
@@ -117,10 +114,7 @@ function gutenberg_mark_block_interactivity( $block_content, $block, $block_inst
 		// to so we can skip them later.
 		return get_comment_delimited_block_content(
 			'core/non-interactivity-wrapper',
-			array(
-				'blockName' => $block['blockName'],
-				// We can put extra information about the block here.
-			),
+			array(),
 			$block_content
 		);
 	}
