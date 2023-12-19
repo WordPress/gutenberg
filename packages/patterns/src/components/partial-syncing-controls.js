@@ -26,7 +26,12 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 
 		if ( ! isChecked ) {
 			for ( const attributeName of Object.keys( syncedAttributes ) ) {
-				delete updatedConnections.attributes[ attributeName ];
+				if (
+					updatedConnections.attributes[ attributeName ]?.source ===
+					'pattern_attributes'
+				) {
+					delete updatedConnections.attributes[ attributeName ];
+				}
 			}
 			if ( ! Object.keys( updatedConnections.attributes ).length ) {
 				delete updatedConnections.attributes;
@@ -41,9 +46,11 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 		}
 
 		for ( const attributeName of Object.keys( syncedAttributes ) ) {
-			updatedConnections.attributes[ attributeName ] = {
-				source: 'pattern_attributes',
-			};
+			if ( ! updatedConnections.attributes[ attributeName ] ) {
+				updatedConnections.attributes[ attributeName ] = {
+					source: 'pattern_attributes',
+				};
+			}
 		}
 
 		if ( typeof attributes.metadata?.id === 'string' ) {
