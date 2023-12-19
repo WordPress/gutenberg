@@ -15,6 +15,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -205,5 +206,25 @@ export const renameTemplateAction = {
 				</VStack>
 			</form>
 		);
+	},
+};
+
+export const seeRevisionsAction = {
+	id: 'see-revisions',
+	label: __( 'See revisions' ),
+	isEligible: ( template ) => {
+		if ( template?._links && template?._links[ 'predecessor-version' ] ) {
+			const predecessorVersions =
+				template._links[ 'predecessor-version' ];
+			return predecessorVersions.length > 0;
+		}
+		return false;
+	},
+	callback( template ) {
+		const lastRevisionId =
+			template?._links[ 'predecessor-version' ][ 0 ].id;
+		document.location.href = addQueryArgs( 'revision.php', {
+			revision: lastRevisionId,
+		} );
 	},
 };
