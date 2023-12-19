@@ -179,6 +179,7 @@ function RevisionsButtons( {
 							}
 						) }
 						key={ id }
+						aria-current={ isSelected }
 					>
 						<Button
 							className="edit-site-global-styles-screen-revisions__revision-button"
@@ -232,13 +233,13 @@ function RevisionsButtons( {
 						</Button>
 						{ canApplyRevision && isSelected && (
 							<Button
-								variant="secondary"
+								variant="primary"
 								className="edit-site-global-styles-screen-revisions__apply-button"
 								onClick={ onApplyRevision }
 							>
 								{ isReset
 									? __( 'Reset to defaults' )
-									: __( 'Apply changes' ) }
+									: __( 'Apply' ) }
 							</Button>
 						) }
 					</li>

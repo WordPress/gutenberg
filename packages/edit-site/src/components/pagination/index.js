@@ -25,6 +25,8 @@ export default function Pagination( {
 	return (
 		<HStack
 			expanded={ false }
+			as="nav"
+			aria-label="Pagination Navigation"
 			spacing={ 3 }
 			justify="flex-start"
 			className={ classnames( 'edit-site-pagination', className ) }
