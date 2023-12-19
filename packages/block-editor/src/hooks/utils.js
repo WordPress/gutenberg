@@ -418,12 +418,14 @@ export function createBlockEditFilter( features ) {
 							neededProps[ key ] = props.attributes[ key ];
 						}
 					}
+
 					return (
 						<Edit
 							// We can use the index because the array length
 							// is fixed per page load right now.
 							key={ i }
 							name={ props.name }
+							isSelected={ props.isSelected }
 							clientId={ props.clientId }
 							setAttributes={ props.setAttributes }
 							__unstableParentLayout={
