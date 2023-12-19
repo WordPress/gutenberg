@@ -55,12 +55,37 @@ const backgroundRepeat = {
 const backgroundSize = {
 	name: 'backgroundSize',
 	generate: ( style: Style, options: StyleOptions ) => {
-		return generateRule(
-			style,
-			options,
-			[ 'background', 'backgroundSize' ],
-			'backgroundSize'
+		const _backgroundSize = style?.background?.backgroundSize;
+		const _backgroundPosition = style?.background?.backgroundPosition;
+
+		const styleRules: GeneratedCSSRule[] = [];
+
+		if ( _backgroundSize === undefined ) {
+			return styleRules;
+		}
+
+		styleRules.push(
+			...generateRule(
+				style,
+				options,
+				[ 'background', 'backgroundSize' ],
+				'backgroundSize'
+			)
 		);
+
+		// If background size is set to contain, but no position is set, default to center.
+		if (
+			_backgroundSize === 'contain' &&
+			_backgroundPosition === undefined
+		) {
+			styleRules.push( {
+				selector: options.selector,
+				key: 'backgroundPosition',
+				value: 'center',
+			} );
+		}
+
+		return styleRules;
 	},
 };
 

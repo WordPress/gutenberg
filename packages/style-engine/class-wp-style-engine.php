@@ -51,6 +51,12 @@ final class WP_Style_Engine {
 				'value_func'    => array( self::class, 'get_url_or_value_css_declaration' ),
 				'path'          => array( 'background', 'backgroundImage' ),
 			),
+			'backgroundPosition'  => array(
+				'property_keys' => array(
+					'default' => 'background-position',
+				),
+				'path'          => array( 'background', 'backgroundPosition' ),
+			),
 			'backgroundRepeat'  => array(
 				'property_keys' => array(
 					'default' => 'background-repeat',

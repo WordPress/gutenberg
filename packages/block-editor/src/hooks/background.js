@@ -149,6 +149,7 @@ export function resetBackgroundSize( style = {}, setAttributes ) {
 			...style,
 			background: {
 				...style?.background,
+				backgroundRepeat: undefined,
 				backgroundSize: undefined,
 			},
 		} ),
@@ -364,73 +365,12 @@ function BackgroundImagePanelItem( {
 	);
 }
 
-function BackgroundRepeatPanelItem( {
-	clientId,
-	isShownByDefault,
-	setAttributes,
-} ) {
-	const style = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
-		[ clientId ]
-	);
-
-	const value = style?.background?.backgroundRepeat;
-
-	const toggleIsRepeated = () => {
-		setAttributes( {
-			style: cleanEmptyObject( {
-				...style,
-				background: {
-					...style?.background,
-					backgroundRepeat:
-						value === 'repeat' || value === undefined
-							? 'no-repeat'
-							: 'repeat',
-				},
-			} ),
-		} );
-	};
-
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			style: {
-				...previousValue.style,
-				background: {
-					...previousValue.style?.background,
-					backgroundRepeat: undefined,
-				},
-			},
-		};
-	}, [] );
-
-	return (
-		<ToolsPanelItem
-			className="single-column"
-			hasValue={ () => !! value }
-			label={ __( 'Repeat' ) }
-			onDeselect={ () => resetBackgroundRepeat( style, setAttributes ) }
-			isShownByDefault={ isShownByDefault }
-			resetAllFilter={ resetAllFilter }
-			panelId={ clientId }
-		>
-			<ToggleControl
-				__nextHasNoMarginBottom
-				label={ __( 'Repeat image' ) }
-				checked={ value === 'no-repeat' ? false : true }
-				onChange={ toggleIsRepeated }
-			/>
-		</ToolsPanelItem>
-	);
-}
-
 function backgroundSizeHelpText( value ) {
 	if ( value === 'cover' || value === undefined ) {
 		return __( 'Stretch image to cover the block.' );
 	}
 	if ( value === 'contain' ) {
-		return __( 'Image is contained within the block.' );
+		return __( 'Resize image to fit without cropping.' );
 	}
 	return __( 'Set a fixed width.' );
 }
@@ -446,7 +386,29 @@ function BackgroundSizePanelItem( {
 		[ clientId ]
 	);
 
-	const value = style?.background?.backgroundSize;
+	const sizeValue = style?.background?.backgroundSize;
+	const repeatValue = style?.background?.backgroundRepeat;
+
+	// An `undefined` value is treated as `cover` by the toggle group control.
+	// An empty string is treated as `auto` by the toggle group control. This
+	// allows a user to select "Size" and then enter a custom value, with an
+	// empty value being treated as `auto`.
+	const currentValueForToggle =
+		( sizeValue !== undefined &&
+			sizeValue !== 'cover' &&
+			sizeValue !== 'contain' ) ||
+		sizeValue === ''
+			? 'auto'
+			: sizeValue || 'cover';
+
+	// If the current value is `cover` and the repeat value is `undefined`, then
+	// the toggle should be unchecked as the default state. Otherwise, the toggle
+	// should reflect the current repeat value.
+	const repeatCheckedValue =
+		repeatValue === 'no-repeat' ||
+		( currentValueForToggle === 'cover' && repeatValue === undefined )
+			? false
+			: true;
 
 	const hasValue = hasBackgroundSizeValue( style );
 
@@ -457,6 +419,7 @@ function BackgroundSizePanelItem( {
 				...previousValue.style,
 				background: {
 					...previousValue.style?.background,
+					backgroundRepeat: undefined,
 					backgroundSize: undefined,
 				},
 			},
@@ -464,26 +427,33 @@ function BackgroundSizePanelItem( {
 	}, [] );
 
 	const updateBackgroundSize = ( next ) => {
+		// When switching to 'contain' toggle the repeat off.
+		const nextRepeat = next === 'contain' ? 'no-repeat' : undefined;
+
 		setAttributes( {
 			style: cleanEmptyObject( {
 				...style,
 				background: {
 					...style?.background,
+					backgroundRepeat: nextRepeat,
 					backgroundSize: next,
 				},
 			} ),
 		} );
 	};
 
-	// An `undefined` value is treated as `cover` by the toggle group control.
-	// An empty string is treated as `auto` by the toggle group control. This
-	// allows a user to select "Size" and then enter a custom value, with an
-	// empty value being treated as `auto`.
-	const currentValueForToggle =
-		( value !== undefined && value !== 'cover' && value !== 'contain' ) ||
-		value === ''
-			? 'auto'
-			: value || 'cover';
+	const toggleIsRepeated = () => {
+		setAttributes( {
+			style: cleanEmptyObject( {
+				...style,
+				background: {
+					...style?.background,
+					backgroundRepeat:
+						repeatCheckedValue === true ? 'no-repeat' : undefined,
+				},
+			} ),
+		} );
+	};
 
 	return (
 		<VStack
@@ -504,7 +474,7 @@ function BackgroundSizePanelItem( {
 				value={ currentValueForToggle }
 				onChange={ updateBackgroundSize }
 				isBlock={ true }
-				help={ backgroundSizeHelpText( value ) }
+				help={ backgroundSizeHelpText( sizeValue ) }
 			>
 				<ToggleGroupControlOption
 					key={ 'cover' }
@@ -522,23 +492,28 @@ function BackgroundSizePanelItem( {
 					label={ __( 'Fixed' ) }
 				/>
 			</ToggleGroupControl>
-			{ value !== undefined &&
-			value !== 'cover' &&
-			value !== 'contain' ? (
+			{ sizeValue !== undefined &&
+			sizeValue !== 'cover' &&
+			sizeValue !== 'contain' ? (
 				<UnitControl
 					size={ '__unstable-large' }
 					onChange={ updateBackgroundSize }
-					value={ value }
+					value={ sizeValue }
 				/>
 			) : null }
+			<ToggleControl
+				__nextHasNoMarginBottom
+				label={ __( 'Repeat image' ) }
+				checked={ repeatCheckedValue }
+				onChange={ toggleIsRepeated }
+			/>
 		</VStack>
 	);
 }
 
 export function BackgroundImagePanel( props ) {
-	const [ backgroundImage, backgroundRepeat, backgroundSize ] = useSettings(
+	const [ backgroundImage, backgroundSize ] = useSettings(
 		'background.backgroundImage',
-		'background.backgroundRepeat',
 		'background.backgroundSize'
 	);
 
@@ -551,11 +526,6 @@ export function BackgroundImagePanel( props ) {
 
 	const showBackgroundSize = !! (
 		backgroundSize && hasBackgroundSupport( props.name, 'backgroundSize' )
-	);
-
-	const showBackgroundRepeat = !! (
-		backgroundRepeat &&
-		hasBackgroundSupport( props.name, 'backgroundRepeat' )
 	);
 
 	const defaultControls = getBlockSupport( props.name, [
@@ -572,12 +542,6 @@ export function BackgroundImagePanel( props ) {
 			{ showBackgroundSize && (
 				<BackgroundSizePanelItem
 					isShownByDefault={ defaultControls?.backgroundSize }
-					{ ...props }
-				/>
-			) }
-			{ showBackgroundRepeat && (
-				<BackgroundRepeatPanelItem
-					isShownByDefault={ defaultControls?.backgroundRepeat }
 					{ ...props }
 				/>
 			) }
