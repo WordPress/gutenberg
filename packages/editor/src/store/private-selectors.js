@@ -1,8 +1,14 @@
 /**
+ * External dependencies
+ */
+import createSelector from 'rememo';
+
+/**
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createRegistrySelector } from '@wordpress/data';
+import { createRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -46,6 +52,9 @@ export const getInsertionPoint = createRegistrySelector(
 	}
 );
 
-export function getListViewToggleRef( state ) {
-	return state.listViewToggleRef;
-}
+export const getListViewToggleRef = createSelector(
+	() => {
+		return createRef();
+	},
+	() => []
+);
