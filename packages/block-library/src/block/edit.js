@@ -140,7 +140,7 @@ export default function ReusableBlockEdit( {
 } ) {
 	const registry = useRegistry();
 	const hasAlreadyRendered = useHasRecursion( ref );
-	const { record, hasResolved } = useEntityRecord(
+	const { record, editedRecord, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
 		ref
@@ -156,9 +156,13 @@ export default function ReusableBlockEdit( {
 	const { getBlockEditingMode } = useSelect( blockEditorStore );
 
 	useEffect( () => {
-		if ( ! record?.content?.raw ) return;
-		const initialBlocks = parse( record.content.raw );
+		const initialBlocks =
+			editedRecord.blocks ??
+			( editedRecord.content && typeof editedRecord.content !== 'function'
+				? parse( editedRecord.content )
+				: [] );
 
+		defaultValuesRef.current = {};
 		const editingMode = getBlockEditingMode( patternClientId );
 		registry.batch( () => {
 			setBlockEditingMode( patternClientId, 'default' );
@@ -176,7 +180,7 @@ export default function ReusableBlockEdit( {
 	}, [
 		__unstableMarkNextChangeAsNotPersistent,
 		patternClientId,
-		record,
+		editedRecord,
 		replaceInnerBlocks,
 		registry,
 		getBlockEditingMode,

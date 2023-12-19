@@ -143,20 +143,21 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 }
 
 function BackgroundImagePanelItem( { clientId, setAttributes } ) {
-	const style = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
+	const { style, mediaUpload } = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSettings } =
+				select( blockEditorStore );
+
+			return {
+				style: getBlockAttributes( clientId )?.style,
+				mediaUpload: getSettings().mediaUpload,
+			};
+		},
 		[ clientId ]
 	);
 	const { id, title, url } = style?.background?.backgroundImage || {};
 
 	const replaceContainerRef = useRef();
-
-	const { mediaUpload } = useSelect( ( select ) => {
-		return {
-			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
-		};
-	} );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {

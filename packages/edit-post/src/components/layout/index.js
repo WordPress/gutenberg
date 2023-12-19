@@ -232,9 +232,6 @@ function Layout() {
 	const [ entitiesSavedStatesCallback, setEntitiesSavedStatesCallback ] =
 		useState( false );
 
-	const [ listViewToggleElement, setListViewToggleElement ] =
-		useState( null );
-
 	const closeEntitiesSavedStates = useCallback(
 		( arg ) => {
 			if ( typeof entitiesSavedStatesCallback === 'function' ) {
@@ -268,11 +265,7 @@ function Layout() {
 			return <InserterSidebar />;
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
-			return (
-				<ListViewSidebar
-					listViewToggleElement={ listViewToggleElement }
-				/>
-			);
+			return <ListViewSidebar />;
 		}
 
 		return null;
@@ -313,7 +306,6 @@ function Layout() {
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
-						setListViewToggleElement={ setListViewToggleElement }
 					/>
 				}
 				editorNotices={ <EditorNotices /> }
