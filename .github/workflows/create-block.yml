@@ -14,14 +14,13 @@ concurrency:
 
 jobs:
     checks:
-        name: Checks
+        name: Checks on ${{ matrix.os }}
         runs-on: ${{ matrix.os }}
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
-                node: ['20']
-                os: [macos-latest, ubuntu-latest, windows-latest]
+                os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
 
         steps:
             - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
@@ -30,8 +29,6 @@ jobs:
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
-              with:
-                  node-version: ${{ matrix.node }}
 
             - name: Create block
               shell: bash
