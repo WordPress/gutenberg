@@ -1,22 +1,20 @@
 # TextDecorationControl
 
+Notice: This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+
 ![TextDecorationControl Element in Inspector Control](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/text-decoration-component.png?raw=true)
 
-## Table of Contents
-
-1. [Usage](#usage)
-3. [Properties](#props)
 
 ## Usage
 
 ```jsx
-import { TextDecorationControl } from '@wordpress/block-editor';
+import { __experimentalTextDecorationControl } from '@wordpress/block-editor';
 ```
 
 Then, you can use the component in your block editor UI:
 
 ```jsx
-<TextDecorationControl
+<__experimentalTextDecorationControl
   value={textDecorationValue}
   onChange={(newValue) => setAttributes({ textDecoration: newValue })}
 />
