@@ -142,8 +142,8 @@ export function useInputRules( props ) {
 				return;
 			}
 
-			if ( __unstableAllowPrefixTransformations ) {
-				if ( inputRule() ) return;
+			if ( __unstableAllowPrefixTransformations && inputRule() ) {
+				return;
 			}
 
 			const value = getValue();
