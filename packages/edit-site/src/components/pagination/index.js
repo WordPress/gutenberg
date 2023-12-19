@@ -21,12 +21,13 @@ export default function Pagination( {
 	className,
 	disabled = false,
 	buttonVariant = 'tertiary',
+	label = __( 'Pagination Navigation' ),
 } ) {
 	return (
 		<HStack
 			expanded={ false }
 			as="nav"
-			aria-label="Pagination Navigation"
+			aria-label={ label }
 			spacing={ 3 }
 			justify="flex-start"
 			className={ classnames( 'edit-site-pagination', className ) }
