@@ -25,9 +25,11 @@ import { useThrottle } from '@wordpress/compose';
  */
 import useTextInputOffset from './use-text-input-offset';
 import useKeyboardOffset from './use-keyboard-offset';
-import useScrollToTextInput from './use-scroll-to-text-input';
 import useTextInputCaretPosition from './use-text-input-caret-position';
+import useScrollToSection from './use-scroll-to-section';
+import useScrollToElement from './use-scroll-to-element';
 
+const DEFAULT_FONT_SIZE = 16;
 const AnimatedScrollView = Animated.createAnimatedComponent( ScrollView );
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
@@ -75,7 +77,7 @@ export const KeyboardAwareFlatList = (
 		scrollViewRef
 	);
 
-	const [ scrollToTextInputOffset ] = useScrollToTextInput(
+	const [ scrollToSection ] = useScrollToSection(
 		extraScrollHeight,
 		keyboardOffset,
 		scrollEnabled,
@@ -83,18 +85,23 @@ export const KeyboardAwareFlatList = (
 		scrollViewRef,
 		scrollViewYOffset
 	);
+	const [ scrollToElement ] = useScrollToElement(
+		scrollViewRef,
+		scrollToSection
+	);
 
 	const onScrollToTextInput = useThrottle(
 		useCallback(
 			async ( caret ) => {
+				const { caretHeight = DEFAULT_FONT_SIZE } = caret ?? {};
 				const textInputOffset = await getTextInputOffset( caret );
 				const hasTextInputOffset = textInputOffset !== null;
 
 				if ( hasTextInputOffset ) {
-					scrollToTextInputOffset( caret, textInputOffset );
+					scrollToSection( textInputOffset, caretHeight );
 				}
 			},
-			[ getTextInputOffset, scrollToTextInputOffset ]
+			[ getTextInputOffset, scrollToSection ]
 		),
 		200,
 		{ leading: false }
@@ -146,6 +153,8 @@ export const KeyboardAwareFlatList = (
 	useImperativeHandle( ref, () => {
 		return {
 			scrollViewRef: scrollViewRef.current,
+			scrollToSection,
+			scrollToElement,
 		};
 	} );
 
