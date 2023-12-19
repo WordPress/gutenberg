@@ -28,6 +28,7 @@
 -   `FocalPointPicker`: Add opt-in prop for 40px default size ([#56021](https://github.com/WordPress/gutenberg/pull/56021)).
 -   `DimensionControl`: Add opt-in prop for 40px default size ([#56805](https://github.com/WordPress/gutenberg/pull/56805)).
 -   `FontSizePicker`: Add opt-in prop for 40px default size ([#56804](https://github.com/WordPress/gutenberg/pull/56804)).
+-   `ToolsPanel`/`ToolsPanelHeader`: Added `dropdownMenuProps` to allow customization of the panel's dropdown menu. Also merged default and optional control menu groups ([#55785](https://github.com/WordPress/gutenberg/pull/55785)).
 
 ### Bug Fix
 
