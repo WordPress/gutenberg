@@ -20,7 +20,7 @@ The [markup representation of a block is parsed for the Block Editor](https://de
 - In the editor, WordPress parses this block markup, captures its data and loads its `edit` version
 - In the front end, WordPress parses this block markup, captures its data and generates its final HTML markup
 
-Whenever a block is saved, the `save` function, defined when the [block is registered in the client](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/#registration-of-the-block-with-javascript-client-side),  is called to return the markup that will be saved into the database within the block delimiter's comment. If `save` is `null` (common case for blocks with dynamic rendering), only a single line block delimiter's comment is stored, along with any attributes
+Whenever a block is saved, the `save` function, defined when the [block is registered in the client](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/#registration-of-the-block-with-javascript-client-side), is called to return the markup that will be saved into the database within the block delimiter's comment. If `save` is `null` (common case for blocks with dynamic rendering), only a single line block delimiter's comment is stored, along with any attributes
 
 The Post Editor checks that the markup created by the `save` function is identical to the block's markup saved to the database:
 - If there are any differences, the Post Editor trigger a **block validation error**.
