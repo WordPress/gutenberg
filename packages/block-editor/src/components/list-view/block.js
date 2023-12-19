@@ -122,11 +122,7 @@ function ListViewBlock( {
 		  )
 		: blockTitle;
 
-	const settingsAriaLabel = sprintf(
-		// translators: %s: The title of the block.
-		__( 'Options for %s' ),
-		blockTitle
-	);
+	const settingsAriaLabel = __( 'Options' );
 
 	const {
 		expand,
