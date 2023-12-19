@@ -8,7 +8,13 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { Children } from '@wordpress/element';
+import {
+	Children,
+	cloneElement,
+	forwardRef,
+	createContext,
+	useContext,
+} from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -17,13 +23,19 @@ import deprecated from '@wordpress/deprecated';
 import type { TooltipProps } from './types';
 import Shortcut from '../shortcut';
 import { positionToPlacement } from '../popover/utils';
+import type { WordPressComponentProps } from '../context';
 
 /**
  * Time over anchor to wait before showing tooltip
  */
 export const TOOLTIP_DELAY = 700;
 
-function Tooltip( props: TooltipProps ) {
+const TooltipContext = createContext( false );
+
+function Tooltip(
+	props: WordPressComponentProps< TooltipProps, 'div', false >,
+	ref: React.ForwardedRef< any >
+) {
 	const {
 		children,
 		delay = TOOLTIP_DELAY,
@@ -32,7 +44,10 @@ function Tooltip( props: TooltipProps ) {
 		position,
 		shortcut,
 		text,
+		...restProps
 	} = props;
+
+	const isNestedInParentTooltip = useContext( TooltipContext );
 
 	const baseId = useInstanceId( Tooltip, 'tooltip' );
 	const describedById = text || shortcut ? baseId : undefined;
@@ -64,17 +79,29 @@ function Tooltip( props: TooltipProps ) {
 	}
 	computedPlacement = computedPlacement || 'bottom';
 
+	// Disable reason: the hook can not run conditionally.
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 	const tooltipStore = Ariakit.useTooltipStore( {
 		placement: computedPlacement,
 		showTimeout: delay,
 	} );
 
+	if ( isNestedInParentTooltip ) {
+		return isOnlyChild
+			? cloneElement( children, {
+					...restProps,
+					ref,
+			  } )
+			: children;
+	}
 	return (
-		<>
+		<TooltipContext.Provider value={ true }>
 			<Ariakit.TooltipAnchor
 				onClick={ hideOnClick ? tooltipStore.hide : undefined }
 				store={ tooltipStore }
 				render={ isOnlyChild ? children : undefined }
+				{ ...restProps }
+				ref={ ref }
 			>
 				{ isOnlyChild ? undefined : children }
 			</Ariakit.TooltipAnchor>
@@ -98,8 +125,8 @@ function Tooltip( props: TooltipProps ) {
 					) }
 				</Ariakit.Tooltip>
 			) }
-		</>
+		</TooltipContext.Provider>
 	);
 }
 
-export default Tooltip;
+export default forwardRef( Tooltip );
