@@ -84,7 +84,7 @@ const blockRemovalRules = {
 	),
 };
 
-export default function Editor( { listViewToggleElement, isLoading } ) {
+export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -251,13 +251,7 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 						secondarySidebar={
 							isEditMode &&
 							( ( shouldShowInserter && <InserterSidebar /> ) ||
-								( shouldShowListView && (
-									<ListViewSidebar
-										listViewToggleElement={
-											listViewToggleElement
-										}
-									/>
-								) ) )
+								( shouldShowListView && <ListViewSidebar /> ) )
 						}
 						sidebar={
 							isEditMode &&

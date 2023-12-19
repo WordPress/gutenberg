@@ -45,3 +45,7 @@ export const getInsertionPoint = createRegistrySelector(
 		return EMPTY_INSERTION_POINT;
 	}
 );
+
+export function getListViewToggleRef( state ) {
+	return state.listViewToggleRef;
+}

@@ -44,7 +44,7 @@ import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { PreviewDropdown } = unlock( editorPrivateApis );
 
-export default function HeaderEditMode( { setListViewToggleElement } ) {
+export default function HeaderEditMode() {
 	const {
 		templateType,
 		isDistractionFree,
@@ -137,7 +137,6 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 						blockEditorMode={ blockEditorMode }
 						isDistractionFree={ isDistractionFree }
 						showIconLabels={ showIconLabels }
-						setListViewToggleElement={ setListViewToggleElement }
 					/>
 					{ isTopToolbar && (
 						<>
