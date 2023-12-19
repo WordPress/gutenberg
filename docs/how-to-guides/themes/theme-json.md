@@ -103,9 +103,9 @@ body {
 }
 ```
 
--   **Custom properties**: there's also a mechanism to create your own CSS Custom Properties.
-
 {% end %}
+
+-   **Custom properties**: there's also a mechanism to create your own CSS Custom Properties.
 
 {% codetabs %}
 {% Input %}

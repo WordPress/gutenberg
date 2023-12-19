@@ -59,18 +59,11 @@ export const wrapperHeight = ( size?: 'default' | '__unstable-large' ) => {
 	`;
 };
 
-export const borderControlDropdown = (
-	size?: 'default' | '__unstable-large'
-) => css`
+export const borderControlDropdown = css`
 	background: #fff;
 
 	&& > button {
-		/*
-		 * Override button component styles to fit within BorderControl
-		 * regardless of size.
-		 */
-		height: ${ size === '__unstable-large' ? '40px' : '30px' };
-		width: ${ size === '__unstable-large' ? '40px' : '30px' };
+		aspect-ratio: 1;
 		padding: 0;
 		display: flex;
 		align-items: center;

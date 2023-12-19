@@ -4,6 +4,7 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/interface',
 	'@wordpress/undo-manager',
 	'@wordpress/sync',
+	'@wordpress/dataviews',
 ];
 
 /**

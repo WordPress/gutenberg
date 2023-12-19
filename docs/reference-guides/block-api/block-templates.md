@@ -61,7 +61,7 @@ registerBlockType( 'myplugin/template', {
 
 See the [Meta Block Tutorial](/docs/how-to-guides/metabox.md#step-4-finishing-touches) for a full example of a template in use.
 
-## Block Attributes
+## Block attributes
 
 To find a comprehensive list of all block attributes that you can define in a template, consult the block's `block.json` file, and look at the `attributes` and `supports` values.
 
@@ -69,7 +69,7 @@ For example, [packages/block-library/src/heading/block.json](https://github.com/
 
 If you don't have the Gutenberg plugin installed, you can find `block.json` files inside `wp-includes/blocks/heading/block.json`.
 
-## Custom Post types
+## Custom post types
 
 A custom post type can register its own template during registration:
 
@@ -161,7 +161,7 @@ $template = array(
 );
 ```
 
-## Nested Templates
+## Nested templates
 
 Container blocks like the columns blocks also support templates. This is achieved by assigning a nested template to the block.
 

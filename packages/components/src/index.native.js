@@ -106,7 +106,6 @@ export { default as LinkPickerScreen } from './mobile/link-picker/link-picker-sc
 export { default as LinkSettings } from './mobile/link-settings';
 export { default as LinkSettingsScreen } from './mobile/link-settings/link-settings-screen';
 export { default as LinkSettingsNavigation } from './mobile/link-settings/link-settings-navigation';
-export { default as ImageLinkDestinationsScreen } from './mobile/link-settings/image-link-destinations-screen';
 export { default as SegmentedControl } from './mobile/segmented-control';
 export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';
@@ -122,6 +121,7 @@ export {
 	ALIGNMENT_BREAKPOINTS,
 	alignmentHelpers,
 } from './mobile/utils/alignments';
+export { default as getPxFromCssUnit } from './mobile/utils/get-px-from-css-unit';
 
 // Hooks.
 export {
@@ -142,3 +142,6 @@ export {
 	useMobileGlobalStylesColors,
 	useEditorColorScheme,
 } from './mobile/global-styles-context/utils';
+
+// Private APIs.
+export { privateApis } from './private-apis';

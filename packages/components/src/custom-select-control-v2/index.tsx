@@ -18,6 +18,7 @@ import type {
 	CustomSelectItemProps,
 	CustomSelectContext as CustomSelectContextType,
 } from './types';
+import type { WordPressComponentProps } from '../context';
 
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
@@ -41,17 +42,16 @@ function defaultRenderSelectedValue( value: CustomSelectProps[ 'value' ] ) {
 	return value;
 }
 
-export function CustomSelect( props: CustomSelectProps ) {
-	const {
-		children,
-		defaultValue,
-		label,
-		onChange,
-		size = 'default',
-		value,
-		renderSelectedValue = defaultRenderSelectedValue,
-	} = props;
-
+export function CustomSelect( {
+	children,
+	defaultValue,
+	label,
+	onChange,
+	size = 'default',
+	value,
+	renderSelectedValue = defaultRenderSelectedValue,
+	...props
+}: WordPressComponentProps< CustomSelectProps, 'button', false > ) {
 	const store = Ariakit.useSelectStore( {
 		setValue: ( nextValue ) => onChange?.( nextValue ),
 		defaultValue,
@@ -66,6 +66,7 @@ export function CustomSelect( props: CustomSelectProps ) {
 				{ label }
 			</Styled.CustomSelectLabel>
 			<Styled.CustomSelectButton
+				{ ...props }
 				size={ size }
 				hasCustomRenderProp={ !! renderSelectedValue }
 				store={ store }
@@ -85,7 +86,7 @@ export function CustomSelect( props: CustomSelectProps ) {
 export function CustomSelectItem( {
 	children,
 	...props
-}: CustomSelectItemProps ) {
+}: WordPressComponentProps< CustomSelectItemProps, 'div', false > ) {
 	const customSelectContext = useContext( CustomSelectContext );
 	return (
 		<Styled.CustomSelectItem

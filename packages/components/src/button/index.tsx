@@ -156,7 +156,7 @@ export function UnforwardedButton(
 		'is-busy': isBusy,
 		'is-link': variant === 'link',
 		'is-destructive': isDestructive,
-		'has-text': !! icon && hasChildren,
+		'has-text': !! icon && ( hasChildren || text ),
 		'has-icon': !! icon,
 	} );
 

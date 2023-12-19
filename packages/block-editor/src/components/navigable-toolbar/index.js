@@ -162,14 +162,9 @@ function useToolbarFocus( {
 			const index = items.findIndex( ( item ) => item.tabIndex === 0 );
 			onIndexChange( index );
 		};
-	}, [ initialIndex, initialFocusOnMount, toolbarRef ] );
+	}, [ initialIndex, initialFocusOnMount, onIndexChange, toolbarRef ] );
 
-	const { lastFocus } = useSelect( ( select ) => {
-		const { getLastFocus } = select( blockEditorStore );
-		return {
-			lastFocus: getLastFocus(),
-		};
-	}, [] );
+	const { getLastFocus } = useSelect( blockEditorStore );
 	/**
 	 * Handles returning focus to the block editor canvas when pressing escape.
 	 */
@@ -178,6 +173,7 @@ function useToolbarFocus( {
 
 		if ( focusEditorOnEscape ) {
 			const handleKeyDown = ( event ) => {
+				const lastFocus = getLastFocus();
 				if ( event.keyCode === ESCAPE && lastFocus?.current ) {
 					// Focus the last focused element when pressing escape.
 					event.preventDefault();
@@ -192,7 +188,7 @@ function useToolbarFocus( {
 				);
 			};
 		}
-	}, [ focusEditorOnEscape, lastFocus, toolbarRef ] );
+	}, [ focusEditorOnEscape, getLastFocus, toolbarRef ] );
 }
 
 export default function NavigableToolbar( {
@@ -210,9 +206,9 @@ export default function NavigableToolbar( {
 	useToolbarFocus( {
 		toolbarRef,
 		focusOnMount,
-		isAccessibleToolbar,
 		defaultIndex: initialIndex,
 		onIndexChange,
+		isAccessibleToolbar,
 		shouldUseKeyboardFocusShortcut,
 		focusEditorOnEscape,
 	} );

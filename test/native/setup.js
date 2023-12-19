@@ -107,7 +107,10 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeShowEditorHelp: jest.fn(),
 		subscribeOnUndoPressed: jest.fn(),
 		subscribeOnRedoPressed: jest.fn(),
+		useIsConnected: jest.fn( () => ( { isConnected: true } ) ),
 		editorDidMount: jest.fn(),
+		showAndroidSoftKeyboard: jest.fn(),
+		hideAndroidSoftKeyboard: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
 		subscribeMediaSave: jest.fn(),
@@ -117,6 +120,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		requestImageUploadCancelDialog: jest.fn(),
 		requestMediaEditor: jest.fn(),
 		requestMediaPicker: jest.fn(),
+		requestMediaImport: jest.fn(),
 		requestUnsupportedBlockFallback: jest.fn(),
 		subscribeReplaceBlock: jest.fn(),
 		mediaSources: {

@@ -10,18 +10,18 @@ The use of <code>supports</code> generates a set of properties that need to be m
 
 A block can have three sets of markup defined, each one of them with a specific target and purpose:
 
-- The one for the **Block Editor**, defined through a `edit` React component passed to `registerBlockType` when registering the block in the client. 
+- The one for the **Block Editor**, defined through a `edit` React component passed to [`registerBlockType`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#registerblocktype) when registering the block in the client. 
 - The one used to **save the block in the DB**, defined through a `save` function passed to `registerBlockType` when registering the block in the client. 
     - This markup will be returned to the front end on request if no dynamic render has been defined for the block.
-- The one used to **dynamically render the markup of the block** returned to the front end on request, defined through the `render_callback` on `register_block_type` or the `render` PHP file in `block.json`
+- The one used to **dynamically render the markup of the block** returned to the front end on request, defined through the `render_callback` on [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) or the [`render`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#render) PHP file in `block.json`
     - If defined, this server-side generated markup will be returned to the front end, ignoring the markup stored in DB.
 
-For the React component `edit` and the `save` function, the block wrapper element should be a native DOM element (like `<div>`) or a React component that forwards any additional props to native DOM elements. Using a <Fragment> or <ServerSideRender> component, for instance, would be invalid.
+For the [`edit` React component and the `save` function](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/), the block wrapper element should be a native DOM element (like `<div>`) or a React component that forwards any additional props to native DOM elements. Using a <Fragment> or <ServerSideRender> component, for instance, would be invalid.
 
 
 ## The Edit component's markup
 
-The `useBlockProps()` hook available on the `@wordpress/block-editor` allows passing the required attributes for the Block Editor to the `edit` block's outer wrapper. 
+The [`useBlockProps()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops) hook available on the [`@wordpress/block-editor`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor) allows passing the required attributes for the Block Editor to the `edit` block's outer wrapper. 
 
 Among other things, the `useBlockProps()` hook takes care of including in this wrapper:
 - An `id` for the block's markup 
