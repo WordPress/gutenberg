@@ -42,7 +42,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
-const { PreviewDropdown } = unlock( editorPrivateApis );
+const { PostViewLink, PreviewDropdown } = unlock( editorPrivateApis );
 
 export default function HeaderEditMode( { setListViewToggleElement } ) {
 	const {
@@ -217,6 +217,7 @@ export default function HeaderEditMode( { setListViewToggleElement } ) {
 							/>
 						</div>
 					) }
+					<PostViewLink showIconLabels={ showIconLabels } />
 					<SaveButton />
 					{ ! isDistractionFree && (
 						<PinnedItems.Slot scope="core/edit-site" />
