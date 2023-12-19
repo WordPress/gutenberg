@@ -96,7 +96,7 @@ export default function Image( {
 	temporaryURL,
 	attributes,
 	setAttributes,
-	isSelected,
+	isSingleSelected,
 	insertBlocksAfter,
 	onReplace,
 	onSelectImage,
@@ -135,59 +135,39 @@ export default function Image( {
 	const { allowResize = true } = context;
 	const { getBlock } = useSelect( blockEditorStore );
 
-	const { image } = useSelect(
-		( select ) => {
-			const { getMedia } = select( coreStore );
-			return {
-				image:
-					id && isSelected
-						? getMedia( id, { context: 'view' } )
-						: null,
-			};
-		},
-		[ id, isSelected ]
+	const image = useSelect(
+		( select ) =>
+			id && isSingleSelected
+				? select( coreStore ).getMedia( id, { context: 'view' } )
+				: null,
+		[ id, isSingleSelected ]
 	);
 
-	const {
-		canInsertCover,
-		imageEditing,
-		imageSizes,
-		maxWidth,
-		mediaUpload,
-		multiImageSelection,
-	} = useSelect(
-		( select ) => {
-			const {
-				getBlockRootClientId,
-				getMultiSelectedBlockClientIds,
-				getBlockName,
-				getSettings,
-				canInsertBlockType,
-			} = select( blockEditorStore );
+	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockRootClientId,
+					getSettings,
+					canInsertBlockType,
+				} = select( blockEditorStore );
 
-			const rootClientId = getBlockRootClientId( clientId );
-			const settings = getSettings();
-			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
+				const rootClientId = getBlockRootClientId( clientId );
+				const settings = getSettings();
 
-			return {
-				imageEditing: settings.imageEditing,
-				imageSizes: settings.imageSizes,
-				maxWidth: settings.maxWidth,
-				mediaUpload: settings.mediaUpload,
-				canInsertCover: canInsertBlockType(
-					'core/cover',
-					rootClientId
-				),
-				multiImageSelection:
-					multiSelectedClientIds.length &&
-					multiSelectedClientIds.every(
-						( _clientId ) =>
-							getBlockName( _clientId ) === 'core/image'
+				return {
+					imageEditing: settings.imageEditing,
+					imageSizes: settings.imageSizes,
+					maxWidth: settings.maxWidth,
+					mediaUpload: settings.mediaUpload,
+					canInsertCover: canInsertBlockType(
+						'core/cover',
+						rootClientId
 					),
-			};
-		},
-		[ clientId ]
-	);
+				};
+			},
+			[ clientId ]
+		);
 
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
@@ -220,7 +200,7 @@ export default function Image( {
 	useEffect( () => {
 		if (
 			! isExternalImage( id, url ) ||
-			! isSelected ||
+			! isSingleSelected ||
 			! canUploadMedia
 		) {
 			setExternalBlob();
@@ -236,7 +216,7 @@ export default function Image( {
 			.then( ( blob ) => setExternalBlob( blob ) )
 			// Do nothing, cannot upload.
 			.catch( () => {} );
-	}, [ id, url, isSelected, externalBlob, canUploadMedia ] );
+	}, [ id, url, isSingleSelected, externalBlob, canUploadMedia ] );
 
 	// Get naturalWidth and naturalHeight from image ref, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
@@ -326,13 +306,13 @@ export default function Image( {
 	}
 
 	useEffect( () => {
-		if ( ! isSelected ) {
+		if ( ! isSingleSelected ) {
 			setIsEditingImage( false );
 		}
-	}, [ isSelected ] );
+	}, [ isSingleSelected ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
-	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
+	const allowCrop = isSingleSelected && canEditImage && ! isEditingImage;
 
 	function switchToCover() {
 		replaceBlocks(
@@ -418,7 +398,7 @@ export default function Image( {
 		lockTitleControls = false,
 	} = useSelect(
 		( select ) => {
-			if ( ! isSelected ) {
+			if ( ! isSingleSelected ) {
 				return {};
 			}
 
@@ -445,26 +425,24 @@ export default function Image( {
 						?.lockAttributesEditing === true,
 			};
 		},
-		[ isSelected ]
+		[ isSingleSelected ]
 	);
 
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ ! multiImageSelection &&
-					! isEditingImage &&
-					! lockUrlControls && (
-						<ImageURLInputUI
-							url={ href || '' }
-							onChangeUrl={ onSetHref }
-							linkDestination={ linkDestination }
-							mediaUrl={ ( image && image.source_url ) || url }
-							mediaLink={ image && image.link }
-							linkTarget={ linkTarget }
-							linkClass={ linkClass }
-							rel={ rel }
-						/>
-					) }
+				{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
+					<ImageURLInputUI
+						url={ href || '' }
+						onChangeUrl={ onSetHref }
+						linkDestination={ linkDestination }
+						mediaUrl={ ( image && image.source_url ) || url }
+						mediaLink={ image && image.link }
+						linkTarget={ linkTarget }
+						linkClass={ linkClass }
+						rel={ rel }
+					/>
+				) }
 				{ allowCrop && (
 					<ToolbarButton
 						onClick={ () => setIsEditingImage( true ) }
@@ -472,7 +450,7 @@ export default function Image( {
 						label={ __( 'Crop' ) }
 					/>
 				) }
-				{ ! multiImageSelection && canInsertCover && (
+				{ isSingleSelected && canInsertCover && (
 					<ToolbarButton
 						icon={ overlayText }
 						label={ __( 'Add text over image' ) }
@@ -480,22 +458,20 @@ export default function Image( {
 					/>
 				) }
 			</BlockControls>
-			{ ! multiImageSelection &&
-				! isEditingImage &&
-				! lockUrlControls && (
-					<BlockControls group="other">
-						<MediaReplaceFlow
-							mediaId={ id }
-							mediaURL={ url }
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							accept="image/*"
-							onSelect={ onSelectImage }
-							onSelectURL={ onSelectURL }
-							onError={ onUploadError }
-						/>
-					</BlockControls>
-				) }
-			{ ! multiImageSelection && externalBlob && (
+			{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
+				<BlockControls group="other">
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ url }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="image/*"
+						onSelect={ onSelectImage }
+						onSelectURL={ onSelectURL }
+						onError={ onUploadError }
+					/>
+				</BlockControls>
+			) }
+			{ isSingleSelected && externalBlob && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
@@ -512,7 +488,7 @@ export default function Image( {
 					resetAll={ resetAll }
 					dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 				>
-					{ ! multiImageSelection && (
+					{ isSingleSelected && (
 						<ToolsPanelItem
 							label={ __( 'Alternative text' ) }
 							isShownByDefault={ true }
@@ -769,7 +745,7 @@ export default function Image( {
 					width: currentWidth ?? 'auto',
 					height: currentHeight ?? 'auto',
 				} }
-				showHandle={ isSelected }
+				showHandle={ isSingleSelected }
 				minWidth={ minWidth }
 				maxWidth={ maxWidthBuffer }
 				minHeight={ minHeight }
@@ -818,12 +794,10 @@ export default function Image( {
 			<Caption
 				attributes={ attributes }
 				setAttributes={ setAttributes }
-				isSelected={ isSelected }
+				isSelected={ isSingleSelected }
 				insertBlocksAfter={ insertBlocksAfter }
 				label={ __( 'Image caption text' ) }
-				showToolbarButton={
-					! multiImageSelection && hasNonContentControls
-				}
+				showToolbarButton={ isSingleSelected && hasNonContentControls }
 			/>
 		</>
 	);
