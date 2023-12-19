@@ -10,6 +10,7 @@ import { isBlobURL } from '@wordpress/blob';
 import { getBlockSupport } from '@wordpress/blocks';
 import { focus } from '@wordpress/dom';
 import {
+	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -87,7 +88,11 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 	}
 
 	if ( feature === 'any' ) {
-		return !! support?.backgroundImage || !! support?.backgroundSize;
+		return (
+			!! support?.backgroundImage ||
+			!! support?.backgroundSize ||
+			!! support?.backgroundRepeat
+		);
 	}
 
 	return !! support?.[ feature ];
@@ -107,6 +112,25 @@ export function resetBackgroundImage( style = {}, setAttributes ) {
 			background: {
 				...style?.background,
 				backgroundImage: undefined,
+			},
+		} ),
+	} );
+}
+
+/**
+ * Resets the background repeat block support attributes. This can be used when disabling
+ * the background repeat controls for a block via a `ToolsPanel`.
+ *
+ * @param {Object}   style         Style attribute.
+ * @param {Function} setAttributes Function to set block's attributes.
+ */
+export function resetBackgroundRepeat( style = {}, setAttributes ) {
+	setAttributes( {
+		style: cleanEmptyObject( {
+			...style,
+			background: {
+				...style?.background,
+				backgroundRepeat: undefined,
 			},
 		} ),
 	} );
@@ -340,6 +364,67 @@ function BackgroundImagePanelItem( {
 	);
 }
 
+function BackgroundRepeatPanelItem( {
+	clientId,
+	isShownByDefault,
+	setAttributes,
+} ) {
+	const style = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
+		[ clientId ]
+	);
+
+	const value = style?.background?.backgroundRepeat;
+
+	const toggleIsRepeated = () => {
+		setAttributes( {
+			style: cleanEmptyObject( {
+				...style,
+				background: {
+					...style?.background,
+					backgroundRepeat:
+						value === 'repeat' || value === undefined
+							? 'no-repeat'
+							: 'repeat',
+				},
+			} ),
+		} );
+	};
+
+	const resetAllFilter = useCallback( ( previousValue ) => {
+		return {
+			...previousValue,
+			style: {
+				...previousValue.style,
+				background: {
+					...previousValue.style?.background,
+					backgroundRepeat: undefined,
+				},
+			},
+		};
+	}, [] );
+
+	return (
+		<ToolsPanelItem
+			className="single-column"
+			hasValue={ () => !! value }
+			label={ __( 'Repeat' ) }
+			onDeselect={ () => resetBackgroundRepeat( style, setAttributes ) }
+			isShownByDefault={ isShownByDefault }
+			resetAllFilter={ resetAllFilter }
+			panelId={ clientId }
+		>
+			<ToggleControl
+				__nextHasNoMarginBottom
+				label={ __( 'Repeat image' ) }
+				checked={ value === 'no-repeat' ? false : true }
+				onChange={ toggleIsRepeated }
+			/>
+		</ToolsPanelItem>
+	);
+}
+
 function backgroundSizeHelpText( value ) {
 	if ( value === 'cover' || value === undefined ) {
 		return __( 'Stretch image to cover the block.' );
@@ -347,7 +432,7 @@ function backgroundSizeHelpText( value ) {
 	if ( value === 'contain' ) {
 		return __( 'Image is contained within the block.' );
 	}
-	return __( 'Repeat the image, and set a fixed width.' );
+	return __( 'Set a fixed width.' );
 }
 
 function BackgroundSizePanelItem( {
@@ -406,7 +491,7 @@ function BackgroundSizePanelItem( {
 			spacing={ 2 }
 			className="single-column"
 			hasValue={ () => hasValue }
-			label={ __( 'Background size' ) }
+			label={ __( 'Size' ) }
 			onDeselect={ () => resetBackgroundSize( style, setAttributes ) }
 			isShownByDefault={ isShownByDefault }
 			resetAllFilter={ resetAllFilter }
@@ -415,7 +500,7 @@ function BackgroundSizePanelItem( {
 			<ToggleGroupControl
 				__nextHasNoMarginBottom
 				size={ '__unstable-large' }
-				label={ __( 'Background size' ) }
+				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
 				onChange={ updateBackgroundSize }
 				isBlock={ true }
@@ -451,8 +536,9 @@ function BackgroundSizePanelItem( {
 }
 
 export function BackgroundImagePanel( props ) {
-	const [ backgroundImage, backgroundSize ] = useSettings(
+	const [ backgroundImage, backgroundRepeat, backgroundSize ] = useSettings(
 		'background.backgroundImage',
+		'background.backgroundRepeat',
 		'background.backgroundSize'
 	);
 
@@ -465,6 +551,11 @@ export function BackgroundImagePanel( props ) {
 
 	const showBackgroundSize = !! (
 		backgroundSize && hasBackgroundSupport( props.name, 'backgroundSize' )
+	);
+
+	const showBackgroundRepeat = !! (
+		backgroundRepeat &&
+		hasBackgroundSupport( props.name, 'backgroundRepeat' )
 	);
 
 	const defaultControls = getBlockSupport( props.name, [
@@ -481,6 +572,12 @@ export function BackgroundImagePanel( props ) {
 			{ showBackgroundSize && (
 				<BackgroundSizePanelItem
 					isShownByDefault={ defaultControls?.backgroundSize }
+					{ ...props }
+				/>
+			) }
+			{ showBackgroundRepeat && (
+				<BackgroundRepeatPanelItem
+					isShownByDefault={ defaultControls?.backgroundRepeat }
 					{ ...props }
 				/>
 			) }

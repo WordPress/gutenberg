@@ -31,6 +31,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		requiresOptOut: true,
 		useEngine: true,
 	},
+	backgroundRepeat: {
+		value: [ 'background', 'backgroundRepeat' ],
+		support: [ 'background', 'backgroundRepeat' ],
+		useEngine: true,
+	},
 	backgroundSize: {
 		value: [ 'background', 'backgroundSize' ],
 		support: [ 'background', 'backgroundSize' ],
