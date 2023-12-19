@@ -3,7 +3,6 @@
  */
 import { updateBlockBindingsAttribute } from '@wordpress/block-editor';
 import { MenuItem, MenuGroup } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 
 export default function BlockBindingsFieldsList( props ) {
 	const {
