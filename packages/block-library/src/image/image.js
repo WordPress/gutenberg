@@ -25,7 +25,6 @@ import {
 	store as blockEditorStore,
 	useSettings,
 	__experimentalImageEditor as ImageEditor,
-	__experimentalUseBorderProps as useBorderProps,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
@@ -567,9 +566,6 @@ export default function Image( {
 		defaultedAlt = __( 'This image has an empty alt attribute' );
 	}
 
-	const borderProps = useBorderProps( attributes );
-	const isRounded = attributes.className?.includes( 'is-style-rounded' );
-
 	let img = (
 		// Disable reason: Image itself is not meant to be interactive, but
 		// should direct focus to block.
@@ -586,14 +582,12 @@ export default function Image( {
 					} );
 				} }
 				ref={ imageRef }
-				className={ borderProps.className }
 				style={ {
 					width:
 						( width && height ) || aspectRatio ? '100%' : undefined,
 					height:
 						( width && height ) || aspectRatio ? '100%' : undefined,
 					objectFit: scale,
-					...borderProps.style,
 				} }
 			/>
 			{ temporaryURL && <Spinner /> }
@@ -622,7 +616,6 @@ export default function Image( {
 					onFinishEditing={ () => {
 						setIsEditingImage( false );
 					} }
-					borderProps={ isRounded ? undefined : borderProps }
 				/>
 			</ImageWrapper>
 		);
