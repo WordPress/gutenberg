@@ -1,6 +1,6 @@
 # Markup representation of a block
 
-When stored (in the database (DB) or templates as HTML files), blocks are represented using a [specific HTML grammar](https://developer.wordpress.org/block-editor/explanations/architecture/key-concepts/#data-and-attributes), which is technically valid HTML based on HTML comments that act as explicit block delimiters 
+When stored, in the database (DB) or in templates as HTML files, blocks are represented using a [specific HTML grammar](https://developer.wordpress.org/block-editor/explanations/architecture/key-concepts/#data-and-attributes), which is technically valid HTML based on HTML comments that act as explicit block delimiters 
 
 These are some of the rules for the markup used to represent a block:
 - All core block comments start with a prefix and the block name: `wp:blockname`
