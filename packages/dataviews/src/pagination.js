@@ -93,7 +93,6 @@ function Pagination( {
 						tooltipPosition="top"
 					/>
 				</HStack>
-				)
 			</HStack>
 		)
 	);
