@@ -79,6 +79,19 @@ const category = {
 	choices: [ 'text', 'media', 'design', 'widgets', 'theme', 'embed' ],
 };
 
+const textdomain = {
+	type: 'input',
+	name: 'textdomain',
+	message: 'The text domain used to internationalize text in the block:',
+	validate( input ) {
+		if ( ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
+			return 'Invalid text domain specified. Text domain can contain only lowercase alphanumeric characters or dashes, and start with a letter.';
+		}
+
+		return true;
+	},
+};
+
 // Plugin header fields.
 const pluginURI = {
 	type: 'input',
@@ -141,6 +154,7 @@ module.exports = {
 	description,
 	dashicon,
 	category,
+	textdomain,
 	pluginURI,
 	version,
 	author,
