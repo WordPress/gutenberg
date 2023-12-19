@@ -9,7 +9,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { useMemo, useState, useCallback } from '@wordpress/element';
+import { useMemo, useState, useCallback, useRef } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -26,8 +26,6 @@ import { unlock } from './lock-unlock';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
-const postHistory = [];
-
 function Editor( {
 	postId: initialPostId,
 	postType: initialPostType,
@@ -36,6 +34,8 @@ function Editor( {
 	...props
 } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
+
+	const postHistory = useRef( [] );
 	const [ currentPost, setCurrentPost ] = useState( {
 		postId: initialPostId,
 		postType: initialPostType,
@@ -43,14 +43,14 @@ function Editor( {
 
 	const onSelectPost = useCallback(
 		( postId, postType ) => {
-			postHistory.unshift( currentPost );
+			postHistory.current.unshift( currentPost );
 			setCurrentPost( { postId, postType } );
 		},
 		[ currentPost ]
 	);
 
 	const goBack = () => {
-		const previousPost = postHistory.shift();
+		const previousPost = postHistory.current.shift();
 		setCurrentPost( {
 			postId: previousPost.postId ? previousPost.postId : initialPostId,
 			postType: previousPost.postType
@@ -143,7 +143,7 @@ function Editor( {
 			...settings,
 			onSelectPost,
 			goBack,
-			postHistory,
+			postHistory: postHistory.current,
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
