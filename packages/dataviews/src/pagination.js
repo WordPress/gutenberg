@@ -4,7 +4,7 @@
 import {
 	Button,
 	__experimentalHStack as HStack,
-	__experimentalNumberControl as NumberControl,
+	SelectControl,
 } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { sprintf, __, _x } from '@wordpress/i18n';
@@ -40,28 +40,23 @@ function Pagination( {
 						),
 						{
 							CurrenPageControl: (
-								<NumberControl
+								<SelectControl
 									aria-label={ __( 'Current page' ) }
-									min={ 1 }
-									max={ totalPages }
-									onChange={ ( value ) => {
-										const _value = +value;
-										if (
-											! _value ||
-											_value < 1 ||
-											_value > totalPages
-										) {
-											return;
-										}
+									value={ view.page }
+									options={ Array.from(
+										Array( totalPages )
+									).map( ( _, i ) => {
+										const page = i + 1;
+										return { value: page, label: page };
+									} ) }
+									onChange={ ( newValue ) => {
 										onChangeView( {
 											...view,
-											page: _value,
+											page: +newValue,
 										} );
 									} }
-									step="1"
-									value={ view.page }
-									isDragEnabled={ false }
-									spinControls="none"
+									size={ 'compact' }
+									__nextHasNoMarginBottom
 								/>
 							),
 						}
