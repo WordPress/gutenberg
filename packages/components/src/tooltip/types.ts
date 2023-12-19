@@ -23,6 +23,12 @@ export type TooltipProps = {
 	 */
 	hideOnClick?: boolean;
 	/**
+	 * Option to hide the tooltip when the anchor is blurred.
+	 *
+	 * @default true
+	 */
+	hideOnBlur?: boolean;
+	/**
 	 * The amount of time in milliseconds to wait before showing the tooltip.
 	 *
 	 * @default 700

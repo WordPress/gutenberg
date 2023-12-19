@@ -35,6 +35,13 @@ The amount of time in milliseconds to wait before showing the tooltip.
 -   Required: No
 -   Default: `700`
 
+#### `hideOnBlur`: `boolean`
+
+Option to hide the tooltip when the anchor is blurred.
+
+-   Required: No
+-   Default: `true`
+
 #### `hideOnClick`: `boolean`
 
 Option to hide the tooltip when the anchor is clicked.
