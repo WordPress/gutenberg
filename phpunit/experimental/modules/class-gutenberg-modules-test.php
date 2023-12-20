@@ -49,7 +49,7 @@ class Gutenberg_Modules_Test extends WP_UnitTestCase {
 	}
 
 	public function get_preloaded_modules() {
-		$preloaded_markup  = get_echo( array( 'Gutenberg_Modules', 'print_preloaded_modules' ) );
+		$preloaded_markup  = get_echo( array( 'Gutenberg_Modules', 'print_module_preloads' ) );
 		$p                 = new WP_HTML_Tag_Processor( $preloaded_markup );
 		$preloaded_modules = array();
 
