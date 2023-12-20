@@ -6,7 +6,10 @@ import { nanoid } from 'nanoid';
 /**
  * WordPress dependencies
  */
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	updateBlockBindingsAttribute,
+} from '@wordpress/block-editor';
 import { BaseControl, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -31,59 +34,49 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 	}
 
 	function updateBindings( isChecked ) {
-		let updatedBindings = {
-			...attributes?.metadata?.bindings,
-		};
-
 		if ( ! isChecked ) {
 			for ( const attributeName of Object.keys( syncedAttributes ) ) {
-				if (
-					updatedBindings[ attributeName ]?.source?.name ===
-					'pattern_attributes'
-				) {
-					delete updatedBindings[ attributeName ];
-				}
+				updateBlockBindingsAttribute(
+					attributes,
+					setAttributes,
+					attributeName,
+					null,
+					null
+				);
 			}
-			if ( ! Object.keys( updatedBindings ).length ) {
-				updatedBindings = undefined;
-			}
-			setAttributes( {
-				metadata: {
-					...attributes.metadata,
-					bindings: updatedBindings,
-				},
-			} );
 			return;
 		}
 
-		for ( const attributeName of Object.keys( syncedAttributes ) ) {
-			if ( ! updatedBindings[ attributeName ] ) {
-				updatedBindings[ attributeName ] = {
-					source: {
-						name: 'pattern_attributes',
-					},
-				};
-			}
-		}
-
 		if ( typeof attributes.metadata?.id === 'string' ) {
-			setAttributes( {
-				metadata: {
-					...attributes.metadata,
-					bindings: updatedBindings,
-				},
-			} );
+			for ( const attributeName of Object.keys( syncedAttributes ) ) {
+				updateBlockBindingsAttribute(
+					attributes,
+					setAttributes,
+					attributeName,
+					'pattern_attributes',
+					null
+				);
+			}
 			return;
 		}
 
 		const id = nanoid( 6 );
-		setAttributes( {
-			metadata: {
-				...attributes.metadata,
-				id,
-				bindings: updatedBindings,
-			},
-		} );
+		for ( const attributeName of Object.keys( syncedAttributes ) ) {
+			const newMetadata = updateBlockBindingsAttribute(
+				attributes,
+				setAttributes,
+				attributeName,
+				'pattern_attributes',
+				null
+			);
+
+			setAttributes( {
+				metadata: {
+					...newMetadata,
+					id,
+				},
+			} );
+		}
 	}
 
 	return (
