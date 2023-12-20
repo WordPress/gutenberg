@@ -76,7 +76,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		* If the theme doesn't have theme.json but supports both appearance tools and color palette,
 		* the 'theme' origin should be included so color palette presets are also output.
 		*/
-		if ( ! $supports_theme_json && current_theme_supports( 'appearance-tools' ) && current_theme_supports( 'editor-color-palette' ) ) {
+		if ( ! $supports_theme_json && ( current_theme_supports( 'appearance-tools' ) || current_theme_supports( 'border' ) ) && current_theme_supports( 'editor-color-palette' ) ) {
 			$origins = array( 'default', 'theme' );
 		} elseif ( ! $supports_theme_json ) {
 			$origins = array( 'default' );
