@@ -86,12 +86,18 @@ export default function GlobalStylesSidebar() {
 
 	const toggleRevisions = () => {
 		setIsListViewOpened( false );
-		if ( isRevisionsStyleBookOpened || isRevisionsOpened ) {
+		if ( isRevisionsStyleBookOpened ) {
+			goTo( '/' );
+			setEditorCanvasContainerView( 'style-book' );
+			return;
+		}
+		if ( isRevisionsOpened ) {
 			goTo( '/' );
 			setEditorCanvasContainerView( undefined );
 			return;
 		}
 		goTo( '/revisions' );
+
 		if ( isStyleBookOpened ) {
 			setEditorCanvasContainerView(
 				'global-styles-revisions:style-book'
