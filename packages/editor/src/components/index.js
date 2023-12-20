@@ -102,3 +102,6 @@ export { default as EditorProvider } from './provider';
 export * from './deprecated';
 export const VisualEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
 export const TextEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
+
+// Block Bindings Components.
+export * from './block-bindings';
