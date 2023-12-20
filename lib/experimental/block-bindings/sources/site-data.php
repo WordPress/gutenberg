@@ -12,7 +12,7 @@ if ( function_exists( 'register_block_bindings_source' ) ) {
 	register_block_bindings_source(
 		'site_data',
 		array(
-			'label' => __( 'Site Data' ),
+			'label' => __( 'Site Data', 'gutenberg' ),
 			'apply' => $site_data_source_callback,
 		)
 	);
