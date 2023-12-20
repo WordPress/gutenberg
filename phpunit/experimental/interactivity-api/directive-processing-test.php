@@ -49,10 +49,38 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 				),
 			)
 		);
+		register_block_type(
+			'gutenberg/test-context-level-2',
+			array(
+				'render_callback' => function ( $a, $b, $block ) {
+					$inner_blocks_html = '';
+					foreach ( $block->inner_blocks as $inner_block ) {
+						$inner_blocks_html .= $inner_block->render();
+					}
+					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-2" }\'><p data-wp-text=\'context.MyText\'></p>' . $inner_blocks_html . '</div>';
+				},
+				'supports'        => array(
+					'interactivity' => true,
+				),
+			)
+		);
+		register_block_type(
+			'gutenberg/test-context-read-only',
+			array(
+				'render_callback' => function () {
+					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\'><p data-wp-text=\'context.MyText\'></p></div>';
+				},
+				'supports'        => array(
+					'interactivity' => true,
+				),
+			)
+		);
 	}
 
 	public function tear_down() {
 		unregister_block_type( 'gutenberg/test-context-level-1' );
+		unregister_block_type( 'gutenberg/test-context-level-2' );
+		unregister_block_type( 'gutenberg/test-context-read-only' );
 		parent::tear_down();
 	}
 
@@ -121,6 +149,32 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		);
 		$rendered_blocks = do_blocks( $args['post_content'] );
 		$expected        = '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p>inner non interactive</p><p data-wp-text=\'context.MyText\'>level-1</p></div>';
+		$this->assertSame( $expected, $rendered_blocks );
+	}
+	public function test_directive_processing_two_interactive_blocks_at_same_level() {
+		$args            = array(
+			'post_content' => '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group"><!-- wp:gutenberg/test-context-level-1 /--><!-- wp:gutenberg/test-context-level-1 /--></div><!-- /wp:group -->',
+		);
+		$rendered_blocks = do_blocks( $args['post_content'] );
+		$expected        = '<div class="wp-block-group is-layout-constrained wp-block-group-is-layout-constrained"><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p data-wp-text=\'context.MyText\'>level-1</p></div><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p data-wp-text=\'context.MyText\'>level-1</p></div></div>';
+		$this->assertSame( $expected, $rendered_blocks );
+	}
+
+	public function test_directive_processing_alternating_interactive_and_not_interactive() {
+		$args            = array(
+			'post_content' => '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group"><!-- wp:gutenberg/test-context-level-1 /--><!-- wp:paragraph --><p>inner non interactive</p><!-- /wp:paragraph --><!-- wp:gutenberg/test-context-level-1 /--></div><!-- /wp:group -->',
+		);
+		$rendered_blocks = do_blocks( $args['post_content'] );
+		$expected        = '<div class="wp-block-group is-layout-constrained wp-block-group-is-layout-constrained"><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p data-wp-text=\'context.MyText\'>level-1</p></div><p>inner non interactive</p><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p data-wp-text=\'context.MyText\'>level-1</p></div></div>';
+		$this->assertSame( $expected, $rendered_blocks );
+	}
+
+	public function test_directive_directives_are_processed_at_tag_end() {
+		$args            = array(
+			'post_content' => '<!-- wp:gutenberg/test-context-level-1 --><!-- wp:gutenberg/test-context-level-2 /--><!-- wp:gutenberg/test-context-read-only /--><!-- /wp:gutenberg/test-context-level-1 -->',
+		);
+		$rendered_blocks = do_blocks( $args['post_content'] );
+		$expected        = '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-2" }\'><p data-wp-text=\'context.MyText\'>level-2</p></div><div data-wp-interactive=\'{"namespace": "gutenberg"}\'><p data-wp-text=\'context.MyText\'>level-1</p></div><p data-wp-text=\'context.MyText\'>level-1</p></div>';
 		$this->assertSame( $expected, $rendered_blocks );
 	}
 }
