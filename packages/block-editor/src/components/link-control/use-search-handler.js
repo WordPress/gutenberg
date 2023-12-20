@@ -120,7 +120,10 @@ export default function useSearchHandler(
 		},
 		[]
 	);
-	const { pageOnFront, pageForPosts } = usePageSettings();
+	// The function should either be undefined or a stable function reference
+	// throughout the editor lifetime, much like importing a function from a
+	// module. Maybe warn if this becomes a common pattern and it does change?
+	const { pageOnFront, pageForPosts } = usePageSettings?.() ?? {};
 
 	const directEntryHandler = allowDirectEntry
 		? handleDirectEntry
