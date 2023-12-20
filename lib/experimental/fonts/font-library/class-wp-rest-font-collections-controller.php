@@ -25,7 +25,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 	 *
 	 * @since 6.5.0
 	 */
-	public function __construct( ) {
+	public function __construct() {
 		$this->rest_base = 'font-collections';
 		$this->namespace = 'wp/v2';
 	}

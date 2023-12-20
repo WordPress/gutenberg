@@ -9,7 +9,7 @@
  * @since      6.5.0
  */
 
- if ( class_exists( 'WP_REST_Autosave_Font_Families_Controller' ) ) {
+if ( class_exists( 'WP_REST_Autosave_Font_Families_Controller' ) ) {
 	return;
 }
 
@@ -19,7 +19,7 @@
  * @since 6.5.0
  */
 class WP_REST_Autosave_Font_Families_Controller {
-	function register_routes () {
+	function register_routes() {
 		// disable autosave endpoints for font families
 	}
 }

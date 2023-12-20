@@ -22,14 +22,14 @@
 function gutenberg_init_font_library_routes() {
 	// @core-merge: This code will go into Core's `create_initial_post_types()`.
 	$args = array(
-		'supports' => array( 'title', 'editor' ),
-		'public'       => false,
-		'_builtin'     => true,  /* internal use only. don't use this when registering your own post type. */
-		'hierarchical' => false,
-		'label'        => 'Font Family',
-		'show_in_rest' => true,
-		'rest_base'    => 'font-families',
-		'rest_controller_class' => 'WP_REST_Font_Families_Controller',
+		'supports'                       => array( 'title', 'editor' ),
+		'public'                         => false,
+		'_builtin'                       => true,  /* internal use only. don't use this when registering your own post type. */
+		'hierarchical'                   => false,
+		'label'                          => 'Font Family',
+		'show_in_rest'                   => true,
+		'rest_base'                      => 'font-families',
+		'rest_controller_class'          => 'WP_REST_Font_Families_Controller',
 		'autosave_rest_controller_class' => 'WP_REST_Autosave_Font_Families_Controller',
 	);
 	register_post_type( 'wp_font_family', $args );

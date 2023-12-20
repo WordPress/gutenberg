@@ -25,7 +25,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	 *
 	 * @since 6.5.0
 	 */
-	public function __construct( ) {
+	public function __construct() {
 		$this->rest_base = 'font-families';
 		$this->namespace = 'wp/v2';
 		$this->post_type = 'wp_font_family';
@@ -44,7 +44,8 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => function () {return true;},
+					'permission_callback' => function () {
+						return true;},
 				),
 			)
 		);
