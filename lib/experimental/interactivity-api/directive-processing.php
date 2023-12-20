@@ -194,7 +194,7 @@ function gutenberg_process_interactive_block( $interactive_block, $context, $dir
 			$block_index               += 1;
 		}
 	}
-	return gutenberg_process_interactive_html( $content, $interactive_inner_blocks, $context, $directives );
+	return gutenberg_process_interactive_html( $content, $context, $directives, $interactive_inner_blocks );
 }
 
 /**
@@ -237,9 +237,9 @@ function gutenberg_process_non_interactive_block( $non_interactive_block, $conte
  * Processes interactive HTML by applying directives to the HTML tags.
  *
  * @param string $html The HTML to process.
- * @param array  $inner_blocks The inner blocks to process.
  * @param mixed  $context The context to use when processing.
  * @param array  $directives The directives to apply.
+ * @param array  $inner_blocks The inner blocks to process.
  *
  *  This function processes an HTML string by applying directives to the HTML tags.
  *  It uses the WP_Directive_Processor class to parse the HTML and apply the directives.
@@ -250,7 +250,7 @@ function gutenberg_process_non_interactive_block( $non_interactive_block, $conte
  *
  * @return string The processed HTML.
  */
-function gutenberg_process_interactive_html( $html, $inner_blocks, $context, $directives ) {
+function gutenberg_process_interactive_html( $html, $context, $directives, $inner_blocks = array() ) {
 	$tags                   = new WP_Directive_Processor( $html );
 	$prefix                 = 'data-wp-';
 	$tag_stack              = array();
