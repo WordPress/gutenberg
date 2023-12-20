@@ -14,7 +14,7 @@ if ( $gutenberg_experiments ) {
 	if ( array_key_exists( 'gutenberg-pattern-partial-syncing', $gutenberg_experiments ) ) {
 		require_once __DIR__ . '/sources/pattern.php';
 	}
-	if ( array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ) {
+	if ( array_key_exists( 'gutenberg-block-bindings', $gutenberg_experiments ) ) {
 		require_once __DIR__ . '/sources/post-meta.php';
 		require_once __DIR__ . '/sources/post-data.php';
 		require_once __DIR__ . '/sources/site-data.php';

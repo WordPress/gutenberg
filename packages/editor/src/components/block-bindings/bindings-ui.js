@@ -238,7 +238,7 @@ const BlockBindingsUI = ( props ) => {
 	);
 };
 
-if ( window.__experimentalConnections ) {
+if ( window.__experimentalBlockBindings ) {
 	addFilter(
 		'blocks.registerBlockType',
 		'core/block-bindings-ui',

@@ -80,7 +80,7 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 
 $gutenberg_experiments = get_option( 'gutenberg-experiments' );
 if ( $gutenberg_experiments && (
-	array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ||
+	array_key_exists( 'gutenberg-block-bindings', $gutenberg_experiments ) ||
 	array_key_exists( 'gutenberg-pattern-partial-syncing', $gutenberg_experiments )
 ) ) {
 

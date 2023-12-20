@@ -21,7 +21,7 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
  * @return {Object} Filtered block settings.
  */
 function addAttribute( settings ) {
-	if ( hasBlockSupport( settings, '__experimentalConnections', true ) ) {
+	if ( hasBlockSupport( settings, '__experimentalBlockBindings', true ) ) {
 		// Gracefully handle if settings.attributes.connections is undefined.
 		settings.attributes = {
 			...settings.attributes,
@@ -107,7 +107,7 @@ const withCustomFieldsControls = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		const hasCustomFieldsSupport = hasBlockSupport(
 			props.name,
-			'__experimentalConnections',
+			'__experimentalBlockBindings',
 			false
 		);
 
@@ -129,7 +129,7 @@ const withCustomFieldsControls = createHigherOrderComponent( ( BlockEdit ) => {
 }, 'withCustomFieldsControls' );
 
 if (
-	window.__experimentalConnections ||
+	window.__experimentalBlockBindings ||
 	window.__experimentalPatternPartialSyncing
 ) {
 	addFilter(
@@ -138,7 +138,7 @@ if (
 		addAttribute
 	);
 }
-if ( window.__experimentalConnections ) {
+if ( window.__experimentalBlockBindings ) {
 	addFilter(
 		'editor.BlockEdit',
 		'core/editor/connections/with-inspector-controls',

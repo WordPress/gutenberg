@@ -47,7 +47,7 @@ const SiteData = ( props ) => {
 	);
 };
 
-if ( window.__experimentalConnections ) {
+if ( window.__experimentalBlockBindings ) {
 	const withCoreSources = createHigherOrderComponent(
 		( BlockEdit ) => ( props ) => {
 			const { isSelected } = props;

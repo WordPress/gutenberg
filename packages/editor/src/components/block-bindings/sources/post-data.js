@@ -57,7 +57,7 @@ const PostData = ( props ) => {
 	);
 };
 
-if ( window.__experimentalConnections ) {
+if ( window.__experimentalBlockBindings ) {
 	// TODO: Read the context somehow to decide if we should add the source.
 
 	const withCoreSources = createHigherOrderComponent(

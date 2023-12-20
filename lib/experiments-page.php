@@ -127,14 +127,14 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-custom-fields',
-		__( 'Connections', 'gutenberg' ),
+		'gutenberg-block-bindings',
+		__( 'Block Bindings & Custom Fields', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test Connections', 'gutenberg' ),
-			'id'    => 'gutenberg-connections',
+			'label' => __( 'Test connecting block attributes to different sources like custom fields', 'gutenberg' ),
+			'id'    => 'gutenberg-block-bindings',
 		)
 	);
 
