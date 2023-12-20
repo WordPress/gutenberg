@@ -1,6 +1,6 @@
 <?php
 /**
- * Test WP_REST_Font_Library_Controller::get_font_collection().
+ * Test WP_REST_Font_Collections_Controller::get_font_collection().
  *
  * @package WordPress
  * @subpackage Font Library
@@ -8,10 +8,10 @@
  * @group fonts
  * @group font-library
  *
- * @covers WP_REST_Font_Library_Controller::get_font_collection
+ * @covers WP_REST_Font_Collections_Controller::get_font_collection
  */
 
-class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_Font_Library_Controller_UnitTestCase {
+class Tests_Fonts_WPRESTFontCollectionsController_GetFontCollection extends WP_REST_Font_Collections_Controller_UnitTestCase {
 
 	/**
 	 * Register mock collections.
@@ -90,7 +90,7 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_
 	}
 
 	public function test_get_font_collection_from_file() {
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/fonts/collections/one-collection' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-collections/one-collection' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
@@ -99,7 +99,7 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_
 	}
 
 	public function test_get_font_collection_from_url() {
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/fonts/collections/collection-with-url' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-collections/collection-with-url' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
@@ -107,19 +107,19 @@ class Tests_Fonts_WPRESTFontLibraryController_GetFontCollection extends WP_REST_
 	}
 
 	public function test_get_non_existing_collection_should_return_404() {
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/fonts/collections/non-existing-collection-id' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-collections/non-existing-collection-id' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertSame( 404, $response->get_status() );
 	}
 
 	public function test_get_non_existing_file_should_return_500() {
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/fonts/collections/collection-with-non-existing-file' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-collections/collection-with-non-existing-file' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertSame( 500, $response->get_status() );
 	}
 
 	public function test_get_non_existing_url_should_return_500() {
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/fonts/collections/collection-with-non-existing-url' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-collections/collection-with-non-existing-url' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertSame( 500, $response->get_status() );
 	}
