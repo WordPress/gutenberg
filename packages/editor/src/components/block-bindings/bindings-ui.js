@@ -20,7 +20,7 @@ import {
 } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 
-const blockBindingsWhitelist = {
+const blockBindingsAllowedBlocks = {
 	'core/paragraph': [ 'content' ],
 	'core/heading': [ 'content' ],
 	'core/image': [ 'url', 'title' ],
@@ -93,7 +93,7 @@ function AttributesLayer( props ) {
 	const [ activeSource, setIsActiveSource ] = useState( false );
 	return (
 		<MenuGroup>
-			{ blockBindingsWhitelist[ props.name ].map( ( attribute ) => (
+			{ blockBindingsAllowedBlocks[ props.name ].map( ( attribute ) => (
 				<div
 					key={ attribute }
 					className="block-bindings-attribute-picker-container"
@@ -239,7 +239,7 @@ if ( window.__experimentalBlockBindings ) {
 		'blocks.registerBlockType',
 		'core/block-bindings-ui',
 		( settings, name ) => {
-			if ( ! ( name in blockBindingsWhitelist ) ) {
+			if ( ! ( name in blockBindingsAllowedBlocks ) ) {
 				return settings;
 			}
 
