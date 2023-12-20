@@ -64,6 +64,9 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 					) : null }
 				</Button>
 			}
+			style={ {
+				minWidth: '230px',
+			} }
 		>
 			<WithSeparators>
 				<DropdownMenuGroup>
@@ -100,6 +103,9 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 										</DropdownMenuItemLabel>
 									</DropdownMenuItem>
 								}
+								style={ {
+									minWidth: '200px',
+								} }
 							>
 								<WithSeparators>
 									<DropdownMenuGroup>

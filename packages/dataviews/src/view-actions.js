@@ -212,6 +212,9 @@ function SortMenu( { fields, view, onChangeView } ) {
 							</DropdownMenuItem>
 						}
 						placement="left-start"
+						style={ {
+							minWidth: '220px',
+						} }
 					>
 						{ Object.entries( sortingItemsInfo ).map(
 							( [ direction, info ] ) => {

@@ -92,6 +92,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 					) }
 				</Button>
 			}
+			style={ { minWidth: '240px' } }
 		>
 			<WithSeparators>
 				{ isSortable && (
