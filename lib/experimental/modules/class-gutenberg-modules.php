@@ -131,7 +131,7 @@ class Gutenberg_Modules {
 	 * Prints the the static dependencies of the enqueued modules using link tags
 	 * with rel="modulepreload" attributes.
 	 */
-	public static function print_preloaded_modules() {
+	public static function print_module_preloads() {
 		foreach ( self::get_dependencies( array_keys( self::get_enqueued() ), array( 'static' ) ) as $module_identifier => $module ) {
 			if ( true !== $module['enqueued'] ) {
 				echo sprintf(
@@ -269,7 +269,7 @@ add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_import_map' ) );
 add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_enqueued_modules' ) );
 
 // Prints the preloaded modules in the head tag.
-add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_preloaded_modules' ) );
+add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_module_preloads' ) );
 
 // Prints the script that loads the import map polyfill in the footer.
 add_action( 'wp_footer', array( 'Gutenberg_Modules', 'print_import_map_polyfill' ), 11 );
