@@ -1,18 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, Platform } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 /**
  * Hook to scroll to a specified element by taking into account the Keyboard
  * and the Header.
  *
- * @param {RefObject} scrollViewRef   ScrollView reference.
+ * @param {RefObject} nativeScrollRef Native scroll reference.
  * @param {Function}  scrollToSection Function to scroll.
  * @return {Function[]} Function to scroll to an element.
  */
-export default function useScrollToElement( scrollViewRef, scrollToSection ) {
+export default function useScrollToElement( nativeScrollRef, scrollToSection ) {
 	/**
 	 * Function to scroll to an element.
 	 *
@@ -20,16 +20,12 @@ export default function useScrollToElement( scrollViewRef, scrollToSection ) {
 	 */
 	const scrollToElement = useCallback(
 		( elementRef ) => {
-			const scrollRef = Platform.isAndroid
-				? scrollViewRef.current?.getNativeScrollRef()
-				: scrollViewRef.current;
-
-			if ( ! scrollRef || ! elementRef ) {
+			if ( ! nativeScrollRef || ! elementRef ) {
 				return;
 			}
 
 			elementRef.current.measureLayout(
-				scrollRef,
+				nativeScrollRef,
 				( _x, y, _width, height ) => {
 					if ( height || y ) {
 						scrollToSection( Math.round( y ), height );
@@ -38,7 +34,7 @@ export default function useScrollToElement( scrollViewRef, scrollToSection ) {
 				() => {}
 			);
 		},
-		[ scrollViewRef, scrollToSection ]
+		[ nativeScrollRef, scrollToSection ]
 	);
 
 	return [ scrollToElement ];

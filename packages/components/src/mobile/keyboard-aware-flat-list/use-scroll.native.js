@@ -11,7 +11,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useRef, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,6 +28,9 @@ export default function useScroll( {
 	extraScrollHeight,
 } ) {
 	const scrollViewRef = useRef();
+	const nativeScrollRef = Platform.isAndroid
+		? scrollViewRef.current?.getNativeScrollRef()
+		: scrollViewRef.current;
 	const scrollViewMeasurements = useRef();
 	const scrollViewYOffset = useSharedValue( -1 );
 
@@ -58,23 +61,21 @@ export default function useScroll( {
 		keyboardOffset,
 		scrollEnabled,
 		scrollViewMeasurements,
-		scrollViewRef,
+		nativeScrollRef,
 		scrollViewYOffset
 	);
 	const [ scrollToElement ] = useScrollToElement(
-		scrollViewRef,
+		nativeScrollRef,
 		scrollToSection
 	);
 
 	const measureScrollView = useCallback( () => {
-		if ( scrollViewRef.current ) {
-			const scrollRef = scrollViewRef.current.getNativeScrollRef();
-
-			scrollRef.measureInWindow( ( _x, y, width, height ) => {
+		if ( nativeScrollRef ) {
+			nativeScrollRef.measureInWindow( ( _x, y, width, height ) => {
 				scrollViewMeasurements.current = { y, width, height };
 			} );
 		}
-	}, [] );
+	}, [ nativeScrollRef ] );
 
 	const onContentSizeChange = useCallback( () => {
 		if ( onSizeChange ) {

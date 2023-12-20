@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 /**
  * WordPress dependencies
  */
-import { useCallback, Platform } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 /** @typedef {import('react-native-reanimated').SharedValue} SharedValue */
@@ -18,7 +18,7 @@ import { useCallback, Platform } from '@wordpress/element';
  * @param {number}      keyboardOffset         Keyboard space offset.
  * @param {boolean}     scrollEnabled          Whether the scroll is enabled or not.
  * @param {RefObject}   scrollViewMeasurements ScrollView Layout measurements.
- * @param {RefObject}   scrollViewRef          ScrollView reference.
+ * @param {RefObject}   nativeScrollRef        Native scroll reference.
  * @param {SharedValue} scrollViewYOffset      Current offset position of the ScrollView.
  * @return {Function[]} Function to scroll to a section.
  */
@@ -27,7 +27,7 @@ export default function useScrollToSection(
 	keyboardOffset,
 	scrollEnabled,
 	scrollViewMeasurements,
-	scrollViewRef,
+	nativeScrollRef,
 	scrollViewYOffset
 ) {
 	const { top, bottom } = useSafeAreaInsets();
@@ -42,11 +42,11 @@ export default function useScrollToSection(
 	 */
 	const scrollToSection = useCallback(
 		( sectionY, sectionHeight ) => {
-			const scrollRef = Platform.isAndroid
-				? scrollViewRef.current?.getNativeScrollRef()
-				: scrollViewRef.current;
-
-			if ( ! scrollRef || ! scrollEnabled || ! scrollViewMeasurements ) {
+			if (
+				! nativeScrollRef ||
+				! scrollEnabled ||
+				! scrollViewMeasurements
+			) {
 				return;
 			}
 
@@ -57,7 +57,7 @@ export default function useScrollToSection(
 
 			// Scroll to the top of the section.
 			if ( sectionY < currentScrollViewYOffset ) {
-				scrollRef.scrollTo( {
+				nativeScrollRef.scrollTo( {
 					y: sectionY,
 					animated: true,
 				} );
@@ -79,7 +79,7 @@ export default function useScrollToSection(
 
 			// Scroll to the bottom of the section.
 			if ( sectionY > maxOffset && ! isAtTheTop ) {
-				scrollRef.scrollTo( {
+				nativeScrollRef.scrollTo( {
 					y: sectionY - availableScreenSpace,
 					animated: true,
 				} );
@@ -91,7 +91,7 @@ export default function useScrollToSection(
 			keyboardOffset,
 			scrollEnabled,
 			scrollViewMeasurements,
-			scrollViewRef,
+			nativeScrollRef,
 			scrollViewYOffset,
 		]
 	);
