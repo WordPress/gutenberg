@@ -272,8 +272,38 @@
 	{
 		"title": "Curating the Editor Experience",
 		"slug": "curating-the-editor-experience",
-		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience.md",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/README.md",
 		"parent": "how-to-guides"
+	},
+	{
+		"title": "Block Locking API",
+		"slug": "block-locking",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/block-locking.md",
+		"parent": "curating-the-editor-experience"
+	},
+	{
+		"title": "Patterns",
+		"slug": "patterns",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/patterns.md",
+		"parent": "curating-the-editor-experience"
+	},
+	{
+		"title": "theme.json",
+		"slug": "theme-json",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/theme-json.md",
+		"parent": "curating-the-editor-experience"
+	},
+	{
+		"title": "Filters and hooks",
+		"slug": "filters-and-hooks",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/filters-and-hooks.md",
+		"parent": "curating-the-editor-experience"
+	},
+	{
+		"title": "DisableEditorFunctionality",
+		"slug": "disable-editor-functionality",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/disable-editor-functionality.md",
+		"parent": "curating-the-editor-experience"
 	},
 	{
 		"title": "Enqueueing assets in the Editor",
