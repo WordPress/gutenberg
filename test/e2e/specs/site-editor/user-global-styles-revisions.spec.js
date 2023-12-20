@@ -145,6 +145,50 @@ test.describe( 'Global styles revisions', () => {
 			page.getByLabel( 'Global styles revisions list' )
 		).toBeVisible();
 	} );
+
+	test( 'should allow switching to style book view', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.locator( 'body' ).click();
+		await userGlobalStylesRevisions.openStylesPanel();
+		const revisionsButton = page.getByRole( 'button', {
+			name: 'Revisions',
+		} );
+		const styleBookButton = page.getByRole( 'button', {
+			name: 'Style Book',
+		} );
+		await revisionsButton.click();
+		// We can see the Revisions list.
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeVisible();
+		await expect(
+			page.locator( 'iframe[name="revisions"]' )
+		).toBeVisible();
+		await expect(
+			page.locator( 'iframe[name="style-book-canvas"]' )
+		).toBeHidden();
+		await styleBookButton.click();
+		await expect(
+			page.locator( 'iframe[name="style-book-canvas"]' )
+		).toBeVisible();
+		await expect( page.locator( 'iframe[name="revisions"]' ) ).toBeHidden();
+
+		// Deactivating revisions view while the style book is open should close revisions,
+		// but not the style book.
+		await revisionsButton.click();
+
+		// Style book is still visible but...
+		await expect(
+			page.locator( 'iframe[name="style-book-canvas"]' )
+		).toBeVisible();
+		// The Revisions list is hidden.
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeHidden();
+	} );
 } );
 
 class UserGlobalStylesRevisions {
