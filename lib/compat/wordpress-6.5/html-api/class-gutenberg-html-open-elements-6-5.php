@@ -106,6 +106,7 @@ class Gutenberg_HTML_Open_Elements_6_5 {
 	 *
 	 * @see https://html.spec.whatwg.org/#has-an-element-in-the-specific-scope
 	 *
+	 * @param string   $tag_name         Name of tag check.
 	 * @param string[] $termination_list List of elements that terminate the search.
 	 * @return bool Whether the element was found in a specific scope.
 	 */
