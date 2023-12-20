@@ -88,7 +88,6 @@ if ( $gutenberg_experiments && (
 ) ) {
 
 	require_once __DIR__ . '/block-bindings/index.php';
-		// Allowed blocks that support block bindings.
 	// TODO: Look for a mechanism to opt-in for this. Maybe adding a property to block attributes?
 	global $block_bindings_allowed_blocks;
 	$block_bindings_allowed_blocks = array(
@@ -127,7 +126,15 @@ if ( $gutenberg_experiments && (
 			//     }
 			//   }
 			// }
-			//
+			// },
+			// "url": {
+			// "source": {
+			// "name": "post_meta",
+			// "attributes": { "value": "text_custom_field" }
+			// }
+			// }
+			// },
+			// .
 			global $block_bindings_allowed_blocks;
 			global $block_bindings_sources;
 			$modified_block_content = $block_content;
