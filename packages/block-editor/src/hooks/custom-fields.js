@@ -20,7 +20,7 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
  * @return {Object} Filtered block settings.
  */
 function addAttribute( settings ) {
-	if ( hasBlockSupport( settings, '__experimentalConnections', true ) ) {
+	if ( hasBlockSupport( settings, '__experimentalBlockBindings', true ) ) {
 		// Gracefully handle if settings.attributes.connections is undefined.
 		settings.attributes = {
 			...settings.attributes,
@@ -95,7 +95,7 @@ export default {
 	attributeKeys: [ 'connections' ],
 	hasSupport( name ) {
 		return (
-			hasBlockSupport( name, '__experimentalConnections', false ) &&
+			hasBlockSupport( name, '__experimentalBlockBindings', false ) &&
 			// Check if the current block is a paragraph or image block.
 			// Currently, only these two blocks are supported.
 			[ 'core/paragraph', 'core/image' ].includes( name )
@@ -104,7 +104,7 @@ export default {
 };
 
 if (
-	window.__experimentalConnections ||
+	window.__experimentalBlockBindings ||
 	window.__experimentalPatternPartialSyncing
 ) {
 	addFilter(

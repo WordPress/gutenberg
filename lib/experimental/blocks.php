@@ -83,7 +83,7 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 
 $gutenberg_experiments = get_option( 'gutenberg-experiments' );
 if ( $gutenberg_experiments && (
-	array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ||
+	array_key_exists( 'gutenberg-block-bindings', $gutenberg_experiments ) ||
 	array_key_exists( 'gutenberg-pattern-partial-syncing', $gutenberg_experiments )
 ) ) {
 	/**
@@ -118,7 +118,7 @@ if ( $gutenberg_experiments && (
 		}
 
 		// If the block does not have support for block connections, skip it.
-		if ( ! block_has_support( $block_type, array( '__experimentalConnections' ), false ) ) {
+		if ( ! block_has_support( $block_type, array( '__experimentalBlockBindings' ), false ) ) {
 			return $block_content;
 		}
 

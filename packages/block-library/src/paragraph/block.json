@@ -41,7 +41,7 @@
 				"text": true
 			}
 		},
-		"__experimentalConnections": true,
+		"__experimentalBlockBindings": true,
 		"spacing": {
 			"margin": true,
 			"padding": true,
