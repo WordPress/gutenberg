@@ -107,12 +107,12 @@ function HeaderMenu( { field, view, onChangeView } ) {
 										name={ `view-table-sort-${ field.id }` }
 										value={ direction }
 										checked={ isChecked }
-										onClick={ () => {
+										onChange={ ( e ) => {
 											onChangeView( {
 												...view,
 												sort: {
 													field: field.id,
-													direction,
+													direction: e.target.value,
 												},
 											} );
 										} }
@@ -250,7 +250,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 														activeOperator ===
 														operator
 													}
-													onClick={ () =>
+													onChange={ ( e ) =>
 														onChangeView( {
 															...view,
 															page: 1,
@@ -258,7 +258,9 @@ function HeaderMenu( { field, view, onChangeView } ) {
 																...otherFilters,
 																{
 																	field: filter.field,
-																	operator,
+																	operator:
+																		e.target
+																			.value,
 																	value: filterInView?.value,
 																},
 															],

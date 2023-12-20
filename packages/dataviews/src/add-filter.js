@@ -184,7 +184,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 															activeOperator ===
 															operator
 														}
-														onChange={ () => {
+														onChange={ ( e ) => {
 															onChangeView( {
 																...view,
 																page: 1,
@@ -192,7 +192,10 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 																	...otherFilters,
 																	{
 																		field: filter.field,
-																		operator,
+																		operator:
+																			e
+																				.target
+																				.value,
 																		value: filterInView?.value,
 																	},
 																],

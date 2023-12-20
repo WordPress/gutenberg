@@ -55,10 +55,10 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 						value={ availableView.type }
 						name="view-actions-available-view"
 						checked={ availableView.type === view.type }
-						onChange={ () => {
+						onChange={ ( e ) => {
 							onChangeView( {
 								...view,
-								type: availableView.type,
+								type: e.target.value,
 							} );
 						} }
 					>
@@ -96,8 +96,12 @@ function PageSizeMenu( { view, onChangeView } ) {
 						value={ size }
 						name="view-actions-page-size"
 						checked={ view.perPage === size }
-						onChange={ () => {
-							onChangeView( { ...view, perPage: size, page: 1 } );
+						onChange={ ( e ) => {
+							onChangeView( {
+								...view,
+								perPage: e.target.value,
+								page: 1,
+							} );
 						} }
 					>
 						<DropdownMenuItemLabel>{
@@ -222,12 +226,12 @@ function SortMenu( { fields, view, onChangeView } ) {
 										value={ direction }
 										name={ `view-actions-sorting-${ field.id }` }
 										checked={ isChecked }
-										onChange={ () => {
+										onChange={ ( e ) => {
 											onChangeView( {
 												...view,
 												sort: {
 													field: field.id,
-													direction,
+													direction: e.target.value,
 												},
 											} );
 										} }
