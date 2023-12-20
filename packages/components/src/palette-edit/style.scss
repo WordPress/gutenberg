@@ -8,5 +8,6 @@
 	}
 }
 .components-palette-edit__item-column {
-	min-height: $grid-unit-20;
+	// Height of PaletteItem component input + padding.
+	min-height: $grid-unit-30 + 6;
 }
