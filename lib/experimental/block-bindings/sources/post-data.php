@@ -19,7 +19,7 @@ if ( function_exists( 'register_block_bindings_source' ) ) {
 	register_block_bindings_source(
 		'post_data',
 		array(
-			'label' => __( 'Post Data' ),
+			'label' => __( 'Post Data', 'gutenberg' ),
 			'apply' => $post_data_source_callback,
 		)
 	);
