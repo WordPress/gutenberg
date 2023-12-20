@@ -72,6 +72,7 @@ function gutenberg_register_taxonomy_patterns() {
 		'show_in_nav_menus'  => false,
 		'show_in_rest'       => true,
 		'show_admin_column'  => true,
+		'show_tagcloud'      => false,
 	);
 	register_taxonomy( 'wp_pattern_category', array( 'wp_block' ), $args );
 }
