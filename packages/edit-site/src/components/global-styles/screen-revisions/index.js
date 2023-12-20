@@ -26,6 +26,7 @@ import SidebarFixedBottom from '../../sidebar-edit-mode/sidebar-fixed-bottom';
 import { store as editSiteStore } from '../../../store';
 import useGlobalStylesRevisions from './use-global-styles-revisions';
 import RevisionsButtons from './revisions-buttons';
+import StyleBook from '../../style-book';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
@@ -104,7 +105,10 @@ function ScreenRevisions() {
 	};
 
 	useEffect( () => {
-		if ( editorCanvasContainerView !== 'global-styles-revisions' ) {
+		if (
+			! editorCanvasContainerView ||
+			! editorCanvasContainerView.startsWith( 'global-styles-revisions' )
+		) {
 			goTo( '/' ); // Return to global styles main panel.
 			setEditorCanvasContainerView( editorCanvasContainerView );
 		}
@@ -156,13 +160,26 @@ function ScreenRevisions() {
 			{ isLoading && (
 				<Spinner className="edit-site-global-styles-screen-revisions__loading" />
 			) }
+			{ editorCanvasContainerView ===
+			'global-styles-revisions:style-book' ? (
+				<StyleBook
+					userConfig={ currentlySelectedRevision }
+					isSelected={ () => {} }
+					onClose={ () => {
+						setEditorCanvasContainerView(
+							'global-styles-revisions'
+						);
+					} }
+				/>
+			) : (
+				<Revisions
+					blocks={ blocks }
+					userConfig={ currentlySelectedRevision }
+					closeButtonLabel={ __( 'Close revisions' ) }
+				/>
+			) }
 			{ shouldShowRevisions && (
 				<>
-					<Revisions
-						blocks={ blocks }
-						userConfig={ currentlySelectedRevision }
-						onClose={ onCloseRevisions }
-					/>
 					<div className="edit-site-global-styles-screen-revisions">
 						<RevisionsButtons
 							onChange={ selectRevision }
