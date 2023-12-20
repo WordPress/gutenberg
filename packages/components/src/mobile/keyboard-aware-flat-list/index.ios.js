@@ -2,11 +2,8 @@
  * External dependencies
  */
 
-import { ScrollView, FlatList, useWindowDimensions } from 'react-native';
-import Animated, {
-	useAnimatedScrollHandler,
-	useSharedValue,
-} from 'react-native-reanimated';
+import { ScrollView, FlatList } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 /**
  * WordPress dependencies
@@ -14,7 +11,6 @@ import Animated, {
 import {
 	useCallback,
 	useEffect,
-	useRef,
 	forwardRef,
 	useImperativeHandle,
 } from '@wordpress/element';
@@ -23,11 +19,9 @@ import { useThrottle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import useScroll from './use-scroll';
 import useTextInputOffset from './use-text-input-offset';
-import useKeyboardOffset from './use-keyboard-offset';
 import useTextInputCaretPosition from './use-text-input-caret-position';
-import useScrollToSection from './use-scroll-to-section';
-import useScrollToElement from './use-scroll-to-element';
 
 const DEFAULT_FONT_SIZE = 16;
 const AnimatedScrollView = Animated.createAnimatedComponent( ScrollView );
@@ -58,36 +52,24 @@ export const KeyboardAwareFlatList = (
 	},
 	ref
 ) => {
-	const scrollViewRef = useRef();
-	const scrollViewMeasurements = useRef();
-	const scrollViewYOffset = useSharedValue( -1 );
-
-	const { height: windowHeight, width: windowWidth } = useWindowDimensions();
-	const isLandscape = windowWidth >= windowHeight;
-
-	const [ keyboardOffset ] = useKeyboardOffset(
+	const {
+		scrollViewRef,
+		scrollHandler,
+		keyboardOffset,
+		scrollToSection,
+		scrollToElement,
+		onContentSizeChange,
+	} = useScroll( {
 		scrollEnabled,
-		shouldPreventAutomaticScroll
-	);
-
-	const [ currentCaretData ] = useTextInputCaretPosition( scrollEnabled );
+		shouldPreventAutomaticScroll,
+		extraScrollHeight,
+		onScroll,
+		onSizeChange,
+	} );
 
 	const [ getTextInputOffset ] = useTextInputOffset(
 		scrollEnabled,
 		scrollViewRef
-	);
-
-	const [ scrollToSection ] = useScrollToSection(
-		extraScrollHeight,
-		keyboardOffset,
-		scrollEnabled,
-		scrollViewMeasurements,
-		scrollViewRef,
-		scrollViewYOffset
-	);
-	const [ scrollToElement ] = useScrollToElement(
-		scrollViewRef,
-		scrollToSection
 	);
 
 	const onScrollToTextInput = useThrottle(
@@ -107,42 +89,16 @@ export const KeyboardAwareFlatList = (
 		{ leading: false }
 	);
 
+	const [ currentCaretData ] = useTextInputCaretPosition( scrollEnabled );
+
+	const onSizeChange = useCallback(
+		() => onScrollToTextInput( currentCaretData ),
+		[ currentCaretData, onScrollToTextInput ]
+	);
+
 	useEffect( () => {
 		onScrollToTextInput( currentCaretData );
 	}, [ currentCaretData, onScrollToTextInput ] );
-
-	// When the orientation changes, the ScrollView measurements
-	// need to be re-calculated.
-	useEffect( () => {
-		scrollViewMeasurements.current = null;
-	}, [ isLandscape ] );
-
-	const scrollHandler = useAnimatedScrollHandler( {
-		onScroll: ( event ) => {
-			const { contentOffset } = event;
-			scrollViewYOffset.value = contentOffset.y;
-			onScroll( event );
-		},
-	} );
-
-	const measureScrollView = useCallback( () => {
-		if ( scrollViewRef.current ) {
-			const scrollRef = scrollViewRef.current.getNativeScrollRef();
-
-			scrollRef.measureInWindow( ( _x, y, width, height ) => {
-				scrollViewMeasurements.current = { y, width, height };
-			} );
-		}
-	}, [] );
-
-	const onContentSizeChange = useCallback( () => {
-		onScrollToTextInput( currentCaretData );
-
-		// Sets the first values when the content size changes.
-		if ( ! scrollViewMeasurements.current ) {
-			measureScrollView();
-		}
-	}, [ measureScrollView, onScrollToTextInput, currentCaretData ] );
 
 	// Adds content insets when the keyboard is opened to have
 	// extra padding at the bottom.
