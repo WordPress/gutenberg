@@ -429,6 +429,17 @@ export function getColorsAndGradients(
 	};
 }
 
+function isColorTextReadable( globalStyles ) {
+	const colordTextColor = colord( globalStyles?.color?.text );
+	const colordBackgroundColor = colord( globalStyles?.color?.background );
+	const isColordTextReadable =
+		colordTextColor?.parsed &&
+		colordBackgroundColor?.parsed &&
+		colordTextColor.isReadable( colordBackgroundColor );
+
+	return isColordTextReadable;
+}
+
 export function getGlobalStyles( rawStyles, rawFeatures ) {
 	const features = rawFeatures ? JSON.parse( rawFeatures ) : {};
 	const mappedValues = getMappedValues( features, features?.color?.palette );
@@ -451,6 +462,7 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 	);
 
 	const fontSizes = normalizeFontSizes( features?.typography?.fontSizes );
+	const shouldEnableGlobalStyles = isColorTextReadable( globalStyles );
 
 	return {
 		__experimentalFeatures: {
@@ -468,7 +480,9 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 			},
 			spacing: features?.spacing,
 		},
-		__experimentalGlobalStylesBaseStyles: globalStyles,
+		...( shouldEnableGlobalStyles
+			? { __experimentalGlobalStylesBaseStyles: globalStyles }
+			: {} ),
 	};
 }
 
