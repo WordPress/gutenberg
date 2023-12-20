@@ -101,7 +101,8 @@
 }
 
 .edit-site-sidebar-fixed-bottom-slot {
-	position: sticky;
+	position: absolute;
+	min-width: 100%;
 	bottom: 0;
 	background: $white;
 	padding: $grid-unit-15;

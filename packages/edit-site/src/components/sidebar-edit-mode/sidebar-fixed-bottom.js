@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
@@ -13,10 +18,15 @@ const SIDEBAR_FIXED_BOTTOM_SLOT_FILL_NAME = 'SidebarFixedBottom';
 const { Slot: SidebarFixedBottomSlot, Fill: SidebarFixedBottomFill } =
 	createPrivateSlotFill( SIDEBAR_FIXED_BOTTOM_SLOT_FILL_NAME );
 
-export default function SidebarFixedBottom( { children } ) {
+export default function SidebarFixedBottom( { className, children } ) {
 	return (
 		<SidebarFixedBottomFill>
-			<div className="edit-site-sidebar-fixed-bottom-slot">
+			<div
+				className={ classnames(
+					'edit-site-sidebar-fixed-bottom-slot',
+					className
+				) }
+			>
 				{ children }
 			</div>
 		</SidebarFixedBottomFill>

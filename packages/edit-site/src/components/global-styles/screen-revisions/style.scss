@@ -1,6 +1,7 @@
 
 .edit-site-global-styles-screen-revisions {
 	margin: 0 $grid-unit-20 $grid-unit-20 $grid-unit-20;
+	padding-bottom: $grid-unit-60;
 }
 
 .edit-site-global-styles-screen-revisions__revisions-list {
@@ -181,3 +182,6 @@
 	}
 }
 
+.edit-site-global-styles-screen-revisions__footer {
+	height: $grid-unit-60;
+}
