@@ -22,6 +22,8 @@
 		<properties>
 			<property name="allowUnusedParametersBeforeUsed" value="true"/>
 		</properties>
+		<!-- Exclude the html-api folder to prevent linter errors until coding standards are aligned. -->
+		<exclude-pattern>./lib/compat/wordpress-*/html-api/*.php</exclude-pattern>
 	</rule>
 
 	<rule ref="PEAR.Functions.FunctionCallSignature">
