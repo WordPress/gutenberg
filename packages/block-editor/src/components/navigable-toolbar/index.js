@@ -26,7 +26,11 @@ function hasOnlyToolbarItem( elements ) {
 }
 
 function getAllToolbarItemsIn( container ) {
-	return Array.from( container.querySelectorAll( '[data-toolbar-item]' ) );
+	return Array.from(
+		container.querySelectorAll(
+			'[data-toolbar-item]:not([disabled]):not([aria-disabled="true"])'
+		)
+	);
 }
 
 function hasFocusWithin( container ) {
