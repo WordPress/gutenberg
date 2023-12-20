@@ -14,7 +14,7 @@ import {
 	__experimentalVStack as VStack,
 	VisuallyHidden,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -375,6 +375,22 @@ export default function DataviewsTemplates() {
 					deferredRendering={
 						! view.hiddenFields?.includes( 'preview' )
 					}
+					labels={ {
+						getSelectLabel: ( item ) => {
+							return sprintf(
+								// translators: %s: The title of the template.
+								__( 'Select template: %s' ),
+								item.title?.rendered || item.slug
+							);
+						},
+						getDeselectLabel: ( item ) => {
+							return sprintf(
+								// translators: %s: The title of the template.
+								__( 'Deselect template: %s' ),
+								item.title?.rendered || item.slug
+							);
+						},
+					} }
 				/>
 			</Page>
 			{ view.type === LAYOUT_LIST && (

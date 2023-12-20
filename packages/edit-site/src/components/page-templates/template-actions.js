@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { backup, trash } from '@wordpress/icons';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
@@ -36,21 +36,40 @@ export function useResetTemplateAction() {
 			isPrimary: true,
 			icon: backup,
 			isEligible: isTemplateRevertable,
-			async callback( template ) {
+			supportsBulk: true,
+			async callback( templates ) {
 				try {
-					await revertTemplate( template, { allowUndo: false } );
-					await saveEditedEntityRecord(
-						'postType',
-						template.type,
-						template.id
+					await Promise.all(
+						templates.map( ( template ) => {
+							return revertTemplate( template, {
+								allowUndo: false,
+							} );
+						} )
+					);
+					await Promise.all(
+						templates.map( ( template ) => {
+							return saveEditedEntityRecord(
+								'postType',
+								template.type,
+								template.id
+							);
+						} )
 					);
 
 					createSuccessNotice(
-						sprintf(
-							/* translators: The template/part's name. */
-							__( '"%s" reverted.' ),
-							decodeEntities( template.title.rendered )
-						),
+						templates.length > 1
+							? sprintf(
+									/* translators: The number of items. */
+									__( '%s items reverted.' ),
+									decodeEntities( templates.length )
+							  )
+							: sprintf(
+									/* translators: The template/part's name. */
+									__( '"%s" reverted.' ),
+									decodeEntities(
+										templates[ 0 ].title.rendered
+									)
+							  ),
 						{
 							type: 'snackbar',
 							id: 'edit-site-template-reverted',
@@ -58,12 +77,16 @@ export function useResetTemplateAction() {
 					);
 				} catch ( error ) {
 					const fallbackErrorMessage =
-						template.type === TEMPLATE_POST_TYPE
-							? __(
-									'An error occurred while reverting the template.'
+						templates[ 0 ].type === TEMPLATE_POST_TYPE
+							? _n(
+									'An error occurred while reverting the template.',
+									'An error occurred while reverting the templates.',
+									templates.length
 							  )
-							: __(
-									'An error occurred while reverting the template part.'
+							: _n(
+									'An error occurred while reverting the template part.',
+									'An error occurred while reverting the template parts.',
+									templates.length
 							  );
 					const errorMessage =
 						error.message && error.code !== 'unknown_error'
@@ -89,17 +112,31 @@ export const deleteTemplateAction = {
 	isPrimary: true,
 	icon: trash,
 	isEligible: isTemplateRemovable,
+	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { item: template, closeModal } ) => {
+	RenderModal: ( { items: templates, closeModal } ) => {
 		const { removeTemplate } = useDispatch( editSiteStore );
+		const { createSuccessNotice, createErrorNotice } =
+			useDispatch( noticesStore );
+		const { deleteEntityRecord } = useDispatch( coreStore );
 		return (
 			<VStack spacing="5">
 				<Text>
-					{ sprintf(
-						// translators: %s: The template or template part's title.
-						__( 'Are you sure you want to delete "%s"?' ),
-						decodeEntities( template.title.rendered )
-					) }
+					{ templates.length > 1
+						? sprintf(
+								// translators: %s: The template or template part's title.
+								__(
+									'Are you sure you want to delete %s items?'
+								),
+								decodeEntities( templates.length )
+						  )
+						: sprintf(
+								// translators: %s: The template or template part's title.
+								__( 'Are you sure you want to delete "%s"?' ),
+								decodeEntities(
+									templates && templates[ 0 ]?.title?.rendered
+								)
+						  ) }
 				</Text>
 				<HStack justify="right">
 					<Button variant="tertiary" onClick={ closeModal }>
@@ -107,11 +144,49 @@ export const deleteTemplateAction = {
 					</Button>
 					<Button
 						variant="primary"
-						onClick={ () =>
-							removeTemplate( template, {
-								allowUndo: false,
-							} )
-						}
+						onClick={ async () => {
+							if ( templates.length > 1 ) {
+								try {
+									await Promise.all(
+										templates.map( ( template ) => {
+											return deleteEntityRecord(
+												'postType',
+												template.type,
+												template.id,
+												{ force: true },
+												{ throwOnError: true }
+											);
+										} )
+									);
+									createSuccessNotice(
+										__(
+											'The selected items were deleted with success.'
+										),
+										{
+											type: 'snackbar',
+											id: 'edit-site-page-trashed',
+										}
+									);
+								} catch ( error ) {
+									const errorMessage =
+										error.message &&
+										error.code !== 'unknown_error'
+											? error.message
+											: __(
+													'An error occurred while deleting the items.'
+											  );
+
+									createErrorNotice( errorMessage, {
+										type: 'snackbar',
+									} );
+								}
+							} else {
+								await removeTemplate( templates[ 0 ], {
+									allowUndo: false,
+								} );
+							}
+							closeModal();
+						} }
 					>
 						{ __( 'Delete' ) }
 					</Button>
@@ -126,7 +201,8 @@ export const renameTemplateAction = {
 	label: __( 'Rename' ),
 	isEligible: ( template ) =>
 		isTemplateRemovable( template ) && template.is_custom,
-	RenderModal: ( { item: template, closeModal } ) => {
+	RenderModal: ( { items: templates, closeModal } ) => {
+		const template = templates[ 0 ];
 		const title = decodeEntities( template.title.rendered );
 		const [ editedTitle, setEditedTitle ] = useState( title );
 		const {

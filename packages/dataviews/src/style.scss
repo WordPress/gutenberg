@@ -373,6 +373,30 @@
 	padding: 0 $grid-unit-40;
 }
 
+.dataviews-table-selection-checkbox label {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+.dataviews-table-selection-checkbox label {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
 .dataviews-filters__custom-menu-radio-item-prefix {
 	display: block;
 	width: 24px;

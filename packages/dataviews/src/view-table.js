@@ -13,6 +13,7 @@ import {
 	Button,
 	Icon,
 	privateApis as componentsPrivateApis,
+	CheckboxControl,
 } from '@wordpress/components';
 import {
 	Children,
@@ -306,6 +307,77 @@ function WithSeparators( { children } ) {
 		) );
 }
 
+function BulkSelectionCheckbox( { selection, onSelectionChange, data } ) {
+	const areAllSelected = selection && selection.length === data.length;
+	return (
+		<CheckboxControl
+			className="dataviews-table-selection-checkbox"
+			__nextHasNoMarginBottom
+			checked={ areAllSelected }
+			indeterminate={ ! areAllSelected && selection.length }
+			onChange={ () => {
+				if ( areAllSelected ) {
+					onSelectionChange( [] );
+				} else {
+					onSelectionChange( data );
+				}
+			} }
+			label={ areAllSelected ? __( 'Deselect all' ) : __( 'Select all' ) }
+		/>
+	);
+}
+
+function SingleSelectionCheckbox( {
+	selection,
+	onSelectionChange,
+	item,
+	labels,
+	data,
+	getItemId,
+} ) {
+	const id = getItemId?.( item );
+	const isSelected = selection.includes( id );
+	let selectionLabel;
+	if ( isSelected ) {
+		selectionLabel = labels?.getDeselectLabel
+			? labels?.getDeselectLabel( item )
+			: __( 'Deselect item' );
+	} else {
+		selectionLabel = labels?.getSelectLabel
+			? labels?.getSelectLabel( item )
+			: __( 'Select a new item' );
+	}
+	return (
+		<CheckboxControl
+			className="dataviews-table-selection-checkbox"
+			__nextHasNoMarginBottom
+			checked={ isSelected }
+			label={ selectionLabel }
+			onChange={ () => {
+				if ( ! isSelected ) {
+					onSelectionChange(
+						data.filter( ( _item ) => {
+							const itemId = getItemId?.( _item );
+							return (
+								itemId === id || selection.includes( itemId )
+							);
+						} )
+					);
+				} else {
+					onSelectionChange(
+						data.filter( ( _item ) => {
+							const itemId = getItemId?.( _item );
+							return (
+								itemId !== id && selection.includes( itemId )
+							);
+						} )
+					);
+				}
+			} }
+		/>
+	);
+}
+
 function ViewTable( {
 	view,
 	onChangeView,
@@ -315,6 +387,9 @@ function ViewTable( {
 	getItemId,
 	isLoading = false,
 	deferredRendering,
+	selection,
+	onSelectionChange,
+	labels,
 } ) {
 	const headerMenuRefs = useRef( new Map() );
 	const headerMenuToFocusRef = useRef();
@@ -365,6 +440,22 @@ function ViewTable( {
 			>
 				<thead>
 					<tr>
+						{ !! selection && (
+							<th
+								style={ {
+									width: 20,
+									minWidth: 20,
+								} }
+								data-field-id="selection"
+								scope="col"
+							>
+								<BulkSelectionCheckbox
+									selection={ selection }
+									onSelectionChange={ onSelectionChange }
+									data={ data }
+								/>
+							</th>
+						) }
 						{ visibleFields.map( ( field, index ) => (
 							<th
 								key={ field.id }
@@ -421,6 +512,26 @@ function ViewTable( {
 					{ hasData &&
 						usedData.map( ( item ) => (
 							<tr key={ getItemId( item ) }>
+								{ !! selection && hasBulkActions && (
+									<td
+										style={ {
+											width: 20,
+											minWidth: 20,
+										} }
+									>
+										<SingleSelectionCheckbox
+											id={ getItemId?.( item ) || index }
+											item={ item }
+											labels={ labels }
+											selection={ selection }
+											onSelectionChange={
+												onSelectionChange
+											}
+											getItemId={ getItemId }
+											data={ data }
+										/>
+									</td>
+								) }
 								{ visibleFields.map( ( field ) => (
 									<td
 										key={ field.id }
