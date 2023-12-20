@@ -1267,6 +1267,12 @@ class Gutenberg_HTML_Tag_Processor_6_5 {
 					continue;
 				}
 
+				if ( $this->bytes_already_parsed >= $doc_length ) {
+					$this->parser_state = self::STATE_INCOMPLETE;
+
+					return false;
+				}
+
 				if ( '>' === $html[ $this->bytes_already_parsed ] ) {
 					$this->bytes_already_parsed = $closer_potentially_starts_at;
 					return true;
@@ -1312,7 +1318,7 @@ class Gutenberg_HTML_Tag_Processor_6_5 {
 
 			$this->token_starts_at = $at;
 
-			if ( '/' === $this->html[ $at + 1 ] ) {
+			if ( $at + 1 < $doc_length && '/' === $this->html[ $at + 1 ] ) {
 				$this->is_closing_tag = true;
 				++$at;
 			} else {
@@ -1346,7 +1352,7 @@ class Gutenberg_HTML_Tag_Processor_6_5 {
 			 * Abort if no tag is found before the end of
 			 * the document. There is nothing left to parse.
 			 */
-			if ( $at + 1 >= strlen( $html ) ) {
+			if ( $at + 1 >= $doc_length ) {
 				$this->parser_state = self::STATE_INCOMPLETE;
 
 				return false;
@@ -1362,13 +1368,13 @@ class Gutenberg_HTML_Tag_Processor_6_5 {
 				 * https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
 				 */
 				if (
-					strlen( $html ) > $at + 3 &&
+					$doc_length > $at + 3 &&
 					'-' === $html[ $at + 2 ] &&
 					'-' === $html[ $at + 3 ]
 				) {
 					$closer_at = $at + 4;
 					// If it's not possible to close the comment then there is nothing more to scan.
-					if ( strlen( $html ) <= $closer_at ) {
+					if ( $doc_length <= $closer_at ) {
 						$this->parser_state = self::STATE_INCOMPLETE;
 
 						return false;
@@ -1388,7 +1394,7 @@ class Gutenberg_HTML_Tag_Processor_6_5 {
 					 * See https://html.spec.whatwg.org/#parse-error-incorrectly-closed-comment
 					 */
 					--$closer_at; // Pre-increment inside condition below reduces risk of accidental infinite looping.
-					while ( ++$closer_at < strlen( $html ) ) {
+					while ( ++$closer_at < $doc_length ) {
 						$closer_at = strpos( $html, '--', $closer_at );
 						if ( false === $closer_at ) {
 							$this->parser_state = self::STATE_INCOMPLETE;
@@ -1396,12 +1402,12 @@ class Gutenberg_HTML_Tag_Processor_6_5 {
 							return false;
 						}
 
-						if ( $closer_at + 2 < strlen( $html ) && '>' === $html[ $closer_at + 2 ] ) {
+						if ( $closer_at + 2 < $doc_length && '>' === $html[ $closer_at + 2 ] ) {
 							$at = $closer_at + 3;
 							continue 2;
 						}
 
-						if ( $closer_at + 3 < strlen( $html ) && '!' === $html[ $closer_at + 2 ] && '>' === $html[ $closer_at + 3 ] ) {
+						if ( $closer_at + 3 < $doc_length && '!' === $html[ $closer_at + 2 ] && '>' === $html[ $closer_at + 3 ] ) {
 							$at = $closer_at + 4;
 							continue 2;
 						}
@@ -1414,7 +1420,7 @@ class Gutenberg_HTML_Tag_Processor_6_5 {
 				 * https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
 				 */
 				if (
-					strlen( $html ) > $at + 8 &&
+					$doc_length > $at + 8 &&
 					'[' === $html[ $at + 2 ] &&
 					'C' === $html[ $at + 3 ] &&
 					'D' === $html[ $at + 4 ] &&
@@ -1440,7 +1446,7 @@ class Gutenberg_HTML_Tag_Processor_6_5 {
 				 * https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
 				 */
 				if (
-					strlen( $html ) > $at + 8 &&
+					$doc_length > $at + 8 &&
 					( 'D' === $html[ $at + 2 ] || 'd' === $html[ $at + 2 ] ) &&
 					( 'O' === $html[ $at + 3 ] || 'o' === $html[ $at + 3 ] ) &&
 					( 'C' === $html[ $at + 4 ] || 'c' === $html[ $at + 4 ] ) &&
@@ -1512,6 +1518,11 @@ class Gutenberg_HTML_Tag_Processor_6_5 {
 			 * See https://html.spec.whatwg.org/#parse-error-invalid-first-character-of-tag-name
 			 */
 			if ( $this->is_closing_tag ) {
+				// No chance of finding a closer.
+				if ( $at + 3 > $doc_length ) {
+					return false;
+				}
+
 				$closer_at = strpos( $html, '>', $at + 3 );
 				if ( false === $closer_at ) {
 					$this->parser_state = self::STATE_INCOMPLETE;
