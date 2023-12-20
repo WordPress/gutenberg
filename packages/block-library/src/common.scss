@@ -180,8 +180,3 @@ html :where(.is-position-sticky) {
 		/* stylelint-enable length-zero-no-unit */
 	}
 }
-
-// TODO: Put this rule somewhere else
-.has-aspect-ratio {
-	width: 100%;
-}

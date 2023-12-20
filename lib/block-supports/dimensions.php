@@ -98,6 +98,16 @@ function gutenberg_render_dimensions_support( $block_content, $block ) {
 	$dimensions_block_styles                = array();
 	$dimensions_block_styles['aspectRatio'] = $block_attributes['style']['dimensions']['aspectRatio'] ?? null;
 
+	// For aspect ratio to work, the width must be 100%.
+	// While there is not (yet) a width block support, the following is a defensive check.
+	// The `width: 100%;` rule will only be output if the block does not have a width set.
+	if (
+		isset( $dimensions_block_styles['aspectRatio'] ) &&
+		! isset( $block_attributes['style']['dimensions']['width'] )
+	) {
+		$dimensions_block_styles['width'] = '100%';
+	}
+
 	$styles = gutenberg_style_engine_get_styles( array( 'dimensions' => $dimensions_block_styles ) );
 
 	if ( ! empty( $styles['css'] ) ) {

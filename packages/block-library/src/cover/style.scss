@@ -22,10 +22,6 @@
 		min-height: 430px;
 	}
 
-	&:where(.has-aspect-ratio) {
-		width: 100%;
-	}
-
 	/**
 	 * Set a default background color for has-background-dim _unless_ it includes another
 	 * background-color class (e.g. has-green-background-color). The presence of another

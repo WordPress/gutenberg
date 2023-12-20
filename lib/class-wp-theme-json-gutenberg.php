@@ -211,6 +211,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var array
 	 */
 	const PROPERTIES_METADATA = array(
+		'aspect-ratio'                      => array( 'dimensions', 'aspectRatio' ),
 		'background'                        => array( 'color', 'gradient' ),
 		'background-color'                  => array( 'color', 'background' ),
 		'border-radius'                     => array( 'border', 'radius' ),
@@ -2094,6 +2095,16 @@ class WP_Theme_JSON_Gutenberg {
 				 * and therefore the original $value will be returned.
 				 */
 				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ) );
+			}
+
+			if ( 'aspect-ratio' === $css_property ) {
+				// For aspect ratio to work, the width must be 100%.
+				// If a width support is added in the future, this should be updated
+				// to check if a width value is present before outputting this rule.
+				$declarations[] = array(
+					'name'  => 'width',
+					'value' => '100%',
+				);
 			}
 
 			$declarations[] = array(
