@@ -118,32 +118,13 @@ export function resetBackgroundImage( style = {}, setAttributes ) {
 }
 
 /**
- * Resets the background repeat block support attributes. This can be used when disabling
- * the background repeat controls for a block via a `ToolsPanel`.
- *
- * @param {Object}   style         Style attribute.
- * @param {Function} setAttributes Function to set block's attributes.
- */
-export function resetBackgroundRepeat( style = {}, setAttributes ) {
-	setAttributes( {
-		style: cleanEmptyObject( {
-			...style,
-			background: {
-				...style?.background,
-				backgroundRepeat: undefined,
-			},
-		} ),
-	} );
-}
-
-/**
  * Resets the background size block support attributes. This can be used when disabling
  * the background size controls for a block via a `ToolsPanel`.
  *
  * @param {Object}   style         Style attribute.
  * @param {Function} setAttributes Function to set block's attributes.
  */
-export function resetBackgroundSize( style = {}, setAttributes ) {
+function resetBackgroundSize( style = {}, setAttributes ) {
 	setAttributes( {
 		style: cleanEmptyObject( {
 			...style,
