@@ -17,5 +17,11 @@ if ( function_exists( 'register_block_bindings_source' ) ) {
 
 		return get_post_meta( $post_id, $source_attrs['value'], true );
 	};
-	register_block_bindings_source( 'post_meta', $post_meta_source_callback );
+	register_block_bindings_source(
+		'post_meta',
+		array(
+			'label' => __( 'Post Meta' ),
+			'apply' => $post_meta_source_callback,
+		)
+	);
 }

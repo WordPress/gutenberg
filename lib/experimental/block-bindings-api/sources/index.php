@@ -12,12 +12,13 @@ if ( ! function_exists( 'register_block_bindings_source' ) ) {
 	 * Function to register a new source.
 	 *
 	 * @param string   $source_name The name of the source.
-	 * @param function $source_callback The callback executed when the source is processed in the server.
+	 * @param function $source_args List of arguments for the block bindings source:
+	 *                              - label: The label of the source.
+	 *                              - apply: The callback executed when the source is processed in the server.
+	 * @return void
 	 */
-	function register_block_bindings_source( $source_name, $source_callback ) {
-		// We might want to add some validation here, for the name and for the apply_source callback.
-		// To ensure the register sources are valid.
+	function register_block_bindings_source( $source_name, $source_args ) {
 		global $block_bindings_sources;
-		$block_bindings_sources[ $source_name ] = array( 'apply_source' => $source_callback );
+		$block_bindings_sources[ $source_name ] = $source_args;
 	}
 }

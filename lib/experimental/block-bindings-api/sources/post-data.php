@@ -16,5 +16,11 @@ if ( function_exists( 'register_block_bindings_source' ) ) {
 		}
 		return get_post( $post_id )->{$source_attrs['value']};
 	};
-	register_block_bindings_source( 'post_data', $post_data_source_callback );
+	register_block_bindings_source(
+		'post_data',
+		array(
+			'label' => __( 'Post Data' ),
+			'apply' => $post_data_source_callback,
+		)
+	);
 }

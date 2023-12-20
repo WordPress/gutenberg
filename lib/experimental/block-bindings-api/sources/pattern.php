@@ -13,5 +13,11 @@ if ( function_exists( 'register_block_bindings_source' ) ) {
 		$block_id = $block_instance->attributes['metadata']['id'];
 		return _wp_array_get( $block_instance->context, array( 'pattern/overrides', $block_id ), false );
 	};
-	register_block_bindings_source( 'pattern_attributes', $pattern_source_callback );
+	register_block_bindings_source(
+		'pattern_attributes',
+		array(
+			'label' => __( 'Pattern Attributes' ),
+			'apply' => $pattern_source_callback,
+		)
+	);
 }

@@ -114,13 +114,13 @@ if ( $gutenberg_experiments && (
 			// "bindings": {
 			// "title": {
 			// "source": {
-			// "name": "metadata",
+			// "name": "post_meta",
 			// "attributes": { "value": "text_custom_field" }
 			// }
 			// },
 			// "url": {
 			// "source": {
-			// "name": "metadata",
+			// "name": "post_meta",
 			// "attributes": { "value": "text_custom_field" }
 			// }
 			// }
@@ -130,22 +130,25 @@ if ( $gutenberg_experiments && (
 			global $block_bindings_sources;
 			$modified_block_content = $block_content;
 			foreach ( $block['attrs']['metadata']['bindings'] as $binding_attribute => $binding_source ) {
+				// If the block is not in the whitelist, stop processing.
 				if ( ! isset( $block_bindings_whitelist[ $block['blockName'] ] ) ) {
-					continue;
+					return $block_content;
 				}
+				// If the attribute is not in the whitelist, process next attribute.
 				if ( ! in_array( $binding_attribute, $block_bindings_whitelist[ $block['blockName'] ], true ) ) {
 					continue;
 				}
-
-				// Get the value based on the source.
-				// We might want to move this to its own function if it gets more complex.
-				// We pass $block_content, $block, $block_instance to the source callback in case sources want to use them.
-				if ( ! isset( $block_bindings_sources[ $binding_source['source']['name'] ]['apply_source'] ) ) {
-					return $block_content;
+				// If no source is provided, or that source is not registered, process next attribute.
+				if ( ! isset( $binding_source['source'] ) || ! isset( $binding_source['source']['name'] ) || ! isset( $block_bindings_sources[ $binding_source['source']['name'] ] ) ) {
+					continue;
 				}
-				$source_value = $block_bindings_sources[ $binding_source['source']['name'] ]['apply_source']( $binding_source['source']['attributes'], $block_content, $block, $block_instance );
-				if ( false === $source_value ) {
-					return $block_content;
+
+				$source_callback = $block_bindings_sources[ $binding_source['source']['name'] ]['apply'];
+				// Get the value based on the source.
+				$source_value = $source_callback( $binding_source['source']['attributes'], $block_content, $block, $block_instance );
+				// If the value is null, process next attribute.
+				if ( is_null( $source_value ) ) {
+					continue;
 				}
 
 				// Process the HTML based on the block and the attribute.
