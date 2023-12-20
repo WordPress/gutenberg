@@ -17,7 +17,6 @@ jobs:
         name: Checks w/Node.js ${{ matrix.node }} on ${{ matrix.os }}
         runs-on: ${{ matrix.os }}
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-        continue-on-error: ${{ matrix.node != '20' }}
         strategy:
             fail-fast: false
             matrix:
