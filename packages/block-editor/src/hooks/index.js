@@ -53,6 +53,7 @@ createBlockListBlockFilter( [
 	fontSize,
 	border,
 	position,
+	layout,
 	childLayout,
 ] );
 createBlockSaveFilter( [
