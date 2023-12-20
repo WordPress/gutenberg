@@ -78,6 +78,21 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalArchiveTitleNameLabel',
 ];
 
+function usePageSettings() {
+	return useSelect( ( select ) => {
+		const { canUser, getEntityRecord } = select( coreStore );
+
+		const siteSettings = canUser( 'read', 'settings' )
+			? getEntityRecord( 'root', 'site' )
+			: undefined;
+
+		return {
+			pageOnFront: siteSettings?.page_on_front,
+			pageForPosts: siteSettings?.page_for_posts,
+		};
+	}, [] );
+}
+
 /**
  * React hook used to compute the block editor settings to use for the post editor.
  *
@@ -93,8 +108,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
 		userCanCreatePages,
-		pageOnFront,
-		pageForPosts,
 		userPatternCategories,
 		restBlockPatterns,
 		restBlockPatternCategories,
@@ -104,16 +117,11 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			const {
 				canUser,
 				getRawEntityRecord,
-				getEntityRecord,
 				getUserPatternCategories,
 				getEntityRecords,
 				getBlockPatterns,
 				getBlockPatternCategories,
 			} = select( coreStore );
-
-			const siteSettings = canUser( 'read', 'settings' )
-				? getEntityRecord( 'root', 'site' )
-				: undefined;
 
 			return {
 				canUseUnfilteredHTML: getRawEntityRecord(
@@ -128,8 +136,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					: EMPTY_BLOCKS_LIST, // Reusable blocks are fetched in the native version of this hook.
 				hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
 				userCanCreatePages: canUser( 'create', 'pages' ),
-				pageOnFront: siteSettings?.page_on_front,
-				pageForPosts: siteSettings?.page_for_posts,
 				userPatternCategories: getUserPatternCategories(),
 				restBlockPatterns: getBlockPatterns(),
 				restBlockPatternCategories: getBlockPatternCategories(),
@@ -229,8 +235,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			// Check these two properties: they were not present in the site editor.
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
-			pageOnFront,
-			pageForPosts,
+			__experimentalUsePageSettings: usePageSettings,
 			__experimentalPreferPatternsOnRoot: postType === 'wp_template',
 			templateLock:
 				postType === 'wp_navigation' ? 'insert' : settings.templateLock,
@@ -251,8 +256,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			undo,
 			createPageEntity,
 			userCanCreatePages,
-			pageOnFront,
-			pageForPosts,
 			postType,
 			setIsInserterOpened,
 		]

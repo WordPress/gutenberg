@@ -108,19 +108,19 @@ export default function useSearchHandler(
 	allowDirectEntry,
 	withCreateSuggestion
 ) {
-	const { fetchSearchSuggestions, pageOnFront, pageForPosts } = useSelect(
+	const { fetchSearchSuggestions, usePageSettings } = useSelect(
 		( select ) => {
 			const { getSettings } = select( blockEditorStore );
-
+			const settings = getSettings();
 			return {
-				pageOnFront: getSettings().pageOnFront,
-				pageForPosts: getSettings().pageForPosts,
+				usePageSettings: settings.__experimentalUsePageSettings,
 				fetchSearchSuggestions:
-					getSettings().__experimentalFetchLinkSuggestions,
+					settings.__experimentalFetchLinkSuggestions,
 			};
 		},
 		[]
 	);
+	const { pageOnFront, pageForPosts } = usePageSettings();
 
 	const directEntryHandler = allowDirectEntry
 		? handleDirectEntry
