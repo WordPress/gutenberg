@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import {
 	BlockToolbar,
+	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -43,6 +44,7 @@ import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { PostViewLink, PreviewDropdown } = unlock( editorPrivateApis );
+const { useCanBlockToolbarBeFocused } = unlock( blockEditorPrivateApis );
 
 export default function HeaderEditMode() {
 	const {
@@ -99,7 +101,7 @@ export default function HeaderEditMode() {
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
-	const hasBlockSelected = !! blockSelectionStart;
+	const hasBlockToolbar = useCanBlockToolbarBeFocused();
 
 	useEffect( () => {
 		// If we have a new block selection, show the block tools
@@ -154,7 +156,7 @@ export default function HeaderEditMode() {
 								ref={ blockToolbarRef }
 								name="block-toolbar"
 							/>
-							{ hasBlockSelected && (
+							{ hasBlockToolbar && (
 								<Button
 									className="edit-site-header-edit-mode__block-tools-toggle"
 									icon={
@@ -183,7 +185,9 @@ export default function HeaderEditMode() {
 						'edit-site-header-edit-mode__center',
 						{
 							'is-collapsed':
-								! isBlockToolsCollapsed && isLargeViewport,
+								! isBlockToolsCollapsed &&
+								isLargeViewport &&
+								hasBlockToolbar,
 						}
 					) }
 				>
