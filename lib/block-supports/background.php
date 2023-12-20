@@ -72,7 +72,7 @@ function gutenberg_render_background_support( $block_content, $block ) {
 
 	if ( ! empty( $styles['css'] ) ) {
 		// Inject background styles to the first element, presuming it's the wrapper, if it exists.
-		$tags = new WP_HTML_Tag_Processor( $block_content );
+		$tags = new Gutenberg_HTML_Tag_Processor_6_5( $block_content );
 
 		if ( $tags->next_tag() ) {
 			$existing_style = $tags->get_attribute( 'style' );

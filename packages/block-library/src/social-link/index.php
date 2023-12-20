@@ -59,7 +59,7 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	$link .= esc_html( $label );
 	$link .= '</span></a></li>';
 
-	$processor = new WP_HTML_Tag_Processor( $link );
+	$processor = new Gutenberg_HTML_Tag_Processor_6_5( $link );
 	$processor->next_tag( 'a' );
 	if ( $open_in_new_tab ) {
 		$processor->set_attribute( 'rel', trim( $rel . ' noopener nofollow' ) );

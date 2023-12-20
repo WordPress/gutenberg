@@ -18,7 +18,7 @@
  */
 function render_block_core_query( $attributes, $content, $block ) {
 	if ( $attributes['enhancedPagination'] && isset( $attributes['queryId'] ) ) {
-		$p = new WP_HTML_Tag_Processor( $content );
+		$p = new Gutenberg_HTML_Tag_Processor_6_5( $content );
 		if ( $p->next_tag() ) {
 			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-interactive', '{"namespace":"core/query"}' );
@@ -196,7 +196,7 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 				}
 
 				if ( isset( $dirty_enhanced_queries[ $block['attrs']['queryId'] ] ) ) {
-					$p = new WP_HTML_Tag_Processor( $content );
+					$p = new Gutenberg_HTML_Tag_Processor_6_5( $content );
 					if ( $p->next_tag() ) {
 						$p->set_attribute( 'data-wp-navigation-disabled', 'true' );
 					}

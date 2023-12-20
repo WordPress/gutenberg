@@ -91,7 +91,7 @@ function render_block_core_query_pagination_numbers( $attributes, $content, $blo
 	}
 
 	if ( $enhanced_pagination ) {
-		$p = new WP_HTML_Tag_Processor( $content );
+		$p = new Gutenberg_HTML_Tag_Processor_6_5( $content );
 		while ( $p->next_tag(
 			array(
 				'tag_name'   => 'a',

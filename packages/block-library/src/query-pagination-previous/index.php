@@ -52,7 +52,7 @@ function render_block_core_query_pagination_previous( $attributes, $content, $bl
 	}
 
 	if ( $enhanced_pagination && isset( $content ) ) {
-		$p = new WP_HTML_Tag_Processor( $content );
+		$p = new Gutenberg_HTML_Tag_Processor_6_5( $content );
 		if ( $p->next_tag(
 			array(
 				'tag_name'   => 'a',

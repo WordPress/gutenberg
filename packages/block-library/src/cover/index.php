@@ -50,7 +50,7 @@ function render_block_core_cover( $attributes, $content ) {
 			return $content;
 		}
 
-		$processor = new WP_HTML_Tag_Processor( $content );
+		$processor = new Gutenberg_HTML_Tag_Processor_6_5( $content );
 		$processor->next_tag();
 
 		$styles         = $processor->get_attribute( 'style' );

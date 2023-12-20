@@ -15,7 +15,7 @@
  */
 function render_block_core_form( $attributes, $content ) {
 
-	$processed_content = new WP_HTML_Tag_Processor( $content );
+	$processed_content = new Gutenberg_HTML_Tag_Processor_6_5( $content );
 	$processed_content->next_tag( 'form' );
 
 	// Get the action for this form.

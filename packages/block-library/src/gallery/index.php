@@ -77,7 +77,7 @@ function block_core_gallery_render( $attributes, $content ) {
 	}
 
 	$unique_gallery_classname = wp_unique_id( 'wp-block-gallery-' );
-	$processed_content        = new WP_HTML_Tag_Processor( $content );
+	$processed_content        = new Gutenberg_HTML_Tag_Processor_6_5( $content );
 	$processed_content->next_tag();
 	$processed_content->add_class( $unique_gallery_classname );
 

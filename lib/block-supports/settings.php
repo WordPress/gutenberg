@@ -33,7 +33,7 @@ function _gutenberg_add_block_level_presets_class( $block_content, $block ) {
 
 	// Like the layout hook this assumes the hook only applies to blocks with a single wrapper.
 	// Add the class name to the first element, presuming it's the wrapper, if it exists.
-	$tags = new WP_HTML_Tag_Processor( $block_content );
+	$tags = new Gutenberg_HTML_Tag_Processor_6_5( $block_content );
 	if ( $tags->next_tag() ) {
 		$tags->add_class( _wp_get_presets_class_name( $block ) );
 	}

@@ -89,7 +89,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 				 * contains a single wrapper and that it's the first element in the
 				 * rendered output. That first element, if it exists, gets the class.
 				 */
-				$tags = new WP_HTML_Tag_Processor( $block_content );
+				$tags = new Gutenberg_HTML_Tag_Processor_6_5( $block_content );
 				if ( $tags->next_tag() ) {
 					$tags->add_class( wp_get_elements_class_name( $block ) );
 				}

@@ -65,7 +65,7 @@ function render_block_core_file( $attributes, $content, $block ) {
 
 	// If it uses the Interactivity API, add the directives.
 	if ( $should_load_view_script ) {
-		$processor = new WP_HTML_Tag_Processor( $content );
+		$processor = new Gutenberg_HTML_Tag_Processor_6_5( $content );
 		$processor->next_tag();
 		$processor->set_attribute( 'data-wp-interactive', '{"namespace":"core/file"}' );
 		$processor->next_tag( 'object' );

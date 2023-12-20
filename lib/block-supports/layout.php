@@ -599,7 +599,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	}
 
 	// Prep the processor for modifying the block output.
-	$processor = new WP_HTML_Tag_Processor( $block_content );
+	$processor = new Gutenberg_HTML_Tag_Processor_6_5( $block_content );
 
 	// Having no tags implies there are no tags onto which to add class names.
 	if ( ! $processor->next_tag() ) {
@@ -793,7 +793,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$inner_block_wrapper_classes = null;
 	$first_chunk                 = $block['innerContent'][0] ?? null;
 	if ( is_string( $first_chunk ) && count( $block['innerContent'] ) > 1 ) {
-		$first_chunk_processor = new WP_HTML_Tag_Processor( $first_chunk );
+		$first_chunk_processor = new Gutenberg_HTML_Tag_Processor_6_5( $first_chunk );
 		while ( $first_chunk_processor->next_tag() ) {
 			$class_attribute = $first_chunk_processor->get_attribute( 'class' );
 			if ( is_string( $class_attribute ) && ! empty( $class_attribute ) ) {
@@ -874,7 +874,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	 * have to be removed from the outer wrapper and then added to the inner.
 	*/
 	$layout_classes = array();
-	$processor      = new WP_HTML_Tag_Processor( $block_content );
+	$processor      = new Gutenberg_HTML_Tag_Processor_6_5( $block_content );
 
 	if ( $processor->next_tag( array( 'class_name' => 'wp-block-group' ) ) ) {
 		if ( method_exists( $processor, 'class_list' ) ) {
@@ -917,7 +917,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 
 	// Add layout classes to inner wrapper.
 	if ( ! empty( $layout_classes ) ) {
-		$processor = new WP_HTML_Tag_Processor( $updated_content );
+		$processor = new Gutenberg_HTML_Tag_Processor_6_5( $updated_content );
 		if ( $processor->next_tag( array( 'class_name' => 'wp-block-group__inner-container' ) ) ) {
 			foreach ( $layout_classes as $class_name ) {
 				$processor->add_class( $class_name );

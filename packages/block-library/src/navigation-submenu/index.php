@@ -208,7 +208,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		}
 
 		if ( strpos( $inner_blocks_html, 'current-menu-item' ) ) {
-			$tag_processor = new WP_HTML_Tag_Processor( $html );
+			$tag_processor = new Gutenberg_HTML_Tag_Processor_6_5( $html );
 			while ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-navigation-item__content' ) ) ) {
 				$tag_processor->add_class( 'current-menu-ancestor' );
 			}

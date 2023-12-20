@@ -123,7 +123,7 @@ function gutenberg_render_position_support( $block_content, $block ) {
 		);
 
 		// Inject class name to block container markup.
-		$content = new WP_HTML_Tag_Processor( $block_content );
+		$content = new Gutenberg_HTML_Tag_Processor_6_5( $block_content );
 		$content->next_tag();
 		foreach ( $wrapper_classes as $class ) {
 			$content->add_class( $class );

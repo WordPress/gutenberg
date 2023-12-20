@@ -24,7 +24,7 @@ function block_core_heading_render( $attributes, $content ) {
 		return $content;
 	}
 
-	$p = new WP_HTML_Tag_Processor( $content );
+	$p = new Gutenberg_HTML_Tag_Processor_6_5( $content );
 
 	$header_tags = array( 'H1', 'H2', 'H3', 'H4', 'H5', 'H6' );
 	while ( $p->next_tag() ) {

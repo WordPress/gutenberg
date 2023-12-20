@@ -51,7 +51,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 	$open_by_default = 'false';
 
 	$label_inner_html = empty( $attributes['label'] ) ? __( 'Search' ) : wp_kses_post( $attributes['label'] );
-	$label            = new WP_HTML_Tag_Processor( sprintf( '<label %1$s>%2$s</label>', $inline_styles['label'], $label_inner_html ) );
+	$label            = new Gutenberg_HTML_Tag_Processor_6_5( sprintf( '<label %1$s>%2$s</label>', $inline_styles['label'], $label_inner_html ) );
 	if ( $label->next_tag() ) {
 		$label->set_attribute( 'for', $input_id );
 		$label->add_class( 'wp-block-search__label' );
@@ -64,7 +64,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 		}
 	}
 
-	$input         = new WP_HTML_Tag_Processor( sprintf( '<input type="search" name="s" required %s/>', $inline_styles['input'] ) );
+	$input         = new Gutenberg_HTML_Tag_Processor_6_5( sprintf( '<input type="search" name="s" required %s/>', $inline_styles['input'] ) );
 	$input_classes = array( 'wp-block-search__input' );
 	if ( ! $is_button_inside && ! empty( $border_color_classes ) ) {
 		$input_classes[] = $border_color_classes;
@@ -150,7 +150,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 
 		// Include the button element class.
 		$button_classes[] = wp_theme_get_element_class_name( 'button' );
-		$button           = new WP_HTML_Tag_Processor( sprintf( '<button type="submit" %s>%s</button>', $inline_styles['button'], $button_internal_markup ) );
+		$button           = new Gutenberg_HTML_Tag_Processor_6_5( sprintf( '<button type="submit" %s>%s</button>', $inline_styles['button'], $button_internal_markup ) );
 
 		if ( $button->next_tag() ) {
 			$button->add_class( implode( ' ', $button_classes ) );

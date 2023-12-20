@@ -80,7 +80,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$processor = new WP_HTML_Tag_Processor( $block_content );
+	$processor = new Gutenberg_HTML_Tag_Processor_6_5( $block_content );
 
 	$aria_label = __( 'Enlarge image', 'gutenberg' );
 
@@ -123,7 +123,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 		$scale_attr = false;
 	}
 
-	$w = new WP_HTML_Tag_Processor( $block_content );
+	$w = new Gutenberg_HTML_Tag_Processor_6_5( $block_content );
 	$w->next_tag( 'figure' );
 	$w->add_class( 'wp-lightbox-container' );
 	$w->set_attribute( 'data-wp-interactive', true );
@@ -184,7 +184,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	// image is a copy of the one in the body, which animates immediately
 	// as the lightbox is opened, while the enlarged one is a full-sized
 	// version that will likely still be loading as the animation begins.
-	$m = new WP_HTML_Tag_Processor( $block_content );
+	$m = new Gutenberg_HTML_Tag_Processor_6_5( $block_content );
 	$m->next_tag( 'figure' );
 	$m->add_class( 'responsive-image' );
 	$m->next_tag( 'img' );
@@ -200,7 +200,7 @@ function gutenberg_render_behaviors_support_lightbox( $block_content, $block ) {
 	$m->set_attribute( 'data-wp-style--object-fit', 'selectors.core.image.lightboxObjectFit' );
 	$initial_image_content = $m->get_updated_html();
 
-	$q = new WP_HTML_Tag_Processor( $block_content );
+	$q = new Gutenberg_HTML_Tag_Processor_6_5( $block_content );
 	$q->next_tag( 'figure' );
 	$q->add_class( 'enlarged-image' );
 	$q->next_tag( 'img' );

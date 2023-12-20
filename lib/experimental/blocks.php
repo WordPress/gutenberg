@@ -168,7 +168,7 @@ if ( $gutenberg_experiments && (
 				continue;
 			}
 
-			$tags  = new WP_HTML_Tag_Processor( $block_content );
+			$tags  = new Gutenberg_HTML_Tag_Processor_6_5( $block_content );
 			$found = $tags->next_tag(
 				array(
 					// TODO: In the future, when blocks other than Paragraph and Image are
@@ -181,7 +181,7 @@ if ( $gutenberg_experiments && (
 			}
 			$tag_name     = $tags->get_tag();
 			$markup       = "<$tag_name>$custom_value</$tag_name>";
-			$updated_tags = new WP_HTML_Tag_Processor( $markup );
+			$updated_tags = new Gutenberg_HTML_Tag_Processor_6_5( $markup );
 			$updated_tags->next_tag();
 
 			// Get all the attributes from the original block and add them to the new markup.
