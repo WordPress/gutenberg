@@ -6,7 +6,10 @@ import { nanoid } from 'nanoid';
 /**
  * WordPress dependencies
  */
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	updateBlockBindingsAttribute,
+} from '@wordpress/block-editor';
 import { BaseControl, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -20,43 +23,40 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 
 	function updateBindings( attributeName, isChecked ) {
 		if ( ! isChecked ) {
-			let updatedBindings = {
-				...attributes?.metadata?.bindings,
-				[ attributeName ]: undefined,
-			};
-			if ( Object.keys( updatedBindings ).length === 1 ) {
-				updatedBindings = undefined;
-			}
-			setAttributes( {
-				metadata: {
-					...attributes.metadata,
-					bindings: updatedBindings,
-				},
-			} );
+			updateBlockBindingsAttribute(
+				attributes,
+				setAttributes,
+				attributeName,
+				null,
+				null
+			);
 			return;
 		}
 
-		const updatedBindings = {
-			...attributes?.metadata?.bindings,
-			[ attributeName ]: { source: { name: 'pattern_attributes' } },
-		};
-
 		if ( typeof attributes.metadata?.id === 'string' ) {
-			setAttributes( {
-				metadata: {
-					...attributes.metadata,
-					bindings: updatedBindings,
-				},
-			} );
+			updateBlockBindingsAttribute(
+				attributes,
+				setAttributes,
+				attributeName,
+				'pattern_attributes',
+				null
+			);
 			return;
 		}
 
 		const id = nanoid( 6 );
+		const newMetadata = updateBlockBindingsAttribute(
+			attributes,
+			setAttributes,
+			attributeName,
+			'pattern_attributes',
+			null
+		);
+
 		setAttributes( {
 			metadata: {
-				...attributes.metadata,
+				...newMetadata,
 				id,
-				bindings: updatedBindings,
 			},
 		} );
 	}
