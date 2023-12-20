@@ -13,6 +13,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -76,14 +77,14 @@ function EditorCanvasContainer( {
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
+	const { setIsListViewOpened } = useDispatch( editorStore );
+
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const sectionFocusReturnRef = useFocusReturn();
 	const title = useMemo(
 		() => getEditorCanvasContainerTitle( editorCanvasContainerView ),
 		[ editorCanvasContainerView ]
 	);
-
-	const { setIsListViewOpened } = useDispatch( editSiteStore );
 
 	function onCloseContainer() {
 		if ( typeof onClose === 'function' ) {

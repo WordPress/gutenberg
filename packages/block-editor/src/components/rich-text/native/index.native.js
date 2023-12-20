@@ -824,12 +824,6 @@ export class RichText extends Component {
 		}
 	}
 
-	componentWillUnmount() {
-		if ( this._editor.isFocused() ) {
-			this._editor.blur();
-		}
-	}
-
 	componentDidUpdate( prevProps ) {
 		const { style, tagName } = this.props;
 		const { currentFontSize } = this.state;

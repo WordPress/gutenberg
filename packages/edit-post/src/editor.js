@@ -96,8 +96,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		[ postType, postId, isLargeViewport ]
 	);
 
-	const { updatePreferredStyleVariations, setIsInserterOpened } =
-		useDispatch( editPostStore );
+	const { updatePreferredStyleVariations } = useDispatch( editPostStore );
 
 	const editorSettings = useMemo( () => {
 		const result = {
@@ -112,8 +111,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			hasInlineToolbar,
 			allowRightClickOverrides,
 
-			// This is marked as experimental to give time for the quick inserter to mature.
-			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			keepCaretInsideBlock,
 			// Keep a reference of the `allowedBlockTypes` from the server to handle use cases
 			// where we need to differentiate if a block is disabled by the user or some plugin.
@@ -146,7 +143,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,
-		setIsInserterOpened,
 		updatePreferredStyleVariations,
 		keepCaretInsideBlock,
 	] );

@@ -317,7 +317,7 @@ export default function SpacingInputControl( {
 						setShowCustomValueControl( ! showCustomValueControl );
 					} }
 					isPressed={ showCustomValueControl }
-					isSmall
+					size="small"
 					className="spacing-sizes-control__custom-toggle"
 					iconSize={ 24 }
 				/>

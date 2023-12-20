@@ -40,12 +40,6 @@ import { PrivateBlockContext } from './private-block-context';
 import { unlock } from '../../lock-unlock';
 
 /**
- * If the block count exceeds the threshold, we disable the reordering animation
- * to avoid laginess.
- */
-const BLOCK_ANIMATION_THRESHOLD = 200;
-
-/**
  * Merges wrapper props with special handling for classNames and styles.
  *
  * @param {Object} propsA
@@ -516,9 +510,7 @@ function BlockListBlockProvider( props ) {
 
 				getBlockIndex,
 				isTyping,
-				getGlobalBlockCount,
 				isBlockMultiSelected,
-				isAncestorMultiSelected,
 				isBlockSubtreeDisabled,
 				isBlockHighlighted,
 				__unstableIsFullySelected,
@@ -550,9 +542,6 @@ function BlockListBlockProvider( props ) {
 			const canRemove = canRemoveBlock( clientId, rootClientId );
 			const canMove = canMoveBlock( clientId, rootClientId );
 			const { name: blockName, attributes, isValid } = block;
-			const isPartOfMultiSelection =
-				isBlockMultiSelected( clientId ) ||
-				isAncestorMultiSelected( clientId );
 			const blockType = getBlockType( blockName );
 			const match = getActiveBlockVariation( blockName, attributes );
 			const { outlineMode, supportsLayout } = getSettings();
@@ -600,12 +589,6 @@ function BlockListBlockProvider( props ) {
 				index: getBlockIndex( clientId ),
 				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: match?.title || blockType?.title,
-				isPartOfSelection: _isSelected || isPartOfMultiSelection,
-				adjustScrolling:
-					_isSelected || isFirstMultiSelectedBlock( clientId ),
-				enableAnimation:
-					! typing &&
-					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 				isSubtreeDisabled: isBlockSubtreeDisabled( clientId ),
 				isOutlineEnabled: outlineMode,
 				hasOverlay: __unstableHasActiveBlockOverlayActive( clientId ),
@@ -662,9 +645,6 @@ function BlockListBlockProvider( props ) {
 		index,
 		blockApiVersion,
 		blockTitle,
-		isPartOfSelection,
-		adjustScrolling,
-		enableAnimation,
 		isSubtreeDisabled,
 		isOutlineEnabled,
 		hasOverlay,
@@ -699,9 +679,6 @@ function BlockListBlockProvider( props ) {
 		blockApiVersion,
 		blockTitle,
 		isSelected,
-		isPartOfSelection,
-		adjustScrolling,
-		enableAnimation,
 		isSubtreeDisabled,
 		isOutlineEnabled,
 		hasOverlay,

@@ -6,10 +6,6 @@ On-page CSS media queries are also updated to match the width of the device.
 
 Note that this is currently experimental, and is available as `__experimentalUseResizeCanvas`.
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-
 ## Development guidelines
 
 ### Usage

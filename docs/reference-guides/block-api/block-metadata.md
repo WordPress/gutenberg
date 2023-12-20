@@ -61,7 +61,7 @@ Starting in WordPress 5.8 release, we recommend using the `block.json` metadata 
 }
 ```
 
-## Benefits using the metadata file
+## Benefits of using the metadata file
 
 The block definition allows code sharing between JavaScript, PHP, and other languages when processing block types stored as JSON, and registering blocks with the `block.json` metadata file provides multiple benefits on top of it.
 
@@ -85,7 +85,7 @@ Check <a href="https://developer.wordpress.org/block-editor/getting-started/fund
 
 This section describes all the properties that can be added to the `block.json` file to define the behavior and metadata of block types.
 
-### API Version
+### API version
 
 -   Type: `number`
 -   Optional
@@ -460,7 +460,7 @@ Block Hooks is an API that allows a block to automatically insert itself next to
 
 The key is the name of the block (`string`) to hook into, and the value is the position to hook into (`string`). Take a look at the [Block Hooks documentation](/docs/reference-guides/block-api/block-registration.md#block-hooks-optional) for more info about available configurations.
 
-### Editor Script
+### Editor script
 
 -   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
@@ -494,7 +494,7 @@ It's possible to pass a script handle registered with the [`wp_register_script`]
 
 _Note: An option to pass also an array of scripts exists since WordPress `6.1.0`._
 
-### View Script
+### View script
 
 -   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
@@ -512,7 +512,7 @@ It's possible to pass a script handle registered with the [`wp_register_script`]
 
 _Note: An option to pass also an array of view scripts exists since WordPress `6.1.0`._
 
-### Editor Style
+### Editor style
 
 -   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
@@ -649,7 +649,7 @@ return array(
 );
 ```
 
-### Frontend Enqueueing
+### Frontend enqueueing
 
 Starting in the WordPress 5.8 release, it is possible to instruct WordPress to enqueue scripts and styles for a block type only when rendered on the frontend. It applies to the following asset fields in the `block.json` file:
 
@@ -706,7 +706,7 @@ registerBlockType( metadata, {
 } );
 ```
 
-## Backward Compatibility
+## Backward compatibility
 
 The existing registration mechanism (both server side and frontend) will continue to work, it will serve as low-level implementation detail for the `block.json` based registration.
 

@@ -4,8 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 import {
-	chevronDown,
-	chevronUp,
 	unseen,
 	check,
 	arrowUp,
@@ -40,34 +38,38 @@ const sortingItemsInfo = {
 	asc: { icon: arrowUp, label: __( 'Sort ascending' ) },
 	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
 };
-const sortIcons = { asc: chevronUp, desc: chevronDown };
+const sortArrows = { asc: '↑', desc: '↓' };
+
+const sanitizeOperators = ( field ) => {
+	let operators = field.filterBy?.operators;
+	if ( ! operators || ! Array.isArray( operators ) ) {
+		operators = [ OPERATOR_IN, OPERATOR_NOT_IN ];
+	}
+	return operators.filter( ( operator ) =>
+		[ OPERATOR_IN, OPERATOR_NOT_IN ].includes( operator )
+	);
+};
 
 function HeaderMenu( { field, view, onChangeView } ) {
-	const isSortable = field.enableSorting !== false;
 	const isHidable = field.enableHiding !== false;
+
+	const isSortable = field.enableSorting !== false;
 	const isSorted = view.sort?.field === field.id;
-	let filter, filterInView;
-	const otherFilters = [];
-	if ( field.type === ENUMERATION_TYPE ) {
-		let columnOperators = field.filterBy?.operators;
-		if ( ! columnOperators || ! Array.isArray( columnOperators ) ) {
-			columnOperators = [ OPERATOR_IN, OPERATOR_NOT_IN ];
-		}
-		const operators = columnOperators.filter( ( operator ) =>
-			[ OPERATOR_IN, OPERATOR_NOT_IN ].includes( operator )
+
+	let filter, filterInView, activeElement, activeOperator, otherFilters;
+	const operators = sanitizeOperators( field );
+	if ( field.type === ENUMERATION_TYPE && operators.length > 0 ) {
+		filter = {
+			field: field.id,
+			operators,
+			elements: field.elements || [],
+		};
+		filterInView = view.filters.find( ( f ) => f.field === filter.field );
+		otherFilters = view.filters.filter( ( f ) => f.field !== filter.field );
+		activeElement = filter.elements.find(
+			( element ) => element.value === filterInView?.value
 		);
-		if ( operators.length > 0 ) {
-			filter = {
-				field: field.id,
-				operators,
-				elements: field.elements || [],
-			};
-			filterInView = {
-				field: filter.field,
-				operator: filter.operators[ 0 ],
-				value: undefined,
-			};
-		}
+		activeOperator = filterInView?.operator || filter.operators[ 0 ];
 	}
 	const isFilterable = !! filter;
 
@@ -75,29 +77,22 @@ function HeaderMenu( { field, view, onChangeView } ) {
 		return field.header;
 	}
 
-	if ( isFilterable ) {
-		const columnFilters = view.filters;
-		columnFilters.forEach( ( columnFilter ) => {
-			if ( columnFilter.field === filter.field ) {
-				filterInView = {
-					...columnFilter,
-				};
-			} else {
-				otherFilters.push( columnFilter );
-			}
-		} );
-	}
 	return (
 		<DropdownMenu
 			align="start"
 			trigger={
 				<Button
-					icon={ isSorted && sortIcons[ view.sort.direction ] }
-					iconPosition="right"
-					text={ field.header }
-					style={ { padding: 0 } }
 					size="compact"
-				/>
+					className="dataviews-table-header-button"
+					style={ { padding: 0 } }
+				>
+					{ field.header }
+					{ isSorted && (
+						<span aria-hidden="true">
+							{ isSorted && sortArrows[ view.sort.direction ] }
+						</span>
+					) }
+				</Button>
 			}
 		>
 			<WithSeparators>
@@ -161,7 +156,19 @@ function HeaderMenu( { field, view, onChangeView } ) {
 								<DropdownSubMenuTrigger
 									prefix={ <Icon icon={ funnel } /> }
 									suffix={
-										<Icon icon={ chevronRightSmall } />
+										<>
+											{ activeElement &&
+												activeOperator ===
+													OPERATOR_IN &&
+												__( 'Is' ) }
+											{ activeElement &&
+												activeOperator ===
+													OPERATOR_NOT_IN &&
+												__( 'Is not' ) }
+											{ activeElement && ' ' }
+											{ activeElement?.label }
+											<Icon icon={ chevronRightSmall } />
+										</>
 									}
 								>
 									{ __( 'Filter by' ) }
@@ -171,17 +178,9 @@ function HeaderMenu( { field, view, onChangeView } ) {
 							<WithSeparators>
 								<DropdownMenuGroup>
 									{ filter.elements.map( ( element ) => {
-										let isActive = false;
-										if ( filterInView ) {
-											// Intentionally use loose comparison, so it does type conversion.
-											// This covers the case where a top-level filter for the same field converts a number into a string.
-											/* eslint-disable eqeqeq */
-											isActive =
-												element.value ==
-												filterInView.value;
-											/* eslint-enable eqeqeq */
-										}
-
+										const isActive =
+											activeElement?.value ===
+											element.value;
 										return (
 											<DropdownMenuItem
 												key={ element.value }
@@ -195,12 +194,13 @@ function HeaderMenu( { field, view, onChangeView } ) {
 												onSelect={ () => {
 													onChangeView( {
 														...view,
+														page: 1,
 														filters: [
 															...otherFilters,
 															{
 																field: filter.field,
 																operator:
-																	filterInView?.operator,
+																	activeOperator,
 																value: isActive
 																	? undefined
 																	: element.value,
@@ -220,10 +220,12 @@ function HeaderMenu( { field, view, onChangeView } ) {
 											<DropdownSubMenuTrigger
 												suffix={
 													<>
-														{ filterInView.operator ===
-														OPERATOR_IN
-															? __( 'Is' )
-															: __( 'Is not' ) }
+														{ activeOperator ===
+															OPERATOR_IN &&
+															__( 'Is' ) }
+														{ activeOperator ===
+															OPERATOR_NOT_IN &&
+															__( 'Is not' ) }
 														<Icon
 															icon={
 																chevronRightSmall
@@ -240,11 +242,10 @@ function HeaderMenu( { field, view, onChangeView } ) {
 											key="in-filter"
 											role="menuitemradio"
 											aria-checked={
-												filterInView?.operator ===
-												OPERATOR_IN
+												activeOperator === OPERATOR_IN
 											}
 											prefix={
-												filterInView?.operator ===
+												activeOperator ===
 													OPERATOR_IN && (
 													<Icon icon={ check } />
 												)
@@ -252,6 +253,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 											onSelect={ () =>
 												onChangeView( {
 													...view,
+													page: 1,
 													filters: [
 														...otherFilters,
 														{
@@ -270,11 +272,11 @@ function HeaderMenu( { field, view, onChangeView } ) {
 											key="not-in-filter"
 											role="menuitemradio"
 											aria-checked={
-												filterInView?.operator ===
+												activeOperator ===
 												OPERATOR_NOT_IN
 											}
 											prefix={
-												filterInView?.operator ===
+												activeOperator ===
 													OPERATOR_NOT_IN && (
 													<Icon icon={ check } />
 												)
@@ -282,6 +284,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 											onSelect={ () =>
 												onChangeView( {
 													...view,
+													page: 1,
 													filters: [
 														...otherFilters,
 														{

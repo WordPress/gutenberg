@@ -5,7 +5,6 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
-import { pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -66,7 +65,7 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-function DimensionsPanelPure( { clientId, name, setAttributes, settings } ) {
+export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasDimensionsPanel( settings );
 	const value = useSelect(
 		( select ) =>
@@ -125,11 +124,6 @@ function DimensionsPanelPure( { clientId, name, setAttributes, settings } ) {
 		</>
 	);
 }
-
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-export const DimensionsPanel = pure( DimensionsPanelPure );
 
 /**
  * @deprecated

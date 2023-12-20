@@ -138,7 +138,7 @@ function RevisionsButtons( {
 	return (
 		<ol
 			className="edit-site-global-styles-screen-revisions__revisions-list"
-			aria-label={ __( 'Global styles revisions' ) }
+			aria-label={ __( 'Global styles revisions list' ) }
 			role="group"
 		>
 			{ userRevisions.map( ( revision, index ) => {

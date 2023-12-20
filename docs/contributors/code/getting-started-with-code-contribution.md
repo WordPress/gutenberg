@@ -183,7 +183,7 @@ If so, you need to instruct Apache to allow following such links:
 
 Tools like MAMP tend to configure MySQL to use ports other than the default 3306, often preferring 8889. This may throw off WP-CLI, which will fail after trying to connect to the database. To remedy this, edit `wp-config.php` and change the `DB_HOST` constant from `define( 'DB_HOST', 'localhost' )` to `define( 'DB_HOST', '127.0.0.1:8889' )`.
 
-### On A Remote Server
+### On a remote server
 
 You can use a remote server in development by building locally and then uploading the built files as a plugin to the remote server.
 
@@ -203,7 +203,7 @@ You can launch Storybook by running `npm run storybook:dev` locally. It will ope
 
 You can also test Storybook for the current `trunk` branch on GitHub Pages: [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
 
-## Developer Tools
+## Developer tools
 
 We recommend configuring your editor to automatically check for syntax and lint errors. This will help you save time as you develop by automatically fixing minor formatting issues. Here are some directions for setting up Visual Studio Code, a popular editor used by many of the core developers, these tools are also available for other editors.
 

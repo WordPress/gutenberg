@@ -9,7 +9,7 @@ import ResizableBoxPopover from './components/resizable-box-popover';
 import { ComposedPrivateInserter as PrivateInserter } from './components/inserter';
 import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
-import { useShouldContextualToolbarShow } from './utils/use-should-contextual-toolbar-show';
+import { useCanBlockToolbarBeFocused } from './utils/use-can-block-toolbar-be-focused';
 import { cleanEmptyObject, useStyleOverride } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
@@ -39,7 +39,7 @@ lock( privateApis, {
 	PrivateListView,
 	ResizableBoxPopover,
 	BlockInfo,
-	useShouldContextualToolbarShow,
+	useCanBlockToolbarBeFocused,
 	cleanEmptyObject,
 	useStyleOverride,
 	BlockQuickNavigation,
