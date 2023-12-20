@@ -103,7 +103,7 @@ const removeCustomPrefixes = ( path ) => {
  * @param {Object} value Object to merge
  * @return {Array} Array of merged items
  */
-function mergeOrigins( value ) {
+export function mergeOrigins( value ) {
 	let result = mergeCache.get( value );
 	if ( ! result ) {
 		result = [ 'default', 'theme', 'custom' ].flatMap(
@@ -114,6 +114,20 @@ function mergeOrigins( value ) {
 	return result;
 }
 const mergeCache = new WeakMap();
+
+/**
+ * For settings like `color.palette`, which have a value that is an object
+ * with `default`, `theme`, `custom`, with field values that are arrays of
+ * items, see if any of the three origins have values.
+ *
+ * @param {Object} value Object to check
+ * @return {boolean} Whether the object has values in any of the three origins
+ */
+export function hasMergedOrigins( value ) {
+	return [ 'default', 'theme', 'custom' ].some(
+		( key ) => value?.[ key ]?.length
+	);
+}
 
 /**
  * Hook that retrieves the given settings for the block instance in use.

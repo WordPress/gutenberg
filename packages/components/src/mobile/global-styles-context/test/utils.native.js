@@ -108,6 +108,28 @@ describe( 'parseStylesVariables', () => {
 			expect.objectContaining( PARSED_GLOBAL_STYLES )
 		);
 	} );
+
+	it( 'returns the parsed custom color values correctly', () => {
+		const defaultStyles = {
+			...DEFAULT_GLOBAL_STYLES,
+			color: {
+				text: 'var(--wp--custom--color--blue)',
+				background: 'var(--wp--custom--color--green)',
+			},
+		};
+		const customValues = parseStylesVariables(
+			JSON.stringify( RAW_FEATURES.custom ),
+			MAPPED_VALUES
+		);
+		const styles = parseStylesVariables(
+			JSON.stringify( defaultStyles ),
+			MAPPED_VALUES,
+			customValues
+		);
+		expect( styles ).toEqual(
+			expect.objectContaining( PARSED_GLOBAL_STYLES )
+		);
+	} );
 } );
 
 describe( 'getGlobalStyles', () => {

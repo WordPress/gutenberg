@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { compose, usePrevious } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import {
 	BaseControl,
 	PanelBody,
@@ -14,7 +14,6 @@ import {
 	ToggleControl,
 	RangeControl,
 	Spinner,
-	ToolbarButton,
 } from '@wordpress/components';
 import {
 	store as blockEditorStore,
@@ -25,13 +24,7 @@ import {
 	BlockControls,
 	MediaReplaceFlow,
 } from '@wordpress/block-editor';
-import {
-	Platform,
-	useCallback,
-	useEffect,
-	useState,
-	useMemo,
-} from '@wordpress/element';
+import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -39,7 +32,6 @@ import { View } from '@wordpress/primitives';
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
-import { caption as captionIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -82,6 +74,8 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.isNative
 	? { type: 'stepper' }
 	: {};
 
+const EMPTY_ARRAY = [];
+
 function GalleryEdit( props ) {
 	const {
 		setAttributes,
@@ -94,34 +88,7 @@ function GalleryEdit( props ) {
 		onFocus,
 	} = props;
 
-	const { columns, imageCrop, linkTarget, linkTo, sizeSlug, caption } =
-		attributes;
-	const [ showCaption, setShowCaption ] = useState( !! caption );
-	const prevCaption = usePrevious( caption );
-
-	// We need to show the caption when changes come from
-	// history navigation(undo/redo).
-	useEffect( () => {
-		if ( caption && ! prevCaption ) {
-			setShowCaption( true );
-		}
-	}, [ caption, prevCaption ] );
-
-	useEffect( () => {
-		if ( ! isSelected && ! caption ) {
-			setShowCaption( false );
-		}
-	}, [ isSelected, caption ] );
-
-	// Focus the caption when we click to add one.
-	const captionRef = useCallback(
-		( node ) => {
-			if ( node && ! caption ) {
-				node.focus();
-			}
-		},
-		[ caption ]
-	);
+	const { columns, imageCrop, linkTarget, linkTo, sizeSlug } = attributes;
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
@@ -132,33 +99,29 @@ function GalleryEdit( props ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const { getBlock, getSettings, preferredStyle } = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		const preferredStyleVariations =
-			settings.__experimentalPreferredStyleVariations;
-		return {
-			getBlock: select( blockEditorStore ).getBlock,
-			getSettings: select( blockEditorStore ).getSettings,
-			preferredStyle: preferredStyleVariations?.value?.[ 'core/image' ],
-		};
-	}, [] );
-
-	const innerBlockImages = useSelect(
+	const {
+		getBlock,
+		getSettings,
+		preferredStyle,
+		innerBlockImages,
+		wasBlockJustInserted,
+	} = useSelect(
 		( select ) => {
-			const innerBlocks =
-				select( blockEditorStore ).getBlock( clientId )?.innerBlocks ??
-				[];
-			return innerBlocks;
-		},
-		[ clientId ]
-	);
-
-	const wasBlockJustInserted = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).wasBlockJustInserted(
-				clientId,
-				'inserter_menu'
-			);
+			const settings = select( blockEditorStore ).getSettings();
+			const preferredStyleVariations =
+				settings.__experimentalPreferredStyleVariations;
+			return {
+				getBlock: select( blockEditorStore ).getBlock,
+				getSettings: select( blockEditorStore ).getSettings,
+				preferredStyle:
+					preferredStyleVariations?.value?.[ 'core/image' ],
+				innerBlockImages:
+					select( blockEditorStore ).getBlock( clientId )
+						?.innerBlocks ?? EMPTY_ARRAY,
+				wasBlockJustInserted: select(
+					blockEditorStore
+				).wasBlockJustInserted( clientId, 'inserter_menu' ),
+			};
 		},
 		[ clientId ]
 	);
@@ -620,25 +583,6 @@ function GalleryEdit( props ) {
 			</InspectorControls>
 			{ Platform.isWeb && (
 				<>
-					<BlockControls group="block">
-						{ ! isContentLocked && (
-							<ToolbarButton
-								onClick={ () => {
-									setShowCaption( ! showCaption );
-									if ( showCaption && caption ) {
-										setAttributes( { caption: undefined } );
-									}
-								} }
-								icon={ captionIcon }
-								isPressed={ showCaption }
-								label={
-									showCaption
-										? __( 'Remove caption' )
-										: __( 'Add caption' )
-								}
-							/>
-						) }
-					</BlockControls>
 					<BlockControls group="other">
 						<MediaReplaceFlow
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -661,8 +605,7 @@ function GalleryEdit( props ) {
 			) }
 			<Gallery
 				{ ...props }
-				showCaption={ showCaption }
-				ref={ Platform.isWeb ? captionRef : undefined }
+				isContentLocked={ isContentLocked }
 				images={ images }
 				mediaPlaceholder={
 					! hasImages || Platform.isNative

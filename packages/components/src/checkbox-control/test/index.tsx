@@ -60,6 +60,13 @@ describe( 'CheckboxControl', () => {
 			expect( label ).toBeInTheDocument();
 		} );
 
+		it( 'should not render label element if label is set to false', () => {
+			render( <CheckboxControl label={ false } /> );
+
+			const label = screen.queryByRole( 'label' );
+			expect( label ).not.toBeInTheDocument();
+		} );
+
 		it( 'should render a checkbox in an indeterminate state', () => {
 			render( <CheckboxControl indeterminate /> );
 			expect( getInput() ).toHaveProperty( 'indeterminate', true );

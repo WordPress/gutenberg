@@ -17,7 +17,8 @@ import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
 /** @typedef {import('../api/registration').WPBlockType} WPBlockType */
 
-const { error, warn } = window.console;
+const error = ( ...args ) => window?.console?.error?.( ...args );
+const warn = ( ...args ) => window?.console?.warn?.( ...args );
 
 /**
  * Mapping of legacy category slugs to their latest normal values, used to

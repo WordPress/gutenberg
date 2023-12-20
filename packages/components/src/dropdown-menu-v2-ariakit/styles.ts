@@ -212,6 +212,18 @@ export const ItemPrefixWrapper = styled.span`
 	/* Always occupy the first column, even when auto-collapsing */
 	grid-column: 1;
 
+	/*
+	 * Even when the item is not checked, occupy the same screen space to avoid
+	 * the space collapside when no items are checked.
+	 */
+	${ DropdownMenuCheckboxItem } > &,
+	${ DropdownMenuRadioItem } > & {
+		/* Same width as the check icons */
+		min-width: ${ space( 6 ) };
+	}
+
+	${ DropdownMenuCheckboxItem } > &,
+	${ DropdownMenuRadioItem } > &,
 	&:not( :empty ) {
 		margin-inline-end: ${ space( 2 ) };
 	}
@@ -257,8 +269,9 @@ export const DropdownMenuItemChildrenWrapper = styled.div`
 `;
 
 export const ItemSuffixWrapper = styled.span`
-	flex: 0;
-	width: max-content;
+	flex: 0 1 fit-content;
+	min-width: 0;
+	width: fit-content;
 
 	display: flex;
 	align-items: center;

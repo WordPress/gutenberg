@@ -49,11 +49,16 @@ test.describe( 'Global styles revisions', () => {
 		await editor.saveSiteEditorEntities();
 
 		// Now there should be enough revisions to show the revisions UI.
-		await userGlobalStylesRevisions.openRevisions();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
 
 		const revisionButtons = page.getByRole( 'button', {
 			name: /^Changes saved by /,
 		} );
+
+		// Shows changes made in the revision.
+		await expect(
+			page.getByTestId( 'global-styles-revision-changes' )
+		).toHaveText( 'Colors' );
 
 		// There should be 2 revisions not including the reset to theme defaults button.
 		await expect( revisionButtons ).toHaveCount(
@@ -76,7 +81,7 @@ test.describe( 'Global styles revisions', () => {
 			.getByRole( 'option', { name: 'Color: Luminous vivid amber' } )
 			.click( { force: true } );
 
-		await userGlobalStylesRevisions.openRevisions();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
 
 		const unSavedButton = page.getByRole( 'button', {
 			name: /^Unsaved changes/,
@@ -112,9 +117,9 @@ test.describe( 'Global styles revisions', () => {
 	} ) => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
-		await userGlobalStylesRevisions.openRevisions();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
 		const lastRevisionButton = page
-			.getByLabel( 'Global styles revisions' )
+			.getByLabel( 'Global styles revisions list' )
 			.getByRole( 'button' )
 			.last();
 		await expect( lastRevisionButton ).toContainText( 'Default styles' );
@@ -122,6 +127,67 @@ test.describe( 'Global styles revisions', () => {
 		await expect(
 			page.getByRole( 'button', { name: 'Reset to defaults' } )
 		).toBeVisible();
+	} );
+
+	test( 'should access from the site editor sidebar', async ( { page } ) => {
+		const navigationContainer = page.getByRole( 'region', {
+			name: 'Navigation',
+		} );
+		await navigationContainer
+			.getByRole( 'button', { name: 'Styles' } )
+			.click();
+
+		await navigationContainer
+			.getByRole( 'button', { name: 'Revisions' } )
+			.click();
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeVisible();
+	} );
+
+	test( 'should allow switching to style book view', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.locator( 'body' ).click();
+		await userGlobalStylesRevisions.openStylesPanel();
+		const revisionsButton = page.getByRole( 'button', {
+			name: 'Revisions',
+		} );
+		const styleBookButton = page.getByRole( 'button', {
+			name: 'Style Book',
+		} );
+		await revisionsButton.click();
+		// We can see the Revisions list.
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeVisible();
+		await expect(
+			page.locator( 'iframe[name="revisions"]' )
+		).toBeVisible();
+		await expect(
+			page.locator( 'iframe[name="style-book-canvas"]' )
+		).toBeHidden();
+		await styleBookButton.click();
+		await expect(
+			page.locator( 'iframe[name="style-book-canvas"]' )
+		).toBeVisible();
+		await expect( page.locator( 'iframe[name="revisions"]' ) ).toBeHidden();
+
+		// Deactivating revisions view while the style book is open should close revisions,
+		// but not the style book.
+		await revisionsButton.click();
+
+		// Style book is still visible but...
+		await expect(
+			page.locator( 'iframe[name="style-book-canvas"]' )
+		).toBeVisible();
+		// The Revisions list is hidden.
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeHidden();
 	} );
 } );
 
@@ -140,16 +206,6 @@ class UserGlobalStylesRevisions {
 			);
 		}
 		return [];
-	}
-
-	async openRevisions() {
-		await this.page
-			.getByRole( 'menubar', { name: 'Styles actions' } )
-			.click();
-		await this.page.getByRole( 'button', { name: 'Revisions' } ).click();
-		await this.page
-			.getByRole( 'menuitem', { name: /^Revision history/ } )
-			.click();
 	}
 
 	async openStylesPanel() {

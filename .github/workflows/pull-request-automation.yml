@@ -8,9 +8,6 @@ jobs:
     pull-request-automation:
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' }}
-        strategy:
-            matrix:
-                node: ['16']
 
         steps:
             # Checkout defaults to using the branch which triggered the event, which
@@ -23,7 +20,8 @@ jobs:
             - name: Use desired version of Node.js
               uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
               with:
-                  node-version: ${{ matrix.node }}
+                  node-version-file: '.nvmrc'
+                  check-latest: true
 
             - name: Cache NPM packages
               uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2

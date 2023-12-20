@@ -86,7 +86,10 @@ export async function selectGlobalInserterTab( label ) {
 	}
 
 	const activeTab = await page.waitForSelector(
-		'.block-editor-inserter__tabs button.is-active'
+		// Targeting a class name is necessary here, because there are likely
+		// two implementations of the `Tabs` component visible to this test, and
+		// we want to confirm that it's waiting for the correct one.
+		'.block-editor-inserter__tabs [role="tab"][aria-selected="true"]'
 	);
 
 	const activeTabLabel = await page.evaluate(

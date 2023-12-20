@@ -27,6 +27,12 @@ export type FocalPointPickerProps = Pick<
 	 */
 	__nextHasNoMarginBottom?: boolean;
 	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
+	/**
 	 * Autoplays HTML5 video. This only applies to video sources (`url`).
 	 *
 	 * @default true
@@ -62,6 +68,7 @@ export type FocalPointPickerProps = Pick<
 
 export type FocalPointPickerControlsProps = {
 	__nextHasNoMarginBottom?: boolean;
+	__next40pxDefaultSize?: boolean;
 	/**
 	 * A bit of extra bottom margin will be added if a `help` text
 	 * needs to be rendered under it.

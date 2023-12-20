@@ -39,25 +39,26 @@ export default function useGlobalStylesRevisions() {
 		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 		const _currentUser = getCurrentUser();
 		const _isDirty = dirtyEntityRecords.length > 0;
+		const query = {
+			per_page: 100,
+		};
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
 		const globalStylesRevisions =
-			getRevisions(
-				'root',
-				'globalStyles',
-				__experimentalGetCurrentGlobalStylesId(),
-				{
-					per_page: 100,
-				}
-			) || EMPTY_ARRAY;
+			getRevisions( 'root', 'globalStyles', globalStylesId, query ) ||
+			EMPTY_ARRAY;
 		const _authors = getUsers( SITE_EDITOR_AUTHORS_QUERY ) || EMPTY_ARRAY;
-
+		const _isResolving = isResolving( 'getRevisions', [
+			'root',
+			'globalStyles',
+			globalStylesId,
+			query,
+		] );
 		return {
 			authors: _authors,
 			currentUser: _currentUser,
 			isDirty: _isDirty,
 			revisions: globalStylesRevisions,
-			isLoadingGlobalStylesRevisions: isResolving(
-				'getCurrentThemeGlobalStylesRevisions'
-			),
+			isLoadingGlobalStylesRevisions: _isResolving,
 		};
 	}, [] );
 	return useMemo( () => {
