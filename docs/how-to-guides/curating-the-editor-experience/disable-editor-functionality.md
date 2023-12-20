@@ -62,7 +62,7 @@ This JavaScript should be enqueued much like the block variation example above. 
 
 ## Disable access to the Template Editor
 
-Whether you’re using [theme.json in a Classic theme](https://developer.wordpress.org/themes/block-themes/converting-a-classic-theme-to-a-block-theme/#adding-theme-json-in-classic-themes) or Block Theme, you can add the following to your `functions.php` file to remove access to the Template Editor that is available when editing posts or pages:
+Whether you’re using theme.json in a Classic or Block theme, you can add the following to your `functions.php` file to remove access to the Template Editor that is available when editing posts or pages:
 
 ```php
 function example_theme_support() {
