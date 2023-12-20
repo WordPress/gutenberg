@@ -53,6 +53,11 @@ import {
 	placementToMotionAnimationProps,
 	getReferenceElement,
 } from './utils';
+import {
+	contextConnect,
+	useContextSystem,
+	ContextSystemProvider,
+} from '../context';
 import type { WordPressComponentProps } from '../context';
 import type {
 	PopoverProps,
@@ -108,7 +113,7 @@ const getPopoverFallbackContainer = () => {
 	return container;
 };
 
-const UnforwardedPopover = (
+const UnconnectedPopover = (
 	props: Omit<
 		WordPressComponentProps< PopoverProps, 'div', false >,
 		// To avoid overlaps between the standard HTML attributes and the props
@@ -148,7 +153,7 @@ const UnforwardedPopover = (
 
 		// Rest
 		...contentProps
-	} = props;
+	} = useContextSystem( props, 'Popover' );
 
 	let computedFlipProp = flip;
 	let computedResizeProp = resize;
@@ -383,63 +388,100 @@ const UnforwardedPopover = (
 	const isPositioned =
 		( ! shouldAnimate || animationFinished ) && x !== null && y !== null;
 
+	// In case a `ColorPicker` component is rendered as a child of `Popover`,
+	// the `Popover` component can be notified of when the user is dragging
+	// parts of the `ColorPicker` UI (this is possible because the `ColorPicker`
+	// component exposes the `onPickerDragStart` and `onPickerDragEnd` props
+	// via internal context).
+	// While the user is performing a pointer drag, the `Popover` will render
+	// a transparent backdrop element that will serve as a "pointer events trap",
+	// making sure that no pointer events reach any potential `iframe` element
+	// underneath (like, for example, the editor canvas in the WordPress editor).
+	const [ showBackdrop, setShowBackdrop ] = useState( false );
+	const contextValue = useMemo(
+		() => ( {
+			ColorPicker: {
+				onPickerDragStart() {
+					setShowBackdrop( true );
+				},
+				onPickerDragEnd() {
+					setShowBackdrop( false );
+				},
+			},
+		} ),
+		[]
+	);
+
 	let content = (
-		<motion.div
-			className={ classnames( 'components-popover', className, {
-				'is-expanded': isExpanded,
-				'is-positioned': isPositioned,
-				// Use the 'alternate' classname for 'toolbar' variant for back compat.
-				[ `is-${
-					computedVariant === 'toolbar'
-						? 'alternate'
-						: computedVariant
-				}` ]: computedVariant,
-			} ) }
-			{ ...animationProps }
-			{ ...contentProps }
-			ref={ mergedFloatingRef }
-			{ ...dialogProps }
-			tabIndex={ -1 }
-		>
-			{ /* Prevents scroll on the document */ }
-			{ isExpanded && <ScrollLock /> }
-			{ isExpanded && (
-				<div className="components-popover__header">
-					<span className="components-popover__header-title">
-						{ headerTitle }
-					</span>
-					<Button
-						className="components-popover__close"
-						icon={ close }
-						onClick={ onClose }
-					/>
-				</div>
-			) }
-			<div className="components-popover__content">{ children }</div>
-			{ hasArrow && (
+		<>
+			{ showBackdrop && (
 				<div
-					ref={ arrowCallbackRef }
-					className={ [
-						'components-popover__arrow',
-						`is-${ computedPlacement.split( '-' )[ 0 ] }`,
-					].join( ' ' ) }
-					style={ {
-						left:
-							typeof arrowData?.x !== 'undefined' &&
-							Number.isFinite( arrowData.x )
-								? `${ arrowData.x }px`
-								: '',
-						top:
-							typeof arrowData?.y !== 'undefined' &&
-							Number.isFinite( arrowData.y )
-								? `${ arrowData.y }px`
-								: '',
-					} }
-				>
-					<ArrowTriangle />
-				</div>
+					className="components-popover-pointer-events-trap"
+					aria-hidden="true"
+					onClick={ () => setShowBackdrop( false ) }
+				/>
 			) }
-		</motion.div>
+			<motion.div
+				className={ classnames( 'components-popover', className, {
+					'is-expanded': isExpanded,
+					'is-positioned': isPositioned,
+					// Use the 'alternate' classname for 'toolbar' variant for back compat.
+					[ `is-${
+						computedVariant === 'toolbar'
+							? 'alternate'
+							: computedVariant
+					}` ]: computedVariant,
+				} ) }
+				{ ...animationProps }
+				{ ...contentProps }
+				ref={ mergedFloatingRef }
+				{ ...dialogProps }
+				tabIndex={ -1 }
+			>
+				{ /* Prevents scroll on the document */ }
+				{ isExpanded && <ScrollLock /> }
+				{ isExpanded && (
+					<div className="components-popover__header">
+						<span className="components-popover__header-title">
+							{ headerTitle }
+						</span>
+						<Button
+							className="components-popover__close"
+							icon={ close }
+							onClick={ onClose }
+						/>
+					</div>
+				) }
+				<div className="components-popover__content">
+					<ContextSystemProvider value={ contextValue }>
+						{ children }
+					</ContextSystemProvider>
+				</div>
+				{ hasArrow && (
+					<div
+						ref={ arrowCallbackRef }
+						className={ [
+							'components-popover__arrow',
+							`is-${ computedPlacement.split( '-' )[ 0 ] }`,
+						].join( ' ' ) }
+						style={ {
+							left:
+								typeof arrowData?.x !== 'undefined' &&
+								Number.isFinite( arrowData.x )
+									? `${ arrowData.x }px`
+									: '',
+							top:
+								typeof arrowData?.y !== 'undefined' &&
+								Number.isFinite( arrowData.y )
+									? `${ arrowData.y }px`
+									: '',
+						} }
+					>
+						<ArrowTriangle />
+					</div>
+				) }
+			</motion.div>
+		</>
 	);
 
 	const shouldRenderWithinSlot = slot.ref && ! inline;
@@ -489,7 +531,7 @@ const UnforwardedPopover = (
  * ```
  *
  */
-export const Popover = forwardRef( UnforwardedPopover );
+export const Popover = contextConnect( UnconnectedPopover, 'Popover' );
 
 function PopoverSlot(
 	{ name = SLOT_NAME }: { name?: string },

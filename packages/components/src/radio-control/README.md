@@ -5,12 +5,6 @@ Use radio buttons when you want users to select one option from a set, and you w
 ![](https://make.wordpress.org/design/files/2018/11/radio.png)
 Selected and unselected radio buttons
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage

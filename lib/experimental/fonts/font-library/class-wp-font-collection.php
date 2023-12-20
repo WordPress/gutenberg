@@ -6,7 +6,7 @@
  *
  * @package    WordPress
  * @subpackage Font Library
- * @since      6.4.0
+ * @since      6.5.0
  */
 
 if ( class_exists( 'WP_Font_Collection' ) ) {
@@ -16,14 +16,14 @@ if ( class_exists( 'WP_Font_Collection' ) ) {
 /**
  * Font Collection class.
  *
- * @since 6.4.0
+ * @since 6.5.0
  */
 class WP_Font_Collection {
 
 	/**
 	 * Font collection configuration.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @var array
 	 */
@@ -32,7 +32,7 @@ class WP_Font_Collection {
 	/**
 	 * WP_Font_Collection constructor.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $config Font collection config options.
 	 *                      See {@see wp_register_font_collection()} for the supported fields.
@@ -61,7 +61,7 @@ class WP_Font_Collection {
 	/**
 	 * Gets the font collection config.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return array An array containing the font collection config.
 	 */
@@ -72,7 +72,7 @@ class WP_Font_Collection {
 	/**
 	 * Gets the font collection data.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return array|WP_Error An array containing the list of font families in theme.json format on success,
 	 *                        else an instance of WP_Error on failure.

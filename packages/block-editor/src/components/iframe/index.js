@@ -73,12 +73,13 @@ function bubbleEvent( event, Constructor, frame ) {
  * @param {Document} iframeDocument Document to attach listeners to.
  */
 function useBubbleEvents( iframeDocument ) {
-	return useRefEffect( ( body ) => {
+	return useRefEffect( () => {
 		const { defaultView } = iframeDocument;
 		if ( ! defaultView ) {
 			return;
 		}
 		const { frameElement } = defaultView;
+		const html = iframeDocument.documentElement;
 		const eventTypes = [ 'dragover', 'mousemove' ];
 		const handlers = {};
 		for ( const name of eventTypes ) {
@@ -88,12 +89,12 @@ function useBubbleEvents( iframeDocument ) {
 				const Constructor = window[ constructorName ];
 				bubbleEvent( event, Constructor, frameElement );
 			};
-			body.addEventListener( name, handlers[ name ] );
+			html.addEventListener( name, handlers[ name ] );
 		}
 
 		return () => {
 			for ( const name of eventTypes ) {
-				body.removeEventListener( name, handlers[ name ] );
+				html.removeEventListener( name, handlers[ name ] );
 			}
 		};
 	} );

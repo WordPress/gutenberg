@@ -17,7 +17,7 @@ describe( 'preferences', () => {
 	async function getActiveSidebarTabText() {
 		try {
 			return await page.$eval(
-				'.edit-post-sidebar__panel-tab.is-active',
+				'div[aria-label="Editor settings"] [role="tab"][aria-selected="true"]',
 				( node ) => node.textContent
 			);
 		} catch ( error ) {
@@ -29,11 +29,15 @@ describe( 'preferences', () => {
 	}
 
 	it( 'remembers sidebar dismissal between sessions', async () => {
+		const blockTab = await page.waitForXPath(
+			`//button[@role="tab"][contains(text(), 'Block')]`
+		);
+
 		// Open by default.
 		expect( await getActiveSidebarTabText() ).toBe( 'Post' );
 
 		// Change to "Block" tab.
-		await page.click( '.edit-post-sidebar__panel-tab[aria-label="Block"]' );
+		await blockTab.click();
 		expect( await getActiveSidebarTabText() ).toBe( 'Block' );
 
 		// Regression test: Reload resets to document tab.
@@ -46,7 +50,7 @@ describe( 'preferences', () => {
 
 		// Dismiss.
 		await page.click(
-			'.edit-post-sidebar__panel-tabs [aria-label="Close Settings"]'
+			'div[aria-label="Editor settings"] div[role="tablist"] + button[aria-label="Close Settings"]'
 		);
 		expect( await getActiveSidebarTabText() ).toBe( null );
 

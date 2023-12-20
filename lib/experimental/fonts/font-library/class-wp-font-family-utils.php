@@ -6,7 +6,7 @@
  *
  * @package    WordPress
  * @subpackage Font Library
- * @since      6.4.0
+ * @since      6.5.0
  */
 
 if ( class_exists( 'WP_Font_Family_Utils' ) ) {
@@ -16,7 +16,7 @@ if ( class_exists( 'WP_Font_Family_Utils' ) ) {
 /**
  * A class of utilities for working with the Font Library.
  *
- * @since 6.4.0
+ * @since 6.5.0
  */
 class WP_Font_Family_Utils {
 
@@ -26,7 +26,7 @@ class WP_Font_Family_Utils {
 	 * Creates a filename for a font face asset using font family, style, weight and
 	 * extension information.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string $font_slug The font slug to use in the filename.
 	 * @param array  $font_face The font face array containing 'fontFamily', 'fontStyle', and
@@ -48,7 +48,7 @@ class WP_Font_Family_Utils {
 	/**
 	 * Merges two fonts and their font faces.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $font1 The first font to merge.
 	 * @param array $font2 The second font to merge.
@@ -79,7 +79,7 @@ class WP_Font_Family_Utils {
 	/**
 	 * Returns whether the given file has a font MIME type.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string $filepath The file to check.
 	 * @return bool True if the file has a font MIME type, false otherwise.
@@ -89,5 +89,37 @@ class WP_Font_Family_Utils {
 		$filetype           = wp_check_filetype( $filepath, $allowed_mime_types );
 
 		return in_array( $filetype['type'], $allowed_mime_types, true );
+	}
+
+	/**
+	 * Format font family to make it valid CSS.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param string $font_family Font family attribute.
+	 * @return string The formatted font family attribute.
+	 */
+	public static function format_font_family( $font_family ) {
+		if ( $font_family ) {
+			$font_families         = explode( ',', $font_family );
+			$wrapped_font_families = array_map(
+				function ( $family ) {
+					$trimmed = trim( $family );
+					if ( ! empty( $trimmed ) && strpos( $trimmed, ' ' ) !== false && strpos( $trimmed, "'" ) === false && strpos( $trimmed, '"' ) === false ) {
+							return "'" . $trimmed . "'";
+					}
+					return $trimmed;
+				},
+				$font_families
+			);
+
+			if ( count( $wrapped_font_families ) === 1 ) {
+				$font_family = $wrapped_font_families[0];
+			} else {
+				$font_family = implode( ', ', $wrapped_font_families );
+			}
+		}
+
+		return $font_family;
 	}
 }

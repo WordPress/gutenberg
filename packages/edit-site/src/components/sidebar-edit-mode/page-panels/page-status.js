@@ -6,7 +6,6 @@ import {
 	ToggleControl,
 	Dropdown,
 	__experimentalText as Text,
-	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	TextControl,
 	RadioControl,
@@ -19,11 +18,15 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { useInstanceId } from '@wordpress/compose';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import StatusLabel from '../../sidebar-navigation-screen-page/status-label';
+import { unlock } from '../../../lock-unlock';
+
+const { PostPanelRow } = unlock( editorPrivateApis );
 
 const STATUS_OPTIONS = [
 	{
@@ -159,10 +162,7 @@ export default function PageStatus( {
 	};
 
 	return (
-		<HStack className="edit-site-summary-field">
-			<Text className="edit-site-summary-field__label">
-				{ __( 'Status' ) }
-			</Text>
+		<PostPanelRow label={ __( 'Status' ) }>
 			<Dropdown
 				contentClassName="edit-site-change-status__content"
 				popoverProps={ popoverProps }
@@ -244,6 +244,6 @@ export default function PageStatus( {
 					</>
 				) }
 			/>
-		</HStack>
+		</PostPanelRow>
 	);
 }

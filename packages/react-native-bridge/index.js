@@ -3,6 +3,11 @@
  */
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
+/**
+ * WordPress dependencies
+ */
+import { useEffect, useState } from '@wordpress/element';
+
 const { RNReactNativeGutenbergBridge } = NativeModules;
 const isIOS = Platform.OS === 'ios';
 const isAndroid = Platform.OS === 'android';
@@ -183,6 +188,49 @@ export function subscribeOnUndoPressed( callback ) {
 
 export function subscribeOnRedoPressed( callback ) {
 	return gutenbergBridgeEvents.addListener( 'onRedoPressed', callback );
+}
+
+export function useIsConnected() {
+	const [ isConnected, setIsConnected ] = useState( null );
+
+	useEffect( () => {
+		let isCurrent = true;
+
+		RNReactNativeGutenbergBridge.requestConnectionStatus(
+			( isBridgeConnected ) => {
+				if ( ! isCurrent ) {
+					return;
+				}
+
+				setIsConnected( isBridgeConnected );
+			}
+		);
+
+		return () => {
+			isCurrent = false;
+		};
+	}, [] );
+
+	useEffect( () => {
+		const subscription = subscribeConnectionStatus(
+			( { isConnected: isBridgeConnected } ) => {
+				setIsConnected( isBridgeConnected );
+			}
+		);
+
+		return () => {
+			subscription.remove();
+		};
+	}, [] );
+
+	return { isConnected };
+}
+
+function subscribeConnectionStatus( callback ) {
+	return gutenbergBridgeEvents.addListener(
+		'connectionStatusChange',
+		callback
+	);
 }
 
 /**
@@ -465,6 +513,33 @@ export function sendEventToHost( eventName, properties ) {
 		eventName,
 		properties
 	);
+}
+
+/**
+ * Shows Android's soft keyboard if there's a TextInput focused and
+ * the keyboard is hidden.
+ *
+ * @return {void}
+ */
+export function showAndroidSoftKeyboard() {
+	if ( isIOS ) {
+		return;
+	}
+
+	RNReactNativeGutenbergBridge.showAndroidSoftKeyboard();
+}
+
+/**
+ * Hides Android's soft keyboard.
+ *
+ * @return {void}
+ */
+export function hideAndroidSoftKeyboard() {
+	if ( isIOS ) {
+		return;
+	}
+
+	RNReactNativeGutenbergBridge.hideAndroidSoftKeyboard();
 }
 
 /**

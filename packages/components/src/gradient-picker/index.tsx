@@ -257,7 +257,7 @@ export function GradientPicker( {
 						onChange={ onChange }
 					/>
 				) }
-				{ ( gradients.length || clearable ) && (
+				{ ( gradients.length > 0 || clearable ) && (
 					<Component
 						{ ...additionalProps }
 						className={ className }

@@ -52,7 +52,7 @@ const registerGutenberg = ( {
 			this.editorComponent = setup();
 
 			// Apply optional setup configuration, enabling modification via hooks.
-			if ( typeof require.context === 'function' ) {
+			if ( __DEV__ && typeof require.context === 'function' ) {
 				const req = require.context( './', false, /setup-local\.js$/ );
 				req.keys().forEach( ( key ) => req( key ).default() );
 			}

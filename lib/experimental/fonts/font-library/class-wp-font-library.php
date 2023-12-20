@@ -6,7 +6,7 @@
  *
  * @package    WordPress
  * @subpackage Font Library
- * @since      6.4.0
+ * @since      6.5.0
  */
 
 if ( class_exists( 'WP_Font_Library' ) ) {
@@ -16,7 +16,7 @@ if ( class_exists( 'WP_Font_Library' ) ) {
 /**
  * Font Library class.
  *
- * @since 6.4.0
+ * @since 6.5.0
  */
 class WP_Font_Library {
 
@@ -25,7 +25,7 @@ class WP_Font_Library {
 	 *
 	 * This is necessary until a collection of valid mime-types per-file extension can be provided to 'upload_mimes' filter.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $php_version_id The version of PHP to provide mime types for. The default is the current PHP version.
 	 *
@@ -46,7 +46,7 @@ class WP_Font_Library {
 	/**
 	 * Font collections.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @var array
 	 */
@@ -55,7 +55,7 @@ class WP_Font_Library {
 	/**
 	 * Register a new font collection.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $config Font collection config options.
 	 *                      See {@see wp_register_font_collection()} for the supported fields.
@@ -75,7 +75,7 @@ class WP_Font_Library {
 	/**
 	 * Gets all the font collections available.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return array List of font collections.
 	 */
@@ -86,7 +86,7 @@ class WP_Font_Library {
 	/**
 	 * Gets a font collection.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string $id Font collection id.
 	 * @return array List of font collections.
@@ -101,7 +101,7 @@ class WP_Font_Library {
 	/**
 	 * Gets the upload directory for fonts.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return string Path of the upload directory for fonts.
 	 */
@@ -112,7 +112,7 @@ class WP_Font_Library {
 	/**
 	 * Sets the upload directory for fonts.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $defaults {
 	 *     Default upload directory.
@@ -138,7 +138,7 @@ class WP_Font_Library {
 	/**
 	 * Sets the allowed mime types for fonts.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $mime_types List of allowed mime types.
 	 * @return array Modified upload directory.

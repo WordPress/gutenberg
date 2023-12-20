@@ -13,7 +13,7 @@ Do you want to add styling or JavaScript to the user-generated content (blocks) 
 
 There are different hooks to use depending on the answers to these questions, and if you are building a block or a theme, there are additional approaches to consider. Refer to the designated sections below.
 
-## Scenarios for enqueing assets
+## Scenarios for enqueuing assets
 ### Editor scripts and styles
 
 Whenever you need to enqueue assets for the Editor itself (i.e. not the user-generated content), you should use the [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) hook coupled with the standard [`wp_enqueue_script`](https://developer.wordpress.org/reference/functions/wp_enqueue_script/) and [`wp_enqueue_style`](https://developer.wordpress.org/reference/functions/wp_enqueue_style/) functions.

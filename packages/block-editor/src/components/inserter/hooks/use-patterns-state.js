@@ -11,6 +11,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { PATTERN_TYPES } from '../block-patterns-tab/utils';
 
 /**
  * Retrieves the block patterns inserter state.
@@ -57,7 +58,8 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 	const onClickPattern = useCallback(
 		( pattern, blocks ) => {
 			const patternBlocks =
-				pattern.id && pattern.syncStatus !== 'unsynced'
+				pattern.type === PATTERN_TYPES.user &&
+				pattern.syncStatus !== 'unsynced'
 					? [ createBlock( 'core/block', { ref: pattern.id } ) ]
 					: blocks;
 			onInsert(

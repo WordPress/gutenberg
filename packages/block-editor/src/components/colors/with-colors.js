@@ -3,6 +3,7 @@
  */
 import { useMemo, Component } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -13,8 +14,8 @@ import {
 	getColorObjectByAttributeValues,
 	getMostReadableColor,
 } from './utils';
-import useSetting from '../use-setting';
-import { kebabCase } from '../../utils/object';
+import { useSettings } from '../use-settings';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Capitalizes the first letter in a string.
@@ -51,12 +52,11 @@ const withCustomColorPalette = ( colorsArray ) =>
 const withEditorColorPalette = () =>
 	createHigherOrderComponent(
 		( WrappedComponent ) => ( props ) => {
-			// Some color settings have a special handling for deprecated flags in `useSetting`,
-			// so we can't unwrap them by doing const { ... } = useSetting('color')
-			// until https://github.com/WordPress/gutenberg/issues/37094 is fixed.
-			const userPalette = useSetting( 'color.palette.custom' );
-			const themePalette = useSetting( 'color.palette.theme' );
-			const defaultPalette = useSetting( 'color.palette.default' );
+			const [ userPalette, themePalette, defaultPalette ] = useSettings(
+				'color.palette.custom',
+				'color.palette.theme',
+				'color.palette.default'
+			);
 			const allColors = useMemo(
 				() => [
 					...( userPalette || [] ),
@@ -80,6 +80,7 @@ const withEditorColorPalette = () =>
  * @return {Component} The component that can be used as a HOC.
  */
 function createColorHOC( colorTypes, withColorPalette ) {
+	const { kebabCase } = unlock( componentsPrivateApis );
 	const colorMap = colorTypes.reduce( ( colorObject, colorType ) => {
 		return {
 			...colorObject,

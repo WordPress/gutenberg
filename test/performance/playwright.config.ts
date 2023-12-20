@@ -27,6 +27,7 @@ const config = defineConfig( {
 	),
 	use: {
 		...baseConfig.use,
+		actionTimeout: 120_000, // 2 minutes.
 		video: 'off',
 	},
 } );

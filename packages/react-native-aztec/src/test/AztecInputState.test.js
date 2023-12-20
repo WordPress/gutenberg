@@ -32,6 +32,8 @@ const updateCurrentFocusedInput = ( value ) => {
 	notifyInputChange();
 };
 
+jest.useFakeTimers();
+
 describe( 'Aztec Input State', () => {
 	it( 'listens to focus change event', () => {
 		const listener = jest.fn();
@@ -96,6 +98,7 @@ describe( 'Aztec Input State', () => {
 
 	it( 'unfocuses an element', () => {
 		blur( ref );
+		jest.runAllTimers();
 		expect( TextInputState.blurTextInput ).toHaveBeenCalledWith( ref );
 	} );
 } );

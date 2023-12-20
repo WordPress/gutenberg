@@ -12,6 +12,7 @@ process.on( 'unhandledRejection', ( err ) => {
 /**
  * External dependencies
  */
+const path = require( 'path' );
 const { resolve } = require( 'node:path' );
 const { sync: spawn } = require( 'cross-spawn' );
 
@@ -23,25 +24,35 @@ const {
 	hasProjectFile,
 	hasArgInCLI,
 	getArgsFromCLI,
+	getAsBooleanFromENV,
 } = require( '../utils' );
 
-const result = spawn(
-	'node',
-	[ require.resolve( 'playwright-core/cli' ), 'install' ],
-	{
-		stdio: 'inherit',
-	}
-);
+if ( ! getAsBooleanFromENV( 'PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD' ) ) {
+	const result = spawn(
+		'node',
+		[
+			path.resolve(
+				require.resolve( 'playwright-core' ),
+				'..',
+				'cli.js'
+			),
+			'install',
+		],
+		{
+			stdio: 'inherit',
+		}
+	);
 
-if ( result.status > 0 ) {
-	process.exit( result.status );
+	if ( result.status > 0 ) {
+		process.exit( result.status );
+	}
 }
 
 const config =
 	! hasArgInCLI( '--config' ) &&
 	! hasProjectFile( 'playwright.config.ts' ) &&
 	! hasProjectFile( 'playwright.config.js' )
-		? [ '--config', fromConfigRoot( 'playwright.config.ts' ) ]
+		? [ '--config', fromConfigRoot( 'playwright.config.js' ) ]
 		: [];
 
 // Set the default artifacts path.
@@ -53,7 +64,7 @@ if ( ! process.env.WP_ARTIFACTS_PATH ) {
 }
 
 const testResult = spawn(
-	'npx',
+	'node',
 	[
 		require.resolve( '@playwright/test/cli' ),
 		'test',
