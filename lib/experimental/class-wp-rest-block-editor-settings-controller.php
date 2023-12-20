@@ -312,6 +312,11 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 					'type'        => 'boolean',
 					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
 				),
+				'gutenbergVersion'                       => array(
+					'description' => __( 'Returns the current Gutenberg plugin version.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+				),
 			),
 		);
 
