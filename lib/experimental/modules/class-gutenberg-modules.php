@@ -75,7 +75,7 @@ class Gutenberg_Modules {
 	}
 
 	/**
-	 * Unmarks the module so it is not longer enqueued in the page.
+	 * Unmarks the module so it is no longer enqueued in the page.
 	 *
 	 * @param string $module_identifier The identifier of the module.
 	 */
