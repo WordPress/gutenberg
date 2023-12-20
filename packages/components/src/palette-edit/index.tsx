@@ -60,7 +60,7 @@ import type {
 	PaletteElement,
 } from './types';
 
-export const DEFAULT_COLOR = '#000';
+const DEFAULT_COLOR = '#000';
 
 function NameInput( { value, onChange, label }: NameInputProps ) {
 	return (
@@ -259,32 +259,6 @@ function Option< T extends Color | Gradient >( {
 			) }
 		</PaletteItem>
 	);
-}
-
-/**
- * Checks if a color or gradient is a temporary element by testing against default values.
- */
-export function isTemporaryElement(
-	slugPrefix: string,
-	{ slug, color, gradient }: Color | Gradient
-): Boolean {
-	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
-
-	// If the slug matches the temporary name regex,
-	// check if the color or gradient matches the default value.
-	if ( regex.test( slug ) ) {
-		// The order is important as gradient elements
-		// contain a color property.
-		if ( !! gradient ) {
-			return gradient === DEFAULT_GRADIENT;
-		}
-
-		if ( !! color ) {
-			return color === DEFAULT_COLOR;
-		}
-	}
-
-	return false;
 }
 
 function PaletteEditListView< T extends Color | Gradient >( {
