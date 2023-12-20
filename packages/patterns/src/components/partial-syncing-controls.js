@@ -18,51 +18,45 @@ import { PARTIAL_SYNCING_SUPPORTED_BLOCKS } from '../constants';
 function PartialSyncingControls( { name, attributes, setAttributes } ) {
 	const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
 
-	function updateConnections( attributeName, isChecked ) {
+	function updateBindings( attributeName, isChecked ) {
 		if ( ! isChecked ) {
-			let updatedConnections = {
-				...attributes.connections,
-				attributes: {
-					...attributes.connections?.attributes,
-					[ attributeName ]: undefined,
-				},
+			let updatedBindings = {
+				...attributes?.metadata?.bindings,
+				[ attributeName ]: undefined,
 			};
-			if ( Object.keys( updatedConnections.attributes ).length === 1 ) {
-				updatedConnections.attributes = undefined;
-			}
-			if (
-				Object.keys( updatedConnections ).length === 1 &&
-				updateConnections.attributes === undefined
-			) {
-				updatedConnections = undefined;
+			if ( Object.keys( updatedBindings ).length === 1 ) {
+				updatedBindings = undefined;
 			}
 			setAttributes( {
-				connections: updatedConnections,
+				metadata: {
+					...attributes.metadata,
+					bindings: updatedBindings,
+				},
 			} );
 			return;
 		}
 
-		const updatedConnections = {
-			...attributes.connections,
-			attributes: {
-				...attributes.connections?.attributes,
-				[ attributeName ]: {
-					source: 'pattern_attributes',
-				},
-			},
+		const updatedBindings = {
+			...attributes?.metadata?.bindings,
+			[ attributeName ]: { source: { name: 'pattern_attributes' } },
 		};
 
 		if ( typeof attributes.metadata?.id === 'string' ) {
-			setAttributes( { connections: updatedConnections } );
+			setAttributes( {
+				metadata: {
+					...attributes.metadata,
+					bindings: updatedBindings,
+				},
+			} );
 			return;
 		}
 
 		const id = nanoid( 6 );
 		setAttributes( {
-			connections: updatedConnections,
 			metadata: {
 				...attributes.metadata,
 				id,
+				bindings: updatedBindings,
 			},
 		} );
 	}
@@ -80,12 +74,12 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 							__nextHasNoMarginBottom
 							label={ label }
 							checked={
-								attributes.connections?.attributes?.[
+								attributes?.metadata?.bindings?.[
 									attributeName
-								]?.source === 'pattern_attributes'
+								]?.source?.name === 'pattern_attributes'
 							}
 							onChange={ ( isChecked ) => {
-								updateConnections( attributeName, isChecked );
+								updateBindings( attributeName, isChecked );
 							} }
 						/>
 					)

@@ -148,7 +148,12 @@ if ( $gutenberg_experiments && (
 
 				$source_callback = $block_bindings_sources[ $binding_source['source']['name'] ]['apply'];
 				// Get the value based on the source.
-				$source_value = $source_callback( $binding_source['source']['attributes'], $block_content, $block, $block_instance );
+				if ( ! isset( $binding_source['source']['attributes'] ) ) {
+					$source_args = array();
+				} else {
+					$source_args = $binding_source['source']['attributes'];
+				}
+				$source_value = $source_callback( $source_args, $block_content, $block, $block_instance );
 				// If the value is null, process next attribute.
 				if ( is_null( $source_value ) ) {
 					continue;

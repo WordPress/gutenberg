@@ -63,6 +63,7 @@
 				"fontSize": true
 			}
 		},
+		"__experimentalBlockBindings": true,
 		"__experimentalSelector": "p",
 		"__unstablePasteTextInline": true
 	},
