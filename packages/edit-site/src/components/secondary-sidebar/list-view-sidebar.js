@@ -88,10 +88,7 @@ export default function ListViewSidebar() {
 
 	// This only fires when the sidebar is open because of the conditional rendering.
 	// It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
-	useShortcut(
-		'core/edit-site/toggle-list-view',
-		handleToggleListViewShortcut
-	);
+	useShortcut( 'core/editor/toggle-list-view', handleToggleListViewShortcut );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
