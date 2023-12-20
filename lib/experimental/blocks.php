@@ -88,10 +88,10 @@ if ( $gutenberg_experiments && (
 ) ) {
 
 	require_once __DIR__ . '/block-bindings/index.php';
-	// Whitelist of blocks that support block bindings.
+		// Allowed blocks that support block bindings.
 	// TODO: Look for a mechanism to opt-in for this. Maybe adding a property to block attributes?
-	global $block_bindings_whitelist;
-	$block_bindings_whitelist = array(
+	global $block_bindings_allowed_blocks;
+	$block_bindings_allowed_blocks = array(
 		'core/paragraph' => array( 'content' ),
 		'core/heading'   => array( 'content' ),
 		'core/image'     => array( 'url', 'title' ),
@@ -129,16 +129,16 @@ if ( $gutenberg_experiments && (
 			// }
 			// },
 			// .
-			global $block_bindings_whitelist;
+			global $block_bindings_allowed_blocks;
 			global $block_bindings_sources;
 			$modified_block_content = $block_content;
 			foreach ( $block['attrs']['metadata']['bindings'] as $binding_attribute => $binding_source ) {
-				// If the block is not in the whitelist, stop processing.
-				if ( ! isset( $block_bindings_whitelist[ $block['blockName'] ] ) ) {
+				// If the block is not in the list, stop processing.
+				if ( ! isset( $block_bindings_allowed_blocks[ $block['blockName'] ] ) ) {
 					return $block_content;
 				}
-				// If the attribute is not in the whitelist, process next attribute.
-				if ( ! in_array( $binding_attribute, $block_bindings_whitelist[ $block['blockName'] ], true ) ) {
+				// If the attribute is not in the list, process next attribute.
+				if ( ! in_array( $binding_attribute, $block_bindings_allowed_blocks[ $block['blockName'] ], true ) ) {
 					continue;
 				}
 				// If no source is provided, or that source is not registered, process next attribute.
@@ -165,8 +165,8 @@ if ( $gutenberg_experiments && (
 			return $modified_block_content;
 		}
 
-		// Add filter only to the blocks in the whitelist.
-		foreach ( $block_bindings_whitelist as $block_name => $attributes ) {
+		// Add filter only to the blocks in the list.
+		foreach ( $block_bindings_allowed_blocks as $block_name => $attributes ) {
 			add_filter( 'render_block_' . $block_name, 'process_block_bindings', 20, 3 );
 		}
 	}
