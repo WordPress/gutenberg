@@ -39,7 +39,7 @@ class Gutenberg_Modules {
 		if ( ! isset( self::$registered[ $module_identifier ] ) ) {
 			$deps = array();
 			foreach ( $dependencies as $dependency ) {
-				if ( is_array( $dependency ) && isset( $dependency['id'] ) ) {
+				if ( isset( $dependency['id'] ) ) {
 					$deps[] = array(
 						'id'   => $dependency['id'],
 						'type' => isset( $dependency['type'] ) && 'dynamic' === $dependency['type'] ? 'dynamic' : 'static',
