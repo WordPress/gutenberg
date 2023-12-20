@@ -39,7 +39,7 @@ createBlockEditFilter(
 		position,
 		layout,
 		contentLockUI,
-		window.__experimentalConnections ? customFields : null,
+		window.__experimentalBlockBindings ? customFields : null,
 		blockHooks,
 		blockRenaming,
 	].filter( Boolean )
