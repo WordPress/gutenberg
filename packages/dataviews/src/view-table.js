@@ -21,6 +21,7 @@ import {
 	OPERATOR_IN,
 	OPERATOR_NOT_IN,
 	OPERATORS,
+	SORTING_DIRECTIONS,
 } from './constants';
 import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
 
@@ -32,10 +33,6 @@ const {
 	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
-const sortingItemsInfo = {
-	asc: { label: __( 'Sort ascending' ) },
-	desc: { label: __( 'Sort descending' ) },
-};
 const sortArrows = { asc: '↑', desc: '↓' };
 
 const sanitizeOperators = ( field ) => {
@@ -97,7 +94,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 			<WithSeparators>
 				{ isSortable && (
 					<DropdownMenuGroup>
-						{ Object.entries( sortingItemsInfo ).map(
+						{ Object.entries( SORTING_DIRECTIONS ).map(
 							( [ direction, info ] ) => {
 								const isChecked =
 									isSorted &&

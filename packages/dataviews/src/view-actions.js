@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import { VIEW_LAYOUTS, LAYOUT_TABLE } from './constants';
+import { VIEW_LAYOUTS, LAYOUT_TABLE, SORTING_DIRECTIONS } from './constants';
 import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
 
 const {
@@ -167,11 +167,6 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 	);
 }
 
-// This object is used to construct the sorting options per sortable field.
-const sortingItemsInfo = {
-	asc: { label: __( 'Sort ascending' ) },
-	desc: { label: __( 'Sort descending' ) },
-};
 function SortMenu( { fields, view, onChangeView } ) {
 	const sortableFields = fields.filter(
 		( field ) => field.enableSorting !== false
@@ -216,7 +211,7 @@ function SortMenu( { fields, view, onChangeView } ) {
 							minWidth: '220px',
 						} }
 					>
-						{ Object.entries( sortingItemsInfo ).map(
+						{ Object.entries( SORTING_DIRECTIONS ).map(
 							( [ direction, info ] ) => {
 								const isChecked =
 									currentSortedField !== undefined &&
