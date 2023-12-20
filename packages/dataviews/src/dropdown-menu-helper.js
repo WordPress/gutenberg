@@ -25,7 +25,7 @@ export const DropdownMenuRadioItemCustom = forwardRef(
 	( { checked, name, value, onChange, onClick, ...props }, ref ) => {
 		const onClickHandler = ( e ) => {
 			onClick?.( e );
-			onChange( { ...e, target: { ...e.target, value } } );
+			onChange?.( { ...e, target: { ...e.target, value } } );
 		};
 		return (
 			<DropdownMenuItem
