@@ -11,21 +11,16 @@ import { addFilter } from '@wordpress/hooks';
 import BlockBindingsFill from '../../components/block-bindings/bindings-ui';
 import BlockBindingsFieldsList from '../../components/block-bindings/fields-list';
 import { store as editorStore } from '../../store';
+import { BLOCK_BINDINGS_ALLOWED_BLOCKS } from '../../store/constants';
 
 if ( window.__experimentalBlockBindings ) {
 	// External sources could do something similar.
 
 	const withCoreSources = createHigherOrderComponent(
 		( BlockEdit ) => ( props ) => {
-			const blockBindingsAllowedBlocks = {
-				'core/paragraph': [ 'content' ],
-				'core/heading': [ 'content' ],
-				'core/image': [ 'url', 'title' ],
-				'core/button': [ 'url', 'text' ],
-			};
 			const { name, isSelected, context } = props;
 			// If the block is not allowed, return the original BlockEdit.
-			if ( ! blockBindingsAllowedBlocks[ name ] ) {
+			if ( ! BLOCK_BINDINGS_ALLOWED_BLOCKS[ name ] ) {
 				return <BlockEdit key="edit" { ...props } />;
 			}
 			const fields = [];

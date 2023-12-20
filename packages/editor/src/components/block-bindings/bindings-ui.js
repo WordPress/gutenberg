@@ -19,13 +19,10 @@ import {
 	chevronUp,
 } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
-
-const blockBindingsAllowedBlocks = {
-	'core/paragraph': [ 'content' ],
-	'core/heading': [ 'content' ],
-	'core/image': [ 'url', 'title' ],
-	'core/button': [ 'url', 'text' ],
-};
+/**
+ * Internal dependencies
+ */
+import { BLOCK_BINDINGS_ALLOWED_BLOCKS } from '../../store/constants';
 
 const { Slot, Fill } = createSlotFill( 'BlockBindingsUI' );
 
@@ -93,108 +90,116 @@ function AttributesLayer( props ) {
 	const [ activeSource, setIsActiveSource ] = useState( false );
 	return (
 		<MenuGroup>
-			{ blockBindingsAllowedBlocks[ props.name ].map( ( attribute ) => (
-				<div
-					key={ attribute }
-					className="block-bindings-attribute-picker-container"
-				>
-					<MenuItem
-						icon={
-							activeAttribute === attribute
-								? chevronUp
-								: chevronDown
-						}
-						isSelected={ activeAttribute === attribute }
-						onClick={ () =>
-							setIsActiveAttribute(
-								activeAttribute === attribute
-									? false
-									: attribute
-							)
-						}
-						className="block-bindings-attribute-picker-button"
+			{ BLOCK_BINDINGS_ALLOWED_BLOCKS[ props.name ].map(
+				( attribute ) => (
+					<div
+						key={ attribute }
+						className="block-bindings-attribute-picker-container"
 					>
-						{ attribute }
-					</MenuItem>
-					{ activeAttribute === attribute && (
-						<>
-							<MenuGroup>
-								{ /* Sources can fill this slot */ }
-								<Slot
-									fillProps={ {
-										...props,
-										currentAttribute: attribute,
-										setIsActiveAttribute,
-									} }
-								>
-									{ ( fills ) => {
-										if ( ! fills.length ) {
-											return null;
-										}
+						<MenuItem
+							icon={
+								activeAttribute === attribute
+									? chevronUp
+									: chevronDown
+							}
+							isSelected={ activeAttribute === attribute }
+							onClick={ () =>
+								setIsActiveAttribute(
+									activeAttribute === attribute
+										? false
+										: attribute
+								)
+							}
+							className="block-bindings-attribute-picker-button"
+						>
+							{ attribute }
+						</MenuItem>
+						{ activeAttribute === attribute && (
+							<>
+								<MenuGroup>
+									{ /* Sources can fill this slot */ }
+									<Slot
+										fillProps={ {
+											...props,
+											currentAttribute: attribute,
+											setIsActiveAttribute,
+										} }
+									>
+										{ ( fills ) => {
+											if ( ! fills.length ) {
+												return null;
+											}
 
-										return (
-											<>
-												{ fills.map(
-													( fill, index ) => {
-														// TODO: Check better way to get the source and label.
-														const source =
-															fill[ 0 ].props
-																.children.props
-																.source;
-														const sourceLabel =
-															fill[ 0 ].props
-																.children.props
-																.label;
-														const isSourceSelected =
-															activeSource ===
-															source;
+											return (
+												<>
+													{ fills.map(
+														( fill, index ) => {
+															// TODO: Check better way to get the source and label.
+															const source =
+																fill[ 0 ].props
+																	.children
+																	.props
+																	.source;
+															const sourceLabel =
+																fill[ 0 ].props
+																	.children
+																	.props
+																	.label;
+															const isSourceSelected =
+																activeSource ===
+																source;
 
-														return (
-															<Fragment
-																key={ index }
-															>
-																<MenuItem
-																	icon={
-																		isSourceSelected
-																			? chevronUp
-																			: chevronDown
+															return (
+																<Fragment
+																	key={
+																		index
 																	}
-																	isSelected={
-																		isSourceSelected
-																	}
-																	onClick={ () =>
-																		setIsActiveSource(
-																			isSourceSelected
-																				? false
-																				: source
-																		)
-																	}
-																	className="block-bindings-source-picker-button"
 																>
-																	{
-																		sourceLabel
-																	}
-																</MenuItem>
-																{ isSourceSelected &&
-																	fill }
-															</Fragment>
-														);
-													}
-												) }
-											</>
-										);
-									} }
-								</Slot>
-							</MenuGroup>
-							<RemoveBindingButton
-								{ ...props }
-								currentAttribute={ attribute }
-								setIsActiveAttribute={ setIsActiveAttribute }
-							/>
-						</>
-					) }
-				</div>
-			) ) }
+																	<MenuItem
+																		icon={
+																			isSourceSelected
+																				? chevronUp
+																				: chevronDown
+																		}
+																		isSelected={
+																			isSourceSelected
+																		}
+																		onClick={ () =>
+																			setIsActiveSource(
+																				isSourceSelected
+																					? false
+																					: source
+																			)
+																		}
+																		className="block-bindings-source-picker-button"
+																	>
+																		{
+																			sourceLabel
+																		}
+																	</MenuItem>
+																	{ isSourceSelected &&
+																		fill }
+																</Fragment>
+															);
+														}
+													) }
+												</>
+											);
+										} }
+									</Slot>
+								</MenuGroup>
+								<RemoveBindingButton
+									{ ...props }
+									currentAttribute={ attribute }
+									setIsActiveAttribute={
+										setIsActiveAttribute
+									}
+								/>
+							</>
+						) }
+					</div>
+				)
+			) }
 		</MenuGroup>
 	);
 }
@@ -239,7 +244,7 @@ if ( window.__experimentalBlockBindings ) {
 		'blocks.registerBlockType',
 		'core/block-bindings-ui',
 		( settings, name ) => {
-			if ( ! ( name in blockBindingsAllowedBlocks ) ) {
+			if ( ! ( name in BLOCK_BINDINGS_ALLOWED_BLOCKS ) ) {
 				return settings;
 			}
 
