@@ -97,7 +97,6 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 // WordPress 6.4 compat.
 require __DIR__ . '/compat/wordpress-6.4/blocks.php';
 require __DIR__ . '/compat/wordpress-6.4/block-hooks.php';
-require __DIR__ . '/compat/wordpress-6.4/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.4/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.4/kses.php';
 
