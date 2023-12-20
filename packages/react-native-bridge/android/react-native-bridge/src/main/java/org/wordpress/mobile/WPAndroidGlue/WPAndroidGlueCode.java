@@ -113,6 +113,7 @@ public class WPAndroidGlueCode {
 
     private OnToggleRedoButtonListener mOnToggleRedoButtonListener;
     private OnConnectionStatusEventListener mOnConnectionStatusEventListener;
+    private OnBackHandlerEventListener mOnBackHandlerEventListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -262,6 +263,10 @@ public class WPAndroidGlueCode {
 
     public interface OnConnectionStatusEventListener {
         boolean onRequestConnectionStatus();
+    }
+
+    public interface OnBackHandlerEventListener {
+        void onBackHandler();
     }
 
     public void mediaSelectionCancelled() {
@@ -700,6 +705,7 @@ public class WPAndroidGlueCode {
                                   OnToggleUndoButtonListener onToggleUndoButtonListener,
                                   OnToggleRedoButtonListener onToggleRedoButtonListener,
                                   OnConnectionStatusEventListener onConnectionStatusEventListener,
+                                  OnBackHandlerEventListener onBackHandlerEventListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -726,6 +732,7 @@ public class WPAndroidGlueCode {
         mOnToggleUndoButtonListener = onToggleUndoButtonListener;
         mOnToggleRedoButtonListener = onToggleRedoButtonListener;
         mOnConnectionStatusEventListener = onConnectionStatusEventListener;
+        mOnBackHandlerEventListener = onBackHandlerEventListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
@@ -776,7 +783,7 @@ public class WPAndroidGlueCode {
                         @Override
                         public void invokeDefaultOnBackPressed() {
                             if (fragment.isAdded()) {
-                                activity.onBackPressed();
+                                mOnBackHandlerEventListener.onBackHandler();
                             }
                         }
                     });
@@ -801,6 +808,12 @@ public class WPAndroidGlueCode {
             if (mReactInstanceManager.getLifecycleState() != LifecycleState.RESUMED) {
                 mReactInstanceManager.onHostDestroy(activity);
             }
+        }
+    }
+
+    public void onBackPressed() {
+        if (mReactInstanceManager != null) {
+            mReactInstanceManager.onBackPressed();
         }
     }
 
