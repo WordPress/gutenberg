@@ -4,9 +4,8 @@
 import {
 	privateApis as componentsPrivateApis,
 	Button,
-	Icon,
 } from '@wordpress/components';
-import { funnel, check } from '@wordpress/icons';
+import { funnel } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { Children, Fragment } from '@wordpress/element';
 
@@ -15,6 +14,7 @@ import { Children, Fragment } from '@wordpress/element';
  */
 import { unlock } from './lock-unlock';
 import { LAYOUT_LIST, OPERATORS } from './constants';
+import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
 
 const {
 	DropdownMenuV2Ariakit: DropdownMenu,
@@ -109,23 +109,11 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 												activeElement?.value ===
 												element.value;
 											return (
-												<DropdownMenuItem
+												<DropdownMenuRadioItemCustom
 													key={ element.value }
-													role="menuitemradio"
-													aria-checked={ isActive }
-													prefix={
-														isActive ? (
-															<Icon
-																icon={ check }
-															/>
-														) : (
-															<span
-																aria-hidden="true"
-																className="dataviews__filters-custom-menu-radio-item-prefix"
-															></span>
-														)
-													}
-													hideOnClick={ false }
+													name={ `add-filter-${ filter.field.id }` }
+													value={ element.value }
+													checked={ isActive }
 													onClick={ () => {
 														onChangeView( {
 															...view,
@@ -147,7 +135,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 													<DropdownMenuItemLabel>
 														{ element.label }
 													</DropdownMenuItemLabel>
-												</DropdownMenuItem>
+												</DropdownMenuRadioItemCustom>
 											);
 										} ) }
 									</DropdownMenuGroup>

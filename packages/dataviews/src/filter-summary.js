@@ -6,7 +6,7 @@ import {
 	privateApis as componentsPrivateApis,
 	Icon,
 } from '@wordpress/components';
-import { chevronDown, check } from '@wordpress/icons';
+import { chevronDown } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { Children, Fragment } from '@wordpress/element';
 
@@ -15,6 +15,7 @@ import { Children, Fragment } from '@wordpress/element';
  */
 import { OPERATOR_IN, OPERATOR_NOT_IN, OPERATORS } from './constants';
 import { unlock } from './lock-unlock';
+import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
 
 const {
 	DropdownMenuV2Ariakit: DropdownMenu,
@@ -101,20 +102,11 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 					{ filter.elements.map( ( element ) => {
 						const isActive = activeElement?.value === element.value;
 						return (
-							<DropdownMenuItem
+							<DropdownMenuRadioItemCustom
 								key={ element.value }
-								role="menuitemradio"
-								aria-checked={ isActive }
-								prefix={
-									isActive ? (
-										<Icon icon={ check } />
-									) : (
-										<span
-											className="dataviews__filters-custom-menu-radio-item-prefix"
-											aria-hidden="true"
-										></span>
-									)
-								}
+								name={ `filter-summary-${ filter.field.id }` }
+								value={ element.value }
+								checked={ isActive }
 								onClick={ () =>
 									onChangeView( {
 										...view,
@@ -135,7 +127,7 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 								<DropdownMenuItemLabel>
 									{ element.label }
 								</DropdownMenuItemLabel>
-							</DropdownMenuItem>
+							</DropdownMenuRadioItemCustom>
 						);
 					} ) }
 				</DropdownMenuGroup>

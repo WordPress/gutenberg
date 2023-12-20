@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
-import { unseen, check, funnel } from '@wordpress/icons';
+import { unseen, funnel } from '@wordpress/icons';
 import {
 	Button,
 	Icon,
@@ -22,6 +22,7 @@ import {
 	OPERATOR_NOT_IN,
 	OPERATORS,
 } from './constants';
+import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
 
 const {
 	DropdownMenuV2Ariakit: DropdownMenu,
@@ -178,20 +179,11 @@ function HeaderMenu( { field, view, onChangeView } ) {
 											activeElement?.value ===
 											element.value;
 										return (
-											<DropdownMenuItem
+											<DropdownMenuRadioItemCustom
 												key={ element.value }
-												role="menuitemradio"
-												aria-checked={ isActive }
-												prefix={
-													isActive ? (
-														<Icon icon={ check } />
-													) : (
-														<span
-															className="dataviews__filters-custom-menu-radio-item-prefix"
-															aria-hidden="true"
-														></span>
-													)
-												}
+												name={ `view-table-${ filter.field.id }` }
+												value={ element.value }
+												checked={ isActive }
 												onClick={ () => {
 													onChangeView( {
 														...view,
@@ -213,7 +205,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 												<DropdownMenuItemLabel>
 													{ element.label }
 												</DropdownMenuItemLabel>
-											</DropdownMenuItem>
+											</DropdownMenuRadioItemCustom>
 										);
 									} ) }
 								</DropdownMenuGroup>
