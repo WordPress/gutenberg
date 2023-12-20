@@ -136,8 +136,8 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 															></span>
 														)
 													}
-													onClick={ ( event ) => {
-														event.preventDefault();
+													hideOnClick={ false }
+													onClick={ () => {
 														onChangeView( {
 															...view,
 															page: 1,
@@ -221,8 +221,8 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 									<DropdownMenuItem
 										key={ 'reset-filter-' + filter.name }
 										disabled={ ! activeElement }
-										onClick={ ( event ) => {
-											event.preventDefault();
+										hideOnClick={ false }
+										onClick={ () => {
 											onChangeView( ( currentView ) => ( {
 												...currentView,
 												page: 1,
@@ -252,8 +252,8 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 					disabled={
 						view.search === '' && view.filters?.length === 0
 					}
-					onClick={ ( event ) => {
-						event.preventDefault();
+					hideOnClick={ false }
+					onClick={ () => {
 						onChangeView( ( currentView ) => ( {
 							...currentView,
 							page: 1,
