@@ -134,7 +134,11 @@ class Gutenberg_Modules {
 	public static function print_preloaded_modules() {
 		foreach ( self::get_dependencies( array_keys( self::get_enqueued() ), array( 'static' ) ) as $module_identifier => $module ) {
 			if ( true !== $module['enqueued'] ) {
-				echo '<link rel="modulepreload" href="' . $module['src'] . self::get_version_query_string( $module['version'] ) . '" id="' . $module_identifier . '">';
+				echo sprintf(
+					'<link rel="modulepreload" href="%s" id="%s">',
+					esc_attr( $module['src'] . self::get_version_query_string( $module['version'] ) ),
+					esc_attr( $module_identifier )
+				);
 			}
 		}
 	}
