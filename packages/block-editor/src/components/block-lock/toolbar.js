@@ -33,7 +33,7 @@ export default function BlockLockToolbar( { clientId } ) {
 		}
 	}, [ isLocked ] );
 
-	if ( ! canLock || ( ! isLocked && ! hasLockButtonShown.current ) ) {
+	if ( ! isLocked && ! hasLockButtonShown.current ) {
 		return null;
 	}
 
@@ -41,6 +41,7 @@ export default function BlockLockToolbar( { clientId } ) {
 		<>
 			<ToolbarGroup className="block-editor-block-lock-toolbar">
 				<ToolbarButton
+					disabled={ ! canLock }
 					icon={ isLocked ? lock : unlock }
 					label={ isLocked ? __( 'Unlock' ) : __( 'Lock' ) }
 					onClick={ toggleModal }
