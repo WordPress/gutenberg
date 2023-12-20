@@ -7,7 +7,11 @@ import Animated from 'react-native-reanimated';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useImperativeHandle } from '@wordpress/element';
+import {
+	forwardRef,
+	useCallback,
+	useImperativeHandle,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -34,6 +38,15 @@ export const KeyboardAwareFlatList = ( { onScroll, ...props }, ref ) => {
 		onScroll,
 	} );
 
+	const getFlatListRef = useCallback(
+		( flatListRef ) => {
+			// On Android, we get the ref of the associated scroll
+			// view to the FlatList.
+			scrollViewRef.current = flatListRef?.getNativeScrollRef();
+		},
+		[ scrollViewRef ]
+	);
+
 	useImperativeHandle( ref, () => {
 		return {
 			scrollViewRef: scrollViewRef.current,
@@ -45,7 +58,7 @@ export const KeyboardAwareFlatList = ( { onScroll, ...props }, ref ) => {
 	return (
 		<KeyboardAvoidingView style={ { flex: 1 } }>
 			<AnimatedFlatList
-				ref={ scrollViewRef }
+				ref={ getFlatListRef }
 				onScroll={ scrollHandler }
 				onContentSizeChange={ onContentSizeChange }
 				{ ...props }

@@ -18,7 +18,7 @@ import { useCallback } from '@wordpress/element';
  * @param {number}      keyboardOffset         Keyboard space offset.
  * @param {boolean}     scrollEnabled          Whether the scroll is enabled or not.
  * @param {RefObject}   scrollViewMeasurements ScrollView Layout measurements.
- * @param {RefObject}   nativeScrollRef        Native scroll reference.
+ * @param {RefObject}   scrollViewRef          Scroll view reference.
  * @param {SharedValue} scrollViewYOffset      Current offset position of the ScrollView.
  * @return {Function[]} Function to scroll to a section.
  */
@@ -27,7 +27,7 @@ export default function useScrollToSection(
 	keyboardOffset,
 	scrollEnabled,
 	scrollViewMeasurements,
-	nativeScrollRef,
+	scrollViewRef,
 	scrollViewYOffset
 ) {
 	const { top, bottom } = useSafeAreaInsets();
@@ -43,7 +43,7 @@ export default function useScrollToSection(
 	const scrollToSection = useCallback(
 		( sectionY, sectionHeight ) => {
 			if (
-				! nativeScrollRef ||
+				! scrollViewRef.current ||
 				! scrollEnabled ||
 				! scrollViewMeasurements
 			) {
@@ -57,7 +57,7 @@ export default function useScrollToSection(
 
 			// Scroll to the top of the section.
 			if ( sectionY < currentScrollViewYOffset ) {
-				nativeScrollRef.scrollTo( {
+				scrollViewRef.current.scrollTo( {
 					y: sectionY,
 					animated: true,
 				} );
@@ -79,7 +79,7 @@ export default function useScrollToSection(
 
 			// Scroll to the bottom of the section.
 			if ( sectionY > maxOffset && ! isAtTheTop ) {
-				nativeScrollRef.scrollTo( {
+				scrollViewRef.current.scrollTo( {
 					y: sectionY - availableScreenSpace,
 					animated: true,
 				} );
@@ -91,7 +91,7 @@ export default function useScrollToSection(
 			keyboardOffset,
 			scrollEnabled,
 			scrollViewMeasurements,
-			nativeScrollRef,
+			scrollViewRef,
 			scrollViewYOffset,
 		]
 	);

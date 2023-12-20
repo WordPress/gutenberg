@@ -18,7 +18,7 @@ describe( 'useScrollToSection', () => {
 		const extraScrollHeight = 50;
 		const keyboardOffset = 100;
 		const scrollEnabled = true;
-		const nativeScrollRef = { scrollTo: jest.fn() };
+		const scrollViewRef = { current: { scrollTo: jest.fn() } };
 		const scrollViewMeasurements = { current: { height: 600 } };
 		const scrollViewYOffset = { value: 150 };
 
@@ -28,7 +28,7 @@ describe( 'useScrollToSection', () => {
 				keyboardOffset,
 				scrollEnabled,
 				scrollViewMeasurements,
-				nativeScrollRef,
+				scrollViewRef,
 				scrollViewYOffset
 			)
 		);
@@ -37,7 +37,7 @@ describe( 'useScrollToSection', () => {
 		result.current[ 0 ]( sectionY, sectionHeight );
 
 		// Assert
-		expect( nativeScrollRef.scrollTo ).toHaveBeenCalledWith( {
+		expect( scrollViewRef.current.scrollTo ).toHaveBeenCalledWith( {
 			y: sectionY,
 			animated: true,
 		} );
@@ -51,7 +51,7 @@ describe( 'useScrollToSection', () => {
 		const extraScrollHeight = 50;
 		const keyboardOffset = 100;
 		const scrollEnabled = true;
-		const nativeScrollRef = { scrollTo: jest.fn() };
+		const scrollViewRef = { current: { scrollTo: jest.fn() } };
 		const scrollViewMeasurements = { current: { height: 600 } };
 		const scrollViewYOffset = { value: 250 };
 
@@ -61,7 +61,7 @@ describe( 'useScrollToSection', () => {
 				keyboardOffset,
 				scrollEnabled,
 				scrollViewMeasurements,
-				nativeScrollRef,
+				scrollViewRef,
 				scrollViewYOffset
 			)
 		);
@@ -74,7 +74,7 @@ describe( 'useScrollToSection', () => {
 			sectionY -
 			( scrollViewMeasurements.current.height -
 				( keyboardOffset + extraScrollHeight + sectionHeight ) );
-		expect( nativeScrollRef.scrollTo ).toHaveBeenCalledWith( {
+		expect( scrollViewRef.current.scrollTo ).toHaveBeenCalledWith( {
 			y: expectedYOffset,
 			animated: true,
 		} );
@@ -88,7 +88,7 @@ describe( 'useScrollToSection', () => {
 		const extraScrollHeight = 50;
 		const keyboardOffset = 100;
 		const scrollEnabled = true;
-		const nativeScrollRef = null;
+		const scrollViewRef = { current: null };
 		const scrollViewMeasurements = { current: { height: 600 } };
 		const scrollViewYOffset = { value: 0 };
 
@@ -98,7 +98,7 @@ describe( 'useScrollToSection', () => {
 				keyboardOffset,
 				scrollEnabled,
 				scrollViewMeasurements,
-				nativeScrollRef,
+				scrollViewRef,
 				scrollViewYOffset
 			)
 		);
@@ -107,7 +107,7 @@ describe( 'useScrollToSection', () => {
 		result.current[ 0 ]( sectionY, sectionHeight );
 
 		// Assert
-		expect( nativeScrollRef ).toBeNull();
+		expect( scrollViewRef.current ).toBeNull();
 	} );
 
 	it( 'does not scroll when the scroll is not enabled', () => {
@@ -118,7 +118,7 @@ describe( 'useScrollToSection', () => {
 		const extraScrollHeight = 50;
 		const keyboardOffset = 100;
 		const scrollEnabled = false;
-		const nativeScrollRef = { scrollTo: jest.fn() };
+		const scrollViewRef = { current: { scrollTo: jest.fn() } };
 		const scrollViewMeasurements = { current: { height: 600 } };
 		const scrollViewYOffset = { value: 0 };
 
@@ -128,7 +128,7 @@ describe( 'useScrollToSection', () => {
 				keyboardOffset,
 				scrollEnabled,
 				scrollViewMeasurements,
-				nativeScrollRef,
+				scrollViewRef,
 				scrollViewYOffset
 			)
 		);
@@ -137,6 +137,6 @@ describe( 'useScrollToSection', () => {
 		result.current[ 0 ]( sectionY, sectionHeight );
 
 		// Assert
-		expect( nativeScrollRef.scrollTo ).not.toHaveBeenCalled();
+		expect( scrollViewRef.current.scrollTo ).not.toHaveBeenCalled();
 	} );
 } );

@@ -8,11 +8,11 @@ import { useCallback } from '@wordpress/element';
  * Hook to scroll to a specified element by taking into account the Keyboard
  * and the Header.
  *
- * @param {RefObject} nativeScrollRef Native scroll reference.
+ * @param {RefObject} scrollViewRef   Scroll view reference.
  * @param {Function}  scrollToSection Function to scroll.
  * @return {Function[]} Function to scroll to an element.
  */
-export default function useScrollToElement( nativeScrollRef, scrollToSection ) {
+export default function useScrollToElement( scrollViewRef, scrollToSection ) {
 	/**
 	 * Function to scroll to an element.
 	 *
@@ -20,12 +20,12 @@ export default function useScrollToElement( nativeScrollRef, scrollToSection ) {
 	 */
 	const scrollToElement = useCallback(
 		( elementRef ) => {
-			if ( ! nativeScrollRef || ! elementRef ) {
+			if ( ! scrollViewRef.current || ! elementRef ) {
 				return;
 			}
 
 			elementRef.current.measureLayout(
-				nativeScrollRef,
+				scrollViewRef.current,
 				( _x, y, _width, height ) => {
 					if ( height || y ) {
 						scrollToSection( Math.round( y ), height );
@@ -34,7 +34,7 @@ export default function useScrollToElement( nativeScrollRef, scrollToSection ) {
 				() => {}
 			);
 		},
-		[ nativeScrollRef, scrollToSection ]
+		[ scrollViewRef, scrollToSection ]
 	);
 
 	return [ scrollToElement ];
