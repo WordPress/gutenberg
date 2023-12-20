@@ -1,32 +1,11 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import {
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalUseNavigator as useNavigator,
-	__experimentalItemGroup as ItemGroup,
-	__experimentalItem as Item,
-	__experimentalHStack as HStack,
-	__experimentalText as Text,
-	__experimentalTruncate as Truncate,
-	FlexItem,
-	Modal,
-	TabPanel,
-	Button,
-	Card,
-	CardHeader,
-	CardBody,
-} from '@wordpress/components';
-import { isRTL, __ } from '@wordpress/i18n';
+
+import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import {
 	PostTaxonomies,
 	PostExcerptCheck,
@@ -35,13 +14,18 @@ import {
 	PostTypeSupportCheck,
 	store as editorStore,
 } from '@wordpress/editor';
-import { store as coreStore } from '@wordpress/core-data';
-import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
+import {
+	PreferencesModal,
+	PreferencesModalTabs,
+	PreferencesModalSection,
+	store as interfaceStore,
+} from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import Section from './section';
+
 import {
 	EnablePluginDocumentSettingPanelOption,
 	EnablePublishSidebarOption,
@@ -52,52 +36,50 @@ import MetaBoxesSection from './meta-boxes-section';
 import { store as editPostStore } from '../../store';
 import BlockManager from '../block-manager';
 
-const MODAL_NAME = 'edit-post/preferences';
-const PREFERENCES_MENU = 'preferences-menu';
+export const PREFERENCES_MODAL_NAME = 'edit-post/preferences';
 
-function NavigationButton( {
-	as: Tag = Button,
-	path,
-	isBack = false,
-	...props
-} ) {
-	const navigator = useNavigator();
-	return (
-		<Tag
-			onClick={ () => navigator.push( path, { isBack } ) }
-			{ ...props }
-		/>
-	);
-}
-
-export default function PreferencesModal() {
+export default function EditPostPreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { closeModal } = useDispatch( editPostStore );
-	const { isModalActive, isViewable } = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( editorStore );
-		const { getPostType } = select( coreStore );
-		const postType = getPostType( getEditedPostAttribute( 'type' ) );
-		return {
-			isModalActive: select( editPostStore ).isModalActive( MODAL_NAME ),
-			isViewable: get( postType, [ 'viewable' ], false ),
-		};
-	}, [] );
-	const showBlockBreadcrumbsOption = useSelect(
+	const { closeModal } = useDispatch( interfaceStore );
+	const [ isModalActive, showBlockBreadcrumbsOption ] = useSelect(
 		( select ) => {
 			const { getEditorSettings } = select( editorStore );
 			const { getEditorMode, isFeatureActive } = select( editPostStore );
+			const modalActive = select( interfaceStore ).isModalActive(
+				PREFERENCES_MODAL_NAME
+			);
 			const mode = getEditorMode();
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
-			const hasReducedUI = isFeatureActive( 'reducedUI' );
-			return (
-				! hasReducedUI &&
-				isLargeViewport &&
-				isRichEditingEnabled &&
-				mode === 'visual'
-			);
+			const isDistractionFreeEnabled =
+				isFeatureActive( 'distractionFree' );
+			return [
+				modalActive,
+				! isDistractionFreeEnabled &&
+					isLargeViewport &&
+					isRichEditingEnabled &&
+					mode === 'visual',
+				isDistractionFreeEnabled,
+			];
 		},
 		[ isLargeViewport ]
 	);
+
+	const { closeGeneralSidebar } = useDispatch( editPostStore );
+	const { setIsListViewOpened, setIsInserterOpened } =
+		useDispatch( editorStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
+
+	const toggleDistractionFree = () => {
+		setPreference( 'core/edit-post', 'fixedToolbar', true );
+		setIsInserterOpened( false );
+		setIsListViewOpened( false );
+		closeGeneralSidebar();
+	};
+
+	const turnOffDistractionFree = () => {
+		setPreference( 'core/edit-post', 'distractionFree', false );
+	};
+
 	const sections = useMemo(
 		() => [
 			{
@@ -106,138 +88,55 @@ export default function PreferencesModal() {
 				content: (
 					<>
 						{ isLargeViewport && (
-							<Section
+							<PreferencesModalSection
 								title={ __( 'Publishing' ) }
-								description={ __(
-									'Change options related to publishing.'
-								) }
 							>
 								<EnablePublishSidebarOption
 									help={ __(
 										'Review settings, such as visibility and tags.'
 									) }
-									label={ __(
-										'Include pre-publish checklist'
-									) }
+									label={ __( 'Enable pre-publish flow' ) }
 								/>
-							</Section>
+							</PreferencesModalSection>
 						) }
-
-						<Section
-							title={ __( 'Appearance' ) }
-							description={ __(
-								'Customize options related to the block editor interface and editing flow.'
-							) }
-						>
+						<PreferencesModalSection title={ __( 'Interface' ) }>
 							<EnableFeature
-								featureName="reducedUI"
+								featureName="showListViewByDefault"
 								help={ __(
-									'Compacts options and outlines in the toolbar.'
+									'Opens the block list view sidebar by default.'
 								) }
-								label={ __( 'Reduce the interface' ) }
-							/>
-							<EnableFeature
-								featureName="focusMode"
-								help={ __(
-									'Highlights the current block and fades other content.'
-								) }
-								label={ __( 'Spotlight mode' ) }
-							/>
-							<EnableFeature
-								featureName="showIconLabels"
-								help={ __( 'Shows text instead of icons.' ) }
-								label={ __( 'Display button labels' ) }
-							/>
-							<EnableFeature
-								featureName="themeStyles"
-								help={ __(
-									'Make the editor look like your theme.'
-								) }
-								label={ __( 'Use theme styles' ) }
+								label={ __( 'Always open list view' ) }
 							/>
 							{ showBlockBreadcrumbsOption && (
 								<EnableFeature
 									featureName="showBlockBreadcrumbs"
 									help={ __(
-										'Shows block breadcrumbs at the bottom of the editor.'
+										'Display the block hierarchy trail at the bottom of the editor.'
 									) }
-									label={ __( 'Display block breadcrumbs' ) }
+									label={ __( 'Show block breadcrumbs' ) }
 								/>
 							) }
-						</Section>
-					</>
-				),
-			},
-			{
-				name: 'blocks',
-				tabLabel: __( 'Blocks' ),
-				content: (
-					<>
-						<Section
-							title={ __( 'Block interactions' ) }
-							description={ __(
-								'Customize how you interact with blocks in the block library and editing canvas.'
-							) }
-						>
 							<EnableFeature
-								featureName="mostUsedBlocks"
+								featureName="allowRightClickOverrides"
 								help={ __(
-									'Places the most frequent blocks in the block library.'
-								) }
-								label={ __( 'Show most used blocks' ) }
-							/>
-							<EnableFeature
-								featureName="keepCaretInsideBlock"
-								help={ __(
-									'Aids screen readers by stopping text caret from leaving blocks.'
+									'Allows contextual list view menus via right-click, overriding browser defaults.'
 								) }
 								label={ __(
-									'Contain text cursor inside block'
+									'Allow right-click contextual menus'
 								) }
 							/>
-						</Section>
-						<Section
-							title={ __( 'Visible blocks' ) }
-							description={ __(
-								"Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
-							) }
-						>
-							<BlockManager />
-						</Section>
-					</>
-				),
-			},
-			{
-				name: 'panels',
-				tabLabel: __( 'Panels' ),
-				content: (
-					<>
-						<Section
+						</PreferencesModalSection>
+						<PreferencesModalSection
 							title={ __( 'Document settings' ) }
 							description={ __(
-								'Choose what displays in the panel.'
+								'Select what settings are shown in the document panel.'
 							) }
 						>
 							<EnablePluginDocumentSettingPanelOption.Slot />
-							{ isViewable && (
-								<EnablePanelOption
-									label={ __( 'Permalink' ) }
-									panelName="post-link"
-								/>
-							) }
-							{ isViewable && (
-								<EnablePanelOption
-									label={ __( 'Template' ) }
-									panelName="template"
-								/>
-							) }
 							<PostTaxonomies
 								taxonomyWrapper={ ( content, taxonomy ) => (
 									<EnablePanelOption
-										label={ get( taxonomy, [
-											'labels',
-											'menu_name',
-										] ) }
+										label={ taxonomy.labels.menu_name }
 										panelName={ `taxonomy-panel-${ taxonomy.slug }` }
 									/>
 								) }
@@ -268,142 +167,123 @@ export default function PreferencesModal() {
 									panelName="page-attributes"
 								/>
 							</PageAttributesCheck>
-						</Section>
-						<MetaBoxesSection
-							title={ __( 'Additional' ) }
-							description={ __(
-								'Add extra areas to the editor.'
+						</PreferencesModalSection>
+						<MetaBoxesSection title={ __( 'Advanced' ) } />
+					</>
+				),
+			},
+			{
+				name: 'appearance',
+				tabLabel: __( 'Appearance' ),
+				content: (
+					<PreferencesModalSection
+						title={ __( 'Appearance' ) }
+						description={ __(
+							'Customize the editor interface to suit your needs.'
+						) }
+					>
+						<EnableFeature
+							featureName="fixedToolbar"
+							onToggle={ turnOffDistractionFree }
+							help={ __(
+								'Access all block and document tools in a single place.'
 							) }
+							label={ __( 'Top toolbar' ) }
 						/>
+						<EnableFeature
+							featureName="distractionFree"
+							onToggle={ toggleDistractionFree }
+							help={ __(
+								'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
+							) }
+							label={ __( 'Distraction free' ) }
+						/>
+						<EnableFeature
+							featureName="focusMode"
+							help={ __(
+								'Highlights the current block and fades other content.'
+							) }
+							label={ __( 'Spotlight mode' ) }
+						/>
+						<EnableFeature
+							featureName="themeStyles"
+							help={ __(
+								'Make the editor look like your theme.'
+							) }
+							label={ __( 'Use theme styles' ) }
+						/>
+					</PreferencesModalSection>
+				),
+			},
+			{
+				name: 'accessibility',
+				tabLabel: __( 'Accessibility' ),
+				content: (
+					<>
+						<PreferencesModalSection
+							title={ __( 'Navigation' ) }
+							description={ __(
+								'Optimize the editing experience for enhanced control.'
+							) }
+						>
+							<EnableFeature
+								featureName="keepCaretInsideBlock"
+								help={ __(
+									'Keeps the text cursor within the block boundaries, aiding users with screen readers by preventing unintentional cursor movement outside the block.'
+								) }
+								label={ __(
+									'Contain text cursor inside block'
+								) }
+							/>
+						</PreferencesModalSection>
+						<PreferencesModalSection title={ __( 'Interface' ) }>
+							<EnableFeature
+								featureName="showIconLabels"
+								label={ __( 'Show button text labels' ) }
+								help={ __(
+									'Show text instead of icons on buttons across the interface.'
+								) }
+							/>
+						</PreferencesModalSection>
+					</>
+				),
+			},
+			{
+				name: 'blocks',
+				tabLabel: __( 'Blocks' ),
+				content: (
+					<>
+						<PreferencesModalSection title={ __( 'Inserter' ) }>
+							<EnableFeature
+								featureName="mostUsedBlocks"
+								help={ __(
+									'Adds a category with the most frequently used blocks in the inserter.'
+								) }
+								label={ __( 'Show most used blocks' ) }
+							/>
+						</PreferencesModalSection>
+						<PreferencesModalSection
+							title={ __( 'Manage block visibility' ) }
+							description={ __(
+								"Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
+							) }
+						>
+							<BlockManager />
+						</PreferencesModalSection>
 					</>
 				),
 			},
 		],
-		[ isViewable, isLargeViewport, showBlockBreadcrumbsOption ]
+		[ isLargeViewport, showBlockBreadcrumbsOption ]
 	);
 
-	// This is also used to sync the two different rendered components
-	// between small and large viewports.
-	const [ activeMenu, setActiveMenu ] = useState( PREFERENCES_MENU );
-	/**
-	 * Create helper objects from `sections` for easier data handling.
-	 * `tabs` is used for creating the `TabPanel` and `sectionsContentMap`
-	 * is used for easier access to active tab's content.
-	 */
-	const { tabs, sectionsContentMap } = useMemo(
-		() =>
-			sections.reduce(
-				( accumulator, { name, tabLabel: title, content } ) => {
-					accumulator.tabs.push( { name, title } );
-					accumulator.sectionsContentMap[ name ] = content;
-					return accumulator;
-				},
-				{ tabs: [], sectionsContentMap: {} }
-			),
-		[ sections ]
-	);
-	const getCurrentTab = useCallback(
-		( tab ) => sectionsContentMap[ tab.name ] || null,
-		[ sectionsContentMap ]
-	);
 	if ( ! isModalActive ) {
 		return null;
 	}
-	let modalContent;
-	// We render different components based on the viewport size.
-	if ( isLargeViewport ) {
-		modalContent = (
-			<TabPanel
-				className="edit-post-preferences__tabs"
-				tabs={ tabs }
-				initialTabName={
-					activeMenu !== PREFERENCES_MENU ? activeMenu : undefined
-				}
-				onSelect={ setActiveMenu }
-				orientation="vertical"
-			>
-				{ getCurrentTab }
-			</TabPanel>
-		);
-	} else {
-		modalContent = (
-			<NavigatorProvider initialPath="/">
-				<NavigatorScreen path="/">
-					<Card isBorderless size="small">
-						<CardBody>
-							<ItemGroup>
-								{ tabs.map( ( tab ) => {
-									return (
-										<NavigationButton
-											key={ tab.name }
-											path={ tab.name }
-											as={ Item }
-											isAction
-										>
-											<HStack justify="space-between">
-												<FlexItem>
-													<Truncate>
-														{ tab.title }
-													</Truncate>
-												</FlexItem>
-												<FlexItem>
-													<Icon
-														icon={
-															isRTL()
-																? chevronLeft
-																: chevronRight
-														}
-													/>
-												</FlexItem>
-											</HStack>
-										</NavigationButton>
-									);
-								} ) }
-							</ItemGroup>
-						</CardBody>
-					</Card>
-				</NavigatorScreen>
-				{ sections.map( ( section ) => {
-					return (
-						<NavigatorScreen
-							key={ `${ section.name }-menu` }
-							path={ section.name }
-						>
-							<Card isBorderless size="large">
-								<CardHeader
-									isBorderless={ false }
-									justify="left"
-									size="small"
-									gap="6"
-								>
-									<NavigationButton
-										path="/"
-										icon={
-											isRTL() ? chevronRight : chevronLeft
-										}
-										isBack
-										aria-label={ __(
-											'Navigate to the previous view'
-										) }
-									/>
-									<Text size="16">{ section.tabLabel }</Text>
-								</CardHeader>
-								<CardBody>{ section.content }</CardBody>
-							</Card>
-						</NavigatorScreen>
-					);
-				} ) }
-			</NavigatorProvider>
-		);
-	}
+
 	return (
-		<Modal
-			className="edit-post-preferences-modal"
-			title={ __( 'Preferences' ) }
-			closeLabel={ __( 'Close' ) }
-			onRequestClose={ closeModal }
-		>
-			{ modalContent }
-		</Modal>
+		<PreferencesModal closeModal={ closeModal }>
+			<PreferencesModalTabs sections={ sections } />
+		</PreferencesModal>
 	);
 }

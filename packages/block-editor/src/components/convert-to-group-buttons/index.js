@@ -11,18 +11,20 @@ import { useDispatch } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import useConvertToGroupButtonProps from './use-convert-to-group-button-props';
+import BlockGroupToolbar from './toolbar';
 
 function ConvertToGroupButton( {
 	clientIds,
 	isGroupable,
 	isUngroupable,
+	onUngroup,
 	blocksSelection,
 	groupingBlockName,
 	onClose = () => {},
 } ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const onConvertToGroup = () => {
-		// Activate the `transform` on the Grouping Block which does the conversion
+		// Activate the `transform` on the Grouping Block which does the conversion.
 		const newBlocks = switchToBlockType(
 			blocksSelection,
 			groupingBlockName
@@ -33,9 +35,15 @@ function ConvertToGroupButton( {
 	};
 
 	const onConvertFromGroup = () => {
-		const innerBlocks = blocksSelection[ 0 ].innerBlocks;
+		let innerBlocks = blocksSelection[ 0 ].innerBlocks;
 		if ( ! innerBlocks.length ) {
 			return;
+		}
+		if ( onUngroup ) {
+			innerBlocks = onUngroup(
+				blocksSelection[ 0 ].attributes,
+				blocksSelection[ 0 ].innerBlocks
+			);
 		}
 		replaceBlocks( clientIds, innerBlocks );
 	};
@@ -65,7 +73,7 @@ function ConvertToGroupButton( {
 				>
 					{ _x(
 						'Ungroup',
-						'Ungrouping blocks from within a Group block back into individual blocks within the Editor '
+						'Ungrouping blocks from within a grouping block back into individual blocks within the Editor '
 					) }
 				</MenuItem>
 			) }
@@ -73,4 +81,8 @@ function ConvertToGroupButton( {
 	);
 }
 
-export { useConvertToGroupButtonProps, ConvertToGroupButton };
+export {
+	BlockGroupToolbar,
+	ConvertToGroupButton,
+	useConvertToGroupButtonProps,
+};

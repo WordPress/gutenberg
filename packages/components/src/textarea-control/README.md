@@ -4,12 +4,6 @@ TextareaControls are TextControls that allow for multiple lines of text, and wra
 
 ![An empty TextareaControl, and a focused TextareaControl with some content entered.](https://wordpress.org/gutenberg/files/2019/01/TextareaControl.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -77,8 +71,8 @@ When text input isn’t accepted, an error message can display instructions on h
 ### Usage
 
 ```jsx
+import { useState } from 'react';
 import { TextareaControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyTextareaControl = () => {
 	const [ text, setText ] = useState( '' );
@@ -100,47 +94,41 @@ The set of props accepted by the component will be specified below.
 
 Props not included in this set will be applied to the textarea element.
 
-#### label
-
-If this property is added, a label will be generated using label property as the content.
-
--   Type: `String`
--   Required: No
-
-#### hideLabelFromVision
-
-If true, the label will only be visible to screen readers.
-
--   Type: `Boolean`
--   Required: No
-
-#### help
+#### `help`: `string | Element`
 
 If this property is added, a help text will be generated using help property as the content.
 
--   Type: `String|WPElement`
 -   Required: No
 
-#### rows
+#### `hideLabelFromVision`: `boolean`
 
-The number of rows the textarea should contain. Defaults to four.
+If true, the label will only be visible to screen readers.
 
--   Type: `String`
 -   Required: No
--   Default: 4
 
-#### value
+#### `label`: `string`
 
-The current value of the textarea.
+If this property is added, a label will be generated using label property as the content.
 
--   Type: `String`
--   Required: Yes
+-   Required: No
 
-#### onChange
+#### `onChange`: `( value: string ) => void`
 
 A function that receives the new value of the textarea each time it changes.
 
--   Type: `function`
+-   Required: Yes
+
+#### `rows`: `number`
+
+The number of rows the textarea should contain.
+
+-   Required: No
+-   Default: 4
+
+#### `value`: `string`
+
+The current value of the textarea.
+
 -   Required: Yes
 
 ## Related components

@@ -4,7 +4,7 @@
 
 import { isFormatEqual } from './is-format-equal';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Normalises formats: ensures subsequent adjacent equal formats have the same

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { useSelect } from '@wordpress/data';
 import FullscreenModeClose from '../';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test
+	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
 	return mock;
 } );
@@ -36,12 +36,11 @@ describe( 'FullscreenModeClose', () => {
 				} ) );
 			} );
 
-			const { container } = render( <FullscreenModeClose /> );
-			const siteIcon = container.querySelector(
-				'.edit-post-fullscreen-mode-close_site-icon'
-			);
+			render( <FullscreenModeClose /> );
 
-			expect( siteIcon ).toBeTruthy();
+			const siteIcon = screen.getByAltText( 'Site Icon' );
+
+			expect( siteIcon ).toBeVisible();
 		} );
 
 		it( 'should display a default site icon if no user uploaded site icon exists', () => {
@@ -58,13 +57,12 @@ describe( 'FullscreenModeClose', () => {
 			} );
 
 			const { container } = render( <FullscreenModeClose /> );
-			const siteIcon = container.querySelector(
-				'.edit-post-fullscreen-mode-close_site-icon'
-			);
-			const defaultIcon = container.querySelector( 'svg' );
 
-			expect( siteIcon ).toBeFalsy();
-			expect( defaultIcon ).toBeTruthy();
+			expect(
+				screen.queryByAltText( 'Site Icon' )
+			).not.toBeInTheDocument();
+
+			expect( container ).toMatchSnapshot();
 		} );
 	} );
 } );

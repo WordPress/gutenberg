@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
-import { Clipboard } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 /**
  * WordPress dependencies
@@ -38,6 +37,7 @@ export const link = {
 	attributes: {
 		url: 'href',
 		target: 'target',
+		rel: 'rel',
 	},
 	edit: withSpokenMessages(
 		class LinkEdit extends Component {
@@ -47,9 +47,8 @@ export const link = {
 				this.addLink = this.addLink.bind( this );
 				this.stopAddingLink = this.stopAddingLink.bind( this );
 				this.onRemoveFormat = this.onRemoveFormat.bind( this );
-				this.getURLFromClipboard = this.getURLFromClipboard.bind(
-					this
-				);
+				this.getURLFromClipboard =
+					this.getURLFromClipboard.bind( this );
 				this.state = {
 					addingLink: false,
 				};
@@ -81,19 +80,27 @@ export const link = {
 				const { value, isActive } = this.props;
 				const startFormat = getActiveFormat( value, 'core/link' );
 
-				// if the link isn't selected, get the link manually by looking around the cursor
-				// TODO: handle partly selected links
+				// If the link isn't selected, get the link manually by looking around the cursor
+				// TODO: handle partly selected links.
 				if ( startFormat && isCollapsed( value ) && isActive ) {
 					let startIndex = value.start;
 					let endIndex = value.end;
 
-					while ( find( value.formats[ startIndex ], startFormat ) ) {
+					while (
+						value.formats[ startIndex ]?.find(
+							( format ) => format?.type === startFormat.type
+						)
+					) {
 						startIndex--;
 					}
 
 					endIndex++;
 
-					while ( find( value.formats[ endIndex ], startFormat ) ) {
+					while (
+						value.formats[ endIndex ]?.find(
+							( format ) => format?.type === startFormat.type
+						)
+					) {
 						endIndex++;
 					}
 
@@ -127,7 +134,7 @@ export const link = {
 				if ( ! clipboardText ) {
 					return;
 				}
-				// Check if pasted text is URL
+				// Check if pasted text is URL.
 				if ( ! isURL( clipboardText ) ) {
 					return;
 				}
@@ -137,7 +144,7 @@ export const link = {
 			render() {
 				const { isActive, activeAttributes, onChange } = this.props;
 				const linkSelection = this.getLinkSelection();
-				// If no URL is set and we have a clipboard URL let's use it
+				// If no URL is set and we have a clipboard URL let's use it.
 				if ( ! activeAttributes.url && this.state.clipboardURL ) {
 					activeAttributes.url = this.state.clipboardURL;
 				}

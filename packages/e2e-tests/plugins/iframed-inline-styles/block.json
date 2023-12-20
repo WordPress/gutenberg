@@ -1,5 +1,5 @@
 {
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "test/iframed-inline-styles",
 	"title": "Iframed Inline Styles",
 	"category": "text",

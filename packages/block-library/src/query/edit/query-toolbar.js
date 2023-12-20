@@ -10,35 +10,26 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { settings, list, grid } from '@wordpress/icons';
+import { settings } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { usePatterns } from '../utils';
 
 export default function QueryToolbar( {
-	attributes: { query, displayLayout },
+	attributes: { query },
 	setQuery,
-	setDisplayLayout,
+	openPatternSelectionModal,
+	name,
+	clientId,
 } ) {
+	const hasPatterns = !! usePatterns( clientId, name ).length;
 	const maxPageInputId = useInstanceId(
 		QueryToolbar,
 		'blocks-query-pagination-max-page-input'
 	);
-	const displayLayoutControls = [
-		{
-			icon: list,
-			title: __( 'List view' ),
-			onClick: () => setDisplayLayout( { type: 'list' } ),
-			isActive: displayLayout?.type === 'list',
-		},
-		{
-			icon: grid,
-			title: __( 'Grid view' ),
-			onClick: () =>
-				setDisplayLayout( {
-					type: 'flex',
-					columns: displayLayout?.columns || 3,
-				} ),
-			isActive: displayLayout?.type === 'flex',
-		},
-	];
+
 	return (
 		<>
 			{ ! query.inherit && (
@@ -128,7 +119,13 @@ export default function QueryToolbar( {
 					/>
 				</ToolbarGroup>
 			) }
-			<ToolbarGroup controls={ displayLayoutControls } />
+			{ hasPatterns && (
+				<ToolbarGroup className="wp-block-template-part__block-control-group">
+					<ToolbarButton onClick={ openPatternSelectionModal }>
+						{ __( 'Replace' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
+			) }
 		</>
 	);
 }

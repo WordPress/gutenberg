@@ -7,7 +7,12 @@ import { TextInput, Platform, Dimensions } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { getPxFromCssUnit } from '@wordpress/block-editor';
+import { getPxFromCssUnit } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import RichText from '../rich-text';
 
 /**
  * Internal dependencies
@@ -18,10 +23,13 @@ export default class PlainText extends Component {
 	constructor() {
 		super( ...arguments );
 		this.isAndroid = Platform.OS === 'android';
+
+		this.onChangeTextInput = this.onChangeTextInput.bind( this );
+		this.onChangeRichText = this.onChangeRichText.bind( this );
 	}
 
 	componentDidMount() {
-		// if isSelected is true, we should request the focus on this TextInput
+		// If isSelected is true, we should request the focus on this TextInput.
 		if (
 			this._input &&
 			this._input.isFocused() === false &&
@@ -44,7 +52,7 @@ export default class PlainText extends Component {
 
 	componentDidUpdate( prevProps ) {
 		if ( ! this.props.isSelected && prevProps.isSelected ) {
-			this._input.blur();
+			this._input?.blur();
 		}
 	}
 
@@ -55,11 +63,11 @@ export default class PlainText extends Component {
 	}
 
 	focus() {
-		this._input.focus();
+		this._input?.focus();
 	}
 
 	blur() {
-		this._input.blur();
+		this._input?.blur();
 	}
 
 	getFontSize() {
@@ -79,22 +87,71 @@ export default class PlainText extends Component {
 		};
 	}
 
+	replaceLineBreakTags( value ) {
+		return value?.replace( RegExp( '<br>', 'gim' ), '\n' );
+	}
+
+	onChangeTextInput( event ) {
+		const { onChange } = this.props;
+		onChange( event.nativeEvent.text );
+	}
+
+	onChangeRichText( value ) {
+		const { onChange } = this.props;
+		// The <br> tags have to be replaced with new line characters
+		// as the content of plain text shouldn't contain HTML tags.
+		onChange( this.replaceLineBreakTags( value ) );
+	}
+
 	render() {
-		const { style } = this.props;
+		const { style, __experimentalVersion, onFocus, ...otherProps } =
+			this.props;
 		const textStyles = [
 			style || styles[ 'block-editor-plain-text' ],
 			this.getFontSize(),
 		];
 
+		if ( __experimentalVersion === 2 ) {
+			const disableFormattingProps = {
+				withoutInteractiveFormatting: true,
+				disableEditingMenu: true,
+				__unstableDisableFormats: true,
+				disableSuggestions: true,
+			};
+
+			const forcePlainTextProps = {
+				preserveWhiteSpace: true,
+				__unstablePastePlainText: true,
+				multiline: false,
+			};
+
+			const fontProps = {
+				fontFamily: style?.fontFamily,
+				fontSize: style?.fontSize,
+				fontWeight: style?.fontWeight,
+			};
+
+			return (
+				<RichText
+					{ ...otherProps }
+					{ ...disableFormattingProps }
+					{ ...forcePlainTextProps }
+					{ ...fontProps }
+					identifier="content"
+					style={ style }
+					onChange={ this.onChangeRichText }
+					unstableOnFocus={ onFocus }
+				/>
+			);
+		}
+
 		return (
 			<TextInput
 				{ ...this.props }
 				ref={ ( x ) => ( this._input = x ) }
-				onChange={ ( event ) => {
-					this.props.onChange( event.nativeEvent.text );
-				} }
-				onFocus={ this.props.onFocus } // always assign onFocus as a props
-				onBlur={ this.props.onBlur } // always assign onBlur as a props
+				onChange={ this.onChangeTextInput }
+				onFocus={ this.props.onFocus } // Always assign onFocus as a props.
+				onBlur={ this.props.onBlur } // Always assign onBlur as a props.
 				fontFamily={
 					( this.props.style && this.props.style.fontFamily ) ||
 					styles[ 'block-editor-plain-text' ].fontFamily

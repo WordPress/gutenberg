@@ -41,12 +41,19 @@ import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
  *
  * @typedef WPBlock
  *
- * @property {string}    name             Block name
- * @property {Object }   attributes       Block raw or comment attributes.
- * @property {WPBlock[]} innerBlocks      Inner Blocks.
- * @property {string}    originalContent  Original content of the block before validation fixes.
- * @property {boolean}   isValid          Whether the block is valid.
- * @property {Object[]}  validationIssues Validation issues.
+ * @property {string}     name                    Block name
+ * @property {Object}     attributes              Block raw or comment attributes.
+ * @property {WPBlock[]}  innerBlocks             Inner Blocks.
+ * @property {string}     originalContent         Original content of the block before validation fixes.
+ * @property {boolean}    isValid                 Whether the block is valid.
+ * @property {Object[]}   validationIssues        Validation issues.
+ * @property {WPRawBlock} [__unstableBlockSource] Un-processed original copy of block if created through parser.
+ */
+
+/**
+ * @typedef  {Object}  ParseOptions
+ * @property {boolean?} __unstableSkipMigrationLogs If a block is migrated from a deprecated version, skip logging the migration details.
+ * @property {boolean?} __unstableSkipAutop         Whether to skip autop when processing freeform content.
  */
 
 /**
@@ -59,13 +66,11 @@ import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
  * @return {WPRawBlock} The block's name and attributes, changed accordingly if a match was found
  */
 function convertLegacyBlocks( rawBlock ) {
-	const [
-		correctName,
-		correctedAttributes,
-	] = convertLegacyBlockNameAndAttributes(
-		rawBlock.blockName,
-		rawBlock.attrs
-	);
+	const [ correctName, correctedAttributes ] =
+		convertLegacyBlockNameAndAttributes(
+			rawBlock.blockName,
+			rawBlock.attrs
+		);
 	return {
 		...rawBlock,
 		blockName: correctName,
@@ -77,11 +82,12 @@ function convertLegacyBlocks( rawBlock ) {
  * Normalize the raw block by applying the fallback block name if none given,
  * sanitize the parsed HTML...
  *
- * @param {WPRawBlock} rawBlock The raw block object.
+ * @param {WPRawBlock}    rawBlock The raw block object.
+ * @param {ParseOptions?} options  Extra options for handling block parsing.
  *
  * @return {WPRawBlock} The normalized block object.
  */
-export function normalizeRawBlock( rawBlock ) {
+export function normalizeRawBlock( rawBlock, options ) {
 	const fallbackBlockName = getFreeformContentHandlerName();
 
 	// If the grammar parsing don't produce any block name, use the freeform block.
@@ -93,7 +99,11 @@ export function normalizeRawBlock( rawBlock ) {
 	// Fallback content may be upgraded from classic content expecting implicit
 	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,
 	// meaning there are no negative consequences to repeated autop calls.
-	if ( rawBlockName === fallbackBlockName ) {
+	if (
+		rawBlockName === fallbackBlockName &&
+		rawBlockName === 'core/freeform' &&
+		! options?.__unstableSkipAutop
+	) {
 		rawInnerHTML = autop( rawInnerHTML ).trim();
 	}
 
@@ -144,14 +154,47 @@ function createMissingBlockType( rawBlock ) {
 }
 
 /**
+ * Validates a block and wraps with validation meta.
+ *
+ * The name here is regrettable but `validateBlock` is already taken.
+ *
+ * @param {WPBlock}                               unvalidatedBlock
+ * @param {import('../registration').WPBlockType} blockType
+ * @return {WPBlock}                              validated block, with auto-fixes if initially invalid
+ */
+function applyBlockValidation( unvalidatedBlock, blockType ) {
+	// Attempt to validate the block.
+	const [ isValid ] = validateBlock( unvalidatedBlock, blockType );
+
+	if ( isValid ) {
+		return { ...unvalidatedBlock, isValid, validationIssues: [] };
+	}
+
+	// If the block is invalid, attempt some built-in fixes
+	// like custom classNames handling.
+	const fixedBlock = applyBuiltInValidationFixes(
+		unvalidatedBlock,
+		blockType
+	);
+	// Attempt to validate the block once again after the built-in fixes.
+	const [ isFixedValid, validationIssues ] = validateBlock(
+		unvalidatedBlock,
+		blockType
+	);
+
+	return { ...fixedBlock, isValid: isFixedValid, validationIssues };
+}
+
+/**
  * Given a raw block returned by grammar parsing, returns a fully parsed block.
  *
- * @param {WPRawBlock} rawBlock The raw block object.
+ * @param {WPRawBlock}   rawBlock The raw block object.
+ * @param {ParseOptions} options  Extra options for handling block parsing.
  *
- * @return {WPBlock} Fully parsed block.
+ * @return {WPBlock | undefined} Fully parsed block.
  */
-export function parseRawBlock( rawBlock ) {
-	let normalizedBlock = normalizeRawBlock( rawBlock );
+export function parseRawBlock( rawBlock, options ) {
+	let normalizedBlock = normalizeRawBlock( rawBlock, options );
 
 	// During the lifecycle of the project, we renamed some old blocks
 	// and transformed others to new blocks. To avoid breaking existing content,
@@ -181,12 +224,12 @@ export function parseRawBlock( rawBlock ) {
 
 	// Parse inner blocks recursively.
 	const parsedInnerBlocks = normalizedBlock.innerBlocks
-		.map( parseRawBlock )
+		.map( ( innerBlock ) => parseRawBlock( innerBlock, options ) )
 		// See https://github.com/WordPress/gutenberg/pull/17164.
 		.filter( ( innerBlock ) => !! innerBlock );
 
 	// Get the fully parsed block.
-	let parsedBlock = createBlock(
+	const parsedBlock = createBlock(
 		normalizedBlock.blockName,
 		getBlockAttributes(
 			blockType,
@@ -197,47 +240,50 @@ export function parseRawBlock( rawBlock ) {
 	);
 	parsedBlock.originalContent = normalizedBlock.innerHTML;
 
-	// Attempt to validate the block.
-	let [ isValid, validationIssues ] = validateBlock( parsedBlock, blockType );
-
-	// If the block is invalid, attempt some built-in fixes
-	// like custom classNames handling.
-	if ( ! isValid ) {
-		parsedBlock = applyBuiltInValidationFixes( parsedBlock, blockType );
-		// Attempt to validate the block once again after the built-in fixes.
-		[ isValid, validationIssues ] = validateBlock( parsedBlock, blockType );
-	}
-	parsedBlock.isValid = isValid;
-	parsedBlock.validationIssues = validationIssues;
+	const validatedBlock = applyBlockValidation( parsedBlock, blockType );
+	const { validationIssues } = validatedBlock;
 
 	// Run the block deprecation and migrations.
 	// This is performed on both invalid and valid blocks because
 	// migration using the `migrate` functions should run even
 	// if the output is deemed valid.
-	parsedBlock = applyBlockDeprecatedVersions(
-		parsedBlock,
+	const updatedBlock = applyBlockDeprecatedVersions(
+		validatedBlock,
 		normalizedBlock,
 		blockType
 	);
-	if ( validationIssues && validationIssues.length > 0 ) {
-		if ( parsedBlock.isValid ) {
-			/* eslint-disable no-console */
-			console.groupCollapsed( 'Updated Block: %s', blockType.name );
-			console.info(
-				'Block successfully updated for `%s` (%o).\n\nNew content generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
-				blockType.name,
-				blockType,
-				getSaveContent( blockType, parsedBlock.attributes ),
-				parsedBlock.originalContent
-			);
-			console.groupEnd();
-			/* eslint-enable no-console */
-		} else {
-			validationIssues.forEach( ( { log, args } ) => log( ...args ) );
-		}
+
+	if ( ! updatedBlock.isValid ) {
+		// Preserve the original unprocessed version of the block
+		// that we received (no fixes, no deprecations) so that
+		// we can save it as close to exactly the same way as
+		// we loaded it. This is important to avoid corruption
+		// and data loss caused by block implementations trying
+		// to process data that isn't fully recognized.
+		updatedBlock.__unstableBlockSource = rawBlock;
 	}
 
-	return parsedBlock;
+	if (
+		! validatedBlock.isValid &&
+		updatedBlock.isValid &&
+		! options?.__unstableSkipMigrationLogs
+	) {
+		/* eslint-disable no-console */
+		console.groupCollapsed( 'Updated Block: %s', blockType.name );
+		console.info(
+			'Block successfully updated for `%s` (%o).\n\nNew content generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
+			blockType.name,
+			blockType,
+			getSaveContent( blockType, updatedBlock.attributes ),
+			updatedBlock.originalContent
+		);
+		console.groupEnd();
+		/* eslint-enable no-console */
+	} else if ( ! validatedBlock.isValid && ! updatedBlock.isValid ) {
+		validationIssues.forEach( ( { log, args } ) => log( ...args ) );
+	}
+
+	return updatedBlock;
 }
 
 /**
@@ -256,13 +302,14 @@ export function parseRawBlock( rawBlock ) {
  * @see
  * https://developer.wordpress.org/block-editor/packages/packages-block-serialization-default-parser/
  *
- * @param {string} content The post content.
+ * @param {string}       content The post content.
+ * @param {ParseOptions} options Extra options for handling block parsing.
  *
  * @return {Array} Block list.
  */
-export default function parse( content ) {
+export default function parse( content, options ) {
 	return grammarParse( content ).reduce( ( accumulator, rawBlock ) => {
-		const block = parseRawBlock( rawBlock );
+		const block = parseRawBlock( rawBlock, options );
 		if ( block ) {
 			accumulator.push( block );
 		}

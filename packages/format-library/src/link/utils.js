@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { startsWith, find, partialRight } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -47,7 +42,7 @@ export function isValidHref( href ) {
 		// Add some extra checks for http(s) URIs, since these are the most common use-case.
 		// This ensures URIs with an http protocol have exactly two forward slashes following the protocol.
 		if (
-			startsWith( protocol, 'http' ) &&
+			protocol.startsWith( 'http' ) &&
 			! /^https?:\/\/[^\/\s]/i.test( trimmedHref )
 		) {
 			return false;
@@ -75,7 +70,7 @@ export function isValidHref( href ) {
 	}
 
 	// Validate anchor links.
-	if ( startsWith( trimmedHref, '#' ) && ! isValidFragment( trimmedHref ) ) {
+	if ( trimmedHref.startsWith( '#' ) && ! isValidFragment( trimmedHref ) ) {
 		return false;
 	}
 
@@ -90,10 +85,16 @@ export function isValidHref( href ) {
  * @param {string}  options.type             The type of the link.
  * @param {string}  options.id               The ID of the link.
  * @param {boolean} options.opensInNewWindow Whether this link will open in a new window.
- *
+ * @param {boolean} options.nofollow         Whether this link is marked as no follow relationship.
  * @return {Object} The final format object.
  */
-export function createLinkFormat( { url, type, id, opensInNewWindow } ) {
+export function createLinkFormat( {
+	url,
+	type,
+	id,
+	opensInNewWindow,
+	nofollow,
+} ) {
 	const format = {
 		type: 'core/link',
 		attributes: {
@@ -106,7 +107,15 @@ export function createLinkFormat( { url, type, id, opensInNewWindow } ) {
 
 	if ( opensInNewWindow ) {
 		format.attributes.target = '_blank';
-		format.attributes.rel = 'noreferrer noopener';
+		format.attributes.rel = format.attributes.rel
+			? format.attributes.rel + ' noreferrer noopener'
+			: 'noreferrer noopener';
+	}
+
+	if ( nofollow ) {
+		format.attributes.rel = format.attributes.rel
+			? format.attributes.rel + ' nofollow'
+			: 'nofollow';
 	}
 
 	return format;
@@ -146,17 +155,17 @@ export function getFormatBoundary(
 	// Clone formats to avoid modifying source formats.
 	const newFormats = formats.slice();
 
-	const formatAtStart = find( newFormats[ startIndex ], {
-		type: format.type,
-	} );
+	const formatAtStart = newFormats[ startIndex ]?.find(
+		( { type } ) => type === format.type
+	);
 
-	const formatAtEnd = find( newFormats[ endIndex ], {
-		type: format.type,
-	} );
+	const formatAtEnd = newFormats[ endIndex ]?.find(
+		( { type } ) => type === format.type
+	);
 
-	const formatAtEndMinusOne = find( newFormats[ endIndex - 1 ], {
-		type: format.type,
-	} );
+	const formatAtEndMinusOne = newFormats[ endIndex - 1 ]?.find(
+		( { type } ) => type === format.type
+	);
 
 	if ( !! formatAtStart ) {
 		// Set values to conform to "start"
@@ -186,7 +195,7 @@ export function getFormatBoundary(
 	// Walk the endIndex "forwards" until the trailing "edge" of the matching format.
 	endIndex = walkToEnd( ...walkingArgs );
 
-	// Safe guard: start index cannot be less than 0
+	// Safe guard: start index cannot be less than 0.
 	startIndex = startIndex < 0 ? 0 : startIndex;
 
 	// // Return the indicies of the "edges" as the boundaries.
@@ -238,6 +247,11 @@ function walkToBoundary(
 
 	return index;
 }
+
+const partialRight =
+	( fn, ...partialArgs ) =>
+	( ...args ) =>
+		fn( ...args, ...partialArgs );
 
 const walkToStart = partialRight( walkToBoundary, 'backwards' );
 

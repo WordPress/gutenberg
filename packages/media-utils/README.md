@@ -18,7 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ### uploadMedia
 
 Media upload util is a function that allows the invokers to upload files to the WordPress media library.
-As an example, provided that `myFiles` is an array of file objects, `onFileChange` on onFileChange is a function that receives an array of objects containing the description of WordPress media items and `handleFileError` is a function that receives an object describing a possible error, the following code uploads a file to the WordPress media library:
+As an example, provided that `myFiles` is an array of file objects, `handleFileChange` on onFileChange is a function that receives an array of objects containing the description of WordPress media items and `handleFileError` is a function that receives an object describing a possible error, the following code uploads a file to the WordPress media library:
 
 ```js
 wp.mediaUtils.utils.uploadMedia( {
@@ -44,3 +44,11 @@ Beware that first onFileChange is called with temporary blob URLs and then with 
 
 Media upload component provides a UI button that allows users to open the WordPress media library. It is normally used in conjunction with the filter `editor.MediaUpload`.
 The component follows the interface specified in https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md, and more details regarding its usage can be checked there.
+
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

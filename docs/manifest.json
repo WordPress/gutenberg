@@ -12,75 +12,105 @@
 		"parent": null
 	},
 	{
-		"title": "Development Environment",
+		"title": "Block Development Environment",
 		"slug": "devenv",
 		"markdown_source": "../docs/getting-started/devenv/README.md",
 		"parent": "getting-started"
 	},
 	{
-		"title": "How to setup local WordPress environment on Ubuntu",
-		"slug": "docker-ubuntu",
-		"markdown_source": "../docs/getting-started/devenv/docker-ubuntu.md",
+		"title": "Node.js development environment",
+		"slug": "nodejs-development-environment",
+		"markdown_source": "../docs/getting-started/devenv/nodejs-development-environment.md",
 		"parent": "devenv"
 	},
 	{
-		"title": "Create a Block Tutorial",
-		"slug": "create-block",
-		"markdown_source": "../docs/getting-started/create-block/README.md",
+		"title": "Get started with wp-env",
+		"slug": "get-started-with-wp-env",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-env.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Get started with create-block",
+		"slug": "get-started-with-create-block",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-create-block.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Get started with wp-scripts",
+		"slug": "get-started-with-wp-scripts",
+		"markdown_source": "../docs/getting-started/devenv/get-started-with-wp-scripts.md",
+		"parent": "devenv"
+	},
+	{
+		"title": "Quick Start Guide",
+		"slug": "quick-start-guide",
+		"markdown_source": "../docs/getting-started/quick-start-guide.md",
 		"parent": "getting-started"
 	},
 	{
-		"title": "WordPress Plugin",
-		"slug": "wp-plugin",
-		"markdown_source": "../docs/getting-started/create-block/wp-plugin.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Anatomy of a Block",
-		"slug": "block-anatomy",
-		"markdown_source": "../docs/getting-started/create-block/block-anatomy.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Block Attributes",
-		"slug": "attributes",
-		"markdown_source": "../docs/getting-started/create-block/attributes.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Code Implementation",
-		"slug": "block-code",
-		"markdown_source": "../docs/getting-started/create-block/block-code.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Authoring Experience",
-		"slug": "author-experience",
-		"markdown_source": "../docs/getting-started/create-block/author-experience.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Finishing Touches",
-		"slug": "finishing",
-		"markdown_source": "../docs/getting-started/create-block/finishing.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Share your Block with the World",
-		"slug": "submitting-to-block-directory",
-		"markdown_source": "../docs/getting-started/create-block/submitting-to-block-directory.md",
-		"parent": "create-block"
-	},
-	{
-		"title": "Full Site Editing",
-		"slug": "full-site-editing",
-		"markdown_source": "../docs/getting-started/full-site-editing.md",
+		"title": "Tutorial: Build your first block",
+		"slug": "tutorial",
+		"markdown_source": "../docs/getting-started/tutorial.md",
 		"parent": "getting-started"
 	},
 	{
-		"title": "Outreach",
-		"slug": "outreach",
-		"markdown_source": "../docs/getting-started/outreach.md",
+		"title": "Fundamentals of Block Development",
+		"slug": "fundamentals",
+		"markdown_source": "../docs/getting-started/fundamentals/README.md",
+		"parent": "getting-started"
+	},
+	{
+		"title": "File structure of a block",
+		"slug": "file-structure-of-a-block",
+		"markdown_source": "../docs/getting-started/fundamentals/file-structure-of-a-block.md",
+		"parent": "fundamentals"
+	},
+	{
+		"title": "block.json",
+		"slug": "block-json",
+		"markdown_source": "../docs/getting-started/fundamentals/block-json.md",
+		"parent": "fundamentals"
+	},
+	{
+		"title": "Registration of a block",
+		"slug": "registration-of-a-block",
+		"markdown_source": "../docs/getting-started/fundamentals/registration-of-a-block.md",
+		"parent": "fundamentals"
+	},
+	{
+		"title": "The block wrapper",
+		"slug": "block-wrapper",
+		"markdown_source": "../docs/getting-started/fundamentals/block-wrapper.md",
+		"parent": "fundamentals"
+	},
+	{
+		"title": "The block in the Editor",
+		"slug": "block-in-the-editor",
+		"markdown_source": "../docs/getting-started/fundamentals/block-in-the-editor.md",
+		"parent": "fundamentals"
+	},
+	{
+		"title": "Markup representation of a block",
+		"slug": "markup-representation-block",
+		"markdown_source": "../docs/getting-started/fundamentals/markup-representation-block.md",
+		"parent": "fundamentals"
+	},
+	{
+		"title": "Working with Javascript for the Block Editor",
+		"slug": "javascript-in-the-block-editor",
+		"markdown_source": "../docs/getting-started/fundamentals/javascript-in-the-block-editor.md",
+		"parent": "fundamentals"
+	},
+	{
+		"title": "Glossary",
+		"slug": "glossary",
+		"markdown_source": "../docs/getting-started/glossary.md",
+		"parent": "getting-started"
+	},
+	{
+		"title": "Frequently Asked Questions",
+		"slug": "faq",
+		"markdown_source": "../docs/getting-started/faq.md",
 		"parent": "getting-started"
 	},
 	{
@@ -96,45 +126,21 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Backward Compatibility",
-		"slug": "backward-compatibility",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Deprecations",
-		"slug": "deprecations",
-		"markdown_source": "../docs/how-to-guides/backward-compatibility/deprecations.md",
-		"parent": "backward-compatibility"
-	},
-	{
 		"title": "Blocks",
 		"slug": "block-tutorial",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/README.md",
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Writing Your First Block Type",
+		"title": "Create a basic block",
 		"slug": "writing-your-first-block-type",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/writing-your-first-block-type.md",
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Applying Styles From a Stylesheet",
+		"title": "Use styles and stylesheets",
 		"slug": "applying-styles-with-stylesheets",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/applying-styles-with-stylesheets.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Introducing Attributes and Editable Fields",
-		"slug": "introducing-attributes-and-editable-fields",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields.md",
-		"parent": "block-tutorial"
-	},
-	{
-		"title": "Block Controls: Block Toolbar and Settings Sidebar",
-		"slug": "block-controls-toolbar-and-sidebar",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md",
 		"parent": "block-tutorial"
 	},
 	{
@@ -144,46 +150,16 @@
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Generate Blocks with WP-CLI",
-		"slug": "generate-blocks-with-wp-cli",
-		"markdown_source": "../docs/how-to-guides/block-tutorial/generate-blocks-with-wp-cli.md",
-		"parent": "block-tutorial"
-	},
-	{
 		"title": "Nested Blocks: Using InnerBlocks",
 		"slug": "nested-blocks-inner-blocks",
 		"markdown_source": "../docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md",
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Designer Documentation",
-		"slug": "designers",
-		"markdown_source": "../docs/how-to-guides/designers/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Block Design",
-		"slug": "block-design",
-		"markdown_source": "../docs/how-to-guides/designers/block-design.md",
-		"parent": "designers"
-	},
-	{
-		"title": "User Interface",
-		"slug": "user-interface",
-		"markdown_source": "../docs/how-to-guides/designers/user-interface.md",
-		"parent": "designers"
-	},
-	{
-		"title": "Resources",
-		"slug": "design-resources",
-		"markdown_source": "../docs/how-to-guides/designers/design-resources.md",
-		"parent": "designers"
-	},
-	{
-		"title": "Animation",
-		"slug": "animation",
-		"markdown_source": "../docs/how-to-guides/designers/animation.md",
-		"parent": "designers"
+		"title": "Extending the Query Loop block",
+		"slug": "extending-the-query-loop-block",
+		"markdown_source": "../docs/how-to-guides/block-tutorial/extending-the-query-loop-block.md",
+		"parent": "block-tutorial"
 	},
 	{
 		"title": "Development Platform",
@@ -194,14 +170,56 @@
 	{
 		"title": "Building a custom block editor",
 		"slug": "custom-block-editor",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/README.md",
+		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor.md",
 		"parent": "platform"
 	},
 	{
-		"title": "Tutorial: building a custom block editor",
-		"slug": "tutorial",
-		"markdown_source": "../docs/how-to-guides/platform/custom-block-editor/tutorial.md",
-		"parent": "custom-block-editor"
+		"title": "Create your First App with Gutenberg Data",
+		"slug": "data-basics",
+		"markdown_source": "../docs/how-to-guides/data-basics/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Setup",
+		"slug": "1-data-basics-setup",
+		"markdown_source": "../docs/how-to-guides/data-basics/1-data-basics-setup.md",
+		"parent": "data-basics"
+	},
+	{
+		"title": "Building a list of pages",
+		"slug": "2-building-a-list-of-pages",
+		"markdown_source": "../docs/how-to-guides/data-basics/2-building-a-list-of-pages.md",
+		"parent": "data-basics"
+	},
+	{
+		"title": "Building an edit form",
+		"slug": "3-building-an-edit-form",
+		"markdown_source": "../docs/how-to-guides/data-basics/3-building-an-edit-form.md",
+		"parent": "data-basics"
+	},
+	{
+		"title": "Part 4: Building a Create page form",
+		"slug": "4-building-a-create-page-form",
+		"markdown_source": "../docs/how-to-guides/data-basics/4-building-a-create-page-form.md",
+		"parent": "data-basics"
+	},
+	{
+		"title": "Adding a delete button",
+		"slug": "5-adding-a-delete-button",
+		"markdown_source": "../docs/how-to-guides/data-basics/5-adding-a-delete-button.md",
+		"parent": "data-basics"
+	},
+	{
+		"title": "Curating the Editor Experience",
+		"slug": "curating-the-editor-experience",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Enqueueing assets in the Editor",
+		"slug": "enqueueing-assets-in-the-editor",
+		"markdown_source": "../docs/how-to-guides/enqueueing-assets-in-the-editor.md",
+		"parent": "how-to-guides"
 	},
 	{
 		"title": "Feature Flags",
@@ -214,60 +232,6 @@
 		"slug": "format-api",
 		"markdown_source": "../docs/how-to-guides/format-api.md",
 		"parent": "how-to-guides"
-	},
-	{
-		"title": "Getting Started with JavaScript",
-		"slug": "javascript",
-		"markdown_source": "../docs/how-to-guides/javascript/README.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Plugins Background",
-		"slug": "plugins-background",
-		"markdown_source": "../docs/how-to-guides/javascript/plugins-background.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Loading JavaScript",
-		"slug": "loading-javascript",
-		"markdown_source": "../docs/how-to-guides/javascript/loading-javascript.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Extending the Block Editor",
-		"slug": "extending-the-block-editor",
-		"markdown_source": "../docs/how-to-guides/javascript/extending-the-block-editor.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Troubleshooting",
-		"slug": "troubleshooting",
-		"markdown_source": "../docs/how-to-guides/javascript/troubleshooting.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "JavaScript Versions and Build Step",
-		"slug": "versions-and-building",
-		"markdown_source": "../docs/how-to-guides/javascript/versions-and-building.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "Scope Your Code",
-		"slug": "scope-your-code",
-		"markdown_source": "../docs/how-to-guides/javascript/scope-your-code.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "JavaScript Build Setup",
-		"slug": "js-build-setup",
-		"markdown_source": "../docs/how-to-guides/javascript/js-build-setup.md",
-		"parent": "javascript"
-	},
-	{
-		"title": "ESNext Syntax",
-		"slug": "esnext-js",
-		"markdown_source": "../docs/how-to-guides/javascript/esnext-js.md",
-		"parent": "javascript"
 	},
 	{
 		"title": "Internationalization",
@@ -294,22 +258,16 @@
 		"parent": "how-to-guides"
 	},
 	{
+		"title": "Propagating updates for block types",
+		"slug": "propagating-updates",
+		"markdown_source": "../docs/how-to-guides/propagating-updates.md",
+		"parent": "how-to-guides"
+	},
+	{
 		"title": "Themes",
 		"slug": "themes",
 		"markdown_source": "../docs/how-to-guides/themes/README.md",
 		"parent": "how-to-guides"
-	},
-	{
-		"title": "Block Theme",
-		"slug": "block-theme-overview",
-		"markdown_source": "../docs/how-to-guides/themes/block-theme-overview.md",
-		"parent": "themes"
-	},
-	{
-		"title": "Create a block theme",
-		"slug": "create-block-theme",
-		"markdown_source": "../docs/how-to-guides/themes/create-block-theme.md",
-		"parent": "themes"
 	},
 	{
 		"title": "Global Settings & Styles (theme.json)",
@@ -402,7 +360,7 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Metadata",
+		"title": "Metadata in block.json",
 		"slug": "block-metadata",
 		"markdown_source": "../docs/reference-guides/block-api/block-metadata.md",
 		"parent": "block-api"
@@ -417,6 +375,12 @@
 		"title": "Registration",
 		"slug": "block-registration",
 		"markdown_source": "../docs/reference-guides/block-api/block-registration.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Selectors",
+		"slug": "block-selectors",
+		"markdown_source": "../docs/reference-guides/block-api/block-selectors.md",
 		"parent": "block-api"
 	},
 	{
@@ -456,7 +420,7 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Filter Reference",
+		"title": "Hooks Reference",
 		"slug": "filters",
 		"markdown_source": "../docs/reference-guides/filters/README.md",
 		"parent": "reference-guides"
@@ -468,7 +432,7 @@
 		"parent": "filters"
 	},
 	{
-		"title": "Editor Filters",
+		"title": "Editor Hooks",
 		"slug": "editor-filters",
 		"markdown_source": "../docs/reference-guides/filters/editor-filters.md",
 		"parent": "filters"
@@ -489,6 +453,12 @@
 		"title": "Autocomplete",
 		"slug": "autocomplete-filters",
 		"markdown_source": "../docs/reference-guides/filters/autocomplete-filters.md",
+		"parent": "filters"
+	},
+	{
+		"title": "Global Styles Filters",
+		"slug": "global-styles-filters",
+		"markdown_source": "../docs/reference-guides/filters/global-styles-filters.md",
 		"parent": "filters"
 	},
 	{
@@ -558,6 +528,36 @@
 		"parent": "reference-guides"
 	},
 	{
+		"title": "Theme.json Reference",
+		"slug": "theme-json-reference",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/README.md",
+		"parent": "reference-guides"
+	},
+	{
+		"title": "Theme.json Version 2",
+		"slug": "theme-json-living",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-living.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Theme.json Version 1 Reference",
+		"slug": "theme-json-v1",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-v1.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Migrating to Newer Versions",
+		"slug": "theme-json-migrations",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-migrations.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Available Styles Options",
+		"slug": "styles-versions",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/styles-versions.md",
+		"parent": "theme-json-reference"
+	},
+	{
 		"title": "Component Reference",
 		"slug": "components",
 		"markdown_source": "../packages/components/README.md",
@@ -594,9 +594,15 @@
 		"parent": "components"
 	},
 	{
-		"title": "BaseField",
-		"slug": "base-field",
-		"markdown_source": "../packages/components/src/base-field/README.md",
+		"title": "BorderBoxControl",
+		"slug": "border-box-control",
+		"markdown_source": "../packages/components/src/border-box-control/border-box-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "BorderControl",
+		"slug": "border-control",
+		"markdown_source": "../packages/components/src/border-control/border-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -660,6 +666,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "CircularOptionPicker",
+		"slug": "circular-option-picker",
+		"markdown_source": "../packages/components/src/circular-option-picker/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ClipboardButton",
 		"slug": "clipboard-button",
 		"markdown_source": "../packages/components/src/clipboard-button/README.md",
@@ -693,6 +705,12 @@
 		"title": "ConfirmDialog",
 		"slug": "confirm-dialog",
 		"markdown_source": "../packages/components/src/confirm-dialog/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CustomSelectControlV2",
+		"slug": "custom-select-control-v2",
+		"markdown_source": "../packages/components/src/custom-select-control-v2/README.md",
 		"parent": "components"
 	},
 	{
@@ -744,6 +762,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "DropdownMenuV2Ariakit",
+		"slug": "dropdown-menu-v2-ariakit",
+		"markdown_source": "../packages/components/src/dropdown-menu-v2-ariakit/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "DropdownMenu",
 		"slug": "dropdown-menu",
 		"markdown_source": "../packages/components/src/dropdown-menu/README.md",
@@ -789,12 +813,6 @@
 		"title": "Flex",
 		"slug": "flex",
 		"markdown_source": "../packages/components/src/flex/flex/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "Flyout",
-		"slug": "flyout",
-		"markdown_source": "../packages/components/src/flyout/flyout/README.md",
 		"parent": "components"
 	},
 	{
@@ -990,6 +1008,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "NavigatorBackButton",
+		"slug": "navigator-back-button",
+		"markdown_source": "../packages/components/src/navigator/navigator-back-button/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "NavigatorButton",
+		"slug": "navigator-button",
+		"markdown_source": "../packages/components/src/navigator/navigator-button/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "NavigatorProvider",
 		"slug": "navigator-provider",
 		"markdown_source": "../packages/components/src/navigator/navigator-provider/README.md",
@@ -999,6 +1029,12 @@
 		"title": "NavigatorScreen",
 		"slug": "navigator-screen",
 		"markdown_source": "../packages/components/src/navigator/navigator-screen/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "NavigatorToParentButton",
+		"slug": "navigator-to-parent-button",
+		"markdown_source": "../packages/components/src/navigator/navigator-to-parent-button/README.md",
 		"parent": "components"
 	},
 	{
@@ -1140,6 +1176,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Tabs",
+		"slug": "tabs",
+		"markdown_source": "../packages/components/src/tabs/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "TextControl",
 		"slug": "text-control",
 		"markdown_source": "../packages/components/src/text-control/README.md",
@@ -1170,6 +1212,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "ToggleGroupControlOptionBase",
+		"slug": "toggle-group-control-option-base",
+		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control-option-base/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToggleGroupControlOptionIcon",
+		"slug": "toggle-group-control-option-icon",
+		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ToggleGroupControlOption",
 		"slug": "toggle-group-control-option",
 		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control-option/README.md",
@@ -1184,31 +1238,31 @@
 	{
 		"title": "ToolbarButton",
 		"slug": "toolbar-button",
-		"markdown_source": "../packages/components/src/toolbar-button/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-button/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarDropdownMenu",
 		"slug": "toolbar-dropdown-menu",
-		"markdown_source": "../packages/components/src/toolbar-dropdown-menu/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-dropdown-menu/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarGroup",
 		"slug": "toolbar-group",
-		"markdown_source": "../packages/components/src/toolbar-group/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-group/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "ToolbarItem",
 		"slug": "toolbar-item",
-		"markdown_source": "../packages/components/src/toolbar-item/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar-item/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "Toolbar",
 		"slug": "toolbar",
-		"markdown_source": "../packages/components/src/toolbar/README.md",
+		"markdown_source": "../packages/components/src/toolbar/toolbar/README.md",
 		"parent": "components"
 	},
 	{
@@ -1380,6 +1434,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/commands",
+		"slug": "packages-commands",
+		"markdown_source": "../packages/commands/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/components",
 		"slug": "packages-components",
 		"markdown_source": "../packages/components/README.md",
@@ -1392,9 +1452,21 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/core-commands",
+		"slug": "packages-core-commands",
+		"markdown_source": "../packages/core-commands/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/core-data",
 		"slug": "packages-core-data",
 		"markdown_source": "../packages/core-data/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/create-block-interactive-template",
+		"slug": "packages-create-block-interactive-template",
+		"markdown_source": "../packages/create-block-interactive-template/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1410,10 +1482,10 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/custom-templated-path-webpack-plugin",
-		"slug": "packages-custom-templated-path-webpack-plugin",
-		"markdown_source": "../packages/custom-templated-path-webpack-plugin/README.md",
-		"parent": "packages"
+		"title": "External Project Templates",
+		"slug": "packages-create-block-external-template",
+		"markdown_source": "../packages/create-block/docs/external-template.md",
+		"parent": "packages-create-block"
 	},
 	{
 		"title": "@wordpress/customize-widgets",
@@ -1431,6 +1503,12 @@
 		"title": "@wordpress/data",
 		"slug": "packages-data",
 		"markdown_source": "../packages/data/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/dataviews",
+		"slug": "packages-dataviews",
+		"markdown_source": "../packages/dataviews/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1467,6 +1545,12 @@
 		"title": "@wordpress/dom",
 		"slug": "packages-dom",
 		"markdown_source": "../packages/dom/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/e2e-test-utils-playwright",
+		"slug": "packages-e2e-test-utils-playwright",
+		"markdown_source": "../packages/e2e-test-utils-playwright/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1560,6 +1644,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/interactivity",
+		"slug": "packages-interactivity",
+		"markdown_source": "../packages/interactivity/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/interface",
 		"slug": "packages-interface",
 		"markdown_source": "../packages/interface/README.md",
@@ -1608,12 +1698,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/library-export-default-webpack-plugin",
-		"slug": "packages-library-export-default-webpack-plugin",
-		"markdown_source": "../packages/library-export-default-webpack-plugin/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/list-reusable-blocks",
 		"slug": "packages-list-reusable-blocks",
 		"markdown_source": "../packages/list-reusable-blocks/README.md",
@@ -1644,6 +1728,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/patterns",
+		"slug": "packages-patterns",
+		"markdown_source": "../packages/patterns/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "../packages/plugins/README.md",
@@ -1662,6 +1752,18 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/preferences-persistence",
+		"slug": "packages-preferences-persistence",
+		"markdown_source": "../packages/preferences-persistence/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/preferences",
+		"slug": "packages-preferences",
+		"markdown_source": "../packages/preferences/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/prettier-config",
 		"slug": "packages-prettier-config",
 		"markdown_source": "../packages/prettier-config/README.md",
@@ -1677,6 +1779,12 @@
 		"title": "@wordpress/priority-queue",
 		"slug": "packages-priority-queue",
 		"markdown_source": "../packages/priority-queue/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/private-apis",
+		"slug": "packages-private-apis",
+		"markdown_source": "../packages/private-apis/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1716,6 +1824,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/router",
+		"slug": "packages-router",
+		"markdown_source": "../packages/router/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/scripts",
 		"slug": "packages-scripts",
 		"markdown_source": "../packages/scripts/README.md",
@@ -1734,15 +1848,39 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/style-engine",
+		"slug": "packages-style-engine",
+		"markdown_source": "../packages/style-engine/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/style-engine Using the Style Engine to generate block supports styles",
+		"slug": "using-the-style-engine-with-block-supports",
+		"markdown_source": "../packages/style-engine/docs/using-the-style-engine-with-block-supports.md",
+		"parent": "packages-style-engine"
+	},
+	{
 		"title": "@wordpress/stylelint-config",
 		"slug": "packages-stylelint-config",
 		"markdown_source": "../packages/stylelint-config/README.md",
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/sync",
+		"slug": "packages-sync",
+		"markdown_source": "../packages/sync/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/token-list",
 		"slug": "packages-token-list",
 		"markdown_source": "../packages/token-list/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/undo-manager",
+		"slug": "packages-undo-manager",
+		"markdown_source": "../packages/undo-manager/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1794,9 +1932,9 @@
 		"parent": "data"
 	},
 	{
-		"title": "Block Types Data",
-		"slug": "data-core-blocks",
-		"markdown_source": "../docs/reference-guides/data/data-core-blocks.md",
+		"title": "Block directory",
+		"slug": "data-core-block-directory",
+		"markdown_source": "../docs/reference-guides/data/data-core-block-directory.md",
 		"parent": "data"
 	},
 	{
@@ -1806,15 +1944,51 @@
 		"parent": "data"
 	},
 	{
-		"title": "The Post Editor’s Data",
-		"slug": "data-core-editor",
-		"markdown_source": "../docs/reference-guides/data/data-core-editor.md",
+		"title": "Block Types Data",
+		"slug": "data-core-blocks",
+		"markdown_source": "../docs/reference-guides/data/data-core-blocks.md",
+		"parent": "data"
+	},
+	{
+		"title": "The Commands Data",
+		"slug": "data-core-commands",
+		"markdown_source": "../docs/reference-guides/data/data-core-commands.md",
+		"parent": "data"
+	},
+	{
+		"title": "Customize Widgets",
+		"slug": "data-core-customize-widgets",
+		"markdown_source": "../docs/reference-guides/data/data-core-customize-widgets.md",
 		"parent": "data"
 	},
 	{
 		"title": "The Editor’s UI Data",
 		"slug": "data-core-edit-post",
 		"markdown_source": "../docs/reference-guides/data/data-core-edit-post.md",
+		"parent": "data"
+	},
+	{
+		"title": "Edit Site",
+		"slug": "data-core-edit-site",
+		"markdown_source": "../docs/reference-guides/data/data-core-edit-site.md",
+		"parent": "data"
+	},
+	{
+		"title": "Edit Widgets",
+		"slug": "data-core-edit-widgets",
+		"markdown_source": "../docs/reference-guides/data/data-core-edit-widgets.md",
+		"parent": "data"
+	},
+	{
+		"title": "The Post Editor’s Data",
+		"slug": "data-core-editor",
+		"markdown_source": "../docs/reference-guides/data/data-core-editor.md",
+		"parent": "data"
+	},
+	{
+		"title": "The Keyboard Shortcuts Data",
+		"slug": "data-core-keyboard-shortcuts",
+		"markdown_source": "../docs/reference-guides/data/data-core-keyboard-shortcuts.md",
 		"parent": "data"
 	},
 	{
@@ -1827,6 +2001,24 @@
 		"title": "The NUX (New User Experience) Data",
 		"slug": "data-core-nux",
 		"markdown_source": "../docs/reference-guides/data/data-core-nux.md",
+		"parent": "data"
+	},
+	{
+		"title": "Preferences",
+		"slug": "data-core-preferences",
+		"markdown_source": "../docs/reference-guides/data/data-core-preferences.md",
+		"parent": "data"
+	},
+	{
+		"title": "Reusable blocks",
+		"slug": "data-core-reusable-blocks",
+		"markdown_source": "../docs/reference-guides/data/data-core-reusable-blocks.md",
+		"parent": "data"
+	},
+	{
+		"title": "Rich Text",
+		"slug": "data-core-rich-text",
+		"markdown_source": "../docs/reference-guides/data/data-core-rich-text.md",
 		"parent": "data"
 	},
 	{
@@ -1860,6 +2052,12 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "Entities and Undo/Redo.",
+		"slug": "entities",
+		"markdown_source": "../docs/explanations/architecture/entities.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "Modularity",
 		"slug": "modularity",
 		"markdown_source": "../docs/explanations/architecture/modularity.md",
@@ -1878,22 +2076,40 @@
 		"parent": "architecture"
 	},
 	{
-		"title": "Full Site Editing Templates",
+		"title": "Site Editing Templates",
 		"slug": "full-site-editing-templates",
 		"markdown_source": "../docs/explanations/architecture/full-site-editing-templates.md",
 		"parent": "architecture"
 	},
 	{
-		"title": "Frequently Asked Questions",
-		"slug": "faq",
-		"markdown_source": "../docs/explanations/faq.md",
+		"title": "Styles in the Editor",
+		"slug": "styles",
+		"markdown_source": "../docs/explanations/architecture/styles.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "User Interface",
+		"slug": "user-interface",
+		"markdown_source": "../docs/explanations/user-interface/README.md",
 		"parent": "explanations"
 	},
 	{
-		"title": "Glossary",
-		"slug": "glossary",
-		"markdown_source": "../docs/explanations/glossary.md",
-		"parent": "explanations"
+		"title": "Block Design",
+		"slug": "block-design",
+		"markdown_source": "../docs/explanations/user-interface/block-design.md",
+		"parent": "user-interface"
+	},
+	{
+		"title": "Animation",
+		"slug": "animation",
+		"markdown_source": "../docs/explanations/user-interface/animation.md",
+		"parent": "user-interface"
+	},
+	{
+		"title": "Resources",
+		"slug": "design-resources",
+		"markdown_source": "../docs/explanations/user-interface/design-resources.md",
+		"parent": "user-interface"
 	},
 	{
 		"title": "History",
@@ -1938,10 +2154,22 @@
 		"parent": "code"
 	},
 	{
-		"title": "Block Grammar",
-		"slug": "grammar",
-		"markdown_source": "../docs/contributors/code/grammar.md",
-		"parent": "code"
+		"title": "End-to-End Testing",
+		"slug": "e2e",
+		"markdown_source": "../docs/contributors/code/e2e/README.md",
+		"parent": "testing-overview"
+	},
+	{
+		"title": "Migration guide",
+		"slug": "migration",
+		"markdown_source": "../docs/contributors/code/e2e/migration.md",
+		"parent": "e2e"
+	},
+	{
+		"title": "Overusing snapshots",
+		"slug": "overusing-snapshots",
+		"markdown_source": "../docs/contributors/code/e2e/overusing-snapshots.md",
+		"parent": "e2e"
 	},
 	{
 		"title": "Scripts",
@@ -1960,6 +2188,12 @@
 		"slug": "release",
 		"markdown_source": "../docs/contributors/code/release.md",
 		"parent": "code"
+	},
+	{
+		"title": "Cherry-picking automation",
+		"slug": "auto-cherry-picking",
+		"markdown_source": "../docs/contributors/code/auto-cherry-picking.md",
+		"parent": "release"
 	},
 	{
 		"title": "React Native mobile editor",
@@ -1986,6 +2220,30 @@
 		"parent": "react-native"
 	},
 	{
+		"title": "React Native Internationalization Guide",
+		"slug": "internationalization-guide",
+		"markdown_source": "../docs/contributors/code/react-native/internationalization-guide.md",
+		"parent": "react-native"
+	},
+	{
+		"title": "Backward Compatibility",
+		"slug": "backward-compatibility",
+		"markdown_source": "../docs/contributors/code/backward-compatibility.md",
+		"parent": "code"
+	},
+	{
+		"title": "Deprecations",
+		"slug": "deprecations",
+		"markdown_source": "../docs/contributors/code/deprecations.md",
+		"parent": "code"
+	},
+	{
+		"title": "How To Get Your Pull Request Reviewed?",
+		"slug": "how-to-get-your-pull-request-reviewed",
+		"markdown_source": "../docs/contributors/code/how-to-get-your-pull-request-reviewed.md",
+		"parent": "code"
+	},
+	{
 		"title": "Design Contributions",
 		"slug": "design",
 		"markdown_source": "../docs/contributors/design/README.md",
@@ -1995,12 +2253,6 @@
 		"title": "Blocks are the Interface",
 		"slug": "the-block",
 		"markdown_source": "../docs/contributors/design/the-block.md",
-		"parent": "design"
-	},
-	{
-		"title": "Reference",
-		"slug": "reference",
-		"markdown_source": "../docs/contributors/design/reference.md",
 		"parent": "design"
 	},
 	{
@@ -2022,7 +2274,7 @@
 		"parent": "contributors"
 	},
 	{
-		"title": "Localizing Gutenberg Plugin",
+		"title": "Localizing Gutenberg",
 		"slug": "localizing",
 		"markdown_source": "../docs/contributors/localizing.md",
 		"parent": "contributors"
@@ -2049,12 +2301,6 @@
 		"title": "Versions in WordPress",
 		"slug": "versions-in-wordpress",
 		"markdown_source": "../docs/contributors/versions-in-wordpress.md",
-		"parent": "contributors"
-	},
-	{
-		"title": "Upcoming Projects & Roadmap",
-		"slug": "roadmap",
-		"markdown_source": "../docs/contributors/roadmap.md",
 		"parent": "contributors"
 	}
 ]

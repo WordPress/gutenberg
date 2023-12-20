@@ -2,55 +2,72 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { RawHTML } from '@wordpress/element';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
-	useSetting,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
-	store as blockEditorStore,
+	__experimentalRecursionProvider as RecursionProvider,
+	__experimentalUseHasRecursion as useHasRecursion,
 	Warning,
 } from '@wordpress/block-editor';
-import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
-
+import {
+	useEntityProp,
+	useEntityBlockEditor,
+	store as coreStore,
+} from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
 import { useCanEditEntity } from '../utils/hooks';
 
-function ReadOnlyContent( { userCanEdit, postType, postId } ) {
+function ReadOnlyContent( {
+	layoutClassNames,
+	userCanEdit,
+	postType,
+	postId,
+} ) {
 	const [ , , content ] = useEntityProp(
 		'postType',
 		postType,
 		'content',
 		postId
 	);
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( { className: layoutClassNames } );
 	return content?.protected && ! userCanEdit ? (
 		<div { ...blockProps }>
 			<Warning>{ __( 'This content is password protected.' ) }</Warning>
 		</div>
 	) : (
-		<div { ...blockProps }>
-			<RawHTML key="html">{ content?.rendered }</RawHTML>
-		</div>
+		<div
+			{ ...blockProps }
+			dangerouslySetInnerHTML={ { __html: content?.rendered } }
+		></div>
 	);
 }
 
-function EditableContent( { layout, context = {} } ) {
+function EditableContent( { context = {} } ) {
 	const { postType, postId } = context;
-	const themeSupportsLayout = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings()?.supportsLayout;
-	}, [] );
-	const defaultLayout = useSetting( 'layout' ) || {};
-	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		postType,
 		{ id: postId }
 	);
+
+	const entityRecord = useSelect(
+		( select ) => {
+			return select( coreStore ).getEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+		},
+		[ postType, postId ]
+	);
+
+	const hasInnerBlocks = !! entityRecord?.content?.raw || blocks?.length;
+
+	const initialInnerBlocks = [ [ 'core/paragraph' ] ];
 
 	const props = useInnerBlocksProps(
 		useBlockProps( { className: 'entry-content' } ),
@@ -58,22 +75,28 @@ function EditableContent( { layout, context = {} } ) {
 			value: blocks,
 			onInput,
 			onChange,
-			__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
+			template: ! hasInnerBlocks ? initialInnerBlocks : undefined,
 		}
 	);
 	return <div { ...props } />;
 }
 
 function Content( props ) {
-	const { context: { queryId, postType, postId } = {} } = props;
-	const isDescendentOfQueryLoop = Number.isFinite( queryId );
+	const { context: { queryId, postType, postId } = {}, layoutClassNames } =
+		props;
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
+	if ( userCanEdit === undefined ) {
+		return null;
+	}
+
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
 
 	return isEditable ? (
 		<EditableContent { ...props } />
 	) : (
 		<ReadOnlyContent
+			layoutClassNames={ layoutClassNames }
 			userCanEdit={ userCanEdit }
 			postType={ postType }
 			postId={ postId }
@@ -81,11 +104,25 @@ function Content( props ) {
 	);
 }
 
-function Placeholder() {
-	const blockProps = useBlockProps();
+function Placeholder( { layoutClassNames } ) {
+	const blockProps = useBlockProps( { className: layoutClassNames } );
 	return (
 		<div { ...blockProps }>
-			<p>{ __( 'Post Content' ) }</p>
+			<p>
+				{ __(
+					'This is the Content block, it will display all the blocks in any single post or page.'
+				) }
+			</p>
+			<p>
+				{ __(
+					'That might be a simple arrangement like consecutive paragraphs in a blog post, or a more elaborate composition that includes image galleries, videos, tables, columns, and any other block types.'
+				) }
+			</p>
+			<p>
+				{ __(
+					'If there are any Custom Post Types registered at your site, the Content block can display the contents of those entries as well.'
+				) }
+			</p>
 		</div>
 	);
 }
@@ -101,23 +138,26 @@ function RecursionError() {
 	);
 }
 
-export default function PostContentEdit( { context, attributes } ) {
+export default function PostContentEdit( {
+	context,
+	__unstableLayoutClassNames: layoutClassNames,
+} ) {
 	const { postId: contextPostId, postType: contextPostType } = context;
-	const { layout = {} } = attributes;
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		contextPostId
-	);
+	const hasAlreadyRendered = useHasRecursion( contextPostId );
 
 	if ( contextPostId && contextPostType && hasAlreadyRendered ) {
 		return <RecursionError />;
 	}
 
 	return (
-		<RecursionProvider>
+		<RecursionProvider uniqueId={ contextPostId }>
 			{ contextPostId && contextPostType ? (
-				<Content context={ context } layout={ layout } />
+				<Content
+					context={ context }
+					layoutClassNames={ layoutClassNames }
+				/>
 			) : (
-				<Placeholder />
+				<Placeholder layoutClassNames={ layoutClassNames } />
 			) }
 		</RecursionProvider>
 	);

@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+const { getAsBooleanFromENV } = require( './process' );
 const {
 	getArgFromCLI,
 	getArgsFromCLI,
@@ -13,6 +14,9 @@ const {
 const {
 	getJestOverrideConfigFile,
 	getWebpackArgs,
+	getWordPressSrcDirectory,
+	getWebpackEntryPoints,
+	getRenderPropPaths,
 	hasBabelConfig,
 	hasCssnanoConfig,
 	hasJestConfig,
@@ -25,6 +29,7 @@ const { getPackageProp, hasPackageProp } = require( './package' );
 module.exports = {
 	fromProjectRoot,
 	fromConfigRoot,
+	getAsBooleanFromENV,
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
@@ -32,6 +37,9 @@ module.exports = {
 	getNodeArgsFromCLI,
 	getPackageProp,
 	getWebpackArgs,
+	getWordPressSrcDirectory,
+	getWebpackEntryPoints,
+	getRenderPropPaths,
 	hasArgInCLI,
 	hasBabelConfig,
 	hasCssnanoConfig,

@@ -3,23 +3,31 @@
  */
 import { sprintf, _n } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { backup } from '@wordpress/icons';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import PostLastRevisionCheck from './check';
-import { getWPAdminURL } from '../../utils/url';
 import { store as editorStore } from '../../store';
 
-function LastRevision( { lastRevisionId, revisionsCount } ) {
+function LastRevision() {
+	const { lastRevisionId, revisionsCount } = useSelect( ( select ) => {
+		const { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } =
+			select( editorStore );
+		return {
+			lastRevisionId: getCurrentPostLastRevisionId(),
+			revisionsCount: getCurrentPostRevisionsCount(),
+		};
+	}, [] );
+
 	return (
 		<PostLastRevisionCheck>
 			<Button
-				href={ getWPAdminURL( 'revision.php', {
+				href={ addQueryArgs( 'revision.php', {
 					revision: lastRevisionId,
-					gutenberg: true,
 				} ) }
 				className="editor-post-last-revision__title"
 				icon={ backup }
@@ -34,13 +42,4 @@ function LastRevision( { lastRevisionId, revisionsCount } ) {
 	);
 }
 
-export default withSelect( ( select ) => {
-	const {
-		getCurrentPostLastRevisionId,
-		getCurrentPostRevisionsCount,
-	} = select( editorStore );
-	return {
-		lastRevisionId: getCurrentPostLastRevisionId(),
-		revisionsCount: getCurrentPostRevisionsCount(),
-	};
-} )( LastRevision );
+export default LastRevision;

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const { escapeRegExp } = require( 'lodash' );
 const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
 
@@ -17,7 +16,8 @@ const { version } = require( './package' );
  * @type {string}
  */
 const majorMinorRegExp =
-	escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
+	version.replace( /\.\d+$/, '' ).replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' ) +
+	'(\\.\\d+)?';
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -26,8 +26,8 @@ const majorMinorRegExp =
  */
 const developmentFiles = [
 	'**/benchmark/**/*.js',
-	'**/@(__mocks__|__tests__|test)/**/*.js',
-	'**/@(storybook|stories)/**/*.js',
+	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
+	'**/@(storybook|stories)/**/*.[tj]s?(x)',
 	'packages/babel-preset-default/bin/**/*.js',
 ];
 
@@ -36,11 +36,63 @@ const typedFiles = glob( 'packages/*/package.json' )
 	.filter( ( fileName ) => require( join( __dirname, fileName ) ).types )
 	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
 
+const restrictedImports = [
+	{
+		name: 'framer-motion',
+		message:
+			'Please use the Framer Motion API through `@wordpress/components` instead.',
+	},
+	{
+		name: 'lodash',
+		message: 'Please use native functionality instead.',
+	},
+	{
+		name: 'reakit',
+		message:
+			'Please use Reakit API through `@wordpress/components` instead.',
+	},
+	{
+		name: '@ariakit/react',
+		message:
+			'Please use Ariakit API through `@wordpress/components` instead.',
+	},
+	{
+		name: 'redux',
+		importNames: [ 'combineReducers' ],
+		message: 'Please use `combineReducers` from `@wordpress/data` instead.',
+	},
+	{
+		name: 'puppeteer-testing-library',
+		message: '`puppeteer-testing-library` is still experimental.',
+	},
+	{
+		name: '@emotion/css',
+		message:
+			'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+	},
+	{
+		name: '@wordpress/edit-post',
+		message:
+			"edit-post is a WordPress top level package that shouldn't be imported into other packages",
+	},
+	{
+		name: '@wordpress/edit-site',
+		message:
+			"edit-site is a WordPress top level package that shouldn't be imported into other packages",
+	},
+	{
+		name: '@wordpress/edit-widgets',
+		message:
+			"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
+	},
+];
+
 module.exports = {
 	root: true,
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:eslint-comments/recommended',
+		'plugin:storybook/recommended',
 	],
 	globals: {
 		wp: 'off',
@@ -55,7 +107,7 @@ module.exports = {
 	rules: {
 		'jest/expect-expect': 'off',
 		'@wordpress/dependency-group': 'error',
-		'@wordpress/gutenberg-phase': 'error',
+		'@wordpress/is-gutenberg-plugin': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'@wordpress/i18n-text-domain': [
 			'error',
@@ -70,44 +122,27 @@ module.exports = {
 		'no-restricted-imports': [
 			'error',
 			{
+				paths: restrictedImports,
+			},
+		],
+		'@typescript-eslint/no-restricted-imports': [
+			'error',
+			{
 				paths: [
-					{
-						name: 'framer-motion',
-						message:
-							'Please use the Framer Motion API through `@wordpress/components` instead.',
-					},
-					{
-						name: 'lodash',
-						importNames: [ 'memoize' ],
-						message: 'Please use `memize` instead.',
-					},
 					{
 						name: 'react',
 						message:
 							'Please use React API through `@wordpress/element` instead.',
-					},
-					{
-						name: 'reakit',
-						message:
-							'Please use Reakit API through `@wordpress/components` instead.',
-					},
-					{
-						name: 'redux',
-						importNames: [ 'combineReducers' ],
-						message:
-							'Please use `combineReducers` from `@wordpress/data` instead.',
-					},
-					{
-						name: 'puppeteer-testing-library',
-						message:
-							'`puppeteer-testing-library` is still experimental.',
-					},
-					{
-						name: '@emotion/css',
-						message:
-							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+						allowTypeImports: true,
 					},
 				],
+			},
+		],
+		'@typescript-eslint/consistent-type-imports': [
+			'error',
+			{
+				prefer: 'type-imports',
+				disallowTypeAnnotations: false,
 			},
 		],
 		'no-restricted-syntax': [
@@ -186,7 +221,7 @@ module.exports = {
 		{
 			files: [ 'packages/react-native-*/**/*.js' ],
 			settings: {
-				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549
+				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549.
 			},
 		},
 		{
@@ -217,18 +252,93 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'packages/jest*/**/*.js' ],
+			files: [
+				// Components package.
+				'packages/components/src/**/*.[tj]s?(x)',
+				// Navigation block.
+				'packages/block-library/src/navigation/**/*.[tj]s?(x)',
+			],
+			excludedFiles: [ ...developmentFiles ],
+			rules: {
+				'react-hooks/exhaustive-deps': 'error',
+			},
+		},
+		{
+			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
+			excludedFiles: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
+			files: [ '**/test/**/*.[tj]s?(x)' ],
+			excludedFiles: [
+				'**/*.@(android|ios|native).[tj]s?(x)',
+				'packages/react-native-*/**/*.[tj]s?(x)',
+				'test/native/**/*.[tj]s?(x)',
+				'test/e2e/**/*.[tj]s?(x)',
+				'test/performance/**/*.[tj]s?(x)',
+				'test/storybook-playwright/**/*.[tj]s?(x)',
+			],
+			extends: [
+				'plugin:jest-dom/recommended',
+				'plugin:testing-library/react',
+				'plugin:jest/recommended',
+			],
+		},
+		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
+			excludedFiles: [ 'packages/e2e-test-utils-playwright/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e' ],
 			rules: {
 				'jest/expect-expect': 'off',
 			},
 		},
 		{
-			files: [ 'bin/**/*.js', 'packages/env/**' ],
+			files: [
+				'test/e2e/**/*.[tj]s',
+				'test/performance/**/*.[tj]s',
+				'packages/e2e-test-utils-playwright/**/*.[tj]s',
+			],
+			extends: [
+				'plugin:@wordpress/eslint-plugin/test-playwright',
+				'plugin:@typescript-eslint/base',
+			],
+			parserOptions: {
+				tsconfigRootDir: __dirname,
+				project: [
+					'./test/e2e/tsconfig.json',
+					'./test/performance/tsconfig.json',
+					'./packages/e2e-test-utils-playwright/tsconfig.json',
+				],
+			},
+			rules: {
+				'@wordpress/no-global-active-element': 'off',
+				'@wordpress/no-global-get-selection': 'off',
+				'no-restricted-syntax': [
+					'error',
+					{
+						selector: 'CallExpression[callee.property.name="$"]',
+						message:
+							'`$` is discouraged, please use `locator` instead',
+					},
+					{
+						selector: 'CallExpression[callee.property.name="$$"]',
+						message:
+							'`$$` is discouraged, please use `locator` instead',
+					},
+					{
+						selector:
+							'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
+						message: 'Prefer page.locator instead.',
+					},
+				],
+				'playwright/no-conditional-in-test': 'off',
+				'@typescript-eslint/await-thenable': 'error',
+				'@typescript-eslint/no-floating-promises': 'error',
+				'@typescript-eslint/no-misused-promises': 'error',
+			},
+		},
+		{
+			files: [ 'bin/**/*.js', 'bin/**/*.mjs', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
 			},
@@ -238,6 +348,46 @@ module.exports = {
 			rules: {
 				'jsdoc/no-undefined-types': 'off',
 				'jsdoc/valid-types': 'off',
+			},
+		},
+		{
+			files: [
+				'**/@(storybook|stories)/*',
+				'packages/components/src/**/*.tsx',
+			],
+			rules: {
+				// Useful to add story descriptions via JSDoc without specifying params,
+				// or in TypeScript files where params are likely already documented outside of the JSDoc.
+				'jsdoc/require-param': 'off',
+			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
+			plugins: [ 'ssr-friendly' ],
+			extends: [ 'plugin:ssr-friendly/recommended' ],
+		},
+		{
+			files: [ 'packages/block-editor/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					{
+						paths: [
+							...restrictedImports,
+							{
+								name: '@wordpress/api-fetch',
+								message:
+									"block-editor is a generic package that doesn't depend on a server or WordPress backend. To provide WordPress integration, consider passing settings to the BlockEditorProvider components.",
+							},
+							{
+								name: '@wordpress/core-data',
+								message:
+									"block-editor is a generic package that doesn't depend on a server or WordPress backend. To provide WordPress integration, consider passing settings to the BlockEditorProvider components.",
+							},
+						],
+					},
+				],
 			},
 		},
 	],

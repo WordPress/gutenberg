@@ -1,18 +1,21 @@
 /**
  * External dependencies
  */
-import { Dimensions, Platform } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 /**
  * WordPress dependencies
  */
 import {
+	Platform,
 	renderToString,
 	memo,
 	useRef,
 	useState,
 	useEffect,
+	forwardRef,
+	useCallback,
 } from '@wordpress/element';
 import { usePreferredColorScheme } from '@wordpress/compose';
 
@@ -22,34 +25,36 @@ import { usePreferredColorScheme } from '@wordpress/compose';
 import sandboxStyles from './style.scss';
 
 const observeAndResizeJS = `
-	( function() {
-		var observer;
+	(function() {
+		const { MutationObserver } = window;
 
-		if ( ! window.MutationObserver || ! document.body || ! window.parent ) {
+		if ( ! MutationObserver || ! document.body || ! window.parent ) {
 			return;
 		}
 
 		function sendResize() {
-			var clientBoundingRect = document.body.getBoundingClientRect();
+			const clientBoundingRect = document.body.getBoundingClientRect();
 
-			// The function postMessage is exposed by the react-native-webview library 
-			// to communicate between React Native and the WebView, in this case, 
+			// The function postMessage is exposed by the react-native-webview library
+			// to communicate between React Native and the WebView, in this case,
 			// we use it for notifying resize changes.
-            window.ReactNativeWebView.postMessage(JSON.stringify( {
-                action: 'resize',
-				width: clientBoundingRect.width,
-				height: clientBoundingRect.height,
-            }));
+			window.ReactNativeWebView.postMessage(
+				JSON.stringify( {
+					action: 'resize',
+					width: clientBoundingRect.width,
+					height: clientBoundingRect.height,
+				} )
+			);
 		}
 
-		observer = new MutationObserver( sendResize );
+		const observer = new MutationObserver( sendResize );
 		observer.observe( document.body, {
 			attributes: true,
 			attributeOldValue: false,
 			characterData: true,
 			characterDataOldValue: false,
 			childList: true,
-			subtree: true
+			subtree: true,
 		} );
 
 		window.addEventListener( 'load', sendResize, true );
@@ -58,19 +63,32 @@ const observeAndResizeJS = `
 		// the iframe root and interfere with our mechanism for
 		// determining the unconstrained page bounds.
 		function removeViewportStyles( ruleOrNode ) {
-			if( ruleOrNode.style ) {
-				[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function( style ) {
-					if ( /^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] ) ) {
+			if ( ruleOrNode.style ) {
+				[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function (
+					style
+				) {
+					if (
+						/^\\d+(vw|vh|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)$/.test( ruleOrNode.style[ style ] )
+					) {
 						ruleOrNode.style[ style ] = '';
 					}
 				} );
 			}
 		}
 
-		Array.prototype.forEach.call( document.querySelectorAll( '[style]' ), removeViewportStyles );
-		Array.prototype.forEach.call( document.styleSheets, function( stylesheet ) {
-			Array.prototype.forEach.call( stylesheet.cssRules || stylesheet.rules, removeViewportStyles );
-		} );
+		Array.prototype.forEach.call(
+			document.querySelectorAll( '[style]' ),
+			removeViewportStyles
+		);
+		Array.prototype.forEach.call(
+			document.styleSheets,
+			function ( stylesheet ) {
+				Array.prototype.forEach.call(
+					stylesheet.cssRules || stylesheet.rules,
+					removeViewportStyles
+				);
+			}
+		);
 
 		document.body.style.position = 'absolute';
 		document.body.style.width = '100%';
@@ -81,7 +99,9 @@ const observeAndResizeJS = `
 		// Resize events can change the width of elements with 100% width, but we don't
 		// get an DOM mutations for that, so do the resize when the window is resized, too.
 		window.addEventListener( 'resize', sendResize, true );
-} )();`;
+		window.addEventListener( 'orientationchange', sendResize, true );
+	})();
+`;
 
 const style = `
 	body {
@@ -109,8 +129,8 @@ const style = `
 
 	/**
 	 * Add responsiveness to embeds with aspect ratios.
-	 * 
-	 * These styles have been copied from the web version (https://git.io/JEFcX) and
+	 *
+	 * These styles have been copied from the web version (https://github.com/WordPress/gutenberg/blob/7901895ca20cf61e402925e31571d659dab64721/packages/block-library/src/embed/style.scss#L42-L89) and
 	 * adapted for the native version.
 	 */
 	.wp-has-aspect-ratio.wp-block-embed__wrapper::before {
@@ -152,20 +172,26 @@ const style = `
 
 const EMPTY_ARRAY = [];
 
-function Sandbox( {
-	containerStyle,
-	customJS,
-	html = '',
-	lang = 'en',
-	providerUrl = '',
-	scripts = EMPTY_ARRAY,
-	styles = EMPTY_ARRAY,
-	title = '',
-	type,
-	url,
-} ) {
+const Sandbox = forwardRef( function Sandbox(
+	{
+		containerStyle,
+		customJS,
+		html = '',
+		lang = 'en',
+		providerUrl = '',
+		scripts = EMPTY_ARRAY,
+		styles = EMPTY_ARRAY,
+		title = '',
+		type,
+		url,
+		onWindowEvents = {},
+		viewportProps = '',
+		onLoadEnd = () => {},
+		testID,
+	},
+	ref
+) {
 	const colorScheme = usePreferredColorScheme();
-	const ref = useRef();
 	const [ height, setHeight ] = useState( 0 );
 	const [ contentHtml, setContentHtml ] = useState( getHtmlDoc() );
 
@@ -190,13 +216,19 @@ function Sandbox( {
 		// we can use this in the future to inject custom styles or scripts.
 		// Scripts go into the body rather than the head, to support embedded content such as Instagram
 		// that expect the scripts to be part of the body.
+
+		// Avoid comma issues with props.viewportProps.
+		const addViewportProps = viewportProps
+			.trim()
+			.replace( /(^[^,])/, ', $1' );
+
 		const htmlDoc = (
 			<html lang={ lang }>
 				<head>
 					<title>{ title }</title>
 					<meta
 						name="viewport"
-						content="width=device-width, initial-scale=1"
+						content={ `width=device-width, initial-scale=1${ addViewportProps }` }
 					></meta>
 					<style dangerouslySetInnerHTML={ { __html: style } } />
 					{ styles.map( ( rules, i ) => (
@@ -211,12 +243,6 @@ function Sandbox( {
 					className={ type }
 				>
 					<div dangerouslySetInnerHTML={ { __html: html } } />
-					<script
-						type="text/javascript"
-						dangerouslySetInnerHTML={ {
-							__html: customJS || observeAndResizeJS,
-						} }
-					/>
 					{ scripts.map( ( src ) => (
 						<script key={ src } src={ src } />
 					) ) }
@@ -225,6 +251,21 @@ function Sandbox( {
 		);
 		return '<!DOCTYPE html>' + renderToString( htmlDoc );
 	}
+
+	const getInjectedJavaScript = useCallback( () => {
+		// Allow parent to override the resize observers with prop.customJS (legacy support)
+		let injectedJS = customJS || observeAndResizeJS;
+
+		// Add any event listeners that were passed in.
+		Object.keys( onWindowEvents ).forEach( ( eventType ) => {
+			injectedJS += `
+				window.addEventListener( '${ eventType }', function( event ) {
+					window.ReactNativeWebView.postMessage( JSON.stringify( { type: '${ eventType }', ...event.data } ) );
+				});`;
+		} );
+
+		return injectedJS;
+	}, [ customJS, onWindowEvents ] );
 
 	function updateContentHtml( forceRerender = false ) {
 		const newContentHtml = getHtmlDoc();
@@ -240,25 +281,6 @@ function Sandbox( {
 		}
 	}
 
-	function checkMessageForResize( event ) {
-		// Attempt to parse the message data as JSON if passed as string
-		let data = event.nativeEvent.data || {};
-
-		if ( 'string' === typeof data ) {
-			try {
-				data = JSON.parse( data );
-			} catch ( e ) {}
-		}
-
-		// Update the state only if the message is formatted as we expect,
-		// i.e. as an object with a 'resize' action.
-		if ( 'resize' !== data.action ) {
-			return;
-		}
-
-		setHeight( data.height );
-	}
-
 	function getSizeStyle() {
 		const contentHeight = Math.ceil( height );
 
@@ -269,15 +291,54 @@ function Sandbox( {
 		setIsLandscape( dimensions.window.width >= dimensions.window.height );
 	}
 
+	const onMessage = useCallback(
+		( message ) => {
+			let data = message?.nativeEvent?.data;
+
+			try {
+				data = JSON.parse( data );
+			} catch ( e ) {
+				return;
+			}
+
+			// check for resize event
+			if ( 'resize' === data?.action ) {
+				setHeight( data.height );
+			}
+
+			// Forward the event to parent event listeners
+			Object.keys( onWindowEvents ).forEach( ( eventType ) => {
+				if ( data?.type === eventType ) {
+					try {
+						onWindowEvents[ eventType ]( data );
+					} catch ( e ) {
+						// eslint-disable-next-line no-console
+						console.warn(
+							`Error handling event ${ eventType }`,
+							e
+						);
+					}
+				}
+			} );
+		},
+		[ onWindowEvents ]
+	);
+
 	useEffect( () => {
-		Dimensions.addEventListener( 'change', onChangeDimensions );
+		const dimensionsChangeSubscription = Dimensions.addEventListener(
+			'change',
+			onChangeDimensions
+		);
 		return () => {
-			Dimensions.removeEventListener( 'change', onChangeDimensions );
+			dimensionsChangeSubscription.remove();
 		};
 	}, [] );
 
 	useEffect( () => {
 		updateContentHtml();
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ html, title, type, styles, scripts ] );
 
 	useEffect( () => {
@@ -295,6 +356,7 @@ function Sandbox( {
 				sandboxStyles[ 'sandbox-webview__container' ],
 				containerStyle,
 			] }
+			injectedJavaScript={ getInjectedJavaScript() }
 			key={ key }
 			ref={ ref }
 			source={ { baseUrl: providerUrl, html: contentHtml } }
@@ -304,14 +366,29 @@ function Sandbox( {
 			style={ [
 				sandboxStyles[ 'sandbox-webview__content' ],
 				getSizeStyle(),
+				Platform.isAndroid && workaroundStyles.webView,
 			] }
-			onMessage={ checkMessageForResize }
+			onMessage={ onMessage }
 			scrollEnabled={ false }
 			setBuiltInZoomControls={ false }
 			showsHorizontalScrollIndicator={ false }
 			showsVerticalScrollIndicator={ false }
+			mediaPlaybackRequiresUserAction={ false }
+			onLoadEnd={ onLoadEnd }
+			testID={ testID }
 		/>
 	);
-}
+} );
+
+const workaroundStyles = StyleSheet.create( {
+	webView: {
+		/**
+		 * The slight opacity below is a workaround for an Android crash caused from combining Android
+		 * 12's new scroll overflow behavior and webviews.
+		 * https://github.com/react-native-webview/react-native-webview/issues/1915#issuecomment-808869253
+		 */
+		opacity: 0.99,
+	},
+} );
 
 export default memo( Sandbox );

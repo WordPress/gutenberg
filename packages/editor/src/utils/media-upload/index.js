@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
@@ -13,6 +8,8 @@ import { uploadMedia } from '@wordpress/media-utils';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+
+const noop = () => {};
 
 /**
  * Upload a media file when the file upload button is activated.
@@ -38,13 +35,13 @@ export default function mediaUpload( {
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
 	maxUploadFileSize =
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
-
+	const currentPostId = getCurrentPostId();
 	uploadMedia( {
 		allowedTypes,
 		filesList,
 		onFileChange,
 		additionalData: {
-			post: getCurrentPostId(),
+			...( ! isNaN( currentPostId ) ? { post: currentPostId } : {} ),
 			...additionalData,
 		},
 		maxUploadFileSize,

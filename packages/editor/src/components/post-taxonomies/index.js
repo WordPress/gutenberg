@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter, identity, includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
@@ -18,17 +13,20 @@ import HierarchicalTermSelector from './hierarchical-term-selector';
 import FlatTermSelector from './flat-term-selector';
 import { store as editorStore } from '../../store';
 
+const identity = ( x ) => x;
+
 export function PostTaxonomies( {
 	postType,
 	taxonomies,
 	taxonomyWrapper = identity,
 } ) {
-	const availableTaxonomies = filter( taxonomies, ( taxonomy ) =>
-		includes( taxonomy.types, postType )
+	const availableTaxonomies = ( taxonomies ?? [] ).filter( ( taxonomy ) =>
+		taxonomy.types.includes( postType )
 	);
-	const visibleTaxonomies = filter(
-		availableTaxonomies,
-		( taxonomy ) => taxonomy.visibility.show_ui
+	const visibleTaxonomies = availableTaxonomies.filter(
+		// In some circumstances .visibility can end up as undefined so optional chaining operator required.
+		// https://github.com/WordPress/gutenberg/issues/40326
+		( taxonomy ) => taxonomy.visibility?.show_ui
 	);
 	return visibleTaxonomies.map( ( taxonomy ) => {
 		const TaxonomyComponent = taxonomy.hierarchical

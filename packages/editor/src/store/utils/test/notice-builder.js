@@ -17,6 +17,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 			item_scheduled: 'scheduled',
 			item_updated: 'updated',
 			view_item: 'view',
+			item_trashed: 'trash',
 		},
 		viewable: false,
 	};
@@ -34,7 +35,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 		[
 			'when previous post is not published and post will not be published',
 			[ 'draft', 'draft', false ],
-			[ 'Draft saved', defaultExpectedAction ],
+			[ 'Draft saved.', defaultExpectedAction ],
 		],
 		[
 			'when previous post is published and post will be unpublished',
@@ -73,6 +74,11 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 					actions: [ { label: 'view', url: 'some_link' } ],
 				},
 			],
+		],
+		[
+			'when post will be trashed',
+			[ 'publish', 'trash', true ],
+			[ 'trash', defaultExpectedAction ],
 		],
 	].forEach(
 		( [

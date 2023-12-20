@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { ElementType } from 'react';
 
 /**
@@ -12,7 +11,8 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
 import * as styles from '../styles';
 import { useItemGroupContext } from '../context';
 import { useCx } from '../../utils/hooks/use-cx';
@@ -43,13 +43,14 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 	const classes = useMemo(
 		() =>
 			cx(
-				as === 'button' && styles.unstyledButton,
+				( as === 'button' || as === 'a' ) &&
+					styles.unstyledButton( as ),
 				styles.itemSizes[ size ] || styles.itemSizes.medium,
 				styles.item,
 				spacedAround && styles.spacedAround,
 				className
 			),
-		[ as, className, size, spacedAround ]
+		[ as, className, cx, size, spacedAround ]
 	);
 
 	const wrapperClassName = cx( styles.itemWrapper );

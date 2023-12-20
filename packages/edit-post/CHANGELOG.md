@@ -2,6 +2,120 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   Move the panels visibility actions and selectors to the editor package deprecating `toggleEditorPanelEnabled`, `toggleEditorPanelOpened`, `removeEditorPanel`, `isEditorPanelRemoved`, `isEditorPanelOpened` and `isEditorPanelEnabled`.
+
+## 7.25.0 (2023-12-13)
+
+## 7.24.0 (2023-11-29)
+
+## 7.23.0 (2023-11-16)
+
+## 7.22.0 (2023-11-02)
+
+## 7.21.0 (2023-10-18)
+
+## 7.20.0 (2023-10-05)
+
+## 7.19.0 (2023-09-20)
+
+## 7.18.0 (2023-08-31)
+
+## 7.17.0 (2023-08-16)
+
+## 7.16.0 (2023-08-10)
+
+## 7.15.0 (2023-07-20)
+
+## 7.14.0 (2023-07-05)
+
+## 7.13.0 (2023-06-23)
+
+## 7.12.0 (2023-06-07)
+
+## 7.11.0 (2023-05-24)
+
+## 7.10.0 (2023-05-10)
+
+## 7.9.0 (2023-04-26)
+
+## 7.8.0 (2023-04-12)
+
+## 7.7.0 (2023-03-29)
+
+## 7.6.0 (2023-03-15)
+
+## 7.5.0 (2023-03-01)
+
+## 7.4.0 (2023-02-15)
+
+## 7.3.0 (2023-02-01)
+
+## 7.2.0 (2023-01-11)
+
+## 7.1.0 (2023-01-02)
+
+## 7.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 6.19.0 (2022-11-16)
+
+### Enhancement
+
+-   ` BlockTypesChecklist`: Move BlockIcon component out of CheckboxControl label ([#45535](https://github.com/WordPress/gutenberg/pull/45535))
+
+## 6.18.0 (2022-11-02)
+
+## 6.17.0 (2022-10-19)
+
+## 6.16.0 (2022-10-05)
+
+## 6.15.0 (2022-09-21)
+
+## 6.14.0 (2022-09-13)
+
+## 6.13.0 (2022-08-24)
+
+## 6.12.0 (2022-08-10)
+
+## 6.11.0 (2022-07-27)
+
+## 6.10.0 (2022-07-13)
+
+## 6.9.0 (2022-06-29)
+
+## 6.8.0 (2022-06-15)
+
+## 6.7.0 (2022-06-01)
+
+## 6.6.0 (2022-05-18)
+
+## 6.5.0 (2022-05-04)
+
+## 6.4.0 (2022-04-21)
+
+## 6.3.0 (2022-04-08)
+
+## 6.2.0 (2022-03-23)
+
+## 6.1.0 (2022-03-11)
+
+## 6.0.0 (2022-02-10)
+
+### Breaking Change
+
+-   The `GUTENBERG_PHASE` environment variable has been renamed to `IS_GUTENBERG_PLUGIN` and is now a boolean ([#38202](https://github.com/WordPress/gutenberg/pull/38202)).
+
+### Bug Fix
+
+-   Removed unused `@wordpress/api-fetch`, `@wordpress/primitives` and `uuid` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
+## 5.1.0 (2022-01-27)
+
 ## 5.0.0 (2021-07-29)
 
 ### Breaking Change

@@ -9,11 +9,16 @@ import classnames from 'classnames';
 import {
 	AlignmentControl,
 	BlockControls,
-	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { useEntityProp } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
+import { VisuallyHidden } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
+import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import CommentsForm from './form';
 
 export default function PostCommentsFormEdit( {
 	attributes,
@@ -22,16 +27,15 @@ export default function PostCommentsFormEdit( {
 } ) {
 	const { textAlign } = attributes;
 	const { postId, postType } = context;
-	const [ commentStatus ] = useEntityProp(
-		'postType',
-		postType,
-		'comment_status',
-		postId
-	);
+
+	const instanceId = useInstanceId( PostCommentsFormEdit );
+	const instanceIdDesc = sprintf( 'comments-form-edit-%d-desc', instanceId );
+
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
+		'aria-describedby': instanceIdDesc,
 	} );
 
 	return (
@@ -45,23 +49,10 @@ export default function PostCommentsFormEdit( {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
-				{ ! commentStatus && (
-					<Warning>
-						{ __(
-							'Post Comments Form block: comments are not enabled for this post type.'
-						) }
-					</Warning>
-				) }
-
-				{ 'open' !== commentStatus && (
-					<Warning>
-						{ __(
-							'Post Comments Form block: comments to this post are not allowed.'
-						) }
-					</Warning>
-				) }
-
-				{ 'open' === commentStatus && __( 'Post Comments Form' ) }
+				<CommentsForm postId={ postId } postType={ postType } />
+				<VisuallyHidden id={ instanceIdDesc }>
+					{ __( 'Comments form disabled in editor.' ) }
+				</VisuallyHidden>
 			</div>
 		</>
 	);

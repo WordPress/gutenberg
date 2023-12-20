@@ -1,7 +1,7 @@
 // Deprecated gallery styles pre refactoring to use nested image blocks.
 // https://github.com/WordPress/gutenberg/pull/25940.
-.wp-block-gallery,
-.blocks-gallery-grid {
+.wp-block-gallery:not(.has-nested-images),
+.blocks-gallery-grid:not(.has-nested-images) {
 	display: flex;
 	flex-wrap: wrap;
 	list-style-type: none;

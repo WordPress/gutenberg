@@ -22,7 +22,7 @@ ruleTester.run( 'dependency-group', rule, {
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { camelCase } from 'change-case';
 import classnames from 'classnames';
 
 /**
@@ -40,7 +40,7 @@ import edit from './edit';`,
 /**
  * External dependencies
  */
-const { get } = require( 'lodash' );
+const { camelCase } = require( 'change-case' );
 const classnames = require( 'classnames' );
 
 /**
@@ -57,7 +57,7 @@ const edit = require( './edit' );`,
 	invalid: [
 		{
 			code: `
-import { get } from 'lodash';
+import { camelCase } from 'change-case';
 import classnames from 'classnames';
 /*
  * wordpress dependencies.
@@ -82,7 +82,7 @@ import edit from './edit';`,
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { camelCase } from 'change-case';
 import classnames from 'classnames';
 /**
  * WordPress dependencies
@@ -95,7 +95,7 @@ import edit from './edit';`,
 		},
 		{
 			code: `
-const { get } = require( 'lodash' );
+const { camelCase } = require( 'change-case' );
 const classnames = require( 'classnames' );
 /*
  * wordpress dependencies.
@@ -120,7 +120,7 @@ const edit = require( './edit' );`,
 /**
  * External dependencies
  */
-const { get } = require( 'lodash' );
+const { camelCase } = require( 'change-case' );
 const classnames = require( 'classnames' );
 /**
  * WordPress dependencies

@@ -2,45 +2,49 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	VisuallyHidden,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
+import TemplateActions from '../template-actions';
 import Link from '../routes/link';
-import Actions from './actions';
 import AddedBy from './added-by';
 
 export default function Table( { templateType } ) {
-	const { templates, isLoading, postType } = useSelect(
-		( select ) => {
-			const {
-				getEntityRecords,
-				hasFinishedResolution,
-				getPostType,
-			} = select( coreStore );
+	const { records: allTemplates } = useEntityRecords(
+		'postType',
+		templateType,
+		{
+			per_page: -1,
+		}
+	);
 
-			return {
-				templates: getEntityRecords( 'postType', templateType, {
-					per_page: -1,
-				} ),
-				isLoading: ! hasFinishedResolution( 'getEntityRecords', [
-					'postType',
-					templateType,
-					{ per_page: -1 },
-				] ),
-				postType: getPostType( templateType ),
-			};
-		},
+	const templates = useSelect(
+		( select ) =>
+			allTemplates?.filter(
+				( template ) =>
+					! select( coreStore ).isDeletingEntityRecord(
+						'postType',
+						templateType,
+						template.id
+					)
+			),
+		[ allTemplates ]
+	);
+
+	const postType = useSelect(
+		( select ) => select( coreStore ).getPostType( templateType ),
 		[ templateType ]
 	);
 
-	if ( ! templates || isLoading ) {
+	if ( ! templates ) {
 		return null;
 	}
 
@@ -55,6 +59,11 @@ export default function Table( { templateType } ) {
 			</div>
 		);
 	}
+
+	const sortedTemplates = [ ...templates ];
+	sortedTemplates.sort( ( a, b ) =>
+		a.title.rendered.localeCompare( b.title.rendered )
+	);
 
 	return (
 		// These explicit aria roles are needed for Safari.
@@ -84,7 +93,7 @@ export default function Table( { templateType } ) {
 			</thead>
 
 			<tbody>
-				{ templates.map( ( template ) => (
+				{ sortedTemplates.map( ( template ) => (
 					<tr
 						key={ template.id }
 						className="edit-site-list-table-row"
@@ -96,23 +105,32 @@ export default function Table( { templateType } ) {
 									params={ {
 										postId: template.id,
 										postType: template.type,
+										canvas: 'edit',
 									} }
 								>
-									{ template.title?.rendered ||
-										template.slug }
+									{ decodeEntities(
+										template.title?.rendered ||
+											template.slug
+									) }
 								</Link>
 							</Heading>
-							{ template.description }
+							{ decodeEntities( template.description ) }
 						</td>
 
 						<td className="edit-site-list-table-column" role="cell">
-							<AddedBy
-								templateType={ templateType }
-								template={ template }
-							/>
+							{ template ? (
+								<AddedBy
+									postType={ template.type }
+									postId={ template.id }
+								/>
+							) : null }
 						</td>
 						<td className="edit-site-list-table-column" role="cell">
-							<Actions template={ template } />
+							<TemplateActions
+								postType={ template.type }
+								postId={ template.id }
+								className="edit-site-list-table__actions"
+							/>
 						</td>
 					</tr>
 				) ) }

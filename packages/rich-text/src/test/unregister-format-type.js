@@ -1,15 +1,12 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { unregisterFormatType } from '../unregister-format-type';
 import { registerFormatType } from '../register-format-type';
 import { getFormatTypes } from '../get-format-types';
 import { getFormatType } from '../get-format-type';
+
+const noop = () => {};
 
 describe( 'unregisterFormatType', () => {
 	const defaultFormatSettings = {

@@ -16,7 +16,7 @@ import RangeCell from '../mobile/bottom-sheet/range-cell';
 import StepperCell from '../mobile/bottom-sheet/stepper-cell';
 import Picker from '../mobile/picker';
 import styles from './style.scss';
-import { CSS_UNITS, hasUnits, parseA11yLabelForUnit } from './utils';
+import { CSS_UNITS, hasUnits, getAccessibleLabelForUnit } from './utils';
 
 /**
  * WordPress dependencies
@@ -47,6 +47,10 @@ function UnitControl( {
 		if ( pickerRef?.current ) {
 			pickerRef.current.presentPicker();
 		}
+		// Disable reason: this should be fixed by the native team.
+		// It would be great if this could be done in the context of
+		// https://github.com/WordPress/gutenberg/pull/39218
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ pickerRef?.current ] );
 
 	const currentInputValue = currentInput === null ? value : currentInput;
@@ -102,6 +106,10 @@ function UnitControl( {
 			anchorNodeRef?.current
 				? findNodeHandle( anchorNodeRef?.current )
 				: undefined,
+		// Disable reason: this should be fixed by the native team.
+		// It would be great if this could be done in the context of
+		// https://github.com/WordPress/gutenberg/pull/39218
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ anchorNodeRef?.current ]
 	);
 
@@ -116,6 +124,8 @@ function UnitControl( {
 	};
 
 	const renderUnitPicker = useCallback( () => {
+		// Keeping for legacy reasons, although `false` should not be a valid
+		// value for the `units` prop anymore.
 		if ( units === false ) {
 			return null;
 		}
@@ -164,7 +174,7 @@ function UnitControl( {
 					shouldDisplayTextInput
 					decimalNum={ decimalNum }
 					openUnitPicker={ onPickerPresent }
-					unitLabel={ parseA11yLabelForUnit( unit ) }
+					unitLabel={ getAccessibleLabelForUnit( unit ) }
 					{ ...props }
 				>
 					{ renderUnitPicker() }
@@ -182,7 +192,7 @@ function UnitControl( {
 					separatorType={ separatorType }
 					decimalNum={ decimalNum }
 					openUnitPicker={ onPickerPresent }
-					unitLabel={ parseA11yLabelForUnit( unit ) }
+					unitLabel={ getAccessibleLabelForUnit( unit ) }
 					{ ...props }
 				>
 					{ renderUnitPicker() }

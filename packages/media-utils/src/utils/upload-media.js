@@ -1,26 +1,11 @@
 /**
- * External dependencies
- */
-import {
-	compact,
-	flatMap,
-	forEach,
-	get,
-	has,
-	includes,
-	map,
-	noop,
-	omit,
-	some,
-	startsWith,
-} from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { __, sprintf } from '@wordpress/i18n';
+
+const noop = () => {};
 
 /**
  * Browsers may use unexpected mime types, and they differ from browser to browser.
@@ -39,14 +24,18 @@ export function getMimeTypesArray( wpMimeTypesObject ) {
 	if ( ! wpMimeTypesObject ) {
 		return wpMimeTypesObject;
 	}
-	return flatMap( wpMimeTypesObject, ( mime, extensionsString ) => {
-		const [ type ] = mime.split( '/' );
-		const extensions = extensionsString.split( '|' );
-		return [
-			mime,
-			...map( extensions, ( extension ) => `${ type }/${ extension }` ),
-		];
-	} );
+	return Object.entries( wpMimeTypesObject )
+		.map( ( [ extensionsString, mime ] ) => {
+			const [ type ] = mime.split( '/' );
+			const extensions = extensionsString.split( '|' );
+			return [
+				mime,
+				...extensions.map(
+					( extension ) => `${ type }/${ extension }`
+				),
+			];
+		} )
+		.flat();
 }
 
 /**
@@ -73,46 +62,35 @@ export async function uploadMedia( {
 	onFileChange,
 	wpAllowedMimeTypes = null,
 } ) {
-	// Cast filesList to array
+	// Cast filesList to array.
 	const files = [ ...filesList ];
 
 	const filesSet = [];
 	const setAndUpdateFiles = ( idx, value ) => {
-		revokeBlobURL( get( filesSet, [ idx, 'url' ] ) );
+		revokeBlobURL( filesSet[ idx ]?.url );
 		filesSet[ idx ] = value;
-		onFileChange( compact( filesSet ) );
+		onFileChange( filesSet.filter( Boolean ) );
 	};
 
-	// Allowed type specified by consumer
+	// Allowed type specified by consumer.
 	const isAllowedType = ( fileType ) => {
 		if ( ! allowedTypes ) {
 			return true;
 		}
-		return some( allowedTypes, ( allowedType ) => {
+		return allowedTypes.some( ( allowedType ) => {
 			// If a complete mimetype is specified verify if it matches exactly the mime type of the file.
-			if ( includes( allowedType, '/' ) ) {
+			if ( allowedType.includes( '/' ) ) {
 				return allowedType === fileType;
 			}
 			// Otherwise a general mime type is used and we should verify if the file mimetype starts with it.
-			return startsWith( fileType, `${ allowedType }/` );
+			return fileType.startsWith( `${ allowedType }/` );
 		} );
 	};
 
-	// Allowed types for the current WP_User
+	// Allowed types for the current WP_User.
 	const allowedMimeTypesForUser = getMimeTypesArray( wpAllowedMimeTypes );
 	const isAllowedMimeTypeForUser = ( fileType ) => {
-		return includes( allowedMimeTypesForUser, fileType );
-	};
-
-	// Build the error message including the filename
-	const triggerError = ( error ) => {
-		error.message = [
-			<strong key="filename">{ error.file.name }</strong>,
-			': ',
-			error.message,
-		];
-
-		onError( error );
+		return allowedMimeTypesForUser.includes( fileType );
 	};
 
 	const validFiles = [];
@@ -125,10 +103,14 @@ export async function uploadMedia( {
 			mediaFile.type &&
 			! isAllowedMimeTypeForUser( mediaFile.type )
 		) {
-			triggerError( {
+			onError( {
 				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
-				message: __(
-					'Sorry, you are not allowed to upload this file type.'
+				message: sprintf(
+					// translators: %s: file name.
+					__(
+						'%s: Sorry, you are not allowed to upload this file type.'
+					),
+					mediaFile.name
 				),
 				file: mediaFile,
 			} );
@@ -138,20 +120,28 @@ export async function uploadMedia( {
 		// Check if the block supports this mime type.
 		// Defer to the server when type not detected.
 		if ( mediaFile.type && ! isAllowedType( mediaFile.type ) ) {
-			triggerError( {
+			onError( {
 				code: 'MIME_TYPE_NOT_SUPPORTED',
-				message: __( 'Sorry, this file type is not supported here.' ),
+				message: sprintf(
+					// translators: %s: file name.
+					__( '%s: Sorry, this file type is not supported here.' ),
+					mediaFile.name
+				),
 				file: mediaFile,
 			} );
 			continue;
 		}
 
-		// verify if file is greater than the maximum file upload size allowed for the site.
+		// Verify if file is greater than the maximum file upload size allowed for the site.
 		if ( maxUploadFileSize && mediaFile.size > maxUploadFileSize ) {
-			triggerError( {
+			onError( {
 				code: 'SIZE_ABOVE_LIMIT',
-				message: __(
-					'This file exceeds the maximum upload size for this site.'
+				message: sprintf(
+					// translators: %s: file name.
+					__(
+						'%s: This file exceeds the maximum upload size for this site.'
+					),
+					mediaFile.name
 				),
 				file: mediaFile,
 			} );
@@ -160,9 +150,13 @@ export async function uploadMedia( {
 
 		// Don't allow empty files to be uploaded.
 		if ( mediaFile.size <= 0 ) {
-			triggerError( {
+			onError( {
 				code: 'EMPTY_FILE',
-				message: __( 'This file is empty.' ),
+				message: sprintf(
+					// translators: %s: file name.
+					__( '%s: This file is empty.' ),
+					mediaFile.name
+				),
 				file: mediaFile,
 			} );
 			continue;
@@ -171,7 +165,7 @@ export async function uploadMedia( {
 		validFiles.push( mediaFile );
 
 		// Set temporary URL to create placeholder media file, this is replaced
-		// with final file from media gallery when upload is `done` below
+		// with final file from media gallery when upload is `done` below.
 		filesSet.push( { url: createBlobURL( mediaFile ) } );
 		onFileChange( filesSet );
 	}
@@ -183,10 +177,12 @@ export async function uploadMedia( {
 				mediaFile,
 				additionalData
 			);
+			// eslint-disable-next-line camelcase
+			const { alt_text, source_url, ...savedMediaProps } = savedMedia;
 			const mediaObject = {
-				...omit( savedMedia, [ 'alt_text', 'source_url' ] ),
+				...savedMediaProps,
 				alt: savedMedia.alt_text,
-				caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
+				caption: savedMedia.caption?.raw ?? '',
 				title: savedMedia.title.raw,
 				url: savedMedia.source_url,
 			};
@@ -195,8 +191,8 @@ export async function uploadMedia( {
 			// Reset to empty on failure.
 			setAndUpdateFiles( idx, null );
 			let message;
-			if ( has( error, [ 'message' ] ) ) {
-				message = get( error, [ 'message' ] );
+			if ( error.message ) {
+				message = error.message;
 			} else {
 				message = sprintf(
 					// translators: %s: file name
@@ -220,10 +216,14 @@ export async function uploadMedia( {
  * @return {Promise} Media Object Promise.
  */
 function createMediaFromFile( file, additionalData ) {
-	// Create upload payload
+	// Create upload payload.
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
-	forEach( additionalData, ( value, key ) => data.append( key, value ) );
+	if ( additionalData ) {
+		Object.entries( additionalData ).forEach( ( [ key, value ] ) =>
+			data.append( key, value )
+		);
+	}
 	return apiFetch( {
 		path: '/wp/v2/media',
 		body: data,

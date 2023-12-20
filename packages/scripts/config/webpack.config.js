@@ -3,12 +3,14 @@
  */
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const { DefinePlugin } = require( 'webpack' );
 const browserslist = require( 'browserslist' );
-const { sync: glob } = require( 'fast-glob' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
-const path = require( 'path' );
+const { basename, dirname, resolve } = require( 'path' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
+const { realpathSync } = require( 'fs' );
 
 /**
  * WordPress dependencies
@@ -22,8 +24,12 @@ const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 const {
 	fromConfigRoot,
 	hasBabelConfig,
+	hasArgInCLI,
 	hasCssnanoConfig,
 	hasPostCSSConfig,
+	getWordPressSrcDirectory,
+	getWebpackEntryPoints,
+	getRenderPropPaths,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -32,19 +38,28 @@ let target = 'browserslist';
 if ( ! browserslist.findConfig( '.' ) ) {
 	target += ':' + fromConfigRoot( '.browserslistrc' );
 }
-let entry = {};
-if ( process.env.WP_ENTRY ) {
-	entry = JSON.parse( process.env.WP_ENTRY );
-} else {
-	// The script checks whether standard file names can be detected in the `src` folder,
-	// and converts all found files to entry points.
-	const entryFiles = glob( 'src/index.[jt]s?(x)', {
-		absolute: true,
-	} );
-	entryFiles.forEach( ( filepath ) => {
-		const [ entryName ] = path.basename( filepath ).split( '.' );
-		entry[ entryName ] = filepath;
-	} );
+const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
+
+/**
+ * The plugin recomputes the render paths once on each compilation. It is necessary to avoid repeating processing
+ * when filtering every discovered PHP file in the source folder. This is the most performant way to ensure that
+ * changes in `block.json` files are picked up in watch mode.
+ */
+class RenderPathsPlugin {
+	/**
+	 * Paths with the `render` props included in `block.json` files.
+	 *
+	 * @type {string[]}
+	 */
+	static renderPaths;
+
+	apply( compiler ) {
+		const pluginName = this.constructor.name;
+
+		compiler.hooks.thisCompilation.tap( pluginName, () => {
+			this.constructor.renderPaths = getRenderPropPaths();
+		} );
+	}
 }
 
 const cssLoaders = [
@@ -54,6 +69,7 @@ const cssLoaders = [
 	{
 		loader: require.resolve( 'css-loader' ),
 		options: {
+			importLoaders: 1,
 			sourceMap: ! isProduction,
 			modules: {
 				auto: true,
@@ -97,16 +113,16 @@ const cssLoaders = [
 const config = {
 	mode,
 	target,
-	entry,
+	entry: getWebpackEntryPoints,
 	output: {
 		filename: '[name].js',
-		path: path.resolve( process.cwd(), 'build' ),
+		path: resolve( process.cwd(), 'build' ),
 	},
 	resolve: {
 		alias: {
 			'lodash-es': 'lodash',
 		},
-		extensions: [ '.ts', '.tsx', '...' ],
+		extensions: [ '.jsx', '.ts', '.tsx', '...' ],
 	},
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
@@ -115,11 +131,14 @@ const config = {
 			cacheGroups: {
 				style: {
 					type: 'css/mini-extract',
-					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
+					test: /[\\/]style(\.module)?\.(pc|sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
-					name( module, chunks, cacheGroupKey ) {
-						return `${ cacheGroupKey }-${ chunks[ 0 ].name }`;
+					name( _, chunks, cacheGroupKey ) {
+						const chunkName = chunks[ 0 ].name;
+						return `${ dirname(
+							chunkName
+						) }/${ cacheGroupKey }-${ basename( chunkName ) }`;
 					},
 				},
 				default: false,
@@ -169,7 +188,7 @@ const config = {
 									),
 								],
 								plugins: [
-									! isProduction &&
+									hasReactFastRefresh &&
 										require.resolve(
 											'react-refresh/babel'
 										),
@@ -181,6 +200,10 @@ const config = {
 			},
 			{
 				test: /\.css$/,
+				use: cssLoaders,
+			},
+			{
+				test: /\.pcss$/,
 				use: cssLoaders,
 			},
 			{
@@ -203,11 +226,11 @@ const config = {
 			},
 			{
 				test: /\.svg$/,
-				issuer: /\.(sc|sa|c)ss$/,
+				issuer: /\.(pc|sc|sa|c)ss$/,
 				type: 'asset/inline',
 			},
 			{
-				test: /\.(bmp|png|jpe?g|gif)$/i,
+				test: /\.(bmp|png|jpe?g|gif|webp)$/i,
 				type: 'asset/resource',
 				generator: {
 					filename: 'images/[name].[hash:8][ext]',
@@ -223,6 +246,10 @@ const config = {
 		],
 	},
 	plugins: [
+		new DefinePlugin( {
+			// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
+			SCRIPT_DEBUG: ! isProduction,
+		} ),
 		// During rebuilds, all webpack assets that are not used anymore will be
 		// removed automatically. There is an exception added in watch mode for
 		// fonts and images. It is a known limitations:
@@ -233,13 +260,65 @@ const config = {
 			// multiple configurations returned in the webpack config.
 			cleanStaleWebpackAssets: false,
 		} ),
+		new RenderPathsPlugin(),
+		new CopyWebpackPlugin( {
+			patterns: [
+				{
+					from: '**/block.json',
+					context: getWordPressSrcDirectory(),
+					noErrorOnMissing: true,
+					transform( content, absoluteFrom ) {
+						const convertExtension = ( path ) => {
+							return path.replace( /\.(j|t)sx?$/, '.js' );
+						};
+
+						if ( basename( absoluteFrom ) === 'block.json' ) {
+							const blockJson = JSON.parse( content.toString() );
+							[ 'viewScript', 'script', 'editorScript' ].forEach(
+								( key ) => {
+									if ( Array.isArray( blockJson[ key ] ) ) {
+										blockJson[ key ] =
+											blockJson[ key ].map(
+												convertExtension
+											);
+									} else if (
+										typeof blockJson[ key ] === 'string'
+									) {
+										blockJson[ key ] = convertExtension(
+											blockJson[ key ]
+										);
+									}
+								}
+							);
+
+							return JSON.stringify( blockJson, null, 2 );
+						}
+
+						return content;
+					},
+				},
+				{
+					from: '**/*.php',
+					context: getWordPressSrcDirectory(),
+					noErrorOnMissing: true,
+					filter: ( filepath ) => {
+						return (
+							process.env.WP_COPY_PHP_FILES_TO_DIST ||
+							RenderPathsPlugin.renderPaths.includes(
+								realpathSync( filepath ).replace( /\\/g, '/' )
+							)
+						);
+					},
+				},
+			],
+		} ),
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
 		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
 		// React Fast Refresh.
-		! isProduction && new ReactRefreshWebpackPlugin(),
+		hasReactFastRefresh && new ReactRefreshWebpackPlugin(),
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 		// generated, and the default externals set.
 		! process.env.WP_NO_EXTERNALS &&
@@ -250,16 +329,15 @@ const config = {
 	},
 };
 
+// WP_DEVTOOL global variable controls how source maps are generated.
+// See: https://webpack.js.org/configuration/devtool/#devtool.
+if ( process.env.WP_DEVTOOL ) {
+	config.devtool = process.env.WP_DEVTOOL;
+}
+
 if ( ! isProduction ) {
-	// WP_DEVTOOL global variable controls how source maps are generated.
-	// See: https://webpack.js.org/configuration/devtool/#devtool.
-	config.devtool = process.env.WP_DEVTOOL || 'source-map';
-	config.module.rules.unshift( {
-		test: /\.(j|t)sx?$/,
-		exclude: [ /node_modules/ ],
-		use: require.resolve( 'source-map-loader' ),
-		enforce: 'pre',
-	} );
+	// Set default sourcemap mode if it wasn't set by WP_DEVTOOL.
+	config.devtool = config.devtool || 'source-map';
 	config.devServer = {
 		devMiddleware: {
 			writeToDisk: true,
@@ -275,6 +353,16 @@ if ( ! isProduction ) {
 			},
 		},
 	};
+}
+
+// Add source-map-loader if devtool is set, whether in dev mode or not.
+if ( config.devtool ) {
+	config.module.rules.unshift( {
+		test: /\.(j|t)sx?$/,
+		exclude: [ /node_modules/ ],
+		use: require.resolve( 'source-map-loader' ),
+		enforce: 'pre',
+	} );
 }
 
 module.exports = config;

@@ -15,9 +15,8 @@ import {
  */
 import { VIEWMODES } from './constants';
 
-const Actions = ( { onStartBlank, onBlockPatternSelect } ) => (
+const Actions = ( { onBlockPatternSelect } ) => (
 	<div className="block-editor-block-pattern-setup__actions">
-		<Button onClick={ onStartBlank }>{ __( 'Start blank' ) }</Button>
 		<Button variant="primary" onClick={ onBlockPatternSelect }>
 			{ __( 'Choose' ) }
 		</Button>
@@ -36,12 +35,14 @@ const CarouselNavigation = ( {
 			label={ __( 'Previous pattern' ) }
 			onClick={ handlePrevious }
 			disabled={ activeSlide === 0 }
+			__experimentalIsFocusable
 		/>
 		<Button
 			icon={ chevronRight }
 			label={ __( 'Next pattern' ) }
 			onClick={ handleNext }
 			disabled={ activeSlide === totalSlides - 1 }
+			__experimentalIsFocusable
 		/>
 	</div>
 );
@@ -54,7 +55,6 @@ const SetupToolbar = ( {
 	activeSlide,
 	totalSlides,
 	onBlockPatternSelect,
-	onStartBlank,
 } ) => {
 	const isCarouselView = viewMode === VIEWMODES.carousel;
 	const displayControls = (
@@ -85,10 +85,7 @@ const SetupToolbar = ( {
 			) }
 			{ displayControls }
 			{ isCarouselView && (
-				<Actions
-					onBlockPatternSelect={ onBlockPatternSelect }
-					onStartBlank={ onStartBlank }
-				/>
+				<Actions onBlockPatternSelect={ onBlockPatternSelect } />
 			) }
 		</div>
 	);

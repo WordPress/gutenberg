@@ -13,15 +13,18 @@
  *
  * @example
  * ```js
+ * import { store as coreStore } from '@wordpress/core-data';
+ * import { store as editorStore } from '@wordpress/editor';
+ *
  * const getCurrentPostId = createRegistrySelector( ( select ) => ( state ) => {
- *   return select( 'core/editor' ).getCurrentPostId();
+ *   return select( editorStore ).getCurrentPostId();
  * } );
  *
  * const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
  *   // calling another registry selector just like any other function
  *   const postType = getCurrentPostType( state );
  *   const postId = getCurrentPostId( state );
- *	 return select( 'core' ).getEntityRecordEdits( 'postType', postType, postId );
+ *	 return select( coreStore ).getEntityRecordEdits( 'postType', postType, postId );
  * } );
  * ```
  *
@@ -36,7 +39,7 @@
  * @return {Function} Registry selector that can be registered with a store.
  */
 export function createRegistrySelector( registrySelector ) {
-	// create a selector function that is bound to the registry referenced by `selector.registry`
+	// Create a selector function that is bound to the registry referenced by `selector.registry`
 	// and that has the same API as a regular selector. Binding it in such a way makes it
 	// possible to call the selector directly from another selector.
 	const selector = ( ...args ) =>
@@ -44,7 +47,7 @@ export function createRegistrySelector( registrySelector ) {
 
 	/**
 	 * Flag indicating that the selector is a registry selector that needs the correct registry
-	 * reference to be assigned to `selecto.registry` to make it work correctly.
+	 * reference to be assigned to `selector.registry` to make it work correctly.
 	 * be mapped as a registry selector.
 	 *
 	 * @type {boolean}

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { Platform } from 'react-native';
-import { sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -41,6 +40,7 @@ import * as mediaText from './media-text';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
+import * as listItem from './list-item';
 import * as missing from './missing';
 import * as more from './more';
 import * as nextpage from './nextpage';
@@ -63,9 +63,7 @@ import * as buttons from './buttons';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 
-import { transformationCategory } from './transformationCategories';
-
-const ALLOWED_BLOCKS_GRADIENT_SUPPORT = [ 'core/button' ];
+import { transformationCategory } from './utils/transformation-categories';
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -75,6 +73,7 @@ export const coreBlocks = [
 	heading,
 	gallery,
 	list,
+	listItem,
 	quote,
 
 	// Register all remaining core blocks.
@@ -89,6 +88,7 @@ export const coreBlocks = [
 	column,
 	cover,
 	embed,
+	group,
 	file,
 	html,
 	mediaText,
@@ -119,59 +119,32 @@ export const coreBlocks = [
 }, {} );
 
 /**
- * Function to register an individual block.
- *
- * @param {Object} block The block to be registered.
- *
- */
-export const registerBlock = ( block ) => {
-	if ( ! block ) {
-		return;
-	}
-	const { metadata, settings, name } = block;
-	const { supports } = metadata;
-
-	registerBlockType(
-		{
-			name,
-			...metadata,
-			// Gradients support only available for blocks listed in ALLOWED_BLOCKS_GRADIENT_SUPPORT
-			...( ! ALLOWED_BLOCKS_GRADIENT_SUPPORT.includes( name ) &&
-			supports?.color?.gradients
-				? {
-						supports: {
-							...supports,
-							color: { ...supports.color, gradients: false },
-						},
-				  }
-				: {} ),
-		},
-		settings
-	);
-};
-
-/**
  * Function to register a block variations e.g. social icons different types.
  *
  * @param {Object} block The block which variations will be registered.
- *
  */
 const registerBlockVariations = ( block ) => {
 	const { metadata, settings, name } = block;
 
-	sortBy( settings.variations, 'title' ).forEach( ( v ) => {
-		registerBlockType( `${ name }-${ v.name }`, {
-			...metadata,
-			name: `${ name }-${ v.name }`,
-			...settings,
-			icon: v.icon(),
-			title: v.title,
-			variations: [],
+	if ( ! settings.variations ) {
+		return;
+	}
+
+	[ ...settings.variations ]
+		.sort( ( a, b ) => a.title.localeCompare( b.title ) )
+		.forEach( ( v ) => {
+			registerBlockType( `${ name }-${ v.name }`, {
+				...metadata,
+				name: `${ name }-${ v.name }`,
+				...settings,
+				icon: v.icon(),
+				title: v.title,
+				variations: [],
+			} );
 		} );
-	} );
 };
 
-// only enable code block for development
+// Only enable code block for development
 // eslint-disable-next-line no-undef
 const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 
@@ -244,6 +217,7 @@ export const registerCoreBlocks = () => {
 		nextpage,
 		separator,
 		list,
+		listItem,
 		quote,
 		mediaText,
 		preformatted,
@@ -267,7 +241,9 @@ export const registerCoreBlocks = () => {
 		reusableBlock,
 		search,
 		embed,
-	].forEach( registerBlock );
+	]
+		.filter( Boolean )
+		.forEach( ( { init } ) => init() );
 
 	registerBlockVariations( socialLink );
 	setDefaultBlockName( paragraph.name );
@@ -285,10 +261,14 @@ export const registerCoreBlocks = () => {
  * than 0, a "new" badge is displayed on the block type within the block
  * inserter.
  *
+ * With the below example, the Audio block will be displayed as "new" until its
+ * impression count reaches 0, which occurs by various actions decrementing
+ * the impression count.
+ *
+ * {
+ * 	[ audio.name ]: 40
+ * }
+ *
  * @constant {{ string, number }}
  */
-export const NEW_BLOCK_TYPES = {
-	[ embed.name ]: 40,
-	[ search.name ]: 40,
-	[ audio.name ]: 40,
-};
+export const NEW_BLOCK_TYPES = {};

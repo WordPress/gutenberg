@@ -1,8 +1,16 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
-import { __, sprintf } from '@wordpress/i18n';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -18,12 +26,16 @@ export default function save( { attributes } ) {
 	} = attributes;
 
 	const pdfEmbedLabel = RichText.isEmpty( fileName )
-		? __( 'PDF embed' )
-		: sprintf(
-				/* translators: %s: filename. */
-				__( 'Embed of %s.' ),
-				fileName
-		  );
+		? 'PDF embed'
+		: // To do: use toPlainText, but we need ensure it's RichTextData. See
+		  // https://github.com/WordPress/gutenberg/pull/56710.
+		  fileName.toString();
+
+	const hasFilename = ! RichText.isEmpty( fileName );
+
+	// Only output an `aria-describedby` when the element it's referring to is
+	// actually rendered.
+	const describedById = hasFilename ? fileId : undefined;
 
 	return (
 		href && (
@@ -42,9 +54,9 @@ export default function save( { attributes } ) {
 						/>
 					</>
 				) }
-				{ ! RichText.isEmpty( fileName ) && (
+				{ hasFilename && (
 					<a
-						id={ fileId }
+						id={ describedById }
 						href={ textLinkHref }
 						target={ textLinkTarget }
 						rel={
@@ -57,9 +69,12 @@ export default function save( { attributes } ) {
 				{ showDownloadButton && (
 					<a
 						href={ href }
-						className="wp-block-file__button"
+						className={ classnames(
+							'wp-block-file__button',
+							__experimentalGetElementClassName( 'button' )
+						) }
 						download={ true }
-						aria-describedby={ fileId }
+						aria-describedby={ describedById }
 					>
 						<RichText.Content value={ downloadButtonText } />
 					</a>

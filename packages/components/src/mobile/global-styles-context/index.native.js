@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createContext, useContext } from '@wordpress/element';
@@ -31,18 +26,32 @@ export const getMergedGlobalStyles = (
 	blockName,
 	fontSizes
 ) => {
+	// Current support for general styles and blocks.
 	const baseGlobalColors = {
-		baseColors: baseGlobalStyles || {},
+		baseColors: {
+			color: baseGlobalStyles?.color,
+			typography: baseGlobalStyles?.typography,
+			elements: {
+				link: baseGlobalStyles?.elements?.link,
+			},
+			blocks: {
+				'core/button': baseGlobalStyles?.blocks?.[ 'core/button' ],
+			},
+		},
 	};
-	const blockStyleAttributes = pick(
-		blockAttributes,
-		BLOCK_STYLE_ATTRIBUTES
+
+	const blockStyleAttributes = Object.fromEntries(
+		Object.entries( blockAttributes ?? {} ).filter( ( [ key ] ) =>
+			BLOCK_STYLE_ATTRIBUTES.includes( key )
+		)
 	);
+
 	// This prevents certain wrapper styles from being applied to blocks that
 	// don't support them yet.
-	const wrapperPropsStyleFiltered = pick(
-		wrapperPropsStyle,
-		BLOCK_STYLE_ATTRIBUTES
+	const wrapperPropsStyleFiltered = Object.fromEntries(
+		Object.entries( wrapperPropsStyle ?? {} ).filter( ( [ key ] ) =>
+			BLOCK_STYLE_ATTRIBUTES.includes( key )
+		)
 	);
 
 	const mergedStyle = {

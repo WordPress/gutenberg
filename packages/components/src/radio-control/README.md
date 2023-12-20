@@ -5,12 +5,6 @@ Use radio buttons when you want users to select one option from a set, and you w
 ![](https://make.wordpress.org/design/files/2018/11/radio.png)
 Selected and unselected radio buttons
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -58,7 +52,7 @@ Render a user interface to select the user type using radio inputs.
 
 ```jsx
 import { RadioControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState } from 'react';
 
 const MyRadioControl = () => {
 	const [ option, setOption ] = useState( 'a' );
@@ -75,57 +69,51 @@ const MyRadioControl = () => {
 			onChange={ ( value ) => setOption( value ) }
 		/>
 	);
-}
+};
 ```
 
 ### Props
 
 The component accepts the following props:
 
-### hideLabelFromVision
-
-If true, the label will only be visible to screen readers.
-
--   Type: `Boolean`
--   Required: No
-
-#### label
-
-If this property is added, a label will be generated using label property as the content.
-
--   Type: `String`
--   Required: No
-
-#### help
+#### `help`: `string | Element`
 
 If this property is added, a help text will be generated using help property as the content.
 
--   Type: `String|WPElement`
 -   Required: No
 
-#### selected
+#### `hideLabelFromVision`: `boolean`
 
-The value property of the currently selected option.
+If true, the label will only be visible to screen readers.
 
--   Type: `Object`
 -   Required: No
 
-#### options
+#### `label`: `string`
 
-An array of objects containing the following properties:
+If this property is added, a label will be generated using label property as the content.
 
--   `label`: (string) The label to be shown to the user.
--   `value`: (Object) The internal value compared against select and passed to onChange.
+-   Required: No
 
-*   Type: `Array`
-*   Required: No
-
-#### onChange
+#### `onChange`: `( value: string ) => void`
 
 A function that receives the value of the new option that is being selected as input.
 
--   Type: `function`
 -   Required: Yes
+
+#### `options`: `{ label: string, value: string }[]`
+
+An array of objects containing the value and label of the options.
+
+-   `label`: `string` The label to be shown to the user.
+-   `value`: `string` The internal value compared against select and passed to onChange.
+
+*   Required: No
+
+#### `selected`: `string`
+
+The value property of the currently selected option.
+
+-   Required: No
 
 ## Related components
 

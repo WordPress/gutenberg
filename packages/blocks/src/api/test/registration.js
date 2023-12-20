@@ -1,15 +1,11 @@
 /* eslint-disable react/forbid-elements */
 
 /**
- * External dependencies
- */
-import { noop, get, omit, pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
-import { select } from '@wordpress/data';
+import { logged } from '@wordpress/deprecated';
+import { select, dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -32,11 +28,19 @@ import {
 	getBlockSupport,
 	hasBlockSupport,
 	isReusableBlock,
-	serverSideBlockDefinitions,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '../registration';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
+import { omit } from '../utils';
 import { store as blocksStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const noop = () => {};
+
+const pick = ( obj, keys ) =>
+	Object.fromEntries(
+		Object.entries( obj ).filter( ( [ key ] ) => keys.includes( key ) )
+	);
 
 describe( 'blocks', () => {
 	const defaultBlockSettings = {
@@ -45,19 +49,19 @@ describe( 'blocks', () => {
 		title: 'block title',
 	};
 
-	beforeAll( () => {
-		// Initialize the block store.
-		require( '../../store' );
-	} );
-
 	afterEach( () => {
-		getBlockTypes().forEach( ( block ) => {
-			unregisterBlockType( block.name );
-		} );
+		const registeredNames = Object.keys(
+			unlock( select( blocksStore ) ).getUnprocessedBlockTypes()
+		);
+		dispatch( blocksStore ).removeBlockTypes( registeredNames );
 		setFreeformContentHandlerName( undefined );
 		setUnregisteredTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
-		unstable__bootstrapServerSideBlockDefinitions( {} );
+
+		// Reset deprecation logging to ensure we properly track warnings.
+		for ( const key in logged ) {
+			delete logged[ key ];
+		}
 	} );
 
 	describe( 'registerBlockType()', () => {
@@ -125,9 +129,11 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 				save: noop,
 				category: 'text',
 				title: 'block title',
@@ -271,9 +277,11 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 				save: expect.any( Function ),
 			} );
 		} );
@@ -307,9 +315,11 @@ describe( 'blocks', () => {
 					providesContext: {},
 					usesContext: [],
 					keywords: [],
+					selectors: {},
 					supports: {},
 					styles: [],
 					variations: [],
+					blockHooks: {},
 				}
 			);
 		} );
@@ -339,9 +349,11 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 
@@ -349,11 +361,14 @@ describe( 'blocks', () => {
 			const blockName = 'core/test-block-with-incompatible-keys';
 			unstable__bootstrapServerSideBlockDefinitions( {
 				[ blockName ]: {
-					api_version: 2,
+					api_version: 3,
 					provides_context: {
 						fontSize: 'fontSize',
 					},
 					uses_context: [ 'textColor' ],
+					block_hooks: {
+						'tests/my-block': 'after',
+					},
 				},
 			} );
 
@@ -362,7 +377,7 @@ describe( 'blocks', () => {
 			};
 			registerBlockType( blockName, blockType );
 			expect( getBlockType( blockName ) ).toEqual( {
-				apiVersion: 2,
+				apiVersion: 3,
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block title',
@@ -373,15 +388,19 @@ describe( 'blocks', () => {
 				},
 				usesContext: [ 'textColor' ],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {
+					'tests/my-block': 'after',
+				},
 			} );
 		} );
 
-		// This test can be removed once the polyfill for apiVersion gets removed.
-		it( 'should apply apiVersion on the client when not set on the server', () => {
-			const blockName = 'core/test-block-back-compat';
+		// This can be removed once polyfill adding selectors has been removed.
+		it( 'should apply selectors on the client when not set on the server', () => {
+			const blockName = 'core/test-block-with-selectors';
 			unstable__bootstrapServerSideBlockDefinitions( {
 				[ blockName ]: {
 					category: 'widgets',
@@ -389,7 +408,7 @@ describe( 'blocks', () => {
 			} );
 			unstable__bootstrapServerSideBlockDefinitions( {
 				[ blockName ]: {
-					apiVersion: 2,
+					selectors: { root: '.wp-block-custom-selector' },
 					category: 'ignored',
 				},
 			} );
@@ -399,7 +418,6 @@ describe( 'blocks', () => {
 			};
 			registerBlockType( blockName, blockType );
 			expect( getBlockType( blockName ) ).toEqual( {
-				apiVersion: 2,
 				name: blockName,
 				save: expect.any( Function ),
 				title: 'block title',
@@ -409,9 +427,53 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: { root: '.wp-block-custom-selector' },
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
+			} );
+		} );
+
+		// This test can be removed once the polyfill for blockHooks gets removed.
+		it( 'should polyfill blockHooks using metadata on the client when not set on the server', () => {
+			const blockName = 'tests/hooked-block';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					category: 'widgets',
+				},
+			} );
+
+			const blockType = {
+				title: 'block title',
+			};
+			registerBlockType(
+				{
+					name: blockName,
+					blockHooks: {
+						'tests/block': 'firstChild',
+					},
+					category: 'ignored',
+				},
+				blockType
+			);
+			expect( getBlockType( blockName ) ).toEqual( {
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'block title',
+				category: 'widgets',
+				icon: { src: BLOCK_ICON_DEFAULT },
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				keywords: [],
+				selectors: {},
+				supports: {},
+				styles: [],
+				variations: [],
+				blockHooks: {
+					'tests/block': 'firstChild',
+				},
 			} );
 		} );
 
@@ -477,9 +539,11 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 
@@ -508,9 +572,11 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 
@@ -553,9 +619,11 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 
@@ -612,9 +680,11 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 
@@ -638,9 +708,11 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 
@@ -724,14 +796,12 @@ describe( 'blocks', () => {
 										providesContext: {},
 										usesContext: [],
 										keywords: [],
+										selectors: {},
 										supports: {},
 										styles: [],
 										variations: [],
+										blockHooks: {},
 										save: () => null,
-										...get(
-											serverSideBlockDefinitions,
-											name
-										),
 										...blockSettingsWithDeprecations,
 									},
 									DEPRECATED_ENTRY_KEYS
@@ -796,6 +866,69 @@ describe( 'blocks', () => {
 				// Only attributes of block1 are supposed to be edited by the filter thus it must differ from block2.
 				expect( block1.attributes ).not.toEqual( block2.attributes );
 			} );
+
+			it( 'should allow non-string descriptions at registration but warn for undesired usage.', () => {
+				const newDescription = <p>foo bar</p>;
+
+				const block = registerBlockType( 'my-plugin/test-block-1', {
+					...defaultBlockSettings,
+					description: newDescription,
+				} );
+
+				expect( block.description ).toBe( newDescription );
+				expect( console ).toHaveWarnedWith(
+					'Declaring non-string block descriptions is deprecated since version 6.2.'
+				);
+			} );
+
+			it( 'should allow non-string descriptions through `blocks.registerBlockType` filter but warn for undesired usage.', () => {
+				const newDescription = <p>foo bar</p>;
+				addFilter(
+					'blocks.registerBlockType',
+					'core/blocks/non-string-description',
+					( settings ) => {
+						settings.description = newDescription;
+						return settings;
+					}
+				);
+				const block = registerBlockType(
+					'my-plugin/test-block-2',
+					defaultBlockSettings
+				);
+
+				expect( block.description ).toBe( newDescription );
+				expect( console ).toHaveWarnedWith(
+					'Declaring non-string block descriptions is deprecated since version 6.2.'
+				);
+			} );
+
+			it( 're-applies block filters', () => {
+				// register block
+				registerBlockType( 'test/block', defaultBlockSettings );
+
+				// register a filter after registering a block
+				addFilter(
+					'blocks.registerBlockType',
+					'core/blocks/reapply',
+					( settings ) => ( {
+						...settings,
+						title: settings.title + ' filtered',
+					} )
+				);
+
+				// check that block type has unfiltered values
+				expect( getBlockType( 'test/block' ).title ).toBe(
+					'block title'
+				);
+
+				// reapply the block filters
+				dispatch( blocksStore ).reapplyBlockTypeFilters();
+
+				// check that block type has filtered values
+				expect( getBlockType( 'test/block' ).title ).toBe(
+					'block title filtered'
+				);
+			} );
 		} );
 
 		test( 'registers block from metadata', () => {
@@ -831,6 +964,7 @@ describe( 'blocks', () => {
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [
@@ -841,6 +975,7 @@ describe( 'blocks', () => {
 						keywords: [ 'variation' ],
 					},
 				],
+				blockHooks: {},
 				edit: Edit,
 				save: noop,
 			} );
@@ -897,6 +1032,7 @@ describe( 'blocks', () => {
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
+				selectors: {},
 				supports: {},
 				styles: [
 					{
@@ -912,6 +1048,7 @@ describe( 'blocks', () => {
 						keywords: [ 'variation (translated)' ],
 					},
 				],
+				blockHooks: {},
 				edit: Edit,
 				save: noop,
 			} );
@@ -962,9 +1099,11 @@ describe( 'blocks', () => {
 					providesContext: {},
 					usesContext: [],
 					keywords: [],
+					selectors: {},
 					supports: {},
 					styles: [],
 					variations: [],
+					blockHooks: {},
 				},
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
@@ -979,9 +1118,11 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
@@ -1058,9 +1199,11 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 
@@ -1083,9 +1226,11 @@ describe( 'blocks', () => {
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
+				selectors: {},
 				supports: {},
 				styles: [],
 				variations: [],
+				blockHooks: {},
 			} );
 		} );
 	} );
@@ -1115,9 +1260,11 @@ describe( 'blocks', () => {
 					providesContext: {},
 					usesContext: [],
 					keywords: [],
+					selectors: {},
 					supports: {},
 					styles: [],
 					variations: [],
+					blockHooks: {},
 				},
 				{
 					name: 'core/test-block-with-settings',
@@ -1130,9 +1277,11 @@ describe( 'blocks', () => {
 					providesContext: {},
 					usesContext: [],
 					keywords: [],
+					selectors: {},
 					supports: {},
 					styles: [],
 					variations: [],
+					blockHooks: {},
 				},
 			] );
 		} );

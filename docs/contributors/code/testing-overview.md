@@ -17,11 +17,11 @@ When writing tests consider the following:
 -   Does the test test what we think it is testing? Or are we introducing false positives/negatives?
 -   Is it readable? Will other contributors be able to understand how our code behaves by looking at its corresponding test?
 
-## JavaScript Testing
+## JavaScript testing
 
 Tests for JavaScript use [Jest](https://jestjs.io/) as the test runner and its API for [globals](https://jestjs.io/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on) [assertions](https://jestjs.io/docs/en/expect.html), [mocks](https://jestjs.io/docs/en/mock-functions.html), [spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname) and [mock functions](https://jestjs.io/docs/en/mock-function-api.html). If needed, you can also use [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) for React component testing.
 
-_It should be noted that in the past, React components were unit tested with [Enzyme](https://github.com/airbnb/enzyme). However, React Testing Library (RTL) should be used for new tests instead, and over time old tests should be refactored to use RTL too (typically when working on code that touches an old test)._
+_It should be noted that in the past, React components were unit tested with [Enzyme](https://github.com/airbnb/enzyme). However, React Testing Library (RTL) is now used for all existing and new tests instead._
 
 Assuming you've followed the [instructions](/docs/contributors/code/getting-started-with-code-contribution.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
 
@@ -29,11 +29,11 @@ Assuming you've followed the [instructions](/docs/contributors/code/getting-star
 npm test
 ```
 
-Linting is static code analysis used to enforce coding standards and to avoid potential errors. This project uses [ESLint](http://eslint.org/) and [TypeScript's JavaScript type-checking](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html) to capture these issues. While the above `npm test` will execute both unit tests and code linting, code linting can be verified independently by running `npm run lint`. Some JavaScript issues can be fixed automatically by running `npm run lint-js:fix`.
+Linting is static code analysis used to enforce coding standards and to avoid potential errors. This project uses [ESLint](http://eslint.org/) and [TypeScript's JavaScript type-checking](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html) to capture these issues. While the above `npm test` will execute both unit tests and code linting, code linting can be verified independently by running `npm run lint`. Some JavaScript issues can be fixed automatically by running `npm run lint:js:fix`.
 
 To improve your developer workflow, you should setup an editor linting integration. See the [getting started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for additional information.
 
-To run unit tests only, without the linter, use `npm run test-unit` instead.
+To run unit tests only, without the linter, use `npm run test:unit` instead.
 
 ### Folder structure
 
@@ -90,7 +90,7 @@ describe( 'CheckboxWithLabel', () => {
 } );
 ```
 
-### Setup and Teardown methods
+### Setup and teardown methods
 
 The Jest API includes some nifty [setup and teardown methods](https://jestjs.io/docs/en/setup-teardown.html) that allow you to perform tasks _before_ and _after_ each or all of your tests, or tests within a specific `describe` block.
 
@@ -212,6 +212,106 @@ describe( 'my module', () => {
 } );
 ```
 
+### User interactions
+
+Simulating user interactions is a great way to **write tests from the user's perspective**, and therefore avoid testing implementation details.
+
+When writing tests with Testing Library, there are two main alternatives for simulating user interactions:
+
+1. The [`fireEvent`](https://testing-library.com/docs/dom-testing-library/api-events/#fireevent) API, a utility for firing DOM events part of the Testing Library core API.
+2. The [`user-event`](https://testing-library.com/docs/user-event/intro/) library, a companion library to Testing Library that simulates user interactions by dispatching the events that would happen if the interaction took place in a browser.
+
+The built-in `fireEvent` is a utility for dispatching DOM events. It dispatches exactly the events that are described in the test spec - even if those exact events never had been dispatched in a real interaction in a browser.
+
+On the other hand, the `user-event` library exposes higher-level methods (e.g. `type`, `selectOptions`, `clear`, `doubleClick`...), that dispatch events like they would happen if a user interacted with the document, and take care of any react-specific quirks.
+
+For the above reasons, **the `user-event` library is recommended when writing tests for user interactions**.
+
+**Not so good**: using `fireEvent` to dispatch DOM events.
+
+```javascript
+import { render, screen } from '@testing-library/react';
+
+test( 'fires onChange when a new value is typed', () => {
+	const spyOnChange = jest.fn();
+
+	// A component with one `input` and one `select`.
+	render( <MyComponent onChange={ spyOnChange } /> );
+
+	const input = screen.getByRole( 'textbox' );
+	input.focus();
+	// No clicks, no key events.
+	fireEvent.change( input, { target: { value: 62 } } );
+
+	// The `onChange` callback gets called once with '62' as the argument.
+	expect( spyOnChange ).toHaveBeenCalledTimes( 1 );
+
+	const select = screen.getByRole( 'listbox' );
+	select.focus();
+	// No pointer events dispatched.
+	fireEvent.change( select, { target: { value: 'optionValue' } } );
+
+	// ...
+```
+
+**Good**: using `user-event` to simulate user events.
+
+```javascript
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+test( 'fires onChange when a new value is typed', async () => {
+	const user = userEvent.setup();
+
+	const spyOnChange = jest.fn();
+
+	// A component with one `input` and one `select`.
+	render( <MyComponent onChange={ spyOnChange } /> );
+
+	const input = screen.getByRole( 'textbox' );
+	// Focus the element, select and delete all its contents.
+	await user.clear( input );
+	// Click the element, type each character separately (generating keydown,
+	// keypress and keyup events).
+	await user.type( input, '62' );
+
+	// The `onChange` callback gets called 3 times with the following arguments:
+	// - 1: clear ('')
+	// - 2: '6'
+	// - 3: '62'
+	expect( spyOnChange ).toHaveBeenCalledTimes( 3 );
+
+	const select = screen.getByRole( 'listbox' );
+	// Dispatches events for focus, pointer, mouse, click and change.
+	await user.selectOptions( select, [ 'optionValue' ] );
+
+	// ...
+} );
+```
+
+### Integration testing for block UI
+
+Integration testing is defined as a type of testing where different parts are tested as a group. In this case, the parts that we want to test are the different components that are required to be rendered for a specific block or editor logic. In the end, they are very similar to unit tests as they are run with the same command using the Jest library. The main difference is that for the integration tests the blocks are run within a [`special instance of the block editor`](https://github.com/WordPress/gutenberg/blob/trunk/test/integration/helpers/integration-test-editor.js#L60).
+
+The advantage of this approach is that the bulk of a block editor's functionality (block toolbar and inspector panel interactions, etc.) can be tested without having to fire up the full e2e test framework. This means the tests can run much faster and more reliably. It is suggested that as much of a block's UI functionality as possible is covered with integration tests, with e2e tests used for interactions that require a full browser environment, eg. file uploads, drag and drop, etc.
+
+[`The Cover block`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/test/edit.js) is an example of a block that uses this level of testing to provide coverage for a large percentage of the editor interactions.
+
+To set up a jest file for integration tests:
+
+```js
+import { initializeEditor } from 'test/integration/helpers/integration-test-editor';
+
+async function setup( attributes ) {
+	const testBlock = { name: 'core/cover', attributes };
+	return initializeEditor( testBlock );
+}
+```
+
+The `initializeEditor` function returns the output of the `@testing-library/react` `render` method. It will also accept an array of block metadata objects, allowing you to set up the editor with multiple blocks.
+
+The integration test editor module also exports a `selectBlock` which can be used to select the block to be tested by the aria-label on the block wrapper, eg. "Block: Cover".
+
 ### Snapshot testing
 
 This is an overview of [snapshot testing] and how to best leverage snapshot tests.
@@ -224,7 +324,13 @@ However, if the change was intentional, follow these steps to update the snapsho
 
 ```sh
 # --testPathPattern is optional but will be much faster by only running matching tests
-npm run test-unit -- --updateSnapshot --testPathPattern path/to/tests
+npm run test:unit -- --updateSnapshot --testPathPattern path/to/tests
+
+# Update snapshot for e2e tests
+npm run test:e2e -- --updateSnapshot --testPathPattern path/to/e2e-tests
+
+# Update snapshot for Playwright
+npm run test:e2e:playwright -- --update-snapshots path/to/spec
 ```
 
 1. Review the diff and ensure the changes are expected and intentional.
@@ -281,13 +387,13 @@ describe( 'SolarSystem', () => {
 	test( 'should render', () => {
 		const { container } = render( <SolarSystem /> );
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should contain mars if planets is true', () => {
 		const { container } = render( <SolarSystem planets /> );
 
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 		expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
 	} );
 } );
@@ -300,12 +406,12 @@ Reducer tests are also a great fit for snapshots. They are often large, complex 
 You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. The quick and dirty solution is to invoke Jest with `--updateSnapshot`. That can be done as follows:
 
 ```sh
-npm run test-unit -- --updateSnapshot --testPathPattern path/to/tests
+npm run test:unit -- --updateSnapshot --testPathPattern path/to/tests
 ```
 
 `--testPathPattern` is not required, but specifying a path will speed things up by running a subset of tests.
 
-It's a great idea to keep `npm run test-unit:watch` running in the background as you work. Jest will run only the relevant tests for changed files, and when snapshot tests fail, just hit `u` to update a snapshot!
+It's a great idea to keep `npm run test:unit:watch` running in the background as you work. Jest will run only the relevant tests for changed files, and when snapshot tests fail, just hit `u` to update a snapshot!
 
 #### Pain points
 
@@ -336,7 +442,7 @@ test( 'should contain mars if planets is true', () => {
 	const { container } = render( <SolarSystem planets /> );
 
 	// Snapshot will catch unintended changes
-	expect( container.firstChild ).toMatchSnapshot();
+	expect( container ).toMatchSnapshot();
 
 	// This is what we actually expect to find in our test
 	expect( screen.getByText( /mars/i ) ).toBeInTheDocument();
@@ -361,9 +467,7 @@ Similarly, the `toMatchStyleDiffSnapshot` function allows to snapshot only the d
 test( 'should render margin', () => {
 	const { container: spacer } = render( <Spacer /> );
 	const { container: spacerWithMargin } = render( <Spacer margin={ 5 } /> );
-	expect( spacerWithMargin.firstChild ).toMatchStyleDiffSnapshot(
-		spacer.firstChild
-	);
+	expect( spacerWithMargin ).toMatchStyleDiffSnapshot( spacer );
 } );
 ```
 
@@ -377,7 +481,7 @@ In that case, you might see test failures and `TypeError` reported by Jest in th
 
 ### Debugging Jest unit tests
 
-Running `npm run test-unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
+Running `npm run test:unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
 
 ## Native mobile testing
 
@@ -388,7 +492,7 @@ Part of the unit-tests suite is a set of Jest tests run exercise native-mobile c
 To locally run the tests in debug mode, follow these steps:
 
 0. Make sure you have ran `npm ci` to install all the packages
-1. Run `npm run native test:debug` inside the Gutenberg root folder, on the CLI. Node is now waiting for the debugger to connect.
+1. Run `npm run test:native:debug` inside the Gutenberg root folder, on the CLI. Node is now waiting for the debugger to connect.
 2. Open `chrome://inspect` in Chrome
 3. Under the "Remote Target" section, look for a `../../node_modules/.bin/jest` target and click on the "inspect" link. That will open a new window with the Chrome DevTools debugger attached to the process and stopped at the beginning of the `jest.js` file. Alternatively, if the targets are not visible, click on the `Open dedicated DevTools for Node` link in the same page.
 4. You can place breakpoints or `debugger;` statements throughout the code, including the tests code, to stop and inspect
@@ -403,40 +507,42 @@ Contributors to Gutenberg will note that PRs include continuous integration E2E 
 
 There is an ongoing effort to add integration tests to the native mobile project using the [`react-native-testing-library`](https://testing-library.com/docs/react-native-testing-library/intro/) library. A guide to writing integration tests can be found [here](/docs/contributors/code/react-native/integration-test-guide.md).
 
-## End-to-end Testing
+## End-to-end testing
 
-End-to-end tests use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
+Most existing End-to-end tests currently use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver to run the tests in `packages/e2e-tests`, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
+
+There's an ongoing [project](https://github.com/WordPress/gutenberg/issues/38851) to migrate them from Puppeteer to Playwright. **It's recommended to write new e2e tests in Playwright whenever possible**. The sections below mostly apply to the old Jest + Puppeteer framework. See the dedicated [guide](/docs/contributors/code/e2e/README.md) if you're writing tests with Playwright.
 
 ### Using wp-env
 
 If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment), you can run the e2e tests locally using this command:
 
 ```bash
-npm run test-e2e
+npm run test:e2e
 ```
 
 or interactively
 
 ```bash
-npm run test-e2e:watch
+npm run test:e2e:watch
 ```
 
 Sometimes it's useful to observe the browser while running tests. Then, use this command:
 
 ```bash
-npm run test-e2e:watch -- --puppeteer-interactive
+npm run test:e2e:watch -- --puppeteer-interactive
 ```
 
 You can control the speed of execution with `--puppeteer-slowmo`:
 
 ```bash
-npm run test-e2e:watch -- --puppeteer-interactive --puppeteer-slowmo=200
+npm run test:e2e:watch -- --puppeteer-interactive --puppeteer-slowmo=200
 ```
 
 You can additionally have the devtools automatically open for interactive debugging in the browser:
 
 ```bash
-npm run test-e2e:watch -- --puppeteer-devtools
+npm run test:e2e:watch -- --puppeteer-devtools
 ```
 
 ### Using alternate environment
@@ -450,15 +556,15 @@ ln -s gutenberg/packages/e2e-tests/plugins/* .
 Then to run the tests, specify the base URL, username, and passwords for your site. For example, if your test site is at `http://wp.test`, use:
 
 ```bash
-WP_BASE_URL=http://wp.test npm run test-e2e -- --wordpress-username=admin --wordpress-password=password
+WP_BASE_URL=http://wp.test npm run test:e2e -- --wordpress-username=admin --wordpress-password=password
 ```
 
-### Scenario Testing
+### Scenario testing
 
 If you find that end-to-end tests pass when run locally, but fail in GitHub Actions, you may be able to isolate a CPU- or network-bound race condition by simulating a slow CPU or network:
 
 ```
-THROTTLE_CPU=4 npm run test-e2e
+THROTTLE_CPU=4 npm run test:e2e
 ```
 
 `THROTTLE_CPU` is a slowdown factor (in this example, a 4x slowdown multiplier)
@@ -466,7 +572,7 @@ THROTTLE_CPU=4 npm run test-e2e
 See [Chrome docs: setCPUThrottlingRate](https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate)
 
 ```
-SLOW_NETWORK=true npm run test-e2e
+SLOW_NETWORK=true npm run test:e2e
 ```
 
 `SLOW_NETWORK` emulates a network speed equivalent to "Fast 3G" in the Chrome devtools.
@@ -474,47 +580,47 @@ SLOW_NETWORK=true npm run test-e2e
 See [Chrome docs: emulateNetworkConditions](https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions) and [NetworkManager.js](https://github.com/ChromeDevTools/devtools-frontend/blob/80c102878fd97a7a696572054007d40560dcdd21/front_end/sdk/NetworkManager.js#L252-L274)
 
 ```
-OFFLINE=true npm run test-e2e
+OFFLINE=true npm run test:e2e
 ```
 
 `OFFLINE` emulates network disconnection.
 
 See [Chrome docs: emulateNetworkConditions](https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions)
 
-### Core Block Testing
+### Core block testing
 
 Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the integration tests fixtures readme](https://github.com/wordpress/gutenberg/blob/HEAD/test/integration/fixtures/blocks/README.md) for more information and instructions.
 
-### Flaky Tests
+### Flaky tests
 
-A test is considered to be **flaky** when it can pass and fail across multiple retry attempts without any code changes. We auto retry failed tests at most **twice** on CI to detect and report them to GitHub issues automatically under the [`[Type] Flaky Test`](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22%5BType%5D+Flaky+Test%22) label via [`report-flaky-tests`](https://github.com/WordPress/gutenberg/blob/trunk/.github/report-flaky-tests/index.js) GitHub action. Note that a test that failed three times in a row is not counted as a flaky test and will not be reported to an issue.
+A test is considered to be **flaky** when it can pass and fail across multiple retry attempts without any code changes. We auto retry failed tests at most **twice** on CI to detect and report them to GitHub issues automatically under the [`[Type] Flaky Test`](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22%5BType%5D+Flaky+Test%22) label via [`report-flaky-tests`](https://github.com/WordPress/gutenberg/tree/trunk/packages/report-flaky-tests) GitHub action. Note that a test that failed three times in a row is not counted as a flaky test and will not be reported to an issue.
 
-## PHP Testing
+## PHP testing
 
 Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment), you can run the PHP tests locally using this command:
 
 ```bash
-npm run test-php
+npm run test:php
 ```
 
 To re-run tests automatically when files change (similar to Jest), run:
 
 ```
-npm run test-php:watch
+npm run test:php:watch
 ```
 
 _Note: The phpunit commands require `wp-env` to be running and composer dependencies to be installed. The package script will start wp-env for you if it is not already running._
 
 In other environments, run `composer run test` and `composer run test:watch`.
 
-Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `npm run test-php` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint-php`.
+Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `npm run test:php` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint:php`.
 
-To run unit tests only, without the linter, use `npm run test-unit-php` instead.
+To run unit tests only, without the linter, use `npm run test:unit:php` instead.
 
 [snapshot testing]: https://jestjs.io/docs/en/snapshot-testing.html
 [update snapshots]: https://jestjs.io/docs/en/snapshot-testing.html#updating-snapshots
 
-## Performance Testing
+## Performance testing
 
 To ensure that the editor stays performant as we add features, we monitor the impact pull requests and releases can have on some key metrics:
 
@@ -522,10 +628,19 @@ To ensure that the editor stays performant as we add features, we monitor the im
 -   The time it takes for the browser to respond when typing.
 -   The time it takes to select a block.
 
-Performance tests are end-to-end tests running the editor and capturing these measures. To run the tests, make sure you have an e2e testing environment ready and run the following command:
+Performance tests are end-to-end tests running the editor and capturing these measures. Make sure you have an e2e testing environment ready.
+
+To set up the e2e testing environment, checkout the Gutenberg repository and switch to the branch that you would like to test. Run the following command to prepare the environment.
 
 ```
-npm run test-performance
+nvm use && npm install
+npm run build:packages
+```
+
+To run the tests run the following command:
+
+```
+npm run test:performance
 ```
 
 This gives you the result for the current branch/code on the running environment.

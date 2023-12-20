@@ -11,68 +11,80 @@ const { execSync } = require( 'child_process' );
 /**
  * Internal dependencies
  */
+const pkg = require( '../package.json' );
 const env = require( './env' );
 const parseXdebugMode = require( './parse-xdebug-mode' );
+const {
+	RUN_CONTAINERS,
+	validateRunContainer,
+} = require( './validate-run-container' );
 
-// Colors
+// Colors.
 const boldWhite = chalk.bold.white;
 const wpPrimary = boldWhite.bgHex( '#00669b' );
 const wpGreen = boldWhite.bgHex( '#4ab866' );
 const wpRed = boldWhite.bgHex( '#d94f4f' );
 const wpYellow = boldWhite.bgHex( '#f0b849' );
 
-// Spinner
-const withSpinner = ( command ) => ( ...args ) => {
-	const spinner = ora().start();
-	args[ 0 ].spinner = spinner;
-	let time = process.hrtime();
-	return command( ...args ).then(
-		( message ) => {
-			time = process.hrtime( time );
-			spinner.succeed(
-				`${ message || spinner.text } (in ${ time[ 0 ] }s ${ (
-					time[ 1 ] / 1e6
-				).toFixed( 0 ) }ms)`
-			);
-			process.exit( 0 );
-		},
-		( error ) => {
-			if ( error instanceof env.ValidationError ) {
-				// Error is a validation error. That means the user did something wrong.
-				spinner.fail( error.message );
-				process.exit( 1 );
-			} else if (
-				error &&
-				typeof error === 'object' &&
-				'exitCode' in error &&
-				'err' in error &&
-				'out' in error
-			) {
-				// Error is a docker-compose error. That means something docker-related failed.
-				// https://github.com/PDMLab/docker-compose/blob/HEAD/src/index.ts
-				spinner.fail( 'Error while running docker-compose command.' );
-				if ( error.out ) {
-					process.stdout.write( error.out );
-				}
-				if ( error.err ) {
-					process.stderr.write( error.err );
-				}
-				process.exit( error.exitCode );
-			} else if ( error ) {
-				// Error is an unknown error. That means there was a bug in our code.
-				spinner.fail(
-					typeof error === 'string' ? error : error.message
+// Spinner.
+const withSpinner =
+	( command ) =>
+	( ...args ) => {
+		const spinner = ora().start();
+		args[ 0 ].spinner = spinner;
+		let time = process.hrtime();
+		return command( ...args ).then(
+			( message ) => {
+				time = process.hrtime( time );
+				spinner.succeed(
+					`${ message || spinner.text } (in ${ time[ 0 ] }s ${ (
+						time[ 1 ] / 1e6
+					).toFixed( 0 ) }ms)`
 				);
-				// Disable reason: Using console.error() means we get a stack trace.
-				console.error( error );
-				process.exit( 1 );
-			} else {
-				spinner.fail( 'An unknown error occured.' );
-				process.exit( 1 );
+				process.exit( 0 );
+			},
+			( error ) => {
+				if (
+					error instanceof env.ValidationError ||
+					error instanceof env.LifecycleScriptError
+				) {
+					// Error is a configuration error. That means the user did something wrong.
+					spinner.fail( error.message );
+					process.exit( 1 );
+				} else if (
+					error &&
+					typeof error === 'object' &&
+					'exitCode' in error &&
+					'err' in error &&
+					'out' in error
+				) {
+					// Error is a docker compose error. That means something docker-related failed.
+					// https://github.com/PDMLab/docker-compose/blob/HEAD/src/index.ts
+					spinner.fail(
+						'Error while running docker compose command.'
+					);
+					if ( error.out ) {
+						process.stdout.write( error.out );
+					}
+					if ( error.err ) {
+						process.stderr.write( error.err );
+					}
+					process.exit( error.exitCode );
+				} else if ( error ) {
+					// Error is an unknown error. That means there was a bug in our code.
+					spinner.fail(
+						typeof error === 'string' ? error : error.message
+					);
+					// Disable reason: Using console.error() means we get a stack trace.
+					console.error( error );
+					process.exit( 1 );
+				} else {
+					spinner.fail( 'An unknown error occurred.' );
+					process.exit( 1 );
+				}
 			}
-		}
-	);
-};
+		);
+	};
 
 module.exports = function cli() {
 	// Do nothing if Docker is unavailable.
@@ -91,6 +103,17 @@ module.exports = function cli() {
 		describe: 'Enable debug output.',
 		default: false,
 	} );
+
+	yargs.parserConfiguration( {
+		// Treats unknown options as arguments for commands to deal with instead of discarding them.
+		'unknown-options-as-args': true,
+		// Populates '--' in the command options with arguments after the double dash.
+		'populate--': true,
+	} );
+
+	// Since we might be running a different CLI version than the one that was called
+	// we need to set the version manually from the correct package.json.
+	yargs.version( pkg.version );
 
 	yargs.command(
 		'start',
@@ -116,6 +139,11 @@ module.exports = function cli() {
 				coerce: parseXdebugMode,
 				type: 'string',
 			} );
+			args.option( 'scripts', {
+				type: 'boolean',
+				describe: 'Execute any configured lifecycle scripts.',
+				default: true,
+			} );
 		},
 		withSpinner( env.start )
 	);
@@ -136,6 +164,11 @@ module.exports = function cli() {
 				describe: "Which environments' databases to clean.",
 				choices: [ 'all', 'development', 'tests' ],
 				default: 'tests',
+			} );
+			args.option( 'scripts', {
+				type: 'boolean',
+				describe: 'Execute any configured lifecycle scripts.',
+				default: true,
 			} );
 		},
 		withSpinner( env.clean )
@@ -163,15 +196,25 @@ module.exports = function cli() {
 		'Displays the latest logs for the e2e test environment without watching.'
 	);
 	yargs.command(
-		'run <container> [command..]',
-		'Runs an arbitrary command in one of the underlying Docker containers. The "container" param should reference one of the underlying Docker services like "development", "tests", or "cli". To run a wp-cli command, use the "cli" or "tests-cli" service. You can also use this command to open shell sessions like bash and the WordPress shell in the WordPress instance. For example, `wp-env run cli bash` will open bash in the development WordPress instance. When using long commands with arguments and quotation marks, you need to wrap the "command" param in quotation marks. For example: `wp-env run tests-cli "wp post create --post_type=page --post_title=\'Test\'"` will create a post on the tests WordPress instance.',
+		'run <container> [command...]',
+		'Runs an arbitrary command in one of the underlying Docker containers. A double dash can be used to pass arguments to the container without parsing them. This is necessary if you are using an option that is defined below. You can use `bash` to open a shell session and both `composer` and `phpunit` are available in all WordPress and CLI containers. WP-CLI is also available in the CLI containers.',
 		( args ) => {
+			args.option( 'env-cwd', {
+				type: 'string',
+				requiresArg: true,
+				default: '.',
+				describe:
+					"The command's working directory inside of the container. Paths without a leading slash are relative to the WordPress root.",
+			} );
 			args.positional( 'container', {
 				type: 'string',
-				describe: 'The container to run the command on.',
+				describe:
+					'The underlying Docker service to run the command on.',
+				choices: RUN_CONTAINERS,
+				coerce: validateRunContainer,
 			} );
 			args.positional( 'command', {
-				type: 'string',
+				type: 'array',
 				describe: 'The command to run.',
 			} );
 		},
@@ -189,13 +232,26 @@ module.exports = function cli() {
 		'$0 run tests-cli bash',
 		'Open a bash session in the WordPress tests instance.'
 	);
+
 	yargs.command(
 		'destroy',
 		wpRed(
 			'Destroy the WordPress environment. Deletes docker containers, volumes, and networks associated with the WordPress environment and removes local files.'
 		),
-		() => {},
+		( args ) => {
+			args.option( 'scripts', {
+				type: 'boolean',
+				describe: 'Execute any configured lifecycle scripts.',
+				default: true,
+			} );
+		},
 		withSpinner( env.destroy )
+	);
+	yargs.command(
+		'install-path',
+		'Get the path where all of the environment files are stored. This includes the Docker files, WordPress, PHPUnit files, and any sources that were downloaded.',
+		() => {},
+		withSpinner( env.installPath )
 	);
 
 	return yargs;

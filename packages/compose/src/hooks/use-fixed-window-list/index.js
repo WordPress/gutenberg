@@ -1,14 +1,14 @@
 /**
- * External dependencies
- */
-import { debounce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useState, useLayoutEffect } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
 import { PAGEUP, PAGEDOWN, HOME, END } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import { debounce } from '../../utils/debounce';
 
 const DEFAULT_INIT_WINDOW_SIZE = 30;
 
@@ -27,6 +27,7 @@ const DEFAULT_INIT_WINDOW_SIZE = 30;
  * @property {number}  [windowOverscan] Renders windowOverscan number of items before and after the calculated visible window.
  * @property {boolean} [useWindowing]   When false avoids calculating the window size
  * @property {number}  [initWindowSize] Initial window size to use on first render before we can calculate the window size.
+ * @property {any}     [expandedState]  Used to recalculate the window size when the expanded state of a list changes.
  */
 
 /**
@@ -69,7 +70,7 @@ export default function useFixedWindowList(
 			const visibleItems = Math.ceil(
 				scrollContainer.clientHeight / itemHeight
 			);
-			// Aim to keep opening list view fast, afterward we can optimize for scrolling
+			// Aim to keep opening list view fast, afterward we can optimize for scrolling.
 			const windowOverscan = initRender
 				? visibleItems
 				: options?.windowOverscan ?? visibleItems;
@@ -125,7 +126,14 @@ export default function useFixedWindowList(
 				debounceMeasureList
 			);
 		};
-	}, [ itemHeight, elementRef, totalItems ] );
+	}, [
+		itemHeight,
+		elementRef,
+		totalItems,
+		options?.expandedState,
+		options?.windowOverscan,
+		useWindowing,
+	] );
 
 	useLayoutEffect( () => {
 		if ( ! useWindowing ) {
@@ -168,7 +176,14 @@ export default function useFixedWindowList(
 				handleKeyDown
 			);
 		};
-	}, [ totalItems, itemHeight, elementRef, fixedListWindow.visibleItems ] );
+	}, [
+		totalItems,
+		itemHeight,
+		elementRef,
+		fixedListWindow.visibleItems,
+		useWindowing,
+		options?.expandedState,
+	] );
 
 	return [ fixedListWindow, setFixedListWindow ];
 }

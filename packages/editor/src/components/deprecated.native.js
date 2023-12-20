@@ -1,4 +1,4 @@
-// Block Creation Components
+// Block Creation Components.
 /**
  * WordPress dependencies
  */

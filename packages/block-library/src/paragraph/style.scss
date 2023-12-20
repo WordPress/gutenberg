@@ -28,9 +28,9 @@
 	font-style: normal;
 }
 
-p {
-	// Break long strings of text without spaces so they don't overflow the block.
-	overflow-wrap: break-word;
+body.rtl .has-drop-cap:not(:focus)::first-letter {
+	float: initial;
+	margin-left: 0.1em;
 }
 
 // Prevent the dropcap from breaking out of the box when a background is applied.
@@ -48,4 +48,9 @@ p.has-background {
 // For example, this is what global styles does.
 :where(p.has-text-color:not(.has-link-color)) a {
 	color: inherit;
+}
+
+p.has-text-align-right[style*="writing-mode:vertical-rl"],
+p.has-text-align-left[style*="writing-mode:vertical-lr"] {
+	rotate: 180deg;
 }

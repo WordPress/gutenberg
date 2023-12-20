@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { uniqueId } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
@@ -16,13 +11,14 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  *                               browser navigation.
  * @property {?Function} onClick Optional function to invoke when action is
  *                               triggered by user.
- *
  */
+
+let uniqueId = 0;
 
 /**
  * Returns an action object used in signalling that a notice is to be created.
  *
- * @param {string}                [status='info']              Notice status.
+ * @param {string|undefined}      status                       Notice status ("info" if undefined is passed).
  * @param {string}                content                      Notice message.
  * @param {Object}                [options]                    Notice options.
  * @param {string}                [options.context='global']   Context under which to
@@ -40,12 +36,33 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  *                                                             readers.
  * @param {Array<WPNoticeAction>} [options.actions]            User actions to be
  *                                                             presented with notice.
- * @param {Object}                [options.icon]               An icon displayed with the notice.
+ * @param {string}                [options.icon]               An icon displayed with the notice.
+ *                                                             Only used when type is set to `snackbar`.
  * @param {boolean}               [options.explicitDismiss]    Whether the notice includes
- *                                                             an explict dismiss button and
+ *                                                             an explicit dismiss button and
  *                                                             can't be dismissed by clicking
- *                                                             the body of the notice.
+ *                                                             the body of the notice. Only applies
+ *                                                             when type is set to `snackbar`.
  * @param {Function}              [options.onDismiss]          Called when the notice is dismissed.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     const { createNotice } = useDispatch( noticesStore );
+ *     return (
+ *         <Button
+ *             onClick={ () => createNotice( 'success', __( 'Notice message' ) ) }
+ *         >
+ *             { __( 'Generate a success notice!' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
  *
  * @return {Object} Action object.
  */
@@ -54,7 +71,7 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 		speak = true,
 		isDismissible = true,
 		context = DEFAULT_CONTEXT,
-		id = uniqueId( context ),
+		id = `${ context }${ ++uniqueId }`,
 		actions = [],
 		type = 'default',
 		__unstableHTML,
@@ -64,7 +81,7 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 	} = options;
 
 	// The supported value shape of content is currently limited to plain text
-	// strings. To avoid setting expectation that e.g. a WPElement could be
+	// strings. To avoid setting expectation that e.g. a React Element could be
 	// supported, cast to a string.
 	content = String( content );
 
@@ -96,6 +113,30 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
  * @param {string} content   Notice message.
  * @param {Object} [options] Optional notice options.
  *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     const { createSuccessNotice } = useDispatch( noticesStore );
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 createSuccessNotice( __( 'Success!' ), {
+ *                     type: 'snackbar',
+ *                     icon: '🔥',
+ *                 } )
+ *             }
+ *         >
+ *             { __( 'Generate a snackbar success notice!' ) }
+ *        </Button>
+ *     );
+ * };
+ * ```
+ *
  * @return {Object} Action object.
  */
 export function createSuccessNotice( content, options ) {
@@ -110,6 +151,29 @@ export function createSuccessNotice( content, options ) {
  *
  * @param {string} content   Notice message.
  * @param {Object} [options] Optional notice options.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     const { createInfoNotice } = useDispatch( noticesStore );
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                createInfoNotice( __( 'Something happened!' ), {
+ *                   isDismissible: false,
+ *                } )
+ *             }
+ *         >
+ *         { __( 'Generate a notice that cannot be dismissed.' ) }
+ *       </Button>
+ *       );
+ * };
+ *```
  *
  * @return {Object} Action object.
  */
@@ -126,6 +190,32 @@ export function createInfoNotice( content, options ) {
  * @param {string} content   Notice message.
  * @param {Object} [options] Optional notice options.
  *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     const { createErrorNotice } = useDispatch( noticesStore );
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 createErrorNotice( __( 'An error occurred!' ), {
+ *                     type: 'snackbar',
+ *                     explicitDismiss: true,
+ *                 } )
+ *             }
+ *         >
+ *             { __(
+ *                 'Generate an snackbar error notice with explicit dismiss button.'
+ *             ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
+ *
  * @return {Object} Action object.
  */
 export function createErrorNotice( content, options ) {
@@ -141,6 +231,33 @@ export function createErrorNotice( content, options ) {
  * @param {string} content   Notice message.
  * @param {Object} [options] Optional notice options.
  *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     const { createWarningNotice, createInfoNotice } = useDispatch( noticesStore );
+ *     return (
+ *         <Button
+ *             onClick={ () =>
+ *                 createWarningNotice( __( 'Warning!' ), {
+ *                     onDismiss: () => {
+ *                         createInfoNotice(
+ *                             __( 'The warning has been dismissed!' )
+ *                         );
+ *                     },
+ *                 } )
+ *             }
+ *         >
+ *             { __( 'Generates a warning notice with onDismiss callback' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
+ *
  * @return {Object} Action object.
  */
 export function createWarningNotice( content, options ) {
@@ -154,12 +271,147 @@ export function createWarningNotice( content, options ) {
  * @param {string} [context='global'] Optional context (grouping) in which the notice is
  *                                    intended to appear. Defaults to default context.
  *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *    const notices = useSelect( ( select ) => select( noticesStore ).getNotices() );
+ *    const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
+ *
+ *    return (
+ *         <>
+ *             <Button
+ *                 onClick={ () =>
+ *                     createWarningNotice( __( 'Warning!' ), {
+ *                         isDismissible: false,
+ *                     } )
+ *                 }
+ *             >
+ *                 { __( 'Generate a notice' ) }
+ *             </Button>
+ *             { notices.length > 0 && (
+ *                 <Button onClick={ () => removeNotice( notices[ 0 ].id ) }>
+ *                     { __( 'Remove the notice' ) }
+ *                 </Button>
+ *             ) }
+ *         </>
+ *     );
+ *};
+ * ```
+ *
  * @return {Object} Action object.
  */
 export function removeNotice( id, context = DEFAULT_CONTEXT ) {
 	return {
 		type: 'REMOVE_NOTICE',
 		id,
+		context,
+	};
+}
+
+/**
+ * Removes all notices from a given context. Defaults to the default context.
+ *
+ * @param {string} noticeType The context to remove all notices from.
+ * @param {string} context    The context to remove all notices from.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch, useSelect } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * export const ExampleComponent = () => {
+ * 	const notices = useSelect( ( select ) =>
+ * 		select( noticesStore ).getNotices()
+ * 	);
+ * 	const { removeNotices } = useDispatch( noticesStore );
+ * 	return (
+ * 		<>
+ * 			<ul>
+ * 				{ notices.map( ( notice ) => (
+ * 					<li key={ notice.id }>{ notice.content }</li>
+ * 				) ) }
+ * 			</ul>
+ * 			<Button
+ * 				onClick={ () =>
+ * 					removeAllNotices()
+ * 				}
+ * 			>
+ * 				{ __( 'Clear all notices', 'woo-gutenberg-products-block' ) }
+ * 			</Button>
+ * 			<Button
+ * 				onClick={ () =>
+ * 					removeAllNotices( 'snackbar' )
+ * 				}
+ * 			>
+ * 				{ __( 'Clear all snackbar notices', 'woo-gutenberg-products-block' ) }
+ * 			</Button>
+ * 		</>
+ * 	);
+ * };
+ * ```
+ *
+ * @return {Object} 	   Action object.
+ */
+export function removeAllNotices(
+	noticeType = 'default',
+	context = DEFAULT_CONTEXT
+) {
+	return {
+		type: 'REMOVE_ALL_NOTICES',
+		noticeType,
+		context,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that several notices are to be removed.
+ *
+ * @param {string[]} ids                List of unique notice identifiers.
+ * @param {string}   [context='global'] Optional context (grouping) in which the notices are
+ *                                      intended to appear. Defaults to default context.
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { useDispatch, useSelect } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ * 	const notices = useSelect( ( select ) =>
+ * 		select( noticesStore ).getNotices()
+ * 	);
+ * 	const { removeNotices } = useDispatch( noticesStore );
+ * 	return (
+ * 		<>
+ * 			<ul>
+ * 				{ notices.map( ( notice ) => (
+ * 					<li key={ notice.id }>{ notice.content }</li>
+ * 				) ) }
+ * 			</ul>
+ * 			<Button
+ * 				onClick={ () =>
+ * 					removeNotices( notices.map( ( { id } ) => id ) )
+ * 				}
+ * 			>
+ * 				{ __( 'Clear all notices' ) }
+ * 			</Button>
+ * 		</>
+ * 	);
+ * };
+ * ```
+ * @return {Object} Action object.
+ */
+export function removeNotices( ids, context = DEFAULT_CONTEXT ) {
+	return {
+		type: 'REMOVE_NOTICES',
+		ids,
 		context,
 	};
 }

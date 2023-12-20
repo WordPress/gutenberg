@@ -1,5 +1,4 @@
 .wp-block-table {
-	margin: 0 0 1em 0;
 	$subtle-light-gray: #f3f4f5;
 	$subtle-pale-green: #e9fbe5;
 	$subtle-pale-blue: #e7f5fe;
@@ -10,6 +9,21 @@
 	table {
 		border-collapse: collapse;
 		width: 100%;
+	}
+
+	thead {
+		border-bottom: 3px solid;
+	}
+
+	tfoot {
+		border-top: 3px solid;
+	}
+
+	// Match default border style to default style in editor
+	td,
+	th {
+		border: $border-width solid;
+		padding: 0.5em;
 	}
 
 	// Fixed layout toggle
@@ -109,6 +123,58 @@
 		th,
 		td {
 			border-color: inherit;
+		}
+	}
+
+	table[style*="border-top-color"] {
+		> *,
+		tr:first-child {
+			border-top-color: inherit;
+
+			th,
+			td {
+				border-top-color: inherit;
+			}
+		}
+
+		tr:not(:first-child) {
+			border-top-color: currentColor;
+		}
+	}
+	table[style*="border-right-color"] {
+		> *,
+		tr,
+		th,
+		td:last-child {
+			border-right-color: inherit;
+		}
+	}
+	table[style*="border-bottom-color"] {
+		> *,
+		tr:last-child {
+			border-bottom-color: inherit;
+
+			th,
+			td {
+				border-bottom-color: inherit;
+			}
+		}
+
+		// Border support classes and styles are applied on the table block
+		// itself. This means that without the rule below every table row would
+		// have a bottom border matching the color of the table's border.
+		// This style gives the best visual appearance and most expected result
+		// until we can control individual table rows or cells via inner blocks.
+		tr:not(:last-child) {
+			border-bottom-color: currentColor;
+		}
+	}
+	table[style*="border-left-color"] {
+		> *,
+		tr,
+		th,
+		td:first-child {
+			border-left-color: inherit;
 		}
 	}
 

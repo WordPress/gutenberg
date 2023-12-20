@@ -44,13 +44,18 @@ If `isDragEnabled` is true, this controls the amount of `px` to have been dragge
 -   Required: No
 -   Default: `10`
 
-### hideHTMLArrows
+### spinControls
 
-If true, the default `input` HTML arrows will be hidden.
+ The type of spin controls to display. These are butons that allow the user to
+ quickly increment and decrement the number.
+ 
+ - 'none' - Do not show spin controls.
+ - 'native' - Use browser's native HTML `input` controls.
+ - 'custom' - Use plus and minus icon buttons.
 
--   Type: `Boolean`
+-   Type: `String`
 -   Required: No
--   Default: `false`
+-   Default: `'native'`
 
 ### isDragEnabled
 
@@ -96,6 +101,20 @@ The minimum `value` allowed.
 -   Type: `Number`
 -   Required: No
 -   Default: `-Infinity`
+
+### onChange
+
+Callback fired whenever the value of the input changes.
+
+The callback receives two arguments:
+
+1. `newValue`: the new value of the input
+2. `extra`: an object containing, under the `event` key, the original browser event.
+
+Note that the value received as the first argument of the callback is _not_ guaranteed to be a valid value (e.g. it could be outside of the range defined by the [`min`, `max`] props, or it could not match the `step`). In order to check the value's validity, check the `event.target?.validity.valid` property from the callback's second argument.
+
+-   Type: `(newValue, extra) => void`
+-   Required: No
 
 ### required
 

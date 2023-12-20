@@ -1,6 +1,5 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/file",
 		"isValid": true,
 		"attributes": {
@@ -10,7 +9,6 @@
 			"downloadButtonText": "Download",
 			"previewHeight": 600
 		},
-		"innerBlocks": [],
-		"originalContent": "<div class=\"wp-block-file\"><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" class=\"wp-block-file__button\" download>Download</a></div>"
+		"innerBlocks": []
 	}
 ]

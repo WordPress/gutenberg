@@ -51,21 +51,27 @@ export const KeyboardAvoidingView = ( {
 				setSafeAreaBottomInset( safeAreaInsets.bottom );
 			}
 		);
-		SafeArea.addEventListener(
+		const safeAreaSubscription = SafeArea.addEventListener(
 			'safeAreaInsetsForRootViewDidChange',
 			onSafeAreaInsetsUpdate
 		);
-		Keyboard.addListener( 'keyboardWillShow', onKeyboardWillShow );
-		Keyboard.addListener( 'keyboardWillHide', onKeyboardWillHide );
+		const keyboardShowSubscription = Keyboard.addListener(
+			'keyboardWillShow',
+			onKeyboardWillShow
+		);
+		const keyboardHideSubscription = Keyboard.addListener(
+			'keyboardWillHide',
+			onKeyboardWillHide
+		);
 
 		return () => {
-			SafeArea.removeEventListener(
-				'safeAreaInsetsForRootViewDidChange',
-				onSafeAreaInsetsUpdate
-			);
-			Keyboard.removeListener( 'keyboardWillShow', onKeyboardWillShow );
-			Keyboard.removeListener( 'keyboardWillHide', onKeyboardWillHide );
+			safeAreaSubscription.remove();
+			keyboardShowSubscription.remove();
+			keyboardHideSubscription.remove();
 		};
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	function onSafeAreaInsetsUpdate( { safeAreaInsets } ) {

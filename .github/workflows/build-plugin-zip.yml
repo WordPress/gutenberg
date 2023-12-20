@@ -36,11 +36,11 @@ jobs:
                     "https://api.github.com/repos/${{ github.repository }}/releases/latest"
                   LATEST_STABLE_TAG=$(jq --raw-output '.tag_name' latest.json)
                   IFS='.' read LATEST_STABLE_MAJOR LATEST_STABLE_MINOR LATEST_STABLE_PATCH <<< "${LATEST_STABLE_TAG#v}"
-                  echo "::set-output name=current_stable_branch::release/${LATEST_STABLE_MAJOR}.${LATEST_STABLE_MINOR}"
+                  echo "current_stable_branch=release/${LATEST_STABLE_MAJOR}.${LATEST_STABLE_MINOR}" >> $GITHUB_OUTPUT
                   if [[ ${LATEST_STABLE_MINOR} == "9" ]]; then
-                    echo "::set-output name=next_stable_branch::release/$((LATEST_STABLE_MAJOR + 1)).0"
+                    echo "next_stable_branch=release/$((LATEST_STABLE_MAJOR + 1)).0" >> $GITHUB_OUTPUT
                   else
-                    echo "::set-output name=next_stable_branch::release/${LATEST_STABLE_MAJOR}.$((LATEST_STABLE_MINOR + 1))"
+                    echo "next_stable_branch=release/${LATEST_STABLE_MAJOR}.$((LATEST_STABLE_MINOR + 1))" >> $GITHUB_OUTPUT
                   fi
 
     bump-version:
@@ -56,7 +56,7 @@ jobs:
                 github.event.inputs.version == 'rc' ||
                 github.event.inputs.version == 'stable'
               ) || (
-                endsWith( github.ref, needs.compute-stable-branches.outputs.current_stable_branch ) &&
+                startsWith( github.ref, 'refs/heads/release/' ) &&
                 github.event.inputs.version == 'stable'
               )
             )
@@ -69,15 +69,16 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   token: ${{ secrets.GUTENBERG_TOKEN }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Compute old and new version
               id: get_version
               run: |
                   OLD_VERSION=$(jq --raw-output '.version' package.json)
-                  echo "::set-output name=old_version::$(echo $OLD_VERSION)"
+                  echo "old_version=${OLD_VERSION}" >> $GITHUB_OUTPUT
                   if [[ ${{ github.event.inputs.version }} == 'stable' ]]; then
                     NEW_VERSION=$(npx semver $OLD_VERSION -i patch)
                   else
@@ -93,10 +94,10 @@ jobs:
                       fi
                     fi
                   fi
-                  echo "::set-output name=new_version::$(echo $NEW_VERSION)"
+                  echo "new_version=${NEW_VERSION}" >> $GITHUB_OUTPUT
                   IFS='.' read -r -a NEW_VERSION_ARRAY <<< "$NEW_VERSION"
                   RELEASE_BRANCH="release/${NEW_VERSION_ARRAY[0]}.${NEW_VERSION_ARRAY[1]}"
-                  echo "::set-output name=release_branch::$(echo $RELEASE_BRANCH)"
+                  echo "release_branch=${RELEASE_BRANCH}" >> $GITHUB_OUTPUT
 
             - name: Configure git user name and email
               run: |
@@ -122,17 +123,16 @@ jobs:
                   VERSION: ${{ steps.get_version.outputs.new_version }}
               run: |
                   cat <<< $(jq --tab --arg version "${VERSION}" '.version = $version' package.json) > package.json
-                  cat <<< $(jq --tab --arg version "${VERSION}" '.version = $version' package-lock.json) > package-lock.json
+                  cat <<< $(jq --tab --arg version "${VERSION}" '.version = $version | .packages[""].version = $version' package-lock.json) > package-lock.json
                   sed -i "s/${{ steps.get_version.outputs.old_version }}/${VERSION}/g" gutenberg.php
-                  sed -i "s/${{ steps.get_version.outputs.old_version }}/${VERSION}/g" readme.txt
 
             - name: Commit the version bump to the release branch
               id: commit_version_bump_to_release_branch
               run: |
-                  git add gutenberg.php package.json package-lock.json readme.txt
+                  git add gutenberg.php package.json package-lock.json
                   git commit -m "Bump plugin version to ${{ steps.get_version.outputs.new_version }}"
                   git push --set-upstream origin "${{ steps.get_version.outputs.release_branch }}"
-                  echo "::set-output name=version_bump_commit::$(git rev-parse --verify --short HEAD)"
+                  echo "version_bump_commit=$(git rev-parse --verify --short HEAD)" >> $GITHUB_OUTPUT
 
             - name: Fetch trunk
               if: ${{ github.ref != 'refs/heads/trunk' }}
@@ -147,7 +147,7 @@ jobs:
                   if [[ ${{ steps.get_version.outputs.old_version }} == "$TRUNK_VERSION" ]]; then
                     git cherry-pick "${{ steps.get_version.outputs.release_branch }}"
                     git push
-                    echo "::set-output name=version_bump_commit::$(git rev-parse --verify --short HEAD)"
+                    echo "version_bump_commit=$(git rev-parse --verify --short HEAD)" >> $GITHUB_OUTPUT
                   fi
 
     build:
@@ -165,14 +165,15 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
               with:
-                  node-version: 14
+                  node-version-file: '.nvmrc'
                   cache: npm
 
             - name: Build Gutenberg plugin ZIP file
@@ -181,7 +182,7 @@ jobs:
                   NO_CHECKS: 'true'
 
             - name: Upload artifact
-              uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
               with:
                   name: gutenberg-plugin
                   path: ./gutenberg.zip
@@ -193,7 +194,7 @@ jobs:
               run: |
                   IFS='.' read -r -a VERSION_ARRAY <<< "${VERSION}"
                   MILESTONE="Gutenberg ${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
-                  npm run changelog -- --milestone="$MILESTONE" --unreleased > release-notes.txt
+                  npm run other:changelog -- --milestone="$MILESTONE" --unreleased > release-notes.txt
                   sed -ie '1,6d' release-notes.txt
                   if [[ ${{ needs.bump-version.outputs.new_version }} != *"rc"* ]]; then
                     # Include previous RCs' release notes, if any
@@ -204,7 +205,7 @@ jobs:
 
             - name: Upload release notes artifact
               if: ${{ needs.bump-version.outputs.new_version }}
-              uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
               with:
                   name: release-notes
                   path: ./release-notes.txt
@@ -220,11 +221,12 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
               with:
                   fetch-depth: 2
                   ref: ${{ needs.bump-version.outputs.release_branch }}
                   token: ${{ secrets.GUTENBERG_TOKEN }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Configure git user name and email
               run: |
@@ -264,15 +266,15 @@ jobs:
               id: get_release_version
               env:
                   VERSION: ${{ needs.bump-version.outputs.new_version }}
-              run: echo ::set-output name=version::$(echo $VERSION | cut -d / -f 3 | sed 's/-rc./ RC/' )
+              run: echo "version=$(echo $VERSION | cut -d / -f 3 | sed 's/-rc./ RC/' )" >> $GITHUB_OUTPUT
 
             - name: Download Plugin Zip Artifact
-              uses: actions/download-artifact@4a7a711286f30c025902c28b541c10e147a9b843 # v2.0.8
+              uses: actions/download-artifact@7a1cd3216ca9260cd8022db641d960b1db4d1be4 # v4.0.0
               with:
                   name: gutenberg-plugin
 
             - name: Download Release Notes Artifact
-              uses: actions/download-artifact@4a7a711286f30c025902c28b541c10e147a9b843 # v2.0.8
+              uses: actions/download-artifact@7a1cd3216ca9260cd8022db641d960b1db4d1be4 # v4.0.0
               with:
                   name: release-notes
 
@@ -299,3 +301,46 @@ jobs:
                   asset_path: ./gutenberg.zip
                   asset_name: gutenberg.zip
                   asset_content_type: application/zip
+
+    npm-publish:
+        name: Publish WordPress packages to npm
+        runs-on: ubuntu-latest
+        environment: WordPress packages
+        needs: [bump-version, build]
+        if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
+        steps:
+            - name: Checkout (for CLI)
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              with:
+                  path: main
+                  ref: trunk
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Checkout (for publishing)
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              with:
+                  path: publish
+                  # Later, we switch this branch in the script that publishes packages.
+                  ref: trunk
+                  token: ${{ secrets.GUTENBERG_TOKEN }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Configure git user name and email (for publishing)
+              run: |
+                  cd publish
+                  git config user.name "Gutenberg Repository Automation"
+                  git config user.email gutenberg@wordpress.org
+
+            - name: Setup Node.js
+              uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
+              with:
+                  node-version-file: 'main/.nvmrc'
+                  registry-url: 'https://registry.npmjs.org'
+
+            - name: Publish packages to npm ("latest" dist-tag)
+              run: |
+                  cd main
+                  npm ci
+                  ./bin/plugin/cli.js npm-latest --semver minor --ci --repository-path ../publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

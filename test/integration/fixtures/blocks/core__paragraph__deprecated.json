@@ -1,13 +1,11 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/paragraph",
 		"isValid": true,
 		"attributes": {
 			"content": "Unwrapped is <em>still</em> valid.",
 			"dropCap": false
 		},
-		"innerBlocks": [],
-		"originalContent": "Unwrapped is <em>still</em> valid."
+		"innerBlocks": []
 	}
 ]

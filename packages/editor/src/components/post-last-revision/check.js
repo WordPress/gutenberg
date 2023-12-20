@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -9,11 +9,16 @@ import { withSelect } from '@wordpress/data';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 
-export function PostLastRevisionCheck( {
-	lastRevisionId,
-	revisionsCount,
-	children,
-} ) {
+function PostLastRevisionCheck( { children } ) {
+	const { lastRevisionId, revisionsCount } = useSelect( ( select ) => {
+		const { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } =
+			select( editorStore );
+		return {
+			lastRevisionId: getCurrentPostLastRevisionId(),
+			revisionsCount: getCurrentPostRevisionsCount(),
+		};
+	}, [] );
+
 	if ( ! lastRevisionId || revisionsCount < 2 ) {
 		return null;
 	}
@@ -25,13 +30,4 @@ export function PostLastRevisionCheck( {
 	);
 }
 
-export default withSelect( ( select ) => {
-	const {
-		getCurrentPostLastRevisionId,
-		getCurrentPostRevisionsCount,
-	} = select( editorStore );
-	return {
-		lastRevisionId: getCurrentPostLastRevisionId(),
-		revisionsCount: getCurrentPostRevisionsCount(),
-	};
-} )( PostLastRevisionCheck );
+export default PostLastRevisionCheck;

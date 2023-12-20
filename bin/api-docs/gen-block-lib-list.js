@@ -1,7 +1,7 @@
 /**
  * Generates core block documentation using block.json files.
  * Reads from  : packages/block-library/src
- * Publishes to: docs/reference-guides/core-blocks.ms
+ * Publishes to: docs/reference-guides/core-blocks.md
  */
 
 /**
@@ -10,7 +10,6 @@
 const path = require( 'path' );
 const glob = require( 'fast-glob' );
 const fs = require( 'fs' );
-const { keys } = require( 'lodash' );
 /**
  * Path to root project directory.
  *
@@ -68,7 +67,11 @@ const TOKEN_PATTERN = new RegExp( START_TOKEN + '[^]*' + END_TOKEN );
  * @return {string[]} Array of truthy keys
  */
 function getTruthyKeys( obj ) {
-	return keys( obj )
+	if ( ! obj ) {
+		return [];
+	}
+
+	return Object.keys( obj )
 		.filter( ( key ) => ! key.startsWith( '__exp' ) )
 		.map( ( key ) => ( obj[ key ] ? key : `~~${ key }~~` ) );
 }
@@ -123,6 +126,20 @@ function augmentSupports( supports ) {
 }
 
 /**
+ * Returns URL to the block directory source.
+ *
+ * @param {string} filename
+ *
+ * @return {string} URL
+ */
+function getSourceFromFile( filename ) {
+	const pkgdir =
+		'https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/';
+	const blockdir = path.basename( path.dirname( filename ) );
+	return pkgdir + blockdir;
+}
+
+/**
  * Reads block.json file and returns markdown formatted entry.
  *
  * @param {string} filename
@@ -132,17 +149,26 @@ function augmentSupports( supports ) {
 function readBlockJSON( filename ) {
 	const blockjson = require( filename );
 
-	const supportsAugmented = augmentSupports( blockjson.supports );
-	const supportsList = processObjWithInnerKeys( supportsAugmented );
+	const sourcefile = getSourceFromFile( filename );
+	const supportsList =
+		blockjson.supports !== undefined
+			? processObjWithInnerKeys( augmentSupports( blockjson.supports ) )
+			: [];
 	const attributes = getTruthyKeys( blockjson.attributes );
+	const parent = blockjson.parent
+		? '\n' + `-	**Parent:** ${ blockjson.parent.join( ', ' ) }`
+		: '';
+	const experimental = blockjson.__experimental
+		? '\n' + `-	**Experimental:** ${ blockjson.__experimental }`
+		: '';
 
 	return `
 ## ${ blockjson.title }
 
-${ blockjson.description }
+${ blockjson.description } ([Source](${ sourcefile }))
 
--	**Name:** ${ blockjson.name }
--	**Category:** ${ blockjson.category }
+-	**Name:** ${ blockjson.name }${ experimental }
+-	**Category:** ${ blockjson.category }${ parent }
 -	**Supports:** ${ supportsList.sort().join( ', ' ) }
 -	**Attributes:** ${ attributes.sort().join( ', ' ) }
 `;

@@ -38,7 +38,7 @@ const getSummaryForType = ( type ) => {
 	}
 };
 
-// we use some Cell styles here with a column flex-direction
+// We use some Cell styles here with a column flex-direction.
 function LinkSuggestionItemCell( { suggestion, onLinkPicked, ...props } ) {
 	const { title: contentTitle, url, type, isDirectEntry } = suggestion;
 	const title = isDirectEntry ? url : contentTitle;

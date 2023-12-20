@@ -23,4 +23,5 @@
     <dimen name="margin_large">32dp</dimen>
 
     <dimen name="heading_vertical_padding">0dp</dimen>
+    <dimen name="block_vertical_margin">0dp</dimen>
 </resources>

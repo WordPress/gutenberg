@@ -2,25 +2,21 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import {
-	__experimentalRichText as RichText,
-	create,
-	insert,
-} from '@wordpress/rich-text';
+import { create, toHTMLString, insert } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { pasteHandler } from '@wordpress/blocks';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as blockEditorStore, RichText } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -32,9 +28,10 @@ class PostTitle extends Component {
 		super( props );
 
 		this.setRef = this.setRef.bind( this );
+		this.onPaste = this.onPaste.bind( this );
 	}
 	componentDidUpdate( prevProps ) {
-		// Unselect if any other block is selected and blur the RichText
+		// Unselect if any other block is selected and blur the RichText.
 		if (
 			this.props.isSelected &&
 			! prevProps.isAnyBlockSelected &&
@@ -61,16 +58,45 @@ class PostTitle extends Component {
 		this.props.onSelect();
 	}
 
-	onPaste( { value, onChange, plainText } ) {
+	onPaste( { value, plainText, html } ) {
+		const { title, onInsertBlockAfter, onUpdate } = this.props;
+
 		const content = pasteHandler( {
+			HTML: html,
 			plainText,
-			mode: 'INLINE',
-			tagName: 'p',
 		} );
 
-		if ( typeof content === 'string' ) {
-			const valueToInsert = create( { html: content } );
-			onChange( insert( value, valueToInsert ) );
+		if ( ! content.length ) {
+			return;
+		}
+
+		if ( typeof content !== 'string' ) {
+			const [ firstBlock ] = content;
+
+			if (
+				! title &&
+				( firstBlock.name === 'core/heading' ||
+					firstBlock.name === 'core/paragraph' )
+			) {
+				// Strip HTML to avoid unwanted HTML being added to the title.
+				// In the majority of cases it is assumed that HTML in the title
+				// is undesirable.
+				const contentNoHTML = stripHTML(
+					firstBlock.attributes.content
+				);
+				onUpdate( contentNoHTML );
+				onInsertBlockAfter( content.slice( 1 ) );
+			} else {
+				onInsertBlockAfter( content );
+			}
+		} else {
+			// Strip HTML to avoid unwanted HTML being added to the title.
+			// In the majority of cases it is assumed that HTML in the title
+			// is undesirable.
+			const contentNoHTML = stripHTML( content );
+
+			const newValue = insert( value, create( { html: contentNoHTML } ) );
+			onUpdate( toHTMLString( { value: newValue } ) );
 		}
 	}
 
@@ -80,7 +106,7 @@ class PostTitle extends Component {
 
 	getTitle( title, postType ) {
 		if ( 'page' === postType ) {
-			return isEmpty( title )
+			return ! title
 				? /* translators: accessibility text. empty page title. */
 				  __( 'Page title. Empty' )
 				: sprintf(
@@ -90,7 +116,7 @@ class PostTitle extends Component {
 				  );
 		}
 
-		return isEmpty( title )
+		return ! title
 			? /* translators: accessibility text. empty post title. */
 			  __( 'Post title. Empty' )
 			: sprintf(
@@ -126,6 +152,7 @@ class PostTitle extends Component {
 
 		return (
 			<View
+				testID="post-title"
 				style={ [
 					styles.titleContainer,
 					borderStyle,
@@ -136,17 +163,17 @@ class PostTitle extends Component {
 				accessibilityLabel={ this.getTitle( title, postType ) }
 				accessibilityHint={ __( 'Updates the title.' ) }
 			>
-				<RichText
+				<RichText.Raw
 					setRef={ this.setRef }
 					accessibilityLabel={ this.getTitle( title, postType ) }
 					tagName={ 'p' }
 					tagsToEliminate={ [ 'strong' ] }
 					unstableOnFocus={ this.props.onSelect }
-					onBlur={ this.props.onBlur } // always assign onBlur as a props
-					multiline={ false }
+					onBlur={ this.props.onBlur } // Always assign onBlur as a props.
 					style={ titleStyles }
 					styles={ styles }
 					fontSize={ 24 }
+					lineHeight={ 1 }
 					fontWeight={ 'bold' }
 					deleteEnter={ true }
 					onChange={ ( value ) => {
@@ -160,7 +187,7 @@ class PostTitle extends Component {
 					disableEditingMenu={ true }
 					__unstableIsSelected={ this.props.isSelected }
 					__unstableOnCreateUndoLevel={ () => {} }
-				></RichText>
+				/>
 			</View>
 		);
 	}
@@ -168,22 +195,19 @@ class PostTitle extends Component {
 
 export default compose(
 	withSelect( ( select ) => {
-		const { isPostTitleSelected, getEditedPostAttribute } = select(
-			editorStore
-		);
-		const {
-			getSelectedBlockClientId,
-			getBlockRootClientId,
-			getSettings,
-		} = select( blockEditorStore );
+		const { isPostTitleSelected, getEditedPostAttribute } =
+			select( editorStore );
+		const { getSelectedBlockClientId, getBlockRootClientId, getSettings } =
+			select( blockEditorStore );
 
 		const selectedId = getSelectedBlockClientId();
 		const selectionIsNested = !! getBlockRootClientId( selectedId );
-		const globalStyles = getSettings()?.__experimentalGlobalStylesBaseStyles
-			?.color;
+		const globalStyles =
+			getSettings()?.__experimentalGlobalStylesBaseStyles?.color;
 
 		return {
 			postType: getEditedPostAttribute( 'type' ),
+			title: getEditedPostAttribute( 'title' ),
 			isAnyBlockSelected: !! selectedId,
 			isSelected: isPostTitleSelected(),
 			isDimmed: selectionIsNested,
@@ -191,13 +215,11 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { undo, redo, togglePostTitleSelection } = dispatch(
-			editorStore
-		);
+		const { undo, redo, togglePostTitleSelection, editPost } =
+			dispatch( editorStore );
 
-		const { clearSelectedBlock, insertDefaultBlock } = dispatch(
-			blockEditorStore
-		);
+		const { clearSelectedBlock, insertDefaultBlock, insertBlocks } =
+			dispatch( blockEditorStore );
 
 		return {
 			onEnterPress() {
@@ -211,6 +233,12 @@ export default compose(
 			},
 			onUnselect() {
 				togglePostTitleSelection( false );
+			},
+			onUpdate( title ) {
+				editPost( { title } );
+			},
+			onInsertBlockAfter( blocks ) {
+				insertBlocks( blocks, 0 );
 			},
 		};
 	} ),

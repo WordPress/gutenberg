@@ -3,7 +3,6 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { uniq } from 'lodash';
 
 const FIXTURES_DIR = path.join( __dirname, 'blocks' );
 
@@ -31,12 +30,14 @@ export function getAvailableBlockFixturesBasenames() {
 	//  - fixture.json            : blocks structure
 	//  - fixture.serialized.html : re-serialized content
 	// Get the "base" name for each fixture first.
-	return uniq(
-		fs
-			.readdirSync( FIXTURES_DIR )
-			.filter( ( f ) => /(\.html|\.json)$/.test( f ) )
-			.map( ( f ) => f.replace( /\..+$/, '' ) )
-	);
+	return [
+		...new Set(
+			fs
+				.readdirSync( FIXTURES_DIR )
+				.filter( ( f ) => /(\.html|\.json)$/.test( f ) )
+				.map( ( f ) => f.replace( /\..+$/, '' ) )
+		),
+	];
 }
 
 /**

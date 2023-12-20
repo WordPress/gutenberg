@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { BaseControl, Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -15,9 +10,9 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { unescapeTerms } from '../../utils/terms';
 
-const MAX_MOST_USED_TERMS = 10;
+const MIN_MOST_USED_TERMS = 3;
 const DEFAULT_QUERY = {
-	per_page: MAX_MOST_USED_TERMS,
+	per_page: 10,
 	orderby: 'count',
 	order: 'desc',
 	hide_empty: true,
@@ -26,30 +21,35 @@ const DEFAULT_QUERY = {
 };
 
 export default function MostUsedTerms( { onSelect, taxonomy } ) {
-	const { _terms, showTerms } = useSelect( ( select ) => {
-		const mostUsedTerms = select( coreStore ).getEntityRecords(
-			'taxonomy',
-			taxonomy.slug,
-			DEFAULT_QUERY
-		);
-		return {
-			_terms: mostUsedTerms,
-			showTerms: mostUsedTerms?.length === MAX_MOST_USED_TERMS,
-		};
-	}, [] );
+	const { _terms, showTerms } = useSelect(
+		( select ) => {
+			const mostUsedTerms = select( coreStore ).getEntityRecords(
+				'taxonomy',
+				taxonomy.slug,
+				DEFAULT_QUERY
+			);
+			return {
+				_terms: mostUsedTerms,
+				showTerms: mostUsedTerms?.length >= MIN_MOST_USED_TERMS,
+			};
+		},
+		[ taxonomy.slug ]
+	);
 
 	if ( ! showTerms ) {
 		return null;
 	}
 
 	const terms = unescapeTerms( _terms );
-	const label = get( taxonomy, [ 'labels', 'most_used' ] );
 
 	return (
 		<div className="editor-post-taxonomies__flat-term-most-used">
-			<h3 className="editor-post-taxonomies__flat-term-most-used-label">
-				{ label }
-			</h3>
+			<BaseControl.VisualLabel
+				as="h3"
+				className="editor-post-taxonomies__flat-term-most-used-label"
+			>
+				{ taxonomy.labels.most_used }
+			</BaseControl.VisualLabel>
 			{ /*
 			 * Disable reason: The `list` ARIA role is redundant but
 			 * Safari+VoiceOver won't announce the list otherwise.

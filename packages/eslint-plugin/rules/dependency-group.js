@@ -7,8 +7,7 @@ module.exports = {
 		type: 'layout',
 		docs: {
 			description: 'Enforce dependencies docblocks formatting',
-			url:
-				'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/dependency-group.md',
+			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/dependency-group.md',
 		},
 		schema: [],
 		fixable: 'code',
@@ -82,7 +81,7 @@ module.exports = {
 			// - Normalize `/**` and `/*`
 			// - Case insensitive "Dependencies" vs. "dependencies"
 			// - Ending period
-			// - "Node" dependencies as an alias for External
+			// - "Node" dependencies as an alias for External.
 
 			if ( locality === 'External' ) {
 				locality = '(External|Node)';
@@ -121,7 +120,7 @@ module.exports = {
 		 * @param {Node}              node     Node to test.
 		 * @param {WPPackageLocality} locality Desired package locality.
 		 *
-		 * @return {WPDependencyBlockCorrection=} Correction, if applicable.
+		 * @return {WPDependencyBlockCorrection | undefined} Correction, if applicable.
 		 */
 		function getDependencyBlockCorrection( node, locality ) {
 			const value = getCommentValue( locality );
@@ -184,8 +183,9 @@ module.exports = {
 					let source;
 					switch ( child.type ) {
 						case 'ImportDeclaration':
-							source = /** @type {string} */ ( child.source
-								.value );
+							source = /** @type {string} */ (
+								child.source.value
+							);
 							candidates.push( [ child, source ] );
 							break;
 
@@ -195,10 +195,12 @@ module.exports = {
 								if (
 									! init ||
 									init.type !== 'CallExpression' ||
-									/** @type {import('estree').CallExpression} */ ( init )
-										.callee.type !== 'Identifier' ||
-									/** @type {import('estree').Identifier} */ ( init.callee )
-										.name !== 'require'
+									/** @type {import('estree').CallExpression} */ (
+										init
+									).callee.type !== 'Identifier' ||
+									/** @type {import('estree').Identifier} */ (
+										init.callee
+									).name !== 'require'
 								) {
 									return;
 								}

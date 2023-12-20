@@ -1,44 +1,111 @@
 /**
  * External dependencies
  */
-import ShallowRenderer from 'react-test-renderer/shallow';
-const shallowRenderer = new ShallowRenderer();
+import {
+	addBlock,
+	typeInRichText,
+	fireEvent,
+	getEditorHtml,
+	initializeEditor,
+	render,
+	setupCoreBlocks,
+} from 'test/helpers';
+
+/**
+ * WordPress dependencies
+ */
+import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import { PreformattedEdit } from '../edit';
+import PreformattedEdit from '../edit';
 
-describe( 'core/more/edit/native', () => {
-	it( 'renders without crashing', () => {
-		shallowRenderer.render(
+setupCoreBlocks();
+
+describe( 'Preformatted', () => {
+	it( 'should match snapshot when content is empty', () => {
+		const screen = render(
 			<PreformattedEdit
+				attributes={ {} }
 				setAttributes={ jest.fn() }
 				getStylesFromColorScheme={ jest.fn() }
 			/>
 		);
-		const element = shallowRenderer.getRenderOutput();
-		expect( element.type ).toBeDefined();
-	} );
-
-	it( 'should match snapshot when content is empty', () => {
-		shallowRenderer.render(
-			<PreformattedEdit
-				setAttributes={ jest.fn() }
-				getStylesFromColorScheme={ ( styles1 ) => styles1 }
-			/>
-		);
-		expect( shallowRenderer.getRenderOutput() ).toMatchSnapshot();
+		expect( screen.toJSON() ).toMatchSnapshot();
 	} );
 
 	it( 'should match snapshot when content is not empty', () => {
-		shallowRenderer.render(
+		const screen = render(
 			<PreformattedEdit
 				attributes={ { content: 'Hello World!' } }
 				setAttributes={ jest.fn() }
 				getStylesFromColorScheme={ ( styles1 ) => styles1 }
 			/>
 		);
-		expect( shallowRenderer.getRenderOutput() ).toMatchSnapshot();
+		expect( screen.toJSON() ).toMatchSnapshot();
+	} );
+
+	it( 'should produce expected markup for multiline text', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+
+		// Act
+		await addBlock( screen, 'Preformatted' );
+		const preformattedTextInput = await screen.findByPlaceholderText(
+			'Write preformatted text…'
+		);
+		typeInRichText( preformattedTextInput, 'A great statement.' );
+		fireEvent( preformattedTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+		typeInRichText( preformattedTextInput, 'Again' );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:preformatted -->
+		<pre class="wp-block-preformatted">A great statement.<br>Again</pre>
+		<!-- /wp:preformatted -->"
+	` );
+	} );
+
+	it( 'should split on triple Enter', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+
+		// Act
+		await addBlock( screen, 'Preformatted' );
+		const preformattedTextInput = await screen.findByPlaceholderText(
+			'Write preformatted text…'
+		);
+		typeInRichText( preformattedTextInput, 'Hello' );
+		fireEvent( preformattedTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+		fireEvent( preformattedTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+		fireEvent( preformattedTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:preformatted -->
+		<pre class="wp-block-preformatted">Hello</pre>
+		<!-- /wp:preformatted -->
+
+		<!-- wp:paragraph -->
+		<p></p>
+		<!-- /wp:paragraph -->"
+	` );
 	} );
 } );

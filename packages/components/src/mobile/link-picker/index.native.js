@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { Clipboard, SafeAreaView, TouchableOpacity, View } from 'react-native';
-import { lowerCase, startsWith } from 'lodash';
+import { SafeAreaView, TouchableOpacity, View } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 /**
  * WordPress dependencies
@@ -21,11 +21,11 @@ import LinkPickerResults from './link-picker-results';
 import NavBar from '../bottom-sheet/nav-bar';
 import styles from './styles.scss';
 
-// this creates a search suggestion for adding a url directly
+// This creates a search suggestion for adding a url directly.
 export const createDirectEntry = ( value ) => {
 	let type = 'URL';
 
-	const protocol = lowerCase( getProtocol( value ) ) || '';
+	const protocol = getProtocol( value )?.toLowerCase() || '';
 
 	if ( protocol.includes( 'mailto' ) ) {
 		type = 'mailto';
@@ -35,7 +35,7 @@ export const createDirectEntry = ( value ) => {
 		type = 'tel';
 	}
 
-	if ( startsWith( value, '#' ) ) {
+	if ( value?.startsWith( '#' ) ) {
 		type = 'internal';
 	}
 
@@ -57,14 +57,12 @@ export const LinkPicker = ( {
 	onLinkPicked,
 	onCancel: cancel,
 } ) => {
-	const [ { value, clipboardUrl }, setValue ] = useState( {
-		value: initialValue,
-		clipboardUrl: '',
-	} );
+	const [ value, setValue ] = useState( initialValue );
+	const [ clipboardUrl, setClipboardUrl ] = useState( '' );
 	const directEntry = createDirectEntry( value );
 
-	// the title of a direct entry is displayed as the raw input value, but if we
-	// are replacing empty text, we want to use the generated url
+	// The title of a direct entry is displayed as the raw input value, but if we
+	// are replacing empty text, we want to use the generated url.
 	const pickLink = ( { title, url, isDirectEntry } ) => {
 		onLinkPicked( { title: isDirectEntry ? url : title, url } );
 	};
@@ -74,7 +72,8 @@ export const LinkPicker = ( {
 	};
 
 	const clear = () => {
-		setValue( { value: '', clipboardUrl } );
+		setValue( '' );
+		setClipboardUrl( '' );
 	};
 
 	const omniCellStyle = usePreferredColorSchemeStyle(
@@ -89,8 +88,8 @@ export const LinkPicker = ( {
 
 	useEffect( () => {
 		getURLFromClipboard()
-			.then( ( url ) => setValue( { value, clipboardUrl: url } ) )
-			.catch( () => setValue( { value, clipboardUrl: '' } ) );
+			.then( setClipboardUrl )
+			.catch( () => setClipboardUrl( '' ) );
 	}, [] );
 
 	// TODO: Localize the accessibility label.
@@ -112,9 +111,7 @@ export const LinkPicker = ( {
 					autoCapitalize="none"
 					autoCorrect={ false }
 					keyboardType="url"
-					onChangeValue={ ( newValue ) => {
-						setValue( { value: newValue, clipboardUrl } );
-					} }
+					onChangeValue={ setValue }
 					onSubmit={ onSubmit }
 					/* eslint-disable-next-line jsx-a11y/no-autofocus */
 					autoFocus

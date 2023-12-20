@@ -148,23 +148,57 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * This function is run before each method
 	 */
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 		$this->endpoint = new WP_REST_Users_Controller();
 	}
 
 	/**
 	 * The following methods are implemented in core and tested.
 	 * We need to define them here because they exist in the abstract parent.
+	 *
+	 * @doesNotPerformAssertions
 	 */
 	public function test_register_routes() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_context_param() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_get_item() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_prepare_item() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_create_item() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_update_item() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_delete_item() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_get_items() {}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_get_item_schema() {}
 
 	public function test_registered_query_params() {

@@ -4,8 +4,8 @@
  *
  * @template T
  *
- * @param {T | null | undefined} value The value to check.
- * @return {value is T} Whether value is not null or undefined.
+ * @param {T} value The value to check.
+ * @return {value is Exclude<T, null | undefined>} Whether value is not null or undefined.
  */
 export function isValueDefined( value ) {
 	return value !== undefined && value !== null;
@@ -16,10 +16,8 @@ export function isValueDefined( value ) {
 /**
  * Determines if a value is empty, null, or undefined.
  *
- * @template T
- *
- * @param {T | "" | null | undefined} value The value to check.
- * @return {value is T} Whether value is empty.
+ * @param {string | number | null | undefined} value The value to check.
+ * @return {value is ("" | null | undefined)} Whether value is empty.
  */
 export function isValueEmpty( value ) {
 	const isEmptyString = value === '';
@@ -42,61 +40,23 @@ export function getDefinedValue( values = [], fallbackValue ) {
 }
 
 /**
- * @param {string} [locale]
- * @return {[RegExp, RegExp]} The delimiter and decimal regexp
+ * Converts a string to a number.
+ *
+ * @param {string} value
+ * @return {number} String as a number.
  */
-const getDelimiterAndDecimalRegex = ( locale ) => {
-	const formatted = Intl.NumberFormat( locale ).format( 1000.1 );
-	const delimiter = formatted[ 1 ];
-	const decimal = formatted[ formatted.length - 2 ];
-	return [
-		new RegExp( `\\${ delimiter }`, 'g' ),
-		new RegExp( `\\${ decimal }`, 'g' ),
-	];
+export const stringToNumber = ( value ) => {
+	return parseFloat( value );
 };
 
-// https://en.wikipedia.org/wiki/Decimal_separator#Current_standards
-const INTERNATIONAL_THOUSANDS_DELIMITER = / /g;
-
-const ARABIC_NUMERAL_LOCALES = [ 'ar', 'fa', 'ur', 'ckb', 'ps' ];
-
-const EASTERN_ARABIC_NUMBERS = /([۰-۹]|[٠-٩])/g;
-
 /**
- * Checks to see if a value is a numeric value (`number` or `string`).
+ * Regardless of the input being a string or a number, returns a number.
  *
- * Intentionally ignores whether the thousands delimiters are only
- * in the thousands marks.
+ * Returns `undefined` in case the string is `undefined` or not a valid numeric value.
  *
- * @param {any}    value
- * @param {string} [locale]
- * @return {boolean} Whether value is numeric.
+ * @param {string | number} value
+ * @return {number} The parsed number.
  */
-export function isValueNumeric( value, locale = window.navigator.language ) {
-	if ( ARABIC_NUMERAL_LOCALES.some( ( l ) => locale.startsWith( l ) ) ) {
-		locale = 'en-GB';
-		if ( EASTERN_ARABIC_NUMBERS.test( value ) ) {
-			value = value
-				.replace( /[٠-٩]/g, ( /** @type {string} */ d ) =>
-					'٠١٢٣٤٥٦٧٨٩'.indexOf( d )
-				)
-				.replace( /[۰-۹]/g, ( /** @type {string} */ d ) =>
-					'۰۱۲۳۴۵۶۷۸۹'.indexOf( d )
-				)
-				.replace( /٬/g, ',' )
-				.replace( /٫/g, '.' );
-		}
-	}
-
-	const [ delimiterRegexp, decimalRegexp ] = getDelimiterAndDecimalRegex(
-		locale
-	);
-	const valueToCheck =
-		typeof value === 'string'
-			? value
-					.replace( delimiterRegexp, '' )
-					.replace( decimalRegexp, '.' )
-					.replace( INTERNATIONAL_THOUSANDS_DELIMITER, '' )
-			: value;
-	return ! isNaN( parseFloat( valueToCheck ) ) && isFinite( valueToCheck );
-}
+export const ensureNumber = ( value ) => {
+	return typeof value === 'string' ? stringToNumber( value ) : value;
+};

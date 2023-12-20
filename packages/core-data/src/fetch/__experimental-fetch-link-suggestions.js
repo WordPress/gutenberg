@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Filters the search by type
  *
- * @typedef { 'post' | 'term' | 'post-format' } WPLinkSearchType
+ * @typedef { 'attachment' | 'post' | 'term' | 'post-format' } WPLinkSearchType
  */
 
 /**
@@ -36,6 +36,17 @@ import { __ } from '@wordpress/i18n';
  * @property {string} title  Title of the link.
  * @property {string} type   The taxonomy or post type slug or type URL.
  * @property {WPKind} [kind] Link kind of post-type or taxonomy
+ */
+
+/**
+ * @typedef WPLinkSearchResultAugments
+ *
+ * @property {{kind: WPKind}} [meta]    Contains kind information.
+ * @property {WPKind}         [subtype] Optional subtype if it exists.
+ */
+
+/**
+ * @typedef {WPLinkSearchResult & WPLinkSearchResultAugments} WPLinkSearchResultAugmented
  */
 
 /**
@@ -74,15 +85,27 @@ const fetchLinkSuggestions = async (
 ) => {
 	const {
 		isInitialSuggestions = false,
+		initialSuggestionsSearchOptions = undefined,
+	} = searchOptions;
+
+	const { disablePostFormats = false } = settings;
+
+	let {
 		type = undefined,
 		subtype = undefined,
 		page = undefined,
 		perPage = isInitialSuggestions ? 3 : 20,
 	} = searchOptions;
 
-	const { disablePostFormats = false } = settings;
-
+	/** @type {Promise<WPLinkSearchResult>[]} */
 	const queries = [];
+
+	if ( isInitialSuggestions && initialSuggestionsSearchOptions ) {
+		type = initialSuggestionsSearchOptions.type || type;
+		subtype = initialSuggestionsSearchOptions.subtype || subtype;
+		page = initialSuggestionsSearchOptions.page || page;
+		perPage = initialSuggestionsSearchOptions.perPage || perPage;
+	}
 
 	if ( ! type || type === 'post' ) {
 		queries.push(
@@ -103,7 +126,7 @@ const fetchLinkSuggestions = async (
 						};
 					} );
 				} )
-				.catch( () => [] ) // fail by returning no results
+				.catch( () => [] ) // Fail by returning no results.
 		);
 	}
 
@@ -126,7 +149,7 @@ const fetchLinkSuggestions = async (
 						};
 					} );
 				} )
-				.catch( () => [] )
+				.catch( () => [] ) // Fail by returning no results.
 		);
 	}
 
@@ -149,14 +172,36 @@ const fetchLinkSuggestions = async (
 						};
 					} );
 				} )
-				.catch( () => [] )
+				.catch( () => [] ) // Fail by returning no results.
+		);
+	}
+
+	if ( ! type || type === 'attachment' ) {
+		queries.push(
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/media', {
+					search,
+					page,
+					per_page: perPage,
+				} ),
+			} )
+				.then( ( results ) => {
+					return results.map( ( result ) => {
+						return {
+							...result,
+							meta: { kind: 'media' },
+						};
+					} );
+				} )
+				.catch( () => [] ) // Fail by returning no results.
 		);
 	}
 
 	return Promise.all( queries ).then( ( results ) => {
 		return results
 			.reduce(
-				( accumulator, current ) => accumulator.concat( current ), //flatten list
+				( /** @type {WPLinkSearchResult[]} */ accumulator, current ) =>
+					accumulator.concat( current ), // Flatten list.
 				[]
 			)
 			.filter(
@@ -168,22 +213,24 @@ const fetchLinkSuggestions = async (
 				}
 			)
 			.slice( 0, perPage )
-			.map(
-				/**
-				 * @param {{ id: number, url:string, title?:string, subtype?: string, type?: string }} result
-				 */
-				( result ) => {
-					return {
-						id: result.id,
-						url: result.url,
-						title:
-							decodeEntities( result.title || '' ) ||
-							__( '(no title)' ),
-						type: result.subtype || result.type,
-						kind: result?.meta?.kind,
-					};
-				}
-			);
+			.map( ( /** @type {WPLinkSearchResultAugmented} */ result ) => {
+				const isMedia = result.type === 'attachment';
+
+				return {
+					id: result.id,
+					// @ts-ignore fix when we make this a TS file
+					url: isMedia ? result.source_url : result.url,
+					title:
+						decodeEntities(
+							isMedia
+								? // @ts-ignore fix when we make this a TS file
+								  result.title.rendered
+								: result.title || ''
+						) || __( '(no title)' ),
+					type: result.subtype || result.type,
+					kind: result?.meta?.kind,
+				};
+			} );
 	} );
 };
 

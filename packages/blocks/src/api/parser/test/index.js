@@ -90,14 +90,41 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should fall back to the freeform content handler if block type not specified', () => {
-			registerBlockType( 'core/freeform-block', unknownBlockSettings );
-			setFreeformContentHandlerName( 'core/freeform-block' );
+			registerBlockType( 'core/freeform', unknownBlockSettings );
+			setFreeformContentHandlerName( 'core/freeform' );
 
 			const block = parseRawBlock( {
 				innerHTML: 'content',
 			} );
-			expect( block.name ).toEqual( 'core/freeform-block' );
+			expect( block.name ).toEqual( 'core/freeform' );
 			expect( block.attributes ).toEqual( { content: '<p>content</p>' } );
+		} );
+
+		it( 'skips adding paragraph tags if freeform block is set to core/html', () => {
+			registerBlockType( 'core/html', unknownBlockSettings );
+			setFreeformContentHandlerName( 'core/html' );
+
+			const block = parseRawBlock( {
+				innerHTML: 'content',
+			} );
+			expect( block.name ).toEqual( 'core/html' );
+			expect( block.attributes ).toEqual( { content: 'content' } );
+		} );
+
+		it( 'skips adding paragraph tags if __unstableSkipAutop is passed as an option', () => {
+			registerBlockType( 'core/freeform', unknownBlockSettings );
+			setFreeformContentHandlerName( 'core/freeform' );
+
+			const block = parseRawBlock(
+				{
+					innerHTML: 'content',
+				},
+				{
+					__unstableSkipAutop: true,
+				}
+			);
+			expect( block.name ).toEqual( 'core/freeform' );
+			expect( block.attributes ).toEqual( { content: 'content' } );
 		} );
 
 		it( 'should not create a block if no unknown type handler', () => {
@@ -107,51 +134,67 @@ describe( 'block parser', () => {
 			} );
 			expect( block ).toBeUndefined();
 		} );
-
-		it( 'should fallback to an older version of the block if the current one is invalid', () => {
-			registerBlockType( 'core/test-block', {
-				...defaultBlockSettings,
-				attributes: {
-					fruit: {
-						type: 'string',
-						source: 'text',
-						selector: 'div',
-					},
-				},
-				save: ( { attributes } ) => <div>{ attributes.fruit }</div>,
-				deprecated: [
-					{
-						attributes: {
-							fruit: {
-								type: 'string',
-								source: 'text',
-								selector: 'span',
-							},
+		describe( 'fall back to an older version of the block if the current one is invalid', () => {
+			beforeEach( () => {
+				registerBlockType( 'core/test-block', {
+					...defaultBlockSettings,
+					attributes: {
+						fruit: {
+							type: 'string',
+							source: 'text',
+							selector: 'div',
 						},
-						save: ( { attributes } ) => (
-							<span>{ attributes.fruit }</span>
-						),
-						migrate: ( attributes ) => ( {
-							fruit: 'Big ' + attributes.fruit,
-						} ),
 					},
-				],
+					save: ( { attributes } ) => <div>{ attributes.fruit }</div>,
+					deprecated: [
+						{
+							attributes: {
+								fruit: {
+									type: 'string',
+									source: 'text',
+									selector: 'span',
+								},
+							},
+							save: ( { attributes } ) => (
+								<span>{ attributes.fruit }</span>
+							),
+							migrate: ( attributes ) => ( {
+								fruit: 'Big ' + attributes.fruit,
+							} ),
+						},
+					],
+				} );
 			} );
-
-			const block = parseRawBlock( {
-				blockName: 'core/test-block',
-				innerHTML: '<span>Bananas</span>',
-				attrs: { fruit: 'Bananas' },
+			it( 'handle deprecation and log', () => {
+				const block = parseRawBlock( {
+					blockName: 'core/test-block',
+					innerHTML: '<span>Bananas</span>',
+					attrs: { fruit: 'Bananas' },
+				} );
+				expect( block.name ).toEqual( 'core/test-block' );
+				expect( block.attributes ).toEqual( { fruit: 'Big Bananas' } );
+				expect( block.isValid ).toBe( true );
+				expect( console ).toHaveInformed();
 			} );
-			expect( block.name ).toEqual( 'core/test-block' );
-			expect( block.attributes ).toEqual( { fruit: 'Big Bananas' } );
-			expect( block.isValid ).toBe( true );
-			expect( console ).toHaveInformed();
+			it( 'handle deprecation but not log', () => {
+				const block = parseRawBlock(
+					{
+						blockName: 'core/test-block',
+						innerHTML: '<span>Bananas</span>',
+						attrs: { fruit: 'Bananas' },
+					},
+					{ __unstableSkipMigrationLogs: true }
+				);
+				expect( block.name ).toEqual( 'core/test-block' );
+				expect( block.attributes ).toEqual( { fruit: 'Big Bananas' } );
+				expect( block.isValid ).toBe( true );
+				expect( console ).not.toHaveInformed();
+			} );
 		} );
 	} );
 
 	describe( 'parse', () => {
-		// run the test cases using the PegJS defined parser
+		// Run the test cases using the PegJS defined parser.
 		it( 'should parse the post content, including block attributes', () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {

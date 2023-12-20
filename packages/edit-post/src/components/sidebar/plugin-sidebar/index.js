@@ -34,10 +34,10 @@ import { store as editPostStore } from '../../../store';
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
- * var el = wp.element.createElement;
+ * var el = React.createElement;
  * var PanelBody = wp.components.PanelBody;
  * var PluginSidebar = wp.editPost.PluginSidebar;
- * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
+ * var moreIcon = React.createElement( 'svg' ); //... svg element.
  *
  * function MyPluginSidebar() {
  * 	return el(
@@ -84,9 +84,8 @@ export default function PluginSidebarEditPost( { className, ...props } ) {
 			shortcut: select(
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
-			showIconLabels: select( editPostStore ).isFeatureActive(
-				'showIconLabels'
-			),
+			showIconLabels:
+				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
 		};
 	}, [] );
 	return (

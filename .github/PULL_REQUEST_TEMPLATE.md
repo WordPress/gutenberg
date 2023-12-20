@@ -1,28 +1,22 @@
-<!-- Learn the overall process and best practices for pull requests at https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/repository-management.md#pull-requests. -->
+<!-- Thanks for contributing to Gutenberg! Please follow the Gutenberg Contributing Guidelines:
+https://github.com/WordPress/gutenberg/blob/trunk/CONTRIBUTING.md -->
 
-<!-- Gutenberg's license is in the process of updating to be dual-licensed under the GPL and MPL. As part of that transition, all new contributions are dual-licensed. For more information, see: https://github.com/WordPress/gutenberg/blob/trunk/LICENSE.md -->
+## What?
+<!-- In a few words, what is the PR actually doing? -->
 
-## Description
-<!-- Please describe what you have changed or added -->
+## Why?
+<!-- Why is this PR necessary? What problem is it solving? Reference any existing previous issue(s) or PR(s), but please add a short summary here, too -->
 
-## How has this been tested?
-<!-- Please describe in detail how you tested your changes. -->
-<!-- Include details of your testing environment, tests ran to see how -->
-<!-- your change affects other areas of the code, etc. -->
+## How?
+<!-- How is your PR addressing the issue at hand? What are the implementation details? -->
 
-## Screenshots <!-- if applicable -->
+## Testing Instructions
+<!-- Please include step by step instructions on how to test this PR. -->
+<!-- 1. Open a post or page. -->
+<!-- 2. Insert a heading block. -->
+<!-- 3. etc. -->
 
-## Types of changes
-<!-- What types of changes does your code introduce?  -->
-<!-- Bug fix (non-breaking change which fixes an issue) -->
-<!-- New feature (non-breaking change which adds functionality) -->
-<!-- Breaking change (fix or feature that would cause existing functionality to not work as expected) -->
+### Testing Instructions for Keyboard
+<!-- How can you test the changes by using the keyboard only? Please note, this is required for PRs that change the user interface (UI). This ensures the PR can be tested for any possible accessibility regressions. -->
 
-## Checklist:
-- [ ] My code is tested.
-- [ ] My code follows the WordPress code style. <!-- Check code: `npm run lint`, Guidelines: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/javascript/ -->
-- [ ] My code follows the accessibility standards. <!-- Guidelines: https://developer.wordpress.org/coding-standards/wordpress-coding-standards/accessibility/ -->
-- [ ] I've tested my changes with keyboard and screen readers. <!-- Instructions: https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/accessibility-testing.md -->
-- [ ] My code has proper inline documentation. <!-- Guidelines: https://developer.wordpress.org/coding-standards/inline-documentation-standards/javascript/ -->
-- [ ] I've included developer documentation if appropriate. <!-- Handbook: https://developer.wordpress.org/block-editor/ -->
-- [ ] I've updated all React Native files affected by any refactorings/renamings in this PR (please manually search all `*.native.js` files for terms that need renaming or removal). <!-- React Native mobile Gutenberg guidelines: https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/native-mobile.md -->
+## Screenshots or screencast <!-- if applicable -->

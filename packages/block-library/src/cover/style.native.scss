@@ -49,6 +49,10 @@
 	color: $white;
 }
 
+.defaultColorLightMode {
+	color: $black;
+}
+
 .background {
 	width: 100%;
 	height: 100%;
@@ -202,4 +206,15 @@
 
 .mediaPlaceholderEmptyStateContainer {
 	height: 300;
+}
+
+.selectedColorText {
+	font-family: $default-monospace-font;
+	color: $light-primary;
+	font-size: 16px;
+	font-weight: 400;
+}
+
+.selectedColorTextDark {
+	color: $dark-primary;
 }

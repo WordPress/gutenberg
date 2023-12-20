@@ -8,6 +8,8 @@ import { createHigherOrderComponent, pure } from '@wordpress/compose';
  */
 import useSelect from '../use-select';
 
+/** @typedef {import('react').ComponentType} ComponentType */
+
 /**
  * Higher-order component used to inject state-derived props using registered
  * selectors.
@@ -19,6 +21,7 @@ import useSelect from '../use-select';
  * @example
  * ```js
  * import { withSelect } from '@wordpress/data';
+ * import { store as myCustomStore } from 'my-custom-store';
  *
  * function PriceDisplay( { price, currency } ) {
  * 	return new Intl.NumberFormat( 'en-US', {
@@ -28,7 +31,7 @@ import useSelect from '../use-select';
  * }
  *
  * const HammerPriceDisplay = withSelect( ( select, ownProps ) => {
- * 	const { getPrice } = select( 'my-shop' );
+ * 	const { getPrice } = select( myCustomStore );
  * 	const { currency } = ownProps;
  *
  * 	return {
@@ -45,7 +48,7 @@ import useSelect from '../use-select';
  * component and update automatically if the price of a hammer ever changes in
  * the store.
  *
- * @return {WPComponent} Enhanced component with merged state data props.
+ * @return {ComponentType} Enhanced component with merged state data props.
  */
 const withSelect = ( mapSelectToProps ) =>
 	createHigherOrderComponent(

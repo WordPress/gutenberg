@@ -9,6 +9,7 @@ import {
 	publishPost,
 	saveDraft,
 	toggleOfflineMode,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 // Constant to override editor preference
@@ -56,9 +57,9 @@ async function getCurrentPostId() {
 
 async function setLocalAutosaveInterval( value ) {
 	return page.evaluate( ( _value ) => {
-		window.wp.data
-			.dispatch( 'core/edit-post' )
-			.__experimentalUpdateLocalAutosaveInterval( _value );
+		window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
+			localAutosaveInterval: _value,
+		} );
 	}, value );
 }
 
@@ -77,7 +78,7 @@ describe( 'autosave', () => {
 
 	it( 'should save to sessionStorage', async () => {
 		// Wait for the original timeout to kick in, it will schedule
-		// another run using the updated interval length of AUTOSAVE_INTERVAL_SECONDS
+		// another run using the updated interval length of AUTOSAVE_INTERVAL_SECONDS.
 		await sleep( 15 );
 
 		await clickBlockAppender();
@@ -86,7 +87,7 @@ describe( 'autosave', () => {
 		await sleep( 1 );
 		await page.keyboard.type( ' after save' );
 
-		// Wait long enough for local autosave to kick in
+		// Wait long enough for local autosave to kick in.
 		await sleep( AUTOSAVE_INTERVAL_SECONDS + 1 );
 
 		const id = await getCurrentPostId();
@@ -101,11 +102,11 @@ describe( 'autosave', () => {
 		await saveDraftWithKeyboard();
 		await page.keyboard.type( ' after save' );
 
-		// Trigger local autosave
+		// Trigger local autosave.
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
-		// Reload without saving on the server
+		// Reload without saving on the server.
 		await page.reload();
 		await page.waitForSelector( '.edit-post-layout' );
 
@@ -129,7 +130,7 @@ describe( 'autosave', () => {
 		await page.keyboard.type( 'before save' );
 		await saveDraft();
 
-		// Fake local autosave
+		// Fake local autosave.
 		await page.evaluate(
 			( postId ) =>
 				window.sessionStorage.setItem(
@@ -161,13 +162,13 @@ describe( 'autosave', () => {
 	} );
 
 	it( 'should clear local autosave after successful remote autosave', async () => {
-		// Edit, save draft, edit again
+		// Edit, save draft, edit again.
 		await clickBlockAppender();
 		await page.keyboard.type( 'before save' );
 		await saveDraftWithKeyboard();
 		await page.keyboard.type( ' after save' );
 
-		// Trigger local autosave
+		// Trigger local autosave.
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
@@ -175,7 +176,7 @@ describe( 'autosave', () => {
 			await page.evaluate( () => window.sessionStorage.length )
 		).toBeGreaterThanOrEqual( 1 );
 
-		// Trigger remote autosave
+		// Trigger remote autosave.
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/editor' ).autosave()
 		);
@@ -185,13 +186,13 @@ describe( 'autosave', () => {
 	} );
 
 	it( "shouldn't clear local autosave if remote autosave fails", async () => {
-		// Edit, save draft, edit again
+		// Edit, save draft, edit again.
 		await clickBlockAppender();
 		await page.keyboard.type( 'before save' );
 		await saveDraftWithKeyboard();
 		await page.keyboard.type( ' after save' );
 
-		// Trigger local autosave
+		// Trigger local autosave.
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
@@ -199,7 +200,7 @@ describe( 'autosave', () => {
 			await page.evaluate( () => window.sessionStorage.length )
 		).toBe( 1 );
 
-		// Bring network down and attempt to autosave remotely
+		// Bring network down and attempt to autosave remotely.
 		toggleOfflineMode( true );
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/editor' ).autosave()
@@ -210,13 +211,13 @@ describe( 'autosave', () => {
 	} );
 
 	it( 'should clear local autosave after successful save', async () => {
-		// Edit, save draft, edit again
+		// Edit, save draft, edit again.
 		await clickBlockAppender();
 		await page.keyboard.type( 'before save' );
 		await saveDraftWithKeyboard();
 		await page.keyboard.type( ' after save' );
 
-		// Trigger local autosave
+		// Trigger local autosave.
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
@@ -231,13 +232,13 @@ describe( 'autosave', () => {
 	} );
 
 	it( "shouldn't clear local autosave if save fails", async () => {
-		// Edit, save draft, edit again
+		// Edit, save draft, edit again.
 		await clickBlockAppender();
 		await page.keyboard.type( 'before save' );
 		await saveDraftWithKeyboard();
 		await page.keyboard.type( ' after save' );
 
-		// Trigger local autosave
+		// Trigger local autosave.
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
@@ -245,7 +246,7 @@ describe( 'autosave', () => {
 			await page.evaluate( () => window.sessionStorage.length )
 		).toBeGreaterThanOrEqual( 1 );
 
-		// Bring network down and attempt to save
+		// Bring network down and attempt to save.
 		toggleOfflineMode( true );
 		saveDraftWithKeyboard();
 		expect(
@@ -258,15 +259,15 @@ describe( 'autosave', () => {
 		await page.keyboard.type( 'before publish' );
 		await publishPost();
 
-		await page.click( '[data-type="core/paragraph"]' );
+		await canvas().click( '[data-type="core/paragraph"]' );
 		await page.keyboard.type( ' after publish' );
 
-		// Trigger remote autosave
+		// Trigger remote autosave.
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/editor' ).autosave()
 		);
 
-		// Force conflicting local autosave
+		// Force conflicting local autosave.
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
@@ -307,7 +308,7 @@ describe( 'autosave', () => {
 		await page.keyboard.type( 'before save' );
 		await saveDraft();
 
-		// Fake local autosave
+		// Fake local autosave.
 		await page.evaluate(
 			( postId ) =>
 				window.sessionStorage.setItem(

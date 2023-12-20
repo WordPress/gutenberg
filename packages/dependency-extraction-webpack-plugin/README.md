@@ -17,7 +17,7 @@ Install the module
 npm install @wordpress/dependency-extraction-webpack-plugin --save-dev
 ```
 
-**Note**: This package requires Node.js 12.0.0 or later. It also requires webpack 4.8.3 and newer. It is not compatible with older versions.
+**Note**: This package requires Node.js 14.0.0 or later. It also requires webpack 4.8.3 and newer. It is not compatible with older versions.
 
 ## Usage
 
@@ -62,13 +62,13 @@ For example:
 
 ```
 // Source file entrypoint.js
-import { Component } from '@wordpress/element';
+import { Component } from 'react';
 
 // Webpack will produce the output output/entrypoint.js
 /* bundled JavaScript output */
 
 // Webpack will also produce output/entrypoint.asset.php declaring script dependencies
-<?php return array('dependencies' => array('wp-element'), 'version' => 'dd4c2dc50d046ed9d4c063a7ca95702f');
+<?php return array('dependencies' => array('react'), 'version' => 'dd4c2dc50d046ed9d4c063a7ca95702f');
 ```
 
 By default, the following module requests are handled:
@@ -109,8 +109,8 @@ The output format for the generated asset file. There are two options available:
 
 ##### `outputFilename`
 
-- Type: string | function
-- Default: null
+-   Type: string | function
+-   Default: null
 
 The filename for the generated asset file. Accepts the same values as the Webpack `output.filename` option.
 
@@ -233,4 +233,10 @@ $script_url = plugins_url( $script_path, __FILE__ );
 wp_enqueue_script( 'script', $script_url, $script_asset['dependencies'], $script_asset['version'] );
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

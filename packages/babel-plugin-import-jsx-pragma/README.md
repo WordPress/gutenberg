@@ -14,7 +14,7 @@ Install the module to your project using [npm](https://www.npmjs.com/).
 npm install @wordpress/babel-plugin-import-jsx-pragma
 ```
 
-**Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js 14.0.0 or later. It is not compatible with older versions.
 
 ## Usage
 
@@ -38,7 +38,7 @@ _Note:_ `@wordpress/babel-plugin-import-jsx-pragma` is included in `@wordpress/b
 
 As the `@babel/plugin-transform-react-jsx` plugin offers options to customize the `pragma` to which the transform references, there are equivalent options to assign for customizing the imports generated.
 
-For example, if you are using the `@wordpress/element` package, you may want to use the following configuration:
+For example, if you are using the `react` package, you may want to use the following configuration:
 
 ```js
 // .babelrc.js
@@ -49,7 +49,7 @@ module.exports = {
 			{
 				scopeVariable: 'createElement',
 				scopeVariableFrag: 'Fragment',
-				source: '@wordpress/element',
+				source: 'react',
 				isDefault: false,
 			},
 		],
@@ -90,4 +90,10 @@ _Type:_ Boolean
 Whether the scopeVariable is the default import of the source module. Note that this has no impact
 on `scopeVariableFrag`.
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

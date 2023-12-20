@@ -10,11 +10,11 @@ import { store as editorStore } from '@wordpress/editor';
 
 export default function CopyContentMenuItem() {
 	const { createNotice } = useDispatch( noticesStore );
-	const getText = useSelect(
-		( select ) => () =>
-			select( editorStore ).getEditedPostAttribute( 'content' ),
-		[]
-	);
+	const { getEditedPostAttribute } = useSelect( editorStore );
+
+	function getText() {
+		return getEditedPostAttribute( 'content' );
+	}
 
 	function onSuccess() {
 		createNotice( 'info', __( 'All content copied.' ), {
@@ -25,5 +25,5 @@ export default function CopyContentMenuItem() {
 
 	const ref = useCopyToClipboard( getText, onSuccess );
 
-	return <MenuItem ref={ ref }>{ __( 'Copy all content' ) }</MenuItem>;
+	return <MenuItem ref={ ref }>{ __( 'Copy all blocks' ) }</MenuItem>;
 }

@@ -29,18 +29,18 @@ import { isShallowEqualArrays } from '@wordpress/is-shallow-equal';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 ```
 
-Shallow comparison differs from deep comparison by the fact that it compares members from each as being strictly equal to the other, meaning that arrays and objects will be compared by their _references_, not by their values (see also [_Object Equality in JavaScript_.](http://adripofjavascript.com/blog/drips/object-equality-in-javascript.html)) In situations where nested objects must be compared by value, consider using [Lodash's `isEqual`](https://lodash.com/docs/4.17.11#isEqual) instead.
+Shallow comparison differs from deep comparison by the fact that it compares members from each as being strictly equal to the other, meaning that arrays and objects will be compared by their _references_, not by their values (see also [_Object Equality in JavaScript_.](http://adripofjavascript.com/blog/drips/object-equality-in-javascript.html)) In situations where nested objects must be compared by value, consider using [`fast-deep-equal`](https://github.com/epoberezkin/fast-deep-equal) instead.
 
 ```js
 import isShallowEqual from '@wordpress/is-shallow-equal';
-import { isEqual } from 'lodash'; // deep comparison
+import fastDeepEqual from 'fast-deep-equal/es6'; // deep comparison
 
 let object = { a: 1 };
 
 isShallowEqual( [ { a: 1 } ], [ { a: 1 } ] );
 // ⇒ false
 
-isEqual( [ { a: 1 } ], [ { a: 1 } ] );
+fastDeepEqual( [ { a: 1 } ], [ { a: 1 } ] );
 // ⇒ true
 
 isShallowEqual( [ object ], [ object ] );
@@ -93,4 +93,10 @@ npm run build:packages
 node ./packages/is-shallow-equal/benchmark
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

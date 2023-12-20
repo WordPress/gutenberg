@@ -20,9 +20,7 @@ _Returns_
 
 ### getActiveGeneralSidebarName
 
-Returns the current active general sidebar name, or null if there is no
-general sidebar active. The active general sidebar is a unique name to
-identify either an editor or plugin sidebar.
+Returns the current active general sidebar name, or null if there is no general sidebar active. The active general sidebar is a unique name to identify either an editor or plugin sidebar.
 
 Examples:
 
@@ -81,6 +79,14 @@ _Returns_
 
 -   `string`: Editing mode.
 
+### getHiddenBlockTypes
+
+Returns an array of blocks that are hidden.
+
+_Returns_
+
+-   `Array`: A list of the hidden block types
+
 ### getMetaBoxesPerLocation
 
 Returns the list of all the available meta boxes for a given location.
@@ -132,20 +138,15 @@ _Returns_
 
 ### isEditingTemplate
 
+> **Deprecated**
+
 Returns true if the template editing mode is enabled.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: Whether we're editing the template.
 
 ### isEditorPanelEnabled
 
-Returns true if the given panel is enabled, or false otherwise. Panels are
-enabled by default.
+> **Deprecated**
+
+Returns true if the given panel is enabled, or false otherwise. Panels are enabled by default.
 
 _Parameters_
 
@@ -158,8 +159,9 @@ _Returns_
 
 ### isEditorPanelOpened
 
-Returns true if the given panel is open, or false otherwise. Panels are
-closed by default.
+> **Deprecated**
+
+Returns true if the given panel is open, or false otherwise. Panels are closed by default.
 
 _Parameters_
 
@@ -172,8 +174,9 @@ _Returns_
 
 ### isEditorPanelRemoved
 
-Returns true if the given panel was programmatically removed, or false otherwise.
-All panels are not removed by default.
+> **Deprecated**
+
+Returns true if the given panel was programmatically removed, or false otherwise. All panels are not removed by default.
 
 _Parameters_
 
@@ -211,6 +214,8 @@ _Returns_
 
 ### isInserterOpened
 
+> **Deprecated**
+
 Returns true if the inserter is opened.
 
 _Parameters_
@@ -235,8 +240,7 @@ _Returns_
 
 ### isMetaBoxLocationActive
 
-Returns true if there is an active meta box in the given location, or false
-otherwise.
+Returns true if there is an active meta box in the given location, or false otherwise.
 
 _Parameters_
 
@@ -262,6 +266,8 @@ _Returns_
 
 ### isModalActive
 
+> **Deprecated** since WP 6.3 use `core/interface` store's selector with the same name instead.
+
 Returns true if a modal is active, or false otherwise.
 
 _Parameters_
@@ -275,8 +281,7 @@ _Returns_
 
 ### isPluginItemPinned
 
-Returns true if the plugin item is pinned to the header.
-When the value is not set it defaults to true.
+Returns true if the plugin item is pinned to the header. When the value is not set it defaults to true.
 
 _Parameters_
 
@@ -335,6 +340,8 @@ Returns an action object signalling that the user closed the sidebar.
 
 ### closeModal
 
+> **Deprecated** since WP 6.3 use `core/interface` store's action with the same name instead.
+
 Returns an action object signalling that the user closed a modal.
 
 _Returns_
@@ -343,8 +350,7 @@ _Returns_
 
 ### closePublishSidebar
 
-Returns an action object used in signalling that the user closed the
-publish sidebar.
+Returns an action object used in signalling that the user closed the publish sidebar.
 
 _Returns_
 
@@ -352,16 +358,11 @@ _Returns_
 
 ### hideBlockTypes
 
-Returns an action object used in signalling that block types by the given
-name(s) should be hidden.
+Update the provided block types to be hidden.
 
 _Parameters_
 
 -   _blockNames_ `string[]`: Names of block types to hide.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### initializeMetaBoxes
 
@@ -393,6 +394,8 @@ _Parameters_
 
 ### openModal
 
+> **Deprecated** since WP 6.3 use `core/interface` store's action with the same name instead.
+
 Returns an action object used in signalling that the user opened a modal.
 
 _Parameters_
@@ -405,14 +408,15 @@ _Returns_
 
 ### openPublishSidebar
 
-Returns an action object used in signalling that the user opened the publish
-sidebar.
+Returns an action object used in signalling that the user opened the publish sidebar.
 
 _Returns_
 
 -   `Object`: Action object
 
 ### removeEditorPanel
+
+> **Deprecated**
 
 Returns an action object used to remove a panel from the editor.
 
@@ -426,12 +430,11 @@ _Returns_
 
 ### requestMetaBoxUpdates
 
-Returns an action object used to request meta box update.
+Update a metabox.
 
 ### setAvailableMetaBoxesPerLocation
 
-Returns an action object used in signaling
-what Meta boxes are available in which location.
+Stores info about which Meta boxes are available in which location.
 
 _Parameters_
 
@@ -439,31 +442,23 @@ _Parameters_
 
 ### setIsEditingTemplate
 
+> **Deprecated**
+
 Returns an action object used to switch to template editing.
 
-_Parameters_
-
--   _value_ `boolean`: Is editing template.
-
-_Returns_
-
--   `Object`: Action object.
-
 ### setIsInserterOpened
+
+> **Deprecated**
 
 Returns an action object used to open/close the inserter.
 
 _Parameters_
 
--   _value_ `boolean|Object`: Whether the inserter should be opened (true) or closed (false). To specify an insertion point, use an object.
--   _value.rootClientId_ `string`: The root client ID to insert at.
--   _value.insertionIndex_ `number`: The index to insert at.
-
-_Returns_
-
--   `Object`: Action object.
+-   _value_ `boolean|Object`: Whether the inserter should be opened (true) or closed (false).
 
 ### setIsListViewOpened
+
+> **Deprecated**
 
 Returns an action object used to open/close the list view.
 
@@ -471,28 +466,29 @@ _Parameters_
 
 -   _isOpen_ `boolean`: A boolean representing whether the list view should be opened or closed.
 
-_Returns_
-
--   `Object`: Action object.
-
 ### showBlockTypes
 
-Returns an action object used in signalling that block types by the given
-name(s) should be shown.
+Update the provided block types to be visible.
 
 _Parameters_
 
 -   _blockNames_ `string[]`: Names of block types to show.
 
-_Returns_
-
--   `Object`: Action object.
-
 ### switchEditorMode
 
-Undocumented declaration.
+Triggers an action used to switch editor mode.
+
+_Parameters_
+
+-   _mode_ `string`: The editor mode.
+
+### toggleDistractionFree
+
+Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
 
 ### toggleEditorPanelEnabled
+
+> **Deprecated**
 
 Returns an action object used to enable or disable a panel in the editor.
 
@@ -506,15 +502,13 @@ _Returns_
 
 ### toggleEditorPanelOpened
 
-Returns an action object used to open or close a panel in the editor.
+> **Deprecated**
+
+Opens a closed panel and closes an open panel.
 
 _Parameters_
 
 -   _panelName_ `string`: A string that identifies the panel to open or close.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### toggleFeature
 
@@ -548,9 +542,5 @@ _Parameters_
 
 -   _blockName_ `string`: Name of the block.
 -   _blockStyle_ `?string`: Name of the style that should be auto applied. If undefined, the "auto apply" setting of the block is removed.
-
-_Returns_
-
--   `Object`: Action object.
 
 <!-- END TOKEN(Autogenerated actions|../../../packages/edit-post/src/store/actions.js) -->

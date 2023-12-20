@@ -37,8 +37,8 @@ When returned by your block's `edit` implementation, renders a toolbar of icon b
 Example:
 
 ```js
-( function ( editor, element ) {
-	var el = element.createElement,
+( function ( editor, React ) {
+	var el = React.createElement,
 		BlockControls = editor.BlockControls,
 		AlignmentToolbar = editor.AlignmentToolbar;
 
@@ -64,7 +64,7 @@ Example:
 			),
 		];
 	}
-} )( window.wp.editor, window.wp.element );
+} )( window.wp.editor, window.React );
 ```
 
 Note in this example that we render `AlignmentToolbar` as a child of the `BlockControls` element. This is another pre-configured component you can use to simplify block text alignment.
@@ -91,17 +91,12 @@ The following properties (non-exhaustive list) are made available:
 -   `placeholder: string` - A text hint to be shown to the user when the field
     value is empty, similar to the
     [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
--   `multiline: String` - A tag name to use for the tag that should be inserted
-    when Enter is pressed. For example: `li` in a list block, and `p` for a
-    block that can contain multiple paragraphs. The default is that only inline
-    elements are allowed to be used in inserted into the text, effectively
-    disabling the behavior of the "Enter" key.
 
 Example:
 
 ```js
-( function ( editor, element ) {
-	var el = element.createElement,
+( function ( editor, React ) {
+	var el = React.createElement,
 		RichText = editor.RichText;
 
 	function edit( props ) {
@@ -116,7 +111,13 @@ Example:
 	}
 
 	// blocks.registerBlockType( ..., { edit: edit, ... } );
-} )( window.wp.editor, window.wp.element );
+} )( window.wp.editor, window.React );
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

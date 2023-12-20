@@ -1,7 +1,7 @@
 // Developer notes: these rules are duplicated for the site editor.
 // They need to be updated in both places.
 
-.edit-post-fullscreen-mode-close.has-icon {
+.edit-post-fullscreen-mode-close.components-button {
 	// Do not show the toolbar icon on small screens,
 	// when Fullscreen Mode is not an option in the "More" menu.
 	display: none;
@@ -35,7 +35,7 @@
 			position: absolute;
 			top: 9px;
 			right: 9px;
-			bottom: 9px;
+			bottom: 9px + $border-width; // Height of toolbar in edit-post (not edit-site) is 61px tall.
 			left: 9px;
 			border-radius: $radius-block-ui + $border-width + $border-width;
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-900;
@@ -44,6 +44,10 @@
 		// Hover color.
 		&:hover::before {
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-700;
+		}
+
+		&.has-icon:hover::before {
+			box-shadow: none;
 		}
 
 		// Lightened spot color focus.

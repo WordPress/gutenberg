@@ -1,0 +1,3 @@
+<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"></div>
+<!-- /wp:group -->

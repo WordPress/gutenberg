@@ -1,82 +1,121 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { createSlotFill, PanelBody } from '@wordpress/components';
+import { memo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { cog } from '@wordpress/icons';
-import { useEffect } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorScreen as NavigatorScreen,
+} from '@wordpress/components';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import DefaultSidebar from './default-sidebar';
-import GlobalStylesSidebar from './global-styles-sidebar';
-import { STORE_NAME } from '../../store/constants';
-import SettingsHeader from './settings-header';
-import TemplateCard from './template-card';
-import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
+import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
+import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
+import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
+import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
+import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
+import useSyncPathWithURL, {
+	getPathFromURL,
+} from '../sync-state-with-url/use-sync-path-with-url';
+import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
+import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
+import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
+import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
+import SaveHub from '../save-hub';
+import { unlock } from '../../lock-unlock';
+import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
+import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
+import SidebarNavigationScreen from '../sidebar-navigation-screen';
+import DataViewsSidebarContent from '../sidebar-dataviews';
 
-const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
-	'EditSiteSidebarInspector'
-);
-export const SidebarInspectorFill = InspectorFill;
+const { useLocation } = unlock( routerPrivateApis );
 
-export function SidebarComplementaryAreaFills() {
-	const { sidebar, isEditorSidebarOpened, hasBlockSelection } = useSelect(
-		( select ) => {
-			const _sidebar = select(
-				interfaceStore
-			).getActiveComplementaryArea( STORE_NAME );
-			const _isEditorSidebarOpened = [
-				SIDEBAR_BLOCK,
-				SIDEBAR_TEMPLATE,
-			].includes( _sidebar );
-			return {
-				sidebar: _sidebar,
-				isEditorSidebarOpened: _isEditorSidebarOpened,
-				hasBlockSelection: !! select(
-					blockEditorStore
-				).getBlockSelectionStart(),
-			};
-		},
-		[]
+function SidebarScreenWrapper( { className, ...props } ) {
+	return (
+		<NavigatorScreen
+			className={ classNames(
+				'edit-site-sidebar__screen-wrapper',
+				className
+			) }
+			{ ...props }
+		/>
 	);
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	useEffect( () => {
-		if ( ! isEditorSidebarOpened ) return;
-		if ( hasBlockSelection ) {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
-		} else {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
-		}
-	}, [ hasBlockSelection, isEditorSidebarOpened ] );
-	let sidebarName = sidebar;
-	if ( ! isEditorSidebarOpened ) {
-		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
-	}
+}
+
+function SidebarScreens() {
+	useSyncPathWithURL();
+
 	return (
 		<>
-			<DefaultSidebar
-				identifier={ sidebarName }
-				title={ __( 'Settings' ) }
-				icon={ cog }
-				closeLabel={ __( 'Close settings sidebar' ) }
-				header={ <SettingsHeader sidebarName={ sidebarName } /> }
-				headerClassName="edit-site-sidebar__panel-tabs"
-			>
-				{ sidebarName === SIDEBAR_TEMPLATE && (
-					<PanelBody>
-						<TemplateCard />
-					</PanelBody>
-				) }
-				{ sidebarName === SIDEBAR_BLOCK && (
-					<InspectorSlot bubblesVirtually />
-				) }
-			</DefaultSidebar>
-			<GlobalStylesSidebar />
+			<SidebarScreenWrapper path="/">
+				<SidebarNavigationScreenMain />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/navigation">
+				<SidebarNavigationScreenNavigationMenus />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/navigation/:postType/:postId">
+				<SidebarNavigationScreenNavigationMenu />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/wp_global_styles">
+				<SidebarNavigationScreenGlobalStyles />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/page">
+				<SidebarNavigationScreenPages />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/page/:postId">
+				<SidebarNavigationScreenPage />
+			</SidebarScreenWrapper>
+			{ window?.__experimentalAdminViews && (
+				<SidebarScreenWrapper path="/pages">
+					<SidebarNavigationScreen
+						title={ __( 'Pages' ) }
+						backPath="/page"
+						content={ <DataViewsSidebarContent /> }
+					/>
+				</SidebarScreenWrapper>
+			) }
+			<SidebarScreenWrapper path="/:postType(wp_template)">
+				<SidebarNavigationScreenTemplates />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/patterns">
+				<SidebarNavigationScreenPatterns />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/:postType(wp_template|wp_template_part)/all">
+				<SidebarNavigationScreenTemplatesBrowse />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/:postType(wp_template_part|wp_block)/:postId">
+				<SidebarNavigationScreenPattern />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/:postType(wp_template)/:postId">
+				<SidebarNavigationScreenTemplate />
+			</SidebarScreenWrapper>
 		</>
 	);
 }
+
+function Sidebar() {
+	const { params: urlParams } = useLocation();
+	const initialPath = useRef( getPathFromURL( urlParams ) );
+
+	return (
+		<>
+			<NavigatorProvider
+				className="edit-site-sidebar__content"
+				initialPath={ initialPath.current }
+			>
+				<SidebarScreens />
+			</NavigatorProvider>
+			<SaveHub />
+		</>
+	);
+}
+
+export default memo( Sidebar );

@@ -1,0 +1,14 @@
+{
+	"apiVersion": 2,
+	"name": "test/directive-context",
+	"title": "E2E Interactivity tests - directive context",
+	"category": "text",
+	"icon": "heart",
+	"description": "",
+	"supports": {
+		"interactivity": true
+	},
+	"textdomain": "e2e-interactivity",
+	"viewScript": "directive-context-view",
+	"render": "file:./render.php"
+}

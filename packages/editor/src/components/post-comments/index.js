@@ -3,22 +3,29 @@
  */
 import { __ } from '@wordpress/i18n';
 import { CheckboxControl } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 
-function PostComments( { commentStatus = 'open', ...props } ) {
+function PostComments() {
+	const commentStatus = useSelect(
+		( select ) =>
+			select( editorStore ).getEditedPostAttribute( 'comment_status' ) ??
+			'open',
+		[]
+	);
+	const { editPost } = useDispatch( editorStore );
 	const onToggleComments = () =>
-		props.editPost( {
+		editPost( {
 			comment_status: commentStatus === 'open' ? 'closed' : 'open',
 		} );
 
 	return (
 		<CheckboxControl
+			__nextHasNoMarginBottom
 			label={ __( 'Allow comments' ) }
 			checked={ commentStatus === 'open' }
 			onChange={ onToggleComments }
@@ -26,15 +33,4 @@ function PostComments( { commentStatus = 'open', ...props } ) {
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		return {
-			commentStatus: select( editorStore ).getEditedPostAttribute(
-				'comment_status'
-			),
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		editPost: dispatch( editorStore ).editPost,
-	} ) ),
-] )( PostComments );
+export default PostComments;

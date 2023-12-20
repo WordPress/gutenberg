@@ -129,9 +129,8 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 
 					// Merge with any JSX identifiers in scope, if any.
 					if ( FUNCTION_SCOPE_JSX_IDENTIFIERS.has( functionScope ) ) {
-						const jsxIdentifiers = FUNCTION_SCOPE_JSX_IDENTIFIERS.get(
-							functionScope
-						);
+						const jsxIdentifiers =
+							FUNCTION_SCOPE_JSX_IDENTIFIERS.get( functionScope );
 
 						identifiers.push( ...jsxIdentifiers );
 					}

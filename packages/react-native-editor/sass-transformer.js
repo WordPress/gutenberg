@@ -42,7 +42,7 @@ const css2rn = require( 'css-to-react-native-transform' ).default;
 // eslint-disable-next-line import/no-extraneous-dependencies
 const upstreamTransformer = require( 'metro-react-native-babel-transformer' );
 
-// TODO: need to find a way to pass the include paths and the default asset files via some config
+// TODO: need to find a way to pass the include paths and the default asset files via some config.
 const autoImportIncludePaths = [
 	path.join( path.dirname( __filename ), 'src' ),
 	path.join( path.dirname( __filename ), '../base-styles' ),
@@ -59,12 +59,12 @@ const autoImportAssets = [
 const imports =
 	'@import "' + autoImportAssets.join( '";\n@import "' ) + '";\n\n';
 
-// Iterate through the include paths and extensions to find the file variant
+// Iterate through the include paths and extensions to find the file variant.
 function findVariant( name, extensions, includePaths ) {
 	for ( let i = 0; i < includePaths.length; i++ ) {
 		const includePath = includePaths[ i ];
 
-		// try to find the file iterating through the extensions, in order.
+		// Try to find the file iterating through the extensions, in order.
 		const foundExtention = extensions.find( ( extension ) => {
 			const fname = includePath + '/' + name + extension;
 			const partialfname = includePath + '/_' + name + extension;
@@ -80,15 +80,15 @@ function findVariant( name, extensions, includePaths ) {
 }
 
 // Transform function taken from react-native-sass-transformer but extended to have more include paths
-//  and detect and use RN platform specific file variants
+// and detect and use RN platform specific file variants.
 function transform( src, filename, options ) {
 	if ( typeof src === 'object' ) {
-		// handle RN >= 0.46
+		// Handle RN >= 0.46.
 		( { src, filename, options } = src );
 	}
 
 	const exts = [
-		// add the platform specific extension, first in the array to take precedence
+		// Add the platform specific extension, first in the array to take precedence.
 		options.platform === 'android' ? '.android.scss' : '.ios.scss',
 		'.native.scss',
 		'.scss',
@@ -101,11 +101,11 @@ function transform( src, filename, options ) {
 				path.dirname( filename ),
 				...autoImportIncludePaths,
 			],
-			importer( url /*, prev, done */ ) {
+			importer( url /* , prev, done */ ) {
 				// url is the path in import as is, which LibSass encountered.
 				// prev is the previously resolved path.
 				// done is an optional callback, either consume it or return value synchronously.
-				// this.options contains this options hash, this.callback contains the node-style callback
+				// this.options contains this options hash, this.callback contains the node-style callback.
 
 				const urlPath = path.parse( url );
 				const importerOptions = this.options;
@@ -115,7 +115,7 @@ function transform( src, filename, options ) {
 				if ( urlPath.dir.length > 0 ) {
 					incPaths.unshift(
 						path.resolve( path.dirname( filename ), urlPath.dir )
-					); // add the file's dir to the search array
+					); // Add the file's dir to the search array.
 				}
 				const f = findVariant( urlPath.name, exts, incPaths );
 
@@ -142,7 +142,7 @@ function transform( src, filename, options ) {
 
 module.exports.transform = function ( { src, filename, options } ) {
 	if ( filename.endsWith( '.scss' ) || filename.endsWith( '.sass' ) ) {
-		// "auto-import" the stylesheets the GB webpack config imports
+		// "auto-import" the stylesheets the GB webpack config imports.
 		src = imports + src;
 		return transform( { src, filename, options } );
 	}

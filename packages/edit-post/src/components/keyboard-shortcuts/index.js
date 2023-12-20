@@ -10,6 +10,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -17,27 +18,55 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { getBlockSelectionStart } = useSelect( blockEditorStore );
-	const {
-		getEditorMode,
-		isEditorSidebarOpened,
-		isListViewOpened,
-	} = useSelect( editPostStore );
+	const { getEditorMode, isEditorSidebarOpened } = useSelect( editPostStore );
 	const isModeToggleDisabled = useSelect( ( select ) => {
-		const { richEditingEnabled, codeEditingEnabled } = select(
-			editorStore
-		).getEditorSettings();
+		const { richEditingEnabled, codeEditingEnabled } =
+			select( editorStore ).getEditorSettings();
 		return ! richEditingEnabled || ! codeEditingEnabled;
 	}, [] );
-
 	const {
 		switchEditorMode,
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		toggleFeature,
-		setIsListViewOpened,
+		toggleDistractionFree,
 	} = useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const {
+		getBlockName,
+		getSelectedBlockClientId,
+		getBlockAttributes,
+		getBlockSelectionStart,
+	} = useSelect( blockEditorStore );
+
+	const handleTextLevelShortcut = ( event, level ) => {
+		event.preventDefault();
+		const destinationBlockName =
+			level === 0 ? 'core/paragraph' : 'core/heading';
+		const currentClientId = getSelectedBlockClientId();
+		if ( currentClientId === null ) {
+			return;
+		}
+		const blockName = getBlockName( currentClientId );
+		if ( blockName !== 'core/paragraph' && blockName !== 'core/heading' ) {
+			return;
+		}
+		const attributes = getBlockAttributes( currentClientId );
+		const textAlign =
+			blockName === 'core/paragraph' ? 'align' : 'textAlign';
+		const destinationTextAlign =
+			destinationBlockName === 'core/paragraph' ? 'align' : 'textAlign';
+
+		replaceBlocks(
+			currentClientId,
+			createBlock( destinationBlockName, {
+				level,
+				content: attributes.content,
+				...{ [ destinationTextAlign ]: attributes[ textAlign ] },
+			} )
+		);
+	};
 
 	useEffect( () => {
 		registerShortcut( {
@@ -47,6 +76,16 @@ function KeyboardShortcuts() {
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'm',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-post/toggle-distraction-free',
+			category: 'global',
+			description: __( 'Toggle distraction free mode.' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: '\\',
 			},
 		} );
 
@@ -61,19 +100,9 @@ function KeyboardShortcuts() {
 		} );
 
 		registerShortcut( {
-			name: 'core/edit-post/toggle-list-view',
-			category: 'global',
-			description: __( 'Open the block list view.' ),
-			keyCombination: {
-				modifier: 'access',
-				character: 'o',
-			},
-		} );
-
-		registerShortcut( {
 			name: 'core/edit-post/toggle-sidebar',
 			category: 'global',
-			description: __( 'Show or hide the settings sidebar.' ),
+			description: __( 'Show or hide the Settings sidebar.' ),
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: ',',
@@ -109,6 +138,10 @@ function KeyboardShortcuts() {
 					modifier: 'access',
 					character: 'p',
 				},
+				{
+					modifier: 'ctrlShift',
+					character: '~',
+				},
 			],
 		} );
 
@@ -120,6 +153,28 @@ function KeyboardShortcuts() {
 				modifier: 'access',
 				character: 'h',
 			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-post/transform-heading-to-paragraph',
+			category: 'block-library',
+			description: __( 'Transform heading to paragraph.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: `0`,
+			},
+		} );
+
+		[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
+			registerShortcut( {
+				name: `core/edit-post/transform-paragraph-to-heading-${ level }`,
+				category: 'block-library',
+				description: __( 'Transform paragraph to heading.' ),
+				keyCombination: {
+					modifier: 'access',
+					character: `${ level }`,
+				},
+			} );
 		} );
 	}, [] );
 
@@ -139,6 +194,10 @@ function KeyboardShortcuts() {
 		toggleFeature( 'fullscreenMode' );
 	} );
 
+	useShortcut( 'core/edit-post/toggle-distraction-free', () => {
+		toggleDistractionFree();
+	} );
+
 	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {
 		// This shortcut has no known clashes, but use preventDefault to prevent any
 		// obscure shortcuts from triggering.
@@ -154,9 +213,19 @@ function KeyboardShortcuts() {
 		}
 	} );
 
-	useShortcut( 'core/edit-post/toggle-list-view', () =>
-		setIsListViewOpened( ! isListViewOpened() )
+	useShortcut( 'core/edit-post/transform-heading-to-paragraph', ( event ) =>
+		handleTextLevelShortcut( event, 0 )
 	);
+
+	[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
+		//the loop is based off on a constant therefore
+		//the hook will execute the same way every time
+		//eslint-disable-next-line react-hooks/rules-of-hooks
+		useShortcut(
+			`core/edit-post/transform-paragraph-to-heading-${ level }`,
+			( event ) => handleTextLevelShortcut( event, level )
+		);
+	} );
 
 	return null;
 }

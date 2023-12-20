@@ -7,11 +7,13 @@ import { cover as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import variations from './variations';
 
 const { name } = metadata;
 
@@ -29,9 +31,16 @@ export const settings = {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					customFontSize: 48,
 					content: __( '<strong>Snow Patrol</strong>' ),
 					align: 'center',
+					style: {
+						typography: {
+							fontSize: 48,
+						},
+						color: {
+							text: 'white',
+						},
+					},
 				},
 			},
 		],
@@ -40,4 +49,7 @@ export const settings = {
 	save,
 	edit,
 	deprecated,
+	variations,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

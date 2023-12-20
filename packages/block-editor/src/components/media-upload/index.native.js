@@ -3,16 +3,17 @@
  */
 import { Platform } from 'react-native';
 
-import { delay } from 'lodash';
-
-import prompt from 'react-native-prompt-android';
-
 /**
  * WordPress dependencies
  */
 import { Component, React } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Picker } from '@wordpress/components';
+import {
+	BottomSheet,
+	PanelBody,
+	Picker,
+	TextControl,
+} from '@wordpress/components';
 import {
 	getOtherMediaOptions,
 	requestMediaPicker,
@@ -30,27 +31,36 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
-export const MEDIA_TYPE_IMAGE = 'image';
-export const MEDIA_TYPE_VIDEO = 'video';
-export const MEDIA_TYPE_AUDIO = 'audio';
-export const MEDIA_TYPE_ANY = 'any';
-
-export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
-export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
-export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
-export const OPTION_INSERT_FROM_URL = __( 'Insert from URL' );
+/**
+ * Internal dependencies
+ */
+import {
+	MEDIA_TYPE_IMAGE,
+	MEDIA_TYPE_VIDEO,
+	MEDIA_TYPE_AUDIO,
+	MEDIA_TYPE_ANY,
+	OPTION_TAKE_VIDEO,
+	OPTION_TAKE_PHOTO,
+	OPTION_INSERT_FROM_URL,
+	OPTION_WORDPRESS_MEDIA_LIBRARY,
+} from './constants';
+import styles from './style.scss';
 
 const URL_MEDIA_SOURCE = 'URL';
 
 const PICKER_OPENING_DELAY = 200;
 
 export class MediaUpload extends Component {
+	pickerTimeout;
+
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );
 		this.onPickerSelect = this.onPickerSelect.bind( this );
 		this.getAllSources = this.getAllSources.bind( this );
 		this.state = {
+			url: '',
+			showURLInput: false,
 			otherMediaOptions: [],
 		};
 	}
@@ -77,11 +87,17 @@ export class MediaUpload extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		clearTimeout( this.pickerTimeout );
+	}
+
 	getAllSources() {
+		const { onSelectURL } = this.props;
+
 		const cameraImageSource = {
-			id: mediaSources.deviceCamera, // ID is the value sent to native
+			id: mediaSources.deviceCamera, // ID is the value sent to native.
 			value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
-			label: __( 'Take a Photo' ),
+			label: OPTION_TAKE_PHOTO,
 			requiresModal: true,
 			types: [ MEDIA_TYPE_IMAGE ],
 			icon: capturePhoto,
@@ -90,7 +106,7 @@ export class MediaUpload extends Component {
 		const cameraVideoSource = {
 			id: mediaSources.deviceCamera,
 			value: mediaSources.deviceCamera,
-			label: __( 'Take a Video' ),
+			label: OPTION_TAKE_VIDEO,
 			requiresModal: true,
 			types: [ MEDIA_TYPE_VIDEO ],
 			icon: captureVideo,
@@ -108,7 +124,7 @@ export class MediaUpload extends Component {
 		const siteLibrarySource = {
 			id: mediaSources.siteMediaLibrary,
 			value: mediaSources.siteMediaLibrary,
-			label: __( 'WordPress Media Library' ),
+			label: OPTION_WORDPRESS_MEDIA_LIBRARY,
 			requiresModal: true,
 			types: [
 				MEDIA_TYPE_IMAGE,
@@ -123,17 +139,18 @@ export class MediaUpload extends Component {
 		const urlSource = {
 			id: URL_MEDIA_SOURCE,
 			value: URL_MEDIA_SOURCE,
-			label: __( 'Insert from URL' ),
-			types: [ MEDIA_TYPE_AUDIO ],
+			label: OPTION_INSERT_FROM_URL,
+			types: [ MEDIA_TYPE_AUDIO, MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
 			icon: globe,
 		};
 
+		// Only include `urlSource` option if `onSelectURL` prop is present, in order to match the web behavior.
 		const internalSources = [
 			deviceLibrarySource,
 			cameraImageSource,
 			cameraVideoSource,
 			siteLibrarySource,
-			urlSource,
+			...( onSelectURL ? [ urlSource ] : [] ),
 		];
 
 		return internalSources.concat( this.state.otherMediaOptions );
@@ -185,7 +202,7 @@ export class MediaUpload extends Component {
 			// the delay below is required because on iOS this action sheet gets dismissed by the close event of the Inserter
 			// so this delay allows the Inserter to be closed fully before presenting action sheet.
 			if ( autoOpen && isIOS ) {
-				delay(
+				this.pickerTimeout = setTimeout(
 					() => this.picker.presentPicker(),
 					PICKER_OPENING_DELAY
 				);
@@ -196,31 +213,10 @@ export class MediaUpload extends Component {
 	}
 
 	onPickerSelect( value ) {
-		const {
-			allowedTypes = [],
-			onSelect,
-			onSelectURL,
-			multiple = false,
-		} = this.props;
+		const { allowedTypes = [], onSelect, multiple = false } = this.props;
 
 		if ( value === URL_MEDIA_SOURCE ) {
-			prompt(
-				__( 'Type a URL' ), // title
-				undefined, // message
-				[
-					{
-						text: __( 'Cancel' ),
-						style: 'cancel',
-					},
-					{
-						text: __( 'Apply' ),
-						onPress: onSelectURL,
-					},
-				], // buttons
-				'plain-text', // type
-				undefined, // defaultValue
-				'url' // keyboardType
-			);
+			this.setState( { showURLInput: true } );
 			return;
 		}
 
@@ -294,22 +290,65 @@ export class MediaUpload extends Component {
 				ref={ ( instance ) => ( this.picker = instance ) }
 				options={ this.getMediaOptionsItems() }
 				onChange={ this.onPickerSelect }
+				testID="media-options-picker"
 			/>
 		);
 
-		return this.props.render( {
-			open: this.onPickerPresent,
-			getMediaOptions,
-		} );
+		return (
+			<>
+				<URLInput
+					isVisible={ this.state.showURLInput }
+					onClose={ () => {
+						if ( this.state.url !== '' ) {
+							this.props.onSelectURL( this.state.url );
+						}
+						this.setState( { showURLInput: false, url: '' } );
+					} }
+					onChange={ ( url ) => {
+						this.setState( { url } );
+					} }
+					value={ this.state.url }
+				/>
+				{ this.props.render( {
+					open: this.onPickerPresent,
+					getMediaOptions,
+				} ) }
+			</>
+		);
 	}
+}
+
+function URLInput( props ) {
+	return (
+		<BottomSheet
+			hideHeader
+			isVisible={ props.isVisible }
+			onClose={ props.onClose }
+		>
+			<PanelBody style={ styles[ 'media-upload__link-input' ] }>
+				<TextControl
+					// eslint-disable-next-line jsx-a11y/no-autofocus
+					autoFocus
+					autoCapitalize="none"
+					autoCorrect={ false }
+					autoComplete={ Platform.isIOS ? 'url' : 'off' }
+					keyboardType="url"
+					label={ OPTION_INSERT_FROM_URL }
+					onChange={ props.onChange }
+					placeholder={ __( 'Type a URL' ) }
+					value={ props.value }
+				/>
+			</PanelBody>
+		</BottomSheet>
+	);
 }
 
 export default compose( [
 	withSelect( ( select ) => {
+		const { capabilities } = select( blockEditorStore ).getSettings();
 		return {
 			isAudioBlockMediaUploadEnabled:
-				select( blockEditorStore ).getSettings( 'capabilities' )
-					.isAudioBlockMediaUploadEnabled === true,
+				capabilities?.isAudioBlockMediaUploadEnabled === true,
 		};
 	} ),
 ] )( MediaUpload );

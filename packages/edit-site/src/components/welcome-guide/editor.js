@@ -5,18 +5,22 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import WelcomeGuideImage from './image';
-import { store as editSiteStore } from '../../store';
 
 export default function WelcomeGuideEditor() {
-	const { toggleFeature } = useDispatch( editSiteStore );
+	const { toggle } = useDispatch( preferencesStore );
 
 	const isActive = useSelect(
-		( select ) => select( editSiteStore ).isFeatureActive( 'welcomeGuide' ),
+		( select ) =>
+			!! select( preferencesStore ).get(
+				'core/edit-site',
+				'welcomeGuide'
+			),
 		[]
 	);
 
@@ -26,10 +30,10 @@ export default function WelcomeGuideEditor() {
 
 	return (
 		<Guide
-			className="edit-site-welcome-guide"
+			className="edit-site-welcome-guide guide-editor"
 			contentLabel={ __( 'Welcome to the site editor' ) }
-			finishButtonText={ __( 'Get Started' ) }
-			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
+			finishButtonText={ __( 'Get started' ) }
+			onFinish={ () => toggle( 'core/edit-site', 'welcomeGuide' ) }
 			pages={ [
 				{
 					image: (

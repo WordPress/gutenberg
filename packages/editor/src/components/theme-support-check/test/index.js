@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -10,10 +10,8 @@ import { ThemeSupportCheck } from '../index';
 
 describe( 'ThemeSupportCheck', () => {
 	it( "should not render if there's no support check provided", () => {
-		const wrapper = shallow(
-			<ThemeSupportCheck>foobar</ThemeSupportCheck>
-		);
-		expect( wrapper.type() ).toBe( null );
+		render( <ThemeSupportCheck>foobar</ThemeSupportCheck> );
+		expect( screen.queryByText( 'foobar' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'should render if post-thumbnails are supported', () => {
@@ -21,7 +19,7 @@ describe( 'ThemeSupportCheck', () => {
 			'post-thumbnails': true,
 		};
 		const supportKeys = 'post-thumbnails';
-		const wrapper = shallow(
+		render(
 			<ThemeSupportCheck
 				supportKeys={ supportKeys }
 				themeSupports={ themeSupports }
@@ -29,7 +27,7 @@ describe( 'ThemeSupportCheck', () => {
 				foobar
 			</ThemeSupportCheck>
 		);
-		expect( wrapper.type() ).not.toBe( null );
+		expect( screen.getByText( 'foobar' ) ).toBeVisible();
 	} );
 
 	it( 'should render if post-thumbnails are supported for the post type', () => {
@@ -37,7 +35,7 @@ describe( 'ThemeSupportCheck', () => {
 			'post-thumbnails': [ 'post' ],
 		};
 		const supportKeys = 'post-thumbnails';
-		const wrapper = shallow(
+		render(
 			<ThemeSupportCheck
 				supportKeys={ supportKeys }
 				postType={ 'post' }
@@ -46,7 +44,7 @@ describe( 'ThemeSupportCheck', () => {
 				foobar
 			</ThemeSupportCheck>
 		);
-		expect( wrapper.type() ).not.toBe( null );
+		expect( screen.getByText( 'foobar' ) ).toBeVisible();
 	} );
 
 	it( "should not render if post-thumbnails aren't supported for the post type", () => {
@@ -54,7 +52,7 @@ describe( 'ThemeSupportCheck', () => {
 			'post-thumbnails': [ 'post' ],
 		};
 		const supportKeys = 'post-thumbnails';
-		const wrapper = shallow(
+		render(
 			<ThemeSupportCheck
 				supportKeys={ supportKeys }
 				postType={ 'page' }
@@ -63,7 +61,7 @@ describe( 'ThemeSupportCheck', () => {
 				foobar
 			</ThemeSupportCheck>
 		);
-		expect( wrapper.type() ).toBe( null );
+		expect( screen.queryByText( 'foobar' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'should not render if post-thumbnails is limited and false is passed for postType', () => {
@@ -71,7 +69,7 @@ describe( 'ThemeSupportCheck', () => {
 			'post-thumbnails': [ 'post' ],
 		};
 		const supportKeys = 'post-thumbnails';
-		const wrapper = shallow(
+		render(
 			<ThemeSupportCheck
 				supportKeys={ supportKeys }
 				postType={ false }
@@ -80,7 +78,7 @@ describe( 'ThemeSupportCheck', () => {
 				foobar
 			</ThemeSupportCheck>
 		);
-		expect( wrapper.type() ).toBe( null );
+		expect( screen.queryByText( 'foobar' ) ).not.toBeInTheDocument();
 	} );
 
 	it( "should not render if theme doesn't support post-thumbnails", () => {
@@ -88,7 +86,7 @@ describe( 'ThemeSupportCheck', () => {
 			'post-thumbnails': false,
 		};
 		const supportKeys = 'post-thumbnails';
-		const wrapper = shallow(
+		render(
 			<ThemeSupportCheck
 				supportKeys={ supportKeys }
 				themeSupports={ themeSupports }
@@ -96,6 +94,6 @@ describe( 'ThemeSupportCheck', () => {
 				foobar
 			</ThemeSupportCheck>
 		);
-		expect( wrapper.type() ).toBe( null );
+		expect( screen.queryByText( 'foobar' ) ).not.toBeInTheDocument();
 	} );
 } );

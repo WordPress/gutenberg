@@ -16,7 +16,7 @@ const extractZip = util.promisify( require( 'extract-zip' ) );
 const rimraf = util.promisify( require( 'rimraf' ) );
 
 /**
- * @typedef {import('./config').Config} Config
+ * @typedef {import('./config').WPConfig} WPConfig
  * @typedef {import('./config').WPSource} WPSource
  */
 
@@ -24,8 +24,8 @@ const rimraf = util.promisify( require( 'rimraf' ) );
  * Download each source for each environment. If the same source is used in
  * multiple environments, it will only be downloaded once.
  *
- * @param {Config} config  The wp-env configuration object.
- * @param {Object} spinner The spinner object to show progress.
+ * @param {WPConfig} config  The wp-env configuration object.
+ * @param {Object}   spinner The spinner object to show progress.
  * @return {Promise} Returns a promise which resolves when the downloads finish.
  */
 module.exports = function downloadSources( config, spinner ) {
@@ -176,7 +176,7 @@ async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 			rimraf( source.path ),
 			fs.promises.readdir( tempDir ),
 		] )
-	 )[ 2 ];
+	)[ 2 ];
 
 	/**
 	 * The plugin container is the extracted directory which is the direct parent

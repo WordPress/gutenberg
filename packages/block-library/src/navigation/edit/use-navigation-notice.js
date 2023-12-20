@@ -1,35 +1,38 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticeStore } from '@wordpress/notices';
 
-function useNavigationNotice( { name, message } = {} ) {
+function useNavigationNotice( { name, message = '' } = {} ) {
 	const noticeRef = useRef();
 
 	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
 
-	const showNotice = () => {
-		if ( noticeRef.current ) {
-			return;
-		}
+	const showNotice = useCallback(
+		( customMsg ) => {
+			if ( noticeRef.current ) {
+				return;
+			}
 
-		noticeRef.current = name;
+			noticeRef.current = name;
 
-		createWarningNotice( message, {
-			id: noticeRef.current,
-			type: 'snackbar',
-		} );
-	};
+			createWarningNotice( customMsg || message, {
+				id: noticeRef.current,
+				type: 'snackbar',
+			} );
+		},
+		[ noticeRef, createWarningNotice, message, name ]
+	);
 
-	const hideNotice = () => {
+	const hideNotice = useCallback( () => {
 		if ( ! noticeRef.current ) {
 			return;
 		}
 		removeNotice( noticeRef.current );
 		noticeRef.current = null;
-	};
+	}, [ noticeRef, removeNotice ] );
 
 	return [ showNotice, hideNotice ];
 }

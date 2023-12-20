@@ -3,82 +3,63 @@
  */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
+import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../global-styles/utils';
 
 export default function BlockSupportToolsPanel( { children, group, label } ) {
-	const { attributes, clientIds, panelId } = useSelect( ( select ) => {
-		const {
-			getBlockAttributes,
-			getMultiSelectedBlockClientIds,
-			getSelectedBlockClientId,
-			hasMultiSelection,
-		} = select( blockEditorStore );
-
-		// When we currently have a multi-selection, the value returned from
-		// `getSelectedBlockClientId()` is `null`. When a `null` value is used
-		// for the `panelId`, a `ToolsPanel` will still allow panel items to
-		// register themselves despite their panelIds not matching.
-		const selectedBlockClientId = getSelectedBlockClientId();
-
-		if ( hasMultiSelection() ) {
-			const selectedBlockClientIds = getMultiSelectedBlockClientIds();
-			const selectedBlockAttributes = selectedBlockClientIds.reduce(
-				( blockAttributes, blockId ) => {
-					blockAttributes[ blockId ] = getBlockAttributes( blockId );
-					return blockAttributes;
-				},
-				{}
-			);
-
-			return {
-				panelId: selectedBlockClientId,
-				clientIds: selectedBlockClientIds,
-				attributes: selectedBlockAttributes,
-			};
-		}
-
-		return {
-			panelId: selectedBlockClientId,
-			clientIds: [ selectedBlockClientId ],
-			attributes: {
-				[ selectedBlockClientId ]: getBlockAttributes(
-					selectedBlockClientId
-				),
-			},
-		};
-	}, [] );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const {
+		getBlockAttributes,
+		getMultiSelectedBlockClientIds,
+		getSelectedBlockClientId,
+		hasMultiSelection,
+	} = useSelect( blockEditorStore );
 
-	const resetAll = ( resetFilters = [] ) => {
-		const newAttributes = {};
+	const panelId = getSelectedBlockClientId();
+	const resetAll = useCallback(
+		( resetFilters = [] ) => {
+			const newAttributes = {};
 
-		clientIds.forEach( ( clientId ) => {
-			const { style } = attributes[ clientId ];
-			let newBlockAttributes = { style };
+			const clientIds = hasMultiSelection()
+				? getMultiSelectedBlockClientIds()
+				: [ panelId ];
 
-			resetFilters.forEach( ( resetFilter ) => {
+			clientIds.forEach( ( clientId ) => {
+				const { style } = getBlockAttributes( clientId );
+				let newBlockAttributes = { style };
+
+				resetFilters.forEach( ( resetFilter ) => {
+					newBlockAttributes = {
+						...newBlockAttributes,
+						...resetFilter( newBlockAttributes ),
+					};
+				} );
+
+				// Enforce a cleaned style object.
 				newBlockAttributes = {
 					...newBlockAttributes,
-					...resetFilter( newBlockAttributes ),
+					style: cleanEmptyObject( newBlockAttributes.style ),
 				};
+
+				newAttributes[ clientId ] = newBlockAttributes;
 			} );
 
-			// Enforce a cleaned style object.
-			newBlockAttributes = {
-				...newBlockAttributes,
-				style: cleanEmptyObject( newBlockAttributes.style ),
-			};
-
-			newAttributes[ clientId ] = newBlockAttributes;
-		} );
-
-		updateBlockAttributes( clientIds, newAttributes, true );
-	};
+			updateBlockAttributes( clientIds, newAttributes, true );
+		},
+		[
+			getBlockAttributes,
+			getMultiSelectedBlockClientIds,
+			hasMultiSelection,
+			panelId,
+			updateBlockAttributes,
+		]
+	);
 
 	return (
 		<ToolsPanel
@@ -89,6 +70,9 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 			panelId={ panelId }
 			hasInnerWrapper={ true }
 			shouldRenderPlaceholderItems={ true } // Required to maintain fills ordering.
+			__experimentalFirstVisibleItemClass="first"
+			__experimentalLastVisibleItemClass="last"
+			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			{ children }
 		</ToolsPanel>

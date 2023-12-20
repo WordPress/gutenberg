@@ -10,11 +10,6 @@ import {
 	symbolFilled as symbolFilledIcon,
 } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import fallbackVariations from './fallback-variations';
-
 function getTemplatePartIcon( iconName ) {
 	if ( 'header' === iconName ) {
 		return headerIcon;
@@ -31,12 +26,6 @@ export function enhanceTemplatePartVariations( settings, name ) {
 		return settings;
 	}
 
-	// WordPress versions pre-5.8 do not support server side variation registration.
-	// So we must register the fallback variations until those versions are no longer supported.
-	if ( ! ( settings.variations && settings.variations.length ) ) {
-		return { ...settings, variations: fallbackVariations };
-	}
-
 	if ( settings.variations ) {
 		const isActive = ( blockAttributes, variationAttributes ) => {
 			const { area, theme, slug } = blockAttributes;
@@ -46,11 +35,17 @@ export function enhanceTemplatePartVariations( settings, name ) {
 			// Find a matching variation from the created template part
 			// by checking the entity's `area` property.
 			if ( ! slug ) return false;
-			const entity = select( coreDataStore ).getEntityRecord(
+			const { getCurrentTheme, getEntityRecord } =
+				select( coreDataStore );
+			const entity = getEntityRecord(
 				'postType',
 				'wp_template_part',
-				`${ theme }//${ slug }`
+				`${ theme || getCurrentTheme()?.stylesheet }//${ slug }`
 			);
+
+			if ( entity?.slug ) {
+				return entity.slug === variationAttributes.slug;
+			}
 			return entity?.area === variationAttributes.area;
 		};
 

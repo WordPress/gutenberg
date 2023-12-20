@@ -7,13 +7,17 @@
 }
 
 .imageBorder {
-	border-color: $blue-medium;
+	border-color: $blue-40;
 	border-width: 2px;
 	border-style: solid;
 	position: absolute;
 	z-index: 1;
 	width: 100%;
 	height: 100%;
+}
+
+.imageBorderDark {
+	border-color: $blue-50;
 }
 
 .retryIcon {
@@ -89,6 +93,7 @@
 	color: #fff;
 	font-size: 14;
 	margin-top: 5;
+	text-align: center;
 }
 
 .editContainer {

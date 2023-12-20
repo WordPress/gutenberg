@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import { debounce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { debounce } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -99,6 +95,8 @@ function PostAuthorCombobox() {
 
 	return (
 		<ComboboxControl
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			label={ __( 'Author' ) }
 			options={ authorOptions }
 			value={ authorId }

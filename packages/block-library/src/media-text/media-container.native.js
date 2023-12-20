@@ -26,14 +26,12 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withDispatch } from '@wordpress/data';
-import { store as noticesStore } from '@wordpress/notices';
+import { media as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import icon from './media-container-icon';
 import SvgIconRetry from './icon-retry';
 
 /**
@@ -52,16 +50,13 @@ class MediaContainer extends Component {
 	constructor() {
 		super( ...arguments );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
-			this
-		);
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
-			this
-		);
+		this.finishMediaUploadWithSuccess =
+			this.finishMediaUploadWithSuccess.bind( this );
+		this.finishMediaUploadWithFailure =
+			this.finishMediaUploadWithFailure.bind( this );
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
-		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
-			this
-		);
+		this.onSelectMediaUploadOption =
+			this.onSelectMediaUploadOption.bind( this );
 		this.onMediaPressed = this.onMediaPressed.bind( this );
 
 		this.state = {
@@ -73,7 +68,7 @@ class MediaContainer extends Component {
 		const { mediaId, mediaUrl } = this.props;
 
 		// Make sure we mark any temporary images as failed if they failed while
-		// the editor wasn't open
+		// the editor wasn't open.
 		if ( mediaId && mediaUrl && getProtocol( mediaUrl ) === 'file:' ) {
 			mediaUploadSync();
 		}
@@ -152,10 +147,6 @@ class MediaContainer extends Component {
 	}
 
 	finishMediaUploadWithFailure() {
-		const { createErrorNotice } = this.props;
-
-		createErrorNotice( __( 'Failed to insert media.' ) );
-
 		this.setState( { isUploadInProgress: false } );
 	}
 
@@ -197,7 +188,6 @@ class MediaContainer extends Component {
 				<TouchableWithoutFeedback
 					accessible={ ! isSelected }
 					onPress={ this.onMediaPressed }
-					onLongPress={ openMediaOptions }
 					disabled={ ! isSelected }
 				>
 					<View
@@ -228,7 +218,7 @@ class MediaContainer extends Component {
 		);
 	}
 
-	renderVideo( params, openMediaOptions ) {
+	renderVideo( params ) {
 		const {
 			aligmentStyles,
 			mediaUrl,
@@ -257,7 +247,6 @@ class MediaContainer extends Component {
 				<TouchableWithoutFeedback
 					accessible={ ! isSelected }
 					onPress={ this.onMediaPressed }
-					onLongPress={ openMediaOptions }
 					disabled={ ! isSelected }
 				>
 					<View style={ [ styles.videoContainer, aligmentStyles ] }>
@@ -311,7 +300,7 @@ class MediaContainer extends Component {
 				mediaElement = this.renderImage( params, openMediaOptions );
 				break;
 			case MEDIA_TYPE_VIDEO:
-				mediaElement = this.renderVideo( params, openMediaOptions );
+				mediaElement = this.renderVideo( params );
 				break;
 		}
 		return mediaElement;
@@ -327,6 +316,7 @@ class MediaContainer extends Component {
 				onSelect={ this.onSelectMediaUploadOption }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onFocus={ this.props.onFocus }
+				className={ 'no-block-outline' }
 			/>
 		);
 	}
@@ -381,11 +371,4 @@ class MediaContainer extends Component {
 	}
 }
 
-export default compose( [
-	withDispatch( ( dispatch ) => {
-		const { createErrorNotice } = dispatch( noticesStore );
-
-		return { createErrorNotice };
-	} ),
-	withPreferredColorScheme,
-] )( MediaContainer );
+export default compose( [ withPreferredColorScheme ] )( MediaContainer );

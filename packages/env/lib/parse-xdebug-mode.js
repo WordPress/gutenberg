@@ -1,3 +1,4 @@
+'use strict';
 // See https://xdebug.org/docs/all_settings#mode
 const XDEBUG_MODES = [
 	'develop',
@@ -26,7 +27,7 @@ module.exports = function parseXdebugMode( value ) {
 		throwXdebugModeError( value );
 	}
 
-	if ( value.length === 0 ) {
+	if ( value.length === 0 || value === 'undefined' ) {
 		return 'debug';
 	}
 

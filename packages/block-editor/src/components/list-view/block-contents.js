@@ -15,6 +15,7 @@ import { forwardRef } from '@wordpress/element';
 import ListViewBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
+import { useListViewContext } from './context';
 
 const ListViewBlockContents = forwardRef(
 	(
@@ -26,6 +27,8 @@ const ListViewBlockContents = forwardRef(
 			position,
 			siblingBlockCount,
 			level,
+			isExpanded,
+			selectedClientIds,
 			...props
 		},
 		ref
@@ -34,19 +37,18 @@ const ListViewBlockContents = forwardRef(
 
 		const { blockMovingClientId, selectedBlockInBlockEditor } = useSelect(
 			( select ) => {
-				const {
-					getBlockRootClientId,
-					hasBlockMovingClientId,
-					getSelectedBlockClientId,
-				} = select( blockEditorStore );
+				const { hasBlockMovingClientId, getSelectedBlockClientId } =
+					select( blockEditorStore );
 				return {
-					rootClientId: getBlockRootClientId( clientId ) || '',
 					blockMovingClientId: hasBlockMovingClientId(),
 					selectedBlockInBlockEditor: getSelectedBlockClientId(),
 				};
 			},
-			[ clientId ]
+			[]
 		);
+
+		const { AdditionalBlockContent, insertedBlock, setInsertedBlock } =
+			useListViewContext();
 
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
@@ -55,26 +57,44 @@ const ListViewBlockContents = forwardRef(
 			'is-dropping-before': isBlockMoveTarget,
 		} );
 
+		// Only include all selected blocks if the currently clicked on block
+		// is one of the selected blocks. This ensures that if a user attempts
+		// to drag a block that isn't part of the selection, they're still able
+		// to drag it and rearrange its position.
+		const draggableClientIds = selectedClientIds.includes( clientId )
+			? selectedClientIds
+			: [ clientId ];
+
 		return (
-			<BlockDraggable clientIds={ [ block.clientId ] }>
-				{ ( { draggable, onDragStart, onDragEnd } ) => (
-					<ListViewBlockSelectButton
-						ref={ ref }
-						className={ className }
+			<>
+				{ AdditionalBlockContent && (
+					<AdditionalBlockContent
 						block={ block }
-						onClick={ onClick }
-						onToggleExpanded={ onToggleExpanded }
-						isSelected={ isSelected }
-						position={ position }
-						siblingBlockCount={ siblingBlockCount }
-						level={ level }
-						draggable={ draggable }
-						onDragStart={ onDragStart }
-						onDragEnd={ onDragEnd }
-						{ ...props }
+						insertedBlock={ insertedBlock }
+						setInsertedBlock={ setInsertedBlock }
 					/>
 				) }
-			</BlockDraggable>
+				<BlockDraggable clientIds={ draggableClientIds }>
+					{ ( { draggable, onDragStart, onDragEnd } ) => (
+						<ListViewBlockSelectButton
+							ref={ ref }
+							className={ className }
+							block={ block }
+							onClick={ onClick }
+							onToggleExpanded={ onToggleExpanded }
+							isSelected={ isSelected }
+							position={ position }
+							siblingBlockCount={ siblingBlockCount }
+							level={ level }
+							draggable={ draggable }
+							onDragStart={ onDragStart }
+							onDragEnd={ onDragEnd }
+							isExpanded={ isExpanded }
+							{ ...props }
+						/>
+					) }
+				</BlockDraggable>
+			</>
 		);
 	}
 );

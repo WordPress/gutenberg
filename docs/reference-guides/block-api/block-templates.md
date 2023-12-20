@@ -35,7 +35,7 @@ add_action( 'init', 'myplugin_register_template' );
 The following example in JavaScript creates a new block using [InnerBlocks](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md) and templates, when inserted creates a set of blocks based off the template.
 
 ```js
-const el = wp.element.createElement;
+const el = React.createElement;
 const { registerBlockType } = wp.blocks;
 const { InnerBlocks } = wp.blockEditor;
 
@@ -61,7 +61,7 @@ registerBlockType( 'myplugin/template', {
 
 See the [Meta Block Tutorial](/docs/how-to-guides/metabox.md#step-4-finishing-touches) for a full example of a template in use.
 
-## Block Attributes
+## Block attributes
 
 To find a comprehensive list of all block attributes that you can define in a template, consult the block's `block.json` file, and look at the `attributes` and `supports` values.
 
@@ -69,7 +69,7 @@ For example, [packages/block-library/src/heading/block.json](https://github.com/
 
 If you don't have the Gutenberg plugin installed, you can find `block.json` files inside `wp-includes/blocks/heading/block.json`.
 
-## Custom Post types
+## Custom post types
 
 A custom post type can register its own template during registration:
 
@@ -115,6 +115,7 @@ add_action( 'init', 'myplugin_register_template' );
 
 _Options:_
 
+-   `contentOnly` — prevents all operations. Additionally, the block types that don't have content are hidden from the list view and can't gain focus within the block list. Unlike the other lock types, this is not overridable by children.
 -   `all` — prevents all operations. It is not possible to insert new blocks, move existing blocks, or delete blocks.
 -   `insert` — prevents inserting or removing blocks, but allows moving existing blocks.
 
@@ -124,7 +125,6 @@ Lock settings can be inherited by InnerBlocks. If `templateLock` is not set in a
 
 Alongside template level locking, you can lock individual blocks; you can do this using a `lock` attribute on the attributes level. Block-level lock takes priority over the `templateLock` feature. Currently, you can lock moving and removing blocks.
 
-**Block-level locking is an experimental feature that may be removed or change anytime.**
 ```js
 attributes: {
   // Prevent a block from being moved or removed.
@@ -134,13 +134,34 @@ attributes: {
   }
 }
 ```
+
 _Options:_
+
 -   `remove` — Locks the ability of a block from being removed.
 -   `move` — Locks the ability of a block from being moved.
 
 You can use this with `templateLock` to lock all blocks except a single block by using `false` in `remove` or `move`.
 
-## Nested Templates
+```php
+$template = array(
+	array( 'core/image', array(
+		'align' => 'left',
+	) ),
+	array( 'core/heading', array(
+		'placeholder' => 'Add Author...',
+	) ),
+	// Allow a Paragraph block to be moved or removed.
+	array( 'core/paragraph', array(
+		'placeholder' => 'Add Description...',
+		'lock' => array(
+			'move'   => false,
+			'remove' => false,
+		),
+	) ),
+);
+```
+
+## Nested templates
 
 Container blocks like the columns blocks also support templates. This is achieved by assigning a nested template to the block.
 

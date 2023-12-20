@@ -1,12 +1,7 @@
 jest.mock( '@wordpress/compose', () => {
-	const App = () => null;
 	return {
 		...jest.requireActual( '@wordpress/compose' ),
 		useViewportMatch: jest.fn(),
-		useResizeObserver: jest.fn( () => [
-			<App key={ 'mock-key' } />,
-			{ width: 700, height: 500 },
-		] ),
 	};
 } );
 
@@ -21,4 +16,15 @@ jest.mock( '@wordpress/compose', () => {
  */
 if ( ! window.wp?.galleryBlockV2Enabled ) {
 	window.wp = { ...window.wp, galleryBlockV2Enabled: true };
+}
+
+global.ResizeObserver = require( 'resize-observer-polyfill' );
+
+/**
+ * The following mock is for block integration tests that might render
+ * components leveraging DOMRect. For example, the Cover block which now renders
+ * its ResizableBox control via the BlockPopover component.
+ */
+if ( ! window.DOMRect ) {
+	window.DOMRect = class DOMRect {};
 }

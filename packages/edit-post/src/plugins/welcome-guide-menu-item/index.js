@@ -2,24 +2,21 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { MoreMenuFeatureToggle } from '@wordpress/interface';
+import { PreferenceToggleMenuItem } from '@wordpress/preferences';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { store as editPostStore } from '../../store';
+import { store as editorStore } from '@wordpress/editor';
 
 export default function WelcomeGuideMenuItem() {
 	const isTemplateMode = useSelect(
-		( select ) => select( editPostStore ).isEditingTemplate(),
+		( select ) =>
+			select( editorStore ).getRenderingMode() === 'template-only',
 		[]
 	);
 
 	return (
-		<MoreMenuFeatureToggle
+		<PreferenceToggleMenuItem
 			scope="core/edit-post"
-			feature={ isTemplateMode ? 'welcomeGuideTemplate' : 'welcomeGuide' }
+			name={ isTemplateMode ? 'welcomeGuideTemplate' : 'welcomeGuide' }
 			label={ __( 'Welcome Guide' ) }
 		/>
 	);

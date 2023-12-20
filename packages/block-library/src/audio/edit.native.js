@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { TouchableWithoutFeedback } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,6 +23,7 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
+	RichText,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -31,7 +31,7 @@ import { audio as icon, replace } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { isURL } from '@wordpress/url';
+import { isURL, getProtocol } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -66,10 +66,6 @@ function AudioEdit( {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	const onError = () => {
-		createErrorNotice( __( 'Failed to insert audio file.' ) );
-	};
-
 	function toggleAttribute( attribute ) {
 		return ( newValue ) => {
 			setAttributes( { [ attribute ]: newValue } );
@@ -78,7 +74,7 @@ function AudioEdit( {
 
 	function onSelectURL( newSrc ) {
 		if ( newSrc !== src ) {
-			if ( isURL( newSrc ) ) {
+			if ( isURL( newSrc ) && /^https?:/.test( getProtocol( newSrc ) ) ) {
 				setAttributes( { src: newSrc, id: undefined } );
 			} else {
 				createErrorNotice( __( 'Invalid URL. Audio file not found.' ) );
@@ -88,13 +84,13 @@ function AudioEdit( {
 
 	function onSelectAudio( media ) {
 		if ( ! media || ! media.url ) {
-			// in this case there was an error and we should continue in the editing state
-			// previous attributes should be removed because they may be temporary blob urls
+			// In this case there was an error and we should continue in the editing state
+			// previous attributes should be removed because they may be temporary blob urls.
 			setAttributes( { src: undefined, id: undefined } );
 			return;
 		}
-		// sets the block's attribute and updates the edit component from the
-		// selected media, then switches off the editing UI
+		// Sets the block's attribute and updates the edit component from the
+		// selected media, then switches off the editing UI.
 		setAttributes( { src: media.url, id: media.id } );
 	}
 
@@ -144,7 +140,6 @@ function AudioEdit( {
 			<MediaUploadProgress
 				mediaId={ id }
 				onFinishMediaUploadWithSuccess={ onFileChange }
-				onFinishMediaUploadWithFailure={ onError }
 				onMediaUploadStateReset={ onFileChange }
 				containerStyle={ styles.progressContainer }
 				progressBarStyle={ styles.progressBar }
@@ -182,7 +177,7 @@ function AudioEdit( {
 		>
 			<View>
 				<InspectorControls>
-					<PanelBody title={ __( 'Audio settings' ) }>
+					<PanelBody title={ __( 'Settings' ) }>
 						<ToggleControl
 							label={ __( 'Autoplay' ) }
 							onChange={ toggleAttribute( 'autoplay' ) }
@@ -233,7 +228,7 @@ function AudioEdit( {
 				<BlockCaption
 					accessible={ true }
 					accessibilityLabelCreator={ ( caption ) =>
-						isEmpty( caption )
+						RichText.isEmpty( caption )
 							? /* translators: accessibility text. Empty Audio caption. */
 							  __( 'Audio caption. Empty' )
 							: sprintf(

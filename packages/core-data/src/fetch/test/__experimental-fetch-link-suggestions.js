@@ -70,6 +70,18 @@ jest.mock( '@wordpress/api-fetch', () =>
 						subtype: 'page',
 					},
 				] );
+			case '/wp/v2/media?search=&per_page=20':
+				return Promise.resolve( [
+					{
+						id: 54,
+						title: {
+							rendered: 'Some Test Media Title',
+						},
+						type: 'attachment',
+						source_url:
+							'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
+					},
+				] );
 			default:
 				return Promise.resolve( [
 					{
@@ -154,7 +166,24 @@ describe( 'fetchLinkSuggestions', () => {
 			{ disablePostFormats: true }
 		).then( ( suggestions ) => expect( suggestions ).toEqual( [] ) );
 	} );
-	it( 'returns suggestions from post, term, and post-format', () => {
+
+	it( 'filters suggestions by attachment', () => {
+		return fetchLinkSuggestions( '', {
+			type: 'attachment',
+		} ).then( ( suggestions ) =>
+			expect( suggestions ).toEqual( [
+				{
+					id: 54,
+					title: 'Some Test Media Title',
+					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
+					type: 'attachment',
+					kind: 'media',
+				},
+			] )
+		);
+	} );
+
+	it( 'returns suggestions from post, term, post-format and media', () => {
 		return fetchLinkSuggestions( '', {} ).then( ( suggestions ) =>
 			expect( suggestions ).toEqual( [
 				{
@@ -192,25 +221,83 @@ describe( 'fetchLinkSuggestions', () => {
 					type: 'post-format',
 					kind: 'taxonomy',
 				},
-			] )
-		);
-	} );
-	it( 'initial search suggestions limits results', () => {
-		return fetchLinkSuggestions( '', {
-			type: 'post',
-			subtype: 'page',
-			isInitialSuggestions: true,
-		} ).then( ( suggestions ) =>
-			expect( suggestions ).toEqual( [
 				{
-					id: 11,
-					title: 'Limit Case',
-					url: 'http://wordpress.local/limit-case/',
-					type: 'page',
-					kind: 'post-type',
+					id: 54,
+					title: 'Some Test Media Title',
+					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
+					type: 'attachment',
+					kind: 'media',
 				},
 			] )
 		);
+	} );
+	describe( 'Initial search suggestions', () => {
+		it( 'initial search suggestions limits results', () => {
+			return fetchLinkSuggestions( '', {
+				type: 'post',
+				subtype: 'page',
+				isInitialSuggestions: true,
+			} ).then( ( suggestions ) =>
+				expect( suggestions ).toEqual( [
+					{
+						id: 11,
+						title: 'Limit Case',
+						url: 'http://wordpress.local/limit-case/',
+						type: 'page',
+						kind: 'post-type',
+					},
+				] )
+			);
+		} );
+
+		it( 'should allow custom search options for initial suggestions', () => {
+			return fetchLinkSuggestions( '', {
+				type: 'term',
+				subtype: 'category',
+				page: 11,
+				isInitialSuggestions: true,
+				initialSuggestionsSearchOptions: {
+					type: 'post',
+					subtype: 'page',
+					perPage: 20,
+					page: 11,
+				},
+			} ).then( ( suggestions ) =>
+				expect( suggestions ).toEqual( [
+					{
+						id: 22,
+						title: 'Page Case',
+						url: 'http://wordpress.local/page-case/',
+						type: 'page',
+						kind: 'post-type',
+					},
+				] )
+			);
+		} );
+
+		it( 'should default any missing initial search options to those from the main search options', () => {
+			return fetchLinkSuggestions( '', {
+				type: 'post',
+				subtype: 'page',
+				page: 11,
+				perPage: 20,
+				isInitialSuggestions: true,
+				initialSuggestionsSearchOptions: {
+					// intentionally missing.
+					// expected to default to those from the main search options.
+				},
+			} ).then( ( suggestions ) =>
+				expect( suggestions ).toEqual( [
+					{
+						id: 22,
+						title: 'Page Case',
+						url: 'http://wordpress.local/page-case/',
+						type: 'page',
+						kind: 'post-type',
+					},
+				] )
+			);
+		} );
 	} );
 	it( 'allows searching from a page', () => {
 		return fetchLinkSuggestions( '', {

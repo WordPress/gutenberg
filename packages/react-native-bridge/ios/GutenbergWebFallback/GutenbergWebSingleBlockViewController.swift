@@ -1,7 +1,7 @@
 import UIKit
 import WebKit
 
-public protocol GutenbergWebDelegate: class {
+public protocol GutenbergWebDelegate: AnyObject {
     func webController(controller: GutenbergWebSingleBlockViewController, didPressSave block: Block)
     func webControllerDidPressClose(controller: GutenbergWebSingleBlockViewController)
     func webController(controller: GutenbergWebSingleBlockViewController, didLog log: String)
@@ -58,6 +58,12 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
         return []
     }
 
+    /// Requests a set of CSS styles to be added to the web view when the editor has started loading.
+    /// - Returns: Array of all the styles to be added
+    open func onGutenbergLoadStyles() -> [WKUserScript] {
+        return []
+    }
+
     /// Requests a set of JS Scripts to be added to the web view when Gutenberg has been initialized.
     /// - Returns: Array of all the scripts to be added
     open func onGutenbergReadyScripts() -> [WKUserScript] {
@@ -65,11 +71,12 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
     }
 
     /// Called when Gutenberg Web editor is loaded in the web view.
-    /// If overriden, is required to call super.onGutenbergReady()
+    /// If overridden, is required to call super.onGutenbergReady()
     open func onGutenbergReady() {
         onGutenbergReadyScripts().forEach(evaluateJavascript)
         evaluateJavascript(jsInjection.preventAutosavesScript)
         evaluateJavascript(jsInjection.insertBlockScript)
+        evaluateJavascript(jsInjection.editorBehaviorScript)
         DispatchQueue.main.async { [weak self] in
             self?.removeCoverViewAnimated()
         }
@@ -152,14 +159,16 @@ extension GutenbergWebSingleBlockViewController: WKNavigationDelegate {
         evaluateJavascript(jsInjection.injectWPBarsCssScript)
         evaluateJavascript(jsInjection.injectLocalStorageScript)
         onPageLoadScripts().forEach(evaluateJavascript)
+        onGutenbergLoadStyles().forEach(evaluateJavascript)
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         // Sometimes the editor takes longer loading and its CSS can override what
-        // Injectic Editor specific CSS when everything is loaded to avoid overwritting parameters if gutenberg CSS load later.
+        // Injectic Editor specific CSS when everything is loaded to avoid overwriting parameters if gutenberg CSS load later.
         evaluateJavascript(jsInjection.preventAutosavesScript)
         evaluateJavascript(jsInjection.injectEditorCssScript)
         evaluateJavascript(jsInjection.gutenbergObserverScript)
+        onGutenbergLoadStyles().forEach(evaluateJavascript)
     }
 }
 

@@ -8,7 +8,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { memo, useContext, useState } from '@wordpress/element';
+import { memo, useContext, useState, useCallback } from '@wordpress/element';
 import { BottomSheetContext, FocalPointPicker } from '@wordpress/components';
 
 /**
@@ -56,7 +56,7 @@ const FocalPointSettingsPanelMemo = memo(
 				</NavBar>
 				<FocalPointPicker
 					focalPoint={ draftFocalPoint }
-					onChange={ setPosition }
+					onChange={ useCallback( setPosition, [] ) }
 					shouldEnableBottomSheetScroll={
 						shouldEnableBottomSheetScroll
 					}

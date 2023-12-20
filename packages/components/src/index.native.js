@@ -15,12 +15,14 @@ export { default as Dashicon } from './dashicon';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
 export { default as FocalPointPicker } from './focal-point-picker';
-export { default as Toolbar } from './toolbar';
-export { default as ToolbarButton } from './toolbar-button';
-export { default as __experimentalToolbarContext } from './toolbar-context';
-export { default as ToolbarGroup } from './toolbar-group';
-export { default as ToolbarItem } from './toolbar-item';
-export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
+export {
+	Toolbar,
+	ToolbarButton,
+	ToolbarContext as __experimentalToolbarContext,
+	ToolbarDropdownMenu,
+	ToolbarGroup,
+	ToolbarItem,
+} from './toolbar';
 export { default as Tooltip } from './tooltip';
 export { default as Icon } from './icon';
 export { default as Spinner } from './spinner';
@@ -33,6 +35,7 @@ export {
 
 export { default as __experimentalStyleProvider } from './style-provider';
 export { default as BaseControl } from './base-control';
+export { hasSplitBorders as __experimentalHasSplitBorders } from './border-box-control/utils';
 export { default as TextareaControl } from './textarea-control';
 export { default as PanelBody } from './panel/body';
 export { default as PanelActions } from './panel/actions';
@@ -61,8 +64,9 @@ export {
 	filterUnitsWithSettings as filterUnitsWithSettings,
 } from './unit-control/utils';
 export { default as Disabled } from './disabled';
+export { default as Draggable, DraggableTrigger } from './draggable';
 
-// Higher-Order Components
+// Higher-Order Components.
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';
@@ -73,7 +77,7 @@ export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
 export * from './text';
 
-// Mobile Components
+// Mobile Components.
 export {
 	__unstableAutocompletionItemsFill,
 	__unstableAutocompletionItemsSlot,
@@ -90,7 +94,6 @@ export { default as HTMLTextInput } from './mobile/html-text-input';
 export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view';
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
 export { default as Picker } from './mobile/picker';
-export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as Gradient } from './mobile/gradient';
 export { default as ColorSettings } from './mobile/color-settings';
@@ -103,25 +106,24 @@ export { default as LinkPickerScreen } from './mobile/link-picker/link-picker-sc
 export { default as LinkSettings } from './mobile/link-settings';
 export { default as LinkSettingsScreen } from './mobile/link-settings/link-settings-screen';
 export { default as LinkSettingsNavigation } from './mobile/link-settings/link-settings-navigation';
-export { default as ImageLinkDestinationsScreen } from './mobile/link-settings/image-link-destinations-screen';
 export { default as SegmentedControl } from './mobile/segmented-control';
 export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';
-export { default as InserterButton } from './mobile/inserter-button';
 export { setClipboard, getClipboard } from './mobile/clipboard';
 export { default as AudioPlayer } from './mobile/audio-player';
 export { default as Badge } from './mobile/badge';
 export { default as Gridicons } from './mobile/gridicons';
 
-// Utils
+// Utils.
 export { colorsUtils } from './mobile/color-settings/utils';
 export {
 	WIDE_ALIGNMENTS,
 	ALIGNMENT_BREAKPOINTS,
 	alignmentHelpers,
 } from './mobile/utils/alignments';
+export { default as getPxFromCssUnit } from './mobile/utils/get-px-from-css-unit';
 
-// Hooks
+// Hooks.
 export {
 	convertUnitToMobile,
 	useConvertUnitToMobile,
@@ -134,4 +136,12 @@ export {
 	withGlobalStyles,
 	getMergedGlobalStyles,
 } from './mobile/global-styles-context';
-export { getGlobalStyles } from './mobile/global-styles-context/utils';
+export {
+	getGlobalStyles,
+	getColorsAndGradients,
+	useMobileGlobalStylesColors,
+	useEditorColorScheme,
+} from './mobile/global-styles-context/utils';
+
+// Private APIs.
+export { privateApis } from './private-apis';

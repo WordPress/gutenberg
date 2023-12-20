@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+const remark = require( 'remark' );
+
+/**
  * Internal dependencies
  */
 const getSymbolTagsByName = require( '../get-symbol-tags-by-name' );
@@ -18,7 +23,7 @@ const formatTag = ( title, tags, formatter, docs ) => {
 		docs.push( '\n' );
 		docs.push( `*${ title }*` );
 		docs.push( '\n' );
-		docs.push( ...tags.map( formatter ) );
+		docs.push( ...tags.map( ( tag ) => `\n${ formatter( tag ) }` ) );
 	}
 };
 
@@ -31,6 +36,24 @@ const formatExamples = ( tags, docs ) => {
 		docs.push( '\n' );
 		docs.push(
 			...tags.map( ( tag ) => `${ tag.description }` ).join( '\n\n' )
+		);
+	}
+};
+
+const formatSince = ( tags, docs ) => {
+	if ( tags && tags.length > 0 ) {
+		docs.push( '\n' );
+		docs.push( '\n' );
+		docs.push( '*Changelog*' );
+		docs.push( '\n' );
+		docs.push( '\n' );
+		docs.push(
+			...tags.map(
+				( tag ) =>
+					`\n${ cleanSpaces(
+						`\`${ tag.name }\` ${ tag.description }`
+					) }`
+			)
 		);
 	}
 };
@@ -50,9 +73,26 @@ const formatDeprecated = ( tags, docs ) => {
 };
 
 const formatDescription = ( description, docs ) => {
+	const processor = remark().use( () => {
+		return function transformer( tree ) {
+			tree.children.forEach( function ( node ) {
+				if ( node.children ) {
+					transformer( node );
+				}
+				if ( node.type === 'text' && node.value ) {
+					// Replace line breaks with spaces and remove line-ending hyphens.
+					node.value = node.value
+						.replace( /([A-Za-z])-\n([A-Za-z])/g, '$1$2' )
+						.replace( /\n/g, ' ' );
+				}
+			} );
+		};
+	} );
+	const processedDescription = processor.processSync( description );
+
 	docs.push( '\n' );
 	docs.push( '\n' );
-	docs.push( description );
+	docs.push( processedDescription );
 };
 
 const getHeading = ( index, text ) => {
@@ -103,60 +143,97 @@ module.exports = (
 			formatTag(
 				'Related',
 				getSymbolTagsByName( symbol, 'see', 'link' ),
-				( tag ) =>
-					`\n- ${ tag.name.trim() }${
-						tag.description ? ' ' : ''
-					}${ tag.description.trim() }`,
+				( tag ) => {
+					const name = tag.name.trim();
+					const desc = tag.description.trim();
+
+					// prettier-ignore
+					return desc
+						? `- ${ name } ${ desc }`
+						: `- ${ name }`;
+				},
 				docs
 			);
 			formatExamples( getSymbolTagsByName( symbol, 'example' ), docs );
 			formatTag(
 				'Type',
 				getSymbolTagsByName( symbol, 'type' ),
-				( tag ) =>
-					`\n- ${ getTypeOutput( tag ) }${ cleanSpaces(
-						` ${ tag.name } ${ tag.description }`
-					) }`,
+				( tag ) => {
+					const type = tag.type && getTypeOutput( tag );
+					const desc = cleanSpaces(
+						`${ tag.name } ${ tag.description }`
+					);
+
+					// prettier-ignore
+					return type
+						? `- ${ type }${ desc }`
+						: `- ${ desc }`;
+				},
 				docs
 			);
 			formatTag(
 				'Parameters',
 				getSymbolTagsByName( symbol, 'param' ),
-				( tag ) =>
-					`\n- *${ tag.name }* ${ getTypeOutput(
-						tag
-					) }: ${ cleanSpaces( tag.description ) }`,
+				( tag ) => {
+					const name = tag.name;
+					const type = tag.type && getTypeOutput( tag );
+					const desc = cleanSpaces( tag.description );
+
+					return type
+						? `- *${ name }* ${ type }: ${ desc }`
+						: `- *${ name }* ${ desc }`;
+				},
 				docs
 			);
 			formatTag(
 				'Returns',
 				getSymbolTagsByName( symbol, 'return' ),
 				( tag ) => {
-					return `\n- ${ getTypeOutput( tag ) }: ${ cleanSpaces(
+					const type = tag.type && getTypeOutput( tag );
+					const desc = cleanSpaces(
 						`${ tag.name } ${ tag.description }`
-					) }`;
+					);
+
+					// prettier-ignore
+					return type
+						? `- ${ type }: ${ desc }`
+						: `- ${ desc }`;
 				},
 				docs
 			);
 			formatTag(
 				'Type Definition',
 				getSymbolTagsByName( symbol, 'typedef' ),
-				( tag ) => `\n- *${ tag.name }* ${ getTypeOutput( tag ) }`,
+				( tag ) => {
+					const name = tag.name;
+					const type = getTypeOutput( tag );
+					const desc = cleanSpaces( tag.description );
+					return `- *${ name }* ${ type }${
+						desc ? `: ${ desc }` : ''
+					}`;
+				},
 				docs
 			);
 			formatTag(
 				'Properties',
 				getSymbolTagsByName( symbol, 'property' ),
-				( tag ) =>
-					`\n- *${ tag.name }* ${ getTypeOutput(
-						tag
-					) }: ${ cleanSpaces( tag.description ) }`,
+				( tag ) => {
+					const name = tag.name;
+					const type = tag.type && getTypeOutput( tag );
+					const desc = cleanSpaces( tag.description );
+
+					// prettier-ignore
+					return type
+						? `- *${ name }* ${ type }: ${ desc }`
+						: `- *${ name }* ${ desc }`
+				},
 				docs
 			);
+			formatSince( getSymbolTagsByName( symbol, 'since' ), docs );
 			docs.push( '\n' );
 			docs.push( '\n' );
 		} );
-		docs.pop(); // remove last \n, we want one blank line at the end of the file.
+		docs.pop(); // Remove last \n, we want one blank line at the end of the file.
 	} else {
 		docs.push( 'Nothing to document.' );
 		docs.push( '\n' );

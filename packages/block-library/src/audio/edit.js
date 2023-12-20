@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
@@ -6,8 +11,8 @@ import {
 	Disabled,
 	PanelBody,
 	SelectControl,
+	Spinner,
 	ToggleControl,
-	withNotices,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -15,34 +20,33 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
-	RichText,
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
+import { Caption } from '../utils/caption';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
 function AudioEdit( {
 	attributes,
-	noticeOperations,
+	className,
 	setAttributes,
 	onReplace,
 	isSelected,
-	noticeUI,
 	insertBlocksAfter,
 } ) {
-	const { id, autoplay, caption, loop, preload, src } = attributes;
-	const blockProps = useBlockProps();
+	const { id, autoplay, loop, preload, src } = attributes;
+	const isTemporaryAudio = ! id && isBlobURL( src );
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
@@ -55,13 +59,8 @@ function AudioEdit( {
 			if ( file ) {
 				mediaUpload( {
 					filesList: [ file ],
-					onFileChange: ( [ { id: mediaId, url } ] ) => {
-						setAttributes( { id: mediaId, src: url } );
-					},
-					onError: ( e ) => {
-						setAttributes( { src: undefined, id: undefined } );
-						noticeOperations.createErrorNotice( e );
-					},
+					onFileChange: ( [ media ] ) => onSelectAudio( media ),
+					onError: ( e ) => onUploadError( e ),
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 				} );
 			}
@@ -82,7 +81,7 @@ function AudioEdit( {
 			const embedBlock = createUpgradedEmbedBlock( {
 				attributes: { url: newSrc },
 			} );
-			if ( undefined !== embedBlock ) {
+			if ( undefined !== embedBlock && onReplace ) {
 				onReplace( embedBlock );
 				return;
 			}
@@ -90,9 +89,9 @@ function AudioEdit( {
 		}
 	}
 
+	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
 	function getAutoplayHelp( checked ) {
@@ -101,18 +100,34 @@ function AudioEdit( {
 			: null;
 	}
 
-	// const { setAttributes, isSelected, noticeUI } = this.props;
 	function onSelectAudio( media ) {
 		if ( ! media || ! media.url ) {
-			// in this case there was an error and we should continue in the editing state
-			// previous attributes should be removed because they may be temporary blob urls
-			setAttributes( { src: undefined, id: undefined } );
+			// In this case there was an error and we should continue in the editing state
+			// previous attributes should be removed because they may be temporary blob urls.
+			setAttributes( {
+				src: undefined,
+				id: undefined,
+				caption: undefined,
+			} );
 			return;
 		}
-		// sets the block's attribute and updates the edit component from the
-		// selected media, then switches off the editing UI
-		setAttributes( { src: media.url, id: media.id } );
+		// Sets the block's attribute and updates the edit component from the
+		// selected media, then switches off the editing UI.
+		setAttributes( {
+			src: media.url,
+			id: media.id,
+			caption: media.caption,
+		} );
 	}
+
+	const classes = classnames( className, {
+		'is-transient': isTemporaryAudio,
+	} );
+
+	const blockProps = useBlockProps( {
+		className: classes,
+	} );
+
 	if ( ! src ) {
 		return (
 			<div { ...blockProps }>
@@ -123,7 +138,6 @@ function AudioEdit( {
 					accept="audio/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
-					notices={ noticeUI }
 					onError={ onUploadError }
 				/>
 			</div>
@@ -144,19 +158,22 @@ function AudioEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Audio settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Autoplay' ) }
 						onChange={ toggleAttribute( 'autoplay' ) }
 						checked={ autoplay }
 						help={ getAutoplayHelp }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Loop' ) }
 						onChange={ toggleAttribute( 'loop' ) }
 						checked={ loop }
 					/>
 					<SelectControl
+						__nextHasNoMarginBottom
 						label={ _x( 'Preload', 'noun; Audio block parameter' ) }
 						value={ preload || '' }
 						// `undefined` is required for the preload attribute to be unset.
@@ -171,7 +188,7 @@ function AudioEdit( {
 							{ value: 'metadata', label: __( 'Metadata' ) },
 							{
 								value: 'none',
-								label: _x( 'None', '"Preload" value' ),
+								label: _x( 'None', 'Preload value' ),
 							},
 						] }
 					/>
@@ -186,23 +203,17 @@ function AudioEdit( {
 				<Disabled isDisabled={ ! isSelected }>
 					<audio controls="controls" src={ src } />
 				</Disabled>
-				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-					<RichText
-						tagName="figcaption"
-						aria-label={ __( 'Audio caption text' ) }
-						placeholder={ __( 'Add caption' ) }
-						value={ caption }
-						onChange={ ( value ) =>
-							setAttributes( { caption: value } )
-						}
-						inlineToolbar
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
-						}
-					/>
-				) }
+				{ isTemporaryAudio && <Spinner /> }
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Audio caption text' ) }
+				/>
 			</figure>
 		</>
 	);
 }
-export default withNotices( AudioEdit );
+
+export default AudioEdit;

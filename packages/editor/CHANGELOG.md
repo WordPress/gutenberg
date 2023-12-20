@@ -2,6 +2,128 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the editor panels visibility state to the editor store in addition to the following actions and selectors: `toggleEditorPanelEnabled`, `toggleEditorPanelOpened`, `removeEditorPanel`, `isEditorPanelRemoved`, `isEditorPanelOpened` and `isEditorPanelEnabled`.
+
+## 13.25.0 (2023-12-13)
+
+## 13.24.0 (2023-11-29)
+
+## 13.23.0 (2023-11-16)
+
+## 13.22.0 (2023-11-02)
+
+## 13.21.0 (2023-10-18)
+
+## 13.20.0 (2023-10-05)
+
+## 13.19.0 (2023-09-20)
+
+## 13.18.0 (2023-08-31)
+
+## 13.17.0 (2023-08-16)
+
+## 13.16.0 (2023-08-10)
+
+## 13.15.0 (2023-07-20)
+
+## 13.14.0 (2023-07-05)
+
+## 13.13.0 (2023-06-23)
+
+## 13.12.0 (2023-06-07)
+
+## 13.11.0 (2023-05-24)
+
+## 13.10.0 (2023-05-10)
+
+## 13.9.0 (2023-04-26)
+
+## 13.8.0 (2023-04-12)
+
+## 13.7.0 (2023-03-29)
+
+## 13.6.0 (2023-03-15)
+
+## 13.5.0 (2023-03-01)
+
+## 13.4.0 (2023-02-15)
+
+## 13.3.0 (2023-02-01)
+
+## 13.2.0 (2023-01-11)
+
+## 13.1.0 (2023-01-02)
+
+## 13.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 12.21.0 (2022-11-16)
+
+## 12.20.0 (2022-11-02)
+
+## 12.19.0 (2022-10-19)
+
+## 12.18.0 (2022-10-05)
+
+## 12.17.0 (2022-09-21)
+
+## 12.16.0 (2022-09-13)
+
+### New Features
+
+-   Add `isDeletingPost` selector to the `core/editor` store ([#44012](https://github.com/WordPress/gutenberg/pull/44012)).
+
+## 12.15.0 (2022-08-24)
+
+## 12.14.0 (2022-08-10)
+
+## 12.13.0 (2022-07-27)
+
+## 12.12.0 (2022-07-13)
+
+## 12.11.0 (2022-06-29)
+
+## 12.10.0 (2022-06-15)
+
+## 12.9.0 (2022-06-01)
+
+## 12.8.0 (2022-05-18)
+
+## 12.7.0 (2022-05-04)
+
+## 12.6.0 (2022-04-21)
+
+## 12.5.0 (2022-04-08)
+
+## 12.4.0 (2022-03-23)
+
+## 12.3.0 (2022-03-11)
+
+### Deprecations
+
+- Deprecated `cleanForSlug` that is now part of `@wordpress/url`.
+
+## 12.2.0 (2022-02-10)
+
+### Enhancement
+
+-   Export `PostTaxonomiesFlatTermSelector` and `PostTaxonomiesHierarchicalTermSelector` components to allow using them to customize the default term selector for a taxonomy.
+
+### Bug Fix
+
+-   Removed unused `@wordpress/autop`, `@wordpress/blob` and `@wordpress/is-shallow-equal` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
+
+### Deprecations
+
+- the `createUndoLevel` and `refreshPost` actions were marked as deprecated. They were already defunct and acting as noops.
+
+## 12.1.0 (2022-01-27)
+
 ## 12.0.0 (2021-10-12)
 
 ### Breaking changes

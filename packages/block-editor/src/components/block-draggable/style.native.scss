@@ -1,0 +1,19 @@
+.draggable-wrapper__container {
+	flex: 1;
+}
+
+.draggable-chip__wrapper {
+	position: absolute;
+	z-index: 10;
+}
+
+.draggable-chip__container {
+	flex-direction: row;
+	padding: 16px;
+	background-color: $gray-0;
+	border-radius: 8px;
+}
+
+.draggable-chip__container--dark {
+	background-color: $app-background-dark-alt;
+}

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { clamp } from 'lodash';
-
-/**
  * Parses and retrieves a number value.
  *
  * @param {unknown} value The incoming value.
@@ -62,12 +57,26 @@ function getPrecision( value ) {
 }
 
 /**
- * Clamps a value based on a min/max range with rounding
+ * Clamps a value based on a min/max range.
  *
  * @param {number} value The value.
  * @param {number} min   The minimum range.
  * @param {number} max   The maximum range.
- * @param {number} step  A multiplier for the value.
+ *
+ * @return {number} The clamped value.
+ */
+export function clamp( value, min, max ) {
+	const baseValue = getNumber( value );
+	return Math.max( min, Math.min( baseValue, max ) );
+}
+
+/**
+ * Clamps a value based on a min/max range with rounding
+ *
+ * @param {number | string} value The value.
+ * @param {number}          min   The minimum range.
+ * @param {number}          max   The maximum range.
+ * @param {number}          step  A multiplier for the value.
  *
  * @return {number} The rounded and clamped value.
  */
@@ -86,15 +95,4 @@ export function roundClamp(
 	return precision
 		? getNumber( clampedValue.toFixed( precision ) )
 		: clampedValue;
-}
-
-/**
- * Clamps a value based on a min/max range with rounding.
- * Returns a string.
- *
- * @param {Parameters<typeof roundClamp>} args Arguments for roundClamp().
- * @return {string} The rounded and clamped value.
- */
-export function roundClampString( ...args ) {
-	return roundClamp( ...args ).toString();
 }

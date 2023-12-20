@@ -2,6 +2,15 @@
 
 exports[`Audio block renders audio block error state without crashing 1`] = `
 <View
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": true,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
   accessible={true}
   focusable={true}
   onClick={[Function]}
@@ -15,7 +24,7 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
   <View
     pointerEvents="box-none"
     style={
-      Array [
+      [
         undefined,
         undefined,
       ]
@@ -23,7 +32,7 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
   >
     <View
       style={
-        Array [
+        [
           undefined,
           undefined,
           undefined,
@@ -31,6 +40,15 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
       }
     />
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": true,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
       accessible={true}
       focusable={true}
       onClick={[Function]}
@@ -41,24 +59,44 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
+        {
           "height": 44,
         }
       }
     >
       <View>
-        Svg
+        <Svg
+          height={24}
+          style={
+            {
+              "fill": "gray",
+            }
+          }
+          viewBox="0 0 24 24"
+          width={24}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          Path
+        </Svg>
       </View>
       <View
-        style={Object {}}
+        style={{}}
       >
         <Text>
           59IrU0WJtq
         </Text>
         <View>
-          Svg
+          <Svg
+            height={16}
+            style={{}}
+            viewBox="-2 -2 24 24"
+            width={16}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            Path
+          </Svg>
           <Text
-            style={Object {}}
+            style={{}}
           >
             Failed to insert audio file. Please tap for options.
           </Text>
@@ -68,8 +106,8 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
   </View>
   <View
     style={
-      Array [
-        Object {
+      [
+        {
           "height": 44,
         },
         false,
@@ -81,18 +119,34 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
       accessibilityRole="button"
       accessible={true}
       style={
-        Object {
+        {
           "display": "none",
           "flex": 1,
         }
       }
     >
-      <View>
+      <View
+        style={
+          [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
           accessible={true}
-          activeFormats={Array []}
+          activeFormats={[]}
           blockType={
-            Object {
+            {
               "tag": "p",
             }
           }
@@ -122,23 +176,25 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
           onStartShouldSetResponder={[Function]}
           placeholder="Add caption"
           placeholderTextColor="gray"
+          selectionColor="black"
           style={
-            Object {
+            {
               "backgroundColor": undefined,
               "maxWidth": undefined,
               "minHeight": 0,
             }
           }
           text={
-            Object {
+            {
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "",
             }
           }
           textAlign="center"
-          triggerKeyCodes={Array []}
+          triggerKeyCodes={[]}
         />
       </View>
     </View>
@@ -148,6 +204,15 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
 
 exports[`Audio block renders audio file without crashing 1`] = `
 <View
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": true,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
   accessible={true}
   focusable={true}
   onClick={[Function]}
@@ -161,7 +226,7 @@ exports[`Audio block renders audio file without crashing 1`] = `
   <View
     pointerEvents="box-none"
     style={
-      Array [
+      [
         undefined,
         undefined,
       ]
@@ -169,7 +234,7 @@ exports[`Audio block renders audio file without crashing 1`] = `
   >
     <View
       style={
-        Array [
+        [
           undefined,
           undefined,
           undefined,
@@ -177,6 +242,15 @@ exports[`Audio block renders audio file without crashing 1`] = `
       }
     />
     <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": true,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
       accessible={true}
       focusable={true}
       onClick={[Function]}
@@ -187,23 +261,35 @@ exports[`Audio block renders audio file without crashing 1`] = `
       onResponderTerminationRequest={[Function]}
       onStartShouldSetResponder={[Function]}
       style={
-        Object {
+        {
           "height": 44,
         }
       }
     >
       <View>
-        Svg
+        <Svg
+          height={24}
+          style={
+            {
+              "fill": "gray",
+            }
+          }
+          viewBox="0 0 24 24"
+          width={24}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          Path
+        </Svg>
       </View>
       <View
-        style={Object {}}
+        style={{}}
       >
         <Text>
           59IrU0WJtq
         </Text>
         <View>
           <Text
-            style={Object {}}
+            style={{}}
           >
             MP3 audio file
           </Text>
@@ -213,6 +299,15 @@ exports[`Audio block renders audio file without crashing 1`] = `
         accessibilityHint="Double tap to listen the audio file"
         accessibilityLabel="Audio Player"
         accessibilityRole="button"
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
         accessible={true}
         focusable={true}
         onClick={[Function]}
@@ -225,7 +320,7 @@ exports[`Audio block renders audio file without crashing 1`] = `
       >
         <Text
           style={
-            Object {
+            {
               "color": "white",
             }
           }
@@ -237,8 +332,8 @@ exports[`Audio block renders audio file without crashing 1`] = `
   </View>
   <View
     style={
-      Array [
-        Object {
+      [
+        {
           "height": 44,
         },
         false,
@@ -250,18 +345,34 @@ exports[`Audio block renders audio file without crashing 1`] = `
       accessibilityRole="button"
       accessible={true}
       style={
-        Object {
+        {
           "display": "none",
           "flex": 1,
         }
       }
     >
-      <View>
+      <View
+        style={
+          [
+            undefined,
+            undefined,
+          ]
+        }
+      >
         <RCTAztecView
+          accessibilityState={
+            {
+              "busy": undefined,
+              "checked": undefined,
+              "disabled": undefined,
+              "expanded": undefined,
+              "selected": undefined,
+            }
+          }
           accessible={true}
-          activeFormats={Array []}
+          activeFormats={[]}
           blockType={
-            Object {
+            {
               "tag": "p",
             }
           }
@@ -291,23 +402,25 @@ exports[`Audio block renders audio file without crashing 1`] = `
           onStartShouldSetResponder={[Function]}
           placeholder="Add caption"
           placeholderTextColor="gray"
+          selectionColor="black"
           style={
-            Object {
+            {
               "backgroundColor": undefined,
               "maxWidth": undefined,
               "minHeight": 0,
             }
           }
           text={
-            Object {
+            {
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
+              "tag": "p",
               "text": "",
             }
           }
           textAlign="center"
-          triggerKeyCodes={Array []}
+          triggerKeyCodes={[]}
         />
       </View>
     </View>
@@ -319,28 +432,19 @@ exports[`Audio block renders placeholder without crashing 1`] = `
 <View>
   <View
     style={
-      Object {
+      {
         "flex": 1,
       }
     }
   >
     <View
-      accessibilityHint="Double tap to select an audio file"
-      accessibilityLabel="Audio block. Empty"
-      accessibilityRole="button"
-      accessible={true}
-      focusable={true}
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
       style={
-        Array [
-          Array [
-            undefined,
+        [
+          [
+            [
+              undefined,
+              undefined,
+            ],
             undefined,
             undefined,
           ],
@@ -348,25 +452,82 @@ exports[`Audio block renders placeholder without crashing 1`] = `
         ]
       }
     >
+      <View>
+        <View
+          style={
+            {
+              "fill": "black",
+            }
+          }
+        >
+          <View
+            style={{}}
+          >
+            <Svg
+              fill="black"
+              height={24}
+              style={{}}
+              viewBox="0 0 24 24"
+              width={24}
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              Path
+            </Svg>
+          </View>
+        </View>
+        <Text>
+          Audio
+        </Text>
+      </View>
       <View
+        accessibilityHint="Double tap to select an audio file"
+        accessibilityLabel="Audio block. Empty"
+        accessibilityRole="button"
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        hitSlop={
+          {
+            "bottom": 22,
+            "left": 22,
+            "right": 22,
+            "top": 22,
+          }
+        }
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
         style={
-          Object {
-            "fill": "gray",
+          {
+            "opacity": 1,
           }
         }
       >
-        <View
-          style={Object {}}
-        >
-          Svg
-        </View>
+        <Text>
+          Add audio
+        </Text>
       </View>
-      <Text>
-        Audio
-      </Text>
-      <Text>
-        ADD AUDIO
-      </Text>
     </View>
   </View>
 </View>

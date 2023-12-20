@@ -1,219 +1,153 @@
 /**
+ * WordPress dependencies
+ */
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
+import { createRegistry } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
+
+/**
  * Internal dependencies
  */
-import {
-	toggleFeature,
-	setTemplate,
-	addTemplate,
-	setTemplatePart,
-	setPage,
-	showHomepage,
-	setHomeTemplateId,
-	setIsListViewOpened,
-} from '../actions';
+import { store as editSiteStore } from '..';
+
+function createRegistryWithStores() {
+	// create a registry
+	const registry = createRegistry();
+
+	// register stores
+	registry.register( editorStore );
+	registry.register( blockEditorStore );
+	registry.register( coreStore );
+	registry.register( editSiteStore );
+	registry.register( interfaceStore );
+	registry.register( noticesStore );
+	registry.register( preferencesStore );
+
+	return registry;
+}
 
 describe( 'actions', () => {
 	describe( 'toggleFeature', () => {
-		it( 'should return TOGGLE_FEATURE action', () => {
-			const feature = 'name';
-			expect( toggleFeature( feature ) ).toEqual( {
-				type: 'TOGGLE_FEATURE',
-				feature,
-			} );
-		} );
-	} );
+		it( 'should toggle a feature flag', () => {
+			const registry = createRegistryWithStores();
 
-	describe( 'setTemplate', () => {
-		it( 'should return the SET_TEMPLATE action when slug is provided', () => {
-			const templateId = 1;
-			const templateSlug = 'archive';
-			const it = setTemplate( templateId, templateSlug );
-			expect( it.next().value ).toEqual( {
-				type: 'SET_TEMPLATE',
-				templateId,
-				page: { context: { templateSlug } },
-			} );
-		} );
-		it( 'should return the SET_TEMPLATE by getting the template slug', () => {
-			const templateId = 1;
-			const template = { slug: 'index' };
-			const it = setTemplate( templateId );
-			expect( it.next().value ).toEqual( {
-				type: '@@data/RESOLVE_SELECT',
-				storeKey: 'core',
-				selectorName: 'getEntityRecord',
-				args: [ 'postType', 'wp_template', templateId ],
-			} );
-			expect( it.next( template ).value ).toEqual( {
-				type: 'SET_TEMPLATE',
-				templateId,
-				page: { context: { templateSlug: template.slug } },
-			} );
-		} );
-	} );
+			// Should start as undefined.
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core/edit-site', 'name' )
+			).toBe( undefined );
 
-	describe( 'addTemplate', () => {
-		it( 'should yield the DISPATCH control to create the template and return the SET_TEMPLATE action', () => {
-			const template = { slug: 'index' };
-			const newTemplate = { id: 1, slug: 'index' };
+			// Toggle on.
+			registry.dispatch( editSiteStore ).toggleFeature( 'name' );
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core/edit-site', 'name' )
+			).toBe( true );
 
-			const it = addTemplate( template );
-			expect( it.next().value ).toEqual( {
-				type: '@@data/DISPATCH',
-				storeKey: 'core',
-				actionName: 'saveEntityRecord',
-				args: [ 'postType', 'wp_template', template ],
-			} );
-			expect( it.next( newTemplate ) ).toEqual( {
-				value: {
-					type: 'SET_TEMPLATE',
-					templateId: newTemplate.id,
-					page: { context: { templateSlug: newTemplate.slug } },
-				},
-				done: true,
-			} );
+			// Toggle off again.
+			registry.dispatch( editSiteStore ).toggleFeature( 'name' );
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core/edit-site', 'name' )
+			).toBe( false );
+
+			// Expect a deprecation warning.
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
 	describe( 'setTemplatePart', () => {
-		it( 'should return the SET_TEMPLATE_PART action', () => {
-			const templatePartId = 1;
-			expect( setTemplatePart( templatePartId ) ).toEqual( {
-				type: 'SET_TEMPLATE_PART',
-				templatePartId,
-			} );
+		it( 'should set template part', () => {
+			const registry = createRegistryWithStores();
+
+			const ID = 1;
+			registry.dispatch( editSiteStore ).setTemplatePart( ID );
+
+			const select = registry.select( editSiteStore );
+			expect( select.getEditedPostId() ).toBe( ID );
+			expect( select.getEditedPostType() ).toBe( 'wp_template_part' );
 		} );
 	} );
 
-	describe( 'setPage', () => {
-		it( 'should yield the FIND_TEMPLATE control and return the SET_PAGE action', () => {
-			const page = { path: '/' };
-
-			const it = setPage( page );
-			expect( it.next().value ).toEqual( {
-				type: '@@data/RESOLVE_SELECT',
-				storeKey: 'core',
-				selectorName: '__experimentalGetTemplateForLink',
-				args: [ page.path ],
-			} );
-			expect( it.next( { id: 'tt1-blocks//single' } ).value ).toEqual( {
-				type: 'SET_PAGE',
-				page,
-				templateId: 'tt1-blocks//single',
-			} );
-			expect( it.next().done ).toBe( true );
-		} );
-	} );
-
-	describe( 'showHomepage', () => {
-		it( 'should calculate and set the homepage if it is set to show posts', () => {
-			const it = showHomepage();
-
-			expect( it.next().value ).toEqual( {
-				args: [ 'root', 'site' ],
-				selectorName: 'getEntityRecord',
-				storeKey: 'core',
-				type: '@@data/RESOLVE_SELECT',
-			} );
-
-			expect( it.next( { show_on_front: 'posts' } ).value ).toEqual( {
-				args: [],
-				selectorName: 'getSettings',
-				storeKey: 'core/edit-site',
-				type: '@@data/SELECT',
-			} );
-
-			const page = {
-				path: 'http:/my-site',
-				context: {},
-			};
-
-			expect( it.next( { siteUrl: 'http:/my-site' } ).value ).toEqual( {
-				type: '@@data/RESOLVE_SELECT',
-				storeKey: 'core',
-				selectorName: '__experimentalGetTemplateForLink',
-				args: [ page.path ],
-			} );
-			expect( it.next( { id: 'theme//slug' } ).value ).toEqual( {
-				type: 'SET_PAGE',
-				page,
-				templateId: 'theme//slug',
-			} );
-			expect( it.next( 'theme//slug' ).value ).toEqual( {
-				type: 'SET_HOME_TEMPLATE',
-				homeTemplateId: 'theme//slug',
-			} );
-			expect( it.next().done ).toBe( true );
-		} );
-
-		it( 'should calculate and set the homepage if it is set to show a page', () => {
-			const pageId = 2;
-
-			const it = showHomepage();
-
-			expect( it.next().value ).toEqual( {
-				args: [ 'root', 'site' ],
-				selectorName: 'getEntityRecord',
-				storeKey: 'core',
-				type: '@@data/RESOLVE_SELECT',
-			} );
-
+	describe( 'openGeneralSidebar', () => {
+		it( 'should turn off distraction free mode when opening a general sidebar', () => {
+			const registry = createRegistryWithStores();
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core/edit-site', 'distractionFree', true );
+			registry
+				.dispatch( editSiteStore )
+				.openGeneralSidebar( 'edit-site/global-styles' );
 			expect(
-				it.next( { show_on_front: 'page', page_on_front: pageId } )
-					.value
-			).toEqual( {
-				args: [],
-				selectorName: 'getSettings',
-				storeKey: 'core/edit-site',
-				type: '@@data/SELECT',
-			} );
-
-			const page = {
-				path: 'http:/my-site',
-				context: {
-					postType: 'page',
-					postId: pageId,
-				},
-			};
-			expect( it.next( { siteUrl: 'http:/my-site' } ).value ).toEqual( {
-				type: '@@data/RESOLVE_SELECT',
-				storeKey: 'core',
-				selectorName: '__experimentalGetTemplateForLink',
-				args: [ page.path ],
-			} );
-			expect( it.next( { id: 'theme//slug' } ).value ).toEqual( {
-				type: 'SET_PAGE',
-				page,
-				templateId: 'theme//slug',
-			} );
-			expect( it.next( 'theme//slug' ).value ).toEqual( {
-				type: 'SET_HOME_TEMPLATE',
-				homeTemplateId: 'theme//slug',
-			} );
-			expect( it.next().done ).toBe( true );
+				registry
+					.select( preferencesStore )
+					.get( 'core/edit-site', 'distractionFree' )
+			).toBe( false );
 		} );
 	} );
 
-	describe( 'setHomeTemplateId', () => {
-		it( 'should return the SET_HOME_TEMPLATE action', () => {
-			const homeTemplateId = 90;
-			expect( setHomeTemplateId( homeTemplateId ) ).toEqual( {
-				type: 'SET_HOME_TEMPLATE',
-				homeTemplateId,
-			} );
+	describe( 'switchEditorMode', () => {
+		it( 'should turn off distraction free mode when switching to code editor', () => {
+			const registry = createRegistryWithStores();
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core/edit-site', 'distractionFree', true );
+			registry.dispatch( editSiteStore ).switchEditorMode( 'visual' );
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core/edit-site', 'distractionFree' )
+			).toBe( true );
+			registry.dispatch( editSiteStore ).switchEditorMode( 'text' );
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core/edit-site', 'distractionFree' )
+			).toBe( false );
 		} );
 	} );
 
-	describe( 'setIsListViewOpened', () => {
-		it( 'should return the SET_IS_LIST_VIEW_OPENED action', () => {
-			expect( setIsListViewOpened( true ) ).toEqual( {
-				type: 'SET_IS_LIST_VIEW_OPENED',
-				isOpen: true,
-			} );
-			expect( setIsListViewOpened( false ) ).toEqual( {
-				type: 'SET_IS_LIST_VIEW_OPENED',
-				isOpen: false,
-			} );
+	describe( 'toggleDistractionFree', () => {
+		it( 'should properly update settings to prevent layout corruption when enabling distraction free mode', () => {
+			const registry = createRegistryWithStores();
+			// Enable everything that shouldn't be enabled in distraction free mode.
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core/edit-site', 'fixedToolbar', true );
+			registry.dispatch( editorStore ).setIsListViewOpened( true );
+			registry
+				.dispatch( editSiteStore )
+				.openGeneralSidebar( 'edit-site/global-styles' );
+			// Initial state is falsy.
+			registry.dispatch( editSiteStore ).toggleDistractionFree();
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core/edit-site', 'fixedToolbar' )
+			).toBe( true );
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
+				false
+			);
+			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
+				false
+			);
+			expect(
+				registry
+					.select( interfaceStore )
+					.getActiveComplementaryArea( editSiteStore.name )
+			).toBeNull();
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core/edit-site', 'distractionFree' )
+			).toBe( true );
 		} );
 	} );
 } );

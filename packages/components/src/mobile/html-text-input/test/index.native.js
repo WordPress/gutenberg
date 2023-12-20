@@ -1,31 +1,21 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, fireEvent } from 'test/helpers';
 
 /**
  * Internal dependencies
  */
 import { HTMLTextInput } from '..';
 
-// Utility to find a TextInput in a ShallowWrapper
-const findTextInputInWrapper = ( wrapper, accessibilityLabel ) => {
-	return wrapper
-		.dive()
-		.findWhere( ( node ) => {
-			return node.prop( 'accessibilityLabel' ) === accessibilityLabel;
-		} )
-		.first();
+// Finds the Content TextInput in our HTMLInputView.
+const findContentTextInput = ( screen ) => {
+	return screen.getByLabelText( 'html-view-content' );
 };
 
-// Finds the Content TextInput in our HTMLInputView
-const findContentTextInput = ( wrapper ) => {
-	return findTextInputInWrapper( wrapper, 'html-view-content' );
-};
-
-// Finds the Title TextInput in our HTMLInputView
-const findTitleTextInput = ( wrapper ) => {
-	return findTextInputInWrapper( wrapper, 'html-view-title' );
+// Finds the Title TextInput in our HTMLInputView.
+const findTitleTextInput = ( screen ) => {
+	return screen.getByLabelText( 'html-view-title' );
 };
 
 const getStylesFromColorScheme = () => {
@@ -33,43 +23,41 @@ const getStylesFromColorScheme = () => {
 };
 
 describe( 'HTMLTextInput', () => {
-	it( 'HTMLTextInput renders', () => {
-		const wrapper = shallow(
+	it( 'HTMLTextInput renders and matches snapshot', () => {
+		const screen = render(
 			<HTMLTextInput
 				getStylesFromColorScheme={ getStylesFromColorScheme }
 			/>
 		);
-		expect( wrapper ).toBeTruthy();
+		expect( screen.toJSON() ).toMatchSnapshot();
 	} );
 
-	it( 'HTMLTextInput updates store and state on HTML text change', () => {
+	it( 'HTMLTextInput updates state on HTML text change', () => {
 		const onChange = jest.fn();
 
-		const wrapper = shallow(
+		const screen = render(
 			<HTMLTextInput
 				onChange={ onChange }
+				onPersist={ jest.fn() }
 				getStylesFromColorScheme={ getStylesFromColorScheme }
 			/>
 		);
 
-		expect( wrapper.instance().state.isDirty ).toBeFalsy();
+		// Simulate user typing text.
+		const htmlTextInput = findContentTextInput( screen );
+		fireEvent( htmlTextInput, 'changeText', 'text' );
 
-		// Simulate user typing text
-		const htmlTextInput = findContentTextInput( wrapper );
-		htmlTextInput.simulate( 'changeText', 'text' );
-
-		//Check if the onChange is called and the state is updated
+		// Check if the onChange is called and the state is updated.
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 		expect( onChange ).toHaveBeenCalledWith( 'text' );
 
-		expect( wrapper.instance().state.isDirty ).toBeTruthy();
-		expect( wrapper.instance().state.value ).toEqual( 'text' );
+		expect( screen.getByDisplayValue( 'text' ) ).toBeDefined();
 	} );
 
 	it( 'HTMLTextInput persists changes in HTML text input on blur', () => {
 		const onPersist = jest.fn();
 
-		const wrapper = shallow(
+		const screen = render(
 			<HTMLTextInput
 				onPersist={ onPersist }
 				onChange={ jest.fn() }
@@ -77,42 +65,53 @@ describe( 'HTMLTextInput', () => {
 			/>
 		);
 
-		// Simulate user typing text
-		const htmlTextInput = findContentTextInput( wrapper );
-		htmlTextInput.simulate( 'changeText', 'text' );
+		// Simulate user typing text.
+		const htmlTextInput = findContentTextInput( screen );
+		fireEvent( htmlTextInput, 'changeText', 'text' );
 
-		//Simulate blur event
-		htmlTextInput.simulate( 'blur' );
+		//Simulate blur event.
+		fireEvent( htmlTextInput, 'blur' );
 
-		//Normally prop.value is updated with the help of withSelect
-		//But we don't have it in tests so we just simulate it
-		wrapper.setProps( { value: 'text' } );
+		// Normally prop.value is updated with the help of withSelect
+		// but we don't have it in tests so we just simulate it.
+		screen.update(
+			<HTMLTextInput
+				onPersist={ onPersist }
+				onChange={ jest.fn() }
+				getStylesFromColorScheme={ getStylesFromColorScheme }
+				value="text"
+			/>
+		);
 
-		//Check if the onPersist is called and the state is updated
+		// Check if the onPersist is called and the state is updated.
 		expect( onPersist ).toHaveBeenCalledTimes( 1 );
 		expect( onPersist ).toHaveBeenCalledWith( 'text' );
 
-		expect( wrapper.instance().state.isDirty ).toBeFalsy();
+		//Simulate blur event.
+		fireEvent( htmlTextInput, 'blur' );
 
-		//We expect state.value is getting propagated from prop.value
-		expect( wrapper.instance().state.value ).toEqual( 'text' );
+		// Check that onPersist is not called for non-dirty state.
+		expect( onPersist ).toHaveBeenCalledTimes( 1 );
+
+		// We expect state.value is getting propagated from prop.value.
+		expect( screen.getByDisplayValue( 'text' ) ).toBeDefined();
 	} );
 
 	it( 'HTMLTextInput propagates title changes to store', () => {
 		const editTitle = jest.fn();
 
-		const wrapper = shallow(
+		const screen = render(
 			<HTMLTextInput
 				editTitle={ editTitle }
 				getStylesFromColorScheme={ getStylesFromColorScheme }
 			/>
 		);
 
-		// Simulate user typing text
-		const textInput = findTitleTextInput( wrapper );
-		textInput.simulate( 'changeText', 'text' );
+		// Simulate user typing text.
+		const textInput = findTitleTextInput( screen );
+		fireEvent( textInput, 'changeText', 'text' );
 
-		//Check if the setTitleAction is called
+		// Check if the setTitleAction is called.
 		expect( editTitle ).toHaveBeenCalledTimes( 1 );
 		expect( editTitle ).toHaveBeenCalledWith( 'text' );
 	} );

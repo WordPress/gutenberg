@@ -1,0 +1,62 @@
+
+.components-popover.block-editor-block-popover {
+	z-index: z-index(".block-editor-block-popover");
+	position: absolute;
+	// Shouldn't be needed but it looks
+	// like the popover is impacted by the block gap margin.
+	margin: 0 !important;
+
+	// Allow clicking through the toolbar holder.
+	pointer-events: none;
+
+	.components-popover__content {
+		margin: 0 !important;
+		min-width: auto;
+		width: max-content;
+		overflow-y: visible;
+	}
+
+	// Enable pointer events for the toolbar's content.
+	&:not(.block-editor-block-popover__inbetween, .block-editor-block-popover__drop-zone, .block-editor-block-list__block-side-inserter-popover) .components-popover__content {
+		* {
+			pointer-events: all;
+		}
+	}
+}
+
+.components-popover.block-editor-block-popover__inbetween {
+	// Disable pointer events for dragging and dropping.
+	// Without this the insertion point interferes with the
+	// drop zone.
+	pointer-events: none;
+
+	* {
+		pointer-events: none;
+	}
+
+	// Re-enable pointer events when the inbetween inserter has a '+' button.
+	// Needs specificity, do not simplify.
+	.is-with-inserter {
+		pointer-events: all;
+
+		* {
+			pointer-events: all;
+		}
+	}
+}
+
+
+.components-popover.block-editor-block-popover__drop-zone {
+	// Disable pointer events for dragging and dropping.
+	// This drop zone is fully presentational, the actual DnD implementation is handled elsewhere.
+	* {
+		pointer-events: none;
+	}
+
+	.block-editor-block-popover__drop-zone-foreground {
+		position: absolute;
+		inset: 0;
+		background-color: var(--wp-admin-theme-color);
+		border-radius: 2px;
+	}
+}

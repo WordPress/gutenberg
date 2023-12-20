@@ -14,15 +14,29 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Usage
 
+### GET
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
-// GET
 apiFetch( { path: '/wp/v2/posts' } ).then( ( posts ) => {
 	console.log( posts );
 } );
+```
 
-// POST
+### GET with Query Args
+```js
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
+
+const queryParams = { include: [1,2,3] }; // Return posts with ID = 1,2,3.
+
+apiFetch( { path: addQueryArgs( '/wp/v2/posts', queryParams ) } ).then( ( posts ) => {
+	console.log( posts );
+} );
+```
+
+### POST
+```js
 apiFetch( {
 	path: '/wp/v2/posts/1',
 	method: 'POST',
@@ -52,7 +66,7 @@ Unlike `fetch`, the `Promise` return value of `apiFetch` will resolve to the par
 
 #### `data` (`object`)
 
-Shorthand to be used in place of `body`, accepts an object value to be stringified to JSON.
+Sent on `POST` or `PUT` requests only. Shorthand to be used in place of `body`, accepts an object value to be stringified to JSON.
 
 ### Aborting a request
 
@@ -148,4 +162,10 @@ apiFetch.setFetchHandler( ( options ) => {
 } );
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

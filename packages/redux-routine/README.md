@@ -61,12 +61,7 @@ request has completed does the action creator procede to return the `SET_TEMPERA
 
 ### default
 
-Creates a Redux middleware, given an object of controls where each key is an
-action type for which to act upon, the value a function which returns either
-a promise which is to resolve when evaluation of the action should continue,
-or a value. The value or resolved promise value is assigned on the return
-value of the yield assignment. If the control handler returns undefined, the
-execution is not continued.
+Creates a Redux middleware, given an object of controls where each key is an action type for which to act upon, the value a function which returns either a promise which is to resolve when evaluation of the action should continue, or a value. The value or resolved promise value is assigned on the return value of the yield assignment. If the control handler returns undefined, the execution is not continued.
 
 _Parameters_
 
@@ -122,4 +117,10 @@ deepEqual( action.next( jsonResult ).value, {
 
 If your action creator does not assign the yielded result into a variable, you can also use `Array.from` to create an array from the result of the action creator.
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

@@ -10,12 +10,28 @@ import {
 	capitalizeAfterColonSeparatedPrefix,
 	getIssueType,
 	sortGroup,
+	skipCreatedByBots,
 	getTypesByLabels,
 	getTypesByTitle,
 	getIssueFeature,
-	formatChangelog,
+	getFormattedItemDescription,
+	getUniqueByUsername,
+	getChangelog,
+	getContributorProps,
+	getContributorsList,
+	mapLabelsToFeatures,
 } from '../changelog';
-import pullRequests from './fixtures/pull-requests.json';
+import _pullRequests from './fixtures/pull-requests.json';
+import botPullRequestFixture from './fixtures/bot-pull-requests.json';
+
+/**
+ * pull-requests.json is a static snapshot of real data from the Github API.
+ * We merge this with dummy fixture data for a "bot" pull request so as to
+ * ensure future updates to the pull-requests.json doesn't reduce test coverage
+ * of filtering out of bot PRs.
+ * See: https://github.com/WordPress/gutenberg/pull/38777#discussion_r808992346.
+ */
+const pullRequests = _pullRequests.concat( botPullRequestFixture );
 
 describe( 'getNormalizedTitle', () => {
 	const DEFAULT_ISSUE = {
@@ -36,7 +52,7 @@ describe( 'getNormalizedTitle', () => {
 			undefined,
 			{
 				...DEFAULT_ISSUE,
-				labels: [ { name: 'Mobile App Android/iOS' } ],
+				labels: [ { name: 'Mobile App - i.e. Android or iOS' } ],
 			},
 		],
 		[
@@ -173,6 +189,17 @@ describe( 'getIssueType', () => {
 
 		expect( result ).toBe( 'Enhancements' );
 	} );
+
+	it( 'prioritizes meta categories', () => {
+		const result = getIssueType( {
+			labels: [
+				{ name: '[Type] Bug' },
+				{ name: '[Type] Build Tooling' },
+			],
+		} );
+
+		expect( result ).toBe( 'Tools' );
+	} );
 } );
 
 describe( 'getIssueFeature', () => {
@@ -189,7 +216,7 @@ describe( 'getIssueFeature', () => {
 					name: 'Some Label',
 				},
 				{
-					name: '[Package] Example Package', // 1. has explicit mapping
+					name: '[Package] Example Package', // 1. has explicit mapping.
 				},
 				{
 					name: '[Package] Another One',
@@ -204,10 +231,10 @@ describe( 'getIssueFeature', () => {
 		const result = getIssueFeature( {
 			labels: [
 				{
-					name: '[Block] Some Block', // 3. Block-specific label
+					name: '[Block] Some Block', // 3. Block-specific label.
 				},
 				{
-					name: '[Package] Edit Widgets', // 1. has explicit mapping
+					name: '[Package] Edit Widgets', // 1. has explicit mapping.
 				},
 				{
 					name: '[Feature] Some Feature', // 2. Feature label.
@@ -227,13 +254,13 @@ describe( 'getIssueFeature', () => {
 		const result = getIssueFeature( {
 			labels: [
 				{
-					name: '[Block] Some Block', // block specific label
+					name: '[Block] Some Block', // Block specific label.
 				},
 				{
 					name: '[Package] This package',
 				},
 				{
-					name: '[Feature] Cool Feature', // should have priority despite prescence of block specific label
+					name: '[Feature] Cool Feature', // Should have priority despite prescence of block specific label.
 				},
 				{
 					name: '[Package] Another One',
@@ -286,15 +313,32 @@ describe( 'sortGroup', () => {
 } );
 
 describe( 'getTypesByLabels', () => {
-	it( 'returns all normalized type candidates by type prefix', () => {
+	it( 'returns all normalized type candidates by type prefix. it is case insensitive', () => {
 		const result = getTypesByLabels( [
 			'[Type] Regression',
 			'[Type] Bug',
 			'[Package] Blocks',
-			'[Type] Performance',
+			'[Type] performance',
 		] );
 
 		expect( result ).toEqual( [ 'Bug Fixes', 'Performance' ] );
+	} );
+} );
+
+describe( 'mapLabelsToFeatures', () => {
+	it( 'returns all normalized feature candidates by feature prefix. it is case insensitive', () => {
+		const result = mapLabelsToFeatures( [
+			'[Package] Commands',
+			'[Package] Block Library',
+			'[Feature] Link Editing',
+			'[Feature] block Multi Selection',
+		] );
+
+		expect( result ).toEqual( [
+			'Commands',
+			'Block Library',
+			'Block Editor',
+		] );
 	} );
 } );
 
@@ -315,11 +359,161 @@ describe( 'getTypesByTitle', () => {
 	} );
 } );
 
-describe( 'formatChangelog', () => {
+describe( 'getUniqueByUsername', () => {
+	it( 'removes duplicate entries by username', () => {
+		const entries = [
+			{
+				user: {
+					login: '@user1',
+				},
+			},
+			{
+				user: {
+					login: '@user1',
+				},
+			},
+			{
+				user: {
+					login: '@user2',
+				},
+			},
+			{
+				user: {
+					login: '@user3',
+				},
+			},
+			{
+				user: {
+					login: '@user4',
+				},
+			},
+		];
+
+		const expected = [
+			{
+				user: {
+					login: '@user1',
+				},
+			},
+			{
+				user: {
+					login: '@user2',
+				},
+			},
+			{
+				user: {
+					login: '@user3',
+				},
+			},
+			{
+				user: {
+					login: '@user4',
+				},
+			},
+		];
+		expect( getUniqueByUsername( entries ) ).toEqual( expected );
+	} );
+} );
+
+describe( 'skipCreatedByBots', () => {
+	it( 'removes entries created by bots', () => {
+		const entries = [
+			{
+				user: {
+					login: '@user1',
+					type: 'User',
+				},
+			},
+			{
+				user: {
+					login: '@dependabot[bot]',
+					type: 'Bot',
+				},
+			},
+			{
+				user: {
+					login: '@user2',
+					type: 'User',
+				},
+			},
+			{
+				user: {
+					login: '@someotherrandombotusername',
+					type: 'Bot',
+				},
+			},
+			{
+				user: {
+					login: '@user3',
+					type: 'User',
+				},
+			},
+		];
+
+		const expected = [
+			{
+				user: {
+					login: '@user1',
+					type: 'User',
+				},
+			},
+			{
+				user: {
+					login: '@user2',
+					type: 'User',
+				},
+			},
+			{
+				user: {
+					login: '@user3',
+					type: 'User',
+				},
+			},
+		];
+		expect( skipCreatedByBots( entries ) ).toEqual( expected );
+	} );
+} );
+
+describe( 'getFormattedItemDescription', () => {
+	it( 'creates a markdown formatted description', () => {
+		const expected =
+			'This is a test title and should have a link. ([123456](https://github.com/123456))';
+		expect(
+			getFormattedItemDescription(
+				'This is a test title and should have a link.',
+				123456,
+				'https://github.com/123456'
+			)
+		).toEqual( expected );
+	} );
+} );
+
+describe( 'getChangelog', () => {
 	test( 'verify that the changelog is properly formatted', () => {
 		// The fixture with the list of pull requests was generated by running the following command:
-		// npm run changelog -- --milestone="Gutenberg 11.3"
+		// npm run other:changelog -- --milestone="Gutenberg 16.8"
 		// The response from the `fetchAllPullRequests` call in the `getChangelog` method was stored in the JSON file.
-		expect( formatChangelog( pullRequests ) ).toMatchSnapshot();
+		expect( getChangelog( pullRequests ) ).toMatchSnapshot();
+	} );
+} );
+
+describe( 'getContributorProps', () => {
+	test( 'verify that the contributors props are properly formatted', () => {
+		// The fixture with the list of pull requests was generated by running the following command:
+		// npm run other:changelog -- --milestone="Gutenberg 11.3"
+		expect( getContributorProps( pullRequests ) ).toMatchSnapshot();
+	} );
+	test( 'do not include first time contributors section if there are not any', () => {
+		expect(
+			getContributorProps( pullRequests.slice( 0, 4 ) )
+		).toMatchInlineSnapshot( `""` );
+	} );
+} );
+
+describe( 'getContributorList', () => {
+	test( 'verify that the contributors list is properly formatted', () => {
+		// The fixture with the list of pull requests was generated by running the following command:
+		// npm run other:changelog -- --milestone="Gutenberg 11.3"
+		expect( getContributorsList( pullRequests ) ).toMatchSnapshot();
 	} );
 } );

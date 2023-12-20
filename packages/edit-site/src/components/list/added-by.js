@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * External dependencies
  */
@@ -6,11 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalHStack as HStack,
-	Icon,
-	Tooltip,
-} from '@wordpress/components';
+import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -18,182 +15,151 @@ import {
 	commentAuthorAvatar as authorIcon,
 	layout as themeIcon,
 	plugins as pluginIcon,
+	globe as globeIcon,
 } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 
-const TEMPLATE_POST_TYPE_NAMES = [ 'wp_template', 'wp_template_part' ];
+/**
+ * Internal dependencies
+ */
+import { TEMPLATE_POST_TYPE, TEMPLATE_ORIGINS } from '../../utils/constants';
 
-function CustomizedTooltip( { isCustomized, children } ) {
-	if ( ! isCustomized ) {
-		return children;
-	}
+/** @typedef {'wp_template'|'wp_template_part'} TemplateType */
 
-	return (
-		<Tooltip text={ __( 'This template has been customized' ) }>
-			{ children }
-		</Tooltip>
+/**
+ * @typedef {'theme'|'plugin'|'site'|'user'} AddedByType
+ *
+ * @typedef AddedByData
+ * @type {Object}
+ * @property {AddedByType}  type         The type of the data.
+ * @property {JSX.Element}  icon         The icon to display.
+ * @property {string}       [imageUrl]   The optional image URL to display.
+ * @property {string}       [text]       The text to display.
+ * @property {boolean}      isCustomized Whether the template has been customized.
+ *
+ * @param    {TemplateType} postType     The template post type.
+ * @param    {number}       postId       The template post id.
+ * @return {AddedByData} The added by object or null.
+ */
+export function useAddedBy( postType, postId ) {
+	return useSelect(
+		( select ) => {
+			const {
+				getEntityRecord,
+				getMedia,
+				getUser,
+				getEditedEntityRecord,
+			} = select( coreStore );
+			const template = getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			const originalSource = template?.original_source;
+			const authorText = template?.author_text;
+
+			switch ( originalSource ) {
+				case 'theme': {
+					return {
+						type: originalSource,
+						icon: themeIcon,
+						text: authorText,
+						isCustomized:
+							template.source === TEMPLATE_ORIGINS.custom,
+					};
+				}
+				case 'plugin': {
+					return {
+						type: originalSource,
+						icon: pluginIcon,
+						text: authorText,
+						isCustomized:
+							template.source === TEMPLATE_ORIGINS.custom,
+					};
+				}
+				case 'site': {
+					const siteData = getEntityRecord(
+						'root',
+						'__unstableBase'
+					);
+					return {
+						type: originalSource,
+						icon: globeIcon,
+						imageUrl: siteData?.site_logo
+							? getMedia( siteData.site_logo )?.source_url
+							: undefined,
+						text: authorText,
+						isCustomized: false,
+					};
+				}
+				default: {
+					const user = getUser( template.author );
+					return {
+						type: 'user',
+						icon: authorIcon,
+						imageUrl: user?.avatar_urls?.[ 48 ],
+						text: authorText,
+						isCustomized: false,
+					};
+				}
+			}
+		},
+		[ postType, postId ]
 	);
 }
 
-function AddedByTheme( { slug, isCustomized } ) {
-	const theme = useSelect(
-		( select ) => select( coreStore ).getTheme( slug ),
-		[ slug ]
-	);
-
-	return (
-		<HStack alignment="left">
-			<CustomizedTooltip isCustomized={ isCustomized }>
-				<div
-					className={ classnames( 'edit-site-list-added-by__icon', {
-						'is-customized': isCustomized,
-					} ) }
-				>
-					<Icon icon={ themeIcon } />
-				</div>
-			</CustomizedTooltip>
-			<span>{ theme?.name?.rendered || slug }</span>
-		</HStack>
-	);
-}
-
-function AddedByPlugin( { slug, isCustomized } ) {
-	const plugin = useSelect(
-		( select ) => select( coreStore ).getPlugin( slug ),
-		[ slug ]
-	);
-
-	return (
-		<HStack alignment="left">
-			<CustomizedTooltip isCustomized={ isCustomized }>
-				<div
-					className={ classnames( 'edit-site-list-added-by__icon', {
-						'is-customized': isCustomized,
-					} ) }
-				>
-					<Icon icon={ pluginIcon } />
-				</div>
-			</CustomizedTooltip>
-			<span>{ plugin?.name || slug }</span>
-		</HStack>
-	);
-}
-
-function AddedByAuthor( { id } ) {
-	const user = useSelect( ( select ) => select( coreStore ).getUser( id ), [
-		id,
-	] );
-	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
-
-	const avatarURL = user?.avatar_urls?.[ 48 ];
-	const hasAvatar = !! avatarURL;
-
-	return (
-		<HStack alignment="left">
-			<div
-				className={ classnames(
-					hasAvatar
-						? 'edit-site-list-added-by__avatar'
-						: 'edit-site-list-added-by__icon',
-					{
-						'is-loaded': isImageLoaded,
-					}
-				) }
-			>
-				{ hasAvatar ? (
-					<img
-						onLoad={ () => setIsImageLoaded( true ) }
-						alt=""
-						src={ avatarURL }
-					/>
-				) : (
-					<Icon icon={ authorIcon } />
-				) }
-			</div>
-			<span>{ user?.nickname }</span>
-		</HStack>
-	);
-}
-
-function AddedBySite() {
-	const { name, logoURL } = useSelect( ( select ) => {
-		const { getEntityRecord, getMedia } = select( coreStore );
-		const siteData = getEntityRecord( 'root', '__unstableBase' );
-
-		return {
-			name: siteData.name,
-			logoURL: siteData?.site_logo
-				? getMedia( siteData.site_logo )?.source_url
-				: undefined,
-		};
-	}, [] );
+/**
+ * @param {Object} props
+ * @param {string} props.imageUrl
+ */
+export function AvatarImage( { imageUrl } ) {
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 
 	return (
-		<HStack alignment="left">
-			<div
-				className={ classnames( 'edit-site-list-added-by__avatar', {
-					'is-loaded': isImageLoaded,
-				} ) }
-			>
-				<img
-					onLoad={ () => setIsImageLoaded( true ) }
-					alt=""
-					src={ logoURL }
-				/>
-			</div>
-			<span>{ name }</span>
-		</HStack>
+		<div
+			className={ classnames( 'edit-site-list-added-by__avatar', {
+				'is-loaded': isImageLoaded,
+			} ) }
+		>
+			<img
+				onLoad={ () => setIsImageLoaded( true ) }
+				alt=""
+				src={ imageUrl }
+			/>
+		</div>
 	);
 }
 
-export default function AddedBy( { templateType, template } ) {
-	if ( ! template ) {
-		return;
-	}
+/**
+ * @param {Object}       props
+ * @param {TemplateType} props.postType The template post type.
+ * @param {number}       props.postId   The template post id.
+ */
+export default function AddedBy( { postType, postId } ) {
+	const { text, icon, imageUrl, isCustomized } = useAddedBy(
+		postType,
+		postId
+	);
 
-	if ( TEMPLATE_POST_TYPE_NAMES.includes( templateType ) ) {
-		// Template originally provided by a theme, but customized by a user.
-		// Templates originally didn't have the 'origin' field so identify
-		// older customized templates by checking for no origin and a 'theme'
-		// or 'custom' source.
-		if (
-			template.has_theme_file &&
-			( template.origin === 'theme' ||
-				( ! template.origin &&
-					[ 'theme', 'custom' ].includes( template.source ) ) )
-		) {
-			return (
-				<AddedByTheme
-					slug={ template.theme }
-					isCustomized={ template.source === 'custom' }
-				/>
-			);
-		}
-
-		// Template originally provided by a plugin, but customized by a user.
-		if ( template.has_theme_file && template.origin === 'plugin' ) {
-			return (
-				<AddedByPlugin
-					slug={ template.theme }
-					isCustomized={ template.source === 'custom' }
-				/>
-			);
-		}
-
-		// Template was created from scratch, but has no author. Author support
-		// was only added to templates in WordPress 5.9. Fallback to showing the
-		// site logo and title.
-		if (
-			! template.has_theme_file &&
-			template.source === 'custom' &&
-			! template.author
-		) {
-			return <AddedBySite />;
-		}
-	}
-
-	// Simply show the author for templates created from scratch that have an
-	// author or for any other post type.
-	return <AddedByAuthor id={ template.author } />;
+	return (
+		<HStack alignment="left">
+			{ imageUrl ? (
+				<AvatarImage imageUrl={ imageUrl } />
+			) : (
+				<div className="edit-site-list-added-by__icon">
+					<Icon icon={ icon } />
+				</div>
+			) }
+			<span>
+				{ text }
+				{ isCustomized && (
+					<span className="edit-site-list-added-by__customized-info">
+						{ postType === TEMPLATE_POST_TYPE
+							? _x( 'Customized', 'template' )
+							: _x( 'Customized', 'template part' ) }
+					</span>
+				) }
+			</span>
+		</HStack>
+	);
 }

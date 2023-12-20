@@ -11,7 +11,7 @@ function KeyboardShortcuts() {
 }
 
 function KeyboardShortcutsRegister() {
-	// Registering the shortcuts
+	// Registering the shortcuts.
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	useEffect( () => {
 		registerShortcut( {
@@ -61,7 +61,7 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/block-editor/delete-multi-selection',
 			category: 'block',
-			description: __( 'Remove multiple selected blocks.' ),
+			description: __( 'Delete selection.' ),
 			keyCombination: {
 				character: 'del',
 			},
@@ -90,6 +90,16 @@ function KeyboardShortcutsRegister() {
 			description: __( 'Clear selection.' ),
 			keyCombination: {
 				character: 'escape',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/multi-text-selection',
+			category: 'selection',
+			description: __( 'Select text across multiple blocks.' ),
+			keyCombination: {
+				modifier: 'shift',
+				character: 'arrow',
 			},
 		} );
 

@@ -4,8 +4,6 @@ This package includes a library of generic WordPress components to be used for c
 
 ## Installation
 
-Install the module
-
 ```bash
 npm install @wordpress/components --save
 ```
@@ -27,16 +25,48 @@ export default function MyButton() {
 }
 ```
 
-Many components include CSS to add style, you will need to add in order to appear correctly. Within WordPress, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
+Many components include CSS to add styles, which you will need to load in order for them to appear correctly. Within WordPress, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
 
 In non-WordPress projects, link to the `build-style/style.css` file directly, it is located at `node_modules/@wordpress/components/build-style/style.css`.
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+### Popovers
+
+By default, the `Popover` component will render within an extra element appended to the body of the document.
+
+If you want to precisely contol where the popovers render, you will need to use the `Popover.Slot` component.
+
+The following example illustrates how you can wrap a component using a
+`Popover` and have those popovers render to a single location in the DOM.
+
+```jsx
+/**
+ * External dependencies
+ */
+import { Popover, SlotFillProvider } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { MyComponentWithPopover } from './my-component';
+
+const Example = () => {
+	<SlotFillProvider>
+		<MyComponentWithPopover />
+		<Popover.Slot />
+	</SlotFillProvider>;
+};
+```
 
 ## Docs & examples
 
-You can browse the components docs and examples at https://wordpress.github.io/gutenberg/
+You can browse the components docs and examples at [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
 
-## Contributing
+## Contributing to this package
 
-See [CONTRIBUTING.md](/packages/components/CONTRIBUTING.md) for the contributing guidelines for the `@wordpress/components` package.
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+This package also has its own [contributing information](https://github.com/WordPress/gutenberg/tree/HEAD/packages/components/CONTRIBUTING.md) where you can find additional details.
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

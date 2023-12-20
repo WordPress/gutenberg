@@ -12,7 +12,7 @@ import useRefEffect from '../use-ref-effect';
 /**
  * @template T
  * @param {T} value
- * @return {import('react').MutableRefObject<T>} A ref with the value.
+ * @return {import('react').MutableRefObject<T|null>} A ref with the value.
  */
 function useFreshRef( value ) {
 	/* eslint-enable jsdoc/valid-types */
@@ -33,18 +33,20 @@ function useFreshRef( value ) {
 /**
  * A hook to facilitate drag and drop handling.
  *
- * @param {Object}                  props             Named parameters.
- * @param {boolean}                 props.isDisabled  Whether or not to disable the drop zone.
- * @param {(e: DragEvent) => void}  props.onDragStart Called when dragging has started.
- * @param {(e: DragEvent) => void}  props.onDragEnter Called when the zone is entered.
- * @param {(e: DragEvent) => void}  props.onDragOver  Called when the zone is moved within.
- * @param {(e: DragEvent) => void}  props.onDragLeave Called when the zone is left.
- * @param {(e: MouseEvent) => void} props.onDragEnd   Called when dragging has ended.
- * @param {(e: DragEvent) => void}  props.onDrop      Called when dropping in the zone.
+ * @param {Object}                  props                   Named parameters.
+ * @param {?HTMLElement}            [props.dropZoneElement] Optional element to be used as the drop zone.
+ * @param {boolean}                 [props.isDisabled]      Whether or not to disable the drop zone.
+ * @param {(e: DragEvent) => void}  [props.onDragStart]     Called when dragging has started.
+ * @param {(e: DragEvent) => void}  [props.onDragEnter]     Called when the zone is entered.
+ * @param {(e: DragEvent) => void}  [props.onDragOver]      Called when the zone is moved within.
+ * @param {(e: DragEvent) => void}  [props.onDragLeave]     Called when the zone is left.
+ * @param {(e: MouseEvent) => void} [props.onDragEnd]       Called when dragging has ended.
+ * @param {(e: DragEvent) => void}  [props.onDrop]          Called when dropping in the zone.
  *
  * @return {import('react').RefCallback<HTMLElement>} Ref callback to be passed to the drop zone element.
  */
 export default function useDropZone( {
+	dropZoneElement,
 	isDisabled,
 	onDrop: _onDrop,
 	onDragStart: _onDragStart,
@@ -61,10 +63,15 @@ export default function useDropZone( {
 	const onDragOverRef = useFreshRef( _onDragOver );
 
 	return useRefEffect(
-		( element ) => {
+		( elem ) => {
 			if ( isDisabled ) {
 				return;
 			}
+
+			// If a custom dropZoneRef is passed, use that instead of the element.
+			// This allows the dropzone to cover an expanded area, rather than
+			// be restricted to the area of the ref returned by this hook.
+			const element = dropZoneElement ?? elem;
 
 			let isDragging = false;
 
@@ -106,11 +113,6 @@ export default function useDropZone( {
 				}
 
 				isDragging = true;
-
-				ownerDocument.removeEventListener(
-					'dragenter',
-					maybeDragStart
-				);
 
 				// Note that `dragend` doesn't fire consistently for file and
 				// HTML drag events where the drag origin is outside the browser
@@ -161,6 +163,8 @@ export default function useDropZone( {
 				// leaving the drop zone, which means the `relatedTarget`
 				// (element that has been entered) should be outside the drop
 				// zone.
+				// Note: This is not entirely reliable in Safari due to this bug
+				// https://bugs.webkit.org/show_bug.cgi?id=66547
 				if ( isElementInZone( event.relatedTarget ) ) {
 					return;
 				}
@@ -200,7 +204,6 @@ export default function useDropZone( {
 
 				isDragging = false;
 
-				ownerDocument.addEventListener( 'dragenter', maybeDragStart );
 				ownerDocument.removeEventListener( 'dragend', maybeDragEnd );
 				ownerDocument.removeEventListener( 'mousemove', maybeDragEnd );
 
@@ -226,9 +229,12 @@ export default function useDropZone( {
 				element.removeEventListener( 'dragleave', onDragLeave );
 				ownerDocument.removeEventListener( 'dragend', maybeDragEnd );
 				ownerDocument.removeEventListener( 'mousemove', maybeDragEnd );
-				ownerDocument.addEventListener( 'dragenter', maybeDragStart );
+				ownerDocument.removeEventListener(
+					'dragenter',
+					maybeDragStart
+				);
 			};
 		},
-		[ isDisabled ]
+		[ isDisabled, dropZoneElement ] // Refresh when the passed in dropZoneElement changes.
 	);
 }

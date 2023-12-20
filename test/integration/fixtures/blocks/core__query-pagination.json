@@ -1,12 +1,11 @@
 [
 	{
-		"clientId": "_clientId_0",
 		"name": "core/query-pagination",
 		"isValid": true,
 		"attributes": {
-			"paginationArrow": "none"
+			"paginationArrow": "none",
+			"showLabel": true
 		},
-		"innerBlocks": [],
-		"originalContent": ""
+		"innerBlocks": []
 	}
 ]

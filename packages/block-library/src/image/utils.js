@@ -1,31 +1,40 @@
 /**
- * External dependencies
- */
-import { isEmpty, each, get } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { NEW_TAB_REL } from './constants';
 
+/**
+ * Evaluates a CSS aspect-ratio property value as a number.
+ *
+ * Degenerate or invalid ratios behave as 'auto'. And 'auto' ratios return NaN.
+ *
+ * @see https://drafts.csswg.org/css-sizing-4/#aspect-ratio
+ *
+ * @param {string} value CSS aspect-ratio property value.
+ * @return {number} Numerical aspect ratio or NaN if invalid.
+ */
+export function evalAspectRatio( value ) {
+	const [ width, height = 1 ] = value.split( '/' ).map( Number );
+	const aspectRatio = width / height;
+	return aspectRatio === Infinity || aspectRatio === 0 ? NaN : aspectRatio;
+}
+
 export function removeNewTabRel( currentRel ) {
 	let newRel = currentRel;
 
-	if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
-		if ( ! isEmpty( newRel ) ) {
-			each( NEW_TAB_REL, ( relVal ) => {
-				const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
-				newRel = newRel.replace( regExp, '' );
-			} );
+	if ( currentRel !== undefined && newRel ) {
+		NEW_TAB_REL.forEach( ( relVal ) => {
+			const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
+			newRel = newRel.replace( regExp, '' );
+		} );
 
-			// Only trim if NEW_TAB_REL values was replaced.
-			if ( newRel !== currentRel ) {
-				newRel = newRel.trim();
-			}
+		// Only trim if NEW_TAB_REL values was replaced.
+		if ( newRel !== currentRel ) {
+			newRel = newRel.trim();
+		}
 
-			if ( isEmpty( newRel ) ) {
-				newRel = undefined;
-			}
+		if ( ! newRel ) {
+			newRel = undefined;
 		}
 	}
 
@@ -64,7 +73,7 @@ export function getUpdatedLinkTargetSettings( value, { rel } ) {
  * @param {string} size  Selected size slug to apply.
  */
 export function getImageSizeAttributes( image, size ) {
-	const url = get( image, [ 'media_details', 'sizes', size, 'source_url' ] );
+	const url = image?.media_details?.sizes?.[ size ]?.source_url;
 
 	if ( url ) {
 		return { url, width: undefined, height: undefined, sizeSlug: size };

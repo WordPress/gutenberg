@@ -25,7 +25,7 @@ const {
 	hasProjectFile,
 } = require( '../utils' );
 
-// Check if the project has wp-prettier installed and if the project has a Prettier config
+// Check if the project has wp-prettier installed and if the project has a Prettier config.
 function checkPrettier() {
 	try {
 		const prettierResolvePath = require.resolve( 'prettier' );
@@ -90,13 +90,13 @@ if ( ! ignorePath ) {
 }
 const ignoreArgs = [ '--ignore-path', ignorePath ];
 
-// forward the --require-pragma option that formats only files that already have the @format
+// Forward the --require-pragma option that formats only files that already have the @format
 // pragma in the first docblock.
 const pragmaArgs = hasArgInCLI( '--require-pragma' )
 	? [ '--require-pragma' ]
 	: [];
 
-// Get the files and directories to format and convert them to globs
+// Get the files and directories to format and convert them to globs.
 let fileArgs = getFileArgsFromCLI();
 if ( fileArgs.length === 0 ) {
 	fileArgs = [ '.' ];
@@ -104,7 +104,7 @@ if ( fileArgs.length === 0 ) {
 
 // Converts `foo/bar` directory to `foo/bar/**/*.js`
 const globArgs = dirGlob( fileArgs, {
-	extensions: [ 'js', 'jsx', 'ts', 'tsx', 'yml', 'yaml' ],
+	extensions: [ 'js', 'jsx', 'json', 'ts', 'tsx', 'yml', 'yaml' ],
 } );
 
 const result = spawn(

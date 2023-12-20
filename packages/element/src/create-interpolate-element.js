@@ -3,7 +3,11 @@
  */
 import { createElement, cloneElement, Fragment, isValidElement } from './react';
 
-/** @typedef {import('./react').WPElement} WPElement */
+/**
+ * Object containing a React element.
+ *
+ * @typedef {import('react').ReactElement} Element
+ */
 
 let indoc, offset, output, stack;
 
@@ -16,7 +20,7 @@ let indoc, offset, output, stack;
  * There are four references extracted using this tokenizer:
  *
  * match: Full match of the tag (i.e. <strong>, </strong>, <br/>)
- * isClosing: The closing slash, it it exists.
+ * isClosing: The closing slash, if it exists.
  * name: The name portion of the tag (strong, br) (if )
  * isSelfClosed: The slash on a self closing tag, if it exists.
  *
@@ -29,17 +33,17 @@ const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
  *
  * @typedef Frame
  *
- * @property {WPElement}   element            A parent element which may still have
- * @property {number}      tokenStart         Offset at which parent element first
- *                                            appears.
- * @property {number}      tokenLength        Length of string marking start of parent
- *                                            element.
- * @property {number}      [prevOffset]       Running offset at which parsing should
- *                                            continue.
- * @property {number}      [leadingTextStart] Offset at which last closing element
- *                                            finished, used for finding text between
- *                                            elements.
- * @property {WPElement[]} children           Children.
+ * @property {Element}   element            A parent element which may still have
+ * @property {number}    tokenStart         Offset at which parent element first
+ *                                          appears.
+ * @property {number}    tokenLength        Length of string marking start of parent
+ *                                          element.
+ * @property {number}    [prevOffset]       Running offset at which parsing should
+ *                                          continue.
+ * @property {number}    [leadingTextStart] Offset at which last closing element
+ *                                          finished, used for finding text between
+ *                                          elements.
+ * @property {Element[]} children           Children.
  */
 
 /**
@@ -49,17 +53,17 @@ const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
  * parsed.
  *
  * @private
- * @param {WPElement} element            A parent element which may still have
- *                                       nested children not yet parsed.
- * @param {number}    tokenStart         Offset at which parent element first
- *                                       appears.
- * @param {number}    tokenLength        Length of string marking start of parent
- *                                       element.
- * @param {number}    [prevOffset]       Running offset at which parsing should
- *                                       continue.
- * @param {number}    [leadingTextStart] Offset at which last closing element
- *                                       finished, used for finding text between
- *                                       elements.
+ * @param {Element} element            A parent element which may still have
+ *                                     nested children not yet parsed.
+ * @param {number}  tokenStart         Offset at which parent element first
+ *                                     appears.
+ * @param {number}  tokenLength        Length of string marking start of parent
+ *                                     element.
+ * @param {number}  [prevOffset]       Running offset at which parsing should
+ *                                     continue.
+ * @param {number}  [leadingTextStart] Offset at which last closing element
+ *                                     finished, used for finding text between
+ *                                     elements.
  *
  * @return {Frame} The stack frame tracking parse progress.
  */
@@ -101,11 +105,11 @@ function createFrame(
  * }
  * ```
  *
- * @param {string} interpolatedString The interpolation string to be parsed.
- * @param {Object} conversionMap      The map used to convert the string to
- *                                    a react element.
+ * @param {string}                  interpolatedString The interpolation string to be parsed.
+ * @param {Record<string, Element>} conversionMap      The map used to convert the string to
+ *                                                     a react element.
  * @throws {TypeError}
- * @return {WPElement}  A wp element.
+ * @return {Element}  A wp element.
  */
 const createInterpolateElement = ( interpolatedString, conversionMap ) => {
 	indoc = interpolatedString;
@@ -116,7 +120,7 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
 
 	if ( ! isValidConversionMap( conversionMap ) ) {
 		throw new TypeError(
-			'The conversionMap provided is not valid. It must be an object with values that are WPElements'
+			'The conversionMap provided is not valid. It must be an object with values that are React Elements'
 		);
 	}
 
@@ -130,7 +134,7 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
  * Validate conversion map.
  *
  * A map is considered valid if it's an object and every value in the object
- * is a WPElement
+ * is a React Element
  *
  * @private
  *
@@ -169,10 +173,8 @@ function proceed( conversionMap ) {
 	switch ( tokenType ) {
 		case 'no-more-tokens':
 			if ( stackDepth !== 0 ) {
-				const {
-					leadingTextStart: stackLeadingText,
-					tokenStart,
-				} = stack.pop();
+				const { leadingTextStart: stackLeadingText, tokenStart } =
+					stack.pop();
 				output.push( indoc.substr( stackLeadingText, tokenStart ) );
 			}
 			addText();
@@ -193,7 +195,7 @@ function proceed( conversionMap ) {
 				return true;
 			}
 
-			// otherwise we found an inner element
+			// Otherwise we found an inner element.
 			addChild(
 				createFrame( conversionMap[ name ], startOffset, tokenLength )
 			);
@@ -214,15 +216,15 @@ function proceed( conversionMap ) {
 			return true;
 
 		case 'closer':
-			// if we're not nesting then this is easy - close the block
+			// If we're not nesting then this is easy - close the block.
 			if ( 1 === stackDepth ) {
 				closeOuterElement( startOffset );
 				offset = startOffset + tokenLength;
 				return true;
 			}
 
-			// otherwise we're nested and we have to close out the current
-			// block and add it as a innerBlock to the parent
+			// Otherwise we're nested and we have to close out the current
+			// block and add it as a innerBlock to the parent.
 			const stackTop = stack.pop();
 			const text = indoc.substr(
 				stackTop.prevOffset,
@@ -256,7 +258,7 @@ function proceed( conversionMap ) {
  */
 function nextToken() {
 	const matches = tokenizer.exec( indoc );
-	// we have no more tokens
+	// We have no more tokens.
 	if ( null === matches ) {
 		return [ 'no-more-tokens' ];
 	}
@@ -325,13 +327,8 @@ function addChild( frame ) {
  *                           the element.
  */
 function closeOuterElement( endOffset ) {
-	const {
-		element,
-		leadingTextStart,
-		prevOffset,
-		tokenStart,
-		children,
-	} = stack.pop();
+	const { element, leadingTextStart, prevOffset, tokenStart, children } =
+		stack.pop();
 
 	const text = endOffset
 		? indoc.substr( prevOffset, endOffset - prevOffset )

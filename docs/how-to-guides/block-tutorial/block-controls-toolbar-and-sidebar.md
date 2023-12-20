@@ -10,9 +10,6 @@ When the user selects a block, a number of control buttons may be shown in a too
 
 You can also customize the toolbar to include controls specific to your block type. If the return value of your block type's `edit` function includes a `BlockControls` element, those controls will be shown in the selected block's toolbar.
 
-{% codetabs %}
-{% JSX %}
-
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 
@@ -24,14 +21,14 @@ import {
 } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
-	apiVersion: 2,
+	apiVersion: 3,
 	title: 'Example: Controls (esnext)',
 	icon: 'universal-access-alt',
 	category: 'design',
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			type: 'string',
+			source: 'html',
 			selector: 'p',
 		},
 		alignment: {
@@ -92,95 +89,6 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 } );
 ```
 
-{% Plain %}
-
-```js
-( function ( blocks, blockEditor, element ) {
-	var el = element.createElement;
-	var RichText = blockEditor.RichText;
-	var AlignmentToolbar = blockEditor.AlignmentToolbar;
-	var BlockControls = blockEditor.BlockControls;
-	var useBlockProps = blockEditor.useBlockProps;
-
-	blocks.registerBlockType( 'gutenberg-examples/example-04-controls', {
-		title: 'Example: Controls',
-		icon: 'universal-access-alt',
-		category: 'design',
-
-		attributes: {
-			content: {
-				type: 'array',
-				source: 'children',
-				selector: 'p',
-			},
-			alignment: {
-				type: 'string',
-				default: 'none',
-			},
-		},
-		example: {
-			attributes: {
-				content: 'Hello World',
-				alignment: 'right',
-			},
-		},
-		edit: function ( props ) {
-			var content = props.attributes.content;
-			var alignment = props.attributes.alignment;
-
-			function onChangeContent( newContent ) {
-				props.setAttributes( { content: newContent } );
-			}
-
-			function onChangeAlignment( newAlignment ) {
-				props.setAttributes( {
-					alignment:
-						newAlignment === undefined ? 'none' : newAlignment,
-				} );
-			}
-
-			return el(
-				'div',
-				useBlockProps(),
-				el(
-					BlockControls,
-					{ key: 'controls' },
-					el( AlignmentToolbar, {
-						value: alignment,
-						onChange: onChangeAlignment,
-					} )
-				),
-				el( RichText, {
-					key: 'richtext',
-					tagName: 'p',
-					style: { textAlign: alignment },
-					onChange: onChangeContent,
-					value: content,
-				} )
-			);
-		},
-
-		save: function ( props ) {
-			var blockProps = useBlockProps.save();
-
-			return el(
-				'div',
-				blockProps,
-				el( RichText.Content, {
-					tagName: 'p',
-					className:
-						'gutenberg-examples-align-' +
-						props.attributes.alignment,
-					value: props.attributes.content,
-				} )
-			);
-		},
-	} );
-} )( window.wp.blocks, window.wp.blockEditor, window.wp.element );
-```
-
-{% end %}
-
 Note that `BlockControls` is only visible when the block is currently selected and in visual editing mode. `BlockControls` are not shown when editing a block in HTML editing mode.
 
 ## Settings Sidebar
@@ -208,7 +116,7 @@ import {
 } from '@wordpress/block-editor';
 
 registerBlockType( 'create-block/gutenpride', {
-	apiVersion: 2,
+	apiVersion: 3,
 	attributes: {
 		message: {
 			type: 'string',
@@ -279,3 +187,5 @@ registerBlockType( 'create-block/gutenpride', {
 
 Block controls rendered in both the toolbar and sidebar will also be used when
 multiple blocks of the same type are selected.
+
+**Note :** In the example above, we added text and background color customization support to our block to demonstrate the use of `InspectorControls` to add custom controls to the sidebar. That said, for common customization settings including color, border, spacing customization and more, we will see on the [next chapter](/docs/how-to-guides/block-tutorial/block-supports-in-static-blocks.md) that you can rely on block supports to provide the same functionality in a more efficient way.

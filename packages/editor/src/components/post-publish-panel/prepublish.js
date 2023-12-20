@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -24,6 +19,8 @@ import PostScheduleLabel from '../post-schedule/label';
 import MaybeTagsPanel from './maybe-tags-panel';
 import MaybePostFormatPanel from './maybe-post-format-panel';
 import { store as editorStore } from '../../store';
+import MaybeCategoryPanel from './maybe-category-panel';
+import MaybeUploadMedia from './maybe-upload-media';
 
 function PostPublishPanelPrepublish( { children } ) {
 	const {
@@ -34,19 +31,15 @@ function PostPublishPanelPrepublish( { children } ) {
 		siteTitle,
 		siteHome,
 	} = useSelect( ( select ) => {
-		const { getCurrentPost, isEditedPostBeingScheduled } = select(
-			editorStore
-		);
+		const { getCurrentPost, isEditedPostBeingScheduled } =
+			select( editorStore );
 		const { getEntityRecord, isResolving } = select( coreStore );
 		const siteData =
 			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
 		return {
-			hasPublishAction: get(
-				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
-				false
-			),
+			hasPublishAction:
+				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isRequestingSiteIcon: isResolving( 'getEntityRecord', [
 				'root',
@@ -111,6 +104,7 @@ function PostPublishPanelPrepublish( { children } ) {
 					<span className="components-site-home">{ siteHome }</span>
 				</div>
 			</div>
+			<MaybeUploadMedia />
 			{ hasPublishAction && (
 				<>
 					<PanelBody
@@ -145,6 +139,7 @@ function PostPublishPanelPrepublish( { children } ) {
 			) }
 			<MaybePostFormatPanel />
 			<MaybeTagsPanel />
+			<MaybeCategoryPanel />
 			{ children }
 		</div>
 	);

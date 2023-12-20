@@ -8,20 +8,17 @@ import { isEmpty, split, toHTMLString } from '@wordpress/rich-text';
  * as a result of splitting the block by pressing enter, or with blocks as a
  * result of splitting the block by pasting block content in the instance.
  */
-export function splitValue( {
-	value,
-	pastedBlocks = [],
-	onReplace,
-	onSplit,
-	onSplitMiddle,
-	multilineTag,
-} ) {
+export function splitValue( { value, pastedBlocks = [], onReplace, onSplit } ) {
 	if ( ! onReplace || ! onSplit ) {
 		return;
 	}
 
+	// Ensure the value has a selection. This might happen when trying to split
+	// an empty value before there was a `selectionchange` event.
+	const { start = 0, end = 0 } = value;
+	const valueWithEnsuredSelection = { ...value, start, end };
 	const blocks = [];
-	const [ before, after ] = split( value );
+	const [ before, after ] = split( valueWithEnsuredSelection );
 	const hasPastedBlocks = pastedBlocks.length > 0;
 	let lastPastedBlockIndex = -1;
 
@@ -31,17 +28,11 @@ export function splitValue( {
 
 	// Create a block with the content before the caret if there's no pasted
 	// blocks, or if there are pasted blocks and the value is not empty. We do
-	// not want a leading empty block on paste, but we do if split with e.g. the
-	// enter key.
+	// not want a leading empty block on paste, but we do if we split with e.g.
+	// the enter key.
 	if ( ! hasPastedBlocks || ! isEmpty( before ) ) {
 		blocks.push(
-			onSplit(
-				toHTMLString( {
-					value: before,
-					multilineTag,
-				} ),
-				! isAfterOriginal
-			)
+			onSplit( toHTMLString( { value: before } ), ! isAfterOriginal )
 		);
 		lastPastedBlockIndex += 1;
 	}
@@ -49,27 +40,15 @@ export function splitValue( {
 	if ( hasPastedBlocks ) {
 		blocks.push( ...pastedBlocks );
 		lastPastedBlockIndex += pastedBlocks.length;
-	} else if ( onSplitMiddle ) {
-		blocks.push( onSplitMiddle() );
 	}
 
-	// If there's pasted blocks, append a block with non empty content / after
-	// the caret. Otherwise, do append an empty block if there is no
-	// `onSplitMiddle` prop, but if there is and the content is empty, the
-	// middle block is enough to set focus in.
-	if (
-		hasPastedBlocks
-			? ! isEmpty( after )
-			: ! onSplitMiddle || ! isEmpty( after )
-	) {
+	// Create a block with the content after the caret if there's no pasted
+	// blocks, or if there are pasted blocks and the value is not empty. We do
+	// not want a trailing empty block on paste, but we do if we split with e.g.
+	// the enter key.
+	if ( ! hasPastedBlocks || ! isEmpty( after ) ) {
 		blocks.push(
-			onSplit(
-				toHTMLString( {
-					value: after,
-					multilineTag,
-				} ),
-				isAfterOriginal
-			)
+			onSplit( toHTMLString( { value: after } ), isAfterOriginal )
 		);
 	}
 

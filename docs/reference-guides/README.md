@@ -16,12 +16,14 @@
 -   [Metadata](/docs/reference-guides/block-api/block-metadata.md)
 -   [Variations](/docs/reference-guides/block-api/block-variations.md)
 
-## [Filter Reference](/docs/reference-guides/filters/README.md)
+## [Hooks Reference](/docs/reference-guides/filters/README.md)
 
 -   [Block Filters](/docs/reference-guides/filters/block-filters.md)
--   [Editor Filters (Experimental)](/docs/reference-guides/filters/editor-filters.md)
--   [Parser Filters](/docs/reference-guides/filters/parser-filters.md)
+-   [Editor Hooks](/docs/reference-guides/filters/editor-filters.md)
+-   [i18n Hooks](/docs/reference-guides/filters/i18n-filters.md)
+-   [Parser Hooks](/docs/reference-guides/filters/parser-filters.md)
 -   [Autocomplete](/docs/reference-guides/filters/autocomplete-filters.md)
+-   [Global Styles Hooks](/docs/reference-guides/filters/global-styles-filters.md)
 
 ## [SlotFills Reference](/docs/reference-guides/slotfills/README.md)
 
@@ -35,6 +37,12 @@
 -   [PluginSidebar](/docs/reference-guides/slotfills/plugin-sidebar.md)
 -   [PluginSidebarMoreMenuItem](/docs/reference-guides/slotfills/plugin-sidebar-more-menu-item.md)
 
+## [Theme.json Reference](/docs/reference-guides/theme-json-reference/README.md)
+
+-   [Version 2 (living reference)](/docs/reference-guides/theme-json-reference/theme-json-living.md)
+-   [Version 1](/docs/reference-guides/theme-json-reference/theme-json-v1.md)
+-   [Migrating to Newer Versions](/docs/reference-guides/theme-json-reference/theme-json-migrations.md)
+
 ## [RichText Reference](/docs/reference-guides/richtext.md)
 
 ## [Component Reference](/packages/components/README.md)
@@ -45,10 +53,18 @@
 
 -   [**core**: WordPress Core Data](/docs/reference-guides/data/data-core.md)
     -   [**core/annotations**: Annotations](/docs/reference-guides/data/data-core-annotations.md)
-    -   [**core/blocks**: Block Types Data](/docs/reference-guides/data/data-core-blocks.md)
+    -   [**core/block-directory**: Block directory](/docs/reference-guides/data/data-core-block-directory.md)
     -   [**core/block-editor**: The Block Editor’s Data](/docs/reference-guides/data/data-core-block-editor.md)
-    -   [**core/editor**: The Post Editor’s Data](/docs/reference-guides/data/data-core-editor.md)
+    -   [**core/blocks**: Block Types Data](/docs/reference-guides/data/data-core-blocks.md)
+    -   [**core/customize-widgets**: Customize Widgets](/docs/reference-guides/data/data-core-customize-widgets.md)
     -   [**core/edit-post**: The Editor’s UI Data](/docs/reference-guides/data/data-core-edit-post.md)
+    -   [**core/edit-site**: Edit Site](/docs/reference-guides/data/data-core-edit-site.md)
+    -   [**core/edit-widgets**: Edit Widgets](/docs/reference-guides/data/data-core-edit-widgets.md)
+    -   [**core/editor**: The Post Editor’s Data](/docs/reference-guides/data/data-core-editor.md)
+    -   [**core/keyboard-shortcuts**: The Keyboard Shortcuts Data](/docs/reference-guides/data/data-core-keyboard-shortcuts.md)
     -   [**core/notices**: Notices Data](/docs/reference-guides/data/data-core-notices.md)
     -   [**core/nux**: The NUX (New User Experience) Data](/docs/reference-guides/data/data-core-nux.md)
+    -   [**core/preferences**: Preferences](/docs/reference-guides/data/data-core-preferences.md)
+    -   [**core/reusable-blocks**: Reusable blocks](/docs/reference-guides/data/data-core-reusable-blocks.md)
+    -   [**core/rich-text**: Rich Text](/docs/reference-guides/data/data-core-rich-text.md)
     -   [**core/viewport**: The Viewport Data](/docs/reference-guides/data/data-core-viewport.md)

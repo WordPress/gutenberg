@@ -11,12 +11,7 @@
 		"prefer-no-devDependencies": "error",
 		"require-publishConfig": "error",
 		"require-repository-directory": "error",
-		"valid-values-author": [
-			"error",
-			[
-				"The WordPress Contributors"
-			]
-		],
+		"valid-values-author": [ "error", [ "The WordPress Contributors" ] ],
 		"valid-values-publishConfig": [
 			"error",
 			[
@@ -29,6 +24,14 @@
 	"overrides": [
 		{
 			"patterns": [ "./package.json" ],
+			"rules": {
+				"require-publishConfig": "off",
+				"require-repository-directory": "off",
+				"prefer-no-devDependencies": "off"
+			}
+		},
+		{
+			"patterns": [ "./platform-docs/package.json" ],
 			"rules": {
 				"require-publishConfig": "off",
 				"require-repository-directory": "off",

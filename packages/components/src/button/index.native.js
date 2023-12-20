@@ -8,12 +8,12 @@ import {
 	View,
 	Platform,
 } from 'react-native';
-import { isArray } from 'lodash';
+import { LongPressGestureHandler, State } from 'react-native-gesture-handler';
 
 /**
  * WordPress dependencies
  */
-import { Children, cloneElement } from '@wordpress/element';
+import { Children, cloneElement, useCallback } from '@wordpress/element';
 import {
 	usePreferredColorScheme,
 	usePreferredColorSchemeStyle,
@@ -24,6 +24,7 @@ import {
  */
 import Tooltip from '../tooltip';
 import Icon from '../icon';
+import style from './style.scss';
 
 const isAndroid = Platform.OS === 'android';
 const marginBottom = isAndroid ? -0.5 : 0;
@@ -51,11 +52,9 @@ const styles = StyleSheet.create( {
 		justifyContent: 'center',
 		alignItems: 'center',
 		borderRadius: 6,
-		borderColor: '#2e4453',
-		backgroundColor: '#2e4453',
 	},
 	subscriptInactive: {
-		color: '#7b9ab1', // $toolbar-button
+		color: '#7b9ab1', // $toolbar-button.
 		fontWeight: 'bold',
 		fontSize: 13,
 		alignSelf: 'flex-end',
@@ -63,7 +62,7 @@ const styles = StyleSheet.create( {
 		marginBottom,
 	},
 	subscriptInactiveDark: {
-		color: '#a7aaad', // $gray_20
+		color: '#a7aaad', // $gray_20.
 	},
 	subscriptActive: {
 		color: 'white',
@@ -95,6 +94,7 @@ export function Button( props ) {
 		tooltipPosition,
 		isActiveStyle,
 		customContainerStyles,
+		hitSlop,
 	} = props;
 	const preferredColorScheme = usePreferredColorScheme();
 
@@ -105,10 +105,16 @@ export function Button( props ) {
 		customContainerStyles && { ...customContainerStyles },
 	];
 
+	const buttonActiveColorStyles = usePreferredColorSchemeStyle(
+		style[ 'components-button-light--active' ],
+		style[ 'components-button-dark--active' ]
+	);
+
 	const buttonViewStyle = {
 		opacity: isDisabled ? 0.3 : 1,
 		...( fixedRatio && styles.fixedRatio ),
 		...( isPressed ? styles.buttonActive : styles.buttonInactive ),
+		...( isPressed ? buttonActiveColorStyles : {} ),
 		...( isPressed &&
 			isActiveStyle?.borderRadius && {
 				borderRadius: isActiveStyle.borderRadius,
@@ -144,24 +150,32 @@ export function Button( props ) {
 	// Should show the tooltip if...
 	const shouldShowTooltip =
 		! isDisabled &&
-		// an explicit tooltip is passed or...
+		// An explicit tooltip is passed or...
 		( ( showTooltip && label ) ||
-			// there's a shortcut or...
+			// There's a shortcut or...
 			shortcut ||
-			// there's a label and...
+			// There's a label and...
 			( !! label &&
-				// the children are empty and...
+				// The children are empty and...
 				( ! children ||
-					( isArray( children ) && ! children.length ) ) &&
-				// the tooltip is not explicitly disabled.
+					( Array.isArray( children ) && ! children.length ) ) &&
+				// The tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
 	const newIcon = icon
 		? cloneElement( <Icon icon={ icon } size={ iconSize } />, {
-				colorScheme: preferredColorScheme,
 				isPressed,
 		  } )
 		: null;
+
+	const longPressHandler = useCallback(
+		( { nativeEvent } ) => {
+			if ( nativeEvent.state === State.ACTIVE && onLongPress ) {
+				onLongPress();
+			}
+		},
+		[ onLongPress ]
+	);
 
 	const element = (
 		<TouchableOpacity
@@ -172,28 +186,34 @@ export function Button( props ) {
 			accessibilityRole={ 'button' }
 			accessibilityHint={ hint }
 			onPress={ onClick }
-			onLongPress={ onLongPress }
 			style={ containerStyle }
 			disabled={ isDisabled }
 			testID={ testID }
+			hitSlop={ hitSlop }
 		>
-			<View style={ buttonViewStyle }>
-				<View style={ { flexDirection: 'row' } }>
-					{ newIcon }
-					{ newChildren }
-					{ subscript && (
-						<Text
-							style={
-								isPressed
-									? styles.subscriptActive
-									: subscriptInactive
-							}
-						>
-							{ subscript }
-						</Text>
-					) }
+			<LongPressGestureHandler
+				minDurationMs={ 500 }
+				maxDist={ 150 }
+				onHandlerStateChange={ longPressHandler }
+			>
+				<View style={ buttonViewStyle }>
+					<View style={ { flexDirection: 'row' } }>
+						{ newIcon }
+						{ newChildren }
+						{ subscript && (
+							<Text
+								style={
+									isPressed
+										? styles.subscriptActive
+										: subscriptInactive
+								}
+							>
+								{ subscript }
+							</Text>
+						) }
+					</View>
 				</View>
-			</View>
+			</LongPressGestureHandler>
 		</TouchableOpacity>
 	);
 

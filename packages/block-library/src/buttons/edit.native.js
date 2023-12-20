@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { debounce } from 'lodash';
 import { View } from 'react-native';
 
 /**
@@ -13,8 +12,8 @@ import {
 	JustifyContentControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
-import { useResizeObserver } from '@wordpress/compose';
+import { createBlock, getBlockSupport } from '@wordpress/blocks';
+import { debounce, useResizeObserver } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { alignmentHelpers } from '@wordpress/components';
@@ -29,24 +28,32 @@ const ALLOWED_BLOCKS = [ buttonBlockName ];
 
 const layoutProp = { type: 'default', alignments: [] };
 
+const POPOVER_PROPS = {
+	placement: 'bottom-start',
+};
+
 export default function ButtonsEdit( {
-	attributes: { contentJustification, align },
+	attributes: { layout, align },
 	clientId,
 	isSelected,
 	setAttributes,
 	blockWidth,
+	name,
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	const { marginLeft: spacing } = styles.spacing;
 
+	// Extract attributes from block layout
+	const layoutBlockSupport = getBlockSupport( name, 'layout' );
+	const defaultBlockLayout = layoutBlockSupport?.default;
+	const usedLayout = layout || defaultBlockLayout || {};
+	const { justifyContent } = usedLayout;
+
 	const { isInnerButtonSelected, shouldDelete } = useSelect(
 		( select ) => {
-			const {
-				getBlockCount,
-				getBlockParents,
-				getSelectedBlockClientId,
-			} = select( blockEditorStore );
+			const { getBlockCount, getBlockParents, getSelectedBlockClientId } =
+				select( blockEditorStore );
 			const selectedBlockClientId = getSelectedBlockClientId();
 			const selectedBlockParents = getBlockParents(
 				selectedBlockClientId,
@@ -66,16 +73,15 @@ export default function ButtonsEdit( {
 	);
 
 	const preferredStyle = useSelect( ( select ) => {
-		const preferredStyleVariations = select(
-			blockEditorStore
-		).getSettings().__experimentalPreferredStyleVariations;
+		const preferredStyleVariations =
+			select( blockEditorStore ).getSettings()
+				.__experimentalPreferredStyleVariations;
 		return preferredStyleVariations?.value?.[ buttonBlockName ];
 	}, [] );
 
 	const { getBlockOrder } = useSelect( blockEditorStore );
-	const { insertBlock, removeBlock, selectBlock } = useDispatch(
-		blockEditorStore
-	);
+	const { insertBlock, removeBlock, selectBlock } =
+		useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		const { width } = sizes || {};
@@ -101,7 +107,7 @@ export default function ButtonsEdit( {
 
 			const insertedBlock = createBlock( 'core/button' );
 
-			insertBlock( insertedBlock, index, clientId );
+			insertBlock( insertedBlock, index, clientId, false );
 			selectBlock( insertedBlock.clientId );
 		}, 200 ),
 		[]
@@ -126,14 +132,16 @@ export default function ButtonsEdit( {
 				<BlockControls group="block">
 					<JustifyContentControl
 						allowedControls={ justifyControls }
-						value={ contentJustification }
+						value={ justifyContent }
 						onChange={ ( value ) =>
-							setAttributes( { contentJustification: value } )
+							setAttributes( {
+								layout: {
+									...usedLayout,
+									justifyContent: value,
+								},
+							} )
 						}
-						popoverProps={ {
-							position: 'bottom right',
-							isAlternate: true,
-						} }
+						popoverProps={ POPOVER_PROPS }
 					/>
 				</BlockControls>
 			) }
@@ -154,13 +162,13 @@ export default function ButtonsEdit( {
 					shouldRenderFooterAppender && renderFooterAppender.current
 				}
 				orientation="horizontal"
-				horizontalAlignment={ contentJustification }
+				horizontalAlignment={ justifyContent }
 				onDeleteBlock={ shouldDelete ? remove : undefined }
 				onAddBlock={ onAddNextButton }
 				parentWidth={ maxWidth } // This value controls the width of that the buttons are able to expand to.
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
-				__experimentalLayout={ layoutProp }
+				layout={ layoutProp }
 				templateInsertUpdatesSelection
 				blockWidth={ blockWidth }
 			/>

@@ -1,82 +1,99 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { __experimentalTreeGridCell as TreeGridCell } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { __, sprintf } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 import { useSelect } from '@wordpress/data';
+import { forwardRef, useEffect } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import ListViewLeaf from './leaf';
-import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import { useListViewContext } from './context';
+import Inserter from '../inserter';
+import AriaReferencedText from './aria-referenced-text';
 
-export default function ListViewAppender( {
-	parentBlockClientId,
-	position,
-	level,
-	rowCount,
-	path,
-} ) {
-	const isDragging = useSelect(
-		( select ) => {
-			const { isBlockBeingDragged, isAncestorBeingDragged } = select(
-				blockEditorStore
+export const Appender = forwardRef(
+	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
+		const { insertedBlock, setInsertedBlock } = useListViewContext();
+
+		const instanceId = useInstanceId( Appender );
+		const hideInserter = useSelect(
+			( select ) => {
+				const { getTemplateLock, __unstableGetEditorMode } =
+					select( blockEditorStore );
+
+				return (
+					!! getTemplateLock( clientId ) ||
+					__unstableGetEditorMode() === 'zoom-out'
+				);
+			},
+			[ clientId ]
+		);
+
+		const blockTitle = useBlockDisplayTitle( {
+			clientId,
+			context: 'list-view',
+		} );
+
+		const insertedBlockTitle = useBlockDisplayTitle( {
+			clientId: insertedBlock?.clientId,
+			context: 'list-view',
+		} );
+
+		useEffect( () => {
+			if ( ! insertedBlockTitle?.length ) {
+				return;
+			}
+
+			speak(
+				sprintf(
+					// translators: %s: name of block being inserted (i.e. Paragraph, Image, Group etc)
+					__( '%s block inserted' ),
+					insertedBlockTitle
+				),
+				'assertive'
 			);
+		}, [ insertedBlockTitle ] );
 
-			return (
-				isBlockBeingDragged( parentBlockClientId ) ||
-				isAncestorBeingDragged( parentBlockClientId )
-			);
-		},
-		[ parentBlockClientId ]
-	);
-	const instanceId = useInstanceId( ListViewAppender );
-	const descriptionId = `list-view-appender-row__description_${ instanceId }`;
+		if ( hideInserter ) {
+			return null;
+		}
 
-	const appenderPositionDescription = sprintf(
-		/* translators: 1: The numerical position of the block that will be inserted. 2: The level of nesting for the block that will be inserted. */
-		__( 'Add block at position %1$d, Level %2$d' ),
-		position,
-		level
-	);
+		const descriptionId = `list-view-appender__${ instanceId }`;
+		const description = sprintf(
+			/* translators: 1: The name of the block. 2: The numerical position of the block. 3: The level of nesting for the block. */
+			__( 'Append to %1$s block at position %2$d, Level %3$d' ),
+			blockTitle,
+			blockCount + 1,
+			nestingLevel
+		);
 
-	return (
-		<ListViewLeaf
-			className={ classnames( { 'is-dragging': isDragging } ) }
-			level={ level }
-			position={ position }
-			rowCount={ rowCount }
-			path={ path }
-		>
-			<TreeGridCell
-				className="block-editor-list-view-appender__cell"
-				colSpan="3"
-			>
-				{ ( { ref, tabIndex, onFocus } ) => (
-					<div className="block-editor-list-view-appender__container">
-						<Inserter
-							rootClientId={ parentBlockClientId }
-							__experimentalIsQuick
-							aria-describedby={ descriptionId }
-							toggleProps={ { ref, tabIndex, onFocus } }
-						/>
-						<div
-							className="block-editor-list-view-appender__description"
-							id={ descriptionId }
-						>
-							{ appenderPositionDescription }
-						</div>
-					</div>
-				) }
-			</TreeGridCell>
-		</ListViewLeaf>
-	);
-}
+		return (
+			<div className="list-view-appender">
+				<Inserter
+					ref={ ref }
+					rootClientId={ clientId }
+					position="bottom right"
+					isAppender
+					selectBlockOnInsert={ false }
+					shouldDirectInsert={ false }
+					__experimentalIsQuick
+					{ ...props }
+					toggleProps={ { 'aria-describedby': descriptionId } }
+					onSelectOrClose={ ( maybeInsertedBlock ) => {
+						if ( maybeInsertedBlock?.clientId ) {
+							setInsertedBlock( maybeInsertedBlock );
+						}
+					} }
+				/>
+				<AriaReferencedText id={ descriptionId }>
+					{ description }
+				</AriaReferencedText>
+			</div>
+		);
+	}
+);

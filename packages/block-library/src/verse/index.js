@@ -7,6 +7,7 @@ import { verse as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
@@ -33,9 +34,11 @@ export const settings = {
 	deprecated,
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: attributes.content + attributesToMerge.content,
+			content: attributes.content + '\n\n' + attributesToMerge.content,
 		};
 	},
 	edit,
 	save,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

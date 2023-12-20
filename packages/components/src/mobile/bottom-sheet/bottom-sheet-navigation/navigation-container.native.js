@@ -1,22 +1,25 @@
 /**
  * External dependencies
  */
-import { View, Easing } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import Animated, {
+	Easing,
+	useAnimatedStyle,
+	useSharedValue,
+	withTiming,
+} from 'react-native-reanimated';
 
 /**
  * WordPress dependencies
  */
 import {
-	useState,
 	useContext,
 	useMemo,
 	useCallback,
 	Children,
 	useRef,
 	cloneElement,
-	Platform,
 } from '@wordpress/element';
 
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -24,11 +27,11 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { performLayoutAnimation } from '../../layout-animation';
 import {
 	BottomSheetNavigationContext,
 	BottomSheetNavigationProvider,
 } from './bottom-sheet-navigation-context';
+import { BottomSheetContext } from '../bottom-sheet-context';
 
 import styles from './styles.scss';
 
@@ -56,9 +59,11 @@ const options = {
 	headerShown: false,
 	gestureEnabled: false,
 	cardStyleInterpolator: fadeConfig,
+	keyboardHandlingEnabled: false,
 };
 
-const ANIMATION_DURATION = 190;
+const HEIGHT_ANIMATION_DURATION = 300;
+const DEFAULT_HEIGHT = 1;
 
 function BottomSheetNavigationContainer( {
 	children,
@@ -66,11 +71,14 @@ function BottomSheetNavigationContainer( {
 	main,
 	theme,
 	style,
+	testID,
 } ) {
 	const Stack = useRef( createStackNavigator() ).current;
-	const context = useContext( BottomSheetNavigationContext );
-	const [ currentHeight, setCurrentHeight ] = useState(
-		context.currentHeight || 1
+	const navigationContext = useContext( BottomSheetNavigationContext );
+	const { maxHeight: sheetMaxHeight, isMaxHeightSet: isSheetMaxHeightSet } =
+		useContext( BottomSheetContext );
+	const currentHeight = useSharedValue(
+		navigationContext.currentHeight?.value || DEFAULT_HEIGHT
 	);
 
 	const backgroundStyle = usePreferredColorSchemeStyle(
@@ -78,48 +86,48 @@ function BottomSheetNavigationContainer( {
 		styles.backgroundDark
 	);
 
-	const _theme = theme || {
-		...DefaultTheme,
-		colors: {
-			...DefaultTheme.colors,
-			background: backgroundStyle.backgroundColor,
-		},
-	};
+	const defaultTheme = useMemo(
+		() => ( {
+			...DefaultTheme,
+			colors: {
+				...DefaultTheme.colors,
+				background: backgroundStyle.backgroundColor,
+			},
+		} ),
+		[ backgroundStyle.backgroundColor ]
+	);
+	const _theme = theme || defaultTheme;
 
 	const setHeight = useCallback(
 		( height ) => {
-			// The screen is fullHeight or changing from fullScreen to the default mode
 			if (
-				( typeof currentHeight === 'string' &&
-					typeof height !== 'string' ) ||
-				typeof height === 'string'
+				height > DEFAULT_HEIGHT &&
+				Math.round( height ) !== Math.round( currentHeight.value )
 			) {
-				// Animating the opacity for the initial modal results in the backdrop
-				// provided by react-native-modal to never transition from transparent
-				// to partially opaque black. The core issue was not idenfited, but it
-				// may relate to the experimental state of LayoutAnimation for Android.
-				// https://reactnative.dev/docs/layoutanimation
-				if ( ! Platform.isAndroid || currentHeight !== 1 ) {
-					performLayoutAnimation( ANIMATION_DURATION );
-				}
-				setCurrentHeight( height );
+				// If max height is set in the bottom sheet, we clamp
+				// the new height using that value.
+				const newHeight = isSheetMaxHeightSet
+					? Math.min( sheetMaxHeight, height )
+					: height;
+				const shouldAnimate =
+					animate && currentHeight.value !== DEFAULT_HEIGHT;
 
-				return;
-			}
-
-			if ( height > 1 ) {
-				if ( currentHeight === 1 ) {
-					setCurrentHeight( height );
-				} else if ( animate ) {
-					performLayoutAnimation( ANIMATION_DURATION );
-					setCurrentHeight( height );
+				if ( shouldAnimate ) {
+					currentHeight.value = withTiming( newHeight, {
+						duration: HEIGHT_ANIMATION_DURATION,
+						easing: Easing.out( Easing.cubic ),
+					} );
 				} else {
-					setCurrentHeight( height );
+					currentHeight.value = newHeight;
 				}
 			}
 		},
-		[ currentHeight ]
+		[ animate, currentHeight, isSheetMaxHeightSet, sheetMaxHeight ]
 	);
+
+	const animatedStyles = useAnimatedStyle( () => ( {
+		height: currentHeight.value,
+	} ) );
 
 	const screens = useMemo( () => {
 		return Children.map( children, ( child ) => {
@@ -139,32 +147,47 @@ function BottomSheetNavigationContainer( {
 				/>
 			);
 		} );
-	}, [ children ] );
+	}, [ children, main ] );
 
 	return useMemo( () => {
 		return (
-			<View style={ [ style, { height: currentHeight } ] }>
+			<Animated.View
+				style={ [ style, animatedStyles ] }
+				testID={ testID }
+			>
 				<BottomSheetNavigationProvider
-					value={ {
-						setHeight,
-						currentHeight,
-					} }
+					value={ { setHeight, currentHeight } }
 				>
 					{ main ? (
 						<NavigationContainer theme={ _theme }>
-							<Stack.Navigator screenOptions={ options }>
+							<Stack.Navigator
+								screenOptions={ options }
+								detachInactiveScreens={ false }
+							>
 								{ screens }
 							</Stack.Navigator>
 						</NavigationContainer>
 					) : (
-						<Stack.Navigator screenOptions={ options }>
+						<Stack.Navigator
+							screenOptions={ options }
+							detachInactiveScreens={ false }
+						>
 							{ screens }
 						</Stack.Navigator>
 					) }
 				</BottomSheetNavigationProvider>
-			</View>
+			</Animated.View>
 		);
-	}, [ currentHeight, _theme ] );
+	}, [
+		_theme,
+		animatedStyles,
+		currentHeight,
+		main,
+		screens,
+		setHeight,
+		style,
+		testID,
+	] );
 }
 
 export default BottomSheetNavigationContainer;

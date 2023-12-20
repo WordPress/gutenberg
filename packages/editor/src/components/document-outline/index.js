@@ -1,14 +1,9 @@
 /**
- * External dependencies
- */
-import { countBy, flatMap, get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { withSelect, useDispatch } from '@wordpress/data';
 import { create, getTextContent } from '@wordpress/rich-text';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -50,7 +45,7 @@ const multipleH1Headings = [
  * @return {Array} An array of heading blocks enhanced with the properties described above.
  */
 const computeOutlineHeadings = ( blocks = [] ) => {
-	return flatMap( blocks, ( block = {} ) => {
+	return blocks.flatMap( ( block = {} ) => {
 		if ( block.name === 'core/heading' ) {
 			return {
 				...block,
@@ -73,7 +68,7 @@ export const DocumentOutline = ( {
 	hasOutlineItemsDisabled,
 } ) => {
 	const headings = computeOutlineHeadings( blocks );
-
+	const { selectBlock } = useDispatch( blockEditorStore );
 	if ( headings.length < 1 ) {
 		return null;
 	}
@@ -83,7 +78,13 @@ export const DocumentOutline = ( {
 	// Not great but it's the simplest way to locate the title right now.
 	const titleNode = document.querySelector( '.editor-post-title__input' );
 	const hasTitle = isTitleSupported && title && titleNode;
-	const countByLevel = countBy( headings, 'level' );
+	const countByLevel = headings.reduce(
+		( acc, heading ) => ( {
+			...acc,
+			[ heading.level ]: ( acc[ heading.level ] || 0 ) + 1,
+		} ),
+		{}
+	);
 	const hasMultipleH1 = countByLevel[ 1 ] > 1;
 
 	return (
@@ -120,7 +121,10 @@ export const DocumentOutline = ( {
 							isValid={ isValid }
 							isDisabled={ hasOutlineItemsDisabled }
 							href={ `#block-${ item.clientId }` }
-							onSelect={ onSelect }
+							onSelect={ () => {
+								selectBlock( item.clientId );
+								onSelect?.();
+							} }
 						>
 							{ item.isEmpty
 								? emptyHeadingContent
@@ -155,7 +159,7 @@ export default compose(
 		return {
 			title: getEditedPostAttribute( 'title' ),
 			blocks: getBlocks(),
-			isTitleSupported: get( postType, [ 'supports', 'title' ], false ),
+			isTitleSupported: postType?.supports?.title ?? false,
 		};
 	} )
 )( DocumentOutline );

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useViewportMatch, compose } from '@wordpress/compose';
@@ -17,7 +12,6 @@ import { store as editPostStore } from '../../store';
 
 export function PostPublishButtonOrToggle( {
 	forceIsDirty,
-	forceIsSaving,
 	hasPublishAction,
 	isBeingScheduled,
 	isPending,
@@ -37,7 +31,7 @@ export function PostPublishButtonOrToggle( {
 	 * Conditions to show a BUTTON (publish directly) or a TOGGLE (open publish sidebar):
 	 *
 	 * 1) We want to show a BUTTON when the post status is at the _final stage_
-	 * for a particular role (see https://wordpress.org/support/article/post-status/):
+	 * for a particular role (see https://wordpress.org/documentation/article/post-status/):
 	 *
 	 * - is published
 	 * - is scheduled to be published
@@ -72,7 +66,6 @@ export function PostPublishButtonOrToggle( {
 	return (
 		<PostPublishButton
 			forceIsDirty={ forceIsDirty }
-			forceIsSaving={ forceIsSaving }
 			isOpen={ isPublishSidebarOpened }
 			isToggle={ component === IS_TOGGLE }
 			onToggle={ togglePublishSidebar }
@@ -83,20 +76,17 @@ export function PostPublishButtonOrToggle( {
 
 export default compose(
 	withSelect( ( select ) => ( {
-		hasPublishAction: get(
-			select( editorStore ).getCurrentPost(),
-			[ '_links', 'wp:action-publish' ],
-			false
-		),
+		hasPublishAction:
+			select( editorStore ).getCurrentPost()?._links?.[
+				'wp:action-publish'
+			] ?? false,
 		isBeingScheduled: select( editorStore ).isEditedPostBeingScheduled(),
 		isPending: select( editorStore ).isCurrentPostPending(),
 		isPublished: select( editorStore ).isCurrentPostPublished(),
-		isPublishSidebarEnabled: select(
-			editorStore
-		).isPublishSidebarEnabled(),
-		isPublishSidebarOpened: select(
-			editPostStore
-		).isPublishSidebarOpened(),
+		isPublishSidebarEnabled:
+			select( editorStore ).isPublishSidebarEnabled(),
+		isPublishSidebarOpened:
+			select( editPostStore ).isPublishSidebarOpened(),
 		isScheduled: select( editorStore ).isCurrentPostScheduled(),
 	} ) ),
 	withDispatch( ( dispatch ) => {

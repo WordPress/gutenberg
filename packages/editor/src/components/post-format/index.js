@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find, get, includes, union } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -49,30 +44,27 @@ export default function PostFormat() {
 
 	const { postFormat, suggestedFormat, supportedFormats } = useSelect(
 		( select ) => {
-			const { getEditedPostAttribute, getSuggestedPostFormat } = select(
-				editorStore
-			);
+			const { getEditedPostAttribute, getSuggestedPostFormat } =
+				select( editorStore );
 			const _postFormat = getEditedPostAttribute( 'format' );
 			const themeSupports = select( coreStore ).getThemeSupports();
 			return {
 				postFormat: _postFormat ?? 'standard',
 				suggestedFormat: getSuggestedPostFormat(),
-				// Ensure current format is always in the set.
-				// The current format may not be a format supported by the theme.
-				supportedFormats: union(
-					[ _postFormat ],
-					get( themeSupports, [ 'formats' ], [] )
-				),
+				supportedFormats: themeSupports.formats,
 			};
 		},
 		[]
 	);
 
-	const formats = POST_FORMATS.filter( ( format ) =>
-		includes( supportedFormats, format.id )
-	);
-	const suggestion = find(
-		formats,
+	const formats = POST_FORMATS.filter( ( format ) => {
+		// Ensure current format is always in the set.
+		// The current format may not be a format supported by the theme.
+		return (
+			supportedFormats?.includes( format.id ) || postFormat === format.id
+		);
+	} );
+	const suggestion = formats.find(
 		( format ) => format.id === suggestedFormat
 	);
 
@@ -83,24 +75,19 @@ export default function PostFormat() {
 	return (
 		<PostFormatCheck>
 			<div className="editor-post-format">
-				<div className="editor-post-format__content">
-					<label htmlFor={ postFormatSelectorId }>
-						{ __( 'Post Format' ) }
-					</label>
-					<SelectControl
-						value={ postFormat }
-						onChange={ ( format ) => onUpdatePostFormat( format ) }
-						id={ postFormatSelectorId }
-						options={ formats.map( ( format ) => ( {
-							label: format.caption,
-							value: format.id,
-						} ) ) }
-					/>
-				</div>
-
+				<SelectControl
+					__nextHasNoMarginBottom
+					label={ __( 'Post Format' ) }
+					value={ postFormat }
+					onChange={ ( format ) => onUpdatePostFormat( format ) }
+					id={ postFormatSelectorId }
+					options={ formats.map( ( format ) => ( {
+						label: format.caption,
+						value: format.id,
+					} ) ) }
+				/>
 				{ suggestion && suggestion.id !== postFormat && (
-					<div className="editor-post-format__suggestion">
-						{ __( 'Suggestion:' ) }{ ' ' }
+					<p className="editor-post-format__suggestion">
 						<Button
 							variant="link"
 							onClick={ () =>
@@ -109,11 +96,11 @@ export default function PostFormat() {
 						>
 							{ sprintf(
 								/* translators: %s: post format */
-								__( 'Apply format: %s' ),
+								__( 'Apply suggested format: %s' ),
 								suggestion.caption
 							) }
 						</Button>
-					</div>
+					</p>
 				) }
 			</div>
 		</PostFormatCheck>

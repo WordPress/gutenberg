@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { focus } from '@wordpress/dom';
+import { focus, isFormElement } from '@wordpress/dom';
 import { TAB, ESCAPE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect, useMergeRefs } from '@wordpress/compose';
@@ -11,30 +11,23 @@ import { useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-
-function isFormElement( element ) {
-	const { tagName } = element;
-	return (
-		tagName === 'INPUT' ||
-		tagName === 'BUTTON' ||
-		tagName === 'SELECT' ||
-		tagName === 'TEXTAREA'
-	);
-}
+import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
 
 export default function useTabNav() {
 	const container = useRef();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
-	const lastFocus = useRef();
-	const {
-		hasMultiSelection,
-		getSelectedBlockClientId,
-		getBlockCount,
-	} = useSelect( blockEditorStore );
-	const { setNavigationMode } = useDispatch( blockEditorStore );
+
+	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
+		useSelect( blockEditorStore );
+	const { setNavigationMode, setLastFocus } = useDispatch( blockEditorStore );
 	const isNavigationMode = useSelect(
 		( select ) => select( blockEditorStore ).isNavigationMode(),
+		[]
+	);
+
+	const lastFocus = useSelect(
+		( select ) => select( blockEditorStore ).getLastFocus(),
 		[]
 	);
 
@@ -56,13 +49,24 @@ export default function useTabNav() {
 		} else {
 			setNavigationMode( true );
 
+			const canvasElement =
+				container.current.ownerDocument === event.target.ownerDocument
+					? container.current
+					: container.current.ownerDocument.defaultView.frameElement;
+
 			const isBefore =
 				// eslint-disable-next-line no-bitwise
-				event.target.compareDocumentPosition( container.current ) &
+				event.target.compareDocumentPosition( canvasElement ) &
 				event.target.DOCUMENT_POSITION_FOLLOWING;
-			const action = isBefore ? 'findNext' : 'findPrevious';
+			const tabbables = focus.tabbable.find( container.current );
 
-			focus.tabbable[ action ]( event.target ).focus();
+			if ( tabbables.length ) {
+				const next = isBefore
+					? tabbables[ 0 ]
+					: tabbables[ tabbables.length - 1 ];
+
+				next.focus();
+			}
 		}
 	}
 
@@ -118,14 +122,29 @@ export default function useTabNav() {
 				return;
 			}
 
-			// Allow tabbing between form elements rendered in a block,
+			const nextTabbable = focus.tabbable[ direction ]( event.target );
+
+			// We want to constrain the tabbing to the block and its child blocks.
+			// If the preceding form element is within a different block,
+			// such as two sibling image blocks in the placeholder state,
+			// we want shift + tab from the first form element to move to the image
+			// block toolbar and not the previous image block's form element.
+			const currentBlock = event.target.closest( '[data-block]' );
+			const isElementPartOfSelectedBlock =
+				currentBlock &&
+				nextTabbable &&
+				( isInSameBlock( currentBlock, nextTabbable ) ||
+					isInsideRootBlock( currentBlock, nextTabbable ) );
+
+			// Allow tabbing from the block wrapper to a form element,
+			// and between form elements rendered in a block and its child blocks,
 			// such as inside a placeholder. Form elements are generally
 			// meant to be UI rather than part of the content. Ideally
 			// these are not rendered in the content and perhaps in the
 			// future they can be rendered in an iframe or shadow DOM.
 			if (
-				isFormElement( event.target ) &&
-				isFormElement( focus.tabbable[ direction ]( event.target ) )
+				isFormElement( nextTabbable ) &&
+				isElementPartOfSelectedBlock
 			) {
 				return;
 			}
@@ -144,7 +163,7 @@ export default function useTabNav() {
 		}
 
 		function onFocusOut( event ) {
-			lastFocus.current = event.target;
+			setLastFocus( { ...lastFocus, current: event.target } );
 
 			const { ownerDocument } = node;
 
@@ -183,7 +202,7 @@ export default function useTabNav() {
 			const isShift = event.shiftKey;
 			const direction = isShift ? 'findPrevious' : 'findNext';
 			const target = focus.tabbable[ direction ]( event.target );
-			// only do something when the next tabbable is a focus capture div (before/after)
+			// Only do something when the next tabbable is a focus capture div (before/after)
 			if (
 				target === focusCaptureBeforeRef.current ||
 				target === focusCaptureAfterRef.current

@@ -18,7 +18,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		return '';
 	}
 
-	// Get the nagigation type to show the proper link. Available options are `next|previous`.
+	// Get the navigation type to show the proper link. Available options are `next|previous`.
 	$navigation_type = isset( $attributes['type'] ) ? $attributes['type'] : 'next';
 	// Allow only `next` and `previous` in `$navigation_type`.
 	if ( ! in_array( $navigation_type, array( 'next', 'previous' ), true ) ) {
@@ -28,11 +28,28 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes .= " has-text-align-{$attributes['textAlign']}";
 	}
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => $classes,
+		)
+	);
 	// Set default values.
 	$format = '%link';
 	$link   = 'next' === $navigation_type ? _x( 'Next', 'label for next post link' ) : _x( 'Previous', 'label for previous post link' );
 	$label  = '';
+
+	// Only use hardcoded values here, otherwise we need to add escaping where these values are used.
+	$arrow_map = array(
+		'none'    => '',
+		'arrow'   => array(
+			'next'     => '→',
+			'previous' => '←',
+		),
+		'chevron' => array(
+			'next'     => '»',
+			'previous' => '«',
+		),
+	);
 
 	// If a custom label is provided, make this a link.
 	// `$label` is used to prepend the provided label, if we want to show the page title as well.
@@ -49,13 +66,13 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		 */
 		if ( ! $attributes['linkLabel'] ) {
 			if ( $label ) {
-				$format = '<span class="post-navigation-link__label">' . $label . '</span> %link';
+				$format = '<span class="post-navigation-link__label">' . wp_kses_post( $label ) . '</span> %link';
 			}
 			$link = '%title';
 		} elseif ( isset( $attributes['linkLabel'] ) && $attributes['linkLabel'] ) {
 			// If the label link option is enabled and there is a custom label, display it before the title.
 			if ( $label ) {
-				$link = '<span class="post-navigation-link__label">' . $label . '</span> <span class="post-navigation-link__title">%title</title>';
+				$link = '<span class="post-navigation-link__label">' . wp_kses_post( $label ) . '</span> <span class="post-navigation-link__title">%title</span>';
 			} else {
 				/*
 				 * If the label link option is enabled and there is no custom label,
@@ -64,10 +81,21 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 				$label = 'next' === $navigation_type ? _x( 'Next:', 'label before the title of the next post' ) : _x( 'Previous:', 'label before the title of the previous post' );
 				$link  = sprintf(
 					'<span class="post-navigation-link__label">%1$s</span> <span class="post-navigation-link__title">%2$s</span>',
-					$label,
+					wp_kses_post( $label ),
 					'%title'
 				);
 			}
+		}
+	}
+
+	// Display arrows.
+	if ( isset( $attributes['arrow'] ) && 'none' !== $attributes['arrow'] && isset( $arrow_map[ $attributes['arrow'] ] ) ) {
+		$arrow = $arrow_map[ $attributes['arrow'] ][ $navigation_type ];
+
+		if ( 'next' === $navigation_type ) {
+			$format = '%link<span class="wp-block-post-navigation-link__arrow-next is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span>';
+		} else {
+			$format = '<span class="wp-block-post-navigation-link__arrow-previous is-arrow-' . $attributes['arrow'] . '" aria-hidden="true">' . $arrow . '</span>%link';
 		}
 	}
 

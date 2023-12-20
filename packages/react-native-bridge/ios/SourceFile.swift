@@ -1,4 +1,4 @@
-import Foundation
+import WebKit
 
 public struct SourceFile {
     enum SourceFileError: Error {
@@ -20,7 +20,7 @@ public struct SourceFile {
         self.bundle = bundle
     }
 
-    func getContent() throws -> String {
+    public func getContent() throws -> String {
         guard let path = bundle.path(forResource: name, ofType: type.rawValue) else {
             throw SourceFileError.sourceFileNotFound("\(name).\(type)")
         }
@@ -29,13 +29,33 @@ public struct SourceFile {
 }
 
 extension SourceFile {
-    static let editorStyle = SourceFile(name: "editor-style-overrides", type: .css)
-    static let wpBarsStyle = SourceFile(name: "wp-bar-override", type: .css)
-    static let injectCss = SourceFile(name: "inject-css", type: .js)
+    public func getName() -> String {
+        return self.name
+    }
+    
+    public func jsScript(with argument: String? = nil) throws -> WKUserScript {
+        let content = try getContent()
+        let formatted = String(format: content, argument ?? "")
+        
+        switch self.type {
+        case .css:
+            let injectCssScriptTemplate = "window.injectCss(`%@`)"
+            return String(format: injectCssScriptTemplate, formatted).toJsScript()
+        case .js, .json:
+            return formatted.toJsScript()
+        }
+    }
+}
+
+extension SourceFile {
     static let retrieveHtml = SourceFile(name: "content-functions", type: .js)
+    static let editorBehavior = SourceFile(name: "editor-behavior-overrides", type: .js)
+    static let editorStyle = SourceFile(name: "editor-style-overrides", type: .css)
+    static let gutenbergObserver = SourceFile(name: "gutenberg-observer", type: .js)
+    static let injectCss = SourceFile(name: "inject-css", type: .js)
     static let insertBlock = SourceFile(name: "insert-block", type: .js)
     static let localStorage  = SourceFile(name: "local-storage-overrides", type: .json)
     static let preventAutosaves = SourceFile(name: "prevent-autosaves", type: .js)
-    static let gutenbergObserver = SourceFile(name: "gutenberg-observer", type: .js)
     static let supportedBlocks = SourceFile(name: "supported-blocks", type: .json)
+    static let wpBarsStyle = SourceFile(name: "wp-bar-override", type: .css)
 }

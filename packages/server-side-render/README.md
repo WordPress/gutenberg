@@ -56,6 +56,7 @@ The HTTP request method to use, either 'GET' or 'POST'. It's 'GET' by default. T
 
 -   Type: `String`
 -   Required: No
+-   Default: 'GET'
 
 #### Example:
 
@@ -75,6 +76,14 @@ function add_rest_method( $endpoints ) {
 }
 add_filter( 'rest_endpoints', 'add_rest_method');
 ```
+
+### skipBlockSupportAttributes
+
+Remove attributes and style properties applied by the block supports. This prevents duplication of styles in the block wrapper and the `ServerSideRender` components. Even if certain features skip serialization to HTML markup by `__experimentalSkipSerialization`, all attributes and style properties are removed.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: false
 
 ### urlQueryArgs
 
@@ -161,7 +170,7 @@ If you pass `attributes` to `ServerSideRender`, the block must also be registere
 register_block_type(
 	'core/archives',
 	array(
-		'api_version' => 2,
+		'api_version' => 3,
 		'attributes'      => array(
 			'showPostCounts'    => array(
 				'type'      => 'boolean',
@@ -176,3 +185,11 @@ register_block_type(
 	)
 );
 ```
+
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

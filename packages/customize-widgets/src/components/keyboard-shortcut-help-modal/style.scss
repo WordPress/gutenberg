@@ -3,11 +3,6 @@
 		margin: 0 0 2rem 0;
 	}
 
-	&__main-shortcuts .customize-widgets-keyboard-shortcut-help-modal__shortcut-list {
-		// Push the shortcut to be flush with top modal header.
-		margin-top: -$grid-unit-30 -$border-width;
-	}
-
 	&__section-title {
 		font-size: 0.9rem;
 		font-weight: 600;

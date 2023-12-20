@@ -21,9 +21,8 @@ export default function useTemplatePartAreaLabel( clientId ) {
 				return;
 			}
 
-			const { getBlock, getBlockParentsByBlockName } = select(
-				blockEditorStore
-			);
+			const { getBlock, getBlockParentsByBlockName } =
+				select( blockEditorStore );
 
 			const withAscendingResults = true;
 			const parentTemplatePartClientIds = getBlockParentsByBlockName(
@@ -40,18 +39,22 @@ export default function useTemplatePartAreaLabel( clientId ) {
 			// Blocks can be loaded into a *non-post* block editor.
 			// This code is lifted from this file:
 			// packages/block-library/src/template-part/edit/advanced-controls.js
-			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			const definedAreas = select(
-				'core/editor'
-			).__experimentalGetDefaultTemplatePartAreas();
-			const { getEditedEntityRecord } = select( coreStore );
+			/* eslint-disable @wordpress/data-no-store-string-literals */
+			const definedAreas =
+				select(
+					'core/editor'
+				).__experimentalGetDefaultTemplatePartAreas();
+			/* eslint-enable @wordpress/data-no-store-string-literals */
+			const { getCurrentTheme, getEditedEntityRecord } =
+				select( coreStore );
 
 			for ( const templatePartClientId of parentTemplatePartClientIds ) {
 				const templatePartBlock = getBlock( templatePartClientId );
 
 				// The 'area' usually isn't stored on the block, but instead
 				// on the entity.
-				const { theme, slug } = templatePartBlock.attributes;
+				const { theme = getCurrentTheme()?.stylesheet, slug } =
+					templatePartBlock.attributes;
 				const templatePartEntityId = createTemplatePartId(
 					theme,
 					slug

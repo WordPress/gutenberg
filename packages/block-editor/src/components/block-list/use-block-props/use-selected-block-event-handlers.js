@@ -19,14 +19,9 @@ import { store as blockEditorStore } from '../../../store';
  *
  * @param {string} clientId Block client ID.
  */
-export function useEventHandlers( clientId ) {
-	const isSelected = useSelect(
-		( select ) => select( blockEditorStore ).isBlockSelected( clientId ),
-		[ clientId ]
-	);
-	const { getBlockRootClientId, getBlockIndex } = useSelect(
-		blockEditorStore
-	);
+export function useEventHandlers( { clientId, isSelected } ) {
+	const { getBlockRootClientId, getBlockIndex } =
+		useSelect( blockEditorStore );
 	const { insertDefaultBlock, removeBlock } = useDispatch( blockEditorStore );
 
 	return useRefEffect(

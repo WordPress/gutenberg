@@ -4,8 +4,15 @@
 import { getCommentDelimitedContent } from '../serializer';
 
 /**
+ * @typedef {Object}   Options                   Serialization options.
+ * @property {boolean} [isCommentDelimited=true] Whether to output HTML comments around blocks.
+ */
+
+/** @typedef {import("./").WPRawBlock} WPRawBlock */
+
+/**
  * Serializes a block node into the native HTML-comment-powered block format.
- * CAVEAT: This function is intended for reserializing blocks as parsed by
+ * CAVEAT: This function is intended for re-serializing blocks as parsed by
  * valid parsers and skips any validation steps. This is NOT a generic
  * serialization function for in-memory blocks. For most purposes, see the
  * following functions available in the `@wordpress/blocks` package:
@@ -18,9 +25,8 @@ import { getCommentDelimitedContent } from '../serializer';
  * @see `@wordpress/block-serialization-default-parser` package
  * @see `@wordpress/block-serialization-spec-parser` package
  *
- * @param {import(".").WPRawBlock} rawBlock                   A block node as returned by a valid parser.
- * @param {?Object}                options                    Serialization options.
- * @param {?boolean}               options.isCommentDelimited Whether to output HTML comments around blocks.
+ * @param {WPRawBlock} rawBlock     A block node as returned by a valid parser.
+ * @param {Options}    [options={}] Serialization options.
  *
  * @return {string} An HTML string representing a block.
  */

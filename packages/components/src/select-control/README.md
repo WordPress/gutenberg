@@ -4,12 +4,6 @@ SelectControl allow users to select from a single or multiple option menu. It fu
 
 ![A “Link To” select with “none” selected.](https://wordpress.org/gutenberg/files/2018/12/select.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -82,8 +76,8 @@ Use sentences in your menu.
 Render a user interface to select the size of an image.
 
 ```jsx
+import { useState } from 'react';
 import { SelectControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MySelectControl = () => {
 	const [ size, setSize ] = useState( '50%' );
@@ -98,6 +92,7 @@ const MySelectControl = () => {
 				{ label: 'Small', value: '25%' },
 			] }
 			onChange={ ( newSize ) => setSize( newSize ) }
+			__nextHasNoMarginBottom
 		/>
 	);
 };
@@ -114,11 +109,12 @@ Render a user interface to select multiple users from a list.
 		this.setState( { users } );
 	} }
 	options={ [
-		{ value: null, label: 'Select a User', disabled: true },
+		{ value: '', label: 'Select a User', disabled: true },
 		{ value: 'a', label: 'User A' },
 		{ value: 'b', label: 'User B' },
 		{ value: 'c', label: 'User c' },
 	] }
+	__nextHasNoMarginBottom
 />
 ```
 
@@ -133,6 +129,7 @@ const [ item, setItem ] = useState( '' );
     label={ __( 'Select an item:' ) }
     value={ item } // e.g: value = 'a'
     onChange={ ( selection ) => { setItem( selection ) } }
+    __nextHasNoMarginBottom
 >
 	<optgroup label="Theropods">
 		<option value="Tyrannosaurus">Tyrannosaurus</option>
@@ -179,12 +176,14 @@ If true, the label will only be visible to screen readers.
 
 If this property is added, a help text will be generated using help property as the content.
 
--   Type: `String|WPElement`
+-   Type: `String|Element`
 -   Required: No
 
 #### multiple
 
-If this property is added, multiple values can be selected. The value passed should be an array.
+If this property is added, multiple values can be selected. The `value` passed should be an array.
+
+In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
 
 -   Type: `Boolean`
 -   Required: No
@@ -194,16 +193,16 @@ If this property is added, multiple values can be selected. The value passed sho
 An array of objects containing the following properties:
 
 -   `label`: (string) The label to be shown to the user.
--   `value`: (Object) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
+-   `value`: (string) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
 -   `disabled`: (boolean) Whether or not the option should have the disabled attribute.
 -   Type: `Array`
 -   Required: No
 
 #### children
 
-An alternative to the `options` prop.  
+An alternative to the `options` prop.
 Use the `children` prop to have more control on the style of the items being rendered, like `optgroup`s or `options` and possibly avoid re-rendering due to the reference update on the `options` prop.
-- Type: `Element`
+- Type: `ReactNode`
 - Required: No
 
 #### onChange
@@ -214,6 +213,14 @@ If multiple is false the value received is a single value with the new selected 
 
 -   Type: `function`
 -   Required: Yes
+
+### __nextHasNoMarginBottom
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

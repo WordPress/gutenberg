@@ -15,12 +15,24 @@ async function getSelectedOptionLabel( selector ) {
 }
 
 async function getDatePickerValues() {
-	const year = await getInputValue( '[aria-label="Year"]' );
-	const month = await getInputValue( '[aria-label="Month"]' );
-	const monthLabel = await getSelectedOptionLabel( '[aria-label="Month"]' );
-	const day = await getInputValue( '[aria-label="Day"]' );
-	const hours = await getInputValue( '[aria-label="Hours"]' );
-	const minutes = await getInputValue( '[aria-label="Minutes"]' );
+	const year = await getInputValue(
+		'.components-datetime__time-field-year input'
+	);
+	const month = await getInputValue(
+		'.components-datetime__time-field-month select'
+	);
+	const monthLabel = await getSelectedOptionLabel(
+		'.components-datetime__time-field-month select'
+	);
+	const day = await getInputValue(
+		'.components-datetime__time-field-day input'
+	);
+	const hours = await getInputValue(
+		'.components-datetime__time-field-hours-input input'
+	);
+	const minutes = await getInputValue(
+		'.components-datetime__time-field-minutes-input input'
+	);
 	const amOrPm = await page.$eval(
 		'.components-datetime__time-field-am-pm .is-primary',
 		( element ) => element.innerText.toLowerCase()
@@ -33,22 +45,18 @@ function trimLeadingZero( str ) {
 	return str[ 0 ] === '0' ? str.slice( 1 ) : str;
 }
 
-function formatDatePickerValues( {
-	year,
-	monthLabel,
-	day,
-	hours,
-	minutes,
-	amOrPm,
-} ) {
+function formatDatePickerValues(
+	{ year, monthLabel, day, hours, minutes, amOrPm },
+	timezone
+) {
 	const dayTrimmed = trimLeadingZero( day );
 	const hoursTrimmed = trimLeadingZero( hours );
-	return `${ monthLabel } ${ dayTrimmed }, ${ year } ${ hoursTrimmed }:${ minutes } ${ amOrPm }`;
+	return `${ monthLabel } ${ dayTrimmed }, ${ year } ${ hoursTrimmed }:${ minutes }\xa0${ amOrPm } ${ timezone }`;
 }
 
 async function getPublishingDate() {
 	return page.$eval(
-		'.edit-post-post-schedule__toggle',
+		'.editor-post-schedule__dialog-toggle',
 		( dateLabel ) => dateLabel.textContent
 	);
 }
@@ -58,11 +66,13 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
 	( timezone ) => {
 		let oldTimezone;
 		beforeEach( async () => {
+			await page.emulateTimezone( 'America/New_York' ); // Set browser to a timezone that's different to `timezone`.
 			oldTimezone = await changeSiteTimezone( timezone );
 			await createNewPost();
 		} );
 		afterEach( async () => {
 			await changeSiteTimezone( oldTimezone );
+			await page.emulateTimezone( null );
 		} );
 
 		it( 'should show the publishing date as "Immediately" if the date is not altered', async () => {
@@ -73,7 +83,7 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
 
 		it( 'should show the publishing date if the date is in the past', async () => {
 			// Open the datepicker.
-			await page.click( '.edit-post-post-schedule__toggle' );
+			await page.click( '.editor-post-schedule__dialog-toggle' );
 
 			// Change the publishing date to a year in the past.
 			await page.click( '.components-datetime__time-field-year' );
@@ -81,18 +91,18 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
 			const datePickerValues = await getDatePickerValues();
 
 			// Close the datepicker.
-			await page.click( '.edit-post-post-schedule__toggle' );
+			await page.click( '.editor-post-schedule__dialog-toggle' );
 
 			const publishingDate = await getPublishingDate();
 
 			expect( publishingDate ).toBe(
-				formatDatePickerValues( datePickerValues )
+				formatDatePickerValues( datePickerValues, timezone )
 			);
 		} );
 
 		it( 'should show the publishing date if the date is in the future', async () => {
 			// Open the datepicker.
-			await page.click( '.edit-post-post-schedule__toggle' );
+			await page.click( '.editor-post-schedule__dialog-toggle' );
 
 			// Change the publishing date to a year in the future.
 			await page.click( '.components-datetime__time-field-year' );
@@ -100,33 +110,35 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
 			const datePickerValues = await getDatePickerValues();
 
 			// Close the datepicker.
-			await page.click( '.edit-post-post-schedule__toggle' );
+			await page.click( '.editor-post-schedule__dialog-toggle' );
 
 			const publishingDate = await getPublishingDate();
 
 			expect( publishingDate ).not.toEqual( 'Immediately' );
 			// The expected date format will be "Sep 26, 2018 11:52 pm".
 			expect( publishingDate ).toBe(
-				formatDatePickerValues( datePickerValues )
+				formatDatePickerValues( datePickerValues, timezone )
 			);
 		} );
 
 		it( `should show the publishing date as "Immediately" if the date is cleared`, async () => {
 			// Open the datepicker.
-			await page.click( '.edit-post-post-schedule__toggle' );
+			await page.click( '.editor-post-schedule__dialog-toggle' );
 
 			// Change the publishing date to a year in the future.
 			await page.click( '.components-datetime__time-field-year' );
 			await page.keyboard.press( 'ArrowUp' );
 
 			// Close the datepicker.
-			await page.click( '.edit-post-post-schedule__toggle' );
+			await page.click( '.editor-post-schedule__dialog-toggle' );
 
 			// Open the datepicker.
-			await page.click( '.edit-post-post-schedule__toggle' );
+			await page.click( '.editor-post-schedule__dialog-toggle' );
 
-			// Clear the date
-			await page.click( '.components-datetime__date-reset-button' );
+			// Clear the date.
+			await page.click(
+				'.block-editor-publish-date-time-picker button[aria-label="Now"]'
+			);
 
 			const publishingDate = await getPublishingDate();
 

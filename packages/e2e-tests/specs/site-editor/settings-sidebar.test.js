@@ -2,27 +2,24 @@
  * WordPress dependencies
  */
 import {
-	trashAllPosts,
+	deleteAllTemplates,
 	activateTheme,
 	getAllBlocks,
 	selectBlockByClientId,
 	insertBlock,
+	visitSiteEditor,
+	enterEditMode,
 } from '@wordpress/e2e-test-utils';
-
-/**
- * Internal dependencies
- */
-import { siteEditor } from './utils';
 
 async function toggleSidebar() {
 	await page.click(
-		'.edit-site-header__actions button[aria-label="Settings"]'
+		'.edit-site-header-edit-mode__actions button[aria-label="Settings"]'
 	);
 }
 
 async function getActiveTabLabel() {
 	return await page.$eval(
-		'.edit-site-sidebar__panel-tab.is-active',
+		'.edit-site-sidebar-edit-mode__panel-tab.is-active',
 		( element ) => element.getAttribute( 'aria-label' )
 	);
 }
@@ -30,11 +27,11 @@ async function getActiveTabLabel() {
 async function getTemplateCard() {
 	return {
 		title: await page.$eval(
-			'.edit-site-template-card__title',
+			'.edit-site-sidebar-card__title',
 			( element ) => element.innerText
 		),
 		description: await page.$eval(
-			'.edit-site-template-card__description',
+			'.edit-site-sidebar-card__description',
 			( element ) => element.innerText
 		),
 	};
@@ -42,18 +39,18 @@ async function getTemplateCard() {
 
 describe( 'Settings sidebar', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'emptytheme' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 	} );
 	afterAll( async () => {
-		await trashAllPosts( 'wp_template' );
-		await trashAllPosts( 'wp_template_part' );
+		await deleteAllTemplates( 'wp_template' );
+		await deleteAllTemplates( 'wp_template_part' );
 		await activateTheme( 'twentytwentyone' );
 	} );
 	beforeEach( async () => {
-		await siteEditor.visit();
-		await siteEditor.disableWelcomeGuide();
+		await visitSiteEditor();
+		await enterEditMode();
 	} );
 
 	describe( 'Template tab', () => {
@@ -69,19 +66,22 @@ describe( 'Settings sidebar', () => {
 			await toggleSidebar();
 
 			const templateCardBeforeNavigation = await getTemplateCard();
-			await siteEditor.visit( {
-				postId: 'tt1-blocks//404',
+			await visitSiteEditor( {
+				postId: 'emptytheme//singular',
 				postType: 'wp_template',
 			} );
+			await enterEditMode();
 			const templateCardAfterNavigation = await getTemplateCard();
 
 			expect( templateCardBeforeNavigation ).toMatchObject( {
 				title: 'Index',
-				description: 'Displays posts.',
+				description:
+					'Used as a fallback template for all pages when a more specific template is not defined.',
 			} );
 			expect( templateCardAfterNavigation ).toMatchObject( {
-				title: '404',
-				description: 'Displays when no content is found.',
+				title: 'Single Entries',
+				description:
+					'Displays any single entry, such as a post or a page. This template will serve as a fallback when a more specific template (e.g. Single Post, Page, or Attachment) cannot be found.',
 			} );
 		} );
 	} );

@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -13,7 +12,8 @@ import { isRTL } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { Position, POSITIONS } from './utils';
+import type { Position } from './utils';
+import { POSITIONS } from './utils';
 import {
 	TooltipWrapper,
 	Tooltip,
@@ -34,7 +34,7 @@ type LabelProps = React.DetailedHTMLProps<
 
 function Label(
 	{ label, position = POSITIONS.corner, zIndex = 1000, ...props }: LabelProps,
-	ref: Ref< HTMLDivElement >
+	ref: ForwardedRef< HTMLDivElement >
 ): JSX.Element | null {
 	const showLabel = !! label;
 

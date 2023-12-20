@@ -13,7 +13,7 @@ import {
 	Disabled,
 	PanelBody,
 	Spinner,
-	withNotices,
+	Placeholder,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -23,16 +23,15 @@ import {
 	MediaUpload,
 	MediaUploadCheck,
 	MediaReplaceFlow,
-	RichText,
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -41,27 +40,44 @@ import { createUpgradedEmbedBlock } from '../embed/util';
 import VideoCommonSettings from './edit-common-settings';
 import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
+import { Caption } from '../utils/caption';
+
+// Much of this description is duplicated from MediaPlaceholder.
+const placeholder = ( content ) => {
+	return (
+		<Placeholder
+			className="block-editor-media-placeholder"
+			withIllustration={ true }
+			icon={ icon }
+			label={ __( 'Video' ) }
+			instructions={ __(
+				'Upload a video file, pick one from your media library, or add one with a URL.'
+			) }
+		>
+			{ content }
+		</Placeholder>
+	);
+};
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 function VideoEdit( {
 	isSelected,
-	noticeUI,
 	attributes,
 	className,
 	setAttributes,
 	insertBlocksAfter,
 	onReplace,
-	noticeOperations,
 } ) {
 	const instanceId = useInstanceId( VideoEdit );
 	const videoPlayer = useRef();
 	const posterImageButton = useRef();
-	const { id, caption, controls, poster, src, tracks } = attributes;
+	const { id, controls, poster, src, tracks } = attributes;
 	const isTemporaryVideo = ! id && isBlobURL( src );
 	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload
+		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
+		[]
 	);
 
 	useEffect( () => {
@@ -70,12 +86,8 @@ function VideoEdit( {
 			if ( file ) {
 				mediaUpload( {
 					filesList: [ file ],
-					onFileChange: ( [ { url } ] ) => {
-						setAttributes( { src: url } );
-					},
-					onError: ( message ) => {
-						noticeOperations.createErrorNotice( message );
-					},
+					onFileChange: ( [ media ] ) => onSelectVideo( media ),
+					onError: onUploadError,
 					allowedTypes: ALLOWED_MEDIA_TYPES,
 				} );
 			}
@@ -91,24 +103,26 @@ function VideoEdit( {
 
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
-			// in this case there was an error
+			// In this case there was an error
 			// previous attributes should be removed
-			// because they may be temporary blob urls
+			// because they may be temporary blob urls.
 			setAttributes( {
 				src: undefined,
 				id: undefined,
 				poster: undefined,
+				caption: undefined,
 			} );
 			return;
 		}
 
-		// sets the block's attribute and updates the edit component from the
-		// selected media
+		// Sets the block's attribute and updates the edit component from the
+		// selected media.
 		setAttributes( {
 			src: media.url,
 			id: media.id,
 			poster:
 				media.image?.src !== media.icon ? media.image?.src : undefined,
+			caption: media.caption,
 		} );
 	}
 
@@ -118,7 +132,7 @@ function VideoEdit( {
 			const embedBlock = createUpgradedEmbedBlock( {
 				attributes: { url: newSrc },
 			} );
-			if ( undefined !== embedBlock ) {
+			if ( undefined !== embedBlock && onReplace ) {
 				onReplace( embedBlock );
 				return;
 			}
@@ -126,9 +140,9 @@ function VideoEdit( {
 		}
 	}
 
+	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
 	const classes = classnames( className, {
@@ -149,8 +163,8 @@ function VideoEdit( {
 					accept="video/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
-					notices={ noticeUI }
 					onError={ onUploadError }
+					placeholder={ placeholder }
 				/>
 			</div>
 		);
@@ -171,7 +185,7 @@ function VideoEdit( {
 
 	return (
 		<>
-			<BlockControls group="block">
+			<BlockControls>
 				<TracksEditor
 					tracks={ tracks }
 					onChange={ ( newTracks ) => {
@@ -191,7 +205,7 @@ function VideoEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Video settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<VideoCommonSettings
 						setAttributes={ setAttributes }
 						attributes={ attributes }
@@ -264,24 +278,16 @@ function VideoEdit( {
 					</video>
 				</Disabled>
 				{ isTemporaryVideo && <Spinner /> }
-				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-					<RichText
-						tagName="figcaption"
-						aria-label={ __( 'Video caption text' ) }
-						placeholder={ __( 'Add caption' ) }
-						value={ caption }
-						onChange={ ( value ) =>
-							setAttributes( { caption: value } )
-						}
-						inlineToolbar
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
-						}
-					/>
-				) }
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Video caption text' ) }
+				/>
 			</figure>
 		</>
 	);
 }
 
-export default withNotices( VideoEdit );
+export default VideoEdit;

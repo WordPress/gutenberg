@@ -1,37 +1,30 @@
 /**
- * External dependencies
- */
-// eslint-disable-next-line no-restricted-imports
-import type { ComponentType } from 'react';
-
-/**
  * Internal dependencies
  */
-import createHigherOrderComponent from '../../utils/create-higher-order-component';
-import type { PropInjectingHigherOrderComponent } from '../../utils/create-higher-order-component';
+import type {
+	WithInjectedProps,
+	WithoutInjectedProps,
+} from '../../utils/create-higher-order-component';
+import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 import useInstanceId from '../../hooks/use-instance-id';
+
+type InstanceIdProps = { instanceId: string | number };
 
 /**
  * A Higher Order Component used to be provide a unique instance ID by
  * component.
  */
-const withInstanceId: PropInjectingHigherOrderComponent< {
-	instanceId: string | number;
-} > = createHigherOrderComponent(
-	< TProps extends { instanceId: string | number } >(
-		WrappedComponent: ComponentType< TProps >
+const withInstanceId = createHigherOrderComponent(
+	< C extends WithInjectedProps< C, InstanceIdProps > >(
+		WrappedComponent: C
 	) => {
-		return ( props: Omit< TProps, 'instanceId' > ) => {
+		return ( props: WithoutInjectedProps< C, InstanceIdProps > ) => {
 			const instanceId = useInstanceId( WrappedComponent );
-			return (
-				<WrappedComponent
-					{ ...( props as TProps ) }
-					instanceId={ instanceId }
-				/>
-			);
+			// @ts-ignore
+			return <WrappedComponent { ...props } instanceId={ instanceId } />;
 		};
 	},
-	'withInstanceId'
+	'instanceId'
 );
 
 export default withInstanceId;

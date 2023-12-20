@@ -1,166 +1,34 @@
 /**
- * External dependencies
- */
-import { castArray, isFunction, isPlainObject, omit, pick, some } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { applyFilters } from '@wordpress/hooks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import { isValidIcon, normalizeIconObject } from '../api/utils';
-import { DEPRECATED_ENTRY_KEYS } from '../api/constants';
+import { processBlockType } from './process-block-type';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
-
-const { error, warn } = window.console;
-
-/**
- * Mapping of legacy category slugs to their latest normal values, used to
- * accommodate updates of the default set of block categories.
- *
- * @type {Record<string,string>}
- */
-const LEGACY_CATEGORY_MAPPING = {
-	common: 'text',
-	formatting: 'text',
-	layout: 'design',
-};
-
-/**
- * Takes the unprocessed block type data and applies all the existing filters for the registered block type.
- * Next, it validates all the settings and performs additional processing to the block type definition.
- *
- * @param {WPBlockType} blockType        Unprocessed block type settings.
- * @param {Object}      thunkArgs        Argument object for the thunk middleware.
- * @param {Function}    thunkArgs.select Function to select from the store.
- *
- * @return {?WPBlockType} The block, if it has been successfully registered; otherwise `undefined`.
- */
-const processBlockType = ( blockType, { select } ) => {
-	const { name } = blockType;
-
-	const settings = applyFilters(
-		'blocks.registerBlockType',
-		{ ...blockType },
-		name
-	);
-
-	if ( settings.deprecated ) {
-		settings.deprecated = settings.deprecated.map( ( deprecation ) =>
-			pick(
-				// Only keep valid deprecation keys.
-				applyFilters(
-					'blocks.registerBlockType',
-					// Merge deprecation keys with pre-filter settings
-					// so that filters that depend on specific keys being
-					// present don't fail.
-					{
-						// Omit deprecation keys here so that deprecations
-						// can opt out of specific keys like "supports".
-						...omit( blockType, DEPRECATED_ENTRY_KEYS ),
-						...deprecation,
-					},
-					name
-				),
-				DEPRECATED_ENTRY_KEYS
-			)
-		);
-	}
-
-	if ( ! isPlainObject( settings ) ) {
-		error( 'Block settings must be a valid object.' );
-		return;
-	}
-
-	if ( ! isFunction( settings.save ) ) {
-		error( 'The "save" property must be a valid function.' );
-		return;
-	}
-	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
-		error( 'The "edit" property must be a valid function.' );
-		return;
-	}
-
-	// Canonicalize legacy categories to equivalent fallback.
-	if ( LEGACY_CATEGORY_MAPPING.hasOwnProperty( settings.category ) ) {
-		settings.category = LEGACY_CATEGORY_MAPPING[ settings.category ];
-	}
-
-	if (
-		'category' in settings &&
-		! some( select.getCategories(), {
-			slug: settings.category,
-		} )
-	) {
-		warn(
-			'The block "' +
-				name +
-				'" is registered with an invalid category "' +
-				settings.category +
-				'".'
-		);
-		delete settings.category;
-	}
-
-	if ( ! ( 'title' in settings ) || settings.title === '' ) {
-		error( 'The block "' + name + '" must have a title.' );
-		return;
-	}
-	if ( typeof settings.title !== 'string' ) {
-		error( 'Block titles must be strings.' );
-		return;
-	}
-
-	settings.icon = normalizeIconObject( settings.icon );
-	if ( ! isValidIcon( settings.icon.src ) ) {
-		error(
-			'The icon passed is invalid. ' +
-				'The icon should be a string, an element, a function, or an object following the specifications documented in https://developer.wordpress.org/block-editor/developers/block-api/block-registration/#icon-optional'
-		);
-		return;
-	}
-
-	return settings;
-};
+/** @typedef {import('../api/registration').WPBlockType} WPBlockType */
+/** @typedef {import('./reducer').WPBlockCategory} WPBlockCategory */
 
 /**
  * Returns an action object used in signalling that block types have been added.
+ * Ignored from documentation as the recommended usage for this action through registerBlockType from @wordpress/blocks.
  *
- * @param {Array|Object} blockTypes Block types received.
+ * @ignore
+ *
+ * @param {WPBlockType|WPBlockType[]} blockTypes Object or array of objects representing blocks to added.
+ *
  *
  * @return {Object} Action object.
  */
 export function addBlockTypes( blockTypes ) {
 	return {
 		type: 'ADD_BLOCK_TYPES',
-		blockTypes: castArray( blockTypes ),
+		blockTypes: Array.isArray( blockTypes ) ? blockTypes : [ blockTypes ],
 	};
 }
-
-/**
- * Signals that the passed block type's settings should be stored in the state.
- *
- * @param {WPBlockType} blockType Unprocessed block type settings.
- */
-export const __experimentalRegisterBlockType = ( blockType ) => ( {
-	dispatch,
-	select,
-} ) => {
-	dispatch( {
-		type: 'ADD_UNPROCESSED_BLOCK_TYPE',
-		blockType,
-	} );
-
-	const processedBlockType = processBlockType( blockType, { select } );
-	if ( ! processedBlockType ) {
-		return;
-	}
-	dispatch.addBlockTypes( processedBlockType );
-};
 
 /**
  * Signals that all block types should be computed again.
@@ -176,81 +44,99 @@ export const __experimentalRegisterBlockType = ( blockType ) => ( {
  *   7. Filter G.
  * In this scenario some filters would not get applied for all blocks because they are registered too late.
  */
-export const __experimentalReapplyBlockTypeFilters = () => ( {
-	dispatch,
-	select,
-} ) => {
-	const unprocessedBlockTypes = select.__experimentalGetUnprocessedBlockTypes();
-
-	const processedBlockTypes = Object.keys( unprocessedBlockTypes ).reduce(
-		( accumulator, blockName ) => {
-			const result = processBlockType(
-				unprocessedBlockTypes[ blockName ],
-				{ select }
-			);
+export function reapplyBlockTypeFilters() {
+	return ( { dispatch, select } ) => {
+		const processedBlockTypes = [];
+		for ( const [ name, settings ] of Object.entries(
+			select.getUnprocessedBlockTypes()
+		) ) {
+			const result = dispatch( processBlockType( name, settings ) );
 			if ( result ) {
-				accumulator.push( result );
+				processedBlockTypes.push( result );
 			}
-			return accumulator;
-		},
-		[]
+		}
+
+		if ( ! processedBlockTypes.length ) {
+			return;
+		}
+
+		dispatch.addBlockTypes( processedBlockTypes );
+	};
+}
+
+export function __experimentalReapplyBlockFilters() {
+	deprecated(
+		'wp.data.dispatch( "core/blocks" ).__experimentalReapplyBlockFilters',
+		{
+			since: '6.4',
+			alternative: 'reapplyBlockFilters',
+		}
 	);
 
-	if ( ! processedBlockTypes.length ) {
-		return;
-	}
-
-	dispatch.addBlockTypes( processedBlockTypes );
-};
+	return reapplyBlockTypeFilters();
+}
 
 /**
  * Returns an action object used to remove a registered block type.
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockType from @wordpress/blocks.
  *
- * @param {string|Array} names Block name.
+ * @ignore
+ *
+ * @param {string|string[]} names Block name or array of block names to be removed.
+ *
  *
  * @return {Object} Action object.
  */
 export function removeBlockTypes( names ) {
 	return {
 		type: 'REMOVE_BLOCK_TYPES',
-		names: castArray( names ),
+		names: Array.isArray( names ) ? names : [ names ],
 	};
 }
 
 /**
  * Returns an action object used in signalling that new block styles have been added.
+ * Ignored from documentation as the recommended usage for this action through registerBlockStyle from @wordpress/blocks.
  *
  * @param {string}       blockName Block name.
- * @param {Array|Object} styles    Block styles.
+ * @param {Array|Object} styles    Block style object or array of block style objects.
+ *
+ * @ignore
  *
  * @return {Object} Action object.
  */
 export function addBlockStyles( blockName, styles ) {
 	return {
 		type: 'ADD_BLOCK_STYLES',
-		styles: castArray( styles ),
+		styles: Array.isArray( styles ) ? styles : [ styles ],
 		blockName,
 	};
 }
 
 /**
  * Returns an action object used in signalling that block styles have been removed.
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockStyle from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string}       blockName  Block name.
- * @param {Array|string} styleNames Block style names.
+ * @param {Array|string} styleNames Block style names or array of block style names.
  *
  * @return {Object} Action object.
  */
 export function removeBlockStyles( blockName, styleNames ) {
 	return {
 		type: 'REMOVE_BLOCK_STYLES',
-		styleNames: castArray( styleNames ),
+		styleNames: Array.isArray( styleNames ) ? styleNames : [ styleNames ],
 		blockName,
 	};
 }
 
 /**
  * Returns an action object used in signalling that new block variations have been added.
+ * Ignored from documentation as the recommended usage for this action through registerBlockVariation from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string}                              blockName  Block name.
  * @param {WPBlockVariation|WPBlockVariation[]} variations Block variations.
@@ -260,13 +146,16 @@ export function removeBlockStyles( blockName, styleNames ) {
 export function addBlockVariations( blockName, variations ) {
 	return {
 		type: 'ADD_BLOCK_VARIATIONS',
-		variations: castArray( variations ),
+		variations: Array.isArray( variations ) ? variations : [ variations ],
 		blockName,
 	};
 }
 
 /**
  * Returns an action object used in signalling that block variations have been removed.
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockVariation from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string}          blockName      Block name.
  * @param {string|string[]} variationNames Block variation names.
@@ -276,13 +165,18 @@ export function addBlockVariations( blockName, variations ) {
 export function removeBlockVariations( blockName, variationNames ) {
 	return {
 		type: 'REMOVE_BLOCK_VARIATIONS',
-		variationNames: castArray( variationNames ),
+		variationNames: Array.isArray( variationNames )
+			? variationNames
+			: [ variationNames ],
 		blockName,
 	};
 }
 
 /**
  * Returns an action object used to set the default block name.
+ * Ignored from documentation as the recommended usage for this action through setDefaultBlockName from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string} name Block name.
  *
@@ -298,6 +192,9 @@ export function setDefaultBlockName( name ) {
 /**
  * Returns an action object used to set the name of the block used as a fallback
  * for non-block content.
+ * Ignored from documentation as the recommended usage for this action through setFreeformContentHandlerName from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string} name Block name.
  *
@@ -313,6 +210,9 @@ export function setFreeformFallbackBlockName( name ) {
 /**
  * Returns an action object used to set the name of the block used as a fallback
  * for unregistered blocks.
+ * Ignored from documentation as the recommended usage for this action through setUnregisteredTypeHandlerName from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string} name Block name.
  *
@@ -329,6 +229,9 @@ export function setUnregisteredFallbackBlockName( name ) {
  * Returns an action object used to set the name of the block used
  * when grouping other blocks
  * eg: in "Group/Ungroup" interactions
+ * Ignored from documentation as the recommended usage for this action through setGroupingBlockName from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string} name Block name.
  *
@@ -343,8 +246,11 @@ export function setGroupingBlockName( name ) {
 
 /**
  * Returns an action object used to set block categories.
+ * Ignored from documentation as the recommended usage for this action through setCategories from @wordpress/blocks.
  *
- * @param {Object[]} categories Block categories.
+ * @ignore
+ *
+ * @param {WPBlockCategory[]} categories Block categories.
  *
  * @return {Object} Action object.
  */
@@ -357,6 +263,9 @@ export function setCategories( categories ) {
 
 /**
  * Returns an action object used to update a category.
+ * Ignored from documentation as the recommended usage for this action through updateCategory from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string} slug     Block category slug.
  * @param {Object} category Object containing the category properties that should be updated.
@@ -373,6 +282,9 @@ export function updateCategory( slug, category ) {
 
 /**
  * Returns an action object used to add block collections
+ * Ignored from documentation as the recommended usage for this action through registerBlockCollection from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string} namespace The namespace of the blocks to put in the collection
  * @param {string} title     The title to display in the block inserter
@@ -391,6 +303,9 @@ export function addBlockCollection( namespace, title, icon ) {
 
 /**
  * Returns an action object used to remove block collections
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockCollection from @wordpress/blocks.
+ *
+ * @ignore
  *
  * @param {string} namespace The namespace of the blocks to put in the collection
  *

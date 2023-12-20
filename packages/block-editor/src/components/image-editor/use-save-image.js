@@ -1,18 +1,18 @@
 /**
  * WordPress dependencies
  */
+// Disable Reason: Needs to be refactored.
+// eslint-disable-next-line no-restricted-imports
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 export default function useSaveImage( {
 	crop,
 	rotation,
-	height,
-	width,
-	aspect,
 	url,
 	id,
 	onSaveImage,
@@ -24,35 +24,45 @@ export default function useSaveImage( {
 	const cancel = useCallback( () => {
 		setIsInProgress( false );
 		onFinishEditing();
-	}, [ setIsInProgress, onFinishEditing ] );
+	}, [ onFinishEditing ] );
 
 	const apply = useCallback( () => {
 		setIsInProgress( true );
 
-		let attrs = {};
+		const modifiers = [];
+
+		if ( rotation > 0 ) {
+			modifiers.push( {
+				type: 'rotate',
+				args: {
+					angle: rotation,
+				},
+			} );
+		}
 
 		// The crop script may return some very small, sub-pixel values when the image was not cropped.
 		// Crop only when the new size has changed by more than 0.1%.
 		if ( crop.width < 99.9 || crop.height < 99.9 ) {
-			attrs = crop;
+			modifiers.push( {
+				type: 'crop',
+				args: {
+					left: crop.x,
+					top: crop.y,
+					width: crop.width,
+					height: crop.height,
+				},
+			} );
 		}
-
-		if ( rotation > 0 ) {
-			attrs.rotation = rotation;
-		}
-
-		attrs.src = url;
 
 		apiFetch( {
 			path: `/wp/v2/media/${ id }/edit`,
 			method: 'POST',
-			data: attrs,
+			data: { src: url, modifiers },
 		} )
 			.then( ( response ) => {
 				onSaveImage( {
 					id: response.id,
 					url: response.source_url,
-					height: height && width ? width / aspect : undefined,
 				} );
 			} )
 			.catch( ( error ) => {
@@ -60,7 +70,7 @@ export default function useSaveImage( {
 					sprintf(
 						/* translators: 1. Error message */
 						__( 'Could not edit image. %s' ),
-						error.message
+						stripHTML( error.message )
 					),
 					{
 						id: 'image-editing-error',
@@ -73,16 +83,12 @@ export default function useSaveImage( {
 				onFinishEditing();
 			} );
 	}, [
-		setIsInProgress,
 		crop,
 		rotation,
-		height,
-		width,
-		aspect,
+		id,
 		url,
 		onSaveImage,
 		createErrorNotice,
-		setIsInProgress,
 		onFinishEditing,
 	] );
 

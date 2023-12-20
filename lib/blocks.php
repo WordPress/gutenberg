@@ -1,6 +1,6 @@
 <?php
 /**
- * Block and style registration functions.
+ * Block functions specific for the Gutenberg editor plugin.
  *
  * @package gutenberg
  */
@@ -21,23 +21,17 @@ function gutenberg_reregister_core_block_types() {
 				'code',
 				'column',
 				'columns',
-				'comments-query-loop',
-				'cover',
-				'gallery',
+				'details',
+				'form-input',
+				'form-submit-button',
 				'group',
-				'heading',
 				'html',
-				'home-link',
-				'image',
 				'list',
+				'list-item',
 				'media-text',
 				'missing',
 				'more',
-				'navigation-area',
-				'navigation-link',
-				'navigation-submenu',
 				'nextpage',
-				'pattern',
 				'paragraph',
 				'preformatted',
 				'pullquote',
@@ -46,7 +40,7 @@ function gutenberg_reregister_core_block_types() {
 				'social-links',
 				'spacer',
 				'table',
-				// 'table-of-contents',
+				'table-of-contents',
 				'text-columns',
 				'verse',
 				'video',
@@ -54,9 +48,11 @@ function gutenberg_reregister_core_block_types() {
 			),
 			'block_names'   => array(
 				'archives.php'                     => 'core/archives',
+				'avatar.php'                       => 'core/avatar',
 				'block.php'                        => 'core/block',
 				'calendar.php'                     => 'core/calendar',
 				'categories.php'                   => 'core/categories',
+				'cover.php'                        => 'core/cover',
 				'comment-author-avatar.php'        => 'core/comment-author-avatar',
 				'comment-author-name.php'          => 'core/comment-author-name',
 				'comment-content.php'              => 'core/comment-content',
@@ -68,23 +64,30 @@ function gutenberg_reregister_core_block_types() {
 				'comments-pagination-next.php'     => 'core/comments-pagination-next',
 				'comments-pagination-numbers.php'  => 'core/comments-pagination-numbers',
 				'comments-pagination-previous.php' => 'core/comments-pagination-previous',
+				'comments-title.php'               => 'core/comments-title',
+				'comments.php'                     => 'core/comments',
+				'footnotes.php'                    => 'core/footnotes',
 				'file.php'                         => 'core/file',
+				'form.php'                         => 'core/form',
+				'form-input.php'                   => 'core/form-input',
+				'form-submission-notification.php' => 'core/form-submission-notification',
 				'home-link.php'                    => 'core/home-link',
 				'image.php'                        => 'core/image',
 				'gallery.php'                      => 'core/gallery',
+				'heading.php'                      => 'core/heading',
 				'latest-comments.php'              => 'core/latest-comments',
 				'latest-posts.php'                 => 'core/latest-posts',
 				'loginout.php'                     => 'core/loginout',
 				'navigation.php'                   => 'core/navigation',
-				'navigation-area.php'              => 'core/navigation-area',
 				'navigation-link.php'              => 'core/navigation-link',
 				'navigation-submenu.php'           => 'core/navigation-submenu',
 				'page-list.php'                    => 'core/page-list',
+				'page-list-item.php'               => 'core/page-list-item',
 				'pattern.php'                      => 'core/pattern',
 				'post-author.php'                  => 'core/post-author',
 				'post-author-name.php'             => 'core/post-author-name',
+				'post-author-biography.php'        => 'core/post-author-biography',
 				'post-comment.php'                 => 'core/post-comment',
-				'post-comments.php'                => 'core/post-comments',
 				'post-comments-count.php'          => 'core/post-comments-count',
 				'post-comments-form.php'           => 'core/post-comments-form',
 				'post-comments-link.php'           => 'core/post-comments-link',
@@ -94,14 +97,17 @@ function gutenberg_reregister_core_block_types() {
 				'post-featured-image.php'          => 'core/post-featured-image',
 				'post-navigation-link.php'         => 'core/post-navigation-link',
 				'post-terms.php'                   => 'core/post-terms',
+				'post-time-to-read.php'            => 'core/post-time-to-read',
 				'post-title.php'                   => 'core/post-title',
 				'query.php'                        => 'core/query',
 				'post-template.php'                => 'core/post-template',
+				'query-no-results.php'             => 'core/query-no-results',
 				'query-pagination.php'             => 'core/query-pagination',
 				'query-pagination-next.php'        => 'core/query-pagination-next',
 				'query-pagination-numbers.php'     => 'core/query-pagination-numbers',
 				'query-pagination-previous.php'    => 'core/query-pagination-previous',
 				'query-title.php'                  => 'core/query-title',
+				'read-more.php'                    => 'core/read-more',
 				'rss.php'                          => 'core/rss',
 				'search.php'                       => 'core/search',
 				'shortcode.php'                    => 'core/shortcode',
@@ -109,7 +115,6 @@ function gutenberg_reregister_core_block_types() {
 				'site-logo.php'                    => 'core/site-logo',
 				'site-tagline.php'                 => 'core/site-tagline',
 				'site-title.php'                   => 'core/site-title',
-				// 'table-of-contents.php'          => 'core/table-of-contents',
 				'tag-cloud.php'                    => 'core/tag-cloud',
 				'template-part.php'                => 'core/template-part',
 				'term-description.php'             => 'core/term-description',
@@ -136,8 +141,6 @@ function gutenberg_reregister_core_block_types() {
 		$block_folders = $details['block_folders'];
 		$block_names   = $details['block_names'];
 
-		$registry = WP_Block_Type_Registry::get_instance();
-
 		foreach ( $block_folders as $folder_name ) {
 			$block_json_file = $blocks_dir . $folder_name . '/block.json';
 
@@ -146,27 +149,22 @@ function gutenberg_reregister_core_block_types() {
 			// to replace paths with overrides defined by the plugin.
 			$metadata = json_decode( file_get_contents( $block_json_file ), true );
 			if ( ! is_array( $metadata ) || ! $metadata['name'] ) {
-				return false;
+				continue;
 			}
 
-			if ( $registry->is_registered( $metadata['name'] ) ) {
-				$registry->unregister( $metadata['name'] );
-			}
-
+			gutenberg_deregister_core_block_and_assets( $metadata['name'] );
 			gutenberg_register_core_block_assets( $folder_name );
 			register_block_type_from_metadata( $block_json_file );
 		}
 
 		foreach ( $block_names as $file => $sub_block_names ) {
 			if ( ! file_exists( $blocks_dir . $file ) ) {
-				return;
+				continue;
 			}
 
 			$sub_block_names_normalized = is_string( $sub_block_names ) ? array( $sub_block_names ) : $sub_block_names;
 			foreach ( $sub_block_names_normalized as $block_name ) {
-				if ( $registry->is_registered( $block_name ) ) {
-					$registry->unregister( $block_name );
-				}
+				gutenberg_deregister_core_block_and_assets( $block_name );
 				gutenberg_register_core_block_assets( $block_name );
 			}
 
@@ -176,6 +174,62 @@ function gutenberg_reregister_core_block_types() {
 }
 
 add_action( 'init', 'gutenberg_reregister_core_block_types' );
+
+/**
+ * Adds the defer loading strategy to all registered blocks.
+ *
+ * This function would not be part of core merge. Instead, the register_block_script_handle() function would be patched
+ * as follows.
+ *
+ * ```
+ * --- a/wp-includes/blocks.php
+ * +++ b/wp-includes/blocks.php
+ * @ @ -153,7 +153,8 @ @ function register_block_script_handle( $metadata, $field_name, $index = 0 ) {
+ *                 $script_handle,
+ *                 $script_uri,
+ *                 $script_dependencies,
+ * -           isset( $script_asset['version'] ) ? $script_asset['version'] : false
+ * +         isset( $script_asset['version'] ) ? $script_asset['version'] : false,
+ * +         array( 'strategy' => 'defer' )
+ *         );
+ *         if ( ! $result ) {
+ *                 return false;
+ * ```
+ *
+ * @see register_block_script_handle()
+ */
+function gutenberg_defer_block_view_scripts() {
+	$block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
+	foreach ( $block_types as $block_type ) {
+		foreach ( $block_type->view_script_handles as $view_script_handle ) {
+			wp_script_add_data( $view_script_handle, 'strategy', 'defer' );
+		}
+	}
+}
+
+add_action( 'init', 'gutenberg_defer_block_view_scripts', 100 );
+
+/**
+ * Deregisters the existing core block type and its assets.
+ *
+ * @param string $block_name The name of the block.
+ *
+ * @return void
+ */
+function gutenberg_deregister_core_block_and_assets( $block_name ) {
+	$registry = WP_Block_Type_Registry::get_instance();
+	if ( $registry->is_registered( $block_name ) ) {
+		$block_type = $registry->get_registered( $block_name );
+		if ( ! empty( $block_type->view_script_handles ) ) {
+			foreach ( $block_type->view_script_handles as $view_script_handle ) {
+				if ( str_starts_with( $view_script_handle, 'wp-block-' ) ) {
+					wp_deregister_script( $view_script_handle );
+				}
+			}
+		}
+		$registry->unregister( $block_name );
+	}
+}
 
 /**
  * Registers block styles for a core block.
@@ -193,25 +247,26 @@ function gutenberg_register_core_block_assets( $block_name ) {
 
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
-	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
+	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 
-	$style_path        = "build/block-library/blocks/$block_name/style.css";
-	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
+	$style_path      = "build/block-library/blocks/$block_name/";
+	$stylesheet_url  = gutenberg_url( $style_path . 'style.css' );
+	$stylesheet_path = gutenberg_dir_path() . $style_path . ( is_rtl() ? 'style-rtl.css' : 'style.css' );
 
-	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+	if ( file_exists( $stylesheet_path ) ) {
 		wp_deregister_style( "wp-block-{$block_name}" );
 		wp_register_style(
 			"wp-block-{$block_name}",
-			gutenberg_url( $style_path ),
+			$stylesheet_url,
 			array(),
 			$default_version
 		);
 		wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
 
 		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
-		wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $style_path );
+		wp_style_add_data( "wp-block-{$block_name}", 'path', $stylesheet_path );
 	} else {
-		wp_register_style( "wp-block-{$block_name}", false );
+		wp_register_style( "wp-block-{$block_name}", false, array() );
 	}
 
 	// If the current theme supports wp-block-styles, dequeue the full stylesheet
@@ -224,7 +279,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		if ( ! $stylesheet_removed ) {
 			add_action(
 				'wp_enqueue_scripts',
-				function() {
+				static function () {
 					wp_dequeue_style( 'wp-block-library-theme' );
 				}
 			);
@@ -239,7 +294,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		// If the file exists, enqueue it.
 		if ( file_exists( gutenberg_dir_path() . $theme_style_path ) ) {
 
-			if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+			if ( file_exists( $stylesheet_path ) ) {
 				// If there is a main stylesheet for this block, append the theme styles to main styles.
 				wp_add_inline_style(
 					"wp-block-{$block_name}",
@@ -258,6 +313,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		}
 	}
 
+	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
 		wp_deregister_style( "wp-block-{$block_name}-editor" );
 		wp_register_style(
@@ -273,135 +329,6 @@ function gutenberg_register_core_block_assets( $block_name ) {
 }
 
 /**
- * Change the way styles get loaded depending on their size.
- *
- * Optimizes performance and sustainability of styles by inlining smaller stylesheets.
- *
- * @todo Remove this function when the minimum supported version is WordPress 5.8.
- *
- * @return void
- */
-function gutenberg_maybe_inline_styles() {
-
-	// Early exit if the "wp_maybe_inline_styles" function exists.
-	if ( function_exists( 'wp_maybe_inline_styles' ) ) {
-		return;
-	}
-
-	$total_inline_limit = 20000;
-	/**
-	 * The maximum size of inlined styles in bytes.
-	 *
-	 * @param int $total_inline_limit The file-size threshold, in bytes. Defaults to 20000.
-	 * @return int                    The file-size threshold, in bytes.
-	 */
-	$total_inline_limit = apply_filters( 'styles_inline_size_limit', $total_inline_limit );
-
-	global $wp_styles;
-	$styles = array();
-
-	// Build an array of styles that have a path defined.
-	foreach ( $wp_styles->queue as $handle ) {
-		if ( wp_styles()->get_data( $handle, 'path' ) && file_exists( $wp_styles->registered[ $handle ]->extra['path'] ) ) {
-			$styles[] = array(
-				'handle' => $handle,
-				'src'    => $wp_styles->registered[ $handle ]->src,
-				'path'   => $wp_styles->registered[ $handle ]->extra['path'],
-				'size'   => filesize( $wp_styles->registered[ $handle ]->extra['path'] ),
-			);
-		}
-	}
-
-	if ( ! empty( $styles ) ) {
-		// Reorder styles array based on size.
-		usort(
-			$styles,
-			function( $a, $b ) {
-				return ( $a['size'] <= $b['size'] ) ? -1 : 1;
-			}
-		);
-
-		/**
-		 * The total inlined size.
-		 *
-		 * On each iteration of the loop, if a style gets added inline the value of this var increases
-		 * to reflect the total size of inlined styles.
-		 */
-		$total_inline_size = 0;
-
-		// Loop styles.
-		foreach ( $styles as $style ) {
-
-			// Size check. Since styles are ordered by size, we can break the loop.
-			if ( $total_inline_size + $style['size'] > $total_inline_limit ) {
-				break;
-			}
-
-			// Get the styles if we don't already have them.
-			$style['css'] = file_get_contents( $style['path'] );
-
-			// Check if the style contains relative URLs that need to be modified.
-			// URLs relative to the stylesheet's path should be converted to relative to the site's root.
-			$style['css'] = _wp_normalize_relative_css_links( $style['css'], $style['src'] );
-
-			// Set `src` to `false` and add styles inline.
-			$wp_styles->registered[ $style['handle'] ]->src = false;
-			if ( empty( $wp_styles->registered[ $style['handle'] ]->extra['after'] ) ) {
-				$wp_styles->registered[ $style['handle'] ]->extra['after'] = array();
-			}
-			array_unshift( $wp_styles->registered[ $style['handle'] ]->extra['after'], $style['css'] );
-
-			// Add the styles size to the $total_inline_size var.
-			$total_inline_size += (int) $style['size'];
-		}
-	}
-}
-// Run for styles enqueued in <head>.
-add_action( 'wp_head', 'gutenberg_maybe_inline_styles', 1 );
-// Run for late-loaded styles in the footer.
-add_action( 'wp_footer', 'gutenberg_maybe_inline_styles', 1 );
-
-if ( ! function_exists( '_wp_normalize_relative_css_links' ) ) {
-	/**
-	 * Make URLs relative to the WordPress installation.
-	 *
-	 * @since 5.8.2
-	 *
-	 * @param string $css            The CSS to make URLs relative to the WordPress installation.
-	 * @param string $stylesheet_url The URL to the stylesheet.
-	 *
-	 * @return string The CSS with URLs made relative to the WordPress installation.
-	 */
-	function _wp_normalize_relative_css_links( $css, $stylesheet_url ) {
-		$has_src_results = preg_match_all( '#url\s*\(\s*[\'"]?\s*([^\'"\)]+)#', $css, $src_results );
-		if ( $has_src_results ) {
-			// Loop through the URLs to find relative ones.
-			foreach ( $src_results[1] as $src_index => $src_result ) {
-				// Skip if this is an absolute URL.
-				if ( 0 === strpos( $src_result, 'http' ) || 0 === strpos( $src_result, '//' ) ) {
-					continue;
-				}
-
-				// Build the absolute URL.
-				$absolute_url = dirname( $stylesheet_url ) . '/' . $src_result;
-				$absolute_url = str_replace( '/./', '/', $absolute_url );
-				// Convert to URL related to the site root.
-				$relative_url = wp_make_link_relative( $absolute_url );
-
-				// Replace the URL in the CSS.
-				$css = str_replace(
-					$src_results[0][ $src_index ],
-					str_replace( $src_result, $relative_url, $src_results[0][ $src_index ] ),
-					$css
-				);
-			}
-		}
-
-		return $css;
-	}
-}
-
-/**
  * Complements the implementation of block type `core/social-icon`, whether it
  * be provided by core or the plugin, with derived block types for each
  * "service" (WordPress, Twitter, etc.) supported by Social Links.
@@ -410,7 +337,7 @@ if ( ! function_exists( '_wp_normalize_relative_css_links' ) ) {
  * plugin who have used Social Links prior to their conversion to block
  * variations.
  *
- * This shim is INTENTIONALLY left out of core, as Social Links haven't yet
+ * This shim is INTENTIONALLY left out of core, as Social Links have never
  * landed there.
  *
  * @see https://github.com/WordPress/gutenberg/pull/19887
@@ -484,200 +411,168 @@ function gutenberg_register_legacy_social_link_blocks() {
 add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
 
 /**
- * Filters the default block categories array to add a new one for themes.
+ * Migrate the legacy `sync_status` meta key (added 16.1) to the new `wp_pattern_sync_status` meta key (16.1.1).
  *
- * This can be removed when plugin support requires WordPress 5.8.0+.
+ * This filter is INTENTIONALLY left out of core as the meta key was fist introduced to core in 6.3 as `wp_pattern_sync_status`.
+ * see https://github.com/WordPress/gutenberg/pull/52232
  *
- * @see https://core.trac.wordpress.org/ticket/52883
- *
- * @param array[] $categories The list of default block categories.
- *
- * @return array[] Filtered block categories.
+ * @param mixed  $value     The value to return, either a single metadata value or an array of values depending on the value of $single.
+ * @param int    $object_id ID of the object metadata is for.
+ * @param string $meta_key  Metadata key.
+ * @param bool   $single    Whether to return only the first value of the specified $meta_key.
  */
-function gutenberg_register_theme_block_category( $categories ) {
-	foreach ( $categories as $category ) {
-		// Skip when the category is already set in WordPress core.
-		if (
-			isset( $category['slug'] ) &&
-			'theme' === $category['slug']
-		) {
-			return $categories;
-		}
+function gutenberg_legacy_wp_block_post_meta( $value, $object_id, $meta_key, $single ) {
+	if ( 'wp_pattern_sync_status' !== $meta_key ) {
+		return $value;
 	}
 
-	$categories[] = array(
-		'slug'  => 'theme',
-		'title' => _x( 'Theme', 'block category', 'gutenberg' ),
-		'icon'  => null,
-	);
-	return $categories;
-}
-// This can be removed when plugin support requires WordPress 5.8.0+.
-if ( ! function_exists( 'get_default_block_categories' ) ) {
-	add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
-}
+	$sync_status = get_post_meta( $object_id, 'sync_status', $single );
 
-/**
- * Checks whether the current block type supports the feature requested.
- *
- * @param WP_Block_Type $block_type Block type to check for support.
- * @param array         $feature    Path of the feature to check support for.
- * @param mixed         $default    Fallback value for feature support, defaults to false.
- *
- * @return boolean                  Whether or not the feature is supported.
- */
-function gutenberg_block_has_support( $block_type, $feature, $default = false ) {
-	$block_support = $default;
-	if ( $block_type && property_exists( $block_type, 'supports' ) ) {
-		$block_support = _wp_array_get( $block_type->supports, $feature, $default );
+	if ( $single && 'unsynced' === $sync_status ) {
+		return $sync_status;
+	} elseif ( isset( $sync_status[0] ) && 'unsynced' === $sync_status[0] ) {
+		return $sync_status;
 	}
 
-	return true === $block_support || is_array( $block_support );
+	return $value;
 }
 
+add_filter( 'default_post_metadata', 'gutenberg_legacy_wp_block_post_meta', 10, 4 );
+
 /**
- * Updates the shape of supports for declaring fontSize and lineHeight.
+ * Complements the lightbox implementation for the 'core/image' block.
  *
- * @param array $metadata Metadata for registering a block type.
- * @return array          Metadata for registering a block type with the supports shape updated.
+ * This function is INTENTIONALLY left out of core as it only provides
+ * backwards compatibility for the legacy lightbox syntax that was only
+ * introduced in Gutenberg. The legacy syntax was using the `behaviors` key in
+ * the block attrbutes and the `theme.json` file.
+ *
+ * @since 16.7.0
+ *
+ * @param array $block The block to check.
+ * @return array The block with the legacyLightboxSettings set if available.
  */
-function gutenberg_migrate_old_typography_shape( $metadata ) {
-	// Temporarily disable migrations from core blocks to avoid warnings on versions older than 5.8.
-	if ( isset( $metadata['supports'] ) && false === strpos( $metadata['file'], '/wp-includes/blocks/' ) ) {
-		$typography_keys = array(
-			'__experimentalFontFamily',
-			'__experimentalFontStyle',
-			'__experimentalFontWeight',
-			'__experimentalLetterSpacing',
-			'__experimentalTextDecoration',
-			'__experimentalTextTransform',
-			'fontSize',
-			'lineHeight',
+function gutenberg_should_render_lightbox( $block ) {
+
+	if ( 'core/image' !== $block['blockName'] ) {
+		return $block;
+	}
+
+	if ( isset( $block['attrs']['behaviors']['lightbox'] ) ) {
+		$block['legacyLightboxSettings'] = $block['attrs']['behaviors']['lightbox'];
+	}
+
+	return $block;
+}
+
+add_filter( 'render_block_data', 'gutenberg_should_render_lightbox', 15, 1 );
+
+/**
+ * Registers the metadata block attribute for all block types.
+ *
+ * @param array $args Array of arguments for registering a block type.
+ * @return array $args
+ */
+function gutenberg_register_metadata_attribute( $args ) {
+	// Setup attributes if needed.
+	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
+		$args['attributes'] = array();
+	}
+
+	if ( ! array_key_exists( 'metadata', $args['attributes'] ) ) {
+		$args['attributes']['metadata'] = array(
+			'type' => 'object',
 		);
-		foreach ( $typography_keys as $typography_key ) {
-			$support_for_key = _wp_array_get( $metadata['supports'], array( $typography_key ), null );
-			if ( null !== $support_for_key ) {
-				trigger_error(
-					/* translators: %1$s: Block type, %2$s: typography supports key e.g: fontSize, lineHeight etc... */
-					sprintf( __( 'Block %1$s is declaring %2$s support on block.json under supports.%2$s. %2$s support is now declared under supports.typography.%2$s.', 'gutenberg' ), $metadata['name'], $typography_key ),
-					headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
-				);
-				_wp_array_set( $metadata['supports'], array( 'typography', $typography_key ), $support_for_key );
-				unset( $metadata['supports'][ $typography_key ] );
-			}
+	}
+
+	return $args;
+}
+add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );
+
+/**
+ * Strips all HTML from the content of footnotes, and sanitizes the ID.
+ *
+ * This function expects slashed data on the footnotes content.
+ *
+ * @access private
+ *
+ * @param string $footnotes JSON encoded string of an array containing the content and ID of each footnote.
+ * @return string Filtered content without any HTML on the footnote content and with the sanitized id.
+ */
+function _gutenberg_filter_post_meta_footnotes( $footnotes ) {
+	$footnotes_decoded = json_decode( $footnotes, true );
+	if ( ! is_array( $footnotes_decoded ) ) {
+		return '';
+	}
+	$footnotes_sanitized = array();
+	foreach ( $footnotes_decoded as $footnote ) {
+		if ( ! empty( $footnote['content'] ) && ! empty( $footnote['id'] ) ) {
+			$footnotes_sanitized[] = array(
+				'id'      => sanitize_key( $footnote['id'] ),
+				'content' => wp_unslash( wp_filter_post_kses( wp_slash( $footnote['content'] ) ) ),
+			);
 		}
 	}
-	return $metadata;
+	return wp_json_encode( $footnotes_sanitized );
 }
 
-if ( ! function_exists( 'wp_migrate_old_typography_shape' ) ) {
-	add_filter( 'block_type_metadata', 'gutenberg_migrate_old_typography_shape' );
+/**
+ * Adds the filters to filter footnotes meta field.
+ *
+ * @access private
+ */
+function _gutenberg_footnotes_kses_init_filters() {
+	add_filter( 'sanitize_post_meta_footnotes', '_gutenberg_filter_post_meta_footnotes' );
 }
 
-if ( ! function_exists( 'wp_enqueue_block_style' ) ) {
-	/**
-	 * Enqueue a stylesheet for a specific block.
-	 *
-	 * If the theme has opted-in to separate-styles loading,
-	 * then the stylesheet will be enqueued on-render,
-	 * otherwise when the block inits.
-	 *
-	 * @param string $block_name The block-name, including namespace.
-	 * @param array  $args       An array of arguments [handle,src,deps,ver,media].
-	 *
-	 * @return void
-	 */
-	function wp_enqueue_block_style( $block_name, $args ) {
-		$args = wp_parse_args(
-			$args,
-			array(
-				'handle' => '',
-				'src'    => '',
-				'deps'   => array(),
-				'ver'    => false,
-				'media'  => 'all',
-			)
-		);
+/**
+ * Removes the filters that filter footnotes meta field.
+ *
+ * @access private
+ */
+function _gutenberg_footnotes_remove_filters() {
+	remove_filter( 'sanitize_post_meta_footnotes', '_gutenberg_filter_post_meta_footnotes' );
+}
 
-		/**
-		 * Callback function to register and enqueue styles.
-		 *
-		 * @param string $content When the callback is used for the render_block filter,
-		 *                        the content needs to be returned so the function parameter
-		 *                        is to ensure the content exists.
-		 *
-		 * @return string
-		 */
-		$callback = function( $content ) use ( $args ) {
-			// Register the stylesheet.
-			if ( ! empty( $args['src'] ) ) {
-				wp_register_style( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['media'] );
-			}
-
-			// Add `path` data if provided.
-			if ( isset( $args['path'] ) ) {
-				wp_style_add_data( $args['handle'], 'path', $args['path'] );
-
-				// Get the RTL file path.
-				$rtl_file_path = str_replace( '.css', '-rtl.css', $args['path'] );
-
-				// Add RTL stylesheet.
-				if ( file_exists( $rtl_file_path ) ) {
-					wp_style_add_data( $args['hanle'], 'rtl', 'replace' );
-
-					if ( is_rtl() ) {
-						wp_style_add_data( $args['handle'], 'path', $rtl_file_path );
-					}
-				}
-			}
-
-			// Enqueue the stylesheet.
-			wp_enqueue_style( $args['handle'] );
-
-			return $content;
-		};
-
-		$hook = did_action( 'wp_enqueue_scripts' ) ? 'wp_footer' : 'wp_enqueue_scripts';
-		if ( wp_should_load_separate_core_block_assets() ) {
-			$hook = "render_block_$block_name";
-		}
-
-		// Enqueue assets in the frontend.
-		add_filter( $hook, $callback );
-
-		// Enqueue assets in the editor.
-		add_action( 'enqueue_block_assets', $callback );
+/**
+ * Registers the filter of footnotes meta field if the user does not have unfiltered_html capability.
+ *
+ * @access private
+ */
+function _gutenberg_footnotes_kses_init() {
+	if ( function_exists( '_wp_filter_post_meta_footnotes' ) ) {
+		return;
+	}
+	_gutenberg_footnotes_remove_filters();
+	if ( ! current_user_can( 'unfiltered_html' ) ) {
+		_gutenberg_footnotes_kses_init_filters();
 	}
 }
 
 /**
- * Allow multiple block styles.
+ * Initializes footnotes meta field filters when imported data should be filtered.
  *
- * @param array $metadata Metadata for registering a block type.
+ * This filter is the last being executed on force_filtered_html_on_import.
+ * If the input of the filter is true it means we are in an import situation and should
+ * enable kses, independently of the user capabilities.
+ * So in that case we call _gutenberg_footnotes_kses_init_filters;
  *
- * @return array
+ * @access private
+ *
+ * @param string $arg Input argument of the filter.
+ * @return string Input argument of the filter.
  */
-function gutenberg_multiple_block_styles( $metadata ) {
-	foreach ( array( 'style', 'editorStyle' ) as $key ) {
-		if ( ! empty( $metadata[ $key ] ) && is_array( $metadata[ $key ] ) ) {
-			$default_style = array_shift( $metadata[ $key ] );
-			foreach ( $metadata[ $key ] as $handle ) {
-				$args = array( 'handle' => $handle );
-				if ( 0 === strpos( $handle, 'file:' ) && isset( $metadata['file'] ) ) {
-					$style_path = remove_block_asset_path_prefix( $handle );
-					$args       = array(
-						'handle' => sanitize_key( "{$metadata['name']}-{$style_path}" ),
-						'src'    => plugins_url( $style_path, $metadata['file'] ),
-					);
-				}
-
-				wp_enqueue_block_style( $metadata['name'], $args );
-			}
-
-			// Only return the 1st item in the array.
-			$metadata[ $key ] = $default_style;
-		}
+function _gutenberg_footnotes_force_filtered_html_on_import_filter( $arg ) {
+	if ( function_exists( '_wp_filter_post_meta_footnotes' ) ) {
+		return;
 	}
-	return $metadata;
+	// force_filtered_html_on_import is true we need to init the global styles kses filters.
+	if ( $arg ) {
+		_gutenberg_footnotes_kses_init_filters();
+	}
+	return $arg;
 }
-add_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles' );
+
+add_action( 'init', '_gutenberg_footnotes_kses_init' );
+add_action( 'set_current_user', '_gutenberg_footnotes_kses_init' );
+add_filter( 'force_filtered_html_on_import', '_gutenberg_footnotes_force_filtered_html_on_import_filter', 999 );

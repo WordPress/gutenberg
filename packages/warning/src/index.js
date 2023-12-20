@@ -4,11 +4,7 @@
 import { logged } from './utils';
 
 function isDev() {
-	return (
-		typeof process !== 'undefined' &&
-		process.env &&
-		process.env.NODE_ENV !== 'production'
-	);
+	return typeof SCRIPT_DEBUG !== 'undefined' && SCRIPT_DEBUG === true;
 }
 
 /**
@@ -47,7 +43,7 @@ export default function warning( message ) {
 	try {
 		throw Error( message );
 	} catch ( x ) {
-		// do nothing
+		// Do nothing.
 	}
 
 	logged.add( message );

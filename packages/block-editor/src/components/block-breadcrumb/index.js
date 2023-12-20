@@ -11,13 +11,14 @@ import { chevronRightSmall, Icon } from '@wordpress/icons';
  */
 import BlockTitle from '../block-title';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
  *
  * @param {Object} props               Component props.
  * @param {string} props.rootLabelText Translated label for the root element of the breadcrumb trail.
- * @return {WPElement}                 Block Breadcrumb.
+ * @return {Element}                   Block Breadcrumb.
  */
 function BlockBreadcrumb( { rootLabelText } ) {
 	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
@@ -25,11 +26,11 @@ function BlockBreadcrumb( { rootLabelText } ) {
 		const {
 			getSelectionStart,
 			getSelectedBlockClientId,
-			getBlockParents,
-		} = select( blockEditorStore );
+			getEnabledBlockParents,
+		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
-			parents: getBlockParents( selectedBlockClientId ),
+			parents: getEnabledBlockParents( selectedBlockClientId ),
 			clientId: selectedBlockClientId,
 			hasSelection: !! getSelectionStart().clientId,
 		};
@@ -80,7 +81,10 @@ function BlockBreadcrumb( { rootLabelText } ) {
 						variant="tertiary"
 						onClick={ () => selectBlock( parentClientId ) }
 					>
-						<BlockTitle clientId={ parentClientId } />
+						<BlockTitle
+							clientId={ parentClientId }
+							maximumLength={ 35 }
+						/>
 					</Button>
 					<Icon
 						icon={ chevronRightSmall }
@@ -93,7 +97,7 @@ function BlockBreadcrumb( { rootLabelText } ) {
 					className="block-editor-block-breadcrumb__current"
 					aria-current="true"
 				>
-					<BlockTitle clientId={ clientId } />
+					<BlockTitle clientId={ clientId } maximumLength={ 35 } />
 				</li>
 			) }
 		</ul>

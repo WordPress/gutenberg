@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { forEach } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component, forwardRef } from '@wordpress/element';
@@ -12,7 +7,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import createHigherOrderComponent from '../../utils/create-higher-order-component';
+import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 import Listener from './listener';
 
 /**
@@ -46,6 +41,7 @@ export default function withGlobalEvents( eventTypesToHandlers ) {
 		alternative: 'useEffect',
 	} );
 
+	// @ts-ignore We don't need to fix the type-related issues because this is deprecated.
 	return createHigherOrderComponent( ( WrappedComponent ) => {
 		class Wrapper extends Component {
 			constructor( /** @type {any} */ props ) {
@@ -56,13 +52,13 @@ export default function withGlobalEvents( eventTypesToHandlers ) {
 			}
 
 			componentDidMount() {
-				forEach( eventTypesToHandlers, ( _, eventType ) => {
+				Object.keys( eventTypesToHandlers ).forEach( ( eventType ) => {
 					listener.add( eventType, this );
 				} );
 			}
 
 			componentWillUnmount() {
-				forEach( eventTypesToHandlers, ( _, eventType ) => {
+				Object.keys( eventTypesToHandlers ).forEach( ( eventType ) => {
 					listener.remove( eventType, this );
 				} );
 			}
@@ -70,7 +66,9 @@ export default function withGlobalEvents( eventTypesToHandlers ) {
 			handleEvent( /** @type {any} */ event ) {
 				const handler =
 					eventTypesToHandlers[
-						/** @type {keyof GlobalEventHandlersEventMap} */ ( event.type )
+						/** @type {keyof GlobalEventHandlersEventMap} */ (
+							event.type
+						)
 						/* eslint-enable jsdoc/no-undefined-types */
 					];
 				if ( typeof this.wrappedRef[ handler ] === 'function' ) {

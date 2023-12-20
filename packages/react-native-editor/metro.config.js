@@ -13,7 +13,7 @@ const packageNames = fs.readdirSync( PACKAGES_DIR ).filter( ( file ) => {
 module.exports = {
 	watchFolders: [ path.resolve( __dirname, '../..' ) ],
 	resolver: {
-		sourceExts: [ 'js', 'json', 'scss', 'sass', 'ts', 'tsx' ],
+		sourceExts: [ 'js', 'cjs', 'json', 'scss', 'sass', 'ts', 'tsx' ],
 		platforms: [ 'native', 'android', 'ios' ],
 	},
 	transformer: {
@@ -21,9 +21,13 @@ module.exports = {
 		getTransformOptions: async () => ( {
 			transform: {
 				experimentalImportSupport: false,
+				// `inlineRequires` is disabled as it is incompatible with some of the
+				// import side effects utilize in the Gutenberg source.
+				// E.g. `import './hooks'`
 				inlineRequires: false,
 			},
 		} ),
+		unstable_allowRequireContext: true, // Used for optional setup configuration.
 	},
 	server: {
 		enhanceMiddleware: ( middleware ) => ( req, res, next ) => {
@@ -33,8 +37,8 @@ module.exports = {
 			 * within this project to include the necessary `/assets/..` that Metro's
 			 * server expects to traverse to the correct directory.
 			 *
-			 * - https://git.io/JBV4e
-			 * - https://git.io/JBFon
+			 * - https://github.com/facebook/metro/issues/290
+			 * - https://github.com/expo/expo/issues/7545#issuecomment-712737616
 			 */
 			const firstUrlSegment = req.url.split( '/' )[ 1 ];
 			if ( packageNames.includes( firstUrlSegment ) ) {

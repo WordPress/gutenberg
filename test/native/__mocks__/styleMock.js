@@ -1,5 +1,5 @@
 module.exports = {
-	//Mock block paragraph style with minimum height
+	// Mock block paragraph style with minimum height.
 	blockText: {
 		minHeight: 50,
 	},
@@ -92,6 +92,7 @@ module.exports = {
 	},
 	defaultBlock: {
 		marginTop: 16,
+		marginLeft: 16,
 	},
 	scrollableContent: {
 		paddingBottom: 20,
@@ -152,5 +153,62 @@ module.exports = {
 	},
 	'components-autocomplete': {
 		height: 100,
+	},
+	addMediaButton: {
+		color: 'white',
+	},
+	'header-toolbar__container': {
+		height: 44,
+	},
+	'dropping-insertion-point': {
+		height: 3,
+	},
+	blockShortcodeContainer: {
+		padding: 12,
+	},
+	'wp-block-list-item__list-item--default': {
+		fontSize: 16,
+	},
+	'wp-block-list-item__list-item-placeholder': {
+		color: '#87a6bc',
+	},
+	innerAppender: {
+		marginLeft: 8,
+	},
+	mediaAreaPadding: {
+		width: 12,
+	},
+	defaultAppender: {
+		marginLeft: 16,
+	},
+	'components-picker__button-title': {
+		color: 'white',
+	},
+	placeholderColor: {
+		color: 'gray',
+	},
+	'rich-text-selection': {
+		color: 'black',
+	},
+	'header-toolbar__keyboard-hide-shadow--light': {
+		color: 'black',
+	},
+	'header-toolbar__keyboard-hide-shadow--solid': {
+		color: 'black',
+	},
+	'media-placeholder__header-icon': {
+		fill: 'black',
+	},
+	embed__icon: {
+		fill: 'black',
+	},
+	picker: {},
+	pickerPointer: {},
+	columnsContainer: {
+		marginLeft: 16,
+		minWidth: 32,
+	},
+	'unsupported-block-details__icon': {
+		color: 'gray',
 	},
 };

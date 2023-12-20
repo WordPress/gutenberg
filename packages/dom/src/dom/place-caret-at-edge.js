@@ -5,6 +5,7 @@ import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
 import { assertIsDefined } from '../utils/assert-is-defined';
 import isInputOrTextArea from './is-input-or-text-area';
 import isRTL from './is-rtl';
+import { scrollIfNoRange } from './scroll-if-no-range';
 
 /**
  * Gets the range to place.
@@ -22,8 +23,14 @@ function getRange( container, isReverse, x ) {
 	const containerRect = container.getBoundingClientRect();
 	// When placing at the end (isReverse), find the closest range to the bottom
 	// right corner. When placing at the start, to the top left corner.
+	// Ensure x is defined and within the container's boundaries. When it's
+	// exactly at the boundary, it's not considered within the boundaries.
 	if ( x === undefined ) {
 		x = isReverse ? containerRect.right - 1 : containerRect.left + 1;
+	} else if ( x <= containerRect.left ) {
+		x = containerRect.left + 1;
+	} else if ( x >= containerRect.right ) {
+		x = containerRect.right - 1;
 	}
 	const y = isReverseDir ? containerRect.bottom - 1 : containerRect.top + 1;
 	return hiddenCaretRangeFromPoint( ownerDocument, x, y, container );
@@ -64,26 +71,11 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		return;
 	}
 
-	let range = getRange( container, isReverse, x );
+	const range = scrollIfNoRange( container, isReverse, () =>
+		getRange( container, isReverse, x )
+	);
 
-	// If no range range can be created or it is outside the container, the
-	// element may be out of view.
-	if (
-		! range ||
-		! range.startContainer ||
-		! container.contains( range.startContainer )
-	) {
-		container.scrollIntoView( isReverse );
-		range = range = getRange( container, isReverse, x );
-
-		if (
-			! range ||
-			! range.startContainer ||
-			! container.contains( range.startContainer )
-		) {
-			return;
-		}
-	}
+	if ( ! range ) return;
 
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;

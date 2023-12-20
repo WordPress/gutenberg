@@ -19,7 +19,7 @@ For example, to render alternative UI for the taxonomy `product-type`,
 we can render custom markup or use the original component as shown below.
 
 ```js
-var el = wp.element.createElement;
+var el = React.createElement;
 
 function customizeProductTypeSelector( OriginalComponent ) {
 	return function ( props ) {
@@ -33,7 +33,31 @@ function customizeProductTypeSelector( OriginalComponent ) {
 
 wp.hooks.addFilter(
 	'editor.PostTaxonomyType',
-	'my-custom-plugin',
+	'my-plugin/set-custom-term-selector',
 	customizeProductTypeSelector
+);
+```
+
+Or, to use the hierarchical term selector with a non-hierarchical taxonomy `track`,
+you can set the `HierarchicalTermSelector` component as shown below.
+
+```js
+const el = React.createElement;
+const HierarchicalTermSelector = wp.editor.PostTaxonomiesHierarchicalTermSelector;
+
+function customizeTrackSelector( OriginalComponent ) {
+	return function ( props ) {
+		if ( props.slug === 'track' ) {
+			return el( HierarchicalTermSelector, props );
+		} else {
+			return el( OriginalComponent, props );
+		}
+	};
+}
+
+wp.hooks.addFilter(
+	'editor.PostTaxonomyType',
+	'my-plugin/set-hierarchical-term-selector',
+	customizeTrackSelector
 );
 ```

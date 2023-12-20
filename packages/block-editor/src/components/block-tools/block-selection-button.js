@@ -38,6 +38,8 @@ import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
 import useBlockDisplayInformation from '../use-block-display-information';
+import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import BlockMover from '../block-mover';
 
 /**
  * Block selection button component, displaying the label of the block. If the block
@@ -47,9 +49,9 @@ import useBlockDisplayInformation from '../use-block-display-information';
  * @param {string} props          Component props.
  * @param {string} props.clientId Client ID of block.
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
-function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
+function BlockSelectionButton( { clientId, rootClientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const selected = useSelect(
 		( select ) => {
@@ -58,6 +60,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				getBlockIndex,
 				hasBlockMovingClientId,
 				getBlockListSettings,
+				__unstableGetEditorMode,
 			} = select( blockEditorStore );
 			const index = getBlockIndex( clientId );
 			const { name, attributes } = getBlock( clientId );
@@ -68,11 +71,19 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				attributes,
 				blockMovingMode,
 				orientation: getBlockListSettings( rootClientId )?.orientation,
+				editorMode: __unstableGetEditorMode(),
 			};
 		},
 		[ clientId, rootClientId ]
 	);
-	const { index, name, attributes, blockMovingMode, orientation } = selected;
+	const {
+		index,
+		name,
+		attributes,
+		blockMovingMode,
+		orientation,
+		editorMode,
+	} = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
 
@@ -90,6 +101,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 
 		speak( label );
 	}, [ label ] );
+	const blockElement = useBlockElement( clientId );
 
 	const {
 		hasBlockMovingClientId,
@@ -100,7 +112,6 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		getMultiSelectedBlocksEndClientId,
 		getPreviousBlockClientId,
 		getNextBlockClientId,
-		isNavigationMode,
 	} = useSelect( blockEditorStore );
 	const {
 		selectBlock,
@@ -154,14 +165,10 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				selectedBlockClientId;
 		} else if ( navigateIn ) {
 			focusedBlockUid =
-				getClientIdsOfDescendants( [ selectedBlockClientId ] )[ 0 ] ??
+				getClientIdsOfDescendants( selectedBlockClientId )[ 0 ] ??
 				selectedBlockClientId;
 		}
 		const startingBlockClientId = hasBlockMovingClientId();
-		if ( isEscape && isNavigationMode() ) {
-			clearSelectedBlock();
-			event.preventDefault();
-		}
 		if ( isEscape && startingBlockClientId && ! event.defaultPrevented ) {
 			setBlockMovingClientId( null );
 			event.preventDefault();
@@ -186,6 +193,14 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 			selectBlock( startingBlockClientId );
 			setBlockMovingClientId( null );
 		}
+		// Prevent the block from being moved into itself.
+		if (
+			startingBlockClientId &&
+			selectedBlockClientId === startingBlockClientId &&
+			navigateIn
+		) {
+			return;
+		}
 		if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
 			if ( focusedBlockUid ) {
 				event.preventDefault();
@@ -194,7 +209,13 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				let nextTabbable;
 
 				if ( navigateDown ) {
-					nextTabbable = focus.tabbable.findNext( blockElement );
+					nextTabbable = blockElement;
+					do {
+						nextTabbable = focus.tabbable.findNext( nextTabbable );
+					} while (
+						nextTabbable &&
+						blockElement.contains( nextTabbable )
+					);
 
 					if ( ! nextTabbable ) {
 						nextTabbable =
@@ -233,30 +254,43 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 					<BlockIcon icon={ blockInformation?.icon } showColors />
 				</FlexItem>
 				<FlexItem>
-					<BlockDraggable clientIds={ [ clientId ] }>
-						{ ( draggableProps ) => (
-							<Button
-								icon={ dragHandle }
-								className="block-selection-button_drag-handle"
-								aria-hidden="true"
-								label={ dragHandleLabel }
-								// Should not be able to tab to drag handle as this
-								// button can only be used with a pointer device.
-								tabIndex="-1"
-								{ ...draggableProps }
-							/>
-						) }
-					</BlockDraggable>
+					{ editorMode === 'zoom-out' && (
+						<BlockMover clientIds={ [ clientId ] } hideDragHandle />
+					) }
+					{ editorMode === 'navigation' && (
+						<BlockDraggable clientIds={ [ clientId ] }>
+							{ ( draggableProps ) => (
+								<Button
+									icon={ dragHandle }
+									className="block-selection-button_drag-handle"
+									aria-hidden="true"
+									label={ dragHandleLabel }
+									// Should not be able to tab to drag handle as this
+									// button can only be used with a pointer device.
+									tabIndex="-1"
+									{ ...draggableProps }
+								/>
+							) }
+						</BlockDraggable>
+					) }
 				</FlexItem>
 				<FlexItem>
 					<Button
 						ref={ ref }
-						onClick={ () => setNavigationMode( false ) }
+						onClick={
+							editorMode === 'navigation'
+								? () => setNavigationMode( false )
+								: undefined
+						}
 						onKeyDown={ onKeyDown }
 						label={ label }
+						showTooltip={ false }
 						className="block-selection-button_select-button"
 					>
-						<BlockTitle clientId={ clientId } />
+						<BlockTitle
+							clientId={ clientId }
+							maximumLength={ 35 }
+						/>
 					</Button>
 				</FlexItem>
 			</Flex>

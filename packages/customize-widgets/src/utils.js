@@ -6,11 +6,6 @@ import { serialize, parse, createBlock } from '@wordpress/blocks';
 import { addWidgetIdToBlock } from '@wordpress/widgets';
 
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * Convert settingId to widgetId.
  *
  * @param {string} settingId The setting id.
@@ -79,8 +74,10 @@ export function blockToWidget( block, existingWidget = null ) {
 		};
 	}
 
+	const { form, rendered, ...restExistingWidget } = existingWidget || {};
+
 	return {
-		...omit( existingWidget, [ 'form', 'rendered' ] ),
+		...restExistingWidget,
 		...widget,
 	};
 }
@@ -106,7 +103,9 @@ export function widgetToBlock( { id, idBase, number, instance } ) {
 	} = instance;
 
 	if ( idBase === 'block' ) {
-		const parsedBlocks = parse( raw.content );
+		const parsedBlocks = parse( raw.content ?? '', {
+			__unstableSkipAutop: true,
+		} );
 		block = parsedBlocks.length
 			? parsedBlocks[ 0 ]
 			: createBlock( 'core/paragraph', {} );

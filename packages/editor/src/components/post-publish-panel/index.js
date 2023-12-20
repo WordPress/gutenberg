@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get, omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -56,7 +51,6 @@ export class PostPublishPanel extends Component {
 	render() {
 		const {
 			forceIsDirty,
-			forceIsSaving,
 			isBeingScheduled,
 			isPublished,
 			isPublishSidebarEnabled,
@@ -69,11 +63,12 @@ export class PostPublishPanel extends Component {
 			PrePublishExtension,
 			...additionalProps
 		} = this.props;
-		const propsForPanel = omit( additionalProps, [
-			'hasPublishAction',
-			'isDirty',
-			'isPostTypeViewable',
-		] );
+		const {
+			hasPublishAction,
+			isDirty,
+			isPostTypeViewable,
+			...propsForPanel
+		} = additionalProps;
 		const isPublishedOrScheduled =
 			isPublished || ( isScheduled && isBeingScheduled );
 		const isPrePublish = ! isPublishedOrScheduled && ! isSaving;
@@ -91,10 +86,9 @@ export class PostPublishPanel extends Component {
 						<>
 							<div className="editor-post-publish-panel__header-publish-button">
 								<PostPublishButton
-									focusOnMount={ true }
+									focusOnMount
 									onSubmit={ this.onSubmit }
 									forceIsDirty={ forceIsDirty }
-									forceIsSaving={ forceIsSaving }
 								/>
 							</div>
 							<div className="editor-post-publish-panel__header-cancel-button">
@@ -124,6 +118,7 @@ export class PostPublishPanel extends Component {
 				</div>
 				<div className="editor-post-publish-panel__footer">
 					<CheckboxControl
+						__nextHasNoMarginBottom
 						label={ __( 'Always show pre-publish checks.' ) }
 						checked={ isPublishSidebarEnabled }
 						onChange={ onTogglePublishSidebar }
@@ -144,6 +139,7 @@ export default compose( [
 			isCurrentPostScheduled,
 			isEditedPostBeingScheduled,
 			isEditedPostDirty,
+			isAutosavingPost,
 			isSavingPost,
 			isSavingNonPostEntityChanges,
 		} = select( editorStore );
@@ -151,25 +147,21 @@ export default compose( [
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 		return {
-			hasPublishAction: get(
-				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
-				false
-			),
-			isPostTypeViewable: get( postType, [ 'viewable' ], false ),
+			hasPublishAction:
+				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
+			isPostTypeViewable: postType?.viewable,
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isDirty: isEditedPostDirty(),
 			isPublished: isCurrentPostPublished(),
 			isPublishSidebarEnabled: isPublishSidebarEnabled(),
-			isSaving: isSavingPost(),
+			isSaving: isSavingPost() && ! isAutosavingPost(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 			isScheduled: isCurrentPostScheduled(),
 		};
 	} ),
 	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {
-		const { disablePublishSidebar, enablePublishSidebar } = dispatch(
-			editorStore
-		);
+		const { disablePublishSidebar, enablePublishSidebar } =
+			dispatch( editorStore );
 		return {
 			onTogglePublishSidebar: () => {
 				if ( isPublishSidebarEnabled ) {

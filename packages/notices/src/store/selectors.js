@@ -39,7 +39,6 @@ const DEFAULT_NOTICES = [];
  *                                             announced to screen readers. Defaults to
  *                                             `true`.
  * @property {WPNoticeAction[]} actions        User actions to present with notice.
- *
  */
 
 /**
@@ -48,6 +47,24 @@ const DEFAULT_NOTICES = [];
  *
  * @param {Object}  state   Notices state.
  * @param {?string} context Optional grouping context.
+ *
+ * @example
+ *
+ *```js
+ * import { useSelect } from '@wordpress/data';
+ * import { store as noticesStore } from '@wordpress/notices';
+ *
+ * const ExampleComponent = () => {
+ *     const notices = useSelect( ( select ) => select( noticesStore ).getNotices() );
+ *     return (
+ *         <ul>
+ *         { notices.map( ( notice ) => (
+ *             <li key={ notice.ID }>{ notice.content }</li>
+ *         ) ) }
+ *        </ul>
+ *    )
+ * };
+ *```
  *
  * @return {WPNotice[]} Array of notices.
  */

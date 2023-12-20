@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * Internal dependencies
@@ -18,6 +17,7 @@ import Tiles from './tiles';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockCaption,
+	RichText,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
@@ -77,7 +77,7 @@ export const Gallery = ( props ) => {
 			if ( isCaptionSelected ) {
 				setIsCaptionSelected( false );
 			}
-			// we need to fully invoke the curried function here
+			// We need to fully invoke the curried function here.
 			onSelectImage( index )();
 		};
 	};
@@ -142,7 +142,7 @@ export const Gallery = ( props ) => {
 				isSelected={ isCaptionSelected }
 				accessible={ true }
 				accessibilityLabelCreator={ ( caption ) =>
-					isEmpty( caption )
+					RichText.isEmpty( caption )
 						? /* translators: accessibility text. Empty gallery caption. */
 						  'Gallery caption. Empty'
 						: sprintf(
@@ -152,7 +152,7 @@ export const Gallery = ( props ) => {
 						  )
 				}
 				onFocus={ focusGalleryCaption }
-				onBlur={ onBlur } // always assign onBlur as props
+				onBlur={ onBlur } // Always assign onBlur as props.
 				insertBlocksAfter={ insertBlocksAfter }
 			/>
 		</View>

@@ -6,7 +6,7 @@ import {
 	Button,
 	Spinner,
 	VisuallyHidden,
-	__unstableCompositeItem as CompositeItem,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -20,6 +20,9 @@ import BlockRatings from '../block-ratings';
 import DownloadableBlockIcon from '../downloadable-block-icon';
 import DownloadableBlockNotice from '../downloadable-block-notice';
 import { store as blockDirectoryStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { CompositeItemV2: CompositeItem } = unlock( componentsPrivateApis );
 
 // Return the appropriate block item label, given the block data and status.
 function getDownloadableBlockLabel(
@@ -69,10 +72,8 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
 
 	const { hasNotice, isInstalling, isInstallable } = useSelect(
 		( select ) => {
-			const {
-				getErrorNoticeForBlock,
-				isInstalling: isBlockInstalling,
-			} = select( blockDirectoryStore );
+			const { getErrorNoticeForBlock, isInstalling: isBlockInstalling } =
+				select( blockDirectoryStore );
 			const notice = getErrorNoticeForBlock( item.id );
 			const hasFatal = notice && notice.isFatal;
 			return {
@@ -93,23 +94,28 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
 
 	return (
 		<CompositeItem
-			role="option"
-			as={ Button }
-			{ ...composite }
-			className="block-directory-downloadable-block-list-item"
-			onClick={ ( event ) => {
-				event.preventDefault();
-				onClick();
-			} }
-			isBusy={ isInstalling }
+			render={
+				<Button
+					__experimentalIsFocusable
+					type="button"
+					role="option"
+					className="block-directory-downloadable-block-list-item"
+					isBusy={ isInstalling }
+					onClick={ ( event ) => {
+						event.preventDefault();
+						onClick();
+					} }
+					label={ getDownloadableBlockLabel( item, {
+						hasNotice,
+						isInstalled,
+						isInstalling,
+					} ) }
+					showTooltip
+					tooltipPosition="top center"
+				/>
+			}
+			store={ composite }
 			disabled={ isInstalling || ! isInstallable }
-			label={ getDownloadableBlockLabel( item, {
-				hasNotice,
-				isInstalled,
-				isInstalling,
-			} ) }
-			showTooltip={ true }
-			tooltipPosition="top center"
 		>
 			<div className="block-directory-downloadable-block-list-item__icon">
 				<DownloadableBlockIcon icon={ icon } title={ title } />

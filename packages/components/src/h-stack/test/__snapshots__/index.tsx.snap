@@ -1,0 +1,122 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render alignment 1`] = `
+.emotion-0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  gap: calc(4px * 2);
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.emotion-0>* {
+  min-width: 0;
+}
+
+<div>
+  <div
+    class="components-flex components-h-stack emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="HStack"
+  >
+    <div
+      class="emotion-2 emotion-1"
+    />
+    <div
+      class="emotion-2 emotion-1"
+    />
+  </div>
+</div>
+`;
+
+exports[`props should render correctly 1`] = `
+.emotion-0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  gap: calc(4px * 2);
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.emotion-0>* {
+  min-width: 0;
+}
+
+<div>
+  <div
+    class="components-flex components-h-stack emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="HStack"
+  >
+    <div
+      class="emotion-2 emotion-1"
+    />
+    <div
+      class="emotion-2 emotion-1"
+    />
+  </div>
+</div>
+`;
+
+exports[`props should render spacing 1`] = `
+.emotion-0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  gap: calc(4px * 5);
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.emotion-0>* {
+  min-width: 0;
+}
+
+<div>
+  <div
+    class="components-flex components-h-stack emotion-0 emotion-1"
+    data-wp-c16t="true"
+    data-wp-component="HStack"
+  >
+    <div
+      class="emotion-2 emotion-1"
+    />
+    <div
+      class="emotion-2 emotion-1"
+    />
+  </div>
+</div>
+`;

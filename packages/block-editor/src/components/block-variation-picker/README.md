@@ -10,11 +10,6 @@ This component is currently used by "Columns" and "Query Loop" blocks.
 
 ![Columns block variations](https://make.wordpress.org/core/files/2020/09/colums-block-variations.png)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage
@@ -68,7 +63,7 @@ The different variations of the block.
 
 -   Type: `Function`
 
-Callback called when a block variation is selected. It recieves the selected variation as a parameter.
+Callback called when a block variation is selected. It receives the selected variation as a parameter.
 
 #### `icon`
 

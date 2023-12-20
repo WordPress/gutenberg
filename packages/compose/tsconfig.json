@@ -3,16 +3,16 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"types": [ "gutenberg-env" ],
+		"types": [ "gutenberg-env" ]
 	},
 	"references": [
-		{ "path": "../element" },
-		{ "path": "../priority-queue" },
+		{ "path": "../deprecated" },
 		{ "path": "../dom" },
+		{ "path": "../element" },
 		{ "path": "../is-shallow-equal" },
-		{ "path": "../keycodes" }
+		{ "path": "../keycodes" },
+		{ "path": "../priority-queue" },
+		{ "path": "../undo-manager" }
 	],
-	"include": [
-		"src/**/*"
-	]
+	"include": [ "src/**/*" ]
 }

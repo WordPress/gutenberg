@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,24 +10,35 @@ import { useSelect } from '@wordpress/data';
 import InserterMenu from './menu';
 import { store as blockEditorStore } from '../../store';
 
-function InserterLibrary( {
-	rootClientId,
-	clientId,
-	isAppender,
-	showInserterHelpPanel,
-	showMostUsedBlocks = false,
-	__experimentalInsertionIndex,
-	__experimentalFilterValue,
-	onSelect = noop,
-	shouldFocusBlock = false,
-} ) {
-	const destinationRootClientId = useSelect(
-		( select ) => {
-			const { getBlockRootClientId } = select( blockEditorStore );
+const noop = () => {};
 
-			return (
-				rootClientId || getBlockRootClientId( clientId ) || undefined
-			);
+function InserterLibrary(
+	{
+		rootClientId,
+		clientId,
+		isAppender,
+		showInserterHelpPanel,
+		showMostUsedBlocks = false,
+		__experimentalInsertionIndex,
+		__experimentalFilterValue,
+		onSelect = noop,
+		shouldFocusBlock = false,
+	},
+	ref
+) {
+	const { destinationRootClientId, prioritizePatterns } = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, getSettings } =
+				select( blockEditorStore );
+
+			const _rootClientId =
+				rootClientId || getBlockRootClientId( clientId ) || undefined;
+			return {
+				destinationRootClientId: _rootClientId,
+				prioritizePatterns:
+					getSettings().__experimentalPreferPatternsOnRoot &&
+					! _rootClientId,
+			};
 		},
 		[ clientId, rootClientId ]
 	);
@@ -47,8 +54,10 @@ function InserterLibrary( {
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
 			__experimentalFilterValue={ __experimentalFilterValue }
 			shouldFocusBlock={ shouldFocusBlock }
+			prioritizePatterns={ prioritizePatterns }
+			ref={ ref }
 		/>
 	);
 }
 
-export default InserterLibrary;
+export default forwardRef( InserterLibrary );

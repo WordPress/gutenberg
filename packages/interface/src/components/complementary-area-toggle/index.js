@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
@@ -21,6 +16,7 @@ function ComplementaryAreaToggle( {
 	identifier,
 	icon,
 	selectedIcon,
+	name,
 	...props
 } ) {
 	const ComponentToUse = as;
@@ -28,14 +24,14 @@ function ComplementaryAreaToggle( {
 		( select ) =>
 			select( interfaceStore ).getActiveComplementaryArea( scope ) ===
 			identifier,
-		[ identifier ]
+		[ identifier, scope ]
 	);
-	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
-		interfaceStore
-	);
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
 	return (
 		<ComponentToUse
 			icon={ selectedIcon && isSelected ? selectedIcon : icon }
+			aria-controls={ identifier.replace( '/', ':' ) }
 			onClick={ () => {
 				if ( isSelected ) {
 					disableComplementaryArea( scope );
@@ -43,7 +39,7 @@ function ComplementaryAreaToggle( {
 					enableComplementaryArea( scope, identifier );
 				}
 			} }
-			{ ...omit( props, [ 'name' ] ) }
+			{ ...props }
 		/>
 	);
 }

@@ -15,15 +15,52 @@ status () {
 	echo -e "\n\033[1;34m$1\033[0m\n"
 }
 
+error () {
+	echo -e "\n\033[1;31m$1\033[0m\n"
+}
+
 cleanup() {
-	rm -rf "$DIRECTORY/esnext-test"
+	rm -rf "$DIRECTORY/example-static-es5"
+	rm -rf "$DIRECTORY/example-static"
 }
 
 trap cleanup EXIT
 
-status "Scaffolding block..."
-npx wp-create-block esnext-test --no-wp-scripts
-cd esnext-test
+# First test block
+
+status "Scaffolding Example Static (ES5) block..."
+npx wp-create-block example-static-es5 -t es5
+cd example-static-es5
+
+status "Verifying project..."
+expected=8
+actual=$( find . -maxdepth 1 -type f | wc -l )
+if [ "$expected" -ne "$actual" ]; then
+	error "Expected $expected files in the project root, but found $actual."
+    exit 1
+fi
+
+cd ..
+
+# Second test block
+
+status "Scaffolding Example Static block..."
+npx wp-create-block example-static --no-wp-scripts
+cd example-static
+
+status "Verifying project..."
+expected=5
+actual=$( find . -maxdepth 1 -type f | wc -l )
+if [ "$expected" -ne "$actual" ]; then
+	error "Expected $expected files in the project root, but found $actual."
+    exit 1
+fi
+expected=7
+actual=$( find src -maxdepth 1 -type f | wc -l )
+if [ "$expected" -ne "$actual" ]; then
+	error "Expected $expected files in the \`src\` directory, but found $actual."
+    exit 1
+fi
 
 status "Formatting files..."
 ../node_modules/.bin/wp-scripts format
@@ -31,8 +68,19 @@ status "Formatting files..."
 status "Building block..."
 ../node_modules/.bin/wp-scripts build
 
-status "Lintig CSS files..."
+status "Verifying build..."
+expected=7
+actual=$( find build -maxdepth 1 -type f | wc -l )
+if [ "$expected" -ne "$actual" ]; then
+	error "Expected $expected files in the \`build\` directory, but found $actual."
+    exit 1
+fi
+
+status "Linting CSS files..."
 ../node_modules/.bin/wp-scripts lint-style
 
 status "Linting JavaScript files..."
 ../node_modules/.bin/wp-scripts lint-js
+
+status "Creating a plugin zip file..."
+../node_modules/.bin/wp-scripts plugin-zip

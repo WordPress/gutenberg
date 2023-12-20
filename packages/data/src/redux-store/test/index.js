@@ -4,8 +4,6 @@
 import { createRegistry } from '../../registry';
 import { createRegistryControl } from '../../factory';
 
-jest.useFakeTimers();
-
 describe( 'controls', () => {
 	let registry;
 
@@ -32,9 +30,10 @@ describe( 'controls', () => {
 				},
 				controls: {
 					DISPATCH: createRegistryControl(
-						( reg ) => ( { store, action } ) => {
-							return reg.dispatch( store )[ action ]();
-						}
+						( reg ) =>
+							( { store, action } ) => {
+								return reg.dispatch( store )[ action ]();
+							}
 					),
 				},
 			} );
@@ -46,7 +45,7 @@ describe( 'controls', () => {
 
 	it( 'resolves in expected order', async () => {
 		const actions = {
-			wait: () => ( { type: 'WAIT' } ),
+			standby: () => ( { type: 'STANDBY' } ),
 			receive: ( items ) => ( { type: 'RECEIVE', items } ),
 		};
 
@@ -63,12 +62,12 @@ describe( 'controls', () => {
 			},
 			resolvers: {
 				*getItems() {
-					yield actions.wait();
+					yield actions.standby();
 					yield actions.receive( [ 1, 2, 3 ] );
 				},
 			},
 			controls: {
-				WAIT() {
+				STANDBY() {
 					return new Promise( ( resolve ) =>
 						process.nextTick( resolve )
 					);
@@ -90,7 +89,6 @@ describe( 'controls', () => {
 			} );
 
 			registry.select( 'store' ).getItems();
-			jest.runAllTimers();
 		} );
 	} );
 	describe( 'selectors have expected value for the `hasResolver` property', () => {
@@ -233,5 +231,130 @@ describe( 'controls', () => {
 				"Actions must be plain objects. Instead, the actual type was: 'number'."
 			);
 		} );
+	} );
+} );
+
+describe( 'resolveSelect', () => {
+	let registry;
+	let shouldFail;
+
+	beforeEach( () => {
+		shouldFail = false;
+		registry = createRegistry();
+
+		registry.registerStore( 'store', {
+			reducer: ( state = null ) => {
+				return state;
+			},
+			selectors: {
+				getItems: () => 'items',
+				getItemsNoResolver: () => 'items-no-resolver',
+			},
+			resolvers: {
+				getItems: () => {
+					if ( shouldFail ) {
+						throw new Error( 'cannot fetch items' );
+					}
+				},
+			},
+		} );
+	} );
+
+	it( 'resolves when the resolution succeeded', async () => {
+		shouldFail = false;
+		const promise = registry.resolveSelect( 'store' ).getItems();
+		await expect( promise ).resolves.toBe( 'items' );
+	} );
+
+	it( 'rejects when the resolution failed', async () => {
+		shouldFail = true;
+		const promise = registry.resolveSelect( 'store' ).getItems();
+		await expect( promise ).rejects.toEqual(
+			new Error( 'cannot fetch items' )
+		);
+	} );
+
+	it( 'resolves when calling a sync selector without resolver', async () => {
+		const promise = registry.resolveSelect( 'store' ).getItemsNoResolver();
+		await expect( promise ).resolves.toBe( 'items-no-resolver' );
+	} );
+
+	it( 'returns only store native selectors and excludes all meta ones', () => {
+		expect( Object.keys( registry.resolveSelect( 'store' ) ) ).toEqual( [
+			'getItems',
+			'getItemsNoResolver',
+		] );
+	} );
+} );
+
+describe( 'normalizing args', () => {
+	it( 'should call the __unstableNormalizeArgs method of the selector for both the selector and the resolver', async () => {
+		const registry = createRegistry();
+		const selector = () => {};
+
+		const normalizingFunction = jest.fn( ( ...args ) => args );
+
+		selector.__unstableNormalizeArgs = normalizingFunction;
+
+		registry.registerStore( 'store', {
+			reducer: () => {},
+			selectors: {
+				getItems: selector,
+			},
+			resolvers: {
+				getItems: () => 'items',
+			},
+		} );
+		registry.select( 'store' ).getItems( 'foo', 'bar' );
+
+		expect( normalizingFunction ).toHaveBeenCalledWith( [ 'foo', 'bar' ] );
+
+		// Needs to be called twice:
+		// 1. When the selector is called.
+		// 2. When the resolver is fullfilled.
+		expect( normalizingFunction ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'should not call the __unstableNormalizeArgs method if there are no arguments passed to the selector (and thus the resolver)', async () => {
+		const registry = createRegistry();
+		const selector = () => {};
+
+		selector.__unstableNormalizeArgs = jest.fn( ( ...args ) => args );
+
+		registry.registerStore( 'store', {
+			reducer: () => {},
+			selectors: {
+				getItems: selector,
+			},
+			resolvers: {
+				getItems: () => 'items',
+			},
+		} );
+
+		// Called with no args so the __unstableNormalizeArgs method should not be called.
+		registry.select( 'store' ).getItems();
+
+		expect( selector.__unstableNormalizeArgs ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should call the __unstableNormalizeArgs method on the selectors without resolvers', async () => {
+		const registry = createRegistry();
+		const selector = () => {};
+
+		selector.__unstableNormalizeArgs = jest.fn( ( ...args ) => args );
+
+		registry.registerStore( 'store', {
+			reducer: () => {},
+			selectors: {
+				getItems: selector,
+			},
+		} );
+
+		registry.select( 'store' ).getItems( 'foo', 'bar' );
+
+		expect( selector.__unstableNormalizeArgs ).toHaveBeenCalledWith( [
+			'foo',
+			'bar',
+		] );
 	} );
 } );

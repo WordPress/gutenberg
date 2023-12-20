@@ -14,6 +14,7 @@ import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
 import userLocaleMiddleware from './middlewares/user-locale';
 import mediaUploadMiddleware from './middlewares/media-upload';
+import createThemePreviewMiddleware from './middlewares/theme-preview';
 import {
 	parseResponseAndNormalizeError,
 	parseAndThrowError,
@@ -99,7 +100,7 @@ const defaultFetchHandler = ( nextOptions ) => {
 	}
 
 	const responsePromise = window.fetch(
-		// fall back to explicitly passing `window.location` which is the behavior if `undefined` is passed
+		// Fall back to explicitly passing `window.location` which is the behavior if `undefined` is passed.
 		url || path || window.location.href,
 		{
 			...DEFAULT_OPTIONS,
@@ -157,12 +158,12 @@ function apiFetch( options ) {
 	// ```
 	// opts1 => m1( opts1, opts2 => m2( opts2, opts3 => m3( opts3, fetchHandler ) ) );
 	// ```
-	const enhancedHandler = middlewares.reduceRight( (
-		/** @type {FetchHandler} */ next,
-		middleware
-	) => {
-		return ( workingOptions ) => middleware( workingOptions, next );
-	}, fetchHandler );
+	const enhancedHandler = middlewares.reduceRight(
+		( /** @type {FetchHandler} */ next, middleware ) => {
+			return ( workingOptions ) => middleware( workingOptions, next );
+		},
+		fetchHandler
+	);
 
 	return enhancedHandler( options ).catch( ( error ) => {
 		if ( error.code !== 'rest_cookie_invalid_nonce' ) {
@@ -193,5 +194,6 @@ apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
 apiFetch.fetchAllMiddleware = fetchAllMiddleware;
 apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
+apiFetch.createThemePreviewMiddleware = createThemePreviewMiddleware;
 
 export default apiFetch;

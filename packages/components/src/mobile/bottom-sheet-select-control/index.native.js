@@ -22,6 +22,7 @@ const BottomSheetSelectControl = ( {
 	options: items,
 	onChange,
 	value: selectedValue,
+	disabled,
 } ) => {
 	const [ showSubSheet, setShowSubSheet ] = useState( false );
 	const navigation = useNavigation();
@@ -57,14 +58,20 @@ const BottomSheetSelectControl = ( {
 					value={ selectedOption.label }
 					onPress={ openSubSheet }
 					accessibilityRole={ 'button' }
-					accessibilityLabel={ selectedOption.label }
+					accessibilityLabel={ sprintf(
+						// translators:  %1$s: Select control button label e.g. "Button width". %2$s: Select control option value e.g: "Auto, 25%".
+						__( '%1$s. Currently selected: %2$s' ),
+						label,
+						selectedOption.label
+					) }
 					accessibilityHint={ sprintf(
 						// translators: %s: Select control button label e.g. "Button width"
 						__( 'Navigates to select %s' ),
-						selectedOption.label
+						label
 					) }
+					disabled={ disabled }
 				>
-					<Icon icon={ chevronRight }></Icon>
+					{ disabled ? null : <Icon icon={ chevronRight } /> }
 				</BottomSheet.Cell>
 			}
 			showSheet={ showSubSheet }
@@ -82,6 +89,7 @@ const BottomSheetSelectControl = ( {
 							customActionButton
 							separatorType="none"
 							label={ item.label }
+							icon={ item.icon }
 							onPress={ onChangeValue( item.value ) }
 							leftAlign={ true }
 							key={ index }

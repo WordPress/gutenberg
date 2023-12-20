@@ -57,7 +57,7 @@ function SocialLinksEdit( {
 	}, [ shouldRenderFooterAppender ] );
 
 	const renderFooterAppender = useRef( () => (
-		<View>
+		<View style={ styles.footerAppenderContainer }>
 			<InnerBlocks.ButtonBlockAppender isFloating={ true } />
 		</View>
 	) );
@@ -68,11 +68,15 @@ function SocialLinksEdit( {
 	);
 
 	function renderPlaceholder() {
-		return [
-			...new Array( innerBlocks.length || 1 ),
-		].map( ( _, index ) => (
-			<View style={ placeholderStyle } key={ index } />
-		) );
+		return [ ...new Array( innerBlocks.length || 1 ) ].map(
+			( _, index ) => (
+				<View
+					testID="social-links-placeholder"
+					style={ placeholderStyle }
+					key={ index }
+				/>
+			)
+		);
 	}
 
 	function filterInnerBlocks( blockIds ) {

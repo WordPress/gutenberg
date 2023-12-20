@@ -1,16 +1,8 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	__unstableComposite as Composite,
-	__unstableUseCompositeState as useCompositeState,
-} from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
@@ -19,9 +11,14 @@ import { useDispatch } from '@wordpress/data';
  */
 import DownloadableBlockListItem from '../downloadable-block-list-item';
 import { store as blockDirectoryStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { CompositeV2: Composite, useCompositeStoreV2: useCompositeStore } =
+	unlock( componentsPrivateApis );
+const noop = () => {};
 
 function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
-	const composite = useCompositeState();
+	const composite = useCompositeStore();
 	const { installBlockType } = useDispatch( blockDirectoryStore );
 
 	if ( ! items.length ) {
@@ -30,7 +27,7 @@ function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
 
 	return (
 		<Composite
-			{ ...composite }
+			store={ composite }
 			role="listbox"
 			className="block-directory-downloadable-blocks-list"
 			aria-label={ __( 'Blocks available for install' ) }

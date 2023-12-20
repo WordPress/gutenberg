@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEqual } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -13,7 +8,7 @@ import {
 	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import {
 	PanelBody,
 	Placeholder,
@@ -22,122 +17,76 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { renderToString, useEffect, useState } from '@wordpress/element';
+import { renderToString } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
+import { store as noticeStore } from '@wordpress/notices';
+import { tableOfContents as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import TableOfContentsList from './list';
-import { getHeadingsFromContent, linearToNestedHeadingList } from './utils';
+import { linearToNestedHeadingList } from './utils';
+import { useObserveHeadings } from './hooks';
+
+/** @typedef {import('./utils').HeadingData} HeadingData */
 
 /**
  * Table of Contents block edit component.
  *
  * @param {Object}                       props                                   The props.
  * @param {Object}                       props.attributes                        The block attributes.
- * @param {boolean}                      props.attributes.onlyIncludeCurrentPage
- *                                                                               Whether to only include headings from the current page (if the post is
- *                                                                               paginated).
+ * @param {HeadingData[]}                props.attributes.headings               A list of data for each heading in the post.
+ * @param {boolean}                      props.attributes.onlyIncludeCurrentPage Whether to only include headings from the current page (if the post is paginated).
  * @param {string}                       props.clientId
  * @param {(attributes: Object) => void} props.setAttributes
  *
- * @return {WPComponent} The component.
+ * @return {Component} The component.
  */
 export default function TableOfContentsEdit( {
-	attributes: { onlyIncludeCurrentPage },
+	attributes: { headings = [], onlyIncludeCurrentPage },
 	clientId,
 	setAttributes,
 } ) {
+	useObserveHeadings( clientId );
+
 	const blockProps = useBlockProps();
-
-	// Local state; not saved to block attributes. The saved block is dynamic and uses PHP to generate its content.
-	const [ headings, setHeadings ] = useState( [] );
-	const [ headingTree, setHeadingTree ] = useState( [] );
-
-	const { listBlockExists, postContent } = useSelect(
-		( select ) => ( {
-			listBlockExists: !! select( blocksStore ).getBlockType(
-				'core/list'
-			),
-			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
-			// Blocks can be loaded into a *non-post* block editor.
-			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			postContent: select( 'core/editor' ).getEditedPostContent(),
-		} ),
-		[]
+	const instanceId = useInstanceId(
+		TableOfContentsEdit,
+		'table-of-contents'
 	);
 
-	// The page this block would be part of on the front-end. For performance
-	// reasons, this is only calculated when onlyIncludeCurrentPage is true.
-	const pageIndex = useSelect(
+	// If a user clicks to a link prevent redirection and show a warning.
+	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
+	let noticeId;
+	const showRedirectionPreventedNotice = ( event ) => {
+		event.preventDefault();
+		// Remove previous warning if any, to show one at a time per block.
+		removeNotice( noticeId );
+		noticeId = `block-library/core/table-of-contents/redirection-prevented/${ instanceId }`;
+		createWarningNotice( __( 'Links are disabled in the editor.' ), {
+			id: noticeId,
+			type: 'snackbar',
+		} );
+	};
+
+	const canInsertList = useSelect(
 		( select ) => {
-			if ( ! onlyIncludeCurrentPage ) {
-				return null;
-			}
+			const { getBlockRootClientId, canInsertBlockType } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
 
-			const {
-				getBlockAttributes,
-				getBlockIndex,
-				getBlockName,
-				getBlockOrder,
-			} = select( blockEditorStore );
-
-			const blockIndex = getBlockIndex( clientId );
-			const blockOrder = getBlockOrder();
-
-			// Calculate which page the block will appear in on the front-end by
-			// counting how many <!--nextpage--> tags precede it.
-			// Unfortunately, this implementation only accounts for Page Break and
-			// Classic blocks, so if there are any <!--nextpage--> tags in any
-			// other block, they won't be counted. This will result in the table
-			// of contents showing headings from the wrong page if
-			// onlyIncludeCurrentPage === true. Thankfully, this issue only
-			// affects the editor implementation.
-			let page = 1;
-			for ( let i = 0; i < blockIndex; i++ ) {
-				const blockName = getBlockName( blockOrder[ i ] );
-				if ( blockName === 'core/nextpage' ) {
-					page++;
-				} else if ( blockName === 'core/freeform' ) {
-					// Count the page breaks inside the Classic block.
-					const pageBreaks = getBlockAttributes(
-						blockOrder[ i ]
-					).content?.match( /<!--nextpage-->/g );
-
-					if ( pageBreaks !== null && pageBreaks !== undefined ) {
-						page += pageBreaks.length;
-					}
-				}
-			}
-
-			return page;
+			return canInsertBlockType( 'core/list', rootClientId );
 		},
-		[ clientId, onlyIncludeCurrentPage ]
+		[ clientId ]
 	);
-
-	useEffect( () => {
-		let latestHeadings;
-
-		if ( onlyIncludeCurrentPage ) {
-			const pagesOfContent = postContent.split( '<!--nextpage-->' );
-
-			latestHeadings = getHeadingsFromContent(
-				pagesOfContent[ pageIndex - 1 ]
-			);
-		} else {
-			latestHeadings = getHeadingsFromContent( postContent );
-		}
-
-		if ( ! isEqual( headings, latestHeadings ) ) {
-			setHeadings( latestHeadings );
-			setHeadingTree( linearToNestedHeadingList( latestHeadings ) );
-		}
-	}, [ pageIndex, postContent, onlyIncludeCurrentPage ] );
 
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
-	const toolbarControls = listBlockExists && (
+	const headingTree = linearToNestedHeadingList( headings );
+
+	const toolbarControls = canInsertList && (
 		<BlockControls>
 			<ToolbarGroup>
 				<ToolbarButton
@@ -145,6 +94,7 @@ export default function TableOfContentsEdit( {
 						replaceBlocks(
 							clientId,
 							createBlock( 'core/list', {
+								ordered: true,
 								values: renderToString(
 									<TableOfContentsList
 										nestedHeadingList={ headingTree }
@@ -162,8 +112,9 @@ export default function TableOfContentsEdit( {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Table of Contents settings' ) }>
+			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Only include current page' ) }
 					checked={ onlyIncludeCurrentPage }
 					onChange={ ( value ) =>
@@ -191,8 +142,8 @@ export default function TableOfContentsEdit( {
 			<>
 				<div { ...blockProps }>
 					<Placeholder
-						icon={ <BlockIcon icon="list-view" /> }
-						label="Table of Contents"
+						icon={ <BlockIcon icon={ icon } /> }
+						label={ __( 'Table of Contents' ) }
 						instructions={ __(
 							'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
 						) }
@@ -206,9 +157,13 @@ export default function TableOfContentsEdit( {
 	return (
 		<>
 			<nav { ...blockProps }>
-				<ul>
-					<TableOfContentsList nestedHeadingList={ headingTree } />
-				</ul>
+				<ol>
+					<TableOfContentsList
+						nestedHeadingList={ headingTree }
+						disableLinkActivation={ true }
+						onClick={ showRedirectionPreventedNotice }
+					/>
+				</ol>
 			</nav>
 			{ toolbarControls }
 			{ inspectorControls }

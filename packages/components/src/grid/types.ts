@@ -1,10 +1,12 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
-type ResponsiveCSSValue< T > = Array< T | undefined > | T;
+/**
+ * Internal dependencies
+ */
+import type { ResponsiveCSSValue } from '../utils/types';
 
 type GridAlignment =
 	| 'bottom'
@@ -19,11 +21,7 @@ type GridAlignment =
 	| 'topLeft'
 	| 'topRight';
 
-type GridColumns = ResponsiveCSSValue< number >;
-
-type GridRows = ResponsiveCSSValue< number >;
-
-export type Props = {
+export type GridProps = {
 	/**
 	 * Adjusts the block alignment of children.
 	 */
@@ -33,25 +31,29 @@ export type Props = {
 	 */
 	alignment?: GridAlignment;
 	/**
+	 * The children elements.
+	 */
+	children: ReactNode;
+	/**
 	 * Adjusts the number of columns of the `Grid`.
 	 *
 	 * @default 2
 	 */
-	columns?: GridColumns;
+	columns?: ResponsiveCSSValue< number >;
 	/**
 	 * Adjusts the `grid-column-gap`.
 	 */
 	columnGap?: CSSProperties[ 'gridColumnGap' ];
-	/**
-	 * Changes the CSS display from `grid` to `inline-grid`.
-	 */
-	isInline?: boolean;
 	/**
 	 * Gap between each child.
 	 *
 	 * @default 3
 	 */
 	gap?: number;
+	/**
+	 * Changes the CSS display from `grid` to `inline-grid`.
+	 */
+	isInline?: boolean;
 	/**
 	 * Adjusts the inline alignment of children.
 	 */
@@ -63,7 +65,7 @@ export type Props = {
 	/**
 	 * Adjusts the number of rows of the `Grid`.
 	 */
-	rows?: GridRows;
+	rows?: ResponsiveCSSValue< number >;
 	/**
 	 * Adjusts the CSS grid `template-columns`.
 	 */
@@ -72,8 +74,4 @@ export type Props = {
 	 * Adjusts the CSS grid `template-rows`.
 	 */
 	templateRows?: CSSProperties[ 'gridTemplateRows' ];
-	/**
-	 * The children elements.
-	 */
-	children: React.ReactNode;
 };

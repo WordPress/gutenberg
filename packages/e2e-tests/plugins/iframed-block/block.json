@@ -1,5 +1,5 @@
 {
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "test/iframed-block",
 	"title": "Iframed Block",
 	"category": "text",

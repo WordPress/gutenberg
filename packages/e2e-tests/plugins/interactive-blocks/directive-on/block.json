@@ -1,0 +1,14 @@
+{
+	"apiVersion": 2,
+	"name": "test/directive-on",
+	"title": "E2E Interactivity tests - directive on",
+	"category": "text",
+	"icon": "heart",
+	"description": "",
+	"supports": {
+		"interactivity": true
+	},
+	"textdomain": "e2e-interactivity",
+	"viewScript": "directive-on-view",
+	"render": "file:./render.php"
+}

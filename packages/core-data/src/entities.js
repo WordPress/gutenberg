@@ -1,29 +1,62 @@
 /**
  * External dependencies
  */
-import { upperFirst, camelCase, map, find, get, startCase } from 'lodash';
+import { capitalCase, pascalCase } from 'change-case';
 
 /**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import { addEntities } from './actions';
+import { getSyncProvider } from './sync';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
-export const defaultEntities = [
+export const rootEntitiesConfig = [
 	{
 		label: __( 'Base' ),
-		name: '__unstableBase',
 		kind: 'root',
+		name: '__unstableBase',
 		baseURL: '/',
+		baseURLParams: {
+			_fields: [
+				'description',
+				'gmt_offset',
+				'home',
+				'name',
+				'site_icon',
+				'site_icon_url',
+				'site_logo',
+				'timezone_string',
+				'url',
+			].join( ',' ),
+		},
+		syncConfig: {
+			fetch: async () => {
+				return apiFetch( { path: '/' } );
+			},
+			applyChangesToDoc: ( doc, changes ) => {
+				const document = doc.getMap( 'document' );
+				Object.entries( changes ).forEach( ( [ key, value ] ) => {
+					if ( document.get( key ) !== value ) {
+						document.set( key, value );
+					}
+				} );
+			},
+			fromCRDTDoc: ( doc ) => {
+				return doc.getMap( 'document' ).toJSON();
+			},
+		},
+		syncObjectType: 'root/base',
+		getSyncObjectId: () => 'index',
 	},
 	{
 		label: __( 'Site' ),
@@ -31,8 +64,26 @@ export const defaultEntities = [
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
 		getTitle: ( record ) => {
-			return get( record, [ 'title' ], __( 'Site Title' ) );
+			return record?.title ?? __( 'Site Title' );
 		},
+		syncConfig: {
+			fetch: async () => {
+				return apiFetch( { path: '/wp/v2/settings' } );
+			},
+			applyChangesToDoc: ( doc, changes ) => {
+				const document = doc.getMap( 'document' );
+				Object.entries( changes ).forEach( ( [ key, value ] ) => {
+					if ( document.get( key ) !== value ) {
+						document.set( key, value );
+					}
+				} );
+			},
+			fromCRDTDoc: ( doc ) => {
+				return doc.getMap( 'document' ).toJSON();
+			},
+		},
+		syncObjectType: 'root/site',
+		getSyncObjectId: () => 'index',
 	},
 	{
 		label: __( 'Post Type' ),
@@ -41,7 +92,26 @@ export const defaultEntities = [
 		key: 'slug',
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
-		rawAttributes: POST_RAW_ATTRIBUTES,
+		syncConfig: {
+			fetch: async ( id ) => {
+				return apiFetch( {
+					path: `/wp/v2/types/${ id }?context=edit`,
+				} );
+			},
+			applyChangesToDoc: ( doc, changes ) => {
+				const document = doc.getMap( 'document' );
+				Object.entries( changes ).forEach( ( [ key, value ] ) => {
+					if ( document.get( key ) !== value ) {
+						document.set( key, value );
+					}
+				} );
+			},
+			fromCRDTDoc: ( doc ) => {
+				return doc.getMap( 'document' ).toJSON();
+			},
+		},
+		syncObjectType: 'root/postType',
+		getSyncObjectId: ( id ) => id,
 	},
 	{
 		name: 'media',
@@ -50,6 +120,8 @@ export const defaultEntities = [
 		baseURLParams: { context: 'edit' },
 		plural: 'mediaItems',
 		label: __( 'Media' ),
+		rawAttributes: [ 'caption', 'title', 'description' ],
+		supportsPagination: true,
 	},
 	{
 		name: 'taxonomy',
@@ -64,6 +136,7 @@ export const defaultEntities = [
 		name: 'sidebar',
 		kind: 'root',
 		baseURL: '/wp/v2/sidebars',
+		baseURLParams: { context: 'edit' },
 		plural: 'sidebars',
 		transientEdits: { blocks: true },
 		label: __( 'Widget areas' ),
@@ -116,7 +189,7 @@ export const defaultEntities = [
 		baseURLParams: { context: 'edit' },
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
-		rawAttributes: [ 'title', 'content' ],
+		rawAttributes: [ 'title' ],
 	},
 	{
 		name: 'menuLocation',
@@ -128,23 +201,18 @@ export const defaultEntities = [
 		key: 'name',
 	},
 	{
-		name: 'navigationArea',
-		kind: 'root',
-		baseURL: '/wp/v2/block-navigation-areas',
-		baseURLParams: { context: 'edit' },
-		plural: 'navigationAreas',
-		label: __( 'Navigation Area' ),
-		key: 'name',
-		getTitle: ( record ) => record?.description,
-	},
-	{
 		label: __( 'Global Styles' ),
 		name: 'globalStyles',
 		kind: 'root',
 		baseURL: '/wp/v2/global-styles',
 		baseURLParams: { context: 'edit' },
-		plural: 'globalStylesVariations', // should be different than name
+		plural: 'globalStylesVariations', // Should be different from name.
 		getTitle: ( record ) => record?.title?.rendered || record?.title,
+		getRevisionsUrl: ( parentId, revisionId ) =>
+			`/wp/v2/global-styles/${ parentId }/revisions${
+				revisionId ? '/' + revisionId : ''
+			}`,
+		supportsPagination: true,
 	},
 	{
 		label: __( 'Themes' ),
@@ -162,11 +230,20 @@ export const defaultEntities = [
 		baseURLParams: { context: 'edit' },
 		key: 'plugin',
 	},
+	{
+		label: __( 'Status' ),
+		name: 'status',
+		kind: 'root',
+		baseURL: '/wp/v2/statuses',
+		baseURLParams: { context: 'edit' },
+		plural: 'statuses',
+		key: 'slug',
+	},
 ];
 
-export const kinds = [
-	{ name: 'postType', loadEntities: loadPostTypeEntities },
-	{ name: 'taxonomy', loadEntities: loadTaxonomyEntities },
+export const additionalEntityConfigLoaders = [
+	{ kind: 'postType', loadEntities: loadPostTypeEntities },
+	{ kind: 'taxonomy', loadEntities: loadTaxonomyEntities },
 ];
 
 /**
@@ -199,14 +276,39 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
 	return newEdits;
 };
 
+const serialisableBlocksCache = new WeakMap();
+
+function makeBlockAttributesSerializable( attributes ) {
+	const newAttributes = { ...attributes };
+	for ( const [ key, value ] of Object.entries( attributes ) ) {
+		if ( value instanceof RichTextData ) {
+			newAttributes[ key ] = value.valueOf();
+		}
+	}
+	return newAttributes;
+}
+
+function makeBlocksSerializable( blocks ) {
+	return blocks.map( ( block ) => {
+		const { innerBlocks, attributes, ...rest } = block;
+		return {
+			...rest,
+			attributes: makeBlockAttributesSerializable( attributes ),
+			innerBlocks: makeBlocksSerializable( innerBlocks ),
+		};
+	} );
+}
+
 /**
  * Returns the list of post type entities.
  *
  * @return {Promise} Entities promise
  */
 async function loadPostTypeEntities() {
-	const postTypes = await apiFetch( { path: '/wp/v2/types?context=edit' } );
-	return map( postTypes, ( postType, name ) => {
+	const postTypes = await apiFetch( {
+		path: '/wp/v2/types?context=view',
+	} );
+	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
@@ -216,7 +318,7 @@ async function loadPostTypeEntities() {
 			baseURL: `/${ namespace }/${ postType.rest_base }`,
 			baseURLParams: { context: 'edit' },
 			name,
-			label: postType.labels.singular_name,
+			label: postType.name,
 			transientEdits: {
 				blocks: true,
 				selection: true,
@@ -226,9 +328,53 @@ async function loadPostTypeEntities() {
 			getTitle: ( record ) =>
 				record?.title?.rendered ||
 				record?.title ||
-				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
+				( isTemplate
+					? capitalCase( record.slug ?? '' )
+					: String( record.id ) ),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 			__unstable_rest_base: postType.rest_base,
+			syncConfig: {
+				fetch: async ( id ) => {
+					return apiFetch( {
+						path: `/${ namespace }/${ postType.rest_base }/${ id }?context=edit`,
+					} );
+				},
+				applyChangesToDoc: ( doc, changes ) => {
+					const document = doc.getMap( 'document' );
+
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						if ( typeof value !== 'function' ) {
+							if ( key === 'blocks' ) {
+								if ( ! serialisableBlocksCache.has( value ) ) {
+									serialisableBlocksCache.set(
+										value,
+										makeBlocksSerializable( value )
+									);
+								}
+
+								value = serialisableBlocksCache.get( value );
+							}
+
+							if ( document.get( key ) !== value ) {
+								document.set( key, value );
+							}
+						}
+					} );
+				},
+				fromCRDTDoc: ( doc ) => {
+					return doc.getMap( 'document' ).toJSON();
+				},
+			},
+			syncObjectType: 'postType/' + postType.name,
+			getSyncObjectId: ( id ) => id,
+			supportsPagination: true,
+			getRevisionsUrl: ( parentId, revisionId ) =>
+				`/${ namespace }/${
+					postType.rest_base
+				}/${ parentId }/revisions${
+					revisionId ? '/' + revisionId : ''
+				}`,
+			revisionKey: isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 		};
 	} );
 }
@@ -240,22 +386,31 @@ async function loadPostTypeEntities() {
  */
 async function loadTaxonomyEntities() {
 	const taxonomies = await apiFetch( {
-		path: '/wp/v2/taxonomies?context=edit',
+		path: '/wp/v2/taxonomies?context=view',
 	} );
-	return map( taxonomies, ( taxonomy, name ) => {
+	return Object.entries( taxonomies ?? {} ).map( ( [ name, taxonomy ] ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		return {
 			kind: 'taxonomy',
 			baseURL: `/${ namespace }/${ taxonomy.rest_base }`,
 			baseURLParams: { context: 'edit' },
 			name,
-			label: taxonomy.labels.singular_name,
+			label: taxonomy.name,
 		};
 	} );
 }
 
 /**
  * Returns the entity's getter method name given its kind and name.
+ *
+ * @example
+ * ```js
+ * const nameSingular = getMethodName( 'root', 'theme', 'get' );
+ * // nameSingular is getRootTheme
+ *
+ * const namePlural = getMethodName( 'root', 'theme', 'set' );
+ * // namePlural is setRootThemes
+ * ```
  *
  * @param {string}  kind      Entity kind.
  * @param {string}  name      Entity name.
@@ -270,37 +425,63 @@ export const getMethodName = (
 	prefix = 'get',
 	usePlural = false
 ) => {
-	const entity = find( defaultEntities, { kind, name } );
-	const kindPrefix = kind === 'root' ? '' : upperFirst( camelCase( kind ) );
-	const nameSuffix =
-		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
+	const entityConfig = rootEntitiesConfig.find(
+		( config ) => config.kind === kind && config.name === name
+	);
+	const kindPrefix = kind === 'root' ? '' : pascalCase( kind );
+	const nameSuffix = pascalCase( name ) + ( usePlural ? 's' : '' );
 	const suffix =
-		usePlural && entity.plural
-			? upperFirst( camelCase( entity.plural ) )
+		usePlural && 'plural' in entityConfig && entityConfig?.plural
+			? pascalCase( entityConfig.plural )
 			: nameSuffix;
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };
+
+function registerSyncConfigs( configs ) {
+	configs.forEach( ( { syncObjectType, syncConfig } ) => {
+		getSyncProvider().register( syncObjectType, syncConfig );
+		const editSyncConfig = { ...syncConfig };
+		delete editSyncConfig.fetch;
+		getSyncProvider().register( syncObjectType + '--edit', editSyncConfig );
+	} );
+}
 
 /**
  * Loads the kind entities into the store.
  *
  * @param {string} kind Kind
  *
- * @return {Array} Entities
+ * @return {(thunkArgs: object) => Promise<Array>} Entities
  */
-export const getKindEntities = ( kind ) => async ( { select, dispatch } ) => {
-	let entities = select.getEntitiesByKind( kind );
-	if ( entities && entities.length !== 0 ) {
-		return entities;
-	}
+export const getOrLoadEntitiesConfig =
+	( kind ) =>
+	async ( { select, dispatch } ) => {
+		let configs = select.getEntitiesConfig( kind );
+		if ( configs && configs.length !== 0 ) {
+			if ( window.__experimentalEnableSync ) {
+				if ( process.env.IS_GUTENBERG_PLUGIN ) {
+					registerSyncConfigs( configs );
+				}
+			}
 
-	const kindConfig = find( kinds, { name: kind } );
-	if ( ! kindConfig ) {
-		return [];
-	}
+			return configs;
+		}
 
-	entities = await kindConfig.loadEntities();
-	dispatch( addEntities( entities ) );
+		const loader = additionalEntityConfigLoaders.find(
+			( l ) => l.kind === kind
+		);
+		if ( ! loader ) {
+			return [];
+		}
 
-	return entities;
-};
+		configs = await loader.loadEntities();
+		if ( window.__experimentalEnableSync ) {
+			if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				registerSyncConfigs( configs );
+			}
+		}
+
+		dispatch( addEntities( configs ) );
+
+		return configs;
+	};

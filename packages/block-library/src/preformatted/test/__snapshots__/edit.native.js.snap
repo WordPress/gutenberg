@@ -1,42 +1,95 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`core/more/edit/native should match snapshot when content is empty 1`] = `
+exports[`Preformatted should match snapshot when content is empty 1`] = `
 <View
   style={
-    Array [
+    [
       undefined,
       undefined,
       undefined,
     ]
   }
 >
-  <PreformattedEdit
-    getStylesFromColorScheme={[Function]}
-    setAttributes={[MockFunction]}
-    style={Object {}}
-  />
+  <View
+    style={
+      [
+        undefined,
+        undefined,
+      ]
+    }
+  >
+    <TextInput
+      accessibilityLabel="Text input. Empty"
+      activeFormats={[]}
+      blockType={
+        {
+          "tag": "pre",
+        }
+      }
+      disableEditingMenu={false}
+      fontFamily="serif"
+      isMultiline={false}
+      maxImagesWidth={200}
+      onBlur={[Function]}
+      onChange={[Function]}
+      onContentSizeChange={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onPaste={[Function]}
+      onSelectionChange={[Function]}
+      placeholder="Write preformatted text…"
+      placeholderTextColor="gray"
+      selectionColor="black"
+      triggerKeyCodes={[]}
+      value=""
+    />
+  </View>
 </View>
 `;
 
-exports[`core/more/edit/native should match snapshot when content is not empty 1`] = `
+exports[`Preformatted should match snapshot when content is not empty 1`] = `
 <View
   style={
-    Array [
+    [
       undefined,
       undefined,
       undefined,
     ]
   }
 >
-  <PreformattedEdit
-    attributes={
-      Object {
-        "content": "Hello World!",
-      }
+  <View
+    style={
+      [
+        undefined,
+        undefined,
+      ]
     }
-    getStylesFromColorScheme={[Function]}
-    setAttributes={[MockFunction]}
-    style={Object {}}
-  />
+  >
+    <TextInput
+      accessibilityLabel="Text input. <pre>Hello World!</pre>"
+      activeFormats={[]}
+      blockType={
+        {
+          "tag": "pre",
+        }
+      }
+      disableEditingMenu={false}
+      fontFamily="serif"
+      isMultiline={false}
+      maxImagesWidth={200}
+      onBlur={[Function]}
+      onChange={[Function]}
+      onContentSizeChange={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onPaste={[Function]}
+      onSelectionChange={[Function]}
+      placeholder="Write preformatted text…"
+      placeholderTextColor="gray"
+      selectionColor="black"
+      triggerKeyCodes={[]}
+      value="<pre>Hello World!</pre>"
+    />
+  </View>
 </View>
 `;

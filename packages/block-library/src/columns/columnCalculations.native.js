@@ -45,7 +45,7 @@ export const getColumnsInRow = ( width, columnCount ) => {
 				MAX_COLUMNS_NUM_IN_ROW
 			);
 		}
-		// show all Column in one row
+		// Show all Column in one row.
 		return columnCount;
 	}
 };

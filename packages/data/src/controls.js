@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isObject } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { createRegistryControl } from './factory';
@@ -13,6 +8,10 @@ import { createRegistryControl } from './factory';
 const SELECT = '@@data/SELECT';
 const RESOLVE_SELECT = '@@data/RESOLVE_SELECT';
 const DISPATCH = '@@data/DISPATCH';
+
+function isObject( object ) {
+	return object !== null && typeof object === 'object';
+}
 
 /**
  * Dispatches a control action for triggering a synchronous registry select.
@@ -118,20 +117,25 @@ export const controls = { select, resolveSelect, dispatch };
 
 export const builtinControls = {
 	[ SELECT ]: createRegistryControl(
-		( registry ) => ( { storeKey, selectorName, args } ) =>
-			registry.select( storeKey )[ selectorName ]( ...args )
+		( registry ) =>
+			( { storeKey, selectorName, args } ) =>
+				registry.select( storeKey )[ selectorName ]( ...args )
 	),
 	[ RESOLVE_SELECT ]: createRegistryControl(
-		( registry ) => ( { storeKey, selectorName, args } ) => {
-			const method = registry.select( storeKey )[ selectorName ]
-				.hasResolver
-				? 'resolveSelect'
-				: 'select';
-			return registry[ method ]( storeKey )[ selectorName ]( ...args );
-		}
+		( registry ) =>
+			( { storeKey, selectorName, args } ) => {
+				const method = registry.select( storeKey )[ selectorName ]
+					.hasResolver
+					? 'resolveSelect'
+					: 'select';
+				return registry[ method ]( storeKey )[ selectorName ](
+					...args
+				);
+			}
 	),
 	[ DISPATCH ]: createRegistryControl(
-		( registry ) => ( { storeKey, actionName, args } ) =>
-			registry.dispatch( storeKey )[ actionName ]( ...args )
+		( registry ) =>
+			( { storeKey, actionName, args } ) =>
+				registry.dispatch( storeKey )[ actionName ]( ...args )
 	),
 };
