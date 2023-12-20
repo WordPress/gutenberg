@@ -472,7 +472,7 @@ Use this setting to enable the following Global Styles settings:
 - color: link
 - spacing: blockGap, margin, padding
 - typography: lineHeight
-- dimensions: minHeight
+- dimensions: aspectRatio, minHeight
 - position: sticky
 
 ```php

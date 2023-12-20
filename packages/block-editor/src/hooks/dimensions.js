@@ -23,7 +23,7 @@ import { MarginVisualizer } from './margin';
 import { PaddingVisualizer } from './padding';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -149,7 +149,7 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 	}
 
 	if ( feature === 'any' ) {
-		return !! support?.dimensions;
+		return !! ( support?.aspectRatio || !! support?.minHeight );
 	}
 
 	return !! support?.[ feature ];
@@ -163,7 +163,14 @@ export default {
 	},
 };
 
-function useBlockProps( { style } ) {
+function useBlockProps( { name, style } ) {
+	if (
+		! hasDimensionsSupport( name, 'aspectRatio' ) ||
+		shouldSkipSerialization( name, DIMENSIONS_SUPPORT_KEY, 'aspectRatio' )
+	) {
+		return {};
+	}
+
 	const className = classnames( {
 		'has-aspect-ratio': !! style?.dimensions?.aspectRatio,
 	} );
