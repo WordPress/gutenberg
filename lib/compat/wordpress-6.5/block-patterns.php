@@ -35,8 +35,6 @@ add_action( 'init', 'gutenberg_register_media_pattern_categories' );
 /**
  * Adds a new taxonomy for organizing user created patterns.
  *
- * Note: This should be removed when the minimum required WP version is >= 6.4.
- *
  * @see https://github.com/WordPress/gutenberg/pull/53163
  *
  * @return void
