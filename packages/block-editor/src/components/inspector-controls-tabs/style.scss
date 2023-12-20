@@ -15,13 +15,14 @@
 }
 
 .block-editor-inspector-controls-tabs__hint {
-	align-items: top;
+	align-items: flex-start;
 	background: $gray-100;
 	border-radius: $radius-block-ui;
 	color: $gray-900;
 	display: flex;
 	flex-direction: row;
 	margin: $grid-unit-20;
+	font-size: $default-font-size;
 }
 
 .block-editor-inspector-controls-tabs__hint-content {
