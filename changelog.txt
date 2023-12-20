@@ -1,7 +1,28 @@
 == Changelog ==
 
-= 17.3.0-rc.1 =
+= 17.3.0 =
 
+
+
+## Changelog
+
+### Bug Fixes
+
+- (edit-site)(use-init-edited-entity-from-url) Safely access `toString()` on `siteData`'s `page_on_front`. ([57035](https://github.com/WordPress/gutenberg/pull/57035))
+
+#### Components
+- Fix form token field suggestion list reopening after blurring the input. ([57002](https://github.com/WordPress/gutenberg/pull/57002))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@fullofcaffeine @talldan
+
+= 17.3.0-rc.1 =
 
 
 ## Changelog
@@ -278,7 +299,7 @@
 - `CustomSelectControl`: Add additional unit tests. ([56575](https://github.com/WordPress/gutenberg/pull/56575))
 
 
-### Various
+### Copy
 
 - Copy/fix capitalization of WordPress. ([56834](https://github.com/WordPress/gutenberg/pull/56834))
 
@@ -312,6 +333,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @afercia @ajlende @alexstine @andrewhayward @andrewserong @apeatling @atachibana @Aurorum @benoitchantre @bph @brookewp @chad1008 @ciampo @colorful-tones @dcalhoun @derekblank @draganescu @ellatrix @fluiddot @geriux @getdave @jameskoster @jasmussen @jeherve @jeryj @jffng @jonathanbossenger @jorgefilipecosta @jsnajdr @juanmaguitar @kevin940726 @kmanijak @lithrel @luisherranz @Mamaduka @matiasbenedetto @mikachan @miminari @mtias @ndiego @nk-o @ntsekouras @oandregal @ramonjd @richtabor @scruffian @SiobhyB @t-hamano @talldan @taylorgorman @tellthemachines @tyxla @valerogarte @WunderBart @youknowriad
+
+
 
 
 = 17.2.1 =
