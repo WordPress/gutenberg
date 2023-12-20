@@ -14,7 +14,7 @@ import { Children, Fragment } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import { LAYOUT_LIST, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
+import { LAYOUT_LIST, OPERATORS } from './constants';
 
 const {
 	DropdownMenuV2Ariakit: DropdownMenu,
@@ -24,17 +24,6 @@ const {
 	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
 	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
-
-const OPERATORS = {
-	[ OPERATOR_IN ]: {
-		key: 'in-filter',
-		label: __( 'Is' ),
-	},
-	[ OPERATOR_NOT_IN ]: {
-		key: 'not-in-filter',
-		label: __( 'Is not' ),
-	},
-};
 
 function WithSeparators( { children } ) {
 	return Children.toArray( children )

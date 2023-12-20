@@ -13,7 +13,7 @@ import { Children, Fragment } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
+import { OPERATOR_IN, OPERATOR_NOT_IN, OPERATORS } from './constants';
 import { unlock } from './lock-unlock';
 
 const {
@@ -24,17 +24,6 @@ const {
 	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
 	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
-
-const OPERATORS = {
-	[ OPERATOR_IN ]: {
-		key: 'in-filter',
-		label: __( 'Is' ),
-	},
-	[ OPERATOR_NOT_IN ]: {
-		key: 'not-in-filter',
-		label: __( 'Is not' ),
-	},
-};
 
 const FilterText = ( { activeElement, filterInView, filter } ) => {
 	if ( activeElement === undefined ) {

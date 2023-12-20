@@ -16,7 +16,12 @@ import { Children, Fragment } from '@wordpress/element';
  */
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
-import { ENUMERATION_TYPE, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
+import {
+	ENUMERATION_TYPE,
+	OPERATOR_IN,
+	OPERATOR_NOT_IN,
+	OPERATORS,
+} from './constants';
 
 const {
 	DropdownMenuV2Ariakit: DropdownMenu,
@@ -44,17 +49,6 @@ const sanitizeOperators = ( field ) => {
 };
 
 function HeaderMenu( { field, view, onChangeView } ) {
-	const OPERATORS = {
-		[ OPERATOR_IN ]: {
-			key: 'in-filter',
-			label: __( 'Is' ),
-		},
-		[ OPERATOR_NOT_IN ]: {
-			key: 'not-in-filter',
-			label: __( 'Is not' ),
-		},
-	};
-
 	const isHidable = field.enableHiding !== false;
 
 	const isSortable = field.enableSorting !== false;
