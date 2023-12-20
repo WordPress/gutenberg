@@ -596,6 +596,21 @@ function Navigation( {
 								label={ __( 'Always' ) }
 							/>
 						</ToggleGroupControl>
+
+						{ needsBreakpoint && (
+							<ToggleControl
+								__nextHasNoMarginBottom
+								checked={ flexibleBreakpoint }
+								onChange={ ( value ) => {
+									setAttributes( {
+										flexibleBreakpoint: value,
+									} );
+								} }
+								disabled={ attributes.openSubmenusOnClick }
+								label={ __( 'Flexible breakpoint' ) }
+							/>
+						) }
+
 						{ hasSubmenus && (
 							<>
 								<h3>{ __( 'Submenus' ) }</h3>
@@ -624,22 +639,6 @@ function Navigation( {
 									disabled={ attributes.openSubmenusOnClick }
 									label={ __( 'Show arrow' ) }
 								/>
-
-								{ needsBreakpoint && (
-									<ToggleControl
-										__nextHasNoMarginBottom
-										checked={ flexibleBreakpoint }
-										onChange={ ( value ) => {
-											setAttributes( {
-												flexibleBreakpoint: value,
-											} );
-										} }
-										disabled={
-											attributes.openSubmenusOnClick
-										}
-										label={ __( 'Flexible breakpoint' ) }
-									/>
-								) }
 
 								{ submenuAccessibilityNotice && (
 									<div>
