@@ -1,7 +1,7 @@
 .components-inline-color-popover {
 
 	.components-popover__content {
-		.components-tab-panel__tab-content {
+		[role="tabpanel"] {
 			padding: 16px;
 		}
 
