@@ -24,7 +24,6 @@ function gutenberg_init_font_library_routes() {
 	$args = array(
 		'public'                         => false,
 		'_builtin'                       => true,  /* internal use only. don't use this when registering your own post type. */
-		'hierarchical'                   => false,
 		'label'                          => 'Font Family',
 		'show_in_rest'                   => true,
 		'rest_base'                      => 'font-families',
