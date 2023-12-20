@@ -103,7 +103,7 @@ class Gutenberg_Modules {
 	}
 
 	/**
-	 * Prints the import map using <script type="importmap">.
+	 * Prints the import map using a script tag with an type="importmap" attribute.
 	 */
 	public static function print_import_map() {
 		$import_map = self::get_import_map();
@@ -128,7 +128,8 @@ class Gutenberg_Modules {
 	}
 
 	/**
-	 * Prints the the static dependencies of the enqueued modules using <link rel="modulepreload">.
+	 * Prints the the static dependencies of the enqueued modules using link tags
+	 * with rel="modulepreload" attributes.
 	 */
 	public static function print_preloaded_modules() {
 		foreach ( self::get_dependencies( array_keys( self::get_enqueued() ), array( 'static' ) ) as $module_identifier => $module ) {
