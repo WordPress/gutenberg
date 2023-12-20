@@ -38,7 +38,11 @@ const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 
 function isPartiallySynced( block ) {
 	return (
-		!! getBlockSupport( block.name, '__experimentalConnections', false ) &&
+		!! getBlockSupport(
+			block.name,
+			'__experimentalBlockBindings',
+			false
+		) &&
 		!! block.attributes.connections?.attributes &&
 		Object.values( block.attributes.connections.attributes ).some(
 			( connection ) => connection.source === 'pattern_attributes'

@@ -34,7 +34,7 @@ const withPartialSyncingControls = createHigherOrderComponent(
 		const blockEditingMode = useBlockEditingMode();
 		const hasCustomFieldsSupport = hasBlockSupport(
 			props.name,
-			'__experimentalConnections',
+			'__experimentalBlockBindings',
 			false
 		);
 		const isEditingPattern = useSelect(
