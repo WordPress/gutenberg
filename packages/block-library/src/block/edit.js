@@ -43,16 +43,16 @@ function isPartiallySynced( block ) {
 			'__experimentalBlockBindings',
 			false
 		) &&
-		!! block.attributes.connections?.attributes &&
-		Object.values( block.attributes.connections.attributes ).some(
-			( connection ) => connection.source === 'pattern_attributes'
+		!! block.attributes.metadata?.bindings &&
+		Object.values( block.attributes.metadata.bindings ).some(
+			( binding ) => binding.source.name === 'pattern_attributes'
 		)
 	);
 }
 function getPartiallySyncedAttributes( block ) {
-	return Object.entries( block.attributes.connections.attributes )
+	return Object.entries( block.attributes.metadata.bindings )
 		.filter(
-			( [ , connection ] ) => connection.source === 'pattern_attributes'
+			( [ , binding ] ) => binding.source.name === 'pattern_attributes'
 		)
 		.map( ( [ attributeKey ] ) => attributeKey );
 }
