@@ -16,13 +16,7 @@ import { Children, Fragment } from '@wordpress/element';
  */
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
-import {
-	ENUMERATION_TYPE,
-	OPERATOR_IN,
-	OPERATOR_NOT_IN,
-	OPERATORS,
-	SORTING_DIRECTIONS,
-} from './constants';
+import { ENUMERATION_TYPE, OPERATORS, SORTING_DIRECTIONS } from './constants';
 import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
 
 const {
@@ -38,10 +32,10 @@ const sortArrows = { asc: '↑', desc: '↓' };
 const sanitizeOperators = ( field ) => {
 	let operators = field.filterBy?.operators;
 	if ( ! operators || ! Array.isArray( operators ) ) {
-		operators = [ OPERATOR_IN, OPERATOR_NOT_IN ];
+		operators = Object.keys( OPERATORS );
 	}
 	return operators.filter( ( operator ) =>
-		[ OPERATOR_IN, OPERATOR_NOT_IN ].includes( operator )
+		Object.keys( OPERATORS ).includes( operator )
 	);
 };
 
@@ -149,18 +143,13 @@ function HeaderMenu( { field, view, onChangeView } ) {
 								<DropdownMenuItem
 									prefix={ <Icon icon={ funnel } /> }
 									suffix={
-										<>
-											{ activeElement &&
-												activeOperator ===
-													OPERATOR_IN &&
-												__( 'Is' ) }
-											{ activeElement &&
-												activeOperator ===
-													OPERATOR_NOT_IN &&
-												__( 'Is not' ) }
-											{ activeElement && ' ' }
-											{ activeElement?.label }
-										</>
+										activeElement && (
+											<span aria-hidden="true">
+												{ activeOperator in OPERATORS &&
+													`${ OPERATORS[ activeOperator ].label } ` }
+												{ activeElement?.label }
+											</span>
+										)
 									}
 								>
 									<DropdownMenuItemLabel>
