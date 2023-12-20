@@ -28,7 +28,6 @@ const {
 	DropdownMenuV2Ariakit: DropdownMenu,
 	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
-	DropdownMenuRadioItemV2Ariakit: DropdownMenuRadioItem,
 	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
 	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
@@ -103,7 +102,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 									isSorted &&
 									view.sort.direction === direction;
 								return (
-									<DropdownMenuRadioItem
+									<DropdownMenuRadioItemCustom
 										key={ direction }
 										name={ `view-table-sort-${ field.id }` }
 										value={ direction }
@@ -121,7 +120,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 										<DropdownMenuItemLabel>
 											{ info.label }
 										</DropdownMenuItemLabel>
-									</DropdownMenuRadioItem>
+									</DropdownMenuRadioItemCustom>
 								);
 							}
 						) }
@@ -234,7 +233,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 												operator,
 												{ label, key },
 											] ) => (
-												<DropdownMenuRadioItem
+												<DropdownMenuRadioItemCustom
 													key={ key }
 													name={ `view-table-${ filter.name }-conditions` }
 													value={ operator }
@@ -262,7 +261,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 													<DropdownMenuItemLabel>
 														{ label }
 													</DropdownMenuItemLabel>
-												</DropdownMenuRadioItem>
+												</DropdownMenuRadioItemCustom>
 											)
 										) }
 									</DropdownMenu>

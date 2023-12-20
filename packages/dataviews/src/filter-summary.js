@@ -21,7 +21,6 @@ const {
 	DropdownMenuV2Ariakit: DropdownMenu,
 	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
-	DropdownMenuRadioItemV2Ariakit: DropdownMenuRadioItem,
 	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
 	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
@@ -149,7 +148,7 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 					>
 						{ Object.entries( OPERATORS ).map(
 							( [ operator, { label, key } ] ) => (
-								<DropdownMenuRadioItem
+								<DropdownMenuRadioItemCustom
 									key={ key }
 									name={ `filter-summary-${ filter.name }-conditions` }
 									value={ operator }
@@ -172,7 +171,7 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 									<DropdownMenuItemLabel>
 										{ label }
 									</DropdownMenuItemLabel>
-								</DropdownMenuRadioItem>
+								</DropdownMenuRadioItemCustom>
 							)
 						) }
 					</DropdownMenu>

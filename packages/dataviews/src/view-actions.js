@@ -12,12 +12,12 @@ import { __ } from '@wordpress/i18n';
  */
 import { unlock } from './lock-unlock';
 import { VIEW_LAYOUTS, LAYOUT_TABLE } from './constants';
+import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
 
 const {
 	DropdownMenuV2Ariakit: DropdownMenu,
 	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
-	DropdownMenuRadioItemV2Ariakit: DropdownMenuRadioItem,
 	DropdownMenuCheckboxItemV2Ariakit: DropdownMenuCheckboxItem,
 	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
@@ -50,7 +50,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 		>
 			{ _availableViews.map( ( availableView ) => {
 				return (
-					<DropdownMenuRadioItem
+					<DropdownMenuRadioItemCustom
 						key={ availableView.type }
 						value={ availableView.type }
 						name="view-actions-available-view"
@@ -65,7 +65,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 						<DropdownMenuItemLabel>
 							{ availableView.label }
 						</DropdownMenuItemLabel>
-					</DropdownMenuRadioItem>
+					</DropdownMenuRadioItemCustom>
 				);
 			} ) }
 		</DropdownMenu>
@@ -91,7 +91,7 @@ function PageSizeMenu( { view, onChangeView } ) {
 		>
 			{ PAGE_SIZE_VALUES.map( ( size ) => {
 				return (
-					<DropdownMenuRadioItem
+					<DropdownMenuRadioItemCustom
 						key={ size }
 						value={ size }
 						name="view-actions-page-size"
@@ -109,7 +109,7 @@ function PageSizeMenu( { view, onChangeView } ) {
 							// strings for the truncation to work propertly
 							`${ size }`
 						}</DropdownMenuItemLabel>
-					</DropdownMenuRadioItem>
+					</DropdownMenuRadioItemCustom>
 				);
 			} ) }
 		</DropdownMenu>
@@ -221,7 +221,7 @@ function SortMenu( { fields, view, onChangeView } ) {
 									field.id === currentSortedField.id;
 
 								return (
-									<DropdownMenuRadioItem
+									<DropdownMenuRadioItemCustom
 										key={ direction }
 										value={ direction }
 										name={ `view-actions-sorting-${ field.id }` }
@@ -239,7 +239,7 @@ function SortMenu( { fields, view, onChangeView } ) {
 										<DropdownMenuItemLabel>
 											{ info.label }
 										</DropdownMenuItemLabel>
-									</DropdownMenuRadioItem>
+									</DropdownMenuRadioItemCustom>
 								);
 							}
 						) }
