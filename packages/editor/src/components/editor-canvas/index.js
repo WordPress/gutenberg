@@ -301,7 +301,9 @@ function EditorCanvas( {
 			styles={ styles }
 			height="100%"
 			iframeProps={ {
-				className: classnames( { 'has-history': hasHistory } ),
+				className: classnames( 'editor-canvas__iframe', {
+					'has-history': hasHistory,
+				} ),
 				...iframeProps,
 				style: {
 					...iframeProps?.style,

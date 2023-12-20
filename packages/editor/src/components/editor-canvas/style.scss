@@ -1,5 +1,5 @@
-.block-editor__container {
-	.has-history {
+.editor-canvas__iframe {
+	&.has-history {
 		padding: $grid-unit-60 $grid-unit-60 0;
 	}
 }
