@@ -38,6 +38,11 @@ export default function useTruncate(
 		childrenAsText = children;
 	} else if ( typeof children === 'number' ) {
 		childrenAsText = children.toString();
+	} else {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`Truncate: text truncation has been disabled, since it is only available when passing 'children' of type 'string' or 'number'`
+		);
 	}
 
 	const truncatedContent = childrenAsText

@@ -58,13 +58,16 @@ describe( 'Truncate', () => {
 	} );
 
 	describe( 'with other children types', () => {
-		test( 'should no-op', () => {
+		test( 'should no-op and output a warning to console', () => {
 			render(
 				<Truncate>
 					<>Lorem ipsum</>
 				</Truncate>
 			);
 			expect( screen.getByText( 'Lorem ipsum' ) ).toBeVisible();
+			expect( console ).toHaveWarnedWith(
+				"Truncate: text truncation has been disabled, since it is only available when passing 'children' of type 'string' or 'number'"
+			);
 		} );
 	} );
 } );
