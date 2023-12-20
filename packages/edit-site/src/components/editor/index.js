@@ -23,6 +23,8 @@ import {
 	store as interfaceStore,
 } from '@wordpress/interface';
 import {
+	EditorKeyboardShortcutsRegister,
+	EditorKeyboardShortcuts,
 	EditorNotices,
 	EditorSnackbars,
 	privateApis as editorPrivateApis,
@@ -245,7 +247,13 @@ export default function Editor( { isLoading } ) {
 								{ editorMode === 'text' && isEditMode && (
 									<CodeEditor />
 								) }
-								{ isEditMode && <KeyboardShortcutsEditMode /> }
+								{ isEditMode && (
+									<>
+										<KeyboardShortcutsEditMode />
+										<EditorKeyboardShortcutsRegister />
+										<EditorKeyboardShortcuts />
+									</>
+								) }
 							</>
 						}
 						secondarySidebar={
