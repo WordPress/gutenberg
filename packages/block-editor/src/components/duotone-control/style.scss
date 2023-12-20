@@ -33,5 +33,5 @@ $swatch-columns: math.floor(math.div($popover-width + $swatch-gap - 2 * $popover
 
 .block-editor-duotone-control__unset-indicator {
 	// Show a diagonal line (crossed out) for empty swatches.
-	background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+	background-image: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 }

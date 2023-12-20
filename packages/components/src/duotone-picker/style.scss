@@ -4,12 +4,12 @@
 
 .components-duotone-picker__color-indicator > .components-button {
 	// Show a diagonal line (crossed out) for empty swatches.
-	background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+	background-image: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 	color: transparent;
 
 	&.is-pressed:hover:not(:disabled) {
 		// Hover state has to be overridden too.
-		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+		background-image: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 		color: transparent;
 	}
 
