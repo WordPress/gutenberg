@@ -6,7 +6,7 @@
  */
 
 if ( function_exists( 'register_block_bindings_source' ) ) {
-	$post_meta_source_callback = function ( $source_attrs, $block_content, $block, $block_instance ) {
+	$post_meta_source_callback = function ( $source_attrs ) {
 		// Use the postId attribute if available, otherwise use the context.
 		if ( isset( $source_attrs['postId'] ) ) {
 			$post_id = $source_attrs['postId'];
