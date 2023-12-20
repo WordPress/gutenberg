@@ -1,4 +1,6 @@
-# Block locking API
+# Block Locking API
+
+The Block Locking API allows you to restrict actions on specific blocks within the Editor. This API can be used to prevent users from moving, removing, or editing certain blocks, ensuring layout consistency and content integrity.
 
 ## Lock the ability to move or remove specific blocks
 
@@ -54,7 +56,7 @@ add_filter( 'block_editor_settings_all', function( $settings, $context ) {
 }, 10, 2 );
 ```
 
-Another common use case may be to only allow users who can edit the visual design of the site (theme editing) to lock or unlock blocks.  Now, the best option would be to test against the `edit_theme_options` capability, as shown in the following code snippet:
+Another common use case may be to only allow users who can edit the visual design of the site (theme editing) to lock or unlock blocks. Now, the best option would be to test against the `edit_theme_options` capability, as shown in the following code snippet:
 
 ```php
 add_filter( 'block_editor_settings_all', function( $settings ) {

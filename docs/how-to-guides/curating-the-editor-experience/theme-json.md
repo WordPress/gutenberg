@@ -1,8 +1,8 @@
+# theme.json
 
+A theme's theme.json file is one of the best ways to curate the Editor experience and will likely be the first tool you use before reaching for more sophisticated solutions. 
 
 ## Providing default controls/options
-
-**Define default options**
 
 Since theme.json acts as a configuration tool, there are numerous ways to define at a granular level what options are available. This section will use duotone as an example since it showcases a feature that cuts across a few blocks and allows for varying levels of access.   
 
@@ -22,6 +22,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 ```
 
 *Duotone with theme defined color options, Core options, and customization available for each image related block:*
+
 ```json
 {
 	"version": 2,
@@ -121,7 +122,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 
 ## Limiting interface options with theme.json
 
-**Limit options on a per block basis**
+### Limit options on a per-block basis
 
 Beyond defining default values, using theme.json allows you to also remove options entirely and instead rely on what the theme has set in place. Below is a visual showing two extremes with the same paragraph block: 
 
@@ -160,7 +161,7 @@ Continuing the examples with duotone, this means you could allow full access to 
 
 You can read more about how best to [turn on/off options with theme.json here](/docs/how-to-guides/themes/theme-json.md). 
 
-**Disable inherit default layout**
+### Disable inherit default layout
 
 To disable the “Inherit default layout” setting for container blocks like the Group block, remove the following section: 
 
@@ -171,7 +172,7 @@ To disable the “Inherit default layout” setting for container blocks like th
 },
 ```
 
-**Limit options globally**
+### Limit options globally
 
 When using theme.json in a block or classic theme, these settings will stop the default color and typography controls from being enabled globally, greatly limiting what’s possible:
 

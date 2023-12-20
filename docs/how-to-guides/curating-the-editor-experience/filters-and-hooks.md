@@ -1,5 +1,7 @@
 # Filters and hooks
 
+The Editor provides numerous filters and hooks that allow you to modify the editing experience. Here are a few.
+
 ## Server-side theme.json filters
 
 The theme.json file is a great way to control interface options, but it only allows for global or block-level modifications, which can be limiting in some scenarios.
