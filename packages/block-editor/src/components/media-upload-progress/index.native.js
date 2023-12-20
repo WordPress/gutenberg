@@ -10,7 +10,7 @@ import { Component } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
-import { withIsConnected } from '@wordpress/compose';
+import { withNetworkConnectivity } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -167,4 +167,4 @@ export class MediaUploadProgress extends Component {
 	}
 }
 
-export default withIsConnected( MediaUploadProgress );
+export default withNetworkConnectivity( MediaUploadProgress );
