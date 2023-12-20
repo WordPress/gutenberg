@@ -138,6 +138,6 @@ class Gutenberg_HTML_Processor_State_6_5 {
 	 */
 	public function __construct() {
 		$this->stack_of_open_elements     = new Gutenberg_HTML_Open_Elements_6_5();
-		$this->active_formatting_elements = new WP_HTML_Active_Formatting_Elements();
+		$this->active_formatting_elements = new Gutenberg_HTML_Active_Formatting_Elements_6_5();
 	}
 }

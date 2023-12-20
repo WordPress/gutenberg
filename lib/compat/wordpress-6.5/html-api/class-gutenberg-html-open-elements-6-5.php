@@ -175,7 +175,7 @@ class Gutenberg_HTML_Open_Elements_6_5 {
 	 * @return bool Whether given element is in scope.
 	 */
 	public function has_element_in_list_item_scope( $tag_name ) {
-		throw new WP_HTML_Unsupported_Exception( 'Cannot process elements depending on list item scope.' );
+		throw new Gutenberg_HTML_Unsupported_Exception_6_5( 'Cannot process elements depending on list item scope.' );
 
 		return false; // The linter requires this unreachable code until the function is implemented and can return.
 	}
@@ -207,7 +207,7 @@ class Gutenberg_HTML_Open_Elements_6_5 {
 	 * @return bool Whether given element is in scope.
 	 */
 	public function has_element_in_table_scope( $tag_name ) {
-		throw new WP_HTML_Unsupported_Exception( 'Cannot process elements depending on table scope.' );
+		throw new Gutenberg_HTML_Unsupported_Exception_6_5( 'Cannot process elements depending on table scope.' );
 
 		return false; // The linter requires this unreachable code until the function is implemented and can return.
 	}
@@ -225,7 +225,7 @@ class Gutenberg_HTML_Open_Elements_6_5 {
 	 * @return bool Whether given element is in scope.
 	 */
 	public function has_element_in_select_scope( $tag_name ) {
-		throw new WP_HTML_Unsupported_Exception( 'Cannot process elements depending on select scope.' );
+		throw new Gutenberg_HTML_Unsupported_Exception_6_5( 'Cannot process elements depending on select scope.' );
 
 		return false; // The linter requires this unreachable code until the function is implemented and can return.
 	}

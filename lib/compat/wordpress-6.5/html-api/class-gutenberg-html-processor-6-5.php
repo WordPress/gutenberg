@@ -253,11 +253,11 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 		$p->state->insertion_mode = Gutenberg_HTML_Processor_State_6_5::INSERTION_MODE_IN_BODY;
 
 		// @todo Create "fake" bookmarks for non-existent but implied nodes.
-		$p->bookmarks['root-node']    = new WP_HTML_Span( 0, 0 );
-		$p->bookmarks['context-node'] = new WP_HTML_Span( 0, 0 );
+		$p->bookmarks['root-node']    = new Gutenberg_HTML_Span_6_5( 0, 0 );
+		$p->bookmarks['context-node'] = new Gutenberg_HTML_Span_6_5( 0, 0 );
 
 		$p->state->stack_of_open_elements->push(
-			new WP_HTML_Token(
+			new Gutenberg_HTML_Token_6_5(
 				'root-node',
 				'HTML',
 				false
@@ -265,7 +265,7 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 		);
 
 		$p->state->stack_of_open_elements->push(
-			new WP_HTML_Token(
+			new Gutenberg_HTML_Token_6_5(
 				'context-node',
 				$p->state->context_node[0],
 				false
@@ -524,7 +524,7 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 			return false;
 		}
 
-		$this->state->current_token = new WP_HTML_Token(
+		$this->state->current_token = new Gutenberg_HTML_Token_6_5(
 			$this->bookmark_tag(),
 			$this->get_tag(),
 			$this->is_tag_closer(),
@@ -538,9 +538,9 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 
 				default:
 					$this->last_error = self::ERROR_UNSUPPORTED;
-					throw new WP_HTML_Unsupported_Exception( "No support for parsing in the '{$this->state->insertion_mode}' state." );
+					throw new Gutenberg_HTML_Unsupported_Exception_6_5( "No support for parsing in the '{$this->state->insertion_mode}' state." );
 			}
-		} catch ( WP_HTML_Unsupported_Exception $e ) {
+		} catch ( Gutenberg_HTML_Unsupported_Exception_6_5 $e ) {
 			/*
 			 * Exceptions are used in this class to escape deep call stacks that
 			 * otherwise might involve messier calling and return conventions.
@@ -864,7 +864,7 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 
 			default:
 				$this->last_error = self::ERROR_UNSUPPORTED;
-				throw new WP_HTML_Unsupported_Exception( "Cannot process {$tag_name} element." );
+				throw new Gutenberg_HTML_Unsupported_Exception_6_5( "Cannot process {$tag_name} element." );
 		}
 	}
 
@@ -1205,7 +1205,7 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 		}
 
 		$this->last_error = self::ERROR_UNSUPPORTED;
-		throw new WP_HTML_Unsupported_Exception( 'Cannot reconstruct active formatting elements when advancing and rewinding is required.' );
+		throw new Gutenberg_HTML_Unsupported_Exception_6_5( 'Cannot reconstruct active formatting elements when advancing and rewinding is required.' );
 	}
 
 	/**
@@ -1259,7 +1259,7 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 			// > If there is no such element, then return and instead act as described in the "any other end tag" entry above.
 			if ( null === $formatting_element ) {
 				$this->last_error = self::ERROR_UNSUPPORTED;
-				throw new WP_HTML_Unsupported_Exception( 'Cannot run adoption agency when "any other end tag" is required.' );
+				throw new Gutenberg_HTML_Unsupported_Exception_6_5( 'Cannot run adoption agency when "any other end tag" is required.' );
 			}
 
 			// > If formatting element is not in the stack of open elements, then this is a parse error; remove the element from the list, and return.
@@ -1312,11 +1312,11 @@ class Gutenberg_HTML_Processor_6_5 extends Gutenberg_HTML_Tag_Processor_6_5 {
 			}
 
 			$this->last_error = self::ERROR_UNSUPPORTED;
-			throw new WP_HTML_Unsupported_Exception( 'Cannot extract common ancestor in adoption agency algorithm.' );
+			throw new Gutenberg_HTML_Unsupported_Exception_6_5( 'Cannot extract common ancestor in adoption agency algorithm.' );
 		}
 
 		$this->last_error = self::ERROR_UNSUPPORTED;
-		throw new WP_HTML_Unsupported_Exception( 'Cannot run adoption agency when looping required.' );
+		throw new Gutenberg_HTML_Unsupported_Exception_6_5( 'Cannot run adoption agency when looping required.' );
 	}
 
 	/**
