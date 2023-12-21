@@ -25,42 +25,43 @@ if ( window.__experimentalBlockBindings ) {
 			}
 			const fields = [];
 			if ( isSelected ) {
-				const data = useSelect( ( select ) => {
-					const postId = context.postId
-						? context.postId
-						: select( editorStore ).getCurrentPostId();
-					const postType = context.postType
-						? context.postType
-						: select( editorStore ).getCurrentPostType();
-					// If not a post type, return null.
-					if ( postType !== 'post' && postType !== 'page' ) {
-						return null;
-					}
-					const { getEntityRecord } = select( coreStore );
-					return getEntityRecord( 'postType', postType, postId );
-				}, [] );
+				const data = useSelect(
+					( select ) => {
+						const postId = context.postId
+							? context.postId
+							: select( editorStore ).getCurrentPostId();
+						const postType = context.postType
+							? context.postType
+							: select( editorStore ).getCurrentPostType();
+						const { getEntityRecord } = select( coreStore );
+						return getEntityRecord( 'postType', postType, postId );
+					},
+					[ context.postId, context.postType ]
+				);
 
-				if ( data ) {
-					// Adapt the data to the format expected by the fields list.
-					// Prettifying the name until we receive the label from the REST API endpoint.
-					const keyToLabel = ( key ) => {
-						return key
-							.split( '_' )
-							.map(
-								( word ) =>
-									word.charAt( 0 ).toUpperCase() +
-									word.slice( 1 )
-							)
-							.join( ' ' );
-					};
-					Object.entries( data.meta ).forEach( ( [ key, value ] ) => {
-						fields.push( {
-							key,
-							label: keyToLabel( key ),
-							value,
-						} );
-					} );
+				// TODO: Explore how to get the list of available fields depending on the template.
+				if ( ! data || ! data.meta ) {
+					return <BlockEdit key="edit" { ...props } />;
 				}
+
+				// Adapt the data to the format expected by the fields list.
+				// Prettifying the name until we receive the label from the REST API endpoint.
+				const keyToLabel = ( key ) => {
+					return key
+						.split( '_' )
+						.map(
+							( word ) =>
+								word.charAt( 0 ).toUpperCase() + word.slice( 1 )
+						)
+						.join( ' ' );
+				};
+				Object.entries( data.meta ).forEach( ( [ key, value ] ) => {
+					fields.push( {
+						key,
+						label: keyToLabel( key ),
+						value,
+					} );
+				} );
 			}
 
 			return (
@@ -86,6 +87,8 @@ if ( window.__experimentalBlockBindings ) {
 		'withToolbarControls'
 	);
 
+	// TODO: Review if there is a better filter for this.
+	// This runs for every block.
 	addFilter(
 		'editor.BlockEdit',
 		'core/block-bindings-ui/add-sources',
