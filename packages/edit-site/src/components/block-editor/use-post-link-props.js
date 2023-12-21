@@ -1,42 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { getPostLinkProps } from '../routes/link';
 
 const { useHistory } = unlock( routerPrivateApis );
 
 export function usePostLinkProps() {
 	const history = useHistory();
-	const getPostLinkProps = useCallback(
-		( params, state ) => {
-			const currentArgs = getQueryArgs( window.location.href );
-			const currentUrlWithoutArgs = removeQueryArgs(
-				window.location.href,
-				...Object.keys( currentArgs )
-			);
 
-			const newUrl = addQueryArgs( currentUrlWithoutArgs, {
-				post: params.postId,
-				action: 'edit',
-			} );
-
-			return {
-				href: newUrl,
-				onClick: ( event ) => {
-					event.preventDefault();
-					history.push( params, state );
-				},
-			};
-		},
-		[ history ]
-	);
-
-	return getPostLinkProps;
+	return ( params, state ) => {
+		return getPostLinkProps( history, params, state );
+	};
 }
