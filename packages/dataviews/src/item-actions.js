@@ -186,6 +186,9 @@ function CompactItemActions( { item, primaryActions, secondaryActions } ) {
 					size="compact"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
+					disabled={
+						! primaryActions.length && ! secondaryActions.length
+					}
 				/>
 			}
 			placement="bottom-end"
