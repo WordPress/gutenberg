@@ -4,30 +4,8 @@
  *
  * @package Gutenberg
  * @subpackage Interactivity API
- *
- * @phpcs:disable Generic.Files.OneObjectStructurePerFile.MultipleFound
  */
 
-class Helper_Class {
-	public function increment( $store ) {
-		return $store['state']['count'] + $store['context']['count'];
-	}
-
-	public static function static_increment( $store ) {
-		return $store['state']['count'] + $store['context']['count'];
-	}
-}
-
-function gutenberg_test_process_directives_helper_increment( $store ) {
-	return $store['state']['count'] + $store['context']['count'];
-}
-
-/**
- * Tests for the gutenberg_interactivity_process_rendered_html function.
- *
- * @group  interactivity-api
- * @covers gutenberg_interactivity_process_rendered_html
- */
 class Tests_Process_Directives extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
@@ -35,12 +13,8 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		register_block_type(
 			'gutenberg/test-context-level-1',
 			array(
-				'render_callback' => function ( $a, $b, $block ) {
-					$inner_blocks_html = '';
-					foreach ( $block->inner_blocks as $inner_block ) {
-						$inner_blocks_html .= $inner_block->render();
-					}
-					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'></p>' . $inner_blocks_html . '<p data-wp-text=\'context.MyText\'></p></div>';
+				'render_callback' => function ( $a, $content ) {
+					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'> <input class="level-1-input-1" data-wp-bind--value="context.MyText">' . $content . '<input class="level-1-input-2"data-wp-bind--value="context.MyText"></div>';
 				},
 				'supports'        => array(
 					'interactivity' => true,
@@ -51,12 +25,8 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		register_block_type(
 			'gutenberg/test-context-level-2',
 			array(
-				'render_callback' => function ( $a, $b, $block ) {
-					$inner_blocks_html = '';
-					foreach ( $block->inner_blocks as $inner_block ) {
-						$inner_blocks_html .= $inner_block->render();
-					}
-					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-2" }\'><p data-wp-text=\'context.MyText\'></p>' . $inner_blocks_html . '</div>';
+				'render_callback' => function ( $a, $content ) {
+					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-2" }\'><input class="level-2-input-1" data-wp-bind--value="context.MyText">' . $content . '</div>';
 				},
 				'supports'        => array(
 					'interactivity' => true,
@@ -68,7 +38,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 			'gutenberg/test-context-read-only',
 			array(
 				'render_callback' => function () {
-					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\'><p data-wp-text=\'context.MyText\'></p></div>';
+					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\'><input class="read-only-input-1" data-wp-bind--value="context.MyText"></div>';
 				},
 				'supports'        => array(
 					'interactivity' => true,
@@ -123,60 +93,60 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 	public function test_directive_processing_of_interactive_block() {
 		$post_content    = '<!-- wp:gutenberg/test-context-level-1 /-->';
 		$rendered_blocks = do_blocks( $post_content );
-		$expected        = '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p data-wp-text=\'context.MyText\'>level-1</p></div>';
-		$this->assertSame( $expected, $rendered_blocks );
+		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
+		$p->next_tag( array( 'class_name' => 'level-1-input-1' ) );
+		$value = $p->get_attribute( 'value' );
+		$this->assertSame( 'level-1', $value );
+		$p->next_tag( array( 'class_name' => 'level-1-input-2' ) );
+		$value = $p->get_attribute( 'value' );
+		$this->assertSame( 'level-1', $value );
 	}
 
-	public function test_directive_processing_child_blocks() {
-		$post_content    = '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group"><!-- wp:gutenberg/test-context-level-1 /--></div><!-- /wp:group -->';
-		$rendered_blocks = do_blocks( $post_content );
-		$expected        = '<div class="wp-block-group is-layout-constrained wp-block-group-is-layout-constrained"><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p data-wp-text=\'context.MyText\'>level-1</p></div></div>';
-		$this->assertSame( $expected, $rendered_blocks );
-	}
-
-	public function test_directive_processing_inner_non_interactive_blocks() {
-		$post_content    = '<!-- wp:gutenberg/test-context-level-1 --><div class="wp-block-create-block-context"><!-- wp:paragraph --><p>inner non interactive</p><!-- /wp:paragraph --></div><!--/wp:gutenberg/test-context-level-1 -->';
-		$rendered_blocks = do_blocks( $post_content );
-		$expected        = '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p>inner non interactive</p><p data-wp-text=\'context.MyText\'>level-1</p></div>';
-		$this->assertSame( $expected, $rendered_blocks );
-	}
 	public function test_directive_processing_two_interactive_blocks_at_same_level() {
-		$post_content    = '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group"><!-- wp:gutenberg/test-context-level-1 /--><!-- wp:gutenberg/test-context-level-1 /--></div><!-- /wp:group -->';
+		$post_content    = '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group"><!-- wp:gutenberg/test-context-level-1 /--><!-- wp:gutenberg/test-context-level-2 /--></div><!-- /wp:group -->';
 		$rendered_blocks = do_blocks( $post_content );
-		$expected        = '<div class="wp-block-group is-layout-constrained wp-block-group-is-layout-constrained"><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p data-wp-text=\'context.MyText\'>level-1</p></div><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p data-wp-text=\'context.MyText\'>level-1</p></div></div>';
-		$this->assertSame( $expected, $rendered_blocks );
-	}
-
-	public function test_directive_processing_alternating_interactive_and_not_interactive() {
-		$post_content    = '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group"><!-- wp:gutenberg/test-context-level-1 /--><!-- wp:paragraph --><p>inner non interactive</p><!-- /wp:paragraph --><!-- wp:gutenberg/test-context-level-1 /--></div><!-- /wp:group -->';
-		$rendered_blocks = do_blocks( $post_content );
-		$expected        = '<div class="wp-block-group is-layout-constrained wp-block-group-is-layout-constrained"><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p data-wp-text=\'context.MyText\'>level-1</p></div><p>inner non interactive</p><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p data-wp-text=\'context.MyText\'>level-1</p></div></div>';
-		$this->assertSame( $expected, $rendered_blocks );
+		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
+		$p->next_tag( array( 'class_name' => 'level-1-input-1' ) );
+		$value = $p->get_attribute( 'value' );
+		$this->assertSame( 'level-1', $value );
+		$p->next_tag( array( 'class_name' => 'level-1-input-2' ) );
+		$value = $p->get_attribute( 'value' );
+		$this->assertSame( 'level-1', $value );
+		$p->next_tag( array( 'class_name' => 'level-2-input-1' ) );
+		$value = $p->get_attribute( 'value' );
+		$this->assertSame( 'level-2', $value );
 	}
 
 	public function test_directives_are_processed_at_tag_end() {
 		$post_content    = '<!-- wp:gutenberg/test-context-level-1 --><!-- wp:gutenberg/test-context-level-2 /--><!-- wp:gutenberg/test-context-read-only /--><!-- /wp:gutenberg/test-context-level-1 -->';
 		$rendered_blocks = do_blocks( $post_content );
-		$expected        = '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-2" }\'><p data-wp-text=\'context.MyText\'>level-2</p></div><div data-wp-interactive=\'{"namespace": "gutenberg"}\'><p data-wp-text=\'context.MyText\'>level-1</p></div><p data-wp-text=\'context.MyText\'>level-1</p></div>';
-		$this->assertSame( $expected, $rendered_blocks );
+		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
+		$p->next_tag( array( 'class_name' => 'level-1-input-1' ) );
+		$value = $p->get_attribute( 'value' );
+		$this->assertSame( 'level-1', $value );
+		$p->next_tag( array( 'class_name' => 'level-2-input-1' ) );
+		$value = $p->get_attribute( 'value' );
+		$this->assertSame( 'level-2', $value );
+		$p->next_tag( array( 'class_name' => 'read-only-input-1' ) );
+		$value = $p->get_attribute( 'value' );
+		$this->assertSame( 'level-1', $value );
+		$p->next_tag( array( 'class_name' => 'level-1-input-2' ) );
+		$value = $p->get_attribute( 'value' );
+		$this->assertSame( 'level-1', $value );
 	}
 
-	public function test_directive_processing_with_patterns() {
-		$post_content    = '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group"><!-- wp:gutenberg/test-context-level-1 --><!-- wp:paragraph --><p>inner non interactive</p><!-- /wp:paragraph --><!-- wp:gutenberg/test-context-level-2 --><!-- wp:gutenberg/test-context-read-only /--><!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group"><!-- wp:paragraph --><p>inner non interactive</p><!-- /wp:paragraph --><!-- wp:gutenberg/test-context-read-only /--><!-- wp:paragraph --><p>inner non interactive</p><!-- /wp:paragraph --></div><!-- /wp:group --><!-- /wp:gutenberg/test-context-level-2 --><!-- /wp:gutenberg/test-context-level-1 --></div><!-- /wp:group -->';
-		$rendered_blocks = do_blocks( $post_content );
-		$expected        = '<div class="wp-block-group is-layout-constrained wp-block-group-is-layout-constrained"><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'><p data-wp-text=\'context.MyText\'>level-1</p><p>inner non interactive</p><div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-2" }\'><p data-wp-text=\'context.MyText\'>level-2</p><div data-wp-interactive=\'{"namespace": "gutenberg"}\'><p data-wp-text=\'context.MyText\'>level-2</p></div><div class="wp-block-group is-layout-constrained wp-block-group-is-layout-constrained"><p>inner non interactive</p><div data-wp-interactive=\'{"namespace": "gutenberg"}\'><p data-wp-text=\'context.MyText\'>level-2</p></div><p>inner non interactive</p></div></div><p data-wp-text=\'context.MyText\'>level-1</p></div></div>';
-		$this->assertSame( $expected, $rendered_blocks );
+	public function increment( $store ) {
+		return $store['state']['count'] + $store['context']['count'];
 	}
-}
 
+	public static function static_increment( $store ) {
+		return $store['state']['count'] + $store['context']['count'];
+	}
 
-/**
- * Tests for the gutenberg_interactivity_evaluate_reference function.
- *
- * @group  interactivity-api
- * @covers gutenberg_interactivity_evaluate_reference
- */
-class Tests_Utils_Evaluate extends WP_UnitTestCase {
+	protected function gutenberg_test_process_directives_helper_increment( $store ) {
+		return $store['state']['count'] + $store['context']['count'];
+	}
+
 	public function test_evaluate_function_should_access_state() {
 		// Init a simple store.
 		wp_store(
@@ -227,7 +197,6 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 
 	public function test_evaluate_function_should_execute_anonymous_functions() {
 		$context = new WP_Directive_Context( array( 'count' => 2 ) );
-		$helper  = new Helper_Class();
 
 		wp_store(
 			array(
@@ -235,34 +204,29 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 					'count' => 3,
 				),
 				'selectors' => array(
-					'anonymous_function'           => function ( $store ) {
+					'anonymous_function'  => function ( $store ) {
 						return $store['state']['count'] + $store['context']['count'];
 					},
 					// Other types of callables should not be executed.
-					'function_name'                => 'gutenberg_test_process_directives_helper_increment',
-					'class_method'                 => array( $helper, 'increment' ),
-					'class_static_method'          => 'Helper_Class::static_increment',
-					'class_static_method_as_array' => array( 'Helper_Class', 'static_increment' ),
+					'function_name'       => array( $this, 'gutenberg_test_process_directives_helper_increment' ),
+					'class_method'        => array( $this, 'increment' ),
+					'class_static_method' => array( $this, 'static_increment' ),
 				),
 			)
 		);
 
 		$this->assertSame( 5, gutenberg_interactivity_evaluate_reference( 'selectors.anonymous_function', $context->get_context() ) );
 		$this->assertSame(
-			'gutenberg_test_process_directives_helper_increment',
+			array( $this, 'gutenberg_test_process_directives_helper_increment' ),
 			gutenberg_interactivity_evaluate_reference( 'selectors.function_name', $context->get_context() )
 		);
 		$this->assertSame(
-			array( $helper, 'increment' ),
+			array( $this, 'increment' ),
 			gutenberg_interactivity_evaluate_reference( 'selectors.class_method', $context->get_context() )
 		);
 		$this->assertSame(
-			'Helper_Class::static_increment',
+			array( $this, 'static_increment' ),
 			gutenberg_interactivity_evaluate_reference( 'selectors.class_static_method', $context->get_context() )
-		);
-		$this->assertSame(
-			array( 'Helper_Class', 'static_increment' ),
-			gutenberg_interactivity_evaluate_reference( 'selectors.class_static_method_as_array', $context->get_context() )
 		);
 	}
 }
