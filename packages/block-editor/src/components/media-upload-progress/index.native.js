@@ -16,11 +16,12 @@ import { withNetworkConnectivity } from '@wordpress/compose';
  * Internal dependencies
  */
 import styles from './styles.scss';
-
-export const MEDIA_UPLOAD_STATE_UPLOADING = 1;
-export const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
-export const MEDIA_UPLOAD_STATE_FAILED = 3;
-export const MEDIA_UPLOAD_STATE_RESET = 4;
+import {
+	MEDIA_UPLOAD_STATE_UPLOADING,
+	MEDIA_UPLOAD_STATE_SUCCEEDED,
+	MEDIA_UPLOAD_STATE_FAILED,
+	MEDIA_UPLOAD_STATE_RESET,
+} from './constants';
 
 export class MediaUploadProgress extends Component {
 	constructor( props ) {
