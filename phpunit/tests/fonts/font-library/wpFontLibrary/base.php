@@ -13,7 +13,7 @@ abstract class WP_Font_Library_UnitTestCase extends WP_UnitTestCase {
 		$property->setAccessible( true );
 		$property->setValue( array() );
 	}
- 
+
 	public function set_up() {
 		$this->reset_font_collections();
 	}
