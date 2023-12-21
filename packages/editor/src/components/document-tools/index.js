@@ -46,30 +46,19 @@ function DocumentTools( {
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editorStore );
 	const {
-		isInserterDisabled,
 		isInserterOpened,
 		isListViewOpen,
 		listViewShortcut,
 		listViewToggleRef,
 		hasFixedToolbar,
 	} = useSelect( ( select ) => {
-		const {
-			hasInserterItems,
-			getBlockRootClientId,
-			getBlockSelectionEnd,
-			getSettings,
-		} = select( blockEditorStore );
-		const { getEditorSettings, isListViewOpened, getListViewToggleRef } =
-			unlock( select( editorStore ) );
+		const { getSettings } = select( blockEditorStore );
+		const { isListViewOpened, getListViewToggleRef } = unlock(
+			select( editorStore )
+		);
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		return {
-			isInserterDisabled:
-				! getEditorSettings().richEditingEnabled ||
-				// Todo change with insertion point
-				! hasInserterItems(
-					getBlockRootClientId( getBlockSelectionEnd() )
-				),
 			isInserterOpened: select( editorStore ).isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
 			listViewShortcut: getShortcutRepresentation(
@@ -127,7 +116,7 @@ function DocumentTools( {
 					isPressed={ isInserterOpened }
 					onMouseDown={ preventDefault }
 					onClick={ toggleInserter }
-					disabled={ disableBlockTools || isInserterDisabled }
+					disabled={ disableBlockTools }
 					icon={ plus }
 					label={ showIconLabels ? shortLabel : longLabel }
 					showTooltip={ ! showIconLabels }
