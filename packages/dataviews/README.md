@@ -15,15 +15,15 @@ npm install @wordpress/dataviews --save
 ```js
 <DataViews
 	data={ pages }
+	paginationInfo={ { totalItems, totalPages } }
 	view={ view }
 	onChangeView={ onChangeView }
 	fields={ fields }
 	actions={ [ trashPostAction ] }
-	search={ true }
+	search={ false }
 	searchLabel="Filter list"
 	getItemId={ ( item ) => item.id }
-	isLoading={ isLoading }
-	paginationInfo={ { totalItems, totalPages } }
+	isLoading={ true }
 	supportedLayouts={ [ 'table' ] }
 	deferredRendering={ true }
 	onSelectionChange={ ( items ) => { /* ... */ } }
@@ -42,6 +42,11 @@ Example:
 	{ ... }
 ]
 ```
+
+## Pagination Info
+
+- `totalItems`: the total number of items in the datasets.
+- `totalPages`: the total number of pages, taking into account the total items in the dataset and the number of items per page provided by the user.
 
 ## View
 
