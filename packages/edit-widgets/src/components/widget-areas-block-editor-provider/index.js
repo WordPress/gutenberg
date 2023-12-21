@@ -25,7 +25,9 @@ import { store as editWidgetsStore } from '../../store';
 import { ALLOW_REUSABLE_BLOCKS } from '../../constants';
 import { unlock } from '../../lock-unlock';
 
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { ExperimentalBlockEditorProvider, settingsKeys } = unlock(
+	blockEditorPrivateApis
+);
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 function usePageSettings() {
@@ -90,7 +92,7 @@ export default function WidgetAreasBlockEditorProvider( {
 			mediaUpload: mediaUploadBlockEditor,
 			templateLock: 'all',
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
-			__experimentalUsePageSettings: usePageSettings,
+			[ settingsKeys.usePageSettings ]: usePageSettings,
 		};
 	}, [
 		blockEditorSettings,
