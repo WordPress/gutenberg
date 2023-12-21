@@ -132,13 +132,14 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 	return Object.keys( overrides ).length > 0 ? overrides : undefined;
 }
 
-function setBlockEditMode( setEditMode, blocks ) {
+function setBlockEditMode( setEditMode, blocks, mode ) {
 	blocks.forEach( ( block ) => {
-		const editMode = isPartiallySynced( block )
-			? 'contentOnly'
-			: 'disabled';
+		let editMode = mode;
+		if ( ! editMode ) {
+			editMode = isPartiallySynced( block ) ? 'contentOnly' : 'disabled';
+		}
 		setEditMode( block.clientId, editMode );
-		setBlockEditMode( setEditMode, block.innerBlocks );
+		setBlockEditMode( setEditMode, block.innerBlocks, mode );
 	} );
 }
 
@@ -282,6 +283,11 @@ export default function ReusableBlockEdit( {
 		}, blockEditorStore );
 	}, [ syncDerivedUpdates, patternClientId, registry, setAttributes ] );
 
+	const handleEditOriginal = ( event ) => {
+		setBlockEditMode( setBlockEditingMode, innerBlocks, 'default' );
+		editOriginalProps.onClick( event );
+	};
+
 	let children = null;
 
 	if ( hasAlreadyRendered ) {
@@ -313,7 +319,10 @@ export default function ReusableBlockEdit( {
 			{ userCanEdit && editOriginalProps && (
 				<BlockControls>
 					<ToolbarGroup>
-						<ToolbarButton { ...editOriginalProps }>
+						<ToolbarButton
+							href={ editOriginalProps.href }
+							onClick={ handleEditOriginal }
+						>
 							{ __( 'Edit original' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
