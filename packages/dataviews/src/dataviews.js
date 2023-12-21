@@ -16,6 +16,8 @@ import Filters from './filters';
 import Search from './search';
 import { VIEW_LAYOUTS } from './constants';
 
+const defaultGetItemId = ( item ) => item.id;
+
 export default function DataViews( {
 	view,
 	onChangeView,
@@ -24,7 +26,7 @@ export default function DataViews( {
 	searchLabel = undefined,
 	actions,
 	data,
-	getItemId,
+	getItemId = defaultGetItemId,
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
