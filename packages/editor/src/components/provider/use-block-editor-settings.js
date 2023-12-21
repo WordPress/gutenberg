@@ -76,7 +76,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableIsBlockBasedTheme',
 	'__experimentalArchiveTitleTypeLabel',
 	'__experimentalArchiveTitleNameLabel',
-	'__experimentalOnSelectPost',
+	'__experimentalGetPostLinkProps',
 ];
 
 /**
@@ -100,7 +100,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		userPatternCategories,
 		restBlockPatterns,
 		restBlockPatternCategories,
-		selectPost,
+		getPostLinkProps,
 	} = useSelect(
 		( select ) => {
 			const isWeb = Platform.OS === 'web';
@@ -113,7 +113,8 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				getBlockPatterns,
 				getBlockPatternCategories,
 			} = select( coreStore );
-			const { onSelectPost } = select( editorStore ).getEditorSettings();
+			const { getPostLinkProps: postLinkProps } =
+				select( editorStore ).getEditorSettings();
 
 			const siteSettings = canUser( 'read', 'settings' )
 				? getEntityRecord( 'root', 'site' )
@@ -141,7 +142,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				userPatternCategories: getUserPatternCategories(),
 				restBlockPatterns: getBlockPatterns(),
 				restBlockPatternCategories: getBlockPatternCategories(),
-				selectPost: onSelectPost,
+				getPostLinkProps: postLinkProps,
 			};
 		},
 		[ postType, postId ]
@@ -249,7 +250,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					? [ [ 'core/navigation', {}, [] ] ]
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
-			__experimentalOnSelectPost: selectPost,
+			__experimentalGetPostLinkProps: getPostLinkProps,
 		} ),
 		[
 			allowRightClickOverrides,
@@ -267,7 +268,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			pageForPosts,
 			postType,
 			setIsInserterOpened,
-			selectPost,
+			getPostLinkProps,
 		]
 	);
 }

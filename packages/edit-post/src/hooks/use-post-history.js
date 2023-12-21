@@ -16,7 +16,7 @@ import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
  * @param {string} initialPostType The post type of the post when the editor loaded.
  *
  * @return {Object} An object containing the `currentPost` variable and
- *                 `onSelectPost` and `goBack` functions.
+ *                 `getPostLinkProps` and `goBack` functions.
  */
 export default function usePostHistory( initialPostId, initialPostType ) {
 	const [ postHistory, dispatch ] = useReducer(
@@ -35,7 +35,7 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 		[ { postId: initialPostId, postType: initialPostType } ]
 	);
 
-	const onSelectPost = useCallback( ( params ) => {
+	const getPostLinkProps = useCallback( ( params ) => {
 		const currentArgs = getQueryArgs( window.location.href );
 		const currentUrlWithoutArgs = removeQueryArgs(
 			window.location.href,
@@ -47,9 +47,6 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 			action: 'edit',
 		} );
 
-		// This return signature is matched to `useLink` in the site editor to allow the onSelectPost
-		// setting to be easily shared between edit-post and edit-site. In edit-site useLink is passed in
-		// as onSelectPost in order to use the existing edit-site client side routing to move between posts.
 		return {
 			href: newUrl,
 			onClick: ( event ) => {
@@ -70,7 +67,7 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 
 	return {
 		currentPost,
-		onSelectPost,
+		getPostLinkProps,
 		goBack: postHistory.length > 1 ? goBack : undefined,
 	};
 }

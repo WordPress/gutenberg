@@ -35,7 +35,7 @@ function Editor( {
 	...props
 } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { currentPost, onSelectPost, goBack } = usePostHistory(
+	const { currentPost, getPostLinkProps, goBack } = usePostHistory(
 		initialPostId,
 		initialPostType
 	);
@@ -117,7 +117,7 @@ function Editor( {
 	const editorSettings = useMemo( () => {
 		const result = {
 			...settings,
-			onSelectPost,
+			getPostLinkProps,
 			goBack,
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
@@ -161,7 +161,7 @@ function Editor( {
 		blockTypes,
 		preferredStyleVariations,
 		updatePreferredStyleVariations,
-		onSelectPost,
+		getPostLinkProps,
 		goBack,
 	] );
 
