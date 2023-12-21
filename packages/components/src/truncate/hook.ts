@@ -39,7 +39,7 @@ export default function useTruncate(
 		childrenAsText = children;
 	} else if ( typeof children === 'number' ) {
 		childrenAsText = children.toString();
-	} else {
+	} else if ( typeof children !== 'undefined' ) {
 		warn(
 			`Truncate: text truncation has been disabled, since it is only available when passing 'children' of type 'string' or 'number'. Received: ${ children }`
 		);
