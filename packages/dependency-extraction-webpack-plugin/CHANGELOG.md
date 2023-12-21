@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Breaking
+### Breaking Changes
 
 - Drop support for webpack 4.
 - Drop support for Node.js versions < 18.
