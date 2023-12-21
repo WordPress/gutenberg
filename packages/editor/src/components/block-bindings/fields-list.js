@@ -18,10 +18,11 @@ export default function BlockBindingsFieldsList( props ) {
 	// TODO: Try to abstract this function to be reused across all the sources.
 	function selectItem( item ) {
 		// Modify the attribute we are binding.
-		// TODO: Not sure if we should do this. We might need to process the bindings attribute somehow in the editor to modify the content with context.
-		// TODO: Get the type from the block attribute definition and modify/validate the value returned by the source if needed.
+		// TODO: Inherit the value from the bindings instead of setting it manually.
 		const newAttributes = {};
-		newAttributes[ currentAttribute ] = item.value;
+		newAttributes[ currentAttribute ] = item.value ? item.value : '';
+		// TODO: Improve the way we manage placeholders.
+		newAttributes.placeholder = '{ ' + item.placeholder + ' }';
 		setAttributes( newAttributes );
 
 		// Update the bindings property.

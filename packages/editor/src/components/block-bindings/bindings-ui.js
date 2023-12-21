@@ -222,6 +222,7 @@ function RemoveBindingButton( props ) {
 				// Modify the attribute we are binding.
 				const newAttributes = {};
 				newAttributes[ currentAttribute ] = '';
+				newAttributes.placeholder = null;
 				props.setAttributes( newAttributes );
 
 				updateBlockBindingsAttribute(
