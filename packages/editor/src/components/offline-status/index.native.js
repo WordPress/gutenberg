@@ -39,7 +39,7 @@ const OfflineStatus = () => {
 
 	return ! isConnected ? (
 		<View style={ containerStyle }>
-			<Icon fill={ iconStyle.fill } icon={ offlineIcon } />
+			<Icon icon={ offlineIcon } style={ iconStyle } />
 			<Text style={ textStyle }>{ __( 'Working Offline' ) }</Text>
 		</View>
 	) : null;
