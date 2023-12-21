@@ -13,6 +13,7 @@
 ### Enhancements
 
 -   `DateTimePicker`: Adjustment of the dot position on DayButton and expansion of the button area. ([#55502](https://github.com/WordPress/gutenberg/pull/55502)).
+-   `Composite`: Implementing useCompositeState with Ariakit ([#57304](https://github.com/WordPress/gutenberg/pull/57304))
 
 ### Experimental
 
