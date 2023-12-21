@@ -189,8 +189,7 @@ function gutenberg_process_interactive_block( $interactive_block, $context, $dir
 			// This is an inner block. It may be an interactive block or a
 			// non-interactive block.
 			$content                   .= '<wp-inner-blocks-' . $block_index . '></wp-inner-blocks-' . $block_index . '>';
-			$interactive_inner_blocks[] = $interactive_block['innerBlocks'][ $block_index ];
-			$block_index               += 1;
+			$interactive_inner_blocks[] = $interactive_block['innerBlocks'][ $block_index++ ];
 		}
 	}
 	return gutenberg_process_interactive_html( $content, $context, $directives, $interactive_inner_blocks );
@@ -219,8 +218,7 @@ function gutenberg_process_non_interactive_block( $non_interactive_block, $conte
 		} else {
 			// This is an inner block. It may be an interactive block or a
 			// non-interactive block.
-			$inner_block  = $non_interactive_block['innerBlocks'][ $block_index ];
-			$block_index += 1;
+			$inner_block = $non_interactive_block['innerBlocks'][ $block_index++ ];
 
 			if ( 'core/interactivity-wrapper' === $inner_block['blockName'] ) {
 				$content .= gutenberg_process_interactive_block( $inner_block, $context, $directives );
@@ -254,16 +252,12 @@ function gutenberg_process_interactive_html( $html, $context, $directives, $inne
 	$prefix                 = 'data-wp-';
 	$tag_stack              = array();
 	$inner_processed_blocks = array();
-
+	$inner_blocks_index     = 0;
 	while ( $tags->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
 		$tag_name = $tags->get_tag();
-		if ( ! isset( $inner_blocks_index ) ) {
-			$inner_blocks_index = 0;
-		}
 		// Process the inner blocks.
 		if ( str_contains( $tag_name, 'WP-INNER-BLOCKS' ) && ! empty( $inner_blocks ) && ! $tags->is_tag_closer() ) {
-			$inner_processed_blocks[ strtolower( $tag_name ) ] = gutenberg_process_interactive_block( $inner_blocks[ $inner_blocks_index ], $context, $directives );
-			$inner_blocks_index                               += 1;
+			$inner_processed_blocks[ strtolower( $tag_name ) ] = gutenberg_process_interactive_block( $inner_blocks[ $inner_blocks_index++ ], $context, $directives );
 		}
 		if ( $tags->is_tag_closer() ) {
 			if ( 0 === count( $tag_stack ) ) {
