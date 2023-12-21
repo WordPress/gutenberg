@@ -39,6 +39,8 @@ function DocumentTools( {
 	showIconLabels,
 	disableBlockTools = false,
 	children,
+	// This is a temporary prop until the list view is fully unified between post and site editors.
+	listViewLabel = __( 'Document Overview' ),
 } ) {
 	const inserterButton = useRef();
 	const { setIsInserterOpened, setIsListViewOpened } =
@@ -163,7 +165,7 @@ function DocumentTools( {
 							disabled={ disableBlockTools }
 							isPressed={ isListViewOpen }
 							/* translators: button label text should, if possible, be under 16 characters. */
-							label={ __( 'Document Overview' ) }
+							label={ listViewLabel }
 							onClick={ toggleListView }
 							shortcut={ listViewShortcut }
 							showTooltip={ ! showIconLabels }

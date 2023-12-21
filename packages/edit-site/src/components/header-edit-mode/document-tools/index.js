@@ -44,6 +44,7 @@ export default function DocumentTools( {
 		<EditorDocumentTools
 			showIconLabels={ showIconLabels }
 			disableBlockTools={ ! isVisualMode }
+			listViewLabel={ __( 'List View' ) }
 		>
 			{ isZoomedOutViewExperimentEnabled &&
 				isLargeViewport &&
