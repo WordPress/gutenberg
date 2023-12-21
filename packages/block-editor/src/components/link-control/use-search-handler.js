@@ -17,6 +17,7 @@ import {
 	URL_TYPE,
 } from './constants';
 import { store as blockEditorStore } from '../../store';
+import { default as settingsKeys } from '../../private-settings-keys';
 
 export const handleNoop = () => Promise.resolve( [] );
 
@@ -113,7 +114,7 @@ export default function useSearchHandler(
 			const { getSettings } = select( blockEditorStore );
 			const settings = getSettings();
 			return {
-				usePageSettings: settings.__experimentalUsePageSettings,
+				usePageSettings: settings[ settingsKeys.usePageSettings ],
 				fetchSearchSuggestions:
 					settings.__experimentalFetchLinkSuggestions,
 			};

@@ -24,6 +24,7 @@ import {
 import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
 import { getDuotoneFilter } from './components/duotone/utils';
+import { default as settingsKeys } from './private-settings-keys';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -52,4 +53,5 @@ lock( privateApis, {
 	ReusableBlocksRenameHint,
 	useReusableBlocksRenameHint,
 	usesContextKey,
+	settingsKeys,
 } );

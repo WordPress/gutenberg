@@ -9,6 +9,7 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -16,6 +17,9 @@ import { __ } from '@wordpress/i18n';
 import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { settingsKeys } = unlock( blockEditorPrivateApis );
 
 const EMPTY_BLOCKS_LIST = [];
 
@@ -235,7 +239,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			// Check these two properties: they were not present in the site editor.
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
-			__experimentalUsePageSettings: usePageSettings,
+			[ settingsKeys.usePageSettings ]: usePageSettings,
 			__experimentalPreferPatternsOnRoot: postType === 'wp_template',
 			templateLock:
 				postType === 'wp_navigation' ? 'insert' : settings.templateLock,
