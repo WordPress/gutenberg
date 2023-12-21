@@ -226,6 +226,16 @@ Array of operations that can be performed upon each record. Each action is an ob
     - `in`: operator to be used in filters for fields of type `enumeration`.
     - `notIn`: operator to be used in filters for fields of type `enumeration`.
 
+## Other properties
+
+- `search`: whether the search input is enabled. `true` by default.
+- `searchLabel`: what text to show in the search input. "Filter list" by default.
+- `getItemId`: function that receives an item and return an unique identifier for it. Required.
+- `isLoading`: whether the data is loading. `false` by default.
+- `supportedLayouts`: array of layouts supported. By default, all are: `table`, `grid`, `list`.
+- `deferredRendering`: whether the items should be rendered asynchronously. Required.
+- `onSelectionChange`: callback that returns the selected items. So far, only the `list` view implements this.
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
