@@ -30,7 +30,7 @@
 		"@actions/github": "^5.0.0",
 		"@babel/runtime": "^7.16.0",
 		"@octokit/request-error": "^2.1.0",
-		"@octokit/webhooks": "7.1.0"
+		"@octokit/webhooks": "^9.26.3"
 	},
 	"publishConfig": {
 		"access": "public"
