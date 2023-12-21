@@ -35,13 +35,13 @@ export default function mediaUpload( {
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
 	maxUploadFileSize =
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
-
+	const currentPostId = getCurrentPostId();
 	uploadMedia( {
 		allowedTypes,
 		filesList,
 		onFileChange,
 		additionalData: {
-			post: getCurrentPostId(),
+			...( ! isNaN( currentPostId ) ? { post: currentPostId } : {} ),
 			...additionalData,
 		},
 		maxUploadFileSize,

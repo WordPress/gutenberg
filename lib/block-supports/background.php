@@ -103,4 +103,7 @@ WP_Block_Supports::get_instance()->register(
 	)
 );
 
+if ( function_exists( 'wp_render_background_support' ) ) {
+	remove_filter( 'render_block', 'wp_render_background_support' );
+}
 add_filter( 'render_block', 'gutenberg_render_background_support', 10, 2 );

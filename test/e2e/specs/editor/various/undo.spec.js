@@ -168,12 +168,7 @@ test.describe( 'undo', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'test' );
-		await page.click( 'role=button[name="Save draft"i]' );
-		await expect(
-			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text=Draft saved'
-			)
-		).toBeVisible();
+		await editor.saveDraft();
 		await page.reload();
 		await editor.canvas.locator( '[data-type="core/paragraph"]' ).click();
 		await pageUtils.pressKeys( 'primary+a' );
@@ -344,12 +339,7 @@ test.describe( 'undo', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'original' );
-		await page.click( 'role=button[name="Save draft"i]' );
-		await expect(
-			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text=Draft saved'
-			)
-		).toBeVisible();
+		await editor.saveDraft();
 		await page.reload();
 
 		// Issue is demonstrated by forcing state merges (multiple inputs) on
@@ -384,12 +374,7 @@ test.describe( 'undo', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1' );
-		await page.click( 'role=button[name="Save draft"i]' );
-		await expect(
-			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text=Draft saved'
-			)
-		).toBeVisible();
+		await editor.saveDraft();
 		await pageUtils.pressKeys( 'primary+z' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
@@ -420,12 +405,7 @@ test.describe( 'undo', () => {
 			.click();
 
 		await page.keyboard.type( '1' );
-		await page.click( 'role=button[name="Save draft"i]' );
-		await expect(
-			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text=Draft saved'
-			)
-		).toBeVisible();
+		await editor.saveDraft();
 		await page.reload();
 
 		// Expect undo button to be disabled.

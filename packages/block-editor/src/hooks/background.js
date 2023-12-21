@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { isBlobURL } from '@wordpress/blob';
 import { getBlockSupport } from '@wordpress/blocks';
+import { focus } from '@wordpress/dom';
 import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	DropZone,
@@ -19,7 +20,7 @@ import {
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Platform, useCallback } from '@wordpress/element';
+import { Platform, useCallback, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
@@ -29,7 +30,7 @@ import { getFilename } from '@wordpress/url';
  */
 import InspectorControls from '../components/inspector-controls';
 import MediaReplaceFlow from '../components/media-replace-flow';
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 
@@ -40,13 +41,13 @@ export const IMAGE_BACKGROUND_TYPE = 'image';
  * Checks if there is a current value in the background image block support
  * attributes.
  *
- * @param {Object} props Block props.
+ * @param {Object} style Style attribute.
  * @return {boolean}     Whether or not the block has a background image value set.
  */
-export function hasBackgroundImageValue( props ) {
+export function hasBackgroundImageValue( style ) {
 	const hasValue =
-		!! props.attributes.style?.background?.backgroundImage?.id ||
-		!! props.attributes.style?.background?.backgroundImage?.url;
+		!! style?.background?.backgroundImage?.id ||
+		!! style?.background?.backgroundImage?.url;
 
 	return hasValue;
 }
@@ -81,13 +82,10 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
  * Resets the background image block support attributes. This can be used when disabling
  * the background image controls for a block via a `ToolsPanel`.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param {Object}   style         Style attribute.
+ * @param {Function} setAttributes Function to set block's attributes.
  */
-export function resetBackgroundImage( { attributes = {}, setAttributes } ) {
-	const { style = {} } = attributes;
-
+export function resetBackgroundImage( style = {}, setAttributes ) {
 	setAttributes( {
 		style: cleanEmptyObject( {
 			...style,
@@ -144,17 +142,22 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 	);
 }
 
-function BackgroundImagePanelItem( props ) {
-	const { attributes, clientId, setAttributes } = props;
+function BackgroundImagePanelItem( { clientId, setAttributes } ) {
+	const { style, mediaUpload } = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSettings } =
+				select( blockEditorStore );
 
-	const { id, title, url } =
-		attributes.style?.background?.backgroundImage || {};
+			return {
+				style: getBlockAttributes( clientId )?.style,
+				mediaUpload: getSettings().mediaUpload,
+			};
+		},
+		[ clientId ]
+	);
+	const { id, title, url } = style?.background?.backgroundImage || {};
 
-	const { mediaUpload } = useSelect( ( select ) => {
-		return {
-			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
-		};
-	} );
+	const replaceContainerRef = useRef();
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
@@ -164,9 +167,9 @@ function BackgroundImagePanelItem( props ) {
 	const onSelectMedia = ( media ) => {
 		if ( ! media || ! media.url ) {
 			const newStyle = {
-				...attributes.style,
+				...style,
 				background: {
-					...attributes.style?.background,
+					...style?.background,
 					backgroundImage: undefined,
 				},
 			};
@@ -198,9 +201,9 @@ function BackgroundImagePanelItem( props ) {
 		}
 
 		const newStyle = {
-			...attributes.style,
+			...style,
 			background: {
-				...attributes.style?.background,
+				...style?.background,
 				backgroundImage: {
 					url: media.url,
 					id: media.id,
@@ -241,17 +244,22 @@ function BackgroundImagePanelItem( props ) {
 		};
 	}, [] );
 
+	const hasValue = hasBackgroundImageValue( style );
+
 	return (
 		<ToolsPanelItem
 			className="single-column"
-			hasValue={ () => hasBackgroundImageValue( props ) }
+			hasValue={ () => hasValue }
 			label={ __( 'Background image' ) }
-			onDeselect={ () => resetBackgroundImage( props ) }
+			onDeselect={ () => resetBackgroundImage( style, setAttributes ) }
 			isShownByDefault={ true }
 			resetAllFilter={ resetAllFilter }
 			panelId={ clientId }
 		>
-			<div className="block-editor-hooks__background__inspector-media-replace-container">
+			<div
+				className="block-editor-hooks__background__inspector-media-replace-container"
+				ref={ replaceContainerRef }
+			>
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ url }
@@ -267,9 +275,23 @@ function BackgroundImagePanelItem( props ) {
 					}
 					variant="secondary"
 				>
-					<MenuItem onClick={ () => resetBackgroundImage( props ) }>
-						{ __( 'Reset ' ) }
-					</MenuItem>
+					{ hasValue && (
+						<MenuItem
+							onClick={ () => {
+								const [ toggleButton ] = focus.tabbable.find(
+									replaceContainerRef.current
+								);
+								// Focus the toggle button and close the dropdown menu.
+								// This ensures similar behaviour as to selecting an image, where the dropdown is
+								// closed and focus is redirected to the dropdown toggle button.
+								toggleButton?.focus();
+								toggleButton?.click();
+								resetBackgroundImage( style, setAttributes );
+							} }
+						>
+							{ __( 'Reset ' ) }
+						</MenuItem>
+					) }
 				</MediaReplaceFlow>
 				<DropZone
 					onFilesDrop={ onFilesDrop }
@@ -281,19 +303,17 @@ function BackgroundImagePanelItem( props ) {
 }
 
 export function BackgroundImagePanel( props ) {
-	const isBackgroundImageSupported =
-		useSetting( 'background.backgroundImage' ) &&
-		hasBackgroundSupport( props.name, 'backgroundImage' );
-
-	if ( ! isBackgroundImageSupported ) {
+	const [ backgroundImage ] = useSettings( 'background.backgroundImage' );
+	if (
+		! backgroundImage ||
+		! hasBackgroundSupport( props.name, 'backgroundImage' )
+	) {
 		return null;
 	}
 
 	return (
 		<InspectorControls group="background">
-			{ isBackgroundImageSupported && (
-				<BackgroundImagePanelItem { ...props } />
-			) }
+			<BackgroundImagePanelItem { ...props } />
 		</InspectorControls>
 	);
 }

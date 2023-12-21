@@ -3,6 +3,8 @@
  */
 import { createRegistry } from '@wordpress/data';
 
+const getFooSelector = ( state ) => state;
+
 const testStore = {
 	reducer: ( state = null, action ) => {
 		if ( action.type === 'RECEIVE' ) {
@@ -12,7 +14,7 @@ const testStore = {
 		return state;
 	},
 	selectors: {
-		getFoo: ( state ) => state,
+		getFoo: getFooSelector,
 	},
 };
 
@@ -55,7 +57,7 @@ describe( 'getIsResolving', () => {
 		expect( result ).toBe( true );
 	} );
 
-	it( 'should normalize args ard return the right value', () => {
+	it( 'should normalize args and return the right value', () => {
 		registry.dispatch( 'testStore' ).startResolution( 'getFoo', [] );
 		const { getIsResolving } = registry.select( 'testStore' );
 
@@ -441,5 +443,39 @@ describe( 'countSelectorsByStatus', () => {
 		const result2 = countSelectorsByStatus();
 
 		expect( result1 ).not.toBe( result2 );
+	} );
+} );
+
+describe( 'Selector arguments normalization', () => {
+	let registry;
+	beforeEach( () => {
+		registry = createRegistry();
+		registry.registerStore( 'testStore', testStore );
+	} );
+
+	it( 'should call normalization method on target selector if exists', () => {
+		const normalizationFunction = jest.fn( ( args ) => {
+			return args.map( Number );
+		} );
+		getFooSelector.__unstableNormalizeArgs = normalizationFunction;
+
+		registry.dispatch( 'testStore' ).startResolution( 'getFoo', [ 123 ] );
+		const { getIsResolving, hasStartedResolution, hasFinishedResolution } =
+			registry.select( 'testStore' );
+
+		expect( getIsResolving( 'getFoo', [ '123' ] ) ).toBe( true );
+		expect( normalizationFunction ).toHaveBeenCalledWith( [ '123' ] );
+
+		expect( hasStartedResolution( 'getFoo', [ '123' ] ) ).toBe( true );
+		expect( normalizationFunction ).toHaveBeenCalledWith( [ '123' ] );
+
+		expect( normalizationFunction ).toHaveBeenCalledTimes( 2 );
+
+		registry.dispatch( 'testStore' ).finishResolution( 'getFoo', [ 123 ] );
+
+		expect( hasFinishedResolution( 'getFoo', [ '123' ] ) ).toBe( true );
+		expect( normalizationFunction ).toHaveBeenCalledWith( [ '123' ] );
+
+		getFooSelector.__unstableNormalizeArgs = undefined;
 	} );
 } );

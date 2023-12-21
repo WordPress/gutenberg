@@ -32,9 +32,9 @@ test.describe( 'new editor state', () => {
 		await expect( title ).toBeEditable();
 		await expect( title ).toHaveText( '' );
 
-		// Should display the Preview button.
+		// Should display the View button.
 		await expect(
-			page.locator( 'role=button[name="Preview"i]' )
+			page.locator( 'role=button[name="View"i]' )
 		).toBeVisible();
 
 		// Should display the Post Formats UI.
@@ -78,10 +78,7 @@ test.describe( 'new editor state', () => {
 			.locator( 'role=textbox[name="Add title"i]' )
 			.type( 'Here is the title' );
 		// Save the post as a draft.
-		await page.click( 'role=button[name="Save draft"i]' );
-		await page.waitForSelector(
-			'role=button[name="Dismiss this notice"] >> text=Draft saved'
-		);
+		await editor.saveDraft();
 
 		// Reload the browser so a post is loaded with a title.
 		await page.reload();

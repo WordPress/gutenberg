@@ -81,3 +81,90 @@ test.describe( 'Unsynced pattern', () => {
 			.toEqual( [ ...before, ...before ] );
 	} );
 } );
+
+test.describe( 'Synced pattern', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllBlocks();
+		await requestUtils.deleteAllPatternCategories();
+	} );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllBlocks();
+		await requestUtils.deleteAllPatternCategories();
+	} );
+
+	test( 'create a new synced pattern via the block options menu', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'A useful paragraph to reuse' },
+		} );
+
+		// Create a synced pattern from the paragraph block.
+		await editor.showBlockToolbar();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Create pattern' } ).click();
+
+		const createPatternDialog = page.getByRole( 'dialog', {
+			name: 'Create pattern',
+		} );
+		await createPatternDialog
+			.getByRole( 'textbox', { name: 'Name' } )
+			.fill( 'My synced pattern' );
+		const newCategory = 'Contact details';
+		await createPatternDialog
+			.getByRole( 'combobox', { name: 'Categories' } )
+			.fill( newCategory );
+		await createPatternDialog
+			.getByRole( 'checkbox', { name: 'Synced' } )
+			.setChecked( true );
+
+		await createPatternDialog
+			.getByRole( 'button', { name: 'Create' } )
+			.click();
+
+		await expect
+			.poll(
+				editor.getBlocks,
+				'The block content should be wrapped by a pattern block wrapper'
+			)
+			.toEqual( [
+				{
+					name: 'core/block',
+					attributes: { ref: expect.any( Number ) },
+					innerBlocks: [],
+				},
+			] );
+		const after = await editor.getBlocks();
+
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+		await expect( patternBlock ).toBeFocused();
+
+		// Check that the new pattern is available in the inserter.
+		await page.getByLabel( 'Toggle block inserter' ).click();
+		await page
+			.getByRole( 'tab', {
+				name: 'Patterns',
+			} )
+			.click();
+		await page
+			.getByRole( 'button', {
+				name: newCategory,
+			} )
+			.click();
+		await page.getByRole( 'option', { name: 'My synced pattern' } ).click();
+
+		await expect.poll( editor.getBlocks ).toEqual( [ ...after, ...after ] );
+	} );
+} );

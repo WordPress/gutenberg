@@ -229,7 +229,7 @@ function FontLibraryProvider( { children } ) {
 			// Uninstall the font (remove the font files from the server and the post from the database).
 			const response = await fetchUninstallFonts( [ font ] );
 			// Deactivate the font family (remove the font family from the global styles).
-			if ( ! response.errors ) {
+			if ( 0 === response.errors.length ) {
 				deactivateFontFamily( font );
 				// Save the global styles to the database.
 				await saveSpecifiedEntityEdits(
@@ -323,17 +323,23 @@ function FontLibraryProvider( { children } ) {
 		setFontCollections( response );
 	};
 	const getFontCollection = async ( id ) => {
-		const hasData = !! collections.find(
-			( collection ) => collection.id === id
-		)?.data;
-		if ( hasData ) return;
-		const response = await fetchFontCollection( id );
-		const updatedCollections = collections.map( ( collection ) =>
-			collection.id === id
-				? { ...collection, data: { ...response?.data } }
-				: collection
-		);
-		setFontCollections( updatedCollections );
+		try {
+			const hasData = !! collections.find(
+				( collection ) => collection.id === id
+			)?.data;
+			if ( hasData ) return;
+			const response = await fetchFontCollection( id );
+			const updatedCollections = collections.map( ( collection ) =>
+				collection.id === id
+					? { ...collection, data: { ...response?.data } }
+					: collection
+			);
+			setFontCollections( updatedCollections );
+		} catch ( e ) {
+			// eslint-disable-next-line no-console
+			console.error( e );
+			throw e;
+		}
 	};
 
 	useEffect( () => {

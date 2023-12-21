@@ -149,9 +149,9 @@ export const getSizeConfig = ( {
 
 	if ( ! __next40pxDefaultSize ) {
 		sizes.default = {
-			height: 30,
+			height: 32,
 			lineHeight: 1,
-			minHeight: 30,
+			minHeight: 32,
 			paddingLeft: space( 2 ),
 			paddingRight: space( 2 ),
 		};

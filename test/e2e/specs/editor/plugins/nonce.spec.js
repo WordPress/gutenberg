@@ -75,11 +75,8 @@ test.describe( 'Nonce', () => {
 			}
 		} );
 
-		await page.click( 'role=button[name=/Save draft/i]' );
 		// Saving draft should still succeed after retrying.
-		await expect(
-			page.locator( 'role=button[name="Dismiss this notice"i]' )
-		).toContainText( /Draft saved/i );
+		await editor.saveDraft();
 
 		// We expect a 403 status only once.
 		expect( saveDraftResponses ).toEqual( [ 403, 200 ] );

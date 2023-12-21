@@ -246,7 +246,7 @@ function UnforwardedNumberControl(
 								<SpinButton
 									className={ spinButtonClasses }
 									icon={ plusIcon }
-									isSmall
+									size="small"
 									aria-hidden="true"
 									aria-label={ __( 'Increment' ) }
 									tabIndex={ -1 }
@@ -257,7 +257,7 @@ function UnforwardedNumberControl(
 								<SpinButton
 									className={ spinButtonClasses }
 									icon={ resetIcon }
-									isSmall
+									size="small"
 									aria-hidden="true"
 									aria-label={ __( 'Decrement' ) }
 									tabIndex={ -1 }

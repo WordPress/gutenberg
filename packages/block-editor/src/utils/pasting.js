@@ -77,10 +77,7 @@ export function getPasteEventData( { clipboardData } ) {
 
 	const files = getFilesFromDataTransfer( clipboardData );
 
-	if (
-		files.length &&
-		! shouldDismissPastedFiles( files, html, plainText )
-	) {
+	if ( files.length && ! shouldDismissPastedFiles( files, html ) ) {
 		return { files };
 	}
 

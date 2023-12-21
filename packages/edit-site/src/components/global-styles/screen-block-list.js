@@ -9,7 +9,13 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useRef,
+	useDeferredValue,
+	memo,
+} from '@wordpress/element';
 import {
 	BlockIcon,
 	privateApis as blockEditorPrivateApis,
@@ -99,22 +105,16 @@ function BlockMenuItem( { block } ) {
 	);
 }
 
-function ScreenBlockList() {
+function BlockList( { filterValue } ) {
 	const sortedBlockTypes = useSortedBlockTypes();
-	const [ filterValue, setFilterValue ] = useState( '' );
 	const debouncedSpeak = useDebounce( speak, 500 );
-	const isMatchingSearchTerm = useSelect(
-		( select ) => select( blocksStore ).isMatchingSearchTerm,
-		[]
-	);
-	const filteredBlockTypes = useMemo( () => {
-		if ( ! filterValue ) {
-			return sortedBlockTypes;
-		}
-		return sortedBlockTypes.filter( ( blockType ) =>
-			isMatchingSearchTerm( blockType, filterValue )
-		);
-	}, [ filterValue, sortedBlockTypes, isMatchingSearchTerm ] );
+	const { isMatchingSearchTerm } = useSelect( blocksStore );
+
+	const filteredBlockTypes = ! filterValue
+		? sortedBlockTypes
+		: sortedBlockTypes.filter( ( blockType ) =>
+				isMatchingSearchTerm( blockType, filterValue )
+		  );
 
 	const blockTypesListRef = useRef();
 
@@ -141,6 +141,27 @@ function ScreenBlockList() {
 	}, [ filterValue, debouncedSpeak ] );
 
 	return (
+		<div
+			ref={ blockTypesListRef }
+			className="edit-site-block-types-item-list"
+		>
+			{ filteredBlockTypes.map( ( block ) => (
+				<BlockMenuItem
+					block={ block }
+					key={ 'menu-itemblock-' + block.name }
+				/>
+			) ) }
+		</div>
+	);
+}
+
+const MemoizedBlockList = memo( BlockList );
+
+function ScreenBlockList() {
+	const [ filterValue, setFilterValue ] = useState( '' );
+	const deferredFilterValue = useDeferredValue( filterValue );
+
+	return (
 		<>
 			<ScreenHeader
 				title={ __( 'Blocks' ) }
@@ -156,17 +177,7 @@ function ScreenBlockList() {
 				label={ __( 'Search for blocks' ) }
 				placeholder={ __( 'Search' ) }
 			/>
-			<div
-				ref={ blockTypesListRef }
-				className="edit-site-block-types-item-list"
-			>
-				{ filteredBlockTypes.map( ( block ) => (
-					<BlockMenuItem
-						block={ block }
-						key={ 'menu-itemblock-' + block.name }
-					/>
-				) ) }
-			</div>
+			<MemoizedBlockList filterValue={ deferredFilterValue } />
 		</>
 	);
 }

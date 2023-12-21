@@ -40,12 +40,7 @@ test.describe( 'Post type templates', () => {
 				.focus();
 			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'Backspace' );
-			await page.click( 'role=button[name="Save draft"i]' );
-			await expect(
-				page.locator(
-					'role=button[name="Dismiss this notice"i] >> text=Draft saved'
-				)
-			).toBeVisible();
+			await editor.saveDraft();
 			await page.reload();
 
 			const expectedContent = await page.evaluate( ( content ) => {
@@ -72,12 +67,7 @@ test.describe( 'Post type templates', () => {
 			await page.keyboard.press( 'ArrowDown' );
 			await pageUtils.pressKeys( 'primary+A' );
 			await page.keyboard.press( 'Backspace' );
-			await page.click( 'role=button[name="Save draft"i]' );
-			await expect(
-				page.locator(
-					'role=button[name="Dismiss this notice"i] >> text=Draft saved'
-				)
-			).toBeVisible();
+			await editor.saveDraft();
 			await page.reload();
 
 			await expect.poll( editor.getEditedPostContent ).toBe( '' );
@@ -133,12 +123,7 @@ test.describe( 'Post type templates', () => {
 				.locator( 'role=document[name="Block: Image"i]' )
 				.focus();
 			await page.keyboard.press( 'Backspace' );
-			await page.click( 'role=button[name="Save draft"i]' );
-			await expect(
-				page.locator(
-					'role=button[name="Dismiss this notice"i] >> text=Draft saved'
-				)
-			).toBeVisible();
+			await editor.saveDraft();
 			await page.reload();
 
 			await expect.poll( editor.getEditedPostContent ).toBe( '' );

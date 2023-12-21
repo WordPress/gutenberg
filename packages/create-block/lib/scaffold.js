@@ -49,10 +49,57 @@ module.exports = async (
 		customPackageJSON,
 		customBlockJSON,
 		example,
+		transformer,
 	}
 ) => {
 	slug = slug.toLowerCase();
 	namespace = namespace.toLowerCase();
+
+	const transformedValues = transformer( {
+		$schema,
+		apiVersion,
+		plugin,
+		namespace,
+		slug,
+		title,
+		description,
+		dashicon,
+		category,
+		attributes,
+		supports,
+		author,
+		pluginURI,
+		license,
+		licenseURI,
+		domainPath,
+		updateURI,
+		version,
+		wpScripts,
+		wpEnv,
+		npmDependencies,
+		npmDevDependencies,
+		customScripts,
+		folderName,
+		editorScript,
+		editorStyle,
+		style,
+		render,
+		viewScript,
+		variantVars,
+		customPackageJSON,
+		customBlockJSON,
+		example,
+		textdomain: slug,
+	} );
+
+	const view = {
+		...transformedValues,
+		namespaceSnakeCase: snakeCase( transformedValues.slug ),
+		slugSnakeCase: snakeCase( transformedValues.slug ),
+		slugPascalCase: pascalCase( transformedValues.slug ),
+		...variantVars,
+	};
+
 	/**
 	 * --no-plugin relies on the used template supporting the [blockTemplatesPath property](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/#blocktemplatespath).
 	 * If the blockOutputTemplates object has no properties, we can assume that there was a custom --template passed that
@@ -68,49 +115,9 @@ module.exports = async (
 	info( '' );
 	info(
 		plugin
-			? `Creating a new WordPress plugin in the ${ slug } directory.`
-			: `Creating a new block in the ${ slug } directory.`
+			? `Creating a new WordPress plugin in the ${ view.slug } directory.`
+			: `Creating a new block in the ${ view.slug } directory.`
 	);
-
-	const view = {
-		$schema,
-		apiVersion,
-		plugin,
-		namespace,
-		namespaceSnakeCase: snakeCase( namespace ),
-		slug,
-		slugSnakeCase: snakeCase( slug ),
-		slugPascalCase: pascalCase( slug ),
-		title,
-		description,
-		dashicon,
-		category,
-		attributes,
-		supports,
-		version,
-		author,
-		pluginURI,
-		license,
-		licenseURI,
-		textdomain: slug,
-		domainPath,
-		updateURI,
-		wpScripts,
-		wpEnv,
-		npmDependencies,
-		npmDevDependencies,
-		customScripts,
-		folderName,
-		editorScript,
-		editorStyle,
-		style,
-		render,
-		viewScript,
-		customPackageJSON,
-		customBlockJSON,
-		example,
-		...variantVars,
-	};
 
 	if ( plugin ) {
 		await Promise.all(

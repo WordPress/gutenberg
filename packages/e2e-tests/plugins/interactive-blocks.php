@@ -21,10 +21,10 @@ add_action(
 
 				$view_file = plugin_dir_url( $block_folder ) . $name . '/' . 'view.js';
 
-				wp_register_script(
+				gutenberg_register_module(
 					$name . '-view',
 					$view_file,
-					array( 'wp-interactivity' ),
+					array( '@wordpress/interactivity' ),
 					filemtime( $view_file ),
 					true
 				);
@@ -39,8 +39,8 @@ add_action(
 		// HTML is not correct or malformed.
 		if ( 'true' === $_GET['disable_directives_ssr'] ) {
 			remove_filter(
-				'render_block',
-				'gutenberg_interactivity_process_directives_in_root_blocks'
+				'render_block_data',
+				'gutenberg_interactivity_mark_root_blocks'
 			);
 		}
 	}

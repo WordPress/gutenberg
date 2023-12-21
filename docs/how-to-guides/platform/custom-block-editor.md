@@ -10,21 +10,6 @@ This flexibility and interoperability makes blocks a powerful tool for building 
 
 This guide covers the basics of creating your first custom block editor.
 
-## Table of contents
-
--   [Introduction](#introduction)
-- 	[Code Syntax](#code-syntax)
--   [What you're going to be building](#what-youre-going-to-be-building)
--   [Plugin setup and organization](#plugin-setup-and-organization)
--   [The "Core" of the editor](#the-core-of-the-editor)
--   [Creating the custom "Block Editor" page](#creating-the-custom-block-editor-page)
--   [Registering and rendering the custom block editor](#registering-and-rendering-the-custom-block-editor)
--   [Reviewing the `<Editor>` component](#reviewing-the-editor-component)
--   [The custom `<BlockEditor>`](#the-custom-blockeditor)
--   [Reviewing the sidebar](#reviewing-the-sidebar)
--   [Block persistence](#block-persistence)
--   [Wrapping up](#wrapping-up)
-
 ## Introduction
 
 With its many packages and components, the Gutenberg codebase can be daunting at first. But at its core, it's all about managing and editing blocks. So if you want to work on the editor, it's essential to understand how block editing works at a fundamental level.
@@ -70,7 +55,7 @@ Here is a brief summary of what's going on:
 -   `src/` (directory) - This is where the JavaScript and CSS source files will live. These files are _not_ directly enqueued by the plugin.
 -   `webpack.config.js` - A custom Webpack config extending the defaults provided by the [`@wordpress/scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) npm package to allow for custom CSS styles (via Sass).
 
-The only item not shown above is the `build/` directory, which is where the _compiled_ JS and CSS files are outputted by `@wordpress/scripts`. These files are enqueued by the plugin seperately.
+The only item not shown above is the `build/` directory, which is where the _compiled_ JS and CSS files are outputted by `@wordpress/scripts`. These files are enqueued by the plugin separately.
 
 <div class="callout callout-info">
 	Throughout this guide, filename references will be placed in a comment at the top of each code snippet so you can follow along.
@@ -168,7 +153,7 @@ wp_enqueue_script( $script_handle, $script_url, $script_asset['dependencies'], $
 
 To save time and space, the `$script_` variables assignment has been omitted. You can [review these here](https://github.com/getdave/standalone-block-editor/blob/974a59dcbc539a0595e8fa34670e75ec541853ab/init.php#L19).
 
-Note the third arguement for script dependencies, `$script_asset['dependencies']`. These dependencies are
+Note the third argument for script dependencies, `$script_asset['dependencies']`. These dependencies are
 dynamically generated using [@wordpress/dependency-extraction-webpack-plugin](https://developer.wordpress.org/block-editor/packages/packages-dependency-extraction-webpack-plugin/) which will
 [ensure that](https://developer.wordpress.org/block-editor/packages/packages-scripts/#default-webpack-config) WordPress provided scripts are not included in the built
 bundle.
