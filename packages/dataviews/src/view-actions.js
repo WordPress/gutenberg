@@ -104,11 +104,7 @@ function PageSizeMenu( { view, onChangeView } ) {
 							} );
 						} }
 					>
-						<DropdownMenuItemLabel>{
-							// The underlying `Truncate` element requires its children to be
-							// strings for the truncation to work propertly
-							`${ size }`
-						}</DropdownMenuItemLabel>
+						<DropdownMenuItemLabel>{ size }</DropdownMenuItemLabel>
 					</DropdownMenuRadioItemCustom>
 				);
 			} ) }
