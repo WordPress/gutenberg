@@ -288,7 +288,7 @@ function Layout() {
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
-			{ ! hasHistory && <BrowserURL /> }
+			<BrowserURL hasHistory={ hasHistory } />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
