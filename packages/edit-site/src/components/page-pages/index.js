@@ -13,6 +13,7 @@ import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -40,7 +41,7 @@ import {
 import PostPreview from '../post-preview';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
-const { useLocation } = unlock( routerPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
@@ -130,6 +131,7 @@ export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
 	const [ pageId, setPageId ] = useState( null );
+	const history = useHistory();
 
 	const onSelectionChange = ( items ) =>
 		setPageId( items?.length === 1 ? items[ 0 ].id : null );
@@ -336,7 +338,6 @@ export default function PagePages() {
 					fields={ fields }
 					actions={ actions }
 					data={ pages || EMPTY_ARRAY }
-					getItemId={ ( item ) => item.id }
 					isLoading={ isLoadingPages || isLoadingAuthors }
 					view={ view }
 					onChangeView={ onChangeView }
@@ -346,7 +347,28 @@ export default function PagePages() {
 			</Page>
 			{ view.type === LAYOUT_LIST && (
 				<Page>
-					<div className="edit-site-page-pages-preview">
+					<div
+						className="edit-site-page-pages-preview"
+						tabIndex={ 0 }
+						role="button"
+						onKeyDown={ ( event ) => {
+							const { keyCode } = event;
+							if ( keyCode === ENTER || keyCode === SPACE ) {
+								history.push( {
+									postId: pageId,
+									postType,
+									canvas: 'edit',
+								} );
+							}
+						} }
+						onClick={ () =>
+							history.push( {
+								postId: pageId,
+								postType,
+								canvas: 'edit',
+							} )
+						}
+					>
 						{ pageId !== null ? (
 							<PostPreview
 								postId={ pageId }

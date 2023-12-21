@@ -14,14 +14,18 @@ npm install @wordpress/dataviews --save
 
 ```js
 <DataViews
-	data={ pages }
-	getItemId={ ( item ) => item.id }
-	isLoading={ isLoadingPages }
+	data={ data }
+	paginationInfo={ { totalItems, totalPages } }
 	view={ view }
 	onChangeView={ onChangeView }
 	fields={ fields }
 	actions={ [ trashPostAction ] }
-	paginationInfo={ { totalItems, totalPages } }
+	search={ false }
+	searchLabel="Filter list"
+	getItemId={ ( item ) => item.id }
+	isLoading={ isLoadingData }
+	supportedLayouts={ [ 'table' ] }
+	deferredRendering={ true }
 	onSelectionChange={ ( items ) => { /* ... */ } }
 />
 ```
@@ -38,6 +42,13 @@ Example:
 	{ ... }
 ]
 ```
+
+By default, dataviews would use each record's `id` as an unique identifier. If it's not, the consumer should provide a `getItemId` function that returns one. See "Other props" section.
+
+## Pagination Info
+
+- `totalItems`: the total number of items in the datasets.
+- `totalPages`: the total number of pages, taking into account the total items in the dataset and the number of items per page provided by the user.
 
 ## View
 
@@ -79,9 +90,11 @@ Example:
     -   `mediaField`: used by the `grid` and `list` layouts. The `id` of the field to be used for rendering each card's media.
     -   `primaryField`: used by the `grid` and `list` layouts. The `id` of the field to be highlighted in each card/list item.
 
-### View <=> data
+### onChangeView: syncing view and data
 
-The view is a representation of the visible state of the dataset. Note, however, that it's the consumer's responsibility to work with the data provider to make sure the user options defined through the view's config (sort, pagination, filters, etc.) are respected.
+The view is a representation of the visible state of the dataset: what type of layout is used to display it (table, grid, etc.), how the dataset is filtered, how it is sorted or paginated.
+
+It's the consumer's responsibility to work with the data provider to make sure the user options defined through the view's config (sort, pagination, filters, etc.) are respected. The `onChangeView` prop allows the consumer to provide a callback to be called when the view config changes, to process the data accordingly.
 
 The following example shows how a view object is used to query the WordPress REST API via the entities abstraction. The same can be done with any other data provider.
 
@@ -214,6 +227,16 @@ Array of operations that can be performed upon each record. Each action is an ob
 - Operator types:
     - `in`: operator to be used in filters for fields of type `enumeration`.
     - `notIn`: operator to be used in filters for fields of type `enumeration`.
+
+## Other properties
+
+- `search`: whether the search input is enabled. `true` by default.
+- `searchLabel`: what text to show in the search input. "Filter list" by default.
+- `getItemId`: function that receives an item and returns an unique identifier for it. By default, it uses the `id` of the item as unique identifier. If it's not, the consumer should provide their own.
+- `isLoading`: whether the data is loading. `false` by default.
+- `supportedLayouts`: array of layouts supported. By default, all are: `table`, `grid`, `list`.
+- `deferredRendering`: whether the items should be rendered asynchronously. Required.
+- `onSelectionChange`: callback that returns the selected items. So far, only the `list` view implements this.
 
 ## Contributing to this package
 

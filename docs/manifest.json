@@ -90,6 +90,12 @@
 		"parent": "fundamentals"
 	},
 	{
+		"title": "Markup representation of a block",
+		"slug": "markup-representation-block",
+		"markdown_source": "../docs/getting-started/fundamentals/markup-representation-block.md",
+		"parent": "fundamentals"
+	},
+	{
 		"title": "Working with Javascript for the Block Editor",
 		"slug": "javascript-in-the-block-editor",
 		"markdown_source": "../docs/getting-started/fundamentals/javascript-in-the-block-editor.md",

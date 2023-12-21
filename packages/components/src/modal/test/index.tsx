@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -386,6 +386,95 @@ describe( 'Modal', () => {
 			await user.click( opener );
 
 			expect( opener ).toHaveFocus();
+		} );
+	} );
+
+	describe( 'Body class name', () => {
+		const overrideClass = 'is-any-open';
+		const BodyClassDemo = () => {
+			const [ isAShown, setIsAShown ] = useState( false );
+			const [ isA1Shown, setIsA1Shown ] = useState( false );
+			const [ isBShown, setIsBShown ] = useState( false );
+			const [ isClassOverriden, setIsClassOverriden ] = useState( false );
+			useEffect( () => {
+				const toggles: ( e: KeyboardEvent ) => void = ( {
+					key,
+					metaKey,
+				} ) => {
+					if ( key === 'a' ) {
+						if ( metaKey ) return setIsA1Shown( ( v ) => ! v );
+						return setIsAShown( ( v ) => ! v );
+					}
+					if ( key === 'b' ) return setIsBShown( ( v ) => ! v );
+					if ( key === 'c' )
+						return setIsClassOverriden( ( v ) => ! v );
+				};
+				document.addEventListener( 'keydown', toggles );
+				return () =>
+					void document.removeEventListener( 'keydown', toggles );
+			}, [] );
+			return (
+				<>
+					{ isAShown && (
+						<Modal
+							bodyOpenClassName={
+								isClassOverriden ? overrideClass : 'is-A-open'
+							}
+							onRequestClose={ () => setIsAShown( false ) }
+						>
+							<p>Modal A contents</p>
+							{ isA1Shown && (
+								<Modal
+									title="Nested"
+									onRequestClose={ () =>
+										setIsA1Shown( false )
+									}
+								>
+									<p>Modal A1 contents</p>
+								</Modal>
+							) }
+						</Modal>
+					) }
+					{ isBShown && (
+						<Modal
+							bodyOpenClassName={
+								isClassOverriden ? overrideClass : 'is-B-open'
+							}
+							onRequestClose={ () => setIsBShown( false ) }
+						>
+							<p>Modal B contents</p>
+						</Modal>
+					) }
+				</>
+			);
+		};
+
+		it( 'is added and removed when modal opens and closes including when closed due to another modal opening', async () => {
+			const user = userEvent.setup();
+
+			const { baseElement } = render( <BodyClassDemo /> );
+
+			await user.keyboard( 'a' ); // Opens modal A.
+			expect( baseElement ).toHaveClass( 'is-A-open' );
+
+			await user.keyboard( 'b' ); // Opens modal B > closes modal A.
+			expect( baseElement ).toHaveClass( 'is-B-open' );
+			expect( baseElement ).not.toHaveClass( 'is-A-open' );
+
+			await user.keyboard( 'b' ); // Closes modal B.
+			expect( baseElement ).not.toHaveClass( 'is-B-open' );
+		} );
+
+		it( 'is removed even when prop changes while nested modal is open', async () => {
+			const user = userEvent.setup();
+
+			const { baseElement } = render( <BodyClassDemo /> );
+
+			await user.keyboard( 'a' ); // Opens modal A.
+			await user.keyboard( '{Meta>}a{/Meta}' ); // Opens nested modal.
+			await user.keyboard( 'c' ); // Changes `bodyOpenClassName`.
+			await user.keyboard( 'a' ); // Closes modal A.
+			expect( baseElement ).not.toHaveClass( 'is-A-open' );
 		} );
 	} );
 } );
