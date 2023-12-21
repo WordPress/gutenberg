@@ -15,12 +15,12 @@ npm install @wordpress/dataviews --save
 ```js
 <DataViews
 	data={ pages }
-	getItemId={ ( item ) => item.id }
-	isLoading={ isLoadingPages }
 	view={ view }
 	onChangeView={ onChangeView }
 	fields={ fields }
 	actions={ [ trashPostAction ] }
+	getItemId={ ( item ) => item.id }
+	isLoading={ isLoadingPages }
 	paginationInfo={ { totalItems, totalPages } }
 	onSelectionChange={ ( items ) => { /* ... */ } }
 />
@@ -79,9 +79,11 @@ Example:
     -   `mediaField`: used by the `grid` and `list` layouts. The `id` of the field to be used for rendering each card's media.
     -   `primaryField`: used by the `grid` and `list` layouts. The `id` of the field to be highlighted in each card/list item.
 
-### View <=> data
+### onChangeView: syncing view and data
 
-The view is a representation of the visible state of the dataset. Note, however, that it's the consumer's responsibility to work with the data provider to make sure the user options defined through the view's config (sort, pagination, filters, etc.) are respected.
+The view is a representation of the visible state of the dataset: what type of layout is used to display it (table, grid, etc.), how the dataset is filtered, how it is sorted or paginated.
+
+It's the consumer's responsibility to work with the data provider to make sure the user options defined through the view's config (sort, pagination, filters, etc.) are respected. The `onChangeView` prop allows the consumer to provide a callback to be called when the view config changes, to process the data accordingly.
 
 The following example shows how a view object is used to query the WordPress REST API via the entities abstraction. The same can be done with any other data provider.
 
