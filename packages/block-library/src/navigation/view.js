@@ -18,7 +18,7 @@ const focusableSelectors = [
 // capture the clicks, instead of relying on the focusout event.
 document.addEventListener( 'click', () => {} );
 
-const { state, actions } = store( 'core/navigation', {
+const { state, actions, callbacks } = store( 'core/navigation', {
 	state: {
 		get roleAttribute() {
 			const ctx = getContext();
@@ -176,7 +176,12 @@ const { state, actions } = store( 'core/navigation', {
 				ctx.lastFocusableElement =
 					focusableElements[ focusableElements.length - 1 ];
 			}
+			window.addEventListener(
+				'resize',
+				callbacks.isNavCollapsed( ref )
+			);
 		},
+
 		focusFirstElement() {
 			const { ref } = getElement();
 			if ( state.isMenuOpen ) {
@@ -185,5 +190,91 @@ const { state, actions } = store( 'core/navigation', {
 				focusableElements?.[ 0 ]?.focus();
 			}
 		},
+
+		isNavCollapsed( ref ) {
+			//test if the nav items are wrapping before testing if the actual nav is wrapping inside its parent to avoid the recursive function if possible
+			if (
+				areItemsWrapping( ref ) === true ||
+				isNavWrapping( ref ) === true
+			) {
+				//console.log( 'is mobile' );
+			} else {
+				//console.log( 'is not mobile' );
+			}
+		},
 	},
 } );
+
+function areItemsWrapping(
+	wrapper,
+	children = wrapper.querySelectorAll( 'li' )
+) {
+	const wrapperDimensions = wrapper.getBoundingClientRect();
+	//we store an array with the width of each item
+	const itemsWidths = getItemWidths( children );
+	let totalWidth = 0;
+	let isWrapping = false;
+
+	//the nav block may have row-gap applied, which is not calculated in getItemWidths
+	const computedStyle = window.getComputedStyle( wrapper );
+	const rowGap = parseFloat( computedStyle.rowGap ) || 0;
+
+	for ( let i = 0, len = itemsWidths.length; i < len; i++ ) {
+		totalWidth += itemsWidths[ i ];
+		if ( rowGap > 0 && i > 0 ) {
+			totalWidth += rowGap;
+		}
+		if ( parseInt( totalWidth ) > parseInt( wrapperDimensions.width ) ) {
+			isWrapping = true;
+		}
+	}
+	return isWrapping;
+}
+
+function isNavWrapping( ref ) {
+	let isWrapping = false;
+	//how can we check if the nav element is wrapped inside its parent if we don't know anything about it (the parent)?
+	//for debugging purposes
+	const container = getFlexParent( ref );
+	if ( container !== null ) {
+		isWrapping = areItemsWrapping(
+			container,
+			Array.from(
+				container.querySelector( 'ul.wp-block-navigation' ).children
+			)
+		);
+	}
+
+	return isWrapping;
+}
+
+function getFlexParent( elem ) {
+	if ( elem === document.body ) {
+		// Base case: Stop recursion once we go all the way to the body to avoid infinite recursion
+		return null;
+	}
+	const parent = elem.parentNode;
+	const containerStyles = window.getComputedStyle( parent );
+	const isFlexWrap =
+		containerStyles.getPropertyValue( 'flex-wrap' ) === 'wrap';
+	if ( isFlexWrap ) {
+		return parent;
+	}
+	return getFlexParent( parent );
+}
+
+function getItemWidths( items ) {
+	const itemsWidths = [];
+
+	items.forEach( function ( item ) {
+		const style = item.currentStyle || window.getComputedStyle( item );
+		const itemDimensions = item.getBoundingClientRect();
+		const width = parseFloat( itemDimensions.width );
+		const marginLeft = parseFloat( style.marginLeft );
+		const marginRight = parseFloat( style.marginRight );
+		const totalWidth = width + marginLeft + marginRight;
+
+		itemsWidths.push( totalWidth );
+	} );
+	return itemsWidths;
+}

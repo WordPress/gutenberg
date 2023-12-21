@@ -60,6 +60,16 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
+	 * Returns whether or not the navigation has a flexible breakpoint.
+	 *
+	 * @param array $attributes The block attributes.
+	 * @return bool Returns whether or not this is responsive navigation.
+	 */
+	private static function has_flexible_breakpoint( $attributes ) {
+		return $attributes['flexibleBreakpoint'] ? 'true' : 'false';
+	}
+
+	/**
 	 * Returns whether or not a navigation has a submenu.
 	 *
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
@@ -495,9 +505,9 @@ class WP_Navigation_Block_Renderer {
 		$is_responsive_menu      = static::is_responsive( $attributes );
 		$style                   = static::get_styles( $attributes );
 		$class                   = static::get_classes( $attributes );
-		$has_flexible_breakpoint = $attributes['flexibleBreakpoint'] ? 'true' : 'false';
+		$has_flexible_breakpoint = static::has_flexible_breakpoint( $attributes );
 
-		$wrapper_attributes      = get_block_wrapper_attributes(
+		$wrapper_attributes = get_block_wrapper_attributes(
 			array(
 				'class'      => $class,
 				'style'      => $style,
@@ -517,6 +527,7 @@ class WP_Navigation_Block_Renderer {
 	 * Get the nav element directives
 	 *
 	 * @param bool $should_load_view_script Whether or not the view script should be loaded.
+	 * @param bool $has_flexible_breakpoint Whether or not the nav block will have a flexible breakpoint.
 	 * @return string the directives for the navigation element.
 	 */
 	private static function get_nav_element_directives( $should_load_view_script, $has_flexible_breakpoint ) {
@@ -526,17 +537,25 @@ class WP_Navigation_Block_Renderer {
 		// When adding to this array be mindful of security concerns.
 		$nav_element_context = wp_json_encode(
 			array(
-				'overlayOpenedBy' => array(),
-				'type'            => 'overlay',
-				'roleAttribute'   => '',
-				'ariaLabel'       => __( 'Menu' ),
-				'has_flexible_breakpoint'   => $has_flexible_breakpoint,
+				'overlayOpenedBy'         => array(),
+				'type'                    => 'overlay',
+				'roleAttribute'           => '',
+				'ariaLabel'               => __( 'Menu' ),
+				'has_flexible_breakpoint' => $has_flexible_breakpoint,
 			),
 			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
 		);
+
+		$flexible_breakpoint_directives = '';
+
+		if ( $has_flexible_breakpoint ) {
+			$flexible_breakpoint_directives = 'data-wp-init--overlay="actions.isNavCollapsed"';
+		}
+
 		return '
 			data-wp-interactive=\'{"namespace":"core/navigation"}\'
-			data-wp-context=\'' . $nav_element_context . '\'
+			data-wp-context=\'' . $nav_element_context . '\' 
+			' . $flexible_breakpoint_directives . '
 		';
 	}
 
