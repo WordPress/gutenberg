@@ -130,13 +130,17 @@ const baseItem = css`
 	/* Occupy the width of all grid columns (ie. full width) */
 	grid-column: 1 / -1;
 
-	/*
-	 * Define a grid layout which inherits the same columns configuration
-	 * from the parent layout (ie. subgrid).
-	 */
-	display: grid;
-	grid-template-columns: subgrid;
+	display: flex;
 	align-items: center;
+
+	@supports ( grid-template-columns: subgrid ) {
+		/*
+		 * Define a grid layout which inherits the same columns configuration
+		 * from the parent layout (ie. subgrid).
+		 */
+		display: grid;
+		grid-template-columns: subgrid;
+	}
 
 	font-size: ${ font( 'default.fontSize' ) };
 	font-family: inherit;
@@ -246,11 +250,17 @@ export const ItemPrefixWrapper = styled.span`
 `;
 
 export const DropdownMenuItemContentWrapper = styled.div`
-	/*
-	 * Always occupy the second column, since the first column
-	 * is taken by the prefix wrapper (when displayed).
-	 */
-	grid-column: 2;
+	flex: 1;
+
+	@supports ( grid-template-columns: subgrid ) {
+		/* Revert flex rule */
+		flex: none;
+		/*
+		* Always occupy the second column, since the first column
+		* is taken by the prefix wrapper (when displayed).
+		*/
+		grid-column: 2;
+	}
 
 	display: flex;
 	align-items: center;
