@@ -300,7 +300,11 @@ export default function ReusableBlockEdit( {
 			{ userCanEdit && editOriginalPattern && (
 				<BlockControls>
 					<ToolbarGroup>
-						<ToolbarButton onClick={ editOriginalPattern }>
+						<ToolbarButton
+							onClick={ () =>
+								editOriginalPattern( ref, 'wp_block' )
+							}
+						>
 							{ __( 'Edit original' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
