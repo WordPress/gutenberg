@@ -10,6 +10,7 @@ import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
 } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -19,9 +20,10 @@ import { store as postEditorStore } from '../../../store';
 function WritingMenu() {
 	const registry = useRegistry();
 
-	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
-		useDispatch( postEditorStore );
+	const { closeGeneralSidebar } = useDispatch( postEditorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
+	const { setIsInserterOpened, setIsListViewOpened } =
+		useDispatch( editorStore );
 
 	const toggleDistractionFree = () => {
 		registry.batch( () => {

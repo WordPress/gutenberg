@@ -23,6 +23,8 @@ import {
 	store as interfaceStore,
 } from '@wordpress/interface';
 import {
+	EditorKeyboardShortcutsRegister,
+	EditorKeyboardShortcuts,
 	EditorNotices,
 	EditorSnackbars,
 	privateApis as editorPrivateApis,
@@ -84,7 +86,7 @@ const blockRemovalRules = {
 	),
 };
 
-export default function Editor( { listViewToggleElement, isLoading } ) {
+export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -108,17 +110,14 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		showIconLabels,
 		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
-		const {
-			getEditedPostContext,
-			getEditorMode,
-			getCanvasMode,
-			isInserterOpened,
-			isListViewOpened,
-		} = unlock( select( editSiteStore ) );
+		const { getEditedPostContext, getEditorMode, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getEntityRecord } = select( coreDataStore );
-		const { getRenderingMode } = select( editorStore );
+		const { getRenderingMode, isInserterOpened, isListViewOpened } =
+			select( editorStore );
 		const _context = getEditedPostContext();
 
 		// The currently selected entity to display.
@@ -248,19 +247,19 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 								{ editorMode === 'text' && isEditMode && (
 									<CodeEditor />
 								) }
-								{ isEditMode && <KeyboardShortcutsEditMode /> }
+								{ isEditMode && (
+									<>
+										<KeyboardShortcutsEditMode />
+										<EditorKeyboardShortcutsRegister />
+										<EditorKeyboardShortcuts />
+									</>
+								) }
 							</>
 						}
 						secondarySidebar={
 							isEditMode &&
 							( ( shouldShowInserter && <InserterSidebar /> ) ||
-								( shouldShowListView && (
-									<ListViewSidebar
-										listViewToggleElement={
-											listViewToggleElement
-										}
-									/>
-								) ) )
+								( shouldShowListView && <ListViewSidebar /> ) )
 						}
 						sidebar={
 							isEditMode &&

@@ -23,6 +23,7 @@ export default function BlockLockToolbar( { clientId, wrapperRef } ) {
 
 	const lockButtonRef = useRef( null );
 	const isFirstRender = useRef( true );
+	const hasModalOpened = useRef( false );
 
 	const shouldHideBlockLockUI =
 		! canLock || ( canEdit && canMove && canRemove );
@@ -36,7 +37,19 @@ export default function BlockLockToolbar( { clientId, wrapperRef } ) {
 			return;
 		}
 
-		if ( ! isModalOpen && shouldHideBlockLockUI ) {
+		if ( isModalOpen && ! hasModalOpened.current ) {
+			hasModalOpened.current = true;
+		}
+
+		// We only want to allow this effect to happen if the modal has been opened.
+		// The issue is when we're returning focus from the block lock modal to a toolbar,
+		// so it can only happen after a modal has been opened. Without this, the toolbar
+		// will steal focus on rerenders.
+		if (
+			hasModalOpened.current &&
+			! isModalOpen &&
+			shouldHideBlockLockUI
+		) {
 			focus.focusable
 				.find( wrapperRef.current, {
 					sequential: false,
