@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback, useReducer } from '@wordpress/element';
+import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * A hook that records the 'entity' history in the post editor as a user
@@ -34,8 +35,31 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 		[ { postId: initialPostId, postType: initialPostType } ]
 	);
 
-	const onSelectPost = useCallback( ( postId, postType ) => {
-		dispatch( { type: 'push', post: { postId, postType } } );
+	const onSelectPost = useCallback( ( params ) => {
+		const currentArgs = getQueryArgs( window.location.href );
+		const currentUrlWithoutArgs = removeQueryArgs(
+			window.location.href,
+			...Object.keys( currentArgs )
+		);
+
+		const newUrl = addQueryArgs( currentUrlWithoutArgs, {
+			post: params.postId,
+			action: 'edit',
+		} );
+
+		// This return signature is matched to `useLink` in the site editor to allow the onSelectPost
+		// setting to be easily shared between edit-post and edit-site. In edit-site useLink is passed in
+		// as onSelectPost in order to use the existing edit-site client side routing to move between posts.
+		return {
+			href: newUrl,
+			onClick: ( event ) => {
+				event.preventDefault();
+				dispatch( {
+					type: 'push',
+					post: { postId: params.postId, postType: params.postType },
+				} );
+			},
+		};
 	}, [] );
 
 	const goBack = useCallback( () => {

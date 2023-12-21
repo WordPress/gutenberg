@@ -64,44 +64,10 @@ const withPartialSyncingControls = createHigherOrderComponent(
 	}
 );
 
-/**
- * Adds an editOriginalPattern prop which allows the block to switch between post and pattern
- * editing modes.
- *
- * @param {Component} BlockEdit Original component.
- *
- * @return {Component} Wrapped component.
- */
-const withPatternOnlyRenderMode = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const onSelectPost = useSelect(
-			( select ) =>
-				select( editorStore ).getEditorSettings().onSelectPost,
-			[]
-		);
-		if ( props.name !== 'core/block' ) {
-			return <BlockEdit { ...props } />;
-		}
-
-		const newProps = {
-			...props,
-			editOriginalPattern:
-				typeof onSelectPost === 'function' ? onSelectPost : undefined,
-		};
-
-		return <BlockEdit { ...newProps } />;
-	}
-);
-
 if ( window.__experimentalPatternPartialSyncing ) {
 	addFilter(
 		'editor.BlockEdit',
 		'core/editor/with-partial-syncing-controls',
 		withPartialSyncingControls
-	);
-	addFilter(
-		'editor.BlockEdit',
-		'core/editor/with-pattern-edit-original-mode',
-		withPatternOnlyRenderMode
 	);
 }
