@@ -128,7 +128,7 @@ function EditorCanvas( {
 
 		return {
 			renderingMode: _renderingMode,
-			postContentAttributes: getEditorSettings().postContentAttributes,
+			postContentAttributes: editorSettings.postContentAttributes,
 			// Post template fetch returns a 404 on classic themes, which
 			// messes with e2e tests, so check it's a block theme first.
 			editedPostTemplate:
