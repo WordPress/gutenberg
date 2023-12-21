@@ -122,7 +122,7 @@ export class MediaUploadProgress extends Component {
 			// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
 			return __( 'Failed to insert media.\nTap for more info.' );
 		}
-		return __( 'You are currently offline.' );
+		return __( 'Waiting for connection' );
 	}
 
 	render() {
