@@ -9,7 +9,7 @@ import FastImage from 'react-native-fast-image';
  */
 import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/components';
-import { image as icon } from '@wordpress/icons';
+import { image } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useEffect, useState, Platform } from '@wordpress/element';
 
@@ -99,19 +99,19 @@ const ImageComponent = ( {
 	};
 
 	const getIcon = ( iconType ) => {
+		let icon;
 		let iconStyle;
 		switch ( iconType ) {
 			case ICON_TYPE.RETRY:
-				return (
-					<Icon
-						icon={ retryIcon || SvgIconRetry }
-						{ ...styles.iconRetry }
-					/>
-				);
+				icon = retryIcon || SvgIconRetry;
+				iconStyle = styles.iconRetry;
+				break;
 			case ICON_TYPE.PLACEHOLDER:
+				icon = image;
 				iconStyle = iconPlaceholderStyles;
 				break;
 			case ICON_TYPE.UPLOAD:
+				icon = image;
 				iconStyle = iconUploadStyles;
 				break;
 		}
