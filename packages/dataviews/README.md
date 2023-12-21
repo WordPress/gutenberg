@@ -19,9 +19,13 @@ npm install @wordpress/dataviews --save
 	onChangeView={ onChangeView }
 	fields={ fields }
 	actions={ [ trashPostAction ] }
+	search={ true }
+	searchLabel="Filter list"
 	getItemId={ ( item ) => item.id }
-	isLoading={ isLoadingPages }
+	isLoading={ isLoading }
 	paginationInfo={ { totalItems, totalPages } }
+	supportedLayouts={ [ 'table' ] }
+	deferredRendering={ true }
 	onSelectionChange={ ( items ) => { /* ... */ } }
 />
 ```
