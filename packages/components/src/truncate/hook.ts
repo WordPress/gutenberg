@@ -7,6 +7,7 @@ import { css } from '@emotion/react';
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import warn from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -39,10 +40,8 @@ export default function useTruncate(
 	} else if ( typeof children === 'number' ) {
 		childrenAsText = children.toString();
 	} else {
-		// eslint-disable-next-line no-console
-		console.warn(
-			`Truncate: text truncation has been disabled, since it is only available when passing 'children' of type 'string' or 'number'. Received:`,
-			children
+		warn(
+			`Truncate: text truncation has been disabled, since it is only available when passing 'children' of type 'string' or 'number'. Received: ${ children }`
 		);
 	}
 
