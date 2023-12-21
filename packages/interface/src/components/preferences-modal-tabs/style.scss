@@ -1,24 +1,24 @@
 $vertical-tabs-width: 160px;
 
 .interface-preferences__tabs {
-	.components-tab-panel__tabs {
+	[role="tablist"] {
 		position: absolute;
 		top: $header-height + $grid-unit-30;
 		// Aligns button text instead of button box.
 		left: $grid-unit-20;
 		width: $vertical-tabs-width;
 
-		.components-tab-panel__tabs-item {
+		[role="tab"] {
 			border-radius: $radius-block-ui;
 			font-weight: 400;
 
-			&.is-active {
+			&[aria-selected="true"] {
 				background: $gray-100;
 				box-shadow: none;
 				font-weight: 500;
 			}
 
-			&.is-active::after {
+			&[aria-selected="true"]::after {
 				content: none;
 			}
 
@@ -34,7 +34,7 @@ $vertical-tabs-width: 160px;
 		}
 	}
 
-	.components-tab-panel__tab-content {
+	[role="tabpanel"] {
 		padding-left: $grid-unit-30;
 		margin-left: $vertical-tabs-width;
 	}
