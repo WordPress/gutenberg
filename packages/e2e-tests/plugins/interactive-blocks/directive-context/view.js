@@ -33,6 +33,7 @@ const html = `
 		>
 			<div data-testid="navigation text" data-wp-text="context.text"></div>
 			<div data-testid="navigation new text" data-wp-text="context.newText"></div>
+			<div data-testid="navigation derived text" data-wp-text="state.derivedText"></div>
 			<button data-testid="toggle text" data-wp-on--click="actions.toggleText">Toggle Text</button>
 			<button data-testid="add new text" data-wp-on--click="actions.addNewText">Add new text</button>
 			<button data-testid="navigate" data-wp-on--click="actions.navigate">Navigate</button>
@@ -40,6 +41,12 @@ const html = `
 		</div>`;
 
 const { actions } = store( 'directive-context-navigate', {
+	state: {
+		get derivedText() {
+			const { text } = getContext();
+			return text;
+		}
+	},
 	actions: {
 		toggleText() {
 			const ctx = getContext();

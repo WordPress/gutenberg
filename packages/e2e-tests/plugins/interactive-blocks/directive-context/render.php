@@ -50,6 +50,14 @@ gutenberg_enqueue_module( 'directive-context-view' );
 		>
 			obj.prop5
 		</button>
+		<button
+			data-testid="parent obj.newProp"
+			name="obj.newProp"
+			value="newFromParent"
+			data-wp-on--click="actions.updateContext"
+		>
+			obj.newProp
+		</button>
 		<div
 			data-wp-context='{ "prop2":"child","prop3":"child","obj":{"prop5":"child","prop6":"child"},"array":[4,5,6] }'
 		>
@@ -129,6 +137,7 @@ gutenberg_enqueue_module( 'directive-context-view' );
 >
 	<div data-testid="navigation text" data-wp-text="context.text"></div>
 	<div data-testid="navigation new text" data-wp-text="context.newText"></div>
+	<div data-testid="navigation derived text" data-wp-text="state.derivedText"></div>
 	<button data-testid="toggle text" data-wp-on--click="actions.toggleText">Toggle Text</button>
 	<button data-testid="add new text" data-wp-on--click="actions.addNewText">Add New Text</button>
 	<button data-testid="navigate" data-wp-on--click="actions.navigate">Navigate</button>

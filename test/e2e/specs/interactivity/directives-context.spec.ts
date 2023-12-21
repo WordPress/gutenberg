@@ -189,4 +189,23 @@ test.describe( 'data-wp-context', () => {
 		await page.getByTestId( 'async navigate' ).click();
 		await expect( element ).toHaveText( 'changed from async action' );
 	} );
+
+	test( 'should update derived state on navigation', async ( { page } ) => {
+		const element = page.getByTestId( 'navigation derived text' );
+		await expect( element ).toHaveText( 'first page' );
+		await page.getByTestId( 'navigate' ).click();
+		await expect( element ).toHaveText( 'second page' );
+	} );
+
+	test( 'new inherited properties are reflected (child)', async ( {
+		page,
+	} ) => {
+		await page.getByTestId( 'parent obj.newProp' ).click();
+
+		const childContext = await parseContent(
+			page.getByTestId( 'child context' )
+		);
+
+		expect( childContext.obj.newProp ).toBe( 'newFromParent' );
+	} );
 } );
