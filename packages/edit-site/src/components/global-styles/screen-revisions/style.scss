@@ -1,12 +1,8 @@
-
-.edit-site-global-styles-screen-revisions {
-	margin: 0 $grid-unit-20 $grid-unit-20 $grid-unit-20;
-	padding-bottom: $grid-unit-60;
-}
-
 .edit-site-global-styles-screen-revisions__revisions-list {
 	list-style: none;
-	margin: 0;
+	margin: 0 $grid-unit-20 $grid-unit-20 $grid-unit-20;
+	// Forces subsequent flex items to the bottom.
+	flex-grow: 1;
 	li {
 		margin-bottom: 0;
 	}
@@ -167,12 +163,11 @@
 		will-change: opacity;
 	}
 	.components-button.is-tertiary {
-		width: $button-size-small;
-		height: $button-size-small;
 		font-size: 28px;
 		font-weight: 200;
 		color: $gray-900;
 		margin-bottom: $grid-unit-05;
+		line-height: 1.2;
 	}
 	.components-button.is-tertiary:disabled {
 		color: $gray-600;
@@ -183,5 +178,12 @@
 }
 
 .edit-site-global-styles-screen-revisions__footer {
-	height: $grid-unit-60;
+	height: $grid-unit-70;
+	z-index: 1;
+	position: sticky;
+	min-width: 100%;
+	bottom: 0;
+	background: $white;
+	padding: $grid-unit-15;
+	border-top: $border-width solid $gray-300;
 }
