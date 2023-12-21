@@ -17,22 +17,26 @@
 	}
 }
 
+
+// Hide selections on this element, otherwise Safari will include it stacked
+// under your actual selection.
+// This uses a CSS hack to show the rules to Safari only. Failing here is okay,
+// it just makes the selection indication slightly less precise. That makes this
+// hack a progressive enhancement. Stylelint is disabled to allow the hack to work.
+/* stylelint-disable */
+_::-webkit-full-page-media, _:future, :root .block-editor-block-list__layout::selection,
+_::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-block-list__layout::selection {
+	background-color: transparent; 
+}
+/* stylelint-enable */
+
+
 // Note to developers refactoring this, please test navigation mode, and
 // multi selection and hovering the block switcher to highlight the block.
 // Also be sure to test partial selections in Safari, as it draws the
 // selection marker with an entirely different model than Blink.
 .block-editor-block-list__layout {
 	position: relative;
-
-	// Hide selections on this element, otherwise Safari will include it stacked
-	// under your actual selection.
-	&::selection {
-		background: transparent;
-	}
-
-	.has-multi-selection &::selection {
-		background: transparent;
-	}
 
 	// Block multi selection
 	// Apply a rounded radius to the entire block when multi selected, but with low specificity
