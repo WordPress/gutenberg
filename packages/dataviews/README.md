@@ -22,7 +22,6 @@ npm install @wordpress/dataviews --save
 	actions={ [ trashPostAction ] }
 	search={ false }
 	searchLabel="Filter list"
-	getItemId={ ( item ) => item.id }
 	isLoading={ isLoadingData }
 	supportedLayouts={ [ 'table' ] }
 	deferredRendering={ true }
@@ -230,7 +229,6 @@ Array of operations that can be performed upon each record. Each action is an ob
 
 - `search`: whether the search input is enabled. `true` by default.
 - `searchLabel`: what text to show in the search input. "Filter list" by default.
-- `getItemId`: function that receives an item and return an unique identifier for it. Required.
 - `isLoading`: whether the data is loading. `false` by default.
 - `supportedLayouts`: array of layouts supported. By default, all are: `table`, `grid`, `list`.
 - `deferredRendering`: whether the items should be rendered asynchronously. Required.

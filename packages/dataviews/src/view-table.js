@@ -327,7 +327,6 @@ function ViewTable( {
 	fields,
 	actions,
 	data,
-	getItemId,
 	isLoading = false,
 	deferredRendering,
 } ) {
@@ -387,7 +386,7 @@ function ViewTable( {
 					</thead>
 					<tbody>
 						{ usedData.map( ( item, index ) => (
-							<tr key={ getItemId?.( item ) || index }>
+							<tr key={ index }>
 								{ visibleFields.map( ( field ) => (
 									<td
 										key={ field.id }

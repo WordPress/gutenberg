@@ -17,7 +17,6 @@ export default function ViewList( {
 	view,
 	fields,
 	data,
-	getItemId,
 	onSelectionChange,
 	selection,
 	deferredRendering,
@@ -49,7 +48,7 @@ export default function ViewList( {
 		<ul className="dataviews-list-view">
 			{ usedData.map( ( item, index ) => {
 				return (
-					<li key={ getItemId?.( item ) || index }>
+					<li key={ index }>
 						<div
 							role="button"
 							tabIndex={ 0 }

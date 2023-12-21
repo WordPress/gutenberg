@@ -382,7 +382,6 @@ export default function DataviewsTemplates() {
 					fields={ fields }
 					actions={ actions }
 					data={ shownTemplates }
-					getItemId={ ( item ) => item.id }
 					isLoading={ isLoadingData }
 					view={ view }
 					onChangeView={ onChangeView }

@@ -131,7 +131,6 @@ export const Default = ( props ) => {
 };
 Default.args = {
 	actions,
-	getItemId: ( item ) => item.id,
 	isLoading: false,
 	supportedLayouts: [ LAYOUT_TABLE, LAYOUT_GRID ],
 };

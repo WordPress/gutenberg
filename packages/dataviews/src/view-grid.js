@@ -19,7 +19,6 @@ export default function ViewGrid( {
 	fields,
 	view,
 	actions,
-	getItemId,
 	deferredRendering,
 } ) {
 	const mediaField = fields.find(
@@ -47,7 +46,7 @@ export default function ViewGrid( {
 			{ usedData.map( ( item, index ) => (
 				<VStack
 					spacing={ 3 }
-					key={ getItemId?.( item ) || index }
+					key={ index }
 					className="dataviews-view-grid__card"
 				>
 					<div className="dataviews-view-grid__media">
