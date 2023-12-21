@@ -4,7 +4,6 @@
 const path = require( 'path' );
 const webpack = require( 'webpack' );
 const json2php = require( 'json2php' );
-const isWebpack4 = webpack.version.startsWith( '4.' );
 const { createHash } = webpack.util;
 
 /**
@@ -14,7 +13,6 @@ const {
 	defaultRequestToExternal,
 	defaultRequestToHandle,
 } = require( './util' );
-
 
 const { RawSource } = webpack.sources;
 const defaultExternalizedReportFileName = 'externalized-dependencies.json';
@@ -46,13 +44,11 @@ class DependencyExtractionWebpackPlugin {
 		// Offload externalization work to the ExternalsPlugin.
 		this.externalsPlugin = new webpack.ExternalsPlugin(
 			'window',
-			isWebpack4
-				? this.externalizeWpDeps.bind( this )
-				: this.externalizeWpDepsV5.bind( this )
+			this.externalizeWpDeps.bind( this )
 		);
 	}
 
-	externalizeWpDeps( _context, request, callback ) {
+	externalizeWpDeps( { request }, callback ) {
 		let externalRequest;
 
 		// Handle via options.requestToExternal first.
@@ -75,10 +71,6 @@ class DependencyExtractionWebpackPlugin {
 		}
 
 		return callback();
-	}
-
-	externalizeWpDepsV5( { context, request }, callback ) {
-		return this.externalizeWpDeps( context, request, callback );
 	}
 
 	mapRequestToDependency( request ) {
@@ -115,25 +107,19 @@ class DependencyExtractionWebpackPlugin {
 	apply( compiler ) {
 		this.externalsPlugin.apply( compiler );
 
-		if ( isWebpack4 ) {
-			compiler.hooks.emit.tap( this.constructor.name, ( compilation ) =>
-				this.addAssets( compilation )
-			);
-		} else {
-			compiler.hooks.thisCompilation.tap(
-				this.constructor.name,
-				( compilation ) => {
-					compilation.hooks.processAssets.tap(
-						{
-							name: this.constructor.name,
-							stage: compiler.webpack.Compilation
-								.PROCESS_ASSETS_STAGE_ANALYSE,
-						},
-						() => this.addAssets( compilation )
-					);
-				}
-			);
-		}
+		compiler.hooks.thisCompilation.tap(
+			this.constructor.name,
+			( compilation ) => {
+				compilation.hooks.processAssets.tap(
+					{
+						name: this.constructor.name,
+						stage: compiler.webpack.Compilation
+							.PROCESS_ASSETS_STAGE_ANALYSE,
+					},
+					() => this.addAssets( compilation )
+				);
+			}
+		);
 	}
 
 	addAssets( compilation ) {
@@ -192,9 +178,8 @@ class DependencyExtractionWebpackPlugin {
 			};
 
 			// Search for externalized modules in all chunks.
-			const modulesIterable = isWebpack4
-				? chunk.modulesIterable
-				: compilation.chunkGraph.getChunkModules( chunk );
+			const modulesIterable =
+				compilation.chunkGraph.getChunkModules( chunk );
 			for ( const chunkModule of modulesIterable ) {
 				processModule( chunkModule );
 				// Loop through submodules of ConcatenatedModule.
@@ -253,7 +238,7 @@ class DependencyExtractionWebpackPlugin {
 			compilation.assets[ assetFilename ] = new RawSource(
 				this.stringify( assetData )
 			);
-			chunk.files[ isWebpack4 ? 'push' : 'add' ]( assetFilename );
+			chunk.files.add( assetFilename );
 		}
 
 		if ( combineAssets ) {
