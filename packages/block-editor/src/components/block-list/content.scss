@@ -24,10 +24,6 @@
 .block-editor-block-list__layout {
 	position: relative;
 
-	.has-multi-selection &::selection {
-		background: transparent;
-	}
-
 	// Block multi selection
 	// Apply a rounded radius to the entire block when multi selected, but with low specificity
 	// so explicit radii set by tools are preserved.
