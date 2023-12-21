@@ -134,10 +134,8 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 
 function setBlockEditMode( setEditMode, blocks, mode ) {
 	blocks.forEach( ( block ) => {
-		let editMode = mode;
-		if ( ! editMode ) {
-			editMode = isPartiallySynced( block ) ? 'contentOnly' : 'disabled';
-		}
+		const editMode =
+			mode || ( isPartiallySynced( block ) ? 'contentOnly' : 'disabled' );
 		setEditMode( block.clientId, editMode );
 		setBlockEditMode( setEditMode, block.innerBlocks, mode );
 	} );
