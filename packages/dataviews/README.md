@@ -14,7 +14,7 @@ npm install @wordpress/dataviews --save
 
 ```js
 <DataViews
-	data={ pages }
+	data={ data }
 	paginationInfo={ { totalItems, totalPages } }
 	view={ view }
 	onChangeView={ onChangeView }
@@ -23,7 +23,7 @@ npm install @wordpress/dataviews --save
 	search={ false }
 	searchLabel="Filter list"
 	getItemId={ ( item ) => item.id }
-	isLoading={ true }
+	isLoading={ isLoadingData }
 	supportedLayouts={ [ 'table' ] }
 	deferredRendering={ true }
 	onSelectionChange={ ( items ) => { /* ... */ } }
