@@ -14,6 +14,7 @@ import {
 	useCompositeStore as useCompositeStoreV2,
 } from './composite/v2';
 import { default as CustomSelectControl } from './custom-select-control';
+import { CustomSelect, CustomSelectItem } from './custom-select-control-v2';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
 import { default as ProgressBar } from './progress-bar';
 import { createPrivateSlotFill } from './slot-fill';
@@ -41,6 +42,8 @@ lock( privateApis, {
 	CompositeRowV2,
 	useCompositeStoreV2,
 	CustomSelectControl,
+	CustomSelect,
+	CustomSelectItem,
 	__experimentalPopoverLegacyPositionToPlacement,
 	createPrivateSlotFill,
 	ComponentsContext,
