@@ -25,8 +25,12 @@ function hasOnlyToolbarItem( elements ) {
 	return ! elements.some( ( element ) => ! ( dataProp in element.dataset ) );
 }
 
-function getAllToolbarItemsIn( container ) {
-	return Array.from( container.querySelectorAll( '[data-toolbar-item]' ) );
+function getAllFocusableToolbarItemsIn( container ) {
+	return Array.from(
+		container.querySelectorAll(
+			'[data-toolbar-item]:not([disabled]):not([aria-disabled="true"])'
+		)
+	);
 }
 
 function hasFocusWithin( container ) {
@@ -141,7 +145,8 @@ function useToolbarFocus( {
 		let raf = 0;
 		if ( ! initialFocusOnMount ) {
 			raf = window.requestAnimationFrame( () => {
-				const items = getAllToolbarItemsIn( navigableToolbarRef );
+				const items =
+					getAllFocusableToolbarItemsIn( navigableToolbarRef );
 				const index = initialIndex || 0;
 				if ( items[ index ] && hasFocusWithin( navigableToolbarRef ) ) {
 					items[ index ].focus( {
@@ -158,7 +163,7 @@ function useToolbarFocus( {
 			if ( ! onIndexChange || ! navigableToolbarRef ) return;
 			// When the toolbar element is unmounted and onIndexChange is passed, we
 			// pass the focused toolbar item index so it can be hydrated later.
-			const items = getAllToolbarItemsIn( navigableToolbarRef );
+			const items = getAllFocusableToolbarItemsIn( navigableToolbarRef );
 			const index = items.findIndex( ( item ) => item.tabIndex === 0 );
 			onIndexChange( index );
 		};

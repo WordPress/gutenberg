@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "17.3.0-rc.1",
+	"version": "17.3.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -15,8 +15,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=16.0.0",
-		"npm": ">=8 <9"
+		"node": ">=20.10.0",
+		"npm": ">=10.2.3"
 	},
 	"config": {
 		"IS_GUTENBERG_PLUGIN": true
