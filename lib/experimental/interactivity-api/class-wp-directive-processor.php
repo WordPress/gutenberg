@@ -13,47 +13,42 @@ if ( class_exists( 'WP_Directive_Processor' ) ) {
 /**
  * This processor is built on top of the HTML Tag Processor and augments its
  * capabilities to process the Interactivity API directives.
- *
- * IMPORTANT DISCLAIMER: This code is highly experimental and its only purpose
- * is to provide a way to test the server-side rendering of the Interactivity
- * API. Most of this code will be discarded once the HTML Processor is
- * available.  Please restrain from investing unnecessary time and effort trying
- * to improve this code.
  */
 class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
-
 	/**
-	 * A string containing the main root block.
+	 * String containing the current root block.
 	 *
 	 * @var string
 	 */
 	public static $root_block = null;
 
 	/**
-	 * Add a root block to the variable.
+	 * Array containing the direct children of interactive blocks.
+	 *
+	 * @var array
+	 */
+	public static $children_of_interactive_block = array();
+
+	/**
+	 * Sets the current root block.
 	 *
 	 * @param array $block The block to add.
-	 *
-	 * @return void
 	 */
 	public static function mark_root_block( $block ) {
 		self::$root_block = md5( serialize( $block ) );
 	}
 
 	/**
-	 * Remove a root block to the variable.
-	 *
-	 * @return void
+	 * Resets the root block.
 	 */
 	public static function unmark_root_block() {
 		self::$root_block = null;
 	}
 
 	/**
-	 * Check if block is a root block.
+	 * Checks if block is a root block.
 	 *
 	 * @param array $block The block to check.
-	 *
 	 * @return bool True if block is a root block, false otherwise.
 	 */
 	public static function is_marked_as_root_block( $block ) {
@@ -61,37 +56,28 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	}
 
 	/**
-	 * Check if a root block has already been defined.
+	 * Checks if a root block has already been defined.
 	 *
-	 * @return bool True if block is a root block, false otherwise.
+	 * @return bool True if there is a root block, false otherwise.
 	 */
 	public static function has_root_block() {
 		return isset( self::$root_block );
 	}
 
 	/**
-	 * An array containing the main children of interactive.
-	 *
-	 * @var array
-	 */
-	public static $children_of_interactive_block = array();
-
-	/**
-	 * Add a root block to the variable.
+	 * Stores a reference to a direct children of an interactive block to be able
+	 * to identify it later.
 	 *
 	 * @param array $block The block to add.
-	 *
-	 * @return void
 	 */
 	public static function mark_children_of_interactive_block( $block ) {
 		self::$children_of_interactive_block[] = md5( serialize( $block ) );
 	}
 
 	/**
-	 * Remove a root block to the variable.
+	 * Removes a reference to a direct children of an interactive block.
 	 *
 	 * @param array $block The block to remove.
-	 * @return void
 	 */
 	public static function unmark_children_of_interactive_block( $block ) {
 		$key = array_search( md5( serialize( $block ) ), self::$children_of_interactive_block, true );
@@ -101,18 +87,17 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	}
 
 	/**
-	 * Check if block is a root block.
+	 * Checks if block is marked as children of an interactive block.
 	 *
 	 * @param array $block The block to check.
-	 *
-	 * @return bool True if block is a root block, false otherwise.
+	 * @return bool True if block is a children of an interactive block, false otherwise.
 	 */
 	public static function is_marked_as_children_of_interactive_block( $block ) {
 		return in_array( md5( serialize( $block ) ), self::$children_of_interactive_block, true );
 	}
 
 	/**
-	 * Find the matching closing tag for an opening tag.
+	 * Finds the matching closing tag for an opening tag.
 	 *
 	 * When called while on an open tag, traverse the HTML until we find the
 	 * matching closing tag, respecting any in-between content, including nested
@@ -152,7 +137,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	}
 
 	/**
-	 * Return the content between two balanced tags.
+	 * Returns the content between two balanced tags.
 	 *
 	 * When called on an opening tag, return the HTML content found between that
 	 * opening tag and its matching closing tag.
@@ -178,14 +163,13 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	}
 
 	/**
-	 * Set the content between two balanced tags.
+	 * Sets the content between two balanced tags.
 	 *
 	 * When called on an opening tag, set the HTML content found between that
 	 * opening tag and its matching closing tag.
 	 *
 	 * @param string $new_html The string to replace the content between the
 	 * matching tags with.
-	 *
 	 * @return bool            Whether the content was successfully replaced.
 	 */
 	public function set_inner_html( $new_html ) {
@@ -209,7 +193,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	}
 
 	/**
-	 * Return a pair of bookmarks for the current opening tag and the matching
+	 * Returns a pair of bookmarks for the current opening tag and the matching
 	 * closing tag.
 	 *
 	 * @return array|false A pair of bookmarks, or false if there's no matching
@@ -239,12 +223,12 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	}
 
 	/**
-	 * Whether a given HTML element is void (e.g. <br>).
+	 * Checks whether a given HTML element is void (e.g. <br>).
+	 *
+	 * @see https://html.spec.whatwg.org/#elements-2
 	 *
 	 * @param string $tag_name The element in question.
 	 * @return bool True if the element is void.
-	 *
-	 * @see https://html.spec.whatwg.org/#elements-2
 	 */
 	public static function is_html_void_element( $tag_name ) {
 		switch ( $tag_name ) {
@@ -269,7 +253,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	}
 
 	/**
-	 * Extract and return the directive type and the the part after the double
+	 * Extracts and return the directive type and the the part after the double
 	 * hyphen from an attribute name (if present), in an array format.
 	 *
 	 * Examples:
@@ -279,7 +263,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	 *     'wp-thing--and--thang' => array( 'wp-thing', 'and--thang' )
 	 *
 	 * @param string $name The attribute name.
-	 * @return array The resulting array
+	 * @return array The resulting array.
 	 */
 	public static function parse_attribute_name( $name ) {
 		return explode( '--', $name, 2 );

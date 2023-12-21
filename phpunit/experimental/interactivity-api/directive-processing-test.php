@@ -8,9 +8,7 @@
  * @phpcs:disable Generic.Files.OneObjectStructurePerFile.MultipleFound
  */
 
-
 class Helper_Class {
-
 	public function increment( $store ) {
 		return $store['state']['count'] + $store['context']['count'];
 	}
@@ -31,9 +29,9 @@ function gutenberg_test_process_directives_helper_increment( $store ) {
  * @covers gutenberg_interactivity_process_rendered_html
  */
 class Tests_Process_Directives extends WP_UnitTestCase {
-
 	public function set_up() {
 		parent::set_up();
+
 		register_block_type(
 			'gutenberg/test-context-level-1',
 			array(
@@ -49,6 +47,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 				),
 			)
 		);
+
 		register_block_type(
 			'gutenberg/test-context-level-2',
 			array(
@@ -64,6 +63,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 				),
 			)
 		);
+
 		register_block_type(
 			'gutenberg/test-context-read-only',
 			array(
@@ -85,7 +85,6 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 	}
 
 	public function test_interactivity_process_directives_in_root_blocks() {
-
 		$block_content =
 		'<!-- wp:paragraph -->' .
 			'<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>' .
@@ -94,15 +93,11 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 			'<p>Welcome to WordPress.</p>' .
 		'<!-- /wp:paragraph -->';
 
-		$parsed_block = parse_blocks( $block_content )[0];
-
-		$source_block = $parsed_block;
-
-		$rendered_content = render_block( $parsed_block );
-
+		$parsed_block        = parse_blocks( $block_content )[0];
+		$source_block        = $parsed_block;
+		$rendered_content    = render_block( $parsed_block );
 		$parsed_block_second = parse_blocks( $block_content )[1];
-
-		$fake_parent_block = array();
+		$fake_parent_block   = array();
 
 		// Test that root block is intially emtpy.
 		$this->assertEmpty( WP_Directive_Processor::$root_block );
@@ -197,6 +192,7 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 				),
 			)
 		);
+
 		$this->assertSame( 1, gutenberg_interactivity_evaluate_reference( 'state.core.number' ) );
 		$this->assertTrue( gutenberg_interactivity_evaluate_reference( 'state.core.bool' ) );
 		$this->assertSame( 'hi', gutenberg_interactivity_evaluate_reference( 'state.core.nested.string' ) );
@@ -213,10 +209,12 @@ class Tests_Utils_Evaluate extends WP_UnitTestCase {
 				),
 			),
 		);
+
 		$this->assertSame( 2, gutenberg_interactivity_evaluate_reference( 'context.local.number', $context ) );
 		$this->assertFalse( gutenberg_interactivity_evaluate_reference( 'context.local.bool', $context ) );
 		$this->assertTrue( gutenberg_interactivity_evaluate_reference( '!context.local.bool', $context ) );
 		$this->assertSame( 'bye', gutenberg_interactivity_evaluate_reference( 'context.local.nested.string', $context ) );
+
 		// Previously defined state is also accessible.
 		$this->assertSame( 1, gutenberg_interactivity_evaluate_reference( 'state.core.number' ) );
 		$this->assertTrue( gutenberg_interactivity_evaluate_reference( 'state.core.bool' ) );
