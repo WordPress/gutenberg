@@ -15,10 +15,12 @@ abstract class WP_Font_Library_UnitTestCase extends WP_UnitTestCase {
 	}
 
 	public function set_up() {
+		parent::set_up();
 		$this->reset_font_collections();
 	}
 
 	public function tear_down() {
+		parent::tear_down();
 		$this->reset_font_collections();
 	}
 }
