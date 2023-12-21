@@ -57,4 +57,41 @@ if ( window?.__experimentalEnableGroupGridVariation ) {
 	} );
 }
 
+const semanticTagNames = [
+	'section',
+	'main',
+	'article',
+	'aside',
+	'footer',
+	'header',
+];
+
+const capitalize = ( name ) =>
+	name.charAt( 0 ).toUpperCase() + name.substring( 1 );
+
+const createSemanticVariations = ( baseVariation ) => {
+	return semanticTagNames.map( ( tagName ) => ( {
+		...baseVariation,
+		isDefault: false,
+		scope: [ 'inserter' ],
+		name: baseVariation.name + `-${ tagName }`,
+		title: capitalize( tagName ),
+		attributes: { ...baseVariation.attributes, tagName },
+		isActive: ( blockAttributes ) =>
+			blockAttributes.tagName === tagName &&
+			baseVariation.isActive( blockAttributes ),
+	} ) );
+};
+
+variations.slice().forEach( ( baseVariation ) => {
+	baseVariation.tagName = 'div';
+	const baseIsActive = baseVariation.isActive;
+	baseVariation.isActive = ( blockAttributes ) =>
+		baseVariation.tagName === 'div' && baseIsActive( blockAttributes );
+
+	createSemanticVariations( baseVariation ).forEach( ( variant ) =>
+		variations.push( variant )
+	);
+} );
+
 export default variations;

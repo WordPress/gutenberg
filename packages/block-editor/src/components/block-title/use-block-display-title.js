@@ -72,6 +72,8 @@ export default function useBlockDisplayTitle( {
 		? getBlockLabel( blockType, attributes, context )
 		: null;
 
+	const { tagName } = attributes;
+
 	const label = reusableBlockTitle || blockLabel;
 	// Label will fallback to the title if no label is defined for the current
 	// label context. If the label is defined we prioritize it over a
@@ -90,5 +92,5 @@ export default function useBlockDisplayTitle( {
 		);
 	}
 
-	return blockTitle;
+	return tagName ? blockTitle + ` (${ tagName })` : blockTitle;
 }
