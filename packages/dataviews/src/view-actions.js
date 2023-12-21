@@ -46,7 +46,6 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 					</DropdownMenuItemLabel>
 				</DropdownMenuItem>
 			}
-			placement="left-start"
 		>
 			{ _availableViews.map( ( availableView ) => {
 				return (
@@ -86,8 +85,6 @@ function PageSizeMenu( { view, onChangeView } ) {
 					</DropdownMenuItemLabel>
 				</DropdownMenuItem>
 			}
-			// TODO": remove?
-			placement="left-start"
 		>
 			{ PAGE_SIZE_VALUES.map( ( size ) => {
 				return (
@@ -129,7 +126,6 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 					</DropdownMenuItemLabel>
 				</DropdownMenuItem>
 			}
-			placement="left-start"
 		>
 			{ hidableFields?.map( ( field ) => {
 				return (
@@ -188,7 +184,6 @@ function SortMenu( { fields, view, onChangeView } ) {
 					</DropdownMenuItemLabel>
 				</DropdownMenuItem>
 			}
-			placement="left-start"
 		>
 			{ sortableFields?.map( ( field ) => {
 				const sortedDirection = view.sort?.direction;
@@ -202,7 +197,6 @@ function SortMenu( { fields, view, onChangeView } ) {
 								</DropdownMenuItemLabel>
 							</DropdownMenuItem>
 						}
-						placement="left-start"
 						style={ {
 							minWidth: '220px',
 						} }
