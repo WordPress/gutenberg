@@ -1,14 +1,9 @@
 name: Build Gutenberg Plugin Zip
 
 on:
-    pull_request:
+    pull_request_target:
+        types: [opened]
     push:
-        branches: [trunk]
-    workflow_dispatch:
-        inputs:
-            version:
-                description: 'rc or stable?'
-                required: true
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
