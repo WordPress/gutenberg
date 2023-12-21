@@ -22,6 +22,17 @@ import { navigate } from './router';
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
 
+const deepClone = ( thing ) => {
+	if ( isObject( thing ) )
+		return Object.fromEntries(
+			Object.entries( thing ).map( ( [ k, v ] ) => [ k, deepClone( v ) ] )
+		);
+	if ( Array.isArray( thing ) ) {
+		return [ ...thing.map( ( i ) => deepClone( i ) ) ];
+	}
+	return thing;
+};
+
 const mergeDeepSignals = ( target, source, overwrite ) => {
 	for ( const k in source ) {
 		if ( isObject( peek( target, k ) ) && isObject( peek( source, k ) ) ) {
@@ -30,8 +41,10 @@ const mergeDeepSignals = ( target, source, overwrite ) => {
 				source[ `$${ k }` ].peek(),
 				overwrite
 			);
-		} else if ( overwrite || typeof peek( target, k ) === 'undefined' ) {
+		} else if ( typeof peek( target, k ) === 'undefined' ) {
 			target[ `$${ k }` ] = source[ `$${ k }` ];
+		} else if ( overwrite ) {
+			target[ k ] = peek( source, k );
 		}
 	}
 };
@@ -52,7 +65,9 @@ export default () => {
 
 			currentValue.current = useMemo( () => {
 				const newValue = context
-					.map( ( c ) => deepSignal( { [ c.namespace ]: c.value } ) )
+					.map( ( c ) =>
+						deepSignal( { [ c.namespace ]: deepClone( c.value ) } )
+					)
 					.reduceRight( mergeDeepSignals );
 
 				mergeDeepSignals( newValue, inheritedValue );
