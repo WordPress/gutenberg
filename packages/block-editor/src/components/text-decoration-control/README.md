@@ -11,7 +11,7 @@ This feature is still experimental. “Experimental” means this is an early im
 ## Usage
 
 ```jsx
-import { __experimentalTextDecorationControl } from '@wordpress/block-editor';
+import { __experimentalTextDecorationControl as TextDecorationControl } from '@wordpress/block-editor';
 ```
 
 Then, you can use the component in your block editor UI:
