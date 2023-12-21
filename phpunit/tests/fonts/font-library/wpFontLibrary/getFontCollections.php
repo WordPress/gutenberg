@@ -10,24 +10,7 @@
  *
  * @covers WP_Font_Library::get_font_collections
  */
-class Tests_Fonts_WpFontLibrary_GetFontCollections extends WP_UnitTestCase {
-
-	public function reset_collections() {
-		// Resets the private static property WP_Font_Library::$collections to empty array.
-		$reflection = new ReflectionClass( 'WP_Font_Library' );
-		$property   = $reflection->getProperty( 'collections' );
-		$property->setAccessible( true );
-		$property->setValue( array() );
-	}
- 
-	public function set_up() {
-		$this->reset_collections();
-	}
-
-	public function tear_down() {
-		$this->reset_collections();
-	}
-
+class Tests_Fonts_WpFontLibrary_GetFontCollections extends WP_Font_Library_UnitTestCase {
 	public function test_should_get_an_empty_list() {
 		$font_collections = WP_Font_Library::get_font_collections();
 		$this->assertEmpty( $font_collections, 'Should return an empty array.' );

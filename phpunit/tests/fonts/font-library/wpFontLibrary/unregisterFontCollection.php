@@ -10,15 +10,9 @@
  *
  * @covers WP_Font_Library::unregister_font_collection
  */
-class Tests_Fonts_WpFontLibrary_UnregisterFontCollection extends WP_UnitTestCase {
+class Tests_Fonts_WpFontLibrary_UnregisterFontCollection extends WP_Font_Library_UnitTestCase {
 
-	public function set_up() {
-		// Resets the private static property WP_Font_Library::$collections to empty array.
-		$reflection = new ReflectionClass( 'WP_Font_Library' );
-		$property   = $reflection->getProperty( 'collections' );
-		$property->setAccessible( true );
-		$property->setValue( array() );
-
+	public function test_should_unregister_font_collection() {
 		// Registers two mock font collections.
 		$config = array(
 			'id'          => 'mock-font-collection-1',
@@ -35,9 +29,7 @@ class Tests_Fonts_WpFontLibrary_UnregisterFontCollection extends WP_UnitTestCase
 			'src'         => 'my-mock-data.json',
 		);
 		WP_Font_Library::register_font_collection( $config );
-	}
 
-	public function test_should_unregister_font_collection() {
 		// Unregister mock font collection.
 		WP_Font_Library::unregister_font_collection( 'mock-font-collection-1' );
 		$collections = WP_Font_Library::get_font_collections();

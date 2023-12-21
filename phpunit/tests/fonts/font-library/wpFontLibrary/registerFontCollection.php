@@ -10,7 +10,7 @@
  *
  * @covers WP_Font_Library::register_font_collection
  */
-class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
+class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_Font_Library_UnitTestCase {
 
 	public function test_should_register_font_collection() {
 		$config     = array(
@@ -69,11 +69,11 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_UnitTestCase {
 		// Register first collection.
 		$collection1 = WP_Font_Library::register_font_collection( $config1 );
 		$this->assertInstanceOf( 'WP_Font_Collection', $collection1, 'A collection should be registered.' );
-
+		
 		// Expects a _doing_it_wrong notice.
 		$this->setExpectedIncorrectUsage( 'WP_Font_Library::register_font_collection' );
 		// Try to register a second collection with same id.
 		$collection2 = WP_Font_Library::register_font_collection( $config2 );
-		$this->assertWPError( $collection2, 'Second collection with the same id should fail.' );
+		$this->assertInstanceOf( 'WP_Error', $collection2, 'Should return an instance of WP_Error.' );
 	}
 }
