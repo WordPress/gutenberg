@@ -45,7 +45,7 @@ _(see the [code above](https://github.com/WordPress/block-development-examples/b
 Blocks with dynamic rendering can also define a markup representation of the block via `save` as a backup for when the dynamic rendering method is no longer available (uninstallation of the plugin that registered the block). If no dynamic rendering method is found, any markup representation of the block in the database will be returned to the front end.
 
 <div class="callout callout-info">
-Even for static blocks, the markup stored for a block can be modified before it gets rendered on the front end via hooks such as [`render_block`](https://developer.wordpress.org/reference/functions/render_block/).
+Even for static blocks, the markup stored for a block can be modified before it gets rendered on the front end via hooks such as <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>render_block</code></a>.
 </div>
 
 ## Blocks with Dynamic Rendering
