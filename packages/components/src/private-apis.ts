@@ -26,7 +26,7 @@ import {
 	DropdownMenuSeparator as DropdownMenuSeparatorV2,
 	DropdownMenuItemLabel as DropdownMenuItemLabelV2,
 	DropdownMenuItemHelpText as DropdownMenuItemHelpTextV2,
-} from './dropdown-menu-v2-ariakit';
+} from './dropdown-menu-v2';
 import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
 import Tabs from './tabs';
