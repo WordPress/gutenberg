@@ -30,9 +30,6 @@ const BlockDraggable = ( {
 		icon,
 		visibleInserter,
 		getBlockType,
-		getAllowedBlocks,
-		draggedBlockNames,
-		getBlockNamesByClientId,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -41,9 +38,6 @@ const BlockDraggable = ( {
 				getBlockName,
 				getBlockAttributes,
 				isBlockInsertionPointVisible,
-				getDraggedBlockClientIds,
-				getBlockNamesByClientId: _getBlockNamesByClientId,
-				getAllowedBlocks: _getAllowedBlocks,
 			} = select( blockEditorStore );
 			const { getBlockType: _getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
@@ -60,11 +54,6 @@ const BlockDraggable = ( {
 				icon: variation?.icon || _getBlockType( blockName )?.icon,
 				visibleInserter: isBlockInsertionPointVisible(),
 				getBlockType: _getBlockType,
-				getAllowedBlocks: _getAllowedBlocks,
-				draggedBlockNames: _getBlockNamesByClientId(
-					getDraggedBlockClientIds()
-				),
-				getBlockNamesByClientId: _getBlockNamesByClientId,
 			};
 		},
 		[ clientIds ]
@@ -73,6 +62,9 @@ const BlockDraggable = ( {
 	const isDragging = useRef( false );
 	const [ startScrolling, scrollOnDragOver, stopScrolling ] =
 		useScrollWhenDragging();
+
+	const { getAllowedBlocks, getBlockNamesByClientId, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 
 	const { startDraggingBlocks, stopDraggingBlocks } =
 		useDispatch( blockEditorStore );
@@ -90,9 +82,10 @@ const BlockDraggable = ( {
 	const blockRef = useBlockRef( clientIds[ 0 ] );
 	const editorRoot = blockRef.current?.closest( 'body' );
 
-	// Add a dragover event listener to the editor root to track the blocks being dragged over.
-	// The listener has to be inside the editor iframe otherwise the target isn't accessible.
-	// Check if the dragged blocks are allowed inside the target. If not, grey out the draggable.
+	/*
+	 * Add a dragover event listener to the editor root to track the blocks being dragged over.
+	 * The listener has to be inside the editor iframe otherwise the target isn't accessible.
+	 */
 	useEffect( () => {
 		if ( ! editorRoot || ! fadeWhenDisabled ) {
 			return;
@@ -102,7 +95,7 @@ const BlockDraggable = ( {
 			if ( ! event.target.closest( '[data-block]' ) ) {
 				return;
 			}
-
+			const draggedBlockNames = getBlockNamesByClientId( clientIds );
 			const targetClientId = event.target
 				.closest( '[data-block]' )
 				.getAttribute( 'data-block' );
@@ -111,16 +104,42 @@ const BlockDraggable = ( {
 			const targetBlockName = getBlockNamesByClientId( [
 				targetClientId,
 			] )[ 0 ];
-			const dropTargetValid = isDropTargetValid(
-				getBlockType,
-				allowedBlocks,
-				draggedBlockNames,
-				targetBlockName
-			);
 
-			// Update the body class to reflect if drop target is valid.
-			// This has to be done on the document body because the draggable
-			// chip is rendered outside of the editor iframe.
+			/*
+			 * Check if the target is valid to drop in.
+			 * If the target's allowedBlocks is an empty array,
+			 * it isn't a container block, in which case we check
+			 * its parent's validity instead.
+			 */
+			let dropTargetValid;
+			if ( allowedBlocks?.length === 0 ) {
+				const targetRootClientId =
+					getBlockRootClientId( targetClientId );
+				const targetRootBlockName = getBlockNamesByClientId( [
+					targetRootClientId,
+				] )[ 0 ];
+				const rootAllowedBlocks =
+					getAllowedBlocks( targetRootClientId );
+				dropTargetValid = isDropTargetValid(
+					getBlockType,
+					rootAllowedBlocks,
+					draggedBlockNames,
+					targetRootBlockName
+				);
+			} else {
+				dropTargetValid = isDropTargetValid(
+					getBlockType,
+					allowedBlocks,
+					draggedBlockNames,
+					targetBlockName
+				);
+			}
+
+			/*
+			 * Update the body class to reflect if drop target is valid.
+			 * This has to be done on the document body because the draggable
+			 * chip is rendered outside of the editor iframe.
+			 */
 			if ( ! dropTargetValid && ! visibleInserter ) {
 				window?.document?.body?.classList?.add(
 					'block-draggable-invalid-drag-token'
@@ -140,10 +159,12 @@ const BlockDraggable = ( {
 			editorRoot.removeEventListener( 'dragover', throttledOnDragOver );
 		};
 	}, [
-		draggedBlockNames,
+		clientIds,
 		editorRoot,
+		fadeWhenDisabled,
 		getAllowedBlocks,
 		getBlockNamesByClientId,
+		getBlockRootClientId,
 		getBlockType,
 		visibleInserter,
 	] );
