@@ -386,8 +386,8 @@ function ViewTable( {
 						</tr>
 					</thead>
 					<tbody>
-						{ usedData.map( ( item, index ) => (
-							<tr key={ getItemId?.( item ) || index }>
+						{ usedData.map( ( item ) => (
+							<tr key={ getItemId( item ) }>
 								{ visibleFields.map( ( field ) => (
 									<td
 										key={ field.id }

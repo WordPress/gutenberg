@@ -43,6 +43,8 @@ Example:
 ]
 ```
 
+By default, dataviews would use each record's `id` as an unique identifier. If it's not, the consumer should provide a `getItemId` function that returns one. See "Other props" section.
+
 ## Pagination Info
 
 - `totalItems`: the total number of items in the datasets.
@@ -230,7 +232,7 @@ Array of operations that can be performed upon each record. Each action is an ob
 
 - `search`: whether the search input is enabled. `true` by default.
 - `searchLabel`: what text to show in the search input. "Filter list" by default.
-- `getItemId`: function that receives an item and return an unique identifier for it. Required.
+- `getItemId`: function that receives an item and returns an unique identifier for it. By default, it uses the `id` of the item as unique identifier. If it's not, the consumer should provide their own.
 - `isLoading`: whether the data is loading. `false` by default.
 - `supportedLayouts`: array of layouts supported. By default, all are: `table`, `grid`, `list`.
 - `deferredRendering`: whether the items should be rendered asynchronously. Required.

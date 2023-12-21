@@ -24,7 +24,7 @@ export default function DataViews( {
 	searchLabel = undefined,
 	actions,
 	data,
-	getItemId,
+	getItemId = ( item ) => item.id,
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
