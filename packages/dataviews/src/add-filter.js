@@ -20,6 +20,7 @@ const {
 	DropdownMenuV2Ariakit: DropdownMenu,
 	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
 	DropdownMenuItemV2Ariakit: DropdownMenuItem,
+	DropdownMenuRadioItemV2Ariakit: DropdownMenuRadioItem,
 	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
 	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
@@ -169,7 +170,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 													operator,
 													{ label, key },
 												] ) => (
-													<DropdownMenuRadioItemCustom
+													<DropdownMenuRadioItem
 														key={ key }
 														name={ `add-filter-${ filter.name }-conditions` }
 														value={ operator }
@@ -198,7 +199,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 														<DropdownMenuItemLabel>
 															{ label }
 														</DropdownMenuItemLabel>
-													</DropdownMenuRadioItemCustom>
+													</DropdownMenuRadioItem>
 												)
 											) }
 										</DropdownMenu>
