@@ -9,17 +9,9 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import isURLLike from './is-url-like';
-import {
-	CREATE_TYPE,
-	TEL_TYPE,
-	MAILTO_TYPE,
-	INTERNAL_TYPE,
-	URL_TYPE,
-} from './constants';
+import { TEL_TYPE, MAILTO_TYPE, INTERNAL_TYPE, URL_TYPE } from './constants';
 import { store as blockEditorStore } from '../../store';
 import { default as settingsKeys } from '../../private-settings-keys';
-
-export const handleNoop = () => Promise.resolve( [] );
 
 export const handleDirectEntry = ( val ) => {
 	let type = URL_TYPE;
@@ -48,90 +40,23 @@ export const handleDirectEntry = ( val ) => {
 	] );
 };
 
-function useHandleEntitySearch() {
-	const { fetchSearchSuggestions, usePageSettings } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			const settings = getSettings();
-			return {
-				usePageSettings: settings[ settingsKeys.usePageSettings ],
-				fetchSearchSuggestions:
-					settings.__experimentalFetchLinkSuggestions,
-			};
-		},
-		[]
-	);
-	// The function should either be undefined or a stable function reference
-	// throughout the editor lifetime, much like importing a function from a
-	// module.
-	const { pageOnFront, pageForPosts } = usePageSettings?.() ?? {};
-
-	return useCallback(
-		async ( val, suggestionsQuery, withCreateSuggestion ) => {
-			const { isInitialSuggestions } = suggestionsQuery;
-
-			const results = await fetchSearchSuggestions(
-				val,
-				suggestionsQuery
-			);
-
-			// Identify front page and update type to match.
-			results.map( ( result ) => {
-				if ( Number( result.id ) === pageOnFront ) {
-					result.isFrontPage = true;
-					return result;
-				} else if ( Number( result.id ) === pageForPosts ) {
-					result.isBlogHome = true;
-					return result;
-				}
-
-				return result;
-			} );
-
-			// If displaying initial suggestions just return plain results.
-			if ( isInitialSuggestions ) {
-				return results;
-			}
-
-			// Here we append a faux suggestion to represent a "CREATE" option. This
-			// is detected in the rendering of the search results and handled as a
-			// special case. This is currently necessary because the suggestions
-			// dropdown will only appear if there are valid suggestions and
-			// therefore unless the create option is a suggestion it will not
-			// display in scenarios where there are no results returned from the
-			// API. In addition promoting CREATE to a first class suggestion affords
-			// the a11y benefits afforded by `URLInput` to all suggestions (eg:
-			// keyboard handling, ARIA roles...etc).
-			//
-			// Note also that the value of the `title` and `url` properties must correspond
-			// to the text value of the `<input>`. This is because `title` is used
-			// when creating the suggestion. Similarly `url` is used when using keyboard to select
-			// the suggestion (the <form> `onSubmit` handler falls-back to `url`).
-			return isURLLike( val ) || ! withCreateSuggestion
-				? results
-				: results.concat( {
-						// the `id` prop is intentionally ommitted here because it
-						// is never exposed as part of the component's public API.
-						// see: https://github.com/WordPress/gutenberg/pull/19775#discussion_r378931316.
-						title: val, // Must match the existing `<input>`s text value.
-						url: val, // Must match the existing `<input>`s text value.
-						type: CREATE_TYPE,
-				  } );
-		},
-		[ fetchSearchSuggestions, pageOnFront, pageForPosts ]
-	);
-}
-
 export default function useSearchHandler(
 	suggestionsQuery,
 	allowDirectEntry,
 	withCreateSuggestion
 ) {
+	const handleNoop = useCallback( () => Promise.resolve( [] ), [] );
 	const directEntryHandler = allowDirectEntry
 		? handleDirectEntry
 		: handleNoop;
 
-	const handleEntitySearch = useHandleEntitySearch();
+	const useHandleEntitySearch = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return settings[ settingsKeys.useLinkControlEntitySearch ];
+	}, [] );
+	// Note that this is meant to be a stable function and doesn't change, so it
+	// doesn't break the rules of hooks.
+	const handleEntitySearch = useHandleEntitySearch?.() || handleNoop;
 
 	return useCallback(
 		( val, { isInitialSuggestions } ) => {

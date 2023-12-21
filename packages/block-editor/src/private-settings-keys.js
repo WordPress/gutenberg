@@ -1,3 +1,3 @@
 export default {
-	usePageSettings: Symbol( 'usePageSettings' ),
+	useLinkControlEntitySearch: Symbol( 'useLinkControlEntitySearch' ),
 };

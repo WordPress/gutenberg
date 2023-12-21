@@ -15,7 +15,6 @@ import {
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
 import {
 	registerLegacyWidgetBlock,
 	registerLegacyWidgetVariations,
@@ -81,9 +80,6 @@ export function initializeEditor( id, settings ) {
 	registerLegacyWidgetVariations( settings );
 	registerBlock( widgetArea );
 	registerWidgetGroupBlock();
-
-	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
-		fetchLinkSuggestions( search, searchOptions, settings );
 
 	// As we are unregistering `core/freeform` to avoid the Classic block, we must
 	// replace it with something as the default freeform content handler. Failure to
