@@ -33,17 +33,24 @@ export default function useTruncate(
 
 	const cx = useCx();
 
-	const truncatedContent = truncateContent(
-		typeof children === 'string' ? children : '',
-		{
-			ellipsis,
-			ellipsizeMode,
-			limit,
-			numberOfLines,
-		}
-	);
+	let childrenAsText;
+	if ( typeof children === 'string' ) {
+		childrenAsText = children;
+	} else if ( typeof children === 'number' ) {
+		childrenAsText = children.toString();
+	}
 
-	const shouldTruncate = ellipsizeMode === TRUNCATE_TYPE.auto;
+	const truncatedContent = childrenAsText
+		? truncateContent( childrenAsText, {
+				ellipsis,
+				ellipsizeMode,
+				limit,
+				numberOfLines,
+		  } )
+		: children;
+
+	const shouldTruncate =
+		!! childrenAsText && ellipsizeMode === TRUNCATE_TYPE.auto;
 
 	const classes = useMemo( () => {
 		const truncateLines = css`
