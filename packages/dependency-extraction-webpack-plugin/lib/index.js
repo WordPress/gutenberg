@@ -3,8 +3,6 @@
  */
 const path = require( 'path' );
 const webpack = require( 'webpack' );
-// In webpack 5 there is a `webpack.sources` field but for webpack 4 we have to fallback to the `webpack-sources` package.
-const { RawSource } = webpack.sources || require( 'webpack-sources' );
 const json2php = require( 'json2php' );
 const isWebpack4 = webpack.version.startsWith( '4.' );
 const { createHash } = webpack.util;
@@ -17,6 +15,8 @@ const {
 	defaultRequestToHandle,
 } = require( './util' );
 
+
+const { RawSource } = webpack.sources;
 const defaultExternalizedReportFileName = 'externalized-dependencies.json';
 
 class DependencyExtractionWebpackPlugin {
