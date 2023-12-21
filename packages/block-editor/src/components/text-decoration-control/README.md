@@ -17,7 +17,7 @@ import { __experimentalTextDecorationControl as TextDecorationControl } from '@w
 Then, you can use the component in your block editor UI:
 
 ```jsx
-<__experimentalTextDecorationControl
+<TextDecorationControl
   value={textDecorationValue}
   onChange={(newValue) => setAttributes({ textDecoration: newValue })}
 />
