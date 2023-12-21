@@ -35,7 +35,7 @@ class Tests_Fonts_WpFontLibrary_UnregisterFontCollection extends WP_Font_Library
 		$collections = WP_Font_Library::get_font_collections();
 		$this->assertArrayNotHasKey( 'mock-font-collection-1', $collections, 'Font collection was not unregistered.' );
 		$this->assertArrayHasKey( 'mock-font-collection-2', $collections, 'Font collection was unregistered by mistake.' );
-		
+
 		// Unregisters remaining mock font collection.
 		WP_Font_Library::unregister_font_collection( 'mock-font-collection-2' );
 		$collections = WP_Font_Library::get_font_collections();
