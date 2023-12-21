@@ -409,7 +409,19 @@ function BackgroundSizePanelItem( {
 
 	const updateBackgroundSize = ( next ) => {
 		// When switching to 'contain' toggle the repeat off.
-		const nextRepeat = next === 'contain' ? 'no-repeat' : undefined;
+		let nextRepeat = repeatValue;
+
+		if ( next === 'contain' ) {
+			nextRepeat = 'no-repeat';
+		}
+
+		if (
+			( currentValueForToggle === 'cover' ||
+				currentValueForToggle === 'contain' ) &&
+			next === 'auto'
+		) {
+			nextRepeat = undefined;
+		}
 
 		setAttributes( {
 			style: cleanEmptyObject( {
@@ -482,12 +494,14 @@ function BackgroundSizePanelItem( {
 					value={ sizeValue }
 				/>
 			) : null }
-			<ToggleControl
-				__nextHasNoMarginBottom
-				label={ __( 'Repeat image' ) }
-				checked={ repeatCheckedValue }
-				onChange={ toggleIsRepeated }
-			/>
+			{ currentValueForToggle !== 'cover' && (
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={ __( 'Repeat image' ) }
+					checked={ repeatCheckedValue }
+					onChange={ toggleIsRepeated }
+				/>
+			) }
 		</VStack>
 	);
 }
