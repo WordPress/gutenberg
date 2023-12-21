@@ -33,14 +33,123 @@ if ( window.__experimentalBlockBindings ) {
 						const postType = context.postType
 							? context.postType
 							: select( editorStore ).getCurrentPostType();
-						const { getEntityRecord } = select( coreStore );
-						return getEntityRecord( 'postType', postType, postId );
+						const { getEntityRecord, getEntityRecords } =
+							select( coreStore );
+
+						let isTemplate = false;
+						// If it is a template, get example data if it is a post/page/cpt.
+						if ( postType === 'wp_template' ) {
+							isTemplate = true;
+							const { slug: templateSlug } = getEntityRecord(
+								'postType',
+								'wp_template',
+								postId
+							);
+
+							// Get the post type from the template slug.
+
+							// Match "page-{slug}".
+							const pagePattern = /^page(?:-(.+))?$/;
+							// Match "single-{postType}-{slug}".
+							const postPattern = /^single-([^-]+)(?:-(.+))?$/;
+							// Match "wp-custom-template-{slug}".
+							const customTemplatePattern =
+								/^wp-custom-template-(.+)$/;
+							// If it doesn't match any of the accepted patterns, return.
+							if (
+								! templateSlug !== 'index' &&
+								! templateSlug !== 'page' &&
+								! pagePattern.test( templateSlug ) &&
+								! postPattern.test( templateSlug ) &&
+								! customTemplatePattern.test( templateSlug )
+							) {
+								return null;
+							}
+
+							let records = [];
+							// If it is an index or a generic page template, return any page.
+							if (
+								templateSlug === 'index' ||
+								templateSlug === 'page'
+							) {
+								records = getEntityRecords(
+									'postType',
+									'page',
+									{
+										per_page: 1,
+									}
+								);
+							}
+
+							// If it is specific page template, return that one.
+							if ( pagePattern.test( templateSlug ) ) {
+								records = getEntityRecords(
+									'postType',
+									'page',
+									{
+										slug: templateSlug.match(
+											pagePattern
+										)[ 1 ],
+									}
+								);
+							}
+
+							// If it is post/cpt template.
+							if ( postPattern.test( templateSlug ) ) {
+								const [ , entityPostType, entitySlug ] =
+									templateSlug.match( postPattern );
+
+								// If it is a specific post.
+								if ( entitySlug ) {
+									records = getEntityRecords(
+										'postType',
+										entityPostType,
+										{
+											slug: entitySlug,
+										}
+									);
+								} else {
+									// If it is a generic template, return any post.
+									records = getEntityRecords(
+										'postType',
+										entityPostType,
+										{
+											per_page: 1,
+										}
+									);
+								}
+							}
+
+							// If it is a custom template, get the fields from any page.
+							if (
+								customTemplatePattern.test( templateSlug ) ||
+								! records
+							) {
+								records = getEntityRecords(
+									'postType',
+									'page',
+									{
+										per_page: 1,
+									}
+								);
+							}
+
+							return { isTemplate, fields: records?.[ 0 ] };
+						}
+
+						return {
+							isTemplate,
+							fields: getEntityRecord(
+								'postType',
+								postType,
+								postId
+							),
+						};
 					},
 					[ context.postId, context.postType ]
 				);
 
-				// TODO: Explore how to get the list of available fields depending on the template.
-				if ( ! data || ! data.meta ) {
+				if ( ! data || ! data?.fields?.meta ) {
 					return <BlockEdit key="edit" { ...props } />;
 				}
 
@@ -55,13 +164,16 @@ if ( window.__experimentalBlockBindings ) {
 						)
 						.join( ' ' );
 				};
-				Object.entries( data.meta ).forEach( ( [ key, value ] ) => {
-					fields.push( {
-						key,
-						label: keyToLabel( key ),
-						value,
-					} );
-				} );
+				Object.entries( data.fields.meta ).forEach(
+					( [ key, value ] ) => {
+						fields.push( {
+							key,
+							label: keyToLabel( key ),
+							value: data.isTemplate ? null : value,
+							placeholder: keyToLabel( key ),
+						} );
+					}
+				);
 			}
 
 			return (
