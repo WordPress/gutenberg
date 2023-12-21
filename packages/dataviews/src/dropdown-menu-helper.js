@@ -5,8 +5,8 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { check } from '@wordpress/icons';
 import { forwardRef } from '@wordpress/element';
+import { SVG, Circle } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -15,6 +15,12 @@ import { unlock } from './lock-unlock';
 
 const { DropdownMenuItemV2Ariakit: DropdownMenuItem } = unlock(
 	componentsPrivateApis
+);
+
+const radioCheck = (
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<Circle cx={ 12 } cy={ 12 } r={ 3 }></Circle>
+	</SVG>
 );
 
 /**
@@ -36,7 +42,7 @@ export const DropdownMenuRadioItemCustom = forwardRef(
 				hideOnClick={ false }
 				prefix={
 					checked ? (
-						<Icon icon={ check } />
+						<Icon icon={ radioCheck } />
 					) : (
 						<span
 							className="dataviews__filters-custom-menu-radio-item-prefix"
