@@ -1,9 +1,6 @@
 # Static or Dynamic rendering of a block
 
-The blocks's markup returned for the front end can be generated dynamically via a process in the server (dynamic blocks) or statically when the block is saved in the Block Editor (static blocks).
-
-- Blocks with static rendering _generate the HMTL for the frontend at "update-time" (when it's saved)_. 
-- Blocks with dynamic rendering _generate the HMTL for the frontend at "request-time" (when it's requested)_
+The blocks's markup returned for the front end can be dynamically generated on the server when the block is requested from the client (dynamic blocks) or statically when the block is saved in the Block Editor (static blocks).
 
 <div class="callout callout-tip">
 The post <a href="https://developer.wordpress.org/news/2023/02/27/static-vs-dynamic-blocks-whats-the-difference/">Static vs. dynamic blocks: What’s the difference?</a> provides a great introduction to static and dynamic blocks
