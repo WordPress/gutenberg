@@ -6,6 +6,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
 	__experimentalUseLinkControlEntitySearch as useLinkControlEntitySearch,
+	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -209,6 +210,9 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
+			// We still need this for mobile and URLInput.
+			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
+				fetchLinkSuggestions( search, searchOptions, settings ),
 			inserterMediaCategories,
 			__experimentalFetchRichUrlData: fetchUrlData,
 			// Todo: This only checks the top level post, not the post within a template or any other entity that can be edited.
