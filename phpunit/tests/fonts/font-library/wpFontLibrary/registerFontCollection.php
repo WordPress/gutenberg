@@ -74,6 +74,6 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_Font_Library_U
 		$this->setExpectedIncorrectUsage( 'WP_Font_Library::register_font_collection' );
 		// Try to register a second collection with same id.
 		$collection2 = WP_Font_Library::register_font_collection( $config2 );
-		$this->assertInstanceOf( 'WP_Error', $collection2, 'Should return an instance of WP_Error.' );
+		$this->assertWPError( $collection2, 'A WP_Error should be returned.' );
 	}
 }
