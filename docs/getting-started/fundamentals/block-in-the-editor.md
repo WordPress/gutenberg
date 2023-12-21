@@ -48,9 +48,9 @@ A good workflow when using a component for the Block Editor is:
 
 To simplify block customization and ensure a consistent experience for users, there are a number of built-in UI patterns to help generate the editor preview. 
 
-### Block Toolbar
+![Diagram showing the Block Toolbar and the Settings Sidebar when a Paragraph block is selected](https://developer.wordpress.org/files/2023/12/block-toolbar-settings-sidebar.png)
 
-<img alt="Screenshot of the rich text toolbar applied to a Paragraph block inside the block editor" src="https://developer.wordpress.org/files/2023/12/toolbar-text.png" width="60%">
+### Block Toolbar
 
 When the user selects a block, a number of control buttons may be shown in a toolbar above the selected block. Some of these block-level controls may be included automatically but you can also customize the toolbar to include controls specific to your block type. If the return value of your block type's `edit` function includes a `BlockControls` element, those controls will be shown in the selected block's toolbar.
 
@@ -97,8 +97,6 @@ Note that `BlockControls` is only visible when the block is currently selected a
 
 
 ### Settings Sidebar
-
-<img alt="Screenshot of the inspector panel focused on the settings for a Paragraph block" src="https://developer.wordpress.org/files/2023/12/settings-sidebar.png" width="60%">
 
 The Settings Sidebar is used to display less-often-used settings or settings that require more screen space. The Settings Sidebar should be used for **block-level settings only**.
 

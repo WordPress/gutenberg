@@ -269,8 +269,9 @@ export const DropdownMenuItemChildrenWrapper = styled.div`
 `;
 
 export const ItemSuffixWrapper = styled.span`
-	flex: 0;
-	width: max-content;
+	flex: 0 1 fit-content;
+	min-width: 0;
+	width: fit-content;
 
 	display: flex;
 	align-items: center;

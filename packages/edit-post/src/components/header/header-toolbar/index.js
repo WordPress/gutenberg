@@ -26,13 +26,13 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editPostStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
+const { useCanBlockToolbarBeFocused } = unlock( blockEditorPrivateApis );
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-function HeaderToolbar( { hasFixedToolbar, setListViewToggleElement } ) {
+function HeaderToolbar( { hasFixedToolbar } ) {
 	const inserterButton = useRef();
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editorStore );
@@ -43,10 +43,12 @@ function HeaderToolbar( { hasFixedToolbar, setListViewToggleElement } ) {
 		showIconLabels,
 		isListViewOpen,
 		listViewShortcut,
+		listViewToggleRef,
 	} = useSelect( ( select ) => {
 		const { hasInserterItems, getBlockRootClientId, getBlockSelectionEnd } =
 			select( blockEditorStore );
-		const { getEditorSettings, isListViewOpened } = select( editorStore );
+		const { getEditorSettings, isListViewOpened, getListViewToggleRef } =
+			unlock( select( editorStore ) );
 		const { getEditorMode, isFeatureActive } = select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
@@ -63,24 +65,16 @@ function HeaderToolbar( { hasFixedToolbar, setListViewToggleElement } ) {
 			showIconLabels: isFeatureActive( 'showIconLabels' ),
 			isListViewOpen: isListViewOpened(),
 			listViewShortcut: getShortcutRepresentation(
-				'core/edit-post/toggle-list-view'
+				'core/editor/toggle-list-view'
 			),
+			listViewToggleRef: getListViewToggleRef(),
 		};
 	}, [] );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
-	const {
-		shouldShowContextualToolbar,
-		canFocusHiddenToolbar,
-		fixedToolbarCanBeFocused,
-	} = useShouldContextualToolbarShow();
-	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
-	// There's a fixed block toolbar when the fixed toolbar option is enabled or when the browser width is less than the large viewport.
-	const blockToolbarCanBeFocused =
-		shouldShowContextualToolbar ||
-		canFocusHiddenToolbar ||
-		fixedToolbarCanBeFocused;
+	const blockToolbarCanBeFocused = useCanBlockToolbarBeFocused();
+
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
 
@@ -103,7 +97,7 @@ function HeaderToolbar( { hasFixedToolbar, setListViewToggleElement } ) {
 				showTooltip={ ! showIconLabels }
 				variant={ showIconLabels ? 'tertiary' : undefined }
 				aria-expanded={ isListViewOpen }
-				ref={ setListViewToggleElement }
+				ref={ listViewToggleRef }
 				size="compact"
 			/>
 		</>

@@ -38,6 +38,9 @@ export default function useCommand( command ) {
 	}, [ command.callback ] );
 
 	useEffect( () => {
+		if ( command.disabled ) {
+			return;
+		}
 		registerCommand( {
 			name: command.name,
 			context: command.context,
@@ -55,6 +58,7 @@ export default function useCommand( command ) {
 		command.searchLabel,
 		command.icon,
 		command.context,
+		command.disabled,
 		registerCommand,
 		unregisterCommand,
 	] );

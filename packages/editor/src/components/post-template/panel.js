@@ -23,8 +23,7 @@ export default function PostTemplatePanel() {
 		};
 	}, [] );
 
-	const isVisible = true;
-	useSelect( ( select ) => {
+	const isVisible = useSelect( ( select ) => {
 		const postTypeSlug = select( editorStore ).getCurrentPostType();
 		const postType = select( coreStore ).getPostType( postTypeSlug );
 		if ( ! postType?.viewable ) {

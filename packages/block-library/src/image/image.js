@@ -48,6 +48,7 @@ import { Caption } from '../utils/caption';
 /**
  * Module constants
  */
+import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../utils/constants';
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 import { evalAspectRatio } from './utils';
 
@@ -196,7 +197,8 @@ export default function Image( {
 	const isResizable =
 		allowResize &&
 		hasNonContentControls &&
-		! ( isWideAligned && isLargeViewport );
+		! isWideAligned &&
+		isLargeViewport;
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
@@ -391,7 +393,11 @@ export default function Image( {
 
 	const sizeControls = (
 		<InspectorControls>
-			<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ resetAll }
+				dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			>
 				{ isResizable && dimensionsControl }
 			</ToolsPanel>
 		</InspectorControls>
@@ -452,7 +458,11 @@ export default function Image( {
 				</BlockControls>
 			) }
 			<InspectorControls>
-				<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ resetAll }
+					dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+				>
 					{ ! multiImageSelection && (
 						<ToolsPanelItem
 							label={ __( 'Alternative text' ) }

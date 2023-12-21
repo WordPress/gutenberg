@@ -176,6 +176,14 @@ Renders a red text-based button style to indicate destructive behavior.
 
 -   Required: No
 
+#### `isLink`: `boolean`
+
+Deprecated: Renders a button with an anchor style.
+Use `variant` prop with `link` value instead.
+
+-   Required: No
+-   Default: `false`
+
 #### `isPressed`: `boolean`
 
 Renders a pressed button style.
@@ -184,6 +192,22 @@ If the native `aria-pressed` attribute is also set, it will take precedence.
 
 -   Required: No
 
+#### `isPrimary`: `boolean`
+
+Deprecated: Renders a primary button style.
+Use `variant` prop with `primary` value instead.
+
+-   Required: No
+-   Default: `false`
+
+#### `isSecondary`: `boolean`
+
+Deprecated: Renders a default button style.
+Use `variant` prop with `secondary` value instead.
+
+-   Required: No
+-   Default: `false`
+
 #### `isSmall`: `boolean`
 
 Decreases the size of the button.
@@ -191,6 +215,14 @@ Decreases the size of the button.
 Deprecated in favor of the `size` prop. If both props are defined, the `size` prop will take precedence.
 
 -   Required: No
+
+#### `isTertiary`: `boolean`
+
+Deprecated: Renders a text-based button style.
+Use `variant` prop with `tertiary` value instead.
+
+-   Required: No
+-   Default: `false`
 
 #### `label`: `string`
 

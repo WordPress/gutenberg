@@ -74,9 +74,13 @@ function WithSeparators( { children } ) {
 
 export default function FilterSummary( { filter, view, onChangeView } ) {
 	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
+	const otherFilters = view.filters.filter(
+		( f ) => f.field !== filter.field
+	);
 	const activeElement = filter.elements.find(
 		( element ) => element.value === filterInView?.value
 	);
+	const activeOperator = filterInView?.operator || filter.operators[ 0 ];
 
 	return (
 		<DropdownMenu
@@ -95,40 +99,28 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 			<WithSeparators>
 				<DropdownMenuGroup>
 					{ filter.elements.map( ( element ) => {
+						const isActive = activeElement?.value === element.value;
 						return (
 							<DropdownMenuItem
 								key={ element.value }
 								role="menuitemradio"
-								aria-checked={
-									activeElement?.value === element.value
-								}
-								prefix={
-									activeElement?.value === element.value && (
-										<Icon icon={ check } />
-									)
-								}
+								aria-checked={ isActive }
+								prefix={ isActive && <Icon icon={ check } /> }
 								onSelect={ () =>
-									onChangeView( ( currentView ) => ( {
-										...currentView,
+									onChangeView( {
+										...view,
 										page: 1,
 										filters: [
-											...view.filters.filter(
-												( f ) =>
-													f.field !== filter.field
-											),
+											...otherFilters,
 											{
 												field: filter.field,
-												operator:
-													filterInView?.operator ||
-													filter.operators[ 0 ],
-												value:
-													activeElement?.value ===
-													element.value
-														? undefined
-														: element.value,
+												operator: activeOperator,
+												value: isActive
+													? undefined
+													: element.value,
 											},
 										],
-									} ) )
+									} )
 								}
 							>
 								{ element.label }
@@ -142,9 +134,10 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 							<DropdownSubMenuTrigger
 								suffix={
 									<>
-										{ filterInView.operator === OPERATOR_IN
-											? __( 'Is' )
-											: __( 'Is not' ) }
+										{ activeOperator === OPERATOR_IN &&
+											__( 'Is' ) }
+										{ activeOperator === OPERATOR_NOT_IN &&
+											__( 'Is not' ) }
 										<Icon icon={ chevronRightSmall } />{ ' ' }
 									</>
 								}
@@ -156,29 +149,25 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 						<DropdownMenuItem
 							key="in-filter"
 							role="menuitemradio"
-							aria-checked={
-								filterInView?.operator === OPERATOR_IN
-							}
+							aria-checked={ activeOperator === OPERATOR_IN }
 							prefix={
-								filterInView?.operator === OPERATOR_IN && (
+								activeOperator === OPERATOR_IN && (
 									<Icon icon={ check } />
 								)
 							}
 							onSelect={ () =>
-								onChangeView( ( currentView ) => ( {
-									...currentView,
+								onChangeView( {
+									...view,
 									page: 1,
 									filters: [
-										...view.filters.filter(
-											( f ) => f.field !== filter.field
-										),
+										...otherFilters,
 										{
 											field: filter.field,
 											operator: OPERATOR_IN,
 											value: filterInView?.value,
 										},
 									],
-								} ) )
+								} )
 							}
 						>
 							{ __( 'Is' ) }
@@ -186,29 +175,25 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 						<DropdownMenuItem
 							key="not-in-filter"
 							role="menuitemradio"
-							aria-checked={
-								filterInView?.operator === OPERATOR_NOT_IN
-							}
+							aria-checked={ activeOperator === OPERATOR_NOT_IN }
 							prefix={
-								filterInView?.operator === OPERATOR_NOT_IN && (
+								activeOperator === OPERATOR_NOT_IN && (
 									<Icon icon={ check } />
 								)
 							}
 							onSelect={ () =>
-								onChangeView( ( currentView ) => ( {
-									...currentView,
+								onChangeView( {
+									...view,
 									page: 1,
 									filters: [
-										...view.filters.filter(
-											( f ) => f.field !== filter.field
-										),
+										...otherFilters,
 										{
 											field: filter.field,
 											operator: OPERATOR_NOT_IN,
 											value: filterInView?.value,
 										},
 									],
-								} ) )
+								} )
 							}
 						>
 							{ __( 'Is not' ) }

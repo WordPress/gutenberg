@@ -73,6 +73,9 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 						const filterInView = view.filters.find(
 							( f ) => f.field === filter.field
 						);
+						const otherFilters = view.filters.filter(
+							( f ) => f.field !== filter.field
+						);
 						const activeElement = filter.elements.find(
 							( element ) => element.value === filterInView?.value
 						);
@@ -107,50 +110,45 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 							>
 								<WithSeparators>
 									<DropdownMenuGroup>
-										{ filter.elements.map( ( element ) => (
-											<DropdownMenuItem
-												key={ element.value }
-												role="menuitemradio"
-												aria-checked={
-													activeElement?.value ===
-													element.value
-												}
-												prefix={
-													activeElement?.value ===
-														element.value && (
-														<Icon icon={ check } />
-													)
-												}
-												onSelect={ ( event ) => {
-													event.preventDefault();
-													onChangeView(
-														( currentView ) => ( {
-															...currentView,
+										{ filter.elements.map( ( element ) => {
+											const isActive =
+												activeElement?.value ===
+												element.value;
+											return (
+												<DropdownMenuItem
+													key={ element.value }
+													role="menuitemradio"
+													aria-checked={ isActive }
+													prefix={
+														isActive && (
+															<Icon
+																icon={ check }
+															/>
+														)
+													}
+													onSelect={ ( event ) => {
+														event.preventDefault();
+														onChangeView( {
+															...view,
 															page: 1,
 															filters: [
-																...currentView.filters.filter(
-																	( f ) =>
-																		f.field !==
-																		filter.field
-																),
+																...otherFilters,
 																{
 																	field: filter.field,
 																	operator:
 																		activeOperator,
-																	value:
-																		activeElement?.value ===
-																		element.value
-																			? undefined
-																			: element.value,
+																	value: isActive
+																		? undefined
+																		: element.value,
 																},
 															],
-														} )
-													);
-												} }
-											>
-												{ element.label }
-											</DropdownMenuItem>
-										) ) }
+														} );
+													} }
+												>
+													{ element.label }
+												</DropdownMenuItem>
+											);
+										} ) }
 									</DropdownMenuGroup>
 									{ filter.operators.length > 1 && (
 										<DropdownSubMenu
@@ -191,25 +189,19 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 												}
 												onSelect={ ( event ) => {
 													event.preventDefault();
-													onChangeView(
-														( currentView ) => ( {
-															...currentView,
-															page: 1,
-															filters: [
-																...view.filters.filter(
-																	( f ) =>
-																		f.field !==
-																		filter.field
-																),
-																{
-																	field: filter.field,
-																	operator:
-																		OPERATOR_IN,
-																	value: filterInView?.value,
-																},
-															],
-														} )
-													);
+													onChangeView( {
+														...view,
+														page: 1,
+														filters: [
+															...otherFilters,
+															{
+																field: filter.field,
+																operator:
+																	OPERATOR_IN,
+																value: filterInView?.value,
+															},
+														],
+													} );
 												} }
 											>
 												{ __( 'Is' ) }
@@ -229,25 +221,19 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 												}
 												onSelect={ ( event ) => {
 													event.preventDefault();
-													onChangeView(
-														( currentView ) => ( {
-															...currentView,
-															page: 1,
-															filters: [
-																...view.filters.filter(
-																	( f ) =>
-																		f.field !==
-																		filter.field
-																),
-																{
-																	field: filter.field,
-																	operator:
-																		OPERATOR_NOT_IN,
-																	value: filterInView?.value,
-																},
-															],
-														} )
-													);
+													onChangeView( {
+														...view,
+														page: 1,
+														filters: [
+															...otherFilters,
+															{
+																field: filter.field,
+																operator:
+																	OPERATOR_NOT_IN,
+																value: filterInView?.value,
+															},
+														],
+													} );
 												} }
 											>
 												{ __( 'Is not' ) }
