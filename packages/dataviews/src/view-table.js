@@ -20,11 +20,11 @@ import { ENUMERATION_TYPE, OPERATORS, SORTING_DIRECTIONS } from './constants';
 import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
 
 const {
-	DropdownMenuV2Ariakit: DropdownMenu,
-	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
-	DropdownMenuItemV2Ariakit: DropdownMenuItem,
-	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
-	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuGroupV2: DropdownMenuGroup,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
 const sortArrows = { asc: '↑', desc: '↓' };

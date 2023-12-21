@@ -18,14 +18,14 @@ import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement }
 import { default as ProgressBar } from './progress-bar';
 import { createPrivateSlotFill } from './slot-fill';
 import {
-	DropdownMenu as DropdownMenuV2Ariakit,
-	DropdownMenuGroup as DropdownMenuGroupV2Ariakit,
-	DropdownMenuItem as DropdownMenuItemV2Ariakit,
-	DropdownMenuCheckboxItem as DropdownMenuCheckboxItemV2Ariakit,
-	DropdownMenuRadioItem as DropdownMenuRadioItemV2Ariakit,
-	DropdownMenuSeparator as DropdownMenuSeparatorV2Ariakit,
-	DropdownMenuItemLabel as DropdownMenuItemLabelV2Ariakit,
-	DropdownMenuItemHelpText as DropdownMenuItemHelpTextV2Ariakit,
+	DropdownMenu as DropdownMenuV2,
+	DropdownMenuGroup as DropdownMenuGroupV2,
+	DropdownMenuItem as DropdownMenuItemV2,
+	DropdownMenuCheckboxItem as DropdownMenuCheckboxItemV2,
+	DropdownMenuRadioItem as DropdownMenuRadioItemV2,
+	DropdownMenuSeparator as DropdownMenuSeparatorV2,
+	DropdownMenuItemLabel as DropdownMenuItemLabelV2,
+	DropdownMenuItemHelpText as DropdownMenuItemHelpTextV2,
 } from './dropdown-menu-v2-ariakit';
 import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
@@ -47,13 +47,13 @@ lock( privateApis, {
 	ProgressBar,
 	Tabs,
 	Theme,
-	DropdownMenuV2Ariakit,
-	DropdownMenuGroupV2Ariakit,
-	DropdownMenuItemV2Ariakit,
-	DropdownMenuCheckboxItemV2Ariakit,
-	DropdownMenuRadioItemV2Ariakit,
-	DropdownMenuSeparatorV2Ariakit,
-	DropdownMenuItemLabelV2Ariakit,
-	DropdownMenuItemHelpTextV2Ariakit,
+	DropdownMenuV2,
+	DropdownMenuGroupV2,
+	DropdownMenuItemV2,
+	DropdownMenuCheckboxItemV2,
+	DropdownMenuRadioItemV2,
+	DropdownMenuSeparatorV2,
+	DropdownMenuItemLabelV2,
+	DropdownMenuItemHelpTextV2,
 	kebabCase,
 } );

@@ -17,12 +17,12 @@ import { LAYOUT_LIST, OPERATORS } from './constants';
 import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
 
 const {
-	DropdownMenuV2Ariakit: DropdownMenu,
-	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
-	DropdownMenuItemV2Ariakit: DropdownMenuItem,
-	DropdownMenuRadioItemV2Ariakit: DropdownMenuRadioItem,
-	DropdownMenuSeparatorV2Ariakit: DropdownMenuSeparator,
-	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuGroupV2: DropdownMenuGroup,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
 function WithSeparators( { children } ) {
