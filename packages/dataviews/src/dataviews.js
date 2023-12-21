@@ -79,7 +79,6 @@ export default function DataViews( {
 					fields={ _fields }
 					view={ view }
 					onChangeView={ onChangeView }
-					paginationInfo={ paginationInfo }
 					actions={ actions }
 					data={ data }
 					getItemId={ getItemId }
