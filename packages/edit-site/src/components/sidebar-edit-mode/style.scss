@@ -101,11 +101,11 @@
 }
 
 .edit-site-sidebar-fixed-bottom-slot {
-	position: sticky;
+	position: absolute;
+	min-width: 100%;
 	bottom: 0;
 	background: $white;
-	display: flex;
-	padding: $grid-unit-20;
+	padding: $grid-unit-15;
 	border-top: $border-width solid $gray-300;
 	box-sizing: content-box;
 }

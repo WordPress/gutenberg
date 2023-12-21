@@ -115,6 +115,7 @@ function RevisionsButtons( {
 	selectedRevisionId,
 	onChange,
 	canApplyRevision,
+	onApplyRevision,
 } ) {
 	const { currentThemeName, currentUser } = useSelect( ( select ) => {
 		const { getCurrentTheme, getCurrentUser } = select( coreStore );
@@ -178,6 +179,7 @@ function RevisionsButtons( {
 							}
 						) }
 						key={ id }
+						aria-current={ isSelected }
 					>
 						<Button
 							className="edit-site-global-styles-screen-revisions__revision-button"
@@ -208,6 +210,13 @@ function RevisionsButtons( {
 											{ displayDate }
 										</time>
 									) }
+									<span className="edit-site-global-styles-screen-revisions__meta">
+										<img
+											alt={ authorDisplayName }
+											src={ authorAvatar }
+										/>
+										{ authorDisplayName }
+									</span>
 									{ isSelected && (
 										<ChangesSummary
 											blockNames={ blockNames }
@@ -219,16 +228,28 @@ function RevisionsButtons( {
 											}
 										/>
 									) }
-									<span className="edit-site-global-styles-screen-revisions__meta">
-										<img
-											alt={ authorDisplayName }
-											src={ authorAvatar }
-										/>
-										{ authorDisplayName }
-									</span>
 								</span>
 							) }
 						</Button>
+						{ isSelected &&
+							( areStylesEqual ? (
+								<p className="edit-site-global-styles-screen-revisions__applied-text">
+									{ __(
+										'These styles are already applied to your site.'
+									) }
+								</p>
+							) : (
+								<Button
+									disabled={ areStylesEqual }
+									variant="primary"
+									className="edit-site-global-styles-screen-revisions__apply-button"
+									onClick={ onApplyRevision }
+								>
+									{ isReset
+										? __( 'Reset to defaults' )
+										: __( 'Apply' ) }
+								</Button>
+							) ) }
 					</li>
 				);
 			} ) }
