@@ -41,7 +41,8 @@ export default function useTruncate(
 	} else {
 		// eslint-disable-next-line no-console
 		console.warn(
-			`Truncate: text truncation has been disabled, since it is only available when passing 'children' of type 'string' or 'number'`
+			`Truncate: text truncation has been disabled, since it is only available when passing 'children' of type 'string' or 'number'. Received:`,
+			children
 		);
 	}
 
