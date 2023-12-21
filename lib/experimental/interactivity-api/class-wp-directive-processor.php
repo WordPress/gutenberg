@@ -94,7 +94,10 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	 * @return void
 	 */
 	public static function unmark_children_of_interactive_block( $block ) {
-		self::$children_of_interactive_block = array_diff( self::$children_of_interactive_block, array( md5( serialize( $block ) ) ) );
+		$key = array_search( md5( serialize( $block ) ), self::$children_of_interactive_block, true );
+		if ( false !== $key ) {
+			unset( self::$children_of_interactive_block[ $key ] );
+		}
 	}
 
 	/**
