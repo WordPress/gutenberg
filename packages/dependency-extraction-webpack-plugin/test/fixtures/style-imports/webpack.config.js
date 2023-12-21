@@ -10,7 +10,13 @@ const DependencyExtractionWebpackPlugin = require( '../../..' );
 
 module.exports = {
 	plugins: [
-		new DependencyExtractionWebpackPlugin(),
+		new DependencyExtractionWebpackPlugin( {
+			requestToExternalModule( request ) {
+				if ( request.startsWith( '@wordpress/' ) ) {
+					return request;
+				}
+			},
+		} ),
 		new MiniCSSExtractPlugin(),
 	],
 	module: {
