@@ -15,7 +15,7 @@ const { useHistory } = unlock( routerPrivateApis );
 export function usePostLinkProps() {
 	const history = useHistory();
 	const getPostLinkProps = useCallback(
-		( params ) => {
+		( params, state ) => {
 			const currentArgs = getQueryArgs( window.location.href );
 			const currentUrlWithoutArgs = removeQueryArgs(
 				window.location.href,
@@ -31,7 +31,7 @@ export function usePostLinkProps() {
 				href: newUrl,
 				onClick: ( event ) => {
 					event.preventDefault();
-					history.push( params );
+					history.push( params, state );
 				},
 			};
 		},
