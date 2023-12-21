@@ -152,17 +152,17 @@ function Editor( {
 		return result;
 	}, [
 		settings,
-		onSelectPost,
-		goBack,
-		preferredStyleVariations,
-		updatePreferredStyleVariations,
 		hasFixedToolbar,
+		hasInlineToolbar,
 		focusMode,
 		isDistractionFree,
-		hasInlineToolbar,
 		keepCaretInsideBlock,
 		hiddenBlockTypes,
 		blockTypes,
+		preferredStyleVariations,
+		updatePreferredStyleVariations,
+		onSelectPost,
+		goBack,
 	] );
 
 	if ( ! post ) {

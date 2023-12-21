@@ -19,6 +19,7 @@ import {
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
+
 /**
  * Internal dependencies
  */

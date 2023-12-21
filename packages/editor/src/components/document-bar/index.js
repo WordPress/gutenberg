@@ -78,9 +78,7 @@ export default function DocumentBar() {
 		}
 		if ( goBack ) {
 			goBack();
-			return;
 		}
-		window.history.back();
 	};
 
 	return (
