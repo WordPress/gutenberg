@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
-import { press } from '@ariakit/test';
+import { queryByAttribute, render, screen } from '@testing-library/react';
+import { press, waitFor } from '@ariakit/test';
 
 /**
  * Internal dependencies
@@ -12,18 +12,44 @@ import {
 	CompositeGroup,
 	CompositeItem,
 	useCompositeState,
-} from '..';
+} from '../legacy';
+
+// This is necessary because of how Ariakit calculates page up and
+// page down. Without this, nothing has a height, and so paging up
+// and down doesn't behave as expected in tests.
+
+jest.spyOn( HTMLElement.prototype, 'clientHeight', 'get' ).mockImplementation(
+	function getClientHeight( this: HTMLElement ) {
+		if ( this.tagName === 'BODY' ) {
+			return window.outerHeight;
+		}
+		return 50;
+	}
+);
 
 type InitialState = Parameters< typeof useCompositeState >[ 0 ];
 type CompositeState = ReturnType< typeof useCompositeState >;
 type CompositeStateProps = CompositeState | { state: CompositeState };
 
+async function renderAndValidate( ...args: Parameters< typeof render > ) {
+	const view = render( ...args );
+	await waitFor( () => {
+		const activeButton = queryByAttribute(
+			'data-active-item',
+			view.baseElement,
+			''
+		);
+		expect( activeButton ).not.toBeNull();
+	} );
+	return view;
+}
+
 function getKeys( rtl: boolean ) {
 	return {
 		previous: rtl ? 'ArrowRight' : 'ArrowLeft',
 		next: rtl ? 'ArrowLeft' : 'ArrowRight',
-		first: 'Home',
-		last: 'End',
+		first: rtl ? 'End' : 'Home',
+		last: rtl ? 'Home' : 'End',
 	};
 }
 
@@ -140,7 +166,7 @@ describe.each( [
 				<button>After</button>
 			</>
 		);
-		render( <Test /> );
+		renderAndValidate( <Test /> );
 
 		await press.Tab();
 		expect( screen.getByText( 'Before' ) ).toHaveFocus();
@@ -168,7 +194,7 @@ describe.each( [
 				</Composite>
 			);
 		};
-		render( <Test /> );
+		renderAndValidate( <Test /> );
 
 		const { item1, item2, item3 } = getOneDimensionalItems();
 
@@ -197,7 +223,7 @@ describe.each( [
 				</Composite>
 			);
 		};
-		render( <Test /> );
+		renderAndValidate( <Test /> );
 		const { item1, item2, item3 } = getOneDimensionalItems();
 
 		expect( item2 ).toBeEnabled();
@@ -218,7 +244,7 @@ describe.each( [
 				} ) }
 			/>
 		);
-		render( <Test /> );
+		renderAndValidate( <Test /> );
 		const { item1, item2, item3 } = getOneDimensionalItems();
 
 		expect( item1.id ).toMatch( 'test-id-1' );
@@ -235,7 +261,7 @@ describe.each( [
 				} ) }
 			/>
 		);
-		render( <Test /> );
+		renderAndValidate( <Test /> );
 		const { item2 } = getOneDimensionalItems();
 
 		await press.Tab();
@@ -255,7 +281,7 @@ describe.each( [
 				state={ useCompositeState( { rtl, ...initialState } ) }
 			/>
 		);
-		render( <Test /> );
+		renderAndValidate( <Test /> );
 		return getOneDimensionalItems();
 	}
 
@@ -265,7 +291,7 @@ describe.each( [
 				state={ useCompositeState( { rtl, ...initialState } ) }
 			/>
 		);
-		render( <Test /> );
+		renderAndValidate( <Test /> );
 		return getTwoDimensionalItems();
 	}
 
@@ -273,7 +299,7 @@ describe.each( [
 		const Test = () => (
 			<ShiftTest state={ useCompositeState( { rtl, shift } ) } />
 		);
-		render( <Test /> );
+		renderAndValidate( <Test /> );
 		return getShiftTestItems();
 	}
 
