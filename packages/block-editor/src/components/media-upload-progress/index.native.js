@@ -135,9 +135,7 @@ export class MediaUploadProgress extends Component {
 
 		const progressBarStyle = [
 			styles.progressBar,
-			showSpinner && this.props.isConnected
-				? styles.progressBarHidden
-				: null,
+			showSpinner || styles.progressBarHidden,
 			this.props.progressBarStyle,
 		];
 
