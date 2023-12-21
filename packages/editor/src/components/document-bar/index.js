@@ -48,27 +48,34 @@ const icons = {
 };
 
 export default function DocumentBar() {
-	const { isEditingTemplate, templateId, postType, postId, goBack } =
-		useSelect( ( select ) => {
-			const {
-				getRenderingMode,
-				getCurrentTemplateId,
-				getCurrentPostId,
-				getCurrentPostType,
-				getEditorSettings,
-			} = select( editorStore );
-			const _templateId = getCurrentTemplateId();
-			const back = getEditorSettings().goBack;
-			return {
-				isEditingTemplate:
-					!! _templateId && getRenderingMode() === 'template-only',
-				templateId: _templateId,
-				postType: getCurrentPostType(),
-				postId: getCurrentPostId(),
-				goBack: typeof back === 'function' ? back : undefined,
-			};
-		}, [] );
-	const { getEditorSettings } = useSelect( editorStore );
+	const {
+		isEditingTemplate,
+		templateId,
+		postType,
+		postId,
+		goBack,
+		getEditorSettings,
+	} = useSelect( ( select ) => {
+		const {
+			getRenderingMode,
+			getCurrentTemplateId,
+			getCurrentPostId,
+			getCurrentPostType,
+			getEditorSettings: getSettings,
+		} = select( editorStore );
+		const _templateId = getCurrentTemplateId();
+		const back = getSettings().goBack;
+		return {
+			isEditingTemplate:
+				!! _templateId && getRenderingMode() === 'template-only',
+			templateId: _templateId,
+			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
+			goBack: typeof back === 'function' ? back : undefined,
+			getEditorSettings: getSettings,
+		};
+	}, [] );
+
 	const { setRenderingMode } = useDispatch( editorStore );
 
 	const handleOnBack = () => {

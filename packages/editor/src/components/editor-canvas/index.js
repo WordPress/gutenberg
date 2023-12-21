@@ -138,7 +138,7 @@ function EditorCanvas( {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
-			hasHistory: !! getEditorSettings().goBack,
+			hasHistory: !! editorSettings.goBack,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
