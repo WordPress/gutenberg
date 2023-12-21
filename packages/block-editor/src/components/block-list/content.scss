@@ -24,12 +24,6 @@
 .block-editor-block-list__layout {
 	position: relative;
 
-	// Hide selections on this element, otherwise Safari will include it stacked
-	// under your actual selection.
-	&::selection {
-		background: transparent;
-	}
-
 	.has-multi-selection &::selection {
 		background: transparent;
 	}
