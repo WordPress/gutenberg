@@ -9,8 +9,11 @@ import FastImage from 'react-native-fast-image';
  */
 import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/components';
-import { image } from '@wordpress/icons';
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { image, offline } from '@wordpress/icons';
+import {
+	usePreferredColorSchemeStyle,
+	useNetworkConnectivity,
+} from '@wordpress/compose';
 import { useEffect, useState, Platform } from '@wordpress/element';
 
 /**
@@ -22,6 +25,7 @@ import SvgIconRetry from './icon-retry';
 import ImageEditingButton from './image-editing-button';
 
 const ICON_TYPE = {
+	OFFLINE: 'offline',
 	PLACEHOLDER: 'placeholder',
 	RETRY: 'retry',
 	UPLOAD: 'upload',
@@ -52,6 +56,7 @@ const ImageComponent = ( {
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
+	const { isConnected } = useNetworkConnectivity();
 
 	// Disabled for Android due to https://github.com/WordPress/gutenberg/issues/43149
 	const Image =
@@ -105,6 +110,10 @@ const ImageComponent = ( {
 			case ICON_TYPE.RETRY:
 				icon = retryIcon || SvgIconRetry;
 				iconStyle = styles.iconRetry;
+				break;
+			case ICON_TYPE.OFFLINE:
+				icon = offline;
+				iconStyle = styles.iconOffline;
 				break;
 			case ICON_TYPE.PLACEHOLDER:
 				icon = image;
@@ -250,7 +259,9 @@ const ImageComponent = ( {
 								retryIcon && styles.customRetryIcon,
 							] }
 						>
-							{ getIcon( ICON_TYPE.RETRY ) }
+							{ isConnected
+								? getIcon( ICON_TYPE.RETRY )
+								: getIcon( ICON_TYPE.OFFLINE ) }
 						</View>
 						<Text style={ styles.uploadFailedText }>
 							{ retryMessage }

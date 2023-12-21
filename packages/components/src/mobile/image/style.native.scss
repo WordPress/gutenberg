@@ -21,10 +21,15 @@
 }
 
 .retryIcon {
-	width: 80px;
-	height: 80px;
-	justify-content: center;
-	align-items: center;
+	background-color: $black;
+	border-radius: 200px;
+	padding: 8px;
+}
+
+.iconOffline {
+	fill: #fff;
+	width: 24px;
+	height: 24px;
 }
 
 .customRetryIcon {
@@ -34,8 +39,8 @@
 
 .iconRetry {
 	fill: #fff;
-	width: 100%;
-	height: 100%;
+	width: 24px;
+	height: 24px;
 }
 
 .iconPlaceholder {
@@ -90,7 +95,8 @@
 }
 
 .uploadFailedText {
-	color: #fff;
+	color: $black;
+	font-weight: bold;
 	font-size: 14;
 	margin-top: 5;
 	text-align: center;
@@ -124,7 +130,7 @@
 
 .retryContainer {
 	flex: 1;
-	background-color: "rgba(0, 0, 0, 0.5)";
+	background-color: "rgba(255, 255, 255, 0.8)";
 }
 
 .focalPointContainer {
