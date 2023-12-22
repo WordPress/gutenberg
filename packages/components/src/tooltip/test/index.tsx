@@ -79,18 +79,27 @@ describe( 'Tooltip', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'should render the tooltip when focusing on the tooltip anchor via tab', async () => {
-		render( <Tooltip { ...props } /> );
+	it( 'should show the tooltip when focusing on the tooltip anchor and hide it the anchor loses focus', async () => {
+		render(
+			<>
+				<Tooltip { ...props } />
+				<button>Focus me</button>
+			</>
+		);
 
+		// Focus the anchor, tooltip should show
 		await press.Tab();
-
 		expect(
 			screen.getByRole( 'button', { name: 'Tooltip anchor' } )
 		).toHaveFocus();
+		await waitForTooltipToShow();
 
+		// Focus the other button, tooltip should hide
+		await press.Tab();
 		expect(
-			await screen.findByRole( 'tooltip', { name: 'tooltip text' } )
-		).toBeVisible();
+			screen.getByRole( 'button', { name: 'Focus me' } )
+		).toHaveFocus();
+		await waitForTooltipToHide();
 	} );
 
 	it( 'should render the tooltip when the tooltip anchor is hovered', async () => {
