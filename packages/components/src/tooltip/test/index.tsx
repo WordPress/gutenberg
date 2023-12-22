@@ -118,14 +118,36 @@ describe( 'Tooltip', () => {
 		await waitForTooltipToHide();
 	} );
 
-	it( 'should not show tooltip on focus as result of mouse click', async () => {
+	it( 'should hide tooltip when the tooltip anchor is clicked', async () => {
 		render( <Tooltip { ...props } /> );
 
-		await click( screen.getByRole( 'button', { name: 'Tooltip anchor' } ) );
+		const anchor = screen.getByRole( 'button', { name: 'Tooltip anchor' } );
 
-		expect(
-			screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
-		).not.toBeInTheDocument();
+		expect( anchor ).toBeVisible();
+
+		// Hover over the anchor, tooltip should show
+		await hover( anchor );
+		await waitForTooltipToShow();
+
+		// Click the anchor, tooltip should hide
+		await click( anchor );
+		await waitForTooltipToHide();
+	} );
+
+	it( 'should not hide tooltip when the tooltip anchor is clicked and the `hideOnClick` prop is `false', async () => {
+		render( <Tooltip { ...props } hideOnClick={ false } /> );
+
+		const anchor = screen.getByRole( 'button', { name: 'Tooltip anchor' } );
+
+		expect( anchor ).toBeVisible();
+
+		// Hover over the anchor, tooltip should show
+		await hover( anchor );
+		await waitForTooltipToShow();
+
+		// Click the anchor, tooltip should not hide
+		await click( anchor );
+		await waitForTooltipToShow();
 	} );
 
 	it( 'should respect custom delay prop when showing tooltip', async () => {
@@ -307,23 +329,5 @@ describe( 'Tooltip', () => {
 		expect(
 			await screen.findByRole( 'button', { description: 'tooltip text' } )
 		).toBeInTheDocument();
-	} );
-
-	it( 'should not hide tooltip when the anchor is clicked if hideOnClick is false', async () => {
-		render( <Tooltip { ...props } hideOnClick={ false } /> );
-
-		const button = screen.getByRole( 'button', { name: 'Tooltip anchor' } );
-
-		await hover( button );
-
-		expect(
-			await screen.findByRole( 'tooltip', { name: 'tooltip text' } )
-		).toBeVisible();
-
-		await click( button );
-
-		expect(
-			screen.getByRole( 'tooltip', { name: 'tooltip text' } )
-		).toBeVisible();
 	} );
 } );
