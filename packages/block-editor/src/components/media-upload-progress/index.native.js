@@ -10,17 +10,18 @@ import { Component } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
-import { withNetworkConnectivity } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
 import {
+	MEDIA_UPLOAD_STATE_IDLE,
 	MEDIA_UPLOAD_STATE_UPLOADING,
 	MEDIA_UPLOAD_STATE_SUCCEEDED,
 	MEDIA_UPLOAD_STATE_FAILED,
 	MEDIA_UPLOAD_STATE_RESET,
+	MEDIA_UPLOAD_STATE_PAUSED,
 } from './constants';
 
 export class MediaUploadProgress extends Component {
@@ -28,6 +29,7 @@ export class MediaUploadProgress extends Component {
 		super( props );
 
 		this.state = {
+			uploadState: MEDIA_UPLOAD_STATE_IDLE,
 			progress: 0,
 			isUploadInProgress: false,
 			isUploadFailed: false,
@@ -59,6 +61,9 @@ export class MediaUploadProgress extends Component {
 			case MEDIA_UPLOAD_STATE_SUCCEEDED:
 				this.finishMediaUploadWithSuccess( payload );
 				break;
+			case MEDIA_UPLOAD_STATE_PAUSED:
+				this.finishMediaUploadWithPause( payload );
+				break;
 			case MEDIA_UPLOAD_STATE_FAILED:
 				this.finishMediaUploadWithFailure( payload );
 				break;
@@ -71,6 +76,7 @@ export class MediaUploadProgress extends Component {
 	updateMediaProgress( payload ) {
 		this.setState( {
 			progress: payload.progress,
+			uploadState: payload.state,
 			isUploadInProgress: true,
 			isUploadFailed: false,
 		} );
@@ -80,21 +86,43 @@ export class MediaUploadProgress extends Component {
 	}
 
 	finishMediaUploadWithSuccess( payload ) {
-		this.setState( { isUploadInProgress: false } );
+		this.setState( {
+			uploadState: payload.state,
+			isUploadInProgress: false,
+		} );
 		if ( this.props.onFinishMediaUploadWithSuccess ) {
 			this.props.onFinishMediaUploadWithSuccess( payload );
 		}
 	}
 
+	finishMediaUploadWithPause( payload ) {
+		this.setState( {
+			uploadState: payload.state,
+			isUploadInProgress: true,
+			isUploadFailed: false,
+		} );
+		if ( this.props.onFinishMediaUploadWithFailure ) {
+			this.props.onFinishMediaUploadWithFailure( payload );
+		}
+	}
+
 	finishMediaUploadWithFailure( payload ) {
-		this.setState( { isUploadInProgress: false, isUploadFailed: true } );
+		this.setState( {
+			uploadState: payload.state,
+			isUploadInProgress: false,
+			isUploadFailed: true,
+		} );
 		if ( this.props.onFinishMediaUploadWithFailure ) {
 			this.props.onFinishMediaUploadWithFailure( payload );
 		}
 	}
 
 	mediaUploadStateReset( payload ) {
-		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
+		this.setState( {
+			uploadState: payload.state,
+			isUploadInProgress: false,
+			isUploadFailed: false,
+		} );
 		if ( this.props.onMediaUploadStateReset ) {
 			this.props.onMediaUploadStateReset( payload );
 		}
@@ -119,16 +147,17 @@ export class MediaUploadProgress extends Component {
 	}
 
 	getRetryMessage() {
-		if ( this.props.isConnected === true ) {
-			// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
-			return __( 'Failed to insert media.\nTap for more info.' );
+		if ( this.state.uploadState === MEDIA_UPLOAD_STATE_PAUSED ) {
+			return __( 'Waiting for connection' );
 		}
-		return __( 'Waiting for connection' );
+
+		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
+		return __( 'Failed to insert media.\nTap for more info.' );
 	}
 
 	render() {
 		const { renderContent = () => null } = this.props;
-		const { isUploadInProgress, isUploadFailed } = this.state;
+		const { isUploadInProgress, isUploadFailed, uploadState } = this.state;
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
 		const retryMessage = this.getRetryMessage();
@@ -157,6 +186,7 @@ export class MediaUploadProgress extends Component {
 					) }
 				</View>
 				{ renderContent( {
+					isUploadPaused: uploadState === MEDIA_UPLOAD_STATE_PAUSED,
 					isUploadInProgress,
 					isUploadFailed,
 					retryMessage,
@@ -166,4 +196,4 @@ export class MediaUploadProgress extends Component {
 	}
 }
 
-export default withNetworkConnectivity( MediaUploadProgress );
+export default MediaUploadProgress;

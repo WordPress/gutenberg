@@ -10,10 +10,7 @@ import FastImage from 'react-native-fast-image';
 import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/components';
 import { image, offline } from '@wordpress/icons';
-import {
-	usePreferredColorSchemeStyle,
-	useNetworkConnectivity,
-} from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useEffect, useState, Platform } from '@wordpress/element';
 
 /**
@@ -41,6 +38,7 @@ const ImageComponent = ( {
 	isSelected,
 	shouldUseFastImage,
 	isUploadFailed,
+	isUploadPaused,
 	isUploadInProgress,
 	mediaPickerOptions,
 	onImageDataLoad,
@@ -56,7 +54,6 @@ const ImageComponent = ( {
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
-	const { isConnected } = useNetworkConnectivity();
 
 	// Disabled for Android due to https://github.com/WordPress/gutenberg/issues/43149
 	const Image =
@@ -223,9 +220,11 @@ const ImageComponent = ( {
 			>
 				{ isSelected &&
 					highlightSelected &&
-					! ( isUploadInProgress || isUploadFailed ) && (
-						<View style={ imageSelectedStyles } />
-					) }
+					! (
+						isUploadInProgress ||
+						isUploadFailed ||
+						isUploadPaused
+					) && <View style={ imageSelectedStyles } /> }
 
 				{ ! imageData ? (
 					<View style={ placeholderStyles }>
@@ -246,7 +245,7 @@ const ImageComponent = ( {
 					</View>
 				) }
 
-				{ isUploadFailed && retryMessage && (
+				{ ( isUploadFailed || isUploadPaused ) && retryMessage && (
 					<View
 						style={ [
 							styles.imageContainer,
@@ -259,9 +258,9 @@ const ImageComponent = ( {
 								retryIcon && styles.customRetryIcon,
 							] }
 						>
-							{ isConnected
-								? getIcon( ICON_TYPE.RETRY )
-								: getIcon( ICON_TYPE.OFFLINE ) }
+							{ isUploadPaused
+								? getIcon( ICON_TYPE.OFFLINE )
+								: getIcon( ICON_TYPE.RETRY ) }
 						</View>
 						<Text style={ styles.uploadFailedText }>
 							{ retryMessage }
@@ -274,7 +273,11 @@ const ImageComponent = ( {
 				<ImageEditingButton
 					onSelectMediaUploadOption={ onSelectMediaUploadOption }
 					openMediaOptions={ openMediaOptions }
-					url={ ! isUploadFailed && imageData && url }
+					url={
+						! ( isUploadFailed || isUploadPaused ) &&
+						imageData &&
+						url
+					}
 					pickerOptions={ mediaPickerOptions }
 				/>
 			) }

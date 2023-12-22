@@ -825,6 +825,7 @@ export class ImageEdit extends Component {
 								this.mediaUploadStateReset
 							}
 							renderContent={ ( {
+								isUploadPaused,
 								isUploadInProgress,
 								isUploadFailed,
 								retryMessage,
@@ -843,6 +844,7 @@ export class ImageEdit extends Component {
 												! isCaptionSelected
 											}
 											isUploadFailed={ isUploadFailed }
+											isUploadPaused={ isUploadPaused }
 											isUploadInProgress={
 												isUploadInProgress
 											}
