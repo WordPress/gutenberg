@@ -249,17 +249,23 @@ describe( 'Tooltip', () => {
 		expectTooltipToBeHidden();
 	} );
 
-	it( 'should render the shortcut display text when a string is passed as the shortcut', async () => {
+	it( 'should show the shortcut in the tooltip when a string is passed as the shortcut', async () => {
 		render( <Tooltip { ...props } shortcut="shortcut text" /> );
 
+		// Hover over the anchor, tooltip should show
 		await hover( screen.getByRole( 'button', { name: 'Tooltip anchor' } ) );
+		expect(
+			screen.getByRole( 'tooltip', {
+				name: 'tooltip text shortcut text',
+			} )
+		).toBeVisible();
 
-		await waitFor( () =>
-			expect( screen.getByText( 'shortcut text' ) ).toBeVisible()
-		);
+		// Hover outside of the anchor, tooltip should hide
+		await hoverOutside();
+		await waitForTooltipToHide();
 	} );
 
-	it( 'should render the keyboard shortcut display text and aria-label when an object is passed as the shortcut', async () => {
+	it( 'should show the shortcut in the tooltip when an object is passed as the shortcut', async () => {
 		render(
 			<Tooltip
 				{ ...props }
@@ -270,16 +276,17 @@ describe( 'Tooltip', () => {
 			/>
 		);
 
+		// Hover over the anchor, tooltip should show
 		await hover( screen.getByRole( 'button', { name: 'Tooltip anchor' } ) );
+		const tooltip = screen.getByRole( 'tooltip', {
+			name: 'tooltip text Control + Shift + Comma',
+		} );
+		expect( tooltip ).toBeVisible();
+		expect( tooltip ).toHaveTextContent( /⇧⌘,/i );
 
-		await waitFor( () =>
-			expect( screen.getByText( '⇧⌘,' ) ).toBeVisible()
-		);
-
-		expect( screen.getByText( '⇧⌘,' ) ).toHaveAttribute(
-			'aria-label',
-			'Control + Shift + Comma'
-		);
+		// Hover outside of the anchor, tooltip should hide
+		await hoverOutside();
+		await waitForTooltipToHide();
 	} );
 
 	it( 'esc should close modal even when tooltip is visible', async () => {
