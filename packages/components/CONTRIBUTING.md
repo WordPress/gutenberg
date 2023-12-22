@@ -19,7 +19,6 @@ For an example of a component that follows these requirements, take a look at [`
 - [Documentation](#documentation)
 - [README example](#README-example)
 - [Folder structure](#folder-structure)
-- [Using Radix UI primitives](#using-radix-ui-primitives)
 
 ## Introducing new components
 
@@ -592,12 +591,3 @@ component-family-name/
 ├── types.ts
 └── utils.ts
 ```
-
-## Using Radix UI primitives
-
-Useful links:
-
-- [online docs](https://www.radix-ui.com/docs/primitives/overview/introduction)
-- [repo](https://github.com/radix-ui/primitives) — useful for:
-    - inspecting source code
-    - running storybook examples (`yarn install && yarn dev`)
