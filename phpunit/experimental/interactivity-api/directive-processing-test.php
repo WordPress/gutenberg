@@ -135,6 +135,23 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		$this->assertSame( 'level-1', $value );
 	}
 
+	public function test_non_interactive_children_of_interactive_is_rendered() {
+		$post_content    = '<!-- wp:gutenberg/test-context-level-1 --><!-- wp:gutenberg/test-context-read-only /--><!-- wp:paragraph --><p>Welcome</p><!-- /wp:paragraph --><!-- /wp:gutenberg/test-context-level-1 -->';
+		$rendered_blocks = do_blocks( $post_content );
+		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
+		$p->next_tag( array( 'class_name' => 'level-1-input-1' ) );
+		$value = $p->get_attribute( 'value' );
+		$this->assertSame( 'level-1', $value );
+		$p->next_tag( array( 'class_name' => 'read-only-input-1' ) );
+		$value = $p->get_attribute( 'value' );
+		$this->assertSame( 'level-1', $value );
+		$p->next_tag();
+		$this->assertSame( 'P', $p->get_tag() );
+		$p->next_tag( array( 'class_name' => 'level-1-input-2' ) );
+		$value = $p->get_attribute( 'value' );
+		$this->assertSame( 'level-1', $value );
+	}
+
 	public function increment( $store ) {
 		return $store['state']['count'] + $store['context']['count'];
 	}
