@@ -1286,6 +1286,26 @@ export function blockVisibility( state = {}, action ) {
 }
 
 /**
+ * Reducer tracking the block images.
+ *
+ * @param {Record<string,boolean>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string,boolean>} Block images.
+ */
+export function blockImage( state = {}, action ) {
+	if ( action.type === 'SET_BLOCK_IMAGE' ) {
+		const { clientId, images } = action;
+		return {
+			...state,
+			[ clientId ]: images,
+		};
+	}
+
+	return state;
+}
+
+/**
  * Internal helper reducer for selectionStart and selectionEnd. Can hold a block
  * selection, represented by an object with property clientId.
  *
@@ -2026,6 +2046,7 @@ const combinedReducers = combineReducers( {
 	temporarilyEditingAsBlocks,
 	blockVisibility,
 	blockEditingModes,
+	blockImage,
 	styleOverrides,
 	removalPromptData,
 	blockRemovalRules,

@@ -1679,6 +1679,20 @@ export function setBlockVisibility( updates ) {
 }
 
 /**
+ * Action that sets block image.
+ *
+ * @param {string}          clientId A block client ID.
+ * @param {string|string[]} images   Block images.
+ */
+export function setBlockImage( clientId, images ) {
+	return {
+		type: 'SET_BLOCK_IMAGE',
+		images: castArray( images ),
+		clientId,
+	};
+}
+
+/**
  * Action that sets whether a block is being temporaritly edited as blocks.
  *
  * DO-NOT-USE in production.

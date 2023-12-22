@@ -91,6 +91,7 @@ function GalleryEdit( props ) {
 	const { columns, imageCrop, linkTarget, linkTo, sizeSlug } = attributes;
 
 	const {
+		setBlockImage,
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
 		updateBlockAttributes,
@@ -168,6 +169,11 @@ function GalleryEdit( props ) {
 			} );
 		} );
 	}, [ newImages ] );
+
+	useEffect( () => {
+		const imageUrls = images.map( ( { url } ) => url );
+		setBlockImage( clientId, imageUrls );
+	}, [ images, clientId, setBlockImage ] );
 
 	const imageSizeOptions = useImageSizes(
 		imageData,

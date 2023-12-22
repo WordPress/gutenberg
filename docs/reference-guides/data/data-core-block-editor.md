@@ -251,6 +251,19 @@ _Returns_
 
 -   `string`: Root client ID
 
+### getBlockImage
+
+Returns the list of the block images.
+
+_Parameters_
+
+-   _state_ `Record<string,boolean>`: Current state.
+-   _clientId_ `string`: Client Id of the block.
+
+_Returns_
+
+-   `Record<string,boolean>`: Block images.
+
 ### getBlockIndex
 
 Returns the index at which the block corresponding to the specified client ID occurs within the block order, or `-1` if the block does not exist.
@@ -1637,6 +1650,15 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
+
+### setBlockImage
+
+Action that sets block image.
+
+_Parameters_
+
+-   _clientId_ `string`: A block client ID.
+-   _images_ `string|string[]`: Block images.
 
 ### setBlockMovingClientId
 

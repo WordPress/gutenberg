@@ -2710,6 +2710,17 @@ export function isBlockVisible( state, clientId ) {
 }
 
 /**
+ * Returns the list of the block images.
+ *
+ * @param {Record<string,boolean>} state    Current state.
+ * @param {string}                 clientId Client Id of the block.
+ * @return {Record<string,boolean>} Block images.
+ */
+export function getBlockImage( state, clientId ) {
+	return state?.blockImage?.[ clientId ];
+}
+
+/**
  * Returns the list of all hidden blocks.
  *
  * @param {Object} state Global application state.

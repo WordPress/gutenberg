@@ -124,7 +124,7 @@ export function ImageEdit( {
 		captionRef.current = caption;
 	}, [ caption ] );
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
+	const { setBlockImage, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
 	useEffect( () => {
@@ -138,6 +138,10 @@ export function ImageEdit( {
 			} );
 		}
 	}, [ align ] );
+
+	useEffect( () => {
+		setBlockImage( clientId, url );
+	}, [ url, clientId, setBlockImage ] );
 
 	const ref = useRef();
 	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {

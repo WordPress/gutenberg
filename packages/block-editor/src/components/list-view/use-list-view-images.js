@@ -12,48 +12,6 @@ import { store as blockEditorStore } from '../../store';
 // Maximum number of images to display in a list view row.
 const MAX_IMAGES = 3;
 
-function getImage( block ) {
-	if ( block.name !== 'core/image' ) {
-		return;
-	}
-
-	if ( block.attributes?.url ) {
-		return {
-			url: block.attributes.url,
-			alt: block.attributes.alt,
-			clientId: block.clientId,
-		};
-	}
-}
-
-function getImagesFromGallery( block ) {
-	if ( block.name !== 'core/gallery' || ! block.innerBlocks ) {
-		return [];
-	}
-
-	const images = [];
-
-	for ( const innerBlock of block.innerBlocks ) {
-		const img = getImage( innerBlock );
-		if ( img ) {
-			images.push( img );
-		}
-		if ( images.length >= MAX_IMAGES ) {
-			return images;
-		}
-	}
-
-	return images;
-}
-
-function getImagesFromBlock( block, isExpanded ) {
-	const img = getImage( block );
-	if ( img ) {
-		return [ img ];
-	}
-	return isExpanded ? [] : getImagesFromGallery( block );
-}
-
 /**
  * Get a block's preview images for display within a list view row.
  *
@@ -67,17 +25,15 @@ function getImagesFromBlock( block, isExpanded ) {
  * @return {Array} Images.
  */
 export default function useListViewImages( { clientId, isExpanded } ) {
-	const { block } = useSelect(
+	const images = useSelect(
 		( select ) => {
-			const _block = select( blockEditorStore ).getBlock( clientId );
-			return { block: _block };
+			return select( blockEditorStore ).getBlockImage( clientId ) || [];
 		},
 		[ clientId ]
 	);
-
-	const images = useMemo( () => {
-		return getImagesFromBlock( block, isExpanded );
-	}, [ block, isExpanded ] );
-
-	return images;
+	const filteredImages = useMemo(
+		() => images.slice( 0, MAX_IMAGES ),
+		[ images ]
+	);
+	return isExpanded ? [] : filteredImages;
 }
