@@ -48,10 +48,19 @@ describe( 'Tooltip', () => {
 			// expected TS error since Tooltip cannot have more than one child element
 			// @ts-expect-error
 			<Tooltip { ...props }>
-				<Button>This is a button</Button>
-				<Button>This is another button</Button>
+				<Button>First button</Button>
+				<Button>Second button</Button>
 			</Tooltip>
 		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'First button' } )
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'button', { name: 'Second button' } )
+		).toBeVisible();
+
+		await press.Tab();
 
 		expect(
 			screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
