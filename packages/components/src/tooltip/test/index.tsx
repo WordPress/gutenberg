@@ -130,7 +130,12 @@ describe( 'Tooltip', () => {
 	} );
 
 	it( 'should not hide tooltip when the tooltip anchor is clicked and the `hideOnClick` prop is `false', async () => {
-		render( <Tooltip { ...props } hideOnClick={ false } /> );
+		render(
+			<>
+				<Tooltip { ...props } hideOnClick={ false } />
+				<button>Click me</button>
+			</>
+		);
 
 		const anchor = screen.getByRole( 'button', { name: 'Tooltip anchor' } );
 
@@ -143,6 +148,10 @@ describe( 'Tooltip', () => {
 		// Click the anchor, tooltip should not hide
 		await click( anchor );
 		await waitForTooltipToShow();
+
+		// Click another button, tooltip should hide
+		await click( screen.getByRole( 'button', { name: 'Click me' } ) );
+		await waitForTooltipToHide();
 	} );
 
 	it( 'should respect custom delay prop when showing tooltip', async () => {
