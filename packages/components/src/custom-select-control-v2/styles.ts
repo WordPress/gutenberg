@@ -63,6 +63,8 @@ export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
 	border-radius: ${ space( 0.5 ) };
 	background: ${ COLORS.white };
 	border: 1px solid ${ COLORS.gray[ 900 ] };
+	/* Force the passed wrapper props z-index otherwise it's overridden. */
+	z-index: ${ ( props ) => props.wrapperProps?.style?.zIndex };
 `;
 
 export const CustomSelectItem = styled( Ariakit.SelectItem )`
