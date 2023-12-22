@@ -130,15 +130,16 @@ const baseItem = css`
 	/* Occupy the width of all grid columns (ie. full width) */
 	grid-column: 1 / -1;
 
-	display: flex;
+	display: grid;
+	grid-template-columns: minmax( 0, max-content ) 1fr;
 	align-items: center;
 
 	@supports ( grid-template-columns: subgrid ) {
 		/*
 		 * Define a grid layout which inherits the same columns configuration
-		 * from the parent layout (ie. subgrid).
+		 * from the parent layout (ie. subgrid). This allows the menu
+		 * to synchronize the indentation of all its items.
 		 */
-		display: grid;
 		grid-template-columns: subgrid;
 	}
 
@@ -250,17 +251,11 @@ export const ItemPrefixWrapper = styled.span`
 `;
 
 export const DropdownMenuItemContentWrapper = styled.div`
-	flex: 1;
-
-	@supports ( grid-template-columns: subgrid ) {
-		/* Revert flex rule */
-		flex: none;
-		/*
-		* Always occupy the second column, since the first column
-		* is taken by the prefix wrapper (when displayed).
-		*/
-		grid-column: 2;
-	}
+	/*
+   * Always occupy the second column, since the first column
+   * is taken by the prefix wrapper (when displayed).
+   */
+	grid-column: 2;
 
 	display: flex;
 	align-items: center;
