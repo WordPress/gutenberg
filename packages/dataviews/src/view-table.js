@@ -16,7 +16,13 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { Children, Fragment } from '@wordpress/element';
+import {
+	Children,
+	Fragment,
+	forwardRef,
+	useId,
+	useRef,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -50,7 +56,10 @@ const sanitizeOperators = ( field ) => {
 	);
 };
 
-function HeaderMenu( { field, view, onChangeView } ) {
+const HeaderMenu = forwardRef( function HeaderMenu(
+	{ field, view, onChangeView, onHide },
+	ref
+) {
 	const isHidable = field.enableHiding !== false;
 
 	const isSortable = field.enableSorting !== false;
@@ -85,6 +94,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 					size="compact"
 					className="dataviews-table-header-button"
 					style={ { padding: 0 } }
+					ref={ ref }
 				>
 					{ field.header }
 					{ isSorted && (
@@ -137,12 +147,14 @@ function HeaderMenu( { field, view, onChangeView } ) {
 						prefix={ <Icon icon={ unseen } /> }
 						onSelect={ ( event ) => {
 							event.preventDefault();
-							onChangeView( {
-								...view,
-								hiddenFields: view.hiddenFields.concat(
-									field.id
-								),
-							} );
+							if ( ( onHide && onHide( field ) ) ?? true ) {
+								onChangeView( {
+									...view,
+									hiddenFields: view.hiddenFields.concat(
+										field.id
+									),
+								} );
+							}
 						} }
 					>
 						{ __( 'Hide' ) }
@@ -308,7 +320,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 			</WithSeparators>
 		</DropdownMenu>
 	);
-}
+} );
 
 function WithSeparators( { children } ) {
 	return Children.toArray( children )
@@ -331,6 +343,15 @@ function ViewTable( {
 	isLoading = false,
 	deferredRendering,
 } ) {
+	const headerMenuRefs = useRef( {} );
+	const onHide = ( field ) => {
+		const hidden = headerMenuRefs.current[ field.id ];
+		const fallback = headerMenuRefs.current[ hidden.fallback ];
+		queueMicrotask( () => {
+			if ( fallback?.node ) fallback.node.focus();
+		} );
+	};
+	const previousData = useRef( [] );
 	const visibleFields = fields.filter(
 		( field ) =>
 			! view.hiddenFields.includes( field.id ) &&
@@ -339,54 +360,64 @@ function ViewTable( {
 			)
 	);
 	const shownData = useAsyncList( data );
-	const usedData = deferredRendering ? shownData : data;
+	const usefulData = data.length ? data : shownData;
+	const deferredData = deferredRendering ? shownData : usefulData;
+	const staleData = shownData.length ? shownData : previousData.current;
+	const usedData =
+		isLoading && ! deferredData.length ? staleData : deferredData;
+	previousData.current = usedData;
 	const hasData = !! usedData?.length;
-	if ( isLoading ) {
-		// TODO:Add spinner or progress bar..
-		return (
-			<div className="dataviews-loading">
-				<h3>{ __( 'Loading' ) }</h3>
-			</div>
-		);
-	}
+
 	const sortValues = { asc: 'ascending', desc: 'descending' };
+	const tableNoticeId = useId();
+
 	return (
 		<div className="dataviews-table-view-wrapper">
-			{ hasData && (
-				<table className="dataviews-table-view">
-					<thead>
-						<tr>
-							{ visibleFields.map( ( field ) => (
-								<th
-									key={ field.id }
-									style={ {
-										width: field.width || undefined,
-										minWidth: field.minWidth || undefined,
-										maxWidth: field.maxWidth || undefined,
-									} }
-									data-field-id={ field.id }
-									aria-sort={
-										view.sort?.field === field.id &&
-										sortValues[ view.sort.direction ]
+			<table
+				className="dataviews-table-view"
+				aria-busy={ isLoading || undefined }
+				aria-describedby={ tableNoticeId }
+			>
+				<thead>
+					<tr>
+						{ visibleFields.map( ( field, index ) => (
+							<th
+								key={ field.id }
+								style={ {
+									width: field.width || undefined,
+									minWidth: field.minWidth || undefined,
+									maxWidth: field.maxWidth || undefined,
+								} }
+								data-field-id={ field.id }
+								aria-sort={
+									view.sort?.field === field.id &&
+									sortValues[ view.sort.direction ]
+								}
+								scope="col"
+							>
+								<HeaderMenu
+									ref={ ( node ) =>
+										( headerMenuRefs.current[ field.id ] = {
+											node,
+											fallback:
+												visibleFields[ index - 1 ]?.id,
+										} )
 									}
-									scope="col"
-								>
-									<HeaderMenu
-										field={ field }
-										view={ view }
-										onChangeView={ onChangeView }
-									/>
-								</th>
-							) ) }
-							{ !! actions?.length && (
-								<th data-field-id="actions">
-									{ __( 'Actions' ) }
-								</th>
-							) }
-						</tr>
-					</thead>
-					<tbody>
-						{ usedData.map( ( item ) => (
+									field={ field }
+									view={ view }
+									onChangeView={ onChangeView }
+									onHide={ onHide }
+								/>
+							</th>
+						) ) }
+						{ !! actions?.length && (
+							<th data-field-id="actions">{ __( 'Actions' ) }</th>
+						) }
+					</tr>
+				</thead>
+				<tbody inert={ isLoading ? '' : undefined }>
+					{ hasData &&
+						usedData.map( ( item ) => (
 							<tr key={ getItemId( item ) }>
 								{ visibleFields.map( ( field ) => (
 									<td
@@ -414,14 +445,13 @@ function ViewTable( {
 								) }
 							</tr>
 						) ) }
-					</tbody>
-				</table>
-			) }
-			{ ! hasData && (
-				<div className="dataviews-no-results">
-					<p>{ __( 'No results' ) }</p>
-				</div>
-			) }
+				</tbody>
+			</table>
+			<div className="dataviews-no-results" id={ tableNoticeId }>
+				{ ! hasData && (
+					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
+				) }
+			</div>
 		</div>
 	);
 }

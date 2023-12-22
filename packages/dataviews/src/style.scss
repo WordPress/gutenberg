@@ -120,6 +120,15 @@
 		}
 	}
 
+	tbody {
+		opacity: 1;
+		transition: opacity 0.5s ease-in-out;
+
+		&[inert] {
+			opacity: 0.1;
+		}
+	}
+
 	.dataviews-table-header-button {
 		padding: 0;
 		gap: $grid-unit-05;
