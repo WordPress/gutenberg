@@ -49,6 +49,7 @@ const config = defineConfig( {
 			grepInvert: /-firefox/,
 		},
 	],
+	webServer: null,
 } );
 
 export default config;
