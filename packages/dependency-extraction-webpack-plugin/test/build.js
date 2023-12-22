@@ -13,7 +13,7 @@ const configFixtures = fs.readdirSync( fixturesPath ).sort();
 
 afterAll( () => rimraf( path.join( __dirname, 'build' ) ) );
 
-describe( 'DependencyExtractionWebpackPlugin %s', () => {
+describe( 'DependencyExtractionWebpackPlugin scripts', () => {
 	describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 		const testDirectory = path.join( fixturesPath, configCase );
 		const outputDirectory = path.join( __dirname, 'build', configCase );
