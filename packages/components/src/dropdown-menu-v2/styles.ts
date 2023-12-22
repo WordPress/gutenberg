@@ -254,9 +254,9 @@ export const ItemPrefixWrapper = styled.span`
 
 export const DropdownMenuItemContentWrapper = styled.div`
 	/*
-   * Always occupy the second column, since the first column
-   * is taken by the prefix wrapper (when displayed).
-   */
+	 * Always occupy the second column, since the first column
+	 * is taken by the prefix wrapper (when displayed).
+	 */
 	grid-column: 2;
 
 	display: flex;
