@@ -13,7 +13,7 @@ import { SVG, Circle } from '@wordpress/primitives';
  */
 import { unlock } from './lock-unlock';
 
-const { DropdownMenuItemV2Ariakit: DropdownMenuItem } = unlock(
+const { DropdownMenuItemV2: DropdownMenuItem } = unlock(
 	componentsPrivateApis
 );
 
