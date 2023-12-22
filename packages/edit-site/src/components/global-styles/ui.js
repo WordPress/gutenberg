@@ -243,6 +243,7 @@ function GlobalStylesEditorCanvasContainerLink() {
 	useEffect( () => {
 		switch ( editorCanvasContainerView ) {
 			case 'global-styles-revisions':
+			case 'global-styles-revisions:style-book':
 				goTo( '/revisions' );
 				break;
 			case 'global-styles-css':

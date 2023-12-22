@@ -7,18 +7,23 @@
 -   `FontSizePicker`: Use Button API for keeping focus on reset ([#57221](https://github.com/WordPress/gutenberg/pull/57221)).
 -   `FontSizePicker`: Fix Reset button focus loss ([#57196](https://github.com/WordPress/gutenberg/pull/57196)).
 -   `PaletteEdit`: Consider digits when generating kebab-cased slug ([#56713](https://github.com/WordPress/gutenberg/pull/56713)).
+-   `FormTokenField`: Prevent focus being passed to internal buttons when component is disabled ([#57187](https://github.com/WordPress/gutenberg/pull/57187)).
 -   `Button`: Fix logic of `has-text` class addition ([#56949](https://github.com/WordPress/gutenberg/pull/56949)).
 -   `FormTokenField`: Fix a regression where the suggestion list would re-open after clicking away from the input ([#57002](https://github.com/WordPress/gutenberg/pull/57002)).
 -   `Snackbar`: Remove erroneous `__unstableHTML` prop from TypeScript definitions ([#57218](https://github.com/WordPress/gutenberg/pull/57218)).
+-   `Truncate`: improve handling of non-string `children` ([#57261](https://github.com/WordPress/gutenberg/pull/57261)).
 -   `PaletteEdit`: Don't discard colors with default name and slug ([#54332](https://github.com/WordPress/gutenberg/pull/54332)).
 
 ### Enhancements
 
+-   `DropdownMenuV2`: do not collapse suffix width ([#57238](https://github.com/WordPress/gutenberg/pull/57238)).
 -   `DateTimePicker`: Adjustment of the dot position on DayButton and expansion of the button area. ([#55502](https://github.com/WordPress/gutenberg/pull/55502)).
+-   `Modal`: Improve application of body class names ([#55430](https://github.com/WordPress/gutenberg/pull/55430)).
 
 ### Experimental
 
 -   `Tabs`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
+-   `Tabs`: improve hover and text alignment styles ([#57275](https://github.com/WordPress/gutenberg/pull/57275)).
 -   `Tabs`: make sure `Tab`s are associated to the right `TabPanel`s, regardless of the order they're rendered in ([#57033](https://github.com/WordPress/gutenberg/pull/57033)).
 
 ## 25.14.0 (2023-12-13)

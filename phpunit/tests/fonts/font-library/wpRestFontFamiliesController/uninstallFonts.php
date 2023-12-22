@@ -1,6 +1,6 @@
 <?php
 /**
- * Test WP_REST_Font_Library_Controller::install_fonts().
+ * Test WP_REST_Font_Families_Controller::install_fonts().
  *
  * @package WordPress
  * @subpackage Font Library
@@ -8,10 +8,10 @@
  * @group fonts
  * @group font-library
  *
- * @covers WP_REST_Font_Library_Controller::install_fonts
+ * @covers WP_REST_Font_Families_Controller::install_fonts
  */
 
-class Tests_Fonts_WPRESTFontLibraryController_UninstallFonts extends WP_REST_Font_Library_Controller_UnitTestCase {
+class Tests_Fonts_WPRESTFontFamiliesController_UninstallFonts extends WP_REST_Font_Families_Controller_UnitTestCase {
 
 	/**
 	 * Install fonts to test uninstall.
@@ -51,7 +51,7 @@ class Tests_Fonts_WPRESTFontLibraryController_UninstallFonts extends WP_REST_Fon
 			),
 		);
 
-		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/fonts' );
+		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
 		$font_families_json = json_encode( $mock_families );
 		$install_request->set_param( 'font_families', $font_families_json );
 		rest_get_server()->dispatch( $install_request );
@@ -67,7 +67,7 @@ class Tests_Fonts_WPRESTFontLibraryController_UninstallFonts extends WP_REST_Fon
 			),
 		);
 
-		$uninstall_request = new WP_REST_Request( 'DELETE', '/wp/v2/fonts' );
+		$uninstall_request = new WP_REST_Request( 'DELETE', '/wp/v2/font-families' );
 		$uninstall_request->set_param( 'font_families', $font_families_to_uninstall );
 		$response = rest_get_server()->dispatch( $uninstall_request );
 		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
@@ -75,7 +75,7 @@ class Tests_Fonts_WPRESTFontLibraryController_UninstallFonts extends WP_REST_Fon
 
 
 	public function test_uninstall_non_existing_fonts() {
-		$uninstall_request = new WP_REST_Request( 'DELETE', '/wp/v2/fonts' );
+		$uninstall_request = new WP_REST_Request( 'DELETE', '/wp/v2/font-families' );
 
 		$non_existing_font_data = array(
 			array(

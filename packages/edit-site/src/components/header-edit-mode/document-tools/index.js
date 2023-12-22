@@ -53,7 +53,7 @@ export default function DocumentTools( {
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
 			listViewShortcut: getShortcutRepresentation(
-				'core/edit-site/toggle-list-view'
+				'core/editor/toggle-list-view'
 			),
 			isVisualMode: getEditorMode() === 'visual',
 			listViewToggleRef: getListViewToggleRef(),
