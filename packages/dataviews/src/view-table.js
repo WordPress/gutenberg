@@ -299,8 +299,12 @@ function ViewTable( {
 	const onHide = ( field ) => {
 		const hidden = headerMenuRefs.current[ field.id ];
 		const fallback = headerMenuRefs.current[ hidden.fallback ];
+		// These stacked microtask callbacks are required to
+		// make sure the node is available to be focused
 		queueMicrotask( () => {
-			if ( fallback?.node ) fallback.node.focus();
+			queueMicrotask( () => {
+				if ( fallback?.node ) fallback.node.focus();
+			} );
 		} );
 	};
 	const previousData = useRef( [] );
