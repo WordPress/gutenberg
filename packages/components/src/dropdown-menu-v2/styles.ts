@@ -35,6 +35,8 @@ const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.gray[ '900' ];
 const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.popoverShadow }`;
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
 
+const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
+
 const slideUpAndFade = keyframes( {
 	'0%': {
 		opacity: 0,
@@ -76,7 +78,7 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	z-index: 1000000;
 
 	display: grid;
-	grid-template-columns: minmax( 0, max-content ) 1fr;
+	grid-template-columns: ${ GRID_TEMPLATE_COLS };
 	grid-template-rows: auto;
 
 	box-sizing: border-box;
@@ -130,13 +132,18 @@ const baseItem = css`
 	/* Occupy the width of all grid columns (ie. full width) */
 	grid-column: 1 / -1;
 
-	/*
-	 * Define a grid layout which inherits the same columns configuration
-	 * from the parent layout (ie. subgrid).
-	 */
 	display: grid;
-	grid-template-columns: subgrid;
+	grid-template-columns: ${ GRID_TEMPLATE_COLS };
 	align-items: center;
+
+	@supports ( grid-template-columns: subgrid ) {
+		/*
+		 * Define a grid layout which inherits the same columns configuration
+		 * from the parent layout (ie. subgrid). This allows the menu
+		 * to synchronize the indentation of all its items.
+		 */
+		grid-template-columns: subgrid;
+	}
 
 	font-size: ${ font( 'default.fontSize' ) };
 	font-family: inherit;
