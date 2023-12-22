@@ -21,21 +21,20 @@ const props = {
 	text: 'tooltip text',
 };
 
-const waitForTooltipToShow = ( timeout = TOOLTIP_DELAY ) =>
-	waitFor(
-		() =>
-			expect(
-				screen.getByRole( 'tooltip', { name: 'tooltip text' } )
-			).toBeVisible(),
-		{ timeout }
-	);
+const expectTooltipToBeVisible = () =>
+	expect(
+		screen.getByRole( 'tooltip', { name: 'tooltip text' } )
+	).toBeVisible();
 
-const waitForTooltipToHide = () =>
-	waitFor( () =>
-		expect(
-			screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
-		).not.toBeInTheDocument()
-	);
+const expectTooltipToBeHidden = () =>
+	expect(
+		screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
+	).not.toBeInTheDocument();
+
+const waitForTooltipToShow = ( timeout = TOOLTIP_DELAY ) =>
+	waitFor( () => expectTooltipToBeVisible(), { timeout } );
+
+const waitForTooltipToHide = () => waitFor( () => expectTooltipToBeHidden );
 
 const hoverOutside = async () => {
 	await hover( document.body );
@@ -62,9 +61,7 @@ describe( 'Tooltip', () => {
 
 		await press.Tab();
 
-		expect(
-			screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
-		).not.toBeInTheDocument();
+		expectTooltipToBeHidden();
 	} );
 
 	it( 'should not render the tooltip if there is no focus', () => {
@@ -74,9 +71,7 @@ describe( 'Tooltip', () => {
 			screen.getByRole( 'button', { name: 'Tooltip anchor' } )
 		).toBeVisible();
 
-		expect(
-			screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
-		).not.toBeInTheDocument();
+		expectTooltipToBeHidden();
 	} );
 
 	it( 'should show the tooltip when focusing on the tooltip anchor and hide it the anchor loses focus', async () => {
