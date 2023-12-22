@@ -657,8 +657,8 @@ class RCTAztecView: Aztec.TextView {
             newFontSize = fontMetrics.scaledValue(for: fontSize)
         } else {
             newFontSize = fontMetrics.scaledValue(for: baseFont.pointSize)
-
         }
+
         var newTraits = oldDescriptor.symbolicTraits
 
         if let fontWeight = fontWeight {
