@@ -12,7 +12,6 @@ import BlockBindingsFill from '../../components/block-bindings/bindings-ui';
 import BlockBindingsFieldsList from '../../components/block-bindings/fields-list';
 
 const SiteData = ( props ) => {
-	// TODO: Explore if it makes sense to create a custom endpoint for this.
 	const siteData = useSelect( ( select ) => {
 		const { getEntityRecord } = select( coreStore );
 		return getEntityRecord( 'root', 'site' );
