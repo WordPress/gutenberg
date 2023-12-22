@@ -50,10 +50,10 @@ describe( 'Tooltip', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'should show the tooltip when the tooltip anchor receives focus, and hide it when the anchor loses focus', async () => {
+	it( 'should show the tooltip when the tooltip anchor receives focus, and hide it when the anchor loses focus when the hideOnBlur prop is `true`', async () => {
 		const user = userEvent.setup();
 
-		render( <Tooltip { ...props } /> );
+		render( <Tooltip { ...props } hideOnBlur /> );
 
 		const tooltipAnchor = screen.getByRole( 'button', { name: /Button/i } );
 
@@ -65,17 +65,13 @@ describe( 'Tooltip', () => {
 			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
 		).toBeVisible();
 
-		await user.tab();
-		await user.tab();
-		await user.click( document.body );
+		await cleanupTooltip( user );
 
 		expect( tooltipAnchor ).not.toHaveFocus();
 
 		expect(
 			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
 		).not.toBeInTheDocument();
-
-		await cleanupTooltip( user );
 	} );
 
 	it( 'should show the tooltip when the tooltip anchor is hovered, and hide it when the anchor is not hovered anymore', async () => {
