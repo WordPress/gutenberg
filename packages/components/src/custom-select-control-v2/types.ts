@@ -24,6 +24,12 @@ export type CustomSelectProps = {
 	 */
 	defaultValue?: string | string[];
 	/**
+	 * If true, the label will only be visible to screen readers.
+	 *
+	 * @default false
+	 */
+	hideLabelFromVision?: boolean;
+	/**
 	 * Label for the control.
 	 */
 	label: string;
@@ -31,6 +37,10 @@ export type CustomSelectProps = {
 	 * A function that receives the new value of the input.
 	 */
 	onChange?: ( newValue: string | string[] ) => void;
+	/**
+	 * Optional props passed to the Select Popover.
+	 */
+	popoverProps?: Ariakit.SelectPopoverProps;
 	/**
 	 * Can be used to render select UI with custom styled values.
 	 */

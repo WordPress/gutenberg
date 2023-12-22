@@ -19,6 +19,7 @@ import type {
 	CustomSelectContext as CustomSelectContextType,
 } from './types';
 import type { WordPressComponentProps } from '../context';
+import { VisuallyHidden } from '../visually-hidden';
 
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
@@ -45,11 +46,13 @@ function defaultRenderSelectedValue( value: CustomSelectProps[ 'value' ] ) {
 export function CustomSelect( {
 	children,
 	defaultValue,
+	hideLabelFromVision = false,
 	label,
 	onChange,
 	size = 'default',
 	value,
 	renderSelectedValue = defaultRenderSelectedValue,
+	popoverProps,
 	...props
 }: WordPressComponentProps< CustomSelectProps, 'button', false > ) {
 	const store = Ariakit.useSelectStore( {
@@ -59,12 +62,23 @@ export function CustomSelect( {
 	} );
 
 	const { value: currentValue } = store.useState();
+	const selectPopoverProps = {
+		gutter: 12,
+		sameWidth: true,
+		...popoverProps,
+		store,
+	};
 
 	return (
 		<>
-			<Styled.CustomSelectLabel store={ store }>
-				{ label }
-			</Styled.CustomSelectLabel>
+			{ hideLabelFromVision && (
+				<VisuallyHidden as="label">{ label }</VisuallyHidden>
+			) }
+			{ ! hideLabelFromVision && (
+				<Styled.CustomSelectLabel store={ store }>
+					{ label }
+				</Styled.CustomSelectLabel>
+			) }
 			<Styled.CustomSelectButton
 				{ ...props }
 				size={ size }
@@ -74,7 +88,7 @@ export function CustomSelect( {
 				{ renderSelectedValue( currentValue ) }
 				<Ariakit.SelectArrow />
 			</Styled.CustomSelectButton>
-			<Styled.CustomSelectPopover gutter={ 12 } store={ store } sameWidth>
+			<Styled.CustomSelectPopover { ...selectPopoverProps }>
 				<CustomSelectContext.Provider value={ { store } }>
 					{ children }
 				</CustomSelectContext.Provider>
