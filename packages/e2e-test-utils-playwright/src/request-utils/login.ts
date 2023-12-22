@@ -9,26 +9,45 @@ export interface User {
 }
 
 async function login( this: RequestUtils, user: User = this.user ) {
-	// Login to admin using request context.
-	let response = await this.request.post( 'wp-login.php', {
-		failOnStatusCode: true,
-		form: {
-			log: user.username,
-			pwd: user.password,
-		},
-	} );
-	await response.dispose();
+	// Get the client ID and secret from the environment.
+	const clientId = process.env.WP_CLIENT_ID;
+	const clientSecret = process.env.WP_CLIENT_SECRET;
+	if ( ! clientId || ! clientSecret ) {
+		throw new Error(
+			'WP_CLIENT_ID and WP_CLIENT_SECRET environment variables must be set.'
+		);
+	}
 
-	// Get the nonce.
-	response = await this.request.get(
-		'wp-admin/admin-ajax.php?action=rest-nonce',
+	// Log in and get the bearer token.
+	const response = await this.request.post(
+		'https://wordpress.com/wp-login.php?action=login-endpoint',
 		{
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/x-www-form-urlencoded',
+			},
 			failOnStatusCode: true,
+			form: {
+				username: user.username,
+				password: user.password,
+				client_id: clientId,
+				client_secret: clientSecret,
+				get_bearer_token: '1',
+			},
 		}
 	);
-	const nonce = await response.text();
 
-	return nonce;
+	const payload = await response.json();
+
+	await response.dispose();
+
+	if ( ! payload?.data?.bearer_token ) {
+		throw new Error(
+			'Unable to log in. Please check your username and password.'
+		);
+	}
+
+	return payload.data.bearer_token as string;
 }
 
 export { login };
