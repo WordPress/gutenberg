@@ -15,7 +15,6 @@ import { shortcutAriaLabel } from '@wordpress/keycodes';
 import Button from '../../button';
 import Modal from '../../modal';
 import Tooltip, { TOOLTIP_DELAY } from '..';
-import cleanupTooltip from './utils/';
 
 const props = {
 	children: <Button>Tooltip anchor</Button>,
