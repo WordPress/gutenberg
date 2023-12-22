@@ -22,14 +22,6 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {
-		attributes: {
-			style: {
-				color: {
-					text: '#000000',
-					background: '#ffffff',
-				},
-			},
-		},
 		innerBlocks: [
 			{
 				name: 'core/paragraph',
