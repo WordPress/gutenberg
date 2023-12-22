@@ -59,6 +59,7 @@ export const KeyboardAwareFlatList = (
 		scrollToSection,
 		scrollToElement,
 		onContentSizeChange,
+		lastScrollTo,
 	} = useScroll( {
 		scrollEnabled,
 		shouldPreventAutomaticScroll,
@@ -111,6 +112,7 @@ export const KeyboardAwareFlatList = (
 			scrollViewRef: scrollViewRef.current,
 			scrollToSection,
 			scrollToElement,
+			lastScrollTo,
 		};
 	} );
 

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -16,7 +16,6 @@ const useScrollUponInsertion = ( {
 	isLayoutCalculated,
 	elementRef,
 } ) => {
-	const isAlreadyInserted = useRef( false );
 	const { scrollRef } = useBlockListContext();
 	const wasBlockJustInserted = useSelect(
 		( select ) =>
@@ -27,24 +26,26 @@ const useScrollUponInsertion = ( {
 		[ clientId ]
 	);
 	useEffect( () => {
-		const blockJustInserted =
-			! isAlreadyInserted.current && wasBlockJustInserted;
+		const lastScrollTo = scrollRef?.lastScrollTo.current;
+		const alreadyScrolledTo = lastScrollTo?.clientId === clientId;
 		if (
+			alreadyScrolledTo ||
 			! isSelected ||
 			! scrollRef ||
-			! blockJustInserted ||
+			! wasBlockJustInserted ||
 			! isLayoutCalculated
 		) {
 			return;
 		}
 		scrollRef.scrollToElement( elementRef );
-		isAlreadyInserted.current = wasBlockJustInserted;
+		lastScrollTo.clientId = clientId;
 	}, [
 		isSelected,
 		scrollRef,
 		wasBlockJustInserted,
 		elementRef,
 		isLayoutCalculated,
+		clientId,
 	] );
 };
 

@@ -30,6 +30,9 @@ export default function useScroll( {
 	const scrollViewRef = useRef();
 	const scrollViewMeasurements = useRef();
 	const scrollViewYOffset = useSharedValue( -1 );
+	const lastScrollTo = useRef( {
+		clientId: null,
+	} );
 
 	const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 	const isLandscape = windowWidth >= windowHeight;
@@ -92,5 +95,6 @@ export default function useScroll( {
 		scrollToSection,
 		scrollToElement,
 		onContentSizeChange,
+		lastScrollTo,
 	};
 }
