@@ -135,6 +135,7 @@ public class WPAndroidGlueCode {
     private boolean mIsDarkMode;
     private Consumer<Exception> mExceptionLogger;
     private Consumer<String> mBreadcrumbLogger;
+    private boolean mShouldHandleBackPress = false;
 
     public void onCreate(Context context) {
         SoLoader.init(context, /* native exopackage */ false);
@@ -146,6 +147,10 @@ public class WPAndroidGlueCode {
 
     public boolean hasReactContext() {
         return mReactContext != null;
+    }
+
+    public boolean shouldHandleBackPress() {
+        return mShouldHandleBackPress;
     }
 
     public boolean isContentChanged() {
@@ -768,6 +773,7 @@ public class WPAndroidGlueCode {
     }
 
     public void onPause(Activity activity) {
+        mShouldHandleBackPress = false;
         if (mReactInstanceManager != null) {
             // get the focused view so we re-focus it later if needed. WeakReference so we don't leak it.
             mLastFocusedView = new WeakReference<>(mReactRootView.findFocus());
@@ -777,6 +783,7 @@ public class WPAndroidGlueCode {
     }
 
     public void onResume(final Fragment fragment, final Activity activity) {
+        mShouldHandleBackPress = true;
         if (mReactInstanceManager != null) {
             mReactInstanceManager.onHostResume(activity,
                     new DefaultHardwareBackBtnHandler() {
@@ -791,11 +798,13 @@ public class WPAndroidGlueCode {
     }
 
     public void onDetach(Activity activity) {
+        mShouldHandleBackPress = false;
         mReactInstanceManager.onHostDestroy(activity);
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().notifyModalClosed();
     }
 
     public void onDestroy(Activity activity) {
+        mShouldHandleBackPress = false;
         if (mReactRootView != null) {
             mReactRootView.unmountReactApplication();
             mReactRootView = null;
