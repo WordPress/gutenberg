@@ -16,7 +16,9 @@ export { h as createElement } from 'preact';
 export { useEffect, useContext, useMemo } from 'preact/hooks';
 export { deepSignal } from 'deepsignal';
 
-domReady( async () => {
+domReady( () => {
 	registerDirectives();
-	await init();
+	init().catch( ( err ) => {
+		throw err;
+	} );
 } );
