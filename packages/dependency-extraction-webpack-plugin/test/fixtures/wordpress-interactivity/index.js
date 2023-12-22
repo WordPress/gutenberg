@@ -5,7 +5,6 @@
 import _ from 'lodash';
 
 // This module should be externalized
-// import { store } from '@wordpress/interactivity';
 const { store, getContext } = await import( '@wordpress/interactivity' );
 
 store( _.identity( 'my-namespace' ), { state: 'is great' } );
