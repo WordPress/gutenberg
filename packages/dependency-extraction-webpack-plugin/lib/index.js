@@ -289,6 +289,10 @@ class DependencyExtractionWebpackPlugin {
 				version: contentHash,
 			};
 
+			if ( this.useModules ) {
+				assetData.type = 'module';
+			}
+
 			if ( combineAssets ) {
 				combinedAssetsData[ chunkJSFile ] = assetData;
 				continue;
