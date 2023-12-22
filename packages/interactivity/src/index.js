@@ -18,7 +18,5 @@ export { deepSignal } from 'deepsignal';
 
 domReady( () => {
 	registerDirectives();
-	init().catch( ( err ) => {
-		throw err;
-	} );
+	return init();
 } );
