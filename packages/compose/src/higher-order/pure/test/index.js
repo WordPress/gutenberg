@@ -31,7 +31,9 @@ describe( 'pure', () => {
 
 		// Updating with same props doesn't rerender.
 		rerender( <MyComp /> );
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith(
+			'wp.compose.pure is deprecated since version 6.5. Please use Use `memo` or `PureComponent` instead instead.'
+		);
 		expect( screen.getByTestId( 'counter' ) ).toHaveTextContent( '1' );
 
 		// New prop should trigger a rerender.
@@ -82,7 +84,9 @@ describe( 'pure', () => {
 		);
 
 		const { rerender } = render( <MyComp /> );
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith(
+			'wp.compose.pure is deprecated since version 6.5. Please use Use `memo` or `PureComponent` instead instead.'
+		);
 
 		// Updating with same props doesn't rerender.
 		rerender( <MyComp /> );
