@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen, waitFor } from '@testing-library/react';
-import { press, hover, click } from '@ariakit/test';
+import { press, hover, click, sleep } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -94,9 +94,7 @@ describe( 'Tooltip', () => {
 		await hover( screen.getByRole( 'button', { name: 'Tooltip anchor' } ) );
 
 		// Advance time by default delay
-		await new Promise( ( resolve ) =>
-			setTimeout( resolve, TOOLTIP_DELAY )
-		);
+		await sleep( TOOLTIP_DELAY );
 
 		// Tooltip hasn't appeared yet
 		expect(
@@ -104,12 +102,7 @@ describe( 'Tooltip', () => {
 		).not.toBeInTheDocument();
 
 		// wait for additional delay for tooltip to appear
-		await waitFor(
-			() =>
-				new Promise( ( resolve ) =>
-					setTimeout( resolve, ADDITIONAL_DELAY )
-				)
-		);
+		await sleep( ADDITIONAL_DELAY );
 
 		expect(
 			screen.getByRole( 'tooltip', { name: 'tooltip text' } )
@@ -167,9 +160,7 @@ describe( 'Tooltip', () => {
 		expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
 
 		// Advance time by MOUSE_LEAVE_DELAY time
-		await new Promise( ( resolve ) =>
-			setTimeout( resolve, MOUSE_LEAVE_DELAY )
-		);
+		await sleep( MOUSE_LEAVE_DELAY );
 
 		expect(
 			screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
@@ -190,9 +181,7 @@ describe( 'Tooltip', () => {
 		expect( onMouseLeaveMock ).toHaveBeenCalledTimes( 1 );
 
 		// Advance time again, so that we reach the full TOOLTIP_DELAY time
-		await new Promise( ( resolve ) =>
-			setTimeout( resolve, TOOLTIP_DELAY )
-		);
+		await sleep( TOOLTIP_DELAY );
 
 		// Tooltip won't show, since the mouse has left the tooltip anchor
 		expect(
