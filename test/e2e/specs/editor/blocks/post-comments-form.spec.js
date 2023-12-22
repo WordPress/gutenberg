@@ -48,6 +48,7 @@ test.describe( 'Comments Form', () => {
 		admin,
 		editor,
 	} ) => {
+		// Navigate to "Singular" post template
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//singular',
 			postType: 'wp_template',
