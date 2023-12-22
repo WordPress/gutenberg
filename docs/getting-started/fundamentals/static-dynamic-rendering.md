@@ -39,10 +39,10 @@ export default function save( { attributes } ) {
 
 _(see the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/save.js) in [an example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/copyright-date-block-09aac3))_
 
-Blocks with dynamic rendering can also define a markup representation of the block (via the `save` function) as a backup for when the dynamic rendering method is no longer available (uninstallation of the plugin that registered the block). If no dynamic rendering method is found, any markup representation of the block in the database will be returned to the front end.
+Blocks with dynamic rendering can also define a markup representation of the block (via the `save` function). If no dynamic rendering method is found, any markup representation of the block in the database will be returned to the front end.
 
 <div class="callout callout-info">
-The markup stored for a block can be modified before it gets rendered on the front end via hooks such as <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>render_block</code></a> or via <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>$render_callback</code></a>
+The markup stored for a block can be modified before it gets rendered on the front end via hooks such as <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>render_block</code></a> or via <code>$render_callback</code>
 </div>
 
 Some examples of core blocks whose output for the front end is statically generated when saved to the database (as returned by their `save` functions) are: 
@@ -56,7 +56,7 @@ Blocks with Dynamic Rendering (a.k.a. Dynamic Blocks) are blocks that **build th
 
 ![](https://developer.wordpress.org/files/2023/12/dynamic-rendering.png)
 
-There are two primary uses for dynamic blocks:
+There are some common use cases for dynamic blocks:
 
 1. **Blocks where content should change even if a post has not been updated**. An example is the Latest Posts block - this block will update everywhere it is used when a new post is published.
 2. **Blocks where updates to the code (HTML, CSS, JS) should be immediately shown on the front end of the website**. For example, if you update the structure of a block by adding a new class, adding an HTML element, or changing the layout in any other way, using a dynamic block ensures those changes are applied immediately on all occurrences of that block across the site. If a dynamic block is not used then when block code is updated Gutenberg's [validation process](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#validation) generally applies, causing users to see the validation message, "This block appears to have been modified externally".
@@ -69,8 +69,8 @@ A block can define dynamic rendering in two main ways:
 
 Both of these ways to define the block's dynamic rendering receive the following data:
  - `$attributes` - The array of attributes for this block.
- - `$content` - Rendered block output.
- - `$block` - The instance of the [WP_Block](https://developer.wordpress.org/reference/classes/wp_block/) class that represents the block being rendered.
+ - `$content` - Rendered block output (markup of the block as stored in the database).
+ - `$block` - The instance of the [WP_Block](https://developer.wordpress.org/reference/classes/wp_block/) class that represents the block being rendered ([metadata of the block](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/)).
 
 _Example of `render.php` file for a block with `"render": "file:./render.php"` in its `block.json`_
 
