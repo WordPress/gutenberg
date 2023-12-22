@@ -102,14 +102,20 @@ describe( 'Tooltip', () => {
 		await waitForTooltipToHide();
 	} );
 
-	it( 'should render the tooltip when the tooltip anchor is hovered', async () => {
+	it( 'should show the tooltip when the tooltip anchor is hovered and hide it when the cursor stops hovering the anchor', async () => {
 		render( <Tooltip { ...props } /> );
 
-		await hover( screen.getByRole( 'button', { name: 'Tooltip anchor' } ) );
+		const anchor = screen.getByRole( 'button', { name: 'Tooltip anchor' } );
 
-		expect(
-			await screen.findByRole( 'tooltip', { name: 'tooltip text' } )
-		).toBeVisible();
+		expect( anchor ).toBeVisible();
+
+		// Hover over the anchor, tooltip should show
+		await hover( anchor );
+		await waitForTooltipToShow();
+
+		// Hover outside of the anchor, tooltip should hide
+		await hoverOutside();
+		await waitForTooltipToHide();
 	} );
 
 	it( 'should not show tooltip on focus as result of mouse click', async () => {
