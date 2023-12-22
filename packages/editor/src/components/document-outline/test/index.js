@@ -17,6 +17,10 @@ import {
  */
 import { DocumentOutline } from '../';
 
+jest.mock( '@wordpress/block-editor', () => ( {
+	BlockTitle: () => 'Block Title',
+} ) );
+
 describe( 'DocumentOutline', () => {
 	let paragraph, headingH1, headingH2, headingH3, nestedHeading;
 	beforeAll( () => {
