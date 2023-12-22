@@ -209,62 +209,44 @@ describe( 'Tooltip', () => {
 	it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {
 		const onMouseEnterMock = jest.fn();
 		const onMouseLeaveMock = jest.fn();
-		const MOUSE_LEAVE_DELAY = TOOLTIP_DELAY - 200;
+		const HOVER_OUTSIDE_ANTICIPATION = 200;
 
 		render(
-			<>
-				<Tooltip { ...props }>
-					<Button
-						onMouseEnter={ onMouseEnterMock }
-						onMouseLeave={ onMouseLeaveMock }
-					>
-						Tooltip anchor
-					</Button>
-				</Tooltip>
-				<Button>Other button</Button>
-			</>
+			<Tooltip { ...props }>
+				<Button
+					onMouseEnter={ onMouseEnterMock }
+					onMouseLeave={ onMouseLeaveMock }
+				>
+					Tooltip anchor
+				</Button>
+			</Tooltip>
 		);
 
-		await hover(
-			screen.getByRole( 'button', {
-				name: 'Tooltip anchor',
-			} )
-		);
+		const anchor = screen.getByRole( 'button', { name: 'Tooltip anchor' } );
+		expect( anchor ).toBeVisible();
 
-		// Tooltip hasn't appeared yet
-		expect(
-			screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
-		).not.toBeInTheDocument();
+		// Hover over the anchor, tooltip hasn't appeared yet
+		await hover( anchor );
 		expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
+		expectTooltipToBeHidden();
 
-		// Advance time by MOUSE_LEAVE_DELAY time
-		await sleep( MOUSE_LEAVE_DELAY );
+		// Advance time, tooltip hasn't appeared yet because TOOLTIP_DELAY time
+		// hasn't passed yet
+		await sleep( TOOLTIP_DELAY - HOVER_OUTSIDE_ANTICIPATION );
+		expectTooltipToBeHidden();
 
-		expect(
-			screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
-		).not.toBeInTheDocument();
+		// Hover outside of the anchor, tooltip still hasn't appeared yet
+		await hoverOutside();
+		expectTooltipToBeHidden();
 
-		// Hover the other button, meaning that the mouse will leave the tooltip anchor
-		await hover(
-			screen.getByRole( 'button', {
-				name: 'Other button',
-			} )
-		);
-
-		// Tooltip still hasn't appeared yet
-		expect(
-			screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
-		).not.toBeInTheDocument();
 		expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
 		expect( onMouseLeaveMock ).toHaveBeenCalledTimes( 1 );
 
 		// Advance time again, so that we reach the full TOOLTIP_DELAY time
-		await sleep( TOOLTIP_DELAY );
+		await sleep( HOVER_OUTSIDE_ANTICIPATION );
 
 		// Tooltip won't show, since the mouse has left the tooltip anchor
-		expect(
-			screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
-		).not.toBeInTheDocument();
+		expectTooltipToBeHidden();
 	} );
 
 	it( 'should render the shortcut display text when a string is passed as the shortcut', async () => {
