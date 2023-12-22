@@ -21,6 +21,27 @@ const props = {
 	text: 'tooltip text',
 };
 
+const waitForTooltipToShow = ( timeout = TOOLTIP_DELAY ) =>
+	waitFor(
+		() =>
+			expect(
+				screen.getByRole( 'tooltip', { name: 'tooltip text' } )
+			).toBeVisible(),
+		{ timeout }
+	);
+
+const waitForTooltipToHide = () =>
+	waitFor( () =>
+		expect(
+			screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
+		).not.toBeInTheDocument()
+	);
+
+const hoverOutside = async () => {
+	await hover( document.body );
+	await hover( document.body, { clientX: 10, clientY: 10 } );
+};
+
 describe( 'Tooltip', () => {
 	it( 'should not render the tooltip if multiple children are passed', async () => {
 		render(
