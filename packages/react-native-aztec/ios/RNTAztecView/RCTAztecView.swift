@@ -650,10 +650,9 @@ class RCTAztecView: Aztec.TextView {
     ///
     private func applyFontConstraints(to baseFont: UIFont) -> UIFont {
         let oldDescriptor = baseFont.fontDescriptor
-        let newFontSize: CGFloat
         let fontMetrics = UIFontMetrics(forTextStyle: .body)
 
-        newFontSize = fontMetrics.scaledValue(for: fontSize ?? baseFont.pointSize)
+        let newFontSize = fontMetrics.scaledValue(for: fontSize ?? baseFont.pointSize)
 
         var newTraits = oldDescriptor.symbolicTraits
 
