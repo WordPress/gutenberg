@@ -510,10 +510,15 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress\` should 
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress-interactivity\` should produce expected output: Asset file 'main.asset.json' should match snapshot 1`] = `"{"dependencies":["lodash","wp-interactivity"],"version":"ea7590e6d8a8e420f99f"}"`;
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress-interactivity\` should produce expected output: Asset file 'main.asset.json' should match snapshot 1`] = `"{"dependencies":["lodash","react","wp-dom-ready"],"version":"8d9fcb3d75d3b475913c"}"`;
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress-interactivity\` should produce expected output: External modules should match snapshot 1`] = `
 [
+  {
+    "externalType": "window",
+    "request": "React",
+    "userRequest": "react",
+  },
   {
     "externalType": "window",
     "request": "lodash",
@@ -523,9 +528,9 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress-interacti
     "externalType": "window",
     "request": [
       "wp",
-      "interactivity",
+      "domReady",
     ],
-    "userRequest": "@wordpress/interactivity",
+    "userRequest": "@wordpress/dom-ready",
   },
 ]
 `;
