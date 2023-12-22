@@ -23,6 +23,8 @@ import {
 	store as interfaceStore,
 } from '@wordpress/interface';
 import {
+	EditorKeyboardShortcutsRegister,
+	EditorKeyboardShortcuts,
 	EditorNotices,
 	EditorSnackbars,
 	privateApis as editorPrivateApis,
@@ -50,7 +52,6 @@ import useTitle from '../routes/use-title';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
-import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 import PatternModal from '../pattern-modal';
 import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
 import SiteEditorCanvas from '../block-editor/site-editor-canvas';
@@ -84,7 +85,7 @@ const blockRemovalRules = {
 	),
 };
 
-export default function Editor( { listViewToggleElement, isLoading } ) {
+export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -245,26 +246,25 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 								{ editorMode === 'text' && isEditMode && (
 									<CodeEditor />
 								) }
-								{ isEditMode && <KeyboardShortcutsEditMode /> }
+								{ isEditMode && (
+									<>
+										<KeyboardShortcutsEditMode />
+										<EditorKeyboardShortcutsRegister />
+										<EditorKeyboardShortcuts />
+									</>
+								) }
 							</>
 						}
 						secondarySidebar={
 							isEditMode &&
 							( ( shouldShowInserter && <InserterSidebar /> ) ||
-								( shouldShowListView && (
-									<ListViewSidebar
-										listViewToggleElement={
-											listViewToggleElement
-										}
-									/>
-								) ) )
+								( shouldShowListView && <ListViewSidebar /> ) )
 						}
 						sidebar={
 							isEditMode &&
 							isRightSidebarOpen && (
 								<>
 									<ComplementaryArea.Slot scope="core/edit-site" />
-									<SidebarFixedBottomSlot />
 								</>
 							)
 						}

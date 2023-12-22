@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -13,15 +18,21 @@ export default function Pagination( {
 	numPages,
 	changePage,
 	totalItems,
+	className,
+	disabled = false,
+	buttonVariant = 'tertiary',
+	label = __( 'Pagination Navigation' ),
 } ) {
 	return (
 		<HStack
 			expanded={ false }
+			as="nav"
+			aria-label={ label }
 			spacing={ 3 }
 			justify="flex-start"
-			className="edit-site-patterns__grid-pagination"
+			className={ classnames( 'edit-site-pagination', className ) }
 		>
-			<Text variant="muted">
+			<Text variant="muted" className="edit-site-pagination__total">
 				{
 					// translators: %s: Total number of patterns.
 					sprintf(
@@ -33,17 +44,17 @@ export default function Pagination( {
 			</Text>
 			<HStack expanded={ false } spacing={ 1 }>
 				<Button
-					variant="tertiary"
+					variant={ buttonVariant }
 					onClick={ () => changePage( 1 ) }
-					disabled={ currentPage === 1 }
+					disabled={ disabled || currentPage === 1 }
 					aria-label={ __( 'First page' ) }
 				>
 					«
 				</Button>
 				<Button
-					variant="tertiary"
+					variant={ buttonVariant }
 					onClick={ () => changePage( currentPage - 1 ) }
-					disabled={ currentPage === 1 }
+					disabled={ disabled || currentPage === 1 }
 					aria-label={ __( 'Previous page' ) }
 				>
 					‹
@@ -59,17 +70,17 @@ export default function Pagination( {
 			</Text>
 			<HStack expanded={ false } spacing={ 1 }>
 				<Button
-					variant="tertiary"
+					variant={ buttonVariant }
 					onClick={ () => changePage( currentPage + 1 ) }
-					disabled={ currentPage === numPages }
+					disabled={ disabled || currentPage === numPages }
 					aria-label={ __( 'Next page' ) }
 				>
 					›
 				</Button>
 				<Button
-					variant="tertiary"
+					variant={ buttonVariant }
 					onClick={ () => changePage( numPages ) }
-					disabled={ currentPage === numPages }
+					disabled={ disabled || currentPage === numPages }
 					aria-label={ __( 'Last page' ) }
 				>
 					»

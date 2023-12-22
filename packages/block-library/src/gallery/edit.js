@@ -74,6 +74,8 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.isNative
 	? { type: 'stepper' }
 	: {};
 
+const EMPTY_ARRAY = [];
+
 function GalleryEdit( props ) {
 	const {
 		setAttributes,
@@ -97,33 +99,29 @@ function GalleryEdit( props ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const { getBlock, getSettings, preferredStyle } = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		const preferredStyleVariations =
-			settings.__experimentalPreferredStyleVariations;
-		return {
-			getBlock: select( blockEditorStore ).getBlock,
-			getSettings: select( blockEditorStore ).getSettings,
-			preferredStyle: preferredStyleVariations?.value?.[ 'core/image' ],
-		};
-	}, [] );
-
-	const innerBlockImages = useSelect(
+	const {
+		getBlock,
+		getSettings,
+		preferredStyle,
+		innerBlockImages,
+		wasBlockJustInserted,
+	} = useSelect(
 		( select ) => {
-			const innerBlocks =
-				select( blockEditorStore ).getBlock( clientId )?.innerBlocks ??
-				[];
-			return innerBlocks;
-		},
-		[ clientId ]
-	);
-
-	const wasBlockJustInserted = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).wasBlockJustInserted(
-				clientId,
-				'inserter_menu'
-			);
+			const settings = select( blockEditorStore ).getSettings();
+			const preferredStyleVariations =
+				settings.__experimentalPreferredStyleVariations;
+			return {
+				getBlock: select( blockEditorStore ).getBlock,
+				getSettings: select( blockEditorStore ).getSettings,
+				preferredStyle:
+					preferredStyleVariations?.value?.[ 'core/image' ],
+				innerBlockImages:
+					select( blockEditorStore ).getBlock( clientId )
+						?.innerBlocks ?? EMPTY_ARRAY,
+				wasBlockJustInserted: select(
+					blockEditorStore
+				).wasBlockJustInserted( clientId, 'inserter_menu' ),
+			};
 		},
 		[ clientId ]
 	);

@@ -23,7 +23,7 @@ import border from './border';
 import position from './position';
 import layout from './layout';
 import childLayout from './layout-child';
-import './content-lock-ui';
+import contentLockUI from './content-lock-ui';
 import './metadata';
 import customFields from './custom-fields';
 import blockHooks from './block-hooks';
@@ -38,6 +38,7 @@ createBlockEditFilter(
 		duotone,
 		position,
 		layout,
+		contentLockUI,
 		window.__experimentalConnections ? customFields : null,
 		blockHooks,
 		blockRenaming,

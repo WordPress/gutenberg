@@ -9,4 +9,5 @@ In this section, you will learn:
 1. [**Registration of a block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block) - How a block is registered in both the server and the client.
 1. [**Block wrapper**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-wrapper) - How to set proper attributes to the block's markup wrapper.
 1. [**The block in the Editor**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-in-the-editor) - The block as a React component loaded in the Block Editor and its possibilities.
+1. [**Markup representation of a block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block) - How blocks are represented in the DB or in templates.
 1. [**Javascript in the Block Editor**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/javascript-in-the-block-editor) - How to work with Javascript for the Block Editor.

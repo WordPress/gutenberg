@@ -4,7 +4,7 @@
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
@@ -20,8 +20,9 @@ import { unlock } from '../../lock-unlock';
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
-export default function ListViewSidebar( { listViewToggleElement } ) {
+export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editorStore );
+	const { getListViewToggleRef } = unlock( useSelect( editorStore ) );
 
 	// This hook handles focus when the sidebar first renders.
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
@@ -29,8 +30,8 @@ export default function ListViewSidebar( { listViewToggleElement } ) {
 	// When closing the list view, focus should return to the toggle button.
 	const closeListView = useCallback( () => {
 		setIsListViewOpened( false );
-		listViewToggleElement?.focus();
-	}, [ listViewToggleElement, setIsListViewOpened ] );
+		getListViewToggleRef().current?.focus();
+	}, [ getListViewToggleRef, setIsListViewOpened ] );
 
 	const closeOnEscape = useCallback(
 		( event ) => {
@@ -87,10 +88,7 @@ export default function ListViewSidebar( { listViewToggleElement } ) {
 
 	// This only fires when the sidebar is open because of the conditional rendering.
 	// It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
-	useShortcut(
-		'core/edit-site/toggle-list-view',
-		handleToggleListViewShortcut
-	);
+	useShortcut( 'core/editor/toggle-list-view', handleToggleListViewShortcut );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions

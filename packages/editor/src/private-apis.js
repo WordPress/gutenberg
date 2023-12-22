@@ -7,6 +7,7 @@ import { lock } from './lock-unlock';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import useBlockEditorSettings from './components/provider/use-block-editor-settings';
 import PostPanelRow from './components/post-panel-row';
+import PostViewLink from './components/post-view-link';
 import PreviewDropdown from './components/preview-dropdown';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 
@@ -16,6 +17,7 @@ lock( privateApis, {
 	ExperimentalEditorProvider,
 	EntitiesSavedStatesExtensible,
 	PostPanelRow,
+	PostViewLink,
 	PreviewDropdown,
 	PluginPostExcerpt,
 

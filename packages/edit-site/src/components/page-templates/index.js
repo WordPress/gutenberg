@@ -18,12 +18,14 @@ import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 import { parse } from '@wordpress/blocks';
 import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { DataViews } from '@wordpress/dataviews';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -46,6 +48,7 @@ import {
 	deleteTemplateAction,
 	renameTemplateAction,
 } from './template-actions';
+import { postRevisionsAction } from '../actions';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import PostPreview from '../post-preview';
@@ -53,6 +56,7 @@ import PostPreview from '../post-preview';
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
+const { useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
@@ -164,6 +168,7 @@ export default function DataviewsTemplates() {
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
+	const history = useHistory();
 
 	const onSelectionChange = ( items ) =>
 		setTemplateId( items?.length === 1 ? items[ 0 ].id : null );
@@ -332,6 +337,7 @@ export default function DataviewsTemplates() {
 			resetTemplateAction,
 			deleteTemplateAction,
 			renameTemplateAction,
+			postRevisionsAction,
 		],
 		[ resetTemplateAction ]
 	);
@@ -376,7 +382,6 @@ export default function DataviewsTemplates() {
 					fields={ fields }
 					actions={ actions }
 					data={ shownTemplates }
-					getItemId={ ( item ) => item.id }
 					isLoading={ isLoadingData }
 					view={ view }
 					onChangeView={ onChangeView }
@@ -388,7 +393,28 @@ export default function DataviewsTemplates() {
 			</Page>
 			{ view.type === LAYOUT_LIST && (
 				<Page>
-					<div className="edit-site-template-pages-preview">
+					<div
+						className="edit-site-template-pages-preview"
+						tabIndex={ 0 }
+						role="button"
+						onKeyDown={ ( event ) => {
+							const { keyCode } = event;
+							if ( keyCode === ENTER || keyCode === SPACE ) {
+								history.push( {
+									postId: templateId,
+									postType: TEMPLATE_POST_TYPE,
+									canvas: 'edit',
+								} );
+							}
+						} }
+						onClick={ () =>
+							history.push( {
+								postId: templateId,
+								postType: TEMPLATE_POST_TYPE,
+								canvas: 'edit',
+							} )
+						}
+					>
 						{ templateId !== null ? (
 							<PostPreview
 								postId={ templateId }
