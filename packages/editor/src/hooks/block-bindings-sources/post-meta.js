@@ -39,7 +39,6 @@ if ( window.__experimentalBlockBindings ) {
 					[ context.postId, context.postType ]
 				);
 
-				// TODO: Explore how to get the list of available fields depending on the template.
 				if ( ! data || ! data.meta ) {
 					return <BlockEdit key="edit" { ...props } />;
 				}
