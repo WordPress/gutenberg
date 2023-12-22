@@ -342,7 +342,6 @@ export default function PagePages() {
 					view={ view }
 					onChangeView={ onChangeView }
 					onSelectionChange={ onSelectionChange }
-					deferredRendering={ false }
 				/>
 			</Page>
 			{ view.type === LAYOUT_LIST && (
