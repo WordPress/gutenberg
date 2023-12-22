@@ -45,10 +45,7 @@ Blocks with dynamic rendering can also define a markup representation of the blo
 The markup stored for a block can be modified before it gets rendered on the front end via hooks such as <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>render_block</code></a> or via <code>$render_callback</code>
 </div>
 
-Some examples of core blocks whose output for the front end is statically generated when saved to the database (as returned by their `save` functions) are: 
-
-- [**`preformatted`**](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/preformatted) - see [`save`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/preformatted/save.js) function
-- [**`spacer`**](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer) - see [`save`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer/save.js) function
+Some examples of core blocks whose output for the front end is statically generated when saved to the database (as returned by their `save` functions) are[`preformatted`](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/preformatted) (see its [`save`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/preformatted/save.js) function) or [`spacer`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer) (see its [`save`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer/save.js) function).
 
 ## Blocks with Dynamic Rendering
 
