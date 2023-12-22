@@ -72,31 +72,51 @@ if ( window.__experimentalBlockBindings ) {
 								if ( term === 'archive' ) {
 									// General template for all archives.
 									if ( ! entitySlug )
-										return getEntityRecords(
+										return {
+											usesPlaceholder: true,
+											fields: getEntityRecords(
+												'taxonomy',
+												'category',
+												{
+													per_page: 1,
+												}
+											)?.[ 0 ],
+										};
+									// Specific archive template.
+									return {
+										usesPlaceholder: true,
+										fields: getEntityRecords(
 											'taxonomy',
-											'category',
+											entitySlug,
 											{
 												per_page: 1,
 											}
-										)?.[ 0 ];
-									// Specific archive template.
-									return getEntityRecords(
-										'taxonomy',
-										entitySlug,
-										{
-											per_page: 1,
-										}
-									)?.[ 0 ];
+										)?.[ 0 ],
+									};
 								}
 								// For the rest of templates.
 								if ( ! entitySlug ) {
-									return getEntityRecords( 'taxonomy', term, {
-										per_page: 1,
-									} )?.[ 0 ];
+									return {
+										usesPlaceholder: true,
+										fields: getEntityRecords(
+											'taxonomy',
+											term,
+											{
+												per_page: 1,
+											}
+										)?.[ 0 ],
+									};
 								}
-								return getEntityRecords( 'taxonomy', term, {
-									slug: entitySlug,
-								} )?.[ 0 ];
+								return {
+									usesPlaceholder: false,
+									fields: getEntityRecords(
+										'taxonomy',
+										term,
+										{
+											slug: entitySlug,
+										}
+									)?.[ 0 ],
+								};
 							}
 						}
 
@@ -105,7 +125,7 @@ if ( window.__experimentalBlockBindings ) {
 					[ context.postId, context.postType ]
 				);
 
-				if ( ! data || ! data?.meta ) {
+				if ( ! data || ! data?.fields?.meta ) {
 					return <BlockEdit key="edit" { ...props } />;
 				}
 
@@ -120,14 +140,18 @@ if ( window.__experimentalBlockBindings ) {
 						)
 						.join( ' ' );
 				};
-				Object.entries( data.meta ).forEach( ( [ key, value ] ) => {
-					fields.push( {
-						key,
-						label: keyToLabel( key ),
-						value: data.isTemplate ? null : value,
-						placeholder: data.isTemplate ? keyToLabel( key ) : null,
-					} );
-				} );
+				Object.entries( data.fields.meta ).forEach(
+					( [ key, value ] ) => {
+						fields.push( {
+							key,
+							label: keyToLabel( key ),
+							value: ! data.usesPlaceholder ? value : null,
+							placeholder: data.usesPlaceholder
+								? keyToLabel( key )
+								: null,
+						} );
+					}
+				);
 			}
 
 			return (
