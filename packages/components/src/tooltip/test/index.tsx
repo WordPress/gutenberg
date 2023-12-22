@@ -289,7 +289,7 @@ describe( 'Tooltip', () => {
 		await waitForTooltipToHide();
 	} );
 
-	it( 'esc should close modal even when tooltip is visible', async () => {
+	it( 'should close the parent dialog component when pressing the Escape key while the tooltip is visible', async () => {
 		const onRequestClose = jest.fn();
 		render(
 			<Modal onRequestClose={ onRequestClose }>
@@ -297,25 +297,27 @@ describe( 'Tooltip', () => {
 			</Modal>
 		);
 
-		expect(
-			screen.queryByRole( 'tooltip', { name: /close/i } )
-		).not.toBeInTheDocument();
+		expectTooltipToBeHidden();
 
-		await hover(
-			screen.getByRole( 'button', {
-				name: /close/i,
-			} )
-		);
+		const closeButton = screen.getByRole( 'button', {
+			name: /close/i,
+		} );
 
+		// Hover over the anchor, tooltip should show
+		await hover( closeButton );
 		await waitFor( () =>
 			expect(
 				screen.getByRole( 'tooltip', { name: /close/i } )
 			).toBeVisible()
 		);
 
+		// Press the Escape key, Modal should request to be closed
 		await press.Escape();
-
 		expect( onRequestClose ).toHaveBeenCalled();
+
+		// Hover outside of the anchor, tooltip should hide
+		await hoverOutside();
+		await waitForTooltipToHide();
 	} );
 
 	it( 'should associate the tooltip text with its anchor via the accessible description when visible', async () => {
