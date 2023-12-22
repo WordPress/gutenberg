@@ -28,7 +28,7 @@ function Tooltip( props: TooltipProps ) {
 		children,
 		delay = TOOLTIP_DELAY,
 		hideOnClick = true,
-		hideOnBlur = true,
+		hideOnBlur = false,
 		placement,
 		position,
 		shortcut,

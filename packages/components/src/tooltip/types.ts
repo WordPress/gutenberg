@@ -23,9 +23,14 @@ export type TooltipProps = {
 	 */
 	hideOnClick?: boolean;
 	/**
-	 * Option to hide the tooltip when the anchor is blurred.
+	 * By default, the tooltip will close when interacting with other elements
+	 * in the same `window`. This means that the tooltip will stay open when the
+	 * whole `window` loses focus — for example, this happens when the whole
+	 * browser loses keyboard focus, or even when moving focus to/from an iframe.
+	 * This flag, when set to `true`, will force the tooltip to always hide when
+	 * the anchor is blurred.
 	 *
-	 * @default true
+	 * @default false
 	 */
 	hideOnBlur?: boolean;
 	/**
