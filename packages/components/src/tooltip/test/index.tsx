@@ -170,23 +170,27 @@ describe( 'Tooltip', () => {
 		).toBeVisible();
 	} );
 
-	it( 'should show tooltip when an element is disabled', async () => {
+	it( 'should show tooltip when the anchor button is disabled but focusable', async () => {
 		render(
 			<Tooltip { ...props }>
-				<Button aria-disabled>Button</Button>
+				<Button disabled __experimentalIsFocusable>
+					Tooltip anchor
+				</Button>
 			</Tooltip>
 		);
 
-		const button = screen.getByRole( 'button', { name: 'Tooltip anchor' } );
+		const anchor = screen.getByRole( 'button', { name: 'Tooltip anchor' } );
 
-		expect( button ).toBeVisible();
-		expect( button ).toHaveAttribute( 'aria-disabled' );
+		expect( anchor ).toBeVisible();
+		expect( anchor ).toHaveAttribute( 'aria-disabled', 'true' );
 
-		await hover( button );
+		// Hover over the anchor, tooltip should show
+		await hover( anchor );
+		await waitForTooltipToShow();
 
-		expect(
-			await screen.findByRole( 'tooltip', { name: 'tooltip text' } )
-		).toBeVisible();
+		// Hover outside of the anchor, tooltip should hide
+		await hoverOutside();
+		await waitForTooltipToHide();
 	} );
 
 	it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {
