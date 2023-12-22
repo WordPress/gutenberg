@@ -1,6 +1,6 @@
 # Static or Dynamic rendering of a block
 
-The blocks's markup returned for the front end can be dynamically generated on the server when the block is requested from the client (dynamic blocks) or statically when the block is saved in the Block Editor (static blocks).
+The blocks's markup returned for the front end can be dynamically generated on the server when the block is requested from the client (dynamic blocks) or statically generated when the block is saved in the Block Editor (static blocks).
 
 <div class="callout callout-tip">
 The post <a href="https://developer.wordpress.org/news/2023/02/27/static-vs-dynamic-blocks-whats-the-difference/">Static vs. dynamic blocks: What’s the difference?</a> provides a great introduction to static and dynamic blocks
@@ -10,11 +10,11 @@ The post <a href="https://developer.wordpress.org/news/2023/02/27/static-vs-dyna
 
 ![](https://developer.wordpress.org/files/2023/12/static-rendering.png)
 
-Blocks have static rendering (a.k.a. Static Blocks) **when no dynamic rendering method has been defined (or is available) for the block**. In this case, the output for the front end will be taken from the [markup representation of the block in the database](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block/) that is generated (returned by the `save` function) when the block is saved in the Block Editor via the p.
+Blocks have static rendering (a.k.a. Static Blocks) **when no dynamic rendering method has been defined (or is available) for the block**. In this case, the output for the front end will be taken from the [markup representation of the block in the database](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block/) that is generated (returned by the `save` function) when the block is saved in the Block Editor.
 
 ### How to define static rendering for a block
 
-The `save` function, which can be defined when registering a block on the client, determines the markup of the block that will be stored in the database when the content is saved and eventually returned to the front end when there's a request. This markup is stored wrapped up in [unique block delimiters](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block/), and only the markup inside these block indicators is returned as the markup to be rendered for the block in the front end.
+The `save` function, which can be defined when [registering a block on the client](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/#registration-of-the-block-with-javascript-client-side), determines the markup of the block that will be stored in the database when the content is saved and eventually returned to the front end when there's a request. This markup is stored wrapped up in [unique block delimiters](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block/), and only the markup inside these block indicators is returned as the markup to be rendered for the block in the front end.
 
 _Example of `save` function_
 
@@ -39,7 +39,7 @@ export default function save( { attributes } ) {
 
 _(see the [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/copyright-date-block-09aac3/src/save.js) in [an example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/copyright-date-block-09aac3))_
 
-Blocks with dynamic rendering can also define a markup representation of the block via `save` as a backup for when the dynamic rendering method is no longer available (uninstallation of the plugin that registered the block). If no dynamic rendering method is found, any markup representation of the block in the database will be returned to the front end.
+Blocks with dynamic rendering can also define a markup representation of the block (via the `save` function) as a backup for when the dynamic rendering method is no longer available (uninstallation of the plugin that registered the block). If no dynamic rendering method is found, any markup representation of the block in the database will be returned to the front end.
 
 <div class="callout callout-info">
 Even for static blocks, the markup stored for a block can be modified before it gets rendered on the front end via hooks such as <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>render_block</code></a>.
