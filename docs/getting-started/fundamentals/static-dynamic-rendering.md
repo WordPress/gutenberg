@@ -42,8 +42,13 @@ _(see the [code above](https://github.com/WordPress/block-development-examples/b
 Blocks with dynamic rendering can also define a markup representation of the block (via the `save` function) as a backup for when the dynamic rendering method is no longer available (uninstallation of the plugin that registered the block). If no dynamic rendering method is found, any markup representation of the block in the database will be returned to the front end.
 
 <div class="callout callout-info">
-Even for static blocks, the markup stored for a block can be modified before it gets rendered on the front end via hooks such as <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>render_block</code></a>.
+The markup stored for a block can be modified before it gets rendered on the front end via hooks such as <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>render_block</code></a> or via <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>$render_callback</code></a>
 </div>
+
+Some examples of core blocks whose output for the front end is statically generated when saved to the database (as returned by their `save` functions) are: 
+
+- [**`preformatted`**](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/preformatted) - see [`save`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/preformatted/save.js) function
+- [**`spacer`**](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer) - see [`save`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer/save.js) function
 
 ## Blocks with Dynamic Rendering
 
@@ -93,12 +98,15 @@ _(see the [code above](https://github.com/WordPress/block-development-examples/b
 
 ### HTML representation of dynamic blocks in the database (`save`)
 
-For dynamic blocks, the `save` callback function can return just `null`, which tells the editor to save only the [block attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) to the database. These attributes are then passed into the server-side rendering callback, so you can decide how to display the block on the front end of your site. **When `save` is `null`, the Block Editor will skip the block markup validation process**, avoiding issues with frequently-changing markup.
+For dynamic blocks, the `save` callback function can return just `null`, which tells the editor to save only the [block attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) to the database. These attributes are then passed into the server-side rendering callback, so you can decide how to display the block on the front end of your site. **When `save` is `null`, the Block Editor will skip the block markup validation process**, avoiding issues with frequently changing markup.
 
-Blocks with dynamic rendering can also save an HTML representation of the block. If you provide a server-side rendering callback, this HTML will be replaced with the output of your callback, but will be rendered if your block is deactivated or your render callback is removed.
+Blocks with dynamic rendering can also save an HTML representation of the block as a backup. If you provide a server-side rendering callback, this HTML will be replaced with the output of your callback, but will be rendered if your block is deactivated or your render callback is removed.
+
+In some cases, the block saves an HTML representation of the block and uses a dynamic rendering to fine-tune this markup if some conditions are met. Some examples of core blocks using this approach are:
+- the [`cover`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover) core block saves a [full HTML representation of the block in the database](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/save.js). This markup is processed via a [`render_callback`](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L74) when requested to do some PHP magic that dynamically [injects the featured image if the "use featured image" setting is enabled](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L16).
+- the [`image`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/image) core block also saves [its HTML representation in the database](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/image/save.js) and processes it via a [`render_callback`](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/image/index.php#L363) when requested to [add some attributes to the markup](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/image/index.php#L18) if some conditions are met.
 
 If you are using [InnerBlocks](/docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md) in a dynamic block you will need to save the `InnerBlocks` in the `save` callback function using `<InnerBlocks.Content/>`
-
 
 ## Additional Resources
 
