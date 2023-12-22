@@ -36,7 +36,7 @@ import {
 	PATTERN_SYNC_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
 } from '../../utils/constants';
-// import { duplicatePatternAction } from './dataviews-pattern-actions';
+import { exportJSONaction } from './dataviews-pattern-actions';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import usePatterns from './use-patterns';
@@ -283,7 +283,7 @@ export default function DataviewsPatterns() {
 		};
 	}, [ patterns, view, fields ] );
 
-	// const actions = useMemo( () => [ duplicatePatternAction ], [] );
+	const actions = useMemo( () => [ exportJSONaction ], [] );
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
 			let updatedView =
@@ -303,8 +303,6 @@ export default function DataviewsPatterns() {
 		[ view, setView ]
 	);
 	const id = useId();
-	const titleId = `${ id }-title`;
-	const descriptionId = `${ id }-description`;
 	const settings = usePatternSettings();
 	// Wrap everything in a block editor provider.
 	// This ensures 'styles' that are needed for the previews are synced
@@ -320,13 +318,13 @@ export default function DataviewsPatterns() {
 				<PatternsHeader
 					categoryId={ categoryId }
 					type={ type }
-					titleId={ titleId }
-					descriptionId={ descriptionId }
+					titleId={ `${ id }-title` }
+					descriptionId={ `${ id }-description` }
 				/>
 				<DataViews
 					paginationInfo={ paginationInfo }
 					fields={ fields }
-					// actions={ actions }
+					actions={ actions }
 					data={ data || EMPTY_ARRAY }
 					getItemId={ ( item ) => item.name }
 					isLoading={ isResolving }
