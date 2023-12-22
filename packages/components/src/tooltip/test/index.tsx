@@ -161,22 +161,26 @@ describe( 'Tooltip', () => {
 			<Tooltip { ...props } delay={ TOOLTIP_DELAY + ADDITIONAL_DELAY } />
 		);
 
-		await hover( screen.getByRole( 'button', { name: 'Tooltip anchor' } ) );
+		const anchor = screen.getByRole( 'button', { name: 'Tooltip anchor' } );
+		expect( anchor ).toBeVisible();
+
+		// Hover over the anchor
+		await hover( anchor );
+		expectTooltipToBeHidden();
 
 		// Advance time by default delay
 		await sleep( TOOLTIP_DELAY );
 
 		// Tooltip hasn't appeared yet
-		expect(
-			screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
-		).not.toBeInTheDocument();
+		expectTooltipToBeHidden();
 
-		// wait for additional delay for tooltip to appear
+		// Wait for additional delay for tooltip to appear
 		await sleep( ADDITIONAL_DELAY );
+		await waitForTooltipToShow();
 
-		expect(
-			screen.getByRole( 'tooltip', { name: 'tooltip text' } )
-		).toBeVisible();
+		// Hover outside of the anchor, tooltip should hide
+		await hoverOutside();
+		await waitForTooltipToHide();
 	} );
 
 	it( 'should show tooltip when the anchor button is disabled but focusable', async () => {
