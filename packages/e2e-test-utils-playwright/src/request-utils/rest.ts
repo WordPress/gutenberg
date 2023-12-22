@@ -21,34 +21,15 @@ function splitRequestsToChunks( requests: BatchRequest[], chunkSize: number ) {
 	return cache;
 }
 
-async function getAPIRootURL( request: APIRequestContext ) {
-	// Discover the API root url using link header.
-	// See https://developer.wordpress.org/rest-api/using-the-rest-api/discovery/#link-header
-	const response = await request.head( WP_BASE_URL );
-	const links = response.headers().link;
-	const restLink = links?.match( /<([^>]+)>; rel="https:\/\/api\.w\.org\/"/ );
-
-	if ( ! restLink ) {
-		throw new Error( `Failed to discover REST API endpoint.
- Link header: ${ links }` );
-	}
-
-	const [ , rootURL ] = restLink;
-
-	return rootURL;
-}
-
 async function setupRest( this: RequestUtils ): Promise< StorageState > {
-	const [ nonce, rootURL ] = await Promise.all( [
-		this.login(),
-		getAPIRootURL( this.request ),
-	] );
+	const rootURL = 'https://public-api.wordpress.com/';
+	const bearerToken = await this.login();
 
 	const { cookies } = await this.request.storageState();
 
 	const storageState: StorageState = {
 		cookies,
-		nonce,
+		bearerToken,
 		rootURL,
 	};
 
@@ -84,11 +65,18 @@ async function rest< RestResponse = any >(
 		throw new Error( '"path" is required to make a REST call' );
 	}
 
-	if ( ! this.storageState?.nonce || ! this.storageState?.rootURL ) {
+	if ( ! this.storageState?.bearerToken || ! this.storageState?.rootURL ) {
 		await this.setupRest();
 	}
 
-	const relativePath = path.startsWith( '/' ) ? path.slice( 1 ) : path;
+	const wpcomPath = path.replace(
+		'/wp/v2/',
+		`/wp/v2/sites/${ new URL( WP_BASE_URL ).host }/`
+	);
+
+	const relativePath = wpcomPath.startsWith( '/' )
+		? wpcomPath.slice( 1 )
+		: wpcomPath;
 
 	const url = this.storageState!.rootURL + relativePath;
 
@@ -97,7 +85,7 @@ async function rest< RestResponse = any >(
 			...fetchOptions,
 			failOnStatusCode: false,
 			headers: {
-				'X-WP-Nonce': this.storageState!.nonce,
+				Authorization: `Bearer ${ this.storageState!.bearerToken }`,
 				...( fetchOptions.headers || {} ),
 			},
 		} );
@@ -110,16 +98,16 @@ async function rest< RestResponse = any >(
 		return json;
 	} catch ( error ) {
 		// Nonce in invalid, retry again with a renewed nonce.
-		if (
-			typeof error === 'object' &&
-			error !== null &&
-			Object.prototype.hasOwnProperty.call( error, 'code' ) &&
-			( error as { code: string } ).code === 'rest_cookie_invalid_nonce'
-		) {
-			await this.setupRest();
+		// if (
+		// 	typeof error === 'object' &&
+		// 	error !== null &&
+		// 	Object.prototype.hasOwnProperty.call( error, 'code' ) &&
+		// 	( error as { code: string } ).code === 'rest_cookie_invalid_nonce'
+		// ) {
+		// 	await this.setupRest();
 
-			return this.rest( options );
-		}
+		// 	return this.rest( options );
+		// }
 
 		throw error;
 	}
