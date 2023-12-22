@@ -64,6 +64,34 @@ describe( 'Tooltip', () => {
 		expectTooltipToBeHidden();
 	} );
 
+	it( 'should associate the tooltip text with its anchor via the accessible description when visible', async () => {
+		render( <Tooltip { ...props } /> );
+
+		// The anchor can not be found by querying for its description,
+		// since that is present only when the tooltip is visible
+		expect(
+			screen.queryByRole( 'button', { description: 'tooltip text' } )
+		).not.toBeInTheDocument();
+
+		// Hover the anchor. The tooltip shows and its text is used to describe
+		// the tooltip anchor
+		await hover(
+			screen.getByRole( 'button', {
+				name: 'Tooltip anchor',
+			} )
+		);
+		expect(
+			await screen.findByRole( 'button', { description: 'tooltip text' } )
+		).toBeInTheDocument();
+
+		// Hover outside of the anchor, tooltip should hide
+		await hoverOutside();
+		await waitForTooltipToHide();
+		expect(
+			screen.queryByRole( 'button', { description: 'tooltip text' } )
+		).not.toBeInTheDocument();
+	} );
+
 	it( 'should not render the tooltip if there is no focus', () => {
 		render( <Tooltip { ...props } /> );
 
@@ -318,19 +346,5 @@ describe( 'Tooltip', () => {
 		// Hover outside of the anchor, tooltip should hide
 		await hoverOutside();
 		await waitForTooltipToHide();
-	} );
-
-	it( 'should associate the tooltip text with its anchor via the accessible description when visible', async () => {
-		render( <Tooltip { ...props } /> );
-
-		await hover(
-			screen.getByRole( 'button', {
-				name: 'Tooltip anchor',
-			} )
-		);
-
-		expect(
-			await screen.findByRole( 'button', { description: 'tooltip text' } )
-		).toBeInTheDocument();
 	} );
 } );
