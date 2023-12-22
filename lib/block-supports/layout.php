@@ -476,7 +476,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 			$layout_styles[] = array(
 				'selector'     => $selector,
-				'declarations' => array( 'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))' ),
+				'declarations' => array( 'grid-template-columns' => 'repeat(auto-fit, minmax(min(' . $minimum_column_width . ', 100%), 1fr))' ),
 			);
 		}
 
