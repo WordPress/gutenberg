@@ -170,7 +170,9 @@ if ( window.__experimentalBlockBindings ) {
 							key,
 							label: keyToLabel( key ),
 							value: data.isTemplate ? null : value,
-							placeholder: keyToLabel( key ),
+							placeholder: data.isTemplate
+								? keyToLabel( key )
+								: null,
 						} );
 					}
 				);

@@ -22,7 +22,8 @@ export default function BlockBindingsFieldsList( props ) {
 		const newAttributes = {};
 		newAttributes[ currentAttribute ] = item.value ? item.value : '';
 		// TODO: Improve the way we manage placeholders.
-		newAttributes.placeholder = '{ ' + item.placeholder + ' }';
+		if ( item.placeholder && ! item.value )
+			newAttributes.placeholder = '{ ' + item.placeholder + ' }';
 		setAttributes( newAttributes );
 
 		// Update the bindings property.
