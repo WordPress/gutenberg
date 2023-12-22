@@ -111,7 +111,6 @@ if ( $gutenberg_experiments && (
 				return $block_content;
 			}
 
-			// TODO: Review the bindings syntax.
 			// Assuming the following format for the bindings property of the "metadata" attribute:
 			//
 			// "bindings": {
