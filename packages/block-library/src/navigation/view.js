@@ -1,17 +1,8 @@
 /**
  * WordPress dependencies
  */
+import { focus } from '@wordpress/dom';
 import { store, getContext, getElement } from '@wordpress/interactivity';
-
-const focusableSelectors = [
-	'a[href]',
-	'input:not([disabled]):not([type="hidden"]):not([aria-hidden])',
-	'select:not([disabled]):not([aria-hidden])',
-	'textarea:not([disabled]):not([aria-hidden])',
-	'button:not([disabled]):not([aria-hidden])',
-	'[contenteditable]',
-	'[tabindex]:not([tabindex^="-"])',
-];
 
 // This is a fix for Safari in iOS/iPadOS. Without it, Safari doesn't focus out
 // when the user taps in the body. It can be removed once we add an overlay to
@@ -169,8 +160,7 @@ const { state, actions } = store( 'core/navigation', {
 			const ctx = getContext();
 			const { ref } = getElement();
 			if ( state.isMenuOpen ) {
-				const focusableElements =
-					ref.querySelectorAll( focusableSelectors );
+				const focusableElements = focus.tabbable.find( ref );
 				ctx.modal = ref;
 				ctx.firstFocusableElement = focusableElements[ 0 ];
 				ctx.lastFocusableElement =
@@ -180,9 +170,8 @@ const { state, actions } = store( 'core/navigation', {
 		focusFirstElement() {
 			const { ref } = getElement();
 			if ( state.isMenuOpen ) {
-				ref.querySelector(
-					'.wp-block-navigation-item > *:first-child'
-				).focus();
+				const [ firstTabbable ] = focus.tabbable.find( ref );
+				firstTabbable?.focus();
 			}
 		},
 	},
