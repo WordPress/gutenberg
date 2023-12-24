@@ -103,7 +103,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 	}
 
 	public function test_directive_processing_two_interactive_blocks_at_same_level() {
-		$post_content    = '<!-- wp:group {"layout":{"type":"constrained" }} --><div class="wp-block-group"><!-- wp:test/context-level-1 /--><!-- wp:test/context-level-2 /--></div><!-- /wp:group -->';
+		$post_content    = '<!-- wp:group --><div class="wp-block-group"><!-- wp:test/context-level-1 /--><!-- wp:test/context-level-2 /--></div><!-- /wp:group -->';
 		$rendered_blocks = do_blocks( $post_content );
 		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
 		$p->next_tag( array( 'class_name' => 'level-1-input-1' ) );
@@ -150,6 +150,36 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		$p->next_tag( array( 'class_name' => 'level-1-input-2' ) );
 		$value = $p->get_attribute( 'value' );
 		$this->assertSame( 'level-1', $value );
+	}
+
+	public function test_directives_ordering() {
+		register_block_type(
+			'test/directives-ordering',
+			array(
+				'render_callback' => function () {
+					return '<input data-wp-interactive=\'{ "namespace": "test" }\' data-wp-context=\'{ "isClass": true, "value": "some-value", "display": "none" }\' data-wp-bind--value="context.value" class="other-class" data-wp-class--some-class="context.isClass" data-wp-style--display="context.display">';
+				},
+				'supports'        => array(
+					'interactivity' => true,
+				),
+			)
+		);
+
+		$post_content    = '<!-- wp:test/directives-ordering -->';
+		$rendered_blocks = do_blocks( $post_content );
+		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
+		$p->next_tag();
+
+		$value = $p->get_attribute( 'class' );
+		$this->assertSame( 'other-class some-class', $value );
+
+		$value = $p->get_attribute( 'value' );
+		$this->assertSame( 'some-value', $value );
+
+		$value = $p->get_attribute( 'style' );
+		$this->assertSame( 'display: none;', $value );
+
+		unregister_block_type( 'test/directives-ordering' );
 	}
 
 	public function increment( $store ) {
