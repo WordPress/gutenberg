@@ -182,18 +182,6 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		unregister_block_type( 'test/directives-ordering' );
 	}
 
-	public function increment( $store ) {
-		return $store['state']['count'] + $store['context']['count'];
-	}
-
-	public static function static_increment( $store ) {
-		return $store['state']['count'] + $store['context']['count'];
-	}
-
-	protected function gutenberg_test_process_directives_helper_increment( $store ) {
-		return $store['state']['count'] + $store['context']['count'];
-	}
-
 	public function test_evaluate_function_should_access_state() {
 		// Init a simple store.
 		wp_store(
@@ -255,16 +243,16 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 						return $store['state']['count'] + $store['context']['count'];
 					},
 					// Other types of callables should not be executed.
-					'function_name'       => array( $this, 'gutenberg_test_process_directives_helper_increment' ),
+					'function_name'       => 'gutenberg_test_process_directives_helper_increment',
 					'class_method'        => array( $this, 'increment' ),
-					'class_static_method' => array( $this, 'static_increment' ),
+					'class_static_method' => array( 'Tests_Process_Directives', 'static_increment' ),
 				),
 			)
 		);
 
 		$this->assertSame( 5, gutenberg_interactivity_evaluate_reference( 'selectors.anonymous_function', $context->get_context() ) );
 		$this->assertSame(
-			array( $this, 'gutenberg_test_process_directives_helper_increment' ),
+			'gutenberg_test_process_directives_helper_increment',
 			gutenberg_interactivity_evaluate_reference( 'selectors.function_name', $context->get_context() )
 		);
 		$this->assertSame(
@@ -272,7 +260,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 			gutenberg_interactivity_evaluate_reference( 'selectors.class_method', $context->get_context() )
 		);
 		$this->assertSame(
-			array( $this, 'static_increment' ),
+			array( 'Tests_Process_Directives', 'static_increment' ),
 			gutenberg_interactivity_evaluate_reference( 'selectors.class_static_method', $context->get_context() )
 		);
 	}
