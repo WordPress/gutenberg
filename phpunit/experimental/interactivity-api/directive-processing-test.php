@@ -11,10 +11,10 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		parent::set_up();
 
 		register_block_type(
-			'gutenberg/test-context-level-1',
+			'test/context-level-1',
 			array(
 				'render_callback' => function ( $a, $content ) {
-					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-1" }\'> <input class="level-1-input-1" data-wp-bind--value="context.MyText">' . $content . '<input class="level-1-input-2"data-wp-bind--value="context.MyText"></div>';
+					return '<div data-wp-interactive=\'{ "namespace": "test" }\' data-wp-context=\'{ "myText": "level-1" }\'> <input class="level-1-input-1" data-wp-bind--value="context.myText">' . $content . '<input class="level-1-input-2" data-wp-bind--value="context.myText"></div>';
 				},
 				'supports'        => array(
 					'interactivity' => true,
@@ -23,10 +23,10 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		);
 
 		register_block_type(
-			'gutenberg/test-context-level-2',
+			'test/context-level-2',
 			array(
 				'render_callback' => function ( $a, $content ) {
-					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\' data-wp-context=\'{"MyText": "level-2" }\'><input class="level-2-input-1" data-wp-bind--value="context.MyText">' . $content . '</div>';
+					return '<div data-wp-interactive=\'{ "namespace": "test" }\' data-wp-context=\'{ "myText": "level-2" }\'><input class="level-2-input-1" data-wp-bind--value="context.myText">' . $content . '</div>';
 				},
 				'supports'        => array(
 					'interactivity' => true,
@@ -35,10 +35,10 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		);
 
 		register_block_type(
-			'gutenberg/test-context-read-only',
+			'test/context-read-only',
 			array(
 				'render_callback' => function () {
-					return '<div data-wp-interactive=\'{"namespace": "gutenberg"}\'><input class="read-only-input-1" data-wp-bind--value="context.MyText"></div>';
+					return '<div data-wp-interactive=\'{ "namespace": "test" }\'><input class="read-only-input-1" data-wp-bind--value="context.myText"></div>';
 				},
 				'supports'        => array(
 					'interactivity' => true,
@@ -48,9 +48,9 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 	}
 
 	public function tear_down() {
-		unregister_block_type( 'gutenberg/test-context-level-1' );
-		unregister_block_type( 'gutenberg/test-context-level-2' );
-		unregister_block_type( 'gutenberg/test-context-read-only' );
+		unregister_block_type( 'test/context-level-1' );
+		unregister_block_type( 'test/context-level-2' );
+		unregister_block_type( 'test/context-read-only' );
 		parent::tear_down();
 	}
 
@@ -91,7 +91,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 	}
 
 	public function test_directive_processing_of_interactive_block() {
-		$post_content    = '<!-- wp:gutenberg/test-context-level-1 /-->';
+		$post_content    = '<!-- wp:test/context-level-1 /-->';
 		$rendered_blocks = do_blocks( $post_content );
 		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
 		$p->next_tag( array( 'class_name' => 'level-1-input-1' ) );
@@ -103,7 +103,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 	}
 
 	public function test_directive_processing_two_interactive_blocks_at_same_level() {
-		$post_content    = '<!-- wp:group {"layout":{"type":"constrained"}} --><div class="wp-block-group"><!-- wp:gutenberg/test-context-level-1 /--><!-- wp:gutenberg/test-context-level-2 /--></div><!-- /wp:group -->';
+		$post_content    = '<!-- wp:group {"layout":{"type":"constrained" }} --><div class="wp-block-group"><!-- wp:test/context-level-1 /--><!-- wp:test/context-level-2 /--></div><!-- /wp:group -->';
 		$rendered_blocks = do_blocks( $post_content );
 		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
 		$p->next_tag( array( 'class_name' => 'level-1-input-1' ) );
@@ -118,7 +118,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 	}
 
 	public function test_directives_are_processed_at_tag_end() {
-		$post_content    = '<!-- wp:gutenberg/test-context-level-1 --><!-- wp:gutenberg/test-context-level-2 /--><!-- wp:gutenberg/test-context-read-only /--><!-- /wp:gutenberg/test-context-level-1 -->';
+		$post_content    = '<!-- wp:test/context-level-1 --><!-- wp:test/context-level-2 /--><!-- wp:test/context-read-only /--><!-- /wp:test/context-level-1 -->';
 		$rendered_blocks = do_blocks( $post_content );
 		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
 		$p->next_tag( array( 'class_name' => 'level-1-input-1' ) );
@@ -136,7 +136,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 	}
 
 	public function test_non_interactive_children_of_interactive_is_rendered() {
-		$post_content    = '<!-- wp:gutenberg/test-context-level-1 --><!-- wp:gutenberg/test-context-read-only /--><!-- wp:paragraph --><p>Welcome</p><!-- /wp:paragraph --><!-- /wp:gutenberg/test-context-level-1 -->';
+		$post_content    = '<!-- wp:test/context-level-1 --><!-- wp:test/context-read-only /--><!-- wp:paragraph --><p>Welcome</p><!-- /wp:paragraph --><!-- /wp:test/context-level-1 -->';
 		$rendered_blocks = do_blocks( $post_content );
 		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
 		$p->next_tag( array( 'class_name' => 'level-1-input-1' ) );
