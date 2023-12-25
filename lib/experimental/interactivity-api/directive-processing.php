@@ -99,12 +99,6 @@ function gutenberg_mark_block_interactivity( $block_content, $block, $block_inst
 		isset( $block_instance->block_type->supports['interactivity'] ) &&
 		$block_instance->block_type->supports['interactivity']
 	) {
-		if ( isset( $block['innerBlocks'] ) ) {
-			foreach ( $block['innerBlocks'] as $inner_block ) {
-				WP_Directive_Processor::unmark_children_of_interactive_block( $inner_block );
-			}
-		}
-
 		// Wraps the interactive block with a comment delimiter to be able to
 		// process it later.
 		return get_comment_delimited_block_content(

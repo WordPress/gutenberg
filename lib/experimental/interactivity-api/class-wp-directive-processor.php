@@ -75,18 +75,6 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	}
 
 	/**
-	 * Removes a reference to a direct children of an interactive block.
-	 *
-	 * @param array $block The block to remove.
-	 */
-	public static function unmark_children_of_interactive_block( $block ) {
-		$key = array_search( md5( serialize( $block ) ), self::$children_of_interactive_block, true );
-		if ( false !== $key ) {
-			unset( self::$children_of_interactive_block[ $key ] );
-		}
-	}
-
-	/**
 	 * Checks if block is marked as children of an interactive block.
 	 *
 	 * @param array $block The block to check.
