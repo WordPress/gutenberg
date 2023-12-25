@@ -107,8 +107,8 @@ const isIconStyles = ( {
 
 	return css`
 		color: ${ COLORS.gray[ 900 ] };
-		width: ${ iconButtonSizes[ size ] };
 		height: ${ iconButtonSizes[ size ] };
+		aspect-ratio: 1;
 		padding-left: 0;
 		padding-right: 0;
 	`;
