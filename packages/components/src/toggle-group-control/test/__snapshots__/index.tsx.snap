@@ -47,9 +47,9 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   display: -ms-inline-flexbox;
   display: inline-flex;
   min-width: 0;
-  padding: 2px;
   position: relative;
   min-height: 36px;
+  padding: 2px;
 }
 
 .emotion-8:hover {
@@ -117,6 +117,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   z-index: 2;
   color: #1e1e1e;
   width: 30px;
+  height: 30px;
   padding-left: 0;
   padding-right: 0;
   color: #fff;
@@ -199,6 +200,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   z-index: 2;
   color: #1e1e1e;
   width: 30px;
+  height: 30px;
   padding-left: 0;
   padding-right: 0;
 }
@@ -372,9 +374,9 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   display: -ms-inline-flexbox;
   display: inline-flex;
   min-width: 0;
-  padding: 2px;
   position: relative;
   min-height: 36px;
+  padding: 2px;
 }
 
 .emotion-8:hover {
@@ -592,9 +594,9 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   display: -ms-inline-flexbox;
   display: inline-flex;
   min-width: 0;
-  padding: 2px;
   position: relative;
   min-height: 36px;
+  padding: 2px;
 }
 
 .emotion-8:hover {
@@ -662,6 +664,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   z-index: 2;
   color: #1e1e1e;
   width: 30px;
+  height: 30px;
   padding-left: 0;
   padding-right: 0;
   color: #fff;
@@ -744,6 +747,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   z-index: 2;
   color: #1e1e1e;
   width: 30px;
+  height: 30px;
   padding-left: 0;
   padding-right: 0;
 }
@@ -911,9 +915,9 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   display: -ms-inline-flexbox;
   display: inline-flex;
   min-width: 0;
-  padding: 2px;
   position: relative;
   min-height: 36px;
+  padding: 2px;
 }
 
 .emotion-8:hover {
