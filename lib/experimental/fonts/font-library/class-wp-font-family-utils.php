@@ -77,21 +77,6 @@ class WP_Font_Family_Utils {
 	}
 
 	/**
-	 * Returns whether the given file has a font MIME type.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param string $filepath The file to check.
-	 * @return bool True if the file has a font MIME type, false otherwise.
-	 */
-	public static function has_font_mime_type( $filepath ) {
-		$allowed_mime_types = WP_Font_Library::get_expected_font_mime_types_per_php_version();
-		$filetype           = wp_check_filetype( $filepath, $allowed_mime_types );
-
-		return in_array( $filetype['type'], $allowed_mime_types, true );
-	}
-
-	/**
 	 * Format font family to make it valid CSS.
 	 *
 	 * @since 6.5.0
