@@ -13,7 +13,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		register_block_type(
 			'test/context-level-1',
 			array(
-				'render_callback' => function ( $a, $content ) {
+				'render_callback' => function ( $attributes, $content ) {
 					return '<div data-wp-interactive=\'{ "namespace": "test" }\' data-wp-context=\'{ "myText": "level-1" }\'> <input class="level-1-input-1" data-wp-bind--value="context.myText">' . $content . '<input class="level-1-input-2" data-wp-bind--value="context.myText"></div>';
 				},
 				'supports'        => array(
@@ -25,7 +25,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		register_block_type(
 			'test/context-level-2',
 			array(
-				'render_callback' => function ( $a, $content ) {
+				'render_callback' => function ( $attributes, $content ) {
 					return '<div data-wp-interactive=\'{ "namespace": "test" }\' data-wp-context=\'{ "myText": "level-2" }\'><input class="level-2-input-1" data-wp-bind--value="context.myText">' . $content . '</div>';
 				},
 				'supports'        => array(
@@ -45,12 +45,52 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 				),
 			)
 		);
+
+		register_block_type(
+			'test/non-interactive-with-directive',
+			array(
+				'render_callback' => function () {
+					return '<input class="non-interactive-with-directive" data-wp-bind--value="context.myText">';
+				},
+			)
+		);
+
+		register_block_type(
+			'test/context-level-with-manual-inner-block-rendering',
+			array(
+				'render_callback' => function ( $attributes, $content, $block ) {
+					$inner_blocks_html = '';
+					foreach ( $block->inner_blocks as $inner_block ) {
+						$inner_blocks_html .= $inner_block->render();
+					}
+					return '<div data-wp-interactive=\'{ "namespace": "test" }\' data-wp-context=\'{ "myText": "some value" }\'>' . $inner_blocks_html . '</div>';
+				},
+				'supports'        => array(
+					'interactivity' => true,
+				),
+			)
+		);
+
+		register_block_type(
+			'test/directives-ordering',
+			array(
+				'render_callback' => function () {
+					return '<input data-wp-interactive=\'{ "namespace": "test" }\' data-wp-context=\'{ "isClass": true, "value": "some-value", "display": "none" }\' data-wp-bind--value="context.value" class="other-class" data-wp-class--some-class="context.isClass" data-wp-style--display="context.display">';
+				},
+				'supports'        => array(
+					'interactivity' => true,
+				),
+			)
+		);
 	}
 
 	public function tear_down() {
 		unregister_block_type( 'test/context-level-1' );
 		unregister_block_type( 'test/context-level-2' );
 		unregister_block_type( 'test/context-read-only' );
+		unregister_block_type( 'test/non-interactive-with-directive' );
+		unregister_block_type( 'test/context-level-with-manual-inner-block-rendering' );
+		unregister_block_type( 'test/directives-ordering' );
 		parent::tear_down();
 	}
 
@@ -152,19 +192,25 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		$this->assertSame( 'level-1', $value );
 	}
 
-	public function test_directives_ordering() {
-		register_block_type(
-			'test/directives-ordering',
-			array(
-				'render_callback' => function () {
-					return '<input data-wp-interactive=\'{ "namespace": "test" }\' data-wp-context=\'{ "isClass": true, "value": "some-value", "display": "none" }\' data-wp-bind--value="context.value" class="other-class" data-wp-class--some-class="context.isClass" data-wp-style--display="context.display">';
-				},
-				'supports'        => array(
-					'interactivity' => true,
-				),
-			)
-		);
+	public function test_non_interactive_blocks_are_not_processed() {
+		$post_content    = '<!-- wp:test/context-level-1 --><!-- wp:test/non-interactive-with-directive /--><!-- /wp:test/context-level-1 -->';
+		$rendered_blocks = do_blocks( $post_content );
+		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
+		$p->next_tag( array( 'class_name' => 'non-interactive-with-directive' ) );
+		$value = $p->get_attribute( 'value' );
+		$this->assertSame( null, $value );
+	}
 
+	public function test_non_interactive_blocks_with_manual_inner_block_rendering_are_not_processed() {
+		$post_content    = '<!-- wp:test/context-level-with-manual-inner-block-rendering --><!-- wp:test/non-interactive-with-directive /--><!-- /wp:test/context-level-with-manual-inner-block-rendering -->';
+		$rendered_blocks = do_blocks( $post_content );
+		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
+		$p->next_tag( array( 'class_name' => 'non-interactive-with-directive' ) );
+		$value = $p->get_attribute( 'value' );
+		$this->assertSame( null, $value );
+	}
+
+	public function test_directives_ordering() {
 		$post_content    = '<!-- wp:test/directives-ordering -->';
 		$rendered_blocks = do_blocks( $post_content );
 		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
@@ -178,8 +224,6 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 
 		$value = $p->get_attribute( 'style' );
 		$this->assertSame( 'display: none;', $value );
-
-		unregister_block_type( 'test/directives-ordering' );
 	}
 
 	public function test_evaluate_function_should_access_state() {
