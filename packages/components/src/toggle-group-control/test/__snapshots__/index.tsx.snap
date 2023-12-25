@@ -116,8 +116,8 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   width: 100%;
   z-index: 2;
   color: #1e1e1e;
-  width: 30px;
   height: 30px;
+  aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
   color: #fff;
@@ -199,8 +199,8 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   width: 100%;
   z-index: 2;
   color: #1e1e1e;
-  width: 30px;
   height: 30px;
+  aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
 }
@@ -663,8 +663,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   width: 100%;
   z-index: 2;
   color: #1e1e1e;
-  width: 30px;
   height: 30px;
+  aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
   color: #fff;
@@ -746,8 +746,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   width: 100%;
   z-index: 2;
   color: #1e1e1e;
-  width: 30px;
   height: 30px;
+  aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
 }
