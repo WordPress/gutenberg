@@ -51,14 +51,18 @@ function FontFamilies() {
 						</Tooltip>
 					</HStack>
 				</HStack>
-				<ItemGroup isBordered isSeparated>
-					{ customFonts.map( ( font ) => (
-						<FontFamilyItem key={ font.slug } font={ font } />
-					) ) }
-					{ themeFonts.map( ( font ) => (
-						<FontFamilyItem key={ font.slug } font={ font } />
-					) ) }
-				</ItemGroup>
+				{ customFonts.length > 0 || themeFonts.length > 0 ? (
+					<ItemGroup isBordered isSeparated>
+						{ customFonts.map( ( font ) => (
+							<FontFamilyItem key={ font.slug } font={ font } />
+						) ) }
+						{ themeFonts.map( ( font ) => (
+							<FontFamilyItem key={ font.slug } font={ font } />
+						) ) }
+					</ItemGroup>
+				) : (
+					<span>{ __( 'No fonts available.' ) }</span>
+				) }
 			</VStack>
 		</>
 	);
