@@ -234,7 +234,8 @@ class DependencyExtractionWebpackPlugin {
 								! (
 									compilation.moduleGraph.getParentBlock(
 										dependency
-									) instanceof AsyncDependenciesBlock
+									).constructor.name ===
+									AsyncDependenciesBlock.name
 								)
 							) {
 								isDynamic = false;
