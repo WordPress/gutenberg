@@ -29,13 +29,14 @@
 	}
 
 	.components-snackbar__content-with-icon {
-		margin-left: $grid-unit-30;
+		position: relative;
+		padding-left: $grid-unit-30;
 	}
 
 	.components-snackbar__icon {
 		position: absolute;
-		top: 24px;
-		left: 28px;
+		left: $grid-unit-10 * -1;
+		top: -3px;
 	}
 
 	.components-snackbar__dismiss-button {
