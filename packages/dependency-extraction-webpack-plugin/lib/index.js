@@ -225,16 +225,22 @@ class DependencyExtractionWebpackPlugin {
 				const { userRequest } = m;
 				if ( this.externalizedDeps.has( userRequest ) ) {
 					if ( this.useModules ) {
-						const isDynamic = Array.prototype.every.call(
-							compilation.moduleGraph.getIncomingConnections( m ),
-							( { dependency } ) => {
-								return (
+						let isDynamic = true;
+						for ( const incomingConnection of compilation.moduleGraph.getIncomingConnections(
+							m
+						) ) {
+							const { dependency } = incomingConnection;
+							if (
+								! (
 									compilation.moduleGraph.getParentBlock(
 										dependency
 									) instanceof AsyncDependenciesBlock
-								);
+								)
+							) {
+								isDynamic = false;
+								break;
 							}
-						);
+						}
 
 						( isDynamic ? chunkDynamicDeps : chunkStaticDeps ).add(
 							userRequest
