@@ -3,7 +3,6 @@
  */
 import Ajv from 'ajv-draft-04';
 import glob from 'fast-glob';
-import path from 'path';
 
 /**
  * Internal dependencies
@@ -11,14 +10,10 @@ import path from 'path';
 import blockSchema from '../../schemas/json/block.json';
 
 describe( 'block.json schema', () => {
-	const blockFolders = glob.sync( 'packages/block-library/src/*', {
-		onlyDirectories: true,
-		ignore: [ 'packages/block-library/src/utils' ],
-	} );
-	const testData = blockFolders.map( ( blockFolder ) => [
-		'core/' + path.basename( blockFolder ),
-		path.join( blockFolder, 'block.json' ),
-	] );
+	const blockJsons = glob.sync(
+		[ 'packages/*/src/**/block.json', 'phpunit/**/block.json' ],
+		{ onlyFiles: true }
+	);
 	const ajv = new Ajv();
 
 	test( 'strictly adheres to the draft-04 meta schema', () => {
@@ -32,21 +27,17 @@ describe( 'block.json schema', () => {
 	} );
 
 	test( 'found block folders', () => {
-		expect( blockFolders.length ).toBeGreaterThan( 0 );
+		expect( blockJsons.length ).toBeGreaterThan( 0 );
 	} );
 
-	test.each( testData )(
-		'validates schema for `%s`',
-		( blockName, filepath ) => {
-			// We want to validate the block.json file using the local schema.
-			const { $schema, ...blockMetadata } = require( filepath );
+	test.each( blockJsons )( 'validates schema for `%s`', ( filepath ) => {
+		// We want to validate the block.json file using the local schema.
+		const { $schema, ...blockMetadata } = require( filepath );
 
-			expect( $schema ).toBe( 'https://schemas.wp.org/trunk/block.json' );
+		expect( $schema ).toBe( 'https://schemas.wp.org/trunk/block.json' );
 
-			const result =
-				ajv.validate( blockSchema, blockMetadata ) || ajv.errors;
+		const result = ajv.validate( blockSchema, blockMetadata ) || ajv.errors;
 
-			expect( result ).toBe( true );
-		}
-	);
+		expect( result ).toBe( true );
+	} );
 } );
