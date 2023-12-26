@@ -10,8 +10,8 @@ import glob from 'fast-glob';
 import blockSchema from '../../schemas/json/block.json';
 
 describe( 'block.json schema', () => {
-	const blockJsons = glob.sync(
-		[ 'packages/*/src/**/block.json', 'phpunit/**/block.json' ],
+	const jsonFiles = glob.sync(
+		[ 'packages/*/src/**/block.json', '{lib,phpunit,test}/**/block.json' ],
 		{ onlyFiles: true }
 	);
 	const ajv = new Ajv();
@@ -26,11 +26,11 @@ describe( 'block.json schema', () => {
 		expect( result.errors ).toBe( null );
 	} );
 
-	test( 'found block folders', () => {
-		expect( blockJsons.length ).toBeGreaterThan( 0 );
+	test( 'found block.json files', () => {
+		expect( jsonFiles.length ).toBeGreaterThan( 0 );
 	} );
 
-	test.each( blockJsons )( 'validates schema for `%s`', ( filepath ) => {
+	test.each( jsonFiles )( 'validates schema for `%s`', ( filepath ) => {
 		// We want to validate the block.json file using the local schema.
 		const { $schema, ...blockMetadata } = require( filepath );
 
