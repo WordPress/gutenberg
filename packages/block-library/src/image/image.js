@@ -755,7 +755,9 @@ export default function Image( {
 				isSelected={ isSelected }
 				insertBlocksAfter={ insertBlocksAfter }
 				label={ __( 'Image caption text' ) }
-				showToolbarButton={ hasNonContentControls }
+				showToolbarButton={
+					! multiImageSelection && hasNonContentControls
+				}
 			/>
 		</>
 	);
