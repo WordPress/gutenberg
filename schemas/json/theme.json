@@ -119,6 +119,11 @@
 							"type": "boolean",
 							"default": true
 						},
+						"caption": {
+							"description": "Allow users to set caption colors.",
+							"type": "boolean",
+							"default": true
+						},
 						"custom": {
 							"description": "Allow users to select custom colors.",
 							"type": "boolean",
