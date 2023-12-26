@@ -5,6 +5,11 @@ const { join } = require( 'path' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 
 /**
+ * WordPress dependencies
+ */
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+
+/**
  * Internal dependencies
  */
 const { baseConfig, plugins } = require( './shared' );
@@ -30,11 +35,8 @@ module.exports = {
 			type: 'module',
 		},
 		path: join( __dirname, '..', '..' ),
+		module: true,
 		environment: { module: true },
-	},
-	externalsType: 'module',
-	externals: {
-		'@wordpress/interactivity': '@wordpress/interactivity',
 	},
 	resolve: {
 		extensions: [ '.js', '.ts', '.tsx' ],
@@ -79,6 +81,8 @@ module.exports = {
 				},
 			],
 		} ),
+
+		new DependencyExtractionWebpackPlugin(),
 	],
 	watchOptions: {
 		ignored: [ '**/node_modules' ],
