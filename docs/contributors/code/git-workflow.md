@@ -23,7 +23,7 @@ See the [repository management document](/docs/contributors/repository-managemen
 
 ## Git Workflow Walkthrough
 
-The workflow for code and documentation is the same, since both are managed in GitHub. You can watch a [video walk-through of contributing documentation](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [slides for contributing to Gutenberg](https://mkaz.blog/wordpress/contribute-documentation-to-gutenberg/).
+The workflow for code and documentation is the same, since both are managed in GitHub. You can watch a [video walk-through of contributing documentation](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [tutorial for contributing to Gutenberg](https://mkaz.blog/wordpress/contribute-developer-documentation-to-gutenberg/).
 
 Here is a visual overview of the Git workflow:
 
@@ -73,7 +73,7 @@ Do not make a new pull request for updates; by pushing your change to your repos
 
 That’s it! Once approved and merged, your change will be incorporated into the main repository. 🎉
 
-## Branch Naming
+## Branch naming
 
 You should name your branches using a prefixes and short description, like this: `[type]/[change]`.
 
@@ -87,7 +87,7 @@ Suggested prefixes:
 
 For example, `add/gallery-block` means you're working on adding a new gallery block.
 
-## Keeping Your Branch Up To Date
+## Keeping your branch up to date
 
 When many different people are working on a project simultaneously, pull requests can go stale quickly. A "stale" pull request is one that is no longer up to date with the main line of development, and it needs to be updated before it can be merged into the project.
 
@@ -105,7 +105,7 @@ git rebase trunk
 git push --force-with-lease origin your-branch-name
 ```
 
-## Keeping Your Fork Up To Date
+## Keeping your fork up to date
 
 Working on pull request starts with forking the Gutenberg repository, your separate working copy. Which can easily go out of sync as new pull requests are merged into the main repository. Here your working repository is a `fork` and the main Gutenberg repository is `upstream`. When working on new pull request you should always update your fork before you do `git checkout -b my-new-branch` to work on a feature or fix.
 
@@ -138,7 +138,7 @@ The above commands will update your `trunk` branch from _upstream_. To update an
 
 ## Miscellaneous
 
-### Git Archeology
+### Git archeology
 
 When looking for a commit that introduced a specific change, it might be helpful to ignore revisions that only contain styling or formatting changes.
 

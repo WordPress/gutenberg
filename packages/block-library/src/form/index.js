@@ -27,7 +27,7 @@ export const init = () => {
 	const DISALLOWED_PARENTS = [ 'core/form' ];
 	addFilter(
 		'blockEditor.__unstableCanInsertBlockType',
-		'removeTemplatePartsFromPostTemplates',
+		'core/block-library/preventInsertingFormIntoAnotherForm',
 		(
 			canInsert,
 			blockType,

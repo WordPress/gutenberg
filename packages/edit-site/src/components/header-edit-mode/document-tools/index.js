@@ -12,13 +12,9 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { _x, __ } from '@wordpress/i18n';
 import { listView, plus, chevronUpDown } from '@wordpress/icons';
-import {
-	__unstableMotion as motion,
-	Button,
-	ToolbarItem,
-} from '@wordpress/components';
+import { Button, ToolbarItem } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -28,7 +24,7 @@ import RedoButton from '../undo-redo/redo';
 import { store as editSiteStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
+const { useCanBlockToolbarBeFocused } = unlock( blockEditorPrivateApis );
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -36,11 +32,9 @@ const preventDefault = ( event ) => {
 
 export default function DocumentTools( {
 	blockEditorMode,
+	hasFixedToolbar,
 	isDistractionFree,
 	showIconLabels,
-	setListViewToggleElement,
-	toolbarTransition,
-	toolbarVariants,
 } ) {
 	const inserterButton = useRef();
 	const {
@@ -48,39 +42,26 @@ export default function DocumentTools( {
 		isListViewOpen,
 		listViewShortcut,
 		isVisualMode,
-		hasFixedToolbar,
+		listViewToggleRef,
 	} = useSelect( ( select ) => {
-		const {
-			__experimentalGetPreviewDeviceType,
-			isInserterOpened,
-			isListViewOpened,
-			getEditorMode,
-		} = select( editSiteStore );
+		const { getEditorMode } = select( editSiteStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-
-		const { get: getPreference } = select( preferencesStore );
+		const { isInserterOpened, isListViewOpened, getListViewToggleRef } =
+			unlock( select( editorStore ) );
 
 		return {
-			deviceType: __experimentalGetPreviewDeviceType(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
 			listViewShortcut: getShortcutRepresentation(
-				'core/edit-site/toggle-list-view'
+				'core/editor/toggle-list-view'
 			),
 			isVisualMode: getEditorMode() === 'visual',
-			hasFixedToolbar: getPreference(
-				editSiteStore.name,
-				'fixedToolbar'
-			),
+			listViewToggleRef: getListViewToggleRef(),
 		};
 	}, [] );
-
-	const {
-		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-		setIsInserterOpened,
-		setIsListViewOpened,
-	} = useDispatch( editSiteStore );
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const { setDeviceType, setIsInserterOpened, setIsListViewOpened } =
+		useDispatch( editorStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
@@ -101,17 +82,8 @@ export default function DocumentTools( {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	const {
-		shouldShowContextualToolbar,
-		canFocusHiddenToolbar,
-		fixedToolbarCanBeFocused,
-	} = useShouldContextualToolbarShow();
 	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
-	// There's a fixed block toolbar when the fixed toolbar option is enabled or when the browser width is less than the large viewport.
-	const blockToolbarCanBeFocused =
-		shouldShowContextualToolbar ||
-		canFocusHiddenToolbar ||
-		fixedToolbarCanBeFocused;
+	const blockToolbarCanBeFocused = useCanBlockToolbarBeFocused();
 
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const longLabel = _x(
@@ -126,12 +98,9 @@ export default function DocumentTools( {
 
 	return (
 		<NavigableToolbar
-			as={ motion.div }
-			className="edit-site-header-edit-mode__start"
+			className="edit-site-header-edit-mode__document-tools"
 			aria-label={ __( 'Document tools' ) }
 			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
-			variants={ toolbarVariants }
-			transition={ toolbarTransition }
 		>
 			<div className="edit-site-header-edit-mode__toolbar">
 				{ ! isDistractionFree && (
@@ -148,6 +117,7 @@ export default function DocumentTools( {
 						label={ showIconLabels ? shortLabel : longLabel }
 						showTooltip={ ! showIconLabels }
 						aria-expanded={ isInserterOpen }
+						size="compact"
 					/>
 				) }
 				{ isLargeViewport && (
@@ -160,17 +130,20 @@ export default function DocumentTools( {
 									showIconLabels ? 'tertiary' : undefined
 								}
 								disabled={ ! isVisualMode }
+								size="compact"
 							/>
 						) }
 						<ToolbarItem
 							as={ UndoButton }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
+							size="compact"
 						/>
 						<ToolbarItem
 							as={ RedoButton }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
+							size="compact"
 						/>
 						{ ! isDistractionFree && (
 							<ToolbarItem
@@ -182,13 +155,14 @@ export default function DocumentTools( {
 								/* translators: button label text should, if possible, be under 16 characters. */
 								label={ __( 'List View' ) }
 								onClick={ toggleListView }
-								ref={ setListViewToggleElement }
+								ref={ listViewToggleRef }
 								shortcut={ listViewShortcut }
 								showTooltip={ ! showIconLabels }
 								variant={
 									showIconLabels ? 'tertiary' : undefined
 								}
 								aria-expanded={ isListViewOpen }
+								size="compact"
 							/>
 						) }
 						{ isZoomedOutViewExperimentEnabled &&
@@ -202,13 +176,14 @@ export default function DocumentTools( {
 									/* translators: button label text should, if possible, be under 16 characters. */
 									label={ __( 'Zoom-out View' ) }
 									onClick={ () => {
-										setPreviewDeviceType( 'Desktop' );
+										setDeviceType( 'Desktop' );
 										__unstableSetEditorMode(
 											isZoomedOutView
 												? 'edit'
 												: 'zoom-out'
 										);
 									} }
+									size="compact"
 								/>
 							) }
 					</>

@@ -18,9 +18,6 @@ The first method shows adding the style inline. This transforms the defined styl
 
 The `useBlockProps` React hook is used to set and apply properties on the block's wrapper element. The following example shows how:
 
-{% codetabs %}
-{% JSX %}
-
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps } from '@wordpress/block-editor';
@@ -55,49 +52,6 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 } );
 ```
 
-{% Plain %}
-
-```js
-( function ( blocks, React, blockEditor ) {
-	var el = React.createElement;
-
-	blocks.registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
-		edit: function ( props ) {
-			const greenBackground = {
-				backgroundColor: '#090',
-				color: '#fff',
-				padding: '20px',
-			};
-			const blockProps = blockEditor.useBlockProps( {
-				style: greenBackground,
-			} );
-			return el(
-				'p',
-				blockProps,
-				'Hello World (from the editor, in green).'
-			);
-		},
-		save: function () {
-			const redBackground = {
-				backgroundColor: '#090',
-				color: '#fff',
-				padding: '20px',
-			};
-			const blockProps = blockEditor.useBlockProps.save( {
-				style: redBackground,
-			} );
-			return el(
-				'p',
-				blockProps,
-				'Hello World (from the frontend, in red).'
-			);
-		},
-	} );
-} )( window.wp.blocks, window.React, window.wp.blockEditor );
-```
-
-{% end %}
-
 ## Method 2: Block classname
 
 The inline style works well for a small amount of CSS to apply. If you have much more than the above you will likely find that it is easier to manage with them in a separate stylesheet file.
@@ -105,9 +59,6 @@ The inline style works well for a small amount of CSS to apply. If you have much
 The `useBlockProps` hooks includes the classname for the block automatically, it generates a name for each block using the block's name prefixed with `wp-block-`, replacing the `/` namespace separator with a single `-`.
 
 For example the block name: `gutenberg-examples/example-02-stylesheets` would get the classname: `wp-block-gutenberg-examples-example-02-stylesheets`. It might be a bit long but best to avoid conflicts with other blocks.
-
-{% codetabs %}
-{% JSX %}
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
@@ -131,65 +82,14 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 } );
 ```
 
-{% Plain %}
-
-```js
-( function ( blocks, React, blockEditor ) {
-	var el = React.createElement;
-
-	blocks.registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
-		edit: function ( props ) {
-			var blockProps = blockEditor.useBlockProps();
-			return el(
-				'p',
-				blockProps,
-				'Hello World (from the editor, in green).'
-			);
-		},
-		save: function () {
-			var blockProps = blockEditor.useBlockProps.save();
-			return el(
-				'p',
-				blockProps,
-				'Hello World (from the frontend, in red).'
-			);
-		},
-	} );
-} )( window.wp.blocks, window.React, window.wp.blockEditor );
-```
-
-{% end %}
-
 ### Build or add dependency
 
 In order to include the blockEditor as a dependency, make sure to run the build step, or update the asset php file.
-
-{% codetabs %}
-{% JSX %}
 
 Build the scripts and update the asset file which is used to keep track of dependencies and the build version.
 ```bash
 npm run build
 ```
-
-{% Plain %}
-
-Edit the asset file to include the block-editor dependency for the scripts.
-
-```php
-<?php return
-	array( 'dependencies' =>
-		array(
-			'react',
-			'wp-blocks',
-			'wp-block-editor',
-			'wp-polyfill'
-		),
-		'version' => '0.1'
-	);
-```
-
-{% end %}
 
 ### Enqueue stylesheets
 
@@ -199,7 +99,7 @@ Use the `editorStyle` property to a CSS file you want to load in the editor view
 
 It is worth noting that, if the editor content is iframed, both of these will
 load in the iframe. `editorStyle` will also load outside the iframe, so it can
-be used for editor content as well as UI. 
+be used for editor content as well as UI.
 
 For example:
 
@@ -249,4 +149,4 @@ The files will automatically be enqueued when specified in the block.json.
 
 This guide showed a couple of different ways to apply styles to your block, by either inline or in its own style sheet. Both of these methods use the `useBlockProps` hook, see the [block wrapper reference documentation](/docs/reference-guides/block-api/block-edit-save.md#block-wrapper-props) for additional details.
 
-See the complete [example-02-stylesheets](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-non-jsx/02-stylesheets) code in the [gutenberg-examples repository](https://github.com/WordPress/gutenberg-examples).
+See the complete [stylesheets-79a4c3](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/stylesheets-79a4c3) code in the [block-development-examples repository](https://github.com/WordPress/block-development-examples).

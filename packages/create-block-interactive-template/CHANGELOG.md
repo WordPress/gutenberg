@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+## 1.11.0 (2023-12-13)
+
+-   Add all files to the generated plugin zip. [#56943](https://github.com/WordPress/gutenberg/pull/56943)
+-   Prevent crash when Gutenberg plugin is not installed. [#56941](https://github.com/WordPress/gutenberg/pull/56941)
+
+## 1.10.1 (2023-12-07)
+
+-   Update template to use modules instead of scripts. [#56694](https://github.com/WordPress/gutenberg/pull/56694)
+
+## 1.10.0 (2023-11-29)
+
+### Enhancement
+
+-   Update `view.js` and `render.php` templates to the new `store()` API. [#56613](https://github.com/WordPress/gutenberg/pull/56613)
+
+## 1.9.0 (2023-11-16)
+
+## 1.8.0 (2023-11-02)
+
 ## 1.7.0 (2023-10-18)
 
 ## 1.6.0 (2023-10-05)

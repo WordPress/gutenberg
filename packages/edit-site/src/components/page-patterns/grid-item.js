@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import downloadjs from 'downloadjs';
 import { paramCase as kebabCase } from 'change-case';
 
 /**
@@ -37,6 +36,7 @@ import {
 } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { downloadBlob } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -118,9 +118,9 @@ function GridItem( { categoryId, item, ...props } ) {
 			syncStatus: item.patternBlock.wp_pattern_sync_status,
 		};
 
-		return downloadjs(
-			JSON.stringify( json, null, 2 ),
+		return downloadBlob(
 			`${ kebabCase( item.title || item.name ) }.json`,
+			JSON.stringify( json, null, 2 ),
 			'application/json'
 		);
 	};

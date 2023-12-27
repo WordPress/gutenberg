@@ -105,26 +105,13 @@ export default function PageDetails( { id } ) {
 	const { record } = useEntityRecord( 'postType', 'page', id );
 	const { parentTitle, templateTitle, isPostsPage } = useSelect(
 		( select ) => {
-			const { getEditedPostContext } = unlock( select( editSiteStore ) );
-			const postContext = getEditedPostContext();
-			const templates = select( coreStore ).getEntityRecords(
+			const { getEditedPostId } = unlock( select( editSiteStore ) );
+			const template = select( coreStore ).getEntityRecord(
 				'postType',
 				TEMPLATE_POST_TYPE,
-				{ per_page: -1 }
+				getEditedPostId()
 			);
-			// Template title.
-			const templateSlug =
-				// Checks that the post type matches the current theme's post type, otherwise
-				// the templateSlug returns 'home'.
-				postContext?.postType === 'page'
-					? postContext?.templateSlug
-					: null;
-			const _templateTitle =
-				templates && templateSlug
-					? templates.find(
-							( template ) => template.slug === templateSlug
-					  )?.title?.rendered
-					: null;
+			const _templateTitle = template?.title?.rendered;
 
 			// Parent page title.
 			const _parentTitle = record?.parent

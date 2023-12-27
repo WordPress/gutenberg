@@ -22,7 +22,6 @@ export const toggleGroupControl = ( {
 	border-radius: ${ CONFIG.controlBorderRadius };
 	display: inline-flex;
 	min-width: 0;
-	padding: 2px;
 	position: relative;
 
 	${ toggleGroupControlSize( size ) }
@@ -55,14 +54,18 @@ const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
 export const toggleGroupControlSize = (
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
 ) => {
-	const heights = {
-		default: '36px',
-		'__unstable-large': '40px',
+	const styles = {
+		default: css`
+			min-height: 36px;
+			padding: 2px;
+		`,
+		'__unstable-large': css`
+			min-height: 40px;
+			padding: 3px;
+		`,
 	};
 
-	return css`
-		min-height: ${ heights[ size ] };
-	`;
+	return styles[ size ];
 };
 
 export const block = css`

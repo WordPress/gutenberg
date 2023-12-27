@@ -1,15 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { store as preferencesStore } from '@wordpress/preferences';
+
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import inserterMediaCategories from './inserter-media-categories';
+
+const { useBlockEditorSettings } = unlock( editorPrivateApis );
 
 function useArchiveLabel( templateSlug ) {
 	const taxonomyMatches = templateSlug?.match(
@@ -83,119 +88,108 @@ function useArchiveLabel( templateSlug ) {
 	);
 }
 
-export default function useSiteEditorSettings() {
-	const { setIsInserterOpened } = useDispatch( editSiteStore );
-	const { storedSettings, canvasMode, templateType, siteSettings } =
-		useSelect(
-			( select ) => {
-				const { canUser, getEntityRecord } = select( coreStore );
-				const { getSettings, getCanvasMode, getEditedPostType } =
-					unlock( select( editSiteStore ) );
-				return {
-					storedSettings: getSettings( setIsInserterOpened ),
-					canvasMode: getCanvasMode(),
-					templateType: getEditedPostType(),
-					siteSettings: canUser( 'read', 'settings' )
-						? getEntityRecord( 'root', 'site' )
-						: undefined,
-				};
-			},
-			[ setIsInserterOpened ]
-		);
-
-	const settingsBlockPatterns =
-		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
-		storedSettings.__experimentalBlockPatterns; // WP 5.9
-	const settingsBlockPatternCategories =
-		storedSettings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
-		storedSettings.__experimentalBlockPatternCategories; // WP 5.9
-
+export function useSpecificEditorSettings() {
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
-		restBlockPatterns,
-		restBlockPatternCategories,
 		templateSlug,
-		userPatternCategories,
-	} = useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
-		const { getEditedEntityRecord, getUserPatternCategories } =
-			select( coreStore );
-		const usedPostType = getEditedPostType();
-		const usedPostId = getEditedPostId();
-		const _record = getEditedEntityRecord(
-			'postType',
-			usedPostType,
-			usedPostId
-		);
-		return {
-			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories:
-				select( coreStore ).getBlockPatternCategories(),
-			templateSlug: _record.slug,
-			userPatternCategories: getUserPatternCategories(),
-		};
-	}, [] );
+		focusMode,
+		allowRightClickOverrides,
+		isDistractionFree,
+		hasFixedToolbar,
+		keepCaretInsideBlock,
+		canvasMode,
+		settings,
+		postWithTemplate,
+	} = useSelect(
+		( select ) => {
+			const {
+				getEditedPostType,
+				getEditedPostId,
+				getEditedPostContext,
+				getCanvasMode,
+				getSettings,
+			} = unlock( select( editSiteStore ) );
+			const { get: getPreference } = select( preferencesStore );
+			const { getEditedEntityRecord } = select( coreStore );
+			const usedPostType = getEditedPostType();
+			const usedPostId = getEditedPostId();
+			const _record = getEditedEntityRecord(
+				'postType',
+				usedPostType,
+				usedPostId
+			);
+			const _context = getEditedPostContext();
+			return {
+				templateSlug: _record.slug,
+				focusMode: !! getPreference( 'core/edit-site', 'focusMode' ),
+				isDistractionFree: !! getPreference(
+					'core/edit-site',
+					'distractionFree'
+				),
+				allowRightClickOverrides: !! getPreference(
+					'core/edit-site',
+					'allowRightClickOverrides'
+				),
+				hasFixedToolbar:
+					!! getPreference( 'core/edit-site', 'fixedToolbar' ) ||
+					! isLargeViewport,
+				keepCaretInsideBlock: !! getPreference(
+					'core/edit-site',
+					'keepCaretInsideBlock'
+				),
+				canvasMode: getCanvasMode(),
+				settings: getSettings(),
+				postWithTemplate: _context?.postId,
+			};
+		},
+		[ isLargeViewport ]
+	);
 	const archiveLabels = useArchiveLabel( templateSlug );
-
-	const blockPatterns = useMemo(
-		() =>
-			[
-				...( settingsBlockPatterns || [] ),
-				...( restBlockPatterns || [] ),
-			]
-				.filter(
-					( x, index, arr ) =>
-						index === arr.findIndex( ( y ) => x.name === y.name )
-				)
-				.filter( ( { postTypes } ) => {
-					return (
-						! postTypes ||
-						( Array.isArray( postTypes ) &&
-							postTypes.includes( templateType ) )
-					);
-				} ),
-		[ settingsBlockPatterns, restBlockPatterns, templateType ]
-	);
-
-	const blockPatternCategories = useMemo(
-		() =>
-			[
-				...( settingsBlockPatternCategories || [] ),
-				...( restBlockPatternCategories || [] ),
-			].filter(
-				( x, index, arr ) =>
-					index === arr.findIndex( ( y ) => x.name === y.name )
-			),
-		[ settingsBlockPatternCategories, restBlockPatternCategories ]
-	);
-	return useMemo( () => {
-		const {
-			__experimentalAdditionalBlockPatterns,
-			__experimentalAdditionalBlockPatternCategories,
-			focusMode,
-			...restStoredSettings
-		} = storedSettings;
-
+	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
+	const defaultEditorSettings = useMemo( () => {
 		return {
-			...restStoredSettings,
-			inserterMediaCategories,
-			__experimentalBlockPatterns: blockPatterns,
-			__experimentalBlockPatternCategories: blockPatternCategories,
-			__experimentalUserPatternCategories: userPatternCategories,
+			...settings,
+
+			supportsTemplateMode: true,
 			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
+			allowRightClickOverrides,
+			isDistractionFree,
+			hasFixedToolbar,
+			keepCaretInsideBlock,
+			defaultRenderingMode,
+
+			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
-			pageOnFront: siteSettings?.page_on_front,
-			pageForPosts: siteSettings?.page_for_posts,
 		};
 	}, [
-		storedSettings,
-		blockPatterns,
-		blockPatternCategories,
-		userPatternCategories,
+		settings,
+		focusMode,
+		allowRightClickOverrides,
+		isDistractionFree,
+		hasFixedToolbar,
+		keepCaretInsideBlock,
 		canvasMode,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
-		siteSettings?.page_on_front,
-		siteSettings?.page_for_posts,
+		defaultRenderingMode,
 	] );
+
+	return defaultEditorSettings;
+}
+
+export default function useSiteEditorSettings() {
+	const defaultEditorSettings = useSpecificEditorSettings();
+	const { postType, postId } = useSelect( ( select ) => {
+		const { getEditedPostType, getEditedPostId } = unlock(
+			select( editSiteStore )
+		);
+		const usedPostType = getEditedPostType();
+		const usedPostId = getEditedPostId();
+		return {
+			postType: usedPostType,
+			postId: usedPostId,
+		};
+	}, [] );
+	return useBlockEditorSettings( defaultEditorSettings, postType, postId );
 }

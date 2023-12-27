@@ -115,7 +115,9 @@ function PostFeaturedImage( {
 					setIsLoading( true );
 					return;
 				}
-				onUpdateImage( image );
+				if ( image ) {
+					onUpdateImage( image );
+				}
 				setIsLoading( false );
 			},
 			onError( message ) {
