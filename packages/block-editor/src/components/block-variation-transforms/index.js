@@ -6,7 +6,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	DropdownMenu,
-	Flex,
 	MenuGroup,
 	MenuItemsChoice,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -106,34 +105,31 @@ function VariationsToggleGroupControl( {
 } ) {
 	return (
 		<fieldset className={ className }>
-			<Flex>
-				<ToggleGroupControl
-					label={ __( 'Transform to variation' ) }
-					value={ selectedValue }
-					isBlock
-					hideLabelFromVision
-					onChange={ onSelectVariation }
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-				>
-					{ variations.map( ( variation ) => (
-						<ToggleGroupControlOptionIcon
-							key={ variation.name }
-							icon={ variation.icon }
-							value={ variation.name }
-							label={
-								selectedValue === variation.name
-									? variation.title
-									: sprintf(
-											/* translators: %s: Name of the block variation */
-											__( 'Transform to %s' ),
-											variation.title
-									  )
-							}
-						/>
-					) ) }
-				</ToggleGroupControl>
-			</Flex>
+			<ToggleGroupControl
+				label={ __( 'Transform to variation' ) }
+				value={ selectedValue }
+				hideLabelFromVision
+				onChange={ onSelectVariation }
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+			>
+				{ variations.map( ( variation ) => (
+					<ToggleGroupControlOptionIcon
+						key={ variation.name }
+						icon={ variation.icon }
+						value={ variation.name }
+						label={
+							selectedValue === variation.name
+								? variation.title
+								: sprintf(
+										/* translators: %s: Name of the block variation */
+										__( 'Transform to %s' ),
+										variation.title
+								  )
+						}
+					/>
+				) ) }
+			</ToggleGroupControl>
 		</fieldset>
 	);
 }
