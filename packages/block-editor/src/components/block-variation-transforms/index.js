@@ -123,7 +123,6 @@ function VariationsToggleGroupControl( {
 							key={ variation.name }
 							icon={ variation.icon }
 							value={ variation.name }
-							aria-label={ variation.title }
 							label={
 								selectedValue === variation.name
 									? variation.title
