@@ -81,7 +81,6 @@ function UnforwardedSearchControl(
 	// - value no fallback to empty string
 
 	return (
-		// @ts-expect-error
 		<InputControl
 			__next40pxDefaultSize={ __next40pxDefaultSize }
 			id={ instanceId }

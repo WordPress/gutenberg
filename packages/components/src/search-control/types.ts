@@ -1,23 +1,25 @@
 /**
- * External dependencies
- */
-import type { HTMLAttributes } from 'react';
-
-/**
  * Internal dependencies
  */
-import type { BaseControlProps } from '../base-control/types';
+import type { InputControlProps } from '../input-control/types';
 
 export type SearchControlProps = Pick<
-	BaseControlProps,
-	'__nextHasNoMarginBottom' | 'help' | 'label'
+	InputControlProps,
+	| '__next40pxDefaultSize'
+	| 'help'
+	| 'hideLabelFromVision'
+	| 'label'
+	| 'onDrag'
+	| 'onDragStart'
+	| 'onDragEnd'
+	| 'value'
 > & {
 	/**
-	 * If true, the label will only be visible to screen readers.
+	 * Start opting into the new margin-free styles that will become the default in a future version.
 	 *
-	 * @default true
+	 * @default false
 	 */
-	hideLabelFromVision?: boolean;
+	__nextHasNoMarginBottom?: boolean;
 	/**
 	 * A function that receives the value of the input when the value is changed.
 	 */
@@ -35,21 +37,11 @@ export type SearchControlProps = Pick<
 	 *
 	 * @default 'Search'
 	 */
-	placeholder?: HTMLAttributes< HTMLInputElement >[ 'placeholder' ];
-	/**
-	 * The current value of the input.
-	 */
-	value?: string;
+	placeholder?: InputControlProps[ 'placeholder' ];
 	/**
 	 * The size of the component
 	 *
 	 * @default 'default'
 	 */
 	size?: 'default' | 'compact';
-	/**
-	 * Start opting into the larger default height that will become the default size in a future version.
-	 *
-	 * @default false
-	 */
-	__next40pxDefaultSize?: boolean;
 };
