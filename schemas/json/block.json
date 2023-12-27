@@ -752,6 +752,48 @@
 				}
 			]
 		},
+		"editorModule": {
+			"description": "Block type editor module definition. It will only be enqueued in the context of the editor.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
+		},
+		"module": {
+			"description": "Block type frontend and editor module definition. It will be enqueued both in the editor and when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
+		},
+		"viewModule": {
+			"description": "Block type frontend module definition. It will be enqueued only when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
+		},
 		"editorStyle": {
 			"description": "Block type editor style definition. It will only be enqueued in the context of the editor.",
 			"oneOf": [

@@ -4,7 +4,7 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
-const { DefinePlugin } = require( 'webpack' );
+const webpack = require( 'webpack' );
 const browserslist = require( 'browserslist' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const { basename, dirname, resolve } = require( 'path' );
@@ -110,13 +110,16 @@ const cssLoaders = [
 	},
 ];
 
-const config = {
+/** @type {webpack.Configuration} */
+const baseConfig = {
 	mode,
 	target,
-	entry: getWebpackEntryPoints,
 	output: {
 		filename: '[name].js',
 		path: resolve( process.cwd(), 'build' ),
+	},
+	experiments: {
+		outputModule: true,
 	},
 	resolve: {
 		alias: {
@@ -245,8 +248,55 @@ const config = {
 			},
 		],
 	},
+	stats: {
+		children: false,
+	},
+};
+
+// WP_DEVTOOL global variable controls how source maps are generated.
+// See: https://webpack.js.org/configuration/devtool/#devtool.
+if ( process.env.WP_DEVTOOL ) {
+	baseConfig.devtool = process.env.WP_DEVTOOL;
+}
+
+if ( ! isProduction ) {
+	// Set default sourcemap mode if it wasn't set by WP_DEVTOOL.
+	baseConfig.devtool = baseConfig.devtool || 'source-map';
+	baseConfig.devServer = {
+		devMiddleware: {
+			writeToDisk: true,
+		},
+		allowedHosts: 'auto',
+		host: 'localhost',
+		port: 8887,
+		proxy: {
+			'/build': {
+				pathRewrite: {
+					'^/build': '',
+				},
+			},
+		},
+	};
+}
+
+// Add source-map-loader if devtool is set, whether in dev mode or not.
+if ( baseConfig.devtool ) {
+	baseConfig.module.rules.unshift( {
+		test: /\.(j|t)sx?$/,
+		exclude: [ /node_modules/ ],
+		use: require.resolve( 'source-map-loader' ),
+		enforce: 'pre',
+	} );
+}
+
+/** @type {webpack.Configuration} */
+const scriptConfig = {
+	...baseConfig,
+
+	entry: getWebpackEntryPoints( 'script' ),
+
 	plugins: [
-		new DefinePlugin( {
+		new webpack.DefinePlugin( {
 			// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
 			SCRIPT_DEBUG: ! isProduction,
 		} ),
@@ -255,7 +305,7 @@ const config = {
 		// fonts and images. It is a known limitations:
 		// https://github.com/johnagan/clean-webpack-plugin/issues/159
 		new CleanWebpackPlugin( {
-			cleanAfterEveryBuildPatterns: [ '!fonts/**', '!images/**' ],
+			cleanOnceBeforeBuildPatterns: [ '!fonts/**', '!images/**' ],
 			// Prevent it from deleting webpack assets during builds that have
 			// multiple configurations returned in the webpack config.
 			cleanStaleWebpackAssets: false,
@@ -324,45 +374,80 @@ const config = {
 		! process.env.WP_NO_EXTERNALS &&
 			new DependencyExtractionWebpackPlugin(),
 	].filter( Boolean ),
-	stats: {
-		children: false,
-	},
 };
 
-// WP_DEVTOOL global variable controls how source maps are generated.
-// See: https://webpack.js.org/configuration/devtool/#devtool.
-if ( process.env.WP_DEVTOOL ) {
-	config.devtool = process.env.WP_DEVTOOL;
-}
+/** @type {webpack.Configuration} */
+const moduleConfig = {
+	...baseConfig,
 
-if ( ! isProduction ) {
-	// Set default sourcemap mode if it wasn't set by WP_DEVTOOL.
-	config.devtool = config.devtool || 'source-map';
-	config.devServer = {
-		devMiddleware: {
-			writeToDisk: true,
+	entry: getWebpackEntryPoints( 'module' ),
+
+	output: {
+		...baseConfig.output,
+		module: true,
+		chunkFormat: 'module',
+		library: {
+			...baseConfig.output.library,
+			type: 'module',
 		},
-		allowedHosts: 'auto',
-		host: 'localhost',
-		port: 8887,
-		proxy: {
-			'/build': {
-				pathRewrite: {
-					'^/build': '',
+	},
+
+	plugins: [
+		new webpack.DefinePlugin( {
+			// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
+			SCRIPT_DEBUG: ! isProduction,
+		} ),
+		new RenderPathsPlugin(),
+		new CopyWebpackPlugin( {
+			patterns: [
+				{
+					from: '**/block.json',
+					context: getWordPressSrcDirectory(),
+					noErrorOnMissing: true,
+					transform( content, absoluteFrom ) {
+						const convertExtension = ( path ) => {
+							return path.replace( /\.(j|t)sx?$/, '.js' );
+						};
+
+						if ( basename( absoluteFrom ) === 'block.json' ) {
+							const blockJson = JSON.parse( content.toString() );
+							[ 'viewModule', 'module', 'editorModule' ].forEach(
+								( key ) => {
+									if ( Array.isArray( blockJson[ key ] ) ) {
+										blockJson[ key ] =
+											blockJson[ key ].map(
+												convertExtension
+											);
+									} else if (
+										typeof blockJson[ key ] === 'string'
+									) {
+										blockJson[ key ] = convertExtension(
+											blockJson[ key ]
+										);
+									}
+								}
+							);
+
+							return JSON.stringify( blockJson, null, 2 );
+						}
+
+						return content;
+					},
 				},
-			},
-		},
-	};
-}
+			],
+		} ),
+		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
+		// bundle content as a convenient interactive zoomable treemap.
+		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
+		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
+		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
+		// React Fast Refresh.
+		hasReactFastRefresh && new ReactRefreshWebpackPlugin(),
+		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
+		// generated, and the default externals set.
+		! process.env.WP_NO_EXTERNALS &&
+			new DependencyExtractionWebpackPlugin(),
+	].filter( Boolean ),
+};
 
-// Add source-map-loader if devtool is set, whether in dev mode or not.
-if ( config.devtool ) {
-	config.module.rules.unshift( {
-		test: /\.(j|t)sx?$/,
-		exclude: [ /node_modules/ ],
-		use: require.resolve( 'source-map-loader' ),
-		enforce: 'pre',
-	} );
-}
-
-module.exports = config;
+module.exports = [ scriptConfig, moduleConfig ];

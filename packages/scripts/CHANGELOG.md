@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Support block.json `editorModule`, `module`, and `viewModule` fields.
+
 ### Breaking Changes
 
 -   Drop support for Node.js versions < 18.
