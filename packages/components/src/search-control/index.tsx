@@ -9,7 +9,7 @@
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon, search, closeSmall } from '@wordpress/icons';
-import { forwardRef, useRef } from '@wordpress/element';
+import { forwardRef, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,6 +20,7 @@ import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { SearchControlProps } from './types';
 import type { ForwardedRef } from 'react';
+import { ContextSystemProvider } from '../context';
 
 function UnforwardedSearchControl(
 	{
@@ -73,30 +74,39 @@ function UnforwardedSearchControl(
 		return <Icon icon={ search } />;
 	};
 
+	// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
+	// to provide backwards compatibile margin for SearchControl.
+	// (In a standard InputControl, the BaseControl `__nextHasNoMarginBottom` is always set to true.)
+	const baseControlContextValue = useMemo(
+		() => ( { BaseControl: { _overrides: { __nextHasNoMarginBottom } } } ),
+		[ __nextHasNoMarginBottom ]
+	);
+
 	// TODO:
-	// - add margin if __nextHasNoMarginBottom if false
 	// - compact size
 	// - classnames
 	// - onChange type signature changed
 	// - value no fallback to empty string
 
 	return (
-		<InputControl
-			__next40pxDefaultSize={ __next40pxDefaultSize }
-			id={ instanceId }
-			hideLabelFromVision={ hideLabelFromVision }
-			ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
-			type="search"
-			onChange={ onChange }
-			autoComplete="off"
-			value={ value }
-			prefix={
-				<InputControlPrefixWrapper>
-					{ renderRightButton() }
-				</InputControlPrefixWrapper>
-			}
-			{ ...restProps }
-		/>
+		<ContextSystemProvider value={ baseControlContextValue }>
+			<InputControl
+				__next40pxDefaultSize={ __next40pxDefaultSize }
+				id={ instanceId }
+				hideLabelFromVision={ hideLabelFromVision }
+				ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
+				type="search"
+				onChange={ onChange }
+				autoComplete="off"
+				value={ value }
+				prefix={
+					<InputControlPrefixWrapper>
+						{ renderRightButton() }
+					</InputControlPrefixWrapper>
+				}
+				{ ...restProps }
+			/>
+		</ContextSystemProvider>
 
 		// <BaseControl
 		// 	__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
