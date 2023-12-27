@@ -209,16 +209,14 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 										disabled={ ! activeElement }
 										hideOnClick={ false }
 										onClick={ () => {
-											onChangeView( ( currentView ) => ( {
-												...currentView,
+											onChangeView( {
+												...view,
 												page: 1,
-												filters:
-													currentView.filters.filter(
-														( f ) =>
-															f.field !==
-															filter.field
-													),
-											} ) );
+												filters: view.filters.filter(
+													( f ) =>
+														f.field !== filter.field
+												),
+											} );
 										} }
 									>
 										<DropdownMenuItemLabel>
@@ -240,11 +238,11 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 					}
 					hideOnClick={ false }
 					onClick={ () => {
-						onChangeView( ( currentView ) => ( {
-							...currentView,
+						onChangeView( {
+							...view,
 							page: 1,
 							filters: [],
-						} ) );
+						} );
 					} }
 				>
 					<DropdownMenuItemLabel>
