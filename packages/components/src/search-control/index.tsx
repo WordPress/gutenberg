@@ -39,8 +39,10 @@ function UnforwardedSearchControl(
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const searchRef = useRef< HTMLInputElement >();
-	const instanceId = useInstanceId( SearchControl );
-	const id = `components-search-control-${ instanceId }`;
+	const instanceId = useInstanceId(
+		SearchControl,
+		'components-search-control'
+	);
 
 	const renderRightButton = () => {
 		if ( onClose ) {
@@ -84,7 +86,7 @@ function UnforwardedSearchControl(
 		// @ts-expect-error
 		<InputControl
 			__next40pxDefaultSize={ __next40pxDefaultSize }
-			id={ id }
+			id={ instanceId }
 			hideLabelFromVision={ hideLabelFromVision }
 			help={ help }
 			ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
