@@ -16,7 +16,6 @@ import {
 	RichText,
 	useBlockProps,
 	store as blockEditorStore,
-	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 
 /**
@@ -91,12 +90,6 @@ function HeadingEdit( {
 	return (
 		<>
 			<BlockControls group="block">
-				<HeadingLevelDropdown
-					value={ level }
-					onChange={ ( newLevel ) =>
-						setAttributes( { level: newLevel } )
-					}
-				/>
 				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
