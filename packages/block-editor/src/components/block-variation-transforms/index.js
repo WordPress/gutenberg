@@ -112,7 +112,6 @@ function VariationsToggleGroupControl( {
 					value={ selectedValue }
 					isBlock
 					hideLabelFromVision
-					showTooltip
 					onChange={ ( variation ) => {
 						onSelectVariation( variation );
 					} }
