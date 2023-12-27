@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.15.0 (2023-12-27)
+
 ### Bug Fix
 
 -   `DropdownMenu V2 `: better fallback on browsers that don't support CSS subgrid([#57327](https://github.com/WordPress/gutenberg/pull/57327)).

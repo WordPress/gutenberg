@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 27.0.0 (2023-12-27)
+
 ### Breaking Changes
 
 -   Drop support for Node.js versions < 18.
