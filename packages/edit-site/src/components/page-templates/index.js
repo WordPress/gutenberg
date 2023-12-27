@@ -344,25 +344,23 @@ export default function DataviewsTemplates() {
 		],
 		[ resetTemplateAction ]
 	);
+
 	const onChangeView = useCallback(
-		( viewUpdater ) => {
-			let updatedView =
-				typeof viewUpdater === 'function'
-					? viewUpdater( view )
-					: viewUpdater;
-			if ( updatedView.type !== view.type ) {
-				updatedView = {
-					...updatedView,
+		( newView ) => {
+			if ( newView.type !== view.type ) {
+				newView = {
+					...newView,
 					layout: {
-						...defaultConfigPerViewType[ updatedView.type ],
+						...defaultConfigPerViewType[ newView.type ],
 					},
 				};
 			}
 
-			setView( updatedView );
+			setView( newView );
 		},
-		[ view, setView ]
+		[ view.type, setView ]
 	);
+
 	return (
 		<>
 			<Page
