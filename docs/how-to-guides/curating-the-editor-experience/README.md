@@ -1,6 +1,6 @@
 # Curating the Editor Experience
 
-Curating the editing experience in WordPress is important because it allows you to streamline the editing process, ensuring consistency and alignment with the site's style and branding guidelines. It also makes it easier for users to create and manage content effectively without accidental modifications or layout changes. This leads to a more efficient, user-friendly, and visually coherent website.
+Curating the editing experience in WordPress is important because it allows you to streamline the editing process, ensuring consistency and alignment with the site's style and branding guidelines. It also makes it easier for users to create and manage content effectively without accidental modifications or layout changes. This leads to a more efficient and personalized experience.
 
 The purpose of this guide is to offer various ways you can lock down and curate the experience of using WordPress, especially with the introduction of more design tools and the Site Editor. 
 
