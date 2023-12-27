@@ -85,6 +85,7 @@ function UnforwardedSearchControl(
 	// TODO:
 	// - compact size
 	// - classnames
+	// - RTL support re: prefix/suffix
 	// - onChange type signature changed
 	// - value no fallback to empty string
 
