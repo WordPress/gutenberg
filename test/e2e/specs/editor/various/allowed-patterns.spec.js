@@ -5,12 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Allowed Patterns', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.deactivatePlugin( 'gutenberg-test-allowed-patterns' ),
-			requestUtils.deactivatePlugin(
-				'gutenberg-test-allowed-patterns-disable-blocks'
-			),
-		] );
+		await requestUtils.activatePlugin( 'gutenberg-test-allowed-patterns' );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -25,9 +20,7 @@ test.describe( 'Allowed Patterns', () => {
 	test( 'should show all patterns when blocks are not disabled', async ( {
 		admin,
 		page,
-		requestUtils,
 	} ) => {
-		await requestUtils.activatePlugin( 'gutenberg-test-allowed-patterns' );
 		await admin.createNewPost();
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
