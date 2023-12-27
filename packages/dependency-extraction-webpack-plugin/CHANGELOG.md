@@ -9,7 +9,7 @@
 
 ### New Features
 
--   Add support for producing module-compatible asset files ((#57199)[https://github.com/WordPress/gutenberg/pull/57199])
+-   Add support for producing module-compatible asset files ([#57199](https://github.com/WordPress/gutenberg/pull/57199))
 
 ## 4.31.0 (2023-12-13)
 
