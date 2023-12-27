@@ -67,32 +67,6 @@
 		background: $gray-700;
 		color: $gray-100;
 	}
-
-	.edit-site-patterns__grid-pagination {
-		border-top: 1px solid $gray-800;
-		background: $gray-900;
-		padding: $grid-unit-30 $grid-unit-40;
-		position: sticky;
-		bottom: 0;
-		z-index: z-index(".edit-site-patterns__grid-pagination");
-
-		.components-button.is-tertiary {
-			width: $button-size-compact;
-			height: $button-size-compact;
-			color: $gray-100;
-			background-color: $gray-800;
-			justify-content: center;
-
-			&:disabled {
-				color: $gray-600;
-				background: none;
-			}
-
-			&:hover:not(:disabled) {
-				background-color: $gray-700;
-			}
-		}
-	}
 }
 
 .edit-site-patterns__header {
@@ -225,4 +199,27 @@
 
 .edit-site-patterns__delete-modal {
 	width: $modal-width-small;
+}
+
+.edit-site-patterns__pagination {
+	padding: $grid-unit-30 $grid-unit-40;
+	border-top: 1px solid $gray-800;
+	background: $gray-900;
+	position: sticky;
+	bottom: 0;
+	color: $gray-100;
+	z-index: z-index(".edit-site-patterns__grid-pagination");
+	.components-button.is-tertiary {
+		background-color: $gray-800;
+		color: $gray-100;
+
+		&:disabled {
+			color: $gray-600;
+			background: none;
+		}
+
+		&:hover:not(:disabled) {
+			background-color: $gray-700;
+		}
+	}
 }

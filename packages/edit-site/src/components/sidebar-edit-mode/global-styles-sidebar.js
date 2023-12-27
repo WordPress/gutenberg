@@ -33,6 +33,7 @@ export default function GlobalStylesSidebar() {
 		showListViewByDefault,
 		hasRevisions,
 		isRevisionsOpened,
+		isRevisionsStyleBookOpened,
 	} = useSelect( ( select ) => {
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getEditorCanvasContainerView, getCanvasMode } = unlock(
@@ -64,6 +65,8 @@ export default function GlobalStylesSidebar() {
 			showListViewByDefault: _showListViewByDefault,
 			hasRevisions:
 				!! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count,
+			isRevisionsStyleBookOpened:
+				'global-styles-revisions:style-book' === canvasContainerView,
 			isRevisionsOpened:
 				'global-styles-revisions' === canvasContainerView,
 		};
@@ -80,16 +83,44 @@ export default function GlobalStylesSidebar() {
 
 	const { setIsListViewOpened } = useDispatch( editorStore );
 	const { goTo } = useNavigator();
-	const loadRevisions = () => {
-		setIsListViewOpened( false );
 
-		if ( ! isRevisionsOpened ) {
-			goTo( '/revisions' );
-			setEditorCanvasContainerView( 'global-styles-revisions' );
-		} else {
+	const toggleRevisions = () => {
+		setIsListViewOpened( false );
+		if ( isRevisionsStyleBookOpened ) {
+			goTo( '/' );
+			setEditorCanvasContainerView( 'style-book' );
+			return;
+		}
+		if ( isRevisionsOpened ) {
 			goTo( '/' );
 			setEditorCanvasContainerView( undefined );
+			return;
 		}
+		goTo( '/revisions' );
+
+		if ( isStyleBookOpened ) {
+			setEditorCanvasContainerView(
+				'global-styles-revisions:style-book'
+			);
+		} else {
+			setEditorCanvasContainerView( 'global-styles-revisions' );
+		}
+	};
+	const toggleStyleBook = () => {
+		if ( isRevisionsOpened ) {
+			setEditorCanvasContainerView(
+				'global-styles-revisions:style-book'
+			);
+			return;
+		}
+		if ( isRevisionsStyleBookOpened ) {
+			setEditorCanvasContainerView( 'global-styles-revisions' );
+			return;
+		}
+		setIsListViewOpened( isStyleBookOpened && showListViewByDefault );
+		setEditorCanvasContainerView(
+			isStyleBookOpened ? undefined : 'style-book'
+		);
 	};
 
 	return (
@@ -113,25 +144,22 @@ export default function GlobalStylesSidebar() {
 						<Button
 							icon={ seen }
 							label={ __( 'Style Book' ) }
-							isPressed={ isStyleBookOpened }
+							isPressed={
+								isStyleBookOpened || isRevisionsStyleBookOpened
+							}
 							disabled={ shouldClearCanvasContainerView }
-							onClick={ () => {
-								setIsListViewOpened(
-									isStyleBookOpened && showListViewByDefault
-								);
-								setEditorCanvasContainerView(
-									isStyleBookOpened ? undefined : 'style-book'
-								);
-							} }
+							onClick={ toggleStyleBook }
 						/>
 					</FlexItem>
 					<FlexItem>
 						<Button
 							label={ __( 'Revisions' ) }
 							icon={ backup }
-							onClick={ loadRevisions }
+							onClick={ toggleRevisions }
 							disabled={ ! hasRevisions }
-							isPressed={ isRevisionsOpened }
+							isPressed={
+								isRevisionsOpened || isRevisionsStyleBookOpened
+							}
 						/>
 					</FlexItem>
 					<GlobalStylesMenuSlot />

@@ -68,7 +68,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 
 			return (
 				<FilterSummary
-					key={ filter.field + '.' + filter.operator }
+					key={ filter.field }
 					filter={ filter }
 					view={ view }
 					onChangeView={ onChangeView }

@@ -3,6 +3,11 @@
  */
 import { Platform } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { undoIgnoreBlocks } from './undo-ignore';
+
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
@@ -291,10 +296,30 @@ export function deleteStyleOverride( id ) {
 	};
 }
 
-export function syncDerivedBlockAttributes( clientId, attributes ) {
-	return {
-		type: 'SYNC_DERIVED_BLOCK_ATTRIBUTES',
-		clientIds: [ clientId ],
-		attributes,
+/**
+ * A higher-order action that mark every change inside a callback as "non-persistent"
+ * and ignore pushing to the undo history stack. It's primarily used for synchronized
+ * derived updates from the block editor without affecting the undo history.
+ *
+ * @param {() => void} callback The synchronous callback to derive updates.
+ */
+export function syncDerivedUpdates( callback ) {
+	return ( { dispatch, select, registry } ) => {
+		registry.batch( () => {
+			// Mark every change in the `callback` as non-persistent.
+			dispatch( {
+				type: 'SET_EXPLICIT_PERSISTENT',
+				isPersistentChange: false,
+			} );
+			callback();
+			dispatch( {
+				type: 'SET_EXPLICIT_PERSISTENT',
+				isPersistentChange: undefined,
+			} );
+
+			// Ignore pushing undo stack for the updated blocks.
+			const updatedBlocks = select.getBlocks();
+			undoIgnoreBlocks.add( updatedBlocks );
+		} );
 	};
 }

@@ -34,6 +34,7 @@ function getEditorCanvasContainerTitle( view ) {
 		case 'style-book':
 			return __( 'Style Book' );
 		case 'global-styles-revisions':
+		case 'global-styles-revisions:style-book':
 			return __( 'Global styles revisions' );
 		default:
 			return '';
@@ -87,12 +88,12 @@ function EditorCanvasContainer( {
 	);
 
 	function onCloseContainer() {
-		if ( typeof onClose === 'function' ) {
-			onClose();
-		}
 		setIsListViewOpened( showListViewByDefault );
 		setEditorCanvasContainerView( undefined );
 		setIsClosed( true );
+		if ( typeof onClose === 'function' ) {
+			onClose();
+		}
 	}
 
 	function closeOnEscape( event ) {

@@ -52,7 +52,6 @@ import useTitle from '../routes/use-title';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
-import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 import PatternModal from '../pattern-modal';
 import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
 import SiteEditorCanvas from '../block-editor/site-editor-canvas';
@@ -266,7 +265,6 @@ export default function Editor( { isLoading } ) {
 							isRightSidebarOpen && (
 								<>
 									<ComplementaryArea.Slot scope="core/edit-site" />
-									<SidebarFixedBottomSlot />
 								</>
 							)
 						}

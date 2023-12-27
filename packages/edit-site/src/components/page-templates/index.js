@@ -170,8 +170,11 @@ export default function DataviewsTemplates() {
 		} );
 	const history = useHistory();
 
-	const onSelectionChange = ( items ) =>
-		setTemplateId( items?.length === 1 ? items[ 0 ].id : null );
+	const onSelectionChange = useCallback(
+		( items ) =>
+			setTemplateId( items?.length === 1 ? items[ 0 ].id : null ),
+		[ setTemplateId ]
+	);
 
 	const authors = useMemo( () => {
 		if ( ! allTemplates ) {
@@ -341,25 +344,23 @@ export default function DataviewsTemplates() {
 		],
 		[ resetTemplateAction ]
 	);
+
 	const onChangeView = useCallback(
-		( viewUpdater ) => {
-			let updatedView =
-				typeof viewUpdater === 'function'
-					? viewUpdater( view )
-					: viewUpdater;
-			if ( updatedView.type !== view.type ) {
-				updatedView = {
-					...updatedView,
+		( newView ) => {
+			if ( newView.type !== view.type ) {
+				newView = {
+					...newView,
 					layout: {
-						...defaultConfigPerViewType[ updatedView.type ],
+						...defaultConfigPerViewType[ newView.type ],
 					},
 				};
 			}
 
-			setView( updatedView );
+			setView( newView );
 		},
-		[ view, setView ]
+		[ view.type, setView ]
 	);
+
 	return (
 		<>
 			<Page
@@ -382,7 +383,6 @@ export default function DataviewsTemplates() {
 					fields={ fields }
 					actions={ actions }
 					data={ shownTemplates }
-					getItemId={ ( item ) => item.id }
 					isLoading={ isLoadingData }
 					view={ view }
 					onChangeView={ onChangeView }

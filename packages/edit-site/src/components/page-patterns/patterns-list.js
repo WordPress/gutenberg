@@ -31,7 +31,7 @@ import usePatterns from './use-patterns';
 import SidebarButton from '../sidebar-button';
 import { unlock } from '../../lock-unlock';
 import { PATTERN_SYNC_TYPES, PATTERN_TYPES } from '../../utils/constants';
-import Pagination from './pagination';
+import Pagination from '../pagination';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -217,6 +217,7 @@ export default function PatternsList( { categoryId, type } ) {
 			</VStack>
 			{ numPages > 1 && (
 				<Pagination
+					className="edit-site-patterns__pagination"
 					currentPage={ currentPage }
 					numPages={ numPages }
 					changePage={ changePage }

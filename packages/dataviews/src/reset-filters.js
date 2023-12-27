@@ -4,7 +4,7 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default ( { view, onChangeView } ) => {
+export default function ResetFilter( { view, onChangeView } ) {
 	return (
 		<Button
 			disabled={ view.search === '' && view.filters?.length === 0 }
@@ -12,15 +12,15 @@ export default ( { view, onChangeView } ) => {
 			size="compact"
 			variant="tertiary"
 			onClick={ () => {
-				onChangeView( ( currentView ) => ( {
-					...currentView,
+				onChangeView( {
+					...view,
 					page: 1,
 					search: '',
 					filters: [],
-				} ) );
+				} );
 			} }
 		>
 			{ __( 'Reset filters' ) }
 		</Button>
 	);
-};
+}
