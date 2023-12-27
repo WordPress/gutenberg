@@ -112,9 +112,7 @@ function VariationsToggleGroupControl( {
 					value={ selectedValue }
 					isBlock
 					hideLabelFromVision
-					onChange={ ( variation ) => {
-						onSelectVariation( variation );
-					} }
+					onChange={ onSelectVariation }
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 				>
