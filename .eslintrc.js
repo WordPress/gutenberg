@@ -36,11 +36,63 @@ const typedFiles = glob( 'packages/*/package.json' )
 	.filter( ( fileName ) => require( join( __dirname, fileName ) ).types )
 	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
 
+const restrictedImports = [
+	{
+		name: 'framer-motion',
+		message:
+			'Please use the Framer Motion API through `@wordpress/components` instead.',
+	},
+	{
+		name: 'lodash',
+		message: 'Please use native functionality instead.',
+	},
+	{
+		name: 'reakit',
+		message:
+			'Please use Reakit API through `@wordpress/components` instead.',
+	},
+	{
+		name: '@ariakit/react',
+		message:
+			'Please use Ariakit API through `@wordpress/components` instead.',
+	},
+	{
+		name: 'redux',
+		importNames: [ 'combineReducers' ],
+		message: 'Please use `combineReducers` from `@wordpress/data` instead.',
+	},
+	{
+		name: 'puppeteer-testing-library',
+		message: '`puppeteer-testing-library` is still experimental.',
+	},
+	{
+		name: '@emotion/css',
+		message:
+			'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+	},
+	{
+		name: '@wordpress/edit-post',
+		message:
+			"edit-post is a WordPress top level package that shouldn't be imported into other packages",
+	},
+	{
+		name: '@wordpress/edit-site',
+		message:
+			"edit-site is a WordPress top level package that shouldn't be imported into other packages",
+	},
+	{
+		name: '@wordpress/edit-widgets',
+		message:
+			"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
+	},
+];
+
 module.exports = {
 	root: true,
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:eslint-comments/recommended',
+		'plugin:storybook/recommended',
 	],
 	globals: {
 		wp: 'off',
@@ -70,136 +122,7 @@ module.exports = {
 		'no-restricted-imports': [
 			'error',
 			{
-				paths: [
-					{
-						name: 'framer-motion',
-						message:
-							'Please use the Framer Motion API through `@wordpress/components` instead.',
-					},
-					{
-						name: 'lodash',
-						importNames: [
-							'camelCase',
-							'capitalize',
-							'castArray',
-							'chunk',
-							'clamp',
-							'cloneDeep',
-							'compact',
-							'concat',
-							'countBy',
-							'debounce',
-							'deburr',
-							'defaults',
-							'defaultTo',
-							'delay',
-							'difference',
-							'differenceWith',
-							'dropRight',
-							'each',
-							'escape',
-							'escapeRegExp',
-							'every',
-							'extend',
-							'findIndex',
-							'findKey',
-							'findLast',
-							'first',
-							'flatMap',
-							'flatten',
-							'flattenDeep',
-							'flow',
-							'flowRight',
-							'forEach',
-							'fromPairs',
-							'has',
-							'identity',
-							'includes',
-							'invoke',
-							'isArray',
-							'isBoolean',
-							'isFinite',
-							'isFunction',
-							'isMatch',
-							'isNil',
-							'isNumber',
-							'isObject',
-							'isObjectLike',
-							'isPlainObject',
-							'isString',
-							'isUndefined',
-							'keyBy',
-							'keys',
-							'last',
-							'lowerCase',
-							'mapKeys',
-							'maxBy',
-							'memoize',
-							'negate',
-							'noop',
-							'nth',
-							'omitBy',
-							'once',
-							'overEvery',
-							'partial',
-							'partialRight',
-							'random',
-							'reject',
-							'repeat',
-							'reverse',
-							'size',
-							'snakeCase',
-							'some',
-							'sortBy',
-							'startCase',
-							'startsWith',
-							'stubFalse',
-							'stubTrue',
-							'sum',
-							'sumBy',
-							'take',
-							'throttle',
-							'times',
-							'toString',
-							'trim',
-							'truncate',
-							'unionBy',
-							'uniq',
-							'uniqBy',
-							'uniqueId',
-							'uniqWith',
-							'upperFirst',
-							'values',
-							'without',
-							'words',
-							'xor',
-							'zip',
-						],
-						message:
-							'This Lodash method is not recommended. Please use native functionality instead. If using `memoize`, please use `memize` instead.',
-					},
-					{
-						name: 'reakit',
-						message:
-							'Please use Reakit API through `@wordpress/components` instead.',
-					},
-					{
-						name: 'redux',
-						importNames: [ 'combineReducers' ],
-						message:
-							'Please use `combineReducers` from `@wordpress/data` instead.',
-					},
-					{
-						name: 'puppeteer-testing-library',
-						message:
-							'`puppeteer-testing-library` is still experimental.',
-					},
-					{
-						name: '@emotion/css',
-						message:
-							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
-					},
-				],
+				paths: restrictedImports,
 			},
 		],
 		'@typescript-eslint/no-restricted-imports': [
@@ -213,6 +136,13 @@ module.exports = {
 						allowTypeImports: true,
 					},
 				],
+			},
+		],
+		'@typescript-eslint/consistent-type-imports': [
+			'error',
+			{
+				prefer: 'type-imports',
+				disallowTypeAnnotations: false,
 			},
 		],
 		'no-restricted-syntax': [
@@ -322,26 +252,37 @@ module.exports = {
 			},
 		},
 		{
+			files: [
+				// Components package.
+				'packages/components/src/**/*.[tj]s?(x)',
+				// Navigation block.
+				'packages/block-library/src/navigation/**/*.[tj]s?(x)',
+			],
+			excludedFiles: [ ...developmentFiles ],
+			rules: {
+				'react-hooks/exhaustive-deps': 'error',
+			},
+		},
+		{
 			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
-			excludedFiles: [ 'test/e2e/**/*.js' ],
+			excludedFiles: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
 		},
 		{
-			files: [ '**/test/**/*.js' ],
+			files: [ '**/test/**/*.[tj]s?(x)' ],
 			excludedFiles: [
-				'**/*.@(android|ios|native).js',
-				'packages/react-native-*/**/*.js',
-				'test/native/**/*.js',
-				'test/e2e/**/*.[tj]s',
+				'**/*.@(android|ios|native).[tj]s?(x)',
+				'packages/react-native-*/**/*.[tj]s?(x)',
+				'test/native/**/*.[tj]s?(x)',
+				'test/e2e/**/*.[tj]s?(x)',
+				'test/performance/**/*.[tj]s?(x)',
+				'test/storybook-playwright/**/*.[tj]s?(x)',
 			],
 			extends: [
 				'plugin:jest-dom/recommended',
 				'plugin:testing-library/react',
+				'plugin:jest/recommended',
 			],
-			rules: {
-				'testing-library/no-container': 'off',
-				'testing-library/no-node-access': 'off',
-			},
 		},
 		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
@@ -354,9 +295,21 @@ module.exports = {
 		{
 			files: [
 				'test/e2e/**/*.[tj]s',
+				'test/performance/**/*.[tj]s',
 				'packages/e2e-test-utils-playwright/**/*.[tj]s',
 			],
-			extends: [ 'plugin:eslint-plugin-playwright/playwright-test' ],
+			extends: [
+				'plugin:@wordpress/eslint-plugin/test-playwright',
+				'plugin:@typescript-eslint/base',
+			],
+			parserOptions: {
+				tsconfigRootDir: __dirname,
+				project: [
+					'./test/e2e/tsconfig.json',
+					'./test/performance/tsconfig.json',
+					'./packages/e2e-test-utils-playwright/tsconfig.json',
+				],
+			},
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
 				'@wordpress/no-global-get-selection': 'off',
@@ -378,6 +331,10 @@ module.exports = {
 						message: 'Prefer page.locator instead.',
 					},
 				],
+				'playwright/no-conditional-in-test': 'off',
+				'@typescript-eslint/await-thenable': 'error',
+				'@typescript-eslint/no-floating-promises': 'error',
+				'@typescript-eslint/no-misused-promises': 'error',
 			},
 		},
 		{
@@ -409,6 +366,29 @@ module.exports = {
 			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
 			plugins: [ 'ssr-friendly' ],
 			extends: [ 'plugin:ssr-friendly/recommended' ],
+		},
+		{
+			files: [ 'packages/block-editor/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					{
+						paths: [
+							...restrictedImports,
+							{
+								name: '@wordpress/api-fetch',
+								message:
+									"block-editor is a generic package that doesn't depend on a server or WordPress backend. To provide WordPress integration, consider passing settings to the BlockEditorProvider components.",
+							},
+							{
+								name: '@wordpress/core-data',
+								message:
+									"block-editor is a generic package that doesn't depend on a server or WordPress backend. To provide WordPress integration, consider passing settings to the BlockEditorProvider components.",
+							},
+						],
+					},
+				],
+			},
 		},
 	],
 };

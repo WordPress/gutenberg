@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map, groupBy, orderBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
@@ -17,6 +12,7 @@ import BlockTypesList from '../block-types-list';
 import InserterPanel from './panel';
 import useBlockTypesState from './hooks/use-block-types-state';
 import InserterListbox from '../inserter-listbox';
+import { orderBy } from '../../utils/sorting';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
@@ -42,7 +38,7 @@ export function BlockTypesTab( {
 	);
 
 	const suggestedItems = useMemo( () => {
-		return orderBy( items, [ 'frecency' ], [ 'desc' ] ).slice(
+		return orderBy( items, 'frecency', 'desc' ).slice(
 			0,
 			MAX_SUGGESTED_ITEMS
 		);
@@ -58,7 +54,15 @@ export function BlockTypesTab( {
 				itemList.filter(
 					( item ) => item.category && item.category !== 'reusable'
 				),
-			( itemList ) => groupBy( itemList, 'category' )
+			( itemList ) =>
+				itemList.reduce( ( acc, item ) => {
+					const { category } = item;
+					if ( ! acc[ category ] ) {
+						acc[ category ] = [];
+					}
+					acc[ category ].push( item );
+					return acc;
+				}, {} )
 		)( items );
 	}, [ items ] );
 
@@ -112,7 +116,7 @@ export function BlockTypesTab( {
 					</InserterPanel>
 				) }
 
-				{ map( currentlyRenderedCategories, ( category ) => {
+				{ currentlyRenderedCategories.map( ( category ) => {
 					const categoryItems = itemsPerCategory[ category.slug ];
 					if ( ! categoryItems || ! categoryItems.length ) {
 						return null;
@@ -147,8 +151,7 @@ export function BlockTypesTab( {
 					</InserterPanel>
 				) }
 
-				{ map(
-					currentlyRenderedCollections,
+				{ currentlyRenderedCollections.map(
 					( [ namespace, collection ] ) => {
 						const collectionItems = itemsPerCollection[ namespace ];
 						if ( ! collectionItems || ! collectionItems.length ) {

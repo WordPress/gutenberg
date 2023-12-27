@@ -2,13 +2,15 @@
  * External dependencies
  */
 import {
+	addBlock,
 	fireEvent,
-	waitFor,
 	getEditorHtml,
 	within,
 	getBlock,
 	initializeEditor,
-	changeTextOfRichText,
+	triggerBlockListLayout,
+	typeInRichText,
+	waitFor,
 } from 'test/helpers';
 
 /**
@@ -16,15 +18,6 @@ import {
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
-
-// Mock debounce to prevent potentially belated state updates.
-jest.mock( 'lodash', () => ( {
-	...jest.requireActual( 'lodash' ),
-	debounce: ( fn ) => {
-		fn.cancel = jest.fn();
-		return fn;
-	},
-} ) );
 
 const BUTTONS_HTML = `<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button /--></div>
@@ -50,20 +43,21 @@ describe( 'Buttons block', () => {
 			<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" style="border-radius:5px" >Hello</a></div>
 			<!-- /wp:button --></div>
 			<!-- /wp:buttons -->`;
-			const { getByA11yLabel } = await initializeEditor( {
+			const editor = await initializeEditor( {
 				initialHtml,
 			} );
 
-			const buttonsBlock = await waitFor( () =>
-				getByA11yLabel( /Buttons Block\. Row 1/ )
+			const [ buttonsBlock ] = await editor.findAllByLabelText(
+				/Buttons Block\. Row 1/
 			);
 			fireEvent.press( buttonsBlock );
 
 			// onLayout event has to be explicitly dispatched in BlockList component,
 			// otherwise the inner blocks are not rendered.
-			const innerBlockListWrapper = await waitFor( () =>
-				within( buttonsBlock ).getByTestId( 'block-list-wrapper' )
-			);
+			const innerBlockListWrapper =
+				await within( buttonsBlock ).findByTestId(
+					'block-list-wrapper'
+				);
 			fireEvent( innerBlockListWrapper, 'layout', {
 				nativeEvent: {
 					layout: {
@@ -72,22 +66,22 @@ describe( 'Buttons block', () => {
 				},
 			} );
 
-			const buttonInnerBlock = await waitFor( () =>
-				within( buttonsBlock ).getByA11yLabel( /Button Block\. Row 1/ )
-			);
+			const [ buttonInnerBlock ] =
+				await within( buttonsBlock ).findAllByLabelText(
+					/Button Block\. Row 1/
+				);
 			fireEvent.press( buttonInnerBlock );
 
-			const settingsButton = await waitFor( () =>
-				getByA11yLabel( 'Open Settings' )
-			);
+			const settingsButton =
+				await editor.findByLabelText( 'Open Settings' );
 			fireEvent.press( settingsButton );
 
-			const radiusStepper = await waitFor( () =>
-				getByA11yLabel( /Border Radius/ )
-			);
+			const radiusStepper =
+				await editor.findByLabelText( /Border Radius/ );
 
-			const incrementButton = await waitFor( () =>
-				within( radiusStepper ).getByTestId( 'Increment' )
+			const incrementButton = await within( radiusStepper ).findByTestId(
+				'Increment',
+				{ hidden: true }
 			);
 			fireEvent( incrementButton, 'onPressIn' );
 
@@ -98,15 +92,15 @@ describe( 'Buttons block', () => {
 			const screen = await initializeEditor( {
 				initialHtml: BUTTONS_HTML,
 			} );
-			const { getByA11yLabel } = screen;
 
 			// Get block
 			const buttonsBlock = await getBlock( screen, 'Buttons' );
 
 			// Trigger inner blocks layout
-			const innerBlockListWrapper = await waitFor( () =>
-				within( buttonsBlock ).getByTestId( 'block-list-wrapper' )
-			);
+			const innerBlockListWrapper =
+				await within( buttonsBlock ).findByTestId(
+					'block-list-wrapper'
+				);
 			fireEvent( innerBlockListWrapper, 'layout', {
 				nativeEvent: {
 					layout: {
@@ -125,14 +119,15 @@ describe( 'Buttons block', () => {
 			fireEvent.press( appenderButton );
 
 			// Check for new button
-			const secondButtonBlock = await waitFor( () =>
-				within( buttonsBlock ).getByA11yLabel( /Button Block\. Row 2/ )
-			);
+			const [ secondButtonBlock ] =
+				await within( buttonsBlock ).findAllByLabelText(
+					/Button Block\. Row 2/
+				);
 			expect( secondButtonBlock ).toBeVisible();
 
 			// Add a Paragraph block using the empty placeholder at the bottom
-			const paragraphPlaceholder = await waitFor( () =>
-				getByA11yLabel( 'Add paragraph block' )
+			const paragraphPlaceholder = await screen.findByLabelText(
+				'Add paragraph block'
 			);
 			fireEvent.press( paragraphPlaceholder );
 
@@ -148,21 +143,16 @@ describe( 'Buttons block', () => {
 			const screen = await initializeEditor( {
 				initialHtml: BUTTONS_HTML,
 			} );
-			const {
-				getByA11yLabel,
-				getByTestId,
-				queryAllByA11yLabel,
-				getByText,
-			} = screen;
 
 			// Get block
 			const buttonsBlock = await getBlock( screen, 'Buttons' );
 			fireEvent.press( buttonsBlock );
 
 			// Trigger inner blocks layout
-			const innerBlockListWrapper = await waitFor( () =>
-				within( buttonsBlock ).getByTestId( 'block-list-wrapper' )
-			);
+			const innerBlockListWrapper =
+				await within( buttonsBlock ).findByTestId(
+					'block-list-wrapper'
+				);
 			fireEvent( innerBlockListWrapper, 'layout', {
 				nativeEvent: {
 					layout: {
@@ -176,9 +166,9 @@ describe( 'Buttons block', () => {
 			fireEvent.press( buttonBlock );
 
 			// Open the block inserter
-			fireEvent.press( getByA11yLabel( 'Add block' ) );
+			fireEvent.press( screen.getByLabelText( 'Add block' ) );
 
-			const blockList = getByTestId( 'InserterUI-Blocks' );
+			const blockList = screen.getByTestId( 'InserterUI-Blocks' );
 			// onScroll event used to force the FlatList to render all items
 			fireEvent.scroll( blockList, {
 				nativeEvent: {
@@ -190,21 +180,21 @@ describe( 'Buttons block', () => {
 
 			// Check the Add block here placeholder is not visible
 			const addBlockHerePlaceholders =
-				queryAllByA11yLabel( 'ADD BLOCK HERE' );
+				screen.queryAllByLabelText( 'ADD BLOCK HERE' );
 			expect( addBlockHerePlaceholders.length ).toBe( 0 );
 
 			// Add a new Button block
-			fireEvent.press( await waitFor( () => getByText( 'Button' ) ) );
+			fireEvent.press( within( blockList ).getByText( 'Button' ) );
 
 			// Get new button
 			const secondButtonBlock = await getBlock( screen, 'Button', {
 				rowIndex: 2,
 			} );
 			const secondButtonInput =
-				within( secondButtonBlock ).getByA11yLabel(
+				within( secondButtonBlock ).getByLabelText(
 					'Text input. Empty'
 				);
-			changeTextOfRichText( secondButtonInput, 'Hello!' );
+			typeInRichText( secondButtonInput, 'Hello!' );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
@@ -214,15 +204,15 @@ describe( 'Buttons block', () => {
 				const screen = await initializeEditor( {
 					initialHtml: BUTTONS_HTML,
 				} );
-				const { getByA11yLabel } = screen;
 
 				// Get block
 				const buttonsBlock = await getBlock( screen, 'Buttons' );
 
 				// Trigger inner blocks layout
-				const innerBlockListWrapper = await waitFor( () =>
-					within( buttonsBlock ).getByTestId( 'block-list-wrapper' )
-				);
+				const innerBlockListWrapper =
+					await within( buttonsBlock ).findByTestId(
+						'block-list-wrapper'
+					);
 				fireEvent( innerBlockListWrapper, 'layout', {
 					nativeEvent: {
 						layout: {
@@ -236,13 +226,13 @@ describe( 'Buttons block', () => {
 				fireEvent.press( buttonBlock );
 
 				// Open block actions menu
-				const blockActionsButton = getByA11yLabel(
+				const blockActionsButton = screen.getByLabelText(
 					/Open Block Actions Menu/
 				);
 				fireEvent.press( blockActionsButton );
 
 				// Delete block
-				const deleteButton = getByA11yLabel( /Remove block/ );
+				const deleteButton = screen.getByLabelText( /Remove block/ );
 				fireEvent.press( deleteButton );
 
 				expect( getEditorHtml() ).toMatchSnapshot();
@@ -260,26 +250,146 @@ describe( 'Buttons block', () => {
 				const initialHtml = `<!-- wp:buttons -->
 				<div class="wp-block-buttons"><!-- wp:button /--></div>
 				<!-- /wp:buttons -->`;
-				const { getByA11yLabel, getByText } = await initializeEditor( {
-					initialHtml,
-				} );
+				const screen = await initializeEditor( { initialHtml } );
 
-				const block = await waitFor( () =>
-					getByA11yLabel( /Buttons Block\. Row 1/ )
+				const [ block ] = await screen.findAllByLabelText(
+					/Buttons Block\. Row 1/
 				);
 				fireEvent.press( block );
 
 				fireEvent.press(
-					getByA11yLabel( 'Change items justification' )
+					screen.getByLabelText( 'Change items justification' )
 				);
 
 				// Select alignment option.
 				fireEvent.press(
-					await waitFor( () => getByText( justificationOption ) )
+					await screen.findByText( justificationOption )
 				);
 
 				expect( getEditorHtml() ).toMatchSnapshot();
 			} )
 		);
+	} );
+
+	describe( 'color customization', () => {
+		it( 'sets a text color', async () => {
+			// Arrange
+			const screen = await initializeEditor();
+			await addBlock( screen, 'Buttons' );
+
+			// Act
+			const buttonsBlock = getBlock( screen, 'Buttons' );
+			fireEvent.press( buttonsBlock );
+
+			// Trigger onLayout for the list
+			await triggerBlockListLayout( buttonsBlock );
+
+			const buttonBlock = await getBlock( screen, 'Button' );
+			fireEvent.press( buttonBlock );
+
+			// Open Block Settings.
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+			// Wait for Block Settings to be visible.
+			const blockSettingsModal = screen.getByTestId(
+				'block-settings-modal'
+			);
+			await waitFor( () => blockSettingsModal.props.isVisible );
+
+			// Open Text color settings
+			fireEvent.press( screen.getByLabelText( 'Text, Default' ) );
+
+			// Tap one color
+			fireEvent.press( screen.getByLabelText( 'Pale pink' ) );
+			// TODO(jest-console): Fix the warning and remove the expect below.
+			expect( console ).toHaveWarnedWith(
+				`Non-serializable values were found in the navigation state. Check:\n\nColor > params.onColorChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
+			);
+
+			// Dismiss the Block Settings modal.
+			fireEvent( blockSettingsModal, 'backdropPress' );
+
+			// Assert
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'sets a background color', async () => {
+			// Arrange
+			const screen = await initializeEditor();
+			await addBlock( screen, 'Buttons' );
+
+			// Act
+			const buttonsBlock = getBlock( screen, 'Buttons' );
+			fireEvent.press( buttonsBlock );
+
+			// Trigger onLayout for the list
+			await triggerBlockListLayout( buttonsBlock );
+
+			const buttonBlock = await getBlock( screen, 'Button' );
+			fireEvent.press( buttonBlock );
+
+			// Open Block Settings.
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+			// Wait for Block Settings to be visible.
+			const blockSettingsModal = screen.getByTestId(
+				'block-settings-modal'
+			);
+			await waitFor( () => blockSettingsModal.props.isVisible );
+
+			// Open Text color settings
+			fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
+
+			// Tap one color
+			fireEvent.press( screen.getByLabelText( 'Luminous vivid amber' ) );
+
+			// Dismiss the Block Settings modal.
+			fireEvent( blockSettingsModal, 'backdropPress' );
+
+			// Assert
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'sets a gradient background color', async () => {
+			// Arrange
+			const screen = await initializeEditor();
+			await addBlock( screen, 'Buttons' );
+
+			// Act
+			const buttonsBlock = getBlock( screen, 'Buttons' );
+			fireEvent.press( buttonsBlock );
+
+			// Trigger onLayout for the list
+			await triggerBlockListLayout( buttonsBlock );
+
+			const buttonBlock = await getBlock( screen, 'Button' );
+			fireEvent.press( buttonBlock );
+
+			// Open Block Settings.
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+			// Wait for Block Settings to be visible.
+			const blockSettingsModal = screen.getByTestId(
+				'block-settings-modal'
+			);
+			await waitFor( () => blockSettingsModal.props.isVisible );
+
+			// Open Text color settings
+			fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
+
+			// Tap on the gradient segment
+			fireEvent.press( screen.getByLabelText( 'Gradient' ) );
+
+			// Tap one gradient color
+			fireEvent.press(
+				screen.getByLabelText( 'Light green cyan to vivid green cyan' )
+			);
+
+			// Dismiss the Block Settings modal.
+			fireEvent( blockSettingsModal, 'backdropPress' );
+
+			// Assert
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
 	} );
 } );

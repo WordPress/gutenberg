@@ -3,8 +3,8 @@
  */
 import { getActiveFormats } from './get-active-formats';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
-/** @typedef {import('./create').RichTextFormat} RichTextFormat */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextFormat} RichTextFormat */
 
 /**
  * Gets the format object by type at the start of the selection. This can be
@@ -19,7 +19,7 @@ import { getActiveFormats } from './get-active-formats';
  *                                    type, or undefined.
  */
 export function getActiveFormat( value, formatType ) {
-	return getActiveFormats( value )?.find(
+	return getActiveFormats( value ).find(
 		( { type } ) => type === formatType
 	);
 }

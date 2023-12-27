@@ -123,6 +123,10 @@ public class Gutenberg: UIResponder {
         sendEvent(.featuredImageIdNativeUpdated, body: ["featuredImageId": mediaId])
     }
 
+    public func postHasBeenJustSaved() {
+        sendEvent(.postHasBeenJustSaved)
+    }
+
     public func replace(block: Block) {
         sendEvent(.replaceBlock, body: ["html": block.content, "clientId": block.id])
     }
@@ -140,8 +144,8 @@ public class Gutenberg: UIResponder {
         bridgeModule.sendEvent(withName: event.rawValue, body: body)
     }
 
-    public func mediaUploadUpdate(id: Int32, state: MediaUploadState, progress: Float, url: URL?, serverID: Int32?) {
-        mediaUpdate(event: .mediaUpload, id: id, state: state, progress: progress, url: url, serverID: serverID)
+    public func mediaUploadUpdate(id: Int32, state: MediaUploadState, progress: Float, url: URL?, serverID: Int32?, metadata: [String: Any] = [:]) {
+        mediaUpdate(event: .mediaUpload, id: id, state: state, progress: progress, url: url, serverID: serverID, metadata: metadata)
     }
 
     public func updateMediaSaveStatus(id: Int32, state: MediaSaveState, progress: Float, url: URL?, serverID: Int32?) {
@@ -165,8 +169,8 @@ public class Gutenberg: UIResponder {
         ])
     }
 
-    private func mediaUpdate<State: MediaState>(event: RNReactNativeGutenbergBridge.EventName, id: Int32, state: State, progress: Float, url: URL?, serverID: Int32?)  {
-        var data: [String: Any] = ["mediaId": id, "state": state.rawValue, "progress": progress];
+    private func mediaUpdate<State: MediaState>(event: RNReactNativeGutenbergBridge.EventName, id: Int32, state: State, progress: Float, url: URL?, serverID: Int32?, metadata: [String: Any] = [:])  {
+        var data: [String: Any] = ["mediaId": id, "state": state.rawValue, "progress": progress, "metadata": metadata ];
         if let url = url {
             data["mediaUrl"] = url.absoluteString
         }
@@ -196,6 +200,19 @@ public class Gutenberg: UIResponder {
 
     public func showEditorHelp() {
         bridgeModule.sendEventIfNeeded(.showEditorHelp, body: nil)
+    }
+    
+    public func onUndoPressed() {
+        bridgeModule.sendEventIfNeeded(.onUndoPressed, body: nil)
+    }
+    
+    public func onRedoPressed() {
+        bridgeModule.sendEventIfNeeded(.onRedoPressed, body: nil)
+    }
+
+    public func connectionStatusChange(isConnected: Bool) {
+        var data: [String: Any] = ["isConnected": isConnected]
+        bridgeModule.sendEventIfNeeded(.connectionStatusChange, body: data)
     }
 
     private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {
@@ -250,13 +267,17 @@ extension Gutenberg: RCTBridgeDelegate {
         }
         let monitorQueue = DispatchQueue(label: "org.wordpress.network-path-monitor")
         monitor.start(queue: monitorQueue)
-        semaphore.wait(timeout: .distantFuture)
+        _ = semaphore.wait(timeout: .distantFuture)
         monitor.cancel()
         if isOnCellularNetwork {
             return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
         }
         #endif
-        return RCTBundleURLProvider.sharedSettings()?.jsBundleURL(forBundleRoot: "index", fallbackResource: "")
+        
+        guard let localBundle = RCTBundleURLProvider.sharedSettings()?.jsBundleURL(forBundleRoot: "index", fallbackExtension: "") else {
+            return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+        }
+        return localBundle
     }
 
     public func extraModules(for bridge: RCTBridge!) -> [RCTBridgeModule]! {

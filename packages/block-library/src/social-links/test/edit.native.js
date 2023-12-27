@@ -3,12 +3,14 @@
  */
 import {
 	addBlock,
+	dismissModal,
 	fireEvent,
 	getEditorHtml,
 	initializeEditor,
 	within,
 	getBlock,
 	waitFor,
+	waitForModalVisible,
 } from 'test/helpers';
 
 /**
@@ -88,7 +90,7 @@ describe( 'Social links block', () => {
 
 		// Check there's only one active social link
 		const socialLinks =
-			within( socialLinksBlock ).getAllByA11yLabel( / social icon/ );
+			within( socialLinksBlock ).getAllByLabelText( / social icon/ );
 		expect( socialLinks.length ).toBe( 1 );
 
 		// Check the WordPress link is shown when unselected
@@ -104,7 +106,6 @@ describe( 'Social links block', () => {
 
 	it( 'shows the social links bottom sheet when tapping on the inline appender', async () => {
 		const screen = await initializeEditor();
-		const { getByTestId, getByText } = screen;
 
 		// Add block
 		await addBlock( screen, 'Social Icons' );
@@ -131,7 +132,7 @@ describe( 'Social links block', () => {
 		fireEvent.press( appenderButton );
 
 		// Find a social link in the inserter
-		const blockList = getByTestId( 'InserterUI-Blocks' );
+		const blockList = screen.getByTestId( 'InserterUI-Blocks' );
 
 		// onScroll event used to force the FlatList to render all items
 		fireEvent.scroll( blockList, {
@@ -143,17 +144,19 @@ describe( 'Social links block', () => {
 		} );
 
 		// Add the Amazon link
-		const amazonBlock = await waitFor( () => getByText( 'Amazon' ) );
+		const amazonBlock = await screen.findByText( 'Amazon' );
 		expect( amazonBlock ).toBeVisible();
 
 		fireEvent.press( amazonBlock );
+
+		await screen.findByTestId( 'navigation-screen-LinkSettingsScreen' );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
 	it( 'shows the ghost placeholder when no icon is active', async () => {
 		const screen = await initializeEditor();
-		const { getByA11yLabel } = screen;
+		const { getByLabelText } = screen;
 
 		// Add block
 		await addBlock( screen, 'Social Icons' );
@@ -178,11 +181,11 @@ describe( 'Social links block', () => {
 		fireEvent.press( firstLinkBlock );
 
 		// Open block actions menu
-		const blockActionsButton = getByA11yLabel( /Open Block Actions Menu/ );
+		const blockActionsButton = getByLabelText( /Open Block Actions Menu/ );
 		fireEvent.press( blockActionsButton );
 
 		// Delete the social link
-		const deleteButton = getByA11yLabel( /Remove block/ );
+		const deleteButton = getByLabelText( /Remove block/ );
 		fireEvent.press( deleteButton );
 
 		// Add Paragraph block
@@ -195,5 +198,33 @@ describe( 'Social links block', () => {
 		expect( socialLinks.length ).toBe( 3 );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( "should set a icon's URL", async () => {
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Social Icons' );
+		fireEvent.press( screen.getByLabelText( 'Facebook social icon' ) );
+		fireEvent.press( screen.getByLabelText( 'Add link to Facebook' ) );
+
+		await waitForModalVisible(
+			screen.getByTestId( 'link-settings-navigation' )
+		);
+		fireEvent.changeText(
+			screen.getByPlaceholderText( 'Add URL' ),
+			'https://facebook.com'
+		);
+		dismissModal( screen.getByTestId( 'link-settings-navigation' ) );
+
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:social-links -->
+		<ul class="wp-block-social-links"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /-->
+
+		<!-- wp:social-link {"url":"https://facebook.com","service":"facebook","label":"","rel":""} /-->
+
+		<!-- wp:social-link {"service":"twitter"} /-->
+
+		<!-- wp:social-link {"service":"instagram"} /--></ul>
+		<!-- /wp:social-links -->"
+	` );
 	} );
 } );

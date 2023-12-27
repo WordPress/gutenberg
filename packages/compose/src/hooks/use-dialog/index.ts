@@ -17,7 +17,6 @@ import useFocusOnMount from '../use-focus-on-mount';
 import useFocusReturn from '../use-focus-return';
 import useFocusOutside from '../use-focus-outside';
 import useMergeRefs from '../use-merge-refs';
-import type { FocusOutsideReturnValue } from '../use-focus-outside';
 
 type DialogOptions = {
 	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
@@ -35,7 +34,7 @@ type DialogOptions = {
 
 type useDialogReturn = [
 	RefCallback< HTMLElement >,
-	FocusOutsideReturnValue & Pick< HTMLElement, 'tabIndex' >
+	ReturnType< typeof useFocusOutside > & Pick< HTMLElement, 'tabIndex' >,
 ];
 
 /**
@@ -45,7 +44,7 @@ type useDialogReturn = [
  *  - return focus on unmount.
  *  - focus outside.
  *
- * @param  options Dialog Options.
+ * @param options Dialog Options.
  */
 function useDialog( options: DialogOptions ): useDialogReturn {
 	const currentOptions = useRef< DialogOptions | undefined >();

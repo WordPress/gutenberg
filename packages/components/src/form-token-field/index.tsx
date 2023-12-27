@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
+import type { KeyboardEvent, MouseEvent, TouchEvent, FocusEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -22,7 +22,12 @@ import { TokensAndInputWrapperFlex } from './styles';
 import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
 import { FlexItem } from '../flex';
-import { StyledLabel } from '../base-control/styles/base-control-styles';
+import {
+	StyledHelp,
+	StyledLabel,
+} from '../base-control/styles/base-control-styles';
+import { Spacer } from '../spacer';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 const identity = ( value: string ) => value;
 
@@ -65,9 +70,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalExpandOnFocus = false,
 		__experimentalValidateInput = () => true,
 		__experimentalShowHowTo = true,
-		__next36pxDefaultSize = false,
+		__next40pxDefaultSize = false,
 		__experimentalAutoSelectFirstMatch = false,
-	} = props;
+		__nextHasNoMarginBottom = false,
+		tokenizeOnBlur = false,
+	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >(
+		props,
+		'wp.components.FormTokenField'
+	);
 
 	const instanceId = useInstanceId( FormTokenField );
 
@@ -152,15 +162,33 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 	}
 
-	function onBlur() {
-		if ( inputHasValidValue() ) {
+	function onBlur( event: FocusEvent ) {
+		if (
+			inputHasValidValue() &&
+			__experimentalValidateInput( incompleteTokenValue )
+		) {
 			setIsActive( false );
+			if ( tokenizeOnBlur && inputHasValidValue() ) {
+				addNewToken( incompleteTokenValue );
+			}
 		} else {
 			// Reset to initial state
 			setIncompleteTokenValue( '' );
 			setInputOffsetFromEnd( 0 );
 			setIsActive( false );
-			setIsExpanded( false );
+
+			if ( __experimentalExpandOnFocus ) {
+				// If `__experimentalExpandOnFocus` is true, don't close the suggestions list when
+				// the user clicks on it (`tokensAndInput` will be the element that caused the blur).
+				const hasFocusWithin =
+					event.relatedTarget === tokensAndInput.current;
+				setIsExpanded( hasFocusWithin );
+			} else {
+				// Else collapse the suggestion list. This will result in the suggestion list closing
+				// after a suggestion has been submitted since that causes a blur.
+				setIsExpanded( false );
+			}
+
 			setSelectedSuggestionIndex( -1 );
 			setSelectedSuggestionScroll( false );
 		}
@@ -169,10 +197,18 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	function onKeyDown( event: KeyboardEvent ) {
 		let preventDefault = false;
 
-		if ( event.defaultPrevented ) {
+		if (
+			event.defaultPrevented ||
+			// Ignore keydowns from IMEs
+			event.nativeEvent.isComposing ||
+			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
+			// is `isComposing=false`, even though it's technically still part of the composition.
+			// These can only be detected by keyCode.
+			event.keyCode === 229
+		) {
 			return;
 		}
-		switch ( event.code ) {
+		switch ( event.key ) {
 			case 'Backspace':
 				preventDefault = handleDeleteKey( deleteTokenBeforeInput );
 				break;
@@ -213,9 +249,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 
 	function onKeyPress( event: KeyboardEvent ) {
 		let preventDefault = false;
-		// TODO: replace to event.code;
-		switch ( event.charCode ) {
-			case 44: // Comma.
+
+		switch ( event.key ) {
+			case ',':
 				preventDefault = handleCommaKey();
 				break;
 			default:
@@ -431,7 +467,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		setSelectedSuggestionScroll( false );
 		setIsExpanded( ! __experimentalExpandOnFocus );
 
-		if ( isActive ) {
+		if ( isActive && ! tokenizeOnBlur ) {
 			focus();
 		}
 	}
@@ -686,7 +722,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					align="center"
 					gap={ 1 }
 					wrap={ true }
-					__next36pxDefaultSize={ __next36pxDefaultSize }
+					__next40pxDefaultSize={ __next40pxDefaultSize }
 					hasTokens={ !! value.length }
 				>
 					{ renderTokensAndInput() }
@@ -705,17 +741,19 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					/>
 				) }
 			</div>
+			{ ! __nextHasNoMarginBottom && <Spacer marginBottom={ 2 } /> }
 			{ __experimentalShowHowTo && (
-				<p
+				<StyledHelp
 					id={ `components-form-token-suggestions-howto-${ instanceId }` }
 					className="components-form-token-field__help"
+					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 				>
 					{ tokenizeOnSpace
 						? __(
 								'Separate with commas, spaces, or the Enter key.'
 						  )
 						: __( 'Separate with commas or the Enter key.' ) }
-				</p>
+				</StyledHelp>
 			) }
 		</div>
 	);

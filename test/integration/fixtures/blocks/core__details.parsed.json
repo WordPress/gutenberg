@@ -1,0 +1,25 @@
+[
+	{
+		"blockName": "core/details",
+		"attrs": {
+			"summary": "Details Summary"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {
+					"placeholder": "Type / to add a hidden block"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<p>Details Content</p>\n\t",
+				"innerContent": [ "\n\t<p>Details Content</p>\n\t" ]
+			}
+		],
+		"innerHTML": "\n<details class=\"wp-block-details\"><summary>Details Summary</summary>\n\t\n</details>\n",
+		"innerContent": [
+			"\n<details class=\"wp-block-details\"><summary>Details Summary</summary>\n\t",
+			null,
+			"\n</details>\n"
+		]
+	}
+]

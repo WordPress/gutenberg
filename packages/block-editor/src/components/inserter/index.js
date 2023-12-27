@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { forwardRef, Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
@@ -31,20 +31,25 @@ const defaultRenderToggle = ( {
 	toggleProps = {},
 	prioritizePatterns,
 } ) => {
-	let label;
-	if ( hasSingleBlockType ) {
+	const {
+		as: Wrapper = Button,
+		label: labelProp,
+		onClick,
+		...rest
+	} = toggleProps;
+
+	let label = labelProp;
+	if ( ! label && hasSingleBlockType ) {
 		label = sprintf(
 			// translators: %s: the name of the block when there is only one
 			_x( 'Add %s', 'directly add the only allowed block' ),
 			blockTitle
 		);
-	} else if ( prioritizePatterns ) {
+	} else if ( ! label && prioritizePatterns ) {
 		label = __( 'Add pattern' );
-	} else {
+	} else if ( ! label ) {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
-
-	const { onClick, ...rest } = toggleProps;
 
 	// Handle both onClick functions from the toggle and the parent component.
 	function handleClick( event ) {
@@ -57,7 +62,7 @@ const defaultRenderToggle = ( {
 	}
 
 	return (
-		<Button
+		<Wrapper
 			icon={ plus }
 			label={ label }
 			tooltipPosition="bottom"
@@ -71,7 +76,7 @@ const defaultRenderToggle = ( {
 	);
 };
 
-class Inserter extends Component {
+class PrivateInserter extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -97,7 +102,7 @@ class Inserter extends Component {
 	 *                                    pressed.
 	 * @param {boolean}  options.isOpen   Whether dropdown is currently open.
 	 *
-	 * @return {WPElement} Dropdown toggle element.
+	 * @return {Element} Dropdown toggle element.
 	 */
 	renderToggle( { onToggle, isOpen } ) {
 		const {
@@ -130,7 +135,7 @@ class Inserter extends Component {
 	 * @param {Function} options.onClose Callback to invoke when dropdown is
 	 *                                   closed.
 	 *
-	 * @return {WPElement} Dropdown content element.
+	 * @return {Element} Dropdown content element.
 	 */
 	renderContent( { onClose } ) {
 		const {
@@ -143,18 +148,31 @@ class Inserter extends Component {
 			// Feel free to make them stable after a few releases.
 			__experimentalIsQuick: isQuick,
 			prioritizePatterns,
+			onSelectOrClose,
+			selectBlockOnInsert,
 		} = this.props;
 
 		if ( isQuick ) {
 			return (
 				<QuickInserter
-					onSelect={ () => {
+					onSelect={ ( blocks ) => {
+						const firstBlock =
+							Array.isArray( blocks ) && blocks?.length
+								? blocks[ 0 ]
+								: blocks;
+						if (
+							onSelectOrClose &&
+							typeof onSelectOrClose === 'function'
+						) {
+							onSelectOrClose( firstBlock );
+						}
 						onClose();
 					} }
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
 					prioritizePatterns={ prioritizePatterns }
+					selectBlockOnInsert={ selectBlockOnInsert }
 				/>
 			);
 		}
@@ -194,7 +212,7 @@ class Inserter extends Component {
 					'block-editor-inserter__popover',
 					{ 'is-quick': isQuick }
 				) }
-				position={ position }
+				popoverProps={ { position, shift: true } }
 				onToggle={ this.onToggle }
 				expandOnMobile
 				headerTitle={ __( 'Add a block' ) }
@@ -206,49 +224,52 @@ class Inserter extends Component {
 	}
 }
 
-export default compose( [
-	withSelect( ( select, { clientId, rootClientId } ) => {
-		const {
-			getBlockRootClientId,
-			hasInserterItems,
-			__experimentalGetAllowedBlocks,
-			__experimentalGetDirectInsertBlock,
-			getSettings,
-		} = select( blockEditorStore );
+export const ComposedPrivateInserter = compose( [
+	withSelect(
+		( select, { clientId, rootClientId, shouldDirectInsert = true } ) => {
+			const {
+				getBlockRootClientId,
+				hasInserterItems,
+				getAllowedBlocks,
+				getDirectInsertBlock,
+				getSettings,
+			} = select( blockEditorStore );
 
-		const { getBlockVariations } = select( blocksStore );
+			const { getBlockVariations } = select( blocksStore );
 
-		rootClientId =
-			rootClientId || getBlockRootClientId( clientId ) || undefined;
+			rootClientId =
+				rootClientId || getBlockRootClientId( clientId ) || undefined;
 
-		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
+			const allowedBlocks = getAllowedBlocks( rootClientId );
 
-		const directInsertBlock =
-			__experimentalGetDirectInsertBlock( rootClientId );
+			const directInsertBlock =
+				shouldDirectInsert && getDirectInsertBlock( rootClientId );
 
-		const settings = getSettings();
+			const settings = getSettings();
 
-		const hasSingleBlockType =
-			allowedBlocks?.length === 1 &&
-			getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
-				?.length === 0;
+			const hasSingleBlockType =
+				allowedBlocks?.length === 1 &&
+				getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
+					?.length === 0;
 
-		let allowedBlockType = false;
-		if ( hasSingleBlockType ) {
-			allowedBlockType = allowedBlocks[ 0 ];
+			let allowedBlockType = false;
+			if ( hasSingleBlockType ) {
+				allowedBlockType = allowedBlocks[ 0 ];
+			}
+
+			return {
+				hasItems: hasInserterItems( rootClientId ),
+				hasSingleBlockType,
+				blockTitle: allowedBlockType ? allowedBlockType.title : '',
+				allowedBlockType,
+				directInsertBlock,
+				rootClientId,
+				prioritizePatterns:
+					settings.__experimentalPreferPatternsOnRoot &&
+					! rootClientId,
+			};
 		}
-
-		return {
-			hasItems: hasInserterItems( rootClientId ),
-			hasSingleBlockType,
-			blockTitle: allowedBlockType ? allowedBlockType.title : '',
-			allowedBlockType,
-			directInsertBlock,
-			rootClientId,
-			prioritizePatterns:
-				settings.__experimentalPreferPatternsOnRoot && ! rootClientId,
-		};
-	} ),
+	),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		return {
 			insertOnlyAllowedBlock() {
@@ -260,6 +281,7 @@ export default compose( [
 					allowedBlockType,
 					directInsertBlock,
 					onSelectOrClose,
+					selectBlockOnInsert,
 				} = ownProps;
 
 				if ( ! hasSingleBlockType && ! directInsertBlock ) {
@@ -370,10 +392,17 @@ export default compose( [
 					blockToInsert = createBlock( allowedBlockType.name );
 				}
 
-				insertBlock( blockToInsert, getInsertionIndex(), rootClientId );
+				insertBlock(
+					blockToInsert,
+					getInsertionIndex(),
+					rootClientId,
+					selectBlockOnInsert
+				);
 
 				if ( onSelectOrClose ) {
-					onSelectOrClose();
+					onSelectOrClose( {
+						clientId: blockToInsert?.clientId,
+					} );
 				}
 
 				const message = sprintf(
@@ -391,4 +420,10 @@ export default compose( [
 		( { hasItems, isAppender, rootClientId, clientId } ) =>
 			hasItems || ( ! isAppender && ! rootClientId && ! clientId )
 	),
-] )( Inserter );
+] )( PrivateInserter );
+
+const Inserter = forwardRef( ( props, ref ) => {
+	return <ComposedPrivateInserter ref={ ref } { ...props } />;
+} );
+
+export default Inserter;

@@ -105,7 +105,9 @@ export function useTypewriter() {
 					return;
 				}
 
-				const windowScroll = scrollContainer === ownerDocument.body;
+				const windowScroll =
+					scrollContainer === ownerDocument.body ||
+					scrollContainer === ownerDocument.documentElement;
 				const scrollY = windowScroll
 					? defaultView.scrollY
 					: scrollContainer.scrollTop;
@@ -271,7 +273,7 @@ function Typewriter( { children } ) {
  * challenges in Internet Explorer, and is simply skipped, rendering the given
  * props children instead.
  *
- * @type {WPComponent}
+ * @type {Component}
  */
 const TypewriterOrIEBypass = isIE ? ( props ) => props.children : Typewriter;
 

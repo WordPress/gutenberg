@@ -2,17 +2,29 @@
  * External dependencies
  */
 import {
+	fireEvent,
 	getEditorHtml,
 	initializeEditor,
-	fireEvent,
+	render,
 	waitFor,
 } from 'test/helpers';
 
 /**
  * WordPress dependencies
  */
-import { setDefaultBlockName, unregisterBlockType } from '@wordpress/blocks';
+import {
+	registerBlockType,
+	setDefaultBlockName,
+	unregisterBlockType,
+} from '@wordpress/blocks';
 import { coreBlocks } from '@wordpress/block-library';
+import { BlockControls, BlockEdit } from '@wordpress/block-editor';
+import { SlotFillProvider } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { textColor } from '..';
 
 const COLOR_PINK = '#f78da7';
 const paragraph = coreBlocks[ 'core/paragraph' ];
@@ -32,90 +44,84 @@ afterAll( () => {
 
 describe( 'Text color', () => {
 	it( 'shows the text color formatting button in the toolbar', async () => {
-		const { getByA11yLabel } = await initializeEditor();
+		const screen = await initializeEditor();
 
 		// Wait for the editor placeholder
-		const paragraphPlaceholder = await waitFor( () =>
-			getByA11yLabel( 'Add paragraph block' )
+		const paragraphPlaceholder = await screen.findByLabelText(
+			'Add paragraph block'
 		);
 		expect( paragraphPlaceholder ).toBeDefined();
 		fireEvent.press( paragraphPlaceholder );
 
 		// Wait for the block to be created
-		const paragraphBlock = await waitFor( () =>
-			getByA11yLabel( /Paragraph Block\. Row 1/ )
+		const [ paragraphBlock ] = await screen.findAllByLabelText(
+			/Paragraph Block\. Row 1/
 		);
 		expect( paragraphBlock ).toBeDefined();
 
 		// Look for the highlight text color button
-		const textColorButton = await waitFor( () =>
-			getByA11yLabel( 'Text color' )
-		);
+		const textColorButton = await screen.findByLabelText( 'Text color' );
 		expect( textColorButton ).toBeDefined();
 	} );
 
 	it( 'allows toggling the highlight color feature to type new text', async () => {
-		const { getByA11yLabel, getByTestId, getByA11yHint } =
-			await initializeEditor();
+		const screen = await initializeEditor();
 
 		// Wait for the editor placeholder
-		const paragraphPlaceholder = await waitFor( () =>
-			getByA11yLabel( 'Add paragraph block' )
+		const paragraphPlaceholder = await screen.findByLabelText(
+			'Add paragraph block'
 		);
 		expect( paragraphPlaceholder ).toBeDefined();
 		fireEvent.press( paragraphPlaceholder );
 
 		// Wait for the block to be created
-		const paragraphBlock = await waitFor( () =>
-			getByA11yLabel( /Paragraph Block\. Row 1/ )
+		const [ paragraphBlock ] = await screen.findAllByLabelText(
+			/Paragraph Block\. Row 1/
 		);
 		expect( paragraphBlock ).toBeDefined();
 
 		// Look for the highlight text color button
-		const textColorButton = await waitFor( () =>
-			getByA11yLabel( 'Text color' )
-		);
+		const textColorButton = await screen.findByLabelText( 'Text color' );
 		expect( textColorButton ).toBeDefined();
 		fireEvent.press( textColorButton );
 
 		// Wait for Inline color modal to be visible
-		const inlineTextColorModal = getByTestId( 'inline-text-color-modal' );
+		const inlineTextColorModal = screen.getByTestId(
+			'inline-text-color-modal'
+		);
 		await waitFor( () => inlineTextColorModal.props.isVisible );
 
 		// Look for the pink color button
-		const pinkColorButton = await waitFor( () =>
-			getByA11yHint( COLOR_PINK )
-		);
+		const pinkColorButton = await screen.findByA11yHint( COLOR_PINK );
 		expect( pinkColorButton ).toBeDefined();
 		fireEvent.press( pinkColorButton );
+		// TODO(jest-console): Fix the warning and remove the expect below.
+		expect( console ).toHaveWarnedWith(
+			`Non-serializable values were found in the navigation state. Check:\n\ntext-color > Palette > params.onColorChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
+		);
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
 	it( 'allows toggling the highlight color feature to selected text', async () => {
-		const {
-			getByA11yLabel,
-			getByTestId,
-			getByPlaceholderText,
-			getByA11yHint,
-		} = await initializeEditor();
+		const screen = await initializeEditor();
 		const text = 'Hello this is a test';
 
 		// Wait for the editor placeholder
-		const paragraphPlaceholder = await waitFor( () =>
-			getByA11yLabel( 'Add paragraph block' )
+		const paragraphPlaceholder = await screen.findByLabelText(
+			'Add paragraph block'
 		);
 		expect( paragraphPlaceholder ).toBeDefined();
 		fireEvent.press( paragraphPlaceholder );
 
 		// Wait for the block to be created
-		const paragraphBlock = await waitFor( () =>
-			getByA11yLabel( /Paragraph Block\. Row 1/ )
+		const [ paragraphBlock ] = await screen.findAllByLabelText(
+			/Paragraph Block\. Row 1/
 		);
 		expect( paragraphBlock ).toBeDefined();
 
 		// Update TextInput value
-		const paragraphText = getByPlaceholderText( 'Start writing…' );
+		const paragraphText = screen.getByPlaceholderText( 'Start writing…' );
 		fireEvent( paragraphText, 'onSelectionChange', 0, text.length, text, {
 			nativeEvent: {
 				eventCount: 1,
@@ -125,20 +131,18 @@ describe( 'Text color', () => {
 		} );
 
 		// Look for the highlight text color button
-		const textColorButton = await waitFor( () =>
-			getByA11yLabel( 'Text color' )
-		);
+		const textColorButton = await screen.findByLabelText( 'Text color' );
 		expect( textColorButton ).toBeDefined();
 		fireEvent.press( textColorButton );
 
 		// Wait for Inline color modal to be visible
-		const inlineTextColorModal = getByTestId( 'inline-text-color-modal' );
+		const inlineTextColorModal = screen.getByTestId(
+			'inline-text-color-modal'
+		);
 		await waitFor( () => inlineTextColorModal.props.isVisible );
 
 		// Look for the pink color button
-		const pinkColorButton = await waitFor( () =>
-			getByA11yHint( COLOR_PINK )
-		);
+		const pinkColorButton = await screen.findByA11yHint( COLOR_PINK );
 		expect( pinkColorButton ).toBeDefined();
 		fireEvent.press( pinkColorButton );
 
@@ -146,13 +150,13 @@ describe( 'Text color', () => {
 	} );
 
 	it( 'creates a paragraph block with the text color format', async () => {
-		const { getByA11yLabel } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml: TEXT_WITH_COLOR,
 		} );
 
 		// Wait for the block to be created
-		const paragraphBlock = await waitFor( () =>
-			getByA11yLabel( /Paragraph Block\. Row 1/ )
+		const [ paragraphBlock ] = await screen.findAllByLabelText(
+			/Paragraph Block\. Row 1/
 		);
 		expect( paragraphBlock ).toBeDefined();
 
@@ -171,5 +175,53 @@ describe( 'Text color', () => {
 		} );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'renders when "contentRef" is undefined', () => {
+		registerBlockType( 'core/test-block', {
+			save: () => {},
+			category: 'text',
+			title: 'block title',
+			edit: ( { children } ) => <>{ children }</>,
+		} );
+		const TextColorEdit = textColor.edit;
+		// Empty text with black color set as the text color
+		const textValue = {
+			formats: [],
+			replacements: [],
+			text: '',
+			start: 0,
+			end: 0,
+			activeFormats: [
+				{
+					type: 'core/text-color',
+					attributes: {
+						style: 'background-color:rgba(0, 0, 0, 0);color:#111111',
+						class: 'has-contrast-color',
+					},
+				},
+			],
+		};
+
+		const { getByLabelText } = render(
+			<SlotFillProvider>
+				<BlockEdit name="core/test-block" isSelected mayDisplayControls>
+					<TextColorEdit
+						isActive={ true }
+						activeAttributes={ {} }
+						value={ textValue }
+						onChange={ jest.fn() }
+						// This ref is usually defined by the `RichText` component.
+						// However, there are rare cases (probably related to slow performance
+						// in low-end devices) where it's undefined upon mounting.
+						contentRef={ undefined }
+					/>
+				</BlockEdit>
+				<BlockControls.Slot />
+			</SlotFillProvider>
+		);
+
+		const textColorButton = getByLabelText( 'Text color' );
+		expect( textColorButton ).toBeDefined();
 	} );
 } );

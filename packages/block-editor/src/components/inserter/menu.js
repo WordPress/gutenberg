@@ -14,20 +14,21 @@ import {
 	useImperativeHandle,
 	useRef,
 } from '@wordpress/element';
-import { VisuallyHidden, SearchControl } from '@wordpress/components';
+import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { useDebouncedInput } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
-import BlockPatternsTabs, {
-	BlockPatternsCategoryDialog,
-} from './block-patterns-tab';
-import ReusableBlocksTab from './reusable-blocks-tab';
+import BlockPatternsTab from './block-patterns-tab';
+import { PatternCategoryPreviewPanel } from './block-patterns-tab/pattern-category-preview-panel';
+import { MediaTab, MediaCategoryDialog, useMediaCategories } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
@@ -48,11 +49,13 @@ function InserterMenu(
 	},
 	ref
 ) {
-	const [ filterValue, setFilterValue ] = useState(
-		__experimentalFilterValue
-	);
+	const [ filterValue, setFilterValue, delayedFilterValue ] =
+		useDebouncedInput( __experimentalFilterValue );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
 	const [ selectedPatternCategory, setSelectedPatternCategory ] =
+		useState( null );
+	const [ patternFilter, setPatternFilter ] = useState( 'all' );
+	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
 	const [ selectedTab, setSelectedTab ] = useState( null );
 
@@ -64,21 +67,18 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
-	const { showPatterns, hasReusableBlocks } = useSelect(
+	const { showPatterns } = useSelect(
 		( select ) => {
-			const { __experimentalGetAllowedPatterns, getSettings } =
-				select( blockEditorStore );
-
+			const { hasAllowedPatterns } = unlock( select( blockEditorStore ) );
 			return {
-				showPatterns: !! __experimentalGetAllowedPatterns(
-					destinationRootClientId
-				).length,
-				hasReusableBlocks:
-					!! getSettings().__experimentalReusableBlocks?.length,
+				showPatterns: hasAllowedPatterns( destinationRootClientId ),
 			};
 		},
 		[ destinationRootClientId ]
 	);
+
+	const mediaCategories = useMediaCategories( destinationRootClientId );
+	const showMedia = mediaCategories.length > 0;
 
 	const onInsert = useCallback(
 		( blocks, meta, shouldForceFocusBlock ) => {
@@ -104,9 +104,17 @@ function InserterMenu(
 		[ onToggleInsertionPoint, setHoveredItem ]
 	);
 
+	const onHoverPattern = useCallback(
+		( item ) => {
+			onToggleInsertionPoint( !! item );
+		},
+		[ onToggleInsertionPoint ]
+	);
+
 	const onClickPatternCategory = useCallback(
-		( patternCategory ) => {
+		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
+			setPatternFilter( filter );
 		},
 		[ setSelectedPatternCategory ]
 	);
@@ -136,7 +144,6 @@ function InserterMenu(
 			destinationRootClientId,
 			onInsert,
 			onHover,
-			filterValue,
 			showMostUsedBlocks,
 			showInserterHelpPanel,
 		]
@@ -144,7 +151,7 @@ function InserterMenu(
 
 	const patternsTab = useMemo(
 		() => (
-			<BlockPatternsTabs
+			<BlockPatternsTab
 				rootClientId={ destinationRootClientId }
 				onInsert={ onInsertPattern }
 				onSelectCategory={ onClickPatternCategory }
@@ -159,27 +166,30 @@ function InserterMenu(
 		]
 	);
 
-	const reusableBlocksTab = useMemo(
+	const mediaTab = useMemo(
 		() => (
-			<ReusableBlocksTab
+			<MediaTab
 				rootClientId={ destinationRootClientId }
+				selectedCategory={ selectedMediaCategory }
+				onSelectCategory={ setSelectedMediaCategory }
 				onInsert={ onInsert }
-				onHover={ onHover }
 			/>
 		),
-		[ destinationRootClientId, onInsert, onHover ]
+		[
+			destinationRootClientId,
+			onInsert,
+			selectedMediaCategory,
+			setSelectedMediaCategory,
+		]
 	);
 
-	const getCurrentTab = useCallback(
-		( tab ) => {
-			if ( tab.name === 'blocks' ) {
-				return blocksTab;
-			} else if ( tab.name === 'patterns' ) {
-				return patternsTab;
-			}
-			return reusableBlocksTab;
-		},
-		[ blocksTab, patternsTab, reusableBlocksTab ]
+	const inserterTabsContents = useMemo(
+		() => ( {
+			blocks: blocksTab,
+			patterns: patternsTab,
+			media: mediaTab,
+		} ),
+		[ blocksTab, mediaTab, patternsTab ]
 	);
 
 	const searchRef = useRef();
@@ -190,8 +200,22 @@ function InserterMenu(
 	} ) );
 
 	const showPatternPanel =
-		selectedTab === 'patterns' && ! filterValue && selectedPatternCategory;
-	const showAsTabs = ! filterValue && ( showPatterns || hasReusableBlocks );
+		selectedTab === 'patterns' &&
+		! delayedFilterValue &&
+		selectedPatternCategory;
+	const showAsTabs = ! delayedFilterValue && ( showPatterns || showMedia );
+	const showMediaPanel =
+		selectedTab === 'media' &&
+		! delayedFilterValue &&
+		selectedMediaCategory;
+
+	const handleSetSelectedTab = ( value ) => {
+		// If no longer on patterns tab remove the category setting.
+		if ( value !== 'patterns' ) {
+			setSelectedPatternCategory( null );
+		}
+		setSelectedTab( value );
+	};
 
 	return (
 		<div className="block-editor-inserter__menu">
@@ -201,6 +225,7 @@ function InserterMenu(
 				} ) }
 			>
 				<SearchControl
+					__nextHasNoMarginBottom
 					className="block-editor-inserter__search"
 					onChange={ ( value ) => {
 						if ( hoveredItem ) setHoveredItem( null );
@@ -211,12 +236,13 @@ function InserterMenu(
 					placeholder={ __( 'Search' ) }
 					ref={ searchRef }
 				/>
-				{ !! filterValue && (
+				{ !! delayedFilterValue && (
 					<div className="block-editor-inserter__no-tab-container">
 						<InserterSearchResults
-							filterValue={ filterValue }
+							filterValue={ delayedFilterValue }
 							onSelect={ onSelect }
 							onHover={ onHover }
+							onHoverPattern={ onHoverPattern }
 							rootClientId={ rootClientId }
 							clientId={ clientId }
 							isAppender={ isAppender }
@@ -231,27 +257,44 @@ function InserterMenu(
 				{ showAsTabs && (
 					<InserterTabs
 						showPatterns={ showPatterns }
-						showReusableBlocks={ hasReusableBlocks }
+						showMedia={ showMedia }
 						prioritizePatterns={ prioritizePatterns }
-						onSelect={ setSelectedTab }
-					>
-						{ getCurrentTab }
-					</InserterTabs>
+						onSelect={ handleSetSelectedTab }
+						tabsContents={ inserterTabsContents }
+					/>
 				) }
-				{ ! filterValue && ! showAsTabs && (
+				{ ! delayedFilterValue && ! showAsTabs && (
 					<div className="block-editor-inserter__no-tab-container">
 						{ blocksTab }
 					</div>
 				) }
 			</div>
+			{ showMediaPanel && (
+				<MediaCategoryDialog
+					rootClientId={ destinationRootClientId }
+					onInsert={ onInsert }
+					category={ selectedMediaCategory }
+				/>
+			) }
 			{ showInserterHelpPanel && hoveredItem && (
-				<InserterPreviewPanel item={ hoveredItem } />
+				<Popover
+					className="block-editor-inserter__preview-container__popover"
+					placement="right-start"
+					offset={ 16 }
+					focusOnMount={ false }
+					animate={ false }
+				>
+					<InserterPreviewPanel item={ hoveredItem } />
+				</Popover>
 			) }
 			{ showPatternPanel && (
-				<BlockPatternsCategoryDialog
+				<PatternCategoryPreviewPanel
 					rootClientId={ destinationRootClientId }
 					onInsert={ onInsertPattern }
+					onHover={ onHoverPattern }
 					category={ selectedPatternCategory }
+					patternFilter={ patternFilter }
+					showTitlesAsTooltip
 				/>
 			) }
 		</div>

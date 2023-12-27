@@ -32,19 +32,32 @@ import { store as blockEditorStore } from '../../store';
  */
 export function isNavigationCandidate( element, keyCode, hasModifier ) {
 	const isVertical = keyCode === UP || keyCode === DOWN;
+	const { tagName } = element;
+	const elementType = element.getAttribute( 'type' );
 
-	// Currently, all elements support unmodified vertical navigation.
+	// Native inputs should not navigate vertically, unless they are simple types that don't need up/down arrow keys.
 	if ( isVertical && ! hasModifier ) {
+		if ( tagName === 'INPUT' ) {
+			const verticalInputTypes = [
+				'date',
+				'datetime-local',
+				'month',
+				'number',
+				'range',
+				'time',
+				'week',
+			];
+			return ! verticalInputTypes.includes( elementType );
+		}
 		return true;
 	}
-
-	const { tagName } = element;
 
 	// Native inputs should not navigate horizontally, unless they are simple types that don't need left/right arrow keys.
 	if ( tagName === 'INPUT' ) {
 		const simpleInputTypes = [
 			'button',
 			'checkbox',
+			'number',
 			'color',
 			'file',
 			'image',
@@ -52,7 +65,7 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 			'reset',
 			'submit',
 		];
-		return simpleInputTypes.includes( element.getAttribute( 'type' ) );
+		return simpleInputTypes.includes( elementType );
 	}
 
 	// Native textareas should not navigate horizontally.
@@ -101,6 +114,10 @@ export function getClosestTabbable(
 	}
 
 	function isTabCandidate( node ) {
+		if ( node.closest( '[inert]' ) ) {
+			return;
+		}
+
 		// Skip if there's only one child that is content editable (and thus a
 		// better candidate).
 		if (
@@ -167,6 +184,12 @@ export default function useArrowNav() {
 		}
 
 		function onKeyDown( event ) {
+			// Abort if navigation has already been handled (e.g. RichText
+			// inline boundaries).
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
 			const { keyCode, target, shiftKey, ctrlKey, altKey, metaKey } =
 				event;
 			const isUp = keyCode === UP;
@@ -182,24 +205,20 @@ export default function useArrowNav() {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
+			if ( ! isNav ) {
+				return;
+			}
+
 			// If there is a multi-selection, the arrow keys should collapse the
 			// selection to the start or end of the selection.
 			if ( hasMultiSelection() ) {
+				if ( shiftKey ) {
+					return;
+				}
+
 				// Only handle if we have a full selection (not a native partial
 				// selection).
 				if ( ! __unstableIsFullySelected() ) {
-					return;
-				}
-
-				if ( event.defaultPrevented ) {
-					return;
-				}
-
-				if ( ! isNav ) {
-					return;
-				}
-
-				if ( shiftKey ) {
 					return;
 				}
 
@@ -214,6 +233,12 @@ export default function useArrowNav() {
 				return;
 			}
 
+			// Abort if our current target is not a candidate for navigation
+			// (e.g. preserve native input behaviors).
+			if ( ! isNavigationCandidate( target, keyCode, hasModifier ) ) {
+				return;
+			}
+
 			// When presing any key other than up or down, the initial vertical
 			// position must ALWAYS be reset. The vertical position is saved so
 			// it can be restored as well as possible on sebsequent vertical
@@ -225,22 +250,6 @@ export default function useArrowNav() {
 				verticalRect = null;
 			} else if ( ! verticalRect ) {
 				verticalRect = computeCaretRect( defaultView );
-			}
-
-			// Abort if navigation has already been handled (e.g. RichText
-			// inline boundaries).
-			if ( event.defaultPrevented ) {
-				return;
-			}
-
-			if ( ! isNav ) {
-				return;
-			}
-
-			// Abort if our current target is not a candidate for navigation
-			// (e.g. preserve native input behaviors).
-			if ( ! isNavigationCandidate( target, keyCode, hasModifier ) ) {
-				return;
 			}
 
 			// In the case of RTL scripts, right means previous and left means

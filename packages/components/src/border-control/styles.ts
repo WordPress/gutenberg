@@ -7,11 +7,8 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { COLORS, CONFIG, boxSizingReset, rtl } from '../utils';
-import { space } from '../ui/utils/space';
-import {
-	StyledField,
-	StyledLabel,
-} from '../base-control/styles/base-control-styles';
+import { space } from '../utils/space';
+import { StyledLabel } from '../base-control/styles/base-control-styles';
 import {
 	ValueInput as UnitControlWrapper,
 	UnitSelect,
@@ -24,7 +21,7 @@ const labelStyles = css`
 `;
 
 const focusBoxShadow = css`
-	box-shadow: inset 0 0 0 ${ CONFIG.borderWidth } ${ COLORS.ui.borderFocus };
+	box-shadow: inset ${ CONFIG.controlBoxShadowFocus };
 `;
 
 export const borderControl = css`
@@ -62,18 +59,11 @@ export const wrapperHeight = ( size?: 'default' | '__unstable-large' ) => {
 	`;
 };
 
-export const borderControlDropdown = (
-	size?: 'default' | '__unstable-large'
-) => css`
+export const borderControlDropdown = css`
 	background: #fff;
 
 	&& > button {
-		/*
-		 * Override button component styles to fit within BorderControl
-		 * regardless of size.
-		 */
-		height: ${ size === '__unstable-large' ? '40px' : '30px' };
-		width: ${ size === '__unstable-large' ? '40px' : '30px' };
+		aspect-ratio: 1;
 		padding: 0;
 		display: flex;
 		align-items: center;
@@ -168,10 +158,10 @@ export const resetButton = css`
 
 	/* Override button component styling */
 	&& {
-		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
+		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 400 ] };
 		border-top-left-radius: 0;
 		border-top-right-radius: 0;
-		height: 46px;
+		height: 40px;
 	}
 `;
 
@@ -183,20 +173,14 @@ export const borderControlStylePicker = css`
 
 export const borderStyleButton = css`
 	&&&&& {
-		min-width: 30px;
-		width: 30px;
-		height: 30px;
-		padding: 3px;
+		min-width: 32px;
+		width: 32px;
+		height: 32px;
+		padding: 4px;
 	}
 `;
 
 export const borderSlider = () => css`
 	flex: 1 1 60%;
 	${ rtl( { marginRight: space( 3 ) } )() }
-
-	${ StyledField } {
-		margin-bottom: 0;
-		font-size: 0;
-		display: flex;
-	}
 `;

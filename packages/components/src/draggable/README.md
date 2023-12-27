@@ -1,6 +1,6 @@
 # Draggable
 
-`Draggable` is a Component that provides a way to set up a cross-browser (including IE) customisable drag image and the transfer data for the drag event. It decouples the drag handle and the element to drag: use it by wrapping the component that will become the drag handle and providing the DOM ID of the element to drag.
+`Draggable` is a Component that provides a way to set up a cross-browser (including IE) customizable drag image and the transfer data for the drag event. It decouples the drag handle and the element to drag: use it by wrapping the component that will become the drag handle and providing the DOM ID of the element to drag.
 
 Note that the drag handle needs to declare the `draggable="true"` property and bind the `Draggable`s `onDraggableStart` and `onDraggableEnd` event handlers to its own `onDragStart` and `onDragEnd` respectively. `Draggable` takes care of the logic to setup the drag image and the transfer data, but is not concerned with creating an actual DOM element that is draggable.
 
@@ -8,43 +8,45 @@ Note that the drag handle needs to declare the `draggable="true"` property and b
 
 The component accepts the following props:
 
-### elementId
+### `appendToOwnerDocument`: `boolean`
 
-The HTML id of the element to clone on drag
+Whether to append the cloned element to the `ownerDocument` body. By default, elements sourced by id are appended to the element's wrapper.
 
--   Type: `string`
+-   Required: No
+-   Default: `false`
+
+### `elementId`: `string`
+
+The HTML id of the element to clone on drag.
+
 -   Required: Yes
 
-### transferData
-
-Arbitrary data object attached to the drag and drop event.
-
--   Type: `Object`
--   Required: Yes
-
-### onDragStart
-
-A function called when dragging starts. This callback receives the `event` object from the `dragstart` event as its first parameter.
-
--   Type: `Function`
--   Required: No
--   Default: `noop`
-
-### onDragOver
-
-A function called when the element being dragged is dragged over a valid drop target. This callback receives the `event` object from the `dragover` event as its first parameter.
-
--   Type: `Function`
--   Required: No
--   Default: `noop`
-
-### onDragEnd
+### `onDragEnd`: `( event: DragEvent ) => void`
 
 A function called when dragging ends. This callback receives the `event` object from the `dragend` event as its first parameter.
 
--   Type: `Function`
 -   Required: No
 -   Default: `noop`
+
+### `onDragOver`: `( event: DragEvent ) => void`
+
+A function called when the element being dragged is dragged over a valid drop target. This callback receives the `event` object from the `dragover` event as its first parameter.
+
+-   Required: No
+-   Default: `noop`
+
+### `onDragStart`: `( event: DragEvent ) => void`
+
+A function called when dragging starts. This callback receives the `event` object from the `dragstart` event as its first parameter.
+
+-   Required: No
+-   Default: `noop`
+
+### `transferData`: `unknown`
+
+Arbitrary data object attached to the drag and drop event.
+
+-   Required: Yes
 
 ## Usage
 

@@ -13,17 +13,14 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
 					className="edit-post-block-manager__checklist-item"
 				>
 					<CheckboxControl
-						label={
-							<>
-								{ blockType.title }
-								<BlockIcon icon={ blockType.icon } />
-							</>
-						}
+						__nextHasNoMarginBottom
+						label={ blockType.title }
 						checked={ value.includes( blockType.name ) }
 						onChange={ ( ...args ) =>
 							onItemChange( blockType.name, ...args )
 						}
 					/>
+					<BlockIcon icon={ blockType.icon } />
 				</li>
 			) ) }
 		</ul>

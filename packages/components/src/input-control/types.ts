@@ -4,9 +4,7 @@
 import type {
 	CSSProperties,
 	ReactNode,
-	ChangeEvent,
 	SyntheticEvent,
-	PointerEvent,
 	HTMLInputTypeAttribute,
 } from 'react';
 import type { useDrag } from '@use-gesture/react';
@@ -15,8 +13,9 @@ import type { useDrag } from '@use-gesture/react';
  * Internal dependencies
  */
 import type { StateReducer } from './reducer/state';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { FlexProps } from '../flex/types';
+import type { BaseControlProps } from '../base-control/types';
 
 export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge';
 
@@ -28,11 +27,18 @@ export type Size = 'default' | 'small' | '__unstable-large';
 
 interface BaseProps {
 	/**
+	 * Deprecated. Use `__next40pxDefaultSize` instead.
+	 *
+	 * @default false
+	 * @deprecated
+	 */
+	__next36pxDefaultSize?: boolean;
+	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
 	 * @default false
 	 */
-	__next36pxDefaultSize?: boolean;
+	__next40pxDefaultSize?: boolean;
 	__unstableInputWidth?: CSSProperties[ 'width' ];
 	/**
 	 * If true, the label will only be visible to screen readers.
@@ -62,12 +68,13 @@ interface BaseProps {
 	size?: Size;
 }
 
-export type InputChangeCallback<
-	E = ChangeEvent< HTMLInputElement > | PointerEvent< HTMLInputElement >,
-	P = {}
-> = ( nextValue: string | undefined, extra: { event: E } & P ) => void;
+export type InputChangeCallback< P = {} > = (
+	nextValue: string | undefined,
+	extra: { event: SyntheticEvent } & P
+) => void;
 
-export interface InputFieldProps extends BaseProps {
+export interface InputFieldProps
+	extends Omit< BaseProps, '__next36pxDefaultSize' > {
 	/**
 	 * Determines the drag axis.
 	 *
@@ -166,11 +173,6 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 */
 	disabled?: boolean;
 	/**
-	 * The class name to be added to the wrapper element.
-	 */
-	className?: string;
-	id?: string;
-	/**
 	 * If this property is added, a label will be generated using label property as the content.
 	 */
 	label?: ReactNode;
@@ -178,6 +180,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 
 export interface InputControlProps
 	extends Omit< InputBaseProps, 'children' | 'isFocused' | keyof FlexProps >,
+		Pick< BaseControlProps, 'help' >,
 		/**
 		 * The `prefix` prop in `WordPressComponentProps< InputFieldProps, 'input', false >` comes from the
 		 * `HTMLInputAttributes` and clashes with the one from `InputBaseProps`. So we have to omit it from

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -668,7 +667,7 @@ const v4 = {
 
 		return {
 			...attributes,
-			ids: map( attributes.ids, ( id ) => {
+			ids: ( attributes.ids ?? [] ).map( ( id ) => {
 				const parsedId = parseInt( id, 10 );
 				return Number.isInteger( parsedId ) ? parsedId : null;
 			} ),
@@ -942,7 +941,7 @@ const v2 = {
 		}
 		return {
 			...attributes,
-			ids: map( attributes.images, ( { id } ) => {
+			ids: ( attributes.images ?? [] ).map( ( { id } ) => {
 				if ( ! id ) {
 					return null;
 				}

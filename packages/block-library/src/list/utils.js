@@ -1,9 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, rawHandler } from '@wordpress/blocks';
+
+const LIST_STYLES = {
+	A: 'upper-alpha',
+	a: 'lower-alpha',
+	I: 'upper-roman',
+	i: 'lower-roman',
+};
 
 export function createListBlockFromDOMElement( listElement ) {
+	const type = listElement.getAttribute( 'type' );
 	const listAttributes = {
 		ordered: 'OL' === listElement.tagName,
 		anchor: listElement.id === '' ? undefined : listElement.id,
@@ -11,7 +19,7 @@ export function createListBlockFromDOMElement( listElement ) {
 			? parseInt( listElement.getAttribute( 'start' ), 10 )
 			: undefined,
 		reversed: listElement.hasAttribute( 'reversed' ) ? true : undefined,
-		type: listElement.getAttribute( 'type' ) ?? undefined,
+		type: type && LIST_STYLES[ type ] ? LIST_STYLES[ type ] : undefined,
 	};
 
 	const innerBlocks = Array.from( listElement.children ).map(
@@ -56,7 +64,8 @@ export function createListBlockFromDOMElement( listElement ) {
 }
 
 export function migrateToListV2( attributes ) {
-	const { values, start, reversed, ordered, type } = attributes;
+	const { values, start, reversed, ordered, type, ...otherAttributes } =
+		attributes;
 
 	const list = document.createElement( ordered ? 'ol' : 'ul' );
 	list.innerHTML = values;
@@ -70,15 +79,23 @@ export function migrateToListV2( attributes ) {
 		list.setAttribute( 'type', type );
 	}
 
-	const listBlock = createListBlockFromDOMElement( list );
-
-	const { values: omittedValues, ...restAttributes } = attributes;
+	const [ listBlock ] = rawHandler( { HTML: list.outerHTML } );
 
 	return [
-		{
-			...restAttributes,
-			...listBlock.attributes,
-		},
+		{ ...otherAttributes, ...listBlock.attributes },
 		listBlock.innerBlocks,
 	];
+}
+
+export function migrateTypeToInlineStyle( attributes ) {
+	const { type } = attributes;
+
+	if ( type && LIST_STYLES[ type ] ) {
+		return {
+			...attributes,
+			type: LIST_STYLES[ type ],
+		};
+	}
+
+	return attributes;
 }

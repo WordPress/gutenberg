@@ -1,3 +1,6 @@
+// Run all tests with development tools enabled.
+global.SCRIPT_DEBUG = true;
+
 // These are necessary to load TinyMCE successfully.
 global.URL = window.URL;
 global.window.tinyMCEPreInit = {
@@ -48,13 +51,6 @@ global.window.matchMedia = () => ( {
 	removeListener: () => {},
 	removeEventListener: () => {},
 } );
-
-// Setup fake localStorage.
-const storage = {};
-global.window.localStorage = {
-	getItem: ( key ) => ( key in storage ? storage[ key ] : null ),
-	setItem: ( key, value ) => ( storage[ key ] = value ),
-};
 
 // UserSettings global.
 global.window.userSettings = { uid: 1 };

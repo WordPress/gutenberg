@@ -139,7 +139,6 @@ supports: {
 -   Default value: null
 -   Subproperties:
     -   `background`: type `boolean`, default value `true`
-    -   `__experimentalDuotone`: type `string`, default value undefined
     -   `gradients`: type `boolean`, default value `false`
     -   `link`: type `boolean`, default value `false`
     -   `text`: type `boolean`, default value `true`
@@ -231,46 +230,9 @@ When the block declares support for `color.background`, the attributes definitio
 
 ### color.__experimentalDuotone
 
-This property adds UI controls which allow to apply a duotone filter to a block or part of a block.
+_**Note:** Deprecated since WordPress 6.3._
 
-The parent selector is automatically added much like nesting in Sass/SCSS (however, the `&` selector is not supported).
-
-```js
-supports: {
-    color: {
-        // Apply the filter to the same selector in both edit and save.
-        __experimentalDuotone: '> .duotone-img, > .duotone-video',
-
-        // Default values must be disabled if you don't want to use them with duotone.
-        background: false,
-        text: false
-    }
-}
-```
-
-Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/theme-json.md).
-
-When the block declares support for `color.__experimentalDuotone`, the attributes definition is extended to include the attribute `style`:
-
-- `style`: attribute of `object` type with no default assigned.
-
-  The block can apply a default duotone color by specifying its own attribute with a default e.g.:
-
-  ```js
-  attributes: {
-      style: {
-          type: 'object',
-          default: {
-              color: {
-                  duotone: [
-                      '#FFF',
-                      '#000'
-                  ]
-              }
-          }
-      }
-  }
-  ```
+This property has been replaced by [`filter.duotone`](#filterduotone).
 
 ### color.gradients
 
@@ -351,36 +313,25 @@ supports: {
 Link color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
 
 
-When the block declares support for `color.link`, the attributes definition is extended to include two new attributes: `linkColor` and `style`:
-
-- `linkColor`: attribute of `string` type with no default assigned.
-
-  When a user chooses from the list of preset link colors, the preset slug is stored in the `linkColor` attribute.
-
-  The block can apply a default preset text color by specifying its own attribute with a default e.g.:
-
-  ```js
-  attributes: {
-      linkColor: {
-          type: 'string',
-          default: 'some-preset-link-color-slug',
-      }
-  }
-  ```
+When the block declares support for `color.link`, the attributes definition is extended to include the `style` attribute:
 
 - `style`: attribute of `object` type with no default assigned.
 
-  When a custom link color is selected (i.e. using the custom color picker), the custom color value is stored in the `style.color.link` attribute.
+  When a link color is selected, the color value is stored in the `style.elements.link.color.text` attribute.
 
-  The block can apply a default custom link color by specifying its own attribute with a default e.g.:
+  The block can apply a default link color by specifying its own attribute with a default e.g.:
 
   ```js
   attributes: {
       style: {
           type: 'object',
           default: {
-              color: {
-                  link: '#ff0000',
+              elements: {
+                  link: {
+                      color: {
+                          text: '#ff0000',
+                      }
+                  }
               }
           }
       }
@@ -477,6 +428,93 @@ supports: {
 }
 ```
 
+## dimensions
+
+_**Note:** Since WordPress 6.2._
+
+-   Type: `Object`
+-   Default value: null
+-   Subproperties:
+    -   `minHeight`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls).
+
+```js
+supports: {
+    dimensions: {
+        minHeight: true // Enable min height control.
+    }
+}
+```
+
+When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
+
+- `style`: attribute of `object` type with no default assigned. This is added when `minHeight` support is declared. It stores the custom values set by the user, e.g.:
+
+```js
+attributes: {
+    style: {
+        dimensions: {
+            minHeight: "50vh"
+        }
+    }
+}
+```
+
+## filter
+-   Type: `Object`
+-   Default value: null
+-   Subproperties:
+    -   `duotone`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the properties related to filters. When it does, the block editor will show UI controls for the user to set their values.
+
+### filter.duotone
+
+This property adds UI controls which allow the user to apply a duotone filter to
+a block or part of a block.
+
+```js
+supports: {
+    filter: {
+        // Enable duotone support
+        duotone: true
+    }
+},
+selectors: {
+    filter: {
+        // Apply the filter to img elements inside the image block
+        duotone: '.wp-block-image img'
+    }
+}
+```
+
+The filter can be applied to an element inside the block by setting the `selectors.filter.duotone` selector.
+
+Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/theme-json.md).
+
+When the block declares support for `filter.duotone`, the attributes definition is extended to include the attribute `style`:
+
+- `style`: attribute of `object` type with no default assigned.
+
+  The block can apply a default duotone color by specifying its own attribute with a default e.g.:
+
+  ```js
+  attributes: {
+      style: {
+          type: 'object',
+          default: {
+              color: {
+                  duotone: [
+                      '#FFF',
+                      '#000'
+                  ]
+              }
+          }
+      }
+  }
+  ```
+
 ## html
 
 -   Type: `boolean`
@@ -496,7 +534,7 @@ supports: {
 -   Type: `boolean`
 -   Default value: `true`
 
-By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
+By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programmatically, set `inserter` to `false`.
 
 ```js
 supports: {
@@ -504,6 +542,87 @@ supports: {
 	inserter: false
 }
 ```
+
+## layout
+
+-   Type: `boolean` or `Object`
+-   Default value: null
+-   Subproperties:
+    -   `default`: type `Object`, default value null
+    -   `allowSwitching`: type `boolean`, default value `false`
+    -   `allowEditing`: type `boolean`, default value `true`
+    -   `allowInheriting`: type `boolean`, default value `true`
+    -   `allowSizingOnChildren`: type `boolean`, default value `false`
+    -   `allowVerticalAlignment`: type `boolean`, default value `true`
+    -   `allowJustification`: type `boolean`, default value `true`
+    -   `allowOrientation`: type `boolean`, default value `true`
+    -   `allowCustomContentAndWideSize`: type `boolean`, default value `true`
+
+This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.
+
+### layout.default
+
+-   Type: `Object`
+-   Default value: null
+
+Allows setting the `type` property to define what layout type is default for the block, and also default values for any properties inherent to that layout type, e.g., for a `flex` layout, a default value can be set for `flexWrap`.
+
+### layout.allowSwitching
+
+-   Type: `boolean`
+-   Default value: `false`
+
+Exposes a switcher control that allows toggling between all existing layout types.
+
+### layout.allowEditing
+
+-   Type: `boolean`
+-   Default value: `true`
+
+Determines display of layout controls in the block sidebar. If set to false, layout controls will be hidden.
+
+### layout.allowInheriting
+
+-   Type: `boolean`
+-   Default value: `true`
+
+For the `flow` layout type only, determines display of the "Inner blocks use content width" toggle.
+
+### layout.allowSizingOnChildren
+
+-   Type: `boolean`
+-   Default value: `false`
+
+For the `flex` layout type only, determines display of sizing controls (Fit/Fill/Fixed) on all child blocks of the flex block.
+
+### layout.allowVerticalAlignment
+
+-   Type: `boolean`
+-   Default value: `true`
+
+For the `flex` layout type only, determines display of the vertical alignment control in the block toolbar.
+
+### layout.allowJustification
+
+-   Type: `boolean`
+-   Default value: `true`
+
+For the `flex` layout type, determines display of the justification control in the block toolbar and block sidebar. For the `constrained` layout type, determines display of justification control in the block sidebar.
+
+### layout.allowOrientation
+
+-   Type: `boolean`
+-   Default value: `true`
+
+For the `flex` layout type only, determines display of the orientation control in the block toolbar.
+
+### layout.allowCustomContentAndWideSize
+
+-   Type: `boolean`
+-   Default value: `true`
+
+For the `constrained` layout type only, determines display of the custom content and wide size controls in the block sidebar.
+
 
 ## multiple
 
@@ -547,6 +666,42 @@ supports: {
 }
 ```
 
+## position
+
+_**Note:** Since WordPress 6.2._
+
+-   Type: `Object`
+-   Default value: null
+-   Subproperties:
+    -   `sticky`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the CSS style properties related to position. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls).
+
+Note that sticky position controls are currently only available for blocks set at the root level of the document. Setting a block to the `sticky` position will stick the block to its most immediate parent when the user scrolls the page.
+
+```js
+supports: {
+    position: {
+        sticky: true // Enable selecting sticky position.
+    }
+}
+```
+
+When the block declares support for a specific position property, its attributes definition is extended to include the `style` attribute.
+
+- `style`: attribute of `object` type with no default assigned. This is added when `sticky` support is declared. It stores the custom values set by the user, e.g.:
+
+```js
+attributes: {
+    style: {
+        position: {
+            type: "sticky",
+            top: "0px"
+        }
+    }
+}
+```
+
 ## spacing
 
 -   Type: `Object`
@@ -556,19 +711,19 @@ supports: {
     -   `padding`: type `boolean` or `array`, default value `false`
     -   `blockGap`: type `boolean` or `array`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
+This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
 
 ```js
 supports: {
     spacing: {
         margin: true,  // Enable margin UI control.
         padding: true, // Enable padding UI control.
-        blockGap: true,  // Enables block spacing UI control.
+        blockGap: true,  // Enables block spacing UI control for blocks that also use `layout`.
     }
 }
 ```
 
-When the block declares support for a specific spacing property, the attributes definition is extended to include the `style` attribute.
+When the block declares support for a specific spacing property, its attributes definition is extended to include the `style` attribute.
 
 - `style`: attribute of `object` type with no default assigned. This is added when `margin` or `padding` support is declared. It stores the custom values set by the user, e.g.:
 
@@ -583,7 +738,7 @@ attributes: {
 }
 ```
 
-A spacing property may define an array of allowable sides – 'top', 'right', 'bottom', 'left' – that can be configured. When such arbitrary sides are defined, only UI controls for those sides are displayed. 
+A spacing property may define an array of allowable sides – 'top', 'right', 'bottom', 'left' – that can be configured. When such arbitrary sides are defined, only UI controls for those sides are displayed.
 
 Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.
 

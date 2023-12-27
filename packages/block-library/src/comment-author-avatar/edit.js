@@ -50,6 +50,8 @@ export default function Edit( {
 		<InspectorControls>
 			<PanelBody title={ __( 'Avatar Settings' ) }>
 				<RangeControl
+					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Image size' ) }
 					onChange={ ( newWidth ) =>
 						setAttributes( {

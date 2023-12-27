@@ -29,19 +29,19 @@ const ALERT = {
 	green: '#4ab866',
 };
 
-// Matches @wordpress/base-styles
+// Matches the Modern admin scheme in @wordpress/base-styles
 const ADMIN = {
-	theme: 'var( --wp-admin-theme-color, #007cba)',
-	themeDark10: 'var( --wp-admin-theme-color-darker-10, #006ba1)',
+	theme: 'var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))',
+	themeDark10:
+		'var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6))',
 };
 
 const UI = {
-	theme: ADMIN.theme,
 	background: white,
 	backgroundDisabled: GRAY[ 100 ],
-	border: GRAY[ 700 ],
+	border: GRAY[ 600 ],
 	borderHover: GRAY[ 700 ],
-	borderFocus: ADMIN.themeDark10,
+	borderFocus: ADMIN.theme,
 	borderDisabled: GRAY[ 400 ],
 	textDisabled: GRAY[ 600 ],
 	textDark: white,
@@ -51,6 +51,11 @@ const UI = {
 	lightGrayPlaceholder: rgba( white, 0.65 ),
 };
 
+const THEME = {
+	accent: ADMIN.theme,
+	accentDarker10: ADMIN.themeDark10,
+};
+
 export const COLORS = Object.freeze( {
 	/**
 	 * The main gray color object.
@@ -58,6 +63,7 @@ export const COLORS = Object.freeze( {
 	gray: GRAY,
 	white,
 	alert: ALERT,
+	theme: THEME,
 	ui: UI,
 } );
 

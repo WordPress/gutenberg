@@ -5,7 +5,7 @@
 import { create } from './create';
 import { normaliseFormats } from './normalise-formats';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Combine an array of Rich Text values into one, optionally separated by

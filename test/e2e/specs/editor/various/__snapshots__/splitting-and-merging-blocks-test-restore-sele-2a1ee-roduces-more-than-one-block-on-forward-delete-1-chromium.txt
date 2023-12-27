@@ -1,3 +1,0 @@
-<!-- wp:paragraph -->
-<p>hi-</p>
-<!-- /wp:paragraph -->

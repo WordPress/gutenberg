@@ -12,25 +12,38 @@ import {
 	InspectorControls,
 	useBlockProps,
 	PlainText,
+	HeadingLevelDropdown,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { useEntityProp } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 import { useCanEditEntity } from '../utils/hooks';
 
 export default function PostTitleEdit( {
 	attributes: { level, textAlign, isLink, rel, linkTarget },
 	setAttributes,
 	context: { postType, postId, queryId },
+	insertBlocksAfter,
 } ) {
-	const TagName = 0 === level ? 'p' : 'h' + level;
+	const TagName = 'h' + level;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
+	/**
+	 * Hack: useCanEditEntity may trigger an OPTIONS request to the REST API via the canUser resolver.
+	 * However, when the Post Title is a descendant of a Query Loop block, the title cannot be edited.
+	 * In order to avoid these unnecessary requests, we call the hook without
+	 * the proper data, resulting in returning early without making them.
+	 */
+	const userCanEdit = useCanEditEntity(
+		'postType',
+		! isDescendentOfQueryLoop && postType,
+		postId
+	);
 	const [ rawTitle = '', setTitle, fullTitle ] = useEntityProp(
 		'postType',
 		postType,
@@ -38,86 +51,89 @@ export default function PostTitleEdit( {
 		postId
 	);
 	const [ link ] = useEntityProp( 'postType', postType, 'link', postId );
+	const onSplitAtEnd = () => {
+		insertBlocksAfter( createBlock( getDefaultBlockName() ) );
+	};
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+	const blockEditingMode = useBlockEditingMode();
 
-	let titleElement = (
-		<TagName { ...blockProps }>{ __( 'Post Title' ) }</TagName>
-	);
+	let titleElement = <TagName { ...blockProps }>{ __( 'Title' ) }</TagName>;
 
 	if ( postType && postId ) {
-		titleElement =
-			userCanEdit && ! isDescendentOfQueryLoop ? (
-				<PlainText
-					tagName={ TagName }
-					placeholder={ __( 'No Title' ) }
-					value={ rawTitle }
-					onChange={ setTitle }
-					__experimentalVersion={ 2 }
-					{ ...blockProps }
-				/>
-			) : (
-				<TagName
-					{ ...blockProps }
-					dangerouslySetInnerHTML={ { __html: fullTitle?.rendered } }
-				/>
-			);
+		titleElement = userCanEdit ? (
+			<PlainText
+				tagName={ TagName }
+				placeholder={ __( 'No Title' ) }
+				value={ rawTitle }
+				onChange={ setTitle }
+				__experimentalVersion={ 2 }
+				__unstableOnSplitAtEnd={ onSplitAtEnd }
+				{ ...blockProps }
+			/>
+		) : (
+			<TagName
+				{ ...blockProps }
+				dangerouslySetInnerHTML={ { __html: fullTitle?.rendered } }
+			/>
+		);
 	}
 
 	if ( isLink && postType && postId ) {
-		titleElement =
-			userCanEdit && ! isDescendentOfQueryLoop ? (
-				<TagName { ...blockProps }>
-					<PlainText
-						tagName="a"
-						href={ link }
-						target={ linkTarget }
-						rel={ rel }
-						placeholder={
-							! rawTitle.length ? __( 'No Title' ) : null
-						}
-						value={ rawTitle }
-						onChange={ setTitle }
-						__experimentalVersion={ 2 }
-					/>
-				</TagName>
-			) : (
-				<TagName { ...blockProps }>
-					<a
-						href={ link }
-						target={ linkTarget }
-						rel={ rel }
-						onClick={ ( event ) => event.preventDefault() }
-						dangerouslySetInnerHTML={ {
-							__html: fullTitle?.rendered,
-						} }
-					/>
-				</TagName>
-			);
+		titleElement = userCanEdit ? (
+			<TagName { ...blockProps }>
+				<PlainText
+					tagName="a"
+					href={ link }
+					target={ linkTarget }
+					rel={ rel }
+					placeholder={ ! rawTitle.length ? __( 'No Title' ) : null }
+					value={ rawTitle }
+					onChange={ setTitle }
+					__experimentalVersion={ 2 }
+					__unstableOnSplitAtEnd={ onSplitAtEnd }
+				/>
+			</TagName>
+		) : (
+			<TagName { ...blockProps }>
+				<a
+					href={ link }
+					target={ linkTarget }
+					rel={ rel }
+					onClick={ ( event ) => event.preventDefault() }
+					dangerouslySetInnerHTML={ {
+						__html: fullTitle?.rendered,
+					} }
+				/>
+			</TagName>
+		);
 	}
 
 	return (
 		<>
-			<BlockControls group="block">
-				<HeadingLevelDropdown
-					selectedLevel={ level }
-					onChange={ ( newLevel ) =>
-						setAttributes( { level: newLevel } )
-					}
-				/>
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
+			{ blockEditingMode === 'default' && (
+				<BlockControls group="block">
+					<HeadingLevelDropdown
+						value={ level }
+						onChange={ ( newLevel ) =>
+							setAttributes( { level: newLevel } )
+						}
+					/>
+					<AlignmentControl
+						value={ textAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { textAlign: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Make title a link' ) }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
@@ -125,6 +141,7 @@ export default function PostTitleEdit( {
 					{ isLink && (
 						<>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {
@@ -134,6 +151,7 @@ export default function PostTitleEdit( {
 								checked={ linkTarget === '_blank' }
 							/>
 							<TextControl
+								__nextHasNoMarginBottom
 								label={ __( 'Link rel' ) }
 								value={ rel }
 								onChange={ ( newRel ) =>

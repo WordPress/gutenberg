@@ -14,51 +14,80 @@ concurrency:
 
 jobs:
     test:
-        runs-on: macos-latest
+        runs-on: macos-12
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
-                native-test-name: [gutenberg-editor-initial-html]
+                native-test-name: [gutenberg-editor-rendering]
+                api-level: [29]
 
         steps:
             - name: checkout
-              uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Use desired version of Java
-              uses: actions/setup-java@de1bb2b0c5634f0fc4438d7aa9944e68f9bf86cc # v3.6.0
+              uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
               with:
-                  distribution: 'temurin'
-                  java-version: '11'
-                  cache: 'gradle'
+                  distribution: 'corretto'
+                  java-version: '17'
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Restore tests setup cache
+              uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
               with:
-                  node-version-file: '.nvmrc'
-                  cache: npm
+                  path: |
+                      ~/.appium
+                  key: ${{ runner.os }}-tests-setup-${{ hashFiles('package-lock.json') }}
 
-            - run: npm ci
+            - name: Prepare tests setup
+              run: npm run native test:e2e:setup
 
-            - name: Restore Gradle cache
-              uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 # v3.0.11
+            - name: Gradle cache
+              uses: gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a # v2.9.0
+
+            - name: AVD cache
+              uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+              id: avd-cache
               with:
-                  path: ~/.gradle/caches
-                  key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+                  path: |
+                      ~/.android/avd/*
+                      ~/.android/adb*
+                  key: avd-${{ matrix.api-level }}
 
-            - uses: reactivecircus/android-emulator-runner@d7b53ddc6e44254e1f4cf4a6ad67345837027a66 # v2.26.0
+            - name: Create AVD and generate snapshot for caching
+              if: steps.avd-cache.outputs.cache-hit != 'true'
+              uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # v2.28.0
               with:
-                  api-level: 28
-                  emulator-build: 7425822 # https://github.com/ReactiveCircus/android-emulator-runner/issues/160#issuecomment-868615730
-                  profile: pixel_xl
+                  api-level: ${{ matrix.api-level }}
+                  force-avd-creation: false
+                  emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+                  disable-animations: false
+                  arch: x86_64
+                  profile: Nexus 6
+                  script: echo "Generated AVD snapshot for caching."
+
+            - name: Run tests
+              uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # v2.28.0
+              with:
+                  api-level: ${{ matrix.api-level }}
+                  force-avd-creation: false
+                  emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+                  disable-animations: true
+                  arch: x86_64
+                  profile: Nexus 6
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
-            - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+            - uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
               if: always()
               with:
                   name: android-screen-recordings
                   path: packages/react-native-editor/android-screen-recordings
 
-            - uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+            - uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
               if: always()
               with:
                   name: appium-logs

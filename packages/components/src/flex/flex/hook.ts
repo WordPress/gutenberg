@@ -12,9 +12,10 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
-import { useResponsiveValue } from '../../ui/utils/use-responsive-value';
-import { space } from '../../ui/utils/space';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
+import { useResponsiveValue } from '../../utils/use-responsive-value';
+import { space } from '../../utils/space';
 import * as styles from '../styles';
 import { useCx } from '../../utils';
 import type { FlexProps } from '../types';
@@ -40,7 +41,7 @@ function useDeprecatedProps(
 
 export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 	const {
-		align = 'center',
+		align,
 		className,
 		direction: directionProp = 'row',
 		expanded = true,
@@ -57,14 +58,12 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 
 	const isColumn =
 		typeof direction === 'string' && !! direction.includes( 'column' );
-	const isReverse =
-		typeof direction === 'string' && direction.includes( 'reverse' );
 
 	const cx = useCx();
 
 	const classes = useMemo( () => {
 		const base = css( {
-			alignItems: isColumn ? 'normal' : align,
+			alignItems: align ?? ( isColumn ? 'normal' : 'center' ),
 			flexDirection: direction,
 			flexWrap: wrap ? 'wrap' : undefined,
 			gap: space( gap ),
@@ -87,7 +86,6 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
 		expanded,
 		gap,
 		isColumn,
-		isReverse,
 		justify,
 		wrap,
 	] );

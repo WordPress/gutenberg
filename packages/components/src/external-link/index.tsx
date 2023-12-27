@@ -17,7 +17,7 @@ import { external } from '@wordpress/icons';
 import { VisuallyHidden } from '../visually-hidden';
 import { StyledIcon } from './styles/external-link-styles';
 import type { ExternalLinkProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 function UnforwardedExternalLink(
 	props: Omit<
@@ -43,17 +43,25 @@ function UnforwardedExternalLink(
 	to prevent them from being opened in the editor. */
 	const isInternalAnchor = !! href?.startsWith( '#' );
 
+	const onClickHandler = (
+		event: React.MouseEvent< HTMLAnchorElement, MouseEvent >
+	) => {
+		if ( isInternalAnchor ) {
+			event.preventDefault();
+		}
+
+		if ( props.onClick ) {
+			props.onClick( event );
+		}
+	};
+
 	return (
 		/* eslint-disable react/jsx-no-target-blank */
 		<a
 			{ ...additionalProps }
 			className={ classes }
 			href={ href }
-			onClick={
-				isInternalAnchor
-					? ( event ) => event.preventDefault()
-					: undefined
-			}
+			onClick={ onClickHandler }
 			target="_blank"
 			rel={ optimizedRel }
 			ref={ ref }

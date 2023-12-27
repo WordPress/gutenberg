@@ -27,22 +27,16 @@ jobs:
                       remove-stale-when-updated: true
                       stale-issue-label: '[Status] Stale'
                     - name: 'Flaky test issues without activity'
-                      message: 'This issue has gone 30 days without any activity.'
-                      days-before-stale: 30
+                      message: 'This issue has gone 15 days without any activity.'
+                      days-before-stale: 15
                       days-before-close: 1
                       only-labels: '[Type] Flaky Test'
                       remove-stale-when-updated: true
                       stale-issue-label: '[Status] Stale'
-                    - name: 'Issues without recent updates that need confirmation'
-                      message: "Hi,\nThis issue has gone 180 days without any activity. This means it is time for a check-in to make sure it is still relevant. If you are still experiencing this issue with the latest versions, you can help the project by responding to confirm the problem and by providing any updated reproduction steps.\nThanks for helping out."
-                      days-before-stale: 180
-                      days-before-close: -1
-                      remove-stale-when-updated: false
-                      stale-issue-label: 'Needs Testing'
 
         steps:
             - name: Update issues
-              uses: actions/stale@5ebf00ea0e4c1561e9b43a292ed34424fb1d4578 # v6.0.1
+              uses: actions/stale@28ca1036281a5e5922ead5184a1bbf96e5fc984e # v9.0.0
               with:
                   repo-token: ${{ secrets.GITHUB_TOKEN }}
                   stale-issue-message: ${{ matrix.message }}

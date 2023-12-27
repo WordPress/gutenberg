@@ -68,53 +68,6 @@ function BlockPopoverInbetween( {
 	const previousElement = useBlockElement( previousClientId );
 	const nextElement = useBlockElement( nextClientId );
 	const isVertical = orientation === 'vertical';
-	const style = useMemo( () => {
-		if (
-			// popoverRecomputeCounter is by definition always equal or greater than 0.
-			// This check is only there to satisfy the correctness of the
-			// exhaustive-deps rule for the `useMemo` hook.
-			popoverRecomputeCounter < 0 ||
-			( ! previousElement && ! nextElement ) ||
-			! isVisible
-		) {
-			return {};
-		}
-
-		const previousRect = previousElement
-			? previousElement.getBoundingClientRect()
-			: null;
-		const nextRect = nextElement
-			? nextElement.getBoundingClientRect()
-			: null;
-
-		if ( isVertical ) {
-			return {
-				width: previousRect ? previousRect.width : nextRect.width,
-				height:
-					nextRect && previousRect
-						? nextRect.top - previousRect.bottom
-						: 0,
-			};
-		}
-
-		let width = 0;
-		if ( previousRect && nextRect ) {
-			width = isRTL()
-				? previousRect.left - nextRect.right
-				: nextRect.left - previousRect.right;
-		}
-
-		return {
-			width,
-			height: previousRect ? previousRect.height : nextRect.height,
-		};
-	}, [
-		previousElement,
-		nextElement,
-		isVertical,
-		popoverRecomputeCounter,
-		isVisible,
-	] );
 
 	const popoverAnchor = useMemo( () => {
 		if (
@@ -128,10 +81,10 @@ function BlockPopoverInbetween( {
 			return undefined;
 		}
 
-		const { ownerDocument } = previousElement || nextElement;
+		const contextElement = previousElement || nextElement;
 
 		return {
-			ownerDocument,
+			contextElement,
 			getBoundingClientRect() {
 				const previousRect = previousElement
 					? previousElement.getBoundingClientRect()
@@ -142,37 +95,44 @@ function BlockPopoverInbetween( {
 
 				let left = 0;
 				let top = 0;
+				let width = 0;
+				let height = 0;
 
 				if ( isVertical ) {
 					// vertical
 					top = previousRect ? previousRect.bottom : nextRect.top;
-
-					if ( isRTL() ) {
-						// vertical, rtl
-						left = previousRect
-							? previousRect.right
-							: nextRect.right;
-					} else {
-						// vertical, ltr
-						left = previousRect ? previousRect.left : nextRect.left;
-					}
+					width = previousRect ? previousRect.width : nextRect.width;
+					height =
+						nextRect && previousRect
+							? nextRect.top - previousRect.bottom
+							: 0;
+					left = previousRect ? previousRect.left : nextRect.left;
 				} else {
 					top = previousRect ? previousRect.top : nextRect.top;
+					height = previousRect
+						? previousRect.height
+						: nextRect.height;
 
 					if ( isRTL() ) {
 						// non vertical, rtl
-						left = previousRect
-							? previousRect.left
-							: nextRect.right;
+						left = nextRect ? nextRect.right : previousRect.left;
+						width =
+							previousRect && nextRect
+								? previousRect.left - nextRect.right
+								: 0;
 					} else {
 						// non vertical, ltr
 						left = previousRect
 							? previousRect.right
 							: nextRect.left;
+						width =
+							previousRect && nextRect
+								? nextRect.left - previousRect.right
+								: 0;
 					}
 				}
 
-				return new window.DOMRect( left, top, 0, 0 );
+				return new window.DOMRect( left, top, width, height );
 			},
 		};
 	}, [
@@ -255,7 +215,8 @@ function BlockPopoverInbetween( {
 			focusOnMount={ false }
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the default popover slot).
-			__unstableSlotName={ __unstablePopoverSlot || null }
+			__unstableSlotName={ __unstablePopoverSlot }
+			inline={ ! __unstablePopoverSlot }
 			// Forces a remount of the popover when its position changes
 			// This makes sure the popover doesn't animate from its previous position.
 			key={ nextClientId + '--' + rootClientId }
@@ -267,12 +228,10 @@ function BlockPopoverInbetween( {
 			) }
 			resize={ false }
 			flip={ false }
-			placement="bottom-start"
+			placement="overlay"
+			variant="unstyled"
 		>
-			<div
-				className="block-editor-block-popover__inbetween-container"
-				style={ style }
-			>
+			<div className="block-editor-block-popover__inbetween-container">
 				{ children }
 			</div>
 		</Popover>

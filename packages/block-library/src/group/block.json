@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/group",
 	"title": "Group",
 	"category": "design",
@@ -15,17 +15,30 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
+		},
+		"allowedBlocks": {
+			"type": "array"
 		}
 	},
 	"supports": {
 		"__experimentalOnEnter": true,
+		"__experimentalOnMerge": true,
 		"__experimentalSettings": true,
 		"align": [ "wide", "full" ],
 		"anchor": true,
 		"ariaLabel": true,
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true
+			}
+		},
 		"color": {
 			"gradients": true,
+			"heading": true,
+			"button": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
@@ -41,6 +54,9 @@
 				"blockGap": true
 			}
 		},
+		"dimensions": {
+			"minHeight": true
+		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
@@ -52,6 +68,9 @@
 				"style": true,
 				"width": true
 			}
+		},
+		"position": {
+			"sticky": true
 		},
 		"typography": {
 			"fontSize": true,
@@ -66,7 +85,9 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalLayout": true
+		"layout": {
+			"allowSizingOnChildren": true
+		}
 	},
 	"editorStyle": "wp-block-group-editor",
 	"style": "wp-block-group"

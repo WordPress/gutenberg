@@ -17,38 +17,6 @@ import {
  */
 import { useBlockPreview } from '../';
 
-jest.mock( '@wordpress/dom', () => {
-	const focus = jest.requireActual( '../../../../../dom/src' ).focus;
-
-	return {
-		focus: {
-			...focus,
-			focusable: {
-				...focus.focusable,
-				find( context ) {
-					// In JSDOM, all elements have zero'd widths and height.
-					// This is a metric for focusable's `isVisible`, so find
-					// and apply an arbitrary non-zero width.
-					Array.from( context.querySelectorAll( '*' ) ).forEach(
-						( element ) => {
-							Object.defineProperties( element, {
-								offsetWidth: {
-									get: () => 1,
-									configurable: true,
-								},
-							} );
-						}
-					);
-
-					return focus.focusable.find( ...arguments );
-				},
-			},
-		},
-	};
-} );
-
-jest.useRealTimers();
-
 describe( 'useBlockPreview', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block', {
@@ -78,14 +46,19 @@ describe( 'useBlockPreview', () => {
 			blocks,
 			props: { className },
 		} );
-		return <div { ...blockPreviewProps } />;
+		return (
+			<div
+				{ ...blockPreviewProps }
+				data-testid="block-preview-component"
+			/>
+		);
 	}
 
 	it( 'will render a block preview with minimal nesting', async () => {
 		const blocks = [];
 		blocks.push( createBlock( 'core/test-block' ) );
 
-		const { container } = render(
+		render(
 			<BlockPreviewComponent
 				className="test-container-classname"
 				blocks={ blocks }
@@ -99,12 +72,20 @@ describe( 'useBlockPreview', () => {
 		);
 		expect( previewedBlockContents ).toBeInTheDocument();
 
-		// Ensure the block preview class names are merged with the component's class name.
-		expect( container.firstChild.className ).toBe(
-			'test-container-classname block-editor-block-preview__live-content components-disabled'
+		const blockPreviewComponent = screen.getByTestId(
+			'block-preview-component'
 		);
 
+		// Ensure the block preview class names are merged with the component's class name.
+		expect( blockPreviewComponent ).toHaveClass(
+			'block-editor-block-preview__live-content'
+		);
+		expect( blockPreviewComponent ).toHaveClass(
+			'test-container-classname'
+		);
+		expect( blockPreviewComponent ).toHaveClass( 'components-disabled' );
+
 		// Ensure there is no nesting between the parent component and rendered blocks.
-		expect( container.firstChild.firstChild ).toBe( previewedBlock );
+		expect( blockPreviewComponent ).toContainElement( previewedBlock );
 	} );
 } );

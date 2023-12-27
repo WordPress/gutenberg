@@ -65,18 +65,6 @@ export default function ListViewOutline() {
 	}, [] );
 	return (
 		<>
-			{ headingCount > 0 ? (
-				<DocumentOutline />
-			) : (
-				<div className="edit-post-editor__list-view-empty-headings">
-					<EmptyOutlineIllustration />
-					<p>
-						{ __(
-							'Navigate the structure of your document and address issues like empty or incorrect heading levels.'
-						) }
-					</p>
-				</div>
-			) }
 			<div className="edit-post-editor__list-view-overview">
 				<div>
 					<Text>{ __( 'Characters:' ) }</Text>
@@ -93,6 +81,18 @@ export default function ListViewOutline() {
 					<TimeToRead />
 				</div>
 			</div>
+			{ headingCount > 0 ? (
+				<DocumentOutline />
+			) : (
+				<div className="edit-post-editor__list-view-empty-headings">
+					<EmptyOutlineIllustration />
+					<p>
+						{ __(
+							'Navigate the structure of your document and address issues like empty or incorrect heading levels.'
+						) }
+					</p>
+				</div>
+			) }
 		</>
 	);
 }

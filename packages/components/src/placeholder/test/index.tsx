@@ -8,12 +8,13 @@ import { render, screen, within } from '@testing-library/react';
  */
 import { useResizeObserver } from '@wordpress/compose';
 import { SVG, Path } from '@wordpress/primitives';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import BasePlaceholder from '../';
-import type { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
 import type { PlaceholderProps } from '../types';
 
 jest.mock( '@wordpress/compose', () => {
@@ -34,12 +35,15 @@ const testIcon = (
 
 const Placeholder = (
 	props: Omit<
-		WordPressComponentProps< PlaceholderProps< unknown >, 'div', false >,
+		WordPressComponentProps< PlaceholderProps, 'div', false >,
 		'ref'
 	>
 ) => <BasePlaceholder data-testid="placeholder" { ...props } />;
 
 const getPlaceholder = () => screen.getByTestId( 'placeholder' );
+
+jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
+const mockedSpeak = jest.mocked( speak );
 
 describe( 'Placeholder', () => {
 	beforeEach( () => {
@@ -48,10 +52,11 @@ describe( 'Placeholder', () => {
 			<div key="1" />,
 			{ width: 320 },
 		] );
+		mockedSpeak.mockReset();
 	} );
 
 	describe( 'basic rendering', () => {
-		it( 'should by default render label section and fieldset.', () => {
+		it( 'should by default render label section and content section.', () => {
 			render( <Placeholder /> );
 			const placeholder = getPlaceholder();
 
@@ -59,6 +64,7 @@ describe( 'Placeholder', () => {
 
 			// Test for empty label. When the label is empty, the only way to
 			// query the div is with `querySelector`.
+			// eslint-disable-next-line testing-library/no-node-access
 			const label = placeholder.querySelector(
 				'.components-placeholder__label'
 			);
@@ -67,14 +73,18 @@ describe( 'Placeholder', () => {
 
 			// Test for non existent instructions. When the instructions is
 			// empty, the only way to query the div is with `querySelector`.
+			// eslint-disable-next-line testing-library/no-node-access
 			const placeholderInstructions = placeholder.querySelector(
 				'.components-placeholder__instructions'
 			);
 			expect( placeholderInstructions ).not.toBeInTheDocument();
 
-			// Test for empty fieldset.
-			const placeholderFieldset =
-				within( placeholder ).getByRole( 'group' );
+			// Test for empty content. When the content is empty,
+			// the only way to query the div is with `querySelector`
+			// eslint-disable-next-line testing-library/no-node-access
+			const placeholderFieldset = placeholder.querySelector(
+				'.components-placeholder__fieldset'
+			);
 			expect( placeholderFieldset ).toBeInTheDocument();
 			expect( placeholderFieldset ).toBeEmptyDOMElement();
 		} );
@@ -84,6 +94,7 @@ describe( 'Placeholder', () => {
 
 			const placeholder = getPlaceholder();
 			const icon = within( placeholder ).getByTestId( 'icon' );
+			// eslint-disable-next-line testing-library/no-node-access
 			expect( icon.parentNode ).toHaveClass(
 				'components-placeholder__label'
 			);
@@ -101,27 +112,38 @@ describe( 'Placeholder', () => {
 			expect( placeholderLabel ).toBeInTheDocument();
 		} );
 
-		it( 'should display a fieldset from the children property', () => {
-			const content = 'Fieldset';
+		it( 'should display content from the children property', () => {
+			const content = 'Placeholder content';
 			render( <Placeholder>{ content }</Placeholder> );
-			const placeholderFieldset = screen.getByRole( 'group' );
+			const placeholder = screen.getByText( content );
 
-			expect( placeholderFieldset ).toBeInTheDocument();
-			expect( placeholderFieldset ).toHaveTextContent( content );
+			expect( placeholder ).toBeInTheDocument();
+			expect( placeholder ).toHaveTextContent( content );
 		} );
 
-		it( 'should display a legend if instructions are passed', () => {
+		it( 'should display instructions when provided', () => {
 			const instructions = 'Choose an option.';
 			render(
 				<Placeholder instructions={ instructions }>
-					<div>Fieldset</div>
+					<div>Placeholder content</div>
 				</Placeholder>
 			);
-			const captionedFieldset = screen.getByRole( 'group', {
-				name: instructions,
-			} );
+			const placeholder = getPlaceholder();
+			const instructionsContainer =
+				within( placeholder ).getByText( instructions );
 
-			expect( captionedFieldset ).toBeInTheDocument();
+			expect( instructionsContainer ).toBeInTheDocument();
+		} );
+
+		it( 'should announce instructions to screen readers', () => {
+			const instructions = 'Awesome block placeholder instructions.';
+			render(
+				<Placeholder instructions={ instructions }>
+					<div>Placeholder content</div>
+				</Placeholder>
+			);
+
+			expect( speak ).toHaveBeenCalledWith( instructions );
 		} );
 
 		it( 'should add an additional className to the top container', () => {

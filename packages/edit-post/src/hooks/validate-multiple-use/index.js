@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -28,9 +23,9 @@ const enhance = compose(
 	 * "original" block is not the current one. Thus, an inexisting
 	 * `originalBlockClientId` prop signals that the block is valid.
 	 *
-	 * @param {WPComponent} WrappedBlockEdit A filtered BlockEdit instance.
+	 * @param {Component} WrappedBlockEdit A filtered BlockEdit instance.
 	 *
-	 * @return {WPComponent} Enhanced component with merged state data props.
+	 * @return {Component} Enhanced component with merged state data props.
 	 */
 	withSelect( ( select, block ) => {
 		const multiple = hasBlockSupport( block.name, 'multiple', true );
@@ -44,8 +39,7 @@ const enhance = compose(
 		// Otherwise, only pass `originalBlockClientId` if it refers to a different
 		// block from the current one.
 		const blocks = select( blockEditorStore ).getBlocks();
-		const firstOfSameType = find(
-			blocks,
+		const firstOfSameType = blocks.find(
 			( { name } ) => block.name === name
 		);
 		const isInvalid =

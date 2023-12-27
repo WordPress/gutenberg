@@ -12,6 +12,7 @@ import {
 	useBlockProps,
 	InspectorControls,
 	store as blockEditorStore,
+	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
@@ -20,11 +21,6 @@ import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
-import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
 export default function Edit( {
 	attributes: { textAlign, showPostTitle, showCommentsCount, level },
@@ -98,7 +94,7 @@ export default function Edit( {
 				}
 			/>
 			<HeadingLevelDropdown
-				selectedLevel={ level }
+				value={ level }
 				onChange={ ( newLevel ) =>
 					setAttributes( { level: newLevel } )
 				}
@@ -110,6 +106,7 @@ export default function Edit( {
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Show post title' ) }
 					checked={ showPostTitle }
 					onChange={ ( value ) =>
@@ -117,6 +114,7 @@ export default function Edit( {
 					}
 				/>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Show comments count' ) }
 					checked={ showCommentsCount }
 					onChange={ ( value ) =>

@@ -137,6 +137,7 @@ export {
 	unregisterBlockVariation,
 } from './registration';
 export {
+	isUnmodifiedBlock,
 	isUnmodifiedDefaultBlock,
 	normalizeIconObject,
 	isValidIcon,

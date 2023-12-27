@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-import type { ReactNode } from 'react';
-
 export type FontSizePickerProps = {
 	/**
 	 * If `true`, it will not be possible to choose a custom fontSize. The user
@@ -27,7 +22,14 @@ export type FontSizePickerProps = {
 	 * attending to what reset means in that context, e.g., set the font size to
 	 * undefined or set the font size a starting value.
 	 */
-	onChange?: ( value: number | string | undefined ) => void;
+	onChange?: (
+		value: number | string | undefined,
+		selectedItem?: FontSize
+	) => void;
+	/**
+	 * Available units for custom font size selection.
+	 */
+	units?: string[];
 	/**
 	 * The current font size value.
 	 */
@@ -56,6 +58,12 @@ export type FontSizePickerProps = {
 	 */
 	__nextHasNoMarginBottom?: boolean;
 	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
+	/**
 	 * Size of the control.
 	 *
 	 * @default 'default'
@@ -81,18 +89,30 @@ export type FontSize = {
 	slug: string;
 };
 
-export type FontSizeOption = Omit< FontSize, 'size' > &
-	Partial< Pick< FontSize, 'size' > >;
-
-export type FontSizeSelectOption = Pick< FontSizeOption, 'size' > & {
-	key: string;
-	name?: string;
-	__experimentalHint: ReactNode;
+export type FontSizePickerSelectProps = Pick<
+	FontSizePickerProps,
+	'value' | 'size'
+> & {
+	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
+	disableCustomFontSizes: NonNullable<
+		FontSizePickerProps[ 'disableCustomFontSizes' ]
+	>;
+	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;
+	onSelectCustom: () => void;
+	__next40pxDefaultSize: boolean;
 };
 
-export type FontSizeToggleGroupOption = {
+export type FontSizePickerSelectOption = {
 	key: string;
-	value: number | string;
-	label: string;
 	name: string;
+	value?: FontSize[ 'size' ];
+	__experimentalHint?: string;
+};
+
+export type FontSizePickerToggleGroupProps = Pick<
+	FontSizePickerProps,
+	'value' | 'size' | '__nextHasNoMarginBottom' | '__next40pxDefaultSize'
+> & {
+	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
+	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;
 };

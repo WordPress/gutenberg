@@ -1,8 +1,15 @@
 @import "./functions";
+@import "./long-content-fade";
 
 /**
  * Breakpoint mixins
  */
+
+@mixin break-xhuge() {
+	@media (min-width: #{ ($break-xhuge) }) {
+		@content;
+	}
+}
 
 @mixin break-huge() {
 	@media (min-width: #{ ($break-huge) }) {
@@ -52,75 +59,12 @@
 	}
 }
 
-
-/**
- * Long content fade mixin
- *
- * Creates a fading overlay to signify that the content is longer
- * than the space allows.
- */
-
-@mixin long-content-fade($direction: right, $size: 20%, $color: #fff, $edge: 0, $z-index: false) {
-	content: "";
-	display: block;
-	position: absolute;
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	pointer-events: none;
-
-	@if $z-index {
-		z-index: $z-index;
-	}
-
-	@if $direction == "bottom" {
-		background: linear-gradient(to top, transparent, $color 90%);
-		left: $edge;
-		right: $edge;
-		top: $edge;
-		bottom: calc(100% - $size);
-		width: auto;
-	}
-
-	@if $direction == "top" {
-		background: linear-gradient(to bottom, transparent, $color 90%);
-		top: calc(100% - $size);
-		left: $edge;
-		right: $edge;
-		bottom: $edge;
-		width: auto;
-	}
-
-	@if $direction == "left" {
-		background: linear-gradient(to left, transparent, $color 90%);
-		top: $edge;
-		left: $edge;
-		bottom: $edge;
-		right: auto;
-		width: $size;
-		height: auto;
-	}
-
-	@if $direction == "right" {
-		background: linear-gradient(to right, transparent, $color 90%);
-		top: $edge;
-		bottom: $edge;
-		right: $edge;
-		left: auto;
-		width: $size;
-		height: auto;
-	}
-}
-
 /**
  * Focus styles.
  */
 
 @mixin block-toolbar-button-style__focus() {
-	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 4px $white;
+	box-shadow: inset 0 0 0 $border-width var(--wp-components-color-background, $white), 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
@@ -131,17 +75,33 @@
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
 	border-radius: $radius-block-ui;
-	border: $border-width solid $gray-700;
+	border: $border-width solid $gray-600;
 	@include reduce-motion("transition");
 }
 
 
 @mixin input-style__focus() {
 	border-color: var(--wp-admin-theme-color);
-	box-shadow: 0 0 0 ($border-width-focus - $border-width) var(--wp-admin-theme-color);
+	// Expand the default border focus style by .5px to be a total of 1.5px.
+	box-shadow: 0 0 0 0.5px var(--wp-admin-theme-color);
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+}
+
+@mixin button-style__focus() {
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
+}
+
+
+@mixin button-style-outset__focus($focus-color) {
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $white, 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) $focus-color;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+	outline-offset: 2px;
 }
 
 
@@ -286,7 +246,7 @@
 	border-radius: $radius-block-ui;
 
 	&:focus {
-		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus-fallback) var(--wp-admin-theme-color);
 
 		// Only visible in Windows High Contrast mode.
 		outline: 2px solid transparent;
@@ -370,7 +330,7 @@
 	}
 
 	&:focus {
-		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus-fallback) var(--wp-admin-theme-color);
 
 		// Only visible in Windows High Contrast mode.
 		outline: 2px solid transparent;
@@ -394,6 +354,31 @@
 	*::before,
 	*::after {
 		box-sizing: inherit;
+	}
+}
+
+// The editor input reset with increased specificity to avoid theme styles bleeding in.
+@mixin editor-input-reset() {
+	font-family: $editor-html-font !important;
+	color: $gray-900 !important;
+	background: $white !important;
+	padding: $grid-unit-15 !important;
+	border: $border-width solid $gray-900 !important;
+	box-shadow: none !important;
+	border-radius: $radius-block-ui !important;
+
+	// Fonts smaller than 16px causes mobile safari to zoom.
+	font-size: $mobile-text-min-font-size !important;
+	@include break-small {
+		font-size: $default-font-size !important;
+	}
+
+	&:focus {
+		border-color: var(--wp-admin-theme-color) !important;
+		box-shadow: 0 0 0 ($border-width-focus-fallback - $border-width) var(--wp-admin-theme-color) !important;
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent !important;
 	}
 }
 
@@ -549,4 +534,48 @@
 		background: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);
 	}
 	/* stylelint-enable function-comma-space-after */
+}
+
+@mixin custom-scrollbars-on-hover($handle-color, $handle-color-hover) {
+
+	// WebKit
+	&::-webkit-scrollbar {
+		width: 12px;
+		height: 12px;
+	}
+	&::-webkit-scrollbar-track {
+		background-color: transparent;
+	}
+	&::-webkit-scrollbar-thumb {
+		background-color: $handle-color;
+		border-radius: 8px;
+		border: 3px solid transparent;
+		background-clip: padding-box;
+	}
+	&:hover::-webkit-scrollbar-thumb, // This needs specificity.
+	&:focus::-webkit-scrollbar-thumb,
+	&:focus-within::-webkit-scrollbar-thumb {
+		background-color: $handle-color-hover;
+	}
+
+	// Firefox 109+ and Chrome 111+
+	scrollbar-width: thin;
+	scrollbar-gutter: stable both-edges;
+	scrollbar-color: $handle-color transparent; // Syntax, "dark", "light", or "#handle-color #track-color"
+
+	&:hover,
+	&:focus,
+	&:focus-within {
+		scrollbar-color: $handle-color-hover transparent;
+	}
+
+	// Needed to fix a Safari rendering issue.
+	will-change: transform;
+
+	// Always show scrollbar on Mobile devices.
+	@media (hover: none) {
+		& {
+			scrollbar-color: $handle-color-hover transparent;
+		}
+	}
 }

@@ -26,6 +26,10 @@ import { Icon, check } from '@wordpress/icons';
 | ------ | --------- | ------- | ----------------------- |
 | `size` | `integer` | `24`    | Size of icon in pixels. |
 
+## Docs & Examples
+
+You can browse the icons docs and examples at [https://wordpress.github.io/gutenberg/?path=/docs/icons-icon--default](https://wordpress.github.io/gutenberg/?path=/docs/icons-icon--default)
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.

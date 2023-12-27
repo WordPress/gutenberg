@@ -1,0 +1,35 @@
+[
+	{
+		"name": "core/cover",
+		"isValid": true,
+		"attributes": {
+			"url": "https://w.wiki/59So",
+			"useFeaturedImage": false,
+			"id": 612,
+			"alt": "Custom alt text",
+			"hasParallax": true,
+			"isRepeated": false,
+			"dimRatio": 50,
+			"backgroundType": "image",
+			"isDark": false,
+			"tagName": "div",
+			"layout": {
+				"type": "constrained"
+			}
+		},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"align": "center",
+					"content": "",
+					"dropCap": false,
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

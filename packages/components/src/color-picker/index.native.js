@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback, Platform } from 'react-native';
-import HsvColorPicker from 'react-native-hsv-color-picker';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 /**
@@ -17,6 +16,7 @@ import { Icon, check, close } from '@wordpress/icons';
  * Internal dependencies
  */
 import styles from './style.scss';
+import HsvColorPicker from './hsv-color-picker.native.js';
 
 extend( [ namesPlugin ] );
 
@@ -122,6 +122,7 @@ function ColorPicker( {
 		<>
 			<HsvColorPicker
 				huePickerHue={ hue }
+				currentColor={ currentColor }
 				onHuePickerDragMove={ updateColor }
 				onHuePickerPress={
 					! isBottomSheetContentScrolling && updateColor

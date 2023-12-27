@@ -3,9 +3,12 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'splitting and merging blocks', () => {
-	test.beforeEach( async ( { admin } ) => {
+test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeFocused();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
@@ -23,7 +26,7 @@ test.describe( 'splitting and merging blocks', () => {
 
 		// Move caret between 'First' and 'Second' and press Enter to split
 		// paragraph blocks.
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 6 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 6 } );
 		await page.keyboard.press( 'Enter' );
 
 		// Assert that there are now two paragraph blocks with correct content.
@@ -55,16 +58,16 @@ test.describe( 'splitting and merging blocks', () => {
 <!-- /wp:paragraph -->`
 		);
 
-		await pageUtils.pressKeyTimes( 'Backspace', 7 ); // Delete "Between"
+		await pageUtils.pressKeys( 'Backspace', { times: 7 } ); // Delete "Between"
 
 		// Edge case: Without ensuring that the editor still has focus when
 		// restoring a bookmark, the caret may be inadvertently moved back to
 		// an inline boundary after a split occurs.
 		await page.keyboard.press( 'Home' );
 		await page.keyboard.down( 'Shift' );
-		await pageUtils.pressKeyTimes( 'ArrowRight', 5 );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 5 } );
 		await page.keyboard.up( 'Shift' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await pageUtils.pressKeys( 'primary+b' );
 		// Collapse selection, still within inline boundary.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
@@ -90,13 +93,13 @@ test.describe( 'splitting and merging blocks', () => {
 		// Regression Test: Caret should reset to end of inline boundary when
 		// backspacing to delete second paragraph.
 		await editor.insertBlock( { name: 'core/paragraph' } );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( 'Foo' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Backspace' );
 
 		// Replace contents of first paragraph with "Bar".
-		await pageUtils.pressKeyTimes( 'Backspace', 4 );
+		await pageUtils.pressKeys( 'Backspace', { times: 4 } );
 		await page.keyboard.type( 'Bar' );
 
 		const content = await editor.getEditedPostContent();
@@ -161,7 +164,7 @@ test.describe( 'splitting and merging blocks', () => {
 
 		// Select text.
 		await page.keyboard.down( 'Shift' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 3 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 3 } );
 		await page.keyboard.up( 'Shift' );
 
 		// Delete selection.
@@ -194,9 +197,9 @@ test.describe( 'splitting and merging blocks', () => {
 		// The regression appeared to only affect paragraphs created while
 		// within an inline boundary.
 		await page.keyboard.down( 'Shift' );
-		await pageUtils.pressKeyTimes( 'ArrowLeft', 3 );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 3 } );
 		await page.keyboard.up( 'Shift' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'b' );
+		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
@@ -306,11 +309,11 @@ test.describe( 'splitting and merging blocks', () => {
 
 		// There is a default block and post title:
 		await expect(
-			page.locator( 'role=document[name=/Empty block/i]' )
+			editor.canvas.locator( 'role=document[name=/Empty block/i]' )
 		).toBeVisible();
 
 		await expect(
-			page.locator( 'role=textbox[name="Add title"i]' )
+			editor.canvas.locator( 'role=textbox[name="Add title"i]' )
 		).toBeVisible();
 
 		// But the effective saved content is still empty:
@@ -318,7 +321,7 @@ test.describe( 'splitting and merging blocks', () => {
 
 		// And focus is retained:
 		await expect(
-			page.locator( 'role=document[name=/Empty block/i]' )
+			editor.canvas.locator( 'role=document[name=/Empty block/i]' )
 		).toBeFocused();
 	} );
 
@@ -331,13 +334,20 @@ test.describe( 'splitting and merging blocks', () => {
 		await page.keyboard.type( '12' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 
 		// Check the content.
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '12',
+				},
+			},
+		] );
 	} );
 
-	test( 'should not split with line break in front', async ( {
+	test( 'should not split with line break in front (-firefox)', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -345,7 +355,7 @@ test.describe( 'splitting and merging blocks', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Enter' );
+		await pageUtils.pressKeys( 'shift+Enter' );
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'Backspace' );
@@ -363,45 +373,92 @@ test.describe( 'splitting and merging blocks', () => {
 		);
 	} );
 
-	test.describe(
-		'test restore selection when merge produces more than one block',
-		() => {
-			test( 'on forward delete', async ( {
-				editor,
-				page,
-				pageUtils,
-			} ) => {
-				await editor.insertBlock( { name: 'core/paragraph' } );
-				await page.keyboard.type( 'hi' );
-				await editor.insertBlock( { name: 'core/list' } );
-				await page.keyboard.type( 'item 1' );
-				await page.keyboard.press( 'Enter' );
-				await page.keyboard.type( 'item 2' );
-				await pageUtils.pressKeyTimes( 'ArrowUp', 2 );
-				await page.keyboard.press( 'Delete' );
-				// Carret should be in the first block and at the proper position.
-				await page.keyboard.type( '-' );
+	test.describe( 'test restore selection when merge produces more than one block', () => {
+		const snap1 = [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'hi',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'item 1',
+				},
+			},
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: {
+							content: 'item 2',
+						},
+					},
+				],
+			},
+		];
 
-				// Check the content.
-				expect( await editor.getEditedPostContent() ).toMatchSnapshot();
-			} );
+		const snap2 = [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'hi-item 1',
+				},
+			},
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: {
+							content: 'item 2',
+						},
+					},
+				],
+			},
+		];
 
-			test( 'on backspace', async ( { editor, page, pageUtils } ) => {
-				await editor.insertBlock( { name: 'core/paragraph' } );
-				await page.keyboard.type( 'hi' );
-				await editor.insertBlock( { name: 'core/list' } );
-				await page.keyboard.type( 'item 1' );
-				await page.keyboard.press( 'Enter' );
-				await page.keyboard.type( 'item 2' );
-				await page.keyboard.press( 'ArrowUp' );
-				await pageUtils.pressKeyTimes( 'ArrowLeft', 6 );
-				await page.keyboard.press( 'Backspace' );
-				// Carret should be in the first block and at the proper position.
-				await page.keyboard.type( '-' );
+		test( 'on forward delete', async ( { editor, page, pageUtils } ) => {
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await page.keyboard.type( 'hi' );
+			await editor.insertBlock( { name: 'core/list' } );
+			await page.keyboard.type( 'item 1' );
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( 'item 2' );
+			await pageUtils.pressKeys( 'ArrowUp', { times: 3 } );
+			await page.keyboard.press( 'Delete' );
 
-				// Check the content.
-				expect( await editor.getEditedPostContent() ).toMatchSnapshot();
-			} );
-		}
-	);
+			expect( await editor.getBlocks() ).toMatchObject( snap1 );
+
+			await page.keyboard.press( 'Delete' );
+			// Carret should be in the first block and at the proper position.
+			await page.keyboard.type( '-' );
+
+			// Check the content.
+			expect( await editor.getBlocks() ).toMatchObject( snap2 );
+		} );
+
+		test( 'on backspace', async ( { editor, page, pageUtils } ) => {
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await page.keyboard.type( 'hi' );
+			await editor.insertBlock( { name: 'core/list' } );
+			await page.keyboard.type( 'item 1' );
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( 'item 2' );
+			await page.keyboard.press( 'ArrowUp' );
+			await pageUtils.pressKeys( 'ArrowLeft', { times: 6 } );
+			await page.keyboard.press( 'Backspace' );
+
+			expect( await editor.getBlocks() ).toMatchObject( snap1 );
+
+			await page.keyboard.press( 'Backspace' );
+			// Carret should be in the first block and at the proper position.
+			await page.keyboard.type( '-' );
+
+			// Check the content.
+			expect( await editor.getBlocks() ).toMatchObject( snap2 );
+		} );
+	} );
 } );

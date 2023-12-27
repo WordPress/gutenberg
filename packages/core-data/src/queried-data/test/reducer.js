@@ -64,6 +64,17 @@ describe( 'getMergedItemIds', () => {
 
 		expect( result ).toEqual( [ 1, 3, 4 ] );
 	} );
+	it( 'should update a page properly if less items are provided than previously stored', () => {
+		let original = deepFreeze( [ 1, 2, 3 ] );
+		let result = getMergedItemIds( original, [ 1, 2 ], 1, 3 );
+
+		expect( result ).toEqual( [ 1, 2 ] );
+
+		original = deepFreeze( [ 1, 2, 3, 4, 5, 6 ] );
+		result = getMergedItemIds( original, [ 9 ], 2, 2 );
+
+		expect( result ).toEqual( [ 1, 2, 9, undefined, 5, 6 ] );
+	} );
 } );
 
 describe( 'itemIsComplete', () => {
@@ -159,7 +170,7 @@ describe( 'reducer', () => {
 				default: { 1: true },
 			},
 			queries: {
-				default: { 's=a': [ 1 ] },
+				default: { 's=a': { itemIds: [ 1 ] } },
 			},
 		} );
 	} );
@@ -200,8 +211,8 @@ describe( 'reducer', () => {
 			},
 			queries: {
 				default: {
-					'': [ 1, 2, 3, 4 ],
-					's=a': [ 1, 3 ],
+					'': { itemIds: [ 1, 2, 3, 4 ] },
+					's=a': { itemIds: [ 1, 3 ] },
 				},
 			},
 		} );
@@ -218,8 +229,48 @@ describe( 'reducer', () => {
 			},
 			queries: {
 				default: {
-					'': [ 1, 2, 4 ],
-					's=a': [ 1 ],
+					'': { itemIds: [ 1, 2, 4 ] },
+					's=a': { itemIds: [ 1 ] },
+				},
+			},
+		} );
+	} );
+
+	it( 'deletes an item with string ID', () => {
+		const kind = 'postType';
+		const name = 'wp_template';
+		const original = deepFreeze( {
+			items: {
+				default: {
+					'foo//bar1': { id: 'foo//bar1', name: 'Foo Bar 1' },
+					'foo//bar2': { id: 'foo//bar2', name: 'Foo Bar 2' },
+					'foo//bar3': { id: 'foo//bar3', name: 'Foo Bar 3' },
+				},
+			},
+			queries: {
+				default: {
+					'': { itemIds: [ 'foo//bar1', 'foo//bar2', 'foo//bar3' ] },
+					's=2': { itemIds: [ 'foo//bar2' ] },
+				},
+			},
+		} );
+		const state = reducer(
+			original,
+			removeItems( kind, name, 'foo//bar2' )
+		);
+
+		expect( state ).toEqual( {
+			itemIsComplete: {},
+			items: {
+				default: {
+					'foo//bar1': { id: 'foo//bar1', name: 'Foo Bar 1' },
+					'foo//bar3': { id: 'foo//bar3', name: 'Foo Bar 3' },
+				},
+			},
+			queries: {
+				default: {
+					'': { itemIds: [ 'foo//bar1', 'foo//bar3' ] },
+					's=2': { itemIds: [] },
 				},
 			},
 		} );
