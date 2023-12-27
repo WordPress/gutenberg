@@ -4,7 +4,7 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-`ToggleGroupControlOptionIcon` is a form component which is meant to be used as a child of [`ToggleGroupControl`] and displays an icon(<(/packages/components/src/toggle-group-control/toggle-group-control/README.md)>).
+`ToggleGroupControlOptionIcon` is a form component which is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md) and displays an icon.
 
 ## Usage
 

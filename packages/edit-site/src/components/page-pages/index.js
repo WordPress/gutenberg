@@ -133,8 +133,10 @@ export default function PagePages() {
 	const [ pageId, setPageId ] = useState( null );
 	const history = useHistory();
 
-	const onSelectionChange = ( items ) =>
-		setPageId( items?.length === 1 ? items[ 0 ].id : null );
+	const onSelectionChange = useCallback(
+		( items ) => setPageId( items?.length === 1 ? items[ 0 ].id : null ),
+		[ setPageId ]
+	);
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -303,23 +305,19 @@ export default function PagePages() {
 		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]
 	);
 	const onChangeView = useCallback(
-		( viewUpdater ) => {
-			let updatedView =
-				typeof viewUpdater === 'function'
-					? viewUpdater( view )
-					: viewUpdater;
-			if ( updatedView.type !== view.type ) {
-				updatedView = {
-					...updatedView,
+		( newView ) => {
+			if ( newView.type !== view.type ) {
+				newView = {
+					...newView,
 					layout: {
-						...defaultConfigPerViewType[ updatedView.type ],
+						...defaultConfigPerViewType[ newView.type ],
 					},
 				};
 			}
 
-			setView( updatedView );
+			setView( newView );
 		},
-		[ view, setView ]
+		[ view.type, setView ]
 	);
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
@@ -338,12 +336,10 @@ export default function PagePages() {
 					fields={ fields }
 					actions={ actions }
 					data={ pages || EMPTY_ARRAY }
-					getItemId={ ( item ) => item.id }
 					isLoading={ isLoadingPages || isLoadingAuthors }
 					view={ view }
 					onChangeView={ onChangeView }
 					onSelectionChange={ onSelectionChange }
-					deferredRendering={ false }
 				/>
 			</Page>
 			{ view.type === LAYOUT_LIST && (
