@@ -43,7 +43,9 @@ export { useBaseControlProps } from './hooks';
  * );
  * ```
  */
-const UnconnectedBaseControl = ( props: BaseControlProps ) => {
+const UnconnectedBaseControl = (
+	props: WordPressComponentProps< BaseControlProps, null >
+) => {
 	const {
 		__nextHasNoMarginBottom = false,
 		id,
