@@ -181,7 +181,10 @@ test.describe( 'Block Switcher', () => {
 		).toBeHidden();
 	} );
 
-	test( 'Block variation transforms', async ( { editor, page } ) => {
+	test( 'should be able to transform to block variations', async ( {
+		editor,
+		page,
+	} ) => {
 		// This is the `stack` Group variation.
 		await editor.insertBlock( {
 			name: 'core/group',
