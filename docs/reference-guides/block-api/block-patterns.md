@@ -14,7 +14,7 @@ In this Document:
 	- [Block patterns contextual to block types and pattern transformations](#block-patterns-contextual-to-block-types-and-pattern-transformations)
 	- [Semantic block patterns](#semantic-block-patterns)
 
-## Block Patterns
+## Block patterns
 
 ### register_block_pattern
 
@@ -63,7 +63,7 @@ function my_plugin_register_my_patterns() {
 add_action( 'init', 'my_plugin_register_my_patterns' );
 ```
 
-## Unregistering Block Patterns
+## Unregistering block patterns
 
 ### unregister_block_pattern
 
@@ -88,7 +88,7 @@ function my_plugin_unregister_my_patterns() {
 add_action( 'init', 'my_plugin_unregister_my_patterns' );
 ```
 
-## Block Pattern Categories
+## Block pattern categories
 
 Block patterns can be grouped using categories. The block editor comes with bundled categories you can use on your custom block patterns. You can also register your own block pattern categories.
 

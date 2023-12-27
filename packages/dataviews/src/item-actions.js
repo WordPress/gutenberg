@@ -17,10 +17,10 @@ import { moreVertical } from '@wordpress/icons';
 import { unlock } from './lock-unlock';
 
 const {
-	DropdownMenuV2Ariakit: DropdownMenu,
-	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
-	DropdownMenuItemV2Ariakit: DropdownMenuItem,
-	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuGroupV2: DropdownMenuGroup,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
 function ButtonTrigger( { action, onClick } ) {
@@ -120,9 +120,6 @@ export default function ItemActions( { item, actions, isCompact } ) {
 			{ primaryActions: [], secondaryActions: [] }
 		);
 	}, [ actions, item ] );
-	if ( ! primaryActions.length && ! secondaryActions.length ) {
-		return null;
-	}
 	if ( isCompact ) {
 		return (
 			<CompactItemActions
@@ -161,23 +158,22 @@ export default function ItemActions( { item, actions, isCompact } ) {
 						/>
 					);
 				} ) }
-			{ !! secondaryActions.length && (
-				<DropdownMenu
-					trigger={
-						<Button
-							size="compact"
-							icon={ moreVertical }
-							label={ __( 'Actions' ) }
-						/>
-					}
-					placement="bottom-end"
-				>
-					<ActionsDropdownMenuGroup
-						actions={ secondaryActions }
-						item={ item }
+			<DropdownMenu
+				trigger={
+					<Button
+						size="compact"
+						icon={ moreVertical }
+						label={ __( 'Actions' ) }
+						disabled={ ! secondaryActions.length }
 					/>
-				</DropdownMenu>
-			) }
+				}
+				placement="bottom-end"
+			>
+				<ActionsDropdownMenuGroup
+					actions={ secondaryActions }
+					item={ item }
+				/>
+			</DropdownMenu>
 		</HStack>
 	);
 }
@@ -190,6 +186,9 @@ function CompactItemActions( { item, primaryActions, secondaryActions } ) {
 					size="compact"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
+					disabled={
+						! primaryActions.length && ! secondaryActions.length
+					}
 				/>
 			}
 			placement="bottom-end"

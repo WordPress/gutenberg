@@ -48,6 +48,7 @@ import { Caption } from '../utils/caption';
 /**
  * Module constants
  */
+import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../utils/constants';
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 import { evalAspectRatio } from './utils';
 
@@ -133,17 +134,49 @@ export default function Image( {
 	const { allowResize = true } = context;
 	const { getBlock } = useSelect( blockEditorStore );
 
-	const { image, multiImageSelection } = useSelect(
+	const { image } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
-			const { getMultiSelectedBlockClientIds, getBlockName } =
-				select( blockEditorStore );
-			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
 				image:
 					id && isSelected
 						? getMedia( id, { context: 'view' } )
 						: null,
+			};
+		},
+		[ id, isSelected ]
+	);
+
+	const {
+		canInsertCover,
+		imageEditing,
+		imageSizes,
+		maxWidth,
+		mediaUpload,
+		multiImageSelection,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				getMultiSelectedBlockClientIds,
+				getBlockName,
+				getSettings,
+				canInsertBlockType,
+			} = select( blockEditorStore );
+
+			const rootClientId = getBlockRootClientId( clientId );
+			const settings = getSettings();
+			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
+
+			return {
+				imageEditing: settings.imageEditing,
+				imageSizes: settings.imageSizes,
+				maxWidth: settings.maxWidth,
+				mediaUpload: settings.mediaUpload,
+				canInsertCover: canInsertBlockType(
+					'core/cover',
+					rootClientId
+				),
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
@@ -152,33 +185,8 @@ export default function Image( {
 					),
 			};
 		},
-		[ id, isSelected ]
+		[ clientId ]
 	);
-	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockRootClientId,
-					getSettings,
-					canInsertBlockType,
-				} = select( blockEditorStore );
-
-				const rootClientId = getBlockRootClientId( clientId );
-				const settings = getSettings();
-
-				return {
-					imageEditing: settings.imageEditing,
-					imageSizes: settings.imageSizes,
-					maxWidth: settings.maxWidth,
-					mediaUpload: settings.mediaUpload,
-					canInsertCover: canInsertBlockType(
-						'core/cover',
-						rootClientId
-					),
-				};
-			},
-			[ clientId ]
-		);
 
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
@@ -196,7 +204,8 @@ export default function Image( {
 	const isResizable =
 		allowResize &&
 		hasNonContentControls &&
-		! ( isWideAligned && isLargeViewport );
+		! isWideAligned &&
+		isLargeViewport;
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
@@ -391,7 +400,11 @@ export default function Image( {
 
 	const sizeControls = (
 		<InspectorControls>
-			<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ resetAll }
+				dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			>
 				{ isResizable && dimensionsControl }
 			</ToolsPanel>
 		</InspectorControls>
@@ -452,7 +465,11 @@ export default function Image( {
 				</BlockControls>
 			) }
 			<InspectorControls>
-				<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ resetAll }
+					dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+				>
 					{ ! multiImageSelection && (
 						<ToolsPanelItem
 							label={ __( 'Alternative text' ) }
@@ -745,7 +762,9 @@ export default function Image( {
 				isSelected={ isSelected }
 				insertBlocksAfter={ insertBlocksAfter }
 				label={ __( 'Image caption text' ) }
-				showToolbarButton={ hasNonContentControls }
+				showToolbarButton={
+					! multiImageSelection && hasNonContentControls
+				}
 			/>
 		</>
 	);

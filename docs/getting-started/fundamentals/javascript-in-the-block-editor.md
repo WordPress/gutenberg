@@ -2,7 +2,7 @@
 
 A JavaScript Build Process is recommended for most cases when working with Javascript for the Block Editor. With a build process, you'll be able to work with ESNext and JSX (among others) syntaxes and features in your code while producing code ready for the majority of the browsers.
 
-## JavaScript Build Process
+## JavaScript build process
 
 ["ESNext"](https://developer.mozilla.org/en-US/docs/Web/JavaScript/JavaScript_technologies_overview#standardization_process) is a dynamic name that refers to Javascript's latest syntax and features. ["JSX"](https://react.dev/learn/writing-markup-with-jsx) is a custom syntax extension to JavaScript, created by React project, that allows you to write JavaScript using a familiar HTML tag-like syntax.
 
@@ -42,6 +42,7 @@ Use [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/ho
 
 ## Additional resources
 
+- [Package Reference](https://developer.wordpress.org/block-editor/reference-guides/packages/)
 - [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/) 
 - [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) 
 - [WordPress Packages handles](https://developer.wordpress.org/block-editor/contributors/code/scripts/) 

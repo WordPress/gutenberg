@@ -134,7 +134,7 @@ export function onBlockDrop(
  *
  * @param {string}   targetRootClientId    The root client id where the block(s) will be inserted.
  * @param {number}   targetBlockIndex      The index where the block(s) will be inserted.
- * @param {boolean}  hasUploadPermissions  Whether the user has upload permissions.
+ * @param {Function} getSettings           A function that gets the block editor settings.
  * @param {Function} updateBlockAttributes A function that updates a block's attributes.
  * @param {Function} canInsertBlockType    A function that returns checks whether a block type can be inserted.
  * @param {Function} insertOrReplaceBlocks A function that inserts or replaces blocks.
@@ -144,13 +144,13 @@ export function onBlockDrop(
 export function onFilesDrop(
 	targetRootClientId,
 	targetBlockIndex,
-	hasUploadPermissions,
+	getSettings,
 	updateBlockAttributes,
 	canInsertBlockType,
 	insertOrReplaceBlocks
 ) {
 	return ( files ) => {
-		if ( ! hasUploadPermissions ) {
+		if ( ! getSettings().mediaUpload ) {
 			return;
 		}
 
@@ -211,16 +211,13 @@ export default function useOnBlockDrop(
 	options = {}
 ) {
 	const { operation = 'insert' } = options;
-	const hasUploadPermissions = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
-		[]
-	);
 	const {
 		canInsertBlockType,
 		getBlockIndex,
 		getClientIdsOfDescendants,
 		getBlockOrder,
 		getBlocksByClientId,
+		getSettings,
 	} = useSelect( blockEditorStore );
 	const {
 		insertBlocks,
@@ -313,7 +310,7 @@ export default function useOnBlockDrop(
 	const _onFilesDrop = onFilesDrop(
 		targetRootClientId,
 		targetBlockIndex,
-		hasUploadPermissions,
+		getSettings,
 		updateBlockAttributes,
 		canInsertBlockType,
 		insertOrReplaceBlocks

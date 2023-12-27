@@ -113,8 +113,14 @@ export function RichTextWrapper(
 	props = removeNativeProps( props );
 
 	const anchorRef = useRef();
-	const { clientId } = useBlockEditContext();
+	const { clientId, isSelected: isBlockSelected } = useBlockEditContext();
 	const selector = ( select ) => {
+		// Avoid subscribing to the block editor store if the block is not
+		// selected.
+		if ( ! isBlockSelected ) {
+			return { isSelected: false };
+		}
+
 		const { getSelectionStart, getSelectionEnd } =
 			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
@@ -137,10 +143,12 @@ export function RichTextWrapper(
 			isSelected,
 		};
 	};
-	// This selector must run on every render so the right selection state is
-	// retrieved from the store on merge.
-	// To do: fix this somehow.
-	const { selectionStart, selectionEnd, isSelected } = useSelect( selector );
+	const { selectionStart, selectionEnd, isSelected } = useSelect( selector, [
+		clientId,
+		identifier,
+		originalIsSelected,
+		isBlockSelected,
+	] );
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
@@ -317,10 +325,13 @@ export function RichTextWrapper(
 				{ ...props }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
+					// Rich text ref must be first because its focus listener
+					// must be set up before any other ref calls .focus() on
+					// mount.
+					richTextRef,
 					forwardedRef,
 					autocompleteProps.ref,
 					props.ref,
-					richTextRef,
 					useBeforeInputRules( { value, onChange } ),
 					useInputRules( {
 						getValue,
@@ -379,6 +390,7 @@ export function RichTextWrapper(
 				// tabIndex because Safari will focus the element. However,
 				// Safari will correctly ignore nested contentEditable elements.
 				tabIndex={ props.tabIndex === 0 ? null : props.tabIndex }
+				data-wp-block-attribute-key={ identifier }
 			/>
 		</>
 	);

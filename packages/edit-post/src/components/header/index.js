@@ -37,12 +37,11 @@ import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
-import ViewLink from '../view-link';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { PreviewDropdown } = unlock( editorPrivateApis );
+const { PostViewLink, PreviewDropdown } = unlock( editorPrivateApis );
 
 const slideY = {
 	hidden: { y: '-50px' },
@@ -56,15 +55,12 @@ const slideX = {
 	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
 };
 
-function Header( {
-	setEntitiesSavedStatesCallback,
-	setListViewToggleElement,
-} ) {
+function Header( { setEntitiesSavedStatesCallback } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const blockToolbarRef = useRef();
 	const {
-		blockSelectionStart,
+		hasBlockSelection,
 		hasActiveMetaboxes,
 		hasFixedToolbar,
 		isEditingTemplate,
@@ -74,8 +70,8 @@ function Header( {
 		const { get: getPreference } = select( preferencesStore );
 
 		return {
-			blockSelectionStart:
-				select( blockEditorStore ).getBlockSelectionStart(),
+			hasBlockSelection:
+				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			isEditingTemplate:
 				select( editorStore ).getRenderingMode() === 'template-only',
@@ -90,14 +86,12 @@ function Header( {
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
-	const hasBlockSelected = !! blockSelectionStart;
-
 	useEffect( () => {
 		// If we have a new block selection, show the block tools
-		if ( blockSelectionStart ) {
+		if ( hasBlockSelection ) {
 			setIsBlockToolsCollapsed( false );
 		}
-	}, [ blockSelectionStart ] );
+	}, [ hasBlockSelection ] );
 
 	return (
 		<div className="edit-post-header">
@@ -114,10 +108,7 @@ function Header( {
 				transition={ { type: 'tween', delay: 0.8 } }
 				className="edit-post-header__toolbar"
 			>
-				<HeaderToolbar
-					hasFixedToolbar={ hasFixedToolbar }
-					setListViewToggleElement={ setListViewToggleElement }
-				/>
+				<HeaderToolbar hasFixedToolbar={ hasFixedToolbar } />
 				{ hasFixedToolbar && isLargeViewport && (
 					<>
 						<div
@@ -136,7 +127,7 @@ function Header( {
 							ref={ blockToolbarRef }
 							name="block-toolbar"
 						/>
-						{ isEditingTemplate && hasBlockSelected && (
+						{ isEditingTemplate && hasBlockSelection && (
 							<Button
 								className="edit-post-header__block-tools-toggle"
 								icon={ isBlockToolsCollapsed ? next : previous }
@@ -158,7 +149,7 @@ function Header( {
 					className={ classnames( 'edit-post-header__center', {
 						'is-collapsed':
 							isEditingTemplate &&
-							hasBlockSelected &&
+							hasBlockSelection &&
 							! isBlockToolsCollapsed &&
 							hasFixedToolbar &&
 							isLargeViewport,
@@ -191,7 +182,7 @@ function Header( {
 					className="edit-post-header__post-preview-button"
 					forceIsAutosaveable={ hasActiveMetaboxes }
 				/>
-				<ViewLink />
+				<PostViewLink showIconLabels={ showIconLabels } />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					setEntitiesSavedStatesCallback={

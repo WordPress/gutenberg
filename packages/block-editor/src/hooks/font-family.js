@@ -82,6 +82,7 @@ function useBlockProps( { name, fontFamily } ) {
 
 export default {
 	useBlockProps,
+	addSaveProps,
 	attributeKeys: [ 'fontFamily' ],
 	hasSupport( name ) {
 		return hasBlockSupport( name, FONT_FAMILY_SUPPORT_KEY );
@@ -104,10 +105,4 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/fontFamily/addAttribute',
 	addAttributes
-);
-
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/fontFamily/addSaveProps',
-	addSaveProps
 );
