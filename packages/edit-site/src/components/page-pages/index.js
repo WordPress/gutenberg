@@ -133,8 +133,10 @@ export default function PagePages() {
 	const [ pageId, setPageId ] = useState( null );
 	const history = useHistory();
 
-	const onSelectionChange = ( items ) =>
-		setPageId( items?.length === 1 ? items[ 0 ].id : null );
+	const onSelectionChange = useCallback(
+		( items ) => setPageId( items?.length === 1 ? items[ 0 ].id : null ),
+		[ setPageId ]
+	);
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
