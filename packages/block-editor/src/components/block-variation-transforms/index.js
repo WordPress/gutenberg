@@ -116,7 +116,7 @@ function VariationsToggleGroupControl( {
 					onChange={ ( variation ) => {
 						onSelectVariation( variation );
 					} }
-					size="__unstable-large"
+					__next40pxDefaultSize
 				>
 					{ variations.map( ( variation ) => (
 						<ToggleGroupControlOptionIcon
