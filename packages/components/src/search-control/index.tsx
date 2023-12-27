@@ -27,11 +27,9 @@ function UnforwardedSearchControl(
 		__next40pxDefaultSize = false,
 		className,
 		onChange,
-		onKeyDown,
 		value,
 		placeholder = __( 'Search' ),
 		hideLabelFromVision = true,
-		help,
 		onClose,
 		size = 'default',
 		...restProps
@@ -88,11 +86,9 @@ function UnforwardedSearchControl(
 			__next40pxDefaultSize={ __next40pxDefaultSize }
 			id={ instanceId }
 			hideLabelFromVision={ hideLabelFromVision }
-			help={ help }
 			ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
 			type="search"
-			onChange={ ( newValue ) => onChange( newValue ) }
-			onKeyDown={ onKeyDown }
+			onChange={ onChange }
 			autoComplete="off"
 			value={ value }
 			prefix={
