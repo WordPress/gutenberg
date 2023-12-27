@@ -612,6 +612,116 @@ export function setDeviceType( deviceType ) {
 }
 
 /**
+ * Returns an action object used to enable or disable a panel in the editor.
+ *
+ * @param {string} panelName A string that identifies the panel to enable or disable.
+ *
+ * @return {Object} Action object.
+ */
+export const toggleEditorPanelEnabled =
+	( panelName ) =>
+	( { registry } ) => {
+		const inactivePanels =
+			registry
+				.select( preferencesStore )
+				.get( 'core/edit-post', 'inactivePanels' ) ?? [];
+
+		const isPanelInactive = !! inactivePanels?.includes( panelName );
+
+		// If the panel is inactive, remove it to enable it, else add it to
+		// make it inactive.
+		let updatedInactivePanels;
+		if ( isPanelInactive ) {
+			updatedInactivePanels = inactivePanels.filter(
+				( invactivePanelName ) => invactivePanelName !== panelName
+			);
+		} else {
+			updatedInactivePanels = [ ...inactivePanels, panelName ];
+		}
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'inactivePanels', updatedInactivePanels );
+	};
+
+/**
+ * Opens a closed panel and closes an open panel.
+ *
+ * @param {string} panelName A string that identifies the panel to open or close.
+ */
+export const toggleEditorPanelOpened =
+	( panelName ) =>
+	( { registry } ) => {
+		const openPanels =
+			registry
+				.select( preferencesStore )
+				.get( 'core/edit-post', 'openPanels' ) ?? [];
+
+		const isPanelOpen = !! openPanels?.includes( panelName );
+
+		// If the panel is open, remove it to close it, else add it to
+		// make it open.
+		let updatedOpenPanels;
+		if ( isPanelOpen ) {
+			updatedOpenPanels = openPanels.filter(
+				( openPanelName ) => openPanelName !== panelName
+			);
+		} else {
+			updatedOpenPanels = [ ...openPanels, panelName ];
+		}
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'openPanels', updatedOpenPanels );
+	};
+
+/**
+ * Returns an action object used to remove a panel from the editor.
+ *
+ * @param {string} panelName A string that identifies the panel to remove.
+ *
+ * @return {Object} Action object.
+ */
+export function removeEditorPanel( panelName ) {
+	return {
+		type: 'REMOVE_PANEL',
+		panelName,
+	};
+}
+
+/**
+ * Returns an action object used to open/close the inserter.
+ *
+ * @param {boolean|Object} value                Whether the inserter should be
+ *                                              opened (true) or closed (false).
+ *                                              To specify an insertion point,
+ *                                              use an object.
+ * @param {string}         value.rootClientId   The root client ID to insert at.
+ * @param {number}         value.insertionIndex The index to insert at.
+ *
+ * @return {Object} Action object.
+ */
+export function setIsInserterOpened( value ) {
+	return {
+		type: 'SET_IS_INSERTER_OPENED',
+		value,
+	};
+}
+
+/**
+ * Returns an action object used to open/close the list view.
+ *
+ * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
+ * @return {Object} Action object.
+ */
+export function setIsListViewOpened( isOpen ) {
+	return {
+		type: 'SET_IS_LIST_VIEW_OPENED',
+		isOpen,
+	};
+}
+
+/**
  * Backward compatibility
  */
 

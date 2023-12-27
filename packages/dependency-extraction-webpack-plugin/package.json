@@ -20,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=14"
+		"node": ">=18"
 	},
 	"files": [
 		"lib",
@@ -29,11 +29,10 @@
 	"main": "lib/index.js",
 	"types": "lib/types.d.ts",
 	"dependencies": {
-		"json2php": "^0.0.7",
-		"webpack-sources": "^3.2.2"
+		"json2php": "^0.0.7"
 	},
 	"peerDependencies": {
-		"webpack": "^4.8.3 || ^5.0.0"
+		"webpack": "^5.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

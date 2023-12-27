@@ -217,7 +217,8 @@ function useEditUICommands() {
 		isListViewOpen,
 		isDistractionFree,
 	} = useSelect( ( select ) => {
-		const { isListViewOpened, getEditorMode } = select( editSiteStore );
+		const { getEditorMode } = select( editSiteStore );
+		const { isListViewOpened } = select( editorStore );
 		return {
 			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
 			editorMode: getEditorMode(),

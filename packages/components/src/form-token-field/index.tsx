@@ -177,13 +177,17 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			setInputOffsetFromEnd( 0 );
 			setIsActive( false );
 
-			// If `__experimentalExpandOnFocus` is true, don't close the suggestions list when
-			// the user clicks on it (`tokensAndInput` will be the element that caused the blur).
-			const shouldKeepSuggestionsExpanded =
-				! __experimentalExpandOnFocus ||
-				( __experimentalExpandOnFocus &&
-					event.relatedTarget === tokensAndInput.current );
-			setIsExpanded( shouldKeepSuggestionsExpanded );
+			if ( __experimentalExpandOnFocus ) {
+				// If `__experimentalExpandOnFocus` is true, don't close the suggestions list when
+				// the user clicks on it (`tokensAndInput` will be the element that caused the blur).
+				const hasFocusWithin =
+					event.relatedTarget === tokensAndInput.current;
+				setIsExpanded( hasFocusWithin );
+			} else {
+				// Else collapse the suggestion list. This will result in the suggestion list closing
+				// after a suggestion has been submitted since that causes a blur.
+				setIsExpanded( false );
+			}
 
 			setSelectedSuggestionIndex( -1 );
 			setSelectedSuggestionScroll( false );

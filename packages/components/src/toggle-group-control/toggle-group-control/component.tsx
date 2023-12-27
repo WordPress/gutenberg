@@ -47,6 +47,8 @@ function UnconnectedToggleGroupControl(
 	} = useContextSystem( props, 'ToggleGroupControl' );
 
 	const baseId = useInstanceId( ToggleGroupControl, 'toggle-group-control' );
+	const normalizedSize =
+		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
 
 	const cx = useCx();
 
@@ -56,13 +58,12 @@ function UnconnectedToggleGroupControl(
 				styles.toggleGroupControl( {
 					isBlock,
 					isDeselectable,
-					size,
-					__next40pxDefaultSize,
+					size: normalizedSize,
 				} ),
 				isBlock && styles.block,
 				className
 			),
-		[ className, cx, isBlock, isDeselectable, size, __next40pxDefaultSize ]
+		[ className, cx, isBlock, isDeselectable, normalizedSize ]
 	);
 
 	const MainControl = isDeselectable
@@ -86,7 +87,7 @@ function UnconnectedToggleGroupControl(
 				label={ label }
 				onChange={ onChange }
 				ref={ forwardedRef }
-				size={ size }
+				size={ normalizedSize }
 				value={ value }
 			>
 				<LayoutGroup id={ baseId }>{ children }</LayoutGroup>

@@ -122,6 +122,8 @@ export function togglePublishSidebar() {
 /**
  * Returns an action object used to enable or disable a panel in the editor.
  *
+ * @deprecated
+ *
  * @param {string} panelName A string that identifies the panel to enable or disable.
  *
  * @return {Object} Action object.
@@ -129,73 +131,48 @@ export function togglePublishSidebar() {
 export const toggleEditorPanelEnabled =
 	( panelName ) =>
 	( { registry } ) => {
-		const inactivePanels =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'inactivePanels' ) ?? [];
-
-		const isPanelInactive = !! inactivePanels?.includes( panelName );
-
-		// If the panel is inactive, remove it to enable it, else add it to
-		// make it inactive.
-		let updatedInactivePanels;
-		if ( isPanelInactive ) {
-			updatedInactivePanels = inactivePanels.filter(
-				( invactivePanelName ) => invactivePanelName !== panelName
-			);
-		} else {
-			updatedInactivePanels = [ ...inactivePanels, panelName ];
-		}
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'inactivePanels', updatedInactivePanels );
+		deprecated( "dispatch( 'core/edit-post' ).toggleEditorPanelEnabled", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').toggleEditorPanelEnabled",
+		} );
+		registry.dispatch( editorStore ).toggleEditorPanelEnabled( panelName );
 	};
 
 /**
  * Opens a closed panel and closes an open panel.
+ *
+ * @deprecated
  *
  * @param {string} panelName A string that identifies the panel to open or close.
  */
 export const toggleEditorPanelOpened =
 	( panelName ) =>
 	( { registry } ) => {
-		const openPanels =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'openPanels' ) ?? [];
-
-		const isPanelOpen = !! openPanels?.includes( panelName );
-
-		// If the panel is open, remove it to close it, else add it to
-		// make it open.
-		let updatedOpenPanels;
-		if ( isPanelOpen ) {
-			updatedOpenPanels = openPanels.filter(
-				( openPanelName ) => openPanelName !== panelName
-			);
-		} else {
-			updatedOpenPanels = [ ...openPanels, panelName ];
-		}
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'openPanels', updatedOpenPanels );
+		deprecated( "dispatch( 'core/edit-post' ).toggleEditorPanelOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').toggleEditorPanelOpened",
+		} );
+		registry.dispatch( editorStore ).toggleEditorPanelOpened( panelName );
 	};
 
 /**
  * Returns an action object used to remove a panel from the editor.
  *
+ * @deprecated
+ *
  * @param {string} panelName A string that identifies the panel to remove.
  *
  * @return {Object} Action object.
  */
-export function removeEditorPanel( panelName ) {
-	return {
-		type: 'REMOVE_PANEL',
-		panelName,
+export const removeEditorPanel =
+	( panelName ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).removeEditorPanel", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').removeEditorPanel",
+		} );
+		registry.dispatch( editorStore ).removeEditorPanel( panelName );
 	};
-}
 
 /**
  * Triggers an action used to toggle a feature flag.
@@ -461,8 +438,6 @@ export function metaBoxUpdatesFailure() {
  * @deprecated
  *
  * @param {string} deviceType
- *
- * @return {Object} Action object.
  */
 export const __experimentalSetPreviewDeviceType =
 	( deviceType ) =>
@@ -481,41 +456,35 @@ export const __experimentalSetPreviewDeviceType =
 /**
  * Returns an action object used to open/close the inserter.
  *
- * @param {boolean|Object} value                Whether the inserter should be
- *                                              opened (true) or closed (false).
- *                                              To specify an insertion point,
- *                                              use an object.
- * @param {string}         value.rootClientId   The root client ID to insert at.
- * @param {number}         value.insertionIndex The index to insert at.
+ * @deprecated
  *
- * @return {Object} Action object.
+ * @param {boolean|Object} value Whether the inserter should be opened (true) or closed (false).
  */
-export function setIsInserterOpened( value ) {
-	return {
-		type: 'SET_IS_INSERTER_OPENED',
-		value,
+export const setIsInserterOpened =
+	( value ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).setIsInserterOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsInserterOpened",
+		} );
+		registry.dispatch( editorStore ).setIsInserterOpened( value );
 	};
-}
 
 /**
  * Returns an action object used to open/close the list view.
  *
+ * @deprecated
+ *
  * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
- * @return {Object} Action object.
  */
 export const setIsListViewOpened =
 	( isOpen ) =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core/edit-post', 'distractionFree' );
-		if ( isDistractionFree && isOpen ) {
-			dispatch.toggleDistractionFree();
-		}
-		dispatch( {
-			type: 'SET_IS_LIST_VIEW_OPENED',
-			isOpen,
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).setIsListViewOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsListViewOpened",
 		} );
+		registry.dispatch( editorStore ).setIsListViewOpened( isOpen );
 	};
 
 /**
@@ -617,8 +586,8 @@ export const toggleDistractionFree =
 				registry
 					.dispatch( preferencesStore )
 					.set( 'core/edit-post', 'fixedToolbar', true );
-				dispatch.setIsInserterOpened( false );
-				dispatch.setIsListViewOpened( false );
+				registry.dispatch( editorStore ).setIsInserterOpened( false );
+				registry.dispatch( editorStore ).setIsListViewOpened( false );
 				dispatch.closeGeneralSidebar();
 			} );
 		}

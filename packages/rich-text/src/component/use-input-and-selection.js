@@ -126,48 +126,14 @@ export function useInputAndSelection( props ) {
 				return;
 			}
 
-			// If the selection changes where the active element is a parent of
-			// the rich text instance (writing flow), call `onSelectionChange`
-			// for the rich text instance that contains the start or end of the
-			// selection.
+			// Ensure the active element is the rich text element.
 			if ( ownerDocument.activeElement !== element ) {
-				// Only process if the active elment is contentEditable, either
-				// this rich text instance or the writing flow parent. Fixes a
-				// bug in Firefox where it strangely selects the closest
-				// contentEditable element, even though the click was outside
-				// any contentEditable element.
-				if ( ownerDocument.activeElement.contentEditable !== 'true' ) {
-					return;
-				}
-
-				if ( ! ownerDocument.activeElement.contains( element ) ) {
-					return;
-				}
-
-				const selection = defaultView.getSelection();
-				const { anchorNode, focusNode } = selection;
-
-				if (
-					element.contains( anchorNode ) &&
-					element !== anchorNode &&
-					element.contains( focusNode ) &&
-					element !== focusNode
-				) {
-					const { start, end } = createRecord();
-					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
-					onSelectionChange( start, end );
-				} else if (
-					element.contains( anchorNode ) &&
-					element !== anchorNode
-				) {
-					const { start, end: offset = start } = createRecord();
-					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
-					onSelectionChange( offset );
-				} else if ( element.contains( focusNode ) ) {
-					const { start, end: offset = start } = createRecord();
-					record.current.activeFormats = EMPTY_ACTIVE_FORMATS;
-					onSelectionChange( undefined, offset );
-				}
+				// If it is not, we can stop listening for selection changes.
+				// We resume listening when the element is focused.
+				ownerDocument.removeEventListener(
+					'selectionchange',
+					handleSelectionChange
+				);
 				return;
 			}
 
@@ -276,18 +242,21 @@ export function useInputAndSelection( props ) {
 				};
 			} else {
 				applyRecord( record.current );
-				onSelectionChange( record.current.start, record.current.end );
 			}
+
+			onSelectionChange( record.current.start, record.current.end );
+
+			ownerDocument.addEventListener(
+				'selectionchange',
+				handleSelectionChange
+			);
 		}
 
 		element.addEventListener( 'input', onInput );
 		element.addEventListener( 'compositionstart', onCompositionStart );
 		element.addEventListener( 'compositionend', onCompositionEnd );
 		element.addEventListener( 'focus', onFocus );
-		ownerDocument.addEventListener(
-			'selectionchange',
-			handleSelectionChange
-		);
+
 		return () => {
 			element.removeEventListener( 'input', onInput );
 			element.removeEventListener(
@@ -296,10 +265,6 @@ export function useInputAndSelection( props ) {
 			);
 			element.removeEventListener( 'compositionend', onCompositionEnd );
 			element.removeEventListener( 'focus', onFocus );
-			ownerDocument.removeEventListener(
-				'selectionchange',
-				handleSelectionChange
-			);
 		};
 	}, [] );
 }

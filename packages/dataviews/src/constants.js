@@ -22,6 +22,22 @@ export const ENUMERATION_TYPE = 'enumeration';
 // Filter operators.
 export const OPERATOR_IN = 'in';
 export const OPERATOR_NOT_IN = 'notIn';
+export const OPERATORS = {
+	[ OPERATOR_IN ]: {
+		key: 'in-filter',
+		label: __( 'Is' ),
+	},
+	[ OPERATOR_NOT_IN ]: {
+		key: 'not-in-filter',
+		label: __( 'Is not' ),
+	},
+};
+
+// Sorting
+export const SORTING_DIRECTIONS = {
+	asc: { label: __( 'Sort ascending' ) },
+	desc: { label: __( 'Sort descending' ) },
+};
 
 // View layouts.
 export const LAYOUT_TABLE = 'table';

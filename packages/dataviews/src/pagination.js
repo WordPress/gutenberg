@@ -4,12 +4,11 @@
 import {
 	Button,
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
-	__experimentalNumberControl as NumberControl,
+	SelectControl,
 } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
-import { sprintf, __, _x, _n } from '@wordpress/i18n';
-import { chevronRight, chevronLeft, previous, next } from '@wordpress/icons';
+import { sprintf, __, _x } from '@wordpress/i18n';
+import { chevronRight, chevronLeft } from '@wordpress/icons';
 
 function Pagination( {
 	view,
@@ -20,124 +19,77 @@ function Pagination( {
 		return null;
 	}
 	return (
-		<HStack
-			expanded={ false }
-			spacing={ 3 }
-			justify="space-between"
-			className="dataviews-pagination"
-		>
-			<Text variant="muted">
-				{
-					// translators: %s: Total number of entries.
-					sprintf(
-						// translators: %s: Total number of entries.
-						_n( '%s item', '%s items', totalItems ),
-						totalItems
-					)
-				}
-			</Text>
-			{ !! totalItems && totalPages !== 1 && (
-				<HStack expanded={ false } spacing={ 3 }>
-					<HStack
-						justify="flex-start"
-						expanded={ false }
-						spacing={ 1 }
-					>
-						<Button
-							onClick={ () =>
-								onChangeView( { ...view, page: 1 } )
-							}
-							disabled={ view.page === 1 }
-							__experimentalIsFocusable
-							label={ __( 'First page' ) }
-							icon={ previous }
-							showTooltip
-							size="compact"
-						/>
-						<Button
-							onClick={ () =>
-								onChangeView( { ...view, page: view.page - 1 } )
-							}
-							disabled={ view.page === 1 }
-							__experimentalIsFocusable
-							label={ __( 'Previous page' ) }
-							icon={ chevronLeft }
-							showTooltip
-							size="compact"
-						/>
-					</HStack>
-					<HStack
-						justify="flex-start"
-						expanded={ false }
-						spacing={ 2 }
-					>
-						{ createInterpolateElement(
-							sprintf(
-								// translators: %1$s: Current page number, %2$s: Total number of pages.
-								_x( '<CurrenPageControl /> of %2$s', 'paging' ),
-								view.page,
-								totalPages
+		!! totalItems &&
+		totalPages !== 1 && (
+			<HStack
+				expanded={ false }
+				spacing={ 3 }
+				justify="space-between"
+				className="dataviews-pagination"
+			>
+				<HStack justify="flex-start" expanded={ false } spacing={ 2 }>
+					{ createInterpolateElement(
+						sprintf(
+							// translators: %1$s: Current page number, %2$s: Total number of pages.
+							_x(
+								'Page <CurrenPageControl /> of %2$s',
+								'paging'
 							),
-							{
-								CurrenPageControl: (
-									<NumberControl
-										aria-label={ __( 'Current page' ) }
-										min={ 1 }
-										max={ totalPages }
-										onChange={ ( value ) => {
-											const _value = +value;
-											if (
-												! _value ||
-												_value < 1 ||
-												_value > totalPages
-											) {
-												return;
-											}
-											onChangeView( {
-												...view,
-												page: _value,
-											} );
-										} }
-										step="1"
-										value={ view.page }
-										isDragEnabled={ false }
-										spinControls="none"
-									/>
-								),
-							}
-						) }
-					</HStack>
-					<HStack
-						justify="flex-start"
-						expanded={ false }
-						spacing={ 1 }
-					>
-						<Button
-							onClick={ () =>
-								onChangeView( { ...view, page: view.page + 1 } )
-							}
-							disabled={ view.page >= totalPages }
-							__experimentalIsFocusable
-							label={ __( 'Next page' ) }
-							icon={ chevronRight }
-							showTooltip
-							size="compact"
-						/>
-						<Button
-							onClick={ () =>
-								onChangeView( { ...view, page: totalPages } )
-							}
-							disabled={ view.page >= totalPages }
-							__experimentalIsFocusable
-							label={ __( 'Last page' ) }
-							icon={ next }
-							showTooltip
-							size="compact"
-						/>
-					</HStack>
+							view.page,
+							totalPages
+						),
+						{
+							CurrenPageControl: (
+								<SelectControl
+									aria-label={ __( 'Current page' ) }
+									value={ view.page }
+									options={ Array.from(
+										Array( totalPages )
+									).map( ( _, i ) => {
+										const page = i + 1;
+										return { value: page, label: page };
+									} ) }
+									onChange={ ( newValue ) => {
+										onChangeView( {
+											...view,
+											page: +newValue,
+										} );
+									} }
+									size={ 'compact' }
+									__nextHasNoMarginBottom
+								/>
+							),
+						}
+					) }
 				</HStack>
-			) }
-		</HStack>
+				<HStack expanded={ false } spacing={ 1 }>
+					<Button
+						onClick={ () =>
+							onChangeView( { ...view, page: view.page - 1 } )
+						}
+						disabled={ view.page === 1 }
+						__experimentalIsFocusable
+						label={ __( 'Previous page' ) }
+						icon={ chevronLeft }
+						showTooltip
+						size="compact"
+						tooltipPosition="top"
+					/>
+					<Button
+						onClick={ () =>
+							onChangeView( { ...view, page: view.page + 1 } )
+						}
+						disabled={ view.page >= totalPages }
+						__experimentalIsFocusable
+						label={ __( 'Next page' ) }
+						icon={ chevronRight }
+						showTooltip
+						size="compact"
+						tooltipPosition="top"
+					/>
+				</HStack>
+			</HStack>
+		)
 	);
 }
 

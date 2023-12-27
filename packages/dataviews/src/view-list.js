@@ -47,9 +47,9 @@ export default function ViewList( {
 
 	return (
 		<ul className="dataviews-list-view">
-			{ usedData.map( ( item, index ) => {
+			{ usedData.map( ( item ) => {
 				return (
-					<li key={ getItemId?.( item ) || index }>
+					<li key={ getItemId( item ) }>
 						<div
 							role="button"
 							tabIndex={ 0 }
@@ -64,7 +64,7 @@ export default function ViewList( {
 							) }
 							onClick={ () => onSelectionChange( [ item ] ) }
 						>
-							<HStack spacing={ 3 }>
+							<HStack spacing={ 3 } alignment="flex-start">
 								<div className="dataviews-list-view__media-wrapper">
 									{ mediaField?.render( { item } ) || (
 										<div className="dataviews-list-view__media-placeholder"></div>

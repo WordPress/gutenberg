@@ -15,6 +15,7 @@ import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
 } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -37,8 +38,9 @@ import { store as siteEditorStore } from '../../../store';
 export default function MoreMenu( { showIconLabels } ) {
 	const registry = useRegistry();
 
-	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
-		useDispatch( siteEditorStore );
+	const { closeGeneralSidebar } = useDispatch( siteEditorStore );
+	const { setIsInserterOpened, setIsListViewOpened } =
+		useDispatch( editorStore );
 	const { openModal } = useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 

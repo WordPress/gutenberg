@@ -20,7 +20,7 @@
 	}
 
 	@include break-medium {
-		width: calc(#{$nav-sidebar-width} - #{$canvas-padding});
+		width: calc(#{$nav-sidebar-width} - #{$grid-unit-30});
 	}
 
 	.edit-site-layout.is-full-canvas & {
@@ -156,14 +156,21 @@
 	}
 }
 
+.edit-site-template-pages-list-view,
+.edit-site-page-pages-list-view {
+	max-width: $nav-sidebar-width;
+}
+
 // This shouldn't be necessary (we should have a way to say that a skeletton is relative
 .edit-site-layout__canvas .interface-interface-skeleton,
-.edit-site-page-pages-preview .interface-interface-skeleton {
+.edit-site-page-pages-preview .interface-interface-skeleton,
+.edit-site-template-pages-preview .interface-interface-skeleton {
 	position: relative !important;
 	min-height: 100% !important;
 }
 
-.edit-site-page-pages-preview {
+.edit-site-page-pages-preview,
+.edit-site-template-pages-preview {
 	height: 100%;
 }
 

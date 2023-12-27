@@ -879,11 +879,74 @@ _Returns_
 
 -   `boolean`: Whether the post can be saved.
 
+### isEditorPanelEnabled
+
+Returns true if the given panel is enabled, or false otherwise. Panels are enabled by default.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _panelName_ `string`: A string that identifies the panel.
+
+_Returns_
+
+-   `boolean`: Whether or not the panel is enabled.
+
+### isEditorPanelOpened
+
+Returns true if the given panel is open, or false otherwise. Panels are closed by default.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _panelName_ `string`: A string that identifies the panel.
+
+_Returns_
+
+-   `boolean`: Whether or not the panel is open.
+
+### isEditorPanelRemoved
+
+Returns true if the given panel was programmatically removed, or false otherwise. All panels are not removed by default.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _panelName_ `string`: A string that identifies the panel.
+
+_Returns_
+
+-   `boolean`: Whether or not the panel is removed.
+
 ### isFirstMultiSelectedBlock
 
 _Related_
 
 -   isFirstMultiSelectedBlock in core/block-editor store.
+
+### isInserterOpened
+
+Returns true if the inserter is opened.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether the inserter is opened.
+
+### isListViewOpened
+
+Returns true if the list view is opened.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether the list view is opened.
 
 ### isMultiSelecting
 
@@ -1226,6 +1289,18 @@ _Related_
 
 -   removeBlocks in core/block-editor store.
 
+### removeEditorPanel
+
+Returns an action object used to remove a panel from the editor.
+
+_Parameters_
+
+-   _panelName_ `string`: A string that identifies the panel to remove.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### replaceBlock
 
 _Related_
@@ -1293,6 +1368,32 @@ _Parameters_
 
 -   _postType_ `string`: Post Type.
 -   _postId_ `string`: Post ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setIsInserterOpened
+
+Returns an action object used to open/close the inserter.
+
+_Parameters_
+
+-   _value_ `boolean|Object`: Whether the inserter should be opened (true) or closed (false). To specify an insertion point, use an object.
+-   _value.rootClientId_ `string`: The root client ID to insert at.
+-   _value.insertionIndex_ `number`: The index to insert at.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setIsListViewOpened
+
+Returns an action object used to open/close the list view.
+
+_Parameters_
+
+-   _isOpen_ `boolean`: A boolean representing whether the list view should be opened or closed.
 
 _Returns_
 
@@ -1378,6 +1479,26 @@ _Related_
 _Related_
 
 -   toggleBlockMode in core/block-editor store.
+
+### toggleEditorPanelEnabled
+
+Returns an action object used to enable or disable a panel in the editor.
+
+_Parameters_
+
+-   _panelName_ `string`: A string that identifies the panel to enable or disable.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### toggleEditorPanelOpened
+
+Opens a closed panel and closes an open panel.
+
+_Parameters_
+
+-   _panelName_ `string`: A string that identifies the panel to open or close.
 
 ### toggleSelection
 
