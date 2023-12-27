@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+const { getAsBooleanFromENV } = require( './process' );
 const {
 	getArgFromCLI,
 	getArgsFromCLI,
@@ -28,6 +29,7 @@ const { getPackageProp, hasPackageProp } = require( './package' );
 module.exports = {
 	fromProjectRoot,
 	fromConfigRoot,
+	getAsBooleanFromENV,
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,

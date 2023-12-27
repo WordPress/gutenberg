@@ -4,7 +4,7 @@ This reference guide lists the settings and style properties defined in the them
 
 -   [Version 2 (living reference)](/docs/reference-guides/theme-json-reference/theme-json-living.md)
 
-## Older Versions
+## Older versions
 
 -   [Migrating to Newer Theme.json Versions](/docs/reference-guides/theme-json-reference/theme-json-migrations.md)
 -   [Version 1](/docs/reference-guides/theme-json-reference/theme-json-v1.md)

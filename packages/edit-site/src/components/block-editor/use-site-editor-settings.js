@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
@@ -88,61 +89,74 @@ function useArchiveLabel( templateSlug ) {
 }
 
 export function useSpecificEditorSettings() {
-	const { setIsInserterOpened } = useDispatch( editSiteStore );
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		templateSlug,
 		focusMode,
+		allowRightClickOverrides,
 		isDistractionFree,
 		hasFixedToolbar,
 		keepCaretInsideBlock,
 		canvasMode,
 		settings,
-	} = useSelect( ( select ) => {
-		const {
-			getEditedPostType,
-			getEditedPostId,
-			getCanvasMode,
-			getSettings,
-		} = unlock( select( editSiteStore ) );
-		const { get: getPreference } = select( preferencesStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const usedPostType = getEditedPostType();
-		const usedPostId = getEditedPostId();
-		const _record = getEditedEntityRecord(
-			'postType',
-			usedPostType,
-			usedPostId
-		);
-		return {
-			templateSlug: _record.slug,
-			focusMode: !! getPreference( 'core/edit-site', 'focusMode' ),
-			isDistractionFree: !! getPreference(
-				'core/edit-site',
-				'distractionFree'
-			),
-			hasFixedToolbar: !! getPreference(
-				'core/edit-site',
-				'fixedToolbar'
-			),
-			keepCaretInsideBlock: !! getPreference(
-				'core/edit-site',
-				'keepCaretInsideBlock'
-			),
-			canvasMode: getCanvasMode(),
-			settings: getSettings(),
-		};
-	}, [] );
+		postWithTemplate,
+	} = useSelect(
+		( select ) => {
+			const {
+				getEditedPostType,
+				getEditedPostId,
+				getEditedPostContext,
+				getCanvasMode,
+				getSettings,
+			} = unlock( select( editSiteStore ) );
+			const { get: getPreference } = select( preferencesStore );
+			const { getEditedEntityRecord } = select( coreStore );
+			const usedPostType = getEditedPostType();
+			const usedPostId = getEditedPostId();
+			const _record = getEditedEntityRecord(
+				'postType',
+				usedPostType,
+				usedPostId
+			);
+			const _context = getEditedPostContext();
+			return {
+				templateSlug: _record.slug,
+				focusMode: !! getPreference( 'core/edit-site', 'focusMode' ),
+				isDistractionFree: !! getPreference(
+					'core/edit-site',
+					'distractionFree'
+				),
+				allowRightClickOverrides: !! getPreference(
+					'core/edit-site',
+					'allowRightClickOverrides'
+				),
+				hasFixedToolbar:
+					!! getPreference( 'core/edit-site', 'fixedToolbar' ) ||
+					! isLargeViewport,
+				keepCaretInsideBlock: !! getPreference(
+					'core/edit-site',
+					'keepCaretInsideBlock'
+				),
+				canvasMode: getCanvasMode(),
+				settings: getSettings(),
+				postWithTemplate: _context?.postId,
+			};
+		},
+		[ isLargeViewport ]
+	);
 	const archiveLabels = useArchiveLabel( templateSlug );
-
+	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
 	const defaultEditorSettings = useMemo( () => {
 		return {
 			...settings,
 
-			__experimentalSetIsInserterOpened: setIsInserterOpened,
+			supportsTemplateMode: true,
 			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
+			allowRightClickOverrides,
 			isDistractionFree,
 			hasFixedToolbar,
 			keepCaretInsideBlock,
+			defaultRenderingMode,
 
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
@@ -150,14 +164,15 @@ export function useSpecificEditorSettings() {
 		};
 	}, [
 		settings,
-		setIsInserterOpened,
 		focusMode,
+		allowRightClickOverrides,
 		isDistractionFree,
 		hasFixedToolbar,
 		keepCaretInsideBlock,
 		canvasMode,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
+		defaultRenderingMode,
 	] );
 
 	return defaultEditorSettings;

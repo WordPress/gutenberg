@@ -555,6 +555,7 @@ function TableEdit( {
 					>
 						<TextControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Column count' ) }
 							value={ initialColumnCount }
@@ -564,6 +565,7 @@ function TableEdit( {
 						/>
 						<TextControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Row count' ) }
 							value={ initialRowCount }
@@ -572,7 +574,7 @@ function TableEdit( {
 							className="blocks-table__placeholder-input"
 						/>
 						<Button
-							className="blocks-table__placeholder-button"
+							__next40pxDefaultSize
 							variant="primary"
 							type="submit"
 						>

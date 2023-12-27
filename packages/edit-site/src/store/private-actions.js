@@ -3,6 +3,7 @@
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Action that switches the canvas mode.
@@ -28,8 +29,11 @@ export const setCanvasMode =
 				.select( preferencesStore )
 				.get( 'core/edit-site', 'distractionFree' )
 		) {
-			dispatch.setIsListViewOpened( true );
+			registry.dispatch( editorStore ).setIsListViewOpened( true );
+		} else {
+			registry.dispatch( editorStore ).setIsListViewOpened( false );
 		}
+		registry.dispatch( editorStore ).setIsInserterOpened( false );
 	};
 
 /**

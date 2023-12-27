@@ -27,16 +27,22 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
 				<VStack spacing="3">
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ editedMenuTitle }
 						placeholder={ __( 'Navigation title' ) }
 						onChange={ setEditedMenuTitle }
 					/>
 					<HStack justify="right">
-						<Button variant="tertiary" onClick={ onClose }>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ onClose }
+						>
 							{ __( 'Cancel' ) }
 						</Button>
 
 						<Button
+							__next40pxDefaultSize
 							disabled={ ! isEditedMenuTitleValid }
 							variant="primary"
 							type="submit"

@@ -12,10 +12,31 @@
 
 	.selected-block-tools-wrapper {
 		overflow-x: hidden;
-	}
 
-	.block-editor-block-contextual-toolbar.is-fixed {
-		border: none;
+		.block-editor-block-contextual-toolbar {
+			border-bottom: 0;
+		}
+
+		// Modified group borders
+		.components-toolbar-group,
+		.components-toolbar {
+			border-right: none;
+
+			&::after {
+				content: "";
+				width: $border-width;
+				margin-top: $grid-unit + $grid-unit-05;
+				margin-bottom: $grid-unit + $grid-unit-05;
+				background-color: $gray-300;
+				margin-left: $grid-unit;
+			}
+
+			& .components-toolbar-group.components-toolbar-group {
+				&::after {
+					display: none;
+				}
+			}
+		}
 	}
 }
 
