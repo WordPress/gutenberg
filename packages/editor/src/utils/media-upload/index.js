@@ -31,17 +31,25 @@ export default function mediaUpload( {
 	onError = noop,
 	onFileChange,
 } ) {
-	const { getCurrentPostId, getEditorSettings } = select( editorStore );
+	const { getCurrentPost, getEditorSettings } = select( editorStore );
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
 	maxUploadFileSize =
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
-	const currentPostId = getCurrentPostId();
+	const currentPost = getCurrentPost();
+	let currentPostId =
+		typeof currentPost?.id === 'number' ? currentPost.id : 0;
+
+	// Templates and template parts' numerical ID is stored in `wp_id`.
+	if ( ! currentPostId && typeof currentPost?.wp_id === 'number' ) {
+		currentPostId = currentPost.wp_id;
+	}
+
 	uploadMedia( {
 		allowedTypes,
 		filesList,
 		onFileChange,
 		additionalData: {
-			...( ! isNaN( currentPostId ) ? { post: currentPostId } : {} ),
+			post: currentPostId,
 			...additionalData,
 		},
 		maxUploadFileSize,
