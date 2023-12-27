@@ -116,6 +116,7 @@ function VariationsToggleGroupControl( {
 						onSelectVariation( variation );
 					} }
 					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 				>
 					{ variations.map( ( variation ) => (
 						<ToggleGroupControlOptionIcon
