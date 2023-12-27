@@ -105,7 +105,7 @@ function GalleryEdit( props ) {
 		preferredStyle,
 		innerBlockImages,
 		blockWasJustInserted,
-		multiVGallerySelection,
+		multiGallerySelection,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -130,7 +130,7 @@ function GalleryEdit( props ) {
 					clientId,
 					'inserter_menu'
 				),
-				multiVGallerySelection:
+				multiGallerySelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
 						( _clientId ) =>
@@ -598,7 +598,7 @@ function GalleryEdit( props ) {
 			</InspectorControls>
 			{ Platform.isWeb && (
 				<>
-					{ ! multiVGallerySelection && (
+					{ ! multiGallerySelection && (
 						<BlockControls group="other">
 							<MediaReplaceFlow
 								allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -631,7 +631,7 @@ function GalleryEdit( props ) {
 				}
 				blockProps={ innerBlocksProps }
 				insertBlocksAfter={ insertBlocksAfter }
-				multiVGallerySelection={ multiVGallerySelection }
+				multiGallerySelection={ multiGallerySelection }
 			/>
 		</>
 	);
