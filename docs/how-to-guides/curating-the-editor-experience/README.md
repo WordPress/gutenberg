@@ -8,7 +8,7 @@ In this section, you will learn:
 
 1. [**Block locking**](https://developer.wordpress.org/block-editor/how-to-guides/curating-the-editor-experience/block-locking): how to restrict user interactions with specific blocks in the Editor for better content control
 1. [**Patterns**](https://developer.wordpress.org/block-editor/how-to-guides/curating-the-editor-experience/patterns): about creating and implementing predefined block layouts to ensure design and content uniformity
-1. [**theme.json**](https://developer.wordpress.org/block-editor/how-to-guides/curating-the-editor-experience/theme-json): to configure global styles and settings for your theme using the theme.json file
+1. [**theme.json configurations**](https://developer.wordpress.org/block-editor/how-to-guides/curating-the-editor-experience/theme-json): to configure global styles and settings for your theme using the theme.json file
 1. [**Filters and hooks**](https://developer.wordpress.org/block-editor/how-to-guides/curating-the-editor-experience/filters-and-hooks): about the essential filters and hooks used to modify the Editor
 1. [**Disabling Editor functionality**](https://developer.wordpress.org/block-editor/how-to-guides/curating-the-editor-experience/disable-editor-functionality): about additional ways to selectively disable features or components in the Editor to streamline the user experience
 

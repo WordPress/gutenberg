@@ -228,9 +228,9 @@
 		"parent": "curating-the-editor-experience"
 	},
 	{
-		"title": "theme.json",
-		"slug": "theme-json",
-		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/theme-json.md",
+		"title": "theme.json configurations",
+		"slug": "theme-json-configurations",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/theme-json-configurations.md",
 		"parent": "curating-the-editor-experience"
 	},
 	{

@@ -1,4 +1,4 @@
-# theme.json
+# theme.json configurations
 
 A theme's theme.json file is one of the best ways to curate the Editor experience and will likely be the first tool you use before reaching for more sophisticated solutions. 
 
