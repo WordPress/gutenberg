@@ -187,7 +187,10 @@ export const blurOnUnmount = ( element ) => {
 	}
 };
 
-const dismissKeyboardDebounce = debounce( () => hideAndroidSoftKeyboard(), 0 );
+const dismissKeyboardDebounce = debounce( () => {
+	hideAndroidSoftKeyboard();
+	currentFocusedElement = null;
+}, 0 );
 
 /**
  * Unfocuses the current focused element.
