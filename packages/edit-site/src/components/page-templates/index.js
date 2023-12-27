@@ -170,8 +170,11 @@ export default function DataviewsTemplates() {
 		} );
 	const history = useHistory();
 
-	const onSelectionChange = ( items ) =>
-		setTemplateId( items?.length === 1 ? items[ 0 ].id : null );
+	const onSelectionChange = useCallback(
+		( items ) =>
+			setTemplateId( items?.length === 1 ? items[ 0 ].id : null ),
+		[ setTemplateId ]
+	);
 
 	const authors = useMemo( () => {
 		if ( ! allTemplates ) {
