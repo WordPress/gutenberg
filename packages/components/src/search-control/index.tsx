@@ -29,7 +29,6 @@ function UnforwardedSearchControl(
 		onChange,
 		onKeyDown,
 		value,
-		label,
 		placeholder = __( 'Search' ),
 		hideLabelFromVision = true,
 		help,
@@ -76,7 +75,6 @@ function UnforwardedSearchControl(
 
 	// TODO:
 	// - add margin if __nextHasNoMarginBottom if false
-	// - check label
 	// - compact size
 	// - classnames
 	// - onChange type signature changed
@@ -86,7 +84,6 @@ function UnforwardedSearchControl(
 		// @ts-expect-error
 		<InputControl
 			__next40pxDefaultSize={ __next40pxDefaultSize }
-			label={ label }
 			id={ id }
 			hideLabelFromVision={ hideLabelFromVision }
 			help={ help }
