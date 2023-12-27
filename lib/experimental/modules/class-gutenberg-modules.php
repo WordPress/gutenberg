@@ -269,8 +269,8 @@ add_action( $modules_position, array( 'Gutenberg_Modules', 'print_import_map' ) 
 // Prints the enqueued modules in the head tag in block themes. Otherwise in the footer.
 add_action( $modules_position, array( 'Gutenberg_Modules', 'print_enqueued_modules' ) );
 
-// Prints the preloaded modules in the head tag in block themes.
-add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_module_preloads' ) );
+// Prints the preloaded modules in the head tag in block themes. Otherwise in the footer.
+add_action( $modules_position, array( 'Gutenberg_Modules', 'print_module_preloads' ) );
 
 // Prints the script that loads the import map polyfill in the footer.
 add_action( 'wp_footer', array( 'Gutenberg_Modules', 'print_import_map_polyfill' ), 11 );
