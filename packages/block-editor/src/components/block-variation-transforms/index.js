@@ -104,7 +104,7 @@ function VariationsToggleGroupControl( {
 	variations,
 } ) {
 	return (
-		<fieldset className={ className }>
+		<div className={ className }>
 			<ToggleGroupControl
 				label={ __( 'Transform to variation' ) }
 				value={ selectedValue }
@@ -130,7 +130,7 @@ function VariationsToggleGroupControl( {
 					/>
 				) ) }
 			</ToggleGroupControl>
-		</fieldset>
+		</div>
 	);
 }
 
