@@ -99,7 +99,25 @@
 					}
 				]
 			},
-			{ "docs/how-to-guides/curating-the-editor-experience.md": [] },
+			{
+				"docs/how-to-guides/curating-the-editor-experience/README.md": [
+					{
+						"docs/how-to-guides/curating-the-editor-experience/block-locking.md": []
+					},
+					{
+						"docs/how-to-guides/curating-the-editor-experience/patterns.md": []
+					},
+					{
+						"docs/how-to-guides/curating-the-editor-experience/theme-json.md": []
+					},
+					{
+						"docs/how-to-guides/curating-the-editor-experience/filters-and-hooks.md": []
+					},
+					{
+						"docs/how-to-guides/curating-the-editor-experience/disable-editor-functionality.md": []
+					}
+				]
+			},
 			{ "docs/how-to-guides/enqueueing-assets-in-the-editor.md": [] },
 			{ "docs/how-to-guides/feature-flags.md": [] },
 			{ "docs/how-to-guides/format-api.md": [] },
