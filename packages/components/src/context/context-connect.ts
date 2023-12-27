@@ -71,10 +71,9 @@ function _contextConnect<
 	Component: C,
 	namespace: string,
 	options?: O
-): WordPressComponentFromProps<
-	Parameters< C >[ 0 ],
-	O[ 'forwardsRef' ] extends true ? true : false
-> {
+): O[ 'forwardsRef' ] extends true
+	? WordPressComponentFromProps< Parameters< C >[ 0 ], true >
+	: C {
 	const WrappedComponent = options?.forwardsRef
 		? forwardRef< any, Parameters< C >[ 0 ] >( Component )
 		: Component;
