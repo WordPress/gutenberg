@@ -89,10 +89,11 @@ const OfflineStatus = () => {
 				'Network connection lost, working offline'
 			) }
 			style={ containerStyle }
-		> 
-		<View style={ containerStyle }>
-			<Icon fill={ iconStyle.fill } icon={ offlineIcon } />
-			<Text style={ textStyle }>{ __( 'Working Offline' ) }</Text>
+		>
+			<View style={ containerStyle }>
+				<Icon fill={ iconStyle.fill } icon={ offlineIcon } />
+				<Text style={ textStyle }>{ __( 'Working Offline' ) }</Text>
+			</View>
 		</View>
 	) : null;
 };
