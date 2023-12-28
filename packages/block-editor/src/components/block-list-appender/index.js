@@ -16,67 +16,122 @@ import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
 import { store as blockEditorStore } from '../../store';
 
-function BlockListAppender( {
-	rootClientId,
-	renderAppender: CustomAppender,
-	className,
-	tagName: TagName = 'div',
-} ) {
-	const { hideInserter, canInsertDefaultBlock, selectedBlockClientId } =
-		useSelect(
-			( select ) => {
-				const {
-					canInsertBlockType,
-					getTemplateLock,
-					getSelectedBlockClientId,
-					__unstableGetEditorMode,
-				} = select( blockEditorStore );
+function DefaultAppender( { rootClientId } ) {
+	const canInsertDefaultBlock = useSelect( ( select ) =>
+		select( blockEditorStore ).canInsertBlockType(
+			getDefaultBlockName(),
+			rootClientId
+		)
+	);
 
-				return {
-					hideInserter:
-						!! getTemplateLock( rootClientId ) ||
-						__unstableGetEditorMode() === 'zoom-out',
-					canInsertDefaultBlock: canInsertBlockType(
-						getDefaultBlockName(),
-						rootClientId
-					),
-					selectedBlockClientId: getSelectedBlockClientId(),
-				};
-			},
-			[ rootClientId ]
-		);
+	if ( canInsertDefaultBlock ) {
+		// Render the default block appender if the context supports use
+		// of the default appender.
+		return <DefaultBlockAppender rootClientId={ rootClientId } />;
+	}
 
-	if ( hideInserter || CustomAppender === false ) {
+	// Fallback in case the default block can't be inserted.
+	return (
+		<ButtonBlockAppender
+			rootClientId={ rootClientId }
+			className="block-list-appender__toggle"
+		/>
+	);
+}
+
+function useAppender( rootClientId, CustomAppender ) {
+	const isVisible = useSelect(
+		( select ) => {
+			const {
+				getTemplateLock,
+				getSelectedBlockClientId,
+				__unstableGetEditorMode,
+				getBlockEditingMode,
+			} = select( blockEditorStore );
+
+			if ( ! CustomAppender ) {
+				const selectedBlockClientId = getSelectedBlockClientId();
+				const isParentSelected =
+					rootClientId === selectedBlockClientId ||
+					( ! rootClientId && ! selectedBlockClientId );
+				if ( ! isParentSelected ) {
+					return false;
+				}
+			}
+
+			if (
+				getTemplateLock( rootClientId ) ||
+				getBlockEditingMode( rootClientId ) === 'disabled' ||
+				__unstableGetEditorMode() === 'zoom-out'
+			) {
+				return false;
+			}
+
+			return true;
+		},
+		[ rootClientId, CustomAppender ]
+	);
+
+	if ( ! isVisible ) {
 		return null;
 	}
 
-	let appender;
-	if ( CustomAppender ) {
-		// Prefer custom render prop if provided.
-		appender = <CustomAppender />;
-	} else {
-		const isParentSelected =
-			selectedBlockClientId === rootClientId ||
-			( ! rootClientId && ! selectedBlockClientId );
+	return CustomAppender ? (
+		<CustomAppender />
+	) : (
+		<DefaultAppender rootClientId={ rootClientId } />
+	);
+}
 
-		if ( ! isParentSelected ) {
-			return null;
-		}
+function BlockListAppender( {
+	rootClientId,
+	renderAppender,
+	className,
+	tagName: TagName = 'div',
+} ) {
+	if ( renderAppender === false ) {
+		return null;
+	}
 
-		if ( canInsertDefaultBlock ) {
-			// Render the default block appender when renderAppender has not been
-			// provided and the context supports use of the default appender.
-			appender = <DefaultBlockAppender rootClientId={ rootClientId } />;
-		} else {
-			// Fallback in the case no renderAppender has been provided and the
-			// default block can't be inserted.
-			appender = (
-				<ButtonBlockAppender
-					rootClientId={ rootClientId }
-					className="block-list-appender__toggle"
-				/>
+	return (
+		<BlockListAppenderInner
+			rootClientId={ rootClientId }
+			renderAppender={ renderAppender }
+			className={ className }
+			tagName={ TagName }
+		/>
+	);
+}
+
+function BlockListAppenderInner( {
+	rootClientId,
+	renderAppender,
+	className,
+	tagName: TagName,
+} ) {
+	const appender = useAppender( rootClientId, renderAppender );
+	const isDragOver = useSelect(
+		( select ) => {
+			const {
+				getBlockInsertionPoint,
+				isBlockInsertionPointVisible,
+				getBlockCount,
+			} = select( blockEditorStore );
+			const insertionPoint = getBlockInsertionPoint();
+			// Ideally we should also check for `isDragging` but currently it
+			// requires a lot more setup. We can revisit this once we refactor
+			// the DnD utility hooks.
+			return (
+				isBlockInsertionPointVisible() &&
+				rootClientId === insertionPoint?.rootClientId &&
+				getBlockCount( rootClientId ) === 0
 			);
-		}
+		},
+		[ rootClientId ]
+	);
+
+	if ( ! appender ) {
+		return null;
 	}
 
 	return (
@@ -90,10 +145,9 @@ function BlockListAppender( {
 			//
 			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 			tabIndex={ -1 }
-			className={ classnames(
-				'block-list-appender wp-block',
-				className
-			) }
+			className={ classnames( 'block-list-appender wp-block', className, {
+				'is-drag-over': isDragOver,
+			} ) }
 			// Needed in case the whole editor is content editable (for multi
 			// selection). It fixes an edge case where ArrowDown and ArrowRight
 			// should collapse the selection to the end of that selection and

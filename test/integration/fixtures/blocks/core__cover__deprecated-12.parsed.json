@@ -1,0 +1,34 @@
+[
+	{
+		"blockName": "core/cover",
+		"attrs": {
+			"useFeaturedImage": true,
+			"dimRatio": 50,
+			"customOverlayColor": "#3615d9",
+			"layout": {
+				"type": "constrained"
+			}
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {
+					"align": "center",
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n\t<p class=\"has-text-align-center has-large-font-size\"></p>\n\t",
+				"innerContent": [
+					"\n\t<p class=\"has-text-align-center has-large-font-size\"></p>\n\t"
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-cover\"><span aria-hidden=\"true\" class=\"wp-block-cover__background has-background-dim\" style=\"background-color:#3615d9\"></span><div class=\"wp-block-cover__inner-container\"></div></div>\n\t",
+		"innerContent": [
+			"\n<div class=\"wp-block-cover\"><span aria-hidden=\"true\" class=\"wp-block-cover__background has-background-dim\" style=\"background-color:#3615d9\"></span><div class=\"wp-block-cover__inner-container\">",
+			null,
+			"</div></div>\n\t"
+		]
+	}
+]

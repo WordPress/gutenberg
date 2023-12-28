@@ -11,7 +11,8 @@ import { useMergeRefs } from '@wordpress/compose';
 import BorderBoxControlVisualizer from '../border-box-control-visualizer';
 import { BorderControl } from '../../border-control';
 import { Grid } from '../../grid';
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { useBorderBoxControlSplitControls } from './hook';
 
 import type { BorderControlProps } from '../../border-control/types';
@@ -33,7 +34,6 @@ const BorderBoxControlSplitControls = (
 		rightAlignedClassName,
 		size = 'default',
 		value,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 		...otherProps
 	} = useBorderBoxControlSplitControls( props );
@@ -65,7 +65,6 @@ const BorderBoxControlSplitControls = (
 		enableAlpha,
 		enableStyle,
 		isCompact: true,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 		size,
 	};

@@ -6,14 +6,15 @@ import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { ungroup } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import UngroupIcon from './icon';
 import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
+const EMPTY_BLOCKS_LIST = [];
 
 export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
 	if ( ! isUngroupable ) {
@@ -23,7 +24,7 @@ export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
 		<ToolbarGroup>
 			<ToolbarButton
 				title={ __( 'Ungroup' ) }
-				icon={ UngroupIcon }
+				icon={ ungroup }
 				onClick={ onConvertFromGroup }
 			/>
 		</ToolbarGroup>
@@ -45,9 +46,12 @@ export default compose( [
 		const isUngroupable =
 			selectedBlock &&
 			selectedBlock.innerBlocks &&
-			!! selectedBlock.innerBlocks.length &&
+			selectedBlock.innerBlocks.length > 0 &&
 			selectedBlock.name === groupingBlockName;
-		const innerBlocks = isUngroupable ? selectedBlock.innerBlocks : [];
+
+		const innerBlocks = isUngroupable
+			? selectedBlock.innerBlocks
+			: EMPTY_BLOCKS_LIST;
 
 		return {
 			isUngroupable,

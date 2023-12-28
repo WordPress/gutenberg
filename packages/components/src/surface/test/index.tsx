@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { render } from '@testing-library/react';
-import type { RenderResult } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -10,49 +9,40 @@ import type { RenderResult } from '@testing-library/react';
 import { Surface } from '../index';
 
 describe( 'props', () => {
-	let base: RenderResult;
-	beforeEach( () => {
-		base = render( <Surface>Surface</Surface> );
-	} );
-
 	test( 'should render correctly', () => {
-		expect( base.container.firstChild ).toMatchSnapshot();
+		const { container } = render( <Surface>Surface</Surface> );
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render variants', () => {
+		const view = render( <Surface>Surface</Surface> );
 		const { container } = render(
 			<Surface variant="secondary">Surface</Surface>
 		);
-		expect( container.firstChild ).toMatchDiffSnapshot(
-			base.container.firstChild
-		);
+		expect( container ).toMatchDiffSnapshot( view.container );
 	} );
 
 	test( 'should render borderLeft', () => {
+		const view = render( <Surface>Surface</Surface> );
 		const { container } = render( <Surface borderLeft>Surface</Surface> );
-		expect( container.firstChild ).toMatchDiffSnapshot(
-			base.container.firstChild
-		);
+		expect( container ).toMatchDiffSnapshot( view.container );
 	} );
 
 	test( 'should render borderRight', () => {
+		const view = render( <Surface>Surface</Surface> );
 		const { container } = render( <Surface borderRight>Surface</Surface> );
-		expect( container.firstChild ).toMatchDiffSnapshot(
-			base.container.firstChild
-		);
+		expect( container ).toMatchDiffSnapshot( view.container );
 	} );
 
 	test( 'should render borderTop', () => {
+		const view = render( <Surface>Surface</Surface> );
 		const { container } = render( <Surface borderTop>Surface</Surface> );
-		expect( container.firstChild ).toMatchDiffSnapshot(
-			base.container.firstChild
-		);
+		expect( container ).toMatchDiffSnapshot( view.container );
 	} );
 
 	test( 'should render borderBottom', () => {
+		const view = render( <Surface>Surface</Surface> );
 		const { container } = render( <Surface borderBottom>Surface</Surface> );
-		expect( container.firstChild ).toMatchDiffSnapshot(
-			base.container.firstChild
-		);
+		expect( container ).toMatchDiffSnapshot( view.container );
 	} );
 } );

@@ -1,8 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { regexp } from '@wordpress/shortcode';
-import deprecated from '@wordpress/deprecated';
 import { renderToString } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 
@@ -24,7 +22,7 @@ export function addActiveFormats( value, activeFormats ) {
  *
  * @param {?(string|boolean)} multiline The multiline prop.
  *
- * @return {?string} The multiline tag.
+ * @return {string | undefined} The multiline tag.
  */
 export function getMultilineTag( multiline ) {
 	if ( multiline !== true && multiline !== 'p' && multiline !== 'li' ) {
@@ -34,35 +32,15 @@ export function getMultilineTag( multiline ) {
 	return multiline === true ? 'p' : multiline;
 }
 
-export function getAllowedFormats( {
-	allowedFormats,
-	formattingControls,
-	disableFormats,
-} ) {
+export function getAllowedFormats( { allowedFormats, disableFormats } ) {
 	if ( disableFormats ) {
 		return getAllowedFormats.EMPTY_ARRAY;
 	}
 
-	if ( ! allowedFormats && ! formattingControls ) {
-		return;
-	}
-
-	if ( allowedFormats ) {
-		return allowedFormats;
-	}
-
-	deprecated( 'wp.blockEditor.RichText formattingControls prop', {
-		since: '5.4',
-		alternative: 'allowedFormats',
-		version: '6.2',
-	} );
-
-	return formattingControls.map( ( name ) => `core/${ name }` );
+	return allowedFormats;
 }
 
 getAllowedFormats.EMPTY_ARRAY = [];
-
-export const isShortcode = ( text ) => regexp( '.*' ).test( text );
 
 /**
  * Creates a link from pasted URL.

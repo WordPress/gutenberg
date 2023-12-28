@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,21 +24,27 @@ export default function save( { attributes } ) {
 		linkClass,
 		width,
 		height,
+		aspectRatio,
+		scale,
 		id,
 		linkTarget,
 		sizeSlug,
 		title,
 	} = attributes;
 
-	const newRel = isEmpty( rel ) ? undefined : rel;
+	const newRel = ! rel ? undefined : rel;
 	const borderProps = getBorderClassesAndStyles( attributes );
 
 	const classes = classnames( {
-		[ `align${ align }` ]: align,
+		// All other align classes are handled by block supports.
+		// `{ align: 'none' }` is unique to transforms for the image block.
+		alignnone: 'none' === align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
 		'has-custom-border':
-			!! borderProps.className || ! isEmpty( borderProps.style ),
+			!! borderProps.className ||
+			( borderProps.style &&
+				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
 	const imageClasses = classnames( borderProps.className, {
@@ -51,9 +56,13 @@ export default function save( { attributes } ) {
 			src={ url }
 			alt={ alt }
 			className={ imageClasses || undefined }
-			style={ borderProps.style }
-			width={ width }
-			height={ height }
+			style={ {
+				...borderProps.style,
+				aspectRatio,
+				objectFit: scale,
+				width,
+				height,
+			} }
 			title={ title }
 		/>
 	);

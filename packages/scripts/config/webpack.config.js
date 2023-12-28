@@ -4,11 +4,13 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const { DefinePlugin } = require( 'webpack' );
 const browserslist = require( 'browserslist' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const { basename, dirname, resolve } = require( 'path' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
+const { realpathSync } = require( 'fs' );
 
 /**
  * WordPress dependencies
@@ -38,8 +40,27 @@ if ( ! browserslist.findConfig( '.' ) ) {
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 
-// Get paths of the `render` props included in `block.json` files
-const renderPaths = getRenderPropPaths();
+/**
+ * The plugin recomputes the render paths once on each compilation. It is necessary to avoid repeating processing
+ * when filtering every discovered PHP file in the source folder. This is the most performant way to ensure that
+ * changes in `block.json` files are picked up in watch mode.
+ */
+class RenderPathsPlugin {
+	/**
+	 * Paths with the `render` props included in `block.json` files.
+	 *
+	 * @type {string[]}
+	 */
+	static renderPaths;
+
+	apply( compiler ) {
+		const pluginName = this.constructor.name;
+
+		compiler.hooks.thisCompilation.tap( pluginName, () => {
+			this.constructor.renderPaths = getRenderPropPaths();
+		} );
+	}
+}
 
 const cssLoaders = [
 	{
@@ -48,6 +69,7 @@ const cssLoaders = [
 	{
 		loader: require.resolve( 'css-loader' ),
 		options: {
+			importLoaders: 1,
 			sourceMap: ! isProduction,
 			modules: {
 				auto: true,
@@ -109,7 +131,7 @@ const config = {
 			cacheGroups: {
 				style: {
 					type: 'css/mini-extract',
-					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
+					test: /[\\/]style(\.module)?\.(pc|sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
 					name( _, chunks, cacheGroupKey ) {
@@ -181,6 +203,10 @@ const config = {
 				use: cssLoaders,
 			},
 			{
+				test: /\.pcss$/,
+				use: cssLoaders,
+			},
+			{
 				test: /\.(sc|sa)ss$/,
 				use: [
 					...cssLoaders,
@@ -200,7 +226,7 @@ const config = {
 			},
 			{
 				test: /\.svg$/,
-				issuer: /\.(sc|sa|c)ss$/,
+				issuer: /\.(pc|sc|sa|c)ss$/,
 				type: 'asset/inline',
 			},
 			{
@@ -220,6 +246,10 @@ const config = {
 		],
 	},
 	plugins: [
+		new DefinePlugin( {
+			// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
+			SCRIPT_DEBUG: ! isProduction,
+		} ),
 		// During rebuilds, all webpack assets that are not used anymore will be
 		// removed automatically. There is an exception added in watch mode for
 		// fonts and images. It is a known limitations:
@@ -230,6 +260,7 @@ const config = {
 			// multiple configurations returned in the webpack config.
 			cleanStaleWebpackAssets: false,
 		} ),
+		new RenderPathsPlugin(),
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
@@ -273,7 +304,9 @@ const config = {
 					filter: ( filepath ) => {
 						return (
 							process.env.WP_COPY_PHP_FILES_TO_DIST ||
-							renderPaths.includes( filepath )
+							RenderPathsPlugin.renderPaths.includes(
+								realpathSync( filepath ).replace( /\\/g, '/' )
+							)
 						);
 					},
 				},
@@ -296,16 +329,15 @@ const config = {
 	},
 };
 
+// WP_DEVTOOL global variable controls how source maps are generated.
+// See: https://webpack.js.org/configuration/devtool/#devtool.
+if ( process.env.WP_DEVTOOL ) {
+	config.devtool = process.env.WP_DEVTOOL;
+}
+
 if ( ! isProduction ) {
-	// WP_DEVTOOL global variable controls how source maps are generated.
-	// See: https://webpack.js.org/configuration/devtool/#devtool.
-	config.devtool = process.env.WP_DEVTOOL || 'source-map';
-	config.module.rules.unshift( {
-		test: /\.(j|t)sx?$/,
-		exclude: [ /node_modules/ ],
-		use: require.resolve( 'source-map-loader' ),
-		enforce: 'pre',
-	} );
+	// Set default sourcemap mode if it wasn't set by WP_DEVTOOL.
+	config.devtool = config.devtool || 'source-map';
 	config.devServer = {
 		devMiddleware: {
 			writeToDisk: true,
@@ -321,6 +353,16 @@ if ( ! isProduction ) {
 			},
 		},
 	};
+}
+
+// Add source-map-loader if devtool is set, whether in dev mode or not.
+if ( config.devtool ) {
+	config.module.rules.unshift( {
+		test: /\.(j|t)sx?$/,
+		exclude: [ /node_modules/ ],
+		use: require.resolve( 'source-map-loader' ),
+		enforce: 'pre',
+	} );
 }
 
 module.exports = config;

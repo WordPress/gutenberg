@@ -2,6 +2,125 @@
 
 ## Unreleased
 
+## 12.16.0 (2023-12-13)
+
+## 12.15.0 (2023-11-29)
+
+## 12.14.0 (2023-11-16)
+
+## 12.13.0 (2023-11-02)
+
+-   Deprecated the `useSetting` function in favor of new `useSettings` one that can retrieve multiple settings at once ([#55337](https://github.com/WordPress/gutenberg/pull/55337)).
+
+## 12.12.0 (2023-10-18)
+
+## 12.11.0 (2023-10-05)
+
+-   Deprecated `CopyHandler`, absorbed into `WritingFlow`.
+
+## 12.10.0 (2023-09-20)
+
+-   The Deprecated multiline prop on RichText will now fall back to using multiple
+    rich text instances instead of a single multiline instance. The prop remains
+    deprecated.
+
+## 12.9.0 (2023-08-31)
+
+### Enhancements
+
+-   Embed the `ObserveTyping` behavior within the `BlockList` component making to simplify instanciations of third-party block editors.
+
+## 12.8.0 (2023-08-16)
+
+## 12.7.0 (2023-08-10)
+
+## 12.6.0 (2023-07-20)
+
+## 12.5.0 (2023-07-05)
+
+## 12.4.0 (2023-06-23)
+
+### Enhancements
+
+-   Add `HeadingLevelDropdown` component for selecting H1-H6 and paragraph HTML tags from the block toolbar.
+
+### Bug Fix
+
+-   Fluid typography: custom font-sizes should use max viewport width ([#51516](https://github.com/WordPress/gutenberg/pull/51516)).
+
+## 12.3.0 (2023-06-07)
+
+## 12.2.0 (2023-05-24)
+
+## 12.1.0 (2023-05-10)
+
+-   `MediaPlaceholder`: Remove the undocumented `onHTMLDrop` prop ([#49673](https://github.com/WordPress/gutenberg/pull/49673)).
+
+## 12.0.0 (2023-04-26)
+
+### Breaking Changes
+
+-   Renamed utility function `immutableSet` to `setImmutably` ([#50040](https://github.com/WordPress/gutenberg/pull/50040)).
+
+## 11.8.0 (2023-04-12)
+
+## 11.7.0 (2023-03-29)
+
+-   `ImageSizeControl`: Update image size label ([#49112](https://github.com/WordPress/gutenberg/pull/49112)).
+
+## 11.6.0 (2023-03-15)
+
+## 11.5.0 (2023-03-01)
+
+### Bug Fix
+
+-   `SpacingSizesControl`: fix white dot on thumb ([#48574](https://github.com/WordPress/gutenberg/pull/48574)).
+
+## 11.4.0 (2023-02-15)
+
+### Bug Fix
+
+-   `LinkControl`: fix scrollbar displayed on toggle link settings ([#47986](https://github.com/WordPress/gutenberg/pull/47986)).
+
+## 11.3.0 (2023-02-01)
+
+## 11.2.0 (2023-01-11)
+
+### Bug Fix
+
+-   `BlockInspector`: Fix browser warning error when block is not selected ([#46875](https://github.com/WordPress/gutenberg/pull/46875)).
+-   Move component styles needed for iframes to content styles ([#47103](https://github.com/WordPress/gutenberg/pull/47103)).
+-   Block Inserter: Correctly apply style to the default inserter ([#47166](https://github.com/WordPress/gutenberg/pull/47166)).
+-   List View: Fix crash when the first template-parts is deleted width del key ([#47227](https://github.com/WordPress/gutenberg/pull/47227)).
+
+## 11.1.0 (2023-01-02)
+
+## 11.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+### Enhancements
+
+-   `URLInput`: the `renderSuggestions` callback prop now receives `currentInputValue` as a new parameter ([45806](https://github.com/WordPress/gutenberg/pull/45806)).
+-   Fluid typography: add configurable fluid typography settings for minimum font size to theme.json ([#42489](https://github.com/WordPress/gutenberg/pull/42489)).
+-   `URLInput`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([46692](https://github.com/WordPress/gutenberg/pull/46692)).
+
+### Bug Fix
+
+-   `SpacingSizesControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#46530](https://github.com/WordPress/gutenberg/pull/46530)).
+-   `FocalPointPicker`: Fix layout misalignment when placed in the `BlockInspector` ([#46631](https://github.com/WordPress/gutenberg/pull/46631)).
+
+## 10.5.0 (2022-11-16)
+
+### Enhancement
+
+-   `BlockLockModal`: Move Icon component out of CheckboxControl label ([#45535](https://github.com/WordPress/gutenberg/pull/45535))
+-   Fluid typography: adjust font size min and max rules ([#45536](https://github.com/WordPress/gutenberg/pull/45536)).
+
+## 10.4.0 (2022-11-02)
+
 ### Bug Fix
 
 -   `InserterListItem`: Fix dragging and dropping in Firefox. ([#44631](https://github.com/WordPress/gutenberg/pull/44631))

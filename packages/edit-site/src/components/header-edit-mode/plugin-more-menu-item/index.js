@@ -60,7 +60,7 @@ import { withPluginContext } from '@wordpress/plugins';
  * );
  * ```
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 export default compose(
 	withPluginContext( ( context, ownProps ) => {

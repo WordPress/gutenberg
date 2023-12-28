@@ -74,7 +74,7 @@ Install [Xcode](https://developer.apple.com/xcode/) via the app store and then o
 -   Accept the license agreement.
 -   Verify that `Xcode > Preferences > Locations > Command Line Tools` points to the current Xcode version.
 
-<img src="https://developer.wordpress.org/files/2021/10/xcode-command-line-tools.png" width="700px" alt="Screenshot of XCode command line tools settings.">
+<img src="https://developer.wordpress.org/files/2021/10/xcode-command-line-tools.png" width="700px" alt="Screenshot of Xcode command line tools settings.">
 
 ### react-native doctor
 
@@ -212,7 +212,7 @@ After a bit of a wait, we’ll see something like this:
 ## Unit Tests
 
 ```sh
-npm run native test
+npm run test:native
 ```
 
 ## Integration Tests

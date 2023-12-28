@@ -1,10 +1,19 @@
 /**
  * External dependencies
  */
-import { find, kebabCase } from 'lodash';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
+
+/**
+ * WordPress dependencies
+ */
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -26,7 +35,9 @@ export const getColorObjectByAttributeValues = (
 	customColor
 ) => {
 	if ( definedColor ) {
-		const colorObj = find( colors, { slug: definedColor } );
+		const colorObj = colors?.find(
+			( color ) => color.slug === definedColor
+		);
 
 		if ( colorObj ) {
 			return colorObj;
@@ -47,7 +58,7 @@ export const getColorObjectByAttributeValues = (
  *                   Returns undefined if no color object matches this requirement.
  */
 export const getColorObjectByColorValue = ( colors, colorValue ) => {
-	return find( colors, { color: colorValue } );
+	return colors?.find( ( color ) => color.color === colorValue );
 };
 
 /**
@@ -63,6 +74,8 @@ export function getColorClassName( colorContextName, colorSlug ) {
 	if ( ! colorContextName || ! colorSlug ) {
 		return undefined;
 	}
+
+	const { kebabCase } = unlock( componentsPrivateApis );
 
 	return `has-${ kebabCase( colorSlug ) }-${ colorContextName }`;
 }

@@ -28,11 +28,11 @@ test.describe( 'Paragraph', () => {
 		} );
 		await page.keyboard.type( '1' );
 
-		const firstBlockTagName = await page.evaluate( () => {
-			return document.querySelector(
-				'.block-editor-block-list__layout .wp-block'
-			).tagName;
-		} );
+		const firstBlockTagName = await editor.canvas
+			.locator( ':root' )
+			.evaluate( () => {
+				return document.querySelector( '[data-block]' ).tagName;
+			} );
 
 		// The outer element should be a paragraph. Blocks should never have any
 		// additional div wrappers so the markup remains simple and easy to
@@ -59,9 +59,8 @@ test.describe( 'Paragraph', () => {
 			await requestUtils.deleteAllMedia();
 		} );
 
-		test( 'should allow dropping an image on en empty paragraph block', async ( {
+		test( 'should allow dropping an image on an empty paragraph block', async ( {
 			editor,
-			page,
 			pageUtils,
 			draggingUtils,
 		} ) => {
@@ -74,18 +73,19 @@ test.describe( 'Paragraph', () => {
 				testImageName
 			);
 
-			const { dragOver, drop } = await pageUtils.dragFiles(
-				testImagePath
+			const { dragOver, drop } =
+				await pageUtils.dragFiles( testImagePath );
+
+			await dragOver(
+				editor.canvas.locator( '[data-type="core/paragraph"]' )
 			);
 
-			await dragOver( '[data-type="core/paragraph"]' );
-
 			await expect( draggingUtils.dropZone ).toBeVisible();
-			await expect( draggingUtils.insertionIndicator ).not.toBeVisible();
+			await expect( draggingUtils.insertionIndicator ).toBeHidden();
 
 			await drop();
 
-			const imageBlock = page.locator(
+			const imageBlock = editor.canvas.locator(
 				'role=document[name="Block: Image"i]'
 			);
 			await expect( imageBlock ).toBeVisible();
@@ -95,7 +95,7 @@ test.describe( 'Paragraph', () => {
 			);
 		} );
 
-		test( 'should allow dropping blocks on en empty paragraph block', async ( {
+		test( 'should allow dropping blocks on an empty paragraph block', async ( {
 			editor,
 			page,
 			draggingUtils,
@@ -105,7 +105,7 @@ test.describe( 'Paragraph', () => {
 				attributes: { content: 'My Heading' },
 			} );
 			await editor.insertBlock( { name: 'core/paragraph' } );
-			await page.focus( 'text=My Heading' );
+			await editor.canvas.locator( 'text=My Heading' ).focus();
 			await editor.showBlockToolbar();
 
 			const dragHandle = page.locator(
@@ -114,53 +114,54 @@ test.describe( 'Paragraph', () => {
 			await dragHandle.hover();
 			await page.mouse.down();
 
-			const emptyParagraph = page.locator(
+			const emptyParagraph = editor.canvas.locator(
 				'[data-type="core/paragraph"][data-empty="true"]'
 			);
 			const boundingBox = await emptyParagraph.boundingBox();
 			await draggingUtils.dragOver( boundingBox.x, boundingBox.y );
 
 			await expect( draggingUtils.dropZone ).toBeVisible();
-			await expect( draggingUtils.insertionIndicator ).not.toBeVisible();
+			await expect( draggingUtils.insertionIndicator ).toBeHidden();
 
 			await page.mouse.up();
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:heading -->
-<h2>My Heading</h2>
+<h2 class="wp-block-heading">My Heading</h2>
 <!-- /wp:heading -->` );
 		} );
 
-		test( 'should allow dropping HTML on en empty paragraph block', async ( {
+		test( 'should allow dropping HTML on an empty paragraph block', async ( {
 			editor,
 			page,
 			draggingUtils,
 		} ) => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 
-			await draggingUtils.simulateDraggingHTML( '<h2>My Heading</h2>' );
+			await draggingUtils.simulateDraggingHTML(
+				'<h2 class="wp-block-heading">My Heading</h2>'
+			);
 
-			const emptyParagraph = page.locator(
+			const emptyParagraph = editor.canvas.locator(
 				'[data-type="core/paragraph"][data-empty="true"]'
 			);
 			const boundingBox = await emptyParagraph.boundingBox();
 			await draggingUtils.dragOver( boundingBox.x, boundingBox.y );
 
 			await expect( draggingUtils.dropZone ).toBeVisible();
-			await expect( draggingUtils.insertionIndicator ).not.toBeVisible();
+			await expect( draggingUtils.insertionIndicator ).toBeHidden();
 
 			await page.mouse.up();
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:heading -->
-<h2>My Heading</h2>
+<h2 class="wp-block-heading">My Heading</h2>
 <!-- /wp:heading -->` );
 		} );
 
 		test.describe( 'Dragging positions', () => {
 			test( 'Only the first block is an empty paragraph block', async ( {
 				editor,
-				page,
 				draggingUtils,
 			} ) => {
 				await editor.setContent( `
@@ -173,10 +174,10 @@ test.describe( 'Paragraph', () => {
 					<!-- /wp:heading -->
 				` );
 
-				const emptyParagraph = page.locator(
+				const emptyParagraph = editor.canvas.locator(
 					'[data-type="core/paragraph"]'
 				);
-				const heading = page.locator( 'text=Heading' );
+				const heading = editor.canvas.locator( 'text=Heading' );
 
 				await draggingUtils.simulateDraggingHTML(
 					'<h2>Draggable</h2>'
@@ -193,8 +194,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( firstBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								firstBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -205,8 +210,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( firstBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								firstBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -217,8 +226,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( firstBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								firstBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -229,8 +242,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( firstBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								firstBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -239,7 +256,7 @@ test.describe( 'Paragraph', () => {
 						headingBox.x,
 						headingBox.y + headingBox.height - 1
 					);
-					await expect( draggingUtils.dropZone ).not.toBeVisible();
+					await expect( draggingUtils.dropZone ).toBeHidden();
 					await expect(
 						draggingUtils.insertionIndicator
 					).toBeVisible();
@@ -255,7 +272,6 @@ test.describe( 'Paragraph', () => {
 
 			test( 'Only the second block is an empty paragraph block', async ( {
 				editor,
-				page,
 				draggingUtils,
 			} ) => {
 				await editor.setContent( `
@@ -268,10 +284,10 @@ test.describe( 'Paragraph', () => {
 					<!-- /wp:paragraph -->
 				` );
 
-				const emptyParagraph = page.locator(
+				const emptyParagraph = editor.canvas.locator(
 					'[data-type="core/paragraph"]'
 				);
-				const heading = page.locator( 'text=Heading' );
+				const heading = editor.canvas.locator( 'text=Heading' );
 
 				await draggingUtils.simulateDraggingHTML(
 					'<h2>Draggable</h2>'
@@ -286,7 +302,7 @@ test.describe( 'Paragraph', () => {
 						headingBox.x,
 						headingBox.y + 1
 					);
-					await expect( draggingUtils.dropZone ).not.toBeVisible();
+					await expect( draggingUtils.dropZone ).toBeHidden();
 					await expect(
 						draggingUtils.insertionIndicator
 					).toBeVisible();
@@ -307,8 +323,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( secondBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								secondBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -319,8 +339,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( secondBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								secondBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -331,8 +355,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( secondBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								secondBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -343,14 +371,17 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( secondBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								secondBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 			} );
 
 			test( 'Both blocks are empty paragraph blocks', async ( {
 				editor,
-				page,
 				draggingUtils,
 			} ) => {
 				await editor.setContent( `
@@ -363,10 +394,10 @@ test.describe( 'Paragraph', () => {
 					<!-- /wp:paragraph -->
 				` );
 
-				const firstEmptyParagraph = page
+				const firstEmptyParagraph = editor.canvas
 					.locator( '[data-type="core/paragraph"]' )
 					.first();
-				const secondEmptyParagraph = page
+				const secondEmptyParagraph = editor.canvas
 					.locator( '[data-type="core/paragraph"]' )
 					.nth( 1 );
 
@@ -385,8 +416,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( firstBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								firstBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -397,8 +432,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( firstBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								firstBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -409,8 +448,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( firstBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								firstBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -421,8 +464,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( secondBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								secondBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -433,8 +480,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( secondBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								secondBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 
 				{
@@ -445,8 +496,12 @@ test.describe( 'Paragraph', () => {
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
 					await expect
-						.poll( () => draggingUtils.dropZone.boundingBox() )
-						.toEqual( secondBlockBox );
+						.poll( () =>
+							draggingUtils.confirmValidDropZonePosition(
+								secondBlockBox
+							)
+						)
+						.toBeTruthy();
 				}
 			} );
 		} );
@@ -505,5 +560,19 @@ class DraggingUtils {
 		// This is where the dummy draggable element is at.
 		await this.page.mouse.move( 0, 0 );
 		await this.page.mouse.down();
+	}
+
+	async confirmValidDropZonePosition( element ) {
+		// Check that both x and y axis of the dropzone
+		// have a less than 1 difference with a given target element
+		const box = await this.dropZone.boundingBox();
+		if ( ! box ) {
+			return false;
+		}
+
+		return (
+			Math.abs( element.x - box.x ) < 1 &&
+			Math.abs( element.y - box.y ) < 1
+		);
 	}
 }

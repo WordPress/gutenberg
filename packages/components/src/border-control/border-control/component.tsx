@@ -13,7 +13,8 @@ import { HStack } from '../../h-stack';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import { View } from '../../view';
 import { VisuallyHidden } from '../../visually-hidden';
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { useBorderControl } from './hook';
 
 import type { BorderControlProps, LabelProps } from '../types';
@@ -41,7 +42,7 @@ const UnconnectedBorderControl = (
 		disableCustomColors,
 		disableUnits,
 		enableAlpha,
-		enableStyle = true,
+		enableStyle,
 		hideLabelFromVision,
 		innerWrapperClassName,
 		inputWidth,
@@ -53,13 +54,12 @@ const UnconnectedBorderControl = (
 		__unstablePopoverProps,
 		previousStyleSelection,
 		showDropdownHeader,
-		size = 'default',
+		size,
 		sliderClassName,
 		value: border,
 		widthUnit,
 		widthValue,
 		withSlider,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 		...otherProps
 	} = useBorderControl( props );
@@ -83,9 +83,6 @@ const UnconnectedBorderControl = (
 							onChange={ onBorderChange }
 							previousStyleSelection={ previousStyleSelection }
 							showDropdownHeader={ showDropdownHeader }
-							__experimentalHasMultipleOrigins={
-								__experimentalHasMultipleOrigins
-							}
 							__experimentalIsRenderedInSidebar={
 								__experimentalIsRenderedInSidebar
 							}
@@ -104,6 +101,7 @@ const UnconnectedBorderControl = (
 				/>
 				{ withSlider && (
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Border width' ) }
 						hideLabelFromVision
 						className={ sliderClassName }

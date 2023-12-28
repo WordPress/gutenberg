@@ -2,8 +2,8 @@
  * External dependencies
  */
 import memize from 'memize';
-import { map } from 'lodash';
 import { I18nManager } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 /**
  * WordPress dependencies
@@ -73,7 +73,7 @@ class Editor extends Component {
 			// all block types).
 			const defaultAllowedBlockTypes =
 				true === settings.allowedBlockTypes
-					? map( blockTypes, 'name' )
+					? blockTypes.map( ( { name } ) => name )
 					: settings.allowedBlockTypes || [];
 
 			settings.allowedBlockTypes = defaultAllowedBlockTypes.filter(
@@ -173,35 +173,31 @@ class Editor extends Component {
 		};
 
 		return (
-			<SlotFillProvider>
-				<EditorProvider
-					settings={ editorSettings }
-					post={ normalizedPost }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					{ ...props }
-				>
-					<Layout setTitleRef={ this.setTitleRef } />
-				</EditorProvider>
-			</SlotFillProvider>
+			<GestureHandlerRootView style={ { flex: 1 } }>
+				<SlotFillProvider>
+					<EditorProvider
+						settings={ editorSettings }
+						post={ normalizedPost }
+						initialEdits={ initialEdits }
+						useSubRegistry={ false }
+						{ ...props }
+					>
+						<Layout setTitleRef={ this.setTitleRef } />
+					</EditorProvider>
+				</SlotFillProvider>
+			</GestureHandlerRootView>
 		);
 	}
 }
 
 export default compose( [
 	withSelect( ( select ) => {
-		const {
-			isFeatureActive,
-			getEditorMode,
-			__experimentalGetPreviewDeviceType,
-			getHiddenBlockTypes,
-		} = select( editPostStore );
+		const { isFeatureActive, getEditorMode, getHiddenBlockTypes } =
+			select( editPostStore );
 		const { getBlockTypes } = select( blocksStore );
 
 		return {
-			hasFixedToolbar:
-				isFeatureActive( 'fixedToolbar' ) ||
-				__experimentalGetPreviewDeviceType() !== 'Desktop',
+			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 			focusMode: isFeatureActive( 'focusMode' ),
 			mode: getEditorMode(),
 			hiddenBlockTypes: getHiddenBlockTypes(),

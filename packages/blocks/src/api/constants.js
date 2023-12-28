@@ -31,6 +31,16 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		requiresOptOut: true,
 		useEngine: true,
 	},
+	backgroundRepeat: {
+		value: [ 'background', 'backgroundRepeat' ],
+		support: [ 'background', 'backgroundRepeat' ],
+		useEngine: true,
+	},
+	backgroundSize: {
+		value: [ 'background', 'backgroundSize' ],
+		support: [ 'background', 'backgroundSize' ],
+		useEngine: true,
+	},
 	borderColor: {
 		value: [ 'border', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],
@@ -123,13 +133,22 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		requiresOptOut: true,
 		useEngine: true,
 	},
+	columnCount: {
+		value: [ 'typography', 'textColumns' ],
+		support: [ 'typography', 'textColumns' ],
+		useEngine: true,
+	},
 	filter: {
 		value: [ 'filter', 'duotone' ],
-		support: [ 'color', '__experimentalDuotone' ],
+		support: [ 'filter', 'duotone' ],
 	},
 	linkColor: {
 		value: [ 'elements', 'link', 'color', 'text' ],
 		support: [ 'color', 'link' ],
+	},
+	captionColor: {
+		value: [ 'elements', 'caption', 'color', 'text' ],
+		support: [ 'color', 'caption' ],
 	},
 	buttonColor: {
 		value: [ 'elements', 'button', 'color', 'text' ],
@@ -138,6 +157,14 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	buttonBackgroundColor: {
 		value: [ 'elements', 'button', 'color', 'background' ],
 		support: [ 'color', 'button' ],
+	},
+	headingColor: {
+		value: [ 'elements', 'heading', 'color', 'text' ],
+		support: [ 'color', 'heading' ],
+	},
+	headingBackgroundColor: {
+		value: [ 'elements', 'heading', 'color', 'background' ],
+		support: [ 'color', 'heading' ],
 	},
 	fontFamily: {
 		value: [ 'typography', 'fontFamily' ],
@@ -175,6 +202,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 		useEngine: true,
 	},
+	minHeight: {
+		value: [ 'dimensions', 'minHeight' ],
+		support: [ 'dimensions', 'minHeight' ],
+		useEngine: true,
+	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],
@@ -199,6 +231,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	letterSpacing: {
 		value: [ 'typography', 'letterSpacing' ],
 		support: [ 'typography', '__experimentalLetterSpacing' ],
+		useEngine: true,
+	},
+	writingMode: {
+		value: [ 'typography', 'writingMode' ],
+		support: [ 'typography', '__experimentalWritingMode' ],
 		useEngine: true,
 	},
 	'--wp--style--root--padding': {

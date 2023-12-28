@@ -67,44 +67,43 @@ import requestIdleCallback from './request-idle-callback';
  * @return {WPPriorityQueue} Queue object with `add`, `flush` and `reset` methods.
  */
 export const createQueue = () => {
-	/** @type {WPPriorityQueueContext[]} */
-	let waitingList = [];
-
-	/** @type {WeakMap<WPPriorityQueueContext,WPPriorityQueueCallback>} */
-	let elementsMap = new WeakMap();
-
+	/** @type {Map<WPPriorityQueueContext, WPPriorityQueueCallback>} */
+	const waitingList = new Map();
 	let isRunning = false;
 
 	/**
 	 * Callback to process as much queue as time permits.
 	 *
+	 * Map Iteration follows the original insertion order. This means that here
+	 * we can iterate the queue and know that the first contexts which were
+	 * added will be run first. On the other hand, if anyone adds a new callback
+	 * for an existing context it will supplant the previously-set callback for
+	 * that context because we reassigned that map key's value.
+	 *
+	 * In the case that a callback adds a new callback to its own context then
+	 * the callback it adds will appear at the end of the iteration and will be
+	 * run only after all other existing contexts have finished executing.
+	 *
 	 * @param {IdleDeadline|number} deadline Idle callback deadline object, or
 	 *                                       animation frame timestamp.
 	 */
 	const runWaitingList = ( deadline ) => {
-		const hasTimeRemaining =
-			typeof deadline === 'number'
-				? () => false
-				: () => deadline.timeRemaining() > 0;
-
-		do {
-			if ( waitingList.length === 0 ) {
-				isRunning = false;
-				return;
-			}
-
-			const nextElement = /** @type {WPPriorityQueueContext} */ (
-				waitingList.shift()
-			);
-			const callback = /** @type {WPPriorityQueueCallback} */ (
-				elementsMap.get( nextElement )
-			);
-			// If errors with undefined callbacks are encountered double check that all of your useSelect calls
-			// have all dependecies set correctly in second parameter. Missing dependencies can cause unexpected
-			// loops and race conditions in the queue.
+		for ( const [ nextElement, callback ] of waitingList ) {
+			waitingList.delete( nextElement );
 			callback();
-			elementsMap.delete( nextElement );
-		} while ( hasTimeRemaining() );
+
+			if (
+				'number' === typeof deadline ||
+				deadline.timeRemaining() <= 0
+			) {
+				break;
+			}
+		}
+
+		if ( waitingList.size === 0 ) {
+			isRunning = false;
+			return;
+		}
 
 		requestIdleCallback( runWaitingList );
 	};
@@ -112,16 +111,18 @@ export const createQueue = () => {
 	/**
 	 * Add a callback to the queue for a given context.
 	 *
+	 * If errors with undefined callbacks are encountered double check that
+	 * all of your useSelect calls have the right dependencies set correctly
+	 * in their second parameter. Missing dependencies can cause unexpected
+	 * loops and race conditions in the queue.
+	 *
 	 * @type {WPPriorityQueueAdd}
 	 *
 	 * @param {WPPriorityQueueContext}  element Context object.
 	 * @param {WPPriorityQueueCallback} item    Callback function.
 	 */
 	const add = ( element, item ) => {
-		if ( ! elementsMap.has( element ) ) {
-			waitingList.push( element );
-		}
-		elementsMap.set( element, item );
+		waitingList.set( element, item );
 		if ( ! isRunning ) {
 			isRunning = true;
 			requestIdleCallback( runWaitingList );
@@ -139,16 +140,12 @@ export const createQueue = () => {
 	 * @return {boolean} Whether flush was performed.
 	 */
 	const flush = ( element ) => {
-		if ( ! elementsMap.has( element ) ) {
+		const callback = waitingList.get( element );
+		if ( undefined === callback ) {
 			return false;
 		}
 
-		const index = waitingList.indexOf( element );
-		waitingList.splice( index, 1 );
-		const callback = /** @type {WPPriorityQueueCallback} */ (
-			elementsMap.get( element )
-		);
-		elementsMap.delete( element );
+		waitingList.delete( element );
 		callback();
 
 		return true;
@@ -166,15 +163,7 @@ export const createQueue = () => {
 	 * @return {boolean} Whether any callbacks got cancelled.
 	 */
 	const cancel = ( element ) => {
-		if ( ! elementsMap.has( element ) ) {
-			return false;
-		}
-
-		const index = waitingList.indexOf( element );
-		waitingList.splice( index, 1 );
-		elementsMap.delete( element );
-
-		return true;
+		return waitingList.delete( element );
 	};
 
 	/**
@@ -183,8 +172,7 @@ export const createQueue = () => {
 	 * @type {WPPriorityQueueReset}
 	 */
 	const reset = () => {
-		waitingList = [];
-		elementsMap = new WeakMap();
+		waitingList.clear();
 		isRunning = false;
 	};
 

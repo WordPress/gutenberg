@@ -4,7 +4,7 @@ exports[`PostSavedState returns a disabled button if the post is not saveable 1`
 <button
   aria-disabled="true"
   aria-label="Save draft"
-  class="components-button has-icon"
+  class="components-button is-compact is-tertiary has-icon"
   type="button"
 >
   <svg
@@ -22,20 +22,11 @@ exports[`PostSavedState returns a disabled button if the post is not saveable 1`
 </button>
 `;
 
-exports[`PostSavedState returns a switch to draft link if the post is published 1`] = `
-<button
-  class="components-button editor-post-switch-to-draft is-tertiary"
-  type="button"
->
-  Switch to draft
-</button>
-`;
-
 exports[`PostSavedState should return Save button if edits to be saved 1`] = `
 <button
   aria-disabled="false"
   aria-label="Save draft"
-  class="components-button editor-post-save-draft is-tertiary"
+  class="components-button editor-post-save-draft is-compact is-tertiary"
   type="button"
 >
   Save draft

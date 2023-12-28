@@ -33,11 +33,13 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
+		editor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
+		await editor.canvas.locator( 'body' ).click();
 
 		await siteEditorStyleVariations.browseStyles();
 
@@ -68,11 +70,13 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
+		editor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
+		await editor.canvas.locator( 'body' ).click();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="pink"i]' );
 		await page.click(
@@ -82,13 +86,13 @@ test.describe( 'Global styles variations', () => {
 
 		await expect(
 			page.locator(
-				'role=button[name="Colors background styles"i] >> data-testid=background-color-indicator'
+				'role=button[name="Color Background styles"i] >> .component-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(202, 105, 211\)/ );
 
 		await expect(
 			page.locator(
-				'role=button[name="Colors text styles"i] >> data-testid=text-color-indicator'
+				'role=button[name="Color Text styles"i] >> .component-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(74, 7, 74\)/ );
 
@@ -100,18 +104,20 @@ test.describe( 'Global styles variations', () => {
 
 		await expect(
 			page.locator( 'css=.components-font-size-picker__header__hint' )
-		).toHaveText( 'Medium(px)' );
+		).toHaveText( 'Medium' );
 	} );
 
 	test( 'should apply custom colors and font sizes in a variation', async ( {
 		admin,
 		page,
 		siteEditorStyleVariations,
+		editor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
+		await editor.canvas.locator( 'body' ).click();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="yellow"i]' );
 		await page.click(
@@ -121,13 +127,13 @@ test.describe( 'Global styles variations', () => {
 
 		await expect(
 			page.locator(
-				'role=button[name="Colors background styles"i] >> data-testid=background-color-indicator'
+				'role=button[name="Color Background styles"i] >> .component-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(255, 239, 11\)/ );
 
 		await expect(
 			page.locator(
-				'role=button[name="Colors text styles"i] >> data-testid=text-color-indicator'
+				'role=button[name="Color Text styles"i] >> .component-color-indicator'
 			)
 		).toHaveCSS( 'background', /rgb\(25, 25, 17\)/ );
 
@@ -141,7 +147,7 @@ test.describe( 'Global styles variations', () => {
 		//  we could provide accessible attributes to the source code in packages/components/src/font-size-picker/index.js.
 		await expect(
 			page.locator( 'css=.components-font-size-picker__header__hint' )
-		).toHaveText( '(Custom)' );
+		).toHaveText( 'Custom' );
 
 		await expect(
 			page.locator( 'role=spinbutton[name="Custom"i]' )
@@ -152,11 +158,13 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
+		editor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
+		await editor.canvas.locator( 'body' ).click();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="pink"i]' );
 		await page.click(
@@ -166,15 +174,15 @@ test.describe( 'Global styles variations', () => {
 		await page.click( 'role=button[name="Color palettes"i]' );
 
 		await expect(
-			page.locator( 'role=button[name="Color: Foreground"i]' )
+			page.locator( 'role=option[name="Color: Foreground"i]' )
 		).toHaveCSS( 'background-color', 'rgb(74, 7, 74)' );
 
 		await expect(
-			page.locator( 'role=button[name="Color: Background"i]' )
+			page.locator( 'role=option[name="Color: Background"i]' )
 		).toHaveCSS( 'background-color', 'rgb(202, 105, 211)' );
 
 		await expect(
-			page.locator( 'role=button[name="Color: Awesome pink"i]' )
+			page.locator( 'role=option[name="Color: Awesome pink"i]' )
 		).toHaveCSS( 'background-color', 'rgba(204, 0, 255, 0.77)' );
 	} );
 
@@ -182,19 +190,22 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
+		editor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
 		} );
+		await editor.canvas.locator( 'body' ).click();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="yellow"i]' );
 
-		const frame = page.frame( 'editor-canvas' );
-		const paragraph = frame.locator( 'text="My awesome paragraph"' );
+		const paragraph = editor.canvas.locator(
+			'text="My awesome paragraph"'
+		);
 		await expect( paragraph ).toHaveCSS( 'color', 'rgb(25, 25, 17)' );
 
-		const body = frame.locator( 'css=body' );
+		const body = editor.canvas.locator( 'css=body' );
 		await expect( body ).toHaveCSS(
 			'background-color',
 			'rgb(255, 239, 11)'
@@ -207,17 +218,7 @@ class SiteEditorStyleVariations {
 		this.page = page;
 	}
 
-	async disableWelcomeGuide() {
-		// Turn off the welcome guide.
-		await this.page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'welcomeGuideStyles', false );
-		} );
-	}
-
 	async browseStyles() {
-		await this.disableWelcomeGuide();
 		await this.page.click( 'role=button[name="Styles"i]' );
 		await this.page.click( 'role=button[name="Browse styles"i]' );
 	}

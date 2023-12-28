@@ -5,12 +5,6 @@ Use radio buttons when you want users to select one option from a set, and you w
 ![](https://make.wordpress.org/design/files/2018/11/radio.png)
 Selected and unselected radio buttons
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -58,7 +52,7 @@ Render a user interface to select the user type using radio inputs.
 
 ```jsx
 import { RadioControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState } from 'react';
 
 const MyRadioControl = () => {
 	const [ option, setOption ] = useState( 'a' );
@@ -82,7 +76,7 @@ const MyRadioControl = () => {
 
 The component accepts the following props:
 
-#### `help`: `string | WPElement`
+#### `help`: `string | Element`
 
 If this property is added, a help text will be generated using help property as the content.
 

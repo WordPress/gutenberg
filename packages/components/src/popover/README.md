@@ -6,13 +6,13 @@ The behavior of the popover when it exceeds the viewport's edges can be controll
 
 ## Usage
 
-Render a Popover within the parent to which it should anchor.
+Render a Popover adjacent to its container.
 
 If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
 
 ```jsx
+import { useState } from 'react';
 import { Button, Popover } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyPopover = () => {
 	const [ isVisible, setIsVisible ] = useState( false );
@@ -32,8 +32,8 @@ const MyPopover = () => {
 In order to pass an explicit anchor, you can use the `anchor` prop. When doing so, **the anchor element should be stored in local state** rather than a plain React ref to ensure reactive updating when it changes.
 
 ```jsx
+import { useState } from 'react';
 import { Button, Popover } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyPopover = () => {
 	// Use internal state instead of a ref to make sure that the component
@@ -60,21 +60,20 @@ const MyPopover = () => {
 };
 ```
 
-If you want Popover elements to render to a specific location on the page to allow style cascade to take effect, you must render a `Popover.Slot` further up the element tree:
+By default Popovers render at the end of the body of your document. If you want Popover elements to render to a specific location on the page, you must render a `Popover.Slot` further up the element tree:
 
 ```jsx
-import { render } from '@wordpress/element';
+import { createRoot } from 'react-dom/client';
 import { Popover } from '@wordpress/components';
 import Content from './Content';
 
 const app = document.getElementById( 'app' );
-
-render(
+const root = createRoot( app );
+root.render(
 	<div>
 		<Content />
 		<Popover.Slot />
-	</div>,
-	app
+	</div>
 );
 ```
 
@@ -171,6 +170,8 @@ Used to customize the header text shown when the popover is toggled to fullscree
 
 ### `isAlternate`: `boolean`
 
+_Note: this prop is deprecated. Please use the `variant` prop with the `'toolbar'` values instead._
+
 Used to enable a different visual style for the popover.
 
 -   Required: No
@@ -194,9 +195,12 @@ A callback invoked when the popover should be closed.
 
 -   Required: No
 
-### `placement`: `'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
+### `placement`: `'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'overlay'`
 
 Used to specify the popover's position with respect to its anchor.
+
+`overlay` is a special case that places the popover over the reference element.
+Please note that other placement related props may not behave as excepted.
 
 -   Required: No
 -   Default: `"bottom-start"`
@@ -212,8 +216,7 @@ Possible values:
 - `yAxis`: `'top' | 'middle' | 'bottom'`
 - `xAxis`: `'left' | 'center' | 'right'`
 - `corner`: `'top' | 'right' | 'bottom' | 'left'`
-
-
+<!-- Break into two separate lists using an HTML comment -->
 -   Required: No
 
 ### `resize`: `boolean`
@@ -222,3 +225,13 @@ Adjusts the size of the popover to prevent its contents from going out of view w
 
 -   Required: No
 -   Default: `true`
+
+### `variant`: `'toolbar' | 'unstyled'`
+
+Specifies the popover's style.
+
+Leave undefined for the default style. Possible values are:
+-   `unstyled`:  The popover is essentially without any visible style, it has no background, border, outline or drop shadow, but the popover contents are still displayed.
+-   `toolbar`: A style that has no elevation, but a high contrast with other elements. This matches the style of the [`Toolbar` component](/packages/components/toolbar/README.md).
+<!-- Break into two separate lists using an HTML comment -->
+-   Required: No

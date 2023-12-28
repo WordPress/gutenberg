@@ -6,19 +6,15 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	RichText,
-	useInnerBlocksProps,
-	__experimentalGetElementClassName,
-} from '@wordpress/block-editor';
-import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { View } from '@wordpress/primitives';
 
-const allowedBlocks = [ 'core/image' ];
+/**
+ * Internal dependencies
+ */
+import { Caption } from '../utils/caption';
 
-export const Gallery = ( props ) => {
+export default function Gallery( props ) {
 	const {
 		attributes,
 		isSelected,
@@ -27,20 +23,15 @@ export const Gallery = ( props ) => {
 		insertBlocksAfter,
 		blockProps,
 		__unstableLayoutClassNames: layoutClassNames,
+		isContentLocked,
+		multiGallerySelection,
 	} = props;
 
-	const { align, columns, caption, imageCrop } = attributes;
-
-	const { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps, {
-		allowedBlocks,
-		orientation: 'horizontal',
-		renderAppender: false,
-		__experimentalLayout: { type: 'default', alignments: [] },
-	} );
+	const { align, columns, imageCrop } = attributes;
 
 	return (
 		<figure
-			{ ...innerBlocksProps }
+			{ ...blockProps }
 			className={ classnames(
 				blockProps.className,
 				layoutClassNames,
@@ -53,55 +44,24 @@ export const Gallery = ( props ) => {
 				}
 			) }
 		>
-			{ children }
-			{ isSelected && ! children && (
+			{ blockProps.children }
+			{ isSelected && ! blockProps.children && (
 				<View className="blocks-gallery-media-placeholder-wrapper">
 					{ mediaPlaceholder }
 				</View>
 			) }
-			<RichTextVisibilityHelper
-				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
-				tagName="figcaption"
-				className={ classnames(
-					'blocks-gallery-caption',
-					__experimentalGetElementClassName( 'caption' )
-				) }
-				aria-label={ __( 'Gallery caption text' ) }
-				placeholder={ __( 'Write gallery caption…' ) }
-				value={ caption }
-				onChange={ ( value ) => setAttributes( { caption: value } ) }
-				inlineToolbar
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+			<Caption
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				isSelected={ isSelected }
+				insertBlocksAfter={ insertBlocksAfter }
+				showToolbarButton={
+					! multiGallerySelection && ! isContentLocked
 				}
+				className="blocks-gallery-caption"
+				label={ __( 'Gallery caption text' ) }
+				placeholder={ __( 'Add gallery caption' ) }
 			/>
 		</figure>
 	);
-};
-
-function RichTextVisibilityHelper( {
-	isHidden,
-	className,
-	value,
-	placeholder,
-	tagName,
-	captionRef,
-	...richTextProps
-} ) {
-	if ( isHidden ) {
-		return <VisuallyHidden as={ RichText } { ...richTextProps } />;
-	}
-
-	return (
-		<RichText
-			ref={ captionRef }
-			value={ value }
-			placeholder={ placeholder }
-			className={ className }
-			tagName={ tagName }
-			{ ...richTextProps }
-		/>
-	);
 }
-
-export default Gallery;

@@ -9,6 +9,7 @@ import {
 	clickBlockToolbarButton,
 	clickMenuItem,
 	clickOnCloseModalButton,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 const createTestParagraphBlocks = async () => {
@@ -50,9 +51,10 @@ describe( 'block editor keyboard shortcuts', () => {
 			it( 'should move the blocks up', async () => {
 				await createTestParagraphBlocks();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
-				await page.keyboard.down( 'Shift' );
-				await page.keyboard.press( 'ArrowUp' );
-				await page.keyboard.up( 'Shift' );
+				await pressKeyWithModifier( 'shift', 'ArrowUp' );
+				await canvas().waitForSelector(
+					'[aria-label="Multiple selected blocks"]'
+				);
 				await moveUp();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 			} );
@@ -61,9 +63,10 @@ describe( 'block editor keyboard shortcuts', () => {
 				await createTestParagraphBlocks();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 				await page.keyboard.press( 'ArrowUp' );
-				await page.keyboard.down( 'Shift' );
-				await page.keyboard.press( 'ArrowUp' );
-				await page.keyboard.up( 'Shift' );
+				await pressKeyWithModifier( 'shift', 'ArrowUp' );
+				await canvas().waitForSelector(
+					'[aria-label="Multiple selected blocks"]'
+				);
 				await moveDown();
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 			} );
@@ -87,9 +90,9 @@ describe( 'block editor keyboard shortcuts', () => {
 		} );
 		it( 'should prevent deleting multiple selected blocks from inputs', async () => {
 			await clickBlockToolbarButton( 'Options' );
-			await clickMenuItem( 'Create Reusable block' );
+			await clickMenuItem( 'Create pattern' );
 			const reusableBlockNameInputSelector =
-				'.reusable-blocks-menu-items__convert-modal .components-text-control__input';
+				'.patterns-menu-items__convert-modal .components-text-control__input';
 			const nameInput = await page.waitForSelector(
 				reusableBlockNameInputSelector
 			);
@@ -99,7 +102,7 @@ describe( 'block editor keyboard shortcuts', () => {
 			await page.keyboard.press( 'ArrowLeft' );
 			await page.keyboard.press( 'Delete' );
 			await clickOnCloseModalButton(
-				'.reusable-blocks-menu-items__convert-modal'
+				'.patterns-menu-items__convert-modal'
 			);
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );

@@ -1,9 +1,13 @@
 /**
  * External dependencies
  */
-import type { CSSProperties, MouseEventHandler, ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
-type OnColorChange = ( newColor?: string ) => void;
+/**
+ * Internal dependencies
+ */
+import type { DropdownProps } from '../dropdown/types';
+import type { HeadingSize } from '../heading/types';
 
 export type ColorObject = {
 	name: string;
@@ -18,9 +22,13 @@ export type PaletteObject = {
 type PaletteProps = {
 	className?: string;
 	clearColor: () => void;
-	onChange: OnColorChange;
+	/**
+	 * Callback called when a color is selected.
+	 */
+	onChange: ( newColor?: string, index?: number ) => void;
 	value?: string;
 	actions?: ReactNode;
+	headingLevel?: HeadingSize;
 };
 
 export type SinglePaletteProps = PaletteProps & {
@@ -31,18 +39,11 @@ export type MultiplePalettesProps = PaletteProps & {
 	colors: PaletteObject[];
 };
 
-// TODO: should extend `Dropdown`'s props once it gets refactored to TypeScript
-export type CustomColorPickerDropdownProps = {
+export type CustomColorPickerDropdownProps = DropdownProps & {
 	isRenderedInSidebar: boolean;
-	renderContent: () => ReactNode;
-	popoverProps?: string[];
-	renderToggle: ( props: {
-		isOpen: boolean;
-		onToggle: MouseEventHandler< HTMLButtonElement >;
-	} ) => ReactNode;
 };
 
-export type ColorPaletteProps = {
+export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
 	/**
 	 * Whether the palette should have a clearing button.
 	 *
@@ -56,7 +57,7 @@ export type ColorPaletteProps = {
 	 *
 	 * @default []
 	 */
-	colors?: ( PaletteObject | ColorObject )[];
+	colors?: PaletteObject[] | ColorObject[];
 	/**
 	 * Whether to allow the user to pick a custom color on top of the predefined
 	 * choices (defined via the `colors` prop).
@@ -65,29 +66,59 @@ export type ColorPaletteProps = {
 	 */
 	disableCustomColors?: boolean;
 	/**
-	 * Whether the color picker should display the alpha channel
-	 * both in the bottom inputs as well as in the color picker itself.
+	 * This controls whether the alpha channel will be offered when selecting
+	 * custom colors.
+	 *
+	 * @default false
 	 */
 	enableAlpha?: boolean;
 	/**
-	 * Callback called when a color is selected.
+	 * The heading level.
+	 *
+	 * @default 2
 	 */
-	onChange: OnColorChange;
+	headingLevel?: HeadingSize;
 	/**
 	 * Currently active value.
 	 */
 	value?: string;
 	/**
-	 * Whether the colors prop is an array of color palettes,
-	 * rather than an array of color objects.
+	 * Whether the control should present as a set of buttons,
+	 * each with its own tab stop.
 	 *
 	 * @default false
 	 */
-	__experimentalHasMultipleOrigins?: boolean;
+	asButtons?: boolean;
+	/**
+	 * Prevents keyboard interaction from wrapping around.
+	 * Only used when `asButtons` is not true.
+	 *
+	 * @default true
+	 */
+	loop?: boolean;
 	/**
 	 * Whether this is rendered in the sidebar.
 	 *
 	 * @default false
 	 */
 	__experimentalIsRenderedInSidebar?: boolean;
-};
+} & (
+		| {
+				/**
+				 * A label to identify the purpose of the control.
+				 *
+				 * @todo [#54055] Either this or `aria-labelledby` should be required
+				 */
+				'aria-label'?: string;
+				'aria-labelledby'?: never;
+		  }
+		| {
+				/**
+				 * An ID of an element to provide a label for the control.
+				 *
+				 * @todo [#54055] Either this or `aria-label` should be required
+				 */
+				'aria-labelledby'?: string;
+				'aria-label'?: never;
+		  }
+	);

@@ -12,7 +12,7 @@ import { forwardRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { TokenInputProps } from './types';
 
 export function UnForwardedTokenInput(
@@ -48,9 +48,7 @@ export function UnForwardedTokenInput(
 		onFocus?.( e );
 	};
 
-	const onBlurHandler: React.FocusEventHandler< HTMLInputElement > = (
-		e
-	) => {
+	const onBlurHandler: FocusEventHandler< HTMLInputElement > = ( e ) => {
 		setHasFocus( false );
 		onBlur?.( e );
 	};

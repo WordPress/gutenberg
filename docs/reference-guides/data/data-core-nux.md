@@ -20,8 +20,7 @@ _Returns_
 
 ### getAssociatedGuide
 
-Returns an object describing the guide, if any, that the given tip is a part
-of.
+Returns an object describing the guide, if any, that the given tip is a part of.
 
 _Parameters_
 
@@ -34,9 +33,7 @@ _Returns_
 
 ### isTipVisible
 
-Determines whether or not the given tip is showing. Tips are hidden if they
-are disabled, have been dismissed, or are not the current tip in any
-guide that they have been added to.
+Determines whether or not the given tip is showing. Tips are hidden if they are disabled, have been dismissed, or are not the current tip in any guide that they have been added to.
 
 _Parameters_
 
@@ -55,8 +52,7 @@ _Returns_
 
 ### disableTips
 
-Returns an action object that, when dispatched, prevents all tips from
-showing again.
+Returns an action object that, when dispatched, prevents all tips from showing again.
 
 _Returns_
 
@@ -64,8 +60,7 @@ _Returns_
 
 ### dismissTip
 
-Returns an action object that, when dispatched, dismisses the given tip. A
-dismissed tip will not show again.
+Returns an action object that, when dispatched, dismisses the given tip. A dismissed tip will not show again.
 
 _Parameters_
 
@@ -85,8 +80,7 @@ _Returns_
 
 ### triggerGuide
 
-Returns an action object that, when dispatched, presents a guide that takes
-the user through a series of tips step by step.
+Returns an action object that, when dispatched, presents a guide that takes the user through a series of tips step by step.
 
 _Parameters_
 

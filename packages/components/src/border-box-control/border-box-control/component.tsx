@@ -14,7 +14,8 @@ import { BorderControl } from '../../border-control';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import { View } from '../../view';
 import { VisuallyHidden } from '../../visually-hidden';
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { useBorderBoxControl } from './hook';
 
 import type { BorderBoxControlProps } from '../types';
@@ -58,11 +59,10 @@ const UnconnectedBorderBoxControl = (
 		onSplitChange,
 		popoverPlacement,
 		popoverOffset,
-		size = 'default',
+		size,
 		splitValue,
 		toggleLinked,
 		wrapperClassName,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 		...otherProps
 	} = useBorderBoxControl( props );
@@ -116,9 +116,6 @@ const UnconnectedBorderBoxControl = (
 						width={
 							size === '__unstable-large' ? '116px' : '110px'
 						}
-						__experimentalHasMultipleOrigins={
-							__experimentalHasMultipleOrigins
-						}
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
@@ -134,9 +131,6 @@ const UnconnectedBorderBoxControl = (
 						popoverPlacement={ popoverPlacement }
 						popoverOffset={ popoverOffset }
 						value={ splitValue }
-						__experimentalHasMultipleOrigins={
-							__experimentalHasMultipleOrigins
-						}
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}

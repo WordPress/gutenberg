@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -34,10 +33,20 @@ export class PostPublishButton extends Component {
 			entitiesSavedStatesCallback: false,
 		};
 	}
+
 	componentDidMount() {
 		if ( this.props.focusOnMount ) {
-			this.buttonNode.current.focus();
+			// This timeout is necessary to make sure the `useEffect` hook of
+			// `useFocusReturn` gets the correct element (the button that opens the
+			// PostPublishPanel) otherwise it will get this button.
+			this.timeoutID = setTimeout( () => {
+				this.buttonNode.current.focus();
+			}, 0 );
 		}
+	}
+
+	componentWillUnmount() {
+		clearTimeout( this.timeoutID );
 	}
 
 	createOnClick( callback ) {
@@ -93,7 +102,6 @@ export class PostPublishButton extends Component {
 	render() {
 		const {
 			forceIsDirty,
-			forceIsSaving,
 			hasPublishAction,
 			isBeingScheduled,
 			isOpen,
@@ -115,7 +123,6 @@ export class PostPublishButton extends Component {
 
 		const isButtonDisabled =
 			( isSaving ||
-				forceIsSaving ||
 				! isSaveable ||
 				isPostSavingLocked ||
 				( ! isPublishable && ! forceIsDirty ) ) &&
@@ -124,7 +131,6 @@ export class PostPublishButton extends Component {
 		const isToggleDisabled =
 			( isPublished ||
 				isSaving ||
-				forceIsSaving ||
 				! isSaveable ||
 				( ! isPublishable && ! forceIsDirty ) ) &&
 			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
@@ -159,7 +165,7 @@ export class PostPublishButton extends Component {
 		const buttonProps = {
 			'aria-disabled': isButtonDisabled,
 			className: 'editor-post-publish-button',
-			isBusy: ! isAutoSaving && isSaving && isPublished,
+			isBusy: ! isAutoSaving && isSaving,
 			variant: 'primary',
 			onClick: this.createOnClick( onClickButton ),
 		};
@@ -170,6 +176,7 @@ export class PostPublishButton extends Component {
 			className: 'editor-post-publish-panel__toggle',
 			isBusy: isSaving && isPublished,
 			variant: 'primary',
+			size: 'compact',
 			onClick: this.createOnClick( onClickToggle ),
 		};
 
@@ -178,7 +185,6 @@ export class PostPublishButton extends Component {
 			: __( 'Publish' );
 		const buttonChildren = (
 			<PublishButtonLabel
-				forceIsSaving={ forceIsSaving }
 				hasNonPostEntityChanges={ hasNonPostEntityChanges }
 			/>
 		);
@@ -222,21 +228,17 @@ export default compose( [
 			hasNonPostEntityChanges,
 			isSavingNonPostEntityChanges,
 		} = select( editorStore );
-		const _isAutoSaving = isAutosavingPost();
 		return {
-			isSaving: isSavingPost() || _isAutoSaving,
-			isAutoSaving: _isAutoSaving,
+			isSaving: isSavingPost(),
+			isAutoSaving: isAutosavingPost(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			visibility: getEditedPostVisibility(),
 			isSaveable: isEditedPostSaveable(),
 			isPostSavingLocked: isPostSavingLocked(),
 			isPublishable: isEditedPostPublishable(),
 			isPublished: isCurrentPostPublished(),
-			hasPublishAction: get(
-				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
-				false
-			),
+			hasPublishAction:
+				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),

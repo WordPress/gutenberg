@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { FocusEventHandler, SyntheticEvent } from 'react';
+import type { FocusEventHandler } from 'react';
 
 /**
  * Internal dependencies
@@ -9,11 +9,10 @@ import type { FocusEventHandler, SyntheticEvent } from 'react';
 import type {
 	InputChangeCallback,
 	InputControlProps,
-	Size as InputSize,
 } from '../input-control/types';
 import type { NumberControlProps } from '../number-control/types';
 
-export type SelectSize = InputSize;
+export type SelectSize = 'default' | 'small';
 
 export type WPUnitControlUnit = {
 	/**
@@ -38,12 +37,11 @@ export type WPUnitControlUnit = {
 	step?: number;
 };
 
-export type UnitControlOnChangeCallback = InputChangeCallback<
-	SyntheticEvent< HTMLSelectElement | HTMLInputElement >,
-	{ data?: WPUnitControlUnit }
->;
+export type UnitControlOnChangeCallback = InputChangeCallback< {
+	data?: WPUnitControlUnit;
+} >;
 
-export type UnitSelectControlProps = Pick< InputControlProps, 'size' > & {
+export type UnitSelectControlProps = {
 	/**
 	 * Whether the control can be focused via keyboard navigation.
 	 *
@@ -54,6 +52,10 @@ export type UnitSelectControlProps = Pick< InputControlProps, 'size' > & {
 	 * A callback function invoked when the value is changed.
 	 */
 	onChange?: UnitControlOnChangeCallback;
+	/**
+	 * The size of the unit select.
+	 */
+	size?: SelectSize;
 	/**
 	 * Current unit.
 	 */
@@ -66,8 +68,9 @@ export type UnitSelectControlProps = Pick< InputControlProps, 'size' > & {
 	units?: WPUnitControlUnit[];
 };
 
-export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
-	Omit< NumberControlProps, 'hideHTMLArrows' | 'suffix' | 'type' > & {
+export type UnitControlProps = Pick< InputControlProps, 'size' > &
+	Omit< UnitSelectControlProps, 'size' | 'unit' > &
+	Omit< NumberControlProps, 'spinControls' | 'suffix' | 'type' > & {
 		/**
 		 * If `true`, the unit `<select>` is hidden.
 		 *
@@ -100,4 +103,8 @@ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
 		 * Callback when either the quantity or the unit inputs lose focus.
 		 */
 		onBlur?: FocusEventHandler< HTMLInputElement | HTMLSelectElement >;
+		/**
+		 * Callback when either the quantity or the unit inputs gains focus.
+		 */
+		onFocus?: FocusEventHandler< HTMLInputElement | HTMLSelectElement >;
 	};

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, find } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -14,10 +14,12 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
+import { getNestedValue, setNestedValue } from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
+import { getSyncProvider } from './sync';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -78,6 +80,7 @@ export function addEntities( entities ) {
  * @param {?Object}      query           Query Object.
  * @param {?boolean}     invalidateCache Should invalidate query caches.
  * @param {?Object}      edits           Edits to reset.
+ * @param {?Object}      meta            Meta information about pagination.
  * @return {Object} Action object.
  */
 export function receiveEntityRecords(
@@ -86,7 +89,8 @@ export function receiveEntityRecords(
 	records,
 	query,
 	invalidateCache = false,
-	edits
+	edits,
+	meta
 ) {
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
@@ -100,9 +104,9 @@ export function receiveEntityRecords(
 	}
 	let action;
 	if ( query ) {
-		action = receiveQueriedItems( records, query, edits );
+		action = receiveQueriedItems( records, query, edits, meta );
 	} else {
-		action = receiveItems( records, edits );
+		action = receiveItems( records, edits, meta );
 	}
 
 	return {
@@ -211,6 +215,34 @@ export function receiveThemeSupports() {
 }
 
 /**
+ * Returns an action object used in signalling that the theme global styles CPT post revisions have been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @deprecated since WordPress 6.5.0. Callers should use `dispatch( 'core' ).receiveRevision` instead.
+ *
+ * @ignore
+ *
+ * @param {number} currentId The post id.
+ * @param {Array}  revisions The global styles revisions.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveThemeGlobalStyleRevisions( currentId, revisions ) {
+	deprecated(
+		"wp.data.dispatch( 'core' ).receiveThemeGlobalStyleRevisions()",
+		{
+			since: '6.5.0',
+			alternative: "wp.data.dispatch( 'core' ).receiveRevisions",
+		}
+	);
+	return {
+		type: 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS',
+		currentId,
+		revisions,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the preview data for
  * a given URl has been received.
  * Ignored from documentation as it's internal to the data store.
@@ -255,7 +287,9 @@ export const deleteEntityRecord =
 	) =>
 	async ( { dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		let error;
 		let deletedRecord = false;
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
@@ -317,12 +351,12 @@ export const deleteEntityRecord =
  * Returns an action object that triggers an
  * edit to an entity record.
  *
- * @param {string}  kind                 Kind of the edited entity record.
- * @param {string}  name                 Name of the edited entity record.
- * @param {number}  recordId             Record ID of the edited entity record.
- * @param {Object}  edits                The edits.
- * @param {Object}  options              Options for the edit.
- * @param {boolean} [options.undoIgnore] Whether to ignore the edit in undo history or not.
+ * @param {string}        kind                 Kind of the edited entity record.
+ * @param {string}        name                 Name of the edited entity record.
+ * @param {number|string} recordId             Record ID of the edited entity record.
+ * @param {Object}        edits                The edits.
+ * @param {Object}        options              Options for the edit.
+ * @param {boolean}       [options.undoIgnore] Whether to ignore the edit in undo history or not.
  *
  * @return {Object} Action object.
  */
@@ -335,7 +369,7 @@ export const editEntityRecord =
 				`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
 			);
 		}
-		const { transientEdits = {}, mergedEdits = {} } = entityConfig;
+		const { mergedEdits = {} } = entityConfig;
 		const record = select.getRawEntityRecord( kind, name, recordId );
 		const editedRecord = select.getEditedEntityRecord(
 			kind,
@@ -355,25 +389,47 @@ export const editEntityRecord =
 				const value = mergedEdits[ key ]
 					? { ...editedRecordValue, ...edits[ key ] }
 					: edits[ key ];
-				acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
+				acc[ key ] = fastDeepEqual( recordValue, value )
+					? undefined
+					: value;
 				return acc;
 			}, {} ),
-			transientEdits,
 		};
-		dispatch( {
-			type: 'EDIT_ENTITY_RECORD',
-			...edit,
-			meta: {
-				undo: ! options.undoIgnore && {
-					...edit,
-					// Send the current values for things like the first undo stack entry.
-					edits: Object.keys( edits ).reduce( ( acc, key ) => {
-						acc[ key ] = editedRecord[ key ];
-						return acc;
-					}, {} ),
-				},
-			},
-		} );
+		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
+			if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				const objectId = entityConfig.getSyncObjectId( recordId );
+				getSyncProvider().update(
+					entityConfig.syncObjectType + '--edit',
+					objectId,
+					edit.edits
+				);
+			}
+		} else {
+			if ( ! options.undoIgnore ) {
+				select.getUndoManager().addRecord(
+					[
+						{
+							id: { kind, name, recordId },
+							changes: Object.keys( edits ).reduce(
+								( acc, key ) => {
+									acc[ key ] = {
+										from: editedRecord[ key ],
+										to: edits[ key ],
+									};
+									return acc;
+								},
+								{}
+							),
+						},
+					],
+					options.isCached
+				);
+			}
+			dispatch( {
+				type: 'EDIT_ENTITY_RECORD',
+				...edit,
+			} );
+		}
 	};
 
 /**
@@ -383,14 +439,13 @@ export const editEntityRecord =
 export const undo =
 	() =>
 	( { select, dispatch } ) => {
-		const undoEdit = select.getUndoEdit();
-		if ( ! undoEdit ) {
+		const undoRecord = select.getUndoManager().undo();
+		if ( ! undoRecord ) {
 			return;
 		}
 		dispatch( {
-			type: 'EDIT_ENTITY_RECORD',
-			...undoEdit,
-			meta: { isUndo: true },
+			type: 'UNDO',
+			record: undoRecord,
 		} );
 	};
 
@@ -401,14 +456,13 @@ export const undo =
 export const redo =
 	() =>
 	( { select, dispatch } ) => {
-		const redoEdit = select.getRedoEdit();
-		if ( ! redoEdit ) {
+		const redoRecord = select.getUndoManager().redo();
+		if ( ! redoRecord ) {
 			return;
 		}
 		dispatch( {
-			type: 'EDIT_ENTITY_RECORD',
-			...redoEdit,
-			meta: { isRedo: true },
+			type: 'REDO',
+			record: redoRecord,
 		} );
 	};
 
@@ -417,9 +471,11 @@ export const redo =
  *
  * @return {Object} Action object.
  */
-export function __unstableCreateUndoLevel() {
-	return { type: 'CREATE_UNDO_LEVEL' };
-}
+export const __unstableCreateUndoLevel =
+	() =>
+	( { select } ) => {
+		select.getUndoManager().addRecord();
+	};
 
 /**
  * Action triggered to save an entity record.
@@ -448,7 +504,9 @@ export const saveEntityRecord =
 	) =>
 	async ( { select, resolveSelect, dispatch } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
@@ -528,9 +586,12 @@ export const saveEntityRecord =
 					data = Object.keys( data ).reduce(
 						( acc, key ) => {
 							if (
-								[ 'title', 'excerpt', 'content' ].includes(
-									key
-								)
+								[
+									'title',
+									'excerpt',
+									'content',
+									'meta',
+								].includes( key )
 							) {
 								acc[ key ] = data[ key ];
 							}
@@ -720,7 +781,9 @@ export const saveEditedEntityRecord =
 			return;
 		}
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
-		const entityConfig = find( configs, { kind, name } );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -741,7 +804,7 @@ export const saveEditedEntityRecord =
  * @param {string} kind        Kind of the entity.
  * @param {string} name        Name of the entity.
  * @param {Object} recordId    ID of the record.
- * @param {Array}  itemsToSave List of entity properties to save.
+ * @param {Array}  itemsToSave List of entity properties or property paths to save.
  * @param {Object} options     Saving options.
  */
 export const __experimentalSaveSpecifiedEntityEdits =
@@ -756,10 +819,24 @@ export const __experimentalSaveSpecifiedEntityEdits =
 			recordId
 		);
 		const editsToSave = {};
-		for ( const edit in edits ) {
-			if ( itemsToSave.some( ( item ) => item === edit ) ) {
-				editsToSave[ edit ] = edits[ edit ];
-			}
+
+		for ( const item of itemsToSave ) {
+			setNestedValue( editsToSave, item, getNestedValue( edits, item ) );
+		}
+
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
+
+		const entityIdKey = entityConfig?.key || DEFAULT_ENTITY_KEY;
+
+		// If a record key is provided then update the existing record.
+		// This necessitates providing `recordKey` to saveEntityRecord as part of the
+		// `record` argument (here called `editsToSave`) to stop that action creating
+		// a new record and instead cause it to update the existing record.
+		if ( recordId ) {
+			editsToSave[ entityIdKey ] = recordId;
 		}
 		return await dispatch.saveEntityRecord(
 			kind,
@@ -826,3 +903,69 @@ export function receiveAutosaves( postId, autosaves ) {
 		autosaves: Array.isArray( autosaves ) ? autosaves : [ autosaves ],
 	};
 }
+
+/**
+ * Returns an action object signalling that the fallback Navigation
+ * Menu id has been received.
+ *
+ * @param {integer} fallbackId the id of the fallback Navigation Menu
+ * @return {Object} Action object.
+ */
+export function receiveNavigationFallbackId( fallbackId ) {
+	return {
+		type: 'RECEIVE_NAVIGATION_FALLBACK_ID',
+		fallbackId,
+	};
+}
+
+/**
+ * Returns an action object used to set the template for a given query.
+ *
+ * @param {Object} query      The lookup query.
+ * @param {string} templateId The resolved template id.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveDefaultTemplateId( query, templateId ) {
+	return {
+		type: 'RECEIVE_DEFAULT_TEMPLATE',
+		query,
+		templateId,
+	};
+}
+
+/**
+ * Action triggered to receive revision items.
+ *
+ * @param {string}        kind            Kind of the received entity record revisions.
+ * @param {string}        name            Name of the received entity record revisions.
+ * @param {number|string} recordKey       The key of the entity record whose revisions you want to fetch.
+ * @param {Array|Object}  records         Revisions received.
+ * @param {?Object}       query           Query Object.
+ * @param {?boolean}      invalidateCache Should invalidate query caches.
+ * @param {?Object}       meta            Meta information about pagination.
+ */
+export const receiveRevisions =
+	( kind, name, recordKey, records, query, invalidateCache = false, meta ) =>
+	async ( { dispatch } ) => {
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
+		const key =
+			entityConfig && entityConfig?.revisionKey
+				? entityConfig.revisionKey
+				: DEFAULT_ENTITY_KEY;
+
+		dispatch( {
+			type: 'RECEIVE_ITEM_REVISIONS',
+			key,
+			items: Array.isArray( records ) ? records : [ records ],
+			recordKey,
+			meta,
+			query,
+			kind,
+			name,
+			invalidateCache,
+		} );
+	};

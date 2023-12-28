@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { createNewPost, clickOnMoreMenuItem } from '@wordpress/e2e-test-utils';
+import {
+	createNewPost,
+	clickOnMoreMenuItem,
+	canvas,
+} from '@wordpress/e2e-test-utils';
 
 describe( 'New User Experience (NUX)', () => {
 	it( 'should show the guide to first-time users', async () => {
@@ -105,7 +109,7 @@ describe( 'New User Experience (NUX)', () => {
 		expect( welcomeGuide ).not.toBeNull();
 
 		// Close the guide
-		await page.click( 'button[aria-label="Close dialog"]' );
+		await page.click( '[role="dialog"] button[aria-label="Close"]' );
 
 		// Reload the editor.
 		await page.reload();
@@ -125,10 +129,10 @@ describe( 'New User Experience (NUX)', () => {
 		expect( welcomeGuide ).not.toBeNull();
 
 		// Close the guide.
-		await page.click( 'button[aria-label="Close dialog"]' );
+		await page.click( '[role="dialog"] button[aria-label="Close"]' );
 
 		// Focus should be in post title field.
-		const postTitle = await page.waitForSelector(
+		const postTitle = await canvas().waitForSelector(
 			'h1[aria-label="Add title"'
 		);
 		await expect( postTitle ).toHaveFocus();

@@ -1,27 +1,28 @@
 /**
  * External dependencies
  */
-
-import { orderBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-
 import { __ } from '@wordpress/i18n';
 import { ToolbarItem, DropdownMenu, Slot } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { orderBy } from '../../../utils/sorting';
+
 const POPOVER_PROPS = {
-	position: 'bottom right',
-	isAlternate: true,
+	placement: 'bottom-start',
 };
 
 const FormatToolbar = () => {
 	return (
 		<>
-			{ [ 'bold', 'italic', 'link' ].map( ( format ) => (
+			{ [ 'bold', 'italic', 'link', 'unknown' ].map( ( format ) => (
 				<Slot
 					name={ `RichText.ToolbarControls.${ format }` }
 					key={ format }

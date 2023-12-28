@@ -19,6 +19,8 @@ Upcoming tasks on the roadmap include, but are not limited to, the following:
 
 For more information about the roadmap, please refer to [Block editor styles: initiatives and goals](https://make.wordpress.org/core/2022/06/24/block-editor-styles-initiatives-and-goals/) and the [Github project board](https://github.com/orgs/WordPress/projects/19).
 
+If you're making changes or additions to the Style Engine, please take a moment to read the [notes on contributing](https://github.com/WordPress/gutenberg/tree/HEAD/packages/style-engine/CONTRIBUTING.md).
+
 ## Backend API
 
 ### wp_style_engine_get_styles()
@@ -106,7 +108,7 @@ _Returns_
 
 Useful for when you wish to compile a bespoke set of CSS rules from a series of selector + declaration items.
 
-The Style Engine will return a sanitized and optimized stylesheet. By passing a `context` identifier in the options, the Style Engine will store the styles for later retrieval, for example, should you wish to batch enqueue a set of CSS rules.
+The Style Engine will return a sanitized stylesheet. By passing a `context` identifier in the options, the Style Engine will store the styles for later retrieval, for example, should you wish to batch enqueue a set of CSS rules.
 
 You can call `wp_style_engine_get_stylesheet_from_css_rules()` multiple times, and, so long as your styles use the same `context` identifier, they will be stored together.
 

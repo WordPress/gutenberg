@@ -9,6 +9,20 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		switch_theme( 'emptytheme' );
+		register_post_type(
+			'custom_book',
+			array(
+				'public'       => true,
+				'show_in_rest' => true,
+			)
+		);
+		register_taxonomy( 'book_type', 'custom_book' );
+	}
+
+	public function tear_down() {
+		unregister_post_type( 'custom_book' );
+		unregister_taxonomy( 'book_type' );
+		parent::tear_down();
 	}
 
 	public function test_get_template_hierarchy() {
@@ -48,9 +62,23 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 		$this->assertEquals( array( 'index' ), $hierarchy );
 
 		// Taxonomies.
+		$hierarchy = get_template_hierarchy( 'taxonomy-book_type', false );
+		$this->assertEquals( array( 'taxonomy-book_type', 'taxonomy', 'archive', 'index' ), $hierarchy );
+
 		$hierarchy = get_template_hierarchy( 'taxonomy-books', false, 'taxonomy-books' );
 		$this->assertEquals( array( 'taxonomy-books', 'taxonomy', 'archive', 'index' ), $hierarchy );
 		// Single word category.
+		$hierarchy = get_template_hierarchy( 'category-fruits', false );
+		$this->assertEquals(
+			array(
+				'category-fruits',
+				'category',
+				'archive',
+				'index',
+			),
+			$hierarchy
+		);
+
 		$hierarchy = get_template_hierarchy( 'category-fruits', false, 'category' );
 		$this->assertEquals(
 			array(
@@ -62,6 +90,17 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			$hierarchy
 		);
 		// Multi word category.
+		$hierarchy = get_template_hierarchy( 'category-fruits-yellow', false );
+		$this->assertEquals(
+			array(
+				'category-fruits-yellow',
+				'category',
+				'archive',
+				'index',
+			),
+			$hierarchy
+		);
+
 		$hierarchy = get_template_hierarchy( 'category-fruits-yellow', false, 'category' );
 		$this->assertEquals(
 			array(
@@ -84,6 +123,10 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			),
 			$hierarchy
 		);
+
+		$hierarchy = get_template_hierarchy( 'taxonomy-book_type-adventure', false );
+		$this->assertEquals( array( 'taxonomy-book_type-adventure', 'taxonomy-book_type', 'taxonomy', 'archive', 'index' ), $hierarchy );
+
 		$hierarchy = get_template_hierarchy( 'taxonomy-books-action-adventure', false, 'taxonomy-books' );
 		$this->assertEquals(
 			array(
@@ -139,7 +182,41 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			),
 			$hierarchy
 		);
+
+		$hierarchy = get_template_hierarchy( 'single-custom_book', false );
+		$this->assertEquals(
+			array(
+				'single-custom_book',
+				'single',
+				'singular',
+				'index',
+			),
+			$hierarchy
+		);
+
+		$hierarchy = get_template_hierarchy( 'single-custom_book-book-1', false );
+		$this->assertEquals(
+			array(
+				'single-custom_book-book-1',
+				'single-custom_book',
+				'single',
+				'singular',
+				'index',
+			),
+			$hierarchy
+		);
+
 		$hierarchy = get_template_hierarchy( 'page-hi', false, 'page' );
+		$this->assertEquals(
+			array(
+				'page-hi',
+				'page',
+				'singular',
+				'index',
+			),
+			$hierarchy
+		);
+		$hierarchy = get_template_hierarchy( 'page-hi', false );
 		$this->assertEquals(
 			array(
 				'page-hi',
@@ -155,6 +232,16 @@ class Tests_Block_Template_Utils extends WP_UnitTestCase {
 			array(
 				'author-rigas',
 				'author',
+				'archive',
+				'index',
+			),
+			$hierarchy
+		);
+		// Archive post types.
+		$hierarchy = get_template_hierarchy( 'archive-book', false );
+		$this->assertEquals(
+			array(
+				'archive-book',
 				'archive',
 				'index',
 			),

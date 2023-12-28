@@ -10,7 +10,7 @@ import {
 /**
  * External dependencies
  */
-import { act, render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -21,8 +21,6 @@ describe( 'useQuerySelect', () => {
 	let registry;
 
 	beforeEach( () => {
-		jest.useFakeTimers();
-
 		registry = createRegistry();
 		registry.registerStore( 'testStore', {
 			reducer: () => ( { foo: 'bar' } ),
@@ -31,11 +29,6 @@ describe( 'useQuerySelect', () => {
 				testSelector: ( state, key ) => state[ key ],
 			},
 		} );
-	} );
-
-	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
 	} );
 
 	const getTestComponent = ( mapSelectSpy, dependencyKey ) => ( props ) => {
@@ -57,11 +50,9 @@ describe( 'useQuerySelect', () => {
 				<TestComponent keyName="foo" />
 			</RegistryProvider>
 		);
-		// 2 times expected
-		// - 1 for initial mount
-		// - 1 for after mount before subscription set.
-		expect( selectSpy ).toHaveBeenCalledTimes( 2 );
-		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+
+		expect( selectSpy ).toHaveBeenCalledTimes( 1 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
 		// ensure expected state was rendered
 		expect( screen.getByText( 'bar' ) ).toBeInTheDocument();
@@ -88,10 +79,9 @@ describe( 'useQuerySelect', () => {
 		);
 
 		// ensure the selectors were properly memoized
-		expect( selectors ).toHaveLength( 4 );
+		expect( selectors ).toHaveLength( 2 );
 		expect( selectors[ 0 ] ).toHaveProperty( 'testSelector' );
 		expect( selectors[ 0 ] ).toBe( selectors[ 1 ] );
-		expect( selectors[ 1 ] ).toBe( selectors[ 2 ] );
 
 		// Re-render
 		render(
@@ -101,9 +91,10 @@ describe( 'useQuerySelect', () => {
 		);
 
 		// ensure we still got the memoized results after re-rendering
-		expect( selectors ).toHaveLength( 8 );
-		expect( selectors[ 3 ] ).toHaveProperty( 'testSelector' );
-		expect( selectors[ 5 ] ).toBe( selectors[ 6 ] );
+		expect( selectors ).toHaveLength( 4 );
+		expect( selectors[ 2 ] ).toHaveProperty( 'testSelector' );
+		expect( selectors[ 1 ] ).toBe( selectors[ 2 ] );
+		expect( selectors[ 2 ] ).toBe( selectors[ 3 ] );
 	} );
 
 	it( 'returns the expected "response" details – no resolvers and arguments', () => {
@@ -177,21 +168,20 @@ describe( 'useQuerySelect', () => {
 			status: 'IDLE',
 		} );
 
-		await act( async () => {
-			jest.advanceTimersToNextTimer();
-		} );
-
 		// Re-render, expect resolved data
 		render(
 			<RegistryProvider value={ registry }>
 				<TestComponent />
 			</RegistryProvider>
 		);
-		expect( querySelectData ).toEqual( {
-			data: 15,
-			isResolving: false,
-			hasResolved: true,
-			status: 'SUCCESS',
-		} );
+
+		await waitFor( () =>
+			expect( querySelectData ).toEqual( {
+				data: 15,
+				isResolving: false,
+				hasResolved: true,
+				status: 'SUCCESS',
+			} )
+		);
 	} );
 } );

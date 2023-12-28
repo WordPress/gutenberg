@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -15,9 +10,10 @@ import {
 	ResponsiveWrapper,
 	withNotices,
 	withFilters,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { isBlobURL } from '@wordpress/blob';
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { useSelect, withDispatch, withSelect } from '@wordpress/data';
 import {
@@ -38,7 +34,6 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
 // Used when labels from post type were not yet loaded or when they are not present.
 const DEFAULT_FEATURE_IMAGE_LABEL = __( 'Featured image' );
 const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
-const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove image' );
 
 const instructions = (
 	<p>
@@ -101,11 +96,11 @@ function PostFeaturedImage( {
 	noticeUI,
 	noticeOperations,
 } ) {
+	const toggleRef = useRef();
 	const [ isLoading, setIsLoading ] = useState( false );
 	const mediaUpload = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
-	const postLabel = get( postType, [ 'labels' ], {} );
 	const { mediaWidth, mediaHeight, mediaSourceUrl } = getMediaDetails(
 		media,
 		currentPostId
@@ -120,7 +115,9 @@ function PostFeaturedImage( {
 					setIsLoading( true );
 					return;
 				}
-				onUpdateImage( image );
+				if ( image ) {
+					onUpdateImage( image );
+				}
 				setIsLoading( false );
 			},
 			onError( message ) {
@@ -159,7 +156,7 @@ function PostFeaturedImage( {
 				<MediaUploadCheck fallback={ instructions }>
 					<MediaUpload
 						title={
-							postLabel.featured_image ||
+							postType?.labels?.featured_image ||
 							DEFAULT_FEATURE_IMAGE_LABEL
 						}
 						onSelect={ onUpdateImage }
@@ -169,6 +166,7 @@ function PostFeaturedImage( {
 						render={ ( { open } ) => (
 							<div className="editor-post-featured-image__container">
 								<Button
+									ref={ toggleRef }
 									className={
 										! featuredImageId
 											? 'editor-post-featured-image__toggle'
@@ -178,7 +176,7 @@ function PostFeaturedImage( {
 									aria-label={
 										! featuredImageId
 											? null
-											: __( 'Edit or update the image' )
+											: __( 'Edit or replace the image' )
 									}
 									aria-describedby={
 										! featuredImageId
@@ -201,47 +199,37 @@ function PostFeaturedImage( {
 									{ isLoading && <Spinner /> }
 									{ ! featuredImageId &&
 										! isLoading &&
-										( postLabel.set_featured_image ||
+										( postType?.labels
+											?.set_featured_image ||
 											DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
 								</Button>
+								{ !! featuredImageId && (
+									<HStack className="editor-post-featured-image__actions">
+										<Button
+											className="editor-post-featured-image__action"
+											onClick={ open }
+											// Prefer that screen readers use the .editor-post-featured-image__preview button.
+											aria-hidden="true"
+										>
+											{ __( 'Replace' ) }
+										</Button>
+										<Button
+											className="editor-post-featured-image__action"
+											onClick={ () => {
+												onRemoveImage();
+												toggleRef.current.focus();
+											} }
+										>
+											{ __( 'Remove' ) }
+										</Button>
+									</HStack>
+								) }
 								<DropZone onFilesDrop={ onDropFiles } />
 							</div>
 						) }
 						value={ featuredImageId }
 					/>
 				</MediaUploadCheck>
-				{ !! featuredImageId && (
-					<MediaUploadCheck>
-						{ media && (
-							<MediaUpload
-								title={
-									postLabel.featured_image ||
-									DEFAULT_FEATURE_IMAGE_LABEL
-								}
-								onSelect={ onUpdateImage }
-								unstableFeaturedImageFlow
-								allowedTypes={ ALLOWED_MEDIA_TYPES }
-								modalClass="editor-post-featured-image__media-modal"
-								render={ ( { open } ) => (
-									<Button
-										onClick={ open }
-										variant="secondary"
-									>
-										{ __( 'Replace Image' ) }
-									</Button>
-								) }
-							/>
-						) }
-						<Button
-							onClick={ onRemoveImage }
-							variant="link"
-							isDestructive
-						>
-							{ postLabel.remove_featured_image ||
-								DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
-						</Button>
-					</MediaUploadCheck>
-				) }
 			</div>
 		</PostFeaturedImageCheck>
 	);

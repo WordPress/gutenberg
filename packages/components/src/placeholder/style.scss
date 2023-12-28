@@ -3,7 +3,6 @@
 	box-sizing: border-box;
 	position: relative;
 	padding: 1em;
-	min-height: 200px;
 	width: 100%;
 	text-align: left;
 	margin: 0;
@@ -17,7 +16,7 @@
 	@supports (position: sticky) {
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
+		justify-content: top;
 		align-items: flex-start;
 	}
 
@@ -45,7 +44,7 @@
 	> svg,
 	.dashicon,
 	.block-editor-block-icon {
-		margin-right: 1ch;
+		margin-right: $grid-unit-15;
 		fill: currentColor;
 		// Optimizate for high contrast modes.
 		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
@@ -70,18 +69,6 @@
 	p {
 		font-family: $default-font;
 		font-size: $default-font-size;
-	}
-}
-
-// Overrides for browser and editor fieldset styles.
-.components-placeholder__fieldset.components-placeholder__fieldset {
-	border: none;
-	padding: 0;
-
-	.components-placeholder__instructions {
-		padding: 0;
-		font-weight: normal;
-		font-size: 1em;
 	}
 }
 
@@ -161,6 +148,11 @@
 			padding: 0 $grid-unit-10 2px;
 		}
 	}
+	.components-placeholder__learn-more {
+		.components-external-link {
+			color: var(--wp-admin-theme-color);
+		}
+	}
 }
 
 
@@ -175,7 +167,6 @@
 	color: inherit;
 	display: flex;
 	box-shadow: none;
-	min-width: 100px;
 
 	// Blur the background so layered dashed placeholders are still visually separate.
 	// Make the background transparent to not interfere with the background overlay in placeholder-style() pseudo element
@@ -220,7 +211,7 @@
 
 	// By painting the borders here, we enable them to be replaced by the Border control.
 	@include placeholder-style();
-	overflow: hidden;
+	overflow: auto;
 }
 
 // Position the spinner.

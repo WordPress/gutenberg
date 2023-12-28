@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -19,10 +14,10 @@ import { ChainIcon } from './icons';
  *
  * @param {string} name key for a social service (lowercase slug)
  *
- * @return {WPComponent} Icon component for social service.
+ * @return {Component} Icon component for social service.
  */
 export const getIconBySite = ( name ) => {
-	const variation = find( variations, { name } );
+	const variation = variations.find( ( v ) => v.name === name );
 	return variation ? variation.icon : ChainIcon;
 };
 
@@ -34,6 +29,6 @@ export const getIconBySite = ( name ) => {
  * @return {string} Display name for social service
  */
 export const getNameBySite = ( name ) => {
-	const variation = find( variations, { name } );
+	const variation = variations.find( ( v ) => v.name === name );
 	return variation ? variation.title : __( 'Social Icon' );
 };

@@ -1,10 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarButton } from '@wordpress/components';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { ToolbarButton, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useCallback } from '@wordpress/element';
 
@@ -12,11 +10,7 @@ import { useEffect, useRef, useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
-import { BlockControls } from '../components';
-/**
- * External dependencies
- */
-import classnames from 'classnames';
+import { BlockControls, BlockSettingsMenuControls } from '../components';
 
 function StopEditingAsBlocksOnOutsideSelect( {
 	clientId,
@@ -37,125 +31,123 @@ function StopEditingAsBlocksOnOutsideSelect( {
 		if ( ! isBlockOrDescendantSelected ) {
 			stopEditingAsBlock();
 		}
-	}, [ isBlockOrDescendantSelected ] );
+	}, [ isBlockOrDescendantSelected, stopEditingAsBlock ] );
 	return null;
 }
 
-export const withBlockControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { getBlockListSettings, getSettings } =
-			useSelect( blockEditorStore );
-		const focusModeToRevert = useRef();
-		const { templateLock, isLockedByParent, isEditingAsBlocks } = useSelect(
-			( select ) => {
-				const {
-					__unstableGetContentLockingParent,
-					getTemplateLock,
-					__unstableGetTemporarilyEditingAsBlocks,
-				} = select( blockEditorStore );
-				return {
-					templateLock: getTemplateLock( props.clientId ),
-					isLockedByParent: !! __unstableGetContentLockingParent(
-						props.clientId
-					),
-					isEditingAsBlocks:
-						__unstableGetTemporarilyEditingAsBlocks() ===
-						props.clientId,
-				};
-			},
-			[ props.clientId ]
-		);
+function ContentLockControlsPure( { clientId, isSelected } ) {
+	const { getBlockListSettings, getSettings } = useSelect( blockEditorStore );
+	const focusModeToRevert = useRef();
+	const { templateLock, isLockedByParent, isEditingAsBlocks } = useSelect(
+		( select ) => {
+			const {
+				__unstableGetContentLockingParent,
+				getTemplateLock,
+				__unstableGetTemporarilyEditingAsBlocks,
+			} = select( blockEditorStore );
+			return {
+				templateLock: getTemplateLock( clientId ),
+				isLockedByParent:
+					!! __unstableGetContentLockingParent( clientId ),
+				isEditingAsBlocks:
+					__unstableGetTemporarilyEditingAsBlocks() === clientId,
+			};
+		},
+		[ clientId ]
+	);
 
-		const {
-			updateSettings,
-			updateBlockListSettings,
-			__unstableSetTemporarilyEditingAsBlocks,
-		} = useDispatch( blockEditorStore );
-		const isContentLocked =
-			! isLockedByParent && templateLock === 'contentOnly';
-		const {
-			__unstableMarkNextChangeAsNotPersistent,
-			updateBlockAttributes,
-		} = useDispatch( blockEditorStore );
+	const {
+		updateSettings,
+		updateBlockListSettings,
+		__unstableSetTemporarilyEditingAsBlocks,
+	} = useDispatch( blockEditorStore );
+	const isContentLocked =
+		! isLockedByParent && templateLock === 'contentOnly';
+	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
+		useDispatch( blockEditorStore );
 
-		const stopEditingAsBlock = useCallback( () => {
-			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( props.clientId, {
-				templateLock: 'contentOnly',
-			} );
-			updateBlockListSettings( props.clientId, {
-				...getBlockListSettings( props.clientId ),
-				templateLock: 'contentOnly',
-			} );
-			updateSettings( { focusMode: focusModeToRevert.current } );
-			__unstableSetTemporarilyEditingAsBlocks();
-		}, [
-			props.clientId,
-			focusModeToRevert,
-			updateSettings,
-			updateBlockListSettings,
-			getBlockListSettings,
-			__unstableMarkNextChangeAsNotPersistent,
-			updateBlockAttributes,
-			__unstableSetTemporarilyEditingAsBlocks,
-		] );
+	const stopEditingAsBlock = useCallback( () => {
+		__unstableMarkNextChangeAsNotPersistent();
+		updateBlockAttributes( clientId, {
+			templateLock: 'contentOnly',
+		} );
+		updateBlockListSettings( clientId, {
+			...getBlockListSettings( clientId ),
+			templateLock: 'contentOnly',
+		} );
+		updateSettings( { focusMode: focusModeToRevert.current } );
+		__unstableSetTemporarilyEditingAsBlocks();
+	}, [
+		clientId,
+		updateSettings,
+		updateBlockListSettings,
+		getBlockListSettings,
+		__unstableMarkNextChangeAsNotPersistent,
+		updateBlockAttributes,
+		__unstableSetTemporarilyEditingAsBlocks,
+	] );
 
-		if ( ! isContentLocked && ! isEditingAsBlocks ) {
-			return <BlockEdit { ...props } />;
-		}
+	if ( ! isContentLocked && ! isEditingAsBlocks ) {
+		return null;
+	}
 
-		return (
-			<>
-				{ isEditingAsBlocks && ! isContentLocked && (
+	const showStopEditingAsBlocks = isEditingAsBlocks && ! isContentLocked;
+	const showStartEditingAsBlocks =
+		! isEditingAsBlocks && isContentLocked && isSelected;
+
+	return (
+		<>
+			{ showStopEditingAsBlocks && (
+				<>
 					<StopEditingAsBlocksOnOutsideSelect
-						clientId={ props.clientId }
+						clientId={ clientId }
 						stopEditingAsBlock={ stopEditingAsBlock }
 					/>
-				) }
-				<BlockControls group="other">
-					<ToolbarButton
-						onClick={ () => {
-							if ( isEditingAsBlocks && ! isContentLocked ) {
+					<BlockControls group="other">
+						<ToolbarButton
+							onClick={ () => {
 								stopEditingAsBlock();
-							} else {
+							} }
+						>
+							{ __( 'Done' ) }
+						</ToolbarButton>
+					</BlockControls>
+				</>
+			) }
+			{ showStartEditingAsBlocks && (
+				<BlockSettingsMenuControls>
+					{ ( { onClose } ) => (
+						<MenuItem
+							onClick={ () => {
 								__unstableMarkNextChangeAsNotPersistent();
-								updateBlockAttributes( props.clientId, {
+								updateBlockAttributes( clientId, {
 									templateLock: undefined,
 								} );
-								updateBlockListSettings( props.clientId, {
-									...getBlockListSettings( props.clientId ),
+								updateBlockListSettings( clientId, {
+									...getBlockListSettings( clientId ),
 									templateLock: false,
 								} );
 								focusModeToRevert.current =
 									getSettings().focusMode;
 								updateSettings( { focusMode: true } );
 								__unstableSetTemporarilyEditingAsBlocks(
-									props.clientId
+									clientId
 								);
-							}
-						} }
-					>
-						{ isEditingAsBlocks && ! isContentLocked
-							? __( 'Done' )
-							: __( 'Modify' ) }
-					</ToolbarButton>
-				</BlockControls>
-				<BlockEdit
-					{ ...props }
-					className={ classnames(
-						props.className,
-						isEditingAsBlocks &&
-							'is-content-locked-editing-as-blocks'
+								onClose();
+							} }
+						>
+							{ __( 'Modify' ) }
+						</MenuItem>
 					) }
-				/>
-			</>
-		);
-	},
-	'withToolbarControls'
-);
+				</BlockSettingsMenuControls>
+			) }
+		</>
+	);
+}
 
-addFilter(
-	'editor.BlockEdit',
-	'core/style/with-block-controls',
-	withBlockControls
-);
+export default {
+	edit: ContentLockControlsPure,
+	hasSupport() {
+		return true;
+	},
+};

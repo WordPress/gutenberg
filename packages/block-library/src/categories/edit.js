@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { unescape } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -16,6 +15,7 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 import { useEntityRecords } from '@wordpress/core-data';
@@ -57,13 +57,13 @@ export default function CategoriesEdit( {
 		setAttributes( { [ attributeName ]: newValue } );
 
 	const renderCategoryName = ( name ) =>
-		! name ? __( '(Untitled)' ) : unescape( name ).trim();
+		! name ? __( '(Untitled)' ) : decodeEntities( name ).trim();
 
 	const renderCategoryList = () => {
 		const parentId = showHierarchy ? 0 : null;
 		const categoriesList = getCategoriesList( parentId );
 		return categoriesList.map( ( category ) =>
-			renderCategoryListItem( category, 0 )
+			renderCategoryListItem( category )
 		);
 	};
 
@@ -143,27 +143,32 @@ export default function CategoriesEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }
 						onChange={ toggleAttribute( 'displayAsDropdown' ) }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show post counts' ) }
 						checked={ showPostCounts }
 						onChange={ toggleAttribute( 'showPostCounts' ) }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show only top level categories' ) }
 						checked={ showOnlyTopLevel }
 						onChange={ toggleAttribute( 'showOnlyTopLevel' ) }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Show empty categories' ) }
 						checked={ showEmpty }
 						onChange={ toggleAttribute( 'showEmpty' ) }
 					/>
 					{ ! showOnlyTopLevel && (
 						<ToggleControl
+							__nextHasNoMarginBottom
 							label={ __( 'Show hierarchy' ) }
 							checked={ showHierarchy }
 							onChange={ toggleAttribute( 'showHierarchy' ) }

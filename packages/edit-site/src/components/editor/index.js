@@ -1,14 +1,21 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { useEffect, useMemo } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { Popover, Button, Notice } from '@wordpress/components';
-import { EntityProvider, store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { Notice } from '@wordpress/components';
+import { useInstanceId, useViewportMatch } from '@wordpress/compose';
+import { store as preferencesStore } from '@wordpress/preferences';
 import {
-	BlockContextProvider,
 	BlockBreadcrumb,
+	BlockToolbar,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+	BlockInspector,
 } from '@wordpress/block-editor';
 import {
 	InterfaceSkeleton,
@@ -16,39 +23,46 @@ import {
 	store as interfaceStore,
 } from '@wordpress/interface';
 import {
+	EditorKeyboardShortcutsRegister,
+	EditorKeyboardShortcuts,
 	EditorNotices,
 	EditorSnackbars,
-	EntitiesSavedStates,
+	privateApis as editorPrivateApis,
+	store as editorStore,
 } from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
-import {
-	ShortcutProvider,
-	store as keyboardShortcutsStore,
-} from '@wordpress/keyboard-shortcuts';
-import { store as preferencesStore } from '@wordpress/preferences';
+import { __, sprintf } from '@wordpress/i18n';
+import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import Header from '../header-edit-mode';
-import { SidebarComplementaryAreaFills } from '../sidebar-edit-mode';
-import NavigationSidebar from '../navigation-sidebar';
-import BlockEditor from '../block-editor';
+import {
+	SidebarComplementaryAreaFills,
+	SidebarInspectorFill,
+} from '../sidebar-edit-mode';
 import CodeEditor from '../code-editor';
-import KeyboardShortcuts from '../keyboard-shortcuts';
-import URLQueryController from '../url-query-controller';
+import KeyboardShortcutsEditMode from '../keyboard-shortcuts/edit-mode';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
-import ErrorBoundary from '../error-boundary';
 import WelcomeGuide from '../welcome-guide';
+import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
-import { GlobalStylesRenderer } from './global-styles-renderer';
-import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
+import { GlobalStylesRenderer } from '../global-styles-renderer';
 import useTitle from '../routes/use-title';
+import CanvasLoader from '../canvas-loader';
+import { unlock } from '../../lock-unlock';
+import useEditedEntityRecord from '../use-edited-entity-record';
+import PatternModal from '../pattern-modal';
+import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
+import SiteEditorCanvas from '../block-editor/site-editor-canvas';
+import TemplatePartConverter from '../template-part-converter';
+import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
+
+const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
+const { ExperimentalEditorProvider: EditorProvider } =
+	unlock( editorPrivateApis );
 
 const interfaceLabels = {
-	/* translators: accessibility text for the editor top bar landmark region. */
-	header: __( 'Editor top bar' ),
 	/* translators: accessibility text for the editor content landmark region. */
 	body: __( 'Editor content' ),
 	/* translators: accessibility text for the editor settings landmark region. */
@@ -57,286 +71,222 @@ const interfaceLabels = {
 	actions: __( 'Editor publish' ),
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
-	/* translators: accessibility text for the navigation sidebar landmark region. */
-	drawer: __( 'Navigation Sidebar' ),
 };
 
-function Editor( { onError } ) {
+// Prevent accidental removal of certain blocks, asking the user for
+// confirmation.
+const blockRemovalRules = {
+	'core/query': __( 'Query Loop displays a list of posts or pages.' ),
+	'core/post-content': __(
+		'Post Content displays the content of a post or page.'
+	),
+	'core/post-template': __(
+		'Post Template displays each post or page in a Query Loop.'
+	),
+};
+
+export default function Editor( { isLoading } ) {
 	const {
+		record: editedPost,
+		getTitle,
+		isLoaded: hasLoadedPost,
+	} = useEditedEntityRecord();
+
+	const { type: editedPostType } = editedPost;
+
+	const isLargeViewport = useViewportMatch( 'medium' );
+
+	const {
+		context,
+		contextPost,
+		editorMode,
+		canvasMode,
+		renderingMode,
+		blockEditorMode,
+		isRightSidebarOpen,
 		isInserterOpen,
 		isListViewOpen,
-		isSaveViewOpen,
-		sidebarIsOpened,
-		settings,
-		entityId,
-		templateType,
-		page,
-		template,
-		templateResolved,
-		isNavigationOpen,
-		previousShortcut,
-		nextShortcut,
-		editorMode,
 		showIconLabels,
-		blockEditorMode,
+		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
-		const {
-			isInserterOpened,
-			isListViewOpened,
-			isSaveViewOpened,
-			getSettings,
-			getEditedPostType,
-			getEditedPostId,
-			getPage,
-			isNavigationOpened,
-			getEditorMode,
-		} = select( editSiteStore );
-		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
+		const { getEditedPostContext, getEditorMode, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
 		const { __unstableGetEditorMode } = select( blockEditorStore );
-		const postType = getEditedPostType();
-		const postId = getEditedPostId();
+		const { getActiveComplementaryArea } = select( interfaceStore );
+		const { getEntityRecord } = select( coreDataStore );
+		const { getRenderingMode, isInserterOpened, isListViewOpened } =
+			select( editorStore );
+		const _context = getEditedPostContext();
 
-		// The currently selected entity to display. Typically template or template part.
+		// The currently selected entity to display.
+		// Typically template or template part in the site editor.
 		return {
+			context: _context,
+			contextPost: _context?.postId
+				? getEntityRecord(
+						'postType',
+						_context.postType,
+						_context.postId
+				  )
+				: undefined,
+			editorMode: getEditorMode(),
+			canvasMode: getCanvasMode(),
+			renderingMode: getRenderingMode(),
+			blockEditorMode: __unstableGetEditorMode(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
-			isSaveViewOpen: isSaveViewOpened(),
-			sidebarIsOpened: !! select(
-				interfaceStore
-			).getActiveComplementaryArea( editSiteStore.name ),
-			settings: getSettings(),
-			templateType: postType,
-			page: getPage(),
-			template: postId
-				? getEntityRecord( 'postType', postType, postId )
-				: null,
-			templateResolved: postId
-				? hasFinishedResolution( 'getEntityRecord', [
-						'postType',
-						postType,
-						postId,
-				  ] )
-				: false,
-			entityId: postId,
-			isNavigationOpen: isNavigationOpened(),
-			previousShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-site/previous-region' ),
-			nextShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-site/next-region' ),
-			editorMode: getEditorMode(),
+			isRightSidebarOpen: getActiveComplementaryArea(
+				editSiteStore.name
+			),
 			showIconLabels: select( preferencesStore ).get(
 				'core/edit-site',
 				'showIconLabels'
 			),
-			blockEditorMode: __unstableGetEditorMode(),
+			showBlockBreadcrumbs: select( preferencesStore ).get(
+				'core/edit-site',
+				'showBlockBreadcrumbs'
+			),
 		};
 	}, [] );
-	const { setPage, setIsInserterOpened, setIsSaveViewOpened } =
-		useDispatch( editSiteStore );
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
-	const blockContext = useMemo(
-		() => ( {
-			...page?.context,
-			queryContext: [
-				page?.context.queryContext || { page: 1 },
-				( newQueryContext ) =>
-					setPage( {
-						...page,
-						context: {
-							...page?.context,
-							queryContext: {
-								...page?.context.queryContext,
-								...newQueryContext,
-							},
-						},
-					} ),
-			],
-		} ),
-		[ page?.context ]
-	);
-
-	useEffect( () => {
-		if ( isNavigationOpen ) {
-			document.body.classList.add( 'is-navigation-sidebar-open' );
-		} else {
-			document.body.classList.remove( 'is-navigation-sidebar-open' );
-		}
-	}, [ isNavigationOpen ] );
-
-	useEffect(
-		function openGlobalStylesOnLoad() {
-			const searchParams = new URLSearchParams( window.location.search );
-			if ( searchParams.get( 'styles' ) === 'open' ) {
-				enableComplementaryArea(
-					'core/edit-site',
-					'edit-site/global-styles'
-				);
-			}
-		},
-		[ enableComplementaryArea ]
-	);
-
-	// Don't render the Editor until the settings are set and loaded.
-	const isReady =
-		settings?.siteUrl &&
-		templateType !== undefined &&
-		entityId !== undefined;
-
+	const isViewMode = canvasMode === 'view';
+	const isEditMode = canvasMode === 'edit';
+	const showVisualEditor = isViewMode || editorMode === 'visual';
+	const shouldShowBlockBreadcrumbs =
+		showBlockBreadcrumbs &&
+		isEditMode &&
+		showVisualEditor &&
+		blockEditorMode !== 'zoom-out';
+	const shouldShowInserter = isEditMode && showVisualEditor && isInserterOpen;
+	const shouldShowListView = isEditMode && showVisualEditor && isListViewOpen;
 	const secondarySidebarLabel = isListViewOpen
 		? __( 'List View' )
 		: __( 'Block Library' );
+	const postWithTemplate = !! context?.postId;
 
-	const secondarySidebar = () => {
-		if ( editorMode === 'visual' && isInserterOpen ) {
-			return <InserterSidebar />;
-		}
-		if ( editorMode === 'visual' && isListViewOpen ) {
-			return <ListViewSidebar />;
-		}
-		return null;
-	};
+	let title;
+	if ( hasLoadedPost ) {
+		title = sprintf(
+			// translators: A breadcrumb trail for the Admin document title. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
+			__( '%1$s ‹ %2$s' ),
+			getTitle(),
+			POST_TYPE_LABELS[ editedPostType ] ??
+				POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ]
+		);
+	}
 
 	// Only announce the title once the editor is ready to prevent "Replace"
-	// action in <URlQueryController> from double-announcing.
-	useTitle( isReady && __( 'Editor (beta)' ) );
+	// action in <URLQueryController> from double-announcing.
+	useTitle( hasLoadedPost && title );
+
+	const loadingProgressId = useInstanceId(
+		CanvasLoader,
+		'edit-site-editor__loading-progress'
+	);
+
+	const settings = useSpecificEditorSettings();
+	const isReady =
+		! isLoading &&
+		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
+			( ! postWithTemplate && !! editedPost ) );
 
 	return (
 		<>
-			<URLQueryController />
+			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
+			{ isEditMode && <WelcomeGuide /> }
+			{ hasLoadedPost && ! editedPost && (
+				<Notice status="warning" isDismissible={ false }>
+					{ __(
+						"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+					) }
+				</Notice>
+			) }
 			{ isReady && (
-				<ShortcutProvider>
-					<EntityProvider kind="root" type="site">
-						<EntityProvider
-							kind="postType"
-							type={ templateType }
-							id={ entityId }
-						>
-							<GlobalStylesProvider>
-								<BlockContextProvider value={ blockContext }>
-									<GlobalStylesRenderer />
-									<ErrorBoundary onError={ onError }>
-										<KeyboardShortcuts.Register />
-										<SidebarComplementaryAreaFills />
-										<InterfaceSkeleton
-											labels={ {
-												...interfaceLabels,
-												secondarySidebar:
-													secondarySidebarLabel,
-											} }
-											className={
-												showIconLabels &&
-												'show-icon-labels'
-											}
-											secondarySidebar={ secondarySidebar() }
-											sidebar={
-												sidebarIsOpened && (
-													<ComplementaryArea.Slot scope="core/edit-site" />
-												)
-											}
-											drawer={
-												<NavigationSidebar.Slot />
-											}
-											header={
-												<Header
-													showIconLabels={
-														showIconLabels
-													}
-												/>
-											}
-											notices={ <EditorSnackbars /> }
-											content={
-												<>
-													<EditorNotices />
-													{ editorMode === 'visual' &&
-														template && (
-															<BlockEditor
-																setIsInserterOpen={
-																	setIsInserterOpened
-																}
-															/>
-														) }
-													{ editorMode === 'text' &&
-														template && (
-															<CodeEditor />
-														) }
-													{ templateResolved &&
-														! template &&
-														settings?.siteUrl &&
-														entityId && (
-															<Notice
-																status="warning"
-																isDismissible={
-																	false
-																}
-															>
-																{ __(
-																	"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-																) }
-															</Notice>
-														) }
-													<KeyboardShortcuts />
-												</>
-											}
-											actions={
-												<>
-													{ isSaveViewOpen ? (
-														<EntitiesSavedStates
-															close={ () =>
-																setIsSaveViewOpened(
-																	false
-																)
-															}
-														/>
-													) : (
-														<div className="edit-site-editor__toggle-save-panel">
-															<Button
-																variant="secondary"
-																className="edit-site-editor__toggle-save-panel-button"
-																onClick={ () =>
-																	setIsSaveViewOpened(
-																		true
-																	)
-																}
-																aria-expanded={
-																	false
-																}
-															>
-																{ __(
-																	'Open save panel'
-																) }
-															</Button>
-														</div>
-													) }
-												</>
-											}
-											footer={
-												blockEditorMode !==
-												'zoom-out' ? (
-													<BlockBreadcrumb
-														rootLabelText={ __(
-															'Template'
-														) }
-													/>
-												) : undefined
-											}
-											shortcuts={ {
-												previous: previousShortcut,
-												next: nextShortcut,
-											} }
+				<EditorProvider
+					post={ postWithTemplate ? contextPost : editedPost }
+					__unstableTemplate={
+						postWithTemplate ? editedPost : undefined
+					}
+					settings={ settings }
+					useSubRegistry={ false }
+				>
+					<SidebarComplementaryAreaFills />
+					{ isEditMode && <StartTemplateOptions /> }
+					<InterfaceSkeleton
+						isDistractionFree={ true }
+						enableRegionNavigation={ false }
+						className={ classnames(
+							'edit-site-editor__interface-skeleton',
+							{
+								'show-icon-labels': showIconLabels,
+							}
+						) }
+						notices={ <EditorSnackbars /> }
+						content={
+							<>
+								<GlobalStylesRenderer />
+								{ isEditMode && <EditorNotices /> }
+								{ showVisualEditor && (
+									<>
+										<TemplatePartConverter />
+										<SidebarInspectorFill>
+											<BlockInspector />
+										</SidebarInspectorFill>
+										{ ! isLargeViewport && (
+											<BlockToolbar hideDragHandle />
+										) }
+										<SiteEditorCanvas />
+										<BlockRemovalWarningModal
+											rules={ blockRemovalRules }
 										/>
-										<WelcomeGuide />
-										<Popover.Slot />
-									</ErrorBoundary>
-								</BlockContextProvider>
-							</GlobalStylesProvider>
-						</EntityProvider>
-					</EntityProvider>
-				</ShortcutProvider>
+										<PatternModal />
+									</>
+								) }
+								{ editorMode === 'text' && isEditMode && (
+									<CodeEditor />
+								) }
+								{ isEditMode && (
+									<>
+										<KeyboardShortcutsEditMode />
+										<EditorKeyboardShortcutsRegister />
+										<EditorKeyboardShortcuts />
+									</>
+								) }
+							</>
+						}
+						secondarySidebar={
+							isEditMode &&
+							( ( shouldShowInserter && <InserterSidebar /> ) ||
+								( shouldShowListView && <ListViewSidebar /> ) )
+						}
+						sidebar={
+							isEditMode &&
+							isRightSidebarOpen && (
+								<>
+									<ComplementaryArea.Slot scope="core/edit-site" />
+								</>
+							)
+						}
+						footer={
+							shouldShowBlockBreadcrumbs && (
+								<BlockBreadcrumb
+									rootLabelText={
+										postWithTemplate &&
+										renderingMode !== 'template-only'
+											? __( 'Page' )
+											: __( 'Template' )
+									}
+								/>
+							)
+						}
+						labels={ {
+							...interfaceLabels,
+							secondarySidebar: secondarySidebarLabel,
+						} }
+					/>
+				</EditorProvider>
 			) }
 		</>
 	);
 }
-export default Editor;

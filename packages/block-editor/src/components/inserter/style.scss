@@ -22,6 +22,8 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	height: 100%;
 	gap: $grid-unit-20;
+	overflow-y: hidden;
+
 	&.show-as-tabs {
 		gap: 0;
 	}
@@ -35,6 +37,7 @@ $block-inserter-tabs-height: 44px;
 	.components-popover__content {
 		border: none;
 		outline: none;
+		box-shadow: $shadow-popover;
 
 		.block-editor-inserter__quick-inserter > * {
 			border-left: $border-width solid $gray-400;
@@ -42,10 +45,12 @@ $block-inserter-tabs-height: 44px;
 
 			&:first-child {
 				border-top: $border-width solid $gray-400;
+				border-radius: $radius-block-ui $radius-block-ui 0 0;
 			}
 
 			&:last-child {
 				border-bottom: $border-width solid $gray-400;
+				border-radius: 0 0 $radius-block-ui $radius-block-ui;
 			}
 
 			&.components-button {
@@ -58,7 +63,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__popover .block-editor-inserter__menu {
 	margin: -$grid-unit-15;
 
-	.block-editor-inserter__tabs .components-tab-panel__tabs {
+	.block-editor-inserter__tabs div[role="tablist"] {
 		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60 - $grid-unit-15;
 	}
 
@@ -107,10 +112,6 @@ $block-inserter-tabs-height: 44px;
 	.components-search-control__icon {
 		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) * 0.5;
 	}
-
-	.components-base-control__field {
-		margin-bottom: 0;
-	}
 }
 
 .block-editor-inserter__tabs {
@@ -119,16 +120,22 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	overflow: hidden;
 
-	.components-tab-panel__tabs {
+	div[role="tablist"] {
 		border-bottom: $border-width solid $gray-300;
 
-		.components-tab-panel__tabs-item {
+		button[role="tab"] {
 			flex-grow: 1;
 			margin-bottom: -$border-width;
+			&[id$="reusable"] {
+				flex-grow: inherit;
+				// These are to align the `reusable` icon with the search icon.
+				padding-left: $grid-unit-20;
+				padding-right: $grid-unit-20;
+			}
 		}
 	}
 
-	.components-tab-panel__tab-content {
+	div[role="tabpanel"] {
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;
@@ -174,9 +181,13 @@ $block-inserter-tabs-height: 44px;
 	text-align: right;
 }
 
+.block-editor-inserter__manage-reusable-blocks-container {
+	margin: auto $grid-unit-20 $grid-unit-20;
+}
+
 .block-editor-inserter__manage-reusable-blocks {
-	display: inline-block;
-	margin: $grid-unit-20;
+	justify-content: center;
+	width: 100%;
 }
 
 .block-editor-inserter__no-results {
@@ -205,15 +216,14 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__preview-container__popover {
+	top: $grid-unit-20 !important;
+}
+
 .block-editor-inserter__preview-container {
 	display: none;
-	width: 300px;
-	background: $white;
-	border-radius: $radius-block-ui;
-	border: $border-width solid $gray-300;
-	position: absolute;
-	top: $grid-unit-20;
-	left: calc(100% + #{$grid-unit-20});
+	width: $sidebar-width;
+	padding: $grid-unit-20;
 	max-height: calc(100% - #{$grid-unit-40});
 	overflow-y: hidden;
 
@@ -221,12 +231,14 @@ $block-inserter-tabs-height: 44px;
 		display: block;
 	}
 
-	.block-editor-block-card {
-		padding: $grid-unit-20;
+	.block-editor-block-preview__container {
+		height: 100%;
 	}
 
-	.block-editor-block-card__title {
-		font-size: $default-font-size;
+	.block-editor-block-card {
+		padding-left: 0;
+		padding-right: 0;
+		padding-bottom: $grid-unit-05;
 	}
 }
 
@@ -275,24 +287,26 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20;
 	overflow-y: auto;
 	height: 100%;
+	// Push the listitem wrapping the "explore" button to the bottom of the panel.
+	div[role="listitem"]:last-child {
+		margin-top: auto;
+	}
+
+	.block-editor-inserter__patterns-category {
+		// Account for the icon on the right so that it's visually balanced.
+		padding-right: $grid-unit-05;
+	}
 }
 
-.block-editor-inserter__patterns-fill-space {
-	flex-grow: 1;
-}
-
-.block-editor-inserter__patterns-category-panel {
+.block-editor-inserter__patterns-category-dialog {
 	background: $gray-100;
 	border-left: $border-width solid $gray-200;
 	border-right: $border-width solid $gray-200;
 	position: absolute;
-	padding: $grid-unit-40 $grid-unit-30;
 	top: 0;
 	left: 0;
 	height: 100%;
 	width: 100%;
-	overflow-y: auto;
-	scrollbar-gutter: stable both-edges;
 
 	@include break-medium {
 		left: 100%;
@@ -301,18 +315,37 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	.block-editor-block-patterns-list {
-		margin-top: $grid-unit-30;
+		overflow-y: auto;
+		flex-grow: 1;
+		height: 100%;
+		padding: $grid-unit-20 $grid-unit-30;
 	}
+}
 
+.block-editor-block-patterns-list__list-item {
 	.block-editor-block-preview__container {
 		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
-		&:hover {
+	}
+	&:hover {
+		.block-editor-block-preview__container {
 			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
 		}
 	}
+}
 
-	.block-editor-block-patterns-list__item-title {
-		display: none;
+.block-editor-inserter__patterns-category-panel {
+	padding: 0 $grid-unit-20;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	@include break-medium {
+		padding: 0;
+	}
+	.block-editor-inserter__patterns-category-panel-header {
+		padding: 16px $grid-unit-30;
+	}
+	.block-editor-inserter__patterns-category-no-results {
+		margin-top: $grid-unit-30;
 	}
 }
 
@@ -332,6 +365,7 @@ $block-inserter-tabs-height: 44px;
 	min-height: $grid-unit-60 * 3;
 	color: $gray-700;
 	background: $gray-100;
+	border-radius: $radius-block-ui;
 }
 
 .block-editor-inserter__tips {
@@ -339,10 +373,6 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20;
 	flex-shrink: 0;
 	position: relative; // prevents overscroll when block library is open
-}
-
-.block-editor-inserter__manage-reusable-blocks-container {
-	padding: $grid-unit-20;
 }
 
 .block-editor-inserter__quick-inserter {
@@ -417,7 +447,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-block-patterns-explorer {
 	&__sidebar {
 		position: absolute;
-		top: $header-height + $grid-unit-20;
+		top: $header-height + $grid-unit-15;
 		left: 0;
 		bottom: 0;
 		width: $sidebar-width;
@@ -442,13 +472,20 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	&__list {
-		margin-left: $sidebar-width - $grid-unit-40;
+		margin-left: $sidebar-width;
+		padding: $grid-unit-30 0 $grid-unit-40;
+		.block-editor-patterns__sync-status-filter {
+			.components-input-control__container {
+				width: 380px;
+			}
+		}
 	}
 
 	.block-editor-block-patterns-list {
 		display: grid;
 		grid-gap: $grid-unit-40;
 		grid-template-columns: repeat(1, 1fr);
+		margin-bottom: $grid-unit-20;
 
 		@include break-xlarge() {
 			grid-template-columns: repeat(2, 1fr);
@@ -472,4 +509,271 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__patterns-category-panel-title {
 	font-size: calc(1.25 * 13px);
+}
+
+.block-editor-inserter__media-tabs-container {
+	height: 100%;
+
+	nav {
+		height: 100%;
+	}
+
+	.block-editor-inserter__media-library-button {
+		padding: $grid-unit-20;
+		justify-content: center;
+		margin-top: $grid-unit-20;
+		width: 100%;
+	}
+}
+
+.block-editor-inserter__media-tabs {
+	display: flex;
+	flex-direction: column;
+	padding: $grid-unit-20;
+	overflow-y: auto;
+	height: 100%;
+
+	// Push the listitem wrapping the "open media library" button to the bottom of the panel.
+	div[role="listitem"]:last-child {
+		margin-top: auto;
+	}
+
+	.block-editor-inserter__media-tabs__media-category {
+		// Account for the icon on the right so that it's visually balanced.
+		padding-right: $grid-unit-05;
+
+		&.is-selected {
+			color: var(--wp-admin-theme-color);
+			position: relative;
+
+			.components-flex-item {
+				filter: brightness(0.95);
+			}
+
+			svg {
+				fill: var(--wp-admin-theme-color);
+			}
+
+			&::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				border-radius: $radius-block-ui;
+				opacity: 0.04;
+				background: var(--wp-admin-theme-color);
+			}
+		}
+	}
+}
+
+.block-editor-inserter__media-dialog {
+	background: $gray-100;
+	border-left: $border-width solid $gray-200;
+	border-right: $border-width solid $gray-200;
+	position: absolute;
+	padding: $grid-unit-20 $grid-unit-30;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	overflow-y: auto;
+	scrollbar-gutter: stable both-edges;
+
+	@include break-medium {
+		left: 100%;
+		display: block;
+		width: 300px;
+	}
+
+	.block-editor-block-preview__container {
+		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
+		&:hover {
+			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+		}
+	}
+}
+
+.block-editor-inserter__media-panel {
+	min-height: 100%;
+	padding: 0 $grid-unit-20;
+	display: flex;
+	flex-direction: column;
+
+	@include break-medium {
+		padding: 0;
+	}
+
+	.block-editor-inserter__media-panel-spinner {
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex: 1;
+	}
+
+	.block-editor-inserter__media-panel-search {
+		&.components-search-control {
+			input[type="search"].components-search-control__input {
+				background: $white;
+			}
+			button.components-button {
+				min-width: auto;
+				padding-left: $grid-unit-05 * 0.5;
+				padding-right: $grid-unit-05 * 0.5;
+			}
+		}
+	}
+}
+
+.block-editor-inserter__media-list {
+	margin-top: $grid-unit-20;
+	.block-editor-inserter__media-list__list-item {
+		position: relative;
+		cursor: pointer;
+		margin-bottom: $grid-unit-30;
+
+		&.is-placeholder {
+			min-height: 100px;
+		}
+
+		&[draggable="true"] .block-editor-block-preview__container {
+			cursor: grab;
+		}
+
+		&.is-hovered {
+			.block-editor-inserter__media-list__item-preview {
+				box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
+			}
+
+			.block-editor-inserter__media-list__item-preview-options > button {
+				display: block;
+			}
+		}
+
+		.block-editor-inserter__media-list__item-preview-options {
+			position: absolute;
+			right: $grid-unit-10;
+			top: $grid-unit-10;
+
+			> button {
+				background: $white;
+				border-radius: $radius-block-ui;
+				display: none;
+
+				// These styles are important so as focus isn't lost
+				// when the button is focused and we hover away.
+				&.is-opened,
+				&:focus {
+					display: block;
+				}
+
+				&:hover {
+					box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+					// Windows High Contrast mode will show this outline, but not the box-shadow.
+					outline: 2px solid transparent;
+				}
+			}
+		}
+	}
+
+	.block-editor-inserter__media-list__item {
+		height: 100%;
+
+		.block-editor-inserter__media-list__item-preview {
+			display: flex;
+			align-items: center;
+			overflow: hidden;
+			border-radius: 2px;
+
+			> * {
+				margin: 0 auto;
+				max-width: 100%;
+			}
+
+			.block-editor-inserter__media-list__item-preview-spinner {
+				display: flex;
+				height: 100%;
+				width: 100%;
+				position: absolute;
+				justify-content: center;
+				background: rgba($white, 0.7);
+				align-items: center;
+				pointer-events: none;
+			}
+		}
+
+		&:focus .block-editor-inserter__media-list__item-preview {
+			box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+		}
+	}
+}
+
+.block-editor-inserter__media-list__item-preview-options__popover {
+	.components-menu-item__button .components-menu-item__item {
+		min-width: auto;
+	}
+}
+
+
+.block-editor-inserter__mobile-tab-navigation {
+	padding: $grid-unit-20;
+	height: 100%;
+
+	> * {
+		height: 100%;
+	}
+}
+
+
+.block-editor-inserter-media-tab-media-preview-inserter-external-image-modal {
+	@include break-small() {
+		max-width: $break-mobile;
+	}
+
+	p {
+		margin: 0;
+	}
+}
+
+.block-editor-inserter__hint {
+	margin: $grid-unit-20 $grid-unit-20 0;
+}
+
+.reusable-blocks-menu-items__rename-hint {
+	align-items: top;
+	background: $gray-100;
+	border-radius: $radius-block-ui;
+	color: $gray-900;
+	display: flex;
+	flex-direction: row;
+	max-width: 380px;
+}
+
+.reusable-blocks-menu-items__rename-hint-content {
+	margin: $grid-unit-15 0 $grid-unit-15 $grid-unit-15;
+}
+
+.reusable-blocks-menu-items__rename-hint-dismiss {
+	// The dismiss button has a lot of empty space through its padding.
+	// Apply margin to visually align the icon with the top of the text to its left.
+	margin: $grid-unit-05 $grid-unit-05 $grid-unit-05 0;
+}
+
+.components-menu-group .reusable-blocks-menu-items__rename-hint {
+	margin: 0;
+}
+
+.block-editor-patterns__sync-status-filter {
+	.components-input-control__container {
+		select.components-select-control__input {
+			height: 40px;
+		}
+	}
 }

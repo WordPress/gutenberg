@@ -5,8 +5,8 @@
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { ColorPalette } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyColorPalette = () => {
 	const [ color, setColor ] = useState ( '#f00' )
@@ -36,7 +36,14 @@ for the `ColorPalette`'s color swatches, by rendering your `ColorPalette` with a
 
 The component accepts the following props.
 
-### `colors`: `( PaletteObject | ColorObject )[]`
+### `clearable`: `boolean`
+
+Whether the palette should have a clearing button.
+
+-   Required: No
+-   Default: `true`
+
+### `colors`: `PaletteObject[] | ColorObject[]`
 
 Array with the colors to be shown. When displaying multiple color palettes to choose from, the format of the array changes from an array of colors objects, to an array of color palettes.
 
@@ -45,21 +52,30 @@ Array with the colors to be shown. When displaying multiple color palettes to ch
 
 ### `disableCustomColors`: `boolean`
 
-Whether to allow the user to pick a custom color on top of the predefined choices (defined via the `colors` prop).
+Whether to allow the user to pick a custom color on top of the predefined
+choices (defined via the `colors` prop).
 
 -   Required: No
 -   Default: `false`
 
 ### `enableAlpha`: `boolean`
 
-Whether the color picker should display the alpha channel both in the bottom inputs as well as in the color picker itself.
+This controls whether the alpha channel will be offered when selecting custom
+colors.
 
 -   Required: No
 -   Default: `false`
 
+### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
+
+The heading level.
+
+-   Required: No
+-   Default: `2`
+
 ### `value`: `string`
 
-currently active value
+Currently active value.
 
 -   Required: No
 
@@ -69,15 +85,16 @@ Callback called when a color is selected.
 
 -   Required: Yes
 
-### `className`: `string`
+### `asButtons`: `boolean`
 
-classes to be applied to the container.
+Whether the control should present as a set of buttons, each with its own tab stop.
 
--   Required: No
+- Required: No
+- Default: `false`
 
-### `clearable`: `boolean`
+### `loop`: `boolean`
 
-Whether the palette should have a clearing button.
+Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
 
--   Required: No
--   Default: `true`
+- Required: No
+- Default: `true`
