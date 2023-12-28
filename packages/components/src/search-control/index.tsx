@@ -16,11 +16,11 @@ import { forwardRef, useMemo, useRef } from '@wordpress/element';
  */
 import Button from '../button';
 import InputControl from '../input-control';
-import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { SearchControlProps } from './types';
 import type { ForwardedRef } from 'react';
 import { ContextSystemProvider } from '../context';
+import { SearchIconWrapper } from './styles';
 
 function UnforwardedSearchControl(
 	{
@@ -43,35 +43,25 @@ function UnforwardedSearchControl(
 		'components-search-control'
 	);
 
-	const renderRightButton = () => {
-		if ( onClose ) {
-			return (
-				<Button
-					__next40pxDefaultSize={ __next40pxDefaultSize }
-					icon={ closeSmall }
-					label={ __( 'Close search' ) }
-					onClick={ onClose }
-					size={ size }
-				/>
-			);
+	const SuffixItem = () => {
+		if ( ! onClose && ! value ) {
+			return null;
 		}
 
-		if ( !! value ) {
-			return (
-				<Button
-					__next40pxDefaultSize={ __next40pxDefaultSize }
-					icon={ closeSmall }
-					label={ __( 'Reset search' ) }
-					onClick={ () => {
-						onChange( '' );
-						searchRef.current?.focus();
-					} }
-					size={ size }
-				/>
-			);
-		}
+		const onReset = () => {
+			onChange( '' );
+			searchRef.current?.focus();
+		};
 
-		return <Icon icon={ search } />;
+		return (
+			<Button
+				__next40pxDefaultSize={ __next40pxDefaultSize }
+				size={ size }
+				icon={ closeSmall }
+				label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
+				onClick={ onClose ?? onReset }
+			/>
+		);
 	};
 
 	// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
@@ -105,10 +95,11 @@ function UnforwardedSearchControl(
 				autoComplete="off"
 				value={ value }
 				prefix={
-					<InputControlPrefixWrapper>
-						{ renderRightButton() }
-					</InputControlPrefixWrapper>
+					<SearchIconWrapper size={ size }>
+						<Icon icon={ search } />
+					</SearchIconWrapper>
 				}
+				suffix={ <SuffixItem /> }
 				{ ...restProps }
 			/>
 		</ContextSystemProvider>
