@@ -37,6 +37,8 @@ const {
 	ExperimentalBlockCanvas: BlockCanvas,
 } = unlock( blockEditorPrivateApis );
 
+const noop = () => {};
+
 /**
  * Given an array of nested blocks, find the first Post Content
  * block inside it, recursing through any nesting levels,
@@ -283,12 +285,10 @@ function EditorCanvas( {
 
 	const localRef = useRef();
 	const typewriterRef = useTypewriter();
-	const contentRef = useMergeRefs(
-		[
-			localRef,
-			renderingMode === 'post-only' ? typewriterRef : undefined,
-		].filter( ( r ) => !! r )
-	);
+	const contentRef = useMergeRefs( [
+		localRef,
+		renderingMode === 'post-only' ? typewriterRef : noop,
+	] );
 
 	return (
 		<BlockCanvas
