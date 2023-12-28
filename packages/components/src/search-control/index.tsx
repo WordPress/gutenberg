@@ -77,7 +77,6 @@ function UnforwardedSearchControl(
 	// - RTL support re: prefix/suffix
 	// - comb the codebase for `components-search-control__*` selectors
 	// - onChange type signature changed
-	// - value no fallback to empty string
 
 	return (
 		<ContextSystemProvider value={ baseControlContextValue }>
@@ -93,7 +92,7 @@ function UnforwardedSearchControl(
 				) }
 				onChange={ onChange }
 				autoComplete="off"
-				value={ value }
+				value={ value || '' }
 				prefix={
 					<SearchIconWrapper size={ size }>
 						<Icon icon={ search } />
