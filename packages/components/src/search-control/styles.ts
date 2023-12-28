@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
  */
 import { space } from '../utils/space';
 import type { SearchControlProps } from './types';
+import InputControl from '../input-control';
 
 const horizontalPadding = ( {
 	size,
@@ -18,4 +19,15 @@ const horizontalPadding = ( {
 export const SearchIconWrapper = styled.div`
 	display: flex;
 	padding: 0 ${ horizontalPadding };
+`;
+
+export const InputControlWithoutWebkitStyles = styled( InputControl )`
+	input[type='search'] {
+		&::-webkit-search-decoration,
+		&::-webkit-search-cancel-button,
+		&::-webkit-search-results-button,
+		&::-webkit-search-results-decoration {
+			-webkit-appearance: none;
+		}
+	}
 `;

@@ -15,12 +15,11 @@ import { forwardRef, useMemo, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../button';
-import InputControl from '../input-control';
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { SearchControlProps } from './types';
 import type { ForwardedRef } from 'react';
 import { ContextSystemProvider } from '../context';
-import { SearchIconWrapper } from './styles';
+import { SearchIconWrapper, InputControlWithoutWebkitStyles } from './styles';
 
 function UnforwardedSearchControl(
 	{
@@ -74,13 +73,15 @@ function UnforwardedSearchControl(
 
 	// TODO:
 	// - compact size
+	// - always use compact close button?
 	// - RTL support re: prefix/suffix
 	// - comb the codebase for `components-search-control__*` selectors
+	// - remove stylesheet
 	// - onChange type signature changed
 
 	return (
 		<ContextSystemProvider value={ baseControlContextValue }>
-			<InputControl
+			<InputControlWithoutWebkitStyles
 				__next40pxDefaultSize={ __next40pxDefaultSize }
 				id={ instanceId }
 				hideLabelFromVision={ hideLabelFromVision }
