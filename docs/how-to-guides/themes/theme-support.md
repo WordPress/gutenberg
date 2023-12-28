@@ -315,7 +315,7 @@ Themes can opt out of generated block layout styles that provide default structu
 add_theme_support( 'disable-layout-styles' );
 ```
 
-For themes looking to customize `blockGap` styles or block spacing, see [the developer docs on Global Settings & Styles](/docs/how-to-guides/themes/global-settings-and-styles/#what-is-blockgap-and-how-can-i-use-it).
+For themes looking to customize `blockGap` styles or block spacing, see [the developer docs on Global Settings & Styles](/docs/how-to-guides/themes/global-settings-and-styles.md#what-is-blockgap-and-how-can-i-use-it).
 
 ### Supporting custom line heights
 
