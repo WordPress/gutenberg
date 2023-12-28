@@ -47,7 +47,7 @@ export default function getIntersectingFontFaces( incoming, existing ) {
 						} );
 					}
 				);
-				matches.push( { ...existingFont, fontFace: matchingFaces } );
+				matches.push( { ...incomingFont, fontFace: matchingFaces } );
 			} else {
 				matches.push( incomingFont );
 			}

@@ -22,6 +22,7 @@ const results = {
 	firstContentfulPaint: [],
 	firstBlock: [],
 	type: [],
+	typeWithoutInspector: [],
 	typeContainer: [],
 	focus: [],
 	listViewOpen: [],
@@ -48,12 +49,12 @@ test.describe( 'Post Editor Performance', () => {
 	} );
 
 	test.describe( 'Loading', () => {
-		let draftURL = null;
+		let draftId = null;
 
 		test( 'Setup the test post', async ( { admin, perfUtils } ) => {
 			await admin.createNewPost();
 			await perfUtils.loadBlocksForLargePost();
-			draftURL = await perfUtils.saveDraft();
+			draftId = await perfUtils.saveDraft();
 		} );
 
 		const samples = 10;
@@ -61,18 +62,16 @@ test.describe( 'Post Editor Performance', () => {
 		const iterations = samples + throwaway;
 		for ( let i = 1; i <= iterations; i++ ) {
 			test( `Run the test (${ i } of ${ iterations })`, async ( {
-				page,
+				admin,
 				perfUtils,
 				metrics,
 			} ) => {
 				// Open the test draft.
-				await page.goto( draftURL );
+				await admin.editPost( draftId );
 				const canvas = await perfUtils.getCanvas();
 
 				// Wait for the first block.
-				await canvas.locator( '.wp-block' ).first().waitFor( {
-					timeout: 120_000,
-				} );
+				await canvas.locator( '.wp-block' ).first().waitFor();
 
 				// Get the durations.
 				const loadingDurations = await metrics.getLoadingDurations();
@@ -93,18 +92,52 @@ test.describe( 'Post Editor Performance', () => {
 		}
 	} );
 
+	async function type( target, metrics, key ) {
+		// The first character typed triggers a longer time (isTyping change).
+		// It can impact the stability of the metric, so we exclude it. It
+		// probably deserves a dedicated metric itself, though.
+		const samples = 10;
+		const throwaway = 1;
+		const iterations = samples + throwaway;
+
+		// Start tracing.
+		await metrics.startTracing();
+
+		// Type the testing sequence into the empty paragraph.
+		await target.type( 'x'.repeat( iterations ), {
+			delay: BROWSER_IDLE_WAIT,
+			// The extended timeout is needed because the typing is very slow
+			// and the `delay` value itself does not extend it.
+			timeout: iterations * BROWSER_IDLE_WAIT * 2, // 2x the total time to be safe.
+		} );
+
+		// Stop tracing.
+		await metrics.stopTracing();
+
+		// Get the durations.
+		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
+			metrics.getTypingEventDurations();
+
+		// Save the results.
+		for ( let i = throwaway; i < iterations; i++ ) {
+			results[ key ].push(
+				keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
+			);
+		}
+	}
+
 	test.describe( 'Typing', () => {
-		let draftURL = null;
+		let draftId = null;
 
 		test( 'Setup the test post', async ( { admin, perfUtils, editor } ) => {
 			await admin.createNewPost();
 			await perfUtils.loadBlocksForLargePost();
 			await editor.insertBlock( { name: 'core/paragraph' } );
-			draftURL = await perfUtils.saveDraft();
+			draftId = await perfUtils.saveDraft();
 		} );
 
-		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
-			await page.goto( draftURL );
+		test( 'Run the test', async ( { admin, perfUtils, metrics } ) => {
+			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 			const canvas = await perfUtils.getCanvas();
 
@@ -112,51 +145,57 @@ test.describe( 'Post Editor Performance', () => {
 				name: /Empty block/i,
 			} );
 
-			// The first character typed triggers a longer time (isTyping change).
-			// It can impact the stability of the metric, so we exclude it. It
-			// probably deserves a dedicated metric itself, though.
-			const samples = 10;
-			const throwaway = 1;
-			const iterations = samples + throwaway;
+			await type( paragraph, metrics, 'type' );
+		} );
+	} );
 
-			// Start tracing.
-			await metrics.startTracing();
+	test.describe( 'Typing (without inspector)', () => {
+		let draftId = null;
 
-			// Type the testing sequence into the empty paragraph.
-			await paragraph.type( 'x'.repeat( iterations ), {
-				delay: BROWSER_IDLE_WAIT,
-				// The extended timeout is needed because the typing is very slow
-				// and the `delay` value itself does not extend it.
-				timeout: iterations * BROWSER_IDLE_WAIT * 2, // 2x the total time to be safe.
+		test( 'Setup the test post', async ( { admin, perfUtils, editor } ) => {
+			await admin.createNewPost();
+			await perfUtils.loadBlocksForLargePost();
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( {
+			admin,
+			perfUtils,
+			metrics,
+			page,
+			editor,
+		} ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			const toggleButton = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Close Settings' } );
+			await toggleButton.click();
+			const canvas = await perfUtils.getCanvas();
+
+			const paragraph = canvas.getByRole( 'document', {
+				name: /Empty block/i,
 			} );
 
-			// Stop tracing.
-			await metrics.stopTracing();
+			await type( paragraph, metrics, 'typeWithoutInspector' );
 
-			// Get the durations.
-			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-				metrics.getTypingEventDurations();
-
-			// Save the results.
-			for ( let i = throwaway; i < iterations; i++ ) {
-				results.type.push(
-					keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
-				);
-			}
+			// Open the inspector again.
+			await editor.openDocumentSettingsSidebar();
 		} );
 	} );
 
 	test.describe( 'Typing within containers', () => {
-		let draftURL = null;
+		let draftId = null;
 
 		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
 			await admin.createNewPost();
 			await perfUtils.loadBlocksForSmallPostWithContainers();
-			draftURL = await perfUtils.saveDraft();
+			draftId = await perfUtils.saveDraft();
 		} );
 
-		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
-			await page.goto( draftURL );
+		test( 'Run the test', async ( { admin, perfUtils, metrics } ) => {
+			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 			const canvas = await perfUtils.getCanvas();
 
@@ -168,51 +207,21 @@ test.describe( 'Post Editor Performance', () => {
 				.first();
 			await firstParagraph.click();
 
-			// The first character typed triggers a longer time (isTyping change).
-			// It can impact the stability of the metric, so we exclude it. It
-			// probably deserves a dedicated metric itself, though.
-			const samples = 10;
-			const throwaway = 1;
-			const iterations = samples + throwaway;
-
-			// Start tracing.
-			await metrics.startTracing();
-
-			// Start typing in the middle of the text.
-			await firstParagraph.type( 'x'.repeat( iterations ), {
-				delay: BROWSER_IDLE_WAIT,
-				// The extended timeout is needed because the typing is very slow
-				// and the `delay` value itself does not extend it.
-				timeout: iterations * BROWSER_IDLE_WAIT * 2, // 2x the total time to be safe.
-			} );
-
-			// Stop tracing.
-			await metrics.stopTracing();
-
-			// Get the durations.
-			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
-				metrics.getTypingEventDurations();
-
-			// Save the results.
-			for ( let i = throwaway; i < iterations; i++ ) {
-				results.typeContainer.push(
-					keyDownEvents[ i ] + keyPressEvents[ i ] + keyUpEvents[ i ]
-				);
-			}
+			await type( firstParagraph, metrics, 'typeContainer' );
 		} );
 	} );
 
 	test.describe( 'Selecting blocks', () => {
-		let draftURL = null;
+		let draftId = null;
 
 		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
 			await admin.createNewPost();
 			await perfUtils.load1000Paragraphs();
-			draftURL = await perfUtils.saveDraft();
+			draftId = await perfUtils.saveDraft();
 		} );
 
-		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
-			await page.goto( draftURL );
+		test( 'Run the test', async ( { admin, page, perfUtils, metrics } ) => {
+			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 			const canvas = await perfUtils.getCanvas();
 
@@ -253,16 +262,16 @@ test.describe( 'Post Editor Performance', () => {
 	} );
 
 	test.describe( 'Opening persistent List View', () => {
-		let draftURL = null;
+		let draftId = null;
 
 		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
 			await admin.createNewPost();
 			await perfUtils.load1000Paragraphs();
-			draftURL = await perfUtils.saveDraft();
+			draftId = await perfUtils.saveDraft();
 		} );
 
-		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
-			await page.goto( draftURL );
+		test( 'Run the test', async ( { page, admin, perfUtils, metrics } ) => {
+			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 
 			const listViewToggle = page.getByRole( 'button', {
@@ -303,17 +312,17 @@ test.describe( 'Post Editor Performance', () => {
 	} );
 
 	test.describe( 'Opening Inserter', () => {
-		let draftURL = null;
+		let draftId = null;
 
 		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
 			await admin.createNewPost();
 			await perfUtils.load1000Paragraphs();
-			draftURL = await perfUtils.saveDraft();
+			draftId = await perfUtils.saveDraft();
 		} );
 
-		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
+		test( 'Run the test', async ( { page, admin, perfUtils, metrics } ) => {
 			// Go to the test page.
-			await page.goto( draftURL );
+			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 			const globalInserterToggle = page.getByRole( 'button', {
 				name: 'Toggle block inserter',
@@ -359,17 +368,17 @@ test.describe( 'Post Editor Performance', () => {
 	} );
 
 	test.describe( 'Searching Inserter', () => {
-		let draftURL = null;
+		let draftId = null;
 
 		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
 			await admin.createNewPost();
 			await perfUtils.load1000Paragraphs();
-			draftURL = await perfUtils.saveDraft();
+			draftId = await perfUtils.saveDraft();
 		} );
 
-		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
+		test( 'Run the test', async ( { page, admin, perfUtils, metrics } ) => {
 			// Go to the test page.
-			await page.goto( draftURL );
+			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 			const globalInserterToggle = page.getByRole( 'button', {
 				name: 'Toggle block inserter',
@@ -415,17 +424,17 @@ test.describe( 'Post Editor Performance', () => {
 	} );
 
 	test.describe( 'Hovering Inserter items', () => {
-		let draftURL = null;
+		let draftId = null;
 
 		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
 			await admin.createNewPost();
 			await perfUtils.load1000Paragraphs();
-			draftURL = await perfUtils.saveDraft();
+			draftId = await perfUtils.saveDraft();
 		} );
 
-		test( 'Run the test', async ( { page, perfUtils, metrics } ) => {
+		test( 'Run the test', async ( { page, admin, perfUtils, metrics } ) => {
 			// Go to the test page.
-			await page.goto( draftURL );
+			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 
 			const globalInserterToggle = page.getByRole( 'button', {

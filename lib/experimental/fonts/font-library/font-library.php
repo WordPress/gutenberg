@@ -22,16 +22,19 @@
 function gutenberg_init_font_library_routes() {
 	// @core-merge: This code will go into Core's `create_initial_post_types()`.
 	$args = array(
-		'public'       => false,
-		'_builtin'     => true,  /* internal use only. don't use this when registering your own post type. */
-		'label'        => 'Font Library',
-		'show_in_rest' => true,
+		'public'                         => false,
+		'_builtin'                       => true,  /* internal use only. don't use this when registering your own post type. */
+		'label'                          => 'Font Family',
+		'show_in_rest'                   => true,
+		'rest_base'                      => 'font-families',
+		'rest_controller_class'          => 'WP_REST_Font_Families_Controller',
+		'autosave_rest_controller_class' => 'WP_REST_Autosave_Font_Families_Controller',
 	);
 	register_post_type( 'wp_font_family', $args );
 
 	// @core-merge: This code will go into Core's `create_initial_rest_routes()`.
-	$font_library_controller = new WP_REST_Font_Library_Controller();
-	$font_library_controller->register_routes();
+	$font_collections_controller = new WP_REST_Font_Collections_Controller();
+	$font_collections_controller->register_routes();
 }
 
 add_action( 'rest_api_init', 'gutenberg_init_font_library_routes' );

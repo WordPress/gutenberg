@@ -1,18 +1,20 @@
-( ( { wp } ) => {
-	const { store } = wp.interactivity;
+/**
+ * WordPress dependencies
+ */
+import { store, getContext } from '@wordpress/interactivity';
 
-	store( {
-		state: {
-			slot: ''
+const { state } = store( 'directive-slots', {
+	state: {
+		slot: '',
+	},
+	actions: {
+		changeSlot( event ) {
+			state.slot = event.target.dataset.slot;
 		},
-		actions: {
-			changeSlot: ( { state, event } ) => {
-				state.slot = event.target.dataset.slot;
-			},
-			updateSlotText: ( { context } ) => {
-				const n = context.text[1];
-				context.text = `[${n} updated]`;
-			},
+		updateSlotText() {
+			const context = getContext();
+			const n = context.text[ 1 ];
+			context.text = `[${ n } updated]`;
 		},
-	} );
-} )( window );
+	},
+} );

@@ -12,7 +12,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 	useBlockProps,
-	useSetting,
+	useSettings,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -33,14 +33,9 @@ function ColumnEdit( {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'%',
-			'px',
-			'em',
-			'rem',
-			'vw',
-		],
+		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 	} );
 
 	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
@@ -108,7 +103,7 @@ function ColumnEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Column settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<UnitControl
 						label={ __( 'Width' ) }
 						labelPosition="edge"

@@ -26,12 +26,14 @@ export interface WPRawPerformanceResults {
 	firstContentfulPaint: number[];
 	firstBlock: number[];
 	type: number[];
+	typeWithoutInspector: number[];
 	typeContainer: number[];
 	focus: number[];
 	inserterOpen: number[];
 	inserterSearch: number[];
 	inserterHover: number[];
 	listViewOpen: number[];
+	navigate: number[];
 }
 
 export interface WPPerformanceResults {
@@ -47,6 +49,7 @@ export interface WPPerformanceResults {
 	type?: number;
 	minType?: number;
 	maxType?: number;
+	typeWithoutInspector?: number;
 	typeContainer?: number;
 	minTypeContainer?: number;
 	maxTypeContainer?: number;
@@ -65,6 +68,7 @@ export interface WPPerformanceResults {
 	listViewOpen?: number;
 	minListViewOpen?: number;
 	maxListViewOpen?: number;
+	navigate?: number;
 }
 
 /**
@@ -90,6 +94,7 @@ export function curateResults(
 		type: average( results.type ),
 		minType: minimum( results.type ),
 		maxType: maximum( results.type ),
+		typeWithoutInspector: average( results.typeWithoutInspector ),
 		typeContainer: average( results.typeContainer ),
 		minTypeContainer: minimum( results.typeContainer ),
 		maxTypeContainer: maximum( results.typeContainer ),
@@ -108,6 +113,7 @@ export function curateResults(
 		listViewOpen: average( results.listViewOpen ),
 		minListViewOpen: minimum( results.listViewOpen ),
 		maxListViewOpen: maximum( results.listViewOpen ),
+		navigate: median( results.navigate ),
 	};
 
 	return (

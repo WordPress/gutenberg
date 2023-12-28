@@ -3,11 +3,7 @@
  */
 import { ComplementaryArea } from '@wordpress/interface';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../../store';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
@@ -76,7 +72,11 @@ import { store as editSiteStore } from '../../../store';
  */
 export default function PluginSidebarEditSite( { className, ...props } ) {
 	const showIconLabels = useSelect(
-		( select ) => select( editSiteStore ).getSettings().showIconLabels,
+		( select ) =>
+			!! select( preferencesStore ).get(
+				'core/edit-site',
+				'showIconLabels'
+			),
 		[]
 	);
 

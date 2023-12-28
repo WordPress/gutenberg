@@ -18,7 +18,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
@@ -72,7 +72,6 @@ export default function Layout() {
 	useCommonCommands();
 	useBlockCommands();
 
-	const hubRef = useRef();
 	const { params } = useLocation();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isListPage = getIsListPage( params, isMobileViewport );
@@ -117,7 +116,7 @@ export default function Layout() {
 	} );
 	const disableMotion = useReducedMotion();
 	const showSidebar =
-		( isMobileViewport && ! isListPage ) ||
+		( isMobileViewport && canvasMode === 'view' && ! isListPage ) ||
 		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
 	const showCanvas =
 		( isMobileViewport && isEditorPage && isEditing ) ||
@@ -127,12 +126,9 @@ export default function Layout() {
 		( isMobileViewport && isListPage ) || ( isEditorPage && isEditing );
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer ] = useResizeObserver();
-	const [ isResizing ] = useState( false );
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
-	const [ listViewToggleElement, setListViewToggleElement ] =
-		useState( null );
 
 	// This determines which animation variant should apply to the header.
 	// There is also a `isDistractionFreeHovering` state that gets priority
@@ -193,6 +189,7 @@ export default function Layout() {
 						'is-full-canvas': isFullCanvas,
 						'is-edit-mode': isEditing,
 						'has-fixed-toolbar': hasFixedToolbar,
+						'is-block-toolbar-visible': hasBlockSelected,
 					}
 				) }
 			>
@@ -226,13 +223,6 @@ export default function Layout() {
 					animate={ headerAnimationState }
 				>
 					<SiteHub
-						variants={ {
-							isDistractionFree: { x: '-100%' },
-							isDistractionFreeHovering: { x: 0 },
-							view: { x: 0 },
-							edit: { x: 0 },
-						} }
-						ref={ hubRef }
 						isTransparent={ isResizableFrameOversized }
 						className="edit-site-layout__hub"
 					/>
@@ -266,11 +256,7 @@ export default function Layout() {
 									ease: 'easeOut',
 								} }
 							>
-								<Header
-									setListViewToggleElement={
-										setListViewToggleElement
-									}
-								/>
+								<Header />
 							</NavigableRegion>
 						) }
 					</AnimatePresence>
@@ -285,26 +271,27 @@ export default function Layout() {
 						ariaLabel={ __( 'Navigation' ) }
 						className="edit-site-layout__sidebar-region"
 					>
-						<motion.div
-							// The sidebar is needed for routing on mobile
-							// (https://github.com/WordPress/gutenberg/pull/51558/files#r1231763003),
-							// so we can't remove the element entirely. Using `inert` will make
-							// it inaccessible to screen readers and keyboard navigation.
-							inert={ showSidebar ? undefined : 'inert' }
-							animate={ { opacity: showSidebar ? 1 : 0 } }
-							transition={ {
-								type: 'tween',
-								duration:
-									// Disable transition in mobile to emulate a full page transition.
-									disableMotion || isMobileViewport
-										? 0
-										: ANIMATION_DURATION,
-								ease: 'easeOut',
-							} }
-							className="edit-site-layout__sidebar"
-						>
-							<Sidebar />
-						</motion.div>
+						<AnimatePresence>
+							{ showSidebar && (
+								<motion.div
+									initial={ { opacity: 0 } }
+									animate={ { opacity: 1 } }
+									exit={ { opacity: 0 } }
+									transition={ {
+										type: 'tween',
+										duration:
+											// Disable transition in mobile to emulate a full page transition.
+											disableMotion || isMobileViewport
+												? 0
+												: ANIMATION_DURATION,
+										ease: 'easeOut',
+									} }
+									className="edit-site-layout__sidebar"
+								>
+									<Sidebar />
+								</motion.div>
+							) }
+						</AnimatePresence>
 					</NavigableRegion>
 
 					<SavePanel />
@@ -313,14 +300,7 @@ export default function Layout() {
 						<>
 							{ isListPage && <PageMain /> }
 							{ isEditorPage && (
-								<div
-									className={ classnames(
-										'edit-site-layout__canvas-container',
-										{
-											'is-resizing': isResizing,
-										}
-									) }
-								>
+								<div className="edit-site-layout__canvas-container">
 									{ canvasResizer }
 									{ !! canvasSize.width && (
 										<motion.div
@@ -331,8 +311,7 @@ export default function Layout() {
 															scale: 1.005,
 															transition: {
 																duration:
-																	disableMotion ||
-																	isResizing
+																	disableMotion
 																		? 0
 																		: 0.5,
 																ease: 'easeOut',
@@ -351,10 +330,9 @@ export default function Layout() {
 											) }
 											transition={ {
 												type: 'tween',
-												duration:
-													disableMotion || isResizing
-														? 0
-														: ANIMATION_DURATION,
+												duration: disableMotion
+													? 0
+													: ANIMATION_DURATION,
 												ease: 'easeOut',
 											} }
 										>
@@ -383,9 +361,6 @@ export default function Layout() {
 													} }
 												>
 													<Editor
-														listViewToggleElement={
-															listViewToggleElement
-														}
 														isLoading={
 															isEditorLoading
 														}

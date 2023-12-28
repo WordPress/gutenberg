@@ -82,7 +82,10 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 
 
 $gutenberg_experiments = get_option( 'gutenberg-experiments' );
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ) {
+if ( $gutenberg_experiments && (
+	array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ||
+	array_key_exists( 'gutenberg-pattern-partial-syncing', $gutenberg_experiments )
+) ) {
 	/**
 	 * Renders the block meta attributes.
 	 *
@@ -132,9 +135,8 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 				continue;
 			}
 
-			// If the source value is not "meta_fields", skip it because the only supported
-			// connection source is meta (custom fields) for now.
-			if ( 'meta_fields' !== $attribute_value['source'] ) {
+			// Skip if the source value is not "meta_fields" or "pattern_attributes".
+			if ( 'meta_fields' !== $attribute_value['source'] && 'pattern_attributes' !== $attribute_value['source'] ) {
 				continue;
 			}
 
@@ -143,16 +145,28 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 				continue;
 			}
 
-			// If the attribute does not specify the name of the custom field, skip it.
-			if ( ! isset( $attribute_value['value'] ) ) {
-				continue;
+			if ( 'pattern_attributes' === $attribute_value['source'] ) {
+				if ( ! _wp_array_get( $block_instance->attributes, array( 'metadata', 'id' ), false ) ) {
+					continue;
+				}
+
+				$custom_value = $connection_sources[ $attribute_value['source'] ]( $block_instance );
+			} else {
+				// If the attribute does not specify the name of the custom field, skip it.
+				if ( ! isset( $attribute_value['value'] ) ) {
+					continue;
+				}
+
+				// Get the content from the connection source.
+				$custom_value = $connection_sources[ $attribute_value['source'] ](
+					$block_instance,
+					$attribute_value['value']
+				);
 			}
 
-			// Get the content from the connection source.
-			$custom_value = $connection_sources[ $attribute_value['source'] ](
-				$block_instance,
-				$attribute_value['value']
-			);
+			if ( false === $custom_value ) {
+				continue;
+			}
 
 			$tags  = new WP_HTML_Tag_Processor( $block_content );
 			$found = $tags->next_tag(
@@ -181,5 +195,6 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $guten
 
 		return $block_content;
 	}
+
 	add_filter( 'render_block', 'gutenberg_render_block_connections', 10, 3 );
 }

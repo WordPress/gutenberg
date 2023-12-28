@@ -155,6 +155,9 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const id = _id ?? providerId;
 	const { content, editedBlocks, meta } = useSelect(
 		( select ) => {
+			if ( ! id ) {
+				return {};
+			}
 			const { getEditedEntityRecord } = select( STORE_NAME );
 			const editedRecord = getEditedEntityRecord( kind, name, id );
 			return {
@@ -169,6 +172,10 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		useDispatch( STORE_NAME );
 
 	const blocks = useMemo( () => {
+		if ( ! id ) {
+			return undefined;
+		}
+
 		if ( editedBlocks ) {
 			return editedBlocks;
 		}
@@ -176,7 +183,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		return content && typeof content !== 'function'
 			? parse( content )
 			: EMPTY_ARRAY;
-	}, [ editedBlocks, content ] );
+	}, [ id, editedBlocks, content ] );
 
 	const updateFootnotes = useCallback(
 		( _blocks ) => updateFootnotesFromMeta( _blocks, meta ),
@@ -189,7 +196,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			if ( noChange ) {
 				return __unstableCreateUndoLevel( kind, name, id );
 			}
-			const { selection } = options;
+			const { selection, ...rest } = options;
 
 			// We create a new function here on every persistent edit
 			// to make sure the edit makes the post dirty and creates
@@ -201,7 +208,10 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 				...updateFootnotes( newBlocks ),
 			};
 
-			editEntityRecord( kind, name, id, edits, { isCached: false } );
+			editEntityRecord( kind, name, id, edits, {
+				isCached: false,
+				...rest,
+			} );
 		},
 		[
 			kind,
@@ -216,11 +226,14 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 	const onInput = useCallback(
 		( newBlocks, options ) => {
-			const { selection } = options;
+			const { selection, ...rest } = options;
 			const footnotesChanges = updateFootnotes( newBlocks );
 			const edits = { selection, ...footnotesChanges };
 
-			editEntityRecord( kind, name, id, edits, { isCached: true } );
+			editEntityRecord( kind, name, id, edits, {
+				isCached: true,
+				...rest,
+			} );
 		},
 		[ kind, name, id, updateFootnotes, editEntityRecord ]
 	);

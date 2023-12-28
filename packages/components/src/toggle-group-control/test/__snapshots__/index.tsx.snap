@@ -47,9 +47,9 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   display: -ms-inline-flexbox;
   display: inline-flex;
   min-width: 0;
-  padding: 2px;
   position: relative;
   min-height: 36px;
+  padding: 2px;
 }
 
 .emotion-8:hover {
@@ -116,7 +116,8 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   width: 100%;
   z-index: 2;
   color: #1e1e1e;
-  width: 30px;
+  height: 30px;
+  aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
   color: #fff;
@@ -198,7 +199,8 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   width: 100%;
   z-index: 2;
   color: #1e1e1e;
-  width: 30px;
+  height: 30px;
+  aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
 }
@@ -249,13 +251,13 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
             aria-label="Uppercase"
             class="emotion-12 components-toggle-group-control-option-base"
             data-active-item=""
-            data-command=""
             data-value="uppercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-8-20"
             role="radio"
             type="button"
+            value="uppercase"
           >
             <div
               class="emotion-13 emotion-14"
@@ -287,13 +289,13 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
             aria-checked="false"
             aria-label="Lowercase"
             class="emotion-18 components-toggle-group-control-option-base"
-            data-command=""
             data-value="lowercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-8-21"
             role="radio"
             type="button"
+            value="lowercase"
           >
             <div
               class="emotion-13 emotion-14"
@@ -372,9 +374,9 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   display: -ms-inline-flexbox;
   display: inline-flex;
   min-width: 0;
-  padding: 2px;
   position: relative;
   min-height: 36px;
+  padding: 2px;
 }
 
 .emotion-8:hover {
@@ -496,13 +498,13 @@ exports[`ToggleGroupControl controlled should render correctly with text options
             aria-checked="false"
             aria-label="R"
             class="emotion-12 components-toggle-group-control-option-base"
-            data-command=""
             data-value="rigas"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-7-18"
             role="radio"
             type="button"
+            value="rigas"
           >
             <div
               class="emotion-13 emotion-14"
@@ -518,13 +520,13 @@ exports[`ToggleGroupControl controlled should render correctly with text options
             aria-checked="false"
             aria-label="J"
             class="emotion-12 components-toggle-group-control-option-base"
-            data-command=""
             data-value="jack"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-7-19"
             role="radio"
             type="button"
+            value="jack"
           >
             <div
               class="emotion-13 emotion-14"
@@ -592,9 +594,9 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   display: -ms-inline-flexbox;
   display: inline-flex;
   min-width: 0;
-  padding: 2px;
   position: relative;
   min-height: 36px;
+  padding: 2px;
 }
 
 .emotion-8:hover {
@@ -661,7 +663,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   width: 100%;
   z-index: 2;
   color: #1e1e1e;
-  width: 30px;
+  height: 30px;
+  aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
   color: #fff;
@@ -743,7 +746,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   width: 100%;
   z-index: 2;
   color: #1e1e1e;
-  width: 30px;
+  height: 30px;
+  aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
 }
@@ -794,13 +798,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
             aria-label="Uppercase"
             class="emotion-12 components-toggle-group-control-option-base"
             data-active-item=""
-            data-command=""
             data-value="uppercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-1-2"
             role="radio"
             type="button"
+            value="uppercase"
           >
             <div
               class="emotion-13 emotion-14"
@@ -832,13 +836,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
             aria-checked="false"
             aria-label="Lowercase"
             class="emotion-18 components-toggle-group-control-option-base"
-            data-command=""
             data-value="lowercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-1-3"
             role="radio"
             type="button"
+            value="lowercase"
           >
             <div
               class="emotion-13 emotion-14"
@@ -911,9 +915,9 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   display: -ms-inline-flexbox;
   display: inline-flex;
   min-width: 0;
-  padding: 2px;
   position: relative;
   min-height: 36px;
+  padding: 2px;
 }
 
 .emotion-8:hover {
@@ -1035,13 +1039,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
             aria-checked="false"
             aria-label="R"
             class="emotion-12 components-toggle-group-control-option-base"
-            data-command=""
             data-value="rigas"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-0-0"
             role="radio"
             type="button"
+            value="rigas"
           >
             <div
               class="emotion-13 emotion-14"
@@ -1057,13 +1061,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
             aria-checked="false"
             aria-label="J"
             class="emotion-12 components-toggle-group-control-option-base"
-            data-command=""
             data-value="jack"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
             id="toggle-group-control-as-radio-group-0-1"
             role="radio"
             type="button"
+            value="jack"
           >
             <div
               class="emotion-13 emotion-14"

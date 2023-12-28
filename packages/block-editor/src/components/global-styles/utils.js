@@ -159,6 +159,13 @@ export const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 	'typography.fontFamily': 'fontFamily',
 };
 
+export const TOOLSPANEL_DROPDOWNMENU_PROPS = {
+	popoverProps: {
+		placement: 'left-start',
+		offset: 259, // Inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+	},
+};
+
 function findInPresetsBy(
 	features,
 	blockName,

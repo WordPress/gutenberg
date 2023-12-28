@@ -19,7 +19,6 @@ import { useState } from 'react';
 import {
 	BlockEditorProvider,
 	BlockList,
-	BlockTools,
 	WritingFlow,
 } from '@wordpress/block-editor';
 
@@ -32,9 +31,7 @@ function MyEditorComponent() {
 			onInput={ ( blocks ) => updateBlocks( blocks ) }
 			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
-			<BlockTools>
-				<BlockCanvas height="400px" />
-			</BlockTools>
+			<BlockCanvas height="400px" />
 		</BlockEditorProvider>
 	);
 }
@@ -280,9 +277,17 @@ _Returns_
 
 ### BlockToolbar
 
+Renders the block toolbar.
+
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md>
+
+_Parameters_
+
+-   _props_ `Object`: Components props.
+-   _props.hideDragHandle_ `boolean`: Show or hide the Drag Handle for drag and drop functionality.
+-   _props.variant_ `string`: Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
 
 ### BlockTools
 
@@ -534,16 +539,13 @@ _Returns_
 
 ### getPxFromCssUnit
 
-Returns the px value of a cssUnit. The memoized version of getPxFromCssUnit;
+> **Deprecated**
 
-_Parameters_
-
--   _cssUnit_ `string`:
--   _options_ `Object`:
+This function was accidentially exposed for mobile/native usage.
 
 _Returns_
 
--   `string`: returns the cssUnit value in a simple px format.
+-   `string`: Empty string.
 
 ### getSpacingPresetCssVar
 
@@ -789,12 +791,22 @@ Applies a series of CSS rule transforms to wrap selectors inside a given class a
 
 _Parameters_
 
--   _styles_ `Object|Array`: CSS rules.
--   _wrapperClassName_ `string`: Wrapper Class Name.
+-   _styles_ `EditorStyle[]`: CSS rules.
+-   _wrapperSelector_ `string`: Wrapper selector.
 
 _Returns_
 
 -   `Array`: converted rules.
+
+_Type Definition_
+
+-   _EditorStyle_ `Object`
+
+_Properties_
+
+-   _css_ `string`: the CSS block(s), as a single string.
+-   _baseURL_ `?string`: the base URL to be used as the reference when rewritting urls.
+-   _ignoredSelectors_ `?string[]`: the selectors not to wrap.
 
 ### Typewriter
 
@@ -944,9 +956,11 @@ _Parameters_
 
 ### useSetting
 
+> **Deprecated** 6.5.0 Use useSettings instead.
+
 Hook that retrieves the given setting for the block instance in use.
 
-It looks up the settings first in the block instance hierarchy. If none is found, it'll look it up in the block editor store.
+It looks up the setting first in the block instance hierarchy. If none is found, it'll look it up in the block editor settings.
 
 _Usage_
 
@@ -961,6 +975,26 @@ _Parameters_
 _Returns_
 
 -   `any`: Returns the value defined for the setting.
+
+### useSettings
+
+Hook that retrieves the given settings for the block instance in use.
+
+It looks up the settings first in the block instance hierarchy. If none are found, it'll look them up in the block editor settings.
+
+_Usage_
+
+```js
+const [ fixed, sticky ] = useSettings( 'position.fixed', 'position.sticky' );
+```
+
+_Parameters_
+
+-   _paths_ `string[]`: The paths to the settings.
+
+_Returns_
+
+-   `any[]`: Returns the values defined for the settings.
 
 ### Warning
 
