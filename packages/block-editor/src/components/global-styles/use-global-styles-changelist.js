@@ -101,19 +101,38 @@ function deepCompare( changedObject, originalObject, parentPath = '' ) {
 }
 
 /**
+ * From a useGlobalStylesChangelist() result, returns a truncated array of translated changes.
+ * Appends a translated string indicating the number of changes that were truncated.
+ * @param {string[]} changes    An array of translated changes.
+ * @param {number}   maxResults Max results to show before truncating.
+ * @return {string[]}                        An array of translated changes.
+ */
+export function truncateGlobalStylesChanges( changes, maxResults = 3 ) {
+	const changesLength = changes.length;
+
+	// Truncate to `n` results if necessary.
+	if ( !! maxResults && changesLength && changesLength > maxResults ) {
+		const deleteCount = changesLength - maxResults;
+		const andMoreText = sprintf(
+			// translators: %d: number of global styles changes that are not displayed in the UI.
+			_n( '…and %d more change.', '…and %d more changes.', deleteCount ),
+			deleteCount
+		);
+		changes.splice( maxResults, deleteCount, andMoreText );
+	}
+
+	return changes;
+}
+
+/**
  * Returns an array of translated summarized global styles changes.
  * Results are cached using a Map() key of `JSON.stringify( { next, previous } )`.
  *
- * @param {Object}              next     The changed object to compare.
- * @param {Object}              previous The original object to compare against.
- * @param {{maxResults:number}} options  An object of options.
+ * @param {Object} next     The changed object to compare.
+ * @param {Object} previous The original object to compare against.
  * @return {string[]}                        An array of translated changes.
  */
-export default function useGlobalStylesChangelist(
-	next,
-	previous,
-	options = {}
-) {
+export default function useGlobalStylesChangelist( next, previous ) {
 	const cacheKey = JSON.stringify( { next, previous } );
 	const blockNames = useMemo( () => {
 		const blockTypes = getBlockTypes();
@@ -175,23 +194,6 @@ export default function useGlobalStylesChangelist(
 		}, [] );
 
 	globalStylesChangesCache.set( cacheKey, result );
-
-	const changesLength = result.length;
-
-	// Truncate to `n` results if necessary.
-	if (
-		!! options?.maxResults &&
-		changesLength &&
-		changesLength > options.maxResults
-	) {
-		const deleteCount = changesLength - options.maxResults;
-		const andMoreText = sprintf(
-			// translators: %d: number of global styles changes that are not displayed in the UI.
-			_n( '…and %d more change.', '…and %d more changes.', deleteCount ),
-			deleteCount
-		);
-		result.splice( options.maxResults, deleteCount, andMoreText );
-	}
 
 	return result;
 }

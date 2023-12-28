@@ -20,12 +20,12 @@ import { unlock } from '../../../lock-unlock';
 
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 const MAX_CHANGES = 7;
-const { useGlobalStylesChangelist } = unlock( blockEditorPrivateApis );
+const { useGlobalStylesChangelist, truncateGlobalStylesChanges } = unlock(
+	blockEditorPrivateApis
+);
 
 function ChangesSummary( { revision, previousRevision } ) {
-	const changes = useGlobalStylesChangelist( revision, previousRevision, {
-		maxResults: MAX_CHANGES,
-	} );
+	const changes = useGlobalStylesChangelist( revision, previousRevision );
 	const changesLength = changes.length;
 
 	if ( ! changesLength ) {
@@ -37,7 +37,7 @@ function ChangesSummary( { revision, previousRevision } ) {
 			data-testid="global-styles-revision-changes"
 			className="edit-site-global-styles-screen-revisions__changes"
 		>
-			{ changes.join( ', ' ) }
+			{ truncateGlobalStylesChanges( changes, MAX_CHANGES ).join( ', ' ) }
 		</span>
 	);
 }
