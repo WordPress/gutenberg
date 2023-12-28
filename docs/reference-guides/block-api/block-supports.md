@@ -437,7 +437,7 @@ _**Note:** Since WordPress 6.2._
 -   Subproperties:
     -   `minHeight`: type `boolean`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles/#opt-in-into-ui-controls).
+This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
 ```js
 supports: {
