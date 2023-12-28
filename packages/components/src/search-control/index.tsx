@@ -77,7 +77,6 @@ function UnforwardedSearchControl(
 	// - RTL support re: prefix/suffix
 	// - comb the codebase for `components-search-control__*` selectors
 	// - remove stylesheet
-	// - onChange type signature changed
 
 	return (
 		<ContextSystemProvider value={ baseControlContextValue }>
@@ -91,7 +90,9 @@ function UnforwardedSearchControl(
 					'components-search-control',
 					className
 				) }
-				onChange={ onChange }
+				onChange={ ( nextValue?: string ) =>
+					onChange( nextValue ?? '' )
+				}
 				autoComplete="off"
 				placeholder={ placeholder }
 				value={ value || '' }
