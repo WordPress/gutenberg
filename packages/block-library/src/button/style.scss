@@ -92,7 +92,6 @@ $blocks-block__margin: 0.5em;
 	border-radius: 0;
 }
 
-
 // the first selector is required for old buttons markup
 .wp-block-button.no-border-radius,
 .wp-block-button__link.no-border-radius {
@@ -115,4 +114,41 @@ $blocks-block__margin: 0.5em;
 	background-color: transparent;
 	// background-image is required to overwrite a gradient background
 	background-image: none;
+}
+
+.wp-block-button .wp-block-button__link {
+	// The following styles ensure a default border is applied when the user
+	// selects only a border color or style. This overcomes the zero border
+	// width applied by core's theme.json via the elements API.
+	&:where(.has-border-color) {
+		border-width: initial;
+	}
+	&:where([style*="border-top-color"]) {
+		border-top-width: initial;
+	}
+	&:where([style*="border-right-color"]) {
+		border-right-width: initial;
+	}
+	&:where([style*="border-bottom-color"]) {
+		border-bottom-width: initial;
+	}
+	&:where([style*="border-left-color"]) {
+		border-left-width: initial;
+	}
+
+	&:where([style*="border-style"]) {
+		border-width: initial;
+	}
+	&:where([style*="border-top-style"]) {
+		border-top-width: initial;
+	}
+	&:where([style*="border-right-style"]) {
+		border-right-width: initial;
+	}
+	&:where([style*="border-bottom-style"]) {
+		border-bottom-width: initial;
+	}
+	&:where([style*="border-left-style"]) {
+		border-left-width: initial;
+	}
 }

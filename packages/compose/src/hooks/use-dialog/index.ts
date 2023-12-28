@@ -34,7 +34,7 @@ type DialogOptions = {
 
 type useDialogReturn = [
 	RefCallback< HTMLElement >,
-	ReturnType< typeof useFocusOutside > & Pick< HTMLElement, 'tabIndex' >
+	ReturnType< typeof useFocusOutside > & Pick< HTMLElement, 'tabIndex' >,
 ];
 
 /**
@@ -44,7 +44,7 @@ type useDialogReturn = [
  *  - return focus on unmount.
  *  - focus outside.
  *
- * @param  options Dialog Options.
+ * @param options Dialog Options.
  */
 function useDialog( options: DialogOptions ): useDialogReturn {
 	const currentOptions = useRef< DialogOptions | undefined >();

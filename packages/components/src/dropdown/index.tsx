@@ -7,34 +7,23 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
+import { contextConnect, useContextSystem } from '../context';
+import { useControlledValue } from '../utils/hooks';
 import Popover from '../popover';
-import type { DropdownProps } from './types';
+import type { DropdownProps, DropdownInternalContext } from './types';
 
-function useObservableState(
-	initialState: boolean,
-	onStateChange?: ( newState: boolean ) => void
-) {
-	const [ state, setState ] = useState( initialState );
-	return [
-		state,
-		( value: boolean ) => {
-			setState( value );
-			if ( onStateChange ) {
-				onStateChange( value );
-			}
-		},
-	] as const;
-}
-
-function UnforwardedDropdown(
-	{
+const UnconnectedDropdown = (
+	props: DropdownProps,
+	forwardedRef: ForwardedRef< any >
+) => {
+	const {
 		renderContent,
 		renderToggle,
 		className,
@@ -47,11 +36,19 @@ function UnforwardedDropdown(
 		onToggle,
 		style,
 
+		open,
+		defaultOpen,
+
 		// Deprecated props
 		position,
-	}: DropdownProps,
-	forwardedRef: ForwardedRef< any >
-) {
+
+		// From context system
+		variant,
+	} = useContextSystem< DropdownProps & DropdownInternalContext >(
+		props,
+		'Dropdown'
+	);
+
 	if ( position !== undefined ) {
 		deprecated( '`position` prop in wp.components.Dropdown', {
 			since: '6.2',
@@ -65,20 +62,12 @@ function UnforwardedDropdown(
 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
 		useState< HTMLDivElement | null >( null );
 	const containerRef = useRef< HTMLDivElement >();
-	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
 
-	useEffect(
-		() => () => {
-			if ( onToggle && isOpen ) {
-				onToggle( false );
-			}
-		},
-		[ onToggle, isOpen ]
-	);
-
-	function toggle() {
-		setIsOpen( ! isOpen );
-	}
+	const [ isOpen, setIsOpen ] = useControlledValue( {
+		defaultValue: defaultOpen,
+		value: open,
+		onChange: onToggle,
+	} );
 
 	/**
 	 * Closes the popover when focus leaves it unless the toggle was pressed or
@@ -103,13 +92,15 @@ function UnforwardedDropdown(
 	}
 
 	function close() {
-		if ( onClose ) {
-			onClose();
-		}
+		onClose?.();
 		setIsOpen( false );
 	}
 
-	const args = { isOpen, onToggle: toggle, onClose: close };
+	const args = {
+		isOpen: !! isOpen,
+		onToggle: () => setIsOpen( ! isOpen ),
+		onClose: close,
+	};
 	const popoverPropsHaveAnchor =
 		!! popoverProps?.anchor ||
 		// Note: `anchorRef`, `getAnchorRect` and `anchorRect` are deprecated and
@@ -120,7 +111,7 @@ function UnforwardedDropdown(
 
 	return (
 		<div
-			className={ classnames( 'components-dropdown', className ) }
+			className={ className }
 			ref={ useMergeRefs( [
 				containerRef,
 				forwardedRef,
@@ -149,6 +140,7 @@ function UnforwardedDropdown(
 							? fallbackPopoverAnchor
 							: undefined
 					}
+					variant={ variant }
 					{ ...popoverProps }
 					className={ classnames(
 						'components-dropdown__content',
@@ -161,7 +153,7 @@ function UnforwardedDropdown(
 			) }
 		</div>
 	);
-}
+};
 
 /**
  * Renders a button that opens a floating content modal when clicked.
@@ -188,6 +180,6 @@ function UnforwardedDropdown(
  * );
  * ```
  */
-export const Dropdown = forwardRef( UnforwardedDropdown );
+export const Dropdown = contextConnect( UnconnectedDropdown, 'Dropdown' );
 
 export default Dropdown;

@@ -1,45 +1,52 @@
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import {
+	privateApis,
 	__experimentalToolbarContext as ToolbarContext,
 	ToolbarGroup,
 	__experimentalUseSlotFills as useSlotFills,
 } from '@wordpress/components';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
  */
 import groups from './groups';
+import { unlock } from '../../lock-unlock';
+
+const { ComponentsContext } = unlock( privateApis );
 
 export default function BlockControlsSlot( { group = 'default', ...props } ) {
-	const accessibleToolbarState = useContext( ToolbarContext );
-	const Slot = groups[ group ].Slot;
-	const fills = useSlotFills( Slot.__unstableName );
-	const hasFills = Boolean( fills && fills.length );
+	const toolbarState = useContext( ToolbarContext );
+	const contextState = useContext( ComponentsContext );
+	const fillProps = useMemo(
+		() => ( {
+			forwardedContext: [
+				[ ToolbarContext.Provider, { value: toolbarState } ],
+				[ ComponentsContext.Provider, { value: contextState } ],
+			],
+		} ),
+		[ toolbarState, contextState ]
+	);
 
-	if ( ! hasFills ) {
+	const Slot = groups[ group ]?.Slot;
+	const fills = useSlotFills( Slot?.__unstableName );
+	if ( ! Slot ) {
+		warning( `Unknown BlockControls group "${ group }" provided.` );
 		return null;
 	}
 
-	if ( group === 'default' ) {
-		return (
-			<Slot
-				{ ...props }
-				bubblesVirtually
-				fillProps={ accessibleToolbarState }
-			/>
-		);
+	if ( ! fills?.length ) {
+		return null;
 	}
 
-	return (
-		<ToolbarGroup>
-			<Slot
-				{ ...props }
-				bubblesVirtually
-				fillProps={ accessibleToolbarState }
-			/>
-		</ToolbarGroup>
-	);
+	const slot = <Slot { ...props } bubblesVirtually fillProps={ fillProps } />;
+
+	if ( group === 'default' ) {
+		return slot;
+	}
+
+	return <ToolbarGroup>{ slot }</ToolbarGroup>;
 }

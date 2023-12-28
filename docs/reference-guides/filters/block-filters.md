@@ -1,4 +1,4 @@
-# Block Hooks
+# Block Filters
 
 To modify the behavior of existing blocks, WordPress exposes several APIs.
 
@@ -63,11 +63,13 @@ function addListBlockClassName( settings, name ) {
 		return settings;
 	}
 
-	return lodash.assign( {}, settings, {
-		supports: lodash.assign( {}, settings.supports, {
+	return {
+		...settings,
+		supports: {
+			...settings.supports,
 			className: true,
-		} ),
-	} );
+		},
+	};
 }
 
 wp.hooks.addFilter(
@@ -83,7 +85,7 @@ The following filters are available to change the behavior of blocks while editi
 
 ### `blocks.getSaveElement`
 
-A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
+A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `React.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
 
 The filter's callback receives an element, a block type definition object and the block attributes as arguments. It should return an element.
 
@@ -114,7 +116,7 @@ wp.hooks.addFilter(
 );
 ```
 
-#### `blocks.getSaveContent.extraProps`
+### `blocks.getSaveContent.extraProps`
 
 A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element.
 
@@ -126,7 +128,10 @@ Adding a background by default to all blocks.
 
 ```js
 function addBackgroundColorStyle( props ) {
-	return lodash.assign( props, { style: { backgroundColor: 'red' } } );
+	return {
+		...props,
+		style: { backgroundColor: 'red' },
+	};
 }
 
 wp.hooks.addFilter(
@@ -174,15 +179,13 @@ Used to modify the block's `edit` component. It receives the original block `Blo
 
 _Example:_
 
-{% codetabs %}
-{% JSX %}
 
 ```js
 const { createHigherOrderComponent } = wp.compose;
 const { InspectorControls } = wp.blockEditor;
 const { PanelBody } = wp.components;
 
-const withInspectorControls = createHigherOrderComponent( ( BlockEdit ) => {
+const withMyPluginControls = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		return (
 			<>
@@ -193,55 +196,44 @@ const withInspectorControls = createHigherOrderComponent( ( BlockEdit ) => {
 			</>
 		);
 	};
-}, 'withInspectorControl' );
+}, 'withMyPluginControls' );
 
 wp.hooks.addFilter(
 	'editor.BlockEdit',
 	'my-plugin/with-inspector-controls',
-	withInspectorControls
+	withMyPluginControls
 );
 ```
 
-{% Plain %}
+
+Note that as this hook is run for _all blocks_, consuming it has potential for performance regressions particularly around block selection metrics.
+
+To mitigate this, consider whether any work you perform can be altered to run only under certain conditions.
+
+For example, if you are adding components that only need to render when the block is _selected_, then you can use the block's "selected" state (`props.isSelected`) to conditionalize your rendering.
 
 ```js
-var el = wp.element.createElement;
-
-var withInspectorControls = wp.compose.createHigherOrderComponent( function (
-	BlockEdit
-) {
-	return function ( props ) {
-		return el(
-			wp.element.Fragment,
-			{},
-			el( BlockEdit, props ),
-			el(
-				wp.blockEditor.InspectorControls,
-				{},
-				el( wp.components.PanelBody, {}, 'My custom control' )
-			)
+const withMyPluginControls = createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
+		return (
+			<>
+				<BlockEdit { ...props } />
+				{ props.isSelected && {
+					<InspectorControls>
+						<PanelBody>My custom control</PanelBody>
+					</InspectorControls>
+				}}
+			</>
 		);
 	};
-},
-'withInspectorControls' );
-
-wp.hooks.addFilter(
-	'editor.BlockEdit',
-	'my-plugin/with-inspector-controls',
-	withInspectorControls
-);
+}, 'withMyPluginControls' );
 ```
 
-{% end %}
-
-#### `editor.BlockListBlock`
+### `editor.BlockListBlock`
 
 Used to modify the block's wrapper component containing the block's `edit` component and all toolbars. It receives the original `BlockListBlock` component and returns a new wrapped component.
 
 _Example:_
-
-{% codetabs %}
-{% JSX %}
 
 ```js
 const { createHigherOrderComponent } = wp.compose;
@@ -267,39 +259,10 @@ wp.hooks.addFilter(
 );
 ```
 
-{% Plain %}
-
-```js
-var el = wp.element.createElement;
-
-var withClientIdClassName = wp.compose.createHigherOrderComponent( function (
-	BlockListBlock
-) {
-	return function ( props ) {
-		var newProps = lodash.assign( {}, props, {
-			className: 'block-' + props.clientId,
-		} );
-
-		return el( BlockListBlock, newProps );
-	};
-},
-'withClientIdClassName' );
-
-wp.hooks.addFilter(
-	'editor.BlockListBlock',
-	'my-plugin/with-client-id-class-name',
-	withClientIdClassName
-);
-```
-
-{% end %}
-
 Adding new properties to the block's wrapper component can be achieved by adding them to the `wrapperProps` property of the returned component.
 
 _Example:_
 
-{% codetabs %}
-{% JSX %}
 
 ```js
 const { createHigherOrderComponent } = wp.compose;
@@ -319,32 +282,6 @@ wp.hooks.addFilter(
 );
 ```
 
-{% Plain %}
-
-```js
-var el = wp.element.createElement;
-var hoc = wp.compose.createHigherOrderComponent;
-
-var withMyWrapperProp = hoc( function ( BlockListBlock ) {
-	return function ( props ) {
-		var newProps = {
-			...props,
-			wrapperProps: {
-				...props.wrapperProps,
-				'data-my-property': 'the-value',
-			},
-		};
-		return el( BlockListBlock, newProps );
-	};
-}, 'withMyWrapperProp' );
-wp.hooks.addFilter(
-	'editor.BlockListBlock',
-	'my-plugin/with-my-wrapper-prop',
-	withMyWrapperProp
-);
-```
-
-{% end %}
 
 ## Removing Blocks
 
@@ -352,8 +289,6 @@ wp.hooks.addFilter(
 
 Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
 
-{% codetabs %}
-{% JSX %}
 
 ```js
 // my-plugin.js
@@ -365,16 +300,6 @@ domReady( function () {
 } );
 ```
 
-{% Plain %}
-
-```js
-// my-plugin.js
-wp.domReady( function () {
-	wp.blocks.unregisterBlockType( 'core/verse' );
-} );
-```
-
-{% end %}
 
 and load this script in the Editor
 
@@ -476,7 +401,7 @@ To set an SVG icon for the category shown in the previous example, add the follo
 
 ```js
 ( function () {
-	var el = wp.element.createElement;
+	var el = React.createElement;
 	var SVG = wp.primitives.SVG;
 	var circle = el( 'circle', {
 		cx: 10,

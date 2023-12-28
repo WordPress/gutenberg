@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -59,12 +58,37 @@ function ColumnsEditContainer( {
 	updateColumns,
 	clientId,
 } ) {
-	const { isStackedOnMobile, verticalAlignment } = attributes;
+	const { isStackedOnMobile, verticalAlignment, templateLock } = attributes;
 
-	const { count } = useSelect(
+	const { count, canInsertColumnBlock, minCount } = useSelect(
 		( select ) => {
+			const {
+				canInsertBlockType,
+				canRemoveBlock,
+				getBlocks,
+				getBlockCount,
+			} = select( blockEditorStore );
+			const innerBlocks = getBlocks( clientId );
+
+			// Get the indexes of columns for which removal is prevented.
+			// The highest index will be used to determine the minimum column count.
+			const preventRemovalBlockIndexes = innerBlocks.reduce(
+				( acc, block, index ) => {
+					if ( ! canRemoveBlock( block.clientId ) ) {
+						acc.push( index );
+					}
+					return acc;
+				},
+				[]
+			);
+
 			return {
-				count: select( blockEditorStore ).getBlockCount( clientId ),
+				count: getBlockCount( clientId ),
+				canInsertColumnBlock: canInsertBlockType(
+					'core/column',
+					clientId
+				),
+				minCount: Math.max( ...preventRemovalBlockIndexes ) + 1,
 			};
 		},
 		[ clientId ]
@@ -82,6 +106,7 @@ function ColumnsEditContainer( {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
 		renderAppender: false,
+		templateLock,
 	} );
 
 	return (
@@ -94,22 +119,36 @@ function ColumnsEditContainer( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody>
-					<RangeControl
-						__nextHasNoMarginBottom
-						label={ __( 'Columns' ) }
-						value={ count }
-						onChange={ ( value ) => updateColumns( count, value ) }
-						min={ 1 }
-						max={ Math.max( 6, count ) }
-					/>
-					{ count > 6 && (
-						<Notice status="warning" isDismissible={ false }>
-							{ __(
-								'This column count exceeds the recommended amount and may cause visual breakage.'
+					{ canInsertColumnBlock && (
+						<>
+							<RangeControl
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+								label={ __( 'Columns' ) }
+								value={ count }
+								onChange={ ( value ) =>
+									updateColumns(
+										count,
+										Math.max( minCount, value )
+									)
+								}
+								min={ Math.max( 1, minCount ) }
+								max={ Math.max( 6, count ) }
+							/>
+							{ count > 6 && (
+								<Notice
+									status="warning"
+									isDismissible={ false }
+								>
+									{ __(
+										'This column count exceeds the recommended amount and may cause visual breakage.'
+									) }
+								</Notice>
 							) }
-						</Notice>
+						</>
 					) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Stack on mobile' ) }
 						checked={ isStackedOnMobile }
 						onChange={ () =>
@@ -201,13 +240,12 @@ const ColumnsEditContainerWrapper = withDispatch(
 						return createBlock( 'core/column' );
 					} ),
 				];
-			} else {
+			} else if ( newColumns < previousColumns ) {
 				// The removed column will be the last of the inner blocks.
 				innerBlocks = innerBlocks.slice(
 					0,
 					-( previousColumns - newColumns )
 				);
-
 				if ( hasExplicitWidths ) {
 					// Redistribute as if block is already removed.
 					const widths = getRedistributedColumnWidths(
@@ -247,8 +285,8 @@ function Placeholder( { clientId, name, setAttributes } ) {
 	return (
 		<div { ...blockProps }>
 			<__experimentalBlockVariationPicker
-				icon={ get( blockType, [ 'icon', 'src' ] ) }
-				label={ get( blockType, [ 'title' ] ) }
+				icon={ blockType?.icon?.src }
+				label={ blockType?.title }
 				variations={ variations }
 				onSelect={ ( nextVariation = defaultVariation ) => {
 					if ( nextVariation.attributes ) {

@@ -1,41 +1,56 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	NavigableMenu,
+	Button,
+	Modal,
+	__experimentalGrid as Grid,
+	__experimentalText as Text,
+	__experimentalVStack as VStack,
+	Flex,
+	Icon,
 } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	archive,
 	blockMeta,
+	calendar,
 	category,
+	commentAuthorAvatar,
+	edit,
 	home,
+	layout,
 	list,
 	media,
 	notFound,
 	page,
 	plus,
-	post,
-	postAuthor,
-	postDate,
+	pin,
+	verse,
 	search,
 	tag,
-	layout as customGenericTemplateIcon,
 } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import AddCustomTemplateModal from './add-custom-template-modal';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+
+/**
+ * Internal dependencies
+ */
+import AddCustomTemplateModalContent from './add-custom-template-modal-content';
 import {
 	useExistingTemplates,
 	useDefaultTemplateTypes,
@@ -44,13 +59,15 @@ import {
 	useAuthorMenuItem,
 	usePostTypeArchiveMenuItems,
 } from './utils';
-import AddCustomGenericTemplateModal from './add-custom-generic-template-modal';
+import AddCustomGenericTemplateModalContent from './add-custom-generic-template-modal-content';
 import TemplateActionsLoadingScreen from './template-actions-loading-screen';
-import { useHistory } from '../routes';
-import { store as editSiteStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { useHistory } = unlock( routerPrivateApis );
 
 const DEFAULT_TEMPLATE_SLUGS = [
 	'front-page',
+	'home',
 	'single',
 	'page',
 	'index',
@@ -59,25 +76,76 @@ const DEFAULT_TEMPLATE_SLUGS = [
 	'category',
 	'date',
 	'tag',
-	'taxonomy',
 	'search',
 	'404',
 ];
 
 const TEMPLATE_ICONS = {
 	'front-page': home,
-	single: post,
+	home: verse,
+	single: pin,
 	page,
 	archive,
 	search,
 	404: notFound,
 	index: list,
 	category,
-	author: postAuthor,
+	author: commentAuthorAvatar,
 	taxonomy: blockMeta,
-	date: postDate,
+	date: calendar,
 	tag,
 	attachment: media,
+};
+
+function TemplateListItem( {
+	title,
+	direction,
+	className,
+	description,
+	icon,
+	onClick,
+	children,
+} ) {
+	return (
+		<Button
+			className={ className }
+			onClick={ onClick }
+			label={ description }
+			showTooltip={ !! description }
+		>
+			<Flex
+				as="span"
+				spacing={ 2 }
+				align="center"
+				justify="center"
+				style={ { width: '100%' } }
+				direction={ direction }
+			>
+				<div className="edit-site-add-new-template__template-icon">
+					<Icon icon={ icon } />
+				</div>
+				<VStack
+					className="edit-site-add-new-template__template-name"
+					alignment="center"
+					spacing={ 0 }
+				>
+					<Text
+						weight={ 500 }
+						lineHeight={ 1.53846153846 } // 20px
+					>
+						{ title }
+					</Text>
+					{ children }
+				</VStack>
+			</Flex>
+		</Button>
+	);
+}
+
+const modalContentMap = {
+	templatesList: 1,
+	customTemplate: 2,
+	customGenericTemplate: 3,
 };
 
 export default function NewTemplate( {
@@ -85,12 +153,10 @@ export default function NewTemplate( {
 	toggleProps,
 	showIcon = true,
 } ) {
-	const [ showCustomTemplateModal, setShowCustomTemplateModal ] =
-		useState( false );
-	const [
-		showCustomGenericTemplateModal,
-		setShowCustomGenericTemplateModal,
-	] = useState( false );
+	const [ showModal, setShowModal ] = useState( false );
+	const [ modalContent, setModalContent ] = useState(
+		modalContentMap.templatesList
+	);
 	const [ entityForSuggestions, setEntityForSuggestions ] = useState( {} );
 	const [ isCreatingTemplate, setIsCreatingTemplate ] = useState( false );
 
@@ -98,8 +164,25 @@ export default function NewTemplate( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const { setTemplate, __unstableSetCanvasMode } =
-		useDispatch( editSiteStore );
+
+	const { homeUrl } = useSelect( ( select ) => {
+		const {
+			getUnstableBase, // Site index.
+		} = select( coreStore );
+
+		return {
+			homeUrl: getUnstableBase()?.home,
+		};
+	}, [] );
+
+	const TEMPLATE_SHORT_DESCRIPTIONS = {
+		'front-page': homeUrl,
+		date: sprintf(
+			// translators: %s: The homepage url.
+			__( 'E.g. %s' ),
+			homeUrl + '/' + new Date().getFullYear()
+		),
+	};
 
 	async function createTemplate( template, isWPSuggestion = true ) {
 		if ( isCreatingTemplate ) {
@@ -107,51 +190,34 @@ export default function NewTemplate( {
 		}
 		setIsCreatingTemplate( true );
 		try {
-			const { title, description, slug, templatePrefix } = template;
-			let templateContent = template.content;
-			// Try to find fallback content from existing templates.
-			if ( ! templateContent ) {
-				const fallbackTemplate = await apiFetch( {
-					path: addQueryArgs( '/wp/v2/templates/lookup', {
-						slug,
-						is_custom: ! isWPSuggestion,
-						template_prefix: templatePrefix,
-					} ),
-				} );
-				templateContent = fallbackTemplate.content.raw;
-			}
+			const { title, description, slug } = template;
 			const newTemplate = await saveEntityRecord(
 				'postType',
-				'wp_template',
+				TEMPLATE_POST_TYPE,
 				{
 					description,
 					// Slugs need to be strings, so this is for template `404`
 					slug: slug.toString(),
 					status: 'publish',
 					title,
-					content: templateContent,
 					// This adds a post meta field in template that is part of `is_custom` value calculation.
 					is_wp_suggestion: isWPSuggestion,
 				},
 				{ throwOnError: true }
 			);
 
-			// Set template before navigating away to avoid initial stale value.
-			setTemplate( newTemplate.id, newTemplate.slug );
-
-			// Switch to edit mode.
-			__unstableSetCanvasMode( 'edit' );
-
 			// Navigate to the created template editor.
 			history.push( {
 				postId: newTemplate.id,
 				postType: newTemplate.type,
+				canvas: 'edit',
 			} );
+
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: Title of the created template e.g: "Category".
 					__( '"%s" successfully created.' ),
-					title
+					decodeEntities( newTemplate.title?.rendered || title )
 				),
 				{
 					type: 'snackbar',
@@ -170,106 +236,135 @@ export default function NewTemplate( {
 			setIsCreatingTemplate( false );
 		}
 	}
+	const onModalClose = () => {
+		setShowModal( false );
+		setModalContent( modalContentMap.templatesList );
+	};
 
-	const missingTemplates = useMissingTemplates(
-		setEntityForSuggestions,
-		setShowCustomTemplateModal
+	const missingTemplates = useMissingTemplates( setEntityForSuggestions, () =>
+		setModalContent( modalContentMap.customTemplate )
 	);
 	if ( ! missingTemplates.length ) {
 		return null;
 	}
+	const { as: Toggle = Button, ...restToggleProps } = toggleProps ?? {};
+
+	let modalTitle = __( 'Add template' );
+	if ( modalContent === modalContentMap.customTemplate ) {
+		modalTitle = sprintf(
+			// translators: %s: Name of the post type e.g: "Post".
+			__( 'Add template: %s' ),
+			entityForSuggestions.labels.singular_name
+		);
+	} else if ( modalContent === modalContentMap.customGenericTemplate ) {
+		modalTitle = __( 'Create custom template' );
+	}
 	return (
 		<>
-			<DropdownMenu
-				className="edit-site-new-template-dropdown"
+			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
+			<Toggle
+				{ ...restToggleProps }
+				onClick={ () => setShowModal( true ) }
 				icon={ showIcon ? plus : null }
-				text={ showIcon ? null : postType.labels.add_new }
 				label={ postType.labels.add_new_item }
-				popoverProps={ {
-					noArrow: false,
-				} }
-				toggleProps={ toggleProps }
 			>
-				{ () => (
-					<>
-						{ isCreatingTemplate && (
-							<TemplateActionsLoadingScreen />
-						) }
-						<NavigableMenu className="edit-site-new-template-dropdown__popover">
-							<MenuGroup label={ postType.labels.add_new_item }>
-								{ missingTemplates.map( ( template ) => {
-									const {
-										title,
-										description,
-										slug,
-										onClick,
-										icon,
-									} = template;
-									return (
-										<MenuItem
-											icon={
-												icon ||
-												TEMPLATE_ICONS[ slug ] ||
-												post
-											}
-											iconPosition="left"
-											info={ description }
-											key={ slug }
-											onClick={ () =>
-												onClick
-													? onClick( template )
-													: createTemplate( template )
-											}
-										>
-											{ title }
-										</MenuItem>
-									);
-								} ) }
-							</MenuGroup>
-							<MenuGroup>
-								<MenuItem
-									icon={ customGenericTemplateIcon }
-									iconPosition="left"
-									info={ __(
-										'Custom templates can be applied to any post or page.'
-									) }
-									key="custom-template"
-									onClick={ () =>
-										setShowCustomGenericTemplateModal(
-											true
-										)
-									}
+				{ showIcon ? null : postType.labels.add_new_item }
+			</Toggle>
+			{ showModal && (
+				<Modal
+					title={ modalTitle }
+					className={ classnames(
+						'edit-site-add-new-template__modal',
+						{
+							'edit-site-add-new-template__modal_template_list':
+								modalContent === modalContentMap.templatesList,
+							'edit-site-custom-template-modal':
+								modalContent === modalContentMap.customTemplate,
+						}
+					) }
+					onRequestClose={ onModalClose }
+					overlayClassName={
+						modalContent === modalContentMap.customGenericTemplate
+							? 'edit-site-custom-generic-template__modal'
+							: undefined
+					}
+				>
+					{ modalContent === modalContentMap.templatesList && (
+						<Grid
+							columns={ 3 }
+							gap={ 4 }
+							align="flex-start"
+							justify="center"
+							className="edit-site-add-new-template__template-list__contents"
+						>
+							<Flex className="edit-site-add-new-template__template-list__prompt">
+								{ __(
+									'Select what the new template should apply to:'
+								) }
+							</Flex>
+							{ missingTemplates.map( ( template ) => {
+								const { title, slug, onClick } = template;
+								return (
+									<TemplateListItem
+										key={ slug }
+										title={ title }
+										direction="column"
+										className="edit-site-add-new-template__template-button"
+										description={
+											TEMPLATE_SHORT_DESCRIPTIONS[ slug ]
+										}
+										icon={
+											TEMPLATE_ICONS[ slug ] || layout
+										}
+										onClick={ () =>
+											onClick
+												? onClick( template )
+												: createTemplate( template )
+										}
+									/>
+								);
+							} ) }
+							<TemplateListItem
+								title={ __( 'Custom template' ) }
+								direction="row"
+								className="edit-site-add-new-template__custom-template-button"
+								icon={ edit }
+								onClick={ () =>
+									setModalContent(
+										modalContentMap.customGenericTemplate
+									)
+								}
+							>
+								<Text
+									lineHeight={ 1.53846153846 } // 20px
 								>
-									{ __( 'Custom template' ) }
-								</MenuItem>
-							</MenuGroup>
-						</NavigableMenu>
-					</>
-				) }
-			</DropdownMenu>
-			{ showCustomTemplateModal && (
-				<AddCustomTemplateModal
-					onClose={ () => setShowCustomTemplateModal( false ) }
-					onSelect={ createTemplate }
-					entityForSuggestions={ entityForSuggestions }
-					isCreatingTemplate={ isCreatingTemplate }
-				/>
-			) }
-			{ showCustomGenericTemplateModal && (
-				<AddCustomGenericTemplateModal
-					onClose={ () => setShowCustomGenericTemplateModal( false ) }
-					createTemplate={ createTemplate }
-					isCreatingTemplate={ isCreatingTemplate }
-				/>
+									{ __(
+										'A custom template can be manually applied to any post or page.'
+									) }
+								</Text>
+							</TemplateListItem>
+						</Grid>
+					) }
+					{ modalContent === modalContentMap.customTemplate && (
+						<AddCustomTemplateModalContent
+							onSelect={ createTemplate }
+							entityForSuggestions={ entityForSuggestions }
+						/>
+					) }
+					{ modalContent ===
+						modalContentMap.customGenericTemplate && (
+						<AddCustomGenericTemplateModalContent
+							onClose={ onModalClose }
+							createTemplate={ createTemplate }
+						/>
+					) }
+				</Modal>
 			) }
 		</>
 	);
 }
 
-function useMissingTemplates(
-	setEntityForSuggestions,
-	setShowCustomTemplateModal
-) {
+function useMissingTemplates( setEntityForSuggestions, onClick ) {
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
@@ -281,7 +376,7 @@ function useMissingTemplates(
 			! existingTemplateSlugs.includes( template.slug )
 	);
 	const onClickMenuItem = ( _entityForSuggestions ) => {
-		setShowCustomTemplateModal( true );
+		onClick?.();
 		setEntityForSuggestions( _entityForSuggestions );
 	};
 	// We need to replace existing default template types with

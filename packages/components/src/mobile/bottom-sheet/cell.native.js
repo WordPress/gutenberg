@@ -10,7 +10,6 @@ import {
 	AccessibilityInfo,
 	Platform,
 } from 'react-native';
-import { isEmpty, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,6 +26,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
 import TouchableRipple from './ripple';
+import LockIcon from './lock-icon';
 
 const isIOS = Platform.OS === 'ios';
 class BottomSheetCell extends Component {
@@ -93,6 +93,8 @@ class BottomSheetCell extends Component {
 			accessibilityHint,
 			accessibilityRole,
 			disabled = false,
+			disabledStyle = styles.cellDisabled,
+			showLockIcon = true,
 			activeOpacity,
 			onPress,
 			onLongPress,
@@ -224,27 +226,38 @@ class BottomSheetCell extends Component {
 				styles.cellValue,
 				styles.cellTextDark
 			);
-			const finalStyle = {
+			const textInputStyle = {
 				...cellValueStyle,
 				...valueStyle,
 				...styleRTL,
+			};
+			const placeholderTextColor = disabled
+				? this.props.getStylesFromColorScheme(
+						styles.placeholderColorDisabled,
+						styles.placeholderColorDisabledDark
+				  ).color
+				: styles.placeholderColor.color;
+			const textStyle = {
+				...( disabled && styles.cellDisabled ),
+				...cellValueStyle,
+				...valueStyle,
 			};
 
 			// To be able to show the `middle` ellipsizeMode on editable cells
 			// we show the TextInput just when the user wants to edit the value,
 			// and the Text component to display it.
 			// We also show the TextInput to display placeholder.
-			const shouldShowPlaceholder = isValueEditable && value === '';
+			const shouldShowPlaceholder = isInteractive && value === '';
 			return this.state.isEditingValue || shouldShowPlaceholder ? (
 				<TextInput
 					ref={ ( c ) => ( this._valueTextInput = c ) }
 					numberOfLines={ 1 }
-					style={ finalStyle }
+					style={ textInputStyle }
 					value={ value }
 					placeholder={ valuePlaceholder }
-					placeholderTextColor={ '#87a6bc' }
+					placeholderTextColor={ placeholderTextColor }
 					onChangeText={ onChangeValue }
-					editable={ isValueEditable }
+					editable={ isValueEditable && ! disabled }
 					pointerEvents={
 						this.state.isEditingValue ? 'auto' : 'none'
 					}
@@ -252,11 +265,12 @@ class BottomSheetCell extends Component {
 					onBlur={ finishEditing }
 					onSubmitEditing={ onSubmit }
 					keyboardType={ this.typeToKeyboardType( type, step ) }
+					disabled={ disabled }
 					{ ...valueProps }
 				/>
 			) : (
 				<Text
-					style={ { ...cellValueStyle, ...valueStyle } }
+					style={ textStyle }
 					numberOfLines={ 1 }
 					ellipsizeMode={ 'middle' }
 				>
@@ -273,8 +287,8 @@ class BottomSheetCell extends Component {
 				return accessibilityLabel || label;
 			}
 
-			if ( isEmpty( value ) ) {
-				return isEmpty( help )
+			if ( ! value ) {
+				return ! help
 					? sprintf(
 							/* translators: accessibility text. Empty state of a inline textinput cell. %s: The cell's title */
 							_x( '%s. Empty', 'inline textinput cell' ),
@@ -288,7 +302,7 @@ class BottomSheetCell extends Component {
 							help
 					  );
 			}
-			return isEmpty( help )
+			return ! help
 				? sprintf(
 						/* translators: accessibility text. Inline textinput title and value.%1: Cell title, %2: cell value. */
 						_x( '%1$s, %2$s', 'inline textinput cell' ),
@@ -323,7 +337,7 @@ class BottomSheetCell extends Component {
 		const opacity =
 			activeOpacity !== undefined
 				? activeOpacity
-				: get( platformStyles, 'activeOpacity.opacity' );
+				: platformStyles.activeOpacity?.opacity;
 
 		return (
 			<TouchableRipple
@@ -362,6 +376,7 @@ class BottomSheetCell extends Component {
 									] }
 								>
 									<Icon
+										lock
 										icon={ icon }
 										size={ 24 }
 										fill={
@@ -416,10 +431,24 @@ class BottomSheetCell extends Component {
 						<Icon
 							icon={ check }
 							fill={ platformStyles.isSelected.color }
+							testID="bottom-sheet-cell-selected-icon"
 						/>
 					) }
 					{ showValue && getValueComponent() }
-					{ children }
+					<View
+						style={ [
+							disabled && disabledStyle,
+							styles.cellRowContainer,
+						] }
+						pointerEvents={ disabled ? 'none' : 'auto' }
+					>
+						{ children }
+					</View>
+					{ disabled && showLockIcon && (
+						<View style={ styles.cellDisabled }>
+							<LockIcon />
+						</View>
+					) }
 				</View>
 				{ help && (
 					<Text style={ [ cellHelpStyle, styles.placeholderColor ] }>

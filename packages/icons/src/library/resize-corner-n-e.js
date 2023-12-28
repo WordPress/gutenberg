@@ -5,7 +5,7 @@ import { Path, SVG } from '@wordpress/primitives';
 
 const resizeCornerNE = (
 	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-		<Path d="M12.5 4.2v1.6h4.7L5.8 17.2V12H4.2v7.8H12v-1.6H6.8L18.2 6.8v4.7h1.6V4.2z" />
+		<Path d="M7 18h4.5v1.5h-7v-7H6V17L17 6h-4.5V4.5h7v7H18V7L7 18Z" />
 	</SVG>
 );
 

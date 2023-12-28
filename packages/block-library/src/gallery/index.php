@@ -44,7 +44,7 @@ add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' 
  * @return string The content of the block being rendered.
  */
 function block_core_gallery_render( $attributes, $content ) {
-	$gap = _wp_array_get( $attributes, array( 'style', 'spacing', 'blockGap' ) );
+	$gap = $attributes['style']['spacing']['blockGap'] ?? null;
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
@@ -99,16 +99,17 @@ function block_core_gallery_render( $attributes, $content ) {
 	}
 
 	// Set the CSS variable to the column value, and the `gap` property to the combined gap value.
-	$gallery_styles   = array();
-	$gallery_styles[] = array(
-		'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
-		'declarations' => array(
-			'--wp--style--unstable-gallery-gap' => $gap_column,
-			'gap'                               => $gap_value,
+	$gallery_styles = array(
+		array(
+			'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
+			'declarations' => array(
+				'--wp--style--unstable-gallery-gap' => $gap_column,
+				'gap'                               => $gap_value,
+			),
 		),
 	);
 
-	gutenberg_style_engine_get_stylesheet_from_css_rules(
+	wp_style_engine_get_stylesheet_from_css_rules(
 		$gallery_styles,
 		array(
 			'context' => 'block-supports',

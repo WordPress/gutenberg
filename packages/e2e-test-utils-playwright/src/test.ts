@@ -2,13 +2,21 @@
  * External dependencies
  */
 import * as path from 'path';
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect, chromium } from '@playwright/test';
 import type { ConsoleMessage } from '@playwright/test';
+import * as getPort from 'get-port';
 
 /**
  * Internal dependencies
  */
-import { Admin, Editor, PageUtils, RequestUtils, SiteEditor } from './index';
+import {
+	Admin,
+	Editor,
+	PageUtils,
+	RequestUtils,
+	Metrics,
+	Lighthouse,
+} from './index';
 
 const STORAGE_STATE_PATH =
 	process.env.STORAGE_STATE_PATH ||
@@ -26,13 +34,13 @@ const OBSERVED_CONSOLE_MESSAGE_TYPES = [ 'warn', 'error' ] as const;
  * Adds a page event handler to emit uncaught exception to process if one of
  * the observed console logging types is encountered.
  *
- * @param  message The console message.
+ * @param message The console message.
  */
 function observeConsoleLogging( message: ConsoleMessage ) {
 	const type = message.type();
 	if (
 		! OBSERVED_CONSOLE_MESSAGE_TYPES.includes(
-			type as typeof OBSERVED_CONSOLE_MESSAGE_TYPES[ number ]
+			type as ( typeof OBSERVED_CONSOLE_MESSAGE_TYPES )[ number ]
 		)
 	) {
 		return;
@@ -85,7 +93,8 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 		return;
 	}
 
-	const logFunction = type as typeof OBSERVED_CONSOLE_MESSAGE_TYPES[ number ];
+	const logFunction =
+		type as ( typeof OBSERVED_CONSOLE_MESSAGE_TYPES )[ number ];
 
 	// Disable reason: We intentionally bubble up the console message
 	// which, unless the test explicitly anticipates the logging via
@@ -102,20 +111,19 @@ const test = base.extend<
 		editor: Editor;
 		pageUtils: PageUtils;
 		snapshotConfig: void;
-		siteEditor: SiteEditor;
+		metrics: Metrics;
+		lighthouse: Lighthouse;
 	},
 	{
 		requestUtils: RequestUtils;
+		lighthousePort: number;
 	}
 >( {
-	admin: async ( { page, pageUtils }, use ) => {
-		await use( new Admin( { page, pageUtils } ) );
+	admin: async ( { page, pageUtils, editor }, use ) => {
+		await use( new Admin( { page, pageUtils, editor } ) );
 	},
 	editor: async ( { page }, use ) => {
 		await use( new Editor( { page } ) );
-	},
-	siteEditor: async ( { page }, use ) => {
-		await use( new SiteEditor( { page } ) );
 	},
 	page: async ( { page }, use ) => {
 		page.on( 'console', observeConsoleLogging );
@@ -123,9 +131,15 @@ const test = base.extend<
 		await use( page );
 
 		// Clear local storage after each test.
-		await page.evaluate( () => {
-			window.localStorage.clear();
-		} );
+		// This needs to be wrapped with a try/catch because it can fail when
+		// the test is skipped (e.g. via fixme).
+		try {
+			await page.evaluate( () => {
+				window.localStorage.clear();
+			} );
+		} catch ( error ) {
+			// noop.
+		}
 
 		await page.close();
 	},
@@ -139,40 +153,34 @@ const test = base.extend<
 				storageStatePath: STORAGE_STATE_PATH,
 			} );
 
-			await Promise.all( [
-				requestUtils.activateTheme( 'twentytwentyone' ),
-				// Disable this test plugin as it's conflicting with some of the tests.
-				// We already have reduced motion enabled and Playwright will wait for most of the animations anyway.
-				requestUtils.deactivatePlugin(
-					'gutenberg-test-plugin-disables-the-css-animations'
-				),
-				requestUtils.deleteAllPosts(),
-				requestUtils.deleteAllBlocks(),
-				requestUtils.resetPreferences(),
-			] );
-
 			await use( requestUtils );
 		},
 		{ scope: 'worker', auto: true },
 	],
-	// An automatic fixture to configure snapshot settings globally.
-	snapshotConfig: [
-		async ( {}, use, testInfo ) => {
-			// A work-around to remove the default snapshot suffix.
-			// See https://github.com/microsoft/playwright/issues/11134
-			testInfo.snapshotSuffix = '';
-			// Normalize snapshots into the same `__snapshots__` folder to minimize
-			// the file name length on Windows.
-			// See https://github.com/WordPress/gutenberg/issues/40291
-			testInfo.snapshotDir = path.join(
-				path.dirname( testInfo.file ),
-				'__snapshots__'
-			);
+	// Spins up a new browser for use by the Lighthouse fixture
+	// so that Lighthouse can connect to the debugging port.
+	// As a worker-scoped fixture, this will only launch 1
+	// instance for the whole test worker, so multiple tests
+	// will share the same instance with the same port.
+	lighthousePort: [
+		async ( {}, use ) => {
+			const port = await getPort();
+			const browser = await chromium.launch( {
+				args: [ `--remote-debugging-port=${ port }` ],
+			} );
 
-			await use();
+			await use( port );
+
+			await browser.close();
 		},
-		{ auto: true },
+		{ scope: 'worker' },
 	],
+	lighthouse: async ( { page, lighthousePort }, use ) => {
+		await use( new Lighthouse( { page, port: lighthousePort } ) );
+	},
+	metrics: async ( { page }, use ) => {
+		await use( new Metrics( { page } ) );
+	},
 } );
 
 export { test, expect };

@@ -45,8 +45,13 @@ import * as commentsPaginationNext from './comments-pagination-next';
 import * as commentsPaginationNumbers from './comments-pagination-numbers';
 import * as commentsTitle from './comments-title';
 import * as cover from './cover';
+import * as details from './details';
 import * as embed from './embed';
 import * as file from './file';
+import * as form from './form';
+import * as formInput from './form-input';
+import * as formSubmitButton from './form-submit-button';
+import * as formSubmissionNotification from './form-submission-notification';
 import * as gallery from './gallery';
 import * as group from './group';
 import * as heading from './heading';
@@ -83,6 +88,7 @@ import * as postFeaturedImage from './post-featured-image';
 import * as postNavigationLink from './post-navigation-link';
 import * as postTemplate from './post-template';
 import * as postTerms from './post-terms';
+import * as postTimeToRead from './post-time-to-read';
 import * as postTitle from './post-title';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
@@ -114,14 +120,15 @@ import * as termDescription from './term-description';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+import * as footnotes from './footnotes';
 
 import isBlockMetadataExperimental from './utils/is-block-metadata-experimental';
 
 /**
  * Function to get all the block-library blocks in an array
  */
-const getAllBlocks = () =>
-	[
+const getAllBlocks = () => {
+	const blocks = [
 		// Common blocks are grouped at the top to prioritize their display
 		// in various contexts — like the inserter and auto-complete components.
 		paragraph,
@@ -139,12 +146,12 @@ const getAllBlocks = () =>
 		buttons,
 		calendar,
 		categories,
-		...( window.wp && window.wp.oldEditor ? [ classic ] : [] ), // Only add the classic block in WP Context.
 		code,
 		column,
 		columns,
 		commentAuthorAvatar,
 		cover,
+		details,
 		embed,
 		file,
 		group,
@@ -173,6 +180,7 @@ const getAllBlocks = () =>
 		textColumns,
 		verse,
 		video,
+		footnotes,
 
 		// theme blocks
 		navigation,
@@ -197,6 +205,7 @@ const getAllBlocks = () =>
 		postTerms,
 		postNavigationLink,
 		postTemplate,
+		postTimeToRead,
 		queryPagination,
 		queryPaginationNext,
 		queryPaginationNumbers,
@@ -222,7 +231,33 @@ const getAllBlocks = () =>
 		termDescription,
 		queryTitle,
 		postAuthorBiography,
-	].filter( Boolean );
+	];
+	if ( window?.__experimentalEnableFormBlocks ) {
+		blocks.push( form );
+		blocks.push( formInput );
+		blocks.push( formSubmitButton );
+		blocks.push( formSubmissionNotification );
+	}
+
+	// When in a WordPress context, conditionally
+	// add the classic block and TinyMCE editor
+	// under any of the following conditions:
+	//   - the current post contains a classic block
+	//   - the experiment to disable TinyMCE isn't active.
+	//   - a query argument specifies that TinyMCE should be loaded
+	if (
+		window?.wp?.oldEditor &&
+		( window?.wp?.needsClassicBlock ||
+			! window?.__experimentalDisableTinymce ||
+			!! new URLSearchParams( window?.location?.search ).get(
+				'requiresTinymce'
+			) )
+	) {
+		blocks.push( classic );
+	}
+
+	return blocks.filter( Boolean );
+};
 
 /**
  * Function to get all the core blocks in an array.
@@ -257,7 +292,11 @@ export const registerCoreBlocks = (
 	blocks.forEach( ( { init } ) => init() );
 
 	setDefaultBlockName( paragraph.name );
-	if ( window.wp && window.wp.oldEditor ) {
+	if (
+		window.wp &&
+		window.wp.oldEditor &&
+		blocks.some( ( { name } ) => name === classic.name )
+	) {
 		setFreeformContentHandlerName( classic.name );
 	}
 	setUnregisteredTypeHandlerName( missing.name );

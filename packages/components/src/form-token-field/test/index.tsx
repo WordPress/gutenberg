@@ -1,3 +1,5 @@
+/* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "expectTokensToBeInTheDocument", "expectTokensNotToBeInTheDocument", "expectVisibleSuggestionsToBe", "expectEscapedProperly"] }] */
+
 /**
  * External dependencies
  */
@@ -42,6 +44,7 @@ const FormTokenFieldWithState = ( {
 				setSelectedValue( tokens );
 				onChange?.( tokens );
 			} }
+			__nextHasNoMarginBottom
 		/>
 	);
 };
@@ -81,6 +84,17 @@ const expectTokensNotToBeInTheDocument = ( tokensText: string[] ) => {
 	tokensText.forEach( ( tokenText ) =>
 		expect( screen.queryByText( tokenText ) ).not.toBeInTheDocument()
 	);
+};
+
+const expectEscapedProperly = ( tokenHtml: string ) => {
+	screen.getByText( ( _, node: Element | null ) => {
+		if ( node === null ) {
+			return false;
+		}
+
+		// This is hacky, but it's a way we can check exactly the output HTML
+		return node.innerHTML === tokenHtml;
+	} );
 };
 
 const expectVisibleSuggestionsToBe = (
@@ -191,7 +205,42 @@ describe( 'FormTokenField', () => {
 			] );
 		} );
 
-		it( "should not add a token with the input's value when pressing the tab key", async () => {
+		it( 'should add a token with the input value with onBlur when `tokenizeOnBlur` prop is `true`', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+
+			const { rerender } = render(
+				<FormTokenFieldWithState onChange={ onChangeSpy } />
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Add 'grapefruit' token by typing it and check blur of field does not tokenize it.
+			await user.type( input, 'grapefruit' );
+			await user.click( document.body );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 0 );
+			expectTokensNotToBeInTheDocument( [ 'grapefruit' ] );
+
+			rerender(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					tokenizeOnBlur
+				/>
+			);
+			await user.clear( input );
+
+			// Add 'grapefruit' token by typing it and check blur of field tokenizes it.
+			await user.type( input, 'grapefruit' );
+
+			await user.click( document.body );
+			expect( onChangeSpy ).toHaveBeenNthCalledWith( 1, [
+				'grapefruit',
+			] );
+			expectTokensToBeInTheDocument( [ 'grapefruit' ] );
+		} );
+
+		it( "should not add a token with the input's value when tokenizeOnBlur is not set and pressing the tab key", async () => {
 			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
@@ -692,6 +741,103 @@ describe( 'FormTokenField', () => {
 			] );
 		} );
 
+		it( 'should render suggestions after a selection is made when the `__experimentalExpandOnFocus` prop is set to `true`', async () => {
+			const user = userEvent.setup();
+
+			const onFocusSpy = jest.fn();
+
+			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
+
+			render(
+				<>
+					<FormTokenFieldWithState
+						onFocus={ onFocusSpy }
+						suggestions={ suggestions }
+						__experimentalExpandOnFocus
+					/>
+				</>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'ee' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Green',
+				'Seaweed',
+			] );
+
+			// Select the first suggestion ("Green")
+			await user.keyboard( '[ArrowDown][Enter]' );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+		} );
+
+		it( 'should not render suggestions after a selection is made when the `__experimentalExpandOnFocus` prop is set to `false` or not defined', async () => {
+			const user = userEvent.setup();
+
+			const onFocusSpy = jest.fn();
+
+			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
+
+			render(
+				<>
+					<FormTokenFieldWithState
+						onFocus={ onFocusSpy }
+						suggestions={ suggestions }
+					/>
+				</>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'ee' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Green',
+				'Seaweed',
+			] );
+
+			// Select the first suggestion ("Green")
+			await user.keyboard( '[ArrowDown][Enter]' );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should not render suggestions after the input is blurred', async () => {
+			const user = userEvent.setup();
+
+			const onFocusSpy = jest.fn();
+
+			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
+
+			render(
+				<>
+					<FormTokenFieldWithState
+						onFocus={ onFocusSpy }
+						suggestions={ suggestions }
+					/>
+				</>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'ee' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Green',
+				'Seaweed',
+			] );
+
+			// Select the first suggestion ("Green")
+			await user.keyboard( '[ArrowDown][Enter]' );
+
+			// Click the body, blurring the input.
+			await user.click( document.body );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
 		it( 'should not render suggestions if the text input is not matching any of the suggestions', async () => {
 			const user = userEvent.setup();
 
@@ -935,6 +1081,86 @@ describe( 'FormTokenField', () => {
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 			expect( onChangeSpy ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should hide the suggestion list on an empty input', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [ 'One', 'Two', 'Three' ];
+
+			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'on' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'One',
+			] );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.clear( input );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should hide the suggestion list on blur and invalid input', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [ 'One', 'Two', 'Three' ];
+
+			render(
+				<FormTokenFieldWithState
+					suggestions={ suggestions }
+					__experimentalValidateInput={ ( token ) =>
+						suggestions.includes( token )
+					}
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'on' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'One',
+			] );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.click( document.body );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should not hide the suggestion list on blur and valid input', async () => {
+			const user = userEvent.setup();
+
+			const suggestions = [ 'One', 'Two', 'Three' ];
+
+			render(
+				<FormTokenFieldWithState
+					suggestions={ suggestions }
+					__experimentalValidateInput={ ( token ) =>
+						suggestions.includes( token )
+					}
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'One' );
+
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'One',
+			] );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.click( document.body );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
 		} );
 
 		it( 'matches the search text with the suggestions in a case-insensitive way', async () => {
@@ -1233,13 +1459,29 @@ describe( 'FormTokenField', () => {
 			expect( screen.getByTitle( 'España' ) ).toBeVisible();
 		} );
 
-		it( 'should be still used to filter out duplicate suggestions', () => {
+		it( 'should be still used to filter out duplicate suggestions', async () => {
+			const user = userEvent.setup();
+
 			render(
 				<FormTokenFieldWithState
 					__experimentalExpandOnFocus
-					initialValue={ [ { value: 'France' }, { value: 'Spain' } ] }
+					initialValue={ [
+						{ value: 'Slovenia' },
+						{ value: 'Spain' },
+					] }
+					suggestions={ [ 'Slovenia', 'Slovakia', 'Sweden' ] }
 				/>
 			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Typing `slov` will match both `Slovenia` and `Slovakia`.
+			await user.type( input, 'slov' );
+
+			// However, `Slovenia` is already selected.
+			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+				'Slovakia',
+			] );
 		} );
 	} );
 
@@ -1516,15 +1758,7 @@ describe( 'FormTokenField', () => {
 				'a&nbsp;&nbsp;&nbsp;b',
 				'i&nbsp;&lt;3&nbsp;tags',
 				'1&amp;2&amp;3&amp;4',
-			].forEach( ( tokenHtml ) => {
-				screen.getByText( ( _, node: Element | null ) => {
-					if ( node === null ) {
-						return false;
-					}
-
-					return node.innerHTML === tokenHtml;
-				} );
-			} );
+			].forEach( ( tokenHtml ) => expectEscapedProperly( tokenHtml ) );
 		} );
 
 		it( 'should allow to pass a function that renders tokens with special characters correctly', async () => {
@@ -1546,15 +1780,7 @@ describe( 'FormTokenField', () => {
 				'a&nbsp;&nbsp;&nbsp;b',
 				'i&nbsp;&lt;3&nbsp;tags',
 				'1&amp;2&amp;3&amp;4',
-			].forEach( ( tokenHtml ) => {
-				screen.getByText( ( _, node: Element | null ) => {
-					if ( node === null ) {
-						return false;
-					}
-
-					return node.innerHTML === tokenHtml;
-				} );
-			} );
+			].forEach( ( tokenHtml ) => expectEscapedProperly( tokenHtml ) );
 		} );
 	} );
 

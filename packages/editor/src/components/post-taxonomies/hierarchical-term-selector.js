@@ -1,24 +1,23 @@
 /**
- * External dependencies
- */
-import { get, unescape as unescapeString } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 import {
 	Button,
 	CheckboxControl,
 	TextControl,
 	TreeSelect,
 	withFilters,
+	Flex,
+	FlexItem,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -150,7 +149,7 @@ export function getFilterMatcher( filterValue ) {
  *
  * @param {Object} props      Component props.
  * @param {string} props.slug Taxonomy slug.
- * @return {WPElement}        Hierarchical term selector component.
+ * @return {Element}        Hierarchical term selector component.
  */
 export function HierarchicalTermSelector( { slug } ) {
 	const [ adding, setAdding ] = useState( false );
@@ -178,27 +177,18 @@ export function HierarchicalTermSelector( { slug } ) {
 			const { getTaxonomy, getEntityRecords, isResolving } =
 				select( coreStore );
 			const _taxonomy = getTaxonomy( slug );
+			const post = getCurrentPost();
 
 			return {
 				hasCreateAction: _taxonomy
-					? get(
-							getCurrentPost(),
-							[
-								'_links',
-								'wp:action-create-' + _taxonomy.rest_base,
-							],
-							false
-					  )
+					? post._links?.[
+							'wp:action-create-' + _taxonomy.rest_base
+					  ] ?? false
 					: false,
 				hasAssignAction: _taxonomy
-					? get(
-							getCurrentPost(),
-							[
-								'_links',
-								'wp:action-assign-' + _taxonomy.rest_base,
-							],
-							false
-					  )
+					? post._links?.[
+							'wp:action-assign-' + _taxonomy.rest_base
+					  ] ?? false
 					: false,
 				terms: _taxonomy
 					? getEditedPostAttribute( _taxonomy.rest_base )
@@ -227,6 +217,8 @@ export function HierarchicalTermSelector( { slug } ) {
 		[ availableTerms ]
 	);
 
+	const { createErrorNotice } = useDispatch( noticesStore );
+
 	if ( ! hasAssignAction ) {
 		return null;
 	}
@@ -238,7 +230,9 @@ export function HierarchicalTermSelector( { slug } ) {
 	 * @return {Promise} A promise that resolves to save term object.
 	 */
 	const addTerm = ( term ) => {
-		return saveEntityRecord( 'taxonomy', slug, term );
+		return saveEntityRecord( 'taxonomy', slug, term, {
+			throwOnError: true,
+		} );
 	};
 
 	/**
@@ -300,20 +294,24 @@ export function HierarchicalTermSelector( { slug } ) {
 			return;
 		}
 		setAdding( true );
-
-		const newTerm = await addTerm( {
-			name: formName,
-			parent: formParent ? formParent : undefined,
-		} );
-
+		let newTerm;
+		try {
+			newTerm = await addTerm( {
+				name: formName,
+				parent: formParent ? formParent : undefined,
+			} );
+		} catch ( error ) {
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+			} );
+			return;
+		}
+		const defaultName =
+			slug === 'category' ? __( 'Category' ) : __( 'Term' );
 		const termAddedMessage = sprintf(
 			/* translators: %s: taxonomy name */
 			_x( '%s added', 'term' ),
-			get(
-				taxonomy,
-				[ 'labels', 'singular_name' ],
-				slug === 'category' ? __( 'Category' ) : __( 'Term' )
-			)
+			taxonomy?.labels?.singular_name ?? defaultName
 		);
 		speak( termAddedMessage, 'assertive' );
 		setAdding( false );
@@ -364,7 +362,7 @@ export function HierarchicalTermSelector( { slug } ) {
 							const termId = parseInt( term.id, 10 );
 							onChange( termId );
 						} }
-						label={ unescapeString( term.name ) }
+						label={ decodeEntities( term.name ) }
 					/>
 					{ !! term.children.length && (
 						<div className="editor-post-taxonomies__hierarchical-terms-subchoices">
@@ -381,11 +379,9 @@ export function HierarchicalTermSelector( { slug } ) {
 		fallbackIsCategory,
 		fallbackIsNotCategory
 	) =>
-		get(
-			taxonomy,
-			[ 'labels', labelProperty ],
-			slug === 'category' ? fallbackIsCategory : fallbackIsNotCategory
-		);
+		taxonomy?.labels?.[ labelProperty ] ??
+		( slug === 'category' ? fallbackIsCategory : fallbackIsNotCategory );
+
 	const newTermButtonLabel = labelWithFallback(
 		'add_new_item',
 		__( 'Add new category' ),
@@ -403,19 +399,15 @@ export function HierarchicalTermSelector( { slug } ) {
 	);
 	const noParentOption = `— ${ parentSelectLabel } —`;
 	const newTermSubmitLabel = newTermButtonLabel;
-	const filterLabel = get(
-		taxonomy,
-		[ 'labels', 'search_items' ],
-		__( 'Search Terms' )
-	);
-	const groupLabel = get( taxonomy, [ 'name' ], __( 'Terms' ) );
+	const filterLabel = taxonomy?.labels?.search_items ?? __( 'Search Terms' );
+	const groupLabel = taxonomy?.name ?? __( 'Terms' );
 	const showFilter = availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER;
 
 	return (
-		<>
+		<Flex direction="column" gap="4">
 			{ showFilter && (
 				<TextControl
-					className="editor-post-taxonomies__hierarchical-terms-filter"
+					__nextHasNoMarginBottom
 					label={ filterLabel }
 					value={ filterValue }
 					onChange={ setFilter }
@@ -432,43 +424,51 @@ export function HierarchicalTermSelector( { slug } ) {
 				) }
 			</div>
 			{ ! loading && hasCreateAction && (
-				<Button
-					onClick={ onToggleForm }
-					className="editor-post-taxonomies__hierarchical-terms-add"
-					aria-expanded={ showForm }
-					variant="link"
-				>
-					{ newTermButtonLabel }
-				</Button>
+				<FlexItem>
+					<Button
+						onClick={ onToggleForm }
+						className="editor-post-taxonomies__hierarchical-terms-add"
+						aria-expanded={ showForm }
+						variant="link"
+					>
+						{ newTermButtonLabel }
+					</Button>
+				</FlexItem>
 			) }
 			{ showForm && (
 				<form onSubmit={ onAddTerm }>
-					<TextControl
-						className="editor-post-taxonomies__hierarchical-terms-input"
-						label={ newTermLabel }
-						value={ formName }
-						onChange={ onChangeFormName }
-						required
-					/>
-					{ !! availableTerms.length && (
-						<TreeSelect
-							label={ parentSelectLabel }
-							noOptionLabel={ noParentOption }
-							onChange={ onChangeFormParent }
-							selectedId={ formParent }
-							tree={ availableTermsTree }
+					<Flex direction="column" gap="4">
+						<TextControl
+							__nextHasNoMarginBottom
+							className="editor-post-taxonomies__hierarchical-terms-input"
+							label={ newTermLabel }
+							value={ formName }
+							onChange={ onChangeFormName }
+							required
 						/>
-					) }
-					<Button
-						variant="secondary"
-						type="submit"
-						className="editor-post-taxonomies__hierarchical-terms-submit"
-					>
-						{ newTermSubmitLabel }
-					</Button>
+						{ !! availableTerms.length && (
+							<TreeSelect
+								__nextHasNoMarginBottom
+								label={ parentSelectLabel }
+								noOptionLabel={ noParentOption }
+								onChange={ onChangeFormParent }
+								selectedId={ formParent }
+								tree={ availableTermsTree }
+							/>
+						) }
+						<FlexItem>
+							<Button
+								variant="secondary"
+								type="submit"
+								className="editor-post-taxonomies__hierarchical-terms-submit"
+							>
+								{ newTermSubmitLabel }
+							</Button>
+						</FlexItem>
+					</Flex>
 				</form>
 			) }
-		</>
+		</Flex>
 	);
 }
 

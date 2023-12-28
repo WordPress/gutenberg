@@ -12,6 +12,7 @@ process.on( 'unhandledRejection', ( err ) => {
 /**
  * External dependencies
  */
+const path = require( 'path' );
 const jest = require( 'jest' );
 const { sync: spawn } = require( 'cross-spawn' );
 
@@ -51,6 +52,7 @@ const config = configFile
 	? [ '--config', JSON.stringify( require( configFile ) ) ]
 	: [];
 
+// Force e2e tests to run serially, not in parallel. They test against a shared Docker instance
 const hasRunInBand = hasArgInCLI( '--runInBand' ) || hasArgInCLI( '-i' );
 const runInBand = ! hasRunInBand ? [ '--runInBand' ] : [];
 
@@ -75,6 +77,14 @@ Object.entries( configsMapping ).forEach( ( [ envKey, argName ] ) => {
 		process.env[ envKey ] = getArgFromCLI( argName );
 	}
 } );
+
+// Set the default artifacts path.
+if ( ! process.env.WP_ARTIFACTS_PATH ) {
+	process.env.WP_ARTIFACTS_PATH = path.resolve(
+		process.env.GITHUB_WORKSPACE || process.cwd(),
+		'artifacts'
+	);
+}
 
 const cleanUpPrefixes = [ '--puppeteer-', '--wordpress-' ];
 

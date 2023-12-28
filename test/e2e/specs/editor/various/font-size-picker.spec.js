@@ -8,34 +8,25 @@ test.describe( 'Font Size Picker', () => {
 		await admin.createNewPost();
 	} );
 
+	test.afterEach( async ( { page } ) => {
+		const closeButton = page.locator(
+			'role=region[name="Editor settings"i] >> role=button[name^="Close settings"i]'
+		);
+
+		if ( await closeButton.isVisible() ) {
+			await closeButton.click();
+		}
+	} );
+
 	test.describe( 'Common', () => {
-		test( 'should apply a named font size using the font size input', async ( {
-			editor,
-			page,
-		} ) => {
-			await editor.openDocumentSettingsSidebar();
-			await page.click( 'role=button[name="Add default block"i]' );
-			await page.keyboard.type( 'Paragraph to be made "small"' );
-			await page.click(
-				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
-			);
-			await page.click( 'role=spinbutton[name="Custom"i]' );
-
-			// This should be the "small" font-size of the editor defaults.
-			await page.keyboard.type( '13' );
-
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:paragraph {"fontSize":"small"} -->
-<p class="has-small-font-size">Paragraph to be made "small"</p>
-<!-- /wp:paragraph -->` );
-		} );
-
 		test( 'should apply a custom font size using the font size input', async ( {
 			editor,
 			page,
 		} ) => {
 			await editor.openDocumentSettingsSidebar();
-			await page.click( 'role=button[name="Add default block"i]' );
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
 			await page.keyboard.type( 'Paragraph to be made "small"' );
 			await page.click(
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
@@ -56,7 +47,9 @@ test.describe( 'Font Size Picker', () => {
 			pageUtils,
 		} ) => {
 			await editor.openDocumentSettingsSidebar();
-			await page.click( 'role=button[name="Add default block"i]' );
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
 			await page.keyboard.type( 'Paragraph reset - custom size' );
 			await page.click(
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
@@ -69,7 +62,7 @@ test.describe( 'Font Size Picker', () => {
 <p style="font-size:23px">Paragraph reset - custom size</p>
 <!-- /wp:paragraph -->` );
 
-			await pageUtils.pressKeyTimes( 'Backspace', 2 );
+			await pageUtils.pressKeys( 'Backspace', { times: 2 } );
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:paragraph -->
 <p>Paragraph reset - custom size</p>
@@ -92,11 +85,11 @@ test.describe( 'Font Size Picker', () => {
 					return doSet( obj, 0 );
 				}
 
-				window.wp.data.dispatch( 'core/block-editor' ).updateSettings(
+				window.wp.data.dispatch( 'core/editor' ).updateEditorSettings(
 					setDeep(
 						window.wp.data
-							.select( 'core/block-editor' )
-							.getSettings(),
+							.select( 'core/editor' )
+							.getEditorSettings(),
 						[
 							'__experimentalFeatures',
 							'typography',
@@ -146,12 +139,14 @@ test.describe( 'Font Size Picker', () => {
 			pageUtils,
 		} ) => {
 			await editor.openDocumentSettingsSidebar();
-			await page.click( 'role=button[name="Add default block"i]' );
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
 			await page.keyboard.type( 'Paragraph to be made "large"' );
 			await page.click(
 				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
 			);
-			await pageUtils.pressKeyTimes( 'ArrowDown', 4 );
+			await pageUtils.pressKeys( 'ArrowDown', { times: 4 } );
 			await page.keyboard.press( 'Enter' );
 
 			await expect.poll( editor.getEditedPostContent )
@@ -166,14 +161,16 @@ test.describe( 'Font Size Picker', () => {
 			pageUtils,
 		} ) => {
 			await editor.openDocumentSettingsSidebar();
-			await page.click( 'role=button[name="Add default block"i]' );
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
 			await page.keyboard.type(
 				'Paragraph with font size reset using tools panel menu'
 			);
 			await page.click(
 				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
 			);
-			await pageUtils.pressKeyTimes( 'ArrowDown', 3 );
+			await pageUtils.pressKeys( 'ArrowDown', { times: 3 } );
 			await page.keyboard.press( 'Enter' );
 
 			await expect.poll( editor.getEditedPostContent )
@@ -183,6 +180,7 @@ test.describe( 'Font Size Picker', () => {
 
 			await page.click( 'role=button[name="Typography options"i]' );
 			await page.click( 'role=menuitem[name="Reset Font size"i]' );
+			await page.keyboard.press( 'Escape' ); // Close the menu
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:paragraph -->
@@ -196,14 +194,16 @@ test.describe( 'Font Size Picker', () => {
 			pageUtils,
 		} ) => {
 			await editor.openDocumentSettingsSidebar();
-			await page.click( 'role=button[name="Add default block"i]' );
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
 			await page.keyboard.type(
 				'Paragraph with font size reset using input field'
 			);
 			await page.click(
 				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
 			);
-			await pageUtils.pressKeyTimes( 'ArrowDown', 2 );
+			await pageUtils.pressKeys( 'ArrowDown', { times: 2 } );
 			await page.keyboard.press( 'Enter' );
 
 			await expect.poll( editor.getEditedPostContent )
@@ -215,7 +215,7 @@ test.describe( 'Font Size Picker', () => {
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
 			);
 			await page.click( 'role=spinbutton[name="Custom"i]' );
-			await pageUtils.pressKeyWithModifier( 'primary', 'A' );
+			await pageUtils.pressKeys( 'primary+A' );
 			await page.keyboard.press( 'Backspace' );
 
 			await expect.poll( editor.getEditedPostContent )
@@ -231,7 +231,9 @@ test.describe( 'Font Size Picker', () => {
 			page,
 		} ) => {
 			await editor.openDocumentSettingsSidebar();
-			await page.click( 'role=button[name="Add default block"i]' );
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
 			await page.keyboard.type( 'Paragraph to be made "large"' );
 			await page.click(
 				'role=radiogroup[name="Font size"i] >> role=radio[name="Large"i]'
@@ -248,7 +250,9 @@ test.describe( 'Font Size Picker', () => {
 			page,
 		} ) => {
 			await editor.openDocumentSettingsSidebar();
-			await page.click( 'role=button[name="Add default block"i]' );
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
 			await page.keyboard.type(
 				'Paragraph with font size reset using tools panel menu'
 			);
@@ -263,6 +267,7 @@ test.describe( 'Font Size Picker', () => {
 
 			await page.click( 'role=button[name="Typography options"i]' );
 			await page.click( 'role=menuitem[name="Reset Font size"i]' );
+			await page.keyboard.press( 'Escape' ); // Close the menu
 
 			await expect.poll( editor.getEditedPostContent )
 				.toBe( `<!-- wp:paragraph -->
@@ -276,7 +281,9 @@ test.describe( 'Font Size Picker', () => {
 			pageUtils,
 		} ) => {
 			await editor.openDocumentSettingsSidebar();
-			await page.click( 'role=button[name="Add default block"i]' );
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
 			await page.keyboard.type(
 				'Paragraph with font size reset using input field'
 			);
@@ -293,7 +300,7 @@ test.describe( 'Font Size Picker', () => {
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
 			);
 			await page.click( 'role=spinbutton[name="Custom"i]' );
-			await pageUtils.pressKeyWithModifier( 'primary', 'A' );
+			await pageUtils.pressKeys( 'primary+A' );
 			await page.keyboard.press( 'Backspace' );
 
 			await expect.poll( editor.getEditedPostContent )

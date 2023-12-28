@@ -14,7 +14,7 @@ In this Document:
 	- [Block patterns contextual to block types and pattern transformations](#block-patterns-contextual-to-block-types-and-pattern-transformations)
 	- [Semantic block patterns](#semantic-block-patterns)
 
-## Block Patterns
+## Block patterns
 
 ### register_block_pattern
 
@@ -36,6 +36,7 @@ The properties available for block patterns are:
 -   `postTypes` (optional): An array of post types that the pattern is restricted to be used with. The pattern will only be available when editing one of the post types passed on the array, for all the other post types the pattern is not available at all.
 -   `templateTypes` (optional): An array of template types where the pattern makes sense e.g: '404' if the pattern is for a 404 page, single-post if the pattern is for showing a single post.
 -   `inserter` (optional): By default, all patterns will appear in the inserter. To hide a pattern so that it can only be inserted programmatically, set the `inserter` to `false`.
+-   `source` (optional): A string that denotes the source of the pattern. For a plugin registering a pattern, pass the string 'plugin'. For a theme, pass the string 'theme'.
 
 The following code sample registers a block pattern named 'my-plugin/my-awesome-pattern':
 
@@ -62,7 +63,7 @@ function my_plugin_register_my_patterns() {
 add_action( 'init', 'my_plugin_register_my_patterns' );
 ```
 
-## Unregistering Block Patterns
+## Unregistering block patterns
 
 ### unregister_block_pattern
 
@@ -87,7 +88,7 @@ function my_plugin_unregister_my_patterns() {
 add_action( 'init', 'my_plugin_unregister_my_patterns' );
 ```
 
-## Block Pattern Categories
+## Block pattern categories
 
 Block patterns can be grouped using categories. The block editor comes with bundled categories you can use on your custom block patterns. You can also register your own block pattern categories.
 
@@ -193,7 +194,7 @@ register_block_pattern(
 );
 ```
 
-In the above example if we select **one of the two** block types, either a paragraph or a heading block, this pattern will be suggested by transforming the selected block using its content and will also add the remaing blocks from the pattern. If on the other hand we multi select one paragraph and one heading block, both blocks will be transformed.
+In the above example if we select **one of the two** block types, either a paragraph or a heading block, this pattern will be suggested by transforming the selected block using its content and will also add the remaining blocks from the pattern. If on the other hand we multi select one paragraph and one heading block, both blocks will be transformed.
 
 Blocks can also use these contextual block patterns in other places. For instance, when inserting a new Query Loop block, the user is provided with a list of all patterns attached to the block.
 

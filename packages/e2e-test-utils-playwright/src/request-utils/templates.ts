@@ -10,6 +10,13 @@ interface Template {
 	id: string;
 }
 
+interface CreateTemplatePayload {
+	slug: string;
+	title?: string;
+	content?: string;
+	description?: string;
+}
+
 const PATH_MAPPING = {
 	wp_template: '/wp/v2/templates',
 	wp_template_part: '/wp/v2/template-parts',
@@ -18,8 +25,8 @@ const PATH_MAPPING = {
 /**
  * Delete all the templates of given type.
  *
- * @param  this
- * @param  type - Template type to delete.
+ * @param this
+ * @param type - Template type to delete.
  */
 async function deleteAllTemplates( this: RequestUtils, type: TemplateType ) {
 	const path = PATH_MAPPING[ type ];
@@ -52,4 +59,25 @@ async function deleteAllTemplates( this: RequestUtils, type: TemplateType ) {
 	}
 }
 
-export { deleteAllTemplates };
+/**
+ * Creates a new template using the REST API.
+ *
+ * @param this
+ * @param type    Template type to delete.
+ * @param payload Template attributes.
+ */
+async function createTemplate(
+	this: RequestUtils,
+	type: TemplateType,
+	payload: CreateTemplatePayload
+) {
+	const template = await this.rest< Template >( {
+		method: 'POST',
+		path: PATH_MAPPING[ type ],
+		params: { ...payload, type, status: 'publish', is_wp_suggestion: true },
+	} );
+
+	return template;
+}
+
+export { deleteAllTemplates, createTemplate };

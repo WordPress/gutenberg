@@ -4,9 +4,9 @@
 import { __ } from '@wordpress/i18n';
 import { Spinner } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { withSelect } from '@wordpress/data';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -15,6 +15,8 @@ import DownloadableBlocksList from '../downloadable-blocks-list';
 import DownloadableBlocksInserterPanel from './inserter-panel';
 import DownloadableBlocksNoResults from './no-results';
 import { store as blockDirectoryStore } from '../../store';
+
+const EMPTY_ARRAY = [];
 
 function DownloadableBlocksPanel( {
 	downloadableItems,
@@ -70,10 +72,12 @@ function DownloadableBlocksPanel( {
 }
 
 export default compose( [
-	withSelect( ( select, { filterValue, rootClientId = null } ) => {
-		const { getDownloadableBlocks, isRequestingDownloadableBlocks } =
-			select( blockDirectoryStore );
-		const { canInsertBlockType } = select( blockEditorStore );
+	withSelect( ( select, { filterValue } ) => {
+		const {
+			getDownloadableBlocks,
+			isRequestingDownloadableBlocks,
+			getInstalledBlockTypes,
+		} = select( blockDirectoryStore );
 
 		const hasPermission = select( coreStore ).canUser(
 			'read',
@@ -81,14 +85,35 @@ export default compose( [
 		);
 
 		function getInstallableBlocks( term ) {
-			return getDownloadableBlocks( term ).filter( ( block ) =>
-				canInsertBlockType( block, rootClientId, true )
-			);
+			const downloadableBlocks = getDownloadableBlocks( term );
+			const installedBlockTypes = getInstalledBlockTypes();
+			// Filter out blocks that are already installed.
+			const installableBlocks = downloadableBlocks.filter( ( block ) => {
+				// Check if the block has just been installed, in which case it
+				// should still show in the list to avoid suddenly disappearing.
+				// `installedBlockTypes` only returns blocks stored in state
+				// immediately after installation, not all installed blocks.
+				const isJustInstalled = !! installedBlockTypes.find(
+					( blockType ) => blockType.name === block.name
+				);
+				const isPreviouslyInstalled = getBlockType( block.name );
+				return isJustInstalled || ! isPreviouslyInstalled;
+			} );
+
+			if ( downloadableBlocks.length === installableBlocks.length ) {
+				return downloadableBlocks;
+			}
+			return installableBlocks;
 		}
 
-		const downloadableItems = hasPermission
+		let downloadableItems = hasPermission
 			? getInstallableBlocks( filterValue )
 			: [];
+
+		if ( downloadableItems.length === 0 ) {
+			downloadableItems = EMPTY_ARRAY;
+		}
+
 		const isLoading = isRequestingDownloadableBlocks( filterValue );
 
 		return {

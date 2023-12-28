@@ -1,5 +1,5 @@
 .show-icon-labels {
-	.block-editor-block-inspector__tabs .components-tab-panel__tabs {
+	.block-editor-block-inspector__tabs [role="tablist"] {
 		.components-button.has-icon {
 			// Hide the button icons when labels are set to display...
 			svg {
@@ -12,4 +12,25 @@
 			}
 		}
 	}
+}
+
+.block-editor-inspector-controls-tabs__hint {
+	align-items: flex-start;
+	background: $gray-100;
+	border-radius: $radius-block-ui;
+	color: $gray-900;
+	display: flex;
+	flex-direction: row;
+	margin: $grid-unit-20;
+	font-size: $default-font-size;
+}
+
+.block-editor-inspector-controls-tabs__hint-content {
+	margin: $grid-unit-15 0 $grid-unit-15 $grid-unit-15;
+}
+
+.block-editor-inspector-controls-tabs__hint-dismiss {
+	// The dismiss button has a lot of empty space through its padding.
+	// Apply margin to visually align the icon with the top of the text to its left.
+	margin: $grid-unit-05 $grid-unit-05 $grid-unit-05 0;
 }

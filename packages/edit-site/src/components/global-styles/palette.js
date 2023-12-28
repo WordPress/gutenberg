@@ -13,7 +13,7 @@ import {
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { shuffle } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -22,9 +22,9 @@ import Subtitle from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
 import { useColorRandomizer } from './hooks';
 import ColorIndicatorWrapper from './color-indicator-wrapper';
-import { unlock } from '../../experiments';
+import { unlock } from '../../lock-unlock';
 
-const { useGlobalSetting } = unlock( blockEditorExperiments );
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 const EMPTY_COLORS = [];
 
@@ -65,7 +65,7 @@ function Palette( { name } ) {
 
 	return (
 		<VStack spacing={ 3 }>
-			<Subtitle>{ __( 'Palette' ) }</Subtitle>
+			<Subtitle level={ 3 }>{ __( 'Palette' ) }</Subtitle>
 			<ItemGroup isBordered isSeparated>
 				<NavigationButtonAsItem
 					path={ screenPath }
@@ -91,15 +91,16 @@ function Palette( { name } ) {
 					</HStack>
 				</NavigationButtonAsItem>
 			</ItemGroup>
-			{ randomizeThemeColors && (
-				<Button
-					variant="secondary"
-					icon={ shuffle }
-					onClick={ randomizeThemeColors }
-				>
-					{ __( 'Randomize colors' ) }
-				</Button>
-			) }
+			{ window.__experimentalEnableColorRandomizer &&
+				themeColors?.length > 0 && (
+					<Button
+						variant="secondary"
+						icon={ shuffle }
+						onClick={ randomizeThemeColors }
+					>
+						{ __( 'Randomize colors' ) }
+					</Button>
+				) }
 		</VStack>
 	);
 }

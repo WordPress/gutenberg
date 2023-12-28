@@ -19,3 +19,12 @@ if ( ! window.wp?.galleryBlockV2Enabled ) {
 }
 
 global.ResizeObserver = require( 'resize-observer-polyfill' );
+
+/**
+ * The following mock is for block integration tests that might render
+ * components leveraging DOMRect. For example, the Cover block which now renders
+ * its ResizableBox control via the BlockPopover component.
+ */
+if ( ! window.DOMRect ) {
+	window.DOMRect = class DOMRect {};
+}

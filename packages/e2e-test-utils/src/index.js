@@ -51,7 +51,6 @@ export {
 	searchForBlockDirectoryBlock,
 	insertBlock,
 	insertPattern,
-	insertReusableBlock,
 	insertBlockDirectoryBlock,
 } from './inserter';
 export { installPlugin } from './install-plugin';
@@ -59,6 +58,7 @@ export { installTheme } from './install-theme';
 export { isCurrentURL } from './is-current-url';
 export { isInDefaultBlock } from './is-in-default-block';
 export { loginUser } from './login-user';
+export { logout } from './logout';
 export { createMenu, deleteAllMenus } from './menus';
 export {
 	enableFocusLossObservation,
@@ -103,7 +103,7 @@ export {
 	rest as __experimentalRest,
 	batch as __experimentalBatch,
 } from './rest-api';
-export { openListView, closeListView } from './list-view';
+export { isListViewOpen, openListView, closeListView } from './list-view';
 export {
 	disableSiteEditorWelcomeGuide,
 	getCurrentSiteEditorContent,

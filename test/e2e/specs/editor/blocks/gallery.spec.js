@@ -47,14 +47,16 @@ test.describe( 'Gallery', () => {
 	} ) => {
 		await admin.createNewPost();
 
-		await pageUtils.setClipboardData( {
+		pageUtils.setClipboardData( {
 			plainText: `[gallery ids="${ uploadedMedia.id }"]`,
 		} );
 
-		await page.click( 'role=button[name="Add default block"i]' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'v' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await pageUtils.pressKeys( 'primary+v' );
 
-		const img = page.locator(
+		const img = editor.canvas.locator(
 			'role=document[name="Block: Image"i] >> role=img'
 		);
 
@@ -87,12 +89,11 @@ test.describe( 'Gallery', () => {
 	test( 'can be created using uploaded images', async ( {
 		admin,
 		editor,
-		page,
 		galleryBlockUtils,
 	} ) => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/gallery' } );
-		const galleryBlock = page.locator(
+		const galleryBlock = editor.canvas.locator(
 			'role=document[name="Block: Gallery"i]'
 		);
 		await expect( galleryBlock ).toBeVisible();
@@ -132,16 +133,18 @@ test.describe( 'Gallery', () => {
 			],
 		} );
 
-		const gallery = page.locator( 'role=document[name="Block: Gallery"i]' );
+		const gallery = editor.canvas.locator(
+			'role=document[name="Block: Gallery"i]'
+		);
 
 		await expect( gallery ).toBeVisible();
 		await editor.selectBlocks( gallery );
+		await editor.clickBlockToolbarButton( 'Add caption' );
 
 		const caption = gallery.locator(
 			'role=textbox[name="Gallery caption text"i]'
 		);
-		await expect( caption ).toBeVisible();
-		await caption.click();
+		await expect( caption ).toBeFocused();
 
 		await page.keyboard.type( galleryCaption );
 
@@ -173,7 +176,7 @@ test.describe( 'Gallery', () => {
 			],
 		} );
 
-		const galleryImage = page.locator(
+		const galleryImage = editor.canvas.locator(
 			'role=document[name="Block: Gallery"i] >> role=document[name="Block: Image"i]'
 		);
 		const imageCaption = galleryImage.locator(
@@ -203,7 +206,9 @@ test.describe( 'Gallery', () => {
 	} ) => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/gallery' } );
-		await page.click( 'role=button[name="Media Library"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Media Library"i]' )
+			.click();
 
 		const mediaLibrary = page.locator(
 			'role=dialog[name="Create gallery"i]'

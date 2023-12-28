@@ -13,7 +13,7 @@ const packageNames = fs.readdirSync( PACKAGES_DIR ).filter( ( file ) => {
 module.exports = {
 	watchFolders: [ path.resolve( __dirname, '../..' ) ],
 	resolver: {
-		sourceExts: [ 'js', 'json', 'scss', 'sass', 'ts', 'tsx' ],
+		sourceExts: [ 'js', 'cjs', 'json', 'scss', 'sass', 'ts', 'tsx' ],
 		platforms: [ 'native', 'android', 'ios' ],
 	},
 	transformer: {
@@ -27,6 +27,7 @@ module.exports = {
 				inlineRequires: false,
 			},
 		} ),
+		unstable_allowRequireContext: true, // Used for optional setup configuration.
 	},
 	server: {
 		enhanceMiddleware: ( middleware ) => ( req, res, next ) => {

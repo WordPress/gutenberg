@@ -28,11 +28,23 @@ export const getActiveComplementaryArea = createRegistrySelector(
 		}
 
 		// Return `null` to indicate the user hid the complementary area.
-		if ( ! isComplementaryAreaVisible ) {
+		if ( isComplementaryAreaVisible === false ) {
 			return null;
 		}
 
 		return state?.complementaryAreas?.[ scope ];
+	}
+);
+
+export const isComplementaryAreaLoading = createRegistrySelector(
+	( select ) => ( state, scope ) => {
+		const isVisible = select( preferencesStore ).get(
+			scope,
+			'isComplementaryAreaVisible'
+		);
+		const identifier = state?.complementaryAreas?.[ scope ];
+
+		return isVisible && identifier === undefined;
 	}
 );
 
@@ -78,3 +90,15 @@ export const isFeatureActive = createRegistrySelector(
 		return !! select( preferencesStore ).get( scope, featureName );
 	}
 );
+
+/**
+ * Returns true if a modal is active, or false otherwise.
+ *
+ * @param {Object} state     Global application state.
+ * @param {string} modalName A string that uniquely identifies the modal.
+ *
+ * @return {boolean} Whether the modal is active.
+ */
+export function isModalActive( state, modalName ) {
+	return state.activeModal === modalName;
+}

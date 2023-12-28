@@ -12,6 +12,7 @@ import {
 	BASE_DEFAULT_VALUE,
 	RESET_VALUE,
 	STEP,
+	SPIN_FACTOR,
 	isLineHeightDefined,
 } from './utils';
 
@@ -30,24 +31,25 @@ const LineHeightControl = ( {
 		if ( isDefined ) return nextValue;
 
 		/**
-		 * The following logic handles the initial step up/down action
+		 * The following logic handles the initial spin up/down action
 		 * (from an undefined value state) so that the next values are better suited for
-		 * line-height rendering. For example, the first step up should immediately
+		 * line-height rendering. For example, the first spin up should immediately
 		 * go to 1.6, rather than the normally expected 0.1.
 		 *
-		 * Step up/down actions can be triggered by keydowns of the up/down arrow keys,
-		 * or by clicking the spin buttons.
+		 * Spin up/down actions can be triggered by keydowns of the up/down arrow keys,
+		 * dragging the input or by clicking the spin buttons.
 		 */
+		const spin = STEP * SPIN_FACTOR;
 		switch ( `${ nextValue }` ) {
-			case `${ STEP }`:
-				// Increment by step value.
-				return BASE_DEFAULT_VALUE + STEP;
+			case `${ spin }`:
+				// Increment by spin value.
+				return BASE_DEFAULT_VALUE + spin;
 			case '0': {
-				// This means the user explicitly input '0', rather than stepped down
-				// from an undefined value state.
+				// This means the user explicitly input '0', rather than using the
+				// spin down action from an undefined value state.
 				if ( wasTypedOrPasted ) return nextValue;
-				// Decrement by step value.
-				return BASE_DEFAULT_VALUE - STEP;
+				// Decrement by spin value.
+				return BASE_DEFAULT_VALUE - spin;
 			}
 			case '':
 				return BASE_DEFAULT_VALUE;
@@ -84,6 +86,20 @@ const LineHeightControl = ( {
 		? undefined
 		: { marginBottom: 24 };
 
+	const handleOnChange = ( nextValue, { event } ) => {
+		if ( nextValue === '' ) {
+			onChange();
+			return;
+		}
+
+		if ( event.type === 'click' ) {
+			onChange( adjustNextValue( `${ nextValue }`, false ) );
+			return;
+		}
+
+		onChange( `${ nextValue }` );
+	};
+
 	return (
 		<div
 			className="block-editor-line-height-control"
@@ -93,10 +109,11 @@ const LineHeightControl = ( {
 				{ ...otherProps }
 				__unstableInputWidth={ __unstableInputWidth }
 				__unstableStateReducer={ stateReducer }
-				onChange={ onChange }
+				onChange={ handleOnChange }
 				label={ __( 'Line height' ) }
 				placeholder={ BASE_DEFAULT_VALUE }
 				step={ STEP }
+				spinFactor={ SPIN_FACTOR }
 				value={ value }
 				min={ 0 }
 				spinControls="custom"

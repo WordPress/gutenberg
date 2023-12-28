@@ -13,8 +13,6 @@ import { forwardRef } from '@wordpress/element';
  */
 import useDisabled from '../';
 
-jest.useRealTimers();
-
 describe( 'useDisabled', () => {
 	const Form = forwardRef( ( { showButton }, ref ) => {
 		return (

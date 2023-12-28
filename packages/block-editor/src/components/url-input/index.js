@@ -267,6 +267,7 @@ class URLInput extends Component {
 	}
 
 	onKeyDown( event ) {
+		this.props.onKeyDown?.( event );
 		const { showSuggestions, selectedSuggestion, suggestions, loading } =
 			this.state;
 
@@ -309,11 +310,10 @@ class URLInput extends Component {
 
 				// Submitting while loading should trigger onSubmit.
 				case ENTER: {
-					event.preventDefault();
 					if ( this.props.onSubmit ) {
+						event.preventDefault();
 						this.props.onSubmit( null, event );
 					}
-
 					break;
 				}
 			}
@@ -434,6 +434,7 @@ class URLInput extends Component {
 			placeholder = __( 'Paste URL or type to search' ),
 			__experimentalRenderControl: renderControl,
 			value = '',
+			hideLabelFromVision = false,
 		} = this.props;
 
 		const {
@@ -452,6 +453,7 @@ class URLInput extends Component {
 			className: classnames( 'block-editor-url-input', className, {
 				'is-full-width': isFullWidth,
 			} ),
+			hideLabelFromVision,
 		};
 
 		const inputProps = {
@@ -468,7 +470,7 @@ class URLInput extends Component {
 			'aria-label': label ? undefined : __( 'URL' ), // Ensure input always has an accessible label
 			'aria-expanded': showSuggestions,
 			'aria-autocomplete': 'list',
-			'aria-controls': suggestionsListboxId,
+			'aria-owns': suggestionsListboxId,
 			'aria-activedescendant':
 				selectedSuggestion !== null
 					? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
@@ -531,7 +533,8 @@ class URLInput extends Component {
 				tabIndex: '-1',
 				id: `${ suggestionOptionIdPrefix }-${ index }`,
 				ref: this.bindSuggestionNode( index ),
-				'aria-selected': index === selectedSuggestion,
+				'aria-selected':
+					index === selectedSuggestion ? true : undefined,
 			};
 		};
 

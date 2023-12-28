@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get, isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
@@ -105,17 +100,10 @@ function GalleryEdit( props ) {
 					}
 					const image = getMedia( id );
 					const sizes = imageSizes.reduce( ( currentSizes, size ) => {
-						const defaultUrl = get( image, [
-							'sizes',
-							size.slug,
-							'url',
-						] );
-						const mediaDetailsUrl = get( image, [
-							'media_details',
-							'sizes',
-							size.slug,
-							'source_url',
-						] );
+						const defaultUrl = image?.sizes?.[ size.slug ]?.url;
+						const mediaDetailsUrl =
+							image?.media_details?.sizes?.[ size.slug ]
+								?.source_url;
 						return {
 							...currentSizes,
 							[ size.slug ]: defaultUrl || mediaDetailsUrl,
@@ -310,10 +298,8 @@ function GalleryEdit( props ) {
 			if ( ! image.id ) {
 				return image;
 			}
-			const url = get( resizedImages, [
-				parseInt( image.id, 10 ),
-				newSizeSlug,
-			] );
+			const url =
+				resizedImages[ parseInt( image.id, 10 ) ]?.[ newSizeSlug ];
 			return {
 				...image,
 				...( url && { url } ),
@@ -394,7 +380,7 @@ function GalleryEdit( props ) {
 	}
 
 	const imageSizeOptions = getImagesSizeOptions();
-	const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
+	const shouldShowSizeOptions = hasImages && imageSizeOptions.length > 0;
 
 	return (
 		<>
@@ -413,6 +399,7 @@ function GalleryEdit( props ) {
 						/>
 					) }
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Crop images' ) }
 						checked={ !! imageCrop }
 						onChange={ toggleImageCrop }

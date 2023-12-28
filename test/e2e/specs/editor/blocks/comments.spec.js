@@ -165,11 +165,11 @@ test.describe( 'Comments', () => {
 		await expect( warning ).toBeVisible();
 		await expect( placeholder ).toBeVisible();
 
-		await editor.canvas.click(
-			'role=button[name="Switch to editable mode"i]'
-		);
+		await editor.canvas
+			.locator( 'role=button[name="Switch to editable mode"i]' )
+			.click();
 
-		const commentTemplate = block.locator(
+		const commentTemplate = editor.canvas.locator(
 			'role=document[name="Block: Comment Template"i]'
 		);
 		await expect( block ).toHaveClass( /has-vivid-purple-color/ );
@@ -313,8 +313,14 @@ test.describe( 'Post Comments', () => {
 		).toBeVisible();
 
 		// Check the block definition has changed.
-		const content = await editor.getEditedPostContent();
-		expect( content ).toBe( '<!-- wp:comments {"legacy":true} /-->' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/comments',
+				attributes: {
+					legacy: true,
+				},
+			},
+		] );
 
 		// Visit post
 		await page.goto( `/?p=${ postId }` );

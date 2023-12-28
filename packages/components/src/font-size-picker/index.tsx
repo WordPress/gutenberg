@@ -14,7 +14,7 @@ import { useState, useMemo, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Button from '../button';
+import { Button } from '../button';
 import RangeControl from '../range-control';
 import { Flex, FlexItem } from '../flex';
 import {
@@ -24,14 +24,14 @@ import {
 } from '../unit-control';
 import { VisuallyHidden } from '../visually-hidden';
 import { getCommonSizeUnit } from './utils';
-import { HStack } from '../h-stack';
 import type { FontSizePickerProps } from './types';
 import {
 	Container,
+	Header,
 	HeaderHint,
 	HeaderLabel,
+	HeaderToggle,
 	Controls,
-	ResetButton,
 } from './styles';
 import { Spacer } from '../spacer';
 import FontSizePickerSelect from './font-size-picker-select';
@@ -45,11 +45,13 @@ const UnforwardedFontSizePicker = (
 	const {
 		/** Start opting into the new margin-free styles that will become the default in a future version. */
 		__nextHasNoMarginBottom = false,
+		__next40pxDefaultSize = false,
 		fallbackFontSize,
 		fontSizes = [],
 		disableCustomFontSizes = false,
 		onChange,
 		size = 'default',
+		units: unitsProp,
 		value,
 		withSlider = false,
 		withReset = true,
@@ -64,7 +66,7 @@ const UnforwardedFontSizePicker = (
 	}
 
 	const units = useCustomUnits( {
-		availableUnits: [ 'px', 'em', 'rem' ],
+		availableUnits: unitsProp || [ 'px', 'em', 'rem' ],
 	} );
 
 	const shouldUseSelectControl = fontSizes.length > 5;
@@ -121,12 +123,13 @@ const UnforwardedFontSizePicker = (
 	);
 	const isValueUnitRelative =
 		!! valueUnit && [ 'em', 'rem' ].includes( valueUnit );
+	const isDisabled = value === undefined;
 
 	return (
 		<Container ref={ ref } className="components-font-size-picker">
 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
 			<Spacer>
-				<HStack className="components-font-size-picker__header">
+				<Header className="components-font-size-picker__header">
 					<HeaderLabel
 						aria-label={ `${ __( 'Size' ) } ${ headerHint || '' }` }
 					>
@@ -138,7 +141,7 @@ const UnforwardedFontSizePicker = (
 						) }
 					</HeaderLabel>
 					{ ! disableCustomFontSizes && (
-						<Button
+						<HeaderToggle
 							label={
 								showCustomValueControl
 									? __( 'Use size preset' )
@@ -151,10 +154,10 @@ const UnforwardedFontSizePicker = (
 								);
 							} }
 							isPressed={ showCustomValueControl }
-							isSmall
+							size="small"
 						/>
 					) }
-				</HStack>
+				</Header>
 			</Spacer>
 			<Controls
 				className="components-font-size-picker__controls"
@@ -164,6 +167,7 @@ const UnforwardedFontSizePicker = (
 					shouldUseSelectControl &&
 					! showCustomValueControl && (
 						<FontSizePickerSelect
+							__next40pxDefaultSize={ __next40pxDefaultSize }
 							fontSizes={ fontSizes }
 							value={ value }
 							disableCustomFontSizes={ disableCustomFontSizes }
@@ -193,6 +197,7 @@ const UnforwardedFontSizePicker = (
 						fontSizes={ fontSizes }
 						value={ value }
 						__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 						size={ size }
 						onChange={ ( newValue ) => {
 							if ( newValue === undefined ) {
@@ -213,6 +218,7 @@ const UnforwardedFontSizePicker = (
 					<Flex className="components-font-size-picker__custom-size-control">
 						<FlexItem isBlock>
 							<UnitControl
+								__next40pxDefaultSize={ __next40pxDefaultSize }
 								label={ __( 'Custom' ) }
 								labelPosition="top"
 								hideLabelFromVision
@@ -239,6 +245,9 @@ const UnforwardedFontSizePicker = (
 									<RangeControl
 										__nextHasNoMarginBottom={
 											__nextHasNoMarginBottom
+										}
+										__next40pxDefaultSize={
+											__next40pxDefaultSize
 										}
 										className="components-font-size-picker__custom-input"
 										label={ __( 'Custom Size' ) }
@@ -267,17 +276,23 @@ const UnforwardedFontSizePicker = (
 						) }
 						{ withReset && (
 							<FlexItem>
-								<ResetButton
-									disabled={ value === undefined }
+								<Button
+									disabled={ isDisabled }
+									__experimentalIsFocusable
 									onClick={ () => {
 										onChange?.( undefined );
 									} }
-									isSmall
 									variant="secondary"
-									size={ size }
+									__next40pxDefaultSize
+									size={
+										size === '__unstable-large' ||
+										props.__next40pxDefaultSize
+											? 'default'
+											: 'small'
+									}
 								>
 									{ __( 'Reset' ) }
-								</ResetButton>
+								</Button>
 							</FlexItem>
 						) }
 					</Flex>

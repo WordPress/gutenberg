@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { visitAdminPage } from '@wordpress/e2e-test-utils';
+import { canvas, visitAdminPage } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -10,74 +10,30 @@ import { addQueryArgs } from '@wordpress/url';
 
 const SELECTORS = {
 	visualEditor: '.edit-site-visual-editor iframe',
+	canvasLoader: '.edit-site-canvas-loader',
 };
 
 /**
  * Skips the welcome guide popping up to first time users of the site editor
  */
 export async function disableSiteEditorWelcomeGuide() {
-	// This code prioritizes using the preferences store. However, performance
-	// tests run on older versions of the codebase where the preferences store
-	// doesn't exist. Some backwards compatibility has been built-in so that
-	// those tests continue to work there. This can be removed once WordPress
-	// 6.0 is released, as the older version used by the performance tests will
-	// then include the preferences store.
-	// See https://github.com/WordPress/gutenberg/pull/39300.
-	const isWelcomeGuideActive = await page.evaluate( () => {
-		// TODO - remove if statement after WordPress 6.0 is released.
-		if ( ! wp.data.select( 'core/preferences' ) ) {
-			return wp.data
-				.select( 'core/edit-site' )
-				.isFeatureActive( 'welcomeGuide' );
-		}
+	await page.evaluate( () => {
+		window.wp.data
+			.dispatch( 'core/preferences' )
+			.set( 'core/edit-site', 'welcomeGuide', false );
 
-		return !! wp.data
-			.select( 'core/preferences' )
-			?.get( 'core/edit-site', 'welcomeGuide' );
+		window.wp.data
+			.dispatch( 'core/preferences' )
+			.set( 'core/edit-site', 'welcomeGuideStyles', false );
+
+		window.wp.data
+			.dispatch( 'core/preferences' )
+			.set( 'core/edit-site', 'welcomeGuidePage', false );
+
+		window.wp.data
+			.dispatch( 'core/preferences' )
+			.set( 'core/edit-site', 'welcomeGuideTemplate', false );
 	} );
-	const isWelcomeGuideStyesActive = await page.evaluate( () => {
-		// TODO - remove if statement after WordPress 6.0 is released.
-		if ( ! wp.data.select( 'core/preferences' ) ) {
-			return wp.data
-				.select( 'core/edit-site' )
-				.isFeatureActive( 'welcomeGuideStyles' );
-		}
-
-		return !! wp.data
-			.select( 'core/preferences' )
-			?.get( 'core/edit-site', 'welcomeGuideStyles' );
-	} );
-
-	if ( isWelcomeGuideActive ) {
-		await page.evaluate( () => {
-			// TODO - remove if statement after WordPress 6.0 is released.
-			if ( ! wp.data.dispatch( 'core/preferences' ) ) {
-				wp.data
-					.dispatch( 'core/edit-site' )
-					.toggleFeature( 'welcomeGuide' );
-				return;
-			}
-
-			wp.data
-				.dispatch( 'core/preferences' )
-				.toggle( 'core/edit-site', 'welcomeGuide' );
-		} );
-	}
-
-	if ( isWelcomeGuideStyesActive ) {
-		await page.evaluate( () => {
-			// TODO - remove if statement after WordPress 6.0 is released.
-			if ( ! wp.data.dispatch( 'core/preferences' ) ) {
-				wp.data
-					.dispatch( 'core/edit-site' )
-					.toggleFeature( 'welcomeGuideStyles' );
-				return;
-			}
-			wp.data
-				.dispatch( 'core/preferences' )
-				.toggle( 'core/edit-site', 'welcomeGuideStyles' );
-		} );
-	}
 }
 
 /**
@@ -128,6 +84,9 @@ export async function visitSiteEditor( query, skipWelcomeGuide = true ) {
 
 	await visitAdminPage( 'site-editor.php', query );
 	await page.waitForSelector( SELECTORS.visualEditor );
+	await page.waitForSelector( SELECTORS.canvasLoader, {
+		hidden: true,
+	} );
 
 	if ( skipWelcomeGuide ) {
 		await disableSiteEditorWelcomeGuide();
@@ -166,11 +125,15 @@ export async function openPreviousGlobalStylesPanel() {
  * Enters edit mode.
  */
 export async function enterEditMode() {
-	const editSiteToggle = await page.$( '.edit-site-site-hub__edit-button' );
-	// This check is necessary for the performance tests in old branches
-	// where the site editor toggle was not implemented yet.
-	if ( ! editSiteToggle ) {
-		return;
+	try {
+		await page.waitForSelector(
+			'.edit-site-visual-editor__editor-canvas[role="button"]',
+			{ timeout: 3000 }
+		);
+
+		await canvas().click( 'body' );
+	} catch {
+		// This catch is necessary for the performance tests in old branches
+		// where the site editor toggle was not implemented yet.
 	}
-	await page.click( '.edit-site-site-hub__edit-button' );
 }

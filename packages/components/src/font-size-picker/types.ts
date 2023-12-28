@@ -27,6 +27,10 @@ export type FontSizePickerProps = {
 		selectedItem?: FontSize
 	) => void;
 	/**
+	 * Available units for custom font size selection.
+	 */
+	units?: string[];
+	/**
 	 * The current font size value.
 	 */
 	value?: number | string;
@@ -53,6 +57,12 @@ export type FontSizePickerProps = {
 	 * @default false
 	 */
 	__nextHasNoMarginBottom?: boolean;
+	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
 	/**
 	 * Size of the control.
 	 *
@@ -89,6 +99,7 @@ export type FontSizePickerSelectProps = Pick<
 	>;
 	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;
 	onSelectCustom: () => void;
+	__next40pxDefaultSize: boolean;
 };
 
 export type FontSizePickerSelectOption = {
@@ -100,7 +111,7 @@ export type FontSizePickerSelectOption = {
 
 export type FontSizePickerToggleGroupProps = Pick<
 	FontSizePickerProps,
-	'value' | 'size' | '__nextHasNoMarginBottom'
+	'value' | 'size' | '__nextHasNoMarginBottom' | '__next40pxDefaultSize'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
 	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;

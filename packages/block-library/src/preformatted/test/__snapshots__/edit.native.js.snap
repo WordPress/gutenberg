@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`core/more/edit/native should match snapshot when content is empty 1`] = `
+exports[`Preformatted should match snapshot when content is empty 1`] = `
 <View
   style={
-    Array [
+    [
       undefined,
       undefined,
       undefined,
@@ -12,7 +12,7 @@ exports[`core/more/edit/native should match snapshot when content is empty 1`] =
 >
   <View
     style={
-      Array [
+      [
         undefined,
         undefined,
       ]
@@ -20,9 +20,9 @@ exports[`core/more/edit/native should match snapshot when content is empty 1`] =
   >
     <TextInput
       accessibilityLabel="Text input. Empty"
-      activeFormats={Array []}
+      activeFormats={[]}
       blockType={
-        Object {
+        {
           "tag": "pre",
         }
       }
@@ -39,17 +39,18 @@ exports[`core/more/edit/native should match snapshot when content is empty 1`] =
       onSelectionChange={[Function]}
       placeholder="Write preformatted text…"
       placeholderTextColor="gray"
-      triggerKeyCodes={Array []}
+      selectionColor="black"
+      triggerKeyCodes={[]}
       value=""
     />
   </View>
 </View>
 `;
 
-exports[`core/more/edit/native should match snapshot when content is not empty 1`] = `
+exports[`Preformatted should match snapshot when content is not empty 1`] = `
 <View
   style={
-    Array [
+    [
       undefined,
       undefined,
       undefined,
@@ -58,7 +59,7 @@ exports[`core/more/edit/native should match snapshot when content is not empty 1
 >
   <View
     style={
-      Array [
+      [
         undefined,
         undefined,
       ]
@@ -66,9 +67,9 @@ exports[`core/more/edit/native should match snapshot when content is not empty 1
   >
     <TextInput
       accessibilityLabel="Text input. <pre>Hello World!</pre>"
-      activeFormats={Array []}
+      activeFormats={[]}
       blockType={
-        Object {
+        {
           "tag": "pre",
         }
       }
@@ -85,7 +86,8 @@ exports[`core/more/edit/native should match snapshot when content is not empty 1
       onSelectionChange={[Function]}
       placeholder="Write preformatted text…"
       placeholderTextColor="gray"
-      triggerKeyCodes={Array []}
+      selectionColor="black"
+      triggerKeyCodes={[]}
       value="<pre>Hello World!</pre>"
     />
   </View>

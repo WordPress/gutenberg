@@ -37,7 +37,7 @@ test.describe( 'Avatar', () => {
 
 		const username = 'Gravatar Gravatar';
 
-		const avatarBlock = page.locator(
+		const avatarBlock = editor.canvas.locator(
 			'role=document[name="Block: Avatar"i]'
 		);
 

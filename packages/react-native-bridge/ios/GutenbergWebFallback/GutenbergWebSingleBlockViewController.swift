@@ -1,7 +1,7 @@
 import UIKit
 import WebKit
 
-public protocol GutenbergWebDelegate: class {
+public protocol GutenbergWebDelegate: AnyObject {
     func webController(controller: GutenbergWebSingleBlockViewController, didPressSave block: Block)
     func webControllerDidPressClose(controller: GutenbergWebSingleBlockViewController)
     func webController(controller: GutenbergWebSingleBlockViewController, didLog log: String)
@@ -71,11 +71,12 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
     }
 
     /// Called when Gutenberg Web editor is loaded in the web view.
-    /// If overriden, is required to call super.onGutenbergReady()
+    /// If overridden, is required to call super.onGutenbergReady()
     open func onGutenbergReady() {
         onGutenbergReadyScripts().forEach(evaluateJavascript)
         evaluateJavascript(jsInjection.preventAutosavesScript)
         evaluateJavascript(jsInjection.insertBlockScript)
+        evaluateJavascript(jsInjection.editorBehaviorScript)
         DispatchQueue.main.async { [weak self] in
             self?.removeCoverViewAnimated()
         }

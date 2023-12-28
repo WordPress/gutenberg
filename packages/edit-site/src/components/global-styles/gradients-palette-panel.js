@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalVStack as VStack,
 	__experimentalPaletteEdit as PaletteEdit,
@@ -8,15 +9,16 @@ import {
 	DuotonePicker,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { experiments as blockEditorExperiments } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import Subtitle from './subtitle';
-import { unlock } from '../../experiments';
+import { unlock } from '../../lock-unlock';
 
-const { useGlobalSetting } = unlock( blockEditorExperiments );
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+const mobilePopoverProps = { placement: 'bottom-start', offset: 8 };
 
 const noop = () => {};
 
@@ -63,6 +65,9 @@ export default function GradientPalettePanel( { name } ) {
 		...( defaultDuotone && defaultDuotoneEnabled ? defaultDuotone : [] ),
 	];
 
+	const isMobileViewport = useViewportMatch( 'small', '<' );
+	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
+
 	return (
 		<VStack
 			className="edit-site-global-styles-gradient-palette-panel"
@@ -75,6 +80,8 @@ export default function GradientPalettePanel( { name } ) {
 					gradients={ themeGradients }
 					onChange={ setThemeGradients }
 					paletteLabel={ __( 'Theme' ) }
+					paletteLabelHeadingLevel={ 3 }
+					popoverProps={ popoverProps }
 				/>
 			) }
 			{ !! defaultGradients &&
@@ -86,20 +93,24 @@ export default function GradientPalettePanel( { name } ) {
 						gradients={ defaultGradients }
 						onChange={ setDefaultGradients }
 						paletteLabel={ __( 'Default' ) }
+						paletteLabelLevel={ 3 }
+						popoverProps={ popoverProps }
 					/>
 				) }
 			<PaletteEdit
 				gradients={ customGradients }
 				onChange={ setCustomGradients }
 				paletteLabel={ __( 'Custom' ) }
+				paletteLabelLevel={ 3 }
 				emptyMessage={ __(
 					'Custom gradients are empty! Add some gradients to create your own palette.'
 				) }
 				slugPrefix="custom-"
+				popoverProps={ popoverProps }
 			/>
 			{ !! duotonePalette && !! duotonePalette.length && (
 				<div>
-					<Subtitle>{ __( 'Duotone' ) }</Subtitle>
+					<Subtitle level={ 3 }>{ __( 'Duotone' ) }</Subtitle>
 					<Spacer margin={ 3 } />
 					<DuotonePicker
 						duotonePalette={ duotonePalette }

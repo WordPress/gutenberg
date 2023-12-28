@@ -6,16 +6,15 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	RichText,
-	__experimentalGetElementClassName,
-} from '@wordpress/block-editor';
-import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { View } from '@wordpress/primitives';
 
-export const Gallery = ( props ) => {
+/**
+ * Internal dependencies
+ */
+import { Caption } from '../utils/caption';
+
+export default function Gallery( props ) {
 	const {
 		attributes,
 		isSelected,
@@ -24,9 +23,11 @@ export const Gallery = ( props ) => {
 		insertBlocksAfter,
 		blockProps,
 		__unstableLayoutClassNames: layoutClassNames,
+		isContentLocked,
+		multiGallerySelection,
 	} = props;
 
-	const { align, columns, caption, imageCrop } = attributes;
+	const { align, columns, imageCrop } = attributes;
 
 	return (
 		<figure
@@ -49,50 +50,18 @@ export const Gallery = ( props ) => {
 					{ mediaPlaceholder }
 				</View>
 			) }
-			<RichTextVisibilityHelper
-				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
-				identifier="caption"
-				tagName="figcaption"
-				className={ classnames(
-					'blocks-gallery-caption',
-					__experimentalGetElementClassName( 'caption' )
-				) }
-				aria-label={ __( 'Gallery caption text' ) }
-				placeholder={ __( 'Write gallery caption…' ) }
-				value={ caption }
-				onChange={ ( value ) => setAttributes( { caption: value } ) }
-				inlineToolbar
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+			<Caption
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				isSelected={ isSelected }
+				insertBlocksAfter={ insertBlocksAfter }
+				showToolbarButton={
+					! multiGallerySelection && ! isContentLocked
 				}
+				className="blocks-gallery-caption"
+				label={ __( 'Gallery caption text' ) }
+				placeholder={ __( 'Add gallery caption' ) }
 			/>
 		</figure>
 	);
-};
-
-function RichTextVisibilityHelper( {
-	isHidden,
-	className,
-	value,
-	placeholder,
-	tagName,
-	captionRef,
-	...richTextProps
-} ) {
-	if ( isHidden ) {
-		return <VisuallyHidden as={ RichText } { ...richTextProps } />;
-	}
-
-	return (
-		<RichText
-			ref={ captionRef }
-			value={ value }
-			placeholder={ placeholder }
-			className={ className }
-			tagName={ tagName }
-			{ ...richTextProps }
-		/>
-	);
 }
-
-export default Gallery;
