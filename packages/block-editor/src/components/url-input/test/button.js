@@ -1,91 +1,167 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
-import TestUtils from 'react-dom/test-utils';
-import ReactDOM from 'react-dom';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import URLInput from '../';
 import URLInputButton from '../button';
 
-import '../../../store';
-
 describe( 'URLInputButton', () => {
-	const clickEditLink = ( wrapper ) =>
-		wrapper
-			.find( 'ForwardRef(Button).components-toolbar__control' )
-			.simulate( 'click' );
+	it( 'should render a `Insert link` button and not be pressed when `url` is not provided', () => {
+		render( <URLInputButton /> );
 
-	it( 'should have a valid class name in the wrapper tag', () => {
-		const wrapper = shallow( <URLInputButton /> );
-		expect( wrapper.hasClass( 'block-editor-url-input__button' ) ).toBe(
-			true
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Edit link',
+				pressed: true,
+			} )
+		).not.toBeInTheDocument();
+
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Insert link',
+				pressed: false,
+			} )
+		).toBeVisible();
+	} );
+
+	it( 'should render an `Edit link` button and be pressed when `url` is provided', () => {
+		render( <URLInputButton url="https://example.com" /> );
+
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Insert link',
+				pressed: false,
+			} )
+		).not.toBeInTheDocument();
+
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Edit link',
+				pressed: true,
+			} )
+		).toBeVisible();
+	} );
+
+	it( 'should not render a form by default', () => {
+		render( <URLInputButton /> );
+
+		expect(
+			screen.queryByRole( 'button', { name: 'Submit' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'should render a form when `Insert link` button is clicked', async () => {
+		const user = userEvent.setup();
+		render( <URLInputButton /> );
+
+		// Click the button to insert a link.
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Insert link',
+				pressed: false,
+			} )
 		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Submit' } )
+		).toBeVisible();
 	} );
-	it( 'should have isPressed props set to false when url prop not defined', () => {
-		const wrapper = shallow( <URLInputButton /> );
-		expect( wrapper.find( 'ForwardRef(Button)' ).prop( 'isPressed' ) ).toBe(
-			false
-		);
-	} );
-	it( 'should have isPressed prop set to true if url prop defined', () => {
-		const wrapper = shallow( <URLInputButton url="https://example.com" /> );
-		expect( wrapper.find( 'ForwardRef(Button)' ).prop( 'isPressed' ) ).toBe(
-			true
-		);
-	} );
-	it( 'should have hidden form by default', () => {
-		const wrapper = shallow( <URLInputButton /> );
-		expect( wrapper.find( 'form' ) ).toHaveLength( 0 );
-		expect( wrapper.state().expanded ).toBe( false );
-	} );
-	it( 'should have visible form when Edit Link button clicked', () => {
-		const wrapper = shallow( <URLInputButton /> );
-		clickEditLink( wrapper );
-		expect( wrapper.find( 'form' ) ).toHaveLength( 1 );
-		expect( wrapper.state().expanded ).toBe( true );
-	} );
-	it( 'should call onChange function once when value changes once', () => {
+
+	it( 'should call `onChange` function once per each value change', async () => {
+		const user = userEvent.setup();
 		const onChangeMock = jest.fn();
-		const wrapper = shallow( <URLInputButton onChange={ onChangeMock } /> );
-		clickEditLink( wrapper );
-		wrapper.find( URLInput ).simulate( 'change' );
-		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
-	} );
-	it( 'should call onChange function twice when value changes twice', () => {
-		const onChangeMock = jest.fn();
-		const wrapper = shallow( <URLInputButton onChange={ onChangeMock } /> );
-		clickEditLink( wrapper );
-		wrapper.find( URLInput ).simulate( 'change' );
-		wrapper.find( URLInput ).simulate( 'change' );
-		expect( onChangeMock ).toHaveBeenCalledTimes( 2 );
-	} );
-	it( 'should close the form when user clicks Close button', () => {
-		const wrapper = shallow( <URLInputButton /> );
-		clickEditLink( wrapper );
-		expect( wrapper.state().expanded ).toBe( true );
-		wrapper.find( '.block-editor-url-input__back' ).simulate( 'click' );
-		expect( wrapper.state().expanded ).toBe( false );
-	} );
-	it( 'should close the form when user submits it', () => {
-		const wrapper = TestUtils.renderIntoDocument( <URLInputButton /> );
-		const buttonElement = () =>
-			TestUtils.scryRenderedDOMComponentsWithClass(
-				wrapper,
-				'components-toolbar__control'
-			);
-		const formElement = () =>
-			TestUtils.scryRenderedDOMComponentsWithTag( wrapper, 'form' );
-		TestUtils.Simulate.click( buttonElement().shift() );
-		expect( wrapper.state.expanded ).toBe( true );
-		TestUtils.Simulate.submit( formElement().shift() );
-		expect( wrapper.state.expanded ).toBe( false );
-		ReactDOM.unmountComponentAtNode(
-			// eslint-disable-next-line react/no-find-dom-node
-			ReactDOM.findDOMNode( wrapper ).parentNode
+
+		render( <URLInputButton onChange={ onChangeMock } /> );
+
+		// Click the button to insert a link.
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Insert link',
+				pressed: false,
+			} )
 		);
+
+		// Type something into the URL field.
+		const urlField = screen.getByRole( 'combobox' );
+		const val1 = 'foo';
+		const val2 = 'barbaz';
+		await user.type( urlField, val1 );
+		await user.type( urlField, val2 );
+
+		expect( onChangeMock ).toHaveBeenCalledTimes(
+			val1.length + val2.length
+		);
+	} );
+
+	it( 'should close the form when the user clicks the `Close` button', async () => {
+		const user = userEvent.setup();
+
+		render( <URLInputButton /> );
+
+		// Click the button to insert a link.
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Insert link',
+				pressed: false,
+			} )
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Submit' } )
+		).toBeVisible();
+
+		// Click the button to close the form.
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Close',
+			} )
+		);
+
+		expect(
+			screen.queryByRole( 'button', { name: 'Submit' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'should close the form when user submits it', async () => {
+		const user = userEvent.setup();
+
+		function TestURLInputButton() {
+			// maintain state for the controlled component and process value changes
+			const [ url, setUrl ] = useState( '' );
+			return <URLInputButton url={ url } onChange={ setUrl } />;
+		}
+
+		render( <TestURLInputButton /> );
+
+		// Click the button to insert a link.
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Insert link',
+				pressed: false,
+			} )
+		);
+
+		// Type something into the URL field.
+		await user.type( screen.getByRole( 'combobox' ), 'foo' );
+
+		const submitButton = screen.getByRole( 'button', {
+			name: 'Submit',
+		} );
+
+		expect( submitButton ).toBeInTheDocument();
+
+		// Submit the form.
+		await user.click( submitButton );
+
+		expect( submitButton ).not.toBeInTheDocument();
 	} );
 } );

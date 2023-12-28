@@ -19,6 +19,9 @@ export interface EntityRecordResolution< RecordType > {
 	/** The edited entity record */
 	editedRecord: Partial< RecordType >;
 
+	/** The edits to the edited entity record */
+	edits: Partial< RecordType >;
+
 	/** Apply local (in-browser) edits to the edited entity record */
 	edit: ( diff: Partial< RecordType > ) => void;
 
@@ -53,13 +56,17 @@ export interface Options {
 	enabled: boolean;
 }
 
+const EMPTY_OBJECT = {};
+
 /**
  * Resolves the specified entity record.
  *
- * @param  kind     Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
- * @param  name     Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
- * @param  recordId ID of the requested entity record.
- * @param  options  Optional hook options.
+ * @since 6.1.0 Introduced in WordPress core.
+ *
+ * @param    kind     Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
+ * @param    name     Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
+ * @param    recordId ID of the requested entity record.
+ * @param    options  Optional hook options.
  * @example
  * ```js
  * import { useEntityRecord } from '@wordpress/core-data';
@@ -84,7 +91,7 @@ export interface Options {
  *
  * @example
  * ```js
- * import { useState } from '@wordpress/data';
+ * import { useCallback } from 'react';
  * import { useDispatch } from '@wordpress/data';
  * import { __ } from '@wordpress/i18n';
  * import { TextControl } from '@wordpress/components';
@@ -93,9 +100,12 @@ export interface Options {
  *
  * function PageRenameForm( { id } ) {
  * 	const page = useEntityRecord( 'postType', 'page', id );
- * 	const [ title, setTitle ] = useState( () => page.record.title.rendered );
  * 	const { createSuccessNotice, createErrorNotice } =
  * 		useDispatch( noticeStore );
+ *
+ * 	const setTitle = useCallback( ( title ) => {
+ * 		page.edit( { title } );
+ * 	}, [ page.edit ] );
  *
  * 	if ( page.isResolving ) {
  * 		return 'Loading...';
@@ -103,7 +113,6 @@ export interface Options {
  *
  * 	async function onRename( event ) {
  * 		event.preventDefault();
- * 		page.edit( { title } );
  * 		try {
  * 			await page.save();
  * 			createSuccessNotice( __( 'Page renamed.' ), {
@@ -118,7 +127,7 @@ export interface Options {
  * 		<form onSubmit={ onRename }>
  * 			<TextControl
  * 				label={ __( 'Name' ) }
- * 				value={ title }
+ * 				value={ page.editedRecord.title }
  * 				onChange={ setTitle }
  * 			/>
  * 			<button type="submit">{ __( 'Save' ) }</button>
@@ -148,29 +157,54 @@ export default function useEntityRecord< RecordType >(
 
 	const mutations = useMemo(
 		() => ( {
-			edit: ( record ) =>
-				editEntityRecord( kind, name, recordId, record ),
+			edit: ( record, editOptions: any = {} ) =>
+				editEntityRecord( kind, name, recordId, record, editOptions ),
 			save: ( saveOptions: any = {} ) =>
 				saveEditedEntityRecord( kind, name, recordId, {
 					throwOnError: true,
 					...saveOptions,
 				} ),
 		} ),
-		[ recordId ]
+		[ editEntityRecord, kind, name, recordId, saveEditedEntityRecord ]
 	);
 
-	const { editedRecord, hasEdits } = useSelect(
-		( select ) => ( {
-			editedRecord: select( coreStore ).getEditedEntityRecord(),
-			hasEdits: select( coreStore ).hasEditsForEntityRecord(),
-		} ),
-		[ kind, name, recordId ]
+	const { editedRecord, hasEdits, edits } = useSelect(
+		( select ) => {
+			if ( ! options.enabled ) {
+				return {
+					editedRecord: EMPTY_OBJECT,
+					hasEdits: false,
+					edits: EMPTY_OBJECT,
+				};
+			}
+
+			return {
+				editedRecord: select( coreStore ).getEditedEntityRecord(
+					kind,
+					name,
+					recordId
+				),
+				hasEdits: select( coreStore ).hasEditsForEntityRecord(
+					kind,
+					name,
+					recordId
+				),
+				edits: select( coreStore ).getEntityRecordNonTransientEdits(
+					kind,
+					name,
+					recordId
+				),
+			};
+		},
+		[ kind, name, recordId, options.enabled ]
 	);
 
 	const { data: record, ...querySelectRest } = useQuerySelect(
 		( query ) => {
 			if ( ! options.enabled ) {
-				return null;
+				return {
+					data: null,
+				};
 			}
 			return query( coreStore ).getEntityRecord( kind, name, recordId );
 		},
@@ -181,6 +215,7 @@ export default function useEntityRecord< RecordType >(
 		record,
 		editedRecord,
 		hasEdits,
+		edits,
 		...querySelectRest,
 		...mutations,
 	};

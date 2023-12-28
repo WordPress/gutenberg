@@ -60,31 +60,69 @@ const supportedLocales = [
 	'zh-tw', // Chinese (Taiwan)
 ];
 
-const getLanguageUrl = ( locale, plugin ) =>
-	`https://translate.wordpress.org/projects/wp-plugins/${ plugin }/dev/${ locale }/default/export-translations\?format\=json`;
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 2000;
+
+const getLanguageUrl = ( locale, projectSlug ) =>
+	`https://translate.wordpress.org/projects/${ projectSlug }/dev/${ locale }/default/export-translations/\?format\=json`;
 
 const getTranslationFilePath = ( locale ) => `./data/${ locale }.json`;
 
-const fetchTranslation = ( locale, plugin ) => {
-	const localeUrl = getLanguageUrl( locale, plugin );
-	return fetch( localeUrl )
-		.then( ( response ) => response.json() )
-		.then( ( body ) => {
-			return { response: body, locale };
-		} )
-		.catch( () => {
-			console.error( `Could not find translation file ${ localeUrl }` );
-		} );
+const fetchTranslation = ( locale, projectSlug ) => {
+	let retryCount = MAX_RETRIES;
+	const localeUrl = getLanguageUrl( locale, projectSlug );
+	const request = () =>
+		fetch( localeUrl )
+			.then( ( response ) => {
+				if ( ! response.ok ) {
+					const { status, statusText } = response;
+
+					// Retry when encountering "429 - Too Many Requests" error
+					if ( status === 429 && retryCount > 0 ) {
+						console.log(
+							`Translation file ${ localeUrl } for project slug ${ projectSlug } failed with error 429 - Too Many Requests, retrying (${ retryCount })...`
+						);
+						retryCount--;
+						return new Promise( ( resolve ) =>
+							setTimeout(
+								() => request().then( resolve ),
+								RETRY_DELAY
+							)
+						);
+					}
+
+					console.error(
+						`Could not find translation file ${ localeUrl } for project slug ${ projectSlug }`,
+						{ status, statusText }
+					);
+					return { locale, status, statusText };
+				}
+				return response.json();
+			} )
+			.then( ( body ) => {
+				return { response: body, locale };
+			} )
+			.catch( () => {
+				console.error(
+					`Could not find translation file ${ localeUrl } for project slug ${ projectSlug }`
+				);
+			} );
+	return request();
 };
 
-const fetchTranslations = ( { plugin, pluginDir, usedStrings } ) => {
+const fetchTranslations = ( {
+	plugin,
+	projectSlug,
+	pluginDir,
+	usedStrings,
+} ) => {
 	console.log(
-		`Fetching translations of plugin "${ plugin }" for the following locales:`,
+		`Fetching translations of plugin "${ plugin }" with project slug "${ projectSlug }" for the following locales:`,
 		supportedLocales
 	);
 
 	const fetchPromises = supportedLocales.map( ( locale ) =>
-		fetchTranslation( locale, plugin )
+		fetchTranslation( locale, projectSlug )
 	);
 
 	// Create data folder if it doesn't exist
@@ -97,7 +135,16 @@ const fetchTranslations = ( { plugin, pluginDir, usedStrings } ) => {
 	let extraTranslations = [];
 
 	return Promise.all( fetchPromises ).then( ( results ) => {
-		const fetchedTranslations = results.filter( Boolean );
+		const fetchedTranslations = results.filter(
+			( result ) => result.response
+		);
+
+		// Abort process if any translation can't be fetched
+		if ( fetchedTranslations.length !== supportedLocales.length ) {
+			process.exit( 1 );
+			return;
+		}
+
 		const translationFilePromises = fetchedTranslations.map(
 			( languageResult ) => {
 				return new Promise( ( resolve, reject ) => {
@@ -230,8 +277,9 @@ const generateIndexFile = ( translations, pluginDir ) => {
 if ( require.main === module ) {
 	const args = process.argv.slice( 2 );
 	const plugin = args[ 0 ] || 'gutenberg';
-	const destination = args[ 1 ] || './i18n-cache';
-	const usedStringsFile = args[ 2 ];
+	const projectSlug = args[ 1 ] || 'wp-plugins/gutenberg';
+	const destination = args[ 2 ] || './i18n-cache';
+	const usedStringsFile = args[ 3 ];
 
 	const translationsDir = path.resolve( destination );
 	const pluginDir = path.join( translationsDir, plugin );
@@ -243,6 +291,7 @@ if ( require.main === module ) {
 
 	fetchTranslations( {
 		plugin,
+		projectSlug,
 		pluginDir,
 		usedStrings,
 	} ).then( ( { translations, missingTranslations, extraTranslations } ) => {

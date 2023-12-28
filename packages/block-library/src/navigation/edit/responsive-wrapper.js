@@ -26,6 +26,7 @@ export default function ResponsiveWrapper( {
 	overlayBackgroundColor,
 	overlayTextColor,
 	hasIcon,
+	icon,
 } ) {
 	if ( ! isResponsive ) {
 		return children;
@@ -79,16 +80,12 @@ export default function ResponsiveWrapper( {
 			{ ! isOpen && (
 				<Button
 					aria-haspopup="true"
-					aria-label={ __( 'Open menu' ) }
+					aria-label={ hasIcon && __( 'Open menu' ) }
 					className={ openButtonClasses }
 					onClick={ () => onToggle( true ) }
 				>
-					{ hasIcon && <OverlayMenuIcon /> }
-					{ ! hasIcon && (
-						<span className="wp-block-navigation__toggle_button_label">
-							{ __( 'Menu' ) }
-						</span>
-					) }
+					{ hasIcon && <OverlayMenuIcon icon={ icon } /> }
+					{ ! hasIcon && __( 'Menu' ) }
 				</Button>
 			) }
 
@@ -104,10 +101,11 @@ export default function ResponsiveWrapper( {
 					<div { ...dialogProps }>
 						<Button
 							className="wp-block-navigation__responsive-container-close"
-							aria-label={ __( 'Close menu' ) }
+							aria-label={ hasIcon && __( 'Close menu' ) }
 							onClick={ () => onToggle( false ) }
 						>
-							<Icon icon={ close } />
+							{ hasIcon && <Icon icon={ close } /> }
+							{ ! hasIcon && __( 'Close' ) }
 						</Button>
 						<div
 							className="wp-block-navigation__responsive-container-content"

@@ -7,10 +7,8 @@ import { escapeAttribute } from '@wordpress/escape-html';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
 import Button from '../../button';
 import useNavigator from '../use-navigator';
 import type { NavigatorButtonProps } from '../types';
@@ -44,7 +42,7 @@ export function useNavigatorButton(
 				} );
 				onClick?.( e );
 			},
-			[ goTo, onClick ]
+			[ goTo, onClick, attributeName, escapedPath ]
 		);
 
 	return {

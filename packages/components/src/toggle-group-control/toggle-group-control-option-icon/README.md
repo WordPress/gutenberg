@@ -4,7 +4,7 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-`ToggleGroupControlOptionIcon` is a form component which is meant to be used as a child of [`ToggleGroupControl`] and displays an icon(<(/packages/components/src/toggle-group-control/toggle-group-control/README.md)>).
+`ToggleGroupControlOptionIcon` is a form component which is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md) and displays an icon.
 
 ## Usage
 
@@ -17,18 +17,16 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
 
 function Example() {
 	return (
-		<ToggleGroupControl label="my label" value="lowercase" isBlock>
+		<ToggleGroupControl>
 			<ToggleGroupControlOptionIcon
 				value="uppercase"
 				icon={ formatUppercase }
-				showTooltip={ true }
-				aria-label="Uppercase"
+				label="Uppercase"
 			/>
 			<ToggleGroupControlOptionIcon
 				value="lowercase"
 				icon={ formatLowercase }
-				showTooltip={ true }
-				aria-label="Lowercase"
+				label="Lowercase"
 			/>
 		</ToggleGroupControl>
 	);
@@ -43,14 +41,14 @@ The value of the `ToggleGroupControlOption`.
 
 -   Required: Yes
 
-### `icon`: `WPComponent`
+### `icon`: `Component`
 
 Icon displayed as the content of the option. Usually one of the icons from the `@wordpress/icons` package, or a custom React `<svg>` icon.
 
 -   Required: Yes
 
-### `showTooltip`: `boolean`
+### `label`: `string`
 
-Whether to show a tooltip when hovering over the option. The tooltip will only show if a label for it is provided using the `aria-label` prop.
+The text to accessibly label the icon option. Will also be shown in a tooltip.
 
--   Required: No
+-   Required: Yes

@@ -28,6 +28,7 @@ export {
 	JustifyContentControl,
 } from './justify-content-control';
 export { default as LineHeightControl } from './line-height-control';
+export { default as HeadingLevelDropdown } from './block-heading-level-dropdown';
 export { default as PlainText } from './plain-text';
 export {
 	default as RichText,
@@ -37,13 +38,13 @@ export {
 } from './rich-text';
 export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
+export { default as MediaUpload } from './media-upload';
 export {
-	default as MediaUpload,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
 	MEDIA_TYPE_AUDIO,
 	MEDIA_TYPE_ANY,
-} from './media-upload';
+} from './media-upload/constants';
 export {
 	default as MediaUploadProgress,
 	MEDIA_UPLOAD_STATE_UPLOADING,
@@ -58,7 +59,7 @@ export { default as BlockCaption } from './block-caption';
 export { default as Caption } from './caption';
 export { default as PanelColorSettings } from './panel-color-settings';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
-export { default as useSetting } from './use-setting';
+export { useSettings, default as useSetting } from './use-settings';
 export {
 	RecursionProvider as __experimentalRecursionProvider,
 	useHasRecursion as __experimentalUseHasRecursion,
@@ -66,6 +67,7 @@ export {
 export { default as Warning } from './warning';
 export { default as ContrastChecker } from './contrast-checker';
 export { default as useMultipleOriginColorsAndGradients } from './colors-gradients/use-multiple-origin-colors-and-gradients';
+export { default as UnsupportedBlockDetails } from './unsupported-block-details';
 
 export {
 	BottomSheetSettings,
@@ -74,6 +76,11 @@ export {
 } from './block-settings';
 export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 
+export {
+	getSpacingPresetCssVar,
+	getCustomValueFromPreset,
+	isValueSpacingPreset,
+} from './spacing-sizes-control/utils';
 // Content Related Components.
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
@@ -83,6 +90,7 @@ export { default as BlockStyles } from './block-styles';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
+export { default as InserterButton } from './inserter-button';
 export { useBlockProps } from './block-list/use-block-props';
 export { default as FloatingToolbar } from './floating-toolbar';
 

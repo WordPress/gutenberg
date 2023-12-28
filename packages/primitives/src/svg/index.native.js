@@ -8,6 +8,7 @@ import { Animated } from 'react-native';
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import { usePreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -24,6 +25,8 @@ export {
 	RadialGradient,
 	LinearGradient,
 	Stop,
+	Line,
+	SvgXml,
 } from 'react-native-svg';
 
 const AnimatedSvg = Animated.createAnimatedComponent(
@@ -36,13 +39,13 @@ export const SVG = ( {
 	animated = false,
 	...props
 } ) => {
-	const colorScheme = props.colorScheme || 'light';
+	const colorScheme = usePreferredColorScheme();
 	const stylesFromClasses = className
 		.split( ' ' )
 		.map( ( element ) => styles[ element ] )
 		.filter( Boolean );
 	const defaultStyle = isPressed
-		? styles[ 'is-pressed' ]
+		? styles[ `is-pressed--${ colorScheme }` ]
 		: styles[ 'components-toolbar__control-' + colorScheme ];
 	const propStyle = Array.isArray( props.style )
 		? props.style.reduce( ( acc, el ) => {

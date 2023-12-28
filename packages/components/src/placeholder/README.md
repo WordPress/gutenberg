@@ -17,7 +17,7 @@ Class to set on the container div.
 
 -   Required: No
 
-### `icon`: `string|Function|WPComponent|null`
+### `icon`: `string|Function|Component|null`
 
 If provided, renders an icon next to the label.
 
@@ -39,7 +39,7 @@ Changes placeholder children layout from flex-row to flex-column.
 
 Title of the placeholder.
 
--   Required: Yes
+-   Required: No
 
 ### `notices`: `ReactNode`
 

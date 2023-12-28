@@ -69,6 +69,19 @@ $blocks-block__margin: 0.5em;
 		margin-right: auto;
 		width: 100%;
 	}
+
+	&[style*="text-decoration"] {
+		.wp-block-button,
+		.wp-block-button__link {
+			text-decoration: inherit;
+		}
+	}
+
+	&.has-custom-font-size {
+		.wp-block-button__link {
+			font-size: inherit;
+		}
+	}
 }
 
 // Legacy buttons that did not come in a wrapping container.

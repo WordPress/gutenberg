@@ -4,15 +4,26 @@
 import {
 	requireNativeComponent,
 	UIManager,
-	TouchableWithoutFeedback,
+	Pressable,
 	Platform,
+	TouchableWithoutFeedback,
 } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { ENTER, BACKSPACE } from '@wordpress/keycodes';
+import {
+	BACKSPACE,
+	DELETE,
+	DOWN,
+	ENTER,
+	ESCAPE,
+	LEFT,
+	RIGHT,
+	SPACE,
+	UP,
+} from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -20,6 +31,19 @@ import { ENTER, BACKSPACE } from '@wordpress/keycodes';
 import * as AztecInputState from './AztecInputState';
 
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
+
+// Used to match KeyboardEvent.code values (from the Web API) with native keycodes.
+const KEYCODES = {
+	[ BACKSPACE ]: 'Backspace',
+	[ DELETE ]: 'Delete',
+	[ DOWN ]: 'ArrowDown',
+	[ ENTER ]: 'Enter',
+	[ ESCAPE ]: 'Escape',
+	[ LEFT ]: 'ArrowLeft',
+	[ RIGHT ]: 'ArrowRight',
+	[ SPACE ]: 'Space',
+	[ UP ]: 'ArrowUp',
+};
 
 class AztecView extends Component {
 	constructor() {
@@ -42,6 +66,10 @@ class AztecView extends Component {
 		this.focus = this.focus.bind( this );
 	}
 
+	componentWillUnmount() {
+		AztecInputState.blurOnUnmount( this.aztecViewRef.current );
+	}
+
 	dispatch( command, params ) {
 		params = params || [];
 		UIManager.dispatchViewManagerCommand(
@@ -56,6 +84,8 @@ class AztecView extends Component {
 	}
 
 	_onContentSizeChange( event ) {
+		this.updateCaretData( event );
+
 		if ( ! this.props.onContentSizeChange ) {
 			return;
 		}
@@ -75,7 +105,7 @@ class AztecView extends Component {
 
 		const { onKeyDown } = this.props;
 
-		const newEvent = { ...event, keyCode: ENTER };
+		const newEvent = { ...event, keyCode: ENTER, code: KEYCODES[ ENTER ] };
 		onKeyDown( newEvent );
 	}
 
@@ -89,6 +119,7 @@ class AztecView extends Component {
 		const newEvent = {
 			...event,
 			keyCode: BACKSPACE,
+			code: KEYCODES[ BACKSPACE ],
 			preventDefault: () => {},
 		};
 		onKeyDown( newEvent );
@@ -100,9 +131,13 @@ class AztecView extends Component {
 		}
 
 		const { onKeyDown } = this.props;
+		const { keyCode } = event.nativeEvent;
 		const newEvent = {
 			...event,
-			keyCode: event.nativeEvent.keyCode,
+			keyCode,
+			...( KEYCODES[ keyCode ] && {
+				code: KEYCODES[ keyCode ],
+			} ),
 			preventDefault: () => {},
 		};
 		onKeyDown( newEvent );
@@ -169,16 +204,19 @@ class AztecView extends Component {
 			onSelectionChange( selectionStart, selectionEnd, text, event );
 		}
 
+		this.updateCaretData( event );
+	}
+
+	updateCaretData( event ) {
 		if (
-			this.props.onCaretVerticalPositionChange &&
-			this.selectionEndCaretY !== event.nativeEvent.selectionEndCaretY
+			this.isFocused() &&
+			this.selectionEndCaretY !== event?.nativeEvent?.selectionEndCaretY
 		) {
 			const caretY = event.nativeEvent.selectionEndCaretY;
-			this.props.onCaretVerticalPositionChange(
-				event.nativeEvent.target,
+			AztecInputState.setCurrentCaretData( {
 				caretY,
-				this.selectionEndCaretY
-			);
+				caretHeight: event.nativeEvent?.selectionEndCaretHeight,
+			} );
 			this.selectionEndCaretY = caretY;
 		}
 	}
@@ -204,12 +242,49 @@ class AztecView extends Component {
 	}
 
 	_onAztecFocus( event ) {
-		// IMPORTANT: the onFocus events from Aztec are thrown away on Android as these are handled by onPress() in the upper level.
-		// It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
-		// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
-		// For iOS, this is necessary to let the system know when Aztec was focused programatically.
-		if ( Platform.OS === 'ios' ) {
-			this._onPress( event );
+		// IMPORTANT: This function serves two purposes:
+		//
+		// Android: This intentional no-op function prevents focus loops originating
+		// when the native Aztec module programmatically focuses the instance. The
+		// no-op is explicitly passed as an `onFocus` prop to avoid future prop
+		// spreading from inadvertently introducing focus loops. The user-facing
+		// focus of the element is handled by `onPress` instead.
+		//
+		// See: https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
+		//
+		// iOS: Programmatic focus from the native Aztec module is required to
+		// ensure the React-based `TextStateInput` ref is properly set when focus
+		// is *returned* to an instance, e.g. dismissing a bottom sheet. If the ref
+		// is not updated, attempts to dismiss the keyboard via the `ToolbarButton`
+		// will fail.
+		//
+		// See: https://github.com/wordpress-mobile/gutenberg-mobile/issues/702
+		if (
+			// The Android keyboard is, likely erroneously, already dismissed in the
+			// contexts where programmatic focus may be required on iOS.
+			//
+			// - https://github.com/WordPress/gutenberg/issues/28748
+			// - https://github.com/WordPress/gutenberg/issues/29048
+			// - https://github.com/wordpress-mobile/WordPress-Android/issues/16167
+			Platform.OS === 'ios'
+		) {
+			this.updateCaretData( event );
+
+			if ( ! this.isFocused() ) {
+				// Programmatically swapping input focus creates an infinite loop if the
+				// user taps a different input in between the programmatic focus and
+				// the resulting update to the React Native TextInputState focused element
+				// ref. To mitigate this, the below updates the focused element ref, but
+				// does not call the native focus methods.
+				//
+				// See: https://github.com/wordpress-mobile/WordPress-iOS/issues/18783
+				AztecInputState.focusInput( this.aztecViewRef.current );
+
+				// Calling _onFocus is needed to trigger provided onFocus callbacks
+				// which are needed to prevent undesired results like having a focused
+				// TextInput when another element has the focus.
+				this._onFocus( event );
+			}
 		}
 	}
 
@@ -221,15 +296,30 @@ class AztecView extends Component {
 
 		if ( style.hasOwnProperty( 'lineHeight' ) ) {
 			delete style.lineHeight;
-			window.console.warn(
-				"Removing lineHeight style as it's not supported by native AztecView"
-			);
-			// Prevents passing line-heigth within styles to avoid a crash due to values without units
+			// Prevents passing line-height within styles to avoid a crash due to values without units
 			// We now support this but passing line-height as a prop instead.
 		}
 
+		// Remove Font size rendering for pre elements until we fix an issue with AztecAndroid.
+		if (
+			Platform.OS === 'android' &&
+			this.props.text?.tag === 'pre' &&
+			style.hasOwnProperty( 'fontSize' )
+		) {
+			delete style.fontSize;
+		}
+
+		// We need to use `Pressable` on iOS to avoid issues with VoiceOver and assistive
+		// input like the Braille Screen Input.
+		// More information about this can be found in https://github.com/WordPress/gutenberg/pull/53895.
+		const TouchableComponent =
+			Platform.OS === 'ios' ? Pressable : TouchableWithoutFeedback;
+
 		return (
-			<TouchableWithoutFeedback onPress={ this._onPress }>
+			<TouchableComponent
+				accessible={ Platform.OS !== 'ios' }
+				onPress={ this._onPress }
+			>
 				<RCTAztecView
 					{ ...otherProps }
 					style={ style }
@@ -241,14 +331,12 @@ class AztecView extends Component {
 					onBackspace={ this.props.onKeyDown && this._onBackspace }
 					onKeyDown={ this.props.onKeyDown && this._onKeyDown }
 					deleteEnter={ this.props.deleteEnter }
-					// IMPORTANT: the onFocus events are thrown away as these are handled by onPress() in the upper level.
-					// It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
-					// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
+					// IMPORTANT: Do not remove the `onFocus` prop, see `_onAztecFocus`
 					onFocus={ this._onAztecFocus }
 					onBlur={ this._onBlur }
 					ref={ this.aztecViewRef }
 				/>
-			</TouchableWithoutFeedback>
+			</TouchableComponent>
 		);
 	}
 }
@@ -256,5 +344,6 @@ class AztecView extends Component {
 const RCTAztecView = requireNativeComponent( 'RCTAztecView', AztecView );
 
 AztecView.InputState = AztecInputState;
+AztecView.KeyCodes = KEYCODES;
 
 export default AztecView;

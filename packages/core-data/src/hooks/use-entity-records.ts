@@ -3,34 +3,58 @@
  */
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
-import type { Options, EntityRecordResolution } from './use-entity-record';
+import type { Options } from './use-entity-record';
+import type { Status } from './constants';
 
-type EntityRecordsResolution< RecordType > = Omit<
-	EntityRecordResolution< RecordType >,
-	'record'
-> & {
+interface EntityRecordsResolution< RecordType > {
 	/** The requested entity record */
 	records: RecordType[] | null;
-};
+
+	/**
+	 * Is the record still being resolved?
+	 */
+	isResolving: boolean;
+
+	/**
+	 * Is the record resolved by now?
+	 */
+	hasResolved: boolean;
+
+	/** Resolution status */
+	status: Status;
+
+	/**
+	 * The total number of available items (if not paginated).
+	 */
+	totalItems: number | null;
+
+	/**
+	 * The total number of pages.
+	 */
+	totalPages: number | null;
+}
 
 const EMPTY_ARRAY = [];
 
 /**
  * Resolves the specified entity records.
  *
- * @param  kind      Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
- * @param  name      Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
- * @param  queryArgs Optional HTTP query description for how to fetch the data, passed to the requested API endpoint.
- * @param  options   Optional hook options.
+ * @since 6.1.0 Introduced in WordPress core.
+ *
+ * @param    kind      Kind of the entity, e.g. `root` or a `postType`. See rootEntitiesConfig in ../entities.ts for a list of available kinds.
+ * @param    name      Name of the entity, e.g. `plugin` or a `post`. See rootEntitiesConfig in ../entities.ts for a list of available names.
+ * @param    queryArgs Optional HTTP query description for how to fetch the data, passed to the requested API endpoint.
+ * @param    options   Optional hook options.
  * @example
  * ```js
- * import { useEntityRecord } from '@wordpress/core-data';
+ * import { useEntityRecords } from '@wordpress/core-data';
  *
  * function PageTitlesList() {
  *   const { records, isResolving } = useEntityRecords( 'postType', 'page' );
@@ -84,8 +108,34 @@ export default function useEntityRecords< RecordType >(
 		[ kind, name, queryAsString, options.enabled ]
 	);
 
+	const { totalItems, totalPages } = useSelect(
+		( select ) => {
+			if ( ! options.enabled ) {
+				return {
+					totalItems: null,
+					totalPages: null,
+				};
+			}
+			return {
+				totalItems: select( coreStore ).getEntityRecordsTotalItems(
+					kind,
+					name,
+					queryArgs
+				),
+				totalPages: select( coreStore ).getEntityRecordsTotalPages(
+					kind,
+					name,
+					queryArgs
+				),
+			};
+		},
+		[ kind, name, queryAsString, options.enabled ]
+	);
+
 	return {
 		records,
+		totalItems,
+		totalPages,
 		...rest,
 	};
 }

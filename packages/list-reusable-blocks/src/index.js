@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { render } from '@wordpress/element';
+import { createRoot } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -31,9 +31,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	const showNotice = () => {
 		const notice = document.createElement( 'div' );
 		notice.className = 'notice notice-success is-dismissible';
-		notice.innerHTML = `<p>${ __(
-			'Reusable block imported successfully!'
-		) }</p>`;
+		notice.innerHTML = `<p>${ __( 'Pattern imported successfully!' ) }</p>`;
 
 		const headerEnd = document.querySelector( '.wp-header-end' );
 		if ( ! headerEnd ) {
@@ -45,5 +43,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	const container = document.createElement( 'div' );
 	container.className = 'list-reusable-blocks__container';
 	button.parentNode.insertBefore( container, button );
-	render( <ImportDropdown onUpload={ showNotice } />, container );
+	createRoot( container ).render(
+		<ImportDropdown onUpload={ showNotice } />
+	);
 } );

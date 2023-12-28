@@ -2,18 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import {
-	RawHTML,
-	Platform,
-	useRef,
-	useCallback,
-	forwardRef,
-} from '@wordpress/element';
+import { Platform, useRef, useCallback, forwardRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	pasteHandler,
@@ -24,20 +17,15 @@ import {
 } from '@wordpress/blocks';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
-	__experimentalRichText as RichText,
 	__unstableCreateElement,
 	isEmpty,
-	__unstableIsEmptyLine as isEmptyLine,
 	insert,
-	__unstableInsertLineSeparator as insertLineSeparator,
+	remove,
 	create,
-	replace,
 	split,
-	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
 	toHTMLString,
 	slice,
 } from '@wordpress/rich-text';
-import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
 
 /**
@@ -48,21 +36,20 @@ import { useBlockEditContext } from '../block-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
-import { useNativeProps } from './use-native-props';
 import { store as blockEditorStore } from '../../store';
 import {
 	addActiveFormats,
-	getMultilineTag,
 	getAllowedFormats,
-	isShortcode,
 	createLinkInParagraph,
 } from './utils';
 import EmbedHandlerPicker from './embed-handler-picker';
+import { Content } from './content';
+import RichText from './native';
+import { withDeprecations } from './with-deprecations';
 
-const wrapperClasses = 'block-editor-rich-text';
 const classes = 'block-editor-rich-text__editable';
 
-function RichTextWrapper(
+export function RichTextWrapper(
 	{
 		children,
 		tagName,
@@ -71,20 +58,19 @@ function RichTextWrapper(
 		value: originalValue,
 		onChange: originalOnChange,
 		isSelected: originalIsSelected,
-		multiline,
 		inlineToolbar,
 		wrapperClassName,
 		autocompleters,
 		onReplace,
 		placeholder,
 		allowedFormats,
-		formattingControls,
 		withoutInteractiveFormatting,
 		onRemove,
 		onMerge,
 		onSplit,
 		__unstableOnSplitAtEnd: onSplitAtEnd,
 		__unstableOnSplitMiddle: onSplitMiddle,
+		__unstableOnSplitAtDoubleLineEnd: onSplitAtDoubleLineEnd,
 		identifier,
 		preserveWhiteSpace,
 		__unstablePastePlainText: pastePlainText,
@@ -93,7 +79,6 @@ function RichTextWrapper(
 		disableLineBreaks,
 		unstableOnFocus,
 		__unstableAllowPrefixTransformations,
-		__unstableMultilineRootTag,
 		// Native props.
 		__unstableMobileNoFocusOnMount,
 		deleteEnter,
@@ -101,7 +86,6 @@ function RichTextWrapper(
 		textAlign,
 		selectionColor,
 		tagsToEliminate,
-		rootTagsToEliminate,
 		disableEditingMenu,
 		fontSize,
 		fontFamily,
@@ -114,6 +98,7 @@ function RichTextWrapper(
 		disableSuggestions,
 		disableAutocorrection,
 		containerWidth,
+		onEnter: onCustomEnter,
 		...props
 	},
 	forwardedRef
@@ -124,7 +109,6 @@ function RichTextWrapper(
 
 	const fallbackRef = useRef();
 	const { clientId, isSelected: blockIsSelected } = useBlockEditContext();
-	const nativeProps = useNativeProps();
 	const embedHandlerPickerRef = useRef();
 	const selector = ( select ) => {
 		const {
@@ -193,10 +177,8 @@ function RichTextWrapper(
 		selectionChange,
 		__unstableMarkAutomaticChange,
 	} = useDispatch( blockEditorStore );
-	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
-		formattingControls,
 		disableFormats,
 	} );
 	const hasFormats =
@@ -224,6 +206,7 @@ function RichTextWrapper(
 				selectionChangeEnd
 			);
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ clientId, identifier ]
 	);
 
@@ -237,7 +220,7 @@ function RichTextWrapper(
 			// an intentional user interaction distinguishing between Backspace and
 			// Delete to remove the empty field, but also to avoid merge & remove
 			// causing destruction of two fields (merge, then removed merged).
-			if ( onRemove && isEmpty( value ) && isReverse ) {
+			else if ( onRemove && isEmpty( value ) && isReverse ) {
 				onRemove( ! isReverse );
 			}
 		},
@@ -275,10 +258,7 @@ function RichTextWrapper(
 			if ( ! hasPastedBlocks || ! isEmpty( before ) ) {
 				blocks.push(
 					onSplit(
-						toHTMLString( {
-							value: before,
-							multilineTag,
-						} ),
+						toHTMLString( { value: before } ),
 						! isAfterOriginal
 					)
 				);
@@ -302,13 +282,7 @@ function RichTextWrapper(
 					: ! onSplitMiddle || ! isEmpty( after )
 			) {
 				blocks.push(
-					onSplit(
-						toHTMLString( {
-							value: after,
-							multilineTag,
-						} ),
-						isAfterOriginal
-					)
+					onSplit( toHTMLString( { value: after } ), isAfterOriginal )
 				);
 			}
 
@@ -322,7 +296,7 @@ function RichTextWrapper(
 
 			onReplace( blocks, indexToSelect, initialPosition );
 		},
-		[ onReplace, onSplit, multilineTag, onSplitMiddle ]
+		[ onReplace, onSplit, onSplitMiddle ]
 	);
 
 	const onEnter = useCallback(
@@ -345,39 +319,45 @@ function RichTextWrapper(
 				}
 			}
 
-			if ( multiline ) {
-				if ( shiftKey ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( value, '\n' ) );
-					}
-				} else if ( canSplit && isEmptyLine( value ) ) {
-					splitValue( value );
-				} else {
-					onChange( insertLineSeparator( value ) );
-				}
-			} else {
-				const { text, start: splitStart, end: splitEnd } = value;
-				const canSplitAtEnd =
-					onSplitAtEnd &&
-					splitStart === splitEnd &&
-					splitEnd === text.length;
+			if ( onCustomEnter ) {
+				onCustomEnter();
+			}
 
-				if ( shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( value, '\n' ) );
-					}
-				} else if ( ! canSplit && canSplitAtEnd ) {
-					onSplitAtEnd();
-				} else if ( canSplit ) {
-					splitValue( value );
+			const { text, start: splitStart, end: splitEnd } = value;
+			const canSplitAtEnd =
+				onSplitAtEnd &&
+				splitStart === splitEnd &&
+				splitEnd === text.length;
+
+			if ( shiftKey ) {
+				if ( ! disableLineBreaks ) {
+					onChange( insert( value, '\n' ) );
 				}
+			} else if ( canSplit ) {
+				splitValue( value );
+			} else if ( canSplitAtEnd ) {
+				onSplitAtEnd();
+			} else if (
+				// For some blocks it's desirable to split at the end of the
+				// block when there are two line breaks at the end of the
+				// block, so triple Enter exits the block.
+				onSplitAtDoubleLineEnd &&
+				splitStart === splitEnd &&
+				splitEnd === text.length &&
+				text.slice( -2 ) === '\n\n'
+			) {
+				value.start = value.end - 2;
+				onChange( remove( value ) );
+				onSplitAtDoubleLineEnd();
+			} else if ( ! disableLineBreaks ) {
+				onChange( insert( value, '\n' ) );
 			}
 		},
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
 			onReplace,
 			onSplit,
 			__unstableMarkAutomaticChange,
-			multiline,
 			splitValue,
 			onSplitAtEnd,
 		]
@@ -399,9 +379,6 @@ function RichTextWrapper(
 			if ( isInternal ) {
 				const pastedValue = create( {
 					html,
-					multilineTag,
-					multilineWrapperTags:
-						multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
 					preserveWhiteSpace,
 				} );
 				addActiveFormats( pastedValue, activeFormats );
@@ -439,18 +416,6 @@ function RichTextWrapper(
 
 			let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
 
-			// Force the blocks mode when the user is pasting
-			// on a new line & the content resembles a shortcode.
-			// Otherwise it's going to be detected as inline
-			// and the shortcode won't be replaced.
-			if (
-				mode === 'AUTO' &&
-				isEmpty( value ) &&
-				isShortcode( plainText )
-			) {
-				mode = 'BLOCKS';
-			}
-
 			const isPastedURL = isURL( plainText.trim() );
 			const presentEmbedHandlerPicker = () =>
 				embedHandlerPickerRef.current?.presentPicker( {
@@ -477,20 +442,8 @@ function RichTextWrapper(
 			} );
 
 			if ( typeof content === 'string' ) {
-				let valueToInsert = create( { html: content } );
-
+				const valueToInsert = create( { html: content } );
 				addActiveFormats( valueToInsert, activeFormats );
-
-				// If the content should be multiline, we should process text
-				// separated by a line break as separate lines.
-				if ( multilineTag ) {
-					valueToInsert = replace(
-						valueToInsert,
-						/\n+/g,
-						LINE_SEPARATOR
-					);
-				}
-
 				onChange( insert( value, valueToInsert ) );
 			} else if ( content.length > 0 ) {
 				// When an URL is pasted in an empty paragraph then the EmbedHandlerPicker should showcase options allowing the transformation of that URL
@@ -527,7 +480,6 @@ function RichTextWrapper(
 			onSplit,
 			splitValue,
 			__unstableEmbedURLOnPaste,
-			multilineTag,
 			preserveWhiteSpace,
 			pastePlainText,
 		]
@@ -578,7 +530,7 @@ function RichTextWrapper(
 
 	const mergedRef = useMergeRefs( [ forwardedRef, fallbackRef ] );
 
-	const content = (
+	return (
 		<RichText
 			clientId={ clientId }
 			identifier={ identifier }
@@ -599,7 +551,6 @@ function RichTextWrapper(
 			onPaste={ onPaste }
 			__unstableIsSelected={ isSelected }
 			__unstableInputRule={ inputRule }
-			__unstableMultilineTag={ multilineTag }
 			__unstableOnEnterFormattedText={ enterFormattedText }
 			__unstableOnExitFormattedText={ exitFormattedText }
 			__unstableOnCreateUndoLevel={ __unstableMarkLastChangeAsPersistent }
@@ -613,9 +564,7 @@ function RichTextWrapper(
 			__unstableAllowPrefixTransformations={
 				__unstableAllowPrefixTransformations
 			}
-			__unstableMultilineRootTag={ __unstableMultilineRootTag }
 			// Native props.
-			{ ...nativeProps }
 			blockIsSelected={
 				originalIsSelected !== undefined
 					? originalIsSelected
@@ -628,7 +577,6 @@ function RichTextWrapper(
 			textAlign={ textAlign }
 			selectionColor={ selectionColor }
 			tagsToEliminate={ tagsToEliminate }
-			rootTagsToEliminate={ rootTagsToEliminate }
 			disableEditingMenu={ disableEditingMenu }
 			fontSize={ fontSize }
 			fontFamily={ fontFamily }
@@ -706,51 +654,13 @@ function RichTextWrapper(
 			) }
 		</RichText>
 	);
-
-	if ( ! wrapperClassName ) {
-		return content;
-	}
-
-	deprecated( 'wp.blockEditor.RichText wrapperClassName prop', {
-		since: '5.4',
-		alternative: 'className prop or create your own wrapper div',
-		version: '6.2',
-	} );
-
-	return (
-		<div className={ classnames( wrapperClasses, wrapperClassName ) }>
-			{ content }
-		</div>
-	);
 }
 
-const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
+const ForwardedRichTextContainer = withDeprecations(
+	forwardRef( RichTextWrapper )
+);
 
-ForwardedRichTextContainer.Content = ( {
-	value,
-	tagName: Tag,
-	multiline,
-	...props
-} ) => {
-	// Handle deprecated `children` and `node` sources.
-	if ( Array.isArray( value ) ) {
-		value = childrenSource.toHTML( value );
-	}
-
-	const MultilineTag = getMultilineTag( multiline );
-
-	if ( ! value && MultilineTag ) {
-		value = `<${ MultilineTag }></${ MultilineTag }>`;
-	}
-
-	const content = <RawHTML>{ value }</RawHTML>;
-
-	if ( Tag ) {
-		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
-	}
-
-	return content;
-};
+ForwardedRichTextContainer.Content = Content;
 
 ForwardedRichTextContainer.isEmpty = ( value ) => {
 	return ! value || value.length === 0;
@@ -760,6 +670,8 @@ ForwardedRichTextContainer.Content.defaultProps = {
 	format: 'string',
 	value: '',
 };
+
+ForwardedRichTextContainer.Raw = RichText;
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md

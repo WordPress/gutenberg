@@ -12,20 +12,31 @@ import { useSelect } from '@wordpress/data';
 import useIndentListItem from './use-indent-list-item';
 
 export default function useSpace( clientId ) {
-	const { getSelectionStart, getSelectionEnd } =
+	const { getSelectionStart, getSelectionEnd, getBlockIndex } =
 		useSelect( blockEditorStore );
-	const [ canIndent, indentListItem ] = useIndentListItem( clientId );
+	const indentListItem = useIndentListItem( clientId );
 
 	return useRefEffect(
 		( element ) => {
 			function onKeyDown( event ) {
+				const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
+
 				if (
 					event.defaultPrevented ||
-					event.keyCode !== SPACE ||
-					! canIndent
+					keyCode !== SPACE ||
+					// Only override when no modifiers are pressed.
+					shiftKey ||
+					altKey ||
+					metaKey ||
+					ctrlKey
 				) {
 					return;
 				}
+
+				if ( getBlockIndex( clientId ) === 0 ) {
+					return;
+				}
+
 				const selectionStart = getSelectionStart();
 				const selectionEnd = getSelectionEnd();
 				if (
@@ -42,6 +53,6 @@ export default function useSpace( clientId ) {
 				element.removeEventListener( 'keydown', onKeyDown );
 			};
 		},
-		[ canIndent, indentListItem ]
+		[ clientId, indentListItem ]
 	);
 }

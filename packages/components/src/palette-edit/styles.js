@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
 import Button from '../button';
 import { Heading } from '../heading';
 import { HStack } from '../h-stack';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import { COLORS, CONFIG } from '../utils';
 import { View } from '../view';
 import InputControl from '../input-control';
@@ -29,7 +29,7 @@ export const IndicatorStyled = styled( CircularOptionPicker.Option )`
 export const NameInputControl = styled( InputControl )`
 	${ InputControlContainer } {
 		background: ${ COLORS.gray[ 100 ] };
-		border-radius: ${ CONFIG.controlBorderRadius }};
+		border-radius: ${ CONFIG.controlBorderRadius };
 		${ Input }${ Input }${ Input }${ Input } {
 			height: ${ space( 8 ) };
 		}
@@ -41,8 +41,8 @@ export const NameInputControl = styled( InputControl )`
 `;
 
 export const PaletteItem = styled( View )`
-	padding: 3px 0 3px ${ space( 3 ) };
-	height: calc( 40px - ${ CONFIG.borderWidth } );
+	padding-block: 3px;
+	padding-inline-start: ${ space( 3 ) };
 	border: 1px solid ${ CONFIG.surfaceBorderColor };
 	border-bottom-color: transparent;
 	&:first-of-type {
@@ -58,7 +58,7 @@ export const PaletteItem = styled( View )`
 		border-top-color: transparent;
 	}
 	&.is-selected {
-		border-color: ${ COLORS.blue.wordpress[ 700 ] };
+		border-color: ${ COLORS.theme.accent };
 	}
 `;
 
@@ -69,7 +69,7 @@ export const NameContainer = styled.div`
 	white-space: nowrap;
 	overflow: hidden;
 	${ PaletteItem }:hover & {
-		color: var( --wp-admin-theme-color, ${ COLORS.blue.wordpress[ 700 ] } );
+		color: ${ COLORS.theme.accent };
 	}
 `;
 
@@ -95,14 +95,15 @@ export const PaletteHStackHeader = styled( HStack )`
 export const PaletteEditStyles = styled( View )`
 	&&& {
 		.components-button.has-icon {
-		min-width: 0;
-		padding: 0;
+			min-width: 0;
+			padding: 0;
+		}
 	}
 `;
 
 export const DoneButton = styled( Button )`
 	&& {
-		color: ${ COLORS.ui.theme };
+		color: ${ COLORS.theme.accent };
 	}
 `;
 

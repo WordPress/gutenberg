@@ -26,7 +26,14 @@ function render_block_core_query_title( $attributes ) {
 	}
 	$title = '';
 	if ( $is_archive ) {
-		$title = get_the_archive_title();
+		$show_prefix = isset( $attributes['showPrefix'] ) ? $attributes['showPrefix'] : true;
+		if ( ! $show_prefix ) {
+			add_filter( 'get_the_archive_title_prefix', '__return_empty_string', 1 );
+			$title = get_the_archive_title();
+			remove_filter( 'get_the_archive_title_prefix', '__return_empty_string', 1 );
+		} else {
+			$title = get_the_archive_title();
+		}
 	}
 	if ( $is_search ) {
 		$title = __( 'Search results' );

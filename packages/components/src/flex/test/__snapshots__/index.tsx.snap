@@ -7,25 +7,25 @@ Snapshot Diff:
 
 @@ -1,22 +1,18 @@
   <div
-    class="components-flex css-1giw1wa-View-Flex-sx-Base-sx-Items-ItemsRow em57xhy0"
+    class="components-flex css-j6raph-View-Flex-base-ItemsRow e19lxcc00"
 -   data-testid="flex"
 +   data-testid="base-flex"
     data-wp-c16t="true"
     data-wp-component="Flex"
   >
     <div
-      class="components-flex-item css-mw3lhz-View-Item-sx-Base em57xhy0"
+      class="components-flex-item css-mw3lhz-View-Item-sx-Base e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
     >
       Item
     </div>
 -   <div
--     class="css-1mm2cvy-View em57xhy0"
+-     class="css-1mm2cvy-View e19lxcc00"
 -   />
 -   <div />
     <div
-      class="components-flex-item components-flex-block css-14wzr73-View-Item-sx-Base-block em57xhy0"
+      class="components-flex-item components-flex-block css-14wzr73-View-Item-sx-Base-block e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="FlexBlock"
     >
@@ -53,9 +53,9 @@ Snapshot Diff:
 +     "align-items": "center",
       "display": "flex",
       "flex-direction": "row",
+      "gap": "calc(4px * 2)",
       "justify-content": "space-between",
       "width": "100%",
-    },
 `;
 
 exports[`props should render correctly 1`] = `
@@ -71,14 +71,11 @@ exports[`props should render correctly 1`] = `
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
+  gap: calc(4px * 2);
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   justify-content: space-between;
   width: 100%;
-}
-
-.emotion-0>*+*:not( marquee ) {
-  margin-left: calc(4px * 2);
 }
 
 .emotion-0>* {
@@ -147,6 +144,7 @@ Snapshot Diff:
       "align-items": "center",
       "display": "flex",
       "flex-direction": "row",
+      "gap": "calc(4px * 2)",
 -     "justify-content": "flex-start",
 +     "justify-content": "space-between",
       "width": "100%",
@@ -161,9 +159,6 @@ Snapshot Diff:
 
   Array [
     Object {
--     "margin-left": "calc(4px * 2)",
--   },
--   Object {
 -     "min-width": "0",
 -   },
 -   Object {
@@ -175,9 +170,6 @@ Snapshot Diff:
       "max-width": "100%",
       "min-height": "0",
 +     "min-width": "0",
-+   },
-+   Object {
-+     "margin-left": "calc(4px * 5)",
 +   },
 +   Object {
       "min-width": "0",

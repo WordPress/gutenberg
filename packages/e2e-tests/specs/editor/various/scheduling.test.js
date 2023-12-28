@@ -46,7 +46,7 @@ describe( 'Scheduling', () => {
 				await page.keyboard.press( 'ArrowUp' );
 
 				// Close the datepicker.
-				await page.click( '.edit-post-post-schedule__toggle' );
+				await page.click( '.editor-post-schedule__dialog-toggle' );
 
 				expect( await getPublishButtonText() ).toBe( 'Schedule…' );
 			} );
@@ -57,13 +57,9 @@ describe( 'Scheduling', () => {
 		await createNewPost();
 
 		await page.click( '*[aria-label^="Change date"]' );
-		await page.click(
-			'*[aria-label="Move backward to switch to the previous month."]'
-		);
+		await page.click( '*[aria-label="View previous month"]' );
 		expect( await isDateTimeComponentFocused() ).toBe( true );
-		await page.click(
-			'*[aria-label="Move forward to switch to the next month."]'
-		);
+		await page.click( '*[aria-label="View next month"]' );
 		expect( await isDateTimeComponentFocused() ).toBe( true );
 	} );
 } );

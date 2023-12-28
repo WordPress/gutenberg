@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import renderer, { act } from 'react-test-renderer';
-
-/**
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
@@ -16,13 +11,7 @@ import {
 /**
  * Internal dependencies
  */
-import BlockEditorProvider from '../../components/provider';
-import {
-	getValidAlignments,
-	withToolbarControls,
-	withDataAlign,
-	addAssignedAlign,
-} from '../align';
+import { getValidAlignments, addAssignedAlign } from '../align';
 
 const noop = () => {};
 
@@ -31,6 +20,7 @@ describe( 'align', () => {
 		save: noop,
 		category: 'text',
 		title: 'block title',
+		edit: ( { children } ) => <>{ children }</>,
 	};
 
 	afterEach( () => {
@@ -150,149 +140,6 @@ describe( 'align', () => {
 					false
 				)
 			).toEqual( [ 'left', 'right' ] );
-		} );
-	} );
-
-	describe( 'withToolbarControls', () => {
-		it( 'should do nothing if no valid alignments', () => {
-			registerBlockType( 'core/foo', blockSettings );
-
-			const EnhancedComponent = withToolbarControls(
-				( { wrapperProps } ) => <div { ...wrapperProps } />
-			);
-
-			const wrapper = renderer.create(
-				<EnhancedComponent
-					name="core/foo"
-					attributes={ {} }
-					isSelected
-				/>
-			);
-			// When there's only one child, `rendered` in the tree is an object not an array.
-			expect( wrapper.toTree().rendered ).toBeInstanceOf( Object );
-		} );
-
-		it( 'should render toolbar controls if valid alignments', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: true,
-					alignWide: false,
-				},
-			} );
-
-			const EnhancedComponent = withToolbarControls(
-				( { wrapperProps } ) => <div { ...wrapperProps } />
-			);
-
-			const wrapper = renderer.create(
-				<EnhancedComponent
-					name="core/foo"
-					attributes={ {} }
-					isSelected
-				/>
-			);
-			expect( wrapper.toTree().rendered ).toHaveLength( 2 );
-		} );
-	} );
-
-	describe( 'withDataAlign', () => {
-		it( 'should render with wrapper props', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: true,
-					alignWide: true,
-				},
-			} );
-
-			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
-				<div { ...wrapperProps } />
-			) );
-
-			let wrapper;
-			act( () => {
-				wrapper = renderer.create(
-					<BlockEditorProvider
-						settings={ { alignWide: true, supportsLayout: false } }
-						value={ [] }
-					>
-						<EnhancedComponent
-							attributes={ {
-								align: 'wide',
-							} }
-							name="core/foo"
-						/>
-					</BlockEditorProvider>
-				);
-			} );
-			expect( wrapper.root.findByType( 'div' ).props ).toEqual( {
-				'data-align': 'wide',
-			} );
-		} );
-
-		it( 'should not render wide/full wrapper props if wide controls are not enabled', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: true,
-					alignWide: true,
-				},
-			} );
-
-			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
-				<div { ...wrapperProps } />
-			) );
-
-			let wrapper;
-			act( () => {
-				wrapper = renderer.create(
-					<BlockEditorProvider
-						settings={ { alignWide: false } }
-						value={ [] }
-					>
-						<EnhancedComponent
-							name="core/foo"
-							attributes={ {
-								align: 'wide',
-							} }
-						/>
-					</BlockEditorProvider>
-				);
-			} );
-			expect( wrapper.root.findByType( 'div' ).props ).toEqual( {} );
-		} );
-
-		it( 'should not render invalid align', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: true,
-					alignWide: false,
-				},
-			} );
-
-			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
-				<div { ...wrapperProps } />
-			) );
-
-			let wrapper;
-			act( () => {
-				wrapper = renderer.create(
-					<BlockEditorProvider
-						settings={ { alignWide: true } }
-						value={ [] }
-					>
-						<EnhancedComponent
-							name="core/foo"
-							attributes={ {
-								align: 'wide',
-							} }
-						/>
-					</BlockEditorProvider>
-				);
-			} );
-			expect( wrapper.root.findByType( 'div' ).props ).toEqual( {} );
 		} );
 	} );
 

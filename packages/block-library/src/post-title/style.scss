@@ -1,5 +1,7 @@
 .wp-block-post-title {
 	word-break: break-word;
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 
 	a {
 		display: inline-block;

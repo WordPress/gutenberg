@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -17,44 +18,85 @@ describe( 'pure', () => {
 	it( 'functional component should rerender only when props change', () => {
 		let i = 0;
 		const MyComp = pure( () => {
-			return <p>{ ++i }</p>;
+			return <p data-testid="counter">{ ++i }</p>;
 		} );
-		const wrapper = mount( <MyComp /> );
-		wrapper.update(); // Updating with same props doesn't rerender.
-		expect( wrapper.html() ).toBe( '<p>1</p>' );
-		wrapper.setProps( { prop: 'a' } ); // New prop should trigger a rerender.
-		expect( wrapper.html() ).toBe( '<p>2</p>' );
-		wrapper.setProps( { prop: 'a' } ); // Keeping the same prop value should not rerender.
-		expect( wrapper.html() ).toBe( '<p>2</p>' );
-		wrapper.setProps( { prop: 'b' } ); // Changing the prop value should rerender.
-		expect( wrapper.html() ).toBe( '<p>3</p>' );
+		const { rerender } = render( <MyComp /> );
+
+		// Updating with same props doesn't rerender.
+		rerender( <MyComp /> );
+		expect( screen.getByTestId( 'counter' ) ).toHaveTextContent( '1' );
+
+		// New prop should trigger a rerender.
+		rerender( <MyComp { ...{ prop: 'a' } } /> );
+		expect( screen.getByTestId( 'counter' ) ).toHaveTextContent( '2' );
+
+		// Keeping the same prop value should not rerender.
+		rerender( <MyComp { ...{ prop: 'a' } } /> );
+		expect( screen.getByTestId( 'counter' ) ).toHaveTextContent( '2' );
+
+		// Changing the prop value should rerender.
+		rerender( <MyComp { ...{ prop: 'b' } } /> );
+		expect( screen.getByTestId( 'counter' ) ).toHaveTextContent( '3' );
 	} );
 
-	it( 'class component should rerender if the props or state change', () => {
+	it( 'class component should rerender if the props or state change', async () => {
+		const user = userEvent.setup();
 		let i = 0;
 		const MyComp = pure(
 			class extends Component {
 				constructor() {
 					super( ...arguments );
-					this.state = {};
+					this.state = {
+						val: '',
+					};
 				}
 				render() {
-					return <p>{ ++i }</p>;
+					return (
+						<>
+							<p data-testid="counter">{ ++i }</p>
+							<input
+								type="text"
+								value={ this.state.val }
+								onChange={ ( e ) =>
+									this.setState( { val: e.target.value } )
+								}
+							/>
+							<input
+								type="button"
+								onClick={ () =>
+									this.setState( { val: this.state.val } )
+								}
+							/>
+						</>
+					);
 				}
 			}
 		);
-		const wrapper = mount( <MyComp /> );
-		wrapper.update(); // Updating with same props doesn't rerender.
-		expect( wrapper.html() ).toBe( '<p>1</p>' );
-		wrapper.setProps( { prop: 'a' } ); // New prop should trigger a rerender.
-		expect( wrapper.html() ).toBe( '<p>2</p>' );
-		wrapper.setProps( { prop: 'a' } ); // Keeping the same prop value should not rerender.
-		expect( wrapper.html() ).toBe( '<p>2</p>' );
-		wrapper.setProps( { prop: 'b' } ); // Changing the prop value should rerender.
-		expect( wrapper.html() ).toBe( '<p>3</p>' );
-		wrapper.setState( { state: 'a' } ); // New state value should trigger a rerender.
-		expect( wrapper.html() ).toBe( '<p>4</p>' );
-		wrapper.setState( { state: 'a' } ); // Keeping the same state value should not trigger a rerender.
-		expect( wrapper.html() ).toBe( '<p>4</p>' );
+
+		const { rerender } = render( <MyComp /> );
+
+		// Updating with same props doesn't rerender.
+		rerender( <MyComp /> );
+		expect( screen.getByTestId( 'counter' ) ).toHaveTextContent( '1' );
+
+		// New prop should trigger a rerender.
+		rerender( <MyComp { ...{ prop: 'a' } } /> );
+		expect( screen.getByTestId( 'counter' ) ).toHaveTextContent( '2' );
+
+		// Keeping the same prop value should not rerender.
+		rerender( <MyComp { ...{ prop: 'a' } } /> );
+		expect( screen.getByTestId( 'counter' ) ).toHaveTextContent( '2' );
+
+		// Changing the prop value should rerender.
+		rerender( <MyComp { ...{ prop: 'b' } } /> );
+		expect( screen.getByTestId( 'counter' ) ).toHaveTextContent( '3' );
+
+		// New state value should trigger a rerender.
+		await user.type( screen.getByRole( 'textbox' ), 'a' );
+		expect( screen.getByTestId( 'counter' ) ).toHaveTextContent( '4' );
+
+		// Keeping the same state value should not trigger a rerender.
+		await user.click( screen.getByRole( 'button' ) );
+		expect( screen.getByTestId( 'counter' ) ).toHaveTextContent( '4' );
 	} );
 } );

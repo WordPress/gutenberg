@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
-import { mapKeys } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -57,7 +56,12 @@ function getConvertedKey( key ) {
  * @return {import('react').CSSProperties} Converted ltr -> rtl styles
  */
 export const convertLTRToRTL = ( ltrStyles = {} ) => {
-	return mapKeys( ltrStyles, ( _value, key ) => getConvertedKey( key ) );
+	return Object.fromEntries(
+		Object.entries( ltrStyles ).map( ( [ key, value ] ) => [
+			getConvertedKey( key ),
+			value,
+		] )
+	);
 };
 
 /**

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { mapKeys } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -35,7 +30,12 @@ const interactiveContentTags = new Set( [
 
 function prefixSelectKeys( selected, prefix ) {
 	if ( typeof selected !== 'object' ) return { [ prefix ]: selected };
-	return mapKeys( selected, ( value, key ) => `${ prefix }.${ key }` );
+	return Object.fromEntries(
+		Object.entries( selected ).map( ( [ key, value ] ) => [
+			`${ prefix }.${ key }`,
+			value,
+		] )
+	);
 }
 
 function getPrefixedSelectKeys( selected, prefix ) {
@@ -66,21 +66,21 @@ export function useFormatTypes( {
 } ) {
 	const allFormatTypes = useSelect( formatTypesSelector, [] );
 	const formatTypes = useMemo( () => {
-		return allFormatTypes.filter( ( { name, tagName } ) => {
+		return allFormatTypes.filter( ( { name, interactive, tagName } ) => {
 			if ( allowedFormats && ! allowedFormats.includes( name ) ) {
 				return false;
 			}
 
 			if (
 				withoutInteractiveFormatting &&
-				interactiveContentTags.has( tagName )
+				( interactive || interactiveContentTags.has( tagName ) )
 			) {
 				return false;
 			}
 
 			return true;
 		} );
-	}, [ allFormatTypes, allowedFormats, interactiveContentTags ] );
+	}, [ allFormatTypes, allowedFormats, withoutInteractiveFormatting ] );
 	const keyedSelected = useSelect(
 		( select ) =>
 			formatTypes.reduce( ( accumulator, type ) => {

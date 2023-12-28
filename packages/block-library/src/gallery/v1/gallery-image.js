@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -111,14 +110,18 @@ class GalleryImage extends Component {
 		// written by the user, make sure the text is not overwritten.
 		if ( isTemporaryImage( id, url ) ) {
 			if ( alt ) {
-				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
+				const { alt: omittedAlt, ...restMediaAttributes } =
+					mediaAttributes;
+				mediaAttributes = restMediaAttributes;
 			}
 		}
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
-		if ( caption && ! get( mediaAttributes, [ 'caption' ] ) ) {
-			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
+		if ( caption && ! mediaAttributes.caption ) {
+			const { caption: omittedCaption, ...restMediaAttributes } =
+				mediaAttributes;
+			mediaAttributes = restMediaAttributes;
 		}
 
 		setAttributes( mediaAttributes );

@@ -1,6 +1,16 @@
 /**
+ * WordPress dependencies
+ */
+import { store } from '@wordpress/interactivity';
+/**
  * Internal dependencies
  */
-import { hidePdfEmbedsOnUnsupportedBrowsers } from './utils';
+import { browserSupportsPdfs } from './utils';
 
-hidePdfEmbedsOnUnsupportedBrowsers();
+store( 'core/file', {
+	state: {
+		get hasPdfPreview() {
+			return browserSupportsPdfs();
+		},
+	},
+} );

@@ -11,8 +11,8 @@ Specifically, this ensures that:
 Examples of **incorrect** code for this rule:
 
 ```js
-import { get } from 'lodash';
-import { Component } from '@wordpress/element';
+import { camelCase } from 'change-case';
+import { Component } from 'react';
 import edit from './edit';
 ```
 
@@ -22,12 +22,12 @@ Examples of **correct** code for this rule:
 /*
  * External dependencies
  */
-import { get } from 'lodash';
+import { camelCase } from 'change-case';
 
 /*
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component } from 'react';
 
 /*
  * Internal dependencies

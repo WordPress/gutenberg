@@ -3,7 +3,6 @@
  */
 import { Children, createElement } from './react';
 
-// Disable reason: JSDoc linter doesn't seem to parse the union (`&`) correctly.
 /** @typedef {{children: string} & import('react').ComponentPropsWithoutRef<'div'>} RawHTMLProps */
 
 /**

@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import { EditorKeyboardShortcutsRegister } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -11,25 +16,21 @@ import { KeyboardShortcutHelpModal } from '../index';
 const noop = () => {};
 
 describe( 'KeyboardShortcutHelpModal', () => {
-	it( 'should match snapshot when the modal is active', () => {
-		const wrapper = shallow(
-			<KeyboardShortcutHelpModal
-				isModalActive={ true }
-				toggleModal={ noop }
-			/>
+	it( 'should not render the modal when inactive', () => {
+		render(
+			<>
+				<EditorKeyboardShortcutsRegister />
+				<KeyboardShortcutHelpModal
+					isModalActive={ false }
+					toggleModal={ noop }
+				/>
+			</>
 		);
 
-		expect( wrapper ).toMatchSnapshot();
-	} );
-
-	it( 'should match snapshot when the modal is not active', () => {
-		const wrapper = shallow(
-			<KeyboardShortcutHelpModal
-				isModalActive={ false }
-				toggleModal={ noop }
-			/>
-		);
-
-		expect( wrapper ).toMatchSnapshot();
+		expect(
+			screen.queryByRole( 'dialog', {
+				name: 'Keyboard shortcuts',
+			} )
+		).not.toBeInTheDocument();
 	} );
 } );

@@ -12,7 +12,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 	useBlockProps,
-	useSetting,
+	useSettings,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -25,12 +25,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
 function ColumnEdit( {
-	attributes: {
-		verticalAlignment,
-		width,
-		templateLock = false,
-		allowedBlocks,
-	},
+	attributes: { verticalAlignment, width, templateLock, allowedBlocks },
 	setAttributes,
 	clientId,
 } ) {
@@ -38,14 +33,9 @@ function ColumnEdit( {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'%',
-			'px',
-			'em',
-			'rem',
-			'vw',
-		],
+		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 	} );
 
 	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
@@ -109,10 +99,11 @@ function ColumnEdit( {
 				<BlockVerticalAlignmentToolbar
 					onChange={ updateAlignment }
 					value={ verticalAlignment }
+					controls={ [ 'top', 'center', 'bottom', 'stretch' ] }
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Column settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<UnitControl
 						label={ __( 'Width' ) }
 						labelPosition="edge"

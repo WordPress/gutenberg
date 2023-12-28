@@ -1,15 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { ordered, values, type, reversed, start } = attributes;
+	const { ordered, type, reversed, start } = attributes;
 	const TagName = ordered ? 'ol' : 'ul';
-
 	return (
-		<TagName { ...useBlockProps.save( { type, reversed, start } ) }>
-			<RichText.Content value={ values } multiline="li" />
+		<TagName
+			{ ...useBlockProps.save( {
+				reversed,
+				start,
+				style: {
+					listStyleType:
+						ordered && type !== 'decimal' ? type : undefined,
+				},
+			} ) }
+		>
+			<InnerBlocks.Content />
 		</TagName>
 	);
 }

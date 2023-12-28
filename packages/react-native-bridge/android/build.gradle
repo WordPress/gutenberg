@@ -12,6 +12,12 @@ plugins {
 
 allprojects {
     repositories {
+        mavenCentral()
+        // Starting from React Native 0.70, we no longer need to publish React Native binaries
+        // because they are already published to Maven (reference: https://t.ly/Biea).
+        // However, the third-party dependencies from forked repositories still point to older
+        // versions of React Native, hence we need to keep this Maven repository.
         maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
+        mavenLocal()
     }
 }

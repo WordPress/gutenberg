@@ -1,15 +1,10 @@
 /**
- * External dependencies
- */
-import { some, groupBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Button, Flex, FlexItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useCallback, useRef } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
@@ -19,15 +14,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import EntityTypeList from './entity-type-list';
-
-const TRANSLATED_SITE_PROPERTIES = {
-	title: __( 'Title' ),
-	description: __( 'Tagline' ),
-	site_logo: __( 'Logo' ),
-	site_icon: __( 'Icon' ),
-	show_on_front: __( 'Show on front' ),
-	page_on_front: __( 'Page on front' ),
-};
+import { useIsDirty } from './hooks/use-is-dirty';
 
 const PUBLISH_ON_SAVE_ENTITIES = [
 	{
@@ -36,40 +23,30 @@ const PUBLISH_ON_SAVE_ENTITIES = [
 	},
 ];
 
+function identity( values ) {
+	return values;
+}
+
 export default function EntitiesSavedStates( { close } ) {
+	const isDirtyProps = useIsDirty();
+	return (
+		<EntitiesSavedStatesExtensible close={ close } { ...isDirtyProps } />
+	);
+}
+
+export function EntitiesSavedStatesExtensible( {
+	additionalPrompt = undefined,
+	close,
+	onSave = identity,
+	saveEnabled: saveEnabledProp = undefined,
+	saveLabel = __( 'Save' ),
+
+	dirtyEntityRecords,
+	isDirty,
+	setUnselectedEntities,
+	unselectedEntities,
+} ) {
 	const saveButtonRef = useRef();
-	const { dirtyEntityRecords } = useSelect( ( select ) => {
-		const dirtyRecords =
-			select( coreStore ).__experimentalGetDirtyEntityRecords();
-
-		// Remove site object and decouple into its edited pieces.
-		const dirtyRecordsWithoutSite = dirtyRecords.filter(
-			( record ) => ! ( record.kind === 'root' && record.name === 'site' )
-		);
-
-		const siteEdits = select( coreStore ).getEntityRecordEdits(
-			'root',
-			'site'
-		);
-
-		const siteEditsAsEntities = [];
-		for ( const property in siteEdits ) {
-			siteEditsAsEntities.push( {
-				kind: 'root',
-				name: 'site',
-				title: TRANSLATED_SITE_PROPERTIES[ property ] || property,
-				property,
-			} );
-		}
-		const dirtyRecordsWithSiteItems = [
-			...dirtyRecordsWithoutSite,
-			...siteEditsAsEntities,
-		];
-
-		return {
-			dirtyEntityRecords: dirtyRecordsWithSiteItems,
-		};
-	}, [] );
 	const {
 		editEntityRecord,
 		saveEditedEntityRecord,
@@ -79,11 +56,18 @@ export default function EntitiesSavedStates( { close } ) {
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
 
-	const { createSuccessNotice, createErrorNotice } =
+	const { createSuccessNotice, createErrorNotice, removeNotice } =
 		useDispatch( noticesStore );
 
 	// To group entities by type.
-	const partitionedSavables = groupBy( dirtyEntityRecords, 'name' );
+	const partitionedSavables = dirtyEntityRecords.reduce( ( acc, record ) => {
+		const { name } = record;
+		if ( ! acc[ name ] ) {
+			acc[ name ] = [];
+		}
+		acc[ name ].push( record );
+		return acc;
+	}, {} );
 
 	// Sort entity groups.
 	const {
@@ -99,36 +83,23 @@ export default function EntitiesSavedStates( { close } ) {
 		...Object.values( contentSavables ),
 	].filter( Array.isArray );
 
-	// Unchecked entities to be ignored by save function.
-	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
+	const saveEnabled = saveEnabledProp ?? isDirty;
 
-	const setUnselectedEntities = (
-		{ kind, name, key, property },
-		checked
-	) => {
-		if ( checked ) {
-			_setUnselectedEntities(
-				unselectedEntities.filter(
-					( elt ) =>
-						elt.kind !== kind ||
-						elt.name !== name ||
-						elt.key !== key ||
-						elt.property !== property
-				)
-			);
-		} else {
-			_setUnselectedEntities( [
-				...unselectedEntities,
-				{ kind, name, key, property },
-			] );
-		}
-	};
+	const { homeUrl } = useSelect( ( select ) => {
+		const {
+			getUnstableBase, // Site index.
+		} = select( coreStore );
+		return {
+			homeUrl: getUnstableBase()?.home,
+		};
+	}, [] );
 
 	const saveCheckedEntities = () => {
+		const saveNoticeId = 'site-editor-save-success';
+		removeNotice( saveNoticeId );
 		const entitiesToSave = dirtyEntityRecords.filter(
 			( { kind, name, key, property } ) => {
-				return ! some(
-					unselectedEntities,
+				return ! unselectedEntities.some(
 					( elt ) =>
 						elt.kind === kind &&
 						elt.name === name &&
@@ -176,6 +147,9 @@ export default function EntitiesSavedStates( { close } ) {
 
 		Promise.all( pendingSavedRecords )
 			.then( ( values ) => {
+				return onSave( values );
+			} )
+			.then( ( values ) => {
 				if (
 					values.some( ( value ) => typeof value === 'undefined' )
 				) {
@@ -183,6 +157,13 @@ export default function EntitiesSavedStates( { close } ) {
 				} else {
 					createSuccessNotice( __( 'Site updated.' ), {
 						type: 'snackbar',
+						id: saveNoticeId,
+						actions: [
+							{
+								label: __( 'View site' ),
+								url: homeUrl,
+							},
+						],
 					} );
 				}
 			} )
@@ -211,15 +192,11 @@ export default function EntitiesSavedStates( { close } ) {
 					as={ Button }
 					ref={ saveButtonRef }
 					variant="primary"
-					disabled={
-						dirtyEntityRecords.length -
-							unselectedEntities.length ===
-						0
-					}
+					disabled={ ! saveEnabled }
 					onClick={ saveCheckedEntities }
 					className="editor-entities-saved-states__save-button"
 				>
-					{ __( 'Save' ) }
+					{ saveLabel }
 				</FlexItem>
 				<FlexItem
 					isBlock
@@ -233,11 +210,14 @@ export default function EntitiesSavedStates( { close } ) {
 
 			<div className="entities-saved-states__text-prompt">
 				<strong>{ __( 'Are you ready to save?' ) }</strong>
-				<p>
-					{ __(
-						'The following changes have been made to your site, templates, and content.'
-					) }
-				</p>
+				{ additionalPrompt }
+				{ isDirty && (
+					<p>
+						{ __(
+							'The following changes have been made to your site, templates, and content.'
+						) }
+					</p>
+				) }
 			</div>
 
 			{ sortedPartitionedSavables.map( ( list ) => {
@@ -245,7 +225,6 @@ export default function EntitiesSavedStates( { close } ) {
 					<EntityTypeList
 						key={ list[ 0 ].name }
 						list={ list }
-						closePanel={ dismissPanel }
 						unselectedEntities={ unselectedEntities }
 						setUnselectedEntities={ setUnselectedEntities }
 					/>

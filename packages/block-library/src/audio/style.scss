@@ -1,4 +1,6 @@
 .wp-block-audio {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 	// Supply caption styles to audio blocks, even if the theme hasn't opted in.
 	// Reason being: the new markup, <figcaptions>, are not likely to be styled in the majority of existing themes,
 	// so we supply the styles so as to not appear broken or unstyled in those themes.

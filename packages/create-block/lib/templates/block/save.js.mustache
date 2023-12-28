@@ -1,3 +1,4 @@
+{{#isStaticVariant}}
 /**
  * React hook that is used to mark the block wrapper element.
  * It provides all the necessary props like the class name.
@@ -13,7 +14,7 @@ import { useBlockProps } from '@wordpress/block-editor';
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#save
  *
- * @return {WPElement} Element to render.
+ * @return {Element} Element to render.
  */
 export default function save() {
 	return (
@@ -22,3 +23,4 @@ export default function save() {
 		</p>
 	);
 }
+{{/isStaticVariant}}

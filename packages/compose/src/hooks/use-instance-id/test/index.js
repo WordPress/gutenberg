@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { create, act } from 'react-test-renderer';
+import { render } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -14,23 +14,16 @@ describe( 'useInstanceId', () => {
 	};
 
 	it( 'should manage ids', async () => {
-		let test0;
+		const { container, rerender } = render( <TestComponent /> );
 
-		await act( async () => {
-			test0 = create( <TestComponent /> );
-		} );
+		expect( container ).toHaveTextContent( '0' );
 
-		expect( test0.toJSON() ).toBe( '0' );
+		rerender(
+			<div>
+				<TestComponent />
+			</div>
+		);
 
-		let test1;
-
-		await act( async () => {
-			test1 = create( <TestComponent /> );
-		} );
-
-		expect( test1.toJSON() ).toBe( '1' );
-
-		test0.unmount();
-		test1.unmount();
+		expect( container ).toHaveTextContent( '1' );
 	} );
 } );

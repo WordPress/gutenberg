@@ -11,6 +11,7 @@ import {
 	pressKeyTimes,
 	pressKeyWithModifier,
 	openTypographyToolsPanelMenu,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Editing modes (visual/HTML)', () => {
@@ -22,9 +23,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 	it( 'should switch between visual and HTML modes', async () => {
 		// This block should be in "visual" mode by default.
-		let visualBlock = await page.$$(
-			'.block-editor-block-list__layout .block-editor-block-list__block.rich-text'
-		);
+		let visualBlock = await canvas().$$( '[data-block].rich-text' );
 		expect( visualBlock ).toHaveLength( 1 );
 
 		// Change editing mode from "Visual" to "HTML".
@@ -32,8 +31,8 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await clickMenuItem( 'Edit as HTML' );
 
 		// Wait for the block to be converted to HTML editing mode.
-		const htmlBlock = await page.$$(
-			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea'
+		const htmlBlock = await canvas().$$(
+			'[data-block] .block-editor-block-list__block-html-textarea'
 		);
 		expect( htmlBlock ).toHaveLength( 1 );
 
@@ -42,9 +41,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await clickMenuItem( 'Edit visually' );
 
 		// This block should be in "visual" mode by default.
-		visualBlock = await page.$$(
-			'.block-editor-block-list__layout .block-editor-block-list__block.rich-text'
-		);
+		visualBlock = await canvas().$$( '[data-block].rich-text' );
 		expect( visualBlock ).toHaveLength( 1 );
 	} );
 
@@ -71,7 +68,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await clickMenuItem( 'Edit as HTML' );
 
 		// Make sure the paragraph content is rendered as expected.
-		let htmlBlockContent = await page.$eval(
+		let htmlBlockContent = await canvas().$eval(
 			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea',
 			( node ) => node.textContent
 		);
@@ -87,7 +84,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		await dropCapToggle.click();
 
 		// Make sure the HTML content updated.
-		htmlBlockContent = await page.$eval(
+		htmlBlockContent = await canvas().$eval(
 			'.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea',
 			( node ) => node.textContent
 		);
@@ -105,22 +102,25 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( title ).toBe( 'Paragraph' );
 
 		// The Block inspector should be active.
-		let blockInspectorTab = await page.$(
-			'.edit-post-sidebar__panel-tab.is-active[data-label="Block"]'
+		let [ blockInspectorTab ] = await page.$x(
+			'//button[@role="tab"][@aria-selected="true"][contains(text(), "Block")]'
 		);
 		expect( blockInspectorTab ).not.toBeNull();
 
 		await switchEditorModeTo( 'Code' );
 
 		// The Block inspector should not be active anymore.
-		blockInspectorTab = await page.$(
-			'.edit-post-sidebar__panel-tab.is-active[data-label="Block"]'
+		[ blockInspectorTab ] = await page.$x(
+			'//button[@role="tab"][@aria-selected="true"][contains(text(), "Block")]'
 		);
-		expect( blockInspectorTab ).toBeNull();
+		expect( blockInspectorTab ).toBeUndefined();
 
 		// No block is selected.
-		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
-		const noBlocksElement = await page.$(
+		const inactiveBlockInspectorTab = await page.waitForXPath(
+			'//button[@role="tab"][contains(text(), "Block")]'
+		);
+		inactiveBlockInspectorTab.click();
+		const noBlocksElement = page.waitForSelector(
 			'.block-editor-block-inspector__no-blocks'
 		);
 		expect( noBlocksElement ).not.toBeNull();
@@ -142,7 +142,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		const editPosition = textContent.indexOf( 'Hello' );
 
 		// Replace the word 'Hello' with 'Hi'.
-		await page.click( '.editor-post-title__input' );
+		await canvas().click( '.editor-post-title__input' );
 		await page.keyboard.press( 'Tab' );
 		await pressKeyTimes( 'ArrowRight', editPosition );
 		await pressKeyTimes( 'Delete', 5 );

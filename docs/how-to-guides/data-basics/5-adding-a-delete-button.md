@@ -43,10 +43,9 @@ function PagesList( { hasResolved, pages } ) {
 						<td>{ decodeEntities( page.title.rendered ) }</td>
 						<td>
 							<div className="form-buttons">
-								<EditPageButton pageId={ page.id } />
+								<PageEditButton pageId={ page.id } />
 								{/* ↓ This is the only change in the PagesList component */}
 								<DeletePageButton pageId={ page.id }/>
-								{/* ↑ This is the only change in the PagesList component */}
 							</div>
 						</td>
 					</tr>
@@ -143,7 +142,7 @@ wp.data.select( 'core' ).getLastEntityDeleteError( 'postType', 'page', 9 )
 Here's how we can apply it in `DeletePageButton`:
 
 ```js
-import { useEffect } from '@wordpress/element';
+import { useEffect } from 'react';
 const DeletePageButton = ({ pageId }) => {
 	// ...
 	const { error, /* ... */ } = useSelect(
@@ -253,8 +252,8 @@ Now we're ready to tell the user about any errors that may have occurred.
 With the SnackbarNotices component in place, we're ready to dispatch some notifications! Here's how:
 
 ```js
+import { useEffect } from 'react';
 import { store as noticesStore } from '@wordpress/notices';
-import { useEffect } from '@wordpress/element';
 function DeletePageButton( { pageId } ) {
 	const { createSuccessNotice, createErrorNotice } = useDispatch( noticesStore );
 	// useSelect returns a list of selectors if you pass the store handle
@@ -285,7 +284,7 @@ function DeletePageButton( { pageId } ) {
 Great! `DeletePageButton` is now fully aware of errors. Let's see that error message in action. We'll trigger an invalid delete and let it fail. One way to do this is to multiply the `pageId` by a large number:
 
 ```js
-export function DeletePageButton( { pageId, onCancel, onSaveFinished } ) {
+function DeletePageButton( { pageId, onCancel, onSaveFinished } ) {
 	pageId = pageId * 1000;
 	// ...
 }
@@ -308,8 +307,8 @@ And that's it!
 All the pieces are in place, great! Here’s all the changes we've made in this chapter:
 
 ```js
+import { useState, useEffect } from 'react';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
 import { Button, Modal, TextControl } from '@wordpress/components';
 
 function MyFirstApp() {
@@ -447,4 +446,4 @@ function DeletePageButton( { pageId } ) {
 ## What's next?
 
 * **Previous part:** [Building a *Create page form*](/docs/how-to-guides/data-basics/4-building-a-create-page-form.md)
-* (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/09-code-data-basics-esnext) in the gutenberg-examples repository
+* (optional) Review the [finished app](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8) in the block-development-examples repository

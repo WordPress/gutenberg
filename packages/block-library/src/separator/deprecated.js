@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -42,9 +41,9 @@ const v1 = {
 		return <hr { ...useBlockProps.save( { className, style } ) } />;
 	},
 	migrate( attributes ) {
-		const { color, customColor } = attributes;
+		const { color, customColor, ...restAttributes } = attributes;
 		return {
-			...omit( attributes, [ 'color', 'customColor' ] ),
+			...restAttributes,
 			backgroundColor: color ? color : undefined,
 			opacity: 'css',
 			style: customColor

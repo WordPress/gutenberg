@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import type { FormToggleProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 export const noop = () => {};
 
@@ -31,12 +31,7 @@ export const noop = () => {};
  * ```
  */
 export function FormToggle(
-	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
-	// ref forwarding to FormToggle.
-	props: Omit<
-		WordPressComponentProps< FormToggleProps, 'input', false >,
-		'ref'
-	>
+	props: WordPressComponentProps< FormToggleProps, 'input', false >
 ) {
 	const {
 		className,

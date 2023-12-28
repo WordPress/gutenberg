@@ -4,16 +4,23 @@
 
 ## Usage
 
-Render a `BaseControl` for a textarea input:
-
 ```jsx
-import { BaseControl } from '@wordpress/components';
+import { BaseControl, useBaseControlProps } from '@wordpress/components';
 
-// The `id` prop is necessary to accessibly associate the label with the textarea
-const MyBaseControl = () => (
-	<BaseControl id="textarea-1" label="Text" help="Enter some text" __nextHasNoMarginBottom={ true }>
-		<textarea id="textarea-1" />
-	</BaseControl>
+// Render a `BaseControl` for a textarea input
+const MyCustomTextareaControl = ({ children, ...baseProps }) => (
+	// `useBaseControlProps` is a convenience hook to get the props for the `BaseControl`
+	// and the inner control itself. Namely, it takes care of generating a unique `id`,
+	// properly associating it with the `label` and `help` elements.
+	const { baseControlProps, controlProps } = useBaseControlProps( baseProps );
+
+	return (
+		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom={ true }>
+			<textarea { ...controlProps }>
+			  { children }
+			</textarea>
+		</BaseControl>
+	);
 );
 ```
 
@@ -23,7 +30,9 @@ The component accepts the following props:
 
 ### id
 
-The HTML `id` of the element (passed in as a child to `BaseControl`) to which labels and help text are being generated. This is necessary to accessibly associate the label with that element.
+The HTML `id` of the control element (passed in as a child to `BaseControl`) to which labels and help text are being generated. This is necessary to accessibly associate the label with that element.
+
+The recommended way is to use the `useBaseControlProps` hook, which takes care of generating a unique `id` for you. Otherwise, if you choose to pass an explicit `id` to this prop, you are responsible for ensuring the uniqueness of the `id`.
 
 -   Type: `String`
 -   Required: No
@@ -44,9 +53,9 @@ If true, the label will only be visible to screen readers.
 
 ### help
 
-If this property is added, a help text will be generated using help property as the content.
+Additional description for the control. It is preferable to use plain text for `help`, as it can be accessibly associated with the control using `aria-describedby`. When the `help` contains links, or otherwise non-plain text content, it will be associated with the control using `aria-details`.
 
--   Type: `String|WPElement`
+-   Type: `ReactNode`
 -   Required: No
 
 ### className

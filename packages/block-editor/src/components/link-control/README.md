@@ -4,6 +4,26 @@ Renders a link control. A link control is a controlled input which maintains a v
 
 It is designed to provide a standardized UI for the creation of a link throughout the Editor, see History section at bottom for further background.
 
+## Best Practices
+
+### Ensuring unique instances
+
+It is possible that a given editor may render multiple instances of the `<LinkControl>` component. As a result, it is important to ensure each instance is unique across the editor to avoid state "leaking" between components.
+
+Why would this happen?
+
+React's reconciliation algorithm means that if you return the same element from a component, it keeps the nodes around as an optimization, even if the props change. This means that if you render two (or more) `<LinkControl>`s, it is possible that the `value` from one will appear in the other as you move between them.
+
+As a result it is recommended that consumers provide a `key` prop to each instance of `<LinkControl>`:
+
+```jsx
+<LinkControl key="some-unique-key" { ...props } />
+```
+
+This will cause React to return the same component/element type but force remount a new instance, thus avoiding the issues described above.
+
+For more information see: https://github.com/WordPress/gutenberg/pull/34742.
+
 ## Relationship to `<URLInput>`
 
 As of Gutenberg 7.4, `<LinkControl>` became the default link creation interface within the Block Editor, replacing previous disparate uses of `<URLInput>` and standardizing the UI.
@@ -14,6 +34,16 @@ The distinction between the two components is perhaps best summarized by the fol
 
 -   `<URLInput>` - an input for presenting and managing selection behaviors associated with choosing a URL, optionally from a pool of available candidates.
 -   `<LinkControl>` - includes the features of `<URLInput>`, plus additional UI and behaviors to control how this URL applies to the concept of a "link". This includes link "settings" (eg: "opens in new tab", etc) and dynamic, "on the fly" link creation capabilities.
+
+## Persistent "Advanced" (settings) toggle state
+
+By default the link "settings" are hidden and can be toggled open/closed by way of a button labelled `Advanced` in the UI.
+
+In some circumstances if may be desirable to persist the toggle state of this portion of the UI so that it remains in the last state triggered by user interaction.
+
+For example, once the user has toggled the UI to "open", then it may remain open across all links on the site until such time as the user toggles the UI back again.
+
+Consumers who which to take advantage of this functionality should ensure that their block editor environment utilizes the [`@wordpress/preferences`](packages/preferences/README.md) package. By default the `<LinkControl>` component will attempt to persist the state of UI to a setting named `linkControlSettingsDrawer` with a scope of `core/block-editor`. If the preferences package is not available then local state is used and the setting will not be persisted.
 
 ## Search Suggestions
 
@@ -49,6 +79,29 @@ The resulting default properties of `value` include:
 -   `title` (`string`, optional): Link title.
 -   `opensInNewTab` (`boolean`, optional): Whether link should open in a new browser tab. This value is only assigned when not providing a custom `settings` prop.
 
+Note: `<LinkControl>` maintains an internal state tracking temporary user edits to the link `value` prior to submission. To avoid unwanted synchronization of this internal value, it is advised that the `value` prop is stablized (likely via memozation) before it is passed to the component. This will avoid unwanted loss of any changes users have may made whilst interacting with the control.
+
+```jsx
+const memoizedValue = useMemo(
+	() => ( {
+		url: attributes.url,
+		type: attributes.type,
+		opensInNewTab: attributes.target === '_blank',
+		title: attributes.text,
+	} ),
+	[
+		attributes.url,
+		attributes.type,
+		attributes.target,
+		attributes.text,
+	]
+);
+
+<LinkControl
+	value={ memoizedValue }
+>
+```
+
 ### settings
 
 -   Type: `Array`
@@ -69,9 +122,7 @@ An array of settings objects associated with a link (for example: a setting to d
 To disable settings, pass in an empty array. for example:
 
 ```jsx
-<LinkControl
-	settings={ [] }
-/>
+<LinkControl settings={ [] } />
 ```
 
 ### onChange
@@ -192,7 +243,8 @@ A `suggestion` should have the following shape:
 	)}
 />
 ```
-### renderControlBottom 
+
+### renderControlBottom
 
 -   Type: `Function`
 -   Required: No
@@ -223,14 +275,14 @@ If passed, children are rendered after the input.
 
 ```jsx
 <LinkControlSearchInput>
-	<div className="block-editor-link-control__search-actions">
+	<HStack justify="right">
 		<Button
 			type="submit"
 			label={ __( 'Submit' ) }
 			icon={ keyboardReturn }
 			className="block-editor-link-control__search-submit"
 		/>
-	</div>
+	</HStack>
 </LinkControlSearchInput>
 ```
 
@@ -322,10 +374,10 @@ The following properties are provided by URLInput:
 -   suggestions
 -   selectedSuggestion
 -   suggestionsListProps
+-   currentInputValue
 
 The following extra properties are provided by LinkControlSearchInput:
 
--   currentInputValue
 -   createSuggestionButtonText
 -   handleSuggestionClick
 -   instanceId
@@ -338,7 +390,7 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
 <LinkControlSearchInput
     renderSuggestions={( { suggestions } ) => {
         return (
-            <Popover focusOnMount={ false } position="bottom">
+            <Popover focusOnMount={ false } placement="bottom">
                 <ul>
                     { suggestions.map( () => ( <li key={ `${ suggestion.id }-${ suggestion.type }` }>{ suggestion.title }</li> ) ) }
                 </ul>
@@ -352,7 +404,7 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
 <LinkControlSearchInput
     renderSuggestions={( suggestionsProps ) => {
         return (
-            <Popover focusOnMount={ false } position="bottom">
+            <Popover focusOnMount={ false } placement="bottom">
                 <LinkControlSearchResults { ...suggestionsProps } />
             </Popover>
         );

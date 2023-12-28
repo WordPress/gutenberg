@@ -7,6 +7,7 @@ import { preformatted as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
@@ -33,7 +34,9 @@ export const settings = {
 	save,
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: attributes.content + attributesToMerge.content,
+			content: attributes.content + '\n\n' + attributesToMerge.content,
 		};
 	},
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

@@ -1,12 +1,8 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
-
-/**
- * WordPress dependencies
- */
-import { TextControl } from '@wordpress/components';
+import { act, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -14,28 +10,17 @@ import { TextControl } from '@wordpress/components';
 import { PostSlug } from '../';
 
 describe( 'PostSlug', () => {
-	describe( '#render()', () => {
-		it( 'should update internal slug', () => {
-			const wrapper = shallow( <PostSlug postSlug="index" /> );
+	it( 'should update slug with sanitized input', async () => {
+		const user = userEvent.setup();
+		const onUpdateSlug = jest.fn();
 
-			wrapper.find( TextControl ).prop( 'onChange' )( 'single' );
+		render( <PostSlug postSlug="index" onUpdateSlug={ onUpdateSlug } /> );
 
-			expect( wrapper.state().editedSlug ).toEqual( 'single' );
-		} );
+		const input = screen.getByRole( 'textbox', { name: 'Slug' } );
+		await user.clear( input );
+		await user.type( input, 'Foo Bar-Baz 9!' );
+		act( () => input.blur() );
 
-		it( 'should update slug', () => {
-			const onUpdateSlug = jest.fn();
-			const wrapper = shallow(
-				<PostSlug postSlug="index" onUpdateSlug={ onUpdateSlug } />
-			);
-
-			wrapper.find( TextControl ).prop( 'onBlur' )( {
-				target: {
-					value: 'single',
-				},
-			} );
-
-			expect( onUpdateSlug ).toHaveBeenCalledWith( 'single' );
-		} );
+		expect( onUpdateSlug ).toHaveBeenCalledWith( 'foo-bar-baz-9' );
 	} );
 } );

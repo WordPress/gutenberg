@@ -22,8 +22,8 @@ export interface User {
 /**
  * Create new comment using the REST API.
  *
- * @param {} this    RequestUtils.
- * @param {} payload CreateCommentPayload.
+ * @param this
+ * @param payload
  */
 export async function createComment(
 	this: RequestUtils,
@@ -48,7 +48,7 @@ export async function createComment(
 /**
  * Delete all comments using the REST API.
  *
- * @param {} this RequestUtils.
+ * @param this
  */
 export async function deleteAllComments( this: RequestUtils ) {
 	// List all comments.
