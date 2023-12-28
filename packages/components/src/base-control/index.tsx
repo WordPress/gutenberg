@@ -57,9 +57,7 @@ const UnconnectedBaseControl = (
 	} = useContextSystem( props, 'BaseControl' );
 
 	return (
-		<Wrapper
-			className={ classnames( 'components-base-control', className ) }
-		>
+		<Wrapper className={ className }>
 			<StyledField
 				className="components-base-control__field"
 				// TODO: Official deprecation for this should start after all internal usages have been migrated
