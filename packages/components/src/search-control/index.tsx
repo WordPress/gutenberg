@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-// import classnames from 'classnames';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -84,8 +84,8 @@ function UnforwardedSearchControl(
 
 	// TODO:
 	// - compact size
-	// - classnames
 	// - RTL support re: prefix/suffix
+	// - comb the codebase for `components-search-control__*` selectors
 	// - onChange type signature changed
 	// - value no fallback to empty string
 
@@ -97,6 +97,10 @@ function UnforwardedSearchControl(
 				hideLabelFromVision={ hideLabelFromVision }
 				ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
 				type="search"
+				className={ classnames(
+					'components-search-control',
+					className
+				) }
 				onChange={ onChange }
 				autoComplete="off"
 				value={ value }
