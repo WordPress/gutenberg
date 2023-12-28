@@ -92,8 +92,7 @@ function TemplateTitle( { item, view } ) {
 	if ( view.type === LAYOUT_LIST ) {
 		return (
 			<>
-				{ decodeEntities( item.title?.rendered || item.slug ) ||
-					__( '(no title)' ) }
+				{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
 			</>
 		);
 	}
@@ -108,7 +107,7 @@ function TemplateTitle( { item, view } ) {
 						canvas: 'edit',
 					} }
 				>
-					{ decodeEntities( item.title?.rendered || item.slug ) ||
+					{ decodeEntities( item.title?.rendered ) ||
 						__( '(no title)' ) }
 				</Link>
 			</View>
@@ -210,7 +209,7 @@ export default function DataviewsTemplates() {
 			{
 				header: __( 'Template' ),
 				id: 'title',
-				getValue: ( { item } ) => item.title?.rendered || item.slug,
+				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => (
 					<TemplateTitle item={ item } view={ view } />
 				),
