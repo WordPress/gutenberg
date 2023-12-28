@@ -36,20 +36,19 @@ export default function mediaUpload( {
 	maxUploadFileSize =
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 	const currentPost = getCurrentPost();
-	let currentPostId =
-		typeof currentPost?.id === 'number' ? currentPost.id : 0;
-
 	// Templates and template parts' numerical ID is stored in `wp_id`.
-	if ( ! currentPostId && typeof currentPost?.wp_id === 'number' ) {
-		currentPostId = currentPost.wp_id;
-	}
+	const currentPostId =
+		typeof currentPost?.id === 'number'
+			? currentPost.id
+			: currentPost?.wp_id;
+	const postData = currentPostId ? { post: currentPostId } : {};
 
 	uploadMedia( {
 		allowedTypes,
 		filesList,
 		onFileChange,
 		additionalData: {
-			post: currentPostId,
+			...postData,
 			...additionalData,
 		},
 		maxUploadFileSize,
