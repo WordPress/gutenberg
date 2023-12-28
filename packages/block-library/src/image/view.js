@@ -230,12 +230,15 @@ const { state, actions, callbacks } = store( 'core/image', {
 			const ctx = getContext();
 			const { ref } = getElement();
 			ctx.imageRef = ref;
-			ctx.lightboxTriggerRef =
-				ref.parentElement.querySelector( '.lightbox-trigger' );
 			if ( ref.complete ) {
 				ctx.imageLoaded = true;
 				ctx.imageCurrentSrc = ref.currentSrc;
 			}
+		},
+		initTriggerButton() {
+			const ctx = getContext();
+			const { ref } = getElement();
+			ctx.lightboxTriggerRef = ref;
 		},
 		initLightbox() {
 			const ctx = getContext();

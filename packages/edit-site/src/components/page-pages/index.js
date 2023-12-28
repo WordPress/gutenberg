@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	__experimentalHeading as Heading,
+	__experimentalView as View,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -13,6 +13,7 @@ import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -40,7 +41,7 @@ import {
 import PostPreview from '../post-preview';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
-const { useLocation } = unlock( routerPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
@@ -130,9 +131,12 @@ export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
 	const [ pageId, setPageId ] = useState( null );
+	const history = useHistory();
 
-	const onSelectionChange = ( items ) =>
-		setPageId( items?.length === 1 ? items[ 0 ].id : null );
+	const onSelectionChange = useCallback(
+		( items ) => setPageId( items?.length === 1 ? items[ 0 ].id : null ),
+		[ setPageId ]
+	);
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -216,7 +220,10 @@ export default function PagePages() {
 				render: ( { item } ) => {
 					return (
 						<VStack spacing={ 1 }>
-							<Heading as="h3" level={ 5 } weight={ 500 }>
+							<View
+								as="span"
+								className="edit-site-page-pages__list-view-title-field"
+							>
 								{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
 									view.type
 								) ? (
@@ -236,7 +243,7 @@ export default function PagePages() {
 										item.title?.rendered || item.slug
 									) || __( '(no title)' )
 								) }
-							</Heading>
+							</View>
 						</VStack>
 					);
 				},
@@ -298,23 +305,19 @@ export default function PagePages() {
 		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]
 	);
 	const onChangeView = useCallback(
-		( viewUpdater ) => {
-			let updatedView =
-				typeof viewUpdater === 'function'
-					? viewUpdater( view )
-					: viewUpdater;
-			if ( updatedView.type !== view.type ) {
-				updatedView = {
-					...updatedView,
+		( newView ) => {
+			if ( newView.type !== view.type ) {
+				newView = {
+					...newView,
 					layout: {
-						...defaultConfigPerViewType[ updatedView.type ],
+						...defaultConfigPerViewType[ newView.type ],
 					},
 				};
 			}
 
-			setView( updatedView );
+			setView( newView );
 		},
-		[ view, setView ]
+		[ view.type, setView ]
 	);
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
@@ -333,17 +336,36 @@ export default function PagePages() {
 					fields={ fields }
 					actions={ actions }
 					data={ pages || EMPTY_ARRAY }
-					getItemId={ ( item ) => item.id }
 					isLoading={ isLoadingPages || isLoadingAuthors }
 					view={ view }
 					onChangeView={ onChangeView }
 					onSelectionChange={ onSelectionChange }
-					deferredRendering={ false }
 				/>
 			</Page>
 			{ view.type === LAYOUT_LIST && (
 				<Page>
-					<div className="edit-site-page-pages-preview">
+					<div
+						className="edit-site-page-pages-preview"
+						tabIndex={ 0 }
+						role="button"
+						onKeyDown={ ( event ) => {
+							const { keyCode } = event;
+							if ( keyCode === ENTER || keyCode === SPACE ) {
+								history.push( {
+									postId: pageId,
+									postType,
+									canvas: 'edit',
+								} );
+							}
+						} }
+						onClick={ () =>
+							history.push( {
+								postId: pageId,
+								postType,
+								canvas: 'edit',
+							} )
+						}
+					>
 						{ pageId !== null ? (
 							<PostPreview
 								postId={ pageId }

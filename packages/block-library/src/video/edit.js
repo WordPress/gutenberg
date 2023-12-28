@@ -75,10 +75,20 @@ function VideoEdit( {
 	const posterImageButton = useRef();
 	const { id, controls, poster, src, tracks } = attributes;
 	const isTemporaryVideo = ! id && isBlobURL( src );
-	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
-		[]
-	);
+	const { mediaUpload, multiVideoSelection } = useSelect( ( select ) => {
+		const { getSettings, getMultiSelectedBlockClientIds, getBlockName } =
+			select( blockEditorStore );
+		const multiSelectedClientIds = getMultiSelectedBlockClientIds();
+
+		return {
+			mediaUpload: getSettings().mediaUpload,
+			multiVideoSelection:
+				multiSelectedClientIds.length &&
+				multiSelectedClientIds.every(
+					( _clientId ) => getBlockName( _clientId ) === 'core/video'
+				),
+		};
+	}, [] );
 
 	useEffect( () => {
 		if ( ! id && isBlobURL( src ) ) {
@@ -185,25 +195,29 @@ function VideoEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<TracksEditor
-					tracks={ tracks }
-					onChange={ ( newTracks ) => {
-						setAttributes( { tracks: newTracks } );
-					} }
-				/>
-			</BlockControls>
-			<BlockControls group="other">
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ src }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="video/*"
-					onSelect={ onSelectVideo }
-					onSelectURL={ onSelectURL }
-					onError={ onUploadError }
-				/>
-			</BlockControls>
+			{ ! multiVideoSelection && (
+				<>
+					<BlockControls>
+						<TracksEditor
+							tracks={ tracks }
+							onChange={ ( newTracks ) => {
+								setAttributes( { tracks: newTracks } );
+							} }
+						/>
+					</BlockControls>
+					<BlockControls group="other">
+						<MediaReplaceFlow
+							mediaId={ id }
+							mediaURL={ src }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							accept="video/*"
+							onSelect={ onSelectVideo }
+							onSelectURL={ onSelectURL }
+							onError={ onUploadError }
+						/>
+					</BlockControls>
+				</>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<VideoCommonSettings
@@ -284,6 +298,7 @@ function VideoEdit( {
 					isSelected={ isSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Video caption text' ) }
+					showToolbarButton={ ! multiVideoSelection }
 				/>
 			</figure>
 		</>

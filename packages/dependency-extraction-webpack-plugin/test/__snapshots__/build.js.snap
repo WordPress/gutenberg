@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`combine-assets\` should produce expected output: Asset file 'assets.php' should match snapshot 1`] = `
-"<?php return array('fileA.js' => array('dependencies' => array('lodash', 'wp-blob'), 'version' => '52d35a0af8a5fb869915'), 'fileB.js' => array('dependencies' => array('wp-token-list'), 'version' => '0af6c51a8e6ac934b85a'));
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`combine-assets\` should produce expected output: Asset file 'assets.php' should match snapshot 1`] = `
+"<?php return array('fileA.js' => array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'cbe985cf6e1a25d848e5'), 'fileB.js' => array('dependencies' => array('wp-token-list'), 'version' => '7f3970305cf0aecb54ab'));
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`combine-assets\` should produce expected output: External modules should match snapshot 1`] = `
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`combine-assets\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
     "externalType": "window",
@@ -31,12 +31,12 @@ exports[`DependencyExtractionWebpackPlugin Webpack \`combine-assets\` should pro
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`dynamic-import\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-blob'), 'version' => '47f8a22aa6c04c930f5f');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`dynamic-import\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('wp-blob'), 'version' => 'c0e8a6f22065ea096606');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`dynamic-import\` should produce expected output: External modules should match snapshot 1`] = `
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`dynamic-import\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
     "externalType": "window",
@@ -49,12 +49,12 @@ exports[`DependencyExtractionWebpackPlugin Webpack \`dynamic-import\` should pro
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`function-output-filename\` should produce expected output: Asset file 'chunk--main--main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '35d057cb1c8a30094445');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`function-output-filename\` should produce expected output: Asset file 'chunk--main--main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'fc2d750fc9e08c5749db');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`function-output-filename\` should produce expected output: External modules should match snapshot 1`] = `
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`function-output-filename\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
     "externalType": "window",
@@ -72,12 +72,12 @@ exports[`DependencyExtractionWebpackPlugin Webpack \`function-output-filename\` 
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`has-extension-suffix\` should produce expected output: Asset file 'index.min.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '27e49c80f699647ec11c');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`has-extension-suffix\` should produce expected output: Asset file 'index.min.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'c3f17b34fdd974d57d0f');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`has-extension-suffix\` should produce expected output: External modules should match snapshot 1`] = `
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`has-extension-suffix\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
     "externalType": "window",
@@ -95,26 +95,26 @@ exports[`DependencyExtractionWebpackPlugin Webpack \`has-extension-suffix\` shou
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`no-default\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => 'cdc72dbcdf872f6141c7');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`no-default\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array(), 'version' => '43880e6c42e7c39fcdf1');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`no-default\` should produce expected output: External modules should match snapshot 1`] = `[]`;
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`no-default\` should produce expected output: External modules should match snapshot 1`] = `[]`;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`no-deps\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => '091ffcd70d94dd16e773');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`no-deps\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array(), 'version' => '143ed23d4b8be5611fcb');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`no-deps\` should produce expected output: External modules should match snapshot 1`] = `[]`;
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`no-deps\` should produce expected output: External modules should match snapshot 1`] = `[]`;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`option-function-output-filename\` should produce expected output: Asset file 'chunk--main--main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '35d057cb1c8a30094445');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`option-function-output-filename\` should produce expected output: Asset file 'chunk--main--main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'fc2d750fc9e08c5749db');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`option-function-output-filename\` should produce expected output: External modules should match snapshot 1`] = `
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`option-function-output-filename\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
     "externalType": "window",
@@ -132,12 +132,12 @@ exports[`DependencyExtractionWebpackPlugin Webpack \`option-function-output-file
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`option-output-filename\` should produce expected output: Asset file 'main-foo.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '35d057cb1c8a30094445');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`option-output-filename\` should produce expected output: Asset file 'main-foo.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'fc2d750fc9e08c5749db');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`option-output-filename\` should produce expected output: External modules should match snapshot 1`] = `
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`option-output-filename\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
     "externalType": "window",
@@ -155,9 +155,9 @@ exports[`DependencyExtractionWebpackPlugin Webpack \`option-output-filename\` sh
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`output-format-json\` should produce expected output: Asset file 'main.asset.json' should match snapshot 1`] = `"{"dependencies":["lodash"],"version":"abdb687afe609197ad7e"}"`;
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`output-format-json\` should produce expected output: Asset file 'main.asset.json' should match snapshot 1`] = `"{"dependencies":["lodash"],"version":"7bd48470d799a795bf9a"}"`;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`output-format-json\` should produce expected output: External modules should match snapshot 1`] = `
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`output-format-json\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
     "externalType": "window",
@@ -167,12 +167,12 @@ exports[`DependencyExtractionWebpackPlugin Webpack \`output-format-json\` should
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`overrides\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-blob', 'wp-script-handle-for-rxjs', 'wp-url'), 'version' => '2a29b245fc3d0509b5a8');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`overrides\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('wp-blob', 'wp-script-handle-for-rxjs', 'wp-url'), 'version' => '708c71445153f1d07e4a');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`overrides\` should produce expected output: External modules should match snapshot 1`] = `
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`overrides\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
     "externalType": "window",
@@ -206,22 +206,22 @@ exports[`DependencyExtractionWebpackPlugin Webpack \`overrides\` should produce 
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'a.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-blob'), 'version' => '4514ed711f6c035e0887');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'a.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('wp-blob'), 'version' => 'd3cda564b538b44d38ef');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'b.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '168d32b5fb42f9e5d8ce');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'b.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '420d636da562e71648f7');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'runtime.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => 'b4058959bcd0df37cd79');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'runtime.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array(), 'version' => 'dc673033633cae5c6702');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`runtime-chunk-single\` should produce expected output: External modules should match snapshot 1`] = `
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-single\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
     "externalType": "window",
@@ -239,12 +239,12 @@ exports[`DependencyExtractionWebpackPlugin Webpack \`runtime-chunk-single\` shou
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`style-imports\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'beb3f6752168c2983cdd');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`style-imports\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '4c661914a4e4d80b8a0b');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`style-imports\` should produce expected output: External modules should match snapshot 1`] = `
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`style-imports\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
     "externalType": "window",
@@ -262,12 +262,12 @@ exports[`DependencyExtractionWebpackPlugin Webpack \`style-imports\` should prod
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`wordpress\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '35d057cb1c8a30094445');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'fc2d750fc9e08c5749db');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`wordpress\` should produce expected output: External modules should match snapshot 1`] = `
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
     "externalType": "window",
@@ -285,12 +285,12 @@ exports[`DependencyExtractionWebpackPlugin Webpack \`wordpress\` should produce 
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`wordpress-require\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'ed2bd4e7df46768bb3c2');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress-require\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '40370eb4ce6428562da6');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin Webpack \`wordpress-require\` should produce expected output: External modules should match snapshot 1`] = `
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress-require\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
     "externalType": "window",

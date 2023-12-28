@@ -11,16 +11,17 @@ import {
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef } from '@wordpress/element';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 export default function InserterSidebar() {
-	const { setIsInserterOpened } = useDispatch( editSiteStore );
+	const { setIsInserterOpened } = useDispatch( editorStore );
 	const insertionPoint = useSelect(
-		( select ) => select( editSiteStore ).__experimentalGetInsertionPoint(),
+		( select ) => unlock( select( editorStore ) ).getInsertionPoint(),
 		[]
 	);
 

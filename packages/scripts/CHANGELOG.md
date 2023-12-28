@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Drop support for Node.js versions < 18.
+
 ## 26.19.0 (2023-12-13)
 
 ### Bug Fix

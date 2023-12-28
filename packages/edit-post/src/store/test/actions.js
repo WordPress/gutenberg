@@ -260,7 +260,7 @@ describe( 'actions', () => {
 			registry
 				.dispatch( preferencesStore )
 				.set( 'core/edit-post', 'fixedToolbar', true );
-			registry.dispatch( editPostStore ).setIsListViewOpened( true );
+			registry.dispatch( editorStore ).setIsListViewOpened( true );
 			registry
 				.dispatch( editPostStore )
 				.openGeneralSidebar( 'edit-post/block' );
@@ -271,10 +271,10 @@ describe( 'actions', () => {
 					.select( preferencesStore )
 					.get( 'core/edit-post', 'fixedToolbar' )
 			).toBe( true );
-			expect( registry.select( editPostStore ).isListViewOpened() ).toBe(
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
 				false
 			);
-			expect( registry.select( editPostStore ).isInserterOpened() ).toBe(
+			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
 				false
 			);
 			expect(
@@ -287,20 +287,6 @@ describe( 'actions', () => {
 					.select( preferencesStore )
 					.get( 'core/edit-post', 'distractionFree' )
 			).toBe( true );
-		} );
-	} );
-
-	describe( 'setIsListViewOpened', () => {
-		it( 'should turn off distraction free mode when opening the list view', () => {
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core/edit-post', 'distractionFree', true );
-			registry.dispatch( editPostStore ).setIsListViewOpened( true );
-			expect(
-				registry
-					.select( preferencesStore )
-					.get( 'core/edit-post', 'distractionFree' )
-			).toBe( false );
 		} );
 	} );
 } );

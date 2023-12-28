@@ -539,16 +539,13 @@ _Returns_
 
 ### getPxFromCssUnit
 
-Returns the px value of a cssUnit. The memoized version of getPxFromCssUnit;
+> **Deprecated**
 
-_Parameters_
-
--   _cssUnit_ `string`:
--   _options_ `Object`:
+This function was accidentially exposed for mobile/native usage.
 
 _Returns_
 
--   `string`: returns the cssUnit value in a simple px format.
+-   `string`: Empty string.
 
 ### getSpacingPresetCssVar
 

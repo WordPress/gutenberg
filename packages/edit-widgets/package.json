@@ -53,7 +53,8 @@
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/url": "file:../url",
 		"@wordpress/widgets": "file:../widgets",
-		"classnames": "^2.3.1"
+		"classnames": "^2.3.1",
+		"rememo": "^4.0.2"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

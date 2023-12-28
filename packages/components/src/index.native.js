@@ -122,6 +122,7 @@ export {
 	ALIGNMENT_BREAKPOINTS,
 	alignmentHelpers,
 } from './mobile/utils/alignments';
+export { default as getPxFromCssUnit } from './mobile/utils/get-px-from-css-unit';
 
 // Hooks.
 export {

@@ -32,7 +32,6 @@ export default function useCommonCommands() {
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		switchEditorMode,
-		setIsListViewOpened,
 		toggleDistractionFree,
 	} = useDispatch( editPostStore );
 	const { openModal } = useDispatch( interfaceStore );
@@ -44,8 +43,8 @@ export default function useCommonCommands() {
 		showBlockBreadcrumbs,
 		isDistractionFree,
 	} = useSelect( ( select ) => {
-		const { getEditorMode, isListViewOpened, isFeatureActive } =
-			select( editPostStore );
+		const { getEditorMode, isFeatureActive } = select( editPostStore );
+		const { isListViewOpened } = select( editorStore );
 		return {
 			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
 				editPostStore.name
@@ -63,7 +62,8 @@ export default function useCommonCommands() {
 	}, [] );
 	const { toggle } = useDispatch( preferencesStore );
 	const { createInfoNotice } = useDispatch( noticesStore );
-	const { __unstableSaveForPreview } = useDispatch( editorStore );
+	const { __unstableSaveForPreview, setIsListViewOpened } =
+		useDispatch( editorStore );
 	const { getCurrentPostId } = useSelect( editorStore );
 
 	useCommand( {
