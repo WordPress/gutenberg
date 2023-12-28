@@ -400,7 +400,7 @@ function gutenberg_register_block_module_handle( $metadata, $field_name, $index 
 		$module_id,
 		$module_uri,
 		$module_dependencies,
-		isset( $module_asset['version'] ) ? $module_asset['version'] : false,
+		isset( $module_asset['version'] ) ? $module_asset['version'] : false
 	);
 
 	// @todo This in_array may not work with module_dependencies.
