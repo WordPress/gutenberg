@@ -92,6 +92,7 @@ function UnforwardedSearchControl(
 				) }
 				onChange={ onChange }
 				autoComplete="off"
+				placeholder={ placeholder }
 				value={ value || '' }
 				prefix={
 					<SearchIconWrapper size={ size }>
