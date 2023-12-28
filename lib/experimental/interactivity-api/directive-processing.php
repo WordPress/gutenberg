@@ -36,14 +36,6 @@ add_filter( 'render_block_data', 'gutenberg_interactivity_mark_root_blocks', 10,
  * @return string Filtered block content.
  */
 function gutenberg_process_directives_in_root_blocks( $block_content, $block ) {
-	static $directives = array(
-		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
-		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
-		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
-		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
-		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
-	);
-
 	if ( WP_Directive_Processor::is_marked_as_root_block( $block ) ) {
 		WP_Directive_Processor::unmark_root_block();
 
@@ -54,9 +46,9 @@ function gutenberg_process_directives_in_root_blocks( $block_content, $block ) {
 
 		foreach ( $parsed_blocks as $parsed_block ) {
 			if ( 'core/interactivity-wrapper' === $parsed_block['blockName'] ) {
-				$processed_content .= gutenberg_process_interactive_block( $parsed_block, $context, $directives );
+				$processed_content .= gutenberg_process_interactive_block( $parsed_block, $context );
 			} elseif ( 'core/non-interactivity-wrapper' === $parsed_block['blockName'] ) {
-				$processed_content .= gutenberg_process_non_interactive_block( $parsed_block, $context, $directives );
+				$processed_content .= gutenberg_process_non_interactive_block( $parsed_block, $context );
 			} else {
 				$processed_content .= $parsed_block['innerHTML'];
 			}
@@ -126,11 +118,10 @@ add_filter( 'render_block', 'gutenberg_mark_block_interactivity', 10, 3 );
  *
  * @param array                $interactive_block The interactive block to process.
  * @param WP_Directive_Context $context The context to use when processing.
- * @param array                $directives The directives to apply.
  *
  * @return string The processed HTML.
  */
-function gutenberg_process_interactive_block( $interactive_block, $context, $directives ) {
+function gutenberg_process_interactive_block( $interactive_block, $context ) {
 	$block_index              = 0;
 	$content                  = '';
 	$interactive_inner_blocks = array();
@@ -146,7 +137,7 @@ function gutenberg_process_interactive_block( $interactive_block, $context, $dir
 		}
 	}
 
-	return gutenberg_process_interactive_html( $content, $context, $directives, $interactive_inner_blocks );
+	return gutenberg_process_interactive_html( $content, $context, $interactive_inner_blocks );
 }
 
 /**
@@ -156,11 +147,10 @@ function gutenberg_process_interactive_block( $interactive_block, $context, $dir
  *
  * @param array                $non_interactive_block The non-interactive block to process.
  * @param WP_Directive_Context $context The context to use when processing.
- * @param array                $directives The directives to apply.
  *
  * @return string The processed HTML.
  */
-function gutenberg_process_non_interactive_block( $non_interactive_block, $context, $directives ) {
+function gutenberg_process_non_interactive_block( $non_interactive_block, $context ) {
 	$block_index = 0;
 	$content     = '';
 	foreach ( $non_interactive_block['innerContent'] as $inner_content ) {
@@ -174,9 +164,9 @@ function gutenberg_process_non_interactive_block( $non_interactive_block, $conte
 			$inner_block = $non_interactive_block['innerBlocks'][ $block_index++ ];
 
 			if ( 'core/interactivity-wrapper' === $inner_block['blockName'] ) {
-				$content .= gutenberg_process_interactive_block( $inner_block, $context, $directives );
+				$content .= gutenberg_process_interactive_block( $inner_block, $context );
 			} elseif ( 'core/non-interactivity-wrapper' === $inner_block['blockName'] ) {
-				$content .= gutenberg_process_non_interactive_block( $inner_block, $context, $directives );
+				$content .= gutenberg_process_non_interactive_block( $inner_block, $context );
 			}
 		}
 	}
@@ -187,20 +177,25 @@ function gutenberg_process_non_interactive_block( $non_interactive_block, $conte
  * Processes interactive HTML by applying directives to the HTML tags.
  *
  * It uses the WP_Directive_Processor class to parse the HTML and apply the
- * directives. The directives are specified in the $directives array and are
- * applied to the tags that have the corresponding data attribute. If a tag
- * contains a 'WP-INNER-BLOCKS' string and there are inner blocks to process,
- * the function processes these inner blocks and replaces the 'WP-INNER-BLOCKS'
- * tag in the HTML with those blocks.
+ * directives. If a tag contains a 'WP-INNER-BLOCKS' string and there are inner
+ * blocks to process, the function processes these inner blocks and replaces the
+ * 'WP-INNER-BLOCKS' tag in the HTML with those blocks.
  *
  * @param string $html The HTML to process.
  * @param mixed  $context The context to use when processing.
- * @param array  $directives The directives to apply.
  * @param array  $inner_blocks The inner blocks to process.
  *
  * @return string The processed HTML.
  */
-function gutenberg_process_interactive_html( $html, $context, $directives, $inner_blocks = array() ) {
+function gutenberg_process_interactive_html( $html, $context, $inner_blocks = array() ) {
+	static $directives = array(
+		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
+		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
+		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
+		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
+		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
+	);
+
 	$tags                   = new WP_Directive_Processor( $html );
 	$prefix                 = 'data-wp-';
 	$tag_stack              = array();
@@ -212,9 +207,9 @@ function gutenberg_process_interactive_html( $html, $context, $directives, $inne
 		// Processes the inner blocks.
 		if ( str_contains( $tag_name, 'WP-INNER-BLOCKS' ) && ! empty( $inner_blocks ) && ! $tags->is_tag_closer() ) {
 			if ( 'core/interactivity-wrapper' === $inner_blocks[ $inner_blocks_index ]['blockName'] ) {
-				$inner_processed_blocks[ strtolower( $tag_name ) ] = gutenberg_process_interactive_block( $inner_blocks[ $inner_blocks_index++ ], $context, $directives );
+				$inner_processed_blocks[ strtolower( $tag_name ) ] = gutenberg_process_interactive_block( $inner_blocks[ $inner_blocks_index++ ], $context );
 			} elseif ( 'core/non-interactivity-wrapper' === $inner_blocks[ $inner_blocks_index ]['blockName'] ) {
-				$inner_processed_blocks[ strtolower( $tag_name ) ] = gutenberg_process_non_interactive_block( $inner_blocks[ $inner_blocks_index++ ], $context, $directives );
+				$inner_processed_blocks[ strtolower( $tag_name ) ] = gutenberg_process_non_interactive_block( $inner_blocks[ $inner_blocks_index++ ], $context );
 			}
 		}
 		if ( $tags->is_tag_closer() ) {
