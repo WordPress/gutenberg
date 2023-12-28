@@ -105,7 +105,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: The component to be rendered.
+-   `Component`: The component to be rendered.
 
 ### PluginSidebar
 
@@ -212,7 +212,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: The component to be rendered.
+-   `Component`: The component to be rendered.
 
 ### PluginTemplateSettingPanel
 
@@ -233,9 +233,13 @@ const MyTemplateSettingTest = () => (
 
 _Returns_
 
--   `WPComponent`: The component to be rendered.
+-   `Component`: The component to be rendered.
 
 ### reinitializeEditor
+
+Undocumented declaration.
+
+### store
 
 Undocumented declaration.
 
