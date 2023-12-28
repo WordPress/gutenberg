@@ -281,7 +281,7 @@ add_action( $modules_position, array( 'Gutenberg_Modules', 'print_module_preload
 // Prints the script that loads the import map polyfill in the footer.
 add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_import_map_polyfill' ), 11 );
 
-function gutenberg_filter_block_type_metadata_settings( $settings, $metadata = null ) {
+function gutenberg_filter_block_type_metadata_settings_register_modules( $settings, $metadata = null ) {
 	$module_fields = array(
 		'editorModule' => 'editor_module_handles',
 		'module'       => 'module_handles',
@@ -316,16 +316,27 @@ function gutenberg_filter_block_type_metadata_settings( $settings, $metadata = n
 	return $settings;
 }
 
-add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadata_settings', 10, 2 );
+add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadata_settings_register_modules', 10, 2 );
 
-/* @todo This doesn't exist in core, we'll need to add it or find another way… */
-add_action( 'block_type_render_enqueue', function ( ?WP_Block_Type $block_type ) {
-	if ( ! empty( $block_type->view_module_handles ) ) {
-		foreach ( $block_type->view_module_handles as $view_module_handle ) {
-			gutenberg_enqueue_module( $view_module_handle );
+function gutenberg_filter_render_block_enqueue_view_modules( $block_content, $parsed_block, $block_instance ) {
+	$block_type = $block_instance->block_type;
+
+	if ( ! empty( $block_type->module_handles ) ) {
+		foreach ( $block_type->module_handles as $module_id ) {
+			gutenberg_enqueue_module( $module_id );
 		}
 	}
-} );
+
+	if ( ! empty( $block_type->view_module_handles ) ) {
+		foreach ( $block_type->view_module_handles as $module_id ) {
+			gutenberg_enqueue_module( $module_id );
+		}
+	}
+
+	return $block_content;
+}
+
+add_filter( 'render_block', 'gutenberg_filter_render_block_enqueue_view_modules', 10, 3 );
 
 /**
  * Finds a module ID for the selected block metadata field. It detects
