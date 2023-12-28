@@ -102,7 +102,7 @@ function EditorHelpTopics( { close, isVisible, onClose, showSupport } ) {
 			contentStyle={ styles.contentContainer }
 			testID="editor-help-modal"
 		>
-			<SafeAreaView>
+			<SafeAreaView style={ styles.safeAreaContainer }>
 				<BottomSheet.NavigationContainer
 					animate
 					main

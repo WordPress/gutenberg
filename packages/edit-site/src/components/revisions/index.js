@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Disabled } from '@wordpress/components';
@@ -16,33 +11,31 @@ import {
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
+import { useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { mergeBaseAndUserConfigs } from '../global-styles/global-styles-provider';
 import EditorCanvasContainer from '../editor-canvas-container';
 
-const { ExperimentalBlockEditorProvider, useGlobalStylesOutputWithConfig } =
-	unlock( blockEditorPrivateApis );
+const {
+	ExperimentalBlockEditorProvider,
+	GlobalStylesContext,
+	useGlobalStylesOutputWithConfig,
+} = unlock( blockEditorPrivateApis );
 
-function Revisions( { onClose, userConfig, blocks } ) {
-	const { baseConfig } = useSelect(
-		( select ) => ( {
-			baseConfig:
-				select(
-					coreStore
-				).__experimentalGetCurrentThemeBaseGlobalStyles(),
-		} ),
-		[]
-	);
+function isObjectEmpty( object ) {
+	return ! object || Object.keys( object ).length === 0;
+}
+
+function Revisions( { userConfig, blocks } ) {
+	const { base: baseConfig } = useContext( GlobalStylesContext );
 
 	const mergedConfig = useMemo( () => {
-		if ( ! isEmpty( userConfig ) && ! isEmpty( baseConfig ) ) {
+		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
 			return mergeBaseAndUserConfigs( baseConfig, userConfig );
 		}
 		return {};
@@ -65,15 +58,15 @@ function Revisions( { onClose, userConfig, blocks } ) {
 	const [ globalStyles ] = useGlobalStylesOutputWithConfig( mergedConfig );
 
 	const editorStyles =
-		! isEmpty( globalStyles ) && ! isEmpty( userConfig )
+		! isObjectEmpty( globalStyles ) && ! isObjectEmpty( userConfig )
 			? globalStyles
 			: settings.styles;
 
 	return (
 		<EditorCanvasContainer
 			title={ __( 'Revisions' ) }
-			onClose={ onClose }
 			closeButtonLabel={ __( 'Close revisions' ) }
+			enableResizing={ true }
 		>
 			<Iframe
 				className="edit-site-revisions__iframe"

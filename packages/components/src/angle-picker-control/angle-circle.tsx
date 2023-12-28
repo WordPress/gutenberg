@@ -13,7 +13,7 @@ import {
 	CircleIndicator,
 } from './styles/angle-picker-control-styles';
 
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { AngleCircleProps } from './types';
 
 type UseDraggingArgumentType = Parameters< typeof useDragging >[ 0 ];

@@ -40,42 +40,47 @@ function DefaultAppender( { rootClientId } ) {
 }
 
 function useAppender( rootClientId, CustomAppender ) {
-	const { hideInserter, isParentSelected } = useSelect(
+	const isVisible = useSelect(
 		( select ) => {
 			const {
 				getTemplateLock,
 				getSelectedBlockClientId,
 				__unstableGetEditorMode,
+				getBlockEditingMode,
 			} = select( blockEditorStore );
 
-			const selectedBlockClientId = getSelectedBlockClientId();
-
-			return {
-				hideInserter:
-					!! getTemplateLock( rootClientId ) ||
-					__unstableGetEditorMode() === 'zoom-out',
-				isParentSelected:
+			if ( ! CustomAppender ) {
+				const selectedBlockClientId = getSelectedBlockClientId();
+				const isParentSelected =
 					rootClientId === selectedBlockClientId ||
-					( ! rootClientId && ! selectedBlockClientId ),
-			};
+					( ! rootClientId && ! selectedBlockClientId );
+				if ( ! isParentSelected ) {
+					return false;
+				}
+			}
+
+			if (
+				getTemplateLock( rootClientId ) ||
+				getBlockEditingMode( rootClientId ) === 'disabled' ||
+				__unstableGetEditorMode() === 'zoom-out'
+			) {
+				return false;
+			}
+
+			return true;
 		},
-		[ rootClientId ]
+		[ rootClientId, CustomAppender ]
 	);
 
-	if ( hideInserter || CustomAppender === false ) {
+	if ( ! isVisible ) {
 		return null;
 	}
 
-	if ( CustomAppender ) {
-		// Prefer custom render prop if provided.
-		return <CustomAppender />;
-	}
-
-	if ( ! isParentSelected ) {
-		return null;
-	}
-
-	return <DefaultAppender rootClientId={ rootClientId } />;
+	return CustomAppender ? (
+		<CustomAppender />
+	) : (
+		<DefaultAppender rootClientId={ rootClientId } />
+	);
 }
 
 function BlockListAppender( {
@@ -84,7 +89,46 @@ function BlockListAppender( {
 	className,
 	tagName: TagName = 'div',
 } ) {
+	if ( renderAppender === false ) {
+		return null;
+	}
+
+	return (
+		<BlockListAppenderInner
+			rootClientId={ rootClientId }
+			renderAppender={ renderAppender }
+			className={ className }
+			tagName={ TagName }
+		/>
+	);
+}
+
+function BlockListAppenderInner( {
+	rootClientId,
+	renderAppender,
+	className,
+	tagName: TagName,
+} ) {
 	const appender = useAppender( rootClientId, renderAppender );
+	const isDragOver = useSelect(
+		( select ) => {
+			const {
+				getBlockInsertionPoint,
+				isBlockInsertionPointVisible,
+				getBlockCount,
+			} = select( blockEditorStore );
+			const insertionPoint = getBlockInsertionPoint();
+			// Ideally we should also check for `isDragging` but currently it
+			// requires a lot more setup. We can revisit this once we refactor
+			// the DnD utility hooks.
+			return (
+				isBlockInsertionPointVisible() &&
+				rootClientId === insertionPoint?.rootClientId &&
+				getBlockCount( rootClientId ) === 0
+			);
+		},
+		[ rootClientId ]
+	);
 
 	if ( ! appender ) {
 		return null;
@@ -101,10 +145,9 @@ function BlockListAppender( {
 			//
 			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 			tabIndex={ -1 }
-			className={ classnames(
-				'block-list-appender wp-block',
-				className
-			) }
+			className={ classnames( 'block-list-appender wp-block', className, {
+				'is-drag-over': isDragOver,
+			} ) }
 			// Needed in case the whole editor is content editable (for multi
 			// selection). It fixes an edge case where ArrowDown and ArrowRight
 			// should collapse the selection to the end of that selection and

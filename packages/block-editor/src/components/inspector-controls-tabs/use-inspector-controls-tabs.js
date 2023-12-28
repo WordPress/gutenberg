@@ -90,6 +90,5 @@ export default function useInspectorControlsTabs( blockName ) {
 	}, [] );
 
 	const showTabs = getShowTabs( blockName, tabSettings );
-
 	return showTabs ? tabs : EMPTY_ARRAY;
 }

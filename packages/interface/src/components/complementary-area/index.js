@@ -27,10 +27,12 @@ function ComplementaryAreaSlot( { scope, ...props } ) {
 	return <Slot name={ `ComplementaryArea/${ scope }` } { ...props } />;
 }
 
-function ComplementaryAreaFill( { scope, children, className } ) {
+function ComplementaryAreaFill( { scope, children, className, id } ) {
 	return (
 		<Fill name={ `ComplementaryArea/${ scope }` }>
-			<div className={ className }>{ children }</div>
+			<div id={ id } className={ className }>
+				{ children }
+			</div>
 		</Fill>
 	);
 }
@@ -79,7 +81,15 @@ function useAdjustComplementaryListener(
 		if ( isSmall !== previousIsSmall.current ) {
 			previousIsSmall.current = isSmall;
 		}
-	}, [ isActive, isSmall, scope, identifier, activeArea ] );
+	}, [
+		isActive,
+		isSmall,
+		scope,
+		identifier,
+		activeArea,
+		disableComplementaryArea,
+		enableComplementaryArea,
+	] );
 }
 
 function ComplementaryArea( {
@@ -145,7 +155,15 @@ function ComplementaryArea( {
 		} else if ( activeArea === undefined && isSmall ) {
 			disableComplementaryArea( scope, identifier );
 		}
-	}, [ activeArea, isActiveByDefault, scope, identifier, isSmall ] );
+	}, [
+		activeArea,
+		isActiveByDefault,
+		scope,
+		identifier,
+		isSmall,
+		enableComplementaryArea,
+		disableComplementaryArea,
+	] );
 
 	return (
 		<>
@@ -164,6 +182,7 @@ function ComplementaryArea( {
 							icon={ showIconLabels ? check : icon }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
+							size="compact"
 						/>
 					) }
 				</PinnedItems>
@@ -184,6 +203,7 @@ function ComplementaryArea( {
 						className
 					) }
 					scope={ scope }
+					id={ identifier.replace( '/', ':' ) }
 				>
 					<ComplementaryAreaHeader
 						className={ headerClassName }

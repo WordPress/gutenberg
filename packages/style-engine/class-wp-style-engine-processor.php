@@ -81,6 +81,8 @@ class WP_Style_Engine_Processor {
 	/**
 	 * Get the CSS rules as a string.
 	 *
+	 * Since 6.4.0 Optimization is no longer the default.
+	 *
 	 * @param array $options   {
 	 *     Optional. An array of options. Default empty array.
 	 *
@@ -92,7 +94,7 @@ class WP_Style_Engine_Processor {
 	 */
 	public function get_css( $options = array() ) {
 		$defaults = array(
-			'optimize' => true,
+			'optimize' => false,
 			'prettify' => SCRIPT_DEBUG,
 		);
 		$options  = wp_parse_args( $options, $defaults );

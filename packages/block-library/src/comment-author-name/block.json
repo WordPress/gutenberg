@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/comment-author-name",
 	"title": "Comment Author Name",
 	"category": "theme",
@@ -22,7 +22,6 @@
 	},
 	"usesContext": [ "commentId" ],
 	"supports": {
-		"anchor": true,
 		"html": false,
 		"spacing": {
 			"margin": true,

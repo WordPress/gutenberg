@@ -1,12 +1,14 @@
 /**
  * WordPress dependencies
  */
+import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../private-apis';
+import { unlock } from '../lock-unlock';
 import {
 	isPreviewingTheme,
 	currentlyPreviewingTheme,
@@ -22,6 +24,7 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
 export function useActivateTheme() {
 	const history = useHistory();
 	const location = useLocation();
+	const { startResolution, finishResolution } = useDispatch( coreStore );
 
 	return async () => {
 		if ( isPreviewingTheme() ) {
@@ -29,9 +32,12 @@ export function useActivateTheme() {
 				'themes.php?action=activate&stylesheet=' +
 				currentlyPreviewingTheme() +
 				'&_wpnonce=' +
-				window.BLOCK_THEME_ACTIVATE_NONCE;
+				window.WP_BLOCK_THEME_ACTIVATE_NONCE;
+			startResolution( 'activateTheme' );
 			await window.fetch( activationURL );
-			const { theme_preview: themePreview, ...params } = location.params;
+			finishResolution( 'activateTheme' );
+			const { wp_theme_preview: themePreview, ...params } =
+				location.params;
 			history.replace( params );
 		}
 	};

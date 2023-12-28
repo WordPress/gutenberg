@@ -1,15 +1,23 @@
 /**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
 import classnames from 'classnames';
+
+/**
+ * WordPress dependencies
+ */
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { getInlineStyles } from './style';
 import { getFontSizeClass } from '../components/font-sizes';
-import { getComputedFluidTypographyValue } from '../components/font-sizes/fluid-utils';
+import {
+	getTypographyFontSizeValue,
+	getFluidTypographyOptionsFromSettings,
+} from '../components/global-styles/typography-utils';
+import { unlock } from '../lock-unlock';
 
 /*
  * This utility is intended to assist where the serialization of the typography
@@ -26,25 +34,18 @@ import { getComputedFluidTypographyValue } from '../components/font-sizes/fluid-
  * @return {Object} Typography block support derived CSS classes & styles.
  */
 export function getTypographyClassesAndStyles( attributes, settings ) {
+	const { kebabCase } = unlock( componentsPrivateApis );
 	let typographyStyles = attributes?.style?.typography || {};
-	const fluidTypographySettings = settings?.typography?.fluid;
+	const fluidTypographySettings =
+		getFluidTypographyOptionsFromSettings( settings );
 
-	if (
-		!! fluidTypographySettings &&
-		( true === fluidTypographySettings ||
-			Object.keys( fluidTypographySettings ).length !== 0 )
-	) {
-		const newFontSize =
-			getComputedFluidTypographyValue( {
-				fontSize: attributes?.style?.typography?.fontSize,
-				minimumFontSizeLimit: fluidTypographySettings?.minFontSize,
-				maximumViewPortWidth: settings?.layout?.wideSize,
-			} ) || attributes?.style?.typography?.fontSize;
-		typographyStyles = {
-			...typographyStyles,
-			fontSize: newFontSize,
-		};
-	}
+	typographyStyles = {
+		...typographyStyles,
+		fontSize: getTypographyFontSizeValue(
+			{ size: attributes?.style?.typography?.fontSize },
+			fluidTypographySettings
+		),
+	};
 
 	const style = getInlineStyles( { typography: typographyStyles } );
 	const fontFamilyClassName = !! attributes?.fontFamily

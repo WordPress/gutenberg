@@ -7,7 +7,7 @@
 
 // We use :where to keep specificity minimal.
 // https://css-tricks.com/almanac/selectors/w/where/
-html :where(.editor-styles-wrapper) {
+:where(.editor-styles-wrapper) {
 	/**
 	* The following styles revert to the browser defaults overriding the WPAdmin styles.
 	* This is only needed while the block editor is not being loaded in an iframe.

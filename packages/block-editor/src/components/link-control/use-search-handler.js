@@ -51,45 +51,26 @@ const handleEntitySearch = async (
 	val,
 	suggestionsQuery,
 	fetchSearchSuggestions,
-	directEntryHandler,
 	withCreateSuggestion,
-	withURLSuggestion,
-	pageOnFront
+	pageOnFront,
+	pageForPosts
 ) => {
 	const { isInitialSuggestions } = suggestionsQuery;
-	let resultsIncludeFrontPage = false;
 
-	let results = await Promise.all( [
-		fetchSearchSuggestions( val, suggestionsQuery ),
-		directEntryHandler( val ),
-	] );
+	const results = await fetchSearchSuggestions( val, suggestionsQuery );
 
 	// Identify front page and update type to match.
-	results[ 0 ] = results[ 0 ].map( ( result ) => {
+	results.map( ( result ) => {
 		if ( Number( result.id ) === pageOnFront ) {
-			resultsIncludeFrontPage = true;
 			result.isFrontPage = true;
+			return result;
+		} else if ( Number( result.id ) === pageForPosts ) {
+			result.isBlogHome = true;
 			return result;
 		}
 
 		return result;
 	} );
-
-	const couldBeURL = ! val.includes( ' ' );
-
-	// If it's potentially a URL search then concat on a URL search suggestion
-	// just for good measure. That way once the actual results run out we always
-	// have a URL option to fallback on.
-	if (
-		! resultsIncludeFrontPage &&
-		couldBeURL &&
-		withURLSuggestion &&
-		! isInitialSuggestions
-	) {
-		results = results[ 0 ].concat( results[ 1 ] );
-	} else {
-		results = results[ 0 ];
-	}
 
 	// If displaying initial suggestions just return plain results.
 	if ( isInitialSuggestions ) {
@@ -125,18 +106,21 @@ const handleEntitySearch = async (
 export default function useSearchHandler(
 	suggestionsQuery,
 	allowDirectEntry,
-	withCreateSuggestion,
-	withURLSuggestion
+	withCreateSuggestion
 ) {
-	const { fetchSearchSuggestions, pageOnFront } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
+	const { fetchSearchSuggestions, pageOnFront, pageForPosts } = useSelect(
+		( select ) => {
+			const { getSettings } = select( blockEditorStore );
 
-		return {
-			pageOnFront: getSettings().pageOnFront,
-			fetchSearchSuggestions:
-				getSettings().__experimentalFetchLinkSuggestions,
-		};
-	}, [] );
+			return {
+				pageOnFront: getSettings().pageOnFront,
+				pageForPosts: getSettings().pageForPosts,
+				fetchSearchSuggestions:
+					getSettings().__experimentalFetchLinkSuggestions,
+			};
+		},
+		[]
+	);
 
 	const directEntryHandler = allowDirectEntry
 		? handleDirectEntry
@@ -150,12 +134,18 @@ export default function useSearchHandler(
 						val,
 						{ ...suggestionsQuery, isInitialSuggestions },
 						fetchSearchSuggestions,
-						directEntryHandler,
 						withCreateSuggestion,
-						withURLSuggestion,
-						pageOnFront
+						pageOnFront,
+						pageForPosts
 				  );
 		},
-		[ directEntryHandler, fetchSearchSuggestions, withCreateSuggestion ]
+		[
+			directEntryHandler,
+			fetchSearchSuggestions,
+			pageOnFront,
+			pageForPosts,
+			suggestionsQuery,
+			withCreateSuggestion,
+		]
 	);
 }

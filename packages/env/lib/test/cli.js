@@ -22,7 +22,7 @@ jest.mock( '../env', () => {
 		clean: jest.fn( Promise.resolve.bind( Promise ) ),
 		run: jest.fn( Promise.resolve.bind( Promise ) ),
 		ValidationError: actual.ValidationError,
-		AfterSetupError: actual.AfterSetupError,
+		LifecycleScriptError: actual.LifecycleScriptError,
 	};
 } );
 
@@ -138,7 +138,7 @@ describe( 'env cli', () => {
 		await env.start.mock.results[ 0 ].value.catch( () => {} );
 
 		expect( spinner.fail ).toHaveBeenCalledWith(
-			'Error while running docker-compose command.'
+			'Error while running docker compose command.'
 		);
 		expect( process.stderr.write ).toHaveBeenCalledWith( 'failure error' );
 		expect( process.exit ).toHaveBeenCalledWith( 1 );

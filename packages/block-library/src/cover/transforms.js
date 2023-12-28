@@ -8,7 +8,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { IMAGE_BACKGROUND_TYPE, VIDEO_BACKGROUND_TYPE } from './shared';
-import { unlock } from '../private-apis';
+import { unlock } from '../lock-unlock';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 

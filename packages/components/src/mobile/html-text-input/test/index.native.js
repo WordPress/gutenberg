@@ -23,13 +23,13 @@ const getStylesFromColorScheme = () => {
 };
 
 describe( 'HTMLTextInput', () => {
-	it( 'HTMLTextInput renders', () => {
+	it( 'HTMLTextInput renders and matches snapshot', () => {
 		const screen = render(
 			<HTMLTextInput
 				getStylesFromColorScheme={ getStylesFromColorScheme }
 			/>
 		);
-		expect( screen.container ).toBeTruthy();
+		expect( screen.toJSON() ).toMatchSnapshot();
 	} );
 
 	it( 'HTMLTextInput updates state on HTML text change', () => {

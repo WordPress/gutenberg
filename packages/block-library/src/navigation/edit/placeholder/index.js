@@ -32,7 +32,7 @@ export default function NavigationPlaceholder( {
 		}
 
 		if ( isResolvingMenus ) {
-			speak( __( 'Loading Navigation block setup options.' ) );
+			speak( __( 'Loading navigation block setup options…' ) );
 		}
 
 		if ( hasResolvedMenus ) {

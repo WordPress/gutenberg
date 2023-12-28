@@ -21,6 +21,7 @@ import { Select as SelectControlSelect } from '../select-control/styles/select-c
 import SelectControlChevronDown from '../select-control/chevron-down';
 import { InputBaseWithBackCompatMinWidth } from './styles';
 import { StyledLabel } from '../base-control/styles/base-control-styles';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 const itemToString = ( item ) => item?.name;
 // This is needed so that in Windows, where
@@ -65,7 +66,7 @@ const stateReducer = (
 export default function CustomSelectControl( props ) {
 	const {
 		/** Start opting into the larger default height that will become the default size in a future version. */
-		__next36pxDefaultSize = false,
+		__next40pxDefaultSize = false,
 		/** Start opting into the unconstrained width that will become the default in a future version. */
 		__nextUnconstrainedWidth = false,
 		className,
@@ -82,7 +83,11 @@ export default function CustomSelectControl( props ) {
 		onFocus,
 		onBlur,
 		__experimentalShowSelectedHint = false,
-	} = props;
+	} = useDeprecated36pxDefaultSizeProp(
+		props,
+		'wp.components.CustomSelectControl',
+		'6.4'
+	);
 
 	const {
 		getLabelProps,
@@ -180,7 +185,7 @@ export default function CustomSelectControl( props ) {
 				</StyledLabel>
 			) }
 			<InputBaseWithBackCompatMinWidth
-				__next36pxDefaultSize={ __next36pxDefaultSize }
+				__next40pxDefaultSize={ __next40pxDefaultSize }
 				__nextUnconstrainedWidth={ __nextUnconstrainedWidth }
 				isFocused={ isOpen || isFocused }
 				__unstableInputWidth={
@@ -197,7 +202,7 @@ export default function CustomSelectControl( props ) {
 					onFocus={ handleOnFocus }
 					onBlur={ handleOnBlur }
 					selectSize={ size }
-					__next36pxDefaultSize={ __next36pxDefaultSize }
+					__next40pxDefaultSize={ __next40pxDefaultSize }
 					{ ...getToggleButtonProps( {
 						// This is needed because some speech recognition software don't support `aria-labelledby`.
 						'aria-label': label,
@@ -232,8 +237,8 @@ export default function CustomSelectControl( props ) {
 										'is-highlighted':
 											index === highlightedIndex,
 										'has-hint': !! item.__experimentalHint,
-										'is-next-36px-default-size':
-											__next36pxDefaultSize,
+										'is-next-40px-default-size':
+											__next40pxDefaultSize,
 									}
 								),
 								style: item.style,

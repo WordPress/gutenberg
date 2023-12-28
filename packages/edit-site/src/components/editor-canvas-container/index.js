@@ -12,12 +12,15 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import ResizableEditor from '../block-editor/resizable-editor';
 
 /**
  * Returns a translated string for the title of the editor canvas container.
@@ -31,6 +34,7 @@ function getEditorCanvasContainerTitle( view ) {
 		case 'style-book':
 			return __( 'Style Book' );
 		case 'global-styles-revisions':
+		case 'global-styles-revisions:style-book':
 			return __( 'Global styles revisions' );
 		default:
 			return '';
@@ -46,28 +50,50 @@ const {
 	Fill: EditorCanvasContainerFill,
 } = createPrivateSlotFill( SLOT_FILL_NAME );
 
-function EditorCanvasContainer( { children, closeButtonLabel, onClose } ) {
-	const editorCanvasContainerView = useSelect(
-		( select ) =>
-			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
+function EditorCanvasContainer( {
+	children,
+	closeButtonLabel,
+	onClose,
+	enableResizing = false,
+} ) {
+	const { editorCanvasContainerView, showListViewByDefault } = useSelect(
+		( select ) => {
+			const _editorCanvasContainerView = unlock(
+				select( editSiteStore )
+			).getEditorCanvasContainerView();
+
+			const _showListViewByDefault = select( preferencesStore ).get(
+				'core/edit-site',
+				'showListViewByDefault'
+			);
+
+			return {
+				editorCanvasContainerView: _editorCanvasContainerView,
+				showListViewByDefault: _showListViewByDefault,
+			};
+		},
 		[]
 	);
 	const [ isClosed, setIsClosed ] = useState( false );
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
+	const { setIsListViewOpened } = useDispatch( editorStore );
+
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const sectionFocusReturnRef = useFocusReturn();
 	const title = useMemo(
 		() => getEditorCanvasContainerTitle( editorCanvasContainerView ),
 		[ editorCanvasContainerView ]
 	);
+
 	function onCloseContainer() {
+		setIsListViewOpened( showListViewByDefault );
+		setEditorCanvasContainerView( undefined );
+		setIsClosed( true );
 		if ( typeof onClose === 'function' ) {
 			onClose();
 		}
-		setEditorCanvasContainerView( undefined );
-		setIsClosed( true );
 	}
 
 	function closeOnEscape( event ) {
@@ -97,24 +123,26 @@ function EditorCanvasContainer( { children, closeButtonLabel, onClose } ) {
 
 	return (
 		<EditorCanvasContainerFill>
-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
-			<section
-				className="edit-site-editor-canvas-container"
-				ref={ shouldShowCloseButton ? focusOnMountRef : null }
-				onKeyDown={ closeOnEscape }
-				aria-label={ title }
-			>
-				{ shouldShowCloseButton && (
-					<Button
-						className="edit-site-editor-canvas-container__close-button"
-						icon={ closeSmall }
-						label={ closeButtonLabel || __( 'Close' ) }
-						onClick={ onCloseContainer }
-						showTooltip={ false }
-					/>
-				) }
-				{ childrenWithProps }
-			</section>
+			<ResizableEditor enableResizing={ enableResizing }>
+				{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+				<section
+					className="edit-site-editor-canvas-container"
+					ref={ shouldShowCloseButton ? focusOnMountRef : null }
+					onKeyDown={ closeOnEscape }
+					aria-label={ title }
+				>
+					{ shouldShowCloseButton && (
+						<Button
+							className="edit-site-editor-canvas-container__close-button"
+							icon={ closeSmall }
+							label={ closeButtonLabel || __( 'Close' ) }
+							onClick={ onCloseContainer }
+							showTooltip={ false }
+						/>
+					) }
+					{ childrenWithProps }
+				</section>
+			</ResizableEditor>
 		</EditorCanvasContainerFill>
 	);
 }

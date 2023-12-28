@@ -1,12 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { FlexItem, FlexBlock, Flex, Button } from '@wordpress/components';
+import {
+	FlexItem,
+	FlexBlock,
+	Flex,
+	Button,
+	__experimentalUseNavigator as useNavigator,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { styles, seen } from '@wordpress/icons';
+import { styles, seen, backup } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -15,31 +23,54 @@ import DefaultSidebar from './default-sidebar';
 import { GlobalStylesUI } from '../global-styles';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesMenuSlot } from '../global-styles/ui';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
+import { store as coreStore } from '@wordpress/core-data';
 
 export default function GlobalStylesSidebar() {
-	const { shouldClearCanvasContainerView, isStyleBookOpened } = useSelect(
-		( select ) => {
-			const { getActiveComplementaryArea } = select( interfaceStore );
-			const { getEditorCanvasContainerView, getCanvasMode } = unlock(
-				select( editSiteStore )
-			);
-			const _isVisualEditorMode =
-				'visual' === select( editSiteStore ).getEditorMode();
-			const _isEditCanvasMode = 'edit' === getCanvasMode();
+	const {
+		shouldClearCanvasContainerView,
+		isStyleBookOpened,
+		showListViewByDefault,
+		hasRevisions,
+		isRevisionsOpened,
+		isRevisionsStyleBookOpened,
+	} = useSelect( ( select ) => {
+		const { getActiveComplementaryArea } = select( interfaceStore );
+		const { getEditorCanvasContainerView, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
+		const canvasContainerView = getEditorCanvasContainerView();
+		const _isVisualEditorMode =
+			'visual' === select( editSiteStore ).getEditorMode();
+		const _isEditCanvasMode = 'edit' === getCanvasMode();
+		const _showListViewByDefault = select( preferencesStore ).get(
+			'core/edit-site',
+			'showListViewByDefault'
+		);
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
 
-			return {
-				isStyleBookOpened:
-					'style-book' === getEditorCanvasContainerView(),
-				shouldClearCanvasContainerView:
-					'edit-site/global-styles' !==
-						getActiveComplementaryArea( 'core/edit-site' ) ||
-					! _isVisualEditorMode ||
-					! _isEditCanvasMode,
-			};
-		},
-		[]
-	);
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+
+		return {
+			isStyleBookOpened: 'style-book' === canvasContainerView,
+			shouldClearCanvasContainerView:
+				'edit-site/global-styles' !==
+					getActiveComplementaryArea( 'core/edit-site' ) ||
+				! _isVisualEditorMode ||
+				! _isEditCanvasMode,
+			showListViewByDefault: _showListViewByDefault,
+			hasRevisions:
+				!! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count,
+			isRevisionsStyleBookOpened:
+				'global-styles-revisions:style-book' === canvasContainerView,
+			isRevisionsOpened:
+				'global-styles-revisions' === canvasContainerView,
+		};
+	}, [] );
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
@@ -50,6 +81,48 @@ export default function GlobalStylesSidebar() {
 		}
 	}, [ shouldClearCanvasContainerView ] );
 
+	const { setIsListViewOpened } = useDispatch( editorStore );
+	const { goTo } = useNavigator();
+
+	const toggleRevisions = () => {
+		setIsListViewOpened( false );
+		if ( isRevisionsStyleBookOpened ) {
+			goTo( '/' );
+			setEditorCanvasContainerView( 'style-book' );
+			return;
+		}
+		if ( isRevisionsOpened ) {
+			goTo( '/' );
+			setEditorCanvasContainerView( undefined );
+			return;
+		}
+		goTo( '/revisions' );
+
+		if ( isStyleBookOpened ) {
+			setEditorCanvasContainerView(
+				'global-styles-revisions:style-book'
+			);
+		} else {
+			setEditorCanvasContainerView( 'global-styles-revisions' );
+		}
+	};
+	const toggleStyleBook = () => {
+		if ( isRevisionsOpened ) {
+			setEditorCanvasContainerView(
+				'global-styles-revisions:style-book'
+			);
+			return;
+		}
+		if ( isRevisionsStyleBookOpened ) {
+			setEditorCanvasContainerView( 'global-styles-revisions' );
+			return;
+		}
+		setIsListViewOpened( isStyleBookOpened && showListViewByDefault );
+		setEditorCanvasContainerView(
+			isStyleBookOpened ? undefined : 'style-book'
+		);
+	};
+
 	return (
 		<DefaultSidebar
 			className="edit-site-global-styles-sidebar"
@@ -59,7 +132,11 @@ export default function GlobalStylesSidebar() {
 			closeLabel={ __( 'Close Styles' ) }
 			panelClassName="edit-site-global-styles-sidebar__panel"
 			header={
-				<Flex className="edit-site-global-styles-sidebar__header">
+				<Flex
+					className="edit-site-global-styles-sidebar__header"
+					role="menubar"
+					aria-label={ __( 'Styles actions' ) }
+				>
 					<FlexBlock style={ { minWidth: 'min-content' } }>
 						<strong>{ __( 'Styles' ) }</strong>
 					</FlexBlock>
@@ -67,18 +144,25 @@ export default function GlobalStylesSidebar() {
 						<Button
 							icon={ seen }
 							label={ __( 'Style Book' ) }
-							isPressed={ isStyleBookOpened }
-							disabled={ shouldClearCanvasContainerView }
-							onClick={ () =>
-								setEditorCanvasContainerView(
-									isStyleBookOpened ? undefined : 'style-book'
-								)
+							isPressed={
+								isStyleBookOpened || isRevisionsStyleBookOpened
 							}
+							disabled={ shouldClearCanvasContainerView }
+							onClick={ toggleStyleBook }
 						/>
 					</FlexItem>
 					<FlexItem>
-						<GlobalStylesMenuSlot />
+						<Button
+							label={ __( 'Revisions' ) }
+							icon={ backup }
+							onClick={ toggleRevisions }
+							disabled={ ! hasRevisions }
+							isPressed={
+								isRevisionsOpened || isRevisionsStyleBookOpened
+							}
+						/>
 					</FlexItem>
+					<GlobalStylesMenuSlot />
 				</Flex>
 			}
 		>

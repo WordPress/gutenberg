@@ -24,6 +24,7 @@ import Tooltip from '../tooltip';
 import Icon from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
 import type { ButtonProps, DeprecatedButtonProps } from './types';
+import { positionToPlacement } from '../popover/utils';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
 
@@ -33,10 +34,23 @@ function useDeprecatedProps( {
 	isSecondary,
 	isTertiary,
 	isLink,
+	isPressed,
+	isSmall,
+	size,
 	variant,
 	...otherProps
 }: ButtonProps & DeprecatedButtonProps ): ButtonProps {
+	let computedSize = size;
 	let computedVariant = variant;
+
+	const newProps: { 'aria-pressed'?: boolean } = {
+		// @TODO Mark `isPressed` as deprecated
+		'aria-pressed': isPressed,
+	};
+
+	if ( isSmall ) {
+		computedSize ??= 'small';
+	}
 
 	if ( isPrimary ) {
 		computedVariant ??= 'primary';
@@ -65,7 +79,9 @@ function useDeprecatedProps( {
 	}
 
 	return {
+		...newProps,
 		...otherProps,
+		size: computedSize,
 		variant: computedVariant,
 	};
 }
@@ -76,8 +92,6 @@ export function UnforwardedButton(
 ) {
 	const {
 		__next40pxDefaultSize,
-		isSmall,
-		isPressed,
 		isBusy,
 		isDestructive,
 		className,
@@ -90,6 +104,7 @@ export function UnforwardedButton(
 		shortcut,
 		label,
 		children,
+		size = 'default',
 		text,
 		variant,
 		__experimentalIsFocusable: isFocusable,
@@ -97,10 +112,16 @@ export function UnforwardedButton(
 		...buttonOrAnchorProps
 	} = useDeprecatedProps( props );
 
-	const { href, target, ...additionalProps } =
-		'href' in buttonOrAnchorProps
-			? buttonOrAnchorProps
-			: { href: undefined, target: undefined, ...buttonOrAnchorProps };
+	const {
+		href,
+		target,
+		'aria-checked': ariaChecked,
+		'aria-pressed': ariaPressed,
+		'aria-selected': ariaSelected,
+		...additionalProps
+	} = 'href' in buttonOrAnchorProps
+		? buttonOrAnchorProps
+		: { href: undefined, target: undefined, ...buttonOrAnchorProps };
 
 	const instanceId = useInstanceId(
 		Button,
@@ -115,17 +136,27 @@ export function UnforwardedButton(
 			// Tooltip should not considered as a child
 			children?.[ 0 ]?.props?.className !== 'components-tooltip' );
 
+	const truthyAriaPressedValues: ( typeof ariaPressed )[] = [
+		true,
+		'true',
+		'mixed',
+	];
+
 	const classes = classnames( 'components-button', className, {
 		'is-next-40px-default-size': __next40pxDefaultSize,
 		'is-secondary': variant === 'secondary',
 		'is-primary': variant === 'primary',
-		'is-small': isSmall,
+		'is-small': size === 'small',
+		'is-compact': size === 'compact',
 		'is-tertiary': variant === 'tertiary',
-		'is-pressed': isPressed,
+
+		'is-pressed': truthyAriaPressedValues.includes( ariaPressed ),
+		'is-pressed-mixed': ariaPressed === 'mixed',
+
 		'is-busy': isBusy,
 		'is-link': variant === 'link',
 		'is-destructive': isDestructive,
-		'has-text': !! icon && hasChildren,
+		'has-text': !! icon && ( hasChildren || text ),
 		'has-icon': !! icon,
 	} );
 
@@ -136,7 +167,9 @@ export function UnforwardedButton(
 			? {
 					type: 'button',
 					disabled: trulyDisabled,
-					'aria-pressed': isPressed,
+					'aria-checked': ariaChecked,
+					'aria-pressed': ariaPressed,
+					'aria-selected': ariaSelected,
 			  }
 			: {};
 	const anchorProps: ComponentPropsWithoutRef< 'a' > =
@@ -216,6 +249,13 @@ export function UnforwardedButton(
 			</button>
 		);
 
+	// Convert legacy `position` values to be used with the new `placement` prop
+	let computedPlacement;
+	// if `tooltipPosition` is defined, compute value to `placement`
+	if ( tooltipPosition !== undefined ) {
+		computedPlacement = positionToPlacement( tooltipPosition );
+	}
+
 	if ( ! shouldShowTooltip ) {
 		return (
 			<>
@@ -239,7 +279,7 @@ export function UnforwardedButton(
 						: label
 				}
 				shortcut={ shortcut }
-				position={ tooltipPosition }
+				placement={ computedPlacement }
 			>
 				{ element }
 			</Tooltip>

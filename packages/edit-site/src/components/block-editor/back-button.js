@@ -9,17 +9,24 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import {
+	TEMPLATE_PART_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+} from '../../utils/constants';
+import { unlock } from '../../lock-unlock';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 function BackButton() {
 	const location = useLocation();
 	const history = useHistory();
-	const isTemplatePart = location.params.postType === 'wp_template_part';
+	const isTemplatePart = location.params.postType === TEMPLATE_PART_POST_TYPE;
+	const isNavigationMenu = location.params.postType === NAVIGATION_POST_TYPE;
 	const previousTemplateId = location.state?.fromTemplateId;
 
-	if ( ! isTemplatePart || ! previousTemplateId ) {
+	const isFocusMode = isTemplatePart || isNavigationMenu;
+
+	if ( ! isFocusMode || ! previousTemplateId ) {
 		return null;
 	}
 

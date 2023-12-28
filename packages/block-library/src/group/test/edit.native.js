@@ -8,7 +8,6 @@ import {
 	initializeEditor,
 	within,
 	getBlock,
-	waitFor,
 } from 'test/helpers';
 
 /**
@@ -43,7 +42,6 @@ afterAll( () => {
 describe( 'Group block', () => {
 	it( 'inserts block and adds a Heading block as an inner block', async () => {
 		const screen = await initializeEditor();
-		const { getByTestId, getByText } = screen;
 
 		// Add block
 		await addBlock( screen, 'Group' );
@@ -58,7 +56,7 @@ describe( 'Group block', () => {
 		fireEvent.press( appenderButton );
 
 		// Look for a block in the inserter
-		const blockList = getByTestId( 'InserterUI-Blocks' );
+		const blockList = screen.getByTestId( 'InserterUI-Blocks' );
 
 		// onScroll event used to force the FlatList to render all items
 		fireEvent.scroll( blockList, {
@@ -70,7 +68,7 @@ describe( 'Group block', () => {
 		} );
 
 		// Add a block
-		fireEvent.press( await waitFor( () => getByText( 'Heading' ) ) );
+		fireEvent.press( await screen.findByText( 'Heading' ) );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );

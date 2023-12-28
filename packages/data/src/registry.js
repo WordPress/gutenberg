@@ -9,7 +9,7 @@ import deprecated from '@wordpress/deprecated';
 import createReduxStore from './redux-store';
 import coreDataStore from './store';
 import { createEmitter } from './utils/emitter';
-import { lock, unlock } from './private-apis';
+import { lock, unlock } from './lock-unlock';
 
 /** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
 
@@ -314,6 +314,12 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	function batch( callback ) {
+		// If we're already batching, just call the callback.
+		if ( emitter.isPaused ) {
+			callback();
+			return;
+		}
+
 		emitter.pause();
 		Object.values( stores ).forEach( ( store ) => store.emitter.pause() );
 		callback();

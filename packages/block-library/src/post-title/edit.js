@@ -12,6 +12,8 @@ import {
 	InspectorControls,
 	useBlockProps,
 	PlainText,
+	HeadingLevelDropdown,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -21,7 +23,6 @@ import { useEntityProp } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 import { useCanEditEntity } from '../utils/hooks';
 
 export default function PostTitleEdit( {
@@ -30,7 +31,7 @@ export default function PostTitleEdit( {
 	context: { postType, postId, queryId },
 	insertBlocksAfter,
 } ) {
-	const TagName = 0 === level ? 'p' : 'h' + level;
+	const TagName = 'h' + level;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	/**
 	 * Hack: useCanEditEntity may trigger an OPTIONS request to the REST API via the canUser resolver.
@@ -58,10 +59,9 @@ export default function PostTitleEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+	const blockEditingMode = useBlockEditingMode();
 
-	let titleElement = (
-		<TagName { ...blockProps }>{ __( 'Post Title' ) }</TagName>
-	);
+	let titleElement = <TagName { ...blockProps }>{ __( 'Title' ) }</TagName>;
 
 	if ( postType && postId ) {
 		titleElement = userCanEdit ? (
@@ -114,20 +114,22 @@ export default function PostTitleEdit( {
 
 	return (
 		<>
-			<BlockControls group="block">
-				<HeadingLevelDropdown
-					selectedLevel={ level }
-					onChange={ ( newLevel ) =>
-						setAttributes( { level: newLevel } )
-					}
-				/>
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
+			{ blockEditingMode === 'default' && (
+				<BlockControls group="block">
+					<HeadingLevelDropdown
+						value={ level }
+						onChange={ ( newLevel ) =>
+							setAttributes( { level: newLevel } )
+						}
+					/>
+					<AlignmentControl
+						value={ textAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { textAlign: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl

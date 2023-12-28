@@ -18,6 +18,7 @@ import {
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
+import { LAYOUT_DEFINITIONS } from './definitions';
 
 const RANGE_CONTROL_MAX_VALUES = {
 	px: 600,
@@ -26,6 +27,28 @@ const RANGE_CONTROL_MAX_VALUES = {
 	vh: 100,
 	em: 38,
 	rem: 38,
+	svw: 100,
+	lvw: 100,
+	dvw: 100,
+	svh: 100,
+	lvh: 100,
+	dvh: 100,
+	vi: 100,
+	svi: 100,
+	lvi: 100,
+	dvi: 100,
+	vb: 100,
+	svb: 100,
+	lvb: 100,
+	dvb: 100,
+	vmin: 100,
+	svmin: 100,
+	lvmin: 100,
+	dvmin: 100,
+	vmax: 100,
+	svmax: 100,
+	lvmax: 100,
+	dvmax: 100,
 };
 
 export default {
@@ -35,7 +58,9 @@ export default {
 		layout = {},
 		onChange,
 	} ) {
-		return (
+		return layout?.columnCount ? (
+			<GridLayoutColumnsControl layout={ layout } onChange={ onChange } />
+		) : (
 			<GridLayoutMinimumWidthControl
 				layout={ layout }
 				onChange={ onChange }
@@ -51,9 +76,9 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
-		layoutDefinitions,
+		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
-		const { minimumColumnWidth = '12rem' } = layout;
+		const { minimumColumnWidth = '12rem', columnCount = null } = layout;
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
@@ -66,7 +91,11 @@ export default {
 		let output = '';
 		const rules = [];
 
-		if ( minimumColumnWidth ) {
+		if ( columnCount ) {
+			rules.push(
+				`grid-template-columns: repeat(${ columnCount }, minmax(0, 1fr))`
+			);
+		} else if ( minimumColumnWidth ) {
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(min(${ minimumColumnWidth }, 100%), 1fr))`
 			);
@@ -124,10 +153,36 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 			// Convert to pixel value assuming a root size of 16px.
 			newValue = Math.round( quantity * 16 ) + newUnit;
 		} else if (
-			[ 'vh', 'vw', '%' ].includes( newUnit ) &&
+			[
+				'vh',
+				'vw',
+				'%',
+				'svw',
+				'lvw',
+				'dvw',
+				'svh',
+				'lvh',
+				'dvh',
+				'vi',
+				'svi',
+				'lvi',
+				'dvi',
+				'vb',
+				'svb',
+				'lvb',
+				'dvb',
+				'vmin',
+				'svmin',
+				'lvmin',
+				'dvmin',
+				'vmax',
+				'svmax',
+				'lvmax',
+				'dvmax',
+			].includes( newUnit ) &&
 			quantity > 100
 		) {
-			// When converting to `vh`, `vw`, or `%` units, cap the new value at 100.
+			// When converting to `%` or viewport-relative units, cap the new value at 100.
 			newValue = 100 + newUnit;
 		}
 
@@ -168,5 +223,25 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 				</FlexItem>
 			</Flex>
 		</fieldset>
+	);
+}
+
+// Enables setting number of grid columns
+function GridLayoutColumnsControl( { layout, onChange } ) {
+	const { columnCount = 3 } = layout;
+
+	return (
+		<RangeControl
+			label={ __( 'Columns' ) }
+			value={ columnCount }
+			onChange={ ( value ) =>
+				onChange( {
+					...layout,
+					columnCount: value,
+				} )
+			}
+			min={ 1 }
+			max={ 6 }
+		/>
 	);
 }

@@ -23,7 +23,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '../animation';
 import type { DropType, DropZoneProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 /**
  * `DropZone` is a component creating a drop zone area taking the full size of its parent element. It supports dropping files, HTML content or any other HTML drop event.

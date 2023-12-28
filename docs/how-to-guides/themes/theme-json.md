@@ -309,7 +309,6 @@ The settings section has the following structure:
 	}
 }
 ```
-
 {% end %}
 
 Each block can configure any of these settings separately, providing a more fine-grained control over what exists via `add_theme_support`. The settings declared at the top-level affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and configure all blocks at once.
@@ -320,6 +319,7 @@ Note, however, that not all settings are relevant for all blocks. The settings s
 
 There's one special setting property, `appearanceTools`, which is a boolean and its default value is false. Themes can use this setting to enable the following ones:
 
+- background: backgroundImage
 - border: color, radius, style, width
 - color: link
 - dimensions: minHeight
@@ -342,8 +342,9 @@ To retain backward compatibility, the existing `add_theme_support` declarations 
 | `editor-color-palette`      | Provide the list of colors via `color.palette`.           |
 | `editor-font-sizes`         | Provide the list of font size via `typography.fontSizes`. |
 | `editor-gradient-presets`   | Provide the list of gradients via `color.gradients`.      |
-| `experimental-link-color`   | Set `color.link` to `true`. `experimental-link-color` will be removed when the plugin requires WordPress 5.9 as the minimum version. |
 | `appearance-tools`          | Set `appearanceTools` to `true`.                          |
+| `border`                    | Set `border: color, radius, style, width` to `true`.      |
+| `link-color `               | Set `color.link` to `true`.                               |
 
 #### Presets
 
@@ -373,6 +374,7 @@ The naming schema for the classes and the custom properties is as follows:
 
 - Custom Properties: `--wp--preset--{preset-category}--{preset-slug}` such as `--wp--preset--color--black`
 - Classes: `.has-{preset-slug}-{preset-category}` such as `.has-black-color`.
+
 
 {% codetabs %}
 {% Input %}
@@ -537,7 +539,6 @@ body {
 .wp-block-group.has-white-border-color { border-color: #444 !important; }
 
 ```
-
 {% end %}
 
 To maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
@@ -701,7 +702,6 @@ The tabs below show WordPress 5.8 supported styles and the ones supported by the
 Each block declares which style properties it exposes via the [block supports mechanism](/docs/reference-guides/block-api/block-supports.md). The support declarations are used to automatically generate the UI controls for the block in the editor. Themes can use any style property via the `theme.json` for any block ― it's the theme's responsibility to verify that it works properly according to the block markup, etc.
 
 {% codetabs %}
-
 {% WordPress %}
 
 ```json
@@ -781,7 +781,6 @@ Each block declares which style properties it exposes via the [block supports me
 	}
 }
 ```
-
 {% Gutenberg %}
 
 ```json
@@ -870,9 +869,7 @@ Each block declares which style properties it exposes via the [block supports me
 	}
 }
 ```
-
 {% end %}
-
 ### Top-level styles
 
 Styles found at the top-level will be enqueued using the `body` selector.
@@ -900,7 +897,6 @@ body {
 ```
 
 {% end %}
-
 ### Block styles
 
 Styles found within a block will be enqueued using the block selector.
@@ -946,7 +942,6 @@ p { /* The core/paragraph opts out from the default behaviour and uses p as a se
 	color: var( --wp--preset--color--tertiary );
 }
 ```
-
 {% end %}
 
 #### Referencing a style
@@ -967,7 +962,7 @@ You can use `ref: "styles.color.background"`  to re-use the style for a block:
 ```JSON
 {
 	"color": {
-		"text": { ref: "styles.color.background" }
+		"text": { "ref": "styles.color.background" }
 	}
 }
 ```
@@ -993,6 +988,7 @@ Supported by WordPress:
 - `link`: maps to the `a` CSS selector.
 
 If they're found in the top-level the element selector will be used. If they're found within a block, the selector to be used will be the element's appended to the corresponding block.
+
 
 {% codetabs %}
 {% Input %}
@@ -1063,9 +1059,7 @@ h3 {
 	font-size: var( --wp--preset--font-size--smaller );
 }
 ```
-
 {% end %}
-
 ##### Element pseudo selectors
 
 Pseudo selectors `:hover`, `:focus`, `:visited`, `:active`, `:link`, `:any-link` are supported by Gutenberg.
@@ -1259,7 +1253,6 @@ body {
 	--wp--custom--font-primary: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif";
 }
 ```
-
 {% end %}
 
 A few notes about this process:
@@ -1330,7 +1323,7 @@ As a result of this change, it’s now the block author and theme author’s res
 
 ### What is blockGap and how can I use it?
 
-For blocks that contain inner blocks, such as Group, Columns, Buttons, and Social Icons, `blockGap` controls the spacing between inner blocks. Depending on the layout of the block, the `blockGap` value will be output as either a vertical margin or a `gap` value. In the editor, the control for the `blockGap` value is called _Block spacing_, located in the Dimensions panel.
+For blocks that contain inner blocks, such as Group, Columns, Buttons, and Social Icons, `blockGap` controls the spacing between inner blocks. For `blockGap` to work, the block must also opt in to the [`layout` block support](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout), which provides layout styles that can be adjusted via the block spacing controls. Depending on the layout of the block, the `blockGap` value will be output as either a vertical margin or a `gap` value. In the editor, the control for the `blockGap` value is called _Block spacing_, located in the Dimensions panel.
 
 ```json
 {

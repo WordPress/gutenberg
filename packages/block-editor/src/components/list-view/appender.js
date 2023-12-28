@@ -4,7 +4,7 @@
 import { useInstanceId } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { useSelect } from '@wordpress/data';
-import { forwardRef, useState, useEffect } from '@wordpress/element';
+import { forwardRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -12,23 +12,24 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import { useListViewContext } from './context';
 import Inserter from '../inserter';
+import AriaReferencedText from './aria-referenced-text';
 
 export const Appender = forwardRef(
 	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
-		const [ insertedBlock, setInsertedBlock ] = useState( null );
+		const { insertedBlock, setInsertedBlock } = useListViewContext();
 
 		const instanceId = useInstanceId( Appender );
-		const { hideInserter } = useSelect(
+		const hideInserter = useSelect(
 			( select ) => {
 				const { getTemplateLock, __unstableGetEditorMode } =
 					select( blockEditorStore );
 
-				return {
-					hideInserter:
-						!! getTemplateLock( clientId ) ||
-						__unstableGetEditorMode() === 'zoom-out',
-				};
+				return (
+					!! getTemplateLock( clientId ) ||
+					__unstableGetEditorMode() === 'zoom-out'
+				);
 			},
 			[ clientId ]
 		);
@@ -89,12 +90,9 @@ export const Appender = forwardRef(
 						}
 					} }
 				/>
-				<div
-					className="list-view-appender__description"
-					id={ descriptionId }
-				>
+				<AriaReferencedText id={ descriptionId }>
 					{ description }
-				</div>
+				</AriaReferencedText>
 			</div>
 		);
 	}

@@ -13,8 +13,8 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
+import TemplateActions from '../template-actions';
 import Link from '../routes/link';
-import Actions from './actions';
 import AddedBy from './added-by';
 
 export default function Table( { templateType } ) {
@@ -126,7 +126,11 @@ export default function Table( { templateType } ) {
 							) : null }
 						</td>
 						<td className="edit-site-list-table-column" role="cell">
-							<Actions template={ template } />
+							<TemplateActions
+								postType={ template.type }
+								postId={ template.id }
+								className="edit-site-list-table__actions"
+							/>
 						</td>
 					</tr>
 				) ) }

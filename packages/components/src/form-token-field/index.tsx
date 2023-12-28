@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
+import type { KeyboardEvent, MouseEvent, TouchEvent, FocusEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -73,6 +73,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__next40pxDefaultSize = false,
 		__experimentalAutoSelectFirstMatch = false,
 		__nextHasNoMarginBottom = false,
+		tokenizeOnBlur = false,
 	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >(
 		props,
 		'wp.components.FormTokenField'
@@ -161,18 +162,33 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 	}
 
-	function onBlur() {
+	function onBlur( event: FocusEvent ) {
 		if (
 			inputHasValidValue() &&
 			__experimentalValidateInput( incompleteTokenValue )
 		) {
 			setIsActive( false );
+			if ( tokenizeOnBlur && inputHasValidValue() ) {
+				addNewToken( incompleteTokenValue );
+			}
 		} else {
 			// Reset to initial state
 			setIncompleteTokenValue( '' );
 			setInputOffsetFromEnd( 0 );
 			setIsActive( false );
-			setIsExpanded( false );
+
+			if ( __experimentalExpandOnFocus ) {
+				// If `__experimentalExpandOnFocus` is true, don't close the suggestions list when
+				// the user clicks on it (`tokensAndInput` will be the element that caused the blur).
+				const hasFocusWithin =
+					event.relatedTarget === tokensAndInput.current;
+				setIsExpanded( hasFocusWithin );
+			} else {
+				// Else collapse the suggestion list. This will result in the suggestion list closing
+				// after a suggestion has been submitted since that causes a blur.
+				setIsExpanded( false );
+			}
+
 			setSelectedSuggestionIndex( -1 );
 			setSelectedSuggestionScroll( false );
 		}
@@ -451,7 +467,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		setSelectedSuggestionScroll( false );
 		setIsExpanded( ! __experimentalExpandOnFocus );
 
-		if ( isActive ) {
+		if ( isActive && ! tokenizeOnBlur ) {
 			focus();
 		}
 	}

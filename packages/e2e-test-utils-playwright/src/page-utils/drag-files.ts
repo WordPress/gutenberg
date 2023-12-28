@@ -54,29 +54,6 @@ async function dragFiles(
 		} )
 	);
 
-	const dataTransfer = await this.page.evaluateHandle(
-		async ( _fileObjects ) => {
-			const dt = new DataTransfer();
-			const fileInstances = await Promise.all(
-				_fileObjects.map( async ( fileObject ) => {
-					const blob = await fetch(
-						`data:${ fileObject.mimeType };base64,${ fileObject.base64 }`
-					).then( ( res ) => res.blob() );
-					return new File( [ blob ], fileObject.name, {
-						type: fileObject.mimeType ?? undefined,
-					} );
-				} )
-			);
-
-			fileInstances.forEach( ( file ) => {
-				dt.items.add( file );
-			} );
-
-			return dt;
-		},
-		fileObjects
-	);
-
 	// CDP doesn't actually support dragging files, this is only a _good enough_
 	// dummy data so that it will correctly send the relevant events.
 	const dragData = {
@@ -145,7 +122,15 @@ async function dragFiles(
 		drop: async () => {
 			const topMostElement = await this.page.evaluateHandle(
 				( { x, y } ) => {
-					return document.elementFromPoint( x, y );
+					const element = document.elementFromPoint( x, y );
+					if ( element instanceof HTMLIFrameElement ) {
+						const offsetBox = element.getBoundingClientRect();
+						return element.contentDocument!.elementFromPoint(
+							x - offsetBox.x,
+							y - offsetBox.y
+						);
+					}
+					return element;
 				},
 				position
 			);
@@ -154,6 +139,29 @@ async function dragFiles(
 			if ( ! elementHandle ) {
 				throw new Error( 'Element not found.' );
 			}
+
+			const dataTransfer = await elementHandle.evaluateHandle(
+				async ( _node, _fileObjects ) => {
+					const dt = new DataTransfer();
+					const fileInstances = await Promise.all(
+						_fileObjects.map( async ( fileObject: any ) => {
+							const blob = await fetch(
+								`data:${ fileObject.mimeType };base64,${ fileObject.base64 }`
+							).then( ( res ) => res.blob() );
+							return new File( [ blob ], fileObject.name, {
+								type: fileObject.mimeType ?? undefined,
+							} );
+						} )
+					);
+
+					fileInstances.forEach( ( file ) => {
+						dt.items.add( file );
+					} );
+
+					return dt;
+				},
+				fileObjects
+			);
 
 			await elementHandle.dispatchEvent( 'drop', { dataTransfer } );
 

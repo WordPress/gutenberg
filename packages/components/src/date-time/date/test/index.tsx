@@ -112,6 +112,6 @@ describe( 'DatePicker', () => {
 		const button = screen.getByRole( 'button', {
 			name: 'May 20, 2022',
 		} ) as HTMLButtonElement;
-		expect( button.disabled ).toBe( true );
+		expect( button ).toBeDisabled();
 	} );
 } );

@@ -57,9 +57,7 @@ function BlockVerticalAlignmentUI( {
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
-	const extraProps = isToolbar
-		? { isCollapsed }
-		: { popoverProps: { variant: 'toolbar' } };
+	const extraProps = isToolbar ? { isCollapsed } : {};
 
 	return (
 		<UIComponent

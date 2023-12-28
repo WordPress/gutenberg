@@ -5,14 +5,11 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useContext, useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-/**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
+
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../private-apis';
+import { unlock } from '../../../lock-unlock';
 
 const SITE_EDITOR_AUTHORS_QUERY = {
 	per_page: -1,
@@ -20,54 +17,77 @@ const SITE_EDITOR_AUTHORS_QUERY = {
 	context: 'view',
 	capabilities: [ 'edit_theme_options' ],
 };
-
+const DEFAULT_QUERY = { per_page: 100, page: 1 };
+const EMPTY_ARRAY = [];
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
-export default function useGlobalStylesRevisions() {
+export default function useGlobalStylesRevisions( { query } = {} ) {
 	const { user: userConfig } = useContext( GlobalStylesContext );
-	const { authors, currentUser, isDirty, revisions, isLoading } = useSelect(
+	const _query = { ...DEFAULT_QUERY, ...query };
+	const {
+		authors,
+		currentUser,
+		isDirty,
+		revisions,
+		isLoadingGlobalStylesRevisions,
+		revisionsCount,
+	} = useSelect(
 		( select ) => {
 			const {
 				__experimentalGetDirtyEntityRecords,
 				getCurrentUser,
 				getUsers,
-				getCurrentThemeGlobalStylesRevisions,
+				getRevisions,
+				__experimentalGetCurrentGlobalStylesId,
+				getEntityRecord,
 				isResolving,
 			} = select( coreStore );
 			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 			const _currentUser = getCurrentUser();
 			const _isDirty = dirtyEntityRecords.length > 0;
+			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+			const globalStyles = globalStylesId
+				? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+				: undefined;
+			const _revisionsCount =
+				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 			const globalStylesRevisions =
-				getCurrentThemeGlobalStylesRevisions() || [];
-			const _authors = getUsers( SITE_EDITOR_AUTHORS_QUERY );
-
+				getRevisions(
+					'root',
+					'globalStyles',
+					globalStylesId,
+					_query
+				) || EMPTY_ARRAY;
+			const _authors =
+				getUsers( SITE_EDITOR_AUTHORS_QUERY ) || EMPTY_ARRAY;
+			const _isResolving = isResolving( 'getRevisions', [
+				'root',
+				'globalStyles',
+				globalStylesId,
+				_query,
+			] );
 			return {
 				authors: _authors,
 				currentUser: _currentUser,
 				isDirty: _isDirty,
 				revisions: globalStylesRevisions,
-				isLoading:
-					! globalStylesRevisions.length ||
-					isResolving( 'getUsers', [ SITE_EDITOR_AUTHORS_QUERY ] ),
+				isLoadingGlobalStylesRevisions: _isResolving,
+				revisionsCount: _revisionsCount,
 			};
 		},
-		[]
+		[ query ]
 	);
 	return useMemo( () => {
-		let _modifiedRevisions = [];
-		if ( isLoading || ! revisions.length ) {
+		if ( ! authors.length || isLoadingGlobalStylesRevisions ) {
 			return {
-				revisions: _modifiedRevisions,
+				revisions: EMPTY_ARRAY,
 				hasUnsavedChanges: isDirty,
-				isLoading,
+				isLoading: true,
+				revisionsCount,
 			};
 		}
-		/*
-		 * Adds a flag to the first revision, which is the latest.
-		 * Also adds author information to the revision.
-		 * Then, if there are unsaved changes in the editor, create a
-		 * new "revision" item that represents the unsaved changes.
-		 */
-		_modifiedRevisions = revisions.map( ( revision ) => {
+
+		// Adds author details to each revision.
+		const _modifiedRevisions = revisions.map( ( revision ) => {
 			return {
 				...revision,
 				author: authors.find(
@@ -76,28 +96,63 @@ export default function useGlobalStylesRevisions() {
 			};
 		} );
 
-		if ( _modifiedRevisions[ 0 ]?.id !== 'unsaved' ) {
-			_modifiedRevisions[ 0 ].isLatest = true;
+		const fetchedRevisionsCount = revisions.length;
+
+		if ( fetchedRevisionsCount ) {
+			// Flags the most current saved revision.
+			if (
+				_modifiedRevisions[ 0 ].id !== 'unsaved' &&
+				_query.page === 1
+			) {
+				_modifiedRevisions[ 0 ].isLatest = true;
+			}
+
+			// Adds an item for unsaved changes.
+			if (
+				isDirty &&
+				userConfig &&
+				Object.keys( userConfig ).length > 0 &&
+				currentUser &&
+				_query.page === 1
+			) {
+				const unsavedRevision = {
+					id: 'unsaved',
+					styles: userConfig?.styles,
+					settings: userConfig?.settings,
+					author: {
+						name: currentUser?.name,
+						avatar_urls: currentUser?.avatar_urls,
+					},
+					modified: new Date(),
+				};
+
+				_modifiedRevisions.unshift( unsavedRevision );
+			}
+
+			if (
+				_query.page === Math.ceil( revisionsCount / _query.per_page )
+			) {
+				// Adds an item for the default theme styles.
+				_modifiedRevisions.push( {
+					id: 'parent',
+					styles: {},
+					settings: {},
+				} );
+			}
 		}
 
-		if ( isDirty && ! isEmpty( userConfig ) && currentUser ) {
-			const unsavedRevision = {
-				id: 'unsaved',
-				styles: userConfig?.styles,
-				settings: userConfig?.settings,
-				author: {
-					name: currentUser?.name,
-					avatar_urls: currentUser?.avatar_urls,
-				},
-				modified: new Date(),
-			};
-
-			_modifiedRevisions.unshift( unsavedRevision );
-		}
 		return {
 			revisions: _modifiedRevisions,
 			hasUnsavedChanges: isDirty,
-			isLoading,
+			isLoading: false,
+			revisionsCount,
 		};
-	}, [ revisions.length, isDirty, isLoading ] );
+	}, [
+		isDirty,
+		revisions,
+		currentUser,
+		authors,
+		userConfig,
+		isLoadingGlobalStylesRevisions,
+	] );
 }

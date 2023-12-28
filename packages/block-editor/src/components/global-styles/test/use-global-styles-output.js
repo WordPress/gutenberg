@@ -14,6 +14,7 @@ import {
 	toCustomProperties,
 	toStyles,
 	getStylesDeclarations,
+	processCSSNesting,
 } from '../use-global-styles-output';
 import { ROOT_BLOCK_SELECTOR } from '../utils';
 
@@ -478,7 +479,7 @@ describe( 'global styles renderer', () => {
 			};
 
 			expect( toStyles( tree, blockSelectors ) ).toEqual(
-				'body {margin: 0;}' +
+				'body {margin: 0;}body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }body .is-layout-grid { display:grid; }body .is-layout-grid > * { margin: 0; }' +
 					'body{background-color: red;margin: 10px;padding: 10px;}a{color: blue;}a:hover{color: orange;}a:focus{color: orange;}h1{font-size: 42px;}.wp-block-group{margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}h1,h2,h3,h4,h5,h6{color: orange;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{color: hotpink;}h1 a:hover,h2 a:hover,h3 a:hover,h4 a:hover,h5 a:hover,h6 a:hover{color: red;}h1 a:focus,h2 a:focus,h3 a:focus,h4 a:focus,h5 a:focus,h6 a:focus{color: red;}' +
 					'.wp-block-image img, .wp-block-image .wp-crop-area{border-radius: 9999px;}.wp-block-image{color: red;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }' +
 					'.has-white-color{color: var(--wp--preset--color--white) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}h1.has-blue-color,h2.has-blue-color,h3.has-blue-color,h4.has-blue-color,h5.has-blue-color,h6.has-blue-color{color: var(--wp--preset--color--blue) !important;}h1.has-blue-background-color,h2.has-blue-background-color,h3.has-blue-background-color,h4.has-blue-background-color,h5.has-blue-background-color,h6.has-blue-background-color{background-color: var(--wp--preset--color--blue) !important;}h1.has-blue-border-color,h2.has-blue-border-color,h3.has-blue-border-color,h4.has-blue-border-color,h5.has-blue-border-color,h6.has-blue-border-color{border-color: var(--wp--preset--color--blue) !important;}'
@@ -521,7 +522,7 @@ describe( 'global styles renderer', () => {
 			};
 
 			expect( toStyles( Object.freeze( tree ), blockSelectors ) ).toEqual(
-				'body {margin: 0;}' +
+				'body {margin: 0;}body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }body .is-layout-grid { display:grid; }body .is-layout-grid > * { margin: 0; }' +
 					'.wp-image-spacing{padding-top: 1px;}.wp-image-border-color{border-color: red;}.wp-image-border{border-radius: 9999px;}.wp-image{color: red;}' +
 					'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
 			);
@@ -569,7 +570,7 @@ describe( 'global styles renderer', () => {
 			};
 
 			expect( toStyles( Object.freeze( tree ), blockSelectors ) ).toEqual(
-				'body {margin: 0;}' +
+				'body {margin: 0;}body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }body .is-layout-grid { display:grid; }body .is-layout-grid > * { margin: 0; }' +
 					'.is-style-foo.wp-image.wp-image-spacing{padding-top: 2px;}.is-style-foo.wp-image.wp-image-border-color{border-color: blue;}.is-style-foo.wp-image{color: blue;}' +
 					'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
 			);
@@ -596,7 +597,7 @@ describe( 'global styles renderer', () => {
 			};
 
 			expect( toStyles( Object.freeze( tree ), blockSelectors ) ).toEqual(
-				'body {margin: 0;}' +
+				'body {margin: 0;}body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }body .is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }body .is-layout-grid { display:grid; }body .is-layout-grid > * { margin: 0; }' +
 					'.wp-image img{filter: blur(5px);}' +
 					'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
 			);
@@ -706,7 +707,8 @@ describe( 'global styles renderer', () => {
 			const style = { spacing: { blockGap: '12px' } };
 
 			const layoutStyles = getLayoutStyles( {
-				tree: layoutDefinitionsTree,
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
 				style,
 				selector: 'body',
 				hasBlockGapSupport: false,
@@ -722,7 +724,8 @@ describe( 'global styles renderer', () => {
 			const style = {};
 
 			const layoutStyles = getLayoutStyles( {
-				tree: layoutDefinitionsTree,
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
 				style,
 				selector: 'body',
 				hasBlockGapSupport: true,
@@ -738,7 +741,8 @@ describe( 'global styles renderer', () => {
 			const style = { spacing: { blockGap: '12px' } };
 
 			const layoutStyles = getLayoutStyles( {
-				tree: layoutDefinitionsTree,
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
 				style,
 				selector: 'body',
 				hasBlockGapSupport: true,
@@ -754,7 +758,8 @@ describe( 'global styles renderer', () => {
 			const style = { spacing: { blockGap: '12px' } };
 
 			const layoutStyles = getLayoutStyles( {
-				tree: layoutDefinitionsTree,
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
 				style,
 				selector: '.wp-block-group',
 				hasBlockGapSupport: true,
@@ -770,7 +775,8 @@ describe( 'global styles renderer', () => {
 			const style = { spacing: { blockGap: '12px' } };
 
 			const layoutStyles = getLayoutStyles( {
-				tree: layoutDefinitionsTree,
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
 				style,
 				selector: '.wp-block-group',
 				hasBlockGapSupport: false, // This means that the fallback value will be used instead of the "real" one.
@@ -960,6 +966,44 @@ describe( 'global styles renderer', () => {
 				'font-family: sans-serif',
 				'font-size: 15px',
 			] );
+		} );
+	} );
+
+	describe( 'processCSSNesting', () => {
+		it( 'should return processed CSS without any nested selectors', () => {
+			expect(
+				processCSSNesting( 'color: red; margin: auto;', '.foo' )
+			).toEqual( '.foo{color: red; margin: auto;}' );
+		} );
+		it( 'should return processed CSS with nested selectors', () => {
+			expect(
+				processCSSNesting(
+					'color: red; margin: auto; &.one{color: blue;} & .two{color: green;}',
+					'.foo'
+				)
+			).toEqual(
+				'.foo{color: red; margin: auto;}.foo.one{color: blue;}.foo .two{color: green;}'
+			);
+		} );
+		it( 'should return processed CSS with pseudo elements', () => {
+			expect(
+				processCSSNesting(
+					'color: red; margin: auto; &::before{color: blue;} & ::before{color: green;}  &.one::before{color: yellow;} & .two::before{color: purple;}',
+					'.foo'
+				)
+			).toEqual(
+				'.foo{color: red; margin: auto;}.foo::before{color: blue;}.foo ::before{color: green;}.foo.one::before{color: yellow;}.foo .two::before{color: purple;}'
+			);
+		} );
+		it( 'should return processed CSS with multiple root selectors', () => {
+			expect(
+				processCSSNesting(
+					'color: red; margin: auto; &.one{color: blue;} & .two{color: green;} &::before{color: yellow;} & ::before{color: purple;}  &.three::before{color: orange;} & .four::before{color: skyblue;}',
+					'.foo, .bar'
+				)
+			).toEqual(
+				'.foo, .bar{color: red; margin: auto;}.foo.one, .bar.one{color: blue;}.foo .two, .bar .two{color: green;}.foo::before, .bar::before{color: yellow;}.foo ::before, .bar ::before{color: purple;}.foo.three::before, .bar.three::before{color: orange;}.foo .four::before, .bar .four::before{color: skyblue;}'
+			);
 		} );
 	} );
 } );

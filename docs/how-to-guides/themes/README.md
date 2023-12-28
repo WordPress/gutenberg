@@ -18,6 +18,5 @@ There isn't an FSE specific theme type. In WordPress > 5.9 FSE is enabled for an
 
 **Contents**
 
-- [Block Theme Overview](/docs/how-to-guides/themes/block-theme-overview.md)
 - [Global Settings (theme.json)](/docs/how-to-guides/themes/theme-json.md)
 - [Theme Support](/docs/how-to-guides/themes/theme-support.md)

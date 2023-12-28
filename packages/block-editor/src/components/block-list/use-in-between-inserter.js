@@ -22,13 +22,12 @@ export function useInBetweenInserter() {
 	);
 	const {
 		getBlockListSettings,
-		getBlockRootClientId,
 		getBlockIndex,
-		isBlockInsertionPointVisible,
 		isMultiSelecting,
 		getSelectedBlockClientIds,
 		getTemplateLock,
 		__unstableIsWithinBlockOverlay,
+		getBlockEditingMode,
 	} = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
@@ -74,8 +73,10 @@ export function useInBetweenInserter() {
 					rootClientId = blockElement.getAttribute( 'data-block' );
 				}
 
-				// Don't set the insertion point if the template is locked.
-				if ( getTemplateLock( rootClientId ) ) {
+				if (
+					getTemplateLock( rootClientId ) ||
+					getBlockEditingMode( rootClientId ) === 'disabled'
+				) {
 					return;
 				}
 
@@ -168,9 +169,7 @@ export function useInBetweenInserter() {
 		[
 			openRef,
 			getBlockListSettings,
-			getBlockRootClientId,
 			getBlockIndex,
-			isBlockInsertionPointVisible,
 			isMultiSelecting,
 			showInsertionPoint,
 			hideInsertionPoint,

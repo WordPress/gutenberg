@@ -121,7 +121,7 @@ const v6 = {
 				blockGap: true,
 			},
 		},
-		__experimentalLayout: {
+		layout: {
 			allowSwitching: false,
 			allowInheriting: false,
 			default: {

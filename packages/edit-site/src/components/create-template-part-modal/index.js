@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Icon,
 	BaseControl,
@@ -20,16 +20,40 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { store as editorStore } from '@wordpress/editor';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { TEMPLATE_PART_AREA_GENERAL } from '../../store/constants';
+import {
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
+} from '../../utils/constants';
+import {
+	useExistingTemplateParts,
+	getUniqueTemplatePartTitle,
+	getCleanTemplatePartSlug,
+} from '../../utils/template-part-create';
 
-export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
-	const [ title, setTitle ] = useState( '' );
-	const [ area, setArea ] = useState( TEMPLATE_PART_AREA_GENERAL );
+export default function CreateTemplatePartModal( {
+	defaultArea = TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
+	blocks = [],
+	confirmLabel = __( 'Create' ),
+	closeModal,
+	modalTitle = __( 'Create template part' ),
+	onCreate,
+	onError,
+	defaultTitle = '',
+} ) {
+	const { createErrorNotice } = useDispatch( noticesStore );
+	const { saveEntityRecord } = useDispatch( coreStore );
+	const existingTemplateParts = useExistingTemplateParts();
+
+	const [ title, setTitle ] = useState( defaultTitle );
+	const [ area, setArea ] = useState( defaultArea );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 	const instanceId = useInstanceId( CreateTemplatePartModal );
 
@@ -39,20 +63,59 @@ export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
 		[]
 	);
 
+	async function createTemplatePart() {
+		if ( ! title || isSubmitting ) {
+			return;
+		}
+
+		try {
+			setIsSubmitting( true );
+			const uniqueTitle = getUniqueTemplatePartTitle(
+				title,
+				existingTemplateParts
+			);
+			const cleanSlug = getCleanTemplatePartSlug( uniqueTitle );
+
+			const templatePart = await saveEntityRecord(
+				'postType',
+				TEMPLATE_PART_POST_TYPE,
+				{
+					slug: cleanSlug,
+					title: uniqueTitle,
+					content: serialize( blocks ),
+					area,
+				},
+				{ throwOnError: true }
+			);
+			await onCreate( templatePart );
+
+			// TODO: Add a success notice?
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __(
+							'An error occurred while creating the template part.'
+					  );
+
+			createErrorNotice( errorMessage, { type: 'snackbar' } );
+
+			onError?.();
+		} finally {
+			setIsSubmitting( false );
+		}
+	}
+
 	return (
 		<Modal
-			title={ __( 'Create a template part' ) }
+			title={ modalTitle }
 			onRequestClose={ closeModal }
 			overlayClassName="edit-site-create-template-part-modal"
 		>
 			<form
 				onSubmit={ async ( event ) => {
 					event.preventDefault();
-					if ( ! title ) {
-						return;
-					}
-					setIsSubmitting( true );
-					await onCreate( { title, area } );
+					await createTemplatePart();
 				} }
 			>
 				<VStack spacing="4">
@@ -119,10 +182,10 @@ export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
 						<Button
 							variant="primary"
 							type="submit"
-							disabled={ ! title }
+							aria-disabled={ ! title || isSubmitting }
 							isBusy={ isSubmitting }
 						>
-							{ __( 'Create' ) }
+							{ confirmLabel }
 						</Button>
 					</HStack>
 				</VStack>

@@ -57,7 +57,7 @@ function SocialLinksEdit( {
 	}, [ shouldRenderFooterAppender ] );
 
 	const renderFooterAppender = useRef( () => (
-		<View>
+		<View style={ styles.footerAppenderContainer }>
 			<InnerBlocks.ButtonBlockAppender isFloating={ true } />
 		</View>
 	) );
