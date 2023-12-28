@@ -343,6 +343,7 @@ function BlockStyleControls( {
 export default {
 	edit: BlockStyleControls,
 	hasSupport: hasStyleSupport,
+	addSaveProps,
 	attributeKeys: [ 'style' ],
 	useBlockProps,
 };
@@ -454,10 +455,4 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/style/addAttribute',
 	addAttribute
-);
-
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/style/addSaveProps',
-	addSaveProps
 );

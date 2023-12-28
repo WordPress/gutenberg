@@ -97,13 +97,13 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 // WordPress 6.4 compat.
 require __DIR__ . '/compat/wordpress-6.4/blocks.php';
 require __DIR__ . '/compat/wordpress-6.4/block-hooks.php';
-require __DIR__ . '/compat/wordpress-6.4/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.4/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.4/kses.php';
 
 // WordPress 6.5 compat.
 require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.5/class-wp-navigation-block-renderer.php';
+require __DIR__ . '/compat/wordpress-6.5/kses.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -149,7 +149,9 @@ if (
 		require __DIR__ . '/experimental/fonts/font-library/class-wp-font-library.php';
 		require __DIR__ . '/experimental/fonts/font-library/class-wp-font-family-utils.php';
 		require __DIR__ . '/experimental/fonts/font-library/class-wp-font-family.php';
-		require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-font-library-controller.php';
+		require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-font-families-controller.php';
+		require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-font-collections-controller.php';
+		require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-autosave-font-families-controller.php';
 		require __DIR__ . '/experimental/fonts/font-library/font-library.php';
 	}
 

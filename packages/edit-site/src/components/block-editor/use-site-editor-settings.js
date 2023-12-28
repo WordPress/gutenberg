@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
@@ -89,11 +89,11 @@ function useArchiveLabel( templateSlug ) {
 }
 
 export function useSpecificEditorSettings() {
-	const { setIsInserterOpened } = useDispatch( editSiteStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		templateSlug,
 		focusMode,
+		allowRightClickOverrides,
 		isDistractionFree,
 		hasFixedToolbar,
 		keepCaretInsideBlock,
@@ -126,6 +126,10 @@ export function useSpecificEditorSettings() {
 					'core/edit-site',
 					'distractionFree'
 				),
+				allowRightClickOverrides: !! getPreference(
+					'core/edit-site',
+					'allowRightClickOverrides'
+				),
 				hasFixedToolbar:
 					!! getPreference( 'core/edit-site', 'fixedToolbar' ) ||
 					! isLargeViewport,
@@ -147,8 +151,8 @@ export function useSpecificEditorSettings() {
 			...settings,
 
 			supportsTemplateMode: true,
-			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
+			allowRightClickOverrides,
 			isDistractionFree,
 			hasFixedToolbar,
 			keepCaretInsideBlock,
@@ -160,8 +164,8 @@ export function useSpecificEditorSettings() {
 		};
 	}, [
 		settings,
-		setIsInserterOpened,
 		focusMode,
+		allowRightClickOverrides,
 		isDistractionFree,
 		hasFixedToolbar,
 		keepCaretInsideBlock,

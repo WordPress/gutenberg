@@ -137,10 +137,11 @@ export default function ReusableBlockEdit( {
 	attributes: { ref, overrides },
 	__unstableParentLayout: parentLayout,
 	clientId: patternClientId,
+	setAttributes,
 } ) {
 	const registry = useRegistry();
 	const hasAlreadyRendered = useHasRecursion( ref );
-	const { record, hasResolved } = useEntityRecord(
+	const { record, editedRecord, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
 		ref
@@ -154,33 +155,42 @@ export default function ReusableBlockEdit( {
 		setBlockEditingMode,
 	} = useDispatch( blockEditorStore );
 	const { getBlockEditingMode } = useSelect( blockEditorStore );
+	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
 
+	// Apply the initial overrides from the pattern block to the inner blocks.
 	useEffect( () => {
-		if ( ! record?.content?.raw ) return;
-		const initialBlocks = parse( record.content.raw );
+		const initialBlocks =
+			editedRecord.blocks ??
+			( editedRecord.content && typeof editedRecord.content !== 'function'
+				? parse( editedRecord.content )
+				: [] );
 
+		defaultValuesRef.current = {};
 		const editingMode = getBlockEditingMode( patternClientId );
+		// Replace the contents of the blocks with the overrides.
 		registry.batch( () => {
 			setBlockEditingMode( patternClientId, 'default' );
-			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks(
-				patternClientId,
-				applyInitialOverrides(
-					initialBlocks,
-					initialOverrides.current,
-					defaultValuesRef.current
-				)
-			);
+			syncDerivedUpdates( () => {
+				replaceInnerBlocks(
+					patternClientId,
+					applyInitialOverrides(
+						initialBlocks,
+						initialOverrides.current,
+						defaultValuesRef.current
+					)
+				);
+			} );
 			setBlockEditingMode( patternClientId, editingMode );
 		} );
 	}, [
 		__unstableMarkNextChangeAsNotPersistent,
 		patternClientId,
-		record,
+		editedRecord,
 		replaceInnerBlocks,
 		registry,
 		getBlockEditingMode,
 		setBlockEditingMode,
+		syncDerivedUpdates,
 	] );
 
 	const innerBlocks = useSelect(
@@ -216,29 +226,26 @@ export default function ReusableBlockEdit( {
 			: InnerBlocks.ButtonBlockAppender,
 	} );
 
-	// Sync the `overrides` attribute from the updated blocks.
-	// `syncDerivedBlockAttributes` is an action that just like `updateBlockAttributes`
-	// but won't create an undo level.
-	// This can be abstracted into a `useSyncDerivedAttributes` hook if needed.
+	// Sync the `overrides` attribute from the updated blocks to the pattern block.
+	// `syncDerivedUpdates` is used here to avoid creating an additional undo level.
 	useEffect( () => {
 		const { getBlocks } = registry.select( blockEditorStore );
-		const { syncDerivedBlockAttributes } = unlock(
-			registry.dispatch( blockEditorStore )
-		);
 		let prevBlocks = getBlocks( patternClientId );
 		return registry.subscribe( () => {
 			const blocks = getBlocks( patternClientId );
 			if ( blocks !== prevBlocks ) {
 				prevBlocks = blocks;
-				syncDerivedBlockAttributes( patternClientId, {
-					overrides: getOverridesFromBlocks(
-						blocks,
-						defaultValuesRef.current
-					),
+				syncDerivedUpdates( () => {
+					setAttributes( {
+						overrides: getOverridesFromBlocks(
+							blocks,
+							defaultValuesRef.current
+						),
+					} );
 				} );
 			}
 		}, blockEditorStore );
-	}, [ patternClientId, registry ] );
+	}, [ syncDerivedUpdates, patternClientId, registry, setAttributes ] );
 
 	let children = null;
 

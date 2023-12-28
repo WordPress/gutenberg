@@ -15,7 +15,8 @@ import {
 	showUserSuggestions,
 	showXpostSuggestions,
 } from '@wordpress/react-native-bridge';
-import { BlockFormatControls, getPxFromCssUnit } from '@wordpress/block-editor';
+import { BlockFormatControls } from '@wordpress/block-editor';
+import { getPxFromCssUnit } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import {
 	compose,
@@ -820,12 +821,6 @@ export class RichText extends Component {
 				this.props.selectionStart || 0,
 				this.props.selectionEnd || 0
 			);
-		}
-	}
-
-	componentWillUnmount() {
-		if ( this._editor.isFocused() ) {
-			this._editor.blur();
 		}
 	}
 

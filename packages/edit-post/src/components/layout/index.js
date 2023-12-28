@@ -142,9 +142,10 @@ function Layout() {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const { openGeneralSidebar, closeGeneralSidebar, setIsInserterOpened } =
+	const { openGeneralSidebar, closeGeneralSidebar } =
 		useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { setIsInserterOpened } = useDispatch( editorStore );
 	const {
 		mode,
 		isFullscreenActive,
@@ -176,8 +177,8 @@ function Layout() {
 			),
 			isFullscreenActive:
 				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
-			isInserterOpened: select( editPostStore ).isInserterOpened(),
-			isListViewOpened: select( editPostStore ).isListViewOpened(),
+			isInserterOpened: select( editorStore ).isInserterOpened(),
+			isListViewOpened: select( editorStore ).isListViewOpened(),
 			mode: select( editPostStore ).getEditorMode(),
 			isRichEditingEnabled: editorSettings.richEditingEnabled,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -197,7 +198,7 @@ function Layout() {
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 			hasBlockSelected:
-				select( blockEditorStore ).getBlockSelectionStart(),
+				!! select( blockEditorStore ).getBlockSelectionStart(),
 		};
 	}, [] );
 
@@ -230,9 +231,6 @@ function Layout() {
 	// Note 'truthy' callback implies an open panel.
 	const [ entitiesSavedStatesCallback, setEntitiesSavedStatesCallback ] =
 		useState( false );
-
-	const [ listViewToggleElement, setListViewToggleElement ] =
-		useState( null );
 
 	const closeEntitiesSavedStates = useCallback(
 		( arg ) => {
@@ -267,11 +265,7 @@ function Layout() {
 			return <InserterSidebar />;
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
-			return (
-				<ListViewSidebar
-					listViewToggleElement={ listViewToggleElement }
-				/>
-			);
+			return <ListViewSidebar />;
 		}
 
 		return null;
@@ -312,7 +306,6 @@ function Layout() {
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
-						setListViewToggleElement={ setListViewToggleElement }
 					/>
 				}
 				editorNotices={ <EditorNotices /> }

@@ -65,6 +65,7 @@ function CustomClassNameControlsPure( { className, setAttributes } ) {
 
 export default {
 	edit: CustomClassNameControlsPure,
+	addSaveProps,
 	attributeKeys: [ 'className' ],
 	hasSupport( name ) {
 		return hasBlockSupport( name, 'customClassName', true );
@@ -139,11 +140,6 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/editor/custom-class-name/attribute',
 	addAttribute
-);
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/editor/custom-class-name/save-props',
-	addSaveProps
 );
 
 addFilter(
