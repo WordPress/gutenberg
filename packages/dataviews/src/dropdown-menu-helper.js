@@ -29,7 +29,7 @@ const radioCheck = (
  */
 export const DropdownMenuRadioItemCustom = forwardRef(
 	function DropdownMenuRadioItemCustom(
-		{ checked, name, value, onChange, onClick, ...props },
+		{ checked, name, value, hideOnClick, onChange, onClick, ...props },
 		ref
 	) {
 		const onClickHandler = ( e ) => {
@@ -42,7 +42,7 @@ export const DropdownMenuRadioItemCustom = forwardRef(
 				role="menuitemradio"
 				name={ name }
 				aria-checked={ checked }
-				hideOnClick={ false }
+				hideOnClick={ !! hideOnClick }
 				prefix={
 					checked ? (
 						<Icon icon={ radioCheck } />
