@@ -228,9 +228,9 @@
 		"parent": "curating-the-editor-experience"
 	},
 	{
-		"title": "theme.json configurations",
-		"slug": "theme-json-configurations",
-		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/theme-json-configurations.md",
+		"title": "theme.json",
+		"slug": "theme-json",
+		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/theme-json.md",
 		"parent": "curating-the-editor-experience"
 	},
 	{
@@ -301,8 +301,8 @@
 	},
 	{
 		"title": "Global Settings & Styles (theme.json)",
-		"slug": "theme-json",
-		"markdown_source": "../docs/how-to-guides/themes/theme-json.md",
+		"slug": "global-settings-and-styles",
+		"markdown_source": "../docs/how-to-guides/themes/global-settings-and-styles.md",
 		"parent": "themes"
 	},
 	{
