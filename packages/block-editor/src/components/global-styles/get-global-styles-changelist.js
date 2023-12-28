@@ -99,50 +99,50 @@ function deepCompare( changedObject, originalObject, parentPath = '' ) {
 }
 
 /**
- * Get an array of translated summarized global styles changes.
- * Results are cached using a Map() key of `JSON.stringify( { revision, previousRevision } )`.
+ * Returns an array of translated summarized global styles changes.
+ * Results are cached using a Map() key of `JSON.stringify( { next, previous } )`.
  *
- * @param {Object}                revision         The changed object to compare.
- * @param {Object}                previousRevision The original object to compare against.
- * @param {Record<string,string>} blockNames       A key/value pair object of block names and their rendered titles.
- * @return {string[]}                              An array of translated changes.
+ * @param {Object}                next       The changed object to compare.
+ * @param {Object}                previous   The original object to compare against.
+ * @param {Record<string,string>} blockNames A key/value pair object of block names and their rendered titles.
+ * @return {string[]}                        An array of translated changes.
  */
-export default function getRevisionChanges(
-	revision,
-	previousRevision,
+export default function getGlobalStylesChangelist(
+	next,
+	previous,
 	blockNames
 ) {
-	const cacheKey = JSON.stringify( { revision, previousRevision } );
+	const cacheKey = JSON.stringify( { next, previous } );
 
 	if ( globalStylesChangesCache.has( cacheKey ) ) {
 		return globalStylesChangesCache.get( cacheKey );
 	}
 
 	/*
-	 * Compare the two revisions with normalized keys.
+	 * Compare the two changesets with normalized keys.
 	 * The order of these keys determines the order in which
 	 * they'll appear in the results.
 	 */
 	const changedValueTree = deepCompare(
 		{
 			styles: {
-				color: revision?.styles?.color,
-				typography: revision?.styles?.typography,
-				spacing: revision?.styles?.spacing,
+				color: next?.styles?.color,
+				typography: next?.styles?.typography,
+				spacing: next?.styles?.spacing,
 			},
-			blocks: revision?.styles?.blocks,
-			elements: revision?.styles?.elements,
-			settings: revision?.settings,
+			blocks: next?.styles?.blocks,
+			elements: next?.styles?.elements,
+			settings: next?.settings,
 		},
 		{
 			styles: {
-				color: previousRevision?.styles?.color,
-				typography: previousRevision?.styles?.typography,
-				spacing: previousRevision?.styles?.spacing,
+				color: previous?.styles?.color,
+				typography: previous?.styles?.typography,
+				spacing: previous?.styles?.spacing,
 			},
-			blocks: previousRevision?.styles?.blocks,
-			elements: previousRevision?.styles?.elements,
-			settings: previousRevision?.settings,
+			blocks: previous?.styles?.blocks,
+			elements: previous?.styles?.elements,
+			settings: previous?.settings,
 		}
 	);
 

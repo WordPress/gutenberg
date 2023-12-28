@@ -13,17 +13,19 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { getBlockTypes } from '@wordpress/blocks';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import getRevisionChanges from './get-revision-changes';
+import { unlock } from '../../../lock-unlock';
 
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
 const MAX_CHANGES = 7;
+const { getGlobalStylesChangelist } = unlock( blockEditorPrivateApis );
 
 function ChangesSummary( { revision, previousRevision, blockNames } ) {
-	const changes = getRevisionChanges(
+	const changes = getGlobalStylesChangelist(
 		revision,
 		previousRevision,
 		blockNames

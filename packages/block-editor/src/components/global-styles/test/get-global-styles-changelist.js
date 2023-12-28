@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import getRevisionChanges from '../get-revision-changes';
+import getGlobalStylesChangelist from '../get-global-styles-changelist';
 
-describe( 'getRevisionChanges', () => {
+describe( 'getGlobalStylesChangelist', () => {
 	const revision = {
 		id: 10,
 		styles: {
@@ -130,7 +130,7 @@ describe( 'getRevisionChanges', () => {
 		'core/paragraph': 'Paragraph',
 	};
 	it( 'returns a list of changes and caches them', () => {
-		const resultA = getRevisionChanges(
+		const resultA = getGlobalStylesChangelist(
 			revision,
 			previousRevision,
 			blockNames
@@ -144,7 +144,7 @@ describe( 'getRevisionChanges', () => {
 			'Color settings',
 		] );
 
-		const resultB = getRevisionChanges(
+		const resultB = getGlobalStylesChangelist(
 			revision,
 			previousRevision,
 			blockNames
@@ -154,7 +154,7 @@ describe( 'getRevisionChanges', () => {
 	} );
 
 	it( 'skips unknown and unchanged keys', () => {
-		const result = getRevisionChanges(
+		const result = getGlobalStylesChangelist(
 			{
 				styles: {
 					frogs: {
