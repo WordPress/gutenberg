@@ -1,7 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import { getBlockTypes } from '@wordpress/blocks';
+import { useMemo } from '@wordpress/element';
 
 const globalStylesChangesCache = new Map();
 const EMPTY_ARRAY = [];
@@ -102,17 +104,24 @@ function deepCompare( changedObject, originalObject, parentPath = '' ) {
  * Returns an array of translated summarized global styles changes.
  * Results are cached using a Map() key of `JSON.stringify( { next, previous } )`.
  *
- * @param {Object}                next       The changed object to compare.
- * @param {Object}                previous   The original object to compare against.
- * @param {Record<string,string>} blockNames A key/value pair object of block names and their rendered titles.
+ * @param {Object}              next     The changed object to compare.
+ * @param {Object}              previous The original object to compare against.
+ * @param {{maxResults:number}} options  An object of options.
  * @return {string[]}                        An array of translated changes.
  */
-export default function getGlobalStylesChangelist(
+export default function useGlobalStylesChangelist(
 	next,
 	previous,
-	blockNames
+	options = {}
 ) {
 	const cacheKey = JSON.stringify( { next, previous } );
+	const blockNames = useMemo( () => {
+		const blockTypes = getBlockTypes();
+		return blockTypes.reduce( ( accumulator, { name, title } ) => {
+			accumulator[ name ] = title;
+			return accumulator;
+		}, {} );
+	}, [] );
 
 	if ( globalStylesChangesCache.has( cacheKey ) ) {
 		return globalStylesChangesCache.get( cacheKey );
@@ -166,6 +175,23 @@ export default function getGlobalStylesChangelist(
 		}, [] );
 
 	globalStylesChangesCache.set( cacheKey, result );
+
+	const changesLength = result.length;
+
+	// Truncate to `n` results if necessary.
+	if (
+		!! options?.maxResults &&
+		changesLength &&
+		changesLength > options.maxResults
+	) {
+		const deleteCount = changesLength - options.maxResults;
+		const andMoreText = sprintf(
+			// translators: %d: number of global styles changes that are not displayed in the UI.
+			_n( '…and %d more change.', '…and %d more changes.', deleteCount ),
+			deleteCount
+		);
+		result.splice( options.maxResults, deleteCount, andMoreText );
+	}
 
 	return result;
 }
