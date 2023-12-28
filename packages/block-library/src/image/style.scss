@@ -25,6 +25,7 @@
 
 	&.aligncenter {
 		text-align: center;
+		justify-content: center;
 	}
 
 	&.alignfull img,
@@ -39,7 +40,7 @@
 	.alignleft,
 	.alignright,
 	.aligncenter {
-		display: table;
+		display: flex;
 
 		> figcaption {
 			display: table-caption;
@@ -49,7 +50,7 @@
 
 	.alignleft {
 		/*rtl:ignore*/
-		float: left;
+		justify-content: flex-end;
 		/*rtl:ignore*/
 		margin-left: 0;
 		/*rtl:ignore*/
@@ -60,7 +61,7 @@
 
 	.alignright {
 		/*rtl:ignore*/
-		float: right;
+		justify-content: flex-start;
 		/*rtl:ignore*/
 		margin-right: 0;
 		/*rtl:ignore*/
