@@ -240,7 +240,7 @@
 		"parent": "curating-the-editor-experience"
 	},
 	{
-		"title": "DisableEditorFunctionality",
+		"title": "Disable Editor functionality",
 		"slug": "disable-editor-functionality",
 		"markdown_source": "../docs/how-to-guides/curating-the-editor-experience/disable-editor-functionality.md",
 		"parent": "curating-the-editor-experience"
