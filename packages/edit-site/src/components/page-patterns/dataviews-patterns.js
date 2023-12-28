@@ -36,7 +36,7 @@ import {
 	PATTERN_SYNC_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
 } from '../../utils/constants';
-import { exportJSONaction } from './dataviews-pattern-actions';
+import { exportJSONaction, renameAction } from './dataviews-pattern-actions';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import usePatterns from './use-patterns';
@@ -283,7 +283,7 @@ export default function DataviewsPatterns() {
 		};
 	}, [ patterns, view, fields ] );
 
-	const actions = useMemo( () => [ exportJSONaction ], [] );
+	const actions = useMemo( () => [ renameAction, exportJSONaction ], [] );
 	const onChangeView = useCallback(
 		( viewUpdater ) => {
 			let updatedView =
