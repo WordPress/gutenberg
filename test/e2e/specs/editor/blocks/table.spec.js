@@ -54,7 +54,7 @@ test.describe( 'Table', () => {
 		await editor.insertBlock( { name: 'core/table' } );
 
 		// Modify the column count.
-		const columnCountInput = page.locator(
+		const columnCountInput = editor.canvas.locator(
 			'role=spinbutton[name="Column count"i]'
 		);
 
@@ -63,7 +63,7 @@ test.describe( 'Table', () => {
 		await page.keyboard.type( '50' );
 
 		// Modify the row count.
-		const rowCountInput = page.locator(
+		const rowCountInput = editor.canvas.locator(
 			'role=spinbutton[name="Row count"i]'
 		);
 		await rowCountInput.click();
@@ -71,7 +71,9 @@ test.describe( 'Table', () => {
 		await page.keyboard.type( '50' );
 
 		// Create the table.
-		await page.click( 'role=button[name="Create Table"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Create Table"i]' )
+			.click();
 
 		// Expect the post content to have a correctly sized table.
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
