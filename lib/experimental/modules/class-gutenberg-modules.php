@@ -390,9 +390,8 @@ function gutenberg_register_block_module_handle( $metadata, $field_name, $index 
 		return false;
 	}
 
-	$module_path_norm = wp_normalize_path( realpath( $path . '/' . $module_path ) );
-	$module_uri       = get_block_asset_url( $module_path_norm );
-
+	$module_path_norm    = wp_normalize_path( realpath( $path . '/' . $module_path ) );
+	$module_uri          = get_block_asset_url( $module_path_norm );
 	$module_asset        = require $module_asset_path;
 	$module_dependencies = isset( $module_asset['dependencies'] ) ? $module_asset['dependencies'] : array();
 
