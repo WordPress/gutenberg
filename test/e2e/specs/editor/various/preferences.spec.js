@@ -7,9 +7,11 @@ test.describe( 'preferences', () => {
 	test( 'remembers sidebar dismissal between sessions', async ( {
 		page,
 		admin,
+		editor,
 	} ) => {
 		const post = 'role=button[name="Post (selected)"i]';
 		await admin.createNewPost();
+		await editor.openDocumentSettingsSidebar();
 
 		// Open by default.
 		await expect( page.locator( post ) ).toHaveText( 'Post' );
