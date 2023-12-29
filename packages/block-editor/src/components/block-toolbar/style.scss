@@ -74,9 +74,13 @@
 	}
 
 	.block-editor-block-toolbar {
+		// These two rules ensure that icons are always positioned in a way that lines up with the rest of the icons in the toolbar.
+		height: $header-height;
+		padding-top: 7px; // It should be 6px (60px header height - 48px toolbar height = 12 / 2), but there is a -1px top-margin down the stack that affects this.
+
 		overflow: auto;
 		overflow-y: hidden;
-		@include custom-scrollbars-on-hover($gray-600, $gray-600);
+		@include custom-scrollbars-on-hover($gray-100, $gray-600);
 
 		// Prevents padding from being applied to the left and right sides of the element.
 		scrollbar-gutter: auto;
