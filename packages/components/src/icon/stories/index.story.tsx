@@ -32,19 +32,26 @@ Default.args = {
 	icon: wordpress,
 };
 
-export const FillColor: StoryFn< typeof Icon > = ( args ) => {
+/**
+ * When `icon` is an SVG element, the `currentColor` prop can be used to
+ * render it in the CSS `currentColor`.
+ */
+export const WithCurrentColor: StoryFn< typeof Icon > = ( args ) => {
 	return (
 		<div
 			style={ {
-				fill: 'blue',
+				background: 'blue',
+				color: 'white',
 			} }
 		>
 			<Icon { ...args } />
+			Some text
 		</div>
 	);
 };
-FillColor.args = {
+WithCurrentColor.args = {
 	...Default.args,
+	currentColor: true,
 };
 
 export const WithAFunction = Template.bind( {} );
