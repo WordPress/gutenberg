@@ -44,6 +44,7 @@ class EditorPage {
 			this.accessibilityIdKey = 'contentDescription';
 		}
 	}
+
 	async initializeEditor( {
 		initialTitle,
 		initialData,
@@ -185,9 +186,18 @@ class EditorPage {
 		await emptyAreaBelowLastBlock.click();
 	}
 
-	async getTitleElement( options = { autoscroll: false } ) {
+	async getDefaultBlockAppenderElement() {
+		const appenderElement = isAndroid()
+			? `//android.widget.EditText[@text='Start writing…']`
+			: '(//XCUIElementTypeOther[contains(@name, "Start writing…")])[2]';
+		return this.driver.$( appenderElement );
+	}
+
+	async getTitleElement( options = { autoscroll: false, isEmpty: false } ) {
 		const titleElement = isAndroid()
-			? 'Post title. Welcome to Gutenberg!'
+			? `Post title. ${
+					options.isEmpty ? 'Empty' : 'Welcome to Gutenberg!'
+			  }`
 			: 'post-title';
 
 		if ( options.autoscroll ) {
@@ -207,6 +217,13 @@ class EditorPage {
 			return await this.getTitleElement( options );
 		}
 		return elements[ 0 ];
+	}
+
+	async getEmptyTitleElement() {
+		const titleElement = isAndroid()
+			? '//android.widget.EditText[@content-desc="Post title. Empty"]'
+			: '~Add title';
+		return this.driver.$( titleElement );
 	}
 
 	// iOS loads the block list more eagerly compared to Android.
@@ -379,10 +396,14 @@ class EditorPage {
 		await settingsButton.click();
 	}
 
-	async removeBlock() {
-		const blockActionsButtonElement = isAndroid()
+	getBlockActionsMenuElement() {
+		return isAndroid()
 			? '//android.widget.Button[contains(@content-desc, "Open Block Actions Menu")]'
 			: '//XCUIElementTypeButton[@name="Open Block Actions Menu"]';
+	}
+
+	async removeBlock() {
+		const blockActionsButtonElement = this.getBlockActionsMenuElement();
 		const blockActionsMenu = await this.swipeToolbarToElement(
 			blockActionsButtonElement
 		);
@@ -398,6 +419,12 @@ class EditorPage {
 
 	async dismissBottomSheet() {
 		return await swipeDown( this.driver );
+	}
+
+	async isBlockActionsMenuButtonDisplayed() {
+		const menuButtonElement = this.getBlockActionsMenuElement();
+		const elementsFound = await this.driver.$$( menuButtonElement );
+		return elementsFound.length !== 0;
 	}
 
 	// =========================
@@ -796,13 +823,25 @@ class EditorPage {
 		await clickIfClickable( this.driver, mediaLibraryLocator );
 	}
 
+	async getImageBlockCaptionButton() {
+		const captionElement = isAndroid()
+			? '//android.widget.Button[starts-with(@content-desc, "Image caption")]'
+			: '//XCUIElementTypeButton[starts-with(@name, "Image caption.")]';
+		return this.driver.$( captionElement );
+	}
+
+	async getImageBlockCaptionInput( imageBlockCaptionButton ) {
+		const captionInputElement = isAndroid()
+			? '//android.widget.EditText'
+			: '//XCUIElementTypeTextView';
+		return imageBlockCaptionButton.$( captionInputElement );
+	}
+
 	async enterCaptionToSelectedImageBlock( caption, clear = true ) {
-		const imageBlockCaptionButton = await this.driver.$(
-			'//XCUIElementTypeButton[starts-with(@name, "Image caption.")]'
-		);
+		const imageBlockCaptionButton = await this.getImageBlockCaptionButton();
 		await imageBlockCaptionButton.click();
-		const imageBlockCaptionField = await imageBlockCaptionButton.$(
-			'//XCUIElementTypeTextView'
+		const imageBlockCaptionField = await this.getImageBlockCaptionInput(
+			imageBlockCaptionButton
 		);
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
 	}
