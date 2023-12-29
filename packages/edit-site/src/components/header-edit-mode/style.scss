@@ -205,7 +205,7 @@ $header-toolbar-min-width: 335px;
 
 .has-fixed-toolbar {
 	.selected-block-tools-wrapper {
-		overflow-x: scroll;
+		overflow-x: hidden;
 
 		.block-editor-block-contextual-toolbar {
 			border-bottom: 0;

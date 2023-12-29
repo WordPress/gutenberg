@@ -76,6 +76,10 @@
 	.block-editor-block-toolbar {
 		overflow: auto;
 		overflow-y: hidden;
+		@include custom-scrollbars-on-hover($gray-600, $gray-600);
+
+		// Prevents padding from being applied to the left and right sides of the element.
+		scrollbar-gutter: auto;
 
 		> :last-child,
 		> :last-child .components-toolbar-group,
