@@ -18,7 +18,8 @@
 				"taxQuery": null,
 				"parents": []
 			},
-			"tagName": "div"
+			"tagName": "div",
+			"enhancedPagination": false
 		},
 		"innerBlocks": []
 	}

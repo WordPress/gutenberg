@@ -42,9 +42,9 @@ export const __experimentalConvertBlockToStatic =
 /**
  * Returns a generator converting one or more static blocks into a pattern.
  *
- * @param {string[]}           clientIds The client IDs of the block to detach.
- * @param {string}             title     Pattern title.
- * @param {'fully'|'unsynced'} syncType  They way block is synced, current 'fully' and 'unsynced'.
+ * @param {string[]}             clientIds The client IDs of the block to detach.
+ * @param {string}               title     Pattern title.
+ * @param {undefined|'unsynced'} syncType  They way block is synced, current undefined (synced) and 'unsynced'.
  */
 export const __experimentalConvertBlocksToReusable =
 	( clientIds, title, syncType ) =>
@@ -52,12 +52,12 @@ export const __experimentalConvertBlocksToReusable =
 		const meta =
 			syncType === 'unsynced'
 				? {
-						sync_status: syncType,
+						wp_pattern_sync_status: syncType,
 				  }
 				: undefined;
 
 		const reusableBlock = {
-			title: title || __( 'Untitled Pattern block' ),
+			title: title || __( 'Untitled pattern block' ),
 			content: serialize(
 				registry
 					.select( blockEditorStore )

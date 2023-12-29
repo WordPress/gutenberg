@@ -8,27 +8,15 @@ _It is largely inspired by [create-react-app](https://create-react-app.dev/docs/
 
 > _Learn more about the [Block API at the Gutenberg HandBook](https://developer.wordpress.org/block-editor/developers/block-api/block-registration/)._
 
-## Table of Contents
-
-- [Quick start](#quick-start)
-- [Usage](#usage)
-    - [Interactive Mode](#interactive-mode)
-    - [`slug`](#slug)
-    - [`options`](#options)
-- [Available Commands](#available-commands)
-- [External Project Templates](#external-project-templates)
-- [Contributing to this package](#contributing-to-this-package)
-
-
 ## Quick start
 
 ```bash
-$ npx @wordpress/create-block todo-list
+$ npx @wordpress/create-block@latest todo-list
 $ cd todo-list
 $ npm start
 ```
 
-The `slug` provided (`todo-list` in the example) defines the folder name for the scaffolded plugin and the internal block name. The WordPress plugin generated must [be installed manually](https://wordpress.org/documentation/article/manage-plugins/#manual-plugin-installation).
+The `slug` provided (`todo-list` in the example) defines the folder name for the scaffolded plugin and the internal block name. The WordPress plugin generated must [be installed manually](https://wordpress.org/documentation/article/manage-plugins/#manual-plugin-installation-1).
 
 
 _(requires `node` version `14.0.0` or above, and `npm` version `6.14.4` or above)_
@@ -41,7 +29,7 @@ _(requires `node` version `14.0.0` or above, and `npm` version `6.14.4` or above
 The `create-block` command generates a project with PHP, JS, and CSS code for registering a block with a WordPress plugin.
 
 ```bash
-$ npx @wordpress/create-block [options] [slug]
+$ npx @wordpress/create-block@latest [options] [slug]
 ```
 
 ![Demo](https://user-images.githubusercontent.com/699132/103872910-4de15f00-50cf-11eb-8c74-67ca91a8c1a4.gif)
@@ -89,21 +77,21 @@ The rest of the configuration is set to all default values unless overridden wit
 This argument specifies an _external npm package_ as a template.
 
 ```bash
-$ npx @wordpress/create-block --template my-template-package
+$ npx @wordpress/create-block@latest --template my-template-package
 ```
 
 This argument also allows to pick a _local directory_ as a template.
 
 ```bash
-$ npx @wordpress/create-block --template ./path/to/template-directory
+$ npx @wordpress/create-block@latest --template ./path/to/template-directory
 ```
 
 #### `--variant`
 
-With this argument, `create-block` will generate a [dynamic block](https://developer.wordpress.org/block-editor/explanations/glossary/#dynamic-block) based on the built-in template.
+With this argument, `create-block` will generate a [dynamic block](https://developer.wordpress.org/block-editor/getting-started/glossary/#dynamic-block) based on the built-in template.
 
 ```bash
-$ npx @wordpress/create-block --variant dynamic
+$ npx @wordpress/create-block@latest --variant dynamic
 ```
 
 #### `--help`
@@ -111,7 +99,7 @@ $ npx @wordpress/create-block --variant dynamic
 With this argument, the `create-block` package outputs usage information.
 
 ```bash
-$ npx @wordpress/create-block --help
+$ npx @wordpress/create-block@latest --help
 ```
 
 #### `--no-plugin`
@@ -119,14 +107,14 @@ $ npx @wordpress/create-block --help
 With this argument, the `create-block` package runs in _No plugin mode_ which only scaffolds block files into the current directory.
 
 ```bash
-$ npx @wordpress/create-block --no-plugin
+$ npx @wordpress/create-block@latest --no-plugin
 ```
 #### `--wp-env`
 
 With this argument, the `create-block` package will add to the generated plugin the configuration and the script to run [`wp-env` package](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) within the plugin. This will allow you to easily set up a local WordPress environment (via Docker) for building and testing the generated plugin.
 
 ```bash
-$ npx @wordpress/create-block --wp-env
+$ npx @wordpress/create-block@latest --wp-env
 ```
 
 ## Available commands in the scaffolded project
@@ -141,7 +129,7 @@ For example, running the `start` script from inside the generated folder (`npm s
 
 ## External Project Templates
 
-[Click here](https://github.com/WordPress/gutenberg/tree/HEAD/packages/create-block/docs/external-template.md) for information on External Project Templates
+[Click here](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/packages-create-block-external-template/) for information on External Project Templates
 
 ## Contributing to this package
 

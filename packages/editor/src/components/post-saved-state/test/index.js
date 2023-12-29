@@ -51,7 +51,9 @@ describe( 'PostSavedState', () => {
 
 		render( <PostSavedState /> );
 
-		expect( screen.getByText( 'Saving' ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'button', { name: /Saving/i } )
+		).toBeVisible();
 	} );
 
 	it( 'returns a disabled button if the post is not saveable', () => {

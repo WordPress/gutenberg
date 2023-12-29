@@ -13,13 +13,15 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { mergeOrigins, hasMergedOrigins } from '../use-settings';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
 import LetterSpacingControl from '../letter-spacing-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
-import { getValueFromVariable } from './utils';
+import WritingModeControl from '../writing-mode-control';
+import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
 
 const MIN_TEXT_COLUMNS = 1;
@@ -32,6 +34,7 @@ export function useHasTypographyPanel( settings ) {
 	const hasLetterSpacing = useHasLetterSpacingControl( settings );
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
+	const hasWritingMode = useHasWritingModeControl( settings );
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
 
@@ -43,30 +46,20 @@ export function useHasTypographyPanel( settings ) {
 		hasTextTransform ||
 		hasFontSize ||
 		hasTextDecoration ||
+		hasWritingMode ||
 		hasTextColumns
 	);
 }
 
 function useHasFontSizeControl( settings ) {
-	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
-	const fontSizes = []
-		.concat( fontSizesPerOrigin?.custom ?? [] )
-		.concat( fontSizesPerOrigin?.theme ?? [] )
-		.concat( fontSizesPerOrigin.default ?? [] );
-	return !! fontSizes?.length || ! disableCustomFontSizes;
+	return (
+		hasMergedOrigins( settings?.typography?.fontSizes ) ||
+		settings?.typography?.customFontSize
+	);
 }
 
 function useHasFontFamilyControl( settings ) {
-	const fontFamiliesPerOrigin = settings?.typography?.fontFamilies;
-	const fontFamilies = []
-		.concat( fontFamiliesPerOrigin?.custom ?? [] )
-		.concat( fontFamiliesPerOrigin?.theme ?? [] )
-		.concat( fontFamiliesPerOrigin?.default ?? [] )
-		.sort( ( a, b ) =>
-			( a?.name || a?.slug ).localeCompare( b?.name || a?.slug )
-		);
-	return !! fontFamilies?.length;
+	return hasMergedOrigins( settings?.typography?.fontFamilies );
 }
 
 function useHasLineHeightControl( settings ) {
@@ -74,18 +67,14 @@ function useHasLineHeightControl( settings ) {
 }
 
 function useHasAppearanceControl( settings ) {
-	const hasFontStyles = settings?.typography?.fontStyle;
-	const hasFontWeights = settings?.typography?.fontWeight;
-	return hasFontStyles || hasFontWeights;
+	return settings?.typography?.fontStyle || settings?.typography?.fontWeight;
 }
 
 function useAppearanceControlLabel( settings ) {
-	const hasFontStyles = settings?.typography?.fontStyle;
-	const hasFontWeights = settings?.typography?.fontWeight;
-	if ( ! hasFontStyles ) {
+	if ( ! settings?.typography?.fontStyle ) {
 		return __( 'Font weight' );
 	}
-	if ( ! hasFontWeights ) {
+	if ( ! settings?.typography?.fontWeight ) {
 		return __( 'Font style' );
 	}
 	return __( 'Appearance' );
@@ -103,8 +92,24 @@ function useHasTextDecorationControl( settings ) {
 	return settings?.typography?.textDecoration;
 }
 
+function useHasWritingModeControl( settings ) {
+	return settings?.typography?.writingMode;
+}
+
 function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
+}
+
+function getUniqueFontSizesBySlug( settings ) {
+	const fontSizes = settings?.typography?.fontSizes;
+	const mergedFontSizes = fontSizes ? mergeOrigins( fontSizes ) : [];
+	const uniqueSizes = [];
+	for ( const currentSize of mergedFontSizes ) {
+		if ( ! uniqueSizes.some( ( { slug } ) => slug === currentSize.slug ) ) {
+			uniqueSizes.push( currentSize );
+		}
+	}
+	return uniqueSizes;
 }
 
 function TypographyToolsPanel( {
@@ -124,6 +129,7 @@ function TypographyToolsPanel( {
 			label={ __( 'Typography' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			{ children }
 		</ToolsPanel>
@@ -138,6 +144,7 @@ const DEFAULT_CONTROLS = {
 	letterSpacing: true,
 	textTransform: true,
 	textDecoration: true,
+	writingMode: true,
 	textColumns: true,
 };
 
@@ -155,14 +162,11 @@ export default function TypographyPanel( {
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
-	const fontFamiliesPerOrigin = settings?.typography?.fontFamilies;
-	const fontFamilies = []
-		.concat( fontFamiliesPerOrigin?.custom ?? [] )
-		.concat( fontFamiliesPerOrigin?.theme ?? [] )
-		.concat( fontFamiliesPerOrigin?.default ?? [] );
+	const fontFamilies = settings?.typography?.fontFamilies;
+	const mergedFontFamilies = fontFamilies ? mergeOrigins( fontFamilies ) : [];
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
-		const slug = fontFamilies?.find(
+		const slug = mergedFontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
 		)?.slug;
 		onChange(
@@ -181,11 +185,8 @@ export default function TypographyPanel( {
 	// Font Size
 	const hasFontSizeEnabled = useHasFontSizeControl( settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-	const fontSizesPerOrigin = settings?.typography?.fontSizes ?? {};
-	const fontSizes = []
-		.concat( fontSizesPerOrigin?.custom ?? [] )
-		.concat( fontSizesPerOrigin?.theme ?? [] )
-		.concat( fontSizesPerOrigin.default ?? [] );
+	const mergedFontSizes = getUniqueFontSizesBySlug( settings );
+
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {
 		const actualValue = !! metadata?.slug
@@ -310,6 +311,21 @@ export default function TypographyPanel( {
 	const hasTextDecoration = () => !! value?.typography?.textDecoration;
 	const resetTextDecoration = () => setTextDecoration( undefined );
 
+	// Text Orientation
+	const hasWritingModeControl = useHasWritingModeControl( settings );
+	const writingMode = decodeValue( inheritedValue?.typography?.writingMode );
+	const setWritingMode = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'writingMode' ],
+				newValue || undefined
+			)
+		);
+	};
+	const hasWritingMode = () => !! value?.typography?.writingMode;
+	const resetWritingMode = () => setWritingMode( undefined );
+
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
@@ -333,7 +349,7 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				>
 					<FontFamilyControl
-						fontFamilies={ fontFamilies }
+						fontFamilies={ mergedFontFamilies }
 						value={ fontFamily }
 						onChange={ setFontFamily }
 						size="__unstable-large"
@@ -352,7 +368,7 @@ export default function TypographyPanel( {
 					<FontSizePicker
 						value={ fontSize }
 						onChange={ setFontSize }
-						fontSizes={ fontSizes }
+						fontSizes={ mergedFontSizes }
 						disableCustomFontSizes={ disableCustomFontSizes }
 						withReset={ false }
 						withSlider
@@ -453,6 +469,23 @@ export default function TypographyPanel( {
 						onChange={ setTextDecoration }
 						size="__unstable-large"
 						__unstableInputWidth="auto"
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasWritingModeControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Text orientation' ) }
+					hasValue={ hasWritingMode }
+					onDeselect={ resetWritingMode }
+					isShownByDefault={ defaultControls.writingMode }
+					panelId={ panelId }
+				>
+					<WritingModeControl
+						value={ writingMode }
+						onChange={ setWritingMode }
+						size="__unstable-large"
+						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }

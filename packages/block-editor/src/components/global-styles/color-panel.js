@@ -12,12 +12,12 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
-	TabPanel,
 	ColorIndicator,
 	Flex,
 	FlexItem,
 	Dropdown,
 	Button,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -27,15 +27,16 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
-import { getValueFromVariable } from './utils';
+import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
+import { unlock } from '../../lock-unlock';
 
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
 	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	const hasLinkPanel = useHasLinkPanel( settings );
 	const hasHeadingPanel = useHasHeadingPanel( settings );
-	const hasButtonPanel = useHasHeadingPanel( settings );
+	const hasButtonPanel = useHasButtonPanel( settings );
 	const hasCaptionPanel = useHasCaptionPanel( settings );
 
 	return (
@@ -129,6 +130,7 @@ function ColorToolsPanel( {
 			className="color-block-support-panel"
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
+			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			<div className="color-block-support-panel__inner-wrapper">
 				{ children }
@@ -203,12 +205,11 @@ function ColorPanelDropdown( {
 	colorGradientControlSettings,
 	panelId,
 } ) {
-	const tabConfigs = tabs.map( ( { key, label: tabLabel } ) => {
-		return {
-			name: key,
-			title: tabLabel,
-		};
-	} );
+	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
+	// Unlocking `Tabs` too early causes the `unlock` method to receive an empty
+	// object, due to circular dependencies.
+	// See https://github.com/WordPress/gutenberg/issues/52692
+	const { Tabs } = unlock( componentsPrivateApis );
 
 	return (
 		<ToolsPanelItem
@@ -258,26 +259,35 @@ function ColorPanelDropdown( {
 								/>
 							) }
 							{ tabs.length > 1 && (
-								<TabPanel tabs={ tabConfigs }>
-									{ ( tab ) => {
-										const selectedTab = tabs.find(
-											( t ) => t.key === tab.name
-										);
+								<Tabs initialTabId={ currentTab?.key }>
+									<Tabs.TabList>
+										{ tabs.map( ( tab ) => (
+											<Tabs.Tab
+												key={ tab.key }
+												tabId={ tab.key }
+											>
+												{ tab.label }
+											</Tabs.Tab>
+										) ) }
+									</Tabs.TabList>
 
-										if ( ! selectedTab ) {
-											return null;
-										}
-
+									{ tabs.map( ( tab ) => {
 										return (
-											<ColorPanelTab
-												{ ...selectedTab }
-												colorGradientControlSettings={
-													colorGradientControlSettings
-												}
-											/>
+											<Tabs.TabPanel
+												key={ tab.key }
+												tabId={ tab.key }
+												focusable={ false }
+											>
+												<ColorPanelTab
+													{ ...tab }
+													colorGradientControlSettings={
+														colorGradientControlSettings
+													}
+												/>
+											</Tabs.TabPanel>
 										);
-									} }
-								</TabPanel>
+									} ) }
+								</Tabs>
 							) }
 						</div>
 					</DropdownContentWrapper>
@@ -327,22 +337,6 @@ export default function ColorPanel( {
 			? 'var:preset|gradient|' + gradientObject.slug
 			: gradientValue;
 	};
-
-	// Text Color
-	const showTextPanel = useHasTextPanel( settings );
-	const textColor = decodeValue( inheritedValue?.color?.text );
-	const userTextColor = decodeValue( value?.color?.text );
-	const hasTextColor = () => !! userTextColor;
-	const setTextColor = ( newColor ) => {
-		onChange(
-			setImmutably(
-				value,
-				[ 'color', 'text' ],
-				encodeColorValue( newColor )
-			)
-		);
-	};
-	const resetTextColor = () => setTextColor( undefined );
 
 	// BackgroundColor
 	const showBackgroundPanel = useHasBackgroundPanel( settings );
@@ -423,6 +417,29 @@ export default function ColorPanel( {
 		);
 		onChange( newValue );
 	};
+
+	// Text Color
+	const showTextPanel = useHasTextPanel( settings );
+	const textColor = decodeValue( inheritedValue?.color?.text );
+	const userTextColor = decodeValue( value?.color?.text );
+	const hasTextColor = () => !! userTextColor;
+	const setTextColor = ( newColor ) => {
+		let changedObject = setImmutably(
+			value,
+			[ 'color', 'text' ],
+			encodeColorValue( newColor )
+		);
+		if ( textColor === linkColor ) {
+			changedObject = setImmutably(
+				changedObject,
+				[ 'elements', 'link', 'color', 'text' ],
+				encodeColorValue( newColor )
+			);
+		}
+
+		onChange( changedObject );
+	};
+	const resetTextColor = () => setTextColor( undefined );
 
 	// Elements
 	const elements = [

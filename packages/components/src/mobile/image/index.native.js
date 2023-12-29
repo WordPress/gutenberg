@@ -185,6 +185,13 @@ const ImageComponent = ( {
 		imageHeight && { height: imageHeight },
 		shapeStyle,
 	];
+	const imageSelectedStyles = [
+		usePreferredColorSchemeStyle(
+			styles.imageBorder,
+			styles.imageBorderDark
+		),
+		{ height: containerSize?.height },
+	];
 
 	return (
 		<View
@@ -210,12 +217,7 @@ const ImageComponent = ( {
 				{ isSelected &&
 					highlightSelected &&
 					! ( isUploadInProgress || isUploadFailed ) && (
-						<View
-							style={ [
-								styles.imageBorder,
-								{ height: containerSize?.height },
-							] }
-						/>
+						<View style={ imageSelectedStyles } />
 					) }
 
 				{ ! imageData ? (

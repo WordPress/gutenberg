@@ -102,7 +102,7 @@ class PrivateInserter extends Component {
 	 *                                    pressed.
 	 * @param {boolean}  options.isOpen   Whether dropdown is currently open.
 	 *
-	 * @return {WPElement} Dropdown toggle element.
+	 * @return {Element} Dropdown toggle element.
 	 */
 	renderToggle( { onToggle, isOpen } ) {
 		const {
@@ -135,7 +135,7 @@ class PrivateInserter extends Component {
 	 * @param {Function} options.onClose Callback to invoke when dropdown is
 	 *                                   closed.
 	 *
-	 * @return {WPElement} Dropdown content element.
+	 * @return {Element} Dropdown content element.
 	 */
 	renderContent( { onClose } ) {
 		const {
@@ -231,7 +231,7 @@ export const ComposedPrivateInserter = compose( [
 				getBlockRootClientId,
 				hasInserterItems,
 				getAllowedBlocks,
-				__experimentalGetDirectInsertBlock,
+				getDirectInsertBlock,
 				getSettings,
 			} = select( blockEditorStore );
 
@@ -243,8 +243,7 @@ export const ComposedPrivateInserter = compose( [
 			const allowedBlocks = getAllowedBlocks( rootClientId );
 
 			const directInsertBlock =
-				shouldDirectInsert &&
-				__experimentalGetDirectInsertBlock( rootClientId );
+				shouldDirectInsert && getDirectInsertBlock( rootClientId );
 
 			const settings = getSettings();
 

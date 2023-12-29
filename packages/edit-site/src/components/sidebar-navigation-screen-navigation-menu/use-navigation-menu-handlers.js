@@ -6,10 +6,12 @@ import { __experimentalUseNavigator as useNavigator } from '@wordpress/component
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+
 /**
  * Internal dependencies
  */
 import { postType } from '.';
+import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 
 function useDeleteNavigationMenu() {
 	const { goTo } = useNavigator();
@@ -65,29 +67,43 @@ function useSaveNavigationMenu() {
 		};
 	}, [] );
 
-	const { editEntityRecord, saveEditedEntityRecord } =
-		useDispatch( coreStore );
+	const {
+		editEntityRecord,
+		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
+	} = useDispatch( coreStore );
 
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const handleSave = async ( navigationMenu, edits = {} ) => {
+	const handleSave = async ( navigationMenu, edits ) => {
+		if ( ! edits ) {
+			return;
+		}
+
 		const postId = navigationMenu?.id;
 		// Prepare for revert in case of error.
 		const originalRecord = getEditedEntityRecord(
 			'postType',
-			'wp_navigation',
+			NAVIGATION_POST_TYPE,
 			postId
 		);
 
 		// Apply the edits.
 		editEntityRecord( 'postType', postType, postId, edits );
 
+		const recordPropertiesToSave = Object.keys( edits );
+
 		// Attempt to persist.
 		try {
-			await saveEditedEntityRecord( 'postType', postType, postId, {
-				throwOnError: true,
-			} );
+			await saveSpecifiedEntityEdits(
+				'postType',
+				postType,
+				postId,
+				recordPropertiesToSave,
+				{
+					throwOnError: true,
+				}
+			);
 			createSuccessNotice( __( 'Renamed Navigation menu' ), {
 				type: 'snackbar',
 			} );

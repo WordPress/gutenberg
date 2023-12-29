@@ -2,6 +2,73 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Drop support for Node.js versions < 18.
+
+## 26.19.0 (2023-12-13)
+
+### Bug Fix
+
+-   Fix CSS imports not minified ([#56516](https://github.com/WordPress/gutenberg/pull/56516)).
+
+## 26.18.0 (2023-11-29)
+
+### Internal
+
+-   The bundled `jest-dev-server` dependency has been updated from `^6.0.2` to `^9.0.1` ([#33287](https://github.com/WordPress/gutenberg/pull/33287)).
+
+## 26.17.0 (2023-11-16)
+
+## 26.16.0 (2023-11-02)
+
+## 26.15.0 (2023-10-18)
+
+## 26.14.0 (2023-10-05)
+
+### Internal
+
+-   The bundled `@pmmmwh/react-refresh-webpack-plugin` dependency has been updated from requiring `^0.5.2` to requiring `^0.5.11` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `browserslist` dependency has been updated from requiring `^4.21.9` to requiring `^4.21.10` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `react-refresh` dependency has been updated from requiring `^0.10.0` to requiring `^0.14.0` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `webpack` dependency has been updated from requiring `^5.47.1` to requiring `^5.88.2` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `webpack-bundle-analyzer` dependency has been updated from requiring `^4.4.2` to requiring `^4.9.1` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `webpack-cli` dependency has been updated from requiring `^4.9.1` to requiring `^5.1.4` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+-   The bundled `webpack-dev-server` dependency has been updated from requiring `^4.4.0` to requiring `^4.15.1` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
+
+## 26.13.0 (2023-09-20)
+
+### Enhancements
+
+-   Added support for `test-playwright` script ([#53108](https://github.com/WordPress/gutenberg/pull/53108)).
+-   The bundled `wp-prettier` dependency has been upgraded from `2.8.5` to `3.0.3` ([#54539](https://github.com/WordPress/gutenberg/pull/54539)).
+
+### Bug Fix
+
+-   Correctly resolve entry points when the directory is symlinked ([#54212](https://github.com/WordPress/gutenberg/pull/54212)).
+
+## 26.12.0 (2023-08-31)
+
+## 26.11.0 (2023-08-16)
+
+### Enhancement
+
+-   Updated `npm-package-json-lint` peer dependency to require v6.0.0 [#53636](https://github.com/WordPress/gutenberg/pull/53636).
+-   The bundled `@svgr/webpack` dependency has been updated from requiring ^6.2.1 to requiring ^8.0.1 ([#53630](https://github.com/WordPress/gutenberg/pull/53630)).
+-   The bundled `cssnano` dependency has been updated from requiring ^5.07 to requiring ^6.0.1 ([#53630](https://github.com/WordPress/gutenberg/pull/53630)).
+
+### Bug Fix
+
+-   Fix prevent watch mode from aborting when encountering a `block.json` file that contains invalid JSON. ([#51971](https://github.com/WordPress/gutenberg/pull/51971))
+
+## 26.10.0 (2023-08-10)
+
+## 26.9.0 (2023-07-20)
+
+## 26.8.0 (2023-07-05)
+
+## 26.7.0 (2023-06-23)
+
 ## 26.6.0 (2023-06-07)
 
 ### Enhancements
@@ -51,6 +118,7 @@
 
 -   The `WP_DEVTOOL` environment variable can now be used to set the Webpack devtool option for sourcemaps in production builds ([#46812](https://github.com/WordPress/gutenberg/pull/46812)). Previously, this only worked for development builds.
 -   Update default webpack config and lint-style script to allow PostCSS (`.pcss` extension) file usage ([#45352](https://github.com/WordPress/gutenberg/pull/45352)).
+-   Add `--no-watch` option to allow creating the unminified/dev JS without starting the watcher ([#44237](https://github.com/WordPress/gutenberg/pull/44237)).
 
 ## 25.3.0 (2023-02-01)
 

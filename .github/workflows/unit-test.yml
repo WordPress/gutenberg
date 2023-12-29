@@ -21,24 +21,25 @@ concurrency:
 
 jobs:
     unit-js:
-        name: JavaScript
+        name: JavaScript (Node.js ${{ matrix.node }})
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-
         strategy:
             fail-fast: false
             matrix:
-                node: ['14']
+                node: ['20', '21']
 
         steps:
-            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
               with:
                   node-version: ${{ matrix.node }}
 
-            - name: Npm build
+            - name: npm build
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
@@ -85,7 +86,6 @@ jobs:
             fail-fast: true
             matrix:
                 php:
-                    - '5.6'
                     - '7.0'
                     - '7.1'
                     - '7.2'
@@ -98,7 +98,7 @@ jobs:
                 wordpress: [''] # Latest WordPress version.
                 include:
                     # Test with the previous WP version.
-                    - php: '5.6'
+                    - php: '7.0'
                       wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
                     - php: '7.4'
                       wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
@@ -110,7 +110,9 @@ jobs:
             WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
 
         steps:
-            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -123,7 +125,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@d30ad8b1843ace22e6698ab99bbafaa747b6bd0d # v2.24.0
+              uses: shivammathur/setup-php@e6f75134d35752277f093989e72e140eaa222f35 # v2.28.0
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -218,10 +220,12 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@d30ad8b1843ace22e6698ab99bbafaa747b6bd0d # v2.24.0
+              uses: shivammathur/setup-php@e6f75134d35752277f093989e72e140eaa222f35 # v2.28.0
               with:
                   php-version: '7.4'
                   coverage: none
@@ -234,7 +238,7 @@ jobs:
               run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> $GITHUB_OUTPUT
 
             - name: Cache PHPCS scan cache
-              uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
+              uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
               with:
                   path: .cache/phpcs.json
                   key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
@@ -285,7 +289,9 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -297,4 +303,4 @@ jobs:
               run: npx lerna run build
 
             - name: Running the tests
-              run: npm run native test -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"

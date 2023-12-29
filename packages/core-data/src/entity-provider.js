@@ -5,7 +5,7 @@ import {
 	createContext,
 	useContext,
 	useCallback,
-	useEffect,
+	useMemo,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
@@ -14,6 +14,7 @@ import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
+import { updateFootnotesFromMeta } from './footnotes';
 
 /** @typedef {import('@wordpress/blocks').WPBlock} WPBlock */
 
@@ -125,7 +126,7 @@ export function useEntityProp( kind, name, prop, _id ) {
 				[ prop ]: newValue,
 			} );
 		},
-		[ kind, name, id, prop ]
+		[ editEntityRecord, kind, name, id, prop ]
 	);
 
 	return [ value, setValue, fullValue ];
@@ -138,7 +139,7 @@ export function useEntityProp( kind, name, prop, _id ) {
  * The return value has the shape `[ blocks, onInput, onChange ]`.
  * `onInput` is for block changes that don't create undo levels
  * or dirty the post, non-persistent changes, and `onChange` is for
- * peristent changes. They map directly to the props of a
+ * persistent changes. They map directly to the props of a
  * `BlockEditorProvider` and are intended to be used with it,
  * or similar components or hooks.
  *
@@ -152,13 +153,17 @@ export function useEntityProp( kind, name, prop, _id ) {
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
-	const { content, blocks } = useSelect(
+	const { content, editedBlocks, meta } = useSelect(
 		( select ) => {
+			if ( ! id ) {
+				return {};
+			}
 			const { getEditedEntityRecord } = select( STORE_NAME );
 			const editedRecord = getEditedEntityRecord( kind, name, id );
 			return {
-				blocks: editedRecord.blocks,
+				editedBlocks: editedRecord.blocks,
 				content: editedRecord.content,
+				meta: editedRecord.meta,
 			};
 		},
 		[ kind, name, id ]
@@ -166,53 +171,72 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const { __unstableCreateUndoLevel, editEntityRecord } =
 		useDispatch( STORE_NAME );
 
-	useEffect( () => {
-		// Load the blocks from the content if not already in state
-		// Guard against other instances that might have
-		// set content to a function already or the blocks are already in state.
-		if ( content && typeof content !== 'function' && ! blocks ) {
-			const parsedContent = parse( content );
-			editEntityRecord(
-				kind,
-				name,
-				id,
-				{
-					blocks: parsedContent,
-				},
-				{ undoIgnore: true }
-			);
+	const blocks = useMemo( () => {
+		if ( ! id ) {
+			return undefined;
 		}
-	}, [ content ] );
+
+		if ( editedBlocks ) {
+			return editedBlocks;
+		}
+
+		return content && typeof content !== 'function'
+			? parse( content )
+			: EMPTY_ARRAY;
+	}, [ id, editedBlocks, content ] );
+
+	const updateFootnotes = useCallback(
+		( _blocks ) => updateFootnotesFromMeta( _blocks, meta ),
+		[ meta ]
+	);
 
 	const onChange = useCallback(
 		( newBlocks, options ) => {
-			const { selection } = options;
-			const edits = { blocks: newBlocks, selection };
-
-			const noChange = blocks === edits.blocks;
+			const noChange = blocks === newBlocks;
 			if ( noChange ) {
 				return __unstableCreateUndoLevel( kind, name, id );
 			}
+			const { selection, ...rest } = options;
 
 			// We create a new function here on every persistent edit
 			// to make sure the edit makes the post dirty and creates
 			// a new undo level.
-			edits.content = ( { blocks: blocksForSerialization = [] } ) =>
-				__unstableSerializeAndClean( blocksForSerialization );
+			const edits = {
+				selection,
+				content: ( { blocks: blocksForSerialization = [] } ) =>
+					__unstableSerializeAndClean( blocksForSerialization ),
+				...updateFootnotes( newBlocks ),
+			};
 
-			editEntityRecord( kind, name, id, edits );
+			editEntityRecord( kind, name, id, edits, {
+				isCached: false,
+				...rest,
+			} );
 		},
-		[ kind, name, id, blocks ]
+		[
+			kind,
+			name,
+			id,
+			blocks,
+			updateFootnotes,
+			__unstableCreateUndoLevel,
+			editEntityRecord,
+		]
 	);
 
 	const onInput = useCallback(
 		( newBlocks, options ) => {
-			const { selection } = options;
-			const edits = { blocks: newBlocks, selection };
-			editEntityRecord( kind, name, id, edits );
+			const { selection, ...rest } = options;
+			const footnotesChanges = updateFootnotes( newBlocks );
+			const edits = { selection, ...footnotesChanges };
+
+			editEntityRecord( kind, name, id, edits, {
+				isCached: true,
+				...rest,
+			} );
 		},
-		[ kind, name, id ]
+		[ kind, name, id, updateFootnotes, editEntityRecord ]
 	);
 
-	return [ blocks ?? EMPTY_ARRAY, onInput, onChange ];
+	return [ blocks, onInput, onChange ];
 }

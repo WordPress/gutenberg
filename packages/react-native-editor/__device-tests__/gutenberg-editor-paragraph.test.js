@@ -6,12 +6,12 @@ import {
 	backspace,
 	clickMiddleOfElement,
 	clickBeginningOfElement,
-	isAndroid,
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
 describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	it( 'should be able to split one paragraph block into two', async () => {
+		await editorPage.initializeEditor();
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
@@ -34,12 +34,10 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		expect( testData.shortText ).toMatch(
 			new RegExp( `${ text0 + text1 }|${ text0 } ${ text1 }` )
 		);
-
-		await editorPage.removeBlock();
-		await editorPage.removeBlock();
 	} );
 
 	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
+		await editorPage.initializeEditor();
 		await editorPage.addNewBlock( blockNames.paragraph );
 		let paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
@@ -78,28 +76,22 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 		await paragraphBlockElement.click();
 		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 1 );
-		await editorPage.removeBlock();
 	} );
 
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
+		await editorPage.initializeEditor();
 		await editorPage.addNewBlock( blockNames.paragraph );
 		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
-
-		for ( let i = 3; i > 0; i-- ) {
-			const paragraphBlockElement =
-				await editorPage.getTextBlockAtPosition( blockNames.paragraph );
-			await paragraphBlockElement.click();
-			await editorPage.removeBlock();
-		}
+		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 3 );
 	} );
 
 	it( 'should be able to merge blocks with unknown html elements', async () => {
-		await editorPage.setHtmlContent(
-			[
+		await editorPage.initializeEditor( {
+			initialData: [
 				testData.unknownElementParagraphBlock,
 				testData.lettersInParagraphBlock,
-			].join( '\n\n' )
-		);
+			].join( '\n\n' ),
+		} );
 
 		// Merge paragraphs.
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
@@ -123,18 +115,16 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		const mergedBlockText =
 			await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text0 + text1 ).toMatch( mergedBlockText );
-
-		await editorPage.removeBlock();
 	} );
 
 	// Based on https://github.com/wordpress-mobile/gutenberg-mobile/pull/1507
 	it( 'should handle multiline paragraphs from web', async () => {
-		await editorPage.setHtmlContent(
-			[
+		await editorPage.initializeEditor( {
+			initialData: [
 				testData.multiLinesParagraphBlock,
 				testData.paragraphBlockEmpty,
-			].join( '\n\n' )
-		);
+			].join( '\n\n' ),
+		} );
 
 		// Merge paragraphs.
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
@@ -149,10 +139,5 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		// Verify the editor has not crashed.
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text.length ).not.toEqual( 0 );
-
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
-		await editorPage.removeBlock();
 	} );
 } );

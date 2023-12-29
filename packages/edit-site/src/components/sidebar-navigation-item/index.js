@@ -18,6 +18,7 @@ export default function SidebarNavigationItem( {
 	className,
 	icon,
 	withChevron = false,
+	suffix,
 	children,
 	...props
 } ) {
@@ -25,6 +26,7 @@ export default function SidebarNavigationItem( {
 		<Item
 			className={ classnames(
 				'edit-site-sidebar-navigation-item',
+				{ 'with-suffix': ! withChevron && suffix },
 				className
 			) }
 			{ ...props }
@@ -45,6 +47,7 @@ export default function SidebarNavigationItem( {
 						size={ 24 }
 					/>
 				) }
+				{ ! withChevron && suffix }
 			</HStack>
 		</Item>
 	);

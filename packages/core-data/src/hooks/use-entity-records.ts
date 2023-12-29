@@ -3,6 +3,7 @@
  */
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -28,6 +29,16 @@ interface EntityRecordsResolution< RecordType > {
 
 	/** Resolution status */
 	status: Status;
+
+	/**
+	 * The total number of available items (if not paginated).
+	 */
+	totalItems: number | null;
+
+	/**
+	 * The total number of pages.
+	 */
+	totalPages: number | null;
 }
 
 const EMPTY_ARRAY = [];
@@ -97,8 +108,34 @@ export default function useEntityRecords< RecordType >(
 		[ kind, name, queryAsString, options.enabled ]
 	);
 
+	const { totalItems, totalPages } = useSelect(
+		( select ) => {
+			if ( ! options.enabled ) {
+				return {
+					totalItems: null,
+					totalPages: null,
+				};
+			}
+			return {
+				totalItems: select( coreStore ).getEntityRecordsTotalItems(
+					kind,
+					name,
+					queryArgs
+				),
+				totalPages: select( coreStore ).getEntityRecordsTotalPages(
+					kind,
+					name,
+					queryArgs
+				),
+			};
+		},
+		[ kind, name, queryAsString, options.enabled ]
+	);
+
 	return {
 		records,
+		totalItems,
+		totalPages,
 		...rest,
 	};
 }

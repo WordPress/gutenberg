@@ -28,10 +28,11 @@ const blockViewRegex = new RegExp(
  * the block will still call the core function when updates are back ported.
  */
 const prefixFunctions = [
-	'build_query_vars_from_query_block',
+	'wp_apply_colors_support',
 	'wp_enqueue_block_support_styles',
 	'wp_get_typography_font_size_value',
 	'wp_style_engine_get_styles',
+	'wp_get_global_settings',
 ];
 
 /**
@@ -216,84 +217,6 @@ module.exports = [
 						},
 					] )
 				),
-			} ),
-		].filter( Boolean ),
-	},
-	{
-		...baseConfig,
-		watchOptions: {
-			aggregateTimeout: 200,
-		},
-		name: 'interactivity',
-		entry: {
-			file: './packages/block-library/src/file/interactivity.js',
-			navigation:
-				'./packages/block-library/src/navigation/interactivity.js',
-			image: './packages/block-library/src/image/interactivity.js',
-		},
-		output: {
-			devtoolNamespace: 'wp',
-			filename: './blocks/[name]/interactivity.min.js',
-			path: join( __dirname, '..', '..', 'build', 'block-library' ),
-		},
-		optimization: {
-			...baseConfig.optimization,
-			runtimeChunk: {
-				name: 'vendors',
-			},
-			splitChunks: {
-				cacheGroups: {
-					vendors: {
-						name: 'vendors',
-						test: /[\\/]node_modules[\\/]/,
-						filename: './interactivity/[name].min.js',
-						minSize: 0,
-						chunks: 'all',
-					},
-					runtime: {
-						name: 'runtime',
-						test: /[\\/]utils[\\/]interactivity[\\/]/,
-						filename: './interactivity/[name].min.js',
-						chunks: 'all',
-						minSize: 0,
-						priority: -10,
-					},
-				},
-			},
-		},
-		module: {
-			rules: [
-				{
-					test: /\.(j|t)sx?$/,
-					exclude: /node_modules/,
-					use: [
-						{
-							loader: require.resolve( 'babel-loader' ),
-							options: {
-								cacheDirectory:
-									process.env.BABEL_CACHE_DIRECTORY || true,
-								babelrc: false,
-								configFile: false,
-								presets: [
-									[
-										'@babel/preset-react',
-										{
-											runtime: 'automatic',
-											importSource: 'preact',
-										},
-									],
-								],
-							},
-						},
-					],
-				},
-			],
-		},
-		plugins: [
-			...plugins,
-			new DependencyExtractionWebpackPlugin( {
-				__experimentalInjectInteractivityRuntime: true,
-				injectPolyfill: false,
 			} ),
 		].filter( Boolean ),
 	},

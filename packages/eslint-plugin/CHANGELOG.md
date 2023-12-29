@@ -2,6 +2,58 @@
 
 ## Unreleased
 
+## 17.5.0 (2023-12-13)
+
+## 17.4.0 (2023-11-29)
+
+## 17.3.0 (2023-11-16)
+
+## 17.2.0 (2023-11-02)
+
+## 17.1.0 (2023-10-18)
+
+## 17.0.0 (2023-10-05)
+
+### Breaking Changes
+
+-   Change the required major version of Prettier from v2 to v3 ([#54775](https://github.com/WordPress/gutenberg/pull/54775)).
+
+## 16.0.0 (2023-09-20)
+
+### Breaking Changes
+
+-   The bundled `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` dependencies has been updated from requiring ^5.62.0 to requiring ^6.4.1 ([#53975](https://github.com/WordPress/gutenberg/pull/53975)):
+    -   Removes the deprecated `@typescript-eslint/no-duplicate-imports` rule in favor of `import/no-duplicates`.
+
+### Enhancements
+
+-   Added a new `test-playwright` ruleset using [`eslint-plugin-playwright`](https://www.npmjs.com/package/eslint-plugin-playwright).
+-   The bundled `eslint-plugin-prettier` dependency has been updated from requiring `^3.3.0` to requiring `^5.0.0` ([#54539](https://github.com/WordPress/gutenberg/pull/54539)).
+
+## 15.1.0 (2023-08-31)
+
+## 15.0.0 (2023-08-16)
+
+### Breaking Changes
+
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring ^39.6.9 to requiring ^46.4.6 ([#53629](https://github.com/WordPress/gutenberg/pull/53629)):
+    -   Removes `jsdoc/newline-after-description` rule in favor of `jsdoc/tag-lines` with option `startLines: 0` for "never" and `startLines: 1` for "always". Defaults now to `startLines: null`.
+    -   Removes `dropEndLines: true` from `jsdoc/tag-lines` in favor of option `endLines: 0`.
+    -   Drops `jsdoc/tag-lines` rule's `noEndLines: true` in favor of `applyToEndTag: false`.
+    -   Disables the newly introduced `jsdoc/no-defaults` rule.
+
+### Enhancement
+
+-   Support Typescript 5 and 5.1 by updating both `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` to version `^5.62.0`. ([#52621](https://github.com/WordPress/gutenberg/pull/52621)).
+
+## 14.12.0 (2023-08-10)
+
+## 14.11.0 (2023-07-20)
+
+## 14.10.0 (2023-07-05)
+
+## 14.9.0 (2023-06-23)
+
 ## 14.8.0 (2023-06-07)
 
 ## 14.7.0 (2023-05-24)

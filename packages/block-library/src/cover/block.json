@@ -19,9 +19,6 @@
 		},
 		"alt": {
 			"type": "string",
-			"source": "attribute",
-			"selector": "img",
-			"attribute": "alt",
 			"default": ""
 		},
 		"hasParallax": {
@@ -41,6 +38,9 @@
 		},
 		"customOverlayColor": {
 			"type": "string"
+		},
+		"isUserOverlayColor": {
+			"type": "boolean"
 		},
 		"backgroundType": {
 			"type": "string",
@@ -108,9 +108,11 @@
 		},
 		"color": {
 			"__experimentalDuotone": "> .wp-block-cover__image-background, > .wp-block-cover__video-background",
+			"heading": true,
 			"text": true,
 			"background": false,
-			"__experimentalSkipSerialization": [ "gradients" ]
+			"__experimentalSkipSerialization": [ "gradients" ],
+			"enableContrastChecker": false
 		},
 		"typography": {
 			"fontSize": true,

@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
 	Button,
+	Tooltip,
 } from '@wordpress/components';
 import { usePrevious, useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -29,14 +30,11 @@ import { store as editorStore } from '../../store';
  * @param {Object}   props                Component props.
  * @param {?boolean} props.forceIsDirty   Whether to force the post to be marked
  *                                        as dirty.
- * @param {?boolean} props.forceIsSaving  Whether to force the post to be marked
- *                                        as being saved.
  * @param {?boolean} props.showIconLabels Whether interface buttons show labels instead of icons
- * @return {import('@wordpress/element').WPComponent} The component.
+ * @return {import('react').ComponentType} The component.
  */
 export default function PostSavedState( {
 	forceIsDirty,
-	forceIsSaving,
 	showIconLabels = false,
 } ) {
 	const [ forceSavedMessage, setForceSavedMessage ] = useState( false );
@@ -72,14 +70,14 @@ export default function PostSavedState( {
 				isNew: isEditedPostNew(),
 				isPending: 'pending' === getEditedPostAttribute( 'status' ),
 				isPublished: isCurrentPostPublished(),
-				isSaving: forceIsSaving || isSavingPost(),
+				isSaving: isSavingPost(),
 				isSaveable: isEditedPostSaveable(),
 				isScheduled: isCurrentPostScheduled(),
 				hasPublishAction:
 					getCurrentPost()?._links?.[ 'wp:action-publish' ] ?? false,
 			};
 		},
-		[ forceIsDirty, forceIsSaving ]
+		[ forceIsDirty ]
 	);
 
 	const { savePost } = useDispatch( editorStore );
@@ -131,45 +129,54 @@ export default function PostSavedState( {
 		text = shortLabel;
 	}
 
+	const buttonAccessibleLabel = text || label;
+
+	/**
+	 * The tooltip needs to be enabled only if the button is not disabled. When
+	 * relying on the internal Button tooltip functionality, this causes the
+	 * resulting `button` element to be always removed and re-added to the DOM,
+	 * causing focus loss. An alternative approach to circumvent the issue
+	 * is not to use the `label` and `shortcut` props on `Button` (which would
+	 * trigger the tooltip), and instead manually wrap the `Button` in a separate
+	 * `Tooltip` component.
+	 */
+	const tooltipProps = isDisabled
+		? undefined
+		: {
+				text: buttonAccessibleLabel,
+				shortcut: displayShortcut.primary( 's' ),
+		  };
+
 	// Use common Button instance for all saved states so that focus is not
 	// lost.
 	return (
-		<Button
-			className={
-				isSaveable || isSaving
-					? classnames( {
-							'editor-post-save-draft': ! isSavedState,
-							'editor-post-saved-state': isSavedState,
-							'is-saving': isSaving,
-							'is-autosaving': isAutosaving,
-							'is-saved': isSaved,
-							[ getAnimateClassName( {
-								type: 'loading',
-							} ) ]: isSaving,
-					  } )
-					: undefined
-			}
-			onClick={ isDisabled ? undefined : () => savePost() }
-			/*
-			 * We want the tooltip to show the keyboard shortcut only when the
-			 * button does something, i.e. when it's not disabled.
-			 */
-			shortcut={ isDisabled ? undefined : displayShortcut.primary( 's' ) }
-			/*
-			 * Displaying the keyboard shortcut conditionally makes the tooltip
-			 * itself show conditionally. This would trigger a full-rerendering
-			 * of the button that we want to avoid. By setting `showTooltip`,
-			 & the tooltip is always rendered even when there's no keyboard shortcut.
-			 */
-			showTooltip
-			variant="tertiary"
-			icon={ isLargeViewport ? undefined : cloudUpload }
-			// Make sure the aria-label has always a value, as the default `text` is undefined on small screens.
-			label={ text || label }
-			aria-disabled={ isDisabled }
-		>
-			{ isSavedState && <Icon icon={ isSaved ? check : cloud } /> }
-			{ text }
-		</Button>
+		<Tooltip { ...tooltipProps }>
+			<Button
+				className={
+					isSaveable || isSaving
+						? classnames( {
+								'editor-post-save-draft': ! isSavedState,
+								'editor-post-saved-state': isSavedState,
+								'is-saving': isSaving,
+								'is-autosaving': isAutosaving,
+								'is-saved': isSaved,
+								[ getAnimateClassName( {
+									type: 'loading',
+								} ) ]: isSaving,
+						  } )
+						: undefined
+				}
+				onClick={ isDisabled ? undefined : () => savePost() }
+				variant="tertiary"
+				size="compact"
+				icon={ isLargeViewport ? undefined : cloudUpload }
+				// Make sure the aria-label has always a value, as the default `text` is undefined on small screens.
+				aria-label={ buttonAccessibleLabel }
+				aria-disabled={ isDisabled }
+			>
+				{ isSavedState && <Icon icon={ isSaved ? check : cloud } /> }
+				{ text }
+			</Button>
+		</Tooltip>
 	);
 }

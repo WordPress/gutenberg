@@ -20,7 +20,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- border: color, radius, style, width\n- color: link\n- dimensions: minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage\n- border: color, radius, style, width\n- color: link\n- dimensions: minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
 				}
@@ -200,7 +200,7 @@
 							}
 						},
 						"link": {
-							"description": "Allow users to set link colors.",
+							"description": "Allow users to set link colors in a block.",
 							"type": "boolean",
 							"default": false
 						},
@@ -228,9 +228,36 @@
 							}
 						},
 						"text": {
-							"description": "Allow users to set text colors.",
+							"description": "Allow users to set text colors in a block.",
 							"type": "boolean",
 							"default": true
+						},
+						"heading": {
+							"description": "Allow users to set heading colors in a block.",
+							"type": "boolean",
+							"default": true
+						},
+						"button": {
+							"description": "Allow users to set button colors in a block.",
+							"type": "boolean",
+							"default": true
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsPropertiesBackground": {
+			"type": "object",
+			"properties": {
+				"background": {
+					"description": "Settings related to background.",
+					"type": "object",
+					"properties": {
+						"backgroundImage": {
+							"description": "Allow users to set a background image.",
+							"type": "boolean",
+							"default": false
 						}
 					},
 					"additionalProperties": false
@@ -268,6 +295,36 @@
 						"wideSize": {
 							"description": "Sets the max-width of wide (`.alignwide`) content. Also used as the maximum viewport when calculating fluid font sizes",
 							"type": "string"
+						},
+						"allowEditing": {
+							"description": "Disable the layout UI controls.",
+							"type": "boolean",
+							"default": true
+						},
+						"allowCustomContentAndWideSize": {
+							"description": "Enable or disable the custom content and wide size controls.",
+							"type": "boolean",
+							"default": true
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsPropertiesLightbox": {
+			"type": "object",
+			"properties": {
+				"lightbox": {
+					"description": "Settings related to the lightbox.",
+					"type": "object",
+					"properties": {
+						"enabled": {
+							"description": "Defines whether the lightbox is enabled or not.",
+							"type": "boolean"
+						},
+						"allowEditing": {
+							"description": "Defines whether to show the Lightbox UI in the block editor. If set to `false`, the user won't be able to change the lightbox settings in the block editor.",
+							"type": "boolean"
 						}
 					},
 					"additionalProperties": false
@@ -322,7 +379,8 @@
 							"items": {
 								"type": "string"
 							},
-							"default": [ "px", "em", "rem", "vh", "vw", "%" ]
+							"default": [ "px", "em", "rem", "vh", "vw", "%" ],
+							"minItems": 1
 						},
 						"customSpacingSize": {
 							"description": "Allow users to set custom space sizes.",
@@ -383,9 +441,31 @@
 										"px",
 										"em",
 										"rem",
-										"vh",
+										"%",
 										"vw",
-										"%"
+										"svw",
+										"lvw",
+										"dvw",
+										"vh",
+										"svh",
+										"lvh",
+										"dvh",
+										"vi",
+										"svi",
+										"lvi",
+										"dvi",
+										"vb",
+										"svb",
+										"lvb",
+										"dvb",
+										"vmin",
+										"svmin",
+										"lvmin",
+										"dvmin",
+										"vmax",
+										"svmax",
+										"lvmax",
+										"dvmax"
 									],
 									"default": "rem"
 								}
@@ -426,7 +506,15 @@
 									"type": "object",
 									"properties": {
 										"minFontSize": {
-											"description": "Allow users to set a global minimum font size boundary in px, rem or em. Custom font sizes below this value will not be clamped, and all calculated minimum font sizes will be, a at minimum, this value.",
+											"description": "Allow users to set a global minimum font size boundary in px, rem or em. Custom font sizes below this value will not be clamped, and all calculated minimum font sizes will be, at a minimum, this value.",
+											"type": "string"
+										},
+										"maxViewportWidth": {
+											"description": "Allow users to set custom a max viewport width in px, rem or em, used to set the maximum size boundary of a fluid font size.",
+											"type": "string"
+										},
+										"minViewportWidth": {
+											"description": "Allow users to set a custom min viewport width in px, rem or em, used to set the minimum size boundary of a fluid font size.",
 											"type": "string"
 										}
 									},
@@ -457,6 +545,11 @@
 							"description": "Allow users to set custom text decorations.",
 							"type": "boolean",
 							"default": true
+						},
+						"writingMode": {
+							"description": "Allow users to set the writing mode.",
+							"type": "boolean",
+							"default": false
 						},
 						"textTransform": {
 							"description": "Allow users to set custom text transforms.",
@@ -528,6 +621,10 @@
 									},
 									"fontFamily": {
 										"description": "CSS font-family value.",
+										"type": "string"
+									},
+									"preview": {
+										"description": "URL to a preview image of the font family.",
 										"type": "string"
 									},
 									"fontFace": {
@@ -620,6 +717,10 @@
 												"unicodeRange": {
 													"description": "CSS unicode-range value.",
 													"type": "string"
+												},
+												"preview": {
+													"description": "URL to a preview image of the font face.",
+													"type": "string"
 												}
 											},
 											"required": [ "fontFamily", "src" ],
@@ -647,11 +748,13 @@
 		"settingsProperties": {
 			"allOf": [
 				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
+				{ "$ref": "#/definitions/settingsPropertiesBackground" },
 				{ "$ref": "#/definitions/settingsPropertiesBorder" },
 				{ "$ref": "#/definitions/settingsPropertiesColor" },
 				{ "$ref": "#/definitions/settingsPropertiesDimensions" },
 				{ "$ref": "#/definitions/settingsPropertiesShadow" },
 				{ "$ref": "#/definitions/settingsPropertiesLayout" },
+				{ "$ref": "#/definitions/settingsPropertiesLightbox" },
 				{ "$ref": "#/definitions/settingsPropertiesPosition" },
 				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
 				{ "$ref": "#/definitions/settingsPropertiesTypography" },
@@ -667,10 +770,12 @@
 				{
 					"properties": {
 						"appearanceTools": {},
+						"background": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
 						"layout": {},
+						"lightbox": {},
 						"position": {},
 						"shadow": {},
 						"spacing": {},
@@ -685,9 +790,7 @@
 			"type": "object",
 			"properties": {
 				"core/archives": {
-					"type": "object",
-					"description": "Archive block. Display a monthly archive of your posts. This block has no block-level settings",
-					"additionalProperties": false
+					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/audio": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -699,35 +802,7 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/button": {
-					"type": "object",
-					"allOf": [
-						{
-							"$ref": "#/definitions/settingsPropertiesAppearanceTools"
-						},
-						{
-							"type": "object",
-							"properties": {
-								"border": {
-									"description": "Settings related to borders.",
-									"type": "object",
-									"properties": {
-										"radius": {
-											"description": "Allow users to set custom border radius.",
-											"type": "boolean",
-											"default": false
-										}
-									}
-								}
-							}
-						},
-						{ "$ref": "#/definitions/settingsPropertiesColor" },
-						{ "$ref": "#/definitions/settingsPropertiesLayout" },
-						{ "$ref": "#/definitions/settingsPropertiesSpacing" },
-						{
-							"$ref": "#/definitions/settingsPropertiesTypography"
-						},
-						{ "$ref": "#/definitions/settingsPropertiesCustom" }
-					]
+					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/buttons": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
@@ -747,6 +822,9 @@
 				"core/columns": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/comment-author-avatar": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/comment-author-name": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -762,13 +840,31 @@
 				"core/comment-reply-link": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
-				"core/comment-template": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
 				"core/comments": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/comments-pagination": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-pagination-next": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-pagination-numbers": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-pagination-previous": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comments-title": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/cover": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/details": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/embed": {
@@ -807,6 +903,9 @@
 				"core/list": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/list-item": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/loginout": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -825,10 +924,16 @@
 				"core/navigation-link": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/navigation-submenu": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/nextpage": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/page-list": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/page-list-item": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/paragraph": {
@@ -837,7 +942,13 @@
 				"core/post-author": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
-				"core/post-comments": {
+				"core/post-author-biography": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-author-name": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/post-comment": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/post-comments-count": {
@@ -870,6 +981,9 @@
 				"core/post-terms": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/post-time-to-read": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/post-title": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -880,6 +994,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/query": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query-no-results": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/query-pagination": {
@@ -898,6 +1015,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/quote": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/read-more": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/rss": {
@@ -1508,6 +1628,17 @@
 								}
 							]
 						},
+						"writingMode": {
+							"description": "Sets the `writing-mode` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
 						"textTransform": {
 							"description": "Sets the `text-transform` CSS property.",
 							"oneOf": [
@@ -1773,6 +1904,9 @@
 				"core/columns": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/comment-author-avatar": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/comment-author-name": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -1788,13 +1922,31 @@
 				"core/comment-reply-link": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/comment-template": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
 				"core/comments": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/comments-pagination": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-pagination-next": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-pagination-numbers": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-pagination-previous": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comments-title": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/comment-template": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/cover": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/details": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/embed": {
@@ -1833,6 +1985,9 @@
 				"core/list": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/list-item": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/loginout": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -1851,10 +2006,16 @@
 				"core/navigation-link": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/navigation-submenu": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/nextpage": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/page-list": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/page-list-item": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/paragraph": {
@@ -1863,7 +2024,13 @@
 				"core/post-author": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/post-comments": {
+				"core/post-author-biography": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-author-name": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/post-comment": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/post-comments-count": {
@@ -1896,6 +2063,9 @@
 				"core/post-terms": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/post-time-to-read": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/post-title": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -1906,6 +2076,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/query": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query-no-results": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/query-pagination": {
@@ -1924,6 +2097,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/quote": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/read-more": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/rss": {
@@ -2066,8 +2242,10 @@
 						"useRootPaddingAwareAlignments": {
 							"$ref": "#/definitions/settingsPropertiesUseRootPaddingAwareAlignments/properties/useRootPaddingAwareAlignments"
 						},
+						"background": {},
 						"color": {},
 						"layout": {},
+						"lightbox": {},
 						"spacing": {},
 						"typography": {},
 						"border": {},

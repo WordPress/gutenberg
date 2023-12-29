@@ -72,7 +72,13 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		 * @see wp_add_global_styles_for_blocks
 		 */
 		$origins = array( 'default', 'theme', 'custom' );
-		if ( ! $supports_theme_json ) {
+		/*
+		* If the theme doesn't have theme.json but supports both appearance tools and color palette,
+		* the 'theme' origin should be included so color palette presets are also output.
+		*/
+		if ( ! $supports_theme_json && ( current_theme_supports( 'appearance-tools' ) || current_theme_supports( 'border' ) ) && current_theme_supports( 'editor-color-palette' ) ) {
+			$origins = array( 'default', 'theme' );
+		} elseif ( ! $supports_theme_json ) {
 			$origins = array( 'default' );
 		}
 		$styles_rest = $tree->get_stylesheet( $types, $origins );
@@ -287,6 +293,6 @@ function gutenberg_get_global_styles( $path = array(), $context = array() ) {
  *
  * @return string[]
  */
-function gutenberg_get_remote_theme_patterns() {
+function gutenberg_get_theme_directory_pattern_slugs() {
 	return WP_Theme_JSON_Resolver_Gutenberg::get_theme_data( array(), array( 'with_supports' => false ) )->get_patterns();
 }

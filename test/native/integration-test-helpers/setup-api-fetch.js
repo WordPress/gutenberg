@@ -33,7 +33,6 @@ import apiFetch from '@wordpress/api-fetch';
  * expect( apiFetch ).toHaveBeenCalledWith( responses[1].request );
  *
  * @param {object[]} responses Array with the potential responses to return upon requests.
- *
  */
 export function setupApiFetch( responses ) {
 	apiFetch.mockImplementation( async ( options ) => {

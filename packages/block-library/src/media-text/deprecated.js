@@ -76,7 +76,7 @@ const migrateDefaultAlign = ( attributes ) => {
 	};
 };
 
-const baseAttributes = {
+const v0Attributes = {
 	align: {
 		type: 'string',
 		default: 'wide',
@@ -104,12 +104,16 @@ const baseAttributes = {
 	},
 	isStackedOnMobile: {
 		type: 'boolean',
-		default: true,
+		default: false,
 	},
 };
 
 const v4ToV5BlockAttributes = {
-	...baseAttributes,
+	...v0Attributes,
+	isStackedOnMobile: {
+		type: 'boolean',
+		default: true,
+	},
 	mediaUrl: {
 		type: 'string',
 		source: 'attribute',
@@ -578,7 +582,11 @@ const v4 = {
 // See: https://github.com/WordPress/gutenberg/pull/21169
 const v3 = {
 	attributes: {
-		...baseAttributes,
+		...v0Attributes,
+		isStackedOnMobile: {
+			type: 'boolean',
+			default: true,
+		},
 		backgroundColor: {
 			type: 'string',
 		},
@@ -726,7 +734,7 @@ const v3 = {
 // See: https://github.com/WordPress/gutenberg/pull/14364
 const v2 = {
 	attributes: {
-		...baseAttributes,
+		...v0Attributes,
 		backgroundColor: {
 			type: 'string',
 		},
@@ -828,7 +836,7 @@ const v2 = {
 // See: https://github.com/WordPress/gutenberg/pull/11922
 const v1 = {
 	attributes: {
-		...baseAttributes,
+		...v0Attributes,
 		backgroundColor: {
 			type: 'string',
 		},

@@ -11,6 +11,7 @@
  * @property {string=}     context     Command context.
  * @property {JSX.Element} icon        Command icon.
  * @property {Function}    callback    Command callback.
+ * @property {boolean}     disabled    Whether to disable the command.
  */
 
 /**
@@ -22,9 +23,10 @@
  *
  * @typedef {Object} WPCommandLoaderConfig
  *
- * @property {string}              name    Command loader name.
- * @property {string=}             context Command loader context.
- * @property {WPCommandLoaderHook} hook    Command loader hook.
+ * @property {string}              name     Command loader name.
+ * @property {string=}             context  Command loader context.
+ * @property {WPCommandLoaderHook} hook     Command loader hook.
+ * @property {boolean}             disabled Whether to disable the command loader.
  */
 
 /**
@@ -84,7 +86,7 @@ export function unregisterCommandLoader( name ) {
 }
 
 /**
- * Opens the command center.
+ * Opens the command palette.
  *
  * @return {Object} action.
  */
@@ -95,7 +97,7 @@ export function open() {
 }
 
 /**
- * Closes the command center.
+ * Closes the command palette.
  *
  * @return {Object} action.
  */

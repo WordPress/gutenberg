@@ -5,7 +5,6 @@
 export * from './colors';
 export * from './gradients';
 export * from './font-sizes';
-export * from './duotone';
 export { AlignmentControl, AlignmentToolbar } from './alignment-control';
 export { default as Autocomplete } from './autocomplete';
 export {
@@ -17,6 +16,7 @@ export { default as __experimentalBlockAlignmentMatrixControl } from './block-al
 export { default as BlockBreadcrumb } from './block-breadcrumb';
 export { default as __experimentalUseBlockOverlayActive } from './block-content-overlay';
 export { BlockContextProvider } from './block-context';
+export { default as BlockCanvas } from './block-canvas';
 export {
 	default as BlockControls,
 	BlockFormatControls,
@@ -50,6 +50,7 @@ export { default as __experimentalFontFamilyControl } from './font-family';
 export { default as __experimentalLetterSpacingControl } from './letter-spacing-control';
 export { default as __experimentalTextDecorationControl } from './text-decoration-control';
 export { default as __experimentalTextTransformControl } from './text-transform-control';
+export { default as __experimentalWritingModeControl } from './writing-mode-control';
 export { default as __experimentalColorGradientControl } from './colors-gradients/control';
 export { default as __experimentalColorGradientSettingsDropdown } from './colors-gradients/dropdown';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
@@ -127,7 +128,7 @@ export { default as BlockToolbar } from './block-toolbar';
 export { default as BlockTools } from './block-tools';
 export {
 	default as CopyHandler,
-	useClipboardHandler as __unstableUseClipboardHandler,
+	__unstableUseClipboardHandler,
 } from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
@@ -157,10 +158,17 @@ export {
 export { default as __experimentalBlockPatternsList } from './block-patterns-list';
 export { default as __experimentalPublishDateTimePicker } from './publish-date-time-picker';
 export { default as __experimentalInspectorPopoverHeader } from './inspector-popover-header';
+export { useBlockEditingMode } from './block-editing-mode';
 
 /*
  * State Related Components
  */
 
 export { default as BlockEditorProvider } from './provider';
-export { default as useSetting } from './use-setting';
+export { useSettings, useSetting } from './use-settings';
+export { useBlockCommands } from './use-block-commands';
+
+/*
+ * The following rename hint component can be removed in 6.4.
+ */
+export { default as ReusableBlocksRenameHint } from './inserter/reusable-block-rename-hint';

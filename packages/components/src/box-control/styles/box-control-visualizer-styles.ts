@@ -35,7 +35,7 @@ export const Container = styled.div`
 
 export const Side = styled.div`
 	box-sizing: border-box;
-	background: ${ COLORS.ui.theme };
+	background: ${ COLORS.theme.accent };
 	filter: brightness( 1 );
 	opacity: 0;
 	position: absolute;

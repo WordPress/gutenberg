@@ -39,13 +39,19 @@ const EntitiesSavedStatesForPreview = ( { onClose } ) => {
 		activateSaveLabel = __( 'Activate' );
 	}
 
-	const { getTheme } = useSelect( coreStore );
-	const theme = getTheme( currentlyPreviewingTheme() );
+	const themeName = useSelect( ( select ) => {
+		const theme = select( coreStore ).getTheme(
+			currentlyPreviewingTheme()
+		);
+
+		return theme?.name?.rendered;
+	}, [] );
+
 	const additionalPrompt = (
 		<p>
 			{ sprintf(
-				'Saving your changes will change your active theme to  %1$s.',
-				theme?.name?.rendered
+				'Saving your changes will change your active theme to %s.',
+				themeName
 			) }
 		</p>
 	);

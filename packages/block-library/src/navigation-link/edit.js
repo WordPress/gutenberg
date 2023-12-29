@@ -27,7 +27,7 @@ import {
 	getColorClassName,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
-import { isURL, prependHTTP } from '@wordpress/url';
+import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import {
 	placeCaretAtHorizontalEdge,
@@ -35,16 +35,12 @@ import {
 } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
-import {
-	store as coreStore,
-	useResourcePermissions,
-} from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { name } from './block.json';
 import { LinkUI } from './link-ui';
 import { updateAttributes } from './update-attributes';
 import { getColors } from '../navigation/edit/utils';
@@ -184,8 +180,9 @@ export default function NavigationLinkEdit( {
 	const itemLabelPlaceholder = __( 'Add label…' );
 	const ref = useRef();
 
-	const pagesPermissions = useResourcePermissions( 'pages' );
-	const postsPermissions = useResourcePermissions( 'posts' );
+	// Change the label using inspector causes rich text to change focus on firefox.
+	// This is a workaround to keep the focus on the label field when label filed is focused we don't render the rich text.
+	const [ isLabelFieldFocused, setIsLabelFieldFocused ] = useState( false );
 
 	const {
 		innerBlocks,
@@ -208,7 +205,7 @@ export default function NavigationLinkEdit( {
 				innerBlocks: getBlocks( clientId ),
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, [
-						name,
+						'core/navigation-link',
 						'core/navigation-submenu',
 					] ).length >= maxNestingLevel,
 				isTopLevelLink:
@@ -322,13 +319,6 @@ export default function NavigationLinkEdit( {
 		setIsLinkOpen( false );
 	}
 
-	let userCanCreate = false;
-	if ( ! type || type === 'page' ) {
-		userCanCreate = pagesPermissions.canCreate;
-	} else if ( type === 'post' ) {
-		userCanCreate = postsPermissions.canCreate;
-	}
-
 	const {
 		textColor,
 		customTextColor,
@@ -381,8 +371,8 @@ export default function NavigationLinkEdit( {
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
-			__experimentalDefaultBlock: DEFAULT_BLOCK,
-			__experimentalDirectInsert: true,
+			defaultBlock: DEFAULT_BLOCK,
+			directInsert: true,
 			renderAppender: false,
 		}
 	);
@@ -437,10 +427,12 @@ export default function NavigationLinkEdit( {
 						} }
 						label={ __( 'Label' ) }
 						autoComplete="off"
+						onFocus={ () => setIsLabelFieldFocused( true ) }
+						onBlur={ () => setIsLabelFieldFocused( false ) }
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
-						value={ url || '' }
+						value={ url ? safeDecodeURI( url ) : '' }
 						onChange={ ( urlValue ) => {
 							updateAttributes(
 								{ url: urlValue },
@@ -494,89 +486,82 @@ export default function NavigationLinkEdit( {
 					{ /* eslint-enable */ }
 					{ ! url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
-							<Tooltip position="top center" text={ tooltipText }>
-								<>
-									<span>{ missingText }</span>
-									<span className="wp-block-navigation-link__missing_text-tooltip">
-										{ tooltipText }
-									</span>
-								</>
+							<Tooltip text={ tooltipText }>
+								<span>{ missingText }</span>
 							</Tooltip>
 						</div>
 					) : (
 						<>
-							{ ! isInvalid && ! isDraft && (
-								<>
-									<RichText
-										ref={ ref }
-										identifier="label"
-										className="wp-block-navigation-item__label"
-										value={ label }
-										onChange={ ( labelValue ) =>
-											setAttributes( {
-												label: labelValue,
-											} )
-										}
-										onMerge={ mergeBlocks }
-										onReplace={ onReplace }
-										__unstableOnSplitAtEnd={ () =>
-											insertBlocksAfter(
-												createBlock(
-													'core/navigation-link'
-												)
-											)
-										}
-										aria-label={ __(
-											'Navigation link text'
-										) }
-										placeholder={ itemLabelPlaceholder }
-										withoutInteractiveFormatting
-										allowedFormats={ [
-											'core/bold',
-											'core/italic',
-											'core/image',
-											'core/strikethrough',
-										] }
-										onClick={ () => {
-											if ( ! url ) {
-												setIsLinkOpen( true );
+							{ ! isInvalid &&
+								! isDraft &&
+								! isLabelFieldFocused && (
+									<>
+										<RichText
+											ref={ ref }
+											identifier="label"
+											className="wp-block-navigation-item__label"
+											value={ label }
+											onChange={ ( labelValue ) =>
+												setAttributes( {
+													label: labelValue,
+												} )
 											}
-										} }
-									/>
-									{ description && (
-										<span className="wp-block-navigation-item__description">
-											{ description }
-										</span>
-									) }
-								</>
-							) }
-							{ ( isInvalid || isDraft ) && (
-								<div className="wp-block-navigation-link__placeholder-text wp-block-navigation-link__label">
-									<Tooltip
-										position="top center"
-										text={ tooltipText }
-									>
-										<>
-											<span
-												aria-label={ __(
-													'Navigation link text'
-												) }
-											>
-												{
-													// Some attributes are stored in an escaped form. It's a legacy issue.
-													// Ideally they would be stored in a raw, unescaped form.
-													// Unescape is used here to "recover" the escaped characters
-													// so they display without encoding.
-													// See `updateAttributes` for more details.
-													`${ decodeEntities(
-														label
-													) } ${ placeholderText }`.trim()
+											onMerge={ mergeBlocks }
+											onReplace={ onReplace }
+											__unstableOnSplitAtEnd={ () =>
+												insertBlocksAfter(
+													createBlock(
+														'core/navigation-link'
+													)
+												)
+											}
+											aria-label={ __(
+												'Navigation link text'
+											) }
+											placeholder={ itemLabelPlaceholder }
+											withoutInteractiveFormatting
+											allowedFormats={ [
+												'core/bold',
+												'core/italic',
+												'core/image',
+												'core/strikethrough',
+											] }
+											onClick={ () => {
+												if ( ! url ) {
+													setIsLinkOpen( true );
 												}
+											} }
+										/>
+										{ description && (
+											<span className="wp-block-navigation-item__description">
+												{ description }
 											</span>
-											<span className="wp-block-navigation-link__missing_text-tooltip">
-												{ tooltipText }
-											</span>
-										</>
+										) }
+									</>
+								) }
+							{ ( isInvalid ||
+								isDraft ||
+								isLabelFieldFocused ) && (
+								<div className="wp-block-navigation-link__placeholder-text wp-block-navigation-link__label">
+									<Tooltip text={ tooltipText }>
+										<span
+											aria-label={ __(
+												'Navigation link text'
+											) }
+										>
+											{
+												// Some attributes are stored in an escaped form. It's a legacy issue.
+												// Ideally they would be stored in a raw, unescaped form.
+												// Unescape is used here to "recover" the escaped characters
+												// so they display without encoding.
+												// See `updateAttributes` for more details.
+												`${ decodeEntities( label ) } ${
+													isInvalid || isDraft
+														? placeholderText
+														: ''
+												}`.trim()
+											}
+										</span>
 									</Tooltip>
 								</div>
 							) }
@@ -584,12 +569,10 @@ export default function NavigationLinkEdit( {
 					) }
 					{ isLinkOpen && (
 						<LinkUI
-							className="wp-block-navigation-link__inline-link-input"
 							clientId={ clientId }
 							link={ attributes }
 							onClose={ () => setIsLinkOpen( false ) }
 							anchor={ popoverAnchor }
-							hasCreateSuggestion={ userCanCreate }
 							onRemove={ removeLink }
 							onChange={ ( updatedValue ) => {
 								updateAttributes(

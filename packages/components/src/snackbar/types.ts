@@ -28,7 +28,8 @@ type SnackbarOnlyProps = {
 	listRef?: MutableRefObject< HTMLDivElement | null >;
 };
 
-export type SnackbarProps = NoticeProps & SnackbarOnlyProps;
+export type SnackbarProps = Omit< NoticeProps, '__unstableHTML' > &
+	SnackbarOnlyProps;
 
 export type SnackbarListProps = {
 	notices: Array<

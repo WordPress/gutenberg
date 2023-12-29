@@ -35,10 +35,11 @@ it( 'navigates back from help topic detail screen', async () => {
 	const backButton = screen.getAllByLabelText( 'Go back' );
 	fireEvent.press( backButton[ backButton.length - 1 ] );
 
-	// Currently logs `act` warning due to https://github.com/callstack/react-native-testing-library/issues/379
 	const text =
 		'Each block has its own settings. To find them, tap on a block. Its settings will appear on the toolbar at the bottom of the screen.';
-	await waitForElementToBeRemoved( () => screen.getByText( text ) );
+	await waitForElementToBeRemoved( () =>
+		screen.getByText( text, { hidden: true } )
+	);
 
 	expect( screen.queryByText( text ) ).toBeNull();
 } );

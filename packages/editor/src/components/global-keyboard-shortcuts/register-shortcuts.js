@@ -53,6 +53,16 @@ function EditorKeyboardShortcutsRegister() {
 						},
 				  ],
 		} );
+
+		registerShortcut( {
+			name: 'core/editor/toggle-list-view',
+			category: 'global',
+			description: __( 'Open the block list view.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'o',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return <BlockEditorKeyboardShortcuts.Register />;

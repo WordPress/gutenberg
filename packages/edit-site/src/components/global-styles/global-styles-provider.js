@@ -15,7 +15,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import CanvasSpinner from '../canvas-spinner';
 import { unlock } from '../../lock-unlock';
 
 const { GlobalStylesContext, cleanEmptyObject } = unlock(
@@ -152,7 +151,7 @@ function useGlobalStylesContext() {
 export function GlobalStylesProvider( { children } ) {
 	const context = useGlobalStylesContext();
 	if ( ! context.isReady ) {
-		return <CanvasSpinner />;
+		return null;
 	}
 
 	return (

@@ -5,11 +5,9 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 	BlockList,
-	BlockTools,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { VisuallyHidden } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -106,11 +104,9 @@ export default function NavigationMenuContent( { rootClientId } ) {
 					showAppender={ false }
 				/>
 			) }
-			<VisuallyHidden aria-hidden="true">
-				<BlockTools>
-					<BlockList />
-				</BlockTools>
-			</VisuallyHidden>
+			<div className="edit-site-sidebar-navigation-screen-navigation-menus__helper-block-editor">
+				<BlockList />
+			</div>
 		</>
 	);
 }

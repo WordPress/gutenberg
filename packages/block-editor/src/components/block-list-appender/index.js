@@ -15,7 +15,6 @@ import { getDefaultBlockName } from '@wordpress/blocks';
 import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 function DefaultAppender( { rootClientId } ) {
 	const canInsertDefaultBlock = useSelect( ( select ) =>
@@ -41,44 +40,47 @@ function DefaultAppender( { rootClientId } ) {
 }
 
 function useAppender( rootClientId, CustomAppender ) {
-	const { hideInserter, isParentSelected } = useSelect(
+	const isVisible = useSelect(
 		( select ) => {
 			const {
 				getTemplateLock,
 				getSelectedBlockClientId,
 				__unstableGetEditorMode,
 				getBlockEditingMode,
-			} = unlock( select( blockEditorStore ) );
+			} = select( blockEditorStore );
 
-			const selectedBlockClientId = getSelectedBlockClientId();
-
-			return {
-				hideInserter:
-					!! getTemplateLock( rootClientId ) ||
-					getBlockEditingMode( rootClientId ) === 'disabled' ||
-					__unstableGetEditorMode() === 'zoom-out',
-				isParentSelected:
+			if ( ! CustomAppender ) {
+				const selectedBlockClientId = getSelectedBlockClientId();
+				const isParentSelected =
 					rootClientId === selectedBlockClientId ||
-					( ! rootClientId && ! selectedBlockClientId ),
-			};
+					( ! rootClientId && ! selectedBlockClientId );
+				if ( ! isParentSelected ) {
+					return false;
+				}
+			}
+
+			if (
+				getTemplateLock( rootClientId ) ||
+				getBlockEditingMode( rootClientId ) === 'disabled' ||
+				__unstableGetEditorMode() === 'zoom-out'
+			) {
+				return false;
+			}
+
+			return true;
 		},
-		[ rootClientId ]
+		[ rootClientId, CustomAppender ]
 	);
 
-	if ( hideInserter || CustomAppender === false ) {
+	if ( ! isVisible ) {
 		return null;
 	}
 
-	if ( CustomAppender ) {
-		// Prefer custom render prop if provided.
-		return <CustomAppender />;
-	}
-
-	if ( ! isParentSelected ) {
-		return null;
-	}
-
-	return <DefaultAppender rootClientId={ rootClientId } />;
+	return CustomAppender ? (
+		<CustomAppender />
+	) : (
+		<DefaultAppender rootClientId={ rootClientId } />
+	);
 }
 
 function BlockListAppender( {
@@ -86,6 +88,26 @@ function BlockListAppender( {
 	renderAppender,
 	className,
 	tagName: TagName = 'div',
+} ) {
+	if ( renderAppender === false ) {
+		return null;
+	}
+
+	return (
+		<BlockListAppenderInner
+			rootClientId={ rootClientId }
+			renderAppender={ renderAppender }
+			className={ className }
+			tagName={ TagName }
+		/>
+	);
+}
+
+function BlockListAppenderInner( {
+	rootClientId,
+	renderAppender,
+	className,
+	tagName: TagName,
 } ) {
 	const appender = useAppender( rootClientId, renderAppender );
 	const isDragOver = useSelect(

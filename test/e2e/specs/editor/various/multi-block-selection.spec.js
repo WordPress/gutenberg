@@ -162,7 +162,7 @@ test.describe( 'Multi-block selection', () => {
 			} );
 		}
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '3' } )
 			.click();
 
@@ -247,13 +247,6 @@ test.describe( 'Multi-block selection', () => {
 		editor,
 		multiBlockSelectionUtils,
 	} ) => {
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 		await editor.canvas
 			.getByRole( 'button', { name: 'Add default block' } )
 			.click();
@@ -262,7 +255,7 @@ test.describe( 'Multi-block selection', () => {
 		await page.keyboard.type( '2' );
 
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '1' } )
 			.click( { modifiers: [ 'Shift' ] } );
 
@@ -279,11 +272,11 @@ test.describe( 'Multi-block selection', () => {
 			.getByRole( 'button', { name: 'Group' } )
 			.click();
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '1' } )
 			.click();
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: '2' } )
 			.click( { modifiers: [ 'Shift' ] } );
 
@@ -300,34 +293,20 @@ test.describe( 'Multi-block selection', () => {
 		pageUtils,
 	} ) => {
 		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
+		await editor.switchToLegacyCanvas();
+
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'test' },
 		} );
 
-		await page.getByRole( 'button', { name: 'Save draft' } ).click();
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Draft saved' } )
-		).toBeVisible();
+		await editor.saveDraft();
 		await page.reload();
 		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
+		await editor.switchToLegacyCanvas();
 
-		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+		await page
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.click( { modifiers: [ 'Shift' ] } );
 		await pageUtils.pressKeys( 'primary+a' );
 		await page.keyboard.type( 'new content' );
@@ -360,12 +339,12 @@ test.describe( 'Multi-block selection', () => {
 		} );
 
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: 'group' } )
 			.nth( 1 )
 			.click();
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: 'first' } )
 			.click( { modifiers: [ 'Shift' ] } );
 
@@ -389,7 +368,7 @@ test.describe( 'Multi-block selection', () => {
 		} );
 
 		const paragraphBlock = editor.canvas.getByRole( 'document', {
-			name: 'Paragraph block',
+			name: 'Block: Paragraph',
 		} );
 		const { height } = await paragraphBlock.boundingBox();
 		await paragraphBlock.click( { position: { x: 0, y: height / 2 } } );
@@ -429,7 +408,7 @@ test.describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'ArrowDown' );
 
 		const [ paragraph1, paragraph2 ] = await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.all();
 
 		await paragraph1.hover();
@@ -466,7 +445,7 @@ test.describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'ArrowDown' );
 
 		const [ paragraph1, paragraph2 ] = await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.all();
 
 		await paragraph1.hover();
@@ -567,33 +546,63 @@ test.describe( 'Multi-block selection', () => {
 			] );
 	} );
 
+	// This test MUST fail when this line is removed:
+	// https://github.com/WordPress/gutenberg/blob/eb2bb1d3456ea98db74b4518e3394ed6aed9e79f/packages/block-editor/src/components/writing-flow/use-drag-selection.js#L68
 	test( 'should return original focus after failed multi selection attempt', async ( {
 		page,
 		editor,
 	} ) => {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: '1' },
-		} );
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: '2' },
-		} );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '12' );
+		await page.keyboard.press( 'ArrowLeft' );
 
-		const [ paragraph1, paragraph2 ] = await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
-			.all();
-		const { height } = await paragraph2.boundingBox();
+		const [ coord1, coord2 ] = await editor.canvas
+			.locator( ':root' )
+			.evaluate( () => {
+				const selection = window.getSelection();
 
-		// Move caret to the start of the second block.
-		await paragraph2.click( { position: { x: 0, y: height / 2 } } );
+				if ( ! selection.rangeCount ) {
+					return;
+				}
+
+				const range = selection.getRangeAt( 0 );
+				const rect1 = range.getClientRects()[ 0 ];
+				const element = document.querySelector(
+					'[data-type="core/paragraph"]'
+				);
+				const rect2 = element.getBoundingClientRect();
+				const iframeOffset =
+					window.frameElement.getBoundingClientRect();
+
+				return [
+					{
+						x: iframeOffset.x + rect1.x,
+						y: iframeOffset.y + rect1.y + rect1.height / 2,
+					},
+					{
+						// Move a bit outside the paragraph.
+						x: iframeOffset.x + rect2.x - 5,
+						y: iframeOffset.y + rect2.y + rect2.height / 2,
+					},
+				];
+			} );
+
+		await page.mouse.click( coord1.x, coord1.y );
 		await page.mouse.down();
-		await paragraph1.hover( {
-			position: { x: -5, y: height / 2 },
-			// Use force since it's outside the bounding box of the element.
-			force: true,
-		} );
+		await page.mouse.move( coord2.x, coord2.y, { steps: 10 } );
+		// Simulate moving once in and out of the paragraph.
+		// Fixes https://github.com/WordPress/gutenberg/issues/48747.
+		await page.mouse.move( coord1.x, coord1.y, { steps: 10 } );
+		await page.mouse.move( coord2.x, coord2.y, { steps: 10 } );
 		await page.mouse.up();
+
+		// Wait for:
+		// https://github.com/WordPress/gutenberg/blob/eb2bb1d3456ea98db74b4518e3394ed6aed9e79f/packages/block-editor/src/components/writing-flow/use-drag-selection.js#L47
+		await page.evaluate(
+			() => new Promise( window.requestAnimationFrame )
+		);
 
 		// Only "1" should be deleted.
 		await page.keyboard.press( 'Backspace' );
@@ -619,7 +628,7 @@ test.describe( 'Multi-block selection', () => {
 		}
 
 		const [ , paragraph2, paragraph3 ] = await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.all();
 
 		// Focus the last paragraph block and hide the block toolbar.
@@ -675,9 +684,19 @@ test.describe( 'Multi-block selection', () => {
 
 		const paragraph1 = editor.canvas
 			.getByRole( 'document', {
-				name: 'Paragraph block',
+				name: 'Block: Paragraph',
 			} )
 			.filter( { hasText: '1' } );
+		await paragraph1.click( {
+			position: { x: -1, y: 0 },
+			// Use force since it's outside the bounding box of the element.
+			force: true,
+		} );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1 ] );
+
 		await paragraph1.click( {
 			position: { x: -1, y: 0 },
 			// Use force since it's outside the bounding box of the element.
@@ -778,7 +797,7 @@ test.describe( 'Multi-block selection', () => {
 		} );
 		// Focus the last paragraph block.
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.nth( 1 )
 			.click();
 
@@ -910,7 +929,9 @@ test.describe( 'Multi-block selection', () => {
 			.toEqual( [] );
 		await expect
 			.poll( () =>
-				editor.canvas.evaluate( () => window.getSelection().toString() )
+				editor.canvas
+					.locator( ':root' )
+					.evaluate( () => window.getSelection().toString() )
 			)
 			.toBe( 'Post title' );
 	} );
@@ -1114,12 +1135,8 @@ test.describe( 'Multi-block selection', () => {
 				attributes: { content: '1' },
 			},
 			{
-				name: 'core/paragraph',
-				attributes: { content: '|' },
-			},
-			{
 				name: 'core/heading',
-				attributes: { level: 2, content: '2' },
+				attributes: { level: 2, content: '|2' },
 			},
 		] );
 	} );
@@ -1141,7 +1158,7 @@ test.describe( 'Multi-block selection', () => {
 
 		// Focus and move the caret to the right of the first paragraph.
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: 'a' } )
 			.click();
 
@@ -1158,17 +1175,13 @@ test.describe( 'Multi-block selection', () => {
 		] );
 	} );
 
-	test( 'should partially select with shift + click', async ( {
+	test( 'should partially select with shift + click (@webkit)', async ( {
 		page,
 		editor,
 	} ) => {
 		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
+		await editor.switchToLegacyCanvas();
+
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: '<strong>1</strong>[' },
@@ -1178,19 +1191,27 @@ test.describe( 'Multi-block selection', () => {
 			attributes: { content: ']2' },
 		} );
 		// Focus and move the caret to the end.
-		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
-			.filter( { hasText: ']2' } )
-			.click();
+		const secondParagraphBlock = page
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: ']2' } );
+		const secondParagraphBlockBox =
+			await secondParagraphBlock.boundingBox();
+		await secondParagraphBlock.click( {
+			position: {
+				x: secondParagraphBlockBox.width - 1,
+				y: secondParagraphBlockBox.height / 2,
+			},
+		} );
 
 		await page.keyboard.press( 'ArrowLeft' );
-		const strongText = editor.canvas
+		const strongText = page
 			.getByRole( 'region', { name: 'Editor content' } )
 			.getByText( '1', { exact: true } );
 		const strongBox = await strongText.boundingBox();
+		// Focus and move the caret to the end.
 		await strongText.click( {
 			// Ensure clicking on the right half of the element.
-			position: { x: strongBox.width, y: strongBox.height / 2 },
+			position: { x: strongBox.width - 1, y: strongBox.height / 2 },
 			modifiers: [ 'Shift' ],
 		} );
 		await page.keyboard.press( 'Backspace' );
@@ -1271,7 +1292,7 @@ test.describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'ArrowUp' );
 
 		await editor.canvas
-			.getByRole( 'document', { name: 'Paragraph block' } )
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.hover();
 		await page.mouse.down();
 		await editor.canvas
@@ -1329,9 +1350,9 @@ class MultiBlockSelectionUtils {
 	 * Tests if the native selection matches the block selection.
 	 */
 	assertNativeSelection = async () => {
-		const selection = await this.#editor.canvas.evaluateHandle( () =>
-			window.getSelection()
-		);
+		const selection = await this.#editor.canvas
+			.locator( ':root' )
+			.evaluateHandle( () => window.getSelection() );
 
 		const { isMultiSelected, selectionStart, selectionEnd } =
 			await this.#page.evaluate( () => {
