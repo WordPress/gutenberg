@@ -65,13 +65,13 @@ export default function DataViews( {
 							/>
 						) }
 						<Filters
-							fields={ fields }
+							fields={ _fields }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
 					<ViewActions
-						fields={ fields }
+						fields={ _fields }
 						view={ view }
 						onChangeView={ onChangeView }
 						supportedLayouts={ supportedLayouts }
