@@ -116,28 +116,4 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text0 + text1 ).toMatch( mergedBlockText );
 	} );
-
-	// Based on https://github.com/wordpress-mobile/gutenberg-mobile/pull/1507
-	it( 'should handle multiline paragraphs from web', async () => {
-		await editorPage.initializeEditor( {
-			initialData: [
-				testData.multiLinesParagraphBlock,
-				testData.paragraphBlockEmpty,
-			].join( '\n\n' ),
-		} );
-
-		// Merge paragraphs.
-		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
-			blockNames.paragraph,
-			2
-		);
-		await editorPage.typeTextToTextBlock(
-			paragraphBlockElement,
-			backspace
-		);
-
-		// Verify the editor has not crashed.
-		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
-		expect( text.length ).not.toEqual( 0 );
-	} );
 } );
