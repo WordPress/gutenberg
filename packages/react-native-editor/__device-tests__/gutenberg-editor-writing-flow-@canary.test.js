@@ -2,7 +2,13 @@
  * Internal dependencies
  */
 import { blockNames } from './pages/editor-page';
-import { backspace, isAndroid, waitForMediaLibrary } from './helpers/utils';
+import {
+	backspace,
+	clickMiddleOfElement,
+	clickBeginningOfElement,
+	isAndroid,
+	waitForMediaLibrary,
+} from './helpers/utils';
 import testData from './helpers/test-data';
 
 async function isImageBlockSelected() {
@@ -191,5 +197,123 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 		);
 		const typedText = await paragraphBlockElement.getText();
 		expect( typedText ).toMatch( testData.listItem1 );
+	} );
+
+	it( 'should be able to split one paragraph block into two', async () => {
+		await editorPage.initializeEditor();
+
+		const defaultBlockAppenderElement =
+			await editorPage.getDefaultBlockAppenderElement();
+		await defaultBlockAppenderElement.click();
+
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+			blockNames.paragraph
+		);
+		await editorPage.typeTextToTextBlock(
+			paragraphBlockElement,
+			testData.shortText
+		);
+		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement );
+		await editorPage.typeTextToTextBlock(
+			paragraphBlockElement,
+			'\n',
+			false
+		);
+		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
+		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 2 );
+		expect( text0 ).not.toBe( '' );
+		expect( text1 ).not.toBe( '' );
+		expect( testData.shortText ).toMatch(
+			new RegExp( `${ text0 + text1 }|${ text0 } ${ text1 }` )
+		);
+	} );
+
+	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
+		await editorPage.initializeEditor();
+
+		const defaultBlockAppenderElement =
+			await editorPage.getDefaultBlockAppenderElement();
+		await defaultBlockAppenderElement.click();
+
+		let paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+			blockNames.paragraph
+		);
+
+		await editorPage.typeTextToTextBlock(
+			paragraphBlockElement,
+			testData.shortText
+		);
+		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement );
+		await editorPage.typeTextToTextBlock( paragraphBlockElement, '\n' );
+
+		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
+		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 2 );
+		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+			blockNames.paragraph,
+			2
+		);
+
+		await clickBeginningOfElement(
+			editorPage.driver,
+			paragraphBlockElement
+		);
+
+		await editorPage.typeTextToTextBlock(
+			paragraphBlockElement,
+			backspace
+		);
+
+		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		expect( text0 + text1 ).toMatch( text );
+		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+			blockNames.paragraph,
+			1
+		);
+		await paragraphBlockElement.click();
+		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 1 );
+	} );
+
+	it( 'should be able to create a post with multiple paragraph blocks', async () => {
+		await editorPage.initializeEditor();
+		const defaultBlockAppenderElement =
+			await editorPage.getDefaultBlockAppenderElement();
+		await defaultBlockAppenderElement.click();
+
+		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
+		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 3 );
+	} );
+
+	it( 'should be able to merge blocks with unknown html elements', async () => {
+		await editorPage.initializeEditor( {
+			initialData: [
+				testData.unknownElementParagraphBlock,
+				testData.lettersInParagraphBlock,
+			].join( '\n\n' ),
+		} );
+
+		// Merge paragraphs.
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+			blockNames.paragraph,
+			2
+		);
+
+		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
+
+		await clickBeginningOfElement(
+			editorPage.driver,
+			paragraphBlockElement
+		);
+		await editorPage.typeTextToTextBlock(
+			paragraphBlockElement,
+			backspace
+		);
+
+		// Verify the editor has not crashed.
+		const mergedBlockText =
+			await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		expect( text0 + text1 ).toMatch( mergedBlockText );
 	} );
 } );
