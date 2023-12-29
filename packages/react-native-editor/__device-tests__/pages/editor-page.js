@@ -181,8 +181,10 @@ class EditorPage {
 	}
 
 	async addParagraphBlockByTappingEmptyAreaBelowLastBlock() {
-		const emptyAreaBelowLastBlock =
-			await this.driver.elementByAccessibilityId( 'Add paragraph block' );
+		const element = isAndroid()
+			? '~Add paragraph block'
+			: '(//XCUIElementTypeOther[@name="Add paragraph block"])';
+		const emptyAreaBelowLastBlock = await this.driver.$( element );
 		await emptyAreaBelowLastBlock.click();
 	}
 
@@ -442,8 +444,6 @@ class EditorPage {
 				swipeRight: true,
 			} );
 			await addButton[ 0 ].click();
-			// Wait for Bottom sheet animation to finish
-			await this.driver.pause( 3000 );
 		}
 
 		// Click on block of choice.
@@ -461,10 +461,9 @@ class EditorPage {
 		const inserterElement = isAndroid()
 			? 'Blocks menu'
 			: 'InserterUI-Blocks';
-		return await this.waitForElementToBeDisplayedById(
-			inserterElement,
-			4000
-		);
+		await this.driver
+			.$( `~${ inserterElement }` )
+			.waitForDisplayed( { timeout: 4000 } );
 	}
 
 	static async isElementOutOfBounds( element, { width, height } = {} ) {
@@ -860,6 +859,16 @@ class EditorPage {
 			.down( { button: 0 } )
 			.up( { button: 0 } )
 			.perform();
+	}
+
+	async isImageBlockSelected() {
+		// Since there isn't an easy way to see if a block is selected,
+		// it will check if the edit image button is visible
+		const editImageElement = isAndroid()
+			? '(//android.widget.Button[@content-desc="Edit image"])'
+			: '(//XCUIElementTypeButton[@name="Edit image"])';
+
+		return await this.driver.$( editImageElement ).isDisplayed();
 	}
 
 	// =============================

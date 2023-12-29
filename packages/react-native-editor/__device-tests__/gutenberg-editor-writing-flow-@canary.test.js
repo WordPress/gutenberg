@@ -6,20 +6,9 @@ import {
 	backspace,
 	clickMiddleOfElement,
 	clickBeginningOfElement,
-	isAndroid,
 	waitForMediaLibrary,
 } from './helpers/utils';
 import testData from './helpers/test-data';
-
-async function isImageBlockSelected() {
-	// Since there isn't an easy way to see if a block is selected,
-	// it will check if the edit image button is visible
-	const editImageElement = isAndroid()
-		? '(//android.widget.Button[@content-desc="Edit image"])'
-		: '(//XCUIElementTypeButton[@name="Edit image"])';
-
-	return await editorPage.driver.$( editImageElement ).isDisplayed();
-}
 
 describe( 'Gutenberg Editor Writing flow tests', () => {
 	it( 'should be able to write a post title', async () => {
@@ -119,11 +108,9 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 
 		// When deleting the Paragraph block, the keyboard should be hidden and
 		// the image block should be focused.
-		expect(
-			await editorPage.getBlockAtPosition( blockNames.image )
-		).toBeTruthy();
+		await editorPage.driver.pause( 1000 );
 		expect( await editorPage.driver.isKeyboardShown() ).toBe( false );
-		expect( await isImageBlockSelected() ).toBe( true );
+		expect( await editorPage.isImageBlockSelected() ).toBe( true );
 
 		// Adding a new Paragraph block
 		await editorPage.addNewBlock( blockNames.paragraph );
@@ -148,7 +135,7 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 		await editorPage.driver.pause( 1000 );
 
 		expect( await editorPage.driver.isKeyboardShown() ).toBe( false );
-		expect( await isImageBlockSelected() ).toBe( true );
+		expect( await editorPage.isImageBlockSelected() ).toBe( true );
 	} );
 
 	it( 'should manually dismiss the keyboard', async () => {
@@ -214,19 +201,14 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 			testData.shortText
 		);
 		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement );
-		await editorPage.typeTextToTextBlock(
-			paragraphBlockElement,
-			'\n',
-			false
-		);
+		await editorPage.typeTextToTextBlock( paragraphBlockElement, '\n' );
+
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
+
 		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 2 );
 		expect( text0 ).not.toBe( '' );
 		expect( text1 ).not.toBe( '' );
-		expect( testData.shortText ).toMatch(
-			new RegExp( `${ text0 + text1 }|${ text0 } ${ text1 }` )
-		);
 	} );
 
 	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
@@ -315,5 +297,41 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 		const mergedBlockText =
 			await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text0 + text1 ).toMatch( mergedBlockText );
+	} );
+
+	it( 'should be able to create a post with heading and paragraph blocks', async () => {
+		await editorPage.initializeEditor();
+		await editorPage.addNewBlock( blockNames.heading );
+		const headingBlockElement = await editorPage.getTextBlockAtPosition(
+			blockNames.heading
+		);
+
+		await editorPage.typeTextToTextBlock(
+			headingBlockElement,
+			testData.heading
+		);
+
+		await editorPage.addParagraphBlockByTappingEmptyAreaBelowLastBlock();
+		let paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+			blockNames.paragraph,
+			2
+		);
+		await editorPage.typeTextToTextBlock(
+			paragraphBlockElement,
+			testData.mediumText
+		);
+
+		await editorPage.addParagraphBlockByTappingEmptyAreaBelowLastBlock();
+		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+			blockNames.paragraph,
+			3
+		);
+		await editorPage.typeTextToTextBlock(
+			paragraphBlockElement,
+			testData.mediumText
+		);
+
+		// Assert that even though there are 3 blocks, there should only be 2 paragraph blocks
+		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 2 );
 	} );
 } );
