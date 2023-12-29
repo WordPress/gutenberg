@@ -2,32 +2,6 @@
 
 WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/06/25/introducing-theme-json-in-wordpress-5-8/) to configure the editor that enables a finer-grained control and introduces the first step in managing styles for future WordPress releases: the `theme.json` file. Then `theme.json` [evolved to a v2](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/) with WordPress 5.9 release. This page documents its format.
 
-- Rationale
-    - Settings for the block editor
-    - Settings can be controlled per block
-    - Styles are managed
-    - CSS Custom Properties: presets & custom
-- Specification
-    - version
-    - settings
-        - Backward compatibility with add_theme_support
-        - Presets
-        - Custom
-        - Setting examples
-    - styles
-        - Top-level
-        - Block-level
-        - Elements
-        - Variations
-    - customTemplates
-    - templateParts
-    - patterns
-- FAQ
-    - The naming schema of CSS Custom Properties
-    - Why using -- as a separator?
-    - How settings under "custom" create new CSS Custom Properties
-    - Why does it take so long to update the styles in the browser?
-
 ## Rationale
 
 The Block Editor API has evolved at different velocities and there are some growing pains, specially in areas that affect themes. Examples of this are: the ability to [control the editor programmatically](https://make.wordpress.org/core/2020/01/23/controlling-the-block-editor/), or [a block style system](https://github.com/WordPress/gutenberg/issues/9534) that facilitates user, theme, and core style preferences.

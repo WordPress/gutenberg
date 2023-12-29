@@ -103,7 +103,7 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 						return (
 							<DropdownMenuRadioItemCustom
 								key={ element.value }
-								name={ `filter-summary-${ filter.field.id }` }
+								name={ `filter-summary-${ filter.field }` }
 								value={ element.value }
 								checked={ isActive }
 								onClick={ () =>
@@ -150,7 +150,7 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 							( [ operator, { label, key } ] ) => (
 								<DropdownMenuRadioItemCustom
 									key={ key }
-									name={ `filter-summary-${ filter.name }-conditions` }
+									name={ `filter-summary-${ filter.field }-conditions` }
 									value={ operator }
 									checked={ activeOperator === operator }
 									onChange={ ( e ) => {

@@ -36,9 +36,9 @@ The first step in creating the Copyright Date Block is to scaffold the initial b
 	Review the <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-env/">Get started with create-block</a> documentation for an introduction to using this package.
 </div>
 
-You can use `create-block` from just about any directory on your computer and then use `wp-env` to create a local WordPress development environment with your new block plugin installed and activated.
+You can use `create-block` from just about any directory (folder) on your computer and then use `wp-env` to create a local WordPress development environment with your new block plugin installed and activated.
 
-Therefore, create a new directory (folder) on your computer called "Block Tutorial". Open your terminal and `cd` to this directory. Then run the following command.
+Therefore, choose a directory to place the block plugin or optionally create a new folder called "Block Tutorial". Open your terminal and `cd` to this directory. Then run the following command.
 
 <div class="callout callout-info">
 	If you are not using <code>wp-env</code>, instead, navigate to the <code>plugins/</code> folder in your local WordPress installation using the terminal and run the following command.
@@ -351,9 +351,10 @@ To enable this starting year functionality, you will need one attribute to store
 
 ### Updating block.json
 
-Block attributes are generally specified in the [`block.json`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-json/#data-storage-in-the-block-with-attributes) file. So open up the file and add the following section after the `example` in line 9.
+Block attributes are generally specified in the [`block.json`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-json/#data-storage-in-the-block-with-attributes) file. So open up the file and add the following section after the `example` property.
 
 ```json
+"example": {},
 "attributes": {
 	"showStartingYear": {
 		"type": "boolean"
@@ -483,7 +484,7 @@ export default function Edit( { attributes, setAttributes } ) {
 							'Starting year',
 							'copyright-date-block'
 						) }
-						value={ startingYear }
+						value={ startingYear || '' }
 						onChange={ ( value ) =>
 							setAttributes( { startingYear: value } )
 						}
@@ -495,6 +496,10 @@ export default function Edit( { attributes, setAttributes } ) {
 	);
 }
 ```
+
+<div class="callout callout-tip">
+	You may have noticed that the <code>value</code> property has a value of <code>startingYear || ''</code>. The symbol <code>||</code> is called the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_OR">Logical OR</a> (logical disjunction) operator. This prevents warnings in React when the <code>startingYear</code> is empty. See <a href="https://react.dev/learn/sharing-state-between-components#controlled-and-uncontrolled-components">Controlled and uncontrolled components</a> for details.
+</div>
 
 Save the file and refresh the Editor. Confirm that a text field now exists in the Settings panel. Add a starting year and confirm that when you update the page, the value is saved.
 
@@ -522,7 +527,7 @@ export default function Edit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings', 'copyright-date-block' ) }>
 					<ToggleControl
-						checked={ showStartingYear }
+						checked={ !! showStartingYear }
 						label={ __(
 							'Show starting year',
 							'copyright-date-block'
@@ -539,7 +544,7 @@ export default function Edit( { attributes, setAttributes } ) {
 								'Starting year',
 								'copyright-date-block'
 							) }
-							value={ startingYear }
+							value={ startingYear || '' }
 							onChange={ ( value ) =>
 								setAttributes( { startingYear: value } )
 							}
@@ -601,7 +606,7 @@ export default function Edit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings', 'copyright-date-block' ) }>
 					<ToggleControl
-						checked={ showStartingYear }
+						checked={ !! showStartingYear }
 						label={ __(
 							'Show starting year',
 							'copyright-date-block'
@@ -618,7 +623,7 @@ export default function Edit( { attributes, setAttributes } ) {
 								'Starting year',
 								'copyright-date-block'
 							) }
-							value={ startingYear }
+							value={ startingYear || '' }
 							onChange={ ( value ) =>
 								setAttributes( { startingYear: value } )
 							}
