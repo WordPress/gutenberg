@@ -6,6 +6,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -239,7 +240,7 @@ function SortMenu( { fields, view, onChangeView } ) {
 	);
 }
 
-export default function ViewActions( {
+const ViewActions = memo( function ViewActions( {
 	fields,
 	view,
 	onChangeView,
@@ -282,4 +283,6 @@ export default function ViewActions( {
 			</DropdownMenuGroup>
 		</DropdownMenu>
 	);
-}
+} );
+
+export default ViewActions;
