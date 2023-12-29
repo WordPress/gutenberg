@@ -203,7 +203,7 @@ Before you start building the functionality of the block itself, let's do a bit 
 
 Open the [`index.js`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/file-structure-of-a-block/#index-js) file. This is the main JavaScript file of the block and is used to register it on the client. You can learn more about client-side and server-side registration in the [Registration of a block](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/) documentation.
 
-Start by looking at the [`registerBlockType`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/) function. This function accepts the name of the block, which we are getting from the imported `block.js` file, and the block configuration object.
+Start by looking at the [`registerBlockType`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/) function. This function accepts the name of the block, which we are getting from the imported `block.json` file, and the block configuration object.
 
 ```js
 import Edit from './edit';
@@ -392,7 +392,7 @@ Next, update the Edit function to return the current block content and an `Inspe
 
 ```js
 export default function Edit() {
-const currentYear = new Date().getFullYear().toString();
+	const currentYear = new Date().getFullYear().toString();
 
 	return (
 		<>
@@ -422,7 +422,7 @@ Then wrap the "Testing" message in the `PanelBody` component and set the `title`
 
 ```js
 export default function Edit() {
-const currentYear = new Date().getFullYear().toString();
+	const currentYear = new Date().getFullYear().toString();
 
 	return (
 		<>
@@ -965,9 +965,9 @@ You will not get any block validation errors, but the Editor will detect that ch
 
 #### Optimizing render.php
 
-The final step is to optimize the `render.php` file. If the `currentYear` and the `fallbackCurrentYear` attribute are the same, then there is no need to dynamically create the block content. It is already saved in the database and is available in the  `render.php` file via the `$block_content` variable.
+The final step is to optimize the `render.php` file. If the `currentYear` and the `fallbackCurrentYear` attribute are the same, then there is no need to dynamically create the block content. It is already saved in the database and is available in the  `render.php` file via the `$content` variable.
 
-Therefore, update the file to render the `$block_content` if `currentYear` and `fallbackCurrentYear` match.
+Therefore, update the file to render the generated content if `currentYear` and `fallbackCurrentYear` do not match.
 
 ```php
 $current_year = date( "Y" );
