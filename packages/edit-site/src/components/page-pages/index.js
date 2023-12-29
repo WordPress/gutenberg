@@ -286,7 +286,7 @@ export default function PagePages() {
 				},
 			},
 		],
-		[ authors, view ]
+		[ authors, view.type ]
 	);
 
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
