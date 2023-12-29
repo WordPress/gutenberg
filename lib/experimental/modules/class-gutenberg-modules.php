@@ -404,9 +404,9 @@ function gutenberg_register_block_module_handle( $metadata, $field_name, $index 
 
 	// @todo This in_array may not work with module_dependencies.
 	// @todo @wordpress/i18n isn't module compatible anyways…
-	if ( ! empty( $metadata['textdomain'] ) && in_array( '@wordpress/i18n', $module_dependencies, true ) ) {
-		wp_set_script_translations( $module_id, $metadata['textdomain'] );
-	}
+	// if ( ! empty( $metadata['textdomain'] ) && in_array( '@wordpress/i18n', $module_dependencies, true ) ) {
+	// 	wp_set_script_translations( $module_id, $metadata['textdomain'] );
+	// }
 
 	return $module_id;
 }
