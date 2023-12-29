@@ -61,6 +61,10 @@ export class PostPublishPanel extends Component {
 			onTogglePublishSidebar,
 			PostPublishExtension,
 			PrePublishExtension,
+			showPrePublishPanel,
+			showPostPublishPanel,
+			onTogglePrePublishPanel,
+			onTogglePostPublishPanel,
 			...additionalProps
 		} = this.props;
 		const {
@@ -71,8 +75,11 @@ export class PostPublishPanel extends Component {
 		} = additionalProps;
 		const isPublishedOrScheduled =
 			isPublished || ( isScheduled && isBeingScheduled );
-		const isPrePublish = ! isPublishedOrScheduled && ! isSaving;
-		const isPostPublish = isPublishedOrScheduled && ! isSaving;
+		const isPrePublish =
+			! isPublishedOrScheduled && ! isSaving && showPrePublishPanel;
+		const isPostPublish =
+			isPublishedOrScheduled && ! isSaving && showPostPublishPanel;
+
 		return (
 			<div className="editor-post-publish-panel" { ...propsForPanel }>
 				<div className="editor-post-publish-panel__header">
@@ -123,6 +130,17 @@ export class PostPublishPanel extends Component {
 						checked={ isPublishSidebarEnabled }
 						onChange={ onTogglePublishSidebar }
 					/>
+					<CheckboxControl
+						label={ __( 'Show Pre-Publish Panel' ) }
+						checked={ showPrePublishPanel }
+						onChange={ onTogglePrePublishPanel }
+					/>
+
+					<CheckboxControl
+						label={ __( 'Show Post-Publish Panel' ) }
+						checked={ showPostPublishPanel }
+						onChange={ onTogglePostPublishPanel }
+					/>
 				</div>
 			</div>
 		);
@@ -157,21 +175,38 @@ export default compose( [
 			isSaving: isSavingPost() && ! isAutosavingPost(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 			isScheduled: isCurrentPostScheduled(),
+			showPrePublishPanel: true,
+			showPostPublishPanel: true,
 		};
 	} ),
-	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {
-		const { disablePublishSidebar, enablePublishSidebar } =
-			dispatch( editorStore );
-		return {
-			onTogglePublishSidebar: () => {
-				if ( isPublishSidebarEnabled ) {
-					disablePublishSidebar();
-				} else {
-					enablePublishSidebar();
-				}
-			},
-		};
-	} ),
+	withDispatch(
+		(
+			dispatch,
+			{
+				isPublishSidebarEnabled,
+				showPrePublishPanel,
+				showPostPublishPanel,
+			}
+		) => {
+			const { disablePublishSidebar, enablePublishSidebar } =
+				dispatch( editorStore );
+			return {
+				onTogglePublishSidebar: () => {
+					if ( isPublishSidebarEnabled ) {
+						disablePublishSidebar();
+					} else {
+						enablePublishSidebar();
+					}
+				},
+				onTogglePrePublishPanel: () => {
+					showPrePublishPanel = ! showPrePublishPanel;
+				},
+				onTogglePostPublishPanel: () => {
+					showPostPublishPanel = ! showPostPublishPanel;
+				},
+			};
+		}
+	),
 	withFocusReturn,
 	withConstrainedTabbing,
 ] )( PostPublishPanel );
