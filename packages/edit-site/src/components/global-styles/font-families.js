@@ -51,7 +51,7 @@ function FontFamilies() {
 						</Tooltip>
 					</HStack>
 				</HStack>
-				{ customFonts.length > 0 || themeFonts.length > 0 ? (
+				{ 0 < customFonts.length || 0 < themeFonts.length ? (
 					<ItemGroup isBordered isSeparated>
 						{ customFonts.map( ( font ) => (
 							<FontFamilyItem key={ font.slug } font={ font } />
@@ -61,7 +61,7 @@ function FontFamilies() {
 						) ) }
 					</ItemGroup>
 				) : (
-					<span>{ __( 'No fonts available.' ) }</span>
+					<>{ __( 'No fonts installed.' ) }</>
 				) }
 			</VStack>
 		</>
