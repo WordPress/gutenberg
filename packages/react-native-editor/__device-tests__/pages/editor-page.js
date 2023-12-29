@@ -44,9 +44,18 @@ class EditorPage {
 			this.accessibilityIdKey = 'contentDescription';
 		}
 	}
-
-	async initializeEditor( { initialData, rawStyles, rawFeatures } = {} ) {
-		await launchApp( this.driver, { initialData, rawStyles, rawFeatures } );
+	async initializeEditor( {
+		initialTitle,
+		initialData,
+		rawStyles,
+		rawFeatures,
+	} = {} ) {
+		await launchApp( this.driver, {
+			initialTitle,
+			initialData,
+			rawStyles,
+			rawFeatures,
+		} );
 
 		// Stores initial values from the editor for different helpers.
 		const addButton = await this.driver.$$( `~${ ADD_BLOCK_ID }` );
