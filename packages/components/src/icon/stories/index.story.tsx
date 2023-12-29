@@ -54,26 +54,60 @@ WithCurrentColor.args = {
 	currentColor: true,
 };
 
+const renderIcon = ( { size = 24, ...restProps } ) => (
+	<div style={ { width: size } } { ...restProps }>
+		<SVG viewBox="0 0 24 24">
+			<Path d="M5 4v3h5.5v12h3V7H19V4z" />
+		</SVG>
+	</div>
+);
+
 export const WithAFunction = Template.bind( {} );
 WithAFunction.args = {
 	...Default.args,
-	icon: () => (
-		<SVG>
+	icon: renderIcon,
+};
+WithAFunction.parameters = {
+	docs: {
+		source: {
+			code: `
+const renderIcon = ( { size = 24, ...restProps } ) => (
+	<div style={ { width: size } } { ...restProps }>
+		<SVG viewBox="0 0 24 24">
 			<Path d="M5 4v3h5.5v12h3V7H19V4z" />
 		</SVG>
-	),
+	</div>
+);
+
+<Icon icon={ renderIcon } />
+			`,
+		},
+	},
 };
 
-const MyIconComponent = () => (
-	<SVG>
-		<Path d="M5 4v3h5.5v12h3V7H19V4z" />
-	</SVG>
-);
+const MyIconComponent = renderIcon;
 
 export const WithAComponent = Template.bind( {} );
 WithAComponent.args = {
 	...Default.args,
 	icon: MyIconComponent,
+};
+WithAComponent.parameters = {
+	docs: {
+		source: {
+			code: `
+const MyIconComponent = ( { size = 24, ...restProps } ) => (
+	<div style={ { width: size } } { ...restProps }>
+		<SVG viewBox="0 0 24 24">
+			<Path d="M5 4v3h5.5v12h3V7H19V4z" />
+		</SVG>
+	</div>
+);
+
+<Icon icon={ <MyIconComponent /> } />
+			`,
+		},
+	},
 };
 
 export const WithAnSVG = Template.bind( {} );
