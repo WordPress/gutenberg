@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { useLayoutEffect, useEffect, useRef } from '@wordpress/element';
+import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -19,6 +22,54 @@ export function useCanEditEntity( kind, name, recordId ) {
 	);
 }
 
-export default {
-	useCanEditEntity,
-};
+/**
+ * Handles uploading a media file from a blob URL on mount.
+ *
+ * @param {Object}   args              Upload media arguments.
+ * @param {string}   args.url          Blob URL.
+ * @param {?Array}   args.allowedTypes Array of allowed media types.
+ * @param {Function} args.onChange     Function called when the media is uploaded.
+ * @param {Function} args.onError      Function called when an error happens.
+ */
+export function useUploadMediaFromBlobURL( args ) {
+	const latestArgs = useRef( args );
+	const { getSettings } = useSelect( blockEditorStore );
+
+	useLayoutEffect( () => {
+		latestArgs.current = args;
+	} );
+
+	useEffect( () => {
+		if (
+			! latestArgs.current.url ||
+			! isBlobURL( latestArgs.current.url )
+		) {
+			return;
+		}
+
+		const file = getBlobByURL( latestArgs.current.url );
+		if ( ! file ) {
+			return;
+		}
+
+		const { url, allowedTypes, onChange, onError } = latestArgs.current;
+		const { mediaUpload } = getSettings();
+
+		mediaUpload( {
+			filesList: [ file ],
+			allowedTypes,
+			onFileChange: ( [ media ] ) => {
+				if ( isBlobURL( media?.url ) ) {
+					return;
+				}
+
+				revokeBlobURL( url );
+				onChange( media );
+			},
+			onError: ( message ) => {
+				revokeBlobURL( url );
+				onError( message );
+			},
+		} );
+	}, [ getSettings ] );
+}
