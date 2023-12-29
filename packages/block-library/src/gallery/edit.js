@@ -88,7 +88,8 @@ function GalleryEdit( props ) {
 		onFocus,
 	} = props;
 
-	const { columns, imageCrop, linkTarget, linkTo, sizeSlug } = attributes;
+	const { columns, defaultColumns, imageCrop, linkTarget, linkTo, sizeSlug } =
+		attributes;
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
@@ -167,7 +168,12 @@ function GalleryEdit( props ) {
 				align: undefined,
 			} );
 		} );
-	}, [ newImages ] );
+
+		if ( images?.length > 1 ) {
+			const defaultColumnCount = defaultColumnsNumber( images.length );
+			setAttributes( { defaultColumns: defaultColumnCount } );
+		}
+	}, [ newImages, images ] );
 
 	const imageSizeOptions = useImageSizes(
 		imageData,
@@ -532,11 +538,7 @@ function GalleryEdit( props ) {
 						<RangeControl
 							__nextHasNoMarginBottom
 							label={ __( 'Columns' ) }
-							value={
-								columns
-									? columns
-									: defaultColumnsNumber( images.length )
-							}
+							value={ columns ? columns : defaultColumns }
 							onChange={ setColumnsNumber }
 							min={ 1 }
 							max={ Math.min( MAX_COLUMNS, images.length ) }
