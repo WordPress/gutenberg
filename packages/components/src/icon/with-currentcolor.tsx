@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { cloneElement } from '@wordpress/element';
 
 /**
- * Modifies an SVG element to use the `currentColor` for its fill.
+ * Modifies an element to use the `currentColor` for the fills in its SVG descendants.
  *
  * In most cases you should be able to use the `currentColor` prop of the `Icon` component instead.
  *
@@ -20,11 +20,11 @@ import { cloneElement } from '@wordpress/element';
  * <RangeControl beforeIcon={ withCurrentColor( wordpress ) } />
  * ```
  */
-export function withCurrentColor( svgElement: React.ReactElement ) {
-	return cloneElement( svgElement, {
+export function withCurrentColor( element: React.ReactElement ) {
+	return cloneElement( element, {
 		className: classnames(
-			'components-icon__svg-with-currentcolor',
-			svgElement.props.className
+			'components-icon__with-currentcolor',
+			element.props.className
 		),
 	} );
 }

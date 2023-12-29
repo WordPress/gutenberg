@@ -43,7 +43,7 @@ interface BaseProps {
 	size?: number;
 	/**
 	 * Whether the icon should be rendered in the CSS `currentColor`.
-	 * Only has an effect when `icon` is an SVG.
+	 * Only has an effect on SVG elements.
 	 *
 	 * @default false
 	 */
@@ -81,10 +81,11 @@ function Icon( {
 	}
 
 	if ( 'function' === typeof icon ) {
-		return createElement( icon, {
+		const element = createElement( icon, {
 			size,
 			...additionalProps,
 		} );
+		return currentColor ? withCurrentColor( element ) : element;
 	}
 
 	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
@@ -99,11 +100,12 @@ function Icon( {
 	}
 
 	if ( isValidElement( icon ) ) {
-		return cloneElement( icon, {
+		const element = cloneElement( icon, {
 			// @ts-ignore Just forwarding the size prop along
 			size,
 			...additionalProps,
 		} );
+		return currentColor ? withCurrentColor( element ) : element;
 	}
 
 	return icon;
