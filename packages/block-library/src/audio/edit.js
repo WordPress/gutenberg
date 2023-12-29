@@ -47,9 +47,19 @@ function AudioEdit( {
 } ) {
 	const { id, autoplay, loop, preload, src } = attributes;
 	const isTemporaryAudio = ! id && isBlobURL( src );
-	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().mediaUpload;
+	const { mediaUpload, multiAudioSelection } = useSelect( ( select ) => {
+		const { getSettings, getMultiSelectedBlockClientIds, getBlockName } =
+			select( blockEditorStore );
+		const multiSelectedClientIds = getMultiSelectedBlockClientIds();
+
+		return {
+			mediaUpload: getSettings().mediaUpload,
+			multiAudioSelection:
+				multiSelectedClientIds.length &&
+				multiSelectedClientIds.every(
+					( _clientId ) => getBlockName( _clientId ) === 'core/audio'
+				),
+		};
 	}, [] );
 
 	useEffect( () => {
@@ -146,17 +156,19 @@ function AudioEdit( {
 
 	return (
 		<>
-			<BlockControls group="other">
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ src }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="audio/*"
-					onSelect={ onSelectAudio }
-					onSelectURL={ onSelectURL }
-					onError={ onUploadError }
-				/>
-			</BlockControls>
+			{ ! multiAudioSelection && (
+				<BlockControls group="other">
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ src }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="audio/*"
+						onSelect={ onSelectAudio }
+						onSelectURL={ onSelectURL }
+						onError={ onUploadError }
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
@@ -210,6 +222,7 @@ function AudioEdit( {
 					isSelected={ isSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Audio caption text' ) }
+					showToolbarButton={ ! multiAudioSelection }
 				/>
 			</figure>
 		</>

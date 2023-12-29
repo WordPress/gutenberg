@@ -30,7 +30,6 @@ import {
 import { BlockDraggableWrapper } from '../block-draggable';
 import { useEditorWrapperStyles } from '../../hooks/use-editor-wrapper-styles';
 import { store as blockEditorStore } from '../../store';
-import OfflineStatus from '../offline-status';
 
 const identity = ( x ) => x;
 
@@ -236,10 +235,6 @@ export default function BlockList( {
 			onLayout={ onLayout }
 			testID="block-list-wrapper"
 		>
-			{
-				// eslint-disable-next-line no-undef
-				__DEV__ && <OfflineStatus />
-			}
 			{ isRootList ? (
 				<BlockListProvider
 					value={ {

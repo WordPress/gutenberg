@@ -104,23 +104,38 @@ function GalleryEdit( props ) {
 		getSettings,
 		preferredStyle,
 		innerBlockImages,
-		wasBlockJustInserted,
+		blockWasJustInserted,
+		multiGallerySelection,
 	} = useSelect(
 		( select ) => {
-			const settings = select( blockEditorStore ).getSettings();
+			const {
+				getBlockName,
+				getMultiSelectedBlockClientIds,
+				getSettings: _getSettings,
+				getBlock: _getBlock,
+				wasBlockJustInserted,
+			} = select( blockEditorStore );
 			const preferredStyleVariations =
-				settings.__experimentalPreferredStyleVariations;
+				_getSettings().__experimentalPreferredStyleVariations;
+			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
+
 			return {
-				getBlock: select( blockEditorStore ).getBlock,
-				getSettings: select( blockEditorStore ).getSettings,
+				getBlock: _getBlock,
+				getSettings: _getSettings,
 				preferredStyle:
 					preferredStyleVariations?.value?.[ 'core/image' ],
 				innerBlockImages:
-					select( blockEditorStore ).getBlock( clientId )
-						?.innerBlocks ?? EMPTY_ARRAY,
-				wasBlockJustInserted: select(
-					blockEditorStore
-				).wasBlockJustInserted( clientId, 'inserter_menu' ),
+					_getBlock( clientId )?.innerBlocks ?? EMPTY_ARRAY,
+				blockWasJustInserted: wasBlockJustInserted(
+					clientId,
+					'inserter_menu'
+				),
+				multiGallerySelection:
+					multiSelectedClientIds.length &&
+					multiSelectedClientIds.every(
+						( _clientId ) =>
+							getBlockName( _clientId ) === 'core/gallery'
+					),
 			};
 		},
 		[ clientId ]
@@ -461,7 +476,7 @@ function GalleryEdit( props ) {
 				( hasImages && ! isSelected ) || imagesUploading,
 			value: hasImageIds ? images : {},
 			autoOpenMediaUpload:
-				! hasImages && isSelected && wasBlockJustInserted,
+				! hasImages && isSelected && blockWasJustInserted,
 			onFocus,
 		},
 	} );
@@ -583,20 +598,22 @@ function GalleryEdit( props ) {
 			</InspectorControls>
 			{ Platform.isWeb && (
 				<>
-					<BlockControls group="other">
-						<MediaReplaceFlow
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							accept="image/*"
-							handleUpload={ false }
-							onSelect={ updateImages }
-							name={ __( 'Add' ) }
-							multiple={ true }
-							mediaIds={ images
-								.filter( ( image ) => image.id )
-								.map( ( image ) => image.id ) }
-							addToGallery={ hasImageIds }
-						/>
-					</BlockControls>
+					{ ! multiGallerySelection && (
+						<BlockControls group="other">
+							<MediaReplaceFlow
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								accept="image/*"
+								handleUpload={ false }
+								onSelect={ updateImages }
+								name={ __( 'Add' ) }
+								multiple={ true }
+								mediaIds={ images
+									.filter( ( image ) => image.id )
+									.map( ( image ) => image.id ) }
+								addToGallery={ hasImageIds }
+							/>
+						</BlockControls>
+					) }
 					<GapStyles
 						blockGap={ attributes.style?.spacing?.blockGap }
 						clientId={ clientId }
@@ -614,6 +631,7 @@ function GalleryEdit( props ) {
 				}
 				blockProps={ innerBlocksProps }
 				insertBlocksAfter={ insertBlocksAfter }
+				multiGallerySelection={ multiGallerySelection }
 			/>
 		</>
 	);

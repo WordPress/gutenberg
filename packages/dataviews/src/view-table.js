@@ -167,7 +167,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 										return (
 											<DropdownMenuRadioItemCustom
 												key={ element.value }
-												name={ `view-table-${ filter.field.id }` }
+												name={ `view-table-${ filter.field }` }
 												value={ element.value }
 												checked={ isActive }
 												onClick={ () => {
@@ -222,7 +222,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 											] ) => (
 												<DropdownMenuRadioItemCustom
 													key={ key }
-													name={ `view-table-${ filter.name }-conditions` }
+													name={ `view-table-${ filter.field }-conditions` }
 													value={ operator }
 													checked={
 														activeOperator ===
