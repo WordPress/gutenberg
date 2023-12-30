@@ -64,7 +64,7 @@ export type Context = 'view' | 'edit' | 'embed';
 export type ContextualField<
 	FieldType,
 	AvailableInContexts extends Context,
-	C extends Context
+	C extends Context,
 > = AvailableInContexts extends C ? FieldType : never;
 
 /**
@@ -93,7 +93,7 @@ export type OmitNevers<
 			: T[ K ] extends Record< string, unknown >
 			? OmitNevers< T[ K ] >
 			: T[ K ];
-	}
+	},
 > = Pick<
 	Nevers,
 	{

@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
-	withNotices,
 	ResizableBox,
 	ToolbarButton,
 } from '@wordpress/components';
@@ -36,6 +35,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import FileBlockInspector from './inspector';
 import { browserSupportsPdfs } from './utils';
+import removeAnchorTag from '../utils/remove-anchor-tag';
 
 export const MIN_PREVIEW_HEIGHT = 200;
 export const MAX_PREVIEW_HEIGHT = 2000;
@@ -60,14 +60,7 @@ function ClipboardToolbarButton( { text, disabled } ) {
 	);
 }
 
-function FileEdit( {
-	attributes,
-	isSelected,
-	setAttributes,
-	noticeUI,
-	noticeOperations,
-	clientId,
-} ) {
+function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const {
 		id,
 		fileId,
@@ -91,6 +84,7 @@ function FileEdit( {
 		[ id ]
 	);
 
+	const { createErrorNotice } = useDispatch( noticesStore );
 	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -108,8 +102,10 @@ function FileEdit( {
 			revokeBlobURL( href );
 		}
 
-		if ( downloadButtonText === undefined ) {
-			changeDownloadButtonText( _x( 'Download', 'button label' ) );
+		if ( RichText.isEmpty( downloadButtonText ) ) {
+			setAttributes( {
+				downloadButtonText: _x( 'Download', 'button label' ),
+			} );
 		}
 	}, [] );
 
@@ -137,8 +133,7 @@ function FileEdit( {
 
 	function onUploadError( message ) {
 		setAttributes( { href: undefined } );
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
 	function changeLinkDestinationOption( newHref ) {
@@ -154,13 +149,6 @@ function FileEdit( {
 
 	function changeShowDownloadButton( newValue ) {
 		setAttributes( { showDownloadButton: newValue } );
-	}
-
-	function changeDownloadButtonText( newValue ) {
-		// Remove anchor tags from button text content.
-		setAttributes( {
-			downloadButtonText: newValue.replace( /<\/?a[^>]*>/g, '' ),
-		} );
 	}
 
 	function changeDisplayPreview( newValue ) {
@@ -207,7 +195,6 @@ function FileEdit( {
 						),
 					} }
 					onSelect={ onSelectFile }
-					notices={ noticeUI }
 					onError={ onUploadError }
 					accept="*"
 				/>
@@ -286,7 +273,9 @@ function FileEdit( {
 						placeholder={ __( 'Write file name…' ) }
 						withoutInteractiveFormatting
 						onChange={ ( text ) =>
-							setAttributes( { fileName: text } )
+							setAttributes( {
+								fileName: removeAnchorTag( text ),
+							} )
 						}
 						href={ textLinkHref }
 					/>
@@ -310,7 +299,10 @@ function FileEdit( {
 								withoutInteractiveFormatting
 								placeholder={ __( 'Add text…' ) }
 								onChange={ ( text ) =>
-									changeDownloadButtonText( text )
+									setAttributes( {
+										downloadButtonText:
+											removeAnchorTag( text ),
+									} )
 								}
 							/>
 						</div>
@@ -321,4 +313,4 @@ function FileEdit( {
 	);
 }
 
-export default withNotices( FileEdit );
+export default FileEdit;

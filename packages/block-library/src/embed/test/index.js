@@ -17,6 +17,7 @@ import {
 	createUpgradedEmbedBlock,
 	getEmbedInfoByProvider,
 	removeAspectRatioClasses,
+	hasAspectRatioClass,
 } from '../util';
 import { embedInstagramIcon } from '../icons';
 import variations from '../variations';
@@ -99,6 +100,17 @@ describe( 'utils', () => {
 					true
 				)
 			).toEqual( expected );
+		} );
+	} );
+	describe( 'hasAspectRatioClass', () => {
+		it( 'should return false if an aspect ratio class does not exist', () => {
+			const existingClassNames = 'wp-block-embed is-type-video';
+			expect( hasAspectRatioClass( existingClassNames ) ).toBe( false );
+		} );
+		it( 'should return true if an aspect ratio class exists', () => {
+			const existingClassNames =
+				'wp-block-embed is-type-video wp-embed-aspect-16-9 wp-has-aspect-ratio';
+			expect( hasAspectRatioClass( existingClassNames ) ).toBe( true );
 		} );
 	} );
 	describe( 'removeAspectRatioClasses', () => {

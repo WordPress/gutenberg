@@ -8,9 +8,12 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import NewTemplate from './new-template';
-import NewTemplatePart from './new-template-part';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
-export default function AddNewTemplate( { templateType = 'wp_template' } ) {
+export default function AddNewTemplate( {
+	templateType = TEMPLATE_POST_TYPE,
+	...props
+} ) {
 	const postType = useSelect(
 		( select ) => select( coreStore ).getPostType( templateType ),
 		[ templateType ]
@@ -20,10 +23,8 @@ export default function AddNewTemplate( { templateType = 'wp_template' } ) {
 		return null;
 	}
 
-	if ( templateType === 'wp_template' ) {
-		return <NewTemplate postType={ postType } />;
-	} else if ( templateType === 'wp_template_part' ) {
-		return <NewTemplatePart postType={ postType } />;
+	if ( templateType === TEMPLATE_POST_TYPE ) {
+		return <NewTemplate { ...props } postType={ postType } />;
 	}
 
 	return null;

@@ -12,12 +12,11 @@ if ( class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 }
 
 /**
- * Holds, sanitizes, processes and prints CSS declarations for the style engine.
+ * Holds, sanitizes, processes and prints CSS declarations for the Style Engine.
  *
  * @access private
  */
 class WP_Style_Engine_CSS_Declarations {
-
 	/**
 	 * An array of CSS declarations (property => value pairs).
 	 *
@@ -31,14 +30,14 @@ class WP_Style_Engine_CSS_Declarations {
 	 * If a `$declarations` array is passed, it will be used to populate
 	 * the initial $declarations prop of the object by calling add_declarations().
 	 *
-	 * @param array $declarations An array of declarations (property => value pairs).
+	 * @param string[] $declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
 	 */
 	public function __construct( $declarations = array() ) {
 		$this->add_declarations( $declarations );
 	}
 
 	/**
-	 * Add a single declaration.
+	 * Adds a single declaration.
 	 *
 	 * @param string $property The CSS property.
 	 * @param string $value    The CSS value.
@@ -46,28 +45,27 @@ class WP_Style_Engine_CSS_Declarations {
 	 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 	 */
 	public function add_declaration( $property, $value ) {
-
-		// Sanitize the property.
+		// Sanitizes the property.
 		$property = $this->sanitize_property( $property );
-		// Bail early if the property is empty.
+		// Bails early if the property is empty.
 		if ( empty( $property ) ) {
 			return $this;
 		}
 
-		// Trim the value. If empty, bail early.
+		// Trims the value. If empty, bail early.
 		$value = trim( $value );
 		if ( '' === $value ) {
 			return $this;
 		}
 
-		// Add the declaration property/value pair.
+		// Adds the declaration property/value pair.
 		$this->declarations[ $property ] = $value;
 
 		return $this;
 	}
 
 	/**
-	 * Remove a single declaration.
+	 * Removes a single declaration.
 	 *
 	 * @param string $property The CSS property.
 	 *
@@ -79,7 +77,7 @@ class WP_Style_Engine_CSS_Declarations {
 	}
 
 	/**
-	 * Add multiple declarations.
+	 * Adds multiple declarations.
 	 *
 	 * @param array $declarations An array of declarations.
 	 *
@@ -93,7 +91,7 @@ class WP_Style_Engine_CSS_Declarations {
 	}
 
 	/**
-	 * Remove multiple declarations.
+	 * Removes multiple declarations.
 	 *
 	 * @param array $properties An array of properties.
 	 *
@@ -107,7 +105,7 @@ class WP_Style_Engine_CSS_Declarations {
 	}
 
 	/**
-	 * Get the declarations array.
+	 * Gets the declarations array.
 	 *
 	 * @return array
 	 */
@@ -122,10 +120,11 @@ class WP_Style_Engine_CSS_Declarations {
 	 * @param string $value    The value to be filtered.
 	 * @param string $spacer   The spacer between the colon and the value. Defaults to an empty string.
 	 *
-	 * @return string The filtered declaration as a single string.
+	 * @return string The filtered declaration or an empty string.
 	 */
 	protected static function filter_declaration( $property, $value, $spacer = '' ) {
 		$filtered_value = wp_strip_all_tags( $value, true );
+
 		if ( '' !== $filtered_value ) {
 			return safecss_filter_attr( "{$property}:{$spacer}{$filtered_value}" );
 		}
@@ -135,8 +134,8 @@ class WP_Style_Engine_CSS_Declarations {
 	/**
 	 * Filters and compiles the CSS declarations.
 	 *
-	 * @param boolean $should_prettify Whether to add spacing, new lines and indents.
-	 * @param number  $indent_count    The number of tab indents to apply to the rule. Applies if `prettify` is `true`.
+	 * @param bool   $should_prettify Whether to add spacing, new lines and indents.
+	 * @param number $indent_count    The number of tab indents to apply to the rule. Applies if `prettify` is `true`.
 	 *
 	 * @return string The CSS declarations.
 	 */
@@ -158,7 +157,7 @@ class WP_Style_Engine_CSS_Declarations {
 	}
 
 	/**
-	 * Sanitize property names.
+	 * Sanitizes property names.
 	 *
 	 * @param string $property The CSS property.
 	 *

@@ -86,26 +86,28 @@ describe( 'selectors', () => {
 
 	describe( 'getChildBlockNames', () => {
 		it( 'should return an empty array if state is empty', () => {
-			const state = {};
+			const state = {
+				blockTypes: {},
+			};
 
 			expect( getChildBlockNames( state, 'parent1' ) ).toHaveLength( 0 );
 		} );
 
 		it( 'should return an empty array if no children exist', () => {
 			const state = {
-				blockTypes: [
-					{
+				blockTypes: {
+					child1: {
 						name: 'child1',
 						parent: [ 'parent1' ],
 					},
-					{
+					child2: {
 						name: 'child2',
 						parent: [ 'parent2' ],
 					},
-					{
+					parent3: {
 						name: 'parent3',
 					},
-				],
+				},
 			};
 
 			expect( getChildBlockNames( state, 'parent3' ) ).toHaveLength( 0 );
@@ -113,15 +115,15 @@ describe( 'selectors', () => {
 
 		it( 'should return an empty array if the parent block is not found', () => {
 			const state = {
-				blockTypes: [
-					{
+				blockTypes: {
+					child1: {
 						name: 'child1',
 						parent: [ 'parent1' ],
 					},
-					{
+					parent1: {
 						name: 'parent1',
 					},
-				],
+				},
 			};
 
 			expect( getChildBlockNames( state, 'parent3' ) ).toHaveLength( 0 );
@@ -129,29 +131,29 @@ describe( 'selectors', () => {
 
 		it( 'should return an array with the child block names', () => {
 			const state = {
-				blockTypes: [
-					{
+				blockTypes: {
+					child1: {
 						name: 'child1',
 						parent: [ 'parent1' ],
 					},
-					{
+					child2: {
 						name: 'child2',
 						parent: [ 'parent2' ],
 					},
-					{
+					child3: {
 						name: 'child3',
 						parent: [ 'parent1' ],
 					},
-					{
+					child4: {
 						name: 'child4',
 					},
-					{
+					parent1: {
 						name: 'parent1',
 					},
-					{
+					parent2: {
 						name: 'parent2',
 					},
-				],
+				},
 			};
 
 			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [
@@ -162,25 +164,25 @@ describe( 'selectors', () => {
 
 		it( 'should return an array with the child block names even if only one child exists', () => {
 			const state = {
-				blockTypes: [
-					{
+				blockTypes: {
+					child1: {
 						name: 'child1',
 						parent: [ 'parent1' ],
 					},
-					{
+					child2: {
 						name: 'child2',
 						parent: [ 'parent2' ],
 					},
-					{
+					child4: {
 						name: 'child4',
 					},
-					{
+					parent1: {
 						name: 'parent1',
 					},
-					{
+					parent2: {
 						name: 'parent2',
 					},
-				],
+				},
 			};
 
 			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [
@@ -190,29 +192,29 @@ describe( 'selectors', () => {
 
 		it( 'should return an array with the child block names even if children have multiple parents', () => {
 			const state = {
-				blockTypes: [
-					{
+				blockTypes: {
+					child1: {
 						name: 'child1',
 						parent: [ 'parent1' ],
 					},
-					{
+					child2: {
 						name: 'child2',
 						parent: [ 'parent1', 'parent2' ],
 					},
-					{
+					child3: {
 						name: 'child3',
 						parent: [ 'parent1' ],
 					},
-					{
+					child4: {
 						name: 'child4',
 					},
-					{
+					parent1: {
 						name: 'parent1',
 					},
-					{
+					parent2: {
 						name: 'parent2',
 					},
-				],
+				},
 			};
 
 			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [
@@ -605,6 +607,10 @@ describe( 'selectors', () => {
 			...blockTypeBase,
 			category,
 		};
+		const blockTypeWithNonStringDescription = {
+			...blockTypeBase,
+			description: <div>writing flow</div>,
+		};
 
 		const state = {
 			blockTypes: {
@@ -617,6 +623,10 @@ describe( 'selectors', () => {
 			[ 'block type', blockType ],
 			[ 'block type without category', blockTypeWithoutCategory ],
 			[ 'block type without description', blockTypeWithoutDescription ],
+			[
+				'block type with non-string description',
+				blockTypeWithNonStringDescription,
+			],
 		] )( 'by %s', ( label, nameOrType ) => {
 			it( 'should return false if not match', () => {
 				const result = isMatchingSearchTerm(
@@ -690,7 +700,10 @@ describe( 'selectors', () => {
 				} );
 			}
 
-			if ( nameOrType.description ) {
+			if (
+				nameOrType.description &&
+				typeof nameOrType.description === 'string'
+			) {
 				it( 'should return true if match using the description', () => {
 					const result = isMatchingSearchTerm(
 						state,

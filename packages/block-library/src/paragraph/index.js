@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -30,18 +25,22 @@ export const settings = {
 			content: __(
 				'In a village of La Mancha, the name of which I have no desire to call to mind, there lived not long since one of those gentlemen that keep a lance in the lance-rack, an old buckler, a lean hack, and a greyhound for coursing.'
 			),
-			style: {
-				typography: {
-					fontSize: 28,
-				},
-			},
-			dropCap: true,
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
+		const customName = attributes?.metadata?.name;
+
+		if ( context === 'list-view' && customName ) {
+			return customName;
+		}
+
 		if ( context === 'accessibility' ) {
+			if ( customName ) {
+				return customName;
+			}
+
 			const { content } = attributes;
-			return isEmpty( content ) ? __( 'Empty' ) : content;
+			return ! content || content.length === 0 ? __( 'Empty' ) : content;
 		}
 	},
 	transforms,

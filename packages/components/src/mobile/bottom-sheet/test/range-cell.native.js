@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { AccessibilityInfo } from 'react-native';
-import { create, act } from 'react-test-renderer';
+import { render, fireEvent } from 'test/helpers';
 
 /**
  * Internal dependencies
@@ -21,17 +21,19 @@ jest.mock( '@wordpress/compose', () => ( {
 	) ),
 } ) );
 
-const isScreenReaderEnabled = Promise.resolve( true );
 beforeAll( () => {
-	// Mock async native module to avoid act warning
-	AccessibilityInfo.isScreenReaderEnabled = jest.fn(
-		() => isScreenReaderEnabled
+	AccessibilityInfo.isScreenReaderEnabled.mockResolvedValue(
+		Promise.resolve( true )
 	);
+} );
+
+afterAll( () => {
+	AccessibilityInfo.isScreenReaderEnabled.mockReset();
 } );
 
 it( 'allows modifying units via a11y actions', async () => {
 	const mockOpenUnitPicker = jest.fn();
-	const renderer = create(
+	const { getByLabelText } = render(
 		<RangeCell
 			label="Opacity"
 			minimumValue={ 0 }
@@ -41,17 +43,18 @@ it( 'allows modifying units via a11y actions', async () => {
 			openUnitPicker={ mockOpenUnitPicker }
 		/>
 	);
-	// Await async update to component state to avoid act warning
-	await act( () => isScreenReaderEnabled );
-	const { onAccessibilityAction } = renderer.toJSON().props;
 
-	onAccessibilityAction( { nativeEvent: { actionName: 'activate' } } );
+	const opacityControl = getByLabelText( /Opacity/ );
+	fireEvent( opacityControl, 'accessibilityAction', {
+		nativeEvent: { actionName: 'activate' },
+	} );
+
 	expect( mockOpenUnitPicker ).toHaveBeenCalled();
 } );
 
 describe( 'when range lacks an adjustable unit', () => {
 	it( 'disallows modifying units via a11y actions', async () => {
-		const renderer = create(
+		const { getByLabelText } = render(
 			<RangeCell
 				label="Opacity"
 				minimumValue={ 0 }
@@ -60,10 +63,9 @@ describe( 'when range lacks an adjustable unit', () => {
 				onChange={ jest.fn() }
 			/>
 		);
-		// Await async update to component state to avoid act warning
-		await act( () => isScreenReaderEnabled );
-		const { onAccessibilityAction } = renderer.toJSON().props;
 
+		const opacityControl = getByLabelText( /Opacity/ );
+		const { onAccessibilityAction } = opacityControl.props;
 		expect( () =>
 			onAccessibilityAction( { nativeEvent: { actionName: 'activate' } } )
 		).not.toThrow();

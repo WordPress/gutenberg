@@ -21,9 +21,11 @@ test.describe( 'Using Format API', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'First paragraph' );
-		await pageUtils.pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 		await editor.clickBlockToolbarButton( 'More' );
 
 		// Used a regex to tackle the  in name of menuitem.(Custom Link).
@@ -34,6 +36,28 @@ test.describe( 'Using Format API', () => {
 		expect( content ).toBe(
 			`<!-- wp:paragraph -->
 <p>First <a href="https://example.com" class="my-plugin-link">paragraph</a></p>
+<!-- /wp:paragraph -->`
+		);
+	} );
+
+	test( 'should show unknow formatting button', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<big>test</big>' },
+		} );
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:paragraph -->
+<p><big>test</big></p>
+<!-- /wp:paragraph -->`
+		);
+		await page.keyboard.press( 'ArrowRight' );
+		await editor.clickBlockToolbarButton( 'Clear Unknown Formatting' );
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:paragraph -->
+<p>test</p>
 <!-- /wp:paragraph -->`
 		);
 	} );

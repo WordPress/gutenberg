@@ -22,7 +22,7 @@ function matchesAttributes( blockAttributes, variation ) {
  *
  * @param {Object}             blockAttributes - The block attributes to try to find a match.
  * @param {WPBlockVariation[]} variations      - A list of block variations to test for a match.
- * @return {?WPBlockVariation} - If a match is found returns it. If not or more than one matches are found returns `undefined`.
+ * @return {WPBlockVariation | undefined} - If a match is found returns it. If not or more than one matches are found returns `undefined`.
  */
 export const __experimentalGetMatchingVariation = (
 	blockAttributes,

@@ -78,22 +78,15 @@ const PaletteScreen = () => {
 		setCurrentValue( color );
 		if ( isSolidSegment && onColorChange && onGradientChange ) {
 			onColorChange( color );
-			onGradientChange( '' );
 		} else if ( isSolidSegment && onColorChange ) {
 			onColorChange( color );
 		} else if ( ! isSolidSegment && onGradientChange ) {
 			onGradientChange( color );
-			onColorChange( '' );
 		}
 	};
 
 	function onClear() {
 		setCurrentValue( undefined );
-		if ( isSolidSegment ) {
-			onColorChange( '' );
-		} else {
-			onGradientChange( '' );
-		}
 
 		if ( onColorCleared ) {
 			onColorCleared();

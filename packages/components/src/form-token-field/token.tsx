@@ -73,7 +73,8 @@ export default function Token( {
 			<Button
 				className="components-form-token-field__remove-token"
 				icon={ closeSmall }
-				onClick={ ! disabled && onClick }
+				onClick={ ! disabled ? onClick : undefined }
+				disabled={ disabled }
 				label={ messages.remove }
 				aria-describedby={ `components-form-token-field__token-text-${ instanceId }` }
 			/>

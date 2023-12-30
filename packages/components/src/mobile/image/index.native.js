@@ -82,6 +82,9 @@ const ImageComponent = ( {
 			} );
 		}
 		return () => ( isCurrent = false );
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ url ] );
 
 	const onContainerLayout = ( event ) => {
@@ -175,12 +178,19 @@ const ImageComponent = ( {
 			imageData &&
 			containerSize && {
 				height:
-					imageData?.width > containerSize?.width
+					imageData?.width > containerSize?.width && ! imageWidth
 						? containerSize?.width / imageData?.aspectRatio
 						: undefined,
 			},
 		imageHeight && { height: imageHeight },
 		shapeStyle,
+	];
+	const imageSelectedStyles = [
+		usePreferredColorSchemeStyle(
+			styles.imageBorder,
+			styles.imageBorderDark
+		),
+		{ height: containerSize?.height },
 	];
 
 	return (
@@ -207,12 +217,7 @@ const ImageComponent = ( {
 				{ isSelected &&
 					highlightSelected &&
 					! ( isUploadInProgress || isUploadFailed ) && (
-						<View
-							style={ [
-								styles.imageBorder,
-								{ height: containerSize?.height },
-							] }
-						/>
+						<View style={ imageSelectedStyles } />
 					) }
 
 				{ ! imageData ? (

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -39,6 +34,8 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody>
 					<RangeControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ ( value ) =>
@@ -63,7 +60,7 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
 						>
 							<RichText
 								tagName="p"
-								value={ get( content, [ index, 'children' ] ) }
+								value={ content?.[ index ]?.children }
 								onChange={ ( nextContent ) => {
 									setAttributes( {
 										content: [

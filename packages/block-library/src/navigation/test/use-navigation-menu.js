@@ -36,16 +36,28 @@ function resolveRecords( registry, menus ) {
 	dispatch.startResolution( 'getEntityRecords', [
 		'postType',
 		'wp_navigation',
-		{ per_page: -1, status: 'publish' },
+		{
+			per_page: 100,
+			status: [ 'publish', 'draft' ],
+			order: 'desc',
+			orderby: 'date',
+		},
 	] );
 	dispatch.finishResolution( 'getEntityRecords', [
 		'postType',
 		'wp_navigation',
-		{ per_page: -1, status: 'publish' },
+		{
+			per_page: 100,
+			status: [ 'publish', 'draft' ],
+			order: 'desc',
+			orderby: 'date',
+		},
 	] );
 	dispatch.receiveEntityRecords( 'postType', 'wp_navigation', menus, {
-		per_page: -1,
-		status: 'publish',
+		per_page: 100,
+		status: [ 'publish', 'draft' ],
+		order: 'desc',
+		orderby: 'date',
 	} );
 }
 
@@ -161,12 +173,12 @@ describe( 'useNavigationMenus', () => {
 		} );
 	} );
 
-	it( 'Should return null for the menu when menu status is "draft"', () => {
+	it( 'Should return the menu when menu status is "draft"', () => {
 		const navigationMenuDraft = { id: 4, title: 'Menu 3', status: 'draft' };
 		const testMenus = [ ...navigationMenus, navigationMenuDraft ];
 		resolveRecords( registry, testMenus );
 		expect( useNavigationMenu( 4 ) ).toEqual( {
-			navigationMenu: null,
+			navigationMenu: navigationMenuDraft,
 			navigationMenus: testMenus,
 			canSwitchNavigationMenu: true,
 			canUserCreateNavigationMenu: false,

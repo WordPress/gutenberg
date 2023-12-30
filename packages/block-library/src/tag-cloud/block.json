@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/tag-cloud",
 	"title": "Tag Cloud",
 	"category": "widgets",
@@ -40,6 +40,14 @@
 		"spacing": {
 			"margin": true,
 			"padding": true
+		},
+		"typography": {
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalLetterSpacing": true
 		}
 	},
 	"editorStyle": "wp-block-tag-cloud-editor"

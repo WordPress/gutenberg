@@ -7,14 +7,12 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import Picker from '../index.js';
+import Picker from '..';
 
 describe( 'FocalPointPicker', () => {
 	describe( 'focus and blur', () => {
 		it( 'clicking the draggable area should focus it', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const mockOnChange = jest.fn();
 
@@ -87,9 +85,7 @@ describe( 'FocalPointPicker', () => {
 
 	describe( 'resolvePoint handling', () => {
 		it( 'should allow value altering', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const spyChange = jest.fn();
 			const spy = jest.fn();
@@ -112,9 +108,9 @@ describe( 'FocalPointPicker', () => {
 			await user.keyboard( '[ArrowUp]' );
 
 			expect( spy ).toHaveBeenCalled();
-			expect( spyChange ).toHaveBeenCalledWith( {
-				x: '0.91',
-				y: '0.42',
+			expect( spyChange ).toHaveBeenLastCalledWith( {
+				x: 0.91,
+				y: 0.42,
 			} );
 		} );
 	} );
@@ -124,14 +120,14 @@ describe( 'FocalPointPicker', () => {
 			const { rerender } = render(
 				<Picker value={ { x: 0.25, y: 0.5 } } />
 			);
-			const xInput = screen.getByRole( 'spinbutton', { name: 'Left' } );
+			const xInput = screen.getByRole( 'spinbutton', {
+				name: 'Focal point left position',
+			} );
 			rerender( <Picker value={ { x: 0.93, y: 0.5 } } /> );
 			expect( xInput.value ).toBe( '93' );
 		} );
 		it( 'call onChange with the expected values', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const spyChange = jest.fn();
 			render(
@@ -143,10 +139,34 @@ describe( 'FocalPointPicker', () => {
 			await user.click( dragArea );
 			await user.keyboard( '[ArrowDown]' );
 
-			expect( spyChange ).toHaveBeenCalledWith( {
-				x: '0.14',
-				y: '0.63',
+			expect( spyChange ).toHaveBeenLastCalledWith( {
+				x: 0.14,
+				y: 0.63,
 			} );
+		} );
+	} );
+
+	describe( 'value handling', () => {
+		it( 'should handle legacy string values', () => {
+			const onChangeSpy = jest.fn();
+			render(
+				<Picker
+					value={ { x: '0.1', y: '0.2' } }
+					onChange={ onChangeSpy }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'spinbutton', {
+					name: 'Focal point left position',
+				} ).value
+			).toBe( '10' );
+			expect(
+				screen.getByRole( 'spinbutton', {
+					name: 'Focal point top position',
+				} ).value
+			).toBe( '20' );
+			expect( onChangeSpy ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

@@ -7,12 +7,14 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { CONFIG, COLORS, reduceMotion } from '../../utils';
+import { CONFIG, COLORS } from '../../utils';
 import type { ToggleGroupControlProps } from '../types';
 
-export const ToggleGroupControl = ( {
+export const toggleGroupControl = ( {
+	isBlock,
+	isDeselectable,
 	size,
-}: {
+}: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > & {
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
 } ) => css`
 	background: ${ COLORS.ui.background };
@@ -20,58 +22,55 @@ export const ToggleGroupControl = ( {
 	border-radius: ${ CONFIG.controlBorderRadius };
 	display: inline-flex;
 	min-width: 0;
-	padding: 2px;
 	position: relative;
-	transition: transform ${ CONFIG.transitionDurationFastest } linear;
-	${ reduceMotion( 'transition' ) }
 
 	${ toggleGroupControlSize( size ) }
-
-	&:focus-within {
-		border-color: ${ COLORS.ui.borderFocus };
-		box-shadow: ${ CONFIG.controlBoxShadowFocus };
-		outline: none;
-		z-index: 1;
-	}
+	${ ! isDeselectable && enclosingBorders( isBlock ) }
 `;
 
-export const border = css`
-	border-color: ${ COLORS.ui.border };
+const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
+	const enclosingBorder = css`
+		border-color: ${ COLORS.ui.border };
+	`;
 
-	&:hover {
-		border-color: ${ COLORS.ui.borderHover };
-	}
-`;
+	return css`
+		${ isBlock && enclosingBorder }
+
+		&:hover {
+			border-color: ${ COLORS.ui.borderHover };
+		}
+
+		&:focus-within {
+			border-color: ${ COLORS.ui.borderFocus };
+			box-shadow: ${ CONFIG.controlBoxShadowFocus };
+			z-index: 1;
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+			outline-offset: -2px;
+		}
+	`;
+};
 
 export const toggleGroupControlSize = (
 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
 ) => {
-	const heights = {
-		default: '36px',
-		'__unstable-large': '40px',
+	const styles = {
+		default: css`
+			min-height: 36px;
+			padding: 2px;
+		`,
+		'__unstable-large': css`
+			min-height: 40px;
+			padding: 3px;
+		`,
 	};
 
-	return css`
-		min-height: ${ heights[ size ] };
-	`;
+	return styles[ size ];
 };
 
 export const block = css`
 	display: flex;
 	width: 100%;
-`;
-
-export const BackdropView = styled.div`
-	background: ${ COLORS.gray[ 900 ] };
-	border-radius: ${ CONFIG.controlBorderRadius };
-	box-shadow: ${ CONFIG.toggleGroupControlBackdropBoxShadow };
-	left: 0;
-	position: absolute;
-	top: 2px;
-	bottom: 2px;
-	transition: transform ${ CONFIG.transitionDurationFast } ease;
-	${ reduceMotion( 'transition' ) }
-	z-index: 1;
 `;
 
 export const VisualLabelWrapper = styled.div`

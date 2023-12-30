@@ -6,6 +6,7 @@
 			"showSubmenuIcon": true,
 			"openSubmenusOnClick": false,
 			"overlayMenu": "mobile",
+			"icon": "handle",
 			"hasIcon": true,
 			"maxNestingLevel": 5
 		},

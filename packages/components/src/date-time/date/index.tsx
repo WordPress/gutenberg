@@ -16,13 +16,14 @@ import {
 	startOfWeek,
 	endOfWeek,
 } from 'date-fns';
+import type { KeyboardEventHandler } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
-import { dateI18n, __experimentalGetSettings } from '@wordpress/date';
+import { dateI18n, getSettings } from '@wordpress/date';
 import { useState, useRef, useEffect } from '@wordpress/element';
 
 /**
@@ -273,7 +274,7 @@ type DayProps = {
 	numEvents: number;
 	isInvalid: boolean;
 	onClick: () => void;
-	onKeyDown: ( event: KeyboardEvent ) => void;
+	onKeyDown: KeyboardEventHandler;
 };
 
 function Day( {
@@ -322,7 +323,7 @@ function Day( {
 }
 
 function getDayLabel( date: Date, isSelected: boolean, numEvents: number ) {
-	const { formats } = __experimentalGetSettings();
+	const { formats } = getSettings();
 	const localizedDate = dateI18n(
 		formats.date,
 		date,

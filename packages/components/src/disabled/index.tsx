@@ -1,26 +1,28 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { useDisabled } from '@wordpress/compose';
 import { createContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { StyledWrapper } from './styles/disabled-styles';
+import { disabledStyles } from './styles/disabled-styles';
 import type { DisabledProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import { useCx } from '../utils';
 
 const Context = createContext< boolean >( false );
 const { Consumer, Provider } = Context;
 
 /**
- * `Disabled` is a component which disables descendant tabbable elements and prevents pointer interaction.
+ * `Disabled` is a component which disables descendant tabbable elements and
+ * prevents pointer interaction.
+ *
+ * _Note: this component may not behave as expected in browsers that don't
+ * support the `inert` HTML attribute. We recommend adding the official WICG
+ * polyfill when using this component in your project._
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/inert
  *
  * ```jsx
  * import { Button, Disabled, TextControl } from '@wordpress/components';
@@ -54,22 +56,23 @@ function Disabled( {
 	children,
 	isDisabled = true,
 	...props
-}: Omit< WordPressComponentProps< DisabledProps, 'div' >, 'ref' > ) {
-	const ref = useDisabled();
-
-	if ( ! isDisabled ) {
-		return <Provider value={ false }>{ children }</Provider>;
-	}
+}: WordPressComponentProps< DisabledProps, 'div' > ) {
+	const cx = useCx();
 
 	return (
-		<Provider value={ true }>
-			<StyledWrapper
-				ref={ ref }
-				className={ classnames( className, 'components-disabled' ) }
+		<Provider value={ isDisabled }>
+			<div
+				// @ts-ignore Reason: inert is a recent HTML attribute
+				inert={ isDisabled ? 'true' : undefined }
+				className={
+					isDisabled
+						? cx( disabledStyles, className, 'components-disabled' )
+						: undefined
+				}
 				{ ...props }
 			>
 				{ children }
-			</StyledWrapper>
+			</div>
 		</Provider>
 	);
 }

@@ -9,7 +9,7 @@ import {
 	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 } from '@wordpress/block-editor';
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -58,27 +58,15 @@ export default function CoverBlockControls( {
 		} );
 	};
 
-	// Flip value horizontally to match the physical direction indicated by
-	// AlignmentMatrixControl with the logical direction indicated by cover
-	// block in RTL languages.
-	const flipHorizontalPosition = ( ltrContentPosition ) => {
-		return isRTL()
-			? ltrContentPosition.replace( /left|right/, ( match ) =>
-					match === 'left' ? 'right' : 'left'
-			  )
-			: ltrContentPosition;
-	};
-
 	return (
 		<>
 			<BlockControls group="block">
 				<BlockAlignmentMatrixControl
 					label={ __( 'Change content position' ) }
-					value={ flipHorizontalPosition( contentPosition ) }
+					value={ contentPosition }
 					onChange={ ( nextPosition ) =>
 						setAttributes( {
-							contentPosition:
-								flipHorizontalPosition( nextPosition ),
+							contentPosition: nextPosition,
 						} )
 					}
 					isDisabled={ ! hasInnerBlocks }

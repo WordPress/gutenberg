@@ -1,0 +1,18 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"types": [ "gutenberg-env" ],
+		"skipLibCheck": true
+	},
+	"references": [
+		{ "path": "../components" },
+		{ "path": "../compose" },
+		{ "path": "../element" },
+		{ "path": "../hooks" },
+		{ "path": "../icons" },
+		{ "path": "../is-shallow-equal" }
+	],
+	"include": [ "src/**/*" ]
+}

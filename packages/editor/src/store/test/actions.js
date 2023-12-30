@@ -15,8 +15,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import * as actions from '../actions';
 import { store as editorStore } from '..';
 
-jest.useRealTimers();
-
 const postId = 44;
 
 const postTypeConfig = {
@@ -35,6 +33,7 @@ const postTypeEntity = {
 		item_updated: 'Updated Post',
 		item_published: 'Post published',
 		item_reverted_to_draft: 'Post reverted to draft.',
+		item_trashed: 'Post trashed.',
 	},
 };
 
@@ -288,11 +287,58 @@ describe( 'Post actions', () => {
 
 			// Check that there are no notices.
 			const notices = registry.select( noticesStore ).getNotices();
-			expect( notices ).toEqual( [] );
+			expect( notices ).toMatchObject( [
+				{
+					status: 'success',
+					content: 'Post trashed.',
+				},
+			] );
 
 			// Check the new status.
 			const { status } = registry.select( editorStore ).getCurrentPost();
 			expect( status ).toBe( 'trash' );
+		} );
+
+		it( 'sets deleting state', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				content: 'foo',
+				status: 'publish',
+			};
+
+			const dispatch = Object.assign( jest.fn(), {
+				savePost: jest.fn(),
+			} );
+			const select = {
+				getCurrentPostType: () => 'post',
+				getCurrentPost: () => post,
+			};
+			const registry = {
+				dispatch: () => ( {
+					removeNotice: jest.fn(),
+					createErrorNotice: jest.fn(),
+				} ),
+				resolveSelect: () => ( {
+					getPostType: () => ( {
+						rest_namespace: 'wp/v2',
+						rest_base: 'posts',
+					} ),
+				} ),
+			};
+
+			apiFetch.setFetchHandler( async () => {
+				return { ...post, status: 'trash' };
+			} );
+
+			await actions.trashPost()( { select, dispatch, registry } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'REQUEST_POST_DELETE_START',
+			} );
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'REQUEST_POST_DELETE_FINISH',
+			} );
 		} );
 	} );
 } );
@@ -383,6 +429,62 @@ describe( 'Editor actions', () => {
 
 			expect(
 				registry.select( editorStore ).isPublishSidebarEnabled()
+			).toBe( false );
+		} );
+	} );
+
+	describe( 'toggleEditorPanelEnabled', () => {
+		it( 'toggles panels to be enabled and not enabled', () => {
+			const registry = createRegistryWithStores();
+
+			// This will switch it off, since the default is on.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelEnabled( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelEnabled( 'control-panel' )
+			).toBe( false );
+
+			// Switch it on again.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelEnabled( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelEnabled( 'control-panel' )
+			).toBe( true );
+		} );
+	} );
+
+	describe( 'toggleEditorPanelOpened', () => {
+		it( 'toggles panels open and closed', () => {
+			const registry = createRegistryWithStores();
+
+			// This will open it, since the default is closed.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelOpened( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelOpened( 'control-panel' )
+			).toBe( true );
+
+			// Close it.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelOpened( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelOpened( 'control-panel' )
 			).toBe( false );
 		} );
 	} );

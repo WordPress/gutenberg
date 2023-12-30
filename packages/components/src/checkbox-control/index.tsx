@@ -17,7 +17,7 @@ import { Icon, check, reset } from '@wordpress/icons';
  */
 import BaseControl from '../base-control';
 import type { CheckboxControlProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 /**
  * Checkboxes allow the user to select one or more items from a set.
@@ -40,20 +40,17 @@ import type { WordPressComponentProps } from '../ui/context';
  * ```
  */
 export function CheckboxControl(
-	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
-	// ref forwarding to CheckboxControl.
-	props: Omit<
-		WordPressComponentProps< CheckboxControlProps, 'input', false >,
-		'ref'
-	>
+	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
 ) {
 	const {
+		__nextHasNoMarginBottom,
 		label,
 		className,
 		heading,
 		checked,
 		indeterminate,
 		help,
+		id: idProp,
 		onChange,
 		...additionalProps
 	} = props;
@@ -85,13 +82,17 @@ export function CheckboxControl(
 		},
 		[ checked, indeterminate ]
 	);
-	const instanceId = useInstanceId( CheckboxControl );
-	const id = `inspector-checkbox-control-${ instanceId }`;
+	const id = useInstanceId(
+		CheckboxControl,
+		'inspector-checkbox-control',
+		idProp
+	);
 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
 		onChange( event.target.checked );
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			label={ heading }
 			id={ id }
 			help={ help }
@@ -124,12 +125,14 @@ export function CheckboxControl(
 					/>
 				) : null }
 			</span>
-			<label
-				className="components-checkbox-control__label"
-				htmlFor={ id }
-			>
-				{ label }
-			</label>
+			{ label && (
+				<label
+					className="components-checkbox-control__label"
+					htmlFor={ id }
+				>
+					{ label }
+				</label>
+			) }
 		</BaseControl>
 	);
 }

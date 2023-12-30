@@ -3,21 +3,21 @@
  */
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { Radio } from 'reakit';
+import * as Ariakit from '@ariakit/react';
+// eslint-disable-next-line no-restricted-imports
+import { motion, useReducedMotion } from 'framer-motion';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	useContextSystem,
-	WordPressComponentProps,
-} from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect, useContextSystem } from '../../context';
 import type {
 	ToggleGroupControlOptionBaseProps,
 	WithToolTipProps,
@@ -29,10 +29,16 @@ import Tooltip from '../../tooltip';
 
 const { ButtonContentView, LabelView } = styles;
 
+const REDUCED_MOTION_TRANSITION_CONFIG = {
+	duration: 0,
+};
+
+const LAYOUT_ID = 'toggle-group-backdrop-shared-layout-id';
+
 const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 	if ( showTooltip && text ) {
 		return (
-			<Tooltip text={ text } position="top center">
+			<Tooltip text={ text } placement="top">
 				{ children }
 			</Tooltip>
 		);
@@ -41,64 +47,130 @@ const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 };
 
 function ToggleGroupControlOptionBase(
-	props: WordPressComponentProps<
-		ToggleGroupControlOptionBaseProps,
-		'button',
-		false
+	props: Omit<
+		WordPressComponentProps<
+			ToggleGroupControlOptionBaseProps,
+			'button',
+			false
+		>,
+		// the element's id is generated internally
+		'id'
 	>,
 	forwardedRef: ForwardedRef< any >
 ) {
+	const shouldReduceMotion = useReducedMotion();
 	const toggleGroupControlContext = useToggleGroupControlContext();
+
 	const id = useInstanceId(
 		ToggleGroupControlOptionBase,
 		toggleGroupControlContext.baseId || 'toggle-group-control-option-base'
-	) as string;
+	);
+
 	const buttonProps = useContextSystem(
 		{ ...props, id },
 		'ToggleGroupControlOptionBase'
 	);
+
+	const {
+		isBlock = false,
+		isDeselectable = false,
+		size = 'default',
+	} = toggleGroupControlContext;
+
 	const {
 		className,
-		isBlock = false,
 		isIcon = false,
 		value,
 		children,
-		size = 'default',
 		showTooltip = false,
-		...radioProps
-	} = {
-		...toggleGroupControlContext,
-		...buttonProps,
+		onFocus: onFocusProp,
+		...otherButtonProps
+	} = buttonProps;
+
+	const isPressed = toggleGroupControlContext.value === value;
+	const cx = useCx();
+	const labelViewClasses = useMemo(
+		() => cx( isBlock && styles.labelBlock ),
+		[ cx, isBlock ]
+	);
+	const itemClasses = useMemo(
+		() =>
+			cx(
+				styles.buttonView( {
+					isDeselectable,
+					isIcon,
+					isPressed,
+					size,
+				} ),
+				className
+			),
+		[ cx, isDeselectable, isIcon, isPressed, size, className ]
+	);
+	const backdropClasses = useMemo( () => cx( styles.backdropView ), [ cx ] );
+
+	const buttonOnClick = () => {
+		if ( isDeselectable && isPressed ) {
+			toggleGroupControlContext.setValue( undefined );
+		} else {
+			toggleGroupControlContext.setValue( value );
+		}
 	};
 
-	const isActive = radioProps.state === value;
-	const cx = useCx();
-	const labelViewClasses = cx( isBlock && styles.labelBlock );
-	const classes = cx(
-		styles.buttonView,
-		isIcon && styles.isIcon( { size } ),
-		className,
-		isActive && styles.buttonActive
-	);
+	const commonProps = {
+		...otherButtonProps,
+		className: itemClasses,
+		'data-value': value,
+		ref: forwardedRef,
+	};
 
 	return (
-		<LabelView className={ labelViewClasses } data-active={ isActive }>
+		<LabelView className={ labelViewClasses }>
 			<WithToolTip
 				showTooltip={ showTooltip }
-				text={ radioProps[ 'aria-label' ] }
+				text={ otherButtonProps[ 'aria-label' ] }
 			>
-				<Radio
-					{ ...radioProps }
-					as="button"
-					aria-label={ radioProps[ 'aria-label' ] }
-					className={ classes }
-					data-value={ value }
-					ref={ forwardedRef }
-					value={ value }
-				>
-					<ButtonContentView>{ children }</ButtonContentView>
-				</Radio>
+				{ isDeselectable ? (
+					<button
+						{ ...commonProps }
+						onFocus={ onFocusProp }
+						aria-pressed={ isPressed }
+						type="button"
+						onClick={ buttonOnClick }
+					>
+						<ButtonContentView>{ children }</ButtonContentView>
+					</button>
+				) : (
+					<Ariakit.Radio
+						render={
+							<button
+								type="button"
+								{ ...commonProps }
+								onFocus={ ( event ) => {
+									onFocusProp?.( event );
+									if ( event.defaultPrevented ) return;
+									toggleGroupControlContext.setValue( value );
+								} }
+							/>
+						}
+						value={ value }
+					>
+						<ButtonContentView>{ children }</ButtonContentView>
+					</Ariakit.Radio>
+				) }
 			</WithToolTip>
+			{ /* Animated backdrop using framer motion's shared layout animation */ }
+			{ isPressed ? (
+				<motion.div
+					className={ backdropClasses }
+					transition={
+						shouldReduceMotion
+							? REDUCED_MOTION_TRANSITION_CONFIG
+							: undefined
+					}
+					role="presentation"
+					layoutId={ LAYOUT_ID }
+				/>
+			) : null }
 		</LabelView>
 	);
 }

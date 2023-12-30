@@ -3,130 +3,95 @@
  */
 import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
-import { RadioGroup, useRadioState } from 'reakit';
+import { LayoutGroup } from 'framer-motion';
 
 /**
  * WordPress dependencies
  */
+import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useRef, useMemo } from '@wordpress/element';
-import {
-	useMergeRefs,
-	useInstanceId,
-	usePrevious,
-	useResizeObserver,
-} from '@wordpress/compose';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	useContextSystem,
-	WordPressComponentProps,
-} from '../../ui/context';
-import { useUpdateEffect, useCx } from '../../utils/hooks';
-import { View } from '../../view';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect, useContextSystem } from '../../context';
+import { useCx } from '../../utils/hooks';
 import BaseControl from '../../base-control';
 import type { ToggleGroupControlProps } from '../types';
-import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
-import ToggleGroupControlContext from '../context';
 import { VisualLabelWrapper } from './styles';
 import * as styles from './styles';
-
-const noop = () => {};
+import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
+import { ToggleGroupControlAsButtonGroup } from './as-button-group';
 
 function UnconnectedToggleGroupControl(
-	props: WordPressComponentProps< ToggleGroupControlProps, 'input', false >,
+	props: WordPressComponentProps< ToggleGroupControlProps, 'div', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		__nextHasNoMarginBottom = false,
+		__next40pxDefaultSize = false,
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,
-		__experimentalIsIconGroup = false,
+		isDeselectable = false,
 		label,
 		hideLabelFromVision = false,
 		help,
-		onChange = noop,
+		onChange,
 		size = 'default',
 		value,
 		children,
 		...otherProps
 	} = useContextSystem( props, 'ToggleGroupControl' );
+
+	const baseId = useInstanceId( ToggleGroupControl, 'toggle-group-control' );
+	const normalizedSize =
+		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
+
 	const cx = useCx();
-	const containerRef = useRef();
-	const [ resizeListener, sizes ] = useResizeObserver();
-	const baseId = useInstanceId(
-		ToggleGroupControl,
-		'toggle-group-control'
-	).toString();
-	const radio = useRadioState( {
-		baseId,
-		state: value,
-	} );
-	const previousValue = usePrevious( value );
-
-	// Propagate radio.state change.
-	useUpdateEffect( () => {
-		// Avoid calling onChange if radio state changed
-		// from incoming value.
-		if ( previousValue !== radio.state ) {
-			onChange( radio.state );
-		}
-	}, [ radio.state ] );
-
-	// Sync incoming value with radio.state.
-	useUpdateEffect( () => {
-		if ( value !== radio.state ) {
-			radio.setState( value );
-		}
-	}, [ value ] );
 
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.ToggleGroupControl( { size } ),
-				! __experimentalIsIconGroup && styles.border,
+				styles.toggleGroupControl( {
+					isBlock,
+					isDeselectable,
+					size: normalizedSize,
+				} ),
 				isBlock && styles.block,
 				className
 			),
-		[ className, cx, isBlock, __experimentalIsIconGroup, size ]
+		[ className, cx, isBlock, isDeselectable, normalizedSize ]
 	);
+
+	const MainControl = isDeselectable
+		? ToggleGroupControlAsButtonGroup
+		: ToggleGroupControlAsRadioGroup;
+
 	return (
 		<BaseControl
 			help={ help }
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 		>
-			<ToggleGroupControlContext.Provider
-				value={ { ...radio, isBlock: ! isAdaptiveWidth, size } }
+			{ ! hideLabelFromVision && (
+				<VisualLabelWrapper>
+					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
+				</VisualLabelWrapper>
+			) }
+			<MainControl
+				{ ...otherProps }
+				className={ classes }
+				isAdaptiveWidth={ isAdaptiveWidth }
+				label={ label }
+				onChange={ onChange }
+				ref={ forwardedRef }
+				size={ normalizedSize }
+				value={ value }
 			>
-				{ ! hideLabelFromVision && (
-					<VisualLabelWrapper>
-						<BaseControl.VisualLabel>
-							{ label }
-						</BaseControl.VisualLabel>
-					</VisualLabelWrapper>
-				) }
-				<RadioGroup
-					{ ...radio }
-					aria-label={ label }
-					as={ View }
-					className={ classes }
-					{ ...otherProps }
-					ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
-				>
-					{ resizeListener }
-					<ToggleGroupControlBackdrop
-						{ ...radio }
-						containerRef={ containerRef }
-						containerWidth={ sizes.width }
-						isAdaptiveWidth={ isAdaptiveWidth }
-					/>
-					{ children }
-				</RadioGroup>
-			</ToggleGroupControlContext.Provider>
+				<LayoutGroup id={ baseId }>{ children }</LayoutGroup>
+			</MainControl>
 		</BaseControl>
 	);
 }

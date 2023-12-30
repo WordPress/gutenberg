@@ -5,34 +5,35 @@ const { join } = require( 'path' );
 
 module.exports = {
 	defaultValues: {
-		slug: 'gutenpride',
-		category: 'text',
-		title: 'Gutenpride',
-		description:
-			'A Gutenberg block to show your pride! This block enables you to type text and style it with the color font Gilbert from Type with Pride.',
-		dashicon: 'flag',
+		slug: 'copyright-date-block',
+		title: 'Copyright Date',
+		description: "Display your site's copyright date.",
 		attributes: {
-			message: {
+			fallbackCurrentYear: {
 				type: 'string',
-				source: 'text',
-				selector: 'div',
+			},
+			showStartingYear: {
+				type: 'boolean',
+			},
+			startingYear: {
+				type: 'string',
 			},
 		},
 		supports: {
+			color: {
+				background: false,
+				text: true,
+			},
 			html: false,
-		},
-	},
-	variants: {
-		static: {},
-		dynamic: {
-			attributes: {
-				message: {
-					type: 'string',
-				},
+			typography: {
+				fontSize: true,
 			},
 		},
+		editorScript: 'file:./index.js',
+		render: 'file:./render.php',
+		example: {},
+		wpEnv: true,
 	},
 	pluginTemplatesPath: join( __dirname, 'plugin-templates' ),
 	blockTemplatesPath: join( __dirname, 'block-templates' ),
-	assetsPath: join( __dirname, 'assets' ),
 };

@@ -44,7 +44,7 @@ add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' 
  * @return string The content of the block being rendered.
  */
 function block_core_gallery_render( $attributes, $content ) {
-	$gap = _wp_array_get( $attributes, array( 'style', 'spacing', 'blockGap' ) );
+	$gap = $attributes['style']['spacing']['blockGap'] ?? null;
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.
@@ -76,13 +76,10 @@ function block_core_gallery_render( $attributes, $content ) {
 		}
 	}
 
-	$class   = wp_unique_id( 'wp-block-gallery-' );
-	$content = preg_replace(
-		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="' . $class . ' ',
-		$content,
-		1
-	);
+	$unique_gallery_classname = wp_unique_id( 'wp-block-gallery-' );
+	$processed_content        = new WP_HTML_Tag_Processor( $content );
+	$processed_content->next_tag();
+	$processed_content->add_class( $unique_gallery_classname );
 
 	// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
 	// gap on the gallery.
@@ -102,10 +99,23 @@ function block_core_gallery_render( $attributes, $content ) {
 	}
 
 	// Set the CSS variable to the column value, and the `gap` property to the combined gap value.
-	$style = '.wp-block-gallery.' . $class . '{ --wp--style--unstable-gallery-gap: ' . $gap_column . '; gap: ' . $gap_value . '}';
+	$gallery_styles = array(
+		array(
+			'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
+			'declarations' => array(
+				'--wp--style--unstable-gallery-gap' => $gap_column,
+				'gap'                               => $gap_value,
+			),
+		),
+	);
 
-	gutenberg_enqueue_block_support_styles( $style, 11 );
-	return $content;
+	wp_style_engine_get_stylesheet_from_css_rules(
+		$gallery_styles,
+		array(
+			'context' => 'block-supports',
+		)
+	);
+	return (string) $processed_content;
 }
 /**
  * Registers the `core/gallery` block on server.

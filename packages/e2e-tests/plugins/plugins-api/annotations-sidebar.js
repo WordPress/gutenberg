@@ -94,7 +94,7 @@
 				PluginSidebar,
 				{
 					name: 'annotations-sidebar',
-					title: __( 'Annotations Sidebar' ),
+					title: __( 'Annotations' ),
 				},
 				el( SidebarContents, {} )
 			),
@@ -103,7 +103,7 @@
 				{
 					target: 'annotations-sidebar',
 				},
-				__( 'Annotations Sidebar' )
+				__( 'Annotations' )
 			)
 		);
 	}

@@ -32,10 +32,11 @@ export const settings = {
 			return;
 		}
 
-		const entity = select( coreDataStore ).getEntityRecord(
+		const { getCurrentTheme, getEntityRecord } = select( coreDataStore );
+		const entity = getEntityRecord(
 			'postType',
 			'wp_template_part',
-			theme + '//' + slug
+			( theme || getCurrentTheme()?.stylesheet ) + '//' + slug
 		);
 		if ( ! entity ) {
 			return;
@@ -60,15 +61,15 @@ export const init = () => {
 	const DISALLOWED_PARENTS = [ 'core/post-template', 'core/post-content' ];
 	addFilter(
 		'blockEditor.__unstableCanInsertBlockType',
-		'removeTemplatePartsFromPostTemplates',
+		'core/block-library/removeTemplatePartsFromPostTemplates',
 		(
-			can,
+			canInsert,
 			blockType,
 			rootClientId,
 			{ getBlock, getBlockParentsByBlockName }
 		) => {
 			if ( blockType.name !== 'core/template-part' ) {
-				return can;
+				return canInsert;
 			}
 
 			for ( const disallowedParentType of DISALLOWED_PARENTS ) {

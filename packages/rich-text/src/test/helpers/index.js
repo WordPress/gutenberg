@@ -11,8 +11,6 @@ const em = { type: 'em' };
 const strong = { type: 'strong' };
 const img = { type: 'img', attributes: { src: '' } };
 const a = { type: 'a', attributes: { href: '#' } };
-const ul = { type: 'ul' };
-const ol = { type: 'ol' };
 
 export const spec = [
 	{
@@ -72,25 +70,6 @@ export const spec = [
 			formats: [ [ em ], [ em ] ],
 			replacements: [ , , ],
 			text: 'hi',
-		},
-	},
-	{
-		description: 'should replace characters to format HTML with space',
-		html: '\n\n\r\n\t',
-		createRange: ( element ) => ( {
-			startOffset: 0,
-			startContainer: element,
-			endOffset: 1,
-			endContainer: element,
-		} ),
-		startPath: [ 0, 0 ],
-		endPath: [ 0, 1 ],
-		record: {
-			start: 0,
-			end: 1,
-			formats: [ , ],
-			replacements: [ , ],
-			text: ' ',
 		},
 	},
 	{
@@ -441,200 +420,6 @@ export const spec = [
 		},
 	},
 	{
-		description: 'should handle empty multiline value',
-		multilineTag: 'p',
-		html: '<p></p>',
-		createRange: ( element ) => ( {
-			startOffset: 0,
-			startContainer: element.firstChild,
-			endOffset: 0,
-			endContainer: element.firstChild,
-		} ),
-		startPath: [ 0, 0, 0 ],
-		endPath: [ 0, 0, 0 ],
-		record: {
-			start: 0,
-			end: 0,
-			formats: [],
-			replacements: [],
-			text: '',
-		},
-	},
-	{
-		description: 'should handle multiline value',
-		multilineTag: 'p',
-		html: '<p>one</p><p>two</p>',
-		createRange: ( element ) => ( {
-			startOffset: 1,
-			startContainer: element.querySelector( 'p' ).firstChild,
-			endOffset: 0,
-			endContainer: element.lastChild,
-		} ),
-		startPath: [ 0, 0, 1 ],
-		endPath: [ 1, 0, 0 ],
-		record: {
-			start: 1,
-			end: 4,
-			formats: [ , , , , , , , ],
-			replacements: [ , , , , , , , ],
-			text: 'one\u2028two',
-		},
-	},
-	{
-		description: 'should handle multiline list value',
-		multilineTag: 'li',
-		multilineWrapperTags: [ 'ul', 'ol' ],
-		html: '<li>one<ul><li>a</li><li>b<ol><li>1</li><li>2</li></ol></li></ul></li><li>three</li>',
-		createRange: ( element ) => ( {
-			startOffset: 0,
-			startContainer: element,
-			endOffset: 1,
-			endContainer: element.querySelector( 'ol > li' ).firstChild,
-		} ),
-		startPath: [ 0, 0, 0 ],
-		endPath: [ 0, 1, 1, 1, 0, 0, 1 ],
-		record: {
-			start: 0,
-			end: 9,
-			formats: [ , , , , , , , , , , , , , , , , , ],
-			replacements: [
-				,
-				,
-				,
-				[ ul ],
-				,
-				[ ul ],
-				,
-				[ ul, ol ],
-				,
-				[ ul, ol ],
-				,
-				,
-				,
-				,
-				,
-				,
-				,
-			],
-			text: 'one\u2028a\u2028b\u20281\u20282\u2028three',
-		},
-	},
-	{
-		description: 'should handle empty list value',
-		multilineTag: 'li',
-		multilineWrapperTags: [ 'ul', 'ol' ],
-		html: '<li></li>',
-		createRange: ( element ) => ( {
-			startOffset: 0,
-			startContainer: element.firstChild,
-			endOffset: 0,
-			endContainer: element.firstChild,
-		} ),
-		startPath: [ 0, 0, 0 ],
-		endPath: [ 0, 0, 0 ],
-		record: {
-			start: 0,
-			end: 0,
-			formats: [],
-			replacements: [],
-			text: '',
-		},
-	},
-	{
-		description: 'should handle nested empty list value',
-		multilineTag: 'li',
-		multilineWrapperTags: [ 'ul', 'ol' ],
-		html: '<li><ul><li></li></ul></li>',
-		createRange: ( element ) => ( {
-			startOffset: 0,
-			startContainer: element.querySelector( 'ul > li' ),
-			endOffset: 0,
-			endContainer: element.querySelector( 'ul > li' ),
-		} ),
-		startPath: [ 0, 2, 0, 0, 0 ],
-		endPath: [ 0, 2, 0, 0, 0 ],
-		record: {
-			start: 1,
-			end: 1,
-			formats: [ , ],
-			replacements: [ [ ul ] ],
-			text: '\u2028',
-		},
-	},
-	{
-		description: 'should handle middle empty list value',
-		multilineTag: 'li',
-		multilineWrapperTags: [ 'ul', 'ol' ],
-		html: '<li></li><li></li><li></li>',
-		createRange: ( element ) => ( {
-			startOffset: 0,
-			startContainer: element.firstChild.nextSibling,
-			endOffset: 0,
-			endContainer: element.firstChild.nextSibling,
-		} ),
-		startPath: [ 1, 1, 1 ],
-		endPath: [ 1, 1, 1 ],
-		record: {
-			start: 1,
-			end: 1,
-			formats: [ , , ],
-			replacements: [ , , ],
-			text: '\u2028\u2028',
-		},
-	},
-	{
-		description: 'should handle multiline value with empty',
-		multilineTag: 'p',
-		html: '<p>one</p><p></p>',
-		createRange: ( element ) => ( {
-			startOffset: 0,
-			startContainer: element.lastChild,
-			endOffset: 0,
-			endContainer: element.lastChild,
-		} ),
-		startPath: [ 1, 0, 0 ],
-		endPath: [ 1, 0, 0 ],
-		record: {
-			start: 4,
-			end: 4,
-			formats: [ , , , , ],
-			replacements: [ , , , , ],
-			text: 'one\u2028',
-		},
-	},
-	{
-		description: 'should handle multiline value with element selection',
-		multilineTag: 'li',
-		multilineWrapperTags: [ 'ul', 'ol' ],
-		html: '<li>one</li>',
-		createRange: ( element ) => ( {
-			startOffset: 1,
-			startContainer: element.firstChild,
-			endOffset: 1,
-			endContainer: element.firstChild,
-		} ),
-		startPath: [ 0, 0, 3 ],
-		endPath: [ 0, 0, 3 ],
-		record: {
-			start: 3,
-			end: 3,
-			formats: [ , , , ],
-			replacements: [ , , , ],
-			text: 'one',
-		},
-	},
-	{
-		description: 'should ignore formats at line separator',
-		multilineTag: 'p',
-		startPath: [],
-		endPath: [],
-		record: {
-			formats: [ [ em ], [ em ], [ em ], [ em ], [ em ], [ em ], [ em ] ],
-			replacements: [ , , , , , , , ],
-			text: 'one\u2028two',
-		},
-	},
-	{
 		description: 'should remove padding',
 		html: ZWNBSP,
 		createRange: ( element ) => ( {
@@ -784,6 +569,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'my-plugin/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {},
 					},
@@ -808,6 +594,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'my-plugin/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {
 							class: 'test',
@@ -834,6 +621,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'core/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {
 							class: 'custom-format',
@@ -899,6 +687,7 @@ export const specWithRegistration = [
 				[
 					{
 						type: 'my-plugin/link',
+						tagName: 'a',
 						attributes: {},
 						unregisteredAttributes: {},
 					},
@@ -906,6 +695,31 @@ export const specWithRegistration = [
 			],
 			replacements: [ , ],
 			text: 'a',
+		},
+	},
+	{
+		description: 'should be non editable',
+		formatName: 'my-plugin/non-editable',
+		formatType: {
+			title: 'Non Editable',
+			tagName: 'a',
+			className: 'non-editable',
+			contentEditable: false,
+			edit() {},
+		},
+		html: '<a class="non-editable">a</a>',
+		value: {
+			formats: [ , ],
+			replacements: [
+				{
+					type: 'my-plugin/non-editable',
+					tagName: 'a',
+					attributes: {},
+					unregisteredAttributes: {},
+					innerHTML: 'a',
+				},
+			],
+			text: OBJECT_REPLACEMENT_CHARACTER,
 		},
 	},
 ];

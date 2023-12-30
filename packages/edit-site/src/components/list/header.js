@@ -9,10 +9,18 @@ import { __experimentalHeading as Heading } from '@wordpress/components';
  * Internal dependencies
  */
 import AddNewTemplate from '../add-new-template';
+import { store as editSiteStore } from '../../store';
 
 export default function Header( { templateType } ) {
-	const postType = useSelect(
-		( select ) => select( coreStore ).getPostType( templateType ),
+	const { canCreate, postType } = useSelect(
+		( select ) => {
+			const { supportsTemplatePartsMode } =
+				select( editSiteStore ).getSettings();
+			return {
+				postType: select( coreStore ).getPostType( templateType ),
+				canCreate: ! supportsTemplatePartsMode,
+			};
+		},
 		[ templateType ]
 	);
 
@@ -26,9 +34,15 @@ export default function Header( { templateType } ) {
 				{ postType.labels?.name }
 			</Heading>
 
-			<div className="edit-site-list-header__right">
-				<AddNewTemplate templateType={ templateType } />
-			</div>
+			{ canCreate && (
+				<div className="edit-site-list-header__right">
+					<AddNewTemplate
+						templateType={ templateType }
+						showIcon={ false }
+						toggleProps={ { variant: 'primary' } }
+					/>
+				</div>
+			) }
 		</header>
 	);
 }

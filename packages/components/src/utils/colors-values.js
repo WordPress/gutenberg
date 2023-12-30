@@ -22,20 +22,6 @@ const GRAY = {
 	100: '#f0f0f0',
 };
 
-const DARK_GRAY = {
-	500: '#555d66', // Use this most of the time for dark items.
-	300: '#6c7781', // Lightest gray that can be used for AA text contrast.
-	150: '#8d96a0', // Lightest gray that can be used for AA non-text contrast.
-};
-
-const LIGHT_GRAY = {
-	800: '#b5bcc2',
-	600: '#d7dade',
-	400: '#e8eaeb', // Good for "readonly" input fields and special text selection.
-	300: '#edeff0',
-	200: '#f3f4f5',
-};
-
 // Matches @wordpress/base-styles
 const ALERT = {
 	yellow: '#f0b849',
@@ -43,21 +29,21 @@ const ALERT = {
 	green: '#4ab866',
 };
 
-// Matches @wordpress/base-styles
+// Matches the Modern admin scheme in @wordpress/base-styles
 const ADMIN = {
-	theme: 'var( --wp-admin-theme-color, #007cba)',
-	themeDark10: 'var( --wp-admin-theme-color-darker-10, #006ba1)',
+	theme: 'var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))',
+	themeDark10:
+		'var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6))',
 };
 
 const UI = {
-	theme: ADMIN.theme,
 	background: white,
-	backgroundDisabled: LIGHT_GRAY[ 200 ], // TODO: Replace with WordPress gray
-	border: GRAY[ 700 ],
+	backgroundDisabled: GRAY[ 100 ],
+	border: GRAY[ 600 ],
 	borderHover: GRAY[ 700 ],
-	borderFocus: ADMIN.themeDark10,
+	borderFocus: ADMIN.theme,
 	borderDisabled: GRAY[ 400 ],
-	textDisabled: DARK_GRAY[ 150 ], // TODO: Replace with WordPress gray
+	textDisabled: GRAY[ 600 ],
 	textDark: white,
 
 	// Matches @wordpress/base-styles
@@ -65,21 +51,19 @@ const UI = {
 	lightGrayPlaceholder: rgba( white, 0.65 ),
 };
 
+const THEME = {
+	accent: ADMIN.theme,
+	accentDarker10: ADMIN.themeDark10,
+};
+
 export const COLORS = Object.freeze( {
-	/**
-	 * @deprecated Try to use `gray` instead.
-	 */
-	darkGray: DARK_GRAY,
 	/**
 	 * The main gray color object.
 	 */
 	gray: GRAY,
-	/**
-	 * @deprecated Try to use `gray` instead.
-	 */
-	lightGray: LIGHT_GRAY,
 	white,
 	alert: ALERT,
+	theme: THEME,
 	ui: UI,
 } );
 

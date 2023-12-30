@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/comment-template",
 	"title": "Comment Template",
 	"category": "design",
@@ -9,9 +9,13 @@
 	"textdomain": "default",
 	"usesContext": [ "postId" ],
 	"supports": {
-		"reusable": false,
-		"html": false,
 		"align": true,
+		"html": false,
+		"reusable": false,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,

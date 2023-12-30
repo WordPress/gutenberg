@@ -1,6 +1,6 @@
 # Core Data
 
-Core Data is a [data module](https://github.com/WordPress/gutenberg/tree/HEAD/packages/data/README.md) intended to simplify access to and manipulation of core WordPress entities. It registers its own store and provides a number of selectors which resolve data from the WordPress REST API automatically, along with dispatching action creators to manipulate data. Core data is shipped with [`TypeScript definitions for WordPress data types`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/core-data/src/types/README.md).
+Core Data is a [data module](https://github.com/WordPress/gutenberg/tree/HEAD/packages/data/README.md) intended to simplify access to and manipulation of core WordPress entities. It registers its own store and provides a number of selectors which resolve data from the WordPress REST API automatically, along with dispatching action creators to manipulate data. Core data is shipped with [`TypeScript definitions for WordPress data types`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/core-data/src/entity-types/README.md).
 
 Used in combination with features of the data module such as [`subscribe`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/data/README.md#subscribe-function) or [higher-order components](https://github.com/WordPress/gutenberg/tree/HEAD/packages/data/README.md#higher-order-components), it enables a developer to easily add data into the logic and display of their plugin.
 
@@ -40,6 +40,122 @@ function MyAuthorsListBase() {
 }
 ```
 
+## What's an entity?
+
+An entity represents a data source. Each item within the entity is called an entity record. Available entities are defined in `rootEntitiesConfig` at ./src/entities.js.
+
+As of right now, the default entities defined by this package map to the [REST API handbook](https://developer.wordpress.org/rest-api/reference/), though there is nothing in the design that prevents it from being used to interact with any other API.
+
+What follows is a description of some of the properties of `rootEntitiesConfig`.
+
+### Connecting the entity with the data source
+
+#### baseURL
+
+-   Type: string.
+-   Example: `'/wp/v2/users'`.
+
+This property maps the entity to a given endpoint, taking its relative URL as value.
+
+#### baseURLParams
+
+-   Type: `object`.
+-   Example: `{ context: 'edit' }`.
+
+Additional parameters to the request, added as a query string. Each property will be converted into a field/value pair. For example, given the `baseURL: '/wp/v2/users'` and the `baseURLParams: { context: 'edit' }` the URL would be `/wp/v2/users?context=edit`.
+
+#### key
+
+-   Type: `string`.
+-   Example: `'slug'`.
+
+The entity engine aims to convert the API response into a number of entity records. Responses can come in different shapes, which are processed differently.
+
+Responses that represent a single object map to a single entity record. For example:
+
+```json
+{
+	"title": "...",
+	"description": "...",
+	"...": "..."
+}
+```
+
+Responses that represent a collection shaped as an array, map to as many entity records as elements of the array. For example:
+
+```json
+[
+	{ "id": 1, "name": "...", "...": "..." },
+	{ "id": 2, "name": "...", "...": "..." },
+	{ "id": 3, "name": "...", "...": "..." }
+]
+```
+
+There are also cases in which a response represents a collection shaped as an object, whose key is one of the property's values. Each of the nested objects should be its own entity record. For this case not to be confused with single object/entities, the entity configuration must provide the property key that holds the value acting as the object key. In the following example, the `slug` property's value is acting as the object key, hence the entity config must declare `key: 'slug'` for each nested object to be processed as an individual entity record:
+
+```json
+{
+	"publish": { "slug": "publish", "name": "Published", "...": "..." },
+	"draft": { "slug": "draft", "name": "Draft", "...": "..." },
+	"future": { "slug": "future", "name": "Future", "...": "..." }
+}
+```
+
+### Interacting with entity records
+
+Entity records are unique. For entities that are collections, it's assumed that each record has an `id` property which serves as an identifier to manage it. If the entity defines a `key`, that property would be used as its identifier instead of the assumed `id`.
+
+#### name
+
+-   Type: `string`.
+-   Example: `user`.
+
+The name of the entity. To be used in the utilities that interact with it (selectors, actions, hooks).
+
+#### kind
+
+-   Type: `string`.
+-   Example: `root`.
+
+Entities can be grouped by `kind`. To be used in the utilities that interact with them (selectors, actions, hooks).
+
+The package provides general methods to interact with the entities (`getEntityRecords`, `getEntityRecord`, etc.) by leveraging the `kind` and `name` properties:
+
+```js
+// Get the record collection for the user entity.
+wp.data.select( 'core' ).getEntityRecords( 'root', 'user' );
+
+// Get a single record for the user entity.
+wp.data.select( 'core' ).getEntityRecord( 'root', 'user', recordId );
+```
+
+#### plural
+
+-   Type: `string`.
+-   Example: `statuses`.
+
+In addition to the general utilities (`getEntityRecords`, `getEntityRecord`, etc.), the package dynamically creates nicer-looking methods to interact with the entity records of the `root` kind, both the collection and single records. Compare the general and nicer-looking methods as follows:
+
+```js
+// Collection
+wp.data.select( 'core' ).getEntityRecords( 'root', 'user' );
+wp.data.select( 'core' ).getUsers();
+
+// Single record
+wp.data.select( 'core' ).getEntityRecord( 'root', 'user', recordId );
+wp.data.select( 'core' ).getUser( recordId );
+```
+
+Sometimes, the pluralized form of an entity is not regular (it is not formed by adding a `-s` suffix). The `plural` property of the entity config allows to declare an alternative pluralized form for the dynamic methods created for the entity. For example, given the `status` entity that declares the `statuses` plural, there are the following methods created for it:
+
+```js
+// Collection
+wp.data.select( 'core' ).getStatuses();
+
+// Single record
+wp.data.select( 'core' ).getStatus( recordId );
+```
+
 ## Actions
 
 The following set of dispatching action creators are available on the object returned by `wp.data.dispatch( 'core' )`:
@@ -74,17 +190,29 @@ _Parameters_
 
 ### editEntityRecord
 
-Returns an action object that triggers an
-edit to an entity record.
+Returns an action object that triggers an edit to an entity record.
 
 _Parameters_
 
 -   _kind_ `string`: Kind of the edited entity record.
 -   _name_ `string`: Name of the edited entity record.
--   _recordId_ `number`: Record ID of the edited entity record.
+-   _recordId_ `number|string`: Record ID of the edited entity record.
 -   _edits_ `Object`: The edits.
 -   _options_ `Object`: Options for the edit.
 -   _options.undoIgnore_ `[boolean]`: Whether to ignore the edit in undo history or not.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### receiveDefaultTemplateId
+
+Returns an action object used to set the template for a given query.
+
+_Parameters_
+
+-   _query_ `Object`: The lookup query.
+-   _templateId_ `string`: The resolved template id.
 
 _Returns_
 
@@ -102,10 +230,37 @@ _Parameters_
 -   _query_ `?Object`: Query Object.
 -   _invalidateCache_ `?boolean`: Should invalidate query caches.
 -   _edits_ `?Object`: Edits to reset.
+-   _meta_ `?Object`: Meta information about pagination.
 
 _Returns_
 
 -   `Object`: Action object.
+
+### receiveNavigationFallbackId
+
+Returns an action object signalling that the fallback Navigation Menu id has been received.
+
+_Parameters_
+
+-   _fallbackId_ `integer`: the id of the fallback Navigation Menu
+
+_Returns_
+
+-   `Object`: Action object.
+
+### receiveRevisions
+
+Action triggered to receive revision items.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the received entity record revisions.
+-   _name_ `string`: Name of the received entity record revisions.
+-   _recordKey_ `number|string`: The key of the entity record whose revisions you want to fetch.
+-   _records_ `Array|Object`: Revisions received.
+-   _query_ `?Object`: Query Object.
+-   _invalidateCache_ `?boolean`: Should invalidate query caches.
+-   _meta_ `?Object`: Meta information about pagination.
 
 ### receiveThemeSupports
 
@@ -133,8 +288,7 @@ _Returns_
 
 ### redo
 
-Action triggered to redo the last undoed
-edit to an entity record, if any.
+Action triggered to redo the last undoed edit to an entity record, if any.
 
 ### saveEditedEntityRecord
 
@@ -163,8 +317,7 @@ _Parameters_
 
 ### undo
 
-Action triggered to undo the last edit to
-an entity record, if any.
+Action triggered to undo the last edit to an entity record, if any.
 
 <!-- END TOKEN(Autogenerated actions|src/actions.js) -->
 
@@ -176,11 +329,9 @@ The following selectors are available on the object returned by `wp.data.select(
 
 ### canUser
 
-Returns whether the current user can perform the given action on the given
-REST resource.
+Returns whether the current user can perform the given action on the given REST resource.
 
-Calling this may trigger an OPTIONS request to the REST API via the
-`canUser()` resolver.
+Calling this may trigger an OPTIONS request to the REST API via the `canUser()` resolver.
 
 <https://developer.wordpress.org/rest-api/reference/>
 
@@ -199,8 +350,7 @@ _Returns_
 
 Returns whether the current user can edit the given entity.
 
-Calling this may trigger an OPTIONS request to the REST API via the
-`canUser()` resolver.
+Calling this may trigger an OPTIONS request to the REST API via the `canUser()` resolver.
 
 <https://developer.wordpress.org/rest-api/reference/>
 
@@ -224,7 +374,7 @@ Returns all available authors.
 _Parameters_
 
 -   _state_ `State`: Data state.
--   _query_ `GetRecordsHttpQuery`: Optional object of query parameters to include with request.
+-   _query_ `GetRecordsHttpQuery`: Optional object of query parameters to include with request. For valid query parameters see the [Users page](https://developer.wordpress.org/rest-api/reference/users/) in the REST API Handbook and see the arguments for [List Users](https://developer.wordpress.org/rest-api/reference/users/#list-users) and [Retrieve a User](https://developer.wordpress.org/rest-api/reference/users/#retrieve-a-user).
 
 _Returns_
 
@@ -249,8 +399,7 @@ _Returns_
 
 Returns the latest autosaves for the post.
 
-May return multiple autosaves since the backend stores one autosave per
-author for each post.
+May return multiple autosaves since the backend stores one autosave per author for each post.
 
 _Parameters_
 
@@ -298,6 +447,20 @@ _Returns_
 
 -   `any`: The current theme.
 
+### getCurrentThemeGlobalStylesRevisions
+
+> **Deprecated** since WordPress 6.5.0. Callers should use `select( 'core' ).getRevisions( 'root', 'globalStyles', ${ recordKey } )` instead, where `recordKey` is the id of the global styles parent post.
+
+Returns the revisions of the current global styles theme.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Array< object > | null`: The current global styles.
+
 ### getCurrentUser
 
 Returns the current user.
@@ -309,6 +472,19 @@ _Parameters_
 _Returns_
 
 -   `undefined< 'edit' >`: Current user object.
+
+### getDefaultTemplateId
+
+Returns the default template use to render a given query.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _query_ `TemplateQuery`: Query.
+
+_Returns_
+
+-   `string`: The default template id for the given query.
 
 ### getEditedEntityRecord
 
@@ -398,9 +574,7 @@ _Returns_
 
 ### getEntityRecord
 
-Returns the Entity's record object by key. Returns `null` if the value is not
-yet received, undefined if the value entity is known to not exist, or the
-entity object if it exists and is received.
+Returns the Entity's record object by key. Returns `null` if the value is not yet received, undefined if the value entity is known to not exist, or the entity object if it exists and is received.
 
 _Parameters_
 
@@ -408,7 +582,7 @@ _Parameters_
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _key_ `EntityRecordKey`: Record's key
--   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available "Retrieve a [Entity kind]".
 
 _Returns_
 
@@ -433,9 +607,7 @@ _Returns_
 
 Returns the specified entity record's non transient edits.
 
-Transient edits don't create an undo level, and
-are not considered for change detection.
-They are defined in the entity's config.
+Transient edits don't create an undo level, and are not considered for change detection. They are defined in the entity's config.
 
 _Parameters_
 
@@ -457,11 +629,41 @@ _Parameters_
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
 -   `EntityRecord[] | null`: Records.
+
+### getEntityRecordsTotalItems
+
+Returns the Entity's total available records for a given query (ignoring pagination).
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+
+_Returns_
+
+-   `number | null`: number | null.
+
+### getEntityRecordsTotalPages
+
+Returns the number of available pages for the given query.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. If requesting specific fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+
+_Returns_
+
+-   `number | null`: number | null.
 
 ### getLastEntityDeleteError
 
@@ -495,8 +697,7 @@ _Returns_
 
 ### getRawEntityRecord
 
-Returns the entity's record object by key,
-with its attributes mapped to their raw values.
+Returns the entity's record object by key, with its attributes mapped to their raw values.
 
 _Parameters_
 
@@ -511,8 +712,9 @@ _Returns_
 
 ### getRedoEdit
 
-Returns the next edit from the current undo offset
-for the entity records edits history, if any.
+> **Deprecated** since 6.3
+
+Returns the next edit from the current undo offset for the entity records edits history, if any.
 
 _Parameters_
 
@@ -524,9 +726,7 @@ _Returns_
 
 ### getReferenceByDistinctEdits
 
-Returns a new reference when edited values have changed. This is useful in
-inferring where an edit has been made between states by comparison of the
-return values using strict equality.
+Returns a new reference when edited values have changed. This is useful in inferring where an edit has been made between states by comparison of the return values using strict equality.
 
 _Usage_
 
@@ -537,11 +737,44 @@ _Usage_
 
 _Parameters_
 
--   _state_ `State`: Editor state.
+-   _state_ Editor state.
 
 _Returns_
 
 -   A value whose reference will change only when an edit occurs.
+
+### getRevision
+
+Returns a single, specific revision of a parent entity.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
+-   _revisionKey_ `EntityRecordKey`: The revision's key.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [entity kind]".
+
+_Returns_
+
+-   `RevisionRecord | Record< PropertyKey, never > | undefined`: Record.
+
+### getRevisions
+
+Returns an entity's revisions.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+
+_Returns_
+
+-   `RevisionRecord[] | null`: Record.
 
 ### getThemeSupports
 
@@ -557,8 +790,9 @@ _Returns_
 
 ### getUndoEdit
 
-Returns the previous edit from the current undo offset
-for the entity records edits history, if any.
+> **Deprecated** since 6.3
+
+Returns the previous edit from the current undo offset for the entity records edits history, if any.
 
 _Parameters_
 
@@ -567,6 +801,18 @@ _Parameters_
 _Returns_
 
 -   `Optional< any >`: The edit.
+
+### getUserPatternCategories
+
+Retrieve the registered user pattern categories.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `Array< UserPatternCategory >`: User patterns category array.
 
 ### getUserQueryResults
 
@@ -583,8 +829,7 @@ _Returns_
 
 ### hasEditsForEntityRecord
 
-Returns true if the specified entity record has edits,
-and false otherwise.
+Returns true if the specified entity record has edits, and false otherwise.
 
 _Parameters_
 
@@ -599,15 +844,14 @@ _Returns_
 
 ### hasEntityRecords
 
-Returns true if records have been received for the given set of parameters,
-or false otherwise.
+Returns true if records have been received for the given set of parameters, or false otherwise.
 
 _Parameters_
 
 -   _state_ `State`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _query_ `GetRecordsHttpQuery`: Optional terms query.
+-   _query_ `GetRecordsHttpQuery`: Optional terms query. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
 
 _Returns_
 
@@ -629,8 +873,7 @@ _Returns_
 
 ### hasRedo
 
-Returns true if there is a next edit from the current undo offset
-for the entity records edits history, and false otherwise.
+Returns true if there is a next edit from the current undo offset for the entity records edits history, and false otherwise.
 
 _Parameters_
 
@@ -642,8 +885,7 @@ _Returns_
 
 ### hasUndo
 
-Returns true if there is a previous edit from the current undo offset
-for the entity records edits history, and false otherwise.
+Returns true if there is a previous edit from the current undo offset for the entity records edits history, and false otherwise.
 
 _Parameters_
 
@@ -687,9 +929,7 @@ _Returns_
 
 Determines if the returned preview is an oEmbed link fallback.
 
-WordPress can be configured to return a simple link to a URL if it is not embeddable.
-We need to be able to determine if a URL is embeddable or not, based on what we
-get back from the oEmbed preview API.
+WordPress can be configured to return a simple link to a URL if it is not embeddable. We need to be able to determine if a URL is embeddable or not, based on what we get back from the oEmbed preview API.
 
 _Parameters_
 
@@ -702,8 +942,7 @@ _Returns_
 
 ### isRequestingEmbedPreview
 
-Returns true if a request is in progress for embed preview data, or false
-otherwise.
+Returns true if a request is in progress for embed preview data, or false otherwise.
 
 _Parameters_
 
@@ -765,8 +1004,8 @@ application, the page and the resolution details will be retrieved from
 the store state using `getEntityRecord()`, or resolved if missing.
 
 ```js
+import { useCallback } from 'react';
 import { useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { TextControl } from '@wordpress/components';
 import { store as noticeStore } from '@wordpress/notices';
@@ -842,7 +1081,7 @@ Resolves the specified entity records.
 _Usage_
 
 ```js
-import { useEntityRecord } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 
 function PageTitlesList() {
 	const { records, isResolving } = useEntityRecords( 'postType', 'page' );

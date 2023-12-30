@@ -18,18 +18,18 @@ Go ahead and create these files using the following snippets:
 **src/index.js:**
 
 ```js
-import { render } from '@wordpress/element';
+import { createRoot } from 'react-dom';
 
 function MyFirstApp() {
 	return <span>Hello from JavaScript!</span>;
 }
 
+const root = createRoot( document.getElementById( 'my-first-gutenberg-app' ) );
 window.addEventListener(
 	'load',
 	function () {
-		render(
+		root.render(
 			<MyFirstApp />,
-			document.querySelector( '#my-first-gutenberg-app' )
 		);
 	},
 	false
@@ -163,29 +163,32 @@ add_action( 'admin_enqueue_scripts', 'load_custom_wp_admin_scripts' );
 
 ```json
 {
-	"name": "05-recipe-card-esnext",
-	"version": "1.1.0",
-	"private": true,
-	"description": "Example: Recipe Card (ESNext).",
-	"author": "The WordPress Contributors",
-	"license": "GPL-2.0-or-later",
-	"keywords": [ "WordPress", "block" ],
-	"homepage": "https://github.com/WordPress/gutenberg-examples/",
-	"repository": "git+https://github.com/WordPress/gutenberg-examples.git",
-	"bugs": {
-		"url": "https://github.com/WordPress/gutenberg-examples/issues"
-	},
-	"main": "build/index.js",
-	"devDependencies": {
-		"@wordpress/scripts": "^18.0.1"
-	},
-	"scripts": {
-		"build": "wp-scripts build",
-		"format": "wp-scripts format",
-		"lint:js": "wp-scripts lint-js",
-		"packages-update": "wp-scripts packages-update",
-		"start": "wp-scripts start"
-	}
+  "name": "09-code-data-basics-esnext",
+  "version": "1.1.0",
+  "private": true,
+  "description": "My first Gutenberg App",
+  "author": "The WordPress Contributors",
+  "license": "GPL-2.0-or-later",
+  "keywords": [
+    "WordPress",
+    "block"
+  ],
+  "homepage": "https://github.com/WordPress/gutenberg-examples/",
+  "repository": "git+https://github.com/WordPress/gutenberg-examples.git",
+  "bugs": {
+    "url": "https://github.com/WordPress/gutenberg-examples/issues"
+  },
+  "main": "build/index.js",
+  "devDependencies": {
+    "@wordpress/scripts": "^24.0.0"
+  },
+  "scripts": {
+    "build": "wp-scripts build",
+    "format": "wp-scripts format",
+    "lint:js": "wp-scripts lint-js",
+    "packages-update": "wp-scripts packages-update",
+    "start": "wp-scripts start"
+  }
 }
 ```
 
@@ -209,4 +212,4 @@ Congratulations! You are now ready to start building the app!
 
 -   Previous part: [Introduction](/docs/how-to-guides/data-basics/README.md)
 -   Next part: [Building a basic list of pages](/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md)
--   (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/09-code-data-basics-esnext) in the gutenberg-examples repository
+-   (optional) Review the [finished app](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8) in the block-development-examples repository

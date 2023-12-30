@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from '@wordpress/element';
 import { Tooltip } from './styles/range-control-styles';
 
 import type { TooltipProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 export default function SimpleTooltip(
 	props: WordPressComponentProps< TooltipProps, 'span' >
@@ -59,7 +59,7 @@ function useTooltipPosition( { inputRef, tooltipPosition }: TooltipProps ) {
 		if ( inputRef && inputRef.current ) {
 			setPosition( tooltipPosition );
 		}
-	}, [ tooltipPosition ] );
+	}, [ tooltipPosition, inputRef ] );
 
 	useEffect( () => {
 		setTooltipPosition();

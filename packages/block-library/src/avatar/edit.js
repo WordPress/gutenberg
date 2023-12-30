@@ -35,6 +35,8 @@ const AvatarInspectorControls = ( {
 	<InspectorControls>
 		<PanelBody title={ __( 'Settings' ) }>
 			<RangeControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				label={ __( 'Image size' ) }
 				onChange={ ( newSize ) =>
 					setAttributes( {
@@ -47,6 +49,7 @@ const AvatarInspectorControls = ( {
 				value={ attributes?.size }
 			/>
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Link to user profile' ) }
 				onChange={ () =>
 					setAttributes( { isLink: ! attributes.isLink } )
@@ -121,7 +124,6 @@ const ResizableAvatar = ( {
 				<img
 					src={ doubledSizedSrc }
 					alt={ avatar.alt }
-					{ ...borderProps }
 					className={ classnames(
 						'avatar',
 						'avatar-' + attributes.size,
@@ -129,9 +131,7 @@ const ResizableAvatar = ( {
 						'wp-block-avatar__image',
 						borderProps.className
 					) }
-					style={ {
-						...borderProps.style, // Border radius, width and style.
-					} }
+					style={ borderProps.style }
 				/>
 			</ResizableBox>
 		</div>

@@ -7,6 +7,7 @@ import {
 	justifyCenter,
 	justifyRight,
 	justifySpaceBetween,
+	justifyStretch,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -15,6 +16,7 @@ const icons = {
 	center: justifyCenter,
 	right: justifyRight,
 	'space-between': justifySpaceBetween,
+	stretch: justifyStretch,
 };
 
 function JustifyContentUI( {
@@ -65,6 +67,13 @@ function JustifyContentUI( {
 			title: __( 'Space between items' ),
 			isActive: 'space-between' === value,
 			onClick: () => handleClick( 'space-between' ),
+		},
+		{
+			name: 'stretch',
+			icon: justifyStretch,
+			title: __( 'Stretch items' ),
+			isActive: 'stretch' === value,
+			onClick: () => handleClick( 'stretch' ),
 		},
 	];
 

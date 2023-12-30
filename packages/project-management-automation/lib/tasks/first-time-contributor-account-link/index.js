@@ -34,7 +34,7 @@ function getPromptMessageText( author ) {
 
 /**
  * Prompts the user to link their GitHub account to their WordPress.org profile
- * if neccessary for props credit.
+ * if necessary for props credit.
  *
  * @param {WebhookPayloadPush} payload Push event payload.
  * @param {GitHub}             octokit Initialized Octokit REST client.

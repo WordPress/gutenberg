@@ -25,6 +25,7 @@ export default function useBlockLock( clientId ) {
 				canLockBlockType,
 				getBlockName,
 				getBlockRootClientId,
+				getTemplateLock,
 			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 
@@ -37,6 +38,7 @@ export default function useBlockLock( clientId ) {
 				canMove,
 				canRemove,
 				canLock: canLockBlockType( getBlockName( clientId ) ),
+				isContentLocked: getTemplateLock( clientId ) === 'contentOnly',
 				isLocked: ! canEdit || ! canMove || ! canRemove,
 			};
 		},

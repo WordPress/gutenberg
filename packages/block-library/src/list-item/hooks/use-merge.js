@@ -3,16 +3,13 @@
  */
 import { useRegistry, useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { getDefaultBlockName, switchToBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import useOutdentListItem from './use-outdent-list-item';
 
-import { name as listItemName } from '../block.json';
-
-export default function useMerge( clientId ) {
+export default function useMerge( clientId, onMerge ) {
 	const registry = useRegistry();
 	const {
 		getPreviousBlockClientId,
@@ -20,11 +17,10 @@ export default function useMerge( clientId ) {
 		getBlockOrder,
 		getBlockRootClientId,
 		getBlockName,
-		getBlock,
 	} = useSelect( blockEditorStore );
-	const { mergeBlocks, moveBlocksToPosition, replaceBlock, selectBlock } =
+	const { mergeBlocks, moveBlocksToPosition } =
 		useDispatch( blockEditorStore );
-	const [ , outdentListItem ] = useOutdentListItem( clientId );
+	const outdentListItem = useOutdentListItem();
 
 	function getTrailingId( id ) {
 		const order = getBlockOrder( id );
@@ -40,7 +36,7 @@ export default function useMerge( clientId ) {
 		const listId = getBlockRootClientId( id );
 		const parentListItemId = getBlockRootClientId( listId );
 		if ( ! parentListItemId ) return;
-		if ( getBlockName( parentListItemId ) !== listItemName ) return;
+		if ( getBlockName( parentListItemId ) !== 'core/list-item' ) return;
 		return parentListItemId;
 	}
 
@@ -79,43 +75,37 @@ export default function useMerge( clientId ) {
 		return getBlockOrder( order[ 0 ] )[ 0 ];
 	}
 
-	function switchToDefaultBlockType( forward ) {
-		const rootClientId = getBlockRootClientId( clientId );
-		const replacement = switchToBlockType(
-			getBlock( rootClientId ),
-			getDefaultBlockName()
-		);
-		const indexToSelect = forward ? replacement.length - 1 : 0;
-		const initialPosition = forward ? -1 : 0;
-		registry.batch( () => {
-			replaceBlock( rootClientId, replacement );
-			selectBlock(
-				replacement[ indexToSelect ].clientId,
-				initialPosition
-			);
-		} );
-	}
-
 	return ( forward ) => {
+		function mergeWithNested( clientIdA, clientIdB ) {
+			registry.batch( () => {
+				// When merging a sub list item with a higher next list item, we
+				// also need to move any nested list items. Check if there's a
+				// listed list, and append its nested list items to the current
+				// list.
+				const [ nestedListClientId ] = getBlockOrder( clientIdB );
+				if ( nestedListClientId ) {
+					moveBlocksToPosition(
+						getBlockOrder( nestedListClientId ),
+						nestedListClientId,
+						getBlockRootClientId( clientIdA )
+					);
+				}
+				mergeBlocks( clientIdA, clientIdB );
+			} );
+		}
+
 		if ( forward ) {
 			const nextBlockClientId = getNextId( clientId );
 
 			if ( ! nextBlockClientId ) {
-				switchToDefaultBlockType( forward );
+				onMerge( forward );
 				return;
 			}
 
 			if ( getParentListItemId( nextBlockClientId ) ) {
 				outdentListItem( nextBlockClientId );
 			} else {
-				registry.batch( () => {
-					moveBlocksToPosition(
-						getBlockOrder( nextBlockClientId ),
-						nextBlockClientId,
-						getPreviousBlockClientId( nextBlockClientId )
-					);
-					mergeBlocks( clientId, nextBlockClientId );
-				} );
+				mergeWithNested( clientId, nextBlockClientId );
 			}
 		} else {
 			// Merging is only done from the top level. For lowel levels, the
@@ -125,16 +115,9 @@ export default function useMerge( clientId ) {
 				outdentListItem( clientId );
 			} else if ( previousBlockClientId ) {
 				const trailingId = getTrailingId( previousBlockClientId );
-				registry.batch( () => {
-					moveBlocksToPosition(
-						getBlockOrder( clientId ),
-						clientId,
-						previousBlockClientId
-					);
-					mergeBlocks( trailingId, clientId );
-				} );
+				mergeWithNested( trailingId, clientId );
 			} else {
-				switchToDefaultBlockType( forward );
+				onMerge( forward );
 			}
 		}
 	};

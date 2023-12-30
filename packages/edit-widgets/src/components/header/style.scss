@@ -3,11 +3,40 @@
 	align-items: center;
 	justify-content: space-between;
 	height: $header-height;
-	padding: 0 $grid-unit-20;
 	overflow: auto;
+	background: #fff;
 
 	@include break-small {
 		overflow: visible;
+	}
+
+	.selected-block-tools-wrapper {
+		overflow-x: hidden;
+
+		.block-editor-block-contextual-toolbar {
+			border-bottom: 0;
+		}
+
+		// Modified group borders
+		.components-toolbar-group,
+		.components-toolbar {
+			border-right: none;
+
+			&::after {
+				content: "";
+				width: $border-width;
+				margin-top: $grid-unit + $grid-unit-05;
+				margin-bottom: $grid-unit + $grid-unit-05;
+				background-color: $gray-300;
+				margin-left: $grid-unit;
+			}
+
+			& .components-toolbar-group.components-toolbar-group {
+				&::after {
+					display: none;
+				}
+			}
+		}
 	}
 }
 
@@ -15,6 +44,9 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	flex-shrink: 2;
+	overflow-x: hidden;
+	padding-left: $grid-unit-20;
 }
 
 .edit-widgets-header__title {
@@ -26,7 +58,7 @@
 .edit-widgets-header__actions {
 	display: flex;
 	align-items: center;
-
+	padding-right: $grid-unit-20;
 	gap: $grid-unit-05;
 
 	@include break-small() {

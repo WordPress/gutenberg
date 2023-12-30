@@ -73,10 +73,10 @@ export function clamp( value, min, max ) {
 /**
  * Clamps a value based on a min/max range with rounding
  *
- * @param {number} value The value.
- * @param {number} min   The minimum range.
- * @param {number} max   The maximum range.
- * @param {number} step  A multiplier for the value.
+ * @param {number | string} value The value.
+ * @param {number}          min   The minimum range.
+ * @param {number}          max   The maximum range.
+ * @param {number}          step  A multiplier for the value.
  *
  * @return {number} The rounded and clamped value.
  */
@@ -95,15 +95,4 @@ export function roundClamp(
 	return precision
 		? getNumber( clampedValue.toFixed( precision ) )
 		: clampedValue;
-}
-
-/**
- * Clamps a value based on a min/max range with rounding.
- * Returns a string.
- *
- * @param {Parameters<typeof roundClamp>} args Arguments for roundClamp().
- * @return {string} The rounded and clamped value.
- */
-export function roundClampString( ...args ) {
-	return roundClamp( ...args ).toString();
 }

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
@@ -26,20 +21,22 @@ function KeyCombination( { keyCombination, forceAriaLabel } ) {
 			className="customize-widgets-keyboard-shortcut-help-modal__shortcut-key-combination"
 			aria-label={ forceAriaLabel || ariaLabel }
 		>
-			{ castArray( shortcut ).map( ( character, index ) => {
-				if ( character === '+' ) {
-					return <Fragment key={ index }>{ character }</Fragment>;
-				}
+			{ ( Array.isArray( shortcut ) ? shortcut : [ shortcut ] ).map(
+				( character, index ) => {
+					if ( character === '+' ) {
+						return <Fragment key={ index }>{ character }</Fragment>;
+					}
 
-				return (
-					<kbd
-						key={ index }
-						className="customize-widgets-keyboard-shortcut-help-modal__shortcut-key"
-					>
-						{ character }
-					</kbd>
-				);
-			} ) }
+					return (
+						<kbd
+							key={ index }
+							className="customize-widgets-keyboard-shortcut-help-modal__shortcut-key"
+						>
+							{ character }
+						</kbd>
+					);
+				}
+			) }
 		</kbd>
 	);
 }

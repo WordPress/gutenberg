@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { TouchableWithoutFeedback } from 'react-native';
-import { isEmpty } from 'lodash';
 import classnames from 'classnames/dedupe';
 
 /**
@@ -11,6 +10,7 @@ import classnames from 'classnames/dedupe';
 import { View } from '@wordpress/primitives';
 import {
 	BlockCaption,
+	RichText,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
@@ -52,7 +52,7 @@ const EmbedPreview = ( {
 		styles[ `embed-preview__sandbox--align-${ align }` ];
 
 	function accessibilityLabelCreator( caption ) {
-		return isEmpty( caption )
+		return RichText.isEmpty( caption )
 			? /* translators: accessibility text. Empty Embed caption. */
 			  __( 'Embed caption. Empty' )
 			: sprintf(

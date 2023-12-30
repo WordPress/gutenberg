@@ -36,7 +36,7 @@ describe( 'FormToggle', () => {
 			const { container } = render( <FormToggle onChange={ noop } /> );
 
 			expect( getInput() ).not.toBeChecked();
-			expect( container.firstChild ).toMatchSnapshot();
+			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'should render a checked checkbox when providing checked prop', () => {
@@ -79,9 +79,7 @@ describe( 'FormToggle', () => {
 
 	describe( 'Value', () => {
 		it( 'should flip the checked property when clicked', async () => {
-			const user = userEvent.setup( {
-				advanceTimers: jest.advanceTimersByTime,
-			} );
+			const user = userEvent.setup();
 
 			const onChange = jest.fn();
 			render( <ControlledFormToggle onChange={ onChange } /> );
