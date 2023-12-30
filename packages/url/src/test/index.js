@@ -254,23 +254,20 @@ describe( 'isValidPath', () => {
 } );
 
 describe( 'getFilename', () => {
-	it( 'returns the filename part of the URL', () => {
-		expect( getFilename( 'https://wordpress.org/image.jpg' ) ).toBe(
-			'image.jpg'
-		);
-		expect(
-			getFilename( 'https://wordpress.org/image.jpg?query=test' )
-		).toBe( 'image.jpg' );
-		expect( getFilename( 'https://wordpress.org/image.jpg#anchor' ) ).toBe(
-			'image.jpg'
-		);
-		expect(
-			getFilename( 'http://localhost:8080/a/path/to/an/image.jpg' )
-		).toBe( 'image.jpg' );
-		expect( getFilename( '/path/to/an/image.jpg' ) ).toBe( 'image.jpg' );
-		expect( getFilename( 'path/to/an/image.jpg' ) ).toBe( 'image.jpg' );
-		expect( getFilename( '/image.jpg' ) ).toBe( 'image.jpg' );
-		expect( getFilename( 'image.jpg' ) ).toBe( 'image.jpg' );
+	it.each( [
+		[ 'https://wordpress.org/image.jpg', 'image.jpg' ],
+		[ 'https://wordpress.org/image.jpg?query=test', 'image.jpg' ],
+		[ 'https://wordpress.org/image.jpg#anchor', 'image.jpg' ],
+		[ 'http://localhost:8080/a/path/to/an/image.jpg', 'image.jpg' ],
+		[ '/path/to/an/image.jpg', 'image.jpg' ],
+		[ 'path/to/an/image.jpg', 'image.jpg' ],
+		[ '/image.jpg', 'image.jpg' ],
+		[ 'https://wordpress.org/file.pdf', 'file.pdf' ],
+		[ 'https://wordpress.org/image.webp?query=test', 'image.webp' ],
+		[ 'https://wordpress.org/video.mov#anchor', 'video.mov' ],
+		[ 'http://localhost:8080/a/path/to/audio.mp3', 'audio.mp3' ],
+	] )( 'returns the filename part of the URL: %s', ( url, filename ) => {
+		expect( getFilename( url ) ).toBe( filename );
 	} );
 
 	it( 'returns undefined when the provided value does not contain a filename', () => {

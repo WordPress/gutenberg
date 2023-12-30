@@ -6,22 +6,24 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { PAGE_CONTENT_BLOCK_TYPES } from '../../page-content-focus-manager/constants';
 import { unlock } from '../../../lock-unlock';
 
 const { BlockQuickNavigation } = unlock( blockEditorPrivateApis );
 
 export default function PageContent() {
-	const clientIds = useSelect(
+	const clientIdsTree = useSelect(
 		( select ) =>
-			select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
-				PAGE_CONTENT_BLOCK_TYPES
-			),
+			unlock( select( blockEditorStore ) ).getEnabledClientIdsTree(),
 		[]
+	);
+	const clientIds = useMemo(
+		() => clientIdsTree.map( ( { clientId } ) => clientId ),
+		[ clientIdsTree ]
 	);
 	return <BlockQuickNavigation clientIds={ clientIds } />;
 }

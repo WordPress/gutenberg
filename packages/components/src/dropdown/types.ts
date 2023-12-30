@@ -62,11 +62,8 @@ export type DropdownProps = {
 	 */
 	onClose?: () => void;
 	/**
-	 * A callback invoked when the state of the popover changes
+	 * A callback invoked when the state of the dropdown changes
 	 * from open to closed and vice versa.
-	 * The callback receives a boolean as a parameter.
-	 * If true, the popover will open.
-	 * If false, the popover will close.
 	 */
 	onToggle?: ( willOpen: boolean ) => void;
 	/**
@@ -111,6 +108,17 @@ export type DropdownProps = {
 	 * @deprecated
 	 */
 	position?: PopoverProps[ 'position' ];
+	/**
+	 * The controlled open state of the dropdown.
+	 * Must be used in conjunction with `onToggle`.
+	 */
+	open?: boolean;
+	/**
+	 * The open state of the dropdown when initially rendered.
+	 * Use when you do not need to control its open state. It will be overridden
+	 * by the `open` prop if it is specified on the component's first render.
+	 */
+	defaultOpen?: boolean;
 };
 
 export type DropdownInternalContext = {

@@ -106,15 +106,7 @@ export const getSupportedStyles = createSelector(
 
 		// Check for blockGap support.
 		// Block spacing support doesn't map directly to a single style property, so needs to be handled separately.
-		// Also, only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
-		if (
-			blockType?.supports?.spacing?.blockGap &&
-			blockType?.supports?.spacing?.__experimentalSkipSerialization !==
-				true &&
-			! blockType?.supports?.spacing?.__experimentalSkipSerialization?.some?.(
-				( spacingType ) => spacingType === 'blockGap'
-			)
-		) {
+		if ( blockType?.supports?.spacing?.blockGap ) {
 			supportKeys.push( 'blockGap' );
 		}
 
@@ -160,3 +152,27 @@ export const getSupportedStyles = createSelector(
 	},
 	( state, name ) => [ state.blockTypes[ name ] ]
 );
+
+/**
+ * Returns the bootstrapped block type metadata for a give block name.
+ *
+ * @param {Object} state Data state.
+ * @param {string} name  Block name.
+ *
+ * @return {Object} Bootstrapped block type metadata for a block.
+ */
+export function getBootstrappedBlockType( state, name ) {
+	return state.bootstrappedBlockTypes[ name ];
+}
+
+/**
+ * Returns all the unprocessed (before applying the `registerBlockType` filter)
+ * block type settings as passed during block registration.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Unprocessed block type settings for all blocks.
+ */
+export function getUnprocessedBlockTypes( state ) {
+	return state.unprocessedBlockTypes;
+}

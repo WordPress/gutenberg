@@ -6,13 +6,13 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin(
-			'gutenberg-test-inner-blocks-allowed-blocks'
+			'gutenberg-test-innerblocks-allowed-blocks'
 		);
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
-			'gutenberg-test-inner-blocks-allowed-blocks'
+			'gutenberg-test-innerblocks-allowed-blocks'
 		);
 	} );
 
@@ -107,7 +107,9 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/Allowed Blocks Dynamic' );
 		await page.keyboard.press( 'Enter' );
 
@@ -128,18 +130,36 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		await blockListBox.getByRole( 'option', { name: 'List' } ).click();
 		// Select the list wrapper and then parent block.
 		await page.keyboard.press( 'ArrowUp' );
-		await editor.clickBlockToolbarButton( 'Select Allowed Blocks Dynamic' );
+		await editor.clickBlockToolbarButton(
+			'Select parent block: Allowed Blocks Dynamic'
+		);
 
 		// Insert the image.
 		await blockAppender.click();
 		await blockListBox.getByRole( 'option', { name: 'Image' } ).click();
 
-		await editor.clickBlockToolbarButton( 'Select Allowed Blocks Dynamic' );
+		await editor.clickBlockToolbarButton(
+			'Select parent block: Allowed Blocks Dynamic'
+		);
 		await blockAppender.click();
 
 		// It should display a different allowed block list.
 		await expect( blockListBox.getByRole( 'option' ) ).toHaveText( [
 			'Gallery',
+			'Video',
+		] );
+
+		await blockListBox.getByRole( 'option', { name: 'Gallery' } ).click();
+
+		await editor.clickBlockToolbarButton(
+			'Select parent block: Allowed Blocks Dynamic'
+		);
+		await blockAppender.click();
+
+		// It should display a different allowed block list.
+		await expect( blockListBox.getByRole( 'option' ) ).toHaveText( [
+			'Gallery',
+			'List',
 			'Video',
 		] );
 	} );

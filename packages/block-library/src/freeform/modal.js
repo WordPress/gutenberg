@@ -13,6 +13,29 @@ import {
 import { useEffect, useState, RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { fullscreen } from '@wordpress/icons';
+import { useViewportMatch } from '@wordpress/compose';
+
+function ModalAuxiliaryActions( { onClick, isModalFullScreen } ) {
+	// 'small' to match the rules in editor.scss.
+	const isMobileViewport = useViewportMatch( 'small', '<' );
+	if ( isMobileViewport ) {
+		return null;
+	}
+
+	return (
+		<Button
+			onClick={ onClick }
+			icon={ fullscreen }
+			isPressed={ isModalFullScreen }
+			label={
+				isModalFullScreen
+					? __( 'Exit fullscreen' )
+					: __( 'Enter fullscreen' )
+			}
+		/>
+	);
+}
 
 function ClassicEdit( props ) {
 	const styles = useSelect(
@@ -58,6 +81,7 @@ export default function ModalEdit( props ) {
 		onReplace,
 	} = props;
 	const [ isOpen, setOpen ] = useState( false );
+	const [ isModalFullScreen, setIsModalFullScreen ] = useState( false );
 	const id = `editor-${ clientId }`;
 
 	const onClose = () => ( content ? setOpen( false ) : onReplace( [] ) );
@@ -78,6 +102,16 @@ export default function ModalEdit( props ) {
 					onRequestClose={ onClose }
 					shouldCloseOnClickOutside={ false }
 					overlayClassName="block-editor-freeform-modal"
+					isFullScreen={ isModalFullScreen }
+					className="block-editor-freeform-modal__content"
+					headerActions={
+						<ModalAuxiliaryActions
+							onClick={ () =>
+								setIsModalFullScreen( ! isModalFullScreen )
+							}
+							isModalFullScreen={ isModalFullScreen }
+						/>
+					}
 				>
 					<ClassicEdit id={ id } defaultValue={ content } />
 					<Flex

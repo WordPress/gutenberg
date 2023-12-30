@@ -10,10 +10,10 @@
 	"usesContext": [
 		"queryId",
 		"query",
-		"queryContext",
 		"displayLayout",
 		"templateSlug",
-		"previewPostType"
+		"previewPostType",
+		"enhancedPagination"
 	],
 	"supports": {
 		"reusable": false,

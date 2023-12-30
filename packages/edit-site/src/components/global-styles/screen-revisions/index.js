@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
-	Button,
 	__experimentalUseNavigator as useNavigator,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Spinner,
@@ -21,32 +20,45 @@ import {
 import ScreenHeader from '../header';
 import { unlock } from '../../../lock-unlock';
 import Revisions from '../../revisions';
-import SidebarFixedBottom from '../../sidebar-edit-mode/sidebar-fixed-bottom';
 import { store as editSiteStore } from '../../../store';
 import useGlobalStylesRevisions from './use-global-styles-revisions';
 import RevisionsButtons from './revisions-buttons';
+import StyleBook from '../../style-book';
+import Pagination from '../../pagination';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
+const PAGE_SIZE = 10;
+
 function ScreenRevisions() {
-	const { goBack } = useNavigator();
-	const { user: userConfig, setUserConfig } =
+	const { goTo } = useNavigator();
+	const { user: currentEditorGlobalStyles, setUserConfig } =
 		useContext( GlobalStylesContext );
-	const { blocks, editorCanvasContainerView } = useSelect( ( select ) => {
-		return {
+	const { blocks, editorCanvasContainerView } = useSelect(
+		( select ) => ( {
 			editorCanvasContainerView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
 			blocks: select( blockEditorStore ).getBlocks(),
-		};
-	}, [] );
-	const { revisions, isLoading, hasUnsavedChanges } =
-		useGlobalStylesRevisions();
-	const [ selectedRevisionId, setSelectedRevisionId ] = useState();
-	const [ globalStylesRevision, setGlobalStylesRevision ] =
-		useState( userConfig );
+		} ),
+		[]
+	);
+	const [ currentPage, setCurrentPage ] = useState( 1 );
+	const [ currentRevisions, setCurrentRevisions ] = useState( [] );
+	const { revisions, isLoading, hasUnsavedChanges, revisionsCount } =
+		useGlobalStylesRevisions( {
+			query: {
+				per_page: PAGE_SIZE,
+				page: currentPage,
+			},
+		} );
+
+	const numPages = Math.ceil( revisionsCount / PAGE_SIZE );
+
+	const [ currentlySelectedRevision, setCurrentlySelectedRevision ] =
+		useState( currentEditorGlobalStyles );
 	const [
 		isLoadingRevisionWithUnsavedChanges,
 		setIsLoadingRevisionWithUnsavedChanges,
@@ -54,16 +66,14 @@ function ScreenRevisions() {
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
-
-	useEffect( () => {
-		if ( editorCanvasContainerView !== 'global-styles-revisions' ) {
-			goBack();
-			setEditorCanvasContainerView( editorCanvasContainerView );
-		}
-	}, [ editorCanvasContainerView ] );
+	const selectedRevisionMatchesEditorStyles = areGlobalStyleConfigsEqual(
+		currentlySelectedRevision,
+		currentEditorGlobalStyles
+	);
 
 	const onCloseRevisions = () => {
-		goBack();
+		goTo( '/' ); // Return to global styles main panel.
+		setEditorCanvasContainerView( undefined );
 	};
 
 	const restoreRevision = ( revision ) => {
@@ -76,90 +86,134 @@ function ScreenRevisions() {
 	};
 
 	const selectRevision = ( revision ) => {
-		setGlobalStylesRevision( {
-			styles: revision?.styles,
-			settings: revision?.settings,
+		setCurrentlySelectedRevision( {
+			styles: revision?.styles || {},
+			settings: revision?.settings || {},
 			id: revision?.id,
 		} );
-		setSelectedRevisionId( revision?.id );
 	};
 
+	useEffect( () => {
+		if (
+			! editorCanvasContainerView ||
+			! editorCanvasContainerView.startsWith( 'global-styles-revisions' )
+		) {
+			goTo( '/' ); // Return to global styles main panel.
+			setEditorCanvasContainerView( editorCanvasContainerView );
+		}
+	}, [ editorCanvasContainerView ] );
+
+	useEffect( () => {
+		if ( ! isLoading && revisions.length ) {
+			setCurrentRevisions( revisions );
+		}
+	}, [ revisions, isLoading ] );
+
+	const firstRevision = revisions[ 0 ];
+	const currentlySelectedRevisionId = currentlySelectedRevision?.id;
+	const shouldSelectFirstItem =
+		!! firstRevision?.id &&
+		! selectedRevisionMatchesEditorStyles &&
+		! currentlySelectedRevisionId;
+
+	useEffect( () => {
+		/*
+		 * Ensure that the first item is selected and loaded into the preview pane
+		 * when no revision is selected and the selected styles don't match the current editor styles.
+		 * This is required in case editor styles are changed outside the revisions panel,
+		 * e.g., via the reset styles function of useGlobalStylesReset().
+		 * See: https://github.com/WordPress/gutenberg/issues/55866
+		 */
+		if ( shouldSelectFirstItem ) {
+			setCurrentlySelectedRevision( {
+				styles: firstRevision?.styles || {},
+				settings: firstRevision?.settings || {},
+				id: firstRevision?.id,
+			} );
+		}
+	}, [ shouldSelectFirstItem, firstRevision ] );
+
+	// Only display load button if there is a revision to load,
+	// and it is different from the current editor styles.
 	const isLoadButtonEnabled =
-		!! globalStylesRevision?.id &&
-		! areGlobalStyleConfigsEqual( globalStylesRevision, userConfig );
+		!! currentlySelectedRevisionId &&
+		currentlySelectedRevisionId !== 'unsaved' &&
+		! selectedRevisionMatchesEditorStyles;
+	const hasRevisions = !! currentRevisions.length;
 
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'Revisions' ) }
+				title={
+					revisionsCount &&
+					// translators: %s: number of revisions.
+					sprintf( __( 'Revisions (%s)' ), revisionsCount )
+				}
 				description={ __(
-					'Revisions are added to the timeline when style changes are saved.'
+					'Click on previously saved styles to preview them. To restore a selected version to the editor, hit "Apply." When you\'re ready, use the Save button to save your changes.'
 				) }
+				onBack={ onCloseRevisions }
 			/>
-			{ isLoading && (
+			{ ! hasRevisions && (
 				<Spinner className="edit-site-global-styles-screen-revisions__loading" />
 			) }
-			{ ! isLoading && (
-				<Revisions
-					blocks={ blocks }
-					userConfig={ globalStylesRevision }
-					onClose={ onCloseRevisions }
-				/>
+			{ hasRevisions &&
+				( editorCanvasContainerView ===
+				'global-styles-revisions:style-book' ? (
+					<StyleBook
+						userConfig={ currentlySelectedRevision }
+						isSelected={ () => {} }
+						onClose={ () => {
+							setEditorCanvasContainerView(
+								'global-styles-revisions'
+							);
+						} }
+					/>
+				) : (
+					<Revisions
+						blocks={ blocks }
+						userConfig={ currentlySelectedRevision }
+						closeButtonLabel={ __( 'Close revisions' ) }
+					/>
+				) ) }
+			<RevisionsButtons
+				onChange={ selectRevision }
+				selectedRevisionId={ currentlySelectedRevisionId }
+				userRevisions={ currentRevisions }
+				canApplyRevision={ isLoadButtonEnabled }
+				onApplyRevision={ () =>
+					hasUnsavedChanges
+						? setIsLoadingRevisionWithUnsavedChanges( true )
+						: restoreRevision( currentlySelectedRevision )
+				}
+			/>
+			{ numPages > 1 && (
+				<div className="edit-site-global-styles-screen-revisions__footer">
+					<Pagination
+						className="edit-site-global-styles-screen-revisions__pagination"
+						currentPage={ currentPage }
+						numPages={ numPages }
+						changePage={ setCurrentPage }
+						totalItems={ revisionsCount }
+						disabled={ isLoading }
+						label={ __( 'Global Styles pagination navigation' ) }
+					/>
+				</div>
 			) }
-			<div className="edit-site-global-styles-screen-revisions">
-				<RevisionsButtons
-					onChange={ selectRevision }
-					selectedRevisionId={ selectedRevisionId }
-					userRevisions={ revisions }
-				/>
-				{ isLoadButtonEnabled && (
-					<SidebarFixedBottom>
-						<Button
-							variant="primary"
-							className="edit-site-global-styles-screen-revisions__button"
-							disabled={
-								! globalStylesRevision?.id ||
-								globalStylesRevision?.id === 'unsaved'
-							}
-							onClick={ () => {
-								if ( hasUnsavedChanges ) {
-									setIsLoadingRevisionWithUnsavedChanges(
-										true
-									);
-								} else {
-									restoreRevision( globalStylesRevision );
-								}
-							} }
-						>
-							{ __( 'Apply' ) }
-						</Button>
-					</SidebarFixedBottom>
-				) }
-			</div>
 			{ isLoadingRevisionWithUnsavedChanges && (
 				<ConfirmDialog
-					title={ __(
-						'Loading this revision will discard all unsaved changes.'
-					) }
 					isOpen={ isLoadingRevisionWithUnsavedChanges }
-					confirmButtonText={ __( ' Discard unsaved changes' ) }
-					onConfirm={ () => restoreRevision( globalStylesRevision ) }
+					confirmButtonText={ __( 'Apply' ) }
+					onConfirm={ () =>
+						restoreRevision( currentlySelectedRevision )
+					}
 					onCancel={ () =>
 						setIsLoadingRevisionWithUnsavedChanges( false )
 					}
 				>
-					<>
-						<h2>
-							{ __(
-								'Loading this revision will discard all unsaved changes.'
-							) }
-						</h2>
-						<p>
-							{ __(
-								'Do you want to replace your unsaved changes in the editor?'
-							) }
-						</p>
-					</>
+					{ __(
+						'Any unsaved changes will be lost when you apply this revision.'
+					) }
 				</ConfirmDialog>
 			) }
 		</>

@@ -3,7 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { useReducer } from '@wordpress/element';
+import { focus } from '@wordpress/dom';
+import { useReducer, useRef, useEffect } from '@wordpress/element';
 import { lock } from '@wordpress/icons';
 
 /**
@@ -12,7 +13,7 @@ import { lock } from '@wordpress/icons';
 import BlockLockModal from './modal';
 import useBlockLock from './use-block-lock';
 
-export default function BlockLockToolbar( { clientId } ) {
+export default function BlockLockToolbar( { clientId, wrapperRef } ) {
 	const { canEdit, canMove, canRemove, canLock } = useBlockLock( clientId );
 
 	const [ isModalOpen, toggleModal ] = useReducer(
@@ -20,11 +21,50 @@ export default function BlockLockToolbar( { clientId } ) {
 		false
 	);
 
-	if ( ! canLock ) {
-		return null;
-	}
+	const lockButtonRef = useRef( null );
+	const isFirstRender = useRef( true );
+	const hasModalOpened = useRef( false );
 
-	if ( canEdit && canMove && canRemove ) {
+	const shouldHideBlockLockUI =
+		! canLock || ( canEdit && canMove && canRemove );
+
+	// Restore focus manually on the first focusable element in the toolbar
+	// when the block lock modal is closed and the block is not locked anymore.
+	// See https://github.com/WordPress/gutenberg/issues/51447
+	useEffect( () => {
+		if ( isFirstRender.current ) {
+			isFirstRender.current = false;
+			return;
+		}
+
+		if ( isModalOpen && ! hasModalOpened.current ) {
+			hasModalOpened.current = true;
+		}
+
+		// We only want to allow this effect to happen if the modal has been opened.
+		// The issue is when we're returning focus from the block lock modal to a toolbar,
+		// so it can only happen after a modal has been opened. Without this, the toolbar
+		// will steal focus on rerenders.
+		if (
+			hasModalOpened.current &&
+			! isModalOpen &&
+			shouldHideBlockLockUI
+		) {
+			focus.focusable
+				.find( wrapperRef.current, {
+					sequential: false,
+				} )
+				.find(
+					( element ) =>
+						element.tagName === 'BUTTON' &&
+						element !== lockButtonRef.current
+				)
+				?.focus();
+		}
+		// wrapperRef is a reference object and should be stable
+	}, [ isModalOpen, shouldHideBlockLockUI, wrapperRef ] );
+
+	if ( shouldHideBlockLockUI ) {
 		return null;
 	}
 
@@ -32,9 +72,12 @@ export default function BlockLockToolbar( { clientId } ) {
 		<>
 			<ToolbarGroup className="block-editor-block-lock-toolbar">
 				<ToolbarButton
+					ref={ lockButtonRef }
 					icon={ lock }
 					label={ __( 'Unlock' ) }
 					onClick={ toggleModal }
+					aria-expanded={ isModalOpen }
+					aria-haspopup="dialog"
 				/>
 			</ToolbarGroup>
 			{ isModalOpen && (

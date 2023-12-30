@@ -67,85 +67,83 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 	}
 
 	/**
-	 * Add Interactivity API directives to the navigation-submenu and page-list blocks markup using the Tag Processor
-	 * The final HTML of the navigation-submenu and the page-list blocks will look similar to this:
+	 * Gets the inner blocks for the navigation block from the unstable location attribute.
 	 *
-	 * <li
-	 *   class="has-child"
-	 *   data-wp-context='{ "core": { "navigation": { "isMenuOpen": false, "overlay": false } } }'
-	 *   data-wp-effect="effects.core.navigation.initMenu"
-	 *   data-wp-on.keydown="actions.core.navigation.handleMenuKeydown"
-	 *   data-wp-on.focusout="actions.core.navigation.handleMenuFocusout"
-	 * >
-	 *   <button
-	 *     class="wp-block-navigation-submenu__toggle"
-	 *     data-wp-on.click="actions.core.navigation.openMenu"
-	 *     data-wp-bind.aria-expanded="context.core.navigation.isMenuOpen"
-	 *   >
-	 *   </button>
-	 *   <span>Title</span>
-	 *   <ul class="wp-block-navigation__submenu-container">
-	 *     SUBMENU ITEMS
-	 *   </ul>
-	 * </li>
-	 *
-	 * @param string $w Markup of the navigation block.
-	 * @param array  $block_attributes Block attributes.
-	 *
-	 * @return string Submenu markup with the directives injected.
+	 * @param array $attributes The block attributes.
+	 * @return WP_Block_List Returns the inner blocks for the navigation block.
 	 */
-	function gutenberg_block_core_navigation_add_directives_to_submenu( $w, $block_attributes ) {
-		while ( $w->next_tag(
-			array(
-				'tag_name'   => 'LI',
-				'class_name' => 'has-child',
-			)
-		) ) {
-			// Add directives to the parent `<li>`.
-			$w->set_attribute( 'data-wp-interactive', true );
-			$w->set_attribute( 'data-wp-context', '{ "core": { "navigation": { "isMenuOpen": { "click": false, "hover": false }, "overlay": false } } }' );
-			$w->set_attribute( 'data-wp-effect', 'effects.core.navigation.initMenu' );
-			$w->set_attribute( 'data-wp-on--focusout', 'actions.core.navigation.handleMenuFocusout' );
-			$w->set_attribute( 'data-wp-on--keydown', 'actions.core.navigation.handleMenuKeydown' );
-			if ( ! isset( $block_attributes['openSubmenusOnClick'] ) || false === $block_attributes['openSubmenusOnClick'] ) {
-				$w->set_attribute( 'data-wp-on--mouseenter', 'actions.core.navigation.openMenuOnHover' );
-				$w->set_attribute( 'data-wp-on--mouseleave', 'actions.core.navigation.closeMenuOnHover' );
-			}
-
-			// Add directives to the toggle submenu button.
-			if ( $w->next_tag(
-				array(
-					'tag_name'   => 'BUTTON',
-					'class_name' => 'wp-block-navigation-submenu__toggle',
-				)
-			) ) {
-				$w->set_attribute( 'data-wp-on--click', 'actions.core.navigation.toggleMenuOnClick' );
-				$w->set_attribute( 'data-wp-bind--aria-expanded', 'selectors.core.navigation.isMenuOpen' );
-			};
-
-			// Iterate through subitems if exist.
-			gutenberg_block_core_navigation_add_directives_to_submenu( $w, $block_attributes );
+	function block_core_navigation_get_inner_blocks_from_unstable_location( $attributes ) {
+		$menu_items = block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] );
+		if ( empty( $menu_items ) ) {
+			return new WP_Block_List( array(), $attributes );
 		}
-		return $w->get_updated_html();
-	};
 
-	/**
-	 * Replaces view script for the Navigation block with version using Interactivity API.
-	 *
-	 * @param array $metadata Block metadata as read in via block.json.
-	 *
-	 * @return array Filtered block type metadata.
-	 */
-	function gutenberg_block_core_navigation_update_interactive_view_script( $metadata ) {
-		if ( 'core/navigation' === $metadata['name'] ) {
-			$metadata['viewScript'] = array( 'file:./interactivity.min.js' );
-		}
-		return $metadata;
+		$menu_items_by_parent_id = block_core_navigation_sort_menu_items_by_parent_id( $menu_items );
+		$parsed_blocks           = block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
+		return new WP_Block_List( $parsed_blocks, $attributes );
 	}
-	add_filter( 'block_type_metadata', 'gutenberg_block_core_navigation_update_interactive_view_script', 10, 1 );
 }
 
+/**
+ * Add Interactivity API directives to the navigation-submenu and page-list
+ * blocks markup using the Tag Processor.
+ *
+ * @param WP_HTML_Tag_Processor $tags             Markup of the navigation block.
+ * @param array                 $block_attributes Block attributes.
+ *
+ * @return string Submenu markup with the directives injected.
+ */
+function block_core_navigation_add_directives_to_submenu( $tags, $block_attributes ) {
+	while ( $tags->next_tag(
+		array(
+			'tag_name'   => 'LI',
+			'class_name' => 'has-child',
+		)
+	) ) {
+		// Add directives to the parent `<li>`.
+		$tags->set_attribute( 'data-wp-interactive', '{ "namespace": "core/navigation" }' );
+		$tags->set_attribute( 'data-wp-context', '{ "submenuOpenedBy": {}, "type": "submenu" }' );
+		$tags->set_attribute( 'data-wp-watch', 'callbacks.initMenu' );
+		$tags->set_attribute( 'data-wp-on--focusout', 'actions.handleMenuFocusout' );
+		$tags->set_attribute( 'data-wp-on--keydown', 'actions.handleMenuKeydown' );
 
+		// This is a fix for Safari. Without it, Safari doesn't change the active
+		// element when the user clicks on a button. It can be removed once we add
+		// an overlay to capture the clicks, instead of relying on the focusout
+		// event.
+		$tags->set_attribute( 'tabindex', '-1' );
+
+		if ( ! isset( $block_attributes['openSubmenusOnClick'] ) || false === $block_attributes['openSubmenusOnClick'] ) {
+			$tags->set_attribute( 'data-wp-on--mouseenter', 'actions.openMenuOnHover' );
+			$tags->set_attribute( 'data-wp-on--mouseleave', 'actions.closeMenuOnHover' );
+		}
+
+		// Add directives to the toggle submenu button.
+		if ( $tags->next_tag(
+			array(
+				'tag_name'   => 'BUTTON',
+				'class_name' => 'wp-block-navigation-submenu__toggle',
+			)
+		) ) {
+			$tags->set_attribute( 'data-wp-on--click', 'actions.toggleMenuOnClick' );
+			$tags->set_attribute( 'data-wp-bind--aria-expanded', 'state.isMenuOpen' );
+			// The `aria-expanded` attribute for SSR is already added in the submenu block.
+		}
+		// Add directives to the submenu.
+		if ( $tags->next_tag(
+			array(
+				'tag_name'   => 'UL',
+				'class_name' => 'wp-block-navigation__submenu-container',
+			)
+		) ) {
+			$tags->set_attribute( 'data-wp-on--focus', 'actions.openMenuOnFocus' );
+		}
+
+		// Iterate through subitems if exist.
+		block_core_navigation_add_directives_to_submenu( $tags, $block_attributes );
+	}
+	return $tags->get_updated_html();
+}
 
 /**
  * Build an array with CSS classes and inline styles defining the colors
@@ -276,10 +274,6 @@ function block_core_navigation_render_submenu_icon() {
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
 
-
-
-
-
 /**
  * Filter out empty "null" blocks from the block list.
  * 'parse_blocks' includes a null block with '\n\n' as the content when
@@ -292,7 +286,7 @@ function block_core_navigation_render_submenu_icon() {
 function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
 	$filtered = array_filter(
 		$parsed_blocks,
-		static function( $block ) {
+		static function ( $block ) {
 			return isset( $block['blockName'] );
 		}
 	);
@@ -341,7 +335,11 @@ function block_core_navigation_get_fallback_blocks() {
 	// If `core/page-list` is not registered then return empty blocks.
 	$fallback_blocks = $registry->is_registered( 'core/page-list' ) ? $page_list_fallback : array();
 
-	$navigation_post = WP_Navigation_Fallback_Gutenberg::get_fallback();
+	if ( class_exists( 'WP_Navigation_Fallback' ) ) {
+		$navigation_post = WP_Navigation_Fallback::get_fallback();
+	} else {
+		$navigation_post = Gutenberg_Navigation_Fallback::get_fallback();
+	}
 
 	// Use the first non-empty Navigation as fallback if available.
 	if ( $navigation_post ) {
@@ -409,377 +407,10 @@ function block_core_navigation_from_block_get_post_ids( $block ) {
  * @param string   $content    The saved content.
  * @param WP_Block $block      The parsed block.
  *
- * @return string Returns the post content with the legacy widget added.
+ * @return string Returns the navigation block markup.
  */
 function render_block_core_navigation( $attributes, $content, $block ) {
-	static $seen_menu_names = array();
-
-	// Flag used to indicate whether the rendered output is considered to be
-	// a fallback (i.e. the block has no menu associated with it).
-	$is_fallback = false;
-
-	$nav_menu_name = '';
-
-	/**
-	 * Deprecated:
-	 * The rgbTextColor and rgbBackgroundColor attributes
-	 * have been deprecated in favor of
-	 * customTextColor and customBackgroundColor ones.
-	 * Move the values from old attrs to the new ones.
-	 */
-	if ( isset( $attributes['rgbTextColor'] ) && empty( $attributes['textColor'] ) ) {
-		$attributes['customTextColor'] = $attributes['rgbTextColor'];
-	}
-
-	if ( isset( $attributes['rgbBackgroundColor'] ) && empty( $attributes['backgroundColor'] ) ) {
-		$attributes['customBackgroundColor'] = $attributes['rgbBackgroundColor'];
-	}
-
-	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
-
-	/**
-	 * This is for backwards compatibility after `isResponsive` attribute has been removed.
-	 */
-	$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] ) && $attributes['isResponsive'];
-	$is_responsive_menu           = isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
-
-	$inner_blocks = $block->inner_blocks;
-
-	// Ensure that blocks saved with the legacy ref attribute name (navigationMenuId) continue to render.
-	if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
-		$attributes['ref'] = $attributes['navigationMenuId'];
-	}
-
-	// If:
-	// - the gutenberg plugin is active
-	// - `__unstableLocation` is defined
-	// - we have menu items at the defined location
-	// - we don't have a relationship to a `wp_navigation` Post (via `ref`).
-	// ...then create inner blocks from the classic menu assigned to that location.
-	if (
-		defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN &&
-		array_key_exists( '__unstableLocation', $attributes ) &&
-		! array_key_exists( 'ref', $attributes ) &&
-		! empty( block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] ) )
-	) {
-		$menu_items = block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] );
-		if ( empty( $menu_items ) ) {
-			return '';
-		}
-
-		$menu_items_by_parent_id = block_core_navigation_sort_menu_items_by_parent_id( $menu_items );
-		$parsed_blocks           = block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
-		$inner_blocks            = new WP_Block_List( $parsed_blocks, $attributes );
-	}
-
-	// Load inner blocks from the navigation post.
-	if ( array_key_exists( 'ref', $attributes ) ) {
-		$navigation_post = get_post( $attributes['ref'] );
-		if ( ! isset( $navigation_post ) ) {
-			return '';
-		}
-
-		// Only published posts are valid. If this is changed then a corresponding change
-		// must also be implemented in `use-navigation-menu.js`.
-		if ( 'publish' === $navigation_post->post_status ) {
-			$nav_menu_name = $navigation_post->post_title;
-
-			if ( isset( $seen_menu_names[ $nav_menu_name ] ) ) {
-				++$seen_menu_names[ $nav_menu_name ];
-			} else {
-				$seen_menu_names[ $nav_menu_name ] = 1;
-			}
-
-			$parsed_blocks = parse_blocks( $navigation_post->post_content );
-
-			// 'parse_blocks' includes a null block with '\n\n' as the content when
-			// it encounters whitespace. This code strips it.
-			$compacted_blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
-
-			// TODO - this uses the full navigation block attributes for the
-			// context which could be refined.
-			$inner_blocks = new WP_Block_List( $compacted_blocks, $attributes );
-		}
-	}
-
-	// If there are no inner blocks then fallback to rendering an appropriate fallback.
-	if ( empty( $inner_blocks ) ) {
-		$is_fallback = true; // indicate we are rendering the fallback.
-
-		$fallback_blocks = block_core_navigation_get_fallback_blocks();
-
-		// Fallback my have been filtered so do basic test for validity.
-		if ( empty( $fallback_blocks ) || ! is_array( $fallback_blocks ) ) {
-			return '';
-		}
-
-		$inner_blocks = new WP_Block_List( $fallback_blocks, $attributes );
-	}
-
-	if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
-		return '';
-	}
-
-	/**
-	 * Filter navigation block $inner_blocks.
-	 * Allows modification of a navigation block menu items.
-	 *
-	 * @since 6.1.0
-	 *
-	 * @param \WP_Block_List $inner_blocks
-	 */
-	$inner_blocks = apply_filters( 'block_core_navigation_render_inner_blocks', $inner_blocks );
-
-	$layout_justification = array(
-		'left'          => 'items-justified-left',
-		'right'         => 'items-justified-right',
-		'center'        => 'items-justified-center',
-		'space-between' => 'items-justified-space-between',
-	);
-
-	// Restore legacy classnames for submenu positioning.
-	$layout_class = '';
-	if (
-		isset( $attributes['layout']['justifyContent'] ) &&
-		isset( $layout_justification[ $attributes['layout']['justifyContent'] ] )
-	) {
-		$layout_class .= $layout_justification[ $attributes['layout']['justifyContent'] ];
-	}
-	if ( isset( $attributes['layout']['orientation'] ) && 'vertical' === $attributes['layout']['orientation'] ) {
-		$layout_class .= ' is-vertical';
-	}
-
-	if ( isset( $attributes['layout']['flexWrap'] ) && 'nowrap' === $attributes['layout']['flexWrap'] ) {
-		$layout_class .= ' no-wrap';
-	}
-
-	// Manually add block support text decoration as CSS class.
-	$text_decoration       = _wp_array_get( $attributes, array( 'style', 'typography', 'textDecoration' ), null );
-	$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
-
-	$colors     = block_core_navigation_build_css_colors( $attributes );
-	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
-	$classes    = array_merge(
-		$colors['css_classes'],
-		$font_sizes['css_classes'],
-		$is_responsive_menu ? array( 'is-responsive' ) : array(),
-		$layout_class ? array( $layout_class ) : array(),
-		$is_fallback ? array( 'is-fallback' ) : array(),
-		$text_decoration ? array( $text_decoration_class ) : array()
-	);
-
-	$post_ids = block_core_navigation_get_post_ids( $inner_blocks );
-	if ( $post_ids ) {
-		_prime_post_caches( $post_ids, false, false );
-	}
-
-	$list_item_nav_blocks = array(
-		'core/navigation-link',
-		'core/home-link',
-		'core/site-title',
-		'core/site-logo',
-		'core/navigation-submenu',
-	);
-
-	$needs_list_item_wrapper = array(
-		'core/site-title',
-		'core/site-logo',
-	);
-
-	$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
-	$style        = $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'];
-	$class        = implode( ' ', $classes );
-
-	// If the menu name has been used previously then append an ID
-	// to the name to ensure uniqueness across a given post.
-	if ( isset( $seen_menu_names[ $nav_menu_name ] ) && $seen_menu_names[ $nav_menu_name ] > 1 ) {
-		$count         = $seen_menu_names[ $nav_menu_name ];
-		$nav_menu_name = $nav_menu_name . ' ' . ( $count );
-	}
-
-	$wrapper_attributes = get_block_wrapper_attributes(
-		array(
-			'class'      => $class,
-			'style'      => $style,
-			'aria-label' => $nav_menu_name,
-		)
-	);
-
-	$container_attributes = get_block_wrapper_attributes(
-		array(
-			'class' => 'wp-block-navigation__container ' . $class,
-			'style' => $style,
-		)
-	);
-
-	$inner_blocks_html = '';
-	$is_list_open      = false;
-	$has_submenus      = false;
-	foreach ( $inner_blocks as $inner_block ) {
-		$is_list_item = in_array( $inner_block->name, $list_item_nav_blocks, true );
-
-		if ( $is_list_item && ! $is_list_open ) {
-			$is_list_open       = true;
-			$inner_blocks_html .= sprintf(
-				'<ul %1$s>',
-				$container_attributes
-			);
-		}
-
-		if ( ! $is_list_item && $is_list_open ) {
-			$is_list_open       = false;
-			$inner_blocks_html .= '</ul>';
-		}
-
-		$inner_block_content = $inner_block->render();
-		$p                   = new WP_HTML_Tag_Processor( $inner_block_content );
-		if ( $p->next_tag(
-			array(
-				'name'       => 'LI',
-				'class_name' => 'has-child',
-			)
-		) ) {
-			$has_submenus = true;
-		}
-		if ( ! empty( $inner_block_content ) ) {
-			if ( in_array( $inner_block->name, $needs_list_item_wrapper, true ) ) {
-				$inner_blocks_html .= '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
-			} else {
-				$inner_blocks_html .= $inner_block_content;
-			}
-		}
-	}
-
-	if ( $is_list_open ) {
-		$inner_blocks_html .= '</ul>';
-	}
-
-	// If the script already exists, there is no point in removing it from viewScript.
-	$should_load_view_script = ( $is_responsive_menu || ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) );
-	$view_js_file            = 'wp-block-navigation-view';
-	if ( ! wp_script_is( $view_js_file ) ) {
-		$script_handles = $block->block_type->view_script_handles;
-
-		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-		if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file, 'wp-block-navigation-view-2' ) );
-		}
-		// If the script is needed, but it was previously removed, add it again.
-		if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
-			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file, 'wp-block-navigation-view-2' ) );
-		}
-	}
-
-	// Add directives to the submenu if needed.
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && $has_submenus && $should_load_view_script ) {
-		$w                 = new WP_HTML_Tag_Processor( $inner_blocks_html );
-		$inner_blocks_html = gutenberg_block_core_navigation_add_directives_to_submenu( $w, $attributes );
-	}
-
-	$modal_unique_id = wp_unique_id( 'modal-' );
-
-	// Determine whether or not navigation elements should be wrapped in the markup required to make it responsive,
-	// return early if they don't.
-	if ( ! $is_responsive_menu ) {
-		return sprintf(
-			'<nav %1$s>%2$s</nav>',
-			$wrapper_attributes,
-			$inner_blocks_html
-		);
-	}
-
-	$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
-
-	$responsive_container_classes = array(
-		'wp-block-navigation__responsive-container',
-		$is_hidden_by_default ? 'hidden-by-default' : '',
-		implode( ' ', $colors['overlay_css_classes'] ),
-	);
-	$open_button_classes          = array(
-		'wp-block-navigation__responsive-container-open',
-		$is_hidden_by_default ? 'always-shown' : '',
-	);
-
-	$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
-	$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg>';
-	if ( isset( $attributes['icon'] ) ) {
-		if ( 'menu' === $attributes['icon'] ) {
-			$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5zm0 7.8h14v-1.5H5v1.5zM5 19h14v-1.5H5V19z" /></svg>';
-		}
-	}
-	$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );
-	$toggle_close_button_icon    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
-	$toggle_close_button_content = $should_display_icon_label ? $toggle_close_button_icon : __( 'Close' );
-	$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
-	$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
-
-	// Add Interactivity API directives to the markup if needed.
-	$nav_element_directives          = '';
-	$open_button_directives          = '';
-	$responsive_container_directives = '';
-	$responsive_dialog_directives    = '';
-	$close_button_directives         = '';
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && $should_load_view_script ) {
-		$nav_element_directives          = '
-			data-wp-interactive
-			data-wp-context=\'{ "core": { "navigation": { "isMenuOpen": { "click": false, "hover": false }, "overlay": true, "roleAttribute": "" } } }\'
-		';
-		$open_button_directives          = '
-			data-wp-on--click="actions.core.navigation.openMenuOnClick"
-			data-wp-on--keydown="actions.core.navigation.handleMenuKeydown"
-		';
-		$responsive_container_directives = '
-			data-wp-class--has-modal-open="selectors.core.navigation.isMenuOpen"
-			data-wp-class--is-menu-open="selectors.core.navigation.isMenuOpen"
-			data-wp-effect="effects.core.navigation.initMenu"
-			data-wp-on--keydown="actions.core.navigation.handleMenuKeydown"
-			data-wp-on--focusout="actions.core.navigation.handleMenuFocusout"
-			tabindex="-1"
-		';
-		$responsive_dialog_directives    = '
-			data-wp-bind--aria-modal="selectors.core.navigation.isMenuOpen"
-			data-wp-bind--role="selectors.core.navigation.roleAttribute"
-			data-wp-effect="effects.core.navigation.focusFirstElement"
-		';
-		$close_button_directives         = '
-			data-wp-on--click="actions.core.navigation.closeMenuOnClick"
-		';
-	}
-
-	$responsive_container_markup = sprintf(
-		'<button aria-haspopup="true" %3$s class="%6$s" data-micromodal-trigger="%1$s" %11$s>%9$s</button>
-			<div class="%5$s" style="%7$s" id="%1$s" %12$s>
-				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
-					<div class="wp-block-navigation__responsive-dialog" aria-label="%8$s" %13$s>
-							<button %4$s data-micromodal-close class="wp-block-navigation__responsive-container-close" %14$s>%10$s</button>
-						<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
-							%2$s
-						</div>
-					</div>
-				</div>
-			</div>',
-		esc_attr( $modal_unique_id ),
-		$inner_blocks_html,
-		$toggle_aria_label_open,
-		$toggle_aria_label_close,
-		esc_attr( implode( ' ', $responsive_container_classes ) ),
-		esc_attr( implode( ' ', $open_button_classes ) ),
-		esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) ),
-		__( 'Menu' ),
-		$toggle_button_content,
-		$toggle_close_button_content,
-		$open_button_directives,
-		$responsive_container_directives,
-		$responsive_dialog_directives,
-		$close_button_directives
-	);
-
-	return sprintf(
-		'<nav %1$s %3$s>%2$s</nav>',
-		$wrapper_attributes,
-		$responsive_container_markup,
-		$nav_element_directives
-	);
+	return WP_Navigation_Block_Renderer::render( $attributes, $content, $block );
 }
 
 /**
@@ -795,6 +426,15 @@ function register_block_core_navigation() {
 			'render_callback' => 'render_block_core_navigation',
 		)
 	);
+
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		gutenberg_register_module(
+			'@wordpress/block-library/navigation-block',
+			gutenberg_url( '/build/interactivity/navigation.min.js' ),
+			array( '@wordpress/interactivity' ),
+			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+		);
+	}
 }
 
 add_action( 'init', 'register_block_core_navigation' );
@@ -834,7 +474,28 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
 
 /**
+ * Ensure that the view script has the `wp-interactivity` dependency.
+ *
+ * @since 6.4.0
+ *
+ * @global WP_Scripts $wp_scripts
+ */
+function block_core_navigation_ensure_interactivity_dependency() {
+	global $wp_scripts;
+	if (
+		isset( $wp_scripts->registered['wp-block-navigation-view'] ) &&
+		! in_array( 'wp-interactivity', $wp_scripts->registered['wp-block-navigation-view']->deps, true )
+	) {
+		$wp_scripts->registered['wp-block-navigation-view']->deps[] = 'wp-interactivity';
+	}
+}
+
+add_action( 'wp_print_scripts', 'block_core_navigation_ensure_interactivity_dependency' );
+
+/**
  * Turns menu item data into a nested array of parsed blocks
+ *
+ * @deprecated 6.3.0 Use WP_Navigation_Fallback::parse_blocks_from_menu_items() instead.
  *
  * @param array $menu_items               An array of menu items that represent
  *                                        an individual level of a menu.
@@ -846,7 +507,7 @@ add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_back
  */
 function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
 
-	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback_Gutenberg::parse_blocks_from_menu_items' );
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback::parse_blocks_from_menu_items' );
 
 	if ( empty( $menu_items ) ) {
 		return array();
@@ -891,11 +552,13 @@ function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_
 /**
  * Get the classic navigation menu to use as a fallback.
  *
+ * @deprecated 6.3.0 Use WP_Navigation_Fallback::get_classic_menu_fallback() instead.
+ *
  * @return object WP_Term The classic navigation.
  */
 function block_core_navigation_get_classic_menu_fallback() {
 
-	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback_Gutenberg::get_classic_menu_fallback' );
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback::get_classic_menu_fallback' );
 
 	$classic_nav_menus = wp_get_nav_menus();
 
@@ -922,7 +585,7 @@ function block_core_navigation_get_classic_menu_fallback() {
 		// Otherwise return the most recently created classic menu.
 		usort(
 			$classic_nav_menus,
-			static function( $a, $b ) {
+			static function ( $a, $b ) {
 				return $b->term_id - $a->term_id;
 			}
 		);
@@ -933,12 +596,14 @@ function block_core_navigation_get_classic_menu_fallback() {
 /**
  * Converts a classic navigation to blocks.
  *
+ * @deprecated 6.3.0 Use WP_Navigation_Fallback::get_classic_menu_fallback_blocks() instead.
+ *
  * @param  object $classic_nav_menu WP_Term The classic navigation object to convert.
  * @return array the normalized parsed blocks.
  */
 function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu ) {
 
-	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback_Gutenberg::get_classic_menu_fallback_blocks' );
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback::get_classic_menu_fallback_blocks' );
 
 	// BEGIN: Code that already exists in wp_nav_menu().
 	$menu_items = wp_get_nav_menu_items( $classic_nav_menu->term_id, array( 'update_post_term_cache' => false ) );
@@ -971,13 +636,15 @@ function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_me
 }
 
 /**
- * If there's a the classic menu then use it as a fallback.
+ * If there's a classic menu then use it as a fallback.
+ *
+ * @deprecated 6.3.0 Use WP_Navigation_Fallback::create_classic_menu_fallback() instead.
  *
  * @return array the normalized parsed blocks.
  */
 function block_core_navigation_maybe_use_classic_menu_fallback() {
 
-	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback_Gutenberg::create_classic_menu_fallback' );
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback::create_classic_menu_fallback' );
 
 	// See if we have a classic menu.
 	$classic_nav_menu = block_core_navigation_get_classic_menu_fallback();
@@ -1016,11 +683,13 @@ function block_core_navigation_maybe_use_classic_menu_fallback() {
 /**
  * Finds the most recently published `wp_navigation` Post.
  *
+ * @deprecated 6.3.0 Use WP_Navigation_Fallback::get_most_recently_published_navigation() instead.
+ *
  * @return WP_Post|null the first non-empty Navigation or null.
  */
 function block_core_navigation_get_most_recently_published_navigation() {
 
-	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback_Gutenberg::get_most_recently_published_navigation' );
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback::get_most_recently_published_navigation' );
 
 	// Default to the most recently created menu.
 	$parsed_args = array(

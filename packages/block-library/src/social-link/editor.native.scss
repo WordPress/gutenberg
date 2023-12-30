@@ -13,11 +13,6 @@
 	justify-content: center;
 }
 
-.inactiveIcon {
-	background-color: $light-quaternary;
-	color: $white;
-}
-
-.inactiveIconDark {
-	background-color: $dark-quaternary;
+.container {
+	margin: $block-selected-margin;
 }

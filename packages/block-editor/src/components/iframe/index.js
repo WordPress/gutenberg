@@ -11,7 +11,6 @@ import {
 	createPortal,
 	forwardRef,
 	useMemo,
-	useReducer,
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -32,6 +31,37 @@ import { useWritingFlow } from '../writing-flow';
 import { useCompatibilityStyles } from './use-compatibility-styles';
 import { store as blockEditorStore } from '../../store';
 
+function bubbleEvent( event, Constructor, frame ) {
+	const init = {};
+
+	for ( const key in event ) {
+		init[ key ] = event[ key ];
+	}
+
+	// Check if the event is a MouseEvent generated within the iframe.
+	// If so, adjust the coordinates to be relative to the position of
+	// the iframe. This ensures that components such as Draggable
+	// receive coordinates relative to the window, instead of relative
+	// to the iframe. Without this, the Draggable event handler would
+	// result in components "jumping" position as soon as the user
+	// drags over the iframe.
+	if ( event instanceof frame.contentDocument.defaultView.MouseEvent ) {
+		const rect = frame.getBoundingClientRect();
+		init.clientX += rect.left;
+		init.clientY += rect.top;
+	}
+
+	const newEvent = new Constructor( event.type, init );
+	if ( init.defaultPrevented ) {
+		newEvent.preventDefault();
+	}
+	const cancelled = ! frame.dispatchEvent( newEvent );
+
+	if ( cancelled ) {
+		event.preventDefault();
+	}
+}
+
 /**
  * Bubbles some event types (keydown, keypress, and dragover) to parent document
  * document to ensure that the keyboard shortcuts and drag and drop work.
@@ -40,64 +70,33 @@ import { store as blockEditorStore } from '../../store';
  * should be context dependent, e.g. actions on blocks like Cmd+A should not
  * work globally outside the block editor.
  *
- * @param {Document} doc Document to attach listeners to.
+ * @param {Document} iframeDocument Document to attach listeners to.
  */
-function bubbleEvents( doc ) {
-	const { defaultView } = doc;
-	const { frameElement } = defaultView;
-
-	function bubbleEvent( event ) {
-		const prototype = Object.getPrototypeOf( event );
-		const constructorName = prototype.constructor.name;
-		const Constructor = window[ constructorName ];
-
-		const init = {};
-
-		for ( const key in event ) {
-			init[ key ] = event[ key ];
+function useBubbleEvents( iframeDocument ) {
+	return useRefEffect( () => {
+		const { defaultView } = iframeDocument;
+		if ( ! defaultView ) {
+			return;
+		}
+		const { frameElement } = defaultView;
+		const html = iframeDocument.documentElement;
+		const eventTypes = [ 'dragover', 'mousemove' ];
+		const handlers = {};
+		for ( const name of eventTypes ) {
+			handlers[ name ] = ( event ) => {
+				const prototype = Object.getPrototypeOf( event );
+				const constructorName = prototype.constructor.name;
+				const Constructor = window[ constructorName ];
+				bubbleEvent( event, Constructor, frameElement );
+			};
+			html.addEventListener( name, handlers[ name ] );
 		}
 
-		if ( event instanceof defaultView.MouseEvent ) {
-			const rect = frameElement.getBoundingClientRect();
-			init.clientX += rect.left;
-			init.clientY += rect.top;
-		}
-
-		const newEvent = new Constructor( event.type, init );
-		const cancelled = ! frameElement.dispatchEvent( newEvent );
-
-		if ( cancelled ) {
-			event.preventDefault();
-		}
-	}
-
-	const eventTypes = [ 'dragover', 'mousemove' ];
-
-	for ( const name of eventTypes ) {
-		doc.addEventListener( name, bubbleEvent );
-	}
-}
-
-function useParsedAssets( html ) {
-	return useMemo( () => {
-		const doc = document.implementation.createHTMLDocument( '' );
-		doc.body.innerHTML = html;
-		return Array.from( doc.body.children );
-	}, [ html ] );
-}
-
-async function loadScript( head, { id, src } ) {
-	return new Promise( ( resolve, reject ) => {
-		const script = head.ownerDocument.createElement( 'script' );
-		script.id = id;
-		if ( src ) {
-			script.src = src;
-			script.onload = () => resolve();
-			script.onerror = () => reject();
-		} else {
-			resolve();
-		}
-		head.appendChild( script );
+		return () => {
+			for ( const name of eventTypes ) {
+				html.removeEventListener( name, handlers[ name ] );
+			}
+		};
 	} );
 }
 
@@ -112,21 +111,25 @@ function Iframe( {
 	forwardedRef: ref,
 	...props
 } ) {
-	const assets = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().__unstableResolvedAssets,
-		[]
-	);
-	const [ , forceRender ] = useReducer( () => ( {} ) );
+	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return {
+			resolvedAssets: settings.__unstableResolvedAssets,
+			isPreviewMode: settings.__unstableIsPreviewMode,
+		};
+	}, [] );
+	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const compatStyles = useCompatibilityStyles();
-	const scripts = useParsedAssets( assets?.scripts );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
 	const setRef = useRefEffect( ( node ) => {
+		node._load = () => {
+			setIframeDocument( node.contentDocument );
+		};
 		let iFrameDocument;
 		// Prevent the default browser action for files dropped outside of dropzones.
 		function preventFileDropDefault( event ) {
@@ -137,8 +140,6 @@ function Iframe( {
 			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
 
-			bubbleEvents( contentDocument );
-			setIframeDocument( contentDocument );
 			clearerRef( documentElement );
 
 			// Ideally ALL classes that are added through get_body_class should
@@ -154,7 +155,6 @@ function Iframe( {
 			);
 
 			contentDocument.dir = ownerDocument.dir;
-			documentElement.removeChild( contentDocument.body );
 
 			for ( const compatStyle of compatStyles ) {
 				if ( contentDocument.getElementById( compatStyle.id ) ) {
@@ -165,11 +165,13 @@ function Iframe( {
 					compatStyle.cloneNode( true )
 				);
 
-				// eslint-disable-next-line no-console
-				console.warn(
-					`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
-					compatStyle
-				);
+				if ( ! isPreviewMode ) {
+					// eslint-disable-next-line no-console
+					console.warn(
+						`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
+						compatStyle
+					);
+				}
 			}
 
 			iFrameDocument.addEventListener(
@@ -187,6 +189,7 @@ function Iframe( {
 		node.addEventListener( 'load', onLoad );
 
 		return () => {
+			delete node._load;
 			node.removeEventListener( 'load', onLoad );
 			iFrameDocument?.removeEventListener(
 				'dragover',
@@ -199,35 +202,31 @@ function Iframe( {
 		};
 	}, [] );
 
-	const headRef = useRefEffect( ( element ) => {
-		scripts
-			.reduce(
-				( promise, script ) =>
-					promise.then( () => loadScript( element, script ) ),
-				Promise.resolve()
-			)
-			.finally( () => {
-				// When script are loaded, re-render blocks to allow them
-				// to initialise.
-				forceRender();
-			} );
-	}, [] );
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
+		useBubbleEvents( iframeDocument ),
 		contentRef,
 		clearerRef,
 		writingFlowRef,
 		disabledRef,
-		headRef,
 	] );
 
 	// Correct doctype is required to enable rendering in standards
 	// mode. Also preload the styles to avoid a flash of unstyled
 	// content.
-	const html =
-		'<!doctype html>' +
-		'<style>html{height:auto!important;min-height:100%;}body{margin:0}</style>' +
-		( assets?.styles ?? '' );
+	const html = `<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script>window.frameElement._load()</script>
+		<style>html{height:auto!important;min-height:100%;}body{margin:0}</style>
+		${ styles }
+		${ scripts }
+	</head>
+	<body>
+		<script>document.currentScript.parentElement.remove()</script>
+	</body>
+</html>`;
 
 	const [ src, cleanup ] = useMemo( () => {
 		const _src = URL.createObjectURL(
@@ -246,9 +245,11 @@ function Iframe( {
 	return (
 		<>
 			{ tabIndex >= 0 && before }
+			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<iframe
 				{ ...props }
 				style={ {
+					border: 0,
 					...props.style,
 					height: expand ? contentHeight : props.style?.height,
 					marginTop:
@@ -272,9 +273,31 @@ function Iframe( {
 				// content.
 				src={ src }
 				title={ __( 'Editor canvas' ) }
+				onKeyDown={ ( event ) => {
+					// If the event originates from inside the iframe, it means
+					// it bubbled through the portal, but only with React
+					// events. We need to to bubble native events as well,
+					// though by doing so we also trigger another React event,
+					// so we need to stop the propagation of this event to avoid
+					// duplication.
+					if (
+						event.currentTarget.ownerDocument !==
+						event.target.ownerDocument
+					) {
+						event.stopPropagation();
+						bubbleEvent(
+							event,
+							window.KeyboardEvent,
+							event.currentTarget
+						);
+					}
+				} }
 			>
 				{ iframeDocument &&
 					createPortal(
+						// We want to prevent React events from bubbling throught the iframe
+						// we bubble these manually.
+						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 						<body
 							ref={ bodyRef }
 							className={ classnames(

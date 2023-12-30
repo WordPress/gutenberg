@@ -37,19 +37,19 @@ import {
 /**
  * Object containing a React element.
  *
- * @typedef {import('react').ReactElement} WPElement
+ * @typedef {import('react').ReactElement} Element
  */
 
 /**
  * Object containing a React component.
  *
- * @typedef {import('react').ComponentType} WPComponent
+ * @typedef {import('react').ComponentType} ComponentType
  */
 
 /**
  * Object containing a React synthetic event.
  *
- * @typedef {import('react').SyntheticEvent} WPSyntheticEvent
+ * @typedef {import('react').SyntheticEvent} SyntheticEvent
  */
 
 /**
@@ -67,10 +67,10 @@ export { Children };
 /**
  * Creates a copy of an element with extended props.
  *
- * @param {WPElement} element Element
- * @param {?Object}   props   Props to apply to cloned element
+ * @param {Element} element Element
+ * @param {?Object} props   Props to apply to cloned element
  *
- * @return {WPElement} Cloned element.
+ * @return {Element} Cloned element.
  */
 export { cloneElement };
 
@@ -96,9 +96,9 @@ export { createContext };
  * @param {Object}             props    Element properties, either attribute
  *                                      set to apply to DOM node or values to
  *                                      pass through to element creator
- * @param {...WPElement}       children Descendant elements
+ * @param {...Element}         children Descendant elements
  *
- * @return {WPElement} Element.
+ * @return {Element} Element.
  */
 export { createElement };
 
@@ -120,7 +120,7 @@ export { createRef };
  * @param {Function} forwarder Function passed `props` and `ref`, expected to
  *                             return an element.
  *
- * @return {WPComponent} Enhanced component.
+ * @return {Component} Enhanced component.
  */
 export { forwardRef };
 
@@ -130,11 +130,11 @@ export { forwardRef };
 export { Fragment };
 
 /**
- * Checks if an object is a valid WPElement.
+ * Checks if an object is a valid React Element.
  *
  * @param {Object} objectToCheck The object to be checked.
  *
- * @return {boolean} true if objectToTest is a valid WPElement and false otherwise.
+ * @return {boolean} true if objectToTest is a valid React Element and false otherwise.
  */
 export { isValidElement };
 

@@ -1,116 +1,65 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf, _x } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import { pencil } from '@wordpress/icons';
-import {
-	__experimentalUseNavigator as useNavigator,
-	Icon,
-} from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
+import { getQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import useEditedEntityRecord from '../use-edited-entity-record';
-import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
-import { unlock } from '../../lock-unlock';
-import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
-import { useAddedBy } from '../list/added-by';
-
-function usePatternTitleAndDescription( postType, postId ) {
-	const { getDescription, getTitle, record } = useEditedEntityRecord(
-		postType,
-		postId
-	);
-	const currentTheme = useSelect(
-		( select ) => select( coreStore ).getCurrentTheme(),
-		[]
-	);
-	const addedBy = useAddedBy( postType, postId );
-	const isAddedByActiveTheme =
-		addedBy.type === 'theme' && record.theme === currentTheme?.stylesheet;
-	const title = getTitle();
-	let descriptionText = getDescription();
-
-	if ( ! descriptionText && addedBy.text ) {
-		descriptionText = sprintf(
-			// translators: %s: pattern title e.g: "Header".
-			__( 'This is your %s pattern.' ),
-			getTitle()
-		);
-	}
-
-	if ( ! descriptionText && postType === 'wp_block' && record?.title ) {
-		descriptionText = sprintf(
-			// translators: %s: user created pattern title e.g. "Footer".
-			__( 'This is your %s pattern.' ),
-			record.title
-		);
-	}
-
-	const description = (
-		<>
-			{ descriptionText }
-
-			{ addedBy.text && ! isAddedByActiveTheme && (
-				<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description">
-					<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-author">
-						<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-author-icon">
-							{ addedBy.imageUrl ? (
-								<img
-									src={ addedBy.imageUrl }
-									alt=""
-									width="24"
-									height="24"
-								/>
-							) : (
-								<Icon icon={ addedBy.icon } />
-							) }
-						</span>
-						{ addedBy.text }
-					</span>
-
-					{ addedBy.isCustomized && (
-						<span className="edit-site-sidebar-navigation-screen-pattern__added-by-description-customized">
-							{ _x( '(Customized)', 'pattern' ) }
-						</span>
-					) }
-				</span>
-			) }
-		</>
-	);
-
-	return { title, description };
-}
+import SidebarNavigationScreen from '../sidebar-navigation-screen';
+import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
+import usePatternDetails from './use-pattern-details';
+import { store as editSiteStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+import TemplateActions from '../template-actions';
+import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
 export default function SidebarNavigationScreenPattern() {
-	const { params } = useNavigator();
-	const { postType, postId } = params;
+	const navigator = useNavigator();
+	const {
+		params: { postType, postId },
+	} = navigator;
+	const { categoryType } = getQueryArgs( window.location.href );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 
 	useInitEditedEntityFromURL();
 
-	const { title, description } = usePatternTitleAndDescription(
-		postType,
-		postId
-	);
+	const patternDetails = usePatternDetails( postType, postId );
+
+	// The absence of a category type in the query params for template parts
+	// indicates the user has arrived at the template part via the "manage all"
+	// page and the back button should return them to that list page.
+	const backPath =
+		! categoryType && postType === TEMPLATE_PART_POST_TYPE
+			? '/wp_template_part/all'
+			: '/patterns';
 
 	return (
 		<SidebarNavigationScreen
-			title={ title }
 			actions={
-				<SidebarButton
-					onClick={ () => setCanvasMode( 'edit' ) }
-					label={ __( 'Edit' ) }
-					icon={ pencil }
-				/>
+				<>
+					<TemplateActions
+						postType={ postType }
+						postId={ postId }
+						toggleProps={ { as: SidebarButton } }
+						onRemove={ () => {
+							navigator.goTo( backPath );
+						} }
+					/>
+					<SidebarButton
+						onClick={ () => setCanvasMode( 'edit' ) }
+						label={ __( 'Edit' ) }
+						icon={ pencil }
+					/>
+				</>
 			}
-			backPath={ '/library' }
-			description={ description }
+			backPath={ backPath }
+			{ ...patternDetails }
 		/>
 	);
 }

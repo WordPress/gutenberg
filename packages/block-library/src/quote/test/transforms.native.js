@@ -21,7 +21,11 @@ const initialHtml = `
 <!-- /wp:quote -->`;
 
 const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
-const blockTransforms = [ 'Pullquote', ...transformsWithInnerBlocks ];
+const blockTransforms = [
+	'Pullquote',
+	'Paragraph',
+	...transformsWithInnerBlocks,
+];
 
 setupCoreBlocks();
 

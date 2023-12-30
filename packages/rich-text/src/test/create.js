@@ -17,39 +17,28 @@ describe( 'create', () => {
 		require( '../store' );
 	} );
 
-	spec.forEach(
-		( {
-			description,
-			multilineTag,
-			multilineWrapperTags,
-			html,
-			createRange,
-			record,
-		} ) => {
-			if ( html === undefined ) {
-				return;
-			}
-
-			// eslint-disable-next-line jest/valid-title
-			it( description, () => {
-				const element = createElement( document, html );
-				const range = createRange( element );
-				const createdRecord = create( {
-					element,
-					range,
-					multilineTag,
-					multilineWrapperTags,
-				} );
-				const formatsLength = getSparseArrayLength( record.formats );
-				const createdFormatsLength = getSparseArrayLength(
-					createdRecord.formats
-				);
-
-				expect( createdRecord ).toEqual( record );
-				expect( createdFormatsLength ).toEqual( formatsLength );
-			} );
+	spec.forEach( ( { description, html, createRange, record } ) => {
+		if ( html === undefined ) {
+			return;
 		}
-	);
+
+		// eslint-disable-next-line jest/valid-title
+		it( description, () => {
+			const element = createElement( document, html );
+			const range = createRange( element );
+			const createdRecord = create( {
+				element,
+				range,
+			} );
+			const formatsLength = getSparseArrayLength( record.formats );
+			const createdFormatsLength = getSparseArrayLength(
+				createdRecord.formats
+			);
+
+			expect( createdRecord ).toEqual( record );
+			expect( createdFormatsLength ).toEqual( formatsLength );
+		} );
+	} );
 
 	specWithRegistration.forEach(
 		( {

@@ -14,15 +14,15 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
 import {
+	useCallback,
+	useMemo,
 	useState,
 	useRef,
-	useEffect,
-	useCallback,
 	memo,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
-import { focus } from '@wordpress/dom';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -35,11 +35,10 @@ import {
 } from '../block-mover/button';
 import ListViewBlockContents from './block-contents';
 import { useListViewContext } from './context';
-import { getBlockPositionDescription } from './utils';
+import { getBlockPositionDescription, focusListItem } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
-import { unlock } from '../../lock-unlock';
 import AriaReferencedText from './aria-referenced-text';
 
 function ListViewBlock( {
@@ -60,7 +59,9 @@ function ListViewBlock( {
 } ) {
 	const cellRef = useRef( null );
 	const rowRef = useRef( null );
+	const settingsRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
+	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 
 	const { isLocked, canEdit } = useBlockLock( clientId );
 
@@ -73,21 +74,26 @@ function ListViewBlock( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const blockTitle = blockInformation?.title || __( 'Untitled' );
-	const block = useSelect(
-		( select ) => select( blockEditorStore ).getBlock( clientId ),
+	const blockTitle =
+		blockInformation?.name || blockInformation?.title || __( 'Untitled' );
+
+	const { block, blockName, blockEditingMode } = useSelect(
+		( select ) => {
+			const { getBlock, getBlockName, getBlockEditingMode } =
+				select( blockEditorStore );
+
+			return {
+				block: getBlock( clientId ),
+				blockName: getBlockName( clientId ),
+				blockEditingMode: getBlockEditingMode( clientId ),
+			};
+		},
 		[ clientId ]
 	);
-	const blockName = useSelect(
-		( select ) => select( blockEditorStore ).getBlockName( clientId ),
-		[ clientId ]
-	);
-	const blockEditingMode = useSelect(
+	const allowRightClickOverrides = useSelect(
 		( select ) =>
-			unlock( select( blockEditorStore ) ).getBlockEditingMode(
-				clientId
-			),
-		[ clientId ]
+			select( blockEditorStore ).getSettings().allowRightClickOverrides,
+		[]
 	);
 
 	const showBlockActions =
@@ -120,7 +126,6 @@ function ListViewBlock( {
 	);
 
 	const {
-		isTreeGridMounted,
 		expand,
 		collapse,
 		BlockSettingsMenu,
@@ -142,14 +147,19 @@ function ListViewBlock( {
 		{ 'is-visible': isHovered || isFirstSelectedBlock }
 	);
 
-	// If ListView has experimental features related to the Persistent List View,
-	// only focus the selected list item on mount; otherwise the list would always
-	// try to steal the focus from the editor canvas.
-	useEffect( () => {
-		if ( ! isTreeGridMounted && isSelected ) {
-			cellRef.current.focus();
+	// If multiple blocks are selected, deselect all blocks when the user
+	// presses the escape key.
+	const onKeyDown = ( event ) => {
+		if (
+			event.keyCode === ESCAPE &&
+			! event.defaultPrevented &&
+			selectedClientIds.length > 0
+		) {
+			event.stopPropagation();
+			event.preventDefault();
+			selectBlock( event, undefined );
 		}
-	}, [] );
+	};
 
 	const onMouseEnter = useCallback( () => {
 		setIsHovered( true );
@@ -174,30 +184,7 @@ function ListViewBlock( {
 				selectBlock( undefined, focusClientId, null, null );
 			}
 
-			const getFocusElement = () => {
-				const row = treeGridElementRef.current?.querySelector(
-					`[role=row][data-block="${ focusClientId }"]`
-				);
-				if ( ! row ) return null;
-				// Focus the first focusable in the row, which is the ListViewBlockSelectButton.
-				return focus.focusable.find( row )[ 0 ];
-			};
-
-			let focusElement = getFocusElement();
-			if ( focusElement ) {
-				focusElement.focus();
-			} else {
-				// The element hasn't been painted yet. Defer focusing on the next frame.
-				// This could happen when all blocks have been deleted and the default block
-				// hasn't been added to the editor yet.
-				window.requestAnimationFrame( () => {
-					focusElement = getFocusElement();
-					// Ignore if the element still doesn't exist.
-					if ( focusElement ) {
-						focusElement.focus();
-					}
-				} );
-			}
+			focusListItem( focusClientId, treeGridElementRef );
 		},
 		[ selectBlock, treeGridElementRef ]
 	);
@@ -215,6 +202,56 @@ function ListViewBlock( {
 		},
 		[ clientId, expand, collapse, isExpanded ]
 	);
+
+	// Allow right-clicking an item in the List View to open up the block settings dropdown.
+	const onContextMenu = useCallback(
+		( event ) => {
+			if ( showBlockActions && allowRightClickOverrides ) {
+				settingsRef.current?.click();
+				// Ensure the position of the settings dropdown is at the cursor.
+				setSettingsAnchorRect(
+					new window.DOMRect( event.clientX, event.clientY, 0, 0 )
+				);
+				event.preventDefault();
+			}
+		},
+		[ allowRightClickOverrides, settingsRef, showBlockActions ]
+	);
+
+	const onMouseDown = useCallback(
+		( event ) => {
+			// Prevent right-click from focusing the block,
+			// because focus will be handled when opening the block settings dropdown.
+			if ( allowRightClickOverrides && event.button === 2 ) {
+				event.preventDefault();
+			}
+		},
+		[ allowRightClickOverrides ]
+	);
+
+	const settingsPopoverAnchor = useMemo( () => {
+		const { ownerDocument } = rowRef?.current || {};
+
+		// If no custom position is set, the settings dropdown will be anchored to the
+		// DropdownMenu toggle button.
+		if ( ! settingsAnchorRect || ! ownerDocument ) {
+			return undefined;
+		}
+
+		// Position the settings dropdown at the cursor when right-clicking a block.
+		return {
+			ownerDocument,
+			getBoundingClientRect() {
+				return settingsAnchorRect;
+			},
+		};
+	}, [ settingsAnchorRect ] );
+
+	const clearSettingsAnchorRect = useCallback( () => {
+		// Clear the custom position for the settings dropdown so that it is restored back
+		// to being anchored to the DropdownMenu toggle button.
+		setSettingsAnchorRect( undefined );
+	}, [ setSettingsAnchorRect ] );
 
 	let colSpan;
 	if ( hasRenderedMovers ) {
@@ -258,6 +295,7 @@ function ListViewBlock( {
 	return (
 		<ListViewLeaf
 			className={ classes }
+			onKeyDown={ onKeyDown }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onMouseEnter }
@@ -282,6 +320,8 @@ function ListViewBlock( {
 						<ListViewBlockContents
 							block={ block }
 							onClick={ selectEditorBlock }
+							onContextMenu={ onContextMenu }
+							onMouseDown={ onMouseDown }
 							onToggleExpanded={ toggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
@@ -340,6 +380,7 @@ function ListViewBlock( {
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
 					aria-selected={ !! isSelected }
+					ref={ settingsRef }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsMenu
@@ -347,10 +388,14 @@ function ListViewBlock( {
 							block={ block }
 							icon={ moreVertical }
 							label={ settingsAriaLabel }
+							popoverProps={ {
+								anchor: settingsPopoverAnchor, // Used to position the settings at the cursor on right-click.
+							} }
 							toggleProps={ {
 								ref,
 								className: 'block-editor-list-view-block__menu',
 								tabIndex,
+								onClick: clearSettingsAnchorRect,
 								onFocus,
 							} }
 							disableOpenOnArrowDown

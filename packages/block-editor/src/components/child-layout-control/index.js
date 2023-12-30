@@ -31,7 +31,7 @@ function helpText( selfStretch, parentLayout ) {
  * @param {Function} props.onChange     Function to update the child layout value.
  * @param {Object}   props.parentLayout The parent layout value.
  *
- * @return {WPElement} child layout edit element.
+ * @return {Element} child layout edit element.
  */
 export default function ChildLayoutControl( {
 	value: childLayout = {},

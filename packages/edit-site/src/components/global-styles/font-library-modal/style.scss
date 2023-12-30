@@ -1,0 +1,156 @@
+.font-library-modal {
+	// @todo: If a new prop is added to the Modal component that constrains
+	// the content width, we should use that prop instead of this style.
+	// see https://github.com/WordPress/gutenberg/issues/54471.
+	&.font-library-modal {
+
+		@include break-medium() {
+			width: 65vw;
+		}
+	}
+
+	.components-modal__header {
+		border-bottom: none;
+	}
+
+	.components-modal__content {
+		padding-top: 0;
+	}
+
+	.font-library-modal__subtitle {
+		text-transform: uppercase;
+		font-weight: 500;
+		font-size: 11px;
+	}
+}
+
+.font-library-modal__tab-layout {
+
+	main {
+		padding-bottom: 4rem;
+	}
+
+	footer {
+		border-top: 1px solid #e5e5e5;
+		margin: 0 -32px -32px;
+		padding: 16px 32px;
+		position: absolute;
+		bottom: 32px;
+		width: 100%;
+		background-color: #fff;
+	}
+
+}
+
+.font-library-modal__fonts-grid {
+	.font-library-modal__fonts-grid__main {
+		display: flex;
+		flex-direction: column;
+	}
+}
+
+.font-library-modal__font-card {
+	border: 1px solid #e5e5e5;
+	height: auto;
+	padding: 1rem;
+	margin-top: -1px; /* To collapse the margin with the previous element */
+
+	.font-library-modal__font-card__name {
+		font-weight: bold;
+	}
+
+	.font-library-modal__font-card__count {
+		color: #6e6e6e;
+	}
+}
+
+.font-library-modal__library-font-variant {
+	border: 1px solid #e5e5e5;
+	padding: 1rem;
+	margin-top: -1px; /* To collapse the margin with the previous element */
+}
+
+.font-library-modal__font-variant {
+	border-bottom: 1px solid #e5e5e5;
+	padding-bottom: 1rem;
+}
+
+.font-library-modal__tab-panel {
+	[role="tablist"] {
+		position: sticky;
+		top: 0;
+		width: calc(100% + 64px);
+		border-bottom: 1px solid #e6e6e6;
+		background: #fff;
+		margin: 0 -32px;
+		padding: 0 16px;
+		z-index: 1;
+	}
+}
+
+.font-library-modal__upload-area {
+	align-items: center;
+	display: flex;
+	justify-content: center;
+	height: 250px;
+	width: 100%;
+	background-color: #f0f0f0;
+}
+
+.font-library-modal__local-fonts {
+	margin: 0 auto;
+	width: 80%;
+
+	.font-library-modal__upload-area__text {
+		color: #6e6e6e;
+	}
+
+	.font-library-modal__upload-area__notice {
+		margin: 0;
+	}
+}
+
+.font-library-modal__font-name {
+	font-weight: bold;
+}
+
+.font-library-modal__font-filename {
+	color: #6e6e6e;
+}
+
+.font-library-modal__font-variant_demo-wrapper {
+	white-space: nowrap;
+	overflow: hidden;
+	width: 100%;
+	position: relative;
+
+	&::after {
+		content: "";
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		width: 30vw;
+		height: 100%;
+		background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+	}
+}
+
+.font-library__google-fonts-confirm {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	h3 {
+		font-size: 1.4rem;
+	}
+
+	.components-card {
+		width: 50%;
+		min-width: 250px;
+		max-width: 350px;
+	}
+}
+
+.font-library-modal__font-collection__notice {
+	margin: 0;
+}

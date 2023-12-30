@@ -17,10 +17,12 @@ import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
-import { forwardRef } from '@wordpress/element';
+import { memo } from '@wordpress/element';
 import { search, external } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -31,33 +33,39 @@ import { unlock } from '../../lock-unlock';
 
 const HUB_ANIMATION_DURATION = 0.3;
 
-const SiteHub = forwardRef( ( props, ref ) => {
-	const { canvasMode, dashboardLink, homeUrl } = useSelect( ( select ) => {
-		const { getCanvasMode, getSettings } = unlock(
-			select( editSiteStore )
-		);
+const SiteHub = memo( ( { isTransparent, className } ) => {
+	const { canvasMode, dashboardLink, homeUrl, siteTitle } = useSelect(
+		( select ) => {
+			const { getCanvasMode, getSettings } = unlock(
+				select( editSiteStore )
+			);
 
-		const {
-			getUnstableBase, // Site index.
-		} = select( coreStore );
+			const {
+				getSite,
+				getUnstableBase, // Site index.
+			} = select( coreStore );
 
-		return {
-			canvasMode: getCanvasMode(),
-			dashboardLink:
-				getSettings().__experimentalDashboardLink || 'index.php',
-			homeUrl: getUnstableBase()?.home,
-		};
-	}, [] );
+			return {
+				canvasMode: getCanvasMode(),
+				dashboardLink:
+					getSettings().__experimentalDashboardLink || 'index.php',
+				homeUrl: getUnstableBase()?.home,
+				siteTitle: getSite()?.title,
+			};
+		},
+		[]
+	);
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 
 	const disableMotion = useReducedMotion();
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const { setDeviceType } = useDispatch( editorStore );
 	const isBackToDashboardButton = canvasMode === 'view';
 	const siteIconButtonProps = isBackToDashboardButton
 		? {
 				href: dashboardLink,
-				label: __( 'Go back to the Dashboard' ),
+				label: __( 'Go to the Dashboard' ),
 		  }
 		: {
 				href: dashboardLink, // We need to keep the `href` here so the component doesn't remount as a `<button>` and break the animation.
@@ -67,22 +75,21 @@ const SiteHub = forwardRef( ( props, ref ) => {
 					event.preventDefault();
 					if ( canvasMode === 'edit' ) {
 						clearSelectedBlock();
+						setDeviceType( 'Desktop' );
 						setCanvasMode( 'view' );
 					}
 				},
 		  };
 
-	const siteTitle = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecord( 'root', 'site' )?.title,
-		[]
-	);
-
 	return (
 		<motion.div
-			ref={ ref }
-			{ ...props }
-			className={ classnames( 'edit-site-site-hub', props.className ) }
+			className={ classnames( 'edit-site-site-hub', className ) }
+			variants={ {
+				isDistractionFree: { x: '-100%' },
+				isDistractionFreeHovering: { x: 0 },
+				view: { x: 0 },
+				edit: { x: 0 },
+			} }
 			initial={ false }
 			transition={ {
 				type: 'tween',
@@ -101,7 +108,12 @@ const SiteHub = forwardRef( ( props, ref ) => {
 					spacing="0"
 				>
 					<motion.div
-						className="edit-site-site-hub__view-mode-toggle-container"
+						className={ classnames(
+							'edit-site-site-hub__view-mode-toggle-container',
+							{
+								'has-transparent-background': isTransparent,
+							}
+						) }
 						layout
 						transition={ {
 							type: 'tween',
@@ -145,7 +157,10 @@ const SiteHub = forwardRef( ( props, ref ) => {
 							exit={ {
 								opacity: 0,
 							} }
-							className="edit-site-site-hub__site-title"
+							className={ classnames(
+								'edit-site-site-hub__site-title',
+								{ 'is-transparent': isTransparent }
+							) }
 							transition={ {
 								type: 'tween',
 								duration: disableMotion ? 0 : 0.2,
@@ -160,7 +175,7 @@ const SiteHub = forwardRef( ( props, ref ) => {
 						<Button
 							href={ homeUrl }
 							target="_blank"
-							label={ __( 'View site' ) }
+							label={ __( 'View site (opens in a new tab)' ) }
 							aria-label={ __(
 								'View site (opens in a new tab)'
 							) }
@@ -171,10 +186,14 @@ const SiteHub = forwardRef( ( props, ref ) => {
 				</HStack>
 				{ canvasMode === 'view' && (
 					<Button
-						className="edit-site-site-hub_toggle-command-center"
+						className={ classnames(
+							'edit-site-site-hub_toggle-command-center',
+							{ 'is-transparent': isTransparent }
+						) }
 						icon={ search }
 						onClick={ () => openCommandCenter() }
-						label={ __( 'Open command center' ) }
+						label={ __( 'Open command palette' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
 					/>
 				) }
 			</HStack>

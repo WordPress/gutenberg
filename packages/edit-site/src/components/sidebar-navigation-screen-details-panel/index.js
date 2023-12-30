@@ -22,7 +22,7 @@ function SidebarNavigationScreenDetailsPanel( { title, children, spacing } ) {
 			{ title && (
 				<Heading
 					className="edit-site-sidebar-navigation-details-screen-panel__heading"
-					level={ 3 }
+					level={ 2 }
 				>
 					{ title }
 				</Heading>
