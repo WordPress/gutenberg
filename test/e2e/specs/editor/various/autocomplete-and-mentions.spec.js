@@ -86,9 +86,9 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				page,
 				editor,
 			} ) => {
-				await editor.canvas.click(
-					'role=button[name="Add default block"i]'
-				);
+				await editor.canvas
+					.locator( 'role=button[name="Add default block"i]' )
+					.click();
 				await page.keyboard.type( 'email@da' );
 				await expect.poll( editor.getEditedPostContent )
 					.toBe( `<!-- wp:paragraph -->
