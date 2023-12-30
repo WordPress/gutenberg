@@ -12,9 +12,10 @@ import {
 	PanelBody,
 	Placeholder,
 	RangeControl,
-	TextControl,
 	ToggleControl,
 	ToolbarGroup,
+	__experimentalHStack as HStack,
+	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { grid, list, edit, rss } from '@wordpress/icons';
@@ -66,17 +67,24 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						onSubmit={ onSubmitURL }
 						className="wp-block-rss__placeholder-form"
 					>
-						<TextControl
-							placeholder={ __( 'Enter URL here…' ) }
-							value={ feedURL }
-							onChange={ ( value ) =>
-								setAttributes( { feedURL: value } )
-							}
-							className="wp-block-rss__placeholder-input"
-						/>
-						<Button variant="primary" type="submit">
-							{ __( 'Use URL' ) }
-						</Button>
+						<HStack wrap>
+							<InputControl
+								__next40pxDefaultSize
+								placeholder={ __( 'Enter URL here…' ) }
+								value={ feedURL }
+								onChange={ ( value ) =>
+									setAttributes( { feedURL: value } )
+								}
+								className="wp-block-rss__placeholder-input"
+							/>
+							<Button
+								__next40pxDefaultSize
+								variant="primary"
+								type="submit"
+							>
+								{ __( 'Use URL' ) }
+							</Button>
+						</HStack>
 					</form>
 				</Placeholder>
 			</div>
@@ -112,6 +120,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Number of items' ) }
 						value={ itemsToShow }
 						onChange={ ( value ) =>
@@ -122,16 +131,19 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						required
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display author' ) }
 						checked={ displayAuthor }
 						onChange={ toggleAttribute( 'displayAuthor' ) }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display date' ) }
 						checked={ displayDate }
 						onChange={ toggleAttribute( 'displayDate' ) }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display excerpt' ) }
 						checked={ displayExcerpt }
 						onChange={ toggleAttribute( 'displayExcerpt' ) }
@@ -139,6 +151,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 					{ displayExcerpt && (
 						<RangeControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Max number of words in excerpt' ) }
 							value={ excerptLength }
 							onChange={ ( value ) =>
@@ -152,6 +165,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 					{ blockLayout === 'grid' && (
 						<RangeControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Columns' ) }
 							value={ columns }
 							onChange={ ( value ) =>

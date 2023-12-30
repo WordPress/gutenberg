@@ -508,7 +508,7 @@ function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
  * @param {CommentTag} tag              The documented parameter.
  * @param {ASTNode}    declarationToken The function the parameter is documented on.
  * @param {number}     paramIndex       The parameter index.
- * @return {string?} The parameter's type annotation.
+ * @return {string | undefined} The parameter's type annotation.
  */
 function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 	const functionToken = getFunctionToken( declarationToken );
@@ -557,7 +557,7 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 
 /**
  * @param {ASTNode} declarationToken A function token.
- * @return {string?} The function's return type annotation.
+ * @return {string | undefined} The function's return type annotation.
  */
 function getReturnTypeAnnotation( declarationToken ) {
 	const functionToken = getFunctionToken( declarationToken );
@@ -570,7 +570,7 @@ function getReturnTypeAnnotation( declarationToken ) {
 
 /**
  * @param {ASTNode} declarationToken
- * @return {string?} The type annotation for the variable.
+ * @return {string | undefined} The type annotation for the variable.
  */
 function getVariableTypeAnnotation( declarationToken ) {
 	let resolvedToken = declarationToken;

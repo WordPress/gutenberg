@@ -3,6 +3,9 @@
  */
 import { createContext, useContext } from '@wordpress/element';
 
+export const mayDisplayControlsKey = Symbol( 'mayDisplayControls' );
+export const mayDisplayParentControlsKey = Symbol( 'mayDisplayParentControls' );
+
 export const DEFAULT_BLOCK_EDIT_CONTEXT = {
 	name: '',
 	isSelected: false,

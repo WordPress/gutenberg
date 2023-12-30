@@ -17,6 +17,7 @@ import {
 	findTransform,
 	isWildcardBlockTransform,
 	isContainerGroupBlock,
+	getBlockFromExample,
 } from '../factory';
 import {
 	getBlockType,
@@ -2274,6 +2275,35 @@ describe( 'block factory', () => {
 		it( 'should return false when passed block name does not match the registered "Grouping" Block', () => {
 			setGroupingBlockName( 'registered-grouping-block' );
 			expect( isContainerGroupBlock( 'core/group' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getBlockFromExample', () => {
+		it( 'should replace unregistered block with core/missing block', () => {
+			registerBlockType( 'core/missing', {
+				title: 'Unsupported',
+			} );
+			registerBlockType( 'core/paragraph', {
+				title: 'Paragraph',
+			} );
+			registerBlockType( 'core/group', {
+				title: 'A block that groups other blocks.',
+			} );
+			const example = {
+				innerBlocks: [
+					{ name: 'core/paragraph' },
+					{ name: 'core/image' },
+				],
+			};
+			expect(
+				getBlockFromExample( 'core/group', example )
+			).toMatchObject( {
+				name: 'core/group',
+				innerBlocks: [
+					{ name: 'core/paragraph' },
+					{ name: 'core/missing' },
+				],
+			} );
 		} );
 	} );
 } );

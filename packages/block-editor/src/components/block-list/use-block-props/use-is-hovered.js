@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import { store as blockEditorStore } from '../../../store';
 
 function listener( event ) {
 	if ( event.defaultPrevented ) {
@@ -20,16 +14,11 @@ function listener( event ) {
 	event.currentTarget.classList[ action ]( 'is-hovered' );
 }
 
-/**
+/*
  * Adds `is-hovered` class when the block is hovered and in navigation or
  * outline mode.
  */
-export function useIsHovered() {
-	const isEnabled = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().outlineMode;
-	}, [] );
-
+export function useIsHovered( { isEnabled } ) {
 	return useRefEffect(
 		( node ) => {
 			if ( isEnabled ) {

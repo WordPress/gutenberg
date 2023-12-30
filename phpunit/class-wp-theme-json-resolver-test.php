@@ -43,6 +43,21 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	private static $property_core_orig_value;
 
+	/**
+	 * @var string|null
+	 */
+	private $theme_root;
+
+	/**
+	 * @var array|null
+	 */
+	private $orig_theme_dir;
+
+	/**
+	 * @var array|null
+	 */
+	private $queries;
+
 	public static function set_up_before_class() {
 		parent::set_up_before_class();
 
@@ -214,13 +229,13 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	/**
 	 * Recursively applies ksort to an array.
 	 */
-	private static function recursive_ksort( &$array ) {
-		foreach ( $array as &$value ) {
+	private static function recursive_ksort( &$input_array ) {
+		foreach ( $input_array as &$value ) {
 			if ( is_array( $value ) ) {
 				self::recursive_ksort( $value );
 			}
 		}
-		ksort( $array );
+		ksort( $input_array );
 	}
 
 	public function test_merges_child_theme_json_into_parent_theme_json() {
@@ -331,7 +346,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertNotEmpty( $user_cpt, 'User CPT is expected not to be empty.' );
 
 		$query_count = count( $this->queries );
-		for ( $i = 0; $i < 3; $i ++ ) {
+		for ( $i = 0; $i < 3; $i++ ) {
 			$new_user_cpt = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme );
 			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
 			$this->assertSameSets( $user_cpt, $new_user_cpt, "User CPTs do not match on run {$i}." );
@@ -381,7 +396,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		register_block_type(
 			'my/block-with-styles',
 			array(
-				'api_version' => 2,
+				'api_version' => 3,
 				'attributes'  => array(
 					'borderColor' => array(
 						'type' => 'string',
@@ -423,7 +438,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( $core_palette, isset( $settings['color']['palette']['default'] ), $core_palette_text );
 		$styles = array_filter(
 			$styles,
-			static function( $element ) {
+			static function ( $element ) {
 				return isset( $element['name'] ) && 'my/block-with-styles' === $element['name'];
 			}
 		);
@@ -488,4 +503,69 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+
+	/**
+	 * Test that get_style_variations returns all variations, including parent theme variations if the theme is a child,
+	 * and that the child variation overwrites the parent variation of the same name.
+	 *
+	 * @covers WP_Theme_JSON_Resolver::get_style_variations
+	 **/
+	public function test_get_style_variations_returns_all_variations() {
+		// Switch to a child theme.
+		switch_theme( 'block-theme-child' );
+		wp_set_current_user( self::$administrator_id );
+
+		$actual_settings   = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
+		$expected_settings = array(
+			array(
+				'version'  => 2,
+				'title'    => 'variation-a',
+				'settings' => array(
+					'blocks' => array(
+						'core/paragraph' => array(
+							'color' => array(
+								'palette' => array(
+									'theme' => array(
+										array(
+											'slug'  => 'dark',
+											'name'  => 'Dark',
+											'color' => '#010101',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+			array(
+				'version'  => 2,
+				'title'    => 'variation-b',
+				'settings' => array(
+					'blocks' => array(
+						'core/post-title' => array(
+							'color' => array(
+								'palette' => array(
+									'theme' => array(
+										array(
+											'slug'  => 'light',
+											'name'  => 'Light',
+											'color' => '#f1f1f1',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+		self::recursive_ksort( $actual_settings );
+		self::recursive_ksort( $expected_settings );
+
+		$this->assertSame(
+			$expected_settings,
+			$actual_settings
+		);
+	}
 }

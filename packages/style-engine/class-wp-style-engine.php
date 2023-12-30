@@ -24,14 +24,18 @@ if ( class_exists( 'WP_Style_Engine' ) ) {
  */
 final class WP_Style_Engine {
 	/**
-	 * Style definitions that contain the instructions to
-	 * parse/output valid Gutenberg styles from a block's attributes.
-	 * For every style definition, the follow properties are valid:
+	 * Style definitions that contain the instructions to parse/output valid Gutenberg styles from a block's attributes.
+	 *
+	 * For every style definition, the following properties are valid:
+	 *
 	 *  - classnames    => (array) an array of classnames to be returned for block styles. The key is a classname or pattern.
 	 *                    A value of `true` means the classname should be applied always. Otherwise, a valid CSS property (string)
 	 *                    to match the incoming value, e.g., "color" to match var:preset|color|somePresetSlug.
-	 *  - css_vars      => (array) an array of key value pairs used to generate CSS var values. The key is a CSS var pattern, whose `$slug` fragment will be replaced with a preset slug.
-	 *                    The value should be a valid CSS property (string) to match the incoming value, e.g., "color" to match var:preset|color|somePresetSlug.
+	 *  - css_vars      => (array) an array of key value pairs used to generate CSS var values.
+	 *                     The key should be the CSS property name that matches the second element of the preset string value,
+	 *                     i.e., "color" in var:preset|color|somePresetSlug. The value is a CSS var pattern (e.g. `--wp--preset--color--$slug`),
+	 *                     whose `$slug` fragment will be replaced with the preset slug, which is the third element of the preset string value,
+	 *                     i.e., `somePresetSlug` in var:preset|color|somePresetSlug.
 	 *  - property_keys => (array) array of keys whose values represent a valid CSS property, e.g., "margin" or "border".
 	 *  - path          => (array) a path that accesses the corresponding style value in the block style object.
 	 *  - value_func    => (string) the name of a function to generate a CSS definition array for a particular style object. The output of this function should be `array( "$property" => "$value", ... )`.
@@ -39,6 +43,33 @@ final class WP_Style_Engine {
 	 * @var array
 	 */
 	const BLOCK_STYLE_DEFINITIONS_METADATA = array(
+		'background' => array(
+			'backgroundImage'    => array(
+				'property_keys' => array(
+					'default' => 'background-image',
+				),
+				'value_func'    => array( self::class, 'get_url_or_value_css_declaration' ),
+				'path'          => array( 'background', 'backgroundImage' ),
+			),
+			'backgroundPosition' => array(
+				'property_keys' => array(
+					'default' => 'background-position',
+				),
+				'path'          => array( 'background', 'backgroundPosition' ),
+			),
+			'backgroundRepeat'   => array(
+				'property_keys' => array(
+					'default' => 'background-repeat',
+				),
+				'path'          => array( 'background', 'backgroundRepeat' ),
+			),
+			'backgroundSize'     => array(
+				'property_keys' => array(
+					'default' => 'background-size',
+				),
+				'path'          => array( 'background', 'backgroundSize' ),
+			),
+		),
 		'color'      => array(
 			'text'       => array(
 				'property_keys' => array(
@@ -58,6 +89,9 @@ final class WP_Style_Engine {
 					'default' => 'background-color',
 				),
 				'path'          => array( 'color', 'background' ),
+				'css_vars'      => array(
+					'color' => '--wp--preset--color--$slug',
+				),
 				'classnames'    => array(
 					'has-background'             => true,
 					'has-$slug-background-color' => 'color',
@@ -66,6 +100,9 @@ final class WP_Style_Engine {
 			'gradient'   => array(
 				'property_keys' => array(
 					'default' => 'background',
+				),
+				'css_vars'      => array(
+					'gradient' => '--wp--preset--gradient--$slug',
 				),
 				'path'          => array( 'color', 'gradient' ),
 				'classnames'    => array(
@@ -136,6 +173,17 @@ final class WP_Style_Engine {
 				),
 			),
 		),
+		'shadow'     => array(
+			'shadow' => array(
+				'property_keys' => array(
+					'default' => 'box-shadow',
+				),
+				'path'          => array( 'shadow' ),
+				'css_vars'      => array(
+					'shadow' => '--wp--preset--shadow--$slug',
+				),
+			),
+		),
 		'dimensions' => array(
 			'minHeight' => array(
 				'property_keys' => array(
@@ -174,6 +222,9 @@ final class WP_Style_Engine {
 				'property_keys' => array(
 					'default' => 'font-size',
 				),
+				'css_vars'      => array(
+					'font-size' => '--wp--preset--font-size--$slug',
+				),
 				'path'          => array( 'typography', 'fontSize' ),
 				'classnames'    => array(
 					'has-$slug-font-size' => 'font-size',
@@ -182,6 +233,9 @@ final class WP_Style_Engine {
 			'fontFamily'     => array(
 				'property_keys' => array(
 					'default' => 'font-family',
+				),
+				'css_vars'      => array(
+					'font-family' => '--wp--preset--font-family--$slug',
 				),
 				'path'          => array( 'typography', 'fontFamily' ),
 				'classnames'    => array(
@@ -206,6 +260,12 @@ final class WP_Style_Engine {
 				),
 				'path'          => array( 'typography', 'lineHeight' ),
 			),
+			'textColumns'    => array(
+				'property_keys' => array(
+					'default' => 'column-count',
+				),
+				'path'          => array( 'typography', 'textColumns' ),
+			),
 			'textDecoration' => array(
 				'property_keys' => array(
 					'default' => 'text-decoration',
@@ -223,6 +283,12 @@ final class WP_Style_Engine {
 					'default' => 'letter-spacing',
 				),
 				'path'          => array( 'typography', 'letterSpacing' ),
+			),
+			'writingMode'    => array(
+				'property_keys' => array(
+					'default' => 'writing-mode',
+				),
+				'path'          => array( 'typography', 'writingMode' ),
 			),
 		),
 	);
@@ -507,6 +573,41 @@ final class WP_Style_Engine {
 				$css_declarations[ $individual_css_property ] = $value;
 			}
 		}
+		return $css_declarations;
+	}
+
+	/**
+	 * Style value parser that constructs a CSS definition array comprising a single CSS property and value.
+	 * If the provided value is an array containing a `url` property, the function will return a CSS definition array
+	 * with a single property and value, with `url` escaped and injected into a CSS `url()` function,
+	 * e.g., array( 'background-image' => "url( '...' )" ).
+	 *
+	 * @param array $style_value      A single raw style value from $block_styles array.
+	 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 *
+	 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+	 */
+	protected static function get_url_or_value_css_declaration( $style_value, $style_definition ) {
+		if ( empty( $style_value ) ) {
+			return array();
+		}
+
+		$css_declarations = array();
+
+		if ( isset( $style_definition['property_keys']['default'] ) ) {
+			$value = null;
+
+			if ( ! empty( $style_value['url'] ) ) {
+				$value = "url('" . $style_value['url'] . "')";
+			} elseif ( is_string( $style_value ) ) {
+				$value = $style_value;
+			}
+
+			if ( null !== $value ) {
+				$css_declarations[ $style_definition['property_keys']['default'] ] = $value;
+			}
+		}
+
 		return $css_declarations;
 	}
 

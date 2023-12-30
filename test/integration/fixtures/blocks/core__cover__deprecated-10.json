@@ -11,7 +11,8 @@
 			"isRepeated": false,
 			"dimRatio": 50,
 			"backgroundType": "image",
-			"isDark": true
+			"isDark": true,
+			"tagName": "div"
 		},
 		"innerBlocks": [
 			{

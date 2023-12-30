@@ -1,15 +1,9 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
 import {
 	BlockSettingsMenuControls,
-	BlockTitle,
 	useBlockProps,
 	Warning,
 	store as blockEditorStore,
@@ -19,7 +13,7 @@ import {
 import { Spinner, Modal, MenuItem } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { useState, createInterpolateElement } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -39,9 +33,12 @@ export default function TemplatePartEdit( {
 	attributes,
 	setAttributes,
 	clientId,
-	isSelected,
 } ) {
-	const { slug, theme, tagName, layout = {} } = attributes;
+	const currentTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
+		[]
+	);
+	const { slug, theme = currentTheme, tagName, layout = {} } = attributes;
 	const templatePartId = createTemplatePartId( theme, slug );
 	const hasAlreadyRendered = useHasRecursion( templatePartId );
 	const [ isTemplatePartSelectionOpen, setIsTemplatePartSelectionOpen ] =
@@ -75,11 +72,14 @@ export default function TemplatePartEdit( {
 			return {
 				innerBlocks: getBlocks( clientId ),
 				isResolved: hasResolvedEntity,
-				isMissing: hasResolvedEntity && isEmpty( entityRecord ),
+				isMissing:
+					hasResolvedEntity &&
+					( ! entityRecord ||
+						Object.keys( entityRecord ).length === 0 ),
 				area: _area,
 			};
 		},
-		[ templatePartId, clientId ]
+		[ templatePartId, attributes.area, clientId ]
 	);
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
@@ -93,10 +93,7 @@ export default function TemplatePartEdit( {
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || areaObject.tagName;
 
-	// The `isSelected` check ensures the `BlockSettingsMenuControls` fill
-	// doesn't render multiple times. The block controls has similar internal check.
 	const canReplace =
-		isSelected &&
 		isEntityAvailable &&
 		hasReplacements &&
 		( area === 'header' || area === 'footer' );
@@ -141,6 +138,7 @@ export default function TemplatePartEdit( {
 					isEntityAvailable={ isEntityAvailable }
 					templatePartId={ templatePartId }
 					defaultWrapper={ areaObject.tagName }
+					hasInnerBlocks={ innerBlocks.length > 0 }
 				/>
 				{ isPlaceholder && (
 					<TagName { ...blockProps }>
@@ -157,25 +155,32 @@ export default function TemplatePartEdit( {
 				) }
 				{ canReplace && (
 					<BlockSettingsMenuControls>
-						{ () => (
-							<MenuItem
-								onClick={ () => {
-									setIsTemplatePartSelectionOpen( true );
-								} }
-							>
-								{ createInterpolateElement(
-									__( 'Replace <BlockTitle />' ),
-									{
-										BlockTitle: (
-											<BlockTitle
-												clientId={ clientId }
-												maximumLength={ 25 }
-											/>
-										),
+						{ ( { selectedClientIds } ) => {
+							// Only enable for single selection that matches the current block.
+							// Ensures menu item doesn't render multiple times.
+							if (
+								! (
+									selectedClientIds.length === 1 &&
+									clientId === selectedClientIds[ 0 ]
+								)
+							) {
+								return null;
+							}
+
+							return (
+								<MenuItem
+									onClick={ () => {
+										setIsTemplatePartSelectionOpen( true );
+									} }
+									aria-expanded={
+										isTemplatePartSelectionOpen
 									}
-								) }
-							</MenuItem>
-						) }
+									aria-haspopup="dialog"
+								>
+									{ __( 'Replace' ) }
+								</MenuItem>
+							);
+						} }
 					</BlockSettingsMenuControls>
 				) }
 				{ isEntityAvailable && (
@@ -201,10 +206,10 @@ export default function TemplatePartEdit( {
 						__( 'Choose a %s' ),
 						areaObject.label.toLowerCase()
 					) }
-					closeLabel={ __( 'Cancel' ) }
 					onRequestClose={ () =>
 						setIsTemplatePartSelectionOpen( false )
 					}
+					isFullScreen={ true }
 				>
 					<TemplatePartSelectionModal
 						templatePartId={ templatePartId }

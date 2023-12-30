@@ -22,7 +22,7 @@ export const textFormattingShortcuts = [
 	},
 	{
 		keyCombination: { character: '[[' },
-		description: __( 'Insert a link to a post or page' ),
+		description: __( 'Insert a link to a post or page.' ),
 	},
 	{
 		keyCombination: { modifier: 'primary', character: 'u' },

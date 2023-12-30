@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map, groupBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
@@ -59,7 +54,15 @@ export function BlockTypesTab( {
 				itemList.filter(
 					( item ) => item.category && item.category !== 'reusable'
 				),
-			( itemList ) => groupBy( itemList, 'category' )
+			( itemList ) =>
+				itemList.reduce( ( acc, item ) => {
+					const { category } = item;
+					if ( ! acc[ category ] ) {
+						acc[ category ] = [];
+					}
+					acc[ category ].push( item );
+					return acc;
+				}, {} )
 		)( items );
 	}, [ items ] );
 
@@ -113,7 +116,7 @@ export function BlockTypesTab( {
 					</InserterPanel>
 				) }
 
-				{ map( currentlyRenderedCategories, ( category ) => {
+				{ currentlyRenderedCategories.map( ( category ) => {
 					const categoryItems = itemsPerCategory[ category.slug ];
 					if ( ! categoryItems || ! categoryItems.length ) {
 						return null;
@@ -148,8 +151,7 @@ export function BlockTypesTab( {
 					</InserterPanel>
 				) }
 
-				{ map(
-					currentlyRenderedCollections,
+				{ currentlyRenderedCollections.map(
 					( [ namespace, collection ] ) => {
 						const collectionItems = itemsPerCollection[ namespace ];
 						if ( ! collectionItems || ! collectionItems.length ) {

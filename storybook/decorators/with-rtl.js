@@ -12,8 +12,7 @@ import {
 /**
  * Internal dependencies
  */
-import ltrStyles from '../style-ltr.lazy.scss';
-import rtlStyles from '../style-rtl.lazy.scss';
+import CONFIG from '../package-styles/config';
 
 export const WithRTL = ( Story, context ) => {
 	const [ rerenderKey, setRerenderKey ] = useState( 0 );
@@ -43,17 +42,20 @@ export const WithRTL = ( Story, context ) => {
 	}, [ context.globals.direction ] );
 
 	useLayoutEffect( () => {
-		if ( context.globals.direction === 'rtl' ) {
-			rtlStyles.use();
-		} else {
-			ltrStyles.use();
-		}
+		const stylesToUse = [];
+
+		CONFIG.forEach( ( item ) => {
+			if ( item.componentIdMatcher.test( context.componentId ) ) {
+				stylesToUse.push( ...item[ context.globals.direction ] );
+			}
+		} );
+
+		stylesToUse.forEach( ( style ) => style.use() );
 
 		return () => {
-			ltrStyles.unuse();
-			rtlStyles.unuse();
+			stylesToUse.forEach( ( style ) => style.unuse() );
 		};
-	}, [ context.globals.direction ] );
+	}, [ context.componentId, context.globals.direction ] );
 
 	return (
 		<div ref={ ref } key={ rerenderKey }>

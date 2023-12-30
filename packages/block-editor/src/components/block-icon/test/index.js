@@ -13,6 +13,10 @@ import { image } from '@wordpress/icons';
  */
 import BlockIcon from '../';
 
+function getIconWrapper( container ) {
+	return container.firstChild;
+}
+
 describe( 'BlockIcon', () => {
 	it( 'renders a Icon', () => {
 		const { container } = render( <BlockIcon icon={ image } /> );
@@ -23,13 +27,13 @@ describe( 'BlockIcon', () => {
 	it( 'renders a span without the has-colors classname', () => {
 		const { container } = render( <BlockIcon icon={ image } /> );
 
-		expect( container.firstChild ).not.toHaveClass( 'has-colors' );
+		expect( getIconWrapper( container ) ).not.toHaveClass( 'has-colors' );
 	} );
 
 	it( 'renders a span with the has-colors classname', () => {
 		const { container } = render( <BlockIcon icon={ image } showColors /> );
 
-		expect( container.firstChild ).toHaveClass( 'has-colors' );
+		expect( getIconWrapper( container ) ).toHaveClass( 'has-colors' );
 	} );
 
 	it( 'supports adding a className to the wrapper', () => {
@@ -37,7 +41,7 @@ describe( 'BlockIcon', () => {
 			<BlockIcon icon={ image } className="foo-bar" />
 		);
 
-		expect( container.firstChild ).toHaveClass( 'foo-bar' );
+		expect( getIconWrapper( container ) ).toHaveClass( 'foo-bar' );
 	} );
 
 	it( 'skips adding background and foreground styles when colors are not enabled', () => {
@@ -51,7 +55,7 @@ describe( 'BlockIcon', () => {
 			/>
 		);
 
-		expect( container.firstChild ).not.toHaveAttribute( 'style' );
+		expect( getIconWrapper( container ) ).not.toHaveAttribute( 'style' );
 	} );
 
 	it( 'adds background and foreground styles when colors are enabled', () => {
@@ -66,9 +70,9 @@ describe( 'BlockIcon', () => {
 			/>
 		);
 
-		expect( container.firstChild ).toHaveStyle( {
-			backgroundColor: 'white',
-			color: 'black',
+		expect( getIconWrapper( container ) ).toHaveStyle( {
+			backgroundColor: 'rgb(255, 255, 255)',
+			color: 'rgb(0, 0, 0)',
 		} );
 	} );
 } );

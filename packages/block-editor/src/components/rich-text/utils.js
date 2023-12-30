@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { regexp } from '@wordpress/shortcode';
 import { renderToString } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 
@@ -23,7 +22,7 @@ export function addActiveFormats( value, activeFormats ) {
  *
  * @param {?(string|boolean)} multiline The multiline prop.
  *
- * @return {?string} The multiline tag.
+ * @return {string | undefined} The multiline tag.
  */
 export function getMultilineTag( multiline ) {
 	if ( multiline !== true && multiline !== 'p' && multiline !== 'li' ) {
@@ -42,8 +41,6 @@ export function getAllowedFormats( { allowedFormats, disableFormats } ) {
 }
 
 getAllowedFormats.EMPTY_ARRAY = [];
-
-export const isShortcode = ( text ) => regexp( '.*' ).test( text );
 
 /**
  * Creates a link from pasted URL.

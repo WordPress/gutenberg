@@ -3,26 +3,60 @@
  */
 import { BlockPreview } from '@wordpress/block-editor';
 import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
-import { useResizeObserver } from '@wordpress/compose';
+import { __experimentalSpacer as Spacer } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
 
-const BlockPreviewPanel = ( { name } ) => {
+const BlockPreviewPanel = ( { name, variation = '' } ) => {
 	const blockExample = getBlockType( name )?.example;
-	const [
-		containerResizeListener,
-		{ width: containerWidth, height: containerHeight },
-	] = useResizeObserver();
-	const viewportWidth = blockExample?.viewportWidth || containerWidth;
+	const blocks = useMemo( () => {
+		if ( ! blockExample ) {
+			return null;
+		}
 
-	return ! blockExample ? null : (
-		<div className="edit-site-global-styles__block-preview-panel">
-			{ containerResizeListener }
+		let example = blockExample;
+		if ( variation ) {
+			example = {
+				...example,
+				attributes: {
+					...example.attributes,
+					className: 'is-style-' + variation,
+				},
+			};
+		}
 
-			<BlockPreview
-				viewportWidth={ viewportWidth }
-				__experimentalMinHeight={ containerHeight }
-				blocks={ getBlockFromExample( name, blockExample ) }
-			/>
-		</div>
+		return getBlockFromExample( name, example );
+	}, [ name, blockExample, variation ] );
+
+	const viewportWidth = blockExample?.viewportWidth ?? null;
+	const previewHeight = '150px';
+
+	if ( ! blockExample ) {
+		return null;
+	}
+
+	return (
+		<Spacer marginX={ 4 } marginBottom={ 4 }>
+			<div
+				className="edit-site-global-styles__block-preview-panel"
+				style={ { maxHeight: previewHeight, boxSizing: 'initial' } }
+			>
+				<BlockPreview
+					blocks={ blocks }
+					viewportWidth={ viewportWidth }
+					minHeight={ previewHeight }
+					additionalStyles={ [
+						{
+							css: `
+								body{
+									min-height:${ previewHeight };
+									display:flex;align-items:center;justify-content:center;
+								}
+							`,
+						},
+					] }
+				/>
+			</div>
+		</Spacer>
 	);
 };
 

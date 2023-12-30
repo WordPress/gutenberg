@@ -27,13 +27,13 @@ function Example() {
 
 ## Props
 
-##### as
+### as
 
 **Type**: `string`,`E`
 
 Render the component as another React Component or HTML Element.
 
-##### css
+### css
 
 **Type**: `InterpolatedCSS`
 

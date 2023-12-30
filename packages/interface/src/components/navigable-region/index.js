@@ -18,9 +18,7 @@ export default function NavigableRegion( {
 			tabIndex="-1"
 			{ ...props }
 		>
-			<div className="interface-navigable-region__stacker">
-				{ children }
-			</div>
+			{ children }
 		</Tag>
 	);
 }

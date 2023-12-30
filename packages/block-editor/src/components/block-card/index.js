@@ -27,9 +27,6 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 		( { title, icon, description } = blockType );
 	}
 
-	const isOffCanvasNavigationEditorEnabled =
-		window?.__experimentalEnableOffCanvasNavigationEditor === true;
-
 	const { parentNavBlockClientId } = useSelect( ( select ) => {
 		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
 			select( blockEditorStore );
@@ -49,7 +46,7 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 
 	return (
 		<div className={ classnames( 'block-editor-block-card', className ) }>
-			{ isOffCanvasNavigationEditorEnabled && parentNavBlockClientId && (
+			{ parentNavBlockClientId && ( // This is only used by the Navigation block for now. It's not ideal having Navigation block specific code here.
 				<Button
 					onClick={ () => selectBlock( parentNavBlockClientId ) }
 					label={ __( 'Go to parent Navigation block' ) }
@@ -59,15 +56,17 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 						{ minWidth: 24, padding: 0 }
 					}
 					icon={ isRTL() ? chevronRight : chevronLeft }
-					isSmall
+					size="small"
 				/>
 			) }
 			<BlockIcon icon={ icon } showColors />
 			<div className="block-editor-block-card__content">
 				<h2 className="block-editor-block-card__title">{ title }</h2>
-				<span className="block-editor-block-card__description">
-					{ description }
-				</span>
+				{ description && (
+					<span className="block-editor-block-card__description">
+						{ description }
+					</span>
+				) }
 			</div>
 		</div>
 	);

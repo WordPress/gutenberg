@@ -46,6 +46,7 @@ describe( 'BaseControl', () => {
 
 		expect( textarea ).toHaveAttribute( 'aria-details' );
 		expect(
+			// eslint-disable-next-line testing-library/no-node-access
 			help.closest( `#${ textarea.getAttribute( 'aria-details' ) }` )
 		).toBeVisible();
 	} );

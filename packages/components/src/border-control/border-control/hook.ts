@@ -8,7 +8,8 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
  */
 import * as styles from '../styles';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 
 import type { Border, BorderControlProps } from '../types';
@@ -39,7 +40,6 @@ export function useBorderControl(
 		size = 'default',
 		value: border,
 		width,
-		__experimentalHasMultipleOrigins = false,
 		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderControl' );
@@ -156,7 +156,6 @@ export function useBorderControl(
 		widthUnit,
 		widthValue,
 		size,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
 	};
 }

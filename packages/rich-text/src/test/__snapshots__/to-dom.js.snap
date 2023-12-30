@@ -61,9 +61,7 @@ exports[`recordToDom should create a value with image object and formatting 1`] 
 
 exports[`recordToDom should create a value with image object and text after 1`] = `
 <body>
-  <em
-    data-rich-text-format-boundary="true"
-  >
+  <em>
     
     <img
       src=""
@@ -203,114 +201,6 @@ exports[`recordToDom should handle double br 1`] = `
 </body>
 `;
 
-exports[`recordToDom should handle empty list value 1`] = `
-<body>
-  <li>
-    
-    ﻿
-  </li>
-</body>
-`;
-
-exports[`recordToDom should handle empty multiline value 1`] = `
-<body>
-  <p>
-    
-    ﻿
-  </p>
-</body>
-`;
-
-exports[`recordToDom should handle middle empty list value 1`] = `
-<body>
-  <li>
-    
-    ﻿
-  </li>
-  <li>
-    
-    ﻿
-  </li>
-  <li>
-    
-    ﻿
-  </li>
-</body>
-`;
-
-exports[`recordToDom should handle multiline list value 1`] = `
-<body>
-  <li>
-    one
-    <ul>
-      <li>
-        a
-      </li>
-      <li>
-        b
-        <ol>
-          <li>
-            1
-          </li>
-          <li>
-            2
-          </li>
-        </ol>
-      </li>
-    </ul>
-  </li>
-  <li>
-    three
-  </li>
-</body>
-`;
-
-exports[`recordToDom should handle multiline value 1`] = `
-<body>
-  <p>
-    one
-  </p>
-  <p>
-    two
-  </p>
-</body>
-`;
-
-exports[`recordToDom should handle multiline value with element selection 1`] = `
-<body>
-  <li>
-    one
-  </li>
-</body>
-`;
-
-exports[`recordToDom should handle multiline value with empty 1`] = `
-<body>
-  <p>
-    one
-  </p>
-  <p>
-    
-    ﻿
-  </p>
-</body>
-`;
-
-exports[`recordToDom should handle nested empty list value 1`] = `
-<body>
-  <li>
-    
-    ﻿
-    <ul>
-      <li>
-        
-        ﻿
-      </li>
-    </ul>
-  </li>
-</body>
-`;
-
 exports[`recordToDom should handle selection before br 1`] = `
 <body>
   a
@@ -322,22 +212,6 @@ exports[`recordToDom should handle selection before br 1`] = `
     data-rich-text-line-break="true"
   />
   b
-</body>
-`;
-
-exports[`recordToDom should ignore formats at line separator 1`] = `
-<body>
-  <p>
-    <em>
-      one
-    </em>
-  </p>
-  <p>
-    <em>
-      two
-    </em>
-    
-  </p>
 </body>
 `;
 
@@ -425,11 +299,5 @@ exports[`recordToDom should remove padding 1`] = `
 <body>
   
   ﻿
-</body>
-`;
-
-exports[`recordToDom should replace characters to format HTML with space 1`] = `
-<body>
-   
 </body>
 `;

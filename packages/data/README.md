@@ -164,13 +164,21 @@ Integrating an existing redux store with its own reducers, store enhancers and m
 _Example:_
 
 ```js
-import { mapValues } from 'lodash';
 import { register } from '@wordpress/data';
 import existingSelectors from './existing-app/selectors';
 import existingActions from './existing-app/actions';
 import createStore from './existing-app/store';
 
 const reduxStore = createStore();
+
+const mapValues = ( obj, callback ) =>
+	Object.entries( obj ).reduce(
+		( acc, [ key, value ] ) => ( {
+			...acc,
+			[ key ]: callback( value ),
+		} ),
+		{}
+	);
 
 const boundSelectors = mapValues(
 	existingSelectors,
@@ -271,8 +279,7 @@ Specific implementation differences from Redux and React Redux:
 
 ### AsyncModeProvider
 
-Context Provider Component used to switch the data module component rerendering
-between Sync and Async modes.
+Context Provider Component used to switch the data module component rerendering between Sync and Async modes.
 
 _Usage_
 
@@ -308,12 +315,11 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: The component to be rendered.
+-   `Component`: The component to be rendered.
 
 ### combineReducers
 
-The combineReducers helper function turns an object whose values are different
-reducing functions into a single reducing function you can pass to registerReducer.
+The combineReducers helper function turns an object whose values are different reducing functions into a single reducing function you can pass to registerReducer.
 
 _Usage_
 
@@ -360,8 +366,7 @@ Undocumented declaration.
 
 ### createReduxStore
 
-Creates a data store descriptor for the provided Redux store configuration containing
-properties describing reducer, actions, selectors, controls and resolvers.
+Creates a data store descriptor for the provided Redux store configuration containing properties describing reducer, actions, selectors, controls and resolvers.
 
 _Usage_
 
@@ -387,8 +392,7 @@ _Returns_
 
 ### createRegistry
 
-Creates a new store registry, given an optional object of initial store
-configurations.
+Creates a new store registry, given an optional object of initial store configurations.
 
 _Parameters_
 
@@ -401,8 +405,7 @@ _Returns_
 
 ### createRegistryControl
 
-Creates a control function that takes additional curried argument with the `registry` object.
-While a regular control has signature
+Creates a control function that takes additional curried argument with the `registry` object. While a regular control has signature
 
 ```js
 ( action ) => iteratorOrPromise;
@@ -414,11 +417,9 @@ where the control works with the `action` that it's bound to, a registry control
 ( registry ) => ( action ) => iteratorOrPromise;
 ```
 
-A registry control is typically used to select data or dispatch an action to a registered
-store.
+A registry control is typically used to select data or dispatch an action to a registered store.
 
-When registering a control created with `createRegistryControl` with a store, the store
-knows which calling convention to use when executing the control.
+When registering a control created with `createRegistryControl` with a store, the store knows which calling convention to use when executing the control.
 
 _Parameters_
 
@@ -430,15 +431,13 @@ _Returns_
 
 ### createRegistrySelector
 
-Creates a selector function that takes additional curried argument with the
-registry `select` function. While a regular selector has signature
+Creates a selector function that takes additional curried argument with the registry `select` function. While a regular selector has signature
 
 ```js
 ( state, ...selectorArgs ) => result;
 ```
 
-that allows to select data from the store's `state`, a registry selector
-has signature:
+that allows to select data from the store's `state`, a registry selector has signature:
 
 ```js
 ( select ) =>
@@ -485,11 +484,9 @@ _Returns_
 
 ### dispatch
 
-Given a store descriptor, returns an object of the store's action creators.
-Calling an action creator will cause it to be dispatched, updating the state value accordingly.
+Given a store descriptor, returns an object of the store's action creators. Calling an action creator will cause it to be dispatched, updating the state value accordingly.
 
-Note: Action creators returned by the dispatch will return a promise when
-they are called.
+Note: Action creators returned by the dispatch will return a promise when they are called.
 
 _Usage_
 
@@ -502,11 +499,11 @@ dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
+-   _storeNameOrDescriptor_ `StoreNameOrDescriptor`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
--   `Object`: Object containing the action creators.
+-   `DispatchReturn< StoreNameOrDescriptor >`: Object containing the action creators.
 
 ### plugins
 
@@ -570,11 +567,9 @@ _Returns_
 
 ### RegistryConsumer
 
-A custom react Context consumer exposing the provided `registry` to
-children components. Used along with the RegistryProvider.
+A custom react Context consumer exposing the provided `registry` to children components. Used along with the RegistryProvider.
 
-You can read more about the react context api here:
-<https://reactjs.org/docs/context.html#contextprovider>
+You can read more about the react context api here: <https://reactjs.org/docs/context.html#contextprovider>
 
 _Usage_
 
@@ -603,17 +598,13 @@ const App = ( { props } ) => {
 
 ### RegistryProvider
 
-A custom Context provider for exposing the provided `registry` to children
-components via a consumer.
+A custom Context provider for exposing the provided `registry` to children components via a consumer.
 
-See <a name="#RegistryConsumer">RegistryConsumer</a> documentation for
-example.
+See <a name="#RegistryConsumer">RegistryConsumer</a> documentation for example.
 
 ### resolveSelect
 
-Given a store descriptor, returns an object containing the store's selectors pre-bound to state
-so that you only need to supply additional arguments, and modified so that they return promises
-that resolve to their eventual values, after any resolvers have ran.
+Given a store descriptor, returns an object containing the store's selectors pre-bound to state so that you only need to supply additional arguments, and modified so that they return promises that resolve to their eventual values, after any resolvers have ran.
 
 _Usage_
 
@@ -634,9 +625,7 @@ _Returns_
 
 ### select
 
-Given a store descriptor, returns an object of the store's selectors.
-The selector functions are been pre-bound to pass the current state automatically.
-As a consumer, you need only pass arguments of the selector, if applicable.
+Given a store descriptor, returns an object of the store's selectors. The selector functions are been pre-bound to pass the current state automatically. As a consumer, you need only pass arguments of the selector, if applicable.
 
 _Usage_
 
@@ -649,18 +638,15 @@ select( myCustomStore ).getPrice( 'hammer' );
 
 _Parameters_
 
--   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
+-   _storeNameOrDescriptor_ `string | T`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
--   `Object`: Object containing the store's selectors.
+-   `CurriedSelectorsOf< T >`: Object containing the store's selectors.
 
 ### subscribe
 
-Given a listener function, the function will be called any time the state value
-of one of the registered stores has changed. If you specify the optional
-`storeNameOrDescriptor` parameter, the listener function will be called only
-on updates on that one specific registered store.
+Given a listener function, the function will be called any time the state value of one of the registered stores has changed. If you specify the optional `storeNameOrDescriptor` parameter, the listener function will be called only on updates on that one specific registered store.
 
 This function returns an `unsubscribe` function used to stop the subscription.
 
@@ -685,9 +671,7 @@ _Parameters_
 
 ### suspendSelect
 
-Given a store descriptor, returns an object containing the store's selectors pre-bound to state
-so that you only need to supply additional arguments, and modified so that they throw promises
-in case the selector is not resolved yet.
+Given a store descriptor, returns an object containing the store's selectors pre-bound to state so that you only need to supply additional arguments, and modified so that they throw promises in case the selector is not resolved yet.
 
 _Parameters_
 
@@ -699,9 +683,7 @@ _Returns_
 
 ### use
 
-Extends a registry to inherit functionality provided by a given plugin. A
-plugin is an object with properties aligning to that of a registry, merged
-to extend the default registry behavior.
+Extends a registry to inherit functionality provided by a given plugin. A plugin is an object with properties aligning to that of a registry, merged to extend the default registry behavior.
 
 _Parameters_
 
@@ -711,8 +693,7 @@ _Parameters_
 
 A custom react hook returning the current registry dispatch actions creators.
 
-Note: The component using this hook must be within the context of a
-RegistryProvider.
+Note: The component using this hook must be within the context of a RegistryProvider.
 
 _Usage_
 
@@ -721,8 +702,8 @@ the server via the `useSelect` hook to use in combination with the dispatch
 action.
 
 ```jsx
+import { useCallback } from 'react';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
 import { store as myCustomStore } from 'my-custom-store';
 
 function Button( { onClick, children } ) {
@@ -763,16 +744,11 @@ _Returns_
 
 A custom react hook exposing the registry context for use.
 
-This exposes the `registry` value provided via the
-<a href="#RegistryProvider">Registry Provider</a> to a component implementing
-this hook.
+This exposes the `registry` value provided via the <a href="#RegistryProvider">Registry Provider</a> to a component implementing this hook.
 
 It acts similarly to the `useContext` react hook.
 
-Note: Generally speaking, `useRegistry` is a low level hook that in most cases
-won't be needed for implementation. Most interactions with the `@wordpress/data`
-API can be performed via the `useSelect` hook, or the `withSelect` and
-`withDispatch` higher order components.
+Note: Generally speaking, `useRegistry` is a low level hook that in most cases won't be needed for implementation. Most interactions with the `@wordpress/data` API can be performed via the `useSelect` hook, or the `withSelect` and `withDispatch` higher order components.
 
 _Usage_
 
@@ -803,8 +779,7 @@ _Returns_
 
 Custom react hook for retrieving props from registered selectors.
 
-In general, this custom React hook follows the
-[rules of hooks](https://reactjs.org/docs/hooks-rules.html).
+In general, this custom React hook follows the [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
 
 _Usage_
 
@@ -867,8 +842,7 @@ _Returns_
 
 ### useSuspenseSelect
 
-A variant of the `useSelect` hook that has the same API, but will throw a
-suspense Promise if any of the called selectors is in an unresolved state.
+A variant of the `useSelect` hook that has the same API, but will throw a suspense Promise if any of the called selectors is in an unresolved state.
 
 _Parameters_
 
@@ -881,8 +855,7 @@ _Returns_
 
 ### withDispatch
 
-Higher-order component used to add dispatch props using registered action
-creators.
+Higher-order component used to add dispatch props using registered action creators.
 
 _Usage_
 
@@ -966,25 +939,23 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: Enhanced component with merged dispatcher props.
+-   `ComponentType`: Enhanced component with merged dispatcher props.
 
 ### withRegistry
 
-Higher-order component which renders the original component with the current
-registry context passed as its `registry` prop.
+Higher-order component which renders the original component with the current registry context passed as its `registry` prop.
 
 _Parameters_
 
--   _OriginalComponent_ `WPComponent`: Original component.
+-   _OriginalComponent_ `Component`: Original component.
 
 _Returns_
 
--   `WPComponent`: Enhanced component.
+-   `Component`: Enhanced component.
 
 ### withSelect
 
-Higher-order component used to inject state-derived props using registered
-selectors.
+Higher-order component used to inject state-derived props using registered selectors.
 
 _Usage_
 
@@ -1024,7 +995,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: Enhanced component with merged state data props.
+-   `ComponentType`: Enhanced component with merged state data props.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 
@@ -1035,7 +1006,7 @@ As a response of `dispatch` calls, WordPress data based applications updates the
 -   The selectors are called with the update state.
 -   If the selectors return values that are different than the previous (strict equality), the component rerenders.
 
-As the application grows, this can become costful, so it's important to ensure that we avoid running both these if possible. One of these situations happen when an interaction requires multiple consisecutive `dispatch` calls in order to update the state properly. To avoid rerendering the components each time we call `dispatch`, we can wrap the sequential dispatch calls in `batch` which will ensure that the components only call selectors and rerender once at the end of the sequence.
+As the application grows, this can become costful, so it's important to ensure that we avoid running both these if possible. One of these situations happen when an interaction requires multiple consecutive `dispatch` calls in order to update the state properly. To avoid rerendering the components each time we call `dispatch`, we can wrap the sequential dispatch calls in `batch` which will ensure that the components only call selectors and rerender once at the end of the sequence.
 
 _Usage_
 
@@ -1056,6 +1027,185 @@ function Component() {
 	return <button onClick={ callback }>Click me</button>;
 }
 ```
+
+## Selectors
+
+The following selectors are available on the object returned by `wp.data.select( 'core' )`.
+
+_Example_
+
+```js
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+
+function Component() {
+	const result = useSelect( ( select ) => {
+		const query = { per_page: 20 };
+		const selectorArgs = [ 'postType', 'page', query ];
+
+		return {
+			pages: select( coreDataStore ).getEntityRecords( ...selectorArgs ),
+			hasStartedResolution: select( coreDataStore ).hasStartedResolution(
+				'getEntityRecords', // _selectorName_
+				selectorArgs
+			),
+			hasFinishedResolution: select(
+				coreDataStore
+			).hasFinishedResolution( 'getEntityRecords', selectorArgs ),
+			isResolving: select( coreDataStore ).isResolving(
+				'getEntityRecords',
+				selectorArgs
+			),
+		};
+	} );
+
+	if ( result.hasStartedResolution ) {
+		return <>Fetching data...</>;
+	}
+
+	if ( result.isResolving ) {
+		return (
+			<>
+				{
+					// show a spinner
+				 }
+			</>
+		);
+	}
+
+	if ( result.hasFinishedResolution ) {
+		return (
+			<>
+				{
+					// data is ready
+				 }
+			</>
+		);
+	}
+}
+```
+
+### hasFinishedResolution
+
+Returns true if resolution has completed for a given selector name, and arguments set.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _selectorName_ `string`: Selector name.
+-   _args_ `unknown[]?`: Arguments passed to selector.
+
+_Returns_
+
+-   `boolean`: Whether resolution has completed.
+
+### hasStartedResolution
+
+Returns true if resolution has already been triggered for a given selector name, and arguments set.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _selectorName_ `string`: Selector name.
+-   _args_ `unknown[]?`: Arguments passed to selector.
+
+_Returns_
+
+-   `boolean`: Whether resolution has been triggered.
+
+### isResolving
+
+Returns true if resolution has been triggered but has not yet completed for a given selector name, and arguments set.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _selectorName_ `string`: Selector name.
+-   _args_ `unknown[]?`: Arguments passed to selector.
+
+_Returns_
+
+-   `boolean`: Whether resolution is in progress.
+
+### Normalizing Selector Arguments
+
+In specific circumstances it may be necessary to normalize the arguments passed to a given _call_ of a selector/resolver pairing.
+
+Each resolver has [its resolution status cached in an internal state](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/metadata/reducer.ts#L39) where the [key is the arguments supplied to the selector](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/metadata/utils.ts#L48) at _call_ time.
+
+For example for a selector with a single argument, the related resolver would generate a cache key of: `[ 123 ]`.
+
+[This cache is used to determine the resolution status of a given resolver](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/metadata/selectors.js#L22-L29) which is used to [avoid unwanted additional invocations of resolvers](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/index.js#L469-L474) (which often undertake "expensive" operations such as network requests).
+
+As a result it's important that arguments remain _consistent_ when calling the selector. For example, by _default_ these two calls will not be cached using the same key, even though they are likely identical:
+
+```js
+// Arg as number
+getSomeDataById( 123 );
+
+// Arg as string
+getSomeDataById( '123' );
+```
+
+This is an opportunity to utilize the `__unstableNormalizeArgs` property to guarantee consistency by protecting callers from passing incorrect types.
+
+#### Example
+
+The _3rd_ argument of the following selector is intended to be a `Number`:
+
+```js
+const getItemsSelector = ( name, type, id ) => {
+	return state.items[ name ][ type ][ id ] || null;
+};
+```
+
+However, it is possible that the `id` parameter will be passed as a `String`. In this case, the `__unstableNormalizeArgs` method (property) can be defined on the _selector_ to coerce the arguments to the desired type even if they are provided "incorrectly":
+
+```js
+// Define normalization method.
+getItemsSelector.__unstableNormalizeArgs = ( args ) {
+	// "id" argument at the 2nd index
+	if (args[2] && typeof args[2] === 'string' ) {
+		args[2] === Number(args[2]);
+	}
+
+	return args;
+}
+```
+
+With this in place the following code will behave consistently:
+
+```js
+const getItemsSelector = ( name, type, id ) => {
+	// here 'id' is now guaranteed to be a number.
+	return state.items[ name ][ type ][ id ] || null;
+};
+
+const getItemsResolver = ( name, type, id ) => {
+	// 'id' is also guaranteed to be a number in the resolver.
+	return {};
+};
+
+registry.registerStore( 'store', {
+	// ...
+	selectors: {
+		getItems: getItemsSelector,
+	},
+	resolvers: {
+		getItems: getItemsResolver,
+	},
+} );
+
+// Call with correct number type.
+registry.select( 'store' ).getItems( 'foo', 'bar', 54 );
+
+// Call with the wrong string type, **but** here we have avoided an
+// wanted resolver call because '54' is guaranteed to have been
+// coerced to a number by the `__unstableNormalizeArgs` method.
+registry.select( 'store' ).getItems( 'foo', 'bar', '54' );
+```
+
+Ensuring consistency of arguments for a given selector call is [an important optimization to help improve performance in the data layer](https://github.com/WordPress/gutenberg/pull/52120). However, this type of problem can be usually be avoided by ensuring selectors don't use variable types for their arguments.
 
 ## Going further
 

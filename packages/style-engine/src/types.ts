@@ -21,6 +21,15 @@ export interface BorderIndividualStyles< T extends BoxEdge > {
 }
 
 export interface Style {
+	background?: {
+		backgroundImage: {
+			url?: CSSProperties[ 'backgroundImage' ];
+			source?: string;
+		};
+		backgroundPosition?: CSSProperties[ 'backgroundPosition' ];
+		backgroundRepeat?: CSSProperties[ 'backgroundRepeat' ];
+		backgroundSize?: CSSProperties[ 'backgroundSize' ];
+	};
 	border?: {
 		color?: CSSProperties[ 'borderColor' ];
 		radius?:
@@ -52,8 +61,10 @@ export interface Style {
 		fontStyle?: CSSProperties[ 'fontStyle' ];
 		letterSpacing?: CSSProperties[ 'letterSpacing' ];
 		lineHeight?: CSSProperties[ 'lineHeight' ];
+		textColumns?: CSSProperties[ 'columnCount' ];
 		textDecoration?: CSSProperties[ 'textDecoration' ];
 		textTransform?: CSSProperties[ 'textTransform' ];
+		writingMode?: CSSProperties[ 'writingMode' ];
 	};
 	color?: {
 		text?: CSSProperties[ 'color' ];

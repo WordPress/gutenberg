@@ -48,7 +48,7 @@ export function checkContrasts(
 	outputs: ThemeOutputValues[ 'colors' ]
 ) {
 	const background = inputs.background || COLORS.white;
-	const accent = inputs.accent || '#007cba';
+	const accent = inputs.accent || '#3858e9';
 	const foreground = outputs.foreground || COLORS.gray[ 900 ];
 	const gray = outputs.gray || COLORS.gray;
 

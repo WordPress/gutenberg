@@ -1,23 +1,25 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, PanelBody } from '@wordpress/components';
+import { createSlotFill } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
-import { useEffect, Fragment } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import DefaultSidebar from './default-sidebar';
 import GlobalStylesSidebar from './global-styles-sidebar';
-import NavigationMenuSidebar from './navigation-menu-sidebar';
 import { STORE_NAME } from '../../store/constants';
 import SettingsHeader from './settings-header';
-import TemplateCard from './template-card';
+import PagePanels from './page-panels';
+import TemplatePanel from './template-panel';
+import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
 import { store as editSiteStore } from '../../store';
 
@@ -32,6 +34,7 @@ export function SidebarComplementaryAreaFills() {
 		isEditorSidebarOpened,
 		hasBlockSelection,
 		supportsGlobalStyles,
+		isEditingPage,
 	} = useSelect( ( select ) => {
 		const _sidebar =
 			select( interfaceStore ).getActiveComplementaryArea( STORE_NAME );
@@ -46,31 +49,36 @@ export function SidebarComplementaryAreaFills() {
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			supportsGlobalStyles: ! settings?.supportsTemplatePartsMode,
+			isEditingPage:
+				select( editSiteStore ).isPage() &&
+				select( editorStore ).getRenderingMode() !== 'template-only',
 		};
 	}, [] );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	useEffect( () => {
-		if ( ! isEditorSidebarOpened ) return;
+		// Don't automatically switch tab when the sidebar is closed or when we
+		// are focused on page content.
+		if ( ! isEditorSidebarOpened ) {
+			return;
+		}
 		if ( hasBlockSelection ) {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+			if ( ! isEditingPage ) {
+				enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+			}
 		} else {
 			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
 		}
-	}, [ hasBlockSelection, isEditorSidebarOpened ] );
+	}, [
+		hasBlockSelection,
+		isEditorSidebarOpened,
+		isEditingPage,
+		enableComplementaryArea,
+	] );
 
 	let sidebarName = sidebar;
 	if ( ! isEditorSidebarOpened ) {
 		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
-	}
-
-	// Conditionally include NavMenu sidebar in Plugin only.
-	// Optimise for dead code elimination.
-	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
-	let MaybeNavigationMenuSidebar = Fragment;
-
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
-		MaybeNavigationMenuSidebar = NavigationMenuSidebar;
 	}
 
 	return (
@@ -79,21 +87,21 @@ export function SidebarComplementaryAreaFills() {
 				identifier={ sidebarName }
 				title={ __( 'Settings' ) }
 				icon={ isRTL() ? drawerLeft : drawerRight }
-				closeLabel={ __( 'Close settings sidebar' ) }
+				closeLabel={ __( 'Close Settings' ) }
 				header={ <SettingsHeader sidebarName={ sidebarName } /> }
 				headerClassName="edit-site-sidebar-edit-mode__panel-tabs"
 			>
 				{ sidebarName === SIDEBAR_TEMPLATE && (
-					<PanelBody>
-						<TemplateCard />
-					</PanelBody>
+					<>
+						{ isEditingPage ? <PagePanels /> : <TemplatePanel /> }
+						<PluginTemplateSettingPanel.Slot />
+					</>
 				) }
 				{ sidebarName === SIDEBAR_BLOCK && (
 					<InspectorSlot bubblesVirtually />
 				) }
 			</DefaultSidebar>
 			{ supportsGlobalStyles && <GlobalStylesSidebar /> }
-			<MaybeNavigationMenuSidebar />
 		</>
 	);
 }

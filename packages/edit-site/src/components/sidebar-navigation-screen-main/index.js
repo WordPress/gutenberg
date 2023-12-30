@@ -3,69 +3,89 @@
  */
 import {
 	__experimentalItemGroup as ItemGroup,
-	__experimentalHStack as HStack,
 	__experimentalNavigatorButton as NavigatorButton,
-	Button,
+	__experimentalUseNavigator as useNavigator,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { layout, symbolFilled } from '@wordpress/icons';
+import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
+
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
-import { useLocation } from '../routes';
+import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import getIsListPage from '../../utils/get-is-list-page';
+import TemplatePartHint from './template-part-hint';
 
 export default function SidebarNavigationScreenMain() {
-	const { params } = useLocation();
-	const isListPage = getIsListPage( params );
-	const isEditorPage = ! isListPage;
-	const { __unstableSetCanvasMode } = useDispatch( editSiteStore );
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const { location } = useNavigator();
+	const { setEditorCanvasContainerView } = unlock(
+		useDispatch( editSiteStore )
+	);
+
+	// Clear the editor canvas container view when accessing the main navigation screen.
+	useEffect( () => {
+		if ( location?.path === '/' ) {
+			setEditorCanvasContainerView( undefined );
+		}
+	}, [ setEditorCanvasContainerView, location?.path ] );
 
 	return (
 		<SidebarNavigationScreen
-			path="/"
-			title={
-				<HStack style={ { minHeight: 36 } }>
-					<div>{ __( 'Design' ) }</div>
-					{ ! isMobileViewport && isEditorPage && (
-						<Button
-							className="edit-site-layout__edit-button"
-							label={ __( 'Open the editor' ) }
-							onClick={ () => {
-								__unstableSetCanvasMode( 'edit' );
-							} }
-						>
-							{ __( 'Edit' ) }
-						</Button>
-					) }
-				</HStack>
-			}
+			isRoot
+			title={ __( 'Design' ) }
+			description={ __(
+				'Customize the appearance of your website using the block editor.'
+			) }
 			content={
-				<ItemGroup>
-					<NavigatorButton
-						as={ SidebarNavigationItem }
-						path="/templates"
-						withChevron
-						icon={ layout }
-					>
-						{ __( 'Templates' ) }
-					</NavigatorButton>
-					<NavigatorButton
-						as={ SidebarNavigationItem }
-						path="/template-parts"
-						withChevron
-						icon={ symbolFilled }
-					>
-						{ __( 'Template Parts' ) }
-					</NavigatorButton>
-				</ItemGroup>
+				<>
+					<ItemGroup>
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/navigation"
+							withChevron
+							icon={ navigation }
+						>
+							{ __( 'Navigation' ) }
+						</NavigatorButton>
+						<SidebarNavigationItemGlobalStyles
+							withChevron
+							icon={ styles }
+						>
+							{ __( 'Styles' ) }
+						</SidebarNavigationItemGlobalStyles>
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/page"
+							withChevron
+							icon={ page }
+						>
+							{ __( 'Pages' ) }
+						</NavigatorButton>
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/wp_template"
+							withChevron
+							icon={ layout }
+						>
+							{ __( 'Templates' ) }
+						</NavigatorButton>
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/patterns"
+							withChevron
+							icon={ symbol }
+						>
+							{ __( 'Patterns' ) }
+						</NavigatorButton>
+					</ItemGroup>
+					<TemplatePartHint />
+				</>
 			}
 		/>
 	);

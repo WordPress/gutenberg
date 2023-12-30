@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import { find, map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useState, useCallback } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import {
 	ToolbarButton,
 	Button,
@@ -17,6 +12,7 @@ import {
 	TextControl,
 	SVG,
 	Path,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { link as linkIcon, close } from '@wordpress/icons';
 
@@ -54,16 +50,16 @@ const ImageURLInputUI = ( {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
-	const openLinkUI = useCallback( () => {
+	const openLinkUI = () => {
 		setIsOpen( true );
-	} );
+	};
 
 	const [ isEditingLink, setIsEditingLink ] = useState( false );
 	const [ urlInput, setUrlInput ] = useState( null );
 
 	const autocompleteRef = useRef( null );
 
-	const startEditLink = useCallback( () => {
+	const startEditLink = () => {
 		if (
 			linkDestination === LINK_DESTINATION_MEDIA ||
 			linkDestination === LINK_DESTINATION_ATTACHMENT
@@ -71,17 +67,17 @@ const ImageURLInputUI = ( {
 			setUrlInput( '' );
 		}
 		setIsEditingLink( true );
-	} );
+	};
 
-	const stopEditLink = useCallback( () => {
+	const stopEditLink = () => {
 		setIsEditingLink( false );
-	} );
+	};
 
-	const closeLinkUI = useCallback( () => {
+	const closeLinkUI = () => {
 		setUrlInput( null );
 		stopEditLink();
 		setIsOpen( false );
-	} );
+	};
 
 	const getUpdatedLinkTargetSettings = ( value ) => {
 		const newLinkTarget = value ? '_blank' : undefined;
@@ -110,7 +106,7 @@ const ImageURLInputUI = ( {
 		};
 	};
 
-	const onFocusOutside = useCallback( () => {
+	const onFocusOutside = () => {
 		return ( event ) => {
 			// The autocomplete suggestions list renders in a separate popover (in a portal),
 			// so onFocusOutside fails to detect that a click on a suggestion occurred in the
@@ -127,9 +123,9 @@ const ImageURLInputUI = ( {
 			setUrlInput( null );
 			stopEditLink();
 		};
-	} );
+	};
 
-	const onSubmitLinkChange = useCallback( () => {
+	const onSubmitLinkChange = () => {
 		return ( event ) => {
 			if ( urlInput ) {
 				// It is possible the entered URL actually matches a named link destination.
@@ -148,14 +144,14 @@ const ImageURLInputUI = ( {
 			setUrlInput( null );
 			event.preventDefault();
 		};
-	} );
+	};
 
-	const onLinkRemove = useCallback( () => {
+	const onLinkRemove = () => {
 		onChangeUrl( {
 			linkDestination: LINK_DESTINATION_NONE,
 			href: '',
 		} );
-	} );
+	};
 
 	const getLinkDestinations = () => {
 		const linkDestinations = [
@@ -189,7 +185,7 @@ const ImageURLInputUI = ( {
 			linkDestinationInput = LINK_DESTINATION_NONE;
 		} else {
 			linkDestinationInput = (
-				find( linkDestinations, ( destination ) => {
+				linkDestinations.find( ( destination ) => {
 					return destination.url === value;
 				} ) || { linkDestination: LINK_DESTINATION_CUSTOM }
 			).linkDestination;
@@ -214,30 +210,34 @@ const ImageURLInputUI = ( {
 	};
 
 	const advancedOptions = (
-		<>
+		<VStack spacing="3">
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Open in new tab' ) }
 				onChange={ onSetNewTab }
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
+				__nextHasNoMarginBottom
 				label={ __( 'Link rel' ) }
 				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
 			/>
 			<TextControl
+				__nextHasNoMarginBottom
 				label={ __( 'Link CSS Class' ) }
 				value={ linkClass || '' }
 				onChange={ onSetLinkClass }
 			/>
-		</>
+		</VStack>
 	);
 
 	const linkEditorValue = urlInput !== null ? urlInput : url;
 
 	const urlLabel = (
-		find( getLinkDestinations(), [ 'linkDestination', linkDestination ] ) ||
-		{}
+		getLinkDestinations().find(
+			( destination ) => destination.linkDestination === linkDestination
+		) || {}
 	).title;
 
 	return (
@@ -249,6 +249,7 @@ const ImageURLInputUI = ( {
 				aria-expanded={ isOpen }
 				onClick={ openLinkUI }
 				ref={ setPopoverAnchor }
+				isActive={ !! url }
 			/>
 			{ isOpen && (
 				<URLPopover
@@ -259,7 +260,7 @@ const ImageURLInputUI = ( {
 					additionalControls={
 						! linkEditorValue && (
 							<NavigableMenu>
-								{ map( getLinkDestinations(), ( link ) => (
+								{ getLinkDestinations().map( ( link ) => (
 									<MenuItem
 										key={ link.linkDestination }
 										icon={ link.icon }

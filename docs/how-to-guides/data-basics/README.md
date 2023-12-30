@@ -2,9 +2,10 @@
 
 This tutorial aims to get you comfortable with the Gutenberg data layer. It guides you through building a simple React application that enables the user to manage their WordPress pages. The finished app will look like this:
 
-![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/list-of-pages/part1-finished.jpg)
 
-You may review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/non-block-examples/09-code-data-basics-esnext) in the gutenberg-examples repository.
+[![Open demo in WordPress Playground](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/list-of-pages/part1-finished.jpg)](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/WordPress/block-development-examples/trunk/plugins/data-basics-59c8f8/_playground/blueprint.json "Opens demo in WordPress Playground")
+
+You may review the [finished app](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8) in the block-development-examples repository.
 
 ### Table of Contents
 

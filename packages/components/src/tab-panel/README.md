@@ -6,11 +6,6 @@ TabPanels organize content across different screens, data sets, and interactions
 
 ![The “Document” tab selected in the sidebar TabPanel.](https://wordpress.org/gutenberg/files/2019/01/s_E36D9C9B8FFA15A1A8CE224E422535A12B016F88884089575F9998E52016A49F_1541785098230_TabPanel.png)
 
-## Table of contents
-
-1. Design guidelines
-2. Development guidelines
-
 ## Design guidelines
 
 ### Usage
@@ -121,6 +116,7 @@ An array of objects containing the following properties:
 -   `title`:`(string)` Defines the translated text for the tab.
 -   `className`:`(string)` Optional. Defines the class to put on the tab.
 -   `icon`:`(ReactNode)` Optional. When set, displays the icon in place of the tab title. The title is then rendered as an aria-label and tooltip.
+-   `disabled`:`(boolean)` Optional. Determines if the tab should be disabled or selectable.
 
 > > **Note:** Other fields may be added to the object and accessed from the child function if desired.
 

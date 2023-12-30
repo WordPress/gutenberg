@@ -30,6 +30,26 @@ export function complementaryAreas( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer for storing the name of the open modal, or null if no modal is open.
+ *
+ * @param {Object} state  Previous state.
+ * @param {Object} action Action object containing the `name` of the modal
+ *
+ * @return {Object} Updated state
+ */
+export function activeModal( state = null, action ) {
+	switch ( action.type ) {
+		case 'OPEN_MODAL':
+			return action.name;
+		case 'CLOSE_MODAL':
+			return null;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	complementaryAreas,
+	activeModal,
 } );

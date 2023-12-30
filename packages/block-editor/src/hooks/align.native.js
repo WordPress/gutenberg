@@ -8,6 +8,7 @@ import { WIDE_ALIGNMENTS } from '@wordpress/components';
 const ALIGNMENTS = [ 'left', 'center', 'right' ];
 
 export * from './align.js';
+export { default } from './align.js';
 
 // Used to filter out blocks that don't support wide/full alignment on mobile
 addFilter(
@@ -36,8 +37,8 @@ addFilter(
 				...settings.attributes,
 				align: {
 					type: 'string',
-					// Allow for '' since it is used by updateAlignment function
-					// in withToolbarControls for special cases with defined default values.
+					// Allow for '' since it is used by the `updateAlignment` function
+					// in toolbar controls for special cases with defined default values.
 					enum: [ ...ALIGNMENTS, '' ],
 				},
 			};

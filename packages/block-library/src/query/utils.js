@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -13,10 +8,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { cloneBlock, store as blocksStore } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { name as queryLoopName } from './block.json';
+/** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
 /**
  * @typedef IHasNameAndId
@@ -61,6 +53,24 @@ export const getEntitiesInfo = ( entities ) => {
 };
 
 /**
+ * Helper util to return a value from a certain path of the object.
+ * Path is specified as a string of properties, separated by dots,
+ * for example: "parent.child".
+ *
+ * @param {Object} object Input object.
+ * @param {string} path   Path to the object property.
+ * @return {*} Value of the object property at the specified path.
+ */
+export const getValueFromObjectPath = ( object, path ) => {
+	const normalizedPath = path.split( '.' );
+	let value = object;
+	normalizedPath.forEach( ( fieldName ) => {
+		value = value?.[ fieldName ];
+	} );
+	return value;
+};
+
+/**
  * Helper util to map records to add a `name` prop from a
  * provided path, in order to handle all entities in the same
  * fashion(implementing`IHasNameAndId` interface).
@@ -72,7 +82,7 @@ export const getEntitiesInfo = ( entities ) => {
 export const mapToIHasNameAndId = ( entities, path ) => {
 	return ( entities || [] ).map( ( entity ) => ( {
 		...entity,
-		name: decodeEntities( get( entity, path ) ),
+		name: decodeEntities( getValueFromObjectPath( entity, path ) ),
 	} ) );
 };
 
@@ -160,7 +170,7 @@ export function useAllowedControls( attributes ) {
 	return useSelect(
 		( select ) =>
 			select( blocksStore ).getActiveBlockVariation(
-				queryLoopName,
+				'core/query',
 				attributes
 			)?.allowedControls,
 
@@ -234,29 +244,146 @@ export function useBlockNameForPatterns( clientId, attributes ) {
 	const activeVariationName = useSelect(
 		( select ) =>
 			select( blocksStore ).getActiveBlockVariation(
-				queryLoopName,
+				'core/query',
 				attributes
 			)?.name,
-
 		[ attributes ]
 	);
-	const blockName = `${ queryLoopName }/${ activeVariationName }`;
-	const activeVariationPatterns = useSelect(
+	const blockName = `core/query/${ activeVariationName }`;
+	const hasActiveVariationPatterns = useSelect(
 		( select ) => {
 			if ( ! activeVariationName ) {
-				return;
+				return false;
 			}
-			const {
-				getBlockRootClientId,
-				__experimentalGetPatternsByBlockTypes,
-			} = select( blockEditorStore );
+			const { getBlockRootClientId, getPatternsByBlockTypes } =
+				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
-			return __experimentalGetPatternsByBlockTypes(
+			const activePatterns = getPatternsByBlockTypes(
 				blockName,
 				rootClientId
 			);
+			return activePatterns.length > 0;
 		},
-		[ clientId, activeVariationName ]
+		[ clientId, activeVariationName, blockName ]
 	);
-	return activeVariationPatterns?.length ? blockName : queryLoopName;
+	return hasActiveVariationPatterns ? blockName : 'core/query';
 }
+
+/**
+ * Helper hook that determines if there is an active variation of the block
+ * and if there are available specific scoped `block` variations connected with
+ * this variation.
+ *
+ * If there are, these variations are going to be the only ones suggested
+ * to the user in setup flow when clicking to `start blank`, without including
+ * the default ones for Query Loop.
+ *
+ * If there are no such scoped `block` variations, the default ones for Query
+ * Loop are going to be suggested.
+ *
+ * The way we determine such variations is with the convention that they have the `namespace`
+ * attribute defined as an array. This array should contain the names(`name` property) of any
+ * variations they want to be connected to.
+ * For example, if we have a `Query Loop` scoped `inserter` variation with the name `products`,
+ * we can connect a scoped `block` variation by setting its `namespace` attribute to `['products']`.
+ * If the user selects this variation, the `namespace` attribute will be overridden by the
+ * main `inserter` variation.
+ *
+ * @param {Object} attributes The block's attributes.
+ * @return {WPBlockVariation[]} The block variations to be suggested in setup flow, when clicking to `start blank`.
+ */
+export function useScopedBlockVariations( attributes ) {
+	const { activeVariationName, blockVariations } = useSelect(
+		( select ) => {
+			const { getActiveBlockVariation, getBlockVariations } =
+				select( blocksStore );
+			return {
+				activeVariationName: getActiveBlockVariation(
+					'core/query',
+					attributes
+				)?.name,
+				blockVariations: getBlockVariations( 'core/query', 'block' ),
+			};
+		},
+		[ attributes ]
+	);
+	const variations = useMemo( () => {
+		// Filter out the variations that have defined a `namespace` attribute,
+		// which means they are 'connected' to specific variations of the block.
+		const isNotConnected = ( variation ) =>
+			! variation.attributes?.namespace;
+		if ( ! activeVariationName ) {
+			return blockVariations.filter( isNotConnected );
+		}
+		const connectedVariations = blockVariations.filter( ( variation ) =>
+			variation.attributes?.namespace?.includes( activeVariationName )
+		);
+		if ( !! connectedVariations.length ) {
+			return connectedVariations;
+		}
+		return blockVariations.filter( isNotConnected );
+	}, [ activeVariationName, blockVariations ] );
+	return variations;
+}
+
+/**
+ * Hook that returns the block patterns for a specific block type.
+ *
+ * @param {string} clientId The block's client ID.
+ * @param {string} name     The block type name.
+ * @return {Object[]} An array of valid block patterns.
+ */
+export const usePatterns = ( clientId, name ) => {
+	return useSelect(
+		( select ) => {
+			const { getBlockRootClientId, getPatternsByBlockTypes } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+			return getPatternsByBlockTypes( name, rootClientId );
+		},
+		[ name, clientId ]
+	);
+};
+
+/**
+ * The object returned by useUnsupportedBlocks with info about the type of
+ * unsupported blocks present inside the Query block.
+ *
+ * @typedef  {Object}  UnsupportedBlocksInfo
+ * @property {boolean} hasBlocksFromPlugins True if blocks from plugins are present.
+ * @property {boolean} hasPostContentBlock  True if a 'core/post-content' block is present.
+ * @property {boolean} hasUnsupportedBlocks True if there are any unsupported blocks.
+ */
+
+/**
+ * Hook that returns an object with information about the unsupported blocks
+ * present inside a Query Loop with the given `clientId`. The returned object
+ * contains props that are true when a certain type of unsupported block is
+ * present.
+ *
+ * @param {string} clientId The block's client ID.
+ * @return {UnsupportedBlocksInfo} The object containing the information.
+ */
+export const useUnsupportedBlocks = ( clientId ) => {
+	return useSelect(
+		( select ) => {
+			const { getClientIdsOfDescendants, getBlockName } =
+				select( blockEditorStore );
+			const blocks = {};
+			getClientIdsOfDescendants( clientId ).forEach(
+				( descendantClientId ) => {
+					const blockName = getBlockName( descendantClientId );
+					if ( ! blockName.startsWith( 'core/' ) ) {
+						blocks.hasBlocksFromPlugins = true;
+					} else if ( blockName === 'core/post-content' ) {
+						blocks.hasPostContentBlock = true;
+					}
+				}
+			);
+			blocks.hasUnsupportedBlocks =
+				blocks.hasBlocksFromPlugins || blocks.hasPostContentBlock;
+			return blocks;
+		},
+		[ clientId ]
+	);
+};

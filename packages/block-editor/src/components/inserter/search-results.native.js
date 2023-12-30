@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,20 +22,23 @@ function InserterSearchResults( {
 	rootClientId,
 	isFullScreen,
 } ) {
-	const { blockTypes } = useSelect(
+	const { inserterItems } = useSelect(
 		( select ) => {
-			const allItems =
+			const items =
 				select( blockEditorStore ).getInserterItems( rootClientId );
 
-			const availableItems = filterInserterItems( allItems, {
-				allowReusable: true,
-			} );
-			const filteredItems = searchItems( availableItems, filterValue );
-
-			return { blockTypes: filteredItems };
+			return { inserterItems: items };
 		},
-		[ rootClientId, filterValue ]
+		[ rootClientId ]
 	);
+
+	const blockTypes = useMemo( () => {
+		const availableItems = filterInserterItems( inserterItems, {
+			allowReusable: true,
+		} );
+
+		return searchItems( availableItems, filterValue );
+	}, [ inserterItems, filterValue ] );
 
 	const { items, trackBlockTypeSelected } =
 		useBlockTypeImpressions( blockTypes );
@@ -54,6 +59,7 @@ function InserterSearchResults( {
 			sections={ [ createInserterSection( { key: 'search', items } ) ] }
 			onSelect={ handleSelect }
 			listProps={ listProps }
+			label={ __( 'Blocks' ) }
 		/>
 	);
 }

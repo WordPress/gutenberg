@@ -7,7 +7,7 @@ import type { Editor } from './index';
  * The block toolbar is not always visible while typing.
  * Call this function to reveal it.
  *
- * @param {Editor} this
+ * @param this
  */
 export async function showBlockToolbar( this: Editor ) {
 	// Move the mouse to disable the isTyping mode. We need at least three

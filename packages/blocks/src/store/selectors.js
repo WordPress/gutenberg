@@ -3,12 +3,16 @@
  */
 import createSelector from 'rememo';
 import removeAccents from 'remove-accents';
-import { get, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { pipe } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { getValueFromObjectPath } from './utils';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
@@ -27,17 +31,6 @@ const getNormalizedBlockType = ( state, nameOrType ) =>
 	'string' === typeof nameOrType
 		? getBlockType( state, nameOrType )
 		: nameOrType;
-
-/**
- * Returns all the unprocessed block types as passed during the registration.
- *
- * @param {Object} state Data state.
- *
- * @return {Array} Unprocessed block types.
- */
-export function __experimentalGetUnprocessedBlockTypes( state ) {
-	return state.unprocessedBlockTypes;
-}
 
 /**
  * Returns all the available block types.
@@ -553,12 +546,11 @@ export function getGroupingBlockName( state ) {
  */
 export const getChildBlockNames = createSelector(
 	( state, blockName ) => {
-		return map(
-			getBlockTypes( state ).filter( ( blockType ) => {
+		return getBlockTypes( state )
+			.filter( ( blockType ) => {
 				return blockType.parent?.includes( blockName );
-			} ),
-			( { name } ) => name
-		);
+			} )
+			.map( ( { name } ) => name );
 	},
 	( state ) => [ state.blockTypes ]
 );
@@ -608,7 +600,11 @@ export const getBlockSupport = (
 		return defaultSupports;
 	}
 
-	return get( blockType.supports, feature, defaultSupports );
+	return getValueFromObjectPath(
+		blockType.supports,
+		feature,
+		defaultSupports
+	);
 };
 
 /**

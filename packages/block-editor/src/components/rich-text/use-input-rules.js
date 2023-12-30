@@ -3,7 +3,7 @@
  */
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
-import { insert, toHTMLString } from '@wordpress/rich-text';
+import { insert, isCollapsed, toHTMLString } from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
@@ -28,8 +28,13 @@ function findSelection( blocks ) {
 		if ( attributeKey ) {
 			blocks[ i ].attributes[ attributeKey ] = blocks[ i ].attributes[
 				attributeKey
-			].replace( START_OF_SELECTED_AREA, '' );
-			return blocks[ i ].clientId;
+			]
+				// To do: refactor this to use rich text's selection instead, so
+				// we no longer have to use on this hack inserting a special
+				// character.
+				.toString()
+				.replace( START_OF_SELECTED_AREA, '' );
+			return [ blocks[ i ].clientId, attributeKey, 0, 0 ];
 		}
 
 		const nestedSelection = findSelection( blocks[ i ].innerBlocks );
@@ -38,6 +43,36 @@ function findSelection( blocks ) {
 			return nestedSelection;
 		}
 	}
+
+	return [];
+}
+
+/**
+ * An input rule that replaces two spaces with an en space, and an en space
+ * followed by a space with an em space.
+ *
+ * @param {Object} value Value to replace spaces in.
+ *
+ * @return {Object} Value with spaces replaced.
+ */
+function replacePrecedingSpaces( value ) {
+	if ( ! isCollapsed( value ) ) {
+		return value;
+	}
+
+	const { text, start } = value;
+	const lastTwoCharacters = text.slice( start - 2, start );
+
+	// Replace two spaces with an em space.
+	if ( lastTwoCharacters === '  ' ) {
+		return insert( value, '\u2002', start - 2, start );
+	}
+	// Replace an en space followed by a space with an em space.
+	else if ( lastTwoCharacters === '\u2002 ' ) {
+		return insert( value, '\u2003', start - 2, start );
+	}
+
+	return value;
 }
 
 export function useInputRules( props ) {
@@ -49,12 +84,15 @@ export function useInputRules( props ) {
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function inputRule() {
-			const { value, onReplace, selectionChange } = propsRef.current;
+			const { getValue, onReplace, selectionChange } = propsRef.current;
 
 			if ( ! onReplace ) {
 				return;
 			}
 
+			// We must use getValue() here because value may be update
+			// asynchronously.
+			const value = getValue();
 			const { start, text } = value;
 			const characterBefore = text.slice( start - 1, start );
 
@@ -83,15 +121,17 @@ export function useInputRules( props ) {
 			} );
 			const block = transformation.transform( content );
 
-			selectionChange( findSelection( [ block ] ) );
+			selectionChange( ...findSelection( [ block ] ) );
 			onReplace( [ block ] );
 			__unstableMarkAutomaticChange();
+
+			return true;
 		}
 
 		function onInput( event ) {
 			const { inputType, type } = event;
 			const {
-				value,
+				getValue,
 				onChange,
 				__unstableAllowPrefixTransformations,
 				formatTypes,
@@ -102,10 +142,11 @@ export function useInputRules( props ) {
 				return;
 			}
 
-			if ( __unstableAllowPrefixTransformations && inputRule ) {
-				inputRule();
+			if ( __unstableAllowPrefixTransformations && inputRule() ) {
+				return;
 			}
 
+			const value = getValue();
 			const transformed = formatTypes.reduce(
 				( accumlator, { __unstableInputRule } ) => {
 					if ( __unstableInputRule ) {
@@ -114,7 +155,7 @@ export function useInputRules( props ) {
 
 					return accumlator;
 				},
-				preventEventDiscovery( value )
+				preventEventDiscovery( replacePrecedingSpaces( value ) )
 			);
 
 			if ( transformed !== value ) {

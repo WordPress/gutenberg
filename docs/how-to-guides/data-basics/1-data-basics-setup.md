@@ -18,18 +18,18 @@ Go ahead and create these files using the following snippets:
 **src/index.js:**
 
 ```js
-import { render } from '@wordpress/element';
+import { createRoot } from 'react-dom';
 
 function MyFirstApp() {
 	return <span>Hello from JavaScript!</span>;
 }
 
+const root = createRoot( document.getElementById( 'my-first-gutenberg-app' ) );
 window.addEventListener(
 	'load',
 	function () {
-		render(
+		root.render(
 			<MyFirstApp />,
-			document.querySelector( '#my-first-gutenberg-app' )
 		);
 	},
 	false
@@ -212,4 +212,4 @@ Congratulations! You are now ready to start building the app!
 
 -   Previous part: [Introduction](/docs/how-to-guides/data-basics/README.md)
 -   Next part: [Building a basic list of pages](/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md)
--   (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/non-block-examples/09-code-data-basics-esnext) in the gutenberg-examples repository
+-   (optional) Review the [finished app](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8) in the block-development-examples repository

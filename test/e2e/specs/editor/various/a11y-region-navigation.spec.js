@@ -22,7 +22,18 @@ test.describe( 'Region navigation (@firefox, @webkit)', () => {
 			attributes: { content: 'Dummy text' },
 		} );
 
-		// Navigate to first region and check that we made it.
+		const dummyParagraph = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+			.filter( { hasText: 'Dummy text' } );
+
+		await expect( dummyParagraph ).toBeFocused();
+
+		// Navigate to first region and check that we made it. Must navigate forward 4 times as initial focus is placed in post title field.
+		await page.keyboard.press( 'Control+`' );
+		await page.keyboard.press( 'Control+`' );
+		await page.keyboard.press( 'Control+`' );
 		await page.keyboard.press( 'Control+`' );
 		const editorTopBar = page.locator(
 			'role=region[name="Editor top bar"i]'

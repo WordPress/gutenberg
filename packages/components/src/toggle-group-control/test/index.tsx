@@ -7,50 +7,87 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import Button from '../../button';
 import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
 	ToggleGroupControlOptionIcon,
 } from '../index';
+import type { ToggleGroupControlProps } from '../types';
+import cleanupTooltip from '../../tooltip/test/utils';
 
-function getWrappingPopoverElement( element: HTMLElement ) {
-	return element.closest( '.components-popover' );
-}
+const ControlledToggleGroupControl = ( {
+	value: valueProp,
+	onChange,
+	extraButtonOptions,
+	...props
+}: ToggleGroupControlProps & {
+	extraButtonOptions?: { name: string; value: string }[];
+} ) => {
+	const [ value, setValue ] = useState( valueProp );
 
-describe( 'ToggleGroupControl', () => {
-	const options = (
+	return (
 		<>
-			<ToggleGroupControlOption value="rigas" label="R" />
-			<ToggleGroupControlOption value="jack" label="J" />
+			<ToggleGroupControl
+				{ ...props }
+				onChange={ ( ...changeArgs ) => {
+					setValue( ...changeArgs );
+					onChange?.( ...changeArgs );
+				} }
+				value={ value }
+			/>
+			<Button onClick={ () => setValue( undefined ) }>Reset</Button>
+			{ extraButtonOptions?.map( ( obj ) => (
+				<Button
+					key={ obj.value }
+					onClick={ () => setValue( obj.value ) }
+				>
+					{ obj.name }
+				</Button>
+			) ) }
 		</>
 	);
-	const optionsWithTooltip = (
-		<>
-			<ToggleGroupControlOption
-				value="gnocchi"
-				label="Delicious Gnocchi"
-				aria-label="Click for Delicious Gnocchi"
-				showTooltip={ true }
-			/>
-			<ToggleGroupControlOption
-				value="caponata"
-				label="Sumptuous Caponata"
-				aria-label="Click for Sumptuous Caponata"
-			/>
-		</>
-	);
+};
+const options = (
+	<>
+		<ToggleGroupControlOption value="rigas" label="R" />
+		<ToggleGroupControlOption value="jack" label="J" />
+	</>
+);
+const optionsWithTooltip = (
+	<>
+		<ToggleGroupControlOption
+			value="gnocchi"
+			label="Delicious Gnocchi"
+			aria-label="Click for Delicious Gnocchi"
+			showTooltip={ true }
+		/>
+		<ToggleGroupControlOption
+			value="caponata"
+			label="Sumptuous Caponata"
+			aria-label="Click for Sumptuous Caponata"
+		/>
+	</>
+);
+
+describe.each( [
+	[ 'uncontrolled', ToggleGroupControl ],
+	[ 'controlled', ControlledToggleGroupControl ],
+] )( 'ToggleGroupControl %s', ( ...modeAndComponent ) => {
+	const [ mode, Component ] = modeAndComponent;
 
 	describe( 'should render correctly', () => {
 		it( 'with text options', () => {
 			const { container } = render(
-				<ToggleGroupControl label="Test Toggle Group Control">
+				<Component label="Test Toggle Group Control">
 					{ options }
-				</ToggleGroupControl>
+				</Component>
 			);
 
 			expect( container ).toMatchSnapshot();
@@ -58,10 +95,7 @@ describe( 'ToggleGroupControl', () => {
 
 		it( 'with icons', () => {
 			const { container } = render(
-				<ToggleGroupControl
-					value="uppercase"
-					label="Test Toggle Group Control"
-				>
+				<Component value="uppercase" label="Test Toggle Group Control">
 					<ToggleGroupControlOptionIcon
 						value="uppercase"
 						icon={ formatUppercase }
@@ -72,26 +106,24 @@ describe( 'ToggleGroupControl', () => {
 						icon={ formatLowercase }
 						label="Lowercase"
 					/>
-				</ToggleGroupControl>
+				</Component>
 			);
 
 			expect( container ).toMatchSnapshot();
 		} );
 	} );
 	it( 'should call onChange with proper value', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		const mockOnChange = jest.fn();
 
 		render(
-			<ToggleGroupControl
+			<Component
 				value="jack"
 				onChange={ mockOnChange }
 				label="Test Toggle Group Control"
 			>
 				{ options }
-			</ToggleGroupControl>
+			</Component>
 		);
 
 		await user.click( screen.getByRole( 'radio', { name: 'R' } ) );
@@ -100,13 +132,11 @@ describe( 'ToggleGroupControl', () => {
 	} );
 
 	it( 'should render tooltip where `showTooltip` === `true`', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		render(
-			<ToggleGroupControl label="Test Toggle Group Control">
+			<Component label="Test Toggle Group Control">
 				{ optionsWithTooltip }
-			</ToggleGroupControl>
+			</Component>
 		);
 
 		const firstRadio = screen.getByLabelText(
@@ -119,23 +149,17 @@ describe( 'ToggleGroupControl', () => {
 			'Click for Delicious Gnocchi'
 		);
 
-		await waitFor( () =>
-			expect(
-				getWrappingPopoverElement( tooltip )
-			).toBePositionedPopover()
-		);
+		await waitFor( () => expect( tooltip ).toBeVisible() );
 
-		expect( tooltip ).toBeVisible();
+		await cleanupTooltip( user );
 	} );
 
 	it( 'should not render tooltip', async () => {
-		const user = userEvent.setup( {
-			advanceTimers: jest.advanceTimersByTime,
-		} );
+		const user = userEvent.setup();
 		render(
-			<ToggleGroupControl label="Test Toggle Group Control">
+			<Component label="Test Toggle Group Control">
 				{ optionsWithTooltip }
-			</ToggleGroupControl>
+			</Component>
 		);
 
 		const secondRadio = screen.getByLabelText(
@@ -151,22 +175,92 @@ describe( 'ToggleGroupControl', () => {
 		);
 	} );
 
+	if ( mode === 'controlled' ) {
+		it( 'should reset values correctly', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Component label="Test Toggle Group Control">
+					{ options }
+				</Component>
+			);
+
+			const rigasOption = screen.getByRole( 'radio', { name: 'R' } );
+			const jackOption = screen.getByRole( 'radio', { name: 'J' } );
+
+			await user.click( rigasOption );
+
+			expect( jackOption ).not.toBeChecked();
+			expect( rigasOption ).toBeChecked();
+
+			await user.keyboard( '[ArrowRight]' );
+
+			expect( rigasOption ).not.toBeChecked();
+			expect( jackOption ).toBeChecked();
+
+			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+
+			expect( rigasOption ).not.toBeChecked();
+			expect( jackOption ).not.toBeChecked();
+		} );
+
+		it( 'should update correctly when triggered by external updates', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Component
+					value="rigas"
+					label="Test Toggle Group Control"
+					extraButtonOptions={ [
+						{ name: 'Rigas', value: 'rigas' },
+						{ name: 'Jack', value: 'jack' },
+					] }
+				>
+					{ options }
+				</Component>
+			);
+
+			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
+			expect(
+				screen.getByRole( 'radio', { name: 'J' } )
+			).not.toBeChecked();
+
+			await user.click( screen.getByRole( 'button', { name: 'Jack' } ) );
+			expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
+			expect(
+				screen.getByRole( 'radio', { name: 'R' } )
+			).not.toBeChecked();
+
+			await user.click( screen.getByRole( 'button', { name: 'Rigas' } ) );
+			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
+			expect(
+				screen.getByRole( 'radio', { name: 'J' } )
+			).not.toBeChecked();
+
+			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+			expect(
+				screen.getByRole( 'radio', { name: 'R' } )
+			).not.toBeChecked();
+			expect(
+				screen.getByRole( 'radio', { name: 'J' } )
+			).not.toBeChecked();
+		} );
+	}
+
 	describe( 'isDeselectable', () => {
 		describe( 'isDeselectable = false', () => {
 			it( 'should not be deselectable', async () => {
 				const mockOnChange = jest.fn();
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
-					<ToggleGroupControl
+					<Component
 						value="rigas"
 						label="Test"
 						onChange={ mockOnChange }
 					>
 						{ options }
-					</ToggleGroupControl>
+					</Component>
 				);
 
 				const rigas = screen.getByRole( 'radio', {
@@ -178,14 +272,12 @@ describe( 'ToggleGroupControl', () => {
 			} );
 
 			it( 'should not tab to next radio option', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
-					<ToggleGroupControl value="rigas" label="Test">
+					<Component value="rigas" label="Test">
 						{ options }
-					</ToggleGroupControl>
+					</Component>
 				);
 
 				const rigas = screen.getByRole( 'radio', {
@@ -196,26 +288,30 @@ describe( 'ToggleGroupControl', () => {
 				expect( rigas ).toHaveFocus();
 
 				await user.tab();
-				expect( rigas.ownerDocument.body ).toHaveFocus();
+
+				const expectedFocusTarget =
+					mode === 'uncontrolled'
+						? rigas.ownerDocument.body
+						: screen.getByRole( 'button', { name: 'Reset' } );
+
+				expect( expectedFocusTarget ).toHaveFocus();
 			} );
 		} );
 
 		describe( 'isDeselectable = true', () => {
 			it( 'should be deselectable', async () => {
 				const mockOnChange = jest.fn();
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
-					<ToggleGroupControl
+					<Component
 						value="rigas"
 						label="Test"
 						onChange={ mockOnChange }
 						isDeselectable
 					>
 						{ options }
-					</ToggleGroupControl>
+					</Component>
 				);
 
 				await user.click(
@@ -225,28 +321,25 @@ describe( 'ToggleGroupControl', () => {
 					} )
 				);
 				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-				expect( mockOnChange ).toHaveBeenCalledWith( undefined );
-				expect(
+				expect( mockOnChange ).toHaveBeenLastCalledWith( undefined );
+
+				await user.click(
 					screen.getByRole( 'button', {
 						name: 'R',
 						pressed: false,
 					} )
-				).toBeVisible();
+				);
+				expect( mockOnChange ).toHaveBeenCalledTimes( 2 );
+				expect( mockOnChange ).toHaveBeenLastCalledWith( 'rigas' );
 			} );
 
 			it( 'should tab to the next option button', async () => {
-				const user = userEvent.setup( {
-					advanceTimers: jest.advanceTimersByTime,
-				} );
+				const user = userEvent.setup();
 
 				render(
-					<ToggleGroupControl
-						isDeselectable
-						value="rigas"
-						label="Test"
-					>
+					<Component isDeselectable value="rigas" label="Test">
 						{ options }
-					</ToggleGroupControl>
+					</Component>
 				);
 
 				await user.tab();

@@ -1,6 +1,5 @@
 .wp-block-columns {
 	display: flex;
-	margin-bottom: 1.75em;
 	box-sizing: border-box;
 
 	// Responsiveness: Allow wrapping on mobile.
@@ -73,6 +72,11 @@
 	}
 }
 
+// Lower specificity of margin styles so they don't override the Layout block support.
+:where(.wp-block-columns) {
+	margin-bottom: 1.75em;
+}
+
 // Add low specificity default padding to columns blocks with backgrounds.
 :where(.wp-block-columns.has-background) {
 	// Matches paragraph block padding.
@@ -103,6 +107,10 @@
 
 	&.is-vertically-aligned-bottom {
 		align-self: flex-end;
+	}
+
+	&.is-vertically-aligned-stretch {
+		align-self: stretch;
 	}
 
 	&.is-vertically-aligned-top,

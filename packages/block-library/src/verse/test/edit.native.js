@@ -1,47 +1,118 @@
 /**
  * External dependencies
  */
-import { render } from 'test/helpers';
-
-/**
- * Internal dependencies
- */
-import { metadata, settings, name } from '../index';
+import {
+	addBlock,
+	getEditorHtml,
+	initializeEditor,
+	getBlock,
+	typeInRichText,
+	fireEvent,
+} from 'test/helpers';
 
 /**
  * WordPress dependencies
  */
-import { BlockEdit } from '@wordpress/block-editor';
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
+import { registerCoreBlocks } from '@wordpress/block-library';
+import { ENTER } from '@wordpress/keycodes';
 
-const Verse = ( { clientId, ...props } ) => (
-	<BlockEdit name={ name } clientId={ clientId || 0 } { ...props } />
-);
+beforeAll( () => {
+	// Register all core blocks
+	registerCoreBlocks();
+} );
 
-describe( 'Verse Block', () => {
-	beforeAll( () => {
-		registerBlockType( name, {
-			...metadata,
-			...settings,
+afterAll( () => {
+	// Clean up registered blocks
+	getBlockTypes().forEach( ( block ) => {
+		unregisterBlockType( block.name );
+	} );
+} );
+
+describe( 'Verse block', () => {
+	it( 'inserts block', async () => {
+		const screen = await initializeEditor();
+
+		// Add block
+		await addBlock( screen, 'Verse' );
+
+		// Get block
+		const verseBlock = await getBlock( screen, 'Verse' );
+		expect( verseBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'renders block text set as initial content', async () => {
+		const screen = await initializeEditor( {
+			initialHtml: `<!-- wp:verse -->
+			<pre class="wp-block-verse">Sample text</pre>
+			<!-- /wp:verse -->`,
 		} );
+
+		// Get block
+		const verseBlock = await getBlock( screen, 'Verse' );
+		expect( verseBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	afterAll( () => {
-		unregisterBlockType( name );
+	it( 'should produce expected markup for multiline text', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Verse' );
+
+		// Act
+		const verseTextInput =
+			await screen.findByPlaceholderText( 'Write verse…' );
+		typeInRichText( verseTextInput, 'A great statement.' );
+		fireEvent( verseTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+		typeInRichText( verseTextInput, 'Again' );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:verse -->
+		<pre class="wp-block-verse">A great statement.<br>Again</pre>
+		<!-- /wp:verse -->"
+	` );
 	} );
 
-	it( 'renders without crashing', () => {
-		const component = render( <Verse attributes={ { content: '' } } /> );
-		const rendered = component.toJSON();
-		expect( rendered ).toBeTruthy();
-	} );
+	it( 'should split on triple Enter', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Verse' );
 
-	it( 'renders given text without crashing', () => {
-		const component = render(
-			<Verse attributes={ { content: 'sample text' } } />
-		);
-		expect(
-			component.getByDisplayValue( '<pre>sample text</pre>' )
-		).toBeTruthy();
+		// Act
+		const verseTextInput =
+			await screen.findByPlaceholderText( 'Write verse…' );
+		typeInRichText( verseTextInput, 'Hello' );
+		fireEvent( verseTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+		fireEvent( verseTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+		fireEvent( verseTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:verse -->
+		<pre class="wp-block-verse">Hello</pre>
+		<!-- /wp:verse -->
+
+		<!-- wp:paragraph -->
+		<p></p>
+		<!-- /wp:paragraph -->"
+	` );
 	} );
 } );

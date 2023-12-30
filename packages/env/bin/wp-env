@@ -1,4 +1,20 @@
 #!/usr/bin/env node
 'use strict';
-const command = process.argv.slice( 2 );
-require( '../lib/cli' )().parse( command.length ? command : [ '--help' ] );
+
+// Remove 'node' and the name of the script from the arguments.
+let command = process.argv.slice( 2 );
+// Default to help text when they aren't running any commands.
+if ( ! command.length ) {
+	command = [ '--help' ];
+}
+
+// Rather than just executing the current CLI we will attempt to find a local version
+// and execute that one instead. This prevents users from accidentally using the
+// global CLI when a potentially different local version is expected.
+const localPath = require.resolve( '@wordpress/env/lib/cli.js', {
+	paths: [ process.cwd(), __dirname ],
+} );
+const cli = require( localPath )();
+
+// Now we can execute the CLI with the given command.
+cli.parse( command );

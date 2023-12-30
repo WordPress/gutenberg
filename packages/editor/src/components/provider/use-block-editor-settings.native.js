@@ -13,11 +13,10 @@ import { store as editorStore } from '../../store';
 
 const EMPTY_BLOCKS_LIST = [];
 
-function useNativeBlockEditorSettings( settings, hasTemplate ) {
-	const capabilities = settings.capabilities ?? {};
-	const editorSettings = useBlockEditorSettings( settings, hasTemplate );
+function useNativeBlockEditorSettings( settings, postType, postId ) {
+	const editorSettings = useBlockEditorSettings( settings, postType, postId );
+	const supportReusableBlock = settings.capabilities?.reusableBlock === true;
 
-	const supportReusableBlock = capabilities.reusableBlock === true;
 	const { reusableBlocks, isTitleSelected } = useSelect(
 		( select ) => {
 			return {

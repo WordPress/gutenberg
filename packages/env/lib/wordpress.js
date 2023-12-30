@@ -1,11 +1,13 @@
+'use strict';
 /**
  * External dependencies
  */
-const dockerCompose = require( 'docker-compose' );
+const { v2: dockerCompose } = require( 'docker-compose' );
 const util = require( 'util' );
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const got = require( 'got' );
+const dns = require( 'dns' ).promises;
 
 /**
  * Promisified dependencies
@@ -13,8 +15,13 @@ const got = require( 'got' );
 const copyDir = util.promisify( require( 'copy-dir' ) );
 
 /**
+ * Internal dependencies
+ */
+const { getCache, setCache } = require( './cache' );
+
+/**
  * @typedef {import('./config').WPConfig} WPConfig
- * @typedef {import('./config').WPServiceConfig} WPServiceConfig
+ * @typedef {import('./config').WPEnvironmentConfig} WPEnvironmentConfig
  * @typedef {import('./config').WPSource} WPSource
  * @typedef {'development'|'tests'} WPEnvironment
  * @typedef {'development'|'tests'|'all'} WPEnvironmentSelection
@@ -44,20 +51,7 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  * @param {Object}        spinner     A CLI spinner which indicates progress.
  */
 async function configureWordPress( environment, config, spinner ) {
-	const url = ( () => {
-		const port = config.env[ environment ].port;
-		const domain =
-			environment === 'tests'
-				? config.env.tests.config.WP_TESTS_DOMAIN
-				: config.env.development.config.WP_SITEURL;
-		if ( port === 80 ) {
-			return domain;
-		}
-
-		return `${ domain }:${ port }`;
-	} )();
-
-	const installCommand = `wp core install --url="${ url }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
+	const installCommand = `wp core install --url="${ config.env[ environment ].config.WP_SITEURL }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.
 	const setupCommands = [ 'set -eo pipefail', installCommand ];
@@ -99,6 +93,7 @@ async function configureWordPress( environment, config, spinner ) {
 		[ 'bash', '-c', setupCommands.join( ' && ' ) ],
 		{
 			config: config.dockerComposeConfigPath,
+			commandOptions: [ '--rm' ],
 			log: config.debug,
 		}
 	);
@@ -160,30 +155,13 @@ async function setupWordPressDirectories( config ) {
 			config.env.development.coreSource.path,
 			config.env.development.coreSource.testsPath
 		);
-		await createUploadsDir( config.env.development.coreSource.testsPath );
 	}
-
-	const checkedPaths = {};
-	for ( const { coreSource } of Object.values( config.env ) ) {
-		if ( coreSource && ! checkedPaths[ coreSource.path ] ) {
-			await createUploadsDir( coreSource.path );
-			checkedPaths[ coreSource.path ] = true;
-		}
-	}
-}
-
-async function createUploadsDir( corePath ) {
-	// Ensure the tests uploads folder is writeable for travis,
-	// creating the folder if necessary.
-	const uploadPath = path.join( corePath, 'wp-content/uploads' );
-	await fs.mkdir( uploadPath, { recursive: true } );
-	await fs.chmod( uploadPath, 0o0767 );
 }
 
 /**
  * Returns true if all given environment configs have the same core source.
  *
- * @param {WPServiceConfig[]} envs An array of environments to check.
+ * @param {WPEnvironmentConfig[]} envs An array of environments to check.
  *
  * @return {boolean} True if all the environments have the same core source.
  */
@@ -272,16 +250,51 @@ async function readWordPressVersion( coreSource, spinner, debug ) {
 }
 
 /**
+ * Basically a quick check to see if we can connect to the internet.
+ *
+ * @return {boolean} True if we can connect to WordPress.org, false otherwise.
+ */
+let IS_OFFLINE;
+async function canAccessWPORG() {
+	// Avoid situations where some parts of the code think we're offline and others don't.
+	if ( IS_OFFLINE !== undefined ) {
+		return IS_OFFLINE;
+	}
+	IS_OFFLINE = !! ( await dns.resolve( 'WordPress.org' ).catch( () => {} ) );
+	return IS_OFFLINE;
+}
+
+/**
  * Returns the latest stable version of WordPress by requesting the stable-check
  * endpoint on WordPress.org.
  *
+ * @param {Object} options an object with cacheDirectoryPath set to the path to the cache directory in ~/.wp-env.
  * @return {string} The latest stable version of WordPress, like "6.0.1"
  */
 let CACHED_WP_VERSION;
-async function getLatestWordPressVersion() {
+async function getLatestWordPressVersion( options ) {
 	// Avoid extra network requests.
 	if ( CACHED_WP_VERSION ) {
 		return CACHED_WP_VERSION;
+	}
+
+	const cacheOptions = {
+		workDirectoryPath: options.cacheDirectoryPath,
+	};
+
+	// When we can't connect to the internet, we don't want to break wp-env or
+	// wait for the stable-check result to timeout.
+	if ( ! ( await canAccessWPORG() ) ) {
+		const latestVersion = await getCache(
+			'latestWordPressVersion',
+			cacheOptions
+		);
+		if ( ! latestVersion ) {
+			throw new Error(
+				'Could not find the current WordPress version in the cache and the network is not available.'
+			);
+		}
+		return latestVersion;
 	}
 
 	const versions = await got(
@@ -291,6 +304,7 @@ async function getLatestWordPressVersion() {
 	for ( const [ version, status ] of Object.entries( versions ) ) {
 		if ( status === 'latest' ) {
 			CACHED_WP_VERSION = version;
+			await setCache( 'latestWordPressVersion', version, cacheOptions );
 			return version;
 		}
 	}
@@ -303,5 +317,6 @@ module.exports = {
 	resetDatabase,
 	setupWordPressDirectories,
 	readWordPressVersion,
+	canAccessWPORG,
 	getLatestWordPressVersion,
 };

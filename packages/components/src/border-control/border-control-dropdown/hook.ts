@@ -8,7 +8,8 @@ import { useMemo } from '@wordpress/element';
  */
 import * as styles from '../styles';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 
 import type { DropdownProps } from '../types';
@@ -25,7 +26,6 @@ export function useBorderControlDropdown(
 		onChange,
 		previousStyleSelection,
 		size = 'default',
-		__experimentalHasMultipleOrigins = false,
 		__experimentalIsRenderedInSidebar = false,
 		...otherProps
 	} = useContextSystem( props, 'BorderControlDropdown' );
@@ -57,8 +57,8 @@ export function useBorderControlDropdown(
 	// Generate class names.
 	const cx = useCx();
 	const classes = useMemo( () => {
-		return cx( styles.borderControlDropdown( size ), className );
-	}, [ className, cx, size ] );
+		return cx( styles.borderControlDropdown, className );
+	}, [ className, cx ] );
 
 	const indicatorClassName = useMemo( () => {
 		return cx( styles.borderColorIndicator );
@@ -95,7 +95,7 @@ export function useBorderControlDropdown(
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonClassName,
-		__experimentalHasMultipleOrigins,
+		size,
 		__experimentalIsRenderedInSidebar,
 	};
 }

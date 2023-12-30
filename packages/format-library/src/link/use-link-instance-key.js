@@ -14,7 +14,7 @@ function getKey( _id ) {
  * Builds a unique link control key for the given object reference.
  *
  * @param {Object} instance an unique object reference specific to this link control instance.
- * @return {string} the unique key to use for this link control.
+ * @return {string | undefined} the unique key to use for this link control.
  */
 function useLinkInstanceKey( instance ) {
 	if ( ! instance ) {

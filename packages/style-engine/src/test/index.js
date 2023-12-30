@@ -72,6 +72,7 @@ describe( 'generate', () => {
 						fontWeight: '800',
 						fontFamily: "'Helvetica Neue',sans-serif",
 						lineHeight: '3.3',
+						textColumns: '2',
 						textDecoration: 'line-through',
 						letterSpacing: '12px',
 						textTransform: 'uppercase',
@@ -88,7 +89,7 @@ describe( 'generate', () => {
 				}
 			)
 		).toEqual(
-			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; min-height: 50vh; outline-color: red; outline-style: dashed; outline-offset: 2px; outline-width: 4px; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; text-decoration: line-through; text-transform: uppercase; }"
+			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; min-height: 50vh; outline-color: red; outline-style: dashed; outline-offset: 2px; outline-width: 4px; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; column-count: 2; text-decoration: line-through; text-transform: uppercase; }"
 		);
 	} );
 
@@ -242,6 +243,7 @@ describe( 'getCSSRules', () => {
 						fontWeight: '800',
 						fontFamily: "'Helvetica Neue',sans-serif",
 						lineHeight: '3.3',
+						textColumns: '2',
 						textDecoration: 'line-through',
 						letterSpacing: '12px',
 						textTransform: 'uppercase',
@@ -348,6 +350,11 @@ describe( 'getCSSRules', () => {
 				selector: '.some-selector',
 				key: 'lineHeight',
 				value: '3.3',
+			},
+			{
+				selector: '.some-selector',
+				key: 'columnCount',
+				value: '2',
 			},
 			{
 				selector: '.some-selector',

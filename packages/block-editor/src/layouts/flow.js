@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
 import { getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
+import { LAYOUT_DEFINITIONS } from './definitions';
 
 export default {
 	name: 'default',
@@ -24,7 +25,7 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
-		layoutDefinitions,
+		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );
 
@@ -56,7 +57,7 @@ export default {
 	getOrientation() {
 		return 'vertical';
 	},
-	getAlignments( layout ) {
+	getAlignments( layout, isBlockBasedTheme ) {
 		const alignmentInfo = getAlignmentsInfo( layout );
 		if ( layout.alignments !== undefined ) {
 			if ( ! layout.alignments.includes( 'none' ) ) {
@@ -67,7 +68,6 @@ export default {
 				info: alignmentInfo[ alignment ],
 			} ) );
 		}
-		const { contentSize, wideSize } = layout;
 
 		const alignments = [
 			{ name: 'left' },
@@ -75,12 +75,19 @@ export default {
 			{ name: 'right' },
 		];
 
-		if ( contentSize ) {
-			alignments.unshift( { name: 'full' } );
-		}
+		// This is for backwards compatibility with hybrid themes.
+		if ( ! isBlockBasedTheme ) {
+			const { contentSize, wideSize } = layout;
+			if ( contentSize ) {
+				alignments.unshift( { name: 'full' } );
+			}
 
-		if ( wideSize ) {
-			alignments.unshift( { name: 'wide', info: alignmentInfo.wide } );
+			if ( wideSize ) {
+				alignments.unshift( {
+					name: 'wide',
+					info: alignmentInfo.wide,
+				} );
+			}
 		}
 
 		alignments.unshift( { name: 'none', info: alignmentInfo.none } );
