@@ -3,13 +3,15 @@
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 import {
 	Button,
 	CheckboxControl,
 	TextControl,
 	TreeSelect,
 	withFilters,
-	__experimentalVStack as VStack,
+	Flex,
+	FlexItem,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
@@ -147,7 +149,7 @@ export function getFilterMatcher( filterValue ) {
  *
  * @param {Object} props      Component props.
  * @param {string} props.slug Taxonomy slug.
- * @return {WPElement}        Hierarchical term selector component.
+ * @return {Element}        Hierarchical term selector component.
  */
 export function HierarchicalTermSelector( { slug } ) {
 	const [ adding, setAdding ] = useState( false );
@@ -215,6 +217,8 @@ export function HierarchicalTermSelector( { slug } ) {
 		[ availableTerms ]
 	);
 
+	const { createErrorNotice } = useDispatch( noticesStore );
+
 	if ( ! hasAssignAction ) {
 		return null;
 	}
@@ -226,7 +230,9 @@ export function HierarchicalTermSelector( { slug } ) {
 	 * @return {Promise} A promise that resolves to save term object.
 	 */
 	const addTerm = ( term ) => {
-		return saveEntityRecord( 'taxonomy', slug, term );
+		return saveEntityRecord( 'taxonomy', slug, term, {
+			throwOnError: true,
+		} );
 	};
 
 	/**
@@ -288,12 +294,18 @@ export function HierarchicalTermSelector( { slug } ) {
 			return;
 		}
 		setAdding( true );
-
-		const newTerm = await addTerm( {
-			name: formName,
-			parent: formParent ? formParent : undefined,
-		} );
-
+		let newTerm;
+		try {
+			newTerm = await addTerm( {
+				name: formName,
+				parent: formParent ? formParent : undefined,
+			} );
+		} catch ( error ) {
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+			} );
+			return;
+		}
 		const defaultName =
 			slug === 'category' ? __( 'Category' ) : __( 'Term' );
 		const termAddedMessage = sprintf(
@@ -392,11 +404,10 @@ export function HierarchicalTermSelector( { slug } ) {
 	const showFilter = availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER;
 
 	return (
-		<>
+		<Flex direction="column" gap="4">
 			{ showFilter && (
 				<TextControl
 					__nextHasNoMarginBottom
-					className="editor-post-taxonomies__hierarchical-terms-filter"
 					label={ filterLabel }
 					value={ filterValue }
 					onChange={ setFilter }
@@ -413,18 +424,20 @@ export function HierarchicalTermSelector( { slug } ) {
 				) }
 			</div>
 			{ ! loading && hasCreateAction && (
-				<Button
-					onClick={ onToggleForm }
-					className="editor-post-taxonomies__hierarchical-terms-add"
-					aria-expanded={ showForm }
-					variant="link"
-				>
-					{ newTermButtonLabel }
-				</Button>
+				<FlexItem>
+					<Button
+						onClick={ onToggleForm }
+						className="editor-post-taxonomies__hierarchical-terms-add"
+						aria-expanded={ showForm }
+						variant="link"
+					>
+						{ newTermButtonLabel }
+					</Button>
+				</FlexItem>
 			) }
 			{ showForm && (
 				<form onSubmit={ onAddTerm }>
-					<VStack>
+					<Flex direction="column" gap="4">
 						<TextControl
 							__nextHasNoMarginBottom
 							className="editor-post-taxonomies__hierarchical-terms-input"
@@ -435,6 +448,7 @@ export function HierarchicalTermSelector( { slug } ) {
 						/>
 						{ !! availableTerms.length && (
 							<TreeSelect
+								__nextHasNoMarginBottom
 								label={ parentSelectLabel }
 								noOptionLabel={ noParentOption }
 								onChange={ onChangeFormParent }
@@ -442,17 +456,19 @@ export function HierarchicalTermSelector( { slug } ) {
 								tree={ availableTermsTree }
 							/>
 						) }
-					</VStack>
-					<Button
-						variant="secondary"
-						type="submit"
-						className="editor-post-taxonomies__hierarchical-terms-submit"
-					>
-						{ newTermSubmitLabel }
-					</Button>
+						<FlexItem>
+							<Button
+								variant="secondary"
+								type="submit"
+								className="editor-post-taxonomies__hierarchical-terms-submit"
+							>
+								{ newTermSubmitLabel }
+							</Button>
+						</FlexItem>
+					</Flex>
 				</form>
 			) }
-		</>
+		</Flex>
 	);
 }
 

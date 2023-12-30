@@ -51,6 +51,7 @@ const ListViewLeaf = forwardRef(
 				level={ level }
 				positionInSet={ position }
 				setSize={ rowCount }
+				isExpanded={ undefined }
 				{ ...props }
 			>
 				{ children }

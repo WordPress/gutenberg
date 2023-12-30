@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import escapeHtml from 'escape-html';
-
-/**
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -12,8 +7,8 @@ import { FormTokenField, withFilters } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
-import apiFetch from '@wordpress/api-fetch';
 import { speak } from '@wordpress/a11y';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -50,28 +45,6 @@ const termNamesToIds = ( names, terms ) => {
 			terms.find( ( term ) => isSameTermName( term.name, termName ) ).id
 	);
 };
-
-// Tries to create a term or fetch it if it already exists.
-function findOrCreateTerm( termName, restBase, namespace ) {
-	const escapedTermName = escapeHtml( termName );
-
-	return apiFetch( {
-		path: `/${ namespace }/${ restBase }`,
-		method: 'POST',
-		data: { name: escapedTermName },
-	} )
-		.catch( ( error ) => {
-			if ( error.code !== 'term_exists' ) {
-				return Promise.reject( error );
-			}
-
-			return Promise.resolve( {
-				id: error.data.term_id,
-				name: termName,
-			} );
-		} )
-		.then( unescapeTerm );
-}
 
 export function FlatTermSelector( { slug } ) {
 	const [ values, setValues ] = useState( [] );
@@ -142,7 +115,7 @@ export function FlatTermSelector( { slug } ) {
 					: EMPTY_ARRAY,
 			};
 		},
-		[ search ]
+		[ search, slug ]
 	);
 
 	// Update terms state only after the selectors are resolved.
@@ -165,9 +138,29 @@ export function FlatTermSelector( { slug } ) {
 	}, [ searchResults ] );
 
 	const { editPost } = useDispatch( editorStore );
+	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	if ( ! hasAssignAction ) {
 		return null;
+	}
+
+	async function findOrCreateTerm( term ) {
+		try {
+			const newTerm = await saveEntityRecord( 'taxonomy', slug, term, {
+				throwOnError: true,
+			} );
+			return unescapeTerm( newTerm );
+		} catch ( error ) {
+			if ( error.code !== 'term_exists' ) {
+				throw error;
+			}
+
+			return {
+				id: error.data.term_id,
+				name: term.name,
+			};
+		}
 	}
 
 	function onUpdateTerms( newTermIds ) {
@@ -209,17 +202,22 @@ export function FlatTermSelector( { slug } ) {
 			return;
 		}
 
-		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		Promise.all(
 			newTermNames.map( ( termName ) =>
-				findOrCreateTerm( termName, taxonomy.rest_base, namespace )
+				findOrCreateTerm( { name: termName } )
 			)
-		).then( ( newTerms ) => {
-			const newAvailableTerms = availableTerms.concat( newTerms );
-			return onUpdateTerms(
-				termNamesToIds( uniqueTerms, newAvailableTerms )
-			);
-		} );
+		)
+			.then( ( newTerms ) => {
+				const newAvailableTerms = availableTerms.concat( newTerms );
+				return onUpdateTerms(
+					termNamesToIds( uniqueTerms, newAvailableTerms )
+				);
+			} )
+			.catch( ( error ) => {
+				createErrorNotice( error.message, {
+					type: 'snackbar',
+				} );
+			} );
 	}
 
 	function appendTerm( newTerm ) {
@@ -264,6 +262,7 @@ export function FlatTermSelector( { slug } ) {
 	return (
 		<>
 			<FormTokenField
+				__next40pxDefaultSize
 				value={ values }
 				suggestions={ suggestions }
 				onChange={ onChange }

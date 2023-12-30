@@ -88,6 +88,7 @@ export const coreBlocks = [
 	column,
 	cover,
 	embed,
+	group,
 	file,
 	html,
 	mediaText,
@@ -121,7 +122,6 @@ export const coreBlocks = [
  * Function to register a block variations e.g. social icons different types.
  *
  * @param {Object} block The block which variations will be registered.
- *
  */
 const registerBlockVariations = ( block ) => {
 	const { metadata, settings, name } = block;
@@ -261,10 +261,14 @@ export const registerCoreBlocks = () => {
  * than 0, a "new" badge is displayed on the block type within the block
  * inserter.
  *
+ * With the below example, the Audio block will be displayed as "new" until its
+ * impression count reaches 0, which occurs by various actions decrementing
+ * the impression count.
+ *
+ * {
+ * 	[ audio.name ]: 40
+ * }
+ *
  * @constant {{ string, number }}
  */
-export const NEW_BLOCK_TYPES = {
-	[ embed.name ]: 40,
-	[ search.name ]: 40,
-	[ audio.name ]: 40,
-};
+export const NEW_BLOCK_TYPES = {};

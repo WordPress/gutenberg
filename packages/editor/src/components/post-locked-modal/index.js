@@ -6,8 +6,7 @@ import {
 	Modal,
 	Button,
 	ExternalLink,
-	Flex,
-	FlexItem,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
@@ -175,55 +174,30 @@ export default function PostLockedModal() {
 			isDismissible={ false }
 			className="editor-post-locked-modal"
 		>
-			{ !! userAvatar && (
-				<img
-					src={ userAvatar }
-					alt={ __( 'Avatar' ) }
-					className="editor-post-locked-modal__avatar"
-					width={ 64 }
-					height={ 64 }
-				/>
-			) }
-			<div>
-				{ !! isTakeover && (
-					<p>
-						{ createInterpolateElement(
-							userDisplayName
-								? sprintf(
-										/* translators: %s: user's display name */
-										__(
-											'<strong>%s</strong> now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
-										),
-										userDisplayName
-								  )
-								: __(
-										'Another user now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
-								  ),
-							{
-								strong: <strong />,
-								PreviewLink: (
-									<ExternalLink href={ previewLink }>
-										{ __( 'preview' ) }
-									</ExternalLink>
-								),
-							}
-						) }
-					</p>
+			<HStack alignment="top" spacing={ 6 }>
+				{ !! userAvatar && (
+					<img
+						src={ userAvatar }
+						alt={ __( 'Avatar' ) }
+						className="editor-post-locked-modal__avatar"
+						width={ 64 }
+						height={ 64 }
+					/>
 				) }
-				{ ! isTakeover && (
-					<>
+				<div>
+					{ !! isTakeover && (
 						<p>
 							{ createInterpolateElement(
 								userDisplayName
 									? sprintf(
 											/* translators: %s: user's display name */
 											__(
-												'<strong>%s</strong> is currently working on this post (<PreviewLink />), which means you cannot make changes, unless you take over.'
+												'<strong>%s</strong> now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
 											),
 											userDisplayName
 									  )
 									: __(
-											'Another user is currently working on this post (<PreviewLink />), which means you cannot make changes, unless you take over.'
+											'Another user now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
 									  ),
 								{
 									strong: <strong />,
@@ -235,33 +209,55 @@ export default function PostLockedModal() {
 								}
 							) }
 						</p>
-						<p>
-							{ __(
-								'If you take over, the other user will lose editing control to the post, but their changes will be saved.'
-							) }
-						</p>
-					</>
-				) }
-
-				<Flex
-					className="editor-post-locked-modal__buttons"
-					justify="flex-end"
-					expanded={ false }
-				>
+					) }
 					{ ! isTakeover && (
-						<FlexItem>
+						<>
+							<p>
+								{ createInterpolateElement(
+									userDisplayName
+										? sprintf(
+												/* translators: %s: user's display name */
+												__(
+													'<strong>%s</strong> is currently working on this post (<PreviewLink />), which means you cannot make changes, unless you take over.'
+												),
+												userDisplayName
+										  )
+										: __(
+												'Another user is currently working on this post (<PreviewLink />), which means you cannot make changes, unless you take over.'
+										  ),
+									{
+										strong: <strong />,
+										PreviewLink: (
+											<ExternalLink href={ previewLink }>
+												{ __( 'preview' ) }
+											</ExternalLink>
+										),
+									}
+								) }
+							</p>
+							<p>
+								{ __(
+									'If you take over, the other user will lose editing control to the post, but their changes will be saved.'
+								) }
+							</p>
+						</>
+					) }
+
+					<HStack
+						className="editor-post-locked-modal__buttons"
+						justify="flex-end"
+					>
+						{ ! isTakeover && (
 							<Button variant="tertiary" href={ unlockUrl }>
 								{ __( 'Take over' ) }
 							</Button>
-						</FlexItem>
-					) }
-					<FlexItem>
+						) }
 						<Button variant="primary" href={ allPostsUrl }>
 							{ allPostsLabel }
 						</Button>
-					</FlexItem>
-				</Flex>
-			</div>
+					</HStack>
+				</div>
+			</HStack>
 		</Modal>
 	);
 }

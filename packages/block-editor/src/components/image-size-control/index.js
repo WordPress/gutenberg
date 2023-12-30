@@ -38,7 +38,7 @@ export default function ImageSizeControl( {
 			{ imageSizeOptions && imageSizeOptions.length > 0 && (
 				<SelectControl
 					__nextHasNoMarginBottom
-					label={ __( 'Image size' ) }
+					label={ __( 'Resolution' ) }
 					value={ slug }
 					options={ imageSizeOptions }
 					onChange={ onChangeImage }
@@ -48,8 +48,6 @@ export default function ImageSizeControl( {
 			) }
 			{ isResizable && (
 				<div className="block-editor-image-size-control">
-					<p>{ __( 'Image dimensions' ) }</p>
-
 					<HStack align="baseline" spacing="3">
 						<NumberControl
 							className="block-editor-image-size-control__width"
@@ -89,7 +87,7 @@ export default function ImageSizeControl( {
 								return (
 									<Button
 										key={ scale }
-										isSmall
+										size="small"
 										variant={
 											isCurrent ? 'primary' : undefined
 										}
@@ -106,7 +104,10 @@ export default function ImageSizeControl( {
 								);
 							} ) }
 						</ButtonGroup>
-						<Button isSmall onClick={ () => updateDimensions() }>
+						<Button
+							size="small"
+							onClick={ () => updateDimensions() }
+						>
 							{ __( 'Reset' ) }
 						</Button>
 					</HStack>

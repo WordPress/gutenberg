@@ -55,12 +55,11 @@ Deprecations are defined on a block type as its `deprecated` property, an array 
 	- _Return_
 		- `boolean`: Whether or not this otherwise valid block is eligible to be migrated by this deprecation.
 
-It's important to note that `attributes`, `supports`, and `save` are not automatically inherited from the current version, since they can impact parsing and serialization of a block, so they must be defined on the deprecated object in order to be processed during a migration.
+<div class="callout callout-alert">
+It's important to note that <code>attributes</code>, <code>supports</code>, and <code>save</code> are not automatically inherited from the current version, since they can impact parsing and serialization of a block, so they must be defined on the deprecated object in order to be processed during a migration.
+</div>
 
 ### Example:
-
-{% codetabs %}
-{% JSX %}
 
 ```js
 const { registerBlockType } = wp.blocks;
@@ -99,46 +98,6 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 } );
 ```
 
-{% Plain %}
-
-```js
-var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType,
-	attributes = {
-		text: {
-			type: 'string',
-			default: 'some random value',
-		},
-	},
-	supports = {
-		className: false,
-	};
-
-registerBlockType( 'gutenberg/block-with-deprecated-version', {
-	// ... other block properties go here
-
-	attributes: attributes,
-
-	supports: supports,
-
-	save: function ( props ) {
-		return el( 'div', {}, props.attributes.text );
-	},
-
-	deprecated: [
-		{
-			attributes: attributes,
-
-			save: function ( props ) {
-				return el( 'p', {}, props.attributes.text );
-			},
-		},
-	],
-} );
-```
-
-{% end %}
-
 In the example above we updated the markup of the block to use a `div` instead of `p`.
 
 ## Changing the attributes set
@@ -147,8 +106,6 @@ Sometimes, you need to update the attributes set to rename or modify old attribu
 
 ### Example:
 
-{% codetabs %}
-{% JSX %}
 
 ```js
 const { registerBlockType } = wp.blocks;
@@ -190,50 +147,6 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 } );
 ```
 
-{% Plain %}
-
-```js
-var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType;
-
-registerBlockType( 'gutenberg/block-with-deprecated-version', {
-	// ... other block properties go here
-
-	attributes: {
-		content: {
-			type: 'string',
-			default: 'some random value',
-		},
-	},
-
-	save: function ( props ) {
-		return el( 'div', {}, props.attributes.content );
-	},
-
-	deprecated: [
-		{
-			attributes: {
-				text: {
-					type: 'string',
-					default: 'some random value',
-				},
-			},
-
-			migrate: function ( attributes ) {
-				return {
-					content: attributes.text,
-				};
-			},
-
-			save: function ( props ) {
-				return el( 'p', {}, props.attributes.text );
-			},
-		},
-	],
-} );
-```
-
-{% end %}
 
 In the example above we updated the markup of the block to use a `div` instead of `p` and rename the `text` attribute to `content`.
 
@@ -243,9 +156,6 @@ Situations may exist where when migrating the block we may need to add or remove
 E.g: a block wants to migrate a title attribute to a paragraph innerBlock.
 
 ### Example:
-
-{% codetabs %}
-{% JSX %}
 
 ```js
 const { registerBlockType } = wp.blocks;
@@ -289,49 +199,6 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	],
 } );
 ```
-
-{% Plain %}
-
-```js
-var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType;
-
-registerBlockType( 'gutenberg/block-with-deprecated-version', {
-	// ... block properties go here
-
-	deprecated: [
-		{
-			attributes: {
-				title: {
-					type: 'string',
-					source: 'html',
-					selector: 'p',
-				},
-			},
-
-			migrate: function ( attributes, innerBlocks ) {
-				const { title, ...restAttributes } = attributes;
-
-				return [
-					restAttributes,
-					[
-						createBlock( 'core/paragraph', {
-							content: attributes.title,
-							fontSize: 'large',
-						} ),
-					].concat( innerBlocks ),
-				];
-			},
-
-			save: function ( props ) {
-				return el( 'p', {}, props.attributes.title );
-			},
-		},
-	],
-} );
-```
-
-{% end %}
 
 In the example above we updated the block to use an inner Paragraph block with a title instead of a title attribute.
 

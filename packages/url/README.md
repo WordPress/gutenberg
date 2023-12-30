@@ -18,9 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ### addQueryArgs
 
-Appends arguments as querystring to the provided URL. If the URL already
-includes query arguments, the arguments are merged with (and take precedent
-over) the existing set.
+Appends arguments as querystring to the provided URL. If the URL already includes query arguments, the arguments are merged with (and take precedent over) the existing set.
 
 _Usage_
 
@@ -41,8 +39,7 @@ _Returns_
 
 Generates URL-encoded query string using input query data.
 
-It is intended to behave equivalent as PHP's `http_build_query`, configured
-with encoding type PHP_QUERY_RFC3986 (spaces as `%20`).
+It is intended to behave equivalent as PHP's `http_build_query`, configured with encoding type PHP_QUERY_RFC3986 (spaces as `%20`).
 
 _Usage_
 
@@ -71,14 +68,9 @@ _Returns_
 
 Performs some basic cleanup of a string for use as a post slug.
 
-This replicates some of what `sanitize_title()` does in WordPress core, but
-is only designed to approximate what the slug will be.
+This replicates some of what `sanitize_title()` does in WordPress core, but is only designed to approximate what the slug will be.
 
-Converts Latin-1 Supplement and Latin Extended-A letters to basic Latin
-letters. Removes combining diacritical marks. Converts whitespace, periods,
-and forward slashes to hyphens. Removes any remaining non-word characters
-except hyphens. Converts remaining string to lowercase. It does not account
-for octets, HTML entities, or other encoded characters.
+Converts Latin-1 Supplement and Latin Extended-A letters to basic Latin letters. Removes combining diacritical marks. Converts whitespace, periods, and forward slashes to hyphens. Removes any remaining non-word characters except hyphens. Converts remaining string to lowercase. It does not account for octets, HTML entities, or other encoded characters.
 
 _Parameters_
 
@@ -256,8 +248,7 @@ _Returns_
 
 ### getQueryArgs
 
-Returns an object of query arguments of the given URL. If the given URL is
-invalid or has no querystring, an empty object is returned.
+Returns an object of query arguments of the given URL. If the given URL is invalid or has no querystring, an empty object is returned.
 
 _Usage_
 
@@ -451,9 +442,7 @@ _Returns_
 
 ### normalizePath
 
-Given a path, returns a normalized path where equal query parameter values
-will be treated as identical, regardless of order they appear in the original
-text.
+Given a path, returns a normalized path where equal query parameter values will be treated as identical, regardless of order they appear in the original text.
 
 _Parameters_
 
@@ -526,8 +515,7 @@ _Returns_
 
 ### safeDecodeURI
 
-Safely decodes a URI with `decodeURI`. Returns the URI unmodified if
-`decodeURI` throws an error.
+Safely decodes a URI with `decodeURI`. Returns the URI unmodified if `decodeURI` throws an error.
 
 _Usage_
 
@@ -545,8 +533,7 @@ _Returns_
 
 ### safeDecodeURIComponent
 
-Safely decodes a URI component with `decodeURIComponent`. Returns the URI component unmodified if
-`decodeURIComponent` throws an error.
+Safely decodes a URI component with `decodeURIComponent`. Returns the URI component unmodified if `decodeURIComponent` throws an error.
 
 _Parameters_
 

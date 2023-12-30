@@ -24,8 +24,7 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
 ];
 
 const POPOVER_PROPS = {
-	position: 'bottom right',
-	variant: 'toolbar',
+	placement: 'bottom-start',
 };
 
 function AlignmentUI( {

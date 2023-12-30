@@ -62,6 +62,7 @@ export default function PatternSelectionModal( {
 			overlayClassName="block-library-query-pattern__selection-modal"
 			title={ __( 'Choose a pattern' ) }
 			onRequestClose={ () => setIsPatternSelectionModalOpen( false ) }
+			isFullScreen={ true }
 		>
 			<div className="block-library-query-pattern__selection-content">
 				<div className="block-library-query-pattern__selection-search">

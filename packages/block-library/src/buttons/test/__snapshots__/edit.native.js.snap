@@ -1,5 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Buttons block color customization sets a background color 1`] = `
+"<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"backgroundColor":"luminous-vivid-amber"} /--></div>
+<!-- /wp:buttons -->"
+`;
+
+exports[`Buttons block color customization sets a gradient background color 1`] = `
+"<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"gradient":"light-green-cyan-to-vivid-green-cyan"} /--></div>
+<!-- /wp:buttons -->"
+`;
+
+exports[`Buttons block color customization sets a text color 1`] = `
+"<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"textColor":"pale-pink"} /--></div>
+<!-- /wp:buttons -->"
+`;
+
 exports[`Buttons block justify content sets Justify items center option 1`] = `
 "<!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"}} -->
 <div class="wp-block-buttons"><!-- wp:button /--></div>

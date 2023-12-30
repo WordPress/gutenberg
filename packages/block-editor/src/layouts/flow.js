@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
 import { getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
+import { LAYOUT_DEFINITIONS } from './definitions';
 
 export default {
 	name: 'default',
@@ -24,7 +25,7 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
-		layoutDefinitions,
+		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );
 

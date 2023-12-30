@@ -9,6 +9,10 @@ import componentsLtr from '../package-styles/components-ltr.lazy.scss';
 import componentsRtl from '../package-styles/components-rtl.lazy.scss';
 import formatLibraryLtr from '../package-styles/format-library-ltr.lazy.scss';
 import formatLibraryRtl from '../package-styles/format-library-rtl.lazy.scss';
+import editSiteLtr from '../package-styles/edit-site-ltr.lazy.scss';
+import editSiteRtl from '../package-styles/edit-site-rtl.lazy.scss';
+import dataviewsLtr from '../package-styles/dataviews-ltr.lazy.scss';
+import dataviewsRtl from '../package-styles/dataviews-rtl.lazy.scss';
 
 /**
  * Stylesheets to lazy load when the story's context.componentId matches the
@@ -40,9 +44,19 @@ const CONFIG = [
 		rtl: [ componentsRtl, blockEditorRtl ],
 	},
 	{
+		componentIdMatcher: /^editsite-/,
+		ltr: [ componentsLtr, editSiteLtr ],
+		rtl: [ componentsRtl, editSiteRtl ],
+	},
+	{
 		componentIdMatcher: /^components-/,
 		ltr: [ componentsLtr ],
 		rtl: [ componentsRtl ],
+	},
+	{
+		componentIdMatcher: /^dataviews-/,
+		ltr: [ dataviewsLtr, componentsLtr ],
+		rtl: [ dataviewsRtl, componentsRtl ],
 	},
 ];
 

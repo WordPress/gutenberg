@@ -1,7 +1,7 @@
 import UIKit
 import WebKit
 
-public protocol GutenbergWebDelegate: class {
+public protocol GutenbergWebDelegate: AnyObject {
     func webController(controller: GutenbergWebSingleBlockViewController, didPressSave block: Block)
     func webControllerDidPressClose(controller: GutenbergWebSingleBlockViewController)
     func webController(controller: GutenbergWebSingleBlockViewController, didLog log: String)

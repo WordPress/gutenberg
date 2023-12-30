@@ -22,6 +22,7 @@ import {
 	NavigatorToParentButton,
 	useNavigator,
 } from '..';
+import type { NavigateOptions } from '../types';
 
 const INVALID_HTML_ATTRIBUTE = {
 	raw: ' "\'><=invalid_path',
@@ -57,6 +58,7 @@ const BUTTON_TEXT = {
 		'Navigate to screen with an invalid HTML value as a path.',
 	back: 'Go back',
 	backUsingGoTo: 'Go back using goTo',
+	goToWithSkipFocus: 'Go to with skipFocus',
 };
 
 type CustomTestOnClickHandler = (
@@ -64,6 +66,7 @@ type CustomTestOnClickHandler = (
 		| {
 				type: 'goTo';
 				path: string;
+				options?: NavigateOptions;
 		  }
 		| { type: 'goBack' }
 		| { type: 'goToParent' }
@@ -100,6 +103,26 @@ function CustomNavigatorGoToBackButton( {
 		<Button
 			onClick={ () => {
 				goTo( path, { isBack: true } );
+				// Used to spy on the values passed to `navigator.goTo`.
+				onClick?.( { type: 'goTo', path } );
+			} }
+			{ ...props }
+		/>
+	);
+}
+
+function CustomNavigatorGoToSkipFocusButton( {
+	path,
+	onClick,
+	...props
+}: Omit< ComponentPropsWithoutRef< typeof NavigatorButton >, 'onClick' > & {
+	onClick?: CustomTestOnClickHandler;
+} ) {
+	const { goTo } = useNavigator();
+	return (
+		<Button
+			onClick={ () => {
+				goTo( path, { skipFocus: true } );
 				// Used to spy on the values passed to `navigator.goTo`.
 				onClick?.( { type: 'goTo', path } );
 			} }
@@ -342,6 +365,12 @@ const MyHierarchicalNavigation = ( {
 						{ BUTTON_TEXT.backUsingGoTo }
 					</CustomNavigatorGoToBackButton>
 				</NavigatorScreen>
+				<CustomNavigatorGoToSkipFocusButton
+					path={ PATHS.NESTED }
+					onClick={ onNavigatorButtonClick }
+				>
+					{ BUTTON_TEXT.goToWithSkipFocus }
+				</CustomNavigatorGoToSkipFocusButton>
 			</NavigatorProvider>
 		</>
 	);
@@ -716,69 +745,28 @@ describe( 'Navigator', () => {
 			await user.click( getNavigationButton( 'back' ) );
 			expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
 		} );
-	} );
 
-	describe( 'animation', () => {
-		it( 'should not animate the initial screen', async () => {
-			const onHomeAnimationStartSpy = jest.fn();
-
-			render(
-				<NavigatorProvider initialPath="/">
-					<NavigatorScreen
-						path="/"
-						onAnimationStart={ onHomeAnimationStartSpy }
-					>
-						<CustomNavigatorButton path="/child">
-							To child
-						</CustomNavigatorButton>
-					</NavigatorScreen>
-				</NavigatorProvider>
-			);
-
-			expect( onHomeAnimationStartSpy ).not.toHaveBeenCalled();
-		} );
-
-		it( 'should animate all other screens (including the initial screen when navigating back)', async () => {
+		it( 'should skip focus based on location `skipFocus` option', async () => {
 			const user = userEvent.setup();
+			render( <MyHierarchicalNavigation /> );
 
-			const onHomeAnimationStartSpy = jest.fn();
-			const onChildAnimationStartSpy = jest.fn();
+			// Navigate to child screen with skipFocus.
+			await user.click( getNavigationButton( 'goToWithSkipFocus' ) );
+			expect( queryScreen( 'home' ) ).not.toBeInTheDocument();
+			expect( getScreen( 'nested' ) ).toBeInTheDocument();
 
-			render(
-				<NavigatorProvider initialPath="/">
-					<NavigatorScreen
-						path="/"
-						onAnimationStart={ onHomeAnimationStartSpy }
-					>
-						<CustomNavigatorButton path="/child">
-							To child
-						</CustomNavigatorButton>
-					</NavigatorScreen>
-					<NavigatorScreen
-						path="/child"
-						onAnimationStart={ onChildAnimationStartSpy }
-					>
-						<CustomNavigatorBackButton>
-							Back to home
-						</CustomNavigatorBackButton>
-					</NavigatorScreen>
-				</NavigatorProvider>
-			);
+			// The clicked button should remain focused.
+			expect( getNavigationButton( 'goToWithSkipFocus' ) ).toHaveFocus();
 
-			expect( onHomeAnimationStartSpy ).not.toHaveBeenCalled();
-			expect( onChildAnimationStartSpy ).not.toHaveBeenCalled();
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'To child' } )
-			);
-			expect( onChildAnimationStartSpy ).toHaveBeenCalledTimes( 1 );
-			expect( onHomeAnimationStartSpy ).not.toHaveBeenCalled();
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Back to home' } )
-			);
-			expect( onChildAnimationStartSpy ).toHaveBeenCalledTimes( 1 );
-			expect( onHomeAnimationStartSpy ).toHaveBeenCalledTimes( 1 );
+			// Navigate back to parent screen.
+			await user.click( getNavigationButton( 'back' ) );
+			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			// The first tabbable element receives focus.
+			expect(
+				screen.getByRole( 'button', {
+					name: 'First tabbable child screen button',
+				} )
+			).toHaveFocus();
 		} );
 	} );
 } );

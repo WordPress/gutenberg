@@ -1,4 +1,5 @@
-.wp-block-post-excerpt {
+// Lowest specificity on wrapper margins to avoid overriding layout styles.
+:where(.wp-block-post-excerpt) {
 	margin-top: var(--wp--style--block-gap);
 	margin-bottom: var(--wp--style--block-gap);
 }

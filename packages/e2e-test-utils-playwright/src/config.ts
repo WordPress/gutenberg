@@ -1,12 +1,12 @@
-const WP_ADMIN_USER = {
-	username: 'admin',
-	password: 'password',
-} as const;
-
 const {
-	WP_USERNAME = WP_ADMIN_USER.username,
-	WP_PASSWORD = WP_ADMIN_USER.password,
+	WP_USERNAME = 'admin',
+	WP_PASSWORD = 'password',
 	WP_BASE_URL = 'http://localhost:8889',
 } = process.env;
+
+const WP_ADMIN_USER = {
+	username: WP_USERNAME,
+	password: WP_PASSWORD,
+} as const;
 
 export { WP_ADMIN_USER, WP_USERNAME, WP_PASSWORD, WP_BASE_URL };

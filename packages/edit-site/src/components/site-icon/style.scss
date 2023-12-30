@@ -3,8 +3,13 @@
 }
 
 .edit-site-site-icon__image {
-	width: $grid-unit-40;
-	height: $grid-unit-40;
-	border-radius: $radius-block-ui;
+	width: 100%;
+	height: auto;
+	border-radius: $radius-block-ui * 2;
 	object-fit: cover;
+	background: #333;
+
+	.edit-site-layout.is-full-canvas.is-edit-mode & {
+		border-radius: 0;
+	}
 }

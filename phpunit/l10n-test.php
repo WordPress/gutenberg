@@ -13,19 +13,19 @@ class Tests_L10n_wpWordcount extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_get_string_variations
 	 *
-	 * @param string $string                      String to count words.
+	 * @param string $input_string                String to count words.
 	 * @param int    $words                       Expected value if the count type is based on word.
 	 * @param int    $characters_excluding_spaces Expected value if the count type is based on single character excluding spaces.
 	 * @param int    $characters_including_spaces Expected value if the count type is based on single character including spaces.
 	 */
-	public function test_word_count( $string, $words, $characters_excluding_spaces, $characters_including_spaces ) {
+	public function test_word_count( $input_string, $words, $characters_excluding_spaces, $characters_including_spaces ) {
 		$settings = array(
 			'shortcodes' => array( 'shortcode' ),
 		);
 
-		$this->assertEquals( wp_word_count( $string, 'words', $settings ), $words );
-		$this->assertEquals( wp_word_count( $string, 'characters_excluding_spaces', $settings ), $characters_excluding_spaces );
-		$this->assertEquals( wp_word_count( $string, 'characters_including_spaces', $settings ), $characters_including_spaces );
+		$this->assertEquals( wp_word_count( $input_string, 'words', $settings ), $words );
+		$this->assertEquals( wp_word_count( $input_string, 'characters_excluding_spaces', $settings ), $characters_excluding_spaces );
+		$this->assertEquals( wp_word_count( $input_string, 'characters_including_spaces', $settings ), $characters_including_spaces );
 	}
 
 	/**

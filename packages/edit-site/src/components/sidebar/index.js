@@ -1,11 +1,18 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { memo, useRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 } from '@wordpress/components';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -13,38 +20,83 @@ import {
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
 import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
 import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
+import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
+import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
 import useSyncPathWithURL, {
 	getPathFromURL,
 } from '../sync-state-with-url/use-sync-path-with-url';
 import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
+import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
+import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SaveHub from '../save-hub';
-import SidebarNavigationScreenNavigationItem from '../sidebar-navigation-screen-navigation-item';
-import { useLocation } from '../routes';
+import { unlock } from '../../lock-unlock';
+import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
+import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
+import SidebarNavigationScreen from '../sidebar-navigation-screen';
+import DataViewsSidebarContent from '../sidebar-dataviews';
+
+const { useLocation } = unlock( routerPrivateApis );
+
+function SidebarScreenWrapper( { className, ...props } ) {
+	return (
+		<NavigatorScreen
+			className={ classNames(
+				'edit-site-sidebar__screen-wrapper',
+				className
+			) }
+			{ ...props }
+		/>
+	);
+}
 
 function SidebarScreens() {
 	useSyncPathWithURL();
 
 	return (
 		<>
-			<NavigatorScreen path="/">
+			<SidebarScreenWrapper path="/">
 				<SidebarNavigationScreenMain />
-			</NavigatorScreen>
-			<NavigatorScreen path="/navigation">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/navigation">
 				<SidebarNavigationScreenNavigationMenus />
-			</NavigatorScreen>
-			<NavigatorScreen path="/navigation/:postType/:postId">
-				<SidebarNavigationScreenNavigationItem />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/navigation/:postType/:postId">
+				<SidebarNavigationScreenNavigationMenu />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/wp_global_styles">
+				<SidebarNavigationScreenGlobalStyles />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/page">
+				<SidebarNavigationScreenPages />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/page/:postId">
+				<SidebarNavigationScreenPage />
+			</SidebarScreenWrapper>
+			{ window?.__experimentalAdminViews && (
+				<SidebarScreenWrapper path="/pages">
+					<SidebarNavigationScreen
+						title={ __( 'Pages' ) }
+						backPath="/page"
+						content={ <DataViewsSidebarContent /> }
+					/>
+				</SidebarScreenWrapper>
+			) }
+			<SidebarScreenWrapper path="/:postType(wp_template)">
 				<SidebarNavigationScreenTemplates />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/patterns">
+				<SidebarNavigationScreenPatterns />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/:postType(wp_template|wp_template_part)/all">
 				<SidebarNavigationScreenTemplatesBrowse />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/:postId">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/:postType(wp_template_part|wp_block)/:postId">
+				<SidebarNavigationScreenPattern />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/:postType(wp_template)/:postId">
 				<SidebarNavigationScreenTemplate />
-			</NavigatorScreen>
+			</SidebarScreenWrapper>
 		</>
 	);
 }
@@ -61,9 +113,7 @@ function Sidebar() {
 			>
 				<SidebarScreens />
 			</NavigatorProvider>
-			<div className="edit-site-sidebar__footer">
-				<SaveHub />
-			</div>
+			<SaveHub />
 		</>
 	);
 }

@@ -10,7 +10,7 @@ import { UP, DOWN, LEFT, RIGHT, HOME, END } from '@wordpress/keycodes';
  */
 import RovingTabIndexContainer from './roving-tab-index';
 import type { TreeGridProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 /**
  * Return focusables in a row element, excluding those from other branches
@@ -91,7 +91,8 @@ function UnforwardedTreeGrid(
 			const canExpandCollapse = 0 === currentColumnIndex;
 			const cannotFocusNextColumn =
 				canExpandCollapse &&
-				activeRow.getAttribute( 'aria-expanded' ) === 'false' &&
+				( activeRow.getAttribute( 'data-expanded' ) === 'false' ||
+					activeRow.getAttribute( 'aria-expanded' ) === 'false' ) &&
 				keyCode === RIGHT;
 
 			if ( ( [ LEFT, RIGHT ] as number[] ).includes( keyCode ) ) {
@@ -112,6 +113,8 @@ function UnforwardedTreeGrid(
 						// Left:
 						// If a row is focused, and it is expanded, collapses the current row.
 						if (
+							activeRow.getAttribute( 'data-expanded' ) ===
+								'true' ||
 							activeRow.getAttribute( 'aria-expanded' ) === 'true'
 						) {
 							onCollapseRow( activeRow );
@@ -151,8 +154,10 @@ function UnforwardedTreeGrid(
 						// Right:
 						// If a row is focused, and it is collapsed, expands the current row.
 						if (
+							activeRow.getAttribute( 'data-expanded' ) ===
+								'false' ||
 							activeRow.getAttribute( 'aria-expanded' ) ===
-							'false'
+								'false'
 						) {
 							onExpandRow( activeRow );
 							event.preventDefault();

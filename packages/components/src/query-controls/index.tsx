@@ -11,6 +11,7 @@ import CategorySelect from './category-select';
 import FormTokenField from '../form-token-field';
 import RangeControl from '../range-control';
 import SelectControl from '../select-control';
+import { VStack } from '../v-stack';
 import type {
 	QueryControlsProps,
 	QueryControlsWithMultipleCategorySelectionProps,
@@ -59,6 +60,7 @@ function isMultipleCategorySelection(
  * ```
  */
 export function QueryControls( {
+	__next40pxDefaultSize = false,
 	authorList,
 	selectedAuthorId,
 	numberOfItems,
@@ -75,11 +77,12 @@ export function QueryControls( {
 	...props
 }: QueryControlsProps ) {
 	return (
-		<>
+		<VStack spacing="4" className="components-query-controls">
 			{ [
 				onOrderChange && onOrderByChange && (
 					<SelectControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 						key="query-controls-order-select"
 						label={ __( 'Order by' ) }
 						value={ `${ orderBy }/${ order }` }
@@ -130,6 +133,7 @@ export function QueryControls( {
 					props.categoriesList &&
 					props.onCategoryChange && (
 						<CategorySelect
+							__next40pxDefaultSize={ __next40pxDefaultSize }
 							key="query-controls-category-select"
 							categoriesList={ props.categoriesList }
 							label={ __( 'Category' ) }
@@ -142,6 +146,8 @@ export function QueryControls( {
 					props.categorySuggestions &&
 					props.onCategoryChange && (
 						<FormTokenField
+							__next40pxDefaultSize={ __next40pxDefaultSize }
+							__nextHasNoMarginBottom
 							key="query-controls-categories-select"
 							label={ __( 'Categories' ) }
 							value={
@@ -164,6 +170,7 @@ export function QueryControls( {
 					),
 				onAuthorChange && (
 					<AuthorSelect
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 						key="query-controls-author-select"
 						authorList={ authorList }
 						label={ __( 'Author' ) }
@@ -175,6 +182,7 @@ export function QueryControls( {
 				onNumberOfItemsChange && (
 					<RangeControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 						key="query-controls-range-control"
 						label={ __( 'Number of items' ) }
 						value={ numberOfItems }
@@ -185,7 +193,7 @@ export function QueryControls( {
 					/>
 				),
 			] }
-		</>
+		</VStack>
 	);
 }
 

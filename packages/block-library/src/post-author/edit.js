@@ -93,14 +93,14 @@ function PostAuthorEdit( {
 	};
 
 	const showCombobox = authorOptions.length >= minimumUsersForCombobox;
+	const showAuthorControl =
+		!! postId && ! isDescendentOfQueryLoop && authorOptions.length > 0;
 
 	return (
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
-					{ !! postId &&
-						! isDescendentOfQueryLoop &&
-						authorOptions.length &&
+					{ showAuthorControl &&
 						( ( showCombobox && (
 							<ComboboxControl
 								__nextHasNoMarginBottom
@@ -196,7 +196,6 @@ function PostAuthorEdit( {
 					{ ( ! RichText.isEmpty( byline ) || isSelected ) && (
 						<RichText
 							className="wp-block-post-author__byline"
-							multiline={ false }
 							aria-label={ __( 'Post author byline text' ) }
 							placeholder={ __( 'Write byline…' ) }
 							value={ byline }

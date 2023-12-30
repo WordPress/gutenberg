@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { Button, Flex, FlexItem, Modal } from '@wordpress/components';
+import {
+	Button,
+	Modal,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import {
 	store as coreStore,
 	useEntityId,
@@ -44,34 +48,30 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 							'Are you sure you want to delete this navigation menu?'
 						) }
 					</p>
-					<Flex justify="flex-end">
-						<FlexItem>
-							<Button
-								variant="secondary"
-								onClick={ () => {
-									setIsConfirmModalVisible( false );
-								} }
-							>
-								{ __( 'Cancel' ) }
-							</Button>
-						</FlexItem>
-						<FlexItem>
-							<Button
-								variant="primary"
-								onClick={ () => {
-									deleteEntityRecord(
-										'postType',
-										'wp_navigation',
-										id,
-										{ force: true }
-									);
-									onDelete( title );
-								} }
-							>
-								{ __( 'Confirm' ) }
-							</Button>
-						</FlexItem>
-					</Flex>
+					<HStack justify="right">
+						<Button
+							variant="tertiary"
+							onClick={ () => {
+								setIsConfirmModalVisible( false );
+							} }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							variant="primary"
+							onClick={ () => {
+								deleteEntityRecord(
+									'postType',
+									'wp_navigation',
+									id,
+									{ force: true }
+								);
+								onDelete( title );
+							} }
+						>
+							{ __( 'Confirm' ) }
+						</Button>
+					</HStack>
 				</Modal>
 			) }
 		</>

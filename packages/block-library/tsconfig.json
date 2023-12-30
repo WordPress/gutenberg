@@ -26,8 +26,11 @@
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../interactivity" },
+		{ "path": "../notices" },
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
+		{ "path": "../rich-text" },
 		{ "path": "../url" },
 		{ "path": "../wordcount" }
 	],

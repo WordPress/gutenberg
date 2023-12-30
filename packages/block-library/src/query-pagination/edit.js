@@ -10,11 +10,13 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { QueryPaginationArrowControls } from './query-pagination-arrow-controls';
+import { QueryPaginationLabelControl } from './query-pagination-label-control';
 
 const TEMPLATE = [
 	[ 'core/query-pagination-previous' ],
@@ -28,29 +30,38 @@ const ALLOWED_BLOCKS = [
 ];
 
 export default function QueryPaginationEdit( {
-	attributes: { paginationArrow },
+	attributes: { paginationArrow, showLabel },
 	setAttributes,
 	clientId,
 } ) {
-	const hasNextPreviousBlocks = useSelect( ( select ) => {
-		const { getBlocks } = select( blockEditorStore );
-		const innerBlocks = getBlocks( clientId );
-		/**
-		 * Show the `paginationArrow` control only if a
-		 * `QueryPaginationNext/Previous` block exists.
-		 */
-		return innerBlocks?.find( ( innerBlock ) => {
-			return [
-				'core/query-pagination-next',
-				'core/query-pagination-previous',
-			].includes( innerBlock.name );
-		} );
-	}, [] );
+	const hasNextPreviousBlocks = useSelect(
+		( select ) => {
+			const { getBlocks } = select( blockEditorStore );
+			const innerBlocks = getBlocks( clientId );
+			/**
+			 * Show the `paginationArrow` and `showLabel` controls only if a
+			 * `QueryPaginationNext/Previous` block exists.
+			 */
+			return innerBlocks?.find( ( innerBlock ) => {
+				return [
+					'core/query-pagination-next',
+					'core/query-pagination-previous',
+				].includes( innerBlock.name );
+			} );
+		},
+		[ clientId ]
+	);
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 		allowedBlocks: ALLOWED_BLOCKS,
 	} );
+	// Always show label text if paginationArrow is set to 'none'.
+	useEffect( () => {
+		if ( paginationArrow === 'none' && ! showLabel ) {
+			setAttributes( { showLabel: true } );
+		}
+	}, [ paginationArrow, setAttributes, showLabel ] );
 	return (
 		<>
 			{ hasNextPreviousBlocks && (
@@ -62,6 +73,14 @@ export default function QueryPaginationEdit( {
 								setAttributes( { paginationArrow: value } );
 							} }
 						/>
+						{ paginationArrow !== 'none' && (
+							<QueryPaginationLabelControl
+								value={ showLabel }
+								onChange={ ( value ) => {
+									setAttributes( { showLabel: value } );
+								} }
+							/>
+						) }
 					</PanelBody>
 				</InspectorControls>
 			) }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentStory } from '@storybook/react';
+import type { StoryFn } from '@storybook/react';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import { NavigationGroup } from '../../group';
 import { NavigationItem } from '../../item';
 import { NavigationMenu } from '../../menu';
 
-export const MoreExamplesStory: ComponentStory< typeof Navigation > = ( {
+export const MoreExamplesStory: StoryFn< typeof Navigation > = ( {
 	className,
 	...props
 } ) => {

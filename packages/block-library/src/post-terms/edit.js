@@ -69,10 +69,6 @@ export default function PostTermsEdit( {
 		} ),
 	} );
 
-	if ( ! hasPost || ! term ) {
-		return <div { ...blockProps }>{ blockInformation.title }</div>;
-	}
-
 	return (
 		<>
 			<BlockControls>
@@ -96,12 +92,11 @@ export default function PostTermsEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ isLoading && <Spinner /> }
-				{ ! isLoading && hasPostTerms && ( isSelected || prefix ) && (
+				{ isLoading && hasPost && <Spinner /> }
+				{ ! isLoading && ( isSelected || prefix ) && (
 					<RichText
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__prefix"
-						multiline={ false }
 						aria-label={ __( 'Prefix' ) }
 						placeholder={ __( 'Prefix' ) + ' ' }
 						value={ prefix }
@@ -111,7 +106,11 @@ export default function PostTermsEdit( {
 						tagName="span"
 					/>
 				) }
-				{ ! isLoading &&
+				{ ( ! hasPost || ! term ) && (
+					<span>{ blockInformation.title }</span>
+				) }
+				{ hasPost &&
+					! isLoading &&
 					hasPostTerms &&
 					postTerms
 						.map( ( postTerm ) => (
@@ -132,15 +131,15 @@ export default function PostTermsEdit( {
 								{ curr }
 							</>
 						) ) }
-				{ ! isLoading &&
+				{ hasPost &&
+					! isLoading &&
 					! hasPostTerms &&
 					( selectedTerm?.labels?.no_terms ||
 						__( 'Term items not found.' ) ) }
-				{ ! isLoading && hasPostTerms && ( isSelected || suffix ) && (
+				{ ! isLoading && ( isSelected || suffix ) && (
 					<RichText
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__suffix"
-						multiline={ false }
 						aria-label={ __( 'Suffix' ) }
 						placeholder={ ' ' + __( 'Suffix' ) }
 						value={ suffix }

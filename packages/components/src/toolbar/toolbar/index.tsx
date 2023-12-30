@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -16,36 +16,65 @@ import deprecated from '@wordpress/deprecated';
 import ToolbarGroup from '../toolbar-group';
 import ToolbarContainer from './toolbar-container';
 import type { ToolbarProps } from './types';
-import type { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { ContextSystemProvider } from '../../context';
 
 function UnforwardedToolbar(
 	{
 		className,
 		label,
+		variant,
 		...props
 	}: WordPressComponentProps< ToolbarProps, 'div', false >,
 	ref: ForwardedRef< any >
 ) {
+	const isVariantDefined = variant !== undefined;
+	const contextSystemValue = useMemo( () => {
+		if ( isVariantDefined ) {
+			return {};
+		}
+		return {
+			DropdownMenu: {
+				variant: 'toolbar',
+			},
+			Dropdown: {
+				variant: 'toolbar',
+			},
+		};
+	}, [ isVariantDefined ] );
+
 	if ( ! label ) {
 		deprecated( 'Using Toolbar without label prop', {
 			since: '5.6',
 			alternative: 'ToolbarGroup component',
 			link: 'https://developer.wordpress.org/block-editor/components/toolbar/',
 		} );
-		return <ToolbarGroup { ...props } className={ className } />;
+		// Extracting title from `props` because `ToolbarGroup` doesn't accept it.
+		const { title: _title, ...restProps } = props;
+		return (
+			<ToolbarGroup
+				isCollapsed={ false }
+				{ ...restProps }
+				className={ className }
+			/>
+		);
 	}
 	// `ToolbarGroup` already uses components-toolbar for compatibility reasons.
 	const finalClassName = classnames(
 		'components-accessible-toolbar',
-		className
+		className,
+		variant && `is-${ variant }`
 	);
+
 	return (
-		<ToolbarContainer
-			className={ finalClassName }
-			label={ label }
-			ref={ ref }
-			{ ...props }
-		/>
+		<ContextSystemProvider value={ contextSystemValue }>
+			<ToolbarContainer
+				className={ finalClassName }
+				label={ label }
+				ref={ ref }
+				{ ...props }
+			/>
+		</ContextSystemProvider>
 	);
 }
 

@@ -5,7 +5,7 @@ import { useMemo } from '@wordpress/element';
 
 /**
  * Calculates the image sizes that are avaible for the current gallery images in order to
- * populate the 'Image size' selector.
+ * populate the 'Resolution' selector.
  *
  * @param {Array}    images      Basic image block data taken from current gallery innerBlock
  * @param {boolean}  isSelected  Is the block currently selected in the editor.

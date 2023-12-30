@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Keyboard, Platform } from 'react-native';
-import { render, fireEvent, waitFor } from 'test/helpers';
+import { render, fireEvent } from 'test/helpers';
 
 /**
  * Internal dependencies
@@ -40,13 +40,8 @@ describe( 'Android', () => {
 	it( 'improves back animation performance by dismissing keyboard beforehand', async () => {
 		const screen = render( subject );
 		fireEvent.press( screen.getByText( 'Link to' ) );
-		fireEvent.press(
-			screen.getByLabelText( 'Link to, Search or type URL' )
-		);
 		// Await back button to allow async state updates to complete
-		const backButton = await waitFor( () =>
-			screen.getByLabelText( 'Go back' )
-		);
+		const backButton = await screen.findByLabelText( 'Go back' );
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );
 
@@ -57,9 +52,7 @@ describe( 'Android', () => {
 		const screen = render( subject );
 		fireEvent.press( screen.getByText( 'Link to' ) );
 		// Await back button to allow async state updates to complete
-		const backButton = await waitFor( () =>
-			screen.getByLabelText( 'Apply' )
-		);
+		const backButton = await screen.findByLabelText( 'Apply' );
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );
 
@@ -81,9 +74,7 @@ describe( 'iOS', () => {
 		const screen = render( subject );
 		fireEvent.press( screen.getByText( 'Link to' ) );
 		// Await back button to allow async state updates to complete
-		const backButton = await waitFor( () =>
-			screen.getByLabelText( 'Go back' )
-		);
+		const backButton = await screen.findByLabelText( 'Go back' );
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );
 
@@ -94,9 +85,7 @@ describe( 'iOS', () => {
 		const screen = render( subject );
 		fireEvent.press( screen.getByText( 'Link to' ) );
 		// Await back button to allow async state updates to complete
-		const backButton = await waitFor( () =>
-			screen.getByLabelText( 'Apply' )
-		);
+		const backButton = await screen.findByLabelText( 'Apply' );
 		Keyboard.dismiss.mockClear();
 		fireEvent.press( backButton );
 

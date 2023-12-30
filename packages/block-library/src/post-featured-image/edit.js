@@ -43,6 +43,11 @@ function getMediaSourceUrlBySizeSlug( media, slug ) {
 	);
 }
 
+const disabledClickProps = {
+	onClick: ( event ) => event.preventDefault(),
+	'aria-disabled': true,
+};
+
 export default function PostFeaturedImageEdit( {
 	clientId,
 	attributes,
@@ -67,9 +72,10 @@ export default function PostFeaturedImageEdit( {
 		postId
 	);
 
-	const { media, postType } = useSelect(
+	const { media, postType, postPermalink } = useSelect(
 		( select ) => {
-			const { getMedia, getPostType } = select( coreStore );
+			const { getMedia, getPostType, getEditedEntityRecord } =
+				select( coreStore );
 			return {
 				media:
 					featuredImage &&
@@ -77,10 +83,16 @@ export default function PostFeaturedImageEdit( {
 						context: 'view',
 					} ),
 				postType: postTypeSlug && getPostType( postTypeSlug ),
+				postPermalink: getEditedEntityRecord(
+					'postType',
+					postTypeSlug,
+					postId
+				)?.link,
 			};
 		},
-		[ featuredImage, postTypeSlug ]
+		[ featuredImage, postTypeSlug, postId ]
 	);
+
 	const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
 
 	const imageSizes = useSelect(
@@ -110,7 +122,8 @@ export default function PostFeaturedImageEdit( {
 				) }
 				withIllustration={ true }
 				style={ {
-					...blockProps.style,
+					height: !! aspectRatio && '100%',
+					width: !! aspectRatio && '100%',
 					...borderProps.style,
 				} }
 			>
@@ -145,9 +158,9 @@ export default function PostFeaturedImageEdit( {
 						label={
 							postType?.labels.singular_name
 								? sprintf(
-										// translators: %s: Name of the post type e.g: "post".
+										// translators: %s: Name of the post type e.g: "Page".
 										__( 'Link to %s' ),
-										postType.labels.singular_name.toLowerCase()
+										postType.labels.singular_name
 								  )
 								: __( 'Link to post' )
 						}
@@ -183,41 +196,30 @@ export default function PostFeaturedImageEdit( {
 	let image;
 
 	/**
-	 * A post featured image block placed in a query loop
-	 * does not have image replacement or upload options.
+	 * A Post Featured Image block should not have image replacement
+	 * or upload options in the following cases:
+	 * - Is placed in a Query Loop. This is a consious decision to
+	 * prevent content editing of different posts in Query Loop, and
+	 * this could change in the future.
+	 * - Is in a context where it does not have a postId (for example
+	 * in a template or template part).
 	 */
-	if ( ! featuredImage && isDescendentOfQueryLoop ) {
+	if ( ! featuredImage && ( isDescendentOfQueryLoop || ! postId ) ) {
 		return (
 			<>
 				{ controls }
 				<div { ...blockProps }>
-					{ placeholder() }
-					<Overlay
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						clientId={ clientId }
-					/>
-				</div>
-			</>
-		);
-	}
-
-	/**
-	 * A post featured image placed in a block template, outside a query loop,
-	 * does not have a postId and will always be a placeholder image.
-	 * It does not have image replacement, upload, or link options.
-	 */
-	if ( ! featuredImage && ! postId ) {
-		return (
-			<>
-				<DimensionControls
-					clientId={ clientId }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					imageSizeOptions={ imageSizeOptions }
-				/>
-				<div { ...blockProps }>
-					{ placeholder() }
+					{ !! isLink ? (
+						<a
+							href={ postPermalink }
+							target={ linkTarget }
+							{ ...disabledClickProps }
+						>
+							{ placeholder() }
+						</a>
+					) : (
+						placeholder()
+					) }
 					<Overlay
 						attributes={ attributes }
 						setAttributes={ setAttributes }
@@ -231,7 +233,7 @@ export default function PostFeaturedImageEdit( {
 	const label = __( 'Add a featured image' );
 	const imageStyles = {
 		...borderProps.style,
-		height: ( !! aspectRatio && '100%' ) || height,
+		height: aspectRatio ? '100%' : height,
 		width: !! aspectRatio && '100%',
 		objectFit: !! ( height || aspectRatio ) && scale,
 	};
@@ -315,7 +317,18 @@ export default function PostFeaturedImageEdit( {
 				</BlockControls>
 			) }
 			<figure { ...blockProps }>
-				{ image }
+				{ /* If the featured image is linked, wrap in an <a /> tag to trigger any inherited link element styles */ }
+				{ !! isLink ? (
+					<a
+						href={ postPermalink }
+						target={ linkTarget }
+						{ ...disabledClickProps }
+					>
+						{ image }
+					</a>
+				) : (
+					image
+				) }
 				<Overlay
 					attributes={ attributes }
 					setAttributes={ setAttributes }

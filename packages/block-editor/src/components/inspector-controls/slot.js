@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import {
-	__experimentalUseSlot as useSlot,
 	__experimentalUseSlotFills as useSlotFills,
+	__unstableMotionContext as MotionContext,
 } from '@wordpress/components';
+import { useContext, useMemo } from '@wordpress/element';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
 
@@ -19,6 +20,7 @@ export default function InspectorControlsSlot( {
 	__experimentalGroup,
 	group = 'default',
 	label,
+	fillProps,
 	...props
 } ) {
 	if ( __experimentalGroup ) {
@@ -33,25 +35,43 @@ export default function InspectorControlsSlot( {
 		group = __experimentalGroup;
 	}
 	const Slot = groups[ group ]?.Slot;
-	const slot = useSlot( Slot?.__unstableName );
 	const fills = useSlotFills( Slot?.__unstableName );
-	if ( ! Slot || ! slot ) {
-		warning( `Unknown InspectorControl group "${ group }" provided.` );
+
+	const motionContextValue = useContext( MotionContext );
+
+	const computedFillProps = useMemo(
+		() => ( {
+			...( fillProps ?? {} ),
+			forwardedContext: [
+				...( fillProps?.forwardedContext ?? [] ),
+				[ MotionContext.Provider, { value: motionContextValue } ],
+			],
+		} ),
+		[ motionContextValue, fillProps ]
+	);
+
+	if ( ! Slot ) {
+		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
 
-	const hasFills = Boolean( fills && fills.length );
-	if ( ! hasFills ) {
+	if ( ! fills?.length ) {
 		return null;
 	}
 
 	if ( label ) {
 		return (
 			<BlockSupportToolsPanel group={ group } label={ label }>
-				<BlockSupportSlotContainer { ...props } Slot={ Slot } />
+				<BlockSupportSlotContainer
+					{ ...props }
+					fillProps={ computedFillProps }
+					Slot={ Slot }
+				/>
 			</BlockSupportToolsPanel>
 		);
 	}
 
-	return <Slot { ...props } bubblesVirtually />;
+	return (
+		<Slot { ...props } fillProps={ computedFillProps } bubblesVirtually />
+	);
 }

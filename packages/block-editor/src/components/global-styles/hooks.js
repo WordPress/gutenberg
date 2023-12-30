@@ -2,7 +2,6 @@
  * External dependencies
  */
 import fastDeepEqual from 'fast-deep-equal/es6';
-import { get, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +15,7 @@ import { _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getValueFromVariable, getPresetVariableFromValue } from './utils';
+import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import { GlobalStylesContext } from './context';
 import { unlock } from '../../lock-unlock';
 
@@ -24,6 +24,9 @@ const EMPTY_CONFIG = { settings: {}, styles: {} };
 const VALID_SETTINGS = [
 	'appearanceTools',
 	'useRootPaddingAwareAlignments',
+	'background.backgroundImage',
+	'background.backgroundRepeat',
+	'background.backgroundSize',
 	'border.color',
 	'border.radius',
 	'border.style',
@@ -31,6 +34,8 @@ const VALID_SETTINGS = [
 	'shadow.presets',
 	'shadow.defaultPresets',
 	'color.background',
+	'color.button',
+	'color.caption',
 	'color.custom',
 	'color.customDuotone',
 	'color.customGradient',
@@ -39,6 +44,7 @@ const VALID_SETTINGS = [
 	'color.defaultPalette',
 	'color.duotone',
 	'color.gradients',
+	'color.heading',
 	'color.link',
 	'color.palette',
 	'color.text',
@@ -47,6 +53,8 @@ const VALID_SETTINGS = [
 	'layout.contentSize',
 	'layout.definitions',
 	'layout.wideSize',
+	'lightbox.enabled',
+	'lightbox.allowEditing',
 	'position.fixed',
 	'position.sticky',
 	'spacing.customSpacingSize',
@@ -68,6 +76,7 @@ const VALID_SETTINGS = [
 	'typography.textColumns',
 	'typography.textDecoration',
 	'typography.textTransform',
+	'typography.writingMode',
 ];
 
 export const useGlobalStylesReset = () => {
@@ -84,7 +93,6 @@ export const useGlobalStylesReset = () => {
 
 export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 	const { setUserConfig, ...configs } = useContext( GlobalStylesContext );
-
 	const appendedBlockPath = blockName ? '.blocks.' + blockName : '';
 	const appendedPropertyPath = propertyPath ? '.' + propertyPath : '';
 	const contextualPath = `settings${ appendedBlockPath }${ appendedPropertyPath }`;
@@ -99,20 +107,21 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 
 		if ( propertyPath ) {
 			return (
-				get( configToUse, contextualPath ) ??
-				get( configToUse, globalPath )
+				getValueFromObjectPath( configToUse, contextualPath ) ??
+				getValueFromObjectPath( configToUse, globalPath )
 			);
 		}
 
-		const result = {};
+		let result = {};
 		VALID_SETTINGS.forEach( ( setting ) => {
 			const value =
-				get(
+				getValueFromObjectPath(
 					configToUse,
 					`settings${ appendedBlockPath }.${ setting }`
-				) ?? get( configToUse, `settings.${ setting }` );
-			if ( value ) {
-				set( result, setting, value );
+				) ??
+				getValueFromObjectPath( configToUse, `settings.${ setting }` );
+			if ( value !== undefined ) {
+				result = setImmutably( result, setting.split( '.' ), value );
 			}
 		} );
 		return result;
@@ -126,15 +135,10 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 	] );
 
 	const setSetting = ( newValue ) => {
-		setUserConfig( ( currentConfig ) => {
-			// Deep clone `currentConfig` to avoid mutating it later.
-			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			set( newUserConfig, contextualPath, newValue );
-
-			return newUserConfig;
-		} );
+		setUserConfig( ( currentConfig ) =>
+			setImmutably( currentConfig, contextualPath.split( '.' ), newValue )
+		);
 	};
-
 	return [ settingValue, setSetting ];
 }
 
@@ -156,12 +160,10 @@ export function useGlobalStyle(
 		: `styles.blocks.${ blockName }${ appendedPath }`;
 
 	const setStyle = ( newValue ) => {
-		setUserConfig( ( currentConfig ) => {
-			// Deep clone `currentConfig` to avoid mutating it later.
-			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			set(
-				newUserConfig,
-				finalPath,
+		setUserConfig( ( currentConfig ) =>
+			setImmutably(
+				currentConfig,
+				finalPath.split( '.' ),
 				shouldDecodeEncode
 					? getPresetVariableFromValue(
 							mergedConfig.settings,
@@ -170,31 +172,26 @@ export function useGlobalStyle(
 							newValue
 					  )
 					: newValue
-			);
-			return newUserConfig;
-		} );
+			)
+		);
 	};
 
 	let rawResult, result;
 	switch ( source ) {
 		case 'all':
-			rawResult =
-				// The styles.css path is allowed to be empty, so don't revert to base if undefined.
-				finalPath === 'styles.css'
-					? get( userConfig, finalPath )
-					: get( mergedConfig, finalPath );
+			rawResult = getValueFromObjectPath( mergedConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
 			break;
 		case 'user':
-			rawResult = get( userConfig, finalPath );
+			rawResult = getValueFromObjectPath( userConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
 			break;
 		case 'base':
-			rawResult = get( baseConfig, finalPath );
+			rawResult = getValueFromObjectPath( baseConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( baseConfig, blockName, rawResult )
 				: rawResult;
@@ -251,6 +248,41 @@ export function useSettingsForBlockElement(
 			};
 		}
 
+		updatedSettings.color = {
+			...updatedSettings.color,
+			text:
+				updatedSettings.color?.text &&
+				supportedStyles.includes( 'color' ),
+			background:
+				updatedSettings.color?.background &&
+				( supportedStyles.includes( 'background' ) ||
+					supportedStyles.includes( 'backgroundColor' ) ),
+			button:
+				updatedSettings.color?.button &&
+				supportedStyles.includes( 'buttonColor' ),
+			heading:
+				updatedSettings.color?.heading &&
+				supportedStyles.includes( 'headingColor' ),
+			link:
+				updatedSettings.color?.link &&
+				supportedStyles.includes( 'linkColor' ),
+			caption:
+				updatedSettings.color?.caption &&
+				supportedStyles.includes( 'captionColor' ),
+		};
+
+		// Some blocks can enable background colors but disable gradients.
+		if ( ! supportedStyles.includes( 'background' ) ) {
+			updatedSettings.color.gradients = [];
+			updatedSettings.color.customGradient = false;
+		}
+
+		// If filters are not supported by the block/element, disable duotone.
+		if ( ! supportedStyles.includes( 'filter' ) ) {
+			updatedSettings.color.defaultDuotone = false;
+			updatedSettings.color.customDuotone = false;
+		}
+
 		[
 			'lineHeight',
 			'fontStyle',
@@ -258,6 +290,7 @@ export function useSettingsForBlockElement(
 			'letterSpacing',
 			'textTransform',
 			'textDecoration',
+			'writingMode',
 		].forEach( ( key ) => {
 			if ( ! supportedStyles.includes( key ) ) {
 				updatedSettings.typography = {
@@ -297,7 +330,8 @@ export function useSettingsForBlockElement(
 			const sides = Array.isArray( supports?.spacing?.[ key ] )
 				? supports?.spacing?.[ key ]
 				: supports?.spacing?.[ key ]?.sides;
-			if ( sides?.length ) {
+			// Check if spacing type is supported before adding sides.
+			if ( sides?.length && updatedSettings.spacing?.[ key ] ) {
 				updatedSettings.spacing = {
 					...updatedSettings.spacing,
 					[ key ]: {
@@ -327,6 +361,10 @@ export function useSettingsForBlockElement(
 				};
 			}
 		} );
+
+		updatedSettings.shadow = supportedStyles.includes( 'shadow' )
+			? updatedSettings.shadow
+			: false;
 
 		return updatedSettings;
 	}, [ parentSettings, supportedStyles, supports ] );
@@ -377,5 +415,53 @@ export function useColorsPerOrigin( settings ) {
 		themeColors,
 		defaultColors,
 		shouldDisplayDefaultColors,
+	] );
+}
+
+export function useGradientsPerOrigin( settings ) {
+	const customGradients = settings?.color?.gradients?.custom;
+	const themeGradients = settings?.color?.gradients?.theme;
+	const defaultGradients = settings?.color?.gradients?.default;
+	const shouldDisplayDefaultGradients = settings?.color?.defaultGradients;
+
+	return useMemo( () => {
+		const result = [];
+		if ( themeGradients && themeGradients.length ) {
+			result.push( {
+				name: _x(
+					'Theme',
+					'Indicates this palette comes from the theme.'
+				),
+				gradients: themeGradients,
+			} );
+		}
+		if (
+			shouldDisplayDefaultGradients &&
+			defaultGradients &&
+			defaultGradients.length
+		) {
+			result.push( {
+				name: _x(
+					'Default',
+					'Indicates this palette comes from WordPress.'
+				),
+				gradients: defaultGradients,
+			} );
+		}
+		if ( customGradients && customGradients.length ) {
+			result.push( {
+				name: _x(
+					'Custom',
+					'Indicates this palette is created by the user.'
+				),
+				gradients: customGradients,
+			} );
+		}
+		return result;
+	}, [
+		customGradients,
+		themeGradients,
+		defaultGradients,
+		shouldDisplayDefaultGradients,
 	] );
 }

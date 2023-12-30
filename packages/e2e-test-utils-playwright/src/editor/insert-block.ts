@@ -19,6 +19,10 @@ async function insertBlock(
 	this: Editor,
 	blockRepresentation: BlockRepresentation
 ) {
+	await this.page.waitForFunction(
+		() => window?.wp?.blocks && window?.wp?.data
+	);
+
 	await this.page.evaluate( ( _blockRepresentation ) => {
 		function recursiveCreateBlock( {
 			name,

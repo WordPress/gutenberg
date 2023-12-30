@@ -8,6 +8,7 @@ import {
 	NavigableToolbar,
 	ToolSelector,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	EditorHistoryRedo,
@@ -23,15 +24,18 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  * Internal dependencies
  */
 import { store as editPostStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
+
+const { useCanBlockToolbarBeFocused } = unlock( blockEditorPrivateApis );
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-function HeaderToolbar() {
+function HeaderToolbar( { hasFixedToolbar } ) {
 	const inserterButton = useRef();
 	const { setIsInserterOpened, setIsListViewOpened } =
-		useDispatch( editPostStore );
+		useDispatch( editorStore );
 	const {
 		isInserterEnabled,
 		isInserterOpened,
@@ -39,12 +43,13 @@ function HeaderToolbar() {
 		showIconLabels,
 		isListViewOpen,
 		listViewShortcut,
+		listViewToggleRef,
 	} = useSelect( ( select ) => {
 		const { hasInserterItems, getBlockRootClientId, getBlockSelectionEnd } =
 			select( blockEditorStore );
-		const { getEditorSettings } = select( editorStore );
-		const { getEditorMode, isFeatureActive, isListViewOpened } =
-			select( editPostStore );
+		const { getEditorSettings, isListViewOpened, getListViewToggleRef } =
+			unlock( select( editorStore ) );
+		const { getEditorMode, isFeatureActive } = select( editPostStore );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		return {
@@ -55,17 +60,20 @@ function HeaderToolbar() {
 				hasInserterItems(
 					getBlockRootClientId( getBlockSelectionEnd() )
 				),
-			isInserterOpened: select( editPostStore ).isInserterOpened(),
+			isInserterOpened: select( editorStore ).isInserterOpened(),
 			isTextModeEnabled: getEditorMode() === 'text',
 			showIconLabels: isFeatureActive( 'showIconLabels' ),
 			isListViewOpen: isListViewOpened(),
 			listViewShortcut: getShortcutRepresentation(
-				'core/edit-post/toggle-list-view'
+				'core/editor/toggle-list-view'
 			),
+			listViewToggleRef: getListViewToggleRef(),
 		};
 	}, [] );
+
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
+	const blockToolbarCanBeFocused = useCanBlockToolbarBeFocused();
 
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
@@ -88,6 +96,9 @@ function HeaderToolbar() {
 				shortcut={ listViewShortcut }
 				showTooltip={ ! showIconLabels }
 				variant={ showIconLabels ? 'tertiary' : undefined }
+				aria-expanded={ isListViewOpen }
+				ref={ listViewToggleRef }
+				size="compact"
 			/>
 		</>
 	);
@@ -114,6 +125,8 @@ function HeaderToolbar() {
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
+			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
+			variant="unstyled"
 		>
 			<div className="edit-post-header-toolbar__left">
 				<ToolbarItem
@@ -128,10 +141,11 @@ function HeaderToolbar() {
 					icon={ plus }
 					label={ showIconLabels ? shortLabel : longLabel }
 					showTooltip={ ! showIconLabels }
+					aria-expanded={ isInserterOpened }
 				/>
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
-						{ isLargeViewport && (
+						{ isLargeViewport && ! hasFixedToolbar && (
 							<ToolbarItem
 								as={ ToolSelector }
 								showTooltip={ ! showIconLabels }
@@ -139,17 +153,20 @@ function HeaderToolbar() {
 									showIconLabels ? 'tertiary' : undefined
 								}
 								disabled={ isTextModeEnabled }
+								size="compact"
 							/>
 						) }
 						<ToolbarItem
 							as={ EditorHistoryUndo }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
+							size="compact"
 						/>
 						<ToolbarItem
 							as={ EditorHistoryRedo }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
+							size="compact"
 						/>
 						{ overflowItems }
 					</>

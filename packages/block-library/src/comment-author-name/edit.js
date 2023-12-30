@@ -70,7 +70,7 @@ export default function Edit( {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Link settings' ) }>
+			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
 					__nextHasNoMarginBottom
 					label={ __( 'Link to authors URL' ) }

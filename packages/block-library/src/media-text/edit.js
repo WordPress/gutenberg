@@ -18,6 +18,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	__experimentalImageSizeControl as ImageSizeControl,
 	store as blockEditorStore,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -126,7 +127,7 @@ function attributesFromMedia( {
 	};
 }
 
-function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
+function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	const {
 		focalPoint,
 		href,
@@ -143,16 +144,14 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		mediaWidth,
 		rel,
 		verticalAlignment,
+		allowedBlocks,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
-	const { imageSizes, image, isContentLocked } = useSelect(
+	const { imageSizes, image } = useSelect(
 		( select ) => {
-			const { __unstableGetContentLockingParent, getSettings } =
-				select( blockEditorStore );
+			const { getSettings } = select( blockEditorStore );
 			return {
-				isContentLocked:
-					!! __unstableGetContentLockingParent( clientId ),
 				image:
 					mediaId && isSelected
 						? select( coreStore ).getMedia( mediaId, {
@@ -162,8 +161,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 				imageSizes: getSettings()?.imageSizes,
 			};
 		},
-
-		[ isSelected, mediaId, clientId ]
+		[ isSelected, mediaId ]
 	);
 
 	const refMediaContainer = useRef();
@@ -246,7 +244,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 				<ToggleControl
 					__nextHasNoMarginBottom
 					label={ __( 'Crop image to fill entire column' ) }
-					checked={ imageFill }
+					checked={ !! imageFill }
 					onChange={ () =>
 						setAttributes( {
 							imageFill: ! imageFill,
@@ -270,17 +268,16 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			{ mediaType === 'image' && (
 				<TextareaControl
 					__nextHasNoMarginBottom
-					label={ __( 'Alt text (alternative text)' ) }
+					label={ __( 'Alternative text' ) }
 					value={ mediaAlt }
 					onChange={ onMediaAltChange }
 					help={
 						<>
 							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-								{ __( 'Describe the purpose of the image' ) }
+								{ __( 'Describe the purpose of the image.' ) }
 							</ExternalLink>
-							{ __(
-								'Leave empty if the image is purely decorative.'
-							) }
+							<br />
+							{ __( 'Leave empty if decorative.' ) }
 						</>
 					}
 				/>
@@ -291,7 +288,9 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					slug={ mediaSizeSlug }
 					imageSizeOptions={ imageSizeOptions }
 					isResizable={ false }
-					imageSizeHelp={ __( 'Select which image size to load.' ) }
+					imageSizeHelp={ __(
+						'Select the size of the source image.'
+					) }
 				/>
 			) }
 			{ mediaUrl && (
@@ -314,14 +313,16 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{ className: 'wp-block-media-text__content' },
-		{ template: TEMPLATE }
+		{ template: TEMPLATE, allowedBlocks }
 	);
+
+	const blockEditingMode = useBlockEditingMode();
 
 	return (
 		<>
 			<InspectorControls>{ mediaTextGeneralSettings }</InspectorControls>
 			<BlockControls group="block">
-				{ ! isContentLocked && (
+				{ blockEditingMode === 'default' && (
 					<>
 						<BlockVerticalAlignmentControl
 							onChange={ onVerticalAlignmentChange }
@@ -368,6 +369,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					onWidthChange={ onWidthChange }
 					commitWidthChange={ commitWidthChange }
 					ref={ refMediaContainer }
+					enableResize={ blockEditingMode === 'default' }
 					{ ...{
 						focalPoint,
 						imageFill,
@@ -379,7 +381,6 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						mediaType,
 						mediaUrl,
 						mediaWidth,
-						isContentLocked,
 					} }
 				/>
 				{ mediaPosition !== 'right' && <div { ...innerBlocksProps } /> }

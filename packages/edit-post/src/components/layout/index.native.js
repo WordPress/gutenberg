@@ -22,7 +22,11 @@ import {
 	Tooltip,
 	__unstableAutocompletionItemsSlot as AutocompletionItemsSlot,
 } from '@wordpress/components';
-import { AutosaveMonitor, store as editorStore } from '@wordpress/editor';
+import {
+	AutosaveMonitor,
+	OfflineStatus,
+	store as editorStore,
+} from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
 
 /**
@@ -148,6 +152,10 @@ class Layout extends Component {
 					onLayout={ this.onRootViewLayout }
 				>
 					<AutosaveMonitor disableIntervalChecks />
+					{
+						// eslint-disable-next-line no-undef
+						__DEV__ && <OfflineStatus />
+					}
 					<View style={ editorStyles }>
 						{ isHtmlView ? this.renderHTML() : this.renderVisual() }
 						{ ! isHtmlView && Platform.OS === 'android' && (

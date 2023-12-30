@@ -121,42 +121,32 @@ const radiusSlider = getByTestId( 'Slider Border Radius' );
 
 Note that either a plain string or a regular expression can be passed into these queries. A regular expression is best for querying part of a string (e.g. any element whose accessibility label contains `Unsupported Block. Row 1`). Note that special characters such as `.` need to be escaped.
 
-### Use of `waitFor`
+### Use of `find` queries
 
-After rendering the components or firing an event, side effects might happen due to potential state updates so the element we’re looking for might not be yet rendered. In this case, we would need to wait for the element to be available and for this purpose, we can use the `waitFor` function, which periodically executes the provided callback to determine whether the element appeared or not.
+After rendering the components or firing an event, side effects might happen due to potential state updates so the element we’re looking for might not be yet rendered. In this case, we would need to wait for the element to be available and for this purpose, we can use the `find*` versions of query functions, which internally use `waitFor` and periodically check whether the element appeared or not.
 
 Here are some examples:
 
 ```js
-const mediaLibraryButton = await waitFor( () =>
-	getByText( 'WordPress Media Library' )
-);
+const mediaLibraryButton = await findByText( 'WordPress Media Library' );
 ```
 
 ```js
-const missingBlock = await waitFor( () =>
-	getByLabelText( /Unsupported Block\. Row 1/ )
-);
+const missingBlock = await findByLabelText( /Unsupported Block\. Row 1/ );
 ```
 
 ```js
-const radiusSlider = await waitFor( () =>
-	getByTestId( 'Slider Border Radius' )
-);
+const radiusSlider = await findByTestId( 'Slider Border Radius' );
 ```
 
-In most cases we’ll use the `waitFor` function, but it’s important to note that it should be restricted to those queries that actually require waiting for the element to be available.
-
-NOTE: The `react-native-testing-library` package provides the `query*` and `find*` functions for this purpose too, but we should avoid using them for now because there’s a [known issue](https://github.com/callstack/react-native-testing-library/issues/379) that would make the test fail.
+In most cases we’ll use the `find*` functions, but it’s important to note that it should be restricted to those queries that actually require waiting for the element to be available.
 
 ### `within` queries
 
 It’s also possible to query elements contained in other elements via the `within` function, here is an example:
 
 ```js
-const missingBlock = await waitFor( () =>
-	getByLabelText( /Unsupported Block\. Row 1/ )
-);
+const missingBlock = await findByLabelText( /Unsupported Block\. Row 1/ );
 const translatedTableTitle = within( missingBlock ).getByText( 'Tabla' );
 ```
 
@@ -236,7 +226,7 @@ Here is an example of how to insert a Paragraph block:
 
 ```js
 // Open the inserter menu
-fireEvent.press( await waitFor( () => getByLabelText( 'Add block' ) ) );
+fireEvent.press( await findByLabelText( 'Add block' ) );
 
 const blockList = getByTestId( 'InserterUI-Blocks' );
 // onScroll event used to force the FlatList to render all items
@@ -249,7 +239,7 @@ fireEvent.scroll( blockList, {
 } );
 
 // Insert a Paragraph block
-fireEvent.press( await waitFor( () => getByText( `Paragraph` ) ) );
+fireEvent.press( await findByText( `Paragraph` ) );
 ```
 
 ### Open block settings
@@ -259,7 +249,7 @@ The block settings can be accessed by tapping the "Open Settings" button after s
 ```js
 fireEvent.press( block );
 
-const settingsButton = await waitFor( () => getByLabelText( 'Open Settings' ) );
+const settingsButton = await findByLabelText( 'Open Settings' );
 fireEvent.press( settingsButton );
 ```
 
@@ -301,9 +291,7 @@ fireEvent.scroll( blockList, {
 Sliders found in bottom sheets should be queried using their `testID`:
 
 ```js
-const radiusSlider = await waitFor( () =>
-	getByTestId( 'Slider Border Radius' )
-);
+const radiusSlider = await findByTestId( 'Slider Border Radius' );
 fireEvent( radiusSlider, 'valueChange', '30' );
 ```
 
@@ -314,8 +302,8 @@ Note that a slider’s `testID` is "Slider " + label. So for a slider with a lab
 One caveat when adding blocks is that if they contain inner blocks, these inner blocks are not rendered. The following example shows how we can make a Buttons block render its inner Button blocks (assumes we’ve already obtained a reference to the Buttons block as `buttonsBlock`):
 
 ```js
-const innerBlockListWrapper = await waitFor( () =>
-	within( buttonsBlock ).getByTestId( 'block-list-wrapper' )
+const innerBlockListWrapper = await within( buttonsBlock ).findByTestId(
+	'block-list-wrapper'
 );
 fireEvent( innerBlockListWrapper, 'layout', {
 	nativeEvent: {
@@ -325,8 +313,8 @@ fireEvent( innerBlockListWrapper, 'layout', {
 	},
 } );
 
-const buttonInnerBlock = await waitFor( () =>
-	within( buttonsBlock ).getByLabelText( /Button Block\. Row 1/ )
+const buttonInnerBlock = await within( buttonsBlock ).findByLabelText(
+	/Button Block\. Row 1/
 );
 fireEvent.press( buttonInnerBlock );
 ```

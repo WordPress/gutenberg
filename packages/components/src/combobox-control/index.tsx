@@ -32,19 +32,22 @@ import { useControlledValue } from '../utils/hooks';
 import { normalizeTextString } from '../utils/strings';
 import type { ComboboxControlOption, ComboboxControlProps } from './types';
 import type { TokenInputProps } from '../form-token-field/types';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 const noop = () => {};
 
+interface DetectOutsideComponentProps {
+	onFocusOutside: ( event: React.FocusEvent ) => void;
+	children?: React.ReactNode;
+}
+
 const DetectOutside = withFocusOutside(
-	class extends Component {
-		// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
-		handleFocusOutside( event ) {
-			// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
+	class extends Component< DetectOutsideComponentProps > {
+		handleFocusOutside( event: React.FocusEvent ) {
 			this.props.onFocusOutside( event );
 		}
 
 		render() {
-			// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
 			return this.props.children;
 		}
 	}
@@ -104,23 +107,28 @@ const getIndexOfMatchingSuggestion = (
  * }
  * ```
  */
-function ComboboxControl( {
-	__nextHasNoMarginBottom = false,
-	__next36pxDefaultSize = false,
-	value: valueProp,
-	label,
-	options,
-	onChange: onChangeProp,
-	onFilterValueChange = noop,
-	hideLabelFromVision,
-	help,
-	allowReset = true,
-	className,
-	messages = {
-		selected: __( 'Item selected.' ),
-	},
-	__experimentalRenderItem,
-}: ComboboxControlProps ) {
+function ComboboxControl( props: ComboboxControlProps ) {
+	const {
+		__nextHasNoMarginBottom = false,
+		__next40pxDefaultSize = false,
+		value: valueProp,
+		label,
+		options,
+		onChange: onChangeProp,
+		onFilterValueChange = noop,
+		hideLabelFromVision,
+		help,
+		allowReset = true,
+		className,
+		messages = {
+			selected: __( 'Item selected.' ),
+		},
+		__experimentalRenderItem,
+	} = useDeprecated36pxDefaultSizeProp< ComboboxControlProps >(
+		props,
+		'wp.components.ComboboxControl'
+	);
+
 	const [ value, setValue ] = useControlledValue( {
 		value: valueProp,
 		onChange: onChangeProp,
@@ -314,7 +322,7 @@ function ComboboxControl( {
 					onKeyDown={ onKeyDown }
 				>
 					<InputWrapperFlex
-						__next36pxDefaultSize={ __next36pxDefaultSize }
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 					>
 						<FlexBlock>
 							<TokenInput

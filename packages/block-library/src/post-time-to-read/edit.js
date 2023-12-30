@@ -93,7 +93,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					} }
 				/>
 			</BlockControls>
-			<p { ...blockProps }>{ minutesToReadString }</p>
+			<div { ...blockProps }>{ minutesToReadString }</div>
 		</>
 	);
 }

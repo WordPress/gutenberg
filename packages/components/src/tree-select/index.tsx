@@ -9,6 +9,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { SelectControl } from '../select-control';
 import type { TreeSelectProps, Tree, Truthy } from './types';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 function getSelectOptions(
 	tree: Tree[],
@@ -27,7 +28,6 @@ function getSelectOptions(
 /**
  * TreeSelect component is used to generate select input fields.
  *
- * @example
  * ```jsx
  * import { TreeSelect } from '@wordpress/components';
  * import { useState } from '@wordpress/element';
@@ -73,14 +73,20 @@ function getSelectOptions(
  * ```
  */
 
-export function TreeSelect( {
-	label,
-	noOptionLabel,
-	onChange,
-	selectedId,
-	tree = [],
-	...props
-}: TreeSelectProps ) {
+export function TreeSelect( props: TreeSelectProps ) {
+	const {
+		label,
+		noOptionLabel,
+		onChange,
+		selectedId,
+		tree = [],
+		...restProps
+	} = useDeprecated36pxDefaultSizeProp(
+		props,
+		'wp.components.TreeSelect',
+		'6.4'
+	);
+
 	const options = useMemo( () => {
 		return [
 			noOptionLabel && { value: '', label: noOptionLabel },
@@ -92,7 +98,7 @@ export function TreeSelect( {
 		<SelectControl
 			{ ...{ label, options, onChange } }
 			value={ selectedId }
-			{ ...props }
+			{ ...restProps }
 		/>
 	);
 }

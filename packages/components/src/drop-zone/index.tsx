@@ -23,7 +23,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '../animation';
 import type { DropType, DropZoneProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 /**
  * `DropZone` is a component creating a drop zone area taking the full size of its parent element. It supports dropping files, HTML content or any other HTML drop event.
@@ -120,30 +120,34 @@ export function DropZoneComponent( {
 
 	let children;
 	const backdrop = {
-		hidden: { scaleY: 0, opacity: 0 },
+		hidden: { opacity: 0 },
 		show: {
-			scaleY: 1,
 			opacity: 1,
 			transition: {
 				type: 'tween',
 				duration: 0.2,
-				delay: 0.1,
-				delayChildren: 0.2,
+				delay: 0,
+				delayChildren: 0.1,
 			},
 		},
 		exit: {
-			scaleY: 1,
 			opacity: 0,
 			transition: {
-				duration: 0.3,
+				duration: 0.2,
 				delayChildren: 0,
 			},
 		},
 	};
 
 	const foreground = {
-		hidden: { opacity: 0, scale: 0.75 },
-		show: { opacity: 1, scale: 1 },
+		hidden: { opacity: 0, scale: 0.9 },
+		show: {
+			opacity: 1,
+			scale: 1,
+			transition: {
+				duration: 0.1,
+			},
+		},
 		exit: { opacity: 0, scale: 0.9 },
 	};
 

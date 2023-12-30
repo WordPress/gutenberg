@@ -23,15 +23,16 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import { IconWithCurrentColor } from './icon-with-current-color';
 import { NavigationButtonAsItem } from './navigation-button';
-import ContextMenu from './context-menu';
+import RootMenu from './root-menu';
 import StylesPreview from './preview';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
+
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 function ScreenRoot() {
-	const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 	const [ customCSS ] = useGlobalStyle( 'css' );
 
-	const { variations, canEditCSS } = useSelect( ( select ) => {
+	const { hasVariations, canEditCSS } = useSelect( ( select ) => {
 		const {
 			getEntityRecord,
 			__experimentalGetCurrentGlobalStylesId,
@@ -44,9 +45,10 @@ function ScreenRoot() {
 			: undefined;
 
 		return {
-			variations: __experimentalGetCurrentThemeGlobalStylesVariations(),
-			canEditCSS:
-				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+			hasVariations:
+				!! __experimentalGetCurrentThemeGlobalStylesVariations()
+					?.length,
+			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
 
@@ -59,7 +61,7 @@ function ScreenRoot() {
 							<StylesPreview />
 						</CardMedia>
 					</Card>
-					{ !! variations?.length && (
+					{ hasVariations && (
 						<ItemGroup>
 							<NavigationButtonAsItem
 								path="/variations"
@@ -78,7 +80,7 @@ function ScreenRoot() {
 							</NavigationButtonAsItem>
 						</ItemGroup>
 					) }
-					<ContextMenu />
+					<RootMenu />
 				</VStack>
 			</CardBody>
 

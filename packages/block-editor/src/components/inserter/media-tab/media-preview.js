@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	__unstableCompositeItem as CompositeItem,
 	Tooltip,
 	DropdownMenu,
 	MenuGroup,
@@ -17,6 +16,7 @@ import {
 	Flex,
 	FlexItem,
 	Button,
+	privateApis as componentsPrivateApis,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -33,6 +33,7 @@ import { isBlobURL } from '@wordpress/blob';
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const MAXIMUM_TITLE_LENGTH = 25;
@@ -41,6 +42,8 @@ const MEDIA_OPTIONS_POPOVER_PROPS = {
 	className:
 		'block-editor-inserter__media-list__item-preview-options__popover',
 };
+
+const { CompositeItemV2: CompositeItem } = unlock( componentsPrivateApis );
 
 function MediaPreviewOptions( { category, media } ) {
 	if ( ! category.getReportUrl ) {
@@ -113,7 +116,7 @@ function InsertExternalImageModal( { onClose, onSubmit } ) {
 	);
 }
 
-export function MediaPreview( { media, onClick, composite, category } ) {
+export function MediaPreview( { media, onClick, category } ) {
 	const [ showExternalUploadModal, setShowExternalUploadModal ] =
 		useState( false );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -216,20 +219,22 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 						onDragStart={ onDragStart }
 						onDragEnd={ onDragEnd }
 					>
-						<Tooltip text={ truncatedTitle || title }>
-							{ /* Adding `is-hovered` class to the wrapper element is needed
-							because the options Popover is rendered outside of this node. */ }
-							<div
-								onMouseEnter={ onMouseEnter }
-								onMouseLeave={ onMouseLeave }
-							>
+						{ /* Adding `is-hovered` class to the wrapper element is needed
+						because the options Popover is rendered outside of this node. */ }
+						<div
+							onMouseEnter={ onMouseEnter }
+							onMouseLeave={ onMouseLeave }
+						>
+							<Tooltip text={ truncatedTitle || title }>
 								<CompositeItem
-									role="option"
-									as="div"
-									{ ...composite }
-									className="block-editor-inserter__media-list__item"
+									render={
+										<div
+											aria-label={ title }
+											role="option"
+											className="block-editor-inserter__media-list__item"
+										/>
+									}
 									onClick={ () => onMediaInsert( block ) }
-									aria-label={ title }
 								>
 									<div className="block-editor-inserter__media-list__item-preview">
 										{ preview }
@@ -240,14 +245,14 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 										) }
 									</div>
 								</CompositeItem>
-								{ ! isInserting && (
-									<MediaPreviewOptions
-										category={ category }
-										media={ media }
-									/>
-								) }
-							</div>
-						</Tooltip>
+							</Tooltip>
+							{ ! isInserting && (
+								<MediaPreviewOptions
+									category={ category }
+									media={ media }
+								/>
+							) }
+						</div>
 					</div>
 				) }
 			</InserterDraggableBlocks>

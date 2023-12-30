@@ -60,6 +60,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void onRequestBlockTypeImpressions(ReadableMap impressions);
     }
 
+    interface ConnectionStatusCallback {
+        void onRequestConnectionStatus(boolean isConnected);
+    }
+
     // Ref: https://github.com/facebook/react-native/blob/HEAD/Libraries/polyfills/console.js#L376
     enum LogLevel {
         TRACE(0),
@@ -146,6 +150,8 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
                                                      String blockName,
                                                      String blockTitle);
 
+    void requestEmbedFullscreenPreview(String content, String title);
+
     void gutenbergDidSendButtonPressedAction(String buttonType);
 
     void onShowUserSuggestions(Consumer<String> onResult);
@@ -177,4 +183,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void requestGotoCustomerSupportOptions();
 
     void sendEventToHost(String eventName, ReadableMap properties);
+
+    void toggleUndoButton(boolean isDisabled);
+
+    void toggleRedoButton(boolean isDisabled);
+
+    void requestConnectionStatus(ConnectionStatusCallback connectionStatusCallback);
 }

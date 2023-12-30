@@ -20,6 +20,7 @@ a "shape" abstraction.
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { __experimentalBorderControl as BorderControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -30,13 +31,12 @@ const colors = [
 
 const MyBorderControl = () => {
 	const [ border, setBorder ] = useState();
-	const onChange = ( newBorder ) => setBorder( newBorder );
 
 	return (
 		<BorderControl
 			colors={ colors }
 			label={ __( 'Border' ) }
-			onChange={ onChange }
+			onChange={ setBorder }
 			value={ border }
 		/>
 	);

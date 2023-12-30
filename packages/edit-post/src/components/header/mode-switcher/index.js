@@ -44,7 +44,8 @@ function ModeSwitcher() {
 				select( editorStore ).getEditorSettings().richEditingEnabled,
 			isCodeEditingEnabled:
 				select( editorStore ).getEditorSettings().codeEditingEnabled,
-			isEditingTemplate: select( editPostStore ).isEditingTemplate(),
+			isEditingTemplate:
+				select( editorStore ).getRenderingMode() === 'template-only',
 			mode: select( editPostStore ).getEditorMode(),
 		} ),
 		[]
@@ -55,12 +56,31 @@ function ModeSwitcher() {
 		return null;
 	}
 
-	if ( ! isRichEditingEnabled || ! isCodeEditingEnabled ) {
-		return null;
+	let selectedMode = mode;
+	if ( ! isRichEditingEnabled && mode === 'visual' ) {
+		selectedMode = 'text';
+	}
+	if ( ! isCodeEditingEnabled && mode === 'text' ) {
+		selectedMode = 'visual';
 	}
 
 	const choices = MODES.map( ( choice ) => {
-		if ( choice.value !== mode ) {
+		if ( ! isCodeEditingEnabled && choice.value === 'text' ) {
+			choice = {
+				...choice,
+				disabled: true,
+			};
+		}
+		if ( ! isRichEditingEnabled && choice.value === 'visual' ) {
+			choice = {
+				...choice,
+				disabled: true,
+				info: __(
+					'You can enable the visual editor in your profile settings.'
+				),
+			};
+		}
+		if ( choice.value !== selectedMode && ! choice.disabled ) {
 			return { ...choice, shortcut };
 		}
 		return choice;
@@ -70,7 +90,7 @@ function ModeSwitcher() {
 		<MenuGroup label={ __( 'Editor' ) }>
 			<MenuItemsChoice
 				choices={ choices }
-				value={ mode }
+				value={ selectedMode }
 				onSelect={ switchEditorMode }
 			/>
 		</MenuGroup>
