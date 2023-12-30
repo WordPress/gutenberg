@@ -144,7 +144,11 @@ $header-toolbar-min-width: 335px;
 
 // Button text label styles
 
-.edit-site-header-edit-mode.show-icon-labels {
+.edit-site-header-edit-mode.show-icon-labels{
+	.edit-site-save-button__button {
+		min-width: 59px;
+		justify-content: center;
+	}
 	.components-button.has-icon {
 		width: auto;
 
