@@ -27,18 +27,19 @@ $actions-height: 92px;
 
 .edit-site-start-template-options__modal-content .block-editor-block-patterns-list {
 	column-count: 2;
-	column-gap: $grid-unit-30;
-
-	@include break-medium() {
-		column-count: 3;
-	}
+	column-gap: $grid-unit-40;
 
 	@include break-wide() {
-		column-count: 4;
+		column-count: 3;
 	}
 
 	.block-editor-block-patterns-list__list-item {
 		break-inside: avoid-column;
+		margin-bottom: $grid-unit-30;
+
+		@include break-small() {
+			margin-bottom: $grid-unit-40;
+		}
 
 		.block-editor-block-patterns-list__item-title {
 			display: none;

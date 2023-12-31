@@ -17,9 +17,10 @@
 
 .block-library-template-part__selection-search {
 	background: $white;
+	box-shadow: 0 -$grid-unit-10 0 6px $white; // Fill in the space around the search.
 	position: sticky;
 	top: 0;
-	padding: $grid-unit-20 0;
+	padding: $grid-unit-10 0;
 	z-index: z-index(".block-library-template-part__selection-search");
 }
 
