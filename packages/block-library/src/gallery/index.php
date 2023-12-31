@@ -33,6 +33,24 @@ function block_core_gallery_data_id_backcompatibility( $parsed_block ) {
 add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' );
 
 /**
+ * Filter to randomize the order of image blocks.
+ *
+ * @param array $parsed_block The block being rendered.
+ * @return array The block object with randomized order of image blocks.
+ */
+function block_core_gallery_random_order( $block ) {
+	if ( 'core/gallery' === $block['blockName'] && isset( $block['attrs']['randomOrder'] ) && $block['attrs']['randomOrder'] ) {
+		$inner_blocks = $block['innerBlocks'];
+		shuffle( $inner_blocks );
+		$block['innerBlocks'] = $inner_blocks;
+	}
+
+	return $block;
+}
+
+add_filter( 'render_block_data', 'block_core_gallery_random_order' );
+
+/**
  * Adds a style tag for the --wp--style--unstable-gallery-gap var.
  *
  * The Gallery block needs to recalculate Image block width based on
