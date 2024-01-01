@@ -11,6 +11,7 @@ import {
 	FormFileUpload,
 	Notice,
 	FlexItem,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useContext, useState, useEffect } from '@wordpress/element';
 
@@ -23,10 +24,14 @@ import { Font } from '../../../../lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser } from './utils';
 import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
+import { unlock } from '../../../lock-unlock';
+
+const { ProgressBar } = unlock( componentsPrivateApis );
 
 function LocalFonts() {
 	const { installFonts } = useContext( FontLibraryContext );
 	const [ notice, setNotice ] = useState( null );
+	const [ isUploading, setIsUploading ] = useState( false );
 	const supportedFormats =
 		ALLOWED_FILE_EXTENSIONS.slice( 0, -1 )
 			.map( ( extension ) => `.${ extension }` )
@@ -58,6 +63,7 @@ function LocalFonts() {
 	 */
 	const handleFilesUpload = ( files ) => {
 		setNotice( null );
+		setIsUploading( true );
 		const uniqueFilenames = new Set();
 		const selectedFiles = [ ...files ];
 		const allowedFiles = selectedFiles.filter( ( file ) => {
@@ -150,6 +156,7 @@ function LocalFonts() {
 		const response = await installFonts( fontFamilies );
 		const installNotice = getNoticeFromInstallResponse( response );
 		setNotice( installNotice );
+		setIsUploading( false );
 	};
 
 	return (
@@ -157,21 +164,24 @@ function LocalFonts() {
 			<Spacer margin={ 16 } />
 			<DropZone onFilesDrop={ handleDropZone } />
 			<VStack className="font-library-modal__local-fonts">
-				<FormFileUpload
-					accept={ ALLOWED_FILE_EXTENSIONS.map(
-						( ext ) => `.${ ext }`
-					).join( ',' ) }
-					multiple={ true }
-					onChange={ onFilesUpload }
-					render={ ( { openFileDialog } ) => (
-						<Button
-							className="font-library-modal__upload-area"
-							onClick={ openFileDialog }
-						>
-							<span>{ __( 'Upload font' ) }</span>
-						</Button>
-					) }
-				/>
+				{ ! isUploading && (
+					<FormFileUpload
+						accept={ ALLOWED_FILE_EXTENSIONS.map(
+							( ext ) => `.${ ext }`
+						).join( ',' ) }
+						multiple={ true }
+						onChange={ onFilesUpload }
+						render={ ( { openFileDialog } ) => (
+							<Button
+								className="font-library-modal__upload-area"
+								onClick={ openFileDialog }
+							>
+								<span>{ __( 'Upload font' ) }</span>
+							</Button>
+						) }
+					/>
+				) }
+				{ isUploading && <ProgressBar /> }
 				{ notice && (
 					<FlexItem>
 						<Spacer margin={ 2 } />
