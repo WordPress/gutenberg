@@ -5,10 +5,12 @@ import { Platform, useMemo, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
+	__experimentalUseLinkControlEntitySearch as useLinkControlEntitySearch,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -16,6 +18,9 @@ import { __ } from '@wordpress/i18n';
 import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { settingsKeys } = unlock( blockEditorPrivateApis );
 
 const EMPTY_BLOCKS_LIST = [];
 
@@ -93,8 +98,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
 		userCanCreatePages,
-		pageOnFront,
-		pageForPosts,
 		userPatternCategories,
 		restBlockPatterns,
 		restBlockPatternCategories,
@@ -104,16 +107,11 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			const {
 				canUser,
 				getRawEntityRecord,
-				getEntityRecord,
 				getUserPatternCategories,
 				getEntityRecords,
 				getBlockPatterns,
 				getBlockPatternCategories,
 			} = select( coreStore );
-
-			const siteSettings = canUser( 'read', 'settings' )
-				? getEntityRecord( 'root', 'site' )
-				: undefined;
 
 			return {
 				canUseUnfilteredHTML: getRawEntityRecord(
@@ -128,8 +126,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					: EMPTY_BLOCKS_LIST, // Reusable blocks are fetched in the native version of this hook.
 				hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
 				userCanCreatePages: canUser( 'create', 'pages' ),
-				pageOnFront: siteSettings?.page_on_front,
-				pageForPosts: siteSettings?.page_for_posts,
 				userPatternCategories: getUserPatternCategories(),
 				restBlockPatterns: getBlockPatterns(),
 				restBlockPatternCategories: getBlockPatternCategories(),
@@ -214,6 +210,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
+			// We still need this for mobile and URLInput.
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			inserterMediaCategories,
@@ -229,8 +226,8 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			// Check these two properties: they were not present in the site editor.
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
-			pageOnFront,
-			pageForPosts,
+			[ settingsKeys.useLinkControlEntitySearch ]:
+				useLinkControlEntitySearch,
 			__experimentalPreferPatternsOnRoot: postType === 'wp_template',
 			templateLock:
 				postType === 'wp_navigation' ? 'insert' : settings.templateLock,
@@ -251,8 +248,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			undo,
 			createPageEntity,
 			userCanCreatePages,
-			pageOnFront,
-			pageForPosts,
 			postType,
 			setIsInserterOpened,
 		]

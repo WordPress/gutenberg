@@ -9,6 +9,7 @@ import {
 	useEntityBlockEditor,
 	store as coreStore,
 	useResourcePermissions,
+	__experimentalUseLinkControlEntitySearch as useLinkControlEntitySearch,
 } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -25,8 +26,11 @@ import { store as editWidgetsStore } from '../../store';
 import { ALLOW_REUSABLE_BLOCKS } from '../../constants';
 import { unlock } from '../../lock-unlock';
 
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { ExperimentalBlockEditorProvider, settingsKeys } = unlock(
+	blockEditorPrivateApis
+);
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
+
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
 	children,
@@ -34,36 +38,25 @@ export default function WidgetAreasBlockEditorProvider( {
 } ) {
 	const mediaPermissions = useResourcePermissions( 'media' );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const {
-		reusableBlocks,
-		isFixedToolbarActive,
-		keepCaretInsideBlock,
-		pageOnFront,
-		pageForPosts,
-	} = useSelect( ( select ) => {
-		const { canUser, getEntityRecord, getEntityRecords } =
-			select( coreStore );
-		const siteSettings = canUser( 'read', 'settings' )
-			? getEntityRecord( 'root', 'site' )
-			: undefined;
-		return {
-			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
-			widgets: select( editWidgetsStore ).getWidgets(),
-			reusableBlocks: ALLOW_REUSABLE_BLOCKS
-				? getEntityRecords( 'postType', 'wp_block' )
-				: [],
-			isFixedToolbarActive: !! select( preferencesStore ).get(
-				'core/edit-widgets',
-				'fixedToolbar'
-			),
-			keepCaretInsideBlock: !! select( preferencesStore ).get(
-				'core/edit-widgets',
-				'keepCaretInsideBlock'
-			),
-			pageOnFront: siteSettings?.page_on_front,
-			pageForPosts: siteSettings?.page_for_posts,
-		};
-	}, [] );
+	const { reusableBlocks, isFixedToolbarActive, keepCaretInsideBlock } =
+		useSelect( ( select ) => {
+			const { getEntityRecords } = select( coreStore );
+			return {
+				widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
+				widgets: select( editWidgetsStore ).getWidgets(),
+				reusableBlocks: ALLOW_REUSABLE_BLOCKS
+					? getEntityRecords( 'postType', 'wp_block' )
+					: [],
+				isFixedToolbarActive: !! select( preferencesStore ).get(
+					'core/edit-widgets',
+					'fixedToolbar'
+				),
+				keepCaretInsideBlock: !! select( preferencesStore ).get(
+					'core/edit-widgets',
+					'keepCaretInsideBlock'
+				),
+			};
+		}, [] );
 	const { setIsInserterOpened } = useDispatch( editWidgetsStore );
 
 	const settings = useMemo( () => {
@@ -85,8 +78,8 @@ export default function WidgetAreasBlockEditorProvider( {
 			mediaUpload: mediaUploadBlockEditor,
 			templateLock: 'all',
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
-			pageOnFront,
-			pageForPosts,
+			[ settingsKeys.useLinkControlEntitySearch ]:
+				useLinkControlEntitySearch,
 		};
 	}, [
 		blockEditorSettings,
@@ -96,8 +89,6 @@ export default function WidgetAreasBlockEditorProvider( {
 		mediaPermissions.canCreate,
 		reusableBlocks,
 		setIsInserterOpened,
-		pageOnFront,
-		pageForPosts,
 	] );
 
 	const widgetAreaId = useLastSelectedWidgetArea();
