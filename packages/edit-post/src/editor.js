@@ -30,7 +30,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const {
-		allowRightClickOverrides,
 		hasFixedToolbar,
 		focusMode,
 		isDistractionFree,
@@ -71,9 +70,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			const isViewable = getPostType( postType )?.viewable ?? false;
 			const canEditTemplate = canUser( 'create', 'templates' );
 			return {
-				allowRightClickOverrides: isFeatureActive(
-					'allowRightClickOverrides'
-				),
 				hasFixedToolbar:
 					isFeatureActive( 'fixedToolbar' ) || ! isLargeViewport,
 				focusMode: isFeatureActive( 'focusMode' ),
@@ -109,7 +105,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			focusMode,
 			isDistractionFree,
 			hasInlineToolbar,
-			allowRightClickOverrides,
 
 			keepCaretInsideBlock,
 			// Keep a reference of the `allowedBlockTypes` from the server to handle use cases
@@ -135,7 +130,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		return result;
 	}, [
 		settings,
-		allowRightClickOverrides,
 		hasFixedToolbar,
 		hasInlineToolbar,
 		focusMode,

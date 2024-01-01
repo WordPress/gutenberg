@@ -9,6 +9,7 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -28,7 +29,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableGalleryWithImageBlocks',
 	'alignWide',
 	'allowedBlockTypes',
-	'allowRightClickOverrides',
 	'blockInspectorTabs',
 	'allowedMimeTypes',
 	'bodyPlaceholder',
@@ -89,6 +89,7 @@ const BLOCK_EDITOR_SETTINGS = [
  */
 function useBlockEditorSettings( settings, postType, postId ) {
 	const {
+		allowRightClickOverrides,
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
@@ -116,6 +117,10 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				: undefined;
 
 			return {
+				allowRightClickOverrides: select( preferencesStore ).get(
+					'core/edit-post',
+					'allowRightClickOverrides'
+				),
 				canUseUnfilteredHTML: getRawEntityRecord(
 					'postType',
 					postType,
@@ -209,6 +214,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					BLOCK_EDITOR_SETTINGS.includes( key )
 				)
 			),
+			allowRightClickOverrides,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
@@ -241,6 +247,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 		} ),
 		[
+			allowRightClickOverrides,
 			settings,
 			hasUploadPermissions,
 			reusableBlocks,

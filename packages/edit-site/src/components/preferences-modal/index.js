@@ -68,6 +68,7 @@ export default function EditSitePreferencesModal() {
 						label={ __( 'Display block breadcrumbs' ) }
 					/>
 					<EnableFeature
+						namespace="core/edit-post"
 						featureName="allowRightClickOverrides"
 						help={ __(
 							'Allows contextual list view menus via right-click, overriding browser defaults.'
