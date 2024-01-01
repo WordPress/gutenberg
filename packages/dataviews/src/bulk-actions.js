@@ -56,7 +56,7 @@ function BulkActionItem( {
 		<DropdownMenuItem
 			key={ action.id }
 			disabled={ eligibleItems.length === 0 }
-			onSelect={ async ( event ) => {
+			onClick={ async ( event ) => {
 				event.preventDefault();
 				if ( !! action.RenderModal ) {
 					onMenuOpenChange( false );
@@ -151,7 +151,7 @@ export default function BulkActions( {
 				<DropdownMenuGroup>
 					<DropdownMenuItem
 						disabled={ areAllSelected }
-						onSelect={ ( event ) => {
+						onClick={ ( event ) => {
 							event.preventDefault();
 							onSelectionChange( data );
 						} }
@@ -161,7 +161,7 @@ export default function BulkActions( {
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						disabled={ selection.length === 0 }
-						onSelect={ ( event ) => {
+						onClick={ ( event ) => {
 							event.preventDefault();
 							onSelectionChange( [] );
 						} }
