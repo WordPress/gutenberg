@@ -4,20 +4,14 @@
 const DependencyExtractionWebpackPlugin = require( '../../..' );
 
 module.exports = {
-	entry: {
-		a: './a',
-		b: './b',
-	},
 	plugins: [
 		new DependencyExtractionWebpackPlugin( {
+			outputFormat: 'json',
 			requestToExternalModule( request ) {
-				if ( request.startsWith( '@wordpress/' ) ) {
+				if ( request.startsWith( 'test-external' ) ) {
 					return request;
 				}
 			},
 		} ),
 	],
-	optimization: {
-		runtimeChunk: 'single',
-	},
 };
