@@ -25,6 +25,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  */
 import { store as editPostStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import PluginHeaderToolbar from '../plugin-header-toolbar';
 
 const { useCanBlockToolbarBeFocused } = unlock( blockEditorPrivateApis );
 
@@ -169,6 +170,11 @@ function HeaderToolbar( { hasFixedToolbar } ) {
 							size="compact"
 						/>
 						{ overflowItems }
+						{ isLargeViewport && (
+							<PluginHeaderToolbar.Slot
+								fillProps={ { showIconLabels } }
+							/>
+						) }
 					</>
 				) }
 			</div>
