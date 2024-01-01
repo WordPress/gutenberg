@@ -2,12 +2,6 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import {
-	DocumentOutline,
-	WordCount,
-	TimeToRead,
-	CharacterCount,
-} from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	__experimentalText as Text,
@@ -17,6 +11,14 @@ import {
 	Rect,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import CharacterCount from '../character-count';
+import WordCount from '../word-count';
+import TimeToRead from '../time-to-read';
+import DocumentOutline from '../document-outline';
 
 function EmptyOutlineIllustration() {
 	return (
@@ -65,7 +67,7 @@ export default function ListViewOutline() {
 	}, [] );
 	return (
 		<>
-			<div className="edit-post-editor__list-view-overview">
+			<div className="editor-list-view-sidebar__outline">
 				<div>
 					<Text>{ __( 'Characters:' ) }</Text>
 					<Text>
@@ -84,7 +86,7 @@ export default function ListViewOutline() {
 			{ headingCount > 0 ? (
 				<DocumentOutline />
 			) : (
-				<div className="edit-post-editor__list-view-empty-headings">
+				<div className="editor-list-view-sidebar__outline-empty-headings">
 					<EmptyOutlineIllustration />
 					<p>
 						{ __(

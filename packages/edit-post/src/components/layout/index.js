@@ -52,7 +52,6 @@ import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import EditPostPreferencesModal from '../preferences-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
-import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
@@ -65,7 +64,7 @@ import useCommonCommands from '../../hooks/commands/use-common-commands';
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
-const { InserterSidebar } = unlock( editorPrivateApis );
+const { InserterSidebar, ListViewSidebar } = unlock( editorPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
