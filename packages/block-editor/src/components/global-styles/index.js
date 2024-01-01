@@ -29,7 +29,4 @@ export {
 } from './image-settings-panel';
 export { default as AdvancedPanel } from './advanced-panel';
 export { areGlobalStyleConfigsEqual } from './utils';
-export {
-	default as useGlobalStylesChangelist,
-	truncateGlobalStylesChanges,
-} from './use-global-styles-changelist';
+export { default as getGlobalStylesChanges } from './get-global-styles-changes';

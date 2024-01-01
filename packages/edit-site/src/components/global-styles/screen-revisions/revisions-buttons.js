@@ -19,13 +19,12 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from '../../../lock-unlock';
 
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
-const MAX_CHANGES = 7;
-const { useGlobalStylesChangelist, truncateGlobalStylesChanges } = unlock(
-	blockEditorPrivateApis
-);
+const { getGlobalStylesChanges } = unlock( blockEditorPrivateApis );
 
 function ChangesSummary( { revision, previousRevision } ) {
-	const changes = useGlobalStylesChangelist( revision, previousRevision );
+	const changes = getGlobalStylesChanges( revision, previousRevision, {
+		maxResults: 7,
+	} );
 	const changesLength = changes.length;
 
 	if ( ! changesLength ) {
@@ -37,7 +36,7 @@ function ChangesSummary( { revision, previousRevision } ) {
 			data-testid="global-styles-revision-changes"
 			className="edit-site-global-styles-screen-revisions__changes"
 		>
-			{ truncateGlobalStylesChanges( changes, MAX_CHANGES ).join( ', ' ) }
+			{ changes.join( ', ' ) }
 		</span>
 	);
 }

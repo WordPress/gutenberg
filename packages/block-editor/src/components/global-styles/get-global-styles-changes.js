@@ -1,13 +1,16 @@
 /**
+ * External dependencies
+ */
+import memoize from 'memize';
+
+/**
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { getBlockTypes } from '@wordpress/blocks';
-import { useMemo } from '@wordpress/element';
 
 const globalStylesChangesCache = new Map();
 const EMPTY_ARRAY = [];
-
 const translationMap = {
 	caption: __( 'Caption' ),
 	link: __( 'Link' ),
@@ -19,16 +22,20 @@ const translationMap = {
 	'styles.spacing': __( 'Spacing' ),
 	'styles.typography': __( 'Typography' ),
 };
-
+const getBlockNames = memoize( () =>
+	getBlockTypes().reduce( ( accumulator, { name, title } ) => {
+		accumulator[ name ] = title;
+		return accumulator;
+	}, {} )
+);
 const isObject = ( obj ) => obj !== null && typeof obj === 'object';
 
 /**
  * Get the translation for a given global styles key.
- * @param {string}                key        A key representing a path to a global style property or setting.
- * @param {Record<string,string>} blockNames A key/value pair object of block names and their rendered titles.
+ * @param {string} key A key representing a path to a global style property or setting.
  * @return {string|undefined}                A translated key or undefined if no translation exists.
  */
-function getTranslation( key, blockNames ) {
+function getTranslation( key ) {
 	if ( translationMap[ key ] ) {
 		return translationMap[ key ];
 	}
@@ -36,7 +43,7 @@ function getTranslation( key, blockNames ) {
 	const keyArray = key.split( '.' );
 
 	if ( keyArray?.[ 0 ] === 'blocks' ) {
-		const blockName = blockNames[ keyArray[ 1 ] ];
+		const blockName = getBlockNames()?.[ keyArray[ 1 ] ];
 		return blockName
 			? sprintf(
 					// translators: %s: block name.
@@ -101,30 +108,6 @@ function deepCompare( changedObject, originalObject, parentPath = '' ) {
 }
 
 /**
- * From a useGlobalStylesChangelist() result, returns a truncated array of translated changes.
- * Appends a translated string indicating the number of changes that were truncated.
- * @param {string[]} changes    An array of translated changes.
- * @param {number}   maxResults Max results to show before truncating.
- * @return {string[]}                        An array of translated changes.
- */
-export function truncateGlobalStylesChanges( changes, maxResults = 3 ) {
-	const changesLength = changes.length;
-
-	// Truncate to `n` results if necessary.
-	if ( !! maxResults && changesLength && changesLength > maxResults ) {
-		const deleteCount = changesLength - maxResults;
-		const andMoreText = sprintf(
-			// translators: %d: number of global styles changes that are not displayed in the UI.
-			_n( '…and %d more change.', '…and %d more changes.', deleteCount ),
-			deleteCount
-		);
-		changes.splice( maxResults, deleteCount, andMoreText );
-	}
-
-	return changes;
-}
-
-/**
  * Returns an array of translated summarized global styles changes.
  * Results are cached using a Map() key of `JSON.stringify( { next, previous } )`.
  *
@@ -132,15 +115,8 @@ export function truncateGlobalStylesChanges( changes, maxResults = 3 ) {
  * @param {Object} previous The original object to compare against.
  * @return {string[]}                        An array of translated changes.
  */
-export default function useGlobalStylesChangelist( next, previous ) {
+function getGlobalStylesChangelist( next, previous ) {
 	const cacheKey = JSON.stringify( { next, previous } );
-	const blockNames = useMemo( () => {
-		const blockTypes = getBlockTypes();
-		return blockTypes.reduce( ( accumulator, { name, title } ) => {
-			accumulator[ name ] = title;
-			return accumulator;
-		}, {} );
-	}, [] );
 
 	if ( globalStylesChangesCache.has( cacheKey ) ) {
 		return globalStylesChangesCache.get( cacheKey );
@@ -186,7 +162,7 @@ export default function useGlobalStylesChangelist( next, previous ) {
 		 * Remove duplicate or empty translations.
 		 */
 		.reduce( ( acc, curr ) => {
-			const translation = getTranslation( curr, blockNames );
+			const translation = getTranslation( curr );
 			if ( translation && ! acc.includes( translation ) ) {
 				acc.push( translation );
 			}
@@ -196,4 +172,32 @@ export default function useGlobalStylesChangelist( next, previous ) {
 	globalStylesChangesCache.set( cacheKey, result );
 
 	return result;
+}
+
+/**
+ * From a getGlobalStylesChangelist() result, returns a truncated array of translated changes.
+ * Appends a translated string indicating the number of changes that were truncated.
+ *
+ * @param {Object}              next     The changed object to compare.
+ * @param {Object}              previous The original object to compare against.
+ * @param {{maxResults:number}} options  Options. maxResults: results to return before truncating.
+ * @return {string[]}                        An array of translated changes.
+ */
+export default function getGlobalStylesChanges( next, previous, options = {} ) {
+	const changes = getGlobalStylesChangelist( next, previous );
+	const changesLength = changes.length;
+	const { maxResults } = options;
+
+	// Truncate to `n` results if necessary.
+	if ( !! maxResults && changesLength && changesLength > maxResults ) {
+		const deleteCount = changesLength - maxResults;
+		const andMoreText = sprintf(
+			// translators: %d: number of global styles changes that are not displayed in the UI.
+			_n( '…and %d more change.', '…and %d more changes.', deleteCount ),
+			deleteCount
+		);
+		changes.splice( maxResults, deleteCount, andMoreText );
+	}
+
+	return changes;
 }
