@@ -195,6 +195,59 @@ function UnforwardedModal(
 		};
 	}, [ isContentScrollable, childrenContainerRef ] );
 
+	useLayoutEffect( () => {
+		// Function to calculate and update scrollbar width.
+		const updateScrollbarWidth = () => {
+			const scrollbarWidth = contentRef.current
+				? contentRef.current.offsetWidth -
+				  contentRef.current.clientWidth
+				: 0;
+
+			let styleTag = document.getElementById(
+				'modal-scrollbar-width-style'
+			) as HTMLStyleElement;
+			if ( ! styleTag ) {
+				styleTag = document.createElement( 'style' );
+				styleTag.id = 'modal-scrollbar-width-style';
+				document.head.appendChild( styleTag );
+			}
+
+			styleTag.textContent = `
+				:root {
+					--modal-scrollbar-width: ${ scrollbarWidth }px;
+				}
+			`;
+		};
+
+		// Set up ResizeObserver.
+		const resizeObserver = new ResizeObserver( () => {
+			updateScrollbarWidth();
+		} );
+
+		const currentContentRef = contentRef.current;
+
+		// Start observing the modal content.
+		if ( currentContentRef ) {
+			resizeObserver.observe( currentContentRef );
+		}
+
+		// Initial update.
+		updateScrollbarWidth();
+
+		// Cleanup function.
+		return () => {
+			if ( currentContentRef ) {
+				resizeObserver.unobserve( currentContentRef );
+			}
+			const styleTag = document.getElementById(
+				'modal-scrollbar-width-style'
+			) as HTMLStyleElement;
+			if ( styleTag ) {
+				document.head.removeChild( styleTag );
+			}
+		};
+	}, [] );
+
 	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
 		if (
 			// Ignore keydowns from IMEs
