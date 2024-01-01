@@ -39,6 +39,15 @@ export class PostPublishPanel extends Component {
 		) {
 			this.props.onClose();
 		}
+
+		// Automatically close the publish sidebar when showPostPublishPanel is unchecked and post is published.
+		if (
+			prevProps.isPublished &&
+			! this.props.isSaving &&
+			! prevProps.showPostPublishPanel
+		) {
+			this.props.onClose();
+		}
 	}
 
 	onSubmit() {
