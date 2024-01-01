@@ -42,7 +42,6 @@ import {
 } from '../sidebar-edit-mode';
 import CodeEditor from '../code-editor';
 import KeyboardShortcutsEditMode from '../keyboard-shortcuts/edit-mode';
-import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
@@ -59,7 +58,7 @@ import TemplatePartConverter from '../template-part-converter';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
 
 const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
-const { ExperimentalEditorProvider: EditorProvider } =
+const { ExperimentalEditorProvider: EditorProvider, InserterSidebar } =
 	unlock( editorPrivateApis );
 
 const interfaceLabels = {

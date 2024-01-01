@@ -50,8 +50,7 @@ body.js.block-editor-page {
 .edit-post-sidebar,
 .editor-post-publish-panel,
 .components-popover,
-.components-modal__frame,
-.edit-post-editor__inserter-panel {
+.components-modal__frame {
 	@include reset;
 }
 
