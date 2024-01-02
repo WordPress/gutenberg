@@ -812,6 +812,7 @@ export class ImageEdit extends Component {
 						{ ! this.state.isCaptionSelected &&
 							getToolbarEditButton( openMediaOptions ) }
 						<MediaUploadProgress
+							enablePausedUploads
 							coverUrl={ url }
 							mediaId={ id }
 							onUpdateMediaProgress={ this.updateMediaProgress }

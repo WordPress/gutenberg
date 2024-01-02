@@ -96,6 +96,11 @@ export class MediaUploadProgress extends Component {
 	}
 
 	finishMediaUploadWithPause( payload ) {
+		if ( ! this.props.enablePausedUploads ) {
+			this.finishMediaUploadWithFailure( payload );
+			return;
+		}
+
 		this.setState( {
 			uploadState: payload.state,
 			isUploadInProgress: true,
@@ -147,7 +152,10 @@ export class MediaUploadProgress extends Component {
 	}
 
 	getRetryMessage() {
-		if ( this.state.uploadState === MEDIA_UPLOAD_STATE_PAUSED ) {
+		if (
+			this.state.uploadState === MEDIA_UPLOAD_STATE_PAUSED &&
+			this.props.enablePausedUploads
+		) {
 			return __( 'Waiting for connection' );
 		}
 
@@ -186,7 +194,9 @@ export class MediaUploadProgress extends Component {
 					) }
 				</View>
 				{ renderContent( {
-					isUploadPaused: uploadState === MEDIA_UPLOAD_STATE_PAUSED,
+					isUploadPaused:
+						uploadState === MEDIA_UPLOAD_STATE_PAUSED &&
+						this.props.enablePausedUploads,
 					isUploadInProgress,
 					isUploadFailed,
 					retryMessage,
