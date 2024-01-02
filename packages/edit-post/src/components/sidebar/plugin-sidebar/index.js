@@ -8,11 +8,6 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editorStore } from '@wordpress/editor';
 
 /**
- * Internal dependencies
- */
-import { store as editPostStore } from '../../../store';
-
-/**
  * Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
  * It also automatically renders a corresponding `PluginSidebarMenuItem` component when `isPinnable` flag is set to `true`.
  * If you wish to display the sidebar, you can with use the `PluginSidebarMoreMenuItem` component or the `wp.data.dispatch` API:
@@ -78,14 +73,12 @@ import { store as editPostStore } from '../../../store';
  * ```
  */
 export default function PluginSidebarEditPost( { className, ...props } ) {
-	const { postTitle, shortcut, showIconLabels } = useSelect( ( select ) => {
+	const { postTitle, shortcut } = useSelect( ( select ) => {
 		return {
 			postTitle: select( editorStore ).getEditedPostAttribute( 'title' ),
 			shortcut: select(
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
-			showIconLabels:
-				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
 		};
 	}, [] );
 	return (
@@ -95,7 +88,6 @@ export default function PluginSidebarEditPost( { className, ...props } ) {
 			smallScreenTitle={ postTitle || __( '(no title)' ) }
 			scope="core/edit-post"
 			toggleShortcut={ shortcut }
-			showIconLabels={ showIconLabels }
 			{ ...props }
 		/>
 	);

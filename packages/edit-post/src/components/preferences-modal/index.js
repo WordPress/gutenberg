@@ -240,6 +240,7 @@ export default function EditPostPreferencesModal() {
 						</PreferencesModalSection>
 						<PreferencesModalSection title={ __( 'Interface' ) }>
 							<EnableFeature
+								scope="core"
 								featureName="showIconLabels"
 								label={ __( 'Show button text labels' ) }
 								help={ __(
