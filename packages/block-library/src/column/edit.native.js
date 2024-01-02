@@ -160,7 +160,7 @@ function ColumnEdit( {
 						/>
 					</BlockControls>
 					<InspectorControls>
-						<PanelBody title={ __( 'Column settings' ) }>
+						<PanelBody title={ __( 'Settings' ) }>
 							<UnitControl
 								label={ __( 'Width' ) }
 								min={ 1 }

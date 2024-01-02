@@ -38,3 +38,15 @@ exports[`Paragraph block should render without crashing and match snapshot 1`] =
   />
 </View>
 `;
+
+exports[`Paragraph block should set a font size value 1`] = `
+"<!-- wp:paragraph {"style":{"typography":{"fontSize":"30px"}}} -->
+<p style="font-size:30px">A quick brown fox jumps over the lazy dog.</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Paragraph block should set a line height value 1`] = `
+"<!-- wp:paragraph {"style":{"typography":{"lineHeight":1.8}}} -->
+<p style="line-height:1.8">A quick brown fox jumps over the lazy dog.</p>
+<!-- /wp:paragraph -->"
+`;

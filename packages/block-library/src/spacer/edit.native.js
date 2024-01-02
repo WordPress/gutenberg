@@ -6,14 +6,16 @@ import { View, useWindowDimensions } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useConvertUnitToMobile } from '@wordpress/components';
+import {
+	useConvertUnitToMobile,
+	getPxFromCssUnit,
+} from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import {
 	InspectorControls,
 	isValueSpacingPreset,
 	useSettings,
 	getCustomValueFromPreset,
-	getPxFromCssUnit,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 
