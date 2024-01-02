@@ -7,6 +7,7 @@ import { __experimentalVStack as VStack } from '@wordpress/components';
 /**
  * Internal dependencies
  */
+import GlobalStylesBackButton from './back-button';
 import TypographyElements from './typogrphy-elements';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
@@ -19,7 +20,9 @@ function ScreenTypography() {
 				description={ __(
 					'Manage the typography settings for different elements.'
 				) }
-			/>
+			>
+				<GlobalStylesBackButton />
+			</ScreenHeader>
 			<div className="edit-site-global-styles-screen-typography">
 				<VStack spacing={ 6 }>
 					{ ! window.__experimentalDisableFontLibrary && (

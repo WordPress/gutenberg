@@ -8,6 +8,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
+import GlobalStylesBackButton from './back-button';
 import ScreenHeader from './header';
 import Palette from './palette';
 import { unlock } from '../../lock-unlock';
@@ -36,7 +37,9 @@ function ScreenColors() {
 				description={ __(
 					'Manage palettes and the default color of different global elements on the site.'
 				) }
-			/>
+			>
+				<GlobalStylesBackButton />
+			</ScreenHeader>
 			<div className="edit-site-global-styles-screen-colors">
 				<VStack spacing={ 10 }>
 					<Palette />

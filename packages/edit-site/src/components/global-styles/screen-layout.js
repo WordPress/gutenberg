@@ -8,6 +8,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import DimensionsPanel from './dimensions-panel';
+import GlobalStylesBackButton from './back-button';
 import ScreenHeader from './header';
 import { unlock } from '../../lock-unlock';
 
@@ -20,7 +21,9 @@ function ScreenLayout() {
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	return (
 		<>
-			<ScreenHeader title={ __( 'Layout' ) } />
+			<ScreenHeader title={ __( 'Layout' ) }>
+				<GlobalStylesBackButton />
+			</ScreenHeader>
 			{ hasDimensionsPanel && <DimensionsPanel /> }
 		</>
 	);

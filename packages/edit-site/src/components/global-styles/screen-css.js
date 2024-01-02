@@ -8,6 +8,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
+import GlobalStylesBackButton from './back-button';
 import { unlock } from '../../lock-unlock';
 import ScreenHeader from './header';
 
@@ -41,7 +42,9 @@ function ScreenCSS() {
 						</ExternalLink>
 					</>
 				}
-			/>
+			>
+				<GlobalStylesBackButton />
+			</ScreenHeader>
 			<div className="edit-site-global-styles-screen-css">
 				<StylesAdvancedPanel
 					value={ style }

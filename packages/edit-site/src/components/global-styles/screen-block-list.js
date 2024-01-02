@@ -26,6 +26,7 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
+import GlobalStylesBackButton from './back-button';
 import { useBlockVariations } from './variations-panel';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
@@ -168,7 +169,9 @@ function ScreenBlockList() {
 				description={ __(
 					'Customize the appearance of specific blocks and for the whole site.'
 				) }
-			/>
+			>
+				<GlobalStylesBackButton />
+			</ScreenHeader>
 			<SearchControl
 				__nextHasNoMarginBottom
 				className="edit-site-block-types-search"
