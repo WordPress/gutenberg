@@ -33,9 +33,7 @@ const name = 'core/text-color';
 const title = __( 'Text color' );
 
 function getComputedStyleProperty( element, property ) {
-	const {
-		props: { style = {} },
-	} = element;
+	const style = element?.props?.style ?? {};
 
 	if ( property === 'background-color' ) {
 		const { backgroundColor, baseColors } = style;

@@ -2,13 +2,18 @@
  * External dependencies
  */
 import { Dimensions } from 'react-native';
-import { getEditorHtml, render, initializeEditor } from 'test/helpers';
+import {
+	fireEvent,
+	getEditorHtml,
+	render,
+	initializeEditor,
+} from 'test/helpers';
 
 /**
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
-import { store as richTextStore } from '@wordpress/rich-text';
+import { store as richTextStore, RichTextData } from '@wordpress/rich-text';
 import { coreBlocks } from '@wordpress/block-library';
 import {
 	getBlockTypes,
@@ -75,6 +80,26 @@ describe( '<RichText/>', () => {
 		// Clean up registered blocks.
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
+		} );
+	} );
+
+	describe( 'when changes arrive from Aztec', () => {
+		it( 'should avoid updating attributes when values are equal', async () => {
+			const handleChange = jest.fn();
+			const defaultEmptyValue = new RichTextData();
+			const screen = render(
+				<RichText
+					onChange={ handleChange }
+					value={ defaultEmptyValue }
+				/>
+			);
+
+			// Simulate an empty string from Aztec
+			fireEvent( screen.getByLabelText( 'Text input. Empty' ), 'change', {
+				nativeEvent: { text: '' },
+			} );
+
+			expect( handleChange ).not.toHaveBeenCalled();
 		} );
 	} );
 

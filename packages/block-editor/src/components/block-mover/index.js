@@ -64,7 +64,7 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 			} ) }
 		>
 			{ ! hideDragHandle && (
-				<BlockDraggable clientIds={ clientIds }>
+				<BlockDraggable clientIds={ clientIds } fadeWhenDisabled>
 					{ ( draggableProps ) => (
 						<Button
 							icon={ dragHandle }

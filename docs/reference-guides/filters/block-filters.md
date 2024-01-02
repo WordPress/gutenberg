@@ -116,7 +116,7 @@ wp.hooks.addFilter(
 );
 ```
 
-#### `blocks.getSaveContent.extraProps`
+### `blocks.getSaveContent.extraProps`
 
 A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element.
 
@@ -229,7 +229,7 @@ const withMyPluginControls = createHigherOrderComponent( ( BlockEdit ) => {
 }, 'withMyPluginControls' );
 ```
 
-#### `editor.BlockListBlock`
+### `editor.BlockListBlock`
 
 Used to modify the block's wrapper component containing the block's `edit` component and all toolbars. It receives the original `BlockListBlock` component and returns a new wrapped component.
 

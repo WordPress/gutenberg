@@ -38,7 +38,7 @@ function Save( { attributes } ) {
 	// ...
 }
 
-registerBlockType( 'gutenpride/gutenpride-block', {
+registerBlockType( 'create-block/gutenpride', {
     // ...
     attributes,
     edit: Edit,

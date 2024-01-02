@@ -27,6 +27,7 @@ import {
 	parse,
 	serialize,
 	getUnregisteredTypeHandlerName,
+	getBlockType,
 	createBlock,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -35,6 +36,7 @@ import { applyFilters } from '@wordpress/hooks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { getGlobalStyles, getColorsAndGradients } from '@wordpress/components';
 import { NEW_BLOCK_TYPES } from '@wordpress/block-library';
+import { __ } from '@wordpress/i18n';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -94,6 +96,7 @@ class NativeEditorProvider extends Component {
 	componentDidMount() {
 		const {
 			capabilities,
+			createErrorNotice,
 			locale,
 			hostAppNamespace,
 			updateEditorSettings,
@@ -136,17 +139,26 @@ class NativeEditorProvider extends Component {
 		this.subscriptionParentMediaAppend = subscribeMediaAppend(
 			( payload ) => {
 				const blockName = 'core/' + payload.mediaType;
-				const newBlock = createBlock( blockName, {
-					id: payload.mediaId,
-					[ payload.mediaType === 'image' ? 'url' : 'src' ]:
-						payload.mediaUrl,
-				} );
+				const blockType = getBlockType( blockName );
 
-				const indexAfterSelected = this.props.selectedBlockIndex + 1;
-				const insertionIndex =
-					indexAfterSelected || this.props.blockCount;
+				if ( blockType && blockType?.name ) {
+					const newBlock = createBlock( blockType.name, {
+						id: payload.mediaId,
+						[ payload.mediaType === 'image' ? 'url' : 'src' ]:
+							payload.mediaUrl,
+					} );
 
-				this.props.insertBlock( newBlock, insertionIndex );
+					const indexAfterSelected =
+						this.props.selectedBlockIndex + 1;
+					const insertionIndex =
+						indexAfterSelected || this.props.blockCount;
+
+					this.props.insertBlock( newBlock, insertionIndex );
+				} else {
+					createErrorNotice(
+						__( 'File type not supported as a media file.' )
+					);
+				}
 			}
 		);
 
@@ -389,7 +401,8 @@ const ComposedNativeProvider = compose( [
 			dispatch( blockEditorStore );
 		const { switchEditorMode } = dispatch( editPostStore );
 		const { addEntities, receiveEntityRecords } = dispatch( coreStore );
-		const { createSuccessNotice } = dispatch( noticesStore );
+		const { createSuccessNotice, createErrorNotice } =
+			dispatch( noticesStore );
 
 		return {
 			updateBlockEditorSettings: updateSettings,
@@ -397,6 +410,7 @@ const ComposedNativeProvider = compose( [
 			addEntities,
 			insertBlock,
 			createSuccessNotice,
+			createErrorNotice,
 			editTitle( title ) {
 				editPost( { title } );
 			},

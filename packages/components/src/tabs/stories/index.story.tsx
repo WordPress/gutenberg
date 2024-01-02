@@ -40,17 +40,17 @@ const Template: StoryFn< typeof Tabs > = ( props ) => {
 	return (
 		<Tabs { ...props }>
 			<Tabs.TabList>
-				<Tabs.Tab id={ 'tab1' }>Tab 1</Tabs.Tab>
-				<Tabs.Tab id={ 'tab2' }>Tab 2</Tabs.Tab>
-				<Tabs.Tab id={ 'tab3' }>Tab 3</Tabs.Tab>
+				<Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab>
+				<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>
+				<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
 			</Tabs.TabList>
-			<Tabs.TabPanel id={ 'tab1' }>
+			<Tabs.TabPanel tabId="tab1">
 				<p>Selected tab: Tab 1</p>
 			</Tabs.TabPanel>
-			<Tabs.TabPanel id={ 'tab2' }>
+			<Tabs.TabPanel tabId="tab2">
 				<p>Selected tab: Tab 2</p>
 			</Tabs.TabPanel>
-			<Tabs.TabPanel id={ 'tab3' } focusable={ false }>
+			<Tabs.TabPanel tabId="tab3" focusable={ false }>
 				<p>Selected tab: Tab 3</p>
 				<p>
 					This tabpanel has its <code>focusable</code> prop set to
@@ -71,19 +71,19 @@ const DisabledTabTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (
 		<Tabs { ...props }>
 			<Tabs.TabList>
-				<Tabs.Tab id={ 'tab1' } disabled={ true }>
+				<Tabs.Tab tabId="tab1" disabled={ true }>
 					Tab 1
 				</Tabs.Tab>
-				<Tabs.Tab id={ 'tab2' }>Tab 2</Tabs.Tab>
-				<Tabs.Tab id={ 'tab3' }>Tab 3</Tabs.Tab>
+				<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>
+				<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
 			</Tabs.TabList>
-			<Tabs.TabPanel id={ 'tab1' }>
+			<Tabs.TabPanel tabId="tab1">
 				<p>Selected tab: Tab 1</p>
 			</Tabs.TabPanel>
-			<Tabs.TabPanel id={ 'tab2' }>
+			<Tabs.TabPanel tabId="tab2">
 				<p>Selected tab: Tab 2</p>
 			</Tabs.TabPanel>
-			<Tabs.TabPanel id={ 'tab3' }>
+			<Tabs.TabPanel tabId="tab3">
 				<p>Selected tab: Tab 3</p>
 			</Tabs.TabPanel>
 		</Tabs>
@@ -96,31 +96,31 @@ const WithTabIconsAndTooltipsTemplate: StoryFn< typeof Tabs > = ( props ) => {
 		<Tabs { ...props }>
 			<Tabs.TabList>
 				<Tabs.Tab
-					id={ 'tab1' }
+					tabId="tab1"
 					render={
 						<Button icon={ wordpress } label="Tab 1" showTooltip />
 					}
 				/>
 				<Tabs.Tab
-					id={ 'tab2' }
+					tabId="tab2"
 					render={
 						<Button icon={ link } label="Tab 2" showTooltip />
 					}
 				/>
 				<Tabs.Tab
-					id={ 'tab3' }
+					tabId="tab3"
 					render={
 						<Button icon={ more } label="Tab 3" showTooltip />
 					}
 				/>
 			</Tabs.TabList>
-			<Tabs.TabPanel id={ 'tab1' }>
+			<Tabs.TabPanel tabId="tab1">
 				<p>Selected tab: Tab 1</p>
 			</Tabs.TabPanel>
-			<Tabs.TabPanel id={ 'tab2' }>
+			<Tabs.TabPanel tabId="tab2">
 				<p>Selected tab: Tab 2</p>
 			</Tabs.TabPanel>
-			<Tabs.TabPanel id={ 'tab3' }>
+			<Tabs.TabPanel tabId="tab3">
 				<p>Selected tab: Tab 3</p>
 			</Tabs.TabPanel>
 		</Tabs>
@@ -140,18 +140,18 @@ const UsingSlotFillTemplate: StoryFn< typeof Tabs > = ( props ) => {
 		<SlotFillProvider>
 			<Tabs { ...props }>
 				<Tabs.TabList>
-					<Tabs.Tab id={ 'tab1' }>Tab 1</Tabs.Tab>
-					<Tabs.Tab id={ 'tab2' }>Tab 2</Tabs.Tab>
-					<Tabs.Tab id={ 'tab3' }>Tab 3</Tabs.Tab>
+					<Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab>
+					<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>
+					<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
 				</Tabs.TabList>
 				<Fill name="tabs-are-fun">
-					<Tabs.TabPanel id={ 'tab1' }>
+					<Tabs.TabPanel tabId="tab1">
 						<p>Selected tab: Tab 1</p>
 					</Tabs.TabPanel>
-					<Tabs.TabPanel id={ 'tab2' }>
+					<Tabs.TabPanel tabId="tab2">
 						<p>Selected tab: Tab 2</p>
 					</Tabs.TabPanel>
-					<Tabs.TabPanel id={ 'tab3' }>
+					<Tabs.TabPanel tabId="tab3">
 						<p>Selected tab: Tab 3</p>
 					</Tabs.TabPanel>
 				</Fill>
@@ -196,9 +196,9 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
 							} }
 						>
 							<Tabs.TabList>
-								<Tabs.Tab id={ 'tab1' }>Tab 1</Tabs.Tab>
-								<Tabs.Tab id={ 'tab2' }>Tab 2</Tabs.Tab>
-								<Tabs.Tab id={ 'tab3' }>Tab 3</Tabs.Tab>
+								<Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab>
+								<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>
+								<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
 							</Tabs.TabList>
 							<Button
 								variant={ 'tertiary' }
@@ -211,13 +211,13 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
 								Close Tabs
 							</Button>
 						</div>
-						<Tabs.TabPanel id={ 'tab1' }>
+						<Tabs.TabPanel tabId="tab1">
 							<p>Selected tab: Tab 1</p>
 						</Tabs.TabPanel>
-						<Tabs.TabPanel id={ 'tab2' }>
+						<Tabs.TabPanel tabId="tab2">
 							<p>Selected tab: Tab 2</p>
 						</Tabs.TabPanel>
-						<Tabs.TabPanel id={ 'tab3' }>
+						<Tabs.TabPanel tabId="tab3">
 							<p>Selected tab: Tab 3</p>
 						</Tabs.TabPanel>
 					</Tabs>
@@ -251,19 +251,19 @@ const ControlledModeTemplate: StoryFn< typeof Tabs > = ( props ) => {
 				} }
 			>
 				<Tabs.TabList>
-					<Tabs.Tab id={ 'tab1' }>Tab 1</Tabs.Tab>
+					<Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab>
 
-					<Tabs.Tab id={ 'tab2' }>Tab 2</Tabs.Tab>
+					<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>
 
-					<Tabs.Tab id={ 'tab3' }>Tab 3</Tabs.Tab>
+					<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
 				</Tabs.TabList>
-				<Tabs.TabPanel id={ 'tab1' }>
+				<Tabs.TabPanel tabId="tab1">
 					<p>Selected tab: Tab 1</p>
 				</Tabs.TabPanel>
-				<Tabs.TabPanel id={ 'tab2' }>
+				<Tabs.TabPanel tabId="tab2">
 					<p>Selected tab: Tab 2</p>
 				</Tabs.TabPanel>
-				<Tabs.TabPanel id={ 'tab3' }>
+				<Tabs.TabPanel tabId="tab3">
 					<p>Selected tab: Tab 3</p>
 				</Tabs.TabPanel>
 			</Tabs>
@@ -314,19 +314,19 @@ const TabBecomesDisabledTemplate: StoryFn< typeof Tabs > = ( props ) => {
 			</Button>
 			<Tabs { ...props }>
 				<Tabs.TabList>
-					<Tabs.Tab id={ 'tab1' }>Tab 1</Tabs.Tab>
-					<Tabs.Tab id={ 'tab2' } disabled={ disableTab2 }>
+					<Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab>
+					<Tabs.Tab tabId="tab2" disabled={ disableTab2 }>
 						Tab 2
 					</Tabs.Tab>
-					<Tabs.Tab id={ 'tab3' }>Tab 3</Tabs.Tab>
+					<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
 				</Tabs.TabList>
-				<Tabs.TabPanel id={ 'tab1' }>
+				<Tabs.TabPanel tabId="tab1">
 					<p>Selected tab: Tab 1</p>
 				</Tabs.TabPanel>
-				<Tabs.TabPanel id={ 'tab2' }>
+				<Tabs.TabPanel tabId="tab2">
 					<p>Selected tab: Tab 2</p>
 				</Tabs.TabPanel>
-				<Tabs.TabPanel id={ 'tab3' }>
+				<Tabs.TabPanel tabId="tab3">
 					<p>Selected tab: Tab 3</p>
 				</Tabs.TabPanel>
 			</Tabs>
@@ -348,17 +348,17 @@ const TabGetsRemovedTemplate: StoryFn< typeof Tabs > = ( props ) => {
 			</Button>
 			<Tabs { ...props }>
 				<Tabs.TabList>
-					{ ! removeTab1 && <Tabs.Tab id={ 'tab1' }>Tab 1</Tabs.Tab> }
-					<Tabs.Tab id={ 'tab2' }>Tab 2</Tabs.Tab>
-					<Tabs.Tab id={ 'tab3' }>Tab 3</Tabs.Tab>
+					{ ! removeTab1 && <Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab> }
+					<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>
+					<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
 				</Tabs.TabList>
-				<Tabs.TabPanel id={ 'tab1' }>
+				<Tabs.TabPanel tabId="tab1">
 					<p>Selected tab: Tab 1</p>
 				</Tabs.TabPanel>
-				<Tabs.TabPanel id={ 'tab2' }>
+				<Tabs.TabPanel tabId="tab2">
 					<p>Selected tab: Tab 2</p>
 				</Tabs.TabPanel>
-				<Tabs.TabPanel id={ 'tab3' }>
+				<Tabs.TabPanel tabId="tab3">
 					<p>Selected tab: Tab 3</p>
 				</Tabs.TabPanel>
 			</Tabs>

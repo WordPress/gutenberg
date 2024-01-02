@@ -819,7 +819,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			break;
 		}
 
-		if ( false !== strpos( $processor->get_attribute( 'class' ), $inner_block_wrapper_classes ) ) {
+		$class_attribute = $processor->get_attribute( 'class' );
+		if ( is_string( $class_attribute ) && false !== strpos( $class_attribute, $inner_block_wrapper_classes ) ) {
 			break;
 		}
 	} while ( $processor->next_tag() );
