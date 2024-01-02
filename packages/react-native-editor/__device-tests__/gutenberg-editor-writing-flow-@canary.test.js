@@ -115,7 +115,7 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 
 		// When deleting the Paragraph block, the keyboard should be hidden and
 		// the image block should be focused.
-		await editorPage.driver.pause( 1000 );
+		await editorPage.driver.pause( 2000 );
 		expect( await editorPage.driver.isKeyboardShown() ).toBe( false );
 		expect( await editorPage.isImageBlockSelected() ).toBe( true );
 
