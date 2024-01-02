@@ -1,9 +1,21 @@
 /**
  * Internal dependencies
  */
-import getRevisionChanges from '../get-revision-changes';
+import getGlobalStylesChanges from '../get-global-styles-changes';
 
-describe( 'getRevisionChanges', () => {
+jest.mock( '@wordpress/blocks', () => {
+	return {
+		...jest.requireActual( '@wordpress/blocks' ),
+		getBlockTypes: jest.fn( () => [
+			{
+				name: 'core/paragraph',
+				title: 'Test Paragraph',
+			},
+		] ),
+	};
+} );
+
+describe( 'getGlobalStylesChanges', () => {
 	const revision = {
 		id: 10,
 		styles: {
@@ -126,35 +138,37 @@ describe( 'getRevisionChanges', () => {
 			},
 		},
 	};
-	const blockNames = {
-		'core/paragraph': 'Paragraph',
-	};
+
 	it( 'returns a list of changes and caches them', () => {
-		const resultA = getRevisionChanges(
-			revision,
-			previousRevision,
-			blockNames
-		);
+		const resultA = getGlobalStylesChanges( revision, previousRevision );
 		expect( resultA ).toEqual( [
 			'Colors',
 			'Typography',
-			'Paragraph block',
+			'Test Paragraph block',
 			'Caption element',
 			'Link element',
 			'Color settings',
 		] );
 
-		const resultB = getRevisionChanges(
-			revision,
-			previousRevision,
-			blockNames
-		);
+		const resultB = getGlobalStylesChanges( revision, previousRevision );
 
 		expect( resultA ).toBe( resultB );
 	} );
 
+	it( 'returns a list of truncated changes', () => {
+		const resultA = getGlobalStylesChanges( revision, previousRevision, {
+			maxResults: 3,
+		} );
+		expect( resultA ).toEqual( [
+			'Colors',
+			'Typography',
+			'Test Paragraph block',
+			'…and 3 more changes.',
+		] );
+	} );
+
 	it( 'skips unknown and unchanged keys', () => {
-		const result = getRevisionChanges(
+		const result = getGlobalStylesChanges(
 			{
 				styles: {
 					frogs: {
