@@ -494,8 +494,7 @@ export function showAndroidSoftKeyboard() {
 		return;
 	}
 
-	const hasFocusedTextInput =
-		RCTAztecView.InputState.getCurrentFocusedElement() !== null;
+	const hasFocusedTextInput = RCTAztecView.InputState.isFocused();
 
 	if ( hasFocusedTextInput ) {
 		RNReactNativeGutenbergBridge.showAndroidSoftKeyboard();
