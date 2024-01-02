@@ -12,6 +12,7 @@ import {
 	isFocused,
 	focus,
 	blur,
+	blurOnUnmount,
 	notifyInputChange,
 	removeFocusChangeListener,
 } from '../AztecInputState';
@@ -100,5 +101,17 @@ describe( 'Aztec Input State', () => {
 		blur( ref );
 		jest.runAllTimers();
 		expect( TextInputState.blurTextInput ).toHaveBeenCalledWith( ref );
+	} );
+
+	it( 'unfocuses an element when unmounted', () => {
+		const listener = jest.fn();
+		addFocusChangeListener( listener );
+
+		updateCurrentFocusedInput( ref );
+		blurOnUnmount( ref );
+		jest.runAllTimers();
+
+		expect( listener ).toHaveBeenCalledWith( { isFocused: false } );
+		expect( isFocused() ).toBeFalsy();
 	} );
 } );
