@@ -7,22 +7,23 @@ import { renderHook } from '@testing-library/react-native';
 /**
  * Internal dependencies
  */
-import useScrollToTextInput from '../use-scroll-to-text-input';
+import useScrollToSection from '../use-scroll-to-section';
 
-describe( 'useScrollToTextInput', () => {
-	it( 'scrolls up to the current TextInput offset', () => {
+describe( 'useScrollToSection', () => {
+	it( 'scrolls up to the section', () => {
 		// Arrange
-		const currentCaretData = { caretHeight: 10 };
+		const sectionY = 50;
+		const sectionHeight = 10;
+
 		const extraScrollHeight = 50;
 		const keyboardOffset = 100;
 		const scrollEnabled = true;
 		const scrollViewRef = { current: { scrollTo: jest.fn() } };
 		const scrollViewMeasurements = { current: { height: 600 } };
 		const scrollViewYOffset = { value: 150 };
-		const textInputOffset = 50;
 
 		const { result } = renderHook( () =>
-			useScrollToTextInput(
+			useScrollToSection(
 				extraScrollHeight,
 				keyboardOffset,
 				scrollEnabled,
@@ -33,28 +34,29 @@ describe( 'useScrollToTextInput', () => {
 		);
 
 		// Act
-		result.current[ 0 ]( currentCaretData, textInputOffset );
+		result.current[ 0 ]( sectionY, sectionHeight );
 
 		// Assert
 		expect( scrollViewRef.current.scrollTo ).toHaveBeenCalledWith( {
-			y: textInputOffset,
+			y: sectionY,
 			animated: true,
 		} );
 	} );
 
-	it( 'scrolls down to the current TextInput offset', () => {
+	it( 'scrolls down to the section', () => {
 		// Arrange
-		const currentCaretData = { caretHeight: 10 };
+		const sectionY = 750;
+		const sectionHeight = 10;
+
 		const extraScrollHeight = 50;
 		const keyboardOffset = 100;
 		const scrollEnabled = true;
 		const scrollViewRef = { current: { scrollTo: jest.fn() } };
 		const scrollViewMeasurements = { current: { height: 600 } };
 		const scrollViewYOffset = { value: 250 };
-		const textInputOffset = 750;
 
 		const { result } = renderHook( () =>
-			useScrollToTextInput(
+			useScrollToSection(
 				extraScrollHeight,
 				keyboardOffset,
 				scrollEnabled,
@@ -65,15 +67,13 @@ describe( 'useScrollToTextInput', () => {
 		);
 
 		// Act
-		result.current[ 0 ]( currentCaretData, textInputOffset );
+		result.current[ 0 ]( sectionY, sectionHeight );
 
 		// Assert
 		const expectedYOffset =
-			textInputOffset -
+			sectionY -
 			( scrollViewMeasurements.current.height -
-				( keyboardOffset +
-					extraScrollHeight +
-					currentCaretData.caretHeight ) );
+				( keyboardOffset + extraScrollHeight + sectionHeight ) );
 		expect( scrollViewRef.current.scrollTo ).toHaveBeenCalledWith( {
 			y: expectedYOffset,
 			animated: true,
@@ -82,17 +82,18 @@ describe( 'useScrollToTextInput', () => {
 
 	it( 'does not scroll when the ScrollView ref is not available', () => {
 		// Arrange
-		const currentCaretData = { caretHeight: 10 };
+		const sectionY = 50;
+		const sectionHeight = 10;
+
 		const extraScrollHeight = 50;
 		const keyboardOffset = 100;
 		const scrollEnabled = true;
 		const scrollViewRef = { current: null };
 		const scrollViewMeasurements = { current: { height: 600 } };
 		const scrollViewYOffset = { value: 0 };
-		const textInputOffset = 50;
 
 		const { result } = renderHook( () =>
-			useScrollToTextInput(
+			useScrollToSection(
 				extraScrollHeight,
 				keyboardOffset,
 				scrollEnabled,
@@ -103,7 +104,7 @@ describe( 'useScrollToTextInput', () => {
 		);
 
 		// Act
-		result.current[ 0 ]( currentCaretData, textInputOffset );
+		result.current[ 0 ]( sectionY, sectionHeight );
 
 		// Assert
 		expect( scrollViewRef.current ).toBeNull();
@@ -111,17 +112,18 @@ describe( 'useScrollToTextInput', () => {
 
 	it( 'does not scroll when the scroll is not enabled', () => {
 		// Arrange
-		const currentCaretData = { caretHeight: 10 };
+		const sectionY = 50;
+		const sectionHeight = 10;
+
 		const extraScrollHeight = 50;
 		const keyboardOffset = 100;
 		const scrollEnabled = false;
 		const scrollViewRef = { current: { scrollTo: jest.fn() } };
 		const scrollViewMeasurements = { current: { height: 600 } };
 		const scrollViewYOffset = { value: 0 };
-		const textInputOffset = 50;
 
 		const { result } = renderHook( () =>
-			useScrollToTextInput(
+			useScrollToSection(
 				extraScrollHeight,
 				keyboardOffset,
 				scrollEnabled,
@@ -132,7 +134,7 @@ describe( 'useScrollToTextInput', () => {
 		);
 
 		// Act
-		result.current[ 0 ]( currentCaretData, textInputOffset );
+		result.current[ 0 ]( sectionY, sectionHeight );
 
 		// Assert
 		expect( scrollViewRef.current.scrollTo ).not.toHaveBeenCalled();

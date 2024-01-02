@@ -33,10 +33,6 @@ function ModeSwitcher() {
 			shortcut: select(
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-site/toggle-mode' ),
-			isRichEditingEnabled:
-				select( editSiteStore ).getSettings().richEditingEnabled,
-			isCodeEditingEnabled:
-				select( editSiteStore ).getSettings().codeEditingEnabled,
 			mode: select( editSiteStore ).getEditorMode(),
 		} ),
 		[]

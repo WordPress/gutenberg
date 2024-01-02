@@ -196,15 +196,15 @@ test.describe( 'Pages', () => {
 		await templateOptionsButton.click();
 		const templatePreviewButton = page
 			.getByRole( 'menu', { name: 'Template options' } )
-			.getByRole( 'menuitem', { name: 'Template preview' } );
+			.getByRole( 'menuitemcheckbox', { name: 'Template preview' } );
 
 		await expect( templatePreviewButton ).toHaveAttribute(
-			'aria-pressed',
+			'aria-checked',
 			'true'
 		);
 		await templatePreviewButton.click();
 		await expect( templatePreviewButton ).toHaveAttribute(
-			'aria-pressed',
+			'aria-checked',
 			'false'
 		);
 
@@ -229,7 +229,7 @@ test.describe( 'Pages', () => {
 		await templateOptionsButton.click();
 		await templatePreviewButton.click();
 		await expect( templatePreviewButton ).toHaveAttribute(
-			'aria-pressed',
+			'aria-checked',
 			'true'
 		);
 
