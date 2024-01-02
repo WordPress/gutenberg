@@ -19,7 +19,7 @@ export default function convertEditorSettings( data ) {
 		}
 	} );
 
-	if ( Object.keys( newData?.[ 'core/edit-post' ] )?.length === 0 ) {
+	if ( Object.keys( newData?.[ 'core/edit-post' ] ?? {} )?.length === 0 ) {
 		delete newData[ 'core/edit-post' ];
 	}
 
