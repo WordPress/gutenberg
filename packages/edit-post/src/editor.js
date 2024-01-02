@@ -49,7 +49,6 @@ function Editor( {
 		preferredStyleVariations,
 		hiddenBlockTypes,
 		blockTypes,
-		keepCaretInsideBlock,
 		template,
 	} = useSelect(
 		( select ) => {
@@ -101,7 +100,6 @@ function Editor( {
 				),
 				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
-				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 				template:
 					supportsTemplateMode && isViewable && canEditTemplate
 						? getEditedPostTemplate()
@@ -128,7 +126,6 @@ function Editor( {
 			isDistractionFree,
 			hasInlineToolbar,
 
-			keepCaretInsideBlock,
 			// Keep a reference of the `allowedBlockTypes` from the server to handle use cases
 			// where we need to differentiate if a block is disabled by the user or some plugin.
 			defaultAllowedBlockTypes: settings.allowedBlockTypes,
@@ -156,7 +153,6 @@ function Editor( {
 		hasInlineToolbar,
 		focusMode,
 		isDistractionFree,
-		keepCaretInsideBlock,
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,

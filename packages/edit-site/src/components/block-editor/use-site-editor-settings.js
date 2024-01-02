@@ -97,7 +97,6 @@ export function useSpecificEditorSettings() {
 		focusMode,
 		isDistractionFree,
 		hasFixedToolbar,
-		keepCaretInsideBlock,
 		canvasMode,
 		settings,
 		postWithTemplate,
@@ -130,10 +129,6 @@ export function useSpecificEditorSettings() {
 				hasFixedToolbar:
 					!! getPreference( 'core/edit-site', 'fixedToolbar' ) ||
 					! isLargeViewport,
-				keepCaretInsideBlock: !! getPreference(
-					'core/edit-site',
-					'keepCaretInsideBlock'
-				),
 				canvasMode: getCanvasMode(),
 				settings: getSettings(),
 				postWithTemplate: _context?.postId,
@@ -152,7 +147,6 @@ export function useSpecificEditorSettings() {
 			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
 			isDistractionFree,
 			hasFixedToolbar,
-			keepCaretInsideBlock,
 			defaultRenderingMode,
 			getPostLinkProps,
 			// I wonder if they should be set in the post editor too
@@ -165,7 +159,6 @@ export function useSpecificEditorSettings() {
 		focusMode,
 		isDistractionFree,
 		hasFixedToolbar,
-		keepCaretInsideBlock,
 		defaultRenderingMode,
 		getPostLinkProps,
 		archiveLabels.archiveTypeLabel,

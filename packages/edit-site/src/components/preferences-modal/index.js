@@ -126,6 +126,7 @@ export default function EditSitePreferencesModal() {
 						) }
 					>
 						<EnableFeature
+							namespace="core"
 							featureName="keepCaretInsideBlock"
 							help={ __(
 								'Keeps the text cursor within the block boundaries, aiding users with screen readers by preventing unintentional cursor movement outside the block.'
