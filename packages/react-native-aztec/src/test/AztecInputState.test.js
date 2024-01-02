@@ -118,4 +118,32 @@ describe( 'Aztec Input State', () => {
 		expect( listener ).toHaveBeenCalledWith( { isFocused: false } );
 		expect( listener ).toHaveBeenCalledTimes( 1 );
 	} );
+
+	it( 'cancels blur event when unfocusing an element that will be unmounted', () => {
+		const listener = jest.fn();
+
+		focus( ref );
+
+		addFocusChangeListener( listener );
+		blur( ref );
+		blurOnUnmount( ref );
+		jest.runAllTimers();
+
+		// TextInputState will update its state internally when the text
+		// input is removed. For this reason and to avoid triggering an
+		// event on an removed element, we don't call blurTextInput.
+		expect( TextInputState.blurTextInput ).not.toHaveBeenCalled();
+		expect( listener ).toHaveBeenCalledWith( { isFocused: false } );
+		expect( listener ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'cancels blur event when focusing an element', () => {
+		focus( ref );
+		blur( ref );
+		focus( anotherRef );
+		jest.runAllTimers();
+
+		expect( TextInputState.focusTextInput ).toHaveBeenCalledTimes( 2 );
+		expect( TextInputState.blurTextInput ).not.toHaveBeenCalled();
+	} );
 } );
