@@ -1150,6 +1150,10 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onMediaFileSaveFailed(mediaId, progress);
     }
 
+    public void mediaFileSavePaused(final String mediaId, final float progress) {
+        mDeferredEventEmitter.onMediaFileSavePaused(mediaId, progress);
+    }
+
     public void mediaFileSaveSucceeded(final String mediaId, final String mediaUrl) {
         mDeferredEventEmitter.onMediaFileSaveSucceeded(mediaId, mediaUrl);
     }

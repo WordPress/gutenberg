@@ -207,6 +207,11 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     }
 
     @Override
+    public void onMediaFileSavePaused(String mediaId, float progress) {
+        setMediaSaveResultDataInJS(MEDIA_SAVE_STATE_PAUSED, mediaId, null, progress);
+    }
+
+    @Override
     public void onMediaCollectionSaveResult(String firstMediaIdInCollection, boolean success) {
         setMediaSaveResultDataInJS(MEDIA_SAVE_FINAL_STATE_RESULT, firstMediaIdInCollection, success, success ? 1 : 0);
     }

@@ -40,6 +40,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void onMediaFileSaveProgress(String mediaId, float progress);
         void onMediaFileSaveSucceeded(String mediaId, String mediaUrl);
         void onMediaFileSaveFailed(String mediaId, float progress);
+        void onMediaFileSavePaused(String mediaId, float progress);
         void onMediaCollectionSaveResult(String firstMediaIdInCollection, boolean success);
         void onMediaIdChanged(final String oldId, final String newId, final String oldUrl);
         void onReplaceMediaFilesEditedBlock(final String mediaFiles, final String blockId);
