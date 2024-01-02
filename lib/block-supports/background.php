@@ -54,6 +54,8 @@ function gutenberg_render_background_support( $block_content, $block ) {
 	$background_image_source = $block_attributes['style']['background']['backgroundImage']['source'] ?? null;
 	$background_image_url    = $block_attributes['style']['background']['backgroundImage']['url'] ?? null;
 	$background_size         = $block_attributes['style']['background']['backgroundSize'] ?? 'cover';
+	$background_position     = $block_attributes['style']['background']['backgroundPosition'] ?? null;
+	$background_repeat       = $block_attributes['style']['background']['backgroundRepeat'] ?? null;
 
 	$background_block_styles = array();
 
@@ -64,8 +66,15 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		// Set file based background URL.
 		// TODO: In a follow-up, similar logic could be added to inject a featured image url.
 		$background_block_styles['backgroundImage']['url'] = $background_image_url;
-		// Only output the background size when an image url is set.
-		$background_block_styles['backgroundSize'] = $background_size;
+		// Only output the background size and repeat when an image url is set.
+		$background_block_styles['backgroundSize']     = $background_size;
+		$background_block_styles['backgroundRepeat']   = $background_repeat;
+		$background_block_styles['backgroundPosition'] = $background_position;
+
+		// If the background size is set to `contain` and no position is set, set the position to `center`.
+		if ( 'contain' === $background_size && ! isset( $background_position ) ) {
+			$background_block_styles['backgroundPosition'] = 'center';
+		}
 	}
 
 	$styles = gutenberg_style_engine_get_styles( array( 'background' => $background_block_styles ) );
@@ -103,4 +112,7 @@ WP_Block_Supports::get_instance()->register(
 	)
 );
 
+if ( function_exists( 'wp_render_background_support' ) ) {
+	remove_filter( 'render_block', 'wp_render_background_support' );
+}
 add_filter( 'render_block', 'gutenberg_render_background_support', 10, 2 );

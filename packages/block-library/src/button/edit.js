@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
+import removeAnchorTag from '../utils/remove-anchor-tag';
 
 /**
  * WordPress dependencies
@@ -166,11 +167,6 @@ function ButtonEdit( props ) {
 
 	const TagName = tagName || 'a';
 
-	function setButtonText( newText ) {
-		// Remove anchor tags from button text content.
-		setAttributes( { text: newText.replace( /<\/?a[^>]*>/g, '' ) } );
-	}
-
 	function onKeyDown( event ) {
 		if ( isKeyboardEvent.primary( event, 'k' ) ) {
 			startEditing( event );
@@ -245,7 +241,11 @@ function ButtonEdit( props ) {
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
-					onChange={ ( value ) => setButtonText( value ) }
+					onChange={ ( value ) =>
+						setAttributes( {
+							text: removeAnchorTag( value ),
+						} )
+					}
 					withoutInteractiveFormatting
 					className={ classnames(
 						className,

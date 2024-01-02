@@ -5,12 +5,12 @@ import { useRef, useEffect } from '@wordpress/element';
 import { Spinner, SearchControl } from '@wordpress/components';
 import { focus } from '@wordpress/dom';
 import { __ } from '@wordpress/i18n';
+import { useDebouncedInput } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import MediaList from './media-list';
-import useDebouncedInput from '../hooks/use-debounced-input';
 import { useMediaResults } from './hooks';
 import InserterNoResults from '../no-results';
 
