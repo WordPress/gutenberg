@@ -61,6 +61,13 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 			paragraphBlockElement,
 			testData.shortText
 		);
+		await editorPage.typeTextToTextBlock( paragraphBlockElement, '\n' );
+
+		// Expect to have a new Paragraph block and the keyboard visible
+		expect(
+			await editorPage.getTextBlockAtPosition( blockNames.paragraph, 2 )
+		).toBeTruthy();
+		expect( await editorPage.driver.isKeyboardShown() ).toBe( true );
 	} );
 
 	it( 'should automatically dismiss the keyboard when selecting non-text-based-blocks', async () => {
