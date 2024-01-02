@@ -115,8 +115,9 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 
 		// When deleting the Paragraph block, the keyboard should be hidden and
 		// the image block should be focused.
-		await editorPage.driver.pause( 2000 );
-		expect( await editorPage.driver.isKeyboardShown() ).toBe( false );
+		await editorPage.driver.waitUntil( async function () {
+			return ! ( await editorPage.driver.isKeyboardShown() );
+		} );
 		expect( await editorPage.isImageBlockSelected() ).toBe( true );
 
 		// Adding a new Paragraph block
@@ -139,9 +140,10 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 			blockNames.image
 		);
 		await imageBlockElement.click();
-		await editorPage.driver.pause( 1000 );
 
-		expect( await editorPage.driver.isKeyboardShown() ).toBe( false );
+		await editorPage.driver.waitUntil( async function () {
+			return ! ( await editorPage.driver.isKeyboardShown() );
+		} );
 		expect( await editorPage.isImageBlockSelected() ).toBe( true );
 	} );
 
@@ -175,13 +177,15 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 		await defaultBlockAppenderElement.click();
 
 		await editorPage.openBlockSettings();
-		await editorPage.driver.pause( 1000 );
-		expect( await editorPage.driver.isKeyboardShown() ).toBe( false );
+		await editorPage.driver.waitUntil( async function () {
+			return ! ( await editorPage.driver.isKeyboardShown() );
+		} );
 
 		await editorPage.dismissBottomSheet();
-		await editorPage.driver.pause( 1000 );
 
-		expect( await editorPage.driver.isKeyboardShown() ).toBe( true );
+		await editorPage.driver.waitUntil( async function () {
+			return await editorPage.driver.isKeyboardShown();
+		} );
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
