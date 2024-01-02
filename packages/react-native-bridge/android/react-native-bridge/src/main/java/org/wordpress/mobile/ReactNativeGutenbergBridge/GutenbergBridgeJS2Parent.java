@@ -28,17 +28,18 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     }
 
     interface MediaUploadEventEmitter {
-        void onUploadMediaFileClear(int mediaId);
+        void onUploadMediaFileClear(int mediaId, float progress);
         void onMediaFileUploadProgress(int mediaId, float progress);
         void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int serverId, WritableNativeMap metadata);
-        void onMediaFileUploadFailed(int mediaId);
+        void onMediaFileUploadFailed(int mediaId, float progress);
+        void onMediaFileUploadPaused(int mediaId, float progress);
     }
 
     interface MediaSaveEventEmitter {
-        void onSaveMediaFileClear(String mediaId);
+        void onSaveMediaFileClear(String mediaId, float progress);
         void onMediaFileSaveProgress(String mediaId, float progress);
         void onMediaFileSaveSucceeded(String mediaId, String mediaUrl);
-        void onMediaFileSaveFailed(String mediaId);
+        void onMediaFileSaveFailed(String mediaId, float progress);
         void onMediaCollectionSaveResult(String firstMediaIdInCollection, boolean success);
         void onMediaIdChanged(final String oldId, final String newId, final String oldUrl);
         void onReplaceMediaFilesEditedBlock(final String mediaFiles, final String blockId);

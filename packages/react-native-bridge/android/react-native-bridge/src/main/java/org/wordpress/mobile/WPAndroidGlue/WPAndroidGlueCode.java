@@ -1121,8 +1121,12 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onMediaFileUploadProgress(mediaId, progress);
     }
 
-    public void mediaFileUploadFailed(final int mediaId) {
-        mDeferredEventEmitter.onMediaFileUploadFailed(mediaId);
+    public void mediaFileUploadFailed(final int mediaId, final float progress) {
+        mDeferredEventEmitter.onMediaFileUploadFailed(mediaId, progress);
+    }
+
+    public void mediaFileUploadPaused(final int mediaId, final float progress) {
+        mDeferredEventEmitter.onMediaFileUploadPaused(mediaId, progress);
     }
 
     public void mediaFileUploadSucceeded(final int mediaId, final String mediaUrl, final int serverMediaId, final
@@ -1130,20 +1134,20 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onMediaFileUploadSucceeded(mediaId, mediaUrl, serverMediaId, metadata);
     }
 
-    public void clearMediaFileURL(final int mediaId) {
-        mDeferredEventEmitter.onUploadMediaFileClear(mediaId);
+    public void clearMediaFileURL(final int mediaId, final float progress) {
+        mDeferredEventEmitter.onUploadMediaFileClear(mediaId, progress);
     }
 
-    public void clearFileSaveStatus(final String mediaId) {
-        mDeferredEventEmitter.onSaveMediaFileClear(mediaId);
+    public void clearFileSaveStatus(final String mediaId, final float progress) {
+        mDeferredEventEmitter.onSaveMediaFileClear(mediaId, progress);
     }
 
     public void mediaFileSaveProgress(final String mediaId, final float progress) {
         mDeferredEventEmitter.onMediaFileSaveProgress(mediaId, progress);
     }
 
-    public void mediaFileSaveFailed(final String mediaId) {
-        mDeferredEventEmitter.onMediaFileSaveFailed(mediaId);
+    public void mediaFileSaveFailed(final String mediaId, final float progress) {
+        mDeferredEventEmitter.onMediaFileSaveFailed(mediaId, progress);
     }
 
     public void mediaFileSaveSucceeded(final String mediaId, final String mediaUrl) {

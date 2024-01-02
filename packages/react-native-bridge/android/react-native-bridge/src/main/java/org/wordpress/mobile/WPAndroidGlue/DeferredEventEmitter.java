@@ -161,8 +161,8 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     }
 
     @Override
-    public void onUploadMediaFileClear(int mediaId) {
-        setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_RESET, mediaId, null, 0);
+    public void onUploadMediaFileClear(int mediaId, float progress) {
+        setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_RESET, mediaId, null, progress);
     }
 
     @Override
@@ -176,14 +176,19 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     }
 
     @Override
-    public void onMediaFileUploadFailed(int mediaId) {
-        setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0);
+    public void onMediaFileUploadFailed(int mediaId, float progress) {
+        setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, progress);
+    }
+
+    @Override
+    public void onMediaFileUploadPaused(int mediaId, float progress) {
+        setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_PAUSED, mediaId, null, progress);
     }
 
     // Media file save events emitter
     @Override
-    public void onSaveMediaFileClear(String mediaId) {
-        setMediaSaveResultDataInJS(MEDIA_SAVE_STATE_RESET, mediaId, null, 0);
+    public void onSaveMediaFileClear(String mediaId, float progress) {
+        setMediaSaveResultDataInJS(MEDIA_SAVE_STATE_RESET, mediaId, null, progress);
     }
 
     @Override
@@ -197,8 +202,8 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     }
 
     @Override
-    public void onMediaFileSaveFailed(String mediaId) {
-        setMediaSaveResultDataInJS(MEDIA_SAVE_STATE_FAILED, mediaId, null, 0);
+    public void onMediaFileSaveFailed(String mediaId, float progress) {
+        setMediaSaveResultDataInJS(MEDIA_SAVE_STATE_FAILED, mediaId, null, progress);
     }
 
     @Override
