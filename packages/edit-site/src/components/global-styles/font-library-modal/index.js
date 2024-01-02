@@ -82,7 +82,7 @@ function FontLibraryModal( {
 							<Tabs.TabPanel
 								key={ id }
 								tabId={ id }
-								focusable="false"
+								focusable={ false }
 							>
 								{ contents }
 							</Tabs.TabPanel>
