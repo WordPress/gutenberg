@@ -27,6 +27,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/patterns',
 	'@wordpress/reusable-blocks',
 	'@wordpress/router',
+	'@wordpress/dataviews',
 ];
 
 /**

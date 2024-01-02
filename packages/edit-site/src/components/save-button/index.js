@@ -60,13 +60,26 @@ export default function SaveButton( {
 	const getLabel = () => {
 		if ( isPreviewingTheme() ) {
 			if ( isSaving ) {
-				return sprintf( 'Activating %s', previewingThemeName );
+				return sprintf(
+					/* translators: %s: The name of theme to be activated. */
+					__( 'Activating %s' ),
+					previewingThemeName
+				);
 			} else if ( disabled ) {
 				return __( 'Saved' );
 			} else if ( isDirty ) {
-				return sprintf( 'Activate %s & Save', previewingThemeName );
+				return sprintf(
+					/* translators: %s: The name of theme to be activated. */
+					__( 'Activate %s & Save' ),
+					previewingThemeName
+				);
 			}
-			return sprintf( 'Activate %s', previewingThemeName );
+
+			return sprintf(
+				/* translators: %s: The name of theme to be activated. */
+				__( 'Activate %s' ),
+				previewingThemeName
+			);
 		}
 
 		if ( isSaving ) {
@@ -98,11 +111,12 @@ export default function SaveButton( {
 			 * Displaying the keyboard shortcut conditionally makes the tooltip
 			 * itself show conditionally. This would trigger a full-rerendering
 			 * of the button that we want to avoid. By setting `showTooltip`,
-			 & the tooltip is always rendered even when there's no keyboard shortcut.
+			 * the tooltip is always rendered even when there's no keyboard shortcut.
 			 */
 			showTooltip={ showTooltip }
 			icon={ icon }
 			__next40pxDefaultSize={ __next40pxDefaultSize }
+			size="compact"
 		>
 			{ label }
 		</Button>

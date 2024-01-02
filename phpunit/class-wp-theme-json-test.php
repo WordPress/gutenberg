@@ -1646,6 +1646,136 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_sanitize_indexed_arrays() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => '2',
+				'badKey2'  => 'I am Evil!!!!',
+				'settings' => array(
+					'badKey3'    => 'I am Evil!!!!',
+					'typography' => array(
+						'badKey4'      => 'I am Evil!!!!',
+						'fontFamilies' => array(
+							'custom' => array(
+								array(
+									'badKey4'    => 'I am Evil!!!!',
+									'name'       => 'Arial',
+									'slug'       => 'arial',
+									'fontFamily' => 'Arial, sans-serif',
+								),
+							),
+							'theme'  => array(
+								array(
+									'badKey5'    => 'I am Evil!!!!',
+									'name'       => 'Piazzolla',
+									'slug'       => 'piazzolla',
+									'fontFamily' => 'Piazzolla',
+									'fontFace'   => array(
+										array(
+											'badKey6'    => 'I am Evil!!!!',
+											'fontFamily' => 'Piazzolla',
+											'fontStyle'  => 'italic',
+											'fontWeight' => '400',
+											'src'        => 'https://example.com/font.ttf',
+										),
+										array(
+											'badKey7'    => 'I am Evil!!!!',
+											'fontFamily' => 'Piazzolla',
+											'fontStyle'  => 'italic',
+											'fontWeight' => '400',
+											'src'        => 'https://example.com/font.ttf',
+										),
+									),
+								),
+								array(
+									'badKey8'    => 'I am Evil!!!!',
+									'name'       => 'Inter',
+									'slug'       => 'Inter',
+									'fontFamily' => 'Inter',
+									'fontFace'   => array(
+										array(
+											'badKey9'    => 'I am Evil!!!!',
+											'fontFamily' => 'Inter',
+											'fontStyle'  => 'italic',
+											'fontWeight' => '400',
+											'src'        => 'https://example.com/font.ttf',
+										),
+										array(
+											'badKey10'   => 'I am Evil!!!!',
+											'fontFamily' => 'Inter',
+											'fontStyle'  => 'italic',
+											'fontWeight' => '400',
+											'src'        => 'https://example.com/font.ttf',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected_sanitized   = array(
+			'version'  => '2',
+			'settings' => array(
+				'typography' => array(
+					'fontFamilies' => array(
+						'custom' => array(
+							array(
+								'name'       => 'Arial',
+								'slug'       => 'arial',
+								'fontFamily' => 'Arial, sans-serif',
+							),
+						),
+						'theme'  => array(
+							array(
+								'name'       => 'Piazzolla',
+								'slug'       => 'piazzolla',
+								'fontFamily' => 'Piazzolla',
+								'fontFace'   => array(
+									array(
+										'fontFamily' => 'Piazzolla',
+										'fontStyle'  => 'italic',
+										'fontWeight' => '400',
+										'src'        => 'https://example.com/font.ttf',
+									),
+									array(
+										'fontFamily' => 'Piazzolla',
+										'fontStyle'  => 'italic',
+										'fontWeight' => '400',
+										'src'        => 'https://example.com/font.ttf',
+									),
+								),
+							),
+							array(
+								'name'       => 'Inter',
+								'slug'       => 'Inter',
+								'fontFamily' => 'Inter',
+								'fontFace'   => array(
+									array(
+										'fontFamily' => 'Inter',
+										'fontStyle'  => 'italic',
+										'fontWeight' => '400',
+										'src'        => 'https://example.com/font.ttf',
+									),
+									array(
+										'fontFamily' => 'Inter',
+										'fontStyle'  => 'italic',
+										'fontWeight' => '400',
+										'src'        => 'https://example.com/font.ttf',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+		$sanitized_theme_json = $theme_json->get_raw_data();
+		$this->assertSameSetsWithIndex( $expected_sanitized, $sanitized_theme_json, 'Sanitized theme.json does not match' );
+	}
+
 	/**
 	 * @dataProvider data_sanitize_with_invalid_style_variation
 	 *

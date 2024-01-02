@@ -14,6 +14,7 @@ import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { CommandMenu } from '@wordpress/commands';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -26,7 +27,10 @@ import { unlock } from './lock-unlock';
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
 function Editor( { postId, postType, settings, initialEdits, ...props } ) {
+	const isLargeViewport = useViewportMatch( 'medium' );
+
 	const {
+		allowRightClickOverrides,
 		hasFixedToolbar,
 		focusMode,
 		isDistractionFree,
@@ -36,13 +40,11 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		hiddenBlockTypes,
 		blockTypes,
 		keepCaretInsideBlock,
-		isTemplateMode,
 		template,
 	} = useSelect(
 		( select ) => {
 			const {
 				isFeatureActive,
-				isEditingTemplate,
 				getEditedPostTemplate,
 				getHiddenBlockTypes,
 			} = select( editPostStore );
@@ -68,9 +70,12 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				getEditorSettings().supportsTemplateMode;
 			const isViewable = getPostType( postType )?.viewable ?? false;
 			const canEditTemplate = canUser( 'create', 'templates' );
-
 			return {
-				hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+				allowRightClickOverrides: isFeatureActive(
+					'allowRightClickOverrides'
+				),
+				hasFixedToolbar:
+					isFeatureActive( 'fixedToolbar' ) || ! isLargeViewport,
 				focusMode: isFeatureActive( 'focusMode' ),
 				isDistractionFree: isFeatureActive( 'distractionFree' ),
 				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
@@ -81,7 +86,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
 				keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
-				isTemplateMode: isEditingTemplate(),
 				template:
 					supportsTemplateMode && isViewable && canEditTemplate
 						? getEditedPostTemplate()
@@ -89,11 +93,10 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				post: postObject,
 			};
 		},
-		[ postType, postId ]
+		[ postType, postId, isLargeViewport ]
 	);
 
-	const { updatePreferredStyleVariations, setIsInserterOpened } =
-		useDispatch( editPostStore );
+	const { updatePreferredStyleVariations } = useDispatch( editPostStore );
 
 	const editorSettings = useMemo( () => {
 		const result = {
@@ -106,9 +109,8 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			focusMode,
 			isDistractionFree,
 			hasInlineToolbar,
+			allowRightClickOverrides,
 
-			// This is marked as experimental to give time for the quick inserter to mature.
-			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			keepCaretInsideBlock,
 			// Keep a reference of the `allowedBlockTypes` from the server to handle use cases
 			// where we need to differentiate if a block is disabled by the user or some plugin.
@@ -133,6 +135,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		return result;
 	}, [
 		settings,
+		allowRightClickOverrides,
 		hasFixedToolbar,
 		hasInlineToolbar,
 		focusMode,
@@ -140,7 +143,6 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,
-		setIsInserterOpened,
 		updatePreferredStyleVariations,
 		keepCaretInsideBlock,
 	] );
@@ -156,7 +158,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				post={ post }
 				initialEdits={ initialEdits }
 				useSubRegistry={ false }
-				__unstableTemplate={ isTemplateMode ? template : undefined }
+				__unstableTemplate={ template }
 				{ ...props }
 			>
 				<ErrorBoundary>

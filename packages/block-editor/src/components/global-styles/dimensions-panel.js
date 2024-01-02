@@ -23,7 +23,7 @@ import { useCallback, Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable } from './utils';
+import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
 import HeightControl from '../height-control';
 import ChildLayoutControl from '../child-layout-control';
@@ -178,6 +178,7 @@ function DimensionsToolsPanel( {
 			label={ __( 'Dimensions' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			{ children }
 		</ToolsPanel>
