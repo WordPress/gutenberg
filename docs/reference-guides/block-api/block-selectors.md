@@ -12,7 +12,7 @@ when their styles are generated.
 A block may customize its CSS selectors at three levels: root, feature, and
 subfeature.
 
-## Root Selector
+## Root selector
 
 The root selector is the block's primary CSS selector.
 
@@ -31,7 +31,7 @@ default is generated in the form of `.wp-block-<name>`.
 }
 ```
 
-## Feature Selectors
+## Feature selectors
 
 Feature selectors relate to styles for a block support, e.g. border, color,
 typography, etc.
@@ -53,7 +53,7 @@ but applying the typography styles to an inner heading only.
 }
 ```
 
-## Subfeature Selectors
+## Subfeature selectors
 
 These selectors relate to individual styles provided by a block support e.g.
 `background-color`

@@ -112,7 +112,11 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			// Test: overlay menu focuses on first element after opening
 			await expect( overlayMenuFirstElement ).toBeFocused();
 
-			// Not Tested: overlay menu traps focus
+			// Test: overlay menu traps focus
+			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
+			await expect( closeMenuButton ).toBeFocused();
+			await pageUtils.pressKeys( 'Shift+Tab', { times: 2, delay: 50 } );
+			await expect( overlayMenuFirstElement ).toBeFocused();
 
 			// Test: overlay menu closes on click on close menu button
 			await closeMenuButton.click();

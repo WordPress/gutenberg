@@ -6,12 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockBreadcrumb,
+	BlockToolbar,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 	BlockInspector,
@@ -22,6 +23,8 @@ import {
 	store as interfaceStore,
 } from '@wordpress/interface';
 import {
+	EditorKeyboardShortcutsRegister,
+	EditorKeyboardShortcuts,
 	EditorNotices,
 	EditorSnackbars,
 	privateApis as editorPrivateApis,
@@ -29,7 +32,6 @@ import {
 } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -50,7 +52,6 @@ import useTitle from '../routes/use-title';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
-import { SidebarFixedBottomSlot } from '../sidebar-edit-mode/sidebar-fixed-bottom';
 import PatternModal from '../pattern-modal';
 import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
 import SiteEditorCanvas from '../block-editor/site-editor-canvas';
@@ -84,7 +85,7 @@ const blockRemovalRules = {
 	),
 };
 
-export default function Editor( { listViewToggleElement, isLoading } ) {
+export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -92,6 +93,8 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 	} = useEditedEntityRecord();
 
 	const { type: editedPostType } = editedPost;
+
+	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const {
 		context,
@@ -106,17 +109,14 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		showIconLabels,
 		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
-		const {
-			getEditedPostContext,
-			getEditorMode,
-			getCanvasMode,
-			isInserterOpened,
-			isListViewOpened,
-		} = unlock( select( editSiteStore ) );
+		const { getEditedPostContext, getEditorMode, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getEntityRecord } = select( coreDataStore );
-		const { getRenderingMode } = select( editorStore );
+		const { getRenderingMode, isInserterOpened, isListViewOpened } =
+			select( editorStore );
 		const _context = getEditedPostContext();
 
 		// The currently selected entity to display.
@@ -149,7 +149,6 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 			),
 		};
 	}, [] );
-	const { setRenderingMode } = useDispatch( editorStore );
 
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
@@ -169,8 +168,8 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 	let title;
 	if ( hasLoadedPost ) {
 		title = sprintf(
-			// translators: A breadcrumb trail in browser tab. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
-			__( '%1$s ‹ %2$s ‹ Editor' ),
+			// translators: A breadcrumb trail for the Admin document title. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
+			__( '%1$s ‹ %2$s' ),
 			getTitle(),
 			POST_TYPE_LABELS[ editedPostType ] ??
 				POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ]
@@ -191,16 +190,6 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 		! isLoading &&
 		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
 			( ! postWithTemplate && !! editedPost ) );
-
-	// This is the only reliable way I've found to reinitialize the rendering mode
-	// when the canvas mode or the edited entity changes.
-	useEffect( () => {
-		if ( canvasMode === 'edit' && postWithTemplate ) {
-			setRenderingMode( 'template-locked' );
-		} else {
-			setRenderingMode( 'all' );
-		}
-	}, [ canvasMode, postWithTemplate, setRenderingMode ] );
 
 	return (
 		<>
@@ -244,6 +233,9 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 										<SidebarInspectorFill>
 											<BlockInspector />
 										</SidebarInspectorFill>
+										{ ! isLargeViewport && (
+											<BlockToolbar hideDragHandle />
+										) }
 										<SiteEditorCanvas />
 										<BlockRemovalWarningModal
 											rules={ blockRemovalRules }
@@ -254,26 +246,25 @@ export default function Editor( { listViewToggleElement, isLoading } ) {
 								{ editorMode === 'text' && isEditMode && (
 									<CodeEditor />
 								) }
-								{ isEditMode && <KeyboardShortcutsEditMode /> }
+								{ isEditMode && (
+									<>
+										<KeyboardShortcutsEditMode />
+										<EditorKeyboardShortcutsRegister />
+										<EditorKeyboardShortcuts />
+									</>
+								) }
 							</>
 						}
 						secondarySidebar={
 							isEditMode &&
 							( ( shouldShowInserter && <InserterSidebar /> ) ||
-								( shouldShowListView && (
-									<ListViewSidebar
-										listViewToggleElement={
-											listViewToggleElement
-										}
-									/>
-								) ) )
+								( shouldShowListView && <ListViewSidebar /> ) )
 						}
 						sidebar={
 							isEditMode &&
 							isRightSidebarOpen && (
 								<>
 									<ComplementaryArea.Slot scope="core/edit-site" />
-									<SidebarFixedBottomSlot />
 								</>
 							)
 						}

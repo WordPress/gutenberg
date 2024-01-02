@@ -168,6 +168,7 @@ export default function PostSavedState( {
 				}
 				onClick={ isDisabled ? undefined : () => savePost() }
 				variant="tertiary"
+				size="compact"
 				icon={ isLargeViewport ? undefined : cloudUpload }
 				// Make sure the aria-label has always a value, as the default `text` is undefined on small screens.
 				aria-label={ buttonAccessibleLabel }

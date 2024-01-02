@@ -83,8 +83,17 @@ export function shouldOverwriteState( action, previousAction ) {
 
 export function postId( state = null, action ) {
 	switch ( action.type ) {
-		case 'SETUP_EDITOR_STATE':
-			return action.post.id;
+		case 'SET_EDITED_POST':
+			return action.postId;
+	}
+
+	return state;
+}
+
+export function templateId( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_CURRENT_TEMPLATE_ID':
+			return action.id;
 	}
 
 	return state;
@@ -92,8 +101,8 @@ export function postId( state = null, action ) {
 
 export function postType( state = null, action ) {
 	switch ( action.type ) {
-		case 'SETUP_EDITOR_STATE':
-			return action.post.type;
+		case 'SET_EDITED_POST':
+			return action.postType;
 	}
 
 	return state;
@@ -238,28 +247,6 @@ export function postAutosavingLock( state = {}, action ) {
 }
 
 /**
- * Reducer returning whether the editor is ready to be rendered.
- * The editor is considered ready to be rendered once
- * the post object is loaded properly and the initial blocks parsed.
- *
- * @param {boolean} state
- * @param {Object}  action
- *
- * @return {boolean} Updated state.
- */
-export function isReady( state = false, action ) {
-	switch ( action.type ) {
-		case 'SETUP_EDITOR_STATE':
-			return true;
-
-		case 'TEAR_DOWN_EDITOR':
-			return false;
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning the post editor setting.
  *
  * @param {Object} state  Current state.
@@ -288,16 +275,106 @@ export function renderingMode( state = 'all', action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the editing canvas device type.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function deviceType( state = 'Desktop', action ) {
+	switch ( action.type ) {
+		case 'SET_DEVICE_TYPE':
+			return action.deviceType;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer storing the list of all programmatically removed panels.
+ *
+ * @param {Array}  state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Array} Updated state.
+ */
+export function removedPanels( state = [], action ) {
+	switch ( action.type ) {
+		case 'REMOVE_PANEL':
+			if ( ! state.includes( action.panelName ) ) {
+				return [ ...state, action.panelName ];
+			}
+	}
+
+	return state;
+}
+
+/**
+ * Reducer to set the block inserter panel open or closed.
+ *
+ * Note: this reducer interacts with the list view panel reducer
+ * to make sure that only one of the two panels is open at the same time.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ */
+export function blockInserterPanel( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_LIST_VIEW_OPENED':
+			return action.isOpen ? false : state;
+		case 'SET_IS_INSERTER_OPENED':
+			return action.value;
+	}
+	return state;
+}
+
+/**
+ * Reducer to set the list view panel open or closed.
+ *
+ * Note: this reducer interacts with the inserter panel reducer
+ * to make sure that only one of the two panels is open at the same time.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ */
+export function listViewPanel( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_INSERTER_OPENED':
+			return action.value ? false : state;
+		case 'SET_IS_LIST_VIEW_OPENED':
+			return action.isOpen;
+	}
+	return state;
+}
+
+/**
+ * This reducer does nothing aside initializing a ref to the list view toggle.
+ * We will have a unique ref per "editor" instance.
+ *
+ * @param {Object} state
+ * @return {Object} Reference to the list view toggle button.
+ */
+export function listViewToggleRef( state = { current: null } ) {
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
+	templateId,
 	saving,
 	deleting,
 	postLock,
 	template,
 	postSavingLock,
-	isReady,
 	editorSettings,
 	postAutosavingLock,
 	renderingMode,
+	deviceType,
+	removedPanels,
+	blockInserterPanel,
+	listViewPanel,
+	listViewToggleRef,
 } );

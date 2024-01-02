@@ -6,7 +6,7 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { PlainText } from '@wordpress/block-editor';
+import { RichText } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
@@ -20,14 +20,11 @@ import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
  */
 import styles from './theme.scss';
 
-// Note: styling is applied directly to the (nested) PlainText component. Web-side components
-// apply it to the container 'div' but we don't have a proper proposal for cascading styling yet.
 export function CodeEdit( props ) {
 	const {
 		attributes,
 		setAttributes,
-		onFocus,
-		onBlur,
+		onRemove,
 		style,
 		insertBlocksAfter,
 		mergeBlocks,
@@ -37,8 +34,9 @@ export function CodeEdit( props ) {
 			styles.blockCode,
 			styles.blockCodeDark
 		),
-		...( style?.fontSize && { fontSize: style.fontSize } ),
 	};
+
+	const textStyle = style?.fontSize ? { fontSize: style.fontSize } : {};
 
 	const placeholderStyle = usePreferredColorSchemeStyle(
 		styles.placeholder,
@@ -46,21 +44,21 @@ export function CodeEdit( props ) {
 	);
 
 	return (
-		<View>
-			<PlainText
+		<View style={ codeStyle }>
+			<RichText
+				tagName="pre"
 				value={ attributes.content }
 				identifier="content"
-				style={ codeStyle }
-				multiline={ true }
+				style={ textStyle }
 				underlineColorAndroid="transparent"
 				onChange={ ( content ) => setAttributes( { content } ) }
 				onMerge={ mergeBlocks }
+				onRemove={ onRemove }
 				placeholder={ __( 'Write code…' ) }
 				aria-label={ __( 'Code' ) }
-				isSelected={ props.isSelected }
-				onFocus={ onFocus }
-				onBlur={ onBlur }
 				placeholderTextColor={ placeholderStyle.color }
+				preserveWhiteSpace
+				__unstablePastePlainText
 				__unstableOnSplitAtDoubleLineEnd={ () =>
 					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
 				}
