@@ -36,11 +36,17 @@ import {
 	PATTERN_SYNC_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
 } from '../../utils/constants';
-import { exportJSONaction, renameAction } from './dataviews-pattern-actions';
+import {
+	exportJSONaction,
+	renameAction,
+	resetAction,
+	deleteAction,
+} from './dataviews-pattern-actions';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import usePatterns from './use-patterns';
 import PatternsHeader from './header';
+import { useLink } from '../routes/link';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
@@ -114,10 +120,17 @@ function Preview( { item, viewType } ) {
 	);
 }
 
-function Title( { item, onClick, categoryId } ) {
+function Title( { item, categoryId } ) {
 	const isUserPattern = item.type === PATTERN_TYPES.user;
 	const isNonUserPattern = item.type === PATTERN_TYPES.theme;
+	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 	let itemIcon;
+	const { onClick } = useLink( {
+		postType: item.type,
+		postId: isUserPattern ? item.id : item.name,
+		categoryId,
+		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
+	} );
 	if ( ! isUserPattern && templatePartIcons[ categoryId ] ) {
 		itemIcon = templatePartIcons[ categoryId ];
 	} else {
@@ -208,11 +221,7 @@ export default function DataviewsPatterns() {
 				id: 'title',
 				getValue: ( { item } ) => item.title,
 				render: ( { item } ) => (
-					<Title
-						item={ item }
-						onClick={ () => {} }
-						categoryId={ categoryId }
-					/>
+					<Title item={ item } categoryId={ categoryId } />
 				),
 				maxWidth: 400,
 				enableHiding: false,
@@ -283,24 +292,24 @@ export default function DataviewsPatterns() {
 		};
 	}, [ patterns, view, fields ] );
 
-	const actions = useMemo( () => [ renameAction, exportJSONaction ], [] );
+	const actions = useMemo(
+		() => [ renameAction, exportJSONaction, resetAction, deleteAction ],
+		[]
+	);
 	const onChangeView = useCallback(
-		( viewUpdater ) => {
-			let updatedView =
-				typeof viewUpdater === 'function'
-					? viewUpdater( view )
-					: viewUpdater;
-			if ( updatedView.type !== view.type ) {
-				updatedView = {
-					...updatedView,
+		( newView ) => {
+			if ( newView.type !== view.type ) {
+				newView = {
+					...newView,
 					layout: {
-						...defaultConfigPerViewType[ updatedView.type ],
+						...defaultConfigPerViewType[ newView.type ],
 					},
 				};
 			}
-			setView( updatedView );
+
+			setView( newView );
 		},
-		[ view, setView ]
+		[ view.type, setView ]
 	);
 	const id = useId();
 	const settings = usePatternSettings();
