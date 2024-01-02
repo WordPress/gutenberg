@@ -167,7 +167,7 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 		expect( await editorPage.driver.isKeyboardShown() ).toBe( false );
 	} );
 
-	it( 'should dimiss the keyboard and show it back when opening modals', async () => {
+	it( 'should dismiss the keyboard and show it back when opening modals', async () => {
 		await editorPage.initializeEditor( { initialTitle: '' } );
 
 		const defaultBlockAppenderElement =
