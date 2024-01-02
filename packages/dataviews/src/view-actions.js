@@ -6,6 +6,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -54,6 +55,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 						value={ availableView.type }
 						name="view-actions-available-view"
 						checked={ availableView.type === view.type }
+						hideOnClick={ true }
 						onChange={ ( e ) => {
 							onChangeView( {
 								...view,
@@ -238,7 +240,7 @@ function SortMenu( { fields, view, onChangeView } ) {
 	);
 }
 
-export default function ViewActions( {
+const ViewActions = memo( function ViewActions( {
 	fields,
 	view,
 	onChangeView,
@@ -281,4 +283,6 @@ export default function ViewActions( {
 			</DropdownMenuGroup>
 		</DropdownMenu>
 	);
-}
+} );
+
+export default ViewActions;

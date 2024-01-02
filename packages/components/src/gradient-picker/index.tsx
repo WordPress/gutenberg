@@ -44,9 +44,9 @@ function SingleOrigin( {
 	...additionalProps
 }: PickerProps< GradientObject > ) {
 	const gradientOptions = useMemo( () => {
-		return gradients.map( ( { gradient, name }, index ) => (
+		return gradients.map( ( { gradient, name, slug }, index ) => (
 			<CircularOptionPicker.Option
-				key={ gradient }
+				key={ slug }
 				value={ gradient }
 				isSelected={ value === gradient }
 				tooltipText={

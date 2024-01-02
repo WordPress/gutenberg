@@ -223,3 +223,30 @@
 		}
 	}
 }
+
+/**
+ * DataViews patterns styles
+ * TODO: when this becomes stable, consolidate styles with the above.
+ */
+.edit-site-page-patterns-dataviews {
+	.page-patterns-preview-field {
+		&.is-viewtype-grid {
+			.block-editor-block-preview__container {
+				height: auto;
+			}
+		}
+	}
+
+	.edit-site-patterns__pattern-lock-icon {
+		min-width: min-content;
+	}
+
+	.edit-site-patterns__section-header {
+		border-bottom: 1px solid #f0f0f0;
+		min-height: 72px;
+		padding: $grid-unit-20 $grid-unit-40;
+		position: sticky;
+		top: 0;
+		z-index: 2;
+	}
+}
