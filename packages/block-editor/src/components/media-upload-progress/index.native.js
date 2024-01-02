@@ -50,7 +50,11 @@ export class MediaUploadProgress extends Component {
 	mediaUpload( payload ) {
 		const { mediaId } = this.props;
 
-		if ( payload.mediaId !== mediaId ) {
+		if (
+			payload.mediaId !== mediaId ||
+			( payload.state === this.state.uploadState &&
+				payload.progress === this.state.progress )
+		) {
 			return;
 		}
 
