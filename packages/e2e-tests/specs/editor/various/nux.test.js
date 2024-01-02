@@ -135,7 +135,11 @@ describe( 'New User Experience (NUX)', () => {
 		const postTitle = await canvas().waitForSelector(
 			'h1[aria-label="Add title"'
 		);
-		await expect( postTitle ).toHaveFocus();
+		await expect(
+			postTitle.evaluate(
+				( node ) => node === node.ownerDocument.activeElement
+			)
+		).resolves.toBe( true );
 	} );
 
 	it( 'should show the welcome guide if it is manually opened', async () => {

@@ -711,7 +711,13 @@ class WidgetsScreen {
 	};
 
 	saveWidgets = async () => {
-		await this.updateButton.click();
-		await this.updateButton.waitFor( { state: 'disabled' } );
+		await test.step(
+			'save widgets',
+			async () => {
+				await this.updateButton.click();
+				await expect( this.updateButton ).toBeDisabled();
+			},
+			{ box: true }
+		);
 	};
 }
