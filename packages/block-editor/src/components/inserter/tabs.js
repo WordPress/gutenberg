@@ -32,7 +32,7 @@ function InserterTabs( {
 	showPatterns = false,
 	showMedia = false,
 	onSelect,
-  tabsContents,
+	tabsContents,
 } ) {
 	const tabs = [
 		blocksTab,
