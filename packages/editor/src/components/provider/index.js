@@ -9,7 +9,6 @@ import {
 	BlockEditorProvider,
 	BlockContextProvider,
 	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
@@ -23,72 +22,12 @@ import { store as editorStore } from '../../store';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
-import { PAGE_CONTENT_BLOCK_TYPES } from './constants';
+import NavigationBlockEditingMode from './navigation-block-editing-mode';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 const noop = () => {};
-
-/**
- * For the Navigation block editor, we need to force the block editor to contentOnly for that block.
- *
- * Set block editing mode to contentOnly when entering Navigation focus mode.
- * this ensures that non-content controls on the block will be hidden and thus
- * the user can focus on editing the Navigation Menu content only.
- *
- * @param {string} navigationBlockClientId ClientId.
- */
-function useForceFocusModeForNavigation( navigationBlockClientId ) {
-	const { setBlockEditingMode, unsetBlockEditingMode } =
-		useDispatch( blockEditorStore );
-
-	useEffect( () => {
-		if ( ! navigationBlockClientId ) {
-			return;
-		}
-
-		setBlockEditingMode( navigationBlockClientId, 'contentOnly' );
-
-		return () => {
-			unsetBlockEditingMode( navigationBlockClientId );
-		};
-	}, [
-		navigationBlockClientId,
-		unsetBlockEditingMode,
-		setBlockEditingMode,
-	] );
-}
-
-/**
- * Helper method to extract the post content block types from a template.
- *
- * @param {Array} blocks Template blocks.
- *
- * @return {Array} Flattened object.
- */
-function extractPageContentBlockTypesFromTemplateBlocks( blocks ) {
-	const result = [];
-	for ( let i = 0; i < blocks.length; i++ ) {
-		// Since the Query Block could contain PAGE_CONTENT_BLOCK_TYPES block types,
-		// we skip it because we only want to render stand-alone page content blocks in the block list.
-		if ( blocks[ i ].name === 'core/query' ) {
-			continue;
-		}
-		if ( PAGE_CONTENT_BLOCK_TYPES.includes( blocks[ i ].name ) ) {
-			result.push( createBlock( blocks[ i ].name ) );
-		}
-		if ( blocks[ i ].innerBlocks.length ) {
-			result.push(
-				...extractPageContentBlockTypesFromTemplateBlocks(
-					blocks[ i ].innerBlocks
-				)
-			);
-		}
-	}
-
-	return result;
-}
 
 /**
  * Depending on the post, template and template mode,
@@ -111,7 +50,7 @@ function useBlockEditorProps( post, template, mode ) {
 		useEntityBlockEditor( 'postType', template?.type, {
 			id: template?.id,
 		} );
-	const blocks = useMemo( () => {
+	const maybeNavigationBlocks = useMemo( () => {
 		if ( post.type === 'wp_navigation' ) {
 			return [
 				createBlock( 'core/navigation', {
@@ -123,26 +62,13 @@ function useBlockEditorProps( post, template, mode ) {
 				} ),
 			];
 		}
+	}, [ post.type, post.id ] );
 
-		if ( mode === 'post-only' ) {
-			return [
-				createBlock(
-					'core/group',
-					{
-						layout: { type: 'constrained' },
-						style: {
-							spacing: {
-								margin: {
-									top: '4em', // Mimics the post editor.
-								},
-							},
-						},
-					},
-					extractPageContentBlockTypesFromTemplateBlocks(
-						templateBlocks
-					)
-				),
-			];
+	// It is important that we don't create a new instance of blocks on every change
+	// We should only create a new instance if the blocks them selves change, not a dependency of them.
+	const blocks = useMemo( () => {
+		if ( maybeNavigationBlocks ) {
+			return maybeNavigationBlocks;
 		}
 
 		if ( rootLevelPost === 'template' ) {
@@ -150,21 +76,14 @@ function useBlockEditorProps( post, template, mode ) {
 		}
 
 		return postBlocks;
-	}, [
-		templateBlocks,
-		postBlocks,
-		rootLevelPost,
-		post.type,
-		post.id,
-		mode,
-	] );
+	}, [ maybeNavigationBlocks, rootLevelPost, templateBlocks, postBlocks ] );
+
+	// Handle fallback to postBlocks outside of the above useMemo, to ensure
+	// that constructed block templates that call `createBlock` are not generated
+	// too frequently. This ensures that clientIds are stable.
 	const disableRootLevelChanges =
 		( !! template && mode === 'template-locked' ) ||
-		post.type === 'wp_navigation' ||
-		mode === 'post-only';
-	const navigationBlockClientId =
-		post.type === 'wp_navigation' && blocks && blocks[ 0 ]?.clientId;
-	useForceFocusModeForNavigation( navigationBlockClientId );
+		post.type === 'wp_navigation';
 	if ( disableRootLevelChanges ) {
 		return [ blocks, noop, noop ];
 	}
@@ -178,7 +97,6 @@ function useBlockEditorProps( post, template, mode ) {
 
 export const ExperimentalEditorProvider = withRegistryProvider(
 	( {
-		mode = 'all',
 		post,
 		settings,
 		recovery,
@@ -187,6 +105,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
 	} ) => {
+		const mode = useSelect(
+			( select ) => select( editorStore ).getRenderingMode(),
+			[]
+		);
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
@@ -242,11 +164,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			updatePostLock,
 			setupEditor,
 			updateEditorSettings,
-			__experimentalTearDownEditor,
-		} = useDispatch( editorStore );
+			setCurrentTemplateId,
+			setEditedPost,
+			setRenderingMode,
+		} = unlock( useDispatch( editorStore ) );
 		const { createWarningNotice } = useDispatch( noticesStore );
 
-		// Initialize and tear down the editor.
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
 			// Assume that we don't need to initialize in the case of an error recovery.
@@ -272,16 +195,27 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					}
 				);
 			}
-
-			return () => {
-				__experimentalTearDownEditor();
-			};
 		}, [] );
+
+		// Synchronizes the active post with the state
+		useEffect( () => {
+			setEditedPost( post.type, post.id );
+		}, [ post.type, post.id ] );
 
 		// Synchronize the editor settings as they change.
 		useEffect( () => {
 			updateEditorSettings( settings );
 		}, [ settings, updateEditorSettings ] );
+
+		// Synchronizes the active template with the state.
+		useEffect( () => {
+			setCurrentTemplateId( template?.id );
+		}, [ template?.id, setCurrentTemplateId ] );
+
+		// Sets the right rendering mode when loading the editor.
+		useEffect( () => {
+			setRenderingMode( settings.defaultRenderingMode ?? 'post-only' );
+		}, [ settings.defaultRenderingMode, setRenderingMode ] );
 
 		if ( ! isReady ) {
 			return null;
@@ -305,9 +239,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						>
 							{ children }
 							<PatternsMenuItems />
-							{ [ 'post-only', 'template-locked' ].includes(
-								mode
-							) && <DisableNonPageContentBlocks /> }
+							{ mode === 'template-locked' && (
+								<DisableNonPageContentBlocks />
+							) }
+							{ type === 'wp_navigation' && (
+								<NavigationBlockEditingMode />
+							) }
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</EntityProvider>

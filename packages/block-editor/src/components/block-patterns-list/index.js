@@ -56,7 +56,7 @@ function BlockPattern( {
 		<InserterDraggableBlocks
 			isEnabled={ isDraggable }
 			blocks={ blocks }
-			isPattern={ !! pattern }
+			pattern={ pattern }
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div

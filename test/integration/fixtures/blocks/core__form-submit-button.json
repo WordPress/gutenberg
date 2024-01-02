@@ -1,0 +1,26 @@
+[
+	{
+		"name": "core/form-submit-button",
+		"isValid": true,
+		"attributes": {},
+		"innerBlocks": [
+			{
+				"name": "core/buttons",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": [
+					{
+						"name": "core/button",
+						"isValid": true,
+						"attributes": {
+							"tagName": "button",
+							"type": "submit",
+							"text": "Submit"
+						},
+						"innerBlocks": []
+					}
+				]
+			}
+		]
+	}
+]

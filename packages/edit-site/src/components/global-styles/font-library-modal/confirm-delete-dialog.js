@@ -13,8 +13,8 @@ function ConfirmDeleteDialog( {
 	return (
 		<ConfirmDialog
 			isOpen={ isConfirmDeleteOpen }
-			cancelButtonText={ __( 'No, keep the font' ) }
-			confirmButtonText={ __( 'Yes, uninstall' ) }
+			cancelButtonText={ __( 'Cancel' ) }
+			confirmButtonText={ __( 'Delete' ) }
 			onCancel={ handleCancelUninstall }
 			onConfirm={ handleConfirmUninstall }
 		>
@@ -22,7 +22,7 @@ function ConfirmDeleteDialog( {
 				sprintf(
 					/* translators: %s: Name of the font. */
 					__(
-						'Would you like to remove %s and all its variants and assets?'
+						'Are you sure you want to delete "%s" font and all its variants and assets?'
 					),
 					font.name
 				) }

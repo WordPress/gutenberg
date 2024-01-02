@@ -15,41 +15,24 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
-import { useViewportMatch, usePrevious } from '@wordpress/compose';
+import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
-	RichText,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
 	useSettings,
 	__experimentalImageEditor as ImageEditor,
-	__experimentalGetElementClassName,
 	__experimentalUseBorderProps as useBorderProps,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import {
-	useEffect,
-	useMemo,
-	useState,
-	useRef,
-	useCallback,
-} from '@wordpress/element';
+import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
-import {
-	createBlock,
-	getDefaultBlockName,
-	switchToBlockType,
-} from '@wordpress/blocks';
-import {
-	crop,
-	overlayText,
-	upload,
-	caption as captionIcon,
-} from '@wordpress/icons';
+import { switchToBlockType } from '@wordpress/blocks';
+import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -60,10 +43,12 @@ import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
 import { isExternalImage } from './edit';
+import { Caption } from '../utils/caption';
 
 /**
  * Module constants
  */
+import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../utils/constants';
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 import { evalAspectRatio } from './utils';
 
@@ -125,7 +110,6 @@ export default function Image( {
 	const {
 		url = '',
 		alt,
-		caption,
 		align,
 		id,
 		href,
@@ -147,22 +131,52 @@ export default function Image( {
 	const numericHeight = height ? parseInt( height, 10 ) : undefined;
 
 	const imageRef = useRef();
-	const prevCaption = usePrevious( caption );
-	const [ showCaption, setShowCaption ] = useState( !! caption );
 	const { allowResize = true } = context;
 	const { getBlock } = useSelect( blockEditorStore );
 
-	const { image, multiImageSelection } = useSelect(
+	const { image } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
-			const { getMultiSelectedBlockClientIds, getBlockName } =
-				select( blockEditorStore );
-			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
 				image:
 					id && isSelected
 						? getMedia( id, { context: 'view' } )
 						: null,
+			};
+		},
+		[ id, isSelected ]
+	);
+
+	const {
+		canInsertCover,
+		imageEditing,
+		imageSizes,
+		maxWidth,
+		mediaUpload,
+		multiImageSelection,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				getMultiSelectedBlockClientIds,
+				getBlockName,
+				getSettings,
+				canInsertBlockType,
+			} = select( blockEditorStore );
+
+			const rootClientId = getBlockRootClientId( clientId );
+			const settings = getSettings();
+			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
+
+			return {
+				imageEditing: settings.imageEditing,
+				imageSizes: settings.imageSizes,
+				maxWidth: settings.maxWidth,
+				mediaUpload: settings.mediaUpload,
+				canInsertCover: canInsertBlockType(
+					'core/cover',
+					rootClientId
+				),
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
@@ -171,33 +185,8 @@ export default function Image( {
 					),
 			};
 		},
-		[ id, isSelected ]
+		[ clientId ]
 	);
-	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockRootClientId,
-					getSettings,
-					canInsertBlockType,
-				} = select( blockEditorStore );
-
-				const rootClientId = getBlockRootClientId( clientId );
-				const settings = getSettings();
-
-				return {
-					imageEditing: settings.imageEditing,
-					imageSizes: settings.imageSizes,
-					maxWidth: settings.maxWidth,
-					mediaUpload: settings.mediaUpload,
-					canInsertCover: canInsertBlockType(
-						'core/cover',
-						rootClientId
-					),
-				};
-			},
-			[ clientId ]
-		);
 
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
@@ -215,7 +204,8 @@ export default function Image( {
 	const isResizable =
 		allowResize &&
 		hasNonContentControls &&
-		! ( isWideAligned && isLargeViewport );
+		! isWideAligned &&
+		isLargeViewport;
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
@@ -246,24 +236,6 @@ export default function Image( {
 			// Do nothing, cannot upload.
 			.catch( () => {} );
 	}, [ id, url, isSelected, externalBlob, canUploadMedia ] );
-
-	// We need to show the caption when changes come from
-	// history navigation(undo/redo).
-	useEffect( () => {
-		if ( caption && ! prevCaption ) {
-			setShowCaption( true );
-		}
-	}, [ caption, prevCaption ] );
-
-	// Focus the caption when we click to add one.
-	const captionRef = useCallback(
-		( node ) => {
-			if ( node && ! caption ) {
-				node.focus();
-			}
-		},
-		[ caption ]
-	);
 
 	// Get naturalWidth and naturalHeight from image ref, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
@@ -355,11 +327,8 @@ export default function Image( {
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
-			if ( ! caption ) {
-				setShowCaption( false );
-			}
 		}
-	}, [ isSelected, caption ] );
+	}, [ isSelected ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
@@ -420,6 +389,7 @@ export default function Image( {
 
 	const resetAll = () => {
 		setAttributes( {
+			alt: undefined,
 			width: undefined,
 			height: undefined,
 			scale: undefined,
@@ -430,7 +400,11 @@ export default function Image( {
 
 	const sizeControls = (
 		<InspectorControls>
-			<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ resetAll }
+				dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			>
 				{ isResizable && dimensionsControl }
 			</ToolsPanel>
 		</InspectorControls>
@@ -439,23 +413,6 @@ export default function Image( {
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ hasNonContentControls && (
-					<ToolbarButton
-						onClick={ () => {
-							setShowCaption( ! showCaption );
-							if ( showCaption && caption ) {
-								setAttributes( { caption: undefined } );
-							}
-						} }
-						icon={ captionIcon }
-						isPressed={ showCaption }
-						label={
-							showCaption
-								? __( 'Remove caption' )
-								: __( 'Add caption' )
-						}
-					/>
-				) }
 				{ ! multiImageSelection && ! isEditingImage && (
 					<ImageURLInputUI
 						url={ href || '' }
@@ -508,19 +465,23 @@ export default function Image( {
 				</BlockControls>
 			) }
 			<InspectorControls>
-				<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ resetAll }
+					dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+				>
 					{ ! multiImageSelection && (
 						<ToolsPanelItem
 							label={ __( 'Alternative text' ) }
 							isShownByDefault={ true }
-							hasValue={ () => alt !== '' }
+							hasValue={ () => !! alt }
 							onDeselect={ () =>
 								setAttributes( { alt: undefined } )
 							}
 						>
 							<TextareaControl
 								label={ __( 'Alternative text' ) }
-								value={ alt }
+								value={ alt || '' }
 								onChange={ updateAlt }
 								help={
 									<>
@@ -538,11 +499,13 @@ export default function Image( {
 						</ToolsPanelItem>
 					) }
 					{ isResizable && dimensionsControl }
-					<ResolutionTool
-						value={ sizeSlug }
-						onChange={ updateImage }
-						options={ imageSizeOptions }
-					/>
+					{ !! imageSizeOptions.length && (
+						<ResolutionTool
+							value={ sizeSlug }
+							onChange={ updateImage }
+							options={ imageSizeOptions }
+						/>
+					) }
 					{ showLightboxToggle && (
 						<ToolsPanelItem
 							hasValue={ () => !! lightbox }
@@ -793,29 +756,16 @@ export default function Image( {
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
 			{ img }
-			{ showCaption &&
-				( ! RichText.isEmpty( caption ) || isSelected ) && (
-					<RichText
-						identifier="caption"
-						className={ __experimentalGetElementClassName(
-							'caption'
-						) }
-						ref={ captionRef }
-						tagName="figcaption"
-						aria-label={ __( 'Image caption text' ) }
-						placeholder={ __( 'Add caption' ) }
-						value={ caption }
-						onChange={ ( value ) =>
-							setAttributes( { caption: value } )
-						}
-						inlineToolbar
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( getDefaultBlockName() )
-							)
-						}
-					/>
-				) }
+			<Caption
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				isSelected={ isSelected }
+				insertBlocksAfter={ insertBlocksAfter }
+				label={ __( 'Image caption text' ) }
+				showToolbarButton={
+					! multiImageSelection && hasNonContentControls
+				}
+			/>
 		</>
 	);
 }

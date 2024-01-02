@@ -64,7 +64,11 @@ test.describe( 'Block context', () => {
 			.fill( '123' );
 
 		await editorPage
-			.getByRole( 'button', { name: 'Preview', expanded: false } )
+			.getByRole( 'button', {
+				name: 'View',
+				expanded: false,
+				exact: true,
+			} )
 			.click();
 		await editorPage
 			.getByRole( 'menuitem', { name: 'Preview in new tab' } )

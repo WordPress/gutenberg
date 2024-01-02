@@ -25,8 +25,12 @@ function hasOnlyToolbarItem( elements ) {
 	return ! elements.some( ( element ) => ! ( dataProp in element.dataset ) );
 }
 
-function getAllToolbarItemsIn( container ) {
-	return Array.from( container.querySelectorAll( '[data-toolbar-item]' ) );
+function getAllFocusableToolbarItemsIn( container ) {
+	return Array.from(
+		container.querySelectorAll(
+			'[data-toolbar-item]:not([disabled]):not([aria-disabled="true"])'
+		)
+	);
 }
 
 function hasFocusWithin( container ) {
@@ -141,7 +145,8 @@ function useToolbarFocus( {
 		let raf = 0;
 		if ( ! initialFocusOnMount ) {
 			raf = window.requestAnimationFrame( () => {
-				const items = getAllToolbarItemsIn( navigableToolbarRef );
+				const items =
+					getAllFocusableToolbarItemsIn( navigableToolbarRef );
 				const index = initialIndex || 0;
 				if ( items[ index ] && hasFocusWithin( navigableToolbarRef ) ) {
 					items[ index ].focus( {
@@ -158,18 +163,13 @@ function useToolbarFocus( {
 			if ( ! onIndexChange || ! navigableToolbarRef ) return;
 			// When the toolbar element is unmounted and onIndexChange is passed, we
 			// pass the focused toolbar item index so it can be hydrated later.
-			const items = getAllToolbarItemsIn( navigableToolbarRef );
+			const items = getAllFocusableToolbarItemsIn( navigableToolbarRef );
 			const index = items.findIndex( ( item ) => item.tabIndex === 0 );
 			onIndexChange( index );
 		};
-	}, [ initialIndex, initialFocusOnMount, toolbarRef ] );
+	}, [ initialIndex, initialFocusOnMount, onIndexChange, toolbarRef ] );
 
-	const { lastFocus } = useSelect( ( select ) => {
-		const { getLastFocus } = select( blockEditorStore );
-		return {
-			lastFocus: getLastFocus(),
-		};
-	}, [] );
+	const { getLastFocus } = useSelect( blockEditorStore );
 	/**
 	 * Handles returning focus to the block editor canvas when pressing escape.
 	 */
@@ -178,6 +178,7 @@ function useToolbarFocus( {
 
 		if ( focusEditorOnEscape ) {
 			const handleKeyDown = ( event ) => {
+				const lastFocus = getLastFocus();
 				if ( event.keyCode === ESCAPE && lastFocus?.current ) {
 					// Focus the last focused element when pressing escape.
 					event.preventDefault();
@@ -192,7 +193,7 @@ function useToolbarFocus( {
 				);
 			};
 		}
-	}, [ focusEditorOnEscape, lastFocus, toolbarRef ] );
+	}, [ focusEditorOnEscape, getLastFocus, toolbarRef ] );
 }
 
 export default function NavigableToolbar( {
@@ -210,9 +211,9 @@ export default function NavigableToolbar( {
 	useToolbarFocus( {
 		toolbarRef,
 		focusOnMount,
-		isAccessibleToolbar,
 		defaultIndex: initialIndex,
 		onIndexChange,
+		isAccessibleToolbar,
 		shouldUseKeyboardFocusShortcut,
 		focusEditorOnEscape,
 	} );

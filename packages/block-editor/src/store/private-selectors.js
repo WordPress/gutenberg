@@ -10,7 +10,12 @@ import {
 	getBlockOrder,
 	getBlockParents,
 	getBlockEditingMode,
+	getSettings,
+	__experimentalGetParsedPattern,
+	canInsertBlockType,
+	__experimentalGetAllowedPatterns,
 } from './selectors';
+import { getUserPatterns, checkAllowListRecursive } from './utils';
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -234,5 +239,45 @@ export const getInserterMediaCategories = createSelector(
 		state.settings.allowedMimeTypes,
 		state.settings.enableOpenverseMediaCategory,
 		state.registeredInserterMediaCategories,
+	]
+);
+
+/**
+ * Returns whether there is at least one allowed pattern for inner blocks children.
+ * This is useful for deferring the parsing of all patterns until needed.
+ *
+ * @param {Object} state               Editor state.
+ * @param {string} [rootClientId=null] Target root client ID.
+ *
+ * @return {boolean} If there is at least one allowed pattern.
+ */
+export const hasAllowedPatterns = createSelector(
+	( state, rootClientId = null ) => {
+		const patterns = state.settings.__experimentalBlockPatterns;
+		const userPatterns = getUserPatterns( state );
+		const { allowedBlockTypes } = getSettings( state );
+		return [ ...userPatterns, ...patterns ].some(
+			( { name, inserter = true } ) => {
+				if ( ! inserter ) {
+					return false;
+				}
+				const { blocks } = __experimentalGetParsedPattern(
+					state,
+					name
+				);
+				return (
+					checkAllowListRecursive( blocks, allowedBlockTypes ) &&
+					blocks.every( ( { name: blockName } ) =>
+						canInsertBlockType( state, blockName, rootClientId )
+					)
+				);
+			}
+		);
+	},
+	( state, rootClientId ) => [
+		...__experimentalGetAllowedPatterns.getDependants(
+			state,
+			rootClientId
+		),
 	]
 );

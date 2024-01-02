@@ -2,11 +2,13 @@
  * WordPress dependencies
  */
 import { useMergeRefs } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockList from '../block-list';
+import BlockTools from '../block-tools';
 import EditorStyles from '../editor-styles';
 import Iframe from '../iframe';
 import WritingFlow from '../writing-flow';
@@ -23,11 +25,15 @@ export function ExperimentalBlockCanvas( {
 } ) {
 	const resetTypingRef = useMouseMoveTypingReset();
 	const clearerRef = useBlockSelectionClearer();
-	const contentRef = useMergeRefs( [ contentRefProp, clearerRef ] );
+	const localRef = useRef();
+	const contentRef = useMergeRefs( [ contentRefProp, clearerRef, localRef ] );
 
 	if ( ! shouldIframe ) {
 		return (
-			<>
+			<BlockTools
+				__unstableContentRef={ localRef }
+				style={ { height, display: 'flex' } }
+			>
 				<EditorStyles
 					styles={ styles }
 					scope=".editor-styles-wrapper"
@@ -36,29 +42,37 @@ export function ExperimentalBlockCanvas( {
 					ref={ contentRef }
 					className="editor-styles-wrapper"
 					tabIndex={ -1 }
-					style={ { height } }
+					style={ {
+						height: '100%',
+						width: '100%',
+					} }
 				>
 					{ children }
 				</WritingFlow>
-			</>
+			</BlockTools>
 		);
 	}
 
 	return (
-		<Iframe
-			{ ...iframeProps }
-			ref={ resetTypingRef }
-			contentRef={ contentRef }
-			style={ {
-				width: '100%',
-				height,
-				...iframeProps?.style,
-			} }
-			name="editor-canvas"
+		<BlockTools
+			__unstableContentRef={ localRef }
+			style={ { height, display: 'flex' } }
 		>
-			<EditorStyles styles={ styles } />
-			{ children }
-		</Iframe>
+			<Iframe
+				{ ...iframeProps }
+				ref={ resetTypingRef }
+				contentRef={ contentRef }
+				style={ {
+					width: '100%',
+					height: '100%',
+					...iframeProps?.style,
+				} }
+				name="editor-canvas"
+			>
+				<EditorStyles styles={ styles } />
+				{ children }
+			</Iframe>
+		</BlockTools>
 	);
 }
 
