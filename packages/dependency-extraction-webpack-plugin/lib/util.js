@@ -2,7 +2,6 @@ const WORDPRESS_NAMESPACE = '@wordpress/';
 const BUNDLED_PACKAGES = [
 	'@wordpress/dataviews',
 	'@wordpress/icons',
-	'@wordpress/interactivity',
 	'@wordpress/interface',
 	'@wordpress/sync',
 	'@wordpress/undo-manager',
