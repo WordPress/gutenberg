@@ -64,7 +64,7 @@ export function initializeEditor( id, settings ) {
 		showListViewByDefault: false,
 		showBlockBreadcrumbs: true,
 	} );
-	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
+	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
 	} );
 

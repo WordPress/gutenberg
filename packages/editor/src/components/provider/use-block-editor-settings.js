@@ -118,7 +118,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 
 			return {
 				allowRightClickOverrides: select( preferencesStore ).get(
-					'core/edit-post',
+					'core',
 					'allowRightClickOverrides'
 				),
 				canUseUnfilteredHTML: getRawEntityRecord(
