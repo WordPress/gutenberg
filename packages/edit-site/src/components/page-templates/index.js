@@ -24,7 +24,11 @@ import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { DataViews } from '@wordpress/dataviews';
+import {
+	DataViews,
+	sortByTextFields,
+	getPaginationResults,
+} from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -301,35 +305,21 @@ export default function DataviewsTemplates() {
 
 		// Handle sorting.
 		if ( view.sort ) {
-			const stringSortingFields = [ 'title', 'author' ];
-			const fieldId = view.sort.field;
-			if ( stringSortingFields.includes( fieldId ) ) {
-				const fieldToSort = fields.find( ( field ) => {
-					return field.id === fieldId;
-				} );
-				filteredTemplates.sort( ( a, b ) => {
-					const valueA = fieldToSort.getValue( { item: a } ) ?? '';
-					const valueB = fieldToSort.getValue( { item: b } ) ?? '';
-					return view.sort.direction === 'asc'
-						? valueA.localeCompare( valueB )
-						: valueB.localeCompare( valueA );
-				} );
-			}
+			filteredTemplates = sortByTextFields( {
+				items: filteredTemplates,
+				view,
+				fields,
+				textFields: [ 'title', 'author' ],
+			} );
 		}
-
 		// Handle pagination.
-		const start = ( view.page - 1 ) * view.perPage;
-		const totalItems = filteredTemplates?.length || 0;
-		filteredTemplates = filteredTemplates?.slice(
-			start,
-			start + view.perPage
-		);
+		const paginationResults = getPaginationResults( {
+			items: filteredTemplates,
+			view,
+		} );
 		return {
-			shownTemplates: filteredTemplates,
-			paginationInfo: {
-				totalItems,
-				totalPages: Math.ceil( totalItems / view.perPage ),
-			},
+			shownTemplates: paginationResults.items,
+			paginationInfo: paginationResults.paginationInfo,
 		};
 	}, [ allTemplates, view, fields ] );
 

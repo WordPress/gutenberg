@@ -15,7 +15,11 @@ import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { DataViews } from '@wordpress/dataviews';
+import {
+	DataViews,
+	sortByTextFields,
+	getPaginationResults,
+} from '@wordpress/dataviews';
 import {
 	Icon,
 	header,
@@ -240,31 +244,21 @@ export default function DataviewsPatterns() {
 		let filteredData = [ ...patterns ];
 		// Handle sorting.
 		if ( view.sort ) {
-			const stringSortingFields = [ 'title' ];
-			const fieldId = view.sort.field;
-			if ( stringSortingFields.includes( fieldId ) ) {
-				const fieldToSort = fields.find( ( field ) => {
-					return field.id === fieldId;
-				} );
-				filteredData.sort( ( a, b ) => {
-					const valueA = fieldToSort.getValue( { item: a } ) ?? '';
-					const valueB = fieldToSort.getValue( { item: b } ) ?? '';
-					return view.sort.direction === 'asc'
-						? valueA.localeCompare( valueB )
-						: valueB.localeCompare( valueA );
-				} );
-			}
+			filteredData = sortByTextFields( {
+				items: filteredData,
+				view,
+				fields,
+				textFields: [ 'title', 'author' ],
+			} );
 		}
 		// Handle pagination.
-		const start = ( view.page - 1 ) * view.perPage;
-		const totalItems = filteredData?.length || 0;
-		filteredData = filteredData?.slice( start, start + view.perPage );
+		const paginationResults = getPaginationResults( {
+			items: filteredData,
+			view,
+		} );
 		return {
-			data: filteredData,
-			paginationInfo: {
-				totalItems,
-				totalPages: Math.ceil( totalItems / view.perPage ),
-			},
+			data: paginationResults.items,
+			paginationInfo: paginationResults.paginationInfo,
 		};
 	}, [ patterns, view, fields ] );
 
