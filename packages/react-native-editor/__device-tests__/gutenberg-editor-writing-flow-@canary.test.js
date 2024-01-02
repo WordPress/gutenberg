@@ -160,7 +160,7 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 
 		await editorPage.dismissKeyboard();
 
-		// Checks that no block is select by looking for the block menu actions button
+		// Checks that no block is selected by looking for the block menu actions button
 		expect( await editorPage.isBlockActionsMenuButtonDisplayed() ).toBe(
 			false
 		);
