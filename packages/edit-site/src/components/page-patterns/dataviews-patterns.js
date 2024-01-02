@@ -238,29 +238,6 @@ export default function DataviewsPatterns() {
 			};
 		}
 		let filteredData = [ ...patterns ];
-		// Handle filters.
-		if ( view.filters.length > 0 ) {
-			// view.filters.forEach( ( filter ) => {
-			// 	if (
-			// 		filter.field === 'author' &&
-			// 		filter.operator === OPERATOR_IN &&
-			// 		!! filter.value
-			// 	) {
-			// 		filteredData = filteredData.filter( ( item ) => {
-			// 			return item.author_text === filter.value;
-			// 		} );
-			// 	} else if (
-			// 		filter.field === 'author' &&
-			// 		filter.operator === OPERATOR_NOT_IN &&
-			// 		!! filter.value
-			// 	) {
-			// 		filteredData = filteredData.filter( ( item ) => {
-			// 			return item.author_text !== filter.value;
-			// 		} );
-			// 	}
-			// } );
-		}
-
 		// Handle sorting.
 		if ( view.sort ) {
 			const stringSortingFields = [ 'title' ];
@@ -278,7 +255,6 @@ export default function DataviewsPatterns() {
 				} );
 			}
 		}
-
 		// Handle pagination.
 		const start = ( view.page - 1 ) * view.perPage;
 		const totalItems = filteredData?.length || 0;
@@ -306,7 +282,6 @@ export default function DataviewsPatterns() {
 					},
 				};
 			}
-
 			setView( newView );
 		},
 		[ view.type, setView ]
