@@ -63,7 +63,7 @@ const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 function VideoEdit( {
-	isSelected: isSignleSelected,
+	isSelected: isSingleSelected,
 	attributes,
 	className,
 	setAttributes,
@@ -182,7 +182,7 @@ function VideoEdit( {
 
 	return (
 		<>
-			{ isSignleSelected && (
+			{ isSingleSelected && (
 				<>
 					<BlockControls>
 						<TracksEditor
@@ -268,7 +268,7 @@ function VideoEdit( {
 					so the user clicking on it won't play the
 					video when the controls are enabled.
 				*/ }
-				<Disabled isDisabled={ ! isSignleSelected }>
+				<Disabled isDisabled={ ! isSingleSelected }>
 					<video
 						controls={ controls }
 						poster={ poster }
@@ -282,10 +282,10 @@ function VideoEdit( {
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					isSelected={ isSignleSelected }
+					isSelected={ isSingleSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Video caption text' ) }
-					showToolbarButton={ isSignleSelected }
+					showToolbarButton={ isSingleSelected }
 				/>
 			</figure>
 		</>

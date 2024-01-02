@@ -42,7 +42,7 @@ function AudioEdit( {
 	className,
 	setAttributes,
 	onReplace,
-	isSelected: isSignleSelected,
+	isSelected: isSingleSelected,
 	insertBlocksAfter,
 } ) {
 	const { id, autoplay, loop, preload, src } = attributes;
@@ -143,7 +143,7 @@ function AudioEdit( {
 
 	return (
 		<>
-			{ isSignleSelected && (
+			{ isSingleSelected && (
 				<BlockControls group="other">
 					<MediaReplaceFlow
 						mediaId={ id }
@@ -199,17 +199,17 @@ function AudioEdit( {
 					so the user clicking on it won't play the
 					file or change the position slider when the controls are enabled.
 				*/ }
-				<Disabled isDisabled={ ! isSignleSelected }>
+				<Disabled isDisabled={ ! isSingleSelected }>
 					<audio controls="controls" src={ src } />
 				</Disabled>
 				{ isTemporaryAudio && <Spinner /> }
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					isSelected={ isSignleSelected }
+					isSelected={ isSingleSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Audio caption text' ) }
-					showToolbarButton={ isSignleSelected }
+					showToolbarButton={ isSingleSelected }
 				/>
 			</figure>
 		</>
