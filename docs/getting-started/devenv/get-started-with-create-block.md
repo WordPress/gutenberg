@@ -4,7 +4,7 @@ Custom blocks for the Block Editor in WordPress are typically registered using p
 
 The package is designed to help developers quickly set up a block development environment following WordPress best practices.
 
-## Quick Start
+## Quick start
 
 ### Installation
 

@@ -21,8 +21,8 @@
 			"attribute": "id"
 		},
 		"fileName": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "a:not([download])"
 		},
 		"textLinkHref": {
@@ -42,8 +42,8 @@
 			"default": true
 		},
 		"downloadButtonText": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "a[download]"
 		},
 		"displayPreview": {

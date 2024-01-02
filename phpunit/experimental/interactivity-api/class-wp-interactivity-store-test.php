@@ -161,7 +161,7 @@ class WP_Interactivity_Store_Test extends WP_UnitTestCase {
 		WP_Interactivity_Store::render();
 		$rendered = ob_get_clean();
 		$this->assertSame(
-			'<script id="wp-interactivity-store-data" type="application/json">{"state":{"core":{"a":1,"b":2}}}</script>',
+			'<script id="wp-interactivity-initial-state" type="application/json">{"state":{"core":{"a":1,"b":2}}}</script>',
 			$rendered
 		);
 	}
@@ -179,7 +179,7 @@ class WP_Interactivity_Store_Test extends WP_UnitTestCase {
 		WP_Interactivity_Store::render();
 		$rendered = ob_get_clean();
 		$this->assertSame(
-			'<script id="wp-interactivity-store-data" type="application/json">{"state":{"amps":"http:\/\/site.test\/?foo=1\u0026baz=2\u0026bar=3","tags":"Do not do this: \u003C!-- \u003Cscript\u003E"}}</script>',
+			'<script id="wp-interactivity-initial-state" type="application/json">{"state":{"amps":"http:\/\/site.test\/?foo=1\u0026baz=2\u0026bar=3","tags":"Do not do this: \u003C!-- \u003Cscript\u003E"}}</script>',
 			$rendered
 		);
 	}

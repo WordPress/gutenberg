@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
  */
 import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
-import { getValueFromVariable } from './utils';
+import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 
 export function useHasBorderPanel( settings ) {
 	const controls = [
@@ -62,6 +62,7 @@ function BorderToolsPanel( {
 			label={ __( 'Border' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			{ children }
 		</ToolsPanel>

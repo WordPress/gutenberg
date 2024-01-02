@@ -370,7 +370,11 @@ describe( 'Change detection', () => {
 	it( 'consecutive edits to the same attribute should mark the post as dirty after a save', async () => {
 		// Open the sidebar block settings.
 		await openDocumentSettingsSidebar();
-		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
+
+		const blockInspectorTab = await page.waitForXPath(
+			'//button[@role="tab"][contains(text(), "Block")]'
+		);
+		await blockInspectorTab.click();
 
 		// Insert a paragraph.
 		await clickBlockAppender();

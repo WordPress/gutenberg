@@ -36,6 +36,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import FileBlockInspector from './inspector';
 import { browserSupportsPdfs } from './utils';
+import removeAnchorTag from '../utils/remove-anchor-tag';
 
 export const MIN_PREVIEW_HEIGHT = 200;
 export const MAX_PREVIEW_HEIGHT = 2000;
@@ -102,8 +103,10 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			revokeBlobURL( href );
 		}
 
-		if ( downloadButtonText === undefined ) {
-			changeDownloadButtonText( _x( 'Download', 'button label' ) );
+		if ( RichText.isEmpty( downloadButtonText ) ) {
+			setAttributes( {
+				downloadButtonText: _x( 'Download', 'button label' ),
+			} );
 		}
 	}, [] );
 
@@ -147,13 +150,6 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	function changeShowDownloadButton( newValue ) {
 		setAttributes( { showDownloadButton: newValue } );
-	}
-
-	function changeDownloadButtonText( newValue ) {
-		// Remove anchor tags from button text content.
-		setAttributes( {
-			downloadButtonText: newValue.replace( /<\/?a[^>]*>/g, '' ),
-		} );
 	}
 
 	function changeDisplayPreview( newValue ) {
@@ -278,7 +274,9 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						placeholder={ __( 'Write file name…' ) }
 						withoutInteractiveFormatting
 						onChange={ ( text ) =>
-							setAttributes( { fileName: text } )
+							setAttributes( {
+								fileName: removeAnchorTag( text ),
+							} )
 						}
 						href={ textLinkHref }
 					/>
@@ -304,7 +302,10 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 								withoutInteractiveFormatting
 								placeholder={ __( 'Add text…' ) }
 								onChange={ ( text ) =>
-									changeDownloadButtonText( text )
+									setAttributes( {
+										downloadButtonText:
+											removeAnchorTag( text ),
+									} )
 								}
 							/>
 						</div>
