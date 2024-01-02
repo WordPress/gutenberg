@@ -2583,9 +2583,6 @@ class WP_Theme_JSON_Gutenberg {
 					$style_variation_block_declarations[ $current_selector ] = $new_declarations;
 				}
 
-				// Note that `get_feature_declarations_for_node` will also unset
-				// feature values so they aren't duplicated in declarations via
-				// the call below.
 				$style_variation_block_declarations[ $variation_node['selector'] ] = static::compute_style_properties(
 					$style_variation_block_node,
 					$settings,
@@ -2697,8 +2694,8 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// 7. Generate and append the block style variations for inner blocks and elements.
-		foreach ( $style_variation_block_declarations as $style_variation_block_selector => $indvidial_style_variation_block_declaration ) {
-			$block_rules .= static::to_ruleset( $style_variation_block_selector, $indvidial_style_variation_block_declaration );
+		foreach ( $style_variation_block_declarations as $style_variation_block_selector => $individial_style_variation_block_declaration ) {
+			$block_rules .= static::to_ruleset( $style_variation_block_selector, $individial_style_variation_block_declaration );
 		}
 
 		return $block_rules;
