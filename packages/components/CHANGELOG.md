@@ -21,10 +21,6 @@
 -   `SlotFill`: Migrate to TypeScript and Convert to Functional Component `<Slot bubblesVirtually />`. ([#51350](https://github.com/WordPress/gutenberg/pull/51350)).
 
 
-### Internal
-
--   `Tooltip`, `Shortcut`: Remove unused `ui/` components from the codebase ([#54573](https://github.com/WordPress/gutenberg/pull/54573))
-
 ## 25.8.0 (2023-09-20)
 
 ### Enhancements

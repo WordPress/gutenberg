@@ -1,4 +1,11 @@
-export type ResponsiveCSSValue< T > = Array< T | undefined > | T;
+export type SizeRangeDefault =
+	| 'xLarge'
+	| 'large'
+	| 'medium'
+	| 'small'
+	| 'xSmall';
+
+export type SizeRangeReduced = 'large' | 'medium' | 'small';
 
 export type PopperPlacement =
 	| 'auto'
@@ -27,10 +34,3 @@ export type PopperProps = {
 	 */
 	placement?: PopperPlacement;
 };
-
-export type SizeRangeDefault =
-	| 'xLarge'
-	| 'large'
-	| 'medium'
-	| 'small'
-	| 'xSmall';
