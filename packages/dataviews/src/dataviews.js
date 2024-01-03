@@ -64,15 +64,6 @@ export default function DataViews( {
 					className="dataviews-filters__view-actions"
 				>
 					<HStack justify="start" wrap>
-						{ view.type === LAYOUT_TABLE && (
-							<BulkActions
-								actions={ actions }
-								data={ data }
-								onSelectionChange={ onSetSelection }
-								selection={ selection }
-								getItemId={ getItemId }
-							/>
-						) }
 						{ search && (
 							<Search
 								label={ searchLabel }
@@ -86,6 +77,15 @@ export default function DataViews( {
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
+					{ view.type === LAYOUT_TABLE && (
+						<BulkActions
+							actions={ actions }
+							data={ data }
+							onSelectionChange={ onSetSelection }
+							selection={ selection }
+							getItemId={ getItemId }
+						/>
+					) }
 					<ViewActions
 						fields={ _fields }
 						view={ view }
