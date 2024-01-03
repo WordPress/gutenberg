@@ -20,6 +20,9 @@ const beforeArray = [ 1, 2, 3, 4, 5, 6, 7 ];
 const afterArraySame = beforeArray;
 const afterArrayEqual = [ 1, 2, 3, 4, 5, 6, 7 ];
 const afterArrayUnequal = [ 1, 2, 3, 4, 5, 'Unequal', 7 ];
+const beforeString = 'code is poetry';
+const afterStringEqual = 'code is poetry';
+const afterStringUnequal = 'poetry is code';
 
 Promise.all( [
 	lazyImport( 'shallowequal@^1.1.0' ),
@@ -81,6 +84,14 @@ Promise.all( [
 
 				suite.add( name + ' (array, unequal)', () => {
 					isShallowEqualArrays( beforeArray, afterArrayUnequal );
+				} );
+
+				suite.add( name + ' (string, equal)', () => {
+					isShallowEqualObjects( beforeString, afterStringEqual );
+				} );
+
+				suite.add( name + ' (string, unequal)', () => {
+					isShallowEqualObjects( beforeString, afterStringUnequal );
 				} );
 			}
 		);
