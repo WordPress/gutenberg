@@ -412,7 +412,6 @@ export default function LogoEdit( {
 		siteIconId,
 		mediaItemData,
 		isRequestingMediaItem,
-		mediaUpload,
 	} = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
@@ -444,9 +443,9 @@ export default function LogoEdit( {
 			mediaItemData: mediaItem,
 			isRequestingMediaItem: _isRequestingMediaItem,
 			siteIconId: _siteIconId,
-			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
 		};
 	}, [] );
+	const { getSettings } = useSelect( blockEditorStore );
 
 	const { editEntityRecord } = useDispatch( coreStore );
 
@@ -511,8 +510,8 @@ export default function LogoEdit( {
 	};
 
 	const onFilesDrop = ( filesList ) => {
-		mediaUpload( {
-			allowedTypes: [ 'image' ],
+		getSettings().mediaUpload( {
+			allowedTypes: ALLOWED_MEDIA_TYPES,
 			filesList,
 			onFileChange( [ image ] ) {
 				if ( isBlobURL( image?.url ) ) {
