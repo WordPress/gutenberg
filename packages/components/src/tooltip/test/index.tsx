@@ -45,8 +45,7 @@ describe( 'Tooltip', () => {
 	describe( 'basic behavior', () => {
 		it( 'should not render the tooltip if multiple children are passed', async () => {
 			render(
-				// expected TS error since Tooltip cannot have more than one child element
-				// @ts-expect-error
+				// @ts-expect-error Tooltip cannot have more than one child element
 				<Tooltip { ...props }>
 					<Button>First button</Button>
 					<Button>Second button</Button>
