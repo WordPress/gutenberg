@@ -32,7 +32,7 @@ import { menu, wordpress } from '@wordpress/icons';
  * Internal dependencies
  */
 import Icon from '../../icon';
-import { ContextSystemProvider } from '../../context';
+import { ContextSystemProvider } from '../../ui/context';
 
 const meta: Meta< typeof DropdownMenu > = {
 	title: 'Components (Experimental)/DropdownMenu v2',

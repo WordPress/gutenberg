@@ -7,7 +7,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context';
+import type { WordPressComponentProps } from '../ui/context';
 
 export default function GuidePage(
 	props: WordPressComponentProps< {}, 'div', false >

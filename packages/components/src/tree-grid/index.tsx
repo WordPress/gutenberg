@@ -10,7 +10,7 @@ import { UP, DOWN, LEFT, RIGHT, HOME, END } from '@wordpress/keycodes';
  */
 import RovingTabIndexContainer from './roving-tab-index';
 import type { TreeGridProps } from './types';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressComponentProps } from '../ui/context';
 
 /**
  * Return focusables in a row element, excluding those from other branches
