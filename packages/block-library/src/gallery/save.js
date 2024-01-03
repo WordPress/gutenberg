@@ -24,11 +24,14 @@ export default function saveWithInnerBlocks( { attributes } ) {
 		return saveWithoutInnerBlocks( { attributes } );
 	}
 
-	const { caption, columns, imageCrop } = attributes;
+	const { caption, columns, defaultColumns, imageCrop } = attributes;
 
 	const className = classnames( 'has-nested-images', {
 		[ `columns-${ columns }` ]: columns !== undefined,
-		[ `columns-default` ]: columns === undefined,
+		[ `columns-default` ]:
+			columns === undefined && defaultColumns === undefined,
+		[ `columns-default columns-${ defaultColumns }` ]:
+			columns === undefined && defaultColumns !== undefined,
 		'is-cropped': imageCrop,
 	} );
 	const blockProps = useBlockProps.save( { className } );

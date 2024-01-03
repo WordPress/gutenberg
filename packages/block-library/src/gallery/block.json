@@ -71,6 +71,11 @@
 			"minimum": 1,
 			"maximum": 8
 		},
+		"defaultColumns": {
+			"type": "number",
+			"minimum": 1,
+			"maximum": 8
+		},
 		"caption": {
 			"type": "rich-text",
 			"source": "rich-text",
