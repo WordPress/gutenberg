@@ -122,10 +122,6 @@ export default function AxialInputControls( {
 		? groupedSides.filter( ( side ) => sides.includes( side ) )
 		: groupedSides;
 
-	const first = filteredSides[ 0 ];
-	const last = filteredSides[ filteredSides.length - 1 ];
-	const only = first === last && first;
-
 	return (
 		<>
 			{ filteredSides.map( ( side ) => {
@@ -146,9 +142,6 @@ export default function AxialInputControls( {
 						<UnitControl
 							{ ...props }
 							id={ inputId }
-							isFirst={ first === side }
-							isLast={ last === side }
-							isOnly={ only === side }
 							value={ [
 								parsedQuantity,
 								selectedUnit ?? parsedUnit,

@@ -98,7 +98,6 @@ export default function AllInputControl( {
 				{ ...props }
 				disableUnits={ isMixed }
 				id={ inputId }
-				isOnly
 				value={ allValue }
 				onChange={ unitControlOnChange }
 				onUnitChange={ handleOnUnitChange }

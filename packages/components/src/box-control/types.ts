@@ -98,9 +98,6 @@ export type BoxControlInputControlProps = UnitControlPassthroughProps & {
 
 export type BoxUnitControlProps = UnitControlPassthroughProps &
 	Pick< UnitControlProps, 'onChange' | 'onFocus' > & {
-		isFirst?: boolean;
-		isLast?: boolean;
-		isOnly?: boolean;
 		label?: string;
 		onHoverOff?: (
 			event: ReturnType< typeof useHover >[ 'event' ],

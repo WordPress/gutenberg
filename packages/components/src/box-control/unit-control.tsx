@@ -7,15 +7,13 @@ import { useHover } from '@use-gesture/react';
  * Internal dependencies
  */
 import Tooltip from '../tooltip';
-import { UnitControlWrapper, UnitControl } from './styles/box-control-styles';
+import UnitControl from '../unit-control';
+import { UnitControlWrapper } from './styles/box-control-styles';
 import type { BoxUnitControlProps } from './types';
 
 const noop = () => {};
 
 export default function BoxUnitControl( {
-	isFirst,
-	isLast,
-	isOnly,
 	onHoverOn = noop,
 	onHoverOff = noop,
 	label,
@@ -36,9 +34,6 @@ export default function BoxUnitControl( {
 				<UnitControl
 					aria-label={ label }
 					className="component-box-control__unit-control"
-					isFirst={ isFirst }
-					isLast={ isLast }
-					isOnly={ isOnly }
 					isPressEnterToChange
 					isResetValueOnUnitChange={ false }
 					value={ value }

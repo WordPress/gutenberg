@@ -98,10 +98,6 @@ export default function BoxInputControls( {
 		? ALL_SIDES.filter( ( side ) => sides.includes( side ) )
 		: ALL_SIDES;
 
-	const first = filteredSides[ 0 ];
-	const last = filteredSides[ filteredSides.length - 1 ];
-	const only = first === last && first;
-
 	return (
 		<>
 			{ filteredSides.map( ( side ) => {
@@ -119,9 +115,6 @@ export default function BoxInputControls( {
 						<FlexedBoxControlIcon side={ side } sides={ sides } />
 						<UnitControl
 							{ ...props }
-							isFirst={ first === side }
-							isLast={ last === side }
-							isOnly={ only === side }
 							id={ inputId }
 							value={ [ parsedQuantity, computedUnit ].join(
 								''
