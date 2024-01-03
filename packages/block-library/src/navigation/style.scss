@@ -611,18 +611,16 @@ button.wp-block-navigation-item__content {
 		}
 	}
 
-	@include break-small() {
-		&:not(.hidden-by-default) {
-			&:not(.is-menu-open) {
-				display: block;
-				width: 100%;
-				position: relative;
-				z-index: auto;
-				background-color: inherit;
+	:not(.is-collapsed) > & {
+		&:not(.is-menu-open) {
+			display: block;
+			width: 100%;
+			position: relative;
+			z-index: auto;
+			background-color: inherit;
 
-				.wp-block-navigation__responsive-container-close {
-					display: none;
-				}
+			.wp-block-navigation__responsive-container-close {
+				display: none;
 			}
 		}
 
@@ -686,10 +684,8 @@ button.wp-block-navigation-item__content {
 		font-size: inherit;
 	}
 
-	&:not(.always-shown) {
-		@include break-small {
-			display: none;
-		}
+	:not(.is-collapsed) > & {
+		display: none;
 	}
 }
 

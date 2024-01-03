@@ -18,7 +18,7 @@ const focusableSelectors = [
 // capture the clicks, instead of relying on the focusout event.
 document.addEventListener( 'click', () => {} );
 
-const { state, actions } = store( 'core/navigation', {
+const { state, actions, callbacks } = store( 'core/navigation', {
 	state: {
 		get roleAttribute() {
 			const ctx = getContext();
@@ -175,6 +175,20 @@ const { state, actions } = store( 'core/navigation', {
 				ctx.firstFocusableElement = focusableElements[ 0 ];
 				ctx.lastFocusableElement =
 					focusableElements[ focusableElements.length - 1 ];
+			}
+		},
+		initNav() {
+			const { ref } = getElement();
+			callbacks.collapseNav( ref );
+			window.addEventListener( 'resize', () =>
+				callbacks.collapseNav( ref )
+			);
+		},
+		collapseNav( ref ) {
+			if ( window.innerWidth < 600 ) {
+				ref.classList.add( 'is-collapsed' );
+			} else {
+				ref.classList.remove( 'is-collapsed' );
 			}
 		},
 		focusFirstElement() {
