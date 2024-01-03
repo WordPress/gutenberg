@@ -9,6 +9,7 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -25,7 +26,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
 	'__experimentalPreferredStyleVariations',
-	'__experimentalSetIsInserterOpened',
 	'__unstableGalleryWithImageBlocks',
 	'alignWide',
 	'allowedBlockTypes',
@@ -59,7 +59,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'imageEditing',
 	'imageSizes',
 	'isRTL',
-	'keepCaretInsideBlock',
 	'locale',
 	'maxWidth',
 	'onUpdateDefaultBlockStyles',
@@ -76,6 +75,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableIsBlockBasedTheme',
 	'__experimentalArchiveTitleTypeLabel',
 	'__experimentalArchiveTitleNameLabel',
+	'__experimentalGetPostLinkProps',
 ];
 
 /**
@@ -89,6 +89,8 @@ const BLOCK_EDITOR_SETTINGS = [
  */
 function useBlockEditorSettings( settings, postType, postId ) {
 	const {
+		allowRightClickOverrides,
+		keepCaretInsideBlock,
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
@@ -96,6 +98,9 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		pageOnFront,
 		pageForPosts,
 		userPatternCategories,
+		restBlockPatterns,
+		restBlockPatternCategories,
+		getPostLinkProps,
 	} = useSelect(
 		( select ) => {
 			const isWeb = Platform.OS === 'web';
@@ -105,18 +110,28 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				getEntityRecord,
 				getUserPatternCategories,
 				getEntityRecords,
+				getBlockPatterns,
+				getBlockPatternCategories,
 			} = select( coreStore );
+			const { getPostLinkProps: postLinkProps } =
+				select( editorStore ).getEditorSettings();
+			const { get } = select( preferencesStore );
 
 			const siteSettings = canUser( 'read', 'settings' )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
 
 			return {
+				allowRightClickOverrides: get(
+					'core',
+					'allowRightClickOverrides'
+				),
 				canUseUnfilteredHTML: getRawEntityRecord(
 					'postType',
 					postType,
 					postId
 				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
+				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				reusableBlocks: isWeb
 					? getEntityRecords( 'postType', 'wp_block', {
 							per_page: -1,
@@ -127,6 +142,9 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
 				userPatternCategories: getUserPatternCategories(),
+				restBlockPatterns: getBlockPatterns(),
+				restBlockPatternCategories: getBlockPatternCategories(),
+				getPostLinkProps: postLinkProps,
 			};
 		},
 		[ postType, postId ]
@@ -138,15 +156,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 	const settingsBlockPatternCategories =
 		settings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
 		settings.__experimentalBlockPatternCategories; // WP 5.9
-
-	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
-		( select ) => ( {
-			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories:
-				select( coreStore ).getBlockPatternCategories(),
-		} ),
-		[]
-	);
 
 	const blockPatterns = useMemo(
 		() =>
@@ -180,7 +189,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
-	const { undo } = useDispatch( editorStore );
+	const { undo, setIsInserterOpened } = useDispatch( editorStore );
 
 	const { saveEntityRecord } = useDispatch( coreStore );
 
@@ -212,6 +221,8 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					BLOCK_EDITOR_SETTINGS.includes( key )
 				)
 			),
+			allowRightClickOverrides,
+			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
@@ -241,8 +252,12 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				postType === 'wp_navigation'
 					? [ [ 'core/navigation', {}, [] ] ]
 					: settings.template,
+			__experimentalSetIsInserterOpened: setIsInserterOpened,
+			__experimentalGetPostLinkProps: getPostLinkProps,
 		} ),
 		[
+			allowRightClickOverrides,
+			keepCaretInsideBlock,
 			settings,
 			hasUploadPermissions,
 			reusableBlocks,
@@ -256,6 +271,8 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			pageOnFront,
 			pageForPosts,
 			postType,
+			setIsInserterOpened,
+			getPostLinkProps,
 		]
 	);
 }

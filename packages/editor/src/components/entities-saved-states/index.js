@@ -209,7 +209,9 @@ export function EntitiesSavedStatesExtensible( {
 			</Flex>
 
 			<div className="entities-saved-states__text-prompt">
-				<strong>{ __( 'Are you ready to save?' ) }</strong>
+				<strong className="entities-saved-states__text-prompt--header">
+					{ __( 'Are you ready to save?' ) }
+				</strong>
 				{ additionalPrompt }
 				{ isDirty && (
 					<p>

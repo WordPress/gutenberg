@@ -10,37 +10,6 @@ Before you begin, there are some requirements that must be met in order to succe
 
 Similar requirements apply to releasing WordPress's [npm packages](https://developer.wordpress.org/block-editor/contributors/code/release/#packages-releases-to-npm-and-wordpress-core-updates).
 
-**Table of contents**
-
--   **[Gutenberg plugin releases](#gutenberg-plugin-releases)**
-    -   [Release schedule](#release-schedule)
-    -   [Release management](#release-management)
-    -   [Preparing a release](#preparing-a-release)
-        -   [Organizing and labeling milestone PRs](#organizing-and-labeling-milestone-prs)
-        -   [Running the release workflow](#running-the-release-workflow)
-        -   [Publishing the @wordpress packages to NPM](#publishing-the-wordpress-packages-to-npm)
-        -   [Viewing the release draft](#viewing-the-release-draft)
-        -   [Curating the release changelog](#curating-the-release-changelog)
-        -   [Creating release candidate patches (cherry-picking)](#creating-release-candidate-patches-cherry-picking)
-            -   [Automated cherry-picking](#automated-cherry-picking)
-            -   [Manual cherry-picking](#manual-cherry-picking)
-        -   [Publishing the release](#publishing-the-release)
-        -   [Troubleshooting the release](#troubleshooting-the-release)
-    -   [Documenting the release](#documenting-the-release)
-        -   [Selecting the release highlights](#selecting-the-release-highlights)
-        -   [Requesting release assets](#requesting-release-assets)
-        -   [Drafting the release post](#drafting-the-release-post)
-        -   [Publishing the release post](#publishing-the-release-post)
-    -   [Creating minor releases](#creating-minor-releases)
-        -   [Updating the release branch](#updating-the-release-branch)
-        -   [Running the minor release](#running-the-minor-release)
-        -   [Creating a minor release for previous stable releases](#creating-a-minor-release-for-previous-stable-releases)
-        -   [Troubleshooting](#troubleshooting)
--   [Packages releases to NPM and WordPress Core updates](#packages-releases-to-npm-and-wordpress-core-updates)
-    -   [Synchronizing the Gutenberg plugin](#synchronizing-the-gutenberg-plugin)
-    -   [WordPress releases](#wordpress-releases)
-    -   [Development releases](#development-releases)
-
 ## Gutenberg plugin releases
 
 The first step in releasing a stable version of the Gutenberg plugin is to [create an issue](https://github.com/WordPress/gutenberg/issues/new?assignees=&labels=&projects=&template=New_release.md) in the Gutenberg repository. The issue template is called "Gutenberg Release," and it contains a checklist for the complete release process, from release candidate to changelog curation to cherry-picking, stable release, and release post. The issue for [Gutenberg 15.7](https://github.com/WordPress/gutenberg/issues/50092) is a good example.

@@ -22,11 +22,6 @@ test.describe( 'Preview', () => {
 	} ) => {
 		const editorPage = page;
 
-		// Disabled until content present.
-		await expect(
-			editorPage.locator( 'role=button[name="Preview"i]' )
-		).toBeDisabled();
-
 		await editor.canvas
 			.locator( 'role=textbox[name="Add title"i]' )
 			.type( 'Hello World' );
@@ -301,7 +296,7 @@ test.describe( 'Preview with private custom post type', () => {
 		} );
 
 		// Open the view menu.
-		await page.click( 'role=button[name="Preview"i]' );
+		await page.click( 'role=button[name="View"i]' );
 
 		await expect(
 			page.locator( 'role=menuitem[name="Preview in new tab"i]' )
@@ -316,7 +311,7 @@ class PreviewUtils {
 
 	async waitForPreviewNavigation( previewPage ) {
 		const previewToggle = this.page.locator(
-			'role=button[name="Preview"i][expanded=false]'
+			'role=button[name="View"i][expanded=false]'
 		);
 		const isDropdownClosed = await previewToggle.isVisible();
 		if ( isDropdownClosed ) {

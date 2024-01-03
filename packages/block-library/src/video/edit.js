@@ -63,7 +63,7 @@ const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 function VideoEdit( {
-	isSelected,
+	isSelected: isSingleSelected,
 	attributes,
 	className,
 	setAttributes,
@@ -75,16 +75,13 @@ function VideoEdit( {
 	const posterImageButton = useRef();
 	const { id, controls, poster, src, tracks } = attributes;
 	const isTemporaryVideo = ! id && isBlobURL( src );
-	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
-		[]
-	);
+	const { getSettings } = useSelect( blockEditorStore );
 
 	useEffect( () => {
 		if ( ! id && isBlobURL( src ) ) {
 			const file = getBlobByURL( src );
 			if ( file ) {
-				mediaUpload( {
+				getSettings().mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ media ] ) => onSelectVideo( media ),
 					onError: onUploadError,
@@ -185,25 +182,29 @@ function VideoEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<TracksEditor
-					tracks={ tracks }
-					onChange={ ( newTracks ) => {
-						setAttributes( { tracks: newTracks } );
-					} }
-				/>
-			</BlockControls>
-			<BlockControls group="other">
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ src }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="video/*"
-					onSelect={ onSelectVideo }
-					onSelectURL={ onSelectURL }
-					onError={ onUploadError }
-				/>
-			</BlockControls>
+			{ isSingleSelected && (
+				<>
+					<BlockControls>
+						<TracksEditor
+							tracks={ tracks }
+							onChange={ ( newTracks ) => {
+								setAttributes( { tracks: newTracks } );
+							} }
+						/>
+					</BlockControls>
+					<BlockControls group="other">
+						<MediaReplaceFlow
+							mediaId={ id }
+							mediaURL={ src }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							accept="video/*"
+							onSelect={ onSelectVideo }
+							onSelectURL={ onSelectURL }
+							onError={ onUploadError }
+						/>
+					</BlockControls>
+				</>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<VideoCommonSettings
@@ -267,7 +268,7 @@ function VideoEdit( {
 					so the user clicking on it won't play the
 					video when the controls are enabled.
 				*/ }
-				<Disabled isDisabled={ ! isSelected }>
+				<Disabled isDisabled={ ! isSingleSelected }>
 					<video
 						controls={ controls }
 						poster={ poster }
@@ -281,9 +282,10 @@ function VideoEdit( {
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					isSelected={ isSelected }
+					isSelected={ isSingleSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Video caption text' ) }
+					showToolbarButton={ isSingleSelected }
 				/>
 			</figure>
 		</>

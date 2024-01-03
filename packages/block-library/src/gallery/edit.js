@@ -74,6 +74,8 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.isNative
 	? { type: 'stepper' }
 	: {};
 
+const EMPTY_ARRAY = [];
+
 function GalleryEdit( props ) {
 	const {
 		setAttributes,
@@ -97,33 +99,44 @@ function GalleryEdit( props ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	const { getBlock, getSettings, preferredStyle } = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		const preferredStyleVariations =
-			settings.__experimentalPreferredStyleVariations;
-		return {
-			getBlock: select( blockEditorStore ).getBlock,
-			getSettings: select( blockEditorStore ).getSettings,
-			preferredStyle: preferredStyleVariations?.value?.[ 'core/image' ],
-		};
-	}, [] );
-
-	const innerBlockImages = useSelect(
+	const {
+		getBlock,
+		getSettings,
+		preferredStyle,
+		innerBlockImages,
+		blockWasJustInserted,
+		multiGallerySelection,
+	} = useSelect(
 		( select ) => {
-			const innerBlocks =
-				select( blockEditorStore ).getBlock( clientId )?.innerBlocks ??
-				[];
-			return innerBlocks;
-		},
-		[ clientId ]
-	);
+			const {
+				getBlockName,
+				getMultiSelectedBlockClientIds,
+				getSettings: _getSettings,
+				getBlock: _getBlock,
+				wasBlockJustInserted,
+			} = select( blockEditorStore );
+			const preferredStyleVariations =
+				_getSettings().__experimentalPreferredStyleVariations;
+			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 
-	const wasBlockJustInserted = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).wasBlockJustInserted(
-				clientId,
-				'inserter_menu'
-			);
+			return {
+				getBlock: _getBlock,
+				getSettings: _getSettings,
+				preferredStyle:
+					preferredStyleVariations?.value?.[ 'core/image' ],
+				innerBlockImages:
+					_getBlock( clientId )?.innerBlocks ?? EMPTY_ARRAY,
+				blockWasJustInserted: wasBlockJustInserted(
+					clientId,
+					'inserter_menu'
+				),
+				multiGallerySelection:
+					multiSelectedClientIds.length &&
+					multiSelectedClientIds.every(
+						( _clientId ) =>
+							getBlockName( _clientId ) === 'core/gallery'
+					),
+			};
 		},
 		[ clientId ]
 	);
@@ -463,7 +476,7 @@ function GalleryEdit( props ) {
 				( hasImages && ! isSelected ) || imagesUploading,
 			value: hasImageIds ? images : {},
 			autoOpenMediaUpload:
-				! hasImages && isSelected && wasBlockJustInserted,
+				! hasImages && isSelected && blockWasJustInserted,
 			onFocus,
 		},
 	} );
@@ -585,20 +598,22 @@ function GalleryEdit( props ) {
 			</InspectorControls>
 			{ Platform.isWeb && (
 				<>
-					<BlockControls group="other">
-						<MediaReplaceFlow
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							accept="image/*"
-							handleUpload={ false }
-							onSelect={ updateImages }
-							name={ __( 'Add' ) }
-							multiple={ true }
-							mediaIds={ images
-								.filter( ( image ) => image.id )
-								.map( ( image ) => image.id ) }
-							addToGallery={ hasImageIds }
-						/>
-					</BlockControls>
+					{ ! multiGallerySelection && (
+						<BlockControls group="other">
+							<MediaReplaceFlow
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								accept="image/*"
+								handleUpload={ false }
+								onSelect={ updateImages }
+								name={ __( 'Add' ) }
+								multiple={ true }
+								mediaIds={ images
+									.filter( ( image ) => image.id )
+									.map( ( image ) => image.id ) }
+								addToGallery={ hasImageIds }
+							/>
+						</BlockControls>
+					) }
 					<GapStyles
 						blockGap={ attributes.style?.spacing?.blockGap }
 						clientId={ clientId }
@@ -616,6 +631,7 @@ function GalleryEdit( props ) {
 				}
 				blockProps={ innerBlocksProps }
 				insertBlocksAfter={ insertBlocksAfter }
+				multiGallerySelection={ multiGallerySelection }
 			/>
 		</>
 	);

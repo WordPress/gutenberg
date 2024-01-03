@@ -62,4 +62,23 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$expected = '<li class="wp-block-navigation-item"><h1 class="wp-block-site-title"><a href="http://' . WP_TESTS_DOMAIN . '" target="_self" rel="home">Test Blog</a></h1></li>';
 		$this->assertEquals( $expected, $result );
 	}
+
+	/**
+	 * Test that the `get_inner_blocks_from_navigation_post` method returns an empty block list for a non-existent post.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_inner_blocks_from_navigation_post
+	 */
+	public function test_gutenberg_get_inner_blocks_from_navigation_post_returns_empty_block_list() {
+		$reflection = new ReflectionClass( 'WP_Navigation_Block_Renderer' );
+		$method     = $reflection->getMethod( 'get_inner_blocks_from_navigation_post' );
+		$method->setAccessible( true );
+		$attributes = array( 'ref' => 0 );
+
+		$actual   = $method->invoke( $reflection, $attributes );
+		$expected = new WP_Block_List( array(), $attributes );
+		$this->assertEquals( $actual, $expected );
+		$this->assertCount( 0, $actual );
+	}
 }

@@ -10,7 +10,12 @@ import { dragHandle } from '@wordpress/icons';
  */
 import BlockIcon from '../block-icon';
 
-export default function BlockDraggableChip( { count, icon, isPattern } ) {
+export default function BlockDraggableChip( {
+	count,
+	icon,
+	isPattern,
+	fadeWhenDisabled,
+} ) {
 	const patternLabel = isPattern && __( 'Pattern' );
 	return (
 		<div className="block-editor-block-draggable-chip-wrapper">
@@ -37,6 +42,11 @@ export default function BlockDraggableChip( { count, icon, isPattern } ) {
 					<FlexItem>
 						<BlockIcon icon={ dragHandle } />
 					</FlexItem>
+					{ fadeWhenDisabled && (
+						<FlexItem className="block-editor-block-draggable-chip__disabled">
+							<span className="block-editor-block-draggable-chip__disabled-icon"></span>
+						</FlexItem>
+					) }
 				</Flex>
 			</div>
 		</div>

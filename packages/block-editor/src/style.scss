@@ -1,5 +1,6 @@
 @import "./autocompleters/style.scss";
 @import "./components/block-alignment-control/style.scss";
+@import "./components/block-canvas/style.scss";
 @import "./components/block-icon/style.scss";
 @import "./components/block-inspector/style.scss";
 @import "./components/block-tools/style.scss";
@@ -10,7 +11,6 @@
 @import "./components/block-draggable/style.scss";
 @import "./components/block-mover/style.scss";
 @import "./components/block-navigation/style.scss";
-@import "./components/block-parent-selector/style.scss";
 @import "./components/block-patterns-list/style.scss";
 @import "./components/block-patterns-paging/style.scss";
 @import "./components/block-popover/style.scss";
@@ -60,7 +60,6 @@
 
 @import "./components/block-toolbar/style.scss";
 @import "./components/inserter/style.scss";
-@import "./components/preview-options/style.scss";
 @import "./components/spacing-sizes-control/style.scss";
 
 @include wordpress-admin-schemes();

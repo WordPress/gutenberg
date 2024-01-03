@@ -13,14 +13,11 @@ import {
 	createContext,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { children as childrenSource } from '@wordpress/blocks';
-import { useInstanceId, useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 import {
 	__unstableUseRichText as useRichText,
-	__unstableCreateElement,
 	removeFormat,
 } from '@wordpress/rich-text';
-import deprecated from '@wordpress/deprecated';
 import { Popover } from '@wordpress/components';
 
 /**
@@ -46,7 +43,7 @@ import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
 import { getAllowedFormats } from './utils';
 import { Content } from './content';
-import RichTextMultiline from './multiline';
+import { withDeprecations } from './with-deprecations';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
@@ -116,8 +113,14 @@ export function RichTextWrapper(
 	props = removeNativeProps( props );
 
 	const anchorRef = useRef();
-	const { clientId } = useBlockEditContext();
+	const { clientId, isSelected: isBlockSelected } = useBlockEditContext();
 	const selector = ( select ) => {
+		// Avoid subscribing to the block editor store if the block is not
+		// selected.
+		if ( ! isBlockSelected ) {
+			return { isSelected: false };
+		}
+
 		const { getSelectionStart, getSelectionEnd } =
 			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
@@ -140,10 +143,12 @@ export function RichTextWrapper(
 			isSelected,
 		};
 	};
-	// This selector must run on every render so the right selection state is
-	// retrieved from the store on merge.
-	// To do: fix this somehow.
-	const { selectionStart, selectionEnd, isSelected } = useSelect( selector );
+	const { selectionStart, selectionEnd, isSelected } = useSelect( selector, [
+		clientId,
+		identifier,
+		originalIsSelected,
+		isBlockSelected,
+	] );
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
@@ -320,10 +325,13 @@ export function RichTextWrapper(
 				{ ...props }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
+					// Rich text ref must be first because its focus listener
+					// must be set up before any other ref calls .focus() on
+					// mount.
+					richTextRef,
 					forwardedRef,
 					autocompleteProps.ref,
 					props.ref,
-					richTextRef,
 					useBeforeInputRules( { value, onChange } ),
 					useInputRules( {
 						getValue,
@@ -382,52 +390,15 @@ export function RichTextWrapper(
 				// tabIndex because Safari will focus the element. However,
 				// Safari will correctly ignore nested contentEditable elements.
 				tabIndex={ props.tabIndex === 0 ? null : props.tabIndex }
+				data-wp-block-attribute-key={ identifier }
 			/>
 		</>
 	);
 }
 
-const ForwardedRichTextWrapper = forwardRef( RichTextWrapper );
-
-function RichTextSwitcher( props, ref ) {
-	let value = props.value;
-	let onChange = props.onChange;
-
-	// Handle deprecated format.
-	if ( Array.isArray( value ) ) {
-		deprecated( 'wp.blockEditor.RichText value prop as children type', {
-			since: '6.1',
-			version: '6.3',
-			alternative: 'value prop as string',
-			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
-		} );
-
-		value = childrenSource.toHTML( props.value );
-		onChange = ( newValue ) =>
-			props.onChange(
-				childrenSource.fromDOM(
-					__unstableCreateElement( document, newValue ).childNodes
-				)
-			);
-	}
-
-	const Component = props.multiline
-		? RichTextMultiline
-		: ForwardedRichTextWrapper;
-	const instanceId = useInstanceId( RichTextSwitcher );
-
-	return (
-		<Component
-			{ ...props }
-			identifier={ props.identifier || instanceId }
-			value={ value }
-			onChange={ onChange }
-			ref={ ref }
-		/>
-	);
-}
-
-const ForwardedRichTextContainer = forwardRef( RichTextSwitcher );
+const ForwardedRichTextContainer = withDeprecations(
+	forwardRef( RichTextWrapper )
+);
 
 ForwardedRichTextContainer.Content = Content;
 ForwardedRichTextContainer.isEmpty = ( value ) => {

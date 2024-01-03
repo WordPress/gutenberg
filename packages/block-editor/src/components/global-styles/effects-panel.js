@@ -26,7 +26,7 @@ import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable } from './utils';
+import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
 
 export function useHasEffectsPanel( settings ) {
@@ -55,6 +55,7 @@ function EffectsToolsPanel( {
 			label={ __( 'Effects' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			{ children }
 		</ToolsPanel>

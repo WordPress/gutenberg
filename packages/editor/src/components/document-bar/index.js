@@ -48,47 +48,58 @@ const icons = {
 };
 
 export default function DocumentBar() {
-	const { isEditingTemplate, templateId, postType, postId } = useSelect(
-		( select ) => {
-			const {
-				getRenderingMode,
-				getCurrentTemplateId,
-				getCurrentPostId,
-				getCurrentPostType,
-			} = select( editorStore );
-			const _templateId = getCurrentTemplateId();
-			return {
-				isEditingTemplate:
-					!! _templateId && getRenderingMode() === 'template-only',
-				templateId: _templateId,
-				postType: getCurrentPostType(),
-				postId: getCurrentPostId(),
-			};
-		},
-		[]
-	);
-	const { getEditorSettings } = useSelect( editorStore );
+	const {
+		isEditingTemplate,
+		templateId,
+		postType,
+		postId,
+		goBack,
+		getEditorSettings,
+	} = useSelect( ( select ) => {
+		const {
+			getRenderingMode,
+			getCurrentTemplateId,
+			getCurrentPostId,
+			getCurrentPostType,
+			getEditorSettings: getSettings,
+		} = select( editorStore );
+		const _templateId = getCurrentTemplateId();
+		const back = getSettings().goBack;
+		return {
+			isEditingTemplate:
+				!! _templateId && getRenderingMode() === 'template-only',
+			templateId: _templateId,
+			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
+			goBack: typeof back === 'function' ? back : undefined,
+			getEditorSettings: getSettings,
+		};
+	}, [] );
+
 	const { setRenderingMode } = useDispatch( editorStore );
+
+	const handleOnBack = () => {
+		if ( isEditingTemplate ) {
+			setRenderingMode( getEditorSettings().defaultRenderingMode );
+			return;
+		}
+		if ( goBack ) {
+			goBack();
+		}
+	};
 
 	return (
 		<BaseDocumentActions
 			postType={ isEditingTemplate ? 'wp_template' : postType }
 			postId={ isEditingTemplate ? templateId : postId }
-			onBack={
-				isEditingTemplate
-					? () =>
-							setRenderingMode(
-								getEditorSettings().defaultRenderingMode
-							)
-					: undefined
-			}
+			onBack={ isEditingTemplate || goBack ? handleOnBack : undefined }
 		/>
 	);
 }
 
 function BaseDocumentActions( { postType, postId, onBack } ) {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
-	const { editedRecord: document, isResolving } = useEntityRecord(
+	const { editedRecord: doc, isResolving } = useEntityRecord(
 		'postType',
 		postType,
 		postId
@@ -96,13 +107,13 @@ function BaseDocumentActions( { postType, postId, onBack } ) {
 	const { templateIcon, templateTitle } = useSelect( ( select ) => {
 		const { __experimentalGetTemplateInfo: getTemplateInfo } =
 			select( editorStore );
-		const templateInfo = getTemplateInfo( document );
+		const templateInfo = getTemplateInfo( doc );
 		return {
 			templateIcon: templateInfo.icon,
 			templateTitle: templateInfo.title,
 		};
 	} );
-	const isNotFound = ! document && ! isResolving;
+	const isNotFound = ! doc && ! isResolving;
 	const icon = icons[ postType ] ?? pageIcon;
 	const [ isAnimated, setIsAnimated ] = useState( false );
 	const isMounting = useRef( true );
@@ -123,7 +134,7 @@ function BaseDocumentActions( { postType, postId, onBack } ) {
 		isMounting.current = false;
 	}, [ postType, postId ] );
 
-	const title = isTemplate ? templateTitle : document.title;
+	const title = isTemplate ? templateTitle : doc.title;
 
 	return (
 		<div

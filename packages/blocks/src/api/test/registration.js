@@ -168,7 +168,7 @@ describe( 'blocks', () => {
 		it( 'should reject blocks with an invalid edit function', () => {
 			const blockType = {
 					save: noop,
-					edit: 'not-a-function',
+					edit: {},
 					category: 'text',
 					title: 'block title',
 				},
@@ -177,7 +177,7 @@ describe( 'blocks', () => {
 					blockType
 				);
 			expect( console ).toHaveErroredWith(
-				'The "edit" property must be a valid function.'
+				'The "edit" property must be a valid component.'
 			);
 			expect( block ).toBeUndefined();
 		} );

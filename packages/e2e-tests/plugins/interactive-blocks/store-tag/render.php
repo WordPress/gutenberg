@@ -3,6 +3,7 @@
  * HTML for testing the hydration of the serialized store.
  *
  * @package gutenberg-test-interactive-blocks
+ *
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
