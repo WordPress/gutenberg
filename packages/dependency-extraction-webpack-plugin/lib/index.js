@@ -221,29 +221,20 @@ class DependencyExtractionWebpackPlugin {
 				chunkStaticDeps.add( 'wp-polyfill' );
 			}
 
+			/**
+			 * @param {webpack.Module} m
+			 */
 			const processModule = ( m ) => {
 				const { userRequest } = m;
 				if ( this.externalizedDeps.has( userRequest ) ) {
 					if ( this.useModules ) {
-						let isDynamic = true;
-						for ( const incomingConnection of compilation.moduleGraph.getIncomingConnections(
-							m
-						) ) {
-							const { dependency } = incomingConnection;
-							if (
-								! (
-									compilation.moduleGraph.getParentBlock(
-										dependency
-									).constructor.name ===
-									AsyncDependenciesBlock.name
-								)
-							) {
-								isDynamic = false;
-								break;
-							}
-						}
+						const isStatic =
+							DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+								compilation,
+								m
+							);
 
-						( isDynamic ? chunkDynamicDeps : chunkStaticDeps ).add(
+						( isStatic ? chunkStaticDeps : chunkDynamicDeps ).add(
 							userRequest
 						);
 					} else {
@@ -345,6 +336,58 @@ class DependencyExtractionWebpackPlugin {
 				this.stringify( combinedAssetsData )
 			);
 		}
+	}
+
+	/**
+	 * Can we trace a line of static dependencies from an entry to a module
+	 *
+	 * @param {webpack.Compilation}       compilation
+	 * @param {webpack.DependenciesBlock} block
+	 *
+	 * @return {boolean} True if there is a static import path to the root
+	 */
+	static hasStaticDependencyPathToRoot( compilation, block ) {
+		const incomingConnections = [
+			...compilation.moduleGraph.getIncomingConnections( block ),
+		].filter(
+			( connection ) =>
+				// Library connections don't have a dependency, this is a root
+				connection.dependency &&
+				// Entry dependencies are another root
+				connection.dependency.constructor.name !== 'EntryDependency'
+		);
+
+		// If we don't have non-entry, non-library incoming connections,
+		// we've reached a root of
+		if ( ! incomingConnections.length ) {
+			return true;
+		}
+
+		const staticDependentModules = incomingConnections.flatMap(
+			( connection ) => {
+				const { dependency } = connection;
+				const parentBlock =
+					compilation.moduleGraph.getParentBlock( dependency );
+
+				return parentBlock.constructor.name !==
+					AsyncDependenciesBlock.name
+					? [ compilation.moduleGraph.getParentModule( dependency ) ]
+					: [];
+			}
+		);
+
+		// All the dependencies were Async, the module was reached via a dynamic import
+		if ( ! staticDependentModules.length ) {
+			return false;
+		}
+
+		// Continue to explore any static dependencies
+		return staticDependentModules.some( ( parentStaticDependentModule ) =>
+			DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+				compilation,
+				parentStaticDependentModule
+			)
+		);
 	}
 }
 
