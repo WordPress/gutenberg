@@ -167,10 +167,7 @@ function BoxControl( {
 			{ isLinked && (
 				<InputWrapper>
 					<FlexedBoxControlIcon side={ side } sides={ sides } />
-					<AllInputControl
-						aria-label={ label }
-						{ ...inputControlProps }
-					/>
+					<AllInputControl { ...inputControlProps } />
 				</InputWrapper>
 			) }
 			{ ! hasOneSide && (
