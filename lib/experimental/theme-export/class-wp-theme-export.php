@@ -29,7 +29,7 @@ class WP_Theme_Export {
 		global $wp_version;
 
 		if ( ! class_exists( 'ZipArchive' ) ) {
-			return new WP_Error( 'missing_zip_package', __( 'Zip Export not supported.' ) );
+			return new WP_Error( 'missing_zip_package', __( 'Zip Export not supported.', 'gutenberg' ) );
 		}
 
 		$obscura    = wp_generate_password( 12, false, false );
@@ -38,7 +38,7 @@ class WP_Theme_Export {
 
 		$zip = new ZipArchive();
 		if ( true !== $zip->open( $filename, ZipArchive::CREATE | ZipArchive::OVERWRITE ) ) {
-			return new WP_Error( 'unable_to_create_zip', __( 'Unable to open export file (archive) for writing.' ) );
+			return new WP_Error( 'unable_to_create_zip', __( 'Unable to open export file (archive) for writing.', 'gutenberg' ) );
 		}
 
 		$zip->addEmptyDir( 'templates' );
