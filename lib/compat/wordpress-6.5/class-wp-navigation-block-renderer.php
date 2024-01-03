@@ -362,7 +362,7 @@ class WP_Navigation_Block_Renderer {
 		$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
 
 		// is-collapsed class is added to the navigation block when the menu is collapsed.
-		$is_collapsed_class = ( isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'] ) ? array( 'is-collapsed' ) : array();
+		$is_collapsed_class = static::is_always_overlay( $attributes ) ? array( 'is-collapsed' ) : array();
 
 		$classes = array_merge(
 			$colors['css_classes'],
@@ -373,6 +373,10 @@ class WP_Navigation_Block_Renderer {
 			$is_collapsed_class
 		);
 		return implode( ' ', $classes );
+	}
+
+	private static function is_always_overlay( $attributes ) {
+		return isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
 	}
 
 	/**
@@ -536,7 +540,7 @@ class WP_Navigation_Block_Renderer {
 			data-wp-context=\'' . $nav_element_context . '\'
 		';
 
-		if ( isset( $attributes['overlayMenu'] ) && 'always' !== $attributes['overlayMenu'] ) {
+		if ( ! static::is_always_overlay( $attributes ) ) {
 			$nav_element_directives .= 'data-wp-watch="callbacks.initNav"';
 		}
 
