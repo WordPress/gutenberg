@@ -66,7 +66,6 @@ class URLInput extends Component {
 		this.state = {
 			suggestions: [],
 			showSuggestions: false,
-			isUpdatingSuggestions: false,
 			suggestionsValue: null,
 			selectedSuggestion: null,
 			suggestionsListboxId: '',
@@ -102,11 +101,7 @@ class URLInput extends Component {
 		}
 
 		// Update suggestions when the value changes.
-		if (
-			prevProps.value !== value &&
-			! this.props.disableSuggestions &&
-			! this.state.isUpdatingSuggestions
-		) {
+		if ( prevProps.value !== value && ! this.props.disableSuggestions ) {
 			if ( value?.length ) {
 				// If the new value is not empty we need to update with suggestions for it.
 				this.updateSuggestions( value );
@@ -183,7 +178,6 @@ class URLInput extends Component {
 		}
 
 		this.setState( {
-			isUpdatingSuggestions: true,
 			selectedSuggestion: null,
 			loading: true,
 		} );
@@ -203,7 +197,6 @@ class URLInput extends Component {
 
 				this.setState( {
 					suggestions,
-					isUpdatingSuggestions: false,
 					suggestionsValue: value,
 					loading: false,
 					showSuggestions: !! suggestions.length,
@@ -235,7 +228,6 @@ class URLInput extends Component {
 				}
 
 				this.setState( {
-					isUpdatingSuggestions: false,
 					loading: false,
 				} );
 			} );
@@ -258,7 +250,6 @@ class URLInput extends Component {
 		if (
 			value &&
 			! disableSuggestions &&
-			! this.state.isUpdatingSuggestions &&
 			! ( suggestions && suggestions.length )
 		) {
 			// Ensure the suggestions are updated with the current input value.
