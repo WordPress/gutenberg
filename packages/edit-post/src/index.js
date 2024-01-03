@@ -62,7 +62,6 @@ export function initializeEditor(
 		isPublishSidebarEnabled: true,
 		openPanels: [ 'post-status' ],
 		preferredStyleVariations: {},
-		showBlockBreadcrumbs: true,
 		showListViewByDefault: false,
 		themeStyles: true,
 		welcomeGuide: true,
@@ -71,6 +70,7 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
+		showBlockBreadcrumbs: true,
 		showIconLabels: false,
 	} );
 

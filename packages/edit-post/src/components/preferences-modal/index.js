@@ -109,6 +109,7 @@ export default function EditPostPreferencesModal() {
 							/>
 							{ showBlockBreadcrumbsOption && (
 								<EnableFeature
+									scope="core"
 									featureName="showBlockBreadcrumbs"
 									help={ __(
 										'Display the block hierarchy trail at the bottom of the editor.'

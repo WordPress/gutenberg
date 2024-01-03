@@ -61,6 +61,7 @@ export default function EditSitePreferencesModal() {
 						label={ __( 'Always open list view' ) }
 					/>
 					<EnableFeature
+						scope="core"
 						featureName="showBlockBreadcrumbs"
 						help={ __(
 							'Shows block breadcrumbs at the bottom of the editor.'

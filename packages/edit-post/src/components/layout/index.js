@@ -40,7 +40,6 @@ import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
@@ -194,9 +193,7 @@ function Layout() {
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree:
 				select( editPostStore ).isFeatureActive( 'distractionFree' ),
-			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
-				'showBlockBreadcrumbs'
-			),
+			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showMostUsedBlocks:
 				select( editPostStore ).isFeatureActive( 'mostUsedBlocks' ),
 			// translators: Default label for the Document in the Block Breadcrumb.
