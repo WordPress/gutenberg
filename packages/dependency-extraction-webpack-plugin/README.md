@@ -343,11 +343,11 @@ wp_enqueue_script( 'script', $script_url, $script_asset['dependencies'], $script
 Or with modules (the Module API is not yet stable):
 
 ```php
-$module_path       = 'path/to/script.js';
-$module_asset_path = 'path/to/script.asset.php';
-$module_asset      = file_exists( $script_asset_path )
+$module_path       = 'path/to/module.js';
+$module_asset_path = 'path/to/module.asset.php';
+$module_asset      = file_exists( $module_asset_path )
 	? require( $module_asset_path )
-	: array( 'dependencies' => array(), 'version' => filemtime( $script_path ) );
+	: array( 'dependencies' => array(), 'version' => filemtime( $module_path ) );
 $module_url = plugins_url( $module_path, __FILE__ );
 wp_register_module( 'my-module', $module_url, $module_asset['dependencies'], $module_asset['version'] );
 wp_enqueue_module( 'my-module' );
