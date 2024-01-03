@@ -4,7 +4,10 @@
 
 export default function convertEditorSettings( data ) {
 	let newData = data;
-	const settingsToMoveToCore = [ 'allowRightClickOverrides' ];
+	const settingsToMoveToCore = [
+		'allowRightClickOverrides',
+		'keepCaretInsideBlock',
+	];
 
 	settingsToMoveToCore.forEach( ( setting ) => {
 		if ( data?.[ 'core/edit-post' ]?.[ setting ] !== undefined ) {

@@ -228,6 +228,7 @@ export default function EditPostPreferencesModal() {
 							) }
 						>
 							<EnableFeature
+								scope="core"
 								featureName="keepCaretInsideBlock"
 								help={ __(
 									'Keeps the text cursor within the block boundaries, aiding users with screen readers by preventing unintentional cursor movement outside the block.'

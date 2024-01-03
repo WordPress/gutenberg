@@ -59,7 +59,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'imageEditing',
 	'imageSizes',
 	'isRTL',
-	'keepCaretInsideBlock',
 	'locale',
 	'maxWidth',
 	'onUpdateDefaultBlockStyles',
@@ -91,6 +90,7 @@ const BLOCK_EDITOR_SETTINGS = [
 function useBlockEditorSettings( settings, postType, postId ) {
 	const {
 		allowRightClickOverrides,
+		keepCaretInsideBlock,
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
@@ -115,13 +115,14 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			} = select( coreStore );
 			const { getPostLinkProps: postLinkProps } =
 				select( editorStore ).getEditorSettings();
+			const { get } = select( preferencesStore );
 
 			const siteSettings = canUser( 'read', 'settings' )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
 
 			return {
-				allowRightClickOverrides: select( preferencesStore ).get(
+				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
 				),
@@ -130,6 +131,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					postType,
 					postId
 				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
+				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				reusableBlocks: isWeb
 					? getEntityRecords( 'postType', 'wp_block', {
 							per_page: -1,
@@ -220,6 +222,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				)
 			),
 			allowRightClickOverrides,
+			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
@@ -254,6 +257,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		} ),
 		[
 			allowRightClickOverrides,
+			keepCaretInsideBlock,
 			settings,
 			hasUploadPermissions,
 			reusableBlocks,
