@@ -78,7 +78,7 @@ function WritingMenu() {
 				scope="core/edit-post"
 				name="fullscreenMode"
 				label={ __( 'Fullscreen mode' ) }
-				info={ __( 'Show and hide admin UI' ) }
+				info={ __( 'Show and hide the admin user interface' ) }
 				messageActivated={ __( 'Fullscreen mode activated' ) }
 				messageDeactivated={ __( 'Fullscreen mode deactivated' ) }
 				shortcut={ displayShortcut.secondary( 'f' ) }
