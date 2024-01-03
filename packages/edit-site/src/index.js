@@ -60,13 +60,13 @@ export function initializeEditor( id, settings ) {
 		welcomeGuideStyles: true,
 		welcomeGuidePage: true,
 		welcomeGuideTemplate: true,
-		showListViewByDefault: false,
 	} );
 
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
 		keepCaretInsideBlock: false,
 		showBlockBreadcrumbs: true,
+		showListViewByDefault: false,
 	} );
 
 	dispatch( interfaceStore ).setDefaultComplementaryArea(

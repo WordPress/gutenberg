@@ -62,7 +62,6 @@ export function initializeEditor(
 		isPublishSidebarEnabled: true,
 		openPanels: [ 'post-status' ],
 		preferredStyleVariations: {},
-		showListViewByDefault: false,
 		themeStyles: true,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,
@@ -72,6 +71,7 @@ export function initializeEditor(
 		allowRightClickOverrides: true,
 		showBlockBreadcrumbs: true,
 		showIconLabels: false,
+		showListViewByDefault: false,
 	} );
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
@@ -79,7 +79,7 @@ export function initializeEditor(
 	// Check if the block list view should be open by default.
 	// If `distractionFree` mode is enabled, the block list view should not be open.
 	if (
-		select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) &&
+		select( preferencesStore ).get( 'core', 'showListViewByDefault' ) &&
 		! select( editPostStore ).isFeatureActive( 'distractionFree' )
 	) {
 		dispatch( editorStore ).setIsListViewOpened( true );

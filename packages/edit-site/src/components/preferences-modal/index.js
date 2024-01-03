@@ -54,6 +54,7 @@ export default function EditSitePreferencesModal() {
 			content: (
 				<PreferencesModalSection title={ __( 'Interface' ) }>
 					<EnableFeature
+						scope="core"
 						featureName="showListViewByDefault"
 						help={ __(
 							'Opens the block list view sidebar by default.'
