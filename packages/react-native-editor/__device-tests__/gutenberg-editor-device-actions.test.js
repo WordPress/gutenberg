@@ -28,9 +28,9 @@ describe( 'Gutenberg Editor Rotation tests', () => {
 
 		if ( isAndroid() ) {
 			// Waits until the keyboard is visible
-			await editorPage.driver.waitUntil( async function () {
-				return await editorPage.driver.isKeyboardShown();
-			} );
+			await editorPage.driver.waitUntil(
+				editorPage.driver.isKeyboardShown
+			);
 			await editorPage.dismissKeyboard();
 		}
 

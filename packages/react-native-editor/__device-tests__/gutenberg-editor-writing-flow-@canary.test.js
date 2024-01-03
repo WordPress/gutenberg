@@ -183,9 +183,7 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 
 		await editorPage.dismissBottomSheet();
 
-		await editorPage.driver.waitUntil( async function () {
-			return await editorPage.driver.isKeyboardShown();
-		} );
+		await editorPage.driver.waitUntil( editorPage.driver.isKeyboardShown );
 		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph
 		);
