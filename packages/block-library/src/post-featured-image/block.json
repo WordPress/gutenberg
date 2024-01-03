@@ -51,6 +51,9 @@
 		},
 		"customGradient": {
 			"type": "string"
+		},
+		"title": {
+			"type": "string"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
