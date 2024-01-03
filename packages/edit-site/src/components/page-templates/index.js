@@ -309,7 +309,7 @@ export default function DataviewsTemplates() {
 				data: filteredTemplates,
 				view,
 				fields,
-				textFields: [ 'title', 'author' ],
+				textFields: [ 'title' ],
 			} );
 		}
 		// Handle pagination.
