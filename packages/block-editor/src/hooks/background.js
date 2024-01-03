@@ -10,7 +10,12 @@ import { isBlobURL } from '@wordpress/blob';
 import { getBlockSupport } from '@wordpress/blocks';
 import { focus } from '@wordpress/dom';
 import {
+	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalUnitControl as UnitControl,
+	__experimentalVStack as VStack,
 	DropZone,
 	FlexItem,
 	MenuItem,
@@ -53,6 +58,17 @@ export function hasBackgroundImageValue( style ) {
 }
 
 /**
+ * Checks if there is a current value in the background size block support
+ * attributes.
+ *
+ * @param {Object} style Style attribute.
+ * @return {boolean}     Whether or not the block has a background size value set.
+ */
+export function hasBackgroundSizeValue( style ) {
+	return style?.background?.backgroundSize !== undefined;
+}
+
+/**
  * Determine whether there is block support for background.
  *
  * @param {string} blockName Block name.
@@ -72,7 +88,11 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 	}
 
 	if ( feature === 'any' ) {
-		return !! support?.backgroundImage;
+		return (
+			!! support?.backgroundImage ||
+			!! support?.backgroundSize ||
+			!! support?.backgroundRepeat
+		);
 	}
 
 	return !! support?.[ feature ];
@@ -92,6 +112,26 @@ export function resetBackgroundImage( style = {}, setAttributes ) {
 			background: {
 				...style?.background,
 				backgroundImage: undefined,
+			},
+		} ),
+	} );
+}
+
+/**
+ * Resets the background size block support attributes. This can be used when disabling
+ * the background size controls for a block via a `ToolsPanel`.
+ *
+ * @param {Object}   style         Style attribute.
+ * @param {Function} setAttributes Function to set block's attributes.
+ */
+function resetBackgroundSize( style = {}, setAttributes ) {
+	setAttributes( {
+		style: cleanEmptyObject( {
+			...style,
+			background: {
+				...style?.background,
+				backgroundRepeat: undefined,
+				backgroundSize: undefined,
 			},
 		} ),
 	} );
@@ -142,7 +182,11 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 	);
 }
 
-function BackgroundImagePanelItem( { clientId, setAttributes } ) {
+function BackgroundImagePanelItem( {
+	clientId,
+	isShownByDefault,
+	setAttributes,
+} ) {
 	const { style, mediaUpload } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getSettings } =
@@ -252,7 +296,7 @@ function BackgroundImagePanelItem( { clientId, setAttributes } ) {
 			hasValue={ () => hasValue }
 			label={ __( 'Background image' ) }
 			onDeselect={ () => resetBackgroundImage( style, setAttributes ) }
-			isShownByDefault={ true }
+			isShownByDefault={ isShownByDefault }
 			resetAllFilter={ resetAllFilter }
 			panelId={ clientId }
 		>
@@ -302,8 +346,172 @@ function BackgroundImagePanelItem( { clientId, setAttributes } ) {
 	);
 }
 
+function backgroundSizeHelpText( value ) {
+	if ( value === 'cover' || value === undefined ) {
+		return __( 'Stretch image to cover the block.' );
+	}
+	if ( value === 'contain' ) {
+		return __( 'Resize image to fit without cropping.' );
+	}
+	return __( 'Set a fixed width.' );
+}
+
+function BackgroundSizePanelItem( {
+	clientId,
+	isShownByDefault,
+	setAttributes,
+} ) {
+	const style = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
+		[ clientId ]
+	);
+
+	const sizeValue = style?.background?.backgroundSize;
+	const repeatValue = style?.background?.backgroundRepeat;
+
+	// An `undefined` value is treated as `cover` by the toggle group control.
+	// An empty string is treated as `auto` by the toggle group control. This
+	// allows a user to select "Size" and then enter a custom value, with an
+	// empty value being treated as `auto`.
+	const currentValueForToggle =
+		( sizeValue !== undefined &&
+			sizeValue !== 'cover' &&
+			sizeValue !== 'contain' ) ||
+		sizeValue === ''
+			? 'auto'
+			: sizeValue || 'cover';
+
+	// If the current value is `cover` and the repeat value is `undefined`, then
+	// the toggle should be unchecked as the default state. Otherwise, the toggle
+	// should reflect the current repeat value.
+	const repeatCheckedValue =
+		repeatValue === 'no-repeat' ||
+		( currentValueForToggle === 'cover' && repeatValue === undefined )
+			? false
+			: true;
+
+	const hasValue = hasBackgroundSizeValue( style );
+
+	const resetAllFilter = useCallback( ( previousValue ) => {
+		return {
+			...previousValue,
+			style: {
+				...previousValue.style,
+				background: {
+					...previousValue.style?.background,
+					backgroundRepeat: undefined,
+					backgroundSize: undefined,
+				},
+			},
+		};
+	}, [] );
+
+	const updateBackgroundSize = ( next ) => {
+		// When switching to 'contain' toggle the repeat off.
+		let nextRepeat = repeatValue;
+
+		if ( next === 'contain' ) {
+			nextRepeat = 'no-repeat';
+		}
+
+		if (
+			( currentValueForToggle === 'cover' ||
+				currentValueForToggle === 'contain' ) &&
+			next === 'auto'
+		) {
+			nextRepeat = undefined;
+		}
+
+		setAttributes( {
+			style: cleanEmptyObject( {
+				...style,
+				background: {
+					...style?.background,
+					backgroundRepeat: nextRepeat,
+					backgroundSize: next,
+				},
+			} ),
+		} );
+	};
+
+	const toggleIsRepeated = () => {
+		setAttributes( {
+			style: cleanEmptyObject( {
+				...style,
+				background: {
+					...style?.background,
+					backgroundRepeat:
+						repeatCheckedValue === true ? 'no-repeat' : undefined,
+				},
+			} ),
+		} );
+	};
+
+	return (
+		<VStack
+			as={ ToolsPanelItem }
+			spacing={ 2 }
+			className="single-column"
+			hasValue={ () => hasValue }
+			label={ __( 'Size' ) }
+			onDeselect={ () => resetBackgroundSize( style, setAttributes ) }
+			isShownByDefault={ isShownByDefault }
+			resetAllFilter={ resetAllFilter }
+			panelId={ clientId }
+		>
+			<ToggleGroupControl
+				__nextHasNoMarginBottom
+				size={ '__unstable-large' }
+				label={ __( 'Size' ) }
+				value={ currentValueForToggle }
+				onChange={ updateBackgroundSize }
+				isBlock={ true }
+				help={ backgroundSizeHelpText( sizeValue ) }
+			>
+				<ToggleGroupControlOption
+					key={ 'cover' }
+					value={ 'cover' }
+					label={ __( 'Cover' ) }
+				/>
+				<ToggleGroupControlOption
+					key={ 'contain' }
+					value={ 'contain' }
+					label={ __( 'Contain' ) }
+				/>
+				<ToggleGroupControlOption
+					key={ 'fixed' }
+					value={ 'auto' }
+					label={ __( 'Fixed' ) }
+				/>
+			</ToggleGroupControl>
+			{ sizeValue !== undefined &&
+			sizeValue !== 'cover' &&
+			sizeValue !== 'contain' ? (
+				<UnitControl
+					size={ '__unstable-large' }
+					onChange={ updateBackgroundSize }
+					value={ sizeValue }
+				/>
+			) : null }
+			{ currentValueForToggle !== 'cover' && (
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={ __( 'Repeat image' ) }
+					checked={ repeatCheckedValue }
+					onChange={ toggleIsRepeated }
+				/>
+			) }
+		</VStack>
+	);
+}
+
 export function BackgroundImagePanel( props ) {
-	const [ backgroundImage ] = useSettings( 'background.backgroundImage' );
+	const [ backgroundImage, backgroundSize ] = useSettings(
+		'background.backgroundImage',
+		'background.backgroundSize'
+	);
+
 	if (
 		! backgroundImage ||
 		! hasBackgroundSupport( props.name, 'backgroundImage' )
@@ -311,9 +519,27 @@ export function BackgroundImagePanel( props ) {
 		return null;
 	}
 
+	const showBackgroundSize = !! (
+		backgroundSize && hasBackgroundSupport( props.name, 'backgroundSize' )
+	);
+
+	const defaultControls = getBlockSupport( props.name, [
+		BACKGROUND_SUPPORT_KEY,
+		'__experimentalDefaultControls',
+	] );
+
 	return (
 		<InspectorControls group="background">
-			<BackgroundImagePanelItem { ...props } />
+			<BackgroundImagePanelItem
+				isShownByDefault={ defaultControls?.backgroundImage }
+				{ ...props }
+			/>
+			{ showBackgroundSize && (
+				<BackgroundSizePanelItem
+					isShownByDefault={ defaultControls?.backgroundSize }
+					{ ...props }
+				/>
+			) }
 		</InspectorControls>
 	);
 }

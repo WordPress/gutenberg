@@ -4,8 +4,14 @@
 import type { Meta, StoryFn } from '@storybook/react';
 
 /**
+ * WordPress dependencies
+ */
+import { wordpress } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
+import Icon from '../../icon';
 import Snackbar from '..';
 
 const meta: Meta< typeof Snackbar > = {
@@ -63,11 +69,7 @@ WithActions.args = {
 export const WithIcon: StoryFn< typeof Snackbar > = DefaultTemplate.bind( {} );
 WithIcon.args = {
 	children: 'Add an icon to make your snackbar stand out',
-	icon: (
-		<span role="img" aria-label="Icon" style={ { fontSize: 21 } }>
-			🌮
-		</span>
-	),
+	icon: <Icon style={ { fill: 'currentcolor' } } icon={ wordpress } />,
 };
 
 export const WithExplicitDismiss: StoryFn< typeof Snackbar > =

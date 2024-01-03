@@ -54,7 +54,6 @@ export function initializeEditor(
 	const root = createRoot( target );
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
-		allowRightClickOverrides: true,
 		editorMode: 'visual',
 		fixedToolbar: false,
 		fullscreenMode: true,
@@ -63,12 +62,16 @@ export function initializeEditor(
 		isPublishSidebarEnabled: true,
 		openPanels: [ 'post-status' ],
 		preferredStyleVariations: {},
-		showBlockBreadcrumbs: true,
-		showIconLabels: false,
 		showListViewByDefault: false,
 		themeStyles: true,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,
+	} );
+
+	dispatch( preferencesStore ).setDefaults( 'core', {
+		allowRightClickOverrides: true,
+		showBlockBreadcrumbs: true,
+		showIconLabels: false,
 	} );
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();

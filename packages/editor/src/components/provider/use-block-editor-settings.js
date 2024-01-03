@@ -9,6 +9,7 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -28,7 +29,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableGalleryWithImageBlocks',
 	'alignWide',
 	'allowedBlockTypes',
-	'allowRightClickOverrides',
 	'blockInspectorTabs',
 	'allowedMimeTypes',
 	'bodyPlaceholder',
@@ -59,7 +59,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'imageEditing',
 	'imageSizes',
 	'isRTL',
-	'keepCaretInsideBlock',
 	'locale',
 	'maxWidth',
 	'onUpdateDefaultBlockStyles',
@@ -76,6 +75,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableIsBlockBasedTheme',
 	'__experimentalArchiveTitleTypeLabel',
 	'__experimentalArchiveTitleNameLabel',
+	'__experimentalGetPostLinkProps',
 ];
 
 /**
@@ -89,6 +89,8 @@ const BLOCK_EDITOR_SETTINGS = [
  */
 function useBlockEditorSettings( settings, postType, postId ) {
 	const {
+		allowRightClickOverrides,
+		keepCaretInsideBlock,
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
@@ -98,6 +100,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		userPatternCategories,
 		restBlockPatterns,
 		restBlockPatternCategories,
+		getPostLinkProps,
 	} = useSelect(
 		( select ) => {
 			const isWeb = Platform.OS === 'web';
@@ -110,17 +113,25 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				getBlockPatterns,
 				getBlockPatternCategories,
 			} = select( coreStore );
+			const { getPostLinkProps: postLinkProps } =
+				select( editorStore ).getEditorSettings();
+			const { get } = select( preferencesStore );
 
 			const siteSettings = canUser( 'read', 'settings' )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
 
 			return {
+				allowRightClickOverrides: get(
+					'core',
+					'allowRightClickOverrides'
+				),
 				canUseUnfilteredHTML: getRawEntityRecord(
 					'postType',
 					postType,
 					postId
 				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
+				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				reusableBlocks: isWeb
 					? getEntityRecords( 'postType', 'wp_block', {
 							per_page: -1,
@@ -133,6 +144,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				userPatternCategories: getUserPatternCategories(),
 				restBlockPatterns: getBlockPatterns(),
 				restBlockPatternCategories: getBlockPatternCategories(),
+				getPostLinkProps: postLinkProps,
 			};
 		},
 		[ postType, postId ]
@@ -209,6 +221,8 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					BLOCK_EDITOR_SETTINGS.includes( key )
 				)
 			),
+			allowRightClickOverrides,
+			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
@@ -239,8 +253,11 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					? [ [ 'core/navigation', {}, [] ] ]
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
+			__experimentalGetPostLinkProps: getPostLinkProps,
 		} ),
 		[
+			allowRightClickOverrides,
+			keepCaretInsideBlock,
 			settings,
 			hasUploadPermissions,
 			reusableBlocks,
@@ -255,6 +272,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			pageForPosts,
 			postType,
 			setIsInserterOpened,
+			getPostLinkProps,
 		]
 	);
 }

@@ -180,9 +180,9 @@ const { state, actions } = store( 'core/navigation', {
 		focusFirstElement() {
 			const { ref } = getElement();
 			if ( state.isMenuOpen ) {
-				ref.querySelector(
-					'.wp-block-navigation-item > *:first-child'
-				).focus();
+				const focusableElements =
+					ref.querySelectorAll( focusableSelectors );
+				focusableElements?.[ 0 ]?.focus();
 			}
 		},
 	},

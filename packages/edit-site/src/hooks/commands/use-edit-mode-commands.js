@@ -217,6 +217,7 @@ function useEditUICommands() {
 		isListViewOpen,
 		isDistractionFree,
 	} = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
 		const { getEditorMode } = select( editSiteStore );
 		const { isListViewOpened } = select( editorStore );
 		return {
@@ -225,15 +226,9 @@ function useEditUICommands() {
 			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
 				editSiteStore.name
 			),
-			showBlockBreadcrumbs: select( preferencesStore ).get(
-				'core/edit-site',
-				'showBlockBreadcrumbs'
-			),
+			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			isListViewOpen: isListViewOpened(),
-			isDistractionFree: select( preferencesStore ).get(
-				editSiteStore.name,
-				'distractionFree'
-			),
+			isDistractionFree: get( editSiteStore.name, 'distractionFree' ),
 		};
 	}, [] );
 	const { openModal } = useDispatch( interfaceStore );
@@ -339,7 +334,7 @@ function useEditUICommands() {
 			? __( 'Hide block breadcrumbs' )
 			: __( 'Show block breadcrumbs' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-site', 'showBlockBreadcrumbs' );
+			toggle( 'core', 'showBlockBreadcrumbs' );
 			close();
 			createInfoNotice(
 				showBlockBreadcrumbs

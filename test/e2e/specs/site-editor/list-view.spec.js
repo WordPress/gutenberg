@@ -118,6 +118,7 @@ test.describe( 'Site Editor List View', () => {
 		// out of range of the sidebar region. Must shift+tab 1 time to reach
 		// close button before list view area.
 		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect(
 			page
 				.getByRole( 'region', { name: 'List View' } )
