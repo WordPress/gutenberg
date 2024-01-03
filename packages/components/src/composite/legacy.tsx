@@ -11,7 +11,13 @@
 /**
  * WordPress dependencies
  */
-import { forwardRef, useMemo, useRef, useState } from '@wordpress/element';
+import {
+	forwardRef,
+	useId as useGeneratedId,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -96,13 +102,9 @@ const idMap = new Map< string, React.MutableRefObject< number > >();
 function useBaseId(
 	initialState: Pick< Partial< IdState >, 'baseId' > = {}
 ): IdState {
+	const defaultId = useGeneratedId();
 	const { baseId: initialBaseId } = initialState;
-	const [ baseId, setBaseId ] = useState(
-		() =>
-			initialBaseId ||
-			// eslint-disable-next-line no-restricted-syntax
-			`id-${ Math.random().toString( 32 ).substring( 2, 8 ) }`
-	);
+	const [ baseId, setBaseId ] = useState( initialBaseId || defaultId );
 	idMap.set( baseId, useRef( 0 ) );
 	return { baseId, setBaseId };
 }
