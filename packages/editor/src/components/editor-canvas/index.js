@@ -91,6 +91,7 @@ function EditorCanvas( {
 		wrapperBlockName,
 		wrapperUniqueId,
 		deviceType,
+		hasHistory,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -127,7 +128,7 @@ function EditorCanvas( {
 
 		return {
 			renderingMode: _renderingMode,
-			postContentAttributes: getEditorSettings().postContentAttributes,
+			postContentAttributes: editorSettings.postContentAttributes,
 			// Post template fetch returns a 404 on classic themes, which
 			// messes with e2e tests, so check it's a block theme first.
 			editedPostTemplate:
@@ -137,6 +138,7 @@ function EditorCanvas( {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
+			hasHistory: !! editorSettings.goBack,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -299,6 +301,9 @@ function EditorCanvas( {
 			styles={ styles }
 			height="100%"
 			iframeProps={ {
+				className: classnames( 'editor-canvas__iframe', {
+					'has-history': hasHistory,
+				} ),
 				...iframeProps,
 				style: {
 					...iframeProps?.style,

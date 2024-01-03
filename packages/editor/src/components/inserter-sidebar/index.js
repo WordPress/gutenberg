@@ -11,21 +11,18 @@ import {
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef } from '@wordpress/element';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { store as editorStore } from '../../store';
 
-export default function InserterSidebar() {
-	const { insertionPoint, showMostUsedBlocks } = useSelect( ( select ) => {
-		const { isFeatureActive } = select( editPostStore );
+export default function InserterSidebar( { showMostUsedBlocks } ) {
+	const { insertionPoint } = useSelect( ( select ) => {
 		const { getInsertionPoint } = unlock( select( editorStore ) );
 		return {
 			insertionPoint: getInsertionPoint(),
-			showMostUsedBlocks: isFeatureActive( 'mostUsedBlocks' ),
 		};
 	}, [] );
 	const { setIsInserterOpened } = useDispatch( editorStore );
@@ -46,16 +43,16 @@ export default function InserterSidebar() {
 		<div
 			ref={ inserterDialogRef }
 			{ ...inserterDialogProps }
-			className="edit-post-editor__inserter-panel"
+			className="editor-inserter-sidebar"
 		>
-			<TagName className="edit-post-editor__inserter-panel-header">
+			<TagName className="editor-inserter-sidebar__header">
 				<Button
 					icon={ close }
 					label={ __( 'Close block inserter' ) }
 					onClick={ () => setIsInserterOpened( false ) }
 				/>
 			</TagName>
-			<div className="edit-post-editor__inserter-panel-content">
+			<div className="editor-inserter-sidebar__content">
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }
 					showInserterHelpPanel

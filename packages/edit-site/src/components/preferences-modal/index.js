@@ -68,6 +68,7 @@ export default function EditSitePreferencesModal() {
 						label={ __( 'Display block breadcrumbs' ) }
 					/>
 					<EnableFeature
+						scope="core"
 						featureName="allowRightClickOverrides"
 						help={ __(
 							'Allows contextual list view menus via right-click, overriding browser defaults.'
@@ -125,6 +126,7 @@ export default function EditSitePreferencesModal() {
 						) }
 					>
 						<EnableFeature
+							namespace="core"
 							featureName="keepCaretInsideBlock"
 							help={ __(
 								'Keeps the text cursor within the block boundaries, aiding users with screen readers by preventing unintentional cursor movement outside the block.'
@@ -134,6 +136,7 @@ export default function EditSitePreferencesModal() {
 					</PreferencesModalSection>
 					<PreferencesModalSection title={ __( 'Interface' ) }>
 						<EnableFeature
+							namespace="core"
 							featureName="showIconLabels"
 							label={ __( 'Show button text labels' ) }
 							help={ __(
