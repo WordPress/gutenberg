@@ -86,7 +86,13 @@ $header-toolbar-min-width: 335px;
 .edit-site-header-edit-mode__actions {
 	display: inline-flex;
 	align-items: center;
-	padding-right: $grid-unit-10;
+	flex-wrap: nowrap;
+	padding-right: $grid-unit-05;
+
+	@include break-small () {
+		padding-right: $grid-unit-10;
+	}
+
 	gap: $grid-unit-10;
 }
 
