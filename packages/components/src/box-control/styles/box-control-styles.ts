@@ -36,5 +36,5 @@ export const FlexedBoxControlIcon = styled( BoxControlIcon )`
 
 export const FlexedRangeControl = styled( RangeControl )`
 	width: 100%;
-	margin-right: ${ space( 2 ) };
+	margin-inline-end: ${ space( 2 ) };
 `;
