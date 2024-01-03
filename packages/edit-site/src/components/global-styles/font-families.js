@@ -63,7 +63,7 @@ function FontFamilies() {
 				) : (
 					<>
 						{ __(
-							'Fonts are empty! Add some fonts and apply them to your site'
+							'No fonts installed.'
 						) }
 					</>
 				) }
