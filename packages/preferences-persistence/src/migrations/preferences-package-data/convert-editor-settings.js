@@ -7,6 +7,7 @@ export default function convertEditorSettings( data ) {
 	const settingsToMoveToCore = [
 		'allowRightClickOverrides',
 		'keepCaretInsideBlock',
+		'showIconLabels',
 	];
 
 	settingsToMoveToCore.forEach( ( setting ) => {
@@ -21,7 +22,7 @@ export default function convertEditorSettings( data ) {
 			delete newData[ 'core/edit-post' ][ setting ];
 		}
 
-		if ( data?.[ 'core/edit-post' ]?.[ setting ] !== undefined ) {
+		if ( data?.[ 'core/edit-site' ]?.[ setting ] !== undefined ) {
 			delete newData[ 'core/edit-site' ][ setting ];
 		}
 	} );
