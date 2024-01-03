@@ -3,7 +3,7 @@
  * WP_Theme_Export class
  *
  * @package   WordPress
- * @since	  6.5.0
+ * @since     6.5.0
  */
 
 if ( class_exists( 'WP_Theme_Export' ) ) {
@@ -13,7 +13,7 @@ if ( class_exists( 'WP_Theme_Export' ) ) {
 /**
  * Core class used to generate a theme export file.
  *
- * @since	  6.5.0
+ * @since     6.5.0
  */
 class WP_Theme_Export {
 	public function __construct() {

@@ -42,4 +42,4 @@ class Gutenberg_REST_Edit_Site_Export_Controller_6_5 extends WP_REST_Edit_Site_E
 		unlink( $filename );
 		exit;
 	}
-} 
+}
