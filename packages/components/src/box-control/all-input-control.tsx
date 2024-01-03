@@ -6,10 +6,10 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import type { UnitControlProps } from '../unit-control/types';
-import { FlexedRangeControl } from './styles/box-control-styles';
+import { FlexedRangeControl, UnitControl } from './styles/box-control-styles';
 import { HStack } from '../h-stack';
 import type { BoxControlInputControlProps } from './types';
-import UnitControl from './unit-control';
+import { parseQuantityAndUnitFromRawValue } from '../unit-control';
 import {
 	LABELS,
 	applyValueToSides,
@@ -18,7 +18,6 @@ import {
 	isValuesDefined,
 	CUSTOM_VALUE_SETTINGS,
 } from './utils';
-import { parseQuantityAndUnitFromRawValue } from '../unit-control';
 
 const noop = () => {};
 
@@ -76,13 +75,17 @@ export default function AllInputControl( {
 		<HStack>
 			<UnitControl
 				{ ...props }
+				className="component-box-control__unit-control"
 				disableUnits={ isMixed }
 				id={ inputId }
+				isPressEnterToChange
 				value={ allValue }
 				onChange={ unitControlOnChange }
 				onUnitChange={ handleOnUnitChange }
 				onFocus={ handleOnFocus }
 				placeholder={ allPlaceholder }
+				label={ LABELS.all }
+				hideLabelFromVision
 			/>
 
 			<FlexedRangeControl

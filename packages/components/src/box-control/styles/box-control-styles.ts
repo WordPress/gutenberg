@@ -9,10 +9,10 @@ import BoxControlIcon from '../icon';
 import Button from '../../button';
 import { HStack } from '../../h-stack';
 import RangeControl from '../../range-control';
+import BaseUnitControl from '../../unit-control';
 import { space } from '../../utils/space';
 
-export const UnitControlWrapper = styled.div`
-	box-sizing: border-box;
+export const UnitControl = styled( BaseUnitControl )`
 	max-width: 90px;
 `;
 

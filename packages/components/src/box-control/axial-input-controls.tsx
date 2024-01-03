@@ -6,12 +6,13 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
-import UnitControl from './unit-control';
+import Tooltip from '../tooltip';
 import { CUSTOM_VALUE_SETTINGS, LABELS } from './utils';
 import {
 	FlexedBoxControlIcon,
 	FlexedRangeControl,
 	InputWrapper,
+	UnitControl,
 } from './styles/box-control-styles';
 import type { BoxControlInputControlProps } from './types';
 
@@ -101,21 +102,28 @@ export default function AxialInputControls( {
 				return (
 					<InputWrapper key={ side }>
 						<FlexedBoxControlIcon side={ side } sides={ sides } />
-						<UnitControl
-							{ ...props }
-							id={ inputId }
-							value={ [
-								parsedQuantity,
-								selectedUnit ?? parsedUnit,
-							].join( '' ) }
-							onChange={ ( newValue ) =>
-								handleOnValueChange( side, newValue )
-							}
-							onUnitChange={ createHandleOnUnitChange( side ) }
-							onFocus={ createHandleOnFocus( side ) }
-							label={ LABELS[ side ] }
-							key={ side }
-						/>
+						<Tooltip placement="top-end" text={ LABELS[ side ] }>
+							<UnitControl
+								{ ...props }
+								className="component-box-control__unit-control"
+								id={ inputId }
+								isPressEnterToChange
+								value={ [
+									parsedQuantity,
+									selectedUnit ?? parsedUnit,
+								].join( '' ) }
+								onChange={ ( newValue ) =>
+									handleOnValueChange( side, newValue )
+								}
+								onUnitChange={ createHandleOnUnitChange(
+									side
+								) }
+								onFocus={ createHandleOnFocus( side ) }
+								label={ LABELS[ side ] }
+								hideLabelFromVision
+								key={ side }
+							/>
+						</Tooltip>
 						<FlexedRangeControl
 							__nextHasNoMarginBottom
 							aria-controls={ inputId }
