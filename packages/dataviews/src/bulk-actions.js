@@ -80,14 +80,10 @@ function ActionsMenuGroup( {
 	onMenuOpenChange,
 	setActionWithModal,
 } ) {
-	const bulkActions = actions.filter( ( action ) => action.supportsBulk );
-	if ( bulkActions.length === 0 ) {
-		return null;
-	}
 	return (
 		<>
 			<DropdownMenuGroup>
-				{ bulkActions.map( ( action ) => (
+				{ actions.map( ( action ) => (
 					<BulkActionItem
 						key={ action.id }
 						action={ action }
@@ -109,6 +105,10 @@ export default function BulkActions( {
 	onSelectionChange,
 	getItemId,
 } ) {
+	const bulkActions = useMemo(
+		() => actions.filter( ( action ) => action.supportsBulk ),
+		[ actions ]
+	);
 	const areAllSelected = selection && selection.length === data.length;
 	const [ isMenuOpen, onMenuOpenChange ] = useState( false );
 	const [ actionWithModal, setActionWithModal ] = useState();
@@ -117,6 +117,9 @@ export default function BulkActions( {
 			selection.includes( getItemId( item ) )
 		);
 	}, [ selection, data, getItemId ] );
+	if ( bulkActions.length === 0 ) {
+		return null;
+	}
 	return (
 		<>
 			<DropdownMenu
@@ -140,7 +143,7 @@ export default function BulkActions( {
 				}
 			>
 				<ActionsMenuGroup
-					actions={ actions }
+					actions={ bulkActions }
 					data={ data }
 					selection={ selection }
 					getItemId={ getItemId }

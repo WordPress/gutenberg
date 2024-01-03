@@ -23,6 +23,7 @@ import {
 	useId,
 	useRef,
 	useState,
+	useMemo,
 } from '@wordpress/element';
 
 /**
@@ -391,6 +392,9 @@ function ViewTable( {
 	onSelectionChange,
 	labels,
 } ) {
+	const hasBulkActions = useMemo( () => {
+		return actions?.some( ( action ) => action.supportsBulk );
+	}, [ actions ] );
 	const headerMenuRefs = useRef( new Map() );
 	const headerMenuToFocusRef = useRef();
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] = useState();
@@ -440,7 +444,7 @@ function ViewTable( {
 			>
 				<thead>
 					<tr>
-						{ !! selection && (
+						{ !! selection && hasBulkActions && (
 							<th
 								style={ {
 									width: 20,
@@ -510,7 +514,7 @@ function ViewTable( {
 				</thead>
 				<tbody>
 					{ hasData &&
-						usedData.map( ( item ) => (
+						usedData.map( ( item, index ) => (
 							<tr key={ getItemId( item ) }>
 								{ !! selection && hasBulkActions && (
 									<td
