@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -14,7 +19,11 @@ import { getCSSRules, compileCSS } from '@wordpress/style-engine';
 /**
  * Internal dependencies
  */
-import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
+import {
+	BACKGROUND_SUPPORT_KEY,
+	BackgroundImagePanel,
+	getBackgroundImageClasses,
+} from './background';
 import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import {
@@ -444,7 +453,12 @@ function useBlockProps( { name, style } ) {
 	useStyleOverride( { css: styles } );
 
 	return addSaveProps(
-		{ className: blockElementsContainerIdentifier },
+		{
+			className: classnames(
+				blockElementsContainerIdentifier,
+				getBackgroundImageClasses( style )
+			),
+		},
 		name,
 		{ style },
 		skipSerializationPathsEdit
