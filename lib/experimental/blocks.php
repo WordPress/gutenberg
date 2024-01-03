@@ -94,7 +94,7 @@ if ( $gutenberg_experiments && (
 	$block_bindings_allowed_blocks = array(
 		'core/paragraph' => array( 'content' ),
 		'core/heading'   => array( 'content' ),
-		'core/image'     => array( 'url', 'title' ),
+		'core/image'     => array( 'url', 'title', 'alt' ),
 		'core/button'    => array( 'url', 'text' ),
 	);
 	if ( ! function_exists( 'process_block_bindings' ) ) {
