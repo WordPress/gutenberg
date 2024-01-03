@@ -154,6 +154,7 @@ export function SidebarComplementaryAreaFills() {
 				isEditorOpen && isEditorSidebarOpened ? sidebarName : null
 			}
 			onSelect={ onTabSelect }
+			selectOnMove={ false }
 		>
 			<FillContents
 				sidebarName={ sidebarName }
