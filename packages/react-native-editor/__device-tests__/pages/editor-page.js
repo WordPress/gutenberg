@@ -221,7 +221,12 @@ class EditorPage {
 		return elements[ 0 ];
 	}
 
-	async getEmptyTitleElement() {
+	async getEmptyTitleTextInputElement() {
+		const titleWrapperElement = await this.getTitleElement( {
+			isEmpty: true,
+		} );
+		await titleWrapperElement.click();
+
 		const titleElement = isAndroid()
 			? '//android.widget.EditText[@content-desc="Post title. Empty"]'
 			: '~Add title';

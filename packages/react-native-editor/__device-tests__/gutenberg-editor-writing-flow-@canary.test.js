@@ -14,14 +14,8 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 	it( 'should be able to write a post title', async () => {
 		await editorPage.initializeEditor( { initialTitle: '' } );
 
-		const titleElement = await editorPage.getTitleElement( {
-			isEmpty: true,
-		} );
-		await titleElement.click();
-
+		const titleInput = await editorPage.getEmptyTitleTextInputElement();
 		expect( await editorPage.driver.isKeyboardShown() ).toBe( true );
-
-		const titleInput = await editorPage.getEmptyTitleElement();
 		await editorPage.typeTextToTextBlock( titleInput, testData.shortText );
 
 		// Trigger the return key to go to the first Paragraph
