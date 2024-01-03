@@ -176,8 +176,7 @@ const { state, actions, callbacks } = store( 'core/navigation', {
 				ctx.lastFocusableElement =
 					focusableElements[ focusableElements.length - 1 ];
 			}
-			window.addEventListener(
-				'resize',
+			window.addEventListener( 'resize', () =>
 				callbacks.isNavCollapsed( ref )
 			);
 		},
@@ -192,14 +191,17 @@ const { state, actions, callbacks } = store( 'core/navigation', {
 		},
 
 		isNavCollapsed( ref ) {
-			//test if the nav items are wrapping before testing if the actual nav is wrapping inside its parent to avoid the recursive function if possible
+			// remove the is-mobile class to avoid false positives.
+			ref.closest( 'nav' ).classList.remove( 'is-mobile' );
+
+			// test if the nav items are wrapping before testing if the actual nav is wrapping inside its parent to avoid the recursive function if possible
 			if (
 				areItemsWrapping( ref ) === true ||
 				isNavWrapping( ref ) === true
 			) {
-				//console.log( 'is mobile' );
+				ref.closest( 'nav' ).classList.add( 'is-mobile' );
 			} else {
-				//console.log( 'is not mobile' );
+				ref.closest( 'nav' ).classList.remove( 'is-mobile' );
 			}
 		},
 	},
@@ -235,19 +237,26 @@ function isNavWrapping( ref ) {
 	let isWrapping = false;
 	//how can we check if the nav element is wrapped inside its parent if we don't know anything about it (the parent)?
 	//for debugging purposes
-	const container = getFlexParent( ref );
+	const container = ref.closest( 'nav' ); //getFlexParent( ref );
 	if ( container !== null ) {
-		isWrapping = areItemsWrapping(
-			container,
-			Array.from(
-				container.querySelector( 'ul.wp-block-navigation' ).children
-			)
+		const childrenWrapper = container.querySelector(
+			'ul.wp-block-navigation'
 		);
+		isWrapping =
+			childrenWrapper &&
+			childrenWrapper.children &&
+			areItemsWrapping(
+				container,
+				Array.from(
+					container.querySelector( 'ul.wp-block-navigation' ).children
+				)
+			);
 	}
 
 	return isWrapping;
 }
 
+/* I'm not sure we still need this - can we just get the nearest nav element?
 function getFlexParent( elem ) {
 	if ( elem === document.body ) {
 		// Base case: Stop recursion once we go all the way to the body to avoid infinite recursion
@@ -261,7 +270,7 @@ function getFlexParent( elem ) {
 		return parent;
 	}
 	return getFlexParent( parent );
-}
+}*/
 
 function getItemWidths( items ) {
 	const itemsWidths = [];

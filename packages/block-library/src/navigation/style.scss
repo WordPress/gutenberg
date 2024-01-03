@@ -475,6 +475,17 @@ button.wp-block-navigation-item__content {
 	right: 0;
 	bottom: 0;
 
+	&:not(.hidden-by-default):not(.is-menu-open):not(.is-mobile) {
+		display: block;
+		position: static;
+	}
+
+	.is-mobile &:not(.hidden-by-default):not(.is-menu-open) {
+		display: none;
+		position: fixed;
+	}
+
+
 	// Low specificity so that themes can override.
 	& :where(.wp-block-navigation-item a) {
 		color: inherit;
@@ -611,7 +622,7 @@ button.wp-block-navigation-item__content {
 		}
 	}
 
-	@include break-small() {
+	/*@include break-small() {
 		&:not(.hidden-by-default) {
 			&:not(.is-menu-open) {
 				display: block;
@@ -632,7 +643,7 @@ button.wp-block-navigation-item__content {
 				left: 0;
 			}
 		}
-	}
+	}*/
 }
 
 // Default menu background and font color.
@@ -690,6 +701,10 @@ button.wp-block-navigation-item__content {
 		@include break-small {
 			display: none;
 		}
+	}
+
+	.is-mobile & {
+		display: block !important;
 	}
 }
 
