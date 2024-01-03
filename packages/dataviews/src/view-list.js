@@ -22,6 +22,7 @@ export default function ViewList( {
 	data,
 	getItemId,
 	onSelectionChange,
+	onDetailsChange,
 	selection,
 	deferredRendering,
 } ) {
@@ -93,9 +94,7 @@ export default function ViewList( {
 									</VStack>
 								</HStack>
 								<Button
-									onClick={ () => {
-										/* TODO */
-									} }
+									onClick={ onDetailsChange }
 									icon={
 										isRTL() ? chevronLeft : chevronRight
 									}

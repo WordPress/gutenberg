@@ -39,6 +39,7 @@ import {
 	useEditPostAction,
 } from '../actions';
 import PostPreview from '../post-preview';
+import ItemDetails from './item-details';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -131,12 +132,17 @@ export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
 	const [ pageId, setPageId ] = useState( null );
+	const [ isDetailsOpen, setIsDetailsOpen ] = useState( false );
 	const history = useHistory();
 
 	const onSelectionChange = useCallback(
 		( items ) => setPageId( items?.length === 1 ? items[ 0 ].id : null ),
 		[ setPageId ]
 	);
+
+	const onDetailsChange = useCallback( () => {
+		setIsDetailsOpen( ! isDetailsOpen );
+	}, [ setIsDetailsOpen, isDetailsOpen ] );
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -319,28 +325,38 @@ export default function PagePages() {
 		[ view.type, setView ]
 	);
 
+	const pageRecord = pages?.find( ( page ) => page.id === pageId );
+	const showDetails =
+		view.type === LAYOUT_LIST && isDetailsOpen && pageRecord;
+
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
 		<>
-			<Page
-				className={
-					view.type === LAYOUT_LIST
-						? 'edit-site-page-pages-list-view'
-						: null
-				}
-				title={ __( 'Pages' ) }
-			>
-				<DataViews
-					paginationInfo={ paginationInfo }
-					fields={ fields }
-					actions={ actions }
-					data={ pages || EMPTY_ARRAY }
-					isLoading={ isLoadingPages || isLoadingAuthors }
-					view={ view }
-					onChangeView={ onChangeView }
-					onSelectionChange={ onSelectionChange }
-				/>
-			</Page>
+			{ showDetails && (
+				<ItemDetails item={ pageRecord } onClose={ onDetailsChange } />
+			) }
+			{ ! showDetails && (
+				<Page
+					className={
+						view.type === LAYOUT_LIST
+							? 'edit-site-page-pages-list-view'
+							: null
+					}
+					title={ __( 'Pages' ) }
+				>
+					<DataViews
+						paginationInfo={ paginationInfo }
+						fields={ fields }
+						actions={ actions }
+						data={ pages || EMPTY_ARRAY }
+						isLoading={ isLoadingPages || isLoadingAuthors }
+						view={ view }
+						onChangeView={ onChangeView }
+						onSelectionChange={ onSelectionChange }
+						onDetailsChange={ onDetailsChange }
+					/>
+				</Page>
+			) }
 			{ view.type === LAYOUT_LIST && (
 				<Page>
 					<div
