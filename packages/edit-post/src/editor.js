@@ -23,11 +23,22 @@ import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
+import usePostHistory from './hooks/use-post-history';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
-function Editor( { postId, postType, settings, initialEdits, ...props } ) {
+function Editor( {
+	postId: initialPostId,
+	postType: initialPostType,
+	settings,
+	initialEdits,
+	...props
+} ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const { currentPost, getPostLinkProps, goBack } = usePostHistory(
+		initialPostId,
+		initialPostType
+	);
 
 	const {
 		hasFixedToolbar,
@@ -52,22 +63,31 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			const { getEditorSettings } = select( editorStore );
 			const { getBlockTypes } = select( blocksStore );
 			const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
-				postType
+				currentPost.postType
 			);
 			// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
 			// to avoid the special case.
 			let postObject;
 			if ( isTemplate ) {
-				const posts = getEntityRecords( 'postType', postType, {
-					wp_id: postId,
-				} );
+				const posts = getEntityRecords(
+					'postType',
+					currentPost.postType,
+					{
+						wp_id: currentPost.postId,
+					}
+				);
 				postObject = posts?.[ 0 ];
 			} else {
-				postObject = getEntityRecord( 'postType', postType, postId );
+				postObject = getEntityRecord(
+					'postType',
+					currentPost.postType,
+					currentPost.postId
+				);
 			}
 			const supportsTemplateMode =
 				getEditorSettings().supportsTemplateMode;
-			const isViewable = getPostType( postType )?.viewable ?? false;
+			const isViewable =
+				getPostType( currentPost.postType )?.viewable ?? false;
 			const canEditTemplate = canUser( 'create', 'templates' );
 			return {
 				hasFixedToolbar:
@@ -89,7 +109,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 				post: postObject,
 			};
 		},
-		[ postType, postId, isLargeViewport ]
+		[ currentPost.postType, currentPost.postId, isLargeViewport ]
 	);
 
 	const { updatePreferredStyleVariations } = useDispatch( editPostStore );
@@ -97,6 +117,8 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 	const editorSettings = useMemo( () => {
 		const result = {
 			...settings,
+			getPostLinkProps,
+			goBack,
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -134,11 +156,13 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 		hasInlineToolbar,
 		focusMode,
 		isDistractionFree,
+		keepCaretInsideBlock,
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,
 		updatePreferredStyleVariations,
-		keepCaretInsideBlock,
+		getPostLinkProps,
+		goBack,
 	] );
 
 	if ( ! post ) {
@@ -157,7 +181,7 @@ function Editor( { postId, postType, settings, initialEdits, ...props } ) {
 			>
 				<ErrorBoundary>
 					<CommandMenu />
-					<EditorInitialization postId={ postId } />
+					<EditorInitialization postId={ currentPost.postId } />
 					<Layout />
 				</ErrorBoundary>
 				<PostLockedModal />

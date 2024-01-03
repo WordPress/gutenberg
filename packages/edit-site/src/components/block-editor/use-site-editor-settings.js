@@ -13,6 +13,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { usePostLinkProps } from './use-post-link-props';
 
 const { useBlockEditorSettings } = unlock( editorPrivateApis );
 
@@ -90,6 +91,7 @@ function useArchiveLabel( templateSlug ) {
 
 export function useSpecificEditorSettings() {
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const getPostLinkProps = usePostLinkProps();
 	const {
 		templateSlug,
 		focusMode,
@@ -152,21 +154,22 @@ export function useSpecificEditorSettings() {
 			hasFixedToolbar,
 			keepCaretInsideBlock,
 			defaultRenderingMode,
-
+			getPostLinkProps,
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
 		};
 	}, [
 		settings,
+		canvasMode,
 		focusMode,
 		isDistractionFree,
 		hasFixedToolbar,
 		keepCaretInsideBlock,
-		canvasMode,
+		defaultRenderingMode,
+		getPostLinkProps,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
-		defaultRenderingMode,
 	] );
 
 	return defaultEditorSettings;

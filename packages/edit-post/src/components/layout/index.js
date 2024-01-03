@@ -162,6 +162,7 @@ function Layout() {
 		showMetaBoxes,
 		showMostUsedBlocks,
 		documentLabel,
+		hasHistory,
 	} = useSelect( ( select ) => {
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
 		const editorSettings = getEditorSettings();
@@ -201,6 +202,7 @@ function Layout() {
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 			hasBlockSelected:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
+			hasHistory: !! getEditorSettings().goBack,
 		};
 	}, [] );
 
@@ -290,7 +292,7 @@ function Layout() {
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
-			<BrowserURL />
+			<BrowserURL hasHistory={ hasHistory } />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
