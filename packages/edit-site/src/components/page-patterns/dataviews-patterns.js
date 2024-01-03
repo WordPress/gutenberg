@@ -10,12 +10,22 @@ import {
 } from '@wordpress/components';
 import { getQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo, useCallback, useId } from '@wordpress/element';
+import {
+	useState,
+	useMemo,
+	useCallback,
+	useId,
+	useEffect,
+} from '@wordpress/element';
 import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { DataViews } from '@wordpress/dataviews';
+import {
+	DataViews,
+	sortByTextFields,
+	getPaginationResults,
+} from '@wordpress/dataviews';
 import {
 	Icon,
 	header,
@@ -24,6 +34,7 @@ import {
 	symbol,
 	lockSmall,
 } from '@wordpress/icons';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -192,6 +203,7 @@ export default function DataviewsPatterns() {
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 	const isUncategorizedThemePatterns =
 		type === PATTERN_TYPES.theme && categoryId === 'uncategorized';
+	const previousCategoryId = usePrevious( categoryId );
 	const { patterns, isResolving } = usePatterns(
 		type,
 		isUncategorizedThemePatterns ? '' : categoryId,
@@ -229,7 +241,12 @@ export default function DataviewsPatterns() {
 		],
 		[ view.type, categoryId ]
 	);
-
+	// Reset the page number when the category changes.
+	useEffect( () => {
+		if ( previousCategoryId !== categoryId ) {
+			setView( DEFAULT_VIEW );
+		}
+	}, [ categoryId, previousCategoryId ] );
 	const { data, paginationInfo } = useMemo( () => {
 		if ( ! patterns ) {
 			return {
@@ -240,32 +257,18 @@ export default function DataviewsPatterns() {
 		let filteredData = [ ...patterns ];
 		// Handle sorting.
 		if ( view.sort ) {
-			const stringSortingFields = [ 'title' ];
-			const fieldId = view.sort.field;
-			if ( stringSortingFields.includes( fieldId ) ) {
-				const fieldToSort = fields.find( ( field ) => {
-					return field.id === fieldId;
-				} );
-				filteredData.sort( ( a, b ) => {
-					const valueA = fieldToSort.getValue( { item: a } ) ?? '';
-					const valueB = fieldToSort.getValue( { item: b } ) ?? '';
-					return view.sort.direction === 'asc'
-						? valueA.localeCompare( valueB )
-						: valueB.localeCompare( valueA );
-				} );
-			}
+			filteredData = sortByTextFields( {
+				data: filteredData,
+				view,
+				fields,
+				textFields: [ 'title', 'author' ],
+			} );
 		}
 		// Handle pagination.
-		const start = ( view.page - 1 ) * view.perPage;
-		const totalItems = filteredData?.length || 0;
-		filteredData = filteredData?.slice( start, start + view.perPage );
-		return {
+		return getPaginationResults( {
 			data: filteredData,
-			paginationInfo: {
-				totalItems,
-				totalPages: Math.ceil( totalItems / view.perPage ),
-			},
-		};
+			view,
+		} );
 	}, [ patterns, view, fields ] );
 
 	const actions = useMemo(

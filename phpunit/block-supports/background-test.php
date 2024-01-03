@@ -137,6 +137,23 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'expected_wrapper'    => '<div style="background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
+			'background image style with contain, position, and repeat is applied' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-rules-are-output',
+				'background_settings' => array(
+					'backgroundImage' => true,
+				),
+				'background_style'    => array(
+					'backgroundImage'  => array(
+						'url'    => 'https://example.com/image.jpg',
+						'source' => 'file',
+					),
+					'backgroundRepeat' => 'no-repeat',
+					'backgroundSize'   => 'contain',
+				),
+				'expected_wrapper'    => '<div style="background-image:url(&#039;https://example.com/image.jpg&#039;);background-position:center;background-repeat:no-repeat;background-size:contain;">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
 			'background image style is appended if a style attribute already exists' => array(
 				'theme_name'          => 'block-theme-child-with-fluid-typography',
 				'block_name'          => 'test/background-rules-are-output',

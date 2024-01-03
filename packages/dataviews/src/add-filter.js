@@ -120,7 +120,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 													name={ `add-filter-${ filter.field }` }
 													value={ element.value }
 													checked={ isActive }
-													onClick={ () => {
+													onChange={ ( e ) => {
 														onChangeView( {
 															...view,
 															page: 1,
@@ -132,7 +132,9 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 																		activeOperator,
 																	value: isActive
 																		? undefined
-																		: element.value,
+																		: e
+																				.target
+																				.value,
 																},
 															],
 														} );
