@@ -13,8 +13,10 @@ import {
 	Children,
 	Fragment,
 	forwardRef,
+	useEffect,
 	useId,
 	useRef,
+	useState,
 } from '@wordpress/element';
 
 /**
@@ -295,16 +297,19 @@ function ViewTable( {
 	deferredRendering,
 } ) {
 	const headerMenuRefs = useRef( new Map() );
+	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] = useState();
+
+	useEffect( () => {
+		if ( nextHeaderMenuToFocus ) {
+			nextHeaderMenuToFocus.focus();
+			setNextHeaderMenuToFocus();
+		}
+	}, [ nextHeaderMenuToFocus ] );
+
 	const onHide = ( field ) => {
 		const hidden = headerMenuRefs.current.get( field.id );
 		const fallback = headerMenuRefs.current.get( hidden.fallback );
-		// These stacked microtask callbacks are required to
-		// make sure the node is available to be focused
-		queueMicrotask( () => {
-			queueMicrotask( () => {
-				if ( fallback?.node ) fallback.node.focus();
-			} );
-		} );
+		setNextHeaderMenuToFocus( fallback?.node );
 	};
 	const previousData = useRef( [] );
 	const visibleFields = fields.filter(
