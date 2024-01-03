@@ -401,16 +401,12 @@ class WP_Navigation_Block_Renderer {
 		$colors                  = gutenberg_block_core_navigation_build_css_colors( $attributes );
 		$modal_unique_id         = wp_unique_id( 'modal-' );
 
-//		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
-
 		$responsive_container_classes = array(
 			'wp-block-navigation__responsive-container',
-//			$is_hidden_by_default ? 'hidden-by-default' : '',
 			implode( ' ', $colors['overlay_css_classes'] ),
 		);
 		$open_button_classes          = array(
 			'wp-block-navigation__responsive-container-open',
-//			$is_hidden_by_default ? 'always-shown' : '',
 		);
 
 		$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
