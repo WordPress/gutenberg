@@ -11,6 +11,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Registers the Edit Site Export REST API routes.
+ */
+function gutenberg_register_edit_site_export_endpoints() {
+	$edit_site_export_controller = new Gutenberg_REST_Edit_Site_Export_Controller_6_5();
+	$edit_site_export_controller->register_routes();
+}
+
+add_action( 'rest_api_init', 'gutenberg_register_edit_site_export_endpoints' );
+
+/**
  * Registers the Global Styles Revisions REST API routes.
  */
 function gutenberg_register_global_styles_revisions_endpoints() {
