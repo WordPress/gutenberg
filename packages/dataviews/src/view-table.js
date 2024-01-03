@@ -316,7 +316,6 @@ function ViewTable( {
 		const fallback = headerMenuRefs.current.get( hidden.fallback );
 		setNextHeaderMenuToFocus( fallback?.node );
 	};
-	const previousData = useRef( [] );
 	const visibleFields = fields.filter(
 		( field ) =>
 			! view.hiddenFields.includes( field.id ) &&
@@ -324,15 +323,9 @@ function ViewTable( {
 				field.id
 			)
 	);
-	const shownData = useAsyncList( data );
-	const usefulData = data.length ? data : shownData;
-	const deferredData = deferredRendering ? shownData : usefulData;
-	const staleData = shownData.length ? shownData : previousData.current;
-	const usedData =
-		isLoading && ! deferredData.length ? staleData : deferredData;
-	previousData.current = usedData;
+	const asyncData = useAsyncList( data );
+	const usedData = deferredRendering ? asyncData : data;
 	const hasData = !! usedData?.length;
-
 	const sortValues = { asc: 'ascending', desc: 'descending' };
 	const tableNoticeId = useId();
 
