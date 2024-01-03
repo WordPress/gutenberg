@@ -9,6 +9,7 @@ export default function convertEditorSettings( data ) {
 		'keepCaretInsideBlock',
 		'showBlockBreadcrumbs',
 		'showIconLabels',
+		'showListViewByDefault',
 	];
 
 	settingsToMoveToCore.forEach( ( setting ) => {

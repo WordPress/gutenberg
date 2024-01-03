@@ -30,7 +30,7 @@ test.describe( 'Site Editor List View', () => {
 		).toBeHidden();
 
 		// Turn on block list view by default.
-		await editor.setPreferences( 'core/edit-site', {
+		await editor.setPreferences( 'core', {
 			showListViewByDefault: true,
 		} );
 
@@ -41,7 +41,7 @@ test.describe( 'Site Editor List View', () => {
 		).toBeVisible();
 
 		// The preferences cleanup.
-		await editor.setPreferences( 'core/edit-site', {
+		await editor.setPreferences( 'core', {
 			showListViewByDefault: false,
 		} );
 	} );
