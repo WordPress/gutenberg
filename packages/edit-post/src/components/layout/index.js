@@ -16,6 +16,7 @@ import {
 	EditorSnackbars,
 	PostSyncStatusModal,
 	store as editorStore,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -38,12 +39,8 @@ import {
 import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
-
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
-
-const { useCommands } = unlock( coreCommandsPrivateApis );
-const { useCommandContext } = unlock( commandsPrivateApis );
 
 /**
  * Internal dependencies
@@ -55,7 +52,6 @@ import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import EditPostPreferencesModal from '../preferences-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
-import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
@@ -67,6 +63,9 @@ import { unlock } from '../../lock-unlock';
 import useCommonCommands from '../../hooks/commands/use-common-commands';
 
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
+const { useCommands } = unlock( coreCommandsPrivateApis );
+const { useCommandContext } = unlock( commandsPrivateApis );
+const { InserterSidebar } = unlock( editorPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -161,6 +160,7 @@ function Layout() {
 		isDistractionFree,
 		showBlockBreadcrumbs,
 		showMetaBoxes,
+		showMostUsedBlocks,
 		documentLabel,
 	} = useSelect( ( select ) => {
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
@@ -195,6 +195,8 @@ function Layout() {
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
+			showMostUsedBlocks:
+				select( editPostStore ).isFeatureActive( 'mostUsedBlocks' ),
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 			hasBlockSelected:
@@ -262,7 +264,9 @@ function Layout() {
 
 	const secondarySidebar = () => {
 		if ( mode === 'visual' && isInserterOpened ) {
-			return <InserterSidebar />;
+			return (
+				<InserterSidebar showMostUsedBlocks={ showMostUsedBlocks } />
+			);
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
 			return <ListViewSidebar />;
