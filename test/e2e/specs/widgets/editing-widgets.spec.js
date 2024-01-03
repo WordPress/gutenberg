@@ -428,7 +428,7 @@ test.describe( 'Widgets screen', () => {
 		} );
 
 		// Create a search widget in the first sidebar using the default instance.
-		await requestUtils.rest( {
+		const widget = await requestUtils.rest( {
 			method: 'POST',
 			path: '/wp/v2/widgets',
 			data: {
@@ -437,16 +437,16 @@ test.describe( 'Widgets screen', () => {
 				instance: defaultSearchInstance,
 			},
 		} );
+		// Add it to the first widget area. The above request for some reason isn't enough.
+		await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/sidebars/sidebar-1',
+			data: {
+				widgets: [ widget.id ],
+			},
+		} );
 
 		await page.reload();
-
-		// FIXME: For some reason the legacy widget is added to the inactive widgets
-		// rather than the first widget area `sidebar-1`.
-		await page
-			.getByRole( 'button', {
-				name: 'Inactive widgets',
-			} )
-			.click();
 
 		const legacyWidgetPreviewFrame = page.frameLocator(
 			'[title="Legacy Widget Preview"]'
@@ -486,9 +486,7 @@ test.describe( 'Widgets screen', () => {
 		).toHaveText( 'Search Title' );
 
 		await expect.poll( widgetsScreen.getWidgetAreaBlocks ).toMatchObject( {
-			// FIXME: For some reason the legacy widget is added to the inactive widgets
-			// rather than the first widget area `sidebar-1`.
-			wp_inactive_widgets: [
+			'sidebar-1': [
 				{
 					name: 'core/legacy-widget',
 					attributes: {
