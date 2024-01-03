@@ -27,16 +27,7 @@
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;
 
-	iframe {
-		display: block;
-		width: 100%;
-		height: 100%;
-		background: $white;
-	}
-
 	.edit-site-visual-editor__editor-canvas {
-		height: 100%;
-
 		&.is-focused {
 			outline: calc(2 * var(--wp-admin-border-width-focus)) solid var(--wp-admin-theme-color);
 			outline-offset: calc(-2 * var(--wp-admin-border-width-focus));
