@@ -37,6 +37,7 @@ import {
 	isControlAllowed,
 	useTaxonomies,
 } from '../../utils';
+import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../../../utils/constants';
 
 const { BlockInfo } = unlock( blockEditorPrivateApis );
 
@@ -226,6 +227,7 @@ export default function QueryInspectorControls( props ) {
 							} );
 							setQuerySearch( '' );
 						} }
+						dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 					>
 						{ showTaxControl && (
 							<ToolsPanelItem

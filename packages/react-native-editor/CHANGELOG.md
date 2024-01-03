@@ -10,7 +10,32 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] [internal] Move InserterButton from components package to block-editor package [#56494]
+-   [*] [internal] Move ImageLinkDestinationsScreen from components package to block-editor package [#56775]
+-   [*] Fix crash when blockType wrapperProps are not defined [#56846]
+-   [*] Guard against an Image block styles crash due to null block values [#56903]
+-   [**] Fix crash when sharing unsupported media types on Android [#56791]
+-   [**] Fix regressions with wrapper props and font size customization [#56985]
+-   [***] Avoid keyboard dismiss when interacting with text blocks [#57070]
+-   [**] Auto-scroll upon block insertion [#57273]
+
+## 1.109.3
+-   [**] Fix duplicate/unresponsive options in font size settings. [#56985]
+
+## 1.109.2
+-   [**] Fix issue related to text color format and receiving in rare cases an undefined ref from `RichText` component [#56686]
+-   [**] Fixes a crash on pasting MS Word list markup [#56653]
+-   [**] Address rare cases where a null value is passed to a heading block, causing a crash [#56757]
+-   [**] Fixes a crash related to HTML to blocks conversion when no transformations are available [#56723]
+-   [**] Fixes a crash related to undefined attributes in `getFormatColors` function of `RichText` component [#56684]
+-   [**] Fixes an issue with custom color variables not being parsed when using global styles [#56752]
+
+## 1.109.1
+-   [***] Fix issue when backspacing in an empty Paragraph block [#56496]
+
+## 1.109.0
 -   [*] Audio block: Improve legibility of audio file details on various background colors [#55627]
+-   [*] In the deeply nested block warning, only display the ungroup option for blocks that support it [#56445]
 
 ## 1.108.0
 -   [*] Fix error when pasting deeply nested structure content [#55613]

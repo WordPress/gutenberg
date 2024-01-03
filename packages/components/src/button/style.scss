@@ -245,6 +245,11 @@
 	&.is-secondary.is-busy:disabled,
 	&.is-secondary.is-busy[aria-disabled="true"] {
 		animation: components-button__busy-animation 2500ms infinite linear;
+		// This should be refactored to use the reduce-motion("animation") mixin
+		// as soon as https://github.com/WordPress/gutenberg/issues/55566 is closed.
+		@media (prefers-reduced-motion: reduce) {
+			animation-duration: 0s;
+		}
 		opacity: 1;
 		background-size: 100px 100%;
 		// Disable reason: This function call looks nicer when each argument is on its own line.

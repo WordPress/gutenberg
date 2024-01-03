@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { external } from '@wordpress/icons';
 import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
@@ -15,6 +15,7 @@ import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
 } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -36,17 +37,10 @@ import { store as siteEditorStore } from '../../../store';
 
 export default function MoreMenu( { showIconLabels } ) {
 	const registry = useRegistry();
-	const isDistractionFree = useSelect(
-		( select ) =>
-			select( preferencesStore ).get(
-				'core/edit-site',
-				'distractionFree'
-			),
-		[]
-	);
 
-	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
-		useDispatch( siteEditorStore );
+	const { closeGeneralSidebar } = useDispatch( siteEditorStore );
+	const { setIsInserterOpened, setIsListViewOpened } =
+		useDispatch( editorStore );
 	const { openModal } = useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 
@@ -57,6 +51,10 @@ export default function MoreMenu( { showIconLabels } ) {
 			setIsListViewOpened( false );
 			closeGeneralSidebar();
 		} );
+	};
+
+	const turnOffDistractionFree = () => {
+		setPreference( 'core/edit-site', 'distractionFree', false );
 	};
 
 	return (
@@ -73,7 +71,7 @@ export default function MoreMenu( { showIconLabels } ) {
 							<PreferenceToggleMenuItem
 								scope="core/edit-site"
 								name="fixedToolbar"
-								disabled={ isDistractionFree }
+								onToggle={ turnOffDistractionFree }
 								label={ __( 'Top toolbar' ) }
 								info={ __(
 									'Access all block and document tools in a single place'
@@ -83,18 +81,6 @@ export default function MoreMenu( { showIconLabels } ) {
 								) }
 								messageDeactivated={ __(
 									'Top toolbar deactivated'
-								) }
-							/>
-							<PreferenceToggleMenuItem
-								scope="core/edit-site"
-								name="focusMode"
-								label={ __( 'Spotlight mode' ) }
-								info={ __( 'Focus on one block at a time' ) }
-								messageActivated={ __(
-									'Spotlight mode activated'
-								) }
-								messageDeactivated={ __(
-									'Spotlight mode deactivated'
 								) }
 							/>
 							<PreferenceToggleMenuItem
@@ -111,6 +97,18 @@ export default function MoreMenu( { showIconLabels } ) {
 								) }
 								shortcut={ displayShortcut.primaryShift(
 									'\\'
+								) }
+							/>
+							<PreferenceToggleMenuItem
+								scope="core/edit-site"
+								name="focusMode"
+								label={ __( 'Spotlight mode' ) }
+								info={ __( 'Focus on one block at a time' ) }
+								messageActivated={ __(
+									'Spotlight mode activated'
+								) }
+								messageDeactivated={ __(
+									'Spotlight mode deactivated'
 								) }
 							/>
 						</MenuGroup>

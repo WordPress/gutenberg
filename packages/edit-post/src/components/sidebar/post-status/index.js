@@ -13,6 +13,8 @@ import {
 	PostSwitchToDraftButton,
 	PostSyncStatus,
 	PostURLPanel,
+	PostTemplatePanel,
+	store as editorStore,
 } from '@wordpress/editor';
 
 /**
@@ -25,8 +27,6 @@ import PostSlug from '../post-slug';
 import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
 import PluginPostStatusInfo from '../plugin-post-status-info';
-import { store as editPostStore } from '../../../store';
-import PostTemplate from '../post-template';
 
 /**
  * Module Constants
@@ -38,13 +38,13 @@ export default function PostStatus() {
 		// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
 		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
 		const { isEditorPanelRemoved, isEditorPanelOpened } =
-			select( editPostStore );
+			select( editorStore );
 		return {
 			isRemoved: isEditorPanelRemoved( PANEL_NAME ),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
 		};
 	}, [] );
-	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
+	const { toggleEditorPanelOpened } = useDispatch( editorStore );
 
 	if ( isRemoved ) {
 		return null;
@@ -62,7 +62,7 @@ export default function PostStatus() {
 					<>
 						<PostVisibility />
 						<PostSchedulePanel />
-						<PostTemplate />
+						<PostTemplatePanel />
 						<PostURLPanel />
 						<PostSyncStatus />
 						<PostSticky />

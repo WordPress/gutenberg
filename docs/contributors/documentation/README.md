@@ -64,7 +64,7 @@ To add a new document requires a working JavaScript development environment to b
 
 If you forget to run, `npm run docs:build` your PR will fail the static analysis check, since the `manifest.json` file is an uncommitted local change that must be committed.
 
-### Documenting Packages
+### Documenting packages
 
 Package documentation is generated automatically by the documentation tool by pulling the contents of the README.md file located in the root of the package. Sometimes however, it is preferable to split the contents of the README out into smaller, easier to read portions.
 

@@ -1,4 +1,6 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"title": "Hooked Block",
 	"name": "tests/hooked-block",
 	"blockHooks": {
 		"tests/group-first-child": "firstChild",

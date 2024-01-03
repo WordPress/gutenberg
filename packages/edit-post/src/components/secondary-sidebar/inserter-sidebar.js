@@ -11,22 +11,24 @@ import {
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef } from '@wordpress/element';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { store as editPostStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 export default function InserterSidebar() {
 	const { insertionPoint, showMostUsedBlocks } = useSelect( ( select ) => {
-		const { isFeatureActive, __experimentalGetInsertionPoint } =
-			select( editPostStore );
+		const { isFeatureActive } = select( editPostStore );
+		const { getInsertionPoint } = unlock( select( editorStore ) );
 		return {
-			insertionPoint: __experimentalGetInsertionPoint(),
+			insertionPoint: getInsertionPoint(),
 			showMostUsedBlocks: isFeatureActive( 'mostUsedBlocks' ),
 		};
 	}, [] );
-	const { setIsInserterOpened } = useDispatch( editPostStore );
+	const { setIsInserterOpened } = useDispatch( editorStore );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';

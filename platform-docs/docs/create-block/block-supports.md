@@ -11,7 +11,7 @@ To avoid duplicating the same logic over and over in your blocks and to align th
 Let's augment our Gutenberg pride block with some of these supports. To do so, we just update the `registerBlockType` call with an additional `supports` key like so:
 
 ```jsx
-registerBlockType( 'gutenpride/gutenpride-block', {
+registerBlockType( 'create-block/gutenpride', {
 	// ...
 	supports: {
 		color: {
