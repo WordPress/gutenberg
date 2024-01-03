@@ -138,6 +138,18 @@ export default function PagePages() {
 		[ setPageId ]
 	);
 
+	const onDetailsChange = useCallback(
+		( items ) => {
+			if ( !! postType && items?.length === 1 ) {
+				history.push( {
+					postId: items[ 0 ].id,
+					postType,
+				} );
+			}
+		},
+		[ history, postType ]
+	);
+
 	const queryArgs = useMemo( () => {
 		const filters = {};
 		view.filters.forEach( ( filter ) => {
@@ -339,6 +351,7 @@ export default function PagePages() {
 					view={ view }
 					onChangeView={ onChangeView }
 					onSelectionChange={ onSelectionChange }
+					onDetailsChange={ onDetailsChange }
 				/>
 			</Page>
 			{ view.type === LAYOUT_LIST && (
