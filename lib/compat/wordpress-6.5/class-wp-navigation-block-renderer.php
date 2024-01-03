@@ -428,11 +428,11 @@ class WP_Navigation_Block_Renderer {
 		$responsive_dialog_directives    = '';
 		$close_button_directives         = '';
 		if ( $should_load_view_script ) {
-			$open_button_directives          = '
+			$open_button_directives                  = '
 				data-wp-on--click="actions.openMenuOnClick"
 				data-wp-on--keydown="actions.handleMenuKeydown"
 			';
-			$responsive_container_directives = '
+			$responsive_container_directives         = '
 				data-wp-class--has-modal-open="state.isMenuOpen"
 				data-wp-class--is-menu-open="state.isMenuOpen"
 				data-wp-watch="callbacks.initMenu"
@@ -440,14 +440,16 @@ class WP_Navigation_Block_Renderer {
 				data-wp-on--focusout="actions.handleMenuFocusout"
 				tabindex="-1"
 			';
-			$responsive_dialog_directives    = '
+			$responsive_dialog_directives            = '
 				data-wp-bind--aria-modal="state.ariaModal"
 				data-wp-bind--aria-label="state.ariaLabel"
 				data-wp-bind--role="state.roleAttribute"
-				data-wp-watch="callbacks.focusFirstElement"
 			';
-			$close_button_directives         = '
+			$close_button_directives                 = '
 				data-wp-on--click="actions.closeMenuOnClick"
+			';
+			$responsive_container_content_directives = '
+				data-wp-watch="callbacks.focusFirstElement"
 			';
 		}
 
@@ -457,7 +459,7 @@ class WP_Navigation_Block_Renderer {
 					<div class="wp-block-navigation__responsive-close" tabindex="-1">
 						<div class="wp-block-navigation__responsive-dialog" %12$s>
 							<button %4$s class="wp-block-navigation__responsive-container-close" %13$s>%9$s</button>
-							<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
+							<div class="wp-block-navigation__responsive-container-content" %14$s id="%1$s-content">
 								%2$s
 							</div>
 						</div>
@@ -475,7 +477,8 @@ class WP_Navigation_Block_Renderer {
 			$open_button_directives,
 			$responsive_container_directives,
 			$responsive_dialog_directives,
-			$close_button_directives
+			$close_button_directives,
+			$responsive_container_content_directives
 		);
 	}
 

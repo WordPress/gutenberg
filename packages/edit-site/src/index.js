@@ -56,13 +56,17 @@ export function initializeEditor( id, settings ) {
 		fixedToolbar: false,
 		focusMode: false,
 		distractionFree: false,
-		keepCaretInsideBlock: false,
 		welcomeGuide: true,
 		welcomeGuideStyles: true,
 		welcomeGuidePage: true,
 		welcomeGuideTemplate: true,
 		showListViewByDefault: false,
 		showBlockBreadcrumbs: true,
+	} );
+
+	dispatch( preferencesStore ).setDefaults( 'core', {
+		allowRightClickOverrides: true,
+		keepCaretInsideBlock: false,
 	} );
 
 	dispatch( interfaceStore ).setDefaultComplementaryArea(

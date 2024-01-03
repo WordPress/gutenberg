@@ -62,7 +62,7 @@ export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
 			}
 		>
 			<CopyButton
-				isSmall
+				size="small"
 				ref={ copyRef }
 				icon={ copy }
 				showTooltip={ false }

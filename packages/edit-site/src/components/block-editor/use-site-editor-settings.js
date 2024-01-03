@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
@@ -13,6 +13,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { usePostLinkProps } from './use-post-link-props';
 
 const { useBlockEditorSettings } = unlock( editorPrivateApis );
 
@@ -89,14 +90,13 @@ function useArchiveLabel( templateSlug ) {
 }
 
 export function useSpecificEditorSettings() {
-	const { setIsInserterOpened } = useDispatch( editSiteStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const getPostLinkProps = usePostLinkProps();
 	const {
 		templateSlug,
 		focusMode,
 		isDistractionFree,
 		hasFixedToolbar,
-		keepCaretInsideBlock,
 		canvasMode,
 		settings,
 		postWithTemplate,
@@ -129,10 +129,6 @@ export function useSpecificEditorSettings() {
 				hasFixedToolbar:
 					!! getPreference( 'core/edit-site', 'fixedToolbar' ) ||
 					! isLargeViewport,
-				keepCaretInsideBlock: !! getPreference(
-					'core/edit-site',
-					'keepCaretInsideBlock'
-				),
 				canvasMode: getCanvasMode(),
 				settings: getSettings(),
 				postWithTemplate: _context?.postId,
@@ -146,29 +142,27 @@ export function useSpecificEditorSettings() {
 		return {
 			...settings,
 
+			richEditingEnabled: true,
 			supportsTemplateMode: true,
-			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
 			isDistractionFree,
 			hasFixedToolbar,
-			keepCaretInsideBlock,
 			defaultRenderingMode,
-
+			getPostLinkProps,
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
 		};
 	}, [
 		settings,
-		setIsInserterOpened,
+		canvasMode,
 		focusMode,
 		isDistractionFree,
 		hasFixedToolbar,
-		keepCaretInsideBlock,
-		canvasMode,
+		defaultRenderingMode,
+		getPostLinkProps,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
-		defaultRenderingMode,
 	] );
 
 	return defaultEditorSettings;

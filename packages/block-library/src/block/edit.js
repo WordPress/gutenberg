@@ -8,12 +8,12 @@ import classnames from 'classnames';
  */
 import { useRegistry, useSelect, useDispatch } from '@wordpress/data';
 import { useRef, useMemo, useEffect } from '@wordpress/element';
-import { useEntityProp, useEntityRecord } from '@wordpress/core-data';
+import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner,
-	TextControl,
-	PanelBody,
+	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -21,11 +21,11 @@ import {
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
 	InnerBlocks,
-	InspectorControls,
 	useBlockProps,
 	Warning,
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
+	BlockControls,
 } from '@wordpress/block-editor';
 import { getBlockSupport, parse } from '@wordpress/blocks';
 
@@ -132,15 +132,25 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 	return Object.keys( overrides ).length > 0 ? overrides : undefined;
 }
 
+function setBlockEditMode( setEditMode, blocks, mode ) {
+	blocks.forEach( ( block ) => {
+		const editMode =
+			mode || ( isPartiallySynced( block ) ? 'contentOnly' : 'disabled' );
+		setEditMode( block.clientId, editMode );
+		setBlockEditMode( setEditMode, block.innerBlocks, mode );
+	} );
+}
+
 export default function ReusableBlockEdit( {
 	name,
 	attributes: { ref, overrides },
 	__unstableParentLayout: parentLayout,
 	clientId: patternClientId,
+	setAttributes,
 } ) {
 	const registry = useRegistry();
 	const hasAlreadyRendered = useHasRecursion( ref );
-	const { record, hasResolved } = useEntityRecord(
+	const { record, editedRecord, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
 		ref
@@ -148,52 +158,86 @@ export default function ReusableBlockEdit( {
 	const isMissing = hasResolved && ! record;
 	const initialOverrides = useRef( overrides );
 	const defaultValuesRef = useRef( {} );
+
 	const {
 		replaceInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 		setBlockEditingMode,
 	} = useDispatch( blockEditorStore );
-	const { getBlockEditingMode } = useSelect( blockEditorStore );
+	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
 
+	const { innerBlocks, userCanEdit, getBlockEditingMode, getPostLinkProps } =
+		useSelect(
+			( select ) => {
+				const { canUser } = select( coreStore );
+				const {
+					getBlocks,
+					getBlockEditingMode: editingMode,
+					getSettings,
+				} = select( blockEditorStore );
+				const blocks = getBlocks( patternClientId );
+				const canEdit = canUser( 'update', 'blocks', ref );
+
+				// For editing link to the site editor if the theme and user permissions support it.
+				return {
+					innerBlocks: blocks,
+					userCanEdit: canEdit,
+					getBlockEditingMode: editingMode,
+					getPostLinkProps:
+						getSettings().__experimentalGetPostLinkProps,
+				};
+			},
+			[ patternClientId, ref ]
+		);
+
+	const editOriginalProps = getPostLinkProps
+		? getPostLinkProps( {
+				postId: ref,
+				postType: 'wp_block',
+				canvas: 'edit',
+		  } )
+		: {};
+
+	useEffect(
+		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
+		[ innerBlocks, setBlockEditingMode ]
+	);
+
+	// Apply the initial overrides from the pattern block to the inner blocks.
 	useEffect( () => {
-		if ( ! record?.content?.raw ) return;
-		const initialBlocks = parse( record.content.raw );
+		const initialBlocks =
+			editedRecord.blocks ??
+			( editedRecord.content && typeof editedRecord.content !== 'function'
+				? parse( editedRecord.content )
+				: [] );
 
+		defaultValuesRef.current = {};
 		const editingMode = getBlockEditingMode( patternClientId );
+		// Replace the contents of the blocks with the overrides.
 		registry.batch( () => {
 			setBlockEditingMode( patternClientId, 'default' );
-			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks(
-				patternClientId,
-				applyInitialOverrides(
-					initialBlocks,
-					initialOverrides.current,
-					defaultValuesRef.current
-				)
-			);
+			syncDerivedUpdates( () => {
+				replaceInnerBlocks(
+					patternClientId,
+					applyInitialOverrides(
+						initialBlocks,
+						initialOverrides.current,
+						defaultValuesRef.current
+					)
+				);
+			} );
 			setBlockEditingMode( patternClientId, editingMode );
 		} );
 	}, [
 		__unstableMarkNextChangeAsNotPersistent,
 		patternClientId,
-		record,
+		editedRecord,
 		replaceInnerBlocks,
 		registry,
 		getBlockEditingMode,
 		setBlockEditingMode,
+		syncDerivedUpdates,
 	] );
-
-	const innerBlocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks( patternClientId ),
-		[ patternClientId ]
-	);
-
-	const [ title, setTitle ] = useEntityProp(
-		'postType',
-		'wp_block',
-		'title',
-		ref
-	);
 
 	const { alignment, layout } = useInferredLayout(
 		innerBlocks,
@@ -216,29 +260,31 @@ export default function ReusableBlockEdit( {
 			: InnerBlocks.ButtonBlockAppender,
 	} );
 
-	// Sync the `overrides` attribute from the updated blocks.
-	// `syncDerivedBlockAttributes` is an action that just like `updateBlockAttributes`
-	// but won't create an undo level.
-	// This can be abstracted into a `useSyncDerivedAttributes` hook if needed.
+	// Sync the `overrides` attribute from the updated blocks to the pattern block.
+	// `syncDerivedUpdates` is used here to avoid creating an additional undo level.
 	useEffect( () => {
 		const { getBlocks } = registry.select( blockEditorStore );
-		const { syncDerivedBlockAttributes } = unlock(
-			registry.dispatch( blockEditorStore )
-		);
 		let prevBlocks = getBlocks( patternClientId );
 		return registry.subscribe( () => {
 			const blocks = getBlocks( patternClientId );
 			if ( blocks !== prevBlocks ) {
 				prevBlocks = blocks;
-				syncDerivedBlockAttributes( patternClientId, {
-					overrides: getOverridesFromBlocks(
-						blocks,
-						defaultValuesRef.current
-					),
+				syncDerivedUpdates( () => {
+					setAttributes( {
+						overrides: getOverridesFromBlocks(
+							blocks,
+							defaultValuesRef.current
+						),
+					} );
 				} );
 			}
 		}, blockEditorStore );
-	}, [ patternClientId, registry ] );
+	}, [ syncDerivedUpdates, patternClientId, registry, setAttributes ] );
+
+	const handleEditOriginal = ( event ) => {
+		setBlockEditMode( setBlockEditingMode, innerBlocks, 'default' );
+		editOriginalProps.onClick( event );
+	};
 
 	let children = null;
 
@@ -268,17 +314,18 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			<InspectorControls>
-				<PanelBody>
-					<TextControl
-						label={ __( 'Name' ) }
-						value={ title }
-						onChange={ setTitle }
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-					/>
-				</PanelBody>
-			</InspectorControls>
+			{ userCanEdit && editOriginalProps && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							href={ editOriginalProps.href }
+							onClick={ handleEditOriginal }
+						>
+							{ __( 'Edit original' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
 			{ children === null ? (
 				<div { ...innerBlocksProps } />
 			) : (

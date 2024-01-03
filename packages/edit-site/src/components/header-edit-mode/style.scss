@@ -99,49 +99,6 @@ $header-toolbar-min-width: 335px;
 	}
 }
 
-.edit-site-header-edit-mode__document-tools {
-	display: flex;
-	border: none;
-
-	// The Toolbar component adds different styles to buttons, so we reset them
-	// here to the original button styles
-	.edit-site-header-edit-mode__toolbar > .components-button.has-icon,
-	.edit-site-header-edit-mode__toolbar > .components-dropdown > .components-button.has-icon {
-		// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
-		// This is best fixed by making the mover control area a proper single toolbar group.
-		// It needs specificity due to style inherited from .components-accessible-toolbar .components-button.has-icon.has-icon.
-		height: $button-size-compact;
-		min-width: $button-size-compact;
-		padding: 4px;
-
-		&.is-pressed {
-			background: $gray-900;
-		}
-
-		&:focus:not(:disabled) {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 $border-width $white;
-			outline: $border-width solid transparent;
-		}
-
-		&::before {
-			display: none;
-		}
-	}
-
-	.edit-site-header-edit-mode__toolbar > .edit-site-header-edit-mode__inserter-toggle.has-icon {
-		// Special dimensions for this button.
-		min-width: $button-size-compact;
-		width: $button-size-compact;
-		height: $button-size-compact;
-		padding: 0;
-	}
-
-	.edit-site-header-edit-mode__toolbar > .edit-site-header-edit-mode__inserter-toggle.has-text.has-icon {
-		width: auto;
-		padding: 0 $grid-unit-10;
-	}
-}
-
 // Button text label styles
 
 .edit-site-header-edit-mode.show-icon-labels {
@@ -183,10 +140,6 @@ $header-toolbar-min-width: 335px;
 	.edit-site-document-actions__get-info.edit-site-document-actions__get-info.edit-site-document-actions__get-info {
 		height: 36px;
 		padding: 0 $grid-unit-10;
-	}
-
-	.edit-site-header-edit-mode__document-tools .edit-site-header-edit-mode__toolbar > * + * {
-		margin-left: $grid-unit-10;
 	}
 
 	.block-editor-block-mover {

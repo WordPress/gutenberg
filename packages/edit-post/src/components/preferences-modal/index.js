@@ -64,9 +64,9 @@ export default function EditPostPreferencesModal() {
 		[ isLargeViewport ]
 	);
 
-	const { closeGeneralSidebar, setIsListViewOpened, setIsInserterOpened } =
-		useDispatch( editPostStore );
-
+	const { closeGeneralSidebar } = useDispatch( editPostStore );
+	const { setIsListViewOpened, setIsInserterOpened } =
+		useDispatch( editorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const toggleDistractionFree = () => {
@@ -116,6 +116,16 @@ export default function EditPostPreferencesModal() {
 									label={ __( 'Show block breadcrumbs' ) }
 								/>
 							) }
+							<EnableFeature
+								scope="core"
+								featureName="allowRightClickOverrides"
+								help={ __(
+									'Allows contextual list view menus via right-click, overriding browser defaults.'
+								) }
+								label={ __(
+									'Allow right-click contextual menus'
+								) }
+							/>
 						</PreferencesModalSection>
 						<PreferencesModalSection
 							title={ __( 'Document settings' ) }
@@ -218,6 +228,7 @@ export default function EditPostPreferencesModal() {
 							) }
 						>
 							<EnableFeature
+								scope="core"
 								featureName="keepCaretInsideBlock"
 								help={ __(
 									'Keeps the text cursor within the block boundaries, aiding users with screen readers by preventing unintentional cursor movement outside the block.'
@@ -229,6 +240,7 @@ export default function EditPostPreferencesModal() {
 						</PreferencesModalSection>
 						<PreferencesModalSection title={ __( 'Interface' ) }>
 							<EnableFeature
+								scope="core"
 								featureName="showIconLabels"
 								label={ __( 'Show button text labels' ) }
 								help={ __(

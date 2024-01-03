@@ -11,6 +11,7 @@ import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -28,8 +29,9 @@ export default function EditSitePreferencesModal() {
 	const toggleModal = () =>
 		isModalActive ? closeModal() : openModal( PREFERENCES_MODAL_NAME );
 	const registry = useRegistry();
-	const { closeGeneralSidebar, setIsListViewOpened, setIsInserterOpened } =
-		useDispatch( editSiteStore );
+	const { closeGeneralSidebar } = useDispatch( editSiteStore );
+	const { setIsListViewOpened, setIsInserterOpened } =
+		useDispatch( editorStore );
 
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const toggleDistractionFree = () => {
@@ -64,6 +66,14 @@ export default function EditSitePreferencesModal() {
 							'Shows block breadcrumbs at the bottom of the editor.'
 						) }
 						label={ __( 'Display block breadcrumbs' ) }
+					/>
+					<EnableFeature
+						scope="core"
+						featureName="allowRightClickOverrides"
+						help={ __(
+							'Allows contextual list view menus via right-click, overriding browser defaults.'
+						) }
+						label={ __( 'Allow right-click contextual menus' ) }
 					/>
 				</PreferencesModalSection>
 			),
@@ -116,6 +126,7 @@ export default function EditSitePreferencesModal() {
 						) }
 					>
 						<EnableFeature
+							namespace="core"
 							featureName="keepCaretInsideBlock"
 							help={ __(
 								'Keeps the text cursor within the block boundaries, aiding users with screen readers by preventing unintentional cursor movement outside the block.'
@@ -125,6 +136,7 @@ export default function EditSitePreferencesModal() {
 					</PreferencesModalSection>
 					<PreferencesModalSection title={ __( 'Interface' ) }>
 						<EnableFeature
+							namespace="core"
 							featureName="showIconLabels"
 							label={ __( 'Show button text labels' ) }
 							help={ __(

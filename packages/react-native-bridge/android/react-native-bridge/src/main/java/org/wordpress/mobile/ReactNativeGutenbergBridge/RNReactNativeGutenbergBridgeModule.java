@@ -1,11 +1,15 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.provider.Settings;
+import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.Nullable;
 
@@ -41,6 +45,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         DeferredEventEmitter.JSEventEmitter {
     private final ReactApplicationContext mReactContext;
     private final GutenbergBridgeJS2Parent mGutenbergBridgeJS2Parent;
+    private Runnable mKeyboardRunnable;
 
     private static final String EVENT_NAME_REQUEST_GET_HTML = "requestGetHtml";
     private static final String EVENT_NAME_UPDATE_HTML = "updateHtml";
@@ -549,5 +554,73 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
                 jsCallback.invoke(isConnected);
             }
         };
+    }
+
+    @ReactMethod
+    public void showAndroidSoftKeyboard() {
+        Activity currentActivity = mReactContext.getCurrentActivity();
+        if (isAnyViewFocused()) {
+            // Cancel any previously scheduled Runnable
+            if (mKeyboardRunnable != null) {
+                currentActivity.getWindow().getDecorView().removeCallbacks(mKeyboardRunnable);
+            }
+
+            View currentFocusedView = getCurrentFocusedView();
+            currentFocusedView.getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
+                @Override
+                public void onWindowFocusChanged(boolean hasFocus) {
+                    if (hasFocus) {
+                        mKeyboardRunnable = createShowKeyboardRunnable();
+                        currentActivity.getWindow().getDecorView().post(mKeyboardRunnable);
+                        currentFocusedView.getViewTreeObserver().removeOnWindowFocusChangeListener(this);
+                    }
+                }
+            });
+        }
+    }
+
+    private Runnable createShowKeyboardRunnable() {
+        return new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Activity activity = mReactContext.getCurrentActivity();
+                    View activeFocusedView = getCurrentFocusedView();
+                    if (activeFocusedView != null && activity.getWindow().getDecorView().isShown()) {
+                        InputMethodManager imm =
+                            (InputMethodManager) mReactContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.showSoftInput(activeFocusedView, InputMethodManager.SHOW_IMPLICIT);
+                    }
+                } catch (Exception e) {
+                    // Noop
+                }
+            }
+        };
+    }
+
+    private View getCurrentFocusedView() {
+        Activity activity = mReactContext.getCurrentActivity();
+        if (activity == null) {
+            return null;
+        }
+        return activity.getCurrentFocus();
+    }
+
+    private boolean isAnyViewFocused() {
+        View getCurrentFocusedView = getCurrentFocusedView();
+        return getCurrentFocusedView != null;
+    }
+
+    @ReactMethod
+    public void hideAndroidSoftKeyboard() {
+        Activity currentActivity = mReactContext.getCurrentActivity();
+        if (currentActivity != null) {
+            View currentFocusedView = currentActivity.getCurrentFocus();
+            if (currentFocusedView != null) {
+                InputMethodManager imm =
+                    (InputMethodManager) mReactContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(currentFocusedView.getWindowToken(), 0);
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@ Each block's markup is wrapped by a container HTML tag that needs to have the pr
 Ensuring proper attributes to the block wrapper is especially important when using custom styling or features like `supports`. 
 
 <div class="callout callout-info">
-The use of <code>supports</code> generates a set of properties that need to be manually added to the wrapping element of the block so they're properly stored as part of the block data
+The use of <code>supports</code> generates a set of properties that need to be manually added to the wrapping element of the block so they're properly stored as part of the block data.
 </div>
 
 A block can have three sets of markup defined, each one of them with a specific target and purpose:
@@ -16,7 +16,7 @@ A block can have three sets of markup defined, each one of them with a specific 
 - The one used to **dynamically render the markup of the block** returned to the front end on request, defined through the `render_callback` on [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) or the [`render`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#render) PHP file in `block.json`
     - If defined, this server-side generated markup will be returned to the front end, ignoring the markup stored in DB.
 
-For the [`edit` React component and the `save` function](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/), the block wrapper element should be a native DOM element (like `<div>`) or a React component that forwards any additional props to native DOM elements. Using a <Fragment> or <ServerSideRender> component, for instance, would be invalid.
+For the [`edit` React component and the `save` function](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/), the block wrapper element should be a native DOM element (like `<div>`) or a React component that forwards any additional props to native DOM elements. Using a `<Fragment>` or `<ServerSideRender>` component, for instance, would be invalid.
 
 
 ## The Edit component's markup
@@ -60,7 +60,7 @@ _(see the [code above](https://github.com/WordPress/block-development-examples/b
 >Hello World - Block Editor</p>
 ```
 
-Any additional classes and attributes for the `Edit` component of the block should be passed as an argument of `useBlockProps` (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/stylesheets-79a4c3/src/edit.js)). When you add `support` for any feature, they get added to the object returned by the `useBlockProps` hook.
+Any additional classes and attributes for the `Edit` component of the block should be passed as an argument of `useBlockProps` (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/stylesheets-79a4c3/src/edit.js)). When you add `supports` for any feature, they get added to the object returned by the `useBlockProps` hook.
 
 
 ## The Save component's markup
@@ -89,7 +89,7 @@ _(see the [code above](https://github.com/WordPress/block-development-examples/b
 
 Any additional classes and attributes for the `save` function of the block should be passed as an argument of `useBlockProps.save()` (see [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/stylesheets-79a4c3/src/save.js)). 
 
-When you add `support` for any feature, the proper classes get added to the object returned by the `useBlockProps.save()` hook.
+When you add `supports` for any feature, the proper classes get added to the object returned by the `useBlockProps.save()` hook.
 
 ```html
 <p class="
