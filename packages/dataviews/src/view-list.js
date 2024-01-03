@@ -10,8 +10,11 @@ import { useAsyncList } from '@wordpress/compose';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	Button,
 } from '@wordpress/components';
 import { ENTER, SPACE } from '@wordpress/keycodes';
+import { chevronRight, chevronLeft } from '@wordpress/icons';
+import { isRTL, __ } from '@wordpress/i18n';
 
 export default function ViewList( {
 	view,
@@ -89,6 +92,16 @@ export default function ViewList( {
 										</div>
 									</VStack>
 								</HStack>
+								<Button
+									onClick={ () => {
+										/* TODO */
+									} }
+									icon={
+										isRTL() ? chevronLeft : chevronRight
+									}
+									label={ __( 'Open page details' ) }
+									showTooltip={ false }
+								/>
 							</HStack>
 						</div>
 					</li>
