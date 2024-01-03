@@ -35,9 +35,9 @@ export const Slot = forwardRef( ( { bubblesVirtually, ...props }, ref ) => {
 	return <BaseSlot { ...props } />;
 } );
 
-export function Provider( { children, ...props } ) {
+export function Provider( { children, passthrough = false, ...props } ) {
 	const parent = useContext( SlotFillContext );
-	if ( ! parent.isDefault ) {
+	if ( ! parent.isDefault && passthrough ) {
 		return children;
 	}
 	return (
