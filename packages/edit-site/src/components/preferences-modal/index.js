@@ -136,6 +136,7 @@ export default function EditSitePreferencesModal() {
 					</PreferencesModalSection>
 					<PreferencesModalSection title={ __( 'Interface' ) }>
 						<EnableFeature
+							namespace="core"
 							featureName="showIconLabels"
 							label={ __( 'Show button text labels' ) }
 							help={ __(

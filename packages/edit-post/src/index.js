@@ -63,7 +63,6 @@ export function initializeEditor(
 		openPanels: [ 'post-status' ],
 		preferredStyleVariations: {},
 		showBlockBreadcrumbs: true,
-		showIconLabels: false,
 		showListViewByDefault: false,
 		themeStyles: true,
 		welcomeGuide: true,
@@ -72,6 +71,7 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
+		showIconLabels: false,
 	} );
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
