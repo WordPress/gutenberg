@@ -94,18 +94,26 @@ function HeaderMenu( { field, view, onChangeView } ) {
 								const isChecked =
 									isSorted &&
 									view.sort.direction === direction;
+
+								const value = `${ field.id }-${ direction }`;
+
 								return (
-									<DropdownMenuRadioItemCustom
-										key={ direction }
-										name={ `view-table-sort-${ field.id }` }
-										value={ direction }
+									<DropdownMenuRadioItem
+										key={ value }
+										// All sorting radio items share the same name, so that
+										// selecting a sorting option automatically deselects the
+										// previously selected one, even if it is displayed in
+										// another submenu. The field and direction are passed via
+										// the `value` prop.
+										name="view-table-sorting"
+										value={ value }
 										checked={ isChecked }
-										onChange={ ( e ) => {
+										onChange={ () => {
 											onChangeView( {
 												...view,
 												sort: {
 													field: field.id,
-													direction: e.target.value,
+													direction,
 												},
 											} );
 										} }
@@ -113,7 +121,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 										<DropdownMenuItemLabel>
 											{ info.label }
 										</DropdownMenuItemLabel>
-									</DropdownMenuRadioItemCustom>
+									</DropdownMenuRadioItem>
 								);
 							}
 						) }

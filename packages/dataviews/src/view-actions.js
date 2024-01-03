@@ -13,7 +13,6 @@ import { memo } from '@wordpress/element';
  */
 import { unlock } from './lock-unlock';
 import { VIEW_LAYOUTS, LAYOUT_TABLE, SORTING_DIRECTIONS } from './constants';
-import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -213,18 +212,25 @@ function SortMenu( { fields, view, onChangeView } ) {
 									sortedDirection === direction &&
 									field.id === currentSortedField.id;
 
+								const value = `${ field.id }-${ direction }`;
+
 								return (
-									<DropdownMenuRadioItemCustom
-										key={ direction }
-										value={ direction }
-										name={ `view-actions-sorting-${ field.id }` }
+									<DropdownMenuRadioItem
+										key={ value }
+										// All sorting radio items share the same name, so that
+										// selecting a sorting option automatically deselects the
+										// previously selected one, even if it is displayed in
+										// another submenu. The field and direction are passed via
+										// the `value` prop.
+										name="view-actions-sorting"
+										value={ value }
 										checked={ isChecked }
-										onChange={ ( e ) => {
+										onChange={ () => {
 											onChangeView( {
 												...view,
 												sort: {
 													field: field.id,
-													direction: e.target.value,
+													direction,
 												},
 											} );
 										} }
@@ -232,7 +238,7 @@ function SortMenu( { fields, view, onChangeView } ) {
 										<DropdownMenuItemLabel>
 											{ info.label }
 										</DropdownMenuItemLabel>
-									</DropdownMenuRadioItemCustom>
+									</DropdownMenuRadioItem>
 								);
 							}
 						) }
