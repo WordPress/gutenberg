@@ -386,7 +386,7 @@ function ViewTable( {
 						) }
 					</tr>
 				</thead>
-				<tbody inert={ isLoading ? '' : undefined }>
+				<tbody>
 					{ hasData &&
 						usedData.map( ( item ) => (
 							<tr key={ getItemId( item ) }>
