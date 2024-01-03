@@ -294,10 +294,10 @@ function ViewTable( {
 	isLoading = false,
 	deferredRendering,
 } ) {
-	const headerMenuRefs = useRef( {} );
+	const headerMenuRefs = useRef( new Map() );
 	const onHide = ( field ) => {
-		const hidden = headerMenuRefs.current[ field.id ];
-		const fallback = headerMenuRefs.current[ hidden.fallback ];
+		const hidden = headerMenuRefs.current.get( field.id );
+		const fallback = headerMenuRefs.current.get( hidden.fallback );
 		// These stacked microtask callbacks are required to
 		// make sure the node is available to be focused
 		queueMicrotask( () => {
@@ -351,13 +351,24 @@ function ViewTable( {
 								scope="col"
 							>
 								<HeaderMenu
-									ref={ ( node ) =>
-										( headerMenuRefs.current[ field.id ] = {
-											node,
-											fallback:
-												visibleFields[ index - 1 ]?.id,
-										} )
-									}
+									ref={ ( node ) => {
+										if ( node ) {
+											headerMenuRefs.current.set(
+												field.id,
+												{
+													node,
+													fallback:
+														visibleFields[
+															index - 1
+														]?.id,
+												}
+											);
+										} else {
+											headerMenuRefs.current.delete(
+												field.id
+											);
+										}
+									} }
 									field={ field }
 									view={ view }
 									onChangeView={ onChangeView }
