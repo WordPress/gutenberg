@@ -1,22 +1,22 @@
 /**
- * Helper util to sort items by text fields, when sorting is done client side.
+ * Helper util to sort data by text fields, when sorting is done client side.
  *
  * @param {Object}   params            Function params.
- * @param {Object[]} params.items      Array of items to sort.
+ * @param {Object[]} params.data       Data to sort.
  * @param {Object}   params.view       Current view object.
  * @param {Object[]} params.fields     Array of available fields.
  * @param {string[]} params.textFields Array of the field ids to sort.
  *
- * @return {Object[]} Sorted items.
+ * @return {Object[]} Sorted data.
  */
-export const sortByTextFields = ( { items, view, fields, textFields } ) => {
-	const sortedItems = [ ...items ];
+export const sortByTextFields = ( { data, view, fields, textFields } ) => {
+	const sortedData = [ ...data ];
 	const fieldId = view.sort.field;
 	if ( textFields.includes( fieldId ) ) {
 		const fieldToSort = fields.find( ( field ) => {
 			return field.id === fieldId;
 		} );
-		sortedItems.sort( ( a, b ) => {
+		sortedData.sort( ( a, b ) => {
 			const valueA = fieldToSort.getValue( { item: a } ) ?? '';
 			const valueB = fieldToSort.getValue( { item: b } ) ?? '';
 			return view.sort.direction === 'asc'
@@ -24,25 +24,25 @@ export const sortByTextFields = ( { items, view, fields, textFields } ) => {
 				: valueB.localeCompare( valueA );
 		} );
 	}
-	return sortedItems;
+	return sortedData;
 };
 
 /**
- * Helper util to get the paginated items and the paginateInfo needed,
+ * Helper util to get the paginated data and the paginateInfo needed,
  * when pagination is done client side.
  *
- * @param {Object}   params       Function params.
- * @param {Object[]} params.items Array of available items.
- * @param {Object}   params.view  Current view object.
+ * @param {Object}   params      Function params.
+ * @param {Object[]} params.data Available data.
+ * @param {Object}   params.view Current view object.
  *
- * @return {Object} Paginated items and paginationInfo.
+ * @return {Object} Paginated data and paginationInfo.
  */
-export function getPaginationResults( { items, view } ) {
+export function getPaginationResults( { data, view } ) {
 	const start = ( view.page - 1 ) * view.perPage;
-	const totalItems = items?.length || 0;
-	items = items?.slice( start, start + view.perPage );
+	const totalItems = data?.length || 0;
+	data = data?.slice( start, start + view.perPage );
 	return {
-		items,
+		data,
 		paginationInfo: {
 			totalItems,
 			totalPages: Math.ceil( totalItems / view.perPage ),

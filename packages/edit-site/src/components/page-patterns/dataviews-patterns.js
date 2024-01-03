@@ -245,21 +245,17 @@ export default function DataviewsPatterns() {
 		// Handle sorting.
 		if ( view.sort ) {
 			filteredData = sortByTextFields( {
-				items: filteredData,
+				data: filteredData,
 				view,
 				fields,
 				textFields: [ 'title', 'author' ],
 			} );
 		}
 		// Handle pagination.
-		const paginationResults = getPaginationResults( {
-			items: filteredData,
+		return getPaginationResults( {
+			data: filteredData,
 			view,
 		} );
-		return {
-			data: paginationResults.items,
-			paginationInfo: paginationResults.paginationInfo,
-		};
 	}, [ patterns, view, fields ] );
 
 	const actions = useMemo(

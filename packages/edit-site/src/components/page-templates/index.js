@@ -256,10 +256,10 @@ export default function DataviewsTemplates() {
 		[ authors, view.type ]
 	);
 
-	const { shownTemplates, paginationInfo } = useMemo( () => {
+	const { data, paginationInfo } = useMemo( () => {
 		if ( ! allTemplates ) {
 			return {
-				shownTemplates: EMPTY_ARRAY,
+				data: EMPTY_ARRAY,
 				paginationInfo: { totalItems: 0, totalPages: 0 },
 			};
 		}
@@ -313,14 +313,10 @@ export default function DataviewsTemplates() {
 			} );
 		}
 		// Handle pagination.
-		const paginationResults = getPaginationResults( {
-			items: filteredTemplates,
+		return getPaginationResults( {
+			data: filteredTemplates,
 			view,
 		} );
-		return {
-			shownTemplates: paginationResults.items,
-			paginationInfo: paginationResults.paginationInfo,
-		};
 	}, [ allTemplates, view, fields ] );
 
 	const resetTemplateAction = useResetTemplateAction();
@@ -371,7 +367,7 @@ export default function DataviewsTemplates() {
 					paginationInfo={ paginationInfo }
 					fields={ fields }
 					actions={ actions }
-					data={ shownTemplates }
+					data={ data }
 					isLoading={ isLoadingData }
 					view={ view }
 					onChangeView={ onChangeView }
