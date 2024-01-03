@@ -11,7 +11,13 @@ import {
 } from '@wordpress/components';
 import { chevronLeft } from '@wordpress/icons';
 
-function TabLayout( { title, description, handleBack, children, footer } ) {
+function TabPanelLayout( {
+	title,
+	description,
+	handleBack,
+	children,
+	footer,
+} ) {
 	return (
 		<div className="font-library-modal__tabpanel-layout">
 			<Spacer margin={ 4 } />
@@ -47,4 +53,4 @@ function TabLayout( { title, description, handleBack, children, footer } ) {
 	);
 }
 
-export default TabLayout;
+export default TabPanelLayout;

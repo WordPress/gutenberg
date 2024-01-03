@@ -16,7 +16,7 @@ import {
 /**
  * Internal dependencies
  */
-import TabLayout from './tab-layout';
+import TabPanelLayout from './tab-panel-layout';
 import { FontLibraryContext } from './context';
 import FontsGrid from './fonts-grid';
 import LibraryFontDetails from './library-font-details';
@@ -92,7 +92,7 @@ function InstalledFonts() {
 	}, [ notice ] );
 
 	return (
-		<TabLayout
+		<TabPanelLayout
 			title={ libraryFontSelected?.name || '' }
 			description={ tabDescription }
 			handleBack={ !! libraryFontSelected && handleUnselectFont }
@@ -173,7 +173,7 @@ function InstalledFonts() {
 					handleCancelUninstall={ handleCancelUninstall }
 				/>
 			) }
-		</TabLayout>
+		</TabPanelLayout>
 	);
 }
 
