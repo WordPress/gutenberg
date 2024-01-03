@@ -43,6 +43,14 @@ const hoverOutside = async () => {
 };
 
 describe( 'Tooltip', () => {
+	// Wait enough time to make sure that tooltips don't show immediately, ignoring
+	// the showTimeout delay. For more context, see:
+	// - https://github.com/WordPress/gutenberg/pull/57345#discussion_r1435167187
+	// - https://ariakit.org/reference/tooltip-provider#skiptimeout
+	afterEach( async () => {
+		await sleep( 300 );
+	} );
+
 	describe( 'basic behavior', () => {
 		it( 'should not render the tooltip if multiple children are passed', async () => {
 			render(
