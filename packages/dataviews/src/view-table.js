@@ -330,7 +330,7 @@ function ViewTable( {
 		<div className="dataviews-table-view-wrapper">
 			<table
 				className="dataviews-table-view"
-				aria-busy={ isLoading || undefined }
+				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 			>
 				<thead>
