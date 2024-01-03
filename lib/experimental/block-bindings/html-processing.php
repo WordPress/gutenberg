@@ -24,73 +24,72 @@ if ( ! function_exists( 'block_bindings_replace_html' ) ) {
 		switch ( $block_type->attributes[ $block_attr ]['source'] ) {
 			case 'html':
 			case 'rich-text':
-				$p = new WP_HTML_Tag_Processor( $block_content );
+				$block_reader = new WP_HTML_Tag_Processor( $block_content );
 
 				// TODO: Support for CSS selectors whenever they are ready in the HTML API.
 				// In the meantime, support comma-separated selectors by exploding them into an array.
 				$selectors = explode( ',', $block_type->attributes[ $block_attr ]['selector'] );
 				// Add a bookmark to the first tag to be able to iterate over the selectors.
-				$p->next_tag();
-				$p->set_bookmark( 'iterate-selectors' );
+				$block_reader->next_tag();
+				$block_reader->set_bookmark( 'iterate-selectors' );
 
 				// TODO: This shouldn't be needed when the `set_inner_html` function is ready.
 				// Store the parent tag and its attributes to be able to restore them later in the button.
 				// The button block has a wrapper while the paragraph and heading blocks don't.
 				if ( 'core/button' === $block_name ) {
-					$parent_tag       = $p->get_tag();
-					$parent_tag_names = $p->get_attribute_names_with_prefix( '' );
-					$parent_tag_attrs = array();
-					foreach ( $parent_tag_names as $name ) {
-						$parent_tag_attrs[ $name ] = $p->get_attribute( $name );
+					$button_wrapper                 = $block_reader->get_tag();
+					$button_wrapper_attribute_names = $block_reader->get_attribute_names_with_prefix( '' );
+					$button_wrapper_attrs           = array();
+					foreach ( $button_wrapper_attribute_names as $name ) {
+						$button_wrapper_attrs[ $name ] = $block_reader->get_attribute( $name );
 					}
 				}
 
 				foreach ( $selectors as $selector ) {
 					// If the parent tag, or any of its children, matches the selector, replace the HTML.
-					if ( strcasecmp( $p->get_tag( $selector ), $selector ) === 0 || $p->next_tag(
+					if ( strcasecmp( $block_reader->get_tag( $selector ), $selector ) === 0 || $block_reader->next_tag(
 						array(
 							'tag_name' => $selector,
 						)
 					) ) {
-						$p->release_bookmark( 'iterate-selectors' );
+						$block_reader->release_bookmark( 'iterate-selectors' );
 
 						// TODO: Use `set_inner_html` method whenever it's ready in the HTML API.
 						// Until then, it is hardcoded for the paragraph, heading, and button blocks.
 						// Store the tag and its attributes to be able to restore them later.
-						$selector_tag_names = $p->get_attribute_names_with_prefix( '' );
-						$selector_tag_attrs = array();
-						foreach ( $selector_tag_names as $name ) {
-							$selector_tag_attrs[ $name ] = $p->get_attribute( $name );
+						$selector_attribute_names = $block_reader->get_attribute_names_with_prefix( '' );
+						$selector_attrs           = array();
+						foreach ( $selector_attribute_names as $name ) {
+							$selector_attrs[ $name ] = $block_reader->get_attribute( $name );
 						}
 						$selector_markup = "<$selector>" . esc_html( $source_value ) . "</$selector>";
-						$p2              = new WP_HTML_Tag_Processor( $selector_markup );
-						$p2->next_tag();
-						foreach ( $selector_tag_attrs as $attribute_key => $attribute_value ) {
-							$p2->set_attribute( $attribute_key, $attribute_value );
+						$amended_content = new WP_HTML_Tag_Processor( $selector_markup );
+						$amended_content->next_tag();
+						foreach ( $selector_attrs as $attribute_key => $attribute_value ) {
+							$amended_content->set_attribute( $attribute_key, $attribute_value );
 						}
-						$selector_updated_html = $p2->get_updated_html();
 						if ( 'core/paragraph' === $block_name || 'core/heading' === $block_name ) {
-							return $selector_updated_html;
+							return $amended_content->get_updated_html();
 						}
 						if ( 'core/button' === $block_name ) {
-							$markup = "<$parent_tag>$selector_updated_html</$parent_tag>";
-							$p3     = new WP_HTML_Tag_Processor( $markup );
-							$p3->next_tag();
-							foreach ( $parent_tag_attrs as $attribute_key => $attribute_value ) {
-								$p3->set_attribute( $attribute_key, $attribute_value );
+							$button_markup  = "<$button_wrapper>{$amended_content->get_updated_html()}</$button_wrapper>";
+							$amended_button = new WP_HTML_Tag_Processor( $button_markup );
+							$amended_button->next_tag();
+							foreach ( $button_wrapper_attrs as $attribute_key => $attribute_value ) {
+								$amended_button->set_attribute( $attribute_key, $attribute_value );
 							}
-							return $p3->get_updated_html();
+							return $amended_button->get_updated_html();
 						}
 					} else {
-						$p->seek( 'iterate-selectors' );
+						$block_reader->seek( 'iterate-selectors' );
 					}
 				}
-				$p->release_bookmark( 'iterate-selectors' );
+				$block_reader->release_bookmark( 'iterate-selectors' );
 				return $block_content;
 
 			case 'attribute':
-				$p = new WP_HTML_Tag_Processor( $block_content );
-				if ( ! $p->next_tag(
+				$amended_content = new WP_HTML_Tag_Processor( $block_content );
+				if ( ! $amended_content->next_tag(
 					array(
 						// TODO: build the query from CSS selector.
 						'tag_name' => $block_type->attributes[ $block_attr ]['selector'],
@@ -98,8 +97,8 @@ if ( ! function_exists( 'block_bindings_replace_html' ) ) {
 				) ) {
 					return $block_content;
 				}
-				$p->set_attribute( $block_type->attributes[ $block_attr ]['attribute'], esc_attr( $source_value ) );
-				return $p->get_updated_html();
+				$amended_content->set_attribute( $block_type->attributes[ $block_attr ]['attribute'], esc_attr( $source_value ) );
+				return $amended_content->get_updated_html();
 				break;
 
 			default:
