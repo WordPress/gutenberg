@@ -36,6 +36,7 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 			test( 'should produce expected output', async () => {
 				const options = Object.assign(
 					{
+						name: `${ configCase }-${ moduleMode }`,
 						target: 'web',
 						context: testDirectory,
 						entry: './index.js',
