@@ -30,6 +30,15 @@ class WP_Font_Family {
 	private $data;
 
 	/**
+	 * Theme.json version of the font family data.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @var int
+	 */
+	private $theme_json_version;
+
+	/**
 	 * WP_Font_Family constructor.
 	 *
 	 * @since 6.5.0
@@ -38,6 +47,7 @@ class WP_Font_Family {
 	 * @throws Exception If the font family data is missing the slug.
 	 */
 	public function __construct( $font_data = array() ) {
+		$this->theme_json_version = WP_Theme_JSON::LATEST_SCHEMA;
 		if ( empty( $font_data['slug'] ) ) {
 			throw new Exception( 'Font family data is missing the slug.' );
 		}
@@ -286,7 +296,7 @@ class WP_Font_Family {
 	private function sanitize() {
 		// Creates the structure of theme.json array with the new fonts.
 		$fonts_json = array(
-			'version'  => '2',
+			'version'  => $this->theme_json_version,
 			'settings' => array(
 				'typography' => array(
 					'fontFamilies' => array(
