@@ -28,49 +28,6 @@
 	}
 }
 
-.wp-block-button__inline-link {
-	color: $gray-700;
-	height: 0;
-	overflow: hidden;
-	max-width: 290px;
-
-	&-input__suggestions {
-		max-width: 290px;
-	}
-
-	@include break-medium() {
-		max-width: 260px;
-
-		&-input__suggestions {
-			max-width: 260px;
-		}
-
-	}
-	@include break-large() {
-		max-width: 290px;
-
-		&-input__suggestions {
-			max-width: 290px;
-		}
-
-	}
-
-	.is-selected & {
-		height: auto;
-		overflow: visible;
-	}
-}
-
-.wp-button-label__width {
-	.components-button-group {
-		display: block;
-	}
-
-	.components-base-control__field {
-		margin-bottom: 12px;
-	}
-}
-
 // Display "table" is used because the button container should only wrap the content and not takes the full width.
 div[data-type="core/button"] {
 	display: table;

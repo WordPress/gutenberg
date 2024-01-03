@@ -1,8 +1,13 @@
-( ( { wp } ) => {
-	const { store, navigate } = wp.interactivity;
+/**
+ * WordPress dependencies
+ */
+import { store, navigate } from '@wordpress/interactivity';
 
-	const html = `
-		<div data-wp-interactive data-wp-navigation-id="some-id">
+const html = `
+		<div
+			data-wp-interactive='{ "namespace": "directive-key" }'
+			data-wp-navigation-id="some-id"
+		>
 			<ul>
 				<li data-wp-key="id-1">1</li>
 				<li data-wp-key="id-2" data-testid="second-item">2</li>
@@ -10,14 +15,13 @@
 			</ul>
 		</div>`;
 
-	store( {
-		actions: {
-			navigate: () => {
-				navigate( window.location, {
-					force: true,
-					html,
-				} );
-			},
+store( 'directive-key', {
+	actions: {
+		navigate() {
+			navigate( window.location, {
+				force: true,
+				html,
+			} );
 		},
-	} );
-} )( window );
+	},
+} );

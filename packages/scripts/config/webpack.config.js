@@ -69,6 +69,7 @@ const cssLoaders = [
 	{
 		loader: require.resolve( 'css-loader' ),
 		options: {
+			importLoaders: 1,
 			sourceMap: ! isProduction,
 			modules: {
 				auto: true,

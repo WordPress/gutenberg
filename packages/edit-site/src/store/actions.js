@@ -10,6 +10,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 import { speak } from '@wordpress/a11y';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -49,16 +50,25 @@ export function toggleFeature( featureName ) {
 /**
  * Action that changes the width of the editing canvas.
  *
+ * @deprecated
+ *
  * @param {string} deviceType
  *
  * @return {Object} Action object.
  */
-export function __experimentalSetPreviewDeviceType( deviceType ) {
-	return {
-		type: 'SET_PREVIEW_DEVICE_TYPE',
-		deviceType,
+export const __experimentalSetPreviewDeviceType =
+	( deviceType ) =>
+	( { registry } ) => {
+		deprecated(
+			"dispatch( 'core/edit-site' ).__experimentalSetPreviewDeviceType",
+			{
+				since: '6.5',
+				version: '6.7',
+				hint: 'registry.dispatch( editorStore ).setDeviceType',
+			}
+		);
+		registry.dispatch( editorStore ).setDeviceType( deviceType );
 	};
-}
 
 /**
  * Action that sets a template, optionally fetching it from REST API.
@@ -311,23 +321,38 @@ export function setIsNavigationPanelOpened() {
 }
 
 /**
- * Opens or closes the inserter.
+ * Returns an action object used to open/close the inserter.
  *
- * @param {boolean|Object} value                Whether the inserter should be
- *                                              opened (true) or closed (false).
- *                                              To specify an insertion point,
- *                                              use an object.
- * @param {string}         value.rootClientId   The root client ID to insert at.
- * @param {number}         value.insertionIndex The index to insert at.
+ * @deprecated
  *
- * @return {Object} Action object.
+ * @param {boolean|Object} value Whether the inserter should be opened (true) or closed (false).
  */
-export function setIsInserterOpened( value ) {
-	return {
-		type: 'SET_IS_INSERTER_OPENED',
-		value,
+export const setIsInserterOpened =
+	( value ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-site' ).setIsInserterOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsInserterOpened",
+		} );
+		registry.dispatch( editorStore ).setIsInserterOpened( value );
 	};
-}
+
+/**
+ * Returns an action object used to open/close the list view.
+ *
+ * @deprecated
+ *
+ * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
+ */
+export const setIsListViewOpened =
+	( isOpen ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-site' ).setIsListViewOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsListViewOpened",
+		} );
+		registry.dispatch( editorStore ).setIsListViewOpened( isOpen );
+	};
 
 /**
  * Returns an action object used to update the settings.
@@ -342,27 +367,6 @@ export function updateSettings( settings ) {
 		settings,
 	};
 }
-
-/**
- * Sets whether the list view panel should be open.
- *
- * @param {boolean} isOpen If true, opens the list view. If false, closes it.
- *                         It does not toggle the state, but sets it directly.
- */
-export const setIsListViewOpened =
-	( isOpen ) =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core/edit-site', 'distractionFree' );
-		if ( isDistractionFree && isOpen ) {
-			dispatch.toggleDistractionFree();
-		}
-		dispatch( {
-			type: 'SET_IS_LIST_VIEW_OPENED',
-			isOpen,
-		} );
-	};
 
 /**
  * Sets whether the save view panel should be open.
@@ -604,8 +608,8 @@ export const toggleDistractionFree =
 				registry
 					.dispatch( preferencesStore )
 					.set( 'core/edit-site', 'fixedToolbar', true );
-				dispatch.setIsInserterOpened( false );
-				dispatch.setIsListViewOpened( false );
+				registry.dispatch( editorStore ).setIsInserterOpened( false );
+				registry.dispatch( editorStore ).setIsListViewOpened( false );
 				dispatch.closeGeneralSidebar();
 			} );
 		}

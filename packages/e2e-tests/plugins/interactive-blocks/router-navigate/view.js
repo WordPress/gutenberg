@@ -1,41 +1,34 @@
-( ( { wp } ) => {
-	/**
-	 * WordPress dependencies
-	 */
-	const { store, navigate } = wp.interactivity;
+/**
+ * WordPress dependencies
+ */
+import { store, navigate } from '@wordpress/interactivity';
 
-	store( {
-		state: {
-			router: {
-				status: 'idle',
-				navigations: 0,
-				timeout: 10000,
+const { state } = store( 'router', {
+	state: {
+		status: 'idle',
+		navigations: 0,
+		timeout: 10000,
+	},
+	actions: {
+		*navigate( e ) {
+			e.preventDefault();
+
+			state.navigations += 1;
+			state.status = 'busy';
+
+			const force = e.target.dataset.forceNavigation === 'true';
+			const { timeout } = state;
+
+			yield navigate( e.target.href, { force, timeout } );
+
+			state.navigations -= 1;
+
+			if ( state.navigations === 0 ) {
+				state.status = 'idle';
 			}
 		},
-		actions: {
-			router: {
-				navigate: async ( { state, event: e } ) => {
-					e.preventDefault();
-
-					state.router.navigations += 1;
-					state.router.status = 'busy';
-
-					const force = e.target.dataset.forceNavigation === 'true';
-					const { timeout } = state.router;
-
-					await navigate( e.target.href, { force, timeout } );
-
-					state.router.navigations -= 1;
-
-					if ( state.router.navigations === 0) {
-						state.router.status = 'idle';
-					}
-				},
-				toggleTimeout: ( { state }) => {
-					state.router.timeout =
-						state.router.timeout === 10000 ? 0 : 10000;
-				}
-			},
+		toggleTimeout() {
+			state.timeout = state.timeout === 10000 ? 0 : 10000;
 		},
-	} );
-} )( window );
+	},
+} );

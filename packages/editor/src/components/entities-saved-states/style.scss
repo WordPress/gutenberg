@@ -10,4 +10,8 @@
 .entities-saved-states__text-prompt {
 	padding: $grid-unit-20;
 	padding-bottom: $grid-unit-05;
+	.entities-saved-states__text-prompt--header {
+		display: block;
+		margin-bottom: $grid-unit-15;
+	}
 }

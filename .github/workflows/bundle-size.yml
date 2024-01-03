@@ -46,6 +46,7 @@ jobs:
               uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
               with:
                   node-version-file: '.nvmrc'
+                  check-latest: true
                   cache: npm
 
             - uses: preactjs/compressed-size-action@8119d3d31b6e57b167e09c81dfa877eada3bcb35 # v2.5.0
