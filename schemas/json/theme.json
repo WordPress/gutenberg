@@ -2235,6 +2235,13 @@
 			"type": "string",
 			"description": "Description of the global styles variation."
 		},
+		"supportedBlockTypes": {
+			"type": "array",
+			"description": "List of block types that can use the block style variation this theme.json file represents.",
+			"items": {
+				"type": "string"
+			}
+		},
 		"settings": {
 			"description": "Settings for the block editor and individual blocks. These include things like:\n- Which customization options should be available to the user. \n- The default colors, font sizes... available to the user. \n- CSS custom properties and class names used in styles.\n- And the default layout of the editor (widths and available alignments).",
 			"type": "object",
