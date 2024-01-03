@@ -88,12 +88,11 @@ function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
 }
 
-function TemplateTitle( { item, view } ) {
-	if ( view.type === LAYOUT_LIST ) {
+function TemplateTitle( { item, viewType } ) {
+	if ( viewType === LAYOUT_LIST ) {
 		return (
 			<>
-				{ decodeEntities( item.title?.rendered || item.slug ) ||
-					__( '(no title)' ) }
+				{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
 			</>
 		);
 	}
@@ -108,7 +107,7 @@ function TemplateTitle( { item, view } ) {
 						canvas: 'edit',
 					} }
 				>
-					{ decodeEntities( item.title?.rendered || item.slug ) ||
+					{ decodeEntities( item.title?.rendered ) ||
 						__( '(no title)' ) }
 				</Link>
 			</View>
@@ -116,9 +115,9 @@ function TemplateTitle( { item, view } ) {
 	);
 }
 
-function AuthorField( { item, view } ) {
+function AuthorField( { item, viewType } ) {
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
-	const withIcon = view.type !== LAYOUT_LIST;
+	const withIcon = viewType !== LAYOUT_LIST;
 
 	return (
 		<HStack alignment="left" spacing={ 1 }>
@@ -210,9 +209,9 @@ export default function DataviewsTemplates() {
 			{
 				header: __( 'Template' ),
 				id: 'title',
-				getValue: ( { item } ) => item.title?.rendered || item.slug,
+				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => (
-					<TemplateTitle item={ item } view={ view } />
+					<TemplateTitle item={ item } viewType={ view.type } />
 				),
 				maxWidth: 400,
 				enableHiding: false,
@@ -243,14 +242,14 @@ export default function DataviewsTemplates() {
 				id: 'author',
 				getValue: ( { item } ) => item.author_text,
 				render: ( { item } ) => {
-					return <AuthorField view={ view } item={ item } />;
+					return <AuthorField viewType={ view.type } item={ item } />;
 				},
 				enableHiding: false,
 				type: ENUMERATION_TYPE,
 				elements: authors,
 			},
 		],
-		[ authors, view ]
+		[ authors, view.type ]
 	);
 
 	const { shownTemplates, paginationInfo } = useMemo( () => {

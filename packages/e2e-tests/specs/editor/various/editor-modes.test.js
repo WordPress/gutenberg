@@ -127,7 +127,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		// The inserter is disabled.
 		const disabledInserter = await page.$(
-			'.edit-post-header-toolbar__inserter-toggle:disabled, .edit-post-header-toolbar__inserter-toggle[aria-disabled="true"]'
+			'.editor-document-tools__inserter-toggle:disabled, .editor-document-tools__inserter-toggle[aria-disabled="true"]'
 		);
 		expect( disabledInserter ).not.toBeNull();
 	} );

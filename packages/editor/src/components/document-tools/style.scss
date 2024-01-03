@@ -1,9 +1,9 @@
-.edit-post-header-toolbar {
+.editor-document-tools {
 	display: inline-flex;
 	align-items: center;
 
 	// Hide all action buttons except the inserter on mobile.
-	.edit-post-header-toolbar__left > .components-button {
+	.editor-document-tools__left > .components-button {
 		display: none;
 
 		@include break-small() {
@@ -11,7 +11,7 @@
 		}
 	}
 
-	.edit-post-header-toolbar__left > .edit-post-header-toolbar__inserter-toggle {
+	.editor-document-tools__left > .editor-document-tools__inserter-toggle {
 		display: inline-flex;
 
 		svg {
@@ -37,8 +37,8 @@
 
 	// The Toolbar component adds different styles to buttons, so we reset them
 	// here to the original button styles
-	.edit-post-header-toolbar__left > .components-button.has-icon,
-	.edit-post-header-toolbar__left > .components-dropdown > .components-button.has-icon {
+	.editor-document-tools__left > .components-button.has-icon,
+	.editor-document-tools__left > .components-dropdown > .components-button.has-icon {
 		// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
 		// This is best fixed by making the mover control area a proper single toolbar group.
 		// It needs specificity due to style inherited from .components-accessible-toolbar .components-button.has-icon.has-icon.
@@ -61,25 +61,7 @@
 	}
 }
 
-// Reduced UI.
-.edit-post-header.has-reduced-ui {
-	@include break-small () {
-		// Apply transition to every button but the first one.
-		.edit-post-header-toolbar__left > * + .components-button,
-		.edit-post-header-toolbar__left > * + .components-dropdown > [aria-expanded="false"] {
-			transition: opacity 0.1s linear;
-			@include reduce-motion("transition");
-		}
-
-		// Zero out opacity unless hovered.
-		&:not(:hover) .edit-post-header-toolbar__left > * + .components-button,
-		&:not(:hover) .edit-post-header-toolbar__left > * + .components-dropdown > [aria-expanded="false"] {
-			opacity: 0;
-		}
-	}
-}
-
-.edit-post-header-toolbar__left {
+.editor-document-tools__left {
 	display: inline-flex;
 	align-items: center;
 	padding-left: $grid-unit-20;
@@ -98,7 +80,7 @@
 	}
 }
 
-.edit-post-header-toolbar .edit-post-header-toolbar__left > .edit-post-header-toolbar__inserter-toggle.has-icon {
+.editor-document-tools .editor-document-tools__left > .editor-document-tools__inserter-toggle.has-icon {
 	min-width: $button-size-compact;
 	width: $button-size-compact;
 	height: $button-size-compact;
@@ -111,6 +93,6 @@
 	}
 }
 
-.show-icon-labels .edit-post-header-toolbar__left > * + * {
+.show-icon-labels .editor-document-tools__left > * + * {
 	margin-left: $grid-unit-10;
 }

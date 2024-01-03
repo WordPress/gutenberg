@@ -34,14 +34,14 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import FullscreenModeClose from './fullscreen-mode-close';
-import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { PostViewLink, PreviewDropdown } = unlock( editorPrivateApis );
+const { DocumentTools, PostViewLink, PreviewDropdown } =
+	unlock( editorPrivateApis );
 
 const slideY = {
 	hidden: { y: '-50px' },
@@ -60,6 +60,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const blockToolbarRef = useRef();
 	const {
+		isTextEditor,
 		hasBlockSelection,
 		hasActiveMetaboxes,
 		hasFixedToolbar,
@@ -68,8 +69,10 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		showIconLabels,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
+		const { getEditorMode } = select( editPostStore );
 
 		return {
+			isTextEditor: getEditorMode() === 'text',
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -108,7 +111,10 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				transition={ { type: 'tween', delay: 0.8 } }
 				className="edit-post-header__toolbar"
 			>
-				<HeaderToolbar hasFixedToolbar={ hasFixedToolbar } />
+				<DocumentTools
+					disableBlockTools={ isTextEditor }
+					showIconLabels={ showIconLabels }
+				/>
 				{ hasFixedToolbar && isLargeViewport && (
 					<>
 						<div
