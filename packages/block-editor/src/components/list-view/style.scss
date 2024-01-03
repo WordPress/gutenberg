@@ -15,8 +15,8 @@
 	// Use position relative for row animation.
 	position: relative;
 
-	&.is-draggable:hover .block-editor-list-view-block__contents-cell,
-	&.is-draggable:hover .block-editor-list-view-block-contents {
+	&.is-draggable,
+	&.is-draggable .block-editor-list-view-block-contents {
 		cursor: grab;
 	}
 
@@ -383,6 +383,7 @@
 	height: $icon-size;
 	margin-left: $grid-unit-05;
 	width: $icon-size;
+	cursor: pointer;
 }
 
 // First level of indentation is aria-level 2, max indent is 8.
