@@ -297,6 +297,24 @@ function Navigation( {
 		[ clientId ]
 	);
 	const isResponsive = 'never' !== overlayMenu;
+
+	const shouldBeCollapsed = useCallback( () => {
+		return (
+			'always' === overlayMenu ||
+			( 'mobile' === overlayMenu && window.innerWidth < 600 )
+		);
+	}, [ overlayMenu ] );
+	const [ isCollapsed, setIsCollapsed ] = useState( shouldBeCollapsed() );
+	useEffect( () => {
+		// Update when the window resizes.
+		window.addEventListener( 'resize', () => {
+			setIsCollapsed( shouldBeCollapsed() );
+		} );
+
+		// Update when the overlay menu setting changes.
+		setIsCollapsed( shouldBeCollapsed() );
+	}, [ overlayMenu, setIsCollapsed, shouldBeCollapsed ] );
+
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: classnames(
@@ -310,6 +328,7 @@ function Navigation( {
 				'is-vertical': orientation === 'vertical',
 				'no-wrap': flexWrap === 'nowrap',
 				'is-responsive': isResponsive,
+				'is-collapsed': isCollapsed,
 				'has-text-color': !! textColor.color || !! textColor?.class,
 				[ getColorClassName( 'color', textColor?.slug ) ]:
 					!! textColor?.slug,
