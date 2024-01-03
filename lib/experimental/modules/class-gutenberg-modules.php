@@ -152,7 +152,7 @@ class Gutenberg_Modules {
 	 * import maps (https://github.com/guybedford/es-module-shims/issues/406).
 	 */
 	public static function print_import_map_polyfill() {
-		$test = 'HTMLScriptElement.supports?.("importmap")';
+		$test = 'HTMLScriptElement.supports && HTMLScriptElement.supports("importmap")';
 		$src  = gutenberg_url( '/build/modules/importmap-polyfill.min.js' );
 
 		echo (
