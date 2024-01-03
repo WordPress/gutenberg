@@ -97,6 +97,7 @@ export class MediaUploadProgress extends Component {
 
 	finishMediaUploadWithPause( payload ) {
 		this.setState( {
+			progress: payload.progress,
 			uploadState: payload.state,
 			isUploadInProgress: true,
 			isUploadFailed: false,
@@ -108,6 +109,7 @@ export class MediaUploadProgress extends Component {
 
 	finishMediaUploadWithFailure( payload ) {
 		this.setState( {
+			progress: payload.progress,
 			uploadState: payload.state,
 			isUploadInProgress: false,
 			isUploadFailed: true,
@@ -119,6 +121,7 @@ export class MediaUploadProgress extends Component {
 
 	mediaUploadStateReset( payload ) {
 		this.setState( {
+			progress: payload.progress,
 			uploadState: payload.state,
 			isUploadInProgress: false,
 			isUploadFailed: false,
@@ -164,7 +167,9 @@ export class MediaUploadProgress extends Component {
 
 		const progressBarStyle = [
 			styles.progressBar,
-			showSpinner || styles.progressBarHidden,
+			showSpinner && this.props.isConnected
+				? styles.progressBarHidden
+				: null,
 			this.props.progressBarStyle,
 		];
 

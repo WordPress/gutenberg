@@ -38,6 +38,8 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     private static final int MEDIA_SAVE_STATE_RESET = 8;
     private static final int MEDIA_SAVE_FINAL_STATE_RESULT = 9;
     private static final int MEDIA_SAVE_MEDIAID_CHANGED = 10;
+    private static final int MEDIA_UPLOAD_STATE_PAUSED = 11;
+
 
     private static final String EVENT_NAME_MEDIA_UPLOAD = "mediaUpload";
     private static final String EVENT_NAME_MEDIA_SAVE = "mediaSave";
