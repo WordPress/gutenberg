@@ -15,8 +15,8 @@
 	// Use position relative for row animation.
 	position: relative;
 
-	&.is-draggable:hover,
-	&.is-draggable:hover .block-editor-list-view-block-contents * {
+	&.is-draggable:hover .block-editor-list-view-block__contents-cell,
+	&.is-draggable:hover .block-editor-list-view-block-contents {
 		cursor: grab;
 	}
 
