@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render correctly 1`] = `
+.emotion-0 {
+  z-index: 1000002;
+  box-sizing: border-box;
+  opacity: 0;
+  outline: none;
+  transform-origin: top center;
+  -webkit-transition: opacity 100ms ease;
+  transition: opacity 100ms ease;
+  font-size: 13px;
+}
+
+.emotion-0[data-enter] {
+  opacity: 1;
+}
+
+.emotion-2 {
+  background: rgba( 0, 0, 0, 0.8 );
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba( 255, 255, 255, 0.04 );
+  color: #fff;
+  padding: 4px 8px;
+}
+
+<div
+  class="components-tooltip-content emotion-0 emotion-1"
+  data-wp-c16t="true"
+  data-wp-component="TooltipContent"
+  id="base-tooltip"
+  role="tooltip"
+  style="position: fixed; left: 100%; top: 100%; pointer-events: none;"
+>
+  <div
+    class="emotion-2 emotion-3"
+  >
+    Code is Poetry
+  </div>
+</div>
+`;
