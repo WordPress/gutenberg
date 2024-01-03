@@ -21,8 +21,6 @@ type GroupedSide = ( typeof groupedSides )[ number ];
 export default function AxialInputControls( {
 	onChange,
 	onFocus,
-	onHoverOn,
-	onHoverOff,
 	values,
 	selectedUnits,
 	setSelectedUnits,
@@ -42,42 +40,6 @@ export default function AxialInputControls( {
 			}
 			onFocus( event, { side } );
 		};
-
-	const createHandleOnHoverOn = ( side: GroupedSide ) => () => {
-		if ( ! onHoverOn ) {
-			return;
-		}
-		if ( side === 'vertical' ) {
-			onHoverOn( {
-				top: true,
-				bottom: true,
-			} );
-		}
-		if ( side === 'horizontal' ) {
-			onHoverOn( {
-				left: true,
-				right: true,
-			} );
-		}
-	};
-
-	const createHandleOnHoverOff = ( side: GroupedSide ) => () => {
-		if ( ! onHoverOff ) {
-			return;
-		}
-		if ( side === 'vertical' ) {
-			onHoverOff( {
-				top: false,
-				bottom: false,
-			} );
-		}
-		if ( side === 'horizontal' ) {
-			onHoverOff( {
-				left: false,
-				right: false,
-			} );
-		}
-	};
 
 	const handleOnValueChange = ( side: GroupedSide, next?: string ) => {
 		if ( ! onChange ) {
@@ -151,8 +113,6 @@ export default function AxialInputControls( {
 							}
 							onUnitChange={ createHandleOnUnitChange( side ) }
 							onFocus={ createHandleOnFocus( side ) }
-							onHoverOn={ createHandleOnHoverOn( side ) }
-							onHoverOff={ createHandleOnHoverOff( side ) }
 							label={ LABELS[ side ] }
 							key={ side }
 						/>

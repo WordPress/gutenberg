@@ -20,8 +20,6 @@ const noop = () => {};
 export default function BoxInputControls( {
 	onChange = noop,
 	onFocus = noop,
-	onHoverOn = noop,
-	onHoverOff = noop,
 	values,
 	selectedUnits,
 	setSelectedUnits,
@@ -35,14 +33,6 @@ export default function BoxInputControls( {
 		( event: React.FocusEvent< HTMLInputElement > ) => {
 			onFocus( event, { side } );
 		};
-
-	const createHandleOnHoverOn = ( side: keyof BoxControlValue ) => () => {
-		onHoverOn( { [ side ]: true } );
-	};
-
-	const createHandleOnHoverOff = ( side: keyof BoxControlValue ) => () => {
-		onHoverOff( { [ side ]: false } );
-	};
 
 	const handleOnChange = ( nextValues: BoxControlValue ) => {
 		onChange( nextValues );
@@ -124,8 +114,6 @@ export default function BoxInputControls( {
 							}
 							onUnitChange={ createHandleOnUnitChange( side ) }
 							onFocus={ createHandleOnFocus( side ) }
-							onHoverOn={ createHandleOnHoverOn( side ) }
-							onHoverOff={ createHandleOnHoverOff( side ) }
 							label={ LABELS[ side ] }
 						/>
 

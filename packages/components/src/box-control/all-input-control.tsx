@@ -25,8 +25,6 @@ const noop = () => {};
 export default function AllInputControl( {
 	onChange = noop,
 	onFocus = noop,
-	onHoverOn = noop,
-	onHoverOff = noop,
 	values,
 	sides,
 	selectedUnits,
@@ -74,24 +72,6 @@ export default function AllInputControl( {
 		setSelectedUnits( newUnits );
 	};
 
-	const handleOnHoverOn = () => {
-		onHoverOn( {
-			top: true,
-			bottom: true,
-			left: true,
-			right: true,
-		} );
-	};
-
-	const handleOnHoverOff = () => {
-		onHoverOff( {
-			top: false,
-			bottom: false,
-			left: false,
-			right: false,
-		} );
-	};
-
 	return (
 		<HStack>
 			<UnitControl
@@ -102,8 +82,6 @@ export default function AllInputControl( {
 				onChange={ unitControlOnChange }
 				onUnitChange={ handleOnUnitChange }
 				onFocus={ handleOnFocus }
-				onHoverOn={ handleOnHoverOn }
-				onHoverOff={ handleOnHoverOff }
 				placeholder={ allPlaceholder }
 			/>
 
