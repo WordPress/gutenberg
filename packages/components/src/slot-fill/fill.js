@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * WordPress dependencies
  */
@@ -8,9 +10,8 @@ import { useContext, useLayoutEffect, useRef } from '@wordpress/element';
  */
 import SlotFillContext from './context';
 import useSlot from './use-slot';
-import type { FillComponentProps } from './types';
 
-export default function Fill( { name, children }: FillComponentProps ) {
+export default function Fill( { name, children } ) {
 	const { registerFill, unregisterFill } = useContext( SlotFillContext );
 	const slot = useSlot( name );
 

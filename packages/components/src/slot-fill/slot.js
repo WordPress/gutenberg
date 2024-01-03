@@ -1,8 +1,4 @@
-/**
- * External dependencies
- */
-import type { ReactElement, ReactNode, Key } from 'react';
-
+// @ts-nocheck
 /**
  * WordPress dependencies
  */
@@ -17,23 +13,20 @@ import {
  * Internal dependencies
  */
 import SlotFillContext from './context';
-import type { BaseSlotComponentProps, SlotComponentProps } from './types';
 
 /**
  * Whether the argument is a function.
  *
- * @param maybeFunc The argument to check.
- * @return True if the argument is a function, false otherwise.
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
  */
-function isFunction( maybeFunc: any ): maybeFunc is Function {
+function isFunction( maybeFunc ) {
 	return typeof maybeFunc === 'function';
 }
 
-class SlotComponent extends Component< BaseSlotComponentProps > {
-	private isUnmounted: boolean;
-
-	constructor( props: BaseSlotComponentProps ) {
-		super( props );
+class SlotComponent extends Component {
+	constructor() {
+		super( ...arguments );
 
 		this.isUnmounted = false;
 	}
@@ -50,7 +43,7 @@ class SlotComponent extends Component< BaseSlotComponentProps > {
 		unregisterSlot( this.props.name, this );
 	}
 
-	componentDidUpdate( prevProps: BaseSlotComponentProps ) {
+	componentDidUpdate( prevProps ) {
 		const { name, unregisterSlot, registerSlot } = this.props;
 
 		if ( prevProps.name !== name ) {
@@ -68,27 +61,20 @@ class SlotComponent extends Component< BaseSlotComponentProps > {
 
 	render() {
 		const { children, name, fillProps = {}, getFills } = this.props;
-		const fills: ReactNode[] = ( getFills( name, this ) ?? [] )
+
+		const fills = ( getFills( name, this ) ?? [] )
 			.map( ( fill ) => {
 				const fillChildren = isFunction( fill.children )
 					? fill.children( fillProps )
 					: fill.children;
+
 				return Children.map( fillChildren, ( child, childIndex ) => {
 					if ( ! child || typeof child === 'string' ) {
 						return child;
 					}
-					let childKey: Key = childIndex;
-					if (
-						typeof child === 'object' &&
-						'key' in child &&
-						child?.key
-					) {
-						childKey = child.key;
-					}
 
-					return cloneElement( child as ReactElement, {
-						key: childKey,
-					} );
+					const childKey = child.key || childIndex;
+					return cloneElement( child, { key: childKey } );
 				} );
 			} )
 			.filter(
@@ -102,7 +88,7 @@ class SlotComponent extends Component< BaseSlotComponentProps > {
 	}
 }
 
-const Slot = ( props: Omit< SlotComponentProps, 'bubblesVirtually' > ) => (
+const Slot = ( props ) => (
 	<SlotFillContext.Consumer>
 		{ ( { registerSlot, unregisterSlot, getFills } ) => (
 			<SlotComponent

@@ -1,8 +1,4 @@
-/**
- * External dependencies
- */
-import type { ForwardedRef } from 'react';
-
+// @ts-nocheck
 /**
  * WordPress dependencies
  */
@@ -19,30 +15,21 @@ import { useMergeRefs } from '@wordpress/compose';
  */
 import { View } from '../../view';
 import SlotFillContext from './slot-fill-context';
-import type { WordPressComponentProps } from '../../context';
-import type { SlotComponentProps } from '../types';
 
-function Slot(
-	props: WordPressComponentProps<
-		Omit< SlotComponentProps, 'bubblesVirtually' >,
-		'div'
-	>,
-	forwardedRef: ForwardedRef< any >
-) {
+function Slot( props, forwardedRef ) {
 	const {
 		name,
 		fillProps = {},
 		as,
 		// `children` is not allowed. However, if it is passed,
 		// it will be displayed as is, so remove `children`.
-		// @ts-ignore
 		children,
 		...restProps
 	} = props;
 
 	const { registerSlot, unregisterSlot, ...registry } =
 		useContext( SlotFillContext );
-	const ref = useRef< HTMLElement >( null );
+	const ref = useRef();
 
 	useLayoutEffect( () => {
 		registerSlot( name, ref, fillProps );
