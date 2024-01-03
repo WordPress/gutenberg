@@ -31,10 +31,11 @@ const expectTooltipToBeHidden = () =>
 		screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
 	).not.toBeInTheDocument();
 
-const waitForTooltipToShow = ( timeout = TOOLTIP_DELAY ) =>
-	waitFor( () => expectTooltipToBeVisible(), { timeout } );
+const waitForTooltipToShow = async ( timeout = TOOLTIP_DELAY ) =>
+	await waitFor( () => expectTooltipToBeVisible(), { timeout } );
 
-const waitForTooltipToHide = () => waitFor( () => expectTooltipToBeHidden );
+const waitForTooltipToHide = async () =>
+	await waitFor( () => expectTooltipToBeHidden );
 
 const hoverOutside = async () => {
 	await hover( document.body );
