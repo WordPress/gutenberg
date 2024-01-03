@@ -4,7 +4,6 @@
 import { blockNames } from './pages/editor-page';
 import {
 	backspace,
-	clickMiddleOfElement,
 	clickBeginningOfElement,
 	waitForMediaLibrary,
 } from './helpers/utils';
@@ -189,75 +188,69 @@ describe( 'Gutenberg Editor Writing flow tests', () => {
 		expect( typedText ).toMatch( testData.listItem1 );
 	} );
 
-	it( 'should be able to split one paragraph block into two', async () => {
+	it( 'should be able to split and merge paragraph blocks', async () => {
 		await editorPage.initializeEditor();
 
+		// Add the first Paragraph block using the default block appender
 		const defaultBlockAppenderElement =
 			await editorPage.getDefaultBlockAppenderElement();
 		await defaultBlockAppenderElement.click();
 
-		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
-			blockNames.paragraph
-		);
+		// Type text into the first Paragraph block
+		const firstParagraphBlockElement =
+			await editorPage.getTextBlockAtPosition( blockNames.paragraph );
 		await editorPage.typeTextToTextBlock(
-			paragraphBlockElement,
+			firstParagraphBlockElement,
 			testData.shortText
 		);
-		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement );
-		await editorPage.typeTextToTextBlock( paragraphBlockElement, '\n' );
 
-		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
-		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
-
-		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 2 );
-		expect( text0 ).not.toBe( '' );
-		expect( text1 ).not.toBe( '' );
-	} );
-
-	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
-		await editorPage.initializeEditor();
-
-		const defaultBlockAppenderElement =
-			await editorPage.getDefaultBlockAppenderElement();
-		await defaultBlockAppenderElement.click();
-
-		let paragraphBlockElement = await editorPage.getTextBlockAtPosition(
-			blockNames.paragraph
-		);
-
+		// Add a second Paragraph block and type some text
+		await editorPage.addParagraphBlockByTappingEmptyAreaBelowLastBlock();
+		expect( await editorPage.driver.isKeyboardShown() ).toBe( true );
+		const secondParagraphBlockElement =
+			await editorPage.getTextBlockAtPosition( blockNames.paragraph, 2 );
 		await editorPage.typeTextToTextBlock(
-			paragraphBlockElement,
-			testData.shortText
-		);
-		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement );
-		await editorPage.typeTextToTextBlock( paragraphBlockElement, '\n' );
-
-		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
-		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
-		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 2 );
-		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
-			blockNames.paragraph,
-			2
+			secondParagraphBlockElement,
+			testData.mediumText
 		);
 
+		// Merge Paragraph blocks
 		await clickBeginningOfElement(
 			editorPage.driver,
-			paragraphBlockElement
+			secondParagraphBlockElement
 		);
-
 		await editorPage.typeTextToTextBlock(
-			paragraphBlockElement,
+			secondParagraphBlockElement,
 			backspace
 		);
 
-		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
-		expect( text0 + text1 ).toMatch( text );
-		paragraphBlockElement = await editorPage.getTextBlockAtPosition(
+		// Wait for blocks to be merged
+		await editorPage.driver.waitUntil( async function () {
+			return ( await editorPage.getNumberOfParagraphBlocks() ) === 1;
+		} );
+		expect( await editorPage.driver.isKeyboardShown() ).toBe( true );
+
+		// Split the current Paragraph block right where the caret is positioned
+		const paragraphBlockElement = await editorPage.getTextBlockAtPosition(
 			blockNames.paragraph,
-			1
+			1,
+			true
 		);
-		await paragraphBlockElement.click();
-		expect( await editorPage.getNumberOfParagraphBlocks() ).toEqual( 1 );
+		await editorPage.typeTextToTextBlock( paragraphBlockElement, '\n' );
+
+		// Wait for blocks to be split
+		await editorPage.driver.waitUntil( async function () {
+			return ( await editorPage.getNumberOfParagraphBlocks() ) === 2;
+		} );
+		expect( await editorPage.driver.isKeyboardShown() ).toBe( true );
+
+		const firstParagraphText =
+			await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		const secondParagraphText =
+			await editorPage.getTextForParagraphBlockAtPosition( 2 );
+
+		expect( firstParagraphText ).toEqual( testData.shortText );
+		expect( secondParagraphText ).toEqual( testData.mediumText );
 	} );
 
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
