@@ -7,7 +7,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { space } from '../utils/space';
+import { space } from '../ui/utils/space';
 import { rtl } from '../utils';
 import type { DividerProps } from './types';
 

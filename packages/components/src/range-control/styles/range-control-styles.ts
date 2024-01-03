@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
  */
 import NumberControl from '../../number-control';
 import { COLORS, reduceMotion, rtl } from '../../utils';
-import { space } from '../../utils/space';
+import { space } from '../../ui/utils/space';
 
 import type {
 	RangeMarkProps,
@@ -301,7 +301,7 @@ export const Tooltip = styled.span< TooltipProps >`
 `;
 
 // @todo: Refactor RangeControl with latest HStack configuration
-// @see: packages/components/src/h-stack
+// @wordpress/components/ui/hstack.
 export const InputNumber = styled( NumberControl )`
 	display: inline-block;
 	font-size: 13px;
