@@ -359,7 +359,9 @@ function ViewTable( {
 													node,
 													fallback:
 														visibleFields[
-															index - 1
+															index > 0
+																? index - 1
+																: 1
 														]?.id,
 												}
 											);
