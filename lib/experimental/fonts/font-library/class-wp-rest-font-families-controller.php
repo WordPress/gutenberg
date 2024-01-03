@@ -59,15 +59,15 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 					'callback'            => array( $this, 'install_fonts' ),
 					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
 					'args'                => array(
-						'font_families' => array(
+						'font_families'      => array(
 							'required'          => true,
 							'type'              => 'string',
 							'validate_callback' => array( $this, 'validate_install_font_families' ),
 						),
 						'theme_json_version' => array(
-							'required'          => false,
-							'type'              => 'integer',
-							'default'           => WP_Theme_JSON::LATEST_SCHEMA,
+							'required' => false,
+							'type'     => 'integer',
+							'default'  => WP_Theme_JSON::LATEST_SCHEMA,
 						),
 					),
 				),
@@ -363,7 +363,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	 */
 	public function install_fonts( $request ) {
 		// Get new fonts to install.
-		$fonts_param = $request->get_param( 'font_families' );
+		$fonts_param        = $request->get_param( 'font_families' );
 		$theme_json_version = $request->get_param( 'theme_json_version' );
 
 		/*
