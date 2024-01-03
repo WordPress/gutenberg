@@ -90,11 +90,11 @@ function StartPageOptionsModal( { onClose } ) {
 export default function StartPageOptions() {
 	const [ isClosed, setIsClosed ] = useState( false );
 	const shouldEnableModal = useSelect( ( select ) => {
-		const { isCleanNewPost } = select( editorStore );
-		const { isEditingTemplate, isFeatureActive } = select( editPostStore );
+		const { isCleanNewPost, getRenderingMode } = select( editorStore );
+		const { isFeatureActive } = select( editPostStore );
 
 		return (
-			! isEditingTemplate() &&
+			getRenderingMode() === 'post-only' &&
 			! isFeatureActive( 'welcomeGuide' ) &&
 			isCleanNewPost()
 		);

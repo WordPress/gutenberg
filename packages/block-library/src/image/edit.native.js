@@ -47,6 +47,7 @@ import {
 	BlockStyles,
 	store as blockEditorStore,
 	blockSettingsScreens,
+	RichText,
 } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg, isURL } from '@wordpress/url';
@@ -329,9 +330,7 @@ export class ImageEdit extends Component {
 
 	accessibilityLabelCreator( caption ) {
 		// Checks if caption is empty.
-		return ( typeof caption === 'string' && caption.trim().length === 0 ) ||
-			caption === undefined ||
-			caption === null
+		return RichText.isEmpty( caption )
 			? /* translators: accessibility text. Empty image caption. */
 			  'Image caption. Empty'
 			: sprintf(

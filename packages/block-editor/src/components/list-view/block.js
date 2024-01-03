@@ -13,7 +13,13 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
-import { useState, useRef, useCallback, memo } from '@wordpress/element';
+import {
+	useCallback,
+	useMemo,
+	useState,
+	useRef,
+	memo,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -53,7 +59,9 @@ function ListViewBlock( {
 } ) {
 	const cellRef = useRef( null );
 	const rowRef = useRef( null );
+	const settingsRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
+	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 
 	const { isLocked, canEdit } = useBlockLock( clientId );
 
@@ -81,6 +89,11 @@ function ListViewBlock( {
 			};
 		},
 		[ clientId ]
+	);
+	const allowRightClickOverrides = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().allowRightClickOverrides,
+		[]
 	);
 
 	const showBlockActions =
@@ -190,6 +203,56 @@ function ListViewBlock( {
 		[ clientId, expand, collapse, isExpanded ]
 	);
 
+	// Allow right-clicking an item in the List View to open up the block settings dropdown.
+	const onContextMenu = useCallback(
+		( event ) => {
+			if ( showBlockActions && allowRightClickOverrides ) {
+				settingsRef.current?.click();
+				// Ensure the position of the settings dropdown is at the cursor.
+				setSettingsAnchorRect(
+					new window.DOMRect( event.clientX, event.clientY, 0, 0 )
+				);
+				event.preventDefault();
+			}
+		},
+		[ allowRightClickOverrides, settingsRef, showBlockActions ]
+	);
+
+	const onMouseDown = useCallback(
+		( event ) => {
+			// Prevent right-click from focusing the block,
+			// because focus will be handled when opening the block settings dropdown.
+			if ( allowRightClickOverrides && event.button === 2 ) {
+				event.preventDefault();
+			}
+		},
+		[ allowRightClickOverrides ]
+	);
+
+	const settingsPopoverAnchor = useMemo( () => {
+		const { ownerDocument } = rowRef?.current || {};
+
+		// If no custom position is set, the settings dropdown will be anchored to the
+		// DropdownMenu toggle button.
+		if ( ! settingsAnchorRect || ! ownerDocument ) {
+			return undefined;
+		}
+
+		// Position the settings dropdown at the cursor when right-clicking a block.
+		return {
+			ownerDocument,
+			getBoundingClientRect() {
+				return settingsAnchorRect;
+			},
+		};
+	}, [ settingsAnchorRect ] );
+
+	const clearSettingsAnchorRect = useCallback( () => {
+		// Clear the custom position for the settings dropdown so that it is restored back
+		// to being anchored to the DropdownMenu toggle button.
+		setSettingsAnchorRect( undefined );
+	}, [ setSettingsAnchorRect ] );
+
 	let colSpan;
 	if ( hasRenderedMovers ) {
 		colSpan = 2;
@@ -257,6 +320,8 @@ function ListViewBlock( {
 						<ListViewBlockContents
 							block={ block }
 							onClick={ selectEditorBlock }
+							onContextMenu={ onContextMenu }
+							onMouseDown={ onMouseDown }
 							onToggleExpanded={ toggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
@@ -315,6 +380,7 @@ function ListViewBlock( {
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
 					aria-selected={ !! isSelected }
+					ref={ settingsRef }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsMenu
@@ -322,10 +388,14 @@ function ListViewBlock( {
 							block={ block }
 							icon={ moreVertical }
 							label={ settingsAriaLabel }
+							popoverProps={ {
+								anchor: settingsPopoverAnchor, // Used to position the settings at the cursor on right-click.
+							} }
 							toggleProps={ {
 								ref,
 								className: 'block-editor-list-view-block__menu',
 								tabIndex,
+								onClick: clearSettingsAnchorRect,
 								onFocus,
 							} }
 							disableOpenOnArrowDown

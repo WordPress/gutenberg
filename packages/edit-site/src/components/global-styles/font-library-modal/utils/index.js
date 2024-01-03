@@ -1,8 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
-import { formatFontFamily } from './preview-styles';
+import { unlock } from '../../../../lock-unlock';
 
 export function setUIValuesNeeded( font, extraValues = {} ) {
 	if ( ! font.name && ( font.fontFamily || font.slug ) ) {
@@ -85,14 +90,10 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 	}
 
 	// eslint-disable-next-line no-undef
-	const newFont = new FontFace(
-		formatFontFamily( fontFace.fontFamily ),
-		dataSource,
-		{
-			style: fontFace.fontStyle,
-			weight: fontFace.fontWeight,
-		}
-	);
+	const newFont = new FontFace( fontFace.fontFamily, dataSource, {
+		style: fontFace.fontStyle,
+		weight: fontFace.fontWeight,
+	} );
 
 	const loadedFace = await newFont.load();
 
@@ -132,6 +133,8 @@ export function getDisplaySrcFromFontFace( input, urlPrefix ) {
 export function makeFormDataFromFontFamilies( fontFamilies ) {
 	const formData = new FormData();
 	const newFontFamilies = fontFamilies.map( ( family, familyIndex ) => {
+		const { kebabCase } = unlock( componentsPrivateApis );
+		family.slug = kebabCase( family.slug );
 		if ( family?.fontFace ) {
 			family.fontFace = family.fontFace.map( ( face, faceIndex ) => {
 				if ( face.file ) {

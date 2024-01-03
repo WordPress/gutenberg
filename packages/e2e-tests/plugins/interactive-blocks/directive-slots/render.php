@@ -5,9 +5,11 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+gutenberg_enqueue_module( 'directive-slots-view' );
 ?>
+
 <div
-	data-wp-interactive
+	data-wp-interactive='{ "namespace": "directive-slots" }'
 	data-wp-slot-provider
 	data-wp-context='{ "text": "fill" }'
 >

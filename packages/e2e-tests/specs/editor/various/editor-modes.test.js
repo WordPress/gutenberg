@@ -102,29 +102,32 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( title ).toBe( 'Paragraph' );
 
 		// The Block inspector should be active.
-		let blockInspectorTab = await page.$(
-			'.edit-post-sidebar__panel-tab.is-active[data-label="Block"]'
+		let [ blockInspectorTab ] = await page.$x(
+			'//button[@role="tab"][@aria-selected="true"][contains(text(), "Block")]'
 		);
 		expect( blockInspectorTab ).not.toBeNull();
 
 		await switchEditorModeTo( 'Code' );
 
 		// The Block inspector should not be active anymore.
-		blockInspectorTab = await page.$(
-			'.edit-post-sidebar__panel-tab.is-active[data-label="Block"]'
+		[ blockInspectorTab ] = await page.$x(
+			'//button[@role="tab"][@aria-selected="true"][contains(text(), "Block")]'
 		);
-		expect( blockInspectorTab ).toBeNull();
+		expect( blockInspectorTab ).toBeUndefined();
 
 		// No block is selected.
-		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
-		const noBlocksElement = await page.$(
+		const inactiveBlockInspectorTab = await page.waitForXPath(
+			'//button[@role="tab"][contains(text(), "Block")]'
+		);
+		inactiveBlockInspectorTab.click();
+		const noBlocksElement = page.waitForSelector(
 			'.block-editor-block-inspector__no-blocks'
 		);
 		expect( noBlocksElement ).not.toBeNull();
 
 		// The inserter is disabled.
 		const disabledInserter = await page.$(
-			'.edit-post-header-toolbar__inserter-toggle:disabled, .edit-post-header-toolbar__inserter-toggle[aria-disabled="true"]'
+			'.editor-document-tools__inserter-toggle:disabled, .editor-document-tools__inserter-toggle[aria-disabled="true"]'
 		);
 		expect( disabledInserter ).not.toBeNull();
 	} );

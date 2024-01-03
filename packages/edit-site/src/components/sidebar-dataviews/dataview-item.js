@@ -6,9 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { page, columns, pullRight } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __experimentalHStack as HStack } from '@wordpress/components';
+import { VIEW_LAYOUTS } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -17,11 +17,6 @@ import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { unlock } from '../../lock-unlock';
 const { useLocation } = unlock( routerPrivateApis );
-
-function getDataViewIcon( type ) {
-	const icons = { list: page, grid: columns, 'side-by-side': pullRight };
-	return icons[ type ];
-}
 
 export default function DataViewItem( {
 	title,
@@ -37,7 +32,8 @@ export default function DataViewItem( {
 		params: { path },
 	} = useLocation();
 
-	const iconToUse = icon || getDataViewIcon( type );
+	const iconToUse =
+		icon || VIEW_LAYOUTS.find( ( v ) => v.type === type ).icon;
 
 	const linkInfo = useLink( {
 		path,
