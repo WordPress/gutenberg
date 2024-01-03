@@ -60,10 +60,7 @@ const webpackConfig = {
 };
 ```
 
-### Behavior
-
-**Note**: This section describes the classic behavior with webpack and WordPress scripts.
-For information about usage with modules, jump to the [behavior with modules](#behavior-with-modules) section.
+### Behavior with scripts
 
 Each entry point in the webpack bundle will include an asset file that declares the WordPress script dependencies that should be enqueued. This file also contains the unique version hash calculated based on the file content.
 
@@ -99,8 +96,10 @@ This plugin is compatible with `externals`, but they may conflict. For example, 
 
 ### Behavior with modules
 
+**Warning:** Modules support is considered experimental at this time.
+
 This section describes the behavior of this package to bundle ECMAScript modules and generate asset
-files suitable for use with the WordPress Module API.
+files suitable for use with the WordPress Modules API.
 
 Some of this plugin's options change, and webpack requires configuration to output modules. Refer to
 [webpack's documentation](https://webpack.js.org/configuration/output/#outputmodule) for up-to-date details.
