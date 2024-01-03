@@ -12,12 +12,9 @@ import {
 	Spinner,
 	ToggleControl,
 	VisuallyHidden,
-	ToolbarGroup,
-	ToolbarButton,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import {
-	BlockControls,
 	InspectorControls,
 	useBlockProps,
 	RichText,
@@ -26,11 +23,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 import { useEntityRecords } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
-import { toggleLabel } from '../search/icons';
 
 export default function CategoriesEdit( {
 	attributes: {
@@ -109,8 +101,6 @@ export default function CategoriesEdit( {
 				{ showLabel ? (
 					<RichText
 						className="wp-block-categories__label"
-						as="label"
-						htmlFor={ selectId }
 						aria-label={ __( 'Label text' ) }
 						placeholder={ __( 'Categories' ) }
 						withoutInteractiveFormatting
@@ -169,22 +159,6 @@ export default function CategoriesEdit( {
 
 	return (
 		<TagName { ...blockProps }>
-			{ displayAsDropdown && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							title={ __( 'Toggle label' ) }
-							icon={ toggleLabel }
-							onClick={ () => {
-								setAttributes( {
-									showLabel: ! showLabel,
-								} );
-							} }
-							className={ showLabel ? 'is-pressed' : undefined }
-						/>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
@@ -193,6 +167,14 @@ export default function CategoriesEdit( {
 						checked={ displayAsDropdown }
 						onChange={ toggleAttribute( 'displayAsDropdown' ) }
 					/>
+					{ displayAsDropdown && (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Show label' ) }
+							checked={ showLabel }
+							onChange={ toggleAttribute( 'showLabel' ) }
+						/>
+					) }
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Show post counts' ) }
