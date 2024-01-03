@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context';
+import type { WordPressComponentProps } from '../ui/context';
 import {
 	Root,
 	Viewbox,

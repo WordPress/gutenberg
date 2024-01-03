@@ -6,11 +6,11 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import { contextConnect } from '../context';
+import { contextConnect } from '../ui/context';
 import { View } from '../view';
 import { useSurface } from './hook';
 import type { SurfaceProps } from './types';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressComponentProps } from '../ui/context';
 
 function UnconnectedSurface(
 	props: WordPressComponentProps< SurfaceProps, 'div' >,

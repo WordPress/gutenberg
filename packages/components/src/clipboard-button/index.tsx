@@ -15,7 +15,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import Button from '../button';
 import type { ClipboardButtonProps } from './types';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressComponentProps } from '../ui/context';
 
 const TIMEOUT = 4000;
 

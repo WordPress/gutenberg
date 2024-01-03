@@ -6,11 +6,11 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../context';
+import { useContextSystem } from '../ui/context';
 import * as styles from './styles';
 import { useCx } from '../utils/hooks/use-cx';
 import type { SurfaceProps } from './types';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressComponentProps } from '../ui/context';
 
 export function useSurface(
 	props: WordPressComponentProps< SurfaceProps, 'div' >

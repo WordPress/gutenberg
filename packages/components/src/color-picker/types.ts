@@ -13,7 +13,7 @@ import type { HslaColor } from 'react-colorful';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context';
+import type { WordPressComponentProps } from '../ui/context';
 import type { useDeprecatedProps } from './use-deprecated-props';
 
 export type ColorType = 'rgb' | 'hsl' | 'hex';
