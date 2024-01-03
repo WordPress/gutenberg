@@ -55,6 +55,7 @@ test.describe( 'Widgets screen', () => {
 			await widgetsScreen.widgetAreas.all();
 
 		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
 			.getByRole( 'button', { name: 'Toggle block inserter' } )
 			.click();
 		const blockLibrary = page.getByRole( 'region', {
@@ -182,9 +183,10 @@ test.describe( 'Widgets screen', () => {
 
 		// Click outside the block to move the focus back to the widget area.
 		await firstWidgetArea.click( {
-			position: { x: 0, y: -1 },
-			// eslint-disable-next-line playwright/no-force-option
-			force: true,
+			position: {
+				x: 0,
+				y: ( await firstWidgetArea.boundingBox() ).height - 1,
+			},
 		} );
 
 		// Hover above the last block to trigger the inline inserter between blocks.
@@ -697,6 +699,7 @@ class WidgetsScreen {
 		} );
 		if ( await blockLibrary.isHidden() ) {
 			await this.#page
+				.getByRole( 'toolbar', { name: 'Document tools' } )
 				.getByRole( 'button', { name: 'Toggle block inserter' } )
 				.click();
 		}
