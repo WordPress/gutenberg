@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -420,7 +425,13 @@ function ViewTable( {
 						) ) }
 				</tbody>
 			</table>
-			<div className="dataviews-no-results" id={ tableNoticeId }>
+			<div
+				className={ classNames( 'dataviews-table-status', {
+					'dataviews-loading': isLoading,
+					'dataviews-no-results': ! hasData && ! isLoading,
+				} ) }
+				id={ tableNoticeId }
+			>
 				{ ! hasData && (
 					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
 				) }
