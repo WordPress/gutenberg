@@ -64,6 +64,11 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 							'type'              => 'string',
 							'validate_callback' => array( $this, 'validate_install_font_families' ),
 						),
+						'theme_json_version' => array(
+							'required'          => false,
+							'type'              => 'integer',
+							'default'           => WP_Theme_JSON::LATEST_SCHEMA,
+						),
 					),
 				),
 			)
@@ -359,6 +364,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	public function install_fonts( $request ) {
 		// Get new fonts to install.
 		$fonts_param = $request->get_param( 'font_families' );
+		$theme_json_version = $request->get_param( 'theme_json_version' );
 
 		/*
 		 * As this is receiving form data, the font families are encoded as a string.
@@ -417,7 +423,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 		// Get uploaded files (used when installing local fonts).
 		$files = $request->get_file_params();
 		foreach ( $fonts_to_install as $font_data ) {
-			$font   = new WP_Font_Family( $font_data );
+			$font   = new WP_Font_Family( $font_data, $theme_json_version );
 			$result = $font->install( $files );
 			if ( is_wp_error( $result ) ) {
 				$errors[] = $result;
