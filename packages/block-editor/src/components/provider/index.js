@@ -45,7 +45,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		useBlockSync( props );
 
 		return (
-			<SlotFillProvider passthrough>
+			<SlotFillProvider>
 				<KeyboardShortcuts.Register />
 				<BlockRefsProvider>{ children }</BlockRefsProvider>
 			</SlotFillProvider>
