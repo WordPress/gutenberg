@@ -2081,9 +2081,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$actual = WP_Theme_JSON_Gutenberg::get_from_block_styles_registry();
-		$this->assertSameSetsWithIndex( $expected, $actual );
 
 		unregister_block_style( 'core/group', 'my-variation' );
+		$this->assertSameSetsWithIndex( $expected, $actual );
 	}
 
 	public function test_block_style_variations_with_invalid_properties() {
