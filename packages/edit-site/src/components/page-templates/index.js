@@ -306,7 +306,7 @@ export default function DataviewsTemplates() {
 		// Handle sorting.
 		if ( view.sort ) {
 			filteredTemplates = sortByTextFields( {
-				items: filteredTemplates,
+				data: filteredTemplates,
 				view,
 				fields,
 				textFields: [ 'title', 'author' ],
