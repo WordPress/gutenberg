@@ -349,11 +349,13 @@ describe( 'Tooltip', () => {
 			await hover(
 				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
 			);
-			expect(
-				screen.getByRole( 'tooltip', {
-					name: 'tooltip text shortcut text',
-				} )
-			).toBeVisible();
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'tooltip', {
+						name: 'tooltip text shortcut text',
+					} )
+				).toBeVisible()
+			);
 
 			// Hover outside of the anchor, tooltip should hide
 			await hoverOutside();
@@ -375,11 +377,18 @@ describe( 'Tooltip', () => {
 			await hover(
 				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
 			);
-			const tooltip = screen.getByRole( 'tooltip', {
-				name: 'tooltip text Control + Shift + Comma',
-			} );
-			expect( tooltip ).toBeVisible();
-			expect( tooltip ).toHaveTextContent( /⇧⌘,/i );
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'tooltip', {
+						name: 'tooltip text Control + Shift + Comma',
+					} )
+				).toBeVisible()
+			);
+			expect(
+				screen.getByRole( 'tooltip', {
+					name: 'tooltip text Control + Shift + Comma',
+				} )
+			).toHaveTextContent( /⇧⌘,/i );
 
 			// Hover outside of the anchor, tooltip should hide
 			await hoverOutside();
