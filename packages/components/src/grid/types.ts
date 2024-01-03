@@ -6,7 +6,7 @@ import type { CSSProperties, ReactNode } from 'react';
 /**
  * Internal dependencies
  */
-import type { ResponsiveCSSValue } from '../utils/types';
+import type { ResponsiveCSSValue } from '../ui/utils/types';
 
 type GridAlignment =
 	| 'bottom'

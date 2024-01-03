@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 /**
  * Internal dependencies
  */
-import type { SpaceInput } from '../utils/space';
+import type { SpaceInput } from '../ui/utils/space';
 
 export type SpacerProps = {
 	/**

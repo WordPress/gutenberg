@@ -7,7 +7,7 @@ import type { StoryFn, Meta } from '@storybook/react';
  * Internal dependencies
  */
 import Spinner from '../';
-import { space } from '../../utils/space';
+import { space } from '../../ui/utils/space';
 
 const meta: Meta< typeof Spinner > = {
 	title: 'Components/Spinner',

@@ -6,7 +6,7 @@ import type { CSSProperties, ReactText } from 'react';
 /**
  * Internal dependencies
  */
-import CONFIG from './config-values';
+import CONFIG from '../../utils/config-values';
 
 export type HeadingSize =
 	| 1
