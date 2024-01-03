@@ -2694,8 +2694,8 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// 7. Generate and append the block style variations for inner blocks and elements.
-		foreach ( $style_variation_block_declarations as $style_variation_block_selector => $individial_style_variation_block_declaration ) {
-			$block_rules .= static::to_ruleset( $style_variation_block_selector, $individial_style_variation_block_declaration );
+		foreach ( $style_variation_block_declarations as $style_variation_block_selector => $individual_style_variation_block_declaration ) {
+			$block_rules .= static::to_ruleset( $style_variation_block_selector, $individual_style_variation_block_declaration );
 		}
 
 		return $block_rules;
