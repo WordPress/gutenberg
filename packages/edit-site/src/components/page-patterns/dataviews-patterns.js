@@ -10,7 +10,13 @@ import {
 } from '@wordpress/components';
 import { getQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo, useCallback, useId } from '@wordpress/element';
+import {
+	useState,
+	useMemo,
+	useCallback,
+	useId,
+	useEffect,
+} from '@wordpress/element';
 import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
@@ -28,6 +34,7 @@ import {
 	symbol,
 	lockSmall,
 } from '@wordpress/icons';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -196,6 +203,7 @@ export default function DataviewsPatterns() {
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 	const isUncategorizedThemePatterns =
 		type === PATTERN_TYPES.theme && categoryId === 'uncategorized';
+	const previousCategoryId = usePrevious( categoryId );
 	const { patterns, isResolving } = usePatterns(
 		type,
 		isUncategorizedThemePatterns ? '' : categoryId,
@@ -233,7 +241,12 @@ export default function DataviewsPatterns() {
 		],
 		[ view.type, categoryId ]
 	);
-
+	// Reset the page number when the category changes.
+	useEffect( () => {
+		if ( previousCategoryId !== categoryId && view.page !== 1 ) {
+			setView( { ...view, page: 1 } );
+		}
+	}, [ categoryId, previousCategoryId, view ] );
 	const { data, paginationInfo } = useMemo( () => {
 		if ( ! patterns ) {
 			return {
