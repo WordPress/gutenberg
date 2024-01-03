@@ -82,9 +82,13 @@ class EditorPage {
 	// Text blocks functions
 	// E.g. Paragraph, Heading blocks
 	// ===============================
-	async getTextBlockAtPosition( blockName, position = 1 ) {
+	async getTextBlockAtPosition(
+		blockName,
+		position = 1,
+		skipWrapperClick = false
+	) {
 		// iOS needs a click to get the text element
-		if ( ! isAndroid() ) {
+		if ( ! isAndroid() && ! skipWrapperClick ) {
 			const textBlockLocator = `(//XCUIElementTypeButton[contains(@name, "${ blockName } Block. Row ${ position }")])`;
 
 			await clickIfClickable( this.driver, textBlockLocator );
