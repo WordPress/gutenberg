@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -7,12 +8,8 @@ import { proxyMap } from 'valtio/utils';
  */
 import { createContext } from '@wordpress/element';
 import warning from '@wordpress/warning';
-/**
- * Internal dependencies
- */
-import type { SlotFillBubblesVirtuallyContext } from '../types';
 
-const initialContextValue: SlotFillBubblesVirtuallyContext = {
+const SlotFillContext = createContext( {
 	slots: proxyMap(),
 	fills: proxyMap(),
 	registerSlot: () => {
@@ -28,8 +25,6 @@ const initialContextValue: SlotFillBubblesVirtuallyContext = {
 
 	// This helps the provider know if it's using the default context value or not.
 	isDefault: true,
-};
-
-const SlotFillContext = createContext( initialContextValue );
+} );
 
 export default SlotFillContext;
