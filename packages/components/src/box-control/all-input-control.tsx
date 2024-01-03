@@ -33,8 +33,7 @@ export default function AllInputControl( {
 	setSelectedUnits,
 	...props
 }: BoxControlInputControlProps ) {
-	const generatedId = useInstanceId( AllInputControl, 'box-control-input' );
-	const inputId = [ generatedId, LABELS.all ].join( '-' );
+	const inputId = useInstanceId( AllInputControl, 'box-control-input-all' );
 
 	const allValue = getAllValue( values, selectedUnits, sides );
 	const hasValues = isValuesDefined( values );

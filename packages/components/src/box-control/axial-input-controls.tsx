@@ -141,7 +141,7 @@ export default function AxialInputControls( {
 				const inputId = [ generatedId, side ].join( '-' );
 
 				return (
-					<InputWrapper key={ `box-control-${ side }` }>
+					<InputWrapper key={ side }>
 						<FlexedBoxControlIcon side={ side } sides={ sides } />
 						<UnitControl
 							{ ...props }
