@@ -110,6 +110,7 @@ export default function Editor( { isLoading } ) {
 		showIconLabels,
 		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
 		const { getEditedPostContext, getEditorMode, getCanvasMode } = unlock(
 			select( editSiteStore )
 		);
@@ -118,7 +119,6 @@ export default function Editor( { isLoading } ) {
 		const { getEntityRecord } = select( coreDataStore );
 		const { getRenderingMode, isInserterOpened, isListViewOpened } =
 			select( editorStore );
-		const { get } = select( preferencesStore );
 		const _context = getEditedPostContext();
 
 		// The currently selected entity to display.
@@ -141,11 +141,8 @@ export default function Editor( { isLoading } ) {
 			isRightSidebarOpen: getActiveComplementaryArea(
 				editSiteStore.name
 			),
+			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
-			showBlockBreadcrumbs: get(
-				'core/edit-site',
-				'showBlockBreadcrumbs'
-			),
 		};
 	}, [] );
 
