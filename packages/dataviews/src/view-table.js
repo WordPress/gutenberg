@@ -23,6 +23,7 @@ const {
 	DropdownMenuV2: DropdownMenu,
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
@@ -220,7 +221,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 												operator,
 												{ label, key },
 											] ) => (
-												<DropdownMenuRadioItemCustom
+												<DropdownMenuRadioItem
 													key={ key }
 													name={ `view-table-${ filter.field }-conditions` }
 													value={ operator }
@@ -248,7 +249,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 													<DropdownMenuItemLabel>
 														{ label }
 													</DropdownMenuItemLabel>
-												</DropdownMenuRadioItemCustom>
+												</DropdownMenuRadioItem>
 											)
 										) }
 									</DropdownMenu>

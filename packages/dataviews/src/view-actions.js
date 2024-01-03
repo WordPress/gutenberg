@@ -19,6 +19,7 @@ const {
 	DropdownMenuV2: DropdownMenu,
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
 	DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
@@ -50,7 +51,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 		>
 			{ _availableViews.map( ( availableView ) => {
 				return (
-					<DropdownMenuRadioItemCustom
+					<DropdownMenuRadioItem
 						key={ availableView.type }
 						value={ availableView.type }
 						name="view-actions-available-view"
@@ -66,7 +67,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 						<DropdownMenuItemLabel>
 							{ availableView.label }
 						</DropdownMenuItemLabel>
-					</DropdownMenuRadioItemCustom>
+					</DropdownMenuRadioItem>
 				);
 			} ) }
 		</DropdownMenu>
@@ -90,21 +91,23 @@ function PageSizeMenu( { view, onChangeView } ) {
 		>
 			{ PAGE_SIZE_VALUES.map( ( size ) => {
 				return (
-					<DropdownMenuRadioItemCustom
+					<DropdownMenuRadioItem
 						key={ size }
 						value={ size }
 						name="view-actions-page-size"
 						checked={ view.perPage === size }
-						onChange={ ( e ) => {
+						onChange={ () => {
 							onChangeView( {
 								...view,
-								perPage: e.target.value,
+								// `e.target.value` holds the same value as `size` but as a string,
+								// so we use `size` directly to avoid parsing to int.
+								perPage: size,
 								page: 1,
 							} );
 						} }
 					>
 						<DropdownMenuItemLabel>{ size }</DropdownMenuItemLabel>
-					</DropdownMenuRadioItemCustom>
+					</DropdownMenuRadioItem>
 				);
 			} ) }
 		</DropdownMenu>
