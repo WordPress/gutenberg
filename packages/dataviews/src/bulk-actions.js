@@ -124,7 +124,7 @@ export default function BulkActions( {
 				onOpenChange={ onMenuOpenChange }
 				label={ __( 'Filters' ) }
 				trigger={
-					<Button>
+					<Button variant="secondary">
 						{ selection.length
 							? sprintf(
 									/* translators: %d: Number of items. */
