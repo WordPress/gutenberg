@@ -37,8 +37,7 @@
 }
 
 .editor-list-view-sidebar__list-view-panel-content,
-.editor-list-view-sidebar__list-view-container > .document-outline,
-.editor-list-view-sidebar__outline-empty-headings {
+.editor-list-view-sidebar__list-view-container > .document-outline {
 	height: 100%;
 
 	// Include custom scrollbars, invisible until hovered.
@@ -82,16 +81,4 @@
 		line-height: $default-line-height;
 		color: $gray-700;
 	}
-}
-
-.editor-list-view-sidebar__outline-empty-headings {
-	& > svg {
-		margin-top: $grid-unit-30 + $grid-unit-05;
-	}
-	& > p {
-		padding-left: $grid-unit-40;
-		padding-right: $grid-unit-40;
-	}
-	text-align: center;
-	color: $gray-700;
 }
