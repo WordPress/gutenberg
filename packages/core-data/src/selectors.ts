@@ -83,10 +83,15 @@ interface EntityState< EntityRecord extends ET.EntityRecord > {
 	revisions?: RevisionsQueriedData;
 }
 
-interface EntityConfig {
+type TransientPropertyConfig = boolean | { read: Function; write: Function };
+type EntityConfig = {
 	name: string;
 	kind: string;
-}
+	key?: string;
+	__unstable_rest_base?: string;
+	getTitle?: ( entity: any ) => string;
+	transientEdits?: Record< string, TransientPropertyConfig >;
+};
 
 interface UserState {
 	queries: Record< string, EntityRecordKey[] >;
@@ -265,7 +270,7 @@ export function getEntityConfig(
 	state: State,
 	kind: string,
 	name: string
-): any {
+): EntityConfig | undefined {
 	return state.entities.config?.find(
 		( config ) => config.kind === kind && config.name === name
 	);
@@ -670,7 +675,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 							// when it's used as an object key.
 							key: entityRecord
 								? entityRecord[
-										entityConfig.key || DEFAULT_ENTITY_KEY
+										entityConfig?.key || DEFAULT_ENTITY_KEY
 								  ]
 								: undefined,
 							title:
@@ -723,7 +728,7 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 							// when it's used as an object key.
 							key: entityRecord
 								? entityRecord[
-										entityConfig.key || DEFAULT_ENTITY_KEY
+										entityConfig?.key || DEFAULT_ENTITY_KEY
 								  ]
 								: undefined,
 							title:
@@ -750,16 +755,56 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
  *
  * @return The entity record's edits.
  */
-export function getEntityRecordEdits(
-	state: State,
-	kind: string,
-	name: string,
-	recordId: EntityRecordKey
-): Optional< any > {
-	return state.entities.records?.[ kind ]?.[ name ]?.edits?.[
-		recordId as string | number
-	];
-}
+export const getEntityRecordEdits = createSelector(
+	(
+		state: State,
+		kind: string,
+		name: string,
+		recordId: EntityRecordKey
+	): Optional< any > => {
+		const { transientEdits } = getEntityConfig( state, kind, name ) ?? {};
+		const regularEdits =
+			state.entities.records?.[ kind ]?.[ name ]?.edits?.[
+				recordId as string | number
+			];
+		let result = regularEdits;
+		const rawRecord = getRawEntityRecord( state, kind, name, recordId );
+		const recordWithEdits = rawRecord
+			? {
+					...rawRecord,
+					...regularEdits,
+			  }
+			: undefined;
+		Object.entries( transientEdits ?? {} ).forEach(
+			( [ key, transientEditConfig ] ) => {
+				if (
+					recordWithEdits &&
+					regularEdits?.[ key ] === undefined &&
+					typeof transientEditConfig === 'object'
+				) {
+					result = {
+						...result,
+						[ key ]: transientEditConfig.read( recordWithEdits ),
+					};
+				}
+			}
+		);
+
+		return result;
+	},
+	( state: State, kind: string, name: string, recordId: EntityRecordKey ) => {
+		const context = 'default';
+		return [
+			state.entities.config,
+			state.entities.records?.[ kind ]?.[ name ]?.edits?.[ recordId ],
+			state.entities.records?.[ kind ]?.[ name ]?.queriedData?.items[
+				context
+			]?.[ recordId ],
+			state.entities.records?.[ kind ]?.[ name ]?.queriedData
+				?.itemIsComplete[ context ]?.[ recordId ],
+		];
+	}
+);
 
 /**
  * Returns the specified entity record's non transient edits.
@@ -1152,6 +1197,9 @@ export function canUserEditEntityRecord(
 		return false;
 	}
 	const resource = entityConfig.__unstable_rest_base;
+	if ( resource === undefined ) {
+		return false;
+	}
 
 	return canUser( state, 'update', resource, recordId );
 }

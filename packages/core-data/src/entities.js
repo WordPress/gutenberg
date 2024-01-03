@@ -9,6 +9,7 @@ import { capitalCase, pascalCase } from 'change-case';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { RichTextData } from '@wordpress/rich-text';
+import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -19,6 +20,13 @@ import { getSyncProvider } from './sync';
 export const DEFAULT_ENTITY_KEY = 'id';
 
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
+const blocksTransientEntity = {
+	read: ( record ) => parse( record.content ),
+	write: ( record ) => ( {
+		...record,
+		content: __unstableSerializeAndClean( record.content ),
+	} ),
+};
 
 export const rootEntitiesConfig = [
 	{
@@ -138,7 +146,9 @@ export const rootEntitiesConfig = [
 		baseURL: '/wp/v2/sidebars',
 		baseURLParams: { context: 'edit' },
 		plural: 'sidebars',
-		transientEdits: { blocks: true },
+		transientEdits: {
+			blocks: blocksTransientEntity,
+		},
 		label: __( 'Widget areas' ),
 	},
 	{
@@ -147,7 +157,7 @@ export const rootEntitiesConfig = [
 		baseURL: '/wp/v2/widgets',
 		baseURLParams: { context: 'edit' },
 		plural: 'widgets',
-		transientEdits: { blocks: true },
+		transientEdits: { blocks: blocksTransientEntity },
 		label: __( 'Widgets' ),
 	},
 	{
@@ -320,7 +330,7 @@ async function loadPostTypeEntities() {
 			name,
 			label: postType.name,
 			transientEdits: {
-				blocks: true,
+				blocks: blocksTransientEntity,
 				selection: true,
 			},
 			mergedEdits: { meta: true },

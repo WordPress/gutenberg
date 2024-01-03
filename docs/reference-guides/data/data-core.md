@@ -249,7 +249,7 @@ _Parameters_
 
 _Returns_
 
--   `any`: Entity config
+-   `EntityConfig | undefined`: Entity config
 
 ### getEntityRecord
 

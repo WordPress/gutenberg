@@ -10,7 +10,6 @@ import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
 	__unstableSerializeAndClean,
-	parse,
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs, cleanForSlug } from '@wordpress/url';
@@ -1112,18 +1111,9 @@ export const isPublishSidebarEnabled = createRegistrySelector(
  * @param {Object} state
  * @return {Array} Block list.
  */
-export const getEditorBlocks = createSelector(
-	( state ) => {
-		return (
-			getEditedPostAttribute( state, 'blocks' ) ||
-			parse( getEditedPostContent( state ) )
-		);
-	},
-	( state ) => [
-		getEditedPostAttribute( state, 'blocks' ),
-		getEditedPostContent( state ),
-	]
-);
+export function getEditorBlocks( state ) {
+	return getEditedPostAttribute( state, 'blocks' );
+}
 
 /**
  * Returns true if the given panel was programmatically removed, or false otherwise.
