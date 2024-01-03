@@ -198,14 +198,14 @@ export const DocumentOutline = ( {
 
 export default compose(
 	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getEditorBlocks } =
-			select( editorStore );
+		const { getBlocks } = select( blockEditorStore );
+		const { getEditedPostAttribute } = select( editorStore );
 		const { getPostType } = select( coreStore );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 		return {
 			title: getEditedPostAttribute( 'title' ),
-			blocks: getEditorBlocks(),
+			blocks: getBlocks(),
 			isTitleSupported: postType?.supports?.title ?? false,
 		};
 	} )
