@@ -243,10 +243,10 @@ export default function DataviewsPatterns() {
 	);
 	// Reset the page number when the category changes.
 	useEffect( () => {
-		if ( previousCategoryId !== categoryId && view.page !== 1 ) {
-			setView( { ...view, page: 1 } );
+		if ( previousCategoryId !== categoryId ) {
+			setView( DEFAULT_VIEW );
 		}
-	}, [ categoryId, previousCategoryId, view ] );
+	}, [ categoryId, previousCategoryId ] );
 	const { data, paginationInfo } = useMemo( () => {
 		if ( ! patterns ) {
 			return {
