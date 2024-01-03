@@ -17,7 +17,7 @@ export type BoxControlValue = {
 };
 
 export type CustomValueUnits = {
-	[ index: string ]: { max: number; steps: number };
+	[ key: string ]: { max: number; step: number };
 };
 
 type UnitControlPassthroughProps = Omit<

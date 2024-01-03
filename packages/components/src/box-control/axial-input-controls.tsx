@@ -185,7 +185,7 @@ export default function AxialInputControls( {
 							}
 							step={
 								CUSTOM_VALUE_SETTINGS[ selectedUnit ?? 'px' ]
-									?.steps ?? 0.1
+									?.step ?? 0.1
 							}
 							value={ parsedQuantity ?? 0 }
 							withInputField={ false }

@@ -112,12 +112,11 @@ export default function AllInputControl( {
 			<FlexedRangeControl
 				__nextHasNoMarginBottom
 				aria-controls={ inputId }
-				aria-labelledby={ inputId }
 				onChange={ sliderOnChange }
 				min={ 0 }
 				max={ CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]?.max ?? 10 }
 				step={
-					CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]?.steps ?? 0.1
+					CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]?.step ?? 0.1
 				}
 				value={ parsedQuantity ?? 0 }
 				withInputField={ false }
