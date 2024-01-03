@@ -93,7 +93,6 @@ export function useSpecificEditorSettings() {
 	const {
 		templateSlug,
 		focusMode,
-		allowRightClickOverrides,
 		isDistractionFree,
 		hasFixedToolbar,
 		keepCaretInsideBlock,
@@ -126,10 +125,6 @@ export function useSpecificEditorSettings() {
 					'core/edit-site',
 					'distractionFree'
 				),
-				allowRightClickOverrides: !! getPreference(
-					'core/edit-site',
-					'allowRightClickOverrides'
-				),
 				hasFixedToolbar:
 					!! getPreference( 'core/edit-site', 'fixedToolbar' ) ||
 					! isLargeViewport,
@@ -153,7 +148,6 @@ export function useSpecificEditorSettings() {
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
 			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
-			allowRightClickOverrides,
 			isDistractionFree,
 			hasFixedToolbar,
 			keepCaretInsideBlock,
@@ -166,7 +160,6 @@ export function useSpecificEditorSettings() {
 	}, [
 		settings,
 		focusMode,
-		allowRightClickOverrides,
 		isDistractionFree,
 		hasFixedToolbar,
 		keepCaretInsideBlock,

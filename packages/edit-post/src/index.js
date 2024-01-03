@@ -54,7 +54,6 @@ export function initializeEditor(
 	const root = createRoot( target );
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
-		allowRightClickOverrides: true,
 		editorMode: 'visual',
 		fixedToolbar: false,
 		fullscreenMode: true,
@@ -69,6 +68,10 @@ export function initializeEditor(
 		themeStyles: true,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,
+	} );
+
+	dispatch( preferencesStore ).setDefaults( 'core', {
+		allowRightClickOverrides: true,
 	} );
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
