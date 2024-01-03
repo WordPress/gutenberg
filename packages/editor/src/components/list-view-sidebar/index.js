@@ -11,13 +11,13 @@ import { __, _x } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import ListViewOutline from './list-view-outline';
 import { unlock } from '../../lock-unlock';
+import { store as editorStore } from '../../store';
 
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editorStore );
@@ -116,7 +116,7 @@ export default function ListViewSidebar() {
 	function renderTabContent( tabName ) {
 		if ( tabName === 'list-view' ) {
 			return (
-				<div className="edit-post-editor__list-view-panel-content">
+				<div className="editor-list-view-sidebar__list-view-panel-content">
 					<ListView dropZoneElement={ dropZoneElement } />
 				</div>
 			);
@@ -127,18 +127,18 @@ export default function ListViewSidebar() {
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
-			className="edit-post-editor__document-overview-panel"
+			className="editor-list-view-sidebar"
 			onKeyDown={ closeOnEscape }
 			ref={ sidebarRef }
 		>
 			<Button
-				className="edit-post-editor__document-overview-panel__close-button"
+				className="editor-list-view-sidebar__close-button"
 				icon={ closeSmall }
 				label={ __( 'Close' ) }
 				onClick={ closeListView }
 			/>
 			<TabPanel
-				className="edit-post-editor__document-overview-panel__tab-panel"
+				className="editor-list-view-sidebar__tab-panel"
 				ref={ tabPanelRef }
 				onSelect={ ( tabName ) => setTab( tabName ) }
 				selectOnMove={ false }
@@ -146,18 +146,18 @@ export default function ListViewSidebar() {
 					{
 						name: 'list-view',
 						title: _x( 'List View', 'Post overview' ),
-						className: 'edit-post-sidebar__panel-tab',
+						className: 'editor-list-view-sidebar__panel-tab',
 					},
 					{
 						name: 'outline',
 						title: _x( 'Outline', 'Post overview' ),
-						className: 'edit-post-sidebar__panel-tab',
+						className: 'editor-list-view-sidebar__panel-tab',
 					},
 				] }
 			>
 				{ ( currentTab ) => (
 					<div
-						className="edit-post-editor__list-view-container"
+						className="editor-list-view-sidebar__list-view-container"
 						ref={ listViewContainerRef }
 					>
 						{ renderTabContent( currentTab.name ) }

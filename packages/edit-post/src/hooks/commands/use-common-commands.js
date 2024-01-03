@@ -43,7 +43,8 @@ export default function useCommonCommands() {
 		showBlockBreadcrumbs,
 		isDistractionFree,
 	} = useSelect( ( select ) => {
-		const { getEditorMode, isFeatureActive } = select( editPostStore );
+		const { get } = select( preferencesStore );
+		const { getEditorMode } = select( editPostStore );
 		const { isListViewOpened } = select( editorStore );
 		return {
 			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
@@ -53,11 +54,8 @@ export default function useCommonCommands() {
 			isListViewOpen: isListViewOpened(),
 			isPublishSidebarEnabled:
 				select( editorStore ).isPublishSidebarEnabled(),
-			showBlockBreadcrumbs: isFeatureActive( 'showBlockBreadcrumbs' ),
-			isDistractionFree: select( preferencesStore ).get(
-				editPostStore.name,
-				'distractionFree'
-			),
+			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
+			isDistractionFree: get( editPostStore.name, 'distractionFree' ),
 		};
 	}, [] );
 	const { toggle } = useDispatch( preferencesStore );
@@ -177,7 +175,7 @@ export default function useCommonCommands() {
 			? __( 'Hide block breadcrumbs' )
 			: __( 'Show block breadcrumbs' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'showBlockBreadcrumbs' );
+			toggle( 'core', 'showBlockBreadcrumbs' );
 			close();
 			createInfoNotice(
 				showBlockBreadcrumbs
