@@ -9,7 +9,6 @@ import {
 	useEffect,
 	useCallback,
 } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -18,7 +17,7 @@ import { ESCAPE } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../store';
+import { useLastFocus } from '../../utils/use-last-focus';
 
 function hasOnlyToolbarItem( elements ) {
 	const dataProp = 'toolbarItem';
@@ -169,7 +168,8 @@ function useToolbarFocus( {
 		};
 	}, [ initialIndex, initialFocusOnMount, onIndexChange, toolbarRef ] );
 
-	const { getLastFocus } = useSelect( blockEditorStore );
+	const { lastFocus } = useLastFocus();
+
 	/**
 	 * Handles returning focus to the block editor canvas when pressing escape.
 	 */
@@ -178,7 +178,6 @@ function useToolbarFocus( {
 
 		if ( focusEditorOnEscape ) {
 			const handleKeyDown = ( event ) => {
-				const lastFocus = getLastFocus();
 				if ( event.keyCode === ESCAPE && lastFocus?.current ) {
 					// Focus the last focused element when pressing escape.
 					event.preventDefault();
@@ -193,7 +192,7 @@ function useToolbarFocus( {
 				);
 			};
 		}
-	}, [ focusEditorOnEscape, getLastFocus, toolbarRef ] );
+	}, [ focusEditorOnEscape, lastFocus, toolbarRef ] );
 }
 
 export default function NavigableToolbar( {

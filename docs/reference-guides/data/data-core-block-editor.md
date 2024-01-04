@@ -590,7 +590,9 @@ _Properties_
 
 ### getLastFocus
 
-Returns the element of the last element that had focus when focus left the editor canvas.
+> **Deprecated**
+
+Returns the element of the last element that had focus when focus left the editor canvas. Warning: Using an element within Redux will break ReactDev Tools: <https://github.com/WordPress/gutenberg/pull/55712#discussion_r1439557418>
 
 _Parameters_
 
@@ -1664,6 +1666,8 @@ _Parameters_
 -   _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
 
 ### setLastFocus
+
+> **Deprecated**
 
 Action that sets the element that had focus when focus leaves the editor canvas.
 

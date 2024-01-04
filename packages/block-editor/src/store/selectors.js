@@ -2949,11 +2949,17 @@ export const isGroupable = createRegistrySelector(
 
 /**
  * Returns the element of the last element that had focus when focus left the editor canvas.
+ * Warning: Using an element within Redux will break ReactDev Tools: https://github.com/WordPress/gutenberg/pull/55712#discussion_r1439557418
  *
+ * @deprecated
  * @param {Object} state Block editor state.
  *
  * @return {Object} Element.
  */
 export function getLastFocus( state ) {
+	deprecated( 'getLastFocus', {
+		since: '6.4',
+		version: '6.6',
+	} );
 	return state.lastFocus;
 }

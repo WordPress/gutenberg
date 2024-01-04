@@ -1923,12 +1923,17 @@ export function unsetBlockEditingMode( clientId = '' ) {
 /**
  * Action that sets the element that had focus when focus leaves the editor canvas.
  *
+ * @deprecated
  * @param {Object} lastFocus The last focused element.
  *
  *
  * @return {Object} Action object.
  */
 export function setLastFocus( lastFocus = null ) {
+	deprecated( 'setLastFocus', {
+		since: '6.4',
+		version: '6.6',
+	} );
 	return {
 		type: 'LAST_FOCUS',
 		lastFocus,
