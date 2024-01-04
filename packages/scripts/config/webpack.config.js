@@ -30,6 +30,7 @@ const {
 	getWordPressSrcDirectory,
 	getWebpackEntryPoints,
 	getRenderPropPaths,
+	getAsBooleanFromENV,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -39,6 +40,9 @@ if ( ! browserslist.findConfig( '.' ) ) {
 	target += ':' + fromConfigRoot( '.browserslistrc' );
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
+const hasExperimentalModulesFlag = getAsBooleanFromENV(
+	'WP_EXPERIMENTAL_MODULES'
+);
 
 /**
  * The plugin recomputes the render paths once on each compilation. It is necessary to avoid repeating processing
@@ -376,43 +380,49 @@ const scriptConfig = {
 	].filter( Boolean ),
 };
 
-/** @type {webpack.Configuration} */
-const moduleConfig = {
-	...baseConfig,
+if ( hasExperimentalModulesFlag ) {
+	/** @type {webpack.Configuration} */
+	const moduleConfig = {
+		...baseConfig,
 
-	entry: getWebpackEntryPoints( 'module' ),
+		entry: getWebpackEntryPoints( 'module' ),
 
-	output: {
-		...baseConfig.output,
-		module: true,
-		chunkFormat: 'module',
-		library: {
-			...baseConfig.output.library,
-			type: 'module',
+		output: {
+			...baseConfig.output,
+			module: true,
+			chunkFormat: 'module',
+			library: {
+				...baseConfig.output.library,
+				type: 'module',
+			},
 		},
-	},
 
-	plugins: [
-		new webpack.DefinePlugin( {
-			// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
-			SCRIPT_DEBUG: ! isProduction,
-		} ),
-		new RenderPathsPlugin(),
-		new CopyWebpackPlugin( {
-			patterns: [
-				{
-					from: '**/block.json',
-					context: getWordPressSrcDirectory(),
-					noErrorOnMissing: true,
-					transform( content, absoluteFrom ) {
-						const convertExtension = ( path ) => {
-							return path.replace( /\.(j|t)sx?$/, '.js' );
-						};
+		plugins: [
+			new webpack.DefinePlugin( {
+				// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
+				SCRIPT_DEBUG: ! isProduction,
+			} ),
+			new RenderPathsPlugin(),
+			new CopyWebpackPlugin( {
+				patterns: [
+					{
+						from: '**/block.json',
+						context: getWordPressSrcDirectory(),
+						noErrorOnMissing: true,
+						transform( content, absoluteFrom ) {
+							const convertExtension = ( path ) => {
+								return path.replace( /\.(j|t)sx?$/, '.js' );
+							};
 
-						if ( basename( absoluteFrom ) === 'block.json' ) {
-							const blockJson = JSON.parse( content.toString() );
-							[ 'viewModule', 'module', 'editorModule' ].forEach(
-								( key ) => {
+							if ( basename( absoluteFrom ) === 'block.json' ) {
+								const blockJson = JSON.parse(
+									content.toString()
+								);
+								[
+									'viewModule',
+									'module',
+									'editorModule',
+								].forEach( ( key ) => {
 									if ( Array.isArray( blockJson[ key ] ) ) {
 										blockJson[ key ] =
 											blockJson[ key ].map(
@@ -425,29 +435,31 @@ const moduleConfig = {
 											blockJson[ key ]
 										);
 									}
-								}
-							);
+								} );
 
-							return JSON.stringify( blockJson, null, 2 );
-						}
+								return JSON.stringify( blockJson, null, 2 );
+							}
 
-						return content;
+							return content;
+						},
 					},
-				},
-			],
-		} ),
-		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
-		// bundle content as a convenient interactive zoomable treemap.
-		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
-		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
-		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
-		// React Fast Refresh.
-		hasReactFastRefresh && new ReactRefreshWebpackPlugin(),
-		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
-		// generated, and the default externals set.
-		! process.env.WP_NO_EXTERNALS &&
-			new DependencyExtractionWebpackPlugin(),
-	].filter( Boolean ),
-};
+				],
+			} ),
+			// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
+			// bundle content as a convenient interactive zoomable treemap.
+			process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
+			// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
+			new MiniCSSExtractPlugin( { filename: '[name].css' } ),
+			// React Fast Refresh.
+			hasReactFastRefresh && new ReactRefreshWebpackPlugin(),
+			// WP_NO_EXTERNALS global variable controls whether scripts' assets get
+			// generated, and the default externals set.
+			! process.env.WP_NO_EXTERNALS &&
+				new DependencyExtractionWebpackPlugin(),
+		].filter( Boolean ),
+	};
 
-module.exports = [ scriptConfig, moduleConfig ];
+	module.exports = [ scriptConfig, moduleConfig ];
+} else {
+	module.exports = scriptConfig;
+}
