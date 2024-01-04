@@ -193,7 +193,7 @@ const { state, actions } = store( 'core/navigation', {
 		initNav() {
 			const context = getContext();
 			const mediaQuery = window.matchMedia(
-				'(max-width: ' + NAVIGATION_MOBILE_BREAKPOINT + 'px)'
+				`(max-width: ${ NAVIGATION_MOBILE_BREAKPOINT })`
 			);
 
 			// Run once to set the initial state.

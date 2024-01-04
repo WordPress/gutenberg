@@ -299,10 +299,11 @@ function Navigation( {
 	);
 	const isResponsive = 'never' !== overlayMenu;
 	const isMobileBreakPoint = useMediaQuery(
-		`(max-width: ${ NAVIGATION_MOBILE_BREAKPOINT }px)`
+		`(max-width: ${ NAVIGATION_MOBILE_BREAKPOINT })`
 	);
 
-	const isCollapsed = ( 'mobile' === overlayMenu && isMobileBreakPoint ) ||
+	const isCollapsed =
+		( 'mobile' === overlayMenu && isMobileBreakPoint ) ||
 		'always' === overlayMenu;
 
 	const blockProps = useBlockProps( {
