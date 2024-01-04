@@ -42,7 +42,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { close, Icon } from '@wordpress/icons';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useMediaQuery } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -298,24 +298,13 @@ function Navigation( {
 		[ clientId ]
 	);
 	const isResponsive = 'never' !== overlayMenu;
+	const isMobileBreakPoint = useMediaQuery(
+		`(max-width: ${ NAVIGATION_MOBILE_BREAKPOINT }px)`
+	);
 
-	const shouldBeCollapsed = useCallback( () => {
-		return (
-			'always' === overlayMenu ||
-			( 'mobile' === overlayMenu &&
-				window.innerWidth < NAVIGATION_MOBILE_BREAKPOINT )
-		);
-	}, [ overlayMenu ] );
-	const [ isCollapsed, setIsCollapsed ] = useState( shouldBeCollapsed() );
-	useEffect( () => {
-		// Update when the window resizes.
-		window.addEventListener( 'resize', () => {
-			setIsCollapsed( shouldBeCollapsed() );
-		} );
-
-		// Update when the overlay menu setting changes.
-		setIsCollapsed( shouldBeCollapsed() );
-	}, [ overlayMenu, setIsCollapsed, shouldBeCollapsed ] );
+	const isCollapsed = () =>
+		( 'mobile' === overlayMenu && isMobileBreakPoint ) ||
+		'always' === overlayMenu;
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -330,7 +319,7 @@ function Navigation( {
 				'is-vertical': orientation === 'vertical',
 				'no-wrap': flexWrap === 'nowrap',
 				'is-responsive': isResponsive,
-				'is-collapsed': isCollapsed,
+				'is-collapsed': isCollapsed(),
 				'has-text-color': !! textColor.color || !! textColor?.class,
 				[ getColorClassName( 'color', textColor?.slug ) ]:
 					!! textColor?.slug,
