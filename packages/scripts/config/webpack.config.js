@@ -31,6 +31,8 @@ const {
 	getWebpackEntryPoints,
 	getRenderPropPaths,
 	getAsBooleanFromENV,
+	getBlockJsonModuleFields,
+	getBlockJsonScriptFields,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -328,22 +330,22 @@ const scriptConfig = {
 
 						if ( basename( absoluteFrom ) === 'block.json' ) {
 							const blockJson = JSON.parse( content.toString() );
-							[ 'viewScript', 'script', 'editorScript' ].forEach(
-								( key ) => {
-									if ( Array.isArray( blockJson[ key ] ) ) {
+
+							const fields =
+								getBlockJsonScriptFields( blockJson );
+							if ( fields ) {
+								for ( const [ key, value ] of Object.entries(
+									fields
+								) ) {
+									if ( Array.isArray( value ) ) {
 										blockJson[ key ] =
-											blockJson[ key ].map(
-												convertExtension
-											);
-									} else if (
-										typeof blockJson[ key ] === 'string'
-									) {
-										blockJson[ key ] = convertExtension(
-											blockJson[ key ]
-										);
+											value.map( convertExtension );
+									} else if ( typeof value === 'string' ) {
+										blockJson[ key ] =
+											convertExtension( value );
 									}
 								}
-							);
+							}
 
 							return JSON.stringify( blockJson, null, 2 );
 						}
@@ -418,20 +420,25 @@ if ( hasExperimentalModulesFlag ) {
 								const blockJson = JSON.parse(
 									content.toString()
 								);
-								[ 'viewModule' ].forEach( ( key ) => {
-									if ( Array.isArray( blockJson[ key ] ) ) {
-										blockJson[ key ] =
-											blockJson[ key ].map(
-												convertExtension
-											);
-									} else if (
-										typeof blockJson[ key ] === 'string'
-									) {
-										blockJson[ key ] = convertExtension(
-											blockJson[ key ]
-										);
+
+								const fields =
+									getBlockJsonModuleFields( blockJson );
+								if ( fields ) {
+									for ( const [
+										key,
+										value,
+									] of Object.entries( fields ) ) {
+										if ( Array.isArray( value ) ) {
+											blockJson[ key ] =
+												value.map( convertExtension );
+										} else if (
+											typeof value === 'string'
+										) {
+											blockJson[ key ] =
+												convertExtension( value );
+										}
 									}
-								} );
+								}
 
 								return JSON.stringify( blockJson, null, 2 );
 							}
