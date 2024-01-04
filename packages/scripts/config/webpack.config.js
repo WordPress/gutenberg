@@ -174,7 +174,7 @@ const baseConfig = {
 	module: {
 		rules: [
 			{
-				test: /\.(j|t)sx?$/,
+				test: /\.m?(j|t)sx?$/,
 				exclude: /node_modules/,
 				use: [
 					{
@@ -325,7 +325,7 @@ const scriptConfig = {
 					noErrorOnMissing: true,
 					transform( content, absoluteFrom ) {
 						const convertExtension = ( path ) => {
-							return path.replace( /\.(j|t)sx?$/, '.js' );
+							return path.replace( /\.m?(j|t)sx?$/, '.js' );
 						};
 
 						if ( basename( absoluteFrom ) === 'block.json' ) {
