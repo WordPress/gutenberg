@@ -133,7 +133,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test Connections', 'gutenberg' ),
+			'label' => __( 'Test connecting block attribute values to a custom field value', 'gutenberg' ),
 			'id'    => 'gutenberg-connections',
 		)
 	);
