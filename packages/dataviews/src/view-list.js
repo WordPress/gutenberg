@@ -98,7 +98,7 @@ export default function ViewList( {
 									icon={
 										isRTL() ? chevronLeft : chevronRight
 									}
-									label={ __( 'Open page details' ) }
+									label={ __( 'Open item details' ) }
 									showTooltip={ false }
 								/>
 							</HStack>
