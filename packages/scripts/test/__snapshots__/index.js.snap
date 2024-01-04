@@ -303,6 +303,10 @@ exports[`should leave webpack.config.js untouched 1`] = `
     },
     DependencyExtractionWebpackPlugin {
       "externalizedDeps": Set {},
+      "externalsPlugin": ExternalsPlugin {
+        "externals": [Function],
+        "type": "window",
+      },
       "options": {
         "combineAssets": false,
         "combinedOutputFile": null,
@@ -312,7 +316,6 @@ exports[`should leave webpack.config.js untouched 1`] = `
         "outputFormat": "php",
         "useDefaults": true,
       },
-      "useModules": false,
     },
   ],
   "resolve": {
