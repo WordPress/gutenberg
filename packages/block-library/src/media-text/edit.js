@@ -16,18 +16,19 @@ import {
 	InspectorControls,
 	useBlockProps,
 	__experimentalImageURLInputUI as ImageURLInputUI,
-	__experimentalImageSizeControl as ImageSizeControl,
 	store as blockEditorStore,
 	useBlockEditingMode,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
-	PanelBody,
 	RangeControl,
 	TextareaControl,
 	ToggleControl,
 	ToolbarButton,
 	ExternalLink,
 	FocalPointPicker,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { pullLeft, pullRight } from '@wordpress/icons';
@@ -44,6 +45,9 @@ import {
 	LINK_DESTINATION_ATTACHMENT,
 	TEMPLATE,
 } from './constants';
+import { unlock } from '../lock-unlock';
+
+const { ResolutionTool } = unlock( blockEditorPrivateApis );
 
 // this limits the resize to a safe zone to avoid making broken layouts
 const applyWidthConstraints = ( width ) =>
@@ -229,81 +233,118 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	};
 
 	const mediaTextGeneralSettings = (
-		<PanelBody title={ __( 'Settings' ) }>
-			<ToggleControl
-				__nextHasNoMarginBottom
+		<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
+			<ToolsPanelItem
 				label={ __( 'Stack on mobile' ) }
-				checked={ isStackedOnMobile }
-				onChange={ () =>
-					setAttributes( {
-						isStackedOnMobile: ! isStackedOnMobile,
-					} )
+				isShownByDefault={ true }
+				hasValue={ () => !! isStackedOnMobile }
+				onDeselect={ () =>
+					setAttributes( { isStackedOnMobile: false } )
 				}
-			/>
-			{ mediaType === 'image' && (
+			>
 				<ToggleControl
 					__nextHasNoMarginBottom
-					label={ __( 'Crop image to fill entire column' ) }
-					checked={ !! imageFill }
+					label={ __( 'Stack on mobile' ) }
+					checked={ isStackedOnMobile }
 					onChange={ () =>
 						setAttributes( {
-							imageFill: ! imageFill,
+							isStackedOnMobile: ! isStackedOnMobile,
 						} )
 					}
 				/>
+			</ToolsPanelItem>
+			{ mediaType === 'image' && (
+				<ToolsPanelItem
+					label={ __( 'Crop image to fill entire column' ) }
+					isShownByDefault={ true }
+					hasValue={ () => !! imageFill }
+					onDeselect={ () => setAttributes( { imageFill: false } ) }
+				>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Crop image to fill entire column' ) }
+						checked={ !! imageFill }
+						onChange={ () =>
+							setAttributes( {
+								imageFill: ! imageFill,
+							} )
+						}
+					/>
+				</ToolsPanelItem>
 			) }
 			{ imageFill && mediaUrl && mediaType === 'image' && (
-				<FocalPointPicker
-					__nextHasNoMarginBottom
+				<ToolsPanelItem
 					label={ __( 'Focal point picker' ) }
-					url={ mediaUrl }
-					value={ focalPoint }
-					onChange={ ( value ) =>
-						setAttributes( { focalPoint: value } )
+					isShownByDefault={ true }
+					hasValue={ () => !! focalPoint }
+					onDeselect={ () =>
+						setAttributes( { focalPoint: undefined } )
 					}
-					onDragStart={ imperativeFocalPointPreview }
-					onDrag={ imperativeFocalPointPreview }
-				/>
+				>
+					<FocalPointPicker
+						__nextHasNoMarginBottom
+						label={ __( 'Focal point picker' ) }
+						url={ mediaUrl }
+						value={ focalPoint }
+						onChange={ ( value ) =>
+							setAttributes( { focalPoint: value } )
+						}
+						onDragStart={ imperativeFocalPointPreview }
+						onDrag={ imperativeFocalPointPreview }
+					/>
+				</ToolsPanelItem>
 			) }
 			{ mediaType === 'image' && (
-				<TextareaControl
-					__nextHasNoMarginBottom
+				<ToolsPanelItem
 					label={ __( 'Alternative text' ) }
-					value={ mediaAlt }
-					onChange={ onMediaAltChange }
-					help={
-						<>
-							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-								{ __( 'Describe the purpose of the image.' ) }
-							</ExternalLink>
-							<br />
-							{ __( 'Leave empty if decorative.' ) }
-						</>
-					}
-				/>
+					isShownByDefault={ true }
+					hasValue={ () => !! mediaAlt }
+					onDeselect={ () => setAttributes( { mediaAlt: '' } ) }
+				>
+					<TextareaControl
+						__nextHasNoMarginBottom
+						label={ __( 'Alternative text' ) }
+						value={ mediaAlt }
+						onChange={ onMediaAltChange }
+						help={
+							<>
+								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+									{ __(
+										'Describe the purpose of the image.'
+									) }
+								</ExternalLink>
+								<br />
+								{ __( 'Leave empty if decorative.' ) }
+							</>
+						}
+					/>
+				</ToolsPanelItem>
 			) }
 			{ mediaType === 'image' && (
-				<ImageSizeControl
-					onChangeImage={ updateImage }
-					slug={ mediaSizeSlug }
+				<ResolutionTool
+					value={ mediaSizeSlug }
 					imageSizeOptions={ imageSizeOptions }
-					isResizable={ false }
-					imageSizeHelp={ __(
-						'Select the size of the source image.'
-					) }
+					onChange={ updateImage }
 				/>
 			) }
 			{ mediaUrl && (
-				<RangeControl
-					__nextHasNoMarginBottom
+				<ToolsPanelItem
 					label={ __( 'Media width' ) }
-					value={ temporaryMediaWidth || mediaWidth }
-					onChange={ commitWidthChange }
-					min={ WIDTH_CONSTRAINT_PERCENTAGE }
-					max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
-				/>
+					isShownByDefault={ true }
+					hasValue={ () => !! mediaWidth }
+					onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
+				>
+					<RangeControl
+						__nextHasNoMarginBottom
+						label={ __( 'Media width' ) }
+						value={ temporaryMediaWidth || mediaWidth }
+						onChange={ commitWidthChange }
+						min={ WIDTH_CONSTRAINT_PERCENTAGE }
+						max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
+					/>
+				</ToolsPanelItem>
 			) }
-		</PanelBody>
+		</ToolsPanel>
 	);
 
 	const blockProps = useBlockProps( {
@@ -317,6 +358,17 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	);
 
 	const blockEditingMode = useBlockEditingMode();
+
+	function resetAll() {
+		setAttributes( {
+			isStackedOnMobile: false,
+			imageFill: false,
+			mediaAlt: undefined,
+			focalPoint: undefined,
+			mediaWidth: undefined,
+			mediaSizeSlug: undefined,
+		} );
+	}
 
 	return (
 		<>
