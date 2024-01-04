@@ -8,24 +8,21 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
  */
 import { useCallback } from '@wordpress/element';
 
-const DEFAULT_FONT_SIZE = 16;
-
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 /** @typedef {import('react-native-reanimated').SharedValue} SharedValue */
 /**
- * Hook to scroll to the currently focused TextInput
- * depending on where the caret is placed taking into
- * account the Keyboard and the Header.
+ * Hook to scroll to a specified section by taking into account the Keyboard
+ * and the Header.
  *
  * @param {number}      extraScrollHeight      Extra space to not overlap the content.
  * @param {number}      keyboardOffset         Keyboard space offset.
  * @param {boolean}     scrollEnabled          Whether the scroll is enabled or not.
  * @param {RefObject}   scrollViewMeasurements ScrollView Layout measurements.
- * @param {RefObject}   scrollViewRef          ScrollView reference.
+ * @param {RefObject}   scrollViewRef          Scroll view reference.
  * @param {SharedValue} scrollViewYOffset      Current offset position of the ScrollView.
- * @return {Function[]} Function to scroll to the current TextInput's offset.
+ * @return {Function[]} Function to scroll to a section.
  */
-export default function useScrollToTextInput(
+export default function useScrollToSection(
 	extraScrollHeight,
 	keyboardOffset,
 	scrollEnabled,
@@ -37,33 +34,31 @@ export default function useScrollToTextInput(
 	const insets = top + bottom;
 
 	/**
-	 * Function to scroll to the current TextInput's offset.
+	 * Function to scroll to a section.
 	 *
-	 * @param {Object} caret             The caret position data of the currently focused TextInput.
-	 * @param {number} caret.caretHeight The height of the caret.
-	 * @param {number} textInputOffset   The offset calculated with the caret's Y coordinate + the
-	 *                                   TextInput's Y coord or height value.
+	 * @param {Object} section        Section data to scroll to.
+	 * @param {number} section.y      Y-coordinate of of the section.
+	 * @param {number} section.height Height of the section.
 	 */
-	const scrollToTextInputOffset = useCallback(
-		( caret, textInputOffset ) => {
-			const { caretHeight = DEFAULT_FONT_SIZE } = caret ?? {};
-
+	const scrollToSection = useCallback(
+		( sectionY, sectionHeight ) => {
 			if (
 				! scrollViewRef.current ||
 				! scrollEnabled ||
-				! scrollViewMeasurements.current
+				! scrollViewMeasurements
 			) {
 				return;
 			}
+
 			const currentScrollViewYOffset = Math.max(
 				0,
 				scrollViewYOffset.value
 			);
 
-			// Scroll up.
-			if ( textInputOffset < currentScrollViewYOffset ) {
+			// Scroll to the top of the section.
+			if ( sectionY < currentScrollViewYOffset ) {
 				scrollViewRef.current.scrollTo( {
-					y: textInputOffset,
+					y: sectionY,
 					animated: true,
 				} );
 				return;
@@ -72,7 +67,7 @@ export default function useScrollToTextInput(
 			const availableScreenSpace = Math.abs(
 				Math.floor(
 					scrollViewMeasurements.current.height -
-						( keyboardOffset + extraScrollHeight + caretHeight )
+						( keyboardOffset + extraScrollHeight + sectionHeight )
 				)
 			);
 			const maxOffset = Math.floor(
@@ -80,12 +75,12 @@ export default function useScrollToTextInput(
 			);
 
 			const isAtTheTop =
-				textInputOffset < scrollViewMeasurements.current.y + insets;
+				sectionY < scrollViewMeasurements.current.y + insets;
 
-			// Scroll down.
-			if ( textInputOffset > maxOffset && ! isAtTheTop ) {
+			// Scroll to the bottom of the section.
+			if ( sectionY > maxOffset && ! isAtTheTop ) {
 				scrollViewRef.current.scrollTo( {
-					y: textInputOffset - availableScreenSpace,
+					y: sectionY - availableScreenSpace,
 					animated: true,
 				} );
 			}
@@ -101,5 +96,5 @@ export default function useScrollToTextInput(
 		]
 	);
 
-	return [ scrollToTextInputOffset ];
+	return [ scrollToSection ];
 }

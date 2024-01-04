@@ -1,23 +1,15 @@
-/**
- * Note that this CSS file should be in sync with its counterpart in the other editor:
- * packages/edit-site/src/components/secondary-sidebar/style.scss
- */
-
-.edit-post-editor__inserter-panel,
-.edit-post-editor__document-overview-panel {
+.editor-list-view-sidebar {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-}
 
-.edit-post-editor__document-overview-panel {
 	@include break-medium() {
 		// Same width as the Inserter.
 		// @see packages/block-editor/src/components/inserter/style.scss
 		width: 350px;
 	}
 
-	.edit-post-editor__document-overview-panel__close-button {
+	.editor-list-view-sidebar__close-button {
 		position: absolute;
 		right: $grid-unit-10;
 		top: math.div($grid-unit-60 - $button-size, 2); // ( tab height - button size ) / 2
@@ -33,7 +25,7 @@
 		width: 100%;
 		padding-right: $grid-unit-70;
 
-		.edit-post-sidebar__panel-tab {
+		.editor-list-view-sidebar__panel-tab {
 			width: 50%;
 			margin-bottom: -$border-width;
 		}
@@ -44,24 +36,8 @@
 	}
 }
 
-.edit-post-editor__inserter-panel-header {
-	padding-top: $grid-unit-10;
-	padding-right: $grid-unit-10;
-	display: flex;
-	justify-content: flex-end;
-}
-
-.edit-post-editor__inserter-panel-content {
-	// Leave space for the close button
-	height: calc(100% - #{$button-size} - #{$grid-unit-10});
-	@include break-medium() {
-		height: 100%;
-	}
-}
-
-.edit-post-editor__list-view-panel-content,
-.edit-post-editor__list-view-container > .document-outline,
-.edit-post-editor__list-view-empty-headings {
+.editor-list-view-sidebar__list-view-panel-content,
+.editor-list-view-sidebar__list-view-container > .document-outline {
 	height: 100%;
 
 	// Include custom scrollbars, invisible until hovered.
@@ -77,19 +53,17 @@
 	padding: $grid-unit-10 ($grid-unit-10 - $border-width - $border-width);
 }
 
-.edit-post-editor__list-view-empty-headings {
-	& > svg {
-		margin-top: $grid-unit-30 + $grid-unit-05;
-	}
-	& > p {
-		padding-left: $grid-unit-40;
-		padding-right: $grid-unit-40;
-	}
-	text-align: center;
-	color: $gray-700;
+.editor-list-view-sidebar__list-view-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
 }
 
-.edit-post-editor__list-view-overview {
+.editor-list-view-sidebar__tab-panel {
+	height: 100%;
+}
+
+.editor-list-view-sidebar__outline {
 	display: flex;
 	flex-direction: column;
 	gap: $grid-unit-10;
@@ -107,14 +81,4 @@
 		line-height: $default-line-height;
 		color: $gray-700;
 	}
-}
-
-.edit-post-editor__list-view-container {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-}
-
-.edit-post-editor__document-overview-panel__tab-panel {
-	height: 100%;
 }

@@ -6,43 +6,29 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
-import { getBlockTypes } from '@wordpress/blocks';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import getRevisionChanges from './get-revision-changes';
+import { unlock } from '../../../lock-unlock';
 
 const DAY_IN_MILLISECONDS = 60 * 60 * 1000 * 24;
-const MAX_CHANGES = 7;
+const { getGlobalStylesChanges } = unlock( blockEditorPrivateApis );
 
-function ChangesSummary( { revision, previousRevision, blockNames } ) {
-	const changes = getRevisionChanges(
-		revision,
-		previousRevision,
-		blockNames
-	);
+function ChangesSummary( { revision, previousRevision } ) {
+	const changes = getGlobalStylesChanges( revision, previousRevision, {
+		maxResults: 7,
+	} );
 	const changesLength = changes.length;
 
 	if ( ! changesLength ) {
 		return null;
-	}
-
-	// Truncate to `n` results if necessary.
-	if ( changesLength > MAX_CHANGES ) {
-		const deleteCount = changesLength - MAX_CHANGES;
-		const andMoreText = sprintf(
-			// translators: %d: number of global styles changes that are not displayed in the UI.
-			_n( '…and %d more change.', '…and %d more changes.', deleteCount ),
-			deleteCount
-		);
-		changes.splice( MAX_CHANGES, deleteCount, andMoreText );
 	}
 
 	return (
@@ -125,13 +111,6 @@ function RevisionsButtons( {
 				currentTheme?.name?.rendered || currentTheme?.stylesheet,
 			currentUser: getCurrentUser(),
 		};
-	}, [] );
-	const blockNames = useMemo( () => {
-		const blockTypes = getBlockTypes();
-		return blockTypes.reduce( ( accumulator, { name, title } ) => {
-			accumulator[ name ] = title;
-			return accumulator;
-		}, {} );
 	}, [] );
 	const dateNowInMs = getDate().getTime();
 	const { datetimeAbbreviated } = getSettings().formats;
@@ -219,7 +198,6 @@ function RevisionsButtons( {
 									</span>
 									{ isSelected && (
 										<ChangesSummary
-											blockNames={ blockNames }
 											revision={ revision }
 											previousRevision={
 												index < userRevisions.length
