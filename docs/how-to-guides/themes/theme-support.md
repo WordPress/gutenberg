@@ -315,7 +315,7 @@ Themes can opt out of generated block layout styles that provide default structu
 add_theme_support( 'disable-layout-styles' );
 ```
 
-For themes looking to customize `blockGap` styles or block spacing, see [the developer docs on Global Settings & Styles](/docs/how-to-guides/themes/theme-json/#what-is-blockgap-and-how-can-i-use-it).
+For themes looking to customize `blockGap` styles or block spacing, see [the developer docs on Global Settings & Styles](/docs/how-to-guides/themes/global-settings-and-styles.md#what-is-blockgap-and-how-can-i-use-it).
 
 ### Supporting custom line heights
 
@@ -434,7 +434,7 @@ add_theme_support( 'custom-spacing' );
 
 ## Link color control
 
-Link support has been made stable as part of WordPress 5.8. It's `false` by default and themes can enable it via the [theme.json file](./theme-json.md):
+Link support has been made stable as part of WordPress 5.8. It's `false` by default and themes can enable it via the [theme.json file](/docs/how-to-guides/curating-the-editor-experience/theme-json.md):
 
 ```json
 {

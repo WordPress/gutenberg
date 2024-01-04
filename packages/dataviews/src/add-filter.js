@@ -23,6 +23,7 @@ const {
 	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
 } = unlock( componentsPrivateApis );
 
 function WithSeparators( { children } ) {
@@ -117,10 +118,10 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 											return (
 												<DropdownMenuRadioItemCustom
 													key={ element.value }
-													name={ `add-filter-${ filter.field.id }` }
+													name={ `add-filter-${ filter.field }` }
 													value={ element.value }
 													checked={ isActive }
-													onClick={ () => {
+													onChange={ ( e ) => {
 														onChangeView( {
 															...view,
 															page: 1,
@@ -132,7 +133,9 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 																		activeOperator,
 																	value: isActive
 																		? undefined
-																		: element.value,
+																		: e
+																				.target
+																				.value,
 																},
 															],
 														} );
@@ -141,6 +144,13 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 													<DropdownMenuItemLabel>
 														{ element.label }
 													</DropdownMenuItemLabel>
+													{ !! element.description && (
+														<DropdownMenuItemHelpText>
+															{
+																element.description
+															}
+														</DropdownMenuItemHelpText>
+													) }
 												</DropdownMenuRadioItemCustom>
 											);
 										} ) }
@@ -172,7 +182,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 												] ) => (
 													<DropdownMenuRadioItem
 														key={ key }
-														name={ `add-filter-${ filter.name }-conditions` }
+														name={ `add-filter-${ filter.field }-conditions` }
 														value={ operator }
 														checked={
 															activeOperator ===

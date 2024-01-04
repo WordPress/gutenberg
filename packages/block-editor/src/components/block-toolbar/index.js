@@ -175,8 +175,7 @@ export function PrivateBlockToolbar( {
 								<BlockSwitcher clientIds={ blockClientIds } />
 								{ ! isMultiToolbar && (
 									<BlockLockToolbar
-										clientId={ blockClientIds[ 0 ] }
-										wrapperRef={ toolbarWrapperRef }
+										clientId={ blockClientId }
 									/>
 								) }
 								<BlockMover

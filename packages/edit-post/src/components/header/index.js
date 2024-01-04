@@ -34,14 +34,14 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import FullscreenModeClose from './fullscreen-mode-close';
-import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { PostViewLink, PreviewDropdown } = unlock( editorPrivateApis );
+const { DocumentTools, PostViewLink, PreviewDropdown } =
+	unlock( editorPrivateApis );
 
 const slideY = {
 	hidden: { y: '-50px' },
@@ -60,26 +60,30 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const blockToolbarRef = useRef();
 	const {
+		isTextEditor,
 		hasBlockSelection,
 		hasActiveMetaboxes,
 		hasFixedToolbar,
 		isEditingTemplate,
 		isPublishSidebarOpened,
 		showIconLabels,
+		hasHistory,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
+		const { getEditorMode } = select( editPostStore );
 
 		return {
+			isTextEditor: getEditorMode() === 'text',
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+			hasHistory: !! select( editorStore ).getEditorSettings().goBack,
 			isEditingTemplate:
 				select( editorStore ).getRenderingMode() === 'template-only',
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core/edit-post', 'fixedToolbar' ),
-			showIconLabels:
-				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
+			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 		};
 	}, [] );
 
@@ -108,7 +112,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				transition={ { type: 'tween', delay: 0.8 } }
 				className="edit-post-header__toolbar"
 			>
-				<HeaderToolbar hasFixedToolbar={ hasFixedToolbar } />
+				<DocumentTools disableBlockTools={ isTextEditor } />
 				{ hasFixedToolbar && isLargeViewport && (
 					<>
 						<div
@@ -155,7 +159,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 							isLargeViewport,
 					} ) }
 				>
-					{ isEditingTemplate && <DocumentBar /> }
+					{ ( isEditingTemplate || hasHistory ) && <DocumentBar /> }
 				</div>
 			</motion.div>
 			<motion.div
@@ -169,20 +173,14 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
 					// We track that DOM node to return focus to the PostPublishButtonOrToggle
 					// when the publish sidebar has been closed.
-					<PostSavedState
-						forceIsDirty={ hasActiveMetaboxes }
-						showIconLabels={ showIconLabels }
-					/>
+					<PostSavedState forceIsDirty={ hasActiveMetaboxes } />
 				) }
-				<PreviewDropdown
-					showIconLabels={ showIconLabels }
-					forceIsAutosaveable={ hasActiveMetaboxes }
-				/>
+				<PreviewDropdown forceIsAutosaveable={ hasActiveMetaboxes } />
 				<PostPreviewButton
 					className="edit-post-header__post-preview-button"
 					forceIsAutosaveable={ hasActiveMetaboxes }
 				/>
-				<PostViewLink showIconLabels={ showIconLabels } />
+				<PostViewLink />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					setEntitiesSavedStatesCallback={
@@ -190,14 +188,9 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 					}
 				/>
 				{ ( isWideViewport || ! showIconLabels ) && (
-					<>
-						<PinnedItems.Slot scope="core/edit-post" />
-						<MoreMenu showIconLabels={ showIconLabels } />
-					</>
+					<PinnedItems.Slot scope="core/edit-post" />
 				) }
-				{ showIconLabels && ! isWideViewport && (
-					<MoreMenu showIconLabels={ showIconLabels } />
-				) }
+				<MoreMenu showIconLabels={ showIconLabels } />
 			</motion.div>
 		</div>
 	);

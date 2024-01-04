@@ -101,6 +101,7 @@ export default function EditPostPreferencesModal() {
 						) }
 						<PreferencesModalSection title={ __( 'Interface' ) }>
 							<EnableFeature
+								scope="core"
 								featureName="showListViewByDefault"
 								help={ __(
 									'Opens the block list view sidebar by default.'
@@ -109,6 +110,7 @@ export default function EditPostPreferencesModal() {
 							/>
 							{ showBlockBreadcrumbsOption && (
 								<EnableFeature
+									scope="core"
 									featureName="showBlockBreadcrumbs"
 									help={ __(
 										'Display the block hierarchy trail at the bottom of the editor.'
@@ -117,6 +119,7 @@ export default function EditPostPreferencesModal() {
 								/>
 							) }
 							<EnableFeature
+								scope="core"
 								featureName="allowRightClickOverrides"
 								help={ __(
 									'Allows contextual list view menus via right-click, overriding browser defaults.'
@@ -199,6 +202,7 @@ export default function EditPostPreferencesModal() {
 							label={ __( 'Distraction free' ) }
 						/>
 						<EnableFeature
+							scope="core"
 							featureName="focusMode"
 							help={ __(
 								'Highlights the current block and fades other content.'
@@ -227,6 +231,7 @@ export default function EditPostPreferencesModal() {
 							) }
 						>
 							<EnableFeature
+								scope="core"
 								featureName="keepCaretInsideBlock"
 								help={ __(
 									'Keeps the text cursor within the block boundaries, aiding users with screen readers by preventing unintentional cursor movement outside the block.'
@@ -238,6 +243,7 @@ export default function EditPostPreferencesModal() {
 						</PreferencesModalSection>
 						<PreferencesModalSection title={ __( 'Interface' ) }>
 							<EnableFeature
+								scope="core"
 								featureName="showIconLabels"
 								label={ __( 'Show button text labels' ) }
 								help={ __(

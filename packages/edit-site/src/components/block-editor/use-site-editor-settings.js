@@ -13,6 +13,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { usePostLinkProps } from './use-post-link-props';
 
 const { useBlockEditorSettings } = unlock( editorPrivateApis );
 
@@ -90,13 +91,11 @@ function useArchiveLabel( templateSlug ) {
 
 export function useSpecificEditorSettings() {
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const getPostLinkProps = usePostLinkProps();
 	const {
 		templateSlug,
-		focusMode,
-		allowRightClickOverrides,
 		isDistractionFree,
 		hasFixedToolbar,
-		keepCaretInsideBlock,
 		canvasMode,
 		settings,
 		postWithTemplate,
@@ -121,22 +120,13 @@ export function useSpecificEditorSettings() {
 			const _context = getEditedPostContext();
 			return {
 				templateSlug: _record.slug,
-				focusMode: !! getPreference( 'core/edit-site', 'focusMode' ),
 				isDistractionFree: !! getPreference(
 					'core/edit-site',
 					'distractionFree'
 				),
-				allowRightClickOverrides: !! getPreference(
-					'core/edit-site',
-					'allowRightClickOverrides'
-				),
 				hasFixedToolbar:
 					!! getPreference( 'core/edit-site', 'fixedToolbar' ) ||
 					! isLargeViewport,
-				keepCaretInsideBlock: !! getPreference(
-					'core/edit-site',
-					'keepCaretInsideBlock'
-				),
 				canvasMode: getCanvasMode(),
 				settings: getSettings(),
 				postWithTemplate: _context?.postId,
@@ -150,29 +140,26 @@ export function useSpecificEditorSettings() {
 		return {
 			...settings,
 
+			richEditingEnabled: true,
 			supportsTemplateMode: true,
-			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
-			allowRightClickOverrides,
+			focusMode: canvasMode !== 'view',
 			isDistractionFree,
 			hasFixedToolbar,
-			keepCaretInsideBlock,
 			defaultRenderingMode,
-
+			getPostLinkProps,
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
 		};
 	}, [
 		settings,
-		focusMode,
-		allowRightClickOverrides,
+		canvasMode,
 		isDistractionFree,
 		hasFixedToolbar,
-		keepCaretInsideBlock,
-		canvasMode,
+		defaultRenderingMode,
+		getPostLinkProps,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
-		defaultRenderingMode,
 	] );
 
 	return defaultEditorSettings;
