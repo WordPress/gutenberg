@@ -230,6 +230,13 @@ class URLInput extends Component {
 				this.setState( {
 					loading: false,
 				} );
+			} )
+			.finally( () => {
+				// If this is the current promise then reset the reference
+				// to allow for checking if a new request is made.
+				if ( this.suggestionsRequest === request ) {
+					this.suggestionsRequest = null;
+				}
 			} );
 
 		// Note that this assignment is handled *before* the async search request
@@ -247,10 +254,12 @@ class URLInput extends Component {
 
 		// When opening the link editor, if there's a value present, we want to load the suggestions pane with the results for this input search value
 		// Don't re-run the suggestions on focus if there are already suggestions present (prevents searching again when tabbing between the input and buttons)
+		// or there is already a request in progress.
 		if (
 			value &&
 			! disableSuggestions &&
-			! ( suggestions && suggestions.length )
+			! ( suggestions && suggestions.length ) &&
+			this.suggestionsRequest === null
 		) {
 			// Ensure the suggestions are updated with the current input value.
 			this.updateSuggestions( value );
