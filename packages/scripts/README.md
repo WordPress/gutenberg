@@ -108,6 +108,11 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
 -   `--output-path` – Allows customization of the output directory. Default is `build`.
 
+Experimental support to support the block.json `viewModule` field is available via the
+`--experimental-modules` option. With this option enabled, script and module fields will all be
+compiled. The `viewModule` field is analogous to the `viewScript` field, but will compile a module
+and should be registered in WordPress using the Modules API.
+
 #### Advanced information
 
 This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll look for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it’ll use the default config provided by `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
@@ -390,6 +395,11 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
 -   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
 -   `--output-path` – Allows customization of the output directory. Default is `build`.
+
+Experimental support to support the block.json `viewModule` field is available via the
+`--experimental-modules` option. With this option enabled, script and module fields will all be
+compiled. The `viewModule` field is analogous to the `viewScript` field, but will compile a module
+and should be registered in WordPress using the Modules API.
 
 #### Advanced information
 
