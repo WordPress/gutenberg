@@ -181,8 +181,14 @@ function LocalFonts() {
 						) }
 					/>
 				) }
-				{ isUploading && <ProgressBar /> }
-				{ notice && (
+				{ isUploading && (
+					<FlexItem>
+						<Spacer margin={ 32 } />
+						<ProgressBar className="font-library-modal__upload-area__progress-bar" />
+						<Spacer margin={ 32 } />
+					</FlexItem>
+				) }
+				{ ! isUploading && notice && (
 					<FlexItem>
 						<Spacer margin={ 2 } />
 						<Notice
@@ -195,15 +201,17 @@ function LocalFonts() {
 					</FlexItem>
 				) }
 				<Spacer margin={ 2 } />
-				<Text className="font-library-modal__upload-area__text">
-					{ sprintf(
-						/* translators: %s: supported font formats: ex: .ttf, .woff and .woff2 */
-						__(
-							'Uploaded fonts appear in your library and can be used in your theme. Supported formats: %s.'
-						),
-						supportedFormats
-					) }
-				</Text>
+				{ ! isUploading && (
+					<Text className="font-library-modal__upload-area__text">
+						{ sprintf(
+							/* translators: %s: supported font formats: ex: .ttf, .woff and .woff2 */
+							__(
+								'Uploaded fonts appear in your library and can be used in your theme. Supported formats: %s.'
+							),
+							supportedFormats
+						) }
+					</Text>
+				) }
 			</VStack>
 		</>
 	);
