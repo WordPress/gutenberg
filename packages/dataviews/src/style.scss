@@ -148,10 +148,18 @@
 	}
 
 	.dataviews-view-grid__card {
-		h3 { // Todo: A better way to target this
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
+		.dataviews-view-grid__primary-field { 
+			.edit-site-grid-view__title-field {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: block;
+				font-size: $default-font-size;
+				font-weight: 500;
+				color: $gray-900;
+				width: 100%;
+				text-decoration: none;
+			}
 		}
 	}
 
