@@ -39,11 +39,11 @@ add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' 
  * @return array The block object with randomized order of image blocks.
  */
 function block_core_gallery_random_order( $parsed_block ) {
-	if ( 'core/gallery' === $parsed_block['blockName'] && isset( $parsed_block['attrs']['randomOrder'] ) && $parsed_block['attrs']['randomOrder'] ) {
-		$inner_blocks = $parsed_block['innerBlocks'];
-		shuffle( $inner_blocks );
-		$parsed_block['innerBlocks'] = $inner_blocks;
+	if ( 'core/gallery' === $parsed_block['blockName'] && ! empty( $parsed_block['attrs']['randomOrder'] ) ) {
+		shuffle( $parsed_block['innerBlocks'] );
 	}
+
+	return $parsed_block;
 
 	return $parsed_block;
 }
