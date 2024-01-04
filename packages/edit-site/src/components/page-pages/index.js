@@ -39,7 +39,7 @@ import {
 	useEditPostAction,
 } from '../actions';
 import PostPreview from '../post-preview';
-import ItemDetails from './item-details';
+import Details from './details';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -328,9 +328,6 @@ export default function PagePages() {
 	const pageRecord = pages?.find( ( page ) => page.id === pageId );
 	const showDetails =
 		view.type === LAYOUT_LIST && isDetailsOpen && pageRecord;
-	const title = decodeEntities(
-		pageRecord?.title?.rendered || __( '(no title)' )
-	);
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
@@ -341,10 +338,17 @@ export default function PagePages() {
 						? 'edit-site-page-pages-list-view'
 						: null
 				}
-				title={ showDetails ? title : __( 'Pages' ) }
+				title={
+					showDetails
+						? decodeEntities(
+								pageRecord?.title?.rendered ||
+									__( '(no title)' )
+						  )
+						: __( 'Pages' )
+				}
 				onClose={ showDetails ? onDetailsChange : null }
 			>
-				{ showDetails && <ItemDetails item={ pageRecord } /> }
+				{ showDetails && <Details item={ pageRecord } /> }
 				{ ! showDetails && (
 					<DataViews
 						paginationInfo={ paginationInfo }
