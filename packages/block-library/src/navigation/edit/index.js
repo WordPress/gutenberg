@@ -71,6 +71,7 @@ import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
+import { NAVIGATION_MOBILE_BREAKPOINT } from '../constants';
 import { unlock } from '../../lock-unlock';
 
 function Navigation( {
@@ -301,7 +302,8 @@ function Navigation( {
 	const shouldBeCollapsed = useCallback( () => {
 		return (
 			'always' === overlayMenu ||
-			( 'mobile' === overlayMenu && window.innerWidth < 600 )
+			( 'mobile' === overlayMenu &&
+				window.innerWidth < NAVIGATION_MOBILE_BREAKPOINT )
 		);
 	}, [ overlayMenu ] );
 	const [ isCollapsed, setIsCollapsed ] = useState( shouldBeCollapsed() );

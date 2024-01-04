@@ -3,6 +3,11 @@
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
+/**
+ * Internal dependencies
+ */
+import { NAVIGATION_MOBILE_BREAKPOINT } from './constants';
+
 const focusableSelectors = [
 	'a[href]',
 	'input:not([disabled]):not([type="hidden"]):not([aria-hidden])',
@@ -185,7 +190,7 @@ const { state, actions, callbacks } = store( 'core/navigation', {
 			);
 		},
 		collapseNav( ref ) {
-			if ( window.innerWidth < 600 ) {
+			if ( window.innerWidth < NAVIGATION_MOBILE_BREAKPOINT ) {
 				ref.classList.add( 'is-collapsed' );
 			} else {
 				ref.classList.remove( 'is-collapsed' );
