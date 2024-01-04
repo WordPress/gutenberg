@@ -14,8 +14,12 @@
  */
 class WP_Interactivity_Initial_State_Test extends WP_UnitTestCase {
 	public function set_up() {
-		// Clear the state before each test.
+		parent::set_up();
 		WP_Interactivity_Initial_State::reset();
+	}
+	public function tear_down() {
+		WP_Interactivity_Initial_State::reset();
+		parent::tear_down();
 	}
 
 	public function test_initial_state_should_be_empty() {
