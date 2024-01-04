@@ -21,7 +21,7 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`combine-assets\` sh
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`dynamic-import\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob'), 'version' => '092c2bce8c247ee11100', 'type' => 'module');
+"<?php return array('dependencies' => array(array('id' => '@wordpress/blob', 'type' => 'dynamic')), 'version' => '092c2bce8c247ee11100', 'type' => 'module');
 "
 `;
 
@@ -198,7 +198,10 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`wordpress\` should 
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin modules Webpack \`wordpress-interactivity\` should produce expected output: Asset file 'main.asset.json' should match snapshot 1`] = `"{"dependencies":[{"id":"@wordpress/interactivity","type":"dynamic"}],"version":"f0242eb6da78af6ca4b8","type":"module"}"`;
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`wordpress-interactivity\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array(array('id' => '@wordpress/interactivity', 'type' => 'dynamic')), 'version' => 'f0242eb6da78af6ca4b8', 'type' => 'module');
+"
+`;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`wordpress-interactivity\` should produce expected output: External modules should match snapshot 1`] = `
 [
@@ -510,7 +513,10 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress\` should 
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress-interactivity\` should produce expected output: Asset file 'main.asset.json' should match snapshot 1`] = `"{"dependencies":["lodash","wp-interactivity"],"version":"b16015e38aea0509f75f"}"`;
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress-interactivity\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('lodash', 'wp-interactivity'), 'version' => 'b16015e38aea0509f75f');
+"
+`;
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress-interactivity\` should produce expected output: External modules should match snapshot 1`] = `
 [
