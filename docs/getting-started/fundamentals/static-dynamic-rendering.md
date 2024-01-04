@@ -42,7 +42,7 @@ _(see the [code above](https://github.com/WordPress/block-development-examples/b
 Blocks with dynamic rendering can also define a markup representation of the block (via the `save` function). If no dynamic rendering method is found, any markup representation of the block in the database will be returned to the front end.
 
 <div class="callout callout-info">
-The markup stored for a block can be modified before it gets rendered on the front end via hooks such as <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>render_block</code></a> or via <code>$render_callback</code>
+The markup stored for a block can be modified before it gets rendered on the front end via hooks such as <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>render_block</code></a> or via <code>$render_callback</code>.
 </div>
 
 Some examples of core blocks whose output for the front end is statically generated when saved to the database (as returned by their `save` functions) are:
