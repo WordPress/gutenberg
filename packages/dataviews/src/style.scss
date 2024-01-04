@@ -149,7 +149,7 @@
 
 	.dataviews-view-grid__card {
 		.dataviews-view-grid__primary-field { 
-			.edit-site-grid-view__title-field {
+			.dataviews-view-grid__title-field {
 				white-space: nowrap;
 				overflow: hidden;
 				text-overflow: ellipsis;
@@ -158,8 +158,8 @@
 				width: 100%;
 			}
 
-			.edit-site-grid-view__title-field a,
-			button.edit-site-grid-view__title-field {
+			.dataviews-view-grid__title-field a,
+			button.dataviews-view-grid__title-field {
 				font-weight: 500;
 				color: $gray-900;
 				text-decoration: none;

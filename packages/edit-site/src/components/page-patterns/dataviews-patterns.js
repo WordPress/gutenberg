@@ -165,7 +165,7 @@ function Title( { item, categoryId } ) {
 			) }
 			<Flex as="span" gap={ 0 } justify="left">
 				{ item.type === PATTERN_TYPES.theme ? (
-					<span className="edit-site-grid-view__title-field">
+					<span className="dataviews-view-grid__title-field">
 						{ item.title }
 					</span>
 				) : (
@@ -176,7 +176,7 @@ function Title( { item, categoryId } ) {
 							// Required for the grid's roving tab index system.
 							// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
 							tabIndex="-1"
-							className="edit-site-grid-view__title-field"
+							className="dataviews-view-grid__title-field"
 						>
 							{ item.title || item.name }
 						</Button>
