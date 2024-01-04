@@ -1,5 +1,21 @@
 == Changelog ==
 
+= 17.3.1 =
+
+## Changelog
+
+### Bug Fixes
+
+- Rich text: add HTML string methods to RichTextData ([57322](https://github.com/WordPress/gutenberg/pull/57322))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@ellatrix 
+
+
+
 = 17.4.0 =
 
 
