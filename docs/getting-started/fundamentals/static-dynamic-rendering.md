@@ -10,7 +10,7 @@ The post <a href="https://developer.wordpress.org/news/2023/02/27/static-vs-dyna
 
 ![](https://developer.wordpress.org/files/2023/12/static-rendering.png)
 
-Blocks have static rendering (a.k.a. Static Blocks) **when no dynamic rendering method has been defined (or is available) for the block**. In this case, the output for the front end will be taken from the [markup representation of the block in the database](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block/) that is generated (returned by the `save` function) when the block is saved in the Block Editor.
+Blocks have static rendering **when no dynamic rendering method has been defined (or is available) for the block**. In this case, the output for the front end will be taken from the [markup representation of the block in the database](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block/) that is generated (returned by the `save` function) when the block is saved in the Block Editor. This type is block is often called a "static block".
 
 ### How to define static rendering for a block
 
