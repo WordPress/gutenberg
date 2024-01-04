@@ -20,6 +20,21 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`combine-assets\` sh
 ]
 `;
 
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-dependency-graph\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('@wordpress/interactivity'), 'version' => '58fadee5eca3ad30aff6', 'type' => 'module');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-dependency-graph\` should produce expected output: External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "module",
+    "request": "@wordpress/interactivity",
+    "userRequest": "@wordpress/interactivity",
+  },
+]
+`;
+
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`dynamic-import\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
 "<?php return array('dependencies' => array(array('id' => '@wordpress/blob', 'type' => 'dynamic')), 'version' => '092c2bce8c247ee11100', 'type' => 'module');
 "
@@ -255,6 +270,24 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`combine-assets\` sh
       "tokenList",
     ],
     "userRequest": "@wordpress/token-list",
+  },
+]
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dependency-graph\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('wp-interactivity'), 'version' => '79a1af3afac581f52492');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dependency-graph\` should produce expected output: External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "window",
+    "request": [
+      "wp",
+      "interactivity",
+    ],
+    "userRequest": "@wordpress/interactivity",
   },
 ]
 `;
