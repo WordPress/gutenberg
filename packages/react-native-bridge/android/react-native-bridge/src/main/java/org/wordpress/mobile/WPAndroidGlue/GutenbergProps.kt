@@ -92,7 +92,6 @@ data class GutenbergProps @JvmOverloads constructor(
                     content?.let { putString(PROP_INITIAL_DATA, it) }
                 }
 
-        private const val PROP_INITIAL_TITLE = "initialTitle"
         private const val PROP_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled"
         private const val PROP_POST_TYPE = "postType"
         private const val PROP_HOST_APP_NAMESPACE = "hostAppNamespace"
@@ -105,6 +104,7 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_QUOTE_BLOCK_V2 = "quoteBlockV2"
         private const val PROP_LIST_BLOCK_V2 = "listBlockV2"
 
+        const val PROP_INITIAL_TITLE = "initialTitle"
         const val PROP_INITIAL_DATA = "initialData"
         const val PROP_STYLES = "rawStyles"
         const val PROP_FEATURES = "rawFeatures"
