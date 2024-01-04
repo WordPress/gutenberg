@@ -187,7 +187,7 @@ The filename for the generated asset file. Accepts the same values as the Webpac
 -   Type: boolean
 -   Default: `false`
 
-By default, one asset file is created for each entry point. When this flag is set to `true`, all information about assets is combined into a single `asset.(json|php)` file generated in the output directory.
+By default, one asset file is created for each entry point. When this flag is set to `true`, all information about assets is combined into a single `assets.(json|php)` file generated in the output directory.
 
 ##### `combinedOutputFile`
 
