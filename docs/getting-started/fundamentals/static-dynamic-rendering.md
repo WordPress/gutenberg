@@ -3,7 +3,7 @@
 The blocks's markup returned for the front end can be dynamically generated on the server when the block is requested from the client (dynamic blocks) or statically generated when the block is saved in the Block Editor (static blocks).
 
 <div class="callout callout-tip">
-The post <a href="https://developer.wordpress.org/news/2023/02/27/static-vs-dynamic-blocks-whats-the-difference/">Static vs. dynamic blocks: What’s the difference?</a> provides a great introduction to static and dynamic blocks
+The post <a href="https://developer.wordpress.org/news/2023/02/27/static-vs-dynamic-blocks-whats-the-difference/">Static vs. dynamic blocks: What’s the difference?</a> provides a great introduction to static and dynamic blocks.
 </div>
 
 ## Blocks with Static Rendering 
