@@ -314,14 +314,15 @@ function gutenberg_process_interactive_html( $html, $context, $inner_blocks = ar
  * Resolves the reference using the store and the context from the provided
  * path.
  *
+ * @param string $ns Namespace.
  * @param string $path Path.
  * @param array  $context Context data.
  * @return mixed
  */
-function gutenberg_interactivity_evaluate_reference( $path, array $context = array() ) {
+function gutenberg_interactivity_evaluate_reference( $ns, $path, array $context = array() ) {
 	$store = array_merge(
-		WP_Interactivity_Store::get_data(),
-		array( 'context' => $context )
+		WP_Interactivity_Store::get_data()[ $ns ],
+		array( 'context' => $context[ $ns ] )
 	);
 
 	/*
