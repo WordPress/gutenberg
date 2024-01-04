@@ -49,7 +49,7 @@ Some examples of core blocks whose output for the front end is statically genera
 - [`preformatted`](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/preformatted) (see its [`save`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/preformatted/save.js) function) 
 - [`spacer`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer) (see its [`save`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer/save.js) function).
 
-## Blocks with Dynamic Rendering
+## Blocks with dynamic rendering
 
 Blocks with dynamic rendering are blocks that **build their structure and content on the fly when the block is requested from the client**. This type is block is often called a "dynamic block".
 
