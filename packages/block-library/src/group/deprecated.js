@@ -53,6 +53,9 @@ const deprecated = [
 				type: [ 'string', 'boolean' ],
 				enum: [ 'all', 'insert', false ],
 			},
+			allowedBlocks: {
+				type: 'array',
+			},
 		},
 		supports: {
 			__experimentalOnEnter: true,
