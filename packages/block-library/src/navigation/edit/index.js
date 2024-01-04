@@ -302,8 +302,7 @@ function Navigation( {
 		`(max-width: ${ NAVIGATION_MOBILE_BREAKPOINT }px)`
 	);
 
-	const isCollapsed = () =>
-		( 'mobile' === overlayMenu && isMobileBreakPoint ) ||
+	const isCollapsed = ( 'mobile' === overlayMenu && isMobileBreakPoint ) ||
 		'always' === overlayMenu;
 
 	const blockProps = useBlockProps( {
