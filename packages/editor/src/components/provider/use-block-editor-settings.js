@@ -10,6 +10,7 @@ import {
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -86,6 +87,7 @@ const BLOCK_EDITOR_SETTINGS = [
  * @return {Object} Block Editor Settings.
  */
 function useBlockEditorSettings( settings, postType, postId ) {
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		allowRightClickOverrides,
 		focusMode,
@@ -129,7 +131,8 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					postId
 				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
 				focusMode: get( 'core', 'focusMode' ),
-				hasFixedToolbar: get( 'core', 'fixedToolbar' ),
+				hasFixedToolbar:
+					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				reusableBlocks: isWeb
 					? getEntityRecords( 'postType', 'wp_block', {
@@ -145,7 +148,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				restBlockPatternCategories: getBlockPatternCategories(),
 			};
 		},
-		[ postType, postId ]
+		[ postType, postId, isLargeViewport ]
 	);
 
 	const settingsBlockPatterns =
