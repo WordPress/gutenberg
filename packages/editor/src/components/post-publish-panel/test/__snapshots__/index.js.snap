@@ -36,7 +36,9 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
     >
       <button
         aria-label="Close panel"
-        class="components-button has-icon"
+        class="components-tooltip components-button has-icon"
+        data-wp-c16t="true"
+        data-wp-component="Tooltip"
         type="button"
       >
         <svg
@@ -198,7 +200,9 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
     >
       <button
         aria-label="Close panel"
-        class="components-button has-icon"
+        class="components-tooltip components-button has-icon"
+        data-wp-c16t="true"
+        data-wp-component="Tooltip"
         type="button"
       >
         <svg

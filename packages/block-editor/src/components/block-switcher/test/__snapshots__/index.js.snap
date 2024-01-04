@@ -51,8 +51,10 @@ exports[`BlockSwitcherDropdownMenu should render enabled block switcher with mul
         aria-expanded="false"
         aria-haspopup="true"
         aria-label="Multiple blocks selected"
-        class="components-button components-dropdown-menu__toggle has-icon"
+        class="components-tooltip components-button components-dropdown-menu__toggle has-icon"
         data-toolbar-item="true"
+        data-wp-c16t="true"
+        data-wp-component="Tooltip"
         type="button"
       >
         <span
@@ -90,8 +92,10 @@ exports[`BlockSwitcherDropdownMenu should render switcher with blocks 1`] = `
         aria-expanded="false"
         aria-haspopup="true"
         aria-label="Block Name"
-        class="components-button components-dropdown-menu__toggle has-icon"
+        class="components-tooltip components-button components-dropdown-menu__toggle has-icon"
         data-toolbar-item="true"
+        data-wp-c16t="true"
+        data-wp-component="Tooltip"
         type="button"
       >
         <span

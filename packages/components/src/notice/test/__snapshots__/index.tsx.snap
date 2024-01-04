@@ -42,7 +42,9 @@ exports[`Notice should match snapshot 1`] = `
     </div>
     <button
       aria-label="Close"
-      class="components-button components-notice__dismiss has-icon"
+      class="components-tooltip components-button components-notice__dismiss has-icon"
+      data-wp-c16t="true"
+      data-wp-component="Tooltip"
       type="button"
     >
       <svg

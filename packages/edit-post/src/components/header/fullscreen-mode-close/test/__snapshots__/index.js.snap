@@ -5,7 +5,9 @@ exports[`FullscreenModeClose when in full screen mode should display a default s
   <div>
     <a
       aria-label="Back"
-      class="components-button edit-post-fullscreen-mode-close"
+      class="components-tooltip components-button edit-post-fullscreen-mode-close"
+      data-wp-c16t="true"
+      data-wp-component="Tooltip"
       href="edit.php?"
     >
       <svg

@@ -219,8 +219,10 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                         <button
                           aria-label="Color: red"
                           aria-selected="true"
-                          class="components-button components-circular-option-picker__option"
+                          class="components-button components-tooltip components-circular-option-picker__option"
                           data-active-item=""
+                          data-wp-c16t="true"
+                          data-wp-component="Tooltip"
                           id="components-circular-option-picker-0-0"
                           role="option"
                           style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"

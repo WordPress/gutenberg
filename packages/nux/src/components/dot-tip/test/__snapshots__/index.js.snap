@@ -27,7 +27,9 @@ exports[`DotTip should render correctly 1`] = `
     </p>
     <button
       aria-label="Disable tips"
-      class="components-button nux-dot-tip__disable has-icon"
+      class="components-tooltip components-button nux-dot-tip__disable has-icon"
+      data-wp-c16t="true"
+      data-wp-component="Tooltip"
       type="button"
     >
       <svg

@@ -10,8 +10,10 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are hidden
       aria-expanded="false"
       aria-haspopup="true"
       aria-label="Change vertical alignment"
-      class="components-button components-dropdown-menu__toggle has-icon"
+      class="components-tooltip components-button components-dropdown-menu__toggle has-icon"
       data-toolbar-item="true"
+      data-wp-c16t="true"
+      data-wp-component="Tooltip"
       type="button"
     >
       <svg
@@ -42,8 +44,10 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are visibl
       <button
         aria-label="Align top"
         aria-pressed="true"
-        class="components-button components-toolbar__control is-pressed has-icon"
+        class="components-tooltip components-button components-toolbar__control is-pressed has-icon"
         data-toolbar-item="true"
+        data-wp-c16t="true"
+        data-wp-component="Tooltip"
         type="button"
       >
         <svg
@@ -64,8 +68,10 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are visibl
       <button
         aria-label="Align middle"
         aria-pressed="false"
-        class="components-button components-toolbar__control has-icon"
+        class="components-tooltip components-button components-toolbar__control has-icon"
         data-toolbar-item="true"
+        data-wp-c16t="true"
+        data-wp-component="Tooltip"
         type="button"
       >
         <svg
@@ -86,8 +92,10 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are visibl
       <button
         aria-label="Align bottom"
         aria-pressed="false"
-        class="components-button components-toolbar__control has-icon"
+        class="components-tooltip components-button components-toolbar__control has-icon"
         data-toolbar-item="true"
+        data-wp-c16t="true"
+        data-wp-component="Tooltip"
         type="button"
       >
         <svg
