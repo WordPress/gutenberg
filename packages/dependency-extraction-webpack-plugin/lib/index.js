@@ -53,14 +53,6 @@ class DependencyExtractionWebpackPlugin {
 		 * @type {boolean}
 		 */
 		this.useModules = false;
-
-		/**
-		 * Offload externalization work to the ExternalsPlugin.
-		 */
-		this.externalsPlugin = new webpack.ExternalsPlugin(
-			'window',
-			this.externalizeWpDeps.bind( this )
-		);
 	}
 
 	/**
@@ -142,9 +134,14 @@ class DependencyExtractionWebpackPlugin {
 	apply( compiler ) {
 		this.useModules = Boolean( compiler.options.output?.module );
 
-		if ( this.useModules ) {
-			this.externalsPlugin.type = 'module';
-		}
+		/**
+		 * Offload externalization work to the ExternalsPlugin.
+		 * @type {webpack.ExternalsPlugin}
+		 */
+		this.externalsPlugin = new webpack.ExternalsPlugin(
+			this.useModules ? 'module' : 'window',
+			this.externalizeWpDeps.bind( this )
+		);
 
 		this.externalsPlugin.apply( compiler );
 
