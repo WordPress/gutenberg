@@ -36,7 +36,7 @@ export default function EditSitePreferencesModal() {
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const toggleDistractionFree = () => {
 		registry.batch( () => {
-			setPreference( 'core/edit-site', 'fixedToolbar', true );
+			setPreference( 'core', 'fixedToolbar', true );
 			setIsInserterOpened( false );
 			setIsListViewOpened( false );
 			closeGeneralSidebar();

@@ -47,16 +47,10 @@ class Editor extends Component {
 		this.setTitleRef = this.setTitleRef.bind( this );
 	}
 
-	getEditorSettings(
-		settings,
-		hasFixedToolbar,
-		hiddenBlockTypes,
-		blockTypes
-	) {
+	getEditorSettings( settings, hiddenBlockTypes, blockTypes ) {
 		settings = {
 			...settings,
 			isRTL: I18nManager.isRTL,
-			hasFixedToolbar,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -132,7 +126,6 @@ class Editor extends Component {
 	render() {
 		const {
 			settings,
-			hasFixedToolbar,
 			initialEdits,
 			hiddenBlockTypes,
 			blockTypes,
@@ -146,7 +139,6 @@ class Editor extends Component {
 
 		const editorSettings = this.getEditorSettings(
 			settings,
-			hasFixedToolbar,
 			hiddenBlockTypes,
 			blockTypes
 		);
@@ -188,12 +180,10 @@ class Editor extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isFeatureActive, getEditorMode, getHiddenBlockTypes } =
-			select( editPostStore );
+		const { getEditorMode, getHiddenBlockTypes } = select( editPostStore );
 		const { getBlockTypes } = select( blocksStore );
 
 		return {
-			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 			mode: getEditorMode(),
 			hiddenBlockTypes: getHiddenBlockTypes(),
 			blockTypes: getBlockTypes(),

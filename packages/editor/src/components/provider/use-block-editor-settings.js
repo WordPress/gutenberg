@@ -51,7 +51,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'gradients',
 	'generateAnchors',
 	'getPostLinkProps',
-	'hasFixedToolbar',
 	'hasInlineToolbar',
 	'isDistractionFree',
 	'imageDefaultSize',
@@ -90,6 +89,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 	const {
 		allowRightClickOverrides,
 		focusMode,
+		hasFixedToolbar,
 		keepCaretInsideBlock,
 		reusableBlocks,
 		hasUploadPermissions,
@@ -129,6 +129,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					postId
 				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
 				focusMode: get( 'core', 'focusMode' ),
+				hasFixedToolbar: get( 'core', 'fixedToolbar' ),
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				reusableBlocks: isWeb
 					? getEntityRecords( 'postType', 'wp_block', {
@@ -222,6 +223,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			),
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,
+			hasFixedToolbar,
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
@@ -258,6 +260,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			allowRightClickOverrides,
 			focusMode,
 			forceDisableFocusMode,
+			hasFixedToolbar,
 			keepCaretInsideBlock,
 			settings,
 			hasUploadPermissions,

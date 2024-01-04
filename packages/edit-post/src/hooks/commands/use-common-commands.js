@@ -134,7 +134,7 @@ export default function useCommonCommands() {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'fixedToolbar' );
+			toggle( 'core', 'fixedToolbar' );
 			if ( isDistractionFree ) {
 				toggleDistractionFree();
 			}
