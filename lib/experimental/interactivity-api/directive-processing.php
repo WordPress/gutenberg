@@ -328,7 +328,7 @@ function gutenberg_interactivity_evaluate_reference( $reference, $ns, array $con
 	list( $ns, $path ) = WP_Directive_Processor::parse_attribute_value( $reference, $ns );
 
 	$store = array(
-		'state'   => WP_Interactivity_Store::get_data()[ $ns ],
+		'state'   => WP_Interactivity_Initial_State::get_state( $ns ),
 		'context' => $context[ $ns ] ?? array(),
 	);
 
