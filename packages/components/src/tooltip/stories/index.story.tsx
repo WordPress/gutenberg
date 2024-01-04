@@ -57,3 +57,14 @@ KeyboardShortcut.args = {
 		ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
 	},
 };
+
+// TODO: remove before merging
+export const Nested: StoryFn< typeof Tooltip > = Template.bind( {} );
+Nested.args = {
+	children: (
+		<Tooltip text="inner text">
+			<Button variant="primary">Tooltip Anchor</Button>
+		</Tooltip>
+	),
+	text: 'outer text',
+};
