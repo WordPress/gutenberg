@@ -42,7 +42,6 @@ function Editor( {
 
 	const {
 		hasFixedToolbar,
-		focusMode,
 		isDistractionFree,
 		hasInlineToolbar,
 		post,
@@ -91,7 +90,6 @@ function Editor( {
 			return {
 				hasFixedToolbar:
 					isFeatureActive( 'fixedToolbar' ) || ! isLargeViewport,
-				focusMode: isFeatureActive( 'focusMode' ),
 				isDistractionFree: isFeatureActive( 'distractionFree' ),
 				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
 				preferredStyleVariations: select( preferencesStore ).get(
@@ -122,7 +120,6 @@ function Editor( {
 				onChange: updatePreferredStyleVariations,
 			},
 			hasFixedToolbar,
-			focusMode,
 			isDistractionFree,
 			hasInlineToolbar,
 
@@ -151,7 +148,6 @@ function Editor( {
 		settings,
 		hasFixedToolbar,
 		hasInlineToolbar,
-		focusMode,
 		isDistractionFree,
 		hiddenBlockTypes,
 		blockTypes,

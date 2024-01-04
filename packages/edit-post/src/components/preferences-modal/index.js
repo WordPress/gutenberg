@@ -202,6 +202,7 @@ export default function EditPostPreferencesModal() {
 							label={ __( 'Distraction free' ) }
 						/>
 						<EnableFeature
+							scope="core"
 							featureName="focusMode"
 							help={ __(
 								'Highlights the current block and fades other content.'

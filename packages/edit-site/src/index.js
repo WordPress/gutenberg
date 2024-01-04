@@ -54,7 +54,6 @@ export function initializeEditor( id, settings ) {
 	dispatch( preferencesStore ).setDefaults( 'core/edit-site', {
 		editorMode: 'visual',
 		fixedToolbar: false,
-		focusMode: false,
 		distractionFree: false,
 		welcomeGuide: true,
 		welcomeGuideStyles: true,
@@ -64,6 +63,7 @@ export function initializeEditor( id, settings ) {
 
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
+		focusMode: false,
 		keepCaretInsideBlock: false,
 		showBlockBreadcrumbs: true,
 		showListViewByDefault: false,

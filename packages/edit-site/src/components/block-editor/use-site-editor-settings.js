@@ -94,10 +94,8 @@ export function useSpecificEditorSettings() {
 	const getPostLinkProps = usePostLinkProps();
 	const {
 		templateSlug,
-		focusMode,
 		isDistractionFree,
 		hasFixedToolbar,
-		canvasMode,
 		settings,
 		postWithTemplate,
 	} = useSelect(
@@ -106,7 +104,6 @@ export function useSpecificEditorSettings() {
 				getEditedPostType,
 				getEditedPostId,
 				getEditedPostContext,
-				getCanvasMode,
 				getSettings,
 			} = unlock( select( editSiteStore ) );
 			const { get: getPreference } = select( preferencesStore );
@@ -121,7 +118,6 @@ export function useSpecificEditorSettings() {
 			const _context = getEditedPostContext();
 			return {
 				templateSlug: _record.slug,
-				focusMode: !! getPreference( 'core/edit-site', 'focusMode' ),
 				isDistractionFree: !! getPreference(
 					'core/edit-site',
 					'distractionFree'
@@ -129,7 +125,6 @@ export function useSpecificEditorSettings() {
 				hasFixedToolbar:
 					!! getPreference( 'core/edit-site', 'fixedToolbar' ) ||
 					! isLargeViewport,
-				canvasMode: getCanvasMode(),
 				settings: getSettings(),
 				postWithTemplate: _context?.postId,
 			};
@@ -144,7 +139,6 @@ export function useSpecificEditorSettings() {
 
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
-			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
 			isDistractionFree,
 			hasFixedToolbar,
 			defaultRenderingMode,
@@ -155,8 +149,6 @@ export function useSpecificEditorSettings() {
 		};
 	}, [
 		settings,
-		canvasMode,
-		focusMode,
 		isDistractionFree,
 		hasFixedToolbar,
 		defaultRenderingMode,

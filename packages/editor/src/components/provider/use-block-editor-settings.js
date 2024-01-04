@@ -46,7 +46,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'enableCustomSpacing',
 	'enableCustomUnits',
 	'enableOpenverseMediaCategory',
-	'focusMode',
 	'distractionFree',
 	'fontSizes',
 	'gradients',
@@ -90,6 +89,7 @@ const BLOCK_EDITOR_SETTINGS = [
 function useBlockEditorSettings( settings, postType, postId ) {
 	const {
 		allowRightClickOverrides,
+		focusMode,
 		keepCaretInsideBlock,
 		reusableBlocks,
 		hasUploadPermissions,
@@ -131,6 +131,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					postType,
 					postId
 				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
+				focusMode: get( 'core', 'focusMode' ),
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				reusableBlocks: isWeb
 					? getEntityRecords( 'postType', 'wp_block', {
@@ -222,6 +223,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				)
 			),
 			allowRightClickOverrides,
+			focusMode,
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
@@ -257,6 +259,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		} ),
 		[
 			allowRightClickOverrides,
+			focusMode,
 			keepCaretInsideBlock,
 			settings,
 			hasUploadPermissions,
