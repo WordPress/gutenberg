@@ -1,0 +1,334 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should leave webpack.config.js untouched 1`] = `
+{
+  "devServer": {
+    "allowedHosts": "auto",
+    "devMiddleware": {
+      "writeToDisk": true,
+    },
+    "host": "localhost",
+    "port": 8887,
+    "proxy": {
+      "/build": {
+        "pathRewrite": {
+          "^/build": "",
+        },
+      },
+    },
+  },
+  "devtool": "source-map",
+  "entry": [Function],
+  "mode": "development",
+  "module": {
+    "rules": [
+      {
+        "enforce": "pre",
+        "exclude": [
+          /node_modules/,
+        ],
+        "test": /\\\\\\.\\(j\\|t\\)sx\\?\\$/,
+        "use": "/Users/jonsurrell/a8c/gutenberg/trunk/node_modules/source-map-loader/dist/cjs.js",
+      },
+      {
+        "exclude": /node_modules/,
+        "test": /\\\\\\.\\(j\\|t\\)sx\\?\\$/,
+        "use": [
+          {
+            "loader": "/Users/jonsurrell/a8c/gutenberg/trunk/node_modules/babel-loader/lib/index.js",
+            "options": {
+              "cacheDirectory": true,
+            },
+          },
+        ],
+      },
+      {
+        "test": /\\\\\\.css\\$/,
+        "use": [
+          {
+            "loader": "/Users/jonsurrell/a8c/gutenberg/trunk/node_modules/mini-css-extract-plugin/dist/loader.js",
+          },
+          {
+            "loader": "/Users/jonsurrell/a8c/gutenberg/trunk/node_modules/css-loader/dist/cjs.js",
+            "options": {
+              "importLoaders": 1,
+              "modules": {
+                "auto": true,
+              },
+              "sourceMap": true,
+            },
+          },
+          {
+            "loader": "/Users/jonsurrell/a8c/gutenberg/trunk/node_modules/postcss-loader/dist/cjs.js",
+            "options": {
+              "postcssOptions": {
+                "ident": "postcss",
+                "plugins": [
+                  {
+                    "browsers": undefined,
+                    "info": [Function],
+                    "options": {
+                      "grid": true,
+                    },
+                    "postcssPlugin": "autoprefixer",
+                    "prepare": [Function],
+                  },
+                ],
+                "sourceMap": true,
+              },
+            },
+          },
+        ],
+      },
+      {
+        "test": /\\\\\\.pcss\\$/,
+        "use": [
+          {
+            "loader": "/Users/jonsurrell/a8c/gutenberg/trunk/node_modules/mini-css-extract-plugin/dist/loader.js",
+          },
+          {
+            "loader": "/Users/jonsurrell/a8c/gutenberg/trunk/node_modules/css-loader/dist/cjs.js",
+            "options": {
+              "importLoaders": 1,
+              "modules": {
+                "auto": true,
+              },
+              "sourceMap": true,
+            },
+          },
+          {
+            "loader": "/Users/jonsurrell/a8c/gutenberg/trunk/node_modules/postcss-loader/dist/cjs.js",
+            "options": {
+              "postcssOptions": {
+                "ident": "postcss",
+                "plugins": [
+                  {
+                    "browsers": undefined,
+                    "info": [Function],
+                    "options": {
+                      "grid": true,
+                    },
+                    "postcssPlugin": "autoprefixer",
+                    "prepare": [Function],
+                  },
+                ],
+                "sourceMap": true,
+              },
+            },
+          },
+        ],
+      },
+      {
+        "test": /\\\\\\.\\(sc\\|sa\\)ss\\$/,
+        "use": [
+          {
+            "loader": "/Users/jonsurrell/a8c/gutenberg/trunk/node_modules/mini-css-extract-plugin/dist/loader.js",
+          },
+          {
+            "loader": "/Users/jonsurrell/a8c/gutenberg/trunk/node_modules/css-loader/dist/cjs.js",
+            "options": {
+              "importLoaders": 1,
+              "modules": {
+                "auto": true,
+              },
+              "sourceMap": true,
+            },
+          },
+          {
+            "loader": "/Users/jonsurrell/a8c/gutenberg/trunk/node_modules/postcss-loader/dist/cjs.js",
+            "options": {
+              "postcssOptions": {
+                "ident": "postcss",
+                "plugins": [
+                  {
+                    "browsers": undefined,
+                    "info": [Function],
+                    "options": {
+                      "grid": true,
+                    },
+                    "postcssPlugin": "autoprefixer",
+                    "prepare": [Function],
+                  },
+                ],
+                "sourceMap": true,
+              },
+            },
+          },
+          {
+            "loader": "/Users/jonsurrell/a8c/gutenberg/trunk/node_modules/sass-loader/dist/cjs.js",
+            "options": {
+              "sourceMap": true,
+            },
+          },
+        ],
+      },
+      {
+        "issuer": /\\\\\\.\\(j\\|t\\)sx\\?\\$/,
+        "test": /\\\\\\.svg\\$/,
+        "type": "javascript/auto",
+        "use": [
+          "@svgr/webpack",
+          "url-loader",
+        ],
+      },
+      {
+        "issuer": /\\\\\\.\\(pc\\|sc\\|sa\\|c\\)ss\\$/,
+        "test": /\\\\\\.svg\\$/,
+        "type": "asset/inline",
+      },
+      {
+        "generator": {
+          "filename": "images/[name].[hash:8][ext]",
+        },
+        "test": /\\\\\\.\\(bmp\\|png\\|jpe\\?g\\|gif\\|webp\\)\\$/i,
+        "type": "asset/resource",
+      },
+      {
+        "generator": {
+          "filename": "fonts/[name].[hash:8][ext]",
+        },
+        "test": /\\\\\\.\\(woff\\|woff2\\|eot\\|ttf\\|otf\\)\\$/i,
+        "type": "asset/resource",
+      },
+    ],
+  },
+  "optimization": {
+    "concatenateModules": false,
+    "minimizer": [
+      TerserPlugin {
+        "options": {
+          "exclude": undefined,
+          "extractComments": false,
+          "include": undefined,
+          "minimizer": {
+            "implementation": [Function],
+            "options": {
+              "compress": {
+                "passes": 2,
+              },
+              "mangle": {
+                "reserved": [
+                  "__",
+                  "_n",
+                  "_nx",
+                  "_x",
+                ],
+              },
+              "output": {
+                "comments": /translators:/i,
+              },
+            },
+          },
+          "parallel": true,
+          "test": /\\\\\\.\\[cm\\]\\?js\\(\\\\\\?\\.\\*\\)\\?\\$/i,
+        },
+      },
+    ],
+    "splitChunks": {
+      "cacheGroups": {
+        "default": false,
+        "style": {
+          "chunks": "all",
+          "enforce": true,
+          "name": [Function],
+          "test": /\\[\\\\\\\\/\\]style\\(\\\\\\.module\\)\\?\\\\\\.\\(pc\\|sc\\|sa\\|c\\)ss\\$/,
+          "type": "css/mini-extract",
+        },
+      },
+    },
+  },
+  "output": {
+    "filename": "[name].js",
+    "path": "/Users/jonsurrell/a8c/gutenberg/trunk/build",
+  },
+  "plugins": [
+    DefinePlugin {
+      "definitions": {
+        "SCRIPT_DEBUG": true,
+      },
+    },
+    CleanWebpackPlugin {
+      "apply": [Function],
+      "cleanAfterEveryBuildPatterns": [
+        "!fonts/**",
+        "!images/**",
+      ],
+      "cleanOnceBeforeBuildPatterns": [
+        "**/*",
+      ],
+      "cleanStaleWebpackAssets": false,
+      "currentAssets": [],
+      "dangerouslyAllowCleanPatternsOutsideProject": false,
+      "dry": false,
+      "handleDone": [Function],
+      "handleInitial": [Function],
+      "initialClean": false,
+      "outputPath": "",
+      "protectWebpackAssets": true,
+      "removeFiles": [Function],
+      "verbose": false,
+    },
+    RenderPathsPlugin {},
+    CopyPlugin {
+      "options": {},
+      "patterns": [
+        {
+          "context": "src",
+          "from": "**/block.json",
+          "noErrorOnMissing": true,
+          "transform": [Function],
+        },
+        {
+          "context": "src",
+          "filter": [Function],
+          "from": "**/*.php",
+          "noErrorOnMissing": true,
+        },
+      ],
+    },
+    MiniCssExtractPlugin {
+      "_sortedModulesCache": WeakMap {},
+      "options": {
+        "chunkFilename": "[name].css",
+        "experimentalUseImportModule": undefined,
+        "filename": "[name].css",
+        "ignoreOrder": false,
+        "runtime": true,
+      },
+      "runtimeOptions": {
+        "attributes": undefined,
+        "insert": undefined,
+        "linkType": "text/css",
+      },
+    },
+    DependencyExtractionWebpackPlugin {
+      "externalizedDeps": Set {},
+      "options": {
+        "combineAssets": false,
+        "combinedOutputFile": null,
+        "externalizedReport": false,
+        "injectPolyfill": false,
+        "outputFilename": null,
+        "outputFormat": "php",
+        "useDefaults": true,
+      },
+      "useModules": false,
+    },
+  ],
+  "resolve": {
+    "alias": {
+      "lodash-es": "lodash",
+    },
+    "extensions": [
+      ".jsx",
+      ".ts",
+      ".tsx",
+      "...",
+    ],
+  },
+  "stats": {
+    "children": false,
+  },
+  "target": "browserslist",
+}
+`;
