@@ -140,12 +140,12 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-pattern-partial-syncing',
-		__( 'Synced patterns partial syncing', 'gutenberg' ),
+		__( 'Pattern overrides', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test partial syncing of patterns', 'gutenberg' ),
+			'label' => __( 'Test overrides in synced patterns', 'gutenberg' ),
 			'id'    => 'gutenberg-pattern-partial-syncing',
 		)
 	);

@@ -1,26 +1,31 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { ___unstablePreferencesModalBaseOption as BaseOption } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
-/**
- * Internal dependencies
- */
-import { store as editPostStore } from '../../../store';
-
-export default compose(
-	withSelect( ( select, { featureName } ) => {
-		const { isFeatureActive } = select( editPostStore );
-		return {
-			isChecked: isFeatureActive( featureName ),
-		};
-	} ),
-	withDispatch( ( dispatch, { featureName, onToggle = () => {} } ) => ( {
-		onChange: () => {
-			onToggle();
-			dispatch( editPostStore ).toggleFeature( featureName );
-		},
-	} ) )
-)( BaseOption );
+export default function EnableFeature( props ) {
+	const {
+		scope = 'core/edit-post',
+		featureName,
+		onToggle = () => {},
+		...remainingProps
+	} = props;
+	const isChecked = useSelect(
+		( select ) => !! select( preferencesStore ).get( scope, featureName ),
+		[ scope, featureName ]
+	);
+	const { toggle } = useDispatch( preferencesStore );
+	const onChange = () => {
+		onToggle();
+		toggle( scope, featureName );
+	};
+	return (
+		<BaseOption
+			onChange={ onChange }
+			isChecked={ isChecked }
+			{ ...remainingProps }
+		/>
+	);
+}
