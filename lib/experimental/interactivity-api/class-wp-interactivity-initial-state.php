@@ -32,10 +32,7 @@ class WP_Interactivity_Initial_State {
 	 *
 	 * @return array The requested state.
 	 */
-	public static function get_state( $store_ns = null ) {
-		if ( ! $store_ns ) {
-			return self::$initial_state;
-		}
+	public static function get_state( $store_ns ) {
 		return self::$initial_state[ $store_ns ] ?? array();
 	}
 
