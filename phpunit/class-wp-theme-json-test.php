@@ -2137,6 +2137,135 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameSetsWithIndex( $expected, $actual );
 	}
 
+	public function test_block_styles_with_invalid_elements() {
+		wp_set_current_user( static::$administrator_id );
+
+		$partially_invalid_elements = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'blocks' => array(
+					'core/button' => array(
+						'elements' => array(
+							'link'    => array(
+								'color'   => array(
+									'text' => 'deepskyblue',
+								),
+								'invalid' => array(
+									'value' => 'should be stripped',
+								),
+								':hover'  => array(
+									'color'   => array(
+										'text' => 'cyan',
+									),
+									'invalid' => array(
+										'value' => 'should be stripped',
+									),
+								),
+							),
+							'invalid' => array(
+								'value' => 'should be stripped',
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'blocks' => array(
+					'core/button' => array(
+						'elements' => array(
+							'link' => array(
+								'color'  => array(
+									'text' => 'deepskyblue',
+								),
+								':hover' => array(
+									'color' => array(
+										'text' => 'cyan',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $partially_invalid_elements );
+
+		$this->assertSameSetsWithIndex( $expected, $actual );
+	}
+	public function test_block_style_variations_with_elements_and_invalid_properties() {
+		wp_set_current_user( static::$administrator_id );
+
+		$partially_invalid_variation = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'blocks' => array(
+					'core/quote' => array(
+						'variations' => array(
+							'plain' => array(
+								'elements' => array(
+									'link'    => array(
+										'color'   => array(
+											'text' => 'deepskyblue',
+										),
+										'invalid' => array(
+											'value' => 'should be stripped',
+										),
+										':hover'  => array(
+											'color'   => array(
+												'text' => 'cyan',
+											),
+											'invalid' => array(
+												'value' => 'should be stripped',
+											),
+										),
+									),
+									'invalid' => array(
+										'value' => 'should be stripped',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'blocks' => array(
+					'core/quote' => array(
+						'variations' => array(
+							'plain' => array(
+								'elements' => array(
+									'link' => array(
+										'color'  => array(
+											'text' => 'deepskyblue',
+										),
+										':hover' => array(
+											'color' => array(
+												'text' => 'cyan',
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $partially_invalid_variation );
+
+		$this->assertSameSetsWithIndex( $expected, $actual );
+	}
+
 	public function test_update_separator_declarations() {
 		// If only background is defined, test that includes border-color to the style so it is applied on the front end.
 		$theme_json = new WP_Theme_JSON_Gutenberg(
