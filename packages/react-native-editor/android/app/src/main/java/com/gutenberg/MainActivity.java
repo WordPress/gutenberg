@@ -113,6 +113,8 @@ public class MainActivity extends ReactActivity {
         LinearLayout linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        linearLayout.setFocusable(false);
+        linearLayout.setFocusableInTouchMode(true);
 
         // Create a Toolbar instance
         Toolbar toolbar = new Toolbar(this);

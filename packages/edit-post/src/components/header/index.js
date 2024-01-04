@@ -67,6 +67,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isEditingTemplate,
 		isPublishSidebarOpened,
 		showIconLabels,
+		hasHistory,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const { getEditorMode } = select( editPostStore );
@@ -76,13 +77,13 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+			hasHistory: !! select( editorStore ).getEditorSettings().goBack,
 			isEditingTemplate:
 				select( editorStore ).getRenderingMode() === 'template-only',
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core/edit-post', 'fixedToolbar' ),
-			showIconLabels:
-				select( editPostStore ).isFeatureActive( 'showIconLabels' ),
+			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 		};
 	}, [] );
 
@@ -111,10 +112,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				transition={ { type: 'tween', delay: 0.8 } }
 				className="edit-post-header__toolbar"
 			>
-				<DocumentTools
-					disableBlockTools={ isTextEditor }
-					showIconLabels={ showIconLabels }
-				/>
+				<DocumentTools disableBlockTools={ isTextEditor } />
 				{ hasFixedToolbar && isLargeViewport && (
 					<>
 						<div
@@ -161,7 +159,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 							isLargeViewport,
 					} ) }
 				>
-					{ isEditingTemplate && <DocumentBar /> }
+					{ ( isEditingTemplate || hasHistory ) && <DocumentBar /> }
 				</div>
 			</motion.div>
 			<motion.div
@@ -175,20 +173,14 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
 					// We track that DOM node to return focus to the PostPublishButtonOrToggle
 					// when the publish sidebar has been closed.
-					<PostSavedState
-						forceIsDirty={ hasActiveMetaboxes }
-						showIconLabels={ showIconLabels }
-					/>
+					<PostSavedState forceIsDirty={ hasActiveMetaboxes } />
 				) }
-				<PreviewDropdown
-					showIconLabels={ showIconLabels }
-					forceIsAutosaveable={ hasActiveMetaboxes }
-				/>
+				<PreviewDropdown forceIsAutosaveable={ hasActiveMetaboxes } />
 				<PostPreviewButton
 					className="edit-post-header__post-preview-button"
 					forceIsAutosaveable={ hasActiveMetaboxes }
 				/>
-				<PostViewLink showIconLabels={ showIconLabels } />
+				<PostViewLink />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					setEntitiesSavedStatesCallback={
@@ -196,14 +188,9 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 					}
 				/>
 				{ ( isWideViewport || ! showIconLabels ) && (
-					<>
-						<PinnedItems.Slot scope="core/edit-post" />
-						<MoreMenu showIconLabels={ showIconLabels } />
-					</>
+					<PinnedItems.Slot scope="core/edit-post" />
 				) }
-				{ showIconLabels && ! isWideViewport && (
-					<MoreMenu showIconLabels={ showIconLabels } />
-				) }
+				<MoreMenu showIconLabels={ showIconLabels } />
 			</motion.div>
 		</div>
 	);

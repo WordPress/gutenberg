@@ -100,7 +100,7 @@ export default function MoreMenu( { showIconLabels } ) {
 								) }
 							/>
 							<PreferenceToggleMenuItem
-								scope="core/edit-site"
+								scope="core"
 								name="focusMode"
 								label={ __( 'Spotlight mode' ) }
 								info={ __( 'Focus on one block at a time' ) }
