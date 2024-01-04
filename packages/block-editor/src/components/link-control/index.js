@@ -314,9 +314,12 @@ function LinkControl( {
 
 	const showActions = hasLinkValue;
 
-	// Show the input if there is not a link value or if the link value
-	// does not represent a Post object.
-	const showSearchInput = ! hasLinkValue || ! value?.id;
+	// Show the searchable input if there is not a link value.
+	const showSearchInput = ! hasLinkValue;
+
+	// Show the plain URL input if there is a link value and
+	// it does not represent a Post object.
+	const showURLInput = hasLinkValue && ! value?.id;
 
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
@@ -374,6 +377,18 @@ function LinkControl( {
 							createSuggestionButtonText
 						}
 						hideLabelFromVision={ ! showTextControl }
+					/>
+				) }
+
+				{ showURLInput && (
+					<TextControl
+						__nextHasNoMarginBottom
+						className="block-editor-link-control__field block-editor-link-control__search-input"
+						label={ __( 'Link' ) }
+						value={ currentUrlInputValue }
+						onChange={ setInternalURLInputValue }
+						onKeyDown={ handleSubmitWithEnter }
+						size="__unstable-large"
 					/>
 				) }
 
