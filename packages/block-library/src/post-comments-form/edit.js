@@ -31,7 +31,7 @@ export default function PostCommentsFormEdit( {
 	const instanceId = useInstanceId( PostCommentsFormEdit );
 	const instanceIdDesc = sprintf( 'comments-form-edit-%d-desc', instanceId );
 
-	const commentFormTitleObject = {
+	const commentFormTitleActions = {
 		title: commentFormTitle,
 		setTitle: ( nextTitle ) => {
 			setAttributes( { commentFormTitle: nextTitle } );
@@ -59,7 +59,7 @@ export default function PostCommentsFormEdit( {
 				<CommentsForm
 					postId={ postId }
 					postType={ postType }
-					commentFormTitleObject={ commentFormTitleObject }
+					commentFormTitleActions={ commentFormTitleActions }
 				/>
 				<VisuallyHidden id={ instanceIdDesc }>
 					{ __( 'Comments form disabled in editor.' ) }

@@ -11,8 +11,7 @@
 			"type": "string"
 		},
 		"commentFormTitle": {
-			"type": "string",
-			"default": "Leave a Reply"
+			"type": "string"
 		}
 	},
 	"usesContext": [ "postId", "postType" ],

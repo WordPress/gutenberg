@@ -18,28 +18,28 @@ import { useInstanceId } from '@wordpress/compose';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
-const CommentsFormPlaceholder = ( { commentFormTitleObject } ) => {
+const CommentsFormPlaceholder = ( { commentFormTitleActions } ) => {
 	const instanceId = useInstanceId( CommentsFormPlaceholder );
 
-	let isCommentFormTitleObjectEmpty = false;
+	let isCommentFormTitleActionsEmpty = false;
 
-	if ( ! commentFormTitleObject ) {
-		isCommentFormTitleObjectEmpty = true;
+	if ( ! commentFormTitleActions ) {
+		isCommentFormTitleActionsEmpty = true;
 
-		commentFormTitleObject = {
+		commentFormTitleActions = {
 			title: __( 'Leave a reply' ),
 			setTitle: null,
 		};
 	} else if (
-		null === commentFormTitleObject.title ||
-		undefined === commentFormTitleObject.title
+		null === commentFormTitleActions.title ||
+		undefined === commentFormTitleActions.title
 	) {
-		commentFormTitleObject.title = '';
+		commentFormTitleActions.title = '';
 	} else if (
-		null === commentFormTitleObject.setTitle ||
-		undefined === commentFormTitleObject.setTitle
+		null === commentFormTitleActions.setTitle ||
+		undefined === commentFormTitleActions.setTitle
 	) {
-		commentFormTitleObject.setTitle = null;
+		commentFormTitleActions.setTitle = null;
 	}
 
 	return (
@@ -48,13 +48,13 @@ const CommentsFormPlaceholder = ( { commentFormTitleObject } ) => {
 				tagName="h3"
 				className={
 					'comment-reply-title' +
-					( isCommentFormTitleObjectEmpty ? ' disabled' : '' )
+					( isCommentFormTitleActionsEmpty ? ' disabled' : '' )
 				}
 				placeholder={ __( 'Leave a reply' ) }
-				value={ commentFormTitleObject.title }
+				value={ commentFormTitleActions.title }
 				onChange={ ( text ) => {
-					if ( commentFormTitleObject.setTitle !== null ) {
-						commentFormTitleObject.setTitle( text );
+					if ( commentFormTitleActions.setTitle !== null ) {
+						commentFormTitleActions.setTitle( text );
 					}
 				} }
 			/>
@@ -93,7 +93,7 @@ const CommentsFormPlaceholder = ( { commentFormTitleObject } ) => {
 	);
 };
 
-const CommentsForm = ( { postId, postType, commentFormTitleObject } ) => {
+const CommentsForm = ( { postId, postType, commentFormTitleActions } ) => {
 	const [ commentStatus, setCommentStatus ] = useEntityProp(
 		'postType',
 		postType,
@@ -161,7 +161,7 @@ const CommentsForm = ( { postId, postType, commentFormTitleObject } ) => {
 
 	return (
 		<CommentsFormPlaceholder
-			commentFormTitleObject={ commentFormTitleObject }
+			commentFormTitleActions={ commentFormTitleActions }
 		/>
 	);
 };
