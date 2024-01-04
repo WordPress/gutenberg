@@ -1,10 +1,10 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
 const BUNDLED_PACKAGES = [
+	'@wordpress/dataviews',
 	'@wordpress/icons',
 	'@wordpress/interface',
-	'@wordpress/undo-manager',
 	'@wordpress/sync',
-	'@wordpress/dataviews',
+	'@wordpress/undo-manager',
 ];
 
 /**
@@ -57,6 +57,21 @@ function defaultRequestToExternal( request ) {
 }
 
 /**
+ * Default request to external module transformation
+ *
+ * Currently only @wordpress/interactivity
+ *
+ * @param {string} request Module request (the module name in `import from`) to be transformed
+ * @return {string|undefined} The resulting external definition. Return `undefined`
+ *   to ignore the request. Return `string` to map the request to an external. This may simply be returning the request, e.g. `@wordpress/interactivity` maps to the external `@wordpress/interactivity`.
+ */
+function defaultRequestToExternalModule( request ) {
+	if ( request === '@wordpress/interactivity' ) {
+		return request;
+	}
+}
+
+/**
  * Default request to WordPress script handle transformation
  *
  * Transform @wordpress dependencies:
@@ -101,5 +116,6 @@ function camelCaseDash( string ) {
 module.exports = {
 	camelCaseDash,
 	defaultRequestToExternal,
+	defaultRequestToExternalModule,
 	defaultRequestToHandle,
 };

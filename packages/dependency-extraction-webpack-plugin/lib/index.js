@@ -11,10 +11,13 @@ const { createHash } = webpack.util;
  */
 const {
 	defaultRequestToExternal,
+	defaultRequestToExternalModule,
 	defaultRequestToHandle,
 } = require( './util' );
 
 const { RawSource } = webpack.sources;
+const { AsyncDependenciesBlock } = webpack;
+
 const defaultExternalizedReportFileName = 'externalized-dependencies.json';
 
 class DependencyExtractionWebpackPlugin {
@@ -32,27 +35,40 @@ class DependencyExtractionWebpackPlugin {
 			options
 		);
 
-		/*
+		/**
 		 * Track requests that are externalized.
 		 *
 		 * Because we don't have a closed set of dependencies, we need to track what has
 		 * been externalized so we can recognize them in a later phase when the dependency
 		 * lists are generated.
+		 *
+		 * @type {Set<string>}
 		 */
 		this.externalizedDeps = new Set();
 
-		// Offload externalization work to the ExternalsPlugin.
-		this.externalsPlugin = new webpack.ExternalsPlugin(
-			'window',
-			this.externalizeWpDeps.bind( this )
-		);
+		/**
+		 * Should we use modules. This will be set later to match webpack's
+		 * output.module option.
+		 *
+		 * @type {boolean}
+		 */
+		this.useModules = false;
 	}
 
+	/**
+	 * @param {webpack.ExternalItemFunctionData}                             data
+	 * @param { ( err?: null | Error, result?: string | string[] ) => void } callback
+	 */
 	externalizeWpDeps( { request }, callback ) {
 		let externalRequest;
 
-		// Handle via options.requestToExternal first.
-		if ( typeof this.options.requestToExternal === 'function' ) {
+		// Handle via options.requestToExternal(Module)  first.
+		if ( this.useModules ) {
+			if ( typeof this.options.requestToExternalModule === 'function' ) {
+				externalRequest =
+					this.options.requestToExternalModule( request );
+			}
+		} else if ( typeof this.options.requestToExternal === 'function' ) {
 			externalRequest = this.options.requestToExternal( request );
 		}
 
@@ -61,7 +77,9 @@ class DependencyExtractionWebpackPlugin {
 			typeof externalRequest === 'undefined' &&
 			this.options.useDefaults
 		) {
-			externalRequest = defaultRequestToExternal( request );
+			externalRequest = this.useModules
+				? defaultRequestToExternalModule( request )
+				: defaultRequestToExternal( request );
 		}
 
 		if ( externalRequest ) {
@@ -73,6 +91,10 @@ class DependencyExtractionWebpackPlugin {
 		return callback();
 	}
 
+	/**
+	 * @param {string} request
+	 * @return {string} Mapped dependency name
+	 */
 	mapRequestToDependency( request ) {
 		// Handle via options.requestToHandle first.
 		if ( typeof this.options.requestToHandle === 'function' ) {
@@ -94,6 +116,10 @@ class DependencyExtractionWebpackPlugin {
 		return request;
 	}
 
+	/**
+	 * @param {any} asset Asset Data
+	 * @return {string} Stringified asset data suitable for output
+	 */
 	stringify( asset ) {
 		if ( this.options.outputFormat === 'php' ) {
 			return `<?php return ${ json2php(
@@ -104,7 +130,19 @@ class DependencyExtractionWebpackPlugin {
 		return JSON.stringify( asset );
 	}
 
+	/** @type {webpack.WebpackPluginInstance['apply']} */
 	apply( compiler ) {
+		this.useModules = Boolean( compiler.options.output?.module );
+
+		/**
+		 * Offload externalization work to the ExternalsPlugin.
+		 * @type {webpack.ExternalsPlugin}
+		 */
+		this.externalsPlugin = new webpack.ExternalsPlugin(
+			this.useModules ? 'module' : 'window',
+			this.externalizeWpDeps.bind( this )
+		);
+
 		this.externalsPlugin.apply( compiler );
 
 		compiler.hooks.thisCompilation.tap(
@@ -122,6 +160,7 @@ class DependencyExtractionWebpackPlugin {
 		);
 	}
 
+	/** @param {webpack.Compilation} compilation */
 	addAssets( compilation ) {
 		const {
 			combineAssets,
@@ -160,27 +199,53 @@ class DependencyExtractionWebpackPlugin {
 		for ( const chunk of entrypointChunks ) {
 			const chunkFiles = Array.from( chunk.files );
 
-			const chunkJSFile = chunkFiles.find( ( f ) => /\.js$/i.test( f ) );
+			const jsExtensionRegExp = this.useModules ? /\.m?js$/i : /\.js$/i;
+
+			const chunkJSFile = chunkFiles.find( ( f ) =>
+				jsExtensionRegExp.test( f )
+			);
 			if ( ! chunkJSFile ) {
 				// There's no JS file in this chunk, no work for us. Typically a `style.css` from cache group.
 				continue;
 			}
 
-			const chunkDeps = new Set();
+			/** @type {Set<string>} */
+			const chunkStaticDeps = new Set();
+			/** @type {Set<string>} */
+			const chunkDynamicDeps = new Set();
+
 			if ( injectPolyfill ) {
-				chunkDeps.add( 'wp-polyfill' );
+				chunkStaticDeps.add( 'wp-polyfill' );
 			}
 
-			const processModule = ( { userRequest } ) => {
+			/**
+			 * @param {webpack.Module} m
+			 */
+			const processModule = ( m ) => {
+				const { userRequest } = m;
 				if ( this.externalizedDeps.has( userRequest ) ) {
-					chunkDeps.add( this.mapRequestToDependency( userRequest ) );
+					if ( this.useModules ) {
+						const isStatic =
+							DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+								compilation,
+								m
+							);
+
+						( isStatic ? chunkStaticDeps : chunkDynamicDeps ).add(
+							m.request
+						);
+					} else {
+						chunkStaticDeps.add(
+							this.mapRequestToDependency( userRequest )
+						);
+					}
 				}
 			};
 
 			// Search for externalized modules in all chunks.
-			const modulesIterable =
-				compilation.chunkGraph.getChunkModules( chunk );
-			for ( const chunkModule of modulesIterable ) {
+			for ( const chunkModule of compilation.chunkGraph.getChunkModulesIterable(
+				chunk
+			) ) {
 				processModule( chunkModule );
 				// Loop through submodules of ConcatenatedModule.
 				if ( chunkModule.modules ) {
@@ -209,10 +274,19 @@ class DependencyExtractionWebpackPlugin {
 				.slice( 0, hashDigestLength );
 
 			const assetData = {
-				// Get a sorted array so we can produce a stable, stringified representation.
-				dependencies: Array.from( chunkDeps ).sort(),
+				dependencies: [
+					// Sort these so we can produce a stable, stringified representation.
+					...Array.from( chunkStaticDeps ).sort(),
+					...Array.from( chunkDynamicDeps )
+						.sort()
+						.map( ( id ) => ( { id, type: 'dynamic' } ) ),
+				],
 				version: contentHash,
 			};
+
+			if ( this.useModules ) {
+				assetData.type = 'module';
+			}
 
 			if ( combineAssets ) {
 				combinedAssetsData[ chunkJSFile ] = assetData;
@@ -231,7 +305,7 @@ class DependencyExtractionWebpackPlugin {
 					'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' );
 				assetFilename = compilation
 					.getPath( '[file]', { filename: chunkJSFile } )
-					.replace( /\.js$/i, suffix );
+					.replace( /\.m?js$/i, suffix );
 			}
 
 			// Add source and file into compilation for webpack to output.
@@ -259,6 +333,58 @@ class DependencyExtractionWebpackPlugin {
 				this.stringify( combinedAssetsData )
 			);
 		}
+	}
+
+	/**
+	 * Can we trace a line of static dependencies from an entry to a module
+	 *
+	 * @param {webpack.Compilation}       compilation
+	 * @param {webpack.DependenciesBlock} block
+	 *
+	 * @return {boolean} True if there is a static import path to the root
+	 */
+	static hasStaticDependencyPathToRoot( compilation, block ) {
+		const incomingConnections = [
+			...compilation.moduleGraph.getIncomingConnections( block ),
+		].filter(
+			( connection ) =>
+				// Library connections don't have a dependency, this is a root
+				connection.dependency &&
+				// Entry dependencies are another root
+				connection.dependency.constructor.name !== 'EntryDependency'
+		);
+
+		// If we don't have non-entry, non-library incoming connections,
+		// we've reached a root of
+		if ( ! incomingConnections.length ) {
+			return true;
+		}
+
+		const staticDependentModules = incomingConnections.flatMap(
+			( connection ) => {
+				const { dependency } = connection;
+				const parentBlock =
+					compilation.moduleGraph.getParentBlock( dependency );
+
+				return parentBlock.constructor.name !==
+					AsyncDependenciesBlock.name
+					? [ compilation.moduleGraph.getParentModule( dependency ) ]
+					: [];
+			}
+		);
+
+		// All the dependencies were Async, the module was reached via a dynamic import
+		if ( ! staticDependentModules.length ) {
+			return false;
+		}
+
+		// Continue to explore any static dependencies
+		return staticDependentModules.some( ( parentStaticDependentModule ) =>
+			DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+				compilation,
+				parentStaticDependentModule
+			)
+		);
 	}
 }
 
