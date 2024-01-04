@@ -182,26 +182,33 @@ const { state, actions, callbacks } = store( 'core/navigation', {
 					focusableElements[ focusableElements.length - 1 ];
 			}
 		},
-		initNav() {
-			const { ref } = getElement();
-			callbacks.collapseNav( ref );
-			window.addEventListener( 'resize', () =>
-				callbacks.collapseNav( ref )
-			);
-		},
-		collapseNav( ref ) {
-			if ( window.innerWidth < NAVIGATION_MOBILE_BREAKPOINT ) {
-				ref.classList.add( 'is-collapsed' );
-			} else {
-				ref.classList.remove( 'is-collapsed' );
-			}
-		},
 		focusFirstElement() {
 			const { ref } = getElement();
 			if ( state.isMenuOpen ) {
 				const focusableElements =
 					ref.querySelectorAll( focusableSelectors );
 				focusableElements?.[ 0 ]?.focus();
+			}
+		},
+		initNav() {
+			const { ref } = getElement();
+			const mediaQuery = window.matchMedia(
+				'(max-width: ' + NAVIGATION_MOBILE_BREAKPOINT + 'px)'
+			);
+
+			// Run once to set the initial state.
+			callbacks.collapseNav( ref, mediaQuery.matches );
+
+			// Run on resize to update the state.
+			mediaQuery.addEventListener( 'change', ( event ) => {
+				callbacks.collapseNav( ref, event.matches );
+			} );
+		},
+		collapseNav( ref, collapse ) {
+			if ( collapse ) {
+				ref.classList.add( 'is-collapsed' );
+			} else {
+				ref.classList.remove( 'is-collapsed' );
 			}
 		},
 	},
