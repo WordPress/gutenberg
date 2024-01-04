@@ -78,7 +78,7 @@ const DEFAULT_VIEW = {
 	search: '',
 	page: 1,
 	perPage: 20,
-	hiddenFields: [],
+	hiddenFields: [ 'sync-status' ],
 	layout: {
 		...defaultConfigPerViewType[ LAYOUT_GRID ],
 	},
@@ -260,13 +260,22 @@ export default function DataviewsPatterns() {
 			_fields.push( {
 				header: __( 'Sync Status' ),
 				id: 'sync-status',
+				render: ( { item } ) => {
+					// User patterns can have their sync statuses checked directly.
+					// Non-user patterns are all unsynced for the time being.
+					const [ , notSyncedStatus ] = SYNC_FILTERS;
+					return ! item.syncStatus
+						? notSyncedStatus.label
+						: SYNC_FILTERS.find(
+								( { value } ) => value === item.syncStatus
+						  )?.label;
+				},
 				type: ENUMERATION_TYPE,
 				elements: SYNC_FILTERS,
 				filterBy: {
 					operators: [ OPERATOR_IN ],
 				},
 				enableSorting: false,
-				enableHiding: false,
 			} );
 		}
 		return _fields;
@@ -348,7 +357,7 @@ export default function DataviewsPatterns() {
 					view={ view }
 					onChangeView={ onChangeView }
 					deferredRendering={ true }
-					supportedLayouts={ [ LAYOUT_GRID, 'table' ] }
+					supportedLayouts={ [ LAYOUT_GRID ] }
 				/>
 			</Page>
 		</ExperimentalBlockEditorProvider>

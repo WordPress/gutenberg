@@ -30,7 +30,6 @@ export default function ViewGrid( {
 	);
 	const visibleFields = fields.filter(
 		( field ) =>
-			!! field.render &&
 			! view.hiddenFields.includes( field.id ) &&
 			! [ view.layout.mediaField, view.layout.primaryField ].includes(
 				field.id
@@ -88,7 +87,7 @@ export default function ViewGrid( {
 										{ field.header }
 									</div>
 									<div className="dataviews-view-grid__field-value">
-										{ field.render( { item } ) }
+										{ renderedValue }
 									</div>
 								</VStack>
 							);
