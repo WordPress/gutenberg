@@ -1,5 +1,5 @@
+const moduleFields = new Set( [ 'viewModule' ] );
 const scriptFields = new Set( [ 'viewScript', 'script', 'editorScript' ] );
-const moduleFields = new Set( [ 'viewModule', 'module', 'editorModule' ] );
 
 /**
  * @param {{}} blockJson

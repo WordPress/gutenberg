@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Support block.json `editorModule`, `module`, and `viewModule` fields.
+-   Support `viewModule` field in block.json for `build` and `start` scripts ([#57461](https://github.com/WordPress/gutenberg/pull/57461)).
 
 ### Breaking Changes
 

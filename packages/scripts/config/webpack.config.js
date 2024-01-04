@@ -418,11 +418,7 @@ if ( hasExperimentalModulesFlag ) {
 								const blockJson = JSON.parse(
 									content.toString()
 								);
-								[
-									'viewModule',
-									'module',
-									'editorModule',
-								].forEach( ( key ) => {
+								[ 'viewModule' ].forEach( ( key ) => {
 									if ( Array.isArray( blockJson[ key ] ) ) {
 										blockJson[ key ] =
 											blockJson[ key ].map(
