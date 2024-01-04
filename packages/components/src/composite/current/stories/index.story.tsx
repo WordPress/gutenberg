@@ -11,12 +11,7 @@ import { isRTL } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	Composite,
-	CompositeRow,
-	CompositeItem,
-	useCompositeStore,
-} from '../v2';
+import { Composite, CompositeRow, CompositeItem, useCompositeStore } from '..';
 
 type InitialState = Parameters< typeof useCompositeStore >[ 0 ];
 

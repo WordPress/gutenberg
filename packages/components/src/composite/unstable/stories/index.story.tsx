@@ -17,7 +17,7 @@ import {
 	CompositeItem,
 	useCompositeState,
 } from '..';
-import Legacy from './legacy.story';
+import Legacy from '../../legacy/stories/index.story';
 
 type InitialState = Parameters< typeof useCompositeState >[ 0 ];
 

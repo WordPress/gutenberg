@@ -22,7 +22,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import * as Current from './v2';
+import * as Current from '../current';
 
 type Component = ( ...any: any[] ) => any;
 

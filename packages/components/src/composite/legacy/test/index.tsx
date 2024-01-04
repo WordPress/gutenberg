@@ -12,7 +12,7 @@ import {
 	CompositeGroup,
 	CompositeItem,
 	useCompositeState,
-} from '../legacy';
+} from '..';
 
 // This is necessary because of how Ariakit calculates page up and
 // page down. Without this, nothing has a height, and so paging up

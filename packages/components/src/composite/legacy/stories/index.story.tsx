@@ -16,9 +16,9 @@ import {
 	CompositeItem,
 	CompositeGroup,
 	useCompositeState,
-} from '../legacy';
+} from '..';
 
-import type { InitialState } from '../legacy';
+import type { InitialState } from '..';
 
 const Placeholder = ( _: InitialState ) => <></>;
 
