@@ -6,7 +6,7 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
 /**
  * Internal dependencies
  */
-import { NAVIGATION_MOBILE_BREAKPOINT } from './constants';
+import { NAVIGATION_MOBILE_COLLAPSE } from './constants';
 
 const focusableSelectors = [
 	'a[href]',
@@ -193,7 +193,7 @@ const { state, actions } = store( 'core/navigation', {
 		initNav() {
 			const context = getContext();
 			const mediaQuery = window.matchMedia(
-				`(max-width: ${ NAVIGATION_MOBILE_BREAKPOINT })`
+				`(max-width: ${ NAVIGATION_MOBILE_COLLAPSE })`
 			);
 
 			// Run once to set the initial state.

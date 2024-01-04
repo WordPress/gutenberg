@@ -544,7 +544,7 @@ class WP_Navigation_Block_Renderer {
 		// When the navigation overlayMenu attribute is set to "always"
 		// we don't need to use JavaScript to collapse the menu as we set the class manually.
 		if ( ! static::is_always_overlay( $attributes ) ) {
-			$nav_element_directives .= 'data-wp-init="callbacks.initNav"';
+			$nav_element_directives .= 'data-wp-init="callbacks.initNav" ';
 			$nav_element_directives .= 'data-wp-class--is-collapsed="context.isCollapsed"';
 		}
 

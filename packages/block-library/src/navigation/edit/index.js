@@ -71,7 +71,7 @@ import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
-import { NAVIGATION_MOBILE_BREAKPOINT } from '../constants';
+import { NAVIGATION_MOBILE_COLLAPSE } from '../constants';
 import { unlock } from '../../lock-unlock';
 
 function Navigation( {
@@ -299,7 +299,7 @@ function Navigation( {
 	);
 	const isResponsive = 'never' !== overlayMenu;
 	const isMobileBreakPoint = useMediaQuery(
-		`(max-width: ${ NAVIGATION_MOBILE_BREAKPOINT })`
+		`(max-width: ${ NAVIGATION_MOBILE_COLLAPSE })`
 	);
 
 	const isCollapsed =
