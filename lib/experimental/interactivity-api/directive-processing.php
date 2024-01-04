@@ -325,7 +325,7 @@ function gutenberg_process_interactive_html( $html, $context, $inner_blocks = ar
  */
 function gutenberg_interactivity_evaluate_reference( $reference, $ns, array $context = array() ) {
 	// Extract the namespace from the reference (if present).
-	list( $ns, $path ) = WP_Directive_Processor::parse_reference( $reference, $ns );
+	list( $ns, $path ) = WP_Directive_Processor::parse_attribute_value( $reference, $ns );
 
 	$store = array(
 		'state'   => WP_Interactivity_Store::get_data()[ $ns ],

@@ -258,20 +258,29 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	}
 
 	/**
-	 * Parse and extract the namespace and path from the given reference.
+	 * Parse and extract the namespace and path from the given value.
 	 *
-	 * @param string $reference Passed reference.
+	 * If the value contains a JSON instead of a path, the function parses it
+	 * and returns the resulting array.
+	 *
+	 * @param string $value Passed value.
 	 * @param string $ns Namespace fallback.
 	 * @return array The resulting array
 	 */
-	public static function parse_reference( $reference, $ns_fallback = null ) {
+	public static function parse_attribute_value( $value, $ns = null ) {
 		$matches = array();
-		$has_ns  = preg_match( '/^([\w\-_\/]+)::(.+)$/', $reference, $matches );
+		$has_ns  = preg_match( '/^([\w\-_\/]+)::(.+)$/', $value, $matches );
 
 		if ( $has_ns ) {
-			return array_slice( $matches, 1 );
-		} else {
-			return array( $ns_fallback, $reference );
+			list( , $ns, $value ) = $matches;
 		}
+
+		// Try parsing the value.
+		$data = json_decode( $value, true );
+		if ( null !== $data || 'null' === trim( $value ) ) {
+			$value = $data;
+		}
+
+		return array( $ns, $value );
 	}
 }
