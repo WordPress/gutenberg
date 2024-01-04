@@ -303,7 +303,9 @@ public class ReactAztecText extends AztecText {
     }
 
     private void hideSoftKeyboard() {
-        mInputMethodManager.hideSoftInputFromWindow(getWindowToken(), 0);
+        if (mInputMethodManager != null) {
+            mInputMethodManager.hideSoftInputFromWindow(getWindowToken(), 0);
+        }
     }
 
     public void setScrollWatcher(ScrollWatcher scrollWatcher) {
