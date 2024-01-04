@@ -183,8 +183,7 @@ export default function ReusableBlockEdit( {
 					innerBlocks: blocks,
 					userCanEdit: canEdit,
 					getBlockEditingMode: editingMode,
-					getPostLinkProps:
-						getSettings().__experimentalGetPostLinkProps,
+					getPostLinkProps: getSettings().getPostLinkProps,
 				};
 			},
 			[ patternClientId, ref ]
