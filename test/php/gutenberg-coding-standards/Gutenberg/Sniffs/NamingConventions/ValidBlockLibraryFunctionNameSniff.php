@@ -153,6 +153,16 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 			return;
 		}
 
+		$function_name = $tokens[$stack_pointer]['content'];
+
+		foreach ( $this->disallowed_function_calls as $disallowed_function_call ) {
+			$regexp = sprintf( '/^%s$/', $disallowed_function_call );
+			if ( 1 !== preg_match( $regexp, $function_name ) ) {
+				// The function has a valid name; bypassing further checks.
+				return;
+			}
+		}
+
 		$phpcs_file->addError( $tokens[$stack_pointer]['content'] . '()', $stack_pointer, 'CalledFunctionInvalid' );
 	}
 
