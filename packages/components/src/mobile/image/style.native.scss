@@ -26,10 +26,18 @@
 	padding: 8px;
 }
 
+.retryIconDark {
+	background-color: $white;
+}
+
 .iconOffline {
-	fill: #fff;
+	fill: $white;
 	width: 24px;
 	height: 24px;
+}
+
+.iconOfflineDark {
+	fill: $black;
 }
 
 .customRetryIcon {
@@ -38,9 +46,13 @@
 }
 
 .iconRetry {
-	fill: #fff;
+	fill: $white;
 	width: 24px;
 	height: 24px;
+}
+
+.iconRetryDark {
+	fill: $black;
 }
 
 .iconPlaceholder {
@@ -102,6 +114,10 @@
 	text-align: center;
 }
 
+.uploadFailedTextDark {
+	color: $white;
+}
+
 .editContainer {
 	width: 44px;
 	height: 44px;
@@ -122,7 +138,7 @@
 }
 
 .iconCustomise {
-	fill: #fff;
+	fill: $white;
 	position: absolute;
 	top: 7px;
 	left: 7px;
@@ -131,6 +147,10 @@
 .retryContainer {
 	flex: 1;
 	background-color: "rgba(255, 255, 255, 0.8)";
+}
+
+.retryContainerDark {
+	background-color: "rgba(0, 0, 0, 0.5)";
 }
 
 .focalPointContainer {

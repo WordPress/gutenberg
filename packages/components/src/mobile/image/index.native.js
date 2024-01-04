@@ -106,11 +106,11 @@ const ImageComponent = ( {
 		switch ( iconType ) {
 			case ICON_TYPE.RETRY:
 				icon = retryIcon || SvgIconRetry;
-				iconStyle = styles.iconRetry;
+				iconStyle = iconRetryStyles;
 				break;
 			case ICON_TYPE.OFFLINE:
 				icon = offline;
-				iconStyle = styles.iconOffline;
+				iconStyle = iconOfflineStyles;
 				break;
 			case ICON_TYPE.PLACEHOLDER:
 				icon = image;
@@ -132,6 +132,31 @@ const ImageComponent = ( {
 	const iconUploadStyles = usePreferredColorSchemeStyle(
 		styles.iconUpload,
 		styles.iconUploadDark
+	);
+
+	const iconOfflineStyles = usePreferredColorSchemeStyle(
+		styles.iconOffline,
+		styles.iconOfflineDark
+	);
+
+	const retryIconStyles = usePreferredColorSchemeStyle(
+		styles.retryIcon,
+		styles.retryIconDark
+	);
+
+	const iconRetryStyles = usePreferredColorSchemeStyle(
+		styles.iconRetry,
+		styles.iconRetryDark
+	);
+
+	const retryContainerStyles = usePreferredColorSchemeStyle(
+		styles.retryContainer,
+		styles.retryContainerDark
+	);
+
+	const uploadFailedTextStyles = usePreferredColorSchemeStyle(
+		styles.uploadFailedText,
+		styles.uploadFailedTextDark
 	);
 
 	const placeholderStyles = [
@@ -249,12 +274,12 @@ const ImageComponent = ( {
 					<View
 						style={ [
 							styles.imageContainer,
-							styles.retryContainer,
+							retryContainerStyles,
 						] }
 					>
 						<View
 							style={ [
-								styles.retryIcon,
+								retryIconStyles,
 								retryIcon && styles.customRetryIcon,
 							] }
 						>
@@ -262,7 +287,7 @@ const ImageComponent = ( {
 								? getIcon( ICON_TYPE.OFFLINE )
 								: getIcon( ICON_TYPE.RETRY ) }
 						</View>
-						<Text style={ styles.uploadFailedText }>
+						<Text style={ uploadFailedTextStyles }>
 							{ retryMessage }
 						</Text>
 					</View>
