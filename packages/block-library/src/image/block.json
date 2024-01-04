@@ -102,6 +102,7 @@
 		"filter": {
 			"duotone": true
 		},
+		"__experimentalBlockBindings": true,
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
