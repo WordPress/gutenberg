@@ -24,6 +24,7 @@ export default function Header( { title, subTitle, actions, onClose } ) {
 							label={ 'Close' }
 							showTooltip={ false }
 							onClick={ onClose }
+							size="compact"
 						/>
 					) }
 					<Heading

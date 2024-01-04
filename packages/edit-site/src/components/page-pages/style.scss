@@ -11,5 +11,12 @@
 }
 
 .edit-site-page-pages__item-details {
-	padding: $grid-unit-20 $grid-unit-40;
+	padding: $grid-unit-30 $grid-unit-40;
+}
+
+.edit-site-sidebar-navigation-details-screen-panel {
+	.edit-site-sidebar-navigation-details-screen-panel__heading,
+	.edit-site-sidebar-navigation-details-screen-panel__value {
+		color: $gray-900 !important; // Todo: Remove !important dependency
+	}
 }

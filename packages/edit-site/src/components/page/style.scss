@@ -29,6 +29,9 @@
 		margin-top: $grid-unit-10;
 		color: $gray-700;
 	}
+	.components-button:first-child {
+		margin-left: -#{$grid-unit-15};
+	}
 }
 
 .edit-site-page-content {
