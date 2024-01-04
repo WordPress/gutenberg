@@ -31,11 +31,11 @@ const expectTooltipToBeHidden = () =>
 		screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
 	).not.toBeInTheDocument();
 
-const waitForTooltipToShow = async ( timeout = TOOLTIP_DELAY ) =>
-	await waitFor( () => expectTooltipToBeVisible(), { timeout } );
+const waitExpectTooltipToShow = async ( timeout = TOOLTIP_DELAY ) =>
+	await waitFor( expectTooltipToBeVisible, { timeout } );
 
-const waitForTooltipToHide = async () =>
-	await waitFor( () => expectTooltipToBeHidden );
+const waitExpectTooltipToHide = async () =>
+	await waitFor( expectTooltipToBeHidden );
 
 const hoverOutside = async () => {
 	await hover( document.body );
@@ -97,7 +97,7 @@ describe( 'Tooltip', () => {
 
 			// Hover outside of the anchor, tooltip should hide
 			await hoverOutside();
-			await waitForTooltipToHide();
+			await waitExpectTooltipToHide();
 			expect(
 				screen.queryByRole( 'button', { description: 'tooltip text' } )
 			).not.toBeInTheDocument();
@@ -128,14 +128,14 @@ describe( 'Tooltip', () => {
 			expect(
 				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
 			).toHaveFocus();
-			await waitForTooltipToShow();
+			await waitExpectTooltipToShow();
 
 			// Focus the other button, tooltip should hide
 			await press.Tab();
 			expect(
 				screen.getByRole( 'button', { name: 'Focus me' } )
 			).toHaveFocus();
-			await waitForTooltipToHide();
+			await waitExpectTooltipToHide();
 		} );
 
 		it( 'should show tooltip when focussing a disabled (but focussable) anchor button', async () => {
@@ -160,7 +160,7 @@ describe( 'Tooltip', () => {
 			// Focus anchor, tooltip should show
 			await press.Tab();
 			expect( anchor ).toHaveFocus();
-			await waitForTooltipToShow();
+			await waitExpectTooltipToShow();
 
 			// Focus another button, tooltip should hide
 			await press.Tab();
@@ -169,7 +169,7 @@ describe( 'Tooltip', () => {
 					name: 'Focus me',
 				} )
 			).toHaveFocus();
-			await waitForTooltipToHide();
+			await waitExpectTooltipToHide();
 		} );
 	} );
 
@@ -185,11 +185,11 @@ describe( 'Tooltip', () => {
 
 			// Hover over the anchor, tooltip should show
 			await hover( anchor );
-			await waitForTooltipToShow();
+			await waitExpectTooltipToShow();
 
 			// Hover outside of the anchor, tooltip should hide
 			await hoverOutside();
-			await waitForTooltipToHide();
+			await waitExpectTooltipToHide();
 		} );
 
 		it( 'should show tooltip when hovering over a disabled (but focussable) anchor button', async () => {
@@ -213,11 +213,11 @@ describe( 'Tooltip', () => {
 
 			// Hover over the anchor, tooltip should show
 			await hover( anchor );
-			await waitForTooltipToShow();
+			await waitExpectTooltipToShow();
 
 			// Hover outside of the anchor, tooltip should hide
 			await hoverOutside();
-			await waitForTooltipToHide();
+			await waitExpectTooltipToHide();
 		} );
 	} );
 
@@ -233,11 +233,11 @@ describe( 'Tooltip', () => {
 
 			// Hover over the anchor, tooltip should show
 			await hover( anchor );
-			await waitForTooltipToShow();
+			await waitExpectTooltipToShow();
 
 			// Click the anchor, tooltip should hide
 			await click( anchor );
-			await waitForTooltipToHide();
+			await waitExpectTooltipToHide();
 		} );
 
 		it( 'should not hide tooltip when the tooltip anchor is clicked and the `hideOnClick` prop is `false', async () => {
@@ -256,15 +256,15 @@ describe( 'Tooltip', () => {
 
 			// Hover over the anchor, tooltip should show
 			await hover( anchor );
-			await waitForTooltipToShow();
+			await waitExpectTooltipToShow();
 
 			// Click the anchor, tooltip should not hide
 			await click( anchor );
-			await waitForTooltipToShow();
+			await waitExpectTooltipToShow();
 
 			// Click another button, tooltip should hide
 			await click( screen.getByRole( 'button', { name: 'Click me' } ) );
-			await waitForTooltipToHide();
+			await waitExpectTooltipToHide();
 		} );
 	} );
 
@@ -296,11 +296,11 @@ describe( 'Tooltip', () => {
 
 			// Wait for additional delay for tooltip to appear
 			await sleep( ADDITIONAL_DELAY );
-			await waitForTooltipToShow();
+			await waitExpectTooltipToShow();
 
 			// Hover outside of the anchor, tooltip should hide
 			await hoverOutside();
-			await waitForTooltipToHide();
+			await waitExpectTooltipToHide();
 		} );
 
 		it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {
@@ -367,7 +367,7 @@ describe( 'Tooltip', () => {
 
 			// Hover outside of the anchor, tooltip should hide
 			await hoverOutside();
-			await waitForTooltipToHide();
+			await waitExpectTooltipToHide();
 		} );
 
 		it( 'should show the shortcut in the tooltip when an object is passed as the shortcut', async () => {
@@ -400,7 +400,7 @@ describe( 'Tooltip', () => {
 
 			// Hover outside of the anchor, tooltip should hide
 			await hoverOutside();
-			await waitForTooltipToHide();
+			await waitExpectTooltipToHide();
 		} );
 	} );
 
@@ -433,7 +433,7 @@ describe( 'Tooltip', () => {
 
 			// Hover outside of the anchor, tooltip should hide
 			await hoverOutside();
-			await waitForTooltipToHide();
+			await waitExpectTooltipToHide();
 		} );
 	} );
 } );
