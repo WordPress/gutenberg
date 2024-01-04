@@ -105,7 +105,7 @@ export default function useCommonCommands() {
 		name: 'core/toggle-spotlight-mode',
 		label: __( 'Toggle spotlight mode' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'focusMode' );
+			toggle( 'core', 'focusMode' );
 			close();
 		},
 	} );

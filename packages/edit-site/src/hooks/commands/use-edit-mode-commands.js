@@ -273,7 +273,7 @@ function useEditUICommands() {
 		name: 'core/toggle-spotlight-mode',
 		label: __( 'Toggle spotlight mode' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-site', 'focusMode' );
+			toggle( 'core', 'focusMode' );
 			close();
 		},
 	} );
