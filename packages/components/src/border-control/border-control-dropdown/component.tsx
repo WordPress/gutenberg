@@ -142,6 +142,7 @@ const BorderControlDropdown = (
 		enableStyle,
 		indicatorClassName,
 		indicatorWrapperClassName,
+		isStyleSettable,
 		onReset,
 		onColorChange,
 		onStyleChange,
@@ -218,7 +219,7 @@ const BorderControlDropdown = (
 						clearable={ false }
 						enableAlpha={ enableAlpha }
 					/>
-					{ enableStyle && (
+					{ enableStyle && isStyleSettable && (
 						<BorderControlStylePicker
 							label={ __( 'Style' ) }
 							value={ style }

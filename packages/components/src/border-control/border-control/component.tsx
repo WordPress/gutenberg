@@ -46,6 +46,7 @@ const UnconnectedBorderControl = (
 		hideLabelFromVision,
 		innerWrapperClassName,
 		inputWidth,
+		isStyleSettable,
 		label,
 		onBorderChange,
 		onSliderChange,
@@ -80,6 +81,7 @@ const UnconnectedBorderControl = (
 							disableCustomColors={ disableCustomColors }
 							enableAlpha={ enableAlpha }
 							enableStyle={ enableStyle }
+							isStyleSettable={ isStyleSettable }
 							onChange={ onBorderChange }
 							previousStyleSelection={ previousStyleSelection }
 							showDropdownHeader={ showDropdownHeader }
