@@ -260,12 +260,13 @@ export default function DataviewsPatterns() {
 			_fields.push( {
 				header: __( 'Sync Status' ),
 				id: 'sync-status',
-				isVirtual: true,
 				type: ENUMERATION_TYPE,
 				elements: SYNC_FILTERS,
 				filterBy: {
 					operators: [ OPERATOR_IN ],
 				},
+				enableSorting: false,
+				enableHiding: false,
 			} );
 		}
 		return _fields;
@@ -347,7 +348,7 @@ export default function DataviewsPatterns() {
 					view={ view }
 					onChangeView={ onChangeView }
 					deferredRendering={ true }
-					supportedLayouts={ [ LAYOUT_GRID ] }
+					supportedLayouts={ [ LAYOUT_GRID, 'table' ] }
 				/>
 			</Page>
 		</ExperimentalBlockEditorProvider>

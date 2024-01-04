@@ -32,7 +32,7 @@ export default function ViewList( {
 	);
 	const visibleFields = fields.filter(
 		( field ) =>
-			! field.isVirtual &&
+			!! field.render &&
 			! view.hiddenFields.includes( field.id ) &&
 			! [ view.layout.primaryField, view.layout.mediaField ].includes(
 				field.id

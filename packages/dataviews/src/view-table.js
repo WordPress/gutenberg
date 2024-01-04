@@ -300,7 +300,7 @@ function ViewTable( {
 } ) {
 	const visibleFields = fields.filter(
 		( field ) =>
-			! field.isVirtual &&
+			!! field.render &&
 			! view.hiddenFields.includes( field.id ) &&
 			! [ view.layout.mediaField, view.layout.primaryField ].includes(
 				field.id
