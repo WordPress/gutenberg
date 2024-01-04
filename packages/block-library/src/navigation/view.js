@@ -23,7 +23,7 @@ const focusableSelectors = [
 // capture the clicks, instead of relying on the focusout event.
 document.addEventListener( 'click', () => {} );
 
-const { state, actions, callbacks } = store( 'core/navigation', {
+const { state, actions } = store( 'core/navigation', {
 	state: {
 		get roleAttribute() {
 			const ctx = getContext();
@@ -191,30 +191,25 @@ const { state, actions, callbacks } = store( 'core/navigation', {
 			}
 		},
 		initNav() {
-			const { ref } = getElement();
+			const context = getContext();
 			const mediaQuery = window.matchMedia(
 				'(max-width: ' + NAVIGATION_MOBILE_BREAKPOINT + 'px)'
 			);
 
 			// Run once to set the initial state.
-			callbacks.collapseNav( ref, mediaQuery.matches );
+			context.isCollapsed = mediaQuery.matches;
+
+			function handleCollapse( event ) {
+				context.isCollapsed = event.matches;
+			}
 
 			// Run on resize to update the state.
-			mediaQuery.addEventListener( 'change', ( event ) => {
-				callbacks.collapseNav( ref, event.matches );
-			} );
+			mediaQuery.addEventListener( 'change', handleCollapse );
 
 			// Remove the listener when the component is unmounted.
 			return () => {
-				mediaQuery.removeEventListener( 'change', () => {} );
+				mediaQuery.removeEventListener( 'change', handleCollapse );
 			};
-		},
-		collapseNav( ref, collapse ) {
-			if ( collapse ) {
-				ref.classList.add( 'is-collapsed' );
-			} else {
-				ref.classList.remove( 'is-collapsed' );
-			}
 		},
 	},
 } );
