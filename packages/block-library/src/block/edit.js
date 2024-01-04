@@ -129,6 +129,8 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 			if (
 				block.attributes[ attributeKey ] !== defaultValues[ blockId ]
 			) {
+				// This line doesn't seem to add the multiple overrides properly.
+				// Is this expected behavior for now?
 				overrides[ blockId ] = block.attributes[ attributeKey ];
 			}
 		}
