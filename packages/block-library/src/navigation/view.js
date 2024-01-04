@@ -203,6 +203,11 @@ const { state, actions, callbacks } = store( 'core/navigation', {
 			mediaQuery.addEventListener( 'change', ( event ) => {
 				callbacks.collapseNav( ref, event.matches );
 			} );
+
+			// Remove the listener when the component is unmounted.
+			return () => {
+				mediaQuery.removeEventListener( 'change', () => {} );
+			};
 		},
 		collapseNav( ref, collapse ) {
 			if ( collapse ) {
