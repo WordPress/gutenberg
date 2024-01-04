@@ -95,6 +95,26 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`has-extension-suffi
 ]
 `;
 
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`module-renames\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('renamed--@my/module', 'renamed--other-module'), 'version' => '601cf94eb9a182fcc0ed', 'type' => 'module');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`module-renames\` should produce expected output: External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "module",
+    "request": "renamed--@my/module",
+    "userRequest": "@my/module",
+  },
+  {
+    "externalType": "module",
+    "request": "renamed--other-module",
+    "userRequest": "other-module",
+  },
+]
+`;
+
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`no-default\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
 "<?php return array('dependencies' => array(), 'version' => '34504aa793c63cd3d73a', 'type' => 'module');
 "
@@ -385,6 +405,32 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`has-extension-suffi
       "blob",
     ],
     "userRequest": "@wordpress/blob",
+  },
+]
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`module-renames\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('renamed--@my/module', 'renamed--other-module'), 'version' => '34854902f36ec8e176d6');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`module-renames\` should produce expected output: External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "window",
+    "request": [
+      "my-namespace",
+      "renamed--@my/module",
+    ],
+    "userRequest": "@my/module",
+  },
+  {
+    "externalType": "window",
+    "request": [
+      "my-namespace",
+      "renamed--other-module",
+    ],
+    "userRequest": "other-module",
   },
 ]
 `;

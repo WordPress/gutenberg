@@ -235,7 +235,7 @@ class DependencyExtractionWebpackPlugin {
 							);
 
 						( isStatic ? chunkStaticDeps : chunkDynamicDeps ).add(
-							userRequest
+							m.request
 						);
 					} else {
 						chunkStaticDeps.add(
