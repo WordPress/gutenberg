@@ -2,7 +2,7 @@ const moduleFields = new Set( [ 'viewModule' ] );
 const scriptFields = new Set( [ 'viewScript', 'script', 'editorScript' ] );
 
 /**
- * @param {{}} blockJson
+ * @param {Object} blockJson
  * @return {null|Record<string, unknown>} Fields
  */
 function getBlockJsonModuleFields( blockJson ) {
@@ -19,7 +19,7 @@ function getBlockJsonModuleFields( blockJson ) {
 }
 
 /**
- * @param {{}} blockJson
+ * @param {Object} blockJson
  * @return {null|Record<string, unknown>} Fields
  */
 function getBlockJsonScriptFields( blockJson ) {

@@ -331,21 +331,27 @@ const scriptConfig = {
 						if ( basename( absoluteFrom ) === 'block.json' ) {
 							const blockJson = JSON.parse( content.toString() );
 
-							const fields =
-								getBlockJsonScriptFields( blockJson );
-							if ( fields ) {
-								for ( const [ key, value ] of Object.entries(
-									fields
-								) ) {
-									if ( Array.isArray( value ) ) {
-										blockJson[ key ] =
-											value.map( convertExtension );
-									} else if ( typeof value === 'string' ) {
-										blockJson[ key ] =
-											convertExtension( value );
+							[
+								getBlockJsonScriptFields( blockJson ),
+								getBlockJsonModuleFields( blockJson ),
+							].forEach( ( fields ) => {
+								if ( fields ) {
+									for ( const [
+										key,
+										value,
+									] of Object.entries( fields ) ) {
+										if ( Array.isArray( value ) ) {
+											blockJson[ key ] =
+												value.map( convertExtension );
+										} else if (
+											typeof value === 'string'
+										) {
+											blockJson[ key ] =
+												convertExtension( value );
+										}
 									}
 								}
-							}
+							} );
 
 							return JSON.stringify( blockJson, null, 2 );
 						}
@@ -405,49 +411,6 @@ if ( hasExperimentalModulesFlag ) {
 				SCRIPT_DEBUG: ! isProduction,
 			} ),
 			new RenderPathsPlugin(),
-			new CopyWebpackPlugin( {
-				patterns: [
-					{
-						from: '**/block.json',
-						context: getWordPressSrcDirectory(),
-						noErrorOnMissing: true,
-						transform( content, absoluteFrom ) {
-							const convertExtension = ( path ) => {
-								return path.replace( /\.(j|t)sx?$/, '.js' );
-							};
-
-							if ( basename( absoluteFrom ) === 'block.json' ) {
-								const blockJson = JSON.parse(
-									content.toString()
-								);
-
-								const fields =
-									getBlockJsonModuleFields( blockJson );
-								if ( fields ) {
-									for ( const [
-										key,
-										value,
-									] of Object.entries( fields ) ) {
-										if ( Array.isArray( value ) ) {
-											blockJson[ key ] =
-												value.map( convertExtension );
-										} else if (
-											typeof value === 'string'
-										) {
-											blockJson[ key ] =
-												convertExtension( value );
-										}
-									}
-								}
-
-								return JSON.stringify( blockJson, null, 2 );
-							}
-
-							return content;
-						},
-					},
-				],
-			} ),
 			// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 			// bundle content as a convenient interactive zoomable treemap.
 			process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
