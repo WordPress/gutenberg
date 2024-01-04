@@ -237,6 +237,7 @@ Array of operations that can be performed upon each record. Each action is an ob
 - `supportedLayouts`: array of layouts supported. By default, all are: `table`, `grid`, `list`.
 - `deferredRendering`: whether the items should be rendered asynchronously. Useful when there's a field that takes a lot of time (e.g.: previews). `false` by default.
 - `onSelectionChange`: callback that returns the selected items. So far, only the `list` view implements this.
+- `onDetailsChange`: callback that signals the user triggered the details for a item. Only used by the `list` view.
 
 ## Contributing to this package
 
