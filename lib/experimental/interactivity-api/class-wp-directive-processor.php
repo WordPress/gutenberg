@@ -271,11 +271,23 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 		$matches = array();
 		$has_ns  = preg_match( '/^([\w\-_\/]+)::(.+)$/', $value, $matches );
 
+		/*
+		 * Overwrite both `$ns` and `$value` variables if `$value` explicitly
+		 * contains a namespace.
+		 */
 		if ( $has_ns ) {
 			list( , $ns, $value ) = $matches;
 		}
 
-		// Try parsing the value.
+		/*
+		 * Try to decode `$value` as a JSON object. If it works, `$value` is
+		 * replaced with the resulting array. The original string is preserved
+		 * otherwise.
+		 *
+		 * Note that `json_decode` returns `null` both for an invalid JSON or
+		 * the `'null'` string (a valid JSON). In the latter case, `$value` is
+		 * replaced with `null`.
+		 */
 		$data = json_decode( $value, true );
 		if ( null !== $data || 'null' === trim( $value ) ) {
 			$value = $data;
