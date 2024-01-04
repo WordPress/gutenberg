@@ -361,7 +361,8 @@ class WP_Navigation_Block_Renderer {
 		$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
 		$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
 
-		// is-collapsed class is added to the navigation block when the menu is collapsed.
+		// Sets the is-collapsed class when the navigation is set to always use the overlay.
+		// This saves us from needing to do this check in the view.js file (see the collapseNav function).
 		$is_collapsed_class = static::is_always_overlay( $attributes ) ? array( 'is-collapsed' ) : array();
 
 		$classes = array_merge(
@@ -540,6 +541,8 @@ class WP_Navigation_Block_Renderer {
 			data-wp-context=\'' . $nav_element_context . '\'
 		';
 
+		// When the navigation overlayMenu attribute is set to "always"
+		// we don't need to use JavaScript to collapse the menu as we set the class manually.
 		if ( ! static::is_always_overlay( $attributes ) ) {
 			$nav_element_directives .= 'data-wp-watch="callbacks.initNav"';
 		}
