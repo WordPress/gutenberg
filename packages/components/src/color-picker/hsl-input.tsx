@@ -4,13 +4,60 @@
 import { colord } from 'colord';
 
 /**
+ * WordPress dependencies
+ */
+import { useState, useEffect } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { InputWithSlider } from './input-with-slider';
 import type { HslInputProps } from './types';
 
 export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
-	const { h, s, l, a } = color.toHsl();
+	const colorPropHSL = color.toHsl();
+
+	const [ internalHSLA, setInternalHSLA ] = useState( { ...colorPropHSL } );
+
+	const isInternalColorSameAsReceivedColor = color.isEqual(
+		colord( internalHSLA )
+	);
+
+	useEffect( () => {
+		if ( ! isInternalColorSameAsReceivedColor ) {
+			setInternalHSLA( colorPropHSL );
+		}
+	}, [ colorPropHSL, isInternalColorSameAsReceivedColor ] );
+
+	const colorValue = isInternalColorSameAsReceivedColor
+		? internalHSLA
+		: colorPropHSL;
+
+	const updateHSLAValue = (
+		partialNewValue: Partial< typeof colorPropHSL >
+	) => {
+		setInternalHSLA( ( prevValue ) => ( {
+			...prevValue,
+			...partialNewValue,
+		} ) );
+
+		const nextOnChangeValue = colord( {
+			...colorValue,
+			...partialNewValue,
+		} );
+
+		// Avoid firing `onChange` if the resulting didn't change.
+		if ( color.isEqual( nextOnChangeValue ) ) {
+			return;
+		}
+
+		onChange(
+			colord( {
+				...colorValue,
+				...partialNewValue,
+			} )
+		);
+	};
 
 	return (
 		<>
@@ -19,9 +66,9 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 				max={ 359 }
 				label="Hue"
 				abbreviation="H"
-				value={ h }
+				value={ colorValue.h }
 				onChange={ ( nextH: number ) => {
-					onChange( colord( { h: nextH, s, l, a } ) );
+					updateHSLAValue( { h: nextH } );
 				} }
 			/>
 			<InputWithSlider
@@ -29,16 +76,9 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 				max={ 100 }
 				label="Saturation"
 				abbreviation="S"
-				value={ s }
+				value={ colorValue.s }
 				onChange={ ( nextS: number ) => {
-					onChange(
-						colord( {
-							h,
-							s: nextS,
-							l,
-							a,
-						} )
-					);
+					updateHSLAValue( { s: nextS } );
 				} }
 			/>
 			<InputWithSlider
@@ -46,16 +86,9 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 				max={ 100 }
 				label="Lightness"
 				abbreviation="L"
-				value={ l }
+				value={ colorValue.l }
 				onChange={ ( nextL: number ) => {
-					onChange(
-						colord( {
-							h,
-							s,
-							l: nextL,
-							a,
-						} )
-					);
+					updateHSLAValue( { l: nextL } );
 				} }
 			/>
 			{ enableAlpha && (
@@ -64,16 +97,9 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 					max={ 100 }
 					label="Alpha"
 					abbreviation="A"
-					value={ Math.trunc( 100 * a ) }
+					value={ Math.trunc( 100 * colorValue.a ) }
 					onChange={ ( nextA: number ) => {
-						onChange(
-							colord( {
-								h,
-								s,
-								l,
-								a: nextA / 100,
-							} )
-						);
+						updateHSLAValue( { a: nextA / 100 } );
 					} }
 				/>
 			) }
