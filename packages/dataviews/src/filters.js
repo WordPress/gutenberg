@@ -40,10 +40,13 @@ const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 
 		switch ( field.type ) {
 			case ENUMERATION_TYPE:
+				if ( ! field.elements?.length ) {
+					return;
+				}
 				filters.push( {
 					field: field.id,
 					name: field.header,
-					elements: field.elements || [],
+					elements: field.elements,
 					operators,
 					isVisible: view.filters.some(
 						( f ) =>

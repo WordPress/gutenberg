@@ -26,6 +26,7 @@ const {
 	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
 } = unlock( componentsPrivateApis );
 
 const sortArrows = { asc: '↑', desc: '↓' };
@@ -200,6 +201,11 @@ function HeaderMenu( { field, view, onChangeView } ) {
 												<DropdownMenuItemLabel>
 													{ element.label }
 												</DropdownMenuItemLabel>
+												{ !! element.description && (
+													<DropdownMenuItemHelpText>
+														{ element.description }
+													</DropdownMenuItemHelpText>
+												) }
 											</DropdownMenuRadioItemCustom>
 										);
 									} ) }
@@ -294,6 +300,7 @@ function ViewTable( {
 } ) {
 	const visibleFields = fields.filter(
 		( field ) =>
+			! field.isVirtual &&
 			! view.hiddenFields.includes( field.id ) &&
 			! [ view.layout.mediaField, view.layout.primaryField ].includes(
 				field.id

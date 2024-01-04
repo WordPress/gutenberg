@@ -50,6 +50,8 @@ export default function DataViews( {
 		return fields.map( ( field ) => ( {
 			...field,
 			render: field.render || field.getValue,
+			enableHiding: field.isVirtual ? false : field.enableHiding,
+			enableSorting: field.isVirtual ? false : field.enableSorting,
 		} ) );
 	}, [ fields ] );
 	return (
