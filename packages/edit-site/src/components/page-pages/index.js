@@ -328,22 +328,24 @@ export default function PagePages() {
 	const pageRecord = pages?.find( ( page ) => page.id === pageId );
 	const showDetails =
 		view.type === LAYOUT_LIST && isDetailsOpen && pageRecord;
+	const title = decodeEntities(
+		pageRecord?.title?.rendered || __( '(no title)' )
+	);
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
 		<>
-			{ showDetails && (
-				<ItemDetails item={ pageRecord } onClose={ onDetailsChange } />
-			) }
-			{ ! showDetails && (
-				<Page
-					className={
-						view.type === LAYOUT_LIST
-							? 'edit-site-page-pages-list-view'
-							: null
-					}
-					title={ __( 'Pages' ) }
-				>
+			<Page
+				className={
+					view.type === LAYOUT_LIST
+						? 'edit-site-page-pages-list-view'
+						: null
+				}
+				title={ showDetails ? title : __( 'Pages' ) }
+				onClose={ showDetails ? onDetailsChange : null }
+			>
+				{ showDetails && <ItemDetails item={ pageRecord } /> }
+				{ ! showDetails && (
 					<DataViews
 						paginationInfo={ paginationInfo }
 						fields={ fields }
@@ -355,8 +357,8 @@ export default function PagePages() {
 						onSelectionChange={ onSelectionChange }
 						onDetailsChange={ onDetailsChange }
 					/>
-				</Page>
-			) }
+				) }
+			</Page>
 			{ view.type === LAYOUT_LIST && (
 				<Page>
 					<div

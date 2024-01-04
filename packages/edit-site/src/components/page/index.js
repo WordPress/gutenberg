@@ -21,6 +21,7 @@ export default function Page( {
 	children,
 	className,
 	hideTitleFromUI = false,
+	onClose = null,
 } ) {
 	const classes = classnames( 'edit-site-page', className );
 
@@ -32,6 +33,7 @@ export default function Page( {
 						title={ title }
 						subTitle={ subTitle }
 						actions={ actions }
+						onClose={ onClose }
 					/>
 				) }
 				{ children }
