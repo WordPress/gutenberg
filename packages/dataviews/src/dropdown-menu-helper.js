@@ -28,7 +28,10 @@ const radioCheck = (
  * component, which allows deselecting selected values.
  */
 export const DropdownMenuRadioItemCustom = forwardRef(
-	( { checked, name, value, onChange, onClick, ...props }, ref ) => {
+	function DropdownMenuRadioItemCustom(
+		{ checked, name, value, hideOnClick, onChange, onClick, ...props },
+		ref
+	) {
 		const onClickHandler = ( e ) => {
 			onClick?.( e );
 			onChange?.( { ...e, target: { ...e.target, value } } );
@@ -39,7 +42,7 @@ export const DropdownMenuRadioItemCustom = forwardRef(
 				role="menuitemradio"
 				name={ name }
 				aria-checked={ checked }
-				hideOnClick={ false }
+				hideOnClick={ !! hideOnClick }
 				prefix={
 					checked ? (
 						<Icon icon={ radioCheck } />

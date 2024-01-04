@@ -117,10 +117,10 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 											return (
 												<DropdownMenuRadioItemCustom
 													key={ element.value }
-													name={ `add-filter-${ filter.field.id }` }
+													name={ `add-filter-${ filter.field }` }
 													value={ element.value }
 													checked={ isActive }
-													onClick={ () => {
+													onChange={ ( e ) => {
 														onChangeView( {
 															...view,
 															page: 1,
@@ -132,7 +132,9 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 																		activeOperator,
 																	value: isActive
 																		? undefined
-																		: element.value,
+																		: e
+																				.target
+																				.value,
 																},
 															],
 														} );
@@ -172,7 +174,7 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 												] ) => (
 													<DropdownMenuRadioItem
 														key={ key }
-														name={ `add-filter-${ filter.name }-conditions` }
+														name={ `add-filter-${ filter.field }-conditions` }
 														value={ operator }
 														checked={
 															activeOperator ===

@@ -174,7 +174,7 @@
 	.components-menu-items-choice .components-menu-items__item-icon.components-menu-items__item-icon {
 		display: block;
 	}
-	.edit-post-header-toolbar__inserter-toggle.edit-post-header-toolbar__inserter-toggle,
+	.editor-document-tools__inserter-toggle.editor-document-tools__inserter-toggle,
 	.interface-pinned-items .components-button {
 		padding-left: $grid-unit;
 		padding-right: $grid-unit;
@@ -275,8 +275,8 @@
 			visibility: hidden;
 		}
 
-		& > .edit-post-header__toolbar .edit-post-header-toolbar__inserter-toggle,
-		& > .edit-post-header__toolbar .edit-post-header-toolbar__document-overview-toggle,
+		& > .edit-post-header__toolbar .editor-document-tools__inserter-toggle,
+		& > .edit-post-header__toolbar .editor-document-tools__document-overview-toggle,
 		& > .edit-post-header__settings > .editor-preview-dropdown,
 		& > .edit-post-header__settings > .interface-pinned-items {
 			display: none;

@@ -216,7 +216,7 @@ export default function PagePages() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
-				getValue: ( { item } ) => item.title?.rendered || item.slug,
+				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => {
 					return (
 						<VStack spacing={ 1 }>
@@ -235,13 +235,12 @@ export default function PagePages() {
 										} }
 									>
 										{ decodeEntities(
-											item.title?.rendered || item.slug
+											item.title?.rendered
 										) || __( '(no title)' ) }
 									</Link>
 								) : (
-									decodeEntities(
-										item.title?.rendered || item.slug
-									) || __( '(no title)' )
+									decodeEntities( item.title?.rendered ) ||
+									__( '(no title)' )
 								) }
 							</View>
 						</VStack>
@@ -287,7 +286,7 @@ export default function PagePages() {
 				},
 			},
 		],
-		[ authors, view ]
+		[ authors, view.type ]
 	);
 
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();

@@ -28,6 +28,7 @@ export function useInBetweenInserter() {
 		getTemplateLock,
 		__unstableIsWithinBlockOverlay,
 		getBlockEditingMode,
+		getBlockName,
 	} = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
@@ -75,7 +76,9 @@ export function useInBetweenInserter() {
 
 				if (
 					getTemplateLock( rootClientId ) ||
-					getBlockEditingMode( rootClientId ) === 'disabled'
+					getBlockEditingMode( rootClientId ) === 'disabled' ||
+					( getBlockName( rootClientId ) === 'core/block' &&
+						window.__experimentalPatternPartialSyncing )
 				) {
 					return;
 				}

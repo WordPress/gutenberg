@@ -1,6 +1,7 @@
 == Changelog ==
 
-= 17.4.0-rc.1 =
+= 17.4.0 =
+
 
 
 ## Changelog
@@ -25,6 +26,7 @@
 - Add the featured image panel. ([57053](https://github.com/WordPress/gutenberg/pull/57053))
 - Editor: Unify revision panel between post and site editors. ([57010](https://github.com/WordPress/gutenberg/pull/57010))
 - Social Link block: Obfuscate email address. ([57384](https://github.com/WordPress/gutenberg/pull/57384))
+- DataViews: Mark the new Templates pages as stable. ([57109](https://github.com/WordPress/gutenberg/pull/57109))
 
 #### Design Tools
 - Background image: Add backgroundSize and repeat features. ([57005](https://github.com/WordPress/gutenberg/pull/57005))
@@ -149,7 +151,6 @@
 - DataViews: Make `deferredRendering` prop optional. ([57334](https://github.com/WordPress/gutenberg/pull/57334))
 - DataViews: Make `getItemId` optional. ([57308](https://github.com/WordPress/gutenberg/pull/57308))
 - DataViews: Make filters footprint more condensed. ([56983](https://github.com/WordPress/gutenberg/pull/56983))
-- DataViews: Mark the new Templates pages as stable. ([57109](https://github.com/WordPress/gutenberg/pull/57109))
 - DataViews: Memoize `onSelectionChange` callback. ([57390](https://github.com/WordPress/gutenberg/pull/57390))
 - DataViews: Remove `paginationInfo` prop from ViewComponent. ([57306](https://github.com/WordPress/gutenberg/pull/57306))
 - DataViews: Remove reference to edit site class. ([57075](https://github.com/WordPress/gutenberg/pull/57075))
@@ -296,6 +297,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @andrewhayward @andrewserong @anton-vlasenko @arthur791004 @atachibana @bacoords @BenjaminZekavica @brookewp @c4rl0sbr4v0 @chad1008 @ciampo @colorful-tones @DAreRodz @dcalhoun @ddryo @derekblank @desrosj @dotslashbit @ellatrix @fluiddot @geriux @getdave @glendaviesnz @gvgvgvijayan @jameskoster @jasmussen @jeryj @jorgefilipecosta @jsnajdr @juanmaguitar @kevin940726 @koen12344 @kurudrive @luisherranz @Mamaduka @matiasbenedetto @mcsf @mhimon @mirka @ndiego @ntsekouras @oandregal @ockham @ramonjd @richtabor @SiobhyB @sirreal @stokesman @t-hamano @tellthemachines @TimBroddin @youknowriad @yuliyan
+
+
 
 
 = 17.2.4 =

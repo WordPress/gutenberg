@@ -5,7 +5,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,10 +35,13 @@ export default function DataViews( {
 } ) {
 	const [ selection, setSelection ] = useState( [] );
 
-	const onSetSelection = ( items ) => {
-		setSelection( items.map( ( item ) => item.id ) );
-		onSelectionChange( items );
-	};
+	const onSetSelection = useCallback(
+		( items ) => {
+			setSelection( items.map( ( item ) => item.id ) );
+			onSelectionChange( items );
+		},
+		[ setSelection, onSelectionChange ]
+	);
 
 	const ViewComponent = VIEW_LAYOUTS.find(
 		( v ) => v.type === view.type
@@ -65,13 +68,13 @@ export default function DataViews( {
 							/>
 						) }
 						<Filters
-							fields={ fields }
+							fields={ _fields }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
 					<ViewActions
-						fields={ fields }
+						fields={ _fields }
 						view={ view }
 						onChangeView={ onChangeView }
 						supportedLayouts={ supportedLayouts }

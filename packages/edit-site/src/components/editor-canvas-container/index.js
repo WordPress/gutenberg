@@ -63,7 +63,7 @@ function EditorCanvasContainer( {
 			).getEditorCanvasContainerView();
 
 			const _showListViewByDefault = select( preferencesStore ).get(
-				'core/edit-site',
+				'core',
 				'showListViewByDefault'
 			);
 
