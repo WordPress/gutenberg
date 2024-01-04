@@ -8,21 +8,20 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import {
-	Children,
-	cloneElement,
-	forwardRef,
-	createContext,
-	useContext,
-} from '@wordpress/element';
+import { Children, cloneElement } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import type { TooltipProps } from './types';
+import type { TooltipProps, TooltipInternalContext } from './types';
 import Shortcut from '../shortcut';
 import { positionToPlacement } from '../popover/utils';
+import {
+	contextConnect,
+	useContextSystem,
+	ContextSystemProvider,
+} from '../context';
 import type { WordPressComponentProps } from '../context';
 
 /**
@@ -30,9 +29,13 @@ import type { WordPressComponentProps } from '../context';
  */
 export const TOOLTIP_DELAY = 700;
 
-const TooltipContext = createContext( false );
+const CONTEXT_VALUE = {
+	Tooltip: {
+		isNestedInParentTooltip: true,
+	},
+};
 
-function Tooltip(
+function UnconnectedTooltip(
 	props: WordPressComponentProps< TooltipProps, 'div', false >,
 	ref: React.ForwardedRef< any >
 ) {
@@ -44,10 +47,15 @@ function Tooltip(
 		position,
 		shortcut,
 		text,
-		...restProps
-	} = props;
 
-	const isNestedInParentTooltip = useContext( TooltipContext );
+		// From Internal Context system
+		isNestedInParentTooltip,
+
+		...restProps
+	} = useContextSystem< typeof props & TooltipInternalContext >(
+		props,
+		'Tooltip'
+	);
 
 	const baseId = useInstanceId( Tooltip, 'tooltip' );
 	const describedById = text || shortcut ? baseId : undefined;
@@ -94,8 +102,9 @@ function Tooltip(
 			  } )
 			: children;
 	}
+
 	return (
-		<TooltipContext.Provider value={ true }>
+		<ContextSystemProvider value={ CONTEXT_VALUE }>
 			<Ariakit.TooltipAnchor
 				onClick={ hideOnClick ? tooltipStore.hide : undefined }
 				store={ tooltipStore }
@@ -125,8 +134,10 @@ function Tooltip(
 					) }
 				</Ariakit.Tooltip>
 			) }
-		</TooltipContext.Provider>
+		</ContextSystemProvider>
 	);
 }
 
-export default forwardRef( Tooltip );
+export const Tooltip = contextConnect( UnconnectedTooltip, 'Tooltip' );
+
+export default Tooltip;
