@@ -57,11 +57,6 @@
 
 .block-editor-block-toolbar__block-controls .block-editor-block-lock-toolbar {
 	margin-left: -$grid-unit-15 * 0.5 !important;
-
-	.components-button:disabled,
-	.components-button[aria-disabled="true"] {
-		opacity: 1;
-	}
 }
 
 .show-icon-labels {
