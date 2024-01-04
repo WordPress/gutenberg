@@ -11,18 +11,53 @@ import {
 	Warning,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
+	RichText,
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
-const CommentsFormPlaceholder = () => {
+const CommentsFormPlaceholder = ( { commentFormTitleObject } ) => {
 	const instanceId = useInstanceId( CommentsFormPlaceholder );
+
+	let isCommentFormTitleObjectEmpty = false;
+
+	if ( ! commentFormTitleObject ) {
+		isCommentFormTitleObjectEmpty = true;
+
+		commentFormTitleObject = {
+			title: __( 'Leave a reply' ),
+			setTitle: null,
+		};
+	} else if (
+		null === commentFormTitleObject.title ||
+		undefined === commentFormTitleObject.title
+	) {
+		commentFormTitleObject.title = '';
+	} else if (
+		null === commentFormTitleObject.setTitle ||
+		undefined === commentFormTitleObject.setTitle
+	) {
+		commentFormTitleObject.setTitle = null;
+	}
 
 	return (
 		<div className="comment-respond">
-			<h3 className="comment-reply-title">{ __( 'Leave a Reply' ) }</h3>
+			<RichText
+				tagName="h3"
+				className={
+					'comment-reply-title' +
+					( isCommentFormTitleObjectEmpty ? ' disabled' : '' )
+				}
+				placeholder={ __( 'Leave a reply' ) }
+				value={ commentFormTitleObject.title }
+				onChange={ ( text ) => {
+					if ( commentFormTitleObject.setTitle !== null ) {
+						commentFormTitleObject.setTitle( text );
+					}
+				} }
+			/>
 			<form
 				noValidate
 				className="comment-form"
@@ -58,7 +93,7 @@ const CommentsFormPlaceholder = () => {
 	);
 };
 
-const CommentsForm = ( { postId, postType } ) => {
+const CommentsForm = ( { postId, postType, commentFormTitleObject } ) => {
 	const [ commentStatus, setCommentStatus ] = useEntityProp(
 		'postType',
 		postType,
@@ -124,7 +159,11 @@ const CommentsForm = ( { postId, postType } ) => {
 		}
 	}
 
-	return <CommentsFormPlaceholder />;
+	return (
+		<CommentsFormPlaceholder
+			commentFormTitleObject={ commentFormTitleObject }
+		/>
+	);
 };
 
 export default CommentsForm;

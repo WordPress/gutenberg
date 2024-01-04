@@ -9,6 +9,10 @@
 	"attributes": {
 		"textAlign": {
 			"type": "string"
+		},
+		"commentFormTitle": {
+			"type": "string",
+			"default": "Leave a Reply"
 		}
 	},
 	"usesContext": [ "postId", "postType" ],

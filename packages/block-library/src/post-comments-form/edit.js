@@ -25,11 +25,18 @@ export default function PostCommentsFormEdit( {
 	context,
 	setAttributes,
 } ) {
-	const { textAlign } = attributes;
+	const { textAlign, commentFormTitle } = attributes;
 	const { postId, postType } = context;
 
 	const instanceId = useInstanceId( PostCommentsFormEdit );
 	const instanceIdDesc = sprintf( 'comments-form-edit-%d-desc', instanceId );
+
+	const commentFormTitleObject = {
+		title: commentFormTitle,
+		setTitle: ( nextTitle ) => {
+			setAttributes( { commentFormTitle: nextTitle } );
+		},
+	};
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -49,7 +56,11 @@ export default function PostCommentsFormEdit( {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
-				<CommentsForm postId={ postId } postType={ postType } />
+				<CommentsForm
+					postId={ postId }
+					postType={ postType }
+					commentFormTitleObject={ commentFormTitleObject }
+				/>
 				<VisuallyHidden id={ instanceIdDesc }>
 					{ __( 'Comments form disabled in editor.' ) }
 				</VisuallyHidden>
