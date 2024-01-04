@@ -97,10 +97,11 @@ const disabledStyles = ( { disabled }: InputProps ) => {
 	} );
 };
 
-const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
+export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 	const sizes = {
 		default: '13px',
 		small: '11px',
+		compact: '13px',
 		'__unstable-large': '13px',
 	};
 
@@ -138,6 +139,13 @@ export const getSizeConfig = ( {
 			paddingLeft: space( 2 ),
 			paddingRight: space( 2 ),
 		},
+		compact: {
+			height: 32,
+			lineHeight: 1,
+			minHeight: 32,
+			paddingLeft: space( 2 ),
+			paddingRight: space( 2 ),
+		},
 		'__unstable-large': {
 			height: 40,
 			lineHeight: 1,
@@ -148,13 +156,7 @@ export const getSizeConfig = ( {
 	};
 
 	if ( ! __next40pxDefaultSize ) {
-		sizes.default = {
-			height: 32,
-			lineHeight: 1,
-			minHeight: 32,
-			paddingLeft: space( 2 ),
-			paddingRight: space( 2 ),
-		};
+		sizes.default = sizes.compact;
 	}
 
 	return sizes[ size as Size ] || sizes.default;

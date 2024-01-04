@@ -73,13 +73,13 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		displayPreview,
 		previewHeight,
 	} = attributes;
-	const { media, mediaUpload } = useSelect(
+	const { getSettings } = useSelect( blockEditorStore );
+	const { media } = useSelect(
 		( select ) => ( {
 			media:
 				id === undefined
 					? undefined
 					: select( coreStore ).getMedia( id ),
-			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
 		} ),
 		[ id ]
 	);
@@ -93,7 +93,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		if ( isBlobURL( href ) ) {
 			const file = getBlobByURL( href );
 
-			mediaUpload( {
+			getSettings().mediaUpload( {
 				filesList: [ file ],
 				onFileChange: ( [ newMedia ] ) => onSelectFile( newMedia ),
 				onError: onUploadError,

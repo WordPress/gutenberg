@@ -44,10 +44,10 @@ export default function ViewGrid( {
 			alignment="top"
 			className="dataviews-grid-view"
 		>
-			{ usedData.map( ( item, index ) => (
+			{ usedData.map( ( item ) => (
 				<VStack
 					spacing={ 3 }
-					key={ getItemId?.( item ) || index }
+					key={ getItemId( item ) }
 					className="dataviews-view-grid__card"
 				>
 					<div className="dataviews-view-grid__media">

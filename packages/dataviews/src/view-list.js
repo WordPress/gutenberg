@@ -47,9 +47,9 @@ export default function ViewList( {
 
 	return (
 		<ul className="dataviews-list-view">
-			{ usedData.map( ( item, index ) => {
+			{ usedData.map( ( item ) => {
 				return (
-					<li key={ getItemId?.( item ) || index }>
+					<li key={ getItemId( item ) }>
 						<div
 							role="button"
 							tabIndex={ 0 }

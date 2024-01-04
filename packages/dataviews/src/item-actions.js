@@ -17,10 +17,10 @@ import { moreVertical } from '@wordpress/icons';
 import { unlock } from './lock-unlock';
 
 const {
-	DropdownMenuV2Ariakit: DropdownMenu,
-	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
-	DropdownMenuItemV2Ariakit: DropdownMenuItem,
-	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuGroupV2: DropdownMenuGroup,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
 function ButtonTrigger( { action, onClick } ) {
@@ -186,6 +186,9 @@ function CompactItemActions( { item, primaryActions, secondaryActions } ) {
 					size="compact"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
+					disabled={
+						! primaryActions.length && ! secondaryActions.length
+					}
 				/>
 			}
 			placement="bottom-end"

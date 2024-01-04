@@ -5,7 +5,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,6 +16,8 @@ import Filters from './filters';
 import Search from './search';
 import { VIEW_LAYOUTS } from './constants';
 
+const defaultGetItemId = ( item ) => item.id;
+
 export default function DataViews( {
 	view,
 	onChangeView,
@@ -24,19 +26,22 @@ export default function DataViews( {
 	searchLabel = undefined,
 	actions,
 	data,
-	getItemId,
+	getItemId = defaultGetItemId,
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
 	onSelectionChange,
-	deferredRendering,
+	deferredRendering = false,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
 
-	const onSetSelection = ( items ) => {
-		setSelection( items.map( ( item ) => item.id ) );
-		onSelectionChange( items );
-	};
+	const onSetSelection = useCallback(
+		( items ) => {
+			setSelection( items.map( ( item ) => item.id ) );
+			onSelectionChange( items );
+		},
+		[ setSelection, onSelectionChange ]
+	);
 
 	const ViewComponent = VIEW_LAYOUTS.find(
 		( v ) => v.type === view.type
@@ -63,13 +68,13 @@ export default function DataViews( {
 							/>
 						) }
 						<Filters
-							fields={ fields }
+							fields={ _fields }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
 					<ViewActions
-						fields={ fields }
+						fields={ _fields }
 						view={ view }
 						onChangeView={ onChangeView }
 						supportedLayouts={ supportedLayouts }
@@ -79,7 +84,6 @@ export default function DataViews( {
 					fields={ _fields }
 					view={ view }
 					onChangeView={ onChangeView }
-					paginationInfo={ paginationInfo }
 					actions={ actions }
 					data={ data }
 					getItemId={ getItemId }

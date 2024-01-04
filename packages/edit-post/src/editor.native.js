@@ -50,7 +50,6 @@ class Editor extends Component {
 	getEditorSettings(
 		settings,
 		hasFixedToolbar,
-		focusMode,
 		hiddenBlockTypes,
 		blockTypes
 	) {
@@ -58,7 +57,6 @@ class Editor extends Component {
 			...settings,
 			isRTL: I18nManager.isRTL,
 			hasFixedToolbar,
-			focusMode,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -135,7 +133,6 @@ class Editor extends Component {
 		const {
 			settings,
 			hasFixedToolbar,
-			focusMode,
 			initialEdits,
 			hiddenBlockTypes,
 			blockTypes,
@@ -150,7 +147,6 @@ class Editor extends Component {
 		const editorSettings = this.getEditorSettings(
 			settings,
 			hasFixedToolbar,
-			focusMode,
 			hiddenBlockTypes,
 			blockTypes
 		);
@@ -198,7 +194,6 @@ export default compose( [
 
 		return {
 			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
-			focusMode: isFeatureActive( 'focusMode' ),
 			mode: getEditorMode(),
 			hiddenBlockTypes: getHiddenBlockTypes(),
 			blockTypes: getBlockTypes(),

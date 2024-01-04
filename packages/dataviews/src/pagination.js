@@ -6,11 +6,11 @@ import {
 	__experimentalHStack as HStack,
 	SelectControl,
 } from '@wordpress/components';
-import { createInterpolateElement } from '@wordpress/element';
+import { createInterpolateElement, memo } from '@wordpress/element';
 import { sprintf, __, _x } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 
-function Pagination( {
+const Pagination = memo( function Pagination( {
 	view,
 	onChangeView,
 	paginationInfo: { totalItems = 0, totalPages },
@@ -91,6 +91,6 @@ function Pagination( {
 			</HStack>
 		)
 	);
-}
+} );
 
 export default Pagination;

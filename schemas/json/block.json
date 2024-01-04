@@ -344,6 +344,11 @@
 					"description": "By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programmatically, set inserter to false.",
 					"default": true
 				},
+				"renaming": {
+					"type": "boolean",
+					"description": "By default, a block can be renamed by a user from the block 'Options' dropdown or the 'Advanced' panel. To disable this behavior, set renaming to false.",
+					"default": true
+				},
 				"layout": {
 					"default": false,
 					"description": "This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.",

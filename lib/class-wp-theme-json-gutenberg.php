@@ -354,6 +354,7 @@ class WP_Theme_JSON_Gutenberg {
 		'useRootPaddingAwareAlignments' => null,
 		'background'                    => array(
 			'backgroundImage' => null,
+			'backgroundSize'  => null,
 		),
 		'border'                        => array(
 			'color'  => null,
@@ -650,6 +651,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const APPEARANCE_TOOLS_OPT_INS = array(
 		array( 'background', 'backgroundImage' ),
+		array( 'background', 'backgroundSize' ),
 		array( 'border', 'color' ),
 		array( 'border', 'radius' ),
 		array( 'border', 'style' ),
@@ -695,7 +697,7 @@ class WP_Theme_JSON_Gutenberg {
 			$origin = 'theme';
 		}
 
-		$this->theme_json    = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
+		$this->theme_json    = WP_Theme_JSON_Schema::migrate( $theme_json );
 		$registry            = WP_Block_Type_Registry::get_instance();
 		$valid_block_names   = array_keys( $registry->get_all_registered() );
 		$valid_element_names = array_keys( static::ELEMENTS );
@@ -2989,7 +2991,7 @@ class WP_Theme_JSON_Gutenberg {
 	public static function remove_insecure_properties( $theme_json ) {
 		$sanitized = array();
 
-		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
+		$theme_json = WP_Theme_JSON_Schema::migrate( $theme_json );
 
 		$valid_block_names   = array_keys( static::get_blocks_metadata() );
 		$valid_element_names = array_keys( static::ELEMENTS );
