@@ -31,7 +31,7 @@ export default function DataViews( {
 	paginationInfo,
 	supportedLayouts,
 	onSelectionChange,
-	onDetailsChange,
+	onDetailsChange = null,
 	deferredRendering = false,
 } ) {
 	const [ selection, setSelection ] = useState( [] );

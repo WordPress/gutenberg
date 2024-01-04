@@ -93,14 +93,16 @@ export default function ViewList( {
 										</div>
 									</VStack>
 								</HStack>
-								<Button
-									onClick={ onDetailsChange }
-									icon={
-										isRTL() ? chevronLeft : chevronRight
-									}
-									label={ __( 'Open item details' ) }
-									showTooltip={ false }
-								/>
+								{ onDetailsChange && (
+									<Button
+										onClick={ onDetailsChange }
+										icon={
+											isRTL() ? chevronLeft : chevronRight
+										}
+										label={ __( 'Open item details' ) }
+										showTooltip={ false }
+									/>
+								) }
 							</HStack>
 						</div>
 					</li>
