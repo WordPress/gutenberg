@@ -67,7 +67,7 @@ function WritingMenu() {
 				shortcut={ displayShortcut.primaryShift( '\\' ) }
 			/>
 			<PreferenceToggleMenuItem
-				scope="core/edit-post"
+				scope="core"
 				name="focusMode"
 				label={ __( 'Spotlight mode' ) }
 				info={ __( 'Focus on one block at a time' ) }

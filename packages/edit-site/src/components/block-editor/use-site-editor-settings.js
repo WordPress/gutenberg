@@ -94,7 +94,6 @@ export function useSpecificEditorSettings() {
 	const getPostLinkProps = usePostLinkProps();
 	const {
 		templateSlug,
-		focusMode,
 		isDistractionFree,
 		hasFixedToolbar,
 		canvasMode,
@@ -121,7 +120,6 @@ export function useSpecificEditorSettings() {
 			const _context = getEditedPostContext();
 			return {
 				templateSlug: _record.slug,
-				focusMode: !! getPreference( 'core/edit-site', 'focusMode' ),
 				isDistractionFree: !! getPreference(
 					'core/edit-site',
 					'distractionFree'
@@ -144,7 +142,7 @@ export function useSpecificEditorSettings() {
 
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
-			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
+			focusMode: canvasMode !== 'view',
 			isDistractionFree,
 			hasFixedToolbar,
 			defaultRenderingMode,
@@ -156,7 +154,6 @@ export function useSpecificEditorSettings() {
 	}, [
 		settings,
 		canvasMode,
-		focusMode,
 		isDistractionFree,
 		hasFixedToolbar,
 		defaultRenderingMode,
