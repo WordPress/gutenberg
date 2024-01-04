@@ -4,11 +4,6 @@
 import type { Meta, StoryFn, StoryContext } from '@storybook/react';
 
 /**
- * WordPress dependencies
- */
-import { isRTL } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import {
@@ -53,9 +48,7 @@ const meta: Meta< typeof Placeholder > = {
 	title: 'Components/Composite/Composite (Legacy)',
 	id: 'components-composite-legacy',
 	component: Placeholder,
-	args: {
-		rtl: isRTL() || undefined,
-	},
+	args: {},
 	argTypes: {
 		baseId: {
 			description: 'ID that will serve as a base for all the items IDs.',
