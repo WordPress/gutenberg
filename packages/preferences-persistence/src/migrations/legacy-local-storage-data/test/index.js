@@ -169,6 +169,7 @@ describe( 'convertLegacyData', () => {
 		  "core/edit-site": {
 		    "complementaryArea": "edit-site/global-styles",
 		    "fixedToolbar": true,
+		    "focusMode": true,
 		    "welcomeGuide": false,
 		    "welcomeGuideStyles": false,
 		  },
