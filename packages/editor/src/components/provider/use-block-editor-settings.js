@@ -215,6 +215,8 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		[ saveEntityRecord, userCanCreatePages ]
 	);
 
+	const forceDisableFocusMode = settings.focusMode === false;
+
 	return useMemo(
 		() => ( {
 			...Object.fromEntries(
@@ -223,7 +225,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				)
 			),
 			allowRightClickOverrides,
-			focusMode,
+			focusMode: focusMode && ! forceDisableFocusMode,
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
@@ -260,6 +262,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		[
 			allowRightClickOverrides,
 			focusMode,
+			forceDisableFocusMode,
 			keepCaretInsideBlock,
 			settings,
 			hasUploadPermissions,
