@@ -318,7 +318,7 @@ function Navigation( {
 				'is-vertical': orientation === 'vertical',
 				'no-wrap': flexWrap === 'nowrap',
 				'is-responsive': isResponsive,
-				'is-collapsed': isCollapsed(),
+				'is-collapsed': isCollapsed,
 				'has-text-color': !! textColor.color || !! textColor?.class,
 				[ getColorClassName( 'color', textColor?.slug ) ]:
 					!! textColor?.slug,
