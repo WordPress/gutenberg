@@ -7,8 +7,13 @@ import * as Ariakit from '@ariakit/react';
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
-import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
+import { useInstanceId, usePrevious } from '@wordpress/compose';
+import {
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -45,7 +50,7 @@ function Tabs( {
 	const isControlled = selectedTabId !== undefined;
 
 	const { items, selectedId } = store.useState();
-	const { setSelectedId, move } = store;
+	const { setSelectedId, setActiveId, move } = store;
 
 	// Keep track of whether tabs have been populated. This is used to prevent
 	// certain effects from firing too early while tab data and relevant
@@ -154,26 +159,49 @@ function Tabs( {
 		setSelectedId,
 	] );
 
-	// In controlled mode, make sure browser focus follows the selected tab if
-	// the selection is changed while a tab is already being focused.
-	useLayoutEffect( () => {
-		if ( ! isControlled || ! selectOnMove ) {
+	const previousSelectedId = usePrevious( selectedId );
+
+	useEffect( () => {
+		if ( ! isControlled ) {
 			return;
 		}
 		const currentItem = items.find( ( item ) => item.id === selectedId );
 		const activeElement = currentItem?.element?.ownerDocument.activeElement;
-		const tabsHasFocus = items.some( ( item ) => {
-			return activeElement && activeElement === item.element;
-		} );
 
-		if (
+		const tabsHasFocus =
 			activeElement &&
+			items.some( ( item ) => {
+				return activeElement === item.element;
+			} );
+		const previousSelectedTabHadFocus =
+			previousSelectedId === activeElement?.id;
+
+		// If the previously selected tab had focus when the selection changed,
+		// move focus to the newly selected tab.
+		if (
 			tabsHasFocus &&
+			previousSelectedTabHadFocus &&
 			selectedId !== activeElement.id
 		) {
 			move( selectedId );
+			return;
 		}
-	}, [ isControlled, items, move, selectOnMove, selectedId ] );
+
+		// If a tab other than the one previously selected had focus when the
+		// selection changed, update the activeId to the currently focused tab.
+		// The activeId controls how arrow key navigation behaves. Keeping them
+		// in sync avoids confusion when navigating tabs with the keyboard.
+		if ( tabsHasFocus && ! previousSelectedTabHadFocus ) {
+			setActiveId( activeElement.id );
+		}
+	}, [
+		isControlled,
+		items,
+		move,
+		previousSelectedId,
+		selectedId,
+		setActiveId,
+	] );
 
 	const contextValue = useMemo(
 		() => ( {
