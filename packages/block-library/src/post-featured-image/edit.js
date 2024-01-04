@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { parse } from '@wordpress/blocks';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -94,22 +93,14 @@ export default function PostFeaturedImageEdit( {
 			return;
 		}
 
-		const firstImageCloser = /<!--\s+\/wp:(?:core\/)?image\s+-->/.exec(
-			postContent
-		);
-
-		if ( ! firstImageCloser ) {
-			return;
-		}
-
-		const content = postContent.slice(
-			0,
-			firstImageCloser.index + firstImageCloser[ 0 ].length
-		);
-
-		const blocks = parse( content );
-		const imageBlock = blocks.find( ( { name } ) => name === 'core/image' );
-		return imageBlock?.attributes?.id;
+		const imageOpener =
+			/<!--\s+wp:(?:core\/)?image\s+(?<attrs>{(?:(?:[^}]+|}+(?=})|(?!}\s+\/?-->).)*)?}\s+)?-->/.exec(
+				postContent
+			);
+		const imageId =
+			imageOpener?.groups?.attrs &&
+			JSON.parse( imageOpener.groups.attrs )?.id;
+		return imageId;
 	}, [ storedFeaturedImage, useFirstImageFromPost, postContent ] );
 
 	const { media, postType, postPermalink } = useSelect(
