@@ -95,12 +95,13 @@ export default function ViewList( {
 								</HStack>
 								{ onDetailsChange && (
 									<Button
+										className="dataviews-list-view__details-button"
 										onClick={ onDetailsChange }
 										icon={
 											isRTL() ? chevronLeft : chevronRight
 										}
-										label={ __( 'Open item details' ) }
-										showTooltip={ false }
+										label={ __( 'View details' ) }
+										size="compact"
 									/>
 								) }
 							</HStack>

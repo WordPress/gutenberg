@@ -220,7 +220,7 @@
 		&:focus {
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
-		h3 {
+		.edit-site-page-pages__list-view-title-field {
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
@@ -275,6 +275,10 @@
 				margin-right: 0;
 			}
 		}
+	}
+
+	.dataviews-list-view__details-button {
+		align-self: center;
 	}
 }
 
