@@ -263,12 +263,15 @@ export default function DataviewsPatterns() {
 				render: ( { item } ) => {
 					// User patterns can have their sync statuses checked directly.
 					// Non-user patterns are all unsynced for the time being.
-					const [ , notSyncedStatus ] = SYNC_FILTERS;
-					return ! item.syncStatus
-						? notSyncedStatus.label
-						: SYNC_FILTERS.find(
-								( { value } ) => value === item.syncStatus
-						  )?.label;
+					return (
+						SYNC_FILTERS.find(
+							( { value } ) => value === item.syncStatus
+						)?.label ||
+						SYNC_FILTERS.find(
+							( { value } ) =>
+								value === PATTERN_SYNC_TYPES.unsynced
+						).label
+					);
 				},
 				type: ENUMERATION_TYPE,
 				elements: SYNC_FILTERS,
