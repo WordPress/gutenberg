@@ -17,7 +17,7 @@ export default function Header( { title, subTitle, actions, onClose } ) {
 	return (
 		<HStack as="header" alignment="left" className="edit-site-page-header">
 			<FlexBlock className="edit-site-page-header__page-title">
-				<HStack alignment="left">
+				<HStack alignment="topLeft">
 					{ onClose && (
 						<Button
 							icon={ icon }
