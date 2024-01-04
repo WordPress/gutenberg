@@ -256,4 +256,22 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	public static function parse_attribute_name( $name ) {
 		return explode( '--', $name, 2 );
 	}
+
+	/**
+	 * Parse and extract the namespace and path from the given reference.
+	 *
+	 * @param string $reference Passed reference.
+	 * @param string $ns Namespace fallback.
+	 * @return array The resulting array
+	 */
+	public static function parse_reference( $reference, $ns_fallback = null ) {
+		$matches = array();
+		$has_ns  = preg_match( '/^([\w\-_\/]+)::(.+)$/', $reference, $matches );
+
+		if ( $has_ns ) {
+			return array_slice( $matches, 1 );
+		} else {
+			return array( $ns_fallback, $reference );
+		}
+	}
 }

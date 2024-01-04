@@ -311,18 +311,25 @@ function gutenberg_process_interactive_html( $html, $context, $inner_blocks = ar
 }
 
 /**
- * Resolves the reference using the store and the context from the provided
- * path.
+ * Resolves the passed reference from the store and the context under the given
+ * namespace.
  *
- * @param string $ns Namespace.
- * @param string $path Path.
+ * A reference could be either a single path or a namespace followed by a path,
+ * separated by two colons, i.e, `namespace::path.to.prop`. If the reference
+ * contains a namespace, that namespace overrides the one passed as argument.
+ *
+ * @param string $reference Reference value.
+ * @param string $ns Inherited namespace.
  * @param array  $context Context data.
- * @return mixed
+ * @return mixed Resolved value.
  */
-function gutenberg_interactivity_evaluate_reference( $ns, $path, array $context = array() ) {
-	$store = array_merge(
-		WP_Interactivity_Store::get_data()[ $ns ],
-		array( 'context' => $context[ $ns ] )
+function gutenberg_interactivity_evaluate_reference( $reference, $ns, array $context = array() ) {
+	// Extract the namespace from the reference (if present).
+	list( $ns, $path ) = WP_Directive_Processor::parse_reference( $reference, $ns );
+
+	$store = array(
+		'state'   => WP_Interactivity_Store::get_data()[ $ns ],
+		'context' => $context[ $ns ] ?? array(),
 	);
 
 	/*
