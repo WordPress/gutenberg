@@ -133,8 +133,8 @@ function proxyComposite< C extends Component >(
 			// @ts-ignore
 			LegacyComponent.displayName ?? LegacyComponent.render.name;
 
-		showDeprecationMessage( componentName, {
-			alternative: `@wordpress/components:${ componentName }`,
+		showDeprecationMessage( `wp.components.__unstable${ componentName }`, {
+			alternative: `wp.components.${ componentName }`,
 		} );
 
 		const { store, props } = manageProps( unmanagedProps );
@@ -168,6 +168,9 @@ export const CompositeItem = proxyComposite( Current.CompositeItem, {
 } );
 
 export function useCompositeState( initialState: InitialState = {} ) {
+	showDeprecationMessage( 'wp.components.__unstableUseCompositeState', {
+		alternative: 'wp.components.useCompositeStore',
+	} );
 	const { baseId, ...storeProps } = useMappedInitialState( initialState );
 	const store = Current.useCompositeStore( storeProps );
 	return { store, baseId };
