@@ -15,6 +15,10 @@ import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
+import {
+	privateApis as editorPrivateApis,
+	store as editorStore,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -23,6 +27,10 @@ import './hooks';
 import './plugins';
 import Editor from './editor';
 import { store as editPostStore } from './store';
+import { unlock } from './lock-unlock';
+
+const { PluginPostExcerpt: __experimentalPluginPostExcerpt } =
+	unlock( editorPrivateApis );
 
 /**
  * Initializes and returns an instance of Editor.
@@ -54,12 +62,16 @@ export function initializeEditor(
 		isPublishSidebarEnabled: true,
 		openPanels: [ 'post-status' ],
 		preferredStyleVariations: {},
-		showBlockBreadcrumbs: true,
-		showIconLabels: false,
-		showListViewByDefault: false,
 		themeStyles: true,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,
+	} );
+
+	dispatch( preferencesStore ).setDefaults( 'core', {
+		allowRightClickOverrides: true,
+		showBlockBreadcrumbs: true,
+		showIconLabels: false,
+		showListViewByDefault: false,
 	} );
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
@@ -67,10 +79,10 @@ export function initializeEditor(
 	// Check if the block list view should be open by default.
 	// If `distractionFree` mode is enabled, the block list view should not be open.
 	if (
-		select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) &&
+		select( preferencesStore ).get( 'core', 'showListViewByDefault' ) &&
 		! select( editPostStore ).isFeatureActive( 'distractionFree' )
 	) {
-		dispatch( editPostStore ).setIsListViewOpened( true );
+		dispatch( editorStore ).setIsListViewOpened( true );
 	}
 
 	registerCoreBlocks();
@@ -93,7 +105,7 @@ export function initializeEditor(
 		'removeTemplatePartsFromInserter',
 		( canInsert, blockType ) => {
 			if (
-				! select( editPostStore ).isEditingTemplate() &&
+				select( editorStore ).getRenderingMode() === 'post-only' &&
 				blockType.name === 'core/template-part'
 			) {
 				return false;
@@ -118,7 +130,7 @@ export function initializeEditor(
 			{ getBlockParentsByBlockName }
 		) => {
 			if (
-				! select( editPostStore ).isEditingTemplate() &&
+				select( editorStore ).getRenderingMode() === 'post-only' &&
 				blockType.name === 'core/post-content'
 			) {
 				return (
@@ -206,5 +218,5 @@ export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
 export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
-export { default as __experimentalPluginPostExcerpt } from './components/sidebar/plugin-post-excerpt';
+export { __experimentalPluginPostExcerpt };
 export { store } from './store';

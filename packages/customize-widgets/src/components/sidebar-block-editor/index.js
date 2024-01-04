@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
+import { useViewportMatch } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo, createPortal } from '@wordpress/element';
 import {
 	BlockList,
-	BlockTools,
+	BlockToolbar,
 	BlockInspector,
 	privateApis as blockEditorPrivateApis,
 	__unstableBlockSettingsMenuFirstItem,
@@ -37,6 +38,7 @@ export default function SidebarBlockEditor( {
 	inspector,
 } ) {
 	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
+	const isMediumViewport = useViewportMatch( 'small' );
 	const {
 		hasUploadPermissions,
 		isFixedToolbarActive,
@@ -77,7 +79,7 @@ export default function SidebarBlockEditor( {
 			...blockEditorSettings,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			mediaUpload: mediaUploadBlockEditor,
-			hasFixedToolbar: isFixedToolbarActive,
+			hasFixedToolbar: isFixedToolbarActive || ! isMediumViewport,
 			keepCaretInsideBlock,
 			__unstableHasCustomAppender: true,
 		};
@@ -85,6 +87,7 @@ export default function SidebarBlockEditor( {
 		hasUploadPermissions,
 		blockEditorSettings,
 		isFixedToolbarActive,
+		isMediumViewport,
 		keepCaretInsideBlock,
 		setIsInserterOpened,
 	] );
@@ -109,18 +112,20 @@ export default function SidebarBlockEditor( {
 					inserter={ inserter }
 					isInserterOpened={ isInserterOpened }
 					setIsInserterOpened={ setIsInserterOpened }
-					isFixedToolbarActive={ isFixedToolbarActive }
+					isFixedToolbarActive={
+						isFixedToolbarActive || ! isMediumViewport
+					}
 				/>
-
-				<BlockTools>
-					<BlockCanvas
-						shouldIframe={ false }
-						styles={ settings.defaultEditorStyles }
-						height="100%"
-					>
-						<BlockList renderAppender={ BlockAppender } />
-					</BlockCanvas>
-				</BlockTools>
+				{ ( isFixedToolbarActive || ! isMediumViewport ) && (
+					<BlockToolbar hideDragHandle />
+				) }
+				<BlockCanvas
+					shouldIframe={ false }
+					styles={ settings.defaultEditorStyles }
+					height="100%"
+				>
+					<BlockList renderAppender={ BlockAppender } />
+				</BlockCanvas>
 
 				{ createPortal(
 					// This is a temporary hack to prevent button component inside <BlockInspector>

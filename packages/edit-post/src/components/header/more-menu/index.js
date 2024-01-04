@@ -26,6 +26,7 @@ const MoreMenu = ( { showIconLabels } ) => {
 			toggleProps={ {
 				showTooltip: ! showIconLabels,
 				...( showIconLabels && { variant: 'tertiary' } ),
+				size: 'compact',
 			} }
 		>
 			{ ( { onClose } ) => (

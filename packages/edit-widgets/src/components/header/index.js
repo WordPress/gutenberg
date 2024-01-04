@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { BlockToolbar } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -16,11 +16,8 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import DocumentTools from './document-tools';
 import SaveButton from '../save-button';
 import MoreMenu from '../more-menu';
-import { unlock } from '../../lock-unlock';
 
-const { BlockContextualToolbar } = unlock( blockEditorPrivateApis );
-
-function Header( { setListViewToggleElement } ) {
+function Header() {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const blockToolbarRef = useRef();
 	const { hasFixedToolbar } = useSelect(
@@ -50,13 +47,11 @@ function Header( { setListViewToggleElement } ) {
 							{ __( 'Widgets' ) }
 						</VisuallyHidden>
 					) }
-					<DocumentTools
-						setListViewToggleElement={ setListViewToggleElement }
-					/>
+					<DocumentTools />
 					{ hasFixedToolbar && isLargeViewport && (
 						<>
 							<div className="selected-block-tools-wrapper">
-								<BlockContextualToolbar isFixed />
+								<BlockToolbar hideDragHandle />
 							</div>
 							<Popover.Slot
 								ref={ blockToolbarRef }

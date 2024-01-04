@@ -10,8 +10,10 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '../../store';
 
 export default function EditorKeyboardShortcuts() {
-	const { redo, undo, savePost } = useDispatch( editorStore );
-	const { isEditedPostDirty, isPostSavingLocked } = useSelect( editorStore );
+	const { redo, undo, savePost, setIsListViewOpened } =
+		useDispatch( editorStore );
+	const { isEditedPostDirty, isPostSavingLocked, isListViewOpened } =
+		useSelect( editorStore );
 
 	useShortcut( 'core/editor/undo', ( event ) => {
 		undo();
@@ -43,6 +45,14 @@ export default function EditorKeyboardShortcuts() {
 		}
 
 		savePost();
+	} );
+
+	// Only opens the list view. Other functionality for this shortcut happens in the rendered sidebar.
+	useShortcut( 'core/editor/toggle-list-view', ( event ) => {
+		if ( ! isListViewOpened() ) {
+			event.preventDefault();
+			setIsListViewOpened( true );
+		}
 	} );
 
 	return null;

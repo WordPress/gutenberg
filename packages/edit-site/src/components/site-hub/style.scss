@@ -73,7 +73,10 @@
 .edit-site-site-hub_toggle-command-center {
 	color: $gray-200;
 
-	&:hover {
-		color: $gray-100;
+	&:hover,
+	&:active {
+		svg {
+			fill: $gray-100;
+		}
 	}
 }

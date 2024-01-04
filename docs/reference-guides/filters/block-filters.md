@@ -116,7 +116,7 @@ wp.hooks.addFilter(
 );
 ```
 
-#### `blocks.getSaveContent.extraProps`
+### `blocks.getSaveContent.extraProps`
 
 A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element.
 
@@ -179,8 +179,6 @@ Used to modify the block's `edit` component. It receives the original block `Blo
 
 _Example:_
 
-{% codetabs %}
-{% JSX %}
 
 ```js
 const { createHigherOrderComponent } = wp.compose;
@@ -207,36 +205,6 @@ wp.hooks.addFilter(
 );
 ```
 
-{% Plain %}
-
-```js
-var el = React.createElement;
-
-var withMyPluginControls = wp.compose.createHigherOrderComponent( function (
-	BlockEdit
-) {
-	return function ( props ) {
-		return el(
-			React.Fragment,
-			{},
-			el( BlockEdit, props ),
-			el(
-				wp.blockEditor.InspectorControls,
-				{},
-				el( wp.components.PanelBody, {}, 'My custom control' )
-			)
-		);
-	};
-}, 'withMyPluginControls' );
-
-wp.hooks.addFilter(
-	'editor.BlockEdit',
-	'my-plugin/with-inspector-controls',
-	withMyPluginControls
-);
-```
-
-{% end %}
 
 Note that as this hook is run for _all blocks_, consuming it has potential for performance regressions particularly around block selection metrics.
 
@@ -261,14 +229,11 @@ const withMyPluginControls = createHigherOrderComponent( ( BlockEdit ) => {
 }, 'withMyPluginControls' );
 ```
 
-#### `editor.BlockListBlock`
+### `editor.BlockListBlock`
 
 Used to modify the block's wrapper component containing the block's `edit` component and all toolbars. It receives the original `BlockListBlock` component and returns a new wrapped component.
 
 _Example:_
-
-{% codetabs %}
-{% JSX %}
 
 ```js
 const { createHigherOrderComponent } = wp.compose;
@@ -294,39 +259,10 @@ wp.hooks.addFilter(
 );
 ```
 
-{% Plain %}
-
-```js
-var el = React.createElement;
-
-var withClientIdClassName = wp.compose.createHigherOrderComponent( function (
-	BlockListBlock
-) {
-	return function ( props ) {
-		var newProps = {
-			...props,
-			className: 'block-' + props.clientId,
-		};
-
-		return el( BlockListBlock, newProps );
-	};
-}, 'withClientIdClassName' );
-
-wp.hooks.addFilter(
-	'editor.BlockListBlock',
-	'my-plugin/with-client-id-class-name',
-	withClientIdClassName
-);
-```
-
-{% end %}
-
 Adding new properties to the block's wrapper component can be achieved by adding them to the `wrapperProps` property of the returned component.
 
 _Example:_
 
-{% codetabs %}
-{% JSX %}
 
 ```js
 const { createHigherOrderComponent } = wp.compose;
@@ -346,32 +282,6 @@ wp.hooks.addFilter(
 );
 ```
 
-{% Plain %}
-
-```js
-var el = React.createElement;
-var hoc = wp.compose.createHigherOrderComponent;
-
-var withMyWrapperProp = hoc( function ( BlockListBlock ) {
-	return function ( props ) {
-		var newProps = {
-			...props,
-			wrapperProps: {
-				...props.wrapperProps,
-				'data-my-property': 'the-value',
-			},
-		};
-		return el( BlockListBlock, newProps );
-	};
-}, 'withMyWrapperProp' );
-wp.hooks.addFilter(
-	'editor.BlockListBlock',
-	'my-plugin/with-my-wrapper-prop',
-	withMyWrapperProp
-);
-```
-
-{% end %}
 
 ## Removing Blocks
 
@@ -379,8 +289,6 @@ wp.hooks.addFilter(
 
 Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
 
-{% codetabs %}
-{% JSX %}
 
 ```js
 // my-plugin.js
@@ -392,16 +300,6 @@ domReady( function () {
 } );
 ```
 
-{% Plain %}
-
-```js
-// my-plugin.js
-wp.domReady( function () {
-	wp.blocks.unregisterBlockType( 'core/verse' );
-} );
-```
-
-{% end %}
 
 and load this script in the Editor
 

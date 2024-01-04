@@ -170,7 +170,7 @@ class WP_Navigation_Block_Renderer {
 		// Add directives to the submenu if needed.
 		if ( $has_submenus && $should_load_view_script ) {
 			$tags              = new WP_HTML_Tag_Processor( $inner_blocks_html );
-			$inner_blocks_html = block_core_navigation_add_directives_to_submenu( $tags, $attributes );
+			$inner_blocks_html = gutenberg_block_core_navigation_add_directives_to_submenu( $tags, $attributes );
 		}
 
 		return $inner_blocks_html;
@@ -185,7 +185,7 @@ class WP_Navigation_Block_Renderer {
 	private static function get_inner_blocks_from_navigation_post( $attributes ) {
 		$navigation_post = get_post( $attributes['ref'] );
 		if ( ! isset( $navigation_post ) ) {
-			return '';
+			return new WP_Block_List( array(), $attributes );
 		}
 
 		// Only published posts are valid. If this is changed then a corresponding change
@@ -195,7 +195,7 @@ class WP_Navigation_Block_Renderer {
 
 			// 'parse_blocks' includes a null block with '\n\n' as the content when
 			// it encounters whitespace. This code strips it.
-			$compacted_blocks = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
+			$compacted_blocks = gutenberg_block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 
 			// TODO - this uses the full navigation block attributes for the
 			// context which could be refined.
@@ -210,11 +210,11 @@ class WP_Navigation_Block_Renderer {
 	 * @return WP_Block_List Returns the inner blocks for the navigation block.
 	 */
 	private static function get_inner_blocks_from_fallback( $attributes ) {
-		$fallback_blocks = block_core_navigation_get_fallback_blocks();
+		$fallback_blocks = gutenberg_block_core_navigation_get_fallback_blocks();
 
 		// Fallback my have been filtered so do basic test for validity.
 		if ( empty( $fallback_blocks ) || ! is_array( $fallback_blocks ) ) {
-			return '';
+			return new WP_Block_List( array(), $attributes );
 		}
 
 		return new WP_Block_List( $fallback_blocks, $attributes );
@@ -245,9 +245,9 @@ class WP_Navigation_Block_Renderer {
 			defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN &&
 			array_key_exists( '__unstableLocation', $attributes ) &&
 			! array_key_exists( 'ref', $attributes ) &&
-			! empty( block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] ) )
+			! empty( gutenberg_block_core_navigation_get_menu_items_at_location( $attributes['__unstableLocation'] ) )
 		) {
-			$inner_blocks = block_core_navigation_get_inner_blocks_from_unstable_location( $attributes );
+			$inner_blocks = gutenberg_block_core_navigation_get_inner_blocks_from_unstable_location( $attributes );
 		}
 
 		// Load inner blocks from the navigation post.
@@ -270,7 +270,7 @@ class WP_Navigation_Block_Renderer {
 		 */
 		$inner_blocks = apply_filters( 'block_core_navigation_render_inner_blocks', $inner_blocks );
 
-		$post_ids = block_core_navigation_get_post_ids( $inner_blocks );
+		$post_ids = gutenberg_block_core_navigation_get_post_ids( $inner_blocks );
 		if ( $post_ids ) {
 			_prime_post_caches( $post_ids, false, false );
 		}
@@ -353,8 +353,8 @@ class WP_Navigation_Block_Renderer {
 	private static function get_classes( $attributes ) {
 		// Restore legacy classnames for submenu positioning.
 		$layout_class       = static::get_layout_class( $attributes );
-		$colors             = block_core_navigation_build_css_colors( $attributes );
-		$font_sizes         = block_core_navigation_build_css_font_sizes( $attributes );
+		$colors             = gutenberg_block_core_navigation_build_css_colors( $attributes );
+		$font_sizes         = gutenberg_block_core_navigation_build_css_font_sizes( $attributes );
 		$is_responsive_menu = static::is_responsive( $attributes );
 
 		// Manually add block support text decoration as CSS class.
@@ -378,8 +378,8 @@ class WP_Navigation_Block_Renderer {
 	 * @return string Returns the styles for the navigation block.
 	 */
 	private static function get_styles( $attributes ) {
-		$colors       = block_core_navigation_build_css_colors( $attributes );
-		$font_sizes   = block_core_navigation_build_css_font_sizes( $attributes );
+		$colors       = gutenberg_block_core_navigation_build_css_colors( $attributes );
+		$font_sizes   = gutenberg_block_core_navigation_build_css_font_sizes( $attributes );
 		$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
 		return $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'];
 	}
@@ -394,7 +394,7 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html ) {
 		$should_load_view_script = static::should_load_view_script( $attributes, $inner_blocks );
-		$colors                  = block_core_navigation_build_css_colors( $attributes );
+		$colors                  = gutenberg_block_core_navigation_build_css_colors( $attributes );
 		$modal_unique_id         = wp_unique_id( 'modal-' );
 
 		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
@@ -428,26 +428,28 @@ class WP_Navigation_Block_Renderer {
 		$responsive_dialog_directives    = '';
 		$close_button_directives         = '';
 		if ( $should_load_view_script ) {
-			$open_button_directives          = '
-				data-wp-on--click="actions.core.navigation.openMenuOnClick"
-				data-wp-on--keydown="actions.core.navigation.handleMenuKeydown"
+			$open_button_directives                  = '
+				data-wp-on--click="actions.openMenuOnClick"
+				data-wp-on--keydown="actions.handleMenuKeydown"
 			';
-			$responsive_container_directives = '
-				data-wp-class--has-modal-open="selectors.core.navigation.isMenuOpen"
-				data-wp-class--is-menu-open="selectors.core.navigation.isMenuOpen"
-				data-wp-effect="effects.core.navigation.initMenu"
-				data-wp-on--keydown="actions.core.navigation.handleMenuKeydown"
-				data-wp-on--focusout="actions.core.navigation.handleMenuFocusout"
+			$responsive_container_directives         = '
+				data-wp-class--has-modal-open="state.isMenuOpen"
+				data-wp-class--is-menu-open="state.isMenuOpen"
+				data-wp-watch="callbacks.initMenu"
+				data-wp-on--keydown="actions.handleMenuKeydown"
+				data-wp-on--focusout="actions.handleMenuFocusout"
 				tabindex="-1"
 			';
-			$responsive_dialog_directives    = '
-				data-wp-bind--aria-modal="selectors.core.navigation.ariaModal"
-				data-wp-bind--aria-label="selectors.core.navigation.ariaLabel"
-				data-wp-bind--role="selectors.core.navigation.roleAttribute"
-				data-wp-effect="effects.core.navigation.focusFirstElement"
+			$responsive_dialog_directives            = '
+				data-wp-bind--aria-modal="state.ariaModal"
+				data-wp-bind--aria-label="state.ariaLabel"
+				data-wp-bind--role="state.roleAttribute"
 			';
-			$close_button_directives         = '
-				data-wp-on--click="actions.core.navigation.closeMenuOnClick"
+			$close_button_directives                 = '
+				data-wp-on--click="actions.closeMenuOnClick"
+			';
+			$responsive_container_content_directives = '
+				data-wp-watch="callbacks.focusFirstElement"
 			';
 		}
 
@@ -457,7 +459,7 @@ class WP_Navigation_Block_Renderer {
 					<div class="wp-block-navigation__responsive-close" tabindex="-1">
 						<div class="wp-block-navigation__responsive-dialog" %12$s>
 							<button %4$s class="wp-block-navigation__responsive-container-close" %13$s>%9$s</button>
-							<div class="wp-block-navigation__responsive-container-content" id="%1$s-content">
+							<div class="wp-block-navigation__responsive-container-content" %14$s id="%1$s-content">
 								%2$s
 							</div>
 						</div>
@@ -475,7 +477,8 @@ class WP_Navigation_Block_Renderer {
 			$open_button_directives,
 			$responsive_container_directives,
 			$responsive_dialog_directives,
-			$close_button_directives
+			$close_button_directives,
+			$responsive_container_content_directives
 		);
 	}
 
@@ -521,19 +524,15 @@ class WP_Navigation_Block_Renderer {
 		// When adding to this array be mindful of security concerns.
 		$nav_element_context = wp_json_encode(
 			array(
-				'core' => array(
-					'navigation' => array(
-						'overlayOpenedBy' => array(),
-						'type'            => 'overlay',
-						'roleAttribute'   => '',
-						'ariaLabel'       => __( 'Menu' ),
-					),
-				),
+				'overlayOpenedBy' => array(),
+				'type'            => 'overlay',
+				'roleAttribute'   => '',
+				'ariaLabel'       => __( 'Menu' ),
 			),
 			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
 		);
 		return '
-			data-wp-interactive
+			data-wp-interactive=\'{"namespace":"core/navigation"}\'
 			data-wp-context=\'' . $nav_element_context . '\'
 		';
 	}
@@ -547,20 +546,28 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function handle_view_script_loading( $attributes, $block, $inner_blocks ) {
 		$should_load_view_script = static::should_load_view_script( $attributes, $inner_blocks );
+		$is_gutenberg_plugin     = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
+		$view_js_file            = 'wp-block-navigation-view';
+		$script_handles          = $block->block_type->view_script_handles;
 
-		$view_js_file = 'wp-block-navigation-view';
-
-		// If the script already exists, there is no point in removing it from viewScript.
-		if ( ! wp_script_is( $view_js_file ) ) {
-			$script_handles = $block->block_type->view_script_handles;
-
-			// If the script is not needed, and it is still in the `view_script_handles`, remove it.
-			if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
-				$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+		if ( $is_gutenberg_plugin ) {
+			if ( $should_load_view_script ) {
+				gutenberg_enqueue_module( '@wordpress/block-library/navigation-block' );
 			}
-			// If the script is needed, but it was previously removed, add it again.
-			if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
-				$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
+			// Remove the view script because we are using the module.
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+		} else {
+			// If the script already exists, there is no point in removing it from viewScript.
+			if ( ! wp_script_is( $view_js_file ) ) {
+
+				// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+				if ( ! $should_load_view_script && in_array( $view_js_file, $script_handles, true ) ) {
+					$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
+				}
+				// If the script is needed, but it was previously removed, add it again.
+				if ( $should_load_view_script && ! in_array( $view_js_file, $script_handles, true ) ) {
+					$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_js_file ) );
+				}
 			}
 		}
 	}
@@ -627,7 +634,7 @@ class WP_Navigation_Block_Renderer {
 
 		$inner_blocks = static::get_inner_blocks( $attributes, $block );
 		// Prevent navigation blocks referencing themselves from rendering.
-		if ( block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
+		if ( gutenberg_block_core_navigation_block_contains_core_navigation( $inner_blocks ) ) {
 			return '';
 		}
 

@@ -10,36 +10,6 @@ Before you begin, there are some requirements that must be met in order to succe
 
 Similar requirements apply to releasing WordPress's [npm packages](https://developer.wordpress.org/block-editor/contributors/code/release/#packages-releases-to-npm-and-wordpress-core-updates).
 
-**Table of contents**
-
--   **[Gutenberg plugin releases](#gutenberg-plugin-releases)**
-    -   [Release schedule](#release-schedule)
-    -   [Release management](#release-management)
-    -   [Preparing a release](#preparing-a-release)
-        -   [Organizing and labeling milestone PRs](#organizing-and-labeling-milestone-prs)
-        -   [Running the release workflow](#running-the-release-workflow)
-        -   [Publishing the @wordpress packages to NPM](#publishing-the-wordpress-packages-to-npm)
-        -   [Viewing the release draft](#viewing-the-release-draft)
-        -   [Curating the release changelog](#curating-the-release-changelog)
-        -   [Creating release candidate patches (cherry-picking)](#creating-release-candidate-patches-cherry-picking)
-            -   [Automated cherry-picking](#automated-cherry-picking)
-            -   [Manual cherry-picking](#manual-cherry-picking)
-        -   [Publishing the release](#publishing-the-release)
-    -   [Documenting the release](#documenting-the-release)
-        -   [Selecting the release highlights](#selecting-the-release-highlights)
-        -   [Requesting release assets](#requesting-release-assets)
-        -   [Drafting the release post](#drafting-the-release-post)
-        -   [Publishing the release post](#publishing-the-release-post)
-    -   [Creating minor releases](#creating-minor-releases)
-        -   [Updating the release branch](#updating-the-release-branch)
-        -   [Running the minor release](#running-the-minor-release)
-        -   [Creating a minor release for previous stable releases](#creating-a-minor-release-for-previous-stable-releases)
-        -   [Troubleshooting](#troubleshooting)
--   [Packages releases to NPM and WordPress Core updates](#packages-releases-to-npm-and-wordpress-core-updates)
-    -   [Synchronizing the Gutenberg plugin](#synchronizing-the-gutenberg-plugin)
-    -   [WordPress releases](#wordpress-releases)
-    -   [Development releases](#development-releases)
-
 ## Gutenberg plugin releases
 
 The first step in releasing a stable version of the Gutenberg plugin is to [create an issue](https://github.com/WordPress/gutenberg/issues/new?assignees=&labels=&projects=&template=New_release.md) in the Gutenberg repository. The issue template is called "Gutenberg Release," and it contains a checklist for the complete release process, from release candidate to changelog curation to cherry-picking, stable release, and release post. The issue for [Gutenberg 15.7](https://github.com/WordPress/gutenberg/issues/50092) is a good example.
@@ -253,6 +223,41 @@ Once approved, the new Gutenberg version will be available to WordPress users al
 
 The final step is to write a release post on [make.wordpress.org/core](https://make.wordpress.org/core/). You can find some tips on that below.
 
+#### Troubleshooting the release
+
+> The plugin was published to the WordPress.org plugin directory but the workflow failed.
+
+This has happened ocassionally, see [this one](https://github.com/WordPress/gutenberg/actions/runs/6955409957/job/18924124118) for example.
+
+It's important to check that:
+
+- the plugin from the directory works as expected
+- the ZIP contents (see [Downloads](https://plugins.trac.wordpress.org/browser/gutenberg/)) looks correct (doesn't have anything obvious missing)
+- the [Gutenberg SVN repo](https://plugins.trac.wordpress.org/browser/gutenberg/) has two new commits (see [the log](https://plugins.trac.wordpress.org/browser/gutenberg/)):
+  - the `trunk` folder should have "Commiting version X.Y.Z"
+  - there is a new `tags/X.Y.Z` folder with the same contents as `trunk` whose latest commit is "Tagging version X.Y.Z"
+
+Most likely, the tag folder couldn't be created. This is a [known issue](https://plugins.trac.wordpress.org/browser/gutenberg/) that [can be fixed manually](https://github.com/WordPress/gutenberg/issues/55295#issuecomment-1759292978).
+
+Either substitute SVN_USERNAME, SVN_PASSWORD, and VERSION for the proper values or set them as global environment variables first:
+
+```sh
+# CHECKOUT THE REPOSITORY
+svn checkout https://plugins.svn.wordpress.org/gutenberg/trunk --username "$SVN_USERNAME" --password "$SVN_PASSWORD" gutenberg-svn
+
+# MOVE TO THE LOCAL FOLDER
+cd gutenberg-svn
+
+# IF YOU HAPPEN TO HAVE ALREADY THE REPO LOCALLY
+# AND DIDN'T CHECKOUT, MAKE SURE IT IS UPDATED
+# svn up .
+
+# COPY CURRENT TRUNK INTO THE NEW TAGS FOLDER
+svn copy https://plugins.svn.wordpress.org/gutenberg/trunk https://plugins.svn.wordpress.org/gutenberg/tags/$VERSION -m 'Tagging version $VERSION' --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+```
+
+Ask around if you need help with any of this.
+
 ### Documenting the release
 
 Documenting the release is led by the release manager with the help of [Gutenberg development team](https://developer.wordpress.org/block-editor/block-editor/contributors/repository-management/#teams) members. This process is comprised of a series of sequential steps that, because of the number of people involved, and the coordination required, need to adhere to a timeline between the RC and stable releases. Stable Gutenberg releases happen on Wednesdays, one week after the initial RC.
@@ -422,7 +427,7 @@ Now, the `wp/X.Y` branch is ready for publishing npm packages. In order to start
 
 ![Run workflow dropdown for npm publishing](https://developer.wordpress.org/files/2023/07/image-2.png)
 
-To publish packages to npm for the WordPress major release, select `wp` from the "Release type" dropdown and enter `X.Y` (example `5.2`) in the "WordPress major release" input field. Finally, press the green "Run workflow" button. It triggers the npm publishing job, and this needs to be approved by a Gutenberg Core team member. Locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) for the current publishing, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
+To publish packages to npm for the WordPress major release, select `trunk` as the branch to run the workflow from (this means that the script used to run the workflow comes from the trunk branch, though the packages themselves will published from the release branch as long as the correct "Release type" is selected below), then select `wp` from the "Release type" dropdown and enter `X.Y` (example `5.2`) in the "WordPress major release" input field. Finally, press the green "Run workflow" button. It triggers the npm publishing job, and this needs to be approved by a Gutenberg Core team member. Locate the ["Publish npm packages" action](https://github.com/WordPress/gutenberg/actions/workflows/publish-npm-packages.yml) for the current publishing, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 
 For the record, the manual process would look like the following:
 

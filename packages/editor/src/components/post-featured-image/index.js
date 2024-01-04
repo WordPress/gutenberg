@@ -115,7 +115,9 @@ function PostFeaturedImage( {
 					setIsLoading( true );
 					return;
 				}
-				onUpdateImage( image );
+				if ( image ) {
+					onUpdateImage( image );
+				}
 				setIsLoading( false );
 			},
 			onError( message ) {
@@ -206,8 +208,6 @@ function PostFeaturedImage( {
 										<Button
 											className="editor-post-featured-image__action"
 											onClick={ open }
-											// Prefer that screen readers use the .editor-post-featured-image__preview button.
-											aria-hidden="true"
 										>
 											{ __( 'Replace' ) }
 										</Button>

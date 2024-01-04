@@ -86,178 +86,6 @@
 }
 
 /**
- * Block Toolbar when contextual.
- */
-
-.block-editor-block-contextual-toolbar {
-	// Block UI appearance.
-	display: inline-flex;
-	border: $border-width solid $gray-900;
-	border-radius: $radius-block-ui;
-	background-color: $white;
-
-	.block-editor-block-toolbar .components-toolbar-group,
-	.block-editor-block-toolbar .components-toolbar {
-		border-right-color: $gray-900;
-	}
-
-	&.is-fixed {
-		overflow: hidden;
-
-		.block-editor-block-toolbar {
-			overflow: auto;
-			overflow-y: hidden;
-		}
-
-		border-bottom: $border-width solid $gray-200;
-		border-radius: 0;
-
-		.block-editor-block-toolbar .components-toolbar-group,
-		.block-editor-block-toolbar .components-toolbar {
-			border-right-color: $gray-200;
-		}
-	}
-
-	@include break-medium() {
-		&.is-fixed {
-			& > .block-editor-block-toolbar {
-				flex-grow: initial;
-				width: initial;
-
-				// Add a border as separator in the block toolbar.
-				&::before {
-					content: "";
-					width: $border-width;
-					height: 3 * $grid-unit;
-					margin-top: $grid-unit + $grid-unit-05;
-					margin-right: 0;
-					background-color: $gray-300;
-					position: relative;
-					left: math.div(-$grid-unit-05, 2);
-					top: -1px;
-				}
-			}
-
-			& > .block-editor-block-toolbar__group-collapse-fixed-toolbar {
-				border: none;
-
-				.show-icon-labels & {
-					.components-button.has-icon {
-						// Hide the button icons when labels are set to display...
-						svg {
-							display: none;
-						}
-						// ... and display labels.
-						&::after {
-							content: attr(aria-label);
-							font-size: $helptext-font-size;
-						}
-					}
-				}
-
-				// Add a border as separator in the block toolbar.
-				&::before {
-					content: "";
-					width: $border-width;
-					height: 3 * $grid-unit;
-					margin-top: $grid-unit + $grid-unit-05;
-					margin-right: $grid-unit-10;
-					background-color: $gray-300;
-					position: relative;
-					left: 0;
-					top: -1px;
-				}
-			}
-
-			& > .block-editor-block-toolbar__group-expand-fixed-toolbar {
-				border: none;
-
-				.show-icon-labels & {
-					width: $grid-unit-80 * 4;
-					.components-button.has-icon {
-						// Hide the button icons when labels are set to display...
-						svg {
-							display: none;
-						}
-						// ... and display labels.
-						&::after {
-							content: attr(aria-label);
-							font-size: $helptext-font-size;
-						}
-					}
-				}
-
-				// Add a border as separator in the block toolbar.
-				&::before {
-					content: "";
-					width: $border-width;
-					margin-top: $grid-unit + $grid-unit-05;
-					margin-bottom: $grid-unit + $grid-unit-05;
-					background-color: $gray-300;
-					position: relative;
-					left: -8px;
-					height: 3 * $grid-unit;
-					top: -1px;
-				}
-			}
-
-			.show-icon-labels & {
-				.block-editor-block-parent-selector .block-editor-block-parent-selector__button::after {
-					left: 0;
-				}
-
-				.block-editor-block-toolbar__block-controls .block-editor-block-mover {
-					border-left: none;
-					&::before {
-						content: "";
-						width: $border-width;
-						margin-top: $grid-unit + $grid-unit-05;
-						margin-bottom: $grid-unit + $grid-unit-05;
-						background-color: $gray-300;
-						position: relative;
-					}
-				}
-			}
-		}
-
-		&.is-fixed .block-editor-block-parent-selector {
-
-			.block-editor-block-parent-selector__button {
-				position: relative;
-				top: -1px;
-				border: 0;
-				padding-right: 6px;
-				padding-left: 6px;
-
-				&::after {
-					content: "\00B7";
-					font-size: 16px;
-					line-height: $grid-unit-40 + $grid-unit-10;
-					position: absolute;
-					left: $grid-unit-40 + $grid-unit-15 + 2px;
-					bottom: $grid-unit-05;
-				}
-			}
-		}
-
-		&:not(.is-fixed) .block-editor-block-parent-selector {
-			position: absolute;
-			top: -$border-width;
-			left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
-
-			.show-icon-labels & {
-				position: relative;
-				left: auto;
-				top: auto;
-				margin-top: -$border-width;
-				margin-left: -$border-width;
-				margin-bottom: -$border-width;
-			}
-		}
-	}
-}
-
-/**
  * Block Label for Navigation/Selection Mode
  */
 
@@ -349,12 +177,37 @@
 }
 
 .components-popover.block-editor-block-list__block-popover {
+
 	// Position the block toolbar.
 	.block-editor-block-list__block-selection-button,
 	.block-editor-block-contextual-toolbar {
 		pointer-events: all;
 		margin-top: $grid-unit-15;
 		margin-bottom: $grid-unit-15;
+	}
+
+	.block-editor-block-contextual-toolbar {
+		border: $border-width solid $gray-900;
+		border-radius: $radius-block-ui;
+		overflow: visible; // allow the parent selector to be visible
+		position: static;
+		width: auto;
+
+		&.has-parent {
+			margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
+			.show-icon-labels & {
+				margin-left: 0;
+			}
+		}
+	}
+
+	.block-editor-block-toolbar {
+		overflow: visible;
+	}
+
+	.block-editor-block-toolbar .components-toolbar-group,
+	.block-editor-block-toolbar .components-toolbar {
+		border-right-color: $gray-900;
 	}
 
 	// Hide the block toolbar if the insertion point is shown.
@@ -367,6 +220,41 @@
 		// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details.
 		// It's essential to hide the toolbar/popover so that `dragEnter` events can pass through them to the underlying elements.
 		animation: hide-during-dragging 1ms linear forwards;
+	}
+
+	.block-editor-block-parent-selector {
+		position: absolute;
+		left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
+
+		&::before {
+			content: "";
+		}
+
+		.block-editor-block-parent-selector__button {
+			border: 1px solid $gray-900;
+			padding-right: 6px;
+			padding-left: 6px;
+			background-color: $white;
+		}
+	}
+
+	// Show Icon Label Styles
+	.show-icon-labels & {
+
+		.block-editor-block-parent-selector {
+			position: static;
+			margin-top: -$border-width;
+			margin-left: -$border-width;
+			margin-bottom: -$border-width;
+
+			.block-editor-block-parent-selector__button {
+				position: static;
+			}
+		}
+		.block-editor-block-mover__move-button-container,
+		.block-editor-block-toolbar__block-controls .block-editor-block-mover {
+			border-left: 1px solid $gray-900;
+		}
 	}
 }
 

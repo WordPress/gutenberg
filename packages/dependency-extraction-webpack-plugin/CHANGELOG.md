@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- Drop support for webpack 4.
+- Drop support for Node.js versions < 18.
+
+## 4.31.0 (2023-12-13)
+
+## 4.30.0 (2023-11-29)
+
+## 4.29.0 (2023-11-16)
+
 ## 4.28.0 (2023-11-02)
 
 ## 4.27.0 (2023-10-18)

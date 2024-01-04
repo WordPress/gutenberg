@@ -21,7 +21,7 @@ import { search, closeSmall } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import TabLayout from './tab-layout';
+import TabPanelLayout from './tab-panel-layout';
 import { FontLibraryContext } from './context';
 import FontsGrid from './fonts-grid';
 import FontCard from './font-card';
@@ -156,7 +156,7 @@ function FontCollection( { id } ) {
 	};
 
 	return (
-		<TabLayout
+		<TabPanelLayout
 			title={
 				! selectedFont ? selectedCollection.name : selectedFont.name
 			}
@@ -270,7 +270,7 @@ function FontCollection( { id } ) {
 					) ) }
 				</FontsGrid>
 			) }
-		</TabLayout>
+		</TabPanelLayout>
 	);
 }
 

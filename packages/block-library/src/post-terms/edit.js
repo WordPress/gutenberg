@@ -97,7 +97,6 @@ export default function PostTermsEdit( {
 					<RichText
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__prefix"
-						multiline={ false }
 						aria-label={ __( 'Prefix' ) }
 						placeholder={ __( 'Prefix' ) + ' ' }
 						value={ prefix }
@@ -141,7 +140,6 @@ export default function PostTermsEdit( {
 					<RichText
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__suffix"
-						multiline={ false }
 						aria-label={ __( 'Suffix' ) }
 						placeholder={ ' ' + __( 'Suffix' ) }
 						value={ suffix }

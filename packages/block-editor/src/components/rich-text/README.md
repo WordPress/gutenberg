@@ -80,41 +80,6 @@ trimmed.
 
 ## Example
 
-{% codetabs %}
-{% ES5 %}
-
-```js
-wp.blocks.registerBlockType( /* ... */, {
-	// ...
-
-	attributes: {
-		content: {
-			source: 'html',
-			selector: 'h2',
-		},
-	},
-
-	edit: function( props ) {
-		return React.createElement( wp.blockEditor.RichText, {
-			tagName: 'h2',
-			className: props.className,
-			value: props.attributes.content,
-			onChange: function( content ) {
-				props.setAttributes( { content: content } );
-			}
-		} );
-	},
-
-	save: function( props ) {
-		return React.createElement( wp.blockEditor.RichText.Content, {
-			tagName: 'h2', value: props.attributes.content
-		} );
-	}
-} );
-```
-
-{% ESNext %}
-
 ```js
 import { registerBlockType } from '@wordpress/blocks';
 import { RichText } from '@wordpress/block-editor';
@@ -146,7 +111,6 @@ registerBlockType( /* ... */, {
 } );
 ```
 
-{% end %}
 
 ## RichTextToolbarButton
 
@@ -154,26 +118,6 @@ Slot to extend the format toolbar. Use it in the edit function of a `registerFor
 
 ### Example
 
-{% codetabs %}
-{% ES5 %}
-
-```js
-wp.richText.registerFormatType( /* ... */, {
-	/* ... */
-	edit: function( props ) {
-		return React.createElement(
-			wp.blockEditor.RichTextToolbarButton, {
-				icon: 'editor-code',
-				title: 'My formatting button',
-				onClick: function() { /* ... */ }
-				isActive: props.isActive,
-			} );
-	},
-	/* ... */
-} );
-```
-
-{% ESNext %}
 
 ```js
 import { registerFormatType } from '@wordpress/rich-text';
@@ -194,5 +138,3 @@ registerFormatType( /* ... */, {
 	/* ... */
 } );
 ```
-
-{% end %}

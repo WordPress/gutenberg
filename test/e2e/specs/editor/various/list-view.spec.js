@@ -421,7 +421,7 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 	} );
 
-	test( 'should duplicate, delete, and deselect blocks using keyboard', async ( {
+	test( 'should select, duplicate, delete, and deselect blocks using keyboard', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -464,6 +464,116 @@ test.describe( 'List View', () => {
 				{ name: 'core/file', selected: true, focused: true },
 			] );
 
+		// Move up to columns block, expand, and then move to the first column block.
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowDown' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'The last inserted block should be selected, while the first column block should be focused.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group' },
+				{
+					name: 'core/columns',
+					innerBlocks: [
+						{ name: 'core/column', selected: false, focused: true },
+						{ name: 'core/column' },
+					],
+				},
+				{ name: 'core/file', selected: true, focused: false },
+			] );
+
+		// Select all sibling column blocks at current level.
+		await pageUtils.pressKeys( 'primary+a' );
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'All column blocks should be selected, with the first one focused.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group', selected: false, focused: false },
+				{
+					name: 'core/columns',
+					innerBlocks: [
+						{ name: 'core/column', selected: true, focused: true },
+						{ name: 'core/column', selected: true, focused: false },
+					],
+					selected: false,
+				},
+				{ name: 'core/file', selected: false, focused: false },
+			] );
+
+		// Select next parent (the columns block).
+		await pageUtils.pressKeys( 'primary+a' );
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'The columns block should be selected and focused.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group', selected: false, focused: false },
+				{
+					name: 'core/columns',
+					innerBlocks: [
+						{ name: 'core/column' },
+						{ name: 'core/column' },
+					],
+					selected: true,
+					focused: true,
+				},
+				{ name: 'core/file', selected: false, focused: false },
+			] );
+
+		// Select all siblings at root level.
+		await pageUtils.pressKeys( 'primary+a' );
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'All blocks should be selected.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group', selected: true, focused: false },
+				{
+					name: 'core/columns',
+					innerBlocks: [
+						{ name: 'core/column' },
+						{ name: 'core/column' },
+					],
+					selected: true,
+					focused: true,
+				},
+				{ name: 'core/file', selected: true, focused: false },
+			] );
+
+		// Deselect blocks via Escape key.
+		await page.keyboard.press( 'Escape' );
+		// Collapse the columns block.
+		await page.keyboard.press( 'ArrowLeft' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'All blocks should be deselected, with focus on the Columns block.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group', selected: false, focused: false },
+				{
+					name: 'core/columns',
+					selected: false,
+					focused: true,
+				},
+				{ name: 'core/file', selected: false, focused: false },
+			] );
+
+		// Move focus and selection to the file block to set up for testing duplication.
+		await listView
+			.getByRole( 'gridcell', { name: 'File', exact: true } )
+			.dblclick();
+
+		// Test duplication behaviour.
 		await pageUtils.pressKeys( 'primaryShift+d' );
 
 		await expect

@@ -62,10 +62,6 @@ const restrictedImports = [
 		message: 'Please use `combineReducers` from `@wordpress/data` instead.',
 	},
 	{
-		name: 'puppeteer-testing-library',
-		message: '`puppeteer-testing-library` is still experimental.',
-	},
-	{
 		name: '@emotion/css',
 		message:
 			'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
@@ -331,6 +327,7 @@ module.exports = {
 						message: 'Prefer page.locator instead.',
 					},
 				],
+				'playwright/no-conditional-in-test': 'off',
 				'@typescript-eslint/await-thenable': 'error',
 				'@typescript-eslint/no-floating-promises': 'error',
 				'@typescript-eslint/no-misused-promises': 'error',

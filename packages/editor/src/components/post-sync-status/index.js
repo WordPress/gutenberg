@@ -4,7 +4,6 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import {
-	PanelRow,
 	Modal,
 	Button,
 	__experimentalHStack as HStack,
@@ -17,6 +16,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
+import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -44,14 +44,13 @@ export default function PostSyncStatus() {
 	}
 
 	return (
-		<PanelRow className="edit-post-sync-status">
-			<span>{ __( 'Sync status' ) }</span>
-			<div>
+		<PostPanelRow label={ __( 'Sync status' ) }>
+			<div className="editor-post-sync-status__value">
 				{ syncStatus === 'unsynced'
 					? __( 'Not synced' )
 					: __( 'Fully synced' ) }
 			</div>
-		</PanelRow>
+		</PostPanelRow>
 	);
 }
 
@@ -114,7 +113,7 @@ export function PostSyncStatusModal() {
 									'Option that makes an individual pattern synchronized'
 								) }
 								help={ __(
-									'Editing the pattern will update it anywhere it is used.'
+									'Sync this pattern across multiple locations.'
 								) }
 								checked={ ! syncType }
 								onChange={ () => {

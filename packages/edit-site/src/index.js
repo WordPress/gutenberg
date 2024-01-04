@@ -54,15 +54,19 @@ export function initializeEditor( id, settings ) {
 	dispatch( preferencesStore ).setDefaults( 'core/edit-site', {
 		editorMode: 'visual',
 		fixedToolbar: false,
-		focusMode: false,
 		distractionFree: false,
-		keepCaretInsideBlock: false,
 		welcomeGuide: true,
 		welcomeGuideStyles: true,
 		welcomeGuidePage: true,
 		welcomeGuideTemplate: true,
-		showListViewByDefault: false,
+	} );
+
+	dispatch( preferencesStore ).setDefaults( 'core', {
+		allowRightClickOverrides: true,
+		focusMode: false,
+		keepCaretInsideBlock: false,
 		showBlockBreadcrumbs: true,
+		showListViewByDefault: false,
 	} );
 
 	dispatch( interfaceStore ).setDefaultComplementaryArea(
