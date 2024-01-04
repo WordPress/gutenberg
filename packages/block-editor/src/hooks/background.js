@@ -145,9 +145,7 @@ function resetBackgroundSize( style = {}, setAttributes ) {
  * @return {string} CSS class name.
  */
 export function getBackgroundImageClasses( style ) {
-	return classnames( {
-		'has-background': hasBackgroundImageValue( style ),
-	} );
+	return hasBackgroundImageValue( style ) ? 'has-background' : '';
 }
 
 function InspectorImagePreview( { label, filename, url: imgUrl } ) {
