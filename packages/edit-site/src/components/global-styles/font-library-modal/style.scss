@@ -94,16 +94,15 @@
 	justify-content: center;
 	height: 250px;
 	width: 100%;
+}
+
+button.font-library-modal__upload-area {
 	background-color: #f0f0f0;
 }
 
 .font-library-modal__local-fonts {
 	margin: 0 auto;
 	width: 80%;
-
-	.font-library-modal__upload-area__progress-bar {
-		margin: 0 auto; // Inherit does not work here, because it's inside a flex Item.
-	}
 
 	.font-library-modal__upload-area__text {
 		color: #6e6e6e;
