@@ -139,7 +139,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 					<DropdownMenuItem
 						prefix={ <Icon icon={ unseen } /> }
 						onClick={ () => {
-							onHide?.( field );
+							onHide( field );
 							onChangeView( {
 								...view,
 								hiddenFields: view.hiddenFields.concat(
