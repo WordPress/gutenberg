@@ -51,7 +51,7 @@ Some examples of core blocks whose output for the front end is statically genera
 
 ## Blocks with Dynamic Rendering
 
-Blocks with Dynamic Rendering (a.k.a. Dynamic Blocks) are blocks that **build their structure and content on the fly when the block is requested from the client**.
+Blocks with dynamic rendering are blocks that **build their structure and content on the fly when the block is requested from the client**. This type is block is often called a "dynamic block".
 
 ![](https://developer.wordpress.org/files/2023/12/dynamic-rendering.png)
 
