@@ -401,3 +401,7 @@
 	display: block;
 	width: 24px;
 }
+
+.dataviews-bulk-edit-button.components-button.is-secondary {
+	padding-right: $grid-unit-15 + 2px;
+}
