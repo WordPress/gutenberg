@@ -314,6 +314,10 @@ function LinkControl( {
 
 	const showActions = hasLinkValue;
 
+	// Show the input if there is not a link value or if the link value
+	// does not represent a Post object.
+	const showSearchInput = ! hasLinkValue || ! value?.id;
+
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
@@ -351,23 +355,27 @@ function LinkControl( {
 					'has-actions': showActions,
 				} ) }
 			>
-				<LinkControlSearchInput
-					currentLink={ value }
-					className="block-editor-link-control__field block-editor-link-control__search-input"
-					placeholder={ searchInputPlaceholder }
-					value={ currentUrlInputValue }
-					withCreateSuggestion={ withCreateSuggestion }
-					onCreateSuggestion={ createPage }
-					onChange={ setInternalURLInputValue }
-					onSelect={ handleSelectSuggestion }
-					showInitialSuggestions={ showInitialSuggestions }
-					allowDirectEntry={ ! noDirectEntry }
-					showSuggestions={ showSuggestions }
-					suggestionsQuery={ suggestionsQuery }
-					withURLSuggestion={ ! noURLSuggestion }
-					createSuggestionButtonText={ createSuggestionButtonText }
-					hideLabelFromVision={ ! showTextControl }
-				/>
+				{ showSearchInput && (
+					<LinkControlSearchInput
+						currentLink={ value }
+						className="block-editor-link-control__field block-editor-link-control__search-input"
+						placeholder={ searchInputPlaceholder }
+						value={ currentUrlInputValue }
+						withCreateSuggestion={ withCreateSuggestion }
+						onCreateSuggestion={ createPage }
+						onChange={ setInternalURLInputValue }
+						onSelect={ handleSelectSuggestion }
+						showInitialSuggestions={ showInitialSuggestions }
+						allowDirectEntry={ ! noDirectEntry }
+						showSuggestions={ showSuggestions }
+						suggestionsQuery={ suggestionsQuery }
+						withURLSuggestion={ ! noURLSuggestion }
+						createSuggestionButtonText={
+							createSuggestionButtonText
+						}
+						hideLabelFromVision={ ! showTextControl }
+					/>
+				) }
 
 				{ showTextControl && (
 					<TextControl
