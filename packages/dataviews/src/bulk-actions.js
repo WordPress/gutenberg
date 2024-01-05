@@ -7,7 +7,7 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { useMemo, useState, useRef, useCallback } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,7 +25,7 @@ function ActionWithModal( {
 	action,
 	selectedItems,
 	setActionWithModal,
-	bulkActionsButtonRef,
+	onMenuOpenChange,
 } ) {
 	const eligibleItems = useMemo( () => {
 		return selectedItems.filter( ( item ) => action.isEligible( item ) );
@@ -33,11 +33,7 @@ function ActionWithModal( {
 	const { RenderModal, hideModalHeader } = action;
 	const onCloseModal = useCallback( () => {
 		setActionWithModal( undefined );
-		// Focus the bulk actions button.
-		if ( bulkActionsButtonRef?.current?.focus ) {
-			bulkActionsButtonRef.current.focus();
-		}
-	}, [ setActionWithModal, bulkActionsButtonRef ] );
+	}, [ setActionWithModal ] );
 	return (
 		<Modal
 			title={ ! hideModalHeader && action.label }
@@ -45,36 +41,33 @@ function ActionWithModal( {
 			onRequestClose={ onCloseModal }
 			overlayClassName="dataviews-action-modal"
 		>
-			<RenderModal items={ eligibleItems } closeModal={ onCloseModal } />
+			<RenderModal
+				items={ eligibleItems }
+				closeModal={ onCloseModal }
+				onPerform={ () => onMenuOpenChange( false ) }
+			/>
 		</Modal>
 	);
 }
 
-function BulkActionItem( {
-	action,
-	selectedItems,
-	onMenuOpenChange,
-	setActionWithModal,
-	bulkActionsButtonRef,
-} ) {
+function BulkActionItem( { action, selectedItems, setActionWithModal } ) {
 	const eligibleItems = useMemo( () => {
 		return selectedItems.filter( ( item ) => action.isEligible( item ) );
 	}, [ action, selectedItems ] );
+
+	const shouldShowModal = !! action.RenderModal;
+
 	return (
 		<DropdownMenuItem
 			key={ action.id }
 			disabled={ eligibleItems.length === 0 }
-			onClick={ async ( event ) => {
-				event.preventDefault();
-				if ( !! action.RenderModal ) {
-					onMenuOpenChange( false );
+			hideOnClick={ ! shouldShowModal }
+			onClick={ async () => {
+				if ( shouldShowModal ) {
 					setActionWithModal( action );
 				} else {
 					await action.callback( eligibleItems );
-					// Click the bulk actions button to close the dropdown and focus the button.
-					if ( bulkActionsButtonRef?.current?.click ) {
-						bulkActionsButtonRef.current.click();
-					}
+					onSelectionChange( [] );
 				}
 			} }
 			suffix={
@@ -86,13 +79,7 @@ function BulkActionItem( {
 	);
 }
 
-function ActionsMenuGroup( {
-	actions,
-	selectedItems,
-	onMenuOpenChange,
-	setActionWithModal,
-	bulkActionsButtonRef,
-} ) {
+function ActionsMenuGroup( { actions, selectedItems, setActionWithModal } ) {
 	return (
 		<>
 			<DropdownMenuGroup>
@@ -101,9 +88,7 @@ function ActionsMenuGroup( {
 						key={ action.id }
 						action={ action }
 						selectedItems={ selectedItems }
-						onMenuOpenChange={ onMenuOpenChange }
 						setActionWithModal={ setActionWithModal }
-						bulkActionsButtonRef={ bulkActionsButtonRef }
 					/>
 				) ) }
 			</DropdownMenuGroup>
@@ -131,7 +116,7 @@ export default function BulkActions( {
 			selection.includes( getItemId( item ) )
 		);
 	}, [ selection, data, getItemId ] );
-	const bulkActionsButtonRef = useRef();
+
 	if ( bulkActions.length === 0 ) {
 		return null;
 	}
@@ -143,7 +128,6 @@ export default function BulkActions( {
 				label={ __( 'Filters' ) }
 				trigger={
 					<Button
-						ref={ bulkActionsButtonRef }
 						className="dataviews-bulk-edit-button"
 						__next40pxDefaultSize
 						variant="secondary"
@@ -164,19 +148,14 @@ export default function BulkActions( {
 			>
 				<ActionsMenuGroup
 					actions={ bulkActions }
-					data={ data }
-					selection={ selection }
-					getItemId={ getItemId }
-					onMenuOpenChange={ onMenuOpenChange }
 					setActionWithModal={ setActionWithModal }
 					selectedItems={ selectedItems }
-					bulkActionsButtonRef={ bulkActionsButtonRef }
 				/>
 				<DropdownMenuGroup>
 					<DropdownMenuItem
 						disabled={ areAllSelected }
-						onClick={ ( event ) => {
-							event.preventDefault();
+						hideOnClick={ false }
+						onClick={ () => {
 							onSelectionChange( data );
 						} }
 						suffix={ data.length }
@@ -185,8 +164,8 @@ export default function BulkActions( {
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						disabled={ selection.length === 0 }
-						onClick={ ( event ) => {
-							event.preventDefault();
+						hideOnClick={ false }
+						onClick={ () => {
 							onSelectionChange( [] );
 						} }
 					>
@@ -199,7 +178,7 @@ export default function BulkActions( {
 					action={ actionWithModal }
 					selectedItems={ selectedItems }
 					setActionWithModal={ setActionWithModal }
-					bulkActionsButtonRef={ bulkActionsButtonRef }
+					onMenuOpenChange={ onMenuOpenChange }
 				/>
 			) }
 		</>

@@ -114,7 +114,7 @@ export const deleteTemplateAction = {
 	isEligible: isTemplateRemovable,
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items: templates, closeModal } ) => {
+	RenderModal: ( { items: templates, closeModal, onPerform } ) => {
 		const { removeTemplate } = useDispatch( editSiteStore );
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
@@ -185,6 +185,7 @@ export const deleteTemplateAction = {
 									allowUndo: false,
 								} );
 							}
+							onPerform();
 							closeModal();
 						} }
 					>
