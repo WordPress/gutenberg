@@ -9,6 +9,8 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -28,7 +30,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableGalleryWithImageBlocks',
 	'alignWide',
 	'allowedBlockTypes',
-	'allowRightClickOverrides',
 	'blockInspectorTabs',
 	'allowedMimeTypes',
 	'bodyPlaceholder',
@@ -46,12 +47,11 @@ const BLOCK_EDITOR_SETTINGS = [
 	'enableCustomSpacing',
 	'enableCustomUnits',
 	'enableOpenverseMediaCategory',
-	'focusMode',
 	'distractionFree',
 	'fontSizes',
 	'gradients',
 	'generateAnchors',
-	'hasFixedToolbar',
+	'getPostLinkProps',
 	'hasInlineToolbar',
 	'isDistractionFree',
 	'imageDefaultSize',
@@ -59,7 +59,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'imageEditing',
 	'imageSizes',
 	'isRTL',
-	'keepCaretInsideBlock',
 	'locale',
 	'maxWidth',
 	'onUpdateDefaultBlockStyles',
@@ -88,7 +87,12 @@ const BLOCK_EDITOR_SETTINGS = [
  * @return {Object} Block Editor Settings.
  */
 function useBlockEditorSettings( settings, postType, postId ) {
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
+		allowRightClickOverrides,
+		focusMode,
+		hasFixedToolbar,
+		keepCaretInsideBlock,
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
@@ -110,17 +114,26 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				getBlockPatterns,
 				getBlockPatternCategories,
 			} = select( coreStore );
+			const { get } = select( preferencesStore );
 
 			const siteSettings = canUser( 'read', 'settings' )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
 
 			return {
+				allowRightClickOverrides: get(
+					'core',
+					'allowRightClickOverrides'
+				),
 				canUseUnfilteredHTML: getRawEntityRecord(
 					'postType',
 					postType,
 					postId
 				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
+				focusMode: get( 'core', 'focusMode' ),
+				hasFixedToolbar:
+					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
+				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				reusableBlocks: isWeb
 					? getEntityRecords( 'postType', 'wp_block', {
 							per_page: -1,
@@ -135,7 +148,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				restBlockPatternCategories: getBlockPatternCategories(),
 			};
 		},
-		[ postType, postId ]
+		[ postType, postId, isLargeViewport ]
 	);
 
 	const settingsBlockPatterns =
@@ -202,6 +215,8 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		[ saveEntityRecord, userCanCreatePages ]
 	);
 
+	const forceDisableFocusMode = settings.focusMode === false;
+
 	return useMemo(
 		() => ( {
 			...Object.fromEntries(
@@ -209,6 +224,10 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					BLOCK_EDITOR_SETTINGS.includes( key )
 				)
 			),
+			allowRightClickOverrides,
+			focusMode: focusMode && ! forceDisableFocusMode,
+			hasFixedToolbar,
+			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
@@ -241,6 +260,11 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 		} ),
 		[
+			allowRightClickOverrides,
+			focusMode,
+			forceDisableFocusMode,
+			hasFixedToolbar,
+			keepCaretInsideBlock,
 			settings,
 			hasUploadPermissions,
 			reusableBlocks,

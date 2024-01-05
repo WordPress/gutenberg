@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.110.0
 -   [*] [internal] Move InserterButton from components package to block-editor package [#56494]
 -   [*] [internal] Move ImageLinkDestinationsScreen from components package to block-editor package [#56775]
 -   [*] Fix crash when blockType wrapperProps are not defined [#56846]
@@ -17,6 +19,8 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Fix crash when sharing unsupported media types on Android [#56791]
 -   [**] Fix regressions with wrapper props and font size customization [#56985]
 -   [***] Avoid keyboard dismiss when interacting with text blocks [#57070]
+-   [**] Auto-scroll upon block insertion [#57273]
+-   [*] Unselect blocks using the hardware back button (Android) [#57279]
 
 ## 1.109.3
 -   [**] Fix duplicate/unresponsive options in font size settings. [#56985]

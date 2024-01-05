@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { memo } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import FilterSummary from './filter-summary';
@@ -21,7 +26,7 @@ const sanitizeOperators = ( field ) => {
 	);
 };
 
-export default function Filters( { fields, view, onChangeView } ) {
+const Filters = memo( function Filters( { fields, view, onChangeView } ) {
 	const filters = [];
 	fields.forEach( ( field ) => {
 		if ( ! field.type ) {
@@ -35,10 +40,13 @@ export default function Filters( { fields, view, onChangeView } ) {
 
 		switch ( field.type ) {
 			case ENUMERATION_TYPE:
+				if ( ! field.elements?.length ) {
+					return;
+				}
 				filters.push( {
 					field: field.id,
 					name: field.header,
-					elements: field.elements || [],
+					elements: field.elements,
 					operators,
 					isVisible: view.filters.some(
 						( f ) =>
@@ -68,7 +76,7 @@ export default function Filters( { fields, view, onChangeView } ) {
 
 			return (
 				<FilterSummary
-					key={ filter.field + '.' + filter.operator }
+					key={ filter.field }
 					filter={ filter }
 					view={ view }
 					onChangeView={ onChangeView }
@@ -88,4 +96,6 @@ export default function Filters( { fields, view, onChangeView } ) {
 	}
 
 	return filterComponents;
-}
+} );
+
+export default Filters;

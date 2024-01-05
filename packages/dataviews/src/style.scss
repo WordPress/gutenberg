@@ -117,6 +117,7 @@
 			border-top: 1px solid $gray-100;
 			padding-top: $grid-unit-05;
 			padding-bottom: $grid-unit-05;
+			z-index: 1;
 		}
 	}
 
@@ -285,4 +286,9 @@
 .dataviews-no-results,
 .dataviews-loading {
 	padding: 0 $grid-unit-40;
+}
+
+.dataviews__filters-custom-menu-radio-item-prefix {
+	display: block;
+	width: 24px;
 }

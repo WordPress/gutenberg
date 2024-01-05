@@ -26,6 +26,8 @@ export interface Style {
 			url?: CSSProperties[ 'backgroundImage' ];
 			source?: string;
 		};
+		backgroundPosition?: CSSProperties[ 'backgroundPosition' ];
+		backgroundRepeat?: CSSProperties[ 'backgroundRepeat' ];
 		backgroundSize?: CSSProperties[ 'backgroundSize' ];
 	};
 	border?: {

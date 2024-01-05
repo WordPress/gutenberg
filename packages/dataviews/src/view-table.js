@@ -1,56 +1,63 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
-import {
-	unseen,
-	check,
-	arrowUp,
-	arrowDown,
-	chevronRightSmall,
-	funnel,
-} from '@wordpress/icons';
+import { unseen, funnel } from '@wordpress/icons';
 import {
 	Button,
 	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { Children, Fragment } from '@wordpress/element';
+import {
+	Children,
+	Fragment,
+	forwardRef,
+	useEffect,
+	useId,
+	useRef,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
-import { ENUMERATION_TYPE, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
+import { ENUMERATION_TYPE, OPERATORS, SORTING_DIRECTIONS } from './constants';
+import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
 
 const {
 	DropdownMenuV2: DropdownMenu,
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
-	DropdownSubMenuV2: DropdownSubMenu,
-	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
 } = unlock( componentsPrivateApis );
 
-const sortingItemsInfo = {
-	asc: { icon: arrowUp, label: __( 'Sort ascending' ) },
-	desc: { icon: arrowDown, label: __( 'Sort descending' ) },
-};
 const sortArrows = { asc: '↑', desc: '↓' };
 
 const sanitizeOperators = ( field ) => {
 	let operators = field.filterBy?.operators;
 	if ( ! operators || ! Array.isArray( operators ) ) {
-		operators = [ OPERATOR_IN, OPERATOR_NOT_IN ];
+		operators = Object.keys( OPERATORS );
 	}
 	return operators.filter( ( operator ) =>
-		[ OPERATOR_IN, OPERATOR_NOT_IN ].includes( operator )
+		Object.keys( OPERATORS ).includes( operator )
 	);
 };
 
-function HeaderMenu( { field, view, onChangeView } ) {
+const HeaderMenu = forwardRef( function HeaderMenu(
+	{ field, view, onChangeView, onHide },
+	ref
+) {
 	const isHidable = field.enableHiding !== false;
 
 	const isSortable = field.enableSorting !== false;
@@ -85,6 +92,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 					size="compact"
 					className="dataviews-table-header-button"
 					style={ { padding: 0 } }
+					ref={ ref }
 				>
 					{ field.header }
 					{ isSorted && (
@@ -94,26 +102,31 @@ function HeaderMenu( { field, view, onChangeView } ) {
 					) }
 				</Button>
 			}
+			style={ { minWidth: '240px' } }
 		>
 			<WithSeparators>
 				{ isSortable && (
 					<DropdownMenuGroup>
-						{ Object.entries( sortingItemsInfo ).map(
+						{ Object.entries( SORTING_DIRECTIONS ).map(
 							( [ direction, info ] ) => {
-								const isActive =
+								const isChecked =
 									isSorted &&
 									view.sort.direction === direction;
+
+								const value = `${ field.id }-${ direction }`;
+
 								return (
-									<DropdownMenuItem
-										key={ direction }
-										role="menuitemradio"
-										aria-checked={ isActive }
-										prefix={ <Icon icon={ info.icon } /> }
-										suffix={
-											isActive && <Icon icon={ check } />
-										}
-										onSelect={ ( event ) => {
-											event.preventDefault();
+									<DropdownMenuRadioItem
+										key={ value }
+										// All sorting radio items share the same name, so that
+										// selecting a sorting option automatically deselects the
+										// previously selected one, even if it is displayed in
+										// another submenu. The field and direction are passed via
+										// the `value` prop.
+										name="view-table-sorting"
+										value={ value }
+										checked={ isChecked }
+										onChange={ () => {
 											onChangeView( {
 												...view,
 												sort: {
@@ -123,8 +136,10 @@ function HeaderMenu( { field, view, onChangeView } ) {
 											} );
 										} }
 									>
-										{ info.label }
-									</DropdownMenuItem>
+										<DropdownMenuItemLabel>
+											{ info.label }
+										</DropdownMenuItemLabel>
+									</DropdownMenuRadioItem>
 								);
 							}
 						) }
@@ -132,11 +147,9 @@ function HeaderMenu( { field, view, onChangeView } ) {
 				) }
 				{ isHidable && (
 					<DropdownMenuItem
-						role="menuitemradio"
-						aria-checked={ false }
 						prefix={ <Icon icon={ unseen } /> }
-						onSelect={ ( event ) => {
-							event.preventDefault();
+						onClick={ () => {
+							onHide( field );
 							onChangeView( {
 								...view,
 								hiddenFields: view.hiddenFields.concat(
@@ -145,34 +158,32 @@ function HeaderMenu( { field, view, onChangeView } ) {
 							} );
 						} }
 					>
-						{ __( 'Hide' ) }
+						<DropdownMenuItemLabel>
+							{ __( 'Hide' ) }
+						</DropdownMenuItemLabel>
 					</DropdownMenuItem>
 				) }
 				{ isFilterable && (
 					<DropdownMenuGroup>
-						<DropdownSubMenu
+						<DropdownMenu
 							key={ filter.field }
 							trigger={
-								<DropdownSubMenuTrigger
+								<DropdownMenuItem
 									prefix={ <Icon icon={ funnel } /> }
 									suffix={
-										<>
-											{ activeElement &&
-												activeOperator ===
-													OPERATOR_IN &&
-												__( 'Is' ) }
-											{ activeElement &&
-												activeOperator ===
-													OPERATOR_NOT_IN &&
-												__( 'Is not' ) }
-											{ activeElement && ' ' }
-											{ activeElement?.label }
-											<Icon icon={ chevronRightSmall } />
-										</>
+										activeElement && (
+											<span aria-hidden="true">
+												{ activeOperator in OPERATORS &&
+													`${ OPERATORS[ activeOperator ].label } ` }
+												{ activeElement?.label }
+											</span>
+										)
 									}
 								>
-									{ __( 'Filter by' ) }
-								</DropdownSubMenuTrigger>
+									<DropdownMenuItemLabel>
+										{ __( 'Filter by' ) }
+									</DropdownMenuItemLabel>
+								</DropdownMenuItem>
 							}
 						>
 							<WithSeparators>
@@ -182,16 +193,12 @@ function HeaderMenu( { field, view, onChangeView } ) {
 											activeElement?.value ===
 											element.value;
 										return (
-											<DropdownMenuItem
+											<DropdownMenuRadioItemCustom
 												key={ element.value }
-												role="menuitemradio"
-												aria-checked={ isActive }
-												prefix={
-													isActive && (
-														<Icon icon={ check } />
-													)
-												}
-												onSelect={ () => {
+												name={ `view-table-${ filter.field }` }
+												value={ element.value }
+												checked={ isActive }
+												onClick={ () => {
 													onChangeView( {
 														...view,
 														page: 1,
@@ -209,106 +216,84 @@ function HeaderMenu( { field, view, onChangeView } ) {
 													} );
 												} }
 											>
-												{ element.label }
-											</DropdownMenuItem>
+												<DropdownMenuItemLabel>
+													{ element.label }
+												</DropdownMenuItemLabel>
+												{ !! element.description && (
+													<DropdownMenuItemHelpText>
+														{ element.description }
+													</DropdownMenuItemHelpText>
+												) }
+											</DropdownMenuRadioItemCustom>
 										);
 									} ) }
 								</DropdownMenuGroup>
 								{ filter.operators.length > 1 && (
-									<DropdownSubMenu
+									<DropdownMenu
 										trigger={
-											<DropdownSubMenuTrigger
+											<DropdownMenuItem
 												suffix={
-													<>
-														{ activeOperator ===
-															OPERATOR_IN &&
-															__( 'Is' ) }
-														{ activeOperator ===
-															OPERATOR_NOT_IN &&
-															__( 'Is not' ) }
-														<Icon
-															icon={
-																chevronRightSmall
-															}
-														/>{ ' ' }
-													</>
+													<span aria-hidden="true">
+														{
+															OPERATORS[
+																activeOperator
+															]?.label
+														}
+													</span>
 												}
 											>
-												{ __( 'Conditions' ) }
-											</DropdownSubMenuTrigger>
+												<DropdownMenuItemLabel>
+													{ __( 'Conditions' ) }
+												</DropdownMenuItemLabel>
+											</DropdownMenuItem>
 										}
 									>
-										<DropdownMenuItem
-											key="in-filter"
-											role="menuitemradio"
-											aria-checked={
-												activeOperator === OPERATOR_IN
-											}
-											prefix={
-												activeOperator ===
-													OPERATOR_IN && (
-													<Icon icon={ check } />
-												)
-											}
-											onSelect={ () =>
-												onChangeView( {
-													...view,
-													page: 1,
-													filters: [
-														...otherFilters,
-														{
-															field: filter.field,
-															operator:
-																OPERATOR_IN,
-															value: filterInView?.value,
-														},
-													],
-												} )
-											}
-										>
-											{ __( 'Is' ) }
-										</DropdownMenuItem>
-										<DropdownMenuItem
-											key="not-in-filter"
-											role="menuitemradio"
-											aria-checked={
-												activeOperator ===
-												OPERATOR_NOT_IN
-											}
-											prefix={
-												activeOperator ===
-													OPERATOR_NOT_IN && (
-													<Icon icon={ check } />
-												)
-											}
-											onSelect={ () =>
-												onChangeView( {
-													...view,
-													page: 1,
-													filters: [
-														...otherFilters,
-														{
-															field: filter.field,
-															operator:
-																OPERATOR_NOT_IN,
-															value: filterInView?.value,
-														},
-													],
-												} )
-											}
-										>
-											{ __( 'Is not' ) }
-										</DropdownMenuItem>
-									</DropdownSubMenu>
+										{ Object.entries( OPERATORS ).map(
+											( [
+												operator,
+												{ label, key },
+											] ) => (
+												<DropdownMenuRadioItem
+													key={ key }
+													name={ `view-table-${ filter.field }-conditions` }
+													value={ operator }
+													checked={
+														activeOperator ===
+														operator
+													}
+													onChange={ ( e ) =>
+														onChangeView( {
+															...view,
+															page: 1,
+															filters: [
+																...otherFilters,
+																{
+																	field: filter.field,
+																	operator:
+																		e.target
+																			.value,
+																	value: filterInView?.value,
+																},
+															],
+														} )
+													}
+												>
+													<DropdownMenuItemLabel>
+														{ label }
+													</DropdownMenuItemLabel>
+												</DropdownMenuRadioItem>
+											)
+										) }
+									</DropdownMenu>
 								) }
 							</WithSeparators>
-						</DropdownSubMenu>
+						</DropdownMenu>
 					</DropdownMenuGroup>
 				) }
 			</WithSeparators>
 		</DropdownMenu>
 	);
-}
+} );
 
 function WithSeparators( { children } ) {
 	return Children.toArray( children )
@@ -331,6 +316,35 @@ function ViewTable( {
 	isLoading = false,
 	deferredRendering,
 } ) {
+	const headerMenuRefs = useRef( new Map() );
+	const headerMenuToFocusRef = useRef();
+	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] = useState();
+
+	useEffect( () => {
+		if ( headerMenuToFocusRef.current ) {
+			headerMenuToFocusRef.current.focus();
+			headerMenuToFocusRef.current = undefined;
+		}
+	} );
+
+	const asyncData = useAsyncList( data );
+	const tableNoticeId = useId();
+
+	if ( nextHeaderMenuToFocus ) {
+		// If we need to force focus, we short-circuit rendering here
+		// to prevent any additional work while we handle that.
+		// Clearing out the focus directive is necessary to make sure
+		// future renders don't cause unexpected focus jumps.
+		headerMenuToFocusRef.current = nextHeaderMenuToFocus;
+		setNextHeaderMenuToFocus();
+		return;
+	}
+
+	const onHide = ( field ) => {
+		const hidden = headerMenuRefs.current.get( field.id );
+		const fallback = headerMenuRefs.current.get( hidden.fallback );
+		setNextHeaderMenuToFocus( fallback?.node );
+	};
 	const visibleFields = fields.filter(
 		( field ) =>
 			! view.hiddenFields.includes( field.id ) &&
@@ -338,55 +352,70 @@ function ViewTable( {
 				field.id
 			)
 	);
-	const shownData = useAsyncList( data );
-	const usedData = deferredRendering ? shownData : data;
+	const usedData = deferredRendering ? asyncData : data;
 	const hasData = !! usedData?.length;
-	if ( isLoading ) {
-		// TODO:Add spinner or progress bar..
-		return (
-			<div className="dataviews-loading">
-				<h3>{ __( 'Loading' ) }</h3>
-			</div>
-		);
-	}
 	const sortValues = { asc: 'ascending', desc: 'descending' };
+
 	return (
 		<div className="dataviews-table-view-wrapper">
-			{ hasData && (
-				<table className="dataviews-table-view">
-					<thead>
-						<tr>
-							{ visibleFields.map( ( field ) => (
-								<th
-									key={ field.id }
-									style={ {
-										width: field.width || undefined,
-										minWidth: field.minWidth || undefined,
-										maxWidth: field.maxWidth || undefined,
+			<table
+				className="dataviews-table-view"
+				aria-busy={ isLoading }
+				aria-describedby={ tableNoticeId }
+			>
+				<thead>
+					<tr>
+						{ visibleFields.map( ( field, index ) => (
+							<th
+								key={ field.id }
+								style={ {
+									width: field.width || undefined,
+									minWidth: field.minWidth || undefined,
+									maxWidth: field.maxWidth || undefined,
+								} }
+								data-field-id={ field.id }
+								aria-sort={
+									view.sort?.field === field.id &&
+									sortValues[ view.sort.direction ]
+								}
+								scope="col"
+							>
+								<HeaderMenu
+									ref={ ( node ) => {
+										if ( node ) {
+											headerMenuRefs.current.set(
+												field.id,
+												{
+													node,
+													fallback:
+														visibleFields[
+															index > 0
+																? index - 1
+																: 1
+														]?.id,
+												}
+											);
+										} else {
+											headerMenuRefs.current.delete(
+												field.id
+											);
+										}
 									} }
-									data-field-id={ field.id }
-									aria-sort={
-										view.sort?.field === field.id &&
-										sortValues[ view.sort.direction ]
-									}
-									scope="col"
-								>
-									<HeaderMenu
-										field={ field }
-										view={ view }
-										onChangeView={ onChangeView }
-									/>
-								</th>
-							) ) }
-							{ !! actions?.length && (
-								<th data-field-id="actions">
-									{ __( 'Actions' ) }
-								</th>
-							) }
-						</tr>
-					</thead>
-					<tbody>
-						{ usedData.map( ( item ) => (
+									field={ field }
+									view={ view }
+									onChangeView={ onChangeView }
+									onHide={ onHide }
+								/>
+							</th>
+						) ) }
+						{ !! actions?.length && (
+							<th data-field-id="actions">{ __( 'Actions' ) }</th>
+						) }
+					</tr>
+				</thead>
+				<tbody>
+					{ hasData &&
+						usedData.map( ( item ) => (
 							<tr key={ getItemId( item ) }>
 								{ visibleFields.map( ( field ) => (
 									<td
@@ -414,14 +443,19 @@ function ViewTable( {
 								) }
 							</tr>
 						) ) }
-					</tbody>
-				</table>
-			) }
-			{ ! hasData && (
-				<div className="dataviews-no-results">
-					<p>{ __( 'No results' ) }</p>
-				</div>
-			) }
+				</tbody>
+			</table>
+			<div
+				className={ classNames( 'dataviews-table-status', {
+					'dataviews-loading': isLoading,
+					'dataviews-no-results': ! hasData && ! isLoading,
+				} ) }
+				id={ tableNoticeId }
+			>
+				{ ! hasData && (
+					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
+				) }
+			</div>
 		</div>
 	);
 }

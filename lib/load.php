@@ -103,6 +103,7 @@ require __DIR__ . '/compat/wordpress-6.4/kses.php';
 // WordPress 6.5 compat.
 require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.5/class-wp-navigation-block-renderer.php';
+require __DIR__ . '/compat/wordpress-6.5/kses.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -220,7 +221,6 @@ require __DIR__ . '/script-loader.php';
 require __DIR__ . '/global-styles-and-settings.php';
 require __DIR__ . '/class-wp-theme-json-data-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
-require __DIR__ . '/class-wp-theme-json-schema-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/class-wp-duotone-gutenberg.php';
 require __DIR__ . '/blocks.php';
@@ -252,7 +252,6 @@ require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/shadow.php';
 require __DIR__ . '/block-supports/background.php';
-require __DIR__ . '/block-supports/behaviors.php';
 require __DIR__ . '/block-supports/pattern.php';
 
 // Data views.

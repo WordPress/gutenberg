@@ -4,9 +4,8 @@
 import {
 	privateApis as componentsPrivateApis,
 	Button,
-	Icon,
 } from '@wordpress/components';
-import { chevronRightSmall, funnel, check } from '@wordpress/icons';
+import { funnel } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { Children, Fragment } from '@wordpress/element';
 
@@ -14,15 +13,17 @@ import { Children, Fragment } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import { LAYOUT_LIST, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
+import { LAYOUT_LIST, OPERATORS } from './constants';
+import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
 
 const {
 	DropdownMenuV2: DropdownMenu,
 	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownSubMenuV2: DropdownSubMenu,
-	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
 	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
 } = unlock( componentsPrivateApis );
 
 function WithSeparators( { children } ) {
@@ -50,7 +51,6 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 
 	return (
 		<DropdownMenu
-			label={ __( 'Filters' ) }
 			trigger={
 				<Button
 					__experimentalIsFocusable
@@ -66,6 +66,9 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 					) : null }
 				</Button>
 			}
+			style={ {
+				minWidth: '230px',
+			} }
 		>
 			<WithSeparators>
 				<DropdownMenuGroup>
@@ -82,31 +85,29 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 						const activeOperator =
 							filterInView?.operator || filter.operators[ 0 ];
 						return (
-							<DropdownSubMenu
+							<DropdownMenu
 								key={ filter.field }
 								trigger={
-									<DropdownSubMenuTrigger
+									<DropdownMenuItem
 										suffix={
-											<>
-												{ activeElement &&
-													activeOperator ===
-														OPERATOR_IN &&
-													__( 'Is' ) }
-												{ activeElement &&
-													activeOperator ===
-														OPERATOR_NOT_IN &&
-													__( 'Is not' ) }
-												{ activeElement && ' ' }
-												{ activeElement?.label }
-												<Icon
-													icon={ chevronRightSmall }
-												/>
-											</>
+											activeElement && (
+												<span aria-hidden="true">
+													{ activeOperator in
+														OPERATORS &&
+														`${ OPERATORS[ activeOperator ].label } ` }
+													{ activeElement.label }
+												</span>
+											)
 										}
 									>
-										{ filter.name }
-									</DropdownSubMenuTrigger>
+										<DropdownMenuItemLabel>
+											{ filter.name }
+										</DropdownMenuItemLabel>
+									</DropdownMenuItem>
 								}
+								style={ {
+									minWidth: '200px',
+								} }
 							>
 								<WithSeparators>
 									<DropdownMenuGroup>
@@ -115,19 +116,12 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 												activeElement?.value ===
 												element.value;
 											return (
-												<DropdownMenuItem
+												<DropdownMenuRadioItemCustom
 													key={ element.value }
-													role="menuitemradio"
-													aria-checked={ isActive }
-													prefix={
-														isActive && (
-															<Icon
-																icon={ check }
-															/>
-														)
-													}
-													onSelect={ ( event ) => {
-														event.preventDefault();
+													name={ `add-filter-${ filter.field }` }
+													value={ element.value }
+													checked={ isActive }
+													onChange={ ( e ) => {
 														onChangeView( {
 															...view,
 															page: 1,
@@ -139,132 +133,112 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 																		activeOperator,
 																	value: isActive
 																		? undefined
-																		: element.value,
+																		: e
+																				.target
+																				.value,
 																},
 															],
 														} );
 													} }
 												>
-													{ element.label }
-												</DropdownMenuItem>
+													<DropdownMenuItemLabel>
+														{ element.label }
+													</DropdownMenuItemLabel>
+													{ !! element.description && (
+														<DropdownMenuItemHelpText>
+															{
+																element.description
+															}
+														</DropdownMenuItemHelpText>
+													) }
+												</DropdownMenuRadioItemCustom>
 											);
 										} ) }
 									</DropdownMenuGroup>
 									{ filter.operators.length > 1 && (
-										<DropdownSubMenu
+										<DropdownMenu
 											trigger={
-												<DropdownSubMenuTrigger
+												<DropdownMenuItem
 													suffix={
-														<>
-															{ activeOperator ===
-																OPERATOR_IN &&
-																__( 'Is' ) }
-															{ activeOperator ===
-																OPERATOR_NOT_IN &&
-																__( 'Is not' ) }
-															<Icon
-																icon={
-																	chevronRightSmall
-																}
-															/>{ ' ' }
-														</>
+														<span aria-hidden="true">
+															{
+																OPERATORS[
+																	activeOperator
+																]?.label
+															}
+														</span>
 													}
 												>
-													{ __( 'Conditions' ) }
-												</DropdownSubMenuTrigger>
+													<DropdownMenuItemLabel>
+														{ __( 'Conditions' ) }
+													</DropdownMenuItemLabel>
+												</DropdownMenuItem>
 											}
 										>
-											<DropdownMenuItem
-												key="in-filter"
-												role="menuitemradio"
-												aria-checked={
-													activeOperator ===
-													OPERATOR_IN
-												}
-												prefix={
-													activeOperator ===
-														OPERATOR_IN && (
-														<Icon icon={ check } />
-													)
-												}
-												onSelect={ ( event ) => {
-													event.preventDefault();
-													onChangeView( {
-														...view,
-														page: 1,
-														filters: [
-															...otherFilters,
-															{
-																field: filter.field,
-																operator:
-																	OPERATOR_IN,
-																value: filterInView?.value,
-															},
-														],
-													} );
-												} }
-											>
-												{ __( 'Is' ) }
-											</DropdownMenuItem>
-											<DropdownMenuItem
-												key="not-in-filter"
-												role="menuitemradio"
-												aria-checked={
-													activeOperator ===
-													OPERATOR_NOT_IN
-												}
-												prefix={
-													activeOperator ===
-														OPERATOR_NOT_IN && (
-														<Icon icon={ check } />
-													)
-												}
-												onSelect={ ( event ) => {
-													event.preventDefault();
-													onChangeView( {
-														...view,
-														page: 1,
-														filters: [
-															...otherFilters,
-															{
-																field: filter.field,
-																operator:
-																	OPERATOR_NOT_IN,
-																value: filterInView?.value,
-															},
-														],
-													} );
-												} }
-											>
-												{ __( 'Is not' ) }
-											</DropdownMenuItem>
-										</DropdownSubMenu>
+											{ Object.entries( OPERATORS ).map(
+												( [
+													operator,
+													{ label, key },
+												] ) => (
+													<DropdownMenuRadioItem
+														key={ key }
+														name={ `add-filter-${ filter.field }-conditions` }
+														value={ operator }
+														checked={
+															activeOperator ===
+															operator
+														}
+														onChange={ ( e ) => {
+															onChangeView( {
+																...view,
+																page: 1,
+																filters: [
+																	...otherFilters,
+																	{
+																		field: filter.field,
+																		operator:
+																			e
+																				.target
+																				.value,
+																		value: filterInView?.value,
+																	},
+																],
+															} );
+														} }
+													>
+														<DropdownMenuItemLabel>
+															{ label }
+														</DropdownMenuItemLabel>
+													</DropdownMenuRadioItem>
+												)
+											) }
+										</DropdownMenu>
 									) }
 									<DropdownMenuItem
 										key={ 'reset-filter-' + filter.name }
 										disabled={ ! activeElement }
-										onSelect={ ( event ) => {
-											event.preventDefault();
-											onChangeView( ( currentView ) => ( {
-												...currentView,
+										hideOnClick={ false }
+										onClick={ () => {
+											onChangeView( {
+												...view,
 												page: 1,
-												filters:
-													currentView.filters.filter(
-														( f ) =>
-															f.field !==
-															filter.field
-													),
-											} ) );
+												filters: view.filters.filter(
+													( f ) =>
+														f.field !== filter.field
+												),
+											} );
 										} }
 									>
-										{ sprintf(
-											/* translators: 1: Filter name. e.g.: "Reset Author". */
-											__( 'Reset %1$s' ),
-											filter.name.toLowerCase()
-										) }
+										<DropdownMenuItemLabel>
+											{ sprintf(
+												/* translators: 1: Filter name. e.g.: "Reset Author". */
+												__( 'Reset %1$s' ),
+												filter.name.toLowerCase()
+											) }
+										</DropdownMenuItemLabel>
 									</DropdownMenuItem>
 								</WithSeparators>
-							</DropdownSubMenu>
+							</DropdownMenu>
 						);
 					} ) }
 				</DropdownMenuGroup>
@@ -272,16 +246,18 @@ export default function AddFilter( { filters, view, onChangeView } ) {
 					disabled={
 						view.search === '' && view.filters?.length === 0
 					}
-					onSelect={ ( event ) => {
-						event.preventDefault();
-						onChangeView( ( currentView ) => ( {
-							...currentView,
+					hideOnClick={ false }
+					onClick={ () => {
+						onChangeView( {
+							...view,
 							page: 1,
 							filters: [],
-						} ) );
+						} );
 					} }
 				>
-					{ __( 'Reset filters' ) }
+					<DropdownMenuItemLabel>
+						{ __( 'Reset filters' ) }
+					</DropdownMenuItemLabel>
 				</DropdownMenuItem>
 			</WithSeparators>
 		</DropdownMenu>
