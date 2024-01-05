@@ -306,9 +306,17 @@ const scriptConfig = {
 			// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
 			SCRIPT_DEBUG: ! isProduction,
 		} ),
-		new CleanWebpackPlugin( {
-			cleanStaleWebpackAssets: false,
-		} ),
+
+		// If we run a modules build, the 2 compilations can "clean" each other's output
+		// Prevent the cleaning from happening
+		! hasExperimentalModulesFlag &&
+			new CleanWebpackPlugin( {
+				cleanAfterEveryBuildPatterns: [ '!fonts/**', '!images/**' ],
+				// Prevent it from deleting webpack assets during builds that have
+				// multiple configurations returned in the webpack config.
+				cleanStaleWebpackAssets: false,
+			} ),
+
 		new RenderPathsPlugin(),
 		new CopyWebpackPlugin( {
 			patterns: [
