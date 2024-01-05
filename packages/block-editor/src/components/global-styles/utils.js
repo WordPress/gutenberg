@@ -450,3 +450,45 @@ export function areGlobalStyleConfigsEqual( original, variation ) {
 		fastDeepEqual( original?.settings, variation?.settings )
 	);
 }
+
+// TODO: Is this the right place for these utils?
+// They're only used in the useGlobalStylesOutput hook and the block screen in
+// the site editor. The block editor's utils/object.js is exported. Do we want
+// that?
+export const isObject = ( item ) =>
+	!! item && typeof item === 'object' && ! Array.isArray( item );
+
+export const deepMerge = ( target, source ) => {
+	if ( isObject( target ) && isObject( source ) ) {
+		for ( const key in source ) {
+			const getter = Object.getOwnPropertyDescriptor( source, key )?.get;
+			if ( typeof getter === 'function' ) {
+				Object.defineProperty( target, key, { get: getter } );
+			} else if ( isObject( source[ key ] ) ) {
+				if ( ! target[ key ] ) Object.assign( target, { [ key ]: {} } );
+				deepMerge( target[ key ], source[ key ] );
+			} else {
+				Object.assign( target, { [ key ]: source[ key ] } );
+			}
+		}
+	}
+};
+
+/**
+ * Retrieves any referenced block style variation data and overrides that with
+ * the current variation style object values.
+ *
+ * @param {Object} variation Style object for block style variation.
+ * @param {Object} tree      A global styles object.
+ *
+ * @return {Object} Style object containing with
+ *
+ */
+export function getMergedVariation( variation, tree ) {
+	const referencedVariation = variation?.ref
+		? getValueFromObjectPath( tree, variation.ref )
+		: {};
+	const mergedVariation = JSON.parse( JSON.stringify( referencedVariation ) );
+	deepMerge( mergedVariation, variation );
+	return mergedVariation;
+}
