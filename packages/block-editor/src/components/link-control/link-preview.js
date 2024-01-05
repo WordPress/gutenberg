@@ -18,6 +18,8 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { ViewerSlot } from './viewer-slot';
 
 import useRichUrlData from './use-rich-url-data';
+import useEntityData from './use-entity-data';
+import { ICONS_MAP } from './constants';
 
 export default function LinkPreview( {
 	value,
@@ -32,23 +34,37 @@ export default function LinkPreview( {
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
 
-	const { richData, isFetching } = useRichUrlData( showRichPreviews );
+	const { richData, isFetching: isFetchingRichURLData } =
+		useRichUrlData( showRichPreviews );
+
+	const { entityData, isFetching: isFetchingEntityData } = useEntityData(
+		value?.type,
+		value?.id
+	);
+
+	const isFetching = isFetchingRichURLData || isFetchingEntityData;
 
 	// Rich data may be an empty object so test for that.
-	const hasRichData = richData && Object.keys( richData ).length;
+	const hasRichData =
+		( richData && Object.keys( richData ).length ) ||
+		( entityData && Object.keys( entityData ).length );
 
 	const displayURL =
 		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
 		'';
 
-	const displayTitle = stripHTML( richData?.title || displayURL );
+	const displayTitle = stripHTML(
+		entityData?.title?.rendered || richData?.title || displayURL
+	);
 
 	// url can be undefined if the href attribute is unset
 	const isEmptyURL = ! value?.url?.length;
 
 	let icon;
 
-	if ( richData?.icon ) {
+	if ( entityData?.type ) {
+		icon = <Icon icon={ ICONS_MAP[ entityData.type ] } />;
+	} else if ( richData?.icon ) {
 		icon = <img src={ richData?.icon } alt="" />;
 	} else if ( isEmptyURL ) {
 		icon = <Icon icon={ info } size={ 32 } />;
@@ -95,9 +111,13 @@ export default function LinkPreview( {
 									</ExternalLink>
 								</Tooltip>
 
-								{ value?.url && displayTitle !== displayURL && (
+								{ ( entityData?.slug ||
+									( value?.url &&
+										displayTitle !== displayURL ) ) && (
 									<span className="block-editor-link-control__search-item-info">
-										{ displayURL }
+										{ filterURLForDisplay(
+											'/' + entityData?.slug
+										) || displayURL }
 									</span>
 								) }
 							</>
