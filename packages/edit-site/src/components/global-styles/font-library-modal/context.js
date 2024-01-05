@@ -14,7 +14,7 @@ import {
  * Internal dependencies
  */
 import {
-	fetchInstallFonts,
+	fetchInstallFont,
 	fetchUninstallFonts,
 	fetchFontCollections,
 	fetchFontCollection,
@@ -198,7 +198,7 @@ function FontLibraryProvider( { children } ) {
 			// Prepare formData to install.
 			const formData = makeFormDataFromFontFamily( font );
 			// Install the fonts (upload the font files to the server and create the post in the database).
-			const response = await fetchInstallFonts( formData );
+			const response = await fetchInstallFont( formData );
 			const fontsInstalled = response?.successes || [];
 			// Get intersecting font faces between the fonts we tried to installed and the fonts that were installed
 			// (to avoid activating a non installed font).
