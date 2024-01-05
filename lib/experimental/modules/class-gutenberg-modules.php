@@ -386,7 +386,7 @@ function gutenberg_register_block_module_handle( $metadata, $field_name, $index 
 		_doing_it_wrong(
 			__FUNCTION__,
 			sprintf(
-				// This is a translation from core. See `register_block_script_handle`jk.
+				// This is a translation from core. See `register_block_script_handle`.
 				__( 'The asset file (%1$s) for the "%2$s" defined in "%3$s" block definition is missing.', 'default' ),
 				$module_asset_raw_path,
 				$field_name,
