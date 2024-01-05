@@ -444,8 +444,6 @@ function gutenberg_generate_block_asset_module_id( $block_name, $field_name, $in
 	}
 
 	$field_mappings = array(
-		'editorModule' => 'editor-module',
-		'module'       => 'module',
 		'viewModule'   => 'view-module',
 	);
 	$asset_handle   = str_replace( '/', '-', $block_name ) .
