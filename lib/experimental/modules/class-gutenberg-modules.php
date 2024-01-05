@@ -380,15 +380,14 @@ function gutenberg_register_block_module_id( $metadata, $field_name, $index = 0 
 	$path                  = dirname( $metadata['file'] );
 	$module_asset_raw_path = $path . '/' . substr_replace( $module_path, '.asset.php', - strlen( '.js' ) );
 	$module_id             = gutenberg_generate_block_asset_module_id( $metadata['name'], $field_name, $index );
-	$module_asset_path     = wp_normalize_path(
-		realpath( $module_asset_raw_path )
-	);
+	$module_asset_path     = wp_normalize_path( realpath( $module_asset_raw_path ) );
 
 	if ( empty( $module_asset_path ) ) {
 		_doing_it_wrong(
 			__FUNCTION__,
 			sprintf(
-				// This is a translation from core. See `register_block_script_handle`.
+				// This string is from WordPress Core. See `register_block_script_handle`.
+				// Translators: This is a translation from WordPress Core (default). No need to translate.
 				__( 'The asset file (%1$s) for the "%2$s" defined in "%3$s" block definition is missing.', 'default' ),
 				$module_asset_raw_path,
 				$field_name,
@@ -410,12 +409,6 @@ function gutenberg_register_block_module_id( $metadata, $field_name, $index = 0 
 		$module_dependencies,
 		isset( $module_asset['version'] ) ? $module_asset['version'] : false
 	);
-
-	// @todo This in_array may not work with module_dependencies.
-	// @todo @wordpress/i18n isn't module compatible anyways…
-	// if ( ! empty( $metadata['textdomain'] ) && in_array( '@wordpress/i18n', $module_dependencies, true ) ) {
-	// 	wp_set_script_translations( $module_id, $metadata['textdomain'] );
-	// }
 
 	return $module_id;
 }
