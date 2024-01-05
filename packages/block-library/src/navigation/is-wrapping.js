@@ -14,7 +14,6 @@ function areItemsWrapping(
 	//we store an array with the width of each item
 	const itemsWidths = getItemWidths( children );
 	let totalWidth = 0;
-	let isWrapping = false;
 
 	//the nav block may have row-gap applied, which is not calculated in getItemWidths
 	const computedStyle = window.getComputedStyle( wrapper );
@@ -26,10 +25,10 @@ function areItemsWrapping(
 			totalWidth += rowGap;
 		}
 		if ( parseInt( totalWidth ) > wrapperWidth ) {
-			isWrapping = true;
+			return true;
 		}
 	}
-	return isWrapping;
+	return false;
 }
 
 /**
