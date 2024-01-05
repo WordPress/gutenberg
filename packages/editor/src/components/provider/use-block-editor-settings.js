@@ -2,10 +2,9 @@
  * WordPress dependencies
  */
 import { Platform, useMemo, useCallback } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, resolveSelect } from '@wordpress/data';
 import {
 	store as coreStore,
-	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -215,6 +214,10 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		[ saveEntityRecord, userCanCreatePages ]
 	);
 
+	const syncGetLinkSuggestions = useCallback( async ( ...args ) => {
+		return await resolveSelect( coreStore ).getLinkSuggestions( ...args );
+	}, [] );
+
 	const forceDisableFocusMode = settings.focusMode === false;
 
 	return useMemo(
@@ -232,8 +235,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
-			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
-				fetchLinkSuggestions( search, searchOptions, settings ),
+			__experimentalFetchLinkSuggestions: syncGetLinkSuggestions,
 			inserterMediaCategories,
 			__experimentalFetchRichUrlData: fetchUrlData,
 			// Todo: This only checks the top level post, not the post within a template or any other entity that can be edited.
@@ -279,6 +281,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			postType,
 			setIsInserterOpened,
 			getPostLinkProps,
+			syncGetLinkSuggestions,
 		]
 	);
 }
