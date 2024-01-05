@@ -63,7 +63,6 @@ function ClipboardToolbarButton( { text, disabled } ) {
 function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const {
 		id,
-		fileId,
 		fileName,
 		href,
 		textLinkHref,
@@ -85,8 +84,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	);
 
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const { toggleSelection } = useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		// Upload a file drag-and-dropped into the editor.
@@ -109,26 +107,21 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		}
 	}, [] );
 
-	useEffect( () => {
-		if ( ! fileId && href ) {
-			// Add a unique fileId to each file block.
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { fileId: `wp-block-file--media-${ clientId }` } );
-		}
-	}, [ href, fileId, clientId ] );
-
 	function onSelectFile( newMedia ) {
-		if ( newMedia && newMedia.url ) {
-			const isPdf = newMedia.url.endsWith( '.pdf' );
-			setAttributes( {
-				href: newMedia.url,
-				fileName: newMedia.title,
-				textLinkHref: newMedia.url,
-				id: newMedia.id,
-				displayPreview: isPdf ? true : undefined,
-				previewHeight: isPdf ? 600 : undefined,
-			} );
+		if ( ! newMedia || ! newMedia.url ) {
+			return;
 		}
+
+		const isPdf = newMedia.url.endsWith( '.pdf' );
+		setAttributes( {
+			href: newMedia.url,
+			fileName: newMedia.title,
+			textLinkHref: newMedia.url,
+			id: newMedia.id,
+			displayPreview: isPdf ? true : undefined,
+			previewHeight: isPdf ? 600 : undefined,
+			fileId: `wp-block-file--media-${ clientId }`,
+		} );
 	}
 
 	function onUploadError( message ) {
