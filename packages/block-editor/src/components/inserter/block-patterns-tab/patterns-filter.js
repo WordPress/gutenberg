@@ -54,7 +54,7 @@ export function PatternsFilter( {
 	const patternSyncMenuOptions = useMemo(
 		() => [
 			{
-				value: SYNC_TYPES.all,
+				value: 'all',
 				label: _x( 'All', 'Option that shows all patterns' ),
 			},
 			{
@@ -105,7 +105,7 @@ export function PatternsFilter( {
 	function handleSetSourceFilterChange( newSourceFilter ) {
 		setPatternSourceFilter( newSourceFilter );
 		if ( getShouldDisableSyncFilter( newSourceFilter ) ) {
-			setPatternSyncFilter( SYNC_TYPES.all );
+			setPatternSyncFilter( 'all' );
 		}
 	}
 

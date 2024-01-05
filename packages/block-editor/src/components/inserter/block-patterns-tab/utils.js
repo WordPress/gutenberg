@@ -11,7 +11,6 @@ export const PATTERN_TYPES = {
 };
 
 export const SYNC_TYPES = {
-	all: 'all',
 	full: 'fully',
 	unsynced: 'unsynced',
 };
