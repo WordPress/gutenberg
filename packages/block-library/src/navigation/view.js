@@ -218,8 +218,7 @@ const { state, actions } = store( 'core/navigation', {
 			// Set the initial state.
 			context.isCollapsed = navigationIsWrapping( ref );
 
-			// Listen for resize events.
-			window.addEventListener( 'resize', () => {
+			function handleResize() {
 				// We need to do this to allow us to measure the width of the nav.
 				context.isCollapsed = false;
 				// We need to wait for the next tick to check if the nav is wrapping.
@@ -227,7 +226,15 @@ const { state, actions } = store( 'core/navigation', {
 				window.requestAnimationFrame( () => {
 					context.isCollapsed = navigationIsWrapping( ref );
 				} );
-			} );
+			}
+
+			// Listen for resize events.
+			window.addEventListener( 'resize', handleResize );
+
+			// Remove the listener when the component is unmounted.
+			return () => {
+				window.removeEventListener( 'resize', handleResize );
+			};
 		},
 	},
 } );
