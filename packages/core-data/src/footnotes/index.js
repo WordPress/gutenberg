@@ -75,6 +75,14 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 						html: replacement.innerHTML,
 					} );
 					countValue.text = String( index + 1 );
+					countValue.formats = Array.from(
+						{ length: countValue.text.length },
+						() => countValue.formats[ 0 ]
+					);
+					countValue.replacements = Array.from(
+						{ length: countValue.text.length },
+						() => countValue.replacements[ 0 ]
+					);
 					replacement.innerHTML = toHTMLString( {
 						value: countValue,
 					} );
