@@ -54,27 +54,27 @@ export default function ViewList( {
 			{ usedData.map( ( item ) => {
 				return (
 					<li key={ getItemId( item ) }>
-						<div
-							role="button"
-							tabIndex={ 0 }
-							aria-pressed={ selection.includes( item.id ) }
-							onKeyDown={ onEnter( item ) }
-							className={ classNames(
-								'dataviews-view-list__item',
-								{
-									'dataviews-view-list__item-selected':
-										selection.includes( item.id ),
-								}
-							) }
-							onClick={ () => onSelectionChange( [ item ] ) }
-						>
-							<HStack spacing={ 3 } alignment="flex-start">
-								<div className="dataviews-view-list__media-wrapper">
-									{ mediaField?.render( { item } ) || (
-										<div className="dataviews-view-list__media-placeholder"></div>
-									) }
-								</div>
-								<HStack>
+						<HStack>
+							<div
+								role="button"
+								tabIndex={ 0 }
+								aria-pressed={ selection.includes( item.id ) }
+								onKeyDown={ onEnter( item ) }
+								className={ classNames(
+									'dataviews-view-list__item',
+									{
+										'dataviews-view-list__item-selected':
+											selection.includes( item.id ),
+									}
+								) }
+								onClick={ () => onSelectionChange( [ item ] ) }
+							>
+								<HStack spacing={ 3 } justify="start">
+									<div className="dataviews-view-list__media-wrapper">
+										{ mediaField?.render( { item } ) || (
+											<div className="dataviews-view-list__media-placeholder"></div>
+										) }
+									</div>
 									<VStack spacing={ 1 }>
 										{ primaryField?.render( { item } ) }
 										<div className="dataviews-view-list__fields">
@@ -93,21 +93,21 @@ export default function ViewList( {
 										</div>
 									</VStack>
 								</HStack>
-								{ onDetailsChange && (
-									<Button
-										className="dataviews-list-view__details-button"
-										onClick={ () =>
-											onDetailsChange( [ item ] )
-										}
-										icon={
-											isRTL() ? chevronLeft : chevronRight
-										}
-										label={ __( 'View details' ) }
-										size="compact"
-									/>
-								) }
-							</HStack>
-						</div>
+							</div>
+							{ onDetailsChange && (
+								<Button
+									className="dataviews-view-list__details-button"
+									onClick={ () =>
+										onDetailsChange( [ item ] )
+									}
+									icon={
+										isRTL() ? chevronLeft : chevronRight
+									}
+									label={ __( 'View details' ) }
+									size="compact"
+								/>
+							) }
+						</HStack>
 					</li>
 				);
 			} ) }
