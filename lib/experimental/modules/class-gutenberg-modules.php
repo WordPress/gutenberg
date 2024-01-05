@@ -283,12 +283,9 @@ add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_import_map_polyfill' )
 
 function gutenberg_filter_block_type_metadata_settings_register_modules( $settings, $metadata = null ) {
 	$module_fields = array(
-		'editorModule' => 'editor_module_handles',
-		'module'       => 'module_handles',
-		'viewModule'   => 'view_module_handles',
+		'viewModule' => 'view_module_handles',
 	);
 	foreach ( $module_fields as $metadata_field_name => $settings_field_name ) {
-
 		if ( ! empty( $settings[ $metadata_field_name ] ) ) {
 			$metadata[ $metadata_field_name ] = $settings[ $metadata_field_name ];
 		}
@@ -320,12 +317,6 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadat
 
 function gutenberg_filter_render_block_enqueue_view_modules( $block_content, $parsed_block, $block_instance ) {
 	$block_type = $block_instance->block_type;
-
-	if ( ! empty( $block_type->module_handles ) ) {
-		foreach ( $block_type->module_handles as $module_id ) {
-			gutenberg_enqueue_module( $module_id );
-		}
-	}
 
 	if ( ! empty( $block_type->view_module_handles ) ) {
 		foreach ( $block_type->view_module_handles as $module_id ) {
