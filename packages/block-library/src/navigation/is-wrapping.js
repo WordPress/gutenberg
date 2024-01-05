@@ -55,7 +55,7 @@ function isNavElementWrapping( navElement ) {
  * @return {Array} An array with the width of each item.
  */
 function getItemWidths( items ) {
-	return items.map( ( item ) => {
+	return Array.from( items ).map( ( item ) => {
 		const style = item.currentStyle || window.getComputedStyle( item );
 		const itemDimensions = item.getBoundingClientRect();
 		const width = parseFloat( itemDimensions.width );
