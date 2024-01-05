@@ -31,6 +31,10 @@ export function initializeEditor( id, postType, postId ) {
 		preferredStyleVariations: {},
 		welcomeGuide: true,
 	} );
+	dispatch( preferencesStore ).setDefaults( 'core', {
+		inactivePanels: [],
+		openPanels: [ 'post-status' ],
+	} );
 
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		fixedToolbar: false,

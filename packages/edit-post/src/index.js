@@ -57,9 +57,7 @@ export function initializeEditor(
 		editorMode: 'visual',
 		fullscreenMode: true,
 		hiddenBlockTypes: [],
-		inactivePanels: [],
 		isPublishSidebarEnabled: true,
-		openPanels: [ 'post-status' ],
 		preferredStyleVariations: {},
 		themeStyles: true,
 		welcomeGuide: true,
@@ -69,6 +67,8 @@ export function initializeEditor(
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
 		fixedToolbar: false,
+		inactivePanels: [],
+		openPanels: [ 'post-status' ],
 		showBlockBreadcrumbs: true,
 		showIconLabels: false,
 		showListViewByDefault: false,

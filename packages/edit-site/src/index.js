@@ -64,7 +64,9 @@ export function initializeEditor( id, settings ) {
 		allowRightClickOverrides: true,
 		fixedToolbar: false,
 		focusMode: false,
+		inactivePanels: [],
 		keepCaretInsideBlock: false,
+		openPanels: [ 'post-status' ],
 		showBlockBreadcrumbs: true,
 		showListViewByDefault: false,
 	} );
