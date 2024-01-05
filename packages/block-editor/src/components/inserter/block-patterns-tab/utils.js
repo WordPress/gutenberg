@@ -10,7 +10,7 @@ export const INSERTER_PATTERN_TYPES = {
 	directory: 'directory',
 };
 
-export const SYNC_TYPES = {
+export const INSERTER_SYNC_TYPES = {
 	full: 'fully',
 	unsynced: 'unsynced',
 };
@@ -58,12 +58,15 @@ export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	}
 
 	// Filter by sync status.
-	if ( syncFilter === SYNC_TYPES.full && pattern.syncStatus !== '' ) {
+	if (
+		syncFilter === INSERTER_SYNC_TYPES.full &&
+		pattern.syncStatus !== ''
+	) {
 		return true;
 	}
 
 	if (
-		syncFilter === SYNC_TYPES.unsynced &&
+		syncFilter === INSERTER_SYNC_TYPES.unsynced &&
 		pattern.syncStatus !== 'unsynced' &&
 		isUserPattern
 	) {

@@ -18,7 +18,7 @@ import { useMemo, createInterpolateElement } from '@wordpress/element';
  */
 import {
 	myPatternsCategory,
-	SYNC_TYPES,
+	INSERTER_SYNC_TYPES,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
 
@@ -62,7 +62,7 @@ export function PatternsFilter( {
 				label: _x( 'All', 'Option that shows all patterns' ),
 			},
 			{
-				value: SYNC_TYPES.full,
+				value: INSERTER_SYNC_TYPES.full,
 				label: _x(
 					'Synced',
 					'Option that shows all synchronized patterns'
@@ -70,7 +70,7 @@ export function PatternsFilter( {
 				disabled: shouldDisableSyncFilter,
 			},
 			{
-				value: SYNC_TYPES.unsynced,
+				value: INSERTER_SYNC_TYPES.unsynced,
 				label: _x(
 					'Not synced',
 					'Option that shows all patterns that are not synchronized'
