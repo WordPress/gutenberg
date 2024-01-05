@@ -92,6 +92,11 @@ function FontCollection( { id } ) {
 		setNotice( null );
 	}, [ id ] );
 
+	useEffect( () => {
+		// If the selected fonts change, reset the selected fonts to install
+		setFontsToInstall( [] );
+	}, [ selectedFont ] );
+
 	// Reset notice after 5 seconds
 	useEffect( () => {
 		if ( notice && notice?.duration !== 0 ) {
@@ -149,7 +154,7 @@ function FontCollection( { id } ) {
 	};
 
 	const handleInstall = async () => {
-		const response = await installFonts( fontsToInstall );
+		const response = await installFonts( fontsToInstall[ 0 ] );
 		const installNotice = getNoticeFromInstallResponse( response );
 		setNotice( installNotice );
 		resetFontsToInstall();

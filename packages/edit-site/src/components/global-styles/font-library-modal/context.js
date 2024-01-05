@@ -26,7 +26,7 @@ import {
 	mergeFontFamilies,
 	loadFontFaceInBrowser,
 	getDisplaySrcFromFontFace,
-	makeFormDataFromFontFamilies,
+	makeFormDataFromFontFamily,
 } from './utils';
 import { toggleFont } from './utils/toggleFont';
 import getIntersectingFontFaces from './utils/get-intersecting-font-faces';
@@ -192,11 +192,11 @@ function FontLibraryProvider( { children } ) {
 		return getActivatedFontsOutline( source )[ slug ] || [];
 	};
 
-	async function installFonts( fonts ) {
+	async function installFonts( font ) {
 		setIsInstalling( true );
 		try {
 			// Prepare formData to install.
-			const formData = makeFormDataFromFontFamilies( fonts );
+			const formData = makeFormDataFromFontFamily( font );
 			// Install the fonts (upload the font files to the server and create the post in the database).
 			const response = await fetchInstallFonts( formData );
 			const fontsInstalled = response?.successes || [];
@@ -204,7 +204,7 @@ function FontLibraryProvider( { children } ) {
 			// (to avoid activating a non installed font).
 			const fontToBeActivated = getIntersectingFontFaces(
 				fontsInstalled,
-				fonts
+				[ font ]
 			);
 			// Activate the font families (add the font families to the global styles).
 			activateCustomFontFamilies( fontToBeActivated );

@@ -130,16 +130,21 @@ export function getDisplaySrcFromFontFace( input, urlPrefix ) {
 	return src;
 }
 
-export function makeFormDataFromFontFamilies( fontFamilies ) {
+export function makeFormDataFromFontFamily( fontFamily ) {
 	const formData = new FormData();
-	const newFontFamilies = fontFamilies.map( ( family, familyIndex ) => {
-		const { kebabCase } = unlock( componentsPrivateApis );
-		family.slug = kebabCase( family.slug );
-		if ( family?.fontFace ) {
-			family.fontFace = family.fontFace.map( ( face, faceIndex ) => {
+	const { kebabCase } = unlock( componentsPrivateApis );
+
+	const newFontFamily = {
+		...fontFamily,
+		slug: kebabCase( fontFamily.slug ),
+	};
+
+	if ( newFontFamily?.fontFace ) {
+		const newFontFaces = newFontFamily.fontFace.map(
+			( face, faceIndex ) => {
 				if ( face.file ) {
 					// Slugified file name because the it might contain spaces or characters treated differently on the server.
-					const fileId = `file-${ familyIndex }-${ faceIndex }`;
+					const fileId = `file-${ faceIndex }`;
 					// Add the files to the formData
 					formData.append( fileId, face.file, face.file.name );
 					// remove the file object from the face object the file is referenced by the uploadedFile key
@@ -151,10 +156,11 @@ export function makeFormDataFromFontFamilies( fontFamilies ) {
 					return newFace;
 				}
 				return face;
-			} );
-		}
-		return family;
-	} );
-	formData.append( 'font_families', JSON.stringify( newFontFamilies ) );
+			}
+		);
+		newFontFamily.fontFace = newFontFaces;
+	}
+
+	formData.append( 'font_family_settings', JSON.stringify( newFontFamily ) );
 	return formData;
 }
