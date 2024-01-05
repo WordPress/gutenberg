@@ -11,6 +11,7 @@ import {
 	useState,
 	useEffect,
 	useRef,
+	useReducer,
 	Platform,
 } from '@wordpress/element';
 import {
@@ -42,7 +43,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { close, Icon } from '@wordpress/icons';
-import { useInstanceId, useMediaQuery } from '@wordpress/compose';
+import { debounce, useInstanceId, useMediaQuery } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -302,10 +303,16 @@ function Navigation( {
 	const isMobileBreakPoint = useMediaQuery(
 		`(max-width: ${ NAVIGATION_MOBILE_COLLAPSE })`
 	);
+
 	const isCollapsed =
 		( 'mobile' === overlayMenu && isMobileBreakPoint ) ||
 		'always' === overlayMenu ||
 		( 'auto' === overlayMenu && navigationIsWrapping( navRef.current ) );
+
+	// We need to update on window resize so that the nav collapses appropriately.
+	// eslint-disable-next-line no-unused-vars
+	const [ ignored, forceUpdate ] = useReducer( ( x ) => x + 1, 0 );
+	window.addEventListener( 'resize', debounce( forceUpdate, 10 ) );
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
