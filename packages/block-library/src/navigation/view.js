@@ -224,7 +224,7 @@ const { state, actions } = store( 'core/navigation', {
 				context.isCollapsed = false;
 				// We need to wait for the next tick to check if the nav is wrapping.
 				// The problem is now we get a flickering effect when the window resizes.
-				setTimeout( () => {
+				window.requestAnimationFrame( () => {
 					context.isCollapsed = navigationIsWrapping( ref );
 				} );
 			} );
