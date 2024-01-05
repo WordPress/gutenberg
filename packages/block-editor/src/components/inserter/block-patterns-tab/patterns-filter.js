@@ -16,7 +16,11 @@ import { useMemo, createInterpolateElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { myPatternsCategory, SYNC_TYPES, PATTERN_TYPES } from './utils';
+import {
+	myPatternsCategory,
+	SYNC_TYPES,
+	INSERTER_PATTERN_TYPES,
+} from './utils';
 
 const getShouldDisableSyncFilter = ( sourceFilter ) => sourceFilter !== 'all';
 const getShouldDisableNonUserSources = ( category ) => {
@@ -37,7 +41,7 @@ export function PatternsFilter( {
 	// this filter themselves.
 	const currentPatternSourceFilter =
 		category.name === myPatternsCategory.name
-			? PATTERN_TYPES.user
+			? INSERTER_PATTERN_TYPES.user
 			: patternSourceFilter;
 
 	// We need to disable the sync filter option if the source filter is not 'all' or 'user'
@@ -85,17 +89,17 @@ export function PatternsFilter( {
 				disabled: shouldDisableNonUserSources,
 			},
 			{
-				value: PATTERN_TYPES.directory,
+				value: INSERTER_PATTERN_TYPES.directory,
 				label: __( 'Pattern Directory' ),
 				disabled: shouldDisableNonUserSources,
 			},
 			{
-				value: PATTERN_TYPES.theme,
+				value: INSERTER_PATTERN_TYPES.theme,
 				label: __( 'Theme & Plugins' ),
 				disabled: shouldDisableNonUserSources,
 			},
 			{
-				value: PATTERN_TYPES.user,
+				value: INSERTER_PATTERN_TYPES.user,
 				label: __( 'User' ),
 			},
 		],

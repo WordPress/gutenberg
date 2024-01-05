@@ -4,7 +4,7 @@
 
 import { __ } from '@wordpress/i18n';
 
-export const PATTERN_TYPES = {
+export const INSERTER_PATTERN_TYPES = {
 	user: 'user',
 	theme: 'theme',
 	directory: 'directory',
@@ -34,7 +34,7 @@ export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	// If theme source selected, filter out user created patterns and those from
 	// the core patterns directory.
 	if (
-		sourceFilter === PATTERN_TYPES.theme &&
+		sourceFilter === INSERTER_PATTERN_TYPES.theme &&
 		( isUserPattern || isDirectoryPattern )
 	) {
 		return true;
@@ -43,7 +43,7 @@ export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	// If the directory source is selected, filter out user created patterns
 	// and those bundled with the theme.
 	if (
-		sourceFilter === PATTERN_TYPES.directory &&
+		sourceFilter === INSERTER_PATTERN_TYPES.directory &&
 		( isUserPattern || ! isDirectoryPattern )
 	) {
 		return true;
@@ -51,8 +51,8 @@ export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 
 	// If user source selected, filter out theme patterns.
 	if (
-		sourceFilter === PATTERN_TYPES.user &&
-		pattern.type !== PATTERN_TYPES.user
+		sourceFilter === INSERTER_PATTERN_TYPES.user &&
+		pattern.type !== INSERTER_PATTERN_TYPES.user
 	) {
 		return true;
 	}
