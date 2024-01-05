@@ -302,14 +302,28 @@ function ViewTable( {
 	deferredRendering,
 } ) {
 	const headerMenuRefs = useRef( new Map() );
+	const headerMenuToFocusRef = useRef();
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] = useState();
 
 	useEffect( () => {
-		if ( nextHeaderMenuToFocus ) {
-			nextHeaderMenuToFocus.focus();
-			setNextHeaderMenuToFocus();
+		if ( headerMenuToFocusRef.current ) {
+			headerMenuToFocusRef.current.focus();
+			headerMenuToFocusRef.current = undefined;
 		}
-	}, [ nextHeaderMenuToFocus ] );
+	} );
+
+	const asyncData = useAsyncList( data );
+	const tableNoticeId = useId();
+
+	if ( nextHeaderMenuToFocus ) {
+		// If we need to force focus, we short-circuit rendering here
+		// to prevent any additional work while we handle that.
+		// Clearing out the focus directive is necessary to make sure
+		// future renders don't cause unexpected focus jumps.
+		headerMenuToFocusRef.current = nextHeaderMenuToFocus;
+		setNextHeaderMenuToFocus();
+		return;
+	}
 
 	const onHide = ( field ) => {
 		const hidden = headerMenuRefs.current.get( field.id );
@@ -323,11 +337,9 @@ function ViewTable( {
 				field.id
 			)
 	);
-	const asyncData = useAsyncList( data );
 	const usedData = deferredRendering ? asyncData : data;
 	const hasData = !! usedData?.length;
 	const sortValues = { asc: 'ascending', desc: 'descending' };
-	const tableNoticeId = useId();
 
 	return (
 		<div className="dataviews-table-view-wrapper">
