@@ -3,6 +3,7 @@
  */
 import {
 	PanelBody,
+	TextControl,
 	ToggleControl,
 	SelectControl,
 	Disabled,
@@ -12,7 +13,8 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 
 export default function ArchivesEdit( { attributes, setAttributes } ) {
-	const { showLabel, showPostCounts, displayAsDropdown, type } = attributes;
+	const { showLabel, showPostCounts, displayAsDropdown, type, label } =
+		attributes;
 
 	return (
 		<>
@@ -37,6 +39,16 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 								setAttributes( {
 									showLabel: ! showLabel,
 								} )
+							}
+						/>
+					) }
+					{ displayAsDropdown && showLabel && (
+						<TextControl
+							__nextHasNoMarginBottom
+							label={ __( 'Label' ) }
+							value={ label }
+							onChange={ ( value ) =>
+								setAttributes( { label: value } )
 							}
 						/>
 					) }
