@@ -7,6 +7,7 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { CustomSelectItem } from '.';
+import { LegacyHint } from './styles';
 import type { CustomSelectProps, LegacyCustomSelectProps } from './types';
 import deprecated from '@wordpress/deprecated';
 
@@ -27,9 +28,7 @@ const transformOptionsToChildren = ( props: LegacyCustomSelectProps ) => {
 			const withHint = (
 				<>
 					<span>{ name }</span>
-					<span className="components-custom-select-control__item-hint">
-						{ __experimentalHint }
-					</span>
+					<LegacyHint>{ __experimentalHint }</LegacyHint>
 				</>
 			);
 
@@ -45,6 +44,19 @@ const transformOptionsToChildren = ( props: LegacyCustomSelectProps ) => {
 			);
 		}
 	);
+};
+
+const adaptSizes = ( props: LegacyCustomSelectProps ) => {
+	if ( props.options === undefined ) {
+		return;
+	}
+
+	const adaptedSize =
+		props.size === 'default' || props.size === '__unstable-large'
+			? 'default'
+			: 'small';
+
+	return adaptedSize;
 };
 
 export function useDeprecatedProps(
@@ -78,8 +90,12 @@ export function useDeprecatedProps(
 		return {
 			...legacyProps,
 			children: transformOptionsToChildren( props ),
+			// temp ignore
+			//@ts-ignore
+			defaultValue: props?.value?.name ?? undefined,
 			label: props.label ?? '',
 			onChange: legacyChangeHandler,
+			size: adaptSizes( props ),
 		};
 	}
 

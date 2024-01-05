@@ -70,7 +70,15 @@ export const CustomSelectItem = styled( Ariakit.SelectItem )`
 	align-items: center;
 	justify-content: space-between;
 	padding: ${ space( 2 ) };
+	line-height: 2;
 	&[data-active-item] {
 		background-color: ${ COLORS.gray[ 300 ] };
 	}
+`;
+
+export const LegacyHint = styled.span`
+	color: ${ COLORS.gray[ 600 ] };
+	text-align: right;
+	margin-inline-end: ${ space( 2 ) };
+	flex-grow: 1;
 `;

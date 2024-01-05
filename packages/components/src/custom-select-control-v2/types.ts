@@ -100,7 +100,7 @@ export type LegacyCustomSelectProps = {
 	 *
 	 * @default 'default'
 	 */
-	size?: CustomSelectProps[ 'size' ];
+	size?: CustomSelectProps[ 'size' ] | '__unstable-large';
 	/**
 	 * Can be used to externally control the value of the control.
 	 */
