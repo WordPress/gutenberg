@@ -67,7 +67,6 @@ function BulkActionItem( { action, selectedItems, setActionWithModal } ) {
 					setActionWithModal( action );
 				} else {
 					await action.callback( eligibleItems );
-					onSelectionChange( [] );
 				}
 			} }
 			suffix={
