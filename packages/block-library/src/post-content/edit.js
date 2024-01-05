@@ -8,13 +8,19 @@ import {
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
 	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	useEntityProp,
 	useEntityBlockEditor,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { Placeholder, Button } from '@wordpress/components';
+import { postContent as icon } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
+import { createBlock } from '@wordpress/blocks';
+
 /**
  * Internal dependencies
  */
@@ -45,9 +51,60 @@ function ReadOnlyContent( {
 	);
 }
 
-function EditableContent( { context = {} } ) {
-	const { postType, postId } = context;
+function EmptyContentPlaceholder( { context, onClose } ) {
+	const { postType } = context;
+	const label =
+		'page' === postType
+			? __( 'This page’s content is empty' )
+			: __( 'This post’s content is empty' );
+	return (
+		<Placeholder
+			icon={ icon }
+			label={ label }
+			instructions={ __(
+				'Add your first block or pattern to get started.'
+			) }
+		>
+			<Button
+				variant="primary"
+				//onClick={ openPatternSelectionModal }
+			>
+				{ __( 'Choose a pattern' ) }
+			</Button>
 
+			<Button variant="secondary" onClick={ onClose }>
+				{ __( 'Start blank' ) }
+			</Button>
+		</Placeholder>
+	);
+}
+
+function PostContentPlaceholder( { layoutClassNames } ) {
+	const blockProps = useBlockProps( { className: layoutClassNames } );
+	return (
+		<div { ...blockProps }>
+			<p>
+				{ __(
+					'This is the Content block, it will display all the blocks in any single post or page.'
+				) }
+			</p>
+			<p>
+				{ __(
+					'That might be a simple arrangement like consecutive paragraphs in a blog post, or a more elaborate composition that includes image galleries, videos, tables, columns, and any other block types.'
+				) }
+			</p>
+			<p>
+				{ __(
+					'If there are any Custom Post Types registered at your site, the Content block can display the contents of those entries as well.'
+				) }
+			</p>
+		</div>
+	);
+}
+
+function EditableContent( { context = {}, clientId } ) {
+	const { postType, postId } = context;
+	const { selectBlock, insertBlock } = useDispatch( blockEditorStore );
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		postType,
@@ -66,19 +123,34 @@ function EditableContent( { context = {} } ) {
 	);
 
 	const hasInnerBlocks = !! entityRecord?.content?.raw || blocks?.length;
+	const [ hasPlaceholder, setHasPlaceholder ] = useState( ! hasInnerBlocks );
 
-	const initialInnerBlocks = [ [ 'core/paragraph' ] ];
-
-	const props = useInnerBlocksProps(
+	const { children, ...props } = useInnerBlocksProps(
 		useBlockProps( { className: 'entry-content' } ),
 		{
 			value: blocks,
 			onInput,
 			onChange,
-			template: ! hasInnerBlocks ? initialInnerBlocks : undefined,
 		}
 	);
-	return <div { ...props } />;
+	const onClose = async () => {
+		await setHasPlaceholder( false );
+		const initialBlock = createBlock( 'core/paragraph' );
+		insertBlock( initialBlock, 0, clientId );
+		selectBlock( initialBlock.clientId );
+	};
+
+	return (
+		<div { ...props }>
+			{ children }
+			{ hasPlaceholder && (
+				<EmptyContentPlaceholder
+					context={ context }
+					onClose={ onClose }
+				/>
+			) }
+		</div>
+	);
 }
 
 function Content( props ) {
@@ -104,29 +176,6 @@ function Content( props ) {
 	);
 }
 
-function Placeholder( { layoutClassNames } ) {
-	const blockProps = useBlockProps( { className: layoutClassNames } );
-	return (
-		<div { ...blockProps }>
-			<p>
-				{ __(
-					'This is the Content block, it will display all the blocks in any single post or page.'
-				) }
-			</p>
-			<p>
-				{ __(
-					'That might be a simple arrangement like consecutive paragraphs in a blog post, or a more elaborate composition that includes image galleries, videos, tables, columns, and any other block types.'
-				) }
-			</p>
-			<p>
-				{ __(
-					'If there are any Custom Post Types registered at your site, the Content block can display the contents of those entries as well.'
-				) }
-			</p>
-		</div>
-	);
-}
-
 function RecursionError() {
 	const blockProps = useBlockProps();
 	return (
@@ -139,6 +188,7 @@ function RecursionError() {
 }
 
 export default function PostContentEdit( {
+	clientId,
 	context,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
@@ -153,11 +203,12 @@ export default function PostContentEdit( {
 		<RecursionProvider uniqueId={ contextPostId }>
 			{ contextPostId && contextPostType ? (
 				<Content
+					clientId={ clientId }
 					context={ context }
 					layoutClassNames={ layoutClassNames }
 				/>
 			) : (
-				<Placeholder layoutClassNames={ layoutClassNames } />
+				<PostContentPlaceholder layoutClassNames={ layoutClassNames } />
 			) }
 		</RecursionProvider>
 	);
