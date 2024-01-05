@@ -54,6 +54,7 @@ import {
 	renameAction,
 	resetAction,
 	deleteAction,
+	duplicatePatternAction,
 } from './dataviews-pattern-actions';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
@@ -314,7 +315,13 @@ export default function DataviewsPatterns() {
 	}, [ patterns, view, fields ] );
 
 	const actions = useMemo(
-		() => [ renameAction, exportJSONaction, resetAction, deleteAction ],
+		() => [
+			renameAction,
+			duplicatePatternAction,
+			exportJSONaction,
+			resetAction,
+			deleteAction,
+		],
 		[]
 	);
 	const onChangeView = useCallback(
