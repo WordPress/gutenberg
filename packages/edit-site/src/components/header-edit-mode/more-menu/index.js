@@ -54,7 +54,7 @@ export default function MoreMenu( { showIconLabels } ) {
 	};
 
 	const turnOffDistractionFree = () => {
-		setPreference( 'core/edit-site', 'distractionFree', false );
+		setPreference( 'core', 'distractionFree', false );
 	};
 
 	return (
@@ -84,7 +84,7 @@ export default function MoreMenu( { showIconLabels } ) {
 								) }
 							/>
 							<PreferenceToggleMenuItem
-								scope="core/edit-site"
+								scope="core"
 								name="distractionFree"
 								onToggle={ toggleDistractionFree }
 								label={ __( 'Distraction free' ) }

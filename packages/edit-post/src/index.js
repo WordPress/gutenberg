@@ -26,7 +26,6 @@ import {
 import './hooks';
 import './plugins';
 import Editor from './editor';
-import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
 
 const { PluginPostExcerpt: __experimentalPluginPostExcerpt } =
@@ -80,7 +79,7 @@ export function initializeEditor(
 	// If `distractionFree` mode is enabled, the block list view should not be open.
 	if (
 		select( preferencesStore ).get( 'core', 'showListViewByDefault' ) &&
-		! select( editPostStore ).isFeatureActive( 'distractionFree' )
+		! select( preferencesStore ).get( 'core', 'distractionFree' )
 	) {
 		dispatch( editorStore ).setIsListViewOpened( true );
 	}

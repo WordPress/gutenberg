@@ -191,8 +191,7 @@ function Layout() {
 				keyboardShortcutsStore
 			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
-			isDistractionFree:
-				select( editPostStore ).isFeatureActive( 'distractionFree' ),
+			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showMostUsedBlocks:
 				select( editPostStore ).isFeatureActive( 'mostUsedBlocks' ),

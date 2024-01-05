@@ -55,7 +55,7 @@ export default function useCommonCommands() {
 			isPublishSidebarEnabled:
 				select( editorStore ).isPublishSidebarEnabled(),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
-			isDistractionFree: get( editPostStore.name, 'distractionFree' ),
+			isDistractionFree: get( 'core', 'distractionFree' ),
 		};
 	}, [] );
 	const { toggle } = useDispatch( preferencesStore );

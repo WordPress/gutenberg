@@ -44,14 +44,14 @@ export default function EditPostPreferencesModal() {
 	const [ isModalActive, showBlockBreadcrumbsOption ] = useSelect(
 		( select ) => {
 			const { getEditorSettings } = select( editorStore );
-			const { getEditorMode, isFeatureActive } = select( editPostStore );
+			const { getEditorMode } = select( editPostStore );
+			const { get } = select( preferencesStore );
 			const modalActive = select( interfaceStore ).isModalActive(
 				PREFERENCES_MODAL_NAME
 			);
 			const mode = getEditorMode();
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
-			const isDistractionFreeEnabled =
-				isFeatureActive( 'distractionFree' );
+			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
 			return [
 				modalActive,
 				! isDistractionFreeEnabled &&
@@ -77,7 +77,7 @@ export default function EditPostPreferencesModal() {
 	};
 
 	const turnOffDistractionFree = () => {
-		setPreference( 'core/edit-post', 'distractionFree', false );
+		setPreference( 'core', 'distractionFree', false );
 	};
 
 	const sections = useMemo(
@@ -195,6 +195,7 @@ export default function EditPostPreferencesModal() {
 							label={ __( 'Top toolbar' ) }
 						/>
 						<EnableFeature
+							scope="core"
 							featureName="distractionFree"
 							onToggle={ toggleDistractionFree }
 							help={ __(
