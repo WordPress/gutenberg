@@ -11,7 +11,6 @@ import {
 	useState,
 	useEffect,
 	useRef,
-	useReducer,
 	Platform,
 } from '@wordpress/element';
 import {
@@ -43,7 +42,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { close, Icon } from '@wordpress/icons';
-import { debounce, useInstanceId, useMediaQuery } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -72,8 +71,7 @@ import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
-import { NAVIGATION_MOBILE_COLLAPSE } from '../constants';
-import navigationIsWrapping from '../is-wrapping';
+import useIsCollapsed from '../use-is-collapsed';
 import { unlock } from '../../lock-unlock';
 
 function Navigation( {
@@ -300,20 +298,6 @@ function Navigation( {
 		[ clientId ]
 	);
 	const isResponsive = 'never' !== overlayMenu;
-	const isMobileBreakPoint = useMediaQuery(
-		`(max-width: ${ NAVIGATION_MOBILE_COLLAPSE })`
-	);
-
-	const isCollapsed =
-		( 'mobile' === overlayMenu && isMobileBreakPoint ) ||
-		'always' === overlayMenu ||
-		( 'auto' === overlayMenu && navigationIsWrapping( navRef.current ) );
-
-	// We need to update on window resize so that the nav collapses appropriately.
-	// eslint-disable-next-line no-unused-vars
-	const [ ignored, forceUpdate ] = useReducer( ( x ) => x + 1, 0 );
-	window.addEventListener( 'resize', debounce( forceUpdate, 10 ) );
-
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: classnames(
@@ -327,7 +311,7 @@ function Navigation( {
 				'is-vertical': orientation === 'vertical',
 				'no-wrap': flexWrap === 'nowrap',
 				'is-responsive': isResponsive,
-				'is-collapsed': isCollapsed,
+				'is-collapsed': useIsCollapsed( overlayMenu, navRef ),
 				'has-text-color': !! textColor.color || !! textColor?.class,
 				[ getColorClassName( 'color', textColor?.slug ) ]:
 					!! textColor?.slug,
