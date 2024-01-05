@@ -55,9 +55,7 @@ function isNavElementWrapping( navElement ) {
  * @return {Array} An array with the width of each item.
  */
 function getItemWidths( items ) {
-	const itemsWidths = [];
-
-	items.forEach( function ( item ) {
+	return items.map( ( item ) => {
 		const style = item.currentStyle || window.getComputedStyle( item );
 		const itemDimensions = item.getBoundingClientRect();
 		const width = parseFloat( itemDimensions.width );
@@ -65,9 +63,8 @@ function getItemWidths( items ) {
 		const marginRight = parseFloat( style.marginRight );
 		const totalWidth = width + marginLeft + marginRight;
 
-		itemsWidths.push( totalWidth );
+		return totalWidth;
 	} );
-	return itemsWidths;
 }
 
 function getFlexParent( element ) {
