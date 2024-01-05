@@ -7,6 +7,7 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
  * Internal dependencies
  */
 import { NAVIGATION_MOBILE_COLLAPSE } from './constants';
+import navigationIsWrapping from './is-wrapping';
 
 const focusableSelectors = [
 	'a[href]',
@@ -190,7 +191,7 @@ const { state, actions } = store( 'core/navigation', {
 				focusableElements?.[ 0 ]?.focus();
 			}
 		},
-		initNav() {
+		initMobileNav() {
 			const context = getContext();
 			const mediaQuery = window.matchMedia(
 				`(max-width: ${ NAVIGATION_MOBILE_COLLAPSE })`
@@ -210,6 +211,23 @@ const { state, actions } = store( 'core/navigation', {
 			return () => {
 				mediaQuery.removeEventListener( 'change', handleCollapse );
 			};
+		},
+		initAutoNav() {
+			const context = getContext();
+			const { ref } = getElement();
+			// Set the initial state.
+			context.isCollapsed = navigationIsWrapping( ref );
+
+			// Listen for resize events.
+			window.addEventListener( 'resize', () => {
+				// We need to do this to allow us to measure the width of the nav.
+				context.isCollapsed = false;
+				// We need to wait for the next tick to check if the nav is wrapping.
+				// The problem is now we get a flickering effect when the window resizes.
+				setTimeout( () => {
+					context.isCollapsed = navigationIsWrapping( ref );
+				} );
+			} );
 		},
 	},
 } );

@@ -72,6 +72,7 @@ import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { NAVIGATION_MOBILE_COLLAPSE } from '../constants';
+import navigationIsWrapping from '../is-wrapping';
 import { unlock } from '../../lock-unlock';
 
 function Navigation( {
@@ -301,10 +302,10 @@ function Navigation( {
 	const isMobileBreakPoint = useMediaQuery(
 		`(max-width: ${ NAVIGATION_MOBILE_COLLAPSE })`
 	);
-
 	const isCollapsed =
 		( 'mobile' === overlayMenu && isMobileBreakPoint ) ||
-		'always' === overlayMenu;
+		'always' === overlayMenu ||
+		( 'auto' === overlayMenu && navigationIsWrapping( navRef.current ) );
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -597,6 +598,10 @@ function Navigation( {
 							<ToggleGroupControlOption
 								value="mobile"
 								label={ __( 'Mobile' ) }
+							/>
+							<ToggleGroupControlOption
+								value="auto"
+								label={ __( 'Auto' ) }
 							/>
 							<ToggleGroupControlOption
 								value="always"
