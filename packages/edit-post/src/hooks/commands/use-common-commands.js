@@ -200,8 +200,8 @@ export default function useCommonCommands() {
 			toggle( 'core/edit-post', 'isPublishSidebarEnabled' );
 			createInfoNotice(
 				isPublishSidebarEnabled
-					? __( 'Pre-publish checks off.' )
-					: __( 'Pre-publish checks on.' ),
+					? __( 'Pre-publish checks disabled.' )
+					: __( 'Pre-publish checks enabled.' ),
 				{
 					id: 'core/edit-post/publish-sidebar/notice',
 					type: 'snackbar',
