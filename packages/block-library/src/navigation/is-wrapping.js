@@ -41,21 +41,15 @@ function areItemsWrapping(
 function isNavElementWrapping( navElement ) {
 	let isWrapping = false;
 	//how can we check if the nav element is wrapped inside its parent if we don't know anything about it (the parent)?
-	if ( navElement !== null ) {
-		const childrenWrapper = navElement.querySelector(
-			'ul.wp-block-navigation'
+	//for debugging purposes
+	const container = getFlexParent( navElement );
+	if ( container !== null ) {
+		isWrapping = areItemsWrapping(
+			container,
+			Array.from( container.children )
 		);
-		isWrapping =
-			childrenWrapper &&
-			childrenWrapper.children &&
-			areItemsWrapping(
-				navElement,
-				Array.from(
-					navElement.querySelector( 'ul.wp-block-navigation' )
-						.children
-				)
-			);
 	}
+
 	return isWrapping;
 }
 
@@ -79,6 +73,22 @@ function getItemWidths( items ) {
 		itemsWidths.push( totalWidth );
 	} );
 	return itemsWidths;
+}
+
+function getFlexParent( element ) {
+	// We need to do this check rather than document.body to account for iframes
+	if ( element.tagName === 'BODY' ) {
+		// Base case: Stop recursion once we go all the way to the body to avoid infinite recursion
+		return null;
+	}
+	const parent = element.parentNode;
+	const containerStyles = window.getComputedStyle( parent );
+	const isFlexWrap =
+		containerStyles.getPropertyValue( 'flex-wrap' ) === 'wrap';
+	if ( isFlexWrap ) {
+		return parent;
+	}
+	return getFlexParent( parent );
 }
 
 /**
