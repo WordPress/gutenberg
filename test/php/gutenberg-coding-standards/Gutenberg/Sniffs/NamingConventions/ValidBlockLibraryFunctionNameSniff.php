@@ -163,7 +163,8 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 			}
 		}
 
-		$phpcs_file->addError( $tokens[$stack_pointer]['content'] . '()', $stack_pointer, 'CalledFunctionInvalid' );
+		$error_message = 'It\'s not allowed to call the "' . $function_name . '()" function as its name matches the forbidden pattern: "' . $regexp . '".';
+		$phpcs_file->addError( $error_message, $stack_pointer, 'CalledFunctionInvalid' );
 	}
 
 	/**
