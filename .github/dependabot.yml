@@ -15,3 +15,12 @@ updates:
           github-actions:
               patterns:
                   - '*'
+              exclude-patterns:
+                  - 'actions/setup-java'
+                  - 'gradle/*'
+                  - 'reactivecircus/*'
+          react-native:
+              patterns:
+                  - 'actions/setup-java'
+                  - 'gradle/*'
+                  - 'reactivecircus/*'
