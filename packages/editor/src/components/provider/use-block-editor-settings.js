@@ -10,6 +10,7 @@ import {
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -51,7 +52,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'gradients',
 	'generateAnchors',
 	'getPostLinkProps',
-	'hasFixedToolbar',
 	'hasInlineToolbar',
 	'isDistractionFree',
 	'imageDefaultSize',
@@ -87,9 +87,11 @@ const BLOCK_EDITOR_SETTINGS = [
  * @return {Object} Block Editor Settings.
  */
 function useBlockEditorSettings( settings, postType, postId ) {
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		allowRightClickOverrides,
 		focusMode,
+		hasFixedToolbar,
 		keepCaretInsideBlock,
 		reusableBlocks,
 		hasUploadPermissions,
@@ -129,6 +131,8 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					postId
 				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
 				focusMode: get( 'core', 'focusMode' ),
+				hasFixedToolbar:
+					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				reusableBlocks: isWeb
 					? getEntityRecords( 'postType', 'wp_block', {
@@ -144,7 +148,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				restBlockPatternCategories: getBlockPatternCategories(),
 			};
 		},
-		[ postType, postId ]
+		[ postType, postId, isLargeViewport ]
 	);
 
 	const settingsBlockPatterns =
@@ -222,6 +226,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			),
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,
+			hasFixedToolbar,
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
@@ -258,6 +263,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			allowRightClickOverrides,
 			focusMode,
 			forceDisableFocusMode,
+			hasFixedToolbar,
 			keepCaretInsideBlock,
 			settings,
 			hasUploadPermissions,

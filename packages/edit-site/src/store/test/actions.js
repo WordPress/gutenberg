@@ -120,7 +120,7 @@ describe( 'actions', () => {
 			// Enable everything that shouldn't be enabled in distraction free mode.
 			registry
 				.dispatch( preferencesStore )
-				.set( 'core/edit-site', 'fixedToolbar', true );
+				.set( 'core', 'fixedToolbar', true );
 			registry.dispatch( editorStore ).setIsListViewOpened( true );
 			registry
 				.dispatch( editSiteStore )
@@ -130,7 +130,7 @@ describe( 'actions', () => {
 			expect(
 				registry
 					.select( preferencesStore )
-					.get( 'core/edit-site', 'fixedToolbar' )
+					.get( 'core', 'fixedToolbar' )
 			).toBe( true );
 			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
 				false

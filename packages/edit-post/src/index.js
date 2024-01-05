@@ -55,7 +55,6 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		editorMode: 'visual',
-		fixedToolbar: false,
 		fullscreenMode: true,
 		hiddenBlockTypes: [],
 		inactivePanels: [],
@@ -69,6 +68,7 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
+		fixedToolbar: false,
 		showBlockBreadcrumbs: true,
 		showIconLabels: false,
 		showListViewByDefault: false,

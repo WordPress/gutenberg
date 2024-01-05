@@ -82,7 +82,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				select( editorStore ).getRenderingMode() === 'template-only',
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
-			hasFixedToolbar: getPreference( 'core/edit-post', 'fixedToolbar' ),
+			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 		};
 	}, [] );
