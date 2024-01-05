@@ -25,7 +25,7 @@ import { loadFontFaceInBrowser } from './utils';
 import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
 
 function LocalFonts() {
-	const { installFonts } = useContext( FontLibraryContext );
+	const { installFont } = useContext( FontLibraryContext );
 	const [ notice, setNotice ] = useState( null );
 	const supportedFormats =
 		ALLOWED_FILE_EXTENSIONS.slice( 0, -1 )
@@ -147,7 +147,18 @@ function LocalFonts() {
 	 */
 	const handleInstall = async ( fontFaces ) => {
 		const fontFamilies = makeFamiliesFromFaces( fontFaces );
-		const response = await installFonts( fontFamilies );
+
+		if ( fontFamilies.length > 1 ) {
+			setNotice( {
+				type: 'error',
+				message: __(
+					'Variants from only one font family can be uploaded at a time.'
+				),
+			} );
+			return;
+		}
+
+		const response = await installFont( fontFamilies[ 0 ] );
 		const installNotice = getNoticeFromInstallResponse( response );
 		setNotice( installNotice );
 	};

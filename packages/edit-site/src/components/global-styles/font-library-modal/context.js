@@ -192,7 +192,7 @@ function FontLibraryProvider( { children } ) {
 		return getActivatedFontsOutline( source )[ slug ] || [];
 	};
 
-	async function installFonts( font ) {
+	async function installFont( font ) {
 		setIsInstalling( true );
 		try {
 			// Prepare formData to install.
@@ -358,7 +358,7 @@ function FontLibraryProvider( { children } ) {
 				isFontActivated,
 				getFontFacesActivated,
 				loadFontFaceAsset,
-				installFonts,
+				installFont,
 				uninstallFont,
 				toggleActivateFont,
 				getAvailableFontsOutline,
