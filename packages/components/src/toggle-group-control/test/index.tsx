@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { press, click, hover } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -20,7 +20,6 @@ import {
 	ToggleGroupControlOptionIcon,
 } from '../index';
 import type { ToggleGroupControlProps } from '../types';
-import cleanupTooltip from '../../tooltip/test/utils';
 
 const ControlledToggleGroupControl = ( {
 	value: valueProp,
@@ -113,7 +112,6 @@ describe.each( [
 		} );
 	} );
 	it( 'should call onChange with proper value', async () => {
-		const user = userEvent.setup();
 		const mockOnChange = jest.fn();
 
 		render(
@@ -126,13 +124,12 @@ describe.each( [
 			</Component>
 		);
 
-		await user.click( screen.getByRole( 'radio', { name: 'R' } ) );
+		await click( screen.getByRole( 'radio', { name: 'R' } ) );
 
 		expect( mockOnChange ).toHaveBeenCalledWith( 'rigas' );
 	} );
 
 	it( 'should render tooltip where `showTooltip` === `true`', async () => {
-		const user = userEvent.setup();
 		render(
 			<Component label="Test Toggle Group Control">
 				{ optionsWithTooltip }
@@ -143,19 +140,29 @@ describe.each( [
 			'Click for Delicious Gnocchi'
 		);
 
-		await user.hover( firstRadio );
+		await hover( firstRadio );
 
-		const tooltip = await screen.findByText(
-			'Click for Delicious Gnocchi'
-		);
+		const tooltip = await screen.findByRole( 'tooltip', {
+			name: 'Click for Delicious Gnocchi',
+		} );
 
 		await waitFor( () => expect( tooltip ).toBeVisible() );
 
-		await cleanupTooltip( user );
+		// hover outside of radio
+		await hover( document.body );
+		await hover( document.body, { clientX: 10, clientY: 10 } );
+
+		// Tooltip should hide
+		await waitFor( () =>
+			expect(
+				screen.queryByRole( 'tooltip', {
+					name: 'Click for Delicious Gnocchi',
+				} )
+			).not.toBeInTheDocument()
+		);
 	} );
 
 	it( 'should not render tooltip', async () => {
-		const user = userEvent.setup();
 		render(
 			<Component label="Test Toggle Group Control">
 				{ optionsWithTooltip }
@@ -166,7 +173,7 @@ describe.each( [
 			'Click for Sumptuous Caponata'
 		);
 
-		await user.hover( secondRadio );
+		await hover( secondRadio );
 
 		await waitFor( () =>
 			expect(
@@ -177,8 +184,6 @@ describe.each( [
 
 	if ( mode === 'controlled' ) {
 		it( 'should reset values correctly', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<Component label="Test Toggle Group Control">
 					{ options }
@@ -188,25 +193,23 @@ describe.each( [
 			const rigasOption = screen.getByRole( 'radio', { name: 'R' } );
 			const jackOption = screen.getByRole( 'radio', { name: 'J' } );
 
-			await user.click( rigasOption );
+			await click( rigasOption );
 
 			expect( jackOption ).not.toBeChecked();
 			expect( rigasOption ).toBeChecked();
 
-			await user.keyboard( '[ArrowRight]' );
+			await press.ArrowRight();
 
 			expect( rigasOption ).not.toBeChecked();
 			expect( jackOption ).toBeChecked();
 
-			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+			await click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 			expect( rigasOption ).not.toBeChecked();
 			expect( jackOption ).not.toBeChecked();
 		} );
 
 		it( 'should update correctly when triggered by external updates', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<Component
 					value="rigas"
@@ -225,19 +228,19 @@ describe.each( [
 				screen.getByRole( 'radio', { name: 'J' } )
 			).not.toBeChecked();
 
-			await user.click( screen.getByRole( 'button', { name: 'Jack' } ) );
+			await click( screen.getByRole( 'button', { name: 'Jack' } ) );
 			expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
 			expect(
 				screen.getByRole( 'radio', { name: 'R' } )
 			).not.toBeChecked();
 
-			await user.click( screen.getByRole( 'button', { name: 'Rigas' } ) );
+			await click( screen.getByRole( 'button', { name: 'Rigas' } ) );
 			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
 			expect(
 				screen.getByRole( 'radio', { name: 'J' } )
 			).not.toBeChecked();
 
-			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+			await click( screen.getByRole( 'button', { name: 'Reset' } ) );
 			expect(
 				screen.getByRole( 'radio', { name: 'R' } )
 			).not.toBeChecked();
@@ -251,7 +254,6 @@ describe.each( [
 		describe( 'isDeselectable = false', () => {
 			it( 'should not be deselectable', async () => {
 				const mockOnChange = jest.fn();
-				const user = userEvent.setup();
 
 				render(
 					<Component
@@ -267,31 +269,35 @@ describe.each( [
 					name: 'R',
 					checked: true,
 				} );
-				await user.click( rigas );
+				await click( rigas );
 				expect( mockOnChange ).toHaveBeenCalledTimes( 0 );
 			} );
 
 			it( 'should not tab to next radio option', async () => {
-				const user = userEvent.setup();
-
 				render(
-					<Component value="rigas" label="Test">
-						{ options }
-					</Component>
+					<>
+						<Component value="rigas" label="Test">
+							{ options }
+						</Component>
+						<button>After ToggleGroupControl</button>
+					</>
 				);
 
 				const rigas = screen.getByRole( 'radio', {
 					name: 'R',
 				} );
 
-				await user.tab();
+				await press.Tab();
 				expect( rigas ).toHaveFocus();
 
-				await user.tab();
+				await press.Tab();
 
+				// When in controlled mode, there is an additional "Reset" button.
 				const expectedFocusTarget =
 					mode === 'uncontrolled'
-						? rigas.ownerDocument.body
+						? screen.getByRole( 'button', {
+								name: 'After ToggleGroupControl',
+						  } )
 						: screen.getByRole( 'button', { name: 'Reset' } );
 
 				expect( expectedFocusTarget ).toHaveFocus();
@@ -301,7 +307,6 @@ describe.each( [
 		describe( 'isDeselectable = true', () => {
 			it( 'should be deselectable', async () => {
 				const mockOnChange = jest.fn();
-				const user = userEvent.setup();
 
 				render(
 					<Component
@@ -314,7 +319,7 @@ describe.each( [
 					</Component>
 				);
 
-				await user.click(
+				await click(
 					screen.getByRole( 'button', {
 						name: 'R',
 						pressed: true,
@@ -323,7 +328,7 @@ describe.each( [
 				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 				expect( mockOnChange ).toHaveBeenLastCalledWith( undefined );
 
-				await user.click(
+				await click(
 					screen.getByRole( 'button', {
 						name: 'R',
 						pressed: false,
@@ -334,15 +339,13 @@ describe.each( [
 			} );
 
 			it( 'should tab to the next option button', async () => {
-				const user = userEvent.setup();
-
 				render(
 					<Component isDeselectable value="rigas" label="Test">
 						{ options }
 					</Component>
 				);
 
-				await user.tab();
+				await press.Tab();
 				expect(
 					screen.getByRole( 'button', {
 						name: 'R',
@@ -350,7 +353,7 @@ describe.each( [
 					} )
 				).toHaveFocus();
 
-				await user.tab();
+				await press.Tab();
 				expect(
 					screen.getByRole( 'button', {
 						name: 'J',
@@ -359,7 +362,7 @@ describe.each( [
 				).toHaveFocus();
 
 				// Focus should not move with arrow keys
-				await user.keyboard( '{ArrowLeft}' );
+				await press.ArrowLeft();
 				expect(
 					screen.getByRole( 'button', {
 						name: 'J',
