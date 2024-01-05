@@ -105,11 +105,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 			! isset( $font_family_settings['name'] ) ||
 			! isset( $font_family_settings['fontFamily'] )
 		) {
-			$error_messages[] = sprintf(
-				// translators: 1: font family index.
-				__( 'Font family [%s] should have slug, name and fontFamily properties defined.', 'gutenberg' ),
-				$family_index
-			);
+			$error_messages[] = __( 'Font family should have slug, name and fontFamily properties defined.', 'gutenberg' );
 
 			return $error_messages;
 		}
@@ -120,7 +116,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 			}
 
 			if ( count( $font_family_settings['fontFace'] ) < 1 ) {
-				$error_messages[] = __( 'Font family [%s] should have at least one font face definition.', 'gutenberg' );
+				$error_messages[] = __( 'Font family should have at least one font face definition.', 'gutenberg' );
 			}
 
 			if ( ! empty( $font_family_settings['fontFace'] ) ) {
