@@ -31,7 +31,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		// Change editing mode from "HTML" back to "Visual".
 		await editor.clickBlockOptionsMenuItem( 'Edit visually' );
 
-		// This block should be in "visual" mode by default.
+		// This block should be in "visual" mode again.
 		await expect( paragraphBlock ).toHaveClass( /rich-text/ );
 	} );
 
