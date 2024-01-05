@@ -13,7 +13,7 @@ declare interface DependencyExtractionWebpackPluginOptions {
 	outputFormat?: 'php' | 'json';
 	outputFilename?: string | Function;
 	requestToExternal?: ( request: string ) => string | string[] | undefined;
-	requestToExternalModule?: ( request: string ) => string | undefined;
+	requestToExternalModule?: ( request: string ) => string | true | undefined;
 	requestToHandle?: ( request: string ) => string | undefined;
 	combinedOutputFile?: string | null;
 	combineAssets?: boolean;
