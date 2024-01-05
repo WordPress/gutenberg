@@ -237,6 +237,11 @@
 		}
 	}
 
+	.edit-site-patterns__pattern-icon {
+		fill: var(--wp-block-synced-color);
+		flex-shrink: 0;
+	}
+
 	.edit-site-patterns__pattern-lock-icon {
 		min-width: min-content;
 	}

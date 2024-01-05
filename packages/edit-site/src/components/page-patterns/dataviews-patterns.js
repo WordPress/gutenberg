@@ -169,7 +169,7 @@ function Title( { item, categoryId } ) {
 			item.syncStatus === PATTERN_SYNC_TYPES.full ? symbol : undefined;
 	}
 	return (
-		<HStack alignment="center" justify="flex-start" spacing={ 3 }>
+		<HStack alignment="center" justify="flex-start" spacing={ 2 }>
 			{ itemIcon && ! isNonUserPattern && (
 				<Tooltip
 					placement="top"
@@ -180,6 +180,18 @@ function Title( { item, categoryId } ) {
 					<Icon
 						className="edit-site-patterns__pattern-icon"
 						icon={ itemIcon }
+					/>
+				</Tooltip>
+			) }
+			{ item.type === PATTERN_TYPES.theme && (
+				<Tooltip
+					placement="top"
+					text={ __( 'This pattern cannot be edited.' ) }
+				>
+					<Icon
+						className="edit-site-patterns__pattern-lock-icon"
+						icon={ lockSmall }
+						size={ 24 }
 					/>
 				</Tooltip>
 			) }
@@ -198,18 +210,6 @@ function Title( { item, categoryId } ) {
 							{ item.title || item.name }
 						</Button>
 					</Heading>
-				) }
-				{ item.type === PATTERN_TYPES.theme && (
-					<Tooltip
-						placement="top"
-						text={ __( 'This pattern cannot be edited.' ) }
-					>
-						<Icon
-							className="edit-site-patterns__pattern-lock-icon"
-							icon={ lockSmall }
-							size={ 24 }
-						/>
-					</Tooltip>
 				) }
 			</Flex>
 		</HStack>
