@@ -25,10 +25,15 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 
 	useEffect( () => {
 		if ( ! isInternalColorSameAsReceivedColor ) {
+			// Keep internal HSLA color up to date with the received color prop
 			setInternalHSLA( colorPropHSL );
 		}
 	}, [ colorPropHSL, isInternalColorSameAsReceivedColor ] );
 
+	// If the internal color is equal to the received color prop, we can use the
+	// HSLA values from the local state which, compared to the received color prop,
+	// retain more details about the actual H and S values that the user selected,
+	// and thus allow for better UX when interacting with the H and S sliders.
 	const colorValue = isInternalColorSameAsReceivedColor
 		? internalHSLA
 		: colorPropHSL;
@@ -36,6 +41,7 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 	const updateHSLAValue = (
 		partialNewValue: Partial< typeof colorPropHSL >
 	) => {
+		// Update internal HSLA color.
 		setInternalHSLA( ( prevValue ) => ( {
 			...prevValue,
 			...partialNewValue,
@@ -46,17 +52,11 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 			...partialNewValue,
 		} );
 
-		// Avoid firing `onChange` if the resulting didn't change.
-		if ( color.isEqual( nextOnChangeValue ) ) {
-			return;
+		// Fire `onChange` only if the resulting color is different from the
+		// current one.
+		if ( ! color.isEqual( nextOnChangeValue ) ) {
+			onChange( nextOnChangeValue );
 		}
-
-		onChange(
-			colord( {
-				...colorValue,
-				...partialNewValue,
-			} )
-		);
 	};
 
 	return (
