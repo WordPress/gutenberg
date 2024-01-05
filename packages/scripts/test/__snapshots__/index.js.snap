@@ -19,6 +19,9 @@ exports[`should leave webpack.config.js untouched 1`] = `
   },
   "devtool": "source-map",
   "entry": [Function],
+  "experiments": {
+    "outputModule": true,
+  },
   "mode": "development",
   "module": {
     "rules": [
@@ -32,7 +35,7 @@ exports[`should leave webpack.config.js untouched 1`] = `
       },
       {
         "exclude": /node_modules/,
-        "test": /\\\\\\.\\(j\\|t\\)sx\\?\\$/,
+        "test": /\\\\\\.m\\?\\(j\\|t\\)sx\\?\\$/,
         "use": [
           {
             "loader": "/Users/jonsurrell/a8c/gutenberg/trunk/node_modules/babel-loader/lib/index.js",
@@ -303,10 +306,6 @@ exports[`should leave webpack.config.js untouched 1`] = `
     },
     DependencyExtractionWebpackPlugin {
       "externalizedDeps": Set {},
-      "externalsPlugin": ExternalsPlugin {
-        "externals": [Function],
-        "type": "window",
-      },
       "options": {
         "combineAssets": false,
         "combinedOutputFile": null,
@@ -316,6 +315,7 @@ exports[`should leave webpack.config.js untouched 1`] = `
         "outputFormat": "php",
         "useDefaults": true,
       },
+      "useModules": false,
     },
   ],
   "resolve": {
