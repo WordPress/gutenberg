@@ -5,7 +5,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useMemo, useState, useCallback } from '@wordpress/element';
+import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -38,6 +38,23 @@ export default function DataViews( {
 	labels,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
+
+	useEffect( () => {
+		if (
+			selection.length > 0 &&
+			selection.some(
+				( id ) => ! data.some( ( item ) => item.id === id )
+			)
+		) {
+			const newSelection = selection.filter( ( id ) =>
+				data.some( ( item ) => item.id === id )
+			);
+			setSelection( newSelection );
+			onSelectionChange(
+				data.filter( ( item ) => newSelection.includes( item.id ) )
+			);
+		}
+	}, [ selection, data, onSelectionChange ] );
 
 	const onSetSelection = useCallback(
 		( items ) => {
