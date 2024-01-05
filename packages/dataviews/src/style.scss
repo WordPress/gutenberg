@@ -403,5 +403,5 @@
 }
 
 .dataviews-bulk-edit-button.components-button.is-secondary {
-	padding-right: $grid-unit-15 + 2px;
+	flex-shrink: 0;
 }
