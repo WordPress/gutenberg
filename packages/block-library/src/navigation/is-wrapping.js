@@ -10,7 +10,7 @@ function areItemsWrapping(
 	wrapper,
 	children = wrapper.querySelectorAll( 'li' )
 ) {
-	const wrapperDimensions = wrapper.getBoundingClientRect();
+	const wrapperWidth = wrapper.offsetWidth;
 	//we store an array with the width of each item
 	const itemsWidths = getItemWidths( children );
 	let totalWidth = 0;
@@ -25,7 +25,7 @@ function areItemsWrapping(
 		if ( rowGap > 0 && i > 0 ) {
 			totalWidth += rowGap;
 		}
-		if ( parseInt( totalWidth ) > parseInt( wrapperDimensions.width ) ) {
+		if ( parseInt( totalWidth ) > wrapperWidth ) {
 			isWrapping = true;
 		}
 	}
