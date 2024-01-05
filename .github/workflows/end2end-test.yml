@@ -126,7 +126,7 @@ jobs:
               # Don't fail the job if there isn't any flaky tests report.
               continue-on-error: true
               with:
-                  name: flaky-tests-report-*
+                  pattern: flaky-tests-report-*
                   path: flaky-tests
                   merge-multiple: true
 
