@@ -18,9 +18,7 @@ import { useMemo, createInterpolateElement } from '@wordpress/element';
  */
 import { myPatternsCategory, SYNC_TYPES, PATTERN_TYPES } from './utils';
 
-const getShouldDisableSyncFilter = ( sourceFilter ) =>
-	sourceFilter !== PATTERN_TYPES.all && sourceFilter !== PATTERN_TYPES.user;
-
+const getShouldDisableSyncFilter = ( sourceFilter ) => sourceFilter !== 'all';
 const getShouldDisableNonUserSources = ( category ) => {
 	return category.name === myPatternsCategory.name;
 };
@@ -82,7 +80,7 @@ export function PatternsFilter( {
 	const patternSourceMenuOptions = useMemo(
 		() => [
 			{
-				value: PATTERN_TYPES.all,
+				value: 'all',
 				label: __( 'All' ),
 				disabled: shouldDisableNonUserSources,
 			},

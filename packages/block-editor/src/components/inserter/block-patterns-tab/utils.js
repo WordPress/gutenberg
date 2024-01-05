@@ -5,7 +5,6 @@
 import { __ } from '@wordpress/i18n';
 
 export const PATTERN_TYPES = {
-	all: 'all',
 	user: 'user',
 	theme: 'theme',
 	directory: 'directory',
