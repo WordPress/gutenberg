@@ -81,7 +81,7 @@ function SidebarScreens() {
 				<SidebarScreenWrapper path="/pages">
 					<SidebarNavigationScreen
 						title={ __( 'Pages' ) }
-						backPath="/page"
+						backPath="/"
 						content={ <DataViewsSidebarContent /> }
 					/>
 				</SidebarScreenWrapper>
