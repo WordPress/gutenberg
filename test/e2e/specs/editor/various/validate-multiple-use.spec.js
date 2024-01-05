@@ -19,7 +19,9 @@ test.describe( 'Validate multiple use', () => {
 			'//button[contains(@class, "components-menu-item__button")][contains(., "Duplicate")]';
 
 		// Insert a block with `multiple` feature enabled, such as `core/more`
-		await editor.insertBlock( 'More' );
+		await editor.insertBlock( {
+			name: 'core/more',
+		} );
 
 		// Block toolbar options dropdown button
 		let optionButton = await page.waitForXPath( OPTIONS_SELECTOR );
