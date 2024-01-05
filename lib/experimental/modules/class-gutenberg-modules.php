@@ -281,6 +281,15 @@ add_action( $modules_position, array( 'Gutenberg_Modules', 'print_module_preload
 // Prints the script that loads the import map polyfill in the footer.
 add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_import_map_polyfill' ), 11 );
 
+/**
+ * Add module fields from block metadata to WP_Block_Type settings
+ *
+ * This filter allows us to register modules from block metadata and attach additional fields to
+ * WP_Block_Type instances.
+ *
+ * @param array $settings Array of determined settings for registering a block type.
+ * @param array $metadata Metadata provided for registering a block type.
+ */
 function gutenberg_filter_block_type_metadata_settings_register_modules( $settings, $metadata = null ) {
 	$module_fields = array(
 		'viewModule' => 'view_module_handles',
@@ -315,6 +324,13 @@ function gutenberg_filter_block_type_metadata_settings_register_modules( $settin
 
 add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadata_settings_register_modules', 10, 2 );
 
+/**
+ * Enqueue modules associated with the block.
+ *
+ * @param string   $block_content The block content.
+ * @param array    $block         The full block, including name and attributes.
+ * @param WP_Block $instance      The block instance.
+ */
 function gutenberg_filter_render_block_enqueue_view_modules( $block_content, $parsed_block, $block_instance ) {
 	$block_type = $block_instance->block_type;
 
