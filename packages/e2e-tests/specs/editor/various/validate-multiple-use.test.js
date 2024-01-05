@@ -1,22 +1,25 @@
 /**
  * WordPress dependencies
  */
-import { createNewPost, insertBlock } from '@wordpress/e2e-test-utils';
 
-describe( 'Validate multiple use', () => {
-	beforeEach( async () => {
-		await createNewPost();
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+
+test.describe( 'Validate multiple use', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
 	} );
 
-	// Regression of: https://github.com/WordPress/gutenberg/pull/39813
-	it( 'should display correct amount of warning message', async () => {
+	test( 'should display correct amount of warning message', async ( {
+		editor,
+		page,
+	} ) => {
 		const OPTIONS_SELECTOR =
 			'//div[contains(@class, "block-editor-block-settings-menu")]//button[contains(@aria-label, "Options")]';
 		const DUPLICATE_BUTTON_SELECTOR =
 			'//button[contains(@class, "components-menu-item__button")][contains(., "Duplicate")]';
 
 		// Insert a block with `multiple` feature enabled, such as `core/more`
-		await insertBlock( 'More' );
+		await editor.insertBlock( 'More' );
 
 		// Block toolbar options dropdown button
 		let optionButton = await page.waitForXPath( OPTIONS_SELECTOR );

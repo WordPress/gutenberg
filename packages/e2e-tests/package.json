@@ -24,6 +24,7 @@
 	},
 	"dependencies": {
 		"@wordpress/e2e-test-utils": "file:../e2e-test-utils",
+		"@wordpress/e2e-test-utils-playwright": "^0.16.0",
 		"@wordpress/interactivity": "file:../interactivity",
 		"@wordpress/jest-console": "file:../jest-console",
 		"@wordpress/jest-puppeteer-axe": "file:../jest-puppeteer-axe",
