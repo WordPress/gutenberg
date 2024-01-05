@@ -1,50 +1,66 @@
+/**
+ * External dependencies
+ */
 import * as esbuild from 'esbuild';
 import fs from 'node:fs';
+import path from 'node:path';
 
 const importAnalysisPlugin = {
 	name: 'import-analysis',
 	setup( build ) {
-		const imports = { static: [], dynamic: [] };
+		const imports = { static: new Set(), dynamic: new Set() };
+		const dynamicImporters = new Set();
 		const externals = new Set( build.initialOptions.external || [] );
-		const isExternal = ( path ) => externals.has( path );
+		const isExternal = ( p ) => externals.has( p );
 
 		build.onResolve( { filter: /.*/ }, ( args ) => {
-			if ( args.kind === 'import-statement' && isExternal( args.path ) ) {
-				imports.static.push( {
-					path: args.path,
-					importer: args.importer,
-				} );
+			if ( isExternal( args.path ) ) {
+				if (
+					dynamicImporters.has( args.importer ) ||
+					args.kind === 'dynamic-import'
+				) {
+					imports.dynamic.add( args.path );
+				} else if ( args.kind === 'import-statement' ) {
+					imports.static.add( args.path );
+				}
 			} else if (
-				args.kind === 'dynamic-import' &&
-				isExternal( args.path )
+				dynamicImporters.has( args.importer ) ||
+				args.kind === 'dynamic-import'
 			) {
-				imports.dynamic.push( {
-					path: args.path,
-					importer: args.importer,
-				} );
+				dynamicImporters.add(
+					// TODO: Improve this resolution.
+					path.join( args.resolveDir, `${ args.path }.js` )
+				);
 			}
+
 			return null; // Continue with the default resolve behavior
 		} );
 
 		build.onEnd( ( result ) => {
 			if ( result.errors.length === 0 ) {
+				const output = {
+					static: Array.from( imports.static ),
+					dynamic: Array.from( imports.dynamic ),
+				};
 				fs.writeFileSync(
-					'import-analysis.json',
-					JSON.stringify( imports, null, 2 )
+					path.join(
+						build.initialOptions.outdir,
+						'import-analysis.json'
+					),
+					JSON.stringify( output, null, 2 )
 				);
 			}
 		} );
 	},
 };
 
-// Sample build script using the plugin
 esbuild
 	.build( {
-		entryPoints: [ 'packages/block-library/src/file/view.js' ],
+		entryPoints: [ 'test-modules/view.js' ],
 		bundle: true,
-		outdir: 'out',
+		outdir: 'test-modules/build',
 		format: 'esm',
-		external: [ '@wordpress/interactivity', 'lodash' ],
+		external: [ '@wordpress/interactivity', '@wordpress/blob' ],
 		plugins: [ importAnalysisPlugin ],
 		minify: true,
 		splitting: true,
