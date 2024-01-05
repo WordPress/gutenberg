@@ -39,18 +39,14 @@ function areItemsWrapping(
  * @return {boolean} Whether the nav element itself is wrapping.
  */
 function isNavElementWrapping( navElement ) {
-	let isWrapping = false;
 	//how can we check if the nav element is wrapped inside its parent if we don't know anything about it (the parent)?
 	//for debugging purposes
 	const container = getFlexParent( navElement );
 	if ( container !== null ) {
-		isWrapping = areItemsWrapping(
-			container,
-			Array.from( container.children )
-		);
+		return areItemsWrapping( container, Array.from( container.children ) );
 	}
 
-	return isWrapping;
+	return false;
 }
 
 /**
@@ -88,7 +84,9 @@ function getFlexParent( element ) {
 	if ( isFlexWrap ) {
 		return parent;
 	}
-	return getFlexParent( parent );
+	// I don't think we should make this recursive
+	// because it means a nav block inside a collapsed column will always collapse.
+	return null; //getFlexParent( parent );
 }
 
 /**
