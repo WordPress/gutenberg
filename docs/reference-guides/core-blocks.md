@@ -799,7 +799,7 @@ Help visitors find your content. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/search
 -	**Category:** widgets
 -	**Supports:** align (center, left, right), color (background, gradients, text), interactivity, typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** buttonBehavior, buttonPosition, buttonText, buttonUseIcon, isSearchFieldHidden, label, placeholder, query, showLabel, width, widthUnit
+-	**Attributes:** buttonPosition, buttonText, buttonUseIcon, isSearchFieldHidden, label, placeholder, query, showLabel, width, widthUnit
 
 ## Separator
 
