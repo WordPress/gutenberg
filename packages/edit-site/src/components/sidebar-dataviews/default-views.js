@@ -7,10 +7,10 @@ import { trash } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { LAYOUT_TABLE, OPERATOR_IN } from '../../utils/constants';
+import { LAYOUT_LIST, OPERATOR_IN } from '../../utils/constants';
 
 const DEFAULT_PAGE_BASE = {
-	type: LAYOUT_TABLE,
+	type: LAYOUT_LIST,
 	search: '',
 	filters: [],
 	page: 1,
