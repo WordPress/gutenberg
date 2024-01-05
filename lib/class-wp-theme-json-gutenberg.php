@@ -862,6 +862,26 @@ class WP_Theme_JSON_Gutenberg {
 		$block_style_variation_styles['blocks']   = $schema_styles_blocks;
 		$block_style_variation_styles['elements'] = $schema_styles_elements;
 
+		// Generate schema for shared variations i.e. those that can be
+		// referenced with block style variations and live under
+		// styles.blocks.variations. These variations could be any valid block
+		// style variation. The schema will differ in that these variations
+		// cannot reference another.
+		//
+		// NOTE: The size of the schema array is already very large given
+		// entries for each individual block. This is compounded when multiple
+		// variations need to added to the schema. Would multiple passes for
+		// validation offer any improvements?
+		$unique_variations              = array_unique(
+			call_user_func_array( 'array_merge', array_values( $valid_variations ) )
+		);
+		$schema_shared_style_variations = array_fill_keys( $unique_variations, $block_style_variation_styles );
+
+		// Allow refs only within the individual block type variations properties.
+		// Assigning it before `$schema_shared_style_variations` would mean
+		// shared variations would allow `ref` properties.
+		$block_style_variation_styles['ref'] = null;
+
 		foreach ( $valid_block_names as $block ) {
 			$style_variation_names = array();
 
@@ -890,6 +910,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		$schema['styles']                                 = static::VALID_STYLES;
 		$schema['styles']['blocks']                       = $schema_styles_blocks;
+		$schema['styles']['blocks']['variations']         = $schema_shared_style_variations;
 		$schema['styles']['elements']                     = $schema_styles_elements;
 		$schema['settings']                               = static::VALID_SETTINGS;
 		$schema['settings']['blocks']                     = $schema_settings_blocks;
@@ -2451,6 +2472,15 @@ class WP_Theme_JSON_Gutenberg {
 					'selector' => $variation_selector,
 				);
 
+				if (
+					isset( $variation_node['ref'] ) &&
+					str_starts_with( $variation_node['ref'], 'styles.blocks.variations' )
+				) {
+					$variation_path       = explode( '.', $variation_node['ref'] );
+					$referenced_variation = _wp_array_get( $theme_json, $variation_path, array() );
+					$variation_node       = static::merge_styles( $referenced_variation, $variation_node );
+				}
+
 				$variation_blocks   = $variation_node['blocks'] ?? array();
 				$variation_elements = $variation_node['elements'] ?? array();
 
@@ -2539,6 +2569,30 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Retrieves a style node along with any of its non-customized block style
+	 * variation data.
+	 *
+	 * @param array $theme_json A theme.json structure to modify.
+	 * @param array $path       Path for the node to retrie.
+	 *
+	 * @return array Style node with merged block style variation data if appropriate.
+	 */
+	public static function get_style_node_with_referenced_variations( $theme_json, $path ) {
+		$node  = _wp_array_get( $theme_json, $path, array() );
+		$index = array_search( 'variations', $path, true );
+
+		// Get any referenced variation and merge any node values into that.
+		if ( false !== $index && isset( $path[ $index + 1 ] ) ) {
+			$variation_path = array( 'styles', 'blocks', 'variations' );
+			$variation_path = array_merge( $variation_path, array_slice( $path, $index + 1 ) );
+			$variation_node = _wp_array_get( $theme_json, $variation_path, array() );
+			$node           = static::merge_styles( $variation_node, $node );
+		}
+
+		return $node;
+	}
+
+	/**
 	 * Gets the CSS rules for a particular block from theme.json.
 	 *
 	 * @since 6.1.0
@@ -2548,7 +2602,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string Styles for the block.
 	 */
 	public function get_styles_for_block( $block_metadata ) {
-		$node             = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
+		$node             = static::get_style_node_with_referenced_variations( $this->theme_json, $block_metadata['path'] );
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 		$selector         = $block_metadata['selector'];
 		$settings         = $this->theme_json['settings'] ?? null;
@@ -2559,7 +2613,21 @@ class WP_Theme_JSON_Gutenberg {
 		$style_variation_declarations = array();
 		if ( ! empty( $block_metadata['variations'] ) ) {
 			foreach ( $block_metadata['variations'] as $style_variation ) {
-				$style_variation_node           = _wp_array_get( $this->theme_json, $style_variation['path'], array() );
+				// Given block style variations can reference an entire object
+				// rather than a single value, any values in the variation
+				// node itself should override the referenced style variation's
+				// values.
+				$style_variation_node = _wp_array_get( $this->theme_json, $style_variation['path'], array() );
+				if (
+					isset( $style_variation_node['ref'] ) &&
+					str_starts_with( $style_variation_node['ref'], 'styles.blocks.variations' )
+				) {
+					$variation_path       = explode( '.', $style_variation_node['ref'] );
+					$referenced_variation = _wp_array_get( $this->theme_json, $variation_path, array() );
+					$style_variation_node = static::merge_styles( $referenced_variation, $style_variation_node );
+				}
+
+				$style_variation_node           = $style_variation_node ? $style_variation_node : array();
 				$clean_style_variation_selector = trim( $style_variation['selector'] );
 
 				// Generate any feature/subfeature style declarations for the current style variation.
@@ -4042,5 +4110,39 @@ class WP_Theme_JSON_Gutenberg {
 
 		$theme_json->theme_json['styles'] = self::convert_variables_to_value( $styles, $vars );
 		return $theme_json;
+	}
+
+	/**
+	 * Recursively merge style objects without merging leaf values.
+	 *
+	 * `array_merge_recursive` will end up merging style values if they are
+	 * present in both style objects resulting in an array when the value
+	 * should be a string.
+	 *
+	 * @param array $target_styles Target style data.
+	 * @param array $source_styles Style data to merge into the target.
+	 *
+	 * @return array Merged style data
+	 */
+	public static function merge_styles( $target_styles, $source_styles ) {
+		if ( empty( $source_styles ) ) {
+			return $target_styles;
+		}
+
+		if ( empty( $target_styles ) ) {
+			return $source_styles;
+		}
+
+		$merged_styles = $target_styles;
+
+		foreach ( $source_styles as $key => $value ) {
+			if ( is_array( $value ) && isset( $merged_styles[ $key ] ) && is_array( $merged_styles[ $key ] ) ) {
+				$merged_styles[ $key ] = static::merge_styles( $merged_styles[ $key ], $value );
+			} else {
+				$merged_styles[ $key ] = $value;
+			}
+		}
+
+		return $merged_styles;
 	}
 }
