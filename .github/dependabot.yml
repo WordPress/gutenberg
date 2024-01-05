@@ -12,7 +12,6 @@ updates:
           - 'GitHub Actions'
           - '[Type] Build Tooling'
       groups:
-        github-actions:
-          patterns:
-            - "*"
-            
+          github-actions:
+              patterns:
+                  - '*'
