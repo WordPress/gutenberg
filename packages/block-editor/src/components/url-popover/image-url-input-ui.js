@@ -35,6 +35,34 @@ const icon = (
 	</SVG>
 );
 
+const expandIcon = (
+	<SVG
+		xmlns="http://www.w3.org/2000/svg"
+		width="12"
+		height="12"
+		fill="none"
+		viewBox="0 0 12 12"
+	>
+		<Path
+			fill="#000"
+			d="M2 0a2 2 0 0 0-2 2v2h1.5V2a.5.5 0 0 1 .5-.5h2V0H2Zm2 10.5H2a.5.5 0 0 1-.5-.5V8H0v2a2 2 0 0 0 2 2h2v-1.5ZM8 12v-1.5h2a.5.5 0 0 0 .5-.5V8H12v2a2 2 0 0 1-2 2H8Zm2-12a2 2 0 0 1 2 2v2h-1.5V2a.5.5 0 0 0-.5-.5H8V0h2Z"
+		/>
+	</SVG>
+);
+
+const unlinkIcon = (
+	<SVG
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 24 24"
+		width="24"
+		height="24"
+		aria-hidden="true"
+		focusable="false"
+	>
+		<Path d="M17.031 4.703 15.576 4l-1.56 3H14v.03l-2.324 4.47H9.5V13h1.396l-1.502 2.889h-.95a3.694 3.694 0 0 1 0-7.389H10V7H8.444a5.194 5.194 0 1 0 0 10.389h.17L7.5 19.53l1.416.719L15.049 8.5h.507a3.694 3.694 0 0 1 0 7.39H14v1.5h1.556a5.194 5.194 0 0 0 .273-10.383l1.202-2.304Z"></Path>
+	</SVG>
+);
+
 const ImageURLInputUI = ( {
 	linkDestination,
 	onChangeUrl,
@@ -45,6 +73,7 @@ const ImageURLInputUI = ( {
 	linkTarget,
 	linkClass,
 	rel,
+	lightboxEnabled,
 } ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
 	// Use internal state instead of a ref to make sure that the component
@@ -138,6 +167,7 @@ const ImageURLInputUI = ( {
 				onChangeUrl( {
 					href: urlInput,
 					linkDestination: selectedDestination,
+					lightbox: { enabled: false },
 				} );
 			}
 			stopEditLink();
@@ -157,7 +187,7 @@ const ImageURLInputUI = ( {
 		const linkDestinations = [
 			{
 				linkDestination: LINK_DESTINATION_MEDIA,
-				title: __( 'Media File' ),
+				title: __( 'Link to media file' ),
 				url: mediaType === 'image' ? mediaUrl : undefined,
 				icon,
 			},
@@ -165,7 +195,7 @@ const ImageURLInputUI = ( {
 		if ( mediaType === 'image' && mediaLink ) {
 			linkDestinations.push( {
 				linkDestination: LINK_DESTINATION_ATTACHMENT,
-				title: __( 'Attachment Page' ),
+				title: __( 'Link to attachment page' ),
 				url: mediaType === 'image' ? mediaLink : undefined,
 				icon: (
 					<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -233,6 +263,7 @@ const ImageURLInputUI = ( {
 	);
 
 	const linkEditorValue = urlInput !== null ? urlInput : url;
+	const showLinkEditor = ( ! linkEditorValue && ! lightboxEnabled ) === true;
 
 	const urlLabel = (
 		getLinkDestinations().find(
@@ -258,12 +289,13 @@ const ImageURLInputUI = ( {
 					onClose={ closeLinkUI }
 					renderSettings={ () => advancedOptions }
 					additionalControls={
-						! linkEditorValue && (
+						showLinkEditor && (
 							<NavigableMenu>
 								{ getLinkDestinations().map( ( link ) => (
 									<MenuItem
 										key={ link.linkDestination }
 										icon={ link.icon }
+										iconPosition="left"
 										onClick={ () => {
 											setUrlInput( null );
 											onSetHref( link.url );
@@ -273,20 +305,39 @@ const ImageURLInputUI = ( {
 										{ link.title }
 									</MenuItem>
 								) ) }
+								<MenuItem
+									key="expand-on-click"
+									icon={ expandIcon }
+									iconPosition="left"
+									onClick={ () => {
+										setUrlInput( null );
+										onChangeUrl( {
+											lightbox: { enabled: true },
+											linkDestination:
+												LINK_DESTINATION_NONE,
+											href: '',
+										} );
+										stopEditLink();
+									} }
+								>
+									{ __( 'Expand on click' ) }
+								</MenuItem>
 							</NavigableMenu>
 						)
 					}
 				>
-					{ ( ! url || isEditingLink ) && (
-						<URLPopover.LinkEditor
-							className="block-editor-format-toolbar__link-container-content"
-							value={ linkEditorValue }
-							onChangeInputValue={ setUrlInput }
-							onSubmit={ onSubmitLinkChange() }
-							autocompleteRef={ autocompleteRef }
-						/>
+					{ ( ! url || isEditingLink ) && ! lightboxEnabled && (
+						<>
+							<URLPopover.LinkEditor
+								className="block-editor-format-toolbar__link-container-content"
+								value={ linkEditorValue }
+								onChangeInputValue={ setUrlInput }
+								onSubmit={ onSubmitLinkChange() }
+								autocompleteRef={ autocompleteRef }
+							/>
+						</>
 					) }
-					{ url && ! isEditingLink && (
+					{ url && ! isEditingLink && ! lightboxEnabled && (
 						<>
 							<URLPopover.LinkViewer
 								className="block-editor-format-toolbar__link-container-content"
@@ -299,6 +350,33 @@ const ImageURLInputUI = ( {
 								label={ __( 'Remove link' ) }
 								onClick={ onLinkRemove }
 							/>
+						</>
+					) }
+					{ ! url && ! isEditingLink && lightboxEnabled && (
+						<>
+							<div
+								className="block-editor-url-popover__expand-on-click"
+								url={ url }
+							>
+								{ expandIcon }
+								<div>
+									<p>{ __( 'Expand on click' ) }</p>
+									<p>
+										{ __(
+											'Scales the image with a lightbox effect'
+										) }
+									</p>
+								</div>
+								<Button
+									icon={ unlinkIcon }
+									label={ __( 'Remove link' ) }
+									onClick={ () => {
+										onChangeUrl( {
+											lightbox: { enabled: false },
+										} );
+									} }
+								/>
+							</div>
 						</>
 					) }
 				</URLPopover>

@@ -78,3 +78,20 @@
 		color: $alert-red;
 	}
 }
+
+.block-editor-url-popover__expand-on-click {
+	display: flex;
+	align-items: center;
+	flex-grow: 1;
+	flex-shrink: 1;
+	margin: 7px;
+	max-width: 500px;
+	min-width: 150px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
+	p {
+		margin: 0 0 0 7px;
+	}
+}
