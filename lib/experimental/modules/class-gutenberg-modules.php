@@ -351,13 +351,15 @@ add_filter( 'render_block', 'gutenberg_filter_render_block_enqueue_view_modules'
  * with details necessary to register the module under an automatically
  * generated module ID.
  *
+ * This is analogous to the `register_block_script_handle` in WordPress Core.
+ *
  * @param array  $metadata   Block metadata.
  * @param string $field_name Field name to pick from metadata.
  * @param int    $index      Optional. Index of the script to register when multiple items passed.
  *                           Default 0.
  * @return string Module ID.
  */
-function gutenberg_register_block_module_handle( $metadata, $field_name, $index = 0 ) {
+function gutenberg_register_block_module_id( $metadata, $field_name, $index = 0 ) {
 	if ( empty( $metadata[ $field_name ] ) ) {
 		return false;
 	}
@@ -421,6 +423,8 @@ function gutenberg_register_block_module_handle( $metadata, $field_name, $index 
 /**
  * Generates the module ID for an asset based on the name of the block
  * and the field name provided.
+ *
+ * This is analogous to the `generate_block_asset_handle` in WordPress Core.
  *
  * @param string $block_name Name of the block.
  * @param string $field_name Name of the metadata field.
