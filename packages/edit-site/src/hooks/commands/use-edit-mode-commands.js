@@ -228,7 +228,7 @@ function useEditUICommands() {
 			),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			isListViewOpen: isListViewOpened(),
-			isDistractionFree: get( editSiteStore.name, 'distractionFree' ),
+			isDistractionFree: get( 'core', 'distractionFree' ),
 		};
 	}, [] );
 	const { openModal } = useDispatch( interfaceStore );

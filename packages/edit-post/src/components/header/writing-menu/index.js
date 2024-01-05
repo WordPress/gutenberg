@@ -35,7 +35,7 @@ function WritingMenu() {
 	};
 
 	const turnOffDistractionFree = () => {
-		setPreference( 'core/edit-post', 'distractionFree', false );
+		setPreference( 'core', 'distractionFree', false );
 	};
 
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -57,7 +57,7 @@ function WritingMenu() {
 				messageDeactivated={ __( 'Top toolbar deactivated' ) }
 			/>
 			<PreferenceToggleMenuItem
-				scope="core/edit-post"
+				scope="core"
 				name="distractionFree"
 				onToggle={ toggleDistractionFree }
 				label={ __( 'Distraction free' ) }

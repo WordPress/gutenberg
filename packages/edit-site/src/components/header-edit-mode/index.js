@@ -71,10 +71,7 @@ export default function HeaderEditMode() {
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
-			isDistractionFree: getPreference(
-				editSiteStore.name,
-				'distractionFree'
-			),
+			isDistractionFree: getPreference( 'core', 'distractionFree' ),
 			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
