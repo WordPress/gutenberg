@@ -30,6 +30,9 @@ function useIsCollapsed( overlayMenu, navRef ) {
 			setIsCollapsed( shouldBeCollapsed() );
 		}
 		window.addEventListener( 'resize', debounce( updateIsCollapsed, 100 ) );
+		return () => {
+			window.removeEventListener( 'resize', updateIsCollapsed );
+		};
 	} );
 
 	return isCollapsed;
