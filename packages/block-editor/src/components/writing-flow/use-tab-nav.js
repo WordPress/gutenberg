@@ -12,6 +12,7 @@ import { useRef } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../store';
 import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
+import { unlock } from '../../lock-unlock';
 
 export default function useTabNav() {
 	const container = useRef();
@@ -20,14 +21,16 @@ export default function useTabNav() {
 
 	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
 		useSelect( blockEditorStore );
-	const { setNavigationMode, setLastFocus } = useDispatch( blockEditorStore );
+	const { setNavigationMode, setLastFocus } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const isNavigationMode = useSelect(
 		( select ) => select( blockEditorStore ).isNavigationMode(),
 		[]
 	);
 
 	const lastFocus = useSelect(
-		( select ) => select( blockEditorStore ).getLastFocus(),
+		( select ) => unlock( select( blockEditorStore ) ).getLastFocus(),
 		[]
 	);
 

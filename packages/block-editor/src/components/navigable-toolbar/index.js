@@ -19,6 +19,7 @@ import { ESCAPE } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 function hasOnlyToolbarItem( elements ) {
 	const dataProp = 'toolbarItem';
@@ -169,7 +170,9 @@ function useToolbarFocus( {
 		};
 	}, [ initialIndex, initialFocusOnMount, onIndexChange, toolbarRef ] );
 
-	const { getLastFocus } = useSelect( blockEditorStore );
+	const getLastFocus = useSelect(
+		( select ) => unlock( select( blockEditorStore ) ).getLastFocus
+	);
 	/**
 	 * Handles returning focus to the block editor canvas when pressing escape.
 	 */
