@@ -51,7 +51,7 @@ function ReadOnlyContent( {
 	);
 }
 
-function EmptyContentPlaceholder( { context, onClose } ) {
+function EmptyContentPlaceholder( { context, onClose, openInserter } ) {
 	const { postType } = context;
 	const label =
 		'page' === postType
@@ -65,10 +65,7 @@ function EmptyContentPlaceholder( { context, onClose } ) {
 				'Add your first block or pattern to get started.'
 			) }
 		>
-			<Button
-				variant="primary"
-				//onClick={ openPatternSelectionModal }
-			>
+			<Button variant="primary" onClick={ openInserter }>
 				{ __( 'Choose a pattern' ) }
 			</Button>
 
@@ -111,13 +108,18 @@ function EditableContent( { context = {}, clientId } ) {
 		{ id: postId }
 	);
 
-	const entityRecord = useSelect(
+	const { entityRecord, setInserterIsOpened } = useSelect(
 		( select ) => {
-			return select( coreStore ).getEntityRecord(
-				'postType',
-				postType,
-				postId
-			);
+			return {
+				entityRecord: select( coreStore ).getEntityRecord(
+					'postType',
+					postType,
+					postId
+				),
+				setInserterIsOpened:
+					select( blockEditorStore ).getSettings()
+						.__experimentalSetIsInserterOpened,
+			};
 		},
 		[ postType, postId ]
 	);
@@ -133,11 +135,20 @@ function EditableContent( { context = {}, clientId } ) {
 			onChange,
 		}
 	);
-	const onClose = async () => {
-		await setHasPlaceholder( false );
+	const onClose = () => {
+		setHasPlaceholder( false );
 		const initialBlock = createBlock( 'core/paragraph' );
 		insertBlock( initialBlock, 0, clientId );
 		selectBlock( initialBlock.clientId );
+	};
+
+	const openInserter = () => {
+		setHasPlaceholder( false );
+		setInserterIsOpened( {
+			initialCategory: 'patterns',
+			rootClientId: clientId,
+			insertionIndex: 0,
+		} );
 	};
 
 	return (
@@ -147,6 +158,7 @@ function EditableContent( { context = {}, clientId } ) {
 				<EmptyContentPlaceholder
 					context={ context }
 					onClose={ onClose }
+					openInserter={ openInserter }
 				/>
 			) }
 		</div>

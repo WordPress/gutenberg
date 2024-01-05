@@ -25,7 +25,11 @@ const EMPTY_INSERTION_POINT = {
 export const getInsertionPoint = createRegistrySelector(
 	( select ) => ( state ) => {
 		if ( typeof state.blockInserterPanel === 'object' ) {
-			return state.blockInserterPanel;
+			return {
+				rootClientId: state.blockInserterPanel?.rootClientId,
+				insertionIndex: state.blockInserterPanel?.insertionIndex,
+				filterValue: state.blockInserterPanel?.filterValue,
+			};
 		}
 
 		if ( getRenderingMode( state ) === 'template-locked' ) {
@@ -43,6 +47,16 @@ export const getInsertionPoint = createRegistrySelector(
 		}
 
 		return EMPTY_INSERTION_POINT;
+	}
+);
+
+export const getInserterInitialCategory = createRegistrySelector(
+	() => ( state ) => {
+		if ( typeof state.blockInserterPanel === 'object' ) {
+			return state.blockInserterPanel?.initialCategory;
+		}
+
+		return null;
 	}
 );
 
