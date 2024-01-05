@@ -306,14 +306,7 @@ const scriptConfig = {
 			// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
 			SCRIPT_DEBUG: ! isProduction,
 		} ),
-		// During rebuilds, all webpack assets that are not used anymore will be
-		// removed automatically. There is an exception added in watch mode for
-		// fonts and images. It is a known limitations:
-		// https://github.com/johnagan/clean-webpack-plugin/issues/159
 		new CleanWebpackPlugin( {
-			cleanOnceBeforeBuildPatterns: [ '!fonts/**', '!images/**' ],
-			// Prevent it from deleting webpack assets during builds that have
-			// multiple configurations returned in the webpack config.
 			cleanStaleWebpackAssets: false,
 		} ),
 		new RenderPathsPlugin(),
