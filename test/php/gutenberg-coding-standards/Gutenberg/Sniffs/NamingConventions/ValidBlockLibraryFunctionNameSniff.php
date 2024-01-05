@@ -75,7 +75,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 			return;
 		}
 
-		$this->processFunctionCallToken( $phpcsFile, $stackPtr );
+		$this->processFunctionCall( $phpcsFile, $stackPtr );
 	}
 
 	/**
@@ -140,7 +140,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 		$phpcsFile->addError( $error_message, $function_token, 'FunctionNameInvalid' );
 	}
 
-	private function processFunctionCallToken( File $phpcs_file, $stack_pointer ) {
+	private function processFunctionCall( File $phpcs_file, $stack_pointer ) {
 		if ( empty( $this->disallowed_function_calls ) ) {
 			// Nothing to process.
 			return;
