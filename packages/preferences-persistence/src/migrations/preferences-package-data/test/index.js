@@ -44,6 +44,10 @@ describe( 'convertPreferencesPackageData', () => {
 		{
 		  "core": {
 		    "fixedToolbar": true,
+		    "inactivePanels": [],
+		    "openPanels": [
+		      "post-status",
+		    ],
 		  },
 		  "core/customize-widgets": {
 		    "fixedToolbar": true,
@@ -55,10 +59,6 @@ describe( 'convertPreferencesPackageData', () => {
 		    "hiddenBlockTypes": [
 		      "core/audio",
 		      "core/cover",
-		    ],
-		    "inactivePanels": [],
-		    "openPanels": [
-		      "post-status",
 		    ],
 		    "pinnedItems": {
 		      "my-sidebar-plugin/title-sidebar": false,

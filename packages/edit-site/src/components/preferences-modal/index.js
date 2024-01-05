@@ -11,12 +11,20 @@ import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	PostTaxonomies,
+	PostExcerptCheck,
+	PageAttributesCheck,
+	PostFeaturedImageCheck,
+	PostTypeSupportCheck,
+	store as editorStore,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import EnableFeature from './enable-feature';
+import EnablePanelOption from './enable-panel-option';
 import { store as editSiteStore } from '../../store';
 
 export const PREFERENCES_MODAL_NAME = 'edit-site/preferences';
@@ -52,32 +60,75 @@ export default function EditSitePreferencesModal() {
 			name: 'general',
 			tabLabel: __( 'General' ),
 			content: (
-				<PreferencesModalSection title={ __( 'Interface' ) }>
-					<EnableFeature
-						scope="core"
-						featureName="showListViewByDefault"
-						help={ __(
-							'Opens the block list view sidebar by default.'
+				<>
+					<PreferencesModalSection title={ __( 'Interface' ) }>
+						<EnableFeature
+							scope="core"
+							featureName="showListViewByDefault"
+							help={ __(
+								'Opens the block list view sidebar by default.'
+							) }
+							label={ __( 'Always open list view' ) }
+						/>
+						<EnableFeature
+							scope="core"
+							featureName="showBlockBreadcrumbs"
+							help={ __(
+								'Shows block breadcrumbs at the bottom of the editor.'
+							) }
+							label={ __( 'Display block breadcrumbs' ) }
+						/>
+						<EnableFeature
+							scope="core"
+							featureName="allowRightClickOverrides"
+							help={ __(
+								'Allows contextual list view menus via right-click, overriding browser defaults.'
+							) }
+							label={ __( 'Allow right-click contextual menus' ) }
+						/>
+					</PreferencesModalSection>
+					<PreferencesModalSection
+						title={ __( 'Document settings' ) }
+						description={ __(
+							'Select what settings are shown in the document panel.'
 						) }
-						label={ __( 'Always open list view' ) }
-					/>
-					<EnableFeature
-						scope="core"
-						featureName="showBlockBreadcrumbs"
-						help={ __(
-							'Shows block breadcrumbs at the bottom of the editor.'
-						) }
-						label={ __( 'Display block breadcrumbs' ) }
-					/>
-					<EnableFeature
-						scope="core"
-						featureName="allowRightClickOverrides"
-						help={ __(
-							'Allows contextual list view menus via right-click, overriding browser defaults.'
-						) }
-						label={ __( 'Allow right-click contextual menus' ) }
-					/>
-				</PreferencesModalSection>
+					>
+						<PostTaxonomies
+							taxonomyWrapper={ ( content, taxonomy ) => (
+								<EnablePanelOption
+									label={ taxonomy.labels.menu_name }
+									panelName={ `taxonomy-panel-${ taxonomy.slug }` }
+								/>
+							) }
+						/>
+						<PostFeaturedImageCheck>
+							<EnablePanelOption
+								label={ __( 'Featured image' ) }
+								panelName="featured-image"
+							/>
+						</PostFeaturedImageCheck>
+						<PostExcerptCheck>
+							<EnablePanelOption
+								label={ __( 'Excerpt' ) }
+								panelName="post-excerpt"
+							/>
+						</PostExcerptCheck>
+						<PostTypeSupportCheck
+							supportKeys={ [ 'comments', 'trackbacks' ] }
+						>
+							<EnablePanelOption
+								label={ __( 'Discussion' ) }
+								panelName="discussion-panel"
+							/>
+						</PostTypeSupportCheck>
+						<PageAttributesCheck>
+							<EnablePanelOption
+								label={ __( 'Page attributes' ) }
+								panelName="page-attributes"
+							/>
+						</PageAttributesCheck>
+					</PreferencesModalSection>
+				</>
 			),
 		},
 		{
