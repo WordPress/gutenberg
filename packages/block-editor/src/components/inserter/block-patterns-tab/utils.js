@@ -6,8 +6,6 @@ import { __ } from '@wordpress/i18n';
 
 export const PATTERN_TYPES = {
 	all: 'all',
-	synced: 'synced',
-	unsynced: 'unsynced',
 	user: 'user',
 	theme: 'theme',
 	directory: 'directory',
