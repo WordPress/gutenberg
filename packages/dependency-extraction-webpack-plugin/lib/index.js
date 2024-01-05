@@ -139,7 +139,7 @@ class DependencyExtractionWebpackPlugin {
 		 * @type {webpack.ExternalsPlugin}
 		 */
 		this.externalsPlugin = new webpack.ExternalsPlugin(
-			this.useModules ? 'module' : 'window',
+			this.useModules ? 'import' : 'window',
 			this.externalizeWpDeps.bind( this )
 		);
 
