@@ -282,7 +282,7 @@ add_action( $modules_position, array( 'Gutenberg_Modules', 'print_module_preload
 add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_import_map_polyfill' ), 11 );
 
 /**
- * Add module fields from block metadata to WP_Block_Type settings
+ * Add module fields from block metadata to WP_Block_Type settings.
  *
  * This filter allows us to register modules from block metadata and attach additional fields to
  * WP_Block_Type instances.
