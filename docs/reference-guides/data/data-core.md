@@ -374,6 +374,21 @@ _Returns_
 
 -   `any`: The entity record's save error.
 
+### getLinkSuggestions
+
+Fetch link suggestions for a given search term.
+
+_Parameters_
+
+-   _state_ Data state.
+-   _search_ Search term.
+-   _searchOptions_
+-   _settings_
+
+_Returns_
+
+-   Link suggestions.
+
 ### getRawEntityRecord
 
 Returns the entity's record object by key, with its attributes mapped to their raw values.

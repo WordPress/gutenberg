@@ -1491,3 +1491,21 @@ export const getRevision = createSelector(
 		];
 	}
 );
+
+/**
+ * Fetch link suggestions for a given search term.
+ *
+ * @param state         Data state.
+ * @param search        Search term.
+ * @param searchOptions
+ * @param settings
+ * @return Link suggestions.
+ */
+export function getLinkSuggestions(
+	state,
+	search = '',
+	searchOptions,
+	settings
+) {
+	return state.linkSuggestions[ search ];
+}

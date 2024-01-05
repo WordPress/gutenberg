@@ -17,6 +17,7 @@ import { STORE_NAME } from './name';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { forwardResolver, getNormalizedCommaSeparable } from './utils';
 import { getSyncProvider } from './sync';
+import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from './fetch';
 
 /**
  * Requests authors from the REST API.
@@ -666,6 +667,17 @@ export const getUserPatternCategories =
 			type: 'RECEIVE_USER_PATTERN_CATEGORIES',
 			patternCategories: mappedPatternCategories,
 		} );
+	};
+
+export const getLinkSuggestions =
+	( search, searchOptions, settings ) =>
+	async ( { dispatch } ) => {
+		const suggestions = await fetchLinkSuggestions(
+			search,
+			searchOptions,
+			settings
+		);
+		dispatch( { type: 'RECEIVE_LINK_SUGGESTIONS', search, suggestions } );
 	};
 
 export const getNavigationFallbackId =

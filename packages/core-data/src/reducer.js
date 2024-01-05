@@ -623,6 +623,18 @@ export function defaultTemplates( state = {}, action ) {
 	return state;
 }
 
+export function linkSuggestions( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_LINK_SUGGESTIONS':
+			return {
+				...state,
+				[ action.search ]: action.suggestions,
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
@@ -644,4 +656,5 @@ export default combineReducers( {
 	userPatternCategories,
 	navigationFallbackId,
 	defaultTemplates,
+	linkSuggestions,
 } );
