@@ -46,7 +46,7 @@ export default function MoreMenu( { showIconLabels } ) {
 
 	const toggleDistractionFree = () => {
 		registry.batch( () => {
-			setPreference( 'core/edit-site', 'fixedToolbar', true );
+			setPreference( 'core', 'fixedToolbar', true );
 			setIsInserterOpened( false );
 			setIsListViewOpened( false );
 			closeGeneralSidebar();
@@ -69,7 +69,7 @@ export default function MoreMenu( { showIconLabels } ) {
 					<>
 						<MenuGroup label={ _x( 'View', 'noun' ) }>
 							<PreferenceToggleMenuItem
-								scope="core/edit-site"
+								scope="core"
 								name="fixedToolbar"
 								onToggle={ turnOffDistractionFree }
 								label={ __( 'Top toolbar' ) }

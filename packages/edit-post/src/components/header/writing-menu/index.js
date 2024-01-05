@@ -27,7 +27,7 @@ function WritingMenu() {
 
 	const toggleDistractionFree = () => {
 		registry.batch( () => {
-			setPreference( 'core/edit-post', 'fixedToolbar', true );
+			setPreference( 'core', 'fixedToolbar', true );
 			setIsInserterOpened( false );
 			setIsListViewOpened( false );
 			closeGeneralSidebar();
@@ -46,7 +46,7 @@ function WritingMenu() {
 	return (
 		<MenuGroup label={ _x( 'View', 'noun' ) }>
 			<PreferenceToggleMenuItem
-				scope="core/edit-post"
+				scope="core"
 				name="fixedToolbar"
 				onToggle={ turnOffDistractionFree }
 				label={ __( 'Top toolbar' ) }

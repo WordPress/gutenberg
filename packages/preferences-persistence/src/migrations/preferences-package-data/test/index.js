@@ -42,13 +42,15 @@ describe( 'convertPreferencesPackageData', () => {
 		expect( convertPreferencesPackageData( input ) )
 			.toMatchInlineSnapshot( `
 		{
+		  "core": {
+		    "fixedToolbar": true,
+		  },
 		  "core/customize-widgets": {
 		    "fixedToolbar": true,
 		    "welcomeGuide": false,
 		  },
 		  "core/edit-post": {
 		    "editorMode": "visual",
-		    "fixedToolbar": true,
 		    "fullscreenMode": false,
 		    "hiddenBlockTypes": [
 		      "core/audio",
@@ -67,7 +69,6 @@ describe( 'convertPreferencesPackageData', () => {
 		    "welcomeGuide": false,
 		  },
 		  "core/edit-site": {
-		    "fixedToolbar": true,
 		    "isComplementaryAreaVisible": true,
 		    "welcomeGuide": false,
 		    "welcomeGuideStyles": false,
