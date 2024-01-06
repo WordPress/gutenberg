@@ -22,10 +22,12 @@ $navigation-icon-size: 24px;
 	}
 
 	ul,
-	ul li {
+	ul li,
+	ul.has-background {
 		list-style: none;
 
 		// Overrides generic ".entry-content li" styles on the front end.
+		// Also overrides List block "ul.has-background" styles on the front end.
 		padding: 0;
 	}
 
