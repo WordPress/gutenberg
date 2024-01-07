@@ -10,13 +10,17 @@ The post <a href="https://developer.wordpress.org/news/2023/02/27/static-vs-dyna
 
 ![Blocks with static rendering diagram](https://developer.wordpress.org/files/2024/01/static-rendering.png)
 
-Blocks have static rendering **when no dynamic rendering method has been defined (or is available) for the block**. In this case, the output for the front end will be taken from the [markup representation of the block in the database](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block/) that is generated (returned by the `save` function) when the block is saved in the Block Editor. This type is block is often called a **"static block"**.
+Blocks are considered "static" when they have "static rendering", this is when their output for the front end is statically generated when saved to the database, as returned by their `save` functions.
+
+Blocks have static rendering **when no dynamic rendering method has been defined (or is available) for the block**. In this case, the output for the front end will be taken from the [markup representation of the block in the database](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block/) that is returned by its `save` function when the block is saved in the Block Editor. This type is block is often called a "static block".
 
 ### How to define static rendering for a block
 
 The `save` function, which can be defined when [registering a block on the client](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/#registration-of-the-block-with-javascript-client-side), determines the markup of the block that will be stored in the database when the content is saved and eventually returned to the front end when there's a request. This markup is stored wrapped up in [unique block delimiters](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block/) but only the markup inside these block indicators is returned as the markup to be rendered for the block on the front end.
 
-<details><summary><em>Example static rendering of <code>preformatted</code> core block</em></summary>
+To define static rendering for a block we define just a `save` function for the block without any dynamic rendering method.
+
+<details><summary><em>Example of static rendering of the <code>preformatted</code> core block</em></summary>
 <br/>
 For example, the following <a href="https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/preformatted/save.js"><code>save</code> function</a> of the <a hreh="https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/preformatted"><code>preformatted</code></a> core block...
 
@@ -58,7 +62,7 @@ Blocks with dynamic rendering can also define a markup representation of the blo
 The markup stored for a block can be modified before it gets rendered on the front end via hooks such as <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>render_block</code></a> or via <code>$render_callback</code>.
 </div>
 
-Some examples of core blocks with static rendering (a.k.a. static blocks), this is blocks which output for the front end is statically generated when saved to the database (as returned by their `save` functions), are:
+Some examples of core blocks with static rendering are:
 - [`separator`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/separator) (see its [`save`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/separator/save.js) function) 
 - [`spacer`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer) (see its [`save`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer/save.js) function).
 - [`button`](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/button) (see its [`save`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/button/save.js) function).
@@ -66,14 +70,14 @@ Some examples of core blocks with static rendering (a.k.a. static blocks), this 
 
 ## Dynamic rendering
 
-Blocks with dynamic rendering are blocks that **build their structure and content on the fly when the block is requested from the client**. This type is block is often called a "dynamic block".
+Blocks with dynamic rendering are blocks that **build their structure and content on the fly when the block is requested from the client**. This type of block is often called a "dynamic block".
 
 ![Blocks with dynamic rendering diagram](https://developer.wordpress.org/files/2024/01/dynamic-rendering.png)
 
 There are some common use cases for dynamic blocks:
 
-1. **Blocks where content should change even if a post has not been updated**. An example is the [`latest-posts` core block](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/latest-posts) which will update its content, on request time, everywhere it is used after a new post is published.
-2. **Blocks where updates to the markup should be immediately shown on the front end of the website**. For example, if you update the structure of a block by adding a new class, adding an HTML element, or changing the layout in any other way, using a dynamic block ensures those changes are applied immediately on all occurrences of that block across the site. If a dynamic block is not used then when block code is updated Gutenberg's [validation process](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#validation) generally applies, causing users to see the validation message, "This block appears to have been modified externally".
+1. **Blocks where content should change even if a post has not been updated**. An example is the [`latest-posts` core block](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/latest-posts), which will update its content on request time, everywhere it is used after a new post is published.
+2. **Blocks where updates to the markup should be immediately shown on the front end of the website**. For example, if you update the structure of a block by adding a new class, adding an HTML element, or changing the layout in any other way, using a dynamic block ensures those changes are applied immediately on all occurrences of that block across the site. If a dynamic block is not used then when block code is updated, Gutenberg's [validation process](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#validation) generally applies, causing users to see the validation message: "This block appears to have been modified externally".
 
 ### How to define dynamic rendering for a block
 
@@ -86,7 +90,7 @@ Both of these ways to define the block's dynamic rendering receive the following
  - `$content` - Rendered block output (markup of the block as stored in the database).
  - `$block` - The instance of the [WP_Block](https://developer.wordpress.org/reference/classes/wp_block/) class that represents the block being rendered ([metadata of the block](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/)).
 
-<details><summary><em>Example dynamic rendering of <code>site-title</code> core block</em></summary>
+<details><summary><em>Example of dynamic rendering of the <code>site-title</code> core block</em></summary>
 <br/>
 
 For example, the [`site-title`](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-title) core block with the following function registered as [`render_callback`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/site-title/index.php)...
@@ -152,7 +156,7 @@ function render_block_core_site_title( $attributes ) {
 
 For dynamic blocks, the `save` callback function can return just `null`, which tells the editor to save only the block delimiter comment (along with any existing [block attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/)) to the database. These attributes are then passed into the server-side rendering callback, which will determine how to display the block on the front end of your site. **When `save` is `null`, the Block Editor will skip the [block markup validation process](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#validation)**, avoiding issues with frequently changing markup.
 
-Blocks with dynamic rendering can also save an HTML representation of the block as a backup. If you provide a server-side rendering callback, this HTML will be replaced with the output of your callback, but will be rendered if your block is deactivated or your render callback is removed.
+Blocks with dynamic rendering can also save an HTML representation of the block as a backup. If you provide a server-side rendering callback, this HTML will be replaced with the output of your callback, but will be rendered if your block is deactivated (the plugin that registers the block is uninstalled) or your render callback is removed.
 
 In some cases, the block saves an HTML representation of the block and uses a dynamic rendering to fine-tune this markup if some conditions are met. Some examples of core blocks using this approach are:
 - The [`cover`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover) block saves a [full HTML representation of the block in the database](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/save.js). This markup is processed via a [`render_callback`](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L74) when requested to do some PHP magic that dynamically [injects the featured image if the "use featured image" setting is enabled](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L16).
