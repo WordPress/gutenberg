@@ -13,11 +13,10 @@ import BlockList from '../block-list';
 import Iframe from '../iframe';
 import EditorStyles from '../editor-styles';
 import { store } from '../../store';
+import useViewportAspectRatio from './use-viewport-aspect-ratio';
 
 // This is used to avoid rendering the block list if the sizes change.
 let MemoizedBlockList;
-
-const MAX_HEIGHT = 2000;
 
 function ScaledBlockPreview( {
 	viewportWidth,
@@ -28,6 +27,8 @@ function ScaledBlockPreview( {
 	if ( ! viewportWidth ) {
 		viewportWidth = containerWidth;
 	}
+
+	const viewportAspectRatio = useViewportAspectRatio();
 
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
@@ -58,6 +59,7 @@ function ScaledBlockPreview( {
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
 
 	const scale = containerWidth / viewportWidth;
+	const maxHeight = containerWidth / viewportAspectRatio / scale;
 	const aspectRatio = contentHeight
 		? containerWidth / ( contentHeight * scale )
 		: 0;
@@ -72,7 +74,7 @@ function ScaledBlockPreview( {
 				// See https://github.com/WordPress/gutenberg/pull/52921 for more info.
 				aspectRatio,
 				maxHeight:
-					contentHeight > MAX_HEIGHT ? MAX_HEIGHT * scale : undefined,
+					contentHeight > maxHeight ? maxHeight * scale : undefined,
 				minHeight,
 			} }
 		>
@@ -100,8 +102,9 @@ function ScaledBlockPreview( {
 					height: contentHeight,
 					pointerEvents: 'none',
 					// This is a catch-all max-height for patterns.
-					// See: https://github.com/WordPress/gutenberg/pull/38175.
-					maxHeight: MAX_HEIGHT,
+					// See: https://github.com/WordPress/gutenberg/pull/38175,
+					// and https://github.com/WordPress/gutenberg/issues/50449.
+					maxHeight,
 					minHeight:
 						scale !== 0 && scale < 1 && minHeight
 							? minHeight / scale
