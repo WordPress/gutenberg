@@ -138,7 +138,8 @@ function EditorCanvas( {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
-			hasHistory: !! editorSettings.goBack,
+			hasHistory:
+				!! editorSettings.goBack && postTypeSlug !== 'wp_template',
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
