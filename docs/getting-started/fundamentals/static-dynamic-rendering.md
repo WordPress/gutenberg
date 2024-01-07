@@ -18,7 +18,7 @@ Blocks have static rendering **when no dynamic rendering method has been defined
 
 The `save` function, which can be defined when [registering a block on the client](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/#registration-of-the-block-with-javascript-client-side), determines the markup of the block that will be stored in the database when the content is saved and eventually returned to the front end when there's a request. This markup is stored wrapped up in [unique block delimiters](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block/) but only the markup inside these block indicators is returned as the markup to be rendered for the block on the front end.
 
-To define static rendering for a block we define just a `save` function for the block without any dynamic rendering method.
+To define static rendering for a block we define a `save` function for the block without any dynamic rendering method.
 
 <details><summary><em>Example of static rendering of the <code>preformatted</code> core block</em></summary>
 <br/>
@@ -156,7 +156,7 @@ function render_block_core_site_title( $attributes ) {
 
 For dynamic blocks, the `save` callback function can return just `null`, which tells the editor to save only the block delimiter comment (along with any existing [block attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/)) to the database. These attributes are then passed into the server-side rendering callback, which will determine how to display the block on the front end of your site. **When `save` is `null`, the Block Editor will skip the [block markup validation process](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#validation)**, avoiding issues with frequently changing markup.
 
-Blocks with dynamic rendering can also save an HTML representation of the block as a backup. If you provide a server-side rendering callback, this HTML will be replaced with the output of your callback, but will be rendered if your block is deactivated (the plugin that registers the block is uninstalled) or your render callback is removed.
+Blocks with dynamic rendering can also save an HTML representation of the block as a backup. If you provide a server-side rendering callback, the HTML representing the block in the database will be replaced with the output of your callback, but will be rendered if your block is deactivated (the plugin that registers the block is uninstalled) or your render callback is removed.
 
 In some cases, the block saves an HTML representation of the block and uses a dynamic rendering to fine-tune this markup if some conditions are met. Some examples of core blocks using this approach are:
 - The [`cover`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover) block saves a [full HTML representation of the block in the database](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/save.js). This markup is processed via a [`render_callback`](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L74) when requested to do some PHP magic that dynamically [injects the featured image if the "use featured image" setting is enabled](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L16).
