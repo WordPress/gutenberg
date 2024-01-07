@@ -79,7 +79,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			hasHistory: !! select( editorStore ).getEditorSettings().goBack,
 			isEditingTemplate:
-				select( editorStore ).getRenderingMode() === 'template-only',
+				select( editorStore ).getCurrentPostType() === 'wp_template',
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
@@ -159,7 +159,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 							isLargeViewport,
 					} ) }
 				>
-					{ ( isEditingTemplate || hasHistory ) && <DocumentBar /> }
+					{ hasHistory && <DocumentBar /> }
 				</div>
 			</motion.div>
 			<motion.div

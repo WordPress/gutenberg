@@ -30,15 +30,18 @@ export default function VisualEditor( { styles } ) {
 		renderingMode,
 		isBlockBasedTheme,
 		hasV3BlocksOnly,
+		isEditingTemplate,
 	} = useSelect( ( select ) => {
 		const { isFeatureActive } = select( editPostStore );
-		const { getEditorSettings, getRenderingMode } = select( editorStore );
+		const { getEditorSettings, getRenderingMode, getCurrentPostType } =
+			select( editorStore );
 		const { getBlockTypes } = select( blocksStore );
 		const editorSettings = getEditorSettings();
 
 		return {
 			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 			renderingMode: getRenderingMode(),
+			isEditingTemplate: getCurrentPostType() === 'wp_template',
 			isBlockBasedTheme: editorSettings.__unstableIsBlockBasedTheme,
 			hasV3BlocksOnly: getBlockTypes().every( ( type ) => {
 				return type.apiVersion >= 3;
@@ -74,12 +77,12 @@ export default function VisualEditor( { styles } ) {
 	const isToBeIframed =
 		( ( hasV3BlocksOnly || ( isGutenbergPlugin && isBlockBasedTheme ) ) &&
 			! hasMetaBoxes ) ||
-		renderingMode === 'template-only';
+		isEditingTemplate;
 
 	return (
 		<div
 			className={ classnames( 'edit-post-visual-editor', {
-				'is-template-mode': renderingMode === 'template-only',
+				'is-template-mode': isEditingTemplate,
 				'has-inline-canvas': ! isToBeIframed,
 			} ) }
 		>
