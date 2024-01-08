@@ -329,12 +329,12 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 * @param string $expected_output Expected output of gutenberg_get_typography_font_size_value().
 	 */
 	public function test_gutenberg_get_typography_font_size_value_with_locale( $font_size, $should_use_fluid_typography, $expected_output ) {
-		$current_locale = setlocale(LC_NUMERIC, 0 );
-		setlocale(LC_NUMERIC,'de_DE.UTF-8' );
+		$current_locale = setlocale( LC_NUMERIC, 0 );
+		setlocale( LC_NUMERIC,'de_DE.UTF-8' );
 		$actual = gutenberg_get_typography_font_size_value( $font_size, $should_use_fluid_typography );
 
 		$this->assertSame( $expected_output, $actual );
-		setlocale(LC_NUMERIC, $current_locale );
+		setlocale( LC_NUMERIC, $current_locale );
 	}
 
 	/**
@@ -834,10 +834,10 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 * @param array $options Options to pass to function.
 	 */
 	public function test_valid_size_wp_get_typography_value_and_unit_with_locale( $raw_value, $expected, $options = array() ) {
-		$current_locale = setlocale(LC_NUMERIC, 0 );
-		setlocale(LC_NUMERIC,'de_DE.UTF-8' );
+		$current_locale = setlocale( LC_NUMERIC, 0 );
+		setlocale( LC_NUMERIC,'de_DE.UTF-8' );
 		$this->assertEquals( $expected, gutenberg_get_typography_value_and_unit( $raw_value, $options ) );
-		setlocale(LC_NUMERIC, $current_locale );
+		setlocale( LC_NUMERIC, $current_locale );
 	}
 
 	/**
@@ -862,65 +862,65 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 			'size: `"10"`'                               => array(
 				'raw_value' => '10',
 				'expected'  => array(
-					'value' => 10,
-					'unit'  => 'px',
-					'combined'  => '10px',
+					'value'    => 10,
+					'unit'     => 'px',
+					'combined' => '10px',
 				),
 			),
 			'size: `11`'                                 => array(
 				'raw_value' => 11,
 				'expected'  => array(
-					'value' => 11,
-					'unit'  => 'px',
-					'combined'  => '11px',
+					'value'    => 11,
+					'unit'     => 'px',
+					'combined' => '11px',
 				),
 			),
 			'size: `11.234`'                             => array(
 				'raw_value' => '11.234',
 				'expected'  => array(
-					'value' => 11.234,
-					'unit'  => 'px',
-					'combined'  => '11.234px',
+					'value'    => 11.234,
+					'unit'     => 'px',
+					'combined' => '11.234px',
 				),
 			),
 			'size: `"12rem"`'                            => array(
 				'raw_value' => '12rem',
 				'expected'  => array(
-					'value' => 12,
-					'unit'  => 'rem',
-					'combined'  => '12rem',
+					'value'    => 12,
+					'unit'     => 'rem',
+					'combined' => '12rem',
 				),
 			),
 			'size: `"12px"`'                             => array(
 				'raw_value' => '12px',
 				'expected'  => array(
 					'value' => 12,
-					'unit'  => 'px',
-					'combined'  => '12px',
+					'unit'      => 'px',
+					'combined' => '12px',
 				),
 			),
 			'size: `"12em"`'                             => array(
 				'raw_value' => '12em',
 				'expected'  => array(
-					'value' => 12,
-					'unit'  => 'em',
-					'combined'  => '12em',
+					'value'    => 12,
+					'unit'     => 'em',
+					'combined' => '12em',
 				),
 			),
 			'size: `"12.74em"`'                          => array(
 				'raw_value' => '12.74em',
 				'expected'  => array(
-					'value' => 12.74,
-					'unit'  => 'em',
-					'combined'  => '12.74em',
+					'value'    => 12.74,
+					'unit'     => 'em',
+					'combined' => '12.74em',
 				),
 			),
 			'size: `"33.3333"`'                          => array(
 				'raw_value' => 33.3333,
 				'expected'  => array(
-					'value' => 33.333,
-					'unit'  => '',
-					'combined'  => '33.333',
+					'value'    => 33.333,
+					'unit'     => '',
+					'combined' => '33.333',
 				),
 				'options'   => array(
 					'skip_unit_parsing' => true,
@@ -929,12 +929,12 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 			'size: `"7.353vh"`'                          => array(
 				'raw_value' => '7.357777vh',
 				'expected'  => array(
-					'value' => 7.358,
-					'unit'  => 'vh',
-					'combined'  => '7.358vh',
+					'value'    => 7.358,
+					'unit'     => 'vh',
+					'combined' => '7.358vh',
 				),
 				'options'   => array(
-					'acceptable_units'  => array( 'vh' )
+					'acceptable_units' => array( 'vh' )
 				),
 			),
 		);
