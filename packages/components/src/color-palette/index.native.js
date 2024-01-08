@@ -122,7 +122,7 @@ function ColorPalette( {
 	function isSelectedCustom() {
 		const isWithinColors =
 			activeColor && allColors && allColors.includes( activeColor );
-		if ( activeColor ) {
+		if ( enableCustomColor && activeColor ) {
 			if ( isGradientSegment ) {
 				return isGradientColor && ! isWithinColors;
 			}
