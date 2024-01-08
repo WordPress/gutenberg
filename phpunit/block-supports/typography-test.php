@@ -330,7 +330,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 */
 	public function test_gutenberg_get_typography_font_size_value_with_locale( $font_size, $should_use_fluid_typography, $expected_output ) {
 		$current_locale = setlocale( LC_NUMERIC, 0 );
-		setlocale( LC_NUMERIC,'de_DE.UTF-8' );
+		setlocale( LC_NUMERIC, 'de_DE.UTF-8' );
 		$actual = gutenberg_get_typography_font_size_value( $font_size, $should_use_fluid_typography );
 
 		$this->assertSame( $expected_output, $actual );
@@ -835,7 +835,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 */
 	public function test_valid_size_wp_get_typography_value_and_unit_with_locale( $raw_value, $expected, $options = array() ) {
 		$current_locale = setlocale( LC_NUMERIC, 0 );
-		setlocale( LC_NUMERIC,'de_DE.UTF-8' );
+		setlocale( LC_NUMERIC, 'de_DE.UTF-8' );
 		$this->assertEquals( $expected, gutenberg_get_typography_value_and_unit( $raw_value, $options ) );
 		setlocale( LC_NUMERIC, $current_locale );
 	}
