@@ -14,7 +14,11 @@ import {
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
-import { store as richTextStore, RichTextData } from '@wordpress/rich-text';
+import {
+	store as richTextStore,
+	RichTextData,
+	__unstableCreateElement,
+} from '@wordpress/rich-text';
 import { coreBlocks } from '@wordpress/block-library';
 import {
 	getBlockTypes,
@@ -101,6 +105,43 @@ describe( '<RichText/>', () => {
 			} );
 
 			expect( handleChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should preserve non-breaking space HTML entity', () => {
+			const onChange = jest.fn();
+			const onSelectionChange = jest.fn();
+			// The initial value is created using an HTML element to preserve
+			// the HTML entity.
+			const initialValue = RichTextData.fromHTMLElement(
+				__unstableCreateElement( document, '&nbsp;' )
+			);
+			render(
+				<RichText
+					onChange={ onChange }
+					onSelectionChange={ onSelectionChange }
+					value={ initialValue }
+					__unstableIsSelected
+				/>
+			);
+
+			// Trigger selection event with same text value as initial.
+			fireEvent(
+				screen.getByLabelText( /Text input/ ),
+				'onSelectionChange',
+				0,
+				0,
+				initialValue.toString(),
+				{
+					nativeEvent: {
+						eventCount: 0,
+						target: undefined,
+						text: initialValue.toString(),
+					},
+				}
+			);
+
+			expect( onChange ).not.toHaveBeenCalled();
+			expect( onSelectionChange ).toHaveBeenCalled();
 		} );
 	} );
 
