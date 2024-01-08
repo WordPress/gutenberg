@@ -309,6 +309,35 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests generating font size values, including fluid formulae, from fontSizes preset using a locale
+	 * that uses a comma as a decimal separator.
+	 *
+	 * @covers ::wp_get_typography_font_size_value
+	 * @covers ::wp_get_typography_value_and_unit
+	 * @covers ::wp_get_computed_fluid_typography_value
+	 *
+	 * @dataProvider data_generate_font_size_preset_fixtures
+	 *
+	 * @param array  $font_size                     {
+	 *     Required. A font size as represented in the fontSizes preset format as seen in theme.json.
+	 *
+	 *     @type string $name Name of the font size preset.
+	 *     @type string $slug Kebab-case unique identifier for the font size preset.
+	 *     @type string $size CSS font-size value, including units where applicable.
+	 * }
+	 * @param bool   $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing.
+	 * @param string $expected_output Expected output of gutenberg_get_typography_font_size_value().
+	 */
+	public function test_gutenberg_get_typography_font_size_value_with_locale( $font_size, $should_use_fluid_typography, $expected_output ) {
+		$current_locale = setlocale(LC_NUMERIC, 0 );
+		setlocale(LC_NUMERIC,'de_DE.UTF-8' );
+		$actual = gutenberg_get_typography_font_size_value( $font_size, $should_use_fluid_typography );
+
+		$this->assertSame( $expected_output, $actual );
+		setlocale(LC_NUMERIC, $current_locale );
+	}
+
+	/**
 	 * Data provider for test_wp_get_typography_font_size_value.
 	 *
 	 * @return array
@@ -787,9 +816,28 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *
 	 * @param mixed $raw_value Raw size value to test.
 	 * @param mixed $expected  An expected return value.
+	 * @param array $options   Options to pass to function.
 	 */
-	public function test_valid_size_wp_get_typography_value_and_unit( $raw_value, $expected ) {
-		$this->assertEquals( $expected, gutenberg_get_typography_value_and_unit( $raw_value ) );
+	public function test_valid_size_wp_get_typography_value_and_unit( $raw_value, $expected, $options = array() ) {
+		$this->assertEquals( $expected, gutenberg_get_typography_value_and_unit( $raw_value, $options ) );
+	}
+
+	/**
+	 * Tests that valid font size values are parsed with a locale that uses a comma as a decimal separator.
+	 *
+	 * @covers ::gutenberg_get_typography_value_and_unit
+	 *
+	 * @dataProvider data_valid_size_wp_get_typography_value_and_unit
+	 *
+	 * @param mixed $raw_value Raw size value to test.
+	 * @param mixed $expected  An expected return value.
+	 * @param array $options Options to pass to function.
+	 */
+	public function test_valid_size_wp_get_typography_value_and_unit_with_locale( $raw_value, $expected, $options = array() ) {
+		$current_locale = setlocale(LC_NUMERIC, 0 );
+		setlocale(LC_NUMERIC,'de_DE.UTF-8' );
+		$this->assertEquals( $expected, gutenberg_get_typography_value_and_unit( $raw_value, $options ) );
+		setlocale(LC_NUMERIC, $current_locale );
 	}
 
 	/**
@@ -816,6 +864,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected'  => array(
 					'value' => 10,
 					'unit'  => 'px',
+					'combined'  => '10px',
 				),
 			),
 			'size: `11`'                                 => array(
@@ -823,6 +872,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected'  => array(
 					'value' => 11,
 					'unit'  => 'px',
+					'combined'  => '11px',
 				),
 			),
 			'size: `11.234`'                             => array(
@@ -830,6 +880,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected'  => array(
 					'value' => 11.234,
 					'unit'  => 'px',
+					'combined'  => '11.234px',
 				),
 			),
 			'size: `"12rem"`'                            => array(
@@ -837,6 +888,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected'  => array(
 					'value' => 12,
 					'unit'  => 'rem',
+					'combined'  => '12rem',
 				),
 			),
 			'size: `"12px"`'                             => array(
@@ -844,6 +896,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected'  => array(
 					'value' => 12,
 					'unit'  => 'px',
+					'combined'  => '12px',
 				),
 			),
 			'size: `"12em"`'                             => array(
@@ -851,6 +904,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected'  => array(
 					'value' => 12,
 					'unit'  => 'em',
+					'combined'  => '12em',
 				),
 			),
 			'size: `"12.74em"`'                          => array(
@@ -858,6 +912,29 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected'  => array(
 					'value' => 12.74,
 					'unit'  => 'em',
+					'combined'  => '12.74em',
+				),
+			),
+			'size: `"33.3333"`'                          => array(
+				'raw_value' => 33.3333,
+				'expected'  => array(
+					'value' => 33.333,
+					'unit'  => '',
+					'combined'  => '33.333',
+				),
+				'options'   => array(
+					'skip_unit_parsing' => true,
+				),
+			),
+			'size: `"7.353vh"`'                          => array(
+				'raw_value' => '7.357777vh',
+				'expected'  => array(
+					'value' => 7.358,
+					'unit'  => 'vh',
+					'combined'  => '7.358vh',
+				),
+				'options'   => array(
+					'acceptable_units'  => array( 'vh' )
 				),
 			),
 		);
