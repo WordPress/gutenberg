@@ -43,6 +43,7 @@ describe( 'convertPreferencesPackageData', () => {
 			.toMatchInlineSnapshot( `
 		{
 		  "core": {
+		    "editorMode": "visual",
 		    "fixedToolbar": true,
 		    "inactivePanels": [],
 		    "openPanels": [
@@ -54,7 +55,6 @@ describe( 'convertPreferencesPackageData', () => {
 		    "welcomeGuide": false,
 		  },
 		  "core/edit-post": {
-		    "editorMode": "visual",
 		    "fullscreenMode": false,
 		    "hiddenBlockTypes": [
 		      "core/audio",
