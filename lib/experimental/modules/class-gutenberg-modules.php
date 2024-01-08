@@ -450,3 +450,21 @@ function gutenberg_generate_block_asset_module_id( $block_name, $field_name, $in
 	}
 	return $asset_handle;
 }
+
+function gutenberg_register_view_module_ids_rest_field() {
+	register_rest_field(
+		'block-type',
+		'view_module_ids',
+		array(
+			'get_callback' => function ( $object ) {
+				 $block_type = WP_Block_Type_Registry::get_instance()->get_registered( $object['name'] );
+				if ( isset( $block_type->view_module_ids ) ) {
+					return $block_type->view_module_ids;
+				}
+				return array();
+			},
+		)
+	);
+}
+
+add_action( 'rest_api_init', 'gutenberg_register_view_module_ids_rest_field' );
