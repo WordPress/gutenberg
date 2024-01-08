@@ -89,12 +89,6 @@ function InlineLinkUI( {
 	}
 
 	function onChangeLink( nextValue ) {
-		// LinkControl calls `onChange` immediately upon the toggling a setting.
-		// Before merging the next value with the current link value, check if
-		// the setting was toggled.
-		const didToggleSetting =
-			linkValue.opensInNewTab !== nextValue.opensInNewTab &&
-			nextValue.url === undefined;
 		// Merge the next value with the current link value.
 		nextValue = {
 			...linkValue,
@@ -180,14 +174,7 @@ function InlineLinkUI( {
 			newValue.start = newValue.end;
 
 			// Hides the Link UI.
-			newValue.activeFormats = [];
 			onChange( newValue );
-		}
-
-		// Focus should only be shifted back to the formatted segment when the
-		// URL is submitted.
-		if ( ! didToggleSetting ) {
-			stopAddingLink();
 		}
 
 		if ( ! isValidHref( newUrl ) ) {
