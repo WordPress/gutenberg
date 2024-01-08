@@ -263,6 +263,7 @@ export default function EditPostPreferencesModal() {
 					<>
 						<PreferencesModalSection title={ __( 'Inserter' ) }>
 							<EnableFeature
+								scope="core"
 								featureName="mostUsedBlocks"
 								help={ __(
 									'Adds a category with the most frequently used blocks in the inserter.'

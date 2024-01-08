@@ -202,6 +202,24 @@ export default function EditSitePreferencesModal() {
 				</>
 			),
 		},
+		{
+			name: 'blocks',
+			tabLabel: __( 'Blocks' ),
+			content: (
+				<>
+					<PreferencesModalSection title={ __( 'Inserter' ) }>
+						<EnableFeature
+							scope="core"
+							featureName="mostUsedBlocks"
+							help={ __(
+								'Adds a category with the most frequently used blocks in the inserter.'
+							) }
+							label={ __( 'Show most used blocks' ) }
+						/>
+					</PreferencesModalSection>
+				</>
+			),
+		},
 	];
 	if ( ! isModalActive ) {
 		return null;
