@@ -81,7 +81,6 @@ export default function DocumentBar() {
 	const handleOnBack = () => {
 		if ( isEditingTemplate ) {
 			setRenderingMode( getEditorSettings().defaultRenderingMode );
-			return;
 		}
 		if ( goBack ) {
 			goBack();
