@@ -894,8 +894,8 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 			'size: `"12px"`'                             => array(
 				'raw_value' => '12px',
 				'expected'  => array(
-					'value' => 12,
-					'unit'      => 'px',
+					'value'    => 12,
+					'unit'     => 'px',
 					'combined' => '12px',
 				),
 			),
@@ -934,7 +934,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'combined' => '7.358vh',
 				),
 				'options'   => array(
-					'acceptable_units' => array( 'vh' )
+					'acceptable_units' => array( 'vh' ),
 				),
 			),
 		);
