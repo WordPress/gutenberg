@@ -7,6 +7,7 @@ export default function convertEditorSettings( data ) {
 	const settingsToMoveToCore = [
 		'allowRightClickOverrides',
 		'distractionFree',
+		'editorMode',
 		'fixedToolbar',
 		'focusMode',
 		'inactivePanels',

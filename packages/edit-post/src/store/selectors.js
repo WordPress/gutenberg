@@ -30,8 +30,7 @@ const EMPTY_OBJECT = {};
  */
 export const getEditorMode = createRegistrySelector(
 	( select ) => () =>
-		select( preferencesStore ).get( 'core/edit-post', 'editorMode' ) ??
-		'visual'
+		select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
 );
 
 /**
@@ -167,7 +166,6 @@ export const getPreferences = createRegistrySelector( ( select ) => () => {
 	// editor preferences.
 	const preferences = [
 		'hiddenBlockTypes',
-		'editorMode',
 		'preferredStyleVariations',
 	].reduce( ( accumulatedPrefs, preferenceKey ) => {
 		const value = select( preferencesStore ).get(
@@ -180,6 +178,20 @@ export const getPreferences = createRegistrySelector( ( select ) => () => {
 			[ preferenceKey ]: value,
 		};
 	}, {} );
+	const corePreferences = [ 'editorMode' ].reduce(
+		( accumulatedPrefs, preferenceKey ) => {
+			const value = select( preferencesStore ).get(
+				'core',
+				preferenceKey
+			);
+
+			return {
+				...accumulatedPrefs,
+				[ preferenceKey ]: value,
+			};
+		},
+		{}
+	);
 
 	// Panels were a preference, but the data structure changed when the state
 	// was migrated to the preferences store. They need to be converted from
@@ -194,6 +206,7 @@ export const getPreferences = createRegistrySelector( ( select ) => () => {
 
 	return {
 		...preferences,
+		...corePreferences,
 		panels,
 	};
 } );

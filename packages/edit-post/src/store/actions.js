@@ -194,9 +194,7 @@ export const toggleFeature =
 export const switchEditorMode =
 	( mode ) =>
 	( { dispatch, registry } ) => {
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'editorMode', mode );
+		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
 
 		// Unselect blocks when we switch to the code editor.
 		if ( mode !== 'visual' ) {
