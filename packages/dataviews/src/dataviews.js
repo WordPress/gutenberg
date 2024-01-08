@@ -57,7 +57,7 @@ export default function DataViews( {
 			<VStack spacing={ 0 } justify="flex-start">
 				<HStack
 					alignment="flex-start"
-					className="dataviews__filters-view-actions"
+					className="dataviews-filters__view-actions"
 				>
 					<HStack justify="start" wrap>
 						{ search && (
