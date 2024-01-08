@@ -1,4 +1,4 @@
-# Static or dynamic rendering of a block
+# Static or Dynamic rendering of a block
 
 The block's markup returned on the front end can be dynamically generated on the server when the block is requested from the client (dynamic blocks) or statically generated when the block is saved in the Block Editor (static blocks).
 
