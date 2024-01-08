@@ -112,9 +112,10 @@ const hasPostCSSConfig = () =>
  */
 const getWebpackArgs = () => {
 	// Gets all args from CLI without those prefixed with `--webpack`.
-	let webpackArgs = getArgsFromCLI( [ '--webpack' ] ).filter(
-		( arg ) => arg !== '--experimental-modules'
-	);
+	let webpackArgs = getArgsFromCLI( [
+		'--experimental-modules',
+		'--webpack',
+	] );
 
 	const hasWebpackOutputOption =
 		hasArgInCLI( '-o' ) || hasArgInCLI( '--output' );
