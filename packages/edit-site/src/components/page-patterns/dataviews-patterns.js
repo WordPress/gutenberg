@@ -55,6 +55,7 @@ import {
 	resetAction,
 	deleteAction,
 	duplicatePatternAction,
+	duplicateTemplatePartAction,
 } from './dataviews-pattern-actions';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
@@ -318,6 +319,7 @@ export default function DataviewsPatterns() {
 		() => [
 			renameAction,
 			duplicatePatternAction,
+			duplicateTemplatePartAction,
 			exportJSONaction,
 			resetAction,
 			deleteAction,
