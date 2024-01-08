@@ -198,13 +198,23 @@
 	.edit-post-header__toolbar .block-editor-block-mover {
 		border-left: none;
 
+		// Modified group borders
 		&::before {
 			content: "";
 			width: $border-width;
-			margin-top: $grid-unit + $grid-unit-05;
-			margin-bottom: $grid-unit + $grid-unit-05;
+			margin-top: $grid-unit-15;
+			margin-bottom: $grid-unit-15;
 			background-color: $gray-300;
 			margin-left: $grid-unit;
+		}
+
+		// Modified block movers separator
+		.block-editor-block-mover__move-button-container {
+			&::before {
+				width: calc(100% - #{$grid-unit-30});
+				background: $gray-300;
+				left: calc(50% + 1px);
+			}
 		}
 	}
 }
