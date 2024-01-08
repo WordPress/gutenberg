@@ -20,3 +20,10 @@
 	display: inline-block;
 }
 
+.wp-block-post-excerpt__more-link--padding {
+	padding-top: calc(0.6rem - 1px);
+	padding-right: calc(1rem - 1px);
+	padding-bottom: calc(0.6rem - 1px);
+	padding-left: calc(1rem - 1px);
+	text-decoration: none !important;
+}
