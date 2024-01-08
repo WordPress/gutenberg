@@ -233,16 +233,22 @@
 		&:last-child {
 			border-bottom: 0;
 		}
+		&:hover,
+		&:focus-within {
+			background-color: lighten($gray-100, 3%);
+		}
+	}
+
+	li.is-selected,
+	li.is-selected:hover,
+	li.is-selected:focus-within {
+		background-color: $gray-100;
 	}
 
 	.dataviews-view-list__item {
 		padding: $grid-unit-15 0 $grid-unit-15 $grid-unit-40;
 		width: 100%;
 		cursor: default;
-		&:focus,
-		&:hover {
-			background-color: lighten($gray-100, 3%);
-		}
 		&:focus {
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
@@ -255,8 +261,6 @@
 
 	.dataviews-view-list__item-selected,
 	.dataviews-view-list__item-selected:hover {
-		background-color: $gray-100;
-
 		&:focus {
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}

@@ -53,7 +53,12 @@ export default function ViewList( {
 		<ul className="dataviews-view-list">
 			{ usedData.map( ( item ) => {
 				return (
-					<li key={ getItemId( item ) }>
+					<li
+						key={ getItemId( item ) }
+						className={ classNames( {
+							'is-selected': selection.includes( item.id ),
+						} ) }
+					>
 						<HStack>
 							<div
 								role="button"
