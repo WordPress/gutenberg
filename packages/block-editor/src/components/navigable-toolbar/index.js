@@ -170,9 +170,7 @@ function useToolbarFocus( {
 		};
 	}, [ initialIndex, initialFocusOnMount, onIndexChange, toolbarRef ] );
 
-	const getLastFocus = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).getLastFocus
-	);
+	const { getLastFocus } = unlock( useSelect( blockEditorStore ) );
 	/**
 	 * Handles returning focus to the block editor canvas when pressing escape.
 	 */

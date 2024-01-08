@@ -29,10 +29,7 @@ export default function useTabNav() {
 		[]
 	);
 
-	const lastFocus = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).getLastFocus(),
-		[]
-	);
+	const { getLastFocus } = unlock( useSelect( blockEditorStore ) );
 
 	// Don't allow tabbing to this element in Navigation mode.
 	const focusCaptureTabIndex = ! isNavigationMode ? '0' : undefined;
@@ -48,7 +45,7 @@ export default function useTabNav() {
 		} else if ( hasMultiSelection() ) {
 			container.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
-			lastFocus.current.focus();
+			getLastFocus()?.current.focus();
 		} else {
 			setNavigationMode( true );
 
@@ -166,7 +163,7 @@ export default function useTabNav() {
 		}
 
 		function onFocusOut( event ) {
-			setLastFocus( { ...lastFocus, current: event.target } );
+			setLastFocus( { ...getLastFocus(), current: event.target } );
 
 			const { ownerDocument } = node;
 
