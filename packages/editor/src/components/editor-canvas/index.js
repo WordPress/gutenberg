@@ -91,7 +91,7 @@ function EditorCanvas( {
 		wrapperBlockName,
 		wrapperUniqueId,
 		deviceType,
-		hasHistory,
+		showEditorPadding,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -138,7 +138,7 @@ function EditorCanvas( {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
-			hasHistory:
+			showEditorPadding:
 				!! editorSettings.goBack && postTypeSlug !== 'wp_template',
 		};
 	}, [] );
@@ -303,7 +303,7 @@ function EditorCanvas( {
 			height="100%"
 			iframeProps={ {
 				className: classnames( 'editor-canvas__iframe', {
-					'has-history': hasHistory,
+					'has-editor-padding': showEditorPadding,
 				} ),
 				...iframeProps,
 				style: {
