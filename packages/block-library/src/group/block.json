@@ -29,7 +29,11 @@
 		"ariaLabel": true,
 		"html": false,
 		"background": {
-			"backgroundImage": true
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true
+			}
 		},
 		"color": {
 			"gradients": true,

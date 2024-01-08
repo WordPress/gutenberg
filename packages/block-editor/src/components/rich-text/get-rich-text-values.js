@@ -6,6 +6,7 @@ import {
 	getSaveElement,
 	__unstableGetBlockProps as getBlockProps,
 } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -95,5 +96,9 @@ export function getRichTextValues( blocks = [] ) {
 	const values = [];
 	addValuesForBlocks( values, blocks );
 	getBlockProps.skipFilters = false;
-	return values;
+	return values.map( ( value ) =>
+		value instanceof RichTextData
+			? value
+			: RichTextData.fromHTMLString( value )
+	);
 }

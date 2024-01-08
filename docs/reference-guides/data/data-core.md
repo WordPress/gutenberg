@@ -741,7 +741,7 @@ _Returns_
 
 ### receiveRevisions
 
-Returns an action object used in signalling that revisions have been received.
+Action triggered to receive revision items.
 
 _Parameters_
 
@@ -752,10 +752,6 @@ _Parameters_
 -   _query_ `?Object`: Query Object.
 -   _invalidateCache_ `?boolean`: Should invalidate query caches.
 -   _meta_ `?Object`: Meta information about pagination.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### receiveThemeSupports
 

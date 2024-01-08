@@ -68,32 +68,32 @@ HTML;
 		$p = new WP_HTML_Tag_Processor( $output );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
-		$this->assertSame( '{"core":{"query":{"loadingText":"Loading page, please wait.","loadedText":"Page Loaded."}}}', $p->get_attribute( 'data-wp-context' ) );
+		$this->assertSame( '{"loadingText":"Loading page, please wait.","loadedText":"Page Loaded."}', $p->get_attribute( 'data-wp-context' ) );
 		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-navigation-id' ) );
-		$this->assertSame( true, $p->get_attribute( 'data-wp-interactive' ) );
+		$this->assertSame( '{"namespace":"core/query"}', $p->get_attribute( 'data-wp-interactive' ) );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-post' ) );
 		$this->assertSame( 'post-template-item-' . self::$posts[1], $p->get_attribute( 'data-wp-key' ) );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-query-pagination-previous' ) );
 		$this->assertSame( 'query-pagination-previous', $p->get_attribute( 'data-wp-key' ) );
-		$this->assertSame( 'actions.core.query.navigate', $p->get_attribute( 'data-wp-on--click' ) );
-		$this->assertSame( 'actions.core.query.prefetch', $p->get_attribute( 'data-wp-on--mouseenter' ) );
-		$this->assertSame( 'effects.core.query.prefetch', $p->get_attribute( 'data-wp-effect' ) );
+		$this->assertSame( 'core/query::actions.navigate', $p->get_attribute( 'data-wp-on--click' ) );
+		$this->assertSame( 'core/query::actions.prefetch', $p->get_attribute( 'data-wp-on--mouseenter' ) );
+		$this->assertSame( 'core/query::callbacks.prefetch', $p->get_attribute( 'data-wp-watch' ) );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-query-pagination-next' ) );
 		$this->assertSame( 'query-pagination-next', $p->get_attribute( 'data-wp-key' ) );
-		$this->assertSame( 'actions.core.query.navigate', $p->get_attribute( 'data-wp-on--click' ) );
-		$this->assertSame( 'actions.core.query.prefetch', $p->get_attribute( 'data-wp-on--mouseenter' ) );
-		$this->assertSame( 'effects.core.query.prefetch', $p->get_attribute( 'data-wp-effect' ) );
+		$this->assertSame( 'core/query::actions.navigate', $p->get_attribute( 'data-wp-on--click' ) );
+		$this->assertSame( 'core/query::actions.prefetch', $p->get_attribute( 'data-wp-on--mouseenter' ) );
+		$this->assertSame( 'core/query::callbacks.prefetch', $p->get_attribute( 'data-wp-watch' ) );
 
 		$p->next_tag( array( 'class_name' => 'screen-reader-text' ) );
 		$this->assertSame( 'polite', $p->get_attribute( 'aria-live' ) );
-		$this->assertSame( 'context.core.query.message', $p->get_attribute( 'data-wp-text' ) );
+		$this->assertSame( 'context.message', $p->get_attribute( 'data-wp-text' ) );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-query__enhanced-pagination-animation' ) );
-		$this->assertSame( 'selectors.core.query.startAnimation', $p->get_attribute( 'data-wp-class--start-animation' ) );
-		$this->assertSame( 'selectors.core.query.finishAnimation', $p->get_attribute( 'data-wp-class--finish-animation' ) );
+		$this->assertSame( 'state.startAnimation', $p->get_attribute( 'data-wp-class--start-animation' ) );
+		$this->assertSame( 'state.finishAnimation', $p->get_attribute( 'data-wp-class--finish-animation' ) );
 	}
 
 	/**
@@ -170,7 +170,7 @@ HTML;
 		$this->assertSame( $p->next_tag(), true );
 		// Test that that div is the accesibility one.
 		$this->assertSame( 'screen-reader-text', $p->get_attribute( 'class' ) );
-		$this->assertSame( 'context.core.query.message', $p->get_attribute( 'data-wp-text' ) );
+		$this->assertSame( 'context.message', $p->get_attribute( 'data-wp-text' ) );
 		$this->assertSame( 'polite', $p->get_attribute( 'aria-live' ) );
 	}
 

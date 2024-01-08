@@ -3,7 +3,6 @@
  */
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { createBlock } from '@wordpress/blocks';
@@ -17,10 +16,6 @@ import { STORE_NAME } from '../../store/constants';
 
 function KeyboardShortcutsEditMode() {
 	const { getEditorMode } = useSelect( editSiteStore );
-	const isListViewOpen = useSelect(
-		( select ) => select( editSiteStore ).isListViewOpened(),
-		[]
-	);
 	const isBlockInspectorOpen = useSelect(
 		( select ) =>
 			select( interfaceStore ).getActiveComplementaryArea(
@@ -28,12 +23,10 @@ function KeyboardShortcutsEditMode() {
 			) === SIDEBAR_BLOCK,
 		[]
 	);
-	const { redo, undo } = useDispatch( coreStore );
-	const { setIsListViewOpened, switchEditorMode, toggleDistractionFree } =
+	const { switchEditorMode, toggleDistractionFree } =
 		useDispatch( editSiteStore );
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
-
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const { getBlockName, getSelectedBlockClientId, getBlockAttributes } =
 		useSelect( blockEditorStore );
@@ -65,24 +58,6 @@ function KeyboardShortcutsEditMode() {
 			} )
 		);
 	};
-
-	useShortcut( 'core/edit-site/undo', ( event ) => {
-		undo();
-		event.preventDefault();
-	} );
-
-	useShortcut( 'core/edit-site/redo', ( event ) => {
-		redo();
-		event.preventDefault();
-	} );
-
-	// Only opens the list view. Other functionality for this shortcut happens in the rendered sidebar.
-	useShortcut( 'core/edit-site/toggle-list-view', () => {
-		if ( isListViewOpen ) {
-			return;
-		}
-		setIsListViewOpened( true );
-	} );
 
 	useShortcut( 'core/edit-site/toggle-block-settings-sidebar', ( event ) => {
 		// This shortcut has no known clashes, but use preventDefault to prevent any

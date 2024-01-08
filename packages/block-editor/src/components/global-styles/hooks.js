@@ -24,6 +24,9 @@ const EMPTY_CONFIG = { settings: {}, styles: {} };
 const VALID_SETTINGS = [
 	'appearanceTools',
 	'useRootPaddingAwareAlignments',
+	'background.backgroundImage',
+	'background.backgroundRepeat',
+	'background.backgroundSize',
 	'border.color',
 	'border.radius',
 	'border.style',

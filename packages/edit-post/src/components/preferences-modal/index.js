@@ -44,14 +44,14 @@ export default function EditPostPreferencesModal() {
 	const [ isModalActive, showBlockBreadcrumbsOption ] = useSelect(
 		( select ) => {
 			const { getEditorSettings } = select( editorStore );
-			const { getEditorMode, isFeatureActive } = select( editPostStore );
+			const { getEditorMode } = select( editPostStore );
+			const { get } = select( preferencesStore );
 			const modalActive = select( interfaceStore ).isModalActive(
 				PREFERENCES_MODAL_NAME
 			);
 			const mode = getEditorMode();
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
-			const isDistractionFreeEnabled =
-				isFeatureActive( 'distractionFree' );
+			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
 			return [
 				modalActive,
 				! isDistractionFreeEnabled &&
@@ -64,16 +64,20 @@ export default function EditPostPreferencesModal() {
 		[ isLargeViewport ]
 	);
 
-	const { closeGeneralSidebar, setIsListViewOpened, setIsInserterOpened } =
-		useDispatch( editPostStore );
-
+	const { closeGeneralSidebar } = useDispatch( editPostStore );
+	const { setIsListViewOpened, setIsInserterOpened } =
+		useDispatch( editorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const toggleDistractionFree = () => {
-		setPreference( 'core/edit-post', 'fixedToolbar', true );
+		setPreference( 'core', 'fixedToolbar', true );
 		setIsInserterOpened( false );
 		setIsListViewOpened( false );
 		closeGeneralSidebar();
+	};
+
+	const turnOffDistractionFree = () => {
+		setPreference( 'core', 'distractionFree', false );
 	};
 
 	const sections = useMemo(
@@ -86,124 +90,49 @@ export default function EditPostPreferencesModal() {
 						{ isLargeViewport && (
 							<PreferencesModalSection
 								title={ __( 'Publishing' ) }
-								description={ __(
-									'Change options related to publishing.'
-								) }
 							>
 								<EnablePublishSidebarOption
 									help={ __(
 										'Review settings, such as visibility and tags.'
 									) }
-									label={ __(
-										'Include pre-publish checklist'
-									) }
+									label={ __( 'Enable pre-publish checks' ) }
 								/>
 							</PreferencesModalSection>
 						) }
-
-						<PreferencesModalSection
-							title={ __( 'Appearance' ) }
-							description={ __(
-								'Customize options related to the block editor interface and editing flow.'
-							) }
-						>
+						<PreferencesModalSection title={ __( 'Interface' ) }>
 							<EnableFeature
-								featureName="distractionFree"
-								onToggle={ toggleDistractionFree }
-								help={ __(
-									'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
-								) }
-								label={ __( 'Distraction free' ) }
-							/>
-							<EnableFeature
-								featureName="focusMode"
-								help={ __(
-									'Highlights the current block and fades other content.'
-								) }
-								label={ __( 'Spotlight mode' ) }
-							/>
-							<EnableFeature
-								featureName="showIconLabels"
-								label={ __( 'Show button text labels' ) }
-								help={ __(
-									'Show text instead of icons on buttons.'
-								) }
-							/>
-							<EnableFeature
+								scope="core"
 								featureName="showListViewByDefault"
 								help={ __(
 									'Opens the block list view sidebar by default.'
 								) }
 								label={ __( 'Always open list view' ) }
 							/>
-							<EnableFeature
-								featureName="themeStyles"
-								help={ __(
-									'Make the editor look like your theme.'
-								) }
-								label={ __( 'Use theme styles' ) }
-							/>
 							{ showBlockBreadcrumbsOption && (
 								<EnableFeature
+									scope="core"
 									featureName="showBlockBreadcrumbs"
 									help={ __(
-										'Shows block breadcrumbs at the bottom of the editor.'
+										'Display the block hierarchy trail at the bottom of the editor.'
 									) }
-									label={ __( 'Display block breadcrumbs' ) }
+									label={ __( 'Show block breadcrumbs' ) }
 								/>
 							) }
-						</PreferencesModalSection>
-					</>
-				),
-			},
-			{
-				name: 'blocks',
-				tabLabel: __( 'Blocks' ),
-				content: (
-					<>
-						<PreferencesModalSection
-							title={ __( 'Block interactions' ) }
-							description={ __(
-								'Customize how you interact with blocks in the block library and editing canvas.'
-							) }
-						>
 							<EnableFeature
-								featureName="mostUsedBlocks"
+								scope="core"
+								featureName="allowRightClickOverrides"
 								help={ __(
-									'Places the most frequent blocks in the block library.'
-								) }
-								label={ __( 'Show most used blocks' ) }
-							/>
-							<EnableFeature
-								featureName="keepCaretInsideBlock"
-								help={ __(
-									'Aids screen readers by stopping text caret from leaving blocks.'
+									'Allows contextual list view menus via right-click, overriding browser defaults.'
 								) }
 								label={ __(
-									'Contain text cursor inside block'
+									'Allow right-click contextual menus'
 								) }
 							/>
 						</PreferencesModalSection>
-						<PreferencesModalSection
-							title={ __( 'Visible blocks' ) }
-							description={ __(
-								"Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
-							) }
-						>
-							<BlockManager />
-						</PreferencesModalSection>
-					</>
-				),
-			},
-			{
-				name: 'panels',
-				tabLabel: __( 'Panels' ),
-				content: (
-					<>
 						<PreferencesModalSection
 							title={ __( 'Document settings' ) }
 							description={ __(
-								'Choose what displays in the panel.'
+								'Select what settings are shown in the document panel.'
 							) }
 						>
 							<EnablePluginDocumentSettingPanelOption.Slot />
@@ -242,12 +171,114 @@ export default function EditPostPreferencesModal() {
 								/>
 							</PageAttributesCheck>
 						</PreferencesModalSection>
-						<MetaBoxesSection
-							title={ __( 'Additional' ) }
-							description={ __(
-								'Add extra areas to the editor.'
+						<MetaBoxesSection title={ __( 'Advanced' ) } />
+					</>
+				),
+			},
+			{
+				name: 'appearance',
+				tabLabel: __( 'Appearance' ),
+				content: (
+					<PreferencesModalSection
+						title={ __( 'Appearance' ) }
+						description={ __(
+							'Customize the editor interface to suit your needs.'
+						) }
+					>
+						<EnableFeature
+							scope="core"
+							featureName="fixedToolbar"
+							onToggle={ turnOffDistractionFree }
+							help={ __(
+								'Access all block and document tools in a single place.'
 							) }
+							label={ __( 'Top toolbar' ) }
 						/>
+						<EnableFeature
+							scope="core"
+							featureName="distractionFree"
+							onToggle={ toggleDistractionFree }
+							help={ __(
+								'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
+							) }
+							label={ __( 'Distraction free' ) }
+						/>
+						<EnableFeature
+							scope="core"
+							featureName="focusMode"
+							help={ __(
+								'Highlights the current block and fades other content.'
+							) }
+							label={ __( 'Spotlight mode' ) }
+						/>
+						<EnableFeature
+							featureName="themeStyles"
+							help={ __(
+								'Make the editor look like your theme.'
+							) }
+							label={ __( 'Use theme styles' ) }
+						/>
+					</PreferencesModalSection>
+				),
+			},
+			{
+				name: 'accessibility',
+				tabLabel: __( 'Accessibility' ),
+				content: (
+					<>
+						<PreferencesModalSection
+							title={ __( 'Navigation' ) }
+							description={ __(
+								'Optimize the editing experience for enhanced control.'
+							) }
+						>
+							<EnableFeature
+								scope="core"
+								featureName="keepCaretInsideBlock"
+								help={ __(
+									'Keeps the text cursor within the block boundaries, aiding users with screen readers by preventing unintentional cursor movement outside the block.'
+								) }
+								label={ __(
+									'Contain text cursor inside block'
+								) }
+							/>
+						</PreferencesModalSection>
+						<PreferencesModalSection title={ __( 'Interface' ) }>
+							<EnableFeature
+								scope="core"
+								featureName="showIconLabels"
+								label={ __( 'Show button text labels' ) }
+								help={ __(
+									'Show text instead of icons on buttons across the interface.'
+								) }
+							/>
+						</PreferencesModalSection>
+					</>
+				),
+			},
+			{
+				name: 'blocks',
+				tabLabel: __( 'Blocks' ),
+				content: (
+					<>
+						<PreferencesModalSection title={ __( 'Inserter' ) }>
+							<EnableFeature
+								scope="core"
+								featureName="mostUsedBlocks"
+								help={ __(
+									'Adds a category with the most frequently used blocks in the inserter.'
+								) }
+								label={ __( 'Show most used blocks' ) }
+							/>
+						</PreferencesModalSection>
+						<PreferencesModalSection
+							title={ __( 'Manage block visibility' ) }
+							description={ __(
+								"Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
+							) }
+						>
+							<BlockManager />
+						</PreferencesModalSection>
 					</>
 				),
 			},

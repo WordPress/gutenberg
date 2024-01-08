@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { memo, useRef } from '@wordpress/element';
@@ -33,53 +38,65 @@ import DataViewsSidebarContent from '../sidebar-dataviews';
 
 const { useLocation } = unlock( routerPrivateApis );
 
+function SidebarScreenWrapper( { className, ...props } ) {
+	return (
+		<NavigatorScreen
+			className={ classNames(
+				'edit-site-sidebar__screen-wrapper',
+				className
+			) }
+			{ ...props }
+		/>
+	);
+}
+
 function SidebarScreens() {
 	useSyncPathWithURL();
 
 	return (
 		<>
-			<NavigatorScreen path="/">
+			<SidebarScreenWrapper path="/">
 				<SidebarNavigationScreenMain />
-			</NavigatorScreen>
-			<NavigatorScreen path="/navigation">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/navigation">
 				<SidebarNavigationScreenNavigationMenus />
-			</NavigatorScreen>
-			<NavigatorScreen path="/navigation/:postType/:postId">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/navigation/:postType/:postId">
 				<SidebarNavigationScreenNavigationMenu />
-			</NavigatorScreen>
-			<NavigatorScreen path="/wp_global_styles">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/wp_global_styles">
 				<SidebarNavigationScreenGlobalStyles />
-			</NavigatorScreen>
-			<NavigatorScreen path="/page">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/page">
 				<SidebarNavigationScreenPages />
-			</NavigatorScreen>
-			<NavigatorScreen path="/page/:postId">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/page/:postId">
 				<SidebarNavigationScreenPage />
-			</NavigatorScreen>
+			</SidebarScreenWrapper>
 			{ window?.__experimentalAdminViews && (
-				<NavigatorScreen path="/pages">
+				<SidebarScreenWrapper path="/pages">
 					<SidebarNavigationScreen
 						title={ __( 'Pages' ) }
 						backPath="/page"
 						content={ <DataViewsSidebarContent /> }
 					/>
-				</NavigatorScreen>
+				</SidebarScreenWrapper>
 			) }
-			<NavigatorScreen path="/:postType(wp_template)">
+			<SidebarScreenWrapper path="/:postType(wp_template)">
 				<SidebarNavigationScreenTemplates />
-			</NavigatorScreen>
-			<NavigatorScreen path="/patterns">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/patterns">
 				<SidebarNavigationScreenPatterns />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/:postType(wp_template|wp_template_part)/all">
 				<SidebarNavigationScreenTemplatesBrowse />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template_part|wp_block)/:postId">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/:postType(wp_template_part|wp_block)/:postId">
 				<SidebarNavigationScreenPattern />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template)/:postId">
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/:postType(wp_template)/:postId">
 				<SidebarNavigationScreenTemplate />
-			</NavigatorScreen>
+			</SidebarScreenWrapper>
 		</>
 	);
 }

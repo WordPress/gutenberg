@@ -67,32 +67,6 @@
 		background: $gray-700;
 		color: $gray-100;
 	}
-
-	.edit-site-patterns__grid-pagination {
-		border-top: 1px solid $gray-800;
-		background: $gray-900;
-		padding: $grid-unit-30 $grid-unit-40;
-		position: sticky;
-		bottom: 0;
-		z-index: z-index(".edit-site-patterns__grid-pagination");
-
-		.components-button.is-tertiary {
-			width: $button-size-compact;
-			height: $button-size-compact;
-			color: $gray-100;
-			background-color: $gray-800;
-			justify-content: center;
-
-			&:disabled {
-				color: $gray-600;
-				background: none;
-			}
-
-			&:hover:not(:disabled) {
-				background-color: $gray-700;
-			}
-		}
-	}
 }
 
 .edit-site-patterns__header {
@@ -225,4 +199,93 @@
 
 .edit-site-patterns__delete-modal {
 	width: $modal-width-small;
+}
+
+.edit-site-patterns__pagination {
+	padding: $grid-unit-30 $grid-unit-40;
+	border-top: 1px solid $gray-800;
+	background: $gray-900;
+	position: sticky;
+	bottom: 0;
+	color: $gray-100;
+	z-index: z-index(".edit-site-patterns__grid-pagination");
+	.components-button.is-tertiary {
+		background-color: $gray-800;
+		color: $gray-100;
+
+		&:disabled {
+			color: $gray-600;
+			background: none;
+		}
+
+		&:hover:not(:disabled) {
+			background-color: $gray-700;
+		}
+	}
+}
+
+/**
+ * DataViews patterns styles.
+ * TODO: when this becomes stable, consolidate styles with the above.
+ */
+.edit-site-page-patterns-dataviews {
+	.page-patterns-preview-field {
+		&.is-viewtype-grid {
+			.block-editor-block-preview__container {
+				height: auto;
+			}
+		}
+	}
+
+	.edit-site-patterns__pattern-icon {
+		fill: var(--wp-block-synced-color);
+		flex-shrink: 0;
+	}
+
+	.edit-site-patterns__pattern-lock-icon {
+		min-width: min-content;
+	}
+
+	.edit-site-patterns__section-header {
+		border-bottom: 1px solid #f0f0f0;
+		min-height: 72px;
+		padding: $grid-unit-20 $grid-unit-40;
+		position: sticky;
+		top: 0;
+		z-index: 2;
+	}
+}
+
+.dataviews-action-modal__duplicate-pattern {
+	// Fix the modal width to prevent added categories from stretching the modal.
+	[role="dialog"] > [role="document"] {
+		width: 350px;
+	}
+
+	.patterns-menu-items__convert-modal-categories {
+		position: relative;
+	}
+
+	.components-form-token-field__suggestions-list:not(:empty) {
+		position: absolute;
+		border: $border-width solid var(--wp-admin-theme-color);
+		border-bottom-left-radius: $radius-block-ui;
+		border-bottom-right-radius: $radius-block-ui;
+		box-shadow: 0 0 0.5px 0.5px var(--wp-admin-theme-color);
+		box-sizing: border-box;
+		z-index: 1;
+		background-color: $white;
+		width: calc(100% + 2px); // Account for the border width of the token field.
+		left: -1px;
+		min-width: initial;
+		max-height: $grid-unit-60 * 2; // Adjust to not cover the save button, showing three items.
+	}
+}
+
+.dataviews-action-modal__duplicate-template-part {
+	.components-modal__frame {
+		@include break-small {
+			max-width: 500px;
+		}
+	}
 }
