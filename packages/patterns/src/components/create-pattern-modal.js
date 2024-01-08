@@ -88,7 +88,7 @@ export function CreatePatternModalContents( {
 
 		corePatternCategories.forEach( ( category ) => {
 			if (
-				! uniqueCategories.has( category.label ) &&
+				! uniqueCategories.has( category.label.toLowerCase() ) &&
 				// There are two core categories with `Post` label so explicitly remove the one with
 				// the `query` slug to avoid any confusion.
 				category.name !== 'query'
