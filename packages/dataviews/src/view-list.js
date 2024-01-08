@@ -13,8 +13,8 @@ import {
 	Button,
 } from '@wordpress/components';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import { chevronRight, chevronLeft } from '@wordpress/icons';
-import { isRTL, __ } from '@wordpress/i18n';
+import { info } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 export default function ViewList( {
 	view,
@@ -55,17 +55,23 @@ export default function ViewList( {
 				return (
 					<li
 						key={ getItemId( item ) }
-						className={ classNames( 'dataviews-list-view__item', {
+						className={ classNames( {
 							'is-selected': selection.includes( item.id ),
 						} ) }
 					>
-						<HStack spacing={ 0 }>
+						<HStack className="dataviews-list-view__item-wrapper">
 							<div
 								role="button"
 								tabIndex={ 0 }
 								aria-pressed={ selection.includes( item.id ) }
 								onKeyDown={ onEnter( item ) }
-								className="dataviews-view-list__item-content"
+								className={ classNames(
+									'dataviews-view-list__item',
+									{
+										'dataviews-view-list__item-selected':
+											selection.includes( item.id ),
+									}
+								) }
 								onClick={ () => onSelectionChange( [ item ] ) }
 							>
 								<HStack spacing={ 3 } justify="start">
@@ -95,13 +101,11 @@ export default function ViewList( {
 							</div>
 							{ onDetailsChange && (
 								<Button
-									className="dataviews-view-list__item-details"
+									className="dataviews-view-list__details-button"
 									onClick={ () =>
 										onDetailsChange( [ item ] )
 									}
-									icon={
-										isRTL() ? chevronLeft : chevronRight
-									}
+									icon={ info }
 									label={ __( 'View details' ) }
 									size="compact"
 								/>
