@@ -221,7 +221,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 
 	const allowedBlockTypes = useMemo( () => {
 		// Omit hidden block types if exists and non-empty.
-		if ( hiddenBlockTypes.length > 0 ) {
+		if ( hiddenBlockTypes && hiddenBlockTypes.length > 0 ) {
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
