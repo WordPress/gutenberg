@@ -3,6 +3,8 @@ project 'GutenbergDemo.xcodeproj'
 require_relative '../../../node_modules/react-native/scripts/react_native_pods'
 require_relative '../../../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
+pod 'WordPress-Aztec-iOS', :git => 'https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git', :commit => 'fadc31252f74cd0d8e131e17266794bce964f373'
+
 # Uncomment the next line to define a global platform for your project
 app_ios_deployment_target = Gem::Version.new('13.0')
 platform :ios, app_ios_deployment_target.version
