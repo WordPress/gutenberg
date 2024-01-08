@@ -39,22 +39,16 @@ export function useResetTemplateAction() {
 			supportsBulk: true,
 			async callback( templates ) {
 				try {
-					await Promise.all(
-						templates.map( ( template ) => {
-							return revertTemplate( template, {
-								allowUndo: false,
-							} );
-						} )
-					);
-					await Promise.all(
-						templates.map( ( template ) => {
-							return saveEditedEntityRecord(
-								'postType',
-								template.type,
-								template.id
-							);
-						} )
-					);
+					for ( const template of templates ) {
+						await revertTemplate( template, {
+							allowUndo: false,
+						} );
+						await saveEditedEntityRecord(
+							'postType',
+							template.type,
+							template.id
+						);
+					}
 
 					createSuccessNotice(
 						templates.length > 1
@@ -147,7 +141,7 @@ export const deleteTemplateAction = {
 						onClick={ async () => {
 							if ( templates.length > 1 ) {
 								try {
-									await Promise.all(
+									await Promise.allSettled(
 										templates.map( ( template ) => {
 											return deleteEntityRecord(
 												'postType',
