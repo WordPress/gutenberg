@@ -151,7 +151,12 @@
 				<element value="wp_restore_footnotes_from_revision"/>
 				<element value="wp_save_footnotes_meta"/>
 			</property>
-			<property name="disallowed_function_calls" type="array">
+		</properties>
+	</rule>
+	<rule ref="Gutenberg.CodeAnalysis.RestrictedFunctionCallSniff">
+		<include-pattern>./packages/block-library/src/*/*.php</include-pattern>
+		<properties>
+			<property name="prefixes" type="array">
 				<element value="(G|g)utenberg.*"/>
 			</property>
 		</properties>
