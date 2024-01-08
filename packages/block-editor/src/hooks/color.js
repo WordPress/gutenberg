@@ -24,6 +24,7 @@ import {
 	transformStyles,
 	shouldSkipSerialization,
 } from './utils';
+import { getBackgroundImageClasses } from './background';
 import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
 import {
@@ -383,12 +384,27 @@ function useBlockProps( {
 		)?.color;
 	}
 
-	return addSaveProps( { style: extraStyles }, name, {
+	const saveProps = addSaveProps( { style: extraStyles }, name, {
 		textColor,
 		backgroundColor,
 		gradient,
 		style,
 	} );
+
+	const hasBackgroundValue =
+		backgroundColor ||
+		style?.color?.background ||
+		gradient ||
+		style?.color?.gradient;
+
+	return {
+		...saveProps,
+		className: classnames(
+			saveProps.className,
+			// Add background image classes in the editor, if not already handled by background color values.
+			! hasBackgroundValue && getBackgroundImageClasses( style )
+		),
+	};
 }
 
 export default {

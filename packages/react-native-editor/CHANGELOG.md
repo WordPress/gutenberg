@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.110.0
 -   [*] [internal] Move InserterButton from components package to block-editor package [#56494]
 -   [*] [internal] Move ImageLinkDestinationsScreen from components package to block-editor package [#56775]
 -   [*] Fix crash when blockType wrapperProps are not defined [#56846]

@@ -19,6 +19,7 @@ import { Button, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useRef, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -36,7 +37,6 @@ const preventDefault = ( event ) => {
 
 function DocumentTools( {
 	className,
-	showIconLabels,
 	disableBlockTools = false,
 	children,
 	// This is a temporary prop until the list view is fully unified between post and site editors.
@@ -51,8 +51,10 @@ function DocumentTools( {
 		listViewShortcut,
 		listViewToggleRef,
 		hasFixedToolbar,
+		showIconLabels,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
+		const { get } = select( preferencesStore );
 		const { isListViewOpened, getListViewToggleRef } = unlock(
 			select( editorStore )
 		);
@@ -66,6 +68,7 @@ function DocumentTools( {
 			),
 			listViewToggleRef: getListViewToggleRef(),
 			hasFixedToolbar: getSettings().hasFixedToolbar,
+			showIconLabels: get( 'core', 'showIconLabels' ),
 		};
 	}, [] );
 

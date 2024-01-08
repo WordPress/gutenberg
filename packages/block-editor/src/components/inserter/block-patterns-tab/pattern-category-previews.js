@@ -30,7 +30,7 @@ import {
 	isPatternFiltered,
 	allPatternsCategory,
 	myPatternsCategory,
-	PATTERN_TYPES,
+	INSERTER_PATTERN_TYPES,
 } from './utils';
 
 const noop = () => {};
@@ -73,7 +73,7 @@ export function PatternCategoryPreviews( {
 
 				if (
 					category.name === myPatternsCategory.name &&
-					pattern.type === PATTERN_TYPES.user
+					pattern.type === INSERTER_PATTERN_TYPES.user
 				) {
 					return true;
 				}

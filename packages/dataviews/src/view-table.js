@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -9,7 +14,15 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { Children, Fragment } from '@wordpress/element';
+import {
+	Children,
+	Fragment,
+	forwardRef,
+	useEffect,
+	useId,
+	useRef,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,8 +36,10 @@ const {
 	DropdownMenuV2: DropdownMenu,
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
 } = unlock( componentsPrivateApis );
 
 const sortArrows = { asc: '↑', desc: '↓' };
@@ -39,7 +54,10 @@ const sanitizeOperators = ( field ) => {
 	);
 };
 
-function HeaderMenu( { field, view, onChangeView } ) {
+const HeaderMenu = forwardRef( function HeaderMenu(
+	{ field, view, onChangeView, onHide },
+	ref
+) {
 	const isHidable = field.enableHiding !== false;
 
 	const isSortable = field.enableSorting !== false;
@@ -74,6 +92,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 					size="compact"
 					className="dataviews-table-header-button"
 					style={ { padding: 0 } }
+					ref={ ref }
 				>
 					{ field.header }
 					{ isSorted && (
@@ -93,18 +112,26 @@ function HeaderMenu( { field, view, onChangeView } ) {
 								const isChecked =
 									isSorted &&
 									view.sort.direction === direction;
+
+								const value = `${ field.id }-${ direction }`;
+
 								return (
-									<DropdownMenuRadioItemCustom
-										key={ direction }
-										name={ `view-table-sort-${ field.id }` }
-										value={ direction }
+									<DropdownMenuRadioItem
+										key={ value }
+										// All sorting radio items share the same name, so that
+										// selecting a sorting option automatically deselects the
+										// previously selected one, even if it is displayed in
+										// another submenu. The field and direction are passed via
+										// the `value` prop.
+										name="view-table-sorting"
+										value={ value }
 										checked={ isChecked }
-										onChange={ ( e ) => {
+										onChange={ () => {
 											onChangeView( {
 												...view,
 												sort: {
 													field: field.id,
-													direction: e.target.value,
+													direction,
 												},
 											} );
 										} }
@@ -112,7 +139,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 										<DropdownMenuItemLabel>
 											{ info.label }
 										</DropdownMenuItemLabel>
-									</DropdownMenuRadioItemCustom>
+									</DropdownMenuRadioItem>
 								);
 							}
 						) }
@@ -122,6 +149,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 					<DropdownMenuItem
 						prefix={ <Icon icon={ unseen } /> }
 						onClick={ () => {
+							onHide( field );
 							onChangeView( {
 								...view,
 								hiddenFields: view.hiddenFields.concat(
@@ -191,6 +219,11 @@ function HeaderMenu( { field, view, onChangeView } ) {
 												<DropdownMenuItemLabel>
 													{ element.label }
 												</DropdownMenuItemLabel>
+												{ !! element.description && (
+													<DropdownMenuItemHelpText>
+														{ element.description }
+													</DropdownMenuItemHelpText>
+												) }
 											</DropdownMenuRadioItemCustom>
 										);
 									} ) }
@@ -220,7 +253,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 												operator,
 												{ label, key },
 											] ) => (
-												<DropdownMenuRadioItemCustom
+												<DropdownMenuRadioItem
 													key={ key }
 													name={ `view-table-${ filter.field }-conditions` }
 													value={ operator }
@@ -248,7 +281,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 													<DropdownMenuItemLabel>
 														{ label }
 													</DropdownMenuItemLabel>
-												</DropdownMenuRadioItemCustom>
+												</DropdownMenuRadioItem>
 											)
 										) }
 									</DropdownMenu>
@@ -260,7 +293,7 @@ function HeaderMenu( { field, view, onChangeView } ) {
 			</WithSeparators>
 		</DropdownMenu>
 	);
-}
+} );
 
 function WithSeparators( { children } ) {
 	return Children.toArray( children )
@@ -283,6 +316,35 @@ function ViewTable( {
 	isLoading = false,
 	deferredRendering,
 } ) {
+	const headerMenuRefs = useRef( new Map() );
+	const headerMenuToFocusRef = useRef();
+	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] = useState();
+
+	useEffect( () => {
+		if ( headerMenuToFocusRef.current ) {
+			headerMenuToFocusRef.current.focus();
+			headerMenuToFocusRef.current = undefined;
+		}
+	} );
+
+	const asyncData = useAsyncList( data );
+	const tableNoticeId = useId();
+
+	if ( nextHeaderMenuToFocus ) {
+		// If we need to force focus, we short-circuit rendering here
+		// to prevent any additional work while we handle that.
+		// Clearing out the focus directive is necessary to make sure
+		// future renders don't cause unexpected focus jumps.
+		headerMenuToFocusRef.current = nextHeaderMenuToFocus;
+		setNextHeaderMenuToFocus();
+		return;
+	}
+
+	const onHide = ( field ) => {
+		const hidden = headerMenuRefs.current.get( field.id );
+		const fallback = headerMenuRefs.current.get( hidden.fallback );
+		setNextHeaderMenuToFocus( fallback?.node );
+	};
 	const visibleFields = fields.filter(
 		( field ) =>
 			! view.hiddenFields.includes( field.id ) &&
@@ -290,55 +352,70 @@ function ViewTable( {
 				field.id
 			)
 	);
-	const shownData = useAsyncList( data );
-	const usedData = deferredRendering ? shownData : data;
+	const usedData = deferredRendering ? asyncData : data;
 	const hasData = !! usedData?.length;
-	if ( isLoading ) {
-		// TODO:Add spinner or progress bar..
-		return (
-			<div className="dataviews-loading">
-				<h3>{ __( 'Loading' ) }</h3>
-			</div>
-		);
-	}
 	const sortValues = { asc: 'ascending', desc: 'descending' };
+
 	return (
 		<div className="dataviews-table-view-wrapper">
-			{ hasData && (
-				<table className="dataviews-table-view">
-					<thead>
-						<tr>
-							{ visibleFields.map( ( field ) => (
-								<th
-									key={ field.id }
-									style={ {
-										width: field.width || undefined,
-										minWidth: field.minWidth || undefined,
-										maxWidth: field.maxWidth || undefined,
+			<table
+				className="dataviews-table-view"
+				aria-busy={ isLoading }
+				aria-describedby={ tableNoticeId }
+			>
+				<thead>
+					<tr>
+						{ visibleFields.map( ( field, index ) => (
+							<th
+								key={ field.id }
+								style={ {
+									width: field.width || undefined,
+									minWidth: field.minWidth || undefined,
+									maxWidth: field.maxWidth || undefined,
+								} }
+								data-field-id={ field.id }
+								aria-sort={
+									view.sort?.field === field.id &&
+									sortValues[ view.sort.direction ]
+								}
+								scope="col"
+							>
+								<HeaderMenu
+									ref={ ( node ) => {
+										if ( node ) {
+											headerMenuRefs.current.set(
+												field.id,
+												{
+													node,
+													fallback:
+														visibleFields[
+															index > 0
+																? index - 1
+																: 1
+														]?.id,
+												}
+											);
+										} else {
+											headerMenuRefs.current.delete(
+												field.id
+											);
+										}
 									} }
-									data-field-id={ field.id }
-									aria-sort={
-										view.sort?.field === field.id &&
-										sortValues[ view.sort.direction ]
-									}
-									scope="col"
-								>
-									<HeaderMenu
-										field={ field }
-										view={ view }
-										onChangeView={ onChangeView }
-									/>
-								</th>
-							) ) }
-							{ !! actions?.length && (
-								<th data-field-id="actions">
-									{ __( 'Actions' ) }
-								</th>
-							) }
-						</tr>
-					</thead>
-					<tbody>
-						{ usedData.map( ( item ) => (
+									field={ field }
+									view={ view }
+									onChangeView={ onChangeView }
+									onHide={ onHide }
+								/>
+							</th>
+						) ) }
+						{ !! actions?.length && (
+							<th data-field-id="actions">{ __( 'Actions' ) }</th>
+						) }
+					</tr>
+				</thead>
+				<tbody>
+					{ hasData &&
+						usedData.map( ( item ) => (
 							<tr key={ getItemId( item ) }>
 								{ visibleFields.map( ( field ) => (
 									<td
@@ -366,14 +443,19 @@ function ViewTable( {
 								) }
 							</tr>
 						) ) }
-					</tbody>
-				</table>
-			) }
-			{ ! hasData && (
-				<div className="dataviews-no-results">
-					<p>{ __( 'No results' ) }</p>
-				</div>
-			) }
+				</tbody>
+			</table>
+			<div
+				className={ classNames( 'dataviews-table-status', {
+					'dataviews-loading': isLoading,
+					'dataviews-no-results': ! hasData && ! isLoading,
+				} ) }
+				id={ tableNoticeId }
+			>
+				{ ! hasData && (
+					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
+				) }
+			</div>
 		</div>
 	);
 }

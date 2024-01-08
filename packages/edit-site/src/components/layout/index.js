@@ -98,11 +98,11 @@ export default function Layout() {
 				'core/edit-site/next-region'
 			),
 			hasFixedToolbar: select( preferencesStore ).get(
-				'core/edit-site',
+				'core',
 				'fixedToolbar'
 			),
 			isDistractionFree: select( preferencesStore ).get(
-				'core/edit-site',
+				'core',
 				'distractionFree'
 			),
 			hasBlockSelected:
