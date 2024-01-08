@@ -300,7 +300,7 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 	$raw_value         = is_string( $raw_value ) && ! $has_decimal_point ? str_replace( $local_info['decimal_point'], '.', $raw_value ) : $raw_value;
 
 	if ( ! $skip_unit_parsing ) {
-		$acceptable_units_group = $skip_unit_parsing ? "" : implode( '|', $options['acceptable_units'] );
+		$acceptable_units_group = $skip_unit_parsing ? '' : implode( '|', $options['acceptable_units'] );
 		$pattern                = '/^(\d*[\.]?\d+)(' . $acceptable_units_group . '){1,1}$/';
 
 		preg_match( $pattern, $raw_value, $matches );
@@ -427,9 +427,12 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 	$view_port_width_offset = gutenberg_get_typography_value_and_unit( ( $minimum_viewport_width['value'] / 100 ) . $font_size_unit )['combined'];
 	$linear_factor          = 100 * ( ( $maximum_font_size['value'] - $minimum_font_size['value'] ) / ( $maximum_viewport_width['value'] - $minimum_viewport_width['value'] ) );
 	$linear_factor_scaled   = $linear_factor * $scale_factor;
-	$linear_factor_scaled   = empty( $linear_factor_scaled ) || 1 === $linear_factor_scaled ? 1 : gutenberg_get_typography_value_and_unit( $linear_factor_scaled, array(
-		'skip_unit_parsing' => true,
-	) )['combined'];
+	$linear_factor_scaled   = empty( $linear_factor_scaled ) || 1 === $linear_factor_scaled ? 1 : gutenberg_get_typography_value_and_unit(
+		$linear_factor_scaled,
+		array(
+			'skip_unit_parsing' => true,
+		)
+	)['combined'];
 
 	$fluid_target_font_size = $minimum_font_size_rem['combined'] . " + ((1vw - $view_port_width_offset) * $linear_factor_scaled)";
 
@@ -570,10 +573,9 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 		if ( ! empty( $minimum_font_size_limit ) && $calculated_minimum_font_size <= $minimum_font_size_limit['value'] ) {
 			$minimum_font_size_raw = $minimum_font_size_limit['combined'];
 		} else {
-			$minimum_font_size_calculated = gutenberg_get_typography_value_and_unit(
+			$minimum_font_size_raw = gutenberg_get_typography_value_and_unit(
 				$calculated_minimum_font_size . $preferred_size['unit']
-			);
-			$minimum_font_size_raw = $minimum_font_size_calculated['combined'];
+			)['combined'];
 		}
 	}
 
