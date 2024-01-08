@@ -11,6 +11,7 @@ export default function convertEditorSettings( data ) {
 		'focusMode',
 		'inactivePanels',
 		'keepCaretInsideBlock',
+		'mostUsedBlocks',
 		'openPanels',
 		'showBlockBreadcrumbs',
 		'showIconLabels',
