@@ -11,6 +11,7 @@ import DataviewsPatterns from '../page-patterns/dataviews-patterns';
 import PageTemplateParts from '../page-template-parts';
 import PageTemplates from '../page-templates';
 import PagePages from '../page-pages';
+import PageStyles from '../page-styles';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
@@ -30,6 +31,9 @@ export default function PageMain() {
 		) : (
 			<PagePatterns />
 		);
+		return <PagePatterns />;
+	} else if ( path === '/wp_global_styles' ) {
+		return <PageStyles />;
 	} else if ( window?.__experimentalAdminViews && path === '/pages' ) {
 		return <PagePages />;
 	}

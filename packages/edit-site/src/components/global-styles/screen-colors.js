@@ -19,7 +19,7 @@ const {
 	ColorPanel: StylesColorPanel,
 } = unlock( blockEditorPrivateApis );
 
-function ScreenColors() {
+function ScreenColors( { showBack = true } ) {
 	const [ style ] = useGlobalStyle( '', undefined, 'user', {
 		shouldDecodeEncode: false,
 	} );
@@ -32,6 +32,7 @@ function ScreenColors() {
 	return (
 		<>
 			<ScreenHeader
+				showBack={ showBack }
 				title={ __( 'Colors' ) }
 				description={ __(
 					'Manage palettes and the default color of different global elements on the site.'

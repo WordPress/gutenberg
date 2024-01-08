@@ -11,10 +11,11 @@ import TypographyElements from './typogrphy-elements';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
 
-function ScreenTypography() {
+function ScreenTypography( { showBack = true } ) {
 	return (
 		<>
 			<ScreenHeader
+				showBack={ showBack }
 				title={ __( 'Typography' ) }
 				description={ __(
 					'Manage the typography settings for different elements.'

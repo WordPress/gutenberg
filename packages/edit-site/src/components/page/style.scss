@@ -5,6 +5,9 @@
 	overflow: hidden;
 	margin: 0;
 	margin-top: $header-height;
+	&.small {
+		max-width: 280px;
+	}
 	@include break-medium() {
 		border-radius: 8px;
 		margin: $canvas-padding $canvas-padding $canvas-padding 0;

@@ -15,7 +15,7 @@ const { useGlobalStyle, AdvancedPanel: StylesAdvancedPanel } = unlock(
 	blockEditorPrivateApis
 );
 
-function ScreenCSS() {
+function ScreenCSS( { showBack = true } ) {
 	const description = __(
 		'Add your own CSS to customize the appearance and layout of your site.'
 	);
@@ -29,6 +29,7 @@ function ScreenCSS() {
 	return (
 		<>
 			<ScreenHeader
+				showBack={ showBack }
 				title={ __( 'CSS' ) }
 				description={
 					<>

@@ -13,7 +13,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import ScreenHeader from './header';
 import StyleVariationsContainer from './style-variations-container';
 
-function ScreenStyleVariations() {
+function ScreenStyleVariations( { showBack = true } ) {
 	const { mode } = useSelect( ( select ) => {
 		return {
 			mode: select( blockEditorStore ).__unstableGetEditorMode(),
@@ -50,6 +50,7 @@ function ScreenStyleVariations() {
 	return (
 		<>
 			<ScreenHeader
+				showBack={ showBack }
 				back="/"
 				title={ __( 'Browse styles' ) }
 				description={ __(

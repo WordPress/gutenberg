@@ -157,13 +157,14 @@ function BlockList( { filterValue } ) {
 
 const MemoizedBlockList = memo( BlockList );
 
-function ScreenBlockList() {
+function ScreenBlockList( { showBack = true } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const deferredFilterValue = useDeferredValue( filterValue );
 
 	return (
 		<>
 			<ScreenHeader
+				showBack={ showBack }
 				title={ __( 'Blocks' ) }
 				description={ __(
 					'Customize the appearance of specific blocks and for the whole site.'

@@ -256,32 +256,38 @@ function GlobalStylesEditorCanvasContainerLink() {
 	}, [ editorCanvasContainerView, goTo ] );
 }
 
-function GlobalStylesUI() {
+function GlobalStylesScreens( { initialPath, root = true } ) {
 	const blocks = getBlockTypes();
 	const editorCanvasContainerView = useSelect(
 		( select ) =>
 			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
 		[]
 	);
+
+	const { goTo } = useNavigator();
+
+	useEffect( () => {
+		goTo( initialPath );
+	}, [ initialPath, goTo ] );
+
 	return (
-		<NavigatorProvider
-			className="edit-site-global-styles-sidebar__navigator-provider"
-			initialPath="/"
-		>
-			<GlobalStylesNavigationScreen path="/">
-				<ScreenRoot />
-			</GlobalStylesNavigationScreen>
+		<>
+			{ root && (
+				<GlobalStylesNavigationScreen path="/">
+					<ScreenRoot />
+				</GlobalStylesNavigationScreen>
+			) }
 
 			<GlobalStylesNavigationScreen path="/variations">
-				<ScreenStyleVariations />
+				<ScreenStyleVariations showBack={ root } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/blocks">
-				<ScreenBlockList />
+				<ScreenBlockList showBack={ root } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/typography">
-				<ScreenTypography />
+				<ScreenTypography showBack={ root } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/typography/text">
@@ -305,19 +311,19 @@ function GlobalStylesUI() {
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/colors">
-				<ScreenColors />
+				<ScreenColors showBack={ root } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/layout">
-				<ScreenLayout />
+				<ScreenLayout showBack={ root } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/css">
-				<ScreenCSS />
+				<ScreenCSS showBack={ root } />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path={ '/revisions' }>
-				<ScreenRevisions />
+				<ScreenRevisions showBack={ root } />
 			</GlobalStylesNavigationScreen>
 
 			{ blocks.map( ( block ) => (
@@ -346,8 +352,19 @@ function GlobalStylesUI() {
 			<GlobalStylesActionMenu />
 			<GlobalStylesBlockLink />
 			<GlobalStylesEditorCanvasContainerLink />
+		</>
+	);
+}
+
+function GlobalStylesUI( { initialPath = '/', root = true } ) {
+	return (
+		<NavigatorProvider
+			className="edit-site-global-styles-sidebar__navigator-provider"
+			initialPath={ initialPath }
+		>
+			<GlobalStylesScreens root={ root } initialPath={ initialPath } />
 		</NavigatorProvider>
 	);
 }
-export { GlobalStylesMenuSlot };
+export { GlobalStylesMenuSlot, GlobalStylesStyleBook };
 export default GlobalStylesUI;

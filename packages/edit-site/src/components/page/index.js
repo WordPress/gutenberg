@@ -20,9 +20,12 @@ export default function Page( {
 	actions,
 	children,
 	className,
+	small = false,
 	hideTitleFromUI = false,
 } ) {
-	const classes = classnames( 'edit-site-page', className );
+	const classes = classnames( 'edit-site-page', className, {
+		small,
+	} );
 
 	return (
 		<NavigableRegion className={ classes } ariaLabel={ title }>
