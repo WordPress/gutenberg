@@ -44,8 +44,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => function () {
-						return true;},
+					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
 				),
 			)
 		);
