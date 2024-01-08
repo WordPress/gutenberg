@@ -124,7 +124,7 @@ function ColorPicker( { name, value, onChange } ) {
 
 	const onColorChange = useCallback(
 		( color ) => {
-			if ( color !== '' ) {
+			if ( color !== '' && color !== undefined ) {
 				onChange(
 					setColors( value, name, colors, { [ property ]: color } )
 				);
@@ -141,7 +141,7 @@ function ColorPicker( { name, value, onChange } ) {
 				onChange( removeFormat( value, name ) );
 			}
 		},
-		[ colors, onChange, property ]
+		[ colors, name, onChange, value ]
 	);
 	const activeColors = useMemo(
 		() => getActiveColors( value, name, colors ),
@@ -152,6 +152,7 @@ function ColorPicker( { name, value, onChange } ) {
 		<ColorSettings
 			colorValue={ activeColors[ property ] }
 			onColorChange={ onColorChange }
+			onColorCleared={ onColorChange }
 			defaultSettings={ colorSettings }
 			hideNavigation
 		/>
