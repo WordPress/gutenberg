@@ -15,6 +15,6 @@ export async function setIsFixedToolbar( this: Editor, isFixed: boolean ) {
 	await this.page.evaluate( ( _isFixed ) => {
 		window.wp.data
 			.dispatch( 'core/preferences' )
-			.set( 'core/edit-post', 'fixedToolbar', _isFixed );
+			.set( 'core', 'fixedToolbar', _isFixed );
 	}, isFixed );
 }

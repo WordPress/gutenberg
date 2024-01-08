@@ -27,7 +27,7 @@ import {
 	store as blockEditorStore,
 	BlockControls,
 } from '@wordpress/block-editor';
-import { getBlockSupport, parse } from '@wordpress/blocks';
+import { getBlockSupport, parse, cloneBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -183,8 +183,7 @@ export default function ReusableBlockEdit( {
 					innerBlocks: blocks,
 					userCanEdit: canEdit,
 					getBlockEditingMode: editingMode,
-					getPostLinkProps:
-						getSettings().__experimentalGetPostLinkProps,
+					getPostLinkProps: getSettings().getPostLinkProps,
 				};
 			},
 			[ patternClientId, ref ]
@@ -206,7 +205,8 @@ export default function ReusableBlockEdit( {
 	// Apply the initial overrides from the pattern block to the inner blocks.
 	useEffect( () => {
 		const initialBlocks =
-			editedRecord.blocks ??
+			// Clone the blocks to generate new client IDs.
+			editedRecord.blocks?.map( ( block ) => cloneBlock( block ) ) ??
 			( editedRecord.content && typeof editedRecord.content !== 'function'
 				? parse( editedRecord.content )
 				: [] );

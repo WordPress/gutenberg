@@ -14,7 +14,6 @@ import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { CommandMenu } from '@wordpress/commands';
-import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -34,16 +33,12 @@ function Editor( {
 	initialEdits,
 	...props
 } ) {
-	const isLargeViewport = useViewportMatch( 'medium' );
 	const { currentPost, getPostLinkProps, goBack } = usePostHistory(
 		initialPostId,
 		initialPostType
 	);
 
 	const {
-		hasFixedToolbar,
-		focusMode,
-		isDistractionFree,
 		hasInlineToolbar,
 		post,
 		preferredStyleVariations,
@@ -89,10 +84,6 @@ function Editor( {
 				getPostType( currentPost.postType )?.viewable ?? false;
 			const canEditTemplate = canUser( 'create', 'templates' );
 			return {
-				hasFixedToolbar:
-					isFeatureActive( 'fixedToolbar' ) || ! isLargeViewport,
-				focusMode: isFeatureActive( 'focusMode' ),
-				isDistractionFree: isFeatureActive( 'distractionFree' ),
 				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
 				preferredStyleVariations: select( preferencesStore ).get(
 					'core/edit-post',
@@ -107,7 +98,7 @@ function Editor( {
 				post: postObject,
 			};
 		},
-		[ currentPost.postType, currentPost.postId, isLargeViewport ]
+		[ currentPost.postType, currentPost.postId ]
 	);
 
 	const { updatePreferredStyleVariations } = useDispatch( editPostStore );
@@ -121,9 +112,6 @@ function Editor( {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
 			},
-			hasFixedToolbar,
-			focusMode,
-			isDistractionFree,
 			hasInlineToolbar,
 
 			// Keep a reference of the `allowedBlockTypes` from the server to handle use cases
@@ -149,10 +137,7 @@ function Editor( {
 		return result;
 	}, [
 		settings,
-		hasFixedToolbar,
 		hasInlineToolbar,
-		focusMode,
-		isDistractionFree,
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,

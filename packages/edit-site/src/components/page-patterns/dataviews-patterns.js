@@ -9,7 +9,7 @@ import {
 	Flex,
 } from '@wordpress/components';
 import { getQueryArgs } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	useState,
 	useMemo,
@@ -46,12 +46,15 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_SYNC_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
+	ENUMERATION_TYPE,
+	OPERATOR_IN,
 } from '../../utils/constants';
 import {
 	exportJSONaction,
 	renameAction,
 	resetAction,
 	deleteAction,
+	duplicatePatternAction,
 } from './dataviews-pattern-actions';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
@@ -76,12 +79,30 @@ const DEFAULT_VIEW = {
 	search: '',
 	page: 1,
 	perPage: 20,
-	hiddenFields: [],
+	hiddenFields: [ 'sync-status' ],
 	layout: {
 		...defaultConfigPerViewType[ LAYOUT_GRID ],
 	},
 	filters: [],
 };
+
+const SYNC_FILTERS = [
+	{
+		value: PATTERN_SYNC_TYPES.full,
+		label: _x( 'Synced', 'Option that shows all synchronized patterns' ),
+		description: __( 'Patterns that are kept in sync across the site.' ),
+	},
+	{
+		value: PATTERN_SYNC_TYPES.unsynced,
+		label: _x(
+			'Not synced',
+			'Option that shows all patterns that are not synchronized'
+		),
+		description: __(
+			'Patterns that can be changed freely without affecting the site.'
+		),
+	},
+];
 
 function Preview( { item, viewType } ) {
 	const descriptionId = useId();
@@ -149,7 +170,7 @@ function Title( { item, categoryId } ) {
 			item.syncStatus === PATTERN_SYNC_TYPES.full ? symbol : undefined;
 	}
 	return (
-		<HStack alignment="center" justify="flex-start" spacing={ 3 }>
+		<HStack alignment="center" justify="flex-start" spacing={ 2 }>
 			{ itemIcon && ! isNonUserPattern && (
 				<Tooltip
 					placement="top"
@@ -160,6 +181,18 @@ function Title( { item, categoryId } ) {
 					<Icon
 						className="edit-site-patterns__pattern-icon"
 						icon={ itemIcon }
+					/>
+				</Tooltip>
+			) }
+			{ item.type === PATTERN_TYPES.theme && (
+				<Tooltip
+					placement="top"
+					text={ __( 'This pattern cannot be edited.' ) }
+				>
+					<Icon
+						className="edit-site-patterns__pattern-lock-icon"
+						icon={ lockSmall }
+						size={ 24 }
 					/>
 				</Tooltip>
 			) }
@@ -179,18 +212,6 @@ function Title( { item, categoryId } ) {
 						</Button>
 					</Heading>
 				) }
-				{ item.type === PATTERN_TYPES.theme && (
-					<Tooltip
-						placement="top"
-						text={ __( 'This pattern cannot be edited.' ) }
-					>
-						<Icon
-							className="edit-site-patterns__pattern-lock-icon"
-							icon={ lockSmall }
-							size={ 24 }
-						/>
-					</Tooltip>
-				) }
 			</Flex>
 		</HStack>
 	);
@@ -204,27 +225,25 @@ export default function DataviewsPatterns() {
 	const isUncategorizedThemePatterns =
 		type === PATTERN_TYPES.theme && categoryId === 'uncategorized';
 	const previousCategoryId = usePrevious( categoryId );
+	const viewSyncStatus = view.filters?.find(
+		( { field } ) => field === 'sync-status'
+	)?.value;
 	const { patterns, isResolving } = usePatterns(
 		type,
 		isUncategorizedThemePatterns ? '' : categoryId,
 		{
 			search: view.search,
-			// syncStatus:
-			// 	deferredSyncedFilter === 'all'
-			// 		? undefined
-			// 		: deferredSyncedFilter,
+			syncStatus: viewSyncStatus,
 		}
 	);
-	const fields = useMemo(
-		() => [
+	const fields = useMemo( () => {
+		const _fields = [
 			{
 				header: __( 'Preview' ),
 				id: 'preview',
 				render: ( { item } ) => (
 					<Preview item={ item } viewType={ view.type } />
 				),
-				minWidth: 120,
-				maxWidth: 120,
 				enableSorting: false,
 				enableHiding: false,
 			},
@@ -235,12 +254,36 @@ export default function DataviewsPatterns() {
 				render: ( { item } ) => (
 					<Title item={ item } categoryId={ categoryId } />
 				),
-				maxWidth: 400,
 				enableHiding: false,
 			},
-		],
-		[ view.type, categoryId ]
-	);
+		];
+		if ( type === PATTERN_TYPES.theme ) {
+			_fields.push( {
+				header: __( 'Sync Status' ),
+				id: 'sync-status',
+				render: ( { item } ) => {
+					// User patterns can have their sync statuses checked directly.
+					// Non-user patterns are all unsynced for the time being.
+					return (
+						SYNC_FILTERS.find(
+							( { value } ) => value === item.syncStatus
+						)?.label ||
+						SYNC_FILTERS.find(
+							( { value } ) =>
+								value === PATTERN_SYNC_TYPES.unsynced
+						).label
+					);
+				},
+				type: ENUMERATION_TYPE,
+				elements: SYNC_FILTERS,
+				filterBy: {
+					operators: [ OPERATOR_IN ],
+				},
+				enableSorting: false,
+			} );
+		}
+		return _fields;
+	}, [ view.type, categoryId, type ] );
 	// Reset the page number when the category changes.
 	useEffect( () => {
 		if ( previousCategoryId !== categoryId ) {
@@ -272,7 +315,13 @@ export default function DataviewsPatterns() {
 	}, [ patterns, view, fields ] );
 
 	const actions = useMemo(
-		() => [ renameAction, exportJSONaction, resetAction, deleteAction ],
+		() => [
+			renameAction,
+			duplicatePatternAction,
+			exportJSONaction,
+			resetAction,
+			deleteAction,
+		],
 		[]
 	);
 	const onChangeView = useCallback(

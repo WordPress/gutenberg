@@ -11,6 +11,11 @@ module.exports = {
 	plugins: [
 		new DependencyExtractionWebpackPlugin( {
 			combineAssets: true,
+			requestToExternalModule( request ) {
+				if ( request.startsWith( '@wordpress/' ) ) {
+					return request;
+				}
+			},
 		} ),
 	],
 };

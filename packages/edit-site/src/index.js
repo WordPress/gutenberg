@@ -53,9 +53,6 @@ export function initializeEditor( id, settings ) {
 	// so that we won't trigger unnecessary re-renders with useEffect.
 	dispatch( preferencesStore ).setDefaults( 'core/edit-site', {
 		editorMode: 'visual',
-		fixedToolbar: false,
-		focusMode: false,
-		distractionFree: false,
 		welcomeGuide: true,
 		welcomeGuideStyles: true,
 		welcomeGuidePage: true,
@@ -64,7 +61,12 @@ export function initializeEditor( id, settings ) {
 
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
+		distractionFree: false,
+		fixedToolbar: false,
+		focusMode: false,
+		inactivePanels: [],
 		keepCaretInsideBlock: false,
+		openPanels: [ 'post-status' ],
 		showBlockBreadcrumbs: true,
 		showListViewByDefault: false,
 	} );
