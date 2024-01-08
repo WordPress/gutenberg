@@ -84,7 +84,7 @@ describe( '<RichText/>', () => {
 		} );
 	} );
 
-	describe( 'when changes arrive from Aztec', () => {
+	describe( 'Value changes', () => {
 		it( 'should avoid updating attributes when values are equal', async () => {
 			const handleChange = jest.fn();
 			const defaultEmptyValue = new RichTextData();
