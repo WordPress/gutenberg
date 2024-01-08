@@ -411,7 +411,6 @@ if ( hasExperimentalModulesFlag ) {
 				// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
 				SCRIPT_DEBUG: ! isProduction,
 			} ),
-			new RenderPathsPlugin(),
 			// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 			// bundle content as a convenient interactive zoomable treemap.
 			process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
