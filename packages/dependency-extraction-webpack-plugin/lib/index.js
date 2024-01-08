@@ -82,6 +82,10 @@ class DependencyExtractionWebpackPlugin {
 				: defaultRequestToExternal( request );
 		}
 
+		if ( this.useModules && externalRequest === true ) {
+			externalRequest = request;
+		}
+
 		if ( externalRequest ) {
 			this.externalizedDeps.add( request );
 

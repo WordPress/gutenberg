@@ -12,9 +12,7 @@ module.exports = {
 		new DependencyExtractionWebpackPlugin( {
 			combineAssets: true,
 			requestToExternalModule( request ) {
-				if ( request.startsWith( '@wordpress/' ) ) {
-					return request;
-				}
+				return request.startsWith( '@wordpress/' );
 			},
 		} ),
 	],
