@@ -39,7 +39,7 @@ export default function PreferencesModalTabs( { sections } ) {
 	const [ activeMenu, setActiveMenu ] = useState( PREFERENCES_MENU );
 	/**
 	 * Create helper objects from `sections` for easier data handling.
-	 * `tabs` is used for creating the `TabPanel` and `sectionsContentMap`
+	 * `tabs` is used for creating the `Tabs` and `sectionsContentMap`
 	 * is used for easier access to active tab's content.
 	 */
 	const { tabs, sectionsContentMap } = useMemo( () => {
