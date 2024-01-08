@@ -152,15 +152,21 @@ class Gutenberg_Modules {
 	 * import maps (https://github.com/guybedford/es-module-shims/issues/406).
 	 */
 	public static function print_import_map_polyfill() {
-		$import_map = self::get_import_map();
-		if ( ! empty( $import_map['imports'] ) ) {
-			wp_print_script_tag(
-				array(
-					'src'   => gutenberg_url( '/build/modules/importmap-polyfill.min.js' ),
-					'defer' => true,
-				)
-			);
-		}
+		$test = 'HTMLScriptElement.supports && HTMLScriptElement.supports("importmap")';
+		$src  = gutenberg_url( '/build/modules/importmap-polyfill.min.js' );
+
+		echo (
+			// Test presence of feature...
+			'<script>( ' . $test . ' ) || ' .
+			/*
+			 * ...appending polyfill on any failures. Cautious viewers may balk
+			 * at the `document.write`. Its caveat of synchronous mid-stream
+			 * blocking write is exactly the behavior we need though.
+			 */
+			'document.write( \'<script src="' .
+			$src .
+			'"></scr\' + \'ipt>\' );</script>'
+		);
 	}
 
 	/**
@@ -273,4 +279,4 @@ add_action( $modules_position, array( 'Gutenberg_Modules', 'print_enqueued_modul
 add_action( $modules_position, array( 'Gutenberg_Modules', 'print_module_preloads' ) );
 
 // Prints the script that loads the import map polyfill in the footer.
-add_action( 'wp_footer', array( 'Gutenberg_Modules', 'print_import_map_polyfill' ), 11 );
+add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_import_map_polyfill' ), 11 );
