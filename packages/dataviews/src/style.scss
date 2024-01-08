@@ -309,6 +309,15 @@
 
 	.dataviews-list-view__details-button {
 		align-self: center;
+		opacity: 0;
+	}
+
+	li.is-selected,
+	li:hover,
+	li:focus-within {
+		.dataviews-list-view__details-button {
+			opacity: 1;
+		}
 	}
 }
 
