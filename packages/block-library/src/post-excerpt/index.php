@@ -33,7 +33,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	if ( isset( $border_array ) && ! empty( $border_array ) ) {
 		$border_string = implode( ';', $border_array );
 	}
-	$border_classes = get_border_color_classes_for_block_excerpt( $attributes );
+	$border_classes = block_core_post_excerpt_get_border_color_classes( $attributes );
 
 	// Generate a readmoreColors string based on readmoreColors attributes.
 	$read_more_colors = isset( $attributes['readMoreColors'] ) ? $attributes['readMoreColors'] : null;
@@ -149,7 +149,7 @@ if ( is_admin() ||
  *
  * @return string The border color classnames to be applied to the block elements.
  */
-function get_border_color_classes_for_block_excerpt( $attributes ) {
+function block_core_post_excerpt_get_border_color_classes( $attributes ) {
 	$border_color_classes    = array();
 	$has_custom_border_color = ! empty( $attributes['style']['border']['color'] );
 	$has_named_border_color  = ! empty( $attributes['borderColor'] );
