@@ -65,13 +65,7 @@ export default function ViewList( {
 								tabIndex={ 0 }
 								aria-pressed={ selection.includes( item.id ) }
 								onKeyDown={ onEnter( item ) }
-								className={ classNames(
-									'dataviews-view-list__item',
-									{
-										'dataviews-view-list__item-selected':
-											selection.includes( item.id ),
-									}
-								) }
+								className="dataviews-view-list__item"
 								onClick={ () => onSelectionChange( [ item ] ) }
 							>
 								<HStack spacing={ 3 } justify="start">
