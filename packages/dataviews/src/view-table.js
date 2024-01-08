@@ -90,7 +90,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 			trigger={
 				<Button
 					size="compact"
-					className="dataviews-table-header-button"
+					className="dataviews-view-table-header-button"
 					ref={ ref }
 					variant="tertiary"
 				>
@@ -357,9 +357,9 @@ function ViewTable( {
 	const sortValues = { asc: 'ascending', desc: 'descending' };
 
 	return (
-		<div className="dataviews-table-view-wrapper">
+		<div>
 			<table
-				className="dataviews-table-view"
+				className="dataviews-view-table"
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 			>
@@ -410,7 +410,7 @@ function ViewTable( {
 						) ) }
 						{ !! actions?.length && (
 							<th data-field-id="actions">
-								<span className="dataviews-table-header">
+								<span className="dataviews-view-table-header">
 									{ __( 'Actions' ) }
 								</span>
 							</th>
@@ -450,7 +450,7 @@ function ViewTable( {
 				</tbody>
 			</table>
 			<div
-				className={ classNames( 'dataviews-table-status', {
+				className={ classNames( {
 					'dataviews-loading': isLoading,
 					'dataviews-no-results': ! hasData && ! isLoading,
 				} ) }

@@ -55,7 +55,7 @@
 	margin: $grid-unit-40 0 $grid-unit-20;
 }
 
-.dataviews-table-view {
+.dataviews-view-table {
 	width: 100%;
 	text-indent: 0;
 	border-color: inherit;
@@ -89,8 +89,8 @@
 		th:first-child {
 			padding-left: $grid-unit-40;
 
-			.dataviews-table-header-button,
-			.dataviews-table-header {
+			.dataviews-view-table-header-button,
+			.dataviews-view-table-header {
 				margin-left: - #{$grid-unit-10};
 			}
 		}
@@ -129,7 +129,7 @@
 		}
 	}
 
-	.dataviews-table-header-button {
+	.dataviews-view-table-header-button {
 		padding: $grid-unit-05 $grid-unit-10;
 		font-size: 11px;
 		text-transform: uppercase;
@@ -148,7 +148,7 @@
 		}
 	}
 
-	.dataviews-table-header {
+	.dataviews-view-table-header {
 		padding-left: $grid-unit-05;
 	}
 }
