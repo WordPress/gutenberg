@@ -166,7 +166,7 @@ export default function InlineColorUI( {
 	return (
 		<Popover
 			onClose={ onClose }
-			className="components-inline-color-popover"
+			className="format-library__inline-color-popover"
 			anchor={ popoverAnchor }
 		>
 			<Tabs>
