@@ -87,7 +87,7 @@ export default function ViewGrid( {
 										{ field.header }
 									</div>
 									<div className="dataviews-view-grid__field-value">
-										{ field.render( { item } ) }
+										{ renderedValue }
 									</div>
 								</VStack>
 							);

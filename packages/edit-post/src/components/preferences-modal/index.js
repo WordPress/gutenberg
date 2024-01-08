@@ -44,14 +44,14 @@ export default function EditPostPreferencesModal() {
 	const [ isModalActive, showBlockBreadcrumbsOption ] = useSelect(
 		( select ) => {
 			const { getEditorSettings } = select( editorStore );
-			const { getEditorMode, isFeatureActive } = select( editPostStore );
+			const { getEditorMode } = select( editPostStore );
+			const { get } = select( preferencesStore );
 			const modalActive = select( interfaceStore ).isModalActive(
 				PREFERENCES_MODAL_NAME
 			);
 			const mode = getEditorMode();
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
-			const isDistractionFreeEnabled =
-				isFeatureActive( 'distractionFree' );
+			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
 			return [
 				modalActive,
 				! isDistractionFreeEnabled &&
@@ -70,14 +70,14 @@ export default function EditPostPreferencesModal() {
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const toggleDistractionFree = () => {
-		setPreference( 'core/edit-post', 'fixedToolbar', true );
+		setPreference( 'core', 'fixedToolbar', true );
 		setIsInserterOpened( false );
 		setIsListViewOpened( false );
 		closeGeneralSidebar();
 	};
 
 	const turnOffDistractionFree = () => {
-		setPreference( 'core/edit-post', 'distractionFree', false );
+		setPreference( 'core', 'distractionFree', false );
 	};
 
 	const sections = useMemo(
@@ -95,12 +95,13 @@ export default function EditPostPreferencesModal() {
 									help={ __(
 										'Review settings, such as visibility and tags.'
 									) }
-									label={ __( 'Enable pre-publish flow' ) }
+									label={ __( 'Enable pre-publish checks' ) }
 								/>
 							</PreferencesModalSection>
 						) }
 						<PreferencesModalSection title={ __( 'Interface' ) }>
 							<EnableFeature
+								scope="core"
 								featureName="showListViewByDefault"
 								help={ __(
 									'Opens the block list view sidebar by default.'
@@ -109,6 +110,7 @@ export default function EditPostPreferencesModal() {
 							/>
 							{ showBlockBreadcrumbsOption && (
 								<EnableFeature
+									scope="core"
 									featureName="showBlockBreadcrumbs"
 									help={ __(
 										'Display the block hierarchy trail at the bottom of the editor.'
@@ -117,6 +119,7 @@ export default function EditPostPreferencesModal() {
 								/>
 							) }
 							<EnableFeature
+								scope="core"
 								featureName="allowRightClickOverrides"
 								help={ __(
 									'Allows contextual list view menus via right-click, overriding browser defaults.'
@@ -183,6 +186,7 @@ export default function EditPostPreferencesModal() {
 						) }
 					>
 						<EnableFeature
+							scope="core"
 							featureName="fixedToolbar"
 							onToggle={ turnOffDistractionFree }
 							help={ __(
@@ -191,6 +195,7 @@ export default function EditPostPreferencesModal() {
 							label={ __( 'Top toolbar' ) }
 						/>
 						<EnableFeature
+							scope="core"
 							featureName="distractionFree"
 							onToggle={ toggleDistractionFree }
 							help={ __(
@@ -199,6 +204,7 @@ export default function EditPostPreferencesModal() {
 							label={ __( 'Distraction free' ) }
 						/>
 						<EnableFeature
+							scope="core"
 							featureName="focusMode"
 							help={ __(
 								'Highlights the current block and fades other content.'
@@ -227,6 +233,7 @@ export default function EditPostPreferencesModal() {
 							) }
 						>
 							<EnableFeature
+								scope="core"
 								featureName="keepCaretInsideBlock"
 								help={ __(
 									'Keeps the text cursor within the block boundaries, aiding users with screen readers by preventing unintentional cursor movement outside the block.'
@@ -238,6 +245,7 @@ export default function EditPostPreferencesModal() {
 						</PreferencesModalSection>
 						<PreferencesModalSection title={ __( 'Interface' ) }>
 							<EnableFeature
+								scope="core"
 								featureName="showIconLabels"
 								label={ __( 'Show button text labels' ) }
 								help={ __(
@@ -255,6 +263,7 @@ export default function EditPostPreferencesModal() {
 					<>
 						<PreferencesModalSection title={ __( 'Inserter' ) }>
 							<EnableFeature
+								scope="core"
 								featureName="mostUsedBlocks"
 								help={ __(
 									'Adds a category with the most frequently used blocks in the inserter.'

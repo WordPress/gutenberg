@@ -209,7 +209,7 @@ function UnforwardedModal(
 
 		if (
 			shouldCloseOnEsc &&
-			event.code === 'Escape' &&
+			( event.code === 'Escape' || event.key === 'Escape' ) &&
 			! event.defaultPrevented
 		) {
 			event.preventDefault();

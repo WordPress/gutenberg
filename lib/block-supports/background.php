@@ -96,6 +96,7 @@ function gutenberg_render_background_support( $block_content, $block ) {
 
 			$updated_style .= $styles['css'];
 			$tags->set_attribute( 'style', $updated_style );
+			$tags->add_class( 'has-background' );
 		}
 
 		return $tags->get_updated_html();

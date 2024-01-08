@@ -137,6 +137,17 @@ function resetBackgroundSize( style = {}, setAttributes ) {
 	} );
 }
 
+/**
+ * Generates a CSS class name if an background image is set.
+ *
+ * @param {Object} style A block's style attribute.
+ *
+ * @return {string} CSS class name.
+ */
+export function getBackgroundImageClasses( style ) {
+	return hasBackgroundImageValue( style ) ? 'has-background' : '';
+}
+
 function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 	const imgLabel = label || getFilename( imgUrl );
 	return (

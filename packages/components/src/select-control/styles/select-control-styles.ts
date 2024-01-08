@@ -11,6 +11,7 @@ import { COLORS, rtl } from '../../utils';
 import { space } from '../../utils/space';
 import type { SelectControlProps } from '../types';
 import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper';
+import { fontSizeStyles } from '../../input-control/styles/input-control-styles';
 
 interface SelectProps
 	extends Pick<
@@ -28,27 +29,6 @@ const disabledStyles = ( { disabled }: SelectProps ) => {
 	return css( {
 		color: COLORS.ui.textDisabled,
 	} );
-};
-
-const fontSizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
-	const sizes = {
-		default: '13px',
-		small: '11px',
-		'__unstable-large': '13px',
-	};
-
-	const fontSize = sizes[ selectSize ];
-	const fontSizeMobile = '16px';
-
-	if ( ! fontSize ) return '';
-
-	return css`
-		font-size: ${ fontSizeMobile };
-
-		@media ( min-width: 600px ) {
-			font-size: ${ fontSize };
-		}
-	`;
 };
 
 const sizeStyles = ( {
@@ -75,6 +55,12 @@ const sizeStyles = ( {
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
+		compact: {
+			height: 32,
+			minHeight: 32,
+			paddingTop: 0,
+			paddingBottom: 0,
+		},
 		'__unstable-large': {
 			height: 40,
 			minHeight: 40,
@@ -84,12 +70,7 @@ const sizeStyles = ( {
 	};
 
 	if ( ! __next40pxDefaultSize ) {
-		sizes.default = {
-			height: 32,
-			minHeight: 32,
-			paddingTop: 0,
-			paddingBottom: 0,
-		};
+		sizes.default = sizes.compact;
 	}
 
 	const style = sizes[ selectSize ] || sizes.default;
@@ -107,11 +88,12 @@ const sizePaddings = ( {
 	const padding = {
 		default: 16,
 		small: 8,
+		compact: 8,
 		'__unstable-large': 16,
 	};
 
 	if ( ! __next40pxDefaultSize ) {
-		padding.default = 8;
+		padding.default = padding.compact;
 	}
 
 	const selectedPadding = padding[ selectSize ] || padding.default;
