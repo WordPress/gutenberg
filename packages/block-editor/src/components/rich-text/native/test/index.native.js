@@ -5,8 +5,9 @@ import { Dimensions } from 'react-native';
 import {
 	fireEvent,
 	getEditorHtml,
-	render,
 	initializeEditor,
+	render,
+	screen,
 } from 'test/helpers';
 
 /**
@@ -87,7 +88,7 @@ describe( '<RichText/>', () => {
 		it( 'should avoid updating attributes when values are equal', async () => {
 			const handleChange = jest.fn();
 			const defaultEmptyValue = new RichTextData();
-			const screen = render(
+			render(
 				<RichText
 					onChange={ handleChange }
 					value={ defaultEmptyValue }
@@ -259,7 +260,7 @@ describe( '<RichText/>', () => {
 			const fontSize = '10';
 			const style = { fontSize: '12' };
 			// Act.
-			const screen = render( <RichText fontSize={ fontSize } /> );
+			render( <RichText fontSize={ fontSize } /> );
 			screen.update( <RichText fontSize={ fontSize } style={ style } /> );
 			// Assert.
 			expect( screen.toJSON() ).toMatchSnapshot();
@@ -281,7 +282,7 @@ describe( '<RichText/>', () => {
 			const fontSize = '10';
 			const style = { fontSize: '12.56px' };
 			// Act.
-			const screen = render( <RichText fontSize={ fontSize } /> );
+			render( <RichText fontSize={ fontSize } /> );
 			screen.update( <RichText fontSize={ fontSize } style={ style } /> );
 			// Assert.
 			expect( screen.toJSON() ).toMatchSnapshot();
