@@ -87,7 +87,7 @@ describe( '<RichText/>', () => {
 	describe( 'Value changes', () => {
 		it( 'should avoid updating attributes when values are equal', async () => {
 			const handleChange = jest.fn();
-			const defaultEmptyValue = new RichTextData();
+			const defaultEmptyValue = RichTextData.empty();
 			render(
 				<RichText
 					onChange={ handleChange }
