@@ -27,9 +27,9 @@ show "Mixed" placeholder text.
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { __experimentalBorderBoxControl as BorderBoxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
 
 const colors = [
 	{ name: 'Blue 20', color: '#72aee6' },

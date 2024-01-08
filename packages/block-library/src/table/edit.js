@@ -349,7 +349,7 @@ function TableEdit( {
 	useEffect( () => {
 		if ( hasTableCreated ) {
 			tableRef?.current
-				?.querySelector( 'td[contentEditable="true"]' )
+				?.querySelector( 'td div[contentEditable="true"]' )
 				?.focus();
 			setHasTableCreated( false );
 		}
@@ -414,31 +414,33 @@ function TableEdit( {
 							},
 							columnIndex
 						) => (
-							<RichText
-								tagName={ CellTag }
+							<CellTag
 								key={ columnIndex }
+								scope={ CellTag === 'th' ? scope : undefined }
+								colSpan={ colspan }
+								rowSpan={ rowspan }
 								className={ classnames(
 									{
 										[ `has-text-align-${ align }` ]: align,
 									},
 									'wp-block-table__cell-content'
 								) }
-								scope={ CellTag === 'th' ? scope : undefined }
-								colSpan={ colspan }
-								rowSpan={ rowspan }
-								value={ content }
-								onChange={ onChange }
-								onFocus={ () => {
-									setSelectedCell( {
-										sectionName: name,
-										rowIndex,
-										columnIndex,
-										type: 'cell',
-									} );
-								} }
-								aria-label={ cellAriaLabel[ name ] }
-								placeholder={ placeholder[ name ] }
-							/>
+							>
+								<RichText
+									value={ content }
+									onChange={ onChange }
+									onFocus={ () => {
+										setSelectedCell( {
+											sectionName: name,
+											rowIndex,
+											columnIndex,
+											type: 'cell',
+										} );
+									} }
+									aria-label={ cellAriaLabel[ name ] }
+									placeholder={ placeholder[ name ] }
+								/>
+							</CellTag>
 						)
 					) }
 				</tr>
@@ -553,6 +555,7 @@ function TableEdit( {
 					>
 						<TextControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Column count' ) }
 							value={ initialColumnCount }
@@ -562,6 +565,7 @@ function TableEdit( {
 						/>
 						<TextControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Row count' ) }
 							value={ initialRowCount }
@@ -570,7 +574,7 @@ function TableEdit( {
 							className="blocks-table__placeholder-input"
 						/>
 						<Button
-							className="blocks-table__placeholder-button"
+							__next40pxDefaultSize
 							variant="primary"
 							type="submit"
 						>

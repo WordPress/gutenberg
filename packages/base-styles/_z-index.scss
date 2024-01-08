@@ -32,7 +32,6 @@ $z-layers: (
 	".interface-interface-skeleton__header": 30,
 	".interface-interface-skeleton__content": 20,
 	".edit-widgets-header": 30,
-	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
 	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block.
 	".wp-block-cover.is-placeholder .components-placeholder.is-large": 1, // Cover block resizer component inside a large placeholder.
 	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
@@ -121,9 +120,15 @@ $z-layers: (
 
 	// Should be above the popover (dropdown)
 	".reusable-blocks-menu-items__convert-modal": 1000001,
+	".patterns-menu-items__convert-modal": 1000001,
 	".edit-site-create-template-part-modal": 1000001,
 	".block-editor-block-lock-modal": 1000001,
 	".block-editor-template-part__selection-modal": 1000001,
+	".block-editor-block-rename-modal": 1000001,
+	".edit-site-list__rename-modal": 1000001,
+	".dataviews-action-modal": 1000001,
+	".editor-post-template__swap-template-modal": 1000001,
+	".edit-site-template-panel__replace-template-modal": 1000001,
 
 	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
 	// because it uses emotion and not sass. We need it to render on top its parent popover.
@@ -144,11 +149,11 @@ $z-layers: (
 	// The focus styles of the region navigation containers should be above their content.
 	".is-focusing-regions {region} :focus::after": 1000000,
 
-	// Show tooltips above wp-admin menus, submenus, and sidebar:
-	".components-tooltip": 1000002,
+	// Show NUX tips above popovers, wp-admin menus, submenus, and sidebar:
+	".nux-dot-tip": 1000001,
 
-	// Keep template popover underneath 'Create custom template' modal overlay.
-	".edit-post-post-template__dialog": 99999,
+	// Show tooltips above NUX tips, wp-admin menus, submenus, and sidebar:
+	".components-tooltip": 1000002,
 
 	// Make sure corner handles are above side handles for ResizableBox component
 	".components-resizable-box__handle": 2,
@@ -159,9 +164,6 @@ $z-layers: (
 	".edit-post-block-manager__category-title": 1,
 	// And block manager sticky disabled block count is higher still
 	".edit-post-block-manager__disabled-blocks-count": 2,
-
-	// Needs to be higher than any other element as this is an overlay to catch all events
-	".components-tooltip .event-catcher": 100002,
 
 	// Needs to appear below other color circular picker related UI elements.
 	".components-circular-option-picker__option-wrapper::before": -1,
@@ -186,6 +188,9 @@ $z-layers: (
 	".edit-site-layout__hub": 3,
 	".edit-site-layout__header": 2,
 	".edit-site-page-header": 2,
+	".edit-site-page-content": 1,
+	".edit-site-patterns__header": 2,
+	".edit-site-patterns__grid-pagination": 2,
 	".edit-site-layout__canvas-container": 2,
 	".edit-site-layout__sidebar": 1,
 	".edit-site-layout__canvas-container.is-resizing::after": 100,

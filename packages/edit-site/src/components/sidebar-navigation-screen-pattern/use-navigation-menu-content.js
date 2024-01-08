@@ -1,8 +1,24 @@
 /**
+ * WordPress dependencies
+ */
+import { parse } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import TemplatePartNavigationMenus from './template-part-navigation-menus';
 import useEditedEntityRecord from '../use-edited-entity-record';
+import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
+
+function getBlocksFromRecord( record ) {
+	if ( record?.blocks ) {
+		return record?.blocks;
+	}
+
+	return record?.content && typeof record.content !== 'function'
+		? parse( record.content )
+		: [];
+}
 
 /**
  * Retrieves a list of specific blocks from a given tree of blocks.
@@ -50,22 +66,33 @@ export default function useNavigationMenuContent( postType, postId ) {
 	// Only managing navigation menus in template parts is supported
 	// to match previous behaviour. This could potentially be expanded
 	// to patterns as well.
-	if ( postType !== 'wp_template_part' ) {
+	if ( postType !== TEMPLATE_PART_POST_TYPE ) {
 		return;
 	}
 
+	const blocks = getBlocksFromRecord( record );
 	const navigationBlocks = getBlocksOfTypeFromBlocks(
 		'core/navigation',
-		record?.blocks
+		blocks
 	);
+
+	if ( ! navigationBlocks.length ) {
+		return;
+	}
 
 	const navigationMenuIds = navigationBlocks?.map(
 		( block ) => block.attributes.ref
 	);
 
-	if ( ! navigationMenuIds?.length ) {
+	// Dedupe the Navigation blocks, as you can have multiple navigation blocks in the template.
+	// Also, filter out undefined values, as blocks don't have an id when initially added.
+	const uniqueNavigationMenuIds = [ ...new Set( navigationMenuIds ) ].filter(
+		( menuId ) => menuId
+	);
+
+	if ( ! uniqueNavigationMenuIds?.length ) {
 		return;
 	}
 
-	return <TemplatePartNavigationMenus menus={ navigationMenuIds } />;
+	return <TemplatePartNavigationMenus menus={ uniqueNavigationMenuIds } />;
 }

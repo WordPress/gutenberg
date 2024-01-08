@@ -8,6 +8,10 @@
 
 // phpcs:disable PEAR.NamingConventions.ValidClassName.StartWithCapital
 
+if ( class_exists( '_WP_Editors' ) ) {
+	return;
+}
+
 /**
  * Placeholder class.
  * Used to disable loading of TinyMCE assets.

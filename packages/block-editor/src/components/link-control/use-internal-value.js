@@ -1,21 +1,25 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
+
+/**
+ * External dependencies
+ */
+import fastDeepEqual from 'fast-deep-equal';
 
 export default function useInternalValue( value ) {
 	const [ internalValue, setInternalValue ] = useState( value || {} );
+	const [ previousValue, setPreviousValue ] = useState( value );
 
 	// If the value prop changes, update the internal state.
-	useEffect( () => {
-		setInternalValue( ( prevValue ) => {
-			if ( value && value !== prevValue ) {
-				return value;
-			}
-
-			return prevValue;
-		} );
-	}, [ value ] );
+	// See:
+	// - https://github.com/WordPress/gutenberg/pull/51387#issuecomment-1722927384.
+	// - https://react.dev/reference/react/useState#storing-information-from-previous-renders.
+	if ( ! fastDeepEqual( value, previousValue ) ) {
+		setPreviousValue( value );
+		setInternalValue( value );
+	}
 
 	const setInternalURLInputValue = ( nextValue ) => {
 		setInternalValue( {

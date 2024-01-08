@@ -20,7 +20,7 @@ NPM 6.9.0 or newer is required, since it uses the [package aliases feature](http
 
 Usage is intended to mimic the behavior of the [dynamic `import` function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#Dynamic_Imports), receiving the name (and optional version specifier) of an NPM package and returning a promise which resolves to the required module.
 
-_**Note:** Currently, this alignment to `import` is superficial, and the module resolution still uses [CommonJS `require`](https://nodejs.org/docs/latest-v12.x/api/modules.html#modules_require_id), rather than the newer [ES Modules support](https://nodejs.org/docs/latest-v14.x/api/esm.html). Future versions of this package will likely support ES Modules, once an LTS release of Node.js including unflagged ES Modules support becomes available._
+_**Note:** Currently, this alignment to `import` is superficial, and the module resolution still uses [CommonJS `require`](https://nodejs.org/docs/latest-v12.x/api/modules.html#modules_require_id), rather than the newer [ES Modules support](https://nodejs.org/docs/latest-v16.x/api/esm.html). Future versions of this package will likely support ES Modules, once an LTS release of Node.js including unflagged ES Modules support becomes available._
 
 The string passed to `lazyImport` can be formatted exactly as you would provide to `npm install`, including an optional version specifier (including [version ranges](https://docs.npmjs.com/misc/semver#ranges)). If the version specifier is omitted, it will be treated as equivalent to `*`, using the version of a locally installed package if available, otherwise installing the latest available version.
 
@@ -55,7 +55,7 @@ function onInstall() {
 lazyImport( 'fbjs@^1.0.0', {
 	localPath: './lib/shallowEqual',
 	onInstall,
-} ).then(/* ... */);
+} ).then( /* ... */ );
 ```
 
 Note that `lazyImport` can throw an error when offline and unable to install the dependency using NPM. You may want to anticipate this and provide remediation steps for a failed install, such as logging a warning messsage:

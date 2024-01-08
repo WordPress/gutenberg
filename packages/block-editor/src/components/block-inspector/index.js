@@ -30,7 +30,6 @@ import PositionControls from '../inspector-controls-tabs/position-controls-panel
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import BlockInfo from '../block-info-slot-fill';
 import BlockQuickNavigation from '../block-quick-navigation';
-import { unlock } from '../../lock-unlock';
 
 function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 	const contentClientIds = useSelect(
@@ -39,8 +38,8 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 				getClientIdsOfDescendants,
 				getBlockName,
 				getBlockEditingMode,
-			} = unlock( select( blockEditorStore ) );
-			return getClientIdsOfDescendants( [ topLevelLockedBlock ] ).filter(
+			} = select( blockEditorStore );
+			return getClientIdsOfDescendants( topLevelLockedBlock ).filter(
 				( clientId ) =>
 					getBlockName( clientId ) !== 'core/list-item' &&
 					getBlockEditingMode( clientId ) === 'contentOnly'
@@ -93,7 +92,9 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			blockType: _blockType,
 			topLevelLockedBlock:
 				__unstableGetContentLockingParent( _selectedBlockClientId ) ||
-				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly'
+				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly' ||
+				( _selectedBlockName === 'core/block' &&
+					window.__experimentalPatternPartialSyncing )
 					? _selectedBlockClientId
 					: undefined ),
 		};
@@ -301,6 +302,10 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						label={ __( 'Border' ) }
 					/>
 					<InspectorControls.Slot group="styles" />
+					<InspectorControls.Slot
+						group="background"
+						label={ __( 'Background' ) }
+					/>
 					<PositionControls />
 					<div>
 						<AdvancedControls />

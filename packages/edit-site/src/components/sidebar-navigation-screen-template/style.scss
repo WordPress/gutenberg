@@ -11,6 +11,8 @@
 
 	img {
 		border-radius: $grid-unit-15;
+		width: 20px;
+		height: 20px;
 	}
 
 	svg {
@@ -21,7 +23,10 @@
 .edit-site-sidebar-navigation-screen-template__added-by-description-author-icon {
 	width: 24px;
 	height: 24px;
-	margin-right: $grid-unit-10;
+	margin-right: $grid-unit-05;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .edit-site-sidebar-navigation-screen-template__template-area-button {

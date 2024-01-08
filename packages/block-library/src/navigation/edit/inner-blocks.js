@@ -98,8 +98,8 @@ export default function NavigationInnerBlocks( {
 			onChange,
 			allowedBlocks: ALLOWED_BLOCKS,
 			prioritizedInserterBlocks: PRIORITIZED_INSERTER_BLOCKS,
-			__experimentalDefaultBlock: DEFAULT_BLOCK,
-			__experimentalDirectInsert: shouldDirectInsert,
+			defaultBlock: DEFAULT_BLOCK,
+			directInsert: shouldDirectInsert,
 			orientation,
 			templateLock,
 
@@ -117,6 +117,8 @@ export default function NavigationInnerBlocks( {
 					? InnerBlocks.ButtonBlockAppender
 					: false,
 			placeholder: showPlaceholder ? placeholder : undefined,
+			__experimentalCaptureToolbars: true,
+			__unstableDisableLayoutClassNames: true,
 		}
 	);
 

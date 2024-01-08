@@ -10,9 +10,9 @@ for more information.
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { Dropdown, Button } from '@wordpress/components';
 import { __experimentalPublishDateTimePicker as PublishDateTimePicker } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
 
 const MyDateTimePicker = () => {
 	const [ date, setDate ] = useState( new Date() );

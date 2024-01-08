@@ -1,68 +1,68 @@
-window.addEventListener( 'DOMContentLoaded', () => {
-	const hiddenClass = 'wp-block-search__searchfield-hidden';
+/**
+ * WordPress dependencies
+ */
+import { store, getContext, getElement } from '@wordpress/interactivity';
 
-	Array.from(
-		document.getElementsByClassName(
-			'wp-block-search__button-behavior-expand'
-		)
-	).forEach( ( block ) => {
-		const searchField = block.querySelector( '.wp-block-search__input' );
-		const searchButton = block.querySelector( '.wp-block-search__button' );
-		const searchLabel = block.querySelector( '.wp-block-search__label' );
-		const ariaLabel = searchButton.getAttribute( 'aria-label' );
-		const id = searchField.getAttribute( 'id' );
-
-		const toggleSearchField = ( showSearchField ) => {
-			if ( showSearchField ) {
-				searchField.removeAttribute( 'aria-hidden' );
-				searchField.removeAttribute( 'tabindex' );
-				searchButton.removeAttribute( 'aria-expanded' );
-				searchButton.removeAttribute( 'aria-controls' );
-				searchButton.setAttribute( 'type', 'submit' );
-				searchButton.setAttribute( 'aria-label', 'Submit Search' );
-
-				return block.classList.remove( hiddenClass );
+const { actions } = store( 'core/search', {
+	state: {
+		get ariaLabel() {
+			const {
+				isSearchInputVisible,
+				ariaLabelCollapsed,
+				ariaLabelExpanded,
+			} = getContext();
+			return isSearchInputVisible
+				? ariaLabelExpanded
+				: ariaLabelCollapsed;
+		},
+		get ariaControls() {
+			const { isSearchInputVisible, inputId } = getContext();
+			return isSearchInputVisible ? null : inputId;
+		},
+		get type() {
+			const { isSearchInputVisible } = getContext();
+			return isSearchInputVisible ? 'submit' : 'button';
+		},
+		get tabindex() {
+			const { isSearchInputVisible } = getContext();
+			return isSearchInputVisible ? '0' : '-1';
+		},
+	},
+	actions: {
+		openSearchInput( event ) {
+			const ctx = getContext();
+			const { ref } = getElement();
+			if ( ! ctx.isSearchInputVisible ) {
+				event.preventDefault();
+				ctx.isSearchInputVisible = true;
+				ref.parentElement.querySelector( 'input' ).focus();
 			}
-
-			searchButton.removeAttribute( 'type' );
-			searchField.setAttribute( 'aria-hidden', 'true' );
-			searchField.setAttribute( 'tabindex', '-1' );
-			searchButton.setAttribute( 'aria-expanded', 'false' );
-			searchButton.setAttribute( 'aria-controls', id );
-			searchButton.setAttribute( 'aria-label', ariaLabel );
-			return block.classList.add( hiddenClass );
-		};
-
-		const hideSearchField = ( e ) => {
-			if ( ! e.target.closest( '.wp-block-search' ) ) {
-				return toggleSearchField( false );
+		},
+		closeSearchInput() {
+			const ctx = getContext();
+			ctx.isSearchInputVisible = false;
+		},
+		handleSearchKeydown( event ) {
+			const { ref } = getElement();
+			// If Escape close the menu.
+			if ( event?.key === 'Escape' ) {
+				actions.closeSearchInput();
+				ref.querySelector( 'button' ).focus();
 			}
-
-			if ( e.key === 'Escape' ) {
-				searchButton.focus();
-				return toggleSearchField( false );
+		},
+		handleSearchFocusout( event ) {
+			const { ref } = getElement();
+			// If focus is outside search form, and in the document, close menu
+			// event.target === The element losing focus
+			// event.relatedTarget === The element receiving focus (if any)
+			// When focusout is outside the document,
+			// `window.document.activeElement` doesn't change.
+			if (
+				! ref.contains( event.relatedTarget ) &&
+				event.target !== window.document.activeElement
+			) {
+				actions.closeSearchInput();
 			}
-		};
-
-		const handleButtonClick = ( e ) => {
-			if ( block.classList.contains( hiddenClass ) ) {
-				e.preventDefault();
-				searchField.focus();
-				toggleSearchField( true );
-			}
-		};
-
-		searchButton.removeAttribute( 'type' );
-		searchField.addEventListener( 'keydown', ( e ) => {
-			hideSearchField( e );
-		} );
-		searchButton.addEventListener( 'click', handleButtonClick );
-		searchButton.addEventListener( 'keydown', ( e ) => {
-			hideSearchField( e );
-		} );
-		if ( searchLabel ) {
-			searchLabel.addEventListener( 'click', handleButtonClick );
-		}
-		document.body.addEventListener( 'click', hideSearchField );
-	} );
+		},
+	},
 } );

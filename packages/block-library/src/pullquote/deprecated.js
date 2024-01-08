@@ -14,12 +14,6 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { select } from '@wordpress/data';
-import {
-	create,
-	replace,
-	toHTMLString,
-	__UNSTABLE_LINE_SEPARATOR,
-} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -64,13 +58,14 @@ function parseBorderColor( styleString ) {
 }
 
 function multilineToInline( value ) {
-	return toHTMLString( {
-		value: replace(
-			create( { html: value, multilineTag: 'p' } ),
-			new RegExp( __UNSTABLE_LINE_SEPARATOR, 'g' ),
-			'\n'
-		),
-	} );
+	value = value || `<p></p>`;
+	const padded = `</p>${ value }<p>`;
+	const values = padded.split( `</p><p>` );
+
+	values.shift();
+	values.pop();
+
+	return values.join( '<br>' );
 }
 
 const v5 = {

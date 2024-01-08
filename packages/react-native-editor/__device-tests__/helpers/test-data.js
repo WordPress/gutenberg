@@ -77,7 +77,7 @@ exports.blockInsertionHtmlFromTitle = `<!-- wp:paragraph -->
 <p>The finer continuum interprets the polynomial rabbit. When can the geology runs? An astronomer runs. Should a communist consent?</p>
 <!-- /wp:paragraph -->`;
 
-exports.imageCaption = `C'est la vie my friends`;
+exports.imageCaption = `Autumn meets winter`;
 
 exports.imageCompletehtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
 <figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/><figcaption>C'est la vie my friends</figcaption></figure>
@@ -96,7 +96,7 @@ exports.imageCompletehtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
 <!-- /wp:paragraph -->`;
 
 exports.imageShortHtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
-<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground" class="wp-image-1"/><figcaption class="wp-element-caption">C'est la vie my friends</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="A snow-capped mountain top in a cloudy sky with red-leafed trees in the foreground" class="wp-image-1"/><figcaption class="wp-element-caption">Autumn meets winter</figcaption></figure>
 <!-- /wp:image -->`;
 
 exports.unsupportedBlockHtml = `<!-- wp:jetpack/gif {"giphyUrl":"https://giphy.com/embed/3orieS4jfHJaKwkeli","searchText":"example"} /-->`;
@@ -202,3 +202,33 @@ exports.galleryBlock = `<!-- wp:gallery {"columns":8,"linkTo":"none","className"
 <!-- /wp:image -->
 </figure>
 <!-- /wp:gallery -->`;
+
+exports.groupNestedStructure = `<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph {"style":{"color":{"background":"#f9d0d0"}}} -->
+<p class="has-background" style="background-color:#f9d0d0">Level 1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"50px"} -->
+<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph {"style":{"color":{"background":"#d5f0ab"}}} -->
+<p class="has-background" style="background-color:#d5f0ab">Level 2</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"50px"} -->
+<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph {"style":{"color":{"background":"#c3e5ff"}}} -->
+<p class="has-background" style="background-color:#c3e5ff">Level 3</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:spacer {"height":"50px"} -->
+<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->`;

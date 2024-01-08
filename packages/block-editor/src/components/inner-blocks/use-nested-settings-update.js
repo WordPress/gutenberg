@@ -1,8 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useMemo } from '@wordpress/element';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useLayoutEffect, useMemo, useState } from '@wordpress/element';
+import { useDispatch, useRegistry } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -14,6 +16,14 @@ import { getLayoutType } from '../../layouts';
 
 const pendingSettingsUpdates = new WeakMap();
 
+function useShallowMemo( value ) {
+	const [ prevValue, setPrevValue ] = useState( value );
+	if ( ! isShallowEqual( prevValue, value ) ) {
+		setPrevValue( value );
+	}
+	return prevValue;
+}
+
 /**
  * This hook is a side effect which updates the block-editor store when changes
  * happen to inner block settings. The given props are transformed into a
@@ -22,12 +32,17 @@ const pendingSettingsUpdates = new WeakMap();
  * came from props.
  *
  * @param {string}               clientId                   The client ID of the block to update.
+ * @param {string}               parentLock
  * @param {string[]}             allowedBlocks              An array of block names which are permitted
  *                                                          in inner blocks.
  * @param {string[]}             prioritizedInserterBlocks  Block names and/or block variations to be prioritized in the inserter, in the format {blockName}/{variationName}.
- * @param {?WPDirectInsertBlock} __experimentalDefaultBlock The default block to insert: [ blockName, { blockAttributes } ].
- * @param {?Function|boolean}    __experimentalDirectInsert If a default block should be inserted directly by the
- *                                                          appender.
+ * @param {?WPDirectInsertBlock} defaultBlock               The default block to insert: [ blockName, { blockAttributes } ].
+ * @param {?Function|boolean}    directInsert               If a default block should be inserted directly by the appender.
+ *
+ * @param {?WPDirectInsertBlock} __experimentalDefaultBlock A deprecated prop for the default block to insert: [ blockName, { blockAttributes } ]. Use `defaultBlock` instead.
+ *
+ * @param {?Function|boolean}    __experimentalDirectInsert A deprecated prop for whether a default block should be inserted directly by the appender. Use `directInsert` instead.
+ *
  * @param {string}               [templateLock]             The template lock specified for the inner
  *                                                          blocks component. (e.g. "all")
  * @param {boolean}              captureToolbars            Whether or children toolbars should be shown
@@ -39,8 +54,11 @@ const pendingSettingsUpdates = new WeakMap();
  */
 export default function useNestedSettingsUpdate(
 	clientId,
+	parentLock,
 	allowedBlocks,
 	prioritizedInserterBlocks,
+	defaultBlock,
+	directInsert,
 	__experimentalDefaultBlock,
 	__experimentalDirectInsert,
 	templateLock,
@@ -48,31 +66,18 @@ export default function useNestedSettingsUpdate(
 	orientation,
 	layout
 ) {
+	// Instead of adding a useSelect mapping here, please add to the useSelect
+	// mapping in InnerBlocks! Every subscription impacts performance.
+
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 	const registry = useRegistry();
 
-	const { parentLock } = useSelect(
-		( select ) => {
-			const rootClientId =
-				select( blockEditorStore ).getBlockRootClientId( clientId );
-			return {
-				parentLock:
-					select( blockEditorStore ).getTemplateLock( rootClientId ),
-			};
-		},
-		[ clientId ]
-	);
-
-	// Memoize allowedBlocks and prioritisedInnerBlocks based on the contents
-	// of the arrays. Implementors often pass a new array on every render,
+	// Implementors often pass a new array on every render,
 	// and the contents of the arrays are just strings, so the entire array
-	// can be passed as dependencies.
-
-	const _allowedBlocks = useMemo(
-		() => allowedBlocks,
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		allowedBlocks
-	);
+	// can be passed as dependencies but We need to include the length of the array,
+	// otherwise if the arrays change length but the first elements are equal the comparison,
+	// does not works as expected.
+	const _allowedBlocks = useShallowMemo( allowedBlocks );
 
 	const _prioritizedInserterBlocks = useMemo(
 		() => prioritizedInserterBlocks,
@@ -108,11 +113,29 @@ export default function useNestedSettingsUpdate(
 		}
 
 		if ( __experimentalDefaultBlock !== undefined ) {
-			newSettings.__experimentalDefaultBlock = __experimentalDefaultBlock;
+			deprecated( '__experimentalDefaultBlock', {
+				alternative: 'defaultBlock',
+				since: '6.3',
+				version: '6.4',
+			} );
+			newSettings.defaultBlock = __experimentalDefaultBlock;
+		}
+
+		if ( defaultBlock !== undefined ) {
+			newSettings.defaultBlock = defaultBlock;
 		}
 
 		if ( __experimentalDirectInsert !== undefined ) {
-			newSettings.__experimentalDirectInsert = __experimentalDirectInsert;
+			deprecated( '__experimentalDirectInsert', {
+				alternative: 'directInsert',
+				since: '6.3',
+				version: '6.4',
+			} );
+			newSettings.directInsert = __experimentalDirectInsert;
+		}
+
+		if ( directInsert !== undefined ) {
+			newSettings.directInsert = directInsert;
 		}
 
 		// Batch updates to block list settings to avoid triggering cascading renders
@@ -144,6 +167,8 @@ export default function useNestedSettingsUpdate(
 		_allowedBlocks,
 		_prioritizedInserterBlocks,
 		_templateLock,
+		defaultBlock,
+		directInsert,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
 		captureToolbars,

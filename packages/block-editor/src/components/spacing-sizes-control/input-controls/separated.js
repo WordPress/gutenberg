@@ -2,7 +2,12 @@
  * Internal dependencies
  */
 import SpacingInputControl from './spacing-input-control';
-import { ALL_SIDES, LABELS, ICONS } from '../utils';
+import {
+	ALL_SIDES,
+	LABELS,
+	ICONS,
+	getPresetValueFromCustomValue,
+} from '../utils';
 
 export default function SeparatedInputControls( {
 	minimumCustomValue,
@@ -20,7 +25,17 @@ export default function SeparatedInputControls( {
 		: ALL_SIDES;
 
 	const createHandleOnChange = ( side ) => ( next ) => {
-		const nextValues = { ...values };
+		// Encode the existing value into the preset value if the passed in value matches the value of one of the spacingSizes.
+		const nextValues = {
+			...Object.keys( values ).reduce( ( acc, key ) => {
+				acc[ key ] = getPresetValueFromCustomValue(
+					values[ key ],
+					spacingSizes
+				);
+				return acc;
+			}, {} ),
+		};
+
 		nextValues[ side ] = next;
 
 		onChange( nextValues );

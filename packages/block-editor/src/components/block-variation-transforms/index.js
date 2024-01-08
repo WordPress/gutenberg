@@ -8,6 +8,8 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItemsChoice,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -95,6 +97,43 @@ function VariationsDropdown( {
 	);
 }
 
+function VariationsToggleGroupControl( {
+	className,
+	onSelectVariation,
+	selectedValue,
+	variations,
+} ) {
+	return (
+		<div className={ className }>
+			<ToggleGroupControl
+				label={ __( 'Transform to variation' ) }
+				value={ selectedValue }
+				hideLabelFromVision
+				onChange={ onSelectVariation }
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+			>
+				{ variations.map( ( variation ) => (
+					<ToggleGroupControlOptionIcon
+						key={ variation.name }
+						icon={ variation.icon }
+						value={ variation.name }
+						label={
+							selectedValue === variation.name
+								? variation.title
+								: sprintf(
+										/* translators: %s: Name of the block variation */
+										__( 'Transform to %s' ),
+										variation.title
+								  )
+						}
+					/>
+				) ) }
+			</ToggleGroupControl>
+		</div>
+	);
+}
+
 function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const { activeBlockVariation, variations } = useSelect(
@@ -138,12 +177,19 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		} );
 	};
 
-	const baseClass = 'block-editor-block-variation-transforms';
-
 	// Skip rendering if there are no variations
 	if ( ! variations?.length ) return null;
 
-	const Component = hasUniqueIcons ? VariationsButtons : VariationsDropdown;
+	const baseClass = 'block-editor-block-variation-transforms';
+
+	// Show buttons if there are more than 5 variations because the ToggleGroupControl does not wrap
+	const showButtons = variations.length > 5;
+
+	const ButtonComponent = showButtons
+		? VariationsButtons
+		: VariationsToggleGroupControl;
+
+	const Component = hasUniqueIcons ? ButtonComponent : VariationsDropdown;
 
 	return (
 		<Component

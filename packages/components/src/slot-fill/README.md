@@ -68,9 +68,9 @@ Both `Slot` and `Fill` accept a `name` string prop, where a `Slot` with a given 
 -   By default, events will bubble to their parents on the DOM hierarchy (native event bubbling)
 -   If `bubblesVirtually` is set to true, events will bubble to their virtual parent in the React elements hierarchy instead.
 
-`Slot` with `bubblesVirtually` set to true also accept an optional `className` to add to the slot container.
+`Slot` with `bubblesVirtually` set to true also accept optional `className` and `style` props to add to the slot container.
 
-`Slot` accepts an optional `children` function prop, which takes `fills` as a param. It allows you to perform additional processing and wrap `fills` conditionally.
+`Slot` **without** `bubblesVirtually` accepts an optional `children` function prop, which takes `fills` as a param. It allows you to perform additional processing and wrap `fills` conditionally.
 
 _Example_:
 
@@ -103,14 +103,14 @@ const ToolbarItem = () => (
 	</Fill>
 );
 
-const Toolbar = () => 
-	const hideToolbar() => {
+const Toolbar = () => {
+	const hideToolbar = () => {
 		console.log( 'Hide toolbar' );
-	}
+	};
 	return (
 		<div className="toolbar">
 			<Slot fillProps={ { hideToolbar } } />
 		</div>
 	);
-);
+};
 ```

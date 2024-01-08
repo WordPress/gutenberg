@@ -6,19 +6,86 @@
  * @subpackage Interactivity API
  */
 
+if ( class_exists( 'WP_Directive_Processor' ) ) {
+	return;
+}
+
 /**
  * This processor is built on top of the HTML Tag Processor and augments its
  * capabilities to process the Interactivity API directives.
- *
- * IMPORTANT DISCLAIMER: This code is highly experimental and its only purpose
- * is to provide a way to test the server-side rendering of the Interactivity
- * API. Most of this code will be discarded once the HTML Processor is
- * available.  Please restrain from investing unnecessary time and effort trying
- * to improve this code.
  */
-class WP_Directive_Processor extends WP_HTML_Tag_Processor {
+class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	/**
-	 * Find the matching closing tag for an opening tag.
+	 * String containing the current root block.
+	 *
+	 * @var string
+	 */
+	public static $root_block = null;
+
+	/**
+	 * Array containing the direct children of interactive blocks.
+	 *
+	 * @var array
+	 */
+	public static $children_of_interactive_block = array();
+
+	/**
+	 * Sets the current root block.
+	 *
+	 * @param array $block The block to add.
+	 */
+	public static function mark_root_block( $block ) {
+		self::$root_block = md5( serialize( $block ) );
+	}
+
+	/**
+	 * Resets the root block.
+	 */
+	public static function unmark_root_block() {
+		self::$root_block = null;
+	}
+
+	/**
+	 * Checks if block is a root block.
+	 *
+	 * @param array $block The block to check.
+	 * @return bool True if block is a root block, false otherwise.
+	 */
+	public static function is_marked_as_root_block( $block ) {
+		return md5( serialize( $block ) ) === self::$root_block;
+	}
+
+	/**
+	 * Checks if a root block has already been defined.
+	 *
+	 * @return bool True if there is a root block, false otherwise.
+	 */
+	public static function has_root_block() {
+		return isset( self::$root_block );
+	}
+
+	/**
+	 * Stores a reference to a direct children of an interactive block to be able
+	 * to identify it later.
+	 *
+	 * @param array $block The block to add.
+	 */
+	public static function mark_children_of_interactive_block( $block ) {
+		self::$children_of_interactive_block[] = md5( serialize( $block ) );
+	}
+
+	/**
+	 * Checks if block is marked as children of an interactive block.
+	 *
+	 * @param array $block The block to check.
+	 * @return bool True if block is a children of an interactive block, false otherwise.
+	 */
+	public static function is_marked_as_children_of_interactive_block( $block ) {
+		return in_array( md5( serialize( $block ) ), self::$children_of_interactive_block, true );
+	}
+
+	/**
+	 * Finds the matching closing tag for an opening tag.
 	 *
 	 * When called while on an open tag, traverse the HTML until we find the
 	 * matching closing tag, respecting any in-between content, including nested
@@ -43,7 +110,7 @@ class WP_Directive_Processor extends WP_HTML_Tag_Processor {
 			)
 		) ) {
 			if ( ! $this->is_tag_closer() ) {
-				$depth++;
+				++$depth;
 				continue;
 			}
 
@@ -51,14 +118,14 @@ class WP_Directive_Processor extends WP_HTML_Tag_Processor {
 				return true;
 			}
 
-			$depth--;
+			--$depth;
 		}
 
 		return false;
 	}
 
 	/**
-	 * Return the content between two balanced tags.
+	 * Returns the content between two balanced tags.
 	 *
 	 * When called on an opening tag, return the HTML content found between that
 	 * opening tag and its matching closing tag.
@@ -73,7 +140,7 @@ class WP_Directive_Processor extends WP_HTML_Tag_Processor {
 		}
 		list( $start_name, $end_name ) = $bookmarks;
 
-		$start = $this->bookmarks[ $start_name ]->end + 1;
+		$start = $this->bookmarks[ $start_name ]->start + $this->bookmarks[ $start_name ]->length + 1;
 		$end   = $this->bookmarks[ $end_name ]->start;
 
 		$this->seek( $start_name ); // Return to original position.
@@ -84,14 +151,13 @@ class WP_Directive_Processor extends WP_HTML_Tag_Processor {
 	}
 
 	/**
-	 * Set the content between two balanced tags.
+	 * Sets the content between two balanced tags.
 	 *
 	 * When called on an opening tag, set the HTML content found between that
 	 * opening tag and its matching closing tag.
 	 *
 	 * @param string $new_html The string to replace the content between the
 	 * matching tags with.
-	 *
 	 * @return bool            Whether the content was successfully replaced.
 	 */
 	public function set_inner_html( $new_html ) {
@@ -103,19 +169,19 @@ class WP_Directive_Processor extends WP_HTML_Tag_Processor {
 		}
 		list( $start_name, $end_name ) = $bookmarks;
 
-		$start = $this->bookmarks[ $start_name ]->end + 1;
+		$start = $this->bookmarks[ $start_name ]->start + $this->bookmarks[ $start_name ]->length + 1;
 		$end   = $this->bookmarks[ $end_name ]->start;
 
 		$this->seek( $start_name ); // Return to original position.
 		$this->release_bookmark( $start_name );
 		$this->release_bookmark( $end_name );
 
-		$this->lexical_updates[] = new WP_HTML_Text_Replacement( $start, $end, $new_html );
+		$this->lexical_updates[] = new Gutenberg_HTML_Text_Replacement_6_5( $start, $end - $start, $new_html );
 		return true;
 	}
 
 	/**
-	 * Return a pair of bookmarks for the current opening tag and the matching
+	 * Returns a pair of bookmarks for the current opening tag and the matching
 	 * closing tag.
 	 *
 	 * @return array|false A pair of bookmarks, or false if there's no matching
@@ -145,12 +211,12 @@ class WP_Directive_Processor extends WP_HTML_Tag_Processor {
 	}
 
 	/**
-	 * Whether a given HTML element is void (e.g. <br>).
+	 * Checks whether a given HTML element is void (e.g. <br>).
+	 *
+	 * @see https://html.spec.whatwg.org/#elements-2
 	 *
 	 * @param string $tag_name The element in question.
 	 * @return bool True if the element is void.
-	 *
-	 * @see https://html.spec.whatwg.org/#elements-2
 	 */
 	public static function is_html_void_element( $tag_name ) {
 		switch ( $tag_name ) {
@@ -175,7 +241,7 @@ class WP_Directive_Processor extends WP_HTML_Tag_Processor {
 	}
 
 	/**
-	 * Extract and return the directive type and the the part after the double
+	 * Extracts and return the directive type and the the part after the double
 	 * hyphen from an attribute name (if present), in an array format.
 	 *
 	 * Examples:
@@ -185,7 +251,7 @@ class WP_Directive_Processor extends WP_HTML_Tag_Processor {
 	 *     'wp-thing--and--thang' => array( 'wp-thing', 'and--thang' )
 	 *
 	 * @param string $name The attribute name.
-	 * @return array The resulting array
+	 * @return array The resulting array.
 	 */
 	public static function parse_attribute_name( $name ) {
 		return explode( '--', $name, 2 );

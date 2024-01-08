@@ -108,9 +108,10 @@ describe( 'Align options', () => {
 				expect( groupBlock ).toBeVisible();
 
 				// Trigger inner blocks layout
-				const innerBlockListWrapper = await within(
-					groupBlock
-				).findByTestId( 'block-list-wrapper' );
+				const innerBlockListWrapper =
+					await within( groupBlock ).findByTestId(
+						'block-list-wrapper'
+					);
 				fireEvent( innerBlockListWrapper, 'layout', {
 					nativeEvent: {
 						layout: {

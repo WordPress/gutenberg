@@ -31,7 +31,7 @@ const WRITING_MODES = [
  * @param {string}   props.value     Currently selected writing mode.
  * @param {Function} props.onChange  Handles change in the writing mode selection.
  *
- * @return {WPElement} Writing Mode control.
+ * @return {Element} Writing Mode control.
  */
 export default function WritingModeControl( { className, value, onChange } ) {
 	return (

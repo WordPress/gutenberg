@@ -2,7 +2,6 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
@@ -20,21 +19,19 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 /**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	useContextSystem,
-	WordPressComponentProps,
-} from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect, useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
+import { patternMatch, findParent } from '../utils/router';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
+import * as styles from '../styles';
 import type {
 	NavigatorProviderProps,
 	NavigatorLocation,
 	NavigatorContext as NavigatorContextType,
 	Screen,
 } from '../types';
-import { patternMatch, findParent } from '../utils/router';
 
 type MatchedPath = ReturnType< typeof patternMatch >;
 type ScreenAction = { type: string; screen: Screen };
@@ -148,6 +145,7 @@ function UnconnectedNavigatorProvider(
 				focusTargetSelector,
 				isBack = false,
 				skipFocus = false,
+				replace = false,
 				...restOptions
 			} = options;
 
@@ -172,34 +170,38 @@ function UnconnectedNavigatorProvider(
 					skipFocus,
 				};
 
-				if ( prevLocationHistory.length < 1 ) {
-					return [ newLocation ];
+				if ( prevLocationHistory.length === 0 ) {
+					return replace ? [] : [ newLocation ];
 				}
 
-				return [
-					...prevLocationHistory.slice(
-						prevLocationHistory.length > MAX_HISTORY_LENGTH - 1
-							? 1
-							: 0,
-						-1
-					),
-					// Assign `focusTargetSelector` to the previous location in history
-					// (the one we just navigated from).
-					{
-						...prevLocationHistory[
-							prevLocationHistory.length - 1
-						],
-						focusTargetSelector,
-					},
-					newLocation,
-				];
+				const newLocationHistory = prevLocationHistory.slice(
+					prevLocationHistory.length > MAX_HISTORY_LENGTH - 1 ? 1 : 0,
+					-1
+				);
+
+				if ( ! replace ) {
+					newLocationHistory.push(
+						// Assign `focusTargetSelector` to the previous location in history
+						// (the one we just navigated from).
+						{
+							...prevLocationHistory[
+								prevLocationHistory.length - 1
+							],
+							focusTargetSelector,
+						}
+					);
+				}
+
+				newLocationHistory.push( newLocation );
+
+				return newLocationHistory;
 			} );
 		},
 		[ goBack ]
 	);
 
-	const goToParent: NavigatorContextType[ 'goToParent' ] =
-		useCallback( () => {
+	const goToParent: NavigatorContextType[ 'goToParent' ] = useCallback(
+		( options = {} ) => {
 			const currentPath =
 				currentLocationHistory.current[
 					currentLocationHistory.current.length - 1
@@ -214,8 +216,10 @@ function UnconnectedNavigatorProvider(
 			if ( parentPath === undefined ) {
 				return;
 			}
-			goTo( parentPath, { isBack: true } );
-		}, [ goTo ] );
+			goTo( parentPath, { ...options, isBack: true } );
+		},
+		[ goTo ]
+	);
 
 	const navigatorContextValue: NavigatorContextType = useMemo(
 		() => ( {
@@ -244,8 +248,7 @@ function UnconnectedNavigatorProvider(
 
 	const cx = useCx();
 	const classes = useMemo(
-		// Prevents horizontal overflow while animating screen transitions.
-		() => cx( css( { overflowX: 'hidden' } ), className ),
+		() => cx( styles.navigatorProviderWrapper, className ),
 		[ className, cx ]
 	);
 
@@ -264,7 +267,6 @@ function UnconnectedNavigatorProvider(
  * view (via the `NavigatorButton` and `NavigatorBackButton` components or the
  * `useNavigator` hook).
  *
- * @example
  * ```jsx
  * import {
  *   __experimentalNavigatorProvider as NavigatorProvider,

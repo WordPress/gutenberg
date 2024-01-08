@@ -6,16 +6,20 @@ import { ___unstablePreferencesModalBaseOption as BaseOption } from '@wordpress/
 import { store as preferencesStore } from '@wordpress/preferences';
 
 export default function EnableFeature( props ) {
-	const { featureName, onToggle = () => {}, ...remainingProps } = props;
+	const {
+		scope = 'core/edit-site',
+		featureName,
+		onToggle = () => {},
+		...remainingProps
+	} = props;
 	const isChecked = useSelect(
-		( select ) =>
-			!! select( preferencesStore ).get( 'core/edit-site', featureName ),
-		[ featureName ]
+		( select ) => !! select( preferencesStore ).get( scope, featureName ),
+		[ scope, featureName ]
 	);
 	const { toggle } = useDispatch( preferencesStore );
 	const onChange = () => {
 		onToggle();
-		toggle( 'core/edit-site', featureName );
+		toggle( scope, featureName );
 	};
 	return (
 		<BaseOption

@@ -4,11 +4,13 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const { DefinePlugin } = require( 'webpack' );
 const browserslist = require( 'browserslist' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const { basename, dirname, resolve } = require( 'path' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
+const { realpathSync } = require( 'fs' );
 
 /**
  * WordPress dependencies
@@ -67,6 +69,7 @@ const cssLoaders = [
 	{
 		loader: require.resolve( 'css-loader' ),
 		options: {
+			importLoaders: 1,
 			sourceMap: ! isProduction,
 			modules: {
 				auto: true,
@@ -243,6 +246,10 @@ const config = {
 		],
 	},
 	plugins: [
+		new DefinePlugin( {
+			// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
+			SCRIPT_DEBUG: ! isProduction,
+		} ),
 		// During rebuilds, all webpack assets that are not used anymore will be
 		// removed automatically. There is an exception added in watch mode for
 		// fonts and images. It is a known limitations:
@@ -297,7 +304,9 @@ const config = {
 					filter: ( filepath ) => {
 						return (
 							process.env.WP_COPY_PHP_FILES_TO_DIST ||
-							RenderPathsPlugin.renderPaths.includes( filepath )
+							RenderPathsPlugin.renderPaths.includes(
+								realpathSync( filepath ).replace( /\\/g, '/' )
+							)
 						);
 					},
 				},

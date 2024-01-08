@@ -201,6 +201,19 @@ public class Gutenberg: UIResponder {
     public func showEditorHelp() {
         bridgeModule.sendEventIfNeeded(.showEditorHelp, body: nil)
     }
+    
+    public func onUndoPressed() {
+        bridgeModule.sendEventIfNeeded(.onUndoPressed, body: nil)
+    }
+    
+    public func onRedoPressed() {
+        bridgeModule.sendEventIfNeeded(.onRedoPressed, body: nil)
+    }
+
+    public func connectionStatusChange(isConnected: Bool) {
+        var data: [String: Any] = ["isConnected": isConnected]
+        bridgeModule.sendEventIfNeeded(.connectionStatusChange, body: data)
+    }
 
     private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {
         var settingsUpdates = [String : Any]()

@@ -23,7 +23,7 @@ import { useCallback, Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable } from './utils';
+import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
 import HeightControl from '../height-control';
 import ChildLayoutControl from '../child-layout-control';
@@ -178,6 +178,7 @@ function DimensionsToolsPanel( {
 			label={ __( 'Dimensions' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			{ children }
 		</ToolsPanel>
@@ -207,18 +208,24 @@ export default function DimensionsPanel( {
 	// in global styles but not in block inspector.
 	includeLayoutControls = false,
 } ) {
+	const { dimensions, spacing } = settings;
+
 	const decodeValue = ( rawValue ) => {
 		if ( rawValue && typeof rawValue === 'object' ) {
 			return Object.keys( rawValue ).reduce( ( acc, key ) => {
 				acc[ key ] = getValueFromVariable(
-					{ settings },
+					{ settings: { dimensions, spacing } },
 					'',
 					rawValue[ key ]
 				);
 				return acc;
 			}, {} );
 		}
-		return getValueFromVariable( { settings }, '', rawValue );
+		return getValueFromVariable(
+			{ settings: { dimensions, spacing } },
+			'',
+			rawValue
+		);
 	};
 
 	const showSpacingPresetsControl = useHasSpacingPresets( settings );

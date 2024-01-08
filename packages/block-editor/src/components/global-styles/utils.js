@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
@@ -11,6 +10,7 @@ import {
 	getTypographyFontSizeValue,
 	getFluidTypographyOptionsFromSettings,
 } from './typography-utils';
+import { getValueFromObjectPath } from '../../utils/object';
 
 /* Supporting data. */
 export const ROOT_BLOCK_NAME = 'root';
@@ -159,6 +159,13 @@ export const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 	'typography.fontFamily': 'fontFamily',
 };
 
+export const TOOLSPANEL_DROPDOWNMENU_PROPS = {
+	popoverProps: {
+		placement: 'left-start',
+		offset: 259, // Inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+	},
+};
+
 function findInPresetsBy(
 	features,
 	blockName,
@@ -168,8 +175,12 @@ function findInPresetsBy(
 ) {
 	// Block presets take priority above root level presets.
 	const orderedPresetsByOrigin = [
-		get( features, [ 'blocks', blockName, ...presetPath ] ),
-		get( features, presetPath ),
+		getValueFromObjectPath( features, [
+			'blocks',
+			blockName,
+			...presetPath,
+		] ),
+		getValueFromObjectPath( features, presetPath ),
 	];
 
 	for ( const presetByOrigin of orderedPresetsByOrigin ) {
@@ -282,8 +293,13 @@ function getValueFromPresetVariable(
 
 function getValueFromCustomVariable( features, blockName, variable, path ) {
 	const result =
-		get( features.settings, [ 'blocks', blockName, 'custom', ...path ] ) ??
-		get( features.settings, [ 'custom', ...path ] );
+		getValueFromObjectPath( features.settings, [
+			'blocks',
+			blockName,
+			'custom',
+			...path,
+		] ) ??
+		getValueFromObjectPath( features.settings, [ 'custom', ...path ] );
 	if ( ! result ) {
 		return variable;
 	}
@@ -303,7 +319,7 @@ export function getValueFromVariable( features, blockName, variable ) {
 	if ( ! variable || typeof variable !== 'string' ) {
 		if ( variable?.ref && typeof variable?.ref === 'string' ) {
 			const refPath = variable.ref.split( '.' );
-			variable = get( features, refPath );
+			variable = getValueFromObjectPath( features, refPath );
 			// Presence of another ref indicates a reference to another dynamic value.
 			// Pointing to another dynamic value is not supported.
 			if ( ! variable || !! variable?.ref ) {
@@ -382,6 +398,27 @@ export function scopeSelector( scope, selector ) {
 	} );
 
 	return selectorsScoped.join( ', ' );
+}
+
+/**
+ * Appends a sub-selector to an existing one.
+ *
+ * Given the compounded `selector` "h1, h2, h3"
+ * and the `toAppend` selector ".some-class" the result will be
+ * "h1.some-class, h2.some-class, h3.some-class".
+ *
+ * @param {string} selector Original selector.
+ * @param {string} toAppend Selector to append.
+ *
+ * @return {string} The new selector.
+ */
+export function appendToSelector( selector, toAppend ) {
+	if ( ! selector.includes( ',' ) ) {
+		return selector + toAppend;
+	}
+	const selectors = selector.split( ',' );
+	const newSelectors = selectors.map( ( sel ) => sel + toAppend );
+	return newSelectors.join( ',' );
 }
 
 /**

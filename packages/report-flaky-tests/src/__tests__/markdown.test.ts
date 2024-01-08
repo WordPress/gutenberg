@@ -15,7 +15,7 @@ import {
 	renderCommitComment,
 	isReportComment,
 } from '../markdown';
-import { ReportedIssue } from '../types';
+import type { ReportedIssue } from '../types';
 
 jest.useFakeTimers( 'modern' ).setSystemTime( new Date( '2020-05-10' ) );
 

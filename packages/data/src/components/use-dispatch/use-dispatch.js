@@ -31,8 +31,8 @@ import useRegistry from '../registry-provider/use-registry';
  * action.
  *
  * ```jsx
+ * import { useCallback } from 'react';
  * import { useDispatch, useSelect } from '@wordpress/data';
- * import { useCallback } from '@wordpress/element';
  * import { store as myCustomStore } from 'my-custom-store';
  *
  * function Button( { onClick, children } ) {

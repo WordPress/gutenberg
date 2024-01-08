@@ -6,18 +6,20 @@
  * @subpackage Interactivity API
  */
 
-/**
- * Merge data with the existing store.
- *
- * @param array $data Data that will be merged with the existing store.
- *
- * @return $data The current store data.
- */
-function wp_store( $data = null ) {
-	if ( $data ) {
-		WP_Interactivity_Store::merge_data( $data );
+if ( ! function_exists( 'wp_store' ) ) {
+	/**
+	 * Merge data with the existing store.
+	 *
+	 * @param array $data Data that will be merged with the existing store.
+	 *
+	 * @return $data The current store data.
+	 */
+	function wp_store( $data = null ) {
+		if ( $data ) {
+			WP_Interactivity_Store::merge_data( $data );
+		}
+		return WP_Interactivity_Store::get_data();
 	}
-	return WP_Interactivity_Store::get_data();
 }
 
 /**

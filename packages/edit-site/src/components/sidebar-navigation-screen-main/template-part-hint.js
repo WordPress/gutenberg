@@ -28,9 +28,7 @@ export default function TemplatePartHint() {
 				setPreference( 'core', PREFERENCE_NAME, false );
 			} }
 		>
-			{ __(
-				'Looking for template parts? You can now find them in the new "Patterns" page.'
-			) }
+			{ __( 'Looking for template parts? Find them in "Patterns".' ) }
 		</Notice>
 	);
 }

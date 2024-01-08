@@ -12,6 +12,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import TemplateAreas from './template-areas';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import { unlock } from '../../lock-unlock';
@@ -45,13 +46,16 @@ function useTemplateDetails( postType, postId ) {
 
 	const content =
 		record?.slug === 'home' || record?.slug === 'index' ? (
-			<HomeTemplateDetails />
-		) : null;
+			<>
+				<HomeTemplateDetails />
+				<TemplateAreas />
+			</>
+		) : (
+			<TemplateAreas />
+		);
 
-	const footer = !! record?.modified ? (
-		<SidebarNavigationScreenDetailsFooter
-			lastModifiedDateTime={ record.modified }
-		/>
+	const footer = record?.modified ? (
+		<SidebarNavigationScreenDetailsFooter record={ record } />
 	) : null;
 
 	const description = (

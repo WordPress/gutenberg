@@ -32,10 +32,19 @@ jobs:
             WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
 
         steps:
-            - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
+
+            - name: Install NVM
+              run: |
+                  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+                  export NVM_DIR="$HOME/.nvm"
+                  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+                  nvm -v
 
             - name: Compare performance with trunk
               if: github.event_name == 'pull_request'
@@ -59,13 +68,13 @@ jobs:
             - name: Compare performance with base branch
               if: github.event_name == 'push'
               # The base hash used here need to be a commit that is compatible with the current WP version
-              # The current one is 34af5829ac9edb31833167ff6a3b51bea982999c and it needs to be updated every WP major release.
+              # The current one is b61dde2e5ec29d98801e623de968bfb286c5be3f and it needs to be updated every WP major release.
               # It is used as a base comparison point to avoid fluctuation in the performance metrics.
               run: |
                   WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  ./bin/plugin/cli.js perf $GITHUB_SHA 34af5829ac9edb31833167ff6a3b51bea982999c --tests-branch $GITHUB_SHA --wp-version "$WP_MAJOR"
+                  ./bin/plugin/cli.js perf $GITHUB_SHA b61dde2e5ec29d98801e623de968bfb286c5be3f --tests-branch $GITHUB_SHA --wp-version "$WP_MAJOR"
 
             - name: Compare performance with custom branches
               if: github.event_name == 'workflow_dispatch'
@@ -77,10 +86,10 @@ jobs:
 
             - name: Archive performance results
               if: success()
-              uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+              uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
               with:
                   name: performance-results
-                  path: ${{ env.WP_ARTIFACTS_PATH }}/*.performance-results.json
+                  path: ${{ env.WP_ARTIFACTS_PATH }}/*.performance-results*.json
 
             - name: Publish performance results
               if: github.event_name == 'push'
@@ -88,10 +97,10 @@ jobs:
                   CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
               run: |
                   COMMITTED_AT=$(git show -s $GITHUB_SHA --format="%cI")
-                  ./bin/log-performance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA 34af5829ac9edb31833167ff6a3b51bea982999c $COMMITTED_AT
+                  ./bin/log-performance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA b61dde2e5ec29d98801e623de968bfb286c5be3f $COMMITTED_AT
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)
-              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+              uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
               if: failure()
               with:
                   name: failures-artifacts

@@ -64,7 +64,8 @@ export async function toggleGlobalBlockInserter() {
 	// "Add block" selector is required to make sure performance comparison
 	// doesn't fail on older branches where we still had "Add block" as label.
 	await page.click(
-		'.edit-post-header [aria-label="Add block"],' +
+		'.editor-document-tools__inserter-toggle,' +
+			'.edit-post-header [aria-label="Add block"],' +
 			'.edit-site-header [aria-label="Add block"],' +
 			'.edit-post-header [aria-label="Toggle block inserter"],' +
 			'.edit-site-header [aria-label="Toggle block inserter"],' +
@@ -86,7 +87,10 @@ export async function selectGlobalInserterTab( label ) {
 	}
 
 	const activeTab = await page.waitForSelector(
-		'.block-editor-inserter__tabs button.is-active'
+		// Targeting a class name is necessary here, because there are likely
+		// two implementations of the `Tabs` component visible to this test, and
+		// we want to confirm that it's waiting for the correct one.
+		'.block-editor-inserter__tabs [role="tab"][aria-selected="true"]'
 	);
 
 	const activeTabLabel = await page.evaluate(
@@ -238,7 +242,7 @@ export async function insertFromGlobalInserter( category, searchTerm ) {
 				await page.$x(
 					`//*[@role='option' and contains(., '${ searchTerm }')]`
 				)
-			 )[ 0 ];
+			)[ 0 ];
 		} catch ( error ) {
 			// noop
 		}
@@ -337,17 +341,6 @@ export async function insertBlock( searchTerm ) {
  */
 export async function insertPattern( searchTerm ) {
 	await insertFromGlobalInserter( 'Patterns', searchTerm );
-}
-
-/**
- * Inserts a reusable block matching a given search term via the global
- * inserter.
- *
- * @param {string} searchTerm The term by which to find the reusable block to
- *                            insert.
- */
-export async function insertReusableBlock( searchTerm ) {
-	await insertFromGlobalInserter( 'Synced patterns', searchTerm );
 }
 
 /**

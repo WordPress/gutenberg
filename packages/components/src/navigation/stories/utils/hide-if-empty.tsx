@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentStory } from '@storybook/react';
+import type { StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -10,7 +10,7 @@ import { Navigation } from '../..';
 import { NavigationItem } from '../../item';
 import { NavigationMenu } from '../../menu';
 
-export const HideIfEmptyStory: ComponentStory< typeof Navigation > = ( {
+export const HideIfEmptyStory: StoryFn< typeof Navigation > = ( {
 	className,
 	...props
 } ) => {

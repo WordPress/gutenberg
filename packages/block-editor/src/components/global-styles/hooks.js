@@ -2,7 +2,6 @@
  * External dependencies
  */
 import fastDeepEqual from 'fast-deep-equal/es6';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,7 +15,7 @@ import { _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getValueFromVariable, getPresetVariableFromValue } from './utils';
-import { setImmutably } from '../../utils/object';
+import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import { GlobalStylesContext } from './context';
 import { unlock } from '../../lock-unlock';
 
@@ -25,6 +24,9 @@ const EMPTY_CONFIG = { settings: {}, styles: {} };
 const VALID_SETTINGS = [
 	'appearanceTools',
 	'useRootPaddingAwareAlignments',
+	'background.backgroundImage',
+	'background.backgroundRepeat',
+	'background.backgroundSize',
 	'border.color',
 	'border.radius',
 	'border.style',
@@ -51,6 +53,8 @@ const VALID_SETTINGS = [
 	'layout.contentSize',
 	'layout.definitions',
 	'layout.wideSize',
+	'lightbox.enabled',
+	'lightbox.allowEditing',
 	'position.fixed',
 	'position.sticky',
 	'spacing.customSpacingSize',
@@ -89,7 +93,6 @@ export const useGlobalStylesReset = () => {
 
 export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 	const { setUserConfig, ...configs } = useContext( GlobalStylesContext );
-
 	const appendedBlockPath = blockName ? '.blocks.' + blockName : '';
 	const appendedPropertyPath = propertyPath ? '.' + propertyPath : '';
 	const contextualPath = `settings${ appendedBlockPath }${ appendedPropertyPath }`;
@@ -104,19 +107,20 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 
 		if ( propertyPath ) {
 			return (
-				get( configToUse, contextualPath ) ??
-				get( configToUse, globalPath )
+				getValueFromObjectPath( configToUse, contextualPath ) ??
+				getValueFromObjectPath( configToUse, globalPath )
 			);
 		}
 
 		let result = {};
 		VALID_SETTINGS.forEach( ( setting ) => {
 			const value =
-				get(
+				getValueFromObjectPath(
 					configToUse,
 					`settings${ appendedBlockPath }.${ setting }`
-				) ?? get( configToUse, `settings.${ setting }` );
-			if ( value ) {
+				) ??
+				getValueFromObjectPath( configToUse, `settings.${ setting }` );
+			if ( value !== undefined ) {
 				result = setImmutably( result, setting.split( '.' ), value );
 			}
 		} );
@@ -135,7 +139,6 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 			setImmutably( currentConfig, contextualPath.split( '.' ), newValue )
 		);
 	};
-
 	return [ settingValue, setSetting ];
 }
 
@@ -176,19 +179,19 @@ export function useGlobalStyle(
 	let rawResult, result;
 	switch ( source ) {
 		case 'all':
-			rawResult = get( mergedConfig, finalPath );
+			rawResult = getValueFromObjectPath( mergedConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
 			break;
 		case 'user':
-			rawResult = get( userConfig, finalPath );
+			rawResult = getValueFromObjectPath( userConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
 			break;
 		case 'base':
-			rawResult = get( baseConfig, finalPath );
+			rawResult = getValueFromObjectPath( baseConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( baseConfig, blockName, rawResult )
 				: rawResult;
@@ -327,7 +330,8 @@ export function useSettingsForBlockElement(
 			const sides = Array.isArray( supports?.spacing?.[ key ] )
 				? supports?.spacing?.[ key ]
 				: supports?.spacing?.[ key ]?.sides;
-			if ( sides?.length ) {
+			// Check if spacing type is supported before adding sides.
+			if ( sides?.length && updatedSettings.spacing?.[ key ] ) {
 				updatedSettings.spacing = {
 					...updatedSettings.spacing,
 					[ key ]: {

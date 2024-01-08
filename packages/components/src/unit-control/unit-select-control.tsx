@@ -12,7 +12,7 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import { UnitSelect, UnitLabel } from './styles/unit-control-styles';
 import { CSS_UNITS, hasUnits } from './utils';
 import type { UnitSelectControlProps } from './types';

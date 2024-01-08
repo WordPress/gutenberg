@@ -6,6 +6,7 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
+import { Children } from '@wordpress/element';
 import { BottomSheetConsumer } from '@wordpress/components';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
@@ -14,7 +15,11 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import groups from './groups';
-import useDisplayBlockControls from '../use-display-block-controls';
+import {
+	useBlockEditContext,
+	mayDisplayControlsKey,
+} from '../block-edit/context';
+import { BlockSettingsButton } from '../block-settings';
 
 export default function InspectorControlsFill( {
 	children,
@@ -33,14 +38,14 @@ export default function InspectorControlsFill( {
 		);
 		group = __experimentalGroup;
 	}
-	const isDisplayed = useDisplayBlockControls();
+	const context = useBlockEditContext();
 
 	const Fill = groups[ group ]?.Fill;
 	if ( ! Fill ) {
 		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
-	if ( ! isDisplayed ) {
+	if ( ! context[ mayDisplayControlsKey ] ) {
 		return null;
 	}
 
@@ -53,6 +58,7 @@ export default function InspectorControlsFill( {
 					</BottomSheetConsumer>
 				}
 			</Fill>
+			{ Children.count( children ) > 0 && <BlockSettingsButton /> }
 		</>
 	);
 }

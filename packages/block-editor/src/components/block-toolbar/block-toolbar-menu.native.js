@@ -60,7 +60,6 @@ const BlockActionsMenu = ( {
 	rootClientId,
 	selectedBlockClientId,
 	selectedBlockPossibleTransformations,
-	canRemove,
 	// Dispatch.
 	createSuccessNotice,
 	convertToRegularBlocks,
@@ -100,12 +99,13 @@ const BlockActionsMenu = ( {
 	} = getMoversSetup( isStackedHorizontally, moversOptions );
 
 	// Check if selected block is Groupable and/or Ungroupable.
-	const convertToGroupButtonProps = useConvertToGroupButtonProps( [
-		selectedBlockClientId,
-	] );
+	const convertToGroupButtonProps = useConvertToGroupButtonProps(
+		// `selectedBlockClientId` can be undefined in some cases where this
+		// component gets re-rendered right after the block is removed.
+		selectedBlockClientId ? [ selectedBlockClientId ] : []
+	);
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
-	const showConvertToGroupButton =
-		( isGroupable || isUngroupable ) && canRemove;
+	const showConvertToGroupButton = isGroupable || isUngroupable;
 	const convertToGroupButtons = useConvertToGroupButtons( {
 		...convertToGroupButtonProps,
 	} );
@@ -212,10 +212,7 @@ const BlockActionsMenu = ( {
 		},
 		convertToRegularBlocks: {
 			id: 'convertToRegularBlocksOption',
-			label:
-				innerBlockCount > 1
-					? __( 'Detach patterns' )
-					: __( 'Detach pattern' ),
+			label: __( 'Detach' ),
 			value: 'convertToRegularBlocksOption',
 			onSelect: () => {
 				/* translators: %s: name of the synced block */
@@ -346,7 +343,6 @@ export default compose(
 			getSelectedBlockClientIds,
 			canInsertBlockType,
 			getTemplateLock,
-			canRemoveBlock,
 		} = select( blockEditorStore );
 		const block = getBlock( clientId );
 		const blockName = getBlockName( clientId );
@@ -383,7 +379,6 @@ export default compose(
 		const selectedBlockPossibleTransformations = selectedBlock
 			? getBlockTransformItems( selectedBlock, rootClientId )
 			: EMPTY_BLOCK_LIST;
-		const canRemove = canRemoveBlock( selectedBlockClientId );
 
 		const isReusableBlockType = block ? isReusableBlock( block ) : false;
 		const reusableBlock = isReusableBlockType
@@ -409,7 +404,6 @@ export default compose(
 			rootClientId,
 			selectedBlockClientId,
 			selectedBlockPossibleTransformations,
-			canRemove,
 		};
 	} ),
 	withDispatch(

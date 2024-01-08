@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import { focus } from '@wordpress/dom';
 
 export const getBlockPositionDescription = ( position, siblingCount, level ) =>
 	sprintf(
@@ -55,4 +56,40 @@ export function getCommonDepthClientIds(
 		start,
 		end,
 	};
+}
+
+/**
+ * Shift focus to the list view item associated with a particular clientId.
+ *
+ * @typedef {import('@wordpress/element').RefObject} RefObject
+ *
+ * @param {string}                 focusClientId      The client ID of the block to focus.
+ * @param {RefObject<HTMLElement>} treeGridElementRef The container element to search within.
+ */
+export function focusListItem( focusClientId, treeGridElementRef ) {
+	const getFocusElement = () => {
+		const row = treeGridElementRef.current?.querySelector(
+			`[role=row][data-block="${ focusClientId }"]`
+		);
+		if ( ! row ) return null;
+		// Focus the first focusable in the row, which is the ListViewBlockSelectButton.
+		return focus.focusable.find( row )[ 0 ];
+	};
+
+	let focusElement = getFocusElement();
+	if ( focusElement ) {
+		focusElement.focus();
+	} else {
+		// The element hasn't been painted yet. Defer focusing on the next frame.
+		// This could happen when all blocks have been deleted and the default block
+		// hasn't been added to the editor yet.
+		window.requestAnimationFrame( () => {
+			focusElement = getFocusElement();
+
+			// Ignore if the element still doesn't exist.
+			if ( focusElement ) {
+				focusElement.focus();
+			}
+		} );
+	}
 }

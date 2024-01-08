@@ -9,6 +9,8 @@ import {
 	removeFormat,
 	slice,
 	isCollapsed,
+	insert,
+	create,
 } from '@wordpress/rich-text';
 import { isURL, isEmail } from '@wordpress/url';
 import {
@@ -89,6 +91,8 @@ function Edit( {
 					isActive={ isActive }
 					shortcutType="primaryShift"
 					shortcutCharacter="k"
+					aria-haspopup="true"
+					aria-expanded={ addingLink || isActive }
 				/>
 			) }
 			{ ! isActive && (
@@ -100,6 +104,8 @@ function Edit( {
 					isActive={ isActive }
 					shortcutType="primary"
 					shortcutCharacter="k"
+					aria-haspopup="true"
+					aria-expanded={ addingLink || isActive }
 				/>
 			) }
 			{ ( addingLink || isActive ) && (
@@ -126,31 +132,44 @@ export const link = {
 		url: 'href',
 		type: 'data-type',
 		id: 'data-id',
+		_id: 'id',
 		target: 'target',
+		rel: 'rel',
 	},
 	__unstablePasteRule( value, { html, plainText } ) {
-		if ( isCollapsed( value ) ) {
-			return value;
-		}
-
 		const pastedText = ( html || plainText )
 			.replace( /<[^>]+>/g, '' )
 			.trim();
 
 		// A URL was pasted, turn the selection into a link.
-		if ( ! isURL( pastedText ) ) {
+		// For the link pasting feature, allow only http(s) protocols.
+		if ( ! isURL( pastedText ) || ! /^https?:/.test( pastedText ) ) {
 			return value;
 		}
 
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Created link:\n\n', pastedText );
 
-		return applyFormat( value, {
+		const format = {
 			type: name,
 			attributes: {
 				url: decodeEntities( pastedText ),
 			},
-		} );
+		};
+
+		if ( isCollapsed( value ) ) {
+			return insert(
+				value,
+				applyFormat(
+					create( { text: plainText } ),
+					format,
+					0,
+					plainText.length
+				)
+			);
+		}
+
+		return applyFormat( value, format );
 	},
 	edit: Edit,
 };

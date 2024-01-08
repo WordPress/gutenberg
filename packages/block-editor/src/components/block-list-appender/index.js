@@ -15,7 +15,6 @@ import { getDefaultBlockName } from '@wordpress/blocks';
 import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 function DefaultAppender( { rootClientId } ) {
 	const canInsertDefaultBlock = useSelect( ( select ) =>
@@ -48,11 +47,7 @@ function useAppender( rootClientId, CustomAppender ) {
 				getSelectedBlockClientId,
 				__unstableGetEditorMode,
 				getBlockEditingMode,
-			} = unlock( select( blockEditorStore ) );
-
-			if ( CustomAppender === false ) {
-				return false;
-			}
+			} = select( blockEditorStore );
 
 			if ( ! CustomAppender ) {
 				const selectedBlockClientId = getSelectedBlockClientId();
@@ -93,6 +88,26 @@ function BlockListAppender( {
 	renderAppender,
 	className,
 	tagName: TagName = 'div',
+} ) {
+	if ( renderAppender === false ) {
+		return null;
+	}
+
+	return (
+		<BlockListAppenderInner
+			rootClientId={ rootClientId }
+			renderAppender={ renderAppender }
+			className={ className }
+			tagName={ TagName }
+		/>
+	);
+}
+
+function BlockListAppenderInner( {
+	rootClientId,
+	renderAppender,
+	className,
+	tagName: TagName,
 } ) {
 	const appender = useAppender( rootClientId, renderAppender );
 	const isDragOver = useSelect(

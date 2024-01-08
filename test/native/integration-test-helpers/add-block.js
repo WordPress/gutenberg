@@ -6,7 +6,7 @@ import { Platform } from '@wordpress/element';
 /**
  * External dependencies
  */
-import { act, fireEvent } from '@testing-library/react-native';
+import { act, fireEvent, within } from '@testing-library/react-native';
 import { AccessibilityInfo } from 'react-native';
 
 /**
@@ -31,9 +31,9 @@ export const addBlock = async (
 		fireEvent.press( screen.getByLabelText( 'Add block' ) );
 	}
 
-	const blockList = screen.getByTestId( 'InserterUI-Blocks' );
+	const inserterModal = screen.getByTestId( 'InserterUI-Blocks' );
 	// onScroll event used to force the FlatList to render all items
-	fireEvent.scroll( blockList, {
+	fireEvent.scroll( inserterModal, {
 		nativeEvent: {
 			contentOffset: { y: 0, x: 0 },
 			contentSize: { width: 100, height: 100 },
@@ -41,14 +41,25 @@ export const addBlock = async (
 		},
 	} );
 
-	fireEvent.press( await screen.findByText( blockName ) );
+	const blockButton = await within( inserterModal ).findByText( blockName );
+	// Blocks can perform belated state updates after they are inserted.
+	// To avoid potential `act` warnings, we ensure that all timers and queued
+	// microtasks are executed.
+	await withFakeTimers( async () => {
+		fireEvent.press( blockButton );
 
-	// On iOS the action for inserting a block is delayed (https://bit.ly/3AVALqH).
-	// Hence, we need to wait for the different steps until the the block is inserted.
-	if ( Platform.isIOS ) {
-		await withFakeTimers( async () => {
+		// On iOS the action for inserting a block is delayed (https://bit.ly/3AVALqH).
+		// Hence, we need to wait for the different steps until the the block is inserted.
+		if ( Platform.isIOS ) {
 			await AccessibilityInfo.isScreenReaderEnabled();
 			act( () => jest.runOnlyPendingTimers() );
-		} );
-	}
+		}
+
+		// Run all timers, in case any performs a state updates.
+		// Column block example: https://t.ly/NjTs
+		act( () => jest.runOnlyPendingTimers() );
+		// Let potential queued microtasks (like Promises) to be executed.
+		// Inner blocks example: https://t.ly/b95nA
+		await act( async () => {} );
+	} );
 };

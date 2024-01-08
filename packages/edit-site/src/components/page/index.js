@@ -26,17 +26,17 @@ export default function Page( {
 
 	return (
 		<NavigableRegion className={ classes } ariaLabel={ title }>
-			{ ! hideTitleFromUI && title && (
-				<Header
-					title={ title }
-					subTitle={ subTitle }
-					actions={ actions }
-				/>
-			) }
 			<div className="edit-site-page-content">
+				{ ! hideTitleFromUI && title && (
+					<Header
+						title={ title }
+						subTitle={ subTitle }
+						actions={ actions }
+					/>
+				) }
 				{ children }
-				<EditorSnackbars />
 			</div>
+			<EditorSnackbars />
 		</NavigableRegion>
 	);
 }
