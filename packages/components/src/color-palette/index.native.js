@@ -79,7 +79,7 @@ function ColorPalette( {
 			( defaultSettings.allColors ?? [] ).map( ( { color } ) => color )
 		),
 	];
-	const allAvailableGradiens = [
+	const allAvailableGradients = [
 		...new Set(
 			( defaultSettings.allGradients ?? [] ).map(
 				( { gradient } ) => gradient
@@ -89,7 +89,7 @@ function ColorPalette( {
 
 	const colors = isGradientSegment ? mergedGradients : mergedColors;
 	const allColors = isGradientSegment
-		? allAvailableGradiens
+		? allAvailableGradients
 		: allAvailableColors;
 
 	const customIndicatorColor = isGradientSegment
