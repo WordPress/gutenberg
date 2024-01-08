@@ -54,7 +54,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
 
 <div>
   <div
-    class="interface-preferences-modal__option"
+    class="preference-base-option"
   >
     <div
       class="components-base-control components-toggle-control emotion-0 emotion-1"
@@ -160,7 +160,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
 
 <div>
   <div
-    class="interface-preferences-modal__option"
+    class="preference-base-option"
   >
     <div
       class="components-base-control components-toggle-control emotion-0 emotion-1"
@@ -256,7 +256,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
 
 <div>
   <div
-    class="interface-preferences-modal__option"
+    class="preference-base-option"
   >
     <div
       class="components-base-control components-toggle-control emotion-0 emotion-1"
@@ -363,7 +363,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
 
 <div>
   <div
-    class="interface-preferences-modal__option"
+    class="preference-base-option"
   >
     <div
       class="components-base-control components-toggle-control emotion-0 emotion-1"
