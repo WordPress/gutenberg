@@ -125,16 +125,16 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 					$font_face = $font_family_settings['fontFace'][ $face_index ];
 					if ( ! isset( $font_face['fontWeight'] ) || ! isset( $font_face['fontStyle'] ) ) {
 						$error_messages[] = sprintf(
-							// translators: 1: font family index, 2: font face index.
-							__( 'Font family Font face [%2$s] should have fontWeight and fontStyle properties defined.', 'gutenberg' ),
+							// translators: font face index.
+							__( 'Font family Font face [%1$s] should have fontWeight and fontStyle properties defined.', 'gutenberg' ),
 							$face_index
 						);
 					}
 
 					if ( isset( $font_face['downloadFromUrl'] ) && isset( $font_face['uploadedFile'] ) ) {
 						$error_messages[] = sprintf(
-							// translators: 1: font family index, 2: font face index.
-							__( 'Font family Font face [%2$s] should have only one of the downloadFromUrl or uploadedFile properties defined and not both.', 'gutenberg' ),
+							// translators: font face index.
+							__( 'Font family Font face [%1$s] should have only one of the downloadFromUrl or uploadedFile properties defined and not both.', 'gutenberg' ),
 							$face_index
 						);
 					}
@@ -142,8 +142,8 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 					if ( isset( $font_face['uploadedFile'] ) ) {
 						if ( ! isset( $files[ $font_face['uploadedFile'] ] ) ) {
 							$error_messages[] = sprintf(
-								// translators: 1: font family index, 2: font face index.
-								__( 'Font family Font face [%2$s] file is not defined in the request files.', 'gutenberg' ),
+								// translators: font face index.
+								__( 'Font family Font face [%1$s] file is not defined in the request files.', 'gutenberg' ),
 								$face_index
 							);
 						}
