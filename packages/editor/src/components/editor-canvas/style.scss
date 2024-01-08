@@ -1,5 +1,6 @@
 .editor-canvas__iframe {
 	&.has-history {
 		padding: $grid-unit-60 $grid-unit-60 0;
+		background-color: $gray-900;
 	}
 }
