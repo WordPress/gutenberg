@@ -149,10 +149,22 @@
 	}
 
 	.dataviews-view-grid__card {
-		h3 { // Todo: A better way to target this
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
+		.dataviews-view-grid__primary-field {
+			.dataviews-view-grid__title-field {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: block;
+				font-size: $default-font-size;
+				width: 100%;
+			}
+
+			.dataviews-view-grid__title-field a,
+			button.dataviews-view-grid__title-field {
+				font-weight: 500;
+				color: $gray-900;
+				text-decoration: none;
+			}
 		}
 	}
 
@@ -173,12 +185,6 @@
 
 	.dataviews-view-grid__primary-field {
 		min-height: $grid-unit-30;
-
-		a {
-			color: $gray-900;
-			text-decoration: none;
-			font-weight: 500;
-		}
 	}
 
 	.dataviews-view-grid__fields {
