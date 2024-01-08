@@ -40,13 +40,6 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	public $allowed_functions = array();
 
 	/**
-	 * Contains prefixes for functions that are not allowed to be called.
-	 *
-	 * @var array
-	 */
-	public $disallowed_function_calls = array();
-
-	/**
 	 * Registers the tokens that this sniff wants to listen for.
 	 *
 	 * @return array
@@ -54,7 +47,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	public function register() {
 		$this->onRegisterEvent();
 
-		return array( T_FUNCTION, T_STRING );
+		return array( T_FUNCTION );
 	}
 
 	/**
@@ -70,12 +63,11 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 		$tokens = $phpcsFile->getTokens();
 		$token  = $tokens[ $stackPtr ];
 
-		if ( 'T_FUNCTION' === $token['type'] ) {
-			$this->processFunctionToken( $phpcsFile, $stackPtr );
+		if ( 'T_FUNCTION' !== $token['type'] ) {
 			return;
 		}
 
-		$this->processFunctionCall( $phpcsFile, $stackPtr );
+		$this->processFunctionToken( $phpcsFile, $stackPtr );
 	}
 
 	/**
@@ -90,6 +82,7 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 	 * @return void
 	 */
 	private function processFunctionToken( File $phpcsFile, $stackPointer ) {
+
 		if ( empty( $this->prefixes ) ) {
 			// Nothing to process.
 			return;
@@ -140,41 +133,13 @@ final class ValidBlockLibraryFunctionNameSniff implements Sniff {
 		$phpcsFile->addError( $error_message, $function_token, 'FunctionNameInvalid' );
 	}
 
-	private function processFunctionCall( File $phpcs_file, $stack_pointer ) {
-		if ( empty( $this->disallowed_function_calls ) ) {
-			// Nothing to process.
-			return;
-		}
-
-		$tokens = $phpcs_file->getTokens();
-		$next_token = $phpcs_file->findNext(T_WHITESPACE, ($stack_pointer + 1), null, true, null, true);
-		if ( false === $next_token || ( $tokens[ $next_token ]['code'] !== T_OPEN_PARENTHESIS ) ) {
-			// Not a function call.
-			return;
-		}
-
-		$function_name = $tokens[$stack_pointer]['content'];
-
-		foreach ( $this->disallowed_function_calls as $disallowed_function_call ) {
-			$regexp = sprintf( '/^%s$/', $disallowed_function_call );
-			if ( 1 !== preg_match( $regexp, $function_name ) ) {
-				// The function has a valid name; bypassing further checks.
-				return;
-			}
-		}
-
-		$error_message = 'It\'s not allowed to call the "' . $function_name . '()" function as its name matches the forbidden pattern: "' . $regexp . '".';
-		$phpcs_file->addError( $error_message, $stack_pointer, 'CalledFunctionInvalid' );
-	}
-
 	/**
 	 * The purpose of this method is to run callbacks
 	 * after the class properties have been set.
 	 */
 	private function onRegisterEvent() {
-		$this->prefixes                  = self::sanitize( $this->prefixes );
-		$this->allowed_functions         = self::sanitize( $this->allowed_functions );
-		$this->disallowed_function_calls = self::sanitize( $this->disallowed_function_calls );
+		$this->prefixes          = self::sanitize( $this->prefixes );
+		$this->allowed_functions = self::sanitize( $this->allowed_functions );
 	}
 
 	/**
