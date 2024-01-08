@@ -268,21 +268,6 @@ if ( process.env.WP_DEVTOOL ) {
 if ( ! isProduction ) {
 	// Set default sourcemap mode if it wasn't set by WP_DEVTOOL.
 	baseConfig.devtool = baseConfig.devtool || 'source-map';
-	baseConfig.devServer = {
-		devMiddleware: {
-			writeToDisk: true,
-		},
-		allowedHosts: 'auto',
-		host: 'localhost',
-		port: 8887,
-		proxy: {
-			'/build': {
-				pathRewrite: {
-					'^/build': '',
-				},
-			},
-		},
-	};
 }
 
 // Add source-map-loader if devtool is set, whether in dev mode or not.
@@ -300,6 +285,24 @@ const scriptConfig = {
 	...baseConfig,
 
 	entry: getWebpackEntryPoints( 'script' ),
+
+	devServer: isProduction
+		? undefined
+		: {
+				devMiddleware: {
+					writeToDisk: true,
+				},
+				allowedHosts: 'auto',
+				host: 'localhost',
+				port: 8887,
+				proxy: {
+					'/build': {
+						pathRewrite: {
+							'^/build': '',
+						},
+					},
+				},
+		  },
 
 	plugins: [
 		new webpack.DefinePlugin( {
