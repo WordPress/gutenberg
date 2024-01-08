@@ -55,23 +55,17 @@ export default function ViewList( {
 				return (
 					<li
 						key={ getItemId( item ) }
-						className={ classNames( {
+						className={ classNames( 'dataviews-list-view__item', {
 							'is-selected': selection.includes( item.id ),
 						} ) }
 					>
-						<HStack>
+						<HStack spacing={ 0 }>
 							<div
 								role="button"
 								tabIndex={ 0 }
 								aria-pressed={ selection.includes( item.id ) }
 								onKeyDown={ onEnter( item ) }
-								className={ classNames(
-									'dataviews-view-list__item',
-									{
-										'dataviews-view-list__item-selected':
-											selection.includes( item.id ),
-									}
-								) }
+								className="dataviews-view-list__item-content"
 								onClick={ () => onSelectionChange( [ item ] ) }
 							>
 								<HStack spacing={ 3 } justify="start">
@@ -101,7 +95,7 @@ export default function ViewList( {
 							</div>
 							{ onDetailsChange && (
 								<Button
-									className="dataviews-view-list__details-button"
+									className="dataviews-view-list__item-details"
 									onClick={ () =>
 										onDetailsChange( [ item ] )
 									}
