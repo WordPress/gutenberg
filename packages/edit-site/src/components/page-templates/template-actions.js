@@ -61,7 +61,7 @@ export function useResetTemplateAction() {
 							? sprintf(
 									/* translators: The number of items. */
 									__( '%s items reverted.' ),
-									decodeEntities( templates.length )
+									templates.length
 							  )
 							: sprintf(
 									/* translators: The template/part's name. */
@@ -128,7 +128,7 @@ export const deleteTemplateAction = {
 								__(
 									'Are you sure you want to delete %s items?'
 								),
-								decodeEntities( templates.length )
+								templates.length
 						  )
 						: sprintf(
 								// translators: %s: The template or template part's title.
