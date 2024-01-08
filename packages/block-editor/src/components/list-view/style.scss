@@ -412,6 +412,8 @@
 
 	&[id^="clone-"] {
 		display: flex;
+		// Where possible, restrict the width of the cloned row to the width of the list view.
+		max-width: 338px;
 		height: 36px;
 		opacity: 1;
 
@@ -425,8 +427,7 @@
 		}
 
 		td {
-			background: var(--wp-admin-theme-color);
-			color: $white;
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 
 			.block-editor-list-view-block-select-button,
 			.components-button.has-icon {
