@@ -192,16 +192,16 @@ export default function useCommonCommands() {
 	useCommand( {
 		name: 'core/toggle-publish-sidebar',
 		label: isPublishSidebarEnabled
-			? __( 'Disable pre-publish checklist' )
-			: __( 'Enable pre-publish checklist' ),
+			? __( 'Disable pre-publish checks' )
+			: __( 'Enable pre-publish checks' ),
 		icon: formatListBullets,
 		callback: ( { close } ) => {
 			close();
 			toggle( 'core/edit-post', 'isPublishSidebarEnabled' );
 			createInfoNotice(
 				isPublishSidebarEnabled
-					? __( 'Pre-publish checklist off.' )
-					: __( 'Pre-publish checklist on.' ),
+					? __( 'Pre-publish checks disabled.' )
+					: __( 'Pre-publish checks enabled.' ),
 				{
 					id: 'core/edit-post/publish-sidebar/notice',
 					type: 'snackbar',
