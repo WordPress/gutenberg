@@ -53,7 +53,7 @@ export default function EditPostPreferencesModal() {
 		),
 		appearance: (
 			<PreferenceToggleControl
-				scorep="core/edit-post"
+				scope="core/edit-post"
 				featureName="themeStyles"
 				help={ __( 'Make the editor look like your theme.' ) }
 				label={ __( 'Use theme styles' ) }

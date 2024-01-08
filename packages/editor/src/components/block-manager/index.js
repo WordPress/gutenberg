@@ -13,6 +13,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import BlockManagerCategory from './category';
 
@@ -148,7 +149,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { showBlockTypes } = dispatch( editorStore );
+		const { showBlockTypes } = unlock( dispatch( editorStore ) );
 		return {
 			enableAllBlockTypes: ( blockTypes ) => {
 				const blockNames = blockTypes.map( ( { name } ) => name );
