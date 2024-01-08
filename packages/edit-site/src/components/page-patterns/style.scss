@@ -255,3 +255,31 @@
 		z-index: 2;
 	}
 }
+
+// TODO: this is duplicated from `patterns-menu-items__convert-modal` styles,
+// except for the `z-index`. Need to check if this is still needed.
+.dataviews-action-modal__duplicate-pattern {
+	// Fix the modal width to prevent added categories from stretching the modal.
+	[role="dialog"] > [role="document"] {
+		width: 350px;
+	}
+
+	.patterns-menu-items__convert-modal-categories {
+		position: relative;
+	}
+
+	.components-form-token-field__suggestions-list:not(:empty) {
+		position: absolute;
+		border: $border-width solid var(--wp-admin-theme-color);
+		border-bottom-left-radius: $radius-block-ui;
+		border-bottom-right-radius: $radius-block-ui;
+		box-shadow: 0 0 0.5px 0.5px var(--wp-admin-theme-color);
+		box-sizing: border-box;
+		z-index: 1;
+		background-color: $white;
+		width: calc(100% + 2px); // Account for the border width of the token field.
+		left: -1px;
+		min-width: initial;
+		max-height: $grid-unit-60 * 2; // Adjust to not cover the save button, showing three items.
+	}
+}
