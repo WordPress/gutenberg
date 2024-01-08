@@ -274,6 +274,35 @@ describe( 'BoxControl', () => {
 				screen.getByRole( 'textbox', { name: 'Left and right sides' } )
 			).toHaveValue( '50' );
 		} );
+
+		it( 'should show "Mixed sides" label when sides have different values but are linked', async () => {
+			const user = userEvent.setup();
+
+			render( <Example /> );
+
+			const unlinkButton = screen.getByRole( 'button', {
+				name: 'Unlink sides',
+			} );
+
+			await user.click( unlinkButton );
+
+			await user.type(
+				screen.getByRole( 'textbox', {
+					name: 'Right side',
+				} ),
+				'13'
+			);
+
+			expect(
+				screen.getByRole( 'textbox', { name: 'Right side' } )
+			).toHaveValue( '13' );
+
+			await user.click( unlinkButton );
+
+			expect(
+				screen.getByRole( 'textbox', { name: 'Mixed sides' } )
+			).toHaveValue( '' );
+		} );
 	} );
 
 	describe( 'Unit selections', () => {

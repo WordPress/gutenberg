@@ -84,7 +84,7 @@ export default function AllInputControl( {
 				onUnitChange={ handleOnUnitChange }
 				onFocus={ handleOnFocus }
 				placeholder={ allPlaceholder }
-				label={ LABELS.all }
+				label={ isMixed ? LABELS.mixed : LABELS.all }
 				hideLabelFromVision
 			/>
 
