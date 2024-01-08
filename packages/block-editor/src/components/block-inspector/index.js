@@ -140,6 +140,10 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 							group="border"
 							label={ __( 'Border' ) }
 						/>
+						<InspectorControls.Slot
+							group="effects"
+							label={ __( 'Effects' ) }
+						/>
 						<InspectorControls.Slot group="styles" />
 					</>
 				) }
