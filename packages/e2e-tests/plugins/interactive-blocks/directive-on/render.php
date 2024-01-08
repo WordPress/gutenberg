@@ -5,8 +5,10 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+gutenberg_enqueue_module( 'directive-on-view' );
 ?>
-<div data-wp-interactive>
+
+<div data-wp-interactive='{ "namespace": "directive-on" }'>
 	<div>
 		<p data-wp-text="state.counter" data-testid="counter">0</p>
 		<button

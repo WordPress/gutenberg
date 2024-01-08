@@ -218,6 +218,9 @@ const typeString = async ( driver, element, str, clear ) => {
 
 	if ( clear ) {
 		await element.clearValue();
+		// This helps prevent skipping characters when the initial
+		// value was previously removed.
+		await driver.pause( 2000 );
 	}
 
 	await element.addValue( str );
@@ -280,25 +283,27 @@ const clickMiddleOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const size = await element.getSize();
 
-	await driver.touchPerform( [
-		{
-			action: 'press',
-			options: { x: location.x + size.width / 2, y: location.y },
-		},
-		{ action: 'release' },
-	] );
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x: location.x + size.width / 2, y: location.y } )
+		.down()
+		.up()
+		.perform();
 };
 
 // Clicks in the top left of an element.
 const clickBeginningOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
-	await driver.touchPerform( [
-		{
-			action: 'press',
-			options: { x: location.x, y: location.y },
-		},
-		{ action: 'release' },
-	] );
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x: location.x, y: location.y } )
+		.down()
+		.up()
+		.perform();
 };
 
 // Long press to activate context menu.
@@ -339,22 +344,15 @@ const longPressMiddleOfElement = async (
 };
 
 const tapStatusBariOS = async ( driver ) => {
-	await driver.touchPerform( [
-		{
-			action: 'press',
-			options: { x: 20, y: 20 },
-		},
-		{
-			action: 'wait',
-			options: {
-				ms: 100,
-			},
-		},
-		{
-			action: 'release',
-			options: {},
-		},
-	] );
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x: 20, y: 20 } )
+		.down()
+		.up()
+		.pause( 100 )
+		.perform();
 
 	// Wait for the scroll animation to finish
 	await driver.pause( 3000 );
@@ -481,23 +479,16 @@ const dragAndDropAfterElement = async ( driver, element, nextElement ) => {
 		? elementLocation.y + nextElementLocation.y + nextElementSize.height
 		: nextElementLocation.y + nextElementSize.height;
 
-	await driver.touchPerform( [
-		{
-			action: 'press',
-			options: { x, y },
-		},
-		{
-			action: 'wait',
-			options: {
-				ms: 5000,
-			},
-		},
-		{
-			action: 'moveTo',
-			options: { x, y: nextYPosition },
-		},
-		{ action: 'release' },
-	] );
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x, y } )
+		.down()
+		.pause( 5000 )
+		.move( { x, y: nextYPosition, duration: 500 } )
+		.up()
+		.perform();
 };
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
@@ -691,42 +682,6 @@ const clickIfClickable = async (
 	}
 };
 
-// Only for Android
-const waitIfAndroid = async () => {
-	if ( isAndroid() ) {
-		await editorPage.driver.sleep( 1000 );
-	}
-};
-
-/**
- * Content type definitions.
- * Note: Android only supports plaintext.
- *
- * @typedef {"plaintext" | "image" | "url"} ClipboardContentType
- */
-
-/**
- * Helper to set content in the clipboard.
- *
- * @param {Object}               driver      Driver
- * @param {string}               content     Content to set in the clipboard
- * @param {ClipboardContentType} contentType Type of the content
- */
-const setClipboard = async ( driver, content, contentType = 'plaintext' ) => {
-	const base64String = Buffer.from( content ).toString( 'base64' );
-	await driver.setClipboard( base64String, contentType );
-};
-
-/**
- * Helper to clear the clipboard
- *
- * @param {Object}               driver      Driver
- * @param {ClipboardContentType} contentType Type of the content
- */
-const clearClipboard = async ( driver, contentType = 'plaintext' ) => {
-	await driver.setClipboard( '', contentType );
-};
-
 const launchApp = async ( driver, initialProps = {} ) => {
 	if ( isAndroid() ) {
 		await driver.execute( 'mobile: startActivity', {
@@ -753,7 +708,6 @@ const launchApp = async ( driver, initialProps = {} ) => {
 
 module.exports = {
 	backspace,
-	clearClipboard,
 	clickBeginningOfElement,
 	clickIfClickable,
 	clickMiddleOfElement,
@@ -765,7 +719,6 @@ module.exports = {
 	launchApp,
 	longPressMiddleOfElement,
 	selectTextFromElement,
-	setClipboard,
 	setupDriver,
 	stopDriver,
 	swipeDown,
@@ -779,5 +732,4 @@ module.exports = {
 	typeString,
 	waitForMediaLibrary,
 	waitForVisible,
-	waitIfAndroid,
 };

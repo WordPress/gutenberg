@@ -25,14 +25,14 @@ The block editor handbook is a mix of markdown files in the `/docs/` directory o
 
 An automated job publishes the docs every 15 minutes to the [block editor handbook site](https://developer.wordpress.org/block-editor/).
 
-See [the Git Workflow](/docs/contributors/code/git-workflow.md) documentation for how to use git to deploy changes using pull requests. Additionally, see the [video walk-through](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [slides for contributing documentation to Gutenberg](https://mkaz.blog/wordpress/contribute-documentation-to-gutenberg/).
+See [the Git Workflow](/docs/contributors/code/git-workflow.md) documentation for how to use git to deploy changes using pull requests. Additionally, see the [video walk-through](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [slides for contributing documentation to Gutenberg](https://mkaz.blog/wordpress/contribute-developer-documentation-to-gutenberg/).
 
 ### Handbook structure
 
 The handbook is organized into four sections based on the functional types of documents. [The Documentation System](https://documentation.divio.com/) does a great job explaining the needs and functions of each type, but in short they are:
 
--   **Getting started tutorials** - full lessons that take learners step by step to complete an objective, for example the [create a block tutorial](/docs/getting-started/create-block/README.md).
--   **How to guides** - short lessons specific to completing a small specific task, for example [how to add a button to the block toolbar](/docshow-to-guides/format-api/README.md).
+-   **Getting started tutorials** - full lessons that take learners step by step to complete an objective, for example the [create a block tutorial](/docs/getting-started/devenv/get-started-with-create-block.md).
+-   **How to guides** - short lessons specific to completing a small specific task, for example [how to add a button to the block toolbar](/docs/how-to-guides/format-api.md).
 -   **Reference guides** - API documentation, purely functional descriptions,
 -   **Explanations** - longer documentation focused on learning, not a specific task.
 
@@ -64,7 +64,7 @@ To add a new document requires a working JavaScript development environment to b
 
 If you forget to run, `npm run docs:build` your PR will fail the static analysis check, since the `manifest.json` file is an uncommitted local change that must be committed.
 
-### Documenting Packages
+### Documenting packages
 
 Package documentation is generated automatically by the documentation tool by pulling the contents of the README.md file located in the root of the package. Sometimes however, it is preferable to split the contents of the README out into smaller, easier to read portions.
 
@@ -164,7 +164,7 @@ This is a **warning** callout.
 Note: In callout notices, links also need to be HTML `&lt;a href>&lt;/a>` notations. 
 The usual link transformation is not applied to links in callouts.
 For instance, to reach the Getting started > Create Block page the URL in GitHub is
-https://developer.wordpress.org/docs/getting-started/create-block/README.md
+https://developer.wordpress.org/docs/getting-started/devenv/get-started-with-create-block.md
 and will have to be hardcoded for the endpoint in the Block Editor Handbook as 
 <a href="https://developer.wordpress.org/block-editor/getting-started/create-block/">https://developer.wordpress.org/block-editor/getting-started/create-block/</a> to link correctly in the handbook. 
 </div>

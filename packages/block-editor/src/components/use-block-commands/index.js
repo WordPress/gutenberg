@@ -22,43 +22,41 @@ import {
 /**
  * Internal dependencies
  */
+import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 
 export const useTransformCommands = () => {
-	const { clientIds } = useSelect( ( select ) => {
-		const { getSelectedBlockClientIds } = select( blockEditorStore );
-		const selectedBlockClientIds = getSelectedBlockClientIds();
-
-		return {
-			clientIds: selectedBlockClientIds,
-		};
-	}, [] );
-	const blocks = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlocksByClientId( clientIds ),
-		[ clientIds ]
-	);
 	const { replaceBlocks, multiSelect } = useDispatch( blockEditorStore );
-	const { possibleBlockTransformations, canRemove } = useSelect(
-		( select ) => {
+	const { blocks, clientIds, canRemove, possibleBlockTransformations } =
+		useSelect( ( select ) => {
 			const {
 				getBlockRootClientId,
 				getBlockTransformItems,
+				getSelectedBlockClientIds,
+				getBlocksByClientId,
 				canRemoveBlocks,
 			} = select( blockEditorStore );
+
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			const selectedBlocks = getBlocksByClientId(
+				selectedBlockClientIds
+			);
 			const rootClientId = getBlockRootClientId(
-				Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
+				selectedBlockClientIds[ 0 ]
 			);
 			return {
+				blocks: selectedBlocks,
+				clientIds: selectedBlockClientIds,
 				possibleBlockTransformations: getBlockTransformItems(
-					blocks,
+					selectedBlocks,
 					rootClientId
 				),
-				canRemove: canRemoveBlocks( clientIds, rootClientId ),
+				canRemove: canRemoveBlocks(
+					selectedBlockClientIds,
+					rootClientId
+				),
 			};
-		},
-		[ clientIds, blocks ]
-	);
+		}, [] );
 
 	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
 
@@ -100,7 +98,7 @@ export const useTransformCommands = () => {
 			name: 'core/block-editor/transform-to-' + name.replace( '/', '-' ),
 			// translators: %s: block title/name.
 			label: sprintf( __( 'Transform to %s' ), title ),
-			icon: icon.src,
+			icon: <BlockIcon icon={ icon } />,
 			callback: ( { close } ) => {
 				onBlockTransform( name );
 				close();

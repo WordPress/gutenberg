@@ -91,7 +91,7 @@ function DuotonePicker( {
 		/>
 	);
 
-	const options = duotonePalette.map( ( { colors, slug, name } ) => {
+	const duotoneOptions = duotonePalette.map( ( { colors, slug, name } ) => {
 		const style = {
 			background: getGradientFromCSSColors( colors, '135deg' ),
 			color: 'transparent',
@@ -155,11 +155,15 @@ function DuotonePicker( {
 		}
 	}
 
+	const options = unsetable
+		? [ unsetOption, ...duotoneOptions ]
+		: duotoneOptions;
+
 	return (
 		<CircularOptionPicker
 			{ ...otherProps }
 			{ ...metaProps }
-			options={ unsetable ? [ unsetOption, ...options ] : options }
+			options={ options }
 			actions={
 				!! clearable && (
 					<CircularOptionPicker.ButtonAction
@@ -170,7 +174,7 @@ function DuotonePicker( {
 				)
 			}
 		>
-			<Spacer paddingTop={ 4 }>
+			<Spacer paddingTop={ options.length === 0 ? 0 : 4 }>
 				<VStack spacing={ 3 }>
 					{ ! disableCustomColors && ! disableCustomDuotone && (
 						<CustomDuotoneBar

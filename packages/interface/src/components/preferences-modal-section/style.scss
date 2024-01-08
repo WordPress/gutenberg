@@ -22,3 +22,7 @@
 	font-style: normal;
 	color: $gray-700;
 }
+
+.interface-preferences-modal__section:has(.interface-preferences-modal__section-content:empty) {
+	display: none;
+}

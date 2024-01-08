@@ -4,6 +4,22 @@
 
 ### Bug Fix
 
+-   Fix namespaces when there are nested interactive regions. ([#57029](https://github.com/WordPress/gutenberg/pull/57029))
+
+## 3.1.0 (2023-12-13)
+
+## 3.0.0 (2023-11-29)
+
+### Breaking Change
+
+-   Implement the new `store()` API as specified in the [proposal](https://github.com/WordPress/gutenberg/discussions/53586). ([#55459](https://github.com/WordPress/gutenberg/pull/55459))
+
+## 2.7.0 (2023-11-16)
+
+## 2.6.0 (2023-11-02)
+
+### Bug Fix
+
 -   Update the title when using enhanced pagination. ([#55446](https://github.com/WordPress/gutenberg/pull/55446))
 
 ## 2.5.0 (2023-10-18)
