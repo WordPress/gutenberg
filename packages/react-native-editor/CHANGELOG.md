@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Fix missing custom color indicator for custom gradients [#57605]
 
 ## 1.110.0
 -   [*] [internal] Move InserterButton from components package to block-editor package [#56494]
