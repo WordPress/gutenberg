@@ -90,7 +90,8 @@ export default function BlockThemeControl( { id } ) {
 					<MenuGroup>
 						<MenuItem
 							icon={ ! isTemplateHidden ? check : undefined }
-							isPressed={ ! isTemplateHidden }
+							isSelected={ ! isTemplateHidden }
+							role="menuitemcheckbox"
 							onClick={ () => {
 								setRenderingMode(
 									isTemplateHidden

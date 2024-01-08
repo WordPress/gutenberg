@@ -1,12 +1,10 @@
 @import "../../interface/src/style.scss";
 @import "./components/header/style.scss";
 @import "./components/header/fullscreen-mode-close/style.scss";
-@import "./components/header/header-toolbar/style.scss";
 @import "./components/keyboard-shortcut-help-modal/style.scss";
 @import "./components/layout/style.scss";
 @import "./components/block-manager/style.scss";
 @import "./components/meta-boxes/meta-boxes-area/style.scss";
-@import "./components/secondary-sidebar/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/sidebar/post-format/style.scss";
 @import "./components/sidebar/post-slug/style.scss";
@@ -51,8 +49,7 @@ body.js.block-editor-page {
 .edit-post-sidebar,
 .editor-post-publish-panel,
 .components-popover,
-.components-modal__frame,
-.edit-post-editor__inserter-panel {
+.components-modal__frame {
 	@include reset;
 }
 

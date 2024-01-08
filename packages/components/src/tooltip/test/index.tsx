@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { press, hover, click, sleep } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -15,321 +15,425 @@ import { shortcutAriaLabel } from '@wordpress/keycodes';
 import Button from '../../button';
 import Modal from '../../modal';
 import Tooltip, { TOOLTIP_DELAY } from '..';
-import cleanupTooltip from './utils/';
 
 const props = {
-	children: <Button>Button</Button>,
+	children: <Button>Tooltip anchor</Button>,
 	text: 'tooltip text',
 };
 
+const expectTooltipToBeVisible = () =>
+	expect(
+		screen.getByRole( 'tooltip', { name: 'tooltip text' } )
+	).toBeVisible();
+
+const expectTooltipToBeHidden = () =>
+	expect(
+		screen.queryByRole( 'tooltip', { name: 'tooltip text' } )
+	).not.toBeInTheDocument();
+
+const waitExpectTooltipToShow = async ( timeout = TOOLTIP_DELAY ) =>
+	await waitFor( expectTooltipToBeVisible, { timeout } );
+
+const waitExpectTooltipToHide = async () =>
+	await waitFor( expectTooltipToBeHidden );
+
+const hoverOutside = async () => {
+	await hover( document.body );
+	await hover( document.body, { clientX: 10, clientY: 10 } );
+};
+
 describe( 'Tooltip', () => {
-	it( 'should not render the tooltip if multiple children are passed', async () => {
-		render(
-			// expected TS error since Tooltip cannot have more than one child element
-			// @ts-expect-error
-			<Tooltip { ...props }>
-				<Button>This is a button</Button>
-				<Button>This is another button</Button>
-			</Tooltip>
-		);
-
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
+	// Wait enough time to make sure that tooltips don't show immediately, ignoring
+	// the showTimeout delay. For more context, see:
+	// - https://github.com/WordPress/gutenberg/pull/57345#discussion_r1435167187
+	// - https://ariakit.org/reference/tooltip-provider#skiptimeout
+	afterEach( async () => {
+		await sleep( 300 );
 	} );
 
-	it( 'should not render the tooltip if there is no focus', () => {
-		render( <Tooltip { ...props } /> );
+	describe( 'basic behavior', () => {
+		it( 'should not render the tooltip if multiple children are passed', async () => {
+			render(
+				// @ts-expect-error Tooltip cannot have more than one child element
+				<Tooltip { ...props }>
+					<Button>First button</Button>
+					<Button>Second button</Button>
+				</Tooltip>
+			);
 
-		expect(
-			screen.getByRole( 'button', { name: /Button/i } )
-		).toBeVisible();
+			expect(
+				screen.getByRole( 'button', { name: 'First button' } )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'button', { name: 'Second button' } )
+			).toBeVisible();
 
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
+			await press.Tab();
+
+			expectTooltipToBeHidden();
+		} );
+
+		it( 'should associate the tooltip text with its anchor via the accessible description when visible', async () => {
+			render( <Tooltip { ...props } /> );
+
+			// The anchor can not be found by querying for its description,
+			// since that is present only when the tooltip is visible
+			expect(
+				screen.queryByRole( 'button', { description: 'tooltip text' } )
+			).not.toBeInTheDocument();
+
+			// Hover the anchor. The tooltip shows and its text is used to describe
+			// the tooltip anchor
+			await hover(
+				screen.getByRole( 'button', {
+					name: 'Tooltip anchor',
+				} )
+			);
+			expect(
+				await screen.findByRole( 'button', {
+					description: 'tooltip text',
+				} )
+			).toBeInTheDocument();
+
+			// Hover outside of the anchor, tooltip should hide
+			await hoverOutside();
+			await waitExpectTooltipToHide();
+			expect(
+				screen.queryByRole( 'button', { description: 'tooltip text' } )
+			).not.toBeInTheDocument();
+		} );
 	} );
 
-	it( 'should render the tooltip when focusing on the tooltip anchor via tab', async () => {
-		const user = userEvent.setup();
+	describe( 'keyboard focus', () => {
+		it( 'should not render the tooltip if there is no focus', () => {
+			render( <Tooltip { ...props } /> );
 
-		render( <Tooltip { ...props } /> );
+			expect(
+				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
+			).toBeVisible();
 
-		await user.tab();
+			expectTooltipToBeHidden();
+		} );
 
-		expect(
-			screen.getByRole( 'button', { name: /Button/i } )
-		).toHaveFocus();
+		it( 'should show the tooltip when focusing on the tooltip anchor and hide it the anchor loses focus', async () => {
+			render(
+				<>
+					<Tooltip { ...props } />
+					<button>Focus me</button>
+				</>
+			);
 
-		expect(
-			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
-		).toBeVisible();
+			// Focus the anchor, tooltip should show
+			await press.Tab();
+			expect(
+				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
+			).toHaveFocus();
+			await waitExpectTooltipToShow();
 
-		await cleanupTooltip( user );
+			// Focus the other button, tooltip should hide
+			await press.Tab();
+			expect(
+				screen.getByRole( 'button', { name: 'Focus me' } )
+			).toHaveFocus();
+			await waitExpectTooltipToHide();
+		} );
+
+		it( 'should show tooltip when focussing a disabled (but focussable) anchor button', async () => {
+			render(
+				<>
+					<Tooltip { ...props }>
+						<Button disabled __experimentalIsFocusable>
+							Tooltip anchor
+						</Button>
+					</Tooltip>
+					<button>Focus me</button>
+				</>
+			);
+
+			const anchor = screen.getByRole( 'button', {
+				name: 'Tooltip anchor',
+			} );
+
+			expect( anchor ).toBeVisible();
+			expect( anchor ).toHaveAttribute( 'aria-disabled', 'true' );
+
+			// Focus anchor, tooltip should show
+			await press.Tab();
+			expect( anchor ).toHaveFocus();
+			await waitExpectTooltipToShow();
+
+			// Focus another button, tooltip should hide
+			await press.Tab();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Focus me',
+				} )
+			).toHaveFocus();
+			await waitExpectTooltipToHide();
+		} );
 	} );
 
-	it( 'should render the tooltip when the tooltip anchor is hovered', async () => {
-		const user = userEvent.setup();
+	describe( 'mouse hover', () => {
+		it( 'should show the tooltip when the tooltip anchor is hovered and hide it when the cursor stops hovering the anchor', async () => {
+			render( <Tooltip { ...props } /> );
 
-		render( <Tooltip { ...props } /> );
+			const anchor = screen.getByRole( 'button', {
+				name: 'Tooltip anchor',
+			} );
 
-		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
+			expect( anchor ).toBeVisible();
 
-		expect(
-			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
-		).toBeVisible();
+			// Hover over the anchor, tooltip should show
+			await hover( anchor );
+			await waitExpectTooltipToShow();
 
-		await cleanupTooltip( user );
+			// Hover outside of the anchor, tooltip should hide
+			await hoverOutside();
+			await waitExpectTooltipToHide();
+		} );
+
+		it( 'should show tooltip when hovering over a disabled (but focussable) anchor button', async () => {
+			render(
+				<>
+					<Tooltip { ...props }>
+						<Button disabled __experimentalIsFocusable>
+							Tooltip anchor
+						</Button>
+					</Tooltip>
+					<button>Focus me</button>
+				</>
+			);
+
+			const anchor = screen.getByRole( 'button', {
+				name: 'Tooltip anchor',
+			} );
+
+			expect( anchor ).toBeVisible();
+			expect( anchor ).toHaveAttribute( 'aria-disabled', 'true' );
+
+			// Hover over the anchor, tooltip should show
+			await hover( anchor );
+			await waitExpectTooltipToShow();
+
+			// Hover outside of the anchor, tooltip should hide
+			await hoverOutside();
+			await waitExpectTooltipToHide();
+		} );
 	} );
 
-	it( 'should not show tooltip on focus as result of mouse click', async () => {
-		const user = userEvent.setup();
+	describe( 'mouse click', () => {
+		it( 'should hide tooltip when the tooltip anchor is clicked', async () => {
+			render( <Tooltip { ...props } /> );
 
-		render( <Tooltip { ...props } /> );
+			const anchor = screen.getByRole( 'button', {
+				name: 'Tooltip anchor',
+			} );
 
-		await user.click( screen.getByRole( 'button', { name: /Button/i } ) );
+			expect( anchor ).toBeVisible();
 
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
+			// Hover over the anchor, tooltip should show
+			await hover( anchor );
+			await waitExpectTooltipToShow();
 
-		await cleanupTooltip( user );
+			// Click the anchor, tooltip should hide
+			await click( anchor );
+			await waitExpectTooltipToHide();
+		} );
+
+		it( 'should not hide tooltip when the tooltip anchor is clicked and the `hideOnClick` prop is `false', async () => {
+			render(
+				<>
+					<Tooltip { ...props } hideOnClick={ false } />
+					<button>Click me</button>
+				</>
+			);
+
+			const anchor = screen.getByRole( 'button', {
+				name: 'Tooltip anchor',
+			} );
+
+			expect( anchor ).toBeVisible();
+
+			// Hover over the anchor, tooltip should show
+			await hover( anchor );
+			await waitExpectTooltipToShow();
+
+			// Click the anchor, tooltip should not hide
+			await click( anchor );
+			await waitExpectTooltipToShow();
+
+			// Click another button, tooltip should hide
+			await click( screen.getByRole( 'button', { name: 'Click me' } ) );
+			await waitExpectTooltipToHide();
+		} );
 	} );
 
-	it( 'should respect custom delay prop when showing tooltip', async () => {
-		const user = userEvent.setup();
-		const ADDITIONAL_DELAY = 100;
+	describe( 'delay', () => {
+		it( 'should respect custom delay prop when showing tooltip', async () => {
+			const ADDITIONAL_DELAY = 100;
 
-		render(
-			<Tooltip { ...props } delay={ TOOLTIP_DELAY + ADDITIONAL_DELAY } />
-		);
+			render(
+				<Tooltip
+					{ ...props }
+					delay={ TOOLTIP_DELAY + ADDITIONAL_DELAY }
+				/>
+			);
 
-		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
+			const anchor = screen.getByRole( 'button', {
+				name: 'Tooltip anchor',
+			} );
+			expect( anchor ).toBeVisible();
 
-		// Advance time by default delay
-		await new Promise( ( resolve ) =>
-			setTimeout( resolve, TOOLTIP_DELAY )
-		);
+			// Hover over the anchor
+			await hover( anchor );
+			expectTooltipToBeHidden();
 
-		// Tooltip hasn't appeared yet
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
+			// Advance time by default delay
+			await sleep( TOOLTIP_DELAY );
 
-		// wait for additional delay for tooltip to appear
-		await waitFor(
-			() =>
-				new Promise( ( resolve ) =>
-					setTimeout( resolve, ADDITIONAL_DELAY )
-				)
-		);
+			// Tooltip hasn't appeared yet
+			expectTooltipToBeHidden();
 
-		expect(
-			screen.getByRole( 'tooltip', { name: /tooltip text/i } )
-		).toBeVisible();
+			// Wait for additional delay for tooltip to appear
+			await sleep( ADDITIONAL_DELAY );
+			await waitExpectTooltipToShow();
 
-		await cleanupTooltip( user );
-	} );
+			// Hover outside of the anchor, tooltip should hide
+			await hoverOutside();
+			await waitExpectTooltipToHide();
+		} );
 
-	it( 'should show tooltip when an element is disabled', async () => {
-		const user = userEvent.setup();
+		it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {
+			const onMouseEnterMock = jest.fn();
+			const onMouseLeaveMock = jest.fn();
+			const HOVER_OUTSIDE_ANTICIPATION = 200;
 
-		render(
-			<Tooltip { ...props }>
-				<Button aria-disabled>Button</Button>
-			</Tooltip>
-		);
-
-		const button = screen.getByRole( 'button', { name: /Button/i } );
-
-		expect( button ).toBeVisible();
-		expect( button ).toHaveAttribute( 'aria-disabled' );
-
-		await user.hover( button );
-
-		expect(
-			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
-		).toBeVisible();
-
-		await cleanupTooltip( user );
-	} );
-
-	it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {
-		const user = userEvent.setup();
-		const onMouseEnterMock = jest.fn();
-		const onMouseLeaveMock = jest.fn();
-		const MOUSE_LEAVE_DELAY = TOOLTIP_DELAY - 200;
-
-		render(
-			<>
+			render(
 				<Tooltip { ...props }>
 					<Button
 						onMouseEnter={ onMouseEnterMock }
 						onMouseLeave={ onMouseLeaveMock }
 					>
-						Button 1
+						Tooltip anchor
 					</Button>
 				</Tooltip>
-				<Button>Button 2</Button>
-			</>
-		);
+			);
 
-		await user.hover(
-			screen.getByRole( 'button', {
-				name: 'Button 1',
-			} )
-		);
+			const anchor = screen.getByRole( 'button', {
+				name: 'Tooltip anchor',
+			} );
+			expect( anchor ).toBeVisible();
 
-		// Tooltip hasn't appeared yet
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
-		expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
+			// Hover over the anchor, tooltip hasn't appeared yet
+			await hover( anchor );
+			expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
+			expectTooltipToBeHidden();
 
-		// Advance time by MOUSE_LEAVE_DELAY time
-		await new Promise( ( resolve ) =>
-			setTimeout( resolve, MOUSE_LEAVE_DELAY )
-		);
+			// Advance time, tooltip hasn't appeared yet because TOOLTIP_DELAY time
+			// hasn't passed yet
+			await sleep( TOOLTIP_DELAY - HOVER_OUTSIDE_ANTICIPATION );
+			expectTooltipToBeHidden();
 
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
+			// Hover outside of the anchor, tooltip still hasn't appeared yet
+			await hoverOutside();
+			expectTooltipToBeHidden();
 
-		// Hover the other button, meaning that the mouse will leave the tooltip anchor
-		await user.hover(
-			screen.getByRole( 'button', {
-				name: 'Button 2',
-			} )
-		);
+			expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
+			expect( onMouseLeaveMock ).toHaveBeenCalledTimes( 1 );
 
-		// Tooltip still hasn't appeared yet
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
-		expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
-		expect( onMouseLeaveMock ).toHaveBeenCalledTimes( 1 );
+			// Advance time again, so that we reach the full TOOLTIP_DELAY time
+			await sleep( HOVER_OUTSIDE_ANTICIPATION );
 
-		// Advance time again, so that we reach the full TOOLTIP_DELAY time
-		await new Promise( ( resolve ) =>
-			setTimeout( resolve, TOOLTIP_DELAY )
-		);
-
-		// Tooltip won't show, since the mouse has left the tooltip anchor
-		expect(
-			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
-		).not.toBeInTheDocument();
-
-		await cleanupTooltip( user );
+			// Tooltip won't show, since the mouse has left the tooltip anchor
+			expectTooltipToBeHidden();
+		} );
 	} );
 
-	it( 'should render the shortcut display text when a string is passed as the shortcut', async () => {
-		const user = userEvent.setup();
+	describe( 'shortcut', () => {
+		it( 'should show the shortcut in the tooltip when a string is passed as the shortcut', async () => {
+			render( <Tooltip { ...props } shortcut="shortcut text" /> );
 
-		render( <Tooltip { ...props } shortcut="shortcut text" /> );
+			// Hover over the anchor, tooltip should show
+			await hover(
+				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
+			);
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'tooltip', {
+						name: 'tooltip text shortcut text',
+					} )
+				).toBeVisible()
+			);
 
-		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
+			// Hover outside of the anchor, tooltip should hide
+			await hoverOutside();
+			await waitExpectTooltipToHide();
+		} );
 
-		await waitFor( () =>
-			expect( screen.getByText( 'shortcut text' ) ).toBeVisible()
-		);
+		it( 'should show the shortcut in the tooltip when an object is passed as the shortcut', async () => {
+			render(
+				<Tooltip
+					{ ...props }
+					shortcut={ {
+						display: '⇧⌘,',
+						ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
+					} }
+				/>
+			);
 
-		await cleanupTooltip( user );
-	} );
-
-	it( 'should render the keyboard shortcut display text and aria-label when an object is passed as the shortcut', async () => {
-		const user = userEvent.setup();
-
-		render(
-			<Tooltip
-				{ ...props }
-				shortcut={ {
-					display: '⇧⌘,',
-					ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
-				} }
-			/>
-		);
-
-		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
-
-		await waitFor( () =>
-			expect( screen.getByText( '⇧⌘,' ) ).toBeVisible()
-		);
-
-		expect( screen.getByText( '⇧⌘,' ) ).toHaveAttribute(
-			'aria-label',
-			'Control + Shift + Comma'
-		);
-
-		await cleanupTooltip( user );
-	} );
-
-	it( 'esc should close modal even when tooltip is visible', async () => {
-		const user = userEvent.setup();
-		const onRequestClose = jest.fn();
-		render(
-			<Modal onRequestClose={ onRequestClose }>
-				<p>Modal content</p>
-			</Modal>
-		);
-
-		expect(
-			screen.queryByRole( 'tooltip', { name: /close/i } )
-		).not.toBeInTheDocument();
-
-		await user.hover(
-			screen.getByRole( 'button', {
-				name: /Close/i,
-			} )
-		);
-
-		await waitFor( () =>
+			// Hover over the anchor, tooltip should show
+			await hover(
+				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
+			);
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'tooltip', {
+						name: 'tooltip text Control + Shift + Comma',
+					} )
+				).toBeVisible()
+			);
 			expect(
-				screen.getByRole( 'tooltip', { name: /close/i } )
-			).toBeVisible()
-		);
+				screen.getByRole( 'tooltip', {
+					name: 'tooltip text Control + Shift + Comma',
+				} )
+			).toHaveTextContent( /⇧⌘,/i );
 
-		await user.keyboard( '[Escape]' );
-
-		expect( onRequestClose ).toHaveBeenCalled();
-
-		await cleanupTooltip( user );
+			// Hover outside of the anchor, tooltip should hide
+			await hoverOutside();
+			await waitExpectTooltipToHide();
+		} );
 	} );
 
-	it( 'should associate the tooltip text with its anchor via the accessible description when visible', async () => {
-		const user = userEvent.setup();
+	describe( 'event propagation', () => {
+		it( 'should close the parent dialog component when pressing the Escape key while the tooltip is visible', async () => {
+			const onRequestClose = jest.fn();
+			render(
+				<Modal onRequestClose={ onRequestClose }>
+					<p>Modal content</p>
+				</Modal>
+			);
 
-		render( <Tooltip { ...props } /> );
+			expectTooltipToBeHidden();
 
-		await user.hover(
-			screen.getByRole( 'button', {
-				name: /Button/i,
-			} )
-		);
+			const closeButton = screen.getByRole( 'button', {
+				name: /close/i,
+			} );
 
-		expect(
-			await screen.findByRole( 'button', { description: 'tooltip text' } )
-		).toBeInTheDocument();
-	} );
+			// Hover over the anchor, tooltip should show
+			await hover( closeButton );
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'tooltip', { name: /close/i } )
+				).toBeVisible()
+			);
 
-	it( 'should not hide tooltip when the anchor is clicked if hideOnClick is false', async () => {
-		const user = userEvent.setup();
+			// Press the Escape key, Modal should request to be closed
+			await press.Escape();
+			expect( onRequestClose ).toHaveBeenCalled();
 
-		render( <Tooltip { ...props } hideOnClick={ false } /> );
-
-		const button = screen.getByRole( 'button', { name: /Button/i } );
-
-		await user.hover( button );
-
-		expect(
-			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
-		).toBeVisible();
-
-		await user.click( button );
-
-		expect(
-			screen.getByRole( 'tooltip', { name: /tooltip text/i } )
-		).toBeVisible();
-
-		await cleanupTooltip( user );
+			// Hover outside of the anchor, tooltip should hide
+			await hoverOutside();
+			await waitExpectTooltipToHide();
+		} );
 	} );
 } );

@@ -524,7 +524,7 @@ export const openGeneralSidebar =
 	( { dispatch, registry } ) => {
 		const isDistractionFree = registry
 			.select( preferencesStore )
-			.get( 'core/edit-site', 'distractionFree' );
+			.get( 'core', 'distractionFree' );
 		if ( isDistractionFree ) {
 			dispatch.toggleDistractionFree();
 		}
@@ -561,7 +561,7 @@ export const switchEditorMode =
 		} else if ( mode === 'text' ) {
 			const isDistractionFree = registry
 				.select( preferencesStore )
-				.get( 'core/edit-site', 'distractionFree' );
+				.get( 'core', 'distractionFree' );
 			if ( isDistractionFree ) {
 				dispatch.toggleDistractionFree();
 			}
@@ -602,12 +602,12 @@ export const toggleDistractionFree =
 	( { dispatch, registry } ) => {
 		const isDistractionFree = registry
 			.select( preferencesStore )
-			.get( 'core/edit-site', 'distractionFree' );
+			.get( 'core', 'distractionFree' );
 		if ( ! isDistractionFree ) {
 			registry.batch( () => {
 				registry
 					.dispatch( preferencesStore )
-					.set( 'core/edit-site', 'fixedToolbar', true );
+					.set( 'core', 'fixedToolbar', true );
 				registry.dispatch( editorStore ).setIsInserterOpened( false );
 				registry.dispatch( editorStore ).setIsListViewOpened( false );
 				dispatch.closeGeneralSidebar();
@@ -616,11 +616,7 @@ export const toggleDistractionFree =
 		registry.batch( () => {
 			registry
 				.dispatch( preferencesStore )
-				.set(
-					'core/edit-site',
-					'distractionFree',
-					! isDistractionFree
-				);
+				.set( 'core', 'distractionFree', ! isDistractionFree );
 			registry
 				.dispatch( noticesStore )
 				.createInfoNotice(

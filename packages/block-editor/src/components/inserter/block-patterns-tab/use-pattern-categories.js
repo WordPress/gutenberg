@@ -14,7 +14,7 @@ import {
 	isPatternFiltered,
 	allPatternsCategory,
 	myPatternsCategory,
-	PATTERN_TYPES,
+	INSERTER_PATTERN_TYPES,
 } from './utils';
 
 function hasRegisteredCategory( pattern, allCategories ) {
@@ -69,7 +69,7 @@ export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 		}
 		if (
 			filteredPatterns.some(
-				( pattern ) => pattern.type === PATTERN_TYPES.user
+				( pattern ) => pattern.type === INSERTER_PATTERN_TYPES.user
 			)
 		) {
 			categories.unshift( myPatternsCategory );

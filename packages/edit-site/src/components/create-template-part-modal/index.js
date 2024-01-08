@@ -39,11 +39,25 @@ import {
 } from '../../utils/template-part-create';
 
 export default function CreateTemplatePartModal( {
+	modalTitle = __( 'Create template part' ),
+	...restProps
+} ) {
+	return (
+		<Modal
+			title={ modalTitle }
+			onRequestClose={ restProps.closeModal }
+			overlayClassName="edit-site-create-template-part-modal"
+		>
+			<CreateTemplatePartModalContents { ...restProps } />
+		</Modal>
+	);
+}
+
+export function CreateTemplatePartModalContents( {
 	defaultArea = TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 	blocks = [],
 	confirmLabel = __( 'Create' ),
 	closeModal,
-	modalTitle = __( 'Create template part' ),
 	onCreate,
 	onError,
 	defaultTitle = '',
@@ -62,7 +76,6 @@ export default function CreateTemplatePartModal( {
 			select( editorStore ).__experimentalGetDefaultTemplatePartAreas(),
 		[]
 	);
-
 	async function createTemplatePart() {
 		if ( ! title || isSubmitting ) {
 			return;
@@ -105,91 +118,79 @@ export default function CreateTemplatePartModal( {
 			setIsSubmitting( false );
 		}
 	}
-
 	return (
-		<Modal
-			title={ modalTitle }
-			onRequestClose={ closeModal }
-			overlayClassName="edit-site-create-template-part-modal"
+		<form
+			onSubmit={ async ( event ) => {
+				event.preventDefault();
+				await createTemplatePart();
+			} }
 		>
-			<form
-				onSubmit={ async ( event ) => {
-					event.preventDefault();
-					await createTemplatePart();
-				} }
-			>
-				<VStack spacing="4">
-					<TextControl
-						__nextHasNoMarginBottom
-						label={ __( 'Name' ) }
-						value={ title }
-						onChange={ setTitle }
-						required
-					/>
-					<BaseControl
+			<VStack spacing="4">
+				<TextControl
+					__nextHasNoMarginBottom
+					label={ __( 'Name' ) }
+					value={ title }
+					onChange={ setTitle }
+					required
+				/>
+				<BaseControl
+					label={ __( 'Area' ) }
+					id={ `edit-site-create-template-part-modal__area-selection-${ instanceId }` }
+					className="edit-site-create-template-part-modal__area-base-control"
+				>
+					<RadioGroup
 						label={ __( 'Area' ) }
+						className="edit-site-create-template-part-modal__area-radio-group"
 						id={ `edit-site-create-template-part-modal__area-selection-${ instanceId }` }
-						className="edit-site-create-template-part-modal__area-base-control"
+						onChange={ setArea }
+						checked={ area }
 					>
-						<RadioGroup
-							label={ __( 'Area' ) }
-							className="edit-site-create-template-part-modal__area-radio-group"
-							id={ `edit-site-create-template-part-modal__area-selection-${ instanceId }` }
-							onChange={ setArea }
-							checked={ area }
-						>
-							{ templatePartAreas.map(
-								( {
-									icon,
-									label,
-									area: value,
-									description,
-								} ) => (
-									<Radio
-										key={ label }
-										value={ value }
-										className="edit-site-create-template-part-modal__area-radio"
-									>
-										<Flex align="start" justify="start">
-											<FlexItem>
-												<Icon icon={ icon } />
-											</FlexItem>
-											<FlexBlock className="edit-site-create-template-part-modal__option-label">
-												{ label }
-												<div>{ description }</div>
-											</FlexBlock>
+						{ templatePartAreas.map(
+							( { icon, label, area: value, description } ) => (
+								<Radio
+									key={ label }
+									value={ value }
+									className="edit-site-create-template-part-modal__area-radio"
+								>
+									<Flex align="start" justify="start">
+										<FlexItem>
+											<Icon icon={ icon } />
+										</FlexItem>
+										<FlexBlock className="edit-site-create-template-part-modal__option-label">
+											{ label }
+											<div>{ description }</div>
+										</FlexBlock>
 
-											<FlexItem className="edit-site-create-template-part-modal__checkbox">
-												{ area === value && (
-													<Icon icon={ check } />
-												) }
-											</FlexItem>
-										</Flex>
-									</Radio>
-								)
-							) }
-						</RadioGroup>
-					</BaseControl>
-					<HStack justify="right">
-						<Button
-							variant="tertiary"
-							onClick={ () => {
-								closeModal();
-							} }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							variant="primary"
-							type="submit"
-							aria-disabled={ ! title || isSubmitting }
-							isBusy={ isSubmitting }
-						>
-							{ confirmLabel }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
-		</Modal>
+										<FlexItem className="edit-site-create-template-part-modal__checkbox">
+											{ area === value && (
+												<Icon icon={ check } />
+											) }
+										</FlexItem>
+									</Flex>
+								</Radio>
+							)
+						) }
+					</RadioGroup>
+				</BaseControl>
+				<HStack justify="right">
+					<Button
+						variant="tertiary"
+						onClick={ () => {
+							closeModal();
+						} }
+					>
+						{ __( 'Cancel' ) }
+					</Button>
+					<Button
+						variant="primary"
+						type="submit"
+						aria-disabled={ ! title || isSubmitting }
+						isBusy={ isSubmitting }
+					>
+						{ confirmLabel }
+					</Button>
+				</HStack>
+			</VStack>
+		</form>
 	);
 }
