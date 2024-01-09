@@ -83,6 +83,7 @@ function DocumentTools() {
 			className="edit-widgets-header-toolbar"
 			aria-label={ __( 'Document tools' ) }
 			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
+			variant="unstyled"
 		>
 			<ToolbarItem
 				ref={ inserterButton }
