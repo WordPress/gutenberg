@@ -344,7 +344,11 @@
 	li:focus-within {
 		.dataviews-view-list__details-button {
 			opacity: 1;
+		}
+	}
 
+	li.is-selected {
+		.dataviews-view-list__details-button {
 			&:focus {
 				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) currentColor;
 			}
