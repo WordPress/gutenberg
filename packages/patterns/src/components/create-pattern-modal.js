@@ -162,7 +162,11 @@ export function CreatePatternModalContents( {
 			invalidateResolution( 'getUserPatternCategories' );
 			return newTerm.id;
 		} catch ( error ) {
-			throw error;
+			if ( error.code !== 'term_exists' ) {
+				throw error;
+			}
+
+			return error.data.term_id;
 		}
 	}
 	return (
