@@ -18,6 +18,10 @@ builder( {
 		// This is an IE-only feature which we don't use, and don't want to polyfill.
 		// @see https://github.com/WordPress/gutenberg/pull/49234
 		'web.immediate',
+		// Stage 3 JSON.rawJSON / JSON.isRawJSON polyfill slows down certain usages
+		// of JSON serialization and deserialization.
+		// @see https://github.com/WordPress/gutenberg/issues/57247
+		/^esnext\.json\./,
 	],
 	targets: require( '@wordpress/browserslist-config' ),
 	filename: './build/polyfill.js',
