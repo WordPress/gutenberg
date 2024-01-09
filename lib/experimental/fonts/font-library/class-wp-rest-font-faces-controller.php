@@ -7,7 +7,7 @@
  * @since 6.5.0
  */
 
-if ( class_exists( 'WP_REST_Font_Families_Controller' ) ) {
+if ( class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 	return;
 }
 
