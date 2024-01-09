@@ -57,7 +57,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'get_font_faces_permissions_check' ),
-					'args'                => $this->get_collection_params(),
+					'args'                => array(),
 				),
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
