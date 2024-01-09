@@ -392,9 +392,7 @@ function ViewTable( {
 	onSelectionChange,
 	labels,
 } ) {
-	const hasBulkActions = useMemo( () => {
-		return actions?.some( ( action ) => action.supportsBulk );
-	}, [ actions ] );
+	const hasBulkActions = actions?.some( ( action ) => action.supportsBulk );
 	const headerMenuRefs = useRef( new Map() );
 	const headerMenuToFocusRef = useRef();
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] = useState();

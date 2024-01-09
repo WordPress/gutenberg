@@ -70,18 +70,26 @@ export function useResetTemplateAction() {
 						}
 					);
 				} catch ( error ) {
-					const fallbackErrorMessage =
-						templates[ 0 ].type === TEMPLATE_POST_TYPE
-							? _n(
-									'An error occurred while reverting the template.',
-									'An error occurred while reverting the templates.',
-									templates.length
-							  )
-							: _n(
-									'An error occurred while reverting the template part.',
-									'An error occurred while reverting the template parts.',
-									templates.length
-							  );
+					let fallbackErrorMessage;
+					if ( templates[ 0 ].type === TEMPLATE_POST_TYPE ) {
+						fallbackErrorMessage =
+							templates.length === 1
+								? __(
+										'An error occurred while reverting the template.'
+								  )
+								: __(
+										'An error occurred while reverting the templates.'
+								  );
+					} else {
+						fallbackErrorMessage =
+							templates.length === 1
+								? __(
+										'An error occurred while reverting the template part.'
+								  )
+								: __(
+										'An error occurred while reverting the template parts.'
+								  );
+					}
 					const errorMessage =
 						error.message && error.code !== 'unknown_error'
 							? error.message
@@ -118,17 +126,19 @@ export const deleteTemplateAction = {
 				<Text>
 					{ templates.length > 1
 						? sprintf(
-								// translators: %s: The template or template part's title.
-								__(
-									'Are you sure you want to delete %s items?'
+								// translators: %d: number of items to delete.
+								_n(
+									'delete %d item?',
+									'delete %d items?',
+									templates.length
 								),
 								templates.length
 						  )
 						: sprintf(
-								// translators: %s: The template or template part's title.
-								__( 'Are you sure you want to delete "%s"?' ),
+								// translators: %s: The template or template part's titles
+								__( 'delete "%s"?' ),
 								decodeEntities(
-									templates && templates[ 0 ]?.title?.rendered
+									templates?.[ 0 ]?.title?.rendered
 								)
 						  ) }
 				</Text>
@@ -153,9 +163,7 @@ export const deleteTemplateAction = {
 										} )
 									);
 									createSuccessNotice(
-										__(
-											'The selected items were deleted with success.'
-										),
+										__( 'Items deleted.' ),
 										{
 											type: 'snackbar',
 											id: 'edit-site-page-trashed',
