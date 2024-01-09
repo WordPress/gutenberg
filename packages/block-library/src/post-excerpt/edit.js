@@ -241,7 +241,7 @@ export default function PostExcerptEditor( {
 					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
-						label={ __( 'Count Excerpt Characters Length' ) }
+						label={ __( 'Set Character Length' ) }
 						checked={ countExcerptCharactersLength }
 						onChange={ ( newCountExcerptCharactersLength ) => {
 							setAttributes( {
@@ -262,7 +262,7 @@ export default function PostExcerptEditor( {
 								} );
 							} }
 							min="10"
-							max="600"
+							max="1000"
 						/>
 					) : (
 						<RangeControl
