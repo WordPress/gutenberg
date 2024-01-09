@@ -135,19 +135,20 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 	}
 
 	$class_name = wp_get_elements_class_name( $block );
+	$class_name = ".$class_name.$class_name";
 
 	$element_types = array(
 		'button'  => array(
-			'selector' => ".$class_name .wp-element-button, .$class_name .wp-block-button__link",
+			'selector' => "$class_name .wp-element-button, $class_name .wp-block-button__link",
 			'skip'     => $skip_button_color_serialization,
 		),
 		'link'    => array(
-			'selector'       => ".$class_name a",
-			'hover_selector' => ".$class_name a:hover",
+			'selector'       => "$class_name a",
+			'hover_selector' => "$class_name a:hover",
 			'skip'           => $skip_link_color_serialization,
 		),
 		'heading' => array(
-			'selector' => ".$class_name h1, .$class_name h2, .$class_name h3, .$class_name h4, .$class_name h5, .$class_name h6",
+			'selector' => "$class_name h1, $class_name h2, $class_name h3, $class_name h4, $class_name h5, $class_name h6",
 			'skip'     => $skip_heading_color_serialization,
 			'elements' => array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ),
 		),
@@ -190,7 +191,7 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 					gutenberg_style_engine_get_styles(
 						$element_style_object,
 						array(
-							'selector' => ".$class_name $element",
+							'selector' => "$class_name $element",
 							'context'  => 'block-supports',
 						)
 					);
