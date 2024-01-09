@@ -45,38 +45,40 @@
 	align-items: center;
 	justify-content: center;
 	flex-shrink: 2;
-	overflow-x: hidden;
-	padding-left: $grid-unit-20;
+	overflow: hidden;
+	// Leave enough room at the top and bottom for the focus ring to show.
+	padding: 2px 0 2px $grid-unit-20;
+
+	@include break-medium() {
+		padding-left: $grid-unit-50 * 0.5;
+	}
 }
 
 .edit-widgets-header__title {
 	font-size: 20px;
 	padding: 0;
-	margin: 0 20px 0 0;
+	margin: 0 $grid-unit-20 0 0;
 }
 
 .edit-widgets-header__actions {
 	display: flex;
 	align-items: center;
 	padding-right: $grid-unit-20;
-	gap: $grid-unit-05;
-
-	@include break-small() {
-		gap: $grid-unit-10;
-	}
+	gap: $grid-unit-10;
 }
 
 .edit-widgets-header-toolbar {
-	border: none;
+	gap: $grid-unit-10;
+	margin-right: $grid-unit-10;
 
 	// The Toolbar component adds different styles to buttons, so we reset them
 	// here to the original button styles
 	// Specificity bump needed to offset https://github.com/WordPress/gutenberg/blob/8ea29cb04412c80c9adf7c1db0e816d6a0ac1232/packages/components/src/toolbar/style.scss#L76
 	> .components-button.has-icon.has-icon.has-icon,
 	> .components-dropdown > .components-button.has-icon.has-icon {
-		height: $button-size;
-		min-width: $button-size;
-		padding: 6px;
+		height: $button-size-compact;
+		min-width: $button-size-compact;
+		padding: 4px;
 
 		&.is-pressed {
 			background: $gray-900;
