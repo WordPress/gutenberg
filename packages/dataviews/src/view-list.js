@@ -59,7 +59,7 @@ export default function ViewList( {
 							'is-selected': selection.includes( item.id ),
 						} ) }
 					>
-						<HStack className="dataviews-list-view__item-wrapper">
+						<HStack className="dataviews-view-list__item-wrapper">
 							<div
 								role="button"
 								tabIndex={ 0 }

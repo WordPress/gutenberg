@@ -228,7 +228,7 @@
 	li {
 		margin: 0;
 
-		.dataviews-list-view__item-wrapper {
+		.dataviews-view-list__item-wrapper {
 			position: relative;
 			padding-right: $grid-unit-30;
 			border-radius: $grid-unit-05;
@@ -247,7 +247,7 @@
 		&:not(.is-selected):hover {
 			color: var(--wp-admin-theme-color);
 
-			.dataviews-list-view__fields {
+			.dataviews-view-list__fields {
 				color: var(--wp-admin-theme-color);
 			}
 		}
@@ -255,11 +255,11 @@
 
 	li.is-selected,
 	li.is-selected:focus-within {
-		.dataviews-list-view__item-wrapper {
+		.dataviews-view-list__item-wrapper {
 			background-color: var(--wp-admin-theme-color);
 			color: $white;
 
-			.dataviews-list-view__fields,
+			.dataviews-view-list__fields,
 			.components-button {
 				color: $white;
 			}
@@ -334,7 +334,7 @@
 		}
 	}
 
-	.dataviews-list-view__details-button {
+	.dataviews-view-list__details-button {
 		align-self: center;
 		opacity: 0;
 	}
@@ -342,7 +342,7 @@
 	li.is-selected,
 	li:hover,
 	li:focus-within {
-		.dataviews-list-view__details-button {
+		.dataviews-view-list__details-button {
 			opacity: 1;
 		}
 	}
