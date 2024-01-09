@@ -61,11 +61,7 @@ export default function SidebarNavigationScreenMain() {
 						</SidebarNavigationItemGlobalStyles>
 						<NavigatorButton
 							as={ SidebarNavigationItem }
-							path={
-								window?.__experimentalAdminViews
-									? '/pages'
-									: '/page'
-							}
+							path="/page"
 							withChevron
 							icon={ page }
 						>
