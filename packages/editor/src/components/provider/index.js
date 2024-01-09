@@ -187,12 +187,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					}
 				);
 			}
+			// Not sure if the missing no dependencies here is deliberate or not so ignoring lint warning for now.
+			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [] );
 
 		// Synchronizes the active post with the state
 		useEffect( () => {
 			setEditedPost( post.type, post.id );
-		}, [ post.type, post.id ] );
+		}, [ post.type, post.id, setEditedPost ] );
 
 		// Synchronize the editor settings as they change.
 		useEffect( () => {
@@ -208,7 +210,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		useEffect( () => {
 			setRenderingMode(
 				settings.defaultRenderingMode ?? post.type === 'wp_template'
-					? 'template-only'
+					? 'all'
 					: 'post-only'
 			);
 		}, [ settings.defaultRenderingMode, setRenderingMode, post.type ] );

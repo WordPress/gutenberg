@@ -1404,13 +1404,12 @@ _Returns_
 Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
 
 -   `all`: This is the default mode. It renders the post editor with all the features available. If a template is provided, it's preferred over the post.
--   `template-only`: This mode renders the editor with only the template blocks visible.
 -   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
 -   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
 
 _Parameters_
 
--   _mode_ `string`: Mode (one of 'template-only', 'post-only', 'template-locked' or 'all').
+-   _mode_ `string`: Mode (one of 'post-only', 'template-locked' or 'all').
 
 ### setTemplateValidity
 
