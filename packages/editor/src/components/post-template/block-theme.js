@@ -38,12 +38,11 @@ export default function BlockThemeControl( { id } ) {
 		'wp_template',
 		id
 	);
-	const { getEditorSettings } = useSelect( editorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { setRenderingMode } = useDispatch( editorStore );
 	const editTemplate = getPostLinkProps
 		? getPostLinkProps( {
-				postId: template.wp_id,
+				postId: template.id,
 				postType: 'wp_template',
 				canvas: 'edit',
 		  } )
@@ -77,16 +76,6 @@ export default function BlockThemeControl( { id } ) {
 									),
 									{
 										type: 'snackbar',
-										actions: [
-											{
-												label: __( 'Go back' ),
-												onClick: () =>
-													setRenderingMode(
-														getEditorSettings()
-															.defaultRenderingMode
-													),
-											},
-										],
 									}
 								);
 							} }

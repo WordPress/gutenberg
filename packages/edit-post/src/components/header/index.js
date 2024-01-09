@@ -64,7 +64,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		hasBlockSelection,
 		hasActiveMetaboxes,
 		hasFixedToolbar,
-		isEditingTemplate,
 		isPublishSidebarOpened,
 		showIconLabels,
 		hasHistory,
@@ -78,8 +77,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			hasHistory: !! select( editorStore ).getEditorSettings().goBack,
-			isEditingTemplate:
-				select( editorStore ).getRenderingMode() === 'template-only',
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
@@ -120,8 +117,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 								'selected-block-tools-wrapper',
 								{
 									'is-collapsed':
-										isEditingTemplate &&
-										isBlockToolsCollapsed,
+										hasHistory && isBlockToolsCollapsed,
 								}
 							) }
 						>
@@ -131,7 +127,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 							ref={ blockToolbarRef }
 							name="block-toolbar"
 						/>
-						{ isEditingTemplate && hasBlockSelection && (
+						{ hasHistory && hasBlockSelection && (
 							<Button
 								className="edit-post-header__block-tools-toggle"
 								icon={ isBlockToolsCollapsed ? next : previous }
@@ -152,7 +148,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				<div
 					className={ classnames( 'edit-post-header__center', {
 						'is-collapsed':
-							isEditingTemplate &&
+							hasHistory &&
 							hasBlockSelection &&
 							! isBlockToolsCollapsed &&
 							hasFixedToolbar &&

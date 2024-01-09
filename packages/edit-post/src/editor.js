@@ -56,13 +56,13 @@ function Editor( {
 				select( coreStore );
 			const { getEditorSettings } = select( editorStore );
 			const { getBlockTypes } = select( blocksStore );
-			const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
+			const isTemplatePart = [ 'wp_template_part' ].includes(
 				currentPost.postType
 			);
 			// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
 			// to avoid the special case.
 			let postObject;
-			if ( isTemplate ) {
+			if ( isTemplatePart ) {
 				const posts = getEntityRecords(
 					'postType',
 					currentPost.postType,
@@ -92,7 +92,10 @@ function Editor( {
 				hiddenBlockTypes: getHiddenBlockTypes(),
 				blockTypes: getBlockTypes(),
 				template:
-					supportsTemplateMode && isViewable && canEditTemplate
+					supportsTemplateMode &&
+					isViewable &&
+					canEditTemplate &&
+					currentPost.postType === 'post'
 						? getEditedPostTemplate()
 						: null,
 				post: postObject,
