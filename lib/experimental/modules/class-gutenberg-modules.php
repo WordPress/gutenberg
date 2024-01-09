@@ -457,7 +457,7 @@ function gutenberg_register_view_module_ids_rest_field() {
 		'view_module_ids',
 		array(
 			'get_callback' => function ( $item ) {
-				 $block_type = WP_Block_Type_Registry::get_instance()->get_registered( $item['name'] );
+				$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $item['name'] );
 				if ( isset( $block_type->view_module_ids ) ) {
 					return $block_type->view_module_ids;
 				}
