@@ -490,7 +490,7 @@ export default function useListViewDropZone( {
 	const throttled = useThrottle(
 		useCallback(
 			( event, currentTarget ) => {
-				const position = { x: event.clientX, y: event.clientY };
+				let position = { x: event.clientX, y: event.clientY };
 				const isBlockDrag = !! draggedBlockClientIds?.length;
 
 				const blockElements = Array.from(
@@ -530,6 +530,22 @@ export default function useListViewDropZone( {
 							: true,
 					};
 				} );
+
+				const { ownerDocument } = currentTarget || {};
+				const dragChipBlockElement = ownerDocument?.querySelector(
+					'.components-draggable-cloned-element .block-editor-block-icon'
+				);
+
+				if ( dragChipBlockElement ) {
+					const dragChipBlockRect =
+						dragChipBlockElement.getBoundingClientRect();
+					position = {
+						x: rtl
+							? dragChipBlockRect.right
+							: dragChipBlockRect.left,
+						y: dragChipBlockRect.top + dragChipBlockRect.height / 2,
+					};
+				}
 
 				const newTarget = getListViewDropTarget(
 					blocksData,

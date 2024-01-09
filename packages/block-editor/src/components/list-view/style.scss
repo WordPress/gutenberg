@@ -518,6 +518,18 @@ $block-navigation-max-indent: 8;
 	}
 }
 
+.block-editor-list-view-drop-indicator--vertical {
+	pointer-events: none;
+
+	.block-editor-list-view-drop-indicator__line {
+		background: var(--wp-admin-theme-color);
+		padding: 4px 0;
+		height: 28px;
+		width: 4px;
+		border-radius: 4px;
+	}
+}
+
 .block-editor-list-view-placeholder {
 	padding: 0;
 	margin: 0;
