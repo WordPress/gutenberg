@@ -1,12 +1,13 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { paramCase as kebabCase } from 'change-case';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
+import { unlock } from '../../../../lock-unlock';
 
 export function setUIValuesNeeded( font, extraValues = {} ) {
 	if ( ! font.name && ( font.fontFamily || font.slug ) ) {
@@ -129,25 +130,21 @@ export function getDisplaySrcFromFontFace( input, urlPrefix ) {
 	return src;
 }
 
-// This function replicates one behavior of _wp_to_kebab_case().
-// Additional context: https://github.com/WordPress/gutenberg/issues/53695
-export function wpKebabCase( str ) {
-	// If a string contains a digit followed by a number, insert a dash between them.
-	return kebabCase( str ).replace(
-		/([a-zA-Z])(\d)|(\d)([a-zA-Z])/g,
-		'$1$3-$2$4'
-	);
-}
-
-export function makeFormDataFromFontFamilies( fontFamilies ) {
+export function makeFormDataFromFontFamily( fontFamily ) {
 	const formData = new FormData();
-	const newFontFamilies = fontFamilies.map( ( family, familyIndex ) => {
-		family.slug = wpKebabCase( family.slug );
-		if ( family?.fontFace ) {
-			family.fontFace = family.fontFace.map( ( face, faceIndex ) => {
+	const { kebabCase } = unlock( componentsPrivateApis );
+
+	const newFontFamily = {
+		...fontFamily,
+		slug: kebabCase( fontFamily.slug ),
+	};
+
+	if ( newFontFamily?.fontFace ) {
+		const newFontFaces = newFontFamily.fontFace.map(
+			( face, faceIndex ) => {
 				if ( face.file ) {
 					// Slugified file name because the it might contain spaces or characters treated differently on the server.
-					const fileId = `file-${ familyIndex }-${ faceIndex }`;
+					const fileId = `file-${ faceIndex }`;
 					// Add the files to the formData
 					formData.append( fileId, face.file, face.file.name );
 					// remove the file object from the face object the file is referenced by the uploadedFile key
@@ -159,10 +156,11 @@ export function makeFormDataFromFontFamilies( fontFamilies ) {
 					return newFace;
 				}
 				return face;
-			} );
-		}
-		return family;
-	} );
-	formData.append( 'font_families', JSON.stringify( newFontFamilies ) );
+			}
+		);
+		newFontFamily.fontFace = newFontFaces;
+	}
+
+	formData.append( 'font_family_settings', JSON.stringify( newFontFamily ) );
 	return formData;
 }

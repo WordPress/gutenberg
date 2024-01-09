@@ -22,6 +22,7 @@ import { useDebouncedInput } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
@@ -44,7 +45,6 @@ function InserterMenu(
 		showMostUsedBlocks,
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
-		prioritizePatterns,
 	},
 	ref
 ) {
@@ -66,27 +66,18 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
-	const { showPatterns, inserterItems } = useSelect(
+	const { showPatterns } = useSelect(
 		( select ) => {
-			const { __experimentalGetAllowedPatterns, getInserterItems } =
-				select( blockEditorStore );
+			const { hasAllowedPatterns } = unlock( select( blockEditorStore ) );
 			return {
-				showPatterns: !! __experimentalGetAllowedPatterns(
-					destinationRootClientId
-				).length,
-				inserterItems: getInserterItems( destinationRootClientId ),
+				showPatterns: hasAllowedPatterns( destinationRootClientId ),
 			};
 		},
 		[ destinationRootClientId ]
 	);
-	const hasReusableBlocks = useMemo( () => {
-		return inserterItems.some(
-			( { category } ) => category === 'reusable'
-		);
-	}, [ inserterItems ] );
 
 	const mediaCategories = useMediaCategories( destinationRootClientId );
-	const showMedia = !! mediaCategories.length;
+	const showMedia = mediaCategories.length > 0;
 
 	const onInsert = useCallback(
 		( blocks, meta, shouldForceFocusBlock ) => {
@@ -191,17 +182,13 @@ function InserterMenu(
 		]
 	);
 
-	const getCurrentTab = useCallback(
-		( tab ) => {
-			if ( tab.name === 'blocks' ) {
-				return blocksTab;
-			} else if ( tab.name === 'patterns' ) {
-				return patternsTab;
-			} else if ( tab.name === 'media' ) {
-				return mediaTab;
-			}
-		},
-		[ blocksTab, patternsTab, mediaTab ]
+	const inserterTabsContents = useMemo(
+		() => ( {
+			blocks: blocksTab,
+			patterns: patternsTab,
+			media: mediaTab,
+		} ),
+		[ blocksTab, mediaTab, patternsTab ]
 	);
 
 	const searchRef = useRef();
@@ -215,9 +202,7 @@ function InserterMenu(
 		selectedTab === 'patterns' &&
 		! delayedFilterValue &&
 		selectedPatternCategory;
-	const showAsTabs =
-		! delayedFilterValue &&
-		( showPatterns || hasReusableBlocks || showMedia );
+	const showAsTabs = ! delayedFilterValue && ( showPatterns || showMedia );
 	const showMediaPanel =
 		selectedTab === 'media' &&
 		! delayedFilterValue &&
@@ -271,13 +256,10 @@ function InserterMenu(
 				{ showAsTabs && (
 					<InserterTabs
 						showPatterns={ showPatterns }
-						showReusableBlocks={ hasReusableBlocks }
 						showMedia={ showMedia }
-						prioritizePatterns={ prioritizePatterns }
 						onSelect={ handleSetSelectedTab }
-					>
-						{ getCurrentTab }
-					</InserterTabs>
+						tabsContents={ inserterTabsContents }
+					/>
 				) }
 				{ ! delayedFilterValue && ! showAsTabs && (
 					<div className="block-editor-inserter__no-tab-container">

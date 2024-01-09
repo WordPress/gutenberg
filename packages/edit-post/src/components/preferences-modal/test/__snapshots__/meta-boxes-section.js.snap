@@ -65,42 +65,46 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
     </h2>
   </legend>
   <div
-    class="interface-preferences-modal__option"
+    class="interface-preferences-modal__section-content"
   >
     <div
-      class="components-base-control components-toggle-control emotion-0 emotion-1"
+      class="interface-preferences-modal__option"
     >
       <div
-        class="components-base-control__field emotion-2 emotion-3"
+        class="components-base-control components-toggle-control emotion-0 emotion-1"
       >
         <div
-          class="components-flex components-h-stack emotion-4 emotion-5"
-          data-wp-c16t="true"
-          data-wp-component="HStack"
+          class="components-base-control__field emotion-2 emotion-3"
         >
-          <span
-            class="components-form-toggle"
-          >
-            <input
-              class="components-form-toggle__input"
-              id="inspector-toggle-control-0"
-              type="checkbox"
-            />
-            <span
-              class="components-form-toggle__track"
-            />
-            <span
-              class="components-form-toggle__thumb"
-            />
-          </span>
-          <label
-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+          <div
+            class="components-flex components-h-stack emotion-4 emotion-5"
             data-wp-c16t="true"
-            data-wp-component="FlexBlock"
-            for="inspector-toggle-control-0"
+            data-wp-component="HStack"
           >
-            Custom fields
-          </label>
+            <span
+              class="components-form-toggle"
+            >
+              <input
+                class="components-form-toggle__input"
+                id="inspector-toggle-control-0"
+                type="checkbox"
+              />
+              <span
+                class="components-form-toggle__track"
+              />
+              <span
+                class="components-form-toggle__thumb"
+              />
+            </span>
+            <label
+              class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+              data-wp-c16t="true"
+              data-wp-component="FlexBlock"
+              for="inspector-toggle-control-0"
+            >
+              Custom fields
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -173,126 +177,130 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
     </h2>
   </legend>
   <div
-    class="interface-preferences-modal__option"
+    class="interface-preferences-modal__section-content"
   >
     <div
-      class="components-base-control components-toggle-control emotion-0 emotion-1"
+      class="interface-preferences-modal__option"
     >
       <div
-        class="components-base-control__field emotion-2 emotion-3"
+        class="components-base-control components-toggle-control emotion-0 emotion-1"
       >
         <div
-          class="components-flex components-h-stack emotion-4 emotion-5"
-          data-wp-c16t="true"
-          data-wp-component="HStack"
+          class="components-base-control__field emotion-2 emotion-3"
         >
-          <span
-            class="components-form-toggle"
-          >
-            <input
-              class="components-form-toggle__input"
-              id="inspector-toggle-control-3"
-              type="checkbox"
-            />
-            <span
-              class="components-form-toggle__track"
-            />
-            <span
-              class="components-form-toggle__thumb"
-            />
-          </span>
-          <label
-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+          <div
+            class="components-flex components-h-stack emotion-4 emotion-5"
             data-wp-c16t="true"
-            data-wp-component="FlexBlock"
-            for="inspector-toggle-control-3"
+            data-wp-component="HStack"
           >
-            Custom fields
-          </label>
+            <span
+              class="components-form-toggle"
+            >
+              <input
+                class="components-form-toggle__input"
+                id="inspector-toggle-control-3"
+                type="checkbox"
+              />
+              <span
+                class="components-form-toggle__track"
+              />
+              <span
+                class="components-form-toggle__thumb"
+              />
+            </span>
+            <label
+              class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+              data-wp-c16t="true"
+              data-wp-component="FlexBlock"
+              for="inspector-toggle-control-3"
+            >
+              Custom fields
+            </label>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div
-    class="interface-preferences-modal__option"
-  >
     <div
-      class="components-base-control components-toggle-control emotion-0 emotion-1"
+      class="interface-preferences-modal__option"
     >
       <div
-        class="components-base-control__field emotion-2 emotion-3"
+        class="components-base-control components-toggle-control emotion-0 emotion-1"
       >
         <div
-          class="components-flex components-h-stack emotion-4 emotion-5"
-          data-wp-c16t="true"
-          data-wp-component="HStack"
+          class="components-base-control__field emotion-2 emotion-3"
         >
-          <span
-            class="components-form-toggle is-checked"
-          >
-            <input
-              checked=""
-              class="components-form-toggle__input"
-              id="inspector-toggle-control-4"
-              type="checkbox"
-            />
-            <span
-              class="components-form-toggle__track"
-            />
-            <span
-              class="components-form-toggle__thumb"
-            />
-          </span>
-          <label
-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+          <div
+            class="components-flex components-h-stack emotion-4 emotion-5"
             data-wp-c16t="true"
-            data-wp-component="FlexBlock"
-            for="inspector-toggle-control-4"
+            data-wp-component="HStack"
           >
-            Meta Box 1
-          </label>
+            <span
+              class="components-form-toggle is-checked"
+            >
+              <input
+                checked=""
+                class="components-form-toggle__input"
+                id="inspector-toggle-control-4"
+                type="checkbox"
+              />
+              <span
+                class="components-form-toggle__track"
+              />
+              <span
+                class="components-form-toggle__thumb"
+              />
+            </span>
+            <label
+              class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+              data-wp-c16t="true"
+              data-wp-component="FlexBlock"
+              for="inspector-toggle-control-4"
+            >
+              Meta Box 1
+            </label>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div
-    class="interface-preferences-modal__option"
-  >
     <div
-      class="components-base-control components-toggle-control emotion-0 emotion-1"
+      class="interface-preferences-modal__option"
     >
       <div
-        class="components-base-control__field emotion-2 emotion-3"
+        class="components-base-control components-toggle-control emotion-0 emotion-1"
       >
         <div
-          class="components-flex components-h-stack emotion-4 emotion-5"
-          data-wp-c16t="true"
-          data-wp-component="HStack"
+          class="components-base-control__field emotion-2 emotion-3"
         >
-          <span
-            class="components-form-toggle is-checked"
-          >
-            <input
-              checked=""
-              class="components-form-toggle__input"
-              id="inspector-toggle-control-5"
-              type="checkbox"
-            />
-            <span
-              class="components-form-toggle__track"
-            />
-            <span
-              class="components-form-toggle__thumb"
-            />
-          </span>
-          <label
-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+          <div
+            class="components-flex components-h-stack emotion-4 emotion-5"
             data-wp-c16t="true"
-            data-wp-component="FlexBlock"
-            for="inspector-toggle-control-5"
+            data-wp-component="HStack"
           >
-            Meta Box 2
-          </label>
+            <span
+              class="components-form-toggle is-checked"
+            >
+              <input
+                checked=""
+                class="components-form-toggle__input"
+                id="inspector-toggle-control-5"
+                type="checkbox"
+              />
+              <span
+                class="components-form-toggle__track"
+              />
+              <span
+                class="components-form-toggle__thumb"
+              />
+            </span>
+            <label
+              class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+              data-wp-c16t="true"
+              data-wp-component="FlexBlock"
+              for="inspector-toggle-control-5"
+            >
+              Meta Box 2
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -365,85 +373,89 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
     </h2>
   </legend>
   <div
-    class="interface-preferences-modal__option"
+    class="interface-preferences-modal__section-content"
   >
     <div
-      class="components-base-control components-toggle-control emotion-0 emotion-1"
+      class="interface-preferences-modal__option"
     >
       <div
-        class="components-base-control__field emotion-2 emotion-3"
+        class="components-base-control components-toggle-control emotion-0 emotion-1"
       >
         <div
-          class="components-flex components-h-stack emotion-4 emotion-5"
-          data-wp-c16t="true"
-          data-wp-component="HStack"
+          class="components-base-control__field emotion-2 emotion-3"
         >
-          <span
-            class="components-form-toggle is-checked"
-          >
-            <input
-              checked=""
-              class="components-form-toggle__input"
-              id="inspector-toggle-control-1"
-              type="checkbox"
-            />
-            <span
-              class="components-form-toggle__track"
-            />
-            <span
-              class="components-form-toggle__thumb"
-            />
-          </span>
-          <label
-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+          <div
+            class="components-flex components-h-stack emotion-4 emotion-5"
             data-wp-c16t="true"
-            data-wp-component="FlexBlock"
-            for="inspector-toggle-control-1"
+            data-wp-component="HStack"
           >
-            Meta Box 1
-          </label>
+            <span
+              class="components-form-toggle is-checked"
+            >
+              <input
+                checked=""
+                class="components-form-toggle__input"
+                id="inspector-toggle-control-1"
+                type="checkbox"
+              />
+              <span
+                class="components-form-toggle__track"
+              />
+              <span
+                class="components-form-toggle__thumb"
+              />
+            </span>
+            <label
+              class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+              data-wp-c16t="true"
+              data-wp-component="FlexBlock"
+              for="inspector-toggle-control-1"
+            >
+              Meta Box 1
+            </label>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div
-    class="interface-preferences-modal__option"
-  >
     <div
-      class="components-base-control components-toggle-control emotion-0 emotion-1"
+      class="interface-preferences-modal__option"
     >
       <div
-        class="components-base-control__field emotion-2 emotion-3"
+        class="components-base-control components-toggle-control emotion-0 emotion-1"
       >
         <div
-          class="components-flex components-h-stack emotion-4 emotion-5"
-          data-wp-c16t="true"
-          data-wp-component="HStack"
+          class="components-base-control__field emotion-2 emotion-3"
         >
-          <span
-            class="components-form-toggle is-checked"
-          >
-            <input
-              checked=""
-              class="components-form-toggle__input"
-              id="inspector-toggle-control-2"
-              type="checkbox"
-            />
-            <span
-              class="components-form-toggle__track"
-            />
-            <span
-              class="components-form-toggle__thumb"
-            />
-          </span>
-          <label
-            class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+          <div
+            class="components-flex components-h-stack emotion-4 emotion-5"
             data-wp-c16t="true"
-            data-wp-component="FlexBlock"
-            for="inspector-toggle-control-2"
+            data-wp-component="HStack"
           >
-            Meta Box 2
-          </label>
+            <span
+              class="components-form-toggle is-checked"
+            >
+              <input
+                checked=""
+                class="components-form-toggle__input"
+                id="inspector-toggle-control-2"
+                type="checkbox"
+              />
+              <span
+                class="components-form-toggle__track"
+              />
+              <span
+                class="components-form-toggle__thumb"
+              />
+            </span>
+            <label
+              class="components-flex-item components-flex-block components-toggle-control__label emotion-6 emotion-5"
+              data-wp-c16t="true"
+              data-wp-component="FlexBlock"
+              for="inspector-toggle-control-2"
+            >
+              Meta Box 2
+            </label>
+          </div>
         </div>
       </div>
     </div>

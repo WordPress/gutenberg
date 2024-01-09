@@ -202,11 +202,6 @@ class WP_Font_Family {
 	 *                     False if the download failed.
 	 */
 	private function download_asset( $url, $filename ) {
-		// Checks if the file to be downloaded has a font mime type.
-		if ( ! WP_Font_Family_Utils::has_font_mime_type( $filename ) ) {
-			return false;
-		}
-
 		// Include file with download_url() if function doesn't exist.
 		if ( ! function_exists( 'download_url' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -262,12 +257,6 @@ class WP_Font_Family {
 		// Remove the uploaded font asset reference from the font face definition
 		// because it is no longer needed.
 		unset( $new_font_face['uploadedFile'] );
-
-		// If the filename has no font mime type, don't move the file and
-		// return the font face definition without src to be ignored later.
-		if ( ! WP_Font_Family_Utils::has_font_mime_type( $filename ) ) {
-			return $new_font_face;
-		}
 
 		// Move the uploaded font asset from the temp folder to the fonts directory.
 		if ( ! function_exists( 'wp_handle_upload' ) ) {

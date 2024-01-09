@@ -217,22 +217,18 @@ function useEditUICommands() {
 		isListViewOpen,
 		isDistractionFree,
 	} = useSelect( ( select ) => {
-		const { isListViewOpened, getEditorMode } = select( editSiteStore );
+		const { get } = select( preferencesStore );
+		const { getEditorMode } = select( editSiteStore );
+		const { isListViewOpened } = select( editorStore );
 		return {
 			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
 			editorMode: getEditorMode(),
 			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
 				editSiteStore.name
 			),
-			showBlockBreadcrumbs: select( preferencesStore ).get(
-				'core/edit-site',
-				'showBlockBreadcrumbs'
-			),
+			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			isListViewOpen: isListViewOpened(),
-			isDistractionFree: select( preferencesStore ).get(
-				editSiteStore.name,
-				'distractionFree'
-			),
+			isDistractionFree: get( 'core', 'distractionFree' ),
 		};
 	}, [] );
 	const { openModal } = useDispatch( interfaceStore );
@@ -277,7 +273,7 @@ function useEditUICommands() {
 		name: 'core/toggle-spotlight-mode',
 		label: __( 'Toggle spotlight mode' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-site', 'focusMode' );
+			toggle( 'core', 'focusMode' );
 			close();
 		},
 	} );
@@ -295,7 +291,7 @@ function useEditUICommands() {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-site', 'fixedToolbar' );
+			toggle( 'core', 'fixedToolbar' );
 			if ( isDistractionFree ) {
 				toggleDistractionFree();
 			}
@@ -338,7 +334,7 @@ function useEditUICommands() {
 			? __( 'Hide block breadcrumbs' )
 			: __( 'Show block breadcrumbs' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-site', 'showBlockBreadcrumbs' );
+			toggle( 'core', 'showBlockBreadcrumbs' );
 			close();
 			createInfoNotice(
 				showBlockBreadcrumbs

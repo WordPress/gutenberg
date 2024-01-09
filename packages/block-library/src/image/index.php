@@ -97,12 +97,6 @@ function block_core_image_get_lightbox_settings( $block ) {
 	// Get the lightbox setting from the block attributes.
 	if ( isset( $block['attrs']['lightbox'] ) ) {
 		$lightbox_settings = $block['attrs']['lightbox'];
-		// If the lightbox setting is not set in the block attributes,
-		// check the legacy lightbox settings that are set using the
-		// `gutenberg_should_render_lightbox` filter.
-		// We can remove this elseif statement when the legacy lightbox settings are removed.
-	} elseif ( isset( $block['legacyLightboxSettings'] ) ) {
-		$lightbox_settings = $block['legacyLightboxSettings'];
 	}
 
 	if ( ! isset( $lightbox_settings ) ) {
@@ -239,6 +233,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			type="button"
 			aria-haspopup="dialog"
 			aria-label="' . esc_attr( $aria_label ) . '"
+			data-wp-init="callbacks.initTriggerButton"
 			data-wp-on--click="actions.showLightbox"
 			data-wp-style--right="context.imageButtonRight"
 			data-wp-style--top="context.imageButtonTop"

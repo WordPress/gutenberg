@@ -112,14 +112,18 @@ export function transformStyles(
  * Check whether serialization of specific block support feature or set should
  * be skipped.
  *
- * @param {string|Object} blockType  Block name or block type object.
- * @param {string}        featureSet Name of block support feature set.
- * @param {string}        feature    Name of the individual feature to check.
+ * @param {string|Object} blockNameOrType Block name or block type object.
+ * @param {string}        featureSet      Name of block support feature set.
+ * @param {string}        feature         Name of the individual feature to check.
  *
  * @return {boolean} Whether serialization should occur.
  */
-export function shouldSkipSerialization( blockType, featureSet, feature ) {
-	const support = getBlockSupport( blockType, featureSet );
+export function shouldSkipSerialization(
+	blockNameOrType,
+	featureSet,
+	feature
+) {
+	const support = getBlockSupport( blockNameOrType, featureSet );
 	const skipSerialization = support?.__experimentalSkipSerialization;
 
 	if ( Array.isArray( skipSerialization ) ) {
@@ -170,6 +174,8 @@ export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
  */
 export function useBlockSettings( name, parentLayout ) {
 	const [
+		backgroundImage,
+		backgroundSize,
 		fontFamilies,
 		fontSizes,
 		customFontSize,
@@ -213,6 +219,8 @@ export function useBlockSettings( name, parentLayout ) {
 		isHeadingEnabled,
 		isButtonEnabled,
 	] = useSettings(
+		'background.backgroundImage',
+		'background.backgroundSize',
 		'typography.fontFamilies',
 		'typography.fontSizes',
 		'typography.customFontSize',
@@ -259,6 +267,10 @@ export function useBlockSettings( name, parentLayout ) {
 
 	const rawSettings = useMemo( () => {
 		return {
+			background: {
+				backgroundImage,
+				backgroundSize,
+			},
 			color: {
 				palette: {
 					custom: customColors,
@@ -326,6 +338,8 @@ export function useBlockSettings( name, parentLayout ) {
 			parentLayout,
 		};
 	}, [
+		backgroundImage,
+		backgroundSize,
 		fontFamilies,
 		fontSizes,
 		customFontSize,
@@ -414,12 +428,14 @@ export function createBlockEditFilter( features ) {
 							neededProps[ key ] = props.attributes[ key ];
 						}
 					}
+
 					return (
 						<Edit
 							// We can use the index because the array length
 							// is fixed per page load right now.
 							key={ i }
 							name={ props.name }
+							isSelected={ props.isSelected }
 							clientId={ props.clientId }
 							setAttributes={ props.setAttributes }
 							__unstableParentLayout={
@@ -484,10 +500,10 @@ export function createBlockListBlockFilter( features ) {
 					}
 
 					if (
-						! hasSupport( props.name ) ||
 						// Skip rendering if none of the needed attributes are
 						// set.
-						! Object.keys( neededProps ).length
+						! Object.keys( neededProps ).length ||
+						! hasSupport( props.name )
 					) {
 						return null;
 					}
@@ -537,5 +553,51 @@ export function createBlockListBlockFilter( features ) {
 		'editor.BlockListBlock',
 		'core/editor/hooks',
 		withBlockListBlockHooks
+	);
+}
+
+export function createBlockSaveFilter( features ) {
+	function extraPropsFromHooks( props, name, attributes ) {
+		return features.reduce( ( accu, feature ) => {
+			const { hasSupport, attributeKeys = [], addSaveProps } = feature;
+
+			const neededAttributes = {};
+			for ( const key of attributeKeys ) {
+				if ( attributes[ key ] ) {
+					neededAttributes[ key ] = attributes[ key ];
+				}
+			}
+
+			if (
+				// Skip rendering if none of the needed attributes are
+				// set.
+				! Object.keys( neededAttributes ).length ||
+				! hasSupport( name )
+			) {
+				return accu;
+			}
+
+			return addSaveProps( accu, name, neededAttributes );
+		}, props );
+	}
+	addFilter(
+		'blocks.getSaveContent.extraProps',
+		'core/editor/hooks',
+		extraPropsFromHooks,
+		0
+	);
+	addFilter(
+		'blocks.getSaveContent.extraProps',
+		'core/editor/hooks',
+		( props ) => {
+			// Previously we had a filter deleting the className if it was an empty
+			// string. That filter is no longer running, so now we need to delete it
+			// here.
+			if ( props.hasOwnProperty( 'className' ) && ! props.className ) {
+				delete props.className;
+			}
+
+			return props;
+		}
 	);
 }

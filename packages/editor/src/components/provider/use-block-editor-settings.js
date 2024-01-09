@@ -9,6 +9,8 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,7 +27,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
 	'__experimentalPreferredStyleVariations',
-	'__experimentalSetIsInserterOpened',
 	'__unstableGalleryWithImageBlocks',
 	'alignWide',
 	'allowedBlockTypes',
@@ -46,20 +47,16 @@ const BLOCK_EDITOR_SETTINGS = [
 	'enableCustomSpacing',
 	'enableCustomUnits',
 	'enableOpenverseMediaCategory',
-	'focusMode',
-	'distractionFree',
 	'fontSizes',
 	'gradients',
 	'generateAnchors',
-	'hasFixedToolbar',
+	'getPostLinkProps',
 	'hasInlineToolbar',
-	'isDistractionFree',
 	'imageDefaultSize',
 	'imageDimensions',
 	'imageEditing',
 	'imageSizes',
 	'isRTL',
-	'keepCaretInsideBlock',
 	'locale',
 	'maxWidth',
 	'onUpdateDefaultBlockStyles',
@@ -88,7 +85,13 @@ const BLOCK_EDITOR_SETTINGS = [
  * @return {Object} Block Editor Settings.
  */
 function useBlockEditorSettings( settings, postType, postId ) {
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
+		allowRightClickOverrides,
+		focusMode,
+		hasFixedToolbar,
+		isDistractionFree,
+		keepCaretInsideBlock,
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
@@ -110,17 +113,27 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				getBlockPatterns,
 				getBlockPatternCategories,
 			} = select( coreStore );
+			const { get } = select( preferencesStore );
 
 			const siteSettings = canUser( 'read', 'settings' )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
 
 			return {
+				allowRightClickOverrides: get(
+					'core',
+					'allowRightClickOverrides'
+				),
 				canUseUnfilteredHTML: getRawEntityRecord(
 					'postType',
 					postType,
 					postId
 				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
+				focusMode: get( 'core', 'focusMode' ),
+				hasFixedToolbar:
+					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
+				isDistractionFree: get( 'core', 'distractionFree' ),
+				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				reusableBlocks: isWeb
 					? getEntityRecords( 'postType', 'wp_block', {
 							per_page: -1,
@@ -135,7 +148,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				restBlockPatternCategories: getBlockPatternCategories(),
 			};
 		},
-		[ postType, postId ]
+		[ postType, postId, isLargeViewport ]
 	);
 
 	const settingsBlockPatterns =
@@ -177,7 +190,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
-	const { undo } = useDispatch( editorStore );
+	const { undo, setIsInserterOpened } = useDispatch( editorStore );
 
 	const { saveEntityRecord } = useDispatch( coreStore );
 
@@ -202,6 +215,8 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		[ saveEntityRecord, userCanCreatePages ]
 	);
 
+	const forceDisableFocusMode = settings.focusMode === false;
+
 	return useMemo(
 		() => ( {
 			...Object.fromEntries(
@@ -209,6 +224,11 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					BLOCK_EDITOR_SETTINGS.includes( key )
 				)
 			),
+			allowRightClickOverrides,
+			focusMode: focusMode && ! forceDisableFocusMode,
+			hasFixedToolbar,
+			isDistractionFree,
+			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
@@ -238,8 +258,15 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				postType === 'wp_navigation'
 					? [ [ 'core/navigation', {}, [] ] ]
 					: settings.template,
+			__experimentalSetIsInserterOpened: setIsInserterOpened,
 		} ),
 		[
+			allowRightClickOverrides,
+			focusMode,
+			forceDisableFocusMode,
+			hasFixedToolbar,
+			isDistractionFree,
+			keepCaretInsideBlock,
 			settings,
 			hasUploadPermissions,
 			reusableBlocks,
@@ -253,6 +280,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			pageOnFront,
 			pageForPosts,
 			postType,
+			setIsInserterOpened,
 		]
 	);
 }

@@ -4,103 +4,262 @@
 import {
 	privateApis as componentsPrivateApis,
 	Button,
-	Icon,
 } from '@wordpress/components';
-import { chevronRightSmall, plus } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { funnel } from '@wordpress/icons';
+import { __, sprintf } from '@wordpress/i18n';
+import { Children, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import { ENUMERATION_TYPE, OPERATOR_IN } from './constants';
+import { LAYOUT_LIST, OPERATORS } from './constants';
+import { DropdownMenuRadioItemCustom } from './dropdown-menu-helper';
 
 const {
 	DropdownMenuV2: DropdownMenu,
-	DropdownSubMenuV2: DropdownSubMenu,
-	DropdownSubMenuTriggerV2: DropdownSubMenuTrigger,
+	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
 } = unlock( componentsPrivateApis );
 
-export default function AddFilter( { fields, view, onChangeView } ) {
-	const filters = [];
-	fields.forEach( ( field ) => {
-		if ( ! field.type ) {
-			return;
-		}
+function WithSeparators( { children } ) {
+	return Children.toArray( children )
+		.filter( Boolean )
+		.map( ( child, i ) => (
+			<Fragment key={ i }>
+				{ i > 0 && <DropdownMenuSeparator /> }
+				{ child }
+			</Fragment>
+		) );
+}
 
-		switch ( field.type ) {
-			case ENUMERATION_TYPE:
-				filters.push( {
-					field: field.id,
-					name: field.header,
-					elements: field.elements || [],
-					isVisible: view.filters.some(
-						( f ) => f.field === field.id
-					),
-				} );
-		}
-	} );
-
+export default function AddFilter( { filters, view, onChangeView } ) {
 	if ( filters.length === 0 ) {
 		return null;
 	}
 
+	const filterCount = view.filters.reduce( ( acc, filter ) => {
+		if ( filter.value !== undefined ) {
+			return acc + 1;
+		}
+		return acc;
+	}, 0 );
+
 	return (
 		<DropdownMenu
-			label={ __( 'Add filter' ) }
 			trigger={
 				<Button
-					disabled={ filters.length === view.filters?.length }
 					__experimentalIsFocusable
-					variant="tertiary"
+					label={ __( 'Filters' ) }
 					size="compact"
+					icon={ funnel }
+					className="dataviews-filters-button"
 				>
-					<Icon icon={ plus } style={ { flexShrink: 0 } } />
-					{ __( 'Add filter' ) }
+					{ view.type === LAYOUT_LIST && filterCount > 0 ? (
+						<span className="dataviews-filters-count">
+							{ filterCount }
+						</span>
+					) : null }
 				</Button>
 			}
+			style={ {
+				minWidth: '230px',
+			} }
 		>
-			{ filters.map( ( filter ) => {
-				if ( filter.isVisible ) {
-					return null;
-				}
-
-				return (
-					<DropdownSubMenu
-						key={ filter.field }
-						trigger={
-							<DropdownSubMenuTrigger
-								suffix={ <Icon icon={ chevronRightSmall } /> }
-							>
-								{ filter.name }
-							</DropdownSubMenuTrigger>
-						}
-					>
-						{ filter.elements.map( ( element ) => (
-							<DropdownMenuItem
-								key={ element.value }
-								onSelect={ () => {
-									onChangeView( ( currentView ) => ( {
-										...currentView,
-										page: 1,
-										filters: [
-											...currentView.filters,
-											{
-												field: filter.field,
-												operator: OPERATOR_IN,
-												value: element.value,
-											},
-										],
-									} ) );
+			<WithSeparators>
+				<DropdownMenuGroup>
+					{ filters.map( ( filter ) => {
+						const filterInView = view.filters.find(
+							( f ) => f.field === filter.field
+						);
+						const otherFilters = view.filters.filter(
+							( f ) => f.field !== filter.field
+						);
+						const activeElement = filter.elements.find(
+							( element ) => element.value === filterInView?.value
+						);
+						const activeOperator =
+							filterInView?.operator || filter.operators[ 0 ];
+						return (
+							<DropdownMenu
+								key={ filter.field }
+								trigger={
+									<DropdownMenuItem
+										suffix={
+											activeElement && (
+												<span aria-hidden="true">
+													{ activeOperator in
+														OPERATORS &&
+														`${ OPERATORS[ activeOperator ].label } ` }
+													{ activeElement.label }
+												</span>
+											)
+										}
+									>
+										<DropdownMenuItemLabel>
+											{ filter.name }
+										</DropdownMenuItemLabel>
+									</DropdownMenuItem>
+								}
+								style={ {
+									minWidth: '200px',
 								} }
 							>
-								{ element.label }
-							</DropdownMenuItem>
-						) ) }
-					</DropdownSubMenu>
-				);
-			} ) }
+								<WithSeparators>
+									<DropdownMenuGroup>
+										{ filter.elements.map( ( element ) => {
+											const isActive =
+												activeElement?.value ===
+												element.value;
+											return (
+												<DropdownMenuRadioItemCustom
+													key={ element.value }
+													name={ `add-filter-${ filter.field }` }
+													value={ element.value }
+													checked={ isActive }
+													onChange={ ( e ) => {
+														onChangeView( {
+															...view,
+															page: 1,
+															filters: [
+																...otherFilters,
+																{
+																	field: filter.field,
+																	operator:
+																		activeOperator,
+																	value: isActive
+																		? undefined
+																		: e
+																				.target
+																				.value,
+																},
+															],
+														} );
+													} }
+												>
+													<DropdownMenuItemLabel>
+														{ element.label }
+													</DropdownMenuItemLabel>
+													{ !! element.description && (
+														<DropdownMenuItemHelpText>
+															{
+																element.description
+															}
+														</DropdownMenuItemHelpText>
+													) }
+												</DropdownMenuRadioItemCustom>
+											);
+										} ) }
+									</DropdownMenuGroup>
+									{ filter.operators.length > 1 && (
+										<DropdownMenu
+											trigger={
+												<DropdownMenuItem
+													suffix={
+														<span aria-hidden="true">
+															{
+																OPERATORS[
+																	activeOperator
+																]?.label
+															}
+														</span>
+													}
+												>
+													<DropdownMenuItemLabel>
+														{ __( 'Conditions' ) }
+													</DropdownMenuItemLabel>
+												</DropdownMenuItem>
+											}
+										>
+											{ Object.entries( OPERATORS ).map(
+												( [
+													operator,
+													{ label, key },
+												] ) => (
+													<DropdownMenuRadioItem
+														key={ key }
+														name={ `add-filter-${ filter.field }-conditions` }
+														value={ operator }
+														checked={
+															activeOperator ===
+															operator
+														}
+														onChange={ ( e ) => {
+															onChangeView( {
+																...view,
+																page: 1,
+																filters: [
+																	...otherFilters,
+																	{
+																		field: filter.field,
+																		operator:
+																			e
+																				.target
+																				.value,
+																		value: filterInView?.value,
+																	},
+																],
+															} );
+														} }
+													>
+														<DropdownMenuItemLabel>
+															{ label }
+														</DropdownMenuItemLabel>
+													</DropdownMenuRadioItem>
+												)
+											) }
+										</DropdownMenu>
+									) }
+									<DropdownMenuItem
+										key={ 'reset-filter-' + filter.name }
+										disabled={ ! activeElement }
+										hideOnClick={ false }
+										onClick={ () => {
+											onChangeView( {
+												...view,
+												page: 1,
+												filters: view.filters.filter(
+													( f ) =>
+														f.field !== filter.field
+												),
+											} );
+										} }
+									>
+										<DropdownMenuItemLabel>
+											{ sprintf(
+												/* translators: 1: Filter name. e.g.: "Reset Author". */
+												__( 'Reset %1$s' ),
+												filter.name.toLowerCase()
+											) }
+										</DropdownMenuItemLabel>
+									</DropdownMenuItem>
+								</WithSeparators>
+							</DropdownMenu>
+						);
+					} ) }
+				</DropdownMenuGroup>
+				<DropdownMenuItem
+					disabled={
+						view.search === '' && view.filters?.length === 0
+					}
+					hideOnClick={ false }
+					onClick={ () => {
+						onChangeView( {
+							...view,
+							page: 1,
+							filters: [],
+						} );
+					} }
+				>
+					<DropdownMenuItemLabel>
+						{ __( 'Reset filters' ) }
+					</DropdownMenuItemLabel>
+				</DropdownMenuItem>
+			</WithSeparators>
 		</DropdownMenu>
 	);
 }

@@ -2,16 +2,18 @@
  * External dependencies
  */
 import { Pressable, View } from 'react-native';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo, useState, useRef } from '@wordpress/element';
 import {
 	GlobalStylesContext,
 	getMergedGlobalStyles,
 	useMobileGlobalStylesColors,
 	useGlobalStyles,
+	withFilters,
 } from '@wordpress/components';
 import {
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
@@ -38,24 +40,41 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockOutline from './block-outline';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
+import useScrollUponInsertion from './use-scroll-upon-insertion';
 import { useSettings } from '../use-settings';
 
 const EMPTY_ARRAY = [];
 
-// Helper function to memoize the wrapperProps since getEditWrapperProps always returns a new reference.
-const wrapperPropsCache = new WeakMap();
-const emptyObj = {};
-function getWrapperProps( value, getWrapperPropsFunction ) {
-	if ( ! getWrapperPropsFunction ) {
-		return emptyObj;
+/**
+ * Merges wrapper props with special handling for classNames and styles.
+ *
+ * @param {Object} propsA
+ * @param {Object} propsB
+ *
+ * @return {Object} Merged props.
+ */
+function mergeWrapperProps( propsA, propsB ) {
+	const newProps = {
+		...propsA,
+		...propsB,
+	};
+
+	// May be set to undefined, so check if the property is set!
+	if (
+		propsA?.hasOwnProperty( 'className' ) &&
+		propsB?.hasOwnProperty( 'className' )
+	) {
+		newProps.className = classnames( propsA.className, propsB.className );
 	}
-	const cachedValue = wrapperPropsCache.get( value );
-	if ( ! cachedValue ) {
-		const wrapperProps = getWrapperPropsFunction( value );
-		wrapperPropsCache.set( value, wrapperProps );
-		return wrapperProps;
+
+	if (
+		propsA?.hasOwnProperty( 'style' ) &&
+		propsB?.hasOwnProperty( 'style' )
+	) {
+		newProps.style = { ...propsA.style, ...propsB.style };
 	}
-	return cachedValue;
+
+	return newProps;
 }
 
 function BlockWrapper( {
@@ -85,6 +104,18 @@ function BlockWrapper( {
 	];
 	const accessible = ! ( isSelected || isDescendentBlockSelected );
 
+	const ref = useRef();
+	const [ isLayoutCalculated, setIsLayoutCalculated ] = useState();
+	useScrollUponInsertion( {
+		clientId,
+		isSelected,
+		isLayoutCalculated,
+		elementRef: ref,
+	} );
+	const onLayout = useCallback( () => {
+		setIsLayoutCalculated( true );
+	}, [] );
+
 	return (
 		<Pressable
 			accessibilityLabel={ accessibilityLabel }
@@ -93,6 +124,8 @@ function BlockWrapper( {
 			disabled={ ! isTouchable }
 			onPress={ onFocus }
 			style={ blockWrapperStyle }
+			ref={ ref }
+			onLayout={ onLayout }
 		>
 			<BlockOutline
 				blockCategory={ blockCategory }
@@ -136,6 +169,7 @@ function BlockListBlock( {
 	rootClientId,
 	setAttributes,
 	toggleSelection,
+	wrapperProps,
 } ) {
 	const {
 		baseGlobalStyles,
@@ -252,18 +286,20 @@ function BlockListBlock( {
 		[ blockWidth, setBlockWidth ]
 	);
 
-	// Block level styles.
-	const wrapperProps = getWrapperProps(
-		attributes,
-		blockType.getEditWrapperProps
-	);
+	// Determine whether the block has props to apply to the wrapper.
+	if ( blockType?.getEditWrapperProps ) {
+		wrapperProps = mergeWrapperProps(
+			wrapperProps,
+			blockType.getEditWrapperProps( attributes )
+		);
+	}
 
 	// Inherited styles merged with block level styles.
 	const mergedStyle = useMemo( () => {
 		return getMergedGlobalStyles(
 			baseGlobalStyles,
 			globalStyle,
-			wrapperProps.style,
+			wrapperProps?.style,
 			attributes,
 			defaultColors,
 			name,
@@ -281,7 +317,7 @@ function BlockListBlock( {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		JSON.stringify( globalStyle ),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		JSON.stringify( wrapperProps.style ),
+		JSON.stringify( wrapperProps?.style ),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		JSON.stringify(
 			Object.fromEntries(
@@ -648,5 +684,6 @@ export default compose(
 	// Block is sometimes not mounted at the right time, causing it be undefined
 	// see issue for more info
 	// https://github.com/WordPress/gutenberg/issues/17013
-	ifCondition( ( { block } ) => !! block )
+	ifCondition( ( { block } ) => !! block ),
+	withFilters( 'editor.BlockListBlock' )
 )( BlockListBlock );

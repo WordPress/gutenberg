@@ -28,11 +28,25 @@ import CategorySelector, { CATEGORY_SLUG } from './category-selector';
 import { unlock } from '../lock-unlock';
 
 export default function CreatePatternModal( {
+	className = 'patterns-menu-items__convert-modal',
+	modalTitle = __( 'Create pattern' ),
+	...restProps
+} ) {
+	return (
+		<Modal
+			title={ modalTitle }
+			onRequestClose={ restProps.onClose }
+			overlayClassName={ className }
+		>
+			<CreatePatternModalContents { ...restProps } />
+		</Modal>
+	);
+}
+
+export function CreatePatternModalContents( {
 	confirmLabel = __( 'Create' ),
 	defaultCategories = [],
-	className = 'patterns-menu-items__convert-modal',
 	content,
-	modalTitle = __( 'Create pattern' ),
 	onClose,
 	onError,
 	onSuccess,
@@ -148,78 +162,68 @@ export default function CreatePatternModal( {
 			return error.data.term_id;
 		}
 	}
-
 	return (
-		<Modal
-			title={ modalTitle }
-			onRequestClose={ () => {
-				onClose();
-				setTitle( '' );
+		<form
+			onSubmit={ ( event ) => {
+				event.preventDefault();
+				onCreate( title, syncType );
 			} }
-			overlayClassName={ className }
 		>
-			<form
-				onSubmit={ ( event ) => {
-					event.preventDefault();
-					onCreate( title, syncType );
-				} }
-			>
-				<VStack spacing="5">
-					<TextControl
-						label={ __( 'Name' ) }
-						value={ title }
-						onChange={ setTitle }
-						placeholder={ __( 'My pattern' ) }
-						className="patterns-create-modal__name-input"
-						__nextHasNoMarginBottom
+			<VStack spacing="5">
+				<TextControl
+					label={ __( 'Name' ) }
+					value={ title }
+					onChange={ setTitle }
+					placeholder={ __( 'My pattern' ) }
+					className="patterns-create-modal__name-input"
+					__nextHasNoMarginBottom
+					__next40pxDefaultSize
+				/>
+				<CategorySelector
+					categoryTerms={ categoryTerms }
+					onChange={ setCategoryTerms }
+					categoryMap={ categoryMap }
+				/>
+				<ToggleControl
+					label={ _x(
+						'Synced',
+						'Option that makes an individual pattern synchronized'
+					) }
+					help={ __(
+						'Sync this pattern across multiple locations.'
+					) }
+					checked={ syncType === PATTERN_SYNC_TYPES.full }
+					onChange={ () => {
+						setSyncType(
+							syncType === PATTERN_SYNC_TYPES.full
+								? PATTERN_SYNC_TYPES.unsynced
+								: PATTERN_SYNC_TYPES.full
+						);
+					} }
+				/>
+				<HStack justify="right">
+					<Button
 						__next40pxDefaultSize
-					/>
-					<CategorySelector
-						categoryTerms={ categoryTerms }
-						onChange={ setCategoryTerms }
-						categoryMap={ categoryMap }
-					/>
-					<ToggleControl
-						label={ _x(
-							'Synced',
-							'Option that makes an individual pattern synchronized'
-						) }
-						help={ __(
-							'Sync this pattern across multiple locations.'
-						) }
-						checked={ syncType === PATTERN_SYNC_TYPES.full }
-						onChange={ () => {
-							setSyncType(
-								syncType === PATTERN_SYNC_TYPES.full
-									? PATTERN_SYNC_TYPES.unsynced
-									: PATTERN_SYNC_TYPES.full
-							);
+						variant="tertiary"
+						onClick={ () => {
+							onClose();
+							setTitle( '' );
 						} }
-					/>
-					<HStack justify="right">
-						<Button
-							__next40pxDefaultSize
-							variant="tertiary"
-							onClick={ () => {
-								onClose();
-								setTitle( '' );
-							} }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
+					>
+						{ __( 'Cancel' ) }
+					</Button>
 
-						<Button
-							__next40pxDefaultSize
-							variant="primary"
-							type="submit"
-							aria-disabled={ ! title || isSaving }
-							isBusy={ isSaving }
-						>
-							{ confirmLabel }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
-		</Modal>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						type="submit"
+						aria-disabled={ ! title || isSaving }
+						isBusy={ isSaving }
+					>
+						{ confirmLabel }
+					</Button>
+				</HStack>
+			</VStack>
+		</form>
 	);
 }

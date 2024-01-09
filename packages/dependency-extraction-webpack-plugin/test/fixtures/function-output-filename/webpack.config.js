@@ -9,5 +9,11 @@ module.exports = {
 			return `chunk--${ chunkData.chunk.name }--[name].js`;
 		},
 	},
-	plugins: [ new DependencyExtractionWebpackPlugin() ],
+	plugins: [
+		new DependencyExtractionWebpackPlugin( {
+			requestToExternalModule( request ) {
+				return request.startsWith( '@wordpress/' );
+			},
+		} ),
+	],
 };
