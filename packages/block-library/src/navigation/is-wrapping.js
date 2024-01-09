@@ -10,7 +10,8 @@ function areItemsWrapping(
 	wrapper,
 	children = wrapper.querySelectorAll( 'li' )
 ) {
-	const wrapperWidth = wrapper.offsetWidth;
+	const wrapperDimensions = wrapper.getBoundingClientRect();
+	const wrapperWidth = wrapperDimensions.width;
 	//we store an array with the width of each item
 	const itemsWidths = getItemWidths( children );
 	let totalWidth = 0;
@@ -24,6 +25,7 @@ function areItemsWrapping(
 		if ( rowGap > 0 && i > 0 ) {
 			totalWidth += rowGap;
 		}
+
 		if ( totalWidth > wrapperWidth ) {
 			return true;
 		}
@@ -80,9 +82,8 @@ function getFlexParent( element ) {
 	if ( isFlexWrap ) {
 		return parent;
 	}
-	// I don't think we should make this recursive
-	// because it means a nav block inside a collapsed column will always collapse.
-	return null; //getFlexParent( parent );
+	// This recursion checks whether the nav element is wrapped inside a flex container.
+	return getFlexParent( parent );
 }
 
 /**
