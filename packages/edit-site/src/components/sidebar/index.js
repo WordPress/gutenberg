@@ -68,20 +68,18 @@ function SidebarScreens() {
 				<SidebarNavigationScreenGlobalStyles />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page">
-				<SidebarNavigationScreenPages />
+				{ window?.__experimentalAdminViews ? (
+					<SidebarNavigationScreen
+						title={ __( 'Pages' ) }
+						content={ <DataViewsSidebarContent /> }
+					/>
+				) : (
+					<SidebarNavigationScreenPages />
+				) }
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page/:postId">
 				<SidebarNavigationScreenPage />
 			</SidebarScreenWrapper>
-			{ window?.__experimentalAdminViews && (
-				<SidebarScreenWrapper path="/pages">
-					<SidebarNavigationScreen
-						title={ __( 'Pages' ) }
-						backPath="/page"
-						content={ <DataViewsSidebarContent /> }
-					/>
-				</SidebarScreenWrapper>
-			) }
 			<SidebarScreenWrapper path="/:postType(wp_template)">
 				<SidebarNavigationScreenTemplates />
 			</SidebarScreenWrapper>

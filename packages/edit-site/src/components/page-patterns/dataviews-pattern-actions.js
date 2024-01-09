@@ -35,6 +35,7 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_DEFAULT_CATEGORY,
 } from '../../utils/constants';
+import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 
 const { useHistory } = unlock( routerPrivateApis );
 const { CreatePatternModalContents, useDuplicatePatternProps } =
@@ -277,6 +278,51 @@ export const duplicatePatternAction = {
 				onClose={ closeModal }
 				confirmLabel={ __( 'Duplicate' ) }
 				{ ...duplicatedProps }
+			/>
+		);
+	},
+};
+
+export const duplicateTemplatePartAction = {
+	id: 'duplicate-template-part',
+	label: __( 'Duplicate' ),
+	isEligible: ( item ) => item.type === TEMPLATE_PART_POST_TYPE,
+	modalHeader: __( 'Duplicate template part' ),
+	RenderModal: ( { item, closeModal } ) => {
+		const { createSuccessNotice } = useDispatch( noticesStore );
+		const { categoryId = PATTERN_DEFAULT_CATEGORY } = getQueryArgs(
+			window.location.href
+		);
+		const history = useHistory();
+		async function onTemplatePartSuccess( templatePart ) {
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
+					__( '"%s" duplicated.' ),
+					item.title
+				),
+				{ type: 'snackbar', id: 'edit-site-patterns-success' }
+			);
+			history.push( {
+				postType: TEMPLATE_PART_POST_TYPE,
+				postId: templatePart?.id,
+				categoryType: TEMPLATE_PART_POST_TYPE,
+				categoryId,
+			} );
+			closeModal();
+		}
+		return (
+			<CreateTemplatePartModalContents
+				blocks={ item.blocks }
+				defaultArea={ item.templatePart.area }
+				defaultTitle={ sprintf(
+					/* translators: %s: Existing template part title */
+					__( '%s (Copy)' ),
+					item.title
+				) }
+				onCreate={ onTemplatePartSuccess }
+				onError={ closeModal }
+				confirmLabel={ __( 'Duplicate' ) }
 			/>
 		);
 	},
