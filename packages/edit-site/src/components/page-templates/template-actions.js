@@ -19,6 +19,7 @@ import {
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import isTemplateRemovable from '../../utils/is-template-removable';
@@ -117,10 +118,7 @@ export const deleteTemplateAction = {
 	supportsBulk: true,
 	hideModalHeader: true,
 	RenderModal: ( { items: templates, closeModal, onPerform } ) => {
-		const { removeTemplate } = useDispatch( editSiteStore );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-		const { deleteEntityRecord } = useDispatch( coreStore );
+		const { removeTemplates } = unlock( useDispatch( editSiteStore ) );
 		return (
 			<VStack spacing="5">
 				<Text>
@@ -149,45 +147,12 @@ export const deleteTemplateAction = {
 					<Button
 						variant="primary"
 						onClick={ async () => {
-							if ( templates.length > 1 ) {
-								try {
-									await Promise.allSettled(
-										templates.map( ( template ) => {
-											return deleteEntityRecord(
-												'postType',
-												template.type,
-												template.id,
-												{ force: true },
-												{ throwOnError: true }
-											);
-										} )
-									);
-									createSuccessNotice(
-										__( 'Items deleted.' ),
-										{
-											type: 'snackbar',
-											id: 'edit-site-page-trashed',
-										}
-									);
-								} catch ( error ) {
-									const errorMessage =
-										error.message &&
-										error.code !== 'unknown_error'
-											? error.message
-											: __(
-													'An error occurred while deleting the items.'
-											  );
-
-									createErrorNotice( errorMessage, {
-										type: 'snackbar',
-									} );
-								}
-							} else {
-								await removeTemplate( templates[ 0 ], {
-									allowUndo: false,
-								} );
+							await removeTemplates( templates, {
+								allowUndo: false,
+							} );
+							if ( onPerform ) {
+								onPerform();
 							}
-							onPerform();
 							closeModal();
 						} }
 					>
