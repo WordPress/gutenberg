@@ -50,7 +50,7 @@ export const LABELS = {
 	bottom: __( 'Bottom side' ),
 	left: __( 'Left side' ),
 	right: __( 'Right side' ),
-	mixed: __( 'Mixed sides' ),
+	mixed: __( 'Mixed' ),
 	vertical: __( 'Top and bottom sides' ),
 	horizontal: __( 'Left and right sides' ),
 };
