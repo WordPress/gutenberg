@@ -7,6 +7,10 @@
  * @since 6.5.0
  */
 
+if ( class_exists( 'WP_REST_Font_Families_Controller' ) ) {
+	return;
+}
+
 /**
  * Class to access font faces through the REST API.
  */
@@ -55,7 +59,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			array(
 				'args'        => array(
 					'parent' => array(
-						'description' => __( 'The ID for the parent font family of the font face.' ),
+						'description' => __( 'The ID for the parent font family of the font face.', 'gutenberg' ),
 						'type'        => 'integer',
 					),
 				),
@@ -82,11 +86,11 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			array(
 				'args'        => array(
 					'parent' => array(
-						'description' => __( 'The ID for the parent font family of the font face.' ),
+						'description' => __( 'The ID for the parent font family of the font face.', 'gutenberg' ),
 						'type'        => 'integer',
 					),
 					'id'     => array(
-						'description' => __( 'Unique identifier for the font face.' ),
+						'description' => __( 'Unique identifier for the font face.', 'gutenberg' ),
 						'type'        => 'integer',
 					),
 				),
@@ -104,7 +108,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 						'force' => array(
 							'type'        => 'boolean',
 							'default'     => false,
-							'description' => __( 'Whether to bypass Trash and force deletion.' ),
+							'description' => __( 'Whether to bypass Trash and force deletion.', 'default' ),
 						),
 					),
 				),
@@ -125,7 +129,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	protected function get_parent( $parent_post_id ) {
 		$error = new WP_Error(
 			'rest_post_invalid_parent',
-			__( 'Invalid post parent ID.' ),
+			__( 'Invalid post parent ID.', 'default' ),
 			array( 'status' => 404 )
 		);
 
@@ -158,7 +162,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		if ( ! current_user_can( $post_type->cap->edit_posts ) ) {
 			return new WP_Error(
 				'rest_cannot_read',
-				__( 'Sorry, you are not allowed to access font faces.' ),
+				__( 'Sorry, you are not allowed to access font faces.', 'gutenberg' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -215,7 +219,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			return new WP_Error(
 				'rest_font_face_parent_id_mismatch',
 				/* translators: %d: A post id. */
-				sprintf( __( 'The font face does not belong to the specified font family with id of "%d"' ), $parent->ID ),
+				sprintf( __( 'The font face does not belong to the specified font family with id of "%d"', 'gutenberg' ), $parent->ID ),
 				array( 'status' => 404 )
 			);
 		}
@@ -239,7 +243,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			return new WP_Error(
 				'rest_trash_not_supported',
 				/* translators: %s: force=true */
-				sprintf( __( "Font faces do not support trashing. Set '%s' to delete." ), 'force=true' ),
+				sprintf( __( "Font faces do not support trashing. Set '%s' to delete.", 'gutenberg' ), 'force=true' ),
 				array( 'status' => 501 )
 			);
 		}
@@ -291,19 +295,19 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			// Base properties for every Post.
 			'properties' => array(
 				'id'                 => array(
-					'description' => __( 'Unique identifier for the post.' ),
+					'description' => __( 'Unique identifier for the post.', 'default' ),
 					'type'        => 'integer',
 					'readonly'    => true,
 				),
 				'theme_json_version' => array(
-					'description' => __( 'Version of the theme.json schema used for the font face typography settings.' ),
+					'description' => __( 'Version of the theme.json schema used for the font face typography settings.', 'gutenberg' ),
 					'type'        => 'integer',
 					'default'     => 2,
 					'minimum'     => 2,
 					'maximum'     => 2,
 				),
 				'parent'             => array(
-					'description' => __( 'The ID for the parent font family of the font face.' ),
+					'description' => __( 'The ID for the parent font family of the font face.', 'gutenberg' ),
 					'type'        => 'integer',
 				),
 				// Font face settings come directly from theme.json schema
@@ -426,7 +430,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	public function get_collection_params() {
 		return array(
 			'page'     => array(
-				'description'       => __( 'Current page of the collection.' ),
+				'description'       => __( 'Current page of the collection.', 'default' ),
 				'type'              => 'integer',
 				'default'           => 1,
 				'sanitize_callback' => 'absint',
@@ -434,7 +438,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 				'minimum'           => 1,
 			),
 			'per_page' => array(
-				'description'       => __( 'Maximum number of items to be returned in result set.' ),
+				'description'       => __( 'Maximum number of items to be returned in result set.', 'default' ),
 				'type'              => 'integer',
 				'default'           => 10,
 				'minimum'           => 1,
@@ -443,7 +447,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 				'validate_callback' => 'rest_validate_request_arg',
 			),
 			'search'   => array(
-				'description'       => __( 'Limit results to those matching a string.' ),
+				'description'       => __( 'Limit results to those matching a string.', 'default' ),
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_text_field',
 				'validate_callback' => 'rest_validate_request_arg',
