@@ -156,7 +156,7 @@
 	<rule ref="Gutenberg.CodeAnalysis.RestrictedFunctionCall">
 		<include-pattern>./packages/block-library/src/*/*.php</include-pattern>
 		<properties>
-			<property name="prefixes" type="array">
+			<property name="restricted_functions" type="array">
 				<element value="(G|g)utenberg.*"/>
 			</property>
 		</properties>
