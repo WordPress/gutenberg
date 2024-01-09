@@ -90,6 +90,14 @@ export default function PostExcerptEditor( {
 	 */
 	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
 
+	/** 
+	 * If the wordCountType is set to something else, Setting the Characters length won't be needed.
+	 * Making it false will help the words get rendered on Front-End as well.
+	 */
+	if ( wordCountType !== 'words' ) {
+		setAttributes( { countExcerptCharactersLength: false } );
+	}
+
 	/**
 	 * When excerpt is editable, strip the html tags from
 	 * rendered excerpt. This will be used if the entity's
@@ -239,17 +247,19 @@ export default function PostExcerptEditor( {
 							} )
 						}
 					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Set Character Length' ) }
-						checked={ countExcerptCharactersLength }
-						onChange={ ( newCountExcerptCharactersLength ) => {
-							setAttributes( {
-								countExcerptCharactersLength:
-									newCountExcerptCharactersLength,
-							} );
-						} }
-					/>
+					{ wordCountType === 'words' && (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Set Character Length' ) }
+							checked={ countExcerptCharactersLength }
+							onChange={ ( newCountExcerptCharactersLength ) => {
+								setAttributes( {
+									countExcerptCharactersLength:
+										newCountExcerptCharactersLength,
+								} );
+							} }
+						/>
+					) }
 
 					{ wordCountType === 'words' &&
 					countExcerptCharactersLength ? (
