@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
@@ -28,12 +29,14 @@ import {
 	DimensionsPanel,
 } from './dimensions';
 import {
+	deepMerge,
 	shouldSkipSerialization,
 	useStyleOverride,
 	useBlockSettings,
 } from './utils';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { store as blockEditorStore } from '../store';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -344,7 +347,7 @@ export default {
 	edit: BlockStyleControls,
 	hasSupport: hasStyleSupport,
 	addSaveProps,
-	attributeKeys: [ 'style' ],
+	attributeKeys: [ 'className', 'style' ],
 	useBlockProps,
 };
 
@@ -360,10 +363,28 @@ const elementTypes = [
 	},
 ];
 
-function useBlockProps( { name, style } ) {
+function useBlockProps( { name, style, className } ) {
 	const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
 		useBlockProps
 	) }`;
+
+	// Get block style variation element styles.
+	// Element styles for a variation are merged into the block instance's
+	// styles to avoid specificity conflicts when inner block instances
+	// override the block style variation's element styles.
+	const variationElementStyles = useSelect(
+		( select ) => {
+			const matches = className?.match( /\bis-style-(\S+)\b/ );
+
+			if ( ! matches?.[ 1 ] ) {
+				return;
+			}
+
+			return select( blockEditorStore ).getSettings().__experimentalStyles
+				?.blocks?.[ name ]?.variations?.[ matches[ 1 ] ]?.elements;
+		},
+		[ className, name ]
+	);
 
 	// The .editor-styles-wrapper selector is required on elements styles. As it is
 	// added to all other editor styles, not providing it causes reset and global
@@ -372,9 +393,16 @@ function useBlockProps( { name, style } ) {
 	const blockElementStyles = style?.elements;
 
 	const styles = useMemo( () => {
-		if ( ! blockElementStyles ) {
+		if ( ! blockElementStyles && ! variationElementStyles ) {
 			return;
 		}
+
+		// Deep clone variation element styles before merging to prevent
+		// mutating the variation within global styles.
+		const mergedElementStyles = variationElementStyles
+			? JSON.parse( JSON.stringify( variationElementStyles ) )
+			: {};
+		deepMerge( mergedElementStyles, blockElementStyles ?? {} );
 
 		const elementCSSRules = [];
 
@@ -389,7 +417,7 @@ function useBlockProps( { name, style } ) {
 				return;
 			}
 
-			const elementStyles = blockElementStyles?.[ elementType ];
+			const elementStyles = mergedElementStyles?.[ elementType ];
 
 			// Process primary element type styles.
 			if ( elementStyles ) {
@@ -422,9 +450,9 @@ function useBlockProps( { name, style } ) {
 			// Process related elements e.g. h1-h6 for headings
 			if ( elements ) {
 				elements.forEach( ( element ) => {
-					if ( blockElementStyles[ element ] ) {
+					if ( mergedElementStyles[ element ] ) {
 						elementCSSRules.push(
-							compileCSS( blockElementStyles[ element ], {
+							compileCSS( mergedElementStyles[ element ], {
 								selector: scopeSelector(
 									baseElementSelector,
 									ELEMENTS[ element ]
@@ -439,7 +467,13 @@ function useBlockProps( { name, style } ) {
 		return elementCSSRules.length > 0
 			? elementCSSRules.join( '' )
 			: undefined;
-	}, [ baseElementSelector, blockElementStyles, name ] );
+	}, [
+		baseElementSelector,
+		blockElementStyles,
+		name,
+		variationElementStyles,
+		className,
+	] );
 
 	useStyleOverride( { css: styles } );
 

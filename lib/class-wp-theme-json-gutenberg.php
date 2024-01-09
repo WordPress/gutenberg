@@ -3942,4 +3942,31 @@ class WP_Theme_JSON_Gutenberg {
 			),
 		);
 	}
+
+	/**
+	 * Retrieves the theme.json node for a specific block style variation.
+	 *
+	 * @param string $block_name     Name of the block type.
+	 * @param string $variation_name Slug for the block style variation.
+	 *
+	 * @return array Style object for the block style variation.
+	 */
+	public function get_block_style_variation( $block_name, $variation_name ) {
+		$path           = array( 'styles', 'blocks', $block_name, 'variations', $variation_name );
+		$variation_node = _wp_array_get( $this->theme_json, $path, null );
+
+		if ( ! $variation_node ) {
+			return null;
+		}
+
+		// TODO: When block style variations can be referenced e.g. from styles.blocks.variations.name
+		// the reference can be resolved here and merged with another values that have been explicitly
+		// set on the current variation node, such as when a user might customize a referenced variation.
+
+		if ( empty( $variation_node ) ) {
+			return null;
+		}
+
+		return $variation_node;
+	}
 }

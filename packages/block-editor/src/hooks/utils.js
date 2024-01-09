@@ -48,6 +48,25 @@ export const cleanEmptyObject = ( object ) => {
 		: Object.fromEntries( cleanedNestedObjects );
 };
 
+export const isObject = ( item ) =>
+	!! item && typeof item === 'object' && ! Array.isArray( item );
+
+export const deepMerge = ( target, source ) => {
+	if ( isObject( target ) && isObject( source ) ) {
+		for ( const key in source ) {
+			const getter = Object.getOwnPropertyDescriptor( source, key )?.get;
+			if ( typeof getter === 'function' ) {
+				Object.defineProperty( target, key, { get: getter } );
+			} else if ( isObject( source[ key ] ) ) {
+				if ( ! target[ key ] ) Object.assign( target, { [ key ]: {} } );
+				deepMerge( target[ key ], source[ key ] );
+			} else {
+				Object.assign( target, { [ key ]: source[ key ] } );
+			}
+		}
+	}
+};
+
 export function transformStyles(
 	activeSupports,
 	migrationPaths,

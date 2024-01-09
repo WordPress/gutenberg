@@ -13,7 +13,32 @@
  * @return string                Filtered block content.
  */
 function gutenberg_render_elements_support( $block_content, $block ) {
-	if ( ! $block_content || ! isset( $block['attrs']['style']['elements'] ) ) {
+	if ( ! $block_content ) {
+		return $block_content;
+	}
+
+	// Block style variatiion element styles are applied per block to avoid
+	// specificity issues due to the required duplication of block style
+	// variation selectors to overcome default block type styles.
+	$variation_element_styles = array();
+	if (
+		isset( $block['attrs']['className'] ) &&
+		str_contains( $block['attrs']['className'], 'is-style-' ) &&
+		preg_match( '/\bis-style-(\S+)\b/', $block['attrs']['className'], $matches ) &&
+		isset( $matches[1] )
+	) {
+		$tree      = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+		$variation = $tree->get_block_style_variation( $block['blockName'], $matches[1] );
+
+		if ( ! empty( $variation['elements'] ) ) {
+			$variation_element_styles = $variation['elements'];
+		}
+	}
+
+	$instance_element_styles = $block['attrs']['style']['elements'] ?? array();
+	$element_styles          = array_merge( $variation_element_styles, $instance_element_styles );
+
+	if ( empty( $element_styles ) ) {
 		return $block_content;
 	}
 
@@ -71,15 +96,13 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$elements_style_attributes = $block['attrs']['style']['elements'];
-
 	foreach ( $element_color_properties as $element_config ) {
 		if ( $element_config['skip'] ) {
 			continue;
 		}
 
 		foreach ( $element_config['paths'] as $path ) {
-			if ( null !== _wp_array_get( $elements_style_attributes, $path, null ) ) {
+			if ( null !== _wp_array_get( $element_styles, $path, null ) ) {
 				/*
 				 * It only takes a single custom attribute to require that the custom
 				 * class name be added to the block, so once one is found there's no
@@ -116,10 +139,31 @@ function gutenberg_render_elements_support( $block_content, $block ) {
  * @return null
  */
 function gutenberg_render_elements_support_styles( $pre_render, $block ) {
-	$block_type           = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$element_block_styles = isset( $block['attrs']['style']['elements'] ) ? $block['attrs']['style']['elements'] : null;
+	$block_type               = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$variation_element_styles = array();
 
-	if ( ! $element_block_styles ) {
+	// Merge in block style variation element styles if present.
+	// Element styles are applied per block to avoid specificity issues due to
+	// the required duplication of block style variation selectors to overcome
+	// default block type styles.
+	if (
+		isset( $block['attrs']['className'] ) &&
+		str_contains( $block['attrs']['className'], 'is-style-' ) &&
+		preg_match( '/\bis-style-(\S+)\b/', $block['attrs']['className'], $matches ) &&
+		isset( $matches[1] )
+	) {
+		$tree      = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+		$variation = $tree->get_block_style_variation( $block['blockName'], $matches[1] );
+
+		if ( ! empty( $variation['elements'] ) ) {
+			$variation_element_styles = $variation['elements'];
+		}
+	}
+
+	$instance_element_styles = $block['attrs']['style']['elements'] ?? array();
+	$element_styles          = array_merge( $variation_element_styles, $instance_element_styles );
+
+	if ( empty( $element_styles ) ) {
 		return null;
 	}
 
@@ -138,8 +182,9 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 
 	$element_types = array(
 		'button'  => array(
-			'selector' => ".$class_name .wp-element-button, .$class_name .wp-block-button__link",
-			'skip'     => $skip_button_color_serialization,
+			'selector'       => ".$class_name .wp-element-button, .$class_name .wp-block-button__link",
+			'hover_selector' => ".$class_name .wp-element-button:hover, .$class_name .wp-block-button__link:hover",
+			'skip'           => $skip_button_color_serialization,
 		),
 		'link'    => array(
 			'selector'       => ".$class_name a",
@@ -158,7 +203,7 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 			continue;
 		}
 
-		$element_style_object = _wp_array_get( $element_block_styles, array( $element_type ), null );
+		$element_style_object = _wp_array_get( $element_styles, array( $element_type ), null );
 
 		// Process primary element type styles.
 		if ( $element_style_object ) {
@@ -184,7 +229,7 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 		// Process related elements e.g. h1-h6 for headings.
 		if ( isset( $element_config['elements'] ) ) {
 			foreach ( $element_config['elements'] as $element ) {
-				$element_style_object = _wp_array_get( $element_block_styles, array( $element ), null );
+				$element_style_object = _wp_array_get( $element_styles, array( $element ), null );
 
 				if ( $element_style_object ) {
 					gutenberg_style_engine_get_styles(
