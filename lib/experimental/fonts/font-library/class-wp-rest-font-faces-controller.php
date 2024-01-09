@@ -19,6 +19,12 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 */
 	private $parent_base;
 
+	/**
+	 * Parent font family post type
+	 *
+	 * @since 6.5.0
+	 * @var string
+	 */
 	private $parent_post_type;
 
 	public function __construct() {
