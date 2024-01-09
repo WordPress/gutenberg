@@ -63,12 +63,15 @@ function PostTemplateDropdownContent( { onClose } ) {
 		selectedTemplateSlug,
 		canCreate,
 		canEdit,
+		currentTemplateId,
+		getPostLinkProps,
 	} = useSelect(
 		( select ) => {
 			const { canUser, getEntityRecords } = select( coreStore );
 			const editorSettings = select( editorStore ).getEditorSettings();
 			const canCreateTemplates = canUser( 'create', 'templates' );
-
+			const _currentTemplateId =
+				select( editorStore ).getCurrentTemplateId();
 			return {
 				availableTemplates: editorSettings.availableTemplates,
 				fetchedTemplates: canCreateTemplates
@@ -88,11 +91,22 @@ function PostTemplateDropdownContent( { onClose } ) {
 					allowSwitchingTemplate &&
 					canCreateTemplates &&
 					editorSettings.supportsTemplateMode &&
-					!! select( editorStore ).getCurrentTemplateId(),
+					!! _currentTemplateId,
+				currentTemplateId: _currentTemplateId,
+				getPostLinkProps: editorSettings.getPostLinkProps,
 			};
 		},
 		[ allowSwitchingTemplate ]
 	);
+
+	const editTemplate =
+		getPostLinkProps && currentTemplateId
+			? getPostLinkProps( {
+					postId: currentTemplateId,
+					postType: 'wp_template',
+					canvas: 'edit',
+			  } )
+			: {};
 
 	const options = useMemo(
 		() =>
@@ -113,9 +127,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 		options.find( ( option ) => ! option.value ); // The default option has '' value.
 
 	const { editPost } = useDispatch( editorStore );
-	const { getEditorSettings } = useSelect( editorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const { setRenderingMode } = useDispatch( editorStore );
 	const [ isCreateModalOpen, setIsCreateModalOpen ] = useState( false );
 
 	return (
@@ -160,7 +172,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 					<Button
 						variant="link"
 						onClick={ () => {
-							setRenderingMode( 'template-only' );
+							editTemplate.onClick();
 							onClose();
 							createSuccessNotice(
 								__(
@@ -168,21 +180,11 @@ function PostTemplateDropdownContent( { onClose } ) {
 								),
 								{
 									type: 'snackbar',
-									actions: [
-										{
-											label: __( 'Go back' ),
-											onClick: () =>
-												setRenderingMode(
-													getEditorSettings()
-														.defaultRenderingMode
-												),
-										},
-									],
 								}
 							);
 						} }
 					>
-						{ __( 'Edit template' ) }
+						{ __( 'Edit templatess' ) }
 					</Button>
 				</p>
 			) }
