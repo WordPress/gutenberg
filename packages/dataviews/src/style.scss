@@ -301,6 +301,10 @@
 			}
 		}
 	}
+
+	& + .dataviews-pagination {
+		justify-content: space-between;
+	}
 }
 
 .dataviews-action-modal {
