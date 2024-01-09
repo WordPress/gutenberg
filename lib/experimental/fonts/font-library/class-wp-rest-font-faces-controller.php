@@ -153,10 +153,9 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_font_faces_permissions_check( $request ) {
+	public function get_font_faces_permissions_check() {
 		$post_type = get_post_type_object( $this->post_type );
 
 		if ( ! current_user_can( $post_type->cap->edit_posts ) ) {
@@ -178,7 +177,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 * @param WP_Post_Type|string $post_type Post type name or object.
 	 * @return bool Whether the post type is allowed in REST.
 	 */
-	protected function check_is_post_type_allowed( $post_type ) {
+	protected function check_is_post_type_allowed( $post_type ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- required by parent class
 		return true;
 	}
 
