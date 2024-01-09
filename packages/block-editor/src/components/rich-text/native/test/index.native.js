@@ -88,7 +88,7 @@ describe( '<RichText/>', () => {
 		} );
 	} );
 
-	describe( 'Value changes', () => {
+	describe( 'when the value changes', () => {
 		it( 'should avoid updating attributes when values are equal', async () => {
 			const handleChange = jest.fn();
 			const defaultEmptyValue = RichTextData.empty();
@@ -145,7 +145,7 @@ describe( '<RichText/>', () => {
 		} );
 	} );
 
-	describe( 'Font Size', () => {
+	describe( 'when applying the font size', () => {
 		it( 'should display rich text at the DEFAULT font size.', () => {
 			// Arrange.
 			const expectedFontSize = 16;
