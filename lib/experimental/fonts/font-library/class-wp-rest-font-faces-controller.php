@@ -198,7 +198,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		return parent::get_items( $request );
 	}
 
-		/**
+	/**
 	 * Retrieves a single font face for within parent font family.
 	 *
 	 * @since 4.7.0
@@ -207,6 +207,11 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_item( $request ) {
+		$post = $this->get_post( $request['id'] );
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
 		$parent = $this->get_parent( $request['parent'] );
 		if ( is_wp_error( $parent ) ) {
 			return $parent;
