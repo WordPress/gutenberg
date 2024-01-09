@@ -67,7 +67,6 @@ export default function BlockThemeControl( { id } ) {
 					<MenuGroup>
 						<MenuItem
 							onClick={ ( event ) => {
-								setRenderingMode( 'template-only' );
 								editTemplate.onClick( event );
 								onClose();
 								createSuccessNotice(
