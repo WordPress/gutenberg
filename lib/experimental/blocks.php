@@ -121,8 +121,8 @@ if ( $gutenberg_experiments && (
 			//     }
 			//   },
 			//   "url": {
-			//   "source": {
-			//     "name": "post_meta",
+			//     "source": {
+			//       "name": "post_meta",
 			//       "attributes": { "value": "text_custom_field" }
 			//     }
 			//   }
