@@ -161,12 +161,22 @@ function FontCollection( { id } ) {
 	const handleInstall = async () => {
 		const fontFamily = fontsToInstall[ 0 ];
 
-		for ( let i = 0; i < fontFamily.fontFace.length; i++ ) {
-			const fontFace = fontFamily.fontFace[ i ];
-			fontFace.file = await downloadFontFaceAsset(
-				fontFace.downloadFromUrl
-			);
-			delete fontFace.downloadFromUrl;
+		try {
+			for ( let i = 0; i < fontFamily.fontFace.length; i++ ) {
+				const fontFace = fontFamily.fontFace[ i ];
+				fontFace.file = await downloadFontFaceAsset(
+					fontFace.downloadFromUrl
+				);
+				delete fontFace.downloadFromUrl;
+			}
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message: __(
+					'Error installing the fonts, could not be downloaded.'
+				),
+			} );
+			return;
 		}
 
 		const response = await installFont( fontFamily );
@@ -178,11 +188,6 @@ function FontCollection( { id } ) {
 	const downloadFontFaceAsset = async ( url ) => {
 		return fetch( new Request( url ) )
 			.then( ( response ) => {
-				if ( ! response.ok ) {
-					throw new Error(
-						`HTTP error! Status: ${ response.status }`
-					);
-				}
 				return response.blob();
 			} )
 			.then( ( blob ) => {
