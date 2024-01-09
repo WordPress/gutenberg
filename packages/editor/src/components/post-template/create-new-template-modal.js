@@ -94,7 +94,7 @@ export default function CreateNewTemplateModal( { onClose } ) {
 			slug: cleanForSlug( title || DEFAULT_TITLE ),
 			content: newTemplateContent,
 			title: title || DEFAULT_TITLE,
-		} ).then( () => {} );
+		} );
 
 		setIsBusy( false );
 		const editTemplate = getPostLinkProps
