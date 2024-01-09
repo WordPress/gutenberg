@@ -10,7 +10,7 @@
 	}
 }
 
-.dataviews__filters-view-actions {
+.dataviews-filters__view-actions {
 	padding: $grid-unit-15 $grid-unit-40;
 	.components-search-control {
 		flex-grow: 1;
@@ -55,7 +55,7 @@
 	margin: $grid-unit-40 0 $grid-unit-20;
 }
 
-.dataviews-table-view {
+.dataviews-view-table {
 	width: 100%;
 	text-indent: 0;
 	border-color: inherit;
@@ -89,8 +89,8 @@
 		th:first-child {
 			padding-left: $grid-unit-40;
 
-			.dataviews-table-header-button,
-			.dataviews-table-header {
+			.dataviews-view-table-header-button,
+			.dataviews-view-table-header {
 				margin-left: - #{$grid-unit-10};
 			}
 		}
@@ -129,7 +129,7 @@
 		}
 	}
 
-	.dataviews-table-header-button {
+	.dataviews-view-table-header-button {
 		padding: $grid-unit-05 $grid-unit-10;
 		font-size: 11px;
 		text-transform: uppercase;
@@ -148,12 +148,12 @@
 		}
 	}
 
-	.dataviews-table-header {
+	.dataviews-view-table-header {
 		padding-left: $grid-unit-05;
 	}
 }
 
-.dataviews-grid-view {
+.dataviews-view-grid {
 	margin-bottom: $grid-unit-30;
 	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 	padding: 0 $grid-unit-40;
@@ -221,7 +221,7 @@
 	}
 }
 
-.dataviews-list-view {
+.dataviews-view-list {
 	margin: 0;
 
 	li {
@@ -235,7 +235,7 @@
 		}
 	}
 
-	.dataviews-list-view__item {
+	.dataviews-view-list__item {
 		padding: $grid-unit-15 $grid-unit-40;
 		cursor: default;
 		&:focus,
@@ -252,8 +252,8 @@
 		}
 	}
 
-	.dataviews-list-view__item-selected,
-	.dataviews-list-view__item-selected:hover {
+	.dataviews-view-list__item-selected,
+	.dataviews-view-list__item-selected:hover {
 		background-color: $gray-100;
 
 		&:focus {
@@ -261,7 +261,7 @@
 		}
 	}
 
-	.dataviews-list-view__media-wrapper {
+	.dataviews-view-list__media-wrapper {
 		min-width: $grid-unit-40;
 		height: $grid-unit-40;
 		border-radius: $grid-unit-05;
@@ -281,19 +281,19 @@
 		}
 	}
 
-	.dataviews-list-view__media-placeholder {
+	.dataviews-view-list__media-placeholder {
 		min-width: $grid-unit-40;
 		height: $grid-unit-40;
 		background-color: $gray-200;
 	}
 
-	.dataviews-list-view__fields {
+	.dataviews-view-list__fields {
 		color: $gray-700;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 
-		.dataviews-list-view__field {
+		.dataviews-view-list__field {
 			margin-right: $grid-unit-15;
 
 			&:last-child {
@@ -312,7 +312,7 @@
 	padding: 0 $grid-unit-40;
 }
 
-.dataviews__filters-custom-menu-radio-item-prefix {
+.dataviews-filters__custom-menu-radio-item-prefix {
 	display: block;
 	width: 24px;
 }
