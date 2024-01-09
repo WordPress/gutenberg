@@ -113,8 +113,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
 			const postContext =
-				rootLevelPost.type !== 'wp_template' ||
-				( shouldRenderTemplate && mode !== 'template-only' )
+				rootLevelPost.type !== 'wp_template'
 					? { postId: post.id, postType: post.type }
 					: {};
 
@@ -125,14 +124,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						? rootLevelPost.slug
 						: undefined,
 			};
-		}, [
-			mode,
-			post.id,
-			post.type,
-			rootLevelPost.type,
-			rootLevelPost?.slug,
-			shouldRenderTemplate,
-		] );
+		}, [ post.id, post.type, rootLevelPost.type, rootLevelPost.slug ] );
 		const { editorSettings, selection, isReady } = useSelect(
 			( select ) => {
 				const {
