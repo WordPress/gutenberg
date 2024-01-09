@@ -1,0 +1,26 @@
+.wp-block-post-content__placeholder {
+	.components-placeholder {
+		min-height: auto;
+		box-shadow: none;
+		padding: $grid-unit-30;
+	}
+}
+
+.wp-block-post-content__content-placeholder {
+	&.has-illustration::before {
+		border: 1px solid currentColor;
+		background: none;
+	}
+	.components-placeholder__illustration {
+		opacity: 0.1;
+	}
+	.components-placeholder__fieldset {
+		font-size: inherit;
+		font-family: inherit;
+		align-self: center;
+		p {
+			font-size: inherit;
+			font-family: inherit;
+		}
+	}
+}

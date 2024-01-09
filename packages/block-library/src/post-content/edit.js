@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -18,7 +23,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Placeholder, Button } from '@wordpress/components';
 import { postContent as icon } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -80,21 +85,14 @@ function PostContentPlaceholder( { layoutClassNames } ) {
 	const blockProps = useBlockProps( { className: layoutClassNames } );
 	return (
 		<div { ...blockProps }>
-			<p>
-				{ __(
-					'This is the Content block, it will display all the blocks in any single post or page.'
-				) }
-			</p>
-			<p>
-				{ __(
-					'That might be a simple arrangement like consecutive paragraphs in a blog post, or a more elaborate composition that includes image galleries, videos, tables, columns, and any other block types.'
-				) }
-			</p>
-			<p>
-				{ __(
-					'If there are any Custom Post Types registered at your site, the Content block can display the contents of those entries as well.'
-				) }
-			</p>
+			<Placeholder
+				className="wp-block-post-content__content-placeholder"
+				withIllustration={ true }
+			>
+				<p>
+					{ __( 'This block will be replaced with your content.' ) }
+				</p>
+			</Placeholder>
 		</div>
 	);
 }
@@ -128,13 +126,23 @@ function EditableContent( { context = {}, clientId } ) {
 	const [ hasPlaceholder, setHasPlaceholder ] = useState( ! hasInnerBlocks );
 
 	const { children, ...props } = useInnerBlocksProps(
-		useBlockProps( { className: 'entry-content' } ),
+		useBlockProps( {
+			className: classnames( 'entry-content', {
+				'wp-block-post-content__placeholder': hasPlaceholder,
+			} ),
+		} ),
 		{
 			value: blocks,
 			onInput,
 			onChange,
 		}
 	);
+
+	useEffect(
+		() => setHasPlaceholder( ! hasInnerBlocks ),
+		[ hasInnerBlocks ]
+	);
+
 	const onClose = () => {
 		setHasPlaceholder( false );
 		const initialBlock = createBlock( 'core/paragraph' );
@@ -143,7 +151,6 @@ function EditableContent( { context = {}, clientId } ) {
 	};
 
 	const openInserter = () => {
-		setHasPlaceholder( false );
 		setInserterIsOpened( {
 			initialCategory: 'patterns',
 			rootClientId: clientId,
