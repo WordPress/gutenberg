@@ -193,11 +193,12 @@ function gutenberg_process_non_interactive_block( $non_interactive_block, $conte
  */
 function gutenberg_process_interactive_html( $html, $context, $inner_blocks = array(), &$namespace_stack = array() ) {
 	static $directives = array(
-		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
-		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
-		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
-		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
-		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
+		'data-wp-interactive' => 'gutenberg_interactivity_process_wp_interactive',
+		'data-wp-context'     => 'gutenberg_interactivity_process_wp_context',
+		'data-wp-bind'        => 'gutenberg_interactivity_process_wp_bind',
+		'data-wp-class'       => 'gutenberg_interactivity_process_wp_class',
+		'data-wp-style'       => 'gutenberg_interactivity_process_wp_style',
+		'data-wp-text'        => 'gutenberg_interactivity_process_wp_text',
 	);
 
 	$tags                   = new WP_Directive_Processor( $html );
@@ -273,25 +274,16 @@ function gutenberg_process_interactive_html( $html, $context, $inner_blocks = ar
 			$attributes
 		);
 
-		// Push the new namespace if the current tag is an island.
-		$island = $tags->get_attribute( 'data-wp-interactive' );
-		if ( isset( $island ) && ! $tags->is_tag_closer() ) {
-			$island_data       = json_decode( $island, true );
-			$namespace_stack[] = $island_data['namespace'];
-		}
-
 		foreach ( $sorted_attrs as $attribute ) {
-			call_user_func(
+			call_user_func_array(
 				$directives[ $attribute ],
-				$tags,
-				$context,
-				end( $namespace_stack )
+				array(
+					$tags,
+					$context,
+					end( $namespace_stack ),
+					&$namespace_stack,
+				)
 			);
-		}
-
-		// Pop the current namespace if this is the closing tag of an island.
-		if ( isset( $island ) && $tags->is_tag_closer() ) {
-			array_pop( $namespace_stack );
 		}
 	}
 
