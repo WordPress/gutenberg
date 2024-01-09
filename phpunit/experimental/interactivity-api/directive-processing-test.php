@@ -82,6 +82,31 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 				),
 			)
 		);
+
+		register_block_type(
+			'test/directives',
+			array(
+				'render_callback' => function ( $attributes, $content ) {
+					$parsed_attributes = array();
+					foreach ( $attributes as $key => $value ) {
+						$parsed_attributes[ $key ] = is_array( $value )
+							? wp_json_encode( $value, JSON_HEX_APOS )
+							: esc_attr( $value );
+					}
+
+					$wrapper_attributes = get_block_wrapper_attributes(
+						$parsed_attributes
+					);
+
+					return "<div $wrapper_attributes>$content</div>";
+				},
+				'supports'        => array(
+					'interactivity' => true,
+				),
+			)
+		);
+
+		WP_Interactivity_Initial_State::reset();
 	}
 
 	public function tear_down() {
@@ -92,6 +117,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		unregister_block_type( 'test/non-interactive-with-directive' );
 		unregister_block_type( 'test/context-level-with-manual-inner-block-rendering' );
 		unregister_block_type( 'test/directives-ordering' );
+		unregister_block_type( 'test/directives' );
 		parent::tear_down();
 	}
 
@@ -313,5 +339,184 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 			array( 'Tests_Process_Directives', 'static_increment' ),
 			gutenberg_interactivity_evaluate_reference( 'state.class_static_method', 'myblock', $context->get_context() )
 		);
+	}
+
+	public function test_namespace_should_be_inherited_from_ancestor() {
+		/*
+		 * This function call should be done inside block render functions. We
+		 * run it here instead just for conveninence.
+		 */
+		wp_initial_state( 'test-1', array( 'text' => 'state' ) );
+
+		$post_content = '
+			<!-- wp:test/directives { "data-wp-interactive": { "namespace": "test-1" } } -->
+				<!-- wp:test/directives { "data-wp-context": { "text": "context" } } -->
+					<!-- wp:test/directives {
+						"class": "bind-state",
+						"data-wp-bind--data-value": "state.text"
+					} /-->
+					<!-- wp:test/directives {
+						"class": "bind-context",
+						"data-wp-bind--data-value": "context.text"
+					} /-->
+				<!-- /wp:test/directives -->
+			<!-- /wp:test/directives -->
+		';
+
+		$html = do_blocks( $post_content );
+		$tags = new WP_HTML_Tag_Processor( $html );
+
+		$tags->next_tag( array( 'class_name' => 'bind-state' ) );
+		$this->assertSame( 'state', $tags->get_attribute( 'data-value' ) );
+
+		$tags->next_tag( array( 'class_name' => 'bind-context' ) );
+		$this->assertSame( 'context', $tags->get_attribute( 'data-value' ) );
+	}
+
+	public function test_namespace_should_be_inherited_from_same_element() {
+		/*
+		 * This function call should be done inside block render functions. We
+		 * run it here instead just for conveninence.
+		 */
+		wp_initial_state( 'test-2', array( 'text' => 'state-2' ) );
+
+		$post_content = '
+			<!-- wp:test/directives { "data-wp-interactive": { "namespace": "test-1" } } -->
+				<!-- wp:test/directives { "data-wp-context": { "text": "context" } } -->
+					<!-- wp:test/directives {
+						"class": "bind-state",
+						"data-wp-interactive": { "namespace": "test-2" },
+						"data-wp-bind--data-value": "state.text"
+					} /-->
+					<!-- wp:test/directives {
+						"class": "bind-context",
+						"data-wp-interactive": { "namespace": "test-2" },
+						"data-wp-context": { "text": "context-2" },
+						"data-wp-bind--data-value": "context.text"
+					} /-->
+				<!-- /wp:test/directives -->
+			<!-- /wp:test/directives -->
+		';
+
+		$html = do_blocks( $post_content );
+		$tags = new WP_HTML_Tag_Processor( $html );
+
+		$tags->next_tag( array( 'class_name' => 'bind-state' ) );
+		$this->assertSame( 'state-2', $tags->get_attribute( 'data-value' ) );
+
+		$tags->next_tag( array( 'class_name' => 'bind-context' ) );
+		$this->assertSame( 'context-2', $tags->get_attribute( 'data-value' ) );
+	}
+
+	public function test_namespace_should_not_leak_from_descendant() {
+		/*
+		 * This function call should be done inside block render functions. We
+		 * run it here instead just for conveninence.
+		 */
+		wp_initial_state( 'test-1', array( 'text' => 'state-1' ) );
+		wp_initial_state( 'test-2', array( 'text' => 'state-2' ) );
+
+		$post_content = '
+			<!-- wp:test/directives {
+				"data-wp-interactive": { "namespace": "test-2" },
+				"data-wp-context": { "text": "context-2" }
+			} -->
+				<!-- wp:test/directives {
+					"class": "target",
+					"data-wp-interactive": { "namespace": "test-1" },
+					"data-wp-context": { "text": "context-1" },
+					"data-wp-bind--data-state": "state.text",
+					"data-wp-bind--data-context": "context.text"
+				} -->
+					<!-- wp:test/directives {
+						"data-wp-interactive": { "namespace": "test-2" }
+					} /-->
+				<!-- /wp:test/directives -->
+			<!-- /wp:test/directives -->
+		';
+
+		$html = do_blocks( $post_content );
+		$tags = new WP_HTML_Tag_Processor( $html );
+
+		$tags->next_tag( array( 'class_name' => 'target' ) );
+		$this->assertSame( 'state-1', $tags->get_attribute( 'data-state' ) );
+		$this->assertSame( 'context-1', $tags->get_attribute( 'data-context' ) );
+	}
+
+	public function test_namespace_should_not_leak_from_sibling() {
+		/*
+		 * This function call should be done inside block render functions. We
+		 * run it here instead just for conveninence.
+		 */
+		wp_initial_state( 'test-1', array( 'text' => 'state-1' ) );
+		wp_initial_state( 'test-2', array( 'text' => 'state-2' ) );
+
+		$post_content = '
+			<!-- wp:test/directives {
+				"data-wp-interactive": { "namespace": "test-2" },
+				"data-wp-context": { "text": "context-2" }
+			} -->
+				<!-- wp:test/directives {
+					"data-wp-interactive": { "namespace": "test-1" },
+					"data-wp-context": { "text": "context-1" }
+				} -->
+					<!-- wp:test/directives {
+						"data-wp-interactive": { "namespace": "test-2" }
+					} /-->
+					<!-- wp:test/directives {
+						"class": "target",
+						"data-wp-bind--data-from-state": "state.text",
+						"data-wp-bind--data-from-context": "context.text"
+					} /-->
+				<!-- /wp:test/directives -->
+			<!-- /wp:test/directives -->
+		';
+
+		$html = do_blocks( $post_content );
+		$tags = new WP_HTML_Tag_Processor( $html );
+
+		$tags->next_tag( array( 'class_name' => 'target' ) );
+		$this->assertSame( 'state-1', $tags->get_attribute( 'data-from-state' ) );
+		$this->assertSame( 'context-1', $tags->get_attribute( 'data-from-context' ) );
+	}
+
+	public function test_namespace_can_be_overwritten_in_directives() {
+		/*
+		 * This function call should be done inside block render functions. We
+		 * run it here instead just for conveninence.
+		 */
+		wp_initial_state( 'test-1', array( 'text' => 'state-1' ) );
+		wp_initial_state( 'test-2', array( 'text' => 'state-2' ) );
+
+		$post_content = '
+			<!-- wp:test/directives { "data-wp-interactive": { "namespace": "test-1" } } -->
+					<!-- wp:test/directives {
+						"class": "inherited-ns",
+						"data-wp-bind--data-value": "state.text"
+					} /-->
+					<!-- wp:test/directives {
+						"class": "custom-ns",
+						"data-wp-bind--data-value": "test-2::state.text"
+					} /-->
+					<!-- wp:test/directives {
+						"class": "mixed-ns",
+						"data-wp-bind--data-inherited-ns": "state.text",
+						"data-wp-bind--data-custom-ns": "test-2::state.text"
+					} /-->
+			<!-- /wp:test/directives -->
+		';
+
+		$html = do_blocks( $post_content );
+		$tags = new WP_HTML_Tag_Processor( $html );
+
+		$tags->next_tag( array( 'class_name' => 'inherited-ns' ) );
+		$this->assertSame( 'state-1', $tags->get_attribute( 'data-value' ) );
+
+		$tags->next_tag( array( 'class_name' => 'custom-ns' ) );
+		$this->assertSame( 'state-2', $tags->get_attribute( 'data-value' ) );
+
+		$tags->next_tag( array( 'class_name' => 'mixed-ns' ) );
+		$this->assertSame( 'state-1', $tags->get_attribute( 'data-inherited-ns' ) );
+		$this->assertSame( 'state-2', $tags->get_attribute( 'data-custom-ns' ) );
 	}
 }
