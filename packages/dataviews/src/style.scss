@@ -263,7 +263,7 @@
 			.components-button {
 				color: $white;
 			}
-			
+
 			&::after {
 				background: transparent;
 			}
@@ -275,7 +275,7 @@
 		width: 100%;
 		cursor: pointer;
 		&:focus {
-			&:before {
+			&::before {
 				position: absolute;
 				content: "";
 				top: -1px;
