@@ -140,6 +140,13 @@ class WP_Font_Library {
 		return new WP_Error( 'font_collection_not_found', 'Font collection not found.' );
 	}
 
+	/**
+	 * Gets a multi site sub-dir.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return string multi site sub-dir path.
+	 */
 	private static function get_multi_site_font_sub_dir() {
 		$font_sub_dir = '';
 		if ( is_multisite() && ! ( is_main_network() && is_main_site() ) ) {
