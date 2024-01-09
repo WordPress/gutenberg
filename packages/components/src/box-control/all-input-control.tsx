@@ -54,10 +54,6 @@ export default function AllInputControl( {
 		onChange( nextValues );
 	};
 
-	const unitControlOnChange: UnitControlProps[ 'onChange' ] = ( next ) => {
-		onValueChange( next );
-	};
-
 	const sliderOnChange = ( next?: number ) => {
 		onValueChange(
 			next !== undefined ? [ next, parsedUnit ].join( '' ) : undefined
@@ -80,7 +76,7 @@ export default function AllInputControl( {
 				id={ inputId }
 				isPressEnterToChange
 				value={ allValue }
-				onChange={ unitControlOnChange }
+				onChange={ onValueChange }
 				onUnitChange={ handleOnUnitChange }
 				onFocus={ handleOnFocus }
 				placeholder={ allPlaceholder }
