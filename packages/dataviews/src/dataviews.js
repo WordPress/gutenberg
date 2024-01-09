@@ -17,6 +17,7 @@ import Search from './search';
 import { VIEW_LAYOUTS } from './constants';
 
 const defaultGetItemId = ( item ) => item.id;
+const defaultOnSelectionChange = () => {};
 
 export default function DataViews( {
 	view,
@@ -30,7 +31,8 @@ export default function DataViews( {
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
-	onSelectionChange,
+	onSelectionChange = defaultOnSelectionChange,
+	onDetailsChange = null,
 	deferredRendering = false,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
@@ -89,6 +91,7 @@ export default function DataViews( {
 					getItemId={ getItemId }
 					isLoading={ isLoading }
 					onSelectionChange={ onSetSelection }
+					onDetailsChange={ onDetailsChange }
 					selection={ selection }
 					deferredRendering={ deferredRendering }
 				/>
