@@ -63,7 +63,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'get_font_faces_permissions_check' ),
-					'args'                => array(),
+					'args'                => $this->get_collection_params(),
 				),
 				array(
 					'methods'             => WP_REST_Server::CREATABLE,
@@ -144,7 +144,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		return $parent_post;
 	}
 
-		/**
+	/**
 	 * Checks if a given request has access to read posts.
 	 *
 	 * @since 6.5.0
@@ -158,7 +158,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		if ( ! current_user_can( $post_type->cap->edit_posts ) ) {
 			return new WP_Error(
 				'rest_cannot_read',
-				__( 'Sorry, you are not allowed to do that.' ),
+				__( 'Sorry, you are not allowed to access font faces.' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -414,5 +414,40 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$this->schema = $schema;
 
 		return $this->add_additional_fields_schema( $this->schema );
+	}
+
+	/**
+	 * Retrieves the query params for the font face collection.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return array Collection parameters.
+	 */
+	public function get_collection_params() {
+		return array(
+			'page'     => array(
+				'description'       => __( 'Current page of the collection.' ),
+				'type'              => 'integer',
+				'default'           => 1,
+				'sanitize_callback' => 'absint',
+				'validate_callback' => 'rest_validate_request_arg',
+				'minimum'           => 1,
+			),
+			'per_page' => array(
+				'description'       => __( 'Maximum number of items to be returned in result set.' ),
+				'type'              => 'integer',
+				'default'           => 10,
+				'minimum'           => 1,
+				'maximum'           => 100,
+				'sanitize_callback' => 'absint',
+				'validate_callback' => 'rest_validate_request_arg',
+			),
+			'search'   => array(
+				'description'       => __( 'Limit results to those matching a string.' ),
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+				'validate_callback' => 'rest_validate_request_arg',
+			),
+		);
 	}
 }

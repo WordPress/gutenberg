@@ -35,18 +35,17 @@ function gutenberg_init_font_library_routes() {
 	register_post_type(
 		'wp_font_face',
 		array(
-			'labels'          => array(
+			'labels'       => array(
 				'name'          => __( 'Font Faces', 'gutenberg' ),
 				'singular_name' => __( 'Font Face', 'gutenberg' ),
 			),
-			'public'          => false,
-			'_builtin'        => true,                              /* internal use only. don't use this when registering your own post type. */
-			'hierarchical'    => false,
-			'show_in_rest'    => false,
-			'rest_base'       => 'font-faces',
+			'public'       => false,
+			'_builtin'     => true,                              /* internal use only. don't use this when registering your own post type. */
+			'hierarchical' => false,
+			'show_in_rest' => false,
+			'rest_base'    => 'font-faces',
 			// TODO: Add custom font capability
-			'capability_type' => 'post',
-			'capabilities'    => array(
+			'capabilities' => array(
 				'read'                   => 'edit_theme_options',
 				'read_post'              => 'edit_theme_options',
 				'read_private_posts'     => 'edit_theme_options',
@@ -61,8 +60,8 @@ function gutenberg_init_font_library_routes() {
 				'edit_others_posts'      => 'edit_theme_options',
 				'delete_others_posts'    => 'edit_theme_options',
 			),
-			'map_meta_cap'    => false,
-			'query_var'       => false,
+			'map_meta_cap' => false,
+			'query_var'    => false,
 		)
 	);
 
