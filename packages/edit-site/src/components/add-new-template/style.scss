@@ -39,7 +39,8 @@
 
 	.edit-site-custom-template-modal__suggestions_list {
 		@include break-small() {
-			overflow: scroll;
+			max-height: $grid-unit-70 * 4; // Height of four buttons
+			overflow-y: auto;
 		}
 
 		&__list-item {

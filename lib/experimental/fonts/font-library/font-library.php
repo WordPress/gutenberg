@@ -60,6 +60,19 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
+	/**
+	 * Unregisters a font collection from the Font Library.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param string $collection_id The font collection ID.
+	 */
+	function wp_unregister_font_collection( $collection_id ) {
+		WP_Font_Library::unregister_font_collection( $collection_id );
+	}
+
+}
 
 $default_font_collection = array(
 	'id'          => 'default-font-collection',

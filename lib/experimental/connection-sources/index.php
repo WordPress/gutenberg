@@ -12,8 +12,12 @@ return array(
 		// if it doesn't, `get_post_meta()` will just return an empty string.
 		return get_post_meta( $block_instance->context['postId'], $meta_field, true );
 	},
-	'pattern_attributes' => function ( $block_instance ) {
+	'pattern_attributes' => function ( $block_instance, $attribute_name ) {
 		$block_id = $block_instance->attributes['metadata']['id'];
-		return _wp_array_get( $block_instance->context, array( 'pattern/overrides', $block_id ), false );
+		return _wp_array_get(
+			$block_instance->context,
+			array( 'pattern/overrides', $block_id, $attribute_name ),
+			false
+		);
 	},
 );

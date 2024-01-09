@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Modal, TabPanel } from '@wordpress/components';
+import {
+	Modal,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -12,33 +15,33 @@ import InstalledFonts from './installed-fonts';
 import FontCollection from './font-collection';
 import UploadFonts from './upload-fonts';
 import { FontLibraryContext } from './context';
+import { unlock } from '../../../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 const DEFAULT_TABS = [
 	{
-		name: 'installed-fonts',
+		id: 'installed-fonts',
 		title: __( 'Library' ),
-		className: 'installed-fonts',
 	},
 	{
-		name: 'upload-fonts',
+		id: 'upload-fonts',
 		title: __( 'Upload' ),
-		className: 'upload-fonts',
 	},
 ];
 
 const tabsFromCollections = ( collections ) =>
 	collections.map( ( { id, name } ) => ( {
-		name: id,
+		id,
 		title:
 			collections.length === 1 && id === 'default-font-collection'
 				? __( 'Install Fonts' )
 				: name,
-		className: 'collection',
 	} ) );
 
 function FontLibraryModal( {
 	onRequestClose,
-	initialTabName = 'installed-fonts',
+	initialTabId = 'installed-fonts',
 } ) {
 	const { collections } = useContext( FontLibraryContext );
 
@@ -54,22 +57,39 @@ function FontLibraryModal( {
 			isFullScreen
 			className="font-library-modal"
 		>
-			<TabPanel
-				className="font-library-modal__tab-panel"
-				initialTabName={ initialTabName }
-				tabs={ tabs }
-			>
-				{ ( tab ) => {
-					switch ( tab.name ) {
-						case 'upload-fonts':
-							return <UploadFonts />;
-						case 'installed-fonts':
-							return <InstalledFonts />;
-						default:
-							return <FontCollection id={ tab.name } />;
-					}
-				} }
-			</TabPanel>
+			<div className="font-library-modal__tabs">
+				<Tabs initialTabId={ initialTabId }>
+					<Tabs.TabList>
+						{ tabs.map( ( { id, title } ) => (
+							<Tabs.Tab key={ id } tabId={ id }>
+								{ title }
+							</Tabs.Tab>
+						) ) }
+					</Tabs.TabList>
+					{ tabs.map( ( { id } ) => {
+						let contents;
+						switch ( id ) {
+							case 'upload-fonts':
+								contents = <UploadFonts />;
+								break;
+							case 'installed-fonts':
+								contents = <InstalledFonts />;
+								break;
+							default:
+								contents = <FontCollection id={ id } />;
+						}
+						return (
+							<Tabs.TabPanel
+								key={ id }
+								tabId={ id }
+								focusable={ false }
+							>
+								{ contents }
+							</Tabs.TabPanel>
+						);
+					} ) }
+				</Tabs>
+			</div>
 		</Modal>
 	);
 }

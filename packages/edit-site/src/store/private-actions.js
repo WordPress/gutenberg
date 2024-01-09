@@ -24,10 +24,10 @@ export const setCanvasMode =
 			mode === 'edit' &&
 			registry
 				.select( preferencesStore )
-				.get( 'core/edit-site', 'showListViewByDefault' ) &&
+				.get( 'core', 'showListViewByDefault' ) &&
 			! registry
 				.select( preferencesStore )
-				.get( 'core/edit-site', 'distractionFree' )
+				.get( 'core', 'distractionFree' )
 		) {
 			registry.dispatch( editorStore ).setIsListViewOpened( true );
 		} else {

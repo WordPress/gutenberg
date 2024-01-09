@@ -56,14 +56,12 @@ describe( 'actions', () => {
 	it( 'openGeneralSidebar - should turn off distraction free mode when opening a general sidebar', () => {
 		registry
 			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'distractionFree', true );
+			.set( 'core', 'distractionFree', true );
 		registry
 			.dispatch( editPostStore )
 			.openGeneralSidebar( 'edit-post/block' );
 		expect(
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'distractionFree' )
+			registry.select( preferencesStore ).get( 'core', 'distractionFree' )
 		).toBe( false );
 	} );
 
@@ -119,12 +117,12 @@ describe( 'actions', () => {
 		it( 'should turn off distraction free mode when switching to code editor', () => {
 			registry
 				.dispatch( preferencesStore )
-				.set( 'core/edit-post', 'distractionFree', true );
+				.set( 'core', 'distractionFree', true );
 			registry.dispatch( editPostStore ).switchEditorMode( 'text' );
 			expect(
 				registry
 					.select( preferencesStore )
-					.get( 'core/edit-post', 'distractionFree' )
+					.get( 'core', 'distractionFree' )
 			).toBe( false );
 		} );
 	} );
@@ -259,7 +257,7 @@ describe( 'actions', () => {
 			// Enable everything that shouldn't be enabled in distraction free mode.
 			registry
 				.dispatch( preferencesStore )
-				.set( 'core/edit-post', 'fixedToolbar', true );
+				.set( 'core', 'fixedToolbar', true );
 			registry.dispatch( editorStore ).setIsListViewOpened( true );
 			registry
 				.dispatch( editPostStore )
@@ -269,7 +267,7 @@ describe( 'actions', () => {
 			expect(
 				registry
 					.select( preferencesStore )
-					.get( 'core/edit-post', 'fixedToolbar' )
+					.get( 'core', 'fixedToolbar' )
 			).toBe( true );
 			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
 				false
@@ -285,7 +283,7 @@ describe( 'actions', () => {
 			expect(
 				registry
 					.select( preferencesStore )
-					.get( 'core/edit-post', 'distractionFree' )
+					.get( 'core', 'distractionFree' )
 			).toBe( true );
 		} );
 	} );

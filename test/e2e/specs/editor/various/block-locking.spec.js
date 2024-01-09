@@ -82,6 +82,12 @@ test.describe( 'Block Locking', () => {
 		await page.click( 'role=checkbox[name="Lock all"]' );
 		await page.click( 'role=button[name="Apply"]' );
 
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Lock' } )
+		).toBeFocused();
+
 		expect( await editor.getEditedPostContent() )
 			.toBe( `<!-- wp:paragraph {"lock":{"move":false,"remove":false}} -->
 <p>Some paragraph</p>

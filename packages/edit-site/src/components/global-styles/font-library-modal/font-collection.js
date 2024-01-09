@@ -21,7 +21,7 @@ import { search, closeSmall } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import TabLayout from './tab-layout';
+import TabPanelLayout from './tab-panel-layout';
 import { FontLibraryContext } from './context';
 import FontsGrid from './fonts-grid';
 import FontCard from './font-card';
@@ -54,7 +54,7 @@ function FontCollection( { id } ) {
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const { collections, getFontCollection, installFonts } =
+	const { collections, getFontCollection, installFont } =
 		useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
 		( collection ) => collection.id === id
@@ -91,6 +91,11 @@ function FontCollection( { id } ) {
 		setSelectedFont( null );
 		setNotice( null );
 	}, [ id ] );
+
+	useEffect( () => {
+		// If the selected fonts change, reset the selected fonts to install
+		setFontsToInstall( [] );
+	}, [ selectedFont ] );
 
 	// Reset notice after 5 seconds
 	useEffect( () => {
@@ -149,14 +154,14 @@ function FontCollection( { id } ) {
 	};
 
 	const handleInstall = async () => {
-		const response = await installFonts( fontsToInstall );
+		const response = await installFont( fontsToInstall[ 0 ] );
 		const installNotice = getNoticeFromInstallResponse( response );
 		setNotice( installNotice );
 		resetFontsToInstall();
 	};
 
 	return (
-		<TabLayout
+		<TabPanelLayout
 			title={
 				! selectedFont ? selectedCollection.name : selectedFont.name
 			}
@@ -270,7 +275,7 @@ function FontCollection( { id } ) {
 					) ) }
 				</FontsGrid>
 			) }
-		</TabLayout>
+		</TabPanelLayout>
 	);
 }
 

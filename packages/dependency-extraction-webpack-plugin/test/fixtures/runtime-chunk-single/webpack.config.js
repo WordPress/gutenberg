@@ -8,7 +8,13 @@ module.exports = {
 		a: './a',
 		b: './b',
 	},
-	plugins: [ new DependencyExtractionWebpackPlugin() ],
+	plugins: [
+		new DependencyExtractionWebpackPlugin( {
+			requestToExternalModule( request ) {
+				return request.startsWith( '@wordpress/' );
+			},
+		} ),
+	],
 	optimization: {
 		runtimeChunk: 'single',
 	},

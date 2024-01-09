@@ -23,6 +23,7 @@ const {
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
 } = unlock( componentsPrivateApis );
 
 const FilterText = ( { activeElement, filterInView, filter } ) => {
@@ -126,6 +127,11 @@ export default function FilterSummary( { filter, view, onChangeView } ) {
 								<DropdownMenuItemLabel>
 									{ element.label }
 								</DropdownMenuItemLabel>
+								{ !! element.description && (
+									<DropdownMenuItemHelpText>
+										{ element.description }
+									</DropdownMenuItemHelpText>
+								) }
 							</DropdownMenuRadioItemCustom>
 						);
 					} ) }

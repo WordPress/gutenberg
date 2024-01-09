@@ -63,7 +63,7 @@ const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 function VideoEdit( {
-	isSelected,
+	isSelected: isSingleSelected,
 	attributes,
 	className,
 	setAttributes,
@@ -75,26 +75,13 @@ function VideoEdit( {
 	const posterImageButton = useRef();
 	const { id, controls, poster, src, tracks } = attributes;
 	const isTemporaryVideo = ! id && isBlobURL( src );
-	const { mediaUpload, multiVideoSelection } = useSelect( ( select ) => {
-		const { getSettings, getMultiSelectedBlockClientIds, getBlockName } =
-			select( blockEditorStore );
-		const multiSelectedClientIds = getMultiSelectedBlockClientIds();
-
-		return {
-			mediaUpload: getSettings().mediaUpload,
-			multiVideoSelection:
-				multiSelectedClientIds.length &&
-				multiSelectedClientIds.every(
-					( _clientId ) => getBlockName( _clientId ) === 'core/video'
-				),
-		};
-	}, [] );
+	const { getSettings } = useSelect( blockEditorStore );
 
 	useEffect( () => {
 		if ( ! id && isBlobURL( src ) ) {
 			const file = getBlobByURL( src );
 			if ( file ) {
-				mediaUpload( {
+				getSettings().mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ media ] ) => onSelectVideo( media ),
 					onError: onUploadError,
@@ -195,7 +182,7 @@ function VideoEdit( {
 
 	return (
 		<>
-			{ ! multiVideoSelection && (
+			{ isSingleSelected && (
 				<>
 					<BlockControls>
 						<TracksEditor
@@ -281,7 +268,7 @@ function VideoEdit( {
 					so the user clicking on it won't play the
 					video when the controls are enabled.
 				*/ }
-				<Disabled isDisabled={ ! isSelected }>
+				<Disabled isDisabled={ ! isSingleSelected }>
 					<video
 						controls={ controls }
 						poster={ poster }
@@ -295,10 +282,10 @@ function VideoEdit( {
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					isSelected={ isSelected }
+					isSelected={ isSingleSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Video caption text' ) }
-					showToolbarButton={ ! multiVideoSelection }
+					showToolbarButton={ isSingleSelected }
 				/>
 			</figure>
 		</>
