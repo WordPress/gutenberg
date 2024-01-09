@@ -71,11 +71,7 @@ function SidebarScreens() {
 				<SidebarNavigationScreenPages />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page/:postId">
-				<SidebarNavigationScreenPage
-					backPath={
-						window.__experimentalAdminViews ? '/pages' : '/page'
-					}
-				/>
+				<SidebarNavigationScreenPage />
 			</SidebarScreenWrapper>
 			{ window?.__experimentalAdminViews && (
 				<SidebarScreenWrapper path="/pages">
