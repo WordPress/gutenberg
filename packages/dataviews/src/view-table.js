@@ -91,8 +91,8 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 				<Button
 					size="compact"
 					className="dataviews-table-header-button"
-					style={ { padding: 0 } }
 					ref={ ref }
+					variant="tertiary"
 				>
 					{ field.header }
 					{ isSorted && (
@@ -409,7 +409,11 @@ function ViewTable( {
 							</th>
 						) ) }
 						{ !! actions?.length && (
-							<th data-field-id="actions">{ __( 'Actions' ) }</th>
+							<th data-field-id="actions">
+								<span className="dataviews-table-header">
+									{ __( 'Actions' ) }
+								</span>
+							</th>
 						) }
 					</tr>
 				</thead>
