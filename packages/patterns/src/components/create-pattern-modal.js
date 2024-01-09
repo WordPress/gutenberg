@@ -82,7 +82,6 @@ export function CreatePatternModalContents( {
 				label: category.label,
 				name: category.name,
 				id: category.id,
-				type: 'user',
 			} );
 		} );
 
@@ -96,7 +95,6 @@ export function CreatePatternModalContents( {
 				uniqueCategories.set( category.label.toLowerCase(), {
 					label: category.label,
 					name: category.name,
-					type: 'core',
 				} );
 			}
 		} );
@@ -146,7 +144,7 @@ export function CreatePatternModalContents( {
 	async function findOrCreateTerm( term ) {
 		try {
 			const existingTerm = categoryMap.get( term.toLowerCase() );
-			if ( existingTerm && existingTerm.type === 'user' ) {
+			if ( existingTerm && existingTerm.id ) {
 				return existingTerm.id;
 			}
 			// If we have an existing core category we need to match the new user category to the
