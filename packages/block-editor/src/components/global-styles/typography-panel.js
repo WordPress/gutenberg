@@ -104,7 +104,7 @@ function getUniqueFontSizesBySlug( settings ) {
 	const fontSizes = settings?.typography?.fontSizes;
 	const mergedFontSizes = fontSizes ? mergeOrigins( fontSizes ) : [];
 	const uniqueSizes = [];
-	for ( const currentSize of mergedFontSizes ) {
+	for ( const currentSize of mergedFontSizes.reverse() ) {
 		if ( ! uniqueSizes.some( ( { slug } ) => slug === currentSize.slug ) ) {
 			uniqueSizes.push( currentSize );
 		}
