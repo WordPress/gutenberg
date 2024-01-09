@@ -151,6 +151,7 @@ if (
 		require __DIR__ . '/experimental/fonts/font-library/class-wp-font-family-utils.php';
 		require __DIR__ . '/experimental/fonts/font-library/class-wp-font-family.php';
 		require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-font-families-controller.php';
+		require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-font-faces-controller.php';
 		require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-font-collections-controller.php';
 		require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-autosave-font-families-controller.php';
 		require __DIR__ . '/experimental/fonts/font-library/font-library.php';
