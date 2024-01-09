@@ -23,7 +23,6 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Placeholder, Button } from '@wordpress/components';
 import { postContent as icon } from '@wordpress/icons';
-import { useState, useEffect } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -87,7 +86,7 @@ function PostContentPlaceholder( { layoutClassNames } ) {
 		<div { ...blockProps }>
 			<Placeholder
 				className="wp-block-post-content__content-placeholder"
-				withIllustration={ true }
+				withIllustration
 			>
 				<p>
 					{ __( 'This block will be replaced with your content.' ) }
@@ -123,12 +122,11 @@ function EditableContent( { context = {}, clientId } ) {
 	);
 
 	const hasInnerBlocks = !! entityRecord?.content?.raw || blocks?.length;
-	const [ hasPlaceholder, setHasPlaceholder ] = useState( ! hasInnerBlocks );
 
 	const { children, ...props } = useInnerBlocksProps(
 		useBlockProps( {
 			className: classnames( 'entry-content', {
-				'wp-block-post-content__placeholder': hasPlaceholder,
+				'wp-block-post-content__placeholder': ! hasInnerBlocks,
 			} ),
 		} ),
 		{
@@ -138,13 +136,7 @@ function EditableContent( { context = {}, clientId } ) {
 		}
 	);
 
-	useEffect(
-		() => setHasPlaceholder( ! hasInnerBlocks ),
-		[ hasInnerBlocks ]
-	);
-
 	const onClose = () => {
-		setHasPlaceholder( false );
 		const initialBlock = createBlock( 'core/paragraph' );
 		insertBlock( initialBlock, 0, clientId );
 		selectBlock( initialBlock.clientId );
@@ -161,7 +153,7 @@ function EditableContent( { context = {}, clientId } ) {
 	return (
 		<div { ...props }>
 			{ children }
-			{ hasPlaceholder && (
+			{ ! hasInnerBlocks && (
 				<EmptyContentPlaceholder
 					context={ context }
 					onClose={ onClose }
