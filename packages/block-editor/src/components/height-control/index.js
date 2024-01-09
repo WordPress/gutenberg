@@ -157,11 +157,14 @@ export default function HeightControl( {
 						onUnitChange={ handleUnitChange }
 						min={ 0 }
 						size={ '__unstable-large' }
+						aria-label={ __( 'Input custom height value' ) }
 					/>
 				</FlexItem>
 				<FlexItem isBlock>
 					<Spacer marginX={ 2 } marginBottom={ 0 }>
 						<RangeControl
+							label={ __( 'Adjust custom height value' ) }
+							hideLabelFromVision
 							value={ customRangeValue }
 							min={ 0 }
 							max={
