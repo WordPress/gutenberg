@@ -114,20 +114,20 @@ if ( $gutenberg_experiments && (
 			// Assuming the following format for the bindings property of the "metadata" attribute:
 			//
 			// "bindings": {
-			// "title": {
-			// "source": {
-			// "name": "post_meta",
-			// "attributes": { "value": "text_custom_field" }
+			//   "title": {
+			//     "source": {
+			//       "name": "post_meta",
+			//       "attributes": { "value": "text_custom_field" }
+			//     }
+			//   },
+			//   "url": {
+			//   "source": {
+			//     "name": "post_meta",
+			//       "attributes": { "value": "text_custom_field" }
+			//     }
+			//   }
 			// }
-			// },
-			// "url": {
-			// "source": {
-			// "name": "post_meta",
-			// "attributes": { "value": "text_custom_field" }
-			// }
-			// }
-			// },
-			// .
+			//
 			global $block_bindings_allowed_blocks;
 			global $block_bindings_sources;
 			$modified_block_content = $block_content;
