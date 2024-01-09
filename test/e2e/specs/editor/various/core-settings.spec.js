@@ -32,11 +32,10 @@ test.describe( 'Settings', () => {
 		);
 
 		await admin.visitAdminPage( 'options-general.php' );
-		await page.type(
-			'input#blogdescription',
-			'Just another Gutenberg site'
-		);
-		await page.click( 'input#submit' );
+		await page
+			.getByRole( 'textbox', { name: 'Tagline' } )
+			.fill( 'Just another Gutenberg site' );
+		await page.getByRole( 'button', { name: 'Save Changes' } ).click();
 
 		const optionsAfter = await getOptionsValues(
 			optionsInputsSelector,
