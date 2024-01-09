@@ -350,9 +350,12 @@ function gutenberg_interactivity_evaluate_reference( $reference, $ns, array $con
 	 * E.g., "file" is an string and a "callable" (the "file" function exists).
 	 */
 	if ( $current instanceof Closure ) {
-		// TODO: Do not pass the store as argument. Implement something similar
-		// to what we have in the JS runtime (`getContext()`, etc.).
-		$current = call_user_func( $current, $store );
+		/*
+		 * TODO: Figure out a way to implement derived state without having to
+		 * pass the store as argument:
+		 *
+		 * $current = call_user_func( $current );
+		 */
 	}
 
 	// Returns the opposite if it has a negator operator (!).
