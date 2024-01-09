@@ -260,6 +260,7 @@ export default function ReusableBlockEdit( {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		templateLock: 'all',
 		layout,
 		renderAppender: innerBlocks?.length
 			? undefined
