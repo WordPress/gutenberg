@@ -1,6 +1,6 @@
 <?php
 /**
- * Define the mechanism to replpace the HTML depending on the block attributes.
+ * Define the mechanism to replace the HTML depending on the block attributes.
  *
  * @package gutenberg
  */
