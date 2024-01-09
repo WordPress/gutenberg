@@ -23,10 +23,12 @@ function gutenberg_interactivity_process_wp_interactive( $tags, $context, $ns, &
 
 	/*
 	 * Decode the data-wp-interactive attribute. In the case it is not a valid
-	 * JSON string, the NULL value is stored in `$island_data`.
+	 * JSON string, NULL is stored in `$island_data`.
 	 */
 	$island      = $tags->get_attribute( 'data-wp-interactive' );
-	$island_data = json_decode( $island, true );
+	$island_data = is_string( $island ) && ! empty( $island )
+		? json_decode( $island, true )
+		: null;
 
 	/*
 	 * Push the newly defined namespace, or the current one if the island
