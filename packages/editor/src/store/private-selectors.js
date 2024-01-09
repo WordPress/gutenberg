@@ -50,14 +50,19 @@ export const getInsertionPoint = createRegistrySelector(
 	}
 );
 
+/**
+ * Get the initial category for the inserter.
+ * A category corresponds to one of the tab categories defined in packages/block-editor/src/components/inserter/tabs.js.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} The initial tab category to open when the inserter is opened.
+ */
 export const getInserterInitialCategory = createRegistrySelector(
-	() => ( state ) => {
-		if ( typeof state.blockInserterPanel === 'object' ) {
-			return state.blockInserterPanel?.initialCategory;
-		}
-
-		return null;
-	}
+	() => ( state ) =>
+		typeof state.blockInserterPanel === 'object'
+			? state.blockInserterPanel?.initialCategory
+			: null
 );
 
 export function getListViewToggleRef( state ) {

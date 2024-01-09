@@ -41,6 +41,10 @@ function InserterTabs( {
 		showMedia && mediaTab,
 	].filter( Boolean );
 
+	initialTabId = !! tabs.find( ( { name } ) => initialTabId === name )
+		? initialTabId
+		: 'blocks';
+
 	return (
 		<div className="block-editor-inserter__tabs">
 			<Tabs initialTabId={ initialTabId } onSelect={ onSelect }>
