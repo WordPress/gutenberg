@@ -6,7 +6,7 @@
  */
 
 if ( function_exists( 'register_block_bindings_source' ) ) {
-	$pattern_source_callback = function ( $source_attrs, $block_content, $block, $block_instance, $attribute_name ) {
+	$pattern_source_callback = function ( $source_attrs, $block_instance, $attribute_name ) {
 		if ( ! _wp_array_get( $block_instance->attributes, array( 'metadata', 'id' ), false ) ) {
 			return null;
 		}
