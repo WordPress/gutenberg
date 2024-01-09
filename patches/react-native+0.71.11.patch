@@ -1,17 +1,5 @@
-diff --git a/node_modules/react-native/Libraries/Components/TextInput/TextInput.js b/node_modules/react-native/Libraries/Components/TextInput/TextInput.js
-index 0758df6..18c5687 100644
---- a/node_modules/react-native/Libraries/Components/TextInput/TextInput.js
-+++ b/node_modules/react-native/Libraries/Components/TextInput/TextInput.js
-@@ -1410,7 +1410,6 @@ function InternalTextInput(props: Props): React.Node {
-         {...props}
-         {...eventHandlers}
-         accessible={accessible}
--        accessibilityState={_accessibilityState}
-         submitBehavior={submitBehavior}
-         caretHidden={caretHidden}
-         dataDetectorTypes={props.dataDetectorTypes}
 diff --git a/node_modules/react-native/third-party-podspecs/boost.podspec b/node_modules/react-native/third-party-podspecs/boost.podspec
-index 3d9331c..bbbb738 100644
+index 3950fce..3ae78ba 100644
 --- a/node_modules/react-native/third-party-podspecs/boost.podspec
 +++ b/node_modules/react-native/third-party-podspecs/boost.podspec
 @@ -10,7 +10,7 @@ Pod::Spec.new do |spec|
