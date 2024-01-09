@@ -1,7 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+import { useMemo } from '@wordpress/element';
+import { hasBlockSupport } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
@@ -9,6 +11,7 @@ import StylesEffectsPanel, {
 	useHasEffectsPanel,
 } from '../components/global-styles/effects-panel';
 import { InspectorControls } from '../components';
+import { store as blockEditorStore } from '../store';
 
 export const EFFECTS_SUPPORT_KEYS = [ 'shadow' ];
 
@@ -18,36 +21,39 @@ export function hasEffectsSupport( blockName ) {
 	);
 }
 
-function EffectsInspectorControl( { children } ) {
-	return <InspectorControls group="effects">{ children }</InspectorControls>;
+function EffectsInspectorControl( { children, resetAllFilter } ) {
+	return (
+		<InspectorControls group="effects" resetAllFilter={ resetAllFilter }>
+			{ children }
+		</InspectorControls>
+	);
 }
 
-export function EffectsPanel( { clientId, name, setAttributes, settings } ) {
+export function EffectsPanel( { clientId, setAttributes, settings } ) {
 	const isEnabled = useHasEffectsPanel( settings );
-
 	const onChange = ( newShadow ) => {
 		setAttributes( {
 			shadow: newShadow,
 		} );
 	};
+	const blockAttributes = useSelect(
+		( select ) => select( blockEditorStore ).getBlockAttributes( clientId ),
+		[ clientId ]
+	);
+	const shadow = blockAttributes?.shadow;
+	const value = useMemo( () => ( { shadow } ), [ shadow ] );
 
 	if ( ! isEnabled ) {
 		return null;
 	}
-
-	const defaultControls = getBlockSupport( name, [
-		'shadow',
-		'__experimentalDefaultControls',
-	] );
 
 	return (
 		<StylesEffectsPanel
 			as={ EffectsInspectorControl }
 			paneldId={ clientId }
 			settings={ settings }
-			value={ settings.shadow }
+			value={ value }
 			onChange={ onChange }
-			defaultControls={ defaultControls }
 		/>
 	);
 }
