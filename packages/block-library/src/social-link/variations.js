@@ -342,6 +342,7 @@ variations.forEach( ( variation ) => {
 	if ( variation.isActive ) return;
 	variation.isActive = ( blockAttributes, variationAttributes ) =>
 		blockAttributes.service === variationAttributes.service;
+	variation.scope = [ 'inserter', 'transform' ];
 } );
 
 export default variations;
