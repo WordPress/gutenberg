@@ -35,25 +35,43 @@ function gutenberg_init_font_library_routes() {
 	register_post_type(
 		'wp_font_face',
 		array(
-			'labels'                => array(
+			'labels'          => array(
 				'name'          => __( 'Font Faces', 'gutenberg' ),
 				'singular_name' => __( 'Font Face', 'gutenberg' ),
 			),
-			'public'                => false,
-			'_builtin'              => true,                              /* internal use only. don't use this when registering your own post type. */
-			'hierarchical'          => false,
-			'show_in_rest'          => true,
-			'rest_base'             => 'font-faces',
-			'rest_controller_class' => 'WP_REST_Font_Faces_Controller',
+			'public'          => false,
+			'_builtin'        => true,                              /* internal use only. don't use this when registering your own post type. */
+			'hierarchical'    => false,
+			'show_in_rest'    => false,
+			'rest_base'       => 'font-faces',
 			// TODO: Add custom font capability
-			// 'capabilities' => array(),
-			'query_var'             => false,
+			'capability_type' => 'post',
+			'capabilities'    => array(
+				'read'                   => 'edit_theme_options',
+				'read_post'              => 'edit_theme_options',
+				'read_private_posts'     => 'edit_theme_options',
+				'create_posts'           => 'edit_theme_options',
+				'edit_post'              => 'edit_theme_options',
+				'edit_posts'             => 'edit_theme_options',
+				'publish_posts'          => 'edit_theme_options',
+				'edit_published_posts'   => 'edit_theme_options',
+				'delete_posts'           => 'edit_theme_options',
+				'delete_post'            => 'edit_theme_options',
+				'delete_published_posts' => 'edit_theme_options',
+				'edit_others_posts'      => 'edit_theme_options',
+				'delete_others_posts'    => 'edit_theme_options',
+			),
+			'map_meta_cap'    => false,
+			'query_var'       => false,
 		)
 	);
 
 	// @core-merge: This code will go into Core's `create_initial_rest_routes()`.
 	$font_collections_controller = new WP_REST_Font_Collections_Controller();
 	$font_collections_controller->register_routes();
+
+	$font_faces_controller = new WP_REST_Font_Faces_Controller();
+	$font_faces_controller->register_routes();
 }
 
 add_action( 'rest_api_init', 'gutenberg_init_font_library_routes' );
