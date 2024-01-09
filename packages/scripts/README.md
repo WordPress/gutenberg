@@ -108,7 +108,7 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
 -   `--output-path` – Allows customization of the output directory. Default is `build`.
 
-Experimental support to support the block.json `viewModule` field is available via the
+Experimental support for the block.json `viewModule` field is available via the
 `--experimental-modules` option. With this option enabled, script and module fields will all be
 compiled. The `viewModule` field is analogous to the `viewScript` field, but will compile a module
 and should be registered in WordPress using the Modules API.
@@ -396,7 +396,7 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
 -   `--output-path` – Allows customization of the output directory. Default is `build`.
 
-Experimental support to support the block.json `viewModule` field is available via the
+Experimental support for the block.json `viewModule` field is available via the
 `--experimental-modules` option. With this option enabled, script and module fields will all be
 compiled. The `viewModule` field is analogous to the `viewScript` field, but will compile a module
 and should be registered in WordPress using the Modules API.
@@ -733,8 +733,8 @@ module.exports = {
 
 If you follow this approach, please, be aware that:
 
-- You should keep using the `wp-scripts` commands (`start` and `build`). Do not use `webpack` directly.
-- Future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
+-   You should keep using the `wp-scripts` commands (`start` and `build`). Do not use `webpack` directly.
+-   Future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
 
 ## Contributing to this package
 
