@@ -8,7 +8,7 @@
  */
 function areItemsWrapping(
 	wrapper,
-	children = wrapper.querySelectorAll( 'li' )
+	children = wrapper.querySelectorAll( ':scope > .wp-block-navigation-item' )
 ) {
 	const wrapperDimensions = wrapper.getBoundingClientRect();
 	const wrapperWidth = wrapperDimensions.width;
