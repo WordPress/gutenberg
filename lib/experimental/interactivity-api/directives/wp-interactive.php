@@ -33,8 +33,8 @@ function gutenberg_interactivity_process_wp_interactive( $tags, $context, $ns, &
 	 * definition was invalid or does not contain a namespace.
 	 *
 	 * This is done because the function pops out the current namespace from the
-	 * stack whenever it finds an island's closing tag, independtly of whether
-	 * the island definition was correct or contained a valid namespace.
+	 * stack whenever it finds an island's closing tag, independently of whether
+	 * the island definition was correct or it contained a valid namespace.
 	 */
 	$ns_stack[] = isset( $island_data ) && $island_data['namespace']
 		? $island_data['namespace']
