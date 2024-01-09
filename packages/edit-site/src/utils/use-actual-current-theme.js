@@ -17,9 +17,10 @@ export function useActualCurrentTheme() {
 			wp_theme_preview: '',
 		} );
 
-		apiFetch( { path } ).then( ( activeThemes ) =>
-			setCurrentTheme( activeThemes[ 0 ] )
-		);
+		apiFetch( { path } )
+			.then( ( activeThemes ) => setCurrentTheme( activeThemes[ 0 ] ) )
+			// Do nothing
+			.catch( () => {} );
 	}, [] );
 
 	return currentTheme;
