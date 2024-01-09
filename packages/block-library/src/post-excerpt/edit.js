@@ -28,7 +28,7 @@ import { useCanEditEntity } from '../utils/hooks';
 const ELLIPSIS = '…';
 
 export default function PostExcerptEditor( {
-	attributes: { textAlign, moreText, showMoreOnNewLine, excerptLength },
+	attributes: { textAlign, moreText, showMoreOnNewLine, excerptWordsLength },
 	setAttributes,
 	isSelected,
 	context: { postId, postType, queryId },
@@ -153,7 +153,7 @@ export default function PostExcerptEditor( {
 	let trimmedExcerpt = '';
 	if ( wordCountType === 'words' ) {
 		trimmedExcerpt = rawOrRenderedExcerpt
-			.split( ' ', excerptLength )
+			.split( ' ', excerptWordsLength )
 			.join( ' ' );
 	} else if ( wordCountType === 'characters_excluding_spaces' ) {
 		/*
@@ -165,7 +165,7 @@ export default function PostExcerptEditor( {
 		 * so that the spaces are excluded from the word count.
 		 */
 		const excerptWithSpaces = rawOrRenderedExcerpt
-			.split( '', excerptLength )
+			.split( '', excerptWordsLength )
 			.join( '' );
 
 		const numberOfSpaces =
@@ -173,11 +173,11 @@ export default function PostExcerptEditor( {
 			excerptWithSpaces.replaceAll( ' ', '' ).length;
 
 		trimmedExcerpt = rawOrRenderedExcerpt
-			.split( '', excerptLength + numberOfSpaces )
+			.split( '', excerptWordsLength + numberOfSpaces )
 			.join( '' );
 	} else if ( wordCountType === 'characters_including_spaces' ) {
 		trimmedExcerpt = rawOrRenderedExcerpt
-			.split( '', excerptLength )
+			.split( '', excerptWordsLength )
 			.join( '' );
 	}
 
@@ -229,9 +229,9 @@ export default function PostExcerptEditor( {
 					/>
 					<RangeControl
 						label={ __( 'Max number of words' ) }
-						value={ excerptLength }
+						value={ excerptWordsLength }
 						onChange={ ( value ) => {
-							setAttributes( { excerptLength: value } );
+							setAttributes( { excerptWordsLength: value } );
 						} }
 						min="10"
 						max="100"
