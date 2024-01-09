@@ -164,6 +164,9 @@ function FontCollection( { id } ) {
 		try {
 			for ( let i = 0; i < fontFamily.fontFace.length; i++ ) {
 				const fontFace = fontFamily.fontFace[ i ];
+				if ( ! fontFace.downloadFromUrl ) {
+					continue;
+				}
 				fontFace.file = await downloadFontFaceAsset(
 					fontFace.downloadFromUrl
 				);
