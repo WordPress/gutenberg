@@ -12,7 +12,7 @@ import {
 	FlexedBoxControlIcon,
 	FlexedRangeControl,
 	InputWrapper,
-	UnitControl,
+	StyledUnitControl,
 } from './styles/box-control-styles';
 import type { BoxControlInputControlProps, BoxControlValue } from './types';
 
@@ -105,7 +105,7 @@ export default function BoxInputControls( {
 					<InputWrapper key={ `box-control-${ side }` } expanded>
 						<FlexedBoxControlIcon side={ side } sides={ sides } />
 						<Tooltip placement="top-end" text={ LABELS[ side ] }>
-							<UnitControl
+							<StyledUnitControl
 								{ ...props }
 								className="component-box-control__unit-control"
 								id={ inputId }

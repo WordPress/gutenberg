@@ -6,7 +6,10 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import type { UnitControlProps } from '../unit-control/types';
-import { FlexedRangeControl, UnitControl } from './styles/box-control-styles';
+import {
+	FlexedRangeControl,
+	StyledUnitControl,
+} from './styles/box-control-styles';
 import { HStack } from '../h-stack';
 import type { BoxControlInputControlProps } from './types';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control';
@@ -69,7 +72,7 @@ export default function AllInputControl( {
 
 	return (
 		<HStack>
-			<UnitControl
+			<StyledUnitControl
 				{ ...props }
 				className="component-box-control__unit-control"
 				disableUnits={ isMixed }
