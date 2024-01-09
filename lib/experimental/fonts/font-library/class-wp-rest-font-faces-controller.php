@@ -73,7 +73,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'create_item' ),
 					'permission_callback' => array( $this, 'create_item_permissions_check' ),
-					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
+					'args'                => array(),
 				),
 				'allow_batch' => $this->allow_batch,
 				'schema'      => array( $this, 'get_public_item_schema' ),
@@ -232,6 +232,82 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
+	 * Creates a font face for the parent font family.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function create_item( $request ) {
+		// Create the font face post so we have an ID to attach the font files to.
+		$font_face_id = wp_insert_post(
+			array(
+				'post_type'   => $this->post_type,
+				'post_parent' => $request['parent'],
+				'post_status' => 'publish',
+			)
+		);
+
+		$font_face_settings = json_decode( $request->get_param( 'font_face_settings' ), true );
+		$file_params        = $request->get_file_params();
+
+		// Move the uploaded font asset from the temp folder to the fonts directory.
+		if ( ! function_exists( 'wp_handle_upload' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+
+		if ( is_string( $font_face_settings['src'] ) ) {
+			$file                      = $file_params[ $font_face_settings['src'] ];
+			$font_file                 = $this->handle_font_file_upload( $file );
+			$font_face_settings['src'] = $font_file['url'];
+			$font_relative_path        = _wp_relative_fonts_path( $font_file['file'] );
+			add_post_meta( $font_face_id, '_wp_font_face_file', $font_relative_path );
+		} else {
+			foreach ( $font_face_settings['src'] as $index => $src ) {
+				$file                                = $file_params[ $src ];
+				$font_file                           = $this->handle_font_file_upload( $file );
+				$font_face_settings['src'][ $index ] = $font_file['url'];
+
+				$font_relative_path = _wp_relative_fonts_path( $font_file['file'] );
+				add_post_meta( $font_face_id, '_wp_font_face_file', $font_relative_path );
+			}
+		}
+
+		wp_update_post(
+			array(
+				'ID'           => $font_face_id,
+				'post_content' => wp_json_encode( $font_face_settings ),
+			)
+		);
+
+		$font_face_post = get_post( $font_face_id );
+
+		return $this->prepare_item_for_response( $font_face_post, $request );
+	}
+
+	protected function handle_font_file_upload( $file ) {
+		add_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
+		add_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
+
+		$overrides = array(
+			// Not testing a form submission.
+			'test_form' => false,
+			// Seems mime type for files that are not images cannot be tested.
+			// See wp_check_filetype_and_ext().
+			'test_type' => false,
+			'mimes'     => WP_Font_Library::get_expected_font_mime_types_per_php_version(),
+		);
+
+		$uploaded_file = wp_handle_upload( $file, $overrides );
+
+		remove_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
+		remove_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
+
+		return $uploaded_file;
+	}
+
+	/**
 	 * Deletes a single font face.
 	 *
 	 * @since 6.5.0
@@ -253,6 +329,26 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		}
 
 		return parent::delete_item( $request );
+	}
+
+	/**
+	 * Prepares a single post output for response.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_Post         $item    Post object.
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response Response object.
+	 */
+	public function prepare_item_for_response( $item, $request ) {
+		$data = array();
+
+		$data['id']                 = $item->ID;
+		$data['theme_json_version'] = 2;
+		$data['parent']             = $item->post_parent;
+		$data['font_face_settings'] = json_decode( $item->post_content, true );
+
+		return $data;
 	}
 
 	/**

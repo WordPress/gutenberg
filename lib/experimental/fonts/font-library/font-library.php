@@ -118,3 +118,26 @@ $default_font_collection = array(
 );
 
 wp_register_font_collection( $default_font_collection );
+
+/**
+ * Returns relative path to an uploaded font file.
+ *
+ * The path is relative to the current fonts dir.
+ *
+ * @since 6.5.0
+ * @access private
+ *
+ * @param string $path Full path to the file.
+ * @return string Relative path on success, unchanged path on failure.
+ */
+function _wp_relative_fonts_path( $path ) {
+	$new_path = $path;
+
+	$fonts_dir = WP_Font_Library::get_fonts_dir();
+	if ( str_starts_with( $new_path, $fonts_dir ) ) {
+			$new_path = str_replace( $fonts_dir, '', $new_path );
+			$new_path = ltrim( $new_path, '/' );
+	}
+
+	return $new_path;
+}
