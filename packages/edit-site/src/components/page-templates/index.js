@@ -375,21 +375,14 @@ export default function DataviewsTemplates() {
 					deferredRendering={
 						! view.hiddenFields?.includes( 'preview' )
 					}
+					getItemTitle={ ( item ) => {
+						return item.title?.rendered;
+					} }
 					labels={ {
-						getSelectLabel: ( item ) => {
-							return sprintf(
-								// translators: %s: The title of the template.
-								__( 'Select template: %s' ),
-								item.title?.rendered || item.slug
-							);
-						},
-						getDeselectLabel: ( item ) => {
-							return sprintf(
-								// translators: %s: The title of the template.
-								__( 'Deselect template: %s' ),
-								item.title?.rendered || item.slug
-							);
-						},
+						/* translators: %s: Title of the template. */
+						selectItem: __( 'Select template: %s' ),
+						/* translators: %s: Title of the page. */
+						deselectItem: __( 'Deselect template: %s' ),
 					} }
 				/>
 			</Page>

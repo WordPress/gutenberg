@@ -6,7 +6,7 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 import { unseen, funnel } from '@wordpress/icons';
 import {
@@ -23,7 +23,6 @@ import {
 	useId,
 	useRef,
 	useState,
-	useMemo,
 } from '@wordpress/element';
 
 /**
@@ -335,18 +334,28 @@ function SingleSelectionCheckbox( {
 	labels,
 	data,
 	getItemId,
+	getItemTitle,
 } ) {
 	const id = getItemId?.( item );
 	const isSelected = selection.includes( id );
 	let selectionLabel;
-	if ( isSelected ) {
-		selectionLabel = labels?.getDeselectLabel
-			? labels?.getDeselectLabel( item )
-			: __( 'Deselect item' );
+	if ( getItemTitle && labels.selectItem ) {
+		// eslint-disable-next-line @wordpress/valid-sprintf
+		selectionLabel = sprintf(
+			isSelected ? labels.deselectItem : labels.selectItem,
+			getItemTitle( item )
+		);
+	} else if ( getItemTitle ) {
+		// eslint-disable-next-line @wordpress/valid-sprintf
+		selectionLabel = sprintf(
+			/* translators: %s: item title. */
+			isSelected ? __( 'Deselect item: %s' ) : __( 'Select item: %s' ),
+			getItemTitle( item )
+		);
 	} else {
-		selectionLabel = labels?.getSelectLabel
-			? labels?.getSelectLabel( item )
-			: __( 'Select a new item' );
+		selectionLabel = isSelected
+			? __( 'Select a new item' )
+			: __( 'Deselect item' );
 	}
 	return (
 		<CheckboxControl
@@ -386,6 +395,7 @@ function ViewTable( {
 	actions,
 	data,
 	getItemId,
+	getItemTitle,
 	isLoading = false,
 	deferredRendering,
 	selection,
@@ -526,6 +536,7 @@ function ViewTable( {
 											item={ item }
 											labels={ labels }
 											selection={ selection }
+											getItemTitle={ getItemTitle }
 											onSelectionChange={
 												onSelectionChange
 											}

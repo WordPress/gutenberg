@@ -29,6 +29,7 @@ export default function DataViews( {
 	actions,
 	data,
 	getItemId = defaultGetItemId,
+	getItemTitle,
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
@@ -117,6 +118,7 @@ export default function DataViews( {
 					actions={ actions }
 					data={ data }
 					getItemId={ getItemId }
+					getItemTitle={ getItemTitle }
 					isLoading={ isLoading }
 					onSelectionChange={ onSetSelection }
 					onDetailsChange={ onDetailsChange }
