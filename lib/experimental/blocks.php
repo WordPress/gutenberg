@@ -152,7 +152,7 @@ if ( $gutenberg_experiments && (
 				} else {
 					$source_args = $binding_source['source']['attributes'];
 				}
-				$source_value = $source_callback( $source_args, $block_content, $block, $block_instance );
+				$source_value = $source_callback( $source_args, $block_content, $block, $block_instance, $binding_attribute );
 				// If the value is null, process next attribute.
 				if ( is_null( $source_value ) ) {
 					continue;
