@@ -1,0 +1,31 @@
+[
+	{
+		"name": "core/post-navigation",
+		"isValid": true,
+		"attributes": {},
+		"innerBlocks": [
+			{
+				"name": "core/post-navigation-link",
+				"isValid": true,
+				"attributes": {
+					"type": "previous",
+					"showTitle": false,
+					"linkLabel": false,
+					"arrow": "none"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/post-navigation-link",
+				"isValid": true,
+				"attributes": {
+					"type": "next",
+					"showTitle": false,
+					"linkLabel": false,
+					"arrow": "none"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]
