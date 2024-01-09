@@ -34,6 +34,7 @@ import { __ } from '@wordpress/i18n';
 import ListViewBranch from './branch';
 import { ListViewContext } from './context';
 import ListViewDropIndicator from './drop-indicator';
+import ListViewDropIndicatorVertical from './drop-indicator-vertical';
 import useBlockSelection from './use-block-selection';
 import useListViewBlockIndexes from './use-list-view-block-indexes';
 import useListViewClientIds from './use-list-view-client-ids';
@@ -322,8 +323,13 @@ function ListViewComponent(
 
 	return (
 		<AsyncModeProvider value={ true }>
-			{ showDropIndicator && (
+			{ showDropIndicator ? (
 				<ListViewDropIndicator
+					listViewRef={ elementRef }
+					blockDropTarget={ blockDropTarget }
+				/>
+			) : (
+				<ListViewDropIndicatorVertical
 					listViewRef={ elementRef }
 					blockDropTarget={ blockDropTarget }
 				/>
