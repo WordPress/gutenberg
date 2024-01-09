@@ -63,6 +63,9 @@ function useView( type ) {
 	const selectedDefaultView =
 		isCustom === 'false' &&
 		DEFAULT_VIEWS[ type ].find( ( { slug } ) => slug === activeView )?.view;
+	selectedDefaultView.layout = {
+		...defaultConfigPerViewType[ selectedDefaultView.type ],
+	};
 	const [ view, setView ] = useState( selectedDefaultView );
 
 	useEffect( () => {
