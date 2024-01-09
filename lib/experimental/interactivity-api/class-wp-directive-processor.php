@@ -35,7 +35,11 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	 * @param array $block The block to add.
 	 */
 	public static function mark_root_block( $block ) {
-		self::$root_block = md5( serialize( $block ) );
+		if ( null !== $block['blockName'] ) {
+			self::$root_block = $block['blockName'] . md5( serialize( $block ) );
+		} else {
+			self::$root_block = md5( serialize( $block ) );
+		}
 	}
 
 	/**
@@ -52,6 +56,14 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	 * @return bool True if block is a root block, false otherwise.
 	 */
 	public static function is_marked_as_root_block( $block ) {
+		// If self::$root_block is null, is impossible that any block has been marked as root.
+		if ( is_null( self::$root_block ) ) {
+			return false;
+		}
+		// Blocks whose blockName is null are specifically intended to convey - "this is a freeform HTML block."
+		if ( null !== $block['blockName'] ) {
+			return str_contains( self::$root_block, $block['blockName'] ) && $block['blockName'] . md5( serialize( $block ) ) === self::$root_block;
+		}
 		return md5( serialize( $block ) ) === self::$root_block;
 	}
 
