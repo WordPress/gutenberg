@@ -20,7 +20,10 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
  */
 import Page from '../page';
 import Link from '../routes/link';
-import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
+import {
+	DEFAULT_VIEWS,
+	DEFAULT_CONFIG_PER_VIEW_TYPE,
+} from '../sidebar-dataviews/default-views';
 import {
 	ENUMERATION_TYPE,
 	LAYOUT_GRID,
@@ -44,17 +47,6 @@ import { unlock } from '../../lock-unlock';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
-const defaultConfigPerViewType = {
-	[ LAYOUT_TABLE ]: {},
-	[ LAYOUT_GRID ]: {
-		mediaField: 'featured-image',
-		primaryField: 'title',
-	},
-	[ LAYOUT_LIST ]: {
-		primaryField: 'title',
-		mediaField: 'featured-image',
-	},
-};
 
 function useView( type ) {
 	const {
@@ -136,6 +128,18 @@ export default function PagePages() {
 	const onSelectionChange = useCallback(
 		( items ) => setPageId( items?.length === 1 ? items[ 0 ].id : null ),
 		[ setPageId ]
+	);
+
+	const onDetailsChange = useCallback(
+		( items ) => {
+			if ( !! postType && items?.length === 1 ) {
+				history.push( {
+					postId: items[ 0 ].id,
+					postType,
+				} );
+			}
+		},
+		[ history, postType ]
 	);
 
 	const queryArgs = useMemo( () => {
@@ -309,7 +313,7 @@ export default function PagePages() {
 				newView = {
 					...newView,
 					layout: {
-						...defaultConfigPerViewType[ newView.type ],
+						...DEFAULT_CONFIG_PER_VIEW_TYPE[ newView.type ],
 					},
 				};
 			}
@@ -339,6 +343,7 @@ export default function PagePages() {
 					view={ view }
 					onChangeView={ onChangeView }
 					onSelectionChange={ onSelectionChange }
+					onDetailsChange={ onDetailsChange }
 				/>
 			</Page>
 			{ view.type === LAYOUT_LIST && (
