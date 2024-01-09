@@ -124,9 +124,6 @@ const baseConfig = {
 		filename: '[name].js',
 		path: resolve( process.cwd(), 'build' ),
 	},
-	experiments: {
-		outputModule: true,
-	},
 	resolve: {
 		alias: {
 			'lodash-es': 'lodash',
@@ -396,6 +393,11 @@ if ( hasExperimentalModulesFlag ) {
 		...baseConfig,
 
 		entry: getWebpackEntryPoints( 'module' ),
+
+		experiments: {
+			...baseConfig.experiments,
+			outputModule: true,
+		},
 
 		output: {
 			...baseConfig.output,
