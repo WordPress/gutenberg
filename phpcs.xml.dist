@@ -153,7 +153,7 @@
 			</property>
 		</properties>
 	</rule>
-	<rule ref="Gutenberg.CodeAnalysis.RestrictedFunctionCallSniff">
+	<rule ref="Gutenberg.CodeAnalysis.RestrictedFunctionCall">
 		<include-pattern>./packages/block-library/src/*/*.php</include-pattern>
 		<properties>
 			<property name="prefixes" type="array">
