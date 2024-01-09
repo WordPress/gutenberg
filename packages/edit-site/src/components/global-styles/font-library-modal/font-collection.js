@@ -32,6 +32,11 @@ import { getFontsOutline } from './utils/fonts-outline';
 import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
 import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
 
+/**
+ * Browser dependencies
+ */
+const { File } = window;
+
 const DEFAULT_CATEGORY = {
 	id: 'all',
 	name: __( 'All' ),
@@ -154,10 +159,39 @@ function FontCollection( { id } ) {
 	};
 
 	const handleInstall = async () => {
-		const response = await installFont( fontsToInstall[ 0 ] );
+		const fontFamily = fontsToInstall[ 0 ];
+
+		for ( let i = 0; i < fontFamily.fontFace.length; i++ ) {
+			const fontFace = fontFamily.fontFace[ i ];
+			fontFace.file = await downloadFontFaceAsset(
+				fontFace.downloadFromUrl
+			);
+			delete fontFace.downloadFromUrl;
+		}
+
+		const response = await installFont( fontFamily );
 		const installNotice = getNoticeFromInstallResponse( response );
 		setNotice( installNotice );
 		resetFontsToInstall();
+	};
+
+	const downloadFontFaceAsset = async ( url ) => {
+		return fetch( new Request( url ) )
+			.then( ( response ) => {
+				if ( ! response.ok ) {
+					throw new Error(
+						`HTTP error! Status: ${ response.status }`
+					);
+				}
+				return response.blob();
+			} )
+			.then( ( blob ) => {
+				const filename = url.split( '/' ).pop();
+				const file = new File( [ blob ], filename, {
+					type: blob.type,
+				} );
+				return file;
+			} );
 	};
 
 	return (
