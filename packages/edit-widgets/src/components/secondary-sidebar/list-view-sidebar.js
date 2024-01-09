@@ -9,16 +9,16 @@ import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { store as editWidgetsStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 export default function ListViewSidebar() {
-	const { setIsListViewOpened } = useDispatch( editWidgetsStore );
-	const { getListViewToggleRef } = unlock( useSelect( editWidgetsStore ) );
+	const { setIsListViewOpened } = useDispatch( editorStore );
+	const { getListViewToggleRef } = unlock( useSelect( editorStore ) );
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the dropZoneElement updates.

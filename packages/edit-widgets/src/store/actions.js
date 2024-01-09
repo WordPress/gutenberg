@@ -2,11 +2,13 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import deprecated from '@wordpress/deprecated';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as interfaceStore } from '@wordpress/interface';
 import { getWidgetIdFromBlock } from '@wordpress/widgets';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -342,34 +344,36 @@ export function setIsWidgetAreaOpen( clientId, isOpen ) {
 /**
  * Returns an action object used to open/close the inserter.
  *
- * @param {boolean|Object} value                Whether the inserter should be
- *                                              opened (true) or closed (false).
- *                                              To specify an insertion point,
- *                                              use an object.
- * @param {string}         value.rootClientId   The root client ID to insert at.
- * @param {number}         value.insertionIndex The index to insert at.
+ * @deprecated
  *
- * @return {Object} Action object.
+ * @param {boolean|Object} value Whether the inserter should be opened (true) or closed (false).
  */
-export function setIsInserterOpened( value ) {
-	return {
-		type: 'SET_IS_INSERTER_OPENED',
-		value,
+export const setIsInserterOpened =
+	( value ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-widgets' ).setIsInserterOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsInserterOpened",
+		} );
+		registry.dispatch( editorStore ).setIsInserterOpened( value );
 	};
-}
 
 /**
  * Returns an action object used to open/close the list view.
  *
+ * @deprecated
+ *
  * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
- * @return {Object} Action object.
  */
-export function setIsListViewOpened( isOpen ) {
-	return {
-		type: 'SET_IS_LIST_VIEW_OPENED',
-		isOpen,
+export const setIsListViewOpened =
+	( isOpen ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-widgets' ).setIsListViewOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsListViewOpened",
+		} );
+		registry.dispatch( editorStore ).setIsListViewOpened( isOpen );
 	};
-}
 
 /**
  * Returns an action object signalling that the user closed the sidebar.

@@ -17,7 +17,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ToolsMoreMenuGroup from './tools-more-menu-group';
 
-export default function MoreMenu() {
+export default function MoreMenu( { showIconLabels } ) {
 	const [
 		isKeyboardShortcutsModalActive,
 		setIsKeyboardShortcutsModalVisible,
@@ -34,7 +34,12 @@ export default function MoreMenu() {
 
 	return (
 		<>
-			<MoreMenuDropdown>
+			<MoreMenuDropdown
+				toggleProps={ {
+					showTooltip: ! showIconLabels,
+					...( showIconLabels && { variant: 'tertiary' } ),
+				} }
+			>
 				{ ( onClose ) => (
 					<>
 						{ isLargeViewport && (

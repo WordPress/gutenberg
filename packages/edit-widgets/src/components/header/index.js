@@ -1,7 +1,13 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { BlockToolbar } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -13,27 +19,35 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import DocumentTools from './document-tools';
 import SaveButton from '../save-button';
 import MoreMenu from '../more-menu';
+import { unlock } from '../../lock-unlock';
+
+const { DocumentTools } = unlock( editorPrivateApis );
 
 function Header() {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const blockToolbarRef = useRef();
-	const { hasFixedToolbar } = useSelect(
-		( select ) => ( {
-			hasFixedToolbar: !! select( preferencesStore ).get(
+	const { hasFixedToolbar, showIconLabels } = useSelect( ( select ) => {
+		const { get: getPreference } = select( preferencesStore );
+
+		return {
+			hasFixedToolbar: !! getPreference(
 				'core/edit-widgets',
 				'fixedToolbar'
 			),
-		} ),
-		[]
-	);
+			showIconLabels: getPreference( 'core', 'showIconLabels' ),
+		};
+	}, [] );
 
 	return (
 		<>
-			<div className="edit-widgets-header">
-				<div className="edit-widgets-header__navigable-toolbar-wrapper">
+			<div
+				className={ classnames( 'edit-widgets-header', {
+					'show-icon-labels': showIconLabels,
+				} ) }
+			>
+				<div className="edit-widgets-header__toolbar">
 					{ isLargeViewport && (
 						<h1 className="edit-widgets-header__title">
 							{ __( 'Widgets' ) }
@@ -63,7 +77,7 @@ function Header() {
 				<div className="edit-widgets-header__actions">
 					<SaveButton />
 					<PinnedItems.Slot scope="core/edit-widgets" />
-					<MoreMenu />
+					<MoreMenu showIconLabels={ showIconLabels } />
 				</div>
 			</div>
 		</>

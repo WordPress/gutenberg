@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
-import { BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	BlockBreadcrumb,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -13,6 +16,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -21,6 +25,7 @@ import Header from '../header';
 import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
 import { store as editWidgetsStore } from '../../store';
 import SecondarySidebar from '../secondary-sidebar';
+import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the widgets screen top bar landmark region. */
@@ -36,8 +41,12 @@ const interfaceLabels = {
 function Interface( { blockEditorSettings } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
-	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
+	const widgetAreaClientId = useLastSelectedWidgetArea();
+	const { setIsInserterOpened, setIsListViewOpened } =
+		useDispatch( editorStore );
+	const { setIsWidgetAreaOpen, closeGeneralSidebar } =
 		useDispatch( editWidgetsStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const {
 		hasBlockBreadCrumbsEnabled,
 		hasSidebarEnabled,
@@ -50,8 +59,8 @@ function Interface( { blockEditorSettings } ) {
 			hasSidebarEnabled: !! select(
 				interfaceStore
 			).getActiveComplementaryArea( editWidgetsStore.name ),
-			isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
-			isListViewOpened: !! select( editWidgetsStore ).isListViewOpened(),
+			isInserterOpened: !! select( editorStore ).isInserterOpened(),
+			isListViewOpened: !! select( editorStore ).isListViewOpened(),
 			hasBlockBreadCrumbsEnabled: !! select( preferencesStore ).get(
 				'core/edit-widgets',
 				'showBlockBreadcrumbs'
@@ -68,6 +77,14 @@ function Interface( { blockEditorSettings } ) {
 		[]
 	);
 
+	const isLastSelectedWidgetAreaOpen = useSelect(
+		( select ) =>
+			select( editWidgetsStore ).getIsWidgetAreaOpen(
+				widgetAreaClientId
+			),
+		[ widgetAreaClientId ]
+	);
+
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
 		if ( hasSidebarEnabled && ! isHugeViewport ) {
@@ -81,6 +98,21 @@ function Interface( { blockEditorSettings } ) {
 			closeGeneralSidebar();
 		}
 	}, [ isInserterOpened, isListViewOpened, isHugeViewport ] );
+
+	useEffect( () => {
+		if ( isInserterOpened && ! isLastSelectedWidgetAreaOpen ) {
+			// Select the last selected block if hasn't already.
+			selectBlock( widgetAreaClientId );
+			// Open the last selected widget area when opening the inserter.
+			setIsWidgetAreaOpen( widgetAreaClientId, true );
+		}
+	}, [
+		widgetAreaClientId,
+		isInserterOpened,
+		isLastSelectedWidgetAreaOpen,
+		selectBlock,
+		setIsWidgetAreaOpen,
+	] );
 
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'List View' )

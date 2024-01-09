@@ -609,7 +609,7 @@ test.describe( 'Widgets screen', () => {
 	test( 'can toggle sidebar list view', async ( { page } ) => {
 		const toggleListViewButton = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'List View' } );
+			.getByRole( 'button', { name: 'Document Overview' } );
 		await toggleListViewButton.click();
 
 		const listView = page.getByRole( 'treegrid', {

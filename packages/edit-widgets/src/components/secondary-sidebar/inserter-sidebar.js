@@ -11,18 +11,18 @@ import {
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import useWidgetLibraryInsertionPoint from '../../hooks/use-widget-library-insertion-point';
-import { store as editWidgetsStore } from '../../store';
 
 export default function InserterSidebar() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { rootClientId, insertionIndex } = useWidgetLibraryInsertionPoint();
 
-	const { setIsInserterOpened } = useDispatch( editWidgetsStore );
+	const { setIsInserterOpened } = useDispatch( editorStore );
 
 	const closeInserter = useCallback( () => {
 		return setIsInserterOpened( false );

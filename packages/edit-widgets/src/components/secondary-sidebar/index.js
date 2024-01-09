@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-/**
- * Internal dependencies
- */
-import { store as editWidgetsStore } from '../../store';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -15,8 +12,7 @@ import ListViewSidebar from './list-view-sidebar';
 
 export default function SecondarySidebar() {
 	const { isInserterOpen, isListViewOpen } = useSelect( ( select ) => {
-		const { isInserterOpened, isListViewOpened } =
-			select( editWidgetsStore );
+		const { isInserterOpened, isListViewOpened } = select( editorStore );
 		return {
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),

@@ -14,6 +14,7 @@ import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -64,7 +65,7 @@ export default function WidgetAreasBlockEditorProvider( {
 			pageForPosts: siteSettings?.page_for_posts,
 		};
 	}, [] );
-	const { setIsInserterOpened } = useDispatch( editWidgetsStore );
+	const { setIsInserterOpened } = useDispatch( editorStore );
 
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
