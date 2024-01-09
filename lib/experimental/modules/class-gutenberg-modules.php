@@ -292,7 +292,7 @@ add_action( 'wp_head', array( 'Gutenberg_Modules', 'print_import_map_polyfill' )
  */
 function gutenberg_filter_block_type_metadata_settings_register_modules( $settings, $metadata = null ) {
 	$module_fields = array(
-		'viewModule' => 'view_module_ids',
+		'viewModule' => 'view_module_identifiers',
 	);
 	foreach ( $module_fields as $metadata_field_name => $settings_field_name ) {
 		if ( ! empty( $settings[ $metadata_field_name ] ) ) {
@@ -303,14 +303,14 @@ function gutenberg_filter_block_type_metadata_settings_register_modules( $settin
 			$processed_modules = array();
 			if ( is_array( $modules ) ) {
 				for ( $index = 0; $index < count( $modules ); $index++ ) {
-					$processed_modules[] = gutenberg_register_block_module_id(
+					$processed_modules[] = gutenberg_register_block_module_identifier(
 						$metadata,
 						$metadata_field_name,
 						$index
 					);
 				}
 			} else {
-				$processed_modules[] = gutenberg_register_block_module_id(
+				$processed_modules[] = gutenberg_register_block_module_identifier(
 					$metadata,
 					$metadata_field_name
 				);
@@ -334,9 +334,9 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadat
 function gutenberg_filter_render_block_enqueue_view_modules( $block_content, $parsed_block, $block_instance ) {
 	$block_type = $block_instance->block_type;
 
-	if ( ! empty( $block_type->view_module_ids ) ) {
-		foreach ( $block_type->view_module_ids as $module_id ) {
-			gutenberg_enqueue_module( $module_id );
+	if ( ! empty( $block_type->view_module_identifiers ) ) {
+		foreach ( $block_type->view_module_identifiers as $module_identifier ) {
+			gutenberg_enqueue_module( $module_identifier );
 		}
 	}
 
@@ -359,27 +359,27 @@ add_filter( 'render_block', 'gutenberg_filter_render_block_enqueue_view_modules'
  *                           Default 0.
  * @return string Module ID.
  */
-function gutenberg_register_block_module_id( $metadata, $field_name, $index = 0 ) {
+function gutenberg_register_block_module_identifier( $metadata, $field_name, $index = 0 ) {
 	if ( empty( $metadata[ $field_name ] ) ) {
 		return false;
 	}
 
-	$module_id = $metadata[ $field_name ];
-	if ( is_array( $module_id ) ) {
-		if ( empty( $module_id[ $index ] ) ) {
+	$module_identifier = $metadata[ $field_name ];
+	if ( is_array( $module_identifier ) ) {
+		if ( empty( $module_identifier[ $index ] ) ) {
 			return false;
 		}
-		$module_id = $module_id[ $index ];
+		$module_identifier = $module_identifier[ $index ];
 	}
 
-	$module_path = remove_block_asset_path_prefix( $module_id );
-	if ( $module_id === $module_path ) {
-		return $module_id;
+	$module_path = remove_block_asset_path_prefix( $module_identifier );
+	if ( $module_identifier === $module_path ) {
+		return $module_identifier;
 	}
 
 	$path                  = dirname( $metadata['file'] );
 	$module_asset_raw_path = $path . '/' . substr_replace( $module_path, '.asset.php', - strlen( '.js' ) );
-	$module_id             = gutenberg_generate_block_asset_module_id( $metadata['name'], $field_name, $index );
+	$module_identifier     = gutenberg_generate_block_asset_module_identifier( $metadata['name'], $field_name, $index );
 	$module_asset_path     = wp_normalize_path( realpath( $module_asset_raw_path ) );
 
 	if ( empty( $module_asset_path ) ) {
@@ -404,13 +404,13 @@ function gutenberg_register_block_module_id( $metadata, $field_name, $index = 0 
 	$module_dependencies = isset( $module_asset['dependencies'] ) ? $module_asset['dependencies'] : array();
 
 	gutenberg_register_module(
-		$module_id,
+		$module_identifier,
 		$module_uri,
 		$module_dependencies,
 		isset( $module_asset['version'] ) ? $module_asset['version'] : false
 	);
 
-	return $module_id;
+	return $module_identifier;
 }
 
 /**
@@ -425,7 +425,7 @@ function gutenberg_register_block_module_id( $metadata, $field_name, $index = 0 
  *                           Default 0.
  * @return string Generated module ID for the block's field.
  */
-function gutenberg_generate_block_asset_module_id( $block_name, $field_name, $index = 0 ) {
+function gutenberg_generate_block_asset_module_identifier( $block_name, $field_name, $index = 0 ) {
 	if ( str_starts_with( $block_name, 'core/' ) ) {
 		$asset_handle = str_replace( 'core/', 'wp-block-', $block_name );
 		if ( str_starts_with( $field_name, 'editor' ) ) {
@@ -451,15 +451,15 @@ function gutenberg_generate_block_asset_module_id( $block_name, $field_name, $in
 	return $asset_handle;
 }
 
-function gutenberg_register_view_module_ids_rest_field() {
+function gutenberg_register_view_module_identifiers_rest_field() {
 	register_rest_field(
 		'block-type',
-		'view_module_ids',
+		'view_module_identifiers',
 		array(
 			'get_callback' => function ( $item ) {
 				 $block_type = WP_Block_Type_Registry::get_instance()->get_registered( $item['name'] );
-				if ( isset( $block_type->view_module_ids ) ) {
-					return $block_type->view_module_ids;
+				if ( isset( $block_type->view_module_identifiers ) ) {
+					return $block_type->view_module_identifiers;
 				}
 				return array();
 			},
@@ -467,4 +467,4 @@ function gutenberg_register_view_module_ids_rest_field() {
 	);
 }
 
-add_action( 'rest_api_init', 'gutenberg_register_view_module_ids_rest_field' );
+add_action( 'rest_api_init', 'gutenberg_register_view_module_identifiers_rest_field' );
