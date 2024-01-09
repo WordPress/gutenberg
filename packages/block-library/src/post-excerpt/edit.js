@@ -28,7 +28,14 @@ import { useCanEditEntity } from '../utils/hooks';
 const ELLIPSIS = '…';
 
 export default function PostExcerptEditor( {
-	attributes: { textAlign, moreText, showMoreOnNewLine, excerptWordsLength },
+	attributes: {
+		textAlign,
+		moreText,
+		showMoreOnNewLine,
+		excerptWordsLength,
+		countExcerptCharactersLength,
+		excerptCharactersLength,
+	},
 	setAttributes,
 	isSelected,
 	context: { postId, postType, queryId },
@@ -151,10 +158,15 @@ export default function PostExcerptEditor( {
 	).trim();
 
 	let trimmedExcerpt = '';
-	if ( wordCountType === 'words' ) {
+	if ( wordCountType === 'words' && ! countExcerptCharactersLength ) {
 		trimmedExcerpt = rawOrRenderedExcerpt
 			.split( ' ', excerptWordsLength )
 			.join( ' ' );
+	} else if ( wordCountType === 'words' && countExcerptCharactersLength ) {
+		trimmedExcerpt = rawOrRenderedExcerpt
+			.split( '', excerptCharactersLength )
+			.join( '' )
+			.trim();
 	} else if ( wordCountType === 'characters_excluding_spaces' ) {
 		/*
 		 * 1. Split the excerpt at the character limit,
@@ -227,15 +239,42 @@ export default function PostExcerptEditor( {
 							} )
 						}
 					/>
-					<RangeControl
-						label={ __( 'Max number of words' ) }
-						value={ excerptWordsLength }
-						onChange={ ( value ) => {
-							setAttributes( { excerptWordsLength: value } );
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Count Excerpt Characters Length' ) }
+						checked={ countExcerptCharactersLength }
+						onChange={ ( newCountExcerptCharactersLength ) => {
+							setAttributes( {
+								countExcerptCharactersLength:
+									newCountExcerptCharactersLength,
+							} );
 						} }
-						min="10"
-						max="100"
 					/>
+
+					{ wordCountType === 'words' &&
+					countExcerptCharactersLength ? (
+						<RangeControl
+							label={ __( 'Max number of Characters' ) }
+							value={ excerptCharactersLength }
+							onChange={ ( value ) => {
+								setAttributes( {
+									excerptCharactersLength: value,
+								} );
+							} }
+							min="10"
+							max="600"
+						/>
+					) : (
+						<RangeControl
+							label={ __( 'Max number of words' ) }
+							value={ excerptWordsLength }
+							onChange={ ( value ) => {
+								setAttributes( { excerptWordsLength: value } );
+							} }
+							min="10"
+							max="100"
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<div { ...blockProps }>
