@@ -311,6 +311,10 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						label={ __( 'Background' ) }
 					/>
 					<PositionControls />
+					<InspectorControls.Slot
+						group="effects"
+						label={ __( 'Effects' ) }
+					/>
 					<div>
 						<AdvancedControls />
 					</div>

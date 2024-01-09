@@ -27,6 +27,7 @@ import {
 	SPACING_SUPPORT_KEY,
 	DimensionsPanel,
 } from './dimensions';
+import { EFFECTS_SUPPORT_KEYS, EffectsPanel } from './effects';
 import {
 	shouldSkipSerialization,
 	useStyleOverride,
@@ -37,6 +38,7 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
+	...EFFECTS_SUPPORT_KEYS,
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
 	DIMENSIONS_SUPPORT_KEY,
@@ -336,6 +338,7 @@ function BlockStyleControls( {
 			<TypographyPanel { ...passedProps } />
 			<BorderPanel { ...passedProps } />
 			<DimensionsPanel { ...passedProps } />
+			<EffectsPanel { ...passedProps } />
 		</>
 	);
 }

@@ -3,6 +3,10 @@
  */
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
+/**
+ * Internal dependencies
+ */
+import { EFFECTS_SUPPORT_KEYS } from './effects';
 
 const ALIGN_SUPPORT_KEY = 'align';
 const ALIGN_WIDE_SUPPORT_KEY = 'alignWide';
@@ -61,6 +65,7 @@ const TYPOGRAPHY_SUPPORT_KEYS = [
 ];
 const SPACING_SUPPORT_KEY = 'spacing';
 const styleSupportKeys = [
+	...EFFECTS_SUPPORT_KEYS,
 	...TYPOGRAPHY_SUPPORT_KEYS,
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
