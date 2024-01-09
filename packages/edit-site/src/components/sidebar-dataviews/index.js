@@ -8,7 +8,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 
-import { default as DEFAULT_VIEWS } from './default-views';
+import { DEFAULT_VIEWS } from './default-views';
 import { unlock } from '../../lock-unlock';
 const { useLocation } = unlock( routerPrivateApis );
 import DataViewItem from './dataview-item';
