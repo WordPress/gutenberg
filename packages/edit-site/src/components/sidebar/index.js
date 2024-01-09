@@ -7,7 +7,6 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { memo, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
@@ -32,9 +31,8 @@ import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen
 import SaveHub from '../save-hub';
 import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
+import SidebarNavigationScreenPagesDataViews from '../sidebar-navigation-screen-pages-dataviews';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
-import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import DataViewsSidebarContent from '../sidebar-dataviews';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -69,10 +67,7 @@ function SidebarScreens() {
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page">
 				{ window?.__experimentalAdminViews ? (
-					<SidebarNavigationScreen
-						title={ __( 'Pages' ) }
-						content={ <DataViewsSidebarContent /> }
-					/>
+					<SidebarNavigationScreenPagesDataViews />
 				) : (
 					<SidebarNavigationScreenPages />
 				) }
