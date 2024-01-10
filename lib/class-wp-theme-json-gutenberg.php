@@ -2763,7 +2763,24 @@ class WP_Theme_JSON_Gutenberg {
 	private static function replace_presets( &$data, &$incoming_data, &$nodes ) {
 		$slugs_global = static::get_default_slugs( $data, array( 'settings' ) );
 
+		/*
+		 * $node = array(
+		 *   'path'     => array( 'settings' ),
+		 *   'selector' => 'body',
+		 * );
+		 */
 		foreach ( $nodes as $node ) {
+			/*
+			 * $preset = array(
+			 *   'path'              => array( 'typography', 'fontSizes' ),
+			 *   'prevent_override'  => array( 'typography', 'defaultFontSizes' ),
+			 *   'use_default_names' => true,
+			 *   'value_func'        => 'gutenberg_get_typography_font_size_value',
+			 *   'css_vars'          => '--wp--preset--font-size--$slug',
+			 *   'classes'           => array( '.has-$slug-font-size' => 'font-size' ),
+			 *   'properties'        => array( 'font-size' ),
+			 * ),
+			 */
 			foreach ( static::PRESETS_METADATA as $preset ) {
 				$override_preset = ! static::get_metadata_boolean( $data['settings'], $preset['prevent_override'], true );
 
@@ -2773,15 +2790,33 @@ class WP_Theme_JSON_Gutenberg {
 						$base_path[] = $leaf;
 					}
 
+					/*
+					 * $base_path = array( 'settings', 'typography', 'fontSizes' );
+					 */
 					$path   = $base_path;
 					$path[] = $origin;
 
+					/*
+					 * $path = array( 'settings', 'typography', 'fontSizes', 'theme' );
+					 */
 					$content = _wp_array_get( $incoming_data, $path, null );
 					if ( ! isset( $content ) ) {
 						continue;
 					}
 
 					if ( 'theme' === $origin && $preset['use_default_names'] ) {
+						/*
+						 * $content = array(
+						 *   array(
+						 *     'slug' => 'small',
+						 *     'size' => '14pt',
+						 *   ),
+						 *   array(
+						 *     'slug' => 'medium',
+						 *     'size' => '16pt',
+						 *   ),
+						 * );
+						 */
 						foreach ( $content as $key => $item ) {
 							if ( ! isset( $item['name'] ) ) {
 								// TODO: Not sure if I should make get_name_from_defaults() static or make replace_presets() non-static.
