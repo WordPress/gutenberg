@@ -43,8 +43,8 @@ class WP_Font_Collection {
 			throw new Exception( 'Font Collection config options is required as a non-empty array.' );
 		}
 
-		if ( empty( $config['id'] ) || ! is_string( $config['id'] ) ) {
-			throw new Exception( 'Font Collection config ID is required as a non-empty string.' );
+		if ( empty( $config['slug'] ) || ! is_string( $config['slug'] ) ) {
+			throw new Exception( 'Font Collection config slug is required as a non-empty string.' );
 		}
 
 		if ( empty( $config['name'] ) || ! is_string( $config['name'] ) ) {
