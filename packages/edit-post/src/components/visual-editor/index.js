@@ -82,7 +82,6 @@ export default function VisualEditor( { styles } ) {
 	return (
 		<div
 			className={ classnames( 'edit-post-visual-editor', {
-				'is-template-mode': isEditingTemplate,
 				'has-inline-canvas': ! isToBeIframed,
 			} ) }
 		>
