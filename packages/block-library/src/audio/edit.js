@@ -124,17 +124,26 @@ function AudioEdit( {
 
 	const blockProps = useBlockProps( {
 		className: classes,
+		style:{
+			borderRadius: attributes.borderRadius
+		}
 	} );
 
 	const borderStyleHandler = ( borderType ) => {
+		console.log( attributes.borderRadius );
 		if( borderType === 'rounded' ){
-			setAttributes( { borderRadius: "10px" } );
-			console.log( attributes.borderRadius );
+			setAttributes( { borderRadius: "15px" } );
 			return;
 		}
 		setAttributes( { borderRadius: "0px" } );
-		console.log( attributes.borderRadius );
 	}
+
+	useEffect(() => {
+		console.log(attributes.borderRadius);
+		 blockProps.style = {
+			borderRadius: attributes.borderRadius,
+		};
+	}, [attributes.borderRadius]);
 
 	if ( ! src ) {
 		return (
@@ -206,13 +215,13 @@ function AudioEdit( {
 				<PanelBody title="Block Settings" initialOpen={true}>
 					<Button
 						className='border-btn'
-						onClick={ () => setAttributes({borderRadius:"0px"}) }
+						onClick={ () => borderStyleHandler("default") }
 					>
 						Default
 					</Button>
 					<Button
 						className='border-btn'
-						onClick={ ()=> setAttributes( {borderRadius: "10px"} ) }
+						onClick={ ()=> borderStyleHandler("rounded") }
 					>
 						Rounded
 					</Button>

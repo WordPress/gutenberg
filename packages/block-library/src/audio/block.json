@@ -45,10 +45,7 @@
 		},
 		"borderRadius": {
 			"type": "string",
-			"default": "0px",
-			"source": "attribute",
-			"selector": "audio",
-			"attribute": "borderRadius"
+			"default": "0px"
 		}
 	},
 	"supports": {
