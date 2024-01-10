@@ -22,6 +22,13 @@ An optional default value for the control. If left `undefined`, the first non-di
 
 -   Required: no
 
+##### `hideLabelFromVision`: `boolean`
+
+If true, the label will only be visible to screen readers.
+
+-   Required: no
+-   Default: `false`
+
 ##### `label`: `string`
 
 Label for the control.
@@ -31,6 +38,12 @@ Label for the control.
 ##### `onChange`: `( newValue: string ) => void`
 
 A function that receives the new value of the input.
+
+-   Required: no
+
+##### `popoverProps`: `Object`
+
+Optional props passed to the Ariakit Select Popover.
 
 -   Required: no
 
