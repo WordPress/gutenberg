@@ -115,8 +115,8 @@ function register_block_core_post_terms() {
 	register_block_type_from_metadata(
 		__DIR__ . '/post-terms',
 		array(
-			'render_callback' => 'render_block_core_post_terms',
-			'variations'      => 'build_post_term_block_variations',
+			'render_callback'    => 'render_block_core_post_terms',
+			'variation_callback' => 'build_post_term_block_variations',
 		)
 	);
 }
