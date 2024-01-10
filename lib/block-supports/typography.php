@@ -412,7 +412,7 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 	 * For floats coerced to strings, locales can use either a comma (,) or dot (.) as decimal separators.
 	 * Replace the locale separator with a dot for CSS rules to be valid.
 	 */
-	$linear_factor_scaled   = empty( $linear_factor_scaled ) || 1 === $linear_factor_scaled ? 1 : str_replace( ',', '.', round( $linear_factor_scaled, 3 )  );
+	$linear_factor_scaled   = empty( $linear_factor_scaled ) || 1 === $linear_factor_scaled ? 1 : str_replace( ',', '.', round( $linear_factor_scaled, 3 ) );
 	$fluid_target_font_size = $minimum_font_size_rem['combined'] . " + ((1vw - $view_port_width_offset) * $linear_factor_scaled)";
 
 	return "clamp($minimum_font_size_raw, $fluid_target_font_size, $maximum_font_size_raw)";
