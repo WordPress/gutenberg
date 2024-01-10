@@ -89,6 +89,9 @@ function InlineLinkUI( {
 	}
 
 	function onChangeLink( nextValue ) {
+		const hasLink = linkValue?.url;
+		const isNewLink = ! hasLink;
+
 		// Merge the next value with the current link value.
 		nextValue = {
 			...linkValue,
@@ -173,7 +176,11 @@ function InlineLinkUI( {
 
 			newValue.start = newValue.end;
 
-			// Hides the Link UI.
+			// Hides the Link UI on change except upon the initial creation of the link.
+			if ( ! isNewLink ) {
+				newValue.activeFormats = [];
+			}
+
 			onChange( newValue );
 		}
 
