@@ -153,10 +153,13 @@
 			</property>
 		</properties>
 	</rule>
-	<rule ref="Gutenberg.CodeAnalysis.RestrictedFunctionCall">
+	<rule ref="Gutenberg.CodeAnalysis.RestrictedFunctionsAndClasses">
 		<include-pattern>./packages/block-library/src/*/*.php</include-pattern>
 		<properties>
 			<property name="restricted_functions" type="array">
+				<element value="(G|g)utenberg.*"/>
+			</property>
+			<property name="restricted_classes" type="array">
 				<element value="(G|g)utenberg.*"/>
 			</property>
 		</properties>
