@@ -17,7 +17,7 @@ import {
 	useMergeRefs,
 	useDebounce,
 } from '@wordpress/compose';
-import { createContext, useMemo, useCallback } from '@wordpress/element';
+import { createContext, useMemo, useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -113,6 +113,29 @@ function Root( { className, ...settings } ) {
 	);
 }
 
+function StopEditingAsBlocksOnOutsideSelect( { clientId } ) {
+	const {
+		__unstableStopEditingAsBlocks,
+	} = useDispatch( blockEditorStore );
+	const isBlockOrDescendantSelected = useSelect(
+		( select ) => {
+			const { isBlockSelected, hasSelectedInnerBlock } =
+				select( blockEditorStore );
+			return (
+				isBlockSelected( clientId ) ||
+				hasSelectedInnerBlock( clientId, true )
+			);
+		},
+		[ clientId ]
+	);
+	useEffect( () => {
+		if ( ! isBlockOrDescendantSelected ) {
+			__unstableStopEditingAsBlocks( clientId );
+		}
+	}, [ isBlockOrDescendantSelected, clientId, __unstableStopEditingAsBlocks ] );
+	return null;
+}
+
 export default function BlockList( settings ) {
 	return (
 		<BlockEditContextProvider value={ DEFAULT_BLOCK_EDIT_CONTEXT }>
@@ -128,17 +151,19 @@ function Items( {
 	__experimentalAppenderTagName,
 	layout = defaultLayout,
 } ) {
-	const { order, selectedBlocks, visibleBlocks } = useSelect(
+	const { order, selectedBlocks, visibleBlocks, temporarilyEditingAsBlocks } = useSelect(
 		( select ) => {
 			const {
 				getBlockOrder,
 				getSelectedBlockClientIds,
 				__unstableGetVisibleBlocks,
+				__unstableGetTemporarilyEditingAsBlocks,
 			} = select( blockEditorStore );
 			return {
 				order: getBlockOrder( rootClientId ),
 				selectedBlocks: getSelectedBlockClientIds(),
 				visibleBlocks: __unstableGetVisibleBlocks(),
+				temporarilyEditingAsBlocks: __unstableGetTemporarilyEditingAsBlocks(),
 			};
 		},
 		[ rootClientId ]
@@ -163,6 +188,7 @@ function Items( {
 				</AsyncModeProvider>
 			) ) }
 			{ order.length < 1 && placeholder }
+			{ !! temporarilyEditingAsBlocks && <StopEditingAsBlocksOnOutsideSelect clientId={ temporarilyEditingAsBlocks } /> }
 			<BlockListAppender
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
