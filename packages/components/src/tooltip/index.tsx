@@ -31,7 +31,7 @@ export const TOOLTIP_DELAY = 700;
 
 const CONTEXT_VALUE = {
 	Tooltip: {
-		isNestedInParentTooltip: true,
+		isNestedInTooltip: true,
 	},
 };
 
@@ -49,7 +49,7 @@ function UnconnectedTooltip(
 		text,
 
 		// From Internal Context system
-		isNestedInParentTooltip,
+		isNestedInTooltip,
 
 		...restProps
 	} = useContextSystem< typeof props & TooltipInternalContext >(
@@ -95,7 +95,7 @@ function UnconnectedTooltip(
 		showTimeout: delay,
 	} );
 
-	if ( isNestedInParentTooltip ) {
+	if ( isNestedInTooltip ) {
 		return isOnlyChild
 			? cloneElement( children, {
 					...restProps,
