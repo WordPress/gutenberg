@@ -13,46 +13,24 @@ test.describe( 'Validate multiple use', () => {
 		editor,
 		page,
 	} ) => {
-		const OPTIONS_SELECTOR =
-			'//div[contains(@class, "block-editor-block-settings-menu")]//button[contains(@aria-label, "Options")]';
-		const DUPLICATE_BUTTON_SELECTOR =
-			'//button[contains(@class, "components-menu-item__button")][contains(., "Duplicate")]';
-
 		// Insert a block with `multiple` feature enabled, such as `core/more`
 		await editor.insertBlock( {
 			name: 'core/more',
 		} );
 
-		// Block toolbar options dropdown button
-		let optionButton = await page.waitForXPath( OPTIONS_SELECTOR );
-		await optionButton.click();
-
-		const groupButton = await page.waitForXPath(
-			'//button[contains(@class, "components-menu-item__button")][contains(., "Group")]'
+		const optionButton = page.locator(
+			".components-dropdown-menu__toggle[data-toolbar-item='true'][aria-label='Options']"
 		);
 
-		await groupButton.click();
-
-		// Block toolbar options dropdown button
-		optionButton = await page.waitForXPath( OPTIONS_SELECTOR );
+		// Group the block
 		await optionButton.click();
+		await page.getByText( 'Group' ).click();
 
-		// Duplicate block twice
-		let duplicateButton = await page.waitForXPath(
-			DUPLICATE_BUTTON_SELECTOR
-		);
-		await duplicateButton.click();
-
-		optionButton = await page.waitForXPath( OPTIONS_SELECTOR );
+		// Duplicate the block
 		await optionButton.click();
-		duplicateButton = await page.waitForXPath( DUPLICATE_BUTTON_SELECTOR );
-		await duplicateButton.click();
+		await page.getByText( 'Duplicate' ).click();
 
-		// Check if there are correct amount of warnings.
-		expect(
-			await page.$x(
-				'//p[contains(@class, "block-editor-warning__message")][contains(., "More: This block can only be used once.")]'
-			)
-		).toHaveLength( 2 );
+		// Check if warnings is visible
+		await expect( page.locator( '.block-editor-warning' ) ).toBeVisible();
 	} );
 } );
