@@ -14,7 +14,7 @@ import {
 	__experimentalVStack as VStack,
 	VisuallyHidden,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';

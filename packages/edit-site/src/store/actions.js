@@ -5,7 +5,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import { addQueryArgs } from '@wordpress/url';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -13,7 +13,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 import { speak } from '@wordpress/a11y';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
