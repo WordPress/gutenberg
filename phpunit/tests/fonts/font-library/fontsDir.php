@@ -1,6 +1,6 @@
 <?php
 /**
- * Test wp_font_dir().
+ * Test wp_get_font_dir().
  *
  * @package WordPress
  * @subpackage Font Library
@@ -8,7 +8,7 @@
  * @group fonts
  * @group font-library
  *
- * @covers wp_font_dir
+ * @covers wp_get_font_dir
  */
 class Tests_Fonts_WpFontDir extends WP_UnitTestCase {
 	private $dir_defaults;
@@ -26,7 +26,7 @@ class Tests_Fonts_WpFontDir extends WP_UnitTestCase {
 	}
 
 	public function test_fonts_dir() {
-		$font_dir = wp_font_dir();
+		$font_dir = wp_get_font_dir();
 		$this->assertEquals( $font_dir, $this->dir_defaults );
 	}
 
@@ -46,7 +46,7 @@ class Tests_Fonts_WpFontDir extends WP_UnitTestCase {
 		add_filter( 'font_dir', 'set_new_values' );
 
 		// Gets the fonts dir.
-		$font_dir = wp_font_dir();
+		$font_dir = wp_get_font_dir();
 
 		$expected = array(
 			'path'    => '/custom-path/fonts/my-custom-subdir',
@@ -57,14 +57,14 @@ class Tests_Fonts_WpFontDir extends WP_UnitTestCase {
 			'error'   => false,
 		);
 
-		$this->assertEquals( $font_dir, $expected, 'The wp_font_dir() method should return the expected values.' );
+		$this->assertEquals( $font_dir, $expected, 'The wp_get_font_dir() method should return the expected values.' );
 
 		// Remove the filter.
 		remove_filter( 'font_dir', 'set_new_values' );
 
 		// Gets the fonts dir.
-		$font_dir = wp_font_dir();
+		$font_dir = wp_get_font_dir();
 
-		$this->assertEquals( $font_dir, $this->dir_defaults, 'The wp_font_dir() method should return the default values.' );
+		$this->assertEquals( $font_dir, $this->dir_defaults, 'The wp_get_font_dir() method should return the default values.' );
 	}
 }
