@@ -309,7 +309,7 @@ function gutenberg_register_block_hooks_rest_field() {
  * @return array The updated block type arguments.
  */
 function gutenberg_register_block_type_args_shim( $args ) {
-	if( isset( $args['variation_callback'] ) && is_callable( $args['variation_callback'] ) ) {
+	if ( isset( $args['variation_callback'] ) && is_callable( $args['variation_callback'] ) ) {
 		$args['variations'] = call_user_func( $args['variation_callback'] );
 		unset( $args['variation_callback'] );
 	}
@@ -324,7 +324,7 @@ if ( ! function_exists( 'traverse_and_serialize_blocks' ) ) {
 	add_action( 'rest_api_init', 'gutenberg_register_block_hooks_rest_field' );
 }
 
-if( ! method_exists( 'WP_Block_Type', 'get_variations' ) ) {
+if ( ! method_exists( 'WP_Block_Type', 'get_variations' ) ) {
 	add_filter( 'register_block_type_args', 'gutenberg_register_block_type_args_shim' );
 }
 
