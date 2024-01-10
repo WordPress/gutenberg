@@ -260,6 +260,7 @@ function InlineLinkUI( {
 			shift
 		>
 			<LinkControl
+				showInitialSuggestions={ true }
 				value={ linkValue }
 				onChange={ onChangeLink }
 				onRemove={ removeLink }
