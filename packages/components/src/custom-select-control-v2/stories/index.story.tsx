@@ -115,6 +115,40 @@ MultiSelect.args = {
 	),
 };
 
+export const HiddenLabelSelect = Template.bind( {} );
+HiddenLabelSelect.args = {
+	hideLabelFromVision: true,
+	label: 'Label',
+	children: (
+		<>
+			<CustomSelectItem value="Small">
+				<span style={ { fontSize: '75%' } }>Small</span>
+			</CustomSelectItem>
+			<CustomSelectItem value="Something bigger">
+				<span style={ { fontSize: '200%' } }>Something bigger</span>
+			</CustomSelectItem>
+		</>
+	),
+};
+
+export const CustomPopoverSelect = Template.bind( {} );
+CustomPopoverSelect.args = {
+	popoverProps: {
+		sameWidth: false,
+	},
+	label: 'Label',
+	children: (
+		<>
+			<CustomSelectItem value="Small">
+				<span style={ { fontSize: '75%' } }>Small</span>
+			</CustomSelectItem>
+			<CustomSelectItem value="Something bigger">
+				<span style={ { fontSize: '200%' } }>Something bigger</span>
+			</CustomSelectItem>
+		</>
+	),
+};
+
 const renderControlledValue = ( gravatar: string | string[] ) => {
 	const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
 	return (
