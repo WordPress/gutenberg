@@ -2713,55 +2713,59 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Merges new incoming data.
+	 * Replace the entire spacing units array with the incoming one.
 	 *
-	 * @since 5.8.0
-	 * @since 5.9.0 Duotone preset also has origins.
+	 * spacing.units is a special case because numeric indexes are used for
+	 * replacement causing extra values to be left behind when the data array
+	 * is longer than the incoming array.
 	 *
-	 * @param WP_Theme_JSON $incoming Data to merge.
+	 * NOTE: This mutates the $data array as a small performance improvement
+	 * since mutating the data is the intention where this is used.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array $data          The data to replace presets in.
+	 * @param array $incoming_data The incoming data to replace presets with.
+	 * @param array $nodes         The nodes to replace presets in.
+	 *
+	 * @return array The data with presets replaced.
 	 */
-	public function merge( $incoming ) {
-		$incoming_data    = $incoming->get_raw_data();
-		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
-
-		/*
-		 * The array_replace_recursive algorithm merges at the leaf level,
-		 * but we don't want leaf arrays to be merged, so we overwrite it.
-		 *
-		 * For leaf values that are sequential arrays it will use the numeric indexes for replacement.
-		 * We rather replace the existing with the incoming value, if it exists.
-		 * This is the case of spacing.units.
-		 *
-		 * For leaf values that are associative arrays it will merge them as expected.
-		 * This is also not the behavior we want for the current associative arrays (presets).
-		 * We rather replace the existing with the incoming value, if it exists.
-		 * This happens, for example, when we merge data from theme.json upon existing
-		 * theme supports or when we merge anything coming from the same source twice.
-		 * This is the case of color.palette, color.gradients, color.duotone,
-		 * typography.fontSizes, or typography.fontFamilies.
-		 *
-		 * Additionally, for some preset types, we also want to make sure the
-		 * values they introduce don't conflict with default values. We do so
-		 * by checking the incoming slugs for theme presets and compare them
-		 * with the equivalent default presets: if a slug is present as a default
-		 * we remove it from the theme presets.
-		 */
-		$nodes        = static::get_setting_nodes( $incoming_data );
-		$slugs_global = static::get_default_slugs( $this->theme_json, array( 'settings' ) );
+	private function replace_spacing_units( &$data, &$incoming_data, &$nodes ) {
 		foreach ( $nodes as $node ) {
-			// Replace the spacing.units.
 			$path   = $node['path'];
 			$path[] = 'spacing';
 			$path[] = 'units';
 
-			$content = _wp_array_get( $incoming_data, $path, null );
-			if ( isset( $content ) ) {
-				_wp_array_set( $this->theme_json, $path, $content );
+			$units = _wp_array_get( $incoming_data, $path, null );
+			if ( isset( $units ) ) {
+				_wp_array_set( $data, $path, $units );
 			}
+		}
 
-			// Replace the presets.
+		return $data;
+	}
+
+	/**
+	 * Replace presets with incoming data according to settings defined in 
+	 * static::PRESETS_METADATA.
+	 *
+	 * NOTE: This mutates the $data array as a small performance improvement
+	 * since mutating the data is the intention where this is used.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array $data          The data to replace presets in.
+	 * @param array $incoming_data The incoming data to replace presets with.
+	 * @param array $nodes         The nodes to replace presets in.
+	 *
+	 * @return array The data with presets replaced.
+	 */
+	private static function replace_presets( &$data, &$incoming_data, &$nodes ) {
+		$slugs_global = static::get_default_slugs( $data, array( 'settings' ) );
+
+		foreach ( $nodes as $node ) {
 			foreach ( static::PRESETS_METADATA as $preset ) {
-				$override_preset = ! static::get_metadata_boolean( $this->theme_json['settings'], $preset['prevent_override'], true );
+				$override_preset = ! static::get_metadata_boolean( $data['settings'], $preset['prevent_override'], true );
 
 				foreach ( static::VALID_ORIGINS as $origin ) {
 					$base_path = $node['path'];
@@ -2780,7 +2784,8 @@ class WP_Theme_JSON_Gutenberg {
 					if ( 'theme' === $origin && $preset['use_default_names'] ) {
 						foreach ( $content as $key => $item ) {
 							if ( ! isset( $item['name'] ) ) {
-								$name = static::get_name_from_defaults( $item['slug'], $base_path );
+								// TODO: Not sure if I should make get_name_from_defaults() static or make replace_presets() non-static.
+								$name = (new self($data, $origin))->get_name_from_defaults( $item['slug'], $base_path );
 								if ( null !== $name ) {
 									$content[ $key ]['name'] = $name;
 								}
@@ -2792,18 +2797,49 @@ class WP_Theme_JSON_Gutenberg {
 						( 'theme' !== $origin ) ||
 						( 'theme' === $origin && $override_preset )
 					) {
-						_wp_array_set( $this->theme_json, $path, $content );
+						_wp_array_set( $data, $path, $content );
 					} else {
-						$slugs_node = static::get_default_slugs( $this->theme_json, $node['path'] );
+						$slugs_node = static::get_default_slugs( $data, $node['path'] );
 						$slugs      = array_merge_recursive( $slugs_global, $slugs_node );
 
 						$slugs_for_preset = _wp_array_get( $slugs, $preset['path'], array() );
 						$content          = static::filter_slugs( $content, $slugs_for_preset );
-						_wp_array_set( $this->theme_json, $path, $content );
+						_wp_array_set( $data, $path, $content );
 					}
 				}
 			}
 		}
+
+		return $data;
+	}
+
+	/**
+	 * Merges new incoming data.
+	 *
+	 * @since 5.8.0
+	 * @since 5.9.0 Duotone preset also has origins.
+	 *
+	 * @param WP_Theme_JSON $incoming Data to merge.
+	 */
+	public function merge( $incoming ) {
+		$incoming_data = $incoming->get_raw_data();
+		$nodes         = static::get_setting_nodes( $incoming_data );
+
+		/*
+		 * First, do a basic merge of the incoming data with the existing data.
+		 *
+		 * array_replace_recursive() works on leaf nodes. When the value in the
+		 * first array is scalar, it will be replaced by the value in the second
+		 * array, may it be scalar or array. When the value in the first array
+		 * and the second array are both arrays, array_replace_recursive() will
+		 * replace their respective value recursively.
+		 * 
+		 * We don't want to do that in all cases, so we re-replace the data
+		 * manually in those special cases after the basic merge.
+		 */
+		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
+		$this->theme_json = static::replace_spacing_units( $this->theme_json, $incoming_data, $nodes );
+		$this->theme_json = static::replace_presets( $this->theme_json, $incoming_data, $nodes );
 	}
 
 	/**
