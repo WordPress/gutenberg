@@ -178,15 +178,14 @@ export default function TypographyPanel( {
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
 
 	/**
-	 * TODO: Doing some hacky things here so the global styles CSS matches what
-	 * is shown in the dropdown.
+	 * TODO: The reversing and filtering of default font sizes is a hack so the
+	 * dropdown UI matches what is generated in the global styles CSS stylesheet.
 	 *
-	 * Global styles PRESETS_METADATA includes a `prevent_override` option
-	 * that's supposed to handle this. But it isn't working as expected.
+	 * This is a temporary solution until #57733 is resolved. At which point,
+	 * the mergedFontSizes would just need to be the concatenated array of all
+	 * presets or a custom dropdown with sections for each.
 	 *
-	 * Ideally, global styles would be fixed to handle overrides and duplicates
-	 * better. But at least with these hacks, the thing you select matches the
-	 * styles that get applied.
+	 * @see {@link https://github.com/WordPress/gutenberg/issues/57733}
 	 */
 
 	// The font size presets are merged in reverse order so that the duplicates
