@@ -381,9 +381,6 @@ export default function PagePages() {
 					view={ view }
 					onChangeView={ onChangeView }
 					onSelectionChange={ onSelectionChange }
-					getItemTitle={ ( item ) => {
-						return item.title?.rendered;
-					} }
 					onDetailsChange={ onDetailsChange }
 				/>
 			</Page>

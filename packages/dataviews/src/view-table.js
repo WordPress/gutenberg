@@ -333,17 +333,17 @@ function SingleSelectionCheckbox( {
 	item,
 	data,
 	getItemId,
-	getItemTitle,
+	primaryField,
 } ) {
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
 	let selectionLabel;
-	if ( getItemTitle ) {
+	if ( primaryField?.getValue && item ) {
 		// eslint-disable-next-line @wordpress/valid-sprintf
 		selectionLabel = sprintf(
 			/* translators: %s: item title. */
 			isSelected ? __( 'Deselect item: %s' ) : __( 'Select item: %s' ),
-			getItemTitle( item )
+			primaryField.getValue( { item } )
 		);
 	} else {
 		selectionLabel = isSelected
@@ -388,7 +388,6 @@ function ViewTable( {
 	actions,
 	data,
 	getItemId,
-	getItemTitle,
 	isLoading = false,
 	deferredRendering,
 	selection,
@@ -427,13 +426,15 @@ function ViewTable( {
 	const visibleFields = fields.filter(
 		( field ) =>
 			! view.hiddenFields.includes( field.id ) &&
-			! [ view.layout.mediaField, view.layout.primaryField ].includes(
-				field.id
-			)
+			! [ view.layout.mediaField ].includes( field.id )
 	);
 	const usedData = deferredRendering ? asyncData : data;
 	const hasData = !! usedData?.length;
 	const sortValues = { asc: 'ascending', desc: 'descending' };
+
+	const primaryField = fields.find(
+		( field ) => field.id === view.layout.primaryField
+	);
 
 	return (
 		<div>
@@ -527,12 +528,12 @@ function ViewTable( {
 											id={ getItemId?.( item ) || index }
 											item={ item }
 											selection={ selection }
-											getItemTitle={ getItemTitle }
 											onSelectionChange={
 												onSelectionChange
 											}
 											getItemId={ getItemId }
 											data={ data }
+											primaryField={ primaryField }
 										/>
 									</td>
 								) }

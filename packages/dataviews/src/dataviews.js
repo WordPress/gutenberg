@@ -29,21 +29,21 @@ export default function DataViews( {
 	actions,
 	data,
 	getItemId = defaultGetItemId,
-	getItemTitle,
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
 	onSelectionChange = defaultOnSelectionChange,
 	onDetailsChange = null,
 	deferredRendering = false,
-	labels,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
 
 	useEffect( () => {
 		if (
 			selection.length > 0 &&
-			selection.some( ( id ) => ! data.includes( id ) )
+			selection.some(
+				( id ) => ! data.some( ( item ) => item.id === id )
+			)
 		) {
 			const newSelection = selection.filter( ( id ) =>
 				data.some( ( item ) => item.id === id )
@@ -116,13 +116,11 @@ export default function DataViews( {
 					actions={ actions }
 					data={ data }
 					getItemId={ getItemId }
-					getItemTitle={ getItemTitle }
 					isLoading={ isLoading }
 					onSelectionChange={ onSetSelection }
 					onDetailsChange={ onDetailsChange }
 					selection={ selection }
 					deferredRendering={ deferredRendering }
-					labels={ labels }
 				/>
 				<Pagination
 					view={ view }
