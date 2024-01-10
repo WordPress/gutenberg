@@ -84,7 +84,17 @@ class WP_Font_Collection {
 				return new WP_Error( 'font_collection_read_error', __( 'Invalid URL for Font Collection data.', 'gutenberg' ) );
 			}
 
-			$response = wp_remote_get( $this->config['src'] );
+			/**
+			 * The user-agent we want to use.
+			 *
+			 * The default user-agent is the only one compatible with woff (not woff2)
+			 * which also supports unicode ranges.
+			 *
+			 * To use woff2, change this to 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'.
+			 */
+			$user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/603.3.8 (KHTML, like Gecko) Version/10.1.2 Safari/603.3.8';
+
+			$response = wp_remote_get( $this->config['src'], array( 'user-agent' => $user_agent ) );
 			if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
 				return new WP_Error( 'font_collection_read_error', __( 'Error fetching the Font Collection data from a URL.', 'gutenberg' ) );
 			}
