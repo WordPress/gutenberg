@@ -43,9 +43,7 @@ export default function DataViews( {
 	useEffect( () => {
 		if (
 			selection.length > 0 &&
-			selection.some(
-				( id ) => ! data.some( ( item ) => item.id === id )
-			)
+			selection.some( ( id ) => ! data.includes( id ) )
 		) {
 			const newSelection = selection.filter( ( id ) =>
 				data.some( ( item ) => item.id === id )
