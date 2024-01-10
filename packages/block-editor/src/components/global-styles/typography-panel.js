@@ -103,6 +103,47 @@ function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
 }
 
+/**
+ * TODO: The reversing and filtering of default font sizes is a hack so the
+ * dropdown UI matches what is generated in the global styles CSS stylesheet.
+ *
+ * This is a temporary solution until #57733 is resolved. At which point,
+ * the mergedFontSizes would just need to be the concatenated array of all
+ * presets or a custom dropdown with sections for each.
+ *
+ * @see {@link https://github.com/WordPress/gutenberg/issues/57733}
+ *
+ * @param {Object} settings The global styles settings.
+ *
+ * @return {Array} The merged font sizes.
+ */
+function getMergedFontSizes( settings ) {
+	// The font size presets are merged in reverse order so that the duplicates
+	// that may defined later in the array have higher priority to match the CSS.
+	const mergedFontSizesAll = uniqByProperty(
+		[
+			settings?.typography?.fontSizes?.custom,
+			settings?.typography?.fontSizes?.theme,
+			settings?.typography?.fontSizes?.default,
+		].flatMap( ( presets ) => presets?.toReversed() ?? [] ),
+		'slug'
+	).reverse();
+
+	// Default presets exist in the global styles CSS no matter the setting, so
+	// filtering them out in the UI has to be done after merging.
+	const mergedFontSizes =
+		settings?.typography?.defaultFontSizes === false
+			? mergedFontSizesAll.filter(
+					( { slug } ) =>
+						! [ 'small', 'medium', 'large', 'x-large' ].includes(
+							slug
+						)
+			  )
+			: mergedFontSizesAll;
+
+	return mergedFontSizes;
+}
+
 function TypographyToolsPanel( {
 	resetAllFilter,
 	onChange,
@@ -176,40 +217,7 @@ export default function TypographyPanel( {
 	// Font Size
 	const hasFontSizeEnabled = useHasFontSizeControl( settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-
-	/**
-	 * TODO: The reversing and filtering of default font sizes is a hack so the
-	 * dropdown UI matches what is generated in the global styles CSS stylesheet.
-	 *
-	 * This is a temporary solution until #57733 is resolved. At which point,
-	 * the mergedFontSizes would just need to be the concatenated array of all
-	 * presets or a custom dropdown with sections for each.
-	 *
-	 * @see {@link https://github.com/WordPress/gutenberg/issues/57733}
-	 */
-
-	// The font size presets are merged in reverse order so that the duplicates
-	// that may defined later in the array have higher priority to match the CSS.
-	const mergedFontSizesAll = uniqByProperty(
-		[
-			settings?.typography?.fontSizes?.custom,
-			settings?.typography?.fontSizes?.theme,
-			settings?.typography?.fontSizes?.default,
-		].flatMap( ( presets ) => presets?.toReversed() ?? [] ),
-		'slug'
-	).reverse();
-
-	// Default presets exist in the global styles CSS no matter the setting, so
-	// filtering them out in the UI has to be done after merging.
-	const mergedFontSizes =
-		settings?.typography?.defaultFontSizes === false
-			? mergedFontSizesAll.filter(
-					( { slug } ) =>
-						! [ 'small', 'medium', 'large', 'x-large' ].includes(
-							slug
-						)
-			  )
-			: mergedFontSizesAll;
+	const mergedFontSizes = getMergedFontSizes( settings );
 
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {
