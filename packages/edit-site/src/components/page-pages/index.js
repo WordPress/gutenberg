@@ -384,12 +384,6 @@ export default function PagePages() {
 					getItemTitle={ ( item ) => {
 						return item.title?.rendered;
 					} }
-					labels={ {
-						/* translators: %s: Title of the page. */
-						selectItem: __( 'Select page: %s' ),
-						/* translators: %s: Title of the page. */
-						deselectItem: __( 'Deselect page: %s' ),
-					} }
 					onDetailsChange={ onDetailsChange }
 				/>
 			</Page>

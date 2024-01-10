@@ -331,7 +331,6 @@ function SingleSelectionCheckbox( {
 	selection,
 	onSelectionChange,
 	item,
-	labels,
 	data,
 	getItemId,
 	getItemTitle,
@@ -339,13 +338,7 @@ function SingleSelectionCheckbox( {
 	const id = getItemId?.( item );
 	const isSelected = selection.includes( id );
 	let selectionLabel;
-	if ( getItemTitle && labels.selectItem ) {
-		// eslint-disable-next-line @wordpress/valid-sprintf
-		selectionLabel = sprintf(
-			isSelected ? labels.deselectItem : labels.selectItem,
-			getItemTitle( item )
-		);
-	} else if ( getItemTitle ) {
+	if ( getItemTitle ) {
 		// eslint-disable-next-line @wordpress/valid-sprintf
 		selectionLabel = sprintf(
 			/* translators: %s: item title. */
@@ -400,7 +393,6 @@ function ViewTable( {
 	deferredRendering,
 	selection,
 	onSelectionChange,
-	labels,
 } ) {
 	const hasBulkActions = actions?.some( ( action ) => action.supportsBulk );
 	const headerMenuRefs = useRef( new Map() );
@@ -534,7 +526,6 @@ function ViewTable( {
 										<SingleSelectionCheckbox
 											id={ getItemId?.( item ) || index }
 											item={ item }
-											labels={ labels }
 											selection={ selection }
 											getItemTitle={ getItemTitle }
 											onSelectionChange={

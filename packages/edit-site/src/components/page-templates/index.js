@@ -378,12 +378,6 @@ export default function DataviewsTemplates() {
 					getItemTitle={ ( item ) => {
 						return item.title?.rendered;
 					} }
-					labels={ {
-						/* translators: %s: Title of the template. */
-						selectItem: __( 'Select template: %s' ),
-						/* translators: %s: Title of the page. */
-						deselectItem: __( 'Deselect template: %s' ),
-					} }
 				/>
 			</Page>
 			{ view.type === LAYOUT_LIST && (
