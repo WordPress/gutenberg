@@ -335,7 +335,7 @@ function SingleSelectionCheckbox( {
 	getItemId,
 	getItemTitle,
 } ) {
-	const id = getItemId?.( item );
+	const id = getItemId( item );
 	const isSelected = selection.includes( id );
 	let selectionLabel;
 	if ( getItemTitle ) {
@@ -444,7 +444,7 @@ function ViewTable( {
 			>
 				<thead>
 					<tr>
-						{ !! selection && hasBulkActions && (
+						{ hasBulkActions && (
 							<th
 								style={ {
 									width: 20,
@@ -516,7 +516,7 @@ function ViewTable( {
 					{ hasData &&
 						usedData.map( ( item, index ) => (
 							<tr key={ getItemId( item ) }>
-								{ !! selection && hasBulkActions && (
+								{ hasBulkActions && (
 									<td
 										style={ {
 											width: 20,
