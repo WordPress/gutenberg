@@ -87,9 +87,10 @@ function UnconnectedTooltip(
 	}
 	computedPlacement = computedPlacement || 'bottom';
 
-	// Disable reason: the hook can not run conditionally.
-	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-	const tooltipStore = Ariakit.useTooltipStore( {
+	// Removing the `Ariakit` namespace from the hook name allows ESLint to
+	// properly identify the hook, and apply the correct linting rules.
+	const useAriakitTooltipStore = Ariakit.useTooltipStore;
+	const tooltipStore = useAriakitTooltipStore( {
 		placement: computedPlacement,
 		showTimeout: delay,
 	} );
