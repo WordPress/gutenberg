@@ -31,11 +31,7 @@ import { toggleFont } from './utils/toggleFont';
 import { getFontsOutline } from './utils/fonts-outline';
 import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
 import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
-
-/**
- * Browser dependencies
- */
-const { File } = window;
+import { downloadFontFaceAsset } from './utils';
 
 const DEFAULT_CATEGORY = {
 	id: 'all',
@@ -162,16 +158,14 @@ function FontCollection( { id } ) {
 		const fontFamily = fontsToInstall[ 0 ];
 
 		try {
-			for ( let i = 0; i < fontFamily.fontFace.length; i++ ) {
-				const fontFace = fontFamily.fontFace[ i ];
-				if ( ! fontFace.downloadFromUrl ) {
-					continue;
+			fontFamily?.fontFace?.forEach( async ( fontFace ) => {
+				if ( fontFace.downloadFromUrl ) {
+					fontFace.file = await downloadFontFaceAsset(
+						fontFace.downloadFromUrl
+					);
+					delete fontFace.downloadFromUrl;
 				}
-				fontFace.file = await downloadFontFaceAsset(
-					fontFace.downloadFromUrl
-				);
-				delete fontFace.downloadFromUrl;
-			}
+			} );
 		} catch ( error ) {
 			setNotice( {
 				type: 'error',
@@ -186,20 +180,6 @@ function FontCollection( { id } ) {
 		const installNotice = getNoticeFromInstallResponse( response );
 		setNotice( installNotice );
 		resetFontsToInstall();
-	};
-
-	const downloadFontFaceAsset = async ( url ) => {
-		return fetch( new Request( url ) )
-			.then( ( response ) => {
-				return response.blob();
-			} )
-			.then( ( blob ) => {
-				const filename = url.split( '/' ).pop();
-				const file = new File( [ blob ], filename, {
-					type: blob.type,
-				} );
-				return file;
-			} );
 	};
 
 	return (
