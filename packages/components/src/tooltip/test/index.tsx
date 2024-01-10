@@ -471,7 +471,7 @@ describe( 'Tooltip', () => {
 				screen.getByRole( 'button', {
 					description: 'Outer tooltip',
 				} )
-			).toBeInTheDocument();
+			).toBeVisible();
 
 			// Hover outside of the anchor, tooltip should hide
 			await hoverOutside();
