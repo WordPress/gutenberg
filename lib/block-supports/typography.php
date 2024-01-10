@@ -249,7 +249,6 @@ function gutenberg_render_typography_support( $block_content, $block ) {
 /**
  * Internal method that checks a string for a unit and value and returns an array consisting of 'value'`, `'unit'` and `'combined'`, e.g., [ 42, 'rem', '42rem' ].
  * A raw font size of `value + unit` is expected. If the value is a number, it will convert to `value + 'px'`.
- * Setting `$parse_units` to `false` will skip parsing the value for units and return the raw value.
  *
  * @access private
  *
@@ -259,7 +258,6 @@ function gutenberg_render_typography_support( $block_content, $block ) {
  *
  *     @type string        $coerce_to        Coerce the value to rem or px. Default `'rem'`.
  *     @type int           $root_size_value  Value of root font size for rem|em <-> px conversion. Default `16`.
- *     @type bool          $parse_units      Whether to parse value for units and recalculate values according to unit coercion. Default `true`.
  *     @type array<string> $acceptable_units An array of font size units. Default `[ 'rem', 'px', 'em' ]`;
  * }
  * @return array An array consisting of `'value'`, `'unit'` and `'combined'` properties.
@@ -281,52 +279,46 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 	$defaults = array(
 		'coerce_to'        => '',
 		'root_size_value'  => 16,
-		'parse_units'      => true,
 		'acceptable_units' => array( 'rem', 'px', 'em' ),
 	);
 	$options  = wp_parse_args( $options, $defaults );
 
-	// For floats coerced to strings, locales can use either a comma (,) or dot (.) as decimal separators.
-	// If the locale isn't using a dot, we need to replace the locale separator with a dot for CSS rules to be valid.
-	$raw_value = is_string( $raw_value ) ? str_replace( ',', '.', $raw_value ) : $raw_value;
+	$acceptable_units_group = implode( '|', $options['acceptable_units'] );
+	$pattern                = '/^(-?\d*[\.,]?\d+)(' . $acceptable_units_group . '){0,1}$/';
 
-	if ( true === $options['parse_units'] ) {
-		$acceptable_units_group = implode( '|', $options['acceptable_units'] );
-		$pattern                = '/^(\d*[\.]?\d+)(' . $acceptable_units_group . '){0,1}$/';
+	preg_match( $pattern, $raw_value, $matches );
 
-		preg_match( $pattern, $raw_value, $matches );
+	// We need a number value.
+	if ( ! isset( $matches[1] ) ) {
+		return null;
+	}
 
-		// We need a number value.
-		if ( ! isset( $matches[1] ) ) {
-			return null;
-		}
+	/*
+	 * For floats coerced to strings, locales can use either a comma (,) or dot (.) as decimal separators.
+	 * Replace the locale separator with a dot for CSS rules to be valid.
+	 */
+	$value = str_replace( ',', '.', $matches[1] );
+	// Converts units to pixel values by default.
+	$unit = isset( $matches[2] ) ? $matches[2] : 'px';
 
-		$value = $matches[1];
-		// Converts units to pixel values by default.
-		$unit = isset( $matches[2] ) ? $matches[2] : 'px';
+	// Default browser font size. Later we could inject some JS to compute this `getComputedStyle( document.querySelector( "html" ) ).fontSize`.
+	if ( 'px' === $options['coerce_to'] && ( 'em' === $unit || 'rem' === $unit ) ) {
+		$value = $value * $options['root_size_value'];
+		$unit  = $options['coerce_to'];
+	}
 
-		// Default browser font size. Later we could inject some JS to compute this `getComputedStyle( document.querySelector( "html" ) ).fontSize`.
-		if ( 'px' === $options['coerce_to'] && ( 'em' === $unit || 'rem' === $unit ) ) {
-			$value = $value * $options['root_size_value'];
-			$unit  = $options['coerce_to'];
-		}
+	if ( 'px' === $unit && ( 'em' === $options['coerce_to'] || 'rem' === $options['coerce_to'] ) ) {
+		$value = $value / $options['root_size_value'];
+		$unit  = $options['coerce_to'];
+	}
 
-		if ( 'px' === $unit && ( 'em' === $options['coerce_to'] || 'rem' === $options['coerce_to'] ) ) {
-			$value = $value / $options['root_size_value'];
-			$unit  = $options['coerce_to'];
-		}
-
-		/*
-		 * No calculation is required if swapping between em and rem yet,
-		 * since we assume a root size value. Later we might like to differentiate between
-		 * :root font size (rem) and parent element font size (em) relativity.
-		 */
-		if ( ( 'em' === $options['coerce_to'] || 'rem' === $options['coerce_to'] ) && ( 'em' === $unit || 'rem' === $unit ) ) {
-			$unit = $options['coerce_to'];
-		}
-	} else {
-		$value = $raw_value;
-		$unit  = '';
+	/*
+	 * No calculation is required if swapping between em and rem yet,
+	 * since we assume a root size value. Later we might like to differentiate between
+	 * :root font size (rem) and parent element font size (em) relativity.
+	 */
+	if ( ( 'em' === $options['coerce_to'] || 'rem' === $options['coerce_to'] ) && ( 'em' === $unit || 'rem' === $unit ) ) {
+		$unit = $options['coerce_to'];
 	}
 
 	$value = round( $value, 3 );
@@ -416,13 +408,11 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 	$view_port_width_offset = gutenberg_get_typography_value_and_unit( ( $minimum_viewport_width['value'] / 100 ) . $font_size_unit )['combined'];
 	$linear_factor          = 100 * ( ( $maximum_font_size['value'] - $minimum_font_size['value'] ) / ( $maximum_viewport_width['value'] - $minimum_viewport_width['value'] ) );
 	$linear_factor_scaled   = $linear_factor * $scale_factor;
-	$linear_factor_scaled   = empty( $linear_factor_scaled ) || 1 === $linear_factor_scaled ? 1 : gutenberg_get_typography_value_and_unit(
-		$linear_factor_scaled,
-		array(
-			'parse_units' => false,
-		)
-	)['combined'];
-
+	/*
+	 * For floats coerced to strings, locales can use either a comma (,) or dot (.) as decimal separators.
+	 * Replace the locale separator with a dot for CSS rules to be valid.
+	 */
+	$linear_factor_scaled   = empty( $linear_factor_scaled ) || 1 === $linear_factor_scaled ? 1 : str_replace( ',', '.', round( $linear_factor_scaled, 3 )  );
 	$fluid_target_font_size = $minimum_font_size_rem['combined'] . " + ((1vw - $view_port_width_offset) * $linear_factor_scaled)";
 
 	return "clamp($minimum_font_size_raw, $fluid_target_font_size, $maximum_font_size_raw)";

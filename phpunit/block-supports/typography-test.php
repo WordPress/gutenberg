@@ -868,17 +868,6 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'combined' => '12.74em',
 				),
 			),
-			'size: `"33.3333"`'                          => array(
-				'raw_value' => 33.3333,
-				'expected'  => array(
-					'value'    => 33.333,
-					'unit'     => '',
-					'combined' => '33.333',
-				),
-				'options'   => array(
-					'parse_units' => false,
-				),
-			),
 			'size: `"7.353vh"`'                          => array(
 				'raw_value' => '7.357777vh',
 				'expected'  => array(
@@ -904,6 +893,14 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'value'    => 1.788,
 					'unit'     => 'px',
 					'combined' => '1.788px',
+				),
+			),
+			'size: `-10.2rem`'                           => array(
+				'raw_value' => '-10.2rem',
+				'expected'  => array(
+					'value'    => -10.2,
+					'unit'     => 'rem',
+					'combined' => '-10.2rem',
 				),
 			),
 		);
