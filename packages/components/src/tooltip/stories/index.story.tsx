@@ -59,7 +59,11 @@ KeyboardShortcut.args = {
 };
 
 /**
- * Nested `Tooltip` components simply ignore the tooltip part, and only
+ * In case one or more `Tooltip` components are rendered inside another
+ * `Tooltip` component, only the tooltip associated to the outermost `Tooltip`
+ * component will be rendered in the browser and shown to the user
+ * appropriately. The rest of the nested `Tooltip` components will simply no-op
+ * and pass-through their anchor.
  */
 export const Nested: StoryFn< typeof Tooltip > = Template.bind( {} );
 Nested.args = {
