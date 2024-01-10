@@ -168,7 +168,7 @@ class WP_Font_Library {
 	 * }
 	 */
 	public static function fonts_dir( $defaults = array() ) {
-		$site_path = self::get_multi_site_fonts_sub_dir();
+		$site_path = self::get_multi_site_dir();
 
 		// Sets the defaults.
 		$defaults['path']    = path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path;
@@ -183,13 +183,13 @@ class WP_Font_Library {
 	}
 
 	/**
-	 * Gets sub-dir for fonts, using the blog ID if multi-site, empty otherwise.
+	 * Gets the Site dir for fonts, using the blog ID if multi-site, empty otherwise.
 	 *
 	 * @since 6.5.0
 	 *
-	 * @return string site sub-dir path.
+	 * @return string Site dir path.
 	 */
-	private static function get_multi_site_fonts_sub_dir() {
+	private static function get_multi_site_dir() {
 		$font_sub_dir = '';
 		if ( is_multisite() && ! ( is_main_network() && is_main_site() ) ) {
 			$font_sub_dir = '/sites/' . get_current_blog_id();
