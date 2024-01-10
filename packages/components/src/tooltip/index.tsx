@@ -66,7 +66,7 @@ function UnconnectedTooltip(
 		if ( 'development' === process.env.NODE_ENV ) {
 			// eslint-disable-next-line no-console
 			console.error(
-				'Tooltip should be called with only a single child element.'
+				'wp-components.Tooltip should be called with only a single child element.'
 			);
 		}
 	}
