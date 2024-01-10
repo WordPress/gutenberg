@@ -312,7 +312,7 @@ function gutenberg_register_block_type_args_shim( $args ) {
 	if( isset( $args['variation_callback'] ) && is_callable( $args['variation_callback'] ) ) {
 		$args['variations'] = call_user_func( $args['variation_callback'] );
 		unset( $args['variation_callback'] );
-	} 
+	}
 	return $args;
 }
 
