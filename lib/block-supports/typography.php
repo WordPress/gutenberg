@@ -285,7 +285,7 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 
 	$acceptable_units_group = implode( '|', $options['acceptable_units'] );
 	// Matches integers and floats (including negative values) with optional decimal (dot or comma) and a unit value.
-	$pattern                = '/^(-?\d*[\.,]?\d+)(' . $acceptable_units_group . '){0,1}$/';
+	$pattern = '/^(-?\d*[\.,]?\d+)(' . $acceptable_units_group . '){0,1}$/';
 
 	preg_match( $pattern, $raw_value, $matches );
 
