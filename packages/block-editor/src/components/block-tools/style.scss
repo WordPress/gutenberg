@@ -235,6 +235,11 @@
 			padding-right: 6px;
 			padding-left: 6px;
 			background-color: $white;
+
+			.show-icon-labels & {
+				padding-right: $grid-unit-15;
+				padding-left: $grid-unit-15;
+			}
 		}
 	}
 
