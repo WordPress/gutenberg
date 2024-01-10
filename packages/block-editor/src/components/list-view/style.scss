@@ -146,32 +146,38 @@
 	&.is-displacement-normal {
 		transition: transform 0.2s;
 		transform: translateY(0);
+		@include reduce-motion("transition");
 	}
 
 	&.is-displacement-up {
 		transition: transform 0.2s;
 		transform: translateY(-36px);
+		@include reduce-motion("transition");
 	}
 
 	&.is-displacement-down {
 		transition: transform 0.2s;
 		transform: translateY(36px);
+		@include reduce-motion("transition");
 	}
 
 	// Collapse multi-selections down into a single row space while dragging.
 	&.is-after-dragged-blocks {
 		transition: transform 0.2s;
 		transform: translateY(calc(var(--wp-admin--list-view-dragged-items-height, 36px) * -1));
+		@include reduce-motion("transition");
 	}
 
 	&.is-after-dragged-blocks.is-displacement-up {
 		transition: transform 0.2s;
 		transform: translateY(calc(-36px + var(--wp-admin--list-view-dragged-items-height, 36px) * -1));
+		@include reduce-motion("transition");
 	}
 
 	&.is-after-dragged-blocks.is-displacement-down {
 		transition: transform 0.2s;
 		transform: translateY(calc(36px + var(--wp-admin--list-view-dragged-items-height, 36px) * -1));
+		@include reduce-motion("transition");
 	}
 
 	&.is-dragging {
