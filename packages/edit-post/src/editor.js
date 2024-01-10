@@ -95,7 +95,7 @@ function Editor( {
 					supportsTemplateMode &&
 					isViewable &&
 					canEditTemplate &&
-					currentPost.postType === 'post'
+					currentPost.postType !== 'wp_template'
 						? getEditedPostTemplate()
 						: null,
 				post: postObject,
