@@ -19,6 +19,10 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
+	innerBlocks: {
+		template: [ [ 'core/paragraph', {} ] ],
+		__experimentalCaptureToolbars: true,
+	},
 	icon,
 	example: {
 		attributes: {

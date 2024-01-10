@@ -2452,9 +2452,34 @@ export const __experimentalGetPatternTransformItems = createSelector(
  *
  * @return {?Object} Block settings of the block if set.
  */
-export function getBlockListSettings( state, clientId ) {
-	return state.blockListSettings[ clientId ];
-}
+export const getBlockListSettings = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, clientId ) => {
+			const name = getBlockName( state, clientId );
+			const parentLock = getTemplateLock(
+				state,
+				getBlockRootClientId( state, clientId )
+			);
+			const { templateLock, ...settings } = {
+				...select( blocksStore ).getBlockType( name )?.innerBlocks,
+				...state.blockListSettings[ clientId ],
+			};
+			return {
+				...settings,
+				templateLock:
+					templateLock === undefined || parentLock === 'contentOnly'
+						? parentLock
+						: templateLock,
+			};
+		},
+		( state, clientId ) => {
+			return [
+				select( blocksStore ).getBlockTypes(),
+				state.blockListSettings[ clientId ],
+			];
+		}
+	)
+);
 
 /**
  * Returns the editor settings.
@@ -2489,21 +2514,29 @@ export function isLastBlockChangePersistent( state ) {
  * @return {Object} An object where the keys are client ids and the values are
  *                  a block list setting object.
  */
-export const __experimentalGetBlockListSettingsForBlocks = createSelector(
-	( state, clientIds = [] ) => {
-		return clientIds.reduce( ( blockListSettingsForBlocks, clientId ) => {
-			if ( ! state.blockListSettings[ clientId ] ) {
-				return blockListSettingsForBlocks;
-			}
-
-			return {
-				...blockListSettingsForBlocks,
-				[ clientId ]: state.blockListSettings[ clientId ],
-			};
-		}, {} );
-	},
-	( state ) => [ state.blockListSettings ]
-);
+export const __experimentalGetBlockListSettingsForBlocks =
+	createRegistrySelector( ( select ) =>
+		createSelector(
+			( state, clientIds = [] ) => {
+				return clientIds.reduce(
+					( blockListSettingsForBlocks, clientId ) => {
+						return {
+							...blockListSettingsForBlocks,
+							[ clientId ]: getBlockListSettings(
+								state,
+								clientId
+							),
+						};
+					},
+					{}
+				);
+			},
+			( state ) => [
+				select( blocksStore ).getBlockTypes(),
+				state.blockListSettings,
+			]
+		)
+	);
 
 /**
  * Returns the title of a given reusable block
