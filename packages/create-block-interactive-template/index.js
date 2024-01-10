@@ -14,6 +14,8 @@ module.exports = {
 		supports: {
 			interactivity: true,
 		},
+		viewScript: null,
+		viewModule: 'file:./view.js',
 		render: 'file:./render.php',
 		example: {},
 		customScripts: {
