@@ -6,7 +6,7 @@ import { colord } from 'colord';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,9 +15,9 @@ import { InputWithSlider } from './input-with-slider';
 import type { HslInputProps } from './types';
 
 export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
-	const colorPropHSL = color.toHsl();
+	const colorPropHSLA = useMemo( () => color.toHsl(), [ color ] );
 
-	const [ internalHSLA, setInternalHSLA ] = useState( { ...colorPropHSL } );
+	const [ internalHSLA, setInternalHSLA ] = useState( { ...colorPropHSLA } );
 
 	const isInternalColorSameAsReceivedColor = color.isEqual(
 		colord( internalHSLA )
@@ -26,9 +26,9 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 	useEffect( () => {
 		if ( ! isInternalColorSameAsReceivedColor ) {
 			// Keep internal HSLA color up to date with the received color prop
-			setInternalHSLA( colorPropHSL );
+			setInternalHSLA( colorPropHSLA );
 		}
-	}, [ colorPropHSL, isInternalColorSameAsReceivedColor ] );
+	}, [ colorPropHSLA, isInternalColorSameAsReceivedColor ] );
 
 	// If the internal color is equal to the received color prop, we can use the
 	// HSLA values from the local state which, compared to the received color prop,
@@ -36,10 +36,10 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 	// and thus allow for better UX when interacting with the H and S sliders.
 	const colorValue = isInternalColorSameAsReceivedColor
 		? internalHSLA
-		: colorPropHSL;
+		: colorPropHSLA;
 
 	const updateHSLAValue = (
-		partialNewValue: Partial< typeof colorPropHSL >
+		partialNewValue: Partial< typeof colorPropHSLA >
 	) => {
 		// Update internal HSLA color.
 		setInternalHSLA( ( prevValue ) => ( {
