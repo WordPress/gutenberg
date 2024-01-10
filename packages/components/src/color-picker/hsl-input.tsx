@@ -41,12 +41,6 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 	const updateHSLAValue = (
 		partialNewValue: Partial< typeof colorPropHSLA >
 	) => {
-		// Update internal HSLA color.
-		setInternalHSLA( ( prevValue ) => ( {
-			...prevValue,
-			...partialNewValue,
-		} ) );
-
 		const nextOnChangeValue = colord( {
 			...colorValue,
 			...partialNewValue,
@@ -54,8 +48,14 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 
 		// Fire `onChange` only if the resulting color is different from the
 		// current one.
+		// Otherwise, update the internal HSLA color to cause a re-render.
 		if ( ! color.isEqual( nextOnChangeValue ) ) {
 			onChange( nextOnChangeValue );
+		} else {
+			setInternalHSLA( ( prevHSLA ) => ( {
+				...prevHSLA,
+				...partialNewValue,
+			} ) );
 		}
 	};
 
