@@ -217,9 +217,9 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			return $parent;
 		}
 
-		$font_face = parent::get_item( $request );
+		$response = parent::get_item( $request );
 
-		if ( (int) $parent->ID !== (int) $font_face->data['parent'] ) {
+		if ( (int) $parent->ID !== (int) $response->data['parent'] ) {
 			return new WP_Error(
 				'rest_font_face_parent_id_mismatch',
 				/* translators: %d: A post id. */
@@ -228,7 +228,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			);
 		}
 
-		return $font_face;
+		return $response;
 	}
 
 	/**
@@ -246,6 +246,8 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 				'post_type'   => $this->post_type,
 				'post_parent' => $request['parent'],
 				'post_status' => 'publish',
+				'post_title'  => 'Font Face',
+				'post_name'   => 'wp-font-face',
 			)
 		);
 
@@ -258,15 +260,29 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		}
 
 		if ( is_string( $font_face_settings['src'] ) ) {
-			$file                      = $file_params[ $font_face_settings['src'] ];
-			$font_file                 = $this->handle_font_file_upload( $file );
+			$file      = $file_params[ $font_face_settings['src'] ];
+			$font_file = $this->handle_font_file_upload( $file );
+			if ( isset( $font_file['error'] ) ) {
+				return new WP_Error(
+					'rest_font_upload_unknown_error',
+					$font_file['error'],
+					array( 'status' => 500 )
+				);
+			}
 			$font_face_settings['src'] = $font_file['url'];
 			$font_relative_path        = _wp_relative_fonts_path( $font_file['file'] );
 			add_post_meta( $font_face_id, '_wp_font_face_file', $font_relative_path );
 		} else {
 			foreach ( $font_face_settings['src'] as $index => $src ) {
-				$file                                = $file_params[ $src ];
-				$font_file                           = $this->handle_font_file_upload( $file );
+				$file      = $file_params[ $src ];
+				$font_file = $this->handle_font_file_upload( $file );
+				if ( isset( $font_file['error'] ) ) {
+					return new WP_Error(
+						'rest_font_upload_unknown_error',
+						$font_file['error'],
+						array( 'status' => 500 )
+					);
+				}
 				$font_face_settings['src'][ $index ] = $font_file['url'];
 
 				$font_relative_path = _wp_relative_fonts_path( $font_file['file'] );
@@ -348,7 +364,11 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$data['parent']             = $item->post_parent;
 		$data['font_face_settings'] = json_decode( $item->post_content, true );
 
-		return $data;
+		$response = rest_ensure_response( $data );
+		$links    = $this->prepare_links( $item );
+		$response->add_links( $links );
+
+		return $response;
 	}
 
 	/**
