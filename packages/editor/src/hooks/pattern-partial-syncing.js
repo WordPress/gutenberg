@@ -5,6 +5,7 @@ import { addFilter } from '@wordpress/hooks';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useBlockEditingMode } from '@wordpress/block-editor';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -31,6 +32,11 @@ const {
 const withPartialSyncingControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const blockEditingMode = useBlockEditingMode();
+		const hasCustomFieldsSupport = hasBlockSupport(
+			props.name,
+			'__experimentalBlockBindings',
+			false
+		);
 		const isEditingPattern = useSelect(
 			( select ) =>
 				select( editorStore ).getCurrentPostType() ===
@@ -39,6 +45,7 @@ const withPartialSyncingControls = createHigherOrderComponent(
 		);
 
 		const shouldShowPartialSyncingControls =
+			hasCustomFieldsSupport &&
 			props.isSelected &&
 			isEditingPattern &&
 			blockEditingMode === 'default' &&
