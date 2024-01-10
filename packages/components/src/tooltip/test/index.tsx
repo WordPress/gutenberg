@@ -438,7 +438,7 @@ describe( 'Tooltip', () => {
 	} );
 
 	describe( 'nested', () => {
-		it( 'should render the outer tooltip and ignore inner tooltips', async () => {
+		it( 'should render the outer tooltip and ignore nested tooltips', async () => {
 			render(
 				<Tooltip text="Outer tooltip">
 					<Tooltip text="Middle tooltip">

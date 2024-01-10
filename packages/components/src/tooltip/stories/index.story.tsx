@@ -64,7 +64,7 @@ KeyboardShortcut.args = {
 export const Nested: StoryFn< typeof Tooltip > = Template.bind( {} );
 Nested.args = {
 	children: (
-		<Tooltip text="Inner tooltip text (that will never show)">
+		<Tooltip text="Nested tooltip text (that will never show)">
 			<Button variant="primary">Tooltip Anchor</Button>
 		</Tooltip>
 	),
