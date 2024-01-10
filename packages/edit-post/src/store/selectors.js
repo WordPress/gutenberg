@@ -594,8 +594,22 @@ export const getEditedPostTemplate = createRegistrySelector(
 		}
 
 		const post = select( editorStore ).getCurrentPost();
+		let slugToCheck;
+		// In `draft` status we might not have a slug available, so we use the `single`
+		// post type templates slug(ex page, single-post, single-product etc..).
+		// Pages do not need the `single` prefix in the slug to be prioritized
+		// through template hierarchy.
+		if ( post.slug ) {
+			slugToCheck =
+				post.type === 'page'
+					? `${ post.type }-${ post.slug }`
+					: `single-${ post.type }-${ post.slug }`;
+		} else {
+			slugToCheck =
+				post.type === 'page' ? 'page' : `single-${ post.type }`;
+		}
 		const defaultTemplateId = select( coreStore ).getDefaultTemplateId( {
-			slug: `${ post.type }-${ post.slug }`,
+			slug: slugToCheck,
 		} );
 		return select( coreStore ).getEditedEntityRecord(
 			'postType',
