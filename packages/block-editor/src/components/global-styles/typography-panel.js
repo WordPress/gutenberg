@@ -198,7 +198,7 @@ export default function TypographyPanel( {
 			settings?.typography?.fontSizes?.default,
 		].flatMap( ( presets ) => presets?.toReversed() ?? [] ),
 		'slug'
-	).toReversed();
+	).reverse();
 
 	// Default presets exist in the global styles CSS no matter the setting, so
 	// filtering them out in the UI has to be done after merging.
