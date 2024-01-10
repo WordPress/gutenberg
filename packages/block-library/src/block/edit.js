@@ -27,7 +27,7 @@ import {
 	store as blockEditorStore,
 	BlockControls,
 } from '@wordpress/block-editor';
-import { getBlockSupport, parse, cloneBlock } from '@wordpress/blocks';
+import { parse, cloneBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -38,11 +38,7 @@ const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 
 function isPartiallySynced( block ) {
 	return (
-		!! getBlockSupport(
-			block.name,
-			'__experimentalBlockBindings',
-			false
-		) &&
+		'core/paragraph' === block.name &&
 		!! block.attributes.metadata?.bindings &&
 		Object.values( block.attributes.metadata.bindings ).some(
 			( binding ) => binding.source.name === 'pattern_attributes'
