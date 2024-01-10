@@ -2,11 +2,10 @@
 
 ## Unreleased
 
-## 25.15.0 (2023-12-27)
-
 ### Bug Fix
 
--   `DropdownMenu V2 `: better fallback on browsers that don't support CSS subgrid([#57327](https://github.com/WordPress/gutenberg/pull/57327)).
+-   `NumberControl`: Make increment and decrement buttons keyboard accessible. ([#57402](https://github.com/WordPress/gutenberg/pull/57402)).
+-   `DropdownMenu V2`: better fallback on browsers that don't support CSS subgrid([#57327](https://github.com/WordPress/gutenberg/pull/57327)).
 -   `FontSizePicker`: Use Button API for keeping focus on reset ([#57221](https://github.com/WordPress/gutenberg/pull/57221)).
 -   `FontSizePicker`: Fix Reset button focus loss ([#57196](https://github.com/WordPress/gutenberg/pull/57196)).
 -   `PaletteEdit`: Consider digits when generating kebab-cased slug ([#56713](https://github.com/WordPress/gutenberg/pull/56713)).
@@ -17,15 +16,22 @@
 -   `Truncate`: improve handling of non-string `children` ([#57261](https://github.com/WordPress/gutenberg/pull/57261)).
 -   `PaletteEdit`: Don't discard colors with default name and slug ([#54332](https://github.com/WordPress/gutenberg/pull/54332)).
 -   `RadioControl`: Fully encapsulate styles ([#57347](https://github.com/WordPress/gutenberg/pull/57347)).
+-   `DuotonePicker`: Remove top margin when no duotone options ([#57489](https://github.com/WordPress/gutenberg/pull/57489)).
+-   `Snackbar`: Fix icon positioning ([#57377](https://github.com/WordPress/gutenberg/pull/57377)).
 -   `GradientPicker`: Use slug while iterating over gradient entries to avoid React "duplicated key" warning ([#57361](https://github.com/WordPress/gutenberg/pull/57361)).
+-   `NavigatorProvider`: Exclude `size` value from `contain` CSS rule ([#57498](https://github.com/WordPress/gutenberg/pull/57498)).
 
 ### Enhancements
 
 -   Update `ariakit` to version `0.3.10` ([#57325](https://github.com/WordPress/gutenberg/pull/57325)).
+-   Update `@ariakit/react` to version `0.3.12` and @ariakit/test to version `0.3.7` ([#57547](https://github.com/WordPress/gutenberg/pull/57547)).
 -   `DropdownMenuV2`: do not collapse suffix width ([#57238](https://github.com/WordPress/gutenberg/pull/57238)).
 -   `DateTimePicker`: Adjustment of the dot position on DayButton and expansion of the button area. ([#55502](https://github.com/WordPress/gutenberg/pull/55502)).
 -   `Modal`: Improve application of body class names ([#55430](https://github.com/WordPress/gutenberg/pull/55430)).
+-   `BaseControl`: Connect to context system ([#57408](https://github.com/WordPress/gutenberg/pull/57408)).
+-   `InputControl`, `NumberControl`, `UnitControl`, `SelectControl`, `TreeSelect`: Add `compact` size variant ([#57398](https://github.com/WordPress/gutenberg/pull/57398)).
 -   `ToggleGroupControl`: Update button size in large variant to be 32px ([#57338](https://github.com/WordPress/gutenberg/pull/57338)).
+-   `Tooltip`: improve unit tests ([#57345](https://github.com/WordPress/gutenberg/pull/57345)).
 
 ### Experimental
 

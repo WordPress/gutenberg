@@ -459,7 +459,7 @@ export default function Image( {
 						<ToolbarButton
 							onClick={ uploadExternal }
 							icon={ upload }
-							label={ __( 'Upload external image' ) }
+							label={ __( 'Upload image to media library' ) }
 						/>
 					</ToolbarGroup>
 				</BlockControls>

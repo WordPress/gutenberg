@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 13.26.0 (2023-12-27)
-
 ### New Features
 
 -   Add the editor panels visibility state to the editor store in addition to the following actions and selectors: `toggleEditorPanelEnabled`, `toggleEditorPanelOpened`, `removeEditorPanel`, `isEditorPanelRemoved`, `isEditorPanelOpened` and `isEditorPanelEnabled`.

@@ -13,65 +13,91 @@ if ( class_exists( 'WP_Directive_Processor' ) ) {
 /**
  * This processor is built on top of the HTML Tag Processor and augments its
  * capabilities to process the Interactivity API directives.
- *
- * IMPORTANT DISCLAIMER: This code is highly experimental and its only purpose
- * is to provide a way to test the server-side rendering of the Interactivity
- * API. Most of this code will be discarded once the HTML Processor is
- * available.  Please restrain from investing unnecessary time and effort trying
- * to improve this code.
  */
 class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
-
 	/**
-	 * An array of root blocks.
+	 * String containing the current root block.
 	 *
-	 * @var array
+	 * @var string
 	 */
 	public static $root_block = null;
 
 	/**
-	 * Add a root block to the variable.
+	 * Array containing the direct children of interactive blocks.
+	 *
+	 * @var array
+	 */
+	public static $children_of_interactive_block = array();
+
+	/**
+	 * Sets the current root block.
 	 *
 	 * @param array $block The block to add.
-	 *
-	 * @return void
 	 */
 	public static function mark_root_block( $block ) {
-		self::$root_block = md5( serialize( $block ) );
+		if ( null !== $block['blockName'] ) {
+			self::$root_block = $block['blockName'] . md5( serialize( $block ) );
+		} else {
+			self::$root_block = md5( serialize( $block ) );
+		}
 	}
 
 	/**
-	 * Remove a root block to the variable.
-	 *
-	 * @return void
+	 * Resets the root block.
 	 */
 	public static function unmark_root_block() {
 		self::$root_block = null;
 	}
 
 	/**
-	 * Check if block is a root block.
+	 * Checks if block is a root block.
 	 *
 	 * @param array $block The block to check.
-	 *
 	 * @return bool True if block is a root block, false otherwise.
 	 */
 	public static function is_marked_as_root_block( $block ) {
+		// If self::$root_block is null, is impossible that any block has been marked as root.
+		if ( is_null( self::$root_block ) ) {
+			return false;
+		}
+		// Blocks whose blockName is null are specifically intended to convey - "this is a freeform HTML block."
+		if ( null !== $block['blockName'] ) {
+			return str_contains( self::$root_block, $block['blockName'] ) && $block['blockName'] . md5( serialize( $block ) ) === self::$root_block;
+		}
 		return md5( serialize( $block ) ) === self::$root_block;
 	}
 
 	/**
-	 * Check if a root block has already been defined.
+	 * Checks if a root block has already been defined.
 	 *
-	 * @return bool True if block is a root block, false otherwise.
+	 * @return bool True if there is a root block, false otherwise.
 	 */
 	public static function has_root_block() {
 		return isset( self::$root_block );
 	}
 
+	/**
+	 * Stores a reference to a direct children of an interactive block to be able
+	 * to identify it later.
+	 *
+	 * @param array $block The block to add.
+	 */
+	public static function mark_children_of_interactive_block( $block ) {
+		self::$children_of_interactive_block[] = md5( serialize( $block ) );
+	}
 
 	/**
-	 * Find the matching closing tag for an opening tag.
+	 * Checks if block is marked as children of an interactive block.
+	 *
+	 * @param array $block The block to check.
+	 * @return bool True if block is a children of an interactive block, false otherwise.
+	 */
+	public static function is_marked_as_children_of_interactive_block( $block ) {
+		return in_array( md5( serialize( $block ) ), self::$children_of_interactive_block, true );
+	}
+
+	/**
+	 * Finds the matching closing tag for an opening tag.
 	 *
 	 * When called while on an open tag, traverse the HTML until we find the
 	 * matching closing tag, respecting any in-between content, including nested
@@ -111,76 +137,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	}
 
 	/**
-	 * Traverses the HTML searching for Interactivity API directives and processing
-	 * them.
-	 *
-	 * @param WP_Directive_Processor $tags An instance of the WP_Directive_Processor.
-	 * @param string                 $prefix Attribute prefix.
-	 * @param string[]               $directives Directives.
-	 *
-	 * @return WP_Directive_Processor The modified instance of the
-	 * WP_Directive_Processor.
-	 */
-	public function process_rendered_html( $tags, $prefix, $directives ) {
-		$context   = new WP_Directive_Context();
-		$tag_stack = array();
-
-		while ( $tags->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
-			$tag_name = $tags->get_tag();
-
-			// Is this a tag that closes the latest opening tag?
-			if ( $tags->is_tag_closer() ) {
-				if ( 0 === count( $tag_stack ) ) {
-					continue;
-				}
-
-				list( $latest_opening_tag_name, $attributes ) = end( $tag_stack );
-				if ( $latest_opening_tag_name === $tag_name ) {
-					array_pop( $tag_stack );
-
-					// If the matching opening tag didn't have any directives, we move on.
-					if ( 0 === count( $attributes ) ) {
-						continue;
-					}
-				}
-			} else {
-				$attributes = array();
-				foreach ( $tags->get_attribute_names_with_prefix( $prefix ) as $name ) {
-					/*
-					 * Removes the part after the double hyphen before looking for
-					 * the directive processor inside `$directives`, e.g., "wp-bind"
-					 * from "wp-bind--src" and "wp-context" from "wp-context" etc...
-					 */
-					list( $type ) = WP_Directive_Processor::parse_attribute_name( $name );
-					if ( array_key_exists( $type, $directives ) ) {
-						$attributes[] = $type;
-					}
-				}
-
-				/*
-				 * If this is an open tag, and if it either has directives, or if
-				 * we're inside a tag that does, take note of this tag and its
-				 * directives so we can call its directive processor once we
-				 * encounter the matching closing tag.
-				 */
-				if (
-				! WP_Directive_Processor::is_html_void_element( $tags->get_tag() ) &&
-				( 0 !== count( $attributes ) || 0 !== count( $tag_stack ) )
-				) {
-					$tag_stack[] = array( $tag_name, $attributes );
-				}
-			}
-
-			foreach ( $attributes as $attribute ) {
-				call_user_func( $directives[ $attribute ], $tags, $context );
-			}
-		}
-
-		return $tags;
-	}
-
-	/**
-	 * Return the content between two balanced tags.
+	 * Returns the content between two balanced tags.
 	 *
 	 * When called on an opening tag, return the HTML content found between that
 	 * opening tag and its matching closing tag.
@@ -206,14 +163,13 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	}
 
 	/**
-	 * Set the content between two balanced tags.
+	 * Sets the content between two balanced tags.
 	 *
 	 * When called on an opening tag, set the HTML content found between that
 	 * opening tag and its matching closing tag.
 	 *
 	 * @param string $new_html The string to replace the content between the
 	 * matching tags with.
-	 *
 	 * @return bool            Whether the content was successfully replaced.
 	 */
 	public function set_inner_html( $new_html ) {
@@ -237,7 +193,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	}
 
 	/**
-	 * Return a pair of bookmarks for the current opening tag and the matching
+	 * Returns a pair of bookmarks for the current opening tag and the matching
 	 * closing tag.
 	 *
 	 * @return array|false A pair of bookmarks, or false if there's no matching
@@ -267,12 +223,12 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	}
 
 	/**
-	 * Whether a given HTML element is void (e.g. <br>).
+	 * Checks whether a given HTML element is void (e.g. <br>).
+	 *
+	 * @see https://html.spec.whatwg.org/#elements-2
 	 *
 	 * @param string $tag_name The element in question.
 	 * @return bool True if the element is void.
-	 *
-	 * @see https://html.spec.whatwg.org/#elements-2
 	 */
 	public static function is_html_void_element( $tag_name ) {
 		switch ( $tag_name ) {
@@ -297,7 +253,7 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	}
 
 	/**
-	 * Extract and return the directive type and the the part after the double
+	 * Extracts and return the directive type and the the part after the double
 	 * hyphen from an attribute name (if present), in an array format.
 	 *
 	 * Examples:
@@ -307,9 +263,48 @@ class WP_Directive_Processor extends Gutenberg_HTML_Tag_Processor_6_5 {
 	 *     'wp-thing--and--thang' => array( 'wp-thing', 'and--thang' )
 	 *
 	 * @param string $name The attribute name.
-	 * @return array The resulting array
+	 * @return array The resulting array.
 	 */
 	public static function parse_attribute_name( $name ) {
 		return explode( '--', $name, 2 );
+	}
+
+	/**
+	 * Parse and extract the namespace and path from the given value.
+	 *
+	 * If the value contains a JSON instead of a path, the function parses it
+	 * and returns the resulting array.
+	 *
+	 * @param string $value Passed value.
+	 * @param string $ns Namespace fallback.
+	 * @return array The resulting array
+	 */
+	public static function parse_attribute_value( $value, $ns = null ) {
+		$matches = array();
+		$has_ns  = preg_match( '/^([\w\-_\/]+)::(.+)$/', $value, $matches );
+
+		/*
+		 * Overwrite both `$ns` and `$value` variables if `$value` explicitly
+		 * contains a namespace.
+		 */
+		if ( $has_ns ) {
+			list( , $ns, $value ) = $matches;
+		}
+
+		/*
+		 * Try to decode `$value` as a JSON object. If it works, `$value` is
+		 * replaced with the resulting array. The original string is preserved
+		 * otherwise.
+		 *
+		 * Note that `json_decode` returns `null` both for an invalid JSON or
+		 * the `'null'` string (a valid JSON). In the latter case, `$value` is
+		 * replaced with `null`.
+		 */
+		$data = json_decode( $value, true );
+		if ( null !== $data || 'null' === trim( $value ) ) {
+			$value = $data;
+		}
+
+		return array( $ns, $value );
 	}
 }

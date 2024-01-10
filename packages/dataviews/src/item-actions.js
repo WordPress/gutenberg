@@ -21,6 +21,7 @@ const {
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	kebabCase,
 } = unlock( componentsPrivateApis );
 
 function ButtonTrigger( { action, onClick } ) {
@@ -58,12 +59,17 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 			<ActionTrigger { ...actionTriggerProps } />
 			{ isModalOpen && (
 				<Modal
-					title={ ! hideModalHeader && action.label }
+					title={
+						( ! hideModalHeader && action.modalHeader ) ||
+						action.label
+					}
 					__experimentalHideHeader={ !! hideModalHeader }
 					onRequestClose={ () => {
 						setIsModalOpen( false );
 					} }
-					overlayClassName="dataviews-action-modal"
+					overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
+						action.id
+					) }` }
 				>
 					<RenderModal
 						item={ item }

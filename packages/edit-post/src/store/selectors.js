@@ -186,13 +186,10 @@ export const getPreferences = createRegistrySelector( ( select ) => () => {
 	// the new preferences store format to old format to ensure no breaking
 	// changes for plugins.
 	const inactivePanels = select( preferencesStore ).get(
-		'core/edit-post',
+		'core',
 		'inactivePanels'
 	);
-	const openPanels = select( preferencesStore ).get(
-		'core/edit-post',
-		'openPanels'
-	);
+	const openPanels = select( preferencesStore ).get( 'core', 'openPanels' );
 	const panels = convertPanelsToOldFormat( inactivePanels, openPanels );
 
 	return {

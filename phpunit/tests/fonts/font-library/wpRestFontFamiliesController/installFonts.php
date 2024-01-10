@@ -21,10 +21,10 @@ class Tests_Fonts_WPRESTFontFamiliesController_InstallFonts extends WP_REST_Font
 	 * @param array $files             Font files to install.
 	 * @param array $expected_response Expected response data.
 	 */
-	public function test_install_fonts( $font_families, $files, $expected_response ) {
-		$install_request    = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
-		$font_families_json = json_encode( $font_families );
-		$install_request->set_param( 'font_families', $font_families_json );
+	public function test_install_fonts( $font_family_settings, $files, $expected_response ) {
+		$install_request  = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
+		$font_family_json = json_encode( $font_family_settings );
+		$install_request->set_param( 'font_family_settings', $font_family_json );
 		$install_request->set_file_params( $files );
 		$response = rest_get_server()->dispatch( $install_request );
 		$data     = $response->get_data();
@@ -68,38 +68,22 @@ class Tests_Fonts_WPRESTFontFamiliesController_InstallFonts extends WP_REST_Font
 		return array(
 
 			'google_fonts_to_download'      => array(
-				'font_families'     => array(
-					array(
-						'fontFamily' => 'Piazzolla',
-						'slug'       => 'piazzolla',
-						'name'       => 'Piazzolla',
-						'fontFace'   => array(
-							array(
-								'fontFamily'      => 'Piazzolla',
-								'fontStyle'       => 'normal',
-								'fontWeight'      => '400',
-								'src'             => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
-								'downloadFromUrl' => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
-							),
-						),
-					),
-					array(
-						'fontFamily' => 'Montserrat',
-						'slug'       => 'montserrat',
-						'name'       => 'Montserrat',
-						'fontFace'   => array(
-							array(
-								'fontFamily'      => 'Montserrat',
-								'fontStyle'       => 'normal',
-								'fontWeight'      => '100',
-								'src'             => 'http://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Uw-Y3tcoqK5.ttf',
-								'downloadFromUrl' => 'http://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Uw-Y3tcoqK5.ttf',
-							),
+				'font_family_settings' => array(
+					'fontFamily' => 'Piazzolla',
+					'slug'       => 'piazzolla',
+					'name'       => 'Piazzolla',
+					'fontFace'   => array(
+						array(
+							'fontFamily'      => 'Piazzolla',
+							'fontStyle'       => 'normal',
+							'fontWeight'      => '400',
+							'src'             => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
+							'downloadFromUrl' => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
 						),
 					),
 				),
-				'files'             => array(),
-				'expected_response' => array(
+				'files'                => array(),
+				'expected_response'    => array(
 					'successes' => array(
 						array(
 							'fontFamily' => 'Piazzolla',
@@ -114,55 +98,27 @@ class Tests_Fonts_WPRESTFontFamiliesController_InstallFonts extends WP_REST_Font
 								),
 							),
 						),
-						array(
-							'fontFamily' => 'Montserrat',
-							'slug'       => 'montserrat',
-							'name'       => 'Montserrat',
-							'fontFace'   => array(
-								array(
-									'fontFamily' => 'Montserrat',
-									'fontStyle'  => 'normal',
-									'fontWeight' => '100',
-									'src'        => '/wp-content/fonts/montserrat_normal_100.ttf',
-								),
-							),
-						),
 					),
 					'errors'    => array(),
 				),
 			),
 
 			'google_fonts_to_use_as_is'     => array(
-				'font_families'     => array(
-					array(
-						'fontFamily' => 'Piazzolla',
-						'slug'       => 'piazzolla',
-						'name'       => 'Piazzolla',
-						'fontFace'   => array(
-							array(
-								'fontFamily' => 'Piazzolla',
-								'fontStyle'  => 'normal',
-								'fontWeight' => '400',
-								'src'        => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
-							),
-						),
-					),
-					array(
-						'fontFamily' => 'Montserrat',
-						'slug'       => 'montserrat',
-						'name'       => 'Montserrat',
-						'fontFace'   => array(
-							array(
-								'fontFamily' => 'Montserrat',
-								'fontStyle'  => 'normal',
-								'fontWeight' => '100',
-								'src'        => 'http://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Uw-Y3tcoqK5.ttf',
-							),
+				'font_family_settings' => array(
+					'fontFamily' => 'Piazzolla',
+					'slug'       => 'piazzolla',
+					'name'       => 'Piazzolla',
+					'fontFace'   => array(
+						array(
+							'fontFamily' => 'Piazzolla',
+							'fontStyle'  => 'normal',
+							'fontWeight' => '400',
+							'src'        => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
 						),
 					),
 				),
-				'files'             => array(),
-				'expected_response' => array(
+				'files'                => array(),
+				'expected_response'    => array(
 					'successes' => array(
 						array(
 							'fontFamily' => 'Piazzolla',
@@ -177,35 +133,19 @@ class Tests_Fonts_WPRESTFontFamiliesController_InstallFonts extends WP_REST_Font
 								),
 							),
 						),
-						array(
-							'fontFamily' => 'Montserrat',
-							'slug'       => 'montserrat',
-							'name'       => 'Montserrat',
-							'fontFace'   => array(
-								array(
-									'fontFamily' => 'Montserrat',
-									'fontStyle'  => 'normal',
-									'fontWeight' => '100',
-									'src'        => 'http://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Uw-Y3tcoqK5.ttf',
-
-								),
-							),
-						),
 					),
 					'errors'    => array(),
 				),
 			),
 
 			'fonts_without_font_faces'      => array(
-				'font_families'     => array(
-					array(
-						'fontFamily' => 'Arial',
-						'slug'       => 'arial',
-						'name'       => 'Arial',
-					),
+				'font_family_settings' => array(
+					'fontFamily' => 'Arial',
+					'slug'       => 'arial',
+					'name'       => 'Arial',
 				),
-				'files'             => array(),
-				'expected_response' => array(
+				'files'                => array(),
+				'expected_response'    => array(
 					'successes' => array(
 						array(
 							'fontFamily' => 'Arial',
@@ -218,35 +158,20 @@ class Tests_Fonts_WPRESTFontFamiliesController_InstallFonts extends WP_REST_Font
 			),
 
 			'fonts_with_local_fonts_assets' => array(
-				'font_families'     => array(
-					array(
-						'fontFamily' => 'Piazzolla',
-						'slug'       => 'piazzolla',
-						'name'       => 'Piazzolla',
-						'fontFace'   => array(
-							array(
-								'fontFamily'   => 'Piazzolla',
-								'fontStyle'    => 'normal',
-								'fontWeight'   => '400',
-								'uploadedFile' => 'files0',
-							),
-						),
-					),
-					array(
-						'fontFamily' => 'Montserrat',
-						'slug'       => 'montserrat',
-						'name'       => 'Montserrat',
-						'fontFace'   => array(
-							array(
-								'fontFamily'   => 'Montserrat',
-								'fontStyle'    => 'normal',
-								'fontWeight'   => '100',
-								'uploadedFile' => 'files1',
-							),
+				'font_family_settings' => array(
+					'fontFamily' => 'Piazzolla',
+					'slug'       => 'piazzolla',
+					'name'       => 'Piazzolla',
+					'fontFace'   => array(
+						array(
+							'fontFamily'   => 'Piazzolla',
+							'fontStyle'    => 'normal',
+							'fontWeight'   => '400',
+							'uploadedFile' => 'files0',
 						),
 					),
 				),
-				'files'             => array(
+				'files'                => array(
 					'files0' => array(
 						'name'     => 'piazzola1.ttf',
 						'type'     => 'font/ttf',
@@ -262,7 +187,7 @@ class Tests_Fonts_WPRESTFontFamiliesController_InstallFonts extends WP_REST_Font
 						'size'     => 123,
 					),
 				),
-				'expected_response' => array(
+				'expected_response'    => array(
 					'successes' => array(
 						array(
 							'fontFamily' => 'Piazzolla',
@@ -277,20 +202,6 @@ class Tests_Fonts_WPRESTFontFamiliesController_InstallFonts extends WP_REST_Font
 								),
 							),
 						),
-						array(
-							'fontFamily' => 'Montserrat',
-							'slug'       => 'montserrat',
-							'name'       => 'Montserrat',
-							'fontFace'   => array(
-								array(
-									'fontFamily' => 'Montserrat',
-									'fontStyle'  => 'normal',
-									'fontWeight' => '100',
-									'src'        => '/wp-content/fonts/montserrat_normal_100.ttf',
-								),
-							),
-						),
-
 					),
 					'errors'    => array(),
 				),
@@ -325,15 +236,15 @@ class Tests_Fonts_WPRESTFontFamiliesController_InstallFonts extends WP_REST_Font
 
 		return array(
 			'not a font families array'        => array(
-				'font_families' => 'This is not an array',
+				'font_family_settings' => 'This is not an array',
 			),
 
 			'empty array'                      => array(
-				'font_families' => array(),
+				'font_family_settings' => array(),
 			),
 
 			'without slug'                     => array(
-				'font_families' => array(
+				'font_family_settings' => array(
 					array(
 						'fontFamily' => 'Piazzolla',
 						'name'       => 'Piazzolla',
@@ -342,63 +253,55 @@ class Tests_Fonts_WPRESTFontFamiliesController_InstallFonts extends WP_REST_Font
 			),
 
 			'with improper font face property' => array(
-				'font_families' => array(
-					array(
-						'fontFamily' => 'Piazzolla',
-						'name'       => 'Piazzolla',
-						'slug'       => 'piazzolla',
-						'fontFace'   => 'This is not an array',
-					),
+				'font_family_settings' => array(
+					'fontFamily' => 'Piazzolla',
+					'name'       => 'Piazzolla',
+					'slug'       => 'piazzolla',
+					'fontFace'   => 'This is not an array',
 				),
 			),
 
 			'with empty font face property'    => array(
-				'font_families' => array(
-					array(
-						'fontFamily' => 'Piazzolla',
-						'name'       => 'Piazzolla',
-						'slug'       => 'piazzolla',
-						'fontFace'   => array(),
-					),
+				'font_family_settings' => array(
+					'fontFamily' => 'Piazzolla',
+					'name'       => 'Piazzolla',
+					'slug'       => 'piazzolla',
+					'fontFace'   => array(),
 				),
 			),
 
 			'fontface referencing uploaded file without uploaded files' => array(
-				'font_families' => array(
-					array(
-						'fontFamily' => 'Piazzolla',
-						'name'       => 'Piazzolla',
-						'slug'       => 'piazzolla',
-						'fontFace'   => array(
-							array(
-								'fontFamily'   => 'Piazzolla',
-								'fontStyle'    => 'normal',
-								'fontWeight'   => '400',
-								'uploadedFile' => 'files0',
-							),
+				'font_family_settings' => array(
+					'fontFamily' => 'Piazzolla',
+					'name'       => 'Piazzolla',
+					'slug'       => 'piazzolla',
+					'fontFace'   => array(
+						array(
+							'fontFamily'   => 'Piazzolla',
+							'fontStyle'    => 'normal',
+							'fontWeight'   => '400',
+							'uploadedFile' => 'files0',
 						),
 					),
 				),
-				'files'         => array(),
+				'files'                => array(),
 			),
 
 			'fontface referencing uploaded file without uploaded files' => array(
-				'font_families' => array(
-					array(
-						'fontFamily' => 'Piazzolla',
-						'name'       => 'Piazzolla',
-						'slug'       => 'piazzolla',
-						'fontFace'   => array(
-							array(
-								'fontFamily'   => 'Piazzolla',
-								'fontStyle'    => 'normal',
-								'fontWeight'   => '400',
-								'uploadedFile' => 'files666',
-							),
+				'font_family_settings' => array(
+					'fontFamily' => 'Piazzolla',
+					'name'       => 'Piazzolla',
+					'slug'       => 'piazzolla',
+					'fontFace'   => array(
+						array(
+							'fontFamily'   => 'Piazzolla',
+							'fontStyle'    => 'normal',
+							'fontWeight'   => '400',
+							'uploadedFile' => 'files666',
 						),
 					),
 				),
-				'files'         => array(
+				'files'                => array(
 					'files0' => array(
 						'name'     => 'piazzola1.ttf',
 						'type'     => 'font/ttf',
@@ -410,20 +313,18 @@ class Tests_Fonts_WPRESTFontFamiliesController_InstallFonts extends WP_REST_Font
 			),
 
 			'fontface with incompatible properties (downloadFromUrl and uploadedFile together)' => array(
-				'font_families' => array(
-					array(
-						'fontFamily' => 'Piazzolla',
-						'slug'       => 'piazzolla',
-						'name'       => 'Piazzolla',
-						'fontFace'   => array(
-							array(
-								'fontFamily'      => 'Piazzolla',
-								'fontStyle'       => 'normal',
-								'fontWeight'      => '400',
-								'src'             => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
-								'downloadFromUrl' => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
-								'uploadedFile'    => 'files0',
-							),
+				'font_family_settings' => array(
+					'fontFamily' => 'Piazzolla',
+					'slug'       => 'piazzolla',
+					'name'       => 'Piazzolla',
+					'fontFace'   => array(
+						array(
+							'fontFamily'      => 'Piazzolla',
+							'fontStyle'       => 'normal',
+							'fontWeight'      => '400',
+							'src'             => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
+							'downloadFromUrl' => 'http://fonts.gstatic.com/s/piazzolla/v33/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhZqx3gX9BRy5m5M.ttf',
+							'uploadedFile'    => 'files0',
 						),
 					),
 				),

@@ -88,7 +88,8 @@ function GalleryEdit( props ) {
 		onFocus,
 	} = props;
 
-	const { columns, imageCrop, linkTarget, linkTo, sizeSlug } = attributes;
+	const { columns, imageCrop, randomOrder, linkTarget, linkTo, sizeSlug } =
+		attributes;
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
@@ -388,6 +389,10 @@ function GalleryEdit( props ) {
 			: __( 'Thumbnails are not cropped.' );
 	}
 
+	function toggleRandomOrder() {
+		setAttributes( { randomOrder: ! randomOrder } );
+	}
+
 	function toggleOpenInNewTab( openInNewTab ) {
 		const newLinkTarget = openInNewTab ? '_blank' : undefined;
 		setAttributes( { linkTarget: newLinkTarget } );
@@ -551,6 +556,12 @@ function GalleryEdit( props ) {
 						checked={ !! imageCrop }
 						onChange={ toggleImageCrop }
 						help={ getImageCropHelp }
+					/>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Random order' ) }
+						checked={ !! randomOrder }
+						onChange={ toggleRandomOrder }
 					/>
 					<SelectControl
 						__nextHasNoMarginBottom

@@ -42,18 +42,20 @@ test.describe( 'Post publish button', () => {
 			topBar.getByRole( 'button', { name: 'Publish' } )
 		).toBeEnabled();
 
-		const postId = new URL( page.url() ).searchParams.get( 'post' );
 		const deferred = defer();
 
 		await page.route(
 			( url ) =>
-				url.searchParams.has(
-					'rest_route',
-					encodeURIComponent( `/wp/v2/posts/${ postId }` )
+				url.href.includes(
+					`rest_route=${ encodeURIComponent( '/wp/v2/posts/' ) }`
 				),
-			async ( route ) => {
-				await deferred;
-				await route.continue();
+			async ( route, request ) => {
+				if ( request.method() === 'POST' ) {
+					await deferred;
+					await route.continue();
+				} else {
+					await route.continue();
+				}
 			}
 		);
 

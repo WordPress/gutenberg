@@ -5,7 +5,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,6 +17,7 @@ import Search from './search';
 import { VIEW_LAYOUTS } from './constants';
 
 const defaultGetItemId = ( item ) => item.id;
+const defaultOnSelectionChange = () => {};
 
 export default function DataViews( {
 	view,
@@ -30,15 +31,19 @@ export default function DataViews( {
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
-	onSelectionChange,
+	onSelectionChange = defaultOnSelectionChange,
+	onDetailsChange = null,
 	deferredRendering = false,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
 
-	const onSetSelection = ( items ) => {
-		setSelection( items.map( ( item ) => item.id ) );
-		onSelectionChange( items );
-	};
+	const onSetSelection = useCallback(
+		( items ) => {
+			setSelection( items.map( ( item ) => item.id ) );
+			onSelectionChange( items );
+		},
+		[ setSelection, onSelectionChange ]
+	);
 
 	const ViewComponent = VIEW_LAYOUTS.find(
 		( v ) => v.type === view.type
@@ -54,7 +59,7 @@ export default function DataViews( {
 			<VStack spacing={ 0 } justify="flex-start">
 				<HStack
 					alignment="flex-start"
-					className="dataviews__filters-view-actions"
+					className="dataviews-filters__view-actions"
 				>
 					<HStack justify="start" wrap>
 						{ search && (
@@ -65,13 +70,13 @@ export default function DataViews( {
 							/>
 						) }
 						<Filters
-							fields={ fields }
+							fields={ _fields }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
 					<ViewActions
-						fields={ fields }
+						fields={ _fields }
 						view={ view }
 						onChangeView={ onChangeView }
 						supportedLayouts={ supportedLayouts }
@@ -86,6 +91,7 @@ export default function DataViews( {
 					getItemId={ getItemId }
 					isLoading={ isLoading }
 					onSelectionChange={ onSetSelection }
+					onDetailsChange={ onDetailsChange }
 					selection={ selection }
 					deferredRendering={ deferredRendering }
 				/>

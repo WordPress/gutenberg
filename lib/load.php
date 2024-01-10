@@ -117,8 +117,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
-require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-store.php';
-require __DIR__ . '/experimental/interactivity-api/store.php';
+require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-initial-state.php';
+require __DIR__ . '/experimental/interactivity-api/initial-state.php';
 require __DIR__ . '/experimental/interactivity-api/modules.php';
 require __DIR__ . '/experimental/interactivity-api/class-wp-directive-processor.php';
 require __DIR__ . '/experimental/interactivity-api/class-wp-directive-context.php';
@@ -128,6 +128,7 @@ require __DIR__ . '/experimental/interactivity-api/directives/wp-context.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-class.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-style.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-text.php';
+require __DIR__ . '/experimental/interactivity-api/directives/wp-interactive.php';
 
 require __DIR__ . '/experimental/modules/class-gutenberg-modules.php';
 
@@ -221,7 +222,6 @@ require __DIR__ . '/script-loader.php';
 require __DIR__ . '/global-styles-and-settings.php';
 require __DIR__ . '/class-wp-theme-json-data-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
-require __DIR__ . '/class-wp-theme-json-schema-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/class-wp-duotone-gutenberg.php';
 require __DIR__ . '/blocks.php';
@@ -253,7 +253,6 @@ require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/shadow.php';
 require __DIR__ . '/block-supports/background.php';
-require __DIR__ . '/block-supports/behaviors.php';
 require __DIR__ . '/block-supports/pattern.php';
 
 // Data views.
