@@ -57,8 +57,8 @@ const PaletteScreen = () => {
 		: defaultSettings.gradients;
 	const allAvailableColors = useMobileGlobalStylesColors();
 	const allAvailableGradients = currentSegmentColors
-		.map( ( item ) => item.gradients || [] )
-		.reduce( ( acc, val ) => acc.concat( val ), [] );
+		.flatMap( ( { gradients } ) => gradients )
+		.filter( Boolean );
 
 	const horizontalSeparatorStyle = usePreferredColorSchemeStyle(
 		styles.horizontalSeparator,
