@@ -51,8 +51,8 @@ class WP_Font_Collection {
 			throw new Exception( 'Font Collection config name is required as a non-empty string.' );
 		}
 
-		if ( empty( $config['src'] ) || ! is_string( $config['src'] ) ) {
-			throw new Exception( 'Font Collection config "src" option is required as a non-empty string.' );
+		if ( ( empty( $config['src'] ) || ! is_string( $config['src'] ) ) && ( empty( $config['data'] )  ) ) {
+			throw new Exception( 'Font Collection config "src" option OR "data" option is required.' );
 		}
 
 		$this->config = $config;
@@ -78,6 +78,11 @@ class WP_Font_Collection {
 	 *                        else an instance of WP_Error on failure.
 	 */
 	public function get_data() {
+
+		if ( ! empty( $this->config[ 'data' ] ) ) {
+			return $this->get_config();
+		}
+
 		// If the src is a URL, fetch the data from the URL.
 		if ( str_contains( $this->config['src'], 'http' ) && str_contains( $this->config['src'], '://' ) ) {
 			if ( ! wp_http_validate_url( $this->config['src'] ) ) {

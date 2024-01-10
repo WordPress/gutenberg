@@ -98,6 +98,20 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 					),
 				),
 			),
+			'with data' => array(
+				'config'        => array(
+					'id'          => 'my-collection',
+					'name'        => 'My Collection',
+					'description' => 'My collection description',
+					'data'        => array( 'this is mock data' => true ),
+				),
+				'expected_data' => array(
+					'id'          => 'my-collection',
+					'name'        => 'My Collection',
+					'description' => 'My collection description',
+					'data'        => array( 'this is mock data' => true ),
+				),
+			),
 		);
 	}
 }
