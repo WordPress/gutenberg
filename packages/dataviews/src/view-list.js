@@ -46,7 +46,7 @@ export default function ViewList( {
 	};
 
 	return (
-		<ul className="dataviews-list-view">
+		<ul className="dataviews-view-list">
 			{ usedData.map( ( item ) => {
 				return (
 					<li key={ getItemId( item ) }>
@@ -56,29 +56,29 @@ export default function ViewList( {
 							aria-pressed={ selection.includes( item.id ) }
 							onKeyDown={ onEnter( item ) }
 							className={ classNames(
-								'dataviews-list-view__item',
+								'dataviews-view-list__item',
 								{
-									'dataviews-list-view__item-selected':
+									'dataviews-view-list__item-selected':
 										selection.includes( item.id ),
 								}
 							) }
 							onClick={ () => onSelectionChange( [ item ] ) }
 						>
 							<HStack spacing={ 3 } alignment="flex-start">
-								<div className="dataviews-list-view__media-wrapper">
+								<div className="dataviews-view-list__media-wrapper">
 									{ mediaField?.render( { item } ) || (
-										<div className="dataviews-list-view__media-placeholder"></div>
+										<div className="dataviews-view-list__media-placeholder"></div>
 									) }
 								</div>
 								<HStack>
 									<VStack spacing={ 1 }>
 										{ primaryField?.render( { item } ) }
-										<div className="dataviews-list-view__fields">
+										<div className="dataviews-view-list__fields">
 											{ visibleFields.map( ( field ) => {
 												return (
 													<span
 														key={ field.id }
-														className="dataviews-list-view__field"
+														className="dataviews-view-list__field"
 													>
 														{ field.render( {
 															item,

@@ -48,7 +48,7 @@ export const DropdownMenuRadioItemCustom = forwardRef(
 						<Icon icon={ radioCheck } />
 					) : (
 						<span
-							className="dataviews__filters-custom-menu-radio-item-prefix"
+							className="dataviews-filters__custom-menu-radio-item-prefix"
 							aria-hidden="true"
 						></span>
 					)

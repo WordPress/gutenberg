@@ -222,7 +222,7 @@ export default function PagePages() {
 						<VStack spacing={ 1 }>
 							<View
 								as="span"
-								className="edit-site-page-pages__list-view-title-field"
+								className="dataviews-view-grid__title-field"
 							>
 								{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
 									view.type
