@@ -63,11 +63,11 @@ class WP_Font_Library {
 	 */
 	public static function register_font_collection( $config ) {
 		$new_collection = new WP_Font_Collection( $config );
-		if ( self::is_collection_registered( $config['id'] ) ) {
+		if ( self::is_collection_registered( $config['slug'] ) ) {
 			$error_message = sprintf(
 				/* translators: %s: Font collection id. */
-				__( 'Font collection with id: "%s" is already registered.', 'default' ),
-				$config['id']
+				__( 'Font collection with slug: "%s" is already registered.', 'default' ),
+				$config['slug']
 			);
 			_doing_it_wrong(
 				__METHOD__,
@@ -76,7 +76,7 @@ class WP_Font_Library {
 			);
 			return new WP_Error( 'font_collection_registration_error', $error_message );
 		}
-		self::$collections[ $config['id'] ] = $new_collection;
+		self::$collections[ $config['slug'] ] = $new_collection;
 		return $new_collection;
 	}
 
@@ -90,12 +90,6 @@ class WP_Font_Library {
 	 */
 	public static function unregister_font_collection( $collection_id ) {
 		if ( ! self::is_collection_registered( $collection_id ) ) {
-			_doing_it_wrong(
-				__METHOD__,
-				/* translators: %s: Font collection id. */
-				sprintf( __( 'Font collection "%s" not found.', 'default' ), $collection_id ),
-				'6.5.0'
-			);
 			return false;
 		}
 		unset( self::$collections[ $collection_id ] );
@@ -131,7 +125,7 @@ class WP_Font_Library {
 	 * @since 6.5.0
 	 *
 	 * @param string $id Font collection id.
-	 * @return array List of font collections.
+	 * @return WP_Font_Collection|WP_Error The requested Font Collection or WP_Error if not found.
 	 */
 	public static function get_font_collection( $id ) {
 		if ( array_key_exists( $id, self::$collections ) ) {
