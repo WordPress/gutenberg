@@ -13,8 +13,6 @@
  * parent is null.
  *
  * @param array $parsed_block The parsed block.
- * @param array $source_block The source block.
- * @param WP_Block|null $parent_block The parent block.
  *
  * @return array The parsed block.
  */
