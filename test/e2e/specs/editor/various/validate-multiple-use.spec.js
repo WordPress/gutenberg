@@ -31,6 +31,8 @@ test.describe( 'Validate multiple use', () => {
 		await page.getByText( 'Duplicate' ).click();
 
 		// Check if warnings is visible
-		await expect( page.locator( '.block-editor-warning' ) ).toBeVisible();
+		await expect(
+			page.frameLocator( 'iFrame' ).locator( '.block-editor-warning' )
+		).toBeVisible();
 	} );
 } );
