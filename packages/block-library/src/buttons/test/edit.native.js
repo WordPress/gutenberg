@@ -10,6 +10,7 @@ import {
 	initializeEditor,
 	triggerBlockListLayout,
 	typeInRichText,
+	openBlockSettings,
 	waitFor,
 } from 'test/helpers';
 
@@ -408,13 +409,7 @@ describe( 'Buttons block', () => {
 			fireEvent.press( buttonBlock );
 
 			// Open Block Settings.
-			fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
-
-			// Wait for Block Settings to be visible.
-			const blockSettingsModal = screen.getByTestId(
-				'block-settings-modal'
-			);
-			await waitFor( () => blockSettingsModal.props.isVisible );
+			await openBlockSettings( screen );
 
 			// Open Text color settings
 			fireEvent.press( screen.getByLabelText( 'Background, Default' ) );
