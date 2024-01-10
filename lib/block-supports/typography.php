@@ -247,8 +247,9 @@ function gutenberg_render_typography_support( $block_content, $block ) {
 }
 
 /**
- * Internal method that checks a string for a unit and value and returns an array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ].
+ * Internal method that checks a string for a unit and value and returns an array consisting of 'value'`, `'unit'` and `'combined'`, e.g., [ 42, 'rem', '42rem' ].
  * A raw font size of `value + unit` is expected. If the value is a number, it will convert to `value + 'px'`.
+ * Setting `$parse_units` to `false` will skip parsing the value for units and return the raw value.
  *
  * @access private
  *
@@ -256,15 +257,14 @@ function gutenberg_render_typography_support( $block_content, $block ) {
  * @param array            $options   {
  *     Optional. An associative array of options. Default is empty array.
  *
- *     @type string        $coerce_to         Coerce the value to rem or px. Default `'rem'`.
- *     @type int           $root_size_value   Value of root font size for rem|em <-> px conversion. Default `16`.
- *     @type bool          $skip_unit_parsing Whether to parse only the value and skip unit parsing/coercion. Default `false`.
- *     @type array<string> $acceptable_units  An array of font size units. Default `[ 'rem', 'px', 'em' ]`;
+ *     @type string        $coerce_to        Coerce the value to rem or px. Default `'rem'`.
+ *     @type int           $root_size_value  Value of root font size for rem|em <-> px conversion. Default `16`.
+ *     @type bool          $parse_units      Whether to parse value for units and recalculate values according to unit coercion. Default `true`.
+ *     @type array<string> $acceptable_units An array of font size units. Default `[ 'rem', 'px', 'em' ]`;
  * }
- * @return array An array consisting of `'value'` and `'unit'` properties.
+ * @return array An array consisting of `'value'`, `'unit'` and `'combined'` properties.
  */
 function gutenberg_get_typography_value_and_unit( $raw_value, $options = array() ) {
-
 	if ( ! is_string( $raw_value ) && ! is_int( $raw_value ) && ! is_float( $raw_value ) ) {
 		_doing_it_wrong(
 			__FUNCTION__,
@@ -279,38 +279,31 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 	}
 
 	$defaults = array(
-		'coerce_to'         => '',
-		'root_size_value'   => 16,
-		'skip_unit_parsing' => false,
-		'acceptable_units'  => array( 'rem', 'px', 'em' ),
+		'coerce_to'        => '',
+		'root_size_value'  => 16,
+		'parse_units'      => true,
+		'acceptable_units' => array( 'rem', 'px', 'em' ),
 	);
-
-	$options           = wp_parse_args( $options, $defaults );
-	$skip_unit_parsing = true === $options['skip_unit_parsing'];
-
-	// Converts numeric values to pixel values by default.
-	if ( is_numeric( $raw_value ) && ! $skip_unit_parsing ) {
-		$raw_value = $raw_value . 'px';
-	}
+	$options  = wp_parse_args( $options, $defaults );
 
 	// For floats coerced to strings, locales can use either a comma (,) or dot (.) as decimal separators.
 	// If the locale isn't using a dot, we need to replace the locale separator with a dot for CSS rules to be valid.
-	$local_info        = localeconv();
-	$has_decimal_point = '.' === $local_info['decimal_point'];
-	$raw_value         = is_string( $raw_value ) && ! $has_decimal_point ? str_replace( $local_info['decimal_point'], '.', $raw_value ) : $raw_value;
+	$raw_value = is_string( $raw_value ) ? str_replace( ',', '.', $raw_value ) : $raw_value;
 
-	if ( ! $skip_unit_parsing ) {
-		$acceptable_units_group = $skip_unit_parsing ? '' : implode( '|', $options['acceptable_units'] );
-		$pattern                = '/^(\d*[\.]?\d+)(' . $acceptable_units_group . '){1,1}$/';
+	if ( true === $options['parse_units'] ) {
+		$acceptable_units_group = implode( '|', $options['acceptable_units'] );
+		$pattern                = '/^(\d*[\.]?\d+)(' . $acceptable_units_group . '){0,1}$/';
 
 		preg_match( $pattern, $raw_value, $matches );
-		// We need a number value and a px or rem unit.
-		if ( ! isset( $matches[1] ) || ! isset( $matches[2] ) ) {
+
+		// We need a number value.
+		if ( ! isset( $matches[1] ) ) {
 			return null;
 		}
 
 		$value = $matches[1];
-		$unit  = $matches[2];
+		// Converts units to pixel values by default.
+		$unit = isset( $matches[2] ) ? $matches[2] : 'px';
 
 		// Default browser font size. Later we could inject some JS to compute this `getComputedStyle( document.querySelector( "html" ) ).fontSize`.
 		if ( 'px' === $options['coerce_to'] && ( 'em' === $unit || 'rem' === $unit ) ) {
@@ -336,16 +329,12 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 		$unit  = '';
 	}
 
-	$value    = round( $value, 3 );
-	$combined = $value . $unit;
-	if ( ! $has_decimal_point ) {
-		$combined = str_replace( $local_info['decimal_point'], '.', $combined );
-	}
+	$value = round( $value, 3 );
 
 	return array(
 		'value'    => $value,
 		'unit'     => $unit,
-		'combined' => $combined,
+		'combined' => str_replace( ',', '.', $value . $unit ),
 	);
 }
 
@@ -430,7 +419,7 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 	$linear_factor_scaled   = empty( $linear_factor_scaled ) || 1 === $linear_factor_scaled ? 1 : gutenberg_get_typography_value_and_unit(
 		$linear_factor_scaled,
 		array(
-			'skip_unit_parsing' => true,
+			'parse_units' => false,
 		)
 	)['combined'];
 

@@ -309,35 +309,6 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests generating font size values, including fluid formulae, from fontSizes preset using a locale
-	 * that uses a comma as a decimal separator.
-	 *
-	 * @covers ::wp_get_typography_font_size_value
-	 * @covers ::wp_get_typography_value_and_unit
-	 * @covers ::wp_get_computed_fluid_typography_value
-	 *
-	 * @dataProvider data_generate_font_size_preset_fixtures
-	 *
-	 * @param array  $font_size                     {
-	 *     Required. A font size as represented in the fontSizes preset format as seen in theme.json.
-	 *
-	 *     @type string $name Name of the font size preset.
-	 *     @type string $slug Kebab-case unique identifier for the font size preset.
-	 *     @type string $size CSS font-size value, including units where applicable.
-	 * }
-	 * @param bool   $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing.
-	 * @param string $expected_output Expected output of gutenberg_get_typography_font_size_value().
-	 */
-	public function test_gutenberg_get_typography_font_size_value_with_locale( $font_size, $should_use_fluid_typography, $expected_output ) {
-		$current_locale = setlocale( LC_NUMERIC, 0 );
-		setlocale( LC_NUMERIC, 'de_DE.UTF-8' );
-		$actual = gutenberg_get_typography_font_size_value( $font_size, $should_use_fluid_typography );
-
-		$this->assertSame( $expected_output, $actual );
-		setlocale( LC_NUMERIC, $current_locale );
-	}
-
-	/**
 	 * Data provider for test_wp_get_typography_font_size_value.
 	 *
 	 * @return array
@@ -823,24 +794,6 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that valid font size values are parsed with a locale that uses a comma as a decimal separator.
-	 *
-	 * @covers ::gutenberg_get_typography_value_and_unit
-	 *
-	 * @dataProvider data_valid_size_wp_get_typography_value_and_unit
-	 *
-	 * @param mixed $raw_value Raw size value to test.
-	 * @param mixed $expected  An expected return value.
-	 * @param array $options Options to pass to function.
-	 */
-	public function test_valid_size_wp_get_typography_value_and_unit_with_locale( $raw_value, $expected, $options = array() ) {
-		$current_locale = setlocale( LC_NUMERIC, 0 );
-		setlocale( LC_NUMERIC, 'de_DE.UTF-8' );
-		$this->assertEquals( $expected, gutenberg_get_typography_value_and_unit( $raw_value, $options ) );
-		setlocale( LC_NUMERIC, $current_locale );
-	}
-
-	/**
 	 * Data provider.
 	 *
 	 * @return array
@@ -923,7 +876,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'combined' => '33.333',
 				),
 				'options'   => array(
-					'skip_unit_parsing' => true,
+					'parse_units' => false,
 				),
 			),
 			'size: `"7.353vh"`'                          => array(
@@ -935,6 +888,22 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				),
 				'options'   => array(
 					'acceptable_units' => array( 'vh' ),
+				),
+			),
+			'size: `"12,1238rem"`'                       => array(
+				'raw_value' => '12,1238rem',
+				'expected'  => array(
+					'value'    => 12.124,
+					'unit'     => 'rem',
+					'combined' => '12.124rem',
+				),
+			),
+			'size: `"1,7879"`'                           => array(
+				'raw_value' => '1,7879',
+				'expected'  => array(
+					'value'    => 1.788,
+					'unit'     => 'px',
+					'combined' => '1.788px',
 				),
 			),
 		);
