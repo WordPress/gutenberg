@@ -82,3 +82,52 @@ $default_font_collection = array(
 );
 
 wp_register_font_collection( $default_font_collection );
+
+// @core-merge: This code should probably go into Core's src/wp-includes/functions.php.
+if ( ! function_exists( 'wp_font_dir' ) ) {
+	/**
+	 * Returns an array containing the current fonts upload directory's path and URL.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array $defaults {
+	 *     Array of information about the upload directory.
+	 *
+	 *     @type string       $path    Base directory and subdirectory or full path to the fonts upload directory.
+	 *     @type string       $url     Base URL and subdirectory or absolute URL to the fonts upload directory.
+	 *     @type string       $subdir  Subdirectory
+	 *     @type string       $basedir Path without subdir.
+	 *     @type string       $baseurl URL path without subdir.
+	 *     @type string|false $error   False or error message.
+	 * }
+	 *
+	 * @return array $defaults {
+	 *     Array of information about the upload directory.
+	 *
+	 *     @type string       $path    Base directory and subdirectory or full path to the fonts upload directory.
+	 *     @type string       $url     Base URL and subdirectory or absolute URL to the fonts upload directory.
+	 *     @type string       $subdir  Subdirectory
+	 *     @type string       $basedir Path without subdir.
+	 *     @type string       $baseurl URL path without subdir.
+	 *     @type string|false $error   False or error message.
+	 * }
+	 */
+	function wp_font_dir( $defaults = array() ) {
+		// Multi site path
+		$site_path = '';
+		if ( is_multisite() && ! ( is_main_network() && is_main_site() ) ) {
+			$site_path = '/sites/' . get_current_blog_id();
+		}
+
+		// Sets the defaults.
+		$defaults['path']    = path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path;
+		$defaults['url']     = untrailingslashit( content_url( 'fonts' ) ) . $site_path;
+		$defaults['subdir']  = '';
+		$defaults['basedir'] = path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path;
+		$defaults['baseurl'] = untrailingslashit( content_url( 'fonts' ) ) . $site_path;
+		$defaults['error']   = false;
+
+		// Filters the fonts directory data.
+		return apply_filters( 'font_dir', $defaults );
+	}
+}
