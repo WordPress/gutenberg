@@ -105,6 +105,18 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 				),
 			)
 		);
+		register_block_type(
+			'test/non-interactive-root-block',
+			array(
+				'render_callback' => function ( $attributes, $content, $block ) {
+					$inner_blocks_html = '';
+					foreach ( $block->inner_blocks as $inner_block ) {
+						$inner_blocks_html .= $inner_block->render();
+					}
+					return '<div>' . $inner_blocks_html . '</div>';
+				},
+			)
+		);
 
 		WP_Interactivity_Initial_State::reset();
 	}
@@ -118,42 +130,52 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		unregister_block_type( 'test/context-level-with-manual-inner-block-rendering' );
 		unregister_block_type( 'test/directives-ordering' );
 		unregister_block_type( 'test/directives' );
+		unregister_block_type( 'test/non-interactive-root-block' );
 		parent::tear_down();
 	}
 
-	public function test_interactivity_process_directives_in_root_blocks() {
+	public function test_interactivity_process_directives_in_interactive_root_blocks() {
 		$block_content =
-		'<!-- wp:paragraph -->' .
-			'<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>' .
-		'<!-- /wp:paragraph -->' .
-		'<!-- wp:paragraph -->' .
-			'<p>Welcome to WordPress.</p>' .
-		'<!-- /wp:paragraph -->';
+		'<!-- wp:test/context-level-1 /-->' .
+		'<!-- wp:test/context-level-1 /-->' .
+		'<!-- wp:test/non-interactive-root-block /-->';
 
-		$parsed_block        = parse_blocks( $block_content )[0];
-		$source_block        = $parsed_block;
-		$rendered_content    = render_block( $parsed_block );
-		$parsed_block_second = parse_blocks( $block_content )[1];
-		$fake_parent_block   = array();
+		$interactive_parsed_block        = parse_blocks( $block_content )[0];
+		$interactive_source_block        = $interactive_parsed_block;
+		$interactive_parsed_block_object = new WP_Block( $interactive_parsed_block );
 
-		// Test that root block is intially emtpy.
+		$rendered_content                  = render_block( $interactive_parsed_block );
+		$parsed_block_second               = parse_blocks( $block_content )[1];
+		$non_interactive_root_block        = parse_blocks( $block_content )[2];
+		$non_interactive_root_block_object = new WP_Block( $non_interactive_root_block );
+		$interactive_parsed_block_object   = new WP_Block( $interactive_parsed_block );
+
+		// Test that root block is intially empty.
 		$this->assertEmpty( WP_Directive_Processor::$root_block );
 
-		// Test that root block is not added if there is a parent block.
-		gutenberg_interactivity_mark_root_blocks( $parsed_block, $source_block, $fake_parent_block );
+		// Test that root block is not added if it is non interactive.
+		gutenberg_interactivity_mark_root_interactive_blocks( $non_interactive_root_block, $non_interactive_root_block, null );
 		$this->assertEmpty( WP_Directive_Processor::$root_block );
+
+		// Test that a root block is not added if its parent is interactive.
+		gutenberg_interactivity_mark_root_interactive_blocks( $interactive_parsed_block, $interactive_source_block, $interactive_parsed_block_object );
+		$this->assertEmpty( WP_Directive_Processor::$root_block );
+
+		// Test that a non root block is added if there is non interactive parent block.
+		gutenberg_interactivity_mark_root_interactive_blocks( $interactive_parsed_block, $interactive_source_block, $non_interactive_root_block_object );
+		$this->assertNotEmpty( WP_Directive_Processor::$root_block );
 
 		// Test that root block is added if there is no parent block.
-		gutenberg_interactivity_mark_root_blocks( $parsed_block, $source_block, null );
+		gutenberg_interactivity_mark_root_interactive_blocks( $interactive_parsed_block, $interactive_source_block, null );
 		$current_root_block = WP_Directive_Processor::$root_block;
 		$this->assertNotEmpty( $current_root_block );
 
 		// Test that a root block is not added if there is already a root block defined.
-		gutenberg_interactivity_mark_root_blocks( $parsed_block_second, $source_block, null );
+		gutenberg_interactivity_mark_root_interactive_blocks( $parsed_block_second, $interactive_source_block, null );
 		$this->assertSame( $current_root_block, WP_Directive_Processor::$root_block );
 
 		// Test that root block is removed after processing.
-		gutenberg_process_directives_in_root_blocks( $rendered_content, $parsed_block );
+		gutenberg_process_directives_in_root_blocks( $rendered_content, $interactive_parsed_block );
 		$this->assertEmpty( WP_Directive_Processor::$root_block );
 	}
 
