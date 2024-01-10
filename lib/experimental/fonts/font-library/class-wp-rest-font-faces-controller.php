@@ -57,10 +57,11 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			$this->namespace,
 			'/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base,
 			array(
-				'args'        => array(
+				'args'   => array(
 					'parent' => array(
 						'description' => __( 'The ID for the parent font family of the font face.', 'gutenberg' ),
 						'type'        => 'integer',
+						'required'    => true,
 					),
 				),
 				array(
@@ -73,10 +74,9 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 					'methods'             => WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'create_item' ),
 					'permission_callback' => array( $this, 'create_item_permissions_check' ),
-					'args'                => array(),
+					'args'                => $this->get_create_params(),
 				),
-				'allow_batch' => $this->allow_batch,
-				'schema'      => array( $this, 'get_public_item_schema' ),
+				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
 
@@ -84,14 +84,16 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			$this->namespace,
 			'/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base . '/(?P<id>[\d]+)',
 			array(
-				'args'        => array(
+				'args'   => array(
 					'parent' => array(
 						'description' => __( 'The ID for the parent font family of the font face.', 'gutenberg' ),
 						'type'        => 'integer',
+						'required'    => true,
 					),
 					'id'     => array(
 						'description' => __( 'Unique identifier for the font face.', 'gutenberg' ),
 						'type'        => 'integer',
+						'required'    => true,
 					),
 				),
 				array(
@@ -112,8 +114,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 						),
 					),
 				),
-				'allow_batch' => $this->allow_batch,
-				'schema'      => array( $this, 'get_public_item_schema' ),
+				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
 	}
@@ -307,11 +308,14 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		add_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
 
 		$overrides = array(
+			// Arbitrary string to avoid the is_uploaded_file() check applied
+			// when using 'wp_handle_upload'.
+			'action'    => 'wp_handle_font_upload',
 			// Not testing a form submission.
 			'test_form' => false,
 			// Seems mime type for files that are not images cannot be tested.
 			// See wp_check_filetype_and_ext().
-			'test_type' => false,
+			'test_type' => true,
 			'mimes'     => WP_Font_Library::get_expected_font_mime_types_per_php_version(),
 		);
 
@@ -433,104 +437,101 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 				// Font face settings come directly from theme.json schema
 				// See https://schemas.wp.org/trunk/theme.json
 				'font_face_settings' => array(
-					'description' => 'Array of font-face declarations.',
-					'type'        => 'array',
-					'items'       => array(
-						'type'                 => 'object',
-						'properties'           => array(
-							'fontFamily'            => array(
-								'description' => 'CSS font-family value.',
-								'type'        => 'string',
-								'default'     => '',
-							),
-							'fontStyle'             => array(
-								'description' => 'CSS font-style value.',
-								'type'        => 'string',
-								'default'     => 'normal',
-							),
-							'fontWeight'            => array(
-								'description' => 'List of available font weights, separated by a space.',
-								'default'     => '400',
-								'oneOf'       => array(
-									array(
-										'type' => 'string',
-									),
-									array(
-										'type' => 'integer',
-									),
+					'description'          => __( 'font-face declaration in theme.json format.', 'gutenberg' ),
+					'type'                 => 'object',
+					'properties'           => array(
+						'fontFamily'            => array(
+							'description' => 'CSS font-family value.',
+							'type'        => 'string',
+							'default'     => '',
+						),
+						'fontStyle'             => array(
+							'description' => 'CSS font-style value.',
+							'type'        => 'string',
+							'default'     => 'normal',
+						),
+						'fontWeight'            => array(
+							'description' => 'List of available font weights, separated by a space.',
+							'default'     => '400',
+							'oneOf'       => array(
+								array(
+									'type' => 'string',
 								),
-							),
-							'fontDisplay'           => array(
-								'description' => 'CSS font-display value.',
-								'type'        => 'string',
-								'default'     => 'fallback',
-								'enum'        => array(
-									'auto',
-									'block',
-									'fallback',
-									'swap',
-									'optional',
+								array(
+									'type' => 'integer',
 								),
-							),
-							'src'                   => array(
-								'description' => 'Paths or URLs to the font files.',
-								'oneOf'       => array(
-									array(
-										'type' => 'string',
-									),
-									array(
-										'type'  => 'array',
-										'items' => array(
-											'type' => 'string',
-										),
-									),
-								),
-								'default'     => array(),
-							),
-							'fontStretch'           => array(
-								'description' => 'CSS font-stretch value.',
-								'type'        => 'string',
-							),
-							'ascentOverride'        => array(
-								'description' => 'CSS ascent-override value.',
-								'type'        => 'string',
-							),
-							'descentOverride'       => array(
-								'description' => 'CSS descent-override value.',
-								'type'        => 'string',
-							),
-							'fontVariant'           => array(
-								'description' => 'CSS font-variant value.',
-								'type'        => 'string',
-							),
-							'fontFeatureSettings'   => array(
-								'description' => 'CSS font-feature-settings value.',
-								'type'        => 'string',
-							),
-							'fontVariationSettings' => array(
-								'description' => 'CSS font-variation-settings value.',
-								'type'        => 'string',
-							),
-							'lineGapOverride'       => array(
-								'description' => 'CSS line-gap-override value.',
-								'type'        => 'string',
-							),
-							'sizeAdjust'            => array(
-								'description' => 'CSS size-adjust value.',
-								'type'        => 'string',
-							),
-							'unicodeRange'          => array(
-								'description' => 'CSS unicode-range value.',
-								'type'        => 'string',
-							),
-							'preview'               => array(
-								'description' => 'URL to a preview image of the font face.',
-								'type'        => 'string',
 							),
 						),
-						'required'             => array( 'fontFamily', 'src' ),
-						'additionalProperties' => false,
+						'fontDisplay'           => array(
+							'description' => 'CSS font-display value.',
+							'type'        => 'string',
+							'default'     => 'fallback',
+							'enum'        => array(
+								'auto',
+								'block',
+								'fallback',
+								'swap',
+								'optional',
+							),
+						),
+						'src'                   => array(
+							'description' => 'Paths or URLs to the font files.',
+							'oneOf'       => array(
+								array(
+									'type' => 'string',
+								),
+								array(
+									'type'  => 'array',
+									'items' => array(
+										'type' => 'string',
+									),
+								),
+							),
+							'default'     => array(),
+						),
+						'fontStretch'           => array(
+							'description' => 'CSS font-stretch value.',
+							'type'        => 'string',
+						),
+						'ascentOverride'        => array(
+							'description' => 'CSS ascent-override value.',
+							'type'        => 'string',
+						),
+						'descentOverride'       => array(
+							'description' => 'CSS descent-override value.',
+							'type'        => 'string',
+						),
+						'fontVariant'           => array(
+							'description' => 'CSS font-variant value.',
+							'type'        => 'string',
+						),
+						'fontFeatureSettings'   => array(
+							'description' => 'CSS font-feature-settings value.',
+							'type'        => 'string',
+						),
+						'fontVariationSettings' => array(
+							'description' => 'CSS font-variation-settings value.',
+							'type'        => 'string',
+						),
+						'lineGapOverride'       => array(
+							'description' => 'CSS line-gap-override value.',
+							'type'        => 'string',
+						),
+						'sizeAdjust'            => array(
+							'description' => 'CSS size-adjust value.',
+							'type'        => 'string',
+						),
+						'unicodeRange'          => array(
+							'description' => 'CSS unicode-range value.',
+							'type'        => 'string',
+						),
+						'preview'               => array(
+							'description' => 'URL to a preview image of the font face.',
+							'type'        => 'string',
+						),
 					),
+					'required'             => array( 'fontFamily', 'src' ),
+					'additionalProperties' => false,
 				),
 			),
 		);
@@ -571,6 +572,27 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_text_field',
 				'validate_callback' => 'rest_validate_request_arg',
+			),
+		);
+	}
+
+	/**
+	 * Get the params used when creating a new font face.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return array Font face create arguments.
+	 */
+	public function get_create_params() {
+		$properties = $this->get_item_schema()['properties'];
+		return array(
+			'theme_json_version' => $properties['theme_json_version'],
+			// Font face settings is stringified JSON, to work with multipart/form-data used
+			// when uploading font files.
+			'font_face_settings' => array(
+				'description' => __( 'font-face declaration in theme.json format, encoded as a string.', 'gutenberg' ),
+				'type'        => 'string',
+				'required'    => true,
 			),
 		);
 	}

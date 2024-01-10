@@ -93,15 +93,15 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 		parent::set_up();
 
 		// @core-merge Use `DIR_TESTDATA` instead of `GUTENBERG_DIR_TESTDATA`.
-		$font_file_ttf       = GUTENBERG_DIR_TESTDATA . '/fonts/OpenSans-Regular.ttf';
-		self::$font_file_ttf = get_temp_dir() . 'OpenSans-Regular.ttf';
-		if ( ! file_exists( self::$font_file_ttf ) ) {
+		$font_file_ttf       = GUTENBERG_DIR_TESTDATA . 'fonts/OpenSans-Regular.ttf';
+		self::$font_file_ttf = wp_tempnam( 'OpenSans-Regular.ttf' );
+		// if ( ! file_exists( self::$font_file_ttf ) ) {
 			copy( $font_file_ttf, self::$font_file_ttf );
-		}
+		// }
 
 		// @core-merge Use `DIR_TESTDATA` instead of `GUTENBERG_DIR_TESTDATA`.
-		$font_file_woff2       = GUTENBERG_DIR_TESTDATA . '/fonts/OpenSans-Regular.woff2';
-		self::$font_file_woff2 = get_temp_dir() . 'codeispoetry.png';
+		$font_file_woff2       = GUTENBERG_DIR_TESTDATA . 'fonts/OpenSans-Regular.woff2';
+		self::$font_file_woff2 = wp_tempnam( 'OpenSans-Regular.woff2' );
 		if ( ! file_exists( self::$font_file_woff2 ) ) {
 			copy( $font_file_woff2, self::$font_file_woff2 );
 		}
@@ -277,10 +277,12 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$request->set_file_params(
 			array(
 				'file-0' => array(
-					'file'     => file_get_contents( self::$font_file_ttf ),
-					'name'     => 'OpenSans-Regular.ttf',
-					'size'     => filesize( self::$font_file_ttf ),
-					'tmp_name' => self::$font_file_ttf,
+					'name'      => 'OpenSans-Regular.ttf',
+					'full_path' => 'OpenSans-Regular.ttf',
+					'type'      => 'font/ttf',
+					'tmp_name'  => self::$font_file_ttf,
+					'error'     => 0,
+					'size'      => filesize( self::$font_file_ttf ),
 				),
 			)
 		);
@@ -288,7 +290,7 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->check_font_face_data( $data, $data['id'], $data->get_links() );
+		$this->check_font_face_data( $data, $data['id'], $response->get_links() );
 		$this->assertSame( self::$font_family_id, $data['parent'], "The returned revision's id should match the parent id." );
 	}
 
