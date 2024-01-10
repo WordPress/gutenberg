@@ -21,6 +21,11 @@ import {
 } from '../index';
 import type { ToggleGroupControlProps } from '../types';
 
+const hoverOutside = async () => {
+	await hover( document.body );
+	await hover( document.body, { clientX: 10, clientY: 10 } );
+};
+
 const ControlledToggleGroupControl = ( {
 	value: valueProp,
 	onChange,
@@ -149,8 +154,7 @@ describe.each( [
 		await waitFor( () => expect( tooltip ).toBeVisible() );
 
 		// hover outside of radio
-		await hover( document.body );
-		await hover( document.body, { clientX: 10, clientY: 10 } );
+		await hoverOutside();
 
 		// Tooltip should hide
 		await waitFor( () =>
