@@ -20,7 +20,7 @@
 
 .dataviews__filters-view-actions.components-h-stack {
 	align-items: center;
-} 
+}
 
 .dataviews-filters-button {
 	position: relative;
@@ -375,18 +375,6 @@
 .dataviews-no-results,
 .dataviews-loading {
 	padding: 0 $grid-unit-40;
-}
-
-.dataviews-table-selection-checkbox label {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	padding: 0;
-	margin: -1px;
-	overflow: hidden;
-	clip: rect(0, 0, 0, 0);
-	white-space: nowrap;
-	border: 0;
 }
 
 .dataviews-table-selection-checkbox label {
