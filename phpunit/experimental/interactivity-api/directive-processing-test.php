@@ -105,18 +105,6 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 				),
 			)
 		);
-		register_block_type(
-			'test/non-interactive-root-block',
-			array(
-				'render_callback' => function ( $attributes, $content, $block ) {
-					$inner_blocks_html = '';
-					foreach ( $block->inner_blocks as $inner_block ) {
-						$inner_blocks_html .= $inner_block->render();
-					}
-					return '<div>' . $inner_blocks_html . '</div>';
-				},
-			)
-		);
 
 		WP_Interactivity_Initial_State::reset();
 	}
@@ -130,7 +118,6 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		unregister_block_type( 'test/context-level-with-manual-inner-block-rendering' );
 		unregister_block_type( 'test/directives-ordering' );
 		unregister_block_type( 'test/directives' );
-		unregister_block_type( 'test/non-interactive-root-block' );
 		parent::tear_down();
 	}
 
@@ -138,7 +125,7 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		$block_content =
 		'<!-- wp:test/context-level-1 /-->' .
 		'<!-- wp:test/context-level-2 /-->' .
-		'<!-- wp:test/non-interactive-root-block /-->';
+		'<!-- wp:paragraph --><p>Welcome</p><!-- /wp:paragraph -->';
 
 		$interactive_parsed_block = parse_blocks( $block_content )[0];
 
