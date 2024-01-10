@@ -23,6 +23,7 @@ const results = {
 	firstBlock: [],
 	type: [],
 	typeWithoutInspector: [],
+	typeWithTopToolbar: [],
 	typeContainer: [],
 	focus: [],
 	listViewOpen: [],
@@ -183,6 +184,39 @@ test.describe( 'Post Editor Performance', () => {
 
 			// Open the inspector again.
 			await editor.openDocumentSettingsSidebar();
+		} );
+	} );
+
+	test.describe( 'Typing (with top toolbar)', () => {
+		let draftId = null;
+
+		test( 'Setup the test post', async ( { admin, perfUtils, editor } ) => {
+			await admin.createNewPost();
+			await perfUtils.loadBlocksForLargePost();
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( {
+			admin,
+			perfUtils,
+			metrics,
+			editor,
+		} ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			// Enable fixed toolbar.
+			await editor.setIsFixedToolbar( true );
+			const canvas = await perfUtils.getCanvas();
+
+			const paragraph = canvas.getByRole( 'document', {
+				name: /Empty block/i,
+			} );
+
+			await type( paragraph, metrics, 'typeWithTopToolbar' );
+
+			// Disabled fixed toolbar. Default state.
+			await editor.setIsFixedToolbar( false );
 		} );
 	} );
 
