@@ -29,7 +29,6 @@ import { useSelect } from '@wordpress/data';
  */
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
-import useLinkInstanceKey from './use-link-instance-key';
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -90,12 +89,9 @@ function InlineLinkUI( {
 	}
 
 	function onChangeLink( nextValue ) {
-		// LinkControl calls `onChange` immediately upon the toggling a setting.
-		// Before merging the next value with the current link value, check if
-		// the setting was toggled.
-		const didToggleSetting =
-			linkValue.opensInNewTab !== nextValue.opensInNewTab &&
-			nextValue.url === undefined;
+		const hasLink = linkValue?.url;
+		const isNewLink = ! hasLink;
+
 		// Merge the next value with the current link value.
 		nextValue = {
 			...linkValue,
@@ -181,12 +177,22 @@ function InlineLinkUI( {
 			newValue.start = newValue.end;
 
 			onChange( newValue );
+
+			// Force update the anchor reference to ensure the Popover is positioned correctly/
+			// Incorrect positioning can happen on the initial creation of a link because the
+			// anchor changes from a rich text selection to a link format element (e.g. <a>).
+			// however the Popover is not repositioned to account for this change because the
+			// dependencies of `useAnchor` do not change.
+			popoverAnchor?.update();
 		}
 
-		// Focus should only be shifted back to the formatted segment when the
-		// URL is submitted.
-		if ( ! didToggleSetting ) {
-			stopAddingLink();
+		// Focus should only be returned to the rich text on submit if this link is not
+		// being created for the first time. If it is then focus should remain within the
+		// Link UI because it should remain open for the user to modify the link they have
+		// just created.
+		if ( ! isNewLink ) {
+			const returnFocusToRichText = true;
+			stopAddingLink( returnFocusToRichText );
 		}
 
 		if ( ! isValidHref( newUrl ) ) {
@@ -207,12 +213,6 @@ function InlineLinkUI( {
 		editableContentElement: contentRef.current,
 		settings,
 	} );
-
-	// Generate a string based key that is unique to this anchor reference.
-	// This is used to force re-mount the LinkControl component to avoid
-	// potential stale state bugs caused by the component not being remounted
-	// See https://github.com/WordPress/gutenberg/pull/34742.
-	const forceRemountKey = useLinkInstanceKey( popoverAnchor );
 
 	// Focus should only be moved into the Popover when the Link is being created or edited.
 	// When the Link is in "preview" mode focus should remain on the rich text because at
@@ -258,7 +258,6 @@ function InlineLinkUI( {
 			shift
 		>
 			<LinkControl
-				key={ forceRemountKey }
 				value={ linkValue }
 				onChange={ onChangeLink }
 				onRemove={ removeLink }
