@@ -184,7 +184,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 							);
 						} }
 					>
-						{ __( 'Edit templatess' ) }
+						{ __( 'Edit templates' ) }
 					</Button>
 				</p>
 			) }
