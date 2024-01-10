@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen, waitFor } from '@testing-library/react';
-import { press, click, hover } from '@ariakit/test';
+import { press, click, hover, sleep } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -19,6 +19,7 @@ import {
 	ToggleGroupControlOption,
 	ToggleGroupControlOptionIcon,
 } from '../index';
+import { TOOLTIP_DELAY } from '../../tooltip';
 import type { ToggleGroupControlProps } from '../types';
 
 const hoverOutside = async () => {
@@ -157,13 +158,11 @@ describe.each( [
 		await hoverOutside();
 
 		// Tooltip should hide
-		await waitFor( () =>
-			expect(
-				screen.queryByRole( 'tooltip', {
-					name: 'Click for Delicious Gnocchi',
-				} )
-			).not.toBeInTheDocument()
-		);
+		expect(
+			screen.queryByRole( 'tooltip', {
+				name: 'Click for Delicious Gnocchi',
+			} )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'should not render tooltip', async () => {
@@ -179,11 +178,18 @@ describe.each( [
 
 		await hover( secondRadio );
 
-		await waitFor( () =>
-			expect(
-				screen.queryByText( 'Click for Sumptuous Caponata' )
-			).not.toBeInTheDocument()
-		);
+		// Tooltip shouldn't show
+		expect(
+			screen.queryByText( 'Click for Sumptuous Caponata' )
+		).not.toBeInTheDocument();
+
+		// Advance time by default delay
+		await sleep( TOOLTIP_DELAY );
+
+		// Tooltip shouldn't show.
+		expect(
+			screen.queryByText( 'Click for Sumptuous Caponata' )
+		).not.toBeInTheDocument();
 	} );
 
 	if ( mode === 'controlled' ) {
