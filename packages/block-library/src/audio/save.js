@@ -24,6 +24,10 @@ export default function save( { attributes } ) {
 					loop={ loop }
 					preload={ preload }
 				/>
+				<RichText.Content
+					tagName='p'
+					value={attributes.captionContent}
+				/>
 				{ ! RichText.isEmpty( caption ) && (
 					<RichText.Content
 						tagName="figcaption"

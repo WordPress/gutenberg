@@ -23,6 +23,7 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	store as blockEditorStore,
+	RichText
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
@@ -212,7 +213,9 @@ function AudioEdit( {
 						] }
 					/>
 				</PanelBody>
-				<PanelBody title="Block Settings" initialOpen={true}>
+			</InspectorControls>
+			<InspectorControls group="styles">
+				<PanelBody title="Styles" initialOpen={true}>
 					<Button
 						className='border-btn'
 						onClick={ () => borderStyleHandler("default") }
@@ -233,11 +236,21 @@ function AudioEdit( {
 					so the user clicking on it won't play the
 					file or change the position slider when the controls are enabled.
 				*/ }
-				Hello World
 				<Disabled isDisabled={ ! isSingleSelected }>
 					<audio controls="controls" src={ src } />
 				</Disabled>
 				{ isTemporaryAudio && <Spinner /> }
+				<RichText
+					{ ...blockProps }
+					tagName='p'
+					value={ attributes.captionContent }
+					allowedFormats={ [ 'core/bold', 'core/italic' ] }
+					onChange={ ( captionContent ) => setAttributes( { captionContent } ) }
+					placeholder={__( 'Enter the caption for the Audio' )}
+					style={{
+						padding:'0px'
+					}}
+				/>
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }

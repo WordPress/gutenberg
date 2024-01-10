@@ -46,6 +46,10 @@
 		"borderRadius": {
 			"type": "string",
 			"default": "0px"
+		},
+		"captionContent": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {
