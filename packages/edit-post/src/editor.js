@@ -39,7 +39,6 @@ function Editor( {
 	);
 
 	const {
-		isDistractionFree,
 		hasInlineToolbar,
 		post,
 		preferredStyleVariations,
@@ -85,7 +84,6 @@ function Editor( {
 				getPostType( currentPost.postType )?.viewable ?? false;
 			const canEditTemplate = canUser( 'create', 'templates' );
 			return {
-				isDistractionFree: isFeatureActive( 'distractionFree' ),
 				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
 				preferredStyleVariations: select( preferencesStore ).get(
 					'core/edit-post',
@@ -114,7 +112,6 @@ function Editor( {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
 			},
-			isDistractionFree,
 			hasInlineToolbar,
 
 			// Keep a reference of the `allowedBlockTypes` from the server to handle use cases
@@ -141,7 +138,6 @@ function Editor( {
 	}, [
 		settings,
 		hasInlineToolbar,
-		isDistractionFree,
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,

@@ -7,7 +7,6 @@ import {
 	PreferencesModalSection,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -52,10 +51,10 @@ export default function EditSitePreferencesModal() {
 	};
 
 	const turnOffDistractionFree = () => {
-		setPreference( 'core/edit-site', 'distractionFree', false );
+		setPreference( 'core', 'distractionFree', false );
 	};
 
-	const sections = useMemo( () => [
+	const sections = [
 		{
 			name: 'general',
 			tabLabel: __( 'General' ),
@@ -142,6 +141,7 @@ export default function EditSitePreferencesModal() {
 					) }
 				>
 					<EnableFeature
+						scope="core"
 						featureName="fixedToolbar"
 						onToggle={ turnOffDistractionFree }
 						help={ __(
@@ -150,6 +150,7 @@ export default function EditSitePreferencesModal() {
 						label={ __( 'Top toolbar' ) }
 					/>
 					<EnableFeature
+						scope="core"
 						featureName="distractionFree"
 						onToggle={ toggleDistractionFree }
 						help={ __(
@@ -201,7 +202,25 @@ export default function EditSitePreferencesModal() {
 				</>
 			),
 		},
-	] );
+		{
+			name: 'blocks',
+			tabLabel: __( 'Blocks' ),
+			content: (
+				<>
+					<PreferencesModalSection title={ __( 'Inserter' ) }>
+						<EnableFeature
+							scope="core"
+							featureName="mostUsedBlocks"
+							help={ __(
+								'Adds a category with the most frequently used blocks in the inserter.'
+							) }
+							label={ __( 'Show most used blocks' ) }
+						/>
+					</PreferencesModalSection>
+				</>
+			),
+		},
+	];
 	if ( ! isModalActive ) {
 		return null;
 	}

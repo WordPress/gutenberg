@@ -102,7 +102,7 @@ export default function Layout() {
 				'fixedToolbar'
 			),
 			isDistractionFree: select( preferencesStore ).get(
-				'core/edit-site',
+				'core',
 				'distractionFree'
 			),
 			hasBlockSelected:

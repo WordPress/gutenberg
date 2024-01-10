@@ -11,6 +11,7 @@ import {
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef } from '@wordpress/element';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -18,11 +19,13 @@ import { useEffect, useRef } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
-export default function InserterSidebar( { showMostUsedBlocks } ) {
-	const { insertionPoint } = useSelect( ( select ) => {
+export default function InserterSidebar() {
+	const { insertionPoint, showMostUsedBlocks } = useSelect( ( select ) => {
 		const { getInsertionPoint } = unlock( select( editorStore ) );
+		const { get } = select( preferencesStore );
 		return {
 			insertionPoint: getInsertionPoint(),
+			showMostUsedBlocks: get( 'core', 'mostUsedBlocks' ),
 		};
 	}, [] );
 	const { setIsInserterOpened } = useDispatch( editorStore );

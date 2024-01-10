@@ -21,14 +21,14 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`combine-assets\` sh
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-dependency-graph\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/interactivity'), 'version' => 'a2723a31145b5f1ec2fd', 'type' => 'module');
+"<?php return array('dependencies' => array('@wordpress/interactivity'), 'version' => '58fadee5eca3ad30aff6', 'type' => 'module');
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-dependency-graph\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module",
     "request": "@wordpress/interactivity",
     "userRequest": "@wordpress/interactivity",
   },
@@ -36,14 +36,14 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-dependency-g
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-dynamic-dependency-graph\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(array('id' => '@wordpress/interactivity', 'type' => 'dynamic')), 'version' => '095c38db2c83d0d2e168', 'type' => 'module');
+"<?php return array('dependencies' => array(array('id' => '@wordpress/interactivity', 'type' => 'dynamic')), 'version' => '293aebad4ca761cf396f', 'type' => 'module');
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-dynamic-dependency-graph\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module",
     "request": "@wordpress/interactivity",
     "userRequest": "@wordpress/interactivity",
   },
@@ -249,14 +249,14 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`wordpress\` should 
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`wordpress-interactivity\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(array('id' => '@wordpress/interactivity', 'type' => 'dynamic')), 'version' => 'b5625778551023855766', 'type' => 'module');
+"<?php return array('dependencies' => array(array('id' => '@wordpress/interactivity', 'type' => 'dynamic')), 'version' => 'f0242eb6da78af6ca4b8', 'type' => 'module');
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`wordpress-interactivity\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module",
     "request": "@wordpress/interactivity",
     "userRequest": "@wordpress/interactivity",
   },

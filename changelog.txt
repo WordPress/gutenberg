@@ -1,5 +1,22 @@
 == Changelog ==
 
+= 17.3.2 =
+
+## Changelog
+
+### Bug Fixes
+
+- Site editor: fix image upload bug ([57040](https://github.com/WordPress/gutenberg/pull/57040))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@glendaviesnz 
+
+
+
+
 = 17.4.1 =
 
 ## Changelog

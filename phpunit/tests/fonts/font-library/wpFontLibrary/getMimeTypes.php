@@ -10,7 +10,7 @@
  *
  * @covers WP_Font_Family_Utils::get_expected_font_mime_types_per_php_version
  */
-class Tests_Fonts_WpFontsFamilyUtils_GetMimeTypes extends WP_UnitTestCase {
+class Tests_Fonts_WpFontsFamilyUtils_GetMimeTypes extends WP_Font_Library_UnitTestCase {
 
 	/**
 	 *
