@@ -594,12 +594,13 @@ export const getEditedPostTemplate = createRegistrySelector(
 		}
 
 		const post = select( editorStore ).getCurrentPost();
-		if ( post.link ) {
-			return select( coreStore ).__experimentalGetTemplateForLink(
-				post.link
-			);
-		}
-
-		return null;
+		const defaultTemplateId = select( coreStore ).getDefaultTemplateId( {
+			slug: `${ post.type }-${ post.slug }`,
+		} );
+		return select( coreStore ).getEditedEntityRecord(
+			'postType',
+			'wp_template',
+			defaultTemplateId
+		);
 	}
 );
