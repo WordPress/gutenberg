@@ -6,10 +6,12 @@
 
 -   Add the `data-wp-run` directive along with the `useInit` and `useWatch` hooks. ([57805](https://github.com/WordPress/gutenberg/pull/57805))
 
-### Breaking Change
+### Breaking Changes
 
--	Remove `data-wp-slot` and  `data-wp-fill`. ([#57854](https://github.com/WordPress/gutenberg/pull/57854))
+-   Remove `data-wp-slot` and `data-wp-fill`. ([#57854](https://github.com/WordPress/gutenberg/pull/57854))
 -   Remove `wp-data-navigation-link` directive. ([#57853](https://github.com/WordPress/gutenberg/pull/57853))
+
+## 3.2.0 (2024-01-10)
 
 ### Bug Fix
 
