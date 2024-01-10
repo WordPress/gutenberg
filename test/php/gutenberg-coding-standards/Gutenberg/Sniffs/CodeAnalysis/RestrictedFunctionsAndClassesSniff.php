@@ -13,12 +13,8 @@ use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
 
 /**
- *
- * This sniff checks function names to ensure they adhere to specified prefixes
- * determined by the parent directory name. It enforces that function names start
- * with one of the allowed prefixes defined in the sniffer configuration.
- *
- * @link https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/README.md#naming-convention-for-php-functions
+ * This sniff enforces usage restrictions on specific classes and functions within the Gutenberg project.
+ * While it permits the declaration of these classes/functions, their actual usage in code is restricted based on defined regular expressions.
  *
  * @package gutenberg/gutenberg-coding-standards
  *
@@ -27,16 +23,18 @@ use PHP_CodeSniffer\Sniffs\Sniff;
 final class RestrictedFunctionsAndClassesSniff implements Sniff {
 
 	/**
-	 * Contains prefixes for classes that are not allowed to be called.
+	 * Holds regular expressions for classes whose use is restricted, though their definition is allowed.
+	 * Useful for enforcing security or architectural constraints.
 	 *
-	 * @var array
+	 * @var array Array of regex patterns for restricted classes.
 	 */
 	public $restricted_classes = array();
 
 	/**
-	 * Contains prefixes for functions that are not allowed to be called.
+	 * Holds regular expressions identifying functions that are restricted from being called.
+	 * Useful for enforcing security or architectural constraints.
 	 *
-	 * @var array
+	 * @var array Array of regex patterns for restricted functions.
 	 */
 	public $restricted_functions = array();
 
@@ -46,7 +44,7 @@ final class RestrictedFunctionsAndClassesSniff implements Sniff {
 	 * @return array
 	 */
 	public function register() {
-		$this->onRegisterEvent();
+		$this->on_register_event();
 
 		return array( T_STRING );
 	}
@@ -55,16 +53,16 @@ final class RestrictedFunctionsAndClassesSniff implements Sniff {
 	 * Processes function and class tokens.
 	 *
 	 * @param File $phpcsFile The file being scanned.
-	 * @param int $stackPtr The position of the current token
+	 * @param int  $stackPtr  The position of the current token
 	 *                        in the stack passed in $tokens.
 	 *
 	 * @return void
 	 */
 	public function process( File $phpcsFile, $stackPtr ) {
-		$this->processStringToken( $phpcsFile, $stackPtr );
+		$this->process_string_token( $phpcsFile, $stackPtr );
 	}
 
-	private function processStringToken( File $phpcs_file, $stack_pointer ) {
+	private function process_string_token( File $phpcs_file, $stack_pointer ) {
 		if ( empty( $this->restricted_functions ) && empty( $this->restricted_classes ) ) {
 			// Nothing to process.
 			return;
@@ -75,7 +73,7 @@ final class RestrictedFunctionsAndClassesSniff implements Sniff {
 		$next_token = $phpcs_file->findPrevious( T_WHITESPACE, ( $stack_pointer + 1 ), null, true, null, true );
 		if ( false !== $next_token && ( $tokens[ $next_token ]['code'] === T_DOUBLE_COLON ) ) {
 			// Static class method or a class constant.
-			$this->processClassUsage( $phpcs_file, $stack_pointer );
+			$this->check_class_usage( $phpcs_file, $stack_pointer );
 
 			return;
 		}
@@ -83,17 +81,17 @@ final class RestrictedFunctionsAndClassesSniff implements Sniff {
 		$previous_token = $phpcs_file->findPrevious( T_WHITESPACE, $stack_pointer - 1, null, true, null, true );
 		if ( false !== $previous_token && ( $tokens[ $previous_token ]['code'] === T_NEW ) ) {
 			// Static method or a constant usage.
-			$this->processClassUsage( $phpcs_file, $stack_pointer );
+			$this->check_class_usage( $phpcs_file, $stack_pointer );
 
 			return;
 		}
 
 		if ( false !== $next_token && ( $tokens[ $next_token ]['code'] === T_OPEN_PARENTHESIS ) ) {
-			$this->processFunctionCall( $phpcs_file, $stack_pointer );
+			$this->check_function_usage( $phpcs_file, $stack_pointer );
 		}
 	}
 
-	private function processClassUsage( File $phpcs_file, $stack_pointer ) {
+	private function check_class_usage( File $phpcs_file, $stack_pointer ) {
 		$tokens     = $phpcs_file->getTokens();
 		$class_name = $tokens[ $stack_pointer ]['content'];
 
@@ -109,7 +107,7 @@ final class RestrictedFunctionsAndClassesSniff implements Sniff {
 		$phpcs_file->addError( $error_message, $stack_pointer, 'UsedClassInvalid' );
 	}
 
-	private function processFunctionCall( File $phpcs_file, $stack_pointer ) {
+	private function check_function_usage( File $phpcs_file, $stack_pointer ) {
 		$tokens        = $phpcs_file->getTokens();
 		$function_name = $tokens[ $stack_pointer ]['content'];
 
@@ -129,7 +127,7 @@ final class RestrictedFunctionsAndClassesSniff implements Sniff {
 	 * The purpose of this method is to run callbacks
 	 * after the class properties have been set.
 	 */
-	private function onRegisterEvent() {
+	private function on_register_event() {
 		$this->restricted_classes   = self::sanitize( $this->restricted_classes );
 		$this->restricted_functions = self::sanitize( $this->restricted_functions );
 	}
