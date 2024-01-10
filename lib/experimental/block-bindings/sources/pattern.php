@@ -15,9 +15,7 @@ if ( function_exists( 'register_block_bindings_source' ) ) {
 	};
 	register_block_bindings_source(
 		'pattern_attributes',
-		array(
-			'label' => __( 'Pattern Attributes', 'gutenberg' ),
-			'apply' => $pattern_source_callback,
-		)
+		__( 'Pattern Attributes', 'gutenberg' ),
+		$pattern_source_callback
 	);
 }
