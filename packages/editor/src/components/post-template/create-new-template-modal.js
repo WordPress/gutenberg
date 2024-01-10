@@ -23,7 +23,7 @@ import { store as editorStore } from '../../store';
 const DEFAULT_TITLE = __( 'Custom Template' );
 
 export default function CreateNewTemplateModal( { onClose } ) {
-	const { defaultBlockTemplate, getPostLinkProps, getTemplateId } = useSelect(
+	const { defaultBlockTemplate, getPostLinkProps } = useSelect(
 		( select ) => {
 			const { getEditorSettings, getCurrentTemplateId } =
 				select( editorStore );
@@ -90,7 +90,7 @@ export default function CreateNewTemplateModal( { onClose } ) {
 				),
 			] );
 
-		await createTemplate( {
+		const newTemplate = await createTemplate( {
 			slug: cleanForSlug( title || DEFAULT_TITLE ),
 			content: newTemplateContent,
 			title: title || DEFAULT_TITLE,
@@ -99,7 +99,7 @@ export default function CreateNewTemplateModal( { onClose } ) {
 		setIsBusy( false );
 		const editTemplate = getPostLinkProps
 			? getPostLinkProps( {
-					postId: getTemplateId(),
+					postId: newTemplate.id,
 					postType: 'wp_template',
 					canvas: 'edit',
 			  } )

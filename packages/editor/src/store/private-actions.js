@@ -59,6 +59,7 @@ export const createTemplate =
 					],
 				}
 			);
+		return savedTemplate;
 	};
 
 /**
