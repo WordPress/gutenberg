@@ -98,7 +98,7 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 					),
 				),
 			),
-			'with data' => array(
+			'with data'   => array(
 				'config'        => array(
 					'id'          => 'my-collection',
 					'name'        => 'My Collection',
