@@ -51,7 +51,7 @@ export function SidebarComplementaryAreaFills() {
 			supportsGlobalStyles: ! settings?.supportsTemplatePartsMode,
 			isEditingPage:
 				select( editSiteStore ).isPage() &&
-				select( editorStore ).getRenderingMode() !== 'template-only',
+				select( editorStore ).getCurrentPostType() !== 'wp_template',
 		};
 	}, [] );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );

@@ -23,10 +23,10 @@ import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../../utils/constants';
 const SettingsHeader = ( { sidebarName } ) => {
 	const { isEditingPage, entityType } = useSelect( ( select ) => {
 		const { getEditedPostType, isPage } = select( editSiteStore );
-		const { getRenderingMode } = select( editorStore );
+		const { getCurrentPostType } = select( editorStore );
 
 		return {
-			isEditingPage: isPage() && getRenderingMode() !== 'template-only',
+			isEditingPage: isPage() && getCurrentPostType() !== 'wp_template',
 			entityType: getEditedPostType(),
 		};
 	} );

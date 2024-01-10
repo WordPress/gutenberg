@@ -25,12 +25,12 @@ export default function WelcomeGuideTemplate() {
 			'welcomeGuide'
 		);
 		const { isPage } = select( editSiteStore );
-		const { getRenderingMode } = select( editorStore );
+		const { getCurrentPostType } = select( editorStore );
 		return (
 			isTemplateActive &&
 			! isEditorActive &&
 			isPage() &&
-			getRenderingMode() === 'template-only'
+			getCurrentPostType() === 'wp_template'
 		);
 	}, [] );
 
