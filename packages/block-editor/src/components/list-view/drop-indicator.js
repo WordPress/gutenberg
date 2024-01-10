@@ -172,7 +172,6 @@ export default function ListViewDropIndicator( {
 				// added to the position of the left edge of the target element.
 				let left = rtl ? rect.left : rect.left + indent;
 				let top = 0;
-				let bottom = 0;
 
 				// In deeply nested lists, where a scrollbar is present,
 				// the width of the drop indicator should be the width of
@@ -212,16 +211,14 @@ export default function ListViewDropIndicator( {
 				}
 
 				if ( dropPosition === 'top' ) {
-					top = rect.top;
-					bottom = rect.top;
+					top = rect.top - 4;
 				} else {
 					// `dropPosition` is either `bottom` or `inside`
-					top = rect.bottom;
-					bottom = rect.bottom;
+					top = rect.bottom + rect.height - 4;
 				}
 
 				const width = getDropIndicatorWidth( rect, indent );
-				const height = bottom - top;
+				const height = 4;
 
 				return new window.DOMRect( left, top, width, height );
 			},
