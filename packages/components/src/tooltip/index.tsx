@@ -110,15 +110,14 @@ function UnconnectedTooltip(
 				onClick={ hideOnClick ? tooltipStore.hide : undefined }
 				store={ tooltipStore }
 				render={ isOnlyChild ? children : undefined }
-				{ ...restProps }
 				ref={ ref }
 			>
 				{ isOnlyChild ? undefined : children }
 			</Ariakit.TooltipAnchor>
 			{ isOnlyChild && ( text || shortcut ) && (
 				<Ariakit.Tooltip
+					{ ...restProps }
 					unmountOnHide
-					className="components-tooltip"
 					gutter={ 4 }
 					id={ describedById }
 					overflowPadding={ 0.5 }
