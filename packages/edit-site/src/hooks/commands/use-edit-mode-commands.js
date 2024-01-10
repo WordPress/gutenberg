@@ -43,17 +43,35 @@ const { useHistory } = unlock( routerPrivateApis );
 
 function usePageContentFocusCommands() {
 	const { record: template } = useEditedEntityRecord();
-	const { isPage, canvasMode, renderingMode } = useSelect( ( select ) => {
+	const {
+		isPage,
+		canvasMode,
+		getPostLinkProps,
+		templateId,
+		currentPostType,
+	} = useSelect( ( select ) => {
 		const { isPage: _isPage, getCanvasMode } = unlock(
 			select( editSiteStore )
 		);
-		const { getRenderingMode } = select( editorStore );
+		const { getCurrentPostType, getEditorSettings, getCurrentTemplateId } =
+			select( editorStore );
 		return {
 			isPage: _isPage(),
 			canvasMode: getCanvasMode(),
-			renderingMode: getRenderingMode(),
+			getPostLinkProps: getEditorSettings().getPostLinkProps,
+			templateId: getCurrentTemplateId(),
+			currentPostType: getCurrentPostType(),
 		};
 	}, [] );
+
+	const editTemplate = getPostLinkProps
+		? getPostLinkProps( {
+				postId: templateId,
+				postType: 'wp_template',
+				canvas: 'edit',
+		  } )
+		: {};
+
 	const { setRenderingMode } = useDispatch( editorStore );
 
 	if ( ! isPage || canvasMode !== 'edit' ) {
@@ -62,7 +80,7 @@ function usePageContentFocusCommands() {
 
 	const commands = [];
 
-	if ( renderingMode !== 'template-only' ) {
+	if ( currentPostType !== 'wp_template' ) {
 		commands.push( {
 			name: 'core/switch-to-template-focus',
 			/* translators: %1$s: template title */
@@ -72,7 +90,7 @@ function usePageContentFocusCommands() {
 			),
 			icon: layout,
 			callback: ( { close } ) => {
-				setRenderingMode( 'template-only' );
+				editTemplate.onClick();
 				close();
 			},
 		} );
@@ -129,7 +147,7 @@ function useManipulateDocumentCommands() {
 	const isEditingPage = useSelect(
 		( select ) =>
 			select( editSiteStore ).isPage() &&
-			select( editorStore ).getRenderingMode() !== 'template-only',
+			select( editorStore ).getCurrentPostType() !== 'wp_template',
 		[]
 	);
 

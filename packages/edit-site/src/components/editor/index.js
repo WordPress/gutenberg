@@ -102,7 +102,7 @@ export default function Editor( { isLoading } ) {
 		contextPost,
 		editorMode,
 		canvasMode,
-		renderingMode,
+		currentPostType,
 		blockEditorMode,
 		isRightSidebarOpen,
 		isInserterOpen,
@@ -117,7 +117,7 @@ export default function Editor( { isLoading } ) {
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getEntityRecord } = select( coreDataStore );
-		const { getRenderingMode, isInserterOpened, isListViewOpened } =
+		const { getCurrentPostType, isInserterOpened, isListViewOpened } =
 			select( editorStore );
 		const _context = getEditedPostContext();
 
@@ -134,7 +134,7 @@ export default function Editor( { isLoading } ) {
 				: undefined,
 			editorMode: getEditorMode(),
 			canvasMode: getCanvasMode(),
-			renderingMode: getRenderingMode(),
+			currentPostType: getCurrentPostType(),
 			blockEditorMode: __unstableGetEditorMode(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
@@ -269,7 +269,7 @@ export default function Editor( { isLoading } ) {
 								<BlockBreadcrumb
 									rootLabelText={
 										postWithTemplate &&
-										renderingMode !== 'template-only'
+										currentPostType !== 'wp_template'
 											? __( 'Page' )
 											: __( 'Template' )
 									}
