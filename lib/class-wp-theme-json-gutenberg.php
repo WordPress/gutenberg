@@ -2745,6 +2745,15 @@ class WP_Theme_JSON_Gutenberg {
 		return $data;
 	}
 
+	private static function array_find( $xs, $f ) {
+		foreach ( $xs as $x ) {
+			if ( call_user_func( $f, $x ) ) {
+				return $x;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Replace presets with incoming data according to settings defined in 
 	 * static::PRESETS_METADATA.
@@ -2820,7 +2829,14 @@ class WP_Theme_JSON_Gutenberg {
 						foreach ( $content as $key => $item ) {
 							if ( ! isset( $item['name'] ) ) {
 								// TODO: Not sure if I should make get_name_from_defaults() static or make replace_presets() non-static.
-								$name = (new self($data, $origin))->get_name_from_defaults( $item['slug'], $base_path );
+								// $name = (new self($data, 'default'))->get_name_from_defaults( $item['slug'], $base_path );
+								$default_preset = static::array_find(
+									_wp_array_get( $data, array_merge( $base_path, array( 'default' ) ) ),
+									static function ( $default ) use ( $item ) {
+										return $default['slug'] === $item['slug'];
+									}
+								);
+								$name           = isset( $default_preset['name'] ) ? $default_preset['name'] : null;
 								if ( null !== $name ) {
 									$content[ $key ]['name'] = $name;
 								}
