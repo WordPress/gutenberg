@@ -208,11 +208,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 		// Sets the right rendering mode when loading the editor.
 		useEffect( () => {
-			setRenderingMode(
-				settings.defaultRenderingMode ?? post.type === 'wp_template'
-					? 'all'
-					: 'post-only'
-			);
+			setRenderingMode( settings.defaultRenderingMode ?? 'post-only' );
 		}, [ settings.defaultRenderingMode, setRenderingMode, post.type ] );
 
 		if ( ! isReady ) {

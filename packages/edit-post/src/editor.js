@@ -105,6 +105,8 @@ function Editor( {
 	);
 
 	const { updatePreferredStyleVariations } = useDispatch( editPostStore );
+	const defaultRenderingMode =
+		currentPost.postType === 'wp_template' ? 'all' : 'post-only';
 
 	const editorSettings = useMemo( () => {
 		const result = {
@@ -120,6 +122,7 @@ function Editor( {
 			// Keep a reference of the `allowedBlockTypes` from the server to handle use cases
 			// where we need to differentiate if a block is disabled by the user or some plugin.
 			defaultAllowedBlockTypes: settings.allowedBlockTypes,
+			defaultRenderingMode,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -147,6 +150,7 @@ function Editor( {
 		updatePreferredStyleVariations,
 		getPostLinkProps,
 		goBack,
+		defaultRenderingMode,
 	] );
 
 	if ( ! post ) {
