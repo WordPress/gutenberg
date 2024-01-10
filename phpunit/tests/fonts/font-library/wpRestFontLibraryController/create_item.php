@@ -114,7 +114,7 @@ class Tests_Fonts_Font_Family_Controller_create_item extends WP_REST_Font_Librar
 								'fontFamily' => 'Font Family',
 								'fontStyle' => 'normal',
 								'fontWeight' => '400',
-								'uploadedFile' => 'files0',
+								'src' => 'files0',
 							),
 						),
 					),
@@ -139,7 +139,7 @@ class Tests_Fonts_Font_Family_Controller_create_item extends WP_REST_Font_Librar
 								'fontFamily' => 'Font Family',
 								'fontStyle' => 'normal',
 								'fontWeight' => '400',
-								'uploadedFile' => 'filesNotCorrectReference',
+								'src' => 'filesNotCorrectReference',
 							),
 						),
 					),
@@ -294,55 +294,6 @@ class Tests_Fonts_Font_Family_Controller_create_item extends WP_REST_Font_Librar
 				),
 			),
 
-			'Font Family with Font Faces with resources to download' => array(
-				'request' => array(
-					'data' => array(
-						'slug'      => 'slug',
-						'name'        => 'Name',
-						'fontFamily' => 'Family',
-						'fontFace' => array(
-							array(
-								'fontFamily'      => 'Family',
-								'fontStyle'       => 'normal',
-								'fontWeight'      => '400',
-								'preview'	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-normal.svg',
-								'downloadFromUrl' => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
-							),
-							array(
-								'fontFamily'      => 'Family',
-								'fontStyle'       => 'italic',
-								'fontWeight'      => '400',
-								'preview' 	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-italic.svg',
-								'downloadFromUrl' => 'https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf',
-							),
-						),
-					),
-				),
-				'expected_response' => array(
-					'data' => array(
-						'slug'      => 'slug',
-						'name'        => 'Name',
-						'fontFamily' => 'Family',
-						'fontFace' => array(
-							array(
-								'fontFamily'      => 'Family',
-								'fontStyle'       => 'normal',
-								'fontWeight'      => '400',
-								'preview'	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-normal.svg',
-								'src'             => 'http://localhost:8889/wp-content/fonts/slug_normal_400.ttf',
-							),
-							array(
-								'fontFamily'      => 'Family',
-								'fontStyle'       => 'italic',
-								'fontWeight'      => '400',
-								'preview' 	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-italic.svg',
-								'src'             => 'http://localhost:8889/wp-content/fonts/slug_italic_400.ttf',
-							),
-						),
-					),
-				),
-			),
-
 			'Font Family with Font Faces with uploaded resources' => array(
 				'request' => array(
 					'data' => array(
@@ -354,13 +305,13 @@ class Tests_Fonts_Font_Family_Controller_create_item extends WP_REST_Font_Librar
 								'fontFamily'      => 'Family',
 								'fontStyle'       => 'normal',
 								'fontWeight'      => '400',
-								'uploadedFile'    => 'files0',
+								'src'    => 'files0',
 							),
 							array(
 								'fontFamily'      => 'Family',
 								'fontStyle'       => 'italic',
 								'fontWeight'      => '400',
-								'uploadedFile'    => 'files1',
+								'src'    => 'files1',
 							),
 						),
 					),

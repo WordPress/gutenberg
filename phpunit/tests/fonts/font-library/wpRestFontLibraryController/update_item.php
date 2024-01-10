@@ -243,14 +243,14 @@ class Tests_Fonts_Font_Family_Controller_update_item extends WP_REST_Font_Librar
 								'fontStyle'       => 'normal',
 								'fontWeight'      => '400',
 								'preview'	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-normal.svg',
-								'downloadFromUrl'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
+								'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
 							),
 							array(
 								'fontFamily'      => 'Family',
 								'fontStyle'       => 'italic',
 								'fontWeight'      => '400',
 								'preview' 	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-italic.svg',
-								'downloadFromUrl'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf',
+								'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf',
 							),
 						),
 					)
@@ -266,7 +266,7 @@ class Tests_Fonts_Font_Family_Controller_update_item extends WP_REST_Font_Librar
 								'fontStyle'       => 'normal',
 								'fontWeight'      => '400',
 								'preview'	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-normal.svg',
-								'downloadFromUrl'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
+								'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
 							),
 						),
 					)
@@ -282,7 +282,7 @@ class Tests_Fonts_Font_Family_Controller_update_item extends WP_REST_Font_Librar
 								'fontStyle'       => 'normal',
 								'fontWeight'      => '400',
 								'preview'	  => 'https://s.w.org/images/fonts/16.7/previews/abeezee/abeezee-400-normal.svg',
-								'src'             => 'http://localhost:8889/wp-content/fonts/slug_normal_400.ttf',
+								'src'             => 'https://fonts.gstatic.com/s/abeezee/v22/esDR31xSG-6AGleN6tKukbcHCpE.ttf',
 							),
 						),
 					)

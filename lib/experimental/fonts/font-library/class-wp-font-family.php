@@ -257,7 +257,14 @@ class WP_Font_Family {
 
 		foreach ( $font_faces as $font_face ) {
 
-			if ( ! empty( $font_face['uploadedFile'] ) || ! empty( $font_face['downloadFromUrl'] ) ) {
+			if ( empty( $font_face['src'] ) ) {
+				return new WP_Error(
+					'font_face_asset_missing',
+					__( 'The font face asset was not defined.', 'gutenberg' )
+				);
+			}
+
+			if ( $files ) {
 
 				if ( ! $this->has_write_permission() ) {
 					return new WP_Error(
@@ -266,22 +273,13 @@ class WP_Font_Family {
 					);
 				}
 
-				if ( ! empty( $font_face['uploadedFile'] ) ) {
-					if ( ! $files || ! array_key_exists( $font_face['uploadedFile'], $files )) {
-						return new WP_Error(
-							'font_face_upload_file_missing',
-							__( 'The font face assets was not provided.', 'gutenberg' )
-						);
-					}
-					$downloaded_font_face_src = $this->move_font_face_asset( $font_face, $files[ $font_face[ 'uploadedFile' ] ] );
-					unset( $font_face['uploadedFile'] );
+				if ( ! $files || ! array_key_exists( $font_face['src'], $files )) {
+					return new WP_Error(
+						'font_face_upload_file_missing',
+						__( 'The font face assets was not provided.', 'gutenberg' )
+					);
 				}
-
-
-				if ( ! empty( $font_face['downloadFromUrl'] ) ) {
-					$downloaded_font_face_src = $this->download_font_face_assets( $font_face );
-					unset( $font_face['downloadFromUrl'] );
-				}
+				$downloaded_font_face_src = $this->move_font_face_asset( $font_face, $files[ $font_face[ 'src' ] ] );
 
 				if ( is_wp_error( $downloaded_font_face_src ) ) {
 					return $downloaded_font_face_src;
@@ -289,6 +287,13 @@ class WP_Font_Family {
 
 				$font_face['src'] = $downloaded_font_face_src;
 			}
+			else if ( str_starts_with( $font_face['src'], 'file' ) ) {
+				return new WP_Error(
+					'font_face_upload_file_missing',
+					__( 'The font face assets was not provided.', 'gutenberg' )
+				);
+			}
+
 			$ready_font_faces[] = $font_face;
 		}
 
