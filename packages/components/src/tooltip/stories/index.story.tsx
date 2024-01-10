@@ -58,13 +58,15 @@ KeyboardShortcut.args = {
 	},
 };
 
-// TODO: remove before merging
+/**
+ * Nested `Tooltip` components simply ignore the tooltip part, and only
+ */
 export const Nested: StoryFn< typeof Tooltip > = Template.bind( {} );
 Nested.args = {
 	children: (
-		<Tooltip text="inner text">
+		<Tooltip text="Inner tooltip text (that will never show)">
 			<Button variant="primary">Tooltip Anchor</Button>
 		</Tooltip>
 	),
-	text: 'outer text',
+	text: 'Outer tooltip text',
 };
