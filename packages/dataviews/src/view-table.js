@@ -311,7 +311,7 @@ function BulkSelectionCheckbox( { selection, onSelectionChange, data } ) {
 	const areAllSelected = selection && selection.length === data.length;
 	return (
 		<CheckboxControl
-			className="dataviews-table-selection-checkbox"
+			className="dataviews-view-table-selection-checkbox"
 			__nextHasNoMarginBottom
 			checked={ areAllSelected }
 			indeterminate={ ! areAllSelected && selection.length }
@@ -352,7 +352,7 @@ function SingleSelectionCheckbox( {
 	}
 	return (
 		<CheckboxControl
-			className="dataviews-table-selection-checkbox"
+			className="dataviews-view-table-selection-checkbox"
 			__nextHasNoMarginBottom
 			checked={ isSelected }
 			label={ selectionLabel }
