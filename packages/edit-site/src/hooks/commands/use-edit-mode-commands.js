@@ -38,39 +38,33 @@ import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { PATTERN_MODALS } from '../../components/pattern-modal';
 import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import { useLink } from '../../components/routes/link';
 
 const { useHistory } = unlock( routerPrivateApis );
 
 function usePageContentFocusCommands() {
 	const { record: template } = useEditedEntityRecord();
-	const {
-		isPage,
-		canvasMode,
-		getPostLinkProps,
-		templateId,
-		currentPostType,
-	} = useSelect( ( select ) => {
-		const { isPage: _isPage, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
-		const { getCurrentPostType, getEditorSettings, getCurrentTemplateId } =
-			select( editorStore );
-		return {
-			isPage: _isPage(),
-			canvasMode: getCanvasMode(),
-			getPostLinkProps: getEditorSettings().getPostLinkProps,
-			templateId: getCurrentTemplateId(),
-			currentPostType: getCurrentPostType(),
-		};
-	}, [] );
+	const { isPage, canvasMode, templateId, currentPostType } = useSelect(
+		( select ) => {
+			const { isPage: _isPage, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
+			const { getCurrentPostType, getCurrentTemplateId } =
+				select( editorStore );
+			return {
+				isPage: _isPage(),
+				canvasMode: getCanvasMode(),
+				templateId: getCurrentTemplateId(),
+				currentPostType: getCurrentPostType(),
+			};
+		},
+		[]
+	);
 
-	const editTemplate = getPostLinkProps
-		? getPostLinkProps( {
-				postId: templateId,
-				postType: 'wp_template',
-				canvas: 'edit',
-		  } )
-		: {};
+	const { onClick: editTemplate } = useLink( {
+		postType: 'wp_template',
+		postId: templateId,
+	} );
 
 	const { setRenderingMode } = useDispatch( editorStore );
 
@@ -90,7 +84,7 @@ function usePageContentFocusCommands() {
 			),
 			icon: layout,
 			callback: ( { close } ) => {
-				editTemplate.onClick();
+				editTemplate();
 				close();
 			},
 		} );
