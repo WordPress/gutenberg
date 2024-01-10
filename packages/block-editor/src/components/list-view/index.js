@@ -34,7 +34,6 @@ import { __ } from '@wordpress/i18n';
 import ListViewBranch from './branch';
 import { ListViewContext } from './context';
 import ListViewDropIndicator from './drop-indicator';
-import ListViewDropIndicatorVertical from './drop-indicator-vertical';
 import useBlockSelection from './use-block-selection';
 import useListViewBlockIndexes from './use-list-view-block-indexes';
 import useListViewClientIds from './use-list-view-client-ids';
@@ -75,7 +74,6 @@ export const BLOCK_LIST_ITEM_HEIGHT = 36;
  * @param {?boolean}       props.showBlockMovers        Flag to enable block movers. Defaults to `false`.
  * @param {?boolean}       props.isExpanded             Flag to determine whether nested levels are expanded by default. Defaults to `false`.
  * @param {?boolean}       props.showAppender           Flag to show or hide the block appender. Defaults to `false`.
- * @param {?boolean}       props.showDropIndicator      Flag to show or hide the drop indicator line. Defaults to `false`.
  * @param {?ComponentType} props.blockSettingsMenu      Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component.
  * @param {string}         props.rootClientId           The client id of the root block from which we determine the blocks to show in the list.
  * @param {string}         props.description            Optional accessible description for the tree grid component.
@@ -91,7 +89,6 @@ function ListViewComponent(
 		showBlockMovers = false,
 		isExpanded = false,
 		showAppender = false,
-		showDropIndicator = false,
 		blockSettingsMenu: BlockSettingsMenu = BlockSettingsDropdown,
 		rootClientId,
 		description,
@@ -323,17 +320,10 @@ function ListViewComponent(
 
 	return (
 		<AsyncModeProvider value={ true }>
-			{ showDropIndicator ? (
-				<ListViewDropIndicator
-					listViewRef={ elementRef }
-					blockDropTarget={ blockDropTarget }
-				/>
-			) : (
-				<ListViewDropIndicatorVertical
-					listViewRef={ elementRef }
-					blockDropTarget={ blockDropTarget }
-				/>
-			) }
+			<ListViewDropIndicator
+				listViewRef={ elementRef }
+				blockDropTarget={ blockDropTarget }
+			/>
 			{ description && (
 				<VisuallyHidden id={ describedById }>
 					{ description }
