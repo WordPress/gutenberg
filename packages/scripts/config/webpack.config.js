@@ -403,6 +403,10 @@ if ( hasExperimentalModulesFlag ) {
 			...baseConfig.output,
 			module: true,
 			chunkFormat: 'module',
+			environment: {
+				...baseConfig.output.environment,
+				module: true,
+			},
 			library: {
 				...baseConfig.output.library,
 				type: 'module',
