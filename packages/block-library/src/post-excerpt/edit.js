@@ -90,9 +90,10 @@ export default function PostExcerptEditor( {
 	 */
 	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
 
-	/** 
-	 * If the wordCountType is set to something else, Setting the Characters length won't be needed.
-	 * Making it false will help the words get rendered on Front-End as well.
+	/**
+	 * When wordCountType is not 'words', toggle button should
+	 * not be rendered. Hence, Making the countExcerptCharactersLength
+	 * false.
 	 */
 	if ( wordCountType !== 'words' ) {
 		setAttributes( { countExcerptCharactersLength: false } );
