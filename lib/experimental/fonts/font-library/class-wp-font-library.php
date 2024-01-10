@@ -141,19 +141,45 @@ class WP_Font_Library {
 	}
 
 	/**
-	 * Gets dir and url settings for font assets.
+	 * Returns an array containing the current fonts upload directory's path and URL.
 	 *
 	 * @since 6.5.0
 	 *
-	 * @return string site sub-dir path.
+	 * @param array $defaults {
+	 *     Array of information about the upload directory.
+	 *
+	 *     @type string       $path    Base directory and subdirectory or full path to the fonts upload directory.
+	 *     @type string       $url     Base URL and subdirectory or absolute URL to the fonts upload directory.
+	 *     @type string       $subdir  Subdirectory
+	 *     @type string       $basedir Path without subdir.
+	 *     @type string       $baseurl URL path without subdir.
+	 *     @type string|false $error   False or error message.
+	 * }
+	 *
+	 * @return array $defaults {
+	 *     Array of information about the upload directory.
+	 *
+	 *     @type string       $path    Base directory and subdirectory or full path to the fonts upload directory.
+	 *     @type string       $url     Base URL and subdirectory or absolute URL to the fonts upload directory.
+	 *     @type string       $subdir  Subdirectory
+	 *     @type string       $basedir Path without subdir.
+	 *     @type string       $baseurl URL path without subdir.
+	 *     @type string|false $error   False or error message.
+	 * }
 	 */
-	private static function get_fonts_dir_settings() {
-		$fonts_dir_settings = array(
-			'dir' => path_join( WP_CONTENT_DIR, 'fonts' ),
-			'url' => content_url( 'fonts' ),
-		);
+	public static function fonts_dir( $defaults = array() ) {
+		$site_path = self::get_multi_site_fonts_sub_dir();
 
-		return apply_filters( 'fonts_dir', $fonts_dir_settings );
+		// Sets the defaults.
+		$defaults['path']    = path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path;
+		$defaults['url']     = untrailingslashit( content_url( 'fonts' ) ) . $site_path;
+		$defaults['subdir']  = '';
+		$defaults['basedir'] = path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path;
+		$defaults['baseurl'] = untrailingslashit( content_url( 'fonts' ) ) . $site_path;
+		$defaults['error']   = false;
+
+		// Filters the fonts directory data.
+		return apply_filters( 'fonts_dir', $defaults );
 	}
 
 	/**
@@ -179,32 +205,8 @@ class WP_Font_Library {
 	 * @return string Path of the upload directory for fonts.
 	 */
 	public static function get_fonts_dir() {
-		$fonts_dir_settings = self::get_fonts_dir_settings();
-		$fonts_sub_dir      = self::get_multi_site_fonts_sub_dir();
-
-		return rtrim( $fonts_dir_settings['dir'], '/' ) . $fonts_sub_dir;
-	}
-
-	/**
-	 * Sets the upload directory for fonts.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param array $defaults {
-	 *     Default upload directory.
-	 *
-	 *     @type string $path    Path to the directory.
-	 *     @type string $url     URL for the directory.
-	 * }
-	 * @return array Modified upload directory.
-	 */
-	public static function set_upload_dir( $defaults ) {
-		$fonts_dir_settings = self::get_fonts_dir_settings();
-		$fonts_sub_dir      = self::get_multi_site_fonts_sub_dir();
-
-		$defaults['path'] = rtrim( $fonts_dir_settings['dir'], '/' ) . $fonts_sub_dir;
-		$defaults['url']  = untrailingslashit( $fonts_dir_settings['url'] ) . $fonts_sub_dir;
-		return $defaults;
+		$fonts_dir_settings = self::fonts_dir();
+		return $fonts_dir_settings['path'];
 	}
 
 	/**

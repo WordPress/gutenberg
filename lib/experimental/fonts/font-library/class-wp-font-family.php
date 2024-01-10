@@ -599,9 +599,9 @@ class WP_Font_Family {
 	 */
 	public function install( $files = null ) {
 		add_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
-		add_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
+		add_filter( 'upload_dir', array( 'WP_Font_Library', 'fonts_dir' ) );
 		$were_assets_written = $this->download_or_move_font_faces( $files );
-		remove_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
+		remove_filter( 'upload_dir', array( 'WP_Font_Library', 'fonts_dir' ) );
 		remove_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
 
 		if ( ! $were_assets_written ) {
