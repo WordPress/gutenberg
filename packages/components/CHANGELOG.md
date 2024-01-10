@@ -31,6 +31,7 @@
 -   `InputControl`, `NumberControl`, `UnitControl`, `SelectControl`, `TreeSelect`: Add `compact` size variant ([#57398](https://github.com/WordPress/gutenberg/pull/57398)).
 -   `ToggleGroupControl`: Update button size in large variant to be 32px ([#57338](https://github.com/WordPress/gutenberg/pull/57338)).
 -   `Tooltip`: improve unit tests ([#57345](https://github.com/WordPress/gutenberg/pull/57345)).
+-   `CustomSelectControl`: Update experimental Ariakit version to offer `popoverProps` and `hideLabelFromVision` props ([#57703](https://github.com/WordPress/gutenberg/pull/57703)).
 
 ### Experimental
 
