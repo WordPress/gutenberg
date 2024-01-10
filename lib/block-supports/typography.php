@@ -284,6 +284,7 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 	$options  = wp_parse_args( $options, $defaults );
 
 	$acceptable_units_group = implode( '|', $options['acceptable_units'] );
+	// Matches integers and floats (including negative values) with optional decimal (dot or comma) and a unit value.
 	$pattern                = '/^(-?\d*[\.,]?\d+)(' . $acceptable_units_group . '){0,1}$/';
 
 	preg_match( $pattern, $raw_value, $matches );
@@ -295,7 +296,7 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 
 	/*
 	 * For floats coerced to strings, locales can use either a comma (,) or dot (.) as decimal separators.
-	 * Replace the locale separator with a dot for CSS rules to be valid.
+	 * Use `str_replace` to replace any comma separators with a dot for CSS rules to be valid.
 	 */
 	$value = str_replace( ',', '.', $matches[1] );
 	// Converts units to pixel values by default.
@@ -403,15 +404,15 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 		return null;
 	}
 
-	// Build CSS rule.
-	// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
-	$view_port_width_offset = gutenberg_get_typography_value_and_unit( ( $minimum_viewport_width['value'] / 100 ) . $font_size_unit )['combined'];
+	/*
+	 * Build CSS rule.
+	 * Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
+	 * For floats coerced to strings, locales can use either a comma (,) or dot (.) as decimal separators.
+	 * Use `str_replace` to replace any comma separators with a dot for CSS rules to be valid.
+	 */
+	$view_port_width_offset = str_replace( ',', '.', round( $minimum_viewport_width['value'] / 100, 3 ) ) . $font_size_unit;
 	$linear_factor          = 100 * ( ( $maximum_font_size['value'] - $minimum_font_size['value'] ) / ( $maximum_viewport_width['value'] - $minimum_viewport_width['value'] ) );
 	$linear_factor_scaled   = $linear_factor * $scale_factor;
-	/*
-	 * For floats coerced to strings, locales can use either a comma (,) or dot (.) as decimal separators.
-	 * Replace the locale separator with a dot for CSS rules to be valid.
-	 */
 	$linear_factor_scaled   = empty( $linear_factor_scaled ) || 1 === $linear_factor_scaled ? 1 : str_replace( ',', '.', round( $linear_factor_scaled, 3 ) );
 	$fluid_target_font_size = $minimum_font_size_rem['combined'] . " + ((1vw - $view_port_width_offset) * $linear_factor_scaled)";
 
