@@ -19,8 +19,9 @@
  * @return array The parsed block.
  */
 function gutenberg_interactivity_mark_root_interactive_blocks( $parsed_block, $source_block, $parent_block ) {
-	$has_interactive_parent = isset( $parent_block ) && isset( $parent_block->block_type->supports['interactivity'] ) && $parent_block->block_type->supports['interactivity'];
-	if ( ! $has_interactive_parent && ! WP_Directive_Processor::has_root_block() ) {
+	$has_interactive_direct_parent      = isset( $parent_block ) && isset( $parent_block->block_type->supports['interactivity'] ) && $parent_block->block_type->supports['interactivity'];
+	$has_interactive_other_level_parent = WP_Directive_Processor::has_root_block();
+	if ( ! $has_interactive_direct_parent && ! $has_interactive_other_level_parent ) {
 		$block_type     = WP_Block_Type_Registry::get_instance()->get_registered( $parsed_block['blockName'] );
 		$is_interactive = isset( $block_type->supports['interactivity'] ) && $block_type->supports['interactivity'];
 		if ( $is_interactive ) {
