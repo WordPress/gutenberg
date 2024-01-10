@@ -127,7 +127,8 @@ export default function AxialInputControls( {
 						<FlexedRangeControl
 							__nextHasNoMarginBottom
 							aria-controls={ inputId }
-							aria-labelledby={ inputId }
+							label={ LABELS[ side ] }
+							hideLabelFromVision
 							onChange={ ( newValue ) =>
 								handleOnValueChange(
 									side,

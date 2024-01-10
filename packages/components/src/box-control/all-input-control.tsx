@@ -90,6 +90,8 @@ export default function AllInputControl( {
 			<FlexedRangeControl
 				__nextHasNoMarginBottom
 				aria-controls={ inputId }
+				label={ LABELS.all }
+				hideLabelFromVision
 				onChange={ sliderOnChange }
 				min={ 0 }
 				max={ CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]?.max ?? 10 }

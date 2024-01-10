@@ -130,9 +130,10 @@ export default function BoxInputControls( {
 						</Tooltip>
 
 						<FlexedRangeControl
-							aria-controls={ inputId }
-							aria-labelledby={ inputId }
 							__nextHasNoMarginBottom
+							aria-controls={ inputId }
+							label={ LABELS[ side ] }
+							hideLabelFromVision
 							onChange={ ( newValue ) => {
 								handleOnValueChange(
 									side,
