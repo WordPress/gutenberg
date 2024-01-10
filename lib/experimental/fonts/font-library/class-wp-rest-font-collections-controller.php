@@ -96,7 +96,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 	public function get_font_collections() {
 		$collections = array();
 		foreach ( WP_Font_Library::get_font_collections() as $collection ) {
-			$collections[] = $collection->get_config();
+			$collections[] = $collection->get_config_and_data();
 		}
 
 		return new WP_REST_Response( $collections, 200 );
