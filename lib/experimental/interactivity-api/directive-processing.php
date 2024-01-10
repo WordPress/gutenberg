@@ -18,10 +18,8 @@
  *
  * @return array The parsed block.
  */
-function gutenberg_interactivity_mark_root_interactive_blocks( $parsed_block, $source_block, $parent_block ) {
-	$has_interactive_parent   = isset( $parent_block ) && isset( $parent_block->block_type->supports['interactivity'] ) && $parent_block->block_type->supports['interactivity'];
-	$has_interactive_ancestor = WP_Directive_Processor::has_root_block();
-	if ( ! $has_interactive_parent && ! $has_interactive_ancestor ) {
+function gutenberg_interactivity_mark_root_interactive_blocks( $parsed_block ) {
+	if ( ! WP_Directive_Processor::has_root_block() ) {
 		$block_type     = WP_Block_Type_Registry::get_instance()->get_registered( $parsed_block['blockName'] );
 		$is_interactive = isset( $block_type->supports['interactivity'] ) && $block_type->supports['interactivity'];
 		if ( $is_interactive ) {
@@ -31,7 +29,7 @@ function gutenberg_interactivity_mark_root_interactive_blocks( $parsed_block, $s
 
 	return $parsed_block;
 }
-add_filter( 'render_block_data', 'gutenberg_interactivity_mark_root_interactive_blocks', 10, 3 );
+add_filter( 'render_block_data', 'gutenberg_interactivity_mark_root_interactive_blocks', 10, 1 );
 
 /**
  * Processes the directives in the root blocks.

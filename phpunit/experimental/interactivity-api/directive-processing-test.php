@@ -137,41 +137,29 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 	public function test_interactivity_process_directives_in_interactive_root_blocks() {
 		$block_content =
 		'<!-- wp:test/context-level-1 /-->' .
-		'<!-- wp:test/context-level-1 /-->' .
+		'<!-- wp:test/context-level-2 /-->' .
 		'<!-- wp:test/non-interactive-root-block /-->';
 
-		$interactive_parsed_block        = parse_blocks( $block_content )[0];
-		$interactive_source_block        = $interactive_parsed_block;
-		$interactive_parsed_block_object = new WP_Block( $interactive_parsed_block );
+		$interactive_parsed_block = parse_blocks( $block_content )[0];
 
-		$rendered_content                  = render_block( $interactive_parsed_block );
-		$parsed_block_second               = parse_blocks( $block_content )[1];
-		$non_interactive_root_block        = parse_blocks( $block_content )[2];
-		$non_interactive_root_block_object = new WP_Block( $non_interactive_root_block );
-		$interactive_parsed_block_object   = new WP_Block( $interactive_parsed_block );
+		$rendered_content           = render_block( $interactive_parsed_block );
+		$parsed_block_second        = parse_blocks( $block_content )[1];
+		$non_interactive_root_block = parse_blocks( $block_content )[2];
 
 		// Test that root block is intially empty.
 		$this->assertEmpty( WP_Directive_Processor::$root_block );
 
 		// Test that root block is not added if it is non interactive.
-		gutenberg_interactivity_mark_root_interactive_blocks( $non_interactive_root_block, $non_interactive_root_block, null );
+		gutenberg_interactivity_mark_root_interactive_blocks( $non_interactive_root_block );
 		$this->assertEmpty( WP_Directive_Processor::$root_block );
 
-		// Test that a root block is not added if its parent is interactive.
-		gutenberg_interactivity_mark_root_interactive_blocks( $interactive_parsed_block, $interactive_source_block, $interactive_parsed_block_object );
-		$this->assertEmpty( WP_Directive_Processor::$root_block );
-
-		// Test that a non root block is added if there is non interactive parent block.
-		gutenberg_interactivity_mark_root_interactive_blocks( $interactive_parsed_block, $interactive_source_block, $non_interactive_root_block_object );
+		// Test that a non root block is added if it is interactive.
+		gutenberg_interactivity_mark_root_interactive_blocks( $interactive_parsed_block );
 		$this->assertNotEmpty( WP_Directive_Processor::$root_block );
 
-		// Test that root block is added if there is no parent block.
-		gutenberg_interactivity_mark_root_interactive_blocks( $interactive_parsed_block, $interactive_source_block, null );
+		// Test that an interactive block is not added if it has in interactive ancestor.
 		$current_root_block = WP_Directive_Processor::$root_block;
-		$this->assertNotEmpty( $current_root_block );
-
-		// Test that a root block is not added if there is already a root block defined.
-		gutenberg_interactivity_mark_root_interactive_blocks( $parsed_block_second, $interactive_source_block, null );
+		gutenberg_interactivity_mark_root_interactive_blocks( $parsed_block_second );
 		$this->assertSame( $current_root_block, WP_Directive_Processor::$root_block );
 
 		// Test that root block is removed after processing.
