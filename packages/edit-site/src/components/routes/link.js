@@ -22,7 +22,7 @@ export function getPostLinkProps(
 	shouldReplace = false
 ) {
 	function onClick( event ) {
-		event.preventDefault();
+		event?.preventDefault();
 
 		if ( shouldReplace ) {
 			history.replace( params, state );
