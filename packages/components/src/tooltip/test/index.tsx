@@ -436,4 +436,50 @@ describe( 'Tooltip', () => {
 			await waitExpectTooltipToHide();
 		} );
 	} );
+
+	describe( 'nested', () => {
+		it( 'should render the outer tooltip and ignore nested tooltips', async () => {
+			render(
+				<Tooltip text="Outer tooltip">
+					<Tooltip text="Middle tooltip">
+						<Tooltip text="Inner tooltip">
+							<Button>Tooltip anchor</Button>
+						</Tooltip>
+					</Tooltip>
+				</Tooltip>
+			);
+
+			// Hover the anchor. Only the outer tooltip should show.
+			await hover(
+				screen.getByRole( 'button', {
+					name: 'Tooltip anchor',
+				} )
+			);
+
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'tooltip', { name: 'Outer tooltip' } )
+				).toBeVisible()
+			);
+			expect(
+				screen.queryByRole( 'tooltip', { name: 'Middle tooltip' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'tooltip', { name: 'Inner tooltip' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', {
+					description: 'Outer tooltip',
+				} )
+			).toBeVisible();
+
+			// Hover outside of the anchor, tooltip should hide
+			await hoverOutside();
+			await waitFor( () =>
+				expect(
+					screen.queryByRole( 'tooltip', { name: 'Outer tooltip' } )
+				).not.toBeInTheDocument()
+			);
+		} );
+	} );
 } );
