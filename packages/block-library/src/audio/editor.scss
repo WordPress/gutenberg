@@ -17,3 +17,17 @@
 		margin-left: -9px;
 	}
 }
+
+.border-btn {
+	width: 6rem;
+    background-color: #fff;
+    color: #000;
+    justify-content: center;
+    margin: 2px;
+	border: 1px solid #000
+}
+
+.border-btn:hover {
+	background-color: #000;
+    color: #fff;
+}

@@ -13,6 +13,7 @@ import {
 	SelectControl,
 	Spinner,
 	ToggleControl,
+	Button
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -26,7 +27,7 @@ import {
 import { useEffect } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { audio as icon } from '@wordpress/icons';
+import { border, audio as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -125,6 +126,16 @@ function AudioEdit( {
 		className: classes,
 	} );
 
+	const borderStyleHandler = ( borderType ) => {
+		if( borderType === 'rounded' ){
+			setAttributes( { borderRadius: "10px" } );
+			console.log( attributes.borderRadius );
+			return;
+		}
+		setAttributes( { borderRadius: "0px" } );
+		console.log( attributes.borderRadius );
+	}
+
 	if ( ! src ) {
 		return (
 			<div { ...blockProps }>
@@ -192,6 +203,20 @@ function AudioEdit( {
 						] }
 					/>
 				</PanelBody>
+				<PanelBody title="Block Settings" initialOpen={true}>
+					<Button
+						className='border-btn'
+						onClick={ () => setAttributes({borderRadius:"0px"}) }
+					>
+						Default
+					</Button>
+					<Button
+						className='border-btn'
+						onClick={ ()=> setAttributes( {borderRadius: "10px"} ) }
+					>
+						Rounded
+					</Button>
+				</PanelBody>
 			</InspectorControls>
 			<figure { ...blockProps }>
 				{ /*
@@ -199,6 +224,7 @@ function AudioEdit( {
 					so the user clicking on it won't play the
 					file or change the position slider when the controls are enabled.
 				*/ }
+				Hello World
 				<Disabled isDisabled={ ! isSingleSelected }>
 					<audio controls="controls" src={ src } />
 				</Disabled>

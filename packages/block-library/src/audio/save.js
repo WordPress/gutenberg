@@ -12,7 +12,7 @@ export default function save( { attributes } ) {
 
 	return (
 		src && (
-			<figure { ...useBlockProps.save() }>
+			<figure { ...useBlockProps.save() } style={{ borderRadius: "20px" }}>
 				<audio
 					controls="controls"
 					src={ src }
