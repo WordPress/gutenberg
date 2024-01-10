@@ -72,9 +72,13 @@ export default function PreferencesModalTabs( { sections } ) {
 					onSelect={ setActiveMenu }
 					orientation="vertical"
 				>
-					<Tabs.TabList>
+					<Tabs.TabList className="interface-preferences__tabs-tablist">
 						{ tabs.map( ( tab ) => (
-							<Tabs.Tab tabId={ tab.name } key={ tab.name }>
+							<Tabs.Tab
+								tabId={ tab.name }
+								key={ tab.name }
+								className="interface-preferences__tabs-tab"
+							>
 								{ tab.title }
 							</Tabs.Tab>
 						) ) }
@@ -83,6 +87,7 @@ export default function PreferencesModalTabs( { sections } ) {
 						<Tabs.TabPanel
 							tabId={ tab.name }
 							key={ tab.name }
+							className="interface-preferences__tabs-tabpanel"
 							focusable={ false }
 						>
 							{ sectionsContentMap[ tab.name ] || null }

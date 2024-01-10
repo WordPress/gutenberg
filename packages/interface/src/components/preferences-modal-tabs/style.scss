@@ -1,14 +1,14 @@
 $vertical-tabs-width: 160px;
 
 .interface-preferences__tabs {
-	[role="tablist"] {
+	.interface-preferences__tabs-tablist {
 		position: absolute;
 		top: $header-height + $grid-unit-30;
 		// Aligns button text instead of button box.
 		left: $grid-unit-20;
 		width: $vertical-tabs-width;
 
-		[role="tab"] {
+		.interface-preferences__tabs-tab {
 			border-radius: $radius-block-ui;
 			font-weight: 400;
 
@@ -34,7 +34,7 @@ $vertical-tabs-width: 160px;
 		}
 	}
 
-	[role="tabpanel"] {
+	.interface-preferences__tabs-tabpanel {
 		padding-left: $grid-unit-30;
 		margin-left: $vertical-tabs-width;
 	}
