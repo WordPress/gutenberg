@@ -70,7 +70,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_font_collection( $request ) {
-		$slug         = $request->get_param( 'slug' );
+		$slug       = $request->get_param( 'slug' );
 		$collection = WP_Font_Library::get_font_collection( $slug );
 		// If the collection doesn't exist returns a 404.
 		if ( is_wp_error( $collection ) ) {

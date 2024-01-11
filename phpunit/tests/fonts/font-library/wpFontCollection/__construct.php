@@ -17,7 +17,7 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 		$property->setAccessible( true );
 
 		$config          = array(
-			'slug'          => 'my-collection',
+			'slug'        => 'my-collection',
 			'name'        => 'My Collection',
 			'description' => 'My collection description',
 			'src'         => 'my-collection-data.json',
@@ -80,7 +80,7 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 
 			'missing src'                     => array(
 				array(
-					'slug'          => 'my-collection',
+					'slug'        => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 				),

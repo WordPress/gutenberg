@@ -51,7 +51,7 @@ class WP_Font_Collection {
 			throw new Exception( 'Font Collection config name is required as a non-empty string.' );
 		}
 
-		if ( ( empty( $config['src'] ) || ! is_string( $config['src'] ) ) && ( empty( $config['data'] )  ) ) {
+		if ( ( empty( $config['src'] ) || ! is_string( $config['src'] ) ) && ( empty( $config['data'] ) ) ) {
 			throw new Exception( 'Font Collection config "src" option OR "data" option is required.' );
 		}
 
@@ -79,7 +79,7 @@ class WP_Font_Collection {
 	 */
 	public function get_data() {
 
-		if ( ! empty( $this->config[ 'data' ] ) ) {
+		if ( ! empty( $this->config['data'] ) ) {
 			return $this->get_config();
 		}
 

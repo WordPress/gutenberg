@@ -27,7 +27,7 @@ class Tests_Fonts_WPRESTFontCollectionsController_GetFontCollections extends WP_
 
 		// Add a font collection.
 		$config = array(
-			'slug'          => 'my-font-collection',
+			'slug'        => 'my-font-collection',
 			'name'        => 'My Font Collection',
 			'description' => 'Demo about how to a font collection to your WordPress Font Library.',
 			'src'         => $mock_file,
