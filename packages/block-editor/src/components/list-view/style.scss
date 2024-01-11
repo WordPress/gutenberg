@@ -427,15 +427,31 @@ $block-navigation-max-indent: 8;
 
 .block-editor-list-view-draggable-chip {
 	.block-editor-list-view-leaf {
+		// The drag chip uses a transparent background to ensure that the nesting level
+		// for where a user drops the dragged block is visible.
+		background-color: rgba(255, 255, 255, 0.5);
+		border-radius: $radius-block-ui;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		display: flex;
 		height: 36px;
 		opacity: 1;
 
+		// Reset colors to use the admin color.
+		td {
+			background: none !important;
+			.block-editor-list-view-block-select-button,
+			.block-editor-block-icon,
+			.components-button.has-icon {
+				color: var(--wp-admin-theme-color) !important;
+			}
+		}
+
 		.block-editor-list-view__expander {
-			// Remove indent on dragged component.
+			// Remove indent on the expander, as the dragged component offsets the entire row.
 			margin-left: 0 !important;
 		}
 
+		// Apply a margin offset to account for nesting level.
 		&[aria-level] {
 			margin-left: ( $icon-size ) * $block-navigation-max-indent + 4 * ( $block-navigation-max-indent - 1 );
 		}
@@ -461,24 +477,6 @@ $block-navigation-max-indent: 8;
 		.block-editor-list-view-block__menu-cell {
 			display: flex;
 			align-items: center;
-		}
-
-		td {
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
-
-			.block-editor-list-view-block-select-button,
-			.components-button.has-icon {
-				color: inherit;
-			}
-		}
-
-		td:first-child {
-			border-top-left-radius: $radius-block-ui;
-			border-bottom-left-radius: $radius-block-ui;
-		}
-		td:last-child {
-			border-top-right-radius: $radius-block-ui;
-			border-bottom-right-radius: $radius-block-ui;
 		}
 	}
 }
