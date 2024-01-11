@@ -10,7 +10,7 @@
 	}
 }
 
-.dataviews__filters-view-actions {
+.dataviews-filters__view-actions {
 	padding: $grid-unit-15 $grid-unit-40;
 	.components-search-control {
 		flex-grow: 1;
@@ -55,7 +55,7 @@
 	margin: $grid-unit-40 0 $grid-unit-20;
 }
 
-.dataviews-table-view {
+.dataviews-view-table {
 	width: 100%;
 	text-indent: 0;
 	border-color: inherit;
@@ -85,9 +85,18 @@
 	tr {
 		border-bottom: 1px solid $gray-100;
 
+		.dataviews-view-table-header-button {
+			gap: $grid-unit-05;
+		}
+
 		td:first-child,
 		th:first-child {
 			padding-left: $grid-unit-40;
+
+			.dataviews-view-table-header-button,
+			.dataviews-view-table-header {
+				margin-left: - #{$grid-unit-10};
+			}
 		}
 
 		td:last-child,
@@ -112,18 +121,27 @@
 		th {
 			position: sticky;
 			top: -1px;
-			background-color: lighten($gray-100, 4%);
+			background-color: $white;
 			box-shadow: inset 0 -#{$border-width} 0 $gray-100;
-			border-top: 1px solid $gray-100;
-			padding-top: $grid-unit-05;
-			padding-bottom: $grid-unit-05;
+			padding-top: $grid-unit-10;
+			padding-bottom: $grid-unit-10;
 			z-index: 1;
+			font-size: 11px;
+			text-transform: uppercase;
+			font-weight: 500;
+			padding-left: $grid-unit-05;
 		}
 	}
 
-	.dataviews-table-header-button {
-		padding: 0;
-		gap: $grid-unit-05;
+	.dataviews-view-table-header-button {
+		padding: $grid-unit-05 $grid-unit-10;
+		font-size: 11px;
+		text-transform: uppercase;
+		font-weight: 500;
+
+		&:not(:hover) {
+			color: $gray-900;
+		}
 
 		span {
 			speak: none;
@@ -133,9 +151,13 @@
 			}
 		}
 	}
+
+	.dataviews-view-table-header {
+		padding-left: $grid-unit-05;
+	}
 }
 
-.dataviews-grid-view {
+.dataviews-view-grid {
 	margin-bottom: $grid-unit-30;
 	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 	padding: 0 $grid-unit-40;
@@ -149,10 +171,22 @@
 	}
 
 	.dataviews-view-grid__card {
-		h3 { // Todo: A better way to target this
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
+		.dataviews-view-grid__primary-field {
+			.dataviews-view-grid__title-field {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: block;
+				font-size: $default-font-size;
+				width: 100%;
+			}
+
+			.dataviews-view-grid__title-field a,
+			button.dataviews-view-grid__title-field {
+				font-weight: 500;
+				color: $gray-900;
+				text-decoration: none;
+			}
 		}
 	}
 
@@ -173,12 +207,6 @@
 
 	.dataviews-view-grid__primary-field {
 		min-height: $grid-unit-30;
-
-		a {
-			color: $gray-900;
-			text-decoration: none;
-			font-weight: 500;
-		}
 	}
 
 	.dataviews-view-grid__fields {
@@ -197,29 +225,71 @@
 	}
 }
 
-.dataviews-list-view {
+.dataviews-view-list {
 	margin: 0;
+	padding: $grid-unit-10;
 
 	li {
-		border-bottom: $border-width solid $gray-100;
 		margin: 0;
-		&:first-child {
-			border-top: $border-width solid $gray-100;
+
+		.dataviews-view-list__item-wrapper {
+			position: relative;
+			padding-right: $grid-unit-30;
+			border-radius: $grid-unit-05;
+
+			&::after {
+				position: absolute;
+				content: "";
+				top: 100%;
+				left: $grid-unit-30;
+				right: $grid-unit-30;
+				background: $gray-100;
+				height: 1px;
+			}
 		}
-		&:last-child {
-			border-bottom: 0;
+
+		&:not(.is-selected):hover {
+			color: var(--wp-admin-theme-color);
+
+			.dataviews-view-list__fields {
+				color: var(--wp-admin-theme-color);
+			}
 		}
 	}
 
-	.dataviews-list-view__item {
-		padding: $grid-unit-15 $grid-unit-40;
-		cursor: default;
-		&:focus,
-		&:hover {
-			background-color: lighten($gray-100, 3%);
+	li.is-selected,
+	li.is-selected:focus-within {
+		.dataviews-view-list__item-wrapper {
+			background-color: var(--wp-admin-theme-color);
+			color: $white;
+
+			.dataviews-view-list__fields,
+			.components-button {
+				color: $white;
+			}
+
+			&::after {
+				background: transparent;
+			}
 		}
+	}
+
+	.dataviews-view-list__item {
+		padding: $grid-unit-15 0 $grid-unit-15 $grid-unit-30;
+		width: 100%;
+		cursor: pointer;
 		&:focus {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			&::before {
+				position: absolute;
+				content: "";
+				top: -1px;
+				right: -1px;
+				bottom: -1px;
+				left: -1px;
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+				z-index: -1;
+				border-radius: $grid-unit-05;
+			}
 		}
 		h3 {
 			overflow: hidden;
@@ -228,22 +298,12 @@
 		}
 	}
 
-	.dataviews-list-view__item-selected,
-	.dataviews-list-view__item-selected:hover {
-		background-color: $gray-100;
-
-		&:focus {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-		}
-	}
-
-	.dataviews-list-view__media-wrapper {
+	.dataviews-view-list__media-wrapper {
 		min-width: $grid-unit-40;
 		height: $grid-unit-40;
 		border-radius: $grid-unit-05;
 		overflow: hidden;
 		position: relative;
-		margin-top: $grid-unit-05;
 
 		&::after {
 			content: "";
@@ -257,23 +317,48 @@
 		}
 	}
 
-	.dataviews-list-view__media-placeholder {
+	.dataviews-view-list__media-placeholder {
 		min-width: $grid-unit-40;
 		height: $grid-unit-40;
 		background-color: $gray-200;
 	}
 
-	.dataviews-list-view__fields {
+	.dataviews-view-list__fields {
 		color: $gray-700;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 
-		.dataviews-list-view__field {
+		.dataviews-view-list__field {
 			margin-right: $grid-unit-15;
 
 			&:last-child {
 				margin-right: 0;
+			}
+		}
+	}
+
+	& + .dataviews-pagination {
+		justify-content: space-between;
+	}
+
+	.dataviews-view-list__details-button {
+		align-self: center;
+		opacity: 0;
+	}
+
+	li.is-selected,
+	li:hover,
+	li:focus-within {
+		.dataviews-view-list__details-button {
+			opacity: 1;
+		}
+	}
+
+	li.is-selected {
+		.dataviews-view-list__details-button {
+			&:focus {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) currentColor;
 			}
 		}
 	}
@@ -288,7 +373,7 @@
 	padding: 0 $grid-unit-40;
 }
 
-.dataviews__filters-custom-menu-radio-item-prefix {
+.dataviews-filters__custom-menu-radio-item-prefix {
 	display: block;
 	width: 24px;
 }

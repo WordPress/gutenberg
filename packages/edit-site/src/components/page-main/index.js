@@ -30,7 +30,7 @@ export default function PageMain() {
 		) : (
 			<PagePatterns />
 		);
-	} else if ( window?.__experimentalAdminViews && path === '/pages' ) {
+	} else if ( window?.__experimentalAdminViews && path === '/page' ) {
 		return <PagePages />;
 	}
 

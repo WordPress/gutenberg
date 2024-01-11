@@ -150,7 +150,7 @@ if ( $gutenberg_experiments && (
 					continue;
 				}
 
-				$custom_value = $connection_sources[ $attribute_value['source'] ]( $block_instance );
+				$custom_value = $connection_sources[ $attribute_value['source'] ]( $block_instance, $attribute_name );
 			} else {
 				// If the attribute does not specify the name of the custom field, skip it.
 				if ( ! isset( $attribute_value['value'] ) ) {

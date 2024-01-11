@@ -97,9 +97,12 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 		const attributes = getPartiallySyncedAttributes( block );
 		const newAttributes = { ...block.attributes };
 		for ( const attributeKey of attributes ) {
-			defaultValues[ blockId ] = block.attributes[ attributeKey ];
+			defaultValues[ blockId ] ??= {};
+			defaultValues[ blockId ][ attributeKey ] =
+				block.attributes[ attributeKey ];
 			if ( overrides[ blockId ] ) {
-				newAttributes[ attributeKey ] = overrides[ blockId ];
+				newAttributes[ attributeKey ] =
+					overrides[ blockId ][ attributeKey ];
 			}
 		}
 		return {
@@ -111,7 +114,7 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 }
 
 function getOverridesFromBlocks( blocks, defaultValues ) {
-	/** @type {Record<string, unknown>} */
+	/** @type {Record<string, Record<string, unknown>>} */
 	const overrides = {};
 	for ( const block of blocks ) {
 		Object.assign(
@@ -123,9 +126,12 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 		const attributes = getPartiallySyncedAttributes( block );
 		for ( const attributeKey of attributes ) {
 			if (
-				block.attributes[ attributeKey ] !== defaultValues[ blockId ]
+				block.attributes[ attributeKey ] !==
+				defaultValues[ blockId ][ attributeKey ]
 			) {
-				overrides[ blockId ] = block.attributes[ attributeKey ];
+				overrides[ blockId ] ??= {};
+				overrides[ blockId ][ attributeKey ] =
+					block.attributes[ attributeKey ];
 			}
 		}
 	}
@@ -254,6 +260,7 @@ export default function ReusableBlockEdit( {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		templateLock: 'all',
 		layout,
 		renderAppender: innerBlocks?.length
 			? undefined

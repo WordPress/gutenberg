@@ -19,7 +19,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import SidebarNavigationItem from '../sidebar-navigation-item';
-import DEFAULT_VIEWS from './default-views';
+import { DEFAULT_VIEWS } from './default-views';
 import { unlock } from '../../lock-unlock';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );

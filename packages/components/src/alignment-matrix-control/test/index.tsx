@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { press, click } from '@ariakit/test';
 
 /**
  * Internal dependencies
@@ -37,11 +37,9 @@ describe( 'AlignmentMatrixControl', () => {
 		} );
 
 		it( 'should be centered by default', async () => {
-			const user = userEvent.setup();
-
 			await renderAndInitCompositeStore( <AlignmentMatrixControl /> );
 
-			await user.tab();
+			await press.Tab();
 
 			expect( getCell( 'center center' ) ).toHaveFocus();
 		} );
@@ -60,7 +58,6 @@ describe( 'AlignmentMatrixControl', () => {
 					'bottom center',
 					'bottom right',
 				] )( '%s', async ( alignment ) => {
-					const user = userEvent.setup();
 					const spy = jest.fn();
 
 					await renderAndInitCompositeStore(
@@ -72,14 +69,13 @@ describe( 'AlignmentMatrixControl', () => {
 
 					const cell = getCell( alignment );
 
-					await user.click( cell );
+					await click( cell );
 
 					expect( cell ).toHaveFocus();
 					expect( spy ).toHaveBeenCalledWith( alignment );
 				} );
 
 				it( 'unless already focused', async () => {
-					const user = userEvent.setup();
 					const spy = jest.fn();
 
 					await renderAndInitCompositeStore(
@@ -91,7 +87,7 @@ describe( 'AlignmentMatrixControl', () => {
 
 					const cell = getCell( 'center center' );
 
-					await user.click( cell );
+					await click( cell );
 
 					expect( cell ).toHaveFocus();
 					expect( spy ).not.toHaveBeenCalled();
@@ -106,16 +102,15 @@ describe( 'AlignmentMatrixControl', () => {
 					[ 'ArrowLeft', 'center left' ],
 					[ 'ArrowDown', 'bottom center' ],
 					[ 'ArrowRight', 'center right' ],
-				] )( '%s', async ( keyRef, cellRef ) => {
-					const user = userEvent.setup();
+				] as const )( '%s', async ( keyRef, cellRef ) => {
 					const spy = jest.fn();
 
 					await renderAndInitCompositeStore(
 						<AlignmentMatrixControl onChange={ spy } />
 					);
 
-					await user.tab();
-					await user.keyboard( `[${ keyRef }]` );
+					await press.Tab();
+					await press[ keyRef ]();
 
 					expect( getCell( cellRef ) ).toHaveFocus();
 					expect( spy ).toHaveBeenCalledWith( cellRef );
@@ -128,8 +123,7 @@ describe( 'AlignmentMatrixControl', () => {
 					[ 'ArrowLeft', 'top left' ],
 					[ 'ArrowDown', 'bottom right' ],
 					[ 'ArrowRight', 'bottom right' ],
-				] )( '%s', async ( keyRef, cellRef ) => {
-					const user = userEvent.setup();
+				] as const )( '%s', async ( keyRef, cellRef ) => {
 					const spy = jest.fn();
 
 					await renderAndInitCompositeStore(
@@ -137,8 +131,8 @@ describe( 'AlignmentMatrixControl', () => {
 					);
 
 					const cell = getCell( cellRef );
-					await user.click( cell );
-					await user.keyboard( `[${ keyRef }]` );
+					await click( cell );
+					await press[ keyRef ]();
 
 					expect( cell ).toHaveFocus();
 					expect( spy ).toHaveBeenCalledWith( cellRef );
