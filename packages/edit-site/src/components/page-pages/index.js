@@ -13,7 +13,7 @@ import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { DataViews } from '@wordpress/dataviews';
+import { DataViews, getPaginationResults } from '@wordpress/dataviews';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
@@ -32,6 +32,7 @@ import {
 	LAYOUT_LIST,
 	OPERATOR_IN,
 	OPERATOR_NOT_IN,
+	TEMPLATE_POST_TYPE,
 } from '../../utils/constants';
 
 import {
@@ -47,8 +48,6 @@ import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
-
-const EMPTY_ARRAY = [];
 
 function useView( type ) {
 	const {
@@ -181,23 +180,19 @@ export default function PagePages() {
 			...filters,
 		};
 	}, [ view ] );
-	const {
-		records: pages,
-		isResolving: isLoadingPages,
-		totalItems,
-		totalPages,
-	} = useEntityRecords( 'postType', postType, queryArgs );
+	const { records: pages, isResolving: isLoadingPages } = useEntityRecords(
+		'postType',
+		postType,
+		queryArgs
+	);
 
 	const { records: authors, isResolving: isLoadingAuthors } =
 		useEntityRecords( 'root', 'user' );
 
-	const paginationInfo = useMemo(
-		() => ( {
-			totalItems,
-			totalPages,
-		} ),
-		[ totalItems, totalPages ]
-	);
+	const { records: templates, isResolving: isLoadingTemplates } =
+		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
+			per_page: -1,
+		} );
 
 	const fields = useMemo(
 		() => [
@@ -295,6 +290,76 @@ export default function PagePages() {
 		[ authors, view.type ]
 	);
 
+	const { data, paginationInfo } = useMemo( () => {
+		// Templates
+		//
+		// - [ ] Fields:
+		//   - [x] featured_media: doesn't have one. It can work the same.
+		//   - [x] title
+		//   - [ ] author: doesn't have the _embedded data. Why DataViews renders current date?
+		//   - [x] status
+		//   - [ ] date: it has modified data instead.
+		// - [ ] Filters:
+		//   - [x] author
+		//   - [x] status
+		//   - [ ] search
+		// - [ ] Sorting
+		// - [x] Pagination
+
+		let homeTemplate =
+			templates?.find( ( template ) => template.slug === 'front-page' ) ||
+			templates?.find( ( template ) => template.slug === 'home' ) ||
+			templates?.find( ( template ) => template.slug === 'index' );
+
+		if ( homeTemplate ) {
+			// TODO: make it for real.
+			homeTemplate = {
+				...homeTemplate,
+				_embedded: {
+					author: [ { name: 'Admin' } ],
+				},
+				date: homeTemplate.modified,
+			};
+			if ( view.filters.length > 0 ) {
+				view.filters.forEach( ( filter ) => {
+					if (
+						filter.field === 'author' &&
+						filter.operator === OPERATOR_IN &&
+						!! filter.value
+					) {
+						homeTemplate =
+							homeTemplate.author === filter.value
+								? homeTemplate
+								: undefined;
+					} else if (
+						filter.field === 'author' &&
+						filter.operator === OPERATOR_NOT_IN &&
+						!! filter.value
+					) {
+						homeTemplate =
+							homeTemplate.author !== filter.value
+								? homeTemplate
+								: undefined;
+					} else if (
+						filter.field === 'status' &&
+						filter.operator === OPERATOR_IN &&
+						!! filter.value
+					) {
+						homeTemplate =
+							homeTemplate.status === filter.value
+								? homeTemplate
+								: undefined;
+					}
+				} );
+			}
+		}
+
+		return getPaginationResults( {
+			data: [ homeTemplate, ...( pages || [] ) ].filter( Boolean ),
+			view,
+		} );
+	}, [ view, pages, templates ] );
+
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
 	const restorePostAction = useRestorePostAction();
 	const editPostAction = useEditPostAction();
@@ -348,7 +413,6 @@ export default function PagePages() {
 		[ history ]
 	);
 
-	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
 		<>
 			<Page
@@ -376,8 +440,10 @@ export default function PagePages() {
 					paginationInfo={ paginationInfo }
 					fields={ fields }
 					actions={ actions }
-					data={ pages || EMPTY_ARRAY }
-					isLoading={ isLoadingPages || isLoadingAuthors }
+					data={ data }
+					isLoading={
+						isLoadingPages || isLoadingAuthors || isLoadingTemplates
+					}
 					view={ view }
 					onChangeView={ onChangeView }
 					onSelectionChange={ onSelectionChange }
