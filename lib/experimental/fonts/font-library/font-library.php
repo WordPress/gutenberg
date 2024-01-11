@@ -132,3 +132,22 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 		return apply_filters( 'font_dir', $defaults );
 	}
 }
+
+// @core-merge: This code should probably go into ...?
+if ( ! function_exists( 'use_font_library_for_site_editor' ) ) {
+	/**
+	 * Returns whether the font library can be loaded in the site editor.
+	 * 
+	 * @since 6.5.0
+	 * @param bool $use_font_library Whether the font library can be loaded or not, defaults to true.
+	 */
+	function use_font_library_for_site_editor( $use_font_library = true ) {
+		/**
+		 * Filters whether the font library can be loaded in the site editor.
+		 * 
+		 * @since 6.5.0
+		 * @param bool $use_font_library Whether the font library can be loaded or not.
+		 */
+		return apply_filters( 'use_font_library_for_site_editor', $use_font_library );
+	}
+}
