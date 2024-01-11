@@ -102,6 +102,8 @@ require __DIR__ . '/compat/wordpress-6.4/kses.php';
 
 // WordPress 6.5 compat.
 require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
+require __DIR__ . '/compat/wordpress-6.5/class-wp-script-modules.php';
+require __DIR__ . '/compat/wordpress-6.5/scripts-modules.php';
 require __DIR__ . '/compat/wordpress-6.5/class-wp-navigation-block-renderer.php';
 require __DIR__ . '/compat/wordpress-6.5/kses.php';
 
@@ -129,8 +131,6 @@ require __DIR__ . '/experimental/interactivity-api/directives/wp-class.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-style.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-text.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-interactive.php';
-
-require __DIR__ . '/experimental/modules/class-gutenberg-modules.php';
 
 // Fonts API / Font Face.
 remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WordPress 6.0's stopgap handler.
