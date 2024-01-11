@@ -25,7 +25,7 @@ class Tests_Fonts_WPRESTFontCollectionsController_GetFontCollection extends WP_R
 		add_filter( 'pre_http_request', array( $this, 'mock_request' ), 10, 3 );
 
 		$config_with_file = array(
-			'id'          => 'one-collection',
+			'slug'        => 'one-collection',
 			'name'        => 'One Font Collection',
 			'description' => 'Demo about how to a font collection to your WordPress Font Library.',
 			'src'         => $mock_file,
@@ -33,7 +33,7 @@ class Tests_Fonts_WPRESTFontCollectionsController_GetFontCollection extends WP_R
 		wp_register_font_collection( $config_with_file );
 
 		$config_with_url = array(
-			'id'          => 'collection-with-url',
+			'slug'        => 'collection-with-url',
 			'name'        => 'Another Font Collection',
 			'description' => 'Demo about how to a font collection to your WordPress Font Library.',
 			'src'         => 'https://wordpress.org/fonts/mock-font-collection.json',
@@ -42,7 +42,7 @@ class Tests_Fonts_WPRESTFontCollectionsController_GetFontCollection extends WP_R
 		wp_register_font_collection( $config_with_url );
 
 		$config_with_non_existing_file = array(
-			'id'          => 'collection-with-non-existing-file',
+			'slug'        => 'collection-with-non-existing-file',
 			'name'        => 'Another Font Collection',
 			'description' => 'Demo about how to a font collection to your WordPress Font Library.',
 			'src'         => '/home/non-existing-file.json',
@@ -51,7 +51,7 @@ class Tests_Fonts_WPRESTFontCollectionsController_GetFontCollection extends WP_R
 		wp_register_font_collection( $config_with_non_existing_file );
 
 		$config_with_non_existing_url = array(
-			'id'          => 'collection-with-non-existing-url',
+			'slug'        => 'collection-with-non-existing-url',
 			'name'        => 'Another Font Collection',
 			'description' => 'Demo about how to a font collection to your WordPress Font Library.',
 			'src'         => 'https://non-existing-url-1234x.com.ar/fake-path/missing-file.json',

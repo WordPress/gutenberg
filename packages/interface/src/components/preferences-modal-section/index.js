@@ -10,7 +10,9 @@ const Section = ( { description, title, children } ) => (
 				</p>
 			) }
 		</legend>
-		{ children }
+		<div className="interface-preferences-modal__section-content">
+			{ children }
+		</div>
 	</fieldset>
 );
 

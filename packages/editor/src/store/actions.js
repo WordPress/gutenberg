@@ -624,7 +624,7 @@ export const toggleEditorPanelEnabled =
 		const inactivePanels =
 			registry
 				.select( preferencesStore )
-				.get( 'core/edit-post', 'inactivePanels' ) ?? [];
+				.get( 'core', 'inactivePanels' ) ?? [];
 
 		const isPanelInactive = !! inactivePanels?.includes( panelName );
 
@@ -641,7 +641,7 @@ export const toggleEditorPanelEnabled =
 
 		registry
 			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'inactivePanels', updatedInactivePanels );
+			.set( 'core', 'inactivePanels', updatedInactivePanels );
 	};
 
 /**
@@ -653,9 +653,8 @@ export const toggleEditorPanelOpened =
 	( panelName ) =>
 	( { registry } ) => {
 		const openPanels =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'openPanels' ) ?? [];
+			registry.select( preferencesStore ).get( 'core', 'openPanels' ) ??
+			[];
 
 		const isPanelOpen = !! openPanels?.includes( panelName );
 
@@ -672,7 +671,7 @@ export const toggleEditorPanelOpened =
 
 		registry
 			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'openPanels', updatedOpenPanels );
+			.set( 'core', 'openPanels', updatedOpenPanels );
 	};
 
 /**

@@ -36,7 +36,6 @@ function render_block_core_search( $attributes, $content, $block ) {
 	$show_button         = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'] ) ? false : true;
 	$button_position     = $show_button ? $attributes['buttonPosition'] : null;
 	$query_params        = ( ! empty( $attributes['query'] ) ) ? $attributes['query'] : array();
-	$button_behavior     = ( ! empty( $attributes['buttonBehavior'] ) ) ? $attributes['buttonBehavior'] : 'default';
 	$button              = '';
 	$query_params_markup = '';
 	$inline_styles       = styles_for_block_core_search( $attributes );
@@ -78,7 +77,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 		$input->set_attribute( 'value', get_search_query() );
 		$input->set_attribute( 'placeholder', $attributes['placeholder'] );
 
-		$is_expandable_searchfield = 'button-only' === $button_position && 'expand-searchfield' === $button_behavior;
+		$is_expandable_searchfield = 'button-only' === $button_position;
 		if ( $is_expandable_searchfield ) {
 			$input->set_attribute( 'data-wp-bind--aria-hidden', '!context.isSearchInputVisible' );
 			$input->set_attribute( 'data-wp-bind--tabindex', 'state.tabindex' );
@@ -154,7 +153,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 
 		if ( $button->next_tag() ) {
 			$button->add_class( implode( ' ', $button_classes ) );
-			if ( 'expand-searchfield' === $attributes['buttonBehavior'] && 'button-only' === $attributes['buttonPosition'] ) {
+			if ( 'button-only' === $attributes['buttonPosition'] ) {
 				$button->set_attribute( 'data-wp-bind--aria-label', 'state.ariaLabel' );
 				$button->set_attribute( 'data-wp-bind--aria-controls', 'state.ariaControls' );
 				$button->set_attribute( 'data-wp-bind--aria-expanded', 'context.isSearchInputVisible' );
@@ -249,10 +248,7 @@ function classnames_for_block_core_search( $attributes ) {
 		}
 
 		if ( 'button-only' === $attributes['buttonPosition'] ) {
-			$classnames[] = 'wp-block-search__button-only';
-			if ( ! empty( $attributes['buttonBehavior'] ) && 'expand-searchfield' === $attributes['buttonBehavior'] ) {
-				$classnames[] = 'wp-block-search__button-behavior-expand wp-block-search__searchfield-hidden';
-			}
+			$classnames[] = 'wp-block-search__button-only wp-block-search__searchfield-hidden';
 		}
 	}
 

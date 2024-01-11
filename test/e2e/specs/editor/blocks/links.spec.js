@@ -1228,10 +1228,10 @@ class LinkUtils {
 		await this.page.evaluate( ( _isFixed ) => {
 			const { select, dispatch } = window.wp.data;
 			const isCurrentlyFixed =
-				select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' );
+				select( 'core/preferences' ).get( 'fixedToolbar' );
 
 			if ( isCurrentlyFixed !== _isFixed ) {
-				dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
+				dispatch( 'core/preferences' ).toggle( 'fixedToolbar' );
 			}
 		}, isFixed );
 	}

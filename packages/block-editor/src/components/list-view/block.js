@@ -63,7 +63,7 @@ function ListViewBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 
-	const { isLocked, canEdit } = useBlockLock( clientId );
+	const { isLocked, canEdit, canMove } = useBlockLock( clientId );
 
 	const isFirstSelectedBlock =
 		isSelected && selectedClientIds[ 0 ] === clientId;
@@ -269,6 +269,7 @@ function ListViewBlock( {
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
 		'is-synced': blockInformation?.isSynced,
+		'is-draggable': canMove,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block

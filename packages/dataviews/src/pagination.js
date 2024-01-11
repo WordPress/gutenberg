@@ -23,8 +23,8 @@ const Pagination = memo( function Pagination( {
 		totalPages !== 1 && (
 			<HStack
 				expanded={ false }
-				spacing={ 3 }
-				justify="space-between"
+				spacing={ 6 }
+				justify="end"
 				className="dataviews-pagination"
 			>
 				<HStack justify="flex-start" expanded={ false } spacing={ 2 }>

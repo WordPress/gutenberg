@@ -28,7 +28,7 @@ function MyEditorPreferencesModal() {
 									'Review settings, such as visibility and tags.'
 								) }
 								label={ __(
-									'Enable pre-publish flow'
+									'Enable pre-publish checks'
 								) }
 							/>
 						</PreferencesModalSection>

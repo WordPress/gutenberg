@@ -10,6 +10,11 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Image block media uploads display a custom error message when there is no internet connection [#56937]
+-   [*] Fix missing custom color indicator for custom gradients [#57605]
+-   [**] Display a notice when a network connection unavailable [#56934]
+
+## 1.110.0
 -   [*] [internal] Move InserterButton from components package to block-editor package [#56494]
 -   [*] [internal] Move ImageLinkDestinationsScreen from components package to block-editor package [#56775]
 -   [*] Fix crash when blockType wrapperProps are not defined [#56846]

@@ -26,7 +26,6 @@ import {
 import './hooks';
 import './plugins';
 import Editor from './editor';
-import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
 
 const { PluginPostExcerpt: __experimentalPluginPostExcerpt } =
@@ -55,14 +54,10 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		editorMode: 'visual',
-		fixedToolbar: false,
 		fullscreenMode: true,
 		hiddenBlockTypes: [],
-		inactivePanels: [],
 		isPublishSidebarEnabled: true,
-		openPanels: [ 'post-status' ],
 		preferredStyleVariations: {},
-		showListViewByDefault: false,
 		themeStyles: true,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,
@@ -70,8 +65,12 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
+		fixedToolbar: false,
+		inactivePanels: [],
+		openPanels: [ 'post-status' ],
 		showBlockBreadcrumbs: true,
 		showIconLabels: false,
+		showListViewByDefault: false,
 	} );
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
@@ -79,8 +78,8 @@ export function initializeEditor(
 	// Check if the block list view should be open by default.
 	// If `distractionFree` mode is enabled, the block list view should not be open.
 	if (
-		select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) &&
-		! select( editPostStore ).isFeatureActive( 'distractionFree' )
+		select( preferencesStore ).get( 'core', 'showListViewByDefault' ) &&
+		! select( preferencesStore ).get( 'core', 'distractionFree' )
 	) {
 		dispatch( editorStore ).setIsListViewOpened( true );
 	}
