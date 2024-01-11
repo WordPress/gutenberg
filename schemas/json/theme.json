@@ -619,6 +619,7 @@
 		},
 		"fontFamily": {
 			"type": "object",
+			"description": "Font family preset",
 			"properties": {
 				"name": {
 					"description": "Name of the font family preset, translatable.",
