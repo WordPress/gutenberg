@@ -251,7 +251,7 @@ describe( 'PaletteEdit', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'can delete palette', async () => {
+	it( 'can remove a color', async () => {
 		const user = userEvent.setup();
 		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
