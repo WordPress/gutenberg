@@ -177,6 +177,7 @@ Settings related to typography.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
+| defaultFontSizes | boolean | true |  |
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
