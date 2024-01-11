@@ -3,9 +3,7 @@
  */
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
-/**
- * Internal dependencies
- */
+
 const ALIGN_SUPPORT_KEY = 'align';
 const ALIGN_WIDE_SUPPORT_KEY = 'alignWide';
 const BORDER_SUPPORT_KEY = '__experimentalBorder';
