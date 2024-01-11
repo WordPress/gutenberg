@@ -33,7 +33,7 @@ import { __ } from '@wordpress/i18n';
  */
 import ListViewBranch from './branch';
 import { ListViewContext } from './context';
-import ListViewDropIndicator from './drop-indicator';
+import ListViewDropIndicatorPreview from './drop-indicator-preview';
 import useBlockSelection from './use-block-selection';
 import useListViewBlockIndexes from './use-list-view-block-indexes';
 import useListViewClientIds from './use-list-view-client-ids';
@@ -320,7 +320,8 @@ function ListViewComponent(
 
 	return (
 		<AsyncModeProvider value={ true }>
-			<ListViewDropIndicator
+			<ListViewDropIndicatorPreview
+				draggedBlockClientId={ firstDraggedBlockClientId }
 				listViewRef={ elementRef }
 				blockDropTarget={ blockDropTarget }
 			/>
