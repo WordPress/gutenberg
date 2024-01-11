@@ -83,118 +83,90 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 
 $gutenberg_experiments = get_option( 'gutenberg-experiments' );
 if ( $gutenberg_experiments && (
-	array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ||
+	array_key_exists( 'gutenberg-block-bindings', $gutenberg_experiments ) ||
 	array_key_exists( 'gutenberg-pattern-partial-syncing', $gutenberg_experiments )
 ) ) {
-	/**
-	 * Renders the block meta attributes.
-	 *
-	 * @param string   $block_content Block Content.
-	 * @param array    $block Block attributes.
-	 * @param WP_Block $block_instance The block instance.
-	 */
-	function gutenberg_render_block_connections( $block_content, $block, $block_instance ) {
-		$connection_sources = require __DIR__ . '/connection-sources/index.php';
-		$block_type         = $block_instance->block_type;
 
-		// Allowlist of blocks that support block connections.
-		// Currently, we only allow the following blocks and attributes:
-		// - Paragraph: content.
-		// - Image: url.
-		$blocks_attributes_allowlist = array(
-			'core/paragraph' => array( 'content' ),
-			'core/image'     => array( 'url' ),
-		);
-
-		// Whitelist of the block types that support block connections.
-		// Currently, we only allow the Paragraph and Image blocks to use block connections.
-		if ( ! in_array( $block['blockName'], array_keys( $blocks_attributes_allowlist ), true ) ) {
-			return $block_content;
-		}
-
-		// If for some reason, the block type is not found, skip it.
-		if ( null === $block_type ) {
-			return $block_content;
-		}
-
-		// If the block does not have support for block connections, skip it.
-		if ( ! block_has_support( $block_type, array( '__experimentalConnections' ), false ) ) {
-			return $block_content;
-		}
-
-		// Get all the attributes that have a connection.
-		$connected_attributes = $block['attrs']['connections']['attributes'] ?? false;
-		if ( ! $connected_attributes ) {
-			return $block_content;
-		}
-
-		foreach ( $connected_attributes as $attribute_name => $attribute_value ) {
-
-			// If the attribute is not in the allowlist, skip it.
-			if ( ! in_array( $attribute_name, $blocks_attributes_allowlist[ $block['blockName'] ], true ) ) {
-				continue;
-			}
-
-			// Skip if the source value is not "meta_fields" or "pattern_attributes".
-			if ( 'meta_fields' !== $attribute_value['source'] && 'pattern_attributes' !== $attribute_value['source'] ) {
-				continue;
-			}
-
-			// If the attribute does not have a source, skip it.
-			if ( ! isset( $block_type->attributes[ $attribute_name ]['source'] ) ) {
-				continue;
-			}
-
-			if ( 'pattern_attributes' === $attribute_value['source'] ) {
-				if ( ! _wp_array_get( $block_instance->attributes, array( 'metadata', 'id' ), false ) ) {
-					continue;
-				}
-
-				$custom_value = $connection_sources[ $attribute_value['source'] ]( $block_instance, $attribute_name );
-			} else {
-				// If the attribute does not specify the name of the custom field, skip it.
-				if ( ! isset( $attribute_value['value'] ) ) {
-					continue;
-				}
-
-				// Get the content from the connection source.
-				$custom_value = $connection_sources[ $attribute_value['source'] ](
-					$block_instance,
-					$attribute_value['value']
-				);
-			}
-
-			if ( false === $custom_value ) {
-				continue;
-			}
-
-			$tags  = new WP_HTML_Tag_Processor( $block_content );
-			$found = $tags->next_tag(
-				array(
-					// TODO: In the future, when blocks other than Paragraph and Image are
-					// supported, we should build the full query from CSS selector.
-					'tag_name' => $block_type->attributes[ $attribute_name ]['selector'],
-				)
-			);
-			if ( ! $found ) {
+	require_once __DIR__ . '/block-bindings/index.php';
+		// Allowed blocks that support block bindings.
+	// TODO: Look for a mechanism to opt-in for this. Maybe adding a property to block attributes?
+	global $block_bindings_allowed_blocks;
+	$block_bindings_allowed_blocks = array(
+		'core/paragraph' => array( 'content' ),
+		'core/heading'   => array( 'content' ),
+		'core/image'     => array( 'url', 'title', 'alt' ),
+		'core/button'    => array( 'url', 'text' ),
+	);
+	if ( ! function_exists( 'process_block_bindings' ) ) {
+		/**
+		 * Process the block bindings attribute.
+		 *
+		 * @param string   $block_content Block Content.
+		 * @param array    $block Block attributes.
+		 * @param WP_Block $block_instance The block instance.
+		 */
+		function process_block_bindings( $block_content, $block, $block_instance ) {
+			// If the block doesn't have the bindings property, return.
+			if ( ! isset( $block['attrs']['metadata']['bindings'] ) ) {
 				return $block_content;
 			}
-			$tag_name     = $tags->get_tag();
-			$markup       = "<$tag_name>$custom_value</$tag_name>";
-			$updated_tags = new WP_HTML_Tag_Processor( $markup );
-			$updated_tags->next_tag();
 
-			// Get all the attributes from the original block and add them to the new markup.
-			$names = $tags->get_attribute_names_with_prefix( '' );
-			foreach ( $names as $name ) {
-				$updated_tags->set_attribute( $name, $tags->get_attribute( $name ) );
+			// Assuming the following format for the bindings property of the "metadata" attribute:
+			//
+			// "bindings": {
+			//   "title": {
+			//     "source": {
+			//       "name": "post_meta",
+			//       "attributes": { "value": "text_custom_field" }
+			//     }
+			//   },
+			//   "url": {
+			//     "source": {
+			//       "name": "post_meta",
+			//       "attributes": { "value": "text_custom_field" }
+			//     }
+			//   }
+			// }
+			//
+			global $block_bindings_allowed_blocks;
+			global $block_bindings_sources;
+			$modified_block_content = $block_content;
+			foreach ( $block['attrs']['metadata']['bindings'] as $binding_attribute => $binding_source ) {
+				// If the block is not in the list, stop processing.
+				if ( ! isset( $block_bindings_allowed_blocks[ $block['blockName'] ] ) ) {
+					return $block_content;
+				}
+				// If the attribute is not in the list, process next attribute.
+				if ( ! in_array( $binding_attribute, $block_bindings_allowed_blocks[ $block['blockName'] ], true ) ) {
+					continue;
+				}
+				// If no source is provided, or that source is not registered, process next attribute.
+				if ( ! isset( $binding_source['source'] ) || ! isset( $binding_source['source']['name'] ) || ! isset( $block_bindings_sources[ $binding_source['source']['name'] ] ) ) {
+					continue;
+				}
+
+				$source_callback = $block_bindings_sources[ $binding_source['source']['name'] ]['apply'];
+				// Get the value based on the source.
+				if ( ! isset( $binding_source['source']['attributes'] ) ) {
+					$source_args = array();
+				} else {
+					$source_args = $binding_source['source']['attributes'];
+				}
+				$source_value = $source_callback( $source_args, $block_instance, $binding_attribute );
+				// If the value is null, process next attribute.
+				if ( is_null( $source_value ) ) {
+					continue;
+				}
+
+				// Process the HTML based on the block and the attribute.
+				$modified_block_content = block_bindings_replace_html( $modified_block_content, $block['blockName'], $binding_attribute, $source_value );
 			}
-
-			return $updated_tags->get_updated_html();
+			return $modified_block_content;
 		}
 
-		return $block_content;
+		// Add filter only to the blocks in the list.
+		foreach ( $block_bindings_allowed_blocks as $block_name => $attributes ) {
+			add_filter( 'render_block_' . $block_name, 'process_block_bindings', 20, 3 );
+		}
 	}
-
-	add_filter( 'render_block', 'gutenberg_render_block_connections', 10, 3 );
 }
