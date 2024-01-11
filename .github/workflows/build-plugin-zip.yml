@@ -342,6 +342,7 @@ jobs:
             - name: Publish packages to npm ("latest" dist-tag)
               run: |
                   cd main
+                  'npm install --global npm@"$(jq .engines.npm package.json)"'
                   npm ci
                   ./bin/plugin/cli.js npm-latest --semver minor --ci --repository-path ../publish
               env:
