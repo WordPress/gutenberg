@@ -10,6 +10,8 @@ import userEvent from '@testing-library/user-event';
 import PaletteEdit, { getNameForPosition } from '..';
 import type { PaletteElement } from '../types';
 
+const noop = () => {};
+
 describe( 'getNameForPosition', () => {
 	test( 'should return 1 by default', () => {
 		const slugPrefix = 'test-';
@@ -85,7 +87,7 @@ describe( 'PaletteEdit', () => {
 	const defaultProps = {
 		paletteLabel: 'Test label',
 		slugPrefix: '',
-		onChange: jest.fn(),
+		onChange: noop,
 	};
 
 	const colors = [
@@ -146,7 +148,7 @@ describe( 'PaletteEdit', () => {
 		expect( screen.getByText( 'Test empty message' ) ).toBeVisible();
 	} );
 
-	it( 'can remove all colors', async () => {
+	it( 'shows an option to remove all colors', async () => {
 		const user = userEvent.setup();
 		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
@@ -199,7 +201,15 @@ describe( 'PaletteEdit', () => {
 
 	it( 'calls the `onChange` with the new color appended', async () => {
 		const user = userEvent.setup();
-		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				onChange={ onChange }
+			/>
+		);
 
 		await user.click(
 			screen.getByRole( 'button', {
@@ -208,7 +218,7 @@ describe( 'PaletteEdit', () => {
 		);
 
 		await waitFor( () => {
-			expect( defaultProps.onChange ).toHaveBeenCalledWith( [
+			expect( onChange ).toHaveBeenCalledWith( [
 				...colors,
 				{
 					color: '#000',
@@ -219,9 +229,17 @@ describe( 'PaletteEdit', () => {
 		} );
 	} );
 
-	it( 'can add a new graident palette', async () => {
+	it( 'calls the `onChange` with the new gradient appended', async () => {
 		const user = userEvent.setup();
-		render( <PaletteEdit { ...defaultProps } gradients={ gradients } /> );
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				gradients={ gradients }
+				onChange={ onChange }
+			/>
+		);
 
 		await user.click(
 			screen.getByRole( 'button', {
@@ -230,10 +248,11 @@ describe( 'PaletteEdit', () => {
 		);
 
 		await waitFor( () => {
-			expect( defaultProps.onChange ).toHaveBeenCalledWith( [
-				...colors,
+			expect( onChange ).toHaveBeenCalledWith( [
+				...gradients,
 				{
-					color: '#000',
+					gradient:
+						'linear-gradient(135deg, rgba(6, 147, 227, 1) 0%, rgb(155, 81, 224) 100%)',
 					name: 'Color 1',
 					slug: 'color-1',
 				},
@@ -253,7 +272,15 @@ describe( 'PaletteEdit', () => {
 
 	it( 'can remove a color', async () => {
 		const user = userEvent.setup();
-		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				onChange={ onChange }
+			/>
+		);
 
 		await user.click(
 			screen.getByRole( 'button', {
@@ -273,15 +300,21 @@ describe( 'PaletteEdit', () => {
 		);
 
 		await waitFor( () => {
-			expect( defaultProps.onChange ).toHaveBeenCalledWith( [
-				colors[ 1 ],
-			] );
+			expect( onChange ).toHaveBeenCalledWith( [ colors[ 1 ] ] );
 		} );
 	} );
 
 	it( 'can update palette name', async () => {
 		const user = userEvent.setup();
-		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				onChange={ onChange }
+			/>
+		);
 
 		await user.click(
 			screen.getByRole( 'button', {
@@ -301,7 +334,7 @@ describe( 'PaletteEdit', () => {
 		await user.type( nameInput, 'Primary Updated' );
 
 		await waitFor( () => {
-			expect( defaultProps.onChange ).toHaveBeenCalledWith( [
+			expect( onChange ).toHaveBeenCalledWith( [
 				{
 					...colors[ 0 ],
 					name: 'Primary Updated',
@@ -314,7 +347,15 @@ describe( 'PaletteEdit', () => {
 
 	it( 'can update color palette value', async () => {
 		const user = userEvent.setup();
-		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ colors }
+				onChange={ onChange }
+			/>
+		);
 
 		await user.click( screen.getByLabelText( 'Color: Primary' ) );
 		const hexInput = screen.getByRole( 'textbox', {
@@ -324,7 +365,7 @@ describe( 'PaletteEdit', () => {
 		await user.type( hexInput, '000000' );
 
 		await waitFor( () => {
-			expect( defaultProps.onChange ).toHaveBeenCalledWith( [
+			expect( onChange ).toHaveBeenCalledWith( [
 				{
 					...colors[ 0 ],
 					color: '#000000',
@@ -336,7 +377,15 @@ describe( 'PaletteEdit', () => {
 
 	it( 'can update gradient palette value', async () => {
 		const user = userEvent.setup();
-		render( <PaletteEdit { ...defaultProps } gradients={ gradients } /> );
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				gradients={ gradients }
+				onChange={ onChange }
+			/>
+		);
 
 		await user.click( screen.getByLabelText( 'Gradient: Pale ocean' ) );
 
@@ -346,7 +395,7 @@ describe( 'PaletteEdit', () => {
 		await user.selectOptions( typeSelectElement, 'radial-gradient' );
 
 		await waitFor( () => {
-			expect( defaultProps.onChange ).toHaveBeenLastCalledWith( [
+			expect( onChange ).toHaveBeenCalledWith( [
 				{
 					...gradients[ 0 ],
 					gradient:
