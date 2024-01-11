@@ -140,42 +140,7 @@ class WP_Font_Library {
 		return new WP_Error( 'font_collection_not_found', 'Font collection not found.' );
 	}
 
-	/**
-	 * Gets the upload directory for fonts.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return string Path of the upload directory for fonts.
-	 */
-	public static function get_fonts_dir() {
-		return path_join( WP_CONTENT_DIR, 'fonts' );
-	}
 
-	/**
-	 * Sets the upload directory for fonts.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param array $defaults {
-	 *     Default upload directory.
-	 *
-	 *     @type string $path    Path to the directory.
-	 *     @type string $url     URL for the directory.
-	 *     @type string $subdir  Sub-directory of the directory.
-	 *     @type string $basedir Base directory.
-	 *     @type string $baseurl Base URL.
-	 * }
-	 * @return array Modified upload directory.
-	 */
-	public static function set_upload_dir( $defaults ) {
-		$defaults['basedir'] = WP_CONTENT_DIR;
-		$defaults['baseurl'] = content_url();
-		$defaults['subdir']  = '/fonts';
-		$defaults['path']    = self::get_fonts_dir();
-		$defaults['url']     = $defaults['baseurl'] . '/fonts';
-
-		return $defaults;
-	}
 
 	/**
 	 * Sets the allowed mime types for fonts.

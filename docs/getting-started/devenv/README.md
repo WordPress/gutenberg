@@ -48,3 +48,10 @@ Refer to the [Get started with `wp-env`](/docs/getting-started/devenv/get-starte
 <div class="callout callout-info">
     Throughout the Handbook, you may also see references to <code><a href="https://github.com/WordPress/playground-tools/tree/trunk/packages/wp-now">wp-now</a></code>. This is a lightweight tool powered by <a hre="https://developer.wordpress.org/playground/">WordPress Playground</a> that streamlines setting up a simple local WordPress environment. While still experimental, this tool is great for quickly testing WordPress releases, plugins, and themes. 
 </div>
+
+This list is not exhaustive, but here are several additional options to choose from if you prefer not to use `wp-env`:
+
+- [Local](https://localwp.com/)
+- [XAMPP](https://www.apachefriends.org/)
+- [MAMP](https://www.mamp.info/en/mamp/mac/)
+- [Varying Vagrant Vagrants](https://varyingvagrantvagrants.org/) (VVV)

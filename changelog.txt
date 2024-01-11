@@ -1,5 +1,261 @@
 == Changelog ==
 
+= 17.5.0-rc.1 =
+
+
+
+## Changelog
+
+### Enhancements
+
+#### Editor Unification
+- Editor: Add the show most used blocks preference to the site editor. ([57637](https://github.com/WordPress/gutenberg/pull/57637))
+- Editor: Migrate and unify the panel preferences. ([57529](https://github.com/WordPress/gutenberg/pull/57529))
+- Editor: Unify context text cursor preference. ([57479](https://github.com/WordPress/gutenberg/pull/57479))
+- Editor: Unify list view open preference. ([57504](https://github.com/WordPress/gutenberg/pull/57504))
+- Editor: Unify right click override preference. ([57468](https://github.com/WordPress/gutenberg/pull/57468))
+- Editor: Unify show icon labels preference. ([57480](https://github.com/WordPress/gutenberg/pull/57480))
+- Editor: Unify spotlight mode preference. ([57533](https://github.com/WordPress/gutenberg/pull/57533))
+- Editor: Unify the distraction free preference. ([57590](https://github.com/WordPress/gutenberg/pull/57590))
+- Editor: Unify the show block breadcrumbs preference. ([57506](https://github.com/WordPress/gutenberg/pull/57506))
+- Editor: Unify the top toolbar preference. ([57531](https://github.com/WordPress/gutenberg/pull/57531))
+
+#### Components
+- Components: Replace `TabPanel` with `Tabs` in inline color picker. ([57292](https://github.com/WordPress/gutenberg/pull/57292)
+- Add `compact` size variant to InputControl-based components. ([57398](https://github.com/WordPress/gutenberg/pull/57398))
+- BaseControl: Connect to context system. ([57408](https://github.com/WordPress/gutenberg/pull/57408))
+- Replace `TabPanel` with `Tabs` in the Style Book. ([57287](https://github.com/WordPress/gutenberg/pull/57287))
+- Tooltip: Improve tests. ([57345](https://github.com/WordPress/gutenberg/pull/57345))
+- Update @ariakit/react to v0.3.12 and @ariakit/test to v0.3.7. ([57547](https://github.com/WordPress/gutenberg/pull/57547))
+
+#### Font Library
+- Font Library: Remove "has_font_mime_type" function. ([57364](https://github.com/WordPress/gutenberg/pull/57364))
+- Font Library: Update font uninstall modal text. ([57368](https://github.com/WordPress/gutenberg/pull/57368))
+- Font Library: Add progress-bar while uploading font assets. ([57463](https://github.com/WordPress/gutenberg/pull/57463))
+- Font Library: Singularize install font families endpoint. ([57569](https://github.com/WordPress/gutenberg/pull/57569))
+- Font Library: Unregister font collection. ([54701](https://github.com/WordPress/gutenberg/pull/54701))
+
+#### Site Editor
+- Add Template Modal: Update scroll related layout. ([57617](https://github.com/WordPress/gutenberg/pull/57617))
+- Components: Replace `TabPanel` with `Tabs` in the Font Library `Modal`. ([57181](https://github.com/WordPress/gutenberg/pull/57181))
+
+#### Interactivity API
+- Implement `wp_initial_state()`. ([57556](https://github.com/WordPress/gutenberg/pull/57556))
+- Server directive processing: Stop processing non-interactive blocks. ([56302](https://github.com/WordPress/gutenberg/pull/56302))
+- Interactive template: Use viewModule. ([57712](https://github.com/WordPress/gutenberg/pull/57712))
+- Navigation Block: Use dom.focus for focus control. ([57362](https://github.com/WordPress/gutenberg/pull/57362))
+
+
+#### Site Editor
+- Site editor: Add padding to entity save panel header. ([57471](https://github.com/WordPress/gutenberg/pull/57471))
+- Site editor: Add margin to entity save panel header via a classname. ([57473](https://github.com/WordPress/gutenberg/pull/57473))
+
+
+#### Block Library
+- Post Featured Image: Add a useFirstImageFromPost attribute. ([56573](https://github.com/WordPress/gutenberg/pull/56573))
+- Gallery Block: Add random order setting. ([57477](https://github.com/WordPress/gutenberg/pull/57477))
+- Image Block: Change upload icon label. ([57704](https://github.com/WordPress/gutenberg/pull/57704))
+
+
+### Bug Fixes
+
+- Avoid using a memoized selector without dependencies. ([57257](https://github.com/WordPress/gutenberg/pull/57257))
+- Core Data: Pass the 'options' argument to data action shortcuts. ([57383](https://github.com/WordPress/gutenberg/pull/57383))
+- Preferences: Update accessibility scope to "core". ([57563](https://github.com/WordPress/gutenberg/pull/57563))
+
+#### Block Editor
+- Fix Link UI displaying out of sync results. ([57522](https://github.com/WordPress/gutenberg/pull/57522))
+- Give iframe fallback background color. ([57330](https://github.com/WordPress/gutenberg/pull/57330))
+- Rich text: Add HTML string methods to RichTextData. ([57322](https://github.com/WordPress/gutenberg/pull/57322))
+
+#### Block Library
+- Footnotes: Fix wrong link when adding more than 9 footnotes. ([57599](https://github.com/WordPress/gutenberg/pull/57599))
+- Table: Remove unnecessary margin override in editor styles. ([57699](https://github.com/WordPress/gutenberg/pull/57699))
+- Template Part block: Fix template part path arg missing from actions. ([56790](https://github.com/WordPress/gutenberg/pull/56790))
+
+#### Components
+- DuotonePicker: Fix top margin when no duotone options. ([57489](https://github.com/WordPress/gutenberg/pull/57489))
+- NavigatorProvider: Exclude size value from contain CSS rule. ([57498](https://github.com/WordPress/gutenberg/pull/57498))
+- Snackbar: Fix icon positioning. ([57377](https://github.com/WordPress/gutenberg/pull/57377))
+
+#### Patterns
+- Pattern Overrides: Add `template-lock: All` to pattern inner blocks to prevent deletion/insertion. ([57661](https://github.com/WordPress/gutenberg/pull/57661))
+- Refactor the findOrCreate term method. ([57655](https://github.com/WordPress/gutenberg/pull/57655))
+- Edit source pattern in focus mode in post and site editors. ([57036](https://github.com/WordPress/gutenberg/pull/57036))
+
+
+#### Site Editor
+- Make sure comamnd palette toggle does not disappear while being clicked. ([57420](https://github.com/WordPress/gutenberg/pull/57420))
+- Reinstate iframe CSS for editor canvas container. ([57503](https://github.com/WordPress/gutenberg/pull/57503))
+
+#### Global Styles
+- Use `is-layout` pattern on layout generated classname. ([57564](https://github.com/WordPress/gutenberg/pull/57564))
+- Global styles revisions: Add individual headings translations, update tests. ([57472](https://github.com/WordPress/gutenberg/pull/57472))
+- Global style revisions: Move change summary code and tests to block editor package. ([57411](https://github.com/WordPress/gutenberg/pull/57411))
+- Reduce specificity of block style variation selectors. ([57659](https://github.com/WordPress/gutenberg/pull/57659))
+- Background image block support: Add tests for size and repeat output. ([57474](https://github.com/WordPress/gutenberg/pull/57474))
+
+
+#### Post Editor
+- Fix Template preview menu item accessibility. ([57456](https://github.com/WordPress/gutenberg/pull/57456))
+- Fullscreen mode description: Use full text instead of abbreviation. ([57518](https://github.com/WordPress/gutenberg/pull/57518))
+- Improve pre-publish checks naming consistency. ([57019](https://github.com/WordPress/gutenberg/pull/57019))
+- Make the Replace featured image button perceivable by assistive technologies. ([57453](https://github.com/WordPress/gutenberg/pull/57453))
+
+#### Components
+- Label the HeightControl. ([57683](https://github.com/WordPress/gutenberg/pull/57683))
+- NumberControl: Make increment and decrement buttons keyboard accessible. ([57402](https://github.com/WordPress/gutenberg/pull/57402))
+
+#### Block Tools
+- Update the position of the patterns tab in the inserter menu. ([55688](https://github.com/WordPress/gutenberg/pull/55688))
+- Use full text instead of abbreviation for min height setting. ([57680](https://github.com/WordPress/gutenberg/pull/57680))
+- ResizableEditor: Fix tab order for resize handles. ([57475](https://github.com/WordPress/gutenberg/pull/57475))
+- Keep Lock button it in the toolbar until unmounted. ([57229](https://github.com/WordPress/gutenberg/pull/57229))
+- Custom field connections: Better description on Experiments page. ([57501](https://github.com/WordPress/gutenberg/pull/57501))
+
+### Performance
+
+#### Block Library
+- File: Remove 'block-editor' store subscription. ([57511](https://github.com/WordPress/gutenberg/pull/57511))
+- Remove store subscriptions from Audio and Video blocks. ([57449](https://github.com/WordPress/gutenberg/pull/57449))
+- Site Logo: Remove unnecessary  'block-editor' store subscription. ([57513](https://github.com/WordPress/gutenberg/pull/57513))
+- Send numerical post id when uploading image. ([57388](https://github.com/WordPress/gutenberg/pull/57388))
+- PostFeaturedImage: Remove unnecessary 'block-editor' store subscription. ([57554](https://github.com/WordPress/gutenberg/pull/57554))
+
+### Experiments
+
+#### Data Views
+- DataViews: Use DropdownMenuRadioItem component when possible. ([57505](https://github.com/WordPress/gutenberg/pull/57505))
+- Align icon size + placement in Patterns data view. ([57548](https://github.com/WordPress/gutenberg/pull/57548))
+- DataViews: Add `duplicate pattern` action in patterns page. ([57592](https://github.com/WordPress/gutenberg/pull/57592))
+- DataViews: Add duplicate template pattern action. ([57638](https://github.com/WordPress/gutenberg/pull/57638))
+- DataViews: Add footer to Pages sidebar. ([57690](https://github.com/WordPress/gutenberg/pull/57690))
+- DataViews: Add new page button in `Pages`. ([57685](https://github.com/WordPress/gutenberg/pull/57685))
+- DataViews: Add sync filter in patterns page. ([57532](https://github.com/WordPress/gutenberg/pull/57532))
+- DataViews: Consolidate CSS selectors naming schema. ([57651](https://github.com/WordPress/gutenberg/pull/57651))
+- DataViews: Fallback to `(no title)` is there's no rendered title. ([57434](https://github.com/WordPress/gutenberg/pull/57434))
+- DataViews: Hide actions menu upon selecting a layout. ([57418](https://github.com/WordPress/gutenberg/pull/57418))
+- DataViews: Make `fields` dependant on `view.type`. ([57450](https://github.com/WordPress/gutenberg/pull/57450))
+- DataViews: Memoize `onSetSelection`. ([57458](https://github.com/WordPress/gutenberg/pull/57458))
+- DataViews: Prevent unnecessary re-renders of Pagination. ([57454](https://github.com/WordPress/gutenberg/pull/57454))
+- DataViews: Prevent unnecessary re-renders. ([57452](https://github.com/WordPress/gutenberg/pull/57452))
+- DataViews: Update names for `DropdownMenuRadioItemCustom`. ([57416](https://github.com/WordPress/gutenberg/pull/57416))
+- DataViews: Use i18n._x to clarify term "Duplicate". ([57686](https://github.com/WordPress/gutenberg/pull/57686))
+- DataViews: Use in patterns page. ([57333](https://github.com/WordPress/gutenberg/pull/57333))
+- Dataview: Change the stacking order of table header. ([57565](https://github.com/WordPress/gutenberg/pull/57565))
+- Dataviews: Add some client side data handling utils. ([57488](https://github.com/WordPress/gutenberg/pull/57488))
+- Make title display in grid views consistent. ([57553](https://github.com/WordPress/gutenberg/pull/57553))
+- Update Table layout design details. ([57644](https://github.com/WordPress/gutenberg/pull/57644))
+- Update pagination spacing in List layout. ([57670](https://github.com/WordPress/gutenberg/pull/57670))
+- Update table header gap. ([57671](https://github.com/WordPress/gutenberg/pull/57671))
+- [Dataviews] Table layout: Ensure focus is not lost on interaction. ([57340](https://github.com/WordPress/gutenberg/pull/57340))
+
+#### Patterns
+- [Pattern Overrides] Fix duplication of inner blocks. ([57538](https://github.com/WordPress/gutenberg/pull/57538))
+- [Pattern overrides] Allow multiple attributes overrides. ([57573](https://github.com/WordPress/gutenberg/pull/57573))
+
+
+### Documentation
+
+- Add links to additional local dev tools in Block Developement Environment readme. ([57682](https://github.com/WordPress/gutenberg/pull/57682))
+- Add new section to the Quick Start Guide about wp-env. ([57559](https://github.com/WordPress/gutenberg/pull/57559))
+- Block JSON schema: Add renaming key to supports definition. ([57373](https://github.com/WordPress/gutenberg/pull/57373))
+- Break out the Curating the Editor Experience doc into its own How-to Guides section. ([57289](https://github.com/WordPress/gutenberg/pull/57289))
+- Change the slug for the theme.json doc to avoid conflicts. ([57410](https://github.com/WordPress/gutenberg/pull/57410))
+- Docs/tutorial: Fix opposite condition for content generation in render.php. ([57445](https://github.com/WordPress/gutenberg/pull/57445))
+- Docs: Fundamentals of Block Development - Static or Dynamic rendering of a block. ([57250](https://github.com/WordPress/gutenberg/pull/57250))
+- Docs: Update sample code to fix React warning error on Tutorial page. ([57412](https://github.com/WordPress/gutenberg/pull/57412))
+- Fix formatting issue due to incorrect link parsing in the Quick Start Guide. ([57693](https://github.com/WordPress/gutenberg/pull/57693))
+- Fix incorrect heading level in Editor curation documentation. ([57409](https://github.com/WordPress/gutenberg/pull/57409))
+- Fix two typos in tutorial.md. ([57627](https://github.com/WordPress/gutenberg/pull/57627))
+- Fix: Create block getting started links. ([57551](https://github.com/WordPress/gutenberg/pull/57551))
+- Improve the static vs dynamic rendering comment in the block tutorial. ([57284](https://github.com/WordPress/gutenberg/pull/57284))
+- Update copyright year to 2024 in `license.md`. ([57481](https://github.com/WordPress/gutenberg/pull/57481))
+- Update the "Build your first block" tutorial based on user feedback. ([57403](https://github.com/WordPress/gutenberg/pull/57403))
+- Update: Material design icons link. ([57550](https://github.com/WordPress/gutenberg/pull/57550))
+
+
+### Code Quality
+- Editor: Unify the DocumentTools component. ([57214](https://github.com/WordPress/gutenberg/pull/57214))
+- Make getLastFocus and setLastFocus private. ([57612](https://github.com/WordPress/gutenberg/pull/57612))
+- Remove deprecated `behaviors` syntax. ([57165](https://github.com/WordPress/gutenberg/pull/57165))
+- Avoid extra `useMarkPersistent` dispatch calls. ([57435](https://github.com/WordPress/gutenberg/pull/57435))
+- Clean up code editor CSS. ([57519](https://github.com/WordPress/gutenberg/pull/57519))
+- Combine selectors in 'useTransformCommands'. ([57424](https://github.com/WordPress/gutenberg/pull/57424))
+
+#### Block Library
+- Background image: Add has-background classname when background image is applied. ([57495](https://github.com/WordPress/gutenberg/pull/57495))
+- File: Remove unnecessary synchronization effect. ([57585](https://github.com/WordPress/gutenberg/pull/57585))
+- Navigation: Refactor mobile overlay breakpoints to JS. ([57520](https://github.com/WordPress/gutenberg/pull/57520))
+- Search Block: Remove unused `buttonBehavior` attribute. ([53467](https://github.com/WordPress/gutenberg/pull/53467))
+
+#### Patterns
+- Improve inserter pattern constants. ([57570](https://github.com/WordPress/gutenberg/pull/57570))
+- Remove duplicate setting for `getPostLinkProps` and prefer stable naming. ([57535](https://github.com/WordPress/gutenberg/pull/57535))
+- Rename `patternBlock` to `patternPost`. ([57568](https://github.com/WordPress/gutenberg/pull/57568))
+
+#### Post Editor
+- Editor: Use hooks instead of HoCs in 'PostVisibilityCheck'. ([57705](https://github.com/WordPress/gutenberg/pull/57705))
+- Quality: Avoid React warning when changing rendering mode. ([57413](https://github.com/WordPress/gutenberg/pull/57413))
+
+#### Block Editor
+- Editor: Unify the inserter sidebar. ([57466](https://github.com/WordPress/gutenberg/pull/57466))
+- Remove unused parameters from useOnBlockDrop. ([57527](https://github.com/WordPress/gutenberg/pull/57527))
+
+#### List View
+- Editor: Unify the list view sidebar between the post and site editors. ([57467](https://github.com/WordPress/gutenberg/pull/57467))
+- Add drag cursor to draggable list items. ([57493](https://github.com/WordPress/gutenberg/pull/57493))
+
+### Tools
+
+- Dependency Extraction Webpack Plugin: Use `import` for module externals. ([57577](https://github.com/WordPress/gutenberg/pull/57577))
+- DependencyExtractionWebpackPlugin: Add true shorthand for requestToExternalModule. ([57593](https://github.com/WordPress/gutenberg/pull/57593))
+- DependencyExtractionWebpackPlugin: Use module for @wordpress/interactivity. ([57602](https://github.com/WordPress/gutenberg/pull/57602))
+- Fix webpack not setting environment.module true. ([57714](https://github.com/WordPress/gutenberg/pull/57714))
+- Modules: Load the import map polyfill when needed. ([57256](https://github.com/WordPress/gutenberg/pull/57256))
+- Blocks: Add handling for block.json viewModule. ([57437](https://github.com/WordPress/gutenberg/pull/57437))
+
+#### Testing
+- Allowed Patterns end-to-end test - move tests that run with a subset of allowed blocks into a group. ([57496](https://github.com/WordPress/gutenberg/pull/57496))
+- Clean up end-to-end tests package. ([57575](https://github.com/WordPress/gutenberg/pull/57575))
+- Fix flaky 'Post publish button' end-to-end test. ([57407](https://github.com/WordPress/gutenberg/pull/57407))
+- Migrate 'allowed patterns' end-to-end tests to Playwright. ([57399](https://github.com/WordPress/gutenberg/pull/57399))
+- Migrate 'block editor keyboard shortcuts' end-to-end tests to Playwright. ([57422](https://github.com/WordPress/gutenberg/pull/57422))
+- Migrate 'core settings' end-to-end tests to Playwright. ([57581](https://github.com/WordPress/gutenberg/pull/57581))
+- Migrate 'datepicker' end-to-end tests to Playwright. ([57545](https://github.com/WordPress/gutenberg/pull/57545))
+- Migrate 'dropdown menu' end-to-end tests to Playwright. ([57663](https://github.com/WordPress/gutenberg/pull/57663))
+- Migrate 'editor modes' end-to-end tests to Playwright. ([57574](https://github.com/WordPress/gutenberg/pull/57574))
+- Migrate 'invalid blocks' end-to-end tests to Playwright. ([57508](https://github.com/WordPress/gutenberg/pull/57508))
+- Migrate 'nux' end-to-end tests to Playwright. ([57542](https://github.com/WordPress/gutenberg/pull/57542))
+- Migrate 'preferences' end-to-end tests to Playwright. ([57446](https://github.com/WordPress/gutenberg/pull/57446))
+- Migrate 'publishing' end-to-end tests to Playwright. ([57521](https://github.com/WordPress/gutenberg/pull/57521))
+- Migrate 'scheduling' end-to-end tests to Playwright. ([57539](https://github.com/WordPress/gutenberg/pull/57539))
+- Migrate 'sidebar' end-to-end tests to Playwright. ([57448](https://github.com/WordPress/gutenberg/pull/57448))
+- Migrate 'taxonomies' end-to-end tests to Playwright. ([57662](https://github.com/WordPress/gutenberg/pull/57662))
+- Migrate `editing-widgets` to Playwright. ([57483](https://github.com/WordPress/gutenberg/pull/57483))
+- Migrate remaining 'publish panel' end-to-end tests to Playwright. ([57432](https://github.com/WordPress/gutenberg/pull/57432))
+- Update 'missing block' end-to-end tests to use the 'setContent' helper. ([57509](https://github.com/WordPress/gutenberg/pull/57509))
+
+#### Build Tooling
+- Group GitHub Action Dependabot updates. ([57591](https://github.com/WordPress/gutenberg/pull/57591))
+- WP Scripts: Build block.json viewModule. ([57461](https://github.com/WordPress/gutenberg/pull/57461))
+- Dependency Extraction Webpack Plugin: Add Module support. ([57199](https://github.com/WordPress/gutenberg/pull/57199))
+
+## First time contributors
+
+The following PRs were merged by first time contributors:
+
+- @HrithikDalal: Font Library: Update font uninstall modal text. ([57368](https://github.com/WordPress/gutenberg/pull/57368))
+- @muhme: Fix two typos in tutorial.md. ([57627](https://github.com/WordPress/gutenberg/pull/57627))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@afercia @andrewhayward @andrewserong @atachibana @c4rl0sbr4v0 @carolinan @chad1008 @ciampo @DAreRodz @dcalhoun @derekblank @desrosj @ellatrix @fai-sal @fluiddot @geriux @getdave @glendaviesnz @gziolo @hbhalodia @HrithikDalal @jameskoster @jeryj @jorgefilipecosta @jsnajdr @juanmaguitar @kevin940726 @Mamaduka @matiasbenedetto @mcsf @michalczaplinski @mirka @muhme @ndiego @ntsekouras @oandregal @ockham @ramonjd @scruffian @sirreal @Soean @t-hamano @talldan @tellthemachines @youknowriad
+
+
 = 17.3.2 =
 
 ## Changelog
