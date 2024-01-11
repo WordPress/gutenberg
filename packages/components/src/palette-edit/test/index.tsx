@@ -163,7 +163,7 @@ describe( 'PaletteEdit', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'can reset colors', async () => {
+	it( 'shows a reset option when the `canReset` prop is enabled', async () => {
 		const user = userEvent.setup();
 		render(
 			<PaletteEdit { ...defaultProps } colors={ colors } canReset />
