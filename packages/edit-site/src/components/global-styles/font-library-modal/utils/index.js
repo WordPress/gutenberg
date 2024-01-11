@@ -176,6 +176,11 @@ export function makeFormDataFromFontFamily( fontFamily ) {
 export async function downloadFontFaceAsset( url ) {
 	return fetch( new Request( url ) )
 		.then( ( response ) => {
+			if ( ! response.ok ) {
+				throw new Error(
+					`Error downloading font face asset from ${ url }. Server responded with status: ${ response.status }`
+				);
+			}
 			return response.blob();
 		} )
 		.then( ( blob ) => {
@@ -184,5 +189,13 @@ export async function downloadFontFaceAsset( url ) {
 				type: blob.type,
 			} );
 			return file;
+		} )
+		.catch( ( error ) => {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Error downloading font face asset from ${ url }:`,
+				error
+			);
+			throw error;
 		} );
 }
