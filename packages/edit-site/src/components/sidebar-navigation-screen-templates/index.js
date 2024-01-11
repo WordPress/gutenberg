@@ -108,7 +108,7 @@ function SidebarTemplatesList( { templates } ) {
 	sortedTemplates.sort( ( a, b ) =>
 		a.title.rendered.localeCompare( b.title.rendered )
 	);
-	const { themeTemplates, customTemplates, ...pluginTemplates } =
+	const { hierarchyTemplates, customTemplates, ...plugins } =
 		sortedTemplates.reduce(
 			( accumulator, template ) => {
 				const {
@@ -123,16 +123,16 @@ function SidebarTemplatesList( { templates } ) {
 				} else if ( template.is_custom ) {
 					accumulator.customTemplates.push( template );
 				} else {
-					accumulator.themeTemplates.push( template );
+					accumulator.hierarchyTemplates.push( template );
 				}
 				return accumulator;
 			},
-			{ themeTemplates: [], customTemplates: [] }
+			{ hierarchyTemplates: [], customTemplates: [] }
 		);
 	return (
 		<VStack spacing={ 3 }>
-			{ !! themeTemplates.length && (
-				<TemplatesGroup templates={ themeTemplates } />
+			{ !! hierarchyTemplates.length && (
+				<TemplatesGroup templates={ hierarchyTemplates } />
 			) }
 			{ !! customTemplates.length && (
 				<TemplatesGroup
@@ -140,18 +140,17 @@ function SidebarTemplatesList( { templates } ) {
 					templates={ customTemplates }
 				/>
 			) }
-			{ !! Object.keys( pluginTemplates ).length &&
-				Object.entries( pluginTemplates ).map(
-					( [ plugin, _pluginTemplates ] ) => {
-						return (
-							<TemplatesGroup
-								key={ plugin }
-								title={ plugin }
-								templates={ _pluginTemplates }
-							/>
-						);
-					}
-				) }
+			{ Object.entries( plugins ).map(
+				( [ plugin, pluginTemplates ] ) => {
+					return (
+						<TemplatesGroup
+							key={ plugin }
+							title={ plugin }
+							templates={ pluginTemplates }
+						/>
+					);
+				}
+			) }
 		</VStack>
 	);
 }
