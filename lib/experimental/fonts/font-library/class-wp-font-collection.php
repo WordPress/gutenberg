@@ -43,8 +43,8 @@ class WP_Font_Collection {
 			throw new Exception( 'Font Collection config options is required as a non-empty array.' );
 		}
 
-		if ( empty( $config['id'] ) || ! is_string( $config['id'] ) ) {
-			throw new Exception( 'Font Collection config ID is required as a non-empty string.' );
+		if ( empty( $config['slug'] ) || ! is_string( $config['slug'] ) ) {
+			throw new Exception( 'Font Collection config slug is required as a non-empty string.' );
 		}
 
 		if ( empty( $config['name'] ) || ! is_string( $config['name'] ) ) {
@@ -66,14 +66,14 @@ class WP_Font_Collection {
 	 * @return array {
 	 *     An array of font collection config.
 	 *
-	 *     @type string $id          The font collection's unique ID.
+	 *     @type string $slug        The font collection's unique slug.
 	 *     @type string $name        The font collection's name.
 	 *     @type string $description The font collection's description.
 	 * }
 	 */
 	public function get_config() {
 		return array(
-			'id'          => $this->config['id'],
+			'slug'        => $this->config['slug'],
 			'name'        => $this->config['name'],
 			'description' => $this->config['description'] ?? '',
 		);
@@ -90,7 +90,7 @@ class WP_Font_Collection {
 	 * @return array {
 	 *     An array of font collection config and data.
 	 *
-	 *     @type string $id          The font collection's unique ID.
+	 *     @type string $slug          The font collection's unique ID.
 	 *     @type string $name        The font collection's name.
 	 *     @type string $description The font collection's description.
 	 *     @type array  $data        The font collection's data as a PHP array.

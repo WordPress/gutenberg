@@ -34,39 +34,39 @@ class Tests_Fonts_WpFontCollection_GetConfig extends WP_UnitTestCase {
 		return array(
 			'with a file' => array(
 				'config'        => array(
-					'id'          => 'my-collection',
+					'slug'        => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 					'src'         => $mock_file,
 				),
 				'expected_data' => array(
-					'id'          => 'my-collection',
+					'slug'        => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 				),
 			),
 			'with a url'  => array(
 				'config'        => array(
-					'id'          => 'my-collection-with-url',
+					'slug'        => 'my-collection-with-url',
 					'name'        => 'My Collection with URL',
 					'description' => 'My collection description',
 					'src'         => 'https://localhost/fonts/mock-font-collection.json',
 				),
 				'expected_data' => array(
-					'id'          => 'my-collection-with-url',
+					'slug'        => 'my-collection-with-url',
 					'name'        => 'My Collection with URL',
 					'description' => 'My collection description',
 				),
 			),
 			'with data'   => array(
 				'config'        => array(
-					'id'          => 'my-collection',
+					'slug'        => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 					'data'        => array( 'this is mock data' => true ),
 				),
 				'expected_data' => array(
-					'id'          => 'my-collection',
+					'slug'        => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 				),
