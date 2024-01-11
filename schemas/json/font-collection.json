@@ -1,5 +1,5 @@
 {
-	"title": "JSON schema for WordPress Font Collection",
+	"title": "JSON schema for WordPress Font Collections",
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"type": "object",
 	"properties": {
