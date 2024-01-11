@@ -40,7 +40,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 
 	// Aspect ratio with a height set needs to override the default width/height.
 	if ( ! empty( $attributes['aspectRatio'] ) ) {
-		$extra_styles .= esc_attr( safecss_filter_attr( 'aspect-ratio:' . $attributes['aspectRatio'] ) ). ';';
+		$extra_styles .= esc_attr( safecss_filter_attr( 'aspect-ratio:' . $attributes['aspectRatio'] ) ) . ';';
 	}
 
 	if ( ! empty( $attributes['width'] ) ) {
