@@ -17,7 +17,12 @@ import {
 	useMergeRefs,
 	useDebounce,
 } from '@wordpress/compose';
-import { createContext, useMemo, useCallback, useEffect } from '@wordpress/element';
+import {
+	createContext,
+	useMemo,
+	useCallback,
+	useEffect,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -34,6 +39,7 @@ import {
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
 import { useTypingObserver } from '../observe-typing';
+import { unlock } from '../../lock-unlock';
 
 export const IntersectionObserver = createContext();
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
@@ -114,9 +120,7 @@ function Root( { className, ...settings } ) {
 }
 
 function StopEditingAsBlocksOnOutsideSelect( { clientId } ) {
-	const {
-		__unstableStopEditingAsBlocks,
-	} = useDispatch( blockEditorStore );
+	const { stopEditingAsBlocks } = unlock( useDispatch( blockEditorStore ) );
 	const isBlockOrDescendantSelected = useSelect(
 		( select ) => {
 			const { isBlockSelected, hasSelectedInnerBlock } =
@@ -130,9 +134,9 @@ function StopEditingAsBlocksOnOutsideSelect( { clientId } ) {
 	);
 	useEffect( () => {
 		if ( ! isBlockOrDescendantSelected ) {
-			__unstableStopEditingAsBlocks( clientId );
+			stopEditingAsBlocks( clientId );
 		}
-	}, [ isBlockOrDescendantSelected, clientId, __unstableStopEditingAsBlocks ] );
+	}, [ isBlockOrDescendantSelected, clientId, stopEditingAsBlocks ] );
 	return null;
 }
 
@@ -151,23 +155,25 @@ function Items( {
 	__experimentalAppenderTagName,
 	layout = defaultLayout,
 } ) {
-	const { order, selectedBlocks, visibleBlocks, temporarilyEditingAsBlocks } = useSelect(
-		( select ) => {
-			const {
-				getBlockOrder,
-				getSelectedBlockClientIds,
-				__unstableGetVisibleBlocks,
-				__unstableGetTemporarilyEditingAsBlocks,
-			} = select( blockEditorStore );
-			return {
-				order: getBlockOrder( rootClientId ),
-				selectedBlocks: getSelectedBlockClientIds(),
-				visibleBlocks: __unstableGetVisibleBlocks(),
-				temporarilyEditingAsBlocks: __unstableGetTemporarilyEditingAsBlocks(),
-			};
-		},
-		[ rootClientId ]
-	);
+	const { order, selectedBlocks, visibleBlocks, temporarilyEditingAsBlocks } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockOrder,
+					getSelectedBlockClientIds,
+					__unstableGetVisibleBlocks,
+					__unstableGetTemporarilyEditingAsBlocks,
+				} = select( blockEditorStore );
+				return {
+					order: getBlockOrder( rootClientId ),
+					selectedBlocks: getSelectedBlockClientIds(),
+					visibleBlocks: __unstableGetVisibleBlocks(),
+					temporarilyEditingAsBlocks:
+						__unstableGetTemporarilyEditingAsBlocks(),
+				};
+			},
+			[ rootClientId ]
+		);
 
 	return (
 		<LayoutProvider value={ layout }>
@@ -188,7 +194,11 @@ function Items( {
 				</AsyncModeProvider>
 			) ) }
 			{ order.length < 1 && placeholder }
-			{ !! temporarilyEditingAsBlocks && <StopEditingAsBlocksOnOutsideSelect clientId={ temporarilyEditingAsBlocks } /> }
+			{ !! temporarilyEditingAsBlocks && (
+				<StopEditingAsBlocksOnOutsideSelect
+					clientId={ temporarilyEditingAsBlocks }
+				/>
+			) }
 			<BlockListAppender
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }

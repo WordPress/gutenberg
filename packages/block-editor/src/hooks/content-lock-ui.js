@@ -11,6 +11,7 @@ import { useCallback } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../store';
 import { BlockControls, BlockSettingsMenuControls } from '../components';
+import { unlock } from '../lock-unlock';
 
 // The implementation of content locking is mainly in this file, although the mechanism
 // to stop temporarily editing as blocks when an outside block is selected is on component StopEditingAsBlocksOnOutsideSelect
@@ -41,17 +42,17 @@ function ContentLockControlsPure( { clientId, isSelected } ) {
 	const {
 		updateSettings,
 		updateBlockListSettings,
-		__unstableStopEditingAsBlocks,
 		__unstableSetTemporarilyEditingAsBlocks,
 	} = useDispatch( blockEditorStore );
+	const { stopEditingAsBlocks } = unlock( useDispatch( blockEditorStore ) );
 	const isContentLocked =
 		! isLockedByParent && templateLock === 'contentOnly';
 	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 
-	const stopEditingAsBlock = useCallback( () => {
-		__unstableStopEditingAsBlocks( clientId );
-	}, [ clientId, __unstableStopEditingAsBlocks ] );
+	const stopEditingAsBlockCallback = useCallback( () => {
+		stopEditingAsBlocks( clientId );
+	}, [ clientId, stopEditingAsBlocks ] );
 
 	if ( ! isContentLocked && ! isEditingAsBlocks ) {
 		return null;
@@ -66,11 +67,7 @@ function ContentLockControlsPure( { clientId, isSelected } ) {
 			{ showStopEditingAsBlocks && (
 				<>
 					<BlockControls group="other">
-						<ToolbarButton
-							onClick={ () => {
-								stopEditingAsBlock();
-							} }
-						>
+						<ToolbarButton onClick={ stopEditingAsBlockCallback }>
 							{ __( 'Done' ) }
 						</ToolbarButton>
 					</BlockControls>

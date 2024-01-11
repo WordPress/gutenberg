@@ -1700,32 +1700,6 @@ export function __unstableSetTemporarilyEditingAsBlocks(
 }
 
 /**
- * Action that stops temporarily editing as blocks.
- *
- * DO-NOT-USE in production.
- * This action is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- *
- * @param {string} clientId The block's clientId.
- */
-export function __unstableStopEditingAsBlocks( clientId ) {
-	return ( { select, dispatch } ) => {
-		const focusModeToRevert =
-			select.__unstableGetTemporarilyEditingFocusModeToRevert();
-		dispatch.__unstableMarkNextChangeAsNotPersistent();
-		dispatch.updateBlockAttributes( clientId, {
-			templateLock: 'contentOnly',
-		} );
-		dispatch.updateBlockListSettings( clientId, {
-			...select.getBlockListSettings( clientId ),
-			templateLock: 'contentOnly',
-		} );
-		dispatch.updateSettings( { focusMode: focusModeToRevert } );
-		dispatch.__unstableSetTemporarilyEditingAsBlocks();
-	};
-}
-
-/**
  * Interface for inserter media requests.
  *
  * @typedef {Object} InserterMediaRequest
