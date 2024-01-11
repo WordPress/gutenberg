@@ -32,9 +32,8 @@ import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PanelBody,
+	SelectControl,
 	ToggleControl,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Button,
 	Spinner,
 	Notice,
@@ -568,37 +567,39 @@ function Navigation( {
 								</div>
 							</>
 						) }
-						<h3>{ __( 'Overlay Menu' ) }</h3>
-						<ToggleGroupControl
-							__nextHasNoMarginBottom
-							label={ __( 'Configure overlay menu' ) }
-							value={ overlayMenu }
+						<SelectControl
+							label={ __( 'Navigation Overlay' ) }
 							help={ __(
-								'Collapses the navigation options in a menu icon opening an overlay.'
+								'Specifies the point at which the navigation will collapse to an icon opening an overlay.'
 							) }
+							value={ overlayMenu }
+							options={ [
+								{
+									label: __( 'Never show the overlay' ),
+									value: 'never',
+								},
+								{
+									label: __(
+										'Show the overlay on mobile devices'
+									),
+									value: 'mobile',
+								},
+								{
+									label: __(
+										'Show the overlay when the navigation items do not fit on one line'
+									),
+									value: 'auto',
+								},
+								{
+									label: __( 'Always show the overlay' ),
+									value: 'always',
+								},
+							] }
 							onChange={ ( value ) =>
 								setAttributes( { overlayMenu: value } )
 							}
-							isBlock
-							hideLabelFromVision
-						>
-							<ToggleGroupControlOption
-								value="never"
-								label={ __( 'Off' ) }
-							/>
-							<ToggleGroupControlOption
-								value="mobile"
-								label={ __( 'Mobile' ) }
-							/>
-							<ToggleGroupControlOption
-								value="auto"
-								label={ __( 'Auto' ) }
-							/>
-							<ToggleGroupControlOption
-								value="always"
-								label={ __( 'Always' ) }
-							/>
-						</ToggleGroupControl>
+							__nextHasNoMarginBottom
+						/>
 						{ hasSubmenus && (
 							<>
 								<h3>{ __( 'Submenus' ) }</h3>
