@@ -181,7 +181,7 @@ describe( 'PaletteEdit', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'can not reset colors', async () => {
+	it( 'does not show a reset colors option when `canReset` is disabled', async () => {
 		const user = userEvent.setup();
 		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
