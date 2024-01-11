@@ -32,7 +32,7 @@ exports.iosServer = ( { iPadDevice = false } ) => ( {
 	deviceName: ! iPadDevice
 		? iOSConfig.saucelabs.deviceName
 		: iOSConfig.saucelabs.deviceTabletName,
-	platformVersion: iOSConfig.local.platformVersion,
+	platformVersion: iOSConfig.saucelabs.platformVersion,
 	pixelRatio: ! iPadDevice
 		? iOSConfig.pixelRatio.iPhone
 		: iOSConfig.pixelRatio.iPad,
