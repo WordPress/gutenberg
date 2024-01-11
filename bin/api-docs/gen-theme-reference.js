@@ -134,7 +134,7 @@ const getSettingsPropertiesMarkup = ( struct ) => {
 		const def = 'default' in props[ key ] ? props[ key ].default : '';
 		const ps =
 			props[ key ].type === 'array'
-				? // ? keys( props[ key ].items.properties ).sort().join( ', ' )
+				?
 				  keys( getPropertiesFromArray( props[ key ].items ) )
 						.sort()
 						.join( ', ' )
