@@ -133,6 +133,7 @@ export {
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
+export { default as QuickInserter } from './inserter/quick-inserter';
 export { default as __experimentalLibrary } from './inserter/library';
 export { default as BlockEditorKeyboardShortcuts } from './keyboard-shortcuts';
 export { MultiSelectScrollIntoView } from './selection-scroll-into-view';

@@ -724,6 +724,10 @@ _Returns_
 
 -   `JSX.Element`: A React element.
 
+### QuickInserter
+
+Undocumented declaration.
+
 ### ReusableBlocksRenameHint
 
 Undocumented declaration.
