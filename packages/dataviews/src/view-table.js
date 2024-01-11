@@ -308,7 +308,7 @@ function WithSeparators( { children } ) {
 }
 
 function BulkSelectionCheckbox( { selection, onSelectionChange, data } ) {
-	const areAllSelected = selection && selection.length === data.length;
+	const areAllSelected = selection.length === data.length;
 	return (
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
