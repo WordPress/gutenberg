@@ -85,7 +85,7 @@ jobs:
               if: ${{ github.event.inputs.release_type == 'development' }}
               run: |
                   cd cli
-                  'npm install --global npm@"$(jq .engines.npm package.json)"'
+                  'npm install --global npm@"$(jq --raw-output --join-output .engines.npm package.json)"'
                   npm ci
                   ./bin/plugin/cli.js npm-next --ci --repository-path ../publish
               env:
@@ -95,7 +95,7 @@ jobs:
               if: ${{ github.event.inputs.release_type == 'bugfix' }}
               run: |
                   cd cli
-                  'npm install --global npm@"$(jq .engines.npm package.json)"'
+                  'npm install --global npm@"$(jq --raw-output --join-output .engines.npm package.json)"'
                   npm ci
                   ./bin/plugin/cli.js npm-bugfix --ci --repository-path ../publish
               env:
@@ -105,7 +105,7 @@ jobs:
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
               run: |
                   cd publish
-                  'npm install --global npm@"$(jq .engines.npm package.json)"'
+                  'npm install --global npm@"$(jq --raw-output --join-output .engines.npm package.json)"'
                   npm ci
                   npx lerna publish patch --dist-tag wp-${{ github.event.inputs.wp_version }} --no-private --yes --no-verify-access
               env:
