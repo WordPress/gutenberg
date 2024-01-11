@@ -97,16 +97,17 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_global_styles_css_
 if ( ! function_exists( 'wp_use_font_library' ) ) {
 	/**
 	 * Function that determines if the font library should activated in the site editor.
-	 * 
+	 *
 	 * @since 6.5.0
 	 */
 	function wp_use_font_library() {
 		$use_font_library = use_font_library_for_site_editor();
-		if ( ! $use_font_library ){
+		if ( ! $use_font_library ) {
 			wp_add_inline_script( 'wp-block-editor', 'window.disableFontLibrary = true', 'before' );
-		} 
+		}
 	}
 	add_action(
-		'enqueue_block_editor_assets', 'wp_use_font_library'
+		'enqueue_block_editor_assets',
+		'wp_use_font_library'
 	);
 }
