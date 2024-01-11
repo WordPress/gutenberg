@@ -45,13 +45,13 @@ export {
 	MEDIA_TYPE_AUDIO,
 	MEDIA_TYPE_ANY,
 } from './media-upload/constants';
+export { default as MediaUploadProgress } from './media-upload-progress';
 export {
-	default as MediaUploadProgress,
 	MEDIA_UPLOAD_STATE_UPLOADING,
 	MEDIA_UPLOAD_STATE_SUCCEEDED,
 	MEDIA_UPLOAD_STATE_FAILED,
 	MEDIA_UPLOAD_STATE_RESET,
-} from './media-upload-progress';
+} from './media-upload-progress/constants';
 export { default as BlockMediaUpdateProgress } from './block-media-update-progress';
 export { default as URLInput } from './url-input';
 export { default as BlockInvalidWarning } from './block-list/block-invalid-warning';
@@ -90,6 +90,7 @@ export { default as BlockStyles } from './block-styles';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
+export { default as InserterButton } from './inserter-button';
 export { useBlockProps } from './block-list/use-block-props';
 export { default as FloatingToolbar } from './floating-toolbar';
 

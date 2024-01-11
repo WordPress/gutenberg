@@ -61,6 +61,7 @@ export default function CategorySelector( {
 			tokenizeOnBlur
 			__experimentalExpandOnFocus
 			__next40pxDefaultSize
+			__nextHasNoMarginBottom
 		/>
 	);
 }

@@ -23,16 +23,15 @@ test.describe( 'Site Editor List View', () => {
 
 	test( 'should open by default when preference is enabled', async ( {
 		page,
+		editor,
 	} ) => {
 		await expect(
 			page.locator( 'role=region[name="List View"i]' )
 		).toBeHidden();
 
 		// Turn on block list view by default.
-		await page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'showListViewByDefault', true );
+		await editor.setPreferences( 'core', {
+			showListViewByDefault: true,
 		} );
 
 		await page.reload();
@@ -42,10 +41,8 @@ test.describe( 'Site Editor List View', () => {
 		).toBeVisible();
 
 		// The preferences cleanup.
-		await page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'showListViewByDefault', false );
+		await editor.setPreferences( 'core', {
+			showListViewByDefault: false,
 		} );
 	} );
 
@@ -120,6 +117,7 @@ test.describe( 'Site Editor List View', () => {
 		// close the list view. This is to catch a bug where elements could be
 		// out of range of the sidebar region. Must shift+tab 1 time to reach
 		// close button before list view area.
+		await pageUtils.pressKeys( 'shift+Tab' );
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect(
 			page

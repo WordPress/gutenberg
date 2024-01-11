@@ -122,6 +122,12 @@ export type ToggleGroupControlProps = Pick<
 	 * @default 'default'
 	 */
 	size?: 'default' | '__unstable-large';
+	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
 };
 
 export type ToggleGroupControlContextProps = {

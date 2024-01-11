@@ -23,7 +23,6 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { mapRichTextSettings } from './utils';
 import {
 	retrieveSelectedAttribute,
 	START_OF_SELECTED_AREA,
@@ -759,43 +758,23 @@ export const __unstableDeleteSelection =
 		const selectionB = selectionEnd;
 
 		const blockA = select.getBlock( selectionA.clientId );
-		const blockAType = getBlockType( blockA.name );
-
 		const blockB = select.getBlock( selectionB.clientId );
-		const blockBType = getBlockType( blockB.name );
 
 		const htmlA = blockA.attributes[ selectionA.attributeKey ];
 		const htmlB = blockB.attributes[ selectionB.attributeKey ];
 
-		const attributeDefinitionA =
-			blockAType.attributes[ selectionA.attributeKey ];
-		const attributeDefinitionB =
-			blockBType.attributes[ selectionB.attributeKey ];
-
-		let valueA = create( {
-			html: htmlA,
-			...mapRichTextSettings( attributeDefinitionA ),
-		} );
-		let valueB = create( {
-			html: htmlB,
-			...mapRichTextSettings( attributeDefinitionB ),
-		} );
+		let valueA = create( { html: htmlA } );
+		let valueB = create( { html: htmlB } );
 
 		valueA = remove( valueA, selectionA.offset, valueA.text.length );
 		valueB = insert( valueB, START_OF_SELECTED_AREA, 0, selectionB.offset );
 
 		// Clone the blocks so we don't manipulate the original.
 		const cloneA = cloneBlock( blockA, {
-			[ selectionA.attributeKey ]: toHTMLString( {
-				value: valueA,
-				...mapRichTextSettings( attributeDefinitionA ),
-			} ),
+			[ selectionA.attributeKey ]: toHTMLString( { value: valueA } ),
 		} );
 		const cloneB = cloneBlock( blockB, {
-			[ selectionB.attributeKey ]: toHTMLString( {
-				value: valueB,
-				...mapRichTextSettings( attributeDefinitionB ),
-			} ),
+			[ selectionB.attributeKey ]: toHTMLString( { value: valueB } ),
 		} );
 
 		const followingBlock = isForward ? cloneA : cloneB;
@@ -831,20 +810,10 @@ export const __unstableDeleteSelection =
 		const newAttributeKey = retrieveSelectedAttribute( updatedAttributes );
 
 		const convertedHtml = updatedAttributes[ newAttributeKey ];
-		const convertedValue = create( {
-			html: convertedHtml,
-			...mapRichTextSettings(
-				targetBlockType.attributes[ newAttributeKey ]
-			),
-		} );
+		const convertedValue = create( { html: convertedHtml } );
 		const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
 		const newValue = remove( convertedValue, newOffset, newOffset + 1 );
-		const newHtml = toHTMLString( {
-			value: newValue,
-			...mapRichTextSettings(
-				targetBlockType.attributes[ newAttributeKey ]
-			),
-		} );
+		const newHtml = toHTMLString( { value: newValue } );
 
 		updatedAttributes[ newAttributeKey ] = newHtml;
 
@@ -931,27 +900,13 @@ export const __unstableSplitSelection =
 		const selectionB = selectionEnd;
 
 		const blockA = select.getBlock( selectionA.clientId );
-		const blockAType = getBlockType( blockA.name );
-
 		const blockB = select.getBlock( selectionB.clientId );
-		const blockBType = getBlockType( blockB.name );
 
 		const htmlA = blockA.attributes[ selectionA.attributeKey ];
 		const htmlB = blockB.attributes[ selectionB.attributeKey ];
 
-		const attributeDefinitionA =
-			blockAType.attributes[ selectionA.attributeKey ];
-		const attributeDefinitionB =
-			blockBType.attributes[ selectionB.attributeKey ];
-
-		let valueA = create( {
-			html: htmlA,
-			...mapRichTextSettings( attributeDefinitionA ),
-		} );
-		let valueB = create( {
-			html: htmlB,
-			...mapRichTextSettings( attributeDefinitionB ),
-		} );
+		let valueA = create( { html: htmlA } );
+		let valueB = create( { html: htmlB } );
 
 		valueA = remove( valueA, selectionA.offset, valueA.text.length );
 		valueB = remove( valueB, 0, selectionB.offset );
@@ -964,7 +919,6 @@ export const __unstableSplitSelection =
 					...blockA.attributes,
 					[ selectionA.attributeKey ]: toHTMLString( {
 						value: valueA,
-						...mapRichTextSettings( attributeDefinitionA ),
 					} ),
 				},
 			},
@@ -975,7 +929,6 @@ export const __unstableSplitSelection =
 					...blockB.attributes,
 					[ selectionB.attributeKey ]: toHTMLString( {
 						value: valueB,
-						...mapRichTextSettings( attributeDefinitionB ),
 					} ),
 				},
 			},
@@ -1143,10 +1096,7 @@ export const mergeBlocks =
 			const selectedBlock = clientId === clientIdA ? cloneA : cloneB;
 			const html = selectedBlock.attributes[ attributeKey ];
 			const value = insert(
-				create( {
-					html,
-					...mapRichTextSettings( attributeDefinition ),
-				} ),
+				create( { html } ),
 				START_OF_SELECTED_AREA,
 				offset,
 				offset
@@ -1154,7 +1104,6 @@ export const mergeBlocks =
 
 			selectedBlock.attributes[ attributeKey ] = toHTMLString( {
 				value,
-				...mapRichTextSettings( attributeDefinition ),
 			} );
 		}
 
@@ -1180,22 +1129,12 @@ export const mergeBlocks =
 			const newAttributeKey =
 				retrieveSelectedAttribute( updatedAttributes );
 			const convertedHtml = updatedAttributes[ newAttributeKey ];
-			const convertedValue = create( {
-				html: convertedHtml,
-				...mapRichTextSettings(
-					blockAType.attributes[ newAttributeKey ]
-				),
-			} );
+			const convertedValue = create( { html: convertedHtml } );
 			const newOffset = convertedValue.text.indexOf(
 				START_OF_SELECTED_AREA
 			);
 			const newValue = remove( convertedValue, newOffset, newOffset + 1 );
-			const newHtml = toHTMLString( {
-				value: newValue,
-				...mapRichTextSettings(
-					blockAType.attributes[ newAttributeKey ]
-				),
-			} );
+			const newHtml = toHTMLString( { value: newValue } );
 
 			updatedAttributes[ newAttributeKey ] = newHtml;
 

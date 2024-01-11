@@ -24,9 +24,11 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/edit-site',
 	'@wordpress/edit-widgets',
 	'@wordpress/editor',
+	'@wordpress/format-library',
 	'@wordpress/patterns',
 	'@wordpress/reusable-blocks',
 	'@wordpress/router',
+	'@wordpress/dataviews',
 ];
 
 /**

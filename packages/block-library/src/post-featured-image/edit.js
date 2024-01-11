@@ -25,6 +25,7 @@ import {
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
+import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -43,6 +44,11 @@ function getMediaSourceUrlBySizeSlug( media, slug ) {
 	);
 }
 
+const disabledClickProps = {
+	onClick: ( event ) => event.preventDefault(),
+	'aria-disabled': true,
+};
+
 export default function PostFeaturedImageEdit( {
 	clientId,
 	attributes,
@@ -59,17 +65,48 @@ export default function PostFeaturedImageEdit( {
 		sizeSlug,
 		rel,
 		linkTarget,
+		useFirstImageFromPost,
 	} = attributes;
-	const [ featuredImage, setFeaturedImage ] = useEntityProp(
+
+	const [ storedFeaturedImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postTypeSlug,
 		'featured_media',
 		postId
 	);
 
-	const { media, postType } = useSelect(
+	// Fallback to post content if no featured image is set.
+	// This is needed for the "Use first image from post" option.
+	const [ postContent ] = useEntityProp(
+		'postType',
+		postTypeSlug,
+		'content',
+		postId
+	);
+
+	const featuredImage = useMemo( () => {
+		if ( storedFeaturedImage ) {
+			return storedFeaturedImage;
+		}
+
+		if ( ! useFirstImageFromPost ) {
+			return;
+		}
+
+		const imageOpener =
+			/<!--\s+wp:(?:core\/)?image\s+(?<attrs>{(?:(?:[^}]+|}+(?=})|(?!}\s+\/?-->).)*)?}\s+)?-->/.exec(
+				postContent
+			);
+		const imageId =
+			imageOpener?.groups?.attrs &&
+			JSON.parse( imageOpener.groups.attrs )?.id;
+		return imageId;
+	}, [ storedFeaturedImage, useFirstImageFromPost, postContent ] );
+
+	const { media, postType, postPermalink } = useSelect(
 		( select ) => {
-			const { getMedia, getPostType } = select( coreStore );
+			const { getMedia, getPostType, getEditedEntityRecord } =
+				select( coreStore );
 			return {
 				media:
 					featuredImage &&
@@ -77,10 +114,16 @@ export default function PostFeaturedImageEdit( {
 						context: 'view',
 					} ),
 				postType: postTypeSlug && getPostType( postTypeSlug ),
+				postPermalink: getEditedEntityRecord(
+					'postType',
+					postTypeSlug,
+					postId
+				)?.link,
 			};
 		},
-		[ featuredImage, postTypeSlug ]
+		[ featuredImage, postTypeSlug, postId ]
 	);
+
 	const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
 
 	const imageSizes = useSelect(
@@ -197,7 +240,17 @@ export default function PostFeaturedImageEdit( {
 			<>
 				{ controls }
 				<div { ...blockProps }>
-					{ placeholder() }
+					{ !! isLink ? (
+						<a
+							href={ postPermalink }
+							target={ linkTarget }
+							{ ...disabledClickProps }
+						>
+							{ placeholder() }
+						</a>
+					) : (
+						placeholder()
+					) }
 					<Overlay
 						attributes={ attributes }
 						setAttributes={ setAttributes }
@@ -295,7 +348,18 @@ export default function PostFeaturedImageEdit( {
 				</BlockControls>
 			) }
 			<figure { ...blockProps }>
-				{ image }
+				{ /* If the featured image is linked, wrap in an <a /> tag to trigger any inherited link element styles */ }
+				{ !! isLink ? (
+					<a
+						href={ postPermalink }
+						target={ linkTarget }
+						{ ...disabledClickProps }
+					>
+						{ image }
+					</a>
+				) : (
+					image
+				) }
 				<Overlay
 					attributes={ attributes }
 					setAttributes={ setAttributes }

@@ -53,7 +53,7 @@ async function createAndSelectBlock() {
 	);
 	await userEvent.click(
 		screen.getByRole( 'button', {
-			name: 'Select Cover',
+			name: 'Select parent block: Cover',
 		} )
 	);
 }

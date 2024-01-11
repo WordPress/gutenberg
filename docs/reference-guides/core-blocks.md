@@ -225,7 +225,7 @@ Displays the previous comment's page link. ([Source](https://github.com/WordPres
 
 ## Comments Title
 
-Displays a title with the number of comments ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-title))
+Displays a title with the number of comments. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-title))
 
 -	**Name:** core/comments-title
 -	**Category:** theme
@@ -294,7 +294,6 @@ The basic building block for forms. ([Source](https://github.com/WordPress/guten
 -	**Name:** core/form-input
 -	**Experimental:** true
 -	**Category:** common
--	**Parent:** core/form
 -	**Supports:** anchor, spacing (margin), ~~reusable~~
 -	**Attributes:** inlineLabel, label, name, placeholder, required, type, value, visibilityPermissions
 
@@ -305,7 +304,6 @@ Provide a notification message after the form has been submitted. ([Source](http
 -	**Name:** core/form-submission-notification
 -	**Experimental:** true
 -	**Category:** common
--	**Parent:** core/form
 -	**Supports:** 
 -	**Attributes:** type
 
@@ -316,7 +314,6 @@ A submission button for forms. ([Source](https://github.com/WordPress/gutenberg/
 -	**Name:** core/form-submit-button
 -	**Experimental:** true
 -	**Category:** common
--	**Parent:** core/form
 -	**Supports:** 
 -	**Attributes:** 
 
@@ -336,7 +333,7 @@ Display multiple images in a rich gallery. ([Source](https://github.com/WordPres
 -	**Name:** core/gallery
 -	**Category:** media
 -	**Supports:** align, anchor, color (background, gradients, ~~text~~), layout (default, ~~allowEditing~~, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin, padding), units (em, px, rem, vh, vw), ~~html~~
--	**Attributes:** allowResize, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, shortCodeTransforms, sizeSlug
+-	**Attributes:** allowResize, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, randomOrder, shortCodeTransforms, sizeSlug
 
 ## Group
 
@@ -344,7 +341,7 @@ Gather blocks in a layout container. ([Source](https://github.com/WordPress/gute
 
 -	**Name:** core/group
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage), color (background, button, gradients, heading, link, text), dimensions (minHeight), layout (allowSizingOnChildren), position (sticky), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, button, gradients, heading, link, text), dimensions (minHeight), layout (allowSizingOnChildren), position (sticky), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** allowedBlocks, tagName, templateLock
 
 ## Heading
@@ -381,8 +378,8 @@ Insert an image to make a visual statement. ([Source](https://github.com/WordPre
 
 -	**Name:** core/image
 -	**Category:** media
--	**Supports:** anchor, color (~~background~~, ~~text~~), filter (duotone)
--	**Attributes:** align, alt, aspectRatio, caption, height, href, id, lightbox, linkClass, linkDestination, linkTarget, rel, scale, sizeSlug, title, url, width
+-	**Supports:** align (center, full, left, right, wide), anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity
+-	**Attributes:** alt, aspectRatio, caption, height, href, id, lightbox, linkClass, linkDestination, linkTarget, rel, scale, sizeSlug, title, url, width
 
 ## Latest Comments
 
@@ -418,7 +415,7 @@ Create a list item. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/
 -	**Name:** core/list-item
 -	**Category:** text
 -	**Parent:** core/list
--	**Supports:** typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** content, placeholder
 
 ## Login/out
@@ -473,7 +470,7 @@ Add a page, link, or another item to your navigation. ([Source](https://github.c
 -	**Name:** core/navigation-link
 -	**Category:** design
 -	**Parent:** core/navigation
--	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** description, id, isTopLevelLink, kind, label, opensInNewTab, rel, title, type, url
 
 ## Submenu
@@ -633,7 +630,7 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/post-featured-image
 -	**Category:** theme
 -	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~
--	**Attributes:** aspectRatio, customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, width
+-	**Attributes:** aspectRatio, customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, useFirstImageFromPost, width
 
 ## Post Navigation Link
 
@@ -741,7 +738,7 @@ Displays the next posts page link. ([Source](https://github.com/WordPress/gutenb
 
 ## Page Numbers
 
-Displays a list of page numbers for pagination ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination-numbers))
+Displays a list of page numbers for pagination. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination-numbers))
 
 -	**Name:** core/query-pagination-numbers
 -	**Category:** theme
@@ -774,7 +771,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 
 -	**Name:** core/quote
 -	**Category:** text
--	**Supports:** anchor, color (background, gradients, heading, link, text), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** anchor, color (background, gradients, heading, link, text), layout (~~allowEditing~~), spacing (blockGap), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** align, citation, value
 
 ## Read More
@@ -802,7 +799,7 @@ Help visitors find your content. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/search
 -	**Category:** widgets
 -	**Supports:** align (center, left, right), color (background, gradients, text), interactivity, typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** buttonBehavior, buttonPosition, buttonText, buttonUseIcon, isSearchFieldHidden, label, placeholder, query, showLabel, width, widthUnit
+-	**Attributes:** buttonPosition, buttonText, buttonUseIcon, isSearchFieldHidden, label, placeholder, query, showLabel, width, widthUnit
 
 ## Separator
 

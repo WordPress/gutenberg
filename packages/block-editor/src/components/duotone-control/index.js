@@ -65,14 +65,11 @@ function DuotoneControl( {
 			} }
 			renderContent={ () => (
 				<MenuGroup label={ __( 'Duotone' ) }>
-					<div
-						id={ descriptionId }
-						className="block-editor-duotone-control__description"
-					>
+					<p>
 						{ __(
 							'Create a two-tone color effect without losing your original image.'
 						) }
-					</div>
+					</p>
 					<DuotonePicker
 						aria-label={ actionLabel }
 						aria-describedby={ descriptionId }

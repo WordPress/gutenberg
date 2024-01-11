@@ -335,6 +335,7 @@ function CoverEdit( {
 			templateInsertUpdatesSelection: true,
 			allowedBlocks,
 			templateLock,
+			dropZoneElement: ref.current,
 		}
 	);
 

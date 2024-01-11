@@ -148,33 +148,31 @@
 .edit-site-list-added-by__icon {
 	display: flex;
 	flex-shrink: 0;
-	align-items: center;
-	justify-content: center;
-	width: $grid-unit-40;
-	height: $grid-unit-40;
-	background: $gray-800;
-	border-radius: 100%;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
 
 	svg {
-		fill: $white;
+		fill: currentColor;
 	}
 }
 
 .edit-site-list-added-by__avatar {
 	flex-shrink: 0;
 	overflow: hidden;
-	border-radius: 100%;
-	background: $gray-800;
-	width: $grid-unit-40;
-	height: $grid-unit-40;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+	align-items: center;
+	justify-content: center;
+	display: flex;
 
 	img {
-		width: $grid-unit-40;
-		height: $grid-unit-40;
+		width: 20px;
+		height: 20px;
 		object-fit: cover;
 		opacity: 0;
 		transition: opacity 0.1s linear;
 		@include reduce-motion("transition");
+		border-radius: 100%;
 	}
 
 	&.is-loaded {

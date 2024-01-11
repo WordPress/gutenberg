@@ -135,7 +135,7 @@ class WP_Font_Family {
 	 */
 	private static function delete_asset( $src ) {
 		$filename  = basename( $src );
-		$file_path = path_join( WP_Font_Library::get_fonts_dir(), $filename );
+		$file_path = path_join( wp_get_font_dir()['path'], $filename );
 
 		wp_delete_file( $file_path );
 
@@ -162,7 +162,6 @@ class WP_Font_Family {
 		}
 		return true;
 	}
-
 
 	/**
 	 * Gets the overrides for the 'wp_handle_upload' function.
@@ -202,11 +201,6 @@ class WP_Font_Family {
 	 *                     False if the download failed.
 	 */
 	private function download_asset( $url, $filename ) {
-		// Checks if the file to be downloaded has a font mime type.
-		if ( ! WP_Font_Family_Utils::has_font_mime_type( $filename ) ) {
-			return false;
-		}
-
 		// Include file with download_url() if function doesn't exist.
 		if ( ! function_exists( 'download_url' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -263,12 +257,6 @@ class WP_Font_Family {
 		// because it is no longer needed.
 		unset( $new_font_face['uploadedFile'] );
 
-		// If the filename has no font mime type, don't move the file and
-		// return the font face definition without src to be ignored later.
-		if ( ! WP_Font_Family_Utils::has_font_mime_type( $filename ) ) {
-			return $new_font_face;
-		}
-
 		// Move the uploaded font asset from the temp folder to the fonts directory.
 		if ( ! function_exists( 'wp_handle_upload' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -300,18 +288,27 @@ class WP_Font_Family {
 			'version'  => '2',
 			'settings' => array(
 				'typography' => array(
-					'fontFamilies' => array( $this->data ),
+					'fontFamilies' => array(
+						'custom' => array(
+							$this->data,
+						),
+					),
 				),
 			),
 		);
+
 		// Creates a new WP_Theme_JSON object with the new fonts to
 		// leverage sanitization and validation.
+		$fonts_json     = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $fonts_json );
 		$theme_json     = new WP_Theme_JSON_Gutenberg( $fonts_json );
 		$theme_data     = $theme_json->get_data();
 		$sanitized_font = ! empty( $theme_data['settings']['typography']['fontFamilies'] )
 			? $theme_data['settings']['typography']['fontFamilies'][0]
 			: array();
-		$this->data     = $sanitized_font;
+
+		$sanitized_font['slug']       = _wp_to_kebab_case( $sanitized_font['slug'] );
+		$sanitized_font['fontFamily'] = WP_Font_Family_Utils::format_font_family( $sanitized_font['fontFamily'] );
+		$this->data                   = $sanitized_font;
 		return $this->data;
 	}
 
@@ -392,6 +389,11 @@ class WP_Font_Family {
 
 			if ( $font_face_is_repeated ) {
 				continue;
+			}
+
+			// If the font face requires the use of the filesystem, create the fonts dir if it doesn't exist.
+			if ( ! empty( $font_face['downloadFromUrl'] ) && ! empty( $font_face['uploadedFile'] ) ) {
+				wp_mkdir_p( wp_get_font_dir()['path'] );
 			}
 
 			// If installing google fonts, download the font face assets.
@@ -596,9 +598,9 @@ class WP_Font_Family {
 	 */
 	public function install( $files = null ) {
 		add_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
-		add_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
+		add_filter( 'upload_dir', 'wp_get_font_dir' );
 		$were_assets_written = $this->download_or_move_font_faces( $files );
-		remove_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
+		remove_filter( 'upload_dir', 'wp_get_font_dir' );
 		remove_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
 
 		if ( ! $were_assets_written ) {

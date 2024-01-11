@@ -4,10 +4,6 @@ The `TextTransformControl` component is responsible for rendering a control elem
  
 ![TextTransformConrol Element in Inspector Control](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/text-transform-component.png?raw=true)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-
 ## Development guidelines
 
 ### Usage

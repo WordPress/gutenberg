@@ -155,7 +155,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'              => array( 'typography', 'fontSizes' ),
-			'prevent_override'  => false,
+			'prevent_override'  => array( 'typography', 'defaultFontSizes' ),
 			'use_default_names' => true,
 			'value_func'        => 'gutenberg_get_typography_font_size_value',
 			'css_vars'          => '--wp--preset--font-size--$slug',
@@ -354,6 +354,7 @@ class WP_Theme_JSON_Gutenberg {
 		'useRootPaddingAwareAlignments' => null,
 		'background'                    => array(
 			'backgroundImage' => null,
+			'backgroundSize'  => null,
 		),
 		'border'                        => array(
 			'color'  => null,
@@ -383,9 +384,10 @@ class WP_Theme_JSON_Gutenberg {
 			'minHeight' => null,
 		),
 		'layout'                        => array(
-			'contentSize'  => null,
-			'wideSize'     => null,
-			'allowEditing' => null,
+			'contentSize'                   => null,
+			'wideSize'                      => null,
+			'allowEditing'                  => null,
+			'allowCustomContentAndWideSize' => null,
 		),
 		'lightbox'                      => array(
 			'enabled'      => null,
@@ -409,19 +411,47 @@ class WP_Theme_JSON_Gutenberg {
 			'defaultPresets' => null,
 		),
 		'typography'                    => array(
-			'fluid'          => null,
-			'customFontSize' => null,
-			'dropCap'        => null,
-			'fontFamilies'   => null,
-			'fontSizes'      => null,
-			'fontStyle'      => null,
-			'fontWeight'     => null,
-			'letterSpacing'  => null,
-			'lineHeight'     => null,
-			'textColumns'    => null,
-			'textDecoration' => null,
-			'textTransform'  => null,
-			'writingMode'    => null,
+			'fluid'            => null,
+			'customFontSize'   => null,
+			'defaultFontSizes' => null,
+			'dropCap'          => null,
+			'fontFamilies'     => null,
+			'fontSizes'        => null,
+			'fontStyle'        => null,
+			'fontWeight'       => null,
+			'letterSpacing'    => null,
+			'lineHeight'       => null,
+			'textColumns'      => null,
+			'textDecoration'   => null,
+			'textTransform'    => null,
+			'writingMode'      => null,
+		),
+	);
+
+	const FONT_FAMILY_SCHEMA = array(
+		array(
+			'fontFamily' => null,
+			'name'       => null,
+			'slug'       => null,
+			'preview'    => null,
+			'fontFace'   => array(
+				array(
+					'ascentOverride'        => null,
+					'descentOverride'       => null,
+					'fontDisplay'           => null,
+					'fontFamily'            => null,
+					'fontFeatureSettings'   => null,
+					'fontStyle'             => null,
+					'fontStretch'           => null,
+					'fontVariationSettings' => null,
+					'fontWeight'            => null,
+					'lineGapOverride'       => null,
+					'sizeAdjust'            => null,
+					'src'                   => null,
+					'unicodeRange'          => null,
+					'preview'               => null,
+				),
+			),
 		),
 	);
 
@@ -550,6 +580,52 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
+	 * Return the input schema at the root and per origin.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array $schema The base schema.
+	 * @return array The schema at the root and per origin.
+	 *
+	 * Example:
+	 * schema_in_root_and_per_origin(
+	 *   array(
+	 *    'fontFamily' => null,
+	 *    'slug' => null,
+	 *   )
+	 * )
+	 *
+	 * Returns:
+	 * array(
+	 *  'fontFamily' => null,
+	 *  'slug' => null,
+	 *  'default' => array(
+	 *    'fontFamily' => null,
+	 *    'slug' => null,
+	 *  ),
+	 *  'blocks' => array(
+	 *    'fontFamily' => null,
+	 *    'slug' => null,
+	 *  ),
+	 *  'theme' => array(
+	 *     'fontFamily' => null,
+	 *     'slug' => null,
+	 *  ),
+	 *  'custom' => array(
+	 *     'fontFamily' => null,
+	 *     'slug' => null,
+	 *  ),
+	 * )
+	 */
+	protected static function schema_in_root_and_per_origin( $schema ) {
+		$schema_in_root_and_per_origin = $schema;
+		foreach ( static::VALID_ORIGINS as $origin ) {
+			$schema_in_root_and_per_origin[ $origin ] = $schema;
+		}
+		return $schema_in_root_and_per_origin;
+	}
+
+	/**
 	 * Returns a class name by an element name.
 	 *
 	 * @since 6.1.0
@@ -576,6 +652,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const APPEARANCE_TOOLS_OPT_INS = array(
 		array( 'background', 'backgroundImage' ),
+		array( 'background', 'backgroundSize' ),
 		array( 'border', 'color' ),
 		array( 'border', 'radius' ),
 		array( 'border', 'style' ),
@@ -621,7 +698,7 @@ class WP_Theme_JSON_Gutenberg {
 			$origin = 'theme';
 		}
 
-		$this->theme_json    = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
+		$this->theme_json    = WP_Theme_JSON_Schema::migrate( $theme_json );
 		$registry            = WP_Block_Type_Registry::get_instance();
 		$valid_block_names   = array_keys( $registry->get_all_registered() );
 		$valid_element_names = array_keys( static::ELEMENTS );
@@ -790,11 +867,12 @@ class WP_Theme_JSON_Gutenberg {
 			$schema_styles_blocks[ $block ]['variations'] = $schema_styles_variations;
 		}
 
-		$schema['styles']             = static::VALID_STYLES;
-		$schema['styles']['blocks']   = $schema_styles_blocks;
-		$schema['styles']['elements'] = $schema_styles_elements;
-		$schema['settings']           = static::VALID_SETTINGS;
-		$schema['settings']['blocks'] = $schema_settings_blocks;
+		$schema['styles']                                 = static::VALID_STYLES;
+		$schema['styles']['blocks']                       = $schema_styles_blocks;
+		$schema['styles']['elements']                     = $schema_styles_elements;
+		$schema['settings']                               = static::VALID_SETTINGS;
+		$schema['settings']['blocks']                     = $schema_settings_blocks;
+		$schema['settings']['typography']['fontFamilies'] = static::schema_in_root_and_per_origin( static::FONT_FAMILY_SCHEMA );
 
 		// Remove anything that's not present in the schema.
 		foreach ( array( 'styles', 'settings' ) as $subtree ) {
@@ -944,8 +1022,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! empty( $block_type->styles ) ) {
 				$style_selectors = array();
 				foreach ( $block_type->styles as $style ) {
-					// The style variation classname is duplicated in the selector to ensure that it overrides core block styles.
-					$style_selectors[ $style['name'] ] = static::append_to_selector( '.is-style-' . $style['name'] . '.is-style-' . $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
+					$style_selectors[ $style['name'] ] = static::append_to_selector( '.is-style-' . $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
 				}
 				static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
 			}
@@ -966,18 +1043,39 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array The modified $tree.
 	 */
 	protected static function remove_keys_not_in_schema( $tree, $schema ) {
-		$tree = array_intersect_key( $tree, $schema );
+		if ( ! is_array( $tree ) ) {
+			return $tree;
+		}
 
-		foreach ( $schema as $key => $data ) {
-			if ( ! isset( $tree[ $key ] ) ) {
+		foreach ( $tree as $key => $value ) {
+			// Remove keys not in the schema or with null/empty values.
+			if ( ! array_key_exists( $key, $schema ) ) {
+				unset( $tree[ $key ] );
 				continue;
 			}
 
-			if ( is_array( $schema[ $key ] ) && is_array( $tree[ $key ] ) ) {
-				$tree[ $key ] = static::remove_keys_not_in_schema( $tree[ $key ], $schema[ $key ] );
+			// Check if the value is an array and requires further processing.
+			if ( is_array( $value ) && is_array( $schema[ $key ] ) ) {
+				// Determine if it is an associative or indexed array.
+				$schema_is_assoc = self::is_assoc( $value );
 
-				if ( empty( $tree[ $key ] ) ) {
-					unset( $tree[ $key ] );
+				if ( $schema_is_assoc ) {
+					// If associative, process as a single object.
+					$tree[ $key ] = self::remove_keys_not_in_schema( $value, $schema[ $key ] );
+
+					if ( empty( $tree[ $key ] ) ) {
+						unset( $tree[ $key ] );
+					}
+				} else {
+					// If indexed, process each item in the array.
+					foreach ( $value as $item_key => $item_value ) {
+						if ( isset( $schema[ $key ][0] ) && is_array( $schema[ $key ][0] ) ) {
+							$tree[ $key ][ $item_key ] = self::remove_keys_not_in_schema( $item_value, $schema[ $key ][0] );
+						} else {
+							// If the schema does not define a further structure, keep the value as is.
+							$tree[ $key ][ $item_key ] = $item_value;
+						}
+					}
 				}
 			} elseif ( is_array( $schema[ $key ] ) && ! is_array( $tree[ $key ] ) ) {
 				unset( $tree[ $key ] );
@@ -985,6 +1083,20 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $tree;
+	}
+
+	/**
+	 * Checks if the given array is associative.
+	 *
+	 * @since 6.5.0
+	 * @param array $data The array to check.
+	 * @return bool True if the array is associative, false otherwise.
+	 */
+	protected static function is_assoc( $data ) {
+		if ( array() === $data ) {
+			return false;
+		}
+		return array_keys( $data ) !== range( 0, count( $data ) - 1 );
 	}
 
 	/**
@@ -2879,7 +2991,7 @@ class WP_Theme_JSON_Gutenberg {
 	public static function remove_insecure_properties( $theme_json ) {
 		$sanitized = array();
 
-		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
+		$theme_json = WP_Theme_JSON_Schema::migrate( $theme_json );
 
 		$valid_block_names   = array_keys( static::get_blocks_metadata() );
 		$valid_element_names = array_keys( static::ELEMENTS );

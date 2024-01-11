@@ -12,9 +12,9 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
-	__experimentalVStack as VStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
+	MenuGroup,
 	ColorIndicator,
 	DuotonePicker,
 	DuotoneSwatch,
@@ -28,7 +28,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable } from './utils';
+import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
 
 const EMPTY_ARRAY = [];
@@ -82,6 +82,7 @@ function FiltersToolsPanel( {
 			label={ _x( 'Filters', 'Name for applying graphical effects' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			{ children }
 		</ToolsPanel>
@@ -197,8 +198,8 @@ export default function FiltersPanel( {
 							);
 						} }
 						renderContent={ () => (
-							<DropdownContentWrapper paddingSize="medium">
-								<VStack>
+							<DropdownContentWrapper paddingSize="small">
+								<MenuGroup label={ __( 'Duotone' ) }>
 									<p>
 										{ __(
 											'Create a two-tone color effect without losing your original image.'
@@ -213,7 +214,7 @@ export default function FiltersPanel( {
 										value={ duotone }
 										onChange={ setDuotone }
 									/>
-								</VStack>
+								</MenuGroup>
 							</DropdownContentWrapper>
 						) }
 					/>

@@ -47,7 +47,9 @@ test.describe( 'Image', () => {
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 		await expect( image ).toBeVisible();
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
 
@@ -69,7 +71,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const filename = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
@@ -98,7 +102,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
@@ -129,7 +135,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
@@ -182,7 +190,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const tmpInput = await page.evaluateHandle( () => {
 			const input = document.createElement( 'input' );
@@ -226,7 +236,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const filename = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
@@ -292,7 +304,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const filename = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
@@ -349,7 +363,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const filename = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
@@ -385,7 +401,9 @@ test.describe( 'Image', () => {
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		const image = imageBlock.locator( 'role=img' );
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 
 		const filename = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
@@ -572,7 +590,9 @@ test.describe( 'Image', () => {
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
-		const imageInEditor = imageBlock.locator( 'role=img' );
+		const imageInEditor = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 		await expect( imageInEditor ).toBeVisible();
 		await expect( imageInEditor ).toHaveAttribute(
 			'src',
@@ -676,7 +696,9 @@ test.describe( 'Image', () => {
 		await expect( linkDom ).toHaveAttribute( 'href', url );
 	} );
 
-	test( 'should upload external image', async ( { editor } ) => {
+	test( 'should upload external image to media library', async ( {
+		editor,
+	} ) => {
 		await editor.insertBlock( {
 			name: 'core/image',
 			attributes: {
@@ -684,7 +706,7 @@ test.describe( 'Image', () => {
 			},
 		} );
 
-		await editor.clickBlockToolbarButton( 'Upload external image' );
+		await editor.clickBlockToolbarButton( 'Upload image to media library' );
 
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
@@ -709,7 +731,9 @@ test.describe( 'Image', () => {
 		await page
 			.getByRole( 'button', { name: 'Publish', exact: true } )
 			.click();
-		await page.getByRole( 'button', { name: 'Upload all' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Upload', exact: true } )
+			.click();
 
 		await expect( page.locator( '.components-spinner' ) ).toHaveCount( 0 );
 
@@ -1269,6 +1293,59 @@ test.describe.skip( 'Image - interactivity', () => {
 
 		await expect( responsiveImage ).toHaveAttribute( 'src', imgUrl );
 		await expect( enlargedImage ).toHaveAttribute( 'src', imgUrl );
+	} );
+} );
+
+// Added to prevent regressions of https://github.com/WordPress/gutenberg/pull/57040.
+test.describe( 'Image - Site editor', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+		await requestUtils.activateTheme( 'emptytheme' );
+	} );
+
+	test.beforeEach( async ( { admin, editor } ) => {
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+		} );
+		await editor.canvas.locator( 'body' ).click();
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
+	test( 'can be inserted via image upload', async ( {
+		editor,
+		imageBlockUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		const filename = await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toBeVisible();
+		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+
+		const regex = new RegExp(
+			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none"} -->
+<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\1"/></figure>
+<!-- \\/wp:image -->`
+		);
+		expect( await editor.getEditedPostContent() ).toMatch( regex );
 	} );
 } );
 

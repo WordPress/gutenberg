@@ -6,6 +6,12 @@ exports[`Buttons block color customization sets a background color 1`] = `
 <!-- /wp:buttons -->"
 `;
 
+exports[`Buttons block color customization sets a custom gradient background color 1`] = `
+"<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"style":{"color":{"gradient":"linear-gradient(200deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)"}}} /--></div>
+<!-- /wp:buttons -->"
+`;
+
 exports[`Buttons block color customization sets a gradient background color 1`] = `
 "<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button {"gradient":"light-green-cyan-to-vivid-green-cyan"} /--></div>
@@ -67,12 +73,6 @@ exports[`Buttons block when a button is shown adjusts the border radius 1`] = `
 `;
 
 exports[`Buttons block when a button is shown removing button along with buttons block removes the button and buttons block when deleting the block using the block delete action 1`] = `
-"<!-- wp:paragraph -->
-<p></p>
-<!-- /wp:paragraph -->"
-`;
-
-exports[`Buttons block when a button is shown removing button along with buttons block removes the button and buttons block when deleting the block using the delete (backspace) key 1`] = `
 "<!-- wp:paragraph -->
 <p></p>
 <!-- /wp:paragraph -->"

@@ -170,7 +170,7 @@ class MediaContainer extends Component {
 			mediaWidth,
 			shouldStack,
 		} = this.props;
-		const { isUploadFailed, retryMessage } = params;
+		const { isUploadFailed, isUploadPaused, retryMessage } = params;
 		const focalPointValues = ! focalPoint
 			? IMAGE_DEFAULT_FOCAL_POINT
 			: focalPoint;
@@ -203,6 +203,7 @@ class MediaContainer extends Component {
 							focalPoint={ imageFill && focalPointValues }
 							isSelected={ isMediaSelected }
 							isUploadFailed={ isUploadFailed }
+							isUploadPaused={ isUploadPaused }
 							isUploadInProgress={ isUploadInProgress }
 							onSelectMediaUploadOption={
 								this.onSelectMediaUploadOption
@@ -340,6 +341,7 @@ class MediaContainer extends Component {
 								{ getMediaOptions() }
 
 								<MediaUploadProgress
+									enablePausedUploads
 									coverUrl={ coverUrl }
 									mediaId={ mediaId }
 									onUpdateMediaProgress={

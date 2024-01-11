@@ -3,7 +3,7 @@
  */
 import { Button, Flex, FlexItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -85,6 +85,15 @@ export function EntitiesSavedStatesExtensible( {
 
 	const saveEnabled = saveEnabledProp ?? isDirty;
 
+	const { homeUrl } = useSelect( ( select ) => {
+		const {
+			getUnstableBase, // Site index.
+		} = select( coreStore );
+		return {
+			homeUrl: getUnstableBase()?.home,
+		};
+	}, [] );
+
 	const saveCheckedEntities = () => {
 		const saveNoticeId = 'site-editor-save-success';
 		removeNotice( saveNoticeId );
@@ -149,6 +158,12 @@ export function EntitiesSavedStatesExtensible( {
 					createSuccessNotice( __( 'Site updated.' ), {
 						type: 'snackbar',
 						id: saveNoticeId,
+						actions: [
+							{
+								label: __( 'View site' ),
+								url: homeUrl,
+							},
+						],
 					} );
 				}
 			} )
@@ -194,15 +209,17 @@ export function EntitiesSavedStatesExtensible( {
 			</Flex>
 
 			<div className="entities-saved-states__text-prompt">
-				<strong>{ __( 'Are you ready to save?' ) }</strong>
+				<strong className="entities-saved-states__text-prompt--header">
+					{ __( 'Are you ready to save?' ) }
+				</strong>
 				{ additionalPrompt }
-				{ isDirty && (
-					<p>
-						{ __(
-							'The following changes have been made to your site, templates, and content.'
-						) }
-					</p>
-				) }
+				<p>
+					{ isDirty
+						? __(
+								'The following changes have been made to your site, templates, and content.'
+						  )
+						: __( 'Select the items you want to save.' ) }
+				</p>
 			</div>
 
 			{ sortedPartitionedSavables.map( ( list ) => {
