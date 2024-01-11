@@ -1679,13 +1679,13 @@ export function setBlockVisibility( updates ) {
 }
 
 /**
- * Action that sets whether a block is being temporaritly edited as blocks.
+ * Action that sets whether a block is being temporarily edited as blocks.
  *
  * DO-NOT-USE in production.
  * This action is created for internal/experimental only usage and may be
  * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
  *
- * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporaritly edited as blocks.
+ * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporarily edited as blocks.
  */
 export function __unstableSetTemporarilyEditingAsBlocks(
 	temporarilyEditingAsBlocks
