@@ -197,7 +197,7 @@ describe( 'PaletteEdit', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'can add a new color palette', async () => {
+	it( 'calls the `onChange` with the new color appended', async () => {
 		const user = userEvent.setup();
 		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
