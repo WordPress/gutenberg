@@ -79,15 +79,19 @@ const keys = ( maybeObject ) => {
  *
  * @param {string} ref
  * @return {Object} definition
+ * @throws {Error} If the referenced definition is not found in 'themejson.definitions'.
  *
  * @example
  * getDefinition( '#/definitions/typographyProperties/properties/fontFamily' )
- * // returns themejson.definitions.typographyProperties.properties.fontFamily
+ *  // returns themejson.definitions.typographyProperties.properties.fontFamily
  *
  */
 const resolveDefintionRef = ( ref ) => {
 	const refParts = ref.split( '/' );
 	const definition = refParts[ refParts.length - 1 ];
+	if ( ! themejson.definitions[ definition ] ) {
+		throw new Error( `Can't resolve '${ ref }'. Definition not found` );
+	}
 	return themejson.definitions[ definition ];
 };
 
