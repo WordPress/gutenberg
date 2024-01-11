@@ -6,8 +6,6 @@ import { Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { EFFECTS_SUPPORT_KEYS } from './effects';
-
 const ALIGN_SUPPORT_KEY = 'align';
 const ALIGN_WIDE_SUPPORT_KEY = 'alignWide';
 const BORDER_SUPPORT_KEY = '__experimentalBorder';
@@ -63,6 +61,7 @@ const TYPOGRAPHY_SUPPORT_KEYS = [
 	WRITING_MODE_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
 ];
+const EFFECTS_SUPPORT_KEYS = [ 'shadow' ];
 const SPACING_SUPPORT_KEY = 'spacing';
 const styleSupportKeys = [
 	...EFFECTS_SUPPORT_KEYS,
