@@ -6,7 +6,7 @@
 			"platformVersion": "17.2"
 		},
 		"saucelabs": {
-			"deviceName": "iPhone 14 Simulator",
+			"deviceName": "iPhone 15 Simulator",
 			"deviceTabletName": "iPad (10th generation) Simulator",
 			"platformVersion": "17.0"
 		},
