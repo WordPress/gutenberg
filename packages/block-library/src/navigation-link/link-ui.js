@@ -2,20 +2,27 @@
  * WordPress dependencies
  */
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { Popover, Button } from '@wordpress/components';
+import {
+	Popover,
+	Button,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
+	QuickInserter,
 	__experimentalLinkControl as LinkControl,
-	BlockIcon,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { createInterpolateElement, useMemo } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import {
 	store as coreStore,
 	useResourcePermissions,
 } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { switchToBlockType } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -56,85 +63,47 @@ export function getSuggestionsQuery( type, kind ) {
 	}
 }
 
-/**
- * Add transforms to Link Control
- *
- * @param {Object} props          Component props.
- * @param {string} props.clientId Block client ID.
- */
-function LinkControlTransforms( { clientId } ) {
-	const { getBlock, blockTransforms } = useSelect(
+function LinkUIBlockInserter( { clientId, onBack } ) {
+	const { rootBlockClientId } = useSelect(
 		( select ) => {
-			const {
-				getBlock: _getBlock,
-				getBlockRootClientId,
-				getBlockTransformItems,
-			} = select( blockEditorStore );
+			const { getBlockRootClientId } = select( blockEditorStore );
 
 			return {
-				getBlock: _getBlock,
-				blockTransforms: getBlockTransformItems(
-					_getBlock( clientId ),
-					getBlockRootClientId( clientId )
-				),
+				rootBlockClientId: getBlockRootClientId( clientId ),
 			};
 		},
 		[ clientId ]
 	);
-
-	const { replaceBlock } = useDispatch( blockEditorStore );
-
-	const featuredBlocks = [
-		'core/page-list',
-		'core/site-logo',
-		'core/social-links',
-		'core/search',
-	];
-
-	const transforms = blockTransforms.filter( ( item ) => {
-		return featuredBlocks.includes( item.name );
-	} );
-
-	if ( ! transforms?.length ) {
-		return null;
-	}
 
 	if ( ! clientId ) {
 		return null;
 	}
 
 	return (
-		<div className="link-control-transform">
-			<h3 className="link-control-transform__subheading">
-				{ __( 'Transform' ) }
-			</h3>
-			<div className="link-control-transform__items">
-				{ transforms.map( ( item, index ) => {
-					return (
-						<Button
-							key={ `transform-${ index }` }
-							onClick={ () =>
-								replaceBlock(
-									clientId,
-									switchToBlockType(
-										getBlock( clientId ),
-										item.name
-									)
-								)
-							}
-							className="link-control-transform__item"
-						>
-							<BlockIcon icon={ item.icon } />
-							{ item.title }
-						</Button>
-					);
-				} ) }
-			</div>
+		<div className="link-ui-block-inserter">
+			<Button
+				onClick={ ( e ) => {
+					e.preventDefault();
+					onBack();
+				} }
+			>
+				{ __( 'Back' ) }
+			</Button>
+
+			<QuickInserter
+				rootClientId={ rootBlockClientId }
+				clientId={ clientId }
+				isAppender={ false }
+				prioritizePatterns={ false }
+				selectBlockOnInsert={ true }
+				hasSearch={ false }
+			/>
 		</div>
 	);
 }
 
 export function LinkUI( props ) {
+	const [ addingBlock, setAddingBlock ] = useState( false );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const pagesPermissions = useResourcePermissions( 'pages' );
 	const postsPermissions = useResourcePermissions( 'posts' );
@@ -193,47 +162,68 @@ export function LinkUI( props ) {
 			anchor={ props.anchor }
 			shift
 		>
-			<LinkControl
-				hasTextControl
-				hasRichPreviews
-				value={ link }
-				showInitialSuggestions={ true }
-				withCreateSuggestion={ userCanCreate }
-				createSuggestion={ handleCreate }
-				createSuggestionButtonText={ ( searchTerm ) => {
-					let format;
+			{ ! addingBlock && (
+				<LinkControl
+					hasTextControl
+					hasRichPreviews
+					value={ link }
+					showInitialSuggestions={ true }
+					withCreateSuggestion={ userCanCreate }
+					createSuggestion={ handleCreate }
+					createSuggestionButtonText={ ( searchTerm ) => {
+						let format;
 
-					if ( type === 'post' ) {
-						/* translators: %s: search term. */
-						format = __( 'Create draft post: <mark>%s</mark>' );
-					} else {
-						/* translators: %s: search term. */
-						format = __( 'Create draft page: <mark>%s</mark>' );
-					}
-
-					return createInterpolateElement(
-						sprintf( format, searchTerm ),
-						{
-							mark: <mark />,
+						if ( type === 'post' ) {
+							/* translators: %s: search term. */
+							format = __( 'Create draft post: <mark>%s</mark>' );
+						} else {
+							/* translators: %s: search term. */
+							format = __( 'Create draft page: <mark>%s</mark>' );
 						}
-					);
-				} }
-				noDirectEntry={ !! type }
-				noURLSuggestion={ !! type }
-				suggestionsQuery={ getSuggestionsQuery( type, kind ) }
-				onChange={ props.onChange }
-				onRemove={ props.onRemove }
-				onCancel={ props.onCancel }
-				renderControlBottom={
-					! url
-						? () => (
-								<LinkControlTransforms
-									clientId={ props.clientId }
-								/>
-						  )
-						: null
-				}
-			/>
+
+						return createInterpolateElement(
+							sprintf( format, searchTerm ),
+							{
+								mark: <mark />,
+							}
+						);
+					} }
+					noDirectEntry={ !! type }
+					noURLSuggestion={ !! type }
+					suggestionsQuery={ getSuggestionsQuery( type, kind ) }
+					onChange={ props.onChange }
+					onRemove={ props.onRemove }
+					onCancel={ props.onCancel }
+					renderControlBottom={ () =>
+						! link?.url?.length && (
+							<LinkUITools setAddingBlock={ setAddingBlock } />
+						)
+					}
+				/>
+			) }
+
+			{ addingBlock && (
+				<LinkUIBlockInserter
+					clientId={ props.clientId }
+					onBack={ setAddingBlock }
+				/>
+			) }
 		</Popover>
+	);
+}
+
+function LinkUITools( { setAddingBlock } ) {
+	return (
+		<VStack>
+			<Button
+				onClick={ ( e ) => {
+					e.preventDefault();
+					setAddingBlock( true );
+				} }
+			>
+				{ __( 'Add block' ) }
+			</Button>
+			<Button>{ __( 'Add Page' ) }</Button>
+		</VStack>
 	);
 }
