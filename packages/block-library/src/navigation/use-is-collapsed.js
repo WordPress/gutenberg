@@ -26,6 +26,7 @@ function useIsCollapsed( overlayMenu, navRef ) {
 	const [ isCollapsed, setIsCollapsed ] = useState( shouldBeCollapsed() );
 
 	useLayoutEffect( () => {
+		updateIsCollapsed();
 		function updateIsCollapsed() {
 			setIsCollapsed( shouldBeCollapsed() );
 		}
