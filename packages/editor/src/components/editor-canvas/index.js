@@ -139,7 +139,8 @@ function EditorCanvas( {
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
 			showEditorPadding:
-				!! editorSettings.goBack && postTypeSlug !== 'wp_template',
+				!! editorSettings.changeEntity?.hasHistory &&
+				postTypeSlug !== 'wp_template',
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -252,6 +253,7 @@ function EditorCanvas( {
 				layout?.wideSize )
 			? { ...globalLayoutSettings, ...layout, type: 'constrained' }
 			: { ...globalLayoutSettings, ...layout, type: 'default' };
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		layout?.type,
 		layout?.inherit,

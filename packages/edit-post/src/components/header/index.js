@@ -76,7 +76,9 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			hasHistory: !! select( editorStore ).getEditorSettings().goBack,
+			hasHistory:
+				select( editorStore ).getEditorSettings().changeEntity
+					?.hasHistory,
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),

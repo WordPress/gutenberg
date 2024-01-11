@@ -27,7 +27,7 @@ import { store as editorStore } from '../../store';
  *                                                                  editor iframe canvas.
  */
 export default function EditTemplateBlocksNotification( { contentRef } ) {
-	const { renderingMode, getPostLinkProps, templateId } = useSelect(
+	const { renderingMode, changeEntity, templateId } = useSelect(
 		( select ) => {
 			const {
 				getRenderingMode,
@@ -36,19 +36,18 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			} = select( editorStore );
 			return {
 				renderingMode: getRenderingMode(),
-				getPostLinkProps: getEditorSettings().getPostLinkProps,
+				changeEntity: getEditorSettings().changeEntity,
 				templateId: getCurrentTemplateId(),
 			};
 		},
 		[]
 	);
-	const editTemplate = getPostLinkProps
-		? getPostLinkProps( {
-				postId: templateId,
-				postType: 'wp_template',
-				canvas: 'edit',
-		  } )
-		: {};
+	const editTemplate = changeEntity?.getEntityLoader( {
+		postId: templateId,
+		postType: 'wp_template',
+		canvas: 'edit',
+	} );
+
 	const { getNotices } = useSelect( noticesStore );
 
 	const { createInfoNotice, removeNotice } = useDispatch( noticesStore );
@@ -79,7 +78,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 					actions: [
 						{
 							label: __( 'Edit template' ),
-							onClick: () => editTemplate.onClick(),
+							onClick: () => editTemplate?.loadEntity(),
 						},
 					],
 				}
@@ -107,7 +106,15 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			canvas?.removeEventListener( 'click', handleClick );
 			canvas?.removeEventListener( 'dblclick', handleDblClick );
 		};
-	}, [ lastNoticeId, renderingMode, contentRef.current ] );
+	}, [
+		lastNoticeId,
+		renderingMode,
+		editTemplate,
+		contentRef,
+		getNotices,
+		createInfoNotice,
+		removeNotice,
+	] );
 
 	return (
 		<ConfirmDialog
@@ -115,7 +122,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			confirmButtonText={ __( 'Edit template' ) }
 			onConfirm={ () => {
 				setIsDialogOpen( false );
-				editTemplate.onClick();
+				editTemplate?.loadEntity();
 			} }
 			onCancel={ () => setIsDialogOpen( false ) }
 		>

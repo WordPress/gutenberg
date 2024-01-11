@@ -11,7 +11,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { usePostLinkProps } from './use-post-link-props';
+import { useChangeEntity } from './use-change-entity';
 
 const { useBlockEditorSettings } = unlock( editorPrivateApis );
 
@@ -88,7 +88,7 @@ function useArchiveLabel( templateSlug ) {
 }
 
 export function useSpecificEditorSettings() {
-	const getPostLinkProps = usePostLinkProps();
+	const changeEntity = useChangeEntity();
 	const { templateSlug, canvasMode, settings, postWithTemplate } = useSelect(
 		( select ) => {
 			const {
@@ -126,7 +126,7 @@ export function useSpecificEditorSettings() {
 			supportsTemplateMode: true,
 			focusMode: canvasMode !== 'view',
 			defaultRenderingMode,
-			getPostLinkProps,
+			changeEntity,
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
@@ -135,7 +135,7 @@ export function useSpecificEditorSettings() {
 		settings,
 		canvasMode,
 		defaultRenderingMode,
-		getPostLinkProps,
+		changeEntity,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
 	] );

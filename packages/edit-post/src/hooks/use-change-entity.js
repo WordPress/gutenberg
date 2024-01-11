@@ -15,10 +15,10 @@ import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
  * @param {number} initialPostId   The post id of the post when the editor loaded.
  * @param {string} initialPostType The post type of the post when the editor loaded.
  *
- * @return {Object} An object containing the `currentPost` variable and
- *                 `getPostLinkProps` and `goBack` functions.
+ * @return {Object} An object containing the `currentPost`, `hasHistory` and `href` variable and
+ *                 `loadEntity` and `goBack` functions.
  */
-export default function usePostHistory( initialPostId, initialPostType ) {
+export default function useChangeEntity( initialPostId, initialPostType ) {
 	const [ postHistory, dispatch ] = useReducer(
 		( historyState, { type, post } ) => {
 			if ( type === 'push' ) {
@@ -35,7 +35,7 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 		[ { postId: initialPostId, postType: initialPostType } ]
 	);
 
-	const getPostLinkProps = useCallback( ( params ) => {
+	const getEntityLoader = useCallback( ( params ) => {
 		const currentArgs = getQueryArgs( window.location.href );
 		const currentUrlWithoutArgs = removeQueryArgs(
 			window.location.href,
@@ -49,7 +49,7 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 
 		return {
 			href: newUrl,
-			onClick: ( event ) => {
+			loadEntity: ( event ) => {
 				event?.preventDefault();
 				dispatch( {
 					type: 'push',
@@ -67,7 +67,10 @@ export default function usePostHistory( initialPostId, initialPostType ) {
 
 	return {
 		currentPost,
-		getPostLinkProps,
-		goBack: postHistory.length > 1 ? goBack : undefined,
+		changeEntity: {
+			getEntityLoader,
+			hasHistory: postHistory.length > 1,
+			goBack,
+		},
 	};
 }

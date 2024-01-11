@@ -64,7 +64,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 		canCreate,
 		canEdit,
 		currentTemplateId,
-		getPostLinkProps,
+		changeEntity,
 	} = useSelect(
 		( select ) => {
 			const { canUser, getEntityRecords } = select( coreStore );
@@ -93,20 +93,20 @@ function PostTemplateDropdownContent( { onClose } ) {
 					editorSettings.supportsTemplateMode &&
 					!! _currentTemplateId,
 				currentTemplateId: _currentTemplateId,
-				getPostLinkProps: editorSettings.getPostLinkProps,
+				changeEntity: editorSettings.changeEntity,
 			};
 		},
 		[ allowSwitchingTemplate ]
 	);
 
 	const editTemplate =
-		getPostLinkProps && currentTemplateId
-			? getPostLinkProps( {
+		changeEntity && currentTemplateId
+			? changeEntity( {
 					postId: currentTemplateId,
 					postType: 'wp_template',
 					canvas: 'edit',
 			  } )
-			: {};
+			: undefined;
 
 	const options = useMemo(
 		() =>
@@ -172,7 +172,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 					<Button
 						variant="link"
 						onClick={ () => {
-							editTemplate.onClick();
+							editTemplate?.onClick();
 							onClose();
 							createSuccessNotice(
 								__(
@@ -180,6 +180,13 @@ function PostTemplateDropdownContent( { onClose } ) {
 								),
 								{
 									type: 'snackbar',
+									actions: [
+										{
+											label: __( 'Go back' ),
+											onClick: () =>
+												changeEntity.goBack(),
+										},
+									],
 								}
 							);
 						} }

@@ -24,13 +24,13 @@ const POPOVER_PROPS = {
 };
 
 export default function BlockThemeControl( { id } ) {
-	const { isTemplateHidden, getPostLinkProps } = useSelect( ( select ) => {
+	const { isTemplateHidden, changeEntity } = useSelect( ( select ) => {
 		const { getRenderingMode, getEditorSettings } = unlock(
 			select( editorStore )
 		);
 		return {
 			isTemplateHidden: getRenderingMode() === 'post-only',
-			getPostLinkProps: getEditorSettings().getPostLinkProps,
+			changeEntity: getEditorSettings().changeEntity,
 		};
 	}, [] );
 	const { editedRecord: template, hasResolved } = useEntityRecord(
@@ -40,13 +40,13 @@ export default function BlockThemeControl( { id } ) {
 	);
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { setRenderingMode } = useDispatch( editorStore );
-	const editTemplate = getPostLinkProps
-		? getPostLinkProps( {
-				postId: template.id,
-				postType: 'wp_template',
-				canvas: 'edit',
-		  } )
-		: {};
+
+	const editTemplate = changeEntity?.getEntityLoader( {
+		postId: template.id,
+		postType: 'wp_template',
+		canvas: 'edit',
+	} );
+
 	if ( ! hasResolved ) {
 		return null;
 	}
@@ -67,7 +67,7 @@ export default function BlockThemeControl( { id } ) {
 					<MenuGroup>
 						<MenuItem
 							onClick={ ( event ) => {
-								editTemplate.onClick( event );
+								editTemplate.loadEntity( event );
 								onClose();
 								createSuccessNotice(
 									__(
@@ -75,6 +75,13 @@ export default function BlockThemeControl( { id } ) {
 									),
 									{
 										type: 'snackbar',
+										actions: [
+											{
+												label: __( 'Go back' ),
+												onClick: () =>
+													changeEntity.goBack(),
+											},
+										],
 									}
 								);
 							} }

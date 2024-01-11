@@ -22,7 +22,7 @@ import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
-import usePostHistory from './hooks/use-post-history';
+import useChangeEntity from './hooks/use-change-entity';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
@@ -33,7 +33,7 @@ function Editor( {
 	initialEdits,
 	...props
 } ) {
-	const { currentPost, getPostLinkProps, goBack } = usePostHistory(
+	const { currentPost, changeEntity } = useChangeEntity(
 		initialPostId,
 		initialPostType
 	);
@@ -111,8 +111,7 @@ function Editor( {
 	const editorSettings = useMemo( () => {
 		const result = {
 			...settings,
-			getPostLinkProps,
-			goBack,
+			changeEntity,
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -148,8 +147,7 @@ function Editor( {
 		blockTypes,
 		preferredStyleVariations,
 		updatePreferredStyleVariations,
-		getPostLinkProps,
-		goBack,
+		changeEntity,
 		defaultRenderingMode,
 	] );
 

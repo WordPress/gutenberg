@@ -48,18 +48,22 @@ const icons = {
 };
 
 export default function DocumentBar() {
-	const { postType, postId, goBack } = useSelect( ( select ) => {
+	const { postType, postId, goBack, hasHistory } = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
 			getCurrentPostType,
 			getEditorSettings: getSettings,
 		} = select( editorStore );
-		const back = getSettings().goBack;
+		const changeEntity = getSettings().changeEntity;
 		return {
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
-			goBack: typeof back === 'function' ? back : undefined,
+			goBack:
+				typeof changeEntity?.goBack === 'function'
+					? changeEntity.goBack
+					: undefined,
 			getEditorSettings: getSettings,
+			hasHistory: changeEntity?.hasHistory,
 		};
 	}, [] );
 
@@ -73,7 +77,7 @@ export default function DocumentBar() {
 		<BaseDocumentActions
 			postType={ postType }
 			postId={ postId }
-			onBack={ goBack ? handleOnBack : undefined }
+			onBack={ goBack && hasHistory ? handleOnBack : undefined }
 		/>
 	);
 }

@@ -166,7 +166,7 @@ export default function ReusableBlockEdit( {
 	} = useDispatch( blockEditorStore );
 	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
 
-	const { innerBlocks, userCanEdit, getBlockEditingMode, getPostLinkProps } =
+	const { innerBlocks, userCanEdit, getBlockEditingMode, changeEntity } =
 		useSelect(
 			( select ) => {
 				const { canUser } = select( coreStore );
@@ -183,19 +183,17 @@ export default function ReusableBlockEdit( {
 					innerBlocks: blocks,
 					userCanEdit: canEdit,
 					getBlockEditingMode: editingMode,
-					getPostLinkProps: getSettings().getPostLinkProps,
+					changeEntity: getSettings().changeEntity,
 				};
 			},
 			[ patternClientId, ref ]
 		);
 
-	const editOriginalProps = getPostLinkProps
-		? getPostLinkProps( {
-				postId: ref,
-				postType: 'wp_block',
-				canvas: 'edit',
-		  } )
-		: {};
+	const editOriginalProps = changeEntity?.getEntityLoader( {
+		postId: ref,
+		postType: 'wp_block',
+		canvas: 'edit',
+	} );
 
 	useEffect(
 		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
@@ -283,7 +281,7 @@ export default function ReusableBlockEdit( {
 
 	const handleEditOriginal = ( event ) => {
 		setBlockEditMode( setBlockEditingMode, innerBlocks, 'default' );
-		editOriginalProps.onClick( event );
+		editOriginalProps.loadEntity( event );
 	};
 
 	let children = null;
