@@ -84,7 +84,6 @@ const keys = ( maybeObject ) => {
  * @example
  * getDefinition( '#/definitions/typographyProperties/properties/fontFamily' )
  *  // returns themejson.definitions.typographyProperties.properties.fontFamily
- *
  */
 const resolveDefinitionRef = ( ref ) => {
 	const refParts = ref.split( '/' );
@@ -100,7 +99,6 @@ const resolveDefinitionRef = ( ref ) => {
  *
  * @param {Object} items
  * @return {Object} properties
- *
  */
 const getPropertiesFromArray = ( items ) => {
 	// if its a $ref resolve it
@@ -134,8 +132,7 @@ const getSettingsPropertiesMarkup = ( struct ) => {
 		const def = 'default' in props[ key ] ? props[ key ].default : '';
 		const ps =
 			props[ key ].type === 'array'
-				?
-				  keys( getPropertiesFromArray( props[ key ].items ) )
+				? keys( getPropertiesFromArray( props[ key ].items ) )
 						.sort()
 						.join( ', ' )
 				: '';
