@@ -215,6 +215,7 @@
 		"lerna": "7.1.4",
 		"lint-staged": "10.0.1",
 		"make-dir": "3.0.0",
+		"md5": "^2.2.1",
 		"metro-react-native-babel-preset": "0.73.10",
 		"metro-react-native-babel-transformer": "0.73.10",
 		"mkdirp": "3.0.1",
