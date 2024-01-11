@@ -84,7 +84,7 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 				),
-				'Font Collection config "src" option is required as a non-empty string.',
+				'Font Collection config "src" option OR "data" option is required.',
 			),
 
 		);
