@@ -334,6 +334,8 @@ function LinkControl( {
 
 	const showActions = isEditingLink && hasLinkValue;
 
+	const showURLInput = hasLinkValue && ! value?.id;
+
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
@@ -359,6 +361,7 @@ function LinkControl( {
 				<LinkPreview
 					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
 					value={ value }
+					isEditing={ isEditing }
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
 					hasUnlinkControl={ shownUnlinkControl }
@@ -398,6 +401,18 @@ function LinkControl( {
 							'has-actions': showActions,
 						} ) }
 					>
+						{ showURLInput && (
+							<TextControl
+								__nextHasNoMarginBottom
+								className="block-editor-link-control__field block-editor-link-control__search-input"
+								label={ __( 'Link' ) }
+								value={ currentUrlInputValue }
+								onChange={ setInternalURLInputValue }
+								onKeyDown={ handleSubmitWithEnter }
+								size="__unstable-large"
+							/>
+						) }
+
 						{ showTextControl && (
 							<TextControl
 								__nextHasNoMarginBottom
