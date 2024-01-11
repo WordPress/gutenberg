@@ -421,13 +421,38 @@
 	}
 }
 
+// First level of indentation is aria-level 2, max indent is 8.
+// Indent is a full icon size, plus 4px which optically aligns child icons to the text label above.
+$block-navigation-max-indent: 8;
+
 .block-editor-list-view-draggable-chip {
 	.block-editor-list-view-leaf {
 		display: flex;
-		// Where possible, restrict the width of the cloned row to the width of the list view.
-		max-width: 338px;
 		height: 36px;
 		opacity: 1;
+
+		.block-editor-list-view__expander {
+			// Remove indent on dragged component.
+			margin-left: 0 !important;
+		}
+
+		&[aria-level] {
+			margin-left: ( $icon-size ) * $block-navigation-max-indent + 4 * ( $block-navigation-max-indent - 1 );
+		}
+
+		// When updating the margin for each indentation level, the corresponding
+		// indentation in `use-list-view-drop-zone.js` must be updated as well
+		// to ensure the drop zone is aligned with the indentation.
+		@for $i from 0 to $block-navigation-max-indent {
+			&[aria-level="#{ $i + 1 }"] {
+				@if $i - 1 >= 0 {
+					margin-left: ( $icon-size * $i ) + 4 * ($i - 1) !important;
+				}
+				@else {
+					margin-left: ( $icon-size * $i ) !important;
+				}
+			}
+		}
 
 		.block-editor-list-view-block__contents-cell {
 			flex: 1;
@@ -474,9 +499,6 @@
 	cursor: pointer;
 }
 
-// First level of indentation is aria-level 2, max indent is 8.
-// Indent is a full icon size, plus 4px which optically aligns child icons to the text label above.
-$block-navigation-max-indent: 8;
 .block-editor-list-view-leaf[aria-level] .block-editor-list-view__expander {
 	margin-left: ( $icon-size ) * $block-navigation-max-indent + 4 * ( $block-navigation-max-indent - 1 );
 }

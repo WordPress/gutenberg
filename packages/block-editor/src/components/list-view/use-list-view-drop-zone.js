@@ -533,7 +533,7 @@ export default function useListViewDropZone( {
 
 				const { ownerDocument } = currentTarget || {};
 				const dragChipBlockElement = ownerDocument?.querySelector(
-					'.components-draggable-cloned-element .block-editor-block-icon'
+					'.block-editor-list-view-draggable-chip .block-editor-block-icon'
 				);
 
 				if ( dragChipBlockElement ) {
