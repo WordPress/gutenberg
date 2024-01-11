@@ -330,8 +330,7 @@ function LinkControl( {
 
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
-	const shownUnlinkControl =
-		onRemove && value && ! isEditingLink && ! isCreatingPage;
+	const shownUnlinkControl = onRemove && value && ! isCreatingPage;
 
 	const showActions = isEditingLink && hasLinkValue;
 
@@ -356,6 +355,40 @@ function LinkControl( {
 				</div>
 			) }
 
+			{ hasLinkValue && ! isCreatingPage && (
+				<LinkPreview
+					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
+					value={ value }
+					onEditClick={ () => setIsEditingLink( true ) }
+					hasRichPreviews={ hasRichPreviews }
+					hasUnlinkControl={ shownUnlinkControl }
+					additionalControls={ () => {
+						// Expose the "Opens in new tab" settings in the preview
+						// as it is the most common setting to change.
+						if (
+							! isEditing &&
+							settings?.find(
+								( setting ) => setting.id === 'opensInNewTab'
+							)
+						) {
+							return (
+								<LinkSettings
+									value={ internalControlValue }
+									settings={ settings?.filter(
+										( { id } ) => id === 'opensInNewTab'
+									) }
+									onChange={ onChange }
+								/>
+							);
+						}
+					} }
+					onRemove={ () => {
+						onRemove();
+						setIsEditingLink( true );
+					} }
+				/>
+			) }
+
 			{ isEditing && (
 				<>
 					<div
@@ -377,35 +410,46 @@ function LinkControl( {
 								size="__unstable-large"
 							/>
 						) }
-						<LinkControlSearchInput
-							currentLink={ value }
-							className="block-editor-link-control__field block-editor-link-control__search-input"
-							placeholder={ searchInputPlaceholder }
-							value={ currentUrlInputValue }
-							withCreateSuggestion={ withCreateSuggestion }
-							onCreateSuggestion={ createPage }
-							onChange={ setInternalURLInputValue }
-							onSelect={ handleSelectSuggestion }
-							showInitialSuggestions={ showInitialSuggestions }
-							allowDirectEntry={ ! noDirectEntry }
-							showSuggestions={ showSuggestions }
-							suggestionsQuery={ suggestionsQuery }
-							withURLSuggestion={ ! noURLSuggestion }
-							createSuggestionButtonText={
-								createSuggestionButtonText
-							}
-							hideLabelFromVision={ ! showTextControl }
-						/>
-						{ ! showActions && (
-							<div className="block-editor-link-control__search-enter">
-								<Button
-									onClick={ isDisabled ? noop : handleSubmit }
-									label={ __( 'Submit' ) }
-									icon={ keyboardReturn }
-									className="block-editor-link-control__search-submit"
-									aria-disabled={ isDisabled }
+
+						{ ! hasLinkValue && (
+							<>
+								<LinkControlSearchInput
+									currentLink={ value }
+									className="block-editor-link-control__field block-editor-link-control__search-input"
+									placeholder={ searchInputPlaceholder }
+									value={ currentUrlInputValue }
+									withCreateSuggestion={
+										withCreateSuggestion
+									}
+									onCreateSuggestion={ createPage }
+									onChange={ setInternalURLInputValue }
+									onSelect={ handleSelectSuggestion }
+									showInitialSuggestions={
+										showInitialSuggestions
+									}
+									allowDirectEntry={ ! noDirectEntry }
+									showSuggestions={ showSuggestions }
+									suggestionsQuery={ suggestionsQuery }
+									withURLSuggestion={ ! noURLSuggestion }
+									createSuggestionButtonText={
+										createSuggestionButtonText
+									}
+									hideLabelFromVision={ ! showTextControl }
 								/>
-							</div>
+								{ ! showActions && (
+									<div className="block-editor-link-control__search-enter">
+										<Button
+											onClick={
+												isDisabled ? noop : handleSubmit
+											}
+											label={ __( 'Submit' ) }
+											icon={ keyboardReturn }
+											className="block-editor-link-control__search-submit"
+											aria-disabled={ isDisabled }
+										/>
+									</div>
+								) }
+							</>
 						) }
 					</div>
 					{ errorMessage && (
@@ -418,39 +462,6 @@ function LinkControl( {
 						</Notice>
 					) }
 				</>
-			) }
-
-			{ value && ! isEditingLink && ! isCreatingPage && (
-				<LinkPreview
-					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
-					value={ value }
-					onEditClick={ () => setIsEditingLink( true ) }
-					hasRichPreviews={ hasRichPreviews }
-					hasUnlinkControl={ shownUnlinkControl }
-					additionalControls={ () => {
-						// Expose the "Opens in new tab" settings in the preview
-						// as it is the most common setting to change.
-						if (
-							settings?.find(
-								( setting ) => setting.id === 'opensInNewTab'
-							)
-						) {
-							return (
-								<LinkSettings
-									value={ internalControlValue }
-									settings={ settings?.filter(
-										( { id } ) => id === 'opensInNewTab'
-									) }
-									onChange={ onChange }
-								/>
-							);
-						}
-					} }
-					onRemove={ () => {
-						onRemove();
-						setIsEditingLink( true );
-					} }
-				/>
 			) }
 
 			{ showSettings && (
