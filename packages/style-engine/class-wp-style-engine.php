@@ -182,6 +182,10 @@ final class WP_Style_Engine {
 				'css_vars'      => array(
 					'shadow' => '--wp--preset--shadow--$slug',
 				),
+				'classnames'    => array(
+					'has-shadow'       => true,
+					'has-$slug-shadow' => 'shadow',
+				),
 			),
 		),
 		'dimensions' => array(

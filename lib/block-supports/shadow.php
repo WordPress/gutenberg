@@ -58,7 +58,7 @@ function gutenberg_apply_shadow_support( $block_type, $block_attributes ) {
 	$shadow_block_styles['shadow'] = $preset_shadow ? $preset_shadow : $custom_shadow;
 
 	$attributes = array();
-	$styles     = gutenberg_style_engine_get_styles( $shadow_block_styles );
+	$styles     = gutenberg_style_engine_get_styles( $shadow_block_styles, array( 'convert_vars_to_classnames' => true ) );
 
 	if ( ! empty( $styles['css'] ) ) {
 		$attributes['style'] = $styles['css'];
