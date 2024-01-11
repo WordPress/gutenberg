@@ -10,7 +10,8 @@ const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const { basename, dirname, resolve } = require( 'path' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
-const { realpathSync } = require( 'fs' );
+const { realpathSync } = require( 'node:fs' );
+const path = require( 'node:path' );
 
 /**
  * WordPress dependencies
@@ -34,6 +35,7 @@ const {
 	getBlockJsonModuleFields,
 	getBlockJsonScriptFields,
 } = require( '../utils' );
+const { getBlockJsonStyleFields } = require( '../utils/block-json' );
 
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
@@ -122,7 +124,6 @@ const baseConfig = {
 	target,
 	output: {
 		filename: '[name].js',
-		path: resolve( process.cwd(), 'build' ),
 	},
 	resolve: {
 		alias: {
@@ -281,6 +282,11 @@ if ( baseConfig.devtool ) {
 const scriptConfig = {
 	...baseConfig,
 
+	output: {
+		...baseConfig.output,
+		path: resolve( process.cwd(), 'build/script' ),
+	},
+
 	entry: getWebpackEntryPoints( 'script' ),
 
 	devServer: isProduction
@@ -322,37 +328,95 @@ const scriptConfig = {
 			patterns: [
 				{
 					from: '**/block.json',
+					to: '..',
 					context: getWordPressSrcDirectory(),
 					noErrorOnMissing: true,
 					transform( content, absoluteFrom ) {
-						const convertExtension = ( path ) => {
-							return path.replace( /\.m?(j|t)sx?$/, '.js' );
+						const convertExtension = ( assetPath ) => {
+							return assetPath.replace( /\.m?(j|t)sx?$/, '.js' );
+						};
+
+						/**
+						 * Adjust output path for compiled block assets
+						 *
+						 * If we're outputting to `build/script`,
+						 * `build/module`, and `build/style` then we'll need
+						 * to adjust the path. This is only true when doing
+						 * experimental module builds.
+						 *
+						 * @param {string} pathPart  Path part to prepend to the view path.
+						 * @param {string} assetPath Path that should be adjusted.
+						 *
+						 * @return {string} Adjusted path.
+						 */
+						const adjustBlockJsonFilePath = (
+							pathPart,
+							assetPath
+						) => {
+							if ( ! hasExperimentalModulesFlag ) {
+								return assetPath;
+							}
+
+							const filePrefix = 'file:./';
+
+							if ( ! assetPath.startsWith( filePrefix ) ) {
+								return assetPath;
+							}
+
+							const parts = assetPath
+								.slice( filePrefix.length )
+								.split( path.sep );
+
+							return filePrefix + path.join( pathPart, ...parts );
 						};
 
 						if ( basename( absoluteFrom ) === 'block.json' ) {
 							const blockJson = JSON.parse( content.toString() );
 
 							[
-								getBlockJsonScriptFields( blockJson ),
-								getBlockJsonModuleFields( blockJson ),
-							].forEach( ( fields ) => {
-								if ( fields ) {
-									for ( const [
-										key,
-										value,
-									] of Object.entries( fields ) ) {
-										if ( Array.isArray( value ) ) {
-											blockJson[ key ] =
-												value.map( convertExtension );
-										} else if (
-											typeof value === 'string'
-										) {
-											blockJson[ key ] =
-												convertExtension( value );
+								[
+									'module',
+									getBlockJsonModuleFields( blockJson ),
+								],
+								[
+									'script',
+									getBlockJsonScriptFields( blockJson ),
+								],
+								[
+									'style',
+									getBlockJsonStyleFields( blockJson ),
+								],
+							].forEach(
+								( [ multiCompilerOutputPath, fields ] ) => {
+									if ( fields ) {
+										for ( const [
+											key,
+											value,
+										] of Object.entries( fields ) ) {
+											if ( Array.isArray( value ) ) {
+												blockJson[ key ] = value
+													.map( convertExtension )
+													.map( ( val ) =>
+														adjustBlockJsonFilePath(
+															multiCompilerOutputPath,
+															val
+														)
+													);
+											} else if (
+												typeof value === 'string'
+											) {
+												blockJson[ key ] =
+													adjustBlockJsonFilePath(
+														multiCompilerOutputPath,
+														convertExtension(
+															value
+														)
+													);
+											}
 										}
 									}
 								}
-							} );
+							);
 
 							return JSON.stringify( blockJson, null, 2 );
 						}
@@ -362,6 +426,7 @@ const scriptConfig = {
 				},
 				{
 					from: '**/*.php',
+					to: '..',
 					context: getWordPressSrcDirectory(),
 					noErrorOnMissing: true,
 					filter: ( filepath ) => {
@@ -379,7 +444,7 @@ const scriptConfig = {
 		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
-		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
+		new MiniCSSExtractPlugin( { filename: '../style/[name].css' } ),
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 		// generated, and the default externals set.
 		! process.env.WP_NO_EXTERNALS &&
@@ -401,6 +466,7 @@ if ( hasExperimentalModulesFlag ) {
 
 		output: {
 			...baseConfig.output,
+			path: resolve( process.cwd(), 'build/module' ),
 			module: true,
 			chunkFormat: 'module',
 			environment: {
@@ -422,7 +488,7 @@ if ( hasExperimentalModulesFlag ) {
 			// bundle content as a convenient interactive zoomable treemap.
 			process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 			// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
-			new MiniCSSExtractPlugin( { filename: '[name].css' } ),
+			new MiniCSSExtractPlugin( { filename: '../style/[name].css' } ),
 			// React Fast Refresh.
 			hasReactFastRefresh && new ReactRefreshWebpackPlugin(),
 			// WP_NO_EXTERNALS global variable controls whether scripts' assets get

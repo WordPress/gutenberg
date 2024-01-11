@@ -1,41 +1,32 @@
 const moduleFields = new Set( [ 'viewModule' ] );
 const scriptFields = new Set( [ 'viewScript', 'script', 'editorScript' ] );
+const styleFields = new Set( [ 'style', 'editorStyle' ] );
 
-/**
- * @param {Object} blockJson
- * @return {null|Record<string, unknown>} Fields
- */
-function getBlockJsonModuleFields( blockJson ) {
-	let result = null;
-	for ( const field of moduleFields ) {
-		if ( Object.hasOwn( blockJson, field ) ) {
-			if ( ! result ) {
-				result = {};
+function makeBlockJsonGetter( properties ) {
+	/**
+	 * @param {Object} blockJson
+	 * @return {null|Record<string, unknown>} Fields
+	 */
+	return ( blockJson ) => {
+		let result = null;
+		for ( const property of properties ) {
+			if ( Object.hasOwn( blockJson, property ) ) {
+				if ( ! result ) {
+					result = {};
+				}
+				result[ property ] = blockJson[ property ];
 			}
-			result[ field ] = blockJson[ field ];
 		}
-	}
-	return result;
+		return result;
+	};
 }
 
-/**
- * @param {Object} blockJson
- * @return {null|Record<string, unknown>} Fields
- */
-function getBlockJsonScriptFields( blockJson ) {
-	let result = null;
-	for ( const field of scriptFields ) {
-		if ( Object.hasOwn( blockJson, field ) ) {
-			if ( ! result ) {
-				result = {};
-			}
-			result[ field ] = blockJson[ field ];
-		}
-	}
-	return result;
-}
+const getBlockJsonModuleFields = makeBlockJsonGetter( moduleFields );
+const getBlockJsonScriptFields = makeBlockJsonGetter( scriptFields );
+const getBlockJsonStyleFields = makeBlockJsonGetter( styleFields );
 
 module.exports = {
 	getBlockJsonModuleFields,
 	getBlockJsonScriptFields,
+	getBlockJsonStyleFields,
 };
