@@ -20,9 +20,6 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	protected static $font_face_id1;
 	protected static $font_face_id2;
 
-	private static $font_file_ttf;
-	private static $font_file_woff2;
-
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$font_family_id       = $factory->post->create( array( 'post_type' => 'wp_font_family' ) );
 		self::$other_font_family_id = $factory->post->create( array( 'post_type' => 'wp_font_family' ) );
