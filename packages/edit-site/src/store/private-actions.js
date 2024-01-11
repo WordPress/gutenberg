@@ -81,7 +81,7 @@ export const removeTemplates =
 				let successMessage;
 
 				if ( templates.length === 1 ) {
-					// Depending on how the entity was retrieved it's title might be
+					// Depending on how the entity was retrieved its title might be
 					// an object or simple string.
 					const templateTitle =
 						typeof templates[ 0 ].title === 'string'
