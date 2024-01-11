@@ -28,7 +28,7 @@ function areItemsWrapping(
 			totalWidth += rowGap;
 		}
 
-		if ( totalWidth > wrapperWidth ) {
+		if ( parseInt( totalWidth ) > parseInt( wrapperWidth ) ) {
 			return true;
 		}
 	}
