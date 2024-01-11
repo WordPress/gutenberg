@@ -143,9 +143,9 @@ $header-toolbar-min-width: 335px;
 	}
 
 	.block-editor-block-mover {
+		// Modified group borders.
 		border-left: none;
 
-		// Modified group borders
 		&::before {
 			content: "";
 			width: $border-width;
@@ -155,7 +155,7 @@ $header-toolbar-min-width: 335px;
 			margin-left: $grid-unit;
 		}
 
-		// Modified block movers separator
+		// Modified block movers horizontal separator.
 		.block-editor-block-mover__move-button-container {
 			&::before {
 				width: calc(100% - #{$grid-unit-30});
@@ -174,7 +174,7 @@ $header-toolbar-min-width: 335px;
 			border-bottom: 0;
 		}
 
-		// Modified group borders
+		// Modified group borders.
 		.components-toolbar-group,
 		.components-toolbar {
 			border-right: none;

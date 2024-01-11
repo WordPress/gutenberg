@@ -209,16 +209,16 @@
 
 			&::before {
 				content: "";
-				display: block;
 				height: $border-width;
 				width: 100%;
 				background: $gray-900;
 				position: absolute;
 				top: 50%;
 				left: 50%;
-				// With Top toolbar on, this separator has a smaller width. Translating both
-				// X and Y axis allows to make the separator alwasy centered regardless of its width.
-				transform: translate(-50%);
+				// With Top toolbar enabled, this separator has a smaller width. Translating the
+				// X axis allows to make the separator always centered regardless of its width.
+				transform: translate(-50%, 0);
+				margin-top: -$border-width * 0.5;
 			}
 		}
 	}

@@ -69,7 +69,7 @@
 			margin-left: $grid-unit;
 		}
 
-		// Modified group borders
+		// Modified group borders.
 		.components-toolbar-group,
 		.components-toolbar {
 			border-right: none;
@@ -194,11 +194,10 @@
 }
 
 .show-icon-labels {
-
 	.edit-post-header__toolbar .block-editor-block-mover {
+		// Modified group borders.
 		border-left: none;
 
-		// Modified group borders
 		&::before {
 			content: "";
 			width: $border-width;
@@ -208,7 +207,7 @@
 			margin-left: $grid-unit;
 		}
 
-		// Modified block movers separator
+		// Modified block movers horizontal separator.
 		.block-editor-block-mover__move-button-container {
 			&::before {
 				width: calc(100% - #{$grid-unit-30});
