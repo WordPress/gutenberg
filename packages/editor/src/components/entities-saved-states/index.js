@@ -218,9 +218,7 @@ export function EntitiesSavedStatesExtensible( {
 						? __(
 								'The following changes have been made to your site, templates, and content.'
 						  )
-						: __(
-								'No changes will be made to your site, templates, and content. Select the items you want to save.'
-						  ) }
+						: __( 'Select the items you want to save.' ) }
 				</p>
 			</div>
 
