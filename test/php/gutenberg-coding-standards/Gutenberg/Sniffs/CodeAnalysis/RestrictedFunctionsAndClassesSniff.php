@@ -23,7 +23,8 @@ use PHP_CodeSniffer\Sniffs\Sniff;
 final class RestrictedFunctionsAndClassesSniff implements Sniff {
 
 	/**
-	 * Holds regular expressions for classes whose use is restricted, though their definition is allowed.
+	 * Holds regular expressions for classes whose usage is restricted.
+	 * Note that declaring functions with names matching these regular expressions is still permitted.
 	 * Useful for enforcing security or architectural constraints.
 	 *
 	 * @var array Array of regex patterns for restricted classes.
@@ -31,7 +32,8 @@ final class RestrictedFunctionsAndClassesSniff implements Sniff {
 	public $restricted_classes = array();
 
 	/**
-	 * Holds regular expressions identifying functions that are restricted from being called.
+	 * Holds regular expressions for classes whose usage is restricted.
+	 * Note that declaring classes with names matching these regular expressions is still permitted.
 	 * Useful for enforcing security or architectural constraints.
 	 *
 	 * @var array Array of regex patterns for restricted functions.
@@ -50,7 +52,19 @@ final class RestrictedFunctionsAndClassesSniff implements Sniff {
 	}
 
 	/**
-	 * Processes function and class tokens.
+	 * Handles processing tokens.
+	 *
+	 * @param File $phpcsFile The file being scanned.
+	 * @param int  $stackPtr  The position of the current token
+	 *                        in the stack passed in $tokens.
+	 */
+	public function process( File $phpcsFile, $stackPtr ) {
+		$this->process_string_token( $phpcsFile, $stackPtr );
+	}
+
+	/**
+	 * Detects whether a given string token represents a function call or class usage.
+	 * It then delegates further processing based on the type of usage detected.
 	 *
 	 * @param File $phpcsFile The file being scanned.
 	 * @param int  $stackPtr  The position of the current token
@@ -58,10 +72,6 @@ final class RestrictedFunctionsAndClassesSniff implements Sniff {
 	 *
 	 * @return void
 	 */
-	public function process( File $phpcsFile, $stackPtr ) {
-		$this->process_string_token( $phpcsFile, $stackPtr );
-	}
-
 	private function process_string_token( File $phpcs_file, $stack_pointer ) {
 		if ( empty( $this->restricted_functions ) && empty( $this->restricted_classes ) ) {
 			// Nothing to process.
@@ -91,6 +101,14 @@ final class RestrictedFunctionsAndClassesSniff implements Sniff {
 		}
 	}
 
+	/**
+	 * Checks for restricted class usage.
+	 *
+	 * @param File $phpcs_file    File being scanned.
+	 * @param int  $stack_pointer Position of the text token in the token stack.
+	 *
+	 * @return void
+	 */
 	private function check_class_usage( File $phpcs_file, $stack_pointer ) {
 		$tokens     = $phpcs_file->getTokens();
 		$class_name = $tokens[ $stack_pointer ]['content'];
@@ -107,6 +125,14 @@ final class RestrictedFunctionsAndClassesSniff implements Sniff {
 		$phpcs_file->addError( $error_message, $stack_pointer, 'UsedClassInvalid' );
 	}
 
+	/**
+	 * Checks for restricted function usage.
+	 *
+	 * @param File $phpcs_file    File being scanned.
+	 * @param int  $stack_pointer Position of the text token in the token stack.
+	 *
+	 * @return void
+	 */
 	private function check_function_usage( File $phpcs_file, $stack_pointer ) {
 		$tokens        = $phpcs_file->getTokens();
 		$function_name = $tokens[ $stack_pointer ]['content'];
