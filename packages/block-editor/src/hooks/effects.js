@@ -48,7 +48,7 @@ export function EffectsPanel( { clientId, setAttributes, settings } ) {
 	return (
 		<StylesEffectsPanel
 			as={ EffectsInspectorControl }
-			paneldId={ clientId }
+			panelId={ clientId }
 			settings={ settings }
 			value={ value }
 			onChange={ onChange }
