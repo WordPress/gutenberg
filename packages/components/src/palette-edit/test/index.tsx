@@ -132,7 +132,7 @@ describe( 'PaletteEdit', () => {
 				level: 5,
 				name: 'Test label',
 			} )
-		).toBeInTheDocument();
+		).toBeVisible();
 	} );
 
 	it( 'shows empty message', () => {
@@ -143,7 +143,7 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Test empty message' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Test empty message' ) ).toBeVisible();
 	} );
 
 	it( 'can remove all colors', async () => {
@@ -160,7 +160,7 @@ describe( 'PaletteEdit', () => {
 			screen.getByRole( 'button', {
 				name: 'Remove all colors',
 			} )
-		).toBeInTheDocument();
+		).toBeVisible();
 	} );
 
 	it( 'shows a reset option when the `canReset` prop is enabled', async () => {
@@ -178,7 +178,7 @@ describe( 'PaletteEdit', () => {
 			screen.getByRole( 'button', {
 				name: 'Reset colors',
 			} )
-		).toBeInTheDocument();
+		).toBeVisible();
 	} );
 
 	it( 'does not show a reset colors option when `canReset` is disabled', async () => {
