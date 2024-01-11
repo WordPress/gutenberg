@@ -1,6 +1,6 @@
 <?php
 /**
- * Test WP_Font_Library::fonts_dir().
+ * Test wp_get_font_dir().
  *
  * @package WordPress
  * @subpackage Font Library
@@ -8,9 +8,9 @@
  * @group fonts
  * @group font-library
  *
- * @covers WP_Font_Library::fonts_dir
+ * @covers wp_get_font_dir
  */
-class Tests_Fonts_WpFontLibrary_FontsDir extends WP_Font_Library_UnitTestCase {
+class Tests_Fonts_WpFontDir extends WP_UnitTestCase {
 	private $dir_defaults;
 
 	public function __construct() {
@@ -26,8 +26,8 @@ class Tests_Fonts_WpFontLibrary_FontsDir extends WP_Font_Library_UnitTestCase {
 	}
 
 	public function test_fonts_dir() {
-		$fonts_dir = WP_Font_Library::fonts_dir();
-		$this->assertEquals( $fonts_dir, $this->dir_defaults );
+		$font_dir = wp_get_font_dir();
+		$this->assertEquals( $font_dir, $this->dir_defaults );
 	}
 
 	public function test_fonts_dir_with_filter() {
@@ -43,10 +43,10 @@ class Tests_Fonts_WpFontLibrary_FontsDir extends WP_Font_Library_UnitTestCase {
 		}
 
 		// Add the filter.
-		add_filter( 'fonts_dir', 'set_new_values' );
+		add_filter( 'font_dir', 'set_new_values' );
 
 		// Gets the fonts dir.
-		$fonts_dir = WP_Font_Library::fonts_dir();
+		$font_dir = wp_get_font_dir();
 
 		$expected = array(
 			'path'    => '/custom-path/fonts/my-custom-subdir',
@@ -57,14 +57,14 @@ class Tests_Fonts_WpFontLibrary_FontsDir extends WP_Font_Library_UnitTestCase {
 			'error'   => false,
 		);
 
-		$this->assertEquals( $fonts_dir, $expected, 'The fonts_dir() method should return the expected values.' );
+		$this->assertEquals( $font_dir, $expected, 'The wp_get_font_dir() method should return the expected values.' );
 
 		// Remove the filter.
-		remove_filter( 'fonts_dir', 'set_new_values' );
+		remove_filter( 'font_dir', 'set_new_values' );
 
 		// Gets the fonts dir.
-		$fonts_dir = WP_Font_Library::fonts_dir();
+		$font_dir = wp_get_font_dir();
 
-		$this->assertEquals( $fonts_dir, $this->dir_defaults, 'The fonts_dir() method should return the default values.' );
+		$this->assertEquals( $font_dir, $this->dir_defaults, 'The wp_get_font_dir() method should return the default values.' );
 	}
 }

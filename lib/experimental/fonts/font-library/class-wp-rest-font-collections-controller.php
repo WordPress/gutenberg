@@ -77,13 +77,16 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 			$collection->add_data( array( 'status' => 404 ) );
 			return $collection;
 		}
-		$collection_with_data = $collection->get_data();
+		$config_and_data = $collection->get_config_and_data();
+		$collection_data = $config_and_data['data'];
+
 		// If there was an error getting the collection data, return the error.
-		if ( is_wp_error( $collection_with_data ) ) {
-			$collection_with_data->add_data( array( 'status' => 500 ) );
-			return $collection_with_data;
+		if ( is_wp_error( $collection_data ) ) {
+			$collection_data->add_data( array( 'status' => 500 ) );
+			return $collection_data;
 		}
-		return new WP_REST_Response( $collection_with_data );
+
+		return new WP_REST_Response( $config_and_data );
 	}
 
 	/**
@@ -96,7 +99,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 	public function get_font_collections() {
 		$collections = array();
 		foreach ( WP_Font_Library::get_font_collections() as $collection ) {
-			$collections[] = $collection->get_config();
+			$collections[] = $collection->get_config_and_data();
 		}
 
 		return new WP_REST_Response( $collections, 200 );
