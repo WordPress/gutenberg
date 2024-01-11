@@ -78,29 +78,8 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	}
 
 	public static function wpTearDownAfterClass() {
-		if ( file_exists( self::$font_file_ttf ) ) {
-			unlink( self::$font_file_ttf );
-		}
-		if ( file_exists( self::$font_file_woff2 ) ) {
-			unlink( self::$font_file_woff2 );
-		}
-
 		self::delete_user( self::$admin_id );
 		self::delete_user( self::$editor_id );
-	}
-
-	public function set_up() {
-		parent::set_up();
-
-		// @core-merge Use `DIR_TESTDATA` instead of `GUTENBERG_DIR_TESTDATA`.
-		$font_file_ttf       = GUTENBERG_DIR_TESTDATA . 'fonts/OpenSans-Regular.ttf';
-		self::$font_file_ttf = wp_tempnam( 'OpenSans-Regular.ttf' );
-		copy( $font_file_ttf, self::$font_file_ttf );
-
-		// @core-merge Use `DIR_TESTDATA` instead of `GUTENBERG_DIR_TESTDATA`.
-		$font_file_woff2       = GUTENBERG_DIR_TESTDATA . 'fonts/OpenSans-Regular.woff2';
-		self::$font_file_woff2 = wp_tempnam( 'OpenSans-Regular.woff2' );
-		copy( $font_file_woff2, self::$font_file_woff2 );
 	}
 
 	/**
@@ -257,6 +236,8 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	 */
 	public function test_create_item() {
 		wp_set_current_user( self::$admin_id );
+		$files = $this->setup_font_file_upload( array( 'woff2' ) );
+
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
 		$request->set_param( 'theme_json_version', 2 );
 		$request->set_param(
@@ -266,28 +247,28 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 					'fontFamily' => 'Open Sans',
 					'fontWeight' => '400',
 					'fontStyle'  => 'normal',
-					'src'        => 'file-0',
+					'src'        => array_keys( $files )[0],
 				)
 			)
 		);
-		$request->set_file_params(
-			array(
-				'file-0' => array(
-					'name'      => 'OpenSans-Regular.ttf',
-					'full_path' => 'OpenSans-Regular.ttf',
-					'type'      => 'font/ttf',
-					'tmp_name'  => self::$font_file_ttf,
-					'error'     => 0,
-					'size'      => filesize( self::$font_file_ttf ),
-				),
-			)
-		);
+		$request->set_file_params( $files );
 
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
 		$this->check_font_face_data( $data, $data['id'], $response->get_links() );
 		$this->check_file_meta( $data['id'], array( $data['font_face_settings']['src'] ) );
+
+		$settings = $data['font_face_settings'];
+		unset( $settings['src'] );
+		$this->assertSame(
+			$settings,
+			array(
+				'fontFamily' => 'Open Sans',
+				'fontWeight' => '400',
+				'fontStyle'  => 'normal',
+			)
+		);
 
 		$this->assertSame( self::$font_family_id, $data['parent'], 'The returned parent id should match the font family id.' );
 
@@ -299,6 +280,8 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	 */
 	public function test_create_item_with_multiple_font_files() {
 		wp_set_current_user( self::$admin_id );
+		$files = $this->setup_font_file_upload( array( 'ttf', 'otf', 'woff', 'woff2' ) );
+
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
 		$request->set_param( 'theme_json_version', 2 );
 		$request->set_param(
@@ -308,36 +291,20 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 					'fontFamily' => 'Open Sans',
 					'fontWeight' => '400',
 					'fontStyle'  => 'normal',
-					'src'        => array( 'file-0', 'file-1' ),
+					'src'        => array_keys( $files ),
 				)
 			)
 		);
-		$request->set_file_params(
-			array(
-				'file-0' => array(
-					'name'      => 'OpenSans-Regular.ttf',
-					'full_path' => 'OpenSans-Regular.ttf',
-					'type'      => 'font/ttf',
-					'tmp_name'  => self::$font_file_ttf,
-					'error'     => 0,
-					'size'      => filesize( self::$font_file_ttf ),
-				),
-				'file-1' => array(
-					'name'      => 'OpenSans-Regular.woff2',
-					'full_path' => 'OpenSans-Regular.woff2',
-					'type'      => 'font/woff2',
-					'tmp_name'  => self::$font_file_woff2,
-					'error'     => 0,
-					'size'      => filesize( self::$font_file_woff2 ),
-				),
-			)
-		);
+		$request->set_file_params( $files );
 
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
 		$this->check_font_face_data( $data, $data['id'], $response->get_links() );
 		$this->check_file_meta( $data['id'], $data['font_face_settings']['src'] );
+
+		$settings = $data['font_face_settings'];
+		$this->assertCount( 4, $settings['src'] );
 
 		wp_delete_post( $data['id'], true );
 	}
@@ -365,6 +332,67 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$data     = $response->get_data();
 
 		$this->check_font_face_data( $data, $data['id'], $response->get_links() );
+
+		wp_delete_post( $data['id'], true );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Faces_Controller::create_item
+	 */
+	public function test_create_item_with_all_properties() {
+		wp_set_current_user( self::$admin_id );
+
+		$properties = array(
+			'fontFamily'            => 'Open Sans',
+			'fontWeight'            => '300 500',
+			'fontStyle'             => 'oblique 30deg 50deg',
+			'fontDisplay'           => 'swap',
+			'fontStretch'           => 'expanded',
+			'ascentOverride'        => '70%',
+			'descentOverride'       => '30%',
+			'fontVariant'           => 'normal',
+			'fontFeatureSettings'   => '"swsh" 2',
+			'fontVariationSettings' => '"xhgt" 0.7',
+			'lineGapOverride'       => '10%',
+			'sizeAdjust'            => '90%',
+			'unicodeRange'          => 'U+0025-00FF, U+4??',
+			'preview'               => 'https://s.w.org/images/fonts/16.7/previews/open-sans/open-sans-400-normal.svg',
+			'src'                   => 'https://fonts.gstatic.com/s/open-sans/v30/KFOkCnqEu92Fr1MmgWxPKTM1K9nz.ttf',
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
+		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'font_face_settings', wp_json_encode( $properties ) );
+
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertArrayHasKey( 'font_face_settings', $data );
+		$this->assertSame( $properties, $data['font_face_settings'] );
+
+		wp_delete_post( $data['id'], true );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Faces_Controller::validate_create_font_face_request
+	 */
+	public function test_create_item_default_theme_json_version() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
+		$request->set_param(
+			'font_face_settings',
+			wp_json_encode(
+				array(
+					'fontFamily' => 'Open Sans',
+					'src'        => 'https://fonts.gstatic.com/s/open-sans/v30/KFOkCnqEu92Fr1MmgWxPKTM1K9nz.ttf',
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 2, $data['theme_json_version'], 'The default theme.json version should be 2.' );
 	}
 
 	/**
@@ -416,7 +444,7 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 			'Invalid src'         => array(
 				'settings' => array(
 					'fontFamily' => 'Open Sans',
-					'src'        => 'invalid',
+					'src'        => '',
 				),
 			),
 			'Missing fontFamily'  => array(
@@ -431,44 +459,6 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 					'fontFamily'  => 'Open Sans',
 					'fontDisplay' => 'invalid',
 					'src'         => 'https://fonts.gstatic.com/s/open-sans/v30/KFOkCnqEu92Fr1MmgWxPKTM1K9nz.ttf',
-				),
-			),
-		);
-	}
-	/**
-	 * @dataProvider data_create_item_default_params
-	 *
-	 * @covers WP_REST_Font_Faces_Controller::validate_create_font_face_request
-	 */
-	// public function test_create_item_default_params( $theme_json_version, $settings, $expected ) {
-	//  wp_set_current_user( self::$admin_id );
-	//  $request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
-	//  $request->set_param( 'theme_json_version', 2 );
-	//  $request->set_param(
-	//      'font_face_settings',
-	//      wp_json_encode( $settings )
-	//  );
-
-	//  $response = rest_get_server()->dispatch( $request );
-	//  $data     = $response->get_data();
-
-	//  foreach ( $expected as $key => $value ) {
-	//      $this->assertSame( $value, $data[ $key ], "The returned $key should match the expected default value." );
-	//  }
-	// }
-
-	public function data_create_item_default_params() {
-		$default_settings = array(
-			'fontFamily' => 'Open Sans',
-			'src'        => 'https://fonts.gstatic.com/s/open-sans/v30/KFOkCnqEu92Fr1MmgWxPKTM1K9nz.ttf',
-		);
-
-		return array(
-			'Default theme_json_version' => array(
-				'theme_json_version' => null,
-				'settings'           => $default_settings,
-				'expected'           => array(
-					'theme_json_version' => 2,
 				),
 			),
 		);
@@ -599,5 +589,25 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 			$file_name = basename( $src );
 			$this->assertContains( $file_name, $file_meta, 'The uploaded font file path should be saved in the post meta.' );
 		}
+	}
+
+	protected function setup_font_file_upload( $formats ) {
+		$files = array();
+		foreach ( $formats as $format ) {
+			$font_file = GUTENBERG_DIR_TESTDATA . 'fonts/OpenSans-Regular.' . $format;
+			$font_path = wp_tempnam( 'OpenSans-Regular.' . $format );
+			copy( $font_file, $font_path );
+
+			$files[ 'file-' . count( $files ) ] = array(
+				'name'      => 'OpenSans-Regular.' . $format,
+				'full_path' => 'OpenSans-Regular.' . $format,
+				'type'      => 'font/' . $format,
+				'tmp_name'  => $font_path,
+				'error'     => 0,
+				'size'      => filesize( $font_path ),
+			);
+		}
+
+		return $files;
 	}
 }

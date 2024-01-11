@@ -141,14 +141,14 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	}
 
 	public function validate_create_font_face_settings( $value, $request ) {
-		// decoded font_face_settings matches schema
 		$settings = json_decode( $value, true );
 		$schema   = $this->get_item_schema()['properties']['font_face_settings'];
 
+		// Check that the font face settings match the theme.json schema.
 		$valid_settings = rest_validate_value_from_schema( $settings, $schema, 'font_face_settings' );
 
-		// Some properties, like fontWeight, validate as multiple "oneOf" types and trigger an error, but are still valid.
-		// e.g. a fontWeight of "400" validates as both a string and an integer due to loose type checking.
+		// Some properties trigger a multiple "oneOf" types error that we ignore, because they are still valid.
+		// e.g. a fontWeight of "400" validates as both a string and an integer due to is_numeric type checking.
 		if ( is_wp_error( $valid_settings ) && $valid_settings->get_error_code() !== 'rest_one_of_multiple_matches' ) {
 			$valid_settings->add_data( array( 'status' => 400 ) );
 			return $valid_settings;
@@ -157,19 +157,29 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$srcs  = is_array( $settings['src'] ) ? $settings['src'] : array( $settings['src'] );
 		$files = $request->get_file_params();
 
-		foreach ( $srcs as $src ) {
-			$src_valid_url      = wp_http_validate_url( $src );
-			$src_valid_file_key = in_array( $src, array_keys( $files ), true );
-
-			if ( ! $src_valid_url && ! $src_valid_file_key ) {
+		// Check that each file in the request references a src in the settings.
+		foreach ( array_keys( $files ) as $file ) {
+			if ( ! in_array( $file, $srcs, true ) ) {
 				return new WP_Error(
 					'rest_invalid_param',
 					/* translators: %s: A URL. */
-					__( 'The src setting must be a valid url or file key.', 'gutenberg' ),
+					__( 'Every file uploaded must be used as a font face src.', 'gutenberg' ),
 					array( 'status' => 400 )
 				);
 			}
 		}
+
+		// Check that src strings are non-empty.
+		foreach ( $srcs as $src ) {
+			if ( ! $src ) {
+				return new WP_Error(
+					'rest_invalid_param',
+					__( 'Font face src values must be non-empty strings.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+		}
+
 		return true;
 	}
 
@@ -232,6 +242,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
+		// Settings arrive as stringified JSON, since this is a multipart/form-data request.
 		$settings    = json_decode( $request->get_param( 'font_face_settings' ), true );
 		$file_params = $request->get_file_params();
 
@@ -255,6 +266,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$processed_srcs = array();
 
 		foreach ( $srcs as $src ) {
+			// If src not a file reference, use it as is.
 			if ( ! isset( $file_params[ $src ] ) ) {
 				$processed_srcs[] = $src;
 				continue;
@@ -278,10 +290,11 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 
 		$settings['src'] = count( $processed_srcs ) === 1 ? $processed_srcs[0] : $processed_srcs;
 
+		// Ensure that $settings data is slashed, so values with quotes are escaped.
 		wp_update_post(
 			array(
 				'ID'           => $font_face_id,
-				'post_content' => wp_json_encode( $settings ),
+				'post_content' => wp_json_encode( wp_slash( $settings ) ),
 			)
 		);
 
