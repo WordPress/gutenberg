@@ -394,6 +394,8 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$data     = $response->get_data();
 
 		$this->assertSame( 2, $data['theme_json_version'], 'The default theme.json version should be 2.' );
+
+		wp_delete_post( $data['id'], true );
 	}
 
 	/**
@@ -572,7 +574,7 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$this->assertSame( $post->post_parent, $data['parent'] );
 
 		$this->assertArrayHasKey( 'theme_json_version', $data );
-		$this->assertSame( 2, $data['theme_json_version'] );
+		$this->assertSame( WP_Theme_JSON::LATEST_SCHEMA, $data['theme_json_version'] );
 
 		$this->assertArrayHasKey( 'font_face_settings', $data );
 		$this->assertSame( $post->post_content, wp_json_encode( $data['font_face_settings'] ) );
