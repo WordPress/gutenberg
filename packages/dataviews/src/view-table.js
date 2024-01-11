@@ -516,7 +516,14 @@ function ViewTable( {
 				<tbody>
 					{ hasData &&
 						usedData.map( ( item, index ) => (
-							<tr key={ getItemId( item ) } className={ classnames({'is-selected': selection.includes( getItemId( item ) || index ) })}>
+							<tr
+								key={ getItemId( item ) }
+								className={ classnames( {
+									'is-selected': selection.includes(
+										getItemId( item ) || index
+									),
+								} ) }
+							>
 								{ hasBulkActions && (
 									<td
 										style={ {

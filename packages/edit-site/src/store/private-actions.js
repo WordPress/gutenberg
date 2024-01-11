@@ -62,88 +62,93 @@ export const setEditorCanvasContainerView =
 export const removeTemplates =
 	( templates ) =>
 	async ( { registry } ) => {
-			const promiseResult = await Promise.allSettled(
-				templates.map( ( template ) => {
-					return registry
-						.dispatch( coreStore )
-						.deleteEntityRecord(
-							'postType',
-							template.type,
-							template.id,
-							{ force: true },
-							{ throwOnError: true }
-						);
-				} )
-			);
-			
-			// If all the promises were fulfilled with sucess.
-			if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
-				let successMessage;
+		const promiseResult = await Promise.allSettled(
+			templates.map( ( template ) => {
+				return registry
+					.dispatch( coreStore )
+					.deleteEntityRecord(
+						'postType',
+						template.type,
+						template.id,
+						{ force: true },
+						{ throwOnError: true }
+					);
+			} )
+		);
 
-				if ( templates.length === 1 ) {
-					// Depending on how the entity was retrieved its title might be
-					// an object or simple string.
-					const templateTitle =
-						typeof templates[ 0 ].title === 'string'
-							? templates[ 0 ].title
-							: templates[ 0 ].title?.rendered;
-					successMessage = sprintf(
-						/* translators: The template/part's name. */
-						__( '"%s" deleted.' ),
-						decodeEntities( templateTitle )
+		// If all the promises were fulfilled with sucess.
+		if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
+			let successMessage;
+
+			if ( templates.length === 1 ) {
+				// Depending on how the entity was retrieved its title might be
+				// an object or simple string.
+				const templateTitle =
+					typeof templates[ 0 ].title === 'string'
+						? templates[ 0 ].title
+						: templates[ 0 ].title?.rendered;
+				successMessage = sprintf(
+					/* translators: The template/part's name. */
+					__( '"%s" deleted.' ),
+					decodeEntities( templateTitle )
+				);
+			} else {
+				successMessage = __( 'Templates deleted.' );
+			}
+
+			registry
+				.dispatch( noticesStore )
+				.createSuccessNotice( successMessage, {
+					type: 'snackbar',
+					id: 'site-editor-template-deleted-success',
+				} );
+		} else {
+			// If there was at lease one failure.
+			let errorMessage;
+			// If we were trying to delete a single template.
+			if ( promiseResult.length === 1 ) {
+				if ( promiseResult[ 0 ].reason?.message ) {
+					errorMessage = promiseResult[ 0 ].reason.message;
+				} else {
+					errorMessage = __(
+						'An error occurred while deleting the template.'
+					);
+				}
+				// If we were trying to delete a multiple templates
+			} else {
+				const errorMessages = new Set();
+				const failedPromises = promiseResult.filter(
+					( { status } ) => status === 'rejected'
+				);
+				for ( const failedPromise of failedPromises ) {
+					if ( failedPromise.reason?.message ) {
+						errorMessages.add( failedPromise.reason.message );
+					}
+				}
+				if ( errorMessages.size === 0 ) {
+					errorMessage = __(
+						'An error occurred while deleting the templates.'
+					);
+				} else if ( errorMessages.size === 1 ) {
+					errorMessage = sprintf(
+						/* translators: %s: an error message */
+						__(
+							'An error occurred while deleting the templates: %s'
+						),
+						[ ...errorMessages ][ 0 ]
 					);
 				} else {
-					successMessage = __( 'Templates deleted.' );
+					errorMessage = sprintf(
+						/* translators: %s: a list of comma separated error messages */
+						__(
+							'Some errors occurred while deleting the templates: %s'
+						),
+						[ ...errorMessages ].join( ',' )
+					);
 				}
-	
-				registry
-					.dispatch( noticesStore )
-					.createSuccessNotice( successMessage, {
-						type: 'snackbar',
-						id: 'site-editor-template-deleted-success',
-					} );		
-			} else {
-				// If there was at lease one failure.
-				let errorMessage;
-				// If we were trying to delete a single template.
-				if ( promiseResult.length === 1 ) {
-					if( promiseResult[0].reason?.message ) {
-						errorMessage = promiseResult[0].reason.message;
-					} else {
-						errorMessage = __(
-							'An error occurred while deleting the template.'
-						);
-					}
-					// If we were trying to delete a multiple templates
-				} else {
-					const errorMessages = new Set();
-					const failedPromises = promiseResult.filter( ( { status } ) => status === 'rejected' );
-					console.error({failedPromises});
-					for( const failedPromise of failedPromises ) {
-						if( failedPromise.reason?.message ) {
-							errorMessages.add( failedPromise.reason.message )
-						}
-					}
-					if( errorMessages.size === 0 ) {
-						errorMessage = __(
-							'An error occurred while deleting the templates.'
-						);
-					} else if ( errorMessages.size === 1 ) {
-						errorMessage = sprintf(
-							/* translators: %s: an error message */
-							__( 'An error occurred while deleting the templates: %s'),
-							[ ...errorMessages][0]
-						)
-					} else {
-						errorMessage = sprintf(
-							/* translators: %s: a list of comma separated error messages */
-							__( 'Some errors occurred while deleting the templates: %s'),
-							[ ...errorMessages].join( ',' )
-						)
-					}
-				}	
-				registry
-				.dispatch( noticesStore )
-				.createErrorNotice( errorMessage, { type: 'snackbar' } );	
 			}
-		};
+			registry
+				.dispatch( noticesStore )
+				.createErrorNotice( errorMessage, { type: 'snackbar' } );
+		}
+	};
