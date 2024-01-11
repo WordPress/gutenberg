@@ -32,16 +32,14 @@ function EffectsInspectorControl( { children, resetAllFilter } ) {
 export function EffectsPanel( { clientId, setAttributes, settings } ) {
 	const isEnabled = useHasEffectsPanel( settings );
 	const onChange = ( newShadow ) => {
-		setAttributes( {
-			shadow: newShadow,
-		} );
+		setAttributes( styleToAttributes( newShadow ) );
 	};
 	const blockAttributes = useSelect(
 		( select ) => select( blockEditorStore ).getBlockAttributes( clientId ),
 		[ clientId ]
 	);
 	const shadow = blockAttributes?.shadow;
-	const value = useMemo( () => ( { shadow } ), [ shadow ] );
+	const value = useMemo( () => attributesToStyle( { shadow } ), [ shadow ] );
 
 	if ( ! isEnabled ) {
 		return null;
@@ -56,4 +54,24 @@ export function EffectsPanel( { clientId, setAttributes, settings } ) {
 			onChange={ onChange }
 		/>
 	);
+}
+
+function styleToAttributes( style ) {
+	const shadowValue = style?.shadow;
+	const shadowSlug = shadowValue?.startsWith( 'var:preset|shadow|' )
+		? shadowValue.substring( 'var:preset|shadow|'.length )
+		: undefined;
+
+	return {
+		style: undefined, // TODO: check for style prop, and return it if it exists
+		shadow: shadowSlug,
+	};
+}
+
+function attributesToStyle( attributes ) {
+	return {
+		shadow: attributes.shadow
+			? 'var:preset|shadow|' + attributes.shadow
+			: undefined,
+	};
 }
