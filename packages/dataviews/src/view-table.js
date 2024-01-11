@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -516,7 +516,7 @@ function ViewTable( {
 				<tbody>
 					{ hasData &&
 						usedData.map( ( item, index ) => (
-							<tr key={ getItemId( item ) }>
+							<tr key={ getItemId( item ) } className={ classnames({'is-selected': selection.includes( getItemId( item ) || index ) })}>
 								{ hasBulkActions && (
 									<td
 										style={ {
@@ -525,7 +525,7 @@ function ViewTable( {
 										} }
 									>
 										<SingleSelectionCheckbox
-											id={ getItemId?.( item ) || index }
+											id={ getItemId( item ) || index }
 											item={ item }
 											selection={ selection }
 											onSelectionChange={
@@ -566,7 +566,7 @@ function ViewTable( {
 				</tbody>
 			</table>
 			<div
-				className={ classNames( {
+				className={ classnames( {
 					'dataviews-loading': isLoading,
 					'dataviews-no-results': ! hasData && ! isLoading,
 				} ) }

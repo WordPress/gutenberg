@@ -33,7 +33,7 @@ export function useResetTemplateAction() {
 	return useMemo(
 		() => ( {
 			id: 'reset-template',
-			label: __( 'Reset template' ),
+			label: __( 'Reset' ),
 			isPrimary: true,
 			icon: backup,
 			isEligible: isTemplateRevertable,
@@ -111,7 +111,7 @@ export function useResetTemplateAction() {
 
 export const deleteTemplateAction = {
 	id: 'delete-template',
-	label: __( 'Delete template' ),
+	label: __( 'Delete' ),
 	isPrimary: true,
 	icon: trash,
 	isEligible: isTemplateRemovable,

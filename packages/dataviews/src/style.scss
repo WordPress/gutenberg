@@ -117,6 +117,9 @@
 				background-color: #f8f8f8;
 			}
 		}
+		&.is-selected {
+			background-color: #f7f8fe;
+		}
 	}
 	thead {
 		tr {
