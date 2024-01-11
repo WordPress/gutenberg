@@ -39,7 +39,7 @@ const ListViewLeaf = forwardRef(
 			enableAnimation: true,
 			triggerAnimationOnChange: path,
 			elementSelector: isDragged
-				? '.components-draggable-cloned-element'
+				? '.block-editor-list-view-draggable-chip'
 				: undefined,
 		} );
 
