@@ -434,6 +434,8 @@ $block-navigation-max-indent: 8;
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		display: flex;
 		height: 36px;
+		// Where possible, restrict the width of the cloned row to the width of the list view.
+		max-width: 338px;
 		opacity: 1;
 
 		// Reset colors to use the admin color.
@@ -551,15 +553,14 @@ $block-navigation-max-indent: 8;
 	}
 }
 
-.block-editor-list-view-drop-indicator--vertical {
+.block-editor-list-view-drop-indicator--preview {
 	pointer-events: none;
 
 	.block-editor-list-view-drop-indicator__line {
-		background: var(--wp-admin-theme-color);
-		padding: 4px 0;
-		height: 28px;
-		width: 4px;
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+		height: 36px;
 		border-radius: 4px;
+		overflow: hidden;
 	}
 }
 
