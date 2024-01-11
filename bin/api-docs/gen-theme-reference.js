@@ -86,7 +86,7 @@ const keys = ( maybeObject ) => {
  *  // returns themejson.definitions.typographyProperties.properties.fontFamily
  *
  */
-const resolveDefintionRef = ( ref ) => {
+const resolveDefinitionRef = ( ref ) => {
 	const refParts = ref.split( '/' );
 	const definition = refParts[ refParts.length - 1 ];
 	if ( ! themejson.definitions[ definition ] ) {
