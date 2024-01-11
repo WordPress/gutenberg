@@ -111,13 +111,13 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$featured_image = $featured_image . $overlay_markup;
 	}
 
-	$width        = ! empty( $attributes['width'] )
+	$width = ! empty( $attributes['width'] )
 		? esc_attr( safecss_filter_attr( 'width:' . $attributes['width'] ) ) . ';'
 		: '';
 	if ( ! $width ) {
 		$wrapper_attributes = get_block_wrapper_attributes();
 	} else {
-		$wrapper_attributes = get_block_wrapper_attributes(array( 'style' => $width ));
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'style' => $width ) );
 	}
 	return "<figure {$wrapper_attributes}>{$featured_image}</figure>";
 }
