@@ -334,8 +334,6 @@ function LinkControl( {
 
 	const showActions = isEditingLink && hasLinkValue;
 
-	const showURLInput = hasLinkValue && ! value?.id;
-
 	// Only show text control once a URL value has been committed
 	// and it isn't just empty whitespace.
 	// See https://github.com/WordPress/gutenberg/pull/33849/#issuecomment-932194927.
@@ -401,18 +399,6 @@ function LinkControl( {
 							'has-actions': showActions,
 						} ) }
 					>
-						{ showURLInput && (
-							<TextControl
-								__nextHasNoMarginBottom
-								className="block-editor-link-control__field block-editor-link-control__search-input"
-								label={ __( 'Link' ) }
-								value={ currentUrlInputValue }
-								onChange={ setInternalURLInputValue }
-								onKeyDown={ handleSubmitWithEnter }
-								size="__unstable-large"
-							/>
-						) }
-
 						{ showTextControl && (
 							<TextControl
 								__nextHasNoMarginBottom
@@ -426,45 +412,35 @@ function LinkControl( {
 							/>
 						) }
 
-						{ ! hasLinkValue && (
-							<>
-								<LinkControlSearchInput
-									currentLink={ value }
-									className="block-editor-link-control__field block-editor-link-control__search-input"
-									placeholder={ searchInputPlaceholder }
-									value={ currentUrlInputValue }
-									withCreateSuggestion={
-										withCreateSuggestion
-									}
-									onCreateSuggestion={ createPage }
-									onChange={ setInternalURLInputValue }
-									onSelect={ handleSelectSuggestion }
-									showInitialSuggestions={
-										showInitialSuggestions
-									}
-									allowDirectEntry={ ! noDirectEntry }
-									showSuggestions={ showSuggestions }
-									suggestionsQuery={ suggestionsQuery }
-									withURLSuggestion={ ! noURLSuggestion }
-									createSuggestionButtonText={
-										createSuggestionButtonText
-									}
-									hideLabelFromVision={ ! showTextControl }
+						<LinkControlSearchInput
+							currentLink={ value }
+							className="block-editor-link-control__field block-editor-link-control__search-input"
+							placeholder={ searchInputPlaceholder }
+							value={ currentUrlInputValue }
+							withCreateSuggestion={ withCreateSuggestion }
+							onCreateSuggestion={ createPage }
+							onChange={ setInternalURLInputValue }
+							onSelect={ handleSelectSuggestion }
+							showInitialSuggestions={ showInitialSuggestions }
+							allowDirectEntry={ ! noDirectEntry }
+							showSuggestions={ showSuggestions }
+							suggestionsQuery={ suggestionsQuery }
+							withURLSuggestion={ ! noURLSuggestion }
+							createSuggestionButtonText={
+								createSuggestionButtonText
+							}
+							hideLabelFromVision={ ! showTextControl }
+						/>
+						{ ! showActions && (
+							<div className="block-editor-link-control__search-enter">
+								<Button
+									onClick={ isDisabled ? noop : handleSubmit }
+									label={ __( 'Submit' ) }
+									icon={ keyboardReturn }
+									className="block-editor-link-control__search-submit"
+									aria-disabled={ isDisabled }
 								/>
-								{ ! showActions && (
-									<div className="block-editor-link-control__search-enter">
-										<Button
-											onClick={
-												isDisabled ? noop : handleSubmit
-											}
-											label={ __( 'Submit' ) }
-											icon={ keyboardReturn }
-											className="block-editor-link-control__search-submit"
-											aria-disabled={ isDisabled }
-										/>
-									</div>
-								) }
-							</>
+							</div>
 						) }
 					</div>
 					{ errorMessage && (
