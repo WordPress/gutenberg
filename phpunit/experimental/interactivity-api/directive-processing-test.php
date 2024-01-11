@@ -225,13 +225,13 @@ class Tests_Process_Directives extends WP_UnitTestCase {
 		$this->assertSame( null, $value );
 	}
 
-	public function test_non_interactive_blocks_with_manual_inner_block_rendering_are_not_processed() {
-		$post_content    = '<!-- wp:test/non-interactive-with-directive /-->';
+	public function test_non_interactive_blocks_with_interactive_ancestor_are_processed() {
+		$post_content    = '<!-- wp:test/context-level-1 --><!-- wp:test/non-interactive-with-directive /--><!-- /wp:test/context-level-1 -->';
 		$rendered_blocks = do_blocks( $post_content );
 		$p               = new WP_HTML_Tag_Processor( $rendered_blocks );
 		$p->next_tag( array( 'class_name' => 'non-interactive-with-directive' ) );
 		$value = $p->get_attribute( 'value' );
-		$this->assertSame( null, $value );
+		$this->assertSame( 'level-1', $value );
 	}
 
 	public function test_directives_ordering() {
