@@ -76,6 +76,7 @@ function PartialSyncingControls( { name, attributes, setAttributes } ) {
 					id,
 				},
 			} );
+			return;
 		}
 	}
 
