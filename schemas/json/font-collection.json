@@ -32,7 +32,8 @@
 						}
 					}
 				},
-				"required": [ "font_family_settings" ]
+				"required": [ "font_family_settings" ],
+				"additionalProperties": false
 			}
 		},
 		"categories": {
@@ -48,8 +49,11 @@
 						"type": "string"
 					}
 				},
-				"required": [ "slug", "name" ]
+				"required": [ "slug", "name" ],
+				"additionalProperties": false
 			}
 		}
-	}
+	},
+	"additionalProperties": false,
+	"required": [ "$schema", "version", "font_families" ]
 }
