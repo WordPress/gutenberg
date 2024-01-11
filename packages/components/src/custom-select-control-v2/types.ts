@@ -8,6 +8,24 @@ import type * as Ariakit from '@ariakit/react';
  */
 import type { useDeprecatedProps } from './use-deprecated-props';
 
+/**
+ * The legacy object structure for the options array.
+ */
+type Option = {
+	key: string;
+	name: string;
+	style?: {};
+	className?: string;
+	__experimentalHint?: string;
+};
+
+/**
+ * The legacy object returned from the onChange event.
+ */
+type OnChangeObject = {
+	selectedItem: Option;
+};
+
 export type LegacyAdapterProps = Parameters< typeof useDeprecatedProps >[ 0 ];
 
 export type CustomSelectContext =
@@ -61,16 +79,6 @@ export type CustomSelectProps = {
 	value?: string | string[];
 };
 
-export type Option =
-	| {
-			key: string;
-			name: string;
-			style?: {};
-			className?: string;
-			__experimentalHint?: string;
-	  }
-	| { selectedItem: string | string[] };
-
 export type LegacyCustomSelectProps = {
 	/**
 	 * Used to visually hide the label. It will always be visible to screen readers.
@@ -90,7 +98,7 @@ export type LegacyCustomSelectProps = {
 	/**
 	 * A function that receives the new value of the input.
 	 */
-	onChange?: ( newValue: Option ) => void;
+	onChange?: ( newValue: OnChangeObject ) => void;
 	/**
 	 * The options that can be chosen from.
 	 */

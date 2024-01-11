@@ -24,7 +24,7 @@ const transformOptionsToChildren = ( props: LegacyCustomSelectProps ) => {
 	}
 
 	return props.options.map(
-		( { name, key, __experimentalHint, ...rest }: any ) => {
+		( { name, key, __experimentalHint, ...rest } ) => {
 			const withHint = (
 				<>
 					<span>{ name }</span>
@@ -63,10 +63,17 @@ export function useDeprecatedProps(
 	props: LegacyCustomSelectProps | CustomSelectProps
 ): CustomSelectProps {
 	const { onChange: onChangeLegacy } = props as LegacyCustomSelectProps;
+
 	const legacyChangeHandler = useCallback(
 		( value: string | string[] ) => {
+			if ( Array.isArray( value ) ) {
+				// The legacy version of the component doesn't handle multiple selection.
+				return;
+			}
+
+			// TODO: find a good value for the `key` prop
 			onChangeLegacy?.( {
-				selectedItem: value,
+				selectedItem: { name: value, key: 'TODO' },
 			} );
 		},
 		[ onChangeLegacy ]
