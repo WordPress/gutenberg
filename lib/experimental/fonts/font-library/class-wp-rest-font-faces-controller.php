@@ -322,7 +322,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Prepares a single post output for response.
+	 * Prepares a single font face output for response.
 	 *
 	 * @since 6.5.0
 	 *
@@ -330,7 +330,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 * @param WP_REST_Request $request Request object.
 	 * @return WP_REST_Response Response object.
 	 */
-	public function prepare_item_for_response( $item, $request ) {
+	public function prepare_item_for_response( $item, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- required by parent class
 		$data = array();
 
 		$data['id']                 = $item->ID;
