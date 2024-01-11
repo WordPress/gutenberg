@@ -53,7 +53,7 @@ class Tests_Fonts_WpFontCollection_GetConfig extends WP_UnitTestCase {
 					'src'         => 'https://localhost/fonts/mock-font-collection.json',
 				),
 				'expected_data' => array(
-					'slug'          => 'my-collection-with-url',
+					'slug'        => 'my-collection-with-url',
 					'name'        => 'My Collection with URL',
 					'description' => 'My collection description',
 				),
