@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { NoticeList } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -11,7 +10,11 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import TemplateValidationNotice from '../template-validation-notice';
 
-export function EditorNotices( { notices, onRemove } ) {
+export function EditorNotices() {
+	const notices = useSelect( ( select ) =>
+		select( noticesStore ).getNotices()
+	);
+	const { removeNotice } = useDispatch( noticesStore );
 	const dismissibleNotices = notices.filter(
 		( { isDismissible, type } ) => isDismissible && type === 'default'
 	);
@@ -28,7 +31,7 @@ export function EditorNotices( { notices, onRemove } ) {
 			<NoticeList
 				notices={ dismissibleNotices }
 				className="components-editor-notices__dismissible"
-				onRemove={ onRemove }
+				onRemove={ removeNotice }
 			>
 				<TemplateValidationNotice />
 			</NoticeList>
@@ -36,11 +39,4 @@ export function EditorNotices( { notices, onRemove } ) {
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => ( {
-		notices: select( noticesStore ).getNotices(),
-	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		onRemove: dispatch( noticesStore ).removeNotice,
-	} ) ),
-] )( EditorNotices );
+export default EditorNotices;
