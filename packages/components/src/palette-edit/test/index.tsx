@@ -115,7 +115,7 @@ describe( 'PaletteEdit', () => {
 			name: 'Test label',
 		} );
 
-		expect( paletteLabel ).toBeInTheDocument();
+		expect( paletteLabel ).toBeVisible();
 	} );
 
 	it( 'shows heading label with custom heading level', () => {
