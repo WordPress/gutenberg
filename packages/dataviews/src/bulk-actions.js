@@ -124,12 +124,14 @@ export default function BulkActions( {
 			<DropdownMenu
 				open={ isMenuOpen }
 				onOpenChange={ onMenuOpenChange }
-				label={ __( 'Filters' ) }
+				label={ __( 'Bulk actions' ) }
+				style={ { minWidth: '240px' } }
 				trigger={
 					<Button
 						className="dataviews-bulk-edit-button"
 						__next40pxDefaultSize
-						variant="secondary"
+						variant="tertiary"
+						size="compact"
 					>
 						{ selection.length
 							? sprintf(

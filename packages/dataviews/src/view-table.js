@@ -444,9 +444,10 @@ function ViewTable( {
 				aria-describedby={ tableNoticeId }
 			>
 				<thead>
-					<tr>
+					<tr className="dataviews-view-table__row">
 						{ hasBulkActions && (
 							<th
+								className="dataviews-view-table__checkbox-column"
 								style={ {
 									width: 20,
 									minWidth: 20,
@@ -518,14 +519,18 @@ function ViewTable( {
 						usedData.map( ( item, index ) => (
 							<tr
 								key={ getItemId( item ) }
-								className={ classnames( {
-									'is-selected': selection.includes(
-										getItemId( item ) || index
-									),
-								} ) }
+								className={ classnames(
+									'dataviews-view-table__row',
+									{
+										'is-selected': selection.includes(
+											getItemId( item ) || index
+										),
+									}
+								) }
 							>
 								{ hasBulkActions && (
 									<td
+										className="dataviews-view-table__checkbox-column"
 										style={ {
 											width: 20,
 											minWidth: 20,

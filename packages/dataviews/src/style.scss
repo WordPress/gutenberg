@@ -85,6 +85,14 @@
 		&[data-field-id="actions"] {
 			text-align: right;
 		}
+
+		&.dataviews-view-table__checkbox-column {
+			padding-right: 0;
+		}
+
+		.components-checkbox-control__input-container {
+			margin: $grid-unit-05;
+		}
 	}
 	tr {
 		border-bottom: 1px solid $gray-100;
@@ -113,12 +121,33 @@
 		}
 
 		&:hover {
-			td {
-				background-color: #f8f8f8;
+			background-color: #f8f8f8;
+		}
+
+		.components-checkbox-control__input {
+			opacity: 0;
+
+			&:checked,
+			&:indeterminate,
+			&:focus {
+				opacity: 1;
 			}
 		}
+
+		&:focus-within,
+		&:hover {
+			.components-checkbox-control__input {
+				opacity: 1;
+			}
+		}
+
 		&.is-selected {
-			background-color: #f7f8fe;
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			color: $gray-700;
+
+			&:hover {
+				background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+			}
 		}
 	}
 	thead {
@@ -397,6 +426,6 @@
 	width: 24px;
 }
 
-.dataviews-bulk-edit-button.components-button.is-secondary {
+.dataviews-bulk-edit-button.components-button {
 	flex-shrink: 0;
 }
