@@ -294,11 +294,6 @@ describe( 'PaletteEdit', () => {
 			} )
 		);
 		await user.click( screen.getByText( 'Primary' ) );
-		await user.click(
-			screen.getByRole( 'textbox', {
-				name: 'Color name',
-			} )
-		);
 		const nameInput = screen.getByRole( 'textbox', {
 			name: 'Color name',
 		} );
