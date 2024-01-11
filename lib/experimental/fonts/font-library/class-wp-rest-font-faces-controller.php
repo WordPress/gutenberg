@@ -246,17 +246,6 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$settings    = json_decode( $request->get_param( 'font_face_settings' ), true );
 		$file_params = $request->get_file_params();
 
-		// Create the font face post so we have an ID to attach the font files to.
-		$font_face_id = wp_insert_post(
-			array(
-				'post_type'   => $this->post_type,
-				'post_parent' => $request['font_family_id'],
-				'post_status' => 'publish',
-				'post_title'  => $settings['fontFamily'],
-				'post_name'   => sanitize_title( $settings['fontFamily'] ),
-			)
-		);
-
 		// Move the uploaded font asset from the temp folder to the fonts directory.
 		if ( ! function_exists( 'wp_handle_upload' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -264,6 +253,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 
 		$srcs           = is_string( $settings['src'] ) ? array( $settings['src'] ) : $settings['src'];
 		$processed_srcs = array();
+		$font_file_meta = array();
 
 		foreach ( $srcs as $src ) {
 			// If src not a file reference, use it as is.
@@ -282,25 +272,29 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 				);
 			}
 
-			$font_relative_path = $this->relative_fonts_path( $font_file['file'] );
-			add_post_meta( $font_face_id, '_wp_font_face_file', $font_relative_path );
-
 			$processed_srcs[] = $font_file['url'];
+			$font_file_meta[] = $this->relative_fonts_path( $font_file['file'] );
 		}
 
+		// Store the updated settings for prepare_item_for_database to use.
 		$settings['src'] = count( $processed_srcs ) === 1 ? $processed_srcs[0] : $processed_srcs;
+		$request->set_param( 'font_face_settings', $settings );
 
 		// Ensure that $settings data is slashed, so values with quotes are escaped.
-		wp_update_post(
-			array(
-				'ID'           => $font_face_id,
-				'post_content' => wp_json_encode( wp_slash( $settings ) ),
-			)
-		);
+		// WP_REST_Posts_Controller::create_item uses wp_slash() on the post_content.
+		$font_face_post = parent::create_item( $request );
 
-		$font_face_post = get_post( $font_face_id );
+		if ( is_wp_error( $font_face_post ) ) {
+			return $font_face_post;
+		}
 
-		return $this->prepare_item_for_response( $font_face_post, $request );
+		$font_face_id = $font_face_post->data['id'];
+
+		foreach ( $font_file_meta as $font_file_path ) {
+			add_post_meta( $font_face_id, '_wp_font_face_file', $font_file_path );
+		}
+
+		return $font_face_post;
 	}
 
 	/**
@@ -614,6 +608,22 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		);
 
 		return $links;
+	}
+
+	protected function prepare_item_for_database( $request ) {
+		$prepared_post = new stdClass();
+
+		// Settings have already been decoded and processed by create_item().
+		$settings = $request->get_param( 'font_face_settings' );
+
+		$prepared_post->post_type    = $this->post_type;
+		$prepared_post->post_parent  = $request['font_family_id'];
+		$prepared_post->post_status  = 'publish';
+		$prepared_post->post_title   = $settings['fontFamily'];
+		$prepared_post->post_name    = sanitize_title( $settings['fontFamily'] );
+		$prepared_post->post_content = wp_json_encode( $settings );
+
+		return $prepared_post;
 	}
 
 	protected function handle_font_file_upload( $file ) {

@@ -27,41 +27,45 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 		self::$font_family_id       = $factory->post->create( array( 'post_type' => 'wp_font_family' ) );
 		self::$other_font_family_id = $factory->post->create( array( 'post_type' => 'wp_font_family' ) );
 		self::$font_face_id1        = $factory->post->create(
-			array(
-				'post_type'    => 'wp_font_face',
-				'post_parent'  => self::$font_family_id,
-				'post_status'  => 'publish',
-				'post_title'   => 'Open Sans',
-				'post_name'    => 'open-sans',
-				'post_content' => wp_json_encode(
-					array(
-						'font_face_settings' => array(
-							'fontFamily' => 'Open Sans',
-							'fontWeight' => '400',
-							'fontStyle'  => 'normal',
-							'src'        => home_url( '/wp-content/fonts/open-sans-medium.ttf' ),
-						),
-					)
-				),
+			wp_slash(
+				array(
+					'post_type'    => 'wp_font_face',
+					'post_parent'  => self::$font_family_id,
+					'post_status'  => 'publish',
+					'post_title'   => 'Open Sans',
+					'post_name'    => 'open-sans',
+					'post_content' => wp_json_encode(
+						array(
+							'font_face_settings' => array(
+								'fontFamily' => 'Open Sans',
+								'fontWeight' => '400',
+								'fontStyle'  => 'normal',
+								'src'        => home_url( '/wp-content/fonts/open-sans-medium.ttf' ),
+							),
+						)
+					),
+				)
 			)
 		);
 		self::$font_face_id2        = $factory->post->create(
-			array(
-				'post_type'    => 'wp_font_face',
-				'post_parent'  => self::$font_family_id,
-				'post_status'  => 'publish',
-				'post_title'   => 'Open Sans',
-				'post_name'    => 'open-sans',
-				'post_content' => wp_json_encode(
-					array(
-						'font_face_settings' => array(
-							'fontFamily' => 'Open Sans',
-							'fontWeight' => '900',
-							'fontStyle'  => 'normal',
-							'src'        => home_url( '/wp-content/fonts/open-sans-bold.ttf' ),
-						),
-					)
-				),
+			wp_slash(
+				array(
+					'post_type'    => 'wp_font_face',
+					'post_parent'  => self::$font_family_id,
+					'post_status'  => 'publish',
+					'post_title'   => 'Open Sans',
+					'post_name'    => 'open-sans',
+					'post_content' => wp_json_encode(
+						array(
+							'font_face_settings' => array(
+								'fontFamily' => 'Open Sans',
+								'fontWeight' => '900',
+								'fontStyle'  => 'normal',
+								'src'        => home_url( '/wp-content/fonts/open-sans-bold.ttf' ),
+							),
+						)
+					),
+				)
 			)
 		);
 
@@ -574,7 +578,7 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$this->assertSame( 2, $data['theme_json_version'] );
 
 		$this->assertArrayHasKey( 'font_face_settings', $data );
-		$this->assertSame( $post->post_content, wp_json_encode( $data['font_face_settings'], JSON_UNESCAPED_SLASHES ) );
+		$this->assertSame( $post->post_content, wp_json_encode( $data['font_face_settings'] ) );
 
 		$this->assertNotEmpty( $links );
 		$this->assertSame( rest_url( 'wp/v2/font-families/' . $post->post_parent . '/font-faces/' . $post->ID ), $links['self'][0]['href'] );
