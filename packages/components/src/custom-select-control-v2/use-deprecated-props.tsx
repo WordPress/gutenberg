@@ -90,10 +90,8 @@ export function useDeprecatedProps(
 		return {
 			...legacyProps,
 			children: transformOptionsToChildren( props ),
-			// temp ignore
-			//@ts-ignore
-			defaultValue: props?.value?.name ?? undefined,
-			label: props.label ?? '',
+			label: props.label,
+			hideLabelFromVision: props.hideLabelFromVision,
 			onChange: legacyChangeHandler,
 			size: adaptSizes( props ),
 		};
