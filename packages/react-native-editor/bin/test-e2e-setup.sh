@@ -2,13 +2,6 @@
 
 set -o pipefail
 
-if command -v appium >/dev/null 2>&1; then
-	APPIUM_CMD="appium"
-else
-	# Use relative path to access the locally installed appium
-	APPIUM_CMD="../../../node_modules/.bin/appium"
-fi
-
 function log_info() {
 	printf "ℹ️  $1\n"
 }
@@ -21,20 +14,20 @@ function log_error() {
 	printf "❌ $1\n"
 }
 
-output=$($APPIUM_CMD driver list --installed --json)
+output=$(appium driver list --installed --json)
 
 if echo "$output" | grep -q 'uiautomator2'; then
 	log_info "UiAutomator2 available."
 else
 	log_info "UiAutomator2 not found, installing..."
-	$APPIUM_CMD driver install uiautomator2
+	appium driver install uiautomator2
 fi
 
 if echo "$output" | grep -q 'xcuitest'; then
 	log_info "XCUITest available."
 else
 	log_info "XCUITest not found, installing..."
-	$APPIUM_CMD driver install xcuitest
+	appium driver install xcuitest
 fi
 
 CONFIG_FILE="$(pwd)/__device-tests__/helpers/device-config.json"
