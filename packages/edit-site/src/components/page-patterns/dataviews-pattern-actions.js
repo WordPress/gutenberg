@@ -45,7 +45,7 @@ export const exportJSONaction = {
 	id: 'export-pattern',
 	label: __( 'Export as JSON' ),
 	isEligible: ( item ) => item.type === PATTERN_TYPES.user,
-	callback: ( item ) => {
+	callback: ( [ item ] ) => {
 		const json = {
 			__file: item.type,
 			title: item.title || item.name,
@@ -71,7 +71,8 @@ export const renameAction = {
 		const hasThemeFile = isTemplatePart && item.templatePart.has_theme_file;
 		return isCustomPattern && ! hasThemeFile;
 	},
-	RenderModal: ( { item, closeModal } ) => {
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
 		const [ title, setTitle ] = useState( () => item.title );
 		const { editEntityRecord, saveEditedEntityRecord } =
 			useDispatch( coreStore );
@@ -160,7 +161,8 @@ export const deleteAction = {
 		return canDeleteOrReset( item ) && ! hasThemeFile;
 	},
 	hideModalHeader: true,
-	RenderModal: ( { item, closeModal } ) => {
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
 		const { __experimentalDeleteReusableBlock } =
 			useDispatch( reusableBlocksStore );
 		const { createErrorNotice, createSuccessNotice } =
@@ -224,7 +226,8 @@ export const resetAction = {
 		return canDeleteOrReset( item ) && hasThemeFile;
 	},
 	hideModalHeader: true,
-	RenderModal: ( { item, closeModal } ) => {
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
 		const { removeTemplate } = useDispatch( editSiteStore );
 		return (
 			<VStack spacing="5">
@@ -254,7 +257,8 @@ export const duplicatePatternAction = {
 	label: _x( 'Duplicate', 'action label' ),
 	isEligible: ( item ) => item.type !== TEMPLATE_PART_POST_TYPE,
 	modalHeader: _x( 'Duplicate pattern', 'action label' ),
-	RenderModal: ( { item, closeModal } ) => {
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
 		const { categoryId = PATTERN_DEFAULT_CATEGORY } = getQueryArgs(
 			window.location.href
 		);
@@ -288,7 +292,8 @@ export const duplicateTemplatePartAction = {
 	label: _x( 'Duplicate', 'action label' ),
 	isEligible: ( item ) => item.type === TEMPLATE_PART_POST_TYPE,
 	modalHeader: _x( 'Duplicate template part', 'action label' ),
-	RenderModal: ( { item, closeModal } ) => {
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
 		const { createSuccessNotice } = useDispatch( noticesStore );
 		const { categoryId = PATTERN_DEFAULT_CATEGORY } = getQueryArgs(
 			window.location.href
