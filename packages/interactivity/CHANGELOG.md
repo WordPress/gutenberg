@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.1.1-next.0 (2024-01-11)
+
 ### Bug Fix
 
 -   Fix namespaces when there are nested interactive regions. ([#57029](https://github.com/WordPress/gutenberg/pull/57029))

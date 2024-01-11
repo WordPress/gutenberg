@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.15.0-next.0 (2024-01-11)
+
 ### Bug Fix
 
 -   `NumberControl`: Make increment and decrement buttons keyboard accessible. ([#57402](https://github.com/WordPress/gutenberg/pull/57402)).
