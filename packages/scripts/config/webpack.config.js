@@ -380,6 +380,8 @@ const scriptConfig = {
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
 		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
+		// React Fast Refresh.
+		hasReactFastRefresh && new ReactRefreshWebpackPlugin(),
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 		// generated, and the default externals set.
 		! process.env.WP_NO_EXTERNALS &&
@@ -423,8 +425,6 @@ if ( hasExperimentalModulesFlag ) {
 			process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 			// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
 			new MiniCSSExtractPlugin( { filename: '[name].css' } ),
-			// React Fast Refresh.
-			hasReactFastRefresh && new ReactRefreshWebpackPlugin(),
 			// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 			// generated, and the default externals set.
 			! process.env.WP_NO_EXTERNALS &&
