@@ -27,13 +27,11 @@ const aspectRatio = {
 			return styleRules;
 		}
 
-		// For aspect ratio to work, the width must be 100%.
-		// If a width support is added in the future, this should be updated
-		// to check if a width value is present before outputting this rule.
+		// To ensure the aspect ratio does not get overridden by `minHeight` unset any existing rule.
 		styleRules.push( {
 			selector: options.selector,
-			key: 'width',
-			value: '100%',
+			key: 'minHeight',
+			value: 'unset',
 		} );
 
 		styleRules.push(
