@@ -44,11 +44,11 @@
 					"slug": {
 						"type": "string"
 					},
-					"title": {
+					"name": {
 						"type": "string"
 					}
 				},
-				"required": [ "slug", "title" ]
+				"required": [ "slug", "name" ]
 			}
 		}
 	}
