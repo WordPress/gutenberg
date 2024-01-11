@@ -105,7 +105,7 @@ const resolveDefinitionRef = ( ref ) => {
 const getPropertiesFromArray = ( items ) => {
 	// if its a $ref resolve it
 	if ( items.$ref ) {
-		return resolveDefintionRef( items.$ref ).properties;
+		return resolveDefinitionRef( items.$ref ).properties;
 	}
 
 	// otherwise just return the properties
