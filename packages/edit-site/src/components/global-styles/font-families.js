@@ -61,11 +61,7 @@ function FontFamilies() {
 						) ) }
 					</ItemGroup>
 				) : (
-					<>
-						{ __(
-							'No fonts installed.'
-						) }
-					</>
+					<>{ __( 'No fonts installed.' ) }</>
 				) }
 			</VStack>
 		</>
