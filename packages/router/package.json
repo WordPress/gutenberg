@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/router",
-	"version": "0.17.0",
+	"version": "0.17.1-next.79a6196f.0",
 	"description": "Router API for WordPress pages.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
