@@ -126,15 +126,15 @@ export const deleteTemplateAction = {
 						? sprintf(
 								// translators: %d: number of items to delete.
 								_n(
-									'delete %d item?',
-									'delete %d items?',
+									'Delete %d item?',
+									'Delete %d items?',
 									templates.length
 								),
 								templates.length
 						  )
 						: sprintf(
 								// translators: %s: The template or template part's titles
-								__( 'delete "%s"?' ),
+								__( 'Delete "%s"?' ),
 								decodeEntities(
 									templates?.[ 0 ]?.title?.rendered
 								)
