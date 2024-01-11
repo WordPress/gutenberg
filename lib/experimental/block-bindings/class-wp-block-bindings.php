@@ -38,7 +38,7 @@ class WP_Block_Bindings {
 	 * @return void
 	 */
 	public function register_source( $source_name, $label, $apply ) {
-		$this->block_bindings_sources[ $source_name ] = array(
+		$this->sources[ $source_name ] = array(
 			'label' => $label,
 			'apply' => $apply,
 		);
