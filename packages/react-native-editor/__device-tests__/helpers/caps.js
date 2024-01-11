@@ -51,7 +51,7 @@ exports.android = {
 
 // SauceLabs config
 exports.sauceOptions = {
-	appiumVersion: '2.0.0',
+	appiumVersion: '2.1.3',
 };
 
 exports.prefixKeysWithAppium = ( obj ) => {
