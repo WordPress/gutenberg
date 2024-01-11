@@ -158,15 +158,21 @@ function FontCollection( { id } ) {
 		const fontFamily = fontsToInstall[ 0 ];
 
 		try {
-			fontFamily?.fontFace?.forEach( async ( fontFace ) => {
-				if ( fontFace.downloadFromUrl ) {
-					fontFace.file = await downloadFontFaceAsset(
-						fontFace.downloadFromUrl
-					);
-					delete fontFace.downloadFromUrl;
-				}
-			} );
+			if ( fontFamily?.fontFace ) {
+				await Promise.all(
+					fontFamily.fontFace.map( async ( fontFace ) => {
+						if ( fontFace.downloadFromUrl ) {
+							fontFace.file = await downloadFontFaceAsset(
+								fontFace.downloadFromUrl
+							);
+							delete fontFace.downloadFromUrl;
+						}
+					} )
+				);
+			}
 		} catch ( error ) {
+			// If any of the fonts fail to download,
+			// show an error notice and stop the request from being sent.
 			setNotice( {
 				type: 'error',
 				message: __(
