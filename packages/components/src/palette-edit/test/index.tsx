@@ -241,7 +241,7 @@ describe( 'PaletteEdit', () => {
 		} );
 	} );
 
-	it( 'can not add a new palette', () => {
+	it( 'can not add new colors when `canOnlyChangeValues` is enabled', () => {
 		render( <PaletteEdit { ...defaultProps } canOnlyChangeValues /> );
 
 		expect(
