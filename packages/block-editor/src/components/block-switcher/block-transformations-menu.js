@@ -37,7 +37,7 @@ function useGroupedTransforms( possibleBlockTransformations ) {
 		const priorityTextTranformsNames = Object.keys(
 			priorityContentTranformationBlocks
 		);
-		return possibleBlockTransformations.reduce(
+		const groupedPossibleTransforms = possibleBlockTransformations.reduce(
 			( accumulator, item ) => {
 				const { name } = item;
 				if ( priorityTextTranformsNames.includes( name ) ) {
@@ -49,6 +49,17 @@ function useGroupedTransforms( possibleBlockTransformations ) {
 			},
 			{ priorityTextTransformations: [], restTransformations: [] }
 		);
+		if (
+			groupedPossibleTransforms.priorityTextTransformations.length ===
+				1 &&
+			groupedPossibleTransforms.priorityTextTransformations[ 0 ].name ===
+				'core/quote'
+		) {
+			const singleQuote =
+				groupedPossibleTransforms.priorityTextTransformations.pop();
+			groupedPossibleTransforms.restTransformations.push( singleQuote );
+		}
+		return groupedPossibleTransforms;
 	}, [ possibleBlockTransformations ] );
 
 	// Order the priority text transformations.
