@@ -41,6 +41,23 @@ describe( 'global styles renderer', () => {
 												fontSize: '3em',
 											},
 										},
+										'core/media-text': {
+											color: {
+												text: 'maroon',
+											},
+											elements: {
+												link: {
+													color: {
+														text: 'firebrick',
+													},
+													':hover': {
+														color: {
+															text: 'coral',
+														},
+													},
+												},
+											},
+										},
 									},
 									elements: {
 										link: {
@@ -131,6 +148,9 @@ describe( 'global styles renderer', () => {
 					selector: '.my-image',
 					featureSelectors: '.my-image img, .my-image .crop-area',
 				},
+				'core/media-text': {
+					selector: '.media-text',
+				},
 			};
 
 			expect( getNodesWithStyles( tree, blockSelectors ) ).toEqual( [
@@ -170,6 +190,27 @@ describe( 'global styles renderer', () => {
 					styles: {
 						typography: {
 							fontSize: '3em',
+						},
+					},
+				},
+				{
+					selector: '.is-style-foo.my-group .media-text',
+					styles: {
+						color: {
+							text: 'maroon',
+						},
+					},
+				},
+				{
+					selector: '.is-style-foo.my-group .media-text a',
+					styles: {
+						color: {
+							text: 'firebrick',
+						},
+						':hover': {
+							color: {
+								text: 'coral',
+							},
 						},
 					},
 				},
