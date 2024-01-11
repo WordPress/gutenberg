@@ -1,0 +1,3 @@
+<?php
+
+Gutenberg_Class();
