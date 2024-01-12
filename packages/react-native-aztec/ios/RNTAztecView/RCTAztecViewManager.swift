@@ -91,5 +91,21 @@ public class RCTAztecViewManager: RCTViewManager {
             aztecView.reactBlur()
         }
     }
+
+    @objc
+    func onMarkFormatting(_ viewTag: NSNumber, _ color: String) {
+        self.executeBlock(viewTag: viewTag) { (aztecView) in
+            let range = NSRange(location: aztecView.selectedRange.location, length: 0)
+            aztecView.toggleMark(range: range, color: color, resetColor: false)
+        }
+    }
+
+    @objc
+    func onRemoveMarkFormatting(_ viewTag: NSNumber) {
+        self.executeBlock(viewTag: viewTag) { (aztecView) in
+            let range = NSRange(location: aztecView.selectedRange.location, length: 0)
+            aztecView.toggleMark(range: range, color: nil, resetColor: true)
+        }
+    }
 }
 
