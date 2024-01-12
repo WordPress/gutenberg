@@ -15,12 +15,33 @@ function useIsCollapsed( overlayMenu, navRef ) {
 		`(max-width: ${ NAVIGATION_MOBILE_COLLAPSE })`
 	);
 
+	// Determines the conditions under which the navigation should be collapsed.
 	const shouldBeCollapsed = () => {
-		return (
-			( 'mobile' === overlayMenu && isMobileBreakPoint ) ||
-			'always' === overlayMenu ||
-			( 'auto' === overlayMenu && navigationIsWrapping( navRef.current ) )
-		);
+		// If the overlay menu is set to always, then it should always be collapsed.
+		if ( 'always' === overlayMenu ) {
+			return true;
+		}
+
+		// If the overlay menu is set to mobile and the screen is at the mobile breakpoint, then it should be collapsed.
+		if ( 'mobile' === overlayMenu && isMobileBreakPoint ) {
+			return true;
+		}
+
+		// If the overlay menu is set to auto, then we need to check if the navigation is wrapping.
+		if ( 'auto' === overlayMenu ) {
+			if ( ! navRef.current ) {
+				return false;
+			}
+
+			// If the navigation is already collapsed, then it should stay collapsed.
+			// We uncollapse it when the screen is resized so that we can measure the full width of the nav.
+			// It's not ideal to use the actual class name here.
+			if ( navRef.current.classList.contains( 'is-collapsed' ) ) {
+				return true;
+			}
+
+			return navigationIsWrapping( navRef.current );
+		}
 	};
 
 	const [ isCollapsed, setIsCollapsed ] = useState( shouldBeCollapsed() );
