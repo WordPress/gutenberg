@@ -119,9 +119,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 							className={ classnames(
 								'selected-block-tools-wrapper',
 								{
-									'is-collapsed':
-										isEditingTemplate &&
-										isBlockToolsCollapsed,
+									'is-collapsed': isBlockToolsCollapsed,
 								}
 							) }
 						>
@@ -131,7 +129,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 							ref={ blockToolbarRef }
 							name="block-toolbar"
 						/>
-						{ isEditingTemplate && hasBlockSelection && (
+						{ hasBlockSelection && (
 							<Button
 								className="edit-post-header__block-tools-toggle"
 								icon={ isBlockToolsCollapsed ? next : previous }
