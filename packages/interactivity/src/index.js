@@ -8,7 +8,7 @@ export { store } from './store';
 export { directive, getContext, getElement } from './hooks';
 export { navigate, prefetch } from './router';
 export { useWatch, useInit } from './utils';
-export { h as createElement } from 'preact';
+export { h as createElement, cloneElement } from 'preact';
 export { useEffect, useLayoutEffect, useContext, useMemo } from 'preact/hooks';
 export { deepSignal } from 'deepsignal';
 
