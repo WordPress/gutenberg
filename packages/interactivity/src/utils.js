@@ -4,6 +4,11 @@
 import { useEffect } from 'preact/hooks';
 import { effect } from '@preact/signals';
 
+/**
+ * Internal dependencies
+ */
+import { getScope, setScope, resetScope } from './hooks';
+
 const afterNextFrame = ( callback ) => {
 	return new Promise( ( resolve ) => {
 		const done = () => {
@@ -37,7 +42,7 @@ function createFlusher( compute, notify ) {
 // Version of `useSignalEffect` with a `useEffect`-like execution. This hook
 // implementation comes from this PR, but we added short-cirtuiting to avoid
 // infinite loops: https://github.com/preactjs/signals/pull/290
-export function useWatch( callback ) {
+export function useSignalEffect( callback ) {
 	useEffect( () => {
 		let eff = null;
 		let isExecuting = false;
@@ -53,9 +58,32 @@ export function useWatch( callback ) {
 	}, [] );
 }
 
+/**
+ * Return the passed function wrapped with the current scope so it is accessible
+ * whenever the function runs. This is primarily to make the scope accessible in
+ * hook callbacks.
+ *
+ * @param {Function} func The passed function.
+ * @return {Function} The wrapped function.
+ */
+const withScope = ( func ) => {
+	const scope = getScope();
+	return ( ...args ) => {
+		setScope( scope );
+		const output = func( ...args );
+		resetScope();
+		return output;
+	};
+};
+
+// TODO: document this.
+export function useWatch( callback ) {
+	useSignalEffect( withScope( callback ) );
+}
+
 // TODO: document this.
 export function useInit( callback ) {
-	useEffect( callback, [] );
+	useEffect( withScope( callback ), [] );
 }
 
 // For wrapperless hydration.
