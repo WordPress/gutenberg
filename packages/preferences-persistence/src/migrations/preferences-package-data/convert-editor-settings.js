@@ -10,6 +10,7 @@ export default function convertEditorSettings( data ) {
 		'editorMode',
 		'fixedToolbar',
 		'focusMode',
+		'hiddenBlockTypes',
 		'inactivePanels',
 		'keepCaretInsideBlock',
 		'mostUsedBlocks',
