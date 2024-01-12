@@ -23,7 +23,9 @@
 
 ### Enhancements
 
+-   `ColorPicker`: improve the UX around HSL sliders ([#57555](https://github.com/WordPress/gutenberg/pull/57555)).
 -   Update `ariakit` to version `0.3.10` ([#57325](https://github.com/WordPress/gutenberg/pull/57325)).
+-   Update `@ariakit/react` to version `0.3.12` and @ariakit/test to version `0.3.7` ([#57547](https://github.com/WordPress/gutenberg/pull/57547)).
 -   `DropdownMenuV2`: do not collapse suffix width ([#57238](https://github.com/WordPress/gutenberg/pull/57238)).
 -   `DateTimePicker`: Adjustment of the dot position on DayButton and expansion of the button area. ([#55502](https://github.com/WordPress/gutenberg/pull/55502)).
 -   `Modal`: Improve application of body class names ([#55430](https://github.com/WordPress/gutenberg/pull/55430)).
@@ -31,6 +33,8 @@
 -   `InputControl`, `NumberControl`, `UnitControl`, `SelectControl`, `TreeSelect`: Add `compact` size variant ([#57398](https://github.com/WordPress/gutenberg/pull/57398)).
 -   `ToggleGroupControl`: Update button size in large variant to be 32px ([#57338](https://github.com/WordPress/gutenberg/pull/57338)).
 -   `Tooltip`: improve unit tests ([#57345](https://github.com/WordPress/gutenberg/pull/57345)).
+-   `Tooltip`: no-op when nested inside other `Tooltip` components ([#57202](https://github.com/WordPress/gutenberg/pull/57202)).
+-   `PaletteEdit`: improve unit tests ([#57645](https://github.com/WordPress/gutenberg/pull/57645)).
 
 ### Experimental
 
@@ -38,6 +42,7 @@
 -   `Tabs`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
 -   `Tabs`: improve hover and text alignment styles ([#57275](https://github.com/WordPress/gutenberg/pull/57275)).
 -   `Tabs`: make sure `Tab`s are associated to the right `TabPanel`s, regardless of the order they're rendered in ([#57033](https://github.com/WordPress/gutenberg/pull/57033)).
+-   `BoxControl`: Update design ([#56665](https://github.com/WordPress/gutenberg/pull/56665)).
 
 ## 25.14.0 (2023-12-13)
 
