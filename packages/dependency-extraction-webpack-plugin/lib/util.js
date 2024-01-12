@@ -81,7 +81,7 @@ function defaultRequestToExternalModule( request ) {
 	const isWordPressScript = Boolean( defaultRequestToExternal( request ) );
 
 	if ( isWordPressScript ) {
-		return new Error(
+		throw new Error(
 			`Attempted to use WordPress script in a module: ${ request }`
 		);
 	}

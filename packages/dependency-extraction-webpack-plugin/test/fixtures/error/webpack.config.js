@@ -8,7 +8,7 @@ module.exports = {
 		new DependencyExtractionWebpackPlugin( {
 			// eslint-disable-next-line no-unused-vars
 			requestToExternal( request ) {
-				return new Error( 'Ensure error in script build.' );
+				throw new Error( 'Ensure error in script build.' );
 			},
 		} ),
 	],
