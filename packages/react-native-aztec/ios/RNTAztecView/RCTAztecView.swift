@@ -734,7 +734,8 @@ class RCTAztecView: Aztec.TextView {
         case "bold": toggleBold(range: emptyRange)
         case "italic": toggleItalic(range: emptyRange)
         case "strikethrough": toggleStrikethrough(range: emptyRange)
-        case "mark": toggleMark(range: emptyRange)
+        // This case is handled by the AztecViewManager.
+        case "mark": return
         default: print("Format not recognized")
         }
     }
