@@ -53,7 +53,6 @@ export function initializeEditor(
 	const root = createRoot( target );
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
-		editorMode: 'visual',
 		fullscreenMode: true,
 		hiddenBlockTypes: [],
 		isPublishSidebarEnabled: true,
@@ -65,6 +64,7 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
+		editorMode: 'visual',
 		fixedToolbar: false,
 		inactivePanels: [],
 		openPanels: [ 'post-status' ],
