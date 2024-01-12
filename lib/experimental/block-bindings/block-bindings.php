@@ -29,7 +29,12 @@ if ( ! function_exists( 'wp_block_bindings' ) ) {
  *
  * @param string   $source_name The name of the source.
  * @param string   $label The label of the source.
- * @param callable $apply The callback function to be executed with the source.
+ * @param callable $apply The callback executed when the source is processed during block rendering. The callable should have the following signature:
+ *                        function (object $source_attrs, object $block_instance, string $attribute_name): string
+ *                        - object $source_attrs: Object containing source ID used to look up the override value, i.e. {"value": "{ID}"}.
+ *                        - object $block_instance: The block instance.
+ *                        - string $attribute_name: The name of an attribute used to retrieve an override value from the block context.
+ *                        The callable should return a string that will be used to override the block's original value.
  * @return void
  */
 if ( ! function_exists( 'wp_block_bindings_register_source' ) ) {
