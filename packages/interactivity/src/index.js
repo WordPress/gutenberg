@@ -7,9 +7,17 @@ import { init } from './router';
 export { store } from './store';
 export { directive, getContext, getElement } from './hooks';
 export { navigate, prefetch } from './router';
-export { useWatch, useInit } from './utils';
+export {
+	useWatch,
+	useInit,
+	useEffect,
+	useLayoutEffect,
+	useCallback,
+	useMemo,
+} from './utils';
+
 export { h as createElement, cloneElement } from 'preact';
-export { useEffect, useLayoutEffect, useContext, useMemo } from 'preact/hooks';
+export { useContext } from 'preact/hooks';
 export { deepSignal } from 'deepsignal';
 
 document.addEventListener( 'DOMContentLoaded', async () => {
