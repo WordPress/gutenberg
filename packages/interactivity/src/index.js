@@ -5,6 +5,7 @@ import registerDirectives from './directives';
 import { init } from './router';
 
 export { store } from './store';
+export { registerWorker, getWorker } from './worker';
 export { directive, getContext, getElement } from './hooks';
 export { navigate, prefetch } from './router';
 export { h as createElement } from 'preact';
