@@ -7,6 +7,7 @@ import { init } from './router';
 export { store } from './store';
 export { directive, getContext, getElement } from './hooks';
 export { navigate, prefetch } from './router';
+export { useWatch, useInit } from './utils';
 export { h as createElement } from 'preact';
 export { useEffect, useContext, useMemo } from 'preact/hooks';
 export { deepSignal } from 'deepsignal';

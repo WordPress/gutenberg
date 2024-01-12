@@ -37,7 +37,7 @@ function createFlusher( compute, notify ) {
 // Version of `useSignalEffect` with a `useEffect`-like execution. This hook
 // implementation comes from this PR, but we added short-cirtuiting to avoid
 // infinite loops: https://github.com/preactjs/signals/pull/290
-export function useSignalEffect( callback ) {
+export function useWatch( callback ) {
 	useEffect( () => {
 		let eff = null;
 		let isExecuting = false;
@@ -51,6 +51,11 @@ export function useSignalEffect( callback ) {
 		eff = createFlusher( callback, notify );
 		return eff.dispose;
 	}, [] );
+}
+
+// TODO: document this.
+export function useInit( callback ) {
+	useEffect( callback, [] );
 }
 
 // For wrapperless hydration.
