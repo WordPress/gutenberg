@@ -139,8 +139,8 @@ if ( ! function_exists( 'wp_use_font_library' ) ) {
 	 * Function that determines if the font library should be activated in the site editor.
 	 *
 	 * @since 6.5.0
-	 * 
-	 * @param array  				  $editor_settings The editor settings to be potentially filtered.
+	 *
+	 * @param array                   $editor_settings The editor settings to be potentially filtered.
 	 * @param WP_Block_Editor_Context $editor_context  The editor context.
 	 */
 	function wp_use_font_library( $editor_settings, $editor_context ) {
