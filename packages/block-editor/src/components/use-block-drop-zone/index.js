@@ -20,6 +20,7 @@ import useOnBlockDrop from '../use-on-block-drop';
 import {
 	getDistanceToNearestEdge,
 	isPointContainedByRect,
+	isPointWithinTopAndBottomBoundariesOfRect,
 } from '../../utils/math';
 import { store as blockEditorStore } from '../../store';
 
@@ -146,22 +147,33 @@ export function getDropTargetPosition(
 				rect,
 				allowedEdges
 			);
+			// If the the point is close to a side, prioritize that side.
+			const [ sideDistance, sideEdge ] = getDistanceToNearestEdge(
+				position,
+				rect,
+				[ 'left', 'right' ]
+			);
+
+			const isPointInsideRect = isPointContainedByRect( position, rect );
+
 			// Prioritize the element if the point is inside of an unmodified default block.
-			if (
-				isUnmodifiedDefaultBlock &&
-				isPointContainedByRect( position, rect )
-			) {
+			if ( isUnmodifiedDefaultBlock && isPointInsideRect ) {
 				distance = 0;
-			} else if ( isPointContainedByRect( position, rect ) ) {
-				// Set target block index if the point is inside of the block
-				// and the block is modified.
+			} else if (
+				orientation === 'vertical' &&
+				( ( isPointInsideRect && sideDistance < rect.width / 4 ) ||
+					( ! isPointInsideRect &&
+						isPointWithinTopAndBottomBoundariesOfRect(
+							position,
+							rect
+						) ) )
+			) {
+				/**
+				 * This condition should only apply when the layout is vertical (otherwise there's
+				 * no need to create a Row) and dropzones should only activate when the block is
+				 * either within and close to the sides of the target block or on its outer sides.
+				 */
 				targetBlockIndex = blockIndex;
-				// If the point is inside of the block, find nearest side.
-				const [ , sideEdge ] = getDistanceToNearestEdge(
-					position,
-					rect,
-					[ 'left', 'right' ]
-				);
 				nearestSide = sideEdge;
 			}
 

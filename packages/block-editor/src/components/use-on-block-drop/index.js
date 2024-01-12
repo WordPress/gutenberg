@@ -269,10 +269,17 @@ export default function useOnBlockDrop(
 					);
 				} );
 
+				const areAllImages = blocks.every( ( block ) => {
+					return block.name === 'core/image';
+				} );
+
 				const wrappedBlocks = createBlock(
-					'core/group',
+					areAllImages ? 'core/gallery' : 'core/group',
 					{
-						layout: { type: 'flex', flexWrap: 'nowrap' },
+						layout: {
+							type: 'flex',
+							flexWrap: areAllImages ? null : 'nowrap',
+						},
 					},
 					groupInnerBlocks
 				);
