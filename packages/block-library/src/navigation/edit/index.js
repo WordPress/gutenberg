@@ -32,7 +32,7 @@ import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PanelBody,
-	SelectControl,
+	CustomSelectControl,
 	ToggleControl,
 	Button,
 	Spinner,
@@ -524,6 +524,30 @@ function Navigation( {
 	);
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+	const overlayMenuOptions = [
+		{
+			name: __( 'Off' ),
+			key: 'never',
+			__experimentalHint: __( 'Never show the overlay' ),
+		},
+		{
+			name: __( 'Always' ),
+			key: 'always',
+			__experimentalHint: __( 'Always show the overlay' ),
+		},
+		{
+			name: __( 'On mobile' ),
+			key: 'mobile',
+			__experimentalHint: __( 'Show the overlay on mobile devices' ),
+		},
+		{
+			name: __( 'Automatic' ),
+			key: 'auto',
+			__experimentalHint: __(
+				'Use the overlay when the navigation items do not fit on one line'
+			),
+		},
+	];
 	const stylingInspectorControls = (
 		<>
 			<InspectorControls>
@@ -567,38 +591,23 @@ function Navigation( {
 								</div>
 							</>
 						) }
-						<SelectControl
+
+						<CustomSelectControl
+							className="wp-block-navigation__overlay-menu-custom-select-control"
 							label={ __( 'Navigation Overlay' ) }
 							help={ __(
-								'Specifies the point at which the navigation will collapse to an icon opening an overlay.'
+								'Replace the items with an icon that opens a full-screen navigation on click.'
 							) }
-							value={ overlayMenu }
-							options={ [
-								{
-									label: __( 'Never show the overlay' ),
-									value: 'never',
-								},
-								{
-									label: __(
-										'Show the overlay on mobile devices'
-									),
-									value: 'mobile',
-								},
-								{
-									label: __(
-										'Show the overlay when the navigation items do not fit on one line'
-									),
-									value: 'auto',
-								},
-								{
-									label: __( 'Always show the overlay' ),
-									value: 'always',
-								},
-							] }
-							onChange={ ( value ) =>
-								setAttributes( { overlayMenu: value } )
-							}
-							__nextHasNoMarginBottom
+							value={ overlayMenuOptions.find( ( option ) => {
+								return option.key === overlayMenu;
+							} ) }
+							options={ overlayMenuOptions }
+							onChange={ ( option ) => {
+								setAttributes( {
+									overlayMenu: option.selectedItem.key,
+								} );
+							} }
+							__nextUnconstrainedWidt
 						/>
 						{ hasSubmenus && (
 							<>
