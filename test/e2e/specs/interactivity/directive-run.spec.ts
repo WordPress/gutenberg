@@ -42,4 +42,20 @@ test.describe( 'data-wp-run', () => {
 		await expect( page.getByTestId( 'navigated' ) ).toHaveText( 'yes' );
 		await expect( page.getByTestId( 'renderCount' ) ).toHaveText( '4' );
 	} );
+
+	test( 'should allow executing hooks', async ( { page } ) => {
+		await page.getByTestId( 'toggle' ).click();
+		const results = page.getByTestId( 'wp-run hooks results' );
+		await expect( results ).toHaveAttribute( 'data-init', 'initialized' );
+
+		await expect( results ).toHaveAttribute( 'data-watch', '0' );
+		await page.getByTestId( 'increment' ).click();
+		await expect( results ).toHaveAttribute( 'data-watch', '1' );
+		await page.getByTestId( 'increment' ).click();
+		await expect( results ).toHaveAttribute( 'data-watch', '2' );
+
+		await page.getByTestId( 'toggle' ).click();
+		await expect( results ).toHaveAttribute( 'data-init', 'cleaned up' );
+		await expect( results ).toHaveAttribute( 'data-watch', 'cleaned up' );
+	} );
 } );

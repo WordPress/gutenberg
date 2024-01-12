@@ -22,14 +22,9 @@ gutenberg_enqueue_module( 'directive-run-view' );
 		data-wp-run--renderCount="callbacks.updateRenderCount"
 		data-wp-text="state.clickCount"
 	></div>
+</div>
 
-	<div data-wp-show-mock="state.isOpen">
-		<div
-			data-wp-run="callbacks.updateIsMounted"
-			data-wp-run--hooks="callbacks.runHooks"
-		></div>
-	</div>
-
+<div data-wp-interactive='{ "namespace": "directive-run" }' >
 	<button data-testid="toggle" data-wp-on--click="actions.toggle">
 		Toggle
 	</button>
@@ -41,4 +36,19 @@ gutenberg_enqueue_module( 'directive-run-view' );
 	<button data-testid="navigate" data-wp-on--click="actions.navigate">
 		Navigate
 	</button>
+
+	<!-- Hook execution results are stored in this element as attributes. -->
+	<div
+		data-testid="wp-run hooks results"
+		data-wp-show-children="state.isOpen"
+		data-init=""
+		data-watch=""
+	>
+		<div
+			data-wp-run--mounted="callbacks.updateIsMounted"
+			data-wp-run--hooks="runs.useHooks"
+		>
+			Element with wp-run using hooks
+		</div>
+	</div>
 </div>

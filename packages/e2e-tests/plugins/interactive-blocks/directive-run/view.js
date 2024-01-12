@@ -4,18 +4,25 @@
 import {
 	store,
 	directive,
-	navigate
+	navigate,
+	useInit,
+	useWatch,
+	cloneElement,
+	getElement,
 } from '@wordpress/interactivity';
 
-// Fake `data-wp-show-mock` directive to test when things are removed from the
-// DOM.  Replace with `data-wp-show` when it's ready.
+// Custom directive to show hide the content elements in which it is placed.
 directive(
-	'show-mock',
-	( { directives: { 'show-mock': showMock }, element, evaluate } ) => {
-		const entry = showMock.find( ( { suffix } ) => suffix === 'default' );
-		if ( ! evaluate( entry ) ) return null;
-		return element;
-	}
+	'show-children',
+	( { directives: { 'show-children': showChildren }, element, evaluate } ) => {
+		const entry = showChildren.find(
+			( { suffix } ) => suffix === 'default'
+		);
+		return evaluate( entry )
+			? element
+			: cloneElement( element, { children: null } );
+	},
+	{ priority: 9 }
 );
 
 const html = `
@@ -67,6 +74,37 @@ const { state } = store( 'directive-run', {
 		},
 		updateRenderCount() {
 			setTimeout( () => ( state.renderCount = state.renderCount + 1 ) );
-		}
+		},
 	},
+	runs: {
+		useHooks() {
+			// Runs only on first render.
+			useInit( () => {
+				const { ref } = getElement();
+				ref
+					.closest( '[data-testid="wp-run hooks results"]')
+					.setAttribute( 'data-init', 'initialized' );
+				return () => {
+					ref
+						.closest( '[data-testid="wp-run hooks results"]')
+						.setAttribute( 'data-init', 'cleaned up' );
+				};
+			} );
+
+			// Runs whenever a signal consumed inside updates its value. Also
+			// executes for the first render.
+			useWatch( () => {
+				const { ref } = getElement();
+				const { clickCount } = state;
+				ref
+					.closest( '[data-testid="wp-run hooks results"]')
+					.setAttribute( 'data-watch', clickCount );
+				return () => {
+					ref
+						.closest( '[data-testid="wp-run hooks results"]')
+						.setAttribute( 'data-watch', 'cleaned up' );
+				};
+			} );
+		}
+	}
 } );
