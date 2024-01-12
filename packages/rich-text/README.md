@@ -301,7 +301,7 @@ _Returns_
 
 ### privateApis
 
-Private @wordpress/block-editor APIs.
+Private @wordpress/rich-text APIs.
 
 ### registerFormatType
 
