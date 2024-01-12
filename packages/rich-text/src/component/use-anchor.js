@@ -86,18 +86,6 @@ function createVirtualAnchorElement( range, editableContentElement ) {
 	};
 }
 
-/**
- * Get the anchor: a format element if there is a matching one based on the
- * tagName and className or a range otherwise.
- *
- * @param {HTMLElement} editableContentElement The editable wrapper.
- * @param {string}      tagName                The tag name of the format
- *                                             element.
- * @param {string}      className              The class name of the format
- *                                             element.
- *
- * @return {HTMLElement|VirtualAnchorElement|undefined} The anchor.
- */
 function getAnchor( editableContentElement, tagName, className ) {
 	if ( ! editableContentElement ) return;
 
@@ -124,19 +112,7 @@ function getAnchor( editableContentElement, tagName, className ) {
 	return createVirtualAnchorElement( range, editableContentElement );
 }
 
-/**
- * This hook, to be used in a format type's Edit component, returns the active
- * element that is formatted, or a virtual element for the selection range if
- * no format is active. The returned value is meant to be used for positioning
- * UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
- *
- * @param {Object}           $1                        Named parameters.
- * @param {HTMLElement|null} $1.editableContentElement The element containing
- *                                                     the editable content.
- * @param {WPFormat=}        $1.settings               The format type's settings.
- * @return {Element|VirtualAnchorElement|undefined|null} The active element or selection range.
- */
-export function useAnchor( { editableContentElement, settings = {} } ) {
+function useAnchorBase( { editableContentElement, settings = {} } ) {
 	const { tagName, className } = settings;
 	const [ anchor, setAnchor ] = useState( () =>
 		getAnchor( editableContentElement, tagName, className )
@@ -174,6 +150,33 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 		};
 	}, [ editableContentElement, tagName, className, callback ] );
 
-	anchor.update = callback;
+	return {
+		anchor,
+		update: callback,
+	};
+}
+
+/**
+ * This hook, to be used in a format type's Edit component, returns the active
+ * element that is formatted, or a virtual element for the selection range if
+ * no format is active. The returned value is meant to be used for positioning
+ * UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
+ *
+ * @param {Object}           $1                        Named parameters.
+ * @param {HTMLElement|null} $1.editableContentElement The element containing
+ *                                                     the editable content.
+ * @param {WPFormat=}        $1.settings               The format type's settings.
+ * @return {Element|VirtualAnchorElement|undefined|null} The active element or selection range.
+ */
+export function useAnchor( { editableContentElement, settings = {} } ) {
+	const { anchor } = useAnchorBase( { editableContentElement, settings } );
+
 	return anchor;
+}
+
+export function useAnchorWithUpdate( {
+	editableContentElement,
+	settings = {},
+} ) {
+	return useAnchorBase( { editableContentElement, settings } );
 }
