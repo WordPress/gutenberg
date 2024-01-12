@@ -72,6 +72,16 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 					} )
 				);
 
+				/* eslint-disable jest/no-conditional-expect */
+				if ( configCase.includes( 'error' ) ) {
+					expect( stats.hasErrors() ).toBe( true );
+					expect(
+						stats.toString( { errors: true, all: false } )
+					).toMatchSnapshot();
+					return;
+				}
+				/* eslint-enable jest/no-conditional-expect */
+
 				if ( stats.hasErrors() ) {
 					throw new Error(
 						stats.toString( { errors: true, all: false } )
