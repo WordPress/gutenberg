@@ -78,6 +78,27 @@ const {
 	AdvancedPanel: StylesAdvancedPanel,
 } = unlock( blockEditorPrivateApis );
 
+// This code is duplicated from utils within the block editor package.
+// Should the block editor export these utils for reuse?
+const isObject = ( item ) =>
+	!! item && typeof item === 'object' && ! Array.isArray( item );
+
+const deepMerge = ( target, source ) => {
+	if ( isObject( target ) && isObject( source ) ) {
+		for ( const key in source ) {
+			const getter = Object.getOwnPropertyDescriptor( source, key )?.get;
+			if ( typeof getter === 'function' ) {
+				Object.defineProperty( target, key, { get: getter } );
+			} else if ( isObject( source[ key ] ) ) {
+				if ( ! target[ key ] ) Object.assign( target, { [ key ]: {} } );
+				deepMerge( target[ key ], source[ key ] );
+			} else {
+				Object.assign( target, { [ key ]: source[ key ] } );
+			}
+		}
+	}
+};
+
 function ScreenBlock( { name, variation } ) {
 	let prefixParts = [];
 	if ( variation ) {
@@ -88,9 +109,23 @@ function ScreenBlock( { name, variation } ) {
 	const [ style ] = useGlobalStyle( prefix, name, 'user', {
 		shouldDecodeEncode: false,
 	} );
-	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
-		shouldDecodeEncode: false,
-	} );
+	const [ rawInheritedStyle, setStyle ] = useGlobalStyle(
+		prefix,
+		name,
+		'all',
+		{
+			shouldDecodeEncode: false,
+		}
+	);
+	const [ variationStyles ] = useGlobalStyle(
+		`blocks.variations.${ variation }`
+	);
+
+	const inheritedStyle = variationStyles
+		? JSON.parse( JSON.stringify( variationStyles ) )
+		: {};
+	deepMerge( inheritedStyle, rawInheritedStyle );
+
 	const [ userSettings ] = useGlobalSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const settings = useSettingsForBlockElement( rawSettings, name );
