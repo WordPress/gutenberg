@@ -63,10 +63,10 @@ if ( ! function_exists( 'wp_block_bindings_get_sources' ) ) {
 /**
  * Replaces the HTML content of a block based on the provided source value.
  *
- * @param string $block_content The original content of the block.
- * @param string $block_name The name of the block.
- * @param array  $block_attr Attributes of the block.
- * @param mixed  $source_value The value from the source to replace in the block content.
+ * @param string $block_content Block Content.
+ * @param string $block_name The name of the block to process.
+ * @param string $block_attr The attribute of the block we want to process.
+ * @param string $source_value The value used to replace the HTML.
  * @return string The modified block content.
  */
 if ( ! function_exists( 'wp_block_bindings_replace_html' ) ) {
