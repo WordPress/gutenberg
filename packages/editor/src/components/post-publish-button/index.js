@@ -167,6 +167,7 @@ export class PostPublishButton extends Component {
 			className: 'editor-post-publish-button',
 			isBusy: ! isAutoSaving && isSaving,
 			variant: 'primary',
+			size: 'compact',
 			onClick: this.createOnClick( onClickButton ),
 		};
 

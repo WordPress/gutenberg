@@ -29,6 +29,7 @@ function SaveButton() {
 			aria-disabled={ isSaving }
 			onClick={ isSaving ? undefined : saveEditedWidgetAreas }
 			disabled={ ! hasEditedWidgetAreaIds }
+			size="compact"
 		>
 			{ isSaving ? __( 'Saving…' ) : __( 'Update' ) }
 		</Button>
