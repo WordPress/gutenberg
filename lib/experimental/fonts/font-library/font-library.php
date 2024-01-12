@@ -22,13 +22,33 @@
 function gutenberg_init_font_library_routes() {
 	// @core-merge: This code will go into Core's `create_initial_post_types()`.
 	$args = array(
+		'labels'                         => array(
+			'name'          => __( 'Font Families', 'gutenberg' ),
+			'singular_name' => __( 'Font Family', 'gutenberg' ),
+		),
 		'public'                         => false,
 		'_builtin'                       => true,  /* internal use only. don't use this when registering your own post type. */
-		'label'                          => 'Font Family',
 		'show_in_rest'                   => true,
+		'capabilities'                   => array(
+			'read'                   => 'edit_theme_options',
+			'read_post'              => 'edit_theme_options',
+			'read_private_posts'     => 'edit_theme_options',
+			'create_posts'           => 'edit_theme_options',
+			'publish_posts'          => 'edit_theme_options',
+			'edit_post'              => 'edit_theme_options',
+			'edit_posts'             => 'edit_theme_options',
+			'edit_others_posts'      => 'edit_theme_options',
+			'edit_published_posts'   => 'edit_theme_options',
+			'delete_post'            => 'edit_theme_options',
+			'delete_posts'           => 'edit_theme_options',
+			'delete_others_posts'    => 'edit_theme_options',
+			'delete_published_posts' => 'edit_theme_options',
+		),
+		'map_meta_cap'                   => false,
 		'rest_base'                      => 'font-families',
 		'rest_controller_class'          => 'WP_REST_Font_Families_Controller',
 		'autosave_rest_controller_class' => 'WP_REST_Autosave_Font_Families_Controller',
+		'query_var'                      => false,
 	);
 	register_post_type( 'wp_font_family', $args );
 
@@ -44,21 +64,20 @@ function gutenberg_init_font_library_routes() {
 			'hierarchical' => false,
 			'show_in_rest' => false,
 			'rest_base'    => 'font-faces',
-			// TODO: Add custom font capability
 			'capabilities' => array(
 				'read'                   => 'edit_theme_options',
 				'read_post'              => 'edit_theme_options',
 				'read_private_posts'     => 'edit_theme_options',
 				'create_posts'           => 'edit_theme_options',
+				'publish_posts'          => 'edit_theme_options',
 				'edit_post'              => 'edit_theme_options',
 				'edit_posts'             => 'edit_theme_options',
-				'publish_posts'          => 'edit_theme_options',
-				'edit_published_posts'   => 'edit_theme_options',
-				'delete_posts'           => 'edit_theme_options',
-				'delete_post'            => 'edit_theme_options',
-				'delete_published_posts' => 'edit_theme_options',
 				'edit_others_posts'      => 'edit_theme_options',
+				'edit_published_posts'   => 'edit_theme_options',
+				'delete_post'            => 'edit_theme_options',
+				'delete_posts'           => 'edit_theme_options',
 				'delete_others_posts'    => 'edit_theme_options',
+				'delete_published_posts' => 'edit_theme_options',
 			),
 			'map_meta_cap' => false,
 			'query_var'    => false,

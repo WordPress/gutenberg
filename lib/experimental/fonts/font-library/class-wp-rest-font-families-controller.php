@@ -1,12 +1,10 @@
 <?php
 /**
- * Rest Font Families Controller.
+ * REST API: WP_REST_Font_Families_Controller class
  *
- * This file contains the class for the REST API Font Families Controller.
- *
- * @package    WordPress
- * @subpackage Font Library
- * @since      6.5.0
+ * @package WordPress
+ * @subpackage REST_API
+ * @since 6.5.0
  */
 
 if ( class_exists( 'WP_REST_Font_Families_Controller' ) ) {
@@ -19,16 +17,18 @@ if ( class_exists( 'WP_REST_Font_Families_Controller' ) ) {
  * @since 6.5.0
  */
 class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
-
 	/**
 	 * Constructor.
 	 *
 	 * @since 6.5.0
 	 */
 	public function __construct() {
-		$this->rest_base = 'font-families';
-		$this->namespace = 'wp/v2';
-		$this->post_type = 'wp_font_family';
+		$post_type       = 'wp_font_family';
+		$this->post_type = $post_type;
+
+		$post_type_obj   = get_post_type_object( $post_type );
+		$this->rest_base = $post_type_obj->rest_base;
+		$this->namespace = $post_type_obj->rest_namespace;
 	}
 
 	/**
@@ -44,363 +44,420 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
+					'permission_callback' => array( $this, 'get_font_families_permissions_check' ),
+					'args'                => $this->get_collection_params(),
 				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'create_item' ),
+					'permission_callback' => array( $this, 'create_item_permissions_check' ),
+					'args'                => $this->get_create_edit_params(),
+				),
+				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base,
+			'/' . $this->rest_base . '/(?P<id>[\d]+)',
 			array(
+				'id' => array(
+					'description' => __( 'Unique identifier for the font family.', 'gutenberg' ),
+					'type'        => 'integer',
+					'required'    => true,
+				),
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
+					'permission_callback' => array( $this, 'get_font_families_permissions_check' ),
+					'args'                => array(),
+				),
 				array(
 					'methods'             => WP_REST_Server::EDITABLE,
-					'callback'            => array( $this, 'install_fonts' ),
-					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
-					'args'                => array(
-						'font_family_settings' => array(
-							'required'          => true,
-							'type'              => 'string',
-							'validate_callback' => array( $this, 'validate_install_font_families' ),
-						),
-					),
+					'callback'            => array( $this, 'update_item' ),
+					'permission_callback' => array( $this, 'update_item_permissions_check' ),
+					'args'                => $this->get_create_edit_params(),
 				),
-			)
-		);
-
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base,
-			array(
 				array(
 					'methods'             => WP_REST_Server::DELETABLE,
-					'callback'            => array( $this, 'uninstall_fonts' ),
-					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
-					'args'                => $this->uninstall_schema(),
+					'callback'            => array( $this, 'delete_item' ),
+					'permission_callback' => array( $this, 'delete_item_permissions_check' ),
+					'args'                => array(
+						'force' => array(
+							'type'        => 'boolean',
+							'default'     => false,
+							'description' => __( 'Whether to bypass Trash and force deletion.', 'default' ),
+						),
+					),
 				),
 			)
 		);
 	}
 
 	/**
-	 * Returns validation errors in font families data for installation.
+	 * Checks if a given request has access to font families.
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param array[] $font_families Font families to install.
-	 * @param array   $files         Files to install.
-	 * @return array $error_messages Array of error messages.
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	private function get_validation_errors( $font_family_settings, $files ) {
-		$error_messages = array();
+	public function get_font_families_permissions_check() {
+		$post_type = get_post_type_object( $this->post_type );
 
-		if ( ! is_array( $font_family_settings ) ) {
-			$error_messages[] = __( 'font_family_settings should be a font family definition.', 'gutenberg' );
-			return $error_messages;
+		if ( ! current_user_can( $post_type->cap->edit_posts ) ) {
+			return new WP_Error(
+				'rest_cannot_read',
+				__( 'Sorry, you are not allowed to access font faces.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
 		}
 
-		if (
-			! isset( $font_family_settings['slug'] ) ||
-			! isset( $font_family_settings['name'] ) ||
-			! isset( $font_family_settings['fontFamily'] )
-		) {
-			$error_messages[] = __( 'Font family should have slug, name and fontFamily properties defined.', 'gutenberg' );
-
-			return $error_messages;
-		}
-
-		if ( isset( $font_family_settings['fontFace'] ) ) {
-			if ( ! is_array( $font_family_settings['fontFace'] ) ) {
-				$error_messages[] = __( 'Font family should have fontFace property defined as an array.', 'gutenberg' );
-			}
-
-			if ( count( $font_family_settings['fontFace'] ) < 1 ) {
-				$error_messages[] = __( 'Font family should have at least one font face definition.', 'gutenberg' );
-			}
-
-			if ( ! empty( $font_family_settings['fontFace'] ) ) {
-				for ( $face_index = 0; $face_index < count( $font_family_settings['fontFace'] ); $face_index++ ) {
-
-					$font_face = $font_family_settings['fontFace'][ $face_index ];
-					if ( ! isset( $font_face['fontWeight'] ) || ! isset( $font_face['fontStyle'] ) ) {
-						$error_messages[] = sprintf(
-							// translators: font face index.
-							__( 'Font family Font face [%1$s] should have fontWeight and fontStyle properties defined.', 'gutenberg' ),
-							$face_index
-						);
-					}
-
-					if ( isset( $font_face['downloadFromUrl'] ) && isset( $font_face['uploadedFile'] ) ) {
-						$error_messages[] = sprintf(
-							// translators: font face index.
-							__( 'Font family Font face [%1$s] should have only one of the downloadFromUrl or uploadedFile properties defined and not both.', 'gutenberg' ),
-							$face_index
-						);
-					}
-
-					if ( isset( $font_face['uploadedFile'] ) ) {
-						if ( ! isset( $files[ $font_face['uploadedFile'] ] ) ) {
-							$error_messages[] = sprintf(
-								// translators: font face index.
-								__( 'Font family Font face [%1$s] file is not defined in the request files.', 'gutenberg' ),
-								$face_index
-							);
-						}
-					}
-				}
-			}
-		}
-
-		return $error_messages;
+		return true;
 	}
 
 	/**
-	 * Validate input for the install endpoint.
+	 * Validates font family settings when creating or updating a font family.
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param string          $param The font families to install.
-	 * @param WP_REST_Request $request The request object.
-	 * @return true|WP_Error True if the parameter is valid, WP_Error otherwise.
+	 * @param string          $value   Encoded JSON string of font family settings.
+	 * @param WP_REST_Request $request Request object.
+	 * @return false|WP_Error True if the settings are valid, otherwise a WP_Error object.
 	 */
-	public function validate_install_font_families( $param, $request ) {
-		$font_family_settings = json_decode( $param, true );
-		$files                = $request->get_file_params();
-		$error_messages       = $this->get_validation_errors( $font_family_settings, $files );
+	public function validate_font_family_settings( $value, $request ) {
+		$settings = json_decode( $value, true );
+		$schema   = $this->get_item_schema()['properties']['font_family_settings'];
+		$required = $schema['required'];
 
-		if ( empty( $error_messages ) ) {
-			return true;
+		// Allow setting individual properties if we are updating an existing font family.
+		if ( isset( $request['id'] ) ) {
+			unset( $schema['required'] );
 		}
 
-		return new WP_Error( 'rest_invalid_param', implode( ', ', $error_messages ), array( 'status' => 400 ) );
+		// Check that the font face settings match the theme.json schema.
+		$valid_settings = rest_validate_value_from_schema( $settings, $schema, 'font_family_settings' );
+
+		if ( is_wp_error( $valid_settings ) ) {
+			$valid_settings->add_data( array( 'status' => 400 ) );
+			return $valid_settings;
+		}
+
+		// Check that none of the required settings are empty values.
+		foreach ( $required as $key ) {
+			if ( isset( $settings[ $key ] ) && ! $settings[ $key ] ) {
+				return new WP_Error(
+					'rest_invalid_param',
+					/* translators: %s: Font family setting key. */
+					sprintf( __( 'Font family setting "%s" cannot be empty.', 'gutenberg' ), $key ),
+					array( 'status' => 400 )
+				);
+			}
+		}
+
+		return true;
 	}
 
 	/**
-	 * Gets the schema for the uninstall endpoint.
+	 * Sanitizes the font family settings when creating or updating a font family.
 	 *
-	 * @since 6.5.0
+	* @since 6.5.0
 	 *
-	 * @return array Schema array.
+	 * @param string          $value   Encoded JSON string of font family settings.
+	 * @param WP_REST_Request $request Request object.
+	 * @return array                   Decoded array font family settings.
 	 */
-	public function uninstall_schema() {
-		return array(
-			'font_families' => array(
-				'type'        => 'array',
-				'description' => __( 'The font families to install.', 'gutenberg' ),
-				'required'    => true,
-				'minItems'    => 1,
-				'items'       => array(
-					'required'   => true,
-					'type'       => 'object',
-					'properties' => array(
-						'slug' => array(
-							'type'        => 'string',
-							'description' => __( 'The font family slug.', 'gutenberg' ),
-							'required'    => true,
-						),
-					),
-				),
-			),
-		);
+	public function sanitize_font_family_settings( $value ) {
+		$settings = json_decode( $value, true );
+
+		if ( isset( $settings['fontFamily'] ) ) {
+			$settings['fontFamily'] = WP_Font_Family_Utils::format_font_family( $settings['fontFamily'] );
+		}
+
+		// Provide default for preview, if not provided.
+		if ( ! isset( $settings['preview'] ) ) {
+			$settings['preview'] = '';
+		}
+
+		return $settings;
 	}
 
 	/**
-	 * Removes font families from the Font Library and all their assets.
+	 * Deletes a single item.
 	 *
 	 * @since 6.5.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function uninstall_fonts( $request ) {
-		$fonts_to_uninstall = $request->get_param( 'font_families' );
+	public function delete_item( $request ) {
+		$font_family_id = $request->get_param( 'id' );
+		$force          = isset( $request['force'] ) ? (bool) $request['force'] : false;
 
-		$errors    = array();
-		$successes = array();
-
-		if ( empty( $fonts_to_uninstall ) ) {
-			$errors[] = new WP_Error(
-				'no_fonts_to_install',
-				__( 'No fonts to uninstall', 'gutenberg' )
-			);
-			$data     = array(
-				'successes' => $successes,
-				'errors'    => $errors,
-			);
-			$response = rest_ensure_response( $data );
-			$response->set_status( 400 );
-			return $response;
-		}
-
-		foreach ( $fonts_to_uninstall as $font_data ) {
-			$font   = new WP_Font_Family( $font_data );
-			$result = $font->uninstall();
-			if ( is_wp_error( $result ) ) {
-				$errors[] = $result;
-			} else {
-				$successes[] = $result;
-			}
-		}
-		$data = array(
-			'successes' => $successes,
-			'errors'    => $errors,
-		);
-		return rest_ensure_response( $data );
-	}
-
-	/**
-	 * Checks whether the user has permissions to update the Font Library.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
-	 */
-	public function update_font_library_permissions_check() {
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
+		// We don't support trashing for revisions.
+		if ( ! $force ) {
 			return new WP_Error(
-				'rest_cannot_update_font_library',
-				__( 'Sorry, you are not allowed to update the Font Library on this site.', 'gutenberg' ),
-				array(
-					'status' => rest_authorization_required_code(),
-				)
+				'rest_trash_not_supported',
+				/* translators: %s: force=true */
+				sprintf( __( "Font faces do not support trashing. Set '%s' to delete.", 'gutenberg' ), 'force=true' ),
+				array( 'status' => 501 )
 			);
 		}
-		return true;
+
+		$deleted = parent::delete_item( $request );
+
+		if ( is_wp_error( $deleted ) ) {
+			return $deleted;
+		}
+
+		foreach ( $this->get_font_face_ids( $font_family_id ) as $font_face_id ) {
+			wp_delete_post( $font_face_id, true );
+		}
 	}
 
 	/**
-	 * Checks whether the font directory exists or not.
+	 * Prepares a single item output for response.
 	 *
 	 * @since 6.5.0
 	 *
-	 * @return bool Whether the font directory exists.
+	 * @param WP_Post         $item    Post object.
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response Response object.
 	 */
-	private function has_upload_directory() {
-		$upload_dir = WP_Font_Library::get_fonts_dir();
-		return is_dir( $upload_dir );
+	public function prepare_item_for_response( $item, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- required by parent class
+		$data = array();
+
+		$data['id']                 = $item->ID;
+		$data['theme_json_version'] = 2;
+		$data['font_faces']         = $this->get_font_face_ids( $item->ID );
+
+		$settings   = json_decode( $item->post_content, true );
+		$properties = $this->get_item_schema()['properties']['font_family_settings']['properties'];
+
+		// Only return the properties defined in the schema.
+		$data['font_family_settings'] = array_intersect_key( $settings, $properties );
+
+		$response = rest_ensure_response( $data );
+		$links    = $this->prepare_links( $item );
+		$response->add_links( $links );
+
+		return $response;
 	}
 
-	/**
-	 * Checks whether the user has write permissions to the temp and fonts directories.
+		/**
+	 * Retrieves the post's schema, conforming to JSON Schema.
 	 *
 	 * @since 6.5.0
 	 *
-	 * @return true|WP_Error True if the user has write permissions, WP_Error object otherwise.
+	 * @return array Item schema data.
 	 */
-	private function has_write_permission() {
-		// The update endpoints requires write access to the temp and the fonts directories.
-		$temp_dir   = get_temp_dir();
-		$upload_dir = WP_Font_Library::get_fonts_dir();
-		if ( ! is_writable( $temp_dir ) || ! wp_is_writable( $upload_dir ) ) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Checks whether the request needs write permissions.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param array[] $font_family_settings Font family definition.
-	 * @return bool Whether the request needs write permissions.
-	 */
-	private function needs_write_permission( $font_family_settings ) {
-		if ( isset( $font_family_settings['fontFace'] ) ) {
-			foreach ( $font_family_settings['fontFace'] as $face ) {
-				// If the font is being downloaded from a URL or uploaded, it needs write permissions.
-				if ( isset( $face['downloadFromUrl'] ) || isset( $face['uploadedFile'] ) ) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Installs new fonts.
-	 *
-	 * Takes a request containing new fonts to install, downloads their assets, and adds them
-	 * to the Font Library.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param WP_REST_Request $request The request object containing the new fonts to install
-	 *                                 in the request parameters.
-	 * @return WP_REST_Response|WP_Error The updated Font Library post content.
-	 */
-	public function install_fonts( $request ) {
-		// Get new fonts to install.
-		$font_family_settings = $request->get_param( 'font_family_settings' );
-
-		/*
-		 * As this is receiving form data, the font families are encoded as a string.
-		 * The form data is used  because local fonts need to use that format to
-		 * attach the files in the request.
-		 */
-		$font_family_settings = json_decode( $font_family_settings, true );
-
-		$successes       = array();
-		$errors          = array();
-		$response_status = 200;
-
-		if ( empty( $font_family_settings ) ) {
-			$errors[]        = new WP_Error(
-				'no_fonts_to_install',
-				__( 'No fonts to install', 'gutenberg' )
-			);
-			$response_status = 400;
+	public function get_item_schema() {
+		if ( $this->schema ) {
+			return $this->add_additional_fields_schema( $this->schema );
 		}
 
-		if ( $this->needs_write_permission( $font_family_settings ) ) {
-			$upload_dir = WP_Font_Library::get_fonts_dir();
-			if ( ! $this->has_upload_directory() ) {
-				if ( ! wp_mkdir_p( $upload_dir ) ) {
-					$errors[] = new WP_Error(
-						'cannot_create_fonts_folder',
-						sprintf(
-							/* translators: %s: Directory path. */
-							__( 'Error: Unable to create directory %s.', 'gutenberg' ),
-							esc_html( $upload_dir )
-						)
-					);
-					$response_status = 500;
-				}
-			}
-
-			if ( $this->has_upload_directory() && ! $this->has_write_permission() ) {
-				$errors[]        = new WP_Error(
-					'cannot_write_fonts_folder',
-					__( 'Error: WordPress does not have permission to write the fonts folder on your server.', 'gutenberg' )
-				);
-				$response_status = 500;
-			}
-		}
-
-		if ( ! empty( $errors ) ) {
-			$data     = array(
-				'successes' => $successes,
-				'errors'    => $errors,
-			);
-			$response = rest_ensure_response( $data );
-			$response->set_status( $response_status );
-			return $response;
-		}
-
-		// Get uploaded files (used when installing local fonts).
-		$files  = $request->get_file_params();
-		$font   = new WP_Font_Family( $font_family_settings );
-		$result = $font->install( $files );
-		if ( is_wp_error( $result ) ) {
-			$errors[] = $result;
-		} else {
-			$successes[] = $result;
-		}
-
-		$data = array(
-			'successes' => $successes,
-			'errors'    => $errors,
+		$schema = array(
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => $this->post_type,
+			'type'       => 'object',
+			// Base properties for every Post.
+			'properties' => array(
+				'id'                   => array(
+					'description' => __( 'Unique identifier for the post.', 'default' ),
+					'type'        => 'integer',
+					'readonly'    => true,
+				),
+				'theme_json_version'   => array(
+					'description' => __( 'Version of the theme.json schema used for the typography settings.', 'gutenberg' ),
+					'type'        => 'integer',
+					'default'     => 2,
+					'minimum'     => 2,
+					'maximum'     => 2,
+				),
+				'font_faces'           => array(
+					'description' => __( 'The IDs of the child font faces in the font family.', 'gutenberg' ),
+					'type'        => 'array',
+					'items'       => array(
+						'type' => 'integer',
+					),
+				),
+				// Font family settings come directly from theme.json schema
+				// See https://schemas.wp.org/trunk/theme.json
+				'font_family_settings' => array(
+					'description'          => __( 'font-face declaration in theme.json format.', 'gutenberg' ),
+					'type'                 => 'object',
+					'properties'           => array(
+						'name'       => array(
+							'description' => 'Name of the font family preset, translatable.',
+							'type'        => 'string',
+						),
+						'slug'       => array(
+							'description' => 'Kebab-case unique identifier for the font family preset.',
+							'type'        => 'string',
+						),
+						'fontFamily' => array(
+							'description' => 'CSS font-family value.',
+							'type'        => 'string',
+						),
+						'preview'    => array(
+							'description' => 'URL to a preview image of the font family.',
+							'type'        => 'string',
+						),
+					),
+					'required'             => array( 'name', 'slug', 'fontFamily' ),
+					'additionalProperties' => false,
+				),
+			),
 		);
-		return rest_ensure_response( $data );
+
+		$this->schema = $schema;
+
+		return $this->add_additional_fields_schema( $this->schema );
+	}
+
+	/**
+	 * Retrieves the query params for the font family collection.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return array Collection parameters.
+	 */
+	public function get_collection_params() {
+		$params = parent::get_collection_params();
+
+		return array(
+			'page'     => $params['page'],
+			'per_page' => $params['per_page'],
+			'search'   => $params['search'],
+		);
+	}
+
+	/**
+	 * Checks if a given request has access to read items.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return true|WP_Error True if the request has read access, otherwise a WP_Error object.
+	 */
+	public function get_font_family_permissions_check() {
+		$post_type = get_post_type_object( $this->post_type );
+
+		if ( ! current_user_can( $post_type->cap->edit_posts ) ) {
+			return new WP_Error(
+				'rest_cannot_read',
+				__( 'Sorry, you are not allowed to access font families.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Get the params used when creating or updating a font family.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return array Font family create/edit arguments.
+	 */
+	public function get_create_edit_params() {
+		$properties = $this->get_item_schema()['properties'];
+		return array(
+			'theme_json_version'   => $properties['theme_json_version'],
+			// Font family settings is stringified JSON, to work with multipart/form-data.
+			// Font families don't currently support file uploads, but may accept preview files in the future.
+			'font_family_settings' => array(
+				'description'       => __( 'font-family declaration in theme.json format, encoded as a string.', 'gutenberg' ),
+				'type'              => 'string',
+				'required'          => true,
+				'validate_callback' => array( $this, 'validate_font_family_settings' ),
+				'sanitize_callback' => array( $this, 'sanitize_font_family_settings' ),
+			),
+		);
+	}
+
+	/**
+	 * Get the child font face post IDs.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param int $font_family_id Font family post ID.
+	 * @return int[] Array of child font face post IDs.
+	 * .
+	 */
+	protected function get_font_face_ids( $font_family_id ) {
+		$font_face_ids = get_posts(
+			array(
+				'fields'         => 'ids',
+				'post_parent'    => $font_family_id,
+				'post_type'      => 'wp_font_face',
+				'posts_per_page' => 999,
+			)
+		);
+		return $font_face_ids;
+	}
+
+	/**
+	 * Prepares links for the request.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_Post $post Post object.
+	 * @return array Links for the given post.
+	 */
+	protected function prepare_links( $post ) {
+		// Entity meta.
+		$links = parent::prepare_links( $post );
+
+		return array(
+			'self'       => $links['self'],
+			'collection' => $links['collection'],
+			'font_faces' => $this->prepare_font_face_links( $post->ID ),
+		);
+	}
+
+	protected function prepare_font_face_links( $font_family_id ) {
+		$font_face_ids = $this->get_font_face_ids( $font_family_id );
+		$links         = array();
+		foreach ( $font_face_ids as $font_face_id ) {
+			$links[] = array(
+				'embeddable' => true,
+				'href'       => rest_url( $this->namespace . '/' . $this->rest_base . '/' . $font_family_id . '/font-faces/' . $font_face_id ),
+			);
+		}
+		return $links;
+	}
+
+	/**
+	 * Prepares a single font family post for create or update.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return stdClass|WP_Error Post object or WP_Error.
+	 */
+	protected function prepare_item_for_database( $request ) {
+		$prepared_post = new stdClass();
+		// Settings have already been decoded by sanitize_font_family_settings().
+		$settings = $request->get_param( 'font_family_settings' );
+
+		if ( isset( $request['id'] ) ) {
+			$existing_post = $this->get_post( $request['id'] );
+			if ( is_wp_error( $existing_post ) ) {
+				return $existing_post;
+			}
+
+			$prepared_post->ID = $existing_post->ID;
+			$existing_settings = json_decode( $existing_post->post_content, true );
+			$settings          = array_merge( $existing_settings, $settings );
+		}
+
+		$prepared_post->post_type    = $this->post_type;
+		$prepared_post->post_status  = 'publish';
+		$prepared_post->post_title   = $settings['name'];
+		$prepared_post->post_name    = sanitize_title( $settings['slug'] );
+		$prepared_post->post_content = wp_json_encode( $settings );
+
+		return $prepared_post;
 	}
 }
