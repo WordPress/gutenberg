@@ -73,10 +73,7 @@ class DependencyExtractionWebpackPlugin {
 		}
 
 		// Cascade to default if unhandled and enabled.
-		if (
-			typeof externalRequest === 'undefined' &&
-			this.options.useDefaults
-		) {
+		if ( ! externalRequest && this.options.useDefaults ) {
 			externalRequest = this.useModules
 				? defaultRequestToExternalModule( request )
 				: defaultRequestToExternal( request );
@@ -84,6 +81,10 @@ class DependencyExtractionWebpackPlugin {
 
 		if ( this.useModules && externalRequest === true ) {
 			externalRequest = request;
+		}
+
+		if ( externalRequest instanceof Error ) {
+			return callback( externalRequest );
 		}
 
 		if ( externalRequest ) {
