@@ -528,23 +528,21 @@ function Navigation( {
 		{
 			name: __( 'Off' ),
 			key: 'never',
-			__experimentalHint: __( 'Never show the overlay' ),
 		},
 		{
 			name: __( 'Always' ),
 			key: 'always',
-			__experimentalHint: __( 'Always show the overlay' ),
 		},
 		{
 			name: __( 'On mobile' ),
 			key: 'mobile',
-			__experimentalHint: __( 'Show the overlay on mobile devices' ),
+			__experimentalHint: __( 'Show the overlay on smaller screens.' ),
 		},
 		{
 			name: __( 'Automatic' ),
 			key: 'auto',
 			__experimentalHint: __(
-				'Use the overlay when the navigation items do not fit on one line'
+				'Use the overlay when the navigation items do not fit on one line.'
 			),
 		},
 	];
