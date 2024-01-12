@@ -38,6 +38,6 @@ if ( ! function_exists( 'wp_block_bindings_get_sources' ) ) {
 
 if ( ! function_exists( 'wp_block_bindings_replace_html' ) ) {
 	function wp_block_bindings_replace_html( $block_content, $block_name, $block_attr, $source_value ) {
-		wp_block_bindings()->replace_html( $block_content, $block_name, $block_attr, $source_value );
+		return wp_block_bindings()->replace_html( $block_content, $block_name, $block_attr, $source_value );
 	}
 }
