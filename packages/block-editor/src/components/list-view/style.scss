@@ -562,6 +562,10 @@ $block-navigation-max-indent: 8;
 		border-radius: 4px;
 		overflow: hidden;
 	}
+
+	.block-editor-list-view-drop-indicator__line--darker {
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.09);
+	}
 }
 
 .block-editor-list-view-placeholder {

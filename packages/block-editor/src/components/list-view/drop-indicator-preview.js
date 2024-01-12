@@ -153,6 +153,43 @@ export default function ListViewDropIndicatorPreview( {
 		};
 	}, [ getDropIndicatorWidth, targetElement ] );
 
+	const horizontalScrollOffsetStyle = useMemo( () => {
+		if ( ! targetElement ) {
+			return {};
+		}
+
+		const scrollContainer = getScrollContainer( targetElement );
+		const ownerDocument = targetElement.ownerDocument;
+		const windowScroll =
+			scrollContainer === ownerDocument.body ||
+			scrollContainer === ownerDocument.documentElement;
+
+		if ( scrollContainer && ! windowScroll ) {
+			const scrollContainerRect = scrollContainer.getBoundingClientRect();
+			const targetElementRect = targetElement.getBoundingClientRect();
+
+			const distanceBetweenContainerAndTarget = rtl
+				? scrollContainerRect.right - targetElementRect.right
+				: targetElementRect.left - scrollContainerRect.left;
+
+			if ( ! rtl && scrollContainerRect.left > targetElementRect.left ) {
+				return {
+					transform: `translateX( ${ distanceBetweenContainerAndTarget }px )`,
+				};
+			}
+
+			if ( rtl && scrollContainerRect.right < targetElementRect.right ) {
+				return {
+					transform: `translateX( ${
+						distanceBetweenContainerAndTarget * -1
+					}px )`,
+				};
+			}
+		}
+
+		return {};
+	}, [ rtl, targetElement ] );
+
 	const ariaLevel = useMemo( () => {
 		if ( ! rootBlockElement ) {
 			return 1;
@@ -165,6 +202,14 @@ export default function ListViewDropIndicatorPreview( {
 
 		return _ariaLevel ? _ariaLevel + 1 : 1;
 	}, [ rootBlockElement ] );
+
+	const hasAdjacentSelectedBranch = useMemo( () => {
+		if ( ! targetElement ) {
+			return false;
+		}
+
+		return targetElement.classList.contains( 'is-branch-selected' );
+	}, [ targetElement ] );
 
 	const popoverAnchor = useMemo( () => {
 		const isValidDropPosition =
@@ -255,7 +300,13 @@ export default function ListViewDropIndicatorPreview( {
 		>
 			<div
 				style={ style }
-				className="block-editor-list-view-drop-indicator__line"
+				className={ classnames(
+					'block-editor-list-view-drop-indicator__line',
+					{
+						'block-editor-list-view-drop-indicator__line--darker':
+							hasAdjacentSelectedBranch,
+					}
+				) }
 			>
 				<div
 					className="block-editor-list-view-leaf"
@@ -266,6 +317,7 @@ export default function ListViewDropIndicatorPreview( {
 							'block-editor-list-view-block-select-button',
 							'block-editor-list-view-block-contents'
 						) }
+						style={ horizontalScrollOffsetStyle }
 					>
 						<ListViewExpander onClick={ () => {} } />
 						<BlockIcon
