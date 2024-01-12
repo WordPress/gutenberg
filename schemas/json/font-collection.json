@@ -1,0 +1,59 @@
+{
+	"title": "JSON schema for WordPress Font Collections",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties": {
+		"$schema": {
+			"description": "JSON schema URI for font-collection.json.",
+			"type": "string"
+		},
+		"version": {
+			"description": "Version of font-collection.json schema to use.",
+			"type": "integer",
+			"enum": [ 1 ]
+		},
+		"font_families": {
+			"type": "array",
+			"description": "Array of font families ready to be installed",
+			"items": {
+				"type": "object",
+				"properties": {
+					"font_family_settings": {
+						"description": "Font family settings as in theme.json",
+						"allOf": [
+							{ "$ref": "./theme.json#/definitions/fontFamily" }
+						]
+					},
+					"categories": {
+						"type": "array",
+						"description": "Array of category slugs",
+						"items": {
+							"type": "string"
+						}
+					}
+				},
+				"required": [ "font_family_settings" ],
+				"additionalProperties": false
+			}
+		},
+		"categories": {
+			"type": "array",
+			"description": "Array of category objects",
+			"items": {
+				"type": "object",
+				"properties": {
+					"slug": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"required": [ "slug", "name" ],
+				"additionalProperties": false
+			}
+		}
+	},
+	"additionalProperties": false,
+	"required": [ "$schema", "version", "font_families" ]
+}
