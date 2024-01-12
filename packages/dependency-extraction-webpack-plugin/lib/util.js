@@ -82,7 +82,7 @@ function defaultRequestToExternalModule( request ) {
 
 	if ( isWordPressScript ) {
 		throw new Error(
-			`Attempted to use WordPress script in a module: ${ request }`
+			`Attempted to use WordPress script in a module: ${ request }, which is not supported yet.`
 		);
 	}
 }
