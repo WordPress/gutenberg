@@ -259,4 +259,15 @@
 			margin-left: 6px;
 		}
 	}
+
+	// Reslve the block dot issue
+	.block-editor-block-popover {
+		.block-editor-block-contextual-toolbar {
+			.block-editor-block-parent-selector {
+				&:after {
+					content: "";
+				}
+			}
+		}
+	}
 }
