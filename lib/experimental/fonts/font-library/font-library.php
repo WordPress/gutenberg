@@ -139,21 +139,23 @@ if ( ! function_exists( 'wp_use_font_library' ) ) {
 	 * Function that determines if the font library should be activated in the site editor.
 	 *
 	 * @since 6.5.0
+	 * 
+	 * @param array  				  $editor_settings The editor settings to be potentially filtered.
+	 * @param WP_Block_Editor_Context $editor_context  The editor context.
 	 */
-	function wp_use_font_library( $editor_settings ) {
+	function wp_use_font_library( $editor_settings, $editor_context ) {
 		/**
-		 * Filters whether the font library can be loaded in the site editor.
+		 * Filters whether a post is able to be edited in the block editor.
 		 *
 		 * @since 6.5.0
-		 * @param bool $use_font_library Whether the font library can be loaded or not. Default is true.
 		 */
-		$use_font_library = apply_filters( 'use_font_library', true );
+		$use_font_library = apply_filters( 'use_font_library_for_site_editor', true );
 
-		if ( ! $use_font_library ) {
+		if ( 'core/edit-site' === $editor_context->name && ! $use_font_library ) {
 			$editor_settings['disableFontLibrary'] = true;
 		}
 
 		return $editor_settings;
 	}
-	add_filter( 'block_editor_settings_all', 'wp_use_font_library', 10, 1 );
+	add_filter( 'block_editor_settings_all', 'wp_use_font_library', 10, 2 );
 }
