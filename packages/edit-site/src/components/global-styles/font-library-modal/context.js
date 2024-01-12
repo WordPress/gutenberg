@@ -213,15 +213,15 @@ function FontLibraryProvider( { children } ) {
 				'settings.typography.fontFamilies',
 			] );
 			refreshLibrary();
-			setIsInstalling( false );
-			setLibraryFontSelected( null );
 
 			return response;
 		} catch ( error ) {
-			setIsInstalling( false );
 			return {
 				errors: [ error ],
 			};
+		} finally {
+			setIsInstalling( false );
+			setLibraryFontSelected( null );
 		}
 	}
 
