@@ -59,9 +59,9 @@ export function useSignalEffect( callback ) {
 }
 
 /**
- * Return the passed function wrapped with the current scope so it is accessible
- * whenever the function runs. This is primarily to make the scope accessible in
- * hook callbacks.
+ * Returns the passed function wrapped with the current scope so it is
+ * accessible whenever the function runs. This is primarily to make the scope
+ * available inside hook callbacks.
  *
  * @param {Function} func The passed function.
  * @return {Function} The wrapped function.
@@ -76,12 +76,29 @@ const withScope = ( func ) => {
 	};
 };
 
-// TODO: document this.
+/**
+ * Accepts a function that contains imperative code which runs whenever any of
+ * the accessed _reactive_ properties (e.g., values from the global state or the
+ * context) is modified.
+ *
+ * This hook makes the element's scope available so functions like
+ * `getElement()` and `getContext()` can be used inside the passed callback.
+ *
+ * @param {Function} callback The hook callback.
+ */
 export function useWatch( callback ) {
 	useSignalEffect( withScope( callback ) );
 }
 
-// TODO: document this.
+/**
+ * Accepts a function that contains imperative code which runs only after the
+ * element's first render, mainly useful for intialization logic.
+ *
+ * This hook makes the element's scope available so functions like
+ * `getElement()` and `getContext()` can be used inside the passed callback.
+ *
+ * @param {Function} callback The hook callback.
+ */
 export function useInit( callback ) {
 	useEffect( withScope( callback ), [] );
 }
