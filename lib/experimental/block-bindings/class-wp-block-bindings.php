@@ -14,15 +14,12 @@ if ( class_exists( 'WP_Block_Bindings' ) ) {
 
 /**
  * Core class used to define supported blocks, register sources, and populate HTML with content from those sources.
- *
- * @since 6.5.0
  */
 class WP_Block_Bindings {
 
 	/**
 	 * Holds the registered block bindings sources, keyed by source identifier.
 	 *
-	 * @since 6.5.0
 	 * @var array
 	 */
 	private $sources = array();
