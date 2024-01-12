@@ -11,8 +11,9 @@
  *
  * @param WP_Directive_Processor $tags Tags.
  * @param WP_Directive_Context   $context Directive context.
+ * @param string                 $ns Namespace.
  */
-function gutenberg_interactivity_process_wp_bind( $tags, $context ) {
+function gutenberg_interactivity_process_wp_bind( $tags, $context, $ns ) {
 	if ( $tags->is_tag_closer() ) {
 		return;
 	}
@@ -25,8 +26,8 @@ function gutenberg_interactivity_process_wp_bind( $tags, $context ) {
 			continue;
 		}
 
-		$expr  = $tags->get_attribute( $attr );
-		$value = gutenberg_interactivity_evaluate_reference( $expr, $context->get_context() );
+		$reference = $tags->get_attribute( $attr );
+		$value     = gutenberg_interactivity_evaluate_reference( $reference, $ns, $context->get_context() );
 		$tags->set_attribute( $bound_attr, $value );
 	}
 }

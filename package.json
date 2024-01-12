@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "17.4.1",
+	"version": "17.5.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -98,7 +98,7 @@
 	"devDependencies": {
 		"@actions/core": "1.9.1",
 		"@actions/github": "5.0.0",
-		"@ariakit/test": "^0.3.5",
+		"@ariakit/test": "^0.3.7",
 		"@babel/core": "7.16.0",
 		"@babel/plugin-proposal-export-namespace-from": "7.18.9",
 		"@babel/plugin-syntax-jsx": "7.16.0",
@@ -224,7 +224,7 @@
 		"node-fetch": "2.6.1",
 		"node-watch": "0.7.0",
 		"npm-run-all": "4.1.5",
-		"patch-package": "6.2.2",
+		"patch-package": "8.0.0",
 		"postcss": "8.4.16",
 		"postcss-loader": "6.2.1",
 		"prettier": "npm:wp-prettier@3.0.3",

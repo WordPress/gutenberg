@@ -18,9 +18,9 @@ class Tests_Directives_WpStyle extends WP_UnitTestCase {
 		$tags   = new WP_HTML_Tag_Processor( $markup );
 		$tags->next_tag();
 
-		$context_before = new WP_Directive_Context( array( 'color' => 'green' ) );
+		$context_before = new WP_Directive_Context( array( 'myblock' => array( 'color' => 'green' ) ) );
 		$context        = $context_before;
-		gutenberg_interactivity_process_wp_style( $tags, $context );
+		gutenberg_interactivity_process_wp_style( $tags, $context, 'myblock' );
 
 		$this->assertSame(
 			'<div data-wp-style--color="context.color" style="background: blue;color: green;">Test</div>',
@@ -35,9 +35,9 @@ class Tests_Directives_WpStyle extends WP_UnitTestCase {
 		$tags   = new WP_HTML_Tag_Processor( $markup );
 		$tags->next_tag();
 
-		$context_before = new WP_Directive_Context( array( 'color' => 'green' ) );
+		$context_before = new WP_Directive_Context( array( 'myblock' => array( 'color' => 'green' ) ) );
 		$context        = $context_before;
-		gutenberg_interactivity_process_wp_style( $tags, $context );
+		gutenberg_interactivity_process_wp_style( $tags, $context, 'myblock' );
 
 		$this->assertSame( $markup, $tags->get_updated_html() );
 		$this->assertStringNotContainsString( 'color: green;', $tags->get_attribute( 'style' ) );
@@ -49,9 +49,9 @@ class Tests_Directives_WpStyle extends WP_UnitTestCase {
 		$tags   = new WP_HTML_Tag_Processor( $markup );
 		$tags->next_tag();
 
-		$context_before = new WP_Directive_Context( array( 'color' => 'green' ) );
+		$context_before = new WP_Directive_Context( array( 'myblock' => array( 'color' => 'green' ) ) );
 		$context        = $context_before;
-		gutenberg_interactivity_process_wp_style( $tags, $context );
+		gutenberg_interactivity_process_wp_style( $tags, $context, 'myblock' );
 
 		$this->assertSame(
 			'<div style="color: green;" data-wp-style--color="context.color">Test</div>',

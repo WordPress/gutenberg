@@ -7,7 +7,7 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 
-export async function fetchInstallFonts( data ) {
+export async function fetchInstallFont( data ) {
 	const config = {
 		path: '/wp/v2/font-families',
 		method: 'POST',

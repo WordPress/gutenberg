@@ -17,6 +17,10 @@ const {
 } = require( './cli' );
 const { fromConfigRoot, fromProjectRoot, hasProjectFile } = require( './file' );
 const { hasPackageProp } = require( './package' );
+const {
+	getBlockJsonModuleFields,
+	getBlockJsonScriptFields,
+} = require( './block-json' );
 const { log } = console;
 
 // See https://babeljs.io/docs/en/config-files#configuration-file-types.
@@ -108,7 +112,10 @@ const hasPostCSSConfig = () =>
  */
 const getWebpackArgs = () => {
 	// Gets all args from CLI without those prefixed with `--webpack`.
-	let webpackArgs = getArgsFromCLI( [ '--webpack' ] );
+	let webpackArgs = getArgsFromCLI( [
+		'--experimental-modules',
+		'--webpack',
+	] );
 
 	const hasWebpackOutputOption =
 		hasArgInCLI( '-o' ) || hasArgInCLI( '--output' );
@@ -186,104 +193,52 @@ function getWordPressSrcDirectory() {
  *
  * @see https://webpack.js.org/concepts/entry-points/
  *
- * @return {Object<string,string>} The list of entry points.
+ * @param {'script' | 'module'} buildType
  */
-function getWebpackEntryPoints() {
-	// 1. Handles the legacy format for entry points when explicitly provided with the `process.env.WP_ENTRY`.
-	if ( process.env.WP_ENTRY ) {
-		return JSON.parse( process.env.WP_ENTRY );
-	}
+function getWebpackEntryPoints( buildType ) {
+	/**
+	 * @return {Object<string,string>} The list of entry points.
+	 */
+	return () => {
+		// 1. Handles the legacy format for entry points when explicitly provided with the `process.env.WP_ENTRY`.
+		if ( process.env.WP_ENTRY ) {
+			return buildType === 'script'
+				? JSON.parse( process.env.WP_ENTRY )
+				: {};
+		}
 
-	// Continue only if the source directory exists.
-	if ( ! hasProjectFile( getWordPressSrcDirectory() ) ) {
-		log(
-			chalk.yellow(
-				`Source directory "${ getWordPressSrcDirectory() }" was not found. Please confirm there is a "src" directory in the root or the value passed to --webpack-src-dir is correct.`
-			)
-		);
-		return {};
-	}
+		// Continue only if the source directory exists.
+		if ( ! hasProjectFile( getWordPressSrcDirectory() ) ) {
+			log(
+				chalk.yellow(
+					`Source directory "${ getWordPressSrcDirectory() }" was not found. Please confirm there is a "src" directory in the root or the value passed to --webpack-src-dir is correct.`
+				)
+			);
+			return {};
+		}
 
-	// 2. Checks whether any block metadata files can be detected in the defined source directory.
-	//    It scans all discovered files looking for JavaScript assets and converts them to entry points.
-	const blockMetadataFiles = glob( '**/block.json', {
-		absolute: true,
-		cwd: fromProjectRoot( getWordPressSrcDirectory() ),
-	} );
+		// 2. Checks whether any block metadata files can be detected in the defined source directory.
+		//    It scans all discovered files looking for JavaScript assets and converts them to entry points.
+		const blockMetadataFiles = glob( '**/block.json', {
+			absolute: true,
+			cwd: fromProjectRoot( getWordPressSrcDirectory() ),
+		} );
 
-	if ( blockMetadataFiles.length > 0 ) {
-		const srcDirectory = fromProjectRoot(
-			getWordPressSrcDirectory() + sep
-		);
-		const entryPoints = blockMetadataFiles.reduce(
-			( accumulator, blockMetadataFile ) => {
+		if ( blockMetadataFiles.length > 0 ) {
+			const srcDirectory = fromProjectRoot(
+				getWordPressSrcDirectory() + sep
+			);
+
+			const entryPoints = {};
+
+			for ( const blockMetadataFile of blockMetadataFiles ) {
+				const fileContents = readFileSync( blockMetadataFile );
+				let parsedBlockJson;
 				// wrapping in try/catch in case the file is malformed
 				// this happens especially when new block.json files are added
 				// at which point they are completely empty and therefore not valid JSON
 				try {
-					const { editorScript, script, viewScript } = JSON.parse(
-						readFileSync( blockMetadataFile )
-					);
-					[ editorScript, script, viewScript ]
-						.flat()
-						.filter(
-							( value ) => value && value.startsWith( 'file:' )
-						)
-						.forEach( ( value ) => {
-							// Removes the `file:` prefix.
-							const filepath = join(
-								dirname( blockMetadataFile ),
-								value.replace( 'file:', '' )
-							);
-
-							// Takes the path without the file extension, and relative to the defined source directory.
-							if ( ! filepath.startsWith( srcDirectory ) ) {
-								log(
-									chalk.yellow(
-										`Skipping "${ value.replace(
-											'file:',
-											''
-										) }" listed in "${ blockMetadataFile.replace(
-											fromProjectRoot( sep ),
-											''
-										) }". File is located outside of the "${ getWordPressSrcDirectory() }" directory.`
-									)
-								);
-								return;
-							}
-							const entryName = filepath
-								.replace( extname( filepath ), '' )
-								.replace( srcDirectory, '' )
-								.replace( /\\/g, '/' );
-
-							// Detects the proper file extension used in the defined source directory.
-							const [ entryFilepath ] = glob(
-								`${ entryName }.[jt]s?(x)`,
-								{
-									absolute: true,
-									cwd: fromProjectRoot(
-										getWordPressSrcDirectory()
-									),
-								}
-							);
-
-							if ( ! entryFilepath ) {
-								log(
-									chalk.yellow(
-										`Skipping "${ value.replace(
-											'file:',
-											''
-										) }" listed in "${ blockMetadataFile.replace(
-											fromProjectRoot( sep ),
-											''
-										) }". File does not exist in the "${ getWordPressSrcDirectory() }" directory.`
-									)
-								);
-								return;
-							}
-							accumulator[ entryName ] = entryFilepath;
-						} );
-					return accumulator;
+					parsedBlockJson = JSON.parse( fileContents );
 				} catch ( error ) {
 					chalk.yellow(
 						`Skipping "${ blockMetadataFile.replace(
@@ -291,35 +246,105 @@ function getWebpackEntryPoints() {
 							''
 						) }" due to malformed JSON.`
 					);
-					return accumulator;
 				}
-			},
-			{}
-		);
 
-		if ( Object.keys( entryPoints ).length > 0 ) {
-			return entryPoints;
+				const fields =
+					buildType === 'script'
+						? getBlockJsonScriptFields( parsedBlockJson )
+						: getBlockJsonModuleFields( parsedBlockJson );
+
+				if ( ! fields ) {
+					continue;
+				}
+
+				for ( const value of Object.values( fields ).flat() ) {
+					if ( ! value.startsWith( 'file:' ) ) {
+						continue;
+					}
+
+					// Removes the `file:` prefix.
+					const filepath = join(
+						dirname( blockMetadataFile ),
+						value.replace( 'file:', '' )
+					);
+
+					// Takes the path without the file extension, and relative to the defined source directory.
+					if ( ! filepath.startsWith( srcDirectory ) ) {
+						log(
+							chalk.yellow(
+								`Skipping "${ value.replace(
+									'file:',
+									''
+								) }" listed in "${ blockMetadataFile.replace(
+									fromProjectRoot( sep ),
+									''
+								) }". File is located outside of the "${ getWordPressSrcDirectory() }" directory.`
+							)
+						);
+						return;
+					}
+					const entryName = filepath
+						.replace( extname( filepath ), '' )
+						.replace( srcDirectory, '' )
+						.replace( /\\/g, '/' );
+
+					// Detects the proper file extension used in the defined source directory.
+					const [ entryFilepath ] = glob(
+						`${ entryName }.?(m)[jt]s?(x)`,
+						{
+							absolute: true,
+							cwd: fromProjectRoot( getWordPressSrcDirectory() ),
+						}
+					);
+
+					if ( ! entryFilepath ) {
+						log(
+							chalk.yellow(
+								`Skipping "${ value.replace(
+									'file:',
+									''
+								) }" listed in "${ blockMetadataFile.replace(
+									fromProjectRoot( sep ),
+									''
+								) }". File does not exist in the "${ getWordPressSrcDirectory() }" directory.`
+							)
+						);
+						return;
+					}
+					entryPoints[ entryName ] = entryFilepath;
+				}
+			}
+
+			if ( Object.keys( entryPoints ).length > 0 ) {
+				return entryPoints;
+			}
 		}
-	}
 
-	// 3. Checks whether a standard file name can be detected in the defined source directory,
-	//  and converts the discovered file to entry point.
-	const [ entryFile ] = glob( 'index.[jt]s?(x)', {
-		absolute: true,
-		cwd: fromProjectRoot( getWordPressSrcDirectory() ),
-	} );
+		// Don't do any further processing if this is a module build.
+		// This only respects *module block.json fields.
+		if ( buildType === 'module' ) {
+			return {};
+		}
 
-	if ( ! entryFile ) {
-		log(
-			chalk.yellow(
-				`No entry file discovered in the "${ getWordPressSrcDirectory() }" directory.`
-			)
-		);
-		return {};
-	}
+		// 3. Checks whether a standard file name can be detected in the defined source directory,
+		//  and converts the discovered file to entry point.
+		const [ entryFile ] = glob( 'index.[jt]s?(x)', {
+			absolute: true,
+			cwd: fromProjectRoot( getWordPressSrcDirectory() ),
+		} );
 
-	return {
-		index: entryFile,
+		if ( ! entryFile ) {
+			log(
+				chalk.yellow(
+					`No entry file discovered in the "${ getWordPressSrcDirectory() }" directory.`
+				)
+			);
+			return {};
+		}
+
+		return {
+			index: entryFile,
+		};
 	};
 }
 

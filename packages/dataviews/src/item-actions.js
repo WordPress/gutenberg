@@ -59,10 +59,7 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 			<ActionTrigger { ...actionTriggerProps } />
 			{ isModalOpen && (
 				<Modal
-					title={
-						( ! hideModalHeader && action.modalHeader ) ||
-						action.label
-					}
+					title={ action.modalHeader || action.label }
 					__experimentalHideHeader={ !! hideModalHeader }
 					onRequestClose={ () => {
 						setIsModalOpen( false );

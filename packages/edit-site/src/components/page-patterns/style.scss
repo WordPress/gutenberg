@@ -225,7 +225,7 @@
 }
 
 /**
- * DataViews patterns styles
+ * DataViews patterns styles.
  * TODO: when this becomes stable, consolidate styles with the above.
  */
 .edit-site-page-patterns-dataviews {
@@ -256,8 +256,6 @@
 	}
 }
 
-// TODO: this is duplicated from `patterns-menu-items__convert-modal` styles,
-// except for the `z-index`. Need to check if this is still needed.
 .dataviews-action-modal__duplicate-pattern {
 	// Fix the modal width to prevent added categories from stretching the modal.
 	[role="dialog"] > [role="document"] {
@@ -281,5 +279,13 @@
 		left: -1px;
 		min-width: initial;
 		max-height: $grid-unit-60 * 2; // Adjust to not cover the save button, showing three items.
+	}
+}
+
+.dataviews-action-modal__duplicate-template-part {
+	.components-modal__frame {
+		@include break-small {
+			max-width: 500px;
+		}
 	}
 }

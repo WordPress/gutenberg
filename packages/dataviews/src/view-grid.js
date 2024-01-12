@@ -42,7 +42,7 @@ export default function ViewGrid( {
 			gap={ 8 }
 			columns={ 2 }
 			alignment="top"
-			className="dataviews-grid-view"
+			className="dataviews-view-grid"
 		>
 			{ usedData.map( ( item ) => (
 				<VStack
