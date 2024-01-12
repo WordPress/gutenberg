@@ -184,10 +184,15 @@ class WP_Script_Modules {
 	 * @since 6.5.0
 	 */
 	public function add_hooks() {
-		$module_position = wp_is_block_theme() ? 'wp_head' : 'wp_footer';
-		add_action( $module_position, array( $this, 'print_import_map' ) );
-		add_action( $module_position, array( $this, 'print_enqueued_modules' ) );
-		add_action( $module_position, array( $this, 'print_module_preloads' ) );
+		if ( wp_is_block_theme() ) {
+			add_action( 'wp_head', array( $this, 'print_import_map' ) );
+			add_action( 'wp_head', array( $this, 'print_enqueued_modules' ) );
+			add_action( 'wp_head', array( $this, 'print_module_preloads' ) );
+		} else {
+			add_action( 'wp_footer', array( $this, 'print_import_map' ) );
+			add_action( 'wp_footer', array( $this, 'print_module_preloads' ) );
+			add_action( 'wp_footer', array( $this, 'print_enqueued_modules' ) );
+		}
 	}
 
 	/**
