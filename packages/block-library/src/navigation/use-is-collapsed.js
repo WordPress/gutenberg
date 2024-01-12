@@ -25,15 +25,49 @@ function useIsCollapsed( overlayMenu, navRef ) {
 
 	const [ isCollapsed, setIsCollapsed ] = useState( shouldBeCollapsed() );
 
+	// We need a layout effect to respond to changed in isMobileBreakPoint.
 	useLayoutEffect( () => {
-		updateIsCollapsed();
 		function updateIsCollapsed() {
 			setIsCollapsed( shouldBeCollapsed() );
 		}
-		window.addEventListener( 'resize', debounce( updateIsCollapsed, 100 ) );
-		return () => {
-			window.removeEventListener( 'resize', updateIsCollapsed );
-		};
+
+		function setIsCollapsedFalse() {
+			setIsCollapsed( false );
+		}
+
+		// This is wrapped in a function so that we can unbind it later.
+		function debouncedSetIsCollapsedFalse() {
+			return debounce( setIsCollapsedFalse, 50 ); // Has to be less than debouncedUpdateIsCollapsed.
+		}
+
+		// This is wrapped in a function so that we can unbind it later.
+		function debouncedUpdateIsCollapsed() {
+			return debounce( updateIsCollapsed, 100 );
+		}
+
+		// Set the value of isCollapsed when the effect runs.
+		updateIsCollapsed();
+
+		// We only need to add listeners if the overlayMenu is set to auto.
+		if ( 'auto' === overlayMenu ) {
+			// Adds a listener to set isCollapsed be false so we can measure the full width of the nav.
+			window.addEventListener( 'resize', debouncedSetIsCollapsedFalse() );
+
+			// Then add a debounced listener to update isCollapsed.
+			window.addEventListener( 'resize', debouncedUpdateIsCollapsed() );
+
+			// Remove the listener when the component is unmounted.
+			return () => {
+				window.removeEventListener(
+					'resize',
+					debouncedUpdateIsCollapsed()
+				);
+				window.removeEventListener(
+					'resize',
+					debouncedSetIsCollapsedFalse()
+				);
+			};
+		}
 	} );
 
 	return isCollapsed;
