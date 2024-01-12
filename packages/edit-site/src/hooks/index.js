@@ -3,5 +3,6 @@
  */
 import './components';
 import './push-changes-to-global-styles';
+import './template-edit';
 import './template-part-edit';
 import './navigation-menu-edit';

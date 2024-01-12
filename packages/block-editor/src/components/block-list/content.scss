@@ -26,7 +26,7 @@
 /* stylelint-disable */
 _::-webkit-full-page-media, _:future, :root .block-editor-block-list__layout::selection,
 _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-block-list__layout::selection {
-	background-color: transparent; 
+	background-color: transparent;
 }
 /* stylelint-enable */
 
@@ -181,6 +181,16 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	&.is-editing-disabled {
 		pointer-events: none;
 		user-select: none;
+
+		.block-editor-block-list__block:not(.is-editing-disabled) {
+			box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+
+			// TODO: show pencil icon in top right
+
+			.block-editor-block-list__block:not(.is-editing-disabled) {
+				box-shadow: none;
+			}
+		}
 	}
 
 	.reusable-block-edit-panel * {

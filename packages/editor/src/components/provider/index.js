@@ -50,6 +50,11 @@ function useBlockEditorProps( post, template, mode ) {
 		useEntityBlockEditor( 'postType', template?.type, {
 			id: template?.id,
 		} );
+	const maybeTemplateBlocks = useMemo( () => {
+		if ( !! template && mode === 'template-locked' ) {
+			return [ createBlock( 'core/template', { ref: template.id } ) ];
+		}
+	}, [ template, mode ] );
 	const maybeNavigationBlocks = useMemo( () => {
 		if ( post.type === 'wp_navigation' ) {
 			return [
@@ -67,16 +72,23 @@ function useBlockEditorProps( post, template, mode ) {
 	// It is important that we don't create a new instance of blocks on every change
 	// We should only create a new instance if the blocks them selves change, not a dependency of them.
 	const blocks = useMemo( () => {
+		if ( maybeTemplateBlocks ) {
+			return maybeTemplateBlocks;
+		}
 		if ( maybeNavigationBlocks ) {
 			return maybeNavigationBlocks;
 		}
-
 		if ( rootLevelPost === 'template' ) {
 			return templateBlocks;
 		}
-
 		return postBlocks;
-	}, [ maybeNavigationBlocks, rootLevelPost, templateBlocks, postBlocks ] );
+	}, [
+		maybeTemplateBlocks,
+		maybeNavigationBlocks,
+		rootLevelPost,
+		templateBlocks,
+		postBlocks,
+	] );
 
 	// Handle fallback to postBlocks outside of the above useMemo, to ensure
 	// that constructed block templates that call `createBlock` are not generated

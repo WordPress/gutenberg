@@ -15,6 +15,7 @@ import {
 	hasBlockSupport,
 	isReusableBlock,
 	isTemplatePart,
+	isTemplate,
 } from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
 
@@ -135,7 +136,9 @@ export function PrivateBlockToolbar( {
 
 	const isMultiToolbar = blockClientIds.length > 1;
 	const isSynced =
-		isReusableBlock( blockType ) || isTemplatePart( blockType );
+		isReusableBlock( blockType ) ||
+		isTemplatePart( blockType ) ||
+		isTemplate( blockType );
 
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = classnames( 'block-editor-block-contextual-toolbar', {

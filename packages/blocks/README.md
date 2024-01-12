@@ -336,6 +336,18 @@ _Returns_
 
 -   `boolean`: Whether the given block is a reusable block.
 
+### isTemplate
+
+Determines whether or not the given block is a template.
+
+_Parameters_
+
+-   _blockOrType_ `Object`: Block or Block Type to test.
+
+_Returns_
+
+-   `boolean`: Whether the given block is a template.
+
 ### isTemplatePart
 
 Determines whether or not the given block is a template part. This is a special block type that allows composing a page template out of reusable design elements.

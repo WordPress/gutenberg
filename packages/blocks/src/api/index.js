@@ -126,6 +126,7 @@ export {
 	hasBlockSupport,
 	getBlockVariations,
 	isReusableBlock,
+	isTemplate,
 	isTemplatePart,
 	getChildBlockNames,
 	hasChildBlocks,

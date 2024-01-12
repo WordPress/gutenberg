@@ -902,6 +902,15 @@ A cloud of your most used tags. ([Source](https://github.com/WordPress/gutenberg
 -	**Supports:** align, spacing (margin, padding), typography (lineHeight), ~~html~~
 -	**Attributes:** largestFontSize, numberOfTags, showTagCounts, smallestFontSize, taxonomy
 
+## Template
+
+ ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/template))
+
+-	**Name:** core/template
+-	**Category:** theme
+-	**Supports:** ~~html~~, ~~inserter~~, ~~lock~~, ~~renaming~~, ~~reusable~~
+-	**Attributes:** ref
+
 ## Template Part
 
 Edit the different global regions of your site, like the header, footer, sidebar, or create your own. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/template-part))

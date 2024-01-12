@@ -563,6 +563,17 @@ export function isReusableBlock( blockOrType ) {
 }
 
 /**
+ * Determines whether or not the given block is a template.
+ *
+ * @param {Object} blockOrType Block or Block Type to test.
+ *
+ * @return {boolean} Whether the given block is a template.
+ */
+export function isTemplate( blockOrType ) {
+	return blockOrType?.name === 'core/template';
+}
+
+/**
  * Determines whether or not the given block is a template part. This is a
  * special block type that allows composing a page template out of reusable
  * design elements.

@@ -13,6 +13,7 @@ import {
 	store as blocksStore,
 	isReusableBlock,
 	isTemplatePart,
+	isTemplate,
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { copy } from '@wordpress/icons';
@@ -95,8 +96,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	} );
 
 	const isSingleBlock = blocks.length === 1;
-	const isReusable = isSingleBlock && isReusableBlock( blocks[ 0 ] );
-	const isTemplate = isSingleBlock && isTemplatePart( blocks[ 0 ] );
+	const _isReusableBlock = isSingleBlock && isReusableBlock( blocks[ 0 ] );
+	const _isTemplatePart = isSingleBlock && isTemplatePart( blocks[ 0 ] );
+	const _isTemplate = isSingleBlock && isTemplate( blocks[ 0 ] );
 
 	function selectForMultipleBlocks( insertedBlocks ) {
 		if ( insertedBlocks.length > 1 ) {
@@ -134,7 +136,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	 * by allowing to exclude blocks from wildcard transformations.
 	 */
 	const hasPossibleBlockTransformations =
-		!! possibleBlockTransformations.length && canRemove && ! isTemplate;
+		!! possibleBlockTransformations.length &&
+		canRemove &&
+		! _isTemplatePart;
 	const hasPossibleBlockVariationTransformations =
 		!! blockVariationTransformations?.length;
 	const hasPatternTransformation = !! patterns?.length && canRemove;
@@ -155,7 +159,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					icon={
 						<>
 							<BlockIcon icon={ icon } showColors />
-							{ ( isReusable || isTemplate ) && (
+							{ ( _isReusableBlock ||
+								_isTemplatePart ||
+								_isTemplate ) && (
 								<span className="block-editor-block-switcher__toggle-text">
 									{ blockTitle }
 								</span>
@@ -201,7 +207,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 									className="block-editor-block-switcher__toggle"
 									showColors
 								/>
-								{ ( isReusable || isTemplate ) && (
+								{ ( _isReusableBlock ||
+									_isTemplatePart ||
+									_isTemplate ) && (
 									<span className="block-editor-block-switcher__toggle-text">
 										{ blockTitle }
 									</span>
