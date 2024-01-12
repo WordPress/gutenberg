@@ -101,7 +101,7 @@ export const SETTINGS_DEFAULTS = {
 	],
 
 	// Allow plugin to disable Font Library UI.
-	fontLibraryEnabled: true,
+	enableFontLibrary: true,
 
 	// fontSizes setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.
