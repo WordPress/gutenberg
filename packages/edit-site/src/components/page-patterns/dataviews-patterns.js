@@ -7,6 +7,7 @@ import {
 	__experimentalHeading as Heading,
 	Tooltip,
 	Flex,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { getQueryArgs } from '@wordpress/url';
 import { __, _x } from '@wordpress/i18n';
@@ -199,8 +200,15 @@ function Title( { item, categoryId } ) {
 			) }
 			<Flex as="span" gap={ 0 } justify="left">
 				{ item.type === PATTERN_TYPES.theme ? (
-					<span className="dataviews-view-grid__title-field">
-						{ item.title }
+					<span>
+						<Text
+							size="13px"
+							weight={ 500 }
+							truncate
+							color="inherit"
+						>
+							{ item.title }
+						</Text>
 					</span>
 				) : (
 					<Heading level={ 5 }>
@@ -210,9 +218,15 @@ function Title( { item, categoryId } ) {
 							// Required for the grid's roving tab index system.
 							// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
 							tabIndex="-1"
-							className="dataviews-view-grid__title-field"
 						>
-							{ item.title || item.name }
+							<Text
+								size="13px"
+								weight={ 500 }
+								truncate
+								color="inherit"
+							>
+								{ item.title || item.name }
+							</Text>
 						</Button>
 					</Heading>
 				) }

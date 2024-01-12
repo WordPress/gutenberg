@@ -207,21 +207,12 @@
 	}
 
 	.dataviews-view-grid__card {
-		.dataviews-view-grid__primary-field {
-			.dataviews-view-grid__title-field {
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				display: block;
-				font-size: $default-font-size;
-				width: 100%;
-			}
+		a {
+			text-decoration: none;
+			color: $gray-900;
 
-			.dataviews-view-grid__title-field a,
-			button.dataviews-view-grid__title-field {
-				font-weight: 500;
-				color: $gray-900;
-				text-decoration: none;
+			&:hover {
+				color: var(--wp-admin-theme-color);
 			}
 		}
 	}
@@ -287,6 +278,10 @@
 		&:not(.is-selected):hover {
 			color: var(--wp-admin-theme-color);
 
+			a {
+				color: var(--wp-admin-theme-color);
+			}
+
 			.dataviews-view-list__fields {
 				color: var(--wp-admin-theme-color);
 			}
@@ -327,10 +322,9 @@
 				border-radius: $grid-unit-05;
 			}
 		}
-		h3 {
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
+		a {
+			text-decoration: none;
+			color: $gray-900;
 		}
 	}
 
@@ -371,6 +365,7 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+		font-size: 12px;
 
 		.dataviews-view-list__field {
 			margin-right: $grid-unit-15;
