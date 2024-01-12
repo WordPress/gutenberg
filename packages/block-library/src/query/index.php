@@ -70,7 +70,7 @@ function render_block_core_query( $attributes, $content, $block ) {
 
 	if ( $is_gutenberg_plugin ) {
 		if ( $should_load_view_script ) {
-			gutenberg_enqueue_module( '@wordpress/block-library/query' );
+			wp_enqueue_module( '@wordpress/block-library/query' );
 		}
 		// Remove the view script because we are using the module.
 		$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
@@ -138,7 +138,7 @@ function register_block_core_query() {
 	);
 
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		gutenberg_register_module(
+		wp_register_module(
 			'@wordpress/block-library/query',
 			'/wp-content/plugins/gutenberg/build/interactivity/query.min.js',
 			array( '@wordpress/interactivity' ),

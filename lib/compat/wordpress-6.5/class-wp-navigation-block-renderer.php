@@ -567,7 +567,7 @@ class WP_Navigation_Block_Renderer {
 
 		if ( $is_gutenberg_plugin ) {
 			if ( $should_load_view_script ) {
-				gutenberg_enqueue_module( '@wordpress/block-library/navigation-block' );
+				wp_enqueue_module( '@wordpress/block-library/navigation-block' );
 			}
 			// Remove the view script because we are using the module.
 			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );

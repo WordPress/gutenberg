@@ -184,12 +184,13 @@ class WP_Script_Modules {
 	 * @since 6.5.0
 	 */
 	public function add_hooks() {
-		add_action( 'wp_head', array( $this, 'print_import_map' ) );
-		add_action( 'wp_head', array( $this, 'print_enqueued_modules' ) );
-		add_action( 'wp_head', array( $this, 'print_module_preloads' ) );
 		if ( ! wp_is_block_theme() ) {
 			add_action( 'wp_footer', array( $this, 'print_import_map' ) );
+		} else {
+			add_action( 'wp_head', array( $this, 'print_import_map' ) );
 		}
+		add_action( 'wp_head', array( $this, 'print_enqueued_modules' ) );
+		add_action( 'wp_head', array( $this, 'print_module_preloads' ) );
 		add_action( 'wp_footer', array( $this, 'print_module_preloads' ) );
 		add_action( 'wp_footer', array( $this, 'print_enqueued_modules' ) );
 	}

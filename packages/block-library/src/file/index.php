@@ -22,7 +22,7 @@ function render_block_core_file( $attributes, $content, $block ) {
 
 	if ( $is_gutenberg_plugin ) {
 		if ( $should_load_view_script ) {
-			gutenberg_enqueue_module( '@wordpress/block-library/file-block' );
+			wp_enqueue_module( '@wordpress/block-library/file-block' );
 		}
 		// Remove the view script because we are using the module.
 		$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file ) );
@@ -108,7 +108,7 @@ function register_block_core_file() {
 	);
 
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		gutenberg_register_module(
+		wp_register_module(
 			'@wordpress/block-library/file-block',
 			gutenberg_url( '/build/interactivity/file.min.js' ),
 			array( '@wordpress/interactivity' ),
