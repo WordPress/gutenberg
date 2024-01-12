@@ -5,7 +5,7 @@
  * This file contains functions for managing block bindings in WordPress.
  *
  * @since 6.5.0
- * @package WordPress
+ * @package Gutenberg
  */
 
 /**
