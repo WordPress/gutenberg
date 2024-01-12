@@ -214,7 +214,7 @@ function FontLibraryProvider( { children } ) {
 			] );
 			refreshLibrary();
 			setIsInstalling( false );
-			handleSetLibraryFontSelected( null );
+			setLibraryFontSelected( null );
 
 			return response;
 		} catch ( error ) {
