@@ -307,7 +307,9 @@
 		flex-shrink: 0;
 
 		img {
-			width: inherit;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
 		}
 
 		&::after {
