@@ -6,6 +6,15 @@
 	"category": "theme",
 	"description": "Displays links to the next and previous post, when applicable.",
 	"textdomain": "default",
+	"attributes": {
+		"ariaLabel": {
+			"type": "string",
+			"source": "attribute",
+			"selector": ".wp-block-post-navigation",
+			"attribute": "aria-label",
+			"default": "Posts"
+		}
+	},
 	"supports": {
 		"align": true,
 		"ariaLabel": true,
