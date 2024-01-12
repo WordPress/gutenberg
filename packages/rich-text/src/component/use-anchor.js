@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useLayoutEffect, useCallback } from '@wordpress/element';
+import { useState, useLayoutEffect } from '@wordpress/element';
 
 /** @typedef {import('../register-format-type').WPFormat} WPFormat */
 /** @typedef {import('../types').RichTextValue} RichTextValue */
@@ -142,14 +142,16 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 		getAnchor( editableContentElement, tagName, className )
 	);
 
-	const callback = useCallback( () => {
-		setAnchor( getAnchor( editableContentElement, tagName, className ) );
-	}, [ className, editableContentElement, tagName ] );
-
 	useLayoutEffect( () => {
 		if ( ! editableContentElement ) return;
 
 		const { ownerDocument } = editableContentElement;
+
+		function callback() {
+			setAnchor(
+				getAnchor( editableContentElement, tagName, className )
+			);
+		}
 
 		function attach() {
 			ownerDocument.addEventListener( 'selectionchange', callback );
@@ -172,8 +174,7 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 			editableContentElement.removeEventListener( 'focusin', attach );
 			editableContentElement.removeEventListener( 'focusout', detach );
 		};
-	}, [ editableContentElement, tagName, className, callback ] );
+	}, [ editableContentElement, tagName, className ] );
 
-	anchor.update = callback;
 	return anchor;
 }
