@@ -99,6 +99,10 @@ export const SETTINGS_DEFAULTS = {
 			color: '#9b51e0',
 		},
 	],
+
+	// Allow plugin to disable Font Library UI.
+	fontLibraryEnabled: true,
+
 	// fontSizes setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.
 	fontSizes: [

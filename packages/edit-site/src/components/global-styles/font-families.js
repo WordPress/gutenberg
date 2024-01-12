@@ -28,13 +28,13 @@ function FontFamilies() {
 		toggleModal,
 		themeFonts,
 		customFonts,
-		disableFontLibrary,
+		fontLibraryEnabled,
 	} = useContext( FontLibraryContext );
 
 	const hasFonts = 0 < customFonts.length || 0 < themeFonts.length;
 
 	return (
-		! disableFontLibrary && (
+		fontLibraryEnabled && (
 			<>
 				{ !! modalTabOpen && (
 					<FontLibraryModal

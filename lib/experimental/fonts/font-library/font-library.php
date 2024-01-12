@@ -152,7 +152,7 @@ if ( ! function_exists( 'wp_use_font_library' ) ) {
 		$use_font_library = apply_filters( 'use_font_library_for_site_editor', true );
 
 		if ( isset( $editor_context->name ) && 'core/edit-site' === $editor_context->name && ! $use_font_library ) {
-			$editor_settings['disableFontLibrary'] = true;
+			$editor_settings['fontLibraryEnabled'] = false;
 		}
 
 		return $editor_settings;

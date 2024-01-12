@@ -347,9 +347,9 @@ function FontLibraryProvider( { children } ) {
 		getFontCollections();
 	}, [] );
 
-	const disableFontLibrary = useSelect( ( select ) => {
+	const fontLibraryEnabled = useSelect( ( select ) => {
 		const { getEditorSettings } = select( editorStore );
-		return getEditorSettings().disableFontLibrary;
+		return getEditorSettings().fontLibraryEnabled;
 	}, [] );
 
 	return (
@@ -378,7 +378,7 @@ function FontLibraryProvider( { children } ) {
 				isInstalling,
 				collections,
 				getFontCollection,
-				disableFontLibrary,
+				fontLibraryEnabled,
 			} }
 		>
 			{ children }
