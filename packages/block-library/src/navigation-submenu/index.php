@@ -82,7 +82,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$is_active   = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
 
 	if ( is_post_type_archive() ) {
-		$queried_archive_link = get_post_type_archive_link(get_queried_object()->name);
+		$queried_archive_link = get_post_type_archive_link( get_queried_object()->name );
 		if ( $attributes['url'] === $queried_archive_link ) {
 			$is_active = true;
 		}
