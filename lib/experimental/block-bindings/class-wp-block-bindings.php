@@ -4,7 +4,8 @@
  *
  * Support for custom fields in blocks.
  *
- * @package Gutenberg
+ * @since 17.6.0
+ * @package gutenberg
  */
 
 if ( class_exists( 'WP_Block_Bindings' ) ) {
