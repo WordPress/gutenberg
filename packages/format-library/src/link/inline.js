@@ -16,11 +16,12 @@ import {
 	replace,
 	split,
 	concat,
-	privateApis as richTextPrivateApis,
+	useAnchor,
 } from '@wordpress/rich-text';
 import {
 	__experimentalLinkControl as LinkControl,
 	store as blockEditorStore,
+	useCachedTruthy,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
@@ -29,9 +30,6 @@ import { useSelect } from '@wordpress/data';
  */
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
-import { unlock } from '../lock-unlock';
-
-const { useAnchorWithUpdate } = unlock( richTextPrivateApis );
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -180,13 +178,6 @@ function InlineLinkUI( {
 			newValue.start = newValue.end;
 
 			onChange( newValue );
-
-			// Force update the anchor reference to ensure the Popover is positioned correctly/
-			// Incorrect positioning can happen on the initial creation of a link because the
-			// anchor changes from a rich text selection to a link format element (e.g. <a>).
-			// however the Popover is not repositioned to account for this change because the
-			// dependencies of `useAnchor` do not change.
-			updatePopoverAnchor();
 		}
 
 		// Focus should only be returned to the rich text on submit if this link is not
@@ -212,11 +203,19 @@ function InlineLinkUI( {
 		}
 	}
 
-	const { anchor: popoverAnchor, update: updatePopoverAnchor } =
-		useAnchorWithUpdate( {
-			editableContentElement: contentRef.current,
-			settings,
-		} );
+	const popoverAnchor = useAnchor( {
+		editableContentElement: contentRef.current,
+		settings,
+	} );
+
+	//  As you change the link by interacting with the Link UI
+	//  the return value of document.getSelection jumps to the field you're editing,
+	//  not the highlighted text. Given that useAnchor uses document.getSelection,
+	//  it will return null, since it can't find the <mark> element within the Link UI.
+	//  This caches the last truthy value of the selection anchor reference.
+	//
+	const cachedRect = useCachedTruthy( popoverAnchor.getBoundingClientRect() );
+	popoverAnchor.getBoundingClientRect = () => cachedRect;
 
 	// Focus should only be moved into the Popover when the Link is being created or edited.
 	// When the Link is in "preview" mode focus should remain on the rich text because at
