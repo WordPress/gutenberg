@@ -62,6 +62,9 @@ function Revisions( { userConfig, blocks } ) {
 			? globalStyles
 			: settings.styles;
 
+	const showCanvas =
+		!! editorStyles && !! originalSettings && !! renderedBlocksArray.length;
+
 	return (
 		<EditorCanvasContainer
 			title={ __( 'Revisions' ) }
@@ -82,12 +85,14 @@ function Revisions( { userConfig, blocks } ) {
 					}
 				</style>
 				<Disabled className="edit-site-revisions__example-preview__content">
-					<ExperimentalBlockEditorProvider
-						value={ renderedBlocksArray }
-						settings={ settings }
-					>
-						<BlockList renderAppender={ false } />
-					</ExperimentalBlockEditorProvider>
+					{ showCanvas ? (
+						<ExperimentalBlockEditorProvider
+							value={ renderedBlocksArray }
+							settings={ settings }
+						>
+							<BlockList renderAppender={ false } />
+						</ExperimentalBlockEditorProvider>
+					) : null }
 				</Disabled>
 			</Iframe>
 		</EditorCanvasContainer>

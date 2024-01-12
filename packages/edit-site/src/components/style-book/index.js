@@ -439,6 +439,8 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 		[ blocks ]
 	);
 
+	const showCanvas = !! originalSettings && !! renderedBlocks.length;
+
 	return (
 		<div role="row">
 			<div role="gridcell">
@@ -464,12 +466,14 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 						aria-hidden
 					>
 						<Disabled className="edit-site-style-book__example-preview__content">
-							<ExperimentalBlockEditorProvider
-								value={ renderedBlocks }
-								settings={ settings }
-							>
-								<BlockList renderAppender={ false } />
-							</ExperimentalBlockEditorProvider>
+							{ showCanvas ? (
+								<ExperimentalBlockEditorProvider
+									value={ renderedBlocks }
+									settings={ settings }
+								>
+									<BlockList renderAppender={ false } />
+								</ExperimentalBlockEditorProvider>
+							) : null }
 						</Disabled>
 					</div>
 				</CompositeItem>
