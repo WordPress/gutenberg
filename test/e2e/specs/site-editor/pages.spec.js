@@ -23,8 +23,8 @@ async function addPageContent( editor, page ) {
 		.getByRole( 'document', {
 			name: 'Block: Content',
 		} )
-		.getByRole( 'document', {
-			name: 'Empty block; start writing or type forward slash to choose a block',
+		.getByRole( 'button', {
+			name: 'Start blank',
 		} )
 		.click();
 
@@ -124,9 +124,7 @@ test.describe( 'Pages', () => {
 			editor.canvas.getByRole( 'document', {
 				name: 'Block: Content',
 			} )
-		).toContainText(
-			'This is the Content block, it will display all the blocks in any single post or page.'
-		);
+		).toContainText( 'This block will be replaced with your content.' );
 		await expect(
 			page.locator(
 				'role=button[name="Dismiss this notice"i] >> text="Editing template. Changes made here affect all posts and pages that use the template."'

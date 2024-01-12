@@ -51,17 +51,17 @@ export const getInsertionPoint = createRegistrySelector(
 );
 
 /**
- * Get the initial category for the inserter.
- * A category corresponds to one of the tab categories defined in packages/block-editor/src/components/inserter/tabs.js.
+ * Get the initial tab id for the inserter.
+ * A category corresponds to one of the tab ids defined in packages/block-editor/src/components/inserter/tabs.js.
  *
  * @param {Object} state Global application state.
  *
  * @return {string} The initial tab category to open when the inserter is opened.
  */
-export const getInserterInitialCategory = createRegistrySelector(
+export const getInserterInitialTab = createRegistrySelector(
 	() => ( state ) =>
 		typeof state.blockInserterPanel === 'object'
-			? state.blockInserterPanel?.initialCategory
+			? state.blockInserterPanel?.initialTab
 			: null
 );
 

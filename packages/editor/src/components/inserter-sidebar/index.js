@@ -20,15 +20,15 @@ import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
 export default function InserterSidebar() {
-	const { insertionPoint, inserterInitialCategory, showMostUsedBlocks } =
+	const { insertionPoint, initialInserterTab, showMostUsedBlocks } =
 		useSelect( ( select ) => {
-			const { getInsertionPoint, getInserterInitialCategory } = unlock(
+			const { getInsertionPoint, getInserterInitialTab } = unlock(
 				select( editorStore )
 			);
 			const { get } = select( preferencesStore );
 			return {
 				insertionPoint: getInsertionPoint(),
-				inserterInitialCategory: getInserterInitialCategory(),
+				initialInserterTab: getInserterInitialTab(),
 				showMostUsedBlocks: get( 'core', 'mostUsedBlocks' ),
 			};
 		}, [] );
@@ -68,7 +68,7 @@ export default function InserterSidebar() {
 					__experimentalInsertionIndex={
 						insertionPoint.insertionIndex
 					}
-					__experimentalInitialCategory={ inserterInitialCategory }
+					initialInserterTab={ initialInserterTab }
 					__experimentalFilterValue={ insertionPoint.filterValue }
 					ref={ libraryRef }
 				/>

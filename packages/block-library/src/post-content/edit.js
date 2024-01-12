@@ -15,11 +15,7 @@ import {
 	Warning,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	useEntityProp,
-	useEntityBlockEditor,
-	store as coreStore,
-} from '@wordpress/core-data';
+import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Placeholder, Button } from '@wordpress/components';
 import { postContent as icon } from '@wordpress/icons';
@@ -105,23 +101,14 @@ function EditableContent( { context = {}, clientId } ) {
 		{ id: postId }
 	);
 
-	const { entityRecord, setInserterIsOpened } = useSelect(
-		( select ) => {
-			return {
-				entityRecord: select( coreStore ).getEntityRecord(
-					'postType',
-					postType,
-					postId
-				),
-				setInserterIsOpened:
-					select( blockEditorStore ).getSettings()
-						.__experimentalSetIsInserterOpened,
-			};
-		},
+	const setInserterIsOpened = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()
+				.__experimentalSetIsInserterOpened,
 		[ postType, postId ]
 	);
 
-	const hasInnerBlocks = !! entityRecord?.content?.raw || blocks?.length;
+	const hasInnerBlocks = blocks?.length;
 
 	const { children, ...props } = useInnerBlocksProps(
 		useBlockProps( {
@@ -144,7 +131,7 @@ function EditableContent( { context = {}, clientId } ) {
 
 	const openInserter = () => {
 		setInserterIsOpened( {
-			initialCategory: 'patterns',
+			initialTab: 'patterns',
 			rootClientId: clientId,
 			insertionIndex: 0,
 		} );
