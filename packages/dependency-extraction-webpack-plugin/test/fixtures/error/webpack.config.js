@@ -6,11 +6,9 @@ const DependencyExtractionWebpackPlugin = require( '../../..' );
 module.exports = {
 	plugins: [
 		new DependencyExtractionWebpackPlugin( {
-			outputFilename: '[name]-foo.asset.php',
-			requestToExternalModule( request ) {
-				return (
-					request.startsWith( '@wordpress/' ) || request === 'lodash'
-				);
+			// eslint-disable-next-line no-unused-vars
+			requestToExternal( request ) {
+				throw new Error( 'Ensure error in script build.' );
 			},
 		} ),
 	],
