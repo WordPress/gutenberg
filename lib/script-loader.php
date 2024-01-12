@@ -96,7 +96,7 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_global_styles_css_
 
 if ( ! function_exists( 'wp_use_font_library' ) ) {
 	/**
-	 * Function that determines if the font library should activated in the site editor.
+	 * Function that determines if the font library should be activated in the site editor.
 	 *
 	 * @since 6.5.0
 	 */
