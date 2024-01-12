@@ -6,7 +6,6 @@
  *
  * @since 6.5.0
  * @package WordPress
- * @subpackage Script Modules
  */
 
 /**

@@ -5,7 +5,6 @@
  * Support for custom fields in blocks.
  *
  * @package WordPress
- * @subpackage Script Modules
  */
 
 if ( class_exists( 'WP_Block_Bindings' ) ) {
