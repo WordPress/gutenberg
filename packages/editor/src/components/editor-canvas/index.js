@@ -139,8 +139,7 @@ function EditorCanvas( {
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
 			showEditorPadding:
-				!! editorSettings.changeEntity?.hasHistory &&
-				postTypeSlug !== 'wp_template',
+				!! editorSettings.isFocusMode && postTypeSlug !== 'wp_template',
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );

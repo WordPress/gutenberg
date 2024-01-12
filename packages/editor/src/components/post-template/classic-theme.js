@@ -64,7 +64,8 @@ function PostTemplateDropdownContent( { onClose } ) {
 		canCreate,
 		canEdit,
 		currentTemplateId,
-		changeEntity,
+		getPostNavigation,
+		goBack,
 	} = useSelect(
 		( select ) => {
 			const { canUser, getEntityRecords } = select( coreStore );
@@ -93,15 +94,16 @@ function PostTemplateDropdownContent( { onClose } ) {
 					editorSettings.supportsTemplateMode &&
 					!! _currentTemplateId,
 				currentTemplateId: _currentTemplateId,
-				changeEntity: editorSettings.changeEntity,
+				getPostNavigation: editorSettings.getPostNavigation,
+				goBack: editorSettings.goBack,
 			};
 		},
 		[ allowSwitchingTemplate ]
 	);
 
-	const editTemplate =
-		changeEntity && currentTemplateId
-			? changeEntity( {
+	const templateNavigation =
+		getPostNavigation && currentTemplateId
+			? getPostNavigation( {
 					postId: currentTemplateId,
 					postType: 'wp_template',
 					canvas: 'edit',
@@ -172,7 +174,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 					<Button
 						variant="link"
 						onClick={ () => {
-							editTemplate?.onClick();
+							templateNavigation?.goTo();
 							onClose();
 							createSuccessNotice(
 								__(
@@ -183,8 +185,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 									actions: [
 										{
 											label: __( 'Go back' ),
-											onClick: () =>
-												changeEntity.goBack(),
+											onClick: () => goBack(),
 										},
 									],
 								}

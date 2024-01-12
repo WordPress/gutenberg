@@ -48,24 +48,26 @@ const icons = {
 };
 
 export default function DocumentBar() {
-	const { postType, postId, goBack, hasHistory } = useSelect( ( select ) => {
-		const {
-			getCurrentPostId,
-			getCurrentPostType,
-			getEditorSettings: getSettings,
-		} = select( editorStore );
-		const changeEntity = getSettings().changeEntity;
-		return {
-			postType: getCurrentPostType(),
-			postId: getCurrentPostId(),
-			goBack:
-				typeof changeEntity?.goBack === 'function'
-					? changeEntity.goBack
-					: undefined,
-			getEditorSettings: getSettings,
-			hasHistory: changeEntity?.hasHistory,
-		};
-	}, [] );
+	const { postType, postId, goBack, isSecondaryMode } = useSelect(
+		( select ) => {
+			const {
+				getCurrentPostId,
+				getCurrentPostType,
+				getEditorSettings: getSettings,
+			} = select( editorStore );
+			const editorSettings = getSettings();
+			const _goBack = editorSettings.goBack;
+			const _isSecondaryMode = editorSettings.isSecondaryMode;
+			return {
+				postType: getCurrentPostType(),
+				postId: getCurrentPostId(),
+				goBack: typeof _goBack === 'function' ? _goBack : undefined,
+				getEditorSettings: getSettings,
+				isSecondaryMode: _isSecondaryMode,
+			};
+		},
+		[]
+	);
 
 	const handleOnBack = () => {
 		if ( goBack ) {
@@ -77,7 +79,7 @@ export default function DocumentBar() {
 		<BaseDocumentActions
 			postType={ postType }
 			postId={ postId }
-			onBack={ goBack && hasHistory ? handleOnBack : undefined }
+			onBack={ goBack && isSecondaryMode ? handleOnBack : undefined }
 		/>
 	);
 }

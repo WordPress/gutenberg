@@ -22,7 +22,7 @@ import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
-import useChangeEntity from './hooks/use-change-entity';
+import usePostNavigation from './hooks/use-post-navigation';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
@@ -33,10 +33,8 @@ function Editor( {
 	initialEdits,
 	...props
 } ) {
-	const { currentPost, changeEntity } = useChangeEntity(
-		initialPostId,
-		initialPostType
-	);
+	const { currentPost, getPostNavigation, goBack, isSecondaryMode } =
+		usePostNavigation( initialPostId, initialPostType );
 
 	const {
 		hasInlineToolbar,
@@ -111,7 +109,9 @@ function Editor( {
 	const editorSettings = useMemo( () => {
 		const result = {
 			...settings,
-			changeEntity,
+			getPostNavigation,
+			goBack,
+			isSecondaryMode,
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -142,13 +142,15 @@ function Editor( {
 		return result;
 	}, [
 		settings,
-		hasInlineToolbar,
-		hiddenBlockTypes,
-		blockTypes,
+		getPostNavigation,
+		goBack,
+		isSecondaryMode,
 		preferredStyleVariations,
 		updatePreferredStyleVariations,
-		changeEntity,
+		hasInlineToolbar,
 		defaultRenderingMode,
+		hiddenBlockTypes,
+		blockTypes,
 	] );
 
 	if ( ! post ) {

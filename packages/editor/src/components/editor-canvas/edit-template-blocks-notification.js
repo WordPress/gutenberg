@@ -27,7 +27,7 @@ import { store as editorStore } from '../../store';
  *                                                                  editor iframe canvas.
  */
 export default function EditTemplateBlocksNotification( { contentRef } ) {
-	const { renderingMode, changeEntity, templateId } = useSelect(
+	const { renderingMode, getPostNavigation, templateId } = useSelect(
 		( select ) => {
 			const {
 				getRenderingMode,
@@ -36,17 +36,19 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			} = select( editorStore );
 			return {
 				renderingMode: getRenderingMode(),
-				changeEntity: getEditorSettings().changeEntity,
+				getPostNavigation: getEditorSettings().getPostNavigation,
 				templateId: getCurrentTemplateId(),
 			};
 		},
 		[]
 	);
-	const editTemplate = changeEntity?.getEntityLoader( {
-		postId: templateId,
-		postType: 'wp_template',
-		canvas: 'edit',
-	} );
+	const templateNavigation = getPostNavigation
+		? getPostNavigation( {
+				postId: templateId,
+				postType: 'wp_template',
+				canvas: 'edit',
+		  } )
+		: undefined;
 
 	const { getNotices } = useSelect( noticesStore );
 
@@ -78,7 +80,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 					actions: [
 						{
 							label: __( 'Edit template' ),
-							onClick: () => editTemplate?.loadEntity(),
+							onClick: () => templateNavigation?.gotTo(),
 						},
 					],
 				}
@@ -109,11 +111,11 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 	}, [
 		lastNoticeId,
 		renderingMode,
-		editTemplate,
 		contentRef,
 		getNotices,
 		createInfoNotice,
 		removeNotice,
+		templateNavigation,
 	] );
 
 	return (
@@ -122,7 +124,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			confirmButtonText={ __( 'Edit template' ) }
 			onConfirm={ () => {
 				setIsDialogOpen( false );
-				editTemplate?.loadEntity();
+				templateNavigation?.goTo();
 			} }
 			onCancel={ () => setIsDialogOpen( false ) }
 		>

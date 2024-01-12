@@ -11,20 +11,20 @@ import { getPostLinkProps } from '../routes/link';
 
 const { useHistory } = unlock( routerPrivateApis );
 
-export function useChangeEntity() {
+export function usePostNavigation() {
 	const history = useHistory();
 
-	const getEntityLoader = ( params, state ) => {
+	const getPostNavigation = ( params, state ) => {
 		const { href, onClick } = getPostLinkProps( history, params, state );
 
 		return {
-			href,
-			loadEntity: ( event ) => onClick( event ),
+			link: href,
+			goTo: ( event ) => onClick( event ),
 		};
 	};
 
 	return {
-		getEntityLoader,
+		getPostNavigation,
 		goBack: history.back,
 	};
 }

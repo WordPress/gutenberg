@@ -166,7 +166,7 @@ export default function ReusableBlockEdit( {
 	} = useDispatch( blockEditorStore );
 	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
 
-	const { innerBlocks, userCanEdit, getBlockEditingMode, changeEntity } =
+	const { innerBlocks, userCanEdit, getBlockEditingMode, getPostNavigation } =
 		useSelect(
 			( select ) => {
 				const { canUser } = select( coreStore );
@@ -183,17 +183,19 @@ export default function ReusableBlockEdit( {
 					innerBlocks: blocks,
 					userCanEdit: canEdit,
 					getBlockEditingMode: editingMode,
-					changeEntity: getSettings().changeEntity,
+					getPostNavigation: getSettings().getPostNavigation,
 				};
 			},
 			[ patternClientId, ref ]
 		);
 
-	const editOriginalProps = changeEntity?.getEntityLoader( {
-		postId: ref,
-		postType: 'wp_block',
-		canvas: 'edit',
-	} );
+	const originalPatternNavigation = getPostNavigation
+		? getPostNavigation( {
+				postId: ref,
+				postType: 'wp_block',
+				canvas: 'edit',
+		  } )
+		: undefined;
 
 	useEffect(
 		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
@@ -281,7 +283,7 @@ export default function ReusableBlockEdit( {
 
 	const handleEditOriginal = ( event ) => {
 		setBlockEditMode( setBlockEditingMode, innerBlocks, 'default' );
-		editOriginalProps.loadEntity( event );
+		originalPatternNavigation?.goTo( event );
 	};
 
 	let children = null;
@@ -312,11 +314,11 @@ export default function ReusableBlockEdit( {
 
 	return (
 		<RecursionProvider uniqueId={ ref }>
-			{ userCanEdit && editOriginalProps && (
+			{ userCanEdit && originalPatternNavigation && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
-							href={ editOriginalProps.href }
+							href={ originalPatternNavigation.link }
 							onClick={ handleEditOriginal }
 						>
 							{ __( 'Edit original' ) }

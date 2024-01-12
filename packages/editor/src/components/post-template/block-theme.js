@@ -24,15 +24,20 @@ const POPOVER_PROPS = {
 };
 
 export default function BlockThemeControl( { id } ) {
-	const { isTemplateHidden, changeEntity } = useSelect( ( select ) => {
-		const { getRenderingMode, getEditorSettings } = unlock(
-			select( editorStore )
-		);
-		return {
-			isTemplateHidden: getRenderingMode() === 'post-only',
-			changeEntity: getEditorSettings().changeEntity,
-		};
-	}, [] );
+	const { isTemplateHidden, getPostNavigation, goBack } = useSelect(
+		( select ) => {
+			const { getRenderingMode, getEditorSettings } = unlock(
+				select( editorStore )
+			);
+			const editorSettings = getEditorSettings();
+			return {
+				isTemplateHidden: getRenderingMode() === 'post-only',
+				getPostNavigation: editorSettings.getPostNavigation,
+				goBack: editorSettings.goBack,
+			};
+		},
+		[]
+	);
 	const { editedRecord: template, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_template',
@@ -41,15 +46,17 @@ export default function BlockThemeControl( { id } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { setRenderingMode } = useDispatch( editorStore );
 
-	const editTemplate = changeEntity?.getEntityLoader( {
-		postId: template.id,
-		postType: 'wp_template',
-		canvas: 'edit',
-	} );
-
 	if ( ! hasResolved ) {
 		return null;
 	}
+
+	const templateNavigation = getPostNavigation
+		? getPostNavigation( {
+				postId: template.id,
+				postType: 'wp_template',
+				canvas: 'edit',
+		  } )
+		: undefined;
 
 	return (
 		<DropdownMenu
@@ -67,7 +74,7 @@ export default function BlockThemeControl( { id } ) {
 					<MenuGroup>
 						<MenuItem
 							onClick={ ( event ) => {
-								editTemplate.loadEntity( event );
+								templateNavigation?.goTo( event );
 								onClose();
 								createSuccessNotice(
 									__(
@@ -78,8 +85,7 @@ export default function BlockThemeControl( { id } ) {
 										actions: [
 											{
 												label: __( 'Go back' ),
-												onClick: () =>
-													changeEntity.goBack(),
+												onClick: () => goBack(),
 											},
 										],
 									}

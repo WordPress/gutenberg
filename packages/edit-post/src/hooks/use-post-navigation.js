@@ -18,7 +18,7 @@ import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
  * @return {Object} An object containing the `currentPost`, `hasHistory` and `href` variable and
  *                 `loadEntity` and `goBack` functions.
  */
-export default function useChangeEntity( initialPostId, initialPostType ) {
+export default function usePostNavigation( initialPostId, initialPostType ) {
 	const [ postHistory, dispatch ] = useReducer(
 		( historyState, { type, post } ) => {
 			if ( type === 'push' ) {
@@ -35,7 +35,7 @@ export default function useChangeEntity( initialPostId, initialPostType ) {
 		[ { postId: initialPostId, postType: initialPostType } ]
 	);
 
-	const getEntityLoader = useCallback( ( params ) => {
+	const getPostNavigation = useCallback( ( params ) => {
 		const currentArgs = getQueryArgs( window.location.href );
 		const currentUrlWithoutArgs = removeQueryArgs(
 			window.location.href,
@@ -48,8 +48,8 @@ export default function useChangeEntity( initialPostId, initialPostType ) {
 		} );
 
 		return {
-			href: newUrl,
-			loadEntity: ( event ) => {
+			link: newUrl,
+			goTo: ( event ) => {
 				event?.preventDefault();
 				dispatch( {
 					type: 'push',
@@ -67,10 +67,8 @@ export default function useChangeEntity( initialPostId, initialPostType ) {
 
 	return {
 		currentPost,
-		changeEntity: {
-			getEntityLoader,
-			hasHistory: postHistory.length > 1,
-			goBack,
-		},
+		getPostNavigation,
+		goBack,
+		isSecondaryMode: postHistory.length > 1,
 	};
 }

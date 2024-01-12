@@ -23,15 +23,17 @@ import { store as editorStore } from '../../store';
 const DEFAULT_TITLE = __( 'Custom Template' );
 
 export default function CreateNewTemplateModal( { onClose } ) {
-	const { defaultBlockTemplate, changeEntity } = useSelect( ( select ) => {
-		const { getEditorSettings, getCurrentTemplateId } =
-			select( editorStore );
-		return {
-			defaultBlockTemplate: getEditorSettings().defaultBlockTemplate,
-			changeEntity: getEditorSettings().changeEntity,
-			getTemplateId: getCurrentTemplateId,
-		};
-	} );
+	const { defaultBlockTemplate, getPostNavigation } = useSelect(
+		( select ) => {
+			const { getEditorSettings, getCurrentTemplateId } =
+				select( editorStore );
+			return {
+				defaultBlockTemplate: getEditorSettings().defaultBlockTemplate,
+				getPostNavigation: getEditorSettings().getPostNavigation,
+				getTemplateId: getCurrentTemplateId,
+			};
+		}
+	);
 
 	const { createTemplate } = unlock( useDispatch( editorStore ) );
 
@@ -95,12 +97,14 @@ export default function CreateNewTemplateModal( { onClose } ) {
 		} );
 
 		setIsBusy( false );
-		const editTemplate = changeEntity( {
-			postId: newTemplate.id,
-			postType: 'wp_template',
-			canvas: 'edit',
-		} );
-		editTemplate?.loadEntity();
+		const templateNavigation = getPostNavigation
+			? getPostNavigation( {
+					postId: newTemplate.id,
+					postType: 'wp_template',
+					canvas: 'edit',
+			  } )
+			: undefined;
+		templateNavigation?.goTo();
 		cancel();
 	};
 
