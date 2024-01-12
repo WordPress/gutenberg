@@ -70,9 +70,11 @@ const withScope = ( func ) => {
 	const scope = getScope();
 	return ( ...args ) => {
 		setScope( scope );
-		const output = func( ...args );
-		resetScope();
-		return output;
+		try {
+			return func( ...args );
+		} finally {
+			resetScope();
+		}
 	};
 };
 
