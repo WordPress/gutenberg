@@ -60,12 +60,6 @@ type ManagedProps = CompositeStoreState & {
 	props: Record< PropertyKey, any >;
 };
 
-function showDeprecationMessage( ...props: Parameters< typeof deprecated > ) {
-	if ( 'test' !== process.env.NODE_ENV ) {
-		deprecated( ...props );
-	}
-}
-
 const idMap = new Map< BaseId, React.MutableRefObject< number > >();
 
 function useBaseId( preferredBaseId?: BaseId ): BaseId {
@@ -133,7 +127,7 @@ function proxyComposite< C extends Component >(
 			// @ts-ignore
 			LegacyComponent.displayName ?? LegacyComponent.render.name;
 
-		showDeprecationMessage( `wp.components.__unstable${ componentName }`, {
+		deprecated( `wp.components.__unstable${ componentName }`, {
 			alternative: `wp.components.${ componentName }`,
 		} );
 
@@ -168,7 +162,7 @@ export const CompositeItem = proxyComposite( Current.CompositeItem, {
 } );
 
 export function useCompositeState( initialState: InitialState = {} ) {
-	showDeprecationMessage( 'wp.components.__unstableUseCompositeState', {
+	deprecated( 'wp.components.__unstableUseCompositeState', {
 		alternative: 'wp.components.useCompositeStore',
 	} );
 	const { baseId, ...storeProps } = useMappedInitialState( initialState );

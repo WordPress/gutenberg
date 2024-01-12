@@ -31,6 +31,8 @@ type InitialState = Parameters< typeof useCompositeState >[ 0 ];
 type CompositeState = ReturnType< typeof useCompositeState >;
 type CompositeStateProps = CompositeState | { state: CompositeState };
 
+const warningsIssued = new Map();
+
 async function renderAndValidate( ...args: Parameters< typeof render > ) {
 	const view = render( ...args );
 	await waitFor( () => {
@@ -167,6 +169,20 @@ describe.each( [
 			</>
 		);
 		renderAndValidate( <Test /> );
+
+		// Using the legacy composite components issues a deprecation
+		// warning, but only on the first usage. As such, we only
+		// expect `console` to warn once; any further rendering
+		// should not warn.
+		const warningKey = 'single tab stop';
+		if ( warningsIssued.get( warningKey ) ) {
+			// eslint-disable-next-line jest/no-conditional-expect
+			expect( console ).not.toHaveWarned();
+		} else {
+			// eslint-disable-next-line jest/no-conditional-expect
+			expect( console ).toHaveWarned();
+			warningsIssued.set( warningKey, true );
+		}
 
 		await press.Tab();
 		expect( screen.getByText( 'Before' ) ).toHaveFocus();
@@ -423,6 +439,20 @@ describe.each( [
 		test( 'All directions work as standard', async () => {
 			const { itemA1, itemA2, itemA3, itemB1, itemB2, itemC1, itemC3 } =
 				useTwoDimensionalTest();
+
+			// Using the legacy composite components issues a deprecation
+			// warning, but only on the first usage. As such, we only
+			// expect `console` to warn once; any further rendering
+			// should not warn.
+			const warningKey = 'directions';
+			if ( warningsIssued.get( warningKey ) ) {
+				// eslint-disable-next-line jest/no-conditional-expect
+				expect( console ).not.toHaveWarned();
+			} else {
+				// eslint-disable-next-line jest/no-conditional-expect
+				expect( console ).toHaveWarned();
+				warningsIssued.set( warningKey, true );
+			}
 
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();
