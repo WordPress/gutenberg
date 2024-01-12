@@ -36,5 +36,3 @@ export {
  * documentation for more information.
  */
 export type { RichTextValue } from './types';
-
-export { privateApis } from './private-apis';

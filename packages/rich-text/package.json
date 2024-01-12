@@ -39,7 +39,6 @@
 		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/keycodes": "file:../keycodes",
-		"@wordpress/private-apis": "file:../private-apis",
 		"memize": "^2.1.0",
 		"rememo": "^4.0.2"
 	},
