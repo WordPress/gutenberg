@@ -13,7 +13,6 @@ test.describe( 'Templates', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
-			requestUtils.deactivatePlugin( 'gutenberg-test-dataviews' ),
 			requestUtils.deleteAllTemplates( 'wp_template' ),
 			requestUtils.setGutenbergExperiments( [] ),
 		] );
