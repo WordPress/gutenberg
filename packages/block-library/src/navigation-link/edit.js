@@ -563,7 +563,14 @@ export default function NavigationLinkEdit( {
 						<LinkUI
 							clientId={ clientId }
 							link={ attributes }
-							onClose={ () => setIsLinkOpen( false ) }
+							onClose={ () => {
+								// If there is no link then remove the auto-inserted block.
+								// This avoids empty blocks which can provided a poor UX.
+								if ( ! url ) {
+									// Need to handle refocusing the Nav block or the inserter?
+									replaceBlock( clientId, [] );
+								}
+							} }
 							anchor={ popoverAnchor }
 							onRemove={ removeLink }
 							onChange={ ( updatedValue ) => {
