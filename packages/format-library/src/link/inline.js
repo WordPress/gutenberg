@@ -175,8 +175,6 @@ function InlineLinkUI( {
 				newValue = concat( valBefore, newValAfter );
 			}
 
-			newValue.start = newValue.end;
-
 			onChange( newValue );
 		}
 
