@@ -125,6 +125,7 @@ require __DIR__ . '/compat/wordpress-6.5/compat.php';
 require __DIR__ . '/compat/wordpress-6.5/blocks.php';
 require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.5/kses.php';
+require __DIR__ . '/compat/wordpress-6.5/formatting.php';
 require __DIR__ . '/compat/wordpress-6.5/interactivity-api/class-wp-interactivity-api.php';
 require __DIR__ . '/compat/wordpress-6.5/interactivity-api/class-wp-interactivity-api-directives-processor.php';
 require __DIR__ . '/compat/wordpress-6.5/interactivity-api/interactivity-api.php';

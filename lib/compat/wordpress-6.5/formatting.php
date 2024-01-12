@@ -8,46 +8,35 @@
 
 
 /**
- * Given a numeric value, returns a rounded float as a string.
- * Takes into account active LM_NUMERIC locales with non-dot decimal point (`localeconv()['decimal_point']`);
+ * Given a numeric value, returns a rounded a valid CSS <number> as a string.
+ * See https://developer.mozilla.org/en-US/docs/Web/CSS/number
+ * Normalizes LM_NUMERIC locales with non-dot decimal point, e.g., "1,234.56" to "1234.56".
  * Negative zero values, e.g., `-0.0`, will return "0"
  *
- * @param {int|string|float} $value          A CSS <number> data type.
- *                                           See https://developer.mozilla.org/en-US/docs/Web/CSS/number
- * @param  {int}             $decimal_places The number of decimal places to output. `0` === remove all decimals.
- * @return {string?}         A rounded value with any decimal commas stripped.
+ * Usage:
+ * Call just before constructing the final output of your CSS rules, and after any number-based calculation.
  *
+ * $padding_rounded = gutenberg_round_css_value( 20.3566 + 5, array( 'decimal_places' => 1 ) );
+ * echo "padding: {$padding_rounded}px;" // "padding: 25.4px;"
+ *
+ * @param int|string|float $value A CSS <number> data type.
+ * @param array            $options {
+ *     Optional. An array of options. Default empty array.
+ * }
+ * @return string A rounded CSS number.
  */
-function wp_round_css_value( $value, $options ) {
+function gutenberg_round_css_value( $value, $options = array() ) {
 	if ( is_numeric( $value ) && is_float( floatval( $value ) ) ) {
 		$defaults = array(
-			'decimal_places'   => 3,
+			'decimal_places' => 3,
 		);
 
-		$options = wp_parse_args( $options, $defaults );
+		$options     = wp_parse_args( $options, $defaults );
+		$value       = number_format( $value, $options['decimal_places'], '.', '' );
+		$split_value = explode( '.', $value );
+		$is_float    = isset( $split_value[1] ) && intval( $split_value[1] ) > 0;
 
-		// Rounding.
-		$value = round( $value, $options['decimal_places'] );
-
-		/*
-		 * Save a negative sign for later.
-		 * When splitting int and float, we want to preserve the negativity of the int
-		 * for values such as `-0.2`. Coercing $value to int will return `0`.
-		 */
-		$negative_sign = $value < 0 ? '-' : '';
-
-		// Get the floating point remainder.
-		$decimal = fmod( $value, 1 );
-
-		// Turn the decimal fragment into a positve integer and remove any trailing zeros.
-		$decimal *= pow( 10, $options['decimal_places'] );
-		$decimal = abs( $decimal );
-		$decimal = rtrim( $decimal, '0' );
-
-		// Now get the whole, positive integer value (the left hand side of the float before the decimal).
-		$whole = (int) abs( $value );
-
-		return $decimal > 0 ? "{$negative_sign}{$whole}.{$decimal}" : "{$negative_sign}{$whole}";
+		return $is_float ? "{$split_value[0]}." . rtrim( $split_value[1], '0' ) : "{$split_value[0]}";
 	}
 
 	return $value;
