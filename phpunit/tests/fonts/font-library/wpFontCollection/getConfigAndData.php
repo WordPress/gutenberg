@@ -1,6 +1,6 @@
 <?php
 /**
- * Test WP_Font_Collection::get_data().
+ * Test WP_Font_Collection::get_config_and_data().
  *
  * @package WordPress
  * @subpackage Font Library
@@ -8,9 +8,9 @@
  * @group fonts
  * @group font-library
  *
- * @covers WP_Font_Collection::get_data
+ * @covers WP_Font_Collection::get_config_and_data
  */
-class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
+class Tests_Fonts_WpFontCollection_GetConfigAndData extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
@@ -47,14 +47,14 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @dataProvider data_should_get_data
+	 * @dataProvider data_should_get_config_and_data
 	 *
 	 * @param array $config Font collection config options.
 	 * @param array $expected_data Expected data.
 	 */
-	public function test_should_get_data( $config, $expected_data ) {
+	public function test_should_get_config_and_data( $config, $expected_data ) {
 		$collection = new WP_Font_Collection( $config );
-		$this->assertSame( $expected_data, $collection->get_data() );
+		$this->assertSame( $expected_data, $collection->get_config_and_data() );
 	}
 
 	/**
@@ -62,20 +62,20 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 	 *
 	 * @return array[]
 	 */
-	public function data_should_get_data() {
+	public function data_should_get_config_and_data() {
 		$mock_file = wp_tempnam( 'my-collection-data-' );
 		file_put_contents( $mock_file, '{"this is mock data":true}' );
 
 		return array(
 			'with a file' => array(
 				'config'        => array(
-					'id'          => 'my-collection',
+					'slug'        => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 					'src'         => $mock_file,
 				),
 				'expected_data' => array(
-					'id'          => 'my-collection',
+					'slug'        => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 					'data'        => array( 'this is mock data' => true ),
@@ -83,19 +83,33 @@ class Tests_Fonts_WpFontCollection_GetData extends WP_UnitTestCase {
 			),
 			'with a url'  => array(
 				'config'        => array(
-					'id'          => 'my-collection-with-url',
+					'slug'        => 'my-collection-with-url',
 					'name'        => 'My Collection with URL',
 					'description' => 'My collection description',
 					'src'         => 'https://localhost/fonts/mock-font-collection.json',
 				),
 				'expected_data' => array(
-					'id'          => 'my-collection-with-url',
+					'slug'        => 'my-collection-with-url',
 					'name'        => 'My Collection with URL',
 					'description' => 'My collection description',
 					'data'        => array(
 						'fontFamilies' => 'mock',
 						'categories'   => 'mock',
 					),
+				),
+			),
+			'with data'   => array(
+				'config'        => array(
+					'slug'        => 'my-collection',
+					'name'        => 'My Collection',
+					'description' => 'My collection description',
+					'data'        => array( 'this is mock data' => true ),
+				),
+				'expected_data' => array(
+					'slug'        => 'my-collection',
+					'name'        => 'My Collection',
+					'description' => 'My collection description',
+					'data'        => array( 'this is mock data' => true ),
 				),
 			),
 		);

@@ -281,3 +281,14 @@ export const hasAllowedPatterns = createSelector(
 		),
 	]
 );
+
+/**
+ * Returns the element of the last element that had focus when focus left the editor canvas.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {Object} Element.
+ */
+export function getLastFocus( state ) {
+	return state.lastFocus;
+}

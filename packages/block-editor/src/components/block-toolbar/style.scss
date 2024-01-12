@@ -203,6 +203,24 @@
 
 	.block-editor-block-mover .block-editor-block-mover__move-button-container {
 		width: auto;
+
+		@include break-small() {
+			position: relative;
+
+			&::before {
+				content: "";
+				height: $border-width;
+				width: 100%;
+				background: $gray-900;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				// With Top toolbar enabled, this separator has a smaller width. Translating the
+				// X axis allows to make the separator always centered regardless of its width.
+				transform: translate(-50%, 0);
+				margin-top: -$border-width * 0.5;
+			}
+		}
 	}
 
 	.block-editor-block-mover.is-horizontal {
@@ -229,19 +247,6 @@
 	.block-editor-block-mover .block-editor-block-mover__drag-handle.has-icon {
 		padding-left: $grid-unit-15;
 		padding-right: $grid-unit-15;
-	}
-
-	@include break-small() {
-		// Specificity override for https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L69
-		.is-up-button.is-up-button.is-up-button {
-			margin-right: 0;
-			border-radius: 0;
-			order: 1;
-		}
-
-		.is-down-button.is-down-button.is-down-button {
-			order: 2;
-		}
 	}
 
 	.block-editor-block-contextual-toolbar .block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {

@@ -13,14 +13,21 @@ import {
 	__experimentalText as Text,
 	__experimentalTruncate as Truncate,
 	FlexItem,
-	TabPanel,
 	Card,
 	CardHeader,
 	CardBody,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useMemo, useCallback, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
 import { isRTL, __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 const PREFERENCES_MENU = 'preferences-menu';
 
@@ -32,7 +39,7 @@ export default function PreferencesModalTabs( { sections } ) {
 	const [ activeMenu, setActiveMenu ] = useState( PREFERENCES_MENU );
 	/**
 	 * Create helper objects from `sections` for easier data handling.
-	 * `tabs` is used for creating the `TabPanel` and `sectionsContentMap`
+	 * `tabs` is used for creating the `Tabs` and `sectionsContentMap`
 	 * is used for easier access to active tab's content.
 	 */
 	const { tabs, sectionsContentMap } = useMemo( () => {
@@ -53,26 +60,41 @@ export default function PreferencesModalTabs( { sections } ) {
 		return mappedTabs;
 	}, [ sections ] );
 
-	const getCurrentTab = useCallback(
-		( tab ) => sectionsContentMap[ tab.name ] || null,
-		[ sectionsContentMap ]
-	);
-
 	let modalContent;
 	// We render different components based on the viewport size.
 	if ( isLargeViewport ) {
 		modalContent = (
-			<TabPanel
-				className="interface-preferences__tabs"
-				tabs={ tabs }
-				initialTabName={
-					activeMenu !== PREFERENCES_MENU ? activeMenu : undefined
-				}
-				onSelect={ setActiveMenu }
-				orientation="vertical"
-			>
-				{ getCurrentTab }
-			</TabPanel>
+			<div className="interface-preferences__tabs">
+				<Tabs
+					initialTabId={
+						activeMenu !== PREFERENCES_MENU ? activeMenu : undefined
+					}
+					onSelect={ setActiveMenu }
+					orientation="vertical"
+				>
+					<Tabs.TabList className="interface-preferences__tabs-tablist">
+						{ tabs.map( ( tab ) => (
+							<Tabs.Tab
+								tabId={ tab.name }
+								key={ tab.name }
+								className="interface-preferences__tabs-tab"
+							>
+								{ tab.title }
+							</Tabs.Tab>
+						) ) }
+					</Tabs.TabList>
+					{ tabs.map( ( tab ) => (
+						<Tabs.TabPanel
+							tabId={ tab.name }
+							key={ tab.name }
+							className="interface-preferences__tabs-tabpanel"
+							focusable={ false }
+						>
+							{ sectionsContentMap[ tab.name ] || null }
+						</Tabs.TabPanel>
+					) ) }
+				</Tabs>
+			</div>
 		);
 	} else {
 		modalContent = (

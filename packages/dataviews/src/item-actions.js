@@ -59,10 +59,7 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 			<ActionTrigger { ...actionTriggerProps } />
 			{ isModalOpen && (
 				<Modal
-					title={
-						( ! hideModalHeader && action.modalHeader ) ||
-						action.label
-					}
+					title={ action.modalHeader || action.label }
 					__experimentalHideHeader={ !! hideModalHeader }
 					onRequestClose={ () => {
 						setIsModalOpen( false );
@@ -72,7 +69,7 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 					) }` }
 				>
 					<RenderModal
-						item={ item }
+						items={ [ item ] }
 						closeModal={ () => setIsModalOpen( false ) }
 					/>
 				</Modal>
@@ -99,7 +96,7 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 					<DropdownMenuItemTrigger
 						key={ action.id }
 						action={ action }
-						onClick={ () => action.callback( item ) }
+						onClick={ () => action.callback( [ item ] ) }
 					/>
 				);
 			} ) }
@@ -160,7 +157,7 @@ export default function ItemActions( { item, actions, isCompact } ) {
 						<ButtonTrigger
 							key={ action.id }
 							action={ action }
-							onClick={ () => action.callback( item ) }
+							onClick={ () => action.callback( [ item ] ) }
 						/>
 					);
 				} ) }

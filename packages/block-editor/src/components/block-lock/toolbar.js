@@ -33,16 +33,24 @@ export default function BlockLockToolbar( { clientId } ) {
 		}
 	}, [ isLocked ] );
 
-	if ( ! canLock || ( ! isLocked && ! hasLockButtonShown.current ) ) {
+	if ( ! isLocked && ! hasLockButtonShown.current ) {
 		return null;
+	}
+
+	let label = isLocked ? __( 'Unlock' ) : __( 'Lock' );
+
+	if ( ! canLock && isLocked ) {
+		label = __( 'Locked' );
 	}
 
 	return (
 		<>
 			<ToolbarGroup className="block-editor-block-lock-toolbar">
 				<ToolbarButton
+					accessibleWhenDisabled
+					disabled={ ! canLock }
 					icon={ isLocked ? lock : unlock }
-					label={ isLocked ? __( 'Unlock' ) : __( 'Lock' ) }
+					label={ label }
 					onClick={ toggleModal }
 					aria-expanded={ isModalOpen }
 					aria-haspopup="dialog"

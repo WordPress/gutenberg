@@ -25,7 +25,6 @@ import layout from './layout';
 import childLayout from './layout-child';
 import contentLockUI from './content-lock-ui';
 import './metadata';
-import customFields from './custom-fields';
 import blockHooks from './block-hooks';
 import blockRenaming from './block-renaming';
 
@@ -39,7 +38,6 @@ createBlockEditFilter(
 		position,
 		layout,
 		contentLockUI,
-		window.__experimentalConnections ? customFields : null,
 		blockHooks,
 		blockRenaming,
 	].filter( Boolean )
