@@ -275,7 +275,7 @@ describe( 'BoxControl', () => {
 			).toHaveValue( '50' );
 		} );
 
-		it( 'should show "Mixed sides" label when sides have different values but are linked', async () => {
+		it( 'should show "Mixed" label when sides have different values but are linked', async () => {
 			const user = userEvent.setup();
 
 			render( <Example /> );
@@ -299,9 +299,7 @@ describe( 'BoxControl', () => {
 
 			await user.click( unlinkButton );
 
-			expect(
-				screen.getByRole( 'textbox', { name: 'Mixed sides' } )
-			).toHaveValue( '' );
+			expect( screen.getByPlaceholderText( 'Mixed' ) ).toHaveValue( '' );
 		} );
 	} );
 
