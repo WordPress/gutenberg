@@ -1,40 +1,40 @@
 /**
  * WordPress dependencies
  */
-import { createNewPost } from '@wordpress/e2e-test-utils';
+const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-describe( 'TypeWriter', () => {
-	beforeEach( async () => {
-		await createNewPost();
+/** @typedef {import('@playwright/test').Page} Page */
+
+// Allow the scroll position to be 1px off.
+const BUFFER = 1;
+
+test.use( {
+	typewriterUtils: async ( { page }, use ) => {
+		await use( new TypewriterUtils( { page } ) );
+	},
+} );
+
+test.describe( 'Typewriter', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
 	} );
 
-	const getCaretPosition = async () =>
-		await page.evaluate(
-			() =>
-				wp.dom.computeCaretRect(
-					document.activeElement?.contentWindow ?? window
-				).y
-		);
-
-	// Allow the scroll position to be 1px off.
-	const BUFFER = 1;
-
-	const getDiff = async ( caretPosition ) =>
-		Math.abs( ( await getCaretPosition() ) - caretPosition );
-
-	it( 'should maintain caret position', async () => {
-		// Create first block.
+	test( 'should maintain caret position', async ( {
+		page,
+		typewriterUtils,
+	} ) => {
+		// Create test blocks.
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
 
-		// Create second block.
-		await page.keyboard.press( 'Enter' );
-
-		const initialPosition = await getCaretPosition();
+		const initialPosition = await typewriterUtils.getCaretPosition();
 
 		// The page shouldn't be scrolled when it's being filled.
 		await page.keyboard.press( 'Enter' );
 
-		expect( await getCaretPosition() ).toBeGreaterThan( initialPosition );
+		expect( await typewriterUtils.getCaretPosition() ).toBeGreaterThan(
+			initialPosition
+		);
 
 		// Create blocks until the typewriter effect kicks in.
 		while (
@@ -42,19 +42,22 @@ describe( 'TypeWriter', () => {
 				const { activeElement } =
 					document.activeElement?.contentDocument ?? document;
 				return (
-					wp.dom.getScrollContainer( activeElement ).scrollTop === 0
+					window.wp.dom.getScrollContainer( activeElement )
+						.scrollTop === 0
 				);
 			} )
 		) {
 			await page.keyboard.press( 'Enter' );
 		}
 
-		const newPosition = await getCaretPosition();
+		const newPosition = await typewriterUtils.getCaretPosition();
 
 		// Now the scroll position should be maintained.
 		await page.keyboard.press( 'Enter' );
 
-		expect( await getDiff( newPosition ) ).toBeLessThanOrEqual( BUFFER );
+		expect(
+			await typewriterUtils.getDiff( newPosition )
+		).toBeLessThanOrEqual( BUFFER );
 
 		// Type until the text wraps.
 		while (
@@ -63,37 +66,47 @@ describe( 'TypeWriter', () => {
 					document.activeElement?.contentDocument ?? document;
 				return (
 					activeElement.clientHeight <=
-					parseInt( getComputedStyle( activeElement ).lineHeight, 10 )
+					parseInt(
+						window.getComputedStyle( activeElement ).lineHeight,
+						10
+					)
 				);
 			} )
 		) {
 			await page.keyboard.type( 'a' );
 		}
 
-		expect( await getDiff( newPosition ) ).toBeLessThanOrEqual( BUFFER );
+		expect(
+			await typewriterUtils.getDiff( newPosition )
+		).toBeLessThanOrEqual( BUFFER );
 
 		// Pressing backspace will reposition the caret to the previous line.
 		// Scroll position should be adjusted again.
 		await page.keyboard.press( 'Backspace' );
 
-		expect( await getDiff( newPosition ) ).toBeLessThanOrEqual( BUFFER );
+		expect(
+			await typewriterUtils.getDiff( newPosition )
+		).toBeLessThanOrEqual( BUFFER );
 
 		// Should reset scroll position to maintain.
 		await page.keyboard.press( 'ArrowUp' );
 
-		const positionAfterArrowUp = await getCaretPosition();
+		const positionAfterArrowUp = await typewriterUtils.getCaretPosition();
 
 		expect( positionAfterArrowUp ).toBeLessThanOrEqual( newPosition );
 
 		// Should be scrolled to new position.
 		await page.keyboard.press( 'Enter' );
 
-		expect( await getDiff( positionAfterArrowUp ) ).toBeLessThanOrEqual(
-			BUFFER
-		);
+		expect(
+			await typewriterUtils.getDiff( positionAfterArrowUp )
+		).toBeLessThanOrEqual( BUFFER );
 	} );
 
-	it( 'should maintain caret position after scroll', async () => {
+	test( 'should maintain caret position after scroll', async ( {
+		page,
+		typewriterUtils,
+	} ) => {
 		// Create first block.
 		await page.keyboard.press( 'Enter' );
 
@@ -104,7 +117,7 @@ describe( 'TypeWriter', () => {
 				const { activeElement } =
 					document.activeElement?.contentDocument ?? document;
 				const scrollContainer =
-					wp.dom.getScrollContainer( activeElement );
+					window.wp.dom.getScrollContainer( activeElement );
 				return (
 					scrollContainer.scrollHeight ===
 					scrollContainer.clientHeight
@@ -117,8 +130,9 @@ describe( 'TypeWriter', () => {
 		const scrollPosition = await page.evaluate( () => {
 			const { activeElement } =
 				document.activeElement?.contentDocument ?? document;
-			return wp.dom.getScrollContainer( activeElement ).scrollTop;
+			return window.wp.dom.getScrollContainer( activeElement ).scrollTop;
 		} );
+
 		// Expect scrollbar to be at the top.
 		expect( scrollPosition ).toBe( 0 );
 
@@ -127,7 +141,7 @@ describe( 'TypeWriter', () => {
 		await page.evaluate( () => {
 			const { activeElement } =
 				document.activeElement?.contentDocument ?? document;
-			wp.dom.getScrollContainer( activeElement ).scrollTop += 2;
+			window.wp.dom.getScrollContainer( activeElement ).scrollTop += 2;
 		} );
 		// Wait for the caret rectangle to be recalculated.
 		await page.evaluate(
@@ -136,39 +150,44 @@ describe( 'TypeWriter', () => {
 
 		// After hitting Enter to create a new block, the caret screen
 		// coordinates should be the same.
-		const initialPosition = await getCaretPosition();
+		const initialPosition = await typewriterUtils.getCaretPosition();
 		await page.keyboard.press( 'Enter' );
 		await page.waitForFunction( () => {
 			const { activeElement } =
 				document.activeElement?.contentDocument ?? document;
 			// Wait for the Typewriter to scroll down past the initial position.
-			return wp.dom.getScrollContainer( activeElement ).scrollTop > 2;
+			return (
+				window.wp.dom.getScrollContainer( activeElement ).scrollTop > 2
+			);
 		} );
-		expect( await getDiff( initialPosition ) ).toBe( 0 );
+
+		expect( await typewriterUtils.getDiff( initialPosition ) ).toBe( 0 );
 	} );
 
-	it( 'should maintain caret position after leaving last editable', async () => {
-		// Create first block.
+	test( 'should maintain caret position after leaving last editable', async ( {
+		page,
+		typewriterUtils,
+	} ) => {
+		// Create test blocks.
 		await page.keyboard.press( 'Enter' );
-		// Create second block.
 		await page.keyboard.press( 'Enter' );
-		// Create third block.
 		await page.keyboard.press( 'Enter' );
 		// Move to first block.
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 
-		const initialPosition = await getCaretPosition();
+		const initialPosition = await typewriterUtils.getCaretPosition();
 
 		// Should maintain scroll position.
-		await page.keyboard.press( 'Enter' );
-
-		expect( await getDiff( initialPosition ) ).toBeLessThanOrEqual(
-			BUFFER
-		);
+		expect(
+			await typewriterUtils.getDiff( initialPosition )
+		).toBeLessThanOrEqual( BUFFER );
 	} );
 
-	it( 'should scroll caret into view from the top', async () => {
+	test( 'should scroll caret into view from the top', async ( {
+		page,
+		typewriterUtils,
+	} ) => {
 		// Create first block.
 		await page.keyboard.press( 'Enter' );
 
@@ -177,7 +196,7 @@ describe( 'TypeWriter', () => {
 			await page.evaluate( () => {
 				const { activeElement } =
 					document.activeElement?.contentDocument ?? document;
-				return ! wp.dom.getScrollContainer( activeElement );
+				return ! window.wp.dom.getScrollContainer( activeElement );
 			} )
 		) {
 			await page.keyboard.press( 'Enter' );
@@ -186,13 +205,14 @@ describe( 'TypeWriter', () => {
 		let count = 0;
 
 		// Create blocks until the typewriter effect kicks in, create at
-		// least 10 blocks to properly test the .
+		// least 10 blocks to properly test it.
 		while (
 			( await page.evaluate( () => {
 				const { activeElement } =
 					document.activeElement?.contentDocument ?? document;
 				return (
-					wp.dom.getScrollContainer( activeElement ).scrollTop === 0
+					window.wp.dom.getScrollContainer( activeElement )
+						.scrollTop === 0
 				);
 			} ) ) ||
 			count < 10
@@ -207,25 +227,25 @@ describe( 'TypeWriter', () => {
 			const { activeElement } =
 				document.activeElement?.contentDocument ?? document;
 			activeElement.scrollIntoView( false );
-			wp.dom.getScrollContainer( activeElement ).scrollTop -=
+			window.wp.dom.getScrollContainer( activeElement ).scrollTop -=
 				activeElement.offsetHeight + 10;
 		} );
 
-		const bottomPostition = await getCaretPosition();
+		const bottomPostition = await typewriterUtils.getCaretPosition();
 
 		// Should scroll the caret back into view (preserve browser behaviour).
 		await page.keyboard.type( 'a' );
 
-		const newBottomPosition = await getCaretPosition();
+		const newBottomPosition = await typewriterUtils.getCaretPosition();
 
 		expect( newBottomPosition ).toBeLessThanOrEqual( bottomPostition );
 
 		// Should maintain new caret position.
 		await page.keyboard.press( 'Enter' );
 
-		expect( await getDiff( newBottomPosition ) ).toBeLessThanOrEqual(
-			BUFFER
-		);
+		expect(
+			await typewriterUtils.getDiff( newBottomPosition )
+		).toBeLessThanOrEqual( BUFFER );
 
 		await page.keyboard.press( 'Backspace' );
 
@@ -239,22 +259,45 @@ describe( 'TypeWriter', () => {
 			const { activeElement } =
 				document.activeElement?.contentDocument ?? document;
 			activeElement.scrollIntoView();
-			wp.dom.getScrollContainer( activeElement ).scrollTop +=
+			window.wp.dom.getScrollContainer( activeElement ).scrollTop +=
 				activeElement.offsetHeight + 10;
 		} );
 
-		const topPostition = await getCaretPosition();
+		const topPostition = await typewriterUtils.getCaretPosition();
 
 		// Should scroll the caret back into view (preserve browser behaviour).
 		await page.keyboard.type( 'a' );
 
-		const newTopPosition = await getCaretPosition();
+		const newTopPosition = await typewriterUtils.getCaretPosition();
 
 		expect( newTopPosition ).toBeGreaterThan( topPostition );
 
 		// Should maintain new caret position.
 		await page.keyboard.press( 'Enter' );
 
-		expect( await getDiff( newTopPosition ) ).toBeLessThanOrEqual( BUFFER );
+		expect(
+			await typewriterUtils.getDiff( newTopPosition )
+		).toBeLessThanOrEqual( BUFFER );
 	} );
 } );
+
+class TypewriterUtils {
+	/** @type {Page} */
+	#page;
+
+	constructor( { page } ) {
+		this.#page = page;
+	}
+
+	async getCaretPosition() {
+		return await this.#page.evaluate( () => {
+			return window.wp.dom.computeCaretRect(
+				document.activeElement?.contentWindow ?? window
+			).y;
+		} );
+	}
+
+	async getDiff( caretPosition ) {
+		return Math.abs( ( await this.getCaretPosition() ) - caretPosition );
+	}
+}
