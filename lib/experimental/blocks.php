@@ -88,15 +88,7 @@ if ( $gutenberg_experiments && (
 ) ) {
 
 	require_once __DIR__ . '/block-bindings/index.php';
-		// Allowed blocks that support block bindings.
-	// TODO: Look for a mechanism to opt-in for this. Maybe adding a property to block attributes?
-	global $block_bindings_allowed_blocks;
-	$block_bindings_allowed_blocks = array(
-		'core/paragraph' => array( 'content' ),
-		'core/heading'   => array( 'content' ),
-		'core/image'     => array( 'url', 'title', 'alt' ),
-		'core/button'    => array( 'url', 'text' ),
-	);
+
 	if ( ! function_exists( 'process_block_bindings' ) ) {
 		/**
 		 * Process the block bindings attribute.
@@ -128,9 +120,9 @@ if ( $gutenberg_experiments && (
 			//   }
 			// }
 			//
-			global $block_bindings_allowed_blocks;
-			global $block_bindings_sources;
-			$modified_block_content = $block_content;
+			$block_bindings_allowed_blocks = wp_block_bindings_get_allowed_blocks();
+			$block_bindings_sources        = wp_block_bindings_get_sources();
+			$modified_block_content        = $block_content;
 			foreach ( $block['attrs']['metadata']['bindings'] as $binding_attribute => $binding_source ) {
 				// If the block is not in the list, stop processing.
 				if ( ! isset( $block_bindings_allowed_blocks[ $block['blockName'] ] ) ) {
@@ -159,13 +151,13 @@ if ( $gutenberg_experiments && (
 				}
 
 				// Process the HTML based on the block and the attribute.
-				$modified_block_content = block_bindings_replace_html( $modified_block_content, $block['blockName'], $binding_attribute, $source_value );
+				$modified_block_content = wp_block_bindings_replace_html( $modified_block_content, $block['blockName'], $binding_attribute, $source_value );
 			}
 			return $modified_block_content;
 		}
 
 		// Add filter only to the blocks in the list.
-		foreach ( $block_bindings_allowed_blocks as $block_name => $attributes ) {
+		foreach ( wp_block_bindings_get_allowed_blocks() as $block_name => $attributes ) {
 			add_filter( 'render_block_' . $block_name, 'process_block_bindings', 20, 3 );
 		}
 	}
