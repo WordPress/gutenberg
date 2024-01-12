@@ -61,10 +61,11 @@ function defaultRequestToExternal( request ) {
  *
  * Currently only @wordpress/interactivity
  *
+ * Do not use the boolean shorthand here, it's only handled for the `requestToExternalModule` option.
+ *
  * @param {string} request Module request (the module name in `import from`) to be transformed
- * @return {string|boolean|Error|undefined} The resulting external definition.
+ * @return {string|Error|undefined} The resulting external definition.
  *   - Return `undefined` to ignore the request (do not externalize).
- *   - Return `true` to externalize the request with the same Module ID
  *   - Return `string` to map the request to an external.
  *   - Return `Error` to emit an error.
  */

@@ -67,20 +67,27 @@ class DependencyExtractionWebpackPlugin {
 			if ( typeof this.options.requestToExternalModule === 'function' ) {
 				externalRequest =
 					this.options.requestToExternalModule( request );
+
+				// requestToExternalModule allows a boolean shorthand
+				if ( externalRequest === false ) {
+					externalRequest = undefined;
+				}
+				if ( externalRequest === true ) {
+					externalRequest = request;
+				}
 			}
 		} else if ( typeof this.options.requestToExternal === 'function' ) {
 			externalRequest = this.options.requestToExternal( request );
 		}
 
 		// Cascade to default if unhandled and enabled.
-		if ( ! externalRequest && this.options.useDefaults ) {
+		if (
+			typeof externalRequest === 'undefined' &&
+			this.options.useDefaults
+		) {
 			externalRequest = this.useModules
 				? defaultRequestToExternalModule( request )
 				: defaultRequestToExternal( request );
-		}
-
-		if ( this.useModules && externalRequest === true ) {
-			externalRequest = request;
 		}
 
 		if ( externalRequest instanceof Error ) {
