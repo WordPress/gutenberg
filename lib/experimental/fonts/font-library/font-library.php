@@ -134,20 +134,42 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 }
 
 // @core-merge: This code should probably go into ...?
-if ( ! function_exists( 'use_font_library_for_site_editor' ) ) {
-	/**
-	 * Returns whether the font library can be loaded in the site editor.
-	 *
-	 * @since 6.5.0
-	 * @param bool $use_font_library Whether the font library can be loaded or not, defaults to true.
-	 */
-	function use_font_library_for_site_editor( $use_font_library = true ) {
-		/**
-		 * Filters whether the font library can be loaded in the site editor.
-		 *
-		 * @since 6.5.0
-		 * @param bool $use_font_library Whether the font library can be loaded or not.
-		 */
-		return apply_filters( 'use_font_library_for_site_editor', $use_font_library );
-	}
+// if ( ! function_exists( 'use_font_library_for_site_editor' ) ) {
+// 	/**
+// 	 * Returns whether the font library can be loaded in the site editor.
+// 	 *
+// 	 * @since 6.5.0
+// 	 * @param bool $use_font_library Whether the font library can be loaded or not, defaults to true.
+// 	 */
+// 	function use_font_library_for_site_editor( $use_font_library = true ) {
+// 		/**
+// 		 * Filters whether the font library can be loaded in the site editor.
+// 		 *
+// 		 * @since 6.5.0
+// 		 * @param bool $use_font_library Whether the font library can be loaded or not.
+// 		 */
+// 		return apply_filters( 'use_font_library_for_site_editor', $use_font_library );
+// 	}
+// }
+
+/**
+ * Function that determines if the font library should be activated in the site editor.
+ *
+ * @since 6.5.0
+ */
+function wp_use_font_library( $editor_settings ) {
+    /**
+     * Filters whether the font library can be loaded in the site editor.
+     *
+     * @since 6.5.0
+     * @param bool $use_font_library Whether the font library can be loaded or not. Default is true.
+     */
+    $use_font_library = apply_filters( 'use_font_library', true );
+
+    if ( ! $use_font_library ) {
+        $editor_settings['disableFontLibrary'] = true;
+    }
+
+    return $editor_settings;
 }
+add_filter( 'block_editor_settings_all', 'wp_use_font_library', 10, 1 );

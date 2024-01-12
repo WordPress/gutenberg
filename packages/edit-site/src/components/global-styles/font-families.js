@@ -23,50 +23,63 @@ import FontFamilyItem from './font-family-item';
 import Subtitle from './subtitle';
 
 function FontFamilies() {
-	const { modalTabOpen, toggleModal, themeFonts, customFonts } =
-		useContext( FontLibraryContext );
+	const {
+		modalTabOpen,
+		toggleModal,
+		themeFonts,
+		customFonts,
+		disableFontLibrary,
+	} = useContext( FontLibraryContext );
 
 	const hasFonts = 0 < customFonts.length || 0 < themeFonts.length;
 
 	return (
-		<>
-			{ !! modalTabOpen && (
-				<FontLibraryModal
-					onRequestClose={ () => toggleModal() }
-					initialTabName={ modalTabOpen }
-				/>
-			) }
-
-			<VStack spacing={ 3 }>
-				<HStack justify="space-between">
-					<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
-					<HStack justify="flex-end">
-						<Tooltip text={ __( 'Manage fonts' ) }>
-							<Button
-								onClick={ () =>
-									toggleModal( 'installed-fonts' )
-								}
-								aria-label={ __( 'Manage fonts' ) }
-								icon={ typography }
-								size={ 'small' }
-							/>
-						</Tooltip>
-					</HStack>
-				</HStack>
-				{ hasFonts ? (
-					<ItemGroup isBordered isSeparated>
-						{ customFonts.map( ( font ) => (
-							<FontFamilyItem key={ font.slug } font={ font } />
-						) ) }
-						{ themeFonts.map( ( font ) => (
-							<FontFamilyItem key={ font.slug } font={ font } />
-						) ) }
-					</ItemGroup>
-				) : (
-					<>{ __( 'No fonts installed.' ) }</>
+		! disableFontLibrary && (
+			<>
+				{ !! modalTabOpen && (
+					<FontLibraryModal
+						onRequestClose={ () => toggleModal() }
+						initialTabName={ modalTabOpen }
+					/>
 				) }
-			</VStack>
-		</>
+
+				<VStack spacing={ 3 }>
+					<HStack justify="space-between">
+						<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
+						<HStack justify="flex-end">
+							<Tooltip text={ __( 'Manage fonts' ) }>
+								<Button
+									onClick={ () =>
+										toggleModal( 'installed-fonts' )
+									}
+									aria-label={ __( 'Manage fonts' ) }
+									icon={ typography }
+									size={ 'small' }
+								/>
+							</Tooltip>
+						</HStack>
+					</HStack>
+					{ hasFonts ? (
+						<ItemGroup isBordered isSeparated>
+							{ customFonts.map( ( font ) => (
+								<FontFamilyItem
+									key={ font.slug }
+									font={ font }
+								/>
+							) ) }
+							{ themeFonts.map( ( font ) => (
+								<FontFamilyItem
+									key={ font.slug }
+									font={ font }
+								/>
+							) ) }
+						</ItemGroup>
+					) : (
+						<>{ __( 'No fonts installed.' ) }</>
+					) }
+				</VStack>
+			</>
+		)
 	);
 }
 

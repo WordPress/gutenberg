@@ -4,6 +4,7 @@
 import { createContext, useState, useEffect } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 import {
 	useEntityRecord,
 	useEntityRecords,
@@ -346,6 +347,11 @@ function FontLibraryProvider( { children } ) {
 		getFontCollections();
 	}, [] );
 
+	const disableFontLibrary = useSelect( ( select ) => {
+		const { getEditorSettings } = select( editorStore );
+		return getEditorSettings().disableFontLibrary;
+	}, [] );
+
 	return (
 		<FontLibraryContext.Provider
 			value={ {
@@ -372,6 +378,7 @@ function FontLibraryProvider( { children } ) {
 				isInstalling,
 				collections,
 				getFontCollection,
+				disableFontLibrary,
 			} }
 		>
 			{ children }
