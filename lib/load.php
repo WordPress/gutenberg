@@ -102,7 +102,10 @@ require __DIR__ . '/compat/wordpress-6.4/kses.php';
 
 // WordPress 6.5 compat.
 require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
-require __DIR__ . '/compat/wordpress-6.5/class-wp-script-modules.php';
+if ( ! class_exists( 'WP_Script_Modules' ) ) {
+	require __DIR__ . '/compat/wordpress-6.5/class-wp-script-modules.php';
+}
+
 require __DIR__ . '/compat/wordpress-6.5/scripts-modules.php';
 require __DIR__ . '/compat/wordpress-6.5/class-wp-navigation-block-renderer.php';
 require __DIR__ . '/compat/wordpress-6.5/kses.php';
