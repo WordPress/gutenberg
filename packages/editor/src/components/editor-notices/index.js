@@ -11,8 +11,11 @@ import { store as noticesStore } from '@wordpress/notices';
 import TemplateValidationNotice from '../template-validation-notice';
 
 export function EditorNotices() {
-	const notices = useSelect( ( select ) =>
-		select( noticesStore ).getNotices()
+	const { notices } = useSelect(
+		( select ) => ( {
+			notices: select( noticesStore ).getNotices(),
+		} ),
+		[]
 	);
 	const { removeNotice } = useDispatch( noticesStore );
 	const dismissibleNotices = notices.filter(
