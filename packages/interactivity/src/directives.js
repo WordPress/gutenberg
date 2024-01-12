@@ -390,4 +390,9 @@ export default () => {
 		),
 		{ priority: 4 }
 	);
+
+	// data-wp-run
+	directive( 'run', ( { directives: { run }, evaluate } ) => {
+		run.forEach( ( entry ) => evaluate( entry ) );
+	} );
 };
