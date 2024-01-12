@@ -505,7 +505,7 @@ export const switchEditorMode =
 	( { dispatch, registry } ) => {
 		registry
 			.dispatch( 'core/preferences' )
-			.set( 'core/edit-site', 'editorMode', mode );
+			.set( 'core', 'editorMode', mode );
 
 		// Unselect blocks when we switch to a non visual mode.
 		if ( mode !== 'visual' ) {
