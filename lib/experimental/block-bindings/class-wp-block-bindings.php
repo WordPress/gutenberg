@@ -1,9 +1,22 @@
 <?php
+/**
+ * Block Bindings API: WP_Block_Bindings class.
+ *
+ * Support for custom fields in blocks.
+ *
+ * @package WordPress
+ * @subpackage Script Modules
+ */
 
 if ( class_exists( 'WP_Block_Bindings' ) ) {
 	return;
 }
 
+/**
+ * Core class used to define supported blocks, register sources, and populate HTML with content from those sources.
+ *
+ * @since 6.5.0
+ */
 class WP_Block_Bindings {
 
 	/**
@@ -146,10 +159,20 @@ class WP_Block_Bindings {
 		return;
 	}
 
+	/**
+	 * Retrieves the list of registered block sources.
+	 *
+	 * @return array The array of registered sources.
+	 */
 	public function get_sources() {
 		return $this->sources;
 	}
 
+	/**
+	 * Retrieves the list of allowed blocks that support block bindings.
+	 *
+	 * @return array The array of allowed blocks.
+	 */
 	public function get_allowed_blocks() {
 		return $this->allowed_blocks;
 	}
