@@ -11,12 +11,12 @@ import {
 	insert,
 	isCollapsed,
 	applyFormat,
-	useAnchor,
 	removeFormat,
 	slice,
 	replace,
 	split,
 	concat,
+	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import {
 	__experimentalLinkControl as LinkControl,
@@ -29,6 +29,9 @@ import { useSelect } from '@wordpress/data';
  */
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
+import { unlock } from '../lock-unlock';
+
+const { useAnchorWithUpdate } = unlock( richTextPrivateApis );
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -183,7 +186,7 @@ function InlineLinkUI( {
 			// anchor changes from a rich text selection to a link format element (e.g. <a>).
 			// however the Popover is not repositioned to account for this change because the
 			// dependencies of `useAnchor` do not change.
-			popoverAnchor?.update();
+			updatePopoverAnchor();
 		}
 
 		// Focus should only be returned to the rich text on submit if this link is not
@@ -209,10 +212,11 @@ function InlineLinkUI( {
 		}
 	}
 
-	const popoverAnchor = useAnchor( {
-		editableContentElement: contentRef.current,
-		settings,
-	} );
+	const { anchor: popoverAnchor, update: updatePopoverAnchor } =
+		useAnchorWithUpdate( {
+			editableContentElement: contentRef.current,
+			settings,
+		} );
 
 	// Focus should only be moved into the Popover when the Link is being created or edited.
 	// When the Link is in "preview" mode focus should remain on the rich text because at
