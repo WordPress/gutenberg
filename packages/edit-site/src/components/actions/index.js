@@ -34,7 +34,7 @@ export const trashPostAction = {
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items: posts, closeModal } ) => {
+	RenderModal: ( { items: posts, closeModal, onPerform } ) => {
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 		const { deleteEntityRecord } = useDispatch( coreStore );
@@ -50,7 +50,7 @@ export const trashPostAction = {
 						: sprintf(
 								// translators: %d: The number of pages (2 or more).
 								__(
-									'Are you sure you want to delete "%d" pages?'
+									'Are you sure you want to delete %d pages?'
 								),
 								posts.length
 						  ) }
@@ -149,6 +149,10 @@ export const trashPostAction = {
 									} );
 								}
 							}
+							if ( onPerform ) {
+								onPerform();
+							}
+							closeModal();
 						} }
 					>
 						{ __( 'Delete' ) }
@@ -305,12 +309,12 @@ export function useRestorePostAction() {
 							? sprintf(
 									/* translators: The number of posts. */
 									__( '%d posts have been restored.' ),
-									decodeEntities( posts[ 0 ].title.rendered )
+									posts.length
 							  )
 							: sprintf(
 									/* translators: The number of posts. */
 									__( '"%s" has been restored.' ),
-									posts.length
+									decodeEntities( posts[ 0 ].title.rendered )
 							  ),
 						{
 							type: 'snackbar',
