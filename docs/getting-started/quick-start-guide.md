@@ -2,6 +2,8 @@
 
 This guide is designed to demonstrate the basic principles of block development in WordPress using a hands-on approach. Following the steps below, you will create a custom block plugin that uses modern JavaScript (ESNext and JSX) in a matter of minutes. The example block displays the copyright symbol (©) and the current year, the perfect addition to any website's footer.
 
+[video width="960px" mp4="" poster="https://developer.wordpress.org/files/2024/01/quick-start-guide-video-thumbnail.png"][/video]
+
 ## Scaffold the block plugin
 
 Start by ensuring you have Node.js and `npm` installed on your computer. Review the [Node.js development environment](https://developer.wordpress.org/block-editor/getting-started/devenv/nodejs-development-environment/) guide if not.
