@@ -52,7 +52,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'generateAnchors',
 	'getPostNavigation',
 	'goBack',
-	'isSecondaryMode',
+	'hasHistory',
 	'hasInlineToolbar',
 	'imageDefaultSize',
 	'imageDimensions',

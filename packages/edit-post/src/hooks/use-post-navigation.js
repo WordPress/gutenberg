@@ -69,6 +69,6 @@ export default function usePostNavigation( initialPostId, initialPostType ) {
 		currentPost,
 		getPostNavigation,
 		goBack,
-		isSecondaryMode: postHistory.length > 1,
+		hasHistory: postHistory.length > 1,
 	};
 }

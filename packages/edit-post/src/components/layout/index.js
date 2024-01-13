@@ -162,7 +162,7 @@ function Layout() {
 		showMetaBoxes,
 		showMostUsedBlocks,
 		documentLabel,
-		isSecondaryMode,
+		hasHistory,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
@@ -199,7 +199,7 @@ function Layout() {
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 			hasBlockSelected:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
-			isSecondaryMode: !! getEditorSettings().isSecondaryMode,
+			hasHistory: !! getEditorSettings().hasHistory,
 		};
 	}, [] );
 
@@ -289,7 +289,7 @@ function Layout() {
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
-			<BrowserURL isSecondaryMode={ isSecondaryMode } />
+			<BrowserURL hasHistory={ hasHistory } />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />

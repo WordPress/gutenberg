@@ -66,7 +66,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		hasFixedToolbar,
 		isPublishSidebarOpened,
 		showIconLabels,
-		isSecondaryMode,
+		hasHistory,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const { getEditorMode } = select( editPostStore );
@@ -76,8 +76,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			isSecondaryMode:
-				select( editorStore ).getEditorSettings().isSecondaryMode,
+			hasHistory: select( editorStore ).getEditorSettings().hasHistory,
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
@@ -118,8 +117,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 								'selected-block-tools-wrapper',
 								{
 									'is-collapsed':
-										isSecondaryMode &&
-										isBlockToolsCollapsed,
+										hasHistory && isBlockToolsCollapsed,
 								}
 							) }
 						>
@@ -129,7 +127,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 							ref={ blockToolbarRef }
 							name="block-toolbar"
 						/>
-						{ isSecondaryMode && hasBlockSelection && (
+						{ hasHistory && hasBlockSelection && (
 							<Button
 								className="edit-post-header__block-tools-toggle"
 								icon={ isBlockToolsCollapsed ? next : previous }
@@ -150,14 +148,14 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				<div
 					className={ classnames( 'edit-post-header__center', {
 						'is-collapsed':
-							isSecondaryMode &&
+							hasHistory &&
 							hasBlockSelection &&
 							! isBlockToolsCollapsed &&
 							hasFixedToolbar &&
 							isLargeViewport,
 					} ) }
 				>
-					{ isSecondaryMode && <DocumentBar /> }
+					{ hasHistory && <DocumentBar /> }
 				</div>
 			</motion.div>
 			<motion.div

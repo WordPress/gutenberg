@@ -33,7 +33,7 @@ function Editor( {
 	initialEdits,
 	...props
 } ) {
-	const { currentPost, getPostNavigation, goBack, isSecondaryMode } =
+	const { currentPost, getPostNavigation, goBack, hasHistory } =
 		usePostNavigation( initialPostId, initialPostType );
 
 	const {
@@ -111,7 +111,7 @@ function Editor( {
 			...settings,
 			getPostNavigation,
 			goBack,
-			isSecondaryMode,
+			hasHistory,
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -144,7 +144,7 @@ function Editor( {
 		settings,
 		getPostNavigation,
 		goBack,
-		isSecondaryMode,
+		hasHistory,
 		preferredStyleVariations,
 		updatePreferredStyleVariations,
 		hasInlineToolbar,

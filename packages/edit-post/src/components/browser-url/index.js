@@ -43,7 +43,7 @@ export class BrowserURL extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { postId, postStatus, postType, isSavingPost, isSecondaryMode } =
+		const { postId, postStatus, postType, isSavingPost, hasHistory } =
 			this.props;
 		const { historyId } = this.state;
 
@@ -58,7 +58,7 @@ export class BrowserURL extends Component {
 			( postId !== prevProps.postId || postId !== historyId ) &&
 			postStatus !== 'auto-draft' &&
 			postId &&
-			! isSecondaryMode
+			! hasHistory
 		) {
 			this.setBrowserURL( postId );
 		}
