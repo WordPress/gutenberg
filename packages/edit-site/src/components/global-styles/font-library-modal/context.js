@@ -213,7 +213,7 @@ function FontLibraryProvider( { children } ) {
 				'settings.typography.fontFamilies',
 			] );
 			refreshLibrary();
-
+			setLibraryFontSelected( null );
 			return response;
 		} catch ( error ) {
 			return {
@@ -221,7 +221,6 @@ function FontLibraryProvider( { children } ) {
 			};
 		} finally {
 			setIsInstalling( false );
-			setLibraryFontSelected( null );
 		}
 	}
 
