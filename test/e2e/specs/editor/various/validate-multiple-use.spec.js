@@ -4,6 +4,14 @@
 
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+async function showBlockMenuItems( { editor, page } ) {
+	await editor.showBlockToolbar();
+	await page
+		.getByRole( 'toolbar', { name: 'Block tools' } )
+		.getByRole( 'button', { name: 'Options' } )
+		.click();
+}
+
 test.describe( 'Validate multiple use', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -18,21 +26,19 @@ test.describe( 'Validate multiple use', () => {
 			name: 'core/more',
 		} );
 
-		const optionButton = page.locator(
-			".components-dropdown-menu__toggle[data-toolbar-item='true'][aria-label='Options']"
-		);
-
 		// Group the block
-		await optionButton.click();
-		await page.getByText( 'Group' ).click();
+		await showBlockMenuItems( { editor, page } );
+		await page.getByRole( 'menuitem', { name: 'Group' } ).click();
 
 		// Duplicate the block
-		await optionButton.click();
-		await page.getByText( 'Duplicate' ).click();
+		await showBlockMenuItems( { editor, page } );
+		await page.getByRole( 'menuitem', { name: 'Duplicate' } ).click();
 
 		// Check if warnings is visible
 		await expect(
-			page.frameLocator( 'iFrame' ).locator( '.block-editor-warning' )
+			editor.canvas.getByRole( 'button', {
+				name: 'Find original',
+			} )
 		).toBeVisible();
 	} );
 } );
