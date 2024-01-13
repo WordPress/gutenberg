@@ -220,6 +220,11 @@ $preview-image-height: 140px;
 		}
 	}
 
+	.block-editor-link-control__search-item-img {
+		aspect-ratio: 1/1;
+		margin-right: 8px;
+	}
+
 	&.is-error .block-editor-link-control__search-item-icon {
 		top: 0;
 		width: 32px;
