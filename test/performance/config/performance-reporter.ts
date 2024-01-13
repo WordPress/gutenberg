@@ -32,6 +32,7 @@ export interface WPRawPerformanceResults {
 	inserterOpen: number[];
 	inserterSearch: number[];
 	inserterHover: number[];
+	loadPatterns: number[];
 	listViewOpen: number[];
 	navigate: number[];
 }
@@ -65,6 +66,7 @@ export interface WPPerformanceResults {
 	inserterHover?: number;
 	minInserterHover?: number;
 	maxInserterHover?: number;
+	loadPatterns?: number;
 	listViewOpen?: number;
 	minListViewOpen?: number;
 	maxListViewOpen?: number;
@@ -110,6 +112,7 @@ export function curateResults(
 		inserterHover: average( results.inserterHover ),
 		minInserterHover: minimum( results.inserterHover ),
 		maxInserterHover: maximum( results.inserterHover ),
+		loadPatterns: average( results.loadPatterns ),
 		listViewOpen: average( results.listViewOpen ),
 		minListViewOpen: minimum( results.listViewOpen ),
 		maxListViewOpen: maximum( results.listViewOpen ),
