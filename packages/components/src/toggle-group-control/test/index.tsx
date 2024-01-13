@@ -117,7 +117,7 @@ describe.each( [
 			expect( container ).toMatchSnapshot();
 		} );
 	} );
-	it( 'should render the correct initial value when defined', () => {
+	it( 'should render with the correct option initially selected when `value` is defined', () => {
 		render(
 			<Component value="jack" label="Test Toggle Group Control">
 				{ options }
@@ -126,7 +126,7 @@ describe.each( [
 		expect( screen.getByRole( 'radio', { name: 'R' } ) ).not.toBeChecked();
 		expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
 	} );
-	it( 'should render the correct initial value when undefined', () => {
+	it( 'should render without a selected option when `value` is `undefined`', () => {
 		render(
 			<Component label="Test Toggle Group Control">{ options }</Component>
 		);
