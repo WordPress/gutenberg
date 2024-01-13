@@ -28,6 +28,7 @@ const ICONS_MAP = {
 
 function SearchItemIcon( { isURL, suggestion } ) {
 	let icon = null;
+	let imgSrc = null;
 
 	if ( isURL ) {
 		icon = globe;
@@ -40,7 +41,25 @@ function SearchItemIcon( { isURL, suggestion } ) {
 			if ( suggestion.isBlogHome ) {
 				icon = verse;
 			}
+		} else if (
+			suggestion.type === 'attachment' &&
+			suggestion.mimeType &&
+			suggestion.mimeType.startsWith( 'image/' )
+		) {
+			imgSrc = suggestion.url;
 		}
+	}
+
+	if ( imgSrc ) {
+		return (
+			<img
+				className="block-editor-link-control__search-item-img"
+				src={ imgSrc }
+				alt={ suggestion.title }
+				width={ 24 }
+				height={ 24 }
+			/>
+		);
 	}
 
 	if ( icon ) {
