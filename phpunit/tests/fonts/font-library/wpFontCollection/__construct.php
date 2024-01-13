@@ -17,7 +17,7 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 		$property->setAccessible( true );
 
 		$config          = array(
-			'id'          => 'my-collection',
+			'slug'        => 'my-collection',
 			'name'        => 'My Collection',
 			'description' => 'My collection description',
 			'src'         => 'my-collection-data.json',
@@ -55,7 +55,7 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 					'description' => 'My collection description',
 					'src'         => 'my-collection-data.json',
 				),
-				'Font Collection config ID is required as a non-empty string.',
+				'Font Collection config slug is required as a non-empty string.',
 			),
 
 			'no config'                       => array(
@@ -80,11 +80,11 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 
 			'missing src'                     => array(
 				array(
-					'id'          => 'my-collection',
+					'slug'        => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 				),
-				'Font Collection config "src" option is required as a non-empty string.',
+				'Font Collection config "src" option OR "data" option is required.',
 			),
 
 		);
