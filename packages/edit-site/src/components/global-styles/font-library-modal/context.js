@@ -213,7 +213,6 @@ function FontLibraryProvider( { children } ) {
 				'settings.typography.fontFamilies',
 			] );
 			refreshLibrary();
-			setLibraryFontSelected( null );
 			return response;
 		} catch ( error ) {
 			return {
