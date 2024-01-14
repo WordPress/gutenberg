@@ -87,6 +87,10 @@ export default {
 					</FlexItem>
 				</Flex>
 				<FlexWrapControl layout={ layout } onChange={ onChange } />
+				<FlexDirectionOrderControl
+					layout={ layout }
+					onChange={ onChange }
+				/>
 			</>
 		);
 	},
@@ -354,32 +358,36 @@ function FlexLayoutJustifyContentControl( {
 }
 
 function FlexWrapControl( { layout, onChange } ) {
-	const { flexWrap = 'wrap', flexDirectionOrder = 'normal' } = layout;
+	const { flexWrap = 'wrap' } = layout;
 	return (
-		<>
-			<ToggleControl
-				__nextHasNoMarginBottom
-				label={ __( 'Allow to wrap to multiple lines' ) }
-				onChange={ ( value ) => {
-					onChange( {
-						...layout,
-						flexWrap: value ? 'wrap' : 'nowrap',
-					} );
-				} }
-				checked={ flexWrap === 'wrap' }
-			/>
-			<ToggleControl
-				__nextHasNoMarginBottom
-				label={ __( 'Reverse the order of elements' ) }
-				onChange={ ( value ) => {
-					onChange( {
-						...layout,
-						flexDirectionOrder: value ? 'reverse' : 'normal',
-					} );
-				} }
-				checked={ flexDirectionOrder === 'reverse' }
-			/>
-		</>
+		<ToggleControl
+			__nextHasNoMarginBottom
+			label={ __( 'Allow to wrap to multiple lines' ) }
+			onChange={ ( value ) => {
+				onChange( {
+					...layout,
+					flexWrap: value ? 'wrap' : 'nowrap',
+				} );
+			} }
+			checked={ flexWrap === 'wrap' }
+		/>
+	);
+}
+
+function FlexDirectionOrderControl( { layout, onChange } ) {
+	const { flexDirectionOrder = 'normal' } = layout;
+	return (
+		<ToggleControl
+			__nextHasNoMarginBottom
+			label={ __( 'Reverse the order of elements' ) }
+			onChange={ ( value ) => {
+				onChange( {
+					...layout,
+					flexDirectionOrder: value ? 'reverse' : 'normal',
+				} );
+			} }
+			checked={ flexDirectionOrder === 'reverse' }
+		/>
 	);
 }
 
