@@ -7,9 +7,10 @@ import {
 } from '@wordpress/components';
 import { layout } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -41,13 +42,36 @@ export default function SidebarNavigationScreenPagesDataViews() {
 			per_page: -1,
 		}
 	);
-	const templates = useMemo(
-		() =>
-			templateRecords?.filter( ( { slug } ) =>
+
+	const { frontPage, postsPage } = useSelect( ( select ) => {
+		const { getEntityRecord } = select( coreStore );
+		const siteSettings = getEntityRecord( 'root', 'site' );
+		return {
+			frontPage: siteSettings?.page_on_front,
+			postsPage: siteSettings?.page_for_posts,
+		};
+	}, [] );
+
+	const templates = useMemo( () => {
+		if ( ! templateRecords ) {
+			return [];
+		}
+
+		const isHomePageBlog = frontPage === postsPage;
+		const homeTemplate =
+			templateRecords?.find(
+				( template ) => template.slug === 'front-page'
+			) ||
+			templateRecords?.find( ( template ) => template.slug === 'home' ) ||
+			templateRecords?.find( ( template ) => template.slug === 'index' );
+
+		return [
+			isHomePageBlog ? homeTemplate : null,
+			...templateRecords?.filter( ( { slug } ) =>
 				[ '404', 'search' ].includes( slug )
 			),
-		[ templateRecords ]
-	);
+		].filter( Boolean );
+	}, [ templateRecords, frontPage, postsPage ] );
 
 	return (
 		<SidebarNavigationScreen

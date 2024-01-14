@@ -268,7 +268,7 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
  * @return {string} Editing mode.
  */
 export const getEditorMode = createRegistrySelector( ( select ) => () => {
-	return select( preferencesStore ).get( 'core/edit-site', 'editorMode' );
+	return select( preferencesStore ).get( 'core', 'editorMode' );
 } );
 
 /**
