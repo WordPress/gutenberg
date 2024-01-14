@@ -31,10 +31,7 @@ const Pagination = memo( function Pagination( {
 					{ createInterpolateElement(
 						sprintf(
 							// translators: %s: Total number of pages.
-							_x(
-								'Page <CurrenPageControl /> of %s',
-								'paging'
-							),
+							_x( 'Page <CurrenPageControl /> of %s', 'paging' ),
 							totalPages
 						),
 						{
