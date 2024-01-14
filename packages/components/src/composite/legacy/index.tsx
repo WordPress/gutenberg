@@ -57,7 +57,7 @@ export type CompositeProps< C extends Component > = CompositeStateProps &
 	React.ComponentProps< C >;
 
 type ManagedProps = CompositeStoreState & {
-	props: Record< PropertyKey, any >;
+	props: Record< string, any >;
 };
 
 const idMap = new Map< BaseId, React.MutableRefObject< number > >();
@@ -120,7 +120,7 @@ function manageProps( stateProps: CompositeStateProps ): ManagedProps {
 
 function proxyComposite< C extends Component >(
 	LegacyComponent: C | ( ( ...args: any[] ) => C ),
-	propMap: Record< PropertyKey, PropertyKey | null > = {}
+	propMap: Record< string, string | null > = {}
 ): ( props: CompositeProps< C > ) => React.ReactElement {
 	return ( unmanagedProps ) => {
 		const componentName =
