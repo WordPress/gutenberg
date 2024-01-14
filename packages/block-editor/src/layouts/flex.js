@@ -370,7 +370,7 @@ function FlexWrapControl( { layout, onChange } ) {
 			/>
 			<ToggleControl
 				__nextHasNoMarginBottom
-				label={ __( 'Reverse order of elements' ) }
+				label={ __( 'Reverse the order of elements' ) }
 				onChange={ ( value ) => {
 					onChange( {
 						...layout,
