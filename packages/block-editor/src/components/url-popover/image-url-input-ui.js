@@ -37,16 +37,11 @@ const icon = (
 
 const expandIcon = (
 	<SVG
+		data-name="Layer 1"
 		xmlns="http://www.w3.org/2000/svg"
-		width="12"
-		height="12"
-		fill="none"
-		viewBox="0 0 12 12"
+		viewBox="0 0 11 11"
 	>
-		<Path
-			fill="#000"
-			d="M2 0a2 2 0 0 0-2 2v2h1.5V2a.5.5 0 0 1 .5-.5h2V0H2Zm2 10.5H2a.5.5 0 0 1-.5-.5V8H0v2a2 2 0 0 0 2 2h2v-1.5ZM8 12v-1.5h2a.5.5 0 0 0 .5-.5V8H12v2a2 2 0 0 1-2 2H8Zm2-12a2 2 0 0 1 2 2v2h-1.5V2a.5.5 0 0 0-.5-.5H8V0h2Z"
-		/>
+		<Path d="M2,0C.9,0,0,.9,0,2v2h1.5v-2c0-.28.22-.5.5-.5h2V0h-2ZM4,9.5h-2c-.28,0-.5-.22-.5-.5v-2H0v2c0,1.1.9,2,2,2h2v-1.5ZM7,11v-1.5h2c.28,0,.5-.22.5-.5v-2h1.5v2c0,1.1-.9,2-2,2h-2ZM9,0c1.1,0,2,.9,2,2v2h-1.5v-2c0-.28-.22-.5-.5-.5h-2V0h2Z" />
 	</SVG>
 );
 
@@ -307,6 +302,7 @@ const ImageURLInputUI = ( {
 								) ) }
 								<MenuItem
 									key="expand-on-click"
+									className="block-editor-url-popover__expand-on-click"
 									icon={ expandIcon }
 									iconPosition="left"
 									onClick={ () => {
@@ -320,7 +316,12 @@ const ImageURLInputUI = ( {
 										stopEditLink();
 									} }
 								>
-									{ __( 'Expand on click' ) }
+									<p>{ __( 'Expand on click' ) }</p>
+									<p className="expand-on-click__description">
+										{ __(
+											'Scales the image with a lightbox effect'
+										) }
+									</p>
 								</MenuItem>
 							</NavigableMenu>
 						)
@@ -355,13 +356,13 @@ const ImageURLInputUI = ( {
 					{ ! url && ! isEditingLink && lightboxEnabled && (
 						<>
 							<div
-								className="block-editor-url-popover__expand-on-click"
+								className="block-editor-url-popover__expand-on-click block-editor-url-popover__expand-on-click__unlink"
 								url={ url }
 							>
 								{ expandIcon }
-								<div>
+								<div className="expand-on-click__unlink-textbox">
 									<p>{ __( 'Expand on click' ) }</p>
-									<p>
+									<p className="expand-on-click__description">
 										{ __(
 											'Scales the image with a lightbox effect'
 										) }

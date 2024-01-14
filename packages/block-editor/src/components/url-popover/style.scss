@@ -1,5 +1,6 @@
 .block-editor-url-popover__additional-controls {
 	border-top: $border-width solid $gray-300;
+	margin: 10px 0 15px;
 }
 
 .block-editor-url-popover__additional-controls > div[role="menu"] .components-button:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) > svg {
@@ -8,6 +9,7 @@
 
 .block-editor-url-popover__additional-controls div[role="menu"] > .components-button {
 	padding-left: $grid-unit-15;
+	margin: 5px 0;
 }
 
 .block-editor-url-popover__row {
@@ -84,14 +86,30 @@
 	align-items: center;
 	flex-grow: 1;
 	flex-shrink: 1;
-	margin: 7px;
 	max-width: 500px;
 	min-width: 150px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	text-align: left;
+
+	.components-menu-item__item {
+		display: block;
+	}
+
+	.expand-on-click__description {
+		color: #7b7b7b;
+	}
 
 	p {
-		margin: 0 0 0 7px;
+		margin: 0;
 	}
+}
+
+.expand-on-click__unlink-textbox {
+	min-width: 300px;
+}
+
+.block-editor-url-popover__expand-on-click__unlink {
+	padding: 10px;
 }
