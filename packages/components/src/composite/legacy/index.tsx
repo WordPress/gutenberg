@@ -54,7 +54,7 @@ export type CompositeStateProps =
 	| { state: CompositeState }
 	| ( CompositeState & { state?: never } );
 export type CompositeProps< C extends Component > = CompositeStateProps &
-	Parameters< C >[ 0 ];
+	React.ComponentProps< C >;
 
 type ManagedProps = CompositeStoreState & {
 	props: Record< PropertyKey, any >;
