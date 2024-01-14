@@ -24,6 +24,9 @@
 		"suffix": {
 			"type": "string",
 			"default": ""
+		},
+		"noLink": {
+			"type": "boolean"
 		}
 	},
 	"usesContext": [ "postId", "postType" ],
