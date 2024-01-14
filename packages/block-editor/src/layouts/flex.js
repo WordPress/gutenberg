@@ -141,6 +141,7 @@ export default {
 			verticalAlignmentMap[ layout.verticalAlignment ];
 		const alignItems =
 			alignItemsMap[ layout.justifyContent ] || alignItemsMap.left;
+		const flexDirectionReversed = layout?.flexDirectionOrder === 'reverse';
 
 		let output = '';
 		const rules = [];
@@ -156,11 +157,18 @@ export default {
 			if ( justifyContent ) {
 				rules.push( `justify-content: ${ justifyContent }` );
 			}
+			if ( flexDirectionReversed ) {
+				rules.push( 'flex-direction: row-reverse' );
+			}
 		} else {
 			if ( verticalAlignment ) {
 				rules.push( `justify-content: ${ verticalAlignment }` );
 			}
-			rules.push( 'flex-direction: column' );
+			if ( flexDirectionReversed ) {
+				rules.push( 'flex-direction: column-reverse' );
+			} else {
+				rules.push( 'flex-direction: column' );
+			}
 			rules.push( `align-items: ${ alignItems }` );
 		}
 
@@ -346,19 +354,32 @@ function FlexLayoutJustifyContentControl( {
 }
 
 function FlexWrapControl( { layout, onChange } ) {
-	const { flexWrap = 'wrap' } = layout;
+	const { flexWrap = 'wrap', flexDirectionOrder = 'normal' } = layout;
 	return (
-		<ToggleControl
-			__nextHasNoMarginBottom
-			label={ __( 'Allow to wrap to multiple lines' ) }
-			onChange={ ( value ) => {
-				onChange( {
-					...layout,
-					flexWrap: value ? 'wrap' : 'nowrap',
-				} );
-			} }
-			checked={ flexWrap === 'wrap' }
-		/>
+		<>
+			<ToggleControl
+				__nextHasNoMarginBottom
+				label={ __( 'Allow to wrap to multiple lines' ) }
+				onChange={ ( value ) => {
+					onChange( {
+						...layout,
+						flexWrap: value ? 'wrap' : 'nowrap',
+					} );
+				} }
+				checked={ flexWrap === 'wrap' }
+			/>
+			<ToggleControl
+				__nextHasNoMarginBottom
+				label={ __( 'Reverse order of elements' ) }
+				onChange={ ( value ) => {
+					onChange( {
+						...layout,
+						flexDirectionOrder: value ? 'reverse' : 'normal',
+					} );
+				} }
+				checked={ flexDirectionOrder === 'reverse' }
+			/>
+		</>
 	);
 }
 
