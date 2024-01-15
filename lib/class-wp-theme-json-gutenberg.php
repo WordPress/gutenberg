@@ -842,15 +842,18 @@ class WP_Theme_JSON_Gutenberg {
 		$schema_styles_blocks   = array();
 		$schema_settings_blocks = array();
 
-		// Generate blocks schema without variations. They will be added later
-		// as each variation can support inner block styles which will need a
-		// schema for variation block styles that don't contain variations
-		// i.e. the variable block styles schema will be the same as the
-		// `$schema_styles_blocks` generated here.
+		// Generate a schema for blocks.
+		// - Block styles can contain `elements` & `variations` definitions.
+		// - Variations can contain styles for inner `blocks`.
+		// - Variations definitions cannot be nested.
+		// - Variations inner block styles cannot contain `elements`.
+		//
+		// As each variation needs a `blocks` schema but without `elements` and
+		// inner `blocks`, the overall schema will be generated in multiple
+		// passes.
 		foreach ( $valid_block_names as $block ) {
-			$schema_settings_blocks[ $block ]           = static::VALID_SETTINGS;
-			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
-			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
+			$schema_settings_blocks[ $block ] = static::VALID_SETTINGS;
+			$schema_styles_blocks[ $block ]   = $styles_non_top_level;
 		}
 
 		// Generate block style variations schema including nested block styles
@@ -879,6 +882,10 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			$schema_styles_blocks[ $block ]['variations'] = $schema_styles_variations;
+
+			// The element styles schema can now be added for this block to the
+			// styles.blocks.$block schema.
+			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 		}
 
 		$schema['styles']                                 = static::VALID_STYLES;
