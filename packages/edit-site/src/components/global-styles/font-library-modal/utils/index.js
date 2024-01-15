@@ -8,7 +8,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 import { unlock } from '../../../../lock-unlock';
-import { fetchInstallFontFamily } from '../resolvers';
+import { fetchInstallFontFace } from '../resolvers';
 
 /**
  * Browser dependencies
@@ -184,7 +184,7 @@ export function makeFontFacesFormData( font ) {
 
 export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
 	const promises = fontFacesData.map( ( faceData ) =>
-		fetchInstallFontFamily( fontFamilyId, faceData )
+		fetchInstallFontFace( fontFamilyId, faceData )
 	);
 	const responses = await Promise.allSettled( promises );
 
