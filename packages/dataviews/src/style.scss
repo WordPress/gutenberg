@@ -290,6 +290,7 @@
 		&:not(.is-selected):hover {
 			color: var(--wp-admin-theme-color);
 
+			.dataviews-view-list__primary-field,
 			.dataviews-view-list__fields {
 				color: var(--wp-admin-theme-color);
 			}
@@ -302,6 +303,7 @@
 			background-color: var(--wp-admin-theme-color);
 			color: $white;
 
+			.dataviews-view-list__primary-field,
 			.dataviews-view-list__fields,
 			.components-button {
 				color: $white;
