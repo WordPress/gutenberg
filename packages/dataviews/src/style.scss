@@ -71,6 +71,11 @@
 		text-decoration: none;
 		color: $gray-900;
 		font-weight: 500;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		width: 100%;
 	}
 	th {
 		text-align: left;
