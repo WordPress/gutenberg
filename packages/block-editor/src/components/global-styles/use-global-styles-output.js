@@ -1050,7 +1050,7 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 	const result = {};
 	blockTypes.forEach( ( blockType ) => {
 		const name = blockType.name;
-		const selector = getBlockCSSSelector( blockType );
+		const selector = `:where(${ getBlockCSSSelector( blockType ) })`;
 		let duotoneSelector = getBlockCSSSelector(
 			blockType,
 			'filter.duotone'
