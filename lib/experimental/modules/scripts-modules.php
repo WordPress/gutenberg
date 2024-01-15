@@ -155,9 +155,9 @@ add_action( 'rest_api_init', 'gutenberg_register_view_module_ids_rest_field' );
  * @param string|false|null $version           Optional. String specifying module version number. Defaults to false. It is added to the URL as a query string for cache busting purposes. If SCRIPT_DEBUG is true, the version is the current timestamp. If $version is set to false, the version number is the currently installed WordPress version. If $version is set to null, no version is added.
  * @deprecated 17.4.2 gutenberg_register_module is deprecated. Use wp_register_module instead.
  */
-function gutenberg_register_module( $module_id, $src, $deps = array(), $version = false ) {
-	_deprecated_function( __FUNCTION__, 'Gutenberg 17.4.2', 'wp_register_module' );
-	wp_modules()->register( $module_id, $src, $deps, $version );
+function gutenberg_register_module( $module_id, $src = '' ) {
+	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6', 'wp_register_module' );
+	wp_modules()->register( $module_id, $src );
 }
 
 /**
@@ -166,9 +166,9 @@ function gutenberg_register_module( $module_id, $src, $deps = array(), $version 
  * @param string $module_identifier The identifier of the module.
  * @deprecated 17.4.2 gutenberg_enqueue_module is deprecated. Use wp_enqueue_module instead.
  */
-function gutenberg_enqueue_module( $module_id, $src = '', $deps = array(), $version = false ) {
-	_deprecated_function( __FUNCTION__, 'Gutenberg 17.4.2', 'wp_enqueue_module' );
-	wp_modules()->enqueue( $module_id, $src, $deps, $version );
+function gutenberg_enqueue_module( $module_id, $src = '' ) {
+	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6', 'wp_enqueue_module' );
+	wp_modules()->enqueue( $module_id );
 }
 
 /**
@@ -178,6 +178,6 @@ function gutenberg_enqueue_module( $module_id, $src = '', $deps = array(), $vers
  * @deprecated 17.4.2 gutenberg_dequeue_module is deprecated. Use wp_dequeue_module instead.
  */
 function gutenberg_dequeue_module( $module_id ) {
-	_deprecated_function( __FUNCTION__, 'Gutenberg 17.4.2', 'wp_dequeue_module' );
+	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6', 'wp_dequeue_module' );
 	wp_modules()->dequeue( $module_id );
 }
