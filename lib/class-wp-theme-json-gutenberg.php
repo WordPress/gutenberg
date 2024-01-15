@@ -2473,26 +2473,6 @@ class WP_Theme_JSON_Gutenberg {
 						}
 					}
 
-					$variation_block_elements = $variation_block_node['elements'] ?? array();
-					foreach ( $variation_block_elements as $variation_element => $variation_element_node ) {
-						$nodes[] = array(
-							'path'     => array( 'styles', 'blocks', $name, 'variations', $variation, 'blocks', $variation_block, 'elements', $variation_element ),
-							'selector' => static::scope_selector( $variation_block_selector, static::ELEMENTS[ $variation_element ] ),
-						);
-
-						if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $variation_element ] ) ) {
-							foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $variation_element ] as $pseudo_selector ) {
-								if ( isset( $variation_element_node[ $pseudo_selector ] ) ) {
-									$pseudo_element_selector = static::append_to_selector( static::ELEMENTS[ $variation_element ], $pseudo_selector );
-									$nodes[]                 = array(
-										'path'     => array( 'styles', 'blocks', $name, 'variations', $variation, 'blocks', $variation_block, 'elements', $variation_element ),
-										'selector' => static::scope_selector( $variation_block_selector, $pseudo_element_selector ),
-									);
-								}
-							}
-						}
-					}
-
 					$variation_nodes[] = array(
 						'name'      => $variation_block,
 						'path'      => array( 'styles', 'blocks', $name, 'variations', $variation, 'blocks', $variation_block ),
