@@ -17,13 +17,24 @@ import {
 	store as blockEditorStore,
 	useCachedTruthy,
 } from '@wordpress/block-editor';
-import { Popover, TabPanel } from '@wordpress/components';
+import {
+	Popover,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { textColor as settings, transparentValue } from './index';
+import { unlock } from '../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
+
+const TABS = [
+	{ name: 'color', title: __( 'Text' ) },
+	{ name: 'backgroundColor', title: __( 'Background' ) },
+];
 
 function parseCSS( css = '' ) {
 	return css.split( ';' ).reduce( ( accumulator, rule ) => {
@@ -155,30 +166,32 @@ export default function InlineColorUI( {
 	return (
 		<Popover
 			onClose={ onClose }
-			className="components-inline-color-popover"
+			className="format-library__inline-color-popover"
 			anchor={ popoverAnchor }
 		>
-			<TabPanel
-				tabs={ [
-					{
-						name: 'color',
-						title: __( 'Text' ),
-					},
-					{
-						name: 'backgroundColor',
-						title: __( 'Background' ),
-					},
-				] }
-			>
-				{ ( tab ) => (
-					<ColorPicker
-						name={ name }
-						property={ tab.name }
-						value={ value }
-						onChange={ onChange }
-					/>
-				) }
-			</TabPanel>
+			<Tabs>
+				<Tabs.TabList>
+					{ TABS.map( ( tab ) => (
+						<Tabs.Tab tabId={ tab.name } key={ tab.name }>
+							{ tab.title }
+						</Tabs.Tab>
+					) ) }
+				</Tabs.TabList>
+				{ TABS.map( ( tab ) => (
+					<Tabs.TabPanel
+						tabId={ tab.name }
+						focusable={ false }
+						key={ tab.name }
+					>
+						<ColorPicker
+							name={ name }
+							property={ tab.name }
+							value={ value }
+							onChange={ onChange }
+						/>
+					</Tabs.TabPanel>
+				) ) }
+			</Tabs>
 		</Popover>
 	);
 }

@@ -23,7 +23,7 @@ The [markup representation of a block is parsed for the Block Editor](https://de
 Whenever a block is saved, the `save` function, defined when the [block is registered in the client](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/#registration-of-the-block-with-javascript-client-side), is called to return the markup that will be saved into the database within the block delimiter's comment. If `save` is `null` (common case for blocks with dynamic rendering), only a single line block delimiter's comment is stored, along with any attributes
 
 The Post Editor checks that the markup created by the `save` function is identical to the block's markup saved to the database:
-- If there are any differences, the Post Editor trigger a **block validation error**.
+- If there are any differences, the Post Editor triggers a [block validation error](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#validation).
 - Block validation errors usually happen when a block’s `save` function is updated to change the markup produced by the block.
 - A block developer can mitigate these issues by adding a [**block deprecation**](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/) to register the change in the block.
 

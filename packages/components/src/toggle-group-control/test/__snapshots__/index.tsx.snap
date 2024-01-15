@@ -240,7 +240,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
         class="components-toggle-group-control emotion-8 emotion-9"
         data-wp-c16t="true"
         data-wp-component="ToggleGroupControl"
-        id="toggle-group-control-as-radio-group-8"
+        id="toggle-group-control-as-radio-group-10"
         role="radiogroup"
       >
         <div
@@ -254,7 +254,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
             data-value="uppercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-8-20"
+            id="toggle-group-control-as-radio-group-10-24"
             role="radio"
             type="button"
             value="uppercase"
@@ -292,7 +292,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
             data-value="lowercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-8-21"
+            id="toggle-group-control-as-radio-group-10-25"
             role="radio"
             type="button"
             value="lowercase"
@@ -488,7 +488,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
         class="components-toggle-group-control emotion-8 emotion-9"
         data-wp-c16t="true"
         data-wp-component="ToggleGroupControl"
-        id="toggle-group-control-as-radio-group-7"
+        id="toggle-group-control-as-radio-group-9"
         role="radiogroup"
       >
         <div
@@ -501,7 +501,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
             data-value="rigas"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-7-18"
+            id="toggle-group-control-as-radio-group-9-22"
             role="radio"
             type="button"
             value="rigas"
@@ -523,7 +523,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
             data-value="jack"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-7-19"
+            id="toggle-group-control-as-radio-group-9-23"
             role="radio"
             type="button"
             value="jack"

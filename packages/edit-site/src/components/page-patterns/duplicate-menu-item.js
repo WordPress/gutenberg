@@ -81,7 +81,7 @@ export default function DuplicateMenuItem( {
 				<DuplicatePatternModal
 					onClose={ closeModal }
 					onSuccess={ onPatternSuccess }
-					pattern={ isThemePattern ? item : item.patternBlock }
+					pattern={ isThemePattern ? item : item.patternPost }
 				/>
 			) }
 			{ isModalOpen && isTemplatePart && (

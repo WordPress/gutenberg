@@ -1,10 +1,19 @@
 /**
+ * WordPress dependencies
+ */
+import { useInstanceId } from '@wordpress/compose';
+/**
  * Internal dependencies
  */
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
-import UnitControl from './unit-control';
-import { LABELS } from './utils';
-import { Layout } from './styles/box-control-styles';
+import Tooltip from '../tooltip';
+import { CUSTOM_VALUE_SETTINGS, LABELS } from './utils';
+import {
+	FlexedBoxControlIcon,
+	FlexedRangeControl,
+	InputWrapper,
+	StyledUnitControl,
+} from './styles/box-control-styles';
 import type { BoxControlInputControlProps } from './types';
 
 const groupedSides = [ 'vertical', 'horizontal' ] as const;
@@ -13,14 +22,17 @@ type GroupedSide = ( typeof groupedSides )[ number ];
 export default function AxialInputControls( {
 	onChange,
 	onFocus,
-	onHoverOn,
-	onHoverOff,
 	values,
 	selectedUnits,
 	setSelectedUnits,
 	sides,
 	...props
 }: BoxControlInputControlProps ) {
+	const generatedId = useInstanceId(
+		AxialInputControls,
+		`box-control-input`
+	);
+
 	const createHandleOnFocus =
 		( side: GroupedSide ) =>
 		( event: React.FocusEvent< HTMLInputElement > ) => {
@@ -30,43 +42,7 @@ export default function AxialInputControls( {
 			onFocus( event, { side } );
 		};
 
-	const createHandleOnHoverOn = ( side: GroupedSide ) => () => {
-		if ( ! onHoverOn ) {
-			return;
-		}
-		if ( side === 'vertical' ) {
-			onHoverOn( {
-				top: true,
-				bottom: true,
-			} );
-		}
-		if ( side === 'horizontal' ) {
-			onHoverOn( {
-				left: true,
-				right: true,
-			} );
-		}
-	};
-
-	const createHandleOnHoverOff = ( side: GroupedSide ) => () => {
-		if ( ! onHoverOff ) {
-			return;
-		}
-		if ( side === 'vertical' ) {
-			onHoverOff( {
-				top: false,
-				bottom: false,
-			} );
-		}
-		if ( side === 'horizontal' ) {
-			onHoverOff( {
-				left: false,
-				right: false,
-			} );
-		}
-	};
-
-	const createHandleOnChange = ( side: GroupedSide ) => ( next?: string ) => {
+	const handleOnValueChange = ( side: GroupedSide, next?: string ) => {
 		if ( ! onChange ) {
 			return;
 		}
@@ -109,16 +85,8 @@ export default function AxialInputControls( {
 		? groupedSides.filter( ( side ) => sides.includes( side ) )
 		: groupedSides;
 
-	const first = filteredSides[ 0 ];
-	const last = filteredSides[ filteredSides.length - 1 ];
-	const only = first === last && first;
-
 	return (
-		<Layout
-			gap={ 0 }
-			align="top"
-			className="component-box-control__vertical-horizontal-input-controls"
-		>
+		<>
 			{ filteredSides.map( ( side ) => {
 				const [ parsedQuantity, parsedUnit ] =
 					parseQuantityAndUnitFromRawValue(
@@ -128,26 +96,65 @@ export default function AxialInputControls( {
 					side === 'vertical'
 						? selectedUnits.top
 						: selectedUnits.left;
+
+				const inputId = [ generatedId, side ].join( '-' );
+
 				return (
-					<UnitControl
-						{ ...props }
-						isFirst={ first === side }
-						isLast={ last === side }
-						isOnly={ only === side }
-						value={ [
-							parsedQuantity,
-							selectedUnit ?? parsedUnit,
-						].join( '' ) }
-						onChange={ createHandleOnChange( side ) }
-						onUnitChange={ createHandleOnUnitChange( side ) }
-						onFocus={ createHandleOnFocus( side ) }
-						onHoverOn={ createHandleOnHoverOn( side ) }
-						onHoverOff={ createHandleOnHoverOff( side ) }
-						label={ LABELS[ side ] }
-						key={ side }
-					/>
+					<InputWrapper key={ side }>
+						<FlexedBoxControlIcon side={ side } sides={ sides } />
+						<Tooltip placement="top-end" text={ LABELS[ side ] }>
+							<StyledUnitControl
+								{ ...props }
+								className="component-box-control__unit-control"
+								id={ inputId }
+								isPressEnterToChange
+								value={ [
+									parsedQuantity,
+									selectedUnit ?? parsedUnit,
+								].join( '' ) }
+								onChange={ ( newValue ) =>
+									handleOnValueChange( side, newValue )
+								}
+								onUnitChange={ createHandleOnUnitChange(
+									side
+								) }
+								onFocus={ createHandleOnFocus( side ) }
+								label={ LABELS[ side ] }
+								hideLabelFromVision
+								key={ side }
+							/>
+						</Tooltip>
+						<FlexedRangeControl
+							__nextHasNoMarginBottom
+							aria-controls={ inputId }
+							label={ LABELS[ side ] }
+							hideLabelFromVision
+							onChange={ ( newValue ) =>
+								handleOnValueChange(
+									side,
+									newValue !== undefined
+										? [
+												newValue,
+												selectedUnit ?? parsedUnit,
+										  ].join( '' )
+										: undefined
+								)
+							}
+							min={ 0 }
+							max={
+								CUSTOM_VALUE_SETTINGS[ selectedUnit ?? 'px' ]
+									?.max ?? 10
+							}
+							step={
+								CUSTOM_VALUE_SETTINGS[ selectedUnit ?? 'px' ]
+									?.step ?? 0.1
+							}
+							value={ parsedQuantity ?? 0 }
+							withInputField={ false }
+						/>
+					</InputWrapper>
 				);
 			} ) }
-		</Layout>
+		</>
 	);
 }

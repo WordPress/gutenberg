@@ -1,18 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { usePostLinkProps } from './use-post-link-props';
 
 const { useBlockEditorSettings } = unlock( editorPrivateApis );
 
@@ -89,18 +88,8 @@ function useArchiveLabel( templateSlug ) {
 }
 
 export function useSpecificEditorSettings() {
-	const isLargeViewport = useViewportMatch( 'medium' );
-	const {
-		templateSlug,
-		focusMode,
-		allowRightClickOverrides,
-		isDistractionFree,
-		hasFixedToolbar,
-		keepCaretInsideBlock,
-		canvasMode,
-		settings,
-		postWithTemplate,
-	} = useSelect(
+	const getPostLinkProps = usePostLinkProps();
+	const { templateSlug, canvasMode, settings, postWithTemplate } = useSelect(
 		( select ) => {
 			const {
 				getEditedPostType,
@@ -109,7 +98,6 @@ export function useSpecificEditorSettings() {
 				getCanvasMode,
 				getSettings,
 			} = unlock( select( editSiteStore ) );
-			const { get: getPreference } = select( preferencesStore );
 			const { getEditedEntityRecord } = select( coreStore );
 			const usedPostType = getEditedPostType();
 			const usedPostId = getEditedPostId();
@@ -121,28 +109,12 @@ export function useSpecificEditorSettings() {
 			const _context = getEditedPostContext();
 			return {
 				templateSlug: _record.slug,
-				focusMode: !! getPreference( 'core/edit-site', 'focusMode' ),
-				isDistractionFree: !! getPreference(
-					'core/edit-site',
-					'distractionFree'
-				),
-				allowRightClickOverrides: !! getPreference(
-					'core/edit-site',
-					'allowRightClickOverrides'
-				),
-				hasFixedToolbar:
-					!! getPreference( 'core/edit-site', 'fixedToolbar' ) ||
-					! isLargeViewport,
-				keepCaretInsideBlock: !! getPreference(
-					'core/edit-site',
-					'keepCaretInsideBlock'
-				),
 				canvasMode: getCanvasMode(),
 				settings: getSettings(),
 				postWithTemplate: _context?.postId,
 			};
 		},
-		[ isLargeViewport ]
+		[]
 	);
 	const archiveLabels = useArchiveLabel( templateSlug );
 	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
@@ -150,29 +122,22 @@ export function useSpecificEditorSettings() {
 		return {
 			...settings,
 
+			richEditingEnabled: true,
 			supportsTemplateMode: true,
-			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
-			allowRightClickOverrides,
-			isDistractionFree,
-			hasFixedToolbar,
-			keepCaretInsideBlock,
+			focusMode: canvasMode !== 'view',
 			defaultRenderingMode,
-
+			getPostLinkProps,
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
 		};
 	}, [
 		settings,
-		focusMode,
-		allowRightClickOverrides,
-		isDistractionFree,
-		hasFixedToolbar,
-		keepCaretInsideBlock,
 		canvasMode,
+		defaultRenderingMode,
+		getPostLinkProps,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
-		defaultRenderingMode,
 	] );
 
 	return defaultEditorSettings;

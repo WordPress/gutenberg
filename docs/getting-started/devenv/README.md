@@ -30,7 +30,7 @@ Node.js and its accompanying development tools allow you to:
 
 The list goes on. While modern JavaScript development can be challenging, WordPress provides several tools, like [`wp-scripts`](/docs/getting-started/devenv/get-started-with-wp-scripts.md) and [`create-block`](/docs/getting-started/devenv/get-started-with-create-block.md), that streamline the process and are made possible by Node.js development tools.
 
-**The recommended Node.js version for block development is [Active LTS](https://nodejs.dev/en/about/releases/) (Long Term Support)**. However, there are times when you need to use different versions. A Node.js version manager tool like `nvm` is strongly recommended and allows you to easily change your `node` version when required. You will also need Node Package Manager (`npm`) and the Node Package eXecute (`npx`) to work with some WordPress packages. Both are installed automatically with Node.js.
+**The recommended Node.js version for block development is [Active LTS](https://nodejs.org/en/about/previous-releases) (Long Term Support)**. However, there are times when you need to use different versions. A Node.js version manager tool like `nvm` is strongly recommended and allows you to easily change your `node` version when required. You will also need Node Package Manager (`npm`) and the Node Package eXecute (`npx`) to work with some WordPress packages. Both are installed automatically with Node.js.
 
 To be able to use the Node.js tools and [packages provided by WordPress](https://github.com/WordPress/gutenberg/tree/trunk/packages) for block development, you'll need to set a proper Node.js runtime environment on your machine. To learn more about how to do this, refer to the links below.
 
@@ -48,3 +48,10 @@ Refer to the [Get started with `wp-env`](/docs/getting-started/devenv/get-starte
 <div class="callout callout-info">
     Throughout the Handbook, you may also see references to <code><a href="https://github.com/WordPress/playground-tools/tree/trunk/packages/wp-now">wp-now</a></code>. This is a lightweight tool powered by <a hre="https://developer.wordpress.org/playground/">WordPress Playground</a> that streamlines setting up a simple local WordPress environment. While still experimental, this tool is great for quickly testing WordPress releases, plugins, and themes. 
 </div>
+
+This list is not exhaustive, but here are several additional options to choose from if you prefer not to use `wp-env`:
+
+- [Local](https://localwp.com/)
+- [XAMPP](https://www.apachefriends.org/)
+- [MAMP](https://www.mamp.info/en/mamp/mac/)
+- [Varying Vagrant Vagrants](https://varyingvagrantvagrants.org/) (VVV)

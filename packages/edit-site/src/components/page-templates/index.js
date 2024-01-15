@@ -24,7 +24,11 @@ import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { DataViews } from '@wordpress/dataviews';
+import {
+	DataViews,
+	sortByTextFields,
+	getPaginationResults,
+} from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -61,7 +65,9 @@ const { useHistory } = unlock( routerPrivateApis );
 const EMPTY_ARRAY = [];
 
 const defaultConfigPerViewType = {
-	[ LAYOUT_TABLE ]: {},
+	[ LAYOUT_TABLE ]: {
+		primaryField: 'title',
+	},
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
@@ -80,7 +86,7 @@ const DEFAULT_VIEW = {
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'preview' ],
-	layout: {},
+	layout: defaultConfigPerViewType[ LAYOUT_TABLE ],
 	filters: [],
 };
 
@@ -99,7 +105,7 @@ function TemplateTitle( { item, viewType } ) {
 
 	return (
 		<VStack spacing={ 1 }>
-			<View as="span" className="edit-site-list-title__customized-info">
+			<View as="span" className="dataviews-view-grid__title-field">
 				<Link
 					params={ {
 						postId: item.id,
@@ -252,10 +258,10 @@ export default function DataviewsTemplates() {
 		[ authors, view.type ]
 	);
 
-	const { shownTemplates, paginationInfo } = useMemo( () => {
+	const { data, paginationInfo } = useMemo( () => {
 		if ( ! allTemplates ) {
 			return {
-				shownTemplates: EMPTY_ARRAY,
+				data: EMPTY_ARRAY,
 				paginationInfo: { totalItems: 0, totalPages: 0 },
 			};
 		}
@@ -301,36 +307,18 @@ export default function DataviewsTemplates() {
 
 		// Handle sorting.
 		if ( view.sort ) {
-			const stringSortingFields = [ 'title', 'author' ];
-			const fieldId = view.sort.field;
-			if ( stringSortingFields.includes( fieldId ) ) {
-				const fieldToSort = fields.find( ( field ) => {
-					return field.id === fieldId;
-				} );
-				filteredTemplates.sort( ( a, b ) => {
-					const valueA = fieldToSort.getValue( { item: a } ) ?? '';
-					const valueB = fieldToSort.getValue( { item: b } ) ?? '';
-					return view.sort.direction === 'asc'
-						? valueA.localeCompare( valueB )
-						: valueB.localeCompare( valueA );
-				} );
-			}
+			filteredTemplates = sortByTextFields( {
+				data: filteredTemplates,
+				view,
+				fields,
+				textFields: [ 'title' ],
+			} );
 		}
-
 		// Handle pagination.
-		const start = ( view.page - 1 ) * view.perPage;
-		const totalItems = filteredTemplates?.length || 0;
-		filteredTemplates = filteredTemplates?.slice(
-			start,
-			start + view.perPage
-		);
-		return {
-			shownTemplates: filteredTemplates,
-			paginationInfo: {
-				totalItems,
-				totalPages: Math.ceil( totalItems / view.perPage ),
-			},
-		};
+		return getPaginationResults( {
+			data: filteredTemplates,
+			view,
+		} );
 	}, [ allTemplates, view, fields ] );
 
 	const resetTemplateAction = useResetTemplateAction();
@@ -381,7 +369,7 @@ export default function DataviewsTemplates() {
 					paginationInfo={ paginationInfo }
 					fields={ fields }
 					actions={ actions }
-					data={ shownTemplates }
+					data={ data }
 					isLoading={ isLoadingData }
 					view={ view }
 					onChangeView={ onChangeView }

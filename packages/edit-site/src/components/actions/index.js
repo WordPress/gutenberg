@@ -33,7 +33,9 @@ export const trashPostAction = {
 		return status !== 'trash';
 	},
 	hideModalHeader: true,
-	RenderModal: ( { item: post, closeModal } ) => {
+	RenderModal: ( { items: posts, closeModal } ) => {
+		// Todo - handle multiple posts
+		const post = posts[ 0 ];
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 		const { deleteEntityRecord } = useDispatch( coreStore );
@@ -109,7 +111,9 @@ export function usePermanentlyDeletePostAction() {
 			isEligible( { status } ) {
 				return status === 'trash';
 			},
-			async callback( post ) {
+			async callback( posts ) {
+				// Todo - handle multiple posts
+				const post = posts[ 0 ];
 				try {
 					await deleteEntityRecord(
 						'postType',
@@ -160,7 +164,9 @@ export function useRestorePostAction() {
 			isEligible( { status } ) {
 				return status === 'trash';
 			},
-			async callback( post ) {
+			async callback( posts ) {
+				// Todo - handle multiple posts
+				const post = posts[ 0 ];
 				await editEntityRecord( 'postType', post.type, post.id, {
 					status: 'draft',
 				} );
@@ -211,7 +217,8 @@ export const viewPostAction = {
 	isEligible( post ) {
 		return post.status !== 'trash';
 	},
-	callback( post ) {
+	callback( posts ) {
+		const post = posts[ 0 ];
 		document.location.href = post.link;
 	},
 };
@@ -225,7 +232,8 @@ export function useEditPostAction() {
 			isEligible( { status } ) {
 				return status !== 'trash';
 			},
-			callback( post ) {
+			callback( posts ) {
+				const post = posts[ 0 ];
 				history.push( {
 					postId: post.id,
 					postType: post.type,
@@ -250,7 +258,8 @@ export const postRevisionsAction = {
 			post?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 		return lastRevisionId && revisionsCount > 1;
 	},
-	callback( post ) {
+	callback( posts ) {
+		const post = posts[ 0 ];
 		const href = addQueryArgs( 'revision.php', {
 			revision: post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id,
 		} );
