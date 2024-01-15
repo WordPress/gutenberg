@@ -4,6 +4,7 @@
 import {
 	__experimentalView as View,
 	__experimentalVStack as VStack,
+	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
@@ -42,6 +43,7 @@ import {
 	useEditPostAction,
 } from '../actions';
 import PostPreview from '../post-preview';
+import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -323,6 +325,29 @@ export default function PagePages() {
 		[ view.type, setView ]
 	);
 
+	const [ showAddPageModal, setShowAddPageModal ] = useState( false );
+	const openModal = useCallback( () => {
+		if ( ! showAddPageModal ) {
+			setShowAddPageModal( true );
+		}
+	}, [ showAddPageModal ] );
+	const closeModal = useCallback( () => {
+		if ( showAddPageModal ) {
+			setShowAddPageModal( false );
+		}
+	}, [ showAddPageModal ] );
+	const handleNewPage = useCallback(
+		( { type, id } ) => {
+			history.push( {
+				postId: id,
+				postType: type,
+				canvas: 'edit',
+			} );
+			closeModal();
+		},
+		[ history ]
+	);
+
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
 		<>
@@ -333,6 +358,19 @@ export default function PagePages() {
 						: null
 				}
 				title={ __( 'Pages' ) }
+				actions={
+					<>
+						<Button variant="primary" onClick={ openModal }>
+							{ __( 'Add new page' ) }
+						</Button>
+						{ showAddPageModal && (
+							<AddNewPageModal
+								onSave={ handleNewPage }
+								onClose={ closeModal }
+							/>
+						) }
+					</>
+				}
 			>
 				<DataViews
 					paginationInfo={ paginationInfo }

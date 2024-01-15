@@ -50,7 +50,8 @@ if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	 *     Font collection associative array of configuration options.
 	 *
 	 *     @type string $id             The font collection's unique ID.
-	 *     @type string $src The font collection's data JSON file.
+	 *     @type string $src            The font collection's data as a JSON file path.
+	 *     @type array  $data           The font collection's data as a PHP array.
 	 * }
 	 * @return WP_Font_Collection|WP_Error A font collection is it was registered
 	 *                                     successfully, else WP_Error.
@@ -75,10 +76,59 @@ if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
 }
 
 $default_font_collection = array(
-	'id'          => 'default-font-collection',
+	'slug'        => 'default-font-collection',
 	'name'        => 'Google Fonts',
 	'description' => __( 'Add from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
 	'src'         => 'https://s.w.org/images/fonts/16.7/collections/google-fonts-with-preview.json',
 );
 
 wp_register_font_collection( $default_font_collection );
+
+// @core-merge: This code should probably go into Core's src/wp-includes/functions.php.
+if ( ! function_exists( 'wp_get_font_dir' ) ) {
+	/**
+	 * Returns an array containing the current fonts upload directory's path and URL.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array $defaults {
+	 *     Array of information about the upload directory.
+	 *
+	 *     @type string       $path    Base directory and subdirectory or full path to the fonts upload directory.
+	 *     @type string       $url     Base URL and subdirectory or absolute URL to the fonts upload directory.
+	 *     @type string       $subdir  Subdirectory
+	 *     @type string       $basedir Path without subdir.
+	 *     @type string       $baseurl URL path without subdir.
+	 *     @type string|false $error   False or error message.
+	 * }
+	 *
+	 * @return array $defaults {
+	 *     Array of information about the upload directory.
+	 *
+	 *     @type string       $path    Base directory and subdirectory or full path to the fonts upload directory.
+	 *     @type string       $url     Base URL and subdirectory or absolute URL to the fonts upload directory.
+	 *     @type string       $subdir  Subdirectory
+	 *     @type string       $basedir Path without subdir.
+	 *     @type string       $baseurl URL path without subdir.
+	 *     @type string|false $error   False or error message.
+	 * }
+	 */
+	function wp_get_font_dir( $defaults = array() ) {
+		// Multi site path
+		$site_path = '';
+		if ( is_multisite() && ! ( is_main_network() && is_main_site() ) ) {
+			$site_path = '/sites/' . get_current_blog_id();
+		}
+
+		// Sets the defaults.
+		$defaults['path']    = path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path;
+		$defaults['url']     = untrailingslashit( content_url( 'fonts' ) ) . $site_path;
+		$defaults['subdir']  = '';
+		$defaults['basedir'] = path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path;
+		$defaults['baseurl'] = untrailingslashit( content_url( 'fonts' ) ) . $site_path;
+		$defaults['error']   = false;
+
+		// Filters the fonts directory data.
+		return apply_filters( 'font_dir', $defaults );
+	}
+}
