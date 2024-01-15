@@ -166,7 +166,7 @@ function gutenberg_register_module( $module_id, $src = '' ) {
  * @param string $module_identifier The identifier of the module.
  * @deprecated 17.4.2 gutenberg_enqueue_module is deprecated. Use wp_enqueue_module instead.
  */
-function gutenberg_enqueue_module( $module_id, $src = '' ) {
+function gutenberg_enqueue_module( $module_id ) {
 	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6', 'wp_enqueue_module' );
 	wp_modules()->enqueue( $module_id );
 }
