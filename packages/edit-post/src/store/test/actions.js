@@ -154,16 +154,13 @@ describe( 'actions', () => {
 
 			expect(
 				registry
-					.select( editPostStore )
-					.getPreference( 'hiddenBlockTypes' )
+					.select( preferencesStore )
+					.get( 'core', 'hiddenBlockTypes' )
 			).toEqual( expected );
 
 			expect(
 				registry.select( editPostStore ).getHiddenBlockTypes()
 			).toEqual( expected );
-
-			// Expect a deprecation message for `getPreference`.
-			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -177,8 +174,8 @@ describe( 'actions', () => {
 
 			expect(
 				registry
-					.select( editPostStore )
-					.getPreference( 'hiddenBlockTypes' )
+					.select( preferencesStore )
+					.get( 'core', 'hiddenBlockTypes' )
 			).toEqual( expectedA );
 
 			expect(
@@ -193,8 +190,8 @@ describe( 'actions', () => {
 
 			expect(
 				registry
-					.select( editPostStore )
-					.getPreference( 'hiddenBlockTypes' )
+					.select( preferencesStore )
+					.get( 'core', 'hiddenBlockTypes' )
 			).toEqual( expectedB );
 
 			expect(
@@ -220,6 +217,9 @@ describe( 'actions', () => {
 				'core/paragraph': 'fancy',
 				'core/quote': 'posh',
 			} );
+
+			// Expect a deprecation message for `getPreference`.
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'removes a preferred style variation for a block when a style name is omitted', () => {

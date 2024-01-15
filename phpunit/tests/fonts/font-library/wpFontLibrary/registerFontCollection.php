@@ -14,7 +14,7 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_Font_Library_U
 
 	public function test_should_register_font_collection() {
 		$config     = array(
-			'id'          => 'my-collection',
+			'slug'        => 'my-collection',
 			'name'        => 'My Collection',
 			'description' => 'My Collection Description',
 			'src'         => 'my-collection-data.json',
@@ -23,20 +23,20 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_Font_Library_U
 		$this->assertInstanceOf( 'WP_Font_Collection', $collection );
 	}
 
-	public function test_should_return_error_if_id_is_missing() {
+	public function test_should_return_error_if_slug_is_missing() {
 		$config = array(
 			'name'        => 'My Collection',
 			'description' => 'My Collection Description',
 			'src'         => 'my-collection-data.json',
 		);
 		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( 'Font Collection config ID is required as a non-empty string.' );
+		$this->expectExceptionMessage( 'Font Collection config slug is required as a non-empty string.' );
 		WP_Font_Library::register_font_collection( $config );
 	}
 
 	public function test_should_return_error_if_name_is_missing() {
 		$config = array(
-			'id'          => 'my-collection',
+			'slug'        => 'my-collection',
 			'description' => 'My Collection Description',
 			'src'         => 'my-collection-data.json',
 		);
@@ -52,15 +52,15 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_Font_Library_U
 		WP_Font_Library::register_font_collection( $config );
 	}
 
-	public function test_should_return_error_if_id_is_repeated() {
+	public function test_should_return_error_if_slug_is_repeated() {
 		$config1 = array(
-			'id'          => 'my-collection-1',
+			'slug'        => 'my-collection-1',
 			'name'        => 'My Collection 1',
 			'description' => 'My Collection 1 Description',
 			'src'         => 'my-collection-1-data.json',
 		);
 		$config2 = array(
-			'id'          => 'my-collection-1',
+			'slug'        => 'my-collection-1',
 			'name'        => 'My Collection 2',
 			'description' => 'My Collection 2 Description',
 			'src'         => 'my-collection-2-data.json',
@@ -72,7 +72,7 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_Font_Library_U
 
 		// Expects a _doing_it_wrong notice.
 		$this->setExpectedIncorrectUsage( 'WP_Font_Library::register_font_collection' );
-		// Try to register a second collection with same id.
+		// Try to register a second collection with same slug.
 		$collection2 = WP_Font_Library::register_font_collection( $config2 );
 		$this->assertWPError( $collection2, 'A WP_Error should be returned.' );
 	}

@@ -27,7 +27,7 @@ class Tests_Fonts_WPRESTFontCollectionsController_GetFontCollections extends WP_
 
 		// Add a font collection.
 		$config = array(
-			'id'          => 'my-font-collection',
+			'slug'        => 'my-font-collection',
 			'name'        => 'My Font Collection',
 			'description' => 'Demo about how to a font collection to your WordPress Font Library.',
 			'src'         => $mock_file,
@@ -39,7 +39,7 @@ class Tests_Fonts_WPRESTFontCollectionsController_GetFontCollections extends WP_
 		$data     = $response->get_data();
 		$this->assertSame( 200, $response->get_status(), 'The response status is not 200.' );
 		$this->assertCount( 1, $data, 'The response data is not an array with one element.' );
-		$this->assertArrayHasKey( 'id', $data[0], 'The response data does not have the key with the collection ID.' );
+		$this->assertArrayHasKey( 'slug', $data[0], 'The response data does not have the key with the collection slug.' );
 		$this->assertArrayHasKey( 'name', $data[0], 'The response data does not have the key with the collection name.' );
 	}
 }

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { backup, trash } from '@wordpress/icons';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
@@ -19,6 +19,7 @@ import {
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import isTemplateRemovable from '../../utils/is-template-removable';
@@ -32,39 +33,64 @@ export function useResetTemplateAction() {
 	return useMemo(
 		() => ( {
 			id: 'reset-template',
-			label: __( 'Reset template' ),
+			label: __( 'Reset' ),
 			isPrimary: true,
 			icon: backup,
 			isEligible: isTemplateRevertable,
-			async callback( template ) {
+			supportsBulk: true,
+			async callback( templates ) {
 				try {
-					await revertTemplate( template, { allowUndo: false } );
-					await saveEditedEntityRecord(
-						'postType',
-						template.type,
-						template.id
-					);
+					for ( const template of templates ) {
+						await revertTemplate( template, {
+							allowUndo: false,
+						} );
+						await saveEditedEntityRecord(
+							'postType',
+							template.type,
+							template.id
+						);
+					}
 
 					createSuccessNotice(
-						sprintf(
-							/* translators: The template/part's name. */
-							__( '"%s" reverted.' ),
-							decodeEntities( template.title.rendered )
-						),
+						templates.length > 1
+							? sprintf(
+									/* translators: The number of items. */
+									__( '%s items reverted.' ),
+									templates.length
+							  )
+							: sprintf(
+									/* translators: The template/part's name. */
+									__( '"%s" reverted.' ),
+									decodeEntities(
+										templates[ 0 ].title.rendered
+									)
+							  ),
 						{
 							type: 'snackbar',
 							id: 'edit-site-template-reverted',
 						}
 					);
 				} catch ( error ) {
-					const fallbackErrorMessage =
-						template.type === TEMPLATE_POST_TYPE
-							? __(
-									'An error occurred while reverting the template.'
-							  )
-							: __(
-									'An error occurred while reverting the template part.'
-							  );
+					let fallbackErrorMessage;
+					if ( templates[ 0 ].type === TEMPLATE_POST_TYPE ) {
+						fallbackErrorMessage =
+							templates.length === 1
+								? __(
+										'An error occurred while reverting the template.'
+								  )
+								: __(
+										'An error occurred while reverting the templates.'
+								  );
+					} else {
+						fallbackErrorMessage =
+							templates.length === 1
+								? __(
+										'An error occurred while reverting the template part.'
+								  )
+								: __(
+										'An error occurred while reverting the template parts.'
+								  );
+					}
 					const errorMessage =
 						error.message && error.code !== 'unknown_error'
 							? error.message
@@ -85,21 +111,34 @@ export function useResetTemplateAction() {
 
 export const deleteTemplateAction = {
 	id: 'delete-template',
-	label: __( 'Delete template' ),
+	label: __( 'Delete' ),
 	isPrimary: true,
 	icon: trash,
 	isEligible: isTemplateRemovable,
+	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { item: template, closeModal } ) => {
-		const { removeTemplate } = useDispatch( editSiteStore );
+	RenderModal: ( { items: templates, closeModal, onPerform } ) => {
+		const { removeTemplates } = unlock( useDispatch( editSiteStore ) );
 		return (
 			<VStack spacing="5">
 				<Text>
-					{ sprintf(
-						// translators: %s: The template or template part's title.
-						__( 'Are you sure you want to delete "%s"?' ),
-						decodeEntities( template.title.rendered )
-					) }
+					{ templates.length > 1
+						? sprintf(
+								// translators: %d: number of items to delete.
+								_n(
+									'Delete %d item?',
+									'Delete %d items?',
+									templates.length
+								),
+								templates.length
+						  )
+						: sprintf(
+								// translators: %s: The template or template part's titles
+								__( 'Delete "%s"?' ),
+								decodeEntities(
+									templates?.[ 0 ]?.title?.rendered
+								)
+						  ) }
 				</Text>
 				<HStack justify="right">
 					<Button variant="tertiary" onClick={ closeModal }>
@@ -107,11 +146,15 @@ export const deleteTemplateAction = {
 					</Button>
 					<Button
 						variant="primary"
-						onClick={ () =>
-							removeTemplate( template, {
+						onClick={ async () => {
+							await removeTemplates( templates, {
 								allowUndo: false,
-							} )
-						}
+							} );
+							if ( onPerform ) {
+								onPerform();
+							}
+							closeModal();
+						} }
 					>
 						{ __( 'Delete' ) }
 					</Button>
@@ -126,7 +169,8 @@ export const renameTemplateAction = {
 	label: __( 'Rename' ),
 	isEligible: ( template ) =>
 		isTemplateRemovable( template ) && template.is_custom,
-	RenderModal: ( { item: template, closeModal } ) => {
+	RenderModal: ( { items: templates, closeModal } ) => {
+		const template = templates[ 0 ];
 		const title = decodeEntities( template.title.rendered );
 		const [ editedTitle, setEditedTitle ] = useState( title );
 		const {

@@ -24,7 +24,7 @@
 			height: 100%;
 		}
 
-		// Modified group borders
+		// Modified group borders.
 		.components-toolbar-group,
 		.components-toolbar {
 			border-right: none;
@@ -52,7 +52,6 @@
 	align-items: center;
 	justify-content: center;
 	flex-shrink: 2;
-	overflow-x: hidden;
 	padding-left: $grid-unit-20;
 }
 
@@ -74,7 +73,7 @@
 }
 
 .edit-widgets-header-toolbar {
-	border: none;
+	gap: $grid-unit-10;
 
 	// The Toolbar component adds different styles to buttons, so we reset them
 	// here to the original button styles

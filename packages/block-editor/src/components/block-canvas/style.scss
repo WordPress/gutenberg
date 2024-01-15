@@ -1,6 +1,13 @@
 iframe[name="editor-canvas"] {
 	width: 100%;
 	height: 100%;
-	background-color: $white;
 	display: block;
+}
+
+iframe[name="editor-canvas"]:not(.has-history) {
+	background-color: $white;
+}
+
+iframe[name="editor-canvas"].has-history {
+	padding: $grid-unit-60 $grid-unit-60 0;
 }

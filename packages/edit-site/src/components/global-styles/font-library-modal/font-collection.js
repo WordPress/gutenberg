@@ -31,6 +31,7 @@ import { toggleFont } from './utils/toggleFont';
 import { getFontsOutline } from './utils/fonts-outline';
 import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
 import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
+import { downloadFontFaceAsset } from './utils';
 
 const DEFAULT_CATEGORY = {
 	id: 'all',
@@ -154,7 +155,34 @@ function FontCollection( { id } ) {
 	};
 
 	const handleInstall = async () => {
-		const response = await installFont( fontsToInstall[ 0 ] );
+		const fontFamily = fontsToInstall[ 0 ];
+
+		try {
+			if ( fontFamily?.fontFace ) {
+				await Promise.all(
+					fontFamily.fontFace.map( async ( fontFace ) => {
+						if ( fontFace.downloadFromUrl ) {
+							fontFace.file = await downloadFontFaceAsset(
+								fontFace.downloadFromUrl
+							);
+							delete fontFace.downloadFromUrl;
+						}
+					} )
+				);
+			}
+		} catch ( error ) {
+			// If any of the fonts fail to download,
+			// show an error notice and stop the request from being sent.
+			setNotice( {
+				type: 'error',
+				message: __(
+					'Error installing the fonts, could not be downloaded.'
+				),
+			} );
+			return;
+		}
+
+		const response = await installFont( fontFamily );
 		const installNotice = getNoticeFromInstallResponse( response );
 		setNotice( installNotice );
 		resetFontsToInstall();

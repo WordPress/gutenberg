@@ -20,6 +20,7 @@ export default function ViewList( {
 	view,
 	fields,
 	data,
+	isLoading,
 	getItemId,
 	onSelectionChange,
 	onDetailsChange,
@@ -48,6 +49,22 @@ export default function ViewList( {
 			onSelectionChange( [ item ] );
 		}
 	};
+
+	const hasData = usedData?.length;
+	if ( ! hasData ) {
+		return (
+			<div
+				className={ classNames( {
+					'dataviews-loading': isLoading,
+					'dataviews-no-results': ! hasData && ! isLoading,
+				} ) }
+			>
+				{ ! hasData && (
+					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
+				) }
+			</div>
+		);
+	}
 
 	return (
 		<ul className="dataviews-view-list">
