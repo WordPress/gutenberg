@@ -22,6 +22,7 @@ DOM elements are connected to data stored in the state and context through direc
     - [`wp-on`](#wp-on) ![](https://img.shields.io/badge/EVENT_HANDLERS-afd2e3.svg)
     - [`wp-watch`](#wp-watch) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
     - [`wp-init`](#wp-init) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
+    - [`wp-run`](#wp-run) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
     - [`wp-key`](#wp-key) ![](https://img.shields.io/badge/TEMPLATING-afd2e3.svg)
   - [Values of directives are references to store properties](#values-of-directives-are-references-to-store-properties)
 - [The store](#the-store)
@@ -470,6 +471,57 @@ store( "myPlugin", {
 <br/>
 
 The `wp-init` can return a function. If it does, the returned function will run when the element is removed from the DOM.
+
+#### `wp-run` 
+
+It runs the passed callback **during node's render execution**.
+
+You can attach several `wp-run` to the same DOM element by using the syntax `data-wp-run--[unique-id]`. _The unique id doesn't need to be unique globally, it just needs to be different than the other unique ids of the `wp-run` directives of that DOM element._
+
+_Example of `data-wp-run` directive_ 
+
+```html
+<div data-wp-run="callbacks.logCounter">
+  <p>Hi!</>
+</div>
+```
+
+_Example of several `wp-run` directives on the same DOM element_
+
+```html
+<div 
+  data-wp-run--log="callbacks.logCounter" 
+  data-wp-run--custom="callbacks.customHooks"
+>
+  <p>Hi!</>
+</div>
+```
+
+<details>
+  <summary><em>See store used with the directive above</em></summary>
+
+```js
+store( "myPlugin", {
+  callbacks: {
+    logCounter: () => {
+      useInit(() => console.log( `Init at ` + new Date() ))
+      useWatch(() => {
+        const { counter } = getContext(); 
+        console.log("Counter is " + counter + " at " + new Date() );
+      })
+    },
+    customHooks: () => {
+      // You can call your own hooks here.
+      useCustomHook( /* ... */ );
+    }
+  },
+} );
+```
+
+</details>
+<br/>
+
+The `wp-run` directive executes its callback while the node is rendered. That means you can use and compose hooks inside the passed callback and create your own logic, providing more flexibility than previous directives.
 
 #### `wp-key` 
 
