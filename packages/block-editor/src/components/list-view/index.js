@@ -33,7 +33,7 @@ import { __ } from '@wordpress/i18n';
  */
 import ListViewBranch from './branch';
 import { ListViewContext } from './context';
-import ListViewDropIndicatorPreview from './drop-indicator-preview';
+import ListViewDropIndicatorPreview from './drop-indicator';
 import useBlockSelection from './use-block-selection';
 import useListViewBlockIndexes from './use-list-view-block-indexes';
 import useListViewClientIds from './use-list-view-client-ids';
