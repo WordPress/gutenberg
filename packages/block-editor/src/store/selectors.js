@@ -2255,12 +2255,21 @@ export const __experimentalGetParsedPattern = createSelector(
 		if ( ! pattern ) {
 			return null;
 		}
-		return {
+
+		const parsedPattern = {
 			...pattern,
-			blocks: parse( pattern.content, {
-				__unstableSkipMigrationLogs: true,
-			} ),
+			// Only parse the content if needed (if the blocks property is
+			// accessed), and cache the result.
+			get blocks() {
+				const parsedContent = parse( pattern.content, {
+					__unstableSkipMigrationLogs: true,
+				} );
+				parsedPattern.blocks = parsedContent;
+				return parsedContent;
+			},
 		};
+
+		return parsedPattern;
 	},
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
