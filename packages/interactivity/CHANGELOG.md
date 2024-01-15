@@ -21,6 +21,8 @@
 
 ### Breaking Change
 
+- Remove wp-data-navigation-link directive. ([#57853](https://github.com/WordPress/gutenberg/pull/57853))
+
 -   Implement the new `store()` API as specified in the [proposal](https://github.com/WordPress/gutenberg/discussions/53586). ([#55459](https://github.com/WordPress/gutenberg/pull/55459))
 
 ## 2.7.0 (2023-11-16)
