@@ -3,10 +3,38 @@
  */
 import { store, getContext } from '@wordpress/interactivity';
 
-const { state } = store( 'directive-each', {
+const { state } = store( 'directive-each' );
+
+store( 'directive-each', {
 	state: {
 		letters: [ 'A', 'B', 'C' ],
+	},
+} );
+
+store( 'directive-each', {
+	state: {
 		fruits: [ 'avocado', 'banana', 'cherimoya' ],
+	},
+	actions: {
+		removeFruit() {
+			const { fruit } = getContext();
+			state.fruits.splice( state.fruits.indexOf( fruit ), 1 );
+		},
+		rotateFruits() {
+			const fruit = state.fruits.pop();
+			state.fruits.splice( 0, 0, fruit );
+		},
+		addFruit() {
+			state.fruits.splice( 0, 0, 'ananas' );
+		},
+		replaceFruit() {
+			state.fruits.splice( 0, 1, 'ananas' );
+		},
+	},
+} );
+
+store( 'directive-each', {
+	state: {
 		books: [
 			{
 				title: 'A Game of Thrones',
@@ -26,21 +54,6 @@ const { state } = store( 'directive-each', {
 		],
 	},
 	actions: {
-		removeFruit() {
-			const { fruit } = getContext();
-			state.fruits.splice( state.fruits.indexOf( fruit ), 1 );
-		},
-		rotateFruits() {
-			const fruit = state.fruits.pop();
-			state.fruits.splice( 0, 0, fruit );
-		},
-		addFruit() {
-			state.fruits.splice( 0, 0, 'ananas' );
-		},
-		replaceFruit() {
-			state.fruits.splice( 0, 1, 'ananas' );
-		},
-
 		removeBook() {
 			const { book } = getContext();
 			state.books.splice( state.books.indexOf( book ), 1 );
@@ -69,6 +82,33 @@ const { state } = store( 'directive-each', {
 			const [ book ] = state.books;
 			book.title = book.title.toUpperCase();
 		},
+	},
+} );
+
+store( 'directive-each', {
+	state: {
+		numbers: [ 1, 2, 3 ],
+	},
+	actions: {
+		shiftNumber() {
+			state.numbers.shift();
+		},
+		unshiftNumber() {
+			if ( state.numbers.length > 0 ) {
+				state.numbers.unshift( state.numbers[ 0 ] - 1 );
+			}
+		}
+	},
+} );
+
+store( 'directive-each', {
+	state: {
+		emptyList: []
+	},
+	actions: {
+		addItem() {
+			state.emptyList.push( `item ${ state.emptyList.length }` );
+		}
 	},
 } );
 
