@@ -421,7 +421,7 @@ class GroupingUtils {
 
 	async insertBlocksOfSameType() {
 		await test.step(
-			'insert blocks of multiple types',
+			'insert blocks of the same type',
 			async () => {
 				await this.#editor.insertBlock( {
 					name: 'core/paragraph',
