@@ -24,15 +24,6 @@ class WP_Block_Bindings {
 	 */
 	private $sources = array();
 
-	// Allowed blocks that support block bindings.
-	// TODO: Look for a mechanism to opt-in for this. Maybe adding a property to block attributes?
-	private $allowed_blocks = array(
-		'core/paragraph' => array( 'content' ),
-		'core/heading'   => array( 'content' ),
-		'core/image'     => array( 'url', 'title', 'alt' ),
-		'core/button'    => array( 'url', 'text' ),
-	);
-
 	/**
 	 * Function to register a new source.
 	 *
@@ -165,12 +156,4 @@ class WP_Block_Bindings {
 		return $this->sources;
 	}
 
-	/**
-	 * Retrieves the list of allowed blocks that support block bindings.
-	 *
-	 * @return array The array of allowed blocks.
-	 */
-	public function get_allowed_blocks() {
-		return $this->allowed_blocks;
-	}
 }

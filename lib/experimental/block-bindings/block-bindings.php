@@ -43,17 +43,6 @@ if ( ! function_exists( 'wp_block_bindings_register_source' ) ) {
 }
 
 /**
- * Retrieves the list of allowed blocks.
- *
- * @return array The list of allowed blocks.
- */
-if ( ! function_exists( 'wp_block_bindings_get_allowed_blocks' ) ) {
-	function wp_block_bindings_get_allowed_blocks() {
-		return wp_block_bindings()->get_allowed_blocks();
-	}
-}
-
-/**
  * Retrieves the list of registered block sources.
  *
  * @return array The list of registered block sources.
