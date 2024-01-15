@@ -2558,35 +2558,7 @@
 						"filter": {},
 						"shadow": {},
 						"outline": {},
-						"css": {},
-						"elements": {
-							"$ref": "#/definitions/stylesElementsPropertiesComplete"
-						},
-						"blocks": {
-							"type": "object",
-							"allOf": [
-								{
-									"$ref": "#/definitions/stylesProperties"
-								},
-								{
-									"properties": {
-										"border": {},
-										"color": {},
-										"dimensions": {},
-										"spacing": {},
-										"typography": {},
-										"filter": {},
-										"shadow": {},
-										"outline": {},
-										"css": {},
-										"elements": {
-											"$ref": "#/definitions/stylesElementsPropertiesComplete"
-										}
-									},
-									"additionalProperties": false
-								}
-							]
-						}
+						"css": {}
 					},
 					"additionalProperties": false
 				}
