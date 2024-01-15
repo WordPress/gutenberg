@@ -20,7 +20,7 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import SidebarNavigationScreenNavigationMenuButton from '../sidebar-navigation-screen-navigation-menus/navigator-button';
+import TemplatePartHint from './template-part-hint';
 
 export default function SidebarNavigationScreenMain() {
 	const { location } = useNavigator();
@@ -43,46 +43,49 @@ export default function SidebarNavigationScreenMain() {
 				'Customize the appearance of your website using the block editor.'
 			) }
 			content={
-				<ItemGroup>
-					<SidebarNavigationScreenNavigationMenuButton
-						withChevron
-						icon={ navigation }
-						as={ SidebarNavigationItem }
-					>
-						{ __( 'Navigation' ) }
-					</SidebarNavigationScreenNavigationMenuButton>
-
-					<SidebarNavigationItemGlobalStyles
-						withChevron
-						icon={ styles }
-					>
-						{ __( 'Styles' ) }
-					</SidebarNavigationItemGlobalStyles>
-					<NavigatorButton
-						as={ SidebarNavigationItem }
-						path="/page"
-						withChevron
-						icon={ page }
-					>
-						{ __( 'Pages' ) }
-					</NavigatorButton>
-					<NavigatorButton
-						as={ SidebarNavigationItem }
-						path="/wp_template"
-						withChevron
-						icon={ layout }
-					>
-						{ __( 'Templates' ) }
-					</NavigatorButton>
-					<NavigatorButton
-						as={ SidebarNavigationItem }
-						path="/wp_template_part"
-						withChevron
-						icon={ symbol }
-					>
-						{ __( 'Library' ) }
-					</NavigatorButton>
-				</ItemGroup>
+				<>
+					<ItemGroup>
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/navigation"
+							withChevron
+							icon={ navigation }
+						>
+							{ __( 'Navigation' ) }
+						</NavigatorButton>
+						<SidebarNavigationItemGlobalStyles
+							withChevron
+							icon={ styles }
+						>
+							{ __( 'Styles' ) }
+						</SidebarNavigationItemGlobalStyles>
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/page"
+							withChevron
+							icon={ page }
+						>
+							{ __( 'Pages' ) }
+						</NavigatorButton>
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/wp_template"
+							withChevron
+							icon={ layout }
+						>
+							{ __( 'Templates' ) }
+						</NavigatorButton>
+						<NavigatorButton
+							as={ SidebarNavigationItem }
+							path="/patterns"
+							withChevron
+							icon={ symbol }
+						>
+							{ __( 'Patterns' ) }
+						</NavigatorButton>
+					</ItemGroup>
+					<TemplatePartHint />
+				</>
 			}
 		/>
 	);

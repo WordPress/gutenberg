@@ -29,7 +29,25 @@ import BlockContext from '../block-context';
  */
 const DEFAULT_BLOCK_CONTEXT = {};
 
-export const Edit = ( props ) => {
+const Edit = ( props ) => {
+	const { name } = props;
+	const blockType = getBlockType( name );
+
+	if ( ! blockType ) {
+		return null;
+	}
+
+	// `edit` and `save` are functions or components describing the markup
+	// with which a block is displayed. If `blockType` is valid, assign
+	// them preferentially as the render value for the block.
+	const Component = blockType.edit || blockType.save;
+
+	return <Component { ...props } />;
+};
+
+const EditWithFilters = withFilters( 'editor.BlockEdit' )( Edit );
+
+const EditWithGeneratedProps = ( props ) => {
 	const { attributes = {}, name } = props;
 	const blockType = getBlockType( name );
 	const blockContext = useContext( BlockContext );
@@ -49,13 +67,8 @@ export const Edit = ( props ) => {
 		return null;
 	}
 
-	// `edit` and `save` are functions or components describing the markup
-	// with which a block is displayed. If `blockType` is valid, assign
-	// them preferentially as the render value for the block.
-	const Component = blockType.edit || blockType.save;
-
 	if ( blockType.apiVersion > 1 ) {
-		return <Component { ...props } context={ context } />;
+		return <EditWithFilters { ...props } context={ context } />;
 	}
 
 	// Generate a class name for the block's editable form.
@@ -69,8 +82,12 @@ export const Edit = ( props ) => {
 	);
 
 	return (
-		<Component { ...props } context={ context } className={ className } />
+		<EditWithFilters
+			{ ...props }
+			context={ context }
+			className={ className }
+		/>
 	);
 };
 
-export default withFilters( 'editor.BlockEdit' )( Edit );
+export default EditWithGeneratedProps;

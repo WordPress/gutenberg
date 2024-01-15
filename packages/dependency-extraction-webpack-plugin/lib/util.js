@@ -1,5 +1,11 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
-const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
+const BUNDLED_PACKAGES = [
+	'@wordpress/dataviews',
+	'@wordpress/icons',
+	'@wordpress/interface',
+	'@wordpress/sync',
+	'@wordpress/undo-manager',
+];
 
 /**
  * Default request to global transformation
@@ -51,6 +57,37 @@ function defaultRequestToExternal( request ) {
 }
 
 /**
+ * Default request to external module transformation
+ *
+ * Currently only @wordpress/interactivity
+ *
+ * Do not use the boolean shorthand here, it's only handled for the `requestToExternalModule` option.
+ *
+ * @param {string} request Module request (the module name in `import from`) to be transformed
+ * @return {string|Error|undefined} The resulting external definition.
+ *   - Return `undefined` to ignore the request (do not externalize).
+ *   - Return `string` to map the request to an external.
+ *   - Return `Error` to emit an error.
+ */
+function defaultRequestToExternalModule( request ) {
+	if ( request === '@wordpress/interactivity' ) {
+		// This is a special case. Interactivity does not support dynamic imports at this
+		// time. We add the external "module" type to indicate that webpack should
+		// externalize this as a module (instead of our default `import()` external type)
+		// which forces @wordpress/interactivity imports to be hoisted to static imports.
+		return `module ${ request }`;
+	}
+
+	const isWordPressScript = Boolean( defaultRequestToExternal( request ) );
+
+	if ( isWordPressScript ) {
+		throw new Error(
+			`Attempted to use WordPress script in a module: ${ request }, which is not supported yet.`
+		);
+	}
+}
+
+/**
  * Default request to WordPress script handle transformation
  *
  * Transform @wordpress dependencies:
@@ -95,5 +132,6 @@ function camelCaseDash( string ) {
 module.exports = {
 	camelCaseDash,
 	defaultRequestToExternal,
+	defaultRequestToExternalModule,
 	defaultRequestToHandle,
 };

@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { RichText } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 
 const transforms = {
@@ -111,31 +112,44 @@ const transforms = {
 		},
 		{
 			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			transform: ( { citation }, innerBlocks ) =>
+				RichText.isEmpty( citation )
+					? innerBlocks
+					: [
+							...innerBlocks,
+							createBlock( 'core/paragraph', {
+								content: citation,
+							} ),
+					  ],
+		},
+		{
+			type: 'block',
 			blocks: [ 'core/group' ],
 			transform: ( { citation, anchor }, innerBlocks ) =>
 				createBlock(
 					'core/group',
 					{ anchor },
-					citation
-						? [
+					RichText.isEmpty( citation )
+						? innerBlocks
+						: [
 								...innerBlocks,
 								createBlock( 'core/paragraph', {
 									content: citation,
 								} ),
 						  ]
-						: innerBlocks
 				),
 		},
 	],
 	ungroup: ( { citation }, innerBlocks ) =>
-		citation
-			? [
+		RichText.isEmpty( citation )
+			? innerBlocks
+			: [
 					...innerBlocks,
 					createBlock( 'core/paragraph', {
 						content: citation,
 					} ),
-			  ]
-			: innerBlocks,
+			  ],
 };
 
 export default transforms;

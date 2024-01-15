@@ -61,10 +61,15 @@
 		},
 		"spacing": {
 			"margin": true,
-			"padding": true
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
 		},
 		"__unstablePasteTextInline": true,
 		"__experimentalSelector": "ol,ul",
+		"__experimentalOnMerge": true,
 		"__experimentalSlashInserter": true
 	},
 	"editorStyle": "wp-block-list-editor",

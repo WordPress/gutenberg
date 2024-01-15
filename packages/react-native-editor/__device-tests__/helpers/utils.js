@@ -2,16 +2,24 @@
  * External dependencies
  */
 const childProcess = require( 'child_process' );
-// eslint-disable-next-line import/no-extraneous-dependencies
-const wd = require( 'wd' );
+// eslint-disable-next-line import/no-extraneous-dependencies, import/named
+import { remote, Key } from 'webdriverio';
+
 const crypto = require( 'crypto' );
 const path = require( 'path' );
 /**
  * Internal dependencies
  */
 const serverConfigs = require( './serverConfigs' );
-const { iosServer, iosLocal, android } = require( './caps' );
+const {
+	iosServer,
+	iosLocal,
+	android,
+	sauceOptions,
+	prefixKeysWithAppium,
+} = require( './caps' );
 const AppiumLocal = require( './appium-local' );
+import { getAndroidEmulatorID } from './get-android-emulator-id';
 
 // Platform setup.
 const defaultPlatform = 'android';
@@ -38,15 +46,9 @@ let appiumProcess;
 
 const backspace = '\u0008';
 
-// Used to map unicode and special values to keycodes on Android
-// Docs for keycode values: https://developer.android.com/reference/android/view/KeyEvent.html
-const strToKeycode = {
-	'\n': 66,
-	[ backspace ]: 67,
-};
-
-// $block-edge-to-content value
-const blockEdgeToContent = 16;
+const IOS_BUNDLE_ID = 'org.wordpress.gutenberg.development';
+const ANDROID_COMPONENT_NAME = 'com.gutenberg/.MainActivity';
+const SAUCE_LABS_TIMEOUT = 240;
 
 const timer = ( ms ) => new Promise( ( res ) => setTimeout( res, ms ) );
 
@@ -58,17 +60,23 @@ const isLocalEnvironment = () => {
 	return testEnvironment.toLowerCase() === 'local';
 };
 
-const getIOSPlatformVersions = () => {
+const getIOSPlatformVersions = ( { requiredVersion } ) => {
 	const { runtimes = [] } = JSON.parse(
 		childProcess.execSync( 'xcrun simctl list runtimes --json' ).toString()
 	);
 
+	const majorVersion = requiredVersion.split( '.' )[ 0 ];
 	return runtimes
 		.reverse()
 		.filter(
-			( { name, isAvailable } ) => name.startsWith( 'iOS' ) && isAvailable
+			( { name, isAvailable, version } ) =>
+				name.startsWith( 'iOS' ) &&
+				new RegExp( `^${ majorVersion }(\\.\\d+)*$` ).test( version ) &&
+				isAvailable
 		);
 };
+
+const PLATFORM_NAME = isAndroid() ? 'Android' : 'iOS';
 
 // Initialises the driver and desired capabilities for appium.
 const setupDriver = async () => {
@@ -76,7 +84,9 @@ const setupDriver = async () => {
 	const safeBranchName = branch.replace( /\//g, '-' );
 	if ( isLocalEnvironment() ) {
 		try {
-			appiumProcess = await AppiumLocal.start( localAppiumPort );
+			appiumProcess = await AppiumLocal.start( {
+				port: localAppiumPort,
+			} );
 		} catch ( err ) {
 			// Ignore error here, Appium is probably already running (Appium Inspector has its own server for instance)
 			// eslint-disable-next-line no-console
@@ -87,19 +97,18 @@ const setupDriver = async () => {
 		}
 	}
 
-	const serverConfig = isLocalEnvironment()
-		? serverConfigs.local
-		: serverConfigs.sauce;
-	const driver = wd.promiseChainRemote( serverConfig );
-
 	let desiredCaps;
 	if ( isAndroid() ) {
 		desiredCaps = { ...android };
 		if ( isLocalEnvironment() ) {
+			const androidDeviceID = getAndroidEmulatorID();
 			desiredCaps.app = path.resolve( localAndroidAppPath );
+			desiredCaps.udid = androidDeviceID;
 			try {
 				const androidVersion = childProcess
-					.execSync( 'adb shell getprop ro.build.version.release' )
+					.execSync(
+						`adb -s ${ androidDeviceID } shell getprop ro.build.version.release`
+					)
 					.toString()
 					.replace( /^\s+|\s+$/g, '' );
 				delete desiredCaps.platformVersion;
@@ -113,18 +122,22 @@ const setupDriver = async () => {
 				// Ignore error.
 			}
 		} else {
-			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL.
+			desiredCaps.app = `storage:filename=Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL.
+			desiredCaps.newCommandTimeout = SAUCE_LABS_TIMEOUT;
 		}
 	} else {
 		desiredCaps = iosServer( { iPadDevice } );
-		desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL.
+		desiredCaps.newCommandTimeout = SAUCE_LABS_TIMEOUT;
+		desiredCaps.app = `storage:filename=Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL.
 		if ( isLocalEnvironment() ) {
 			desiredCaps = iosLocal( { iPadDevice } );
 
-			const iosPlatformVersions = getIOSPlatformVersions();
+			const iosPlatformVersions = getIOSPlatformVersions( {
+				requiredVersion: desiredCaps.platformVersion,
+			} );
 			if ( iosPlatformVersions.length === 0 ) {
 				throw new Error(
-					'No iOS simulators available! Please verify that you have iOS simulators installed.'
+					`No compatible iOS simulators available! Please verify that you have iOS ${ desiredCaps.platformVersion } simulators installed.`
 				);
 			}
 			// eslint-disable-next-line no-console
@@ -147,17 +160,28 @@ const setupDriver = async () => {
 		}
 	}
 
-	if ( ! isLocalEnvironment() ) {
-		desiredCaps.name = `Gutenberg Editor Tests[${ rnPlatform }]-${ branch }`;
-		desiredCaps.tags = [ 'Gutenberg', branch ];
-	}
+	const sauceOptionsConfig = ! isLocalEnvironment()
+		? {
+				'sauce:options': {
+					...sauceOptions,
+					name: `Gutenberg Editor Tests[${ rnPlatform }]-${ branch }`,
+					tags: [ 'Gutenberg', branch ],
+				},
+		  }
+		: {};
+	const serverConfig = isLocalEnvironment()
+		? serverConfigs.local
+		: serverConfigs.sauce;
 
-	await driver.init( desiredCaps );
-
-	const status = await driver.status();
-	// Display the driver status
-	// eslint-disable-next-line no-console
-	console.log( status );
+	const driver = await remote( {
+		...serverConfig,
+		logLevel: 'error',
+		capabilities: {
+			platformName: PLATFORM_NAME,
+			...prefixKeysWithAppium( desiredCaps ),
+			...sauceOptionsConfig,
+		},
+	} );
 
 	await driver.setOrientation( 'PORTRAIT' );
 	return driver;
@@ -165,122 +189,93 @@ const setupDriver = async () => {
 
 const stopDriver = async ( driver ) => {
 	if ( ! isLocalEnvironment() ) {
-		const jobID = driver.sessionID;
+		const sessionId = driver.sessionId;
 
-		const hash = crypto
-			.createHmac( 'md5', jobID )
-			.update( serverConfigs.sauce.auth )
+		const secret = `${ serverConfigs.sauce.user }:${ serverConfigs.sauce.key }`;
+		const token = crypto
+			.createHmac( 'md5', secret )
+			.update( sessionId )
 			.digest( 'hex' );
-		const jobURL = `https://saucelabs.com/jobs/${ jobID }?auth=${ hash }`;
+		const jobURL = `https://app.saucelabs.com/tests/${ sessionId }?auth=${ token }`;
 		// eslint-disable-next-line no-console
 		console.log( `You can view the video of this test run at ${ jobURL }` );
 	}
 	if ( driver === undefined ) {
 		return;
 	}
-	await driver.quit();
+	await driver.deleteSession();
 
 	if ( appiumProcess !== undefined ) {
 		await AppiumLocal.stop( appiumProcess );
 	}
 };
 
-/*
- * Problems about the 'clear' parameter:
- *
- * On Android: "clear" is defaulted to true because not clearing the text requires Android to use ADB, which
- * has demonstrated itself to be very flaky, particularly on CI. In other words, clear the view unless you absolutely
- * have to append the new text and, in that case, append fewest number of characters possible.
- *
- * On iOS: "clear" is not defaulted to true because calling element.clear when a text is present takes a very long time (approx. 23 seconds)
- */
 const typeString = async ( driver, element, str, clear ) => {
-	if ( isAndroid() ) {
-		await typeStringAndroid( driver, element, str, clear );
-	} else {
-		await typeStringIos( driver, element, str, clear );
+	if ( isKeycode( str ) ) {
+		const keyCode = isAndroid() ? getKeycode( str ) : str;
+		return await pressKeycode( driver, keyCode );
 	}
-};
 
-const typeStringIos = async ( driver, element, str, clear ) => {
 	if ( clear ) {
-		// await element.clear(); This was not working correctly on iOS so need a custom implementation
-		await clearTextBox( driver, element );
+		await element.clearValue();
+		// This helps prevent skipping characters when the initial
+		// value was previously removed.
+		await driver.pause( 2000 );
 	}
-	await element.type( str );
-};
 
-const clearTextBox = async ( driver, element ) => {
-	await element.click();
-	let originalText = await element.text();
-	let text = originalText;
-	// We are double tapping on the text field and pressing backspace until all content is removed.
-	do {
-		originalText = await element.text();
-		await doubleTap( driver, element );
-		await element.type( '\b' );
-		text = await element.text();
-		// We compare with the original content and not empty because text always return any hint set on the element.
-	} while ( originalText !== text );
-};
+	await element.addValue( str );
 
-const doubleTap = async ( driver, element ) => {
-	const action = new wd.TouchAction( driver );
-	action.tap( { el: element, count: 2 } );
-	await action.perform();
-};
-
-const typeStringAndroid = async (
-	driver,
-	element,
-	str,
-	clear = true // See comment above for why it is defaulted to true.
-) => {
-	if ( str in strToKeycode ) {
-		return await driver.pressKeycode( strToKeycode[ str ] );
-	} else if ( clear ) {
-		/*
-		 * On Android `element.type` deletes the contents of the EditText before typing and, unfortunately,
-		 * with our blocks it also deletes the block entirely. We used to avoid this by using adb to enter
-		 * long text along these lines:
-		 *         await driver.execute( 'mobile: shell', { command: 'input',
-		 *                                                  args: [ 'text', 'text I want to enter...' ] } )
-		 * but using adb in this way proved to be very flaky (frequently all of the text would not get entered,
-		 * particularly on CI). We are now using the `type` approach again, but adding a space to the block to
-		 * insure it is not empty, which avoids the deletion of the block when `type` executes.
-		 *
-		 * Note that this approach does not allow appending text to the text in a block on account
-		 * of `type` always clearing the block (on Android).
-		 */
-
-		await driver.execute( 'mobile: shell', {
-			command: 'input',
-			args: [ 'text', '%s' ],
-		} );
-		await element.type( str );
-	} else {
-		// eslint-disable-next-line no-console
-		console.log(
-			'Warning: Using `adb shell input text` on Android which is rather flaky.'
-		);
-
-		const paragraphs = str.split( '\n' );
-		for ( let i = 0; i < paragraphs.length; i++ ) {
-			const paragraph = paragraphs[ i ].replace( /[ ]/g, '%s' );
-			if ( paragraph in strToKeycode ) {
-				await driver.pressKeycode( strToKeycode[ paragraph ] );
-			} else {
-				// Execute with adb shell input <text> since normal type auto clears field on Android
-				await driver.execute( 'mobile: shell', {
-					command: 'input',
-					args: [ 'text', paragraph ],
-				} );
-			}
-			if ( i !== paragraphs.length - 1 ) {
-				await driver.pressKeycode( strToKeycode[ '\n' ] );
-			}
-		}
+	if ( ! isAndroid() ) {
+		// Await the completion of the scroll-to-text-input animation
+		await driver.pause( 3000 );
 	}
+};
+
+/**
+ * Returns the mapped keycode for a string to use in `pressKeycode` function.
+ *
+ * @param {string} str String associated to a keycode
+ */
+const getKeycode = ( str ) => {
+	if ( isAndroid() ) {
+		// On Android, we map keycodes using Android values.
+		// Reference: https://developer.android.com/reference/android/view/KeyEvent.html
+		return {
+			'\n': 66,
+			[ backspace ]: 67,
+		}[ str ];
+	}
+	// On iOS, we map keycodes using the special keys defined in WebdriverIO.
+	// Reference: https://webdriver.io/docs/api/browser/action/#special-characters
+	return {
+		'\n': Key.Enter,
+		[ backspace ]: Key.Backspace,
+	}[ str ];
+};
+
+/**
+ * Determines if the string is mapped to a keycode.
+ *
+ * @param {string} str String potentially associated to a keycode
+ */
+const isKeycode = ( str ) => {
+	return !! getKeycode( str );
+};
+
+/**
+ * Presses the specified keycode.
+ *
+ * @param {*} driver  WebDriver instance
+ * @param {*} keycode Keycode to press
+ */
+const pressKeycode = async ( driver, keycode ) => {
+	if ( isAndroid() ) {
+		// `pressKeyCode` command is only implemented on Android
+		return await driver.pressKeyCode( keycode );
+	}
+	// `sendKeys` command only works on iOS. On Android, executing this
+	// results in typing a special character instead.
+	return await driver.sendKeys( [ keycode ] );
 };
 
 // Calculates middle x,y and clicks that position
@@ -288,36 +283,34 @@ const clickMiddleOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const size = await element.getSize();
 
-	const action = await new wd.TouchAction( driver );
-	action.press( { x: location.x + size.width / 2, y: location.y } );
-	action.release();
-	await action.perform();
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x: location.x + size.width / 2, y: location.y } )
+		.down()
+		.up()
+		.perform();
 };
 
 // Clicks in the top left of an element.
 const clickBeginningOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
-	const action = await new wd.TouchAction( driver );
-	action.press( { x: location.x, y: location.y } );
-	action.release();
-	await action.perform();
-};
-
-// Clicks in the top left of a text-based element outside of the TextInput
-const clickElementOutsideOfTextInput = async ( driver, element ) => {
-	const location = await element.getLocation();
-	const y = isAndroid() ? location.y - blockEdgeToContent : location.y;
-	const x = isAndroid() ? location.x - blockEdgeToContent : location.x;
-
-	const action = new wd.TouchAction( driver ).press( { x, y } ).release();
-	await action.perform();
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x: location.x, y: location.y } )
+		.down()
+		.up()
+		.perform();
 };
 
 // Long press to activate context menu.
 const longPressMiddleOfElement = async (
 	driver,
 	element,
-	waitTime = 5000, // Setting to wait a bit longer because this is failing more frequently on the CI
+	waitTime = 1000,
 	customElementSize
 ) => {
 	const location = await element.getLocation();
@@ -326,66 +319,83 @@ const longPressMiddleOfElement = async (
 	const x = location.x + size.width / 2;
 	const y = location.y + size.height / 2;
 
-	const action = new wd.TouchAction( driver )
-		.longPress( { x, y } )
-		.wait( waitTime )
-		.release();
-	await action.perform();
+	// Focus on the element first, otherwise on iOS it fails to open the context menu.
+	// We can't do it all in one action because it detects it as a force press and it
+	// is not supported by the simulator.
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { origin: element } )
+		.down()
+		.up()
+		.perform();
+
+	// Long-press
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x, y } )
+		.down()
+		.pause( waitTime )
+		.up()
+		.perform();
 };
 
-// Press "Select All" in floating context menu.
-const tapSelectAllAboveElement = async ( driver, element ) => {
-	const location = await element.getLocation();
-	const action = await new wd.TouchAction( driver );
-	const x = location.x + 300;
-	const y = location.y - 50;
-	action.press( { x, y } );
-	action.release();
-	await action.perform();
-};
+const tapStatusBariOS = async ( driver ) => {
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x: 20, y: 20 } )
+		.down()
+		.up()
+		.pause( 100 )
+		.perform();
 
-// Press "Copy" in floating context menu.
-const tapCopyAboveElement = async ( driver, element ) => {
-	const location = await element.getLocation();
-	const action = await new wd.TouchAction( driver );
-	const x = location.x + 220;
-	const y = location.y - 50;
-	action.wait( 2000 );
-	action.press( { x, y } );
-	action.wait( 2000 );
-	action.release();
-	await action.perform();
-};
-
-// Press "Paste" in floating context menu.
-const tapPasteAboveElement = async ( driver, element ) => {
-	await longPressMiddleOfElement( driver, element );
-
-	if ( isAndroid() ) {
-		const location = await element.getLocation();
-		const action = await new wd.TouchAction( driver );
-		action.wait( 2000 );
-		action.press( { x: location.x + 100, y: location.y - 50 } );
-		action.wait( 2000 );
-		action.release();
-		await action.perform();
-	} else {
-		const pasteButtonLocator = '//XCUIElementTypeMenuItem[@name="Paste"]';
-		await clickIfClickable( driver, pasteButtonLocator );
-		await driver.sleep( 3000 ); // Wait for paste notification to disappear.
-	}
+	// Wait for the scroll animation to finish
+	await driver.pause( 3000 );
 };
 
 const selectTextFromElement = async ( driver, element ) => {
+	const timeout = 1000;
+
+	// On Android we can't "locate" the context menu options,
+	// To avoid having fixed coordinates to be able to
+	// select all text, it just selects all text by
+	// long-pressing and dragging.
 	if ( isAndroid() ) {
-		await longPressMiddleOfElement( driver, element, 0 );
+		await element.click();
+
+		const location = await element.getLocation();
+		const size = await element.getSize();
+		const paddingPercentage = 0.2;
+		const leftPaddingOffset = size.width * paddingPercentage;
+		const startX = location.x + leftPaddingOffset;
+		const endX = location.x + size.width;
+		const centerY = location.y + size.height / 2;
+
+		await driver
+			.action( 'pointer', {
+				parameters: { pointerType: 'touch' },
+			} )
+			.move( { x: startX, y: centerY } )
+			.down()
+			.pause( timeout ) // Long-press at the start of the element
+			.move( { x: endX, y: centerY, duration: 1000 } ) // Slowly drag to the end of the element to highlight all text
+			.up()
+			.pause( timeout ) // Pause to wait for the context menu to show up
+			.perform();
 	} else {
-		await doubleTap( driver, element );
-		await driver.waitForElementByXPath(
-			'//XCUIElementTypeMenuItem[@name="Copy"]',
-			wd.asserters.isDisplayed,
-			4000
+		// On iOS we can use the context menu to "Select all" text.
+		await longPressMiddleOfElement( driver, element );
+
+		const selectAllElement = await driver.$(
+			'//XCUIElementTypeMenuItem[@name="Select All"]'
 		);
+		await selectAllElement.waitForDisplayed( { timeout } );
+		await selectAllElement.click();
 	}
 };
 
@@ -423,15 +433,18 @@ const swipeFromTo = async (
 	driver,
 	from = defaultCoordinates,
 	to = defaultCoordinates,
-	delay
-) => {
-	const action = await new wd.TouchAction( driver );
-	action.press( from );
-	action.wait( delay );
-	action.moveTo( to );
-	action.release();
-	await action.perform();
-};
+	delay = 0
+) =>
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { ...from, duration: 0 } )
+		.down( { button: 0 } )
+		.move( { ...to, duration: 300 } )
+		.up( { button: 0 } )
+		.pause( delay )
+		.perform();
 
 // Starts from the middle of the screen and swipes downwards
 const swipeDown = async ( driver, delay = 3000 ) => {
@@ -466,39 +479,40 @@ const dragAndDropAfterElement = async ( driver, element, nextElement ) => {
 		? elementLocation.y + nextElementLocation.y + nextElementSize.height
 		: nextElementLocation.y + nextElementSize.height;
 
-	const action = new wd.TouchAction( driver )
-		.press( { x, y } )
-		.wait( 5000 )
-		.moveTo( { x, y: nextYPosition } )
-		.release();
-	await action.perform();
+	await driver
+		.action( 'pointer', {
+			parameters: { pointerType: 'touch' },
+		} )
+		.move( { x, y } )
+		.down()
+		.pause( 5000 )
+		.move( { x, y: nextYPosition, duration: 500 } )
+		.up()
+		.perform();
 };
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
 	if ( isAndroid() ) {
-		// Hit the "Menu" key.
-		await driver.pressKeycode( 82 );
+		const moreOptionsButton = await driver.$( '~More options' );
+		await moreOptionsButton.click();
 
 		const showHtmlButtonXpath =
 			'/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.TextView[9]';
 
 		await clickIfClickable( driver, showHtmlButtonXpath );
 	} else if ( toggleOn ) {
-		await clickIfClickable(
-			driver,
-			'//XCUIElementTypeButton[@name="..."]'
-		);
+		const moreOptionsButton = await driver.$( '~editor-menu-button' );
+		await moreOptionsButton.click();
+
 		await clickIfClickable(
 			driver,
 			'//XCUIElementTypeButton[@name="Switch to HTML"]'
 		);
 	} else {
 		// This is to wait for the clipboard paste notification to disappear, currently it overlaps with the menu button
-		await driver.sleep( 3000 );
-		await clickIfClickable(
-			driver,
-			'//XCUIElementTypeButton[@name="..."]'
-		);
+		await driver.pause( 3000 );
+		const moreOptionsButton = await driver.$( '~editor-menu-button' );
+		await moreOptionsButton.click();
 		await clickIfClickable(
 			driver,
 			'//XCUIElementTypeButton[@name="Switch To Visual"]'
@@ -523,16 +537,18 @@ const toggleOrientation = async ( driver ) => {
  */
 const toggleDarkMode = ( driver, darkMode = true ) => {
 	if ( isAndroid() ) {
-		return driver.execute( 'mobile: shell', [
+		return driver.executeScript( 'mobile: shell', [
 			{
 				command: `cmd uimode night  ${ darkMode ? 'yes' : 'no' }`,
 			},
 		] );
 	}
 
-	return driver.execute( 'mobile: setAppearance', {
-		style: darkMode ? 'dark' : 'light',
-	} );
+	return driver.executeScript( 'mobile: setAppearance', [
+		{
+			style: darkMode ? 'dark' : 'light',
+		},
+	] );
 };
 
 const isEditorVisible = async ( driver ) => {
@@ -540,7 +556,7 @@ const isEditorVisible = async ( driver ) => {
 		? `//android.widget.EditText[contains(@content-desc, "Post title")]`
 		: `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[contains(@name, "Post title")])`;
 
-	await waitForVisible( driver, postTitleLocator );
+	await driver.$( postTitleLocator ).waitForDisplayed( { timeout: 30000 } );
 };
 
 const waitForMediaLibrary = async ( driver ) => {
@@ -576,10 +592,10 @@ const waitForVisible = async (
 		return '';
 	} else if ( iteration !== 0 ) {
 		// wait before trying to locate element again
-		await driver.sleep( timeout );
+		await driver.pause( timeout );
 	}
 
-	const elements = await driver.elementsByXPath( elementLocator );
+	const elements = await driver.$$( elementLocator );
 	if ( elements.length === 0 ) {
 		// if locator is not visible, try again
 		return waitForVisible(
@@ -666,66 +682,49 @@ const clickIfClickable = async (
 	}
 };
 
-// Only for Android
-const waitIfAndroid = async () => {
+const launchApp = async ( driver, initialProps = {} ) => {
 	if ( isAndroid() ) {
-		await editorPage.driver.sleep( 1000 );
+		await driver.execute( 'mobile: startActivity', {
+			component: ANDROID_COMPONENT_NAME,
+			stop: true,
+			extras: [
+				[
+					's',
+					'initialProps',
+					`'${ JSON.stringify( initialProps ) }'`,
+				],
+			],
+		} );
+	} else {
+		await driver.execute( 'mobile: terminateApp', {
+			bundleId: IOS_BUNDLE_ID,
+		} );
+		await driver.execute( 'mobile: launchApp', {
+			bundleId: IOS_BUNDLE_ID,
+			arguments: [ 'uitesting', JSON.stringify( initialProps ) ],
+		} );
 	}
-};
-
-/**
- * Content type definitions.
- * Note: Android only supports plaintext.
- *
- * @typedef {"plaintext" | "image" | "url"} ClipboardContentType
- */
-
-/**
- * Helper to set content in the clipboard.
- *
- * @param {Object}               driver      Driver
- * @param {string}               content     Content to set in the clipboard
- * @param {ClipboardContentType} contentType Type of the content
- */
-const setClipboard = async ( driver, content, contentType = 'plaintext' ) => {
-	const base64String = Buffer.from( content ).toString( 'base64' );
-	await driver.setClipboard( base64String, contentType );
-};
-
-/**
- * Helper to clear the clipboard
- *
- * @param {Object}               driver      Driver
- * @param {ClipboardContentType} contentType Type of the content
- */
-const clearClipboard = async ( driver, contentType = 'plaintext' ) => {
-	await driver.setClipboard( '', contentType );
 };
 
 module.exports = {
 	backspace,
-	clearClipboard,
 	clickBeginningOfElement,
-	clickElementOutsideOfTextInput,
 	clickIfClickable,
 	clickMiddleOfElement,
-	doubleTap,
 	dragAndDropAfterElement,
 	isAndroid,
 	isEditorVisible,
 	isElementVisible,
 	isLocalEnvironment,
+	launchApp,
 	longPressMiddleOfElement,
-	setClipboard,
-	setupDriver,
 	selectTextFromElement,
+	setupDriver,
 	stopDriver,
 	swipeDown,
 	swipeFromTo,
 	swipeUp,
-	tapCopyAboveElement,
-	tapPasteAboveElement,
-	tapSelectAllAboveElement,
+	tapStatusBariOS,
 	timer,
 	toggleDarkMode,
 	toggleHtmlMode,
@@ -733,5 +732,4 @@ module.exports = {
 	typeString,
 	waitForMediaLibrary,
 	waitForVisible,
-	waitIfAndroid,
 };

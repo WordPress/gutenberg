@@ -5,7 +5,7 @@ import { textBlocks } from '../src/initial-html';
 
 describe( 'Gutenberg Editor Rendering Text Blocks test', () => {
 	it( 'should be able to render blocks correctly', async () => {
-		await editorPage.setHtmlContent( textBlocks );
+		await editorPage.initializeEditor( { initialData: textBlocks } );
 
 		// Scroll to the last element
 		const addBlockPlaceholder =

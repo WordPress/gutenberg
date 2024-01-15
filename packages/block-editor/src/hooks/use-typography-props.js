@@ -1,8 +1,12 @@
 /**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
 import classnames from 'classnames';
+
+/**
+ * WordPress dependencies
+ */
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -13,6 +17,7 @@ import {
 	getTypographyFontSizeValue,
 	getFluidTypographyOptionsFromSettings,
 } from '../components/global-styles/typography-utils';
+import { unlock } from '../lock-unlock';
 
 /*
  * This utility is intended to assist where the serialization of the typography
@@ -29,6 +34,7 @@ import {
  * @return {Object} Typography block support derived CSS classes & styles.
  */
 export function getTypographyClassesAndStyles( attributes, settings ) {
+	const { kebabCase } = unlock( componentsPrivateApis );
 	let typographyStyles = attributes?.style?.typography || {};
 	const fluidTypographySettings =
 		getFluidTypographyOptionsFromSettings( settings );

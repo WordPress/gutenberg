@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { SlotFillProvider } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 import { uploadMedia } from '@wordpress/media-utils';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -10,13 +11,8 @@ import {
 	useResourcePermissions,
 } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
-import {
-	BlockEditorKeyboardShortcuts,
-	CopyHandler,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
-import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -30,35 +26,44 @@ import { ALLOW_REUSABLE_BLOCKS } from '../../constants';
 import { unlock } from '../../lock-unlock';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
-
+const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
 	children,
 	...props
 } ) {
 	const mediaPermissions = useResourcePermissions( 'media' );
-	const { reusableBlocks, isFixedToolbarActive, keepCaretInsideBlock } =
-		useSelect(
-			( select ) => ( {
-				widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
-				widgets: select( editWidgetsStore ).getWidgets(),
-				reusableBlocks: ALLOW_REUSABLE_BLOCKS
-					? select( coreStore ).getEntityRecords(
-							'postType',
-							'wp_block'
-					  )
-					: [],
-				isFixedToolbarActive: !! select( preferencesStore ).get(
-					'core/edit-widgets',
-					'fixedToolbar'
-				),
-				keepCaretInsideBlock: !! select( preferencesStore ).get(
-					'core/edit-widgets',
-					'keepCaretInsideBlock'
-				),
-			} ),
-			[]
-		);
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const {
+		reusableBlocks,
+		isFixedToolbarActive,
+		keepCaretInsideBlock,
+		pageOnFront,
+		pageForPosts,
+	} = useSelect( ( select ) => {
+		const { canUser, getEntityRecord, getEntityRecords } =
+			select( coreStore );
+		const siteSettings = canUser( 'read', 'settings' )
+			? getEntityRecord( 'root', 'site' )
+			: undefined;
+		return {
+			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
+			widgets: select( editWidgetsStore ).getWidgets(),
+			reusableBlocks: ALLOW_REUSABLE_BLOCKS
+				? getEntityRecords( 'postType', 'wp_block' )
+				: [],
+			isFixedToolbarActive: !! select( preferencesStore ).get(
+				'core/edit-widgets',
+				'fixedToolbar'
+			),
+			keepCaretInsideBlock: !! select( preferencesStore ).get(
+				'core/edit-widgets',
+				'keepCaretInsideBlock'
+			),
+			pageOnFront: siteSettings?.page_on_front,
+			pageForPosts: siteSettings?.page_for_posts,
+		};
+	}, [] );
 	const { setIsInserterOpened } = useDispatch( editWidgetsStore );
 
 	const settings = useMemo( () => {
@@ -75,19 +80,24 @@ export default function WidgetAreasBlockEditorProvider( {
 		return {
 			...blockEditorSettings,
 			__experimentalReusableBlocks: reusableBlocks,
-			hasFixedToolbar: isFixedToolbarActive,
+			hasFixedToolbar: isFixedToolbarActive || ! isLargeViewport,
 			keepCaretInsideBlock,
 			mediaUpload: mediaUploadBlockEditor,
 			templateLock: 'all',
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
+			pageOnFront,
+			pageForPosts,
 		};
 	}, [
 		blockEditorSettings,
 		isFixedToolbarActive,
+		isLargeViewport,
 		keepCaretInsideBlock,
 		mediaPermissions.canCreate,
 		reusableBlocks,
 		setIsInserterOpened,
+		pageOnFront,
+		pageForPosts,
 	] );
 
 	const widgetAreaId = useLastSelectedWidgetArea();
@@ -99,22 +109,19 @@ export default function WidgetAreasBlockEditorProvider( {
 	);
 
 	return (
-		<ShortcutProvider>
-			<BlockEditorKeyboardShortcuts.Register />
+		<SlotFillProvider>
 			<KeyboardShortcuts.Register />
-			<SlotFillProvider>
-				<ExperimentalBlockEditorProvider
-					value={ blocks }
-					onInput={ onInput }
-					onChange={ onChange }
-					settings={ settings }
-					useSubRegistry={ false }
-					{ ...props }
-				>
-					<CopyHandler>{ children }</CopyHandler>
-					<ReusableBlocksMenuItems rootClientId={ widgetAreaId } />
-				</ExperimentalBlockEditorProvider>
-			</SlotFillProvider>
-		</ShortcutProvider>
+			<ExperimentalBlockEditorProvider
+				value={ blocks }
+				onInput={ onInput }
+				onChange={ onChange }
+				settings={ settings }
+				useSubRegistry={ false }
+				{ ...props }
+			>
+				{ children }
+				<PatternsMenuItems rootClientId={ widgetAreaId } />
+			</ExperimentalBlockEditorProvider>
+		</SlotFillProvider>
 	);
 }

@@ -28,8 +28,16 @@
 		"arrow": {
 			"type": "string",
 			"default": "none"
+		},
+		"inSameTerm": {
+			"type": "boolean"
+		},
+		"taxonomy": {
+			"type": "string",
+			"default": ""
 		}
 	},
+	"usesContext": [ "postType" ],
 	"supports": {
 		"reusable": false,
 		"html": false,
@@ -45,6 +53,7 @@
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
+			"__experimentalWritingMode": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}

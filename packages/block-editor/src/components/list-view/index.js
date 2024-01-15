@@ -6,7 +6,10 @@ import {
 	useMergeRefs,
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
-import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
+import {
+	__experimentalTreeGrid as TreeGrid,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import {
@@ -32,6 +35,7 @@ import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
 import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
+import { focusListItem } from './utils';
 
 const expanded = ( state, action ) => {
 	if ( Array.isArray( action.clientIds ) ) {
@@ -132,8 +136,6 @@ function ListViewComponent(
 	const elementRef = useRef();
 	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
 
-	const isMounted = useRef( false );
-
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
@@ -156,21 +158,14 @@ function ListViewComponent(
 		[ setSelectedTreeId, updateBlockSelection, onSelect, getBlock ]
 	);
 	useEffect( () => {
-		isMounted.current = true;
-	}, [] );
-
-	// List View renders a fixed number of items and relies on each having a fixed item height of 36px.
-	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
-	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
-	const [ fixedListWindow ] = useFixedWindowList(
-		elementRef,
-		BLOCK_LIST_ITEM_HEIGHT,
-		visibleBlockCount,
-		{
-			useWindowing: true,
-			windowOverscan: 40,
+		// If a blocks are already selected when the list view is initially
+		// mounted, shift focus to the first selected block.
+		if ( selectedClientIds?.length ) {
+			focusListItem( selectedClientIds[ 0 ], elementRef );
 		}
-	);
+		// Disable reason: Only focus on the selected item when the list view is mounted.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] );
 
 	const expand = useCallback(
 		( clientId ) => {
@@ -217,7 +212,6 @@ function ListViewComponent(
 
 	const contextValue = useMemo(
 		() => ( {
-			isTreeGridMounted: isMounted.current,
 			draggedClientIds,
 			expandedState,
 			expand,
@@ -228,6 +222,7 @@ function ListViewComponent(
 			insertedBlock,
 			setInsertedBlock,
 			treeGridElementRef: elementRef,
+			rootClientId,
 		} ),
 		[
 			draggedClientIds,
@@ -239,7 +234,27 @@ function ListViewComponent(
 			AdditionalBlockContent,
 			insertedBlock,
 			setInsertedBlock,
+			rootClientId,
 		]
+	);
+
+	// List View renders a fixed number of items and relies on each having a fixed item height of 36px.
+	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
+	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
+	const [ fixedListWindow ] = useFixedWindowList(
+		elementRef,
+		BLOCK_LIST_ITEM_HEIGHT,
+		visibleBlockCount,
+		{
+			// Ensure that the windowing logic is recalculated when the expanded state changes.
+			// This is necessary because expanding a collapsed block in a short list view can
+			// switch the list view to a tall list view with a scrollbar, and vice versa.
+			// When this happens, the windowing logic needs to be recalculated to ensure that
+			// the correct number of blocks are rendered, by rechecking for a scroll container.
+			expandedState,
+			useWindowing: true,
+			windowOverscan: 40,
+		}
 	);
 
 	// If there are no blocks to show and we're not showing the appender, do not render the list view.
@@ -247,12 +262,20 @@ function ListViewComponent(
 		return null;
 	}
 
+	const describedById =
+		description && `block-editor-list-view-description-${ instanceId }`;
+
 	return (
 		<AsyncModeProvider value={ true }>
 			<ListViewDropIndicator
 				listViewRef={ elementRef }
 				blockDropTarget={ blockDropTarget }
 			/>
+			{ description && (
+				<VisuallyHidden id={ describedById }>
+					{ description }
+				</VisuallyHidden>
+			) }
 			<TreeGrid
 				id={ id }
 				className="block-editor-list-view-tree"
@@ -262,8 +285,7 @@ function ListViewComponent(
 				onExpandRow={ expandRow }
 				onFocusRow={ focusRow }
 				applicationAriaLabel={ __( 'Block navigation structure' ) }
-				// eslint-disable-next-line jsx-a11y/aria-props
-				aria-description={ description }
+				aria-describedby={ describedById }
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch

@@ -232,7 +232,7 @@ When the block declares support for `color.background`, the attributes definitio
 
 _**Note:** Deprecated since WordPress 6.3._
 
-This property has been replaced by [`filter.duotone`](#filter-duotone).
+This property has been replaced by [`filter.duotone`](#filterduotone).
 
 ### color.gradients
 
@@ -437,7 +437,7 @@ _**Note:** Since WordPress 6.2._
 -   Subproperties:
     -   `minHeight`: type `boolean`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls).
+This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
 ```js
 supports: {
@@ -491,7 +491,7 @@ selectors: {
 
 The filter can be applied to an element inside the block by setting the `selectors.filter.duotone` selector.
 
-Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/theme-json.md).
+Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/global-settings-and-styles.md).
 
 When the block declares support for `filter.duotone`, the attributes definition is extended to include the attribute `style`:
 
@@ -542,6 +542,87 @@ supports: {
 	inserter: false
 }
 ```
+
+## layout
+
+-   Type: `boolean` or `Object`
+-   Default value: null
+-   Subproperties:
+    -   `default`: type `Object`, default value null
+    -   `allowSwitching`: type `boolean`, default value `false`
+    -   `allowEditing`: type `boolean`, default value `true`
+    -   `allowInheriting`: type `boolean`, default value `true`
+    -   `allowSizingOnChildren`: type `boolean`, default value `false`
+    -   `allowVerticalAlignment`: type `boolean`, default value `true`
+    -   `allowJustification`: type `boolean`, default value `true`
+    -   `allowOrientation`: type `boolean`, default value `true`
+    -   `allowCustomContentAndWideSize`: type `boolean`, default value `true`
+
+This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.
+
+### layout.default
+
+-   Type: `Object`
+-   Default value: null
+
+Allows setting the `type` property to define what layout type is default for the block, and also default values for any properties inherent to that layout type, e.g., for a `flex` layout, a default value can be set for `flexWrap`.
+
+### layout.allowSwitching
+
+-   Type: `boolean`
+-   Default value: `false`
+
+Exposes a switcher control that allows toggling between all existing layout types.
+
+### layout.allowEditing
+
+-   Type: `boolean`
+-   Default value: `true`
+
+Determines display of layout controls in the block sidebar. If set to false, layout controls will be hidden.
+
+### layout.allowInheriting
+
+-   Type: `boolean`
+-   Default value: `true`
+
+For the `flow` layout type only, determines display of the "Inner blocks use content width" toggle.
+
+### layout.allowSizingOnChildren
+
+-   Type: `boolean`
+-   Default value: `false`
+
+For the `flex` layout type only, determines display of sizing controls (Fit/Fill/Fixed) on all child blocks of the flex block.
+
+### layout.allowVerticalAlignment
+
+-   Type: `boolean`
+-   Default value: `true`
+
+For the `flex` layout type only, determines display of the vertical alignment control in the block toolbar.
+
+### layout.allowJustification
+
+-   Type: `boolean`
+-   Default value: `true`
+
+For the `flex` layout type, determines display of the justification control in the block toolbar and block sidebar. For the `constrained` layout type, determines display of justification control in the block sidebar.
+
+### layout.allowOrientation
+
+-   Type: `boolean`
+-   Default value: `true`
+
+For the `flex` layout type only, determines display of the orientation control in the block toolbar.
+
+### layout.allowCustomContentAndWideSize
+
+-   Type: `boolean`
+-   Default value: `true`
+
+For the `constrained` layout type only, determines display of the custom content and wide size controls in the block sidebar.
+
 
 ## multiple
 
@@ -594,7 +675,7 @@ _**Note:** Since WordPress 6.2._
 -   Subproperties:
     -   `sticky`: type `boolean`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to position. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-json/#opt-in-into-ui-controls).
+This value signals that a block supports some of the CSS style properties related to position. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
 Note that sticky position controls are currently only available for blocks set at the root level of the document. Setting a block to the `sticky` position will stick the block to its most immediate parent when the user scrolls the page.
 
@@ -637,7 +718,7 @@ supports: {
     spacing: {
         margin: true,  // Enable margin UI control.
         padding: true, // Enable padding UI control.
-        blockGap: true,  // Enables block spacing UI control.
+        blockGap: true,  // Enables block spacing UI control for blocks that also use `layout`.
     }
 }
 ```

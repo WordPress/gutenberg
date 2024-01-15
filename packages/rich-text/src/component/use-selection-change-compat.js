@@ -21,7 +21,7 @@ export function useSelectionChangeCompat() {
 	return useRefEffect( ( element ) => {
 		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
-		const selection = defaultView.getSelection();
+		const selection = defaultView?.getSelection();
 
 		let range;
 

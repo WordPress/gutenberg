@@ -8,14 +8,15 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { COLORS, rtl } from '../../utils';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 import type { SelectControlProps } from '../types';
 import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper';
+import { fontSizeStyles } from '../../input-control/styles/input-control-styles';
 
 interface SelectProps
 	extends Pick<
 		SelectControlProps,
-		'__next36pxDefaultSize' | 'disabled' | 'multiple'
+		'__next40pxDefaultSize' | 'disabled' | 'multiple'
 	> {
 	// Using `selectSize` instead of `size` to avoid a type conflict with the
 	// `size` HTML attribute of the `select` element.
@@ -30,29 +31,8 @@ const disabledStyles = ( { disabled }: SelectProps ) => {
 	} );
 };
 
-const fontSizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
-	const sizes = {
-		default: '13px',
-		small: '11px',
-		'__unstable-large': '13px',
-	};
-
-	const fontSize = sizes[ selectSize ];
-	const fontSizeMobile = '16px';
-
-	if ( ! fontSize ) return '';
-
-	return css`
-		font-size: ${ fontSizeMobile };
-
-		@media ( min-width: 600px ) {
-			font-size: ${ fontSize };
-		}
-	`;
-};
-
 const sizeStyles = ( {
-	__next36pxDefaultSize,
+	__next40pxDefaultSize,
 	multiple,
 	selectSize = 'default',
 }: SelectProps ) => {
@@ -64,14 +44,20 @@ const sizeStyles = ( {
 
 	const sizes = {
 		default: {
-			height: 36,
-			minHeight: 36,
+			height: 40,
+			minHeight: 40,
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
 		small: {
 			height: 24,
 			minHeight: 24,
+			paddingTop: 0,
+			paddingBottom: 0,
+		},
+		compact: {
+			height: 32,
+			minHeight: 32,
 			paddingTop: 0,
 			paddingBottom: 0,
 		},
@@ -83,13 +69,8 @@ const sizeStyles = ( {
 		},
 	};
 
-	if ( ! __next36pxDefaultSize ) {
-		sizes.default = {
-			height: 30,
-			minHeight: 30,
-			paddingTop: 0,
-			paddingBottom: 0,
-		};
+	if ( ! __next40pxDefaultSize ) {
+		sizes.default = sizes.compact;
 	}
 
 	const style = sizes[ selectSize ] || sizes.default;
@@ -100,18 +81,19 @@ const sizeStyles = ( {
 export const chevronIconSize = 18;
 
 const sizePaddings = ( {
-	__next36pxDefaultSize,
+	__next40pxDefaultSize,
 	multiple,
 	selectSize = 'default',
 }: SelectProps ) => {
 	const padding = {
 		default: 16,
 		small: 8,
+		compact: 8,
 		'__unstable-large': 16,
 	};
 
-	if ( ! __next36pxDefaultSize ) {
-		padding.default = 8;
+	if ( ! __next40pxDefaultSize ) {
+		padding.default = padding.compact;
 	}
 
 	const selectedPadding = padding[ selectSize ] || padding.default;

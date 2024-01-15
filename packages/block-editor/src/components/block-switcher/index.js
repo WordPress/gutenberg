@@ -93,8 +93,10 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		clientId: Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds,
 		maximumLength: 35,
 	} );
-	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
-	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
+
+	const isSingleBlock = blocks.length === 1;
+	const isReusable = isSingleBlock && isReusableBlock( blocks[ 0 ] );
+	const isTemplate = isSingleBlock && isTemplatePart( blocks[ 0 ] );
 
 	function selectForMultipleBlocks( insertedBlocks ) {
 		if ( insertedBlocks.length > 1 ) {
@@ -136,11 +138,14 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const hasPossibleBlockVariationTransformations =
 		!! blockVariationTransformations?.length;
 	const hasPatternTransformation = !! patterns?.length && canRemove;
-	if (
-		! hasBlockStyles &&
-		! hasPossibleBlockTransformations &&
-		! hasPossibleBlockVariationTransformations
-	) {
+	const hasBlockOrBlockVariationTransforms =
+		hasPossibleBlockTransformations ||
+		hasPossibleBlockVariationTransformations;
+	const showDropdown =
+		hasBlockStyles ||
+		hasBlockOrBlockVariationTransforms ||
+		hasPatternTransformation;
+	if ( ! showDropdown ) {
 		return (
 			<ToolbarGroup>
 				<ToolbarButton
@@ -162,32 +167,22 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		);
 	}
 
-	const blockSwitcherLabel = blockTitle;
+	const blockSwitcherLabel = isSingleBlock
+		? blockTitle
+		: __( 'Multiple blocks selected' );
 
-	const blockSwitcherDescription =
-		1 === blocks.length
-			? sprintf(
-					/* translators: %s: block title. */
-					__( '%s: Change block type or style' ),
-					blockTitle
-			  )
-			: sprintf(
-					/* translators: %d: number of blocks. */
-					_n(
-						'Change type of %d block',
-						'Change type of %d blocks',
-						blocks.length
-					),
+	const blockSwitcherDescription = isSingleBlock
+		? __( 'Change block type or style' )
+		: sprintf(
+				/* translators: %d: number of blocks. */
+				_n(
+					'Change type of %d block',
+					'Change type of %d blocks',
 					blocks.length
-			  );
+				),
+				blocks.length
+		  );
 
-	const hasBlockOrBlockVariationTransforms =
-		hasPossibleBlockTransformations ||
-		hasPossibleBlockVariationTransformations;
-	const showDropDown =
-		hasBlockStyles ||
-		hasBlockOrBlockVariationTransforms ||
-		hasPatternTransformation;
 	return (
 		<ToolbarGroup>
 			<ToolbarItem>
@@ -219,54 +214,48 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 						} }
 						menuProps={ { orientation: 'both' } }
 					>
-						{ ( { onClose } ) =>
-							showDropDown && (
-								<div className="block-editor-block-switcher__container">
-									{ hasPatternTransformation && (
-										<PatternTransformationsMenu
-											blocks={ blocks }
-											patterns={ patterns }
-											onSelect={ (
+						{ ( { onClose } ) => (
+							<div className="block-editor-block-switcher__container">
+								{ hasPatternTransformation && (
+									<PatternTransformationsMenu
+										blocks={ blocks }
+										patterns={ patterns }
+										onSelect={ ( transformedBlocks ) => {
+											onPatternTransform(
 												transformedBlocks
-											) => {
-												onPatternTransform(
-													transformedBlocks
-												);
-												onClose();
-											} }
-										/>
-									) }
-									{ hasBlockOrBlockVariationTransforms && (
-										<BlockTransformationsMenu
-											className="block-editor-block-switcher__transforms__menugroup"
-											possibleBlockTransformations={
-												possibleBlockTransformations
-											}
-											possibleBlockVariationTransformations={
-												blockVariationTransformations
-											}
-											blocks={ blocks }
-											onSelect={ ( name ) => {
-												onBlockTransform( name );
-												onClose();
-											} }
-											onSelectVariation={ ( name ) => {
-												onBlockVariationTransform(
-													name
-												);
-												onClose();
-											} }
-										/>
-									) }
-									{ hasBlockStyles && (
-										<BlockStylesMenu
-											hoveredBlock={ blocks[ 0 ] }
-											onSwitch={ onClose }
-										/>
-									) }
-								</div>
-							)
-						}
+											);
+											onClose();
+										} }
+									/>
+								) }
+								{ hasBlockOrBlockVariationTransforms && (
+									<BlockTransformationsMenu
+										className="block-editor-block-switcher__transforms__menugroup"
+										possibleBlockTransformations={
+											possibleBlockTransformations
+										}
+										possibleBlockVariationTransformations={
+											blockVariationTransformations
+										}
+										blocks={ blocks }
+										onSelect={ ( name ) => {
+											onBlockTransform( name );
+											onClose();
+										} }
+										onSelectVariation={ ( name ) => {
+											onBlockVariationTransform( name );
+											onClose();
+										} }
+									/>
+								) }
+								{ hasBlockStyles && (
+									<BlockStylesMenu
+										hoveredBlock={ blocks[ 0 ] }
+										onSwitch={ onClose }
+									/>
+								) }
+							</div>
+						) }
 					</DropdownMenu>
 				) }
 			</ToolbarItem>

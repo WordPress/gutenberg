@@ -15,6 +15,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import { useLink } from '../components/routes/link';
 import { unlock } from '../lock-unlock';
+import { TEMPLATE_PART_POST_TYPE } from '../utils/constants';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -23,11 +24,13 @@ function EditTemplatePartMenuItem( { attributes } ) {
 	const { params } = useLocation();
 	const templatePart = useSelect(
 		( select ) => {
-			return select( coreStore ).getEntityRecord(
+			const { getCurrentTheme, getEntityRecord } = select( coreStore );
+
+			return getEntityRecord(
 				'postType',
-				'wp_template_part',
+				TEMPLATE_PART_POST_TYPE,
 				// Ideally this should be an official public API.
-				`${ theme }//${ slug }`
+				`${ theme || getCurrentTheme()?.stylesheet }//${ slug }`
 			);
 		},
 		[ theme, slug ]
@@ -40,7 +43,7 @@ function EditTemplatePartMenuItem( { attributes } ) {
 			canvas: 'edit',
 		},
 		{
-			fromTemplateId: params.postId,
+			fromTemplateId: params.postId || templatePart?.id,
 		}
 	);
 

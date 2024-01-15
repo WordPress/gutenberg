@@ -1,5 +1,6 @@
 # Documentation
 /docs                                           @ajitbohra @ryanwelcher @juanmaguitar @fabiankaegy @ndiego
+/packages/interactivity/docs                    @juanmaguitar
 
 # Schemas
 /schemas/json                                   @ajlende
@@ -21,6 +22,7 @@
 /packages/block-library/src/comment-template    @michalczaplinski
 /packages/block-library/src/comments            @michalczaplinski
 /packages/block-library/src/table-of-contents   @ZebulanStanphill
+/packages/block-library/src/image								@artemiomorales @michalczaplinski
 
 # Duotone
 /lib/block-supports/duotone.php                       @ajlende
@@ -54,6 +56,9 @@
 # Full Site Editing
 /packages/edit-site
 
+# Interactivity API
+/packages/interactivity                         @luisherranz @darerodz
+
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
 /bin/api-docs                                   @ntwb @nerrad @ajitbohra
@@ -79,12 +84,14 @@
 /packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
 /test/e2e                                       @kevin940726 @Mamaduka
+/test/php/gutenberg-coding-standards			@anton-vlasenko
 
 # UI Components
 /packages/components                            @ajitbohra
 /packages/compose                               @ajitbohra
 /packages/element                               @ajitbohra
 /packages/notices                               @ajitbohra
+/packages/nux                                   @ajitbohra @peterwilsoncc
 /packages/viewport                              @ajitbohra
 /packages/base-styles
 /packages/icons
@@ -129,6 +136,7 @@
 
 # PHP
 /lib                                            @spacedmonkey
+/lib/compat/*/html-api                          @dmsnell
 /lib/experimental/rest-api.php                  @timothybjacobs
 /lib/experimental/class-wp-rest-*               @timothybjacobs
 /lib/experimental/class-wp-rest-block-editor-settings-controller.php @timothybjacobs @spacedmonkey @geriux

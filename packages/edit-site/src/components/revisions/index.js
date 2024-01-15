@@ -11,8 +11,7 @@ import {
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
+import { useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,23 +21,18 @@ import { unlock } from '../../lock-unlock';
 import { mergeBaseAndUserConfigs } from '../global-styles/global-styles-provider';
 import EditorCanvasContainer from '../editor-canvas-container';
 
-const { ExperimentalBlockEditorProvider, useGlobalStylesOutputWithConfig } =
-	unlock( blockEditorPrivateApis );
+const {
+	ExperimentalBlockEditorProvider,
+	GlobalStylesContext,
+	useGlobalStylesOutputWithConfig,
+} = unlock( blockEditorPrivateApis );
 
 function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
 }
 
-function Revisions( { onClose, userConfig, blocks } ) {
-	const { baseConfig } = useSelect(
-		( select ) => ( {
-			baseConfig:
-				select(
-					coreStore
-				).__experimentalGetCurrentThemeBaseGlobalStyles(),
-		} ),
-		[]
-	);
+function Revisions( { userConfig, blocks } ) {
+	const { base: baseConfig } = useContext( GlobalStylesContext );
 
 	const mergedConfig = useMemo( () => {
 		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
@@ -71,7 +65,6 @@ function Revisions( { onClose, userConfig, blocks } ) {
 	return (
 		<EditorCanvasContainer
 			title={ __( 'Revisions' ) }
-			onClose={ onClose }
 			closeButtonLabel={ __( 'Close revisions' ) }
 			enableResizing={ true }
 		>
@@ -85,7 +78,7 @@ function Revisions( { onClose, userConfig, blocks } ) {
 					{
 						// Forming a "block formatting context" to prevent margin collapsing.
 						// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-						`.is-root-container { display: flow-root; } body { position: relative; padding: 32px; }`
+						`.is-root-container { display: flow-root; }`
 					}
 				</style>
 				<Disabled className="edit-site-revisions__example-preview__content">

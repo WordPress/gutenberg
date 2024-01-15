@@ -2,16 +2,12 @@
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
-import {
-	__experimentalHStack as HStack,
-	__experimentalText as Text,
-	__experimentalVStack as VStack,
-	__experimentalTruncate as Truncate,
-} from '@wordpress/components';
+import { __experimentalTruncate as Truncate } from '@wordpress/components';
 import { count as wordCount } from '@wordpress/wordcount';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
+import { safeDecodeURIComponent } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -19,6 +15,13 @@ import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import StatusLabel from './status-label';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import {
+	SidebarNavigationScreenDetailsPanel,
+	SidebarNavigationScreenDetailsPanelRow,
+	SidebarNavigationScreenDetailsPanelLabel,
+	SidebarNavigationScreenDetailsPanelValue,
+} from '../sidebar-navigation-screen-details-panel';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 // Taken from packages/editor/src/components/time-to-read/index.js.
 const AVERAGE_READING_RATE = 189;
@@ -35,12 +38,19 @@ function getPageDetails( page ) {
 				<StatusLabel
 					status={ page?.password ? 'protected' : page.status }
 					date={ page?.date }
+					short
 				/>
 			),
 		},
 		{
 			label: __( 'Slug' ),
-			value: <Truncate numberOfLines={ 1 }>{ page.slug }</Truncate>,
+			value: (
+				<Truncate numberOfLines={ 1 }>
+					{ safeDecodeURIComponent(
+						page.slug || page.generated_slug
+					) }
+				</Truncate>
+			),
 		},
 	];
 
@@ -51,14 +61,12 @@ function getPageDetails( page ) {
 		} );
 	}
 
-	details.push( {
-		label: __( 'Parent' ),
-		// `null` indicates no parent.
-		value:
-			null === page?.parentTitle
-				? __( 'Top level' )
-				: decodeEntities( page?.parentTitle || __( '(no title)' ) ),
-	} );
+	if ( page?.parentTitle ) {
+		details.push( {
+			label: __( 'Parent' ),
+			value: decodeEntities( page.parentTitle || __( '(no title)' ) ),
+		} );
+	}
 
 	/*
 	 * translators: If your word count is based on single characters (e.g. East Asian characters),
@@ -71,7 +79,7 @@ function getPageDetails( page ) {
 		: 0;
 	const readingTime = Math.round( wordsCounted / AVERAGE_READING_RATE );
 
-	if ( wordsCounted ) {
+	if ( wordsCounted && ! page?.isPostsPage ) {
 		details.push(
 			{
 				label: __( 'Words' ),
@@ -95,28 +103,15 @@ function getPageDetails( page ) {
 
 export default function PageDetails( { id } ) {
 	const { record } = useEntityRecord( 'postType', 'page', id );
-
-	const { parentTitle, templateTitle } = useSelect(
+	const { parentTitle, templateTitle, isPostsPage } = useSelect(
 		( select ) => {
-			const { getEditedPostContext, getSettings } = unlock(
-				select( editSiteStore )
+			const { getEditedPostId } = unlock( select( editSiteStore ) );
+			const template = select( coreStore ).getEntityRecord(
+				'postType',
+				TEMPLATE_POST_TYPE,
+				getEditedPostId()
 			);
-			const defaultTemplateTypes = getSettings()?.defaultTemplateTypes;
-			const postContext = getEditedPostContext();
-
-			// Template title.
-			const templateSlug =
-				// Checks that the post type matches the current theme's post type, otherwise
-				// the templateSlug returns 'home'.
-				postContext?.postType === 'page'
-					? postContext?.templateSlug
-					: null;
-			const _templateTitle =
-				defaultTemplateTypes && templateSlug
-					? defaultTemplateTypes.find(
-							( template ) => template.slug === templateSlug
-					  )?.title
-					: null;
+			const _templateTitle = template?.title?.rendered;
 
 			// Parent page title.
 			const _parentTitle = record?.parent
@@ -130,34 +125,37 @@ export default function PageDetails( { id } ) {
 				  )?.title?.rendered
 				: null;
 
+			const { getEntityRecord } = select( coreStore );
+			const siteSettings = getEntityRecord( 'root', 'site' );
+
 			return {
 				parentTitle: _parentTitle,
 				templateTitle: _templateTitle,
+				isPostsPage: record?.id === siteSettings?.page_for_posts,
 			};
 		},
-		[ record ]
+		[ record?.parent, record?.id ]
 	);
 	return (
-		<VStack spacing={ 5 }>
+		<SidebarNavigationScreenDetailsPanel
+			spacing={ 5 }
+			title={ __( 'Details' ) }
+		>
 			{ getPageDetails( {
 				parentTitle,
 				templateTitle,
+				isPostsPage,
 				...record,
 			} ).map( ( { label, value } ) => (
-				<HStack
-					key={ label }
-					spacing={ 5 }
-					alignment="left"
-					className="edit-site-sidebar-navigation-screen-page__details"
-				>
-					<Text className="edit-site-sidebar-navigation-screen-page__details-label">
+				<SidebarNavigationScreenDetailsPanelRow key={ label }>
+					<SidebarNavigationScreenDetailsPanelLabel>
 						{ label }
-					</Text>
-					<Text className="edit-site-sidebar-navigation-screen-page__details-value">
+					</SidebarNavigationScreenDetailsPanelLabel>
+					<SidebarNavigationScreenDetailsPanelValue>
 						{ value }
-					</Text>
-				</HStack>
+					</SidebarNavigationScreenDetailsPanelValue>
+				</SidebarNavigationScreenDetailsPanelRow>
 			) ) }
-		</VStack>
+		</SidebarNavigationScreenDetailsPanel>
 	);
 }

@@ -75,14 +75,17 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 		$a_wonderful_processor = new WP_Style_Engine_Processor_Gutenberg();
 		$a_wonderful_processor->add_rules( array( $a_wonderful_css_rule, $a_very_wonderful_css_rule, $a_more_wonderful_css_rule ) );
 
-		$expected = '.a-more-wonderful-rule {
-	font-family: Wonderful sans;
-	font-size: 1em;
+		$expected = '.a-wonderful-rule {
+	color: var(--wonderful-color);
 	background-color: orange;
 }
-.a-wonderful-rule,
 .a-very_wonderful-rule {
 	color: var(--wonderful-color);
+	background-color: orange;
+}
+.a-more-wonderful-rule {
+	font-family: Wonderful sans;
+	font-size: 1em;
 	background-color: orange;
 }
 ';
@@ -170,6 +173,9 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 
 	/**
 	 * Tests printing out 'unoptimized' CSS, that is, uncombined selectors and duplicate CSS rules.
+	 * This is the default.
+	 *
+	 * @ticket 58811
 	 *
 	 * @covers ::get_css
 	 */
@@ -215,9 +221,11 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that 'optimized' CSS is output, that is, that duplicate CSS rules are combined under their corresponding selectors.
 	 *
+	 * @ticket 58811
+	 *
 	 * @covers ::get_css
 	 */
-	public function test_should_optimize_css_output_by_default() {
+	public function test_should_not_optimize_css_output_by_default() {
 		$a_sweet_rule = new WP_Style_Engine_CSS_Rule_Gutenberg(
 			'.a-sweet-rule',
 			array(
@@ -238,13 +246,15 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 		$a_sweet_processor->add_rules( array( $a_sweet_rule, $a_sweeter_rule ) );
 
 		$this->assertSame(
-			'.a-sweet-rule,#an-even-sweeter-rule > marquee{color:var(--sweet-color);background-color:purple;}',
+			'.a-sweet-rule{color:var(--sweet-color);background-color:purple;}#an-even-sweeter-rule > marquee{color:var(--sweet-color);background-color:purple;}',
 			$a_sweet_processor->get_css( array( 'prettify' => false ) )
 		);
 	}
 
 	/**
-	 * Tests that incoming CSS rules are merged with existing CSS rules.
+	 * Tests that incoming CSS rules are optimized and merged with existing CSS rules.
+	 *
+	 * @ticket 58811
 	 *
 	 * @covers ::add_rules
 	 */
@@ -266,7 +276,12 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 		$a_lovely_processor->add_rules( $a_lovelier_rule );
 		$this->assertSame(
 			'.a-lovely-rule,.a-lovelier-rule{border-color:purple;}',
-			$a_lovely_processor->get_css( array( 'prettify' => false ) ),
+			$a_lovely_processor->get_css(
+				array(
+					'prettify' => false,
+					'optimize' => true,
+				)
+			),
 			'Return value of get_css() does not match expectations when combining 2 CSS rules'
 		);
 
@@ -288,7 +303,12 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 
 		$this->assertSame(
 			'.a-lovely-rule,.a-lovelier-rule,.a-most-lovely-rule,.a-perfectly-lovely-rule{border-color:purple;}',
-			$a_lovely_processor->get_css( array( 'prettify' => false ) ),
+			$a_lovely_processor->get_css(
+				array(
+					'prettify' => false,
+					'optimize' => true,
+				)
+			),
 			'Return value of get_css() does not match expectations when combining 4 CSS rules'
 		);
 	}

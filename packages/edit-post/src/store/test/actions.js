@@ -53,6 +53,18 @@ describe( 'actions', () => {
 		).toBeNull();
 	} );
 
+	it( 'openGeneralSidebar - should turn off distraction free mode when opening a general sidebar', () => {
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core', 'distractionFree', true );
+		registry
+			.dispatch( editPostStore )
+			.openGeneralSidebar( 'edit-post/block' );
+		expect(
+			registry.select( preferencesStore ).get( 'core', 'distractionFree' )
+		).toBe( false );
+	} );
+
 	it( 'toggleFeature', () => {
 		registry.dispatch( editPostStore ).toggleFeature( 'welcomeGuide' );
 		expect(
@@ -102,6 +114,17 @@ describe( 'actions', () => {
 				'text'
 			);
 		} );
+		it( 'should turn off distraction free mode when switching to code editor', () => {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'distractionFree', true );
+			registry.dispatch( editPostStore ).switchEditorMode( 'text' );
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'distractionFree' )
+			).toBe( false );
+		} );
 	} );
 
 	it( 'togglePinnedPluginItem', () => {
@@ -121,34 +144,6 @@ describe( 'actions', () => {
 		).toBe( true );
 	} );
 
-	describe( '__unstableSwitchToTemplateMode', () => {
-		it( 'welcome guide is active', () => {
-			// Activate `welcomeGuideTemplate` feature.
-			registry
-				.dispatch( editPostStore )
-				.toggleFeature( 'welcomeGuideTemplate' );
-			registry.dispatch( editPostStore ).__unstableSwitchToTemplateMode();
-			expect(
-				registry.select( editPostStore ).isEditingTemplate()
-			).toBeTruthy();
-			const notices = registry.select( noticesStore ).getNotices();
-			expect( notices ).toHaveLength( 0 );
-		} );
-
-		it( 'welcome guide is inactive', () => {
-			expect(
-				registry.select( editPostStore ).isEditingTemplate()
-			).toBeFalsy();
-			registry.dispatch( editPostStore ).__unstableSwitchToTemplateMode();
-			expect(
-				registry.select( editPostStore ).isEditingTemplate()
-			).toBeTruthy();
-			const notices = registry.select( noticesStore ).getNotices();
-			expect( notices ).toHaveLength( 1 );
-			expect( notices[ 0 ].content ).toMatch( 'template' );
-		} );
-	} );
-
 	describe( 'hideBlockTypes', () => {
 		it( 'adds the hidden block type to the preferences', () => {
 			registry
@@ -159,16 +154,13 @@ describe( 'actions', () => {
 
 			expect(
 				registry
-					.select( editPostStore )
-					.getPreference( 'hiddenBlockTypes' )
+					.select( preferencesStore )
+					.get( 'core', 'hiddenBlockTypes' )
 			).toEqual( expected );
 
 			expect(
 				registry.select( editPostStore ).getHiddenBlockTypes()
 			).toEqual( expected );
-
-			// Expect a deprecation message for `getPreference`.
-			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -182,8 +174,8 @@ describe( 'actions', () => {
 
 			expect(
 				registry
-					.select( editPostStore )
-					.getPreference( 'hiddenBlockTypes' )
+					.select( preferencesStore )
+					.get( 'core', 'hiddenBlockTypes' )
 			).toEqual( expectedA );
 
 			expect(
@@ -198,90 +190,13 @@ describe( 'actions', () => {
 
 			expect(
 				registry
-					.select( editPostStore )
-					.getPreference( 'hiddenBlockTypes' )
+					.select( preferencesStore )
+					.get( 'core', 'hiddenBlockTypes' )
 			).toEqual( expectedB );
 
 			expect(
 				registry.select( editPostStore ).getHiddenBlockTypes()
 			).toEqual( expectedB );
-		} );
-	} );
-
-	describe( 'toggleEditorPanelEnabled', () => {
-		it( 'toggles panels to be enabled and not enabled', () => {
-			// This will switch it off, since the default is on.
-			registry
-				.dispatch( editPostStore )
-				.toggleEditorPanelEnabled( 'control-panel' );
-
-			expect(
-				registry
-					.select( editPostStore )
-					.isEditorPanelEnabled( 'control-panel' )
-			).toBe( false );
-
-			// Also check that the `getPreference` selector includes panels.
-			expect(
-				registry.select( editPostStore ).getPreference( 'panels' )
-			).toEqual( {
-				'control-panel': {
-					enabled: false,
-				},
-			} );
-
-			// Switch it on again.
-			registry
-				.dispatch( editPostStore )
-				.toggleEditorPanelEnabled( 'control-panel' );
-
-			expect(
-				registry
-					.select( editPostStore )
-					.isEditorPanelEnabled( 'control-panel' )
-			).toBe( true );
-
-			expect(
-				registry.select( editPostStore ).getPreference( 'panels' )
-			).toEqual( {} );
-		} );
-	} );
-
-	describe( 'toggleEditorPanelOpened', () => {
-		it( 'toggles panels open and closed', () => {
-			// This will open it, since the default is closed.
-			registry
-				.dispatch( editPostStore )
-				.toggleEditorPanelOpened( 'control-panel' );
-
-			expect(
-				registry
-					.select( editPostStore )
-					.isEditorPanelOpened( 'control-panel' )
-			).toBe( true );
-
-			expect(
-				registry.select( editPostStore ).getPreference( 'panels' )
-			).toEqual( {
-				'control-panel': {
-					opened: true,
-				},
-			} );
-
-			// Close it.
-			registry
-				.dispatch( editPostStore )
-				.toggleEditorPanelOpened( 'control-panel' );
-
-			expect(
-				registry
-					.select( editPostStore )
-					.isEditorPanelOpened( 'control-panel' )
-			).toBe( false );
-
-			expect(
-				registry.select( editPostStore ).getPreference( 'panels' )
-			).toEqual( {} );
 		} );
 	} );
 
@@ -302,6 +217,9 @@ describe( 'actions', () => {
 				'core/paragraph': 'fancy',
 				'core/quote': 'posh',
 			} );
+
+			// Expect a deprecation message for `getPreference`.
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'removes a preferred style variation for a block when a style name is omitted', () => {
@@ -331,6 +249,42 @@ describe( 'actions', () => {
 			).toEqual( {
 				'core/quote': 'posh',
 			} );
+		} );
+	} );
+
+	describe( 'toggleDistractionFree', () => {
+		it( 'should properly update settings to prevent layout corruption when enabling distraction free mode', () => {
+			// Enable everything that shouldn't be enabled in distraction free mode.
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'fixedToolbar', true );
+			registry.dispatch( editorStore ).setIsListViewOpened( true );
+			registry
+				.dispatch( editPostStore )
+				.openGeneralSidebar( 'edit-post/block' );
+			// Initial state is falsy.
+			registry.dispatch( editPostStore ).toggleDistractionFree();
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'fixedToolbar' )
+			).toBe( true );
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
+				false
+			);
+			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
+				false
+			);
+			expect(
+				registry
+					.select( interfaceStore )
+					.getActiveComplementaryArea( editPostStore.name )
+			).toBeNull();
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'distractionFree' )
+			).toBe( true );
 		} );
 	} );
 } );

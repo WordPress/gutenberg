@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as viewportStore } from '@wordpress/viewport';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -27,10 +28,12 @@ function ComplementaryAreaSlot( { scope, ...props } ) {
 	return <Slot name={ `ComplementaryArea/${ scope }` } { ...props } />;
 }
 
-function ComplementaryAreaFill( { scope, children, className } ) {
+function ComplementaryAreaFill( { scope, children, className, id } ) {
 	return (
 		<Fill name={ `ComplementaryArea/${ scope }` }>
-			<div className={ className }>{ children }</div>
+			<div id={ id } className={ className }>
+				{ children }
+			</div>
 		</Fill>
 	);
 }
@@ -79,7 +82,15 @@ function useAdjustComplementaryListener(
 		if ( isSmall !== previousIsSmall.current ) {
 			previousIsSmall.current = isSmall;
 		}
-	}, [ isActive, isSmall, scope, identifier, activeArea ] );
+	}, [
+		isActive,
+		isSmall,
+		scope,
+		identifier,
+		activeArea,
+		disableComplementaryArea,
+		enableComplementaryArea,
+	] );
 }
 
 function ComplementaryArea( {
@@ -98,31 +109,38 @@ function ComplementaryArea( {
 	title,
 	toggleShortcut,
 	isActiveByDefault,
-	showIconLabels = false,
 } ) {
-	const { isLoading, isActive, isPinned, activeArea, isSmall, isLarge } =
-		useSelect(
-			( select ) => {
-				const {
-					getActiveComplementaryArea,
-					isComplementaryAreaLoading,
-					isItemPinned,
-				} = select( interfaceStore );
+	const {
+		isLoading,
+		isActive,
+		isPinned,
+		activeArea,
+		isSmall,
+		isLarge,
+		showIconLabels,
+	} = useSelect(
+		( select ) => {
+			const {
+				getActiveComplementaryArea,
+				isComplementaryAreaLoading,
+				isItemPinned,
+			} = select( interfaceStore );
+			const { get } = select( preferencesStore );
 
-				const _activeArea = getActiveComplementaryArea( scope );
+			const _activeArea = getActiveComplementaryArea( scope );
 
-				return {
-					isLoading: isComplementaryAreaLoading( scope ),
-					isActive: _activeArea === identifier,
-					isPinned: isItemPinned( scope, identifier ),
-					activeArea: _activeArea,
-					isSmall:
-						select( viewportStore ).isViewportMatch( '< medium' ),
-					isLarge: select( viewportStore ).isViewportMatch( 'large' ),
-				};
-			},
-			[ identifier, scope ]
-		);
+			return {
+				isLoading: isComplementaryAreaLoading( scope ),
+				isActive: _activeArea === identifier,
+				isPinned: isItemPinned( scope, identifier ),
+				activeArea: _activeArea,
+				isSmall: select( viewportStore ).isViewportMatch( '< medium' ),
+				isLarge: select( viewportStore ).isViewportMatch( 'large' ),
+				showIconLabels: get( 'core', 'showIconLabels' ),
+			};
+		},
+		[ identifier, scope ]
+	);
 	useAdjustComplementaryListener(
 		scope,
 		identifier,
@@ -145,7 +163,15 @@ function ComplementaryArea( {
 		} else if ( activeArea === undefined && isSmall ) {
 			disableComplementaryArea( scope, identifier );
 		}
-	}, [ activeArea, isActiveByDefault, scope, identifier, isSmall ] );
+	}, [
+		activeArea,
+		isActiveByDefault,
+		scope,
+		identifier,
+		isSmall,
+		enableComplementaryArea,
+		disableComplementaryArea,
+	] );
 
 	return (
 		<>
@@ -164,6 +190,7 @@ function ComplementaryArea( {
 							icon={ showIconLabels ? check : icon }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
+							size="compact"
 						/>
 					) }
 				</PinnedItems>
@@ -184,6 +211,7 @@ function ComplementaryArea( {
 						className
 					) }
 					scope={ scope }
+					id={ identifier.replace( '/', ':' ) }
 				>
 					<ComplementaryAreaHeader
 						className={ headerClassName }

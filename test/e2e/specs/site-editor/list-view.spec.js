@@ -18,7 +18,32 @@ test.describe( 'Site Editor List View', () => {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
 		} );
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
+	} );
+
+	test( 'should open by default when preference is enabled', async ( {
+		page,
+		editor,
+	} ) => {
+		await expect(
+			page.locator( 'role=region[name="List View"i]' )
+		).toBeHidden();
+
+		// Turn on block list view by default.
+		await editor.setPreferences( 'core', {
+			showListViewByDefault: true,
+		} );
+
+		await page.reload();
+
+		await expect(
+			page.locator( 'role=region[name="List View"i]' )
+		).toBeVisible();
+
+		// The preferences cleanup.
+		await editor.setPreferences( 'core', {
+			showListViewByDefault: false,
+		} );
 	} );
 
 	// If list view sidebar is open and focus is not inside the sidebar, move
@@ -77,13 +102,12 @@ test.describe( 'Site Editor List View', () => {
 		// Since focus is now inside the list view, the shortcut should close
 		// the sidebar.
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).not.toBeVisible();
+		await expect( listView ).toBeHidden();
 
-		// Focus should now be on the Open Navigation button since that is
-		// where we opened the list view sidebar. This is not a perfect
-		// solution, but current functionality prevents a better way at
-		// the moment.
-		await expect( openNavigationButton ).toBeFocused();
+		// Focus should now be on the list view toggle button.
+		await expect(
+			page.getByRole( 'button', { name: 'List View' } )
+		).toBeFocused();
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
@@ -94,6 +118,7 @@ test.describe( 'Site Editor List View', () => {
 		// out of range of the sidebar region. Must shift+tab 1 time to reach
 		// close button before list view area.
 		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect(
 			page
 				.getByRole( 'region', { name: 'List View' } )
@@ -102,7 +127,9 @@ test.describe( 'Site Editor List View', () => {
 				} )
 		).toBeFocused();
 		await pageUtils.pressKeys( 'access+o' );
-		await expect( listView ).not.toBeVisible();
-		await expect( openNavigationButton ).toBeFocused();
+		await expect( listView ).toBeHidden();
+		await expect(
+			page.getByRole( 'button', { name: 'List View' } )
+		).toBeFocused();
 	} );
 } );

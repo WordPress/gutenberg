@@ -2,6 +2,44 @@
 
 ## Unreleased
 
+## 9.39.0 (2023-12-13)
+
+## 9.38.0 (2023-11-29)
+
+## 9.37.0 (2023-11-16)
+
+### New features
+
+- Add new `funnel` icon.
+
+## 9.36.0 (2023-11-02)
+
+## 9.35.0 (2023-10-18)
+
+## 9.34.0 (2023-10-05)
+
+## 9.33.0 (2023-09-20)
+
+### Enhancement
+
+-   `<Icon>` now forwards ref to the underlying child component ([#54492](https://github.com/WordPress/gutenberg/pull/54492)).
+
+## 9.32.0 (2023-08-31)
+
+### Bug Fix
+
+-   Fixed invalid XML namespace on `alignJustify`, `customLink`, `mapMarker`, `postContent` and `title` ([#53955](https://github.com/WordPress/gutenberg/pull/53955)).
+
+## 9.31.0 (2023-08-16)
+
+## 9.30.0 (2023-08-10)
+
+## 9.29.0 (2023-07-20)
+
+## 9.28.0 (2023-07-05)
+
+## 9.27.0 (2023-06-23)
+
 ## 9.26.0 (2023-06-07)
 
 ## 9.25.0 (2023-05-24)

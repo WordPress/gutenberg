@@ -9,7 +9,7 @@ import {
 	getBlockTransformOptions,
 } from 'test/helpers';
 
-const block = 'Reusable block';
+const block = 'Pattern';
 const initialHtml = `
 <!-- wp:block {"ref":130} /-->`;
 

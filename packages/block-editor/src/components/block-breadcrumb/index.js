@@ -18,7 +18,7 @@ import { unlock } from '../../lock-unlock';
  *
  * @param {Object} props               Component props.
  * @param {string} props.rootLabelText Translated label for the root element of the breadcrumb trail.
- * @return {WPElement}                 Block Breadcrumb.
+ * @return {Element}                   Block Breadcrumb.
  */
 function BlockBreadcrumb( { rootLabelText } ) {
 	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
@@ -26,15 +26,11 @@ function BlockBreadcrumb( { rootLabelText } ) {
 		const {
 			getSelectionStart,
 			getSelectedBlockClientId,
-			getBlockParents,
-			getBlockEditingMode,
+			getEnabledBlockParents,
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
-			parents: getBlockParents( selectedBlockClientId ).filter(
-				( parentClientId ) =>
-					getBlockEditingMode( parentClientId ) !== 'disabled'
-			),
+			parents: getEnabledBlockParents( selectedBlockClientId ),
 			clientId: selectedBlockClientId,
 			hasSelection: !! getSelectionStart().clientId,
 		};

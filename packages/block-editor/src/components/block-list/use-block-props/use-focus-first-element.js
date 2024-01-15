@@ -19,38 +19,6 @@ import { store as blockEditorStore } from '../../../store';
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
 /**
- * Returns the initial position if the block needs to be focussed, `undefined`
- * otherwise. The initial position is either 0 (start) or -1 (end).
- *
- * @param {string} clientId Block client ID.
- *
- * @return {number} The initial position, either 0 (start) or -1 (end).
- */
-function useInitialPosition( clientId ) {
-	return useSelect(
-		( select ) => {
-			const {
-				getSelectedBlocksInitialCaretPosition,
-				__unstableGetEditorMode,
-				isBlockSelected,
-			} = select( blockEditorStore );
-
-			if ( ! isBlockSelected( clientId ) ) {
-				return;
-			}
-
-			if ( __unstableGetEditorMode() !== 'edit' ) {
-				return;
-			}
-
-			// If there's no initial position, return 0 to focus the start.
-			return getSelectedBlocksInitialCaretPosition();
-		},
-		[ clientId ]
-	);
-}
-
-/**
  * Transitions focus to the block or inner tabbable when the block becomes
  * selected and an initial position is set.
  *
@@ -58,9 +26,8 @@ function useInitialPosition( clientId ) {
  *
  * @return {RefObject} React ref with the block element.
  */
-export function useFocusFirstElement( clientId ) {
+export function useFocusFirstElement( { clientId, initialPosition } ) {
 	const ref = useRef();
-	const initialPosition = useInitialPosition( clientId );
 	const { isBlockSelected, isMultiSelecting } = useSelect( blockEditorStore );
 
 	useEffect( () => {

@@ -27,6 +27,7 @@ import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import { TaxonomyControls } from './taxonomy-controls';
 import StickyControl from './sticky-control';
+import EnhancedPaginationControl from './enhanced-pagination-control';
 import CreateNewPostLink from './create-new-post-link';
 import { unlock } from '../../../lock-unlock';
 import {
@@ -36,12 +37,14 @@ import {
 	isControlAllowed,
 	useTaxonomies,
 } from '../../utils';
+import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../../../utils/constants';
 
 const { BlockInfo } = unlock( blockEditorPrivateApis );
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, setDisplayLayout } = props;
-	const { query, displayLayout } = attributes;
+	const { attributes, setQuery, setDisplayLayout, setAttributes, clientId } =
+		props;
+	const { query, displayLayout, enhancedPagination } = attributes;
 	const {
 		order,
 		orderBy,
@@ -202,6 +205,11 @@ export default function QueryInspectorControls( props ) {
 								}
 							/>
 						) }
+						<EnhancedPaginationControl
+							enhancedPagination={ enhancedPagination }
+							setAttributes={ setAttributes }
+							clientId={ clientId }
+						/>
 					</PanelBody>
 				</InspectorControls>
 			) }
@@ -219,6 +227,7 @@ export default function QueryInspectorControls( props ) {
 							} );
 							setQuerySearch( '' );
 						} }
+						dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 					>
 						{ showTaxControl && (
 							<ToolsPanelItem

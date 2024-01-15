@@ -1,4 +1,3 @@
-{{#isStaticVariant}}
 /**
  * React hook that is used to mark the block wrapper element.
  * It provides all the necessary props like the class name.
@@ -16,10 +15,27 @@ import { useBlockProps } from '@wordpress/block-editor';
  *
  * @param {Object} props            Properties passed to the function.
  * @param {Object} props.attributes Available block attributes.
- * @return {WPElement} Element to render.
+ *
+ * @return {Element} Element to render.
  */
 export default function save( { attributes } ) {
-	const blockProps = useBlockProps.save();
-	return <div { ...blockProps }>{ attributes.message }</div>;
+	const { fallbackCurrentYear, showStartingYear, startingYear } = attributes;
+	
+	// If there is no fallbackCurrentYear, which could happen if the block
+	// is loaded from a template/pattern, return null. In this case, block
+	// rendering will be handled by the render.php file.
+	if ( ! fallbackCurrentYear ) {
+		return null;
+	}
+	
+	let displayDate;
+
+	// Display the starting year as well if supplied by the user.
+	if ( showStartingYear && startingYear ) {
+		displayDate = startingYear + '–' + fallbackCurrentYear;
+	} else {
+		displayDate = fallbackCurrentYear;
+	}
+
+	return <p { ...useBlockProps.save() }>© { displayDate }</p>;
 }
-{{/isStaticVariant}}

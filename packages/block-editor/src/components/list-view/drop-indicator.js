@@ -159,10 +159,8 @@ export default function ListViewDropIndicator( {
 			return undefined;
 		}
 
-		const ownerDocument = targetElement.ownerDocument;
-
 		return {
-			ownerDocument,
+			contextElement: targetElement,
 			getBoundingClientRect() {
 				const rect = targetElement.getBoundingClientRect();
 				const indent = getDropIndicatorIndent( rect );
@@ -189,9 +187,10 @@ export default function ListViewDropIndicator( {
 					'horizontal'
 				);
 
+				const doc = targetElement.ownerDocument;
 				const windowScroll =
-					scrollContainer === ownerDocument.body ||
-					scrollContainer === ownerDocument.documentElement;
+					scrollContainer === doc.body ||
+					scrollContainer === doc.documentElement;
 
 				// If the scroll container is not the window, offset the left position, if need be.
 				if ( scrollContainer && ! windowScroll ) {

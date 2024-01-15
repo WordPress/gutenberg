@@ -80,7 +80,7 @@ module.exports = ( api ) => {
 				{
 					scopeVariable: 'createElement',
 					scopeVariableFrag: 'Fragment',
-					source: '@wordpress/element',
+					source: 'react',
 					isDefault: false,
 				},
 			],
@@ -89,6 +89,7 @@ module.exports = ( api ) => {
 				{
 					pragma: 'createElement',
 					pragmaFrag: 'Fragment',
+					useSpread: true,
 				},
 			],
 			maybeGetPluginTransformRuntime(),

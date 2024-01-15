@@ -411,6 +411,21 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     func generateHapticFeedback() {
         UISelectionFeedbackGenerator().selectionChanged()
     }
+    
+    @objc
+    func toggleUndoButton(_ isDisabled: Bool) {
+        self.delegate?.gutenbergDidRequestToggleUndoButton(isDisabled)
+    }
+    
+    @objc
+    func toggleRedoButton(_ isDisabled: Bool) {
+        self.delegate?.gutenbergDidRequestToggleRedoButton(isDisabled)
+    }
+
+	@objc
+	func requestConnectionStatus(_ callback: @escaping RCTResponseSenderBlock) {
+		callback([self.delegate?.gutenbergDidRequestConnectionStatus() ?? true])
+	}
 }
 
 // MARK: - RCTBridgeModule delegate
@@ -438,6 +453,9 @@ extension RNReactNativeGutenbergBridge {
         case showNotice
         case mediaSave
         case showEditorHelp
+        case onUndoPressed
+        case onRedoPressed
+        case connectionStatusChange
     }
 
     public override func supportedEvents() -> [String]! {

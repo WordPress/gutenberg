@@ -11,8 +11,15 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 
+const notEmptyString = ( testString ) => testString?.trim()?.length > 0;
+
 export default function RenameModal( { menuTitle, onClose, onSave } ) {
 	const [ editedMenuTitle, setEditedMenuTitle ] = useState( menuTitle );
+
+	const titleHasChanged = editedMenuTitle !== menuTitle;
+
+	const isEditedMenuTitleValid =
+		titleHasChanged && notEmptyString( editedMenuTitle );
 
 	return (
 		<Modal title={ __( 'Rename' ) } onRequestClose={ onClose }>
@@ -20,21 +27,31 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
 				<VStack spacing="3">
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ editedMenuTitle }
 						placeholder={ __( 'Navigation title' ) }
 						onChange={ setEditedMenuTitle }
 					/>
 					<HStack justify="right">
-						<Button variant="tertiary" onClick={ onClose }>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ onClose }
+						>
 							{ __( 'Cancel' ) }
 						</Button>
 
 						<Button
-							disabled={ editedMenuTitle === menuTitle }
+							__next40pxDefaultSize
+							disabled={ ! isEditedMenuTitleValid }
 							variant="primary"
 							type="submit"
 							onClick={ ( e ) => {
 								e.preventDefault();
+
+								if ( ! isEditedMenuTitleValid ) {
+									return;
+								}
 								onSave( { title: editedMenuTitle } );
 
 								// Immediate close avoids ability to hit save multiple times.

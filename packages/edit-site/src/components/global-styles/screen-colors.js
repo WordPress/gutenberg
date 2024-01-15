@@ -10,7 +10,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import ScreenHeader from './header';
 import Palette from './palette';
-import BlockPreviewPanel from './block-preview-panel';
 import { unlock } from '../../lock-unlock';
 
 const {
@@ -38,9 +37,6 @@ function ScreenColors() {
 					'Manage palettes and the default color of different global elements on the site.'
 				) }
 			/>
-
-			<BlockPreviewPanel />
-
 			<div className="edit-site-global-styles-screen-colors">
 				<VStack spacing={ 10 }>
 					<Palette />

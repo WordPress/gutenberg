@@ -356,8 +356,10 @@ class RCTAztecView: Aztec.TextView {
                 
         // Replace occurrences of the obj symbol ("\u{FFFC}")
         textView.text = textView.text?.replacingOccurrences(of: "\u{FFFC}", with: "")
-                
-        if let newPosition = textView.position(from: textView.beginningOfDocument, offset: originalPosition) {
+        
+        // Detect if cursor is off-by-one and correct, if so
+        let newPositionOffset = originalPosition > 0 ? originalPosition - 1 : originalPosition
+        if let newPosition = textView.position(from: textView.beginningOfDocument, offset: newPositionOffset) {
             // Move the cursor to the correct, new position following dictation
             textView.selectedTextRange = textView.textRange(from: newPosition, to: newPosition)
         }
@@ -648,13 +650,9 @@ class RCTAztecView: Aztec.TextView {
     ///
     private func applyFontConstraints(to baseFont: UIFont) -> UIFont {
         let oldDescriptor = baseFont.fontDescriptor
-        let newFontSize: CGFloat
+        let fontMetrics = UIFontMetrics(forTextStyle: .body)
 
-        if let fontSize = fontSize {
-            newFontSize = fontSize
-        } else {
-            newFontSize = baseFont.pointSize
-        }
+        let newFontSize = fontMetrics.scaledValue(for: fontSize ?? baseFont.pointSize)
 
         var newTraits = oldDescriptor.symbolicTraits
 
@@ -687,7 +685,13 @@ class RCTAztecView: Aztec.TextView {
     ///
     private func refreshFont() {
         let newFont = applyFontConstraints(to: defaultFont)
+        font = newFont
+        placeholderLabel.font = newFont
         defaultFont = newFont
+
+        if textStorage.length > 0 {
+            typingAttributes[NSAttributedString.Key.font] = newFont
+        }
     }
 
     /// This method refreshes the font for the palceholder field and typing attributes.

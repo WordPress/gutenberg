@@ -1,4 +1,12 @@
 <?php
+/**
+ * Unit tests covering Gutenberg_REST_Global_Styles_Revisions_Controller_6_4 functionality.
+ *
+ * Note: the bulk of the tests covering this class and its methods have been ported to Core as of 6.3.
+ *
+ * @package WordPress
+ * @subpackage REST API
+ */
 
 class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
@@ -9,22 +17,17 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 	/**
 	 * @var int
 	 */
-	protected static $second_admin_id;
-
-	/**
-	 * @var int
-	 */
-	protected static $author_id;
-
-	/**
-	 * @var int
-	 */
 	protected static $global_styles_id;
 
-	public function set_up() {
-		parent::set_up();
-		switch_theme( 'emptytheme' );
-	}
+	/**
+	 * @var array
+	 */
+	private $revision_1;
+
+	/**
+	 * @var int
+	 */
+	private $revision_1_id;
 
 	/**
 	 * Create fake data before our tests run.
@@ -32,34 +35,118 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetupBeforeClass( $factory ) {
-		self::$admin_id        = $factory->user->create(
+		self::$admin_id = $factory->user->create(
 			array(
 				'role' => 'administrator',
 			)
 		);
-		self::$second_admin_id = $factory->user->create(
-			array(
-				'role' => 'administrator',
-			)
-		);
-		self::$author_id       = $factory->user->create(
-			array(
-				'role' => 'author',
-			)
-		);
+
+		wp_set_current_user( self::$admin_id );
 		// This creates the global styles for the current theme.
 		self::$global_styles_id = $factory->post->create(
 			array(
-				'post_content' => '{"version": ' . WP_Theme_JSON_Gutenberg::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
+				'post_content' => '{"version": ' . WP_Theme_JSON::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
 				'post_status'  => 'publish',
 				'post_title'   => __( 'Custom Styles', 'default' ),
 				'post_type'    => 'wp_global_styles',
-				'post_name'    => 'wp-global-styles-emptytheme-revisions',
+				'post_name'    => 'wp-global-styles-tt1-blocks-revisions',
 				'tax_input'    => array(
-					'wp_theme' => 'emptytheme',
+					'wp_theme' => 'tt1-blocks',
 				),
 			)
 		);
+
+		// Update post to create a new revisions.
+		$new_styles_post = array(
+			'ID'           => self::$global_styles_id,
+			'post_content' => wp_json_encode(
+				array(
+					'version'                     => WP_Theme_JSON::LATEST_SCHEMA,
+					'isGlobalStylesUserThemeJSON' => true,
+					'styles'                      => array(
+						'color' => array(
+							'background' => 'hotpink',
+						),
+					),
+					'settings'                    => array(
+						'color' => array(
+							'palette' => array(
+								'custom' => array(
+									array(
+										'name'  => 'Ghost',
+										'slug'  => 'ghost',
+										'color' => 'ghost',
+									),
+								),
+							),
+						),
+					),
+				)
+			),
+		);
+
+		wp_update_post( $new_styles_post, true, true );
+
+		$new_styles_post = array(
+			'ID'           => self::$global_styles_id,
+			'post_content' => wp_json_encode(
+				array(
+					'version'                     => WP_Theme_JSON::LATEST_SCHEMA,
+					'isGlobalStylesUserThemeJSON' => true,
+					'styles'                      => array(
+						'color' => array(
+							'background' => 'lemonchiffon',
+						),
+					),
+					'settings'                    => array(
+						'color' => array(
+							'palette' => array(
+								'custom' => array(
+									array(
+										'name'  => 'Gwanda',
+										'slug'  => 'gwanda',
+										'color' => 'gwanda',
+									),
+								),
+							),
+						),
+					),
+				)
+			),
+		);
+
+		wp_update_post( $new_styles_post, true, true );
+
+		$new_styles_post = array(
+			'ID'           => self::$global_styles_id,
+			'post_content' => wp_json_encode(
+				array(
+					'version'                     => WP_Theme_JSON::LATEST_SCHEMA,
+					'isGlobalStylesUserThemeJSON' => true,
+					'styles'                      => array(
+						'color' => array(
+							'background' => 'chocolate',
+						),
+					),
+					'settings'                    => array(
+						'color' => array(
+							'palette' => array(
+								'custom' => array(
+									array(
+										'name'  => 'Stacy',
+										'slug'  => 'stacy',
+										'color' => 'stacy',
+									),
+								),
+							),
+						),
+					),
+				)
+			),
+		);
+
+		wp_update_post( $new_styles_post, true, true );
+		wp_set_current_user( 0 );
 	}
 
 	/**
@@ -67,140 +154,122 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_Test extends WP_Test_RES
 	 */
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$admin_id );
-		self::delete_user( self::$second_admin_id );
-		self::delete_user( self::$author_id );
 	}
 
 	/**
-	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller::register_routes
+	 * Sets up before tests.
+	 */
+	public function set_up() {
+		parent::set_up();
+		switch_theme( 'emptytheme' );
+		$revisions           = wp_get_post_revisions( self::$global_styles_id );
+		$this->revision_1    = array_pop( $revisions );
+		$this->revision_1_id = $this->revision_1->ID;
+
+		/*
+		 * For some reason the `rest_api_init` doesn't run early enough to ensure an overwritten `get_item_schema()`
+		 * is used. So we manually call it here.
+		 * See: https://github.com/WordPress/gutenberg/pull/52370#issuecomment-1643331655.
+		 */
+		$global_styles_revisions_controller = new Gutenberg_REST_Global_Styles_Revisions_Controller_6_5();
+		$global_styles_revisions_controller->register_routes();
+	}
+
+	/**
+	 * @ticket 58524
+	 *
+	 * @covers WP_REST_Global_Styles_Controller::register_routes
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayHasKey(
-			'/wp/v2/global-styles/(?P<parent>[\d]+)/revisions',
+			'/wp/v2/global-styles/(?P<parent>[\d]+)/revisions/(?P<id>[\d]+)',
 			$routes,
-			'Global style revisions based on the given parentID route does not exist'
+			'Single global style revisions based on the given parentID and revision ID route does not exist.'
 		);
 	}
 
 	/**
-	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller::get_items
+	 * Utility function to check the items in WP_REST_Global_Styles_Controller::get_items
+	 * against the expected values.
+	 *
+	 * @ticket 58524
 	 */
-	public function test_get_items() {
-		wp_set_current_user( self::$admin_id );
-		// Update post to create a new revision.
-		$config          = array(
-			'version'                     => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-			'isGlobalStylesUserThemeJSON' => true,
-			'styles'                      => array(
-				'color' => array(
-					'background' => 'hotpink',
-				),
-			),
-		);
-		$new_styles_post = array(
-			'ID'           => self::$global_styles_id,
-			'post_content' => wp_json_encode( $config ),
-		);
-
-		wp_update_post( $new_styles_post, true, false );
-
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
-
-		$this->assertCount( 1, $data, 'Check that only one revision exists' );
-		$this->assertArrayHasKey( 'id', $data[0], 'Check that an id key exists' );
-		$this->assertEquals( self::$global_styles_id, $data[0]['parent'], 'Check that an id for the parent exists' );
-
-		// Dates.
-		$this->assertArrayHasKey( 'date', $data[0], 'Check that an date key exists' );
-		$this->assertArrayHasKey( 'date_gmt', $data[0], 'Check that an date_gmt key exists' );
-		$this->assertArrayHasKey( 'modified', $data[0], 'Check that an modified key exists' );
-		$this->assertArrayHasKey( 'modified_gmt', $data[0], 'Check that an modified_gmt key exists' );
-		$this->assertArrayHasKey( 'modified_gmt', $data[0], 'Check that an modified_gmt key exists' );
-
-		// Author information.
-		$this->assertEquals( self::$admin_id, $data[0]['author'], 'Check that author id returns expected value' );
+	protected function check_get_revision_response( $response_revision_item, $revision_expected_item ) {
+		$this->assertSame( (int) $revision_expected_item->post_author, $response_revision_item['author'], 'Check that the revision item `author` exists.' );
+		$this->assertSame( mysql_to_rfc3339( $revision_expected_item->post_date ), $response_revision_item['date'], 'Check that the revision item `date` exists.' );
+		$this->assertSame( mysql_to_rfc3339( $revision_expected_item->post_date_gmt ), $response_revision_item['date_gmt'], 'Check that the revision item `date_gmt` exists.' );
+		$this->assertSame( mysql_to_rfc3339( $revision_expected_item->post_modified ), $response_revision_item['modified'], 'Check that the revision item `modified` exists.' );
+		$this->assertSame( mysql_to_rfc3339( $revision_expected_item->post_modified_gmt ), $response_revision_item['modified_gmt'], 'Check that the revision item `modified_gmt` exists.' );
+		$this->assertSame( $revision_expected_item->post_parent, $response_revision_item['parent'], 'Check that an id for the parent exists.' );
 
 		// Global styles.
+		$config = ( new WP_Theme_JSON_Gutenberg( json_decode( $revision_expected_item->post_content, true ), 'custom' ) )->get_raw_data();
 		$this->assertEquals(
-			$data[0]['settings'],
-			new stdClass(),
+			$config['settings'],
+			$response_revision_item['settings'],
 			'Check that the revision settings exist in the response.'
 		);
 		$this->assertEquals(
-			$data[0]['styles'],
-			array(
-				'color' => array(
-					'background' => 'hotpink',
-				),
-			),
-			'Check that the revision styles match the last updated styles.'
+			$config['styles'],
+			$response_revision_item['styles'],
+			'Check that the revision styles match the updated styles.'
 		);
+	}
 
-		// Checks that the revisions are returned for all eligible users.
-		wp_set_current_user( self::$second_admin_id );
-		$config['styles']['color']['background'] = 'blue';
-		$new_styles_post                         = array(
-			'ID'           => self::$global_styles_id,
-			'post_content' => wp_json_encode( $config ),
-		);
+	/**
+	 * @ticket 59810
+	 *
+	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller_6_4::get_item
+	 */
+	public function test_get_item() {
+		wp_set_current_user( self::$admin_id );
 
-		wp_update_post( $new_styles_post, true, false );
-
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions/' . $this->revision_1_id );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertCount( 2, $data, 'Check that two revisions exists' );
-		$this->assertEquals( self::$second_admin_id, $data[0]['author'], 'Check that second author id returns expected value' );
-		$this->assertEquals( self::$admin_id, $data[1]['author'], 'Check that second author id returns expected value' );
+		$this->assertSame( 200, $response->get_status(), 'Response status is 200.' );
+		$this->check_get_revision_response( $data, $this->revision_1 );
 	}
 
 	/**
-	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller::get_item_schema
+	 * @ticket 59810
+	 *
+	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller_6_4::get_revision
+	 */
+	public function test_get_item_invalid_revision_id_should_error() {
+		wp_set_current_user( self::$admin_id );
+
+		$expected_error  = 'rest_post_invalid_id';
+		$expected_status = 404;
+		$request         = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions/20000001' );
+		$response        = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( $expected_error, $response, $expected_status );
+	}
+
+	/**
+	 * @doesNotPerformAssertions
+	 */
+	public function test_get_items() {
+		// Unit tests have been more to WordPress Core for test_get_items().
+		// No unique compat unit tests exist.
+	}
+
+	/**
+	 * @doesNotPerformAssertions
 	 */
 	public function test_get_item_schema() {
-		$request    = new WP_REST_Request( 'OPTIONS', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' );
-		$response   = rest_get_server()->dispatch( $request );
-		$data       = $response->get_data();
-		$properties = $data['schema']['properties'];
-		$this->assertCount( 9, $properties, 'Schema properties array does not have exactly 9 elements' );
-		$this->assertArrayHasKey( 'id', $properties, 'Schema properties array does not have "id" key' );
-		$this->assertArrayHasKey( 'styles', $properties, 'Schema properties array does not have "styles" key' );
-		$this->assertArrayHasKey( 'settings', $properties, 'Schema properties array does not have "settings" key' );
-		$this->assertArrayHasKey( 'parent', $properties, 'Schema properties array does not have "parent" key' );
-		$this->assertArrayHasKey( 'author', $properties, 'Schema properties array does not have "author" key' );
-		$this->assertArrayHasKey( 'date', $properties, 'Schema properties array does not have "date" key' );
-		$this->assertArrayHasKey( 'date_gmt', $properties, 'Schema properties array does not have "date_gmt" key' );
-		$this->assertArrayHasKey( 'modified', $properties, 'Schema properties array does not have "modified" key' );
-		$this->assertArrayHasKey( 'modified_gmt', $properties, 'Schema properties array does not have "modified_gmt" key' );
-	}
-
-	/**
-	 * @covers Gutenberg_REST_Global_Styles_Revisions_Controller::get_item_permissions_check
-	 */
-	public function test_get_item_permissions_check() {
-		wp_set_current_user( self::$author_id );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertErrorResponse( 'rest_cannot_view', $response, 403 );
+		// Unit tests have been more to WordPress Core for test_get_item_schema().
+		// No unique compat unit tests exist.
 	}
 
 	/**
 	 * @doesNotPerformAssertions
 	 */
 	public function test_context_param() {
-		// Controller does not use get_context_param().
-	}
-
-	/**
-	 * @doesNotPerformAssertions
-	 */
-	public function test_get_item() {
-		// Controller does not implement get_item().
+		// Controller does not implement test_context_param().
 	}
 
 	/**

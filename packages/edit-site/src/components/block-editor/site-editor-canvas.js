@@ -5,21 +5,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
-import {
-	BlockList,
-	BlockTools,
-	__unstableUseClipboardHandler as useClipboardHandler,
-	__unstableUseTypingObserver as useTypingObserver,
-	BlockEditorKeyboardShortcuts,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import {
-	useMergeRefs,
-	useViewportMatch,
-	useResizeObserver,
-} from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
+import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */
@@ -27,22 +15,16 @@ import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
 import EditorCanvasContainer from '../editor-canvas-container';
-import { usePageContentFocusNotifications } from '../page-content-focus';
 import useSiteEditorSettings from './use-site-editor-settings';
 import { store as editSiteStore } from '../../store';
-import { FOCUSABLE_ENTITIES } from './constants';
+import {
+	FOCUSABLE_ENTITIES,
+	NAVIGATION_POST_TYPE,
+} from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 
-const LAYOUT = {
-	type: 'default',
-	// At the root level of the site editor, no alignments should be allowed.
-	alignments: [],
-};
-
 export default function SiteEditorCanvas() {
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-
-	const { isFocusMode, isViewMode } = useSelect( ( select ) => {
+	const { templateType, isFocusMode, isViewMode } = useSelect( ( select ) => {
 		const { getEditedPostType, getCanvasMode } = unlock(
 			select( editSiteStore )
 		);
@@ -50,6 +32,7 @@ export default function SiteEditorCanvas() {
 		const _templateType = getEditedPostType();
 
 		return {
+			templateType: _templateType,
 			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
 			isViewMode: getCanvasMode() === 'view',
 		};
@@ -59,16 +42,6 @@ export default function SiteEditorCanvas() {
 
 	const settings = useSiteEditorSettings();
 
-	const { hasBlocks } = useSelect( ( select ) => {
-		const { getBlockCount } = select( blockEditorStore );
-
-		const blocks = getBlockCount();
-
-		return {
-			hasBlocks: !! blocks,
-		};
-	}, [] );
-
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const enableResizing =
 		isFocusMode &&
@@ -76,16 +49,9 @@ export default function SiteEditorCanvas() {
 		// Disable resizing in mobile viewport.
 		! isMobileViewport;
 
-	const contentRef = useRef();
-	const mergedRefs = useMergeRefs( [
-		contentRef,
-		useClipboardHandler(),
-		useTypingObserver(),
-		usePageContentFocusNotifications(),
-	] );
-
-	// Hide the appender when in view mode (i.e. not editing).
-	const showBlockAppender = hasBlocks || isViewMode ? false : undefined;
+	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
+	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
+	const forceFullHeight = isNavigationFocusMode;
 
 	return (
 		<EditorCanvasContainer.Slot>
@@ -95,40 +61,29 @@ export default function SiteEditorCanvas() {
 						{ editorCanvasView }
 					</div>
 				) : (
-					<BlockTools
+					<div
 						className={ classnames( 'edit-site-visual-editor', {
 							'is-focus-mode': isFocusMode || !! editorCanvasView,
 							'is-view-mode': isViewMode,
 						} ) }
-						__unstableContentRef={ contentRef }
-						onClick={ ( event ) => {
-							// Clear selected block when clicking on the gray background.
-							if ( event.target === event.currentTarget ) {
-								clearSelectedBlock();
-							}
-						} }
 					>
-						<BlockEditorKeyboardShortcuts.Register />
 						<BackButton />
 						<ResizableEditor
 							enableResizing={ enableResizing }
-							height={ sizes.height ?? '100%' }
+							height={
+								sizes.height && ! forceFullHeight
+									? sizes.height
+									: '100%'
+							}
 						>
 							<EditorCanvas
 								enableResizing={ enableResizing }
 								settings={ settings }
-								contentRef={ mergedRefs }
-								readonly={ isViewMode }
 							>
 								{ resizeObserver }
-								<BlockList
-									className="edit-site-block-editor__block-list wp-site-blocks"
-									layout={ LAYOUT }
-									renderAppender={ showBlockAppender }
-								/>
 							</EditorCanvas>
 						</ResizableEditor>
-					</BlockTools>
+					</div>
 				)
 			}
 		</EditorCanvasContainer.Slot>

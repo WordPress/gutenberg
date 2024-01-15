@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import type { FormToggleProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 export const noop = () => {};
 

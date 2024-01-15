@@ -12,6 +12,8 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -32,6 +34,7 @@ function getEditorCanvasContainerTitle( view ) {
 		case 'style-book':
 			return __( 'Style Book' );
 		case 'global-styles-revisions':
+		case 'global-styles-revisions:style-book':
 			return __( 'Global styles revisions' );
 		default:
 			return '';
@@ -53,15 +56,30 @@ function EditorCanvasContainer( {
 	onClose,
 	enableResizing = false,
 } ) {
-	const editorCanvasContainerView = useSelect(
-		( select ) =>
-			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
+	const { editorCanvasContainerView, showListViewByDefault } = useSelect(
+		( select ) => {
+			const _editorCanvasContainerView = unlock(
+				select( editSiteStore )
+			).getEditorCanvasContainerView();
+
+			const _showListViewByDefault = select( preferencesStore ).get(
+				'core',
+				'showListViewByDefault'
+			);
+
+			return {
+				editorCanvasContainerView: _editorCanvasContainerView,
+				showListViewByDefault: _showListViewByDefault,
+			};
+		},
 		[]
 	);
 	const [ isClosed, setIsClosed ] = useState( false );
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
+	const { setIsListViewOpened } = useDispatch( editorStore );
+
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const sectionFocusReturnRef = useFocusReturn();
 	const title = useMemo(
@@ -70,11 +88,12 @@ function EditorCanvasContainer( {
 	);
 
 	function onCloseContainer() {
+		setIsListViewOpened( showListViewByDefault );
+		setEditorCanvasContainerView( undefined );
+		setIsClosed( true );
 		if ( typeof onClose === 'function' ) {
 			onClose();
 		}
-		setEditorCanvasContainerView( undefined );
-		setIsClosed( true );
 	}
 
 	function closeOnEscape( event ) {

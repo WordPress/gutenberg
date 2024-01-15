@@ -1,13 +1,20 @@
 /**
  * External dependencies
  */
-import { Command } from 'cmdk';
+import { Command, useCommandState } from 'cmdk';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useRef,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	Modal,
@@ -18,7 +25,7 @@ import {
 	store as keyboardShortcutsStore,
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
-import { Icon } from '@wordpress/icons';
+import { Icon, search as inputIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -43,12 +50,18 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 						key={ command.name }
 						value={ command.searchLabel ?? command.label }
 						onSelect={ () => command.callback( { close } ) }
+						id={ command.name }
 					>
 						<HStack
 							alignment="left"
-							className="commands-command-menu__item"
+							className={ classnames(
+								'commands-command-menu__item',
+								{
+									'has-icon': command.icon,
+								}
+							) }
 						>
-							<Icon icon={ command.icon } />
+							{ command.icon && <Icon icon={ command.icon } /> }
 							<span>
 								<TextHighlight
 									text={ command.label }
@@ -112,12 +125,15 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 					key={ command.name }
 					value={ command.searchLabel ?? command.label }
 					onSelect={ () => command.callback( { close } ) }
+					id={ command.name }
 				>
 					<HStack
 						alignment="left"
-						className="commands-command-menu__item"
+						className={ classnames( 'commands-command-menu__item', {
+							'has-icon': command.icon,
+						} ) }
 					>
-						<Icon icon={ command.icon } />
+						{ command.icon && <Icon icon={ command.icon } /> }
 						<span>
 							<TextHighlight
 								text={ command.label }
@@ -140,6 +156,36 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 	);
 }
 
+function CommandInput( { isOpen, search, setSearch } ) {
+	const commandMenuInput = useRef();
+	const _value = useCommandState( ( state ) => state.value );
+	const selectedItemId = useMemo( () => {
+		const item = document.querySelector(
+			`[cmdk-item=""][data-value="${ _value }"]`
+		);
+		return item?.getAttribute( 'id' );
+	}, [ _value ] );
+	useEffect( () => {
+		// Focus the command palette input when mounting the modal.
+		if ( isOpen ) {
+			commandMenuInput.current.focus();
+		}
+	}, [ isOpen ] );
+	return (
+		<Command.Input
+			ref={ commandMenuInput }
+			value={ search }
+			onValueChange={ setSearch }
+			placeholder={ __( 'Search for commands' ) }
+			aria-activedescendant={ selectedItemId }
+			icon={ search }
+		/>
+	);
+}
+
+/**
+ * @ignore
+ */
 export function CommandMenu() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const [ search, setSearch ] = useState( '' );
@@ -149,13 +195,12 @@ export function CommandMenu() {
 	);
 	const { open, close } = useDispatch( commandsStore );
 	const [ loaders, setLoaders ] = useState( {} );
-	const commandMenuInput = useRef();
 
 	useEffect( () => {
 		registerShortcut( {
 			name: 'core/commands',
 			category: 'global',
-			description: __( 'Open the global command menu' ),
+			description: __( 'Open the command palette.' ),
 			keyCombination: {
 				modifier: 'primary',
 				character: 'k',
@@ -165,7 +210,11 @@ export function CommandMenu() {
 
 	useShortcut(
 		'core/commands',
+		/** @type {import('react').KeyboardEventHandler} */
 		( event ) => {
+			// Bails to avoid obscuring the effect of the preceding handler(s).
+			if ( event.defaultPrevented ) return;
+
 			event.preventDefault();
 			if ( isOpen ) {
 				close();
@@ -191,16 +240,23 @@ export function CommandMenu() {
 		close();
 	};
 
-	useEffect( () => {
-		// Focus the command menu input when mounting the modal.
-		if ( isOpen ) {
-			commandMenuInput.current.focus();
-		}
-	}, [ isOpen ] );
-
 	if ( ! isOpen ) {
 		return false;
 	}
+
+	const onKeyDown = ( event ) => {
+		if (
+			// Ignore keydowns from IMEs
+			event.nativeEvent.isComposing ||
+			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
+			// is `isComposing=false`, even though it's technically still part of the composition.
+			// These can only be detected by keyCode.
+			event.keyCode === 229
+		) {
+			event.preventDefault();
+		}
+	};
+
 	const isLoading = Object.values( loaders ).some( Boolean );
 
 	return (
@@ -211,13 +267,16 @@ export function CommandMenu() {
 			__experimentalHideHeader
 		>
 			<div className="commands-command-menu__container">
-				<Command label={ __( 'Global Command Menu' ) }>
+				<Command
+					label={ __( 'Command palette' ) }
+					onKeyDown={ onKeyDown }
+				>
 					<div className="commands-command-menu__header">
-						<Command.Input
-							ref={ commandMenuInput }
-							value={ search }
-							onValueChange={ setSearch }
-							placeholder={ __( 'Type a command or search' ) }
+						<Icon icon={ inputIcon } />
+						<CommandInput
+							search={ search }
+							setSearch={ setSearch }
+							isOpen={ isOpen }
 						/>
 					</div>
 					<Command.List>

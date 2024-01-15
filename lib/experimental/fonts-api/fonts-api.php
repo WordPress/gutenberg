@@ -26,14 +26,7 @@ if ( ! function_exists( 'wp_fonts' ) ) {
 			// Initialize.
 			$wp_fonts->register_provider( 'local', 'WP_Fonts_Provider_Local' );
 			add_action( 'wp_head', 'wp_print_fonts', 50 );
-
-			/*
-			 * For themes without a theme.json, admin printing is initiated by the 'admin_print_styles' hook.
-			 * For themes with theme.json, admin printing is initiated by _wp_get_iframed_editor_assets().
-			 */
-			if ( ! wp_theme_has_theme_json() ) {
-				add_action( 'admin_print_styles', 'wp_print_fonts', 50 );
-			}
+			add_action( 'admin_print_styles', 'wp_print_fonts', 50 );
 		}
 
 		return $wp_fonts;
@@ -230,7 +223,7 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
  */
 add_filter(
 	'mime_types',
-	static function( $mime_types ) {
+	static function ( $mime_types ) {
 		// Webfonts formats.
 		$mime_types['woff2'] = 'font/woff2';
 		$mime_types['woff']  = 'font/woff';
@@ -250,3 +243,17 @@ add_filter(
  * during the build. See: tools/webpack/blocks.js.
  */
 add_action( 'init', 'WP_Fonts_Resolver::register_fonts_from_theme_json', 21 );
+
+add_filter(
+	'block_editor_settings_all',
+	static function ( $settings ) {
+		ob_start();
+		wp_print_fonts( true );
+		$styles = ob_get_clean();
+
+		// Add the font-face styles to iframed editor assets.
+		$settings['__unstableResolvedAssets']['styles'] .= $styles;
+		return $settings;
+	},
+	11
+);

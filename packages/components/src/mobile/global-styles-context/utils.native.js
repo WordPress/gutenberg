@@ -3,15 +3,23 @@
  */
 import { camelCase } from 'change-case';
 import { Dimensions } from 'react-native';
+import { colord } from 'colord';
 
 /**
  * WordPress dependencies
  */
 import {
-	getPxFromCssUnit,
-	useSetting,
+	useSettings,
 	useMultipleOriginColorsAndGradients,
+	SETTINGS_DEFAULTS,
 } from '@wordpress/block-editor';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { default as getPxFromCssUnit } from '../utils/get-px-from-css-unit';
+import { useGlobalStyles } from './index.native';
 
 export const BLOCK_STYLE_ATTRIBUTES = [
 	'textColor',
@@ -240,6 +248,20 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 			const customValuesData = customValues ?? JSON.parse( stylesBase );
 			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
 				const path = $2.split( '--' );
+
+				// Supports cases for variables like var(--wp--custom--color--background)
+				if ( path[ 0 ] === 'color' ) {
+					const colorKey = path[ path.length - 1 ];
+					if ( mappedValues?.color ) {
+						const matchedValue = mappedValues.color?.values?.find(
+							( { slug } ) => slug === colorKey
+						);
+						if ( matchedValue ) {
+							return `${ matchedValue?.color }`;
+						}
+					}
+				}
+
 				if (
 					path.reduce(
 						( prev, curr ) => prev && prev[ curr ],
@@ -320,29 +342,38 @@ export function getMappedValues( features, palette ) {
  * @return {Object} normalized sizes.
  */
 function normalizeFontSizes( fontSizes ) {
-	// Adds normalized PX values for each of the different keys.
 	if ( ! fontSizes ) {
 		return fontSizes;
 	}
-	const normalizedFontSizes = {};
-	const dimensions = Dimensions.get( 'window' );
 
-	[ 'default', 'theme', 'custom' ].forEach( ( key ) => {
-		if ( fontSizes[ key ] ) {
-			normalizedFontSizes[ key ] = fontSizes[ key ]?.map(
-				( fontSizeObject ) => {
-					fontSizeObject.sizePx = getPxFromCssUnit(
-						fontSizeObject.size,
-						{
-							width: dimensions.width,
-							height: dimensions.height,
-							fontSize: DEFAULT_FONT_SIZE,
-						}
-					);
-					return fontSizeObject;
-				}
-			);
-		}
+	const dimensions = Dimensions.get( 'window' );
+	const normalizedFontSizes = {};
+	const keysToProcess = [];
+
+	// Check if 'theme' or 'custom' keys exist and add them to keysToProcess array
+	if ( fontSizes?.theme ) {
+		keysToProcess.push( 'theme' );
+	}
+	if ( fontSizes?.custom ) {
+		keysToProcess.push( 'custom' );
+	}
+
+	// If neither 'theme' nor 'custom' exist, add 'default' if it exists
+	if ( keysToProcess.length === 0 && fontSizes?.default ) {
+		keysToProcess.push( 'default' );
+	}
+
+	keysToProcess.forEach( ( key ) => {
+		normalizedFontSizes[ key ] = fontSizes[ key ].map(
+			( fontSizeObject ) => {
+				fontSizeObject.sizePx = getPxFromCssUnit( fontSizeObject.size, {
+					width: dimensions.width,
+					height: dimensions.height,
+					fontSize: DEFAULT_FONT_SIZE,
+				} );
+				return fontSizeObject;
+			}
+		);
 	} );
 
 	return normalizedFontSizes;
@@ -355,13 +386,17 @@ export function useMobileGlobalStylesColors( type = 'colors' ) {
 		[]
 	);
 	// Default editor colors/gradients if it's not a block-based theme.
-	const colorPalette =
+	const defaultPaletteSetting =
 		type === 'colors' ? 'color.palette' : 'color.gradients';
-	const editorDefaultPalette = useSetting( colorPalette );
+	const [ defaultPaletteValue ] = useSettings( defaultPaletteSetting );
+	// In edge cases, the default palette might be undefined. To avoid
+	// exceptions across the editor in that case, we explicitly return
+	// the default editor colors.
+	const defaultPalette = defaultPaletteValue ?? SETTINGS_DEFAULTS.colors;
 
 	return availableThemeColors.length >= 1
 		? availableThemeColors
-		: editorDefaultPalette;
+		: defaultPalette;
 }
 
 export function getColorsAndGradients(
@@ -436,3 +471,40 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 		__experimentalGlobalStylesBaseStyles: globalStyles,
 	};
 }
+
+/**
+ * Determine and apply appropriate color scheme based on global styles or device's light/dark mode.
+ *
+ * The function first attempts to retrieve the editor's background color from global styles.
+ * If the detected background color is light, light styles are applied, and dark styles otherwise.
+ * If no custom background color is defined, styles are applied using the device's dark/light setting.
+ *
+ * @param {Object} baseStyle - An object representing the base (light theme) styles for the editor.
+ * @param {Object} darkStyle - An object representing the additional styles to apply when the editor is in dark mode.
+ *
+ * @return {Object} - The combined style object that should be applied to the editor.
+ */
+export const useEditorColorScheme = ( baseStyle, darkStyle ) => {
+	const globalStyles = useGlobalStyles();
+
+	const deviceColorScheme = usePreferredColorSchemeStyle(
+		baseStyle,
+		darkStyle
+	);
+
+	const editorColors = globalStyles?.baseColors?.color;
+	const editorBackgroundColor = editorColors?.background;
+
+	const isBackgroundColorDefined =
+		typeof editorBackgroundColor !== 'undefined' &&
+		editorBackgroundColor !== 'undefined';
+
+	if ( isBackgroundColorDefined ) {
+		const isEditorBackgroundDark = colord( editorBackgroundColor ).isDark();
+		return isEditorBackgroundDark
+			? { ...baseStyle, ...darkStyle }
+			: baseStyle;
+	}
+
+	return deviceColorScheme;
+};

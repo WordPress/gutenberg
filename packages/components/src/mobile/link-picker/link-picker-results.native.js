@@ -97,7 +97,7 @@ export default function LinkPickerResults( {
 	const onEndReached = () => fetchMoreSuggestions( { query, links } );
 
 	const spinner = ! hasAllSuggestions && meetsThreshold( query ) && (
-		<View style={ styles.spinner }>
+		<View style={ styles.spinner } testID="link-picker-loading">
 			<ActivityIndicator animating />
 		</View>
 	);

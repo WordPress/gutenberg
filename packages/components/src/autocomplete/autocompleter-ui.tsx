@@ -13,7 +13,9 @@ import {
 	useState,
 } from '@wordpress/element';
 import { useAnchor } from '@wordpress/rich-text';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useDebounce, useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -23,7 +25,7 @@ import Button from '../button';
 import Popover from '../popover';
 import { VisuallyHidden } from '../visually-hidden';
 import { createPortal } from 'react-dom';
-import type { AutocompleterUIProps, WPCompleter } from './types';
+import type { AutocompleterUIProps, KeyedOption, WPCompleter } from './types';
 
 export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 	const useItems = autocompleter.useItems
@@ -69,8 +71,48 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 
 		useOnClickOutside( popoverRef, reset );
 
+		const debouncedSpeak = useDebounce( speak, 500 );
+
+		function announce( options: Array< KeyedOption > ) {
+			if ( ! debouncedSpeak ) {
+				return;
+			}
+			if ( !! options.length ) {
+				if ( filterValue ) {
+					debouncedSpeak(
+						sprintf(
+							/* translators: %d: number of results. */
+							_n(
+								'%d result found, use up and down arrow keys to navigate.',
+								'%d results found, use up and down arrow keys to navigate.',
+								options.length
+							),
+							options.length
+						),
+						'assertive'
+					);
+				} else {
+					debouncedSpeak(
+						sprintf(
+							/* translators: %d: number of results. */
+							_n(
+								'Initial %d result loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
+								'Initial %d results loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
+								options.length
+							),
+							options.length
+						),
+						'assertive'
+					);
+				}
+			} else {
+				debouncedSpeak( __( 'No results.' ), 'assertive' );
+			}
+		}
+
 		useLayoutEffect( () => {
 			onChangeOptions( items );
+			announce( items );
 			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
 			// See https://github.com/WordPress/gutenberg/pull/41820
 			// eslint-disable-next-line react-hooks/exhaustive-deps

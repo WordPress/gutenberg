@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Popover } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { PluginArea } from '@wordpress/plugins';
 import { store as noticesStore } from '@wordpress/notices';
@@ -39,7 +38,6 @@ function Layout( { blockEditorSettings } ) {
 			>
 				<Interface blockEditorSettings={ blockEditorSettings } />
 				<Sidebar />
-				<Popover.Slot />
 				<PluginArea onError={ onPluginAreaError } />
 				<UnsavedChangesWarning />
 				<WelcomeGuide />

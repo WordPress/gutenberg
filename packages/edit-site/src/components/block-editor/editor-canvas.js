@@ -6,39 +6,44 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalUseResizeCanvas as useResizeCanvas,
-	__unstableEditorStyles as EditorStyles,
-	__unstableIframe as Iframe,
-	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import {
+	FOCUSABLE_ENTITIES,
+	NAVIGATION_POST_TYPE,
+} from '../../utils/constants';
+
+const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
 
 function EditorCanvas( { enableResizing, settings, children, ...props } ) {
-	const { canvasMode, deviceType, isZoomOutMode } = useSelect(
-		( select ) => ( {
-			deviceType:
-				select( editSiteStore ).__experimentalGetPreviewDeviceType(),
-			isZoomOutMode:
-				select( blockEditorStore ).__unstableGetEditorMode() ===
-				'zoom-out',
-			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
-		} ),
-		[]
-	);
+	const { hasBlocks, isFocusMode, templateType, canvasMode, isZoomOutMode } =
+		useSelect( ( select ) => {
+			const { getBlockCount, __unstableGetEditorMode } =
+				select( blockEditorStore );
+			const { getEditedPostType, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
+			const _templateType = getEditedPostType();
+
+			return {
+				templateType: _templateType,
+				isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
+				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+				canvasMode: getCanvasMode(),
+				hasBlocks: !! getBlockCount(),
+			};
+		}, [] );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const deviceStyles = useResizeCanvas( deviceType );
-	const mouseMoveTypingRef = useMouseMoveTypingReset();
 	const [ isFocused, setIsFocused ] = useState( false );
 
 	useEffect( () => {
@@ -63,35 +68,60 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 		onClick: () => setCanvasMode( 'edit' ),
 		readonly: true,
 	};
+	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
+	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
+	// Hide the appender when:
+	// - In navigation focus mode (should only allow the root Nav block).
+	// - In view mode (i.e. not editing).
+	const showBlockAppender =
+		( isNavigationFocusMode && hasBlocks ) || canvasMode === 'view'
+			? false
+			: undefined;
 
-	return (
-		<Iframe
-			expand={ isZoomOutMode }
-			scale={ ( isZoomOutMode && 0.45 ) || undefined }
-			frameSize={ isZoomOutMode ? 100 : undefined }
-			style={ enableResizing ? {} : deviceStyles }
-			ref={ mouseMoveTypingRef }
-			name="editor-canvas"
-			className={ classnames( 'edit-site-visual-editor__editor-canvas', {
-				'is-focused': isFocused && canvasMode === 'view',
-			} ) }
-			{ ...props }
-			{ ...( canvasMode === 'view' ? viewModeProps : {} ) }
-		>
-			<EditorStyles styles={ settings.styles } />
-			<style>{
+	const styles = useMemo(
+		() => [
+			...settings.styles,
+			{
 				// Forming a "block formatting context" to prevent margin collapsing.
 				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-				`.is-root-container{display:flow-root;${
+
+				css: `.is-root-container{display:flow-root;${
 					// Some themes will have `min-height: 100vh` for the root container,
 					// which isn't a requirement in auto resize mode.
 					enableResizing ? 'min-height:0!important;' : ''
 				}}body{position:relative; ${
-					canvasMode === 'view' ? 'cursor: pointer;' : ''
-				}}}`
-			}</style>
+					canvasMode === 'view'
+						? 'cursor: pointer; min-height: 100vh;'
+						: ''
+				}}}`,
+			},
+		],
+		[ settings.styles, enableResizing, canvasMode ]
+	);
+
+	return (
+		<EditorCanvasRoot
+			className={ classnames( 'edit-site-editor-canvas__block-list', {
+				'is-navigation-block': isTemplateTypeNavigation,
+			} ) }
+			renderAppender={ showBlockAppender }
+			styles={ styles }
+			iframeProps={ {
+				expand: isZoomOutMode,
+				scale: isZoomOutMode ? 0.45 : undefined,
+				frameSize: isZoomOutMode ? 100 : undefined,
+				className: classnames(
+					'edit-site-visual-editor__editor-canvas',
+					{
+						'is-focused': isFocused && canvasMode === 'view',
+					}
+				),
+				...props,
+				...( canvasMode === 'view' ? viewModeProps : {} ),
+			} }
+		>
 			{ children }
-		</Iframe>
+		</EditorCanvasRoot>
 	);
 }
 

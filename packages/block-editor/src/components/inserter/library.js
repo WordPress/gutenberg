@@ -26,17 +26,13 @@ function InserterLibrary(
 	},
 	ref
 ) {
-	const { destinationRootClientId, prioritizePatterns } = useSelect(
+	const { destinationRootClientId } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getSettings } =
-				select( blockEditorStore );
-
+			const { getBlockRootClientId } = select( blockEditorStore );
 			const _rootClientId =
 				rootClientId || getBlockRootClientId( clientId ) || undefined;
 			return {
 				destinationRootClientId: _rootClientId,
-				prioritizePatterns:
-					getSettings().__experimentalPreferPatternsOnRoot,
 			};
 		},
 		[ clientId, rootClientId ]
@@ -53,7 +49,6 @@ function InserterLibrary(
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
 			__experimentalFilterValue={ __experimentalFilterValue }
 			shouldFocusBlock={ shouldFocusBlock }
-			prioritizePatterns={ prioritizePatterns }
 			ref={ ref }
 		/>
 	);

@@ -5,7 +5,8 @@
 	flex-grow: 1;
 
 	// Post title.
-	.editor-post-title {
+	.editor-post-title:not(.is-raw-text),
+	.editor-post-title.is-raw-text textarea {
 		max-width: none;
 		line-height: $default-line-height;
 
@@ -14,6 +15,7 @@
 		font-weight: normal;
 
 		border: $border-width solid $gray-600;
+		border-radius: 0;
 
 		// Same padding as body.
 		padding: $grid-unit-20;
@@ -37,10 +39,8 @@
 	margin-right: auto;
 
 	@include break-large() {
-		padding: $grid-unit-20 $grid-unit-30 #{ $grid-unit-60 * 2 } $grid-unit-30;
 		padding: 0 $grid-unit-30 $grid-unit-30 $grid-unit-30;
 	}
-
 }
 
 // Exit code editor toolbar.
@@ -67,9 +67,5 @@
 		margin: 0 auto 0 0;
 		font-size: $default-font-size;
 		color: $gray-900;
-	}
-
-	.components-button svg {
-		order: 1;
 	}
 }
