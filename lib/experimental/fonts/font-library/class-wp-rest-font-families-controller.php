@@ -213,13 +213,13 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 		$settings = $request->get_param( 'font_family_settings' );
 
 		// Check that the font family slug is unique.
-			$existing_font_family = get_posts(
-				array(
-					'post_type'      => $this->post_type,
-					'posts_per_page' => 1,
-					'name'           => $settings['slug'],
-				)
-			);
+		$existing_font_family = get_posts(
+			array(
+				'post_type'      => $this->post_type,
+				'posts_per_page' => 1,
+				'name'           => $settings['slug'],
+			)
+		);
 		if ( ! empty( $existing_font_family ) ) {
 			return new WP_Error(
 				'rest_duplicate_font_family',
@@ -229,7 +229,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 			);
 		}
 
-			return parent::create_item( $request );
+		return parent::create_item( $request );
 	}
 
 	/**
