@@ -706,7 +706,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Handles file upload error
+	 * Handles file upload error.
 	 *
 	 * @since 6.5.0
 	 *
