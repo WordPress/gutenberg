@@ -17,6 +17,7 @@ import { addFilter } from '@wordpress/hooks';
  */
 import { getMetaBoxContainer } from '../utils/meta-boxes';
 import { store as editPostStore } from '.';
+import { unlock } from '../lock-unlock';
 
 /**
  * Returns an action object used in signalling that the user opened an editor sidebar.
@@ -287,21 +288,7 @@ export const updatePreferredStyleVariations =
 export const showBlockTypes =
 	( blockNames ) =>
 	( { registry } ) => {
-		const existingBlockNames =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
-
-		const newBlockNames = existingBlockNames.filter(
-			( type ) =>
-				! (
-					Array.isArray( blockNames ) ? blockNames : [ blockNames ]
-				).includes( type )
-		);
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'hiddenBlockTypes', newBlockNames );
+		unlock( registry.dispatch( editorStore ) ).showBlockTypes( blockNames );
 	};
 
 /**
@@ -312,21 +299,7 @@ export const showBlockTypes =
 export const hideBlockTypes =
 	( blockNames ) =>
 	( { registry } ) => {
-		const existingBlockNames =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
-
-		const mergedBlockNames = new Set( [
-			...existingBlockNames,
-			...( Array.isArray( blockNames ) ? blockNames : [ blockNames ] ),
-		] );
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'hiddenBlockTypes', [
-				...mergedBlockNames,
-			] );
+		unlock( registry.dispatch( editorStore ) ).hideBlockTypes( blockNames );
 	};
 
 /**

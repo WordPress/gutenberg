@@ -168,7 +168,16 @@
 			padding-left: $grid-unit-05;
 		}
 	}
-
+	tbody {
+		td {
+			vertical-align: top;
+		}
+		.dataviews-view-table__cell-content-wrapper {
+			min-height: $grid-unit-40;
+			display: flex;
+			align-items: center;
+		}
+	}
 	.dataviews-view-table-header-button {
 		padding: $grid-unit-05 $grid-unit-10;
 		font-size: 11px;
@@ -335,11 +344,18 @@
 	}
 
 	.dataviews-view-list__media-wrapper {
-		min-width: $grid-unit-40;
+		width: $grid-unit-40;
 		height: $grid-unit-40;
 		border-radius: $grid-unit-05;
 		overflow: hidden;
 		position: relative;
+		flex-shrink: 0;
+
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
 
 		&::after {
 			content: "";

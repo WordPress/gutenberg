@@ -54,7 +54,6 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		fullscreenMode: true,
-		hiddenBlockTypes: [],
 		isPublishSidebarEnabled: true,
 		preferredStyleVariations: {},
 		themeStyles: true,
@@ -66,6 +65,7 @@ export function initializeEditor(
 		allowRightClickOverrides: true,
 		editorMode: 'visual',
 		fixedToolbar: false,
+		hiddenBlockTypes: [],
 		inactivePanels: [],
 		openPanels: [ 'post-status' ],
 		showBlockBreadcrumbs: true,

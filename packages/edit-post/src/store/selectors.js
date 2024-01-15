@@ -164,21 +164,21 @@ export const getPreferences = createRegistrySelector( ( select ) => () => {
 	// These preferences now exist in the preferences store.
 	// Fetch them so that they can be merged into the post
 	// editor preferences.
-	const preferences = [
-		'hiddenBlockTypes',
-		'preferredStyleVariations',
-	].reduce( ( accumulatedPrefs, preferenceKey ) => {
-		const value = select( preferencesStore ).get(
-			'core/edit-post',
-			preferenceKey
-		);
+	const preferences = [ 'preferredStyleVariations' ].reduce(
+		( accumulatedPrefs, preferenceKey ) => {
+			const value = select( preferencesStore ).get(
+				'core/edit-post',
+				preferenceKey
+			);
 
-		return {
-			...accumulatedPrefs,
-			[ preferenceKey ]: value,
-		};
-	}, {} );
-	const corePreferences = [ 'editorMode' ].reduce(
+			return {
+				...accumulatedPrefs,
+				[ preferenceKey ]: value,
+			};
+		},
+		{}
+	);
+	const corePreferences = [ 'editorMode', 'hiddenBlockTypes' ].reduce(
 		( accumulatedPrefs, preferenceKey ) => {
 			const value = select( preferencesStore ).get(
 				'core',
@@ -238,10 +238,8 @@ export function getPreference( state, preferenceKey, defaultValue ) {
  */
 export const getHiddenBlockTypes = createRegistrySelector( ( select ) => () => {
 	return (
-		select( preferencesStore ).get(
-			'core/edit-post',
-			'hiddenBlockTypes'
-		) ?? EMPTY_ARRAY
+		select( preferencesStore ).get( 'core', 'hiddenBlockTypes' ) ??
+		EMPTY_ARRAY
 	);
 } );
 

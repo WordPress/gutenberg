@@ -482,7 +482,7 @@ BlockListBlock = compose(
 )( BlockListBlock );
 
 // This component provides all the information we need through a single store
-// subscription (useSelect mapping). Only the necesssary props are passed down
+// subscription (useSelect mapping). Only the necessary props are passed down
 // to the BlockListBlock component, which is a filtered component, so these
 // props are public API. To avoid adding to the public API, we use a private
 // context to pass the rest of the information to the filtered BlockListBlock
