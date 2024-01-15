@@ -2,7 +2,7 @@
 /**
  * Block Bindings API: WP_Block_Bindings class.
  *
- * Support for custom fields in blocks.
+ * Support for overriding content in blocks by connecting them to different sources.
  *
  * @since 17.6.0
  * @package gutenberg
