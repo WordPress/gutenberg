@@ -4,7 +4,6 @@
 import {
 	__experimentalHStack as HStack,
 	Button,
-	__experimentalHeading as Heading,
 	Tooltip,
 	Flex,
 } from '@wordpress/components';
@@ -201,17 +200,15 @@ function Title( { item, categoryId } ) {
 				{ item.type === PATTERN_TYPES.theme ? (
 					item.title
 				) : (
-					<Heading level={ 5 }>
-						<Button
-							variant="link"
-							onClick={ onClick }
-							// Required for the grid's roving tab index system.
-							// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
-							tabIndex="-1"
-						>
-							{ item.title || item.name }
-						</Button>
-					</Heading>
+					<Button
+						variant="link"
+						onClick={ onClick }
+						// Required for the grid's roving tab index system.
+						// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
+						tabIndex="-1"
+					>
+						{ item.title || item.name }
+					</Button>
 				) }
 			</Flex>
 		</HStack>
