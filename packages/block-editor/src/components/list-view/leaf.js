@@ -34,13 +34,9 @@ const ListViewLeaf = forwardRef(
 		ref
 	) => {
 		const animationRef = useMovingAnimation( {
-			isSelected,
-			adjustScrolling: false,
+			clientId: props[ 'data-block' ],
 			enableAnimation: true,
 			triggerAnimationOnChange: path,
-			elementSelector: isDragged
-				? '.block-editor-list-view-draggable-chip .block-editor-list-view-leaf'
-				: undefined,
 		} );
 
 		const mergedRef = useMergeRefs( [ ref, animationRef ] );

@@ -21,6 +21,13 @@ import { store as blockEditorStore } from '../../store';
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
+function getAbsolutePosition( element ) {
+	return {
+		top: element.offsetTop,
+		left: element.offsetLeft,
+	};
+}
+
 /**
  * Hook used to compute the styles required to move a div into a new position.
  *
@@ -32,15 +39,15 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  *  - It uses the "resetAnimation" flag to reset the animation
  *    from the beginning in order to animate to the new destination point.
  *
- * @param {Object} $1                          Options
- * @param {*}      $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
- * @param {string} $1.elementSelector          A CSS selector string used to find the position of an element to animate from.
- * @param {string} $1.clientId
+ * @param {Object}  $1                          Options
+ * @param {boolean} $1.enableAnimation          Whether to enable the animation.
+ * @param {*}       $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
+ * @param {string}  $1.clientId
  */
 function useMovingAnimation( {
+	enableAnimation = true,
 	triggerAnimationOnChange,
 	clientId,
-	elementSelector,
 } ) {
 	const ref = useRef();
 	const {
@@ -54,30 +61,17 @@ function useMovingAnimation( {
 
 	// Whenever the trigger changes, we need to take a snapshot of the current
 	// position of the block to use it as a destination point for the animation.
-	const { prevRect } = useMemo(
-		() => {
-			let previousPosition;
-
-			if ( ref.current && elementSelector ) {
-				const { ownerDocument } = ref.current;
-				const element = ownerDocument.querySelector( elementSelector );
-				if ( element ) {
-					previousPosition = element.getBoundingClientRect();
-				}
-			} else if ( ref.current ) {
-				previousPosition = ref.current.getBoundingClientRect();
-			}
-
-			return {
-				prevRect: previousPosition,
-			};
-		},
+	const { previous, prevRect } = useMemo(
+		() => ( {
+			previous: ref.current && getAbsolutePosition( ref.current ),
+			prevRect: ref.current && ref.current.getBoundingClientRect(),
+		} ),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ triggerAnimationOnChange ]
 	);
 
 	useLayoutEffect( () => {
-		if ( ! prevRect || ! ref.current ) {
+		if ( ! previous || ! ref.current ) {
 			return;
 		}
 
@@ -104,6 +98,7 @@ function useMovingAnimation( {
 		// To do: consider enableing the _moving_ animation even for large
 		// posts, while only disabling the _insertion_ animation?
 		const disableAnimation =
+			! enableAnimation ||
 			window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ||
 			isTyping() ||
 			getGlobalBlockCount() > BLOCK_ANIMATION_THRESHOLD;
@@ -144,10 +139,10 @@ function useMovingAnimation( {
 		} );
 
 		ref.current.style.transform = undefined;
-		const destination = ref.current.getBoundingClientRect();
+		const destination = getAbsolutePosition( ref.current );
 
-		const x = Math.round( prevRect.left - destination.left );
-		const y = Math.round( prevRect.top - destination.top );
+		const x = Math.round( previous.left - destination.left );
+		const y = Math.round( previous.top - destination.top );
 
 		controller.start( { x: 0, y: 0, from: { x, y } } );
 
@@ -155,8 +150,10 @@ function useMovingAnimation( {
 			controller.stop();
 		};
 	}, [
+		previous,
 		prevRect,
 		clientId,
+		enableAnimation,
 		isTyping,
 		getGlobalBlockCount,
 		isBlockSelected,
