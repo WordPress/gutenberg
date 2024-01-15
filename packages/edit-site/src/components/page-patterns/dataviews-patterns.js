@@ -196,7 +196,12 @@ function Title( { item, categoryId } ) {
 					/>
 				</Tooltip>
 			) }
-			<Flex as="span" gap={ 0 } justify="left">
+			<Flex
+				as="div"
+				gap={ 0 }
+				justify="left"
+				className="edit-site-patterns__pattern-title"
+			>
 				{ item.type === PATTERN_TYPES.theme ? (
 					item.title
 				) : (

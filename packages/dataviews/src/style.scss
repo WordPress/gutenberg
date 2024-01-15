@@ -223,6 +223,21 @@
 		text-decoration: none;
 		color: inherit;
 		font-weight: inherit;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		width: 100%;
+	}
+}
+
+.dataviews-view-grid__primary-field {
+	a {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		width: 100%;
 	}
 }
 
