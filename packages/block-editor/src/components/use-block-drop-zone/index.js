@@ -161,7 +161,7 @@ export function getDropTargetPosition(
 				distance = 0;
 			} else if (
 				orientation === 'vertical' &&
-				( ( isPointInsideRect && sideDistance < rect.width / 4 ) ||
+				( ( isPointInsideRect && sideDistance < THRESHOLD_DISTANCE ) ||
 					( ! isPointInsideRect &&
 						isPointWithinTopAndBottomBoundariesOfRect(
 							position,
