@@ -106,4 +106,24 @@ gutenberg_enqueue_module( 'directive-each-view' );
 		</template>
 		<p data-testid="item">item X</p>
 	</div>
+
+	<div data-testid="siblings">
+		<button
+			data-testid="unshift"
+			data-wp-on--click="actions.unshiftNumberAndName"
+		>Unshift</button>
+		<template
+			data-wp-each="state.numbersAndNames"
+			data-wp-each-key="context.item.value"
+		>
+			<p data-wp-text="context.item.name" data-testid="item"></p>
+			<p data-wp-text="context.item.value" data-testid="item"></p>
+		</template>
+		<p data-testid="item" data-wp-each-child>two</p>
+		<p data-testid="item" data-wp-each-child>2</p>
+		<p data-testid="item" data-wp-each-child>three</p>
+		<p data-testid="item" data-wp-each-child>3</p>
+		<p data-testid="item">four</p>
+		<p data-testid="item">4</p>
+	</div>
 </div>
