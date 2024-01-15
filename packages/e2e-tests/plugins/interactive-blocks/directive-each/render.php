@@ -35,6 +35,10 @@ gutenberg_enqueue_module( 'directive-each-view' );
 				data-wp-on--click="actions.removeFruit"
 			></p>
 		</template>
+		<!-- SSRed elements; they should be removed on hydration -->
+		<p data-testid="item" data-wp-each-child>avocado</p>
+		<p data-testid="item" data-wp-each-child>banana</p>
+		<p data-testid="item" data-wp-each-child>cherimoya</p>
 	</div>
 
 	<div data-testid="books">
@@ -61,5 +65,9 @@ gutenberg_enqueue_module( 'directive-each-view' );
 				data-wp-init="callbacks.generateRandomId"
 			></p>
 		</template>
+		<!-- SSRed elements; they should be removed on hydration -->
+		<p data-testid="item" data-wp-each-child>A Game of Thrones</p>
+		<p data-testid="item" data-wp-each-child>A Clash of Kings</p>
+		<p data-testid="item" data-wp-each-child>A Storm of Swords</p>
 	</div>
 </div>
