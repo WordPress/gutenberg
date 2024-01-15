@@ -218,6 +218,12 @@
 		text-decoration: none;
 		color: inherit;
 	}
+
+	button.components-button.is-link {
+		text-decoration: none;
+		color: inherit;
+		font-weight: 500;
+	}
 }
 
 .dataviews-view-grid {
