@@ -245,5 +245,9 @@ test.describe( 'data-wp-each', () => {
 		} );
 	} );
 
+	test( 'should support elements around with their own `data-wp-key`', async ( {
+		page,
+	} ) => {} );
+
 	test( 'should work on navigation', async ( { page } ) => {} );
 } );
