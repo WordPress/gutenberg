@@ -108,19 +108,16 @@ function proxyComposite< C extends Component >(
 
 		const { store, ...rest } =
 			mapLegacyStatePropsToComponentProps( legacyProps );
-		const props = rest as Record< keyof ComponentProps< C >, any >;
+		const props = rest as ComponentProps< C >;
+		props.id = useInstanceId( store, props.baseId, props.id );
 
 		Object.entries( propMap ).forEach( ( [ from, to ] ) => {
 			if ( props.hasOwnProperty( from ) ) {
-				// TypeScript doesn't like it if we directly set `to`
-				// on props, i.e. `props[ to ] = props[ from ]`.
 				Object.assign( props, { [ to ]: props[ from ] } );
 				delete props[ from ];
 			}
 		} );
 
-		const { baseId, id } = props;
-		Object.assign( props, { id: useInstanceId( store, baseId, id ) } );
 		delete props.baseId;
 
 		return <ProxiedComponent { ...props } store={ store } />;
