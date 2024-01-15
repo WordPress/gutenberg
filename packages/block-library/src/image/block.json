@@ -91,6 +91,13 @@
 			"attribute": "target"
 		}
 	},
+	"example": {
+		"attributes": {
+			"sizeSlug": "large",
+			"url": "https://s.w.org/images/core/5.3/MtBlanc1.jpg",
+			"caption": "Mont Blanc appears—still, snowy, and serene."
+		}
+	},
 	"supports": {
 		"interactivity": true,
 		"align": [ "left", "center", "right", "wide", "full" ],

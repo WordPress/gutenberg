@@ -259,3 +259,31 @@ require __DIR__ . '/block-supports/pattern.php';
 
 // Data views.
 require_once __DIR__ . '/experimental/data-views.php';
+
+
+function modify_block_attributes_before_render( $block ) {
+	$block_type_registry = WP_Block_Type_Registry::get_instance();
+	$block_type = $block_type_registry->get_registered( $block['blockName'] );
+
+	if ( isset( $block_type->example ) && isset( $block_type->example[ 'attributes' ] ) ) {
+		// Change the attribute value.
+		$block['attrs'] = array_merge( $block['attrs'], $block_type->example[ 'attributes' ] );
+	}
+	if ( $block['blockName'] === 'core/image' ) {
+		echo $block['blockName'];
+		var_dump($block['attrs']);
+	}
+	return $block;
+}
+
+add_filter( 'render_block_data', 'modify_block_attributes_before_render', 10, 2 );
+
+
+
+
+
+
+
+
+
+

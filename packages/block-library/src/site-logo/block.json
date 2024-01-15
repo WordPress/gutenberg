@@ -26,7 +26,7 @@
 		"viewportWidth": 500,
 		"attributes": {
 			"width": 350,
-			"className": "block-editor-block-types-list__site-logo-example"
+			"className": "block-editor-block-types-list__site-logo-example-blah"
 		}
 	},
 	"supports": {
