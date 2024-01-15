@@ -156,7 +156,7 @@ export default function SidebarNavigationScreenPages() {
 			) }
 			<SidebarNavigationScreen
 				title={ __( 'Pages' ) }
-				description={ __( 'Browse and edit pages on your site.' ) }
+				description={ __( 'Browse and manage pages.' ) }
 				actions={
 					<SidebarButton
 						icon={ plus }
