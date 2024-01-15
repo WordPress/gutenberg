@@ -6,7 +6,6 @@ import { init } from './router';
 
 export { store } from './store';
 export { directive, getContext, getElement } from './hooks';
-export { navigate, prefetch } from './router';
 export {
 	useWatch,
 	useInit,
