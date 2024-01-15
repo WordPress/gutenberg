@@ -17,7 +17,7 @@ export {
 } from './utils';
 
 export { h as createElement, cloneElement } from 'preact';
-export { useContext } from 'preact/hooks';
+export { useContext, useState, useRef } from 'preact/hooks';
 export { deepSignal } from 'deepsignal';
 
 document.addEventListener( 'DOMContentLoaded', async () => {
