@@ -95,7 +95,12 @@ function proxyComposite< C extends Component >(
 	propMap: Record< string, string > = {}
 ): CompositeComponent< C > {
 	return ( legacyProps: CompositeStateProps ) => {
-		const componentName = ProxiedComponent.displayName;
+		const componentName =
+			ProxiedComponent.displayName ||
+			// @ts-expect-error - forwardRef isn't smart enough
+			// to set `displayName` to the name of the function
+			// passed through for rendering.
+			ProxiedComponent.render?.name;
 
 		deprecated( `wp.components.__unstable${ componentName }`, {
 			alternative: `wp.components.${ componentName }`,
