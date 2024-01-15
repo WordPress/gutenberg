@@ -127,13 +127,9 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
 	public function get_font_faces_permissions_check() {
-		$post_type        = get_post_type_object( $this->post_type );
-		$parent_post_type = get_post_type_object( $this->parent_post_type );
+		$post_type = get_post_type_object( $this->post_type );
 
-		if (
-			! current_user_can( $post_type->cap->edit_posts ) ||
-			! current_user_can( $parent_post_type->cap->edit_posts )
-		) {
+		if ( ! current_user_can( $post_type->cap->edit_posts ) ) {
 			return new WP_Error(
 				'rest_cannot_read',
 				__( 'Sorry, you are not allowed to access font faces.', 'gutenberg' ),
