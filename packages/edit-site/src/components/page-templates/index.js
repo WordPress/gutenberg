@@ -105,7 +105,7 @@ function TemplateTitle( { item, viewType } ) {
 
 	return (
 		<VStack spacing={ 1 }>
-			<View as="span" className="dataviews-view-grid__title-field">
+			<View as="span">
 				<Link
 					params={ {
 						postId: item.id,
@@ -113,8 +113,10 @@ function TemplateTitle( { item, viewType } ) {
 						canvas: 'edit',
 					} }
 				>
-					{ decodeEntities( item.title?.rendered ) ||
-						__( '(no title)' ) }
+					<Text size="13px" weight={ 500 } truncate color="inherit">
+						{ decodeEntities( item.title?.rendered ) ||
+							__( '(no title)' ) }
+					</Text>
 				</Link>
 			</View>
 		</VStack>

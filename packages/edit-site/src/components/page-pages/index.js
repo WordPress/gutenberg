@@ -3,7 +3,7 @@
  */
 import {
 	__experimentalView as View,
-	__experimentalVStack as VStack,
+	__experimentalText as Text,
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -225,31 +225,43 @@ export default function PagePages() {
 				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => {
 					return (
-						<VStack spacing={ 1 }>
-							<View
-								as="span"
-								className="dataviews-view-grid__title-field"
-							>
-								{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
-									view.type
-								) ? (
-									<Link
-										params={ {
-											postId: item.id,
-											postType: item.type,
-											canvas: 'edit',
-										} }
+						<View as="span">
+							{ [
+								LAYOUT_TABLE,
+								LAYOUT_GRID,
+								LAYOUT_LIST,
+							].includes( view.type ) ? (
+								<Link
+									params={ {
+										postId: item.id,
+										postType: item.type,
+										canvas: 'edit',
+									} }
+								>
+									<Text
+										size="13px"
+										weight={ 500 }
+										truncate
+										color="inherit"
 									>
 										{ decodeEntities(
 											item.title?.rendered
 										) || __( '(no title)' ) }
-									</Link>
-								) : (
-									decodeEntities( item.title?.rendered ) ||
-									__( '(no title)' )
-								) }
-							</View>
-						</VStack>
+									</Text>
+								</Link>
+							) : (
+								decodeEntities( item.title?.rendered ) || (
+									<Text
+										size="13px"
+										weight={ 500 }
+										truncate
+										color="inherit"
+									>
+										{ __( '(no title)' ) }
+									</Text>
+								)
+							) }
+						</View>
 					);
 				},
 				maxWidth: 400,
