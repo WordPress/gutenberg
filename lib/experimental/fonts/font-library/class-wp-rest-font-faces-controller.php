@@ -120,7 +120,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Checks if a given request has access to read posts.
+	 * Checks if a given request has access to font faces.
 	 *
 	 * @since 6.5.0
 	 *
@@ -140,47 +140,95 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		return true;
 	}
 
+	/**
+	 * Validates settings when creating a font face.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param string          $value   Encoded JSON string of font face settings.
+	 * @param WP_REST_Request $request Request object.
+	 * @return false|WP_Error True if the settings are valid, otherwise a WP_Error object.
+	 */
 	public function validate_create_font_face_settings( $value, $request ) {
 		$settings = json_decode( $value, true );
-		$schema   = $this->get_item_schema()['properties']['font_face_settings'];
 
-		// Check that the font face settings match the theme.json schema.
-		$valid_settings = rest_validate_value_from_schema( $settings, $schema, 'font_face_settings' );
-
-		// Some properties trigger a multiple "oneOf" types error that we ignore, because they are still valid.
-		// e.g. a fontWeight of "400" validates as both a string and an integer due to is_numeric type checking.
-		if ( is_wp_error( $valid_settings ) && $valid_settings->get_error_code() !== 'rest_one_of_multiple_matches' ) {
-			$valid_settings->add_data( array( 'status' => 400 ) );
-			return $valid_settings;
+		// Check settings string is valid JSON.
+		if ( null === $settings ) {
+			return new WP_Error(
+				'rest_invalid_param',
+				__( 'font_face_settings parameter must be a valid JSON string.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
 		}
 
-		$srcs  = is_array( $settings['src'] ) ? $settings['src'] : array( $settings['src'] );
-		$files = $request->get_file_params();
+		// Check that the font face settings match the theme.json schema.
+		$schema             = $this->get_item_schema()['properties']['font_face_settings'];
+		$has_valid_settings = rest_validate_value_from_schema( $settings, $schema, 'font_face_settings' );
 
-		// Check that each file in the request references a src in the settings.
-		foreach ( array_keys( $files ) as $file ) {
-			if ( ! in_array( $file, $srcs, true ) ) {
+		if ( is_wp_error( $has_valid_settings ) ) {
+			$has_valid_settings->add_data( array( 'status' => 400 ) );
+			return $has_valid_settings;
+		}
+
+		// Check that none of the required settings are empty values.
+		$required = $schema['required'];
+		foreach ( $required as $key ) {
+			if ( isset( $settings[ $key ] ) && ! $settings[ $key ] ) {
 				return new WP_Error(
 					'rest_invalid_param',
-					/* translators: %s: A URL. */
-					__( 'Every file uploaded must be used as a font face src.', 'gutenberg' ),
+					/* translators: %s: Font family setting key. */
+					sprintf( __( 'font_face_setting[%s] cannot be empty.', 'gutenberg' ), $key ),
 					array( 'status' => 400 )
 				);
 			}
 		}
 
-		// Check that src strings are non-empty.
-		foreach ( $srcs as $src ) {
-			if ( ! $src ) {
+		$srcs = is_array( $settings['src'] ) ? $settings['src'] : array( $settings['src'] );
+
+		// Check that srcs are non-empty strings.
+		$filtered_src = array_filter( array_filter( $srcs, 'is_string' ) );
+		if ( empty( $filtered_src ) ) {
+			return new WP_Error(
+				'rest_invalid_param',
+				__( 'font_face_settings[src] values must be non-empty strings.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		// Check that each file in the request references a src in the settings.
+		$files = $request->get_file_params();
+		foreach ( array_keys( $files ) as $file ) {
+			if ( ! in_array( $file, $srcs, true ) ) {
 				return new WP_Error(
 					'rest_invalid_param',
-					__( 'Font face src values must be non-empty strings.', 'gutenberg' ),
+					// translators: %s: File key (e.g. `file-0`) in the request data.
+					sprintf( __( 'File %1$s must be used in font_face_settings[src].', 'gutenberg' ), $file ),
 					array( 'status' => 400 )
 				);
 			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * Sanitizes the font face settings when creating a font face.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param string          $value   Encoded JSON string of font face settings.
+	 * @param WP_REST_Request $request Request object.
+	 * @return array                   Decoded array of font face settings.
+	 */
+	public function sanitize_font_face_settings( $value ) {
+		// Settings arrive as stringified JSON, since this is a multipart/form-data request.
+		$settings = json_decode( $value, true );
+
+		if ( isset( $settings['fontFamily'] ) ) {
+			$settings['fontFamily'] = WP_Font_Family_Utils::format_font_family( $settings['fontFamily'] );
+		}
+
+		return $settings;
 	}
 
 	/**
@@ -201,7 +249,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Retrieves a single font face for within parent font family.
+	 * Retrieves a single font face within the parent font family.
 	 *
 	 * @since 6.5.0
 	 *
@@ -214,6 +262,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			return $post;
 		}
 
+		// Check that the font face has a valid parent font family.
 		$font_family = $this->get_font_family_post( $request['font_family_id'] );
 		if ( is_wp_error( $font_family ) ) {
 			return $font_family;
@@ -242,8 +291,8 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-		// Settings arrive as stringified JSON, since this is a multipart/form-data request.
-		$settings    = json_decode( $request->get_param( 'font_face_settings' ), true );
+		// Settings have already been decoded by ::sanitize_font_face_settings().
+		$settings    = $request->get_param( 'font_face_settings' );
 		$file_params = $request->get_file_params();
 
 		// Move the uploaded font asset from the temp folder to the fonts directory.
@@ -264,12 +313,8 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 
 			$file      = $file_params[ $src ];
 			$font_file = $this->handle_font_file_upload( $file );
-			if ( isset( $font_file['error'] ) ) {
-				return new WP_Error(
-					'rest_font_upload_unknown_error',
-					$font_file['error'],
-					array( 'status' => 500 )
-				);
+			if ( is_wp_error( $font_file ) ) {
+				return $font_file;
 			}
 
 			$processed_srcs[] = $font_file['url'];
@@ -336,7 +381,20 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$data['id']                 = $item->ID;
 		$data['theme_json_version'] = 2;
 		$data['parent']             = $item->post_parent;
-		$data['font_face_settings'] = json_decode( $item->post_content, true );
+
+		$settings   = json_decode( $item->post_content, true );
+		$properties = $this->get_item_schema()['properties']['font_face_settings']['properties'];
+
+		// Provide required, empty settings if the post_content is not valid JSON.
+		if ( null === $settings ) {
+			$settings = array(
+				'fontFamily' => '',
+				'src'        => array(),
+			);
+		}
+
+		// Only return the properties defined in the schema.
+		$data['font_face_settings'] = array_intersect_key( $settings, $properties );
 
 		$response = rest_ensure_response( $data );
 		$links    = $this->prepare_links( $item );
@@ -369,7 +427,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 					'readonly'    => true,
 				),
 				'theme_json_version' => array(
-					'description' => __( 'Version of the theme.json schema used for the font face typography settings.', 'gutenberg' ),
+					'description' => __( 'Version of the theme.json schema used for the typography settings.', 'gutenberg' ),
 					'type'        => 'integer',
 					'default'     => 2,
 					'minimum'     => 2,
@@ -398,14 +456,9 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 						'fontWeight'            => array(
 							'description' => 'List of available font weights, separated by a space.',
 							'default'     => '400',
-							'oneOf'       => array(
-								array(
-									'type' => 'string',
-								),
-								array(
-									'type' => 'integer',
-								),
-							),
+							// Changed from `oneOf` to avoid errors from loose type checking.
+							// e.g. a fontWeight of "400" validates as both a string and an integer due to is_numeric check.
+							'type'        => array( 'string', 'integer' ),
 						),
 						'fontDisplay'           => array(
 							'description' => 'CSS font-display value.',
@@ -421,7 +474,8 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 						),
 						'src'                   => array(
 							'description' => 'Paths or URLs to the font files.',
-							'oneOf'       => array(
+							// Changed from `oneOf` to `anyOf` due to rest_sanitize_array converting a string into an array.
+							'anyOf'       => array(
 								array(
 									'type' => 'string',
 								),
@@ -494,30 +548,12 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 * @return array Collection parameters.
 	 */
 	public function get_collection_params() {
+		$params = parent::get_collection_params();
+
 		return array(
-			'page'     => array(
-				'description'       => __( 'Current page of the collection.', 'default' ),
-				'type'              => 'integer',
-				'default'           => 1,
-				'sanitize_callback' => 'absint',
-				'validate_callback' => 'rest_validate_request_arg',
-				'minimum'           => 1,
-			),
-			'per_page' => array(
-				'description'       => __( 'Maximum number of items to be returned in result set.', 'default' ),
-				'type'              => 'integer',
-				'default'           => 10,
-				'minimum'           => 1,
-				'maximum'           => 100,
-				'sanitize_callback' => 'absint',
-				'validate_callback' => 'rest_validate_request_arg',
-			),
-			'search'   => array(
-				'description'       => __( 'Limit results to those matching a string.', 'default' ),
-				'type'              => 'string',
-				'sanitize_callback' => 'sanitize_text_field',
-				'validate_callback' => 'rest_validate_request_arg',
-			),
+			'page'     => $params['page'],
+			'per_page' => $params['per_page'],
+			'search'   => $params['search'],
 		);
 	}
 
@@ -539,6 +575,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 				'type'              => 'string',
 				'required'          => true,
 				'validate_callback' => array( $this, 'validate_create_font_face_settings' ),
+				'sanitize_callback' => array( $this, 'sanitize_font_face_settings' ),
 			),
 		);
 	}
@@ -610,10 +647,18 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		return $links;
 	}
 
+	/**
+	 * Prepares a single font face post for creation.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return stdClass|WP_Error Post object or WP_Error.
+	 */
 	protected function prepare_item_for_database( $request ) {
 		$prepared_post = new stdClass();
 
-		// Settings have already been decoded and processed by create_item().
+		// Settings have already been decoded by ::sanitize_font_face_settings().
 		$settings = $request->get_param( 'font_face_settings' );
 
 		$prepared_post->post_type    = $this->post_type;
@@ -626,19 +671,30 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		return $prepared_post;
 	}
 
+	/**
+	 * Handles the upload of a font file using wp_handle_upload().
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array $file Single file item from $_FILES.
+	 * @return array Array containing uploaded file attributes on success, or error on failure.
+	 */
 	protected function handle_font_file_upload( $file ) {
 		add_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
 		add_filter( 'upload_dir', 'wp_get_font_dir' );
 
 		$overrides = array(
+			'upload_error_handler' => array( $this, 'handle_font_file_upload_error' ),
 			// Arbitrary string to avoid the is_uploaded_file() check applied
 			// when using 'wp_handle_upload'.
-			'action'    => 'wp_handle_font_upload',
+			'action'               => 'wp_handle_font_upload',
 			// Not testing a form submission.
-			'test_form' => false,
+			'test_form'            => false,
 			// Seems mime type for files that are not images cannot be tested.
 			// See wp_check_filetype_and_ext().
-			'test_type' => true,
+			'test_type'            => true,
+			// Only allow uploading font files for this request.
+			'mimes'                => WP_Font_Library::get_expected_font_mime_types_per_php_version(),
 		);
 
 		$uploaded_file = wp_handle_upload( $file, $overrides );
@@ -647,6 +703,27 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		remove_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
 
 		return $uploaded_file;
+	}
+
+	/**
+	 * Handles file upload error.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array  $file    File upload data.
+	 * @param string $message Error message from wp_handle_upload().
+	 * @return WP_Error WP_Error object.
+	 */
+	public function handle_font_file_upload_error( $file, $message ) {
+		$status = 500;
+		$code   = 'rest_font_upload_unknown_error';
+
+		if ( 'Sorry, you are not allowed to upload this file type.' === $message ) {
+			$status = 400;
+			$code   = 'rest_font_upload_invalid_file_type';
+		}
+
+		return new WP_Error( $code, $message, array( 'status' => $status ) );
 	}
 
 	/**

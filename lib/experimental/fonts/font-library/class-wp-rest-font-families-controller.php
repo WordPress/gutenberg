@@ -117,7 +117,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Validates font family settings when creating or updating a font family.
+	 * Validates settings when creating or updating a font family.
 	 *
 	 * @since 6.5.0
 	 *
@@ -127,6 +127,16 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	 */
 	public function validate_font_family_settings( $value, $request ) {
 		$settings = json_decode( $value, true );
+
+		// Check settings string is valid JSON.
+		if ( null === $settings ) {
+			return new WP_Error(
+				'rest_invalid_param',
+				__( 'font_family_settings parameter must be a valid JSON string.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
 		$schema   = $this->get_item_schema()['properties']['font_family_settings'];
 		$required = $schema['required'];
 
@@ -136,11 +146,11 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 		}
 
 		// Check that the font face settings match the theme.json schema.
-		$valid_settings = rest_validate_value_from_schema( $settings, $schema, 'font_family_settings' );
+		$has_valid_settings = rest_validate_value_from_schema( $settings, $schema, 'font_family_settings' );
 
-		if ( is_wp_error( $valid_settings ) ) {
-			$valid_settings->add_data( array( 'status' => 400 ) );
-			return $valid_settings;
+		if ( is_wp_error( $has_valid_settings ) ) {
+			$has_valid_settings->add_data( array( 'status' => 400 ) );
+			return $has_valid_settings;
 		}
 
 		// Check that none of the required settings are empty values.
@@ -149,7 +159,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 				return new WP_Error(
 					'rest_invalid_param',
 					/* translators: %s: Font family setting key. */
-					sprintf( __( 'Font family setting "%s" cannot be empty.', 'gutenberg' ), $key ),
+					sprintf( __( 'font_family_settings[%s] cannot be empty.', 'gutenberg' ), $key ),
 					array( 'status' => 400 )
 				);
 			}
@@ -183,7 +193,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Deletes a single item.
+	 * Deletes a single font family.
 	 *
 	 * @since 6.5.0
 	 *
@@ -216,7 +226,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Prepares a single item output for response.
+	 * Prepares a single font family output for response.
 	 *
 	 * @since 6.5.0
 	 *
@@ -233,6 +243,16 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 
 		$settings   = json_decode( $item->post_content, true );
 		$properties = $this->get_item_schema()['properties']['font_family_settings']['properties'];
+
+		// Provide empty settings if the post_content is not valid JSON.
+		if ( null === $settings ) {
+			$settings = array(
+				'name'       => '',
+				'slug'       => '',
+				'fontFamily' => '',
+				'preview'    => '',
+			);
+		}
 
 		// Only return the properties defined in the schema.
 		$data['font_family_settings'] = array_intersect_key( $settings, $properties );
@@ -333,7 +353,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Checks if a given request has access to read items.
+	 * Checks if a given request has access to read font families.
 	 *
 	 * @since 6.5.0
 	 *
