@@ -118,14 +118,20 @@ export function toVdom( root ) {
 			);
 		}
 
-		let child = treeWalker.firstChild();
-		if ( child ) {
-			while ( child ) {
-				const [ vnode, nextChild ] = walk( child );
-				if ( vnode ) children.push( vnode );
-				child = nextChild || treeWalker.nextSibling();
+		if ( node.localName === 'template' ) {
+			props.content = [ ...node.content.childNodes ].map( ( childNode ) =>
+				toVdom( childNode )
+			);
+		} else {
+			let child = treeWalker.firstChild();
+			if ( child ) {
+				while ( child ) {
+					const [ vnode, nextChild ] = walk( child );
+					if ( vnode ) children.push( vnode );
+					child = nextChild || treeWalker.nextSibling();
+				}
+				treeWalker.parentNode();
 			}
-			treeWalker.parentNode();
 		}
 
 		// Restore previous namespace.
