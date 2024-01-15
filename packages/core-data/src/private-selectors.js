@@ -11,60 +11,39 @@ import { parse } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import type * as ET from './entity-types';
-import type { State } from './selectors';
 import {
 	getRawEntityRecord,
 	getEntityRecordEdits,
 	getEditedEntityRecord,
 } from './selectors';
 
-type EntityRecordKey = string | number;
-
 /**
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
  *
- * @param state State tree.
+ * @param {Object} state State tree.
  *
- * @return The undo manager.
+ * @return {Object} The undo manager.
  */
-export function getUndoManager( state: State ) {
+export function getUndoManager( state ) {
 	return state.undoManager;
 }
 
 /**
  * Retrieve the fallback Navigation.
  *
- * @param state Data state.
- * @return The ID for the fallback Navigation post.
+ * @param {Object} state Data state.
+ * @return {string|number} The ID for the fallback Navigation post.
  */
-export function getNavigationFallbackId(
-	state: State
-): EntityRecordKey | undefined {
+export function getNavigationFallbackId( state ) {
 	return state.navigationFallbackId;
 }
 
 const EMPTY_BLOCKS = [];
-const entityBlocksCache = new Map< Object, Array< any > >();
+const entityBlocksCache = new Map();
 
-/**
- * Returns the specified entity record, merged with its edits.
- *
- * @param state    State tree.
- * @param kind     Entity kind.
- * @param name     Entity name.
- * @param recordId Record ID.
- *
- * @return The entity record, merged with its edits.
- */
 export const getEditedEntityRecordWithBlocks = createSelector(
-	< EntityRecord extends ET.EntityRecord< any > >(
-		state: State,
-		kind: string,
-		name: string,
-		recordId: EntityRecordKey
-	): ET.Updatable< EntityRecord > | undefined => {
+	( state, kind, name, recordId ) => {
 		const record = {
 			...getRawEntityRecord( state, kind, name, recordId ),
 			...getEntityRecordEdits( state, kind, name, recordId ),
