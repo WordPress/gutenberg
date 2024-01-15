@@ -199,7 +199,7 @@ function Title( { item, categoryId } ) {
 			) }
 			<Flex as="span" gap={ 0 } justify="left">
 				{ item.type === PATTERN_TYPES.theme ? (
-					<span>{ item.title }</span>
+					item.title
 				) : (
 					<Heading level={ 5 }>
 						<Button
