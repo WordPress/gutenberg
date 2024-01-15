@@ -14,12 +14,12 @@ concurrency:
 
 jobs:
     test:
-        runs-on: macos-12
+        runs-on: macos-13
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
-                xcode: ['14.2']
-                device: ['iPhone 14']
+                xcode: ['15.1']
+                device: ['iPhone 15']
                 native-test-name: [gutenberg-editor-rendering]
 
         steps:
@@ -35,13 +35,6 @@ jobs:
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
-
-            - name: Restore tests setup cache
-              uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
-              with:
-                  path: |
-                      ~/.appium
-                  key: ${{ runner.os }}-tests-setup-${{ hashFiles('package-lock.json') }}
 
             - name: Prepare tests setup
               run: npm run native test:e2e:setup
