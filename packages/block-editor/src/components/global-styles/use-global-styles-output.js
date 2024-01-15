@@ -717,32 +717,6 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 										variationBlockStyles
 									),
 								} );
-
-								// Process element styles for the inner blocks
-								// of the variation.
-								Object.entries(
-									variationBlockStyles.elements ?? {}
-								).forEach(
-									( [
-										variationBlockElement,
-										variationBlockElementStyles,
-									] ) => {
-										if (
-											variationBlockElementStyles &&
-											ELEMENTS[ variationBlockElement ]
-										) {
-											nodes.push( {
-												styles: variationBlockElementStyles,
-												selector: scopeSelector(
-													variationBlockSelector,
-													ELEMENTS[
-														variationBlockElement
-													]
-												),
-											} );
-										}
-									}
-								);
 							}
 						);
 
