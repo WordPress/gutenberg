@@ -31,7 +31,6 @@ import {
 	batchInstallFontFaces,
 } from './utils';
 import { toggleFont } from './utils/toggleFont';
-import getIntersectingFontFaces from './utils/get-intersecting-font-faces';
 
 export const FontLibraryContext = createContext( {} );
 
@@ -224,21 +223,14 @@ function FontLibraryProvider( { children } ) {
 
 			const fontFacesInstalled = response?.successes || [];
 
-			// now we need to rebuild this in theme.json format:
-			const fontsInstalled =
+			// Rebuild fontFace settings
+			font.fontFace =
 				fontFacesInstalled.map( ( face ) => {
 					return face.font_face_settings;
 				} ) || [];
 
-			// Get intersecting font faces between the fonts we tried to installed and the fonts that were installed
-			// (to avoid activating a non installed font).
-			const fontToBeActivated = getIntersectingFontFaces(
-				fontsInstalled,
-				[ font ]
-			);
-
-			// Activate the font families (add the font families to the global styles).
-			activateCustomFontFamilies( fontToBeActivated );
+			// Activate the font family (add the font family to the global styles).
+			activateCustomFontFamilies( [ font ] );
 			// Save the global styles to the database.
 			saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [
 				'settings.typography.fontFamilies',
