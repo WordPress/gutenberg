@@ -193,6 +193,37 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
+	 * Creates a single font family.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function create_item( $request ) {
+		$settings = $request->get_param( 'font_family_settings' );
+
+		// Check that the font family slug is unique.
+			$existing_font_family = get_posts(
+				array(
+					'post_type'      => $this->post_type,
+					'posts_per_page' => 1,
+					'name'           => $settings['slug'],
+				)
+			);
+		if ( ! empty( $existing_font_family ) ) {
+			return new WP_Error(
+				'rest_duplicate_font_family',
+				/* translators: %s: Font family slug. */
+				sprintf( __( 'A font family with slug "%s" already exists.', 'gutenberg' ), $settings['slug'] ),
+				array( 'status' => WP_Http::CONFLICT )
+			);
+		}
+
+			return parent::create_item( $request );
+	}
+
+	/**
 	 * Deletes a single font family.
 	 *
 	 * @since 6.5.0
