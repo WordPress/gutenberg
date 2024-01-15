@@ -185,15 +185,6 @@ if (
 	require __DIR__ . '/experimental/fonts/font-face/bc-layer/class-wp-web-fonts.php';
 } elseif ( ! class_exists( 'WP_Fonts' ) ) {
 
-	// Disables the Font Library.
-	// @core-merge: this should not go to core.
-	add_action(
-		'enqueue_block_editor_assets',
-		function () {
-			wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDisableFontLibrary = true', 'before' );
-		}
-	);
-
 	// Turns off Font Face hooks in Core.
 	// @since 6.4.0.
 	remove_action( 'wp_head', 'wp_print_font_faces', 50 );

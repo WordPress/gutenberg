@@ -8,7 +8,9 @@ module.exports = {
 		new DependencyExtractionWebpackPlugin( {
 			outputFilename: '[name]-foo.asset.php',
 			requestToExternalModule( request ) {
-				return request.startsWith( '@wordpress/' );
+				return (
+					request.startsWith( '@wordpress/' ) || request === 'lodash'
+				);
 			},
 		} ),
 	],
