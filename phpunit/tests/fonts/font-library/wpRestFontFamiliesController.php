@@ -174,7 +174,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	}
 
 	/**
-	 * @covers WP_REST_Font_Faces_Controller::get_item
+	 * @covers WP_REST_Font_Families_Controller::get_item
 	 */
 	public function test_get_item_removes_extra_settings() {
 		$font_family_id = self::create_font_family_post( array( 'fontFace' => array() ) );
@@ -186,6 +186,38 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertArrayNotHasKey( 'fontFace', $data['font_family_settings'] );
+
+		wp_delete_post( $font_family_id, true );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Families_Controller::prepare_item_for_response
+	 */
+	public function test_get_item_malformed_post_content_returns_empty_settings() {
+		$font_family_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_font_family',
+				'post_status'  => 'publish',
+				'post_content' => 'invalid',
+			)
+		);
+
+		$empty_settings = array(
+			'name'       => '',
+			'slug'       => '',
+			'fontFamily' => '',
+			'preview'    => '',
+		);
+
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-families/' . $font_family_id );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( $empty_settings, $data['font_family_settings'] );
+
+		wp_delete_post( $font_family_id, true );
 	}
 
 	/**
@@ -278,7 +310,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	/**
 	 * @dataProvider data_create_item_with_default_preview
 	 *
-	 * @covers WP_REST_Font_Faces_Controller::create_item
+	 * @covers WP_REST_Font_Faces_Controller::sanitize_font_family_settings
 	 */
 	public function test_create_item_with_default_preview( $settings ) {
 		wp_set_current_user( self::$admin_id );
@@ -321,41 +353,60 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
 		$request->set_param( 'theme_json_version', 2 );
-		$request->set_param( 'font_face_settings', wp_json_encode( $settings ) );
+		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
 
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_missing_callback_param', $response, 400 );
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
 	public function data_create_item_invalid_settings() {
-		$default_settings = array(
-			'name'       => 'Open Sans',
-			'slug'       => 'open-sans',
-			'fontFamily' => '"Open Sans", sans-serif',
-			'preview'    => 'https://s.w.org/images/fonts/16.7/previews/open-sans/open-sans-400-normal.svg',
-		);
 		return array(
-			'Missing name'       => array(
-				'settings' => array_diff_key( $default_settings, array( 'name' => '' ) ),
+			'Missing name'          => array(
+				'settings' => array_diff_key( self::$default_settings, array( 'name' => '' ) ),
 			),
-			'Empty name'         => array(
-				'settings' => array_merge( $default_settings, array( 'name' => '' ) ),
+			'Empty name'            => array(
+				'settings' => array_merge( self::$default_settings, array( 'name' => '' ) ),
 			),
-			'Missing slug'       => array(
-				'settings' => array_diff_key( $default_settings, array( 'slug' => '' ) ),
+			'Wrong name type'       => array(
+				'settings' => array_merge( self::$default_settings, array( 'name' => 1234 ) ),
 			),
-			'Empty slug'         => array(
-				'settings' => array_merge( $default_settings, array( 'slug' => '' ) ),
+			'Missing slug'          => array(
+				'settings' => array_diff_key( self::$default_settings, array( 'slug' => '' ) ),
 			),
-			'Missing fontFamily' => array(
-				'settings' => array_diff_key( $default_settings, array( 'fontFamily' => '' ) ),
+			'Empty slug'            => array(
+				'settings' => array_merge( self::$default_settings, array( 'slug' => '' ) ),
 			),
-			'Empty fontFamily'   => array(
-				'settings' => array_merge( $default_settings, array( 'fontFamily' => '' ) ),
+			'Wrong slug type'       => array(
+				'settings' => array_merge( self::$default_settings, array( 'slug' => 1234 ) ),
+			),
+			'Missing fontFamily'    => array(
+				'settings' => array_diff_key( self::$default_settings, array( 'fontFamily' => '' ) ),
+			),
+			'Empty fontFamily'      => array(
+				'settings' => array_merge( self::$default_settings, array( 'fontFamily' => '' ) ),
+			),
+			'Wrong fontFamily type' => array(
+				'settings' => array_merge( self::$default_settings, array( 'fontFamily' => 1234 ) ),
 			),
 		);
 	}
 
+	/**
+	 * @covers WP_REST_Font_Family_Controller::validate_font_family_settings
+	 */
+	public function test_create_item_invalid_settings_json() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
+		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'font_family_settings', 'invalid' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		$expected_message = 'font_family_settings parameter must be a valid JSON string.';
+		$actual_message   = $response->as_error()->get_all_error_data()[0]['params']['font_family_settings'];
+		$this->assertSame( $expected_message, $actual_message );
+	}
 
 	/**
 	 * @covers WP_REST_Font_Faces_Controller::create_item
@@ -448,6 +499,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 		/**
 	 * @dataProvider data_update_item_santize_font_family
+	 *
 	 * @covers WP_REST_Font_Families_Controller::update_item
 	 */
 	public function test_update_item_santize_font_family( $font_family_setting, $expected ) {
@@ -490,14 +542,23 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 	public function data_update_item_invalid_settings() {
 		return array(
-			'Empty name'       => array(
+			'Empty name'            => array(
 				array( 'name' => '' ),
 			),
-			'Empty slug'       => array(
+			'Wrong name type'       => array(
+				array( 'name' => 1234 ),
+			),
+			'Empty slug'            => array(
 				array( 'slug' => '' ),
 			),
-			'Empty fontFamily' => array(
+			'Wrong slug type'       => array(
+				array( 'slug' => 1234 ),
+			),
+			'Empty fontFamily'      => array(
 				array( 'fontFamily' => '' ),
+			),
+			'Wrong fontFamily type' => array(
+				array( 'fontFamily' => 1234 ),
 			),
 		);
 	}
