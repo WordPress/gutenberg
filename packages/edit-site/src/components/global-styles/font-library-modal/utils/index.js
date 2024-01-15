@@ -196,14 +196,12 @@ export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
 	responses.forEach( ( result, index ) => {
 		if ( result.status === 'fulfilled' ) {
 			const response = result.value;
-			if ( response.ok ) {
-				results.successes.push( response.data );
+			if ( response.id ) {
+				results.successes.push( response );
 			} else {
-				// Handle HTTP error statuses
 				results.errors.push( {
 					data: fontFacesData[ index ],
-					error: `HTTP error: ${ response.status }`,
-					message: response.message,
+					message: `Error: ${ response.message }`,
 				} );
 			}
 		} else {
@@ -211,7 +209,6 @@ export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
 			results.errors.push( {
 				data: fontFacesData[ index ],
 				error: `Fetch error: ${ result.reason }`,
-				message: result.message,
 			} );
 		}
 	} );
