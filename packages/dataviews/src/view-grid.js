@@ -53,11 +53,8 @@ export default function ViewGrid( {
 					<div className="dataviews-view-grid__media">
 						{ mediaField?.render( { item } ) }
 					</div>
-					<HStack
-						className="dataviews-view-grid__primary-field"
-						justify="space-between"
-					>
-						<FlexBlock>
+					<HStack justify="space-between">
+						<FlexBlock className="dataviews-view-grid__primary-field">
 							{ primaryField?.render( { item } ) }
 						</FlexBlock>
 						<ItemActions
