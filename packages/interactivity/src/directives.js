@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	useContext,
-	useMemo,
-	useEffect,
-	useRef,
-	useLayoutEffect,
-} from 'preact/hooks';
+import { useContext, useMemo, useRef, useLayoutEffect } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
 
 /**
@@ -16,7 +10,6 @@ import { deepSignal, peek } from 'deepsignal';
 import { createPortal } from './portals';
 import { useWatch, useInit } from './utils';
 import { directive } from './hooks';
-import { navigate } from './router';
 
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
@@ -263,48 +256,6 @@ export default () => {
 			}
 		);
 	} );
-
-	// data-wp-navigation-link
-	directive(
-		'navigation-link',
-		( {
-			directives: { 'navigation-link': navigationLink },
-			props: { href },
-			element,
-		} ) => {
-			const { value: link } = navigationLink.find(
-				( { suffix } ) => suffix === 'default'
-			);
-
-			useEffect( () => {
-				// Prefetch the page if it is in the directive options.
-				if ( link?.prefetch ) {
-					// prefetch( href );
-				}
-			} );
-
-			// Don't do anything if it's falsy.
-			if ( link !== false ) {
-				element.props.onclick = async ( event ) => {
-					event.preventDefault();
-
-					// Fetch the page (or return it from cache).
-					await navigate( href );
-
-					// Update the scroll, depending on the option. True by default.
-					if ( link?.scroll === 'smooth' ) {
-						window.scrollTo( {
-							top: 0,
-							left: 0,
-							behavior: 'smooth',
-						} );
-					} else if ( link?.scroll !== false ) {
-						window.scrollTo( 0, 0 );
-					}
-				};
-			}
-		}
-	);
 
 	// data-wp-ignore
 	directive(
