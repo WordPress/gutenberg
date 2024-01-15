@@ -77,18 +77,12 @@ export default function PostNavigationLinkEdit( {
 			label: __( 'Unfiltered' ),
 			value: '',
 		};
-		const taxonomyOptions = ( taxonomies ?? [] )
-			.filter(
-				( tax ) =>
-					tax.slug !== 'nav_menu' &&
-					tax.slug !== 'wp_pattern_category'
-			)
-			.map( ( item ) => {
-				return {
-					value: item.slug,
-					label: item.name,
-				};
-			} );
+		const taxonomyOptions = ( taxonomies ?? [] ).map( ( item ) => {
+			return {
+				value: item.slug,
+				label: item.name,
+			};
+		} );
 
 		return [ selectOption, ...taxonomyOptions ];
 	};
