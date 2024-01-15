@@ -317,10 +317,7 @@ export default () => {
 	directive(
 		'each',
 		( {
-			directives: {
-				each,
-				'each-key': [ eachKey ],
-			},
+			directives: { each, 'each-key': eachKey },
 			context: inheritedContext,
 			element,
 			evaluate,
@@ -344,7 +341,7 @@ export default () => {
 
 				const scope = { ...getScope(), context: mergedContext };
 				const key = eachKey
-					? getEvaluate( { scope } )( eachKey )
+					? getEvaluate( { scope } )( eachKey[ 0 ] )
 					: item;
 
 				return (
