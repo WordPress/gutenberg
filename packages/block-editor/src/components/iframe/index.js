@@ -129,6 +129,7 @@ function Iframe( {
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
 			setIframeDocument( node.contentDocument );
+			window.wp.polyfill( node.contentWindow );
 		};
 		let iFrameDocument;
 		// Prevent the default browser action for files dropped outside of dropzones.

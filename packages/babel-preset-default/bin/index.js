@@ -30,6 +30,21 @@ builder( {
 			},
 		} );
 		await writeFile( './build/polyfill.min.js', output.code );
+
+		const scopedBefore = `window.wp = window.wp || {};
+window.wp.polyfill = function( window ) {
+`;
+		const scopedAfter = `
+}`;
+
+		await writeFile(
+			'./build/polyfill-scoped.js',
+			scopedBefore + code + scopedAfter
+		);
+		await writeFile(
+			'./build/polyfill-scoped.min.js',
+			scopedBefore + output.code + scopedAfter
+		);
 	} )
 	.catch( ( error ) => {
 		// eslint-disable-next-line no-console
