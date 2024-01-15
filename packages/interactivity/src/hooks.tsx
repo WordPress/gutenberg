@@ -259,7 +259,7 @@ const resolve = ( path, namespace ) => {
 };
 
 // Generate the evaluate function.
-const getEvaluate: GetEvaluate =
+export const getEvaluate: GetEvaluate =
 	( { scope } ) =>
 	( entry, ...args ) => {
 		let { value: path, namespace } = entry;
