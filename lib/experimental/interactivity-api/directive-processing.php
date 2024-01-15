@@ -43,12 +43,13 @@ function gutenberg_process_directives_in_root_blocks( $block_content, $block ) {
 		$parsed_blocks     = parse_blocks( $block_content );
 		$context           = new WP_Directive_Context();
 		$processed_content = '';
+		$namespace_stack   = array();
 
 		foreach ( $parsed_blocks as $parsed_block ) {
 			if ( 'core/interactivity-wrapper' === $parsed_block['blockName'] ) {
-				$processed_content .= gutenberg_process_interactive_block( $parsed_block, $context );
+				$processed_content .= gutenberg_process_interactive_block( $parsed_block, $context, $namespace_stack );
 			} elseif ( 'core/non-interactivity-wrapper' === $parsed_block['blockName'] ) {
-				$processed_content .= gutenberg_process_non_interactive_block( $parsed_block, $context );
+				$processed_content .= gutenberg_process_non_interactive_block( $parsed_block, $context, $namespace_stack );
 			} else {
 				$processed_content .= $parsed_block['innerHTML'];
 			}
@@ -118,10 +119,11 @@ add_filter( 'render_block', 'gutenberg_mark_block_interactivity', 10, 3 );
  *
  * @param array                $interactive_block The interactive block to process.
  * @param WP_Directive_Context $context The context to use when processing.
+ * @param array                $namespace_stack Stack of namespackes passed by reference.
  *
  * @return string The processed HTML.
  */
-function gutenberg_process_interactive_block( $interactive_block, $context ) {
+function gutenberg_process_interactive_block( $interactive_block, $context, &$namespace_stack ) {
 	$block_index              = 0;
 	$content                  = '';
 	$interactive_inner_blocks = array();
@@ -137,7 +139,7 @@ function gutenberg_process_interactive_block( $interactive_block, $context ) {
 		}
 	}
 
-	return gutenberg_process_interactive_html( $content, $context, $interactive_inner_blocks );
+	return gutenberg_process_interactive_html( $content, $context, $interactive_inner_blocks, $namespace_stack );
 }
 
 /**
@@ -147,10 +149,11 @@ function gutenberg_process_interactive_block( $interactive_block, $context ) {
  *
  * @param array                $non_interactive_block The non-interactive block to process.
  * @param WP_Directive_Context $context The context to use when processing.
+ * @param array                $namespace_stack Stack of namespackes passed by reference.
  *
  * @return string The processed HTML.
  */
-function gutenberg_process_non_interactive_block( $non_interactive_block, $context ) {
+function gutenberg_process_non_interactive_block( $non_interactive_block, $context, &$namespace_stack ) {
 	$block_index = 0;
 	$content     = '';
 	foreach ( $non_interactive_block['innerContent'] as $inner_content ) {
@@ -164,9 +167,9 @@ function gutenberg_process_non_interactive_block( $non_interactive_block, $conte
 			$inner_block = $non_interactive_block['innerBlocks'][ $block_index++ ];
 
 			if ( 'core/interactivity-wrapper' === $inner_block['blockName'] ) {
-				$content .= gutenberg_process_interactive_block( $inner_block, $context );
+				$content .= gutenberg_process_interactive_block( $inner_block, $context, $namespace_stack );
 			} elseif ( 'core/non-interactivity-wrapper' === $inner_block['blockName'] ) {
-				$content .= gutenberg_process_non_interactive_block( $inner_block, $context );
+				$content .= gutenberg_process_non_interactive_block( $inner_block, $context, $namespace_stack );
 			}
 		}
 	}
@@ -184,16 +187,18 @@ function gutenberg_process_non_interactive_block( $non_interactive_block, $conte
  * @param string $html The HTML to process.
  * @param mixed  $context The context to use when processing.
  * @param array  $inner_blocks The inner blocks to process.
+ * @param array  $namespace_stack Stack of namespackes passed by reference.
  *
  * @return string The processed HTML.
  */
-function gutenberg_process_interactive_html( $html, $context, $inner_blocks = array() ) {
+function gutenberg_process_interactive_html( $html, $context, $inner_blocks = array(), &$namespace_stack = array() ) {
 	static $directives = array(
-		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
-		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
-		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
-		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
-		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
+		'data-wp-interactive' => 'gutenberg_interactivity_process_wp_interactive',
+		'data-wp-context'     => 'gutenberg_interactivity_process_wp_context',
+		'data-wp-bind'        => 'gutenberg_interactivity_process_wp_bind',
+		'data-wp-class'       => 'gutenberg_interactivity_process_wp_class',
+		'data-wp-style'       => 'gutenberg_interactivity_process_wp_style',
+		'data-wp-text'        => 'gutenberg_interactivity_process_wp_text',
 	);
 
 	$tags                   = new WP_Directive_Processor( $html );
@@ -207,9 +212,9 @@ function gutenberg_process_interactive_html( $html, $context, $inner_blocks = ar
 		// Processes the inner blocks.
 		if ( str_contains( $tag_name, 'WP-INNER-BLOCKS' ) && ! empty( $inner_blocks ) && ! $tags->is_tag_closer() ) {
 			if ( 'core/interactivity-wrapper' === $inner_blocks[ $inner_blocks_index ]['blockName'] ) {
-				$inner_processed_blocks[ strtolower( $tag_name ) ] = gutenberg_process_interactive_block( $inner_blocks[ $inner_blocks_index++ ], $context );
+				$inner_processed_blocks[ strtolower( $tag_name ) ] = gutenberg_process_interactive_block( $inner_blocks[ $inner_blocks_index++ ], $context, $namespace_stack );
 			} elseif ( 'core/non-interactivity-wrapper' === $inner_blocks[ $inner_blocks_index ]['blockName'] ) {
-				$inner_processed_blocks[ strtolower( $tag_name ) ] = gutenberg_process_non_interactive_block( $inner_blocks[ $inner_blocks_index++ ], $context );
+				$inner_processed_blocks[ strtolower( $tag_name ) ] = gutenberg_process_non_interactive_block( $inner_blocks[ $inner_blocks_index++ ], $context, $namespace_stack );
 			}
 		}
 		if ( $tags->is_tag_closer() ) {
@@ -270,7 +275,15 @@ function gutenberg_process_interactive_html( $html, $context, $inner_blocks = ar
 		);
 
 		foreach ( $sorted_attrs as $attribute ) {
-			call_user_func( $directives[ $attribute ], $tags, $context );
+			call_user_func_array(
+				$directives[ $attribute ],
+				array(
+					$tags,
+					$context,
+					end( $namespace_stack ),
+					&$namespace_stack,
+				)
+			);
 		}
 	}
 
@@ -290,17 +303,25 @@ function gutenberg_process_interactive_html( $html, $context, $inner_blocks = ar
 }
 
 /**
- * Resolves the reference using the store and the context from the provided
- * path.
+ * Resolves the passed reference from the store and the context under the given
+ * namespace.
  *
- * @param string $path Path.
+ * A reference could be either a single path or a namespace followed by a path,
+ * separated by two colons, i.e, `namespace::path.to.prop`. If the reference
+ * contains a namespace, that namespace overrides the one passed as argument.
+ *
+ * @param string $reference Reference value.
+ * @param string $ns Inherited namespace.
  * @param array  $context Context data.
- * @return mixed
+ * @return mixed Resolved value.
  */
-function gutenberg_interactivity_evaluate_reference( $path, array $context = array() ) {
-	$store = array_merge(
-		WP_Interactivity_Store::get_data(),
-		array( 'context' => $context )
+function gutenberg_interactivity_evaluate_reference( $reference, $ns, array $context = array() ) {
+	// Extract the namespace from the reference (if present).
+	list( $ns, $path ) = WP_Directive_Processor::parse_attribute_value( $reference, $ns );
+
+	$store = array(
+		'state'   => WP_Interactivity_Initial_State::get_state( $ns ),
+		'context' => $context[ $ns ] ?? array(),
 	);
 
 	/*
@@ -329,7 +350,12 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
 	 * E.g., "file" is an string and a "callable" (the "file" function exists).
 	 */
 	if ( $current instanceof Closure ) {
-		$current = call_user_func( $current, $store );
+		/*
+		 * TODO: Figure out a way to implement derived state without having to
+		 * pass the store as argument:
+		 *
+		 * $current = call_user_func( $current );
+		 */
 	}
 
 	// Returns the opposite if it has a negator operator (!).

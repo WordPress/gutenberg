@@ -10,19 +10,21 @@
  *
  * @param WP_Directive_Processor $tags Tags.
  * @param WP_Directive_Context   $context Directive context.
+ * @param string                 $ns Namespace.
  */
-function gutenberg_interactivity_process_wp_context( $tags, $context ) {
+function gutenberg_interactivity_process_wp_context( $tags, $context, $ns ) {
 	if ( $tags->is_tag_closer() ) {
 		$context->rewind_context();
 		return;
 	}
 
-	$value = $tags->get_attribute( 'data-wp-context' );
+	$attr_value = $tags->get_attribute( 'data-wp-context' );
 
-	$new_context = json_decode(
-		is_string( $value ) && ! empty( $value ) ? $value : '{}',
-		true
-	);
+	//Separate namespace and value from the context directive attribute.
+	list( $ns, $data ) = is_string( $attr_value ) && ! empty( $attr_value )
+		? WP_Directive_Processor::parse_attribute_value( $attr_value, $ns )
+		: array( $ns, null );
 
-	$context->set_context( $new_context ?? array() );
+	// Add parsed data to the context under the corresponding namespace.
+	$context->set_context( array( $ns => is_array( $data ) ? $data : array() ) );
 }

@@ -161,9 +161,9 @@ $z-layers: (
 	".components-resizable-box__corner-handle": 2,
 
 	// Make sure block manager sticky category titles appear above the options
-	".edit-post-block-manager__category-title": 1,
+	".editor-block-manager__category-title": 1,
 	// And block manager sticky disabled block count is higher still
-	".edit-post-block-manager__disabled-blocks-count": 2,
+	".editor-block-manager__disabled-blocks-count": 2,
 
 	// Needs to appear below other color circular picker related UI elements.
 	".components-circular-option-picker__option-wrapper::before": -1,

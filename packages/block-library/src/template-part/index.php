@@ -70,6 +70,12 @@ function render_block_core_template_part( $attributes ) {
 				if ( isset( $block_template->area ) ) {
 					$area = $block_template->area;
 				}
+
+				// Needed for the `render_block_core_template_part_file` and `render_block_core_template_part_none` actions below.
+				$block_template_file = _get_block_template_file( 'wp_template_part', $attributes['slug'] );
+				if ( $block_template_file ) {
+					$template_part_file_path = $block_template_file['path'];
+				}
 			}
 
 			if ( '' !== $content && null !== $content ) {

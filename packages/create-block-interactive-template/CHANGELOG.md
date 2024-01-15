@@ -2,20 +2,24 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Update the template to use `viewModule` in block.json ([#57712](https://github.com/WordPress/gutenberg/pull/57712)).
+
 ## 1.11.0 (2023-12-13)
 
--   Add all files to the generated plugin zip. [#56943](https://github.com/WordPress/gutenberg/pull/56943)
--   Prevent crash when Gutenberg plugin is not installed. [#56941](https://github.com/WordPress/gutenberg/pull/56941)
+-   Add all files to the generated plugin zip ([#56943](https://github.com/WordPress/gutenberg/pull/56943)).
+-   Prevent crash when Gutenberg plugin is not installed ([#56941](https://github.com/WordPress/gutenberg/pull/56941)).
 
 ## 1.10.1 (2023-12-07)
 
--   Update template to use modules instead of scripts. [#56694](https://github.com/WordPress/gutenberg/pull/56694)
+-   Update template to use modules instead of scripts ([#56694](https://github.com/WordPress/gutenberg/pull/56694)).
 
 ## 1.10.0 (2023-11-29)
 
 ### Enhancement
 
--   Update `view.js` and `render.php` templates to the new `store()` API. [#56613](https://github.com/WordPress/gutenberg/pull/56613)
+-   Update `view.js` and `render.php` templates to the new `store()` API ([#56613](https://github.com/WordPress/gutenberg/pull/56613)).
 
 ## 1.9.0 (2023-11-16)
 
@@ -35,4 +39,4 @@
 
 ### Enhancement
 
--   Moves the `example` property into block.json by leveraging changes to create-block to now support `example`. [#52801](https://github.com/WordPress/gutenberg/pull/52801)
+-   Moves the `example` property into block.json by leveraging changes to create-block to now support `example` ([#52801](https://github.com/WordPress/gutenberg/pull/52801)).

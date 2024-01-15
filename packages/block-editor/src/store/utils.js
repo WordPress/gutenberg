@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
+import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 
 const EMPTY_ARRAY = [];
 
@@ -18,7 +18,7 @@ export function getUserPatterns( state ) {
 		return {
 			name: `core/block/${ userPattern.id }`,
 			id: userPattern.id,
-			type: PATTERN_TYPES.user,
+			type: INSERTER_PATTERN_TYPES.user,
 			title: userPattern.title.raw,
 			categories: userPattern.wp_pattern_category.map( ( catId ) =>
 				categories && categories.get( catId )

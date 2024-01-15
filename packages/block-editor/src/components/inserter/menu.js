@@ -45,7 +45,6 @@ function InserterMenu(
 		showMostUsedBlocks,
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
-		prioritizePatterns,
 	},
 	ref
 ) {
@@ -258,7 +257,6 @@ function InserterMenu(
 					<InserterTabs
 						showPatterns={ showPatterns }
 						showMedia={ showMedia }
-						prioritizePatterns={ prioritizePatterns }
 						onSelect={ handleSetSelectedTab }
 						tabsContents={ inserterTabsContents }
 					/>

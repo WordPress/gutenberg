@@ -18,7 +18,7 @@ abstract class WP_REST_Font_Families_Controller_UnitTestCase extends WP_UnitTest
 	public function set_up() {
 		parent::set_up();
 
-		static::$fonts_dir = WP_Font_Library::get_fonts_dir();
+		static::$fonts_dir = wp_get_font_dir()['path'];
 
 		// Create a user with administrator role.
 		$admin_id = $this->factory->user->create(
