@@ -476,24 +476,15 @@ The `wp-init` can return a function. If it does, the returned function will run 
 
 It runs the passed callback **during node's render execution**.
 
+You can use and compose hooks like `useState`, `useWatch` or `useEffect` inside inside the passed callback and create your own logic, providing more flexibility than previous directives.
+
 You can attach several `wp-run` to the same DOM element by using the syntax `data-wp-run--[unique-id]`. _The unique id doesn't need to be unique globally, it just needs to be different than the other unique ids of the `wp-run` directives of that DOM element._
 
 _Example of `data-wp-run` directive_ 
 
 ```html
-<div data-wp-run="callbacks.logCounter">
-  <p>Hi!</>
-</div>
-```
-
-_Example of several `wp-run` directives on the same DOM element_
-
-```html
-<div 
-  data-wp-run--log="callbacks.logCounter" 
-  data-wp-run--custom="callbacks.customHooks"
->
-  <p>Hi!</>
+<div data-wp-run="callbacks.logInView">
+  <p>Hi!</p>
 </div>
 ```
 
@@ -501,18 +492,34 @@ _Example of several `wp-run` directives on the same DOM element_
   <summary><em>See store used with the directive above</em></summary>
 
 ```js
-store( "myPlugin", {
+import { store, useState, useEffect } from '@wordpress/interactivity';
+
+// Unlike `data-wp-init` and `data-wp-watch`, you can use any hooks inside
+// `data-wp-run` callbacks.
+const useInView = ( ref ) => {
+  const [ inView, setInView ] = useState( false );
+  useEffect( () => {
+    const observer = new IntersectionObserver( ( [ entry ] ) => {
+      setInView( entry.isIntersecting );
+    } );
+    if ( ref ) observer.observe( ref );
+    return () => ref && observer.unobserve( ref );
+  }, []);
+  return inView;
+};
+
+store( 'myPlugin', {
   callbacks: {
-    logCounter: () => {
-      useInit(() => console.log( `Init at ` + new Date() ))
-      useWatch(() => {
-        const { counter } = getContext(); 
-        console.log("Counter is " + counter + " at " + new Date() );
-      })
-    },
-    customHooks: () => {
-      // You can call your own hooks here.
-      useCustomHook( /* ... */ );
+    logInView: () => {
+      const { ref } = getElement();
+      const isInView = useInView( ref );
+      useEffect( () => {
+        if ( isInView ) {
+          console.log( 'Inside' );
+        } else {
+          console.log( 'Outside' );
+        }
+      });
     }
   },
 } );
@@ -520,8 +527,6 @@ store( "myPlugin", {
 
 </details>
 <br/>
-
-The `wp-run` directive executes its callback while the node is rendered. That means you can use and compose hooks inside the passed callback and create your own logic, providing more flexibility than previous directives.
 
 #### `wp-key` 
 
@@ -580,7 +585,7 @@ In the example below, we get `state.isPlaying` from `otherPlugin` instead of `my
 
 ```html
 <div data-wp-interactive='{ "namespace": "myPlugin" }'>
-	<div data-bind--hidden="otherPlugin::!state.isPlaying" ... >
+  <div data-bind--hidden="otherPlugin::!state.isPlaying" ... >
 		<iframe ...></iframe>
 	</div>
 </div>
