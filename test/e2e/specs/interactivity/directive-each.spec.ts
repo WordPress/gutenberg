@@ -234,8 +234,7 @@ test.describe( 'data-wp-each', () => {
 				'A Storm of Swords',
 			] );
 
-			// Get the tags. They should not have disappeared or changed,
-			// except for the newly created element.
+			// Get the tags. They should not have disappeared or changed.
 			const [ agot, acok, asos ] = await elements.all();
 			await expect( agot ).toHaveAttribute( 'data-tag', '0' );
 			await expect( acok ).toHaveAttribute( 'data-tag', '1' );
@@ -243,9 +242,28 @@ test.describe( 'data-wp-each', () => {
 		} );
 	} );
 
-	test( 'should support elements around with their own `data-wp-key`', async ( {
-		page,
-	} ) => {} );
+	test( 'should respect elements after', async ( { page } ) => {
+		const elements = page.getByTestId( 'numbers' ).getByTestId( 'item' );
+		await expect( elements ).toHaveText( [ '1', '2', '3', '4' ] );
+		await page.getByTestId( 'numbers' ).getByTestId( 'shift' ).click();
+		await expect( elements ).toHaveText( [ '2', '3', '4' ] );
+		await page
+			.getByTestId( 'numbers' )
+			.getByTestId( 'unshift' )
+			.click( { clickCount: 2 } );
+		await expect( elements ).toHaveText( [ '0', '1', '2', '3', '4' ] );
+	} );
+
+	test( 'should support initial empty lists', async ( { page } ) => {
+		const elements = page.getByTestId( 'empty' ).getByTestId( 'item' );
+		await expect( elements ).toHaveText( [ 'item X' ] );
+		await page
+			.getByTestId( 'empty' )
+			.getByTestId( 'add' )
+			.click( { clickCount: 2 } );
+
+		await expect( elements ).toHaveText( [ 'item 0', 'item 1', 'item X' ] );
+	} );
 
 	test( 'should work on navigation', async ( { page } ) => {} );
 } );

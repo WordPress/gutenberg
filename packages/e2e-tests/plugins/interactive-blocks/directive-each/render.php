@@ -21,6 +21,8 @@ gutenberg_enqueue_module( 'directive-each-view' );
 		<p data-testid="item" data-wp-each-child>C</p>
 	</div>
 
+	<hr>
+
 	<div data-testid="fruits">
 		<button
 			data-testid="rotate" data-wp-on--click="actions.rotateFruits"
@@ -44,6 +46,8 @@ gutenberg_enqueue_module( 'directive-each-view' );
 		<p data-testid="item" data-wp-each-child>cherimoya</p>
 	</div>
 
+	<hr>
+
 	<div data-testid="books">
 		<button
 			data-testid="rotate" data-wp-on--click="actions.rotateBooks"
@@ -65,12 +69,41 @@ gutenberg_enqueue_module( 'directive-each-view' );
 				data-testid="item"
 				data-wp-text="context.book.title"
 				data-wp-on--click="actions.removeBook"
-				data-wp-init="callbacks.generateRandomId"
 			></p>
 		</template>
 		<!-- SSRed elements; they should be removed on hydration -->
 		<p data-testid="item" data-wp-each-child>A Game of Thrones</p>
 		<p data-testid="item" data-wp-each-child>A Clash of Kings</p>
 		<p data-testid="item" data-wp-each-child>A Storm of Swords</p>
+	</div>
+
+	<hr>
+
+	<div data-testid="numbers">
+		<button
+			data-testid="shift" data-wp-on--click="actions.shiftNumber"
+		>Shift</button>
+		<button
+			data-testid="unshift" data-wp-on--click="actions.unshiftNumber"
+		>Unshift</button>
+		<template data-wp-each="state.numbers">
+			<p data-wp-text="context.item" data-testid="item"></p>
+		</template>
+		<p data-testid="item" data-wp-each-child>1</p>
+		<p data-testid="item" data-wp-each-child>2</p>
+		<p data-testid="item" data-wp-each-child>3</p>
+		<p data-testid="item">4</p>
+	</div>
+
+	<hr>
+
+	<div data-testid="empty">
+		<button
+			data-testid="add" data-wp-on--click="actions.addItem"
+		>Add</button>
+		<template data-wp-each="state.emptyList">
+			<p data-wp-text="context.item" data-testid="item"></p>
+		</template>
+		<p data-testid="item">item X</p>
 	</div>
 </div>
