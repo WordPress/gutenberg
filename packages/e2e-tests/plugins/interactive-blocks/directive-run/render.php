@@ -46,7 +46,7 @@ gutenberg_enqueue_module( 'directive-run-view' );
 	>
 		<div
 			data-wp-run--mounted="callbacks.updateIsMounted"
-			data-wp-run--hooks="runs.useHooks"
+			data-wp-run--hooks="callbacks.useHooks"
 		>
 			Element with wp-run using hooks
 		</div>

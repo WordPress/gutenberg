@@ -75,8 +75,6 @@ const { state } = store( 'directive-run', {
 		updateRenderCount() {
 			setTimeout( () => ( state.renderCount = state.renderCount + 1 ) );
 		},
-	},
-	runs: {
 		useHooks() {
 			// Runs only on first render.
 			useInit( () => {
