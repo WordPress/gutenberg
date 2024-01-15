@@ -70,6 +70,7 @@ const ImageURLInputUI = ( {
 	rel,
 	showLightboxSetting,
 	lightboxEnabled,
+	onSetLightbox,
 } ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
 	// Use internal state instead of a ref to make sure that the component
@@ -310,11 +311,11 @@ const ImageURLInputUI = ( {
 										onClick={ () => {
 											setUrlInput( null );
 											onChangeUrl( {
-												lightbox: { enabled: true },
 												linkDestination:
 													LINK_DESTINATION_NONE,
 												href: '',
 											} );
+											onSetLightbox( true );
 											stopEditLink();
 										} }
 									>
@@ -375,9 +376,7 @@ const ImageURLInputUI = ( {
 									icon={ unlinkIcon }
 									label={ __( 'Remove link' ) }
 									onClick={ () => {
-										onChangeUrl( {
-											lightbox: { enabled: false },
-										} );
+										onSetLightbox( false );
 									} }
 								/>
 							</div>

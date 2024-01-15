@@ -254,6 +254,22 @@ export default function Image( {
 		setAttributes( props );
 	}
 
+	function onSetLightbox( enable ) {
+		if ( enable && ! lightboxSetting?.enabled ) {
+			setAttributes( {
+				lightbox: { enabled: true },
+			} );
+		} else if ( ! enable && lightboxSetting?.enabled ) {
+			setAttributes( {
+				lightbox: { enabled: false },
+			} );
+		} else {
+			setAttributes( {
+				lightbox: undefined,
+			} );
+		}
+	}
+
 	function onSetTitle( value ) {
 		// This is the HTML title attribute, separate from the media object
 		// title.
@@ -437,6 +453,7 @@ export default function Image( {
 						rel={ rel }
 						showLightboxSetting={ showLightboxSetting }
 						lightboxEnabled={ lightboxChecked }
+						onSetLightbox={ onSetLightbox }
 					/>
 				) }
 				{ allowCrop && (
