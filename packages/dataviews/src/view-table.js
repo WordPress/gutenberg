@@ -564,7 +564,16 @@ function ViewTable( {
 												field.maxWidth || undefined,
 										} }
 									>
-										<span className="dataviews-view-table__cell-content-wrapper">
+										<span
+											className={ classnames(
+												'dataviews-view-table__cell-content-wrapper',
+												{
+													'dataviews-view-table__primary-field':
+														primaryField?.id ===
+														field.id,
+												}
+											) }
+										>
 											{ field.render( {
 												item,
 											} ) }
