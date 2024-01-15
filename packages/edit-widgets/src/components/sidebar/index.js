@@ -1,13 +1,13 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { useEffect, Platform } from '@wordpress/element';
-import { isRTL, __, sprintf } from '@wordpress/i18n';
+import {
+	useEffect,
+	Platform,
+	useContext,
+	useCallback,
+} from '@wordpress/element';
+import { isRTL, __ } from '@wordpress/i18n';
 import {
 	ComplementaryArea,
 	store as interfaceStore,
@@ -18,7 +18,7 @@ import {
 } from '@wordpress/block-editor';
 
 import { drawerLeft, drawerRight } from '@wordpress/icons';
-import { Button } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
@@ -37,32 +37,104 @@ const WIDGET_AREAS_IDENTIFIER = 'edit-widgets/block-areas';
  */
 import WidgetAreas from './widget-areas';
 import { store as editWidgetsStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
-function ComplementaryAreaTab( { identifier, label, isActive } ) {
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+const { Tabs } = unlock( componentsPrivateApis );
+
+function SidebarHeader( { selectedWidgetAreaBlock } ) {
 	return (
-		<Button
-			onClick={ () =>
-				enableComplementaryArea( editWidgetsStore.name, identifier )
+		<Tabs.TabList>
+			<Tabs.Tab tabId={ WIDGET_AREAS_IDENTIFIER }>
+				{ selectedWidgetAreaBlock
+					? selectedWidgetAreaBlock.attributes.name
+					: __( 'Widget Areas' ) }
+			</Tabs.Tab>
+			<Tabs.Tab tabId={ BLOCK_INSPECTOR_IDENTIFIER }>
+				{ __( 'Block' ) }
+			</Tabs.Tab>
+		</Tabs.TabList>
+	);
+}
+
+function SidebarContent( {
+	hasSelectedNonAreaBlock,
+	currentArea,
+	isGeneralSidebarOpen,
+	selectedWidgetAreaBlock,
+} ) {
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+
+	// currentArea, and isGeneralSidebarOpen are intentionally left out from the dependencies,
+	// because we want to run the effect when a block is selected/unselected and not when the sidebar state changes.
+	useEffect( () => {
+		if (
+			hasSelectedNonAreaBlock &&
+			currentArea === WIDGET_AREAS_IDENTIFIER &&
+			isGeneralSidebarOpen
+		) {
+			enableComplementaryArea(
+				'core/edit-widgets',
+				BLOCK_INSPECTOR_IDENTIFIER
+			);
+		}
+		if (
+			! hasSelectedNonAreaBlock &&
+			currentArea === BLOCK_INSPECTOR_IDENTIFIER &&
+			isGeneralSidebarOpen
+		) {
+			enableComplementaryArea(
+				'core/edit-widgets',
+				WIDGET_AREAS_IDENTIFIER
+			);
+		}
+	}, [ hasSelectedNonAreaBlock, enableComplementaryArea ] );
+
+	const tabsContextValue = useContext( Tabs.Context );
+
+	return (
+		<ComplementaryArea
+			className="edit-widgets-sidebar"
+			header={
+				<Tabs.Context.Provider value={ tabsContextValue }>
+					<SidebarHeader
+						selectedWidgetAreaBlock={ selectedWidgetAreaBlock }
+					/>
+				</Tabs.Context.Provider>
 			}
-			className={ classnames( 'edit-widgets-sidebar__panel-tab', {
-				'is-active': isActive,
-			} ) }
-			aria-label={
-				isActive
-					? // translators: %s: sidebar label e.g: "Widget Areas".
-					  sprintf( __( '%s (selected)' ), label )
-					: label
-			}
-			data-label={ label }
+			headerClassName="edit-widgets-sidebar__panel-tabs"
+			/* translators: button label text should, if possible, be under 16 characters. */
+			title={ __( 'Settings' ) }
+			closeLabel={ __( 'Close Settings' ) }
+			scope="core/edit-widgets"
+			identifier={ currentArea }
+			icon={ isRTL() ? drawerLeft : drawerRight }
+			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
-			{ label }
-		</Button>
+			<Tabs.Context.Provider value={ tabsContextValue }>
+				<Tabs.TabPanel tabId={ WIDGET_AREAS_IDENTIFIER }>
+					<WidgetAreas
+						selectedWidgetAreaId={
+							selectedWidgetAreaBlock?.attributes.id
+						}
+					/>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId={ BLOCK_INSPECTOR_IDENTIFIER }>
+					{ hasSelectedNonAreaBlock ? (
+						<BlockInspector />
+					) : (
+						// Pretend that Widget Areas are part of the UI by not
+						// showing the Block Inspector when one is selected.
+						<span className="block-editor-block-inspector__no-blocks">
+							{ __( 'No block selected.' ) }
+						</span>
+					) }
+				</Tabs.TabPanel>
+			</Tabs.Context.Provider>
+		</ComplementaryArea>
 	);
 }
 
 export default function Sidebar() {
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const {
 		currentArea,
 		hasSelectedNonAreaBlock,
@@ -110,84 +182,33 @@ export default function Sidebar() {
 		};
 	}, [] );
 
-	// currentArea, and isGeneralSidebarOpen are intentionally left out from the dependencies,
-	// because we want to run the effect when a block is selected/unselected and not when the sidebar state changes.
-	useEffect( () => {
-		if (
-			hasSelectedNonAreaBlock &&
-			currentArea === WIDGET_AREAS_IDENTIFIER &&
-			isGeneralSidebarOpen
-		) {
-			enableComplementaryArea(
-				'core/edit-widgets',
-				BLOCK_INSPECTOR_IDENTIFIER
-			);
-		}
-		if (
-			! hasSelectedNonAreaBlock &&
-			currentArea === BLOCK_INSPECTOR_IDENTIFIER &&
-			isGeneralSidebarOpen
-		) {
-			enableComplementaryArea(
-				'core/edit-widgets',
-				WIDGET_AREAS_IDENTIFIER
-			);
-		}
-	}, [ hasSelectedNonAreaBlock, enableComplementaryArea ] );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+
+	const onTabSelect = useCallback(
+		( newSelectedTabId ) => {
+			if ( !! newSelectedTabId ) {
+				enableComplementaryArea(
+					editWidgetsStore.name,
+					newSelectedTabId
+				);
+			}
+		},
+		[ enableComplementaryArea ]
+	);
 
 	return (
-		<ComplementaryArea
-			className="edit-widgets-sidebar"
-			header={
-				<ul>
-					<li>
-						<ComplementaryAreaTab
-							identifier={ WIDGET_AREAS_IDENTIFIER }
-							label={
-								selectedWidgetAreaBlock
-									? selectedWidgetAreaBlock.attributes.name
-									: __( 'Widget Areas' )
-							}
-							isActive={ currentArea === WIDGET_AREAS_IDENTIFIER }
-						/>
-					</li>
-					<li>
-						<ComplementaryAreaTab
-							identifier={ BLOCK_INSPECTOR_IDENTIFIER }
-							label={ __( 'Block' ) }
-							isActive={
-								currentArea === BLOCK_INSPECTOR_IDENTIFIER
-							}
-						/>
-					</li>
-				</ul>
-			}
-			headerClassName="edit-widgets-sidebar__panel-tabs"
-			/* translators: button label text should, if possible, be under 16 characters. */
-			title={ __( 'Settings' ) }
-			closeLabel={ __( 'Close Settings' ) }
-			scope="core/edit-widgets"
-			identifier={ currentArea }
-			icon={ isRTL() ? drawerLeft : drawerRight }
-			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
+		<Tabs
+			selectedTabId={ currentArea }
+			onSelect={ onTabSelect }
+			selectOnMove={ false }
+			focusable={ false }
 		>
-			{ currentArea === WIDGET_AREAS_IDENTIFIER && (
-				<WidgetAreas
-					selectedWidgetAreaId={
-						selectedWidgetAreaBlock?.attributes.id
-					}
-				/>
-			) }
-			{ currentArea === BLOCK_INSPECTOR_IDENTIFIER &&
-				( hasSelectedNonAreaBlock ? (
-					<BlockInspector />
-				) : (
-					// Pretend that Widget Areas are part of the UI by not
-					// showing the Block Inspector when one is selected.
-					<span className="block-editor-block-inspector__no-blocks">
-						{ __( 'No block selected.' ) }
-					</span>
-				) ) }
-		</ComplementaryArea>
+			<SidebarContent
+				hasSelectedNonAreaBlock={ hasSelectedNonAreaBlock }
+				currentArea={ currentArea }
+				isGeneralSidebarOpen={ isGeneralSidebarOpen }
+				selectedWidgetAreaBlock={ selectedWidgetAreaBlock }
+			/>
+		</Tabs>
 	);
 }
