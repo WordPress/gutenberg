@@ -12,10 +12,13 @@ gutenberg_enqueue_module( 'directive-each-view' );
 	data-wp-interactive='{ "namespace": "directive-each" }'
 	data-wp-navigation-id="some-id"
 >
-	<div data-testid="default item name and key">
+	<div data-testid="letters">
 		<template data-wp-each="state.letters">
 			<p data-wp-text="context.item" data-testid="item"></p>
 		</template>
+		<p data-testid="item" data-wp-each-child>A</p>
+		<p data-testid="item" data-wp-each-child>B</p>
+		<p data-testid="item" data-wp-each-child>C</p>
 	</div>
 
 	<div data-testid="fruits">

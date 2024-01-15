@@ -21,9 +21,7 @@ test.describe( 'data-wp-each', () => {
 	test( 'should use `item` as the defaul item name in the context', async ( {
 		page,
 	} ) => {
-		const elements = page
-			.getByTestId( 'default item name and key' )
-			.getByTestId( 'item' );
+		const elements = page.getByTestId( 'letters' ).getByTestId( 'item' );
 		await expect( elements ).toHaveText( [ 'A', 'B', 'C' ] );
 	} );
 
