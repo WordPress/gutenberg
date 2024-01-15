@@ -155,5 +155,4 @@ class WP_Block_Bindings {
 	public function get_sources() {
 		return $this->sources;
 	}
-
 }
