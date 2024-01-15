@@ -148,6 +148,23 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	/**
 	 * @covers WP_REST_Font_Faces_Controller::get_items
 	 */
+	public function test_get_items_by_slug() {
+		$font_family = get_post( self::$font_family_id2 );
+
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/font-families' );
+		$request->set_param( 'slug', $font_family->post_name );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertCount( 1, $data );
+		$this->assertSame( $font_family->ID, $data[0]['id'] );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Faces_Controller::get_items
+	 */
 	public function test_get_items_no_permission() {
 		wp_set_current_user( 0 );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-families' );
@@ -421,7 +438,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 		$response = rest_get_server()->dispatch( $request );
 
-		$this->assertErrorResponse( 'rest_duplicate_font_family', $response, 409 );
+		$this->assertErrorResponse( 'rest_duplicate_font_family', $response, 400 );
 		$expected_message = 'A font family with slug "helvetica" already exists.';
 		$message          = $response->as_error()->get_error_messages()[0];
 		$this->assertSame( $expected_message, $message );

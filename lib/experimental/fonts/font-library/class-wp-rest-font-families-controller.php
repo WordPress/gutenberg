@@ -216,7 +216,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 				'rest_duplicate_font_family',
 				/* translators: %s: Font family slug. */
 				sprintf( __( 'A font family with slug "%s" already exists.', 'gutenberg' ), $settings['slug'] ),
-				array( 'status' => WP_Http::CONFLICT )
+				array( 'status' => 400 )
 			);
 		}
 
@@ -380,6 +380,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 			'page'     => $params['page'],
 			'per_page' => $params['per_page'],
 			'search'   => $params['search'],
+			'slug'     => $params['slug'],
 		);
 	}
 
