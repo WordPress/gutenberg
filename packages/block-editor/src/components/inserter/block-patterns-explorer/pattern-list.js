@@ -18,7 +18,7 @@ import { searchItems } from '../search-items';
 import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
 import {
-	PATTERN_TYPES,
+	INSERTER_PATTERN_TYPES,
 	allPatternsCategory,
 	myPatternsCategory,
 } from '../block-patterns-tab/utils';
@@ -73,7 +73,7 @@ function PatternList( { searchValue, selectedCategory, patternCategories } ) {
 			}
 			if (
 				selectedCategory === myPatternsCategory.name &&
-				pattern.type === PATTERN_TYPES.user
+				pattern.type === INSERTER_PATTERN_TYPES.user
 			) {
 				return true;
 			}

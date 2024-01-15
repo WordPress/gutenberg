@@ -31,6 +31,7 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     private static final int MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
     private static final int MEDIA_UPLOAD_STATE_FAILED = 3;
     private static final int MEDIA_UPLOAD_STATE_RESET = 4;
+    private static final int MEDIA_UPLOAD_STATE_PAUSED = 11;
 
     private static final int MEDIA_SAVE_STATE_SAVING = 5;
     private static final int MEDIA_SAVE_STATE_SUCCEEDED = 6;
@@ -178,6 +179,11 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     @Override
     public void onMediaFileUploadFailed(int mediaId) {
         setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0);
+    }
+
+    @Override
+    public void onMediaFileUploadPaused(int mediaId) {
+        setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_PAUSED, mediaId, null, 0);
     }
 
     // Media file save events emitter

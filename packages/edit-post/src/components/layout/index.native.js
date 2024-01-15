@@ -152,10 +152,7 @@ class Layout extends Component {
 					onLayout={ this.onRootViewLayout }
 				>
 					<AutosaveMonitor disableIntervalChecks />
-					{
-						// eslint-disable-next-line no-undef
-						__DEV__ && <OfflineStatus />
-					}
+					<OfflineStatus />
 					<View style={ editorStyles }>
 						{ isHtmlView ? this.renderHTML() : this.renderVisual() }
 						{ ! isHtmlView && Platform.OS === 'android' && (

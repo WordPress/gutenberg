@@ -213,13 +213,13 @@ export function EntitiesSavedStatesExtensible( {
 					{ __( 'Are you ready to save?' ) }
 				</strong>
 				{ additionalPrompt }
-				{ isDirty && (
-					<p>
-						{ __(
-							'The following changes have been made to your site, templates, and content.'
-						) }
-					</p>
-				) }
+				<p>
+					{ isDirty
+						? __(
+								'The following changes have been made to your site, templates, and content.'
+						  )
+						: __( 'Select the items you want to save.' ) }
+				</p>
 			</div>
 
 			{ sortedPartitionedSavables.map( ( list ) => {

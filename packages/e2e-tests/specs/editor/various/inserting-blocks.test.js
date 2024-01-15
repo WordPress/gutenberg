@@ -323,7 +323,7 @@ describe( 'Inserting blocks', () => {
 		);
 		await browseAll.click();
 		const availableBlocks = await page.$$(
-			'.edit-post-editor__inserter-panel .block-editor-block-types-list__list-item'
+			'.editor-inserter-sidebar .block-editor-block-types-list__list-item'
 		);
 		expect( availableBlocks ).toHaveLength( 1 );
 	} );
@@ -336,9 +336,7 @@ describe( 'Inserting blocks', () => {
 		);
 
 		// The inserter panel should've closed.
-		const inserterPanels = await page.$$(
-			'.edit-post-editor__inserter-panel'
-		);
+		const inserterPanels = await page.$$( '.editor-inserter-sidebar' );
 		expect( inserterPanels.length ).toBe( 0 );
 
 		// The editable 'Read More' text should be focused.

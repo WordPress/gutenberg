@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add experimental support for `viewModule` field in block.json for `build` and `start` scripts ([#57461](https://github.com/WordPress/gutenberg/pull/57461)).
+
 ### Breaking Changes
 
 -   Drop support for Node.js versions < 18.

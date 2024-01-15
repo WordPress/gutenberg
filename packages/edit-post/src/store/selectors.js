@@ -30,8 +30,7 @@ const EMPTY_OBJECT = {};
  */
 export const getEditorMode = createRegistrySelector(
 	( select ) => () =>
-		select( preferencesStore ).get( 'core/edit-post', 'editorMode' ) ??
-		'visual'
+		select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
 );
 
 /**
@@ -165,38 +164,49 @@ export const getPreferences = createRegistrySelector( ( select ) => () => {
 	// These preferences now exist in the preferences store.
 	// Fetch them so that they can be merged into the post
 	// editor preferences.
-	const preferences = [
-		'hiddenBlockTypes',
-		'editorMode',
-		'preferredStyleVariations',
-	].reduce( ( accumulatedPrefs, preferenceKey ) => {
-		const value = select( preferencesStore ).get(
-			'core/edit-post',
-			preferenceKey
-		);
+	const preferences = [ 'preferredStyleVariations' ].reduce(
+		( accumulatedPrefs, preferenceKey ) => {
+			const value = select( preferencesStore ).get(
+				'core/edit-post',
+				preferenceKey
+			);
 
-		return {
-			...accumulatedPrefs,
-			[ preferenceKey ]: value,
-		};
-	}, {} );
+			return {
+				...accumulatedPrefs,
+				[ preferenceKey ]: value,
+			};
+		},
+		{}
+	);
+	const corePreferences = [ 'editorMode', 'hiddenBlockTypes' ].reduce(
+		( accumulatedPrefs, preferenceKey ) => {
+			const value = select( preferencesStore ).get(
+				'core',
+				preferenceKey
+			);
+
+			return {
+				...accumulatedPrefs,
+				[ preferenceKey ]: value,
+			};
+		},
+		{}
+	);
 
 	// Panels were a preference, but the data structure changed when the state
 	// was migrated to the preferences store. They need to be converted from
 	// the new preferences store format to old format to ensure no breaking
 	// changes for plugins.
 	const inactivePanels = select( preferencesStore ).get(
-		'core/edit-post',
+		'core',
 		'inactivePanels'
 	);
-	const openPanels = select( preferencesStore ).get(
-		'core/edit-post',
-		'openPanels'
-	);
+	const openPanels = select( preferencesStore ).get( 'core', 'openPanels' );
 	const panels = convertPanelsToOldFormat( inactivePanels, openPanels );
 
 	return {
 		...preferences,
+		...corePreferences,
 		panels,
 	};
 } );
@@ -228,10 +238,8 @@ export function getPreference( state, preferenceKey, defaultValue ) {
  */
 export const getHiddenBlockTypes = createRegistrySelector( ( select ) => () => {
 	return (
-		select( preferencesStore ).get(
-			'core/edit-post',
-			'hiddenBlockTypes'
-		) ?? EMPTY_ARRAY
+		select( preferencesStore ).get( 'core', 'hiddenBlockTypes' ) ??
+		EMPTY_ARRAY
 	);
 } );
 

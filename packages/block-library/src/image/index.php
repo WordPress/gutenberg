@@ -97,12 +97,6 @@ function block_core_image_get_lightbox_settings( $block ) {
 	// Get the lightbox setting from the block attributes.
 	if ( isset( $block['attrs']['lightbox'] ) ) {
 		$lightbox_settings = $block['attrs']['lightbox'];
-		// If the lightbox setting is not set in the block attributes,
-		// check the legacy lightbox settings that are set using the
-		// `gutenberg_should_render_lightbox` filter.
-		// We can remove this elseif statement when the legacy lightbox settings are removed.
-	} elseif ( isset( $block['legacyLightboxSettings'] ) ) {
-		$lightbox_settings = $block['legacyLightboxSettings'];
 	}
 
 	if ( ! isset( $lightbox_settings ) ) {

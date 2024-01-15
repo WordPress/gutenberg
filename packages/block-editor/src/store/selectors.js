@@ -2742,8 +2742,11 @@ export const __unstableGetContentLockingParent = createSelector(
 		while ( state.blocks.parents.has( current ) ) {
 			current = state.blocks.parents.get( current );
 			if (
-				current &&
-				getTemplateLock( state, current ) === 'contentOnly'
+				( current &&
+					getBlockName( state, current ) === 'core/block' &&
+					window.__experimentalPatternPartialSyncing ) ||
+				( current &&
+					getTemplateLock( state, current ) === 'contentOnly' )
 			) {
 				result = current;
 			}
@@ -2762,6 +2765,17 @@ export const __unstableGetContentLockingParent = createSelector(
  */
 export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 	return state.temporarilyEditingAsBlocks;
+}
+
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @param {Object} state Global application state.
+ */
+export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
+	return state.temporarilyEditingFocusModeRevert;
 }
 
 export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
@@ -2943,14 +2957,3 @@ export const isGroupable = createRegistrySelector(
 			);
 		}
 );
-
-/**
- * Returns the element of the last element that had focus when focus left the editor canvas.
- *
- * @param {Object} state Block editor state.
- *
- * @return {Object} Element.
- */
-export function getLastFocus( state ) {
-	return state.lastFocus;
-}
