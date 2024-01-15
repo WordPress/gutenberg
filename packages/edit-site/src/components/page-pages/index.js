@@ -226,10 +226,7 @@ export default function PagePages() {
 				render: ( { item } ) => {
 					return (
 						<VStack spacing={ 1 }>
-							<View
-								as="span"
-								className="dataviews-view-grid__title-field"
-							>
+							<View as="span">
 								{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
 									view.type
 								) ? (

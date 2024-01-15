@@ -105,7 +105,7 @@ function TemplateTitle( { item, viewType } ) {
 
 	return (
 		<VStack spacing={ 1 }>
-			<View as="span" className="dataviews-view-grid__title-field">
+			<View as="span">
 				<Link
 					params={ {
 						postId: item.id,
