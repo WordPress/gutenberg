@@ -2,15 +2,7 @@
 
 Checkboxes allow the user to select one or more items from a set.
 
-![](https://make.wordpress.org/design/files/2019/02/CheckboxControl.png)
-
-Selected and unselected checkboxes
-
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
+![Selected and unselected checkboxes](https://make.wordpress.org/design/files/2019/02/CheckboxControl.png)
 
 ## Design guidelines
 
@@ -56,8 +48,8 @@ If only a few child checkboxes are checked, the parent checkbox becomes a mixed 
 Render an is author checkbox:
 
 ```jsx
+import { useState } from 'react';
 import { CheckboxControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyCheckboxControl = () => {
 	const [ isChecked, setChecked ] = useState( true );
@@ -77,15 +69,16 @@ const MyCheckboxControl = () => {
 The set of props accepted by the component will be specified below.
 Props not included in this set will be applied to the input element.
 
-#### `label`: `string`
+#### `label`: `string|false`
 
 A label for the input field, that appears at the side of the checkbox.
 The prop will be rendered as content a label element.
 If no prop is passed an empty label is rendered.
+If the prop is set to false no label is rendered.
 
 -   Required: No
 
-#### `help`: `string|WPElement`
+#### `help`: `string|Element`
 
 If this property is added, a help text will be generated using help property as the content.
 

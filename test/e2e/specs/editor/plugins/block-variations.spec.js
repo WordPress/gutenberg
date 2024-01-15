@@ -48,7 +48,9 @@ test.describe( 'Block variations', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/Large Quote' );
 		await page.keyboard.press( 'Enter' );
 
@@ -82,7 +84,9 @@ test.describe( 'Block variations', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/Heading' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/Success Message' );
@@ -97,7 +101,9 @@ test.describe( 'Block variations', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/Columns' );
 		await page.keyboard.press( 'Enter' );
 
@@ -120,7 +126,9 @@ test.describe( 'Block variations', () => {
 		pageUtils,
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/Large Quote' );
 		await page.keyboard.press( 'Enter' );
 
@@ -155,7 +163,9 @@ test.describe( 'Block variations', () => {
 		pageUtils,
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/Heading' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/Success Message' );
@@ -189,7 +199,9 @@ test.describe( 'Block variations', () => {
 		pageUtils,
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/Heading' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/Warning Message' );

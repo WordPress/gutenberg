@@ -98,9 +98,9 @@ The `disableDropZone` prop still takes precedence over `dropZoneUIOnly` – spec
 
 ### icon
 
-Icon to display left of the title. When passed as a `String`, the icon will be resolved as a [Dashicon](https://developer.wordpress.org/resource/dashicons/). Alternatively, you can pass in a `WPComponent` such as `BlockIcon`to render instead.
+Icon to display left of the title. When passed as a `String`, the icon will be resolved as a [Dashicon](https://developer.wordpress.org/resource/dashicons/). Alternatively, you can pass in a `Component` such as `BlockIcon`to render instead.
 
--   Type: `String|WPComponent`
+-   Type: `String|Component`
 -   Required: No
 -   Platform: Web | Mobile
 
@@ -216,7 +216,7 @@ Replace implementation of the placeholder:
 ```js
 function replaceMediaPlaceholder() {
 	return function () {
-		return wp.element.createElement(
+		return React.createElement(
 			'div',
 			{},
 			'The replacement contents or components.'

@@ -14,8 +14,8 @@ export default function getIsListPage(
 	isMobileViewport
 ) {
 	return (
-		path === '/wp_template/all' ||
-		path === '/wp_template_part/all' ||
+		[ '/wp_template/all', '/wp_template_part/all' ].includes( path ) ||
+		( path === '/page' && window?.__experimentalAdminViews ) ||
 		( path === '/patterns' &&
 			// Don't treat "/patterns" without categoryType and categoryId as a
 			// list page in mobile because the sidebar covers the whole page.

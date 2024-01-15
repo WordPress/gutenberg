@@ -22,7 +22,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 ```
 
 2. Quit and restart the terminal.
-3. Run `nvm install --lts` in the terminal to install the latest [LTS](https://nodejs.dev/en/about/releases/) (Long Term Support) version of Node.js.
+3. Run `nvm install --lts` in the terminal to install the latest [LTS](https://nodejs.org/en/about/previous-releases) (Long Term Support) version of Node.js.
 4. Run `node -v` and `npm -v` in the terminal to verify the installed `node` and `npm` versions.
 
 If needed, you can also install specific versions of `node`. For example, install version 18 by running `nvm install 18`, and switch between different versions by running `nvm use [version-number]`. See the `nvm` [usage guide](https://github.com/nvm-sh/nvm#usage) for more details.

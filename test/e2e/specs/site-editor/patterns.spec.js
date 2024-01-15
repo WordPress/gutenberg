@@ -70,9 +70,6 @@ test.describe( 'Patterns', () => {
 			.getByRole( 'textbox', { name: 'Name' } )
 			.fill( 'My pattern' );
 		await page.keyboard.press( 'Enter' );
-		await expect(
-			createPatternDialog.getByRole( 'button', { name: 'Create' } )
-		).toBeDisabled();
 
 		await expect( page ).toHaveTitle( /^My pattern/ );
 		await expect(

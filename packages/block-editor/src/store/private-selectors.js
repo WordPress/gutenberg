@@ -10,7 +10,12 @@ import {
 	getBlockOrder,
 	getBlockParents,
 	getBlockEditingMode,
+	getSettings,
+	__experimentalGetParsedPattern,
+	canInsertBlockType,
+	__experimentalGetAllowedPatterns,
 } from './selectors';
+import { getUserPatterns, checkAllowListRecursive } from './utils';
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -163,4 +168,127 @@ export function getOpenedBlockSettingsMenu( state ) {
  */
 export function getStyleOverrides( state ) {
 	return state.styleOverrides;
+}
+
+/** @typedef {import('./actions').InserterMediaCategory} InserterMediaCategory */
+/**
+ * Returns the registered inserter media categories through the public API.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {InserterMediaCategory[]} Inserter media categories.
+ */
+export function getRegisteredInserterMediaCategories( state ) {
+	return state.registeredInserterMediaCategories;
+}
+
+/**
+ * Returns an array containing the allowed inserter media categories.
+ * It merges the registered media categories from extenders with the
+ * core ones. It also takes into account the allowed `mime_types`, which
+ * can be altered by `upload_mimes` filter and restrict some of them.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {InserterMediaCategory[]} Client IDs of descendants.
+ */
+export const getInserterMediaCategories = createSelector(
+	( state ) => {
+		const {
+			settings: {
+				inserterMediaCategories,
+				allowedMimeTypes,
+				enableOpenverseMediaCategory,
+			},
+			registeredInserterMediaCategories,
+		} = state;
+		// The allowed `mime_types` can be altered by `upload_mimes` filter and restrict
+		// some of them. In this case we shouldn't add the category to the available media
+		// categories list in the inserter.
+		if (
+			( ! inserterMediaCategories &&
+				! registeredInserterMediaCategories.length ) ||
+			! allowedMimeTypes
+		) {
+			return;
+		}
+		const coreInserterMediaCategoriesNames =
+			inserterMediaCategories?.map( ( { name } ) => name ) || [];
+		const mergedCategories = [
+			...( inserterMediaCategories || [] ),
+			...( registeredInserterMediaCategories || [] ).filter(
+				( { name } ) =>
+					! coreInserterMediaCategoriesNames.includes( name )
+			),
+		];
+		return mergedCategories.filter( ( category ) => {
+			// Check if Openverse category is enabled.
+			if (
+				! enableOpenverseMediaCategory &&
+				category.name === 'openverse'
+			) {
+				return false;
+			}
+			return Object.values( allowedMimeTypes ).some( ( mimeType ) =>
+				mimeType.startsWith( `${ category.mediaType }/` )
+			);
+		} );
+	},
+	( state ) => [
+		state.settings.inserterMediaCategories,
+		state.settings.allowedMimeTypes,
+		state.settings.enableOpenverseMediaCategory,
+		state.registeredInserterMediaCategories,
+	]
+);
+
+/**
+ * Returns whether there is at least one allowed pattern for inner blocks children.
+ * This is useful for deferring the parsing of all patterns until needed.
+ *
+ * @param {Object} state               Editor state.
+ * @param {string} [rootClientId=null] Target root client ID.
+ *
+ * @return {boolean} If there is at least one allowed pattern.
+ */
+export const hasAllowedPatterns = createSelector(
+	( state, rootClientId = null ) => {
+		const patterns = state.settings.__experimentalBlockPatterns;
+		const userPatterns = getUserPatterns( state );
+		const { allowedBlockTypes } = getSettings( state );
+		return [ ...userPatterns, ...patterns ].some(
+			( { name, inserter = true } ) => {
+				if ( ! inserter ) {
+					return false;
+				}
+				const { blocks } = __experimentalGetParsedPattern(
+					state,
+					name
+				);
+				return (
+					checkAllowListRecursive( blocks, allowedBlockTypes ) &&
+					blocks.every( ( { name: blockName } ) =>
+						canInsertBlockType( state, blockName, rootClientId )
+					)
+				);
+			}
+		);
+	},
+	( state, rootClientId ) => [
+		...__experimentalGetAllowedPatterns.getDependants(
+			state,
+			rootClientId
+		),
+	]
+);
+
+/**
+ * Returns the element of the last element that had focus when focus left the editor canvas.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {Object} Element.
+ */
+export function getLastFocus( state ) {
+	return state.lastFocus;
 }

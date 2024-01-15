@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import downloadjs from 'downloadjs';
 import { paramCase as kebabCase } from 'change-case';
 
 /**
@@ -37,6 +36,7 @@ import {
 } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { downloadBlob } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -114,13 +114,13 @@ function GridItem( { categoryId, item, ...props } ) {
 		const json = {
 			__file: item.type,
 			title: item.title || item.name,
-			content: item.patternBlock.content.raw,
-			syncStatus: item.patternBlock.wp_pattern_sync_status,
+			content: item.patternPost.content.raw,
+			syncStatus: item.patternPost.wp_pattern_sync_status,
 		};
 
-		return downloadjs(
-			JSON.stringify( json, null, 2 ),
+		return downloadBlob(
 			`${ kebabCase( item.title || item.name ) }.json`,
+			JSON.stringify( json, null, 2 ),
 			'application/json'
 		);
 	};
@@ -174,6 +174,7 @@ function GridItem( { categoryId, item, ...props } ) {
 				// Even though still incomplete, passing ids helps performance.
 				// @see https://reakit.io/docs/composite/#performance.
 				id={ `edit-site-patterns-${ item.name }` }
+				type="button"
 				{ ...props }
 				onClick={
 					item.type !== PATTERN_TYPES.theme ? onClick : undefined
@@ -199,6 +200,7 @@ function GridItem( { categoryId, item, ...props } ) {
 					<BlockPreview
 						blocks={ item.blocks }
 						additionalStyles={ additionalStyles }
+						viewportWidth={ item.viewportWidth }
 					/>
 				) }
 			</button>

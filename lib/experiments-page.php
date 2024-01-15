@@ -68,6 +68,18 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-dataviews',
+		__( 'New admin views', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the new views for different entities like pages.', 'gutenberg' ),
+			'id'    => 'gutenberg-dataviews',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-color-randomizer',
 		__( 'Color randomizer ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -76,6 +88,17 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Test the Global Styles color randomizer; a utility that lets you mix the current color palette pseudo-randomly.', 'gutenberg' ),
 			'id'    => 'gutenberg-color-randomizer',
+		)
+	);
+	add_settings_field(
+		'gutenberg-form-blocks',
+		__( 'Form and input blocks ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test new blocks to allow building forms (Warning: The new feature is not ready. You may experience UX issues that are being addressed)', 'gutenberg' ),
+			'id'    => 'gutenberg-form-blocks',
 		)
 	);
 
@@ -105,13 +128,25 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-custom-fields',
-		__( 'Connections', 'gutenberg' ),
+		__( 'Block Bindings & Custom Fields', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test Connections', 'gutenberg' ),
-			'id'    => 'gutenberg-connections',
+			'label' => __( 'Test connecting block attributes to different sources like custom fields', 'gutenberg' ),
+			'id'    => 'gutenberg-block-bindings',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-pattern-partial-syncing',
+		__( 'Pattern overrides', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test overrides in synced patterns', 'gutenberg' ),
+			'id'    => 'gutenberg-pattern-partial-syncing',
 		)
 	);
 

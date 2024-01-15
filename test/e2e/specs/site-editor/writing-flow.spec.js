@@ -24,7 +24,7 @@ test.describe( 'Site editor writing flow', () => {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
 		} );
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 		// Select the first site title block.
 		const siteTitleBlock = editor.canvas.locator(
 			'role=document[name="Block: Site Title"i]'
@@ -52,7 +52,7 @@ test.describe( 'Site editor writing flow', () => {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
 		} );
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 		// Make sure the sidebar is open.
 		await editor.openDocumentSettingsSidebar();
 

@@ -64,7 +64,7 @@
  */
 
 @mixin block-toolbar-button-style__focus() {
-	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 4px $white;
+	box-shadow: inset 0 0 0 $border-width var(--wp-components-color-background, $white), 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;

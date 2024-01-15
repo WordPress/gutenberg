@@ -21,7 +21,7 @@ import { search, closeSmall } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import TabLayout from './tab-layout';
+import TabPanelLayout from './tab-panel-layout';
 import { FontLibraryContext } from './context';
 import FontsGrid from './fonts-grid';
 import FontCard from './font-card';
@@ -31,6 +31,7 @@ import { toggleFont } from './utils/toggleFont';
 import { getFontsOutline } from './utils/fonts-outline';
 import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
 import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
+import { downloadFontFaceAsset } from './utils';
 
 const DEFAULT_CATEGORY = {
 	id: 'all',
@@ -54,7 +55,7 @@ function FontCollection( { id } ) {
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const { collections, getFontCollection, installFonts } =
+	const { collections, getFontCollection, installFont } =
 		useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
 		( collection ) => collection.id === id
@@ -72,20 +73,37 @@ function FontCollection( { id } ) {
 	}, [ id, requiresPermission ] );
 
 	useEffect( () => {
-		getFontCollection( id );
-		resetFilters();
+		const fetchFontCollection = async () => {
+			try {
+				await getFontCollection( id );
+				resetFilters();
+			} catch ( e ) {
+				setNotice( {
+					type: 'error',
+					message: e?.message,
+					duration: 0, // Don't auto-hide.
+				} );
+			}
+		};
+		fetchFontCollection();
 	}, [ id, getFontCollection ] );
 
 	useEffect( () => {
 		setSelectedFont( null );
+		setNotice( null );
 	}, [ id ] );
+
+	useEffect( () => {
+		// If the selected fonts change, reset the selected fonts to install
+		setFontsToInstall( [] );
+	}, [ selectedFont ] );
 
 	// Reset notice after 5 seconds
 	useEffect( () => {
-		if ( notice ) {
+		if ( notice && notice?.duration !== 0 ) {
 			const timeout = setTimeout( () => {
 				setNotice( null );
-			}, 5000 );
+			}, notice.duration ?? 5000 );
 			return () => clearTimeout( timeout );
 		}
 	}, [ notice ] );
@@ -137,14 +155,41 @@ function FontCollection( { id } ) {
 	};
 
 	const handleInstall = async () => {
-		const response = await installFonts( fontsToInstall );
+		const fontFamily = fontsToInstall[ 0 ];
+
+		try {
+			if ( fontFamily?.fontFace ) {
+				await Promise.all(
+					fontFamily.fontFace.map( async ( fontFace ) => {
+						if ( fontFace.downloadFromUrl ) {
+							fontFace.file = await downloadFontFaceAsset(
+								fontFace.downloadFromUrl
+							);
+							delete fontFace.downloadFromUrl;
+						}
+					} )
+				);
+			}
+		} catch ( error ) {
+			// If any of the fonts fail to download,
+			// show an error notice and stop the request from being sent.
+			setNotice( {
+				type: 'error',
+				message: __(
+					'Error installing the fonts, could not be downloaded.'
+				),
+			} );
+			return;
+		}
+
+		const response = await installFont( fontFamily );
 		const installNotice = getNoticeFromInstallResponse( response );
 		setNotice( installNotice );
 		resetFontsToInstall();
 	};
 
 	return (
-		<TabLayout
+		<TabPanelLayout
 			title={
 				! selectedFont ? selectedCollection.name : selectedFont.name
 			}
@@ -165,10 +210,6 @@ function FontCollection( { id } ) {
 					<Spacer margin={ 8 } />
 					<GoogleFontsConfirmDialog />
 				</>
-			) }
-
-			{ ! renderConfirmDialog && ! selectedCollection.data && (
-				<Spinner />
 			) }
 
 			{ notice && (
@@ -227,16 +268,16 @@ function FontCollection( { id } ) {
 			) }
 
 			<Spacer margin={ 4 } />
-
 			{ ! renderConfirmDialog &&
-				! selectedCollection?.data?.fontFamilies && <Spinner /> }
+				! selectedCollection?.data?.fontFamilies &&
+				! notice && <Spinner /> }
 
 			{ ! renderConfirmDialog &&
 				!! selectedCollection?.data?.fontFamilies?.length &&
 				! fonts.length && (
 					<Text>
 						{ __(
-							'No fonts found. Try with a different seach term'
+							'No fonts found. Try with a different search term'
 						) }
 					</Text>
 				) }
@@ -262,7 +303,7 @@ function FontCollection( { id } ) {
 					) ) }
 				</FontsGrid>
 			) }
-		</TabLayout>
+		</TabPanelLayout>
 	);
 }
 

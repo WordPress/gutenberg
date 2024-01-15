@@ -200,7 +200,7 @@
 							}
 						},
 						"link": {
-							"description": "Allow users to set link colors.",
+							"description": "Allow users to set link colors in a block.",
 							"type": "boolean",
 							"default": false
 						},
@@ -228,7 +228,17 @@
 							}
 						},
 						"text": {
-							"description": "Allow users to set text colors.",
+							"description": "Allow users to set text colors in a block.",
+							"type": "boolean",
+							"default": true
+						},
+						"heading": {
+							"description": "Allow users to set heading colors in a block.",
+							"type": "boolean",
+							"default": true
+						},
+						"button": {
+							"description": "Allow users to set button colors in a block.",
 							"type": "boolean",
 							"default": true
 						}
@@ -288,6 +298,11 @@
 						},
 						"allowEditing": {
 							"description": "Disable the layout UI controls.",
+							"type": "boolean",
+							"default": true
+						},
+						"allowCustomContentAndWideSize": {
+							"description": "Enable or disable the custom content and wide size controls.",
 							"type": "boolean",
 							"default": true
 						}
@@ -364,7 +379,8 @@
 							"items": {
 								"type": "string"
 							},
-							"default": [ "px", "em", "rem", "vh", "vw", "%" ]
+							"default": [ "px", "em", "rem", "vh", "vw", "%" ],
+							"minItems": 1
 						},
 						"customSpacingSize": {
 							"description": "Allow users to set custom space sizes.",
@@ -425,9 +441,31 @@
 										"px",
 										"em",
 										"rem",
-										"vh",
+										"%",
 										"vw",
-										"%"
+										"svw",
+										"lvw",
+										"dvw",
+										"vh",
+										"svh",
+										"lvh",
+										"dvh",
+										"vi",
+										"svi",
+										"lvi",
+										"dvi",
+										"vb",
+										"svb",
+										"lvb",
+										"dvb",
+										"vmin",
+										"svmin",
+										"lvmin",
+										"dvmin",
+										"vmax",
+										"svmax",
+										"lvmax",
+										"dvmax"
 									],
 									"default": "rem"
 								}
@@ -446,6 +484,11 @@
 					"description": "Settings related to typography.",
 					"type": "object",
 					"properties": {
+						"defaultFontSizes": {
+							"description": "Allow users to choose font sizes from the default font size presets.",
+							"type": "boolean",
+							"default": true
+						},
 						"customFontSize": {
 							"description": "Allow users to set custom font sizes.",
 							"type": "boolean",
@@ -571,124 +614,136 @@
 							"description": "Font family presets for the font family selector.\nGenerates a single custom property (`--wp--preset--font-family--{slug}`) per preset value.",
 							"type": "array",
 							"items": {
-								"type": "object",
-								"properties": {
-									"name": {
-										"description": "Name of the font family preset, translatable.",
-										"type": "string"
-									},
-									"slug": {
-										"description": "Kebab-case unique identifier for the font family preset.",
-										"type": "string"
-									},
-									"fontFamily": {
-										"description": "CSS font-family value.",
-										"type": "string"
-									},
-									"fontFace": {
-										"description": "Array of font-face declarations.",
-										"type": "array",
-										"items": {
-											"type": "object",
-											"properties": {
-												"fontFamily": {
-													"description": "CSS font-family value.",
-													"type": "string",
-													"default": ""
-												},
-												"fontStyle": {
-													"description": "CSS font-style value.",
-													"type": "string",
-													"default": "normal"
-												},
-												"fontWeight": {
-													"description": "List of available font weights, separated by a space.",
-													"default": "400",
-													"oneOf": [
-														{
-															"type": "string"
-														},
-														{
-															"type": "integer"
-														}
-													]
-												},
-												"fontDisplay": {
-													"description": "CSS font-display value.",
-													"type": "string",
-													"default": "fallback",
-													"enum": [
-														"auto",
-														"block",
-														"fallback",
-														"swap",
-														"optional"
-													]
-												},
-												"src": {
-													"description": "Paths or URLs to the font files.",
-													"oneOf": [
-														{
-															"type": "string"
-														},
-														{
-															"type": "array",
-															"items": {
-																"type": "string"
-															}
-														}
-													],
-													"default": []
-												},
-												"fontStretch": {
-													"description": "CSS font-stretch value.",
-													"type": "string"
-												},
-												"ascentOverride": {
-													"description": "CSS ascent-override value.",
-													"type": "string"
-												},
-												"descentOverride": {
-													"description": "CSS descent-override value.",
-													"type": "string"
-												},
-												"fontVariant": {
-													"description": "CSS font-variant value.",
-													"type": "string"
-												},
-												"fontFeatureSettings": {
-													"description": "CSS font-feature-settings value.",
-													"type": "string"
-												},
-												"fontVariationSettings": {
-													"description": "CSS font-variation-settings value.",
-													"type": "string"
-												},
-												"lineGapOverride": {
-													"description": "CSS line-gap-override value.",
-													"type": "string"
-												},
-												"sizeAdjust": {
-													"description": "CSS size-adjust value.",
-													"type": "string"
-												},
-												"unicodeRange": {
-													"description": "CSS unicode-range value.",
-													"type": "string"
-												}
-											},
-											"required": [ "fontFamily", "src" ],
-											"additionalProperties": false
-										}
-									}
-								},
-								"additionalProperties": false
+								"$ref": "#/definitions/fontFamily"
 							}
 						}
 					},
 					"additionalProperties": false
 				}
 			}
+		},
+		"fontFamily": {
+			"type": "object",
+			"description": "Font family preset",
+			"properties": {
+				"name": {
+					"description": "Name of the font family preset, translatable.",
+					"type": "string"
+				},
+				"slug": {
+					"description": "Kebab-case unique identifier for the font family preset.",
+					"type": "string"
+				},
+				"fontFamily": {
+					"description": "CSS font-family value.",
+					"type": "string"
+				},
+				"preview": {
+					"description": "URL to a preview image of the font family.",
+					"type": "string"
+				},
+				"fontFace": {
+					"description": "Array of font-face declarations.",
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"fontFamily": {
+								"description": "CSS font-family value.",
+								"type": "string",
+								"default": ""
+							},
+							"fontStyle": {
+								"description": "CSS font-style value.",
+								"type": "string",
+								"default": "normal"
+							},
+							"fontWeight": {
+								"description": "List of available font weights, separated by a space.",
+								"default": "400",
+								"oneOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "integer"
+									}
+								]
+							},
+							"fontDisplay": {
+								"description": "CSS font-display value.",
+								"type": "string",
+								"default": "fallback",
+								"enum": [
+									"auto",
+									"block",
+									"fallback",
+									"swap",
+									"optional"
+								]
+							},
+							"src": {
+								"description": "Paths or URLs to the font files.",
+								"oneOf": [
+									{
+										"type": "string"
+									},
+									{
+										"type": "array",
+										"items": {
+											"type": "string"
+										}
+									}
+								],
+								"default": []
+							},
+							"fontStretch": {
+								"description": "CSS font-stretch value.",
+								"type": "string"
+							},
+							"ascentOverride": {
+								"description": "CSS ascent-override value.",
+								"type": "string"
+							},
+							"descentOverride": {
+								"description": "CSS descent-override value.",
+								"type": "string"
+							},
+							"fontVariant": {
+								"description": "CSS font-variant value.",
+								"type": "string"
+							},
+							"fontFeatureSettings": {
+								"description": "CSS font-feature-settings value.",
+								"type": "string"
+							},
+							"fontVariationSettings": {
+								"description": "CSS font-variation-settings value.",
+								"type": "string"
+							},
+							"lineGapOverride": {
+								"description": "CSS line-gap-override value.",
+								"type": "string"
+							},
+							"sizeAdjust": {
+								"description": "CSS size-adjust value.",
+								"type": "string"
+							},
+							"unicodeRange": {
+								"description": "CSS unicode-range value.",
+								"type": "string"
+							},
+							"preview": {
+								"description": "URL to a preview image of the font face.",
+								"type": "string"
+							}
+						},
+						"required": [ "fontFamily", "src" ],
+						"additionalProperties": false
+					}
+				}
+			},
+			"additionalProperties": false
 		},
 		"settingsPropertiesCustom": {
 			"type": "object",

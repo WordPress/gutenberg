@@ -1,8 +1,18 @@
 /**
+ * WordPress dependencies
+ */
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
-import { formatFontFamily } from './preview-styles';
+import { unlock } from '../../../../lock-unlock';
+
+/**
+ * Browser dependencies
+ */
+const { File } = window;
 
 export function setUIValuesNeeded( font, extraValues = {} ) {
 	if ( ! font.name && ( font.fontFamily || font.slug ) ) {
@@ -85,14 +95,10 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 	}
 
 	// eslint-disable-next-line no-undef
-	const newFont = new FontFace(
-		formatFontFamily( fontFace.fontFamily ),
-		dataSource,
-		{
-			style: fontFace.fontStyle,
-			weight: fontFace.fontWeight,
-		}
-	);
+	const newFont = new FontFace( fontFace.fontFamily, dataSource, {
+		style: fontFace.fontStyle,
+		weight: fontFace.fontWeight,
+	} );
 
 	const loadedFace = await newFont.load();
 
@@ -129,14 +135,21 @@ export function getDisplaySrcFromFontFace( input, urlPrefix ) {
 	return src;
 }
 
-export function makeFormDataFromFontFamilies( fontFamilies ) {
+export function makeFormDataFromFontFamily( fontFamily ) {
 	const formData = new FormData();
-	const newFontFamilies = fontFamilies.map( ( family, familyIndex ) => {
-		if ( family?.fontFace ) {
-			family.fontFace = family.fontFace.map( ( face, faceIndex ) => {
+	const { kebabCase } = unlock( componentsPrivateApis );
+
+	const newFontFamily = {
+		...fontFamily,
+		slug: kebabCase( fontFamily.slug ),
+	};
+
+	if ( newFontFamily?.fontFace ) {
+		const newFontFaces = newFontFamily.fontFace.map(
+			( face, faceIndex ) => {
 				if ( face.file ) {
 					// Slugified file name because the it might contain spaces or characters treated differently on the server.
-					const fileId = `file-${ familyIndex }-${ faceIndex }`;
+					const fileId = `file-${ faceIndex }`;
 					// Add the files to the formData
 					formData.append( fileId, face.file, face.file.name );
 					// remove the file object from the face object the file is referenced by the uploadedFile key
@@ -148,10 +161,41 @@ export function makeFormDataFromFontFamilies( fontFamilies ) {
 					return newFace;
 				}
 				return face;
-			} );
-		}
-		return family;
-	} );
-	formData.append( 'font_families', JSON.stringify( newFontFamilies ) );
+			}
+		);
+		newFontFamily.fontFace = newFontFaces;
+	}
+
+	formData.append( 'font_family_settings', JSON.stringify( newFontFamily ) );
 	return formData;
+}
+
+/*
+ * Downloads a font face asset from a URL to the client and returns a File object.
+ */
+export async function downloadFontFaceAsset( url ) {
+	return fetch( new Request( url ) )
+		.then( ( response ) => {
+			if ( ! response.ok ) {
+				throw new Error(
+					`Error downloading font face asset from ${ url }. Server responded with status: ${ response.status }`
+				);
+			}
+			return response.blob();
+		} )
+		.then( ( blob ) => {
+			const filename = url.split( '/' ).pop();
+			const file = new File( [ blob ], filename, {
+				type: blob.type,
+			} );
+			return file;
+		} )
+		.catch( ( error ) => {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Error downloading font face asset from ${ url }:`,
+				error
+			);
+			throw error;
+		} );
 }

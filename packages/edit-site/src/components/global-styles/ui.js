@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -11,7 +6,6 @@ import {
 	__experimentalNavigatorScreen as NavigatorScreen,
 	__experimentalUseNavigator as useNavigator,
 	createSlotFill,
-	Button,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
@@ -24,7 +18,7 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { backup, moreVertical } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
 
@@ -50,10 +44,12 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
 const SLOT_FILL_NAME = 'GlobalStylesMenu';
+const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
 const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
 	createSlotFill( SLOT_FILL_NAME );
 
 function GlobalStylesActionMenu() {
+	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { toggle } = useDispatch( preferencesStore );
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
@@ -65,100 +61,42 @@ function GlobalStylesActionMenu() {
 			: undefined;
 
 		return {
-			canEditCSS:
-				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
+	const { setEditorCanvasContainerView } = unlock(
+		useDispatch( editSiteStore )
+	);
 	const { goTo } = useNavigator();
-	const loadCustomCSS = () => goTo( '/css' );
+	const loadCustomCSS = () => {
+		setEditorCanvasContainerView( 'global-styles-css' );
+		goTo( '/css' );
+	};
 
 	return (
 		<GlobalStylesMenuFill>
 			<DropdownMenu icon={ moreVertical } label={ __( 'More' ) }>
 				{ ( { onClose } ) => (
-					<MenuGroup>
-						{ canEditCSS && (
-							<MenuItem onClick={ loadCustomCSS }>
-								{ __( 'Additional CSS' ) }
-							</MenuItem>
-						) }
-						<MenuItem
-							onClick={ () => {
-								toggle(
-									'core/edit-site',
-									'welcomeGuideStyles'
-								);
-								onClose();
-							} }
-						>
-							{ __( 'Welcome Guide' ) }
-						</MenuItem>
-					</MenuGroup>
-				) }
-			</DropdownMenu>
-		</GlobalStylesMenuFill>
-	);
-}
-
-function RevisionsCountBadge( { className, children } ) {
-	return (
-		<span
-			className={ classnames(
-				className,
-				'edit-site-global-styles-sidebar__revisions-count-badge'
-			) }
-		>
-			{ children }
-		</span>
-	);
-}
-function GlobalStylesRevisionsMenu() {
-	const { setIsListViewOpened } = useDispatch( editSiteStore );
-	const { revisionsCount } = useSelect( ( select ) => {
-		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-			select( coreStore );
-
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		const globalStyles = globalStylesId
-			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-			: undefined;
-
-		return {
-			revisionsCount:
-				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0,
-		};
-	}, [] );
-	const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
-	const [ canReset, onReset ] = useGlobalStylesReset();
-	const { goTo } = useNavigator();
-	const { setEditorCanvasContainerView } = unlock(
-		useDispatch( editSiteStore )
-	);
-	const loadRevisions = () => {
-		setIsListViewOpened( false );
-		goTo( '/revisions' );
-		setEditorCanvasContainerView( 'global-styles-revisions' );
-	};
-	const hasRevisions = revisionsCount > 0;
-
-	return (
-		<GlobalStylesMenuFill>
-			{ canReset || hasRevisions ? (
-				<DropdownMenu icon={ backup } label={ __( 'Revisions' ) }>
-					{ ( { onClose } ) => (
+					<>
 						<MenuGroup>
-							{ hasRevisions && (
-								<MenuItem
-									onClick={ loadRevisions }
-									icon={
-										<RevisionsCountBadge>
-											{ revisionsCount }
-										</RevisionsCountBadge>
-									}
-								>
-									{ __( 'Revision history' ) }
+							{ canEditCSS && (
+								<MenuItem onClick={ loadCustomCSS }>
+									{ __( 'Additional CSS' ) }
 								</MenuItem>
 							) }
+							<MenuItem
+								onClick={ () => {
+									toggle(
+										'core/edit-site',
+										'welcomeGuideStyles'
+									);
+									onClose();
+								} }
+							>
+								{ __( 'Welcome Guide' ) }
+							</MenuItem>
+						</MenuGroup>
+						<MenuGroup>
 							<MenuItem
 								onClick={ () => {
 									onReset();
@@ -166,19 +104,12 @@ function GlobalStylesRevisionsMenu() {
 								} }
 								disabled={ ! canReset }
 							>
-								{ __( 'Reset to defaults' ) }
+								{ __( 'Reset styles' ) }
 							</MenuItem>
 						</MenuGroup>
-					) }
-				</DropdownMenu>
-			) : (
-				<Button
-					label={ __( 'Revisions' ) }
-					icon={ backup }
-					disabled
-					__experimentalIsFocusable
-				/>
-			) }
+					</>
+				) }
+			</DropdownMenu>
 		</GlobalStylesMenuFill>
 	);
 }
@@ -299,7 +230,7 @@ function GlobalStylesBlockLink() {
 }
 
 function GlobalStylesEditorCanvasContainerLink() {
-	const { goTo, location } = useNavigator();
+	const { goTo } = useNavigator();
 	const editorCanvasContainerView = useSelect(
 		( select ) =>
 			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
@@ -310,25 +241,18 @@ function GlobalStylesEditorCanvasContainerLink() {
 	// to the appropriate screen. This effectively allows deep linking to the
 	// desired screens from outside the global styles navigation provider.
 	useEffect( () => {
-		if ( editorCanvasContainerView === 'global-styles-revisions' ) {
-			// Switching to the revisions container view should
-			// redirect to the revisions screen.
-			goTo( '/revisions' );
-		} else if (
-			!! editorCanvasContainerView &&
-			location?.path === '/revisions'
-		) {
-			// Switching to any container other than revisions should
-			// redirect from the revisions screen to the root global styles screen.
-			goTo( '/' );
-		} else if ( editorCanvasContainerView === 'global-styles-css' ) {
-			goTo( '/css' );
+		switch ( editorCanvasContainerView ) {
+			case 'global-styles-revisions':
+			case 'global-styles-revisions:style-book':
+				goTo( '/revisions' );
+				break;
+			case 'global-styles-css':
+				goTo( '/css' );
+				break;
+			default:
+				goTo( '/' );
+				break;
 		}
-
-		// location?.path is not a dependency because we don't want to track it.
-		// Doing so will cause an infinite loop. We could abstract logic to avoid
-		// having to disable the check later.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ editorCanvasContainerView, goTo ] );
 }
 
@@ -419,7 +343,6 @@ function GlobalStylesUI() {
 				<GlobalStylesStyleBook />
 			) }
 
-			<GlobalStylesRevisionsMenu />
 			<GlobalStylesActionMenu />
 			<GlobalStylesBlockLink />
 			<GlobalStylesEditorCanvasContainerLink />

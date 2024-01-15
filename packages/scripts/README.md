@@ -48,7 +48,7 @@ It might also be a good idea to get familiar with the [JavaScript Build Setup tu
 
 ## Automatic block.json detection and the source code directory
 
-When using the `start` or `build` commands, the source code directory ( the default is `./src`) and its subdirectories are scanned for the existence of `block.json` files. If one or more are found, they are treated a entry points and will be output into corresponding folders in the `build` directory. This allows for the creation of multiple blocks that use a single build process. The source directory can be customized using the `--webpack-src-dir` flag.
+When using the `start` or `build` commands, the source code directory ( the default is `./src`) and its subdirectories are scanned for the existence of `block.json` files. If one or more are found, they are treated a entry points and will be output into corresponding folders in the `build` directory. This allows for the creation of multiple blocks that use a single build process. The source directory can be customized using the `--webpack-src-dir` flag and the output directory with the `--output-path` flag.
 
 ## Updating to New Release
 
@@ -98,7 +98,7 @@ This is how you execute the script with presented setup:
 -   `npm run build` - builds the code for production.
 -   `npm run build:custom` - builds the code for production with two entry points and a custom output directory. Paths for custom entry points are relative to the project root.
 -   `npm run build:copy-php` - builds the code for production and opts into copying all PHP files from the `src` directory and its subfolders to the output directory. By default, only PHP files listed in the `render` field in the detected `block.json` files get copied.
--   `build:custom-directory` - builds the code for production using the `custom-directory` as the source code directory.
+-   `npm run build:custom-directory` - builds the code for production using the `custom-directory` as the source code directory.
 
 This script automatically use the optimized config but sometimes you may want to specify some custom options:
 
@@ -106,6 +106,12 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
 -   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
 -   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
+-   `--output-path` – Allows customization of the output directory. Default is `build`.
+
+Experimental support for the block.json `viewModule` field is available via the
+`--experimental-modules` option. With this option enabled, script and module fields will all be
+compiled. The `viewModule` field is analogous to the `viewScript` field, but will compile a module
+and should be registered in WordPress using the Modules API.
 
 #### Advanced information
 
@@ -388,6 +394,12 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.
 -   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
 -   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
+-   `--output-path` – Allows customization of the output directory. Default is `build`.
+
+Experimental support for the block.json `viewModule` field is available via the
+`--experimental-modules` option. With this option enabled, script and module fields will all be
+compiled. The `viewModule` field is analogous to the `viewScript` field, but will compile a module
+and should be registered in WordPress using the Modules API.
 
 #### Advanced information
 
@@ -491,7 +503,7 @@ Should there be any situation where you want to provide your own Jest config, yo
 -   there is a file called `jest-unit.config.js`, `jest-unit.config.json`, `jest.config.js`, or `jest.config.json` in the top-level directory of your package (at the same level than your `package.json`).
 -   a `jest` object can be provided in the `package.json` file with the test configuration.
 
-### `test-plyawright`
+### `test-playwright`
 
 Launches the Playwright End-To-End (E2E) test runner. Similar to Puppeteer, it provides a high-level API to control a headless browser.
 
@@ -721,8 +733,8 @@ module.exports = {
 
 If you follow this approach, please, be aware that:
 
-- You should keep using the `wp-scripts` commands (`start` and `build`). Do not use `webpack` directly.
-- Future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
+-   You should keep using the `wp-scripts` commands (`start` and `build`). Do not use `webpack` directly.
+-   Future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
 
 ## Contributing to this package
 

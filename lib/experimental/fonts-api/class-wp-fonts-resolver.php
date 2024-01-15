@@ -202,14 +202,24 @@ class WP_Fonts_Resolver {
 				$settings            = static::set_tyopgraphy_settings_array_structure( $settings );
 			}
 
+			// Initialize the font families from variation if set and is an array, otherwise default to an empty array.
+			$variation_font_families = ( isset( $variation['settings']['typography']['fontFamilies']['theme'] ) && is_array( $variation['settings']['typography']['fontFamilies']['theme'] ) )
+				? $variation['settings']['typography']['fontFamilies']['theme']
+				: array();
+
 			// Merge the variation settings with the global settings.
 			$settings['typography']['fontFamilies']['theme'] = array_merge(
 				$settings['typography']['fontFamilies']['theme'],
-				$variation['settings']['typography']['fontFamilies']['theme']
+				$variation_font_families
 			);
 
 			// Make sure there are no duplicates.
-			$settings['typography']['fontFamilies'] = array_unique( $settings['typography']['fontFamilies'] );
+			$settings['typography']['fontFamilies'] = array_unique( $settings['typography']['fontFamilies'], SORT_REGULAR );
+
+			// The font families from settings might become null after running the `array_unique`.
+			if ( ! isset( $settings['typography']['fontFamilies']['theme'] ) || ! is_array( $settings['typography']['fontFamilies']['theme'] ) ) {
+				$settings['typography']['fontFamilies']['theme'] = array();
+			}
 		}
 
 		return $settings;

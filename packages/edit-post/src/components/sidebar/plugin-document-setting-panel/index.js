@@ -5,14 +5,18 @@ import { createSlotFill, PanelBody } from '@wordpress/components';
 import { usePluginContext } from '@wordpress/plugins';
 import { useDispatch, useSelect } from '@wordpress/data';
 import warning from '@wordpress/warning';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { EnablePluginDocumentSettingPanelOption } from '../../preferences-modal/options';
-import { store as editPostStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
+const { EnablePluginDocumentSettingPanelOption } = unlock( editorPrivateApis );
 
 /**
  * Renders items below the Status & Availability panel in the Document Sidebar.
@@ -22,12 +26,12 @@ const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
  * @param {string}                [props.className]                     An optional class name added to the row.
  * @param {string}                [props.title]                         The title of the panel
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
- * @param {WPElement}             props.children                        Children to be rendered
+ * @param {Element}               props.children                        Children to be rendered
  *
  * @example
  * ```js
  * // Using ES5 syntax
- * var el = wp.element.createElement;
+ * var el = React.createElement;
  * var __ = wp.i18n.__;
  * var registerPlugin = wp.plugins.registerPlugin;
  * var PluginDocumentSettingPanel = wp.editPost.PluginDocumentSettingPanel;
@@ -64,7 +68,7 @@ const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
  *  registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
  * ```
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 const PluginDocumentSettingPanel = ( {
 	name,
@@ -78,7 +82,7 @@ const PluginDocumentSettingPanel = ( {
 	const { opened, isEnabled } = useSelect(
 		( select ) => {
 			const { isEditorPanelOpened, isEditorPanelEnabled } =
-				select( editPostStore );
+				select( editorStore );
 
 			return {
 				opened: isEditorPanelOpened( panelName ),
@@ -87,7 +91,7 @@ const PluginDocumentSettingPanel = ( {
 		},
 		[ panelName ]
 	);
-	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
+	const { toggleEditorPanelOpened } = useDispatch( editorStore );
 
 	if ( undefined === name ) {
 		warning( 'PluginDocumentSettingPanel requires a name property.' );

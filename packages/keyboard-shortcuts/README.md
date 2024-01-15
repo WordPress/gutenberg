@@ -26,7 +26,7 @@ _Parameters_
 
 _Returns_
 
--   `import('@wordpress/element').WPElement`: Component.
+-   `Element`: Component.
 
 ### store
 

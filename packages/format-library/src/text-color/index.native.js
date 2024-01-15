@@ -8,7 +8,7 @@ import { StyleSheet, View } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { BlockControls, useSetting } from '@wordpress/block-editor';
+import { BlockControls, useSettings } from '@wordpress/block-editor';
 import {
 	ToolbarGroup,
 	ToolbarButton,
@@ -26,7 +26,6 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  * Internal dependencies
  */
 import { getActiveColors } from './inline.js';
-import { transparentValue } from './index.js';
 import { default as InlineColorUI } from './inline';
 import styles from './style.scss';
 
@@ -34,9 +33,7 @@ const name = 'core/text-color';
 const title = __( 'Text color' );
 
 function getComputedStyleProperty( element, property ) {
-	const {
-		props: { style = {} },
-	} = element;
+	const style = element?.props?.style ?? {};
 
 	if ( property === 'background-color' ) {
 		const { backgroundColor, baseColors } = style;
@@ -72,7 +69,7 @@ function TextColorEdit( {
 	activeAttributes,
 	contentRef,
 } ) {
-	const allowCustomControl = useSetting( 'color.custom' );
+	const [ allowCustomControl ] = useSettings( 'color.custom' );
 	const colors = useMobileGlobalStylesColors();
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
 	const enableIsAddingColor = useCallback(
@@ -182,27 +179,6 @@ export const textColor = {
 	attributes: {
 		style: 'style',
 		class: 'class',
-	},
-	/*
-	 * Since this format relies on the <mark> tag, it's important to
-	 * prevent the default yellow background color applied by most
-	 * browsers. The solution is to detect when this format is used with a
-	 * text color but no background color, and in such cases to override
-	 * the default styling with a transparent background.
-	 *
-	 * @see https://github.com/WordPress/gutenberg/pull/35516
-	 */
-	__unstableFilterAttributeValue( key, value ) {
-		if ( key !== 'style' ) return value;
-		// We need to remove the extra spaces within the styles on mobile
-		const newValue = value?.replace( / /g, '' );
-		// We should not add a background-color if it's already set
-		if ( newValue && newValue.includes( 'background-color' ) )
-			return newValue;
-		const addedCSS = [ 'background-color', transparentValue ].join( ':' );
-		// Prepend `addedCSS` to avoid a double `;;` as any the existing CSS
-		// rules will already include a `;`.
-		return newValue ? [ addedCSS, newValue ].join( ';' ) : addedCSS;
 	},
 	edit: TextColorEdit,
 };

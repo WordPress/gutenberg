@@ -5,8 +5,8 @@
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { ColorPicker } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 function Example() {
 	const [color, setColor] = useState();

@@ -16,7 +16,7 @@ If the post type is not yet known, it will be assumed to be supported.
 
 ### `children`
 
-_Type:_ `WPElement`
+_Type:_ `Element`
 
 Children to be rendered if post type supports.
 

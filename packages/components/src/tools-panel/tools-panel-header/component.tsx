@@ -39,7 +39,7 @@ const DefaultControlsGroup = ( {
 	const resetSuffix = <ResetLabel aria-hidden>{ __( 'Reset' ) }</ResetLabel>;
 
 	return (
-		<MenuGroup label={ __( 'Defaults' ) }>
+		<>
 			{ items.map( ( [ label, hasValue ] ) => {
 				if ( hasValue ) {
 					return (
@@ -73,6 +73,7 @@ const DefaultControlsGroup = ( {
 				return (
 					<MenuItem
 						key={ label }
+						icon={ check }
 						className={ itemClassName }
 						role="menuitemcheckbox"
 						isSelected
@@ -82,7 +83,7 @@ const DefaultControlsGroup = ( {
 					</MenuItem>
 				);
 			} ) }
-		</MenuGroup>
+		</>
 	);
 };
 
@@ -95,7 +96,7 @@ const OptionalControlsGroup = ( {
 	}
 
 	return (
-		<MenuGroup label={ __( 'Tools' ) }>
+		<>
 			{ items.map( ( [ label, isSelected ] ) => {
 				const itemLabel = isSelected
 					? sprintf(
@@ -143,7 +144,7 @@ const OptionalControlsGroup = ( {
 					</MenuItem>
 				);
 			} ) }
-		</MenuGroup>
+		</>
 	);
 };
 
@@ -162,6 +163,7 @@ const ToolsPanelHeader = (
 		menuItems,
 		resetAll,
 		toggleItem,
+		dropdownMenuProps,
 		...headerProps
 	} = useToolsPanelHeader( props );
 
@@ -192,6 +194,7 @@ const ToolsPanelHeader = (
 			</Heading>
 			{ hasMenuItems && (
 				<DropdownMenu
+					{ ...dropdownMenuProps }
 					icon={ dropDownMenuIcon }
 					label={ dropDownMenuLabelText }
 					menuProps={ { className: dropdownMenuClassName } }
@@ -202,15 +205,19 @@ const ToolsPanelHeader = (
 				>
 					{ () => (
 						<>
-							<DefaultControlsGroup
-								items={ defaultItems }
-								toggleItem={ toggleItem }
-								itemClassName={ defaultControlsItemClassName }
-							/>
-							<OptionalControlsGroup
-								items={ optionalItems }
-								toggleItem={ toggleItem }
-							/>
+							<MenuGroup label={ labelText }>
+								<DefaultControlsGroup
+									items={ defaultItems }
+									toggleItem={ toggleItem }
+									itemClassName={
+										defaultControlsItemClassName
+									}
+								/>
+								<OptionalControlsGroup
+									items={ optionalItems }
+									toggleItem={ toggleItem }
+								/>
+							</MenuGroup>
 							<MenuGroup>
 								<MenuItem
 									aria-disabled={ ! canResetAll }

@@ -41,7 +41,7 @@ Create and save content to reuse across your site. Update the pattern, and the c
 
 -	**Name:** core/block
 -	**Category:** reusable
--	**Supports:** ~~customClassName~~, ~~html~~, ~~inserter~~
+-	**Supports:** ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
 -	**Attributes:** ref
 
 ## Button
@@ -225,7 +225,7 @@ Displays the previous comment's page link. ([Source](https://github.com/WordPres
 
 ## Comments Title
 
-Displays a title with the number of comments ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-title))
+Displays a title with the number of comments. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-title))
 
 -	**Name:** core/comments-title
 -	**Category:** theme
@@ -274,7 +274,47 @@ Display footnotes added to the page. ([Source](https://github.com/WordPress/gute
 
 -	**Name:** core/footnotes
 -	**Category:** text
--	**Supports:** color (background, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~multiple~~, ~~reusable~~
+-	**Supports:** color (background, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~, ~~multiple~~, ~~reusable~~
+-	**Attributes:** 
+
+## Form
+
+A form. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form))
+
+-	**Name:** core/form
+-	**Experimental:** true
+-	**Category:** common
+-	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
+-	**Attributes:** action, email, method, submissionMethod
+
+## Input Field
+
+The basic building block for forms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-input))
+
+-	**Name:** core/form-input
+-	**Experimental:** true
+-	**Category:** common
+-	**Supports:** anchor, spacing (margin), ~~reusable~~
+-	**Attributes:** inlineLabel, label, name, placeholder, required, type, value, visibilityPermissions
+
+## Form Submission Notification
+
+Provide a notification message after the form has been submitted. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-submission-notification))
+
+-	**Name:** core/form-submission-notification
+-	**Experimental:** true
+-	**Category:** common
+-	**Supports:** 
+-	**Attributes:** type
+
+## Form Submit Button
+
+A submission button for forms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-submit-button))
+
+-	**Name:** core/form-submit-button
+-	**Experimental:** true
+-	**Category:** common
+-	**Supports:** 
 -	**Attributes:** 
 
 ## Classic
@@ -293,7 +333,7 @@ Display multiple images in a rich gallery. ([Source](https://github.com/WordPres
 -	**Name:** core/gallery
 -	**Category:** media
 -	**Supports:** align, anchor, color (background, gradients, ~~text~~), layout (default, ~~allowEditing~~, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin, padding), units (em, px, rem, vh, vw), ~~html~~
--	**Attributes:** allowResize, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, shortCodeTransforms, sizeSlug
+-	**Attributes:** allowResize, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, randomOrder, shortCodeTransforms, sizeSlug
 
 ## Group
 
@@ -301,7 +341,7 @@ Gather blocks in a layout container. ([Source](https://github.com/WordPress/gute
 
 -	**Name:** core/group
 -	**Category:** design
--	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage), color (background, button, gradients, heading, link, text), dimensions (minHeight), layout (allowSizingOnChildren), position (sticky), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, button, gradients, heading, link, text), dimensions (minHeight), layout (allowSizingOnChildren), position (sticky), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** allowedBlocks, tagName, templateLock
 
 ## Heading
@@ -338,8 +378,8 @@ Insert an image to make a visual statement. ([Source](https://github.com/WordPre
 
 -	**Name:** core/image
 -	**Category:** media
--	**Supports:** anchor, color (~~background~~, ~~text~~), filter (duotone)
--	**Attributes:** align, alt, aspectRatio, caption, height, href, id, lightbox, linkClass, linkDestination, linkTarget, rel, scale, sizeSlug, title, url, width
+-	**Supports:** align (center, full, left, right, wide), anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity
+-	**Attributes:** alt, aspectRatio, caption, height, href, id, lightbox, linkClass, linkDestination, linkTarget, rel, scale, sizeSlug, title, url, width
 
 ## Latest Comments
 
@@ -375,7 +415,7 @@ Create a list item. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/
 -	**Name:** core/list-item
 -	**Category:** text
 -	**Parent:** core/list
--	**Supports:** typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** content, placeholder
 
 ## Login/out
@@ -420,7 +460,7 @@ A collection of blocks that allow visitors to get around your site. ([Source](ht
 
 -	**Name:** core/navigation
 -	**Category:** theme
--	**Supports:** align (full, wide), ariaLabel, inserter, interactivity, layout (allowSizingOnChildren, default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), ariaLabel, inserter, interactivity, layout (allowSizingOnChildren, default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~, ~~renaming~~
 -	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, icon, maxNestingLevel, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, templateLock, textColor
 
 ## Custom Link
@@ -430,7 +470,7 @@ Add a page, link, or another item to your navigation. ([Source](https://github.c
 -	**Name:** core/navigation-link
 -	**Category:** design
 -	**Parent:** core/navigation
--	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** description, id, isTopLevelLink, kind, label, opensInNewTab, rel, title, type, url
 
 ## Submenu
@@ -487,7 +527,7 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 
 -	**Name:** core/pattern
 -	**Category:** theme
--	**Supports:** ~~html~~, ~~inserter~~
+-	**Supports:** ~~html~~, ~~inserter~~, ~~renaming~~
 -	**Attributes:** slug
 
 ## Author
@@ -590,7 +630,7 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/post-featured-image
 -	**Category:** theme
 -	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), spacing (margin, padding), ~~html~~
--	**Attributes:** aspectRatio, customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, width
+-	**Attributes:** aspectRatio, customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, useFirstImageFromPost, width
 
 ## Post Navigation Link
 
@@ -599,7 +639,7 @@ Displays the next or previous post link that is adjacent to the current post. ([
 -	**Name:** core/post-navigation-link
 -	**Category:** theme
 -	**Supports:** color (background, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** arrow, label, linkLabel, showTitle, textAlign, type
+-	**Attributes:** arrow, inSameTerm, label, linkLabel, showTitle, taxonomy, textAlign, type
 
 ## Post Template
 
@@ -698,7 +738,7 @@ Displays the next posts page link. ([Source](https://github.com/WordPress/gutenb
 
 ## Page Numbers
 
-Displays a list of page numbers for pagination ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination-numbers))
+Displays a list of page numbers for pagination. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination-numbers))
 
 -	**Name:** core/query-pagination-numbers
 -	**Category:** theme
@@ -731,7 +771,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 
 -	**Name:** core/quote
 -	**Category:** text
--	**Supports:** anchor, color (background, gradients, heading, link, text), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** anchor, color (background, gradients, heading, link, text), layout (~~allowEditing~~), spacing (blockGap), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** align, citation, value
 
 ## Read More
@@ -759,7 +799,7 @@ Help visitors find your content. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/search
 -	**Category:** widgets
 -	**Supports:** align (center, left, right), color (background, gradients, text), interactivity, typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** buttonBehavior, buttonPosition, buttonText, buttonUseIcon, isSearchFieldHidden, label, placeholder, query, showLabel, width, widthUnit
+-	**Attributes:** buttonPosition, buttonText, buttonUseIcon, isSearchFieldHidden, label, placeholder, query, showLabel, width, widthUnit
 
 ## Separator
 
@@ -868,7 +908,7 @@ Edit the different global regions of your site, like the header, footer, sidebar
 
 -	**Name:** core/template-part
 -	**Category:** theme
--	**Supports:** align, ~~html~~, ~~reusable~~
+-	**Supports:** align, ~~html~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** area, slug, tagName, theme
 
 ## Term Description
@@ -876,7 +916,6 @@ Edit the different global regions of your site, like the header, footer, sidebar
 Display the description of categories, tags and custom taxonomies when viewing an archive. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-description))
 
 -	**Name:** core/term-description
--	**Experimental:** fse
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign

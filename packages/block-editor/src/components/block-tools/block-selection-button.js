@@ -49,7 +49,7 @@ import BlockMover from '../block-mover';
  * @param {string} props          Component props.
  * @param {string} props.clientId Client ID of block.
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 function BlockSelectionButton( { clientId, rootClientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );

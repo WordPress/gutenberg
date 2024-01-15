@@ -2056,6 +2056,25 @@ describe( 'Addition Settings UI', () => {
 			} )
 		);
 	} );
+
+	it( 'should show tooltip with full URL alongside filtered display', async () => {
+		const user = userEvent.setup();
+		const url =
+			'http://www.wordpress.org/wp-content/uploads/a-document.pdf';
+		render( <LinkControl value={ { url } } /> );
+
+		const link = screen.getByRole( 'link' );
+
+		expect( link ).toHaveTextContent( 'a-document.pdf' );
+
+		await user.hover( link );
+
+		expect( await screen.findByRole( 'tooltip' ) ).toHaveTextContent( url );
+
+		await user.unhover( link );
+
+		expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
+	} );
 } );
 
 describe( 'Post types', () => {
@@ -2121,7 +2140,7 @@ describe( 'Post types', () => {
 describe( 'Rich link previews', () => {
 	const selectedLink = {
 		id: '1',
-		title: 'Wordpress.org', // Customize this for differentiation in assertions.
+		title: 'WordPress.org', // Customize this for differentiation in assertions.
 		url: 'https://www.wordpress.org',
 		type: 'URL',
 	};

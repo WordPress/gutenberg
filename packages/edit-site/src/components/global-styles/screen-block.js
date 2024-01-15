@@ -132,8 +132,7 @@ function ScreenBlock( { name, variation } ) {
 			: undefined;
 
 		return {
-			canEditCSS:
-				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
 	const currentBlockStyle = variation
@@ -284,13 +283,7 @@ function ScreenBlock( { name, variation } ) {
 					inheritedValue={ inheritedStyleWithLayout }
 					value={ styleWithLayout }
 					onChange={ setStyle }
-					settings={ {
-						...settings,
-						color: {
-							...settings.color,
-							customDuotone: false, //TO FIX: Custom duotone only works on the block level right now
-						},
-					} }
+					settings={ settings }
 					includeLayoutControls
 				/>
 			) }

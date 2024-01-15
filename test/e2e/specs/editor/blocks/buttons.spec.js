@@ -30,7 +30,9 @@ test.describe( 'Buttons', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/buttons' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Content' );

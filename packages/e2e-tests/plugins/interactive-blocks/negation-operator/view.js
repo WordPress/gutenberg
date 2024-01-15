@@ -1,22 +1,18 @@
-( ( { wp } ) => {
-	/**
-	 * WordPress dependencies
-	 */
-	const { store } = wp.interactivity;
+/**
+ * WordPress dependencies
+ */
+import { store } from '@wordpress/interactivity';
 
-	store( {
-		selectors: {
-			active: ( { state } ) => {
-				return state.active;
-			},
+const { state } = store( 'negation-operator', {
+	state: {
+		active: false,
+		get isActive() {
+			return state.active;
 		},
-		state: {
-			active: false,
+	},
+	actions: {
+		toggle() {
+			state.active = ! state.active;
 		},
-		actions: {
-			toggle: ( { state } ) => {
-				state.active = ! state.active;
-			},
-		},
-	} );
-} )( window );
+	},
+} );

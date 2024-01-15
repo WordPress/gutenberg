@@ -27,7 +27,7 @@ import {
 	getColorClassName,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
-import { isURL, prependHTTP } from '@wordpress/url';
+import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import {
 	placeCaretAtHorizontalEdge,
@@ -432,7 +432,7 @@ export default function NavigationLinkEdit( {
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
-						value={ url || '' }
+						value={ url ? safeDecodeURI( url ) : '' }
 						onChange={ ( urlValue ) => {
 							updateAttributes(
 								{ url: urlValue },

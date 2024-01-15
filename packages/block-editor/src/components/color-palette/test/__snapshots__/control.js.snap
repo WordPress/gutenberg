@@ -175,6 +175,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                     aria-label="Custom color picker. The currently selected color is called "red" and has a value of "#f00"."
                     class="components-color-palette__custom-color-button"
                     style="background: rgb(255, 0, 0);"
+                    type="button"
                   />
                   <div
                     class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper emotion-12 emotion-5"
@@ -219,10 +220,10 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                           aria-label="Color: red"
                           aria-selected="true"
                           class="components-button components-circular-option-picker__option"
+                          data-active-item=""
                           id="components-circular-option-picker-0-0"
                           role="option"
                           style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
-                          tabindex="0"
                           type="button"
                         />
                         <svg

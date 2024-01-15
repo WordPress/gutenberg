@@ -42,14 +42,9 @@ describe( 'convertPreferencesPackageData', () => {
 		expect( convertPreferencesPackageData( input ) )
 			.toMatchInlineSnapshot( `
 		{
-		  "core/customize-widgets": {
-		    "fixedToolbar": true,
-		    "welcomeGuide": false,
-		  },
-		  "core/edit-post": {
+		  "core": {
 		    "editorMode": "visual",
 		    "fixedToolbar": true,
-		    "fullscreenMode": false,
 		    "hiddenBlockTypes": [
 		      "core/audio",
 		      "core/cover",
@@ -58,6 +53,13 @@ describe( 'convertPreferencesPackageData', () => {
 		    "openPanels": [
 		      "post-status",
 		    ],
+		  },
+		  "core/customize-widgets": {
+		    "fixedToolbar": true,
+		    "welcomeGuide": false,
+		  },
+		  "core/edit-post": {
+		    "fullscreenMode": false,
 		    "pinnedItems": {
 		      "my-sidebar-plugin/title-sidebar": false,
 		    },
@@ -67,7 +69,6 @@ describe( 'convertPreferencesPackageData', () => {
 		    "welcomeGuide": false,
 		  },
 		  "core/edit-site": {
-		    "fixedToolbar": true,
 		    "isComplementaryAreaVisible": true,
 		    "welcomeGuide": false,
 		    "welcomeGuideStyles": false,

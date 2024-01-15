@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { RefCallback, RefObject } from 'react';
+import type { ReactElement, RefCallback, RefObject } from 'react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,6 @@ import {
 	useEffect,
 	useState,
 } from '@wordpress/element';
-import type { WPElement } from '@wordpress/element';
 
 type SubscriberCleanup = () => void;
 type SubscriberResponse = SubscriberCleanup | void;
@@ -335,7 +334,7 @@ function useResizeObserver< T extends HTMLElement >(
  * ```
  */
 export default function useResizeAware(): [
-	WPElement,
+	ReactElement,
 	{ width: number | null; height: number | null },
 ] {
 	const { ref, width, height } = useResizeObserver();

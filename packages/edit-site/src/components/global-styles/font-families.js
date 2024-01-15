@@ -26,6 +26,8 @@ function FontFamilies() {
 	const { modalTabOpen, toggleModal, themeFonts, customFonts } =
 		useContext( FontLibraryContext );
 
+	const hasFonts = 0 < customFonts.length || 0 < themeFonts.length;
+
 	return (
 		<>
 			{ !! modalTabOpen && (
@@ -51,25 +53,25 @@ function FontFamilies() {
 						</Tooltip>
 					</HStack>
 				</HStack>
-				<ItemGroup isBordered isSeparated>
-					{ customFonts.map( ( font ) => (
-						<FontFamilyItem key={ font.slug } font={ font } />
-					) ) }
-					{ themeFonts.map( ( font ) => (
-						<FontFamilyItem key={ font.slug } font={ font } />
-					) ) }
-				</ItemGroup>
+				{ hasFonts ? (
+					<ItemGroup isBordered isSeparated>
+						{ customFonts.map( ( font ) => (
+							<FontFamilyItem key={ font.slug } font={ font } />
+						) ) }
+						{ themeFonts.map( ( font ) => (
+							<FontFamilyItem key={ font.slug } font={ font } />
+						) ) }
+					</ItemGroup>
+				) : (
+					<>{ __( 'No fonts installed.' ) }</>
+				) }
 			</VStack>
 		</>
 	);
 }
 
-const FontFamiliesComponent = ( { ...props } ) => (
+export default ( { ...props } ) => (
 	<FontLibraryProvider>
 		<FontFamilies { ...props } />
 	</FontLibraryProvider>
 );
-
-export default process.env.IS_GUTENBERG_PLUGIN
-	? FontFamiliesComponent
-	: undefined;

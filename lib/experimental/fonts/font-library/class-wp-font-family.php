@@ -6,7 +6,7 @@
  *
  * @package    WordPress
  * @subpackage Font Library
- * @since      6.4.0
+ * @since      6.5.0
  */
 
 if ( class_exists( 'WP_Font_Family' ) ) {
@@ -16,14 +16,14 @@ if ( class_exists( 'WP_Font_Family' ) ) {
 /**
  * Font Library class.
  *
- * @since 6.4.0
+ * @since 6.5.0
  */
 class WP_Font_Family {
 
 	/**
 	 * Font family data.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @var array
 	 */
@@ -32,7 +32,7 @@ class WP_Font_Family {
 	/**
 	 * WP_Font_Family constructor.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $font_data Font family data.
 	 * @throws Exception If the font family data is missing the slug.
@@ -47,7 +47,7 @@ class WP_Font_Family {
 	/**
 	 * Gets the font family data.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return array An array in fontFamily theme.json format.
 	 */
@@ -58,7 +58,7 @@ class WP_Font_Family {
 	/**
 	 * Gets the font family data.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return string fontFamily in theme.json format as stringified JSON.
 	 */
@@ -69,7 +69,7 @@ class WP_Font_Family {
 	/**
 	 * Checks whether the font family has font faces defined.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return bool True if the font family has font faces defined, false otherwise.
 	 */
@@ -80,7 +80,7 @@ class WP_Font_Family {
 	/**
 	 * Removes font family assets.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return bool True if assets were removed, false otherwise.
 	 */
@@ -99,7 +99,7 @@ class WP_Font_Family {
 	/**
 	 * Removes a font family from the database and deletes its assets.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return bool|WP_Error True if the font family was uninstalled, WP_Error otherwise.
 	 */
@@ -128,14 +128,14 @@ class WP_Font_Family {
 	/**
 	 * Deletes a specified font asset file from the fonts directory.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string $src The path of the font asset file to delete.
 	 * @return bool Whether the file was deleted.
 	 */
 	private static function delete_asset( $src ) {
 		$filename  = basename( $src );
-		$file_path = path_join( WP_Font_Library::get_fonts_dir(), $filename );
+		$file_path = path_join( wp_get_font_dir()['path'], $filename );
 
 		wp_delete_file( $file_path );
 
@@ -145,7 +145,7 @@ class WP_Font_Family {
 	/**
 	 * Deletes all font face asset files associated with a given font face.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $font_face The font face array containing the 'src' attribute
 	 *                         with the file path(s) to be deleted.
@@ -163,11 +163,10 @@ class WP_Font_Family {
 		return true;
 	}
 
-
 	/**
 	 * Gets the overrides for the 'wp_handle_upload' function.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string $filename The filename to be used for the uploaded file.
 	 * @return array The overrides for the 'wp_handle_upload' function.
@@ -194,7 +193,7 @@ class WP_Font_Family {
 	 * Downloads a font asset from a specified source URL and saves it to
 	 * the font directory.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param string $url      The source URL of the font asset to be downloaded.
 	 * @param string $filename The filename to save the downloaded font asset as.
@@ -202,11 +201,6 @@ class WP_Font_Family {
 	 *                     False if the download failed.
 	 */
 	private function download_asset( $url, $filename ) {
-		// Checks if the file to be downloaded has a font mime type.
-		if ( ! WP_Font_Family_Utils::has_font_mime_type( $filename ) ) {
-			return false;
-		}
-
 		// Include file with download_url() if function doesn't exist.
 		if ( ! function_exists( 'download_url' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -244,7 +238,7 @@ class WP_Font_Family {
 	 *
 	 * This is used when uploading local fonts.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $font_face Font face to download.
 	 * @param array $file      Uploaded file.
@@ -262,12 +256,6 @@ class WP_Font_Family {
 		// Remove the uploaded font asset reference from the font face definition
 		// because it is no longer needed.
 		unset( $new_font_face['uploadedFile'] );
-
-		// If the filename has no font mime type, don't move the file and
-		// return the font face definition without src to be ignored later.
-		if ( ! WP_Font_Family_Utils::has_font_mime_type( $filename ) ) {
-			return $new_font_face;
-		}
 
 		// Move the uploaded font asset from the temp folder to the fonts directory.
 		if ( ! function_exists( 'wp_handle_upload' ) ) {
@@ -290,7 +278,7 @@ class WP_Font_Family {
 	/**
 	 * Sanitizes the font family data using WP_Theme_JSON.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return array A sanitized font family definition.
 	 */
@@ -300,18 +288,27 @@ class WP_Font_Family {
 			'version'  => '2',
 			'settings' => array(
 				'typography' => array(
-					'fontFamilies' => array( $this->data ),
+					'fontFamilies' => array(
+						'custom' => array(
+							$this->data,
+						),
+					),
 				),
 			),
 		);
+
 		// Creates a new WP_Theme_JSON object with the new fonts to
 		// leverage sanitization and validation.
+		$fonts_json     = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $fonts_json );
 		$theme_json     = new WP_Theme_JSON_Gutenberg( $fonts_json );
 		$theme_data     = $theme_json->get_data();
 		$sanitized_font = ! empty( $theme_data['settings']['typography']['fontFamilies'] )
 			? $theme_data['settings']['typography']['fontFamilies'][0]
 			: array();
-		$this->data     = $sanitized_font;
+
+		$sanitized_font['slug']       = _wp_to_kebab_case( $sanitized_font['slug'] );
+		$sanitized_font['fontFamily'] = WP_Font_Family_Utils::format_font_family( $sanitized_font['fontFamily'] );
+		$this->data                   = $sanitized_font;
 		return $this->data;
 	}
 
@@ -321,7 +318,7 @@ class WP_Font_Family {
 	 * Downloads the font face asset(s) associated with a font face. It works with
 	 * both single source URLs and arrays of multiple source URLs.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $font_face The font face array containing the 'src' attribute
 	 *                         with the source URL(s) of the assets.
@@ -364,7 +361,7 @@ class WP_Font_Family {
 	 * Downloads font face assets if the font family is a Google font,
 	 * or moves them if it is a local font.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $files An array of files to be installed.
 	 * @return bool True if the font faces were downloaded or moved successfully, false otherwise.
@@ -376,7 +373,7 @@ class WP_Font_Family {
 
 		$new_font_faces = array();
 		foreach ( $this->data['fontFace'] as $font_face ) {
-			// If the fonts are not meant to be dowloaded or uploaded
+			// If the fonts are not meant to be downloaded or uploaded
 			// (for example to install fonts that use a remote url).
 			$new_font_face = $font_face;
 
@@ -392,6 +389,11 @@ class WP_Font_Family {
 
 			if ( $font_face_is_repeated ) {
 				continue;
+			}
+
+			// If the font face requires the use of the filesystem, create the fonts dir if it doesn't exist.
+			if ( ! empty( $font_face['downloadFromUrl'] ) && ! empty( $font_face['uploadedFile'] ) ) {
+				wp_mkdir_p( wp_get_font_dir()['path'] );
 			}
 
 			// If installing google fonts, download the font face assets.
@@ -429,7 +431,7 @@ class WP_Font_Family {
 	/**
 	 * Gets the post for a font family.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return WP_Post|null The post for this font family object or
 	 *                      null if the post does not exist.
@@ -455,7 +457,7 @@ class WP_Font_Family {
 	 * Gets the data for this object from the database and
 	 * sets it to the data property.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return WP_Post|null The post for this font family object or
 	 *                      null if the post does not exist.
@@ -473,7 +475,7 @@ class WP_Font_Family {
 	/**
 	 * Creates a post for a font family.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return int|WP_Error Post ID if the post was created, WP_Error otherwise.
 	 */
@@ -500,7 +502,7 @@ class WP_Font_Family {
 	/**
 	 * Gets the font faces that are in both the existing and incoming font families.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $existing The existing font faces.
 	 * @param array $incoming The incoming font faces.
@@ -523,7 +525,7 @@ class WP_Font_Family {
 	/**
 	 * Updates a post for a font family.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param WP_Post $post The post to update.
 	 * @return int|WP_Error Post ID if the update was successful, WP_Error otherwise.
@@ -570,7 +572,7 @@ class WP_Font_Family {
 	 * Creates a post for a font in the Font Library if it doesn't exist,
 	 * or updates it if it does.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @return int|WP_Error Post id if the post was created or updated successfully,
 	 *                      WP_Error otherwise.
@@ -589,16 +591,16 @@ class WP_Font_Family {
 	/**
 	 * Installs the font family into the library.
 	 *
-	 * @since 6.4.0
+	 * @since 6.5.0
 	 *
 	 * @param array $files Optional. An array of files to be installed. Default null.
 	 * @return array|WP_Error An array of font family data on success, WP_Error otherwise.
 	 */
 	public function install( $files = null ) {
 		add_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
-		add_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
+		add_filter( 'upload_dir', 'wp_get_font_dir' );
 		$were_assets_written = $this->download_or_move_font_faces( $files );
-		remove_filter( 'upload_dir', array( 'WP_Font_Library', 'set_upload_dir' ) );
+		remove_filter( 'upload_dir', 'wp_get_font_dir' );
 		remove_filter( 'upload_mimes', array( 'WP_Font_Library', 'set_allowed_mime_types' ) );
 
 		if ( ! $were_assets_written ) {

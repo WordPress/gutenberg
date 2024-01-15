@@ -5,7 +5,7 @@ import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export const convertDescription = __(
-	'This page list is synced with the published pages on your site. Detach the page list to add, delete, or reorder pages yourself.'
+	"This navigation menu displays your website's pages. Editing it will enable you to add, delete, or reorder pages. However, new pages will no longer be added automatically."
 );
 
 export function ConvertToLinksModal( { onClick, onClose, disabled } ) {
@@ -30,7 +30,7 @@ export function ConvertToLinksModal( { onClick, onClose, disabled } ) {
 					disabled={ disabled }
 					onClick={ onClick }
 				>
-					{ __( 'Detach' ) }
+					{ __( 'Edit' ) }
 				</Button>
 			</div>
 		</Modal>

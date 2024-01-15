@@ -20,7 +20,7 @@ import {
 	store as keyboardShortcutsStore,
 	__unstableUseShortcutEventMatch,
 } from '@wordpress/keyboard-shortcuts';
-import { pipe, useCopyToClipboard } from '@wordpress/compose';
+import { pipe, useCopyToClipboard, useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -41,10 +41,40 @@ const POPOVER_PROPS = {
 
 function CopyMenuItem( { blocks, onCopy, label } ) {
 	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
-	const copyMenuItemBlocksLabel =
-		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy' );
-	const copyMenuItemLabel = label ? label : copyMenuItemBlocksLabel;
+	const copyMenuItemLabel = label ? label : __( 'Copy' );
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
+}
+
+function ParentSelectorMenuItem( { parentClientId, parentBlockType } ) {
+	const isSmallViewport = useViewportMatch( 'medium', '<' );
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	// Allows highlighting the parent block outline when focusing or hovering
+	// the parent block selector within the child.
+	const menuItemRef = useRef();
+	const gesturesProps = useShowHoveredOrFocusedGestures( {
+		ref: menuItemRef,
+		highlightParent: true,
+	} );
+
+	if ( ! isSmallViewport ) {
+		return null;
+	}
+
+	return (
+		<MenuItem
+			{ ...gesturesProps }
+			ref={ menuItemRef }
+			icon={ <BlockIcon icon={ parentBlockType.icon } /> }
+			onClick={ () => selectBlock( parentClientId ) }
+		>
+			{ sprintf(
+				/* translators: %s: Name of the block's parent. */
+				__( 'Select parent block (%s)' ),
+				parentBlockType.title
+			) }
+		</MenuItem>
+	);
 }
 
 export function BlockSettingsDropdown( {
@@ -132,8 +162,6 @@ export function BlockSettingsDropdown( {
 		};
 	}, [] );
 	const isMatch = __unstableUseShortcutEventMatch();
-
-	const { selectBlock } = useDispatch( blockEditorStore );
 	const hasSelectedBlocks = selectedBlockClientIds.length > 0;
 
 	const updateSelectionAfterDuplicate = useCallback(
@@ -171,17 +199,6 @@ export function BlockSettingsDropdown( {
 		hasSelectedBlocks,
 		getSelectedBlockClientIds,
 	] );
-
-	const removeBlockLabel =
-		count === 1 ? __( 'Delete' ) : __( 'Delete blocks' );
-
-	// Allows highlighting the parent block outline when focusing or hovering
-	// the parent block selector within the child.
-	const selectParentButtonRef = useRef();
-	const showParentOutlineGestures = useShowHoveredOrFocusedGestures( {
-		ref: selectParentButtonRef,
-		highlightParent: true,
-	} );
 
 	// This can occur when the selected block (the parent)
 	// displays child blocks within a List View.
@@ -297,30 +314,12 @@ export function BlockSettingsDropdown( {
 								/>
 								{ ! parentBlockIsSelected &&
 									!! firstParentClientId && (
-										<MenuItem
-											{ ...showParentOutlineGestures }
-											ref={ selectParentButtonRef }
-											icon={
-												<BlockIcon
-													icon={
-														parentBlockType.icon
-													}
-												/>
+										<ParentSelectorMenuItem
+											parentClientId={
+												firstParentClientId
 											}
-											onClick={ () =>
-												selectBlock(
-													firstParentClientId
-												)
-											}
-										>
-											{ sprintf(
-												/* translators: %s: Name of the block's parent. */
-												__(
-													'Select parent block (%s)'
-												),
-												parentBlockType.title
-											) }
-										</MenuItem>
+											parentBlockType={ parentBlockType }
+										/>
 									) }
 								{ count === 1 && (
 									<BlockHTMLConvertButton
@@ -407,7 +406,7 @@ export function BlockSettingsDropdown( {
 										) }
 										shortcut={ shortcuts.remove }
 									>
-										{ removeBlockLabel }
+										{ __( 'Delete' ) }
 									</MenuItem>
 								</MenuGroup>
 							) }

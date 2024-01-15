@@ -22,7 +22,7 @@ import {
 import { plus } from '@wordpress/icons';
 import { useState, useCallback, useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { useSetting, MediaUpload } from '@wordpress/block-editor';
+import { useSettings, MediaUpload } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -68,14 +68,9 @@ function Controls( {
 		[ minHeight ]
 	);
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'px',
-			'em',
-			'rem',
-			'vw',
-			'vh',
-		],
+		availableUnits: availableUnits || [ 'px', 'em', 'rem', 'vw', 'vh' ],
 		defaultValues: { px: 430, em: 20, rem: 20, vw: 20, vh: 50 },
 	} );
 

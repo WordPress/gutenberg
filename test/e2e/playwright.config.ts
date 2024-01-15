@@ -11,7 +11,7 @@ import { defineConfig, devices } from '@playwright/test';
 const baseConfig = require( '@wordpress/scripts/config/playwright.config' );
 
 const config = defineConfig( {
-	...baseConfig.default,
+	...baseConfig,
 	reporter: process.env.CI
 		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ] ]
 		: 'list',

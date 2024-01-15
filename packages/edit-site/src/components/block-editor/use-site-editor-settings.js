@@ -1,15 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import inserterMediaCategories from './inserter-media-categories';
+import { usePostLinkProps } from './use-post-link-props';
+
+const { useBlockEditorSettings } = unlock( editorPrivateApis );
 
 function useArchiveLabel( templateSlug ) {
 	const taxonomyMatches = templateSlug?.match(
@@ -83,111 +87,74 @@ function useArchiveLabel( templateSlug ) {
 	);
 }
 
-export default function useSiteEditorSettings() {
-	const { setIsInserterOpened } = useDispatch( editSiteStore );
-	const { storedSettings, canvasMode, templateType } = useSelect(
+export function useSpecificEditorSettings() {
+	const getPostLinkProps = usePostLinkProps();
+	const { templateSlug, canvasMode, settings, postWithTemplate } = useSelect(
 		( select ) => {
-			const { getSettings, getCanvasMode, getEditedPostType } = unlock(
-				select( editSiteStore )
+			const {
+				getEditedPostType,
+				getEditedPostId,
+				getEditedPostContext,
+				getCanvasMode,
+				getSettings,
+			} = unlock( select( editSiteStore ) );
+			const { getEditedEntityRecord } = select( coreStore );
+			const usedPostType = getEditedPostType();
+			const usedPostId = getEditedPostId();
+			const _record = getEditedEntityRecord(
+				'postType',
+				usedPostType,
+				usedPostId
 			);
+			const _context = getEditedPostContext();
 			return {
-				storedSettings: getSettings( setIsInserterOpened ),
+				templateSlug: _record.slug,
 				canvasMode: getCanvasMode(),
-				templateType: getEditedPostType(),
+				settings: getSettings(),
+				postWithTemplate: _context?.postId,
 			};
 		},
-		[ setIsInserterOpened ]
+		[]
 	);
-
-	const settingsBlockPatterns =
-		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
-		storedSettings.__experimentalBlockPatterns; // WP 5.9
-	const settingsBlockPatternCategories =
-		storedSettings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
-		storedSettings.__experimentalBlockPatternCategories; // WP 5.9
-
-	const {
-		restBlockPatterns,
-		restBlockPatternCategories,
-		templateSlug,
-		userPatternCategories,
-	} = useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
-		const { getEditedEntityRecord, getUserPatternCategories } =
-			select( coreStore );
-		const usedPostType = getEditedPostType();
-		const usedPostId = getEditedPostId();
-		const _record = getEditedEntityRecord(
-			'postType',
-			usedPostType,
-			usedPostId
-		);
-		return {
-			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories:
-				select( coreStore ).getBlockPatternCategories(),
-			templateSlug: _record.slug,
-			userPatternCategories: getUserPatternCategories(),
-		};
-	}, [] );
 	const archiveLabels = useArchiveLabel( templateSlug );
-
-	const blockPatterns = useMemo(
-		() =>
-			[
-				...( settingsBlockPatterns || [] ),
-				...( restBlockPatterns || [] ),
-			]
-				.filter(
-					( x, index, arr ) =>
-						index === arr.findIndex( ( y ) => x.name === y.name )
-				)
-				.filter( ( { postTypes } ) => {
-					return (
-						! postTypes ||
-						( Array.isArray( postTypes ) &&
-							postTypes.includes( templateType ) )
-					);
-				} ),
-		[ settingsBlockPatterns, restBlockPatterns, templateType ]
-	);
-
-	const blockPatternCategories = useMemo(
-		() =>
-			[
-				...( settingsBlockPatternCategories || [] ),
-				...( restBlockPatternCategories || [] ),
-			].filter(
-				( x, index, arr ) =>
-					index === arr.findIndex( ( y ) => x.name === y.name )
-			),
-		[ settingsBlockPatternCategories, restBlockPatternCategories ]
-	);
-	return useMemo( () => {
-		const {
-			__experimentalAdditionalBlockPatterns,
-			__experimentalAdditionalBlockPatternCategories,
-			focusMode,
-			...restStoredSettings
-		} = storedSettings;
-
+	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
+	const defaultEditorSettings = useMemo( () => {
 		return {
-			...restStoredSettings,
-			inserterMediaCategories,
-			__experimentalBlockPatterns: blockPatterns,
-			__experimentalBlockPatternCategories: blockPatternCategories,
-			__experimentalUserPatternCategories: userPatternCategories,
-			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
+			...settings,
+
+			richEditingEnabled: true,
+			supportsTemplateMode: true,
+			focusMode: canvasMode !== 'view',
+			defaultRenderingMode,
+			getPostLinkProps,
+			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
 		};
 	}, [
-		storedSettings,
-		blockPatterns,
-		blockPatternCategories,
-		userPatternCategories,
+		settings,
 		canvasMode,
+		defaultRenderingMode,
+		getPostLinkProps,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
 	] );
+
+	return defaultEditorSettings;
+}
+
+export default function useSiteEditorSettings() {
+	const defaultEditorSettings = useSpecificEditorSettings();
+	const { postType, postId } = useSelect( ( select ) => {
+		const { getEditedPostType, getEditedPostId } = unlock(
+			select( editSiteStore )
+		);
+		const usedPostType = getEditedPostType();
+		const usedPostId = getEditedPostId();
+		return {
+			postType: usedPostType,
+			postId: usedPostId,
+		};
+	}, [] );
+	return useBlockEditorSettings( defaultEditorSettings, postType, postId );
 }

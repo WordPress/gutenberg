@@ -7,14 +7,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { CircularOptionPickerContext } from './circular-option-picker-context';
-import { Composite, useCompositeState } from '../composite';
+import { Composite, useCompositeStore } from '../composite/v2';
 import type {
 	CircularOptionPickerProps,
 	ListboxCircularOptionPickerProps,
@@ -85,30 +84,15 @@ function ListboxCircularOptionPicker(
 		children,
 		...additionalProps
 	} = props;
-	const rtl = isRTL();
 
-	const compositeState = useCompositeState( { baseId, loop, rtl } );
-	const { setBaseId, setLoop, setRTL } = compositeState;
-
-	// These are necessary as `useCompositeState` is sealed after
-	// the first render, so although unlikely to happen, if a state
-	// property should change, we need to process it accordingly.
-
-	useEffect( () => {
-		setBaseId( baseId );
-	}, [ setBaseId, baseId ] );
-
-	useEffect( () => {
-		setLoop( loop );
-	}, [ setLoop, loop ] );
-
-	useEffect( () => {
-		setRTL( rtl );
-	}, [ setRTL, rtl ] );
+	const compositeStore = useCompositeStore( {
+		focusLoop: loop,
+		rtl: isRTL(),
+	} );
 
 	const compositeContext = {
-		isComposite: true,
-		...compositeState,
+		baseId,
+		compositeStore,
 	};
 
 	return (
@@ -116,7 +100,8 @@ function ListboxCircularOptionPicker(
 			<CircularOptionPickerContext.Provider value={ compositeContext }>
 				<Composite
 					{ ...additionalProps }
-					{ ...compositeState }
+					id={ baseId }
+					store={ compositeStore }
 					role={ 'listbox' }
 				>
 					{ options }
@@ -134,10 +119,8 @@ function ButtonsCircularOptionPicker(
 	const { actions, options, children, baseId, ...additionalProps } = props;
 
 	return (
-		<div { ...additionalProps }>
-			<CircularOptionPickerContext.Provider
-				value={ { isComposite: false, baseId } }
-			>
+		<div { ...additionalProps } id={ baseId }>
+			<CircularOptionPickerContext.Provider value={ { baseId } }>
 				{ options }
 				{ children }
 				{ actions }

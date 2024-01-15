@@ -283,6 +283,7 @@ const withBlockTree =
 					false
 				);
 				break;
+			case 'SYNC_DERIVED_BLOCK_ATTRIBUTES':
 			case 'UPDATE_BLOCK_ATTRIBUTES': {
 				newState.tree = new Map( newState.tree );
 				action.clientIds.forEach( ( clientId ) => {
@@ -452,9 +453,26 @@ const withBlockTree =
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
 	let markNextChangeAsNotPersistent = false;
+	let explicitPersistent;
 
 	return ( state, action ) => {
 		let nextState = reducer( state, action );
+
+		let nextIsPersistentChange;
+		if ( action.type === 'SET_EXPLICIT_PERSISTENT' ) {
+			explicitPersistent = action.isPersistentChange;
+			nextIsPersistentChange = state.isPersistentChange ?? true;
+		}
+
+		if ( explicitPersistent !== undefined ) {
+			nextIsPersistentChange = explicitPersistent;
+			return nextIsPersistentChange === nextState.isPersistentChange
+				? nextState
+				: {
+						...nextState,
+						isPersistentChange: nextIsPersistentChange,
+				  };
+		}
 
 		const isExplicitPersistentChange =
 			action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' ||
@@ -466,7 +484,7 @@ function withPersistentBlockChange( reducer ) {
 			markNextChangeAsNotPersistent =
 				action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 
-			const nextIsPersistentChange = state?.isPersistentChange ?? true;
+			nextIsPersistentChange = state?.isPersistentChange ?? true;
 			if ( state.isPersistentChange === nextIsPersistentChange ) {
 				return state;
 			}
@@ -860,6 +878,7 @@ export const blocks = pipe(
 				return newState;
 			}
 
+			case 'SYNC_DERIVED_BLOCK_ATTRIBUTES':
 			case 'UPDATE_BLOCK_ATTRIBUTES': {
 				// Avoid a state change if none of the block IDs are known.
 				if ( action.clientIds.every( ( id ) => ! state.get( id ) ) ) {
@@ -1888,6 +1907,21 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 }
 
 /**
+ * Reducer returning the focus mode that should be used when temporarily edit as blocks finishes.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function temporarilyEditingFocusModeRevert( state = '', action ) {
+	if ( action.type === 'SET_TEMPORARILY_EDITING_AS_BLOCKS' ) {
+		return action.focusModeToRevert;
+	}
+	return state;
+}
+
+/**
  * Reducer returning a map of block client IDs to block editing modes.
  *
  * @param {Map}    state  Current state.
@@ -1949,6 +1983,40 @@ export function styleOverrides( state = new Map(), action ) {
 	return state;
 }
 
+/**
+ * Reducer returning a map of the registered inserter media categories.
+ *
+ * @param {Array}  state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Array} Updated state.
+ */
+export function registeredInserterMediaCategories( state = [], action ) {
+	switch ( action.type ) {
+		case 'REGISTER_INSERTER_MEDIA_CATEGORY':
+			return [ ...state, action.category ];
+	}
+
+	return state;
+}
+
+/**
+ * Reducer setting last focused element
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function lastFocus( state = false, action ) {
+	switch ( action.type ) {
+		case 'LAST_FOCUS':
+			return action.lastFocus;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
@@ -1965,17 +2033,20 @@ const combinedReducers = combineReducers( {
 	settings,
 	preferences,
 	lastBlockAttributesChange,
+	lastFocus,
 	editorMode,
 	hasBlockMovingClientId,
 	highlightedBlock,
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
+	temporarilyEditingFocusModeRevert,
 	blockVisibility,
 	blockEditingModes,
 	styleOverrides,
 	removalPromptData,
 	blockRemovalRules,
 	openedBlockSettingsMenu,
+	registeredInserterMediaCategories,
 } );
 
 function withAutomaticChangeReset( reducer ) {

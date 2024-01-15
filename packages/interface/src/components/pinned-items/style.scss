@@ -26,8 +26,5 @@
 	}
 
 	// Gap between pinned items.
-	gap: $grid-unit-05;
-
-	// Account for larger grid from parent container gap.
-	margin-right: -$grid-unit-05;
+	gap: $grid-unit-10;
 }

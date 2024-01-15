@@ -102,6 +102,130 @@ const allUnits: Record< string, WPUnitControlUnit > = {
 		a11yLabel: __( 'Points (pt)' ),
 		step: 1,
 	},
+	svw: {
+		value: 'svw',
+		label: isWeb ? 'svw' : __( 'Small viewport width (svw)' ),
+		a11yLabel: __( 'Small viewport width (svw)' ),
+		step: 0.1,
+	},
+	svh: {
+		value: 'svh',
+		label: isWeb ? 'svh' : __( 'Small viewport height (svh)' ),
+		a11yLabel: __( 'Small viewport height (svh)' ),
+		step: 0.1,
+	},
+	svi: {
+		value: 'svi',
+		label: isWeb
+			? 'svi'
+			: __( 'Viewport smallest size in the inline direction (svi)' ),
+		a11yLabel: __( 'Small viewport width or height (svi)' ),
+		step: 0.1,
+	},
+	svb: {
+		value: 'svb',
+		label: isWeb
+			? 'svb'
+			: __( 'Viewport smallest size in the block direction (svb)' ),
+		a11yLabel: __( 'Small viewport width or height (svb)' ),
+		step: 0.1,
+	},
+	svmin: {
+		value: 'svmin',
+		label: isWeb
+			? 'svmin'
+			: __( 'Small viewport smallest dimension (svmin)' ),
+		a11yLabel: __( 'Small viewport smallest dimension (svmin)' ),
+		step: 0.1,
+	},
+	lvw: {
+		value: 'lvw',
+		label: isWeb ? 'lvw' : __( 'Large viewport width (lvw)' ),
+		a11yLabel: __( 'Large viewport width (lvw)' ),
+		step: 0.1,
+	},
+	lvh: {
+		value: 'lvh',
+		label: isWeb ? 'lvh' : __( 'Large viewport height (lvh)' ),
+		a11yLabel: __( 'Large viewport height (lvh)' ),
+		step: 0.1,
+	},
+	lvi: {
+		value: 'lvi',
+		label: isWeb ? 'lvi' : __( 'Large viewport width or height (lvi)' ),
+		a11yLabel: __( 'Large viewport width or height (lvi)' ),
+		step: 0.1,
+	},
+	lvb: {
+		value: 'lvb',
+		label: isWeb ? 'lvb' : __( 'Large viewport width or height (lvb)' ),
+		a11yLabel: __( 'Large viewport width or height (lvb)' ),
+		step: 0.1,
+	},
+	lvmin: {
+		value: 'lvmin',
+		label: isWeb
+			? 'lvmin'
+			: __( 'Large viewport smallest dimension (lvmin)' ),
+		a11yLabel: __( 'Large viewport smallest dimension (lvmin)' ),
+		step: 0.1,
+	},
+	dvw: {
+		value: 'dvw',
+		label: isWeb ? 'dvw' : __( 'Dynamic viewport width (dvw)' ),
+		a11yLabel: __( 'Dynamic viewport width (dvw)' ),
+		step: 0.1,
+	},
+	dvh: {
+		value: 'dvh',
+		label: isWeb ? 'dvh' : __( 'Dynamic viewport height (dvh)' ),
+		a11yLabel: __( 'Dynamic viewport height (dvh)' ),
+		step: 0.1,
+	},
+	dvi: {
+		value: 'dvi',
+		label: isWeb ? 'dvi' : __( 'Dynamic viewport width or height (dvi)' ),
+		a11yLabel: __( 'Dynamic viewport width or height (dvi)' ),
+		step: 0.1,
+	},
+	dvb: {
+		value: 'dvb',
+		label: isWeb ? 'dvb' : __( 'Dynamic viewport width or height (dvb)' ),
+		a11yLabel: __( 'Dynamic viewport width or height (dvb)' ),
+		step: 0.1,
+	},
+	dvmin: {
+		value: 'dvmin',
+		label: isWeb
+			? 'dvmin'
+			: __( 'Dynamic viewport smallest dimension (dvmin)' ),
+		a11yLabel: __( 'Dynamic viewport smallest dimension (dvmin)' ),
+		step: 0.1,
+	},
+	dvmax: {
+		value: 'dvmax',
+		label: isWeb
+			? 'dvmax'
+			: __( 'Dynamic viewport largest dimension (dvmax)' ),
+		a11yLabel: __( 'Dynamic viewport largest dimension (dvmax)' ),
+		step: 0.1,
+	},
+	svmax: {
+		value: 'svmax',
+		label: isWeb
+			? 'svmax'
+			: __( 'Small viewport largest dimension (svmax)' ),
+		a11yLabel: __( 'Small viewport largest dimension (svmax)' ),
+		step: 0.1,
+	},
+	lvmax: {
+		value: 'lvmax',
+		label: isWeb
+			? 'lvmax'
+			: __( 'Large viewport largest dimension (lvmax)' ),
+		a11yLabel: __( 'Large viewport largest dimension (lvmax)' ),
+		step: 0.1,
+	},
 };
 
 /**

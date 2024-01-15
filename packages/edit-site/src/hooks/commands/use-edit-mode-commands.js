@@ -4,6 +4,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
+	edit,
 	trash,
 	rotateLeft,
 	rotateRight,
@@ -15,6 +16,7 @@ import {
 	code,
 	keyboard,
 	listView,
+	symbol,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -22,6 +24,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -32,6 +35,7 @@ import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import { KEYBOARD_SHORTCUT_HELP_MODAL_NAME } from '../../components/keyboard-shortcut-help-modal';
 import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
+import { PATTERN_MODALS } from '../../components/pattern-modal';
 import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
@@ -39,15 +43,18 @@ const { useHistory } = unlock( routerPrivateApis );
 
 function usePageContentFocusCommands() {
 	const { record: template } = useEditedEntityRecord();
-	const { isPage, canvasMode, hasPageContentFocus } = useSelect(
-		( select ) => ( {
-			isPage: select( editSiteStore ).isPage(),
-			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
-			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
-		} ),
-		[]
-	);
-	const { setHasPageContentFocus } = useDispatch( editSiteStore );
+	const { isPage, canvasMode, renderingMode } = useSelect( ( select ) => {
+		const { isPage: _isPage, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
+		const { getRenderingMode } = select( editorStore );
+		return {
+			isPage: _isPage(),
+			canvasMode: getCanvasMode(),
+			renderingMode: getRenderingMode(),
+		};
+	}, [] );
+	const { setRenderingMode } = useDispatch( editorStore );
 
 	if ( ! isPage || canvasMode !== 'edit' ) {
 		return { isLoading: false, commands: [] };
@@ -55,7 +62,7 @@ function usePageContentFocusCommands() {
 
 	const commands = [];
 
-	if ( hasPageContentFocus ) {
+	if ( renderingMode !== 'template-only' ) {
 		commands.push( {
 			name: 'core/switch-to-template-focus',
 			/* translators: %1$s: template title */
@@ -65,7 +72,7 @@ function usePageContentFocusCommands() {
 			),
 			icon: layout,
 			callback: ( { close } ) => {
-				setHasPageContentFocus( false );
+				setRenderingMode( 'template-only' );
 				close();
 			},
 		} );
@@ -75,7 +82,7 @@ function usePageContentFocusCommands() {
 			label: __( 'Back to page' ),
 			icon: page,
 			callback: ( { close } ) => {
-				setHasPageContentFocus( true );
+				setRenderingMode( 'template-locked' );
 				close();
 			},
 		} );
@@ -119,8 +126,10 @@ function useManipulateDocumentCommands() {
 	const { isLoaded, record: template } = useEditedEntityRecord();
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
 	const history = useHistory();
-	const hasPageContentFocus = useSelect(
-		( select ) => select( editSiteStore ).hasPageContentFocus(),
+	const isEditingPage = useSelect(
+		( select ) =>
+			select( editSiteStore ).isPage() &&
+			select( editorStore ).getRenderingMode() !== 'template-only',
 		[]
 	);
 
@@ -130,7 +139,7 @@ function useManipulateDocumentCommands() {
 
 	const commands = [];
 
-	if ( isTemplateRevertable( template ) && ! hasPageContentFocus ) {
+	if ( isTemplateRevertable( template ) && ! isEditingPage ) {
 		const label =
 			template.type === TEMPLATE_POST_TYPE
 				? /* translators: %1$s: template title */
@@ -154,7 +163,7 @@ function useManipulateDocumentCommands() {
 		} );
 	}
 
-	if ( isTemplateRemovable( template ) && ! hasPageContentFocus ) {
+	if ( isTemplateRemovable( template ) && ! isEditingPage ) {
 		const label =
 			template.type === TEMPLATE_POST_TYPE
 				? /* translators: %1$s: template title */
@@ -208,22 +217,18 @@ function useEditUICommands() {
 		isListViewOpen,
 		isDistractionFree,
 	} = useSelect( ( select ) => {
-		const { isListViewOpened, getEditorMode } = select( editSiteStore );
+		const { get } = select( preferencesStore );
+		const { getEditorMode } = select( editSiteStore );
+		const { isListViewOpened } = select( editorStore );
 		return {
 			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
 			editorMode: getEditorMode(),
 			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
 				editSiteStore.name
 			),
-			showBlockBreadcrumbs: select( preferencesStore ).get(
-				'core/edit-site',
-				'showBlockBreadcrumbs'
-			),
+			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			isListViewOpen: isListViewOpened(),
-			isDistractionFree: select( preferencesStore ).get(
-				editSiteStore.name,
-				'distractionFree'
-			),
+			isDistractionFree: get( 'core', 'distractionFree' ),
 		};
 	}, [] );
 	const { openModal } = useDispatch( interfaceStore );
@@ -268,7 +273,7 @@ function useEditUICommands() {
 		name: 'core/toggle-spotlight-mode',
 		label: __( 'Toggle spotlight mode' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-site', 'focusMode' );
+			toggle( 'core', 'focusMode' );
 			close();
 		},
 	} );
@@ -286,7 +291,7 @@ function useEditUICommands() {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-site', 'fixedToolbar' );
+			toggle( 'core', 'fixedToolbar' );
 			if ( isDistractionFree ) {
 				toggleDistractionFree();
 			}
@@ -329,7 +334,7 @@ function useEditUICommands() {
 			? __( 'Hide block breadcrumbs' )
 			: __( 'Show block breadcrumbs' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-site', 'showBlockBreadcrumbs' );
+			toggle( 'core', 'showBlockBreadcrumbs' );
 			close();
 			createInfoNotice(
 				showBlockBreadcrumbs
@@ -359,6 +364,40 @@ function useEditUICommands() {
 	};
 }
 
+function usePatternCommands() {
+	const { isLoaded, record: pattern } = useEditedEntityRecord();
+	const { openModal } = useDispatch( interfaceStore );
+
+	if ( ! isLoaded ) {
+		return { isLoading: true, commands: [] };
+	}
+
+	const commands = [];
+
+	if ( pattern?.type === 'wp_block' ) {
+		commands.push( {
+			name: 'core/rename-pattern',
+			label: __( 'Rename pattern' ),
+			icon: edit,
+			callback: ( { close } ) => {
+				openModal( PATTERN_MODALS.rename );
+				close();
+			},
+		} );
+		commands.push( {
+			name: 'core/duplicate-pattern',
+			label: __( 'Duplicate pattern' ),
+			icon: symbol,
+			callback: ( { close } ) => {
+				openModal( PATTERN_MODALS.duplicate );
+				close();
+			},
+		} );
+	}
+
+	return { isLoading: false, commands };
+}
+
 export function useEditModeCommands() {
 	useCommandLoader( {
 		name: 'core/exit-code-editor',
@@ -375,6 +414,12 @@ export function useEditModeCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/manipulate-document',
 		hook: useManipulateDocumentCommands,
+	} );
+
+	useCommandLoader( {
+		name: 'core/edit-site/patterns',
+		hook: usePatternCommands,
+		context: 'site-editor-edit',
 	} );
 
 	useCommandLoader( {

@@ -10,11 +10,8 @@ test.describe( 'Font Library', () => {
 		} );
 
 		test.beforeEach( async ( { admin, editor } ) => {
-			await admin.visitSiteEditor( {
-				postId: 'emptytheme//index',
-				postType: 'wp_template',
-			} );
-			await editor.canvas.click( 'body' );
+			await admin.visitSiteEditor();
+			await editor.canvas.locator( 'body' ).click();
 		} );
 
 		test( 'should display the "Manage Fonts" icon', async ( { page } ) => {
@@ -35,11 +32,8 @@ test.describe( 'Font Library', () => {
 		} );
 
 		test.beforeEach( async ( { admin, editor } ) => {
-			await admin.visitSiteEditor( {
-				postId: 'twentytwentythree//index',
-				postType: 'wp_template',
-			} );
-			await editor.canvas.click( 'body' );
+			await admin.visitSiteEditor();
+			await editor.canvas.locator( 'body' ).click();
 		} );
 
 		test( 'should display the "Manage Fonts" icon', async ( { page } ) => {
@@ -68,6 +62,27 @@ test.describe( 'Font Library', () => {
 			await expect( page.getByRole( 'dialog' ) ).toBeVisible();
 			await expect(
 				page.getByRole( 'heading', { name: 'Fonts' } )
+			).toBeVisible();
+		} );
+
+		test( 'should show font variant panel when clicking on a font family', async ( {
+			page,
+		} ) => {
+			await page.getByRole( 'button', { name: /styles/i } ).click();
+			await page
+				.getByRole( 'button', { name: /typography styles/i } )
+				.click();
+			await page
+				.getByRole( 'button', {
+					name: /manage fonts/i,
+				} )
+				.click();
+			await page.getByRole( 'button', { name: /system font/i } ).click();
+			await expect(
+				page.getByRole( 'heading', { name: /system font/i } )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'checkbox', { name: /system font normal/i } )
 			).toBeVisible();
 		} );
 	} );

@@ -9,8 +9,8 @@ GradientPicker is a React component that renders a color gradient picker to defi
 Render a GradientPicker.
 
 ```jsx
+import { useState } from 'react';
 import { GradientPicker } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const myGradientPicker = () => {
 	const [ gradient, setGradient ] = useState( null );
