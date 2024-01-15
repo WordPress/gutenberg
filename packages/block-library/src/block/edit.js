@@ -208,15 +208,18 @@ export default function ReusableBlockEdit( {
 		[ innerBlocks, setBlockEditingMode ]
 	);
 
-	// Apply the initial overrides from the pattern block to the inner blocks.
-	useEffect( () => {
-		const initialBlocks =
+	const initialBlocks = useMemo(
+		() =>
 			// Clone the blocks to generate new client IDs.
 			editedRecord.blocks?.map( ( block ) => cloneBlock( block ) ) ??
 			( editedRecord.content && typeof editedRecord.content !== 'function'
 				? parse( editedRecord.content )
-				: [] );
+				: [] ),
+		[ editedRecord.blocks, editedRecord.content ]
+	);
 
+	// Apply the initial overrides from the pattern block to the inner blocks.
+	useEffect( () => {
 		defaultValuesRef.current = {};
 		const editingMode = getBlockEditingMode( patternClientId );
 		// Replace the contents of the blocks with the overrides.
@@ -237,7 +240,7 @@ export default function ReusableBlockEdit( {
 	}, [
 		__unstableMarkNextChangeAsNotPersistent,
 		patternClientId,
-		editedRecord,
+		initialBlocks,
 		replaceInnerBlocks,
 		registry,
 		getBlockEditingMode,
@@ -293,6 +296,10 @@ export default function ReusableBlockEdit( {
 		editOriginalProps.onClick( event );
 	};
 
+	const resetOverrides = () => {
+		replaceInnerBlocks( patternClientId, initialBlocks );
+	};
+
 	let children = null;
 
 	if ( hasAlreadyRendered ) {
@@ -333,6 +340,15 @@ export default function ReusableBlockEdit( {
 					</ToolbarGroup>
 				</BlockControls>
 			) }
+			{ overrides ? (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton onClick={ resetOverrides }>
+							{ __( 'Reset overrides' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) : null }
 			{ children === null ? (
 				<div { ...innerBlocksProps } />
 			) : (
