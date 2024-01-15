@@ -14,7 +14,7 @@ import {
  * Internal dependencies
  */
 import {
-	fetchInstallFont,
+	fetchInstallFontFamily,
 	fetchUninstallFonts,
 	fetchFontCollections,
 	fetchFontCollection,
@@ -26,7 +26,9 @@ import {
 	mergeFontFamilies,
 	loadFontFaceInBrowser,
 	getDisplaySrcFromFontFace,
-	makeFormDataFromFontFamily,
+	makeFontFacesFormData,
+	makeFontFamilyFormData,
+	batchInstallFontFaces,
 } from './utils';
 import { toggleFont } from './utils/toggleFont';
 import getIntersectingFontFaces from './utils/get-intersecting-font-faces';
@@ -63,9 +65,8 @@ function FontLibraryProvider( { children } ) {
 	} = useEntityRecords( 'postType', 'wp_font_family', { refreshKey } );
 
 	const libraryFonts =
-		( libraryPosts || [] ).map( ( post ) =>
-			JSON.parse( post.content.raw )
-		) || [];
+		( libraryPosts || [] ).map( ( post ) => post.font_family_settings ) ||
+		[];
 
 	// Global Styles (settings) font families
 	const [ fontFamilies, setFontFamilies ] = useGlobalSetting(
@@ -196,9 +197,24 @@ function FontLibraryProvider( { children } ) {
 		setIsInstalling( true );
 		try {
 			// Prepare formData to install.
-			const formData = makeFormDataFromFontFamily( font );
+			const fontFamilyFormData = makeFontFamilyFormData( font );
+			const fontFacesFormData = makeFontFacesFormData( font );
+			const fontFamilyId = await fetchInstallFontFamily(
+				fontFamilyFormData
+			)
+				.then( ( response ) => response.id )
+				.catch( ( e ) => {
+					// eslint-disable-next-line no-console
+					console.error( e );
+					throw Error( 'Unable to install font family.' );
+				} );
+
 			// Install the fonts (upload the font files to the server and create the post in the database).
-			const response = await fetchInstallFont( formData );
+			const response = await batchInstallFontFaces(
+				fontFamilyId,
+				fontFacesFormData
+			);
+
 			const fontsInstalled = response?.successes || [];
 			// Get intersecting font faces between the fonts we tried to installed and the fonts that were installed
 			// (to avoid activating a non installed font).
@@ -213,14 +229,14 @@ function FontLibraryProvider( { children } ) {
 				'settings.typography.fontFamilies',
 			] );
 			refreshLibrary();
-			setIsInstalling( false );
 
 			return response;
 		} catch ( error ) {
-			setIsInstalling( false );
 			return {
 				errors: [ error ],
 			};
+		} finally {
+			setIsInstalling( false );
 		}
 	}
 

@@ -7,9 +7,18 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 
-export async function fetchInstallFont( data ) {
+export async function fetchInstallFontFamily( data ) {
 	const config = {
 		path: '/wp/v2/font-families',
+		method: 'POST',
+		body: data,
+	};
+	return apiFetch( config );
+}
+
+export async function fetchInstallFontFace( fontFamilyId, data ) {
+	const config = {
+		path: `/wp/v2/font-families/${ fontFamilyId }/font-faces`,
 		method: 'POST',
 		body: data,
 	};
