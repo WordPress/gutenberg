@@ -988,7 +988,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		foreach ( $blocks as $block_name => $block_type ) {
-			$root_selector = wp_get_block_css_selector( $block_type );
+			$root_selector = ':where(' . wp_get_block_css_selector( $block_type ) . ')';
 
 			static::$blocks_metadata[ $block_name ]['selector']  = $root_selector;
 			static::$blocks_metadata[ $block_name ]['selectors'] = static::get_block_selectors( $block_type, $root_selector );
