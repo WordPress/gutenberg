@@ -153,7 +153,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$settings = json_decode( $value, true );
 
 		// Check settings string is valid JSON.
-		if ( $settings === null ) {
+		if ( null === $settings ) {
 			return new WP_Error(
 				'rest_invalid_param',
 				__( 'font_face_settings parameter must be a valid JSON string.', 'gutenberg' ),
@@ -201,6 +201,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			if ( ! in_array( $file, $srcs, true ) ) {
 				return new WP_Error(
 					'rest_invalid_param',
+					// translators: %s: File key (e.g. `file-0`) in the request data.
 					sprintf( __( 'File %1$s must be used in font_face_settings[src].', 'gutenberg' ), $file ),
 					array( 'status' => 400 )
 				);
@@ -385,7 +386,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$properties = $this->get_item_schema()['properties']['font_face_settings']['properties'];
 
 		// Provide required, empty settings if the post_content is not valid JSON.
-		if ( $settings === null ) {
+		if ( null === $settings ) {
 			$settings = array(
 				'fontFamily' => '',
 				'src'        => array(),
@@ -717,7 +718,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$status = 500;
 		$code   = 'rest_font_upload_unknown_error';
 
-		if ( $message === 'Sorry, you are not allowed to upload this file type.' ) {
+		if ( 'Sorry, you are not allowed to upload this file type.' === $message ) {
 			$status = 400;
 			$code   = 'rest_font_upload_invalid_file_type';
 		}

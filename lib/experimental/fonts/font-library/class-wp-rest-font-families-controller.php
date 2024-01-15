@@ -129,7 +129,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 		$settings = json_decode( $value, true );
 
 		// Check settings string is valid JSON.
-		if ( $settings === null ) {
+		if ( null === $settings ) {
 			return new WP_Error(
 				'rest_invalid_param',
 				__( 'font_family_settings parameter must be a valid JSON string.', 'gutenberg' ),
@@ -245,7 +245,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 		$properties = $this->get_item_schema()['properties']['font_family_settings']['properties'];
 
 		// Provide empty settings if the post_content is not valid JSON.
-		if ( $settings === null ) {
+		if ( null === $settings ) {
 			$settings = array(
 				'name'       => '',
 				'slug'       => '',
