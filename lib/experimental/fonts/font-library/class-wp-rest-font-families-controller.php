@@ -140,9 +140,18 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 		$schema   = $this->get_item_schema()['properties']['font_family_settings'];
 		$required = $schema['required'];
 
-		// Allow setting individual properties if we are updating an existing font family.
 		if ( isset( $request['id'] ) ) {
+			// Allow sending individual properties if we are updating an existing font family.
 			unset( $schema['required'] );
+
+			// But don't allow updating the slug, since it is used as a unique identifier.
+			if ( isset( $settings['slug'] ) ) {
+				return new WP_Error(
+					'rest_invalid_param',
+					__( 'font_family_settings[slug] cannot be updated.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
 		}
 
 		// Check that the font face settings match the theme.json schema.
