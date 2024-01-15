@@ -112,5 +112,19 @@ store( 'directive-each', {
 	},
 } );
 
+store( 'directive-each', {
+	state: {
+		numbersAndNames: [
+			{ name: "two", value: 2 },
+			{ name: "three", value: 3 },
+		],
+	},
+	actions: {
+		unshiftNumberAndName() {
+			state.numbersAndNames.unshift( { name: "one", value: 1 } );
+		}
+	},
+} );
+
 
 

@@ -265,5 +265,30 @@ test.describe( 'data-wp-each', () => {
 		await expect( elements ).toHaveText( [ 'item 0', 'item 1', 'item X' ] );
 	} );
 
+	test( 'should support multiple siblings inside the template', async ( {
+		page,
+	} ) => {
+		const elements = page.getByTestId( 'siblings' ).getByTestId( 'item' );
+		await expect( elements ).toHaveText( [
+			'two',
+			'2',
+			'three',
+			'3',
+			'four',
+			'4',
+		] );
+		await page.getByTestId( 'siblings' ).getByTestId( 'unshift' ).click();
+		await expect( elements ).toHaveText( [
+			'one',
+			'1',
+			'two',
+			'2',
+			'three',
+			'3',
+			'four',
+			'4',
+		] );
+	} );
+
 	test( 'should work on navigation', async ( { page } ) => {} );
 } );
