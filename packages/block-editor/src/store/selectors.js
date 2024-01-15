@@ -2244,6 +2244,8 @@ export const __experimentalUserPatternCategories = createSelector(
 	( state ) => [ state.settings.__experimentalUserPatternCategories ]
 );
 
+const parsedPatternCache = new WeakMap();
+
 export const __experimentalGetParsedPattern = createSelector(
 	( state, patternName ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
@@ -2256,20 +2258,18 @@ export const __experimentalGetParsedPattern = createSelector(
 			return null;
 		}
 
-		const parsedPattern = {
+		return {
 			...pattern,
 			// Only parse the content if needed (if the blocks property is
 			// accessed), and cache the result.
 			get blocks() {
-				const parsedContent = parse( pattern.content, {
+				const blocks = parse( pattern.content, {
 					__unstableSkipMigrationLogs: true,
 				} );
-				parsedPattern.blocks = parsedContent;
-				return parsedContent;
+				parsedPatternCache.set( pattern, blocks );
+				return blocks;
 			},
 		};
-
-		return parsedPattern;
 	},
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
