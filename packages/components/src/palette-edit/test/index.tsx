@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { click, type, press } from '@ariakit/test';
 
 /**
  * Internal dependencies
@@ -11,6 +11,15 @@ import PaletteEdit, { getNameForPosition } from '..';
 import type { PaletteElement } from '../types';
 
 const noop = () => {};
+
+async function clearInput( input: HTMLInputElement ) {
+	await click( input );
+
+	// Press backspace as many times as the input's current value
+	for ( const _ of Array( input.value.length ) ) {
+		await press.Backspace();
+	}
+}
 
 describe( 'getNameForPosition', () => {
 	test( 'should return 1 by default', () => {
@@ -149,10 +158,9 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'shows an option to remove all colors', async () => {
-		const user = userEvent.setup();
 		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Color options',
 			} )
@@ -166,12 +174,11 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'shows a reset option when the `canReset` prop is enabled', async () => {
-		const user = userEvent.setup();
 		render(
 			<PaletteEdit { ...defaultProps } colors={ colors } canReset />
 		);
 
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Color options',
 			} )
@@ -184,10 +191,9 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'does not show a reset colors option when `canReset` is disabled', async () => {
-		const user = userEvent.setup();
 		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Color options',
 			} )
@@ -200,7 +206,6 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'calls the `onChange` with the new color appended', async () => {
-		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -211,7 +216,7 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Add color',
 			} )
@@ -230,7 +235,6 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'calls the `onChange` with the new gradient appended', async () => {
-		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -241,7 +245,7 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Add gradient',
 			} )
@@ -271,7 +275,6 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'can remove a color', async () => {
-		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -282,18 +285,18 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Color options',
 			} )
 		);
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Show details',
 			} )
 		);
-		await user.click( screen.getByText( 'Primary' ) );
-		await user.click(
+		await click( screen.getByText( 'Primary' ) );
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Remove color',
 			} )
@@ -305,7 +308,6 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'can update palette name', async () => {
-		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -316,22 +318,24 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Color options',
 			} )
 		);
-		await user.click(
+		await click(
 			screen.getByRole( 'button', {
 				name: 'Show details',
 			} )
 		);
-		await user.click( screen.getByText( 'Primary' ) );
+		await click( screen.getByText( 'Primary' ) );
 		const nameInput = screen.getByRole( 'textbox', {
 			name: 'Color name',
 		} );
-		await user.clear( nameInput );
-		await user.type( nameInput, 'Primary Updated' );
+
+		await clearInput( nameInput as HTMLInputElement );
+
+		await type( 'Primary Updated' );
 
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [
@@ -346,7 +350,6 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'can update color palette value', async () => {
-		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -357,12 +360,14 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await user.click( screen.getByLabelText( 'Color: Primary' ) );
+		await click( screen.getByLabelText( 'Color: Primary' ) );
 		const hexInput = screen.getByRole( 'textbox', {
 			name: 'Hex color',
 		} );
-		await user.clear( hexInput );
-		await user.type( hexInput, '000000' );
+
+		await clearInput( hexInput as HTMLInputElement );
+
+		await type( '000000' );
 
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [
@@ -376,7 +381,6 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'can update gradient palette value', async () => {
-		const user = userEvent.setup();
 		const onChange = jest.fn();
 
 		render(
@@ -387,12 +391,15 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await user.click( screen.getByLabelText( 'Gradient: Pale ocean' ) );
+		await click( screen.getByLabelText( 'Gradient: Pale ocean' ) );
 
-		const typeSelectElement = screen.getByRole( 'combobox', {
-			name: 'Type',
-		} );
-		await user.selectOptions( typeSelectElement, 'radial-gradient' );
+		// Select radial gradient option
+		await click(
+			screen.getByRole( 'combobox', {
+				name: 'Type',
+			} )
+		);
+		await click( screen.getByRole( 'option', { name: 'Radial' } ) );
 
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [

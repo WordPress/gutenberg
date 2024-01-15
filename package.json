@@ -359,8 +359,7 @@
 			"wp-scripts lint-style"
 		],
 		"package-lock.json": [
-			"npm run lint:lockfile",
-			"node ./bin/check-latest-npm.js"
+			"npm run lint:lockfile"
 		],
 		"packages/*/package.json": [
 			"wp-scripts lint-pkg-json"
