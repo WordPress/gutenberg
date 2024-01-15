@@ -55,7 +55,7 @@ export default function useCommonCommands() {
 			isPublishSidebarEnabled:
 				select( editorStore ).isPublishSidebarEnabled(),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
-			isDistractionFree: get( editPostStore.name, 'distractionFree' ),
+			isDistractionFree: get( 'core', 'distractionFree' ),
 		};
 	}, [] );
 	const { toggle } = useDispatch( preferencesStore );
@@ -134,7 +134,7 @@ export default function useCommonCommands() {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'fixedToolbar' );
+			toggle( 'core', 'fixedToolbar' );
 			if ( isDistractionFree ) {
 				toggleDistractionFree();
 			}
@@ -192,16 +192,16 @@ export default function useCommonCommands() {
 	useCommand( {
 		name: 'core/toggle-publish-sidebar',
 		label: isPublishSidebarEnabled
-			? __( 'Disable pre-publish checklist' )
-			: __( 'Enable pre-publish checklist' ),
+			? __( 'Disable pre-publish checks' )
+			: __( 'Enable pre-publish checks' ),
 		icon: formatListBullets,
 		callback: ( { close } ) => {
 			close();
 			toggle( 'core/edit-post', 'isPublishSidebarEnabled' );
 			createInfoNotice(
 				isPublishSidebarEnabled
-					? __( 'Pre-publish checklist off.' )
-					: __( 'Pre-publish checklist on.' ),
+					? __( 'Pre-publish checks disabled.' )
+					: __( 'Pre-publish checks enabled.' ),
 				{
 					id: 'core/edit-post/publish-sidebar/notice',
 					type: 'snackbar',

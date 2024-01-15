@@ -361,14 +361,23 @@ class WP_Navigation_Block_Renderer {
 		$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
 		$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
 
+		// Sets the is-collapsed class when the navigation is set to always use the overlay.
+		// This saves us from needing to do this check in the view.js file (see the collapseNav function).
+		$is_collapsed_class = static::is_always_overlay( $attributes ) ? array( 'is-collapsed' ) : array();
+
 		$classes = array_merge(
 			$colors['css_classes'],
 			$font_sizes['css_classes'],
 			$is_responsive_menu ? array( 'is-responsive' ) : array(),
 			$layout_class ? array( $layout_class ) : array(),
-			$text_decoration ? array( $text_decoration_class ) : array()
+			$text_decoration ? array( $text_decoration_class ) : array(),
+			$is_collapsed_class
 		);
 		return implode( ' ', $classes );
+	}
+
+	private static function is_always_overlay( $attributes ) {
+		return isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
 	}
 
 	/**
@@ -397,16 +406,12 @@ class WP_Navigation_Block_Renderer {
 		$colors                  = gutenberg_block_core_navigation_build_css_colors( $attributes );
 		$modal_unique_id         = wp_unique_id( 'modal-' );
 
-		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
-
 		$responsive_container_classes = array(
 			'wp-block-navigation__responsive-container',
-			$is_hidden_by_default ? 'hidden-by-default' : '',
 			implode( ' ', $colors['overlay_css_classes'] ),
 		);
 		$open_button_classes          = array(
 			'wp-block-navigation__responsive-container-open',
-			$is_hidden_by_default ? 'always-shown' : '',
 		);
 
 		$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
@@ -504,7 +509,7 @@ class WP_Navigation_Block_Renderer {
 		);
 
 		if ( $is_responsive_menu ) {
-			$nav_element_directives = static::get_nav_element_directives( $should_load_view_script );
+			$nav_element_directives = static::get_nav_element_directives( $should_load_view_script, $attributes );
 			$wrapper_attributes    .= ' ' . $nav_element_directives;
 		}
 
@@ -517,12 +522,12 @@ class WP_Navigation_Block_Renderer {
 	 * @param bool $should_load_view_script Whether or not the view script should be loaded.
 	 * @return string the directives for the navigation element.
 	 */
-	private static function get_nav_element_directives( $should_load_view_script ) {
+	private static function get_nav_element_directives( $should_load_view_script, $attributes ) {
 		if ( ! $should_load_view_script ) {
 			return '';
 		}
 		// When adding to this array be mindful of security concerns.
-		$nav_element_context = wp_json_encode(
+		$nav_element_context    = wp_json_encode(
 			array(
 				'overlayOpenedBy' => array(),
 				'type'            => 'overlay',
@@ -531,10 +536,20 @@ class WP_Navigation_Block_Renderer {
 			),
 			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP
 		);
-		return '
+		$nav_element_directives = '
 			data-wp-interactive=\'{"namespace":"core/navigation"}\'
 			data-wp-context=\'' . $nav_element_context . '\'
 		';
+
+		// When the navigation overlayMenu attribute is set to "always"
+		// we don't need to use JavaScript to collapse the menu as we set the class manually.
+		if ( ! static::is_always_overlay( $attributes ) ) {
+			$nav_element_directives .= 'data-wp-init="callbacks.initNav"';
+			$nav_element_directives .= ' '; // space separator
+			$nav_element_directives .= 'data-wp-class--is-collapsed="context.isCollapsed"';
+		}
+
+		return $nav_element_directives;
 	}
 
 	/**

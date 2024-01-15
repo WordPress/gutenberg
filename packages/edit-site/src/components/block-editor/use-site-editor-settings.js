@@ -1,12 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -90,16 +88,8 @@ function useArchiveLabel( templateSlug ) {
 }
 
 export function useSpecificEditorSettings() {
-	const isLargeViewport = useViewportMatch( 'medium' );
 	const getPostLinkProps = usePostLinkProps();
-	const {
-		templateSlug,
-		isDistractionFree,
-		hasFixedToolbar,
-		canvasMode,
-		settings,
-		postWithTemplate,
-	} = useSelect(
+	const { templateSlug, canvasMode, settings, postWithTemplate } = useSelect(
 		( select ) => {
 			const {
 				getEditedPostType,
@@ -108,7 +98,6 @@ export function useSpecificEditorSettings() {
 				getCanvasMode,
 				getSettings,
 			} = unlock( select( editSiteStore ) );
-			const { get: getPreference } = select( preferencesStore );
 			const { getEditedEntityRecord } = select( coreStore );
 			const usedPostType = getEditedPostType();
 			const usedPostId = getEditedPostId();
@@ -120,19 +109,12 @@ export function useSpecificEditorSettings() {
 			const _context = getEditedPostContext();
 			return {
 				templateSlug: _record.slug,
-				isDistractionFree: !! getPreference(
-					'core/edit-site',
-					'distractionFree'
-				),
-				hasFixedToolbar:
-					!! getPreference( 'core/edit-site', 'fixedToolbar' ) ||
-					! isLargeViewport,
 				canvasMode: getCanvasMode(),
 				settings: getSettings(),
 				postWithTemplate: _context?.postId,
 			};
 		},
-		[ isLargeViewport ]
+		[]
 	);
 	const archiveLabels = useArchiveLabel( templateSlug );
 	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
@@ -143,8 +125,6 @@ export function useSpecificEditorSettings() {
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
 			focusMode: canvasMode !== 'view',
-			isDistractionFree,
-			hasFixedToolbar,
 			defaultRenderingMode,
 			getPostLinkProps,
 			// I wonder if they should be set in the post editor too
@@ -154,8 +134,6 @@ export function useSpecificEditorSettings() {
 	}, [
 		settings,
 		canvasMode,
-		isDistractionFree,
-		hasFixedToolbar,
 		defaultRenderingMode,
 		getPostLinkProps,
 		archiveLabels.archiveTypeLabel,

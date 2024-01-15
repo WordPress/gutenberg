@@ -54,6 +54,8 @@ import {
 	renameAction,
 	resetAction,
 	deleteAction,
+	duplicatePatternAction,
+	duplicateTemplatePartAction,
 } from './dataviews-pattern-actions';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
@@ -169,7 +171,7 @@ function Title( { item, categoryId } ) {
 			item.syncStatus === PATTERN_SYNC_TYPES.full ? symbol : undefined;
 	}
 	return (
-		<HStack alignment="center" justify="flex-start" spacing={ 3 }>
+		<HStack alignment="center" justify="flex-start" spacing={ 2 }>
 			{ itemIcon && ! isNonUserPattern && (
 				<Tooltip
 					placement="top"
@@ -183,9 +185,23 @@ function Title( { item, categoryId } ) {
 					/>
 				</Tooltip>
 			) }
+			{ item.type === PATTERN_TYPES.theme && (
+				<Tooltip
+					placement="top"
+					text={ __( 'This pattern cannot be edited.' ) }
+				>
+					<Icon
+						className="edit-site-patterns__pattern-lock-icon"
+						icon={ lockSmall }
+						size={ 24 }
+					/>
+				</Tooltip>
+			) }
 			<Flex as="span" gap={ 0 } justify="left">
 				{ item.type === PATTERN_TYPES.theme ? (
-					item.title
+					<span className="dataviews-view-grid__title-field">
+						{ item.title }
+					</span>
 				) : (
 					<Heading level={ 5 }>
 						<Button
@@ -194,22 +210,11 @@ function Title( { item, categoryId } ) {
 							// Required for the grid's roving tab index system.
 							// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
 							tabIndex="-1"
+							className="dataviews-view-grid__title-field"
 						>
 							{ item.title || item.name }
 						</Button>
 					</Heading>
-				) }
-				{ item.type === PATTERN_TYPES.theme && (
-					<Tooltip
-						placement="top"
-						text={ __( 'This pattern cannot be edited.' ) }
-					>
-						<Icon
-							className="edit-site-patterns__pattern-lock-icon"
-							icon={ lockSmall }
-							size={ 24 }
-						/>
-					</Tooltip>
 				) }
 			</Flex>
 		</HStack>
@@ -314,7 +319,14 @@ export default function DataviewsPatterns() {
 	}, [ patterns, view, fields ] );
 
 	const actions = useMemo(
-		() => [ renameAction, exportJSONaction, resetAction, deleteAction ],
+		() => [
+			renameAction,
+			duplicatePatternAction,
+			duplicateTemplatePartAction,
+			exportJSONaction,
+			resetAction,
+			deleteAction,
+		],
 		[]
 	);
 	const onChangeView = useCallback(

@@ -267,14 +267,17 @@ module.exports = {
  *
  * @param {string} request Requested module
  *
- * @return {(string|undefined)} Script global
+ * @return {(string|boolean|undefined)} Module ID
  */
 function requestToExternalModule( request ) {
 	// Handle imports like `import myModule from 'my-module'`
 	if ( request === 'my-module' ) {
-		// Import should be ov the form `import { something } from "myModule";` in the final bundle.
+		// Import should be of the form `import { something } from "myModule";` in the final bundle.
 		return 'myModule';
 	}
+
+	// If the Module ID in source is the same as the external module, we can return `true`.
+	return request === 'external-module-id-no-change-required';
 }
 
 module.exports = {

@@ -65,7 +65,9 @@ const { useHistory } = unlock( routerPrivateApis );
 const EMPTY_ARRAY = [];
 
 const defaultConfigPerViewType = {
-	[ LAYOUT_TABLE ]: {},
+	[ LAYOUT_TABLE ]: {
+		primaryField: 'title',
+	},
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
@@ -84,7 +86,7 @@ const DEFAULT_VIEW = {
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'preview' ],
-	layout: {},
+	layout: defaultConfigPerViewType[ LAYOUT_TABLE ],
 	filters: [],
 };
 
@@ -103,7 +105,7 @@ function TemplateTitle( { item, viewType } ) {
 
 	return (
 		<VStack spacing={ 1 }>
-			<View as="span" className="edit-site-list-title__customized-info">
+			<View as="span" className="dataviews-view-grid__title-field">
 				<Link
 					params={ {
 						postId: item.id,

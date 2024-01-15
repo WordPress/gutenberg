@@ -1,6 +1,6 @@
 # Schemas
 
-The collection of schemas used in WordPress, including the `theme.json` and `block.json` schemas.
+The collection of schemas used in WordPress, including the `theme.json`, `block.json` and `font-collection.json` schemas.
 
 JSON schemas are used by code editors to offer tooltips, autocomplete, and validation.
 
@@ -21,6 +21,14 @@ Or in your `theme.json`:
 ```json
 {
 	"$schema": "https://schemas.wp.org/trunk/theme.json"
+}
+```
+
+Or in your `font-collection.json`:
+
+```json
+{
+	"$schema": "https://schemas.wp.org/trunk/font-collection.json"
 }
 ```
 
@@ -56,8 +64,16 @@ To allow this you will need to:
 }
 ```
 
+-   update your font collections's `font-collection.json` to include:
+
+```json
+{
+	"$schema": "file://{{FULL_FILE_PATH}}/schemas/json/font-collection.json"
+}
+```
+
 Be sure to replace `{{FULL_FILE_PATH}}` with the full local path to your Gutenberg repo.
 
-With this in place you should now be able to edit either `schemas/json/theme .json` or `schemas/json/block.json` in order to see changes reflected in `theme.json` or `block.json` in your IDE.
+With this in place you should now be able to edit either `schemas/json/theme .json`, `schemas/json/block.json` or `schemas/json/font-collection.json` in order to see changes reflected in `theme.json`, `block.json` or `font-collection.json` in your IDE.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

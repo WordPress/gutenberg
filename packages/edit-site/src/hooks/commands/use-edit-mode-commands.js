@@ -228,7 +228,7 @@ function useEditUICommands() {
 			),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			isListViewOpen: isListViewOpened(),
-			isDistractionFree: get( editSiteStore.name, 'distractionFree' ),
+			isDistractionFree: get( 'core', 'distractionFree' ),
 		};
 	}, [] );
 	const { openModal } = useDispatch( interfaceStore );
@@ -291,7 +291,7 @@ function useEditUICommands() {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-site', 'fixedToolbar' );
+			toggle( 'core', 'fixedToolbar' );
 			if ( isDistractionFree ) {
 				toggleDistractionFree();
 			}

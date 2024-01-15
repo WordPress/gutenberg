@@ -117,8 +117,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
-require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-store.php';
-require __DIR__ . '/experimental/interactivity-api/store.php';
+require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-initial-state.php';
+require __DIR__ . '/experimental/interactivity-api/initial-state.php';
 require __DIR__ . '/experimental/interactivity-api/modules.php';
 require __DIR__ . '/experimental/interactivity-api/class-wp-directive-processor.php';
 require __DIR__ . '/experimental/interactivity-api/class-wp-directive-context.php';
@@ -128,6 +128,7 @@ require __DIR__ . '/experimental/interactivity-api/directives/wp-context.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-class.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-style.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-text.php';
+require __DIR__ . '/experimental/interactivity-api/directives/wp-interactive.php';
 
 require __DIR__ . '/experimental/modules/class-gutenberg-modules.php';
 
@@ -183,15 +184,6 @@ if (
 	require __DIR__ . '/experimental/fonts/font-face/bc-layer/class-wp-webfonts.php';
 	require __DIR__ . '/experimental/fonts/font-face/bc-layer/class-wp-web-fonts.php';
 } elseif ( ! class_exists( 'WP_Fonts' ) ) {
-
-	// Disables the Font Library.
-	// @core-merge: this should not go to core.
-	add_action(
-		'enqueue_block_editor_assets',
-		function () {
-			wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDisableFontLibrary = true', 'before' );
-		}
-	);
 
 	// Turns off Font Face hooks in Core.
 	// @since 6.4.0.

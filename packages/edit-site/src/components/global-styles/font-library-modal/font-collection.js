@@ -31,6 +31,7 @@ import { toggleFont } from './utils/toggleFont';
 import { getFontsOutline } from './utils/fonts-outline';
 import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
 import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
+import { downloadFontFaceAsset } from './utils';
 
 const DEFAULT_CATEGORY = {
 	id: 'all',
@@ -54,7 +55,7 @@ function FontCollection( { id } ) {
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const { collections, getFontCollection, installFonts } =
+	const { collections, getFontCollection, installFont } =
 		useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
 		( collection ) => collection.id === id
@@ -91,6 +92,11 @@ function FontCollection( { id } ) {
 		setSelectedFont( null );
 		setNotice( null );
 	}, [ id ] );
+
+	useEffect( () => {
+		// If the selected fonts change, reset the selected fonts to install
+		setFontsToInstall( [] );
+	}, [ selectedFont ] );
 
 	// Reset notice after 5 seconds
 	useEffect( () => {
@@ -149,7 +155,34 @@ function FontCollection( { id } ) {
 	};
 
 	const handleInstall = async () => {
-		const response = await installFonts( fontsToInstall );
+		const fontFamily = fontsToInstall[ 0 ];
+
+		try {
+			if ( fontFamily?.fontFace ) {
+				await Promise.all(
+					fontFamily.fontFace.map( async ( fontFace ) => {
+						if ( fontFace.downloadFromUrl ) {
+							fontFace.file = await downloadFontFaceAsset(
+								fontFace.downloadFromUrl
+							);
+							delete fontFace.downloadFromUrl;
+						}
+					} )
+				);
+			}
+		} catch ( error ) {
+			// If any of the fonts fail to download,
+			// show an error notice and stop the request from being sent.
+			setNotice( {
+				type: 'error',
+				message: __(
+					'Error installing the fonts, could not be downloaded.'
+				),
+			} );
+			return;
+		}
+
+		const response = await installFont( fontFamily );
 		const installNotice = getNoticeFromInstallResponse( response );
 		setNotice( installNotice );
 		resetFontsToInstall();
