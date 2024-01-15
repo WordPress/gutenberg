@@ -10,7 +10,7 @@
  * Register the `@wordpress/interactivity` module.
  */
 function gutenberg_register_interactivity_module() {
-	wp_register_module(
+	wp_register_script_module(
 		'@wordpress/interactivity',
 		gutenberg_url( '/build/interactivity/index.min.js' ),
 		array(),

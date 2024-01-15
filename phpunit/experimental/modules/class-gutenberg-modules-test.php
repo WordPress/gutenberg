@@ -93,7 +93,7 @@ class Tests_WP_Script_Modules extends WP_UnitTestCase {
 	 * @covers ::enqueue()
 	 * @covers ::print_enqueued_modules()
 	 */
-	public function test_wp_enqueue_module() {
+	public function test_wp_enqueue_script_module() {
 		$this->modules->register( 'foo', '/foo.js' );
 		$this->modules->register( 'bar', '/bar.js' );
 		$this->modules->enqueue( 'foo' );
@@ -116,7 +116,7 @@ class Tests_WP_Script_Modules extends WP_UnitTestCase {
 	* @covers ::dequeue()
 	* @covers ::print_enqueued_modules()
 	*/
-	public function test_wp_dequeue_module() {
+	public function test_wp_dequeue_script_module() {
 		$this->modules->register( 'foo', '/foo.js' );
 		$this->modules->register( 'bar', '/bar.js' );
 		$this->modules->enqueue( 'foo' );
@@ -140,7 +140,7 @@ class Tests_WP_Script_Modules extends WP_UnitTestCase {
 	* @covers ::enqueue()
 	* @covers ::print_enqueued_modules()
 	*/
-	public function test_wp_enqueue_module_works_before_register() {
+	public function test_wp_enqueue_script_module_works_before_register() {
 		$this->modules->enqueue( 'foo' );
 		$this->modules->register( 'foo', '/foo.js' );
 		$this->modules->enqueue( 'bar' ); // Not registered.
@@ -163,7 +163,7 @@ class Tests_WP_Script_Modules extends WP_UnitTestCase {
 	 * @covers ::dequeue()
 	 * @covers ::print_enqueued_modules()
 	 */
-	public function test_wp_dequeue_module_works_before_register() {
+	public function test_wp_dequeue_script_module_works_before_register() {
 		$this->modules->enqueue( 'foo' );
 		$this->modules->enqueue( 'bar' );
 		$this->modules->dequeue( 'foo' );
@@ -593,7 +593,7 @@ class Tests_WP_Script_Modules extends WP_UnitTestCase {
 	 * @covers ::enqueue()
 	 * @covers ::print_enqueued_modules()
 	 */
-	public function test_wp_enqueue_module_doesnt_register_without_a_valid_src() {
+	public function test_wp_enqueue_script_module_doesnt_register_without_a_valid_src() {
 		$this->modules->enqueue( 'foo' );
 
 		$enqueued_modules = $this->get_enqueued_modules();
@@ -610,7 +610,7 @@ class Tests_WP_Script_Modules extends WP_UnitTestCase {
 	 * @covers ::enqueue()
 	 * @covers ::print_enqueued_modules()
 	 */
-	public function test_wp_enqueue_module_registers_with_valid_src() {
+	public function test_wp_enqueue_script_module_registers_with_valid_src() {
 		$this->modules->enqueue( 'foo', '/foo.js' );
 
 		$enqueued_modules = $this->get_enqueued_modules();
@@ -628,7 +628,7 @@ class Tests_WP_Script_Modules extends WP_UnitTestCase {
 	 * @covers ::enqueue()
 	 * @covers ::print_enqueued_modules()
 	 */
-	public function test_wp_enqueue_module_registers_with_valid_src_the_second_time() {
+	public function test_wp_enqueue_script_module_registers_with_valid_src_the_second_time() {
 		$this->modules->enqueue( 'foo' ); // Not valid src.
 
 		$enqueued_modules = $this->get_enqueued_modules();
@@ -654,7 +654,7 @@ class Tests_WP_Script_Modules extends WP_UnitTestCase {
 	 * @covers ::print_enqueued_modules()
 	 * @covers ::print_import_map()
 	 */
-	public function test_wp_enqueue_module_registers_all_params() {
+	public function test_wp_enqueue_script_module_registers_all_params() {
 		$this->modules->enqueue( 'foo', '/foo.js', array( 'dep' ), '1.0' );
 		$this->modules->register( 'dep', '/dep.js' );
 

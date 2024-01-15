@@ -21,7 +21,7 @@ add_action(
 
 				$view_file = plugin_dir_url( $block_folder ) . $name . '/' . 'view.js';
 
-				wp_register_module(
+				wp_register_script_module(
 					$name . '-view',
 					$view_file,
 					array( '@wordpress/interactivity' ),

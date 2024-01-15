@@ -7,7 +7,7 @@
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
-wp_enqueue_module( 'router-navigate-view' );
+wp_enqueue_script_module( 'router-navigate-view' );
 ?>
 
 <div

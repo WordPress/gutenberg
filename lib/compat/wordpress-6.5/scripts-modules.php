@@ -18,8 +18,8 @@
  *
  * @return WP_Script_Modules The main WP_Script_Modules instance.
  */
-if ( ! function_exists( 'wp_modules' ) ) {
-	function wp_modules() {
+if ( ! function_exists( 'wp_script_modules' ) ) {
+	function wp_script_modules() {
 		static $instance = null;
 		if ( is_null( $instance ) ) {
 			$instance = new WP_Script_Modules();
@@ -62,9 +62,9 @@ if ( ! function_exists( 'wp_modules' ) ) {
  *                                                                                 version. If $version is set to
  *                                                                                 null, no version is added.
  */
-if ( ! function_exists( 'wp_register_module' ) ) {
-	function wp_register_module( $module_id, $src, $deps = array(), $version = false ) {
-		wp_modules()->register( $module_id, $src, $deps, $version );
+if ( ! function_exists( 'wp_register_script_module' ) ) {
+	function wp_register_script_module( $module_id, $src, $deps = array(), $version = false ) {
+		wp_script_modules()->register( $module_id, $src, $deps, $version );
 	}
 }
 
@@ -105,9 +105,9 @@ if ( ! function_exists( 'wp_register_module' ) ) {
  *                                                                                 version. If $version is set to
  *                                                                                 null, no version is added.
  */
-if ( ! function_exists( 'wp_enqueue_module' ) ) {
-	function wp_enqueue_module( $module_id, $src = '', $deps = array(), $version = false ) {
-		wp_modules()->enqueue( $module_id, $src, $deps, $version );
+if ( ! function_exists( 'wp_enqueue_script_module' ) ) {
+	function wp_enqueue_script_module( $module_id, $src = '', $deps = array(), $version = false ) {
+		wp_script_modules()->enqueue( $module_id, $src, $deps, $version );
 	}
 }
 
@@ -118,8 +118,8 @@ if ( ! function_exists( 'wp_enqueue_module' ) ) {
  *
  * @param string $module_id The identifier of the module.
  */
-if ( ! function_exists( 'wp_dequeue_module' ) ) {
-	function wp_dequeue_module( $module_id ) {
-		wp_modules()->dequeue( $module_id );
+if ( ! function_exists( 'wp_dequeue_script_module' ) ) {
+	function wp_dequeue_script_module( $module_id ) {
+		wp_script_modules()->dequeue( $module_id );
 	}
 }

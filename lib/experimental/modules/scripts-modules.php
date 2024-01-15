@@ -12,7 +12,7 @@ function gutenberg_filter_render_block_enqueue_view_modules( $block_content, $pa
 
 	if ( ! empty( $block_type->view_module_ids ) ) {
 		foreach ( $block_type->view_module_ids as $module_id ) {
-			wp_enqueue_module( $module_id );
+			wp_enqueue_script_module( $module_id );
 		}
 	}
 
@@ -79,7 +79,7 @@ function gutenberg_register_block_module_id( $metadata, $field_name, $index = 0 
 	$module_asset        = require $module_asset_path;
 	$module_dependencies = isset( $module_asset['dependencies'] ) ? $module_asset['dependencies'] : array();
 
-	wp_register_module(
+	wp_register_script_module(
 		$module_id,
 		$module_uri,
 		$module_dependencies,
@@ -153,31 +153,31 @@ add_action( 'rest_api_init', 'gutenberg_register_view_module_ids_rest_field' );
  * @param string            $src               Full URL of the module, or path of the script relative to the WordPress root directory.
  * @param array             $dependencies      Optional. An array of module identifiers of the dependencies of this module. The dependencies can be strings or arrays. If they are arrays, they need an `id` key with the module identifier, and can contain a `type` key with either `static` or `dynamic`. By default, dependencies that don't contain a type are considered static.
  * @param string|false|null $version           Optional. String specifying module version number. Defaults to false. It is added to the URL as a query string for cache busting purposes. If SCRIPT_DEBUG is true, the version is the current timestamp. If $version is set to false, the version number is the currently installed WordPress version. If $version is set to null, no version is added.
- * @deprecated 17.4.2 gutenberg_register_module is deprecated. Use wp_register_module instead.
+ * @deprecated 17.4.2 gutenberg_register_module is deprecated. Use wp_register_script_module instead.
  */
 function gutenberg_register_module( $module_id, $src = '' ) {
-	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6', 'wp_register_module' );
-	wp_modules()->register( $module_id, $src );
+	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6', 'wp_register_script_module' );
+	wp_script_modules()->register( $module_id, $src );
 }
 
 /**
  * Marks the module to be enqueued in the page.
  *
  * @param string $module_identifier The identifier of the module.
- * @deprecated 17.4.2 gutenberg_enqueue_module is deprecated. Use wp_enqueue_module instead.
+ * @deprecated 17.4.2 gutenberg_enqueue_module is deprecated. Use wp_enqueue_script_module instead.
  */
 function gutenberg_enqueue_module( $module_id ) {
-	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6', 'wp_enqueue_module' );
-	wp_modules()->enqueue( $module_id );
+	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6', 'wp_enqueue_script_module' );
+	wp_script_modules()->enqueue( $module_id );
 }
 
 /**
  * Unmarks the module so it is not longer enqueued in the page.
  *
  * @param string $module_identifier The identifier of the module.
- * @deprecated 17.4.2 gutenberg_dequeue_module is deprecated. Use wp_dequeue_module instead.
+ * @deprecated 17.4.2 gutenberg_dequeue_module is deprecated. Use wp_dequeue_script_module instead.
  */
 function gutenberg_dequeue_module( $module_id ) {
-	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6', 'wp_dequeue_module' );
-	wp_modules()->dequeue( $module_id );
+	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6', 'wp_dequeue_script_module' );
+	wp_script_modules()->dequeue( $module_id );
 }

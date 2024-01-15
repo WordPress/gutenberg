@@ -352,7 +352,7 @@ $module_asset      = file_exists( $module_asset_path )
 	? require( $module_asset_path )
 	: array( 'dependencies' => array(), 'version' => filemtime( $module_path ) );
 $module_url = plugins_url( $module_path, __FILE__ );
-wp_register_module( 'my-module', $module_url, $module_asset['dependencies'], $module_asset['version'] );
+wp_register_script_module( 'my-module', $module_url, $module_asset['dependencies'], $module_asset['version'] );
 wp_enqueue_module( 'my-module' );
 ```
 

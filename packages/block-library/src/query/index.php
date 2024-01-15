@@ -138,7 +138,7 @@ function register_block_core_query() {
 	);
 
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		wp_register_module(
+		wp_register_script_module(
 			'@wordpress/block-library/query',
 			'/wp-content/plugins/gutenberg/build/interactivity/query.min.js',
 			array( '@wordpress/interactivity' ),

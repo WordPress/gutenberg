@@ -428,7 +428,7 @@ function register_block_core_navigation() {
 	);
 
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		wp_register_module(
+		wp_register_script_module(
 			'@wordpress/block-library/navigation-block',
 			gutenberg_url( '/build/interactivity/navigation.min.js' ),
 			array( '@wordpress/interactivity' ),

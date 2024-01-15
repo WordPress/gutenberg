@@ -52,7 +52,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 		true === $lightbox_settings['enabled']
 	) {
 		if ( $is_gutenberg_plugin ) {
-			wp_enqueue_module( '@wordpress/block-library/image' );
+			wp_enqueue_script_module( '@wordpress/block-library/image' );
 			// Remove the view script because we are using the module.
 			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_js_file_handle ) );
 		} elseif ( ! in_array( $view_js_file_handle, $script_handles, true ) ) {
@@ -359,7 +359,7 @@ function register_block_core_image() {
 	);
 
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		wp_register_module(
+		wp_register_script_module(
 			'@wordpress/block-library/image',
 			gutenberg_url( '/build/interactivity/image.min.js' ),
 			array( '@wordpress/interactivity' ),
