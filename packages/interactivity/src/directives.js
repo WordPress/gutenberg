@@ -14,7 +14,7 @@ import { deepSignal, peek } from 'deepsignal';
  * Internal dependencies
  */
 import { createPortal } from './portals';
-import { useSignalEffect } from './utils';
+import { useWatch, useInit } from './utils';
 import { directive } from './hooks';
 import { SlotProvider, Slot, Fill } from './slots';
 import { navigate } from './router';
@@ -75,14 +75,14 @@ export default () => {
 	// data-wp-watch--[name]
 	directive( 'watch', ( { directives: { watch }, evaluate } ) => {
 		watch.forEach( ( entry ) => {
-			useSignalEffect( () => evaluate( entry ) );
+			useWatch( () => evaluate( entry ) );
 		} );
 	} );
 
 	// data-wp-init--[name]
 	directive( 'init', ( { directives: { init }, evaluate } ) => {
 		init.forEach( ( entry ) => {
-			useEffect( () => evaluate( entry ), [] );
+			useInit( () => evaluate( entry ) );
 		} );
 	} );
 
@@ -118,7 +118,7 @@ export default () => {
 							? `${ currentClass } ${ name }`
 							: name;
 
-					useEffect( () => {
+					useInit( () => {
 						// This seems necessary because Preact doesn't change the class
 						// names on the hydration, so we have to do it manually. It doesn't
 						// need deps because it only needs to do it the first time.
@@ -127,7 +127,7 @@ export default () => {
 						} else {
 							element.ref.current.classList.add( name );
 						}
-					}, [] );
+					} );
 				} );
 		}
 	);
@@ -182,7 +182,7 @@ export default () => {
 				if ( ! result ) delete element.props.style[ key ];
 				else element.props.style[ key ] = result;
 
-				useEffect( () => {
+				useInit( () => {
 					// This seems necessary because Preact doesn't change the styles on
 					// the hydration, so we have to do it manually. It doesn't need deps
 					// because it only needs to do it the first time.
@@ -191,7 +191,7 @@ export default () => {
 					} else {
 						element.ref.current.style[ key ] = result;
 					}
-				}, [] );
+				} );
 			} );
 	} );
 
@@ -217,7 +217,7 @@ export default () => {
 				// This seems necessary because Preact doesn't change the attributes
 				// on the hydration, so we have to do it manually. It doesn't need
 				// deps because it only needs to do it the first time.
-				useEffect( () => {
+				useInit( () => {
 					const el = element.ref.current;
 
 					// We set the value directly to the corresponding
@@ -260,7 +260,7 @@ export default () => {
 					} else {
 						el.removeAttribute( attribute );
 					}
-				}, [] );
+				} );
 			}
 		);
 	} );
@@ -390,4 +390,9 @@ export default () => {
 		),
 		{ priority: 4 }
 	);
+
+	// data-wp-run
+	directive( 'run', ( { directives: { run }, evaluate } ) => {
+		run.forEach( ( entry ) => evaluate( entry ) );
+	} );
 };
