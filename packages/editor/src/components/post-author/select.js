@@ -16,16 +16,31 @@ import { AUTHORS_QUERY } from './constants';
 
 function PostAuthorSelect() {
 	const { editPost } = useDispatch( editorStore );
-	const { postAuthor, authors } = useSelect( ( select ) => {
+	const { postAuthorId, authors } = useSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( editorStore );
+		const { getUser, getUsers } = select( coreStore );
+		const _authors = getUsers( AUTHORS_QUERY ) ?? [];
+		const _postAuthorId = getEditedPostAttribute( 'author' );
+		const postAuthor = _postAuthorId ? getUser( _postAuthorId ) : null;
+
+		// If the author of the post does not have a post role, include
+		// in the author list to prevent unintentional author updates.
+		if (
+			_postAuthorId &&
+			postAuthor &&
+			! _authors.find( ( { id } ) => id === postAuthorId )
+		) {
+			_authors.push( postAuthor );
+		}
+
 		return {
-			postAuthor:
-				select( editorStore ).getEditedPostAttribute( 'author' ),
-			authors: select( coreStore ).getUsers( AUTHORS_QUERY ),
+			postAuthorId: _postAuthorId,
+			authors: _authors,
 		};
 	}, [] );
 
 	const authorOptions = useMemo( () => {
-		return ( authors ?? [] ).map( ( author ) => {
+		return authors.map( ( author ) => {
 			return {
 				value: author.id,
 				label: decodeEntities( author.name ),
@@ -46,7 +61,7 @@ function PostAuthorSelect() {
 			label={ __( 'Author' ) }
 			options={ authorOptions }
 			onChange={ setAuthorId }
-			value={ postAuthor }
+			value={ postAuthorId }
 		/>
 	);
 }
