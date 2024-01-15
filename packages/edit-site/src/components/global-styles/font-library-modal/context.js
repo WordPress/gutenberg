@@ -62,11 +62,18 @@ function FontLibraryProvider( { children } ) {
 		records: libraryPosts = [],
 		isResolving: isResolvingLibrary,
 		hasResolved: hasResolvedLibrary,
-	} = useEntityRecords( 'postType', 'wp_font_family', { refreshKey } );
+	} = useEntityRecords( 'postType', 'wp_font_family', {
+		refreshKey,
+		_embed: true,
+	} );
 
 	const libraryFonts =
-		( libraryPosts || [] ).map( ( post ) => post.font_family_settings ) ||
-		[];
+		( libraryPosts || [] ).map( ( post ) => {
+			post.font_family_settings.fontFace = post._embedded.font_faces.map(
+				( face ) => face.font_face_settings
+			);
+			return post.font_family_settings;
+		} ) || [];
 
 	// Global Styles (settings) font families
 	const [ fontFamilies, setFontFamilies ] = useGlobalSetting(

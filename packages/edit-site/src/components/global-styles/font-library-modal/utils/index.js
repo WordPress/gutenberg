@@ -201,15 +201,17 @@ export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
 			} else {
 				// Handle HTTP error statuses
 				results.errors.push( {
-					error: `HTTP error: ${ response.status }`,
 					data: fontFacesData[ index ],
+					error: `HTTP error: ${ response.status }`,
+					message: response.message,
 				} );
 			}
 		} else {
 			// Handle network errors or other fetch-related errors
 			results.errors.push( {
-				error: `Fetch error: ${ result.reason }`,
 				data: fontFacesData[ index ],
+				error: `Fetch error: ${ result.reason }`,
+				message: result.message,
 			} );
 		}
 	} );
