@@ -134,13 +134,8 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 		return null;
 	}
 
-	// The class name is duplicated twice to provide the required specificity
-	// to overcome default block styles, global block styles, and block style
-	// variation styles including elements styles on block types within a
-	// block style variation.
-	// See: https://github.com/WordPress/gutenberg/pull/56540
 	$class_name = wp_get_elements_class_name( $block );
-	$class_name = ".$class_name.$class_name.$class_name";
+	$class_name = ".$class_name.$class_name";
 
 	$element_types = array(
 		'button'  => array(

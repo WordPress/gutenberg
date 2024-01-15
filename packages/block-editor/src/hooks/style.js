@@ -368,11 +368,7 @@ function useBlockProps( { name, style } ) {
 	// The .editor-styles-wrapper selector is required on elements styles. As it is
 	// added to all other editor styles, not providing it causes reset and global
 	// styles to override element styles because of higher specificity.
-	// The block elements class is duplicated to provide the required
-	// specificity to correctly take precedence over block variation styles,
-	// including those for elements within a variation's block type styles.
-	// See: https://github.com/WordPress/gutenberg/pull/56540
-	const baseElementSelector = `.editor-styles-wrapper .${ blockElementsContainerIdentifier }.${ blockElementsContainerIdentifier }`;
+	const baseElementSelector = `.editor-styles-wrapper .${ blockElementsContainerIdentifier }`;
 	const blockElementStyles = style?.elements;
 
 	const styles = useMemo( () => {
