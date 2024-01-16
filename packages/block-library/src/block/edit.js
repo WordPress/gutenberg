@@ -297,7 +297,9 @@ export default function ReusableBlockEdit( {
 	};
 
 	const resetOverrides = () => {
-		replaceInnerBlocks( patternClientId, initialBlocks );
+		if ( overrides ) {
+			replaceInnerBlocks( patternClientId, initialBlocks );
+		}
 	};
 
 	let children = null;
@@ -340,15 +342,18 @@ export default function ReusableBlockEdit( {
 					</ToolbarGroup>
 				</BlockControls>
 			) }
-			{ overrides ? (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton onClick={ resetOverrides }>
-							{ __( 'Reset overrides' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
-			) : null }
+
+			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarButton
+						onClick={ resetOverrides }
+						aria-disabled={ overrides ? 'true' : 'false' }
+					>
+						{ __( 'Reset to original' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
+			</BlockControls>
+
 			{ children === null ? (
 				<div { ...innerBlocksProps } />
 			) : (
