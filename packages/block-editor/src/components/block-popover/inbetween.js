@@ -106,14 +106,16 @@ function BlockPopoverInbetween( {
 				if ( operation === 'group' ) {
 					const targetRect = nextRect || previousRect;
 					top = targetRect.top;
-					width = targetRect.width;
+					// No spacing is likely around blocks in this operation.
+					// So width of the inserter containing rect is set to 0.
+					width = 0;
 					height = targetRect.bottom - targetRect.top;
 					// Popover calculates its distance from mid-block so some
 					// adjustments are needed to make it appear in the right place.
 					left =
 						nearestSide === 'left'
-							? -targetRect.width / 2 + targetRect.left
-							: targetRect.width / 2 + targetRect.left;
+							? targetRect.left - 2
+							: targetRect.right - 2;
 				} else if ( isVertical ) {
 					// vertical
 					top = previousRect ? previousRect.bottom : nextRect.top;
