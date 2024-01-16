@@ -188,6 +188,47 @@ function FontLibraryProvider( { children } ) {
 		);
 	};
 
+	function getActivatedNotInstalledFonts() {
+		return customFonts
+			.map( ( customFont ) => {
+				// Ensure fontFaces is an array in customFont
+				const customFontFaces = Array.isArray( customFont.fontFace )
+					? customFont.fontFace
+					: [];
+
+				// Find the corresponding font in baseCustomFonts
+				const baseFont = baseCustomFonts.find(
+					( base ) => base.slug === customFont.slug
+				);
+
+				// Ensure fontFaces is an array in baseFont, if baseFont exists
+				const baseFontFaces =
+					baseFont && Array.isArray( baseFont.fontFace )
+						? baseFont.fontFace
+						: [];
+
+				// Filter out the font faces that are not installed
+				const fontFacesNotInstalled = customFontFaces.filter(
+					( customFace ) => {
+						// If the font isn't found in baseCustomFonts, all its faces are considered not installed
+						if ( ! baseFont ) return true;
+
+						// Check if the font face is not present in the installed font's faces
+						return ! baseFontFaces.some(
+							( baseFace ) => baseFace === customFace
+						);
+					}
+				);
+
+				// Return the font object with only the non-installed font faces, while copying over all other properties
+				return {
+					...customFont,
+					fontFaces: fontFacesNotInstalled,
+				};
+			} )
+			.filter( ( font ) => font.fontFaces && font.fontFaces.length > 0 ); // Filter out fonts that have no non-installed faces
+	}
+
 	const getFontFacesActivated = ( slug, source ) => {
 		return getActivatedFontsOutline( source )[ slug ] || [];
 	};
@@ -371,6 +412,7 @@ function FontLibraryProvider( { children } ) {
 				isInstalling,
 				collections,
 				getFontCollection,
+				getActivatedNotInstalledFonts,
 			} }
 		>
 			{ children }
