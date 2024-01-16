@@ -839,6 +839,47 @@ class WP_Theme_JSON_Gutenberg {
 
 		$schema_styles_blocks   = array();
 		$schema_settings_blocks = array();
+
+		// Generate a schema for blocks.
+		// - Block styles can contain `elements` & `variations` definitions.
+		// - Variations can contain styles for inner `blocks`.
+		// - Variations definitions cannot be nested.
+		// - Variations inner block styles cannot contain `elements`.
+		//
+		// As each variation needs a `blocks` schema but without `elements` and
+		// inner `blocks`, the overall schema will be generated in multiple
+		// passes.
+		foreach ( $valid_block_names as $block ) {
+			$schema_settings_blocks[ $block ] = static::VALID_SETTINGS;
+			$schema_styles_blocks[ $block ]   = $styles_non_top_level;
+		}
+
+		$block_style_variation_styles             = static::VALID_STYLES;
+		$block_style_variation_styles['blocks']   = $schema_styles_blocks;
+		$block_style_variation_styles['elements'] = $schema_styles_elements;
+
+		// Generate schema for shared variations i.e. those that can be
+		// referenced with block style variations and live under
+		// styles.blocks.variations. These variations could be any valid block
+		// style variation. The schema will differ in that these variations
+		// cannot reference another.
+		//
+		// NOTE: The size of the schema array is already very large given
+		// entries for each individual block. This is compounded when multiple
+		// variations need to added to the schema. Would multiple passes for
+		// validation offer any improvements?
+		$unique_variations                      = array_unique(
+			call_user_func_array( 'array_merge', array_values( $valid_variations ) )
+		);
+		$shared_variation_styles                = $block_style_variation_styles;
+		$shared_variation_styles['block_types'] = null;
+		$schema_shared_style_variations         = array_fill_keys( $unique_variations, $shared_variation_styles );
+
+		// Allow refs only within the individual block type variations properties.
+		// Assigning it before `$schema_shared_style_variations` would mean
+		// shared variations would allow `ref` properties.
+		$block_style_variation_styles['ref'] = null;
+
 		foreach ( $valid_block_names as $block ) {
 			// Build the schema for each block style variation.
 			$style_variation_names = array();
@@ -855,17 +896,19 @@ class WP_Theme_JSON_Gutenberg {
 
 			$schema_styles_variations = array();
 			if ( ! empty( $style_variation_names ) ) {
-				$schema_styles_variations = array_fill_keys( $style_variation_names, $styles_non_top_level );
+				$schema_styles_variations = array_fill_keys( $style_variation_names, $block_style_variation_styles );
 			}
 
-			$schema_settings_blocks[ $block ]             = static::VALID_SETTINGS;
-			$schema_styles_blocks[ $block ]               = $styles_non_top_level;
-			$schema_styles_blocks[ $block ]['elements']   = $schema_styles_elements;
 			$schema_styles_blocks[ $block ]['variations'] = $schema_styles_variations;
+
+			// The element styles schema can now be added for this block to the
+			// styles.blocks.$block schema.
+			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 		}
 
 		$schema['styles']                                 = static::VALID_STYLES;
 		$schema['styles']['blocks']                       = $schema_styles_blocks;
+		$schema['styles']['blocks']['variations']         = $schema_shared_style_variations;
 		$schema['styles']['elements']                     = $schema_styles_elements;
 		$schema['settings']                               = static::VALID_SETTINGS;
 		$schema['settings']['blocks']                     = $schema_settings_blocks;
@@ -978,12 +1021,34 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	protected static function get_blocks_metadata() {
 		// NOTE: the compat/6.1 version of this method in Gutenberg did not have these changes.
-		$registry = WP_Block_Type_Registry::get_instance();
-		$blocks   = $registry->get_all_registered();
+		$registry       = WP_Block_Type_Registry::get_instance();
+		$blocks         = $registry->get_all_registered();
+		$style_registry = WP_Block_Styles_Registry::get_instance();
 
 		// Is there metadata for all currently registered blocks?
 		$blocks = array_diff_key( $blocks, static::$blocks_metadata );
+
 		if ( empty( $blocks ) ) {
+			// New block styles may have been registered within WP_Block_Styles_Registry.
+			// Update block metadata for any new block style variations.
+			$registered_styles = $style_registry->get_all_registered();
+			foreach ( static::$blocks_metadata as $block_name => $block_metadata ) {
+				if ( ! empty( $registered_styles[ $block_name ] ) ) {
+					$style_selectors = $block_metadata['styleVariations'] ?? array();
+
+					foreach ( $registered_styles[ $block_name ] as $block_style ) {
+						if ( ! isset( $style_selectors[ $block_style['name'] ] ) ) {
+							$style_selectors[ $block_style['name'] ] = static::append_to_selector(
+								'.is-style-' . $block_style['name'],
+								$block_metadata['selector']
+							);
+						}
+					}
+
+					static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
+				}
+			}
+
 			return static::$blocks_metadata;
 		}
 
@@ -1016,11 +1081,20 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			// If the block has style variations, append their selectors to the block metadata.
+			$style_selectors = array();
 			if ( ! empty( $block_type->styles ) ) {
-				$style_selectors = array();
 				foreach ( $block_type->styles as $style ) {
 					$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
 				}
+			}
+
+			// Block style variations can be registered through the WP_Block_Styles_Registry as well as block.json.
+			$registered_styles = $style_registry->get_registered_styles_for_block( $block_name );
+			foreach ( $registered_styles as $style ) {
+				$style_selectors[ $style['name'] ] = static::append_to_selector( '.is-style-' . $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
+			}
+
+			if ( ! empty( $style_selectors ) ) {
 				static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
 			}
 		}
@@ -1746,6 +1820,10 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string Scoped selector.
 	 */
 	public static function scope_selector( $scope, $selector ) {
+		if ( ! $selector || ! $scope ) {
+			return $selector;
+		}
+
 		$scopes    = explode( ',', $scope );
 		$selectors = explode( ',', $selector );
 
@@ -3057,6 +3135,29 @@ class WP_Theme_JSON_Gutenberg {
 					}
 
 					$variation_output = static::remove_insecure_styles( $variation_input );
+
+					// Process a variation's elements and element pseudo selector styles.
+					if ( isset( $variation_input['elements'] ) ) {
+						foreach ( $valid_element_names as $element_name ) {
+							$element_input = $variation_input['elements'][ $element_name ] ?? null;
+							if ( $element_input ) {
+								$element_output = static::remove_insecure_styles( $element_input );
+
+								if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ] ) ) {
+									foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ] as $pseudo_selector ) {
+										if ( isset( $element_input[ $pseudo_selector ] ) ) {
+											$element_output[ $pseudo_selector ] = static::remove_insecure_styles( $element_input[ $pseudo_selector ] );
+										}
+									}
+								}
+
+								if ( ! empty( $element_output ) ) {
+									_wp_array_set( $variation_output, array( 'elements', $element_name ), $element_output );
+								}
+							}
+						}
+					}
+
 					if ( ! empty( $variation_output ) ) {
 						_wp_array_set( $sanitized, $variation['path'], $variation_output );
 					}
