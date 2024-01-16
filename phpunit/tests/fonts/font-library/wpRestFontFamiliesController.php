@@ -88,7 +88,12 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 					'post_status'  => 'publish',
 					'post_title'   => $settings['name'],
 					'post_name'    => $settings['slug'],
-					'post_content' => wp_json_encode( $settings ),
+					'post_content' => wp_json_encode(
+						array(
+							'fontFamily' => $settings['fontFamily'],
+							'preview'    => $settings['preview'],
+						)
+					),
 				)
 			)
 		);
@@ -221,7 +226,8 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 		$empty_settings = array(
 			'name'       => '',
-			'slug'       => '',
+			// Slug will default to the post id.
+			'slug'       => (string) $font_family_id,
 			'fontFamily' => '',
 			'preview'    => '',
 		);
@@ -484,7 +490,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 			'preview'    => 'https://s.w.org/images/fonts/16.9/previews/open-sans/open-sans-400-normal.svg',
 		);
 
-		$font_family_id = self::create_font_family_post();
+		$font_family_id = self::create_font_family_post( array( 'slug' => 'open-sans-update' ) );
 		$request        = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . $font_family_id );
 		$request->set_param(
 			'font_family_settings',
@@ -498,7 +504,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 		$expected_settings = array(
 			'name'       => $settings['name'],
-			'slug'       => 'open-sans',
+			'slug'       => 'open-sans-update',
 			'fontFamily' => $settings['fontFamily'],
 			'preview'    => $settings['preview'],
 		);
@@ -768,7 +774,14 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 		$this->assertSame( $font_face_ids, $data['font_faces'] );
 
 		$this->assertArrayHasKey( 'font_family_settings', $data );
-		$this->assertSame( $post->post_content, wp_json_encode( $data['font_family_settings'] ) );
+		$settings          = $data['font_family_settings'];
+		$expected_settings = array(
+			'name'       => $post->post_title,
+			'slug'       => $post->post_name,
+			'fontFamily' => $settings['fontFamily'],
+			'preview'    => $settings['preview'],
+		);
+		$this->assertSame( $expected_settings, $settings );
 
 		$this->assertNotEmpty( $links );
 		$this->assertSame( rest_url( 'wp/v2/font-families/' . $post->ID ), $links['self'][0]['href'] );

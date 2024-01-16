@@ -277,25 +277,10 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	public function prepare_item_for_response( $item, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- required by parent class
 		$data = array();
 
-		$data['id']                 = $item->ID;
-		$data['theme_json_version'] = 2;
-		$data['font_faces']         = $this->get_font_face_ids( $item->ID );
-
-		$settings   = json_decode( $item->post_content, true );
-		$properties = $this->get_item_schema()['properties']['font_family_settings']['properties'];
-
-		// Provide empty settings if the post_content is not valid JSON.
-		if ( null === $settings ) {
-			$settings = array(
-				'name'       => '',
-				'slug'       => '',
-				'fontFamily' => '',
-				'preview'    => '',
-			);
-		}
-
-		// Only return the properties defined in the schema.
-		$data['font_family_settings'] = array_intersect_key( $settings, $properties );
+		$data['id']                   = $item->ID;
+		$data['theme_json_version']   = 2;
+		$data['font_faces']           = $this->get_font_face_ids( $item->ID );
+		$data['font_family_settings'] = $this->get_settings_from_post( $item );
 
 		$response = rest_ensure_response( $data );
 		$links    = $this->prepare_links( $item );
@@ -499,9 +484,10 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	 */
 	protected function prepare_item_for_database( $request ) {
 		$prepared_post = new stdClass();
-		// Settings have already been decoded by sanitize_font_family_settings().
+		// Settings have already been decoded by ::sanitize_font_family_settings().
 		$settings = $request->get_param( 'font_family_settings' );
 
+		// This is an update and we merge with the existing font family.
 		if ( isset( $request['id'] ) ) {
 			$existing_post = $this->get_post( $request['id'] );
 			if ( is_wp_error( $existing_post ) ) {
@@ -509,16 +495,41 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 			}
 
 			$prepared_post->ID = $existing_post->ID;
-			$existing_settings = json_decode( $existing_post->post_content, true );
+			$existing_settings = $this->get_settings_from_post( $existing_post );
 			$settings          = array_merge( $existing_settings, $settings );
 		}
 
-		$prepared_post->post_type    = $this->post_type;
-		$prepared_post->post_status  = 'publish';
-		$prepared_post->post_title   = $settings['name'];
-		$prepared_post->post_name    = sanitize_title( $settings['slug'] );
+		$prepared_post->post_type   = $this->post_type;
+		$prepared_post->post_status = 'publish';
+		$prepared_post->post_title  = $settings['name'];
+		$prepared_post->post_name   = sanitize_title( $settings['slug'] );
+
+		// Remove duplicate information from settings.
+		unset( $settings['name'] );
+		unset( $settings['slug'] );
+
 		$prepared_post->post_content = wp_json_encode( $settings );
 
 		return $prepared_post;
+	}
+
+	/**
+	 * Gets the font family's settings from the post.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_Post $post Font family post object.
+	 * @return array Font family settings array.
+	 */
+	protected function get_settings_from_post( $post ) {
+		$settings_json = json_decode( $post->post_content, true );
+
+		// Default to empty strings if the settings are missing.
+		return array(
+			'name'       => $post->post_title ?? '',
+			'slug'       => $post->post_name ?? '',
+			'fontFamily' => $settings_json['fontFamily'] ?? '',
+			'preview'    => $settings_json['preview'] ?? '',
+		);
 	}
 }
