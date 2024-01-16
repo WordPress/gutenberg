@@ -1164,7 +1164,7 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 		const styleVariationSelectors = {};
 
 		blockStyleVariations?.forEach( ( variation ) => {
-			const styleVariationSelector = `${ selector }.is-style-${ variation.name }`;
+			const styleVariationSelector = `.is-style-${ variation.name }${ selector }`;
 			styleVariationSelectors[ variation.name ] = styleVariationSelector;
 		} );
 
