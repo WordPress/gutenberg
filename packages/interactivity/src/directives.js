@@ -330,9 +330,11 @@ export default () => {
 	// data-wp-text
 	directive( 'text', ( { directives: { text }, element, evaluate } ) => {
 		const entry = text.find( ( { suffix } ) => suffix === 'default' );
-		const evaluatedEntry = evaluate( entry );
-		if ( typeof evaluatedEntry !== 'string' ) return null;
-		element.props.children = evaluatedEntry;
+		try {
+			element.props.children = evaluate( entry ).toString();
+		} catch ( e ) {
+			element.props.children = null;
+		}
 	} );
 
 	// data-wp-slot
