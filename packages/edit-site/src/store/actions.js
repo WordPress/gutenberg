@@ -11,7 +11,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
-import { speak } from '@wordpress/a11y';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -500,30 +499,15 @@ export const closeGeneralSidebar =
 			.disableComplementaryArea( editSiteStoreName );
 	};
 
+/**
+ * Sets the editor mode (for text editing or visual editing).
+ *
+ * @param {'visual'|'text'} mode The mode, either 'visual' or 'text'.
+ */
 export const switchEditorMode =
 	( mode ) =>
-	( { dispatch, registry } ) => {
-		registry
-			.dispatch( 'core/preferences' )
-			.set( 'core', 'editorMode', mode );
-
-		// Unselect blocks when we switch to a non visual mode.
-		if ( mode !== 'visual' ) {
-			registry.dispatch( blockEditorStore ).clearSelectedBlock();
-		}
-
-		if ( mode === 'visual' ) {
-			speak( __( 'Visual editor selected' ), 'assertive' );
-		} else if ( mode === 'text' ) {
-			const isDistractionFree = registry
-				.select( preferencesStore )
-				.get( 'core', 'distractionFree' );
-			if ( isDistractionFree ) {
-				dispatch.toggleDistractionFree();
-			}
-			speak( __( 'Code editor selected' ), 'assertive' );
-		}
-	};
+	( { registry } ) =>
+		registry.dispatch( editorStore ).setEditorMode( mode );
 
 /**
  * Sets whether or not the editor allows only page content to be edited.

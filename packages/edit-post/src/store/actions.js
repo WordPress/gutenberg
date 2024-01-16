@@ -5,9 +5,7 @@ import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
 import { addFilter } from '@wordpress/hooks';
@@ -188,33 +186,14 @@ export const toggleFeature =
 			.toggle( 'core/edit-post', feature );
 
 /**
- * Triggers an action used to switch editor mode.
+ * Sets the editor mode (for text editing or visual editing).
  *
- * @param {string} mode The editor mode.
+ * @param {'visual'|'text'} mode The mode, either 'visual' or 'text'.
  */
 export const switchEditorMode =
 	( mode ) =>
-	( { dispatch, registry } ) => {
-		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
-
-		// Unselect blocks when we switch to the code editor.
-		if ( mode !== 'visual' ) {
-			registry.dispatch( blockEditorStore ).clearSelectedBlock();
-		}
-
-		if (
-			mode === 'text' &&
-			registry.select( preferencesStore ).get( 'core', 'distractionFree' )
-		) {
-			dispatch.toggleDistractionFree();
-		}
-
-		const message =
-			mode === 'visual'
-				? __( 'Visual editor selected' )
-				: __( 'Code editor selected' );
-		speak( message, 'assertive' );
-	};
+	( { registry } ) =>
+		registry.dispatch( editorStore ).setEditorMode( mode );
 
 /**
  * Triggers an action object used to toggle a plugin name flag.

@@ -476,11 +476,11 @@ _Parameters_
 
 ### switchEditorMode
 
-Triggers an action used to switch editor mode.
+Sets the editor mode (for text editing or visual editing).
 
 _Parameters_
 
--   _mode_ `string`: The editor mode.
+-   _mode_ `'visual'|'text'`: The mode, either 'visual' or 'text'.
 
 ### toggleDistractionFree
 

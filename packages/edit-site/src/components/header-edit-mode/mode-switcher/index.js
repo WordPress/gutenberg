@@ -13,12 +13,11 @@ import { unlock } from '../../../lock-unlock';
 const { DocumentTools: EditorModeSwitcher } = unlock( editorPrivateApis );
 
 function ModeSwitcher() {
-	const { shortcut } = useSelect(
-		( select ) => ( {
-			shortcut: select(
-				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/edit-site/toggle-mode' ),
-		} ),
+	const shortcut = useSelect(
+		( select ) =>
+			select( keyboardShortcutsStore ).getShortcutRepresentation(
+				'core/edit-site/toggle-mode'
+			),
 		[]
 	);
 
