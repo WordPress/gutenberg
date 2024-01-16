@@ -425,6 +425,7 @@ async function getCommit( octokit, sha ) {
 	return commit;
 }
 
+// eslint-disable-next-line no-unused-vars
 async function getPullRequestDataForCommit( octokit, commitSha ) {
 	const { data: pullRequests } = await octokit.request(
 		'GET /repos/{owner}/{repo}/commits/{commit_sha}/pulls',
