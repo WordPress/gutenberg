@@ -88,7 +88,12 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 					'post_status'  => 'publish',
 					'post_title'   => $settings['name'],
 					'post_name'    => $settings['slug'],
-					'post_content' => wp_json_encode( $settings ),
+					'post_content' => wp_json_encode(
+						array(
+							'fontFamily' => $settings['fontFamily'],
+							'preview'    => $settings['preview'],
+						)
+					),
 				)
 			)
 		);
@@ -143,6 +148,23 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 		$this->check_font_family_data( $data[0], self::$font_family_id1, $data[0]['_links'] );
 		$this->assertArrayHasKey( '_links', $data[1] );
 		$this->check_font_family_data( $data[1], self::$font_family_id2, $data[1]['_links'] );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Faces_Controller::get_items
+	 */
+	public function test_get_items_by_slug() {
+		$font_family = get_post( self::$font_family_id2 );
+
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/font-families' );
+		$request->set_param( 'slug', $font_family->post_name );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertCount( 1, $data );
+		$this->assertSame( $font_family->ID, $data[0]['id'] );
 	}
 
 	/**
@@ -204,7 +226,8 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 		$empty_settings = array(
 			'name'       => '',
-			'slug'       => '',
+			// Slug will default to the post id.
+			'slug'       => (string) $font_family_id,
 			'fontFamily' => '',
 			'preview'    => '',
 		);
@@ -249,19 +272,20 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	 * @covers WP_REST_Font_Faces_Controller::create_item
 	 */
 	public function test_create_item() {
-		wp_set_current_user( self::$admin_id );
+		$settings = array_merge( self::$default_settings, array( 'slug' => 'open-sans-2' ) );
 
+		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
 		$request->set_param( 'theme_json_version', 2 );
-		$request->set_param( 'font_family_settings', wp_json_encode( self::$default_settings ) );
+		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
 		$this->assertSame( 201, $response->get_status() );
 		$this->check_font_family_data( $data, $data['id'], $response->get_links() );
 
-		$settings = $data['font_family_settings'];
-		$this->assertSame( self::$default_settings, $settings );
+		$reponse_settings = $data['font_family_settings'];
+		$this->assertSame( $settings, $reponse_settings );
 		$this->assertEmpty( $data['font_faces'] );
 
 		wp_delete_post( $data['id'], true );
@@ -271,9 +295,10 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	 * @covers WP_REST_Font_Faces_Controller::validate_create_font_face_request
 	 */
 	public function test_create_item_default_theme_json_version() {
+		$settings = array_merge( self::$default_settings, array( 'slug' => 'open-sans-2' ) );
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
-		$request->set_param( 'font_family_settings', wp_json_encode( self::$default_settings ) );
+		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
 
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
@@ -331,7 +356,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	public function data_create_item_with_default_preview() {
 		$default_settings = array(
 			'name'       => 'Open Sans',
-			'slug'       => 'open-sans',
+			'slug'       => 'open-sans-2',
 			'fontFamily' => '"Open Sans", sans-serif',
 		);
 		return array(
@@ -404,17 +429,35 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 		$expected_message = 'font_family_settings parameter must be a valid JSON string.';
-		$actual_message   = $response->as_error()->get_all_error_data()[0]['params']['font_family_settings'];
-		$this->assertSame( $expected_message, $actual_message );
+		$message          = $response->as_error()->get_all_error_data()[0]['params']['font_family_settings'];
+		$this->assertSame( $expected_message, $message );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Family_Controller::create_item
+	 */
+	public function test_create_item_with_duplicate_slug() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
+		$request->set_param( 'theme_json_version', 2 );
+		$request->set_param( 'font_family_settings', wp_json_encode( array_merge( self::$default_settings, array( 'slug' => 'helvetica' ) ) ) );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_duplicate_font_family', $response, 400 );
+		$expected_message = 'A font family with slug "helvetica" already exists.';
+		$message          = $response->as_error()->get_error_messages()[0];
+		$this->assertSame( $expected_message, $message );
 	}
 
 	/**
 	 * @covers WP_REST_Font_Faces_Controller::create_item
 	 */
 	public function test_create_item_no_permission() {
+		$settings = array_merge( self::$default_settings, array( 'slug' => 'open-sans-2' ) );
 		wp_set_current_user( 0 );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
-		$request->set_param( 'font_family_settings', wp_json_encode( self::$default_settings ) );
+		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_create', $response, 401 );
 
@@ -441,25 +484,31 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	public function test_update_item() {
 		wp_set_current_user( self::$admin_id );
 
-		$updated_settings = array(
+		$settings = array(
 			'name'       => 'Open Sans',
-			'slug'       => 'open-sans',
 			'fontFamily' => '"Open Sans, "Noto Sans", sans-serif',
 			'preview'    => 'https://s.w.org/images/fonts/16.9/previews/open-sans/open-sans-400-normal.svg',
 		);
 
-		$font_family_id = self::create_font_family_post();
+		$font_family_id = self::create_font_family_post( array( 'slug' => 'open-sans-2' ) );
 		$request        = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . $font_family_id );
 		$request->set_param(
 			'font_family_settings',
-			wp_json_encode( $updated_settings )
+			wp_json_encode( $settings )
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->check_font_family_data( $data, $font_family_id, $response->get_links() );
-		$this->assertSame( $updated_settings, $data['font_family_settings'] );
+
+		$expected_settings = array(
+			'name'       => $settings['name'],
+			'slug'       => 'open-sans-2',
+			'fontFamily' => $settings['fontFamily'],
+			'preview'    => $settings['preview'],
+		);
+		$this->assertSame( $expected_settings, $data['font_family_settings'] );
 
 		wp_delete_post( $font_family_id, true );
 	}
@@ -489,7 +538,6 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	public function data_update_item_individual_settings() {
 		return array(
 			array( array( 'name' => 'Opened Sans' ) ),
-			array( array( 'slug' => 'opened-sans' ) ),
 			array( array( 'fontFamily' => '"Opened Sans", sans-serif' ) ),
 			array( array( 'preview' => 'https://s.w.org/images/fonts/16.7/previews/opened-sans/opened-sans-400-normal.svg' ) ),
 			// Empty preview is allowed.
@@ -527,6 +575,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 	/**
 	 * @dataProvider data_update_item_invalid_settings
+	 *
 	 * @covers WP_REST_Font_Faces_Controller::update_item
 	 */
 	public function test_update_item_empty_settings( $settings ) {
@@ -548,12 +597,6 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 			'Wrong name type'       => array(
 				array( 'name' => 1234 ),
 			),
-			'Empty slug'            => array(
-				array( 'slug' => '' ),
-			),
-			'Wrong slug type'       => array(
-				array( 'slug' => 1234 ),
-			),
 			'Empty fontFamily'      => array(
 				array( 'fontFamily' => '' ),
 			),
@@ -566,13 +609,30 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	/**
 	 * @covers WP_REST_Font_Faces_Controller::update_item
 	 */
-	public function test_update_item_invalid_font_family_id() {
+	public function test_update_item_update_slug_not_allowed() {
 		wp_set_current_user( self::$admin_id );
-		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . REST_TESTS_IMPOSSIBLY_HIGH_NUMBER );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id1 );
 		$request->set_param(
 			'font_family_settings',
-			wp_json_encode( self::$default_settings )
+			wp_json_encode( array( 'slug' => 'new-slug' ) )
 		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+		$expected_message = 'font_family_settings[slug] cannot be updated.';
+		$message          = $response->as_error()->get_all_error_data()[0]['params']['font_family_settings'];
+		$this->assertSame( $expected_message, $message );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Faces_Controller::update_item
+	 */
+	public function test_update_item_invalid_font_family_id() {
+		$settings = array_diff_key( self::$default_settings, array( 'slug' => '' ) );
+
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . REST_TESTS_IMPOSSIBLY_HIGH_NUMBER );
+		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_post_invalid_id', $response, 404 );
 	}
@@ -581,15 +641,17 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	 * @covers WP_REST_Font_Faces_Controller::update_item
 	 */
 	public function test_update_item_no_permission() {
+		$settings = array_diff_key( self::$default_settings, array( 'slug' => '' ) );
+
 		wp_set_current_user( 0 );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id1 );
-		$request->set_param( 'font_family_settings', wp_json_encode( self::$default_settings ) );
+		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_edit', $response, 401 );
 
 		wp_set_current_user( self::$editor_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id1 );
-		$request->set_param( 'font_family_settings', wp_json_encode( self::$default_settings ) );
+		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
 	}
@@ -712,7 +774,14 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 		$this->assertSame( $font_face_ids, $data['font_faces'] );
 
 		$this->assertArrayHasKey( 'font_family_settings', $data );
-		$this->assertSame( $post->post_content, wp_json_encode( $data['font_family_settings'] ) );
+		$settings          = $data['font_family_settings'];
+		$expected_settings = array(
+			'name'       => $post->post_title,
+			'slug'       => $post->post_name,
+			'fontFamily' => $settings['fontFamily'],
+			'preview'    => $settings['preview'],
+		);
+		$this->assertSame( $expected_settings, $settings );
 
 		$this->assertNotEmpty( $links );
 		$this->assertSame( rest_url( 'wp/v2/font-families/' . $post->ID ), $links['self'][0]['href'] );

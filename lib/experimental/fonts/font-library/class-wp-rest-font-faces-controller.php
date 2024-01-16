@@ -381,20 +381,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$data['id']                 = $item->ID;
 		$data['theme_json_version'] = 2;
 		$data['parent']             = $item->post_parent;
-
-		$settings   = json_decode( $item->post_content, true );
-		$properties = $this->get_item_schema()['properties']['font_face_settings']['properties'];
-
-		// Provide required, empty settings if the post_content is not valid JSON.
-		if ( null === $settings ) {
-			$settings = array(
-				'fontFamily' => '',
-				'src'        => array(),
-			);
-		}
-
-		// Only return the properties defined in the schema.
-		$data['font_face_settings'] = array_intersect_key( $settings, $properties );
+		$data['font_face_settings'] = $this->get_settings_from_post( $item );
 
 		$response = rest_ensure_response( $data );
 		$links    = $this->prepare_links( $item );
@@ -747,5 +734,29 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		}
 
 		return $new_path;
+	}
+
+	/**
+	 * Gets the font face's settings from the post.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_Post $post Font face post object.
+	 * @return array Font face settings array.
+	 */
+	protected function get_settings_from_post( $post ) {
+		$settings   = json_decode( $post->post_content, true );
+		$properties = $this->get_item_schema()['properties']['font_face_settings']['properties'];
+
+		// Provide required, empty settings if needed.
+		if ( null === $settings ) {
+			$settings = array(
+				'src' => array(),
+			);
+		}
+		$settings['fontFamily'] = $post->post_title ?? '';
+
+		// Only return the properties defined in the schema.
+		return array_intersect_key( $settings, $properties );
 	}
 }

@@ -200,8 +200,8 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 		);
 
 		$empty_settings = array(
-			'fontFamily' => '',
 			'src'        => array(),
+			'fontFamily' => '',
 		);
 
 		wp_set_current_user( self::$admin_id );
