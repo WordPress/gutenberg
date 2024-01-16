@@ -138,8 +138,7 @@ function EditorCanvas( {
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
-			showEditorPadding:
-				!! editorSettings.goBack && postTypeSlug !== 'wp_template',
+			showEditorPadding: !! editorSettings.goBack,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
