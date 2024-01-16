@@ -78,12 +78,9 @@ export default function ViewList( {
 						level={ 1 }
 						setSize={ 1 }
 						positionInSet={ index + 1 }
-						className={ classNames(
-							'dataviews-view-list__item-wrapper',
-							{
-								'is-selected': selection.includes( item.id ),
-							}
-						) }
+						className={ classNames( {
+							'is-selected': selection.includes( item.id ),
+						} ) }
 					>
 						<TreeGridCell>
 							{ () => (
