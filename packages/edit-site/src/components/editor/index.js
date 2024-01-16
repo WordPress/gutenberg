@@ -86,7 +86,7 @@ const blockRemovalRules = {
 	),
 };
 
-export default function Editor( { isLoading } ) {
+export default function Editor() {
 	const {
 		record: editedPost,
 		getTitle,
@@ -182,10 +182,9 @@ export default function Editor( { isLoading } ) {
 	);
 
 	const settings = useSpecificEditorSettings();
-	const isReady =
-		! isLoading &&
-		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
-			( ! postWithTemplate && !! editedPost ) );
+	const isReady = postWithTemplate
+		? !! contextPost && !! editedPost
+		: !! editedPost;
 
 	return (
 		<>

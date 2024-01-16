@@ -80,7 +80,7 @@ function ResizableFrame( {
 	isFullWidth,
 	isOversized,
 	setIsOversized,
-	isReady,
+	isReady = true,
 	children,
 	/** The default (unresized) width/height of the frame, based on the space availalbe in the viewport. */
 	defaultSize,

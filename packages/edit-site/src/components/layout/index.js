@@ -54,7 +54,6 @@ import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 import { useCommonCommands } from '../../hooks/commands/use-common-commands';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
 import PageMain from '../page-main';
-import { useIsSiteEditorLoading } from './hooks';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
@@ -126,7 +125,6 @@ export default function Layout() {
 		( isMobileViewport && isListPage ) || ( isEditorPage && isEditing );
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer ] = useResizeObserver();
-	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
 
@@ -338,9 +336,6 @@ export default function Layout() {
 										>
 											<ErrorBoundary>
 												<ResizableFrame
-													isReady={
-														! isEditorLoading
-													}
 													isFullWidth={ isEditing }
 													defaultSize={ {
 														width:
@@ -360,11 +355,7 @@ export default function Layout() {
 															backgroundColor,
 													} }
 												>
-													<Editor
-														isLoading={
-															isEditorLoading
-														}
-													/>
+													<Editor />
 												</ResizableFrame>
 											</ErrorBoundary>
 										</motion.div>
