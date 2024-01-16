@@ -159,10 +159,6 @@ function ListViewBranch( props ) {
 					const thisBlockIndex = blockIndexes[ clientId ];
 					isAfterDraggedBlocks =
 						thisBlockIndex > firstDraggedBlockIndex;
-					isNesting =
-						typeof blockDropTargetIndex === 'number' &&
-						blockDropTargetIndex - 1 === thisBlockIndex &&
-						blockDropPosition === 'inside';
 
 					// Determine where to displace the position of the current block, relative
 					// to the blocks being dragged (in their original position) and the drop target
@@ -195,6 +191,10 @@ function ListViewBranch( props ) {
 							} else {
 								displacement = 'normal';
 							}
+							isNesting =
+								typeof blockDropTargetIndex === 'number' &&
+								blockDropTargetIndex - 1 === thisBlockIndex &&
+								blockDropPosition === 'inside';
 						}
 					} else if (
 						blockDropTargetIndex === null &&
