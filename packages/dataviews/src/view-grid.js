@@ -53,7 +53,10 @@ export default function ViewGrid( {
 					<div className="dataviews-view-grid__media">
 						{ mediaField?.render( { item } ) }
 					</div>
-					<HStack justify="space-between">
+					<HStack
+						justify="space-between"
+						className="dataviews-view-grid__title-actions"
+					>
 						<HStack className="dataviews-view-grid__primary-field">
 							{ primaryField?.render( { item } ) }
 						</HStack>
@@ -82,7 +85,7 @@ export default function ViewGrid( {
 								>
 									<Tooltip
 										text={ field.header }
-										placement="top"
+										placement="left"
 									>
 										<div className="dataviews-view-grid__field-value">
 											{ renderedValue }
