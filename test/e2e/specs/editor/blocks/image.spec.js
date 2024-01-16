@@ -696,7 +696,9 @@ test.describe( 'Image', () => {
 		await expect( linkDom ).toHaveAttribute( 'href', url );
 	} );
 
-	test( 'should upload external image', async ( { editor } ) => {
+	test( 'should upload external image to media library', async ( {
+		editor,
+	} ) => {
 		await editor.insertBlock( {
 			name: 'core/image',
 			attributes: {
@@ -704,7 +706,7 @@ test.describe( 'Image', () => {
 			},
 		} );
 
-		await editor.clickBlockToolbarButton( 'Upload external image' );
+		await editor.clickBlockToolbarButton( 'Upload image to media library' );
 
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'

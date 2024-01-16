@@ -42,9 +42,6 @@ function block_core_gallery_random_order( $parsed_block ) {
 	if ( 'core/gallery' === $parsed_block['blockName'] && ! empty( $parsed_block['attrs']['randomOrder'] ) ) {
 		shuffle( $parsed_block['innerBlocks'] );
 	}
-
-	return $parsed_block;
-
 	return $parsed_block;
 }
 

@@ -27,7 +27,7 @@ import {
 	store as blockEditorStore,
 	BlockControls,
 } from '@wordpress/block-editor';
-import { getBlockSupport, parse, cloneBlock } from '@wordpress/blocks';
+import { parse, cloneBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -38,17 +38,17 @@ const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 
 function isPartiallySynced( block ) {
 	return (
-		!! getBlockSupport( block.name, '__experimentalConnections', false ) &&
-		!! block.attributes.connections?.attributes &&
-		Object.values( block.attributes.connections.attributes ).some(
-			( connection ) => connection.source === 'pattern_attributes'
+		'core/paragraph' === block.name &&
+		!! block.attributes.metadata?.bindings &&
+		Object.values( block.attributes.metadata.bindings ).some(
+			( binding ) => binding.source.name === 'pattern_attributes'
 		)
 	);
 }
 function getPartiallySyncedAttributes( block ) {
-	return Object.entries( block.attributes.connections.attributes )
+	return Object.entries( block.attributes.metadata.bindings )
 		.filter(
-			( [ , connection ] ) => connection.source === 'pattern_attributes'
+			( [ , binding ] ) => binding.source.name === 'pattern_attributes'
 		)
 		.map( ( [ attributeKey ] ) => attributeKey );
 }

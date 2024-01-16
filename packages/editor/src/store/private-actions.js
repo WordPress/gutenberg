@@ -4,6 +4,7 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Returns an action object used to set which template is currently being used/edited.
@@ -58,4 +59,52 @@ export const createTemplate =
 					],
 				}
 			);
+	};
+
+/**
+ * Update the provided block types to be visible.
+ *
+ * @param {string[]} blockNames Names of block types to show.
+ */
+export const showBlockTypes =
+	( blockNames ) =>
+	( { registry } ) => {
+		const existingBlockNames =
+			registry
+				.select( preferencesStore )
+				.get( 'core', 'hiddenBlockTypes' ) ?? [];
+
+		const newBlockNames = existingBlockNames.filter(
+			( type ) =>
+				! (
+					Array.isArray( blockNames ) ? blockNames : [ blockNames ]
+				).includes( type )
+		);
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core', 'hiddenBlockTypes', newBlockNames );
+	};
+
+/**
+ * Update the provided block types to be hidden.
+ *
+ * @param {string[]} blockNames Names of block types to hide.
+ */
+export const hideBlockTypes =
+	( blockNames ) =>
+	( { registry } ) => {
+		const existingBlockNames =
+			registry
+				.select( preferencesStore )
+				.get( 'core', 'hiddenBlockTypes' ) ?? [];
+
+		const mergedBlockNames = new Set( [
+			...existingBlockNames,
+			...( Array.isArray( blockNames ) ? blockNames : [ blockNames ] ),
+		] );
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core', 'hiddenBlockTypes', [ ...mergedBlockNames ] );
 	};

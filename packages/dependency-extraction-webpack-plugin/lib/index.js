@@ -62,28 +62,38 @@ class DependencyExtractionWebpackPlugin {
 	externalizeWpDeps( { request }, callback ) {
 		let externalRequest;
 
-		// Handle via options.requestToExternal(Module)  first.
-		if ( this.useModules ) {
-			if ( typeof this.options.requestToExternalModule === 'function' ) {
-				externalRequest =
-					this.options.requestToExternalModule( request );
+		try {
+			// Handle via options.requestToExternal(Module)  first.
+			if ( this.useModules ) {
+				if (
+					typeof this.options.requestToExternalModule === 'function'
+				) {
+					externalRequest =
+						this.options.requestToExternalModule( request );
+
+					// requestToExternalModule allows a boolean shorthand
+					if ( externalRequest === false ) {
+						externalRequest = undefined;
+					}
+					if ( externalRequest === true ) {
+						externalRequest = request;
+					}
+				}
+			} else if ( typeof this.options.requestToExternal === 'function' ) {
+				externalRequest = this.options.requestToExternal( request );
 			}
-		} else if ( typeof this.options.requestToExternal === 'function' ) {
-			externalRequest = this.options.requestToExternal( request );
-		}
 
-		// Cascade to default if unhandled and enabled.
-		if (
-			typeof externalRequest === 'undefined' &&
-			this.options.useDefaults
-		) {
-			externalRequest = this.useModules
-				? defaultRequestToExternalModule( request )
-				: defaultRequestToExternal( request );
-		}
-
-		if ( this.useModules && externalRequest === true ) {
-			externalRequest = request;
+			// Cascade to default if unhandled and enabled.
+			if (
+				typeof externalRequest === 'undefined' &&
+				this.options.useDefaults
+			) {
+				externalRequest = this.useModules
+					? defaultRequestToExternalModule( request )
+					: defaultRequestToExternal( request );
+			}
+		} catch ( err ) {
+			return callback( err );
 		}
 
 		if ( externalRequest ) {

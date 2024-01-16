@@ -639,7 +639,7 @@ Displays the next or previous post link that is adjacent to the current post. ([
 -	**Name:** core/post-navigation-link
 -	**Category:** theme
 -	**Supports:** color (background, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** arrow, label, linkLabel, showTitle, textAlign, type
+-	**Attributes:** arrow, inSameTerm, label, linkLabel, showTitle, taxonomy, textAlign, type
 
 ## Post Template
 
@@ -694,7 +694,7 @@ Give special visual emphasis to a quote from your text. ([Source](https://github
 
 -	**Name:** core/pullquote
 -	**Category:** text
--	**Supports:** align (full, left, right, wide), anchor, color (background, gradients, link, text), typography (fontSize, lineHeight)
+-	**Supports:** align (full, left, right, wide), anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** citation, textAlign, value
 
 ## Query Loop
