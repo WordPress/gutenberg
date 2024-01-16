@@ -209,7 +209,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Sets the right rendering mode when loading the editor.
 		useEffect( () => {
 			setRenderingMode( settings.defaultRenderingMode ?? 'post-only' );
-		}, [ settings.defaultRenderingMode, setRenderingMode, post.type ] );
+		}, [ settings.defaultRenderingMode, setRenderingMode ] );
 
 		if ( ! isReady ) {
 			return null;
