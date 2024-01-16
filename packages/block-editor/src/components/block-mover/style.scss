@@ -2,13 +2,14 @@
 	display: flex;
 	padding: 0;
 	border: none;
+	justify-content: center;
 
 	@include break-small() {
 		.block-editor-block-mover:not(.is-horizontal) & {
 			flex-direction: column;
 
 			> * {
-				height: $block-toolbar-height * 0.5;
+				height: $block-toolbar-height * 0.5 - $grid-unit-05;
 				width: 100%;
 				min-width: 0 !important; // overrides default button width.
 
@@ -19,12 +20,12 @@
 			}
 
 			.block-editor-block-mover-button.is-up-button svg {
-				top: 5px;
+				top: 3px;
 				flex-shrink: 0;
 			}
 
 			.block-editor-block-mover-button.is-down-button svg {
-				bottom: 5px;
+				bottom: 3px;
 				flex-shrink: 0;
 			}
 		}

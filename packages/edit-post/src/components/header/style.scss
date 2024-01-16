@@ -58,40 +58,20 @@
 
 		.block-editor-block-contextual-toolbar {
 			border-bottom: 0;
+			height: 100%;
 		}
 
 		// These rules ensure that icons are always positioned in a way that lines up with the rest of the icons in the toolbar.
 		.block-editor-block-toolbar {
-			padding: 2px;
+			// Push down so that buttons are centered vertically.
+			// It should be 14px (60px header height - 32px compact button height = 28 / 2),
+			// but there is a -1px top-margin down the stack that affects this.
+			padding-top: math.div($header-height - $button-size-compact, 2) + 1;
+			height: 100%;
 
-			// Match the size of other buttons in the header toolbar
+			// Match the height of other buttons in the header toolbar.
 			.components-button:not(.block-editor-block-mover-button) {
-				height: 32px;
-				min-width: 32px;
-				width: 32px;
-			}
-
-			.components-toolbar-group {
-				align-items: end;
-				min-height: 36px;
-			}
-
-			.block-editor-block-parent-selector {
-				display: flex;
-				align-items: end;
-				min-height: 36px;
-
-				// Parent selector dot divider
-				&::after {
-					top: auto;
-					bottom: 0;
-					right: -4px;
-				}
-			}
-
-			.block-editor-block-parent-selector__button::before {
-				left: 2px;
-				right: 2px;
+				height: $button-size-compact;
 			}
 		}
 
@@ -124,9 +104,21 @@
 			}
 		}
 
-		// Reposition movers to make more room
-		.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover__move-button-container .block-editor-block-mover-button.is-down-button svg {
-			bottom: 0;
+		.block-editor-block-mover {
+			// Match the height of other buttons in the header toolbar.
+			&.is-horizontal .block-editor-block-mover-button {
+				height: $button-size-compact;
+				overflow: visible;
+			}
+
+			// Move up a little to prevent the toolbar shift when focus is on the vertical movers.
+			@include break-small() {
+				&:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+					position: relative;
+					top: -6px;
+					justify-content: flex-start;
+				}
+			}
 		}
 
 		&.is-collapsed {
