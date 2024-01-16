@@ -5,7 +5,7 @@
  * @package gutenberg-test-interactive-blocks
  */
 
-wp_enqueue_module( 'directive-slots-view' );
+wp_enqueue_script_module( 'directive-slots-view' );
 ?>
 
 <div
