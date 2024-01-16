@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -33,7 +34,9 @@ function ModeSwitcher( {
 } ) {
 	const { mode } = useSelect(
 		( select ) => ( {
-			mode: select( editorStore ).getEditorMode(),
+			mode:
+				select( preferencesStore ).get( 'core', 'editorMode' ) ??
+				'visual',
 		} ),
 		[]
 	);
