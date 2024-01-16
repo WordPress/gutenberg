@@ -260,30 +260,29 @@ require __DIR__ . '/block-supports/pattern.php';
 // Data views.
 require_once __DIR__ . '/experimental/data-views.php';
 
-
+// Updates all blocks to use their example data, if they have it.
 function modify_block_attributes_before_render( $block ) {
 	$block_type_registry = WP_Block_Type_Registry::get_instance();
 	$block_type = $block_type_registry->get_registered( $block['blockName'] );
-
 	if ( isset( $block_type->example ) && isset( $block_type->example[ 'attributes' ] ) ) {
-		// Change the attribute value.
-		$block['attrs'] = array_merge( $block['attrs'], $block_type->example[ 'attributes' ] );
-	}
-	if ( $block['blockName'] === 'core/image' ) {
-		echo $block['blockName'];
-		var_dump($block['attrs']);
+		foreach( $block_type->example[ 'attributes' ] as $attribute_name => $attribute_value ) {
+			// Only replace attributes that are already set.
+			if ( isset( $block['attrs'][ $attribute_name ] ) ) {
+				$block['attrs'][ $attribute_name ] = $attribute_value;
+			}
+			$attribute_definition = $block_type->attributes[ $attribute_name ];
+			// Is this attribute sourced from the block markup istead of the block json comment.
+			if ( isset( $attribute_definition['source'] ) && $attribute_definition['source'] === 'attribute' ) {
+				$processor = new WP_HTML_Tag_Processor( $block['innerHTML'] ); //Should this be innerContent?
+				if ( $processor->next_tag( $attribute_definition['selector'] ) ) {
+					$processor->set_attribute( $attribute_definition['attribute'], $attribute_value );
+					$block['innerHTML'] = $processor->get_updated_html();
+					$block['innerContent'] = array( $processor->get_updated_html() );
+				}
+			}
+		}
 	}
 	return $block;
 }
 
 add_filter( 'render_block_data', 'modify_block_attributes_before_render', 10, 2 );
-
-
-
-
-
-
-
-
-
-
