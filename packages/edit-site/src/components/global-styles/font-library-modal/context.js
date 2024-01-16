@@ -14,6 +14,7 @@ import {
  * Internal dependencies
  */
 import {
+	fetchGetFontFamilyBySlug,
 	fetchInstallFontFamily,
 	fetchUninstallFonts,
 	fetchFontCollections,
@@ -203,9 +204,13 @@ function FontLibraryProvider( { children } ) {
 		setIsInstalling( true );
 		try {
 			// Get the ID of the font family post, if it is already installed.
-			let fontFamilyId = libraryPosts.filter(
-				( post ) => post.font_family_settings.slug === font.slug
-			)[ 0 ]?.id;
+			let fontFamilyId = await fetchGetFontFamilyBySlug( font.slug )
+				.then( ( response ) => response?.[ 0 ]?.id )
+				.catch( ( e ) => {
+					// eslint-disable-next-line no-console
+					console.error( e );
+					return null;
+				} );
 
 			// Otherwise, install it.
 			if ( ! fontFamilyId ) {

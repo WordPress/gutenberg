@@ -25,6 +25,14 @@ export async function fetchInstallFontFace( fontFamilyId, data ) {
 	return apiFetch( config );
 }
 
+export async function fetchGetFontFamilyBySlug( slug ) {
+	const config = {
+		path: `/wp/v2/font-families?slug=${ slug }`,
+		method: 'GET',
+	};
+	return apiFetch( config );
+}
+
 export async function fetchUninstallFonts( fonts ) {
 	const data = {
 		font_families: fonts,
