@@ -10,6 +10,10 @@
 
 -   Add the `data-wp-run` directive along with the `useInit` and `useWatch` hooks. ([57805](https://github.com/WordPress/gutenberg/pull/57805))
 
+### Enhancements
+
+-  Update `preact`, `@preact/signals` and `deepsignal` dependencies. ([57891](https://github.com/WordPress/gutenberg/pull/57891))
+
 ### Breaking Changes
 
 -   Remove `data-wp-slot` and `data-wp-fill`. ([#57854](https://github.com/WordPress/gutenberg/pull/57854))
