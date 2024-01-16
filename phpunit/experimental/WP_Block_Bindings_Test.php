@@ -58,7 +58,6 @@ class WP_Block_Bindings_Test extends WP_UnitTestCase {
 		$source_value      = 'Updated URL';
 
 		$result = $wp_block_bindings->replace_html( $block_content, $block_name, $block_attr, $source_value );
-		echo $result;
 		$this->assertStringContainsString( $source_value, $result );
 	}
 
