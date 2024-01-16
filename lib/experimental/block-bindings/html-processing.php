@@ -16,8 +16,8 @@ if ( ! function_exists( 'block_bindings_replace_html' ) ) {
 	 */
 	function block_bindings_replace_html( $block_content, $block_name, $block_attr, $source_value ) {
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-		if ( null === $block_type ) {
-			return;
+		if ( null === $block_type || ! isset( $block_type->attributes[ $block_attr ] ) ) {
+			return $block_content;
 		}
 
 		// Depending on the attribute source, the processing will be different.
