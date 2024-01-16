@@ -24,5 +24,8 @@ export const PATTERN_SYNC_TYPES = {
 export const PARTIAL_SYNCING_SUPPORTED_BLOCKS = {
 	'core/paragraph': { content: __( 'Content' ) },
 	'core/heading': { content: __( 'Content' ) },
-	'core/button': { text: __( 'Text' ) },
+	'core/button': {
+		text: __( 'Text' ),
+		url: __( 'URL' ),
+	},
 };
