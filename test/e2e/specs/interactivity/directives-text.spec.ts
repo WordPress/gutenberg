@@ -34,12 +34,12 @@ test.describe( 'data-wp-text', () => {
 		await expect( el ).toHaveText( 'Text 1' );
 	} );
 
-	test( 'work only with strings', async ( { page } ) => {
+	test( 'Transforms results into strings', async ( { page } ) => {
 		const elObject = page.getByTestId( 'show state component' );
 		await expect( elObject ).toBeHidden();
 		const elNumber = page.getByTestId( 'show state number' );
-		await expect( elNumber ).toBeHidden();
+		await expect( elNumber ).toHaveText( '1' );
 		const elBool = page.getByTestId( 'show state boolean' );
-		await expect( elBool ).toBeHidden();
+		await expect( elBool ).toHaveText( 'true' );
 	} );
 } );
