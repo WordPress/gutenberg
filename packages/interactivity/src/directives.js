@@ -331,11 +331,9 @@ export default () => {
 	directive( 'text', ( { directives: { text }, element, evaluate } ) => {
 		const entry = text.find( ( { suffix } ) => suffix === 'default' );
 		try {
-			if ( typeof evaluate( entry ) === 'object' ) {
-				element.props.children = null;
-				return;
-			}
-			element.props.children = evaluate( entry ).toString();
+			const result = evaluate( entry );
+			element.props.children =
+				typeof result === 'object' ? null : result.toString();
 		} catch ( e ) {
 			element.props.children = null;
 		}
