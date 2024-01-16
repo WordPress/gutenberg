@@ -42,7 +42,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_font_collections' ),
+					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
 				),
 			)
@@ -54,7 +54,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_font_collection' ),
+					'callback'            => array( $this, 'get_item' ),
 					'permission_callback' => array( $this, 'update_font_library_permissions_check' ),
 				),
 			)
@@ -69,7 +69,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function get_font_collection( $request ) {
+	public function get_item( $request ) {
 		$slug       = $request->get_param( 'slug' );
 		$collection = WP_Font_Library::get_font_collection( $slug );
 		// If the collection doesn't exist returns a 404.
@@ -86,7 +86,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 			return $collection_data;
 		}
 
-		return new WP_REST_Response( $config_and_data );
+		return new rest_ensure_response( $config_and_data );
 	}
 
 	/**
@@ -96,17 +96,17 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 	 *
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function get_font_collections() {
+	public function get_items() {
 		$collections = array();
 		foreach ( WP_Font_Library::get_font_collections() as $collection ) {
-			$collections[] = $collection->get_config_and_data();
+			$collections[] = $collection->get_config();
 		}
 
-		return new WP_REST_Response( $collections, 200 );
+		return new rest_ensure_response( $collections, 200 );
 	}
 
 	/**
-	 * Checks whether the user has permissions to update the Font Library.
+	 * Checks whether the user has permissions to use the Font Library.
 	 *
 	 * @since 6.5.0
 	 *
@@ -116,7 +116,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
 				'rest_cannot_update_font_library',
-				__( 'Sorry, you are not allowed to update the Font Library on this site.', 'gutenberg' ),
+				__( 'Sorry, you are not allowed to use the Font Library on this site.', 'gutenberg' ),
 				array(
 					'status' => rest_authorization_required_code(),
 				)
