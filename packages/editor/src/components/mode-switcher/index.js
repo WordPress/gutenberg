@@ -10,6 +10,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Set of available mode options.
@@ -40,7 +41,7 @@ function ModeSwitcher( {
 		} ),
 		[]
 	);
-	const { switchEditorMode } = useDispatch( editorStore );
+	const { setEditorMode } = unlock( useDispatch( editorStore ) );
 
 	let selectedMode = mode;
 	if ( ! isRichEditingEnabled && mode === 'visual' ) {
@@ -77,7 +78,7 @@ function ModeSwitcher( {
 			<MenuItemsChoice
 				choices={ choices }
 				value={ mode }
-				onSelect={ switchEditorMode }
+				onSelect={ setEditorMode }
 			/>
 		</MenuGroup>
 	);
