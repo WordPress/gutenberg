@@ -49,6 +49,8 @@ export default function ViewGrid( {
 					spacing={ 3 }
 					key={ getItemId( item ) }
 					className="dataviews-view-grid__card"
+					tabIndex={ 0 }
+					aria-label={ primaryField?.getValue( { item } ) }
 				>
 					<div className="dataviews-view-grid__media">
 						{ mediaField?.render( { item } ) }

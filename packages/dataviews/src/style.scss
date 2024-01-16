@@ -207,6 +207,7 @@
 	}
 
 	.dataviews-view-grid__card {
+		padding: $grid-unit-05;
 		.dataviews-view-grid__primary-field {
 			.dataviews-view-grid__title-field {
 				white-space: nowrap;
@@ -223,6 +224,11 @@
 				color: $gray-900;
 				text-decoration: none;
 			}
+		}
+
+		&:focus {
+			box-shadow: 0 0 0 $border-width-focus-fallback $gray-900;
+			border-radius: $radius-block-ui * 2;
 		}
 	}
 
