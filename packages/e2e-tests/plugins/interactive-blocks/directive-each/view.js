@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext } from '@wordpress/interactivity';
+import { store, getContext, navigate } from '@wordpress/interactivity';
 
 const { state } = store( 'directive-each' );
 
@@ -126,5 +126,35 @@ store( 'directive-each', {
 	},
 } );
 
+const html = `
+<div
+	data-wp-interactive='{ "namespace": "directive-each" }'
+	data-wp-navigation-id="navigation-updated list"
+	data-wp-context='{ "list": [ "alpha", "beta", "gamma", "delta" ] }'
+	data-testid="navigation-updated list"
+>
+	<button
+		data-testid="navigate"
+		data-wp-on--click="actions.navigate"
+	>Navigate</button>
+	<template data-wp-each="context.list">
+		<p data-wp-text="context.item" data-testid="item"></p>
+	</template>
+	<p data-testid="item" data-wp-each-child>alpha</p>
+	<p data-testid="item" data-wp-each-child>beta</p>
+	<p data-testid="item" data-wp-each-child>gamma</p>
+	<p data-testid="item" data-wp-each-child>delta</p>
+</div>
+`;
 
+store( 'directive-each', {
+	actions: {
+		navigate() {
+			return navigate( window.location, {
+				force: true,
+				html,
+			} );
+		},
+	}
+} );
 

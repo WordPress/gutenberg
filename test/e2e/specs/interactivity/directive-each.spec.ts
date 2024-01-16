@@ -290,5 +290,41 @@ test.describe( 'data-wp-each', () => {
 		] );
 	} );
 
-	test( 'should work on navigation', async ( { page } ) => {} );
+	test( 'should work on navigation', async ( { page } ) => {
+		const elements = page
+			.getByTestId( 'navigation-updated list' )
+			.getByTestId( 'item' );
+
+		// These tags are included to check that the elements are not unmounted
+		// and mounted again. If an element remounts, its tag should be missing.
+		await elements.evaluateAll( ( refs ) =>
+			refs.forEach( ( ref, index ) => {
+				if ( ref instanceof HTMLElement ) {
+					ref.dataset.tag = `${ index }`;
+				}
+			} )
+		);
+
+		await expect( elements ).toHaveText( [ 'beta', 'gamma', 'delta' ] );
+
+		await page
+			.getByTestId( 'navigation-updated list' )
+			.getByTestId( 'navigate' )
+			.click();
+
+		await expect( elements ).toHaveText( [
+			'alpha',
+			'beta',
+			'gamma',
+			'delta',
+		] );
+
+		// Get the tags. They should not have disappeared or changed,
+		// except for the newly created element.
+		const [ alpha, beta, gamma, delta ] = await elements.all();
+		await expect( alpha ).not.toHaveAttribute( 'data-tag' );
+		await expect( beta ).toHaveAttribute( 'data-tag', '0' );
+		await expect( gamma ).toHaveAttribute( 'data-tag', '1' );
+		await expect( delta ).toHaveAttribute( 'data-tag', '2' );
+	} );
 } );
