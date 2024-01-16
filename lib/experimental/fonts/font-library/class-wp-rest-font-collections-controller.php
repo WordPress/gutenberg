@@ -86,7 +86,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 			return $collection_data;
 		}
 
-		return new rest_ensure_response( $config_and_data );
+		return rest_ensure_response( $config_and_data );
 	}
 
 	/**
@@ -102,7 +102,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 			$collections[] = $collection->get_config();
 		}
 
-		return new rest_ensure_response( $collections, 200 );
+		return rest_ensure_response( $collections, 200 );
 	}
 
 	/**
