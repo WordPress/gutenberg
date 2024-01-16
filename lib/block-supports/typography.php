@@ -407,8 +407,10 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 		return null;
 	}
 
-	// Build CSS rule.
-	// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
+	/*
+	 * Build CSS rule.
+	 * Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
+	 */
 	$view_port_width_offset = round( $minimum_viewport_width['value'] / 100, 3 ) . $font_size_unit;
 	$linear_factor          = 100 * ( ( $maximum_font_size['value'] - $minimum_font_size['value'] ) / ( $linear_factor_denominator ) );
 	$linear_factor_scaled   = round( $linear_factor * $scale_factor, 3 );
