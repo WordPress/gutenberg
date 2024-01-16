@@ -162,7 +162,7 @@ export function makeFontFacesFormData( font ) {
 				const fileId = `file-${ faceIndex }`;
 				// Add the files to the formData
 				formData.append( fileId, face.file, face.file.name );
-				// remove the file object from the face object the file is referenced by the uploadedFile key
+				// remove the file object from the face object the file is referenced in src
 				const { file, ...faceWithoutFileProperty } = face;
 				const fontFaceSettings = {
 					...faceWithoutFileProperty,
