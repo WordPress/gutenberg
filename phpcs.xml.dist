@@ -115,6 +115,8 @@
 				<element value="apply_block_core_search_border_style"/>
 				<element value="apply_block_core_search_border_styles"/>
 				<element value="build_dropdown_script_block_core_categories"/>
+				<element value="build_navigation_link_block_variations"/>
+				<element value="build_post_term_block_variations"/>
 				<element value="build_template_part_block_area_variations"/>
 				<element value="build_template_part_block_instance_variations"/>
 				<element value="build_template_part_block_variations"/>

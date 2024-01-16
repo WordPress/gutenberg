@@ -368,11 +368,11 @@ function block_core_navigation_link_unregister_variation( $name ) {
 
 /**
  * Register the navigation link block.
+ * Returns an array of variations for the navigation link block.
  *
- * @uses render_block_core_navigation()
- * @throws WP_Error An WP_Error exception parsing the block definition.
+ * @return array
  */
-function register_block_core_navigation_link() {
+function build_navigation_link_block_variations() {
 	// This will only handle post types and taxonomies registered until this point (init on priority 9).
 	// See action hooks below for other post types and taxonomies.
 	// See https://github.com/WordPress/gutenberg/issues/53826 for details.
@@ -407,11 +407,21 @@ function register_block_core_navigation_link() {
 		}
 	}
 
+	return array_merge( $built_ins, $variations );
+}
+
+/**
+ * Register the navigation link block.
+ *
+ * @uses render_block_core_navigation()
+ * @throws WP_Error An WP_Error exception parsing the block definition.
+ */
+function register_block_core_navigation_link() {
 	register_block_type_from_metadata(
 		__DIR__ . '/navigation-link',
 		array(
-			'render_callback' => 'render_block_core_navigation_link',
-			'variations'      => array_merge( $built_ins, $variations ),
+			'render_callback'    => 'render_block_core_navigation_link',
+			'variation_callback' => 'build_navigation_link_block_variations',
 		)
 	);
 }
