@@ -8,21 +8,43 @@ import { useCallback } from '@wordpress/element';
  */
 import { CustomSelectItem } from '.';
 import type { CustomSelectProps, LegacyCustomSelectProps } from './types';
+import deprecated from '@wordpress/deprecated';
 
 function isLegacyProps( props: any ): props is LegacyCustomSelectProps {
-	return typeof props.options !== 'undefined';
+	return (
+		typeof props.options !== 'undefined' ||
+		props.__experimentalShowSelectedHint !== undefined
+	);
 }
 
-const transformOptionsToChildren = (
-	options: LegacyCustomSelectProps[ 'options' ]
-) => {
-	if ( options === undefined ) {
+const transformOptionsToChildren = ( props: LegacyCustomSelectProps ) => {
+	if ( props.options === undefined ) {
 		return;
 	}
 
-	return options.map( ( { name, key, ...rest }: any ) => (
-		<CustomSelectItem value={ name } key={ key } { ...rest } />
-	) );
+	return props.options.map(
+		( { name, key, __experimentalHint, ...rest }: any ) => {
+			const withHint = (
+				<>
+					<span>{ name }</span>
+					<span className="components-custom-select-control__item-hint">
+						{ __experimentalHint }
+					</span>
+				</>
+			);
+
+			return (
+				<CustomSelectItem
+					{ ...rest }
+					key={ key }
+					value={ name }
+					children={
+						props.__experimentalShowSelectedHint ? withHint : name
+					}
+				/>
+			);
+		}
+	);
 };
 
 export function useDeprecatedProps(
@@ -42,9 +64,25 @@ export function useDeprecatedProps(
 		},
 		[ onChangeLegacy ]
 	);
+
 	if ( isLegacyProps( props ) ) {
+		if ( props.__nextUnconstrainedWidth ) {
+			deprecated(
+				'Constrained width styles for wp.components.CustomSelectControl',
+				{
+					hint: 'This behaviour is now built-in.',
+					since: '6.4',
+				}
+			);
+		}
+
+		const legacyProps = {
+			'aria-describedby': props.describedBy,
+		};
+
 		return {
-			children: transformOptionsToChildren( props.options ),
+			...legacyProps,
+			children: transformOptionsToChildren( props ),
 			label: props.label,
 			onChange: legacyChangeHandler,
 		};

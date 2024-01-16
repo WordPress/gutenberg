@@ -12,6 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { VisuallyHidden } from '..';
 import * as Styled from './styles';
 import type {
 	CustomSelectProps,
@@ -44,6 +45,7 @@ function defaultRenderSelectedValue( value: CustomSelectProps[ 'value' ] ) {
 export function CustomSelect( {
 	children,
 	defaultValue,
+	hideLabelFromVision = false,
 	label,
 	onChange,
 	size = 'default',
@@ -64,9 +66,13 @@ export function CustomSelect( {
 
 	return (
 		<>
-			<Styled.CustomSelectLabel store={ store }>
-				{ label }
-			</Styled.CustomSelectLabel>
+			{ hideLabelFromVision ? (
+				<VisuallyHidden as="label">{ label }</VisuallyHidden>
+			) : (
+				<Styled.CustomSelectLabel store={ store }>
+					{ label }
+				</Styled.CustomSelectLabel>
+			) }
 			<Styled.CustomSelectButton
 				{ ...props }
 				size={ size }
