@@ -78,10 +78,21 @@ function useView( type ) {
 	const { editEntityRecord } = useDispatch( coreStore );
 
 	const customView = useMemo( () => {
-		return (
-			editedViewRecord?.content && JSON.parse( editedViewRecord?.content )
-		);
+		const storedView =
+			editedViewRecord?.content &&
+			JSON.parse( editedViewRecord?.content );
+		if ( ! storedView ) {
+			return storedView;
+		}
+
+		return {
+			...storedView,
+			layout: {
+				...( DEFAULT_CONFIG_PER_VIEW_TYPE[ storedView?.type ] || {} ),
+			},
+		};
 	}, [ editedViewRecord?.content ] );
+
 	const setCustomView = useCallback(
 		( viewToSet ) => {
 			editEntityRecord(
