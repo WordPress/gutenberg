@@ -440,6 +440,10 @@
 			&:last-child {
 				margin-right: 0;
 			}
+
+			&:empty {
+				display: none;
+			}
 		}
 	}
 

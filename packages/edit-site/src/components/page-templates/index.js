@@ -216,18 +216,18 @@ export default function DataviewsTemplates() {
 				id: 'description',
 				getValue: ( { item } ) => item.description,
 				render: ( { item } ) => {
-					return item.description ? (
-						decodeEntities( item.description )
-					) : (
-						<>
-							<Text variant="muted" aria-hidden="true">
-								&#8212;
-							</Text>
-							<VisuallyHidden>
-								{ __( 'No description.' ) }
-							</VisuallyHidden>
-						</>
-					);
+					return item.description
+						? decodeEntities( item.description )
+						: view.type === LAYOUT_TABLE && (
+								<>
+									<Text variant="muted" aria-hidden="true">
+										&#8212;
+									</Text>
+									<VisuallyHidden>
+										{ __( 'No description.' ) }
+									</VisuallyHidden>
+								</>
+						  );
 				},
 				maxWidth: 200,
 				enableSorting: false,
