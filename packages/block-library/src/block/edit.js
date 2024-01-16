@@ -147,6 +147,13 @@ function setBlockEditMode( setEditMode, blocks, mode ) {
 	} );
 }
 
+function getHasOverridableBlocks( blocks ) {
+	return blocks.some( ( block ) => {
+		if ( isPartiallySynced( block ) ) return true;
+		return getHasOverridableBlocks( block.innerBlocks );
+	} );
+}
+
 export default function ReusableBlockEdit( {
 	name,
 	attributes: { ref, overrides },
@@ -206,6 +213,11 @@ export default function ReusableBlockEdit( {
 	useEffect(
 		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
 		[ innerBlocks, setBlockEditingMode ]
+	);
+
+	const hasOverridableBlocks = useMemo(
+		() => getHasOverridableBlocks( innerBlocks ),
+		[ innerBlocks ]
 	);
 
 	const initialBlocks = useMemo(
@@ -343,16 +355,18 @@ export default function ReusableBlockEdit( {
 				</BlockControls>
 			) }
 
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarButton
-						onClick={ resetOverrides }
-						aria-disabled={ overrides ? 'true' : 'false' }
-					>
-						{ __( 'Reset to original' ) }
-					</ToolbarButton>
-				</ToolbarGroup>
-			</BlockControls>
+			{ hasOverridableBlocks && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ resetOverrides }
+							aria-disabled={ overrides ? 'false' : 'true' }
+						>
+							{ __( 'Reset to original' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
 
 			{ children === null ? (
 				<div { ...innerBlocksProps } />
