@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image as RNImage, Text, View } from 'react-native';
+import { Animated, Image as RNImage, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 /**
@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/components';
 import { image, offline } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { useEffect, useState, Platform } from '@wordpress/element';
+import { useEffect, useState, useRef, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -54,6 +54,9 @@ const ImageComponent = ( {
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
+	const [ localURL, setLocalURL ] = useState( null );
+	const [ networkURL, setNetworkURL ] = useState( null );
+	const [ networkImageLoaded, setNetworkImageLoaded ] = useState( false );
 
 	// Disabled for Android due to https://github.com/WordPress/gutenberg/issues/43149
 	const Image =
@@ -80,6 +83,12 @@ const ImageComponent = ( {
 					onImageDataLoad( metaData );
 				}
 			} );
+
+			if ( url.startsWith( 'file:///' ) ) {
+				return setLocalURL( url );
+			} else if ( url.startsWith( 'https://' ) ) {
+				return setNetworkURL( url );
+			}
 		}
 		return () => ( isCurrent = false );
 		// Disable reason: deferring this refactor to the native team.
@@ -188,9 +197,19 @@ const ImageComponent = ( {
 		focalPoint && styles.focalPointContainer,
 	];
 
+	const opacityValue = useRef( new Animated.Value( 0.3 ) ).current;
+
+	useEffect( () => {
+		Animated.timing( opacityValue, {
+			toValue: isUploadInProgress ? 0.3 : 1,
+			duration: 200,
+			useNativeDriver: true,
+		} ).start();
+	}, [ isUploadInProgress, opacityValue ] );
+
 	const imageStyles = [
 		{
-			opacity: isUploadInProgress ? 0.3 : 1,
+			opacity: opacityValue,
 			height: containerSize?.height,
 		},
 		! resizeMode && {
@@ -259,13 +278,26 @@ const ImageComponent = ( {
 					</View>
 				) : (
 					<View style={ focalPoint && styles.focalPointContent }>
-						<Image
+						<Animated.Image
 							style={ imageStyles }
-							source={ { uri: url } }
+							source={ {
+								uri:
+									networkURL && networkImageLoaded
+										? networkURL
+										: ( localURL && localURL ) ||
+										  ( url && url ),
+							} }
 							{ ...( ! focalPoint && {
 								resizeMethod: 'scale',
 							} ) }
 							resizeMode={ imageResizeMode }
+						/>
+						<Image
+							source={ networkURL }
+							style={ { height: 1, width: 1, opacity: 0 } }
+							onLoad={ () => {
+								setNetworkImageLoaded( true );
+							} }
 						/>
 					</View>
 				) }
