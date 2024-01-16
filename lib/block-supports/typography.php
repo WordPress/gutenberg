@@ -247,7 +247,7 @@ function gutenberg_render_typography_support( $block_content, $block ) {
 }
 
 /**
- * Internal method that checks a string for a unit and value and returns an array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ].
+ * Internal method that checks a string for a unit and value and returns an array consisting of 'value'`, `'unit'` and `'combined'`, e.g., [ 42, 'rem', '42rem' ].
  * A raw font size of `value + unit` is expected. If the value is a number, it will convert to `value + 'px'`.
  *
  * @access private
@@ -260,7 +260,7 @@ function gutenberg_render_typography_support( $block_content, $block ) {
  *     @type int           $root_size_value  Value of root font size for rem|em <-> px conversion. Default `16`.
  *     @type array<string> $acceptable_units An array of font size units. Default `[ 'rem', 'px', 'em' ]`;
  * }
- * @return array An array consisting of `'value'` and `'unit'` properties.
+ * @return array An array consisting of `'value'`, `'unit'` and `'combined'` properties.
  */
 function gutenberg_get_typography_value_and_unit( $raw_value, $options = array() ) {
 	if ( ! is_string( $raw_value ) && ! is_int( $raw_value ) && ! is_float( $raw_value ) ) {
@@ -276,31 +276,31 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 		return null;
 	}
 
-	// Converts numeric values to pixel values by default.
-	if ( is_numeric( $raw_value ) ) {
-		$raw_value = $raw_value . 'px';
-	}
-
 	$defaults = array(
 		'coerce_to'        => '',
 		'root_size_value'  => 16,
 		'acceptable_units' => array( 'rem', 'px', 'em' ),
 	);
-
-	$options = wp_parse_args( $options, $defaults );
+	$options  = wp_parse_args( $options, $defaults );
 
 	$acceptable_units_group = implode( '|', $options['acceptable_units'] );
-	$pattern                = '/^(\d*\.?\d+)(' . $acceptable_units_group . '){1,1}$/';
+	// Matches integers and floats (including negative values) with optional decimal (dot or comma) and a unit value.
+	$pattern = '/^(-?\d*[\.,]?\d+)(' . $acceptable_units_group . '){0,1}$/';
 
 	preg_match( $pattern, $raw_value, $matches );
 
-	// We need a number value and a px or rem unit.
-	if ( ! isset( $matches[1] ) || ! isset( $matches[2] ) ) {
+	// We need a number value.
+	if ( ! isset( $matches[1] ) ) {
 		return null;
 	}
 
-	$value = $matches[1];
-	$unit  = $matches[2];
+	/*
+	 * For floats coerced to strings, locales can use either a comma (,) or dot (.) as decimal separators.
+	 * Use `str_replace` to replace any comma separators with a dot for CSS rules to be valid.
+	 */
+	$value = str_replace( ',', '.', $matches[1] );
+	// Converts units to pixel values by default.
+	$unit = isset( $matches[2] ) ? $matches[2] : 'px';
 
 	// Default browser font size. Later we could inject some JS to compute this `getComputedStyle( document.querySelector( "html" ) ).fontSize`.
 	if ( 'px' === $options['coerce_to'] && ( 'em' === $unit || 'rem' === $unit ) ) {
@@ -322,9 +322,12 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
 		$unit = $options['coerce_to'];
 	}
 
+	$value = round( $value, 3 );
+
 	return array(
-		'value' => round( $value, 3 ),
-		'unit'  => $unit,
+		'value'    => $value,
+		'unit'     => $unit,
+		'combined' => str_replace( ',', '.', $value . $unit ),
 	);
 }
 
@@ -401,13 +404,17 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 		return null;
 	}
 
-	// Build CSS rule.
-	// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
-	$view_port_width_offset = round( $minimum_viewport_width['value'] / 100, 3 ) . $font_size_unit;
+	/*
+	 * Build CSS rule.
+	 * Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
+	 * For floats coerced to strings, locales can use either a comma (,) or dot (.) as decimal separators.
+	 * Use `str_replace` to replace any comma separators with a dot for CSS rules to be valid.
+	 */
+	$view_port_width_offset = str_replace( ',', '.', round( $minimum_viewport_width['value'] / 100, 3 ) ) . $font_size_unit;
 	$linear_factor          = 100 * ( ( $maximum_font_size['value'] - $minimum_font_size['value'] ) / ( $maximum_viewport_width['value'] - $minimum_viewport_width['value'] ) );
-	$linear_factor_scaled   = round( $linear_factor * $scale_factor, 3 );
-	$linear_factor_scaled   = empty( $linear_factor_scaled ) ? 1 : $linear_factor_scaled;
-	$fluid_target_font_size = implode( '', $minimum_font_size_rem ) . " + ((1vw - $view_port_width_offset) * $linear_factor_scaled)";
+	$linear_factor_scaled   = $linear_factor * $scale_factor;
+	$linear_factor_scaled   = empty( $linear_factor_scaled ) || 1 === $linear_factor_scaled ? 1 : str_replace( ',', '.', round( $linear_factor_scaled, 3 ) );
+	$fluid_target_font_size = $minimum_font_size_rem['combined'] . " + ((1vw - $view_port_width_offset) * $linear_factor_scaled)";
 
 	return "clamp($minimum_font_size_raw, $fluid_target_font_size, $maximum_font_size_raw)";
 }
@@ -523,7 +530,7 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 
 	// If no fluid max font size is available use the incoming value.
 	if ( ! $maximum_font_size_raw ) {
-		$maximum_font_size_raw = $preferred_size['value'] . $preferred_size['unit'];
+		$maximum_font_size_raw = $preferred_size['combined'];
 	}
 
 	/*
@@ -544,9 +551,11 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 
 		// Only use calculated min font size if it's > $minimum_font_size_limit value.
 		if ( ! empty( $minimum_font_size_limit ) && $calculated_minimum_font_size <= $minimum_font_size_limit['value'] ) {
-			$minimum_font_size_raw = $minimum_font_size_limit['value'] . $minimum_font_size_limit['unit'];
+			$minimum_font_size_raw = $minimum_font_size_limit['combined'];
 		} else {
-			$minimum_font_size_raw = $calculated_minimum_font_size . $preferred_size['unit'];
+			$minimum_font_size_raw = gutenberg_get_typography_value_and_unit(
+				$calculated_minimum_font_size . $preferred_size['unit']
+			)['combined'];
 		}
 	}
 

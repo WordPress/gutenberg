@@ -787,9 +787,10 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *
 	 * @param mixed $raw_value Raw size value to test.
 	 * @param mixed $expected  An expected return value.
+	 * @param array $options   Options to pass to function.
 	 */
-	public function test_valid_size_wp_get_typography_value_and_unit( $raw_value, $expected ) {
-		$this->assertEquals( $expected, gutenberg_get_typography_value_and_unit( $raw_value ) );
+	public function test_valid_size_wp_get_typography_value_and_unit( $raw_value, $expected, $options = array() ) {
+		$this->assertEquals( $expected, gutenberg_get_typography_value_and_unit( $raw_value, $options ) );
 	}
 
 	/**
@@ -814,50 +815,92 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 			'size: `"10"`'                               => array(
 				'raw_value' => '10',
 				'expected'  => array(
-					'value' => 10,
-					'unit'  => 'px',
+					'value'    => 10,
+					'unit'     => 'px',
+					'combined' => '10px',
 				),
 			),
 			'size: `11`'                                 => array(
 				'raw_value' => 11,
 				'expected'  => array(
-					'value' => 11,
-					'unit'  => 'px',
+					'value'    => 11,
+					'unit'     => 'px',
+					'combined' => '11px',
 				),
 			),
 			'size: `11.234`'                             => array(
 				'raw_value' => '11.234',
 				'expected'  => array(
-					'value' => 11.234,
-					'unit'  => 'px',
+					'value'    => 11.234,
+					'unit'     => 'px',
+					'combined' => '11.234px',
 				),
 			),
 			'size: `"12rem"`'                            => array(
 				'raw_value' => '12rem',
 				'expected'  => array(
-					'value' => 12,
-					'unit'  => 'rem',
+					'value'    => 12,
+					'unit'     => 'rem',
+					'combined' => '12rem',
 				),
 			),
 			'size: `"12px"`'                             => array(
 				'raw_value' => '12px',
 				'expected'  => array(
-					'value' => 12,
-					'unit'  => 'px',
+					'value'    => 12,
+					'unit'     => 'px',
+					'combined' => '12px',
 				),
 			),
 			'size: `"12em"`'                             => array(
 				'raw_value' => '12em',
 				'expected'  => array(
-					'value' => 12,
-					'unit'  => 'em',
+					'value'    => 12,
+					'unit'     => 'em',
+					'combined' => '12em',
 				),
 			),
 			'size: `"12.74em"`'                          => array(
 				'raw_value' => '12.74em',
 				'expected'  => array(
-					'value' => 12.74,
-					'unit'  => 'em',
+					'value'    => 12.74,
+					'unit'     => 'em',
+					'combined' => '12.74em',
+				),
+			),
+			'size: `"7.353vh"`'                          => array(
+				'raw_value' => '7.357777vh',
+				'expected'  => array(
+					'value'    => 7.358,
+					'unit'     => 'vh',
+					'combined' => '7.358vh',
+				),
+				'options'   => array(
+					'acceptable_units' => array( 'vh' ),
+				),
+			),
+			'size: `"12,1238rem"`'                       => array(
+				'raw_value' => '12,1238rem',
+				'expected'  => array(
+					'value'    => 12.124,
+					'unit'     => 'rem',
+					'combined' => '12.124rem',
+				),
+			),
+			'size: `"1,7879"`'                           => array(
+				'raw_value' => '1,7879',
+				'expected'  => array(
+					'value'    => 1.788,
+					'unit'     => 'px',
+					'combined' => '1.788px',
+				),
+			),
+			'size: `-10.2rem`'                           => array(
+				'raw_value' => '-10.2rem',
+				'expected'  => array(
+					'value'    => -10.2,
+					'unit'     => 'rem',
+					'combined' => '-10.2rem',
 				),
 			),
 		);
