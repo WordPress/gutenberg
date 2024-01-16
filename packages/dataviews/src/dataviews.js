@@ -5,7 +5,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,7 +14,11 @@ import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
-import { VIEW_LAYOUTS } from './constants';
+import { VIEW_LAYOUTS, LAYOUT_TABLE } from './constants';
+import BulkActions from './bulk-actions';
+
+const defaultGetItemId = ( item ) => item.id;
+const defaultOnSelectionChange = () => {};
 
 export default function DataViews( {
 	view,
@@ -24,19 +28,40 @@ export default function DataViews( {
 	searchLabel = undefined,
 	actions,
 	data,
-	getItemId,
+	getItemId = defaultGetItemId,
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
-	onSelectionChange,
-	deferredRendering,
+	onSelectionChange = defaultOnSelectionChange,
+	onDetailsChange = null,
+	deferredRendering = false,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
 
-	const onSetSelection = ( items ) => {
-		setSelection( items.map( ( item ) => item.id ) );
-		onSelectionChange( items );
-	};
+	useEffect( () => {
+		if (
+			selection.length > 0 &&
+			selection.some(
+				( id ) => ! data.some( ( item ) => item.id === id )
+			)
+		) {
+			const newSelection = selection.filter( ( id ) =>
+				data.some( ( item ) => item.id === id )
+			);
+			setSelection( newSelection );
+			onSelectionChange(
+				data.filter( ( item ) => newSelection.includes( item.id ) )
+			);
+		}
+	}, [ selection, data, onSelectionChange ] );
+
+	const onSetSelection = useCallback(
+		( items ) => {
+			setSelection( items.map( ( item ) => item.id ) );
+			onSelectionChange( items );
+		},
+		[ setSelection, onSelectionChange ]
+	);
 
 	const ViewComponent = VIEW_LAYOUTS.find(
 		( v ) => v.type === view.type
@@ -52,7 +77,7 @@ export default function DataViews( {
 			<VStack spacing={ 0 } justify="flex-start">
 				<HStack
 					alignment="flex-start"
-					className="dataviews__filters-view-actions"
+					className="dataviews-filters__view-actions"
 				>
 					<HStack justify="start" wrap>
 						{ search && (
@@ -63,13 +88,22 @@ export default function DataViews( {
 							/>
 						) }
 						<Filters
-							fields={ fields }
+							fields={ _fields }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
+					{ view.type === LAYOUT_TABLE && (
+						<BulkActions
+							actions={ actions }
+							data={ data }
+							onSelectionChange={ onSetSelection }
+							selection={ selection }
+							getItemId={ getItemId }
+						/>
+					) }
 					<ViewActions
-						fields={ fields }
+						fields={ _fields }
 						view={ view }
 						onChangeView={ onChangeView }
 						supportedLayouts={ supportedLayouts }
@@ -79,12 +113,12 @@ export default function DataViews( {
 					fields={ _fields }
 					view={ view }
 					onChangeView={ onChangeView }
-					paginationInfo={ paginationInfo }
 					actions={ actions }
 					data={ data }
 					getItemId={ getItemId }
 					isLoading={ isLoading }
 					onSelectionChange={ onSetSelection }
+					onDetailsChange={ onDetailsChange }
 					selection={ selection }
 					deferredRendering={ deferredRendering }
 				/>

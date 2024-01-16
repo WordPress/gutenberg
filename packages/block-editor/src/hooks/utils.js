@@ -174,8 +174,13 @@ export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
  */
 export function useBlockSettings( name, parentLayout ) {
 	const [
+		backgroundImage,
+		backgroundSize,
 		fontFamilies,
-		fontSizes,
+		userFontSizes,
+		themeFontSizes,
+		defaultFontSizes,
+		defaultFontSizesEnabled,
 		customFontSize,
 		fontStyle,
 		fontWeight,
@@ -217,8 +222,13 @@ export function useBlockSettings( name, parentLayout ) {
 		isHeadingEnabled,
 		isButtonEnabled,
 	] = useSettings(
+		'background.backgroundImage',
+		'background.backgroundSize',
 		'typography.fontFamilies',
-		'typography.fontSizes',
+		'typography.fontSizes.custom',
+		'typography.fontSizes.theme',
+		'typography.fontSizes.default',
+		'typography.defaultFontSizes',
 		'typography.customFontSize',
 		'typography.fontStyle',
 		'typography.fontWeight',
@@ -263,6 +273,10 @@ export function useBlockSettings( name, parentLayout ) {
 
 	const rawSettings = useMemo( () => {
 		return {
+			background: {
+				backgroundImage,
+				backgroundSize,
+			},
 			color: {
 				palette: {
 					custom: customColors,
@@ -296,9 +310,12 @@ export function useBlockSettings( name, parentLayout ) {
 					custom: fontFamilies,
 				},
 				fontSizes: {
-					custom: fontSizes,
+					custom: userFontSizes,
+					theme: themeFontSizes,
+					default: defaultFontSizes,
 				},
 				customFontSize,
+				defaultFontSizes: defaultFontSizesEnabled,
 				fontStyle,
 				fontWeight,
 				lineHeight,
@@ -330,8 +347,13 @@ export function useBlockSettings( name, parentLayout ) {
 			parentLayout,
 		};
 	}, [
+		backgroundImage,
+		backgroundSize,
 		fontFamilies,
-		fontSizes,
+		userFontSizes,
+		themeFontSizes,
+		defaultFontSizes,
+		defaultFontSizesEnabled,
 		customFontSize,
 		fontStyle,
 		fontWeight,
@@ -418,12 +440,14 @@ export function createBlockEditFilter( features ) {
 							neededProps[ key ] = props.attributes[ key ];
 						}
 					}
+
 					return (
 						<Edit
 							// We can use the index because the array length
 							// is fixed per page load right now.
 							key={ i }
 							name={ props.name }
+							isSelected={ props.isSelected }
 							clientId={ props.clientId }
 							setAttributes={ props.setAttributes }
 							__unstableParentLayout={

@@ -98,19 +98,19 @@ $blocks-block__margin: 0.5em;
 	border-radius: 0 !important;
 }
 
-.wp-block-button.is-style-outline > .wp-block-button__link,
-.wp-block-button .wp-block-button__link.is-style-outline {
+.wp-block-button:where(.is-style-outline) > .wp-block-button__link,
+.wp-block-button .wp-block-button__link:where(.is-style-outline) {
 	border: 2px solid currentColor;
 	padding: 0.667em 1.333em;
 }
 
-.wp-block-button.is-style-outline > .wp-block-button__link:not(.has-text-color),
-.wp-block-button .wp-block-button__link.is-style-outline:not(.has-text-color) {
+.wp-block-button:where(.is-style-outline) > .wp-block-button__link:not(.has-text-color),
+.wp-block-button .wp-block-button__link:where(.is-style-outline):not(.has-text-color) {
 	color: currentColor;
 }
 
-.wp-block-button.is-style-outline > .wp-block-button__link:not(.has-background),
-.wp-block-button .wp-block-button__link.is-style-outline:not(.has-background) {
+.wp-block-button:where(.is-style-outline) > .wp-block-button__link:not(.has-background),
+.wp-block-button .wp-block-button__link:where(.is-style-outline):not(.has-background) {
 	background-color: transparent;
 	// background-image is required to overwrite a gradient background
 	background-image: none;

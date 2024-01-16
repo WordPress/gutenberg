@@ -76,47 +76,19 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'setIsListViewOpened', () => {
-		it( 'should set the list view opened state', () => {
-			const registry = createRegistryWithStores();
-
-			registry.dispatch( editSiteStore ).setIsListViewOpened( true );
-			expect( registry.select( editSiteStore ).isListViewOpened() ).toBe(
-				true
-			);
-
-			registry.dispatch( editSiteStore ).setIsListViewOpened( false );
-			expect( registry.select( editSiteStore ).isListViewOpened() ).toBe(
-				false
-			);
-		} );
-		it( 'should turn off distraction free mode when opening the list view', () => {
-			const registry = createRegistryWithStores();
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core/edit-site', 'distractionFree', true );
-			registry.dispatch( editSiteStore ).setIsListViewOpened( true );
-			expect(
-				registry
-					.select( preferencesStore )
-					.get( 'core/edit-site', 'distractionFree' )
-			).toBe( false );
-		} );
-	} );
-
 	describe( 'openGeneralSidebar', () => {
 		it( 'should turn off distraction free mode when opening a general sidebar', () => {
 			const registry = createRegistryWithStores();
 			registry
 				.dispatch( preferencesStore )
-				.set( 'core/edit-site', 'distractionFree', true );
+				.set( 'core', 'distractionFree', true );
 			registry
 				.dispatch( editSiteStore )
 				.openGeneralSidebar( 'edit-site/global-styles' );
 			expect(
 				registry
 					.select( preferencesStore )
-					.get( 'core/edit-site', 'distractionFree' )
+					.get( 'core', 'distractionFree' )
 			).toBe( false );
 		} );
 	} );
@@ -126,18 +98,18 @@ describe( 'actions', () => {
 			const registry = createRegistryWithStores();
 			registry
 				.dispatch( preferencesStore )
-				.set( 'core/edit-site', 'distractionFree', true );
+				.set( 'core', 'distractionFree', true );
 			registry.dispatch( editSiteStore ).switchEditorMode( 'visual' );
 			expect(
 				registry
 					.select( preferencesStore )
-					.get( 'core/edit-site', 'distractionFree' )
+					.get( 'core', 'distractionFree' )
 			).toBe( true );
 			registry.dispatch( editSiteStore ).switchEditorMode( 'text' );
 			expect(
 				registry
 					.select( preferencesStore )
-					.get( 'core/edit-site', 'distractionFree' )
+					.get( 'core', 'distractionFree' )
 			).toBe( false );
 		} );
 	} );
@@ -148,8 +120,8 @@ describe( 'actions', () => {
 			// Enable everything that shouldn't be enabled in distraction free mode.
 			registry
 				.dispatch( preferencesStore )
-				.set( 'core/edit-site', 'fixedToolbar', true );
-			registry.dispatch( editSiteStore ).setIsListViewOpened( true );
+				.set( 'core', 'fixedToolbar', true );
+			registry.dispatch( editorStore ).setIsListViewOpened( true );
 			registry
 				.dispatch( editSiteStore )
 				.openGeneralSidebar( 'edit-site/global-styles' );
@@ -158,12 +130,12 @@ describe( 'actions', () => {
 			expect(
 				registry
 					.select( preferencesStore )
-					.get( 'core/edit-site', 'fixedToolbar' )
+					.get( 'core', 'fixedToolbar' )
 			).toBe( true );
-			expect( registry.select( editSiteStore ).isListViewOpened() ).toBe(
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
 				false
 			);
-			expect( registry.select( editSiteStore ).isInserterOpened() ).toBe(
+			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
 				false
 			);
 			expect(
@@ -174,7 +146,7 @@ describe( 'actions', () => {
 			expect(
 				registry
 					.select( preferencesStore )
-					.get( 'core/edit-site', 'distractionFree' )
+					.get( 'core', 'distractionFree' )
 			).toBe( true );
 		} );
 	} );

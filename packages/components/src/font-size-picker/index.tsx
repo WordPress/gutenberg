@@ -123,6 +123,7 @@ const UnforwardedFontSizePicker = (
 	);
 	const isValueUnitRelative =
 		!! valueUnit && [ 'em', 'rem' ].includes( valueUnit );
+	const isDisabled = value === undefined;
 
 	return (
 		<Container ref={ ref } className="components-font-size-picker">
@@ -276,7 +277,8 @@ const UnforwardedFontSizePicker = (
 						{ withReset && (
 							<FlexItem>
 								<Button
-									disabled={ value === undefined }
+									disabled={ isDisabled }
+									__experimentalIsFocusable
 									onClick={ () => {
 										onChange?.( undefined );
 									} }

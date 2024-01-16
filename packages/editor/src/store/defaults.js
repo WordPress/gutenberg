@@ -10,6 +10,7 @@ import { SETTINGS_DEFAULTS } from '@wordpress/block-editor';
  * @property {boolean}       richEditingEnabled    Whether rich editing is enabled or not
  * @property {boolean}       codeEditingEnabled    Whether code editing is enabled or not
  * @property {boolean}       enableCustomFields    Whether the WordPress custom fields are enabled or not.
+ * @property {boolean}       fontLibraryEnabled    Whether the font library is enabled or not.
  *                                                 true  = the user has opted to show the Custom Fields panel at the bottom of the editor.
  *                                                 false = the user has opted to hide the Custom Fields panel at the bottom of the editor.
  *                                                 undefined = the current environment does not support Custom Fields, so the option toggle in Preferences -> Panels to enable the Custom Fields panel is not displayed.
@@ -27,5 +28,6 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 	richEditingEnabled: true,
 	codeEditingEnabled: true,
 	enableCustomFields: undefined,
+	fontLibraryEnabled: true,
 	defaultRenderingMode: 'post-only',
 };

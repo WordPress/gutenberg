@@ -17,6 +17,7 @@ import { addFilter } from '@wordpress/hooks';
  */
 import { getMetaBoxContainer } from '../utils/meta-boxes';
 import { store as editPostStore } from '.';
+import { unlock } from '../lock-unlock';
 
 /**
  * Returns an action object used in signalling that the user opened an editor sidebar.
@@ -28,7 +29,7 @@ export const openGeneralSidebar =
 	( { dispatch, registry } ) => {
 		const isDistractionFree = registry
 			.select( preferencesStore )
-			.get( 'core/edit-post', 'distractionFree' );
+			.get( 'core', 'distractionFree' );
 		if ( isDistractionFree ) {
 			dispatch.toggleDistractionFree();
 		}
@@ -194,9 +195,7 @@ export const toggleFeature =
 export const switchEditorMode =
 	( mode ) =>
 	( { dispatch, registry } ) => {
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'editorMode', mode );
+		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
 
 		// Unselect blocks when we switch to the code editor.
 		if ( mode !== 'visual' ) {
@@ -205,9 +204,7 @@ export const switchEditorMode =
 
 		if (
 			mode === 'text' &&
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'distractionFree' )
+			registry.select( preferencesStore ).get( 'core', 'distractionFree' )
 		) {
 			dispatch.toggleDistractionFree();
 		}
@@ -291,21 +288,7 @@ export const updatePreferredStyleVariations =
 export const showBlockTypes =
 	( blockNames ) =>
 	( { registry } ) => {
-		const existingBlockNames =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
-
-		const newBlockNames = existingBlockNames.filter(
-			( type ) =>
-				! (
-					Array.isArray( blockNames ) ? blockNames : [ blockNames ]
-				).includes( type )
-		);
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'hiddenBlockTypes', newBlockNames );
+		unlock( registry.dispatch( editorStore ) ).showBlockTypes( blockNames );
 	};
 
 /**
@@ -316,21 +299,7 @@ export const showBlockTypes =
 export const hideBlockTypes =
 	( blockNames ) =>
 	( { registry } ) => {
-		const existingBlockNames =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
-
-		const mergedBlockNames = new Set( [
-			...existingBlockNames,
-			...( Array.isArray( blockNames ) ? blockNames : [ blockNames ] ),
-		] );
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'hiddenBlockTypes', [
-				...mergedBlockNames,
-			] );
+		unlock( registry.dispatch( editorStore ) ).hideBlockTypes( blockNames );
 	};
 
 /**
@@ -438,8 +407,6 @@ export function metaBoxUpdatesFailure() {
  * @deprecated
  *
  * @param {string} deviceType
- *
- * @return {Object} Action object.
  */
 export const __experimentalSetPreviewDeviceType =
 	( deviceType ) =>
@@ -458,41 +425,35 @@ export const __experimentalSetPreviewDeviceType =
 /**
  * Returns an action object used to open/close the inserter.
  *
- * @param {boolean|Object} value                Whether the inserter should be
- *                                              opened (true) or closed (false).
- *                                              To specify an insertion point,
- *                                              use an object.
- * @param {string}         value.rootClientId   The root client ID to insert at.
- * @param {number}         value.insertionIndex The index to insert at.
+ * @deprecated
  *
- * @return {Object} Action object.
+ * @param {boolean|Object} value Whether the inserter should be opened (true) or closed (false).
  */
-export function setIsInserterOpened( value ) {
-	return {
-		type: 'SET_IS_INSERTER_OPENED',
-		value,
+export const setIsInserterOpened =
+	( value ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).setIsInserterOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsInserterOpened",
+		} );
+		registry.dispatch( editorStore ).setIsInserterOpened( value );
 	};
-}
 
 /**
  * Returns an action object used to open/close the list view.
  *
+ * @deprecated
+ *
  * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
- * @return {Object} Action object.
  */
 export const setIsListViewOpened =
 	( isOpen ) =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core/edit-post', 'distractionFree' );
-		if ( isDistractionFree && isOpen ) {
-			dispatch.toggleDistractionFree();
-		}
-		dispatch( {
-			type: 'SET_IS_LIST_VIEW_OPENED',
-			isOpen,
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).setIsListViewOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsListViewOpened",
 		} );
+		registry.dispatch( editorStore ).setIsListViewOpened( isOpen );
 	};
 
 /**
@@ -588,25 +549,21 @@ export const toggleDistractionFree =
 	( { dispatch, registry } ) => {
 		const isDistractionFree = registry
 			.select( preferencesStore )
-			.get( 'core/edit-post', 'distractionFree' );
+			.get( 'core', 'distractionFree' );
 		if ( ! isDistractionFree ) {
 			registry.batch( () => {
 				registry
 					.dispatch( preferencesStore )
-					.set( 'core/edit-post', 'fixedToolbar', true );
-				dispatch.setIsInserterOpened( false );
-				dispatch.setIsListViewOpened( false );
+					.set( 'core', 'fixedToolbar', true );
+				registry.dispatch( editorStore ).setIsInserterOpened( false );
+				registry.dispatch( editorStore ).setIsListViewOpened( false );
 				dispatch.closeGeneralSidebar();
 			} );
 		}
 		registry.batch( () => {
 			registry
 				.dispatch( preferencesStore )
-				.set(
-					'core/edit-post',
-					'distractionFree',
-					! isDistractionFree
-				);
+				.set( 'core', 'distractionFree', ! isDistractionFree );
 			registry
 				.dispatch( noticesStore )
 				.createInfoNotice(

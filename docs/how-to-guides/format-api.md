@@ -173,7 +173,7 @@ registerFormatType( 'my-custom-format/sample-output', {
 } );
 ```
 
-### Step5: Add a button outside of the dropdown (Optional)
+### Step 5: Add a button outside of the dropdown (Optional)
 
 Using the `RichTextToolbarButton` component, the button is added to the default dropdown menu. You can add the button directly to the toolbar by using the `BlockControls` component.
 
@@ -220,7 +220,7 @@ If you run into errors:
 -   Confirm the JavaScript is loading in the editor.
 -   Check for any console error messages.
 
-## Additional Resources
+## Additional resources
 
 Reference documentation used in this guide:
 

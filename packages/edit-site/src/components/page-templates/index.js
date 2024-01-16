@@ -18,12 +18,18 @@ import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 import { parse } from '@wordpress/blocks';
 import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { DataViews } from '@wordpress/dataviews';
+import {
+	DataViews,
+	sortByTextFields,
+	getPaginationResults,
+} from '@wordpress/dataviews';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -46,6 +52,7 @@ import {
 	deleteTemplateAction,
 	renameTemplateAction,
 } from './template-actions';
+import { postRevisionsAction } from '../actions';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import PostPreview from '../post-preview';
@@ -53,11 +60,14 @@ import PostPreview from '../post-preview';
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
+const { useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
 const defaultConfigPerViewType = {
-	[ LAYOUT_TABLE ]: {},
+	[ LAYOUT_TABLE ]: {
+		primaryField: 'title',
+	},
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
@@ -76,7 +86,7 @@ const DEFAULT_VIEW = {
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'preview' ],
-	layout: {},
+	layout: defaultConfigPerViewType[ LAYOUT_TABLE ],
 	filters: [],
 };
 
@@ -84,19 +94,18 @@ function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
 }
 
-function TemplateTitle( { item, view } ) {
-	if ( view.type === LAYOUT_LIST ) {
+function TemplateTitle( { item, viewType } ) {
+	if ( viewType === LAYOUT_LIST ) {
 		return (
 			<>
-				{ decodeEntities( item.title?.rendered || item.slug ) ||
-					__( '(no title)' ) }
+				{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
 			</>
 		);
 	}
 
 	return (
 		<VStack spacing={ 1 }>
-			<View as="span" className="edit-site-list-title__customized-info">
+			<View as="span" className="dataviews-view-grid__title-field">
 				<Link
 					params={ {
 						postId: item.id,
@@ -104,7 +113,7 @@ function TemplateTitle( { item, view } ) {
 						canvas: 'edit',
 					} }
 				>
-					{ decodeEntities( item.title?.rendered || item.slug ) ||
+					{ decodeEntities( item.title?.rendered ) ||
 						__( '(no title)' ) }
 				</Link>
 			</View>
@@ -112,9 +121,9 @@ function TemplateTitle( { item, view } ) {
 	);
 }
 
-function AuthorField( { item, view } ) {
+function AuthorField( { item, viewType } ) {
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
-	const withIcon = view.type !== LAYOUT_LIST;
+	const withIcon = viewType !== LAYOUT_LIST;
 
 	return (
 		<HStack alignment="left" spacing={ 1 }>
@@ -164,9 +173,13 @@ export default function DataviewsTemplates() {
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
+	const history = useHistory();
 
-	const onSelectionChange = ( items ) =>
-		setTemplateId( items?.length === 1 ? items[ 0 ].id : null );
+	const onSelectionChange = useCallback(
+		( items ) =>
+			setTemplateId( items?.length === 1 ? items[ 0 ].id : null ),
+		[ setTemplateId ]
+	);
 
 	const authors = useMemo( () => {
 		if ( ! allTemplates ) {
@@ -202,9 +215,9 @@ export default function DataviewsTemplates() {
 			{
 				header: __( 'Template' ),
 				id: 'title',
-				getValue: ( { item } ) => item.title?.rendered || item.slug,
+				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => (
-					<TemplateTitle item={ item } view={ view } />
+					<TemplateTitle item={ item } viewType={ view.type } />
 				),
 				maxWidth: 400,
 				enableHiding: false,
@@ -235,20 +248,20 @@ export default function DataviewsTemplates() {
 				id: 'author',
 				getValue: ( { item } ) => item.author_text,
 				render: ( { item } ) => {
-					return <AuthorField view={ view } item={ item } />;
+					return <AuthorField viewType={ view.type } item={ item } />;
 				},
 				enableHiding: false,
 				type: ENUMERATION_TYPE,
 				elements: authors,
 			},
 		],
-		[ authors, view ]
+		[ authors, view.type ]
 	);
 
-	const { shownTemplates, paginationInfo } = useMemo( () => {
+	const { data, paginationInfo } = useMemo( () => {
 		if ( ! allTemplates ) {
 			return {
-				shownTemplates: EMPTY_ARRAY,
+				data: EMPTY_ARRAY,
 				paginationInfo: { totalItems: 0, totalPages: 0 },
 			};
 		}
@@ -294,36 +307,18 @@ export default function DataviewsTemplates() {
 
 		// Handle sorting.
 		if ( view.sort ) {
-			const stringSortingFields = [ 'title', 'author' ];
-			const fieldId = view.sort.field;
-			if ( stringSortingFields.includes( fieldId ) ) {
-				const fieldToSort = fields.find( ( field ) => {
-					return field.id === fieldId;
-				} );
-				filteredTemplates.sort( ( a, b ) => {
-					const valueA = fieldToSort.getValue( { item: a } ) ?? '';
-					const valueB = fieldToSort.getValue( { item: b } ) ?? '';
-					return view.sort.direction === 'asc'
-						? valueA.localeCompare( valueB )
-						: valueB.localeCompare( valueA );
-				} );
-			}
+			filteredTemplates = sortByTextFields( {
+				data: filteredTemplates,
+				view,
+				fields,
+				textFields: [ 'title' ],
+			} );
 		}
-
 		// Handle pagination.
-		const start = ( view.page - 1 ) * view.perPage;
-		const totalItems = filteredTemplates?.length || 0;
-		filteredTemplates = filteredTemplates?.slice(
-			start,
-			start + view.perPage
-		);
-		return {
-			shownTemplates: filteredTemplates,
-			paginationInfo: {
-				totalItems,
-				totalPages: Math.ceil( totalItems / view.perPage ),
-			},
-		};
+		return getPaginationResults( {
+			data: filteredTemplates,
+			view,
+		} );
 	}, [ allTemplates, view, fields ] );
 
 	const resetTemplateAction = useResetTemplateAction();
@@ -332,28 +327,27 @@ export default function DataviewsTemplates() {
 			resetTemplateAction,
 			deleteTemplateAction,
 			renameTemplateAction,
+			postRevisionsAction,
 		],
 		[ resetTemplateAction ]
 	);
+
 	const onChangeView = useCallback(
-		( viewUpdater ) => {
-			let updatedView =
-				typeof viewUpdater === 'function'
-					? viewUpdater( view )
-					: viewUpdater;
-			if ( updatedView.type !== view.type ) {
-				updatedView = {
-					...updatedView,
+		( newView ) => {
+			if ( newView.type !== view.type ) {
+				newView = {
+					...newView,
 					layout: {
-						...defaultConfigPerViewType[ updatedView.type ],
+						...defaultConfigPerViewType[ newView.type ],
 					},
 				};
 			}
 
-			setView( updatedView );
+			setView( newView );
 		},
-		[ view, setView ]
+		[ view.type, setView ]
 	);
+
 	return (
 		<>
 			<Page
@@ -375,8 +369,7 @@ export default function DataviewsTemplates() {
 					paginationInfo={ paginationInfo }
 					fields={ fields }
 					actions={ actions }
-					data={ shownTemplates }
-					getItemId={ ( item ) => item.id }
+					data={ data }
 					isLoading={ isLoadingData }
 					view={ view }
 					onChangeView={ onChangeView }
@@ -388,7 +381,28 @@ export default function DataviewsTemplates() {
 			</Page>
 			{ view.type === LAYOUT_LIST && (
 				<Page>
-					<div className="edit-site-template-pages-preview">
+					<div
+						className="edit-site-template-pages-preview"
+						tabIndex={ 0 }
+						role="button"
+						onKeyDown={ ( event ) => {
+							const { keyCode } = event;
+							if ( keyCode === ENTER || keyCode === SPACE ) {
+								history.push( {
+									postId: templateId,
+									postType: TEMPLATE_POST_TYPE,
+									canvas: 'edit',
+								} );
+							}
+						} }
+						onClick={ () =>
+							history.push( {
+								postId: templateId,
+								postType: TEMPLATE_POST_TYPE,
+								canvas: 'edit',
+							} )
+						}
+					>
 						{ templateId !== null ? (
 							<PostPreview
 								postId={ templateId }

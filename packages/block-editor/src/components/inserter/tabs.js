@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -33,23 +32,13 @@ function InserterTabs( {
 	showPatterns = false,
 	showMedia = false,
 	onSelect,
-	prioritizePatterns,
 	tabsContents,
 } ) {
-	const tabs = useMemo( () => {
-		const tempTabs = [];
-		if ( prioritizePatterns && showPatterns ) {
-			tempTabs.push( patternsTab );
-		}
-		tempTabs.push( blocksTab );
-		if ( ! prioritizePatterns && showPatterns ) {
-			tempTabs.push( patternsTab );
-		}
-		if ( showMedia ) {
-			tempTabs.push( mediaTab );
-		}
-		return tempTabs;
-	}, [ prioritizePatterns, showPatterns, showMedia ] );
+	const tabs = [
+		blocksTab,
+		showPatterns && patternsTab,
+		showMedia && mediaTab,
+	].filter( Boolean );
 
 	return (
 		<div className="block-editor-inserter__tabs">

@@ -15,6 +15,11 @@
 	// Use position relative for row animation.
 	position: relative;
 
+	&.is-draggable,
+	&.is-draggable .block-editor-list-view-block-contents {
+		cursor: grab;
+	}
+
 	.block-editor-list-view-block-select-button {
 		// When a row is expanded, retain the dark color.
 		&[aria-expanded="true"] {
@@ -378,6 +383,7 @@
 	height: $icon-size;
 	margin-left: $grid-unit-05;
 	width: $icon-size;
+	cursor: pointer;
 }
 
 // First level of indentation is aria-level 2, max indent is 8.

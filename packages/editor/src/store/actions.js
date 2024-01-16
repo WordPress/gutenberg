@@ -624,7 +624,7 @@ export const toggleEditorPanelEnabled =
 		const inactivePanels =
 			registry
 				.select( preferencesStore )
-				.get( 'core/edit-post', 'inactivePanels' ) ?? [];
+				.get( 'core', 'inactivePanels' ) ?? [];
 
 		const isPanelInactive = !! inactivePanels?.includes( panelName );
 
@@ -641,7 +641,7 @@ export const toggleEditorPanelEnabled =
 
 		registry
 			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'inactivePanels', updatedInactivePanels );
+			.set( 'core', 'inactivePanels', updatedInactivePanels );
 	};
 
 /**
@@ -653,9 +653,8 @@ export const toggleEditorPanelOpened =
 	( panelName ) =>
 	( { registry } ) => {
 		const openPanels =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'openPanels' ) ?? [];
+			registry.select( preferencesStore ).get( 'core', 'openPanels' ) ??
+			[];
 
 		const isPanelOpen = !! openPanels?.includes( panelName );
 
@@ -672,7 +671,7 @@ export const toggleEditorPanelOpened =
 
 		registry
 			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'openPanels', updatedOpenPanels );
+			.set( 'core', 'openPanels', updatedOpenPanels );
 	};
 
 /**
@@ -686,6 +685,38 @@ export function removeEditorPanel( panelName ) {
 	return {
 		type: 'REMOVE_PANEL',
 		panelName,
+	};
+}
+
+/**
+ * Returns an action object used to open/close the inserter.
+ *
+ * @param {boolean|Object} value                Whether the inserter should be
+ *                                              opened (true) or closed (false).
+ *                                              To specify an insertion point,
+ *                                              use an object.
+ * @param {string}         value.rootClientId   The root client ID to insert at.
+ * @param {number}         value.insertionIndex The index to insert at.
+ *
+ * @return {Object} Action object.
+ */
+export function setIsInserterOpened( value ) {
+	return {
+		type: 'SET_IS_INSERTER_OPENED',
+		value,
+	};
+}
+
+/**
+ * Returns an action object used to open/close the list view.
+ *
+ * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
+ * @return {Object} Action object.
+ */
+export function setIsListViewOpened( isOpen ) {
+	return {
+		type: 'SET_IS_LIST_VIEW_OPENED',
+		isOpen,
 	};
 }
 

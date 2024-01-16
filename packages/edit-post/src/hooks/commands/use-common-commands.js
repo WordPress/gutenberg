@@ -32,7 +32,6 @@ export default function useCommonCommands() {
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		switchEditorMode,
-		setIsListViewOpened,
 		toggleDistractionFree,
 	} = useDispatch( editPostStore );
 	const { openModal } = useDispatch( interfaceStore );
@@ -44,8 +43,9 @@ export default function useCommonCommands() {
 		showBlockBreadcrumbs,
 		isDistractionFree,
 	} = useSelect( ( select ) => {
-		const { getEditorMode, isListViewOpened, isFeatureActive } =
-			select( editPostStore );
+		const { get } = select( preferencesStore );
+		const { getEditorMode } = select( editPostStore );
+		const { isListViewOpened } = select( editorStore );
 		return {
 			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
 				editPostStore.name
@@ -54,16 +54,14 @@ export default function useCommonCommands() {
 			isListViewOpen: isListViewOpened(),
 			isPublishSidebarEnabled:
 				select( editorStore ).isPublishSidebarEnabled(),
-			showBlockBreadcrumbs: isFeatureActive( 'showBlockBreadcrumbs' ),
-			isDistractionFree: select( preferencesStore ).get(
-				editPostStore.name,
-				'distractionFree'
-			),
+			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
+			isDistractionFree: get( 'core', 'distractionFree' ),
 		};
 	}, [] );
 	const { toggle } = useDispatch( preferencesStore );
 	const { createInfoNotice } = useDispatch( noticesStore );
-	const { __unstableSaveForPreview } = useDispatch( editorStore );
+	const { __unstableSaveForPreview, setIsListViewOpened } =
+		useDispatch( editorStore );
 	const { getCurrentPostId } = useSelect( editorStore );
 
 	useCommand( {
@@ -107,7 +105,7 @@ export default function useCommonCommands() {
 		name: 'core/toggle-spotlight-mode',
 		label: __( 'Toggle spotlight mode' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'focusMode' );
+			toggle( 'core', 'focusMode' );
 			close();
 		},
 	} );
@@ -136,7 +134,7 @@ export default function useCommonCommands() {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'fixedToolbar' );
+			toggle( 'core', 'fixedToolbar' );
 			if ( isDistractionFree ) {
 				toggleDistractionFree();
 			}
@@ -177,7 +175,7 @@ export default function useCommonCommands() {
 			? __( 'Hide block breadcrumbs' )
 			: __( 'Show block breadcrumbs' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'showBlockBreadcrumbs' );
+			toggle( 'core', 'showBlockBreadcrumbs' );
 			close();
 			createInfoNotice(
 				showBlockBreadcrumbs
@@ -194,16 +192,16 @@ export default function useCommonCommands() {
 	useCommand( {
 		name: 'core/toggle-publish-sidebar',
 		label: isPublishSidebarEnabled
-			? __( 'Disable pre-publish checklist' )
-			: __( 'Enable pre-publish checklist' ),
+			? __( 'Disable pre-publish checks' )
+			: __( 'Enable pre-publish checks' ),
 		icon: formatListBullets,
 		callback: ( { close } ) => {
 			close();
 			toggle( 'core/edit-post', 'isPublishSidebarEnabled' );
 			createInfoNotice(
 				isPublishSidebarEnabled
-					? __( 'Pre-publish checklist off.' )
-					: __( 'Pre-publish checklist on.' ),
+					? __( 'Pre-publish checks disabled.' )
+					: __( 'Pre-publish checks enabled.' ),
 				{
 					id: 'core/edit-post/publish-sidebar/notice',
 					type: 'snackbar',

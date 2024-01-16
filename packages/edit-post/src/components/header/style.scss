@@ -69,7 +69,7 @@
 			margin-left: $grid-unit;
 		}
 
-		// Modified group borders
+		// Modified group borders.
 		.components-toolbar-group,
 		.components-toolbar {
 			border-right: none;
@@ -174,7 +174,7 @@
 	.components-menu-items-choice .components-menu-items__item-icon.components-menu-items__item-icon {
 		display: block;
 	}
-	.edit-post-header-toolbar__inserter-toggle.edit-post-header-toolbar__inserter-toggle,
+	.editor-document-tools__inserter-toggle.editor-document-tools__inserter-toggle,
 	.interface-pinned-items .components-button {
 		padding-left: $grid-unit;
 		padding-right: $grid-unit;
@@ -194,17 +194,26 @@
 }
 
 .show-icon-labels {
-
 	.edit-post-header__toolbar .block-editor-block-mover {
+		// Modified group borders.
 		border-left: none;
 
 		&::before {
 			content: "";
 			width: $border-width;
-			margin-top: $grid-unit + $grid-unit-05;
-			margin-bottom: $grid-unit + $grid-unit-05;
+			margin-top: $grid-unit-15;
+			margin-bottom: $grid-unit-15;
 			background-color: $gray-300;
 			margin-left: $grid-unit;
+		}
+
+		// Modified block movers horizontal separator.
+		.block-editor-block-mover__move-button-container {
+			&::before {
+				width: calc(100% - #{$grid-unit-30});
+				background: $gray-300;
+				left: calc(50% + 1px);
+			}
 		}
 	}
 }
@@ -275,8 +284,8 @@
 			visibility: hidden;
 		}
 
-		& > .edit-post-header__toolbar .edit-post-header-toolbar__inserter-toggle,
-		& > .edit-post-header__toolbar .edit-post-header-toolbar__document-overview-toggle,
+		& > .edit-post-header__toolbar .editor-document-tools__inserter-toggle,
+		& > .edit-post-header__toolbar .editor-document-tools__document-overview-toggle,
 		& > .edit-post-header__settings > .editor-preview-dropdown,
 		& > .edit-post-header__settings > .interface-pinned-items {
 			display: none;

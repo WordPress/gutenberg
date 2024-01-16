@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as viewportStore } from '@wordpress/viewport';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -108,31 +109,38 @@ function ComplementaryArea( {
 	title,
 	toggleShortcut,
 	isActiveByDefault,
-	showIconLabels = false,
 } ) {
-	const { isLoading, isActive, isPinned, activeArea, isSmall, isLarge } =
-		useSelect(
-			( select ) => {
-				const {
-					getActiveComplementaryArea,
-					isComplementaryAreaLoading,
-					isItemPinned,
-				} = select( interfaceStore );
+	const {
+		isLoading,
+		isActive,
+		isPinned,
+		activeArea,
+		isSmall,
+		isLarge,
+		showIconLabels,
+	} = useSelect(
+		( select ) => {
+			const {
+				getActiveComplementaryArea,
+				isComplementaryAreaLoading,
+				isItemPinned,
+			} = select( interfaceStore );
+			const { get } = select( preferencesStore );
 
-				const _activeArea = getActiveComplementaryArea( scope );
+			const _activeArea = getActiveComplementaryArea( scope );
 
-				return {
-					isLoading: isComplementaryAreaLoading( scope ),
-					isActive: _activeArea === identifier,
-					isPinned: isItemPinned( scope, identifier ),
-					activeArea: _activeArea,
-					isSmall:
-						select( viewportStore ).isViewportMatch( '< medium' ),
-					isLarge: select( viewportStore ).isViewportMatch( 'large' ),
-				};
-			},
-			[ identifier, scope ]
-		);
+			return {
+				isLoading: isComplementaryAreaLoading( scope ),
+				isActive: _activeArea === identifier,
+				isPinned: isItemPinned( scope, identifier ),
+				activeArea: _activeArea,
+				isSmall: select( viewportStore ).isViewportMatch( '< medium' ),
+				isLarge: select( viewportStore ).isViewportMatch( 'large' ),
+				showIconLabels: get( 'core', 'showIconLabels' ),
+			};
+		},
+		[ identifier, scope ]
+	);
 	useAdjustComplementaryListener(
 		scope,
 		identifier,

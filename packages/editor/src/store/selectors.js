@@ -1152,7 +1152,7 @@ export const isEditorPanelEnabled = createRegistrySelector(
 		// For backward compatibility, we check edit-post
 		// even though now this is in "editor" package.
 		const inactivePanels = select( preferencesStore ).get(
-			'core/edit-post',
+			'core',
 			'inactivePanels'
 		);
 		return (
@@ -1176,7 +1176,7 @@ export const isEditorPanelOpened = createRegistrySelector(
 		// For backward compatibility, we check edit-post
 		// even though now this is in "editor" package.
 		const openPanels = select( preferencesStore ).get(
-			'core/edit-post',
+			'core',
 			'openPanels'
 		);
 		return !! openPanels?.includes( panelName );
@@ -1277,6 +1277,28 @@ export function getRenderingMode( state ) {
  */
 export function getDeviceType( state ) {
 	return state.deviceType;
+}
+
+/**
+ * Returns true if the list view is opened.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the list view is opened.
+ */
+export function isListViewOpened( state ) {
+	return state.listViewPanel;
+}
+
+/**
+ * Returns true if the inserter is opened.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the inserter is opened.
+ */
+export function isInserterOpened( state ) {
+	return !! state.blockInserterPanel;
 }
 
 /*

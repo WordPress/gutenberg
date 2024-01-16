@@ -9,17 +9,16 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { BaseControl } from '../base-control';
-import Button from '../button';
-import { FlexItem, FlexBlock } from '../flex';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import AxialInputControls from './axial-input-controls';
-import BoxControlIcon from './icon';
 import LinkedButton from './linked-button';
+import { Grid } from '../grid';
 import {
-	Root,
-	Header,
-	HeaderControlWrapper,
+	FlexedBoxControlIcon,
+	InputWrapper,
+	ResetButton,
+	LinkedButtonWrapper,
 } from './styles/box-control-styles';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
@@ -155,57 +154,49 @@ function BoxControl( {
 	};
 
 	return (
-		<Root id={ id } role="group" aria-labelledby={ headingId }>
-			<Header className="component-box-control__header">
-				<FlexItem>
-					<BaseControl.VisualLabel id={ headingId }>
-						{ label }
-					</BaseControl.VisualLabel>
-				</FlexItem>
-				{ allowReset && (
-					<FlexItem>
-						<Button
-							className="component-box-control__reset-button"
-							variant="secondary"
-							size="small"
-							onClick={ handleOnReset }
-							disabled={ ! isDirty }
-						>
-							{ __( 'Reset' ) }
-						</Button>
-					</FlexItem>
-				) }
-			</Header>
-			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
-				<FlexItem>
-					<BoxControlIcon side={ side } sides={ sides } />
-				</FlexItem>
-				{ isLinked && (
-					<FlexBlock>
-						<AllInputControl
-							aria-label={ label }
-							{ ...inputControlProps }
-						/>
-					</FlexBlock>
-				) }
-				{ ! isLinked && splitOnAxis && (
-					<FlexBlock>
-						<AxialInputControls { ...inputControlProps } />
-					</FlexBlock>
-				) }
-				{ ! hasOneSide && (
-					<FlexItem>
-						<LinkedButton
-							onClick={ toggleLinked }
-							isLinked={ isLinked }
-						/>
-					</FlexItem>
-				) }
-			</HeaderControlWrapper>
+		<Grid
+			id={ id }
+			columns={ 3 }
+			templateColumns="1fr min-content min-content"
+			role="group"
+			aria-labelledby={ headingId }
+		>
+			<BaseControl.VisualLabel id={ headingId }>
+				{ label }
+			</BaseControl.VisualLabel>
+			{ isLinked && (
+				<InputWrapper>
+					<FlexedBoxControlIcon side={ side } sides={ sides } />
+					<AllInputControl { ...inputControlProps } />
+				</InputWrapper>
+			) }
+			{ ! hasOneSide && (
+				<LinkedButtonWrapper>
+					<LinkedButton
+						onClick={ toggleLinked }
+						isLinked={ isLinked }
+					/>
+				</LinkedButtonWrapper>
+			) }
+
+			{ ! isLinked && splitOnAxis && (
+				<AxialInputControls { ...inputControlProps } />
+			) }
 			{ ! isLinked && ! splitOnAxis && (
 				<InputControls { ...inputControlProps } />
 			) }
-		</Root>
+			{ allowReset && (
+				<ResetButton
+					className="component-box-control__reset-button"
+					variant="secondary"
+					size="small"
+					onClick={ handleOnReset }
+					disabled={ ! isDirty }
+				>
+					{ __( 'Reset' ) }
+				</ResetButton>
+			) }
+		</Grid>
 	);
 }
 

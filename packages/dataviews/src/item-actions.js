@@ -17,10 +17,11 @@ import { moreVertical } from '@wordpress/icons';
 import { unlock } from './lock-unlock';
 
 const {
-	DropdownMenuV2Ariakit: DropdownMenu,
-	DropdownMenuGroupV2Ariakit: DropdownMenuGroup,
-	DropdownMenuItemV2Ariakit: DropdownMenuItem,
-	DropdownMenuItemLabelV2Ariakit: DropdownMenuItemLabel,
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuGroupV2: DropdownMenuGroup,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	kebabCase,
 } = unlock( componentsPrivateApis );
 
 function ButtonTrigger( { action, onClick } ) {
@@ -58,15 +59,17 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 			<ActionTrigger { ...actionTriggerProps } />
 			{ isModalOpen && (
 				<Modal
-					title={ ! hideModalHeader && action.label }
+					title={ action.modalHeader || action.label }
 					__experimentalHideHeader={ !! hideModalHeader }
 					onRequestClose={ () => {
 						setIsModalOpen( false );
 					} }
-					overlayClassName="dataviews-action-modal"
+					overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
+						action.id
+					) }` }
 				>
 					<RenderModal
-						item={ item }
+						items={ [ item ] }
 						closeModal={ () => setIsModalOpen( false ) }
 					/>
 				</Modal>
@@ -93,7 +96,7 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 					<DropdownMenuItemTrigger
 						key={ action.id }
 						action={ action }
-						onClick={ () => action.callback( item ) }
+						onClick={ () => action.callback( [ item ] ) }
 					/>
 				);
 			} ) }
@@ -120,9 +123,6 @@ export default function ItemActions( { item, actions, isCompact } ) {
 			{ primaryActions: [], secondaryActions: [] }
 		);
 	}, [ actions, item ] );
-	if ( ! primaryActions.length && ! secondaryActions.length ) {
-		return null;
-	}
 	if ( isCompact ) {
 		return (
 			<CompactItemActions
@@ -157,27 +157,26 @@ export default function ItemActions( { item, actions, isCompact } ) {
 						<ButtonTrigger
 							key={ action.id }
 							action={ action }
-							onClick={ () => action.callback( item ) }
+							onClick={ () => action.callback( [ item ] ) }
 						/>
 					);
 				} ) }
-			{ !! secondaryActions.length && (
-				<DropdownMenu
-					trigger={
-						<Button
-							size="compact"
-							icon={ moreVertical }
-							label={ __( 'Actions' ) }
-						/>
-					}
-					placement="bottom-end"
-				>
-					<ActionsDropdownMenuGroup
-						actions={ secondaryActions }
-						item={ item }
+			<DropdownMenu
+				trigger={
+					<Button
+						size="compact"
+						icon={ moreVertical }
+						label={ __( 'Actions' ) }
+						disabled={ ! secondaryActions.length }
 					/>
-				</DropdownMenu>
-			) }
+				}
+				placement="bottom-end"
+			>
+				<ActionsDropdownMenuGroup
+					actions={ secondaryActions }
+					item={ item }
+				/>
+			</DropdownMenu>
 		</HStack>
 	);
 }
@@ -190,6 +189,9 @@ function CompactItemActions( { item, primaryActions, secondaryActions } ) {
 					size="compact"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
+					disabled={
+						! primaryActions.length && ! secondaryActions.length
+					}
 				/>
 			}
 			placement="bottom-end"

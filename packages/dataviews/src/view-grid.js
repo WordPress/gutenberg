@@ -42,12 +42,12 @@ export default function ViewGrid( {
 			gap={ 8 }
 			columns={ 2 }
 			alignment="top"
-			className="dataviews-grid-view"
+			className="dataviews-view-grid"
 		>
-			{ usedData.map( ( item, index ) => (
+			{ usedData.map( ( item ) => (
 				<VStack
 					spacing={ 3 }
-					key={ getItemId?.( item ) || index }
+					key={ getItemId( item ) }
 					className="dataviews-view-grid__card"
 				>
 					<div className="dataviews-view-grid__media">
@@ -87,7 +87,7 @@ export default function ViewGrid( {
 										{ field.header }
 									</div>
 									<div className="dataviews-view-grid__field-value">
-										{ field.render( { item } ) }
+										{ renderedValue }
 									</div>
 								</VStack>
 							);

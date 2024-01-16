@@ -4,6 +4,7 @@
 import {
 	__experimentalView as View,
 	__experimentalVStack as VStack,
+	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
@@ -13,13 +14,17 @@ import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import Page from '../page';
 import Link from '../routes/link';
-import { default as DEFAULT_VIEWS } from '../sidebar-dataviews/default-views';
+import {
+	DEFAULT_VIEWS,
+	DEFAULT_CONFIG_PER_VIEW_TYPE,
+} from '../sidebar-dataviews/default-views';
 import {
 	ENUMERATION_TYPE,
 	LAYOUT_GRID,
@@ -38,22 +43,12 @@ import {
 	useEditPostAction,
 } from '../actions';
 import PostPreview from '../post-preview';
+import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
-const { useLocation } = unlock( routerPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
-const defaultConfigPerViewType = {
-	[ LAYOUT_TABLE ]: {},
-	[ LAYOUT_GRID ]: {
-		mediaField: 'featured-image',
-		primaryField: 'title',
-	},
-	[ LAYOUT_LIST ]: {
-		primaryField: 'title',
-		mediaField: 'featured-image',
-	},
-};
 
 function useView( type ) {
 	const {
@@ -130,9 +125,24 @@ export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
 	const [ pageId, setPageId ] = useState( null );
+	const history = useHistory();
 
-	const onSelectionChange = ( items ) =>
-		setPageId( items?.length === 1 ? items[ 0 ].id : null );
+	const onSelectionChange = useCallback(
+		( items ) => setPageId( items?.length === 1 ? items[ 0 ].id : null ),
+		[ setPageId ]
+	);
+
+	const onDetailsChange = useCallback(
+		( items ) => {
+			if ( !! postType && items?.length === 1 ) {
+				history.push( {
+					postId: items[ 0 ].id,
+					postType,
+				} );
+			}
+		},
+		[ history, postType ]
+	);
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -212,13 +222,13 @@ export default function PagePages() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
-				getValue: ( { item } ) => item.title?.rendered || item.slug,
+				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => {
 					return (
 						<VStack spacing={ 1 }>
 							<View
 								as="span"
-								className="edit-site-page-pages__list-view-title-field"
+								className="dataviews-view-grid__title-field"
 							>
 								{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
 									view.type
@@ -231,13 +241,12 @@ export default function PagePages() {
 										} }
 									>
 										{ decodeEntities(
-											item.title?.rendered || item.slug
+											item.title?.rendered
 										) || __( '(no title)' ) }
 									</Link>
 								) : (
-									decodeEntities(
-										item.title?.rendered || item.slug
-									) || __( '(no title)' )
+									decodeEntities( item.title?.rendered ) ||
+									__( '(no title)' )
 								) }
 							</View>
 						</VStack>
@@ -283,7 +292,7 @@ export default function PagePages() {
 				},
 			},
 		],
-		[ authors, view ]
+		[ authors, view.type ]
 	);
 
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
@@ -301,23 +310,42 @@ export default function PagePages() {
 		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]
 	);
 	const onChangeView = useCallback(
-		( viewUpdater ) => {
-			let updatedView =
-				typeof viewUpdater === 'function'
-					? viewUpdater( view )
-					: viewUpdater;
-			if ( updatedView.type !== view.type ) {
-				updatedView = {
-					...updatedView,
+		( newView ) => {
+			if ( newView.type !== view.type ) {
+				newView = {
+					...newView,
 					layout: {
-						...defaultConfigPerViewType[ updatedView.type ],
+						...DEFAULT_CONFIG_PER_VIEW_TYPE[ newView.type ],
 					},
 				};
 			}
 
-			setView( updatedView );
+			setView( newView );
 		},
-		[ view, setView ]
+		[ view.type, setView ]
+	);
+
+	const [ showAddPageModal, setShowAddPageModal ] = useState( false );
+	const openModal = useCallback( () => {
+		if ( ! showAddPageModal ) {
+			setShowAddPageModal( true );
+		}
+	}, [ showAddPageModal ] );
+	const closeModal = useCallback( () => {
+		if ( showAddPageModal ) {
+			setShowAddPageModal( false );
+		}
+	}, [ showAddPageModal ] );
+	const handleNewPage = useCallback(
+		( { type, id } ) => {
+			history.push( {
+				postId: id,
+				postType: type,
+				canvas: 'edit',
+			} );
+			closeModal();
+		},
+		[ history ]
 	);
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
@@ -330,23 +358,56 @@ export default function PagePages() {
 						: null
 				}
 				title={ __( 'Pages' ) }
+				actions={
+					<>
+						<Button variant="primary" onClick={ openModal }>
+							{ __( 'Add new page' ) }
+						</Button>
+						{ showAddPageModal && (
+							<AddNewPageModal
+								onSave={ handleNewPage }
+								onClose={ closeModal }
+							/>
+						) }
+					</>
+				}
 			>
 				<DataViews
 					paginationInfo={ paginationInfo }
 					fields={ fields }
 					actions={ actions }
 					data={ pages || EMPTY_ARRAY }
-					getItemId={ ( item ) => item.id }
 					isLoading={ isLoadingPages || isLoadingAuthors }
 					view={ view }
 					onChangeView={ onChangeView }
 					onSelectionChange={ onSelectionChange }
-					deferredRendering={ false }
+					onDetailsChange={ onDetailsChange }
 				/>
 			</Page>
 			{ view.type === LAYOUT_LIST && (
 				<Page>
-					<div className="edit-site-page-pages-preview">
+					<div
+						className="edit-site-page-pages-preview"
+						tabIndex={ 0 }
+						role="button"
+						onKeyDown={ ( event ) => {
+							const { keyCode } = event;
+							if ( keyCode === ENTER || keyCode === SPACE ) {
+								history.push( {
+									postId: pageId,
+									postType,
+									canvas: 'edit',
+								} );
+							}
+						} }
+						onClick={ () =>
+							history.push( {
+								postId: pageId,
+								postType,
+								canvas: 'edit',
+							} )
+						}
+					>
 						{ pageId !== null ? (
 							<PostPreview
 								postId={ pageId }

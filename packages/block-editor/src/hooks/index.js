@@ -23,9 +23,8 @@ import border from './border';
 import position from './position';
 import layout from './layout';
 import childLayout from './layout-child';
-import './content-lock-ui';
+import contentLockUI from './content-lock-ui';
 import './metadata';
-import customFields from './custom-fields';
 import blockHooks from './block-hooks';
 import blockRenaming from './block-renaming';
 
@@ -38,7 +37,7 @@ createBlockEditFilter(
 		duotone,
 		position,
 		layout,
-		window.__experimentalConnections ? customFields : null,
+		contentLockUI,
 		blockHooks,
 		blockRenaming,
 	].filter( Boolean )

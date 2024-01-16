@@ -42,15 +42,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @see https://developer.wordpress.org/reference/functions/register_block_type/
  */
 function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
-	register_block_type( __DIR__ . '/build' );
-
-	if (function_exists('gutenberg_register_module')) {
-		gutenberg_register_module(
-			'{{namespace}}-view',
-			plugin_dir_url( __FILE__ ) . 'src/view.js',
-			array( '@wordpress/interactivity' ),
-			'{{version}}'
-		);
-	}
+	register_block_type_from_metadata( __DIR__ . '/build' );
 }
 add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );

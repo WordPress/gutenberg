@@ -11,8 +11,9 @@
  *
  * @param WP_Directive_Processor $tags Tags.
  * @param WP_Directive_Context   $context Directive context.
+ * @param string                 $ns Namespace.
  */
-function gutenberg_interactivity_process_wp_text( $tags, $context ) {
+function gutenberg_interactivity_process_wp_text( $tags, $context, $ns ) {
 	if ( $tags->is_tag_closer() ) {
 		return;
 	}
@@ -22,6 +23,6 @@ function gutenberg_interactivity_process_wp_text( $tags, $context ) {
 		return;
 	}
 
-	$text = gutenberg_interactivity_evaluate_reference( $value, $context->get_context() );
+	$text = gutenberg_interactivity_evaluate_reference( $value, $ns, $context->get_context() );
 	$tags->set_inner_html( esc_html( $text ) );
 }

@@ -107,8 +107,11 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeShowEditorHelp: jest.fn(),
 		subscribeOnUndoPressed: jest.fn(),
 		subscribeOnRedoPressed: jest.fn(),
-		useIsConnected: jest.fn( () => ( { isConnected: true } ) ),
+		subscribeConnectionStatus: jest.fn( () => ( { remove: jest.fn() } ) ),
+		requestConnectionStatus: jest.fn( ( callback ) => callback( true ) ),
 		editorDidMount: jest.fn(),
+		showAndroidSoftKeyboard: jest.fn(),
+		hideAndroidSoftKeyboard: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
 		subscribeMediaSave: jest.fn(),
@@ -280,3 +283,9 @@ jest.mock( '@wordpress/compose', () => {
 jest.spyOn( Image, 'getSize' ).mockImplementation( ( url, success ) =>
 	success( 0, 0 )
 );
+
+jest.mock( 'react-native/Libraries/Utilities/BackHandler', () => {
+	return jest.requireActual(
+		'react-native/Libraries/Utilities/__mocks__/BackHandler.js'
+	);
+} );

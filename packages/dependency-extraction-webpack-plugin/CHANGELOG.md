@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Drop support for webpack 4.
+-   Drop support for Node.js versions < 18.
+
+### New Features
+
+-   Add support for producing module-compatible asset files ([#57199](https://github.com/WordPress/gutenberg/pull/57199)).
+
 ## 4.31.0 (2023-12-13)
 
 ## 4.30.0 (2023-11-29)
@@ -140,6 +149,6 @@
 
 ## 1.0.0 (2019-05-21)
 
-### New Feature
+### New Features
 
 -   Introduce the `@wordpress/dependency-extraction-webpack-plugin` package.

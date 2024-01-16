@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
@@ -188,7 +188,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		layout = null,
 		__unstableLayoutClassNames: layoutClassNames = '',
 	} = useBlockEditContext();
-	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const {
 		__experimentalCaptureToolbars,
 		hasOverlay,
@@ -219,7 +218,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const enableClickThrough =
-				__unstableGetEditorMode() === 'navigation' || isSmallScreen;
+				__unstableGetEditorMode() === 'navigation';
 			const blockEditingMode = getBlockEditingMode( clientId );
 			const _parentClientId = getBlockRootClientId( clientId );
 			return {
@@ -244,7 +243,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 					__unstableIsWithinBlockOverlay( clientId ),
 			};
 		},
-		[ clientId, isSmallScreen ]
+		[ clientId ]
 	);
 
 	const blockDropZoneRef = useBlockDropZone( {

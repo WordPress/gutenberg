@@ -60,13 +60,26 @@ export default function SaveButton( {
 	const getLabel = () => {
 		if ( isPreviewingTheme() ) {
 			if ( isSaving ) {
-				return sprintf( 'Activating %s', previewingThemeName );
+				return sprintf(
+					/* translators: %s: The name of theme to be activated. */
+					__( 'Activating %s' ),
+					previewingThemeName
+				);
 			} else if ( disabled ) {
 				return __( 'Saved' );
 			} else if ( isDirty ) {
-				return sprintf( 'Activate %s & Save', previewingThemeName );
+				return sprintf(
+					/* translators: %s: The name of theme to be activated. */
+					__( 'Activate %s & Save' ),
+					previewingThemeName
+				);
 			}
-			return sprintf( 'Activate %s', previewingThemeName );
+
+			return sprintf(
+				/* translators: %s: The name of theme to be activated. */
+				__( 'Activate %s' ),
+				previewingThemeName
+			);
 		}
 
 		if ( isSaving ) {

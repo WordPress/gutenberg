@@ -24,6 +24,9 @@ const EMPTY_CONFIG = { settings: {}, styles: {} };
 const VALID_SETTINGS = [
 	'appearanceTools',
 	'useRootPaddingAwareAlignments',
+	'background.backgroundImage',
+	'background.backgroundRepeat',
+	'background.backgroundSize',
 	'border.color',
 	'border.radius',
 	'border.style',
@@ -63,6 +66,7 @@ const VALID_SETTINGS = [
 	'spacing.units',
 	'typography.fluid',
 	'typography.customFontSize',
+	'typography.defaultFontSizes',
 	'typography.dropCap',
 	'typography.fontFamilies',
 	'typography.fontSizes',
@@ -235,6 +239,7 @@ export function useSettingsForBlockElement(
 				...updatedSettings.typography,
 				fontSizes: {},
 				customFontSize: false,
+				defaultFontSizes: false,
 			};
 		}
 

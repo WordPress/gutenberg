@@ -5,7 +5,10 @@ import {
 	addBlock,
 	dismissModal,
 	fireEvent,
+	getBlock,
+	getEditorHtml,
 	initializeEditor,
+	openBlockSettings,
 	render,
 	screen,
 	setupCoreBlocks,
@@ -30,6 +33,10 @@ import { name } from '../index';
 jest.unmock( '@wordpress/react-native-aztec' );
 
 const MEDIA_UPLOAD_STATE_FAILED = 3;
+
+const AUDIO_BLOCK = `<!-- wp:audio {"id":5} -->
+<figure class="wp-block-audio"><audio controls src="https://cldup.com/59IrU0WJtq.mp3"></audio></figure>
+<!-- /wp:audio -->`;
 
 let uploadCallBack;
 subscribeMediaUpload.mockImplementation( ( callback ) => {
@@ -99,5 +106,27 @@ describe( 'Audio block', () => {
 		expect(
 			screen.getByText( 'Invalid URL. Audio file not found.' )
 		).toBeVisible();
+	} );
+
+	it( 'should enable autoplay setting', async () => {
+		await initializeEditor( { initialHtml: AUDIO_BLOCK } );
+
+		const audioBlock = getBlock( screen, 'Audio' );
+		fireEvent.press( audioBlock );
+		await openBlockSettings( screen );
+
+		fireEvent.press( screen.getByText( 'Autoplay' ) );
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should enable loop setting', async () => {
+		await initializeEditor( { initialHtml: AUDIO_BLOCK } );
+
+		const audioBlock = getBlock( screen, 'Audio' );
+		fireEvent.press( audioBlock );
+		await openBlockSettings( screen );
+
+		fireEvent.press( screen.getByText( 'Loop' ) );
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );
