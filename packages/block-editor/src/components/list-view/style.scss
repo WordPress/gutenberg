@@ -502,6 +502,12 @@ $block-navigation-max-indent: 8;
 .block-editor-list-view-drop-indicator--preview {
 	pointer-events: none;
 
+	// If the drop indicator's popover ever extends to the edge of the screen,
+	// avoid any scrollbars by hiding the overflow.
+	.components-popover__content {
+		overflow: hidden !important;
+	}
+
 	.block-editor-list-view-drop-indicator__line {
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 		height: 36px;

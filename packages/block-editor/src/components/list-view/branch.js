@@ -155,17 +155,22 @@ function ListViewBranch( props ) {
 				let isNesting;
 				let isAfterDraggedBlocks;
 
-				if ( firstDraggedBlockIndex !== undefined && ! isDragged ) {
+				if ( ! isDragged ) {
 					const thisBlockIndex = blockIndexes[ clientId ];
 					isAfterDraggedBlocks =
 						thisBlockIndex > firstDraggedBlockIndex;
+					isNesting =
+						typeof blockDropTargetIndex === 'number' &&
+						blockDropTargetIndex - 1 === thisBlockIndex &&
+						blockDropPosition === 'inside';
 
 					// Determine where to displace the position of the current block, relative
 					// to the blocks being dragged (in their original position) and the drop target
 					// (the position where a user is currently dragging the blocks to).
 					if (
 						blockDropTargetIndex !== undefined &&
-						blockDropTargetIndex !== null
+						blockDropTargetIndex !== null &&
+						firstDraggedBlockIndex !== undefined
 					) {
 						// If the block is being dragged and there is a valid drop target,
 						// determine if the block being rendered should be displaced up or down.
@@ -191,11 +196,10 @@ function ListViewBranch( props ) {
 								displacement = 'normal';
 							}
 						}
-
-						isNesting =
-							blockDropTargetIndex - 1 === thisBlockIndex &&
-							blockDropPosition === 'inside';
-					} else if ( blockDropTargetIndex === null ) {
+					} else if (
+						blockDropTargetIndex === null &&
+						firstDraggedBlockIndex !== undefined
+					) {
 						// A `null` value for `blockDropTargetIndex` indicates that the
 						// drop target is outside of the valid areas within the list view.
 						// In this case, the drag is still active, but as there is no
@@ -209,6 +213,26 @@ function ListViewBranch( props ) {
 						} else {
 							displacement = 'normal';
 						}
+					} else if (
+						blockDropTargetIndex !== undefined &&
+						blockDropTargetIndex !== null &&
+						firstDraggedBlockIndex === undefined
+					) {
+						// If the blockdrop target is defined, but there are no dragged blocks,
+						// then the block should be displaced relative to the drop target.
+						if (
+							thisBlockIndex !== undefined
+							// blockDropTargetIndex !== 0 &&
+							// blockDropPosition !== 'top'
+						) {
+							if ( thisBlockIndex < blockDropTargetIndex ) {
+								displacement = 'normal';
+							} else {
+								displacement = 'down';
+							}
+						}
+					} else if ( blockDropTargetIndex === null ) {
+						displacement = 'normal';
 					}
 				}
 
