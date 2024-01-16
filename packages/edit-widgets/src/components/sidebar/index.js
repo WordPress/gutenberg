@@ -198,7 +198,11 @@ export default function Sidebar() {
 
 	return (
 		<Tabs
-			selectedTabId={ currentArea }
+			// Due to how this component is controlled (via a value from the
+			// `interfaceStore`), when the sidebar closes the currently selected
+			// tab can't be found. This causes the component to continuously reset
+			// the selection to `null` in an infinite loop.Proactively setting
+			// the selected tab to `null` avoids that.selectedTabId={ isGeneralSidebarOpen ? currentArea : null }
 			onSelect={ onTabSelect }
 			selectOnMove={ false }
 			focusable={ false }
