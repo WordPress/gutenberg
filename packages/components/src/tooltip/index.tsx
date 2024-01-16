@@ -8,7 +8,7 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { Children, cloneElement } from '@wordpress/element';
+import { Children } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -21,6 +21,7 @@ import {
 	contextConnect,
 	useContextSystem,
 	ContextSystemProvider,
+	removeExtraPropsAddedByContext,
 } from '../context';
 import type { WordPressComponentProps } from '../context';
 
@@ -96,12 +97,17 @@ function UnconnectedTooltip(
 	} );
 
 	if ( isNestedInTooltip ) {
-		return isOnlyChild
-			? cloneElement( children, {
-					...restProps,
-					ref,
-			  } )
-			: children;
+		// Avoid passing certain props added by the useContextSystem hook when
+		// cloning children, as they are not intended for this scenario.
+		const clonedProps = removeExtraPropsAddedByContext(
+			restProps,
+			'Tooltip'
+		);
+		return isOnlyChild ? (
+			<Ariakit.Role { ...clonedProps } render={ children } />
+		) : (
+			children
+		);
 	}
 
 	return (
