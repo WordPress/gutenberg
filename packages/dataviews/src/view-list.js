@@ -83,10 +83,9 @@ export default function ViewList( {
 						} ) }
 					>
 						<TreeGridCell>
-							{ () => (
+							{ ( { tabIndex, ...otherProps } ) => (
 								<div
 									role="button"
-									tabIndex={ 0 }
 									aria-pressed={ selection.includes(
 										item.id
 									) }
@@ -95,6 +94,8 @@ export default function ViewList( {
 									onClick={ () =>
 										onSelectionChange( [ item ] )
 									}
+									{ ...otherProps }
+									tabIndex={ tabIndex }
 								>
 									<HStack spacing={ 3 } justify="start">
 										<div className="dataviews-view-list__media-wrapper">
@@ -135,7 +136,7 @@ export default function ViewList( {
 						</TreeGridCell>
 						{ onDetailsChange && (
 							<TreeGridCell>
-								{ () => (
+								{ ( props ) => (
 									<Button
 										className="dataviews-view-list__details-button"
 										onClick={ () =>
@@ -144,6 +145,7 @@ export default function ViewList( {
 										icon={ info }
 										label={ __( 'View details' ) }
 										size="compact"
+										{ ...props }
 									/>
 								) }
 							</TreeGridCell>
