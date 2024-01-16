@@ -38,6 +38,7 @@
 -   `Snackbar`: Fix icon positioning ([#57377](https://github.com/WordPress/gutenberg/pull/57377)).
 -   `GradientPicker`: Use slug while iterating over gradient entries to avoid React "duplicated key" warning ([#57361](https://github.com/WordPress/gutenberg/pull/57361)).
 -   `NavigatorProvider`: Exclude `size` value from `contain` CSS rule ([#57498](https://github.com/WordPress/gutenberg/pull/57498)).
+-   `Tooltip`: Improve props forwarding to children of nested `Tooltip` components ([#57878](https://github.com/WordPress/gutenberg/pull/57878)).
 
 ### Enhancements
 
