@@ -3908,4 +3908,33 @@ class WP_Theme_JSON_Gutenberg {
 
 		return implode( ',', $result );
 	}
+
+	/**
+	 * Converts block styles registered through the `WP_Block_Styles_Registry`
+	 * with a style object, into theme.json format.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return array Styles configuration adhering to the theme.json schema.
+	 */
+	public static function get_from_block_styles_registry() {
+		$variations_data = array();
+		$registry        = WP_Block_Styles_Registry::get_instance();
+		$styles          = $registry->get_all_registered();
+
+		foreach ( $styles as $block_name => $variations ) {
+			foreach ( $variations as $variation_name => $variation ) {
+				if ( ! empty( $variation['style_data'] ) ) {
+					$variations_data[ $block_name ]['variations'][ $variation_name ] = $variation['style_data'];
+				}
+			}
+		}
+
+		return array(
+			'version' => static::LATEST_SCHEMA,
+			'styles'  => array(
+				'blocks' => $variations_data,
+			),
+		);
+	}
 }

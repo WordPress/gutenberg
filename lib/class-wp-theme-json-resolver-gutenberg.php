@@ -214,19 +214,22 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Returns the theme's data.
 	 *
 	 * Data from theme.json will be backfilled from existing
-	 * theme supports, if any. Note that if the same data
-	 * is present in theme.json and in theme supports,
-	 * the theme.json takes precedence.
+	 * theme supports and block style variations, if any.
+	 *
+	 * Note that if the same data is present in theme.json and in theme supports
+	 * or registered block styles, the theme.json takes precedence.
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Theme supports have been inlined and the `$theme_support_data` argument removed.
 	 * @since 6.0.0 Added an `$options` parameter to allow the theme data to be returned without theme supports.
+	 * @since 6.5.0 Theme data will now also include block style variations that were registered with a style object.
 	 *
 	 * @param array $deprecated Deprecated. Not used.
 	 * @param array $options {
 	 *     Options arguments.
 	 *
-	 *     @type bool $with_supports Whether to include theme supports in the data. Default true.
+	 *     @type bool $with_supports         Whether to include theme supports in the data. Default true.
+	 *     @type bool $with_style_variations Whether to include block style variations in the data. Default true.
 	 * }
 	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
 	 */
@@ -235,7 +238,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			_deprecated_argument( __METHOD__, '5.9.0' );
 		}
 
-		$options = wp_parse_args( $options, array( 'with_supports' => true ) );
+		$options = wp_parse_args(
+			$options,
+			array(
+				'with_supports'               => true,
+				'with_block_style_variations' => true,
+			)
+		);
 
 		if ( null === static::$theme || ! static::has_same_registered_blocks( 'theme' ) ) {
 			$wp_theme        = wp_get_theme();
@@ -283,74 +292,91 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		}
 
-		if ( ! $options['with_supports'] ) {
+		if ( ! $options['with_supports'] && ! $options['with_block_style_variations'] ) {
 			return static::$theme;
 		}
 
-		/*
-		 * We want the presets and settings declared in theme.json
-		 * to override the ones declared via theme supports.
-		 * So we take theme supports, transform it to theme.json shape
-		 * and merge the static::$theme upon that.
-		 */
-		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
-		if ( ! wp_theme_has_theme_json() ) {
-			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
-				$theme_support_data['settings']['color'] = array();
-			}
+		$theme_support_data = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(),
+		);
 
-			$default_palette = false;
-			if ( current_theme_supports( 'default-color-palette' ) ) {
-				$default_palette = true;
-			}
-			if ( ! isset( $theme_support_data['settings']['color']['palette'] ) ) {
-				// If the theme does not have any palette, we still want to show the core one.
-				$default_palette = true;
-			}
-			$theme_support_data['settings']['color']['defaultPalette'] = $default_palette;
+		if ( $options['with_supports'] ) {
+			/*
+			 * We want the presets and settings declared in theme.json
+			 * to override the ones declared via theme supports.
+			 * So we take theme supports, transform it to theme.json shape
+			 * and merge any block style variations from WP_Block_Styles_Registry
+			 * before merging the static::$theme upon that.
+			 */
+			$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
+			if ( ! wp_theme_has_theme_json() ) {
+				if ( ! isset( $theme_support_data['settings']['color'] ) ) {
+					$theme_support_data['settings']['color'] = array();
+				}
 
-			$default_gradients = false;
-			if ( current_theme_supports( 'default-gradient-presets' ) ) {
-				$default_gradients = true;
-			}
-			if ( ! isset( $theme_support_data['settings']['color']['gradients'] ) ) {
-				// If the theme does not have any gradients, we still want to show the core ones.
-				$default_gradients = true;
-			}
-			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
+				$default_palette = false;
+				if ( current_theme_supports( 'default-color-palette' ) ) {
+					$default_palette = true;
+				}
+				if ( ! isset( $theme_support_data['settings']['color']['palette'] ) ) {
+					// If the theme does not have any palette, we still want to show the core one.
+					$default_palette = true;
+				}
+				$theme_support_data['settings']['color']['defaultPalette'] = $default_palette;
 
-			// Allow themes to enable all border settings via theme_support.
-			if ( current_theme_supports( 'border' ) ) {
-				$theme_support_data['settings']['border']['color']  = true;
-				$theme_support_data['settings']['border']['radius'] = true;
-				$theme_support_data['settings']['border']['style']  = true;
-				$theme_support_data['settings']['border']['width']  = true;
-			}
+				$default_gradients = false;
+				if ( current_theme_supports( 'default-gradient-presets' ) ) {
+					$default_gradients = true;
+				}
+				if ( ! isset( $theme_support_data['settings']['color']['gradients'] ) ) {
+					// If the theme does not have any gradients, we still want to show the core ones.
+					$default_gradients = true;
+				}
+				$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
 
-			// Allow themes to enable link colors via theme_support.
-			if ( current_theme_supports( 'link-color' ) ) {
-				$theme_support_data['settings']['color']['link'] = true;
-			}
-			if ( current_theme_supports( 'experimental-link-color' ) ) {
-				_doing_it_wrong(
-					current_theme_supports( 'experimental-link-color' ),
-					__( '`experimental-link-color` is no longer supported. Use `link-color` instead.', 'gutenberg' ),
-					'6.3.0'
-				);
-			}
+				// Allow themes to enable all border settings via theme_support.
+				if ( current_theme_supports( 'border' ) ) {
+					$theme_support_data['settings']['border']['color']  = true;
+					$theme_support_data['settings']['border']['radius'] = true;
+					$theme_support_data['settings']['border']['style']  = true;
+					$theme_support_data['settings']['border']['width']  = true;
+				}
 
-			// BEGIN EXPERIMENTAL.
-			// Allow themes to enable appearance tools via theme_support.
-			// This feature was backported for WordPress 6.2 as of https://core.trac.wordpress.org/ticket/56487
-			// and then reverted as of https://core.trac.wordpress.org/ticket/57649
-			// Not to backport until the issues are resolved.
-			if ( current_theme_supports( 'appearance-tools' ) ) {
-				$theme_support_data['settings']['appearanceTools'] = true;
+				// Allow themes to enable link colors via theme_support.
+				if ( current_theme_supports( 'link-color' ) ) {
+					$theme_support_data['settings']['color']['link'] = true;
+				}
+				if ( current_theme_supports( 'experimental-link-color' ) ) {
+					_doing_it_wrong(
+						current_theme_supports( 'experimental-link-color' ),
+						__( '`experimental-link-color` is no longer supported. Use `link-color` instead.', 'gutenberg' ),
+						'6.3.0'
+					);
+				}
+
+				// BEGIN EXPERIMENTAL.
+				// Allow themes to enable appearance tools via theme_support.
+				// This feature was backported for WordPress 6.2 as of https://core.trac.wordpress.org/ticket/56487
+				// and then reverted as of https://core.trac.wordpress.org/ticket/57649
+				// Not to backport until the issues are resolved.
+				if ( current_theme_supports( 'appearance-tools' ) ) {
+					$theme_support_data['settings']['appearanceTools'] = true;
+				}
+				// END EXPERIMENTAL.
 			}
-			// END EXPERIMENTAL.
 		}
+
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
+
+		if ( $options['with_block_style_variations'] ) {
+			$block_style_variations_data = WP_Theme_JSON_Gutenberg::get_from_block_styles_registry();
+			$with_block_style_variations = new WP_Theme_JSON_Gutenberg( $block_style_variations_data );
+			$with_theme_supports->merge( $with_block_style_variations );
+		}
+
 		$with_theme_supports->merge( static::$theme );
+
 		return $with_theme_supports;
 	}
 
