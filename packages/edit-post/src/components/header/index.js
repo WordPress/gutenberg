@@ -143,6 +143,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 										? __( 'Show block tools' )
 										: __( 'Hide block tools' )
 								}
+								size="compact"
 							/>
 						) }
 					</>

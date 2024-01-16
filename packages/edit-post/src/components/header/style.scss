@@ -54,6 +54,8 @@
 
 	.selected-block-tools-wrapper {
 		overflow: hidden;
+		display: flex;
+		align-items: center;
 		height: $header-height;
 
 		.block-editor-block-contextual-toolbar {
@@ -92,8 +94,8 @@
 				content: "";
 				width: $border-width;
 				height: $grid-unit-30;
-				margin-top: $grid-unit-05;
 				background-color: $gray-300;
+				margin-top: $grid-unit-05;
 				margin-left: $grid-unit;
 			}
 
