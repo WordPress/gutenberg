@@ -280,7 +280,13 @@ export default () => {
 	// data-wp-text
 	directive( 'text', ( { directives: { text }, element, evaluate } ) => {
 		const entry = text.find( ( { suffix } ) => suffix === 'default' );
-		element.props.children = evaluate( entry );
+		try {
+			const result = evaluate( entry );
+			element.props.children =
+				typeof result === 'object' ? null : result.toString();
+		} catch ( e ) {
+			element.props.children = null;
+		}
 	} );
 
 	// data-wp-run

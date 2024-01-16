@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Prevent the usage of Preact components in `wp-text`. ([#57879](https://github.com/WordPress/gutenberg/pull/57879))
+
 ### New Features
 
 -   Add the `data-wp-run` directive along with the `useInit` and `useWatch` hooks. ([57805](https://github.com/WordPress/gutenberg/pull/57805))
