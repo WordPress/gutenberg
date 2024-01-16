@@ -202,18 +202,26 @@ function FontLibraryProvider( { children } ) {
 	async function installFont( font ) {
 		setIsInstalling( true );
 		try {
-			// Prepare formData to install.
-			const fontFamilyFormData = makeFontFamilyFormData( font );
+			// Get the ID of the font family post, if it is already installed.
+			let fontFamilyId = libraryPosts.filter(
+				( post ) => post.font_family_settings.slug === font.slug
+			)[ 0 ]?.id;
+
+			// Otherwise, install it.
+			if ( ! fontFamilyId ) {
+				const fontFamilyFormData = makeFontFamilyFormData( font );
+				// Prepare font family form data to install.
+				fontFamilyId = await fetchInstallFontFamily(
+					fontFamilyFormData
+				)
+					.then( ( response ) => response.id )
+					.catch( ( e ) => {
+						throw Error( e.message );
+					} );
+			}
+
+			// Prepare font faces form data to install.
 			const fontFacesFormData = makeFontFacesFormData( font );
-			const fontFamilyId = await fetchInstallFontFamily(
-				fontFamilyFormData
-			)
-				.then( ( response ) => response.id )
-				.catch( ( e ) => {
-					// eslint-disable-next-line no-console
-					console.error( e );
-					throw Error( 'Unable to install font family.' );
-				} );
 
 			// Install the fonts (upload the font files to the server and create the post in the database).
 			const response = await batchInstallFontFaces(
