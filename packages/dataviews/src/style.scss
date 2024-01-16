@@ -222,6 +222,10 @@
 		overflow: hidden;
 		display: block;
 		width: 100%;
+
+		&:hover {
+			color: $gray-900;
+		}
 	}
 
 	button.components-button.is-link {
