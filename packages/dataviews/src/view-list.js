@@ -10,6 +10,9 @@ import { useAsyncList } from '@wordpress/compose';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalTreeGrid as TreeGrid,
+	__experimentalTreeGridRow as TreeGridRow,
+	__experimentalTreeGridCell as TreeGridCell,
 	Button,
 } from '@wordpress/components';
 import { ENTER, SPACE } from '@wordpress/keycodes';
@@ -67,66 +70,90 @@ export default function ViewList( {
 	}
 
 	return (
-		<ul className="dataviews-view-list">
-			{ usedData.map( ( item ) => {
+		<TreeGrid className="dataviews-view-list">
+			{ usedData.map( ( item, index ) => {
 				return (
-					<li
+					<TreeGridRow
 						key={ getItemId( item ) }
-						className={ classNames( {
-							'is-selected': selection.includes( item.id ),
-						} ) }
+						level={ 1 }
+						setSize={ 1 }
+						positionInSet={ index + 1 }
+						className={ classNames(
+							'dataviews-view-list__item-wrapper',
+							{
+								'is-selected': selection.includes( item.id ),
+							}
+						) }
 					>
-						<HStack className="dataviews-view-list__item-wrapper">
-							<div
-								role="button"
-								tabIndex={ 0 }
-								aria-pressed={ selection.includes( item.id ) }
-								onKeyDown={ onEnter( item ) }
-								className="dataviews-view-list__item"
-								onClick={ () => onSelectionChange( [ item ] ) }
-							>
-								<HStack spacing={ 3 } justify="start">
-									<div className="dataviews-view-list__media-wrapper">
-										{ mediaField?.render( { item } ) || (
-											<div className="dataviews-view-list__media-placeholder"></div>
-										) }
-									</div>
-									<VStack spacing={ 1 }>
-										<span className="dataviews-view-list__primary-field">
-											{ primaryField?.render( { item } ) }
-										</span>
-										<div className="dataviews-view-list__fields">
-											{ visibleFields.map( ( field ) => {
-												return (
-													<span
-														key={ field.id }
-														className="dataviews-view-list__field"
-													>
-														{ field.render( {
-															item,
-														} ) }
-													</span>
-												);
-											} ) }
-										</div>
-									</VStack>
-								</HStack>
-							</div>
-							{ onDetailsChange && (
-								<Button
-									className="dataviews-view-list__details-button"
+						<TreeGridCell>
+							{ () => (
+								<div
+									role="button"
+									tabIndex={ 0 }
+									aria-pressed={ selection.includes(
+										item.id
+									) }
+									onKeyDown={ onEnter( item ) }
+									className="dataviews-view-list__item"
 									onClick={ () =>
-										onDetailsChange( [ item ] )
+										onSelectionChange( [ item ] )
 									}
-									icon={ info }
-									label={ __( 'View details' ) }
-									size="compact"
-								/>
+								>
+									<HStack spacing={ 3 } justify="start">
+										<div className="dataviews-view-list__media-wrapper">
+											{ mediaField?.render( {
+												item,
+											} ) || (
+												<div className="dataviews-view-list__media-placeholder"></div>
+											) }
+										</div>
+										<VStack spacing={ 1 }>
+											<span className="dataviews-view-list__primary-field">
+												{ primaryField?.render( {
+													item,
+												} ) }
+											</span>
+											<div className="dataviews-view-list__fields">
+												{ visibleFields.map(
+													( field ) => {
+														return (
+															<span
+																key={ field.id }
+																className="dataviews-view-list__field"
+															>
+																{ field.render(
+																	{
+																		item,
+																	}
+																) }
+															</span>
+														);
+													}
+												) }
+											</div>
+										</VStack>
+									</HStack>
+								</div>
 							) }
-						</HStack>
-					</li>
+						</TreeGridCell>
+						{ onDetailsChange && (
+							<TreeGridCell>
+								{ () => (
+									<Button
+										className="dataviews-view-list__details-button"
+										onClick={ () =>
+											onDetailsChange( [ item ] )
+										}
+										icon={ info }
+										label={ __( 'View details' ) }
+										size="compact"
+									/>
+								) }
+							</TreeGridCell>
+						) }
+					</TreeGridRow>
 				);
 			} ) }
-		</ul>
+		</TreeGrid>
 	);
 }
