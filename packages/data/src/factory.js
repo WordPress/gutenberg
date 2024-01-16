@@ -40,12 +40,15 @@
  */
 export function createRegistrySelector( registrySelector ) {
 	let selector;
+	let lastRegistry;
 	// Create a selector function that is bound to the registry referenced by `selector.registry`
 	// and that has the same API as a regular selector. Binding it in such a way makes it
 	// possible to call the selector directly from another selector.
 	const wrappedSelector = ( ...args ) => {
-		selector =
-			selector || registrySelector( wrappedSelector.registry.select );
+		if ( ! selector || lastRegistry !== wrappedSelector.registry ) {
+			selector = registrySelector( wrappedSelector.registry.select );
+			lastRegistry = wrappedSelector.registry;
+		}
 		return selector( ...args );
 	};
 

@@ -88,10 +88,11 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getNewBlockTypes', () => {
+		const getBlocks = jest.fn();
+		getNewBlockTypes.registry = { select: () => ( { getBlocks } ) };
+
 		it( 'should retrieve the block types that are installed and in the post content', () => {
-			getNewBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => blockList } ) ),
-			};
+			getBlocks.mockReturnValue( blockList );
 			const state = {
 				blockManagement: {
 					installedBlockTypes: [
@@ -106,9 +107,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return an empty array if no blocks are used', () => {
-			getNewBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => [] } ) ),
-			};
+			getBlocks.mockReturnValue( [] );
 			const state = {
 				blockManagement: {
 					installedBlockTypes: [
@@ -123,10 +122,11 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getUnusedBlockTypes', () => {
+		const getBlocks = jest.fn();
+		getUnusedBlockTypes.registry = { select: () => ( { getBlocks } ) };
+
 		it( 'should retrieve the block types that are installed but not used', () => {
-			getUnusedBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => blockList } ) ),
-			};
+			getBlocks.mockReturnValue( blockList );
 			const state = {
 				blockManagement: {
 					installedBlockTypes: [
@@ -141,9 +141,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return all block types if no blocks are used', () => {
-			getUnusedBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => [] } ) ),
-			};
+			getBlocks.mockReturnValue( [] );
 			const state = {
 				blockManagement: {
 					installedBlockTypes: [
