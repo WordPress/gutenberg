@@ -225,16 +225,15 @@ export default () => {
 				const result = evaluate( entry );
 				element.props[ attribute ] = result;
 
-				// This seems necessary because Preact doesn't change the attributes
-				// on the hydration, so we have to do it manually. It doesn't need
-				// deps because it only needs to do it the first time.
+				// This is necessary because Preact doesn't change the attributes on the
+				// hydration, so we have to do it manually. It only needs to do it the
+				// first time. After that, Preact will handle the changes.
 				useInit( () => {
 					const el = element.ref.current;
 
-					// We set the value directly to the corresponding
-					// HTMLElement instance property excluding the following
-					// special cases.
-					// We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
+					// We set the value directly to the corresponding HTMLElement instance
+					// property excluding the following special cases. We follow Preact's
+					// logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
 					if (
 						attribute !== 'width' &&
 						attribute !== 'height' &&
