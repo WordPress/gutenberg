@@ -7,11 +7,16 @@
 -   `ColorPicker`: improve the UX around HSL sliders ([#57555](https://github.com/WordPress/gutenberg/pull/57555)).
 -   `BoxControl`, `BorderControl`, `BorderBoxControl`: Add opt-in prop for 40px default size ([#56185](https://github.com/WordPress/gutenberg/pull/56185)).
 -   `PaletteEdit`: improve unit tests ([#57645](https://github.com/WordPress/gutenberg/pull/57645)).
--   `ColorPalette` and `CircularOptionPicker`: improve unit tests ([#57809](https://github.com/WordPress/gutenberg/pull/57809)).
+-   `PaletteEdit` and `CircularOptionPicker`: improve unit tests ([#57809](https://github.com/WordPress/gutenberg/pull/57809)).
+-   `Tooltip`: no-op when nested inside other `Tooltip` components ([#57202](https://github.com/WordPress/gutenberg/pull/57202)).
 
 ### Bug Fixes
 
 -   `ToggleGroupControl`: Improve controlled value detection ([#57770](https://github.com/WordPress/gutenberg/pull/57770)).
+
+### Experimental
+
+-   `BoxControl`: Update design ([#56665](https://github.com/WordPress/gutenberg/pull/56665)).
 
 ## 25.15.0 (2024-01-10)
 
@@ -45,7 +50,6 @@
 -   `InputControl`, `NumberControl`, `UnitControl`, `SelectControl`, `TreeSelect`: Add `compact` size variant ([#57398](https://github.com/WordPress/gutenberg/pull/57398)).
 -   `ToggleGroupControl`: Update button size in large variant to be 32px ([#57338](https://github.com/WordPress/gutenberg/pull/57338)).
 -   `Tooltip`: improve unit tests ([#57345](https://github.com/WordPress/gutenberg/pull/57345)).
--   `Tooltip`: no-op when nested inside other `Tooltip` components ([#57202](https://github.com/WordPress/gutenberg/pull/57202)).
 
 ### Experimental
 
@@ -53,7 +57,6 @@
 -   `Tabs`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
 -   `Tabs`: improve hover and text alignment styles ([#57275](https://github.com/WordPress/gutenberg/pull/57275)).
 -   `Tabs`: make sure `Tab`s are associated to the right `TabPanel`s, regardless of the order they're rendered in ([#57033](https://github.com/WordPress/gutenberg/pull/57033)).
--   `BoxControl`: Update design ([#56665](https://github.com/WordPress/gutenberg/pull/56665)).
 
 ## 25.14.0 (2023-12-13)
 
