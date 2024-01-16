@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { editorPrivateApis } from '@wordpress/editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
@@ -10,7 +10,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  */
 import { unlock } from '../../../lock-unlock';
 
-const { DocumentTools: EditorModeSwitcher } = unlock( editorPrivateApis );
+const { ModeSwitcher: EditorModeSwitcher } = unlock( editorPrivateApis );
 
 function ModeSwitcher() {
 	const shortcut = useSelect(
