@@ -45,7 +45,10 @@
 }
 
 /* Hide block actions unrelated to editing a single block */
-.block-editor-block-settings-menu {
+/* TODO: check with mobile folks if these overrides are needed */
+.block-editor-block-settings-menu__trigger,
+.block-library-navigation-leaf-more-menu__trigger,
+.edit-site-navigation-leaf-more-menu__trigger {
 	display: none;
 }
 

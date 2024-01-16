@@ -13,6 +13,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 
+// TODO: refactor away from DropdownMenu
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
@@ -117,7 +118,6 @@ export default function LeafMoreMenu( props ) {
 		<DropdownMenu
 			icon={ moreVertical }
 			label={ __( 'Options' ) }
-			className="block-editor-block-settings-menu"
 			popoverProps={ POPOVER_PROPS }
 			noIcons
 			{ ...props }

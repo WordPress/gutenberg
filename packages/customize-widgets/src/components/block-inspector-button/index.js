@@ -3,11 +3,21 @@
  */
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { MenuItem } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-function BlockInspectorButton( { inspector, closeMenu, ...props } ) {
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const {
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
+
+function BlockInspectorButton( { inspector, ...props } ) {
 	const selectedBlockClientId = useSelect(
 		( select ) => select( blockEditorStore ).getSelectedBlockClientId(),
 		[]
@@ -19,19 +29,19 @@ function BlockInspectorButton( { inspector, closeMenu, ...props } ) {
 	);
 
 	return (
-		<MenuItem
+		<DropdownMenuItem
 			onClick={ () => {
 				// Open the inspector.
 				inspector.open( {
 					returnFocusWhenClose: selectedBlock,
 				} );
-				// Then close the dropdown menu.
-				closeMenu();
 			} }
 			{ ...props }
 		>
-			{ __( 'Show more settings' ) }
-		</MenuItem>
+			<DropdownMenuItemLabel>
+				{ __( 'Show more settings' ) }
+			</DropdownMenuItemLabel>
+		</DropdownMenuItem>
 	);
 }
 

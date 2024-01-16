@@ -289,7 +289,6 @@ const UnconnectedDropdownMenu = (
 		<>
 			{ /* Menu trigger */ }
 			<Ariakit.MenuButton
-				ref={ ref }
 				store={ dropdownMenuStore }
 				render={
 					dropdownMenuStore.parent
@@ -328,6 +327,7 @@ const UnconnectedDropdownMenu = (
 				wrapperProps={ wrapperProps }
 				hideOnEscape={ hideOnEscape }
 				unmountOnHide
+				ref={ ref }
 			>
 				<DropdownMenuContext.Provider value={ contextValue }>
 					{ children }

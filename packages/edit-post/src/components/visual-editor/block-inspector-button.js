@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { MenuItem } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -11,9 +11,36 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  * Internal dependencies
  */
 import { store as editPostStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const {
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
 
 const noop = () => {};
 
+const Shortcut = ( { shortcut } ) => {
+	if ( ! shortcut ) {
+		return null;
+	}
+
+	let displayText;
+	let ariaLabel;
+
+	if ( typeof shortcut === 'string' ) {
+		displayText = shortcut;
+	}
+
+	if ( shortcut !== null && typeof shortcut === 'object' ) {
+		displayText = shortcut.display;
+		ariaLabel = shortcut.ariaLabel;
+	}
+
+	return <span aria-label={ ariaLabel }>{ displayText }</span>;
+};
+
+// Is this dead code?
 export function BlockInspectorButton( { onClick = noop, small = false } ) {
 	const { shortcut, areAdvancedSettingsOpened } = useSelect(
 		( select ) => ( {
@@ -34,7 +61,8 @@ export function BlockInspectorButton( { onClick = noop, small = false } ) {
 		: __( 'Show more settings' );
 
 	return (
-		<MenuItem
+		<DropdownMenuItem
+			hideOnClick={ false }
 			onClick={ () => {
 				if ( areAdvancedSettingsOpened ) {
 					closeGeneralSidebar();
@@ -49,10 +77,13 @@ export function BlockInspectorButton( { onClick = noop, small = false } ) {
 				}
 				onClick();
 			} }
-			shortcut={ shortcut }
+			suffix={ <Shortcut shortcut={ shortcut } /> }
 		>
-			{ ! small && label }
-		</MenuItem>
+			{ /* TODO: what happens if small is true? */ }
+			{ ! small && (
+				<DropdownMenuItemLabel>{ label }</DropdownMenuItemLabel>
+			) }
+		</DropdownMenuItem>
 	);
 }
 

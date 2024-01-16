@@ -10,10 +10,24 @@ import {
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
 } from '@wordpress/block-editor';
-import { Spinner, Modal, MenuItem } from '@wordpress/components';
+import {
+	Spinner,
+	Modal,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const {
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
 
 /**
  * Internal dependencies
@@ -54,15 +68,16 @@ function ReplaceButton( {
 	}
 
 	return (
-		<MenuItem
+		<DropdownMenuItem
+			hideOnClick={ false }
 			onClick={ () => {
 				setIsTemplatePartSelectionOpen( true );
 			} }
 			aria-expanded={ isTemplatePartSelectionOpen }
 			aria-haspopup="dialog"
 		>
-			{ __( 'Replace' ) }
-		</MenuItem>
+			<DropdownMenuItemLabel>{ __( 'Replace' ) }</DropdownMenuItemLabel>
+		</DropdownMenuItem>
 	);
 }
 

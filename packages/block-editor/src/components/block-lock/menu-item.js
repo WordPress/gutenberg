@@ -3,7 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useReducer } from '@wordpress/element';
-import { MenuItem } from '@wordpress/components';
+import {
+	Icon,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { lockOutline, unlock } from '@wordpress/icons';
 
 /**
@@ -11,7 +14,14 @@ import { lockOutline, unlock } from '@wordpress/icons';
  */
 import useBlockLock from './use-block-lock';
 import BlockLockModal from './modal';
+import { unlock as unlockPrivateApis } from '../../lock-unlock';
 
+const {
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlockPrivateApis( componentsPrivateApis );
+
+/* TODO: check if this used in other legacy dropdown menus */
 export default function BlockLockMenuItem( { clientId } ) {
 	const { canLock, isLocked } = useBlockLock( clientId );
 
@@ -28,14 +38,20 @@ export default function BlockLockMenuItem( { clientId } ) {
 
 	return (
 		<>
-			<MenuItem
-				icon={ isLocked ? unlock : lockOutline }
+			<DropdownMenuItem
+				prefix={
+					<Icon
+						size={ 24 }
+						icon={ isLocked ? unlock : lockOutline }
+					/>
+				}
 				onClick={ toggleModal }
+				hideOnClick={ false }
 				aria-expanded={ isModalOpen }
 				aria-haspopup="dialog"
 			>
-				{ label }
-			</MenuItem>
+				<DropdownMenuItemLabel>{ label }</DropdownMenuItemLabel>
+			</DropdownMenuItem>
 			{ isModalOpen && (
 				<BlockLockModal clientId={ clientId } onClose={ toggleModal } />
 			) }

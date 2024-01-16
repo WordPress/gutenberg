@@ -3,10 +3,20 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { MenuItem } from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function ConvertToRegularBlocks( { clientId, onClose } ) {
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const {
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
+
+export default function ConvertToRegularBlocks( { clientId } ) {
 	const { getBlocks } = useSelect( blockEditorStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
@@ -20,13 +30,13 @@ export default function ConvertToRegularBlocks( { clientId, onClose } ) {
 	}
 
 	return (
-		<MenuItem
+		// TODO: check if this is used in other legacy dropdown menus
+		<DropdownMenuItem
 			onClick={ () => {
 				replaceBlocks( clientId, getBlocks( clientId ) );
-				onClose();
 			} }
 		>
-			{ __( 'Detach' ) }
-		</MenuItem>
+			<DropdownMenuItemLabel>{ __( 'Detach' ) }</DropdownMenuItemLabel>
+		</DropdownMenuItem>
 	);
 }

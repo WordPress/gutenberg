@@ -8,13 +8,14 @@ import {
 } from '@wordpress/block-editor';
 import { useCallback, useState } from '@wordpress/element';
 import {
-	MenuItem,
+	Icon,
 	Modal,
 	Button,
 	TextControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	ToggleControl,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -31,6 +32,11 @@ import { unlock } from '../../lock-unlock';
 const { useReusableBlocksRenameHint, ReusableBlocksRenameHint } = unlock(
 	blockEditorPrivateApis
 );
+
+const {
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
 
 /**
  * Menu control to convert block(s) to reusable block.
@@ -151,11 +157,17 @@ export default function ReusableBlockConvertButton( {
 
 	return (
 		<>
-			<MenuItem icon={ symbol } onClick={ () => setIsModalOpen( true ) }>
-				{ showRenameHint
-					? __( 'Create pattern/reusable block' )
-					: __( 'Create pattern' ) }
-			</MenuItem>
+			<DropdownMenuItem
+				hideOnClick={ false }
+				prefix={ <Icon size={ 24 } icon={ symbol } /> }
+				onClick={ () => setIsModalOpen( true ) }
+			>
+				<DropdownMenuItemLabel>
+					{ showRenameHint
+						? __( 'Create pattern/reusable block' )
+						: __( 'Create pattern' ) }
+				</DropdownMenuItemLabel>
+			</DropdownMenuItem>
 			{ isModalOpen && (
 				<Modal
 					title={ __( 'Create pattern' ) }
@@ -171,6 +183,9 @@ export default function ReusableBlockConvertButton( {
 							onConvert( title );
 							setIsModalOpen( false );
 							setTitle( '' );
+							// The dropdown seems to close automatically due to the old
+							// regular block being replaced by the new block, although
+							// I've kept this line around for now.
 							onClose();
 						} }
 					>

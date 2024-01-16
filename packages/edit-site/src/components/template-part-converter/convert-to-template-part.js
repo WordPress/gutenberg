@@ -3,7 +3,10 @@
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { MenuItem } from '@wordpress/components';
+import {
+	Icon,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -15,6 +18,12 @@ import { symbolFilled } from '@wordpress/icons';
  */
 import CreateTemplatePartModal from '../create-template-part-modal';
 import { store as editSiteStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const {
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
 
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
@@ -51,16 +60,20 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 
 	return (
 		<>
-			<MenuItem
-				icon={ symbolFilled }
+			{ /* TODO: check if this used in other legacy dropdown menus */ }
+			<DropdownMenuItem
+				prefix={ <Icon size={ 24 } icon={ symbolFilled } /> }
+				hideOnClick={ false }
 				onClick={ () => {
 					setIsModalOpen( true );
 				} }
 				aria-expanded={ isModalOpen }
 				aria-haspopup="dialog"
 			>
-				{ __( 'Create template part' ) }
-			</MenuItem>
+				<DropdownMenuItemLabel>
+					{ __( 'Create template part' ) }
+				</DropdownMenuItemLabel>
+			</DropdownMenuItem>
 			{ isModalOpen && (
 				<CreateTemplatePartModal
 					closeModal={ () => {
