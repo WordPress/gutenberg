@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add the `data-wp-run` directive along with the `useInit` and `useWatch` hooks. ([57805](https://github.com/WordPress/gutenberg/pull/57805))
+-   Add the `data-wp-each` directive to render lists of items using a template. ([57859](https://github.com/WordPress/gutenberg/pull/57859))
 
 ### Breaking Changes
 
