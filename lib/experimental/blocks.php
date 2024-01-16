@@ -89,7 +89,7 @@ if ( $gutenberg_experiments && (
 
 	require_once __DIR__ . '/block-bindings/index.php';
 
-	if ( ! function_exists( 'process_block_bindings' ) ) {
+	if ( ! function_exists( 'gutenberg_process_block_bindings' ) ) {
 		/**
 		 * Process the block bindings attribute.
 		 *
@@ -97,7 +97,7 @@ if ( $gutenberg_experiments && (
 		 * @param array    $block Block attributes.
 		 * @param WP_Block $block_instance The block instance.
 		 */
-		function process_block_bindings( $block_content, $block, $block_instance ) {
+		function gutenberg_process_block_bindings( $block_content, $block, $block_instance ) {
 
 			// Allowed blocks that support block bindings.
 			// TODO: Look for a mechanism to opt-in for this. Maybe adding a property to block attributes?
@@ -164,5 +164,5 @@ if ( $gutenberg_experiments && (
 		}
 	}
 
-	add_filter( 'render_block', process_block_bindings, 20, 3 );
+	add_filter( 'render_block', 'gutenberg_process_block_bindings', 20, 3 );
 }
