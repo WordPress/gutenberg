@@ -6,6 +6,10 @@
 
 -   Add the `data-wp-run` directive along with the `useInit` and `useWatch` hooks. ([57805](https://github.com/WordPress/gutenberg/pull/57805))
 
+### Breaking Change
+
+-	Remove `data-wp-slot` and  `data-wp-fill`. ([#57854](https://github.com/WordPress/gutenberg/pull/57854))
+
 ### Bug Fix
 
 -   Fix namespaces when there are nested interactive regions. ([#57029](https://github.com/WordPress/gutenberg/pull/57029))

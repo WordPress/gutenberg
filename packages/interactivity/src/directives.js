@@ -16,7 +16,6 @@ import { deepSignal, peek } from 'deepsignal';
 import { createPortal } from './portals';
 import { useWatch, useInit } from './utils';
 import { directive } from './hooks';
-import { SlotProvider, Slot, Fill } from './slots';
 import { navigate } from './router';
 
 const isObject = ( item ) =>
@@ -332,64 +331,6 @@ export default () => {
 		const entry = text.find( ( { suffix } ) => suffix === 'default' );
 		element.props.children = evaluate( entry );
 	} );
-
-	// data-wp-slot
-	directive(
-		'slot',
-		( { directives: { slot }, props: { children }, element } ) => {
-			const { value } = slot.find(
-				( { suffix } ) => suffix === 'default'
-			);
-			const name = typeof value === 'string' ? value : value.name;
-			const position = value.position || 'children';
-
-			if ( position === 'before' ) {
-				return (
-					<>
-						<Slot name={ name } />
-						{ children }
-					</>
-				);
-			}
-			if ( position === 'after' ) {
-				return (
-					<>
-						{ children }
-						<Slot name={ name } />
-					</>
-				);
-			}
-			if ( position === 'replace' ) {
-				return <Slot name={ name }>{ children }</Slot>;
-			}
-			if ( position === 'children' ) {
-				element.props.children = (
-					<Slot name={ name }>{ element.props.children }</Slot>
-				);
-			}
-		},
-		{ priority: 4 }
-	);
-
-	// data-wp-fill
-	directive(
-		'fill',
-		( { directives: { fill }, props: { children }, evaluate } ) => {
-			const entry = fill.find( ( { suffix } ) => suffix === 'default' );
-			const slot = evaluate( entry );
-			return <Fill slot={ slot }>{ children }</Fill>;
-		},
-		{ priority: 4 }
-	);
-
-	// data-wp-slot-provider
-	directive(
-		'slot-provider',
-		( { props: { children } } ) => (
-			<SlotProvider>{ children }</SlotProvider>
-		),
-		{ priority: 4 }
-	);
 
 	// data-wp-run
 	directive( 'run', ( { directives: { run }, evaluate } ) => {
