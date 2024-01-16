@@ -31,7 +31,7 @@ class WP_Block_Bindings_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	* Test replace_html method.
+	* Test replace_html method for content.
 	*/
 	public function test_replace_html_for_paragraph_content() {
 		$wp_block_bindings = new WP_Block_Bindings();
@@ -48,7 +48,7 @@ class WP_Block_Bindings_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	* Test replace_html method.
+	* Test replace_html method for attributes.
 	*/
 	public function test_replace_html_for_attribute() {
 		$wp_block_bindings = new WP_Block_Bindings();
@@ -61,7 +61,7 @@ class WP_Block_Bindings_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( $source_value, $result );
 	}
 
-	// Test cases for scenarios where block type is not registered, or attribute source is not 'html' or 'rich-text'.
+	// Test case for scenarios where block type is not registered.
 	public function test_replace_html_with_unregistered_block() {
 		$wp_block_bindings = new WP_Block_Bindings();
 
@@ -72,10 +72,10 @@ class WP_Block_Bindings_Test extends WP_UnitTestCase {
 
 		$result = $wp_block_bindings->replace_html( $block_content, $block_name, $block_attr, $source_value );
 
-		// Expect original content to be returned as block type is not registered.
 		$this->assertEquals( $block_content, $result );
 	}
 
+	// Test case for scenarios where block is registered but attribute does not exist on block type.
 	public function test_replace_html_with_registered_block_but_unsupported_source_type() {
 		$wp_block_bindings = new WP_Block_Bindings();
 
@@ -86,7 +86,6 @@ class WP_Block_Bindings_Test extends WP_UnitTestCase {
 
 		$result = $wp_block_bindings->replace_html( $block_content, $block_name, $block_attr, $source_value );
 
-		// Expect original content to be returned as the source type is not supported.
 		$this->assertEquals( $block_content, $result );
 	}
 }
