@@ -202,6 +202,44 @@
 	}
 }
 
+.dataviews-view-list__primary-field,
+.dataviews-view-grid__primary-field,
+.dataviews-view-table__primary-field {
+	font-size: $default-font-size;
+	font-weight: 500;
+	color: $gray-900;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	display: block;
+	width: 100%;
+
+	a {
+		text-decoration: none;
+		color: inherit;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		width: 100%;
+
+		&:hover {
+			color: $gray-900;
+		}
+	}
+
+	button.components-button.is-link {
+		text-decoration: none;
+		color: inherit;
+		font-weight: inherit;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		width: 100%;
+	}
+}
+
 .dataviews-view-grid {
 	margin-bottom: $grid-unit-30;
 	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -213,26 +251,6 @@
 
 	@include break-huge() {
 		grid-template-columns: repeat(4, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
-	}
-
-	.dataviews-view-grid__card {
-		.dataviews-view-grid__primary-field {
-			.dataviews-view-grid__title-field {
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				display: block;
-				font-size: $default-font-size;
-				width: 100%;
-			}
-
-			.dataviews-view-grid__title-field a,
-			button.dataviews-view-grid__title-field {
-				font-weight: 500;
-				color: $gray-900;
-				text-decoration: none;
-			}
-		}
 	}
 
 	.dataviews-view-grid__media {
@@ -248,10 +266,6 @@
 			width: 100%;
 			height: 100%;
 		}
-	}
-
-	.dataviews-view-grid__primary-field {
-		min-height: $grid-unit-30;
 	}
 
 	.dataviews-view-grid__fields {
@@ -296,6 +310,7 @@
 		&:not(.is-selected):hover {
 			color: var(--wp-admin-theme-color);
 
+			.dataviews-view-list__primary-field,
 			.dataviews-view-list__fields {
 				color: var(--wp-admin-theme-color);
 			}
@@ -308,6 +323,7 @@
 			background-color: var(--wp-admin-theme-color);
 			color: $white;
 
+			.dataviews-view-list__primary-field,
 			.dataviews-view-list__fields,
 			.components-button {
 				color: $white;
