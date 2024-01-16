@@ -190,7 +190,7 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 
 // @core-merge: Filters should go in `src/wp-includes/default-filters.php`,
 // functions in a general file for font library.
-if ( ! function_exists( '_wp_deleted_font_family' ) ) {
+if ( ! function_exists( '_wp_delete_font_family' ) ) {
 	/**
 	 * Deletes child font faces when a font family is deleted.
 	 *
