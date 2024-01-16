@@ -23,25 +23,6 @@ import type { WordPressComponentProps } from '../context';
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
 
-function defaultRenderSelectedValue( value: CustomSelectProps[ 'value' ] ) {
-	const isValueEmpty = Array.isArray( value )
-		? value.length === 0
-		: value === undefined || value === null;
-
-	if ( isValueEmpty ) {
-		return __( 'Select an item' );
-	}
-
-	if ( Array.isArray( value ) ) {
-		return value.length === 1
-			? value[ 0 ]
-			: // translators: %s: number of items selected (it will always be 2 or more items)
-			  sprintf( __( '%s items selected' ), value.length );
-	}
-
-	return value;
-}
-
 export function CustomSelect( {
 	children,
 	defaultValue,
@@ -49,7 +30,7 @@ export function CustomSelect( {
 	onChange,
 	size = 'default',
 	value,
-	renderSelectedValue = defaultRenderSelectedValue,
+	renderSelectedValue,
 	...props
 }: WordPressComponentProps< CustomSelectProps, 'button', false > ) {
 	const store = Ariakit.useSelectStore( {
@@ -59,6 +40,25 @@ export function CustomSelect( {
 	} );
 
 	const { value: currentValue } = store.useState();
+
+	const defaultRenderSelectedValue = () => {
+		const isValueEmpty = Array.isArray( currentValue )
+			? currentValue.length === 0
+			: currentValue === undefined || currentValue === null;
+
+		if ( isValueEmpty ) {
+			return __( 'Select an item' );
+		}
+
+		if ( Array.isArray( currentValue ) ) {
+			return currentValue.length === 1
+				? currentValue[ 0 ]
+				: // translators: %s: number of items selected (it will always be 2 or more items)
+				  sprintf( __( '%s items selected' ), currentValue.length );
+		}
+
+		return currentValue;
+	};
 
 	return (
 		<>
@@ -71,7 +71,9 @@ export function CustomSelect( {
 				hasCustomRenderProp={ !! renderSelectedValue }
 				store={ store }
 			>
-				{ renderSelectedValue( currentValue ) }
+				{ renderSelectedValue
+					? renderSelectedValue( defaultRenderSelectedValue() )
+					: currentValue }
 				<Ariakit.SelectArrow />
 			</Styled.CustomSelectButton>
 			<Styled.CustomSelectPopover gutter={ 12 } store={ store } sameWidth>
