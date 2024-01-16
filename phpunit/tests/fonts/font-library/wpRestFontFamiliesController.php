@@ -272,7 +272,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	 * @covers WP_REST_Font_Faces_Controller::create_item
 	 */
 	public function test_create_item() {
-		$settings = array_merge( self::$default_settings, array( 'slug' => 'test_create_item' ) );
+		$settings = array_merge( self::$default_settings, array( 'slug' => 'open-sans-2' ) );
 
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
@@ -295,7 +295,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	 * @covers WP_REST_Font_Faces_Controller::validate_create_font_face_request
 	 */
 	public function test_create_item_default_theme_json_version() {
-		$settings = array_merge( self::$default_settings, array( 'slug' => 'test_create_item_theme_json' ) );
+		$settings = array_merge( self::$default_settings, array( 'slug' => 'open-sans-2' ) );
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
 		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
@@ -356,7 +356,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	public function data_create_item_with_default_preview() {
 		$default_settings = array(
 			'name'       => 'Open Sans',
-			'slug'       => 'create_item_with_default_preview',
+			'slug'       => 'open-sans-2',
 			'fontFamily' => '"Open Sans", sans-serif',
 		);
 		return array(
@@ -454,7 +454,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 	 * @covers WP_REST_Font_Faces_Controller::create_item
 	 */
 	public function test_create_item_no_permission() {
-		$settings = array_merge( self::$default_settings, array( 'slug' => 'test_create_item_no_permissions' ) );
+		$settings = array_merge( self::$default_settings, array( 'slug' => 'open-sans-2' ) );
 		wp_set_current_user( 0 );
 		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families' );
 		$request->set_param( 'font_family_settings', wp_json_encode( $settings ) );
@@ -490,7 +490,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 			'preview'    => 'https://s.w.org/images/fonts/16.9/previews/open-sans/open-sans-400-normal.svg',
 		);
 
-		$font_family_id = self::create_font_family_post( array( 'slug' => 'open-sans-update' ) );
+		$font_family_id = self::create_font_family_post( array( 'slug' => 'open-sans-2' ) );
 		$request        = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . $font_family_id );
 		$request->set_param(
 			'font_family_settings',
@@ -504,7 +504,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 		$expected_settings = array(
 			'name'       => $settings['name'],
-			'slug'       => 'open-sans-update',
+			'slug'       => 'open-sans-2',
 			'fontFamily' => $settings['fontFamily'],
 			'preview'    => $settings['preview'],
 		);
