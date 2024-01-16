@@ -31,13 +31,17 @@ const __dirname = dirname( __filename );
 async function main() {
 	const authToken = getArg( 'token' );
 	if ( ! authToken ) {
-		console.error( 'Aborted. The --token argument is required.' );
+		console.error(
+			'Aborted. The --token argument is required. See: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token'
+		);
 		process.exit( 1 );
 	}
 
 	const since = getArg( 'since' );
 	if ( ! since ) {
-		console.error( 'Aborted. The --since argument is required.' );
+		console.error(
+			'Aborted. The --since argument is required (e.g. 2023-11-01).'
+		);
 		process.exit( 1 );
 	}
 
