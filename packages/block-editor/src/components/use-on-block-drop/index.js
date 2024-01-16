@@ -8,6 +8,7 @@ import {
 	findTransform,
 	getBlockTransforms,
 	pasteHandler,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
@@ -232,6 +233,7 @@ export default function useOnBlockDrop(
 		getSettings,
 		getBlock,
 	} = useSelect( blockEditorStore );
+	const { getBlockType, getGroupingBlockName } = useSelect( blocksStore );
 	const {
 		insertBlocks,
 		moveBlocksToPosition,
@@ -273,8 +275,12 @@ export default function useOnBlockDrop(
 					return block.name === 'core/image';
 				} );
 
+				const galleryBlock = !! getBlockType( 'core/gallery' );
+
 				const wrappedBlocks = createBlock(
-					areAllImages ? 'core/gallery' : 'core/group',
+					areAllImages && galleryBlock
+						? 'core/gallery'
+						: getGroupingBlockName(),
 					{
 						layout: {
 							type: 'flex',
@@ -308,6 +314,9 @@ export default function useOnBlockDrop(
 			operation,
 			replaceBlocks,
 			getBlock,
+			nearestSide,
+			getBlockType,
+			getGroupingBlockName,
 			insertBlocks,
 		]
 	);
