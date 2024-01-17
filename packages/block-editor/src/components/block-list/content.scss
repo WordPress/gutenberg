@@ -181,34 +181,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	&.is-editing-disabled {
 		pointer-events: none;
 		user-select: none;
-
-		// Outline and pencil icon to indicate that the block is editable.
-		.block-editor-block-list__block:not(.is-editing-disabled) {
-			box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
-
-			&::before {
-				background-color: var(--wp-admin-theme-color);
-				// Disable reason: Need quotes around the encoded SVG URL.
-				// stylelint-disable-next-line function-url-quotes
-				background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 24 24'%3E%3Cpath d='m19 7-3-3-8.5 8.5-1 4 4-1L19 7Zm-7 11.5H5V20h7v-1.5Z' fill='%23fff'/%3E%3C/svg%3E%0A");
-				color: $white;
-				content: "";
-				height: 24px;
-				position: absolute;
-				right: 0;
-				top: 0;
-				width: 24px;
-				z-index: z-index(".block-editor-block-list__block:not(.is-editing-disabled)::before");
-			}
-
-			.block-editor-block-list__block:not(.is-editing-disabled) {
-				box-shadow: none;
-
-				&::before {
-					display: none;
-				}
-			}
-		}
 	}
 
 	.reusable-block-edit-panel * {
@@ -328,6 +300,39 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui;
 		}
+	}
+}
+
+.block-editor-block-list__block.is-editing-disabled > .block-editor-block-list__block:not(.is-editing-disabled):not(.is-selected):not(.has-child-selected) {
+	&::before {
+		background-color: var(--wp-admin-theme-color);
+		// Disable reason: Need quotes around the encoded SVG URL.
+		// stylelint-disable-next-line function-url-quotes
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 24 24'%3E%3Cpath d='m19 7-3-3-8.5 8.5-1 4 4-1L19 7Zm-7 11.5H5V20h7v-1.5Z' fill='%23fff'/%3E%3C/svg%3E%0A");
+		color: $white;
+		content: "";
+		height: 24px;
+		position: absolute;
+		right: $grid-unit-05;
+		top: $grid-unit-05;
+		width: 24px;
+		z-index: z-index(".block-editor-block-list__block:not(.is-editing-disabled)::before");
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		pointer-events: none;
+		top: $border-width;
+		left: $border-width;
+		right: $border-width;
+		bottom: $border-width;
+		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+		border-radius: $radius-block-ui - $border-width;
+	}
+
+	&.is-hovered::after {
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.1);
 	}
 }
 
