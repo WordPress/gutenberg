@@ -1,13 +1,9 @@
 /**
  * WordPress dependencies
  */
-import {
-	store,
-	getContext,
-	getElement,
-	navigate,
-	prefetch,
-} from '@wordpress/interactivity';
+import { store, getContext, getElement } from '@wordpress/interactivity';
+// eslint-disable-next-line no-restricted-syntax
+import { navigate, prefetch } from '@wordpress/interactivity/router';
 
 const isValidLink = ( ref ) =>
 	ref &&
