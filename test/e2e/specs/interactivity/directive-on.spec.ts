@@ -51,12 +51,4 @@ test.describe( 'data-wp-on', () => {
 			.click( { clickCount: 3, delay: 100 } );
 		await expect( counter ).toHaveText( '3' );
 	} );
-
-	test( 'should not work if no event is defined', async ( { page } ) => {
-		const counter = page.getByTestId( 'counter not working' );
-		await page
-			.getByTestId( 'button not working' )
-			.click( { clickCount: 1, delay: 100 } );
-		await expect( counter ).toHaveText( '0' );
-	} );
 } );

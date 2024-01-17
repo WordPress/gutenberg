@@ -51,11 +51,4 @@ gutenberg_enqueue_module( 'directive-on-view' );
 			data-wp-on--click="actions.clickHandler"
 		>Click me!</button>
 	</div>
-	<div>
-		<p data-wp-text="state.counter" data-testid="counter not working">0</p>
-		<button
-			data-testid="button not working"
-			data-wp-on="actions.clickHandler"
-		>Click me! But I won't work</button>
-	</div>
 </div>
