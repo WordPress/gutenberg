@@ -190,7 +190,7 @@ function FontCollection( { id } ) {
 		} catch ( error ) {
 			setNotice( {
 				type: 'error',
-				message: error,
+				message: error.message,
 			} );
 		}
 		resetFontsToInstall();

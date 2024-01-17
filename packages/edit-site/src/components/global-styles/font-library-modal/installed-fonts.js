@@ -22,7 +22,6 @@ import FontsGrid from './fonts-grid';
 import LibraryFontDetails from './library-font-details';
 import LibraryFontCard from './library-font-card';
 import ConfirmDeleteDialog from './confirm-delete-dialog';
-import { getNoticeFromUninstallResponse } from './utils/get-notice-from-response';
 import { unlock } from '../../../lock-unlock';
 const { ProgressBar } = unlock( componentsPrivateApis );
 
@@ -50,8 +49,8 @@ function InstalledFonts() {
 
 	const handleConfirmUninstall = async () => {
 		const response = await uninstallFont( libraryFontSelected );
-		const uninstallNotice = getNoticeFromUninstallResponse( response );
-		setNotice( uninstallNotice );
+		// const uninstallNotice = getNoticeFromUninstallResponse( response );
+		// setNotice( uninstallNotice );
 		// If the font was succesfully uninstalled it is unselected
 		if ( ! response?.errors?.length ) {
 			handleUnselectFont();

@@ -160,6 +160,7 @@ function LocalFonts() {
 					'Variants from only one font family can be uploaded at a time.'
 				),
 			} );
+			setIsUploading( false );
 			return;
 		}
 

@@ -248,12 +248,21 @@ function FontLibraryProvider( { children } ) {
 				unsucessfullyInstalledFontFaces = response?.errors;
 			}
 
+			const detailedErrorMessage = unsucessfullyInstalledFontFaces.reduce(
+				( errorMessageCollection, error ) => {
+					return `${ errorMessageCollection } ${ error.message }`;
+				},
+				''
+			);
+
 			// If there were no successes and nothing already installed then we don't need to activate anything and can bounce now.
 			if (
 				sucessfullyInstalledFontFaces.length === 0 &&
 				alreadyInstalledFontFaces.length === 0
 			) {
-				throw new Error( 'No font faces were installed.' );
+				throw new Error(
+					'No font faces were installed. ' + detailedErrorMessage
+				);
 			}
 
 			// Use the sucessfully installed font faces
@@ -275,7 +284,8 @@ function FontLibraryProvider( { children } ) {
 
 			if ( unsucessfullyInstalledFontFaces.length > 0 ) {
 				throw new Error(
-					'Some font faces were installed. There were some errors.'
+					'Some font faces were installed. There were some errors. ' +
+						detailedErrorMessage
 				);
 			}
 		} finally {

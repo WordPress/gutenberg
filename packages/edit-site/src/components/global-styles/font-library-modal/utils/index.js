@@ -208,7 +208,7 @@ export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
 			// Handle network errors or other fetch-related errors
 			results.errors.push( {
 				data: fontFacesData[ index ],
-				error: `Fetch error: ${ result.reason }`,
+				message: `Fetch error: ${ result.reason.message }`,
 			} );
 		}
 	} );
