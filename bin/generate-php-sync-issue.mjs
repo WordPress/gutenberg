@@ -119,7 +119,6 @@ async function main() {
 	const processResult = pipe(
 		processCommits,
 		removeNesting,
-		removeSinglePRLevels,
 		dedupePRsPerLevel,
 		removeEmptyLevels,
 		sortLevels
@@ -267,38 +266,6 @@ function dedupePRsPerLevel( data ) {
 	return processLevel( data );
 }
 
-function removeSinglePRLevels( data ) {
-	function processLevel( levelData, parentData = null, parentKey = null ) {
-		const processedData = {};
-
-		for ( const [ key, value ] of Object.entries( levelData ) ) {
-			if ( Array.isArray( value ) ) {
-				if ( value.length === 1 && parentData && parentKey ) {
-					if ( ! Array.isArray( parentData[ parentKey ] ) ) {
-						parentData[ parentKey ] = [];
-					}
-					parentData[ parentKey ] = [
-						...parentData[ parentKey ],
-						...value,
-					];
-				} else {
-					processedData[ key ] = value;
-				}
-			} else {
-				processedData[ key ] = processLevel(
-					value,
-					processedData,
-					key
-				);
-			}
-		}
-
-		return processedData;
-	}
-
-	return processLevel( data );
-}
-
 function removeNesting( data, maxLevel = 3 ) {
 	function processLevel( levelData, level = 1 ) {
 		const processedData = {};
@@ -347,7 +314,6 @@ function processCommits( commits ) {
 				return;
 			}
 
-			// Skip files within specific packages.
 			if (
 				IGNORED_PATHS.some(
 					( path ) =>
@@ -355,10 +321,12 @@ function processCommits( commits ) {
 						file.filename === path
 				)
 			) {
+				// Skip files within specific packages.
 				return;
 			}
 
 			const parts = file.filename.split( '/' );
+
 			let current = result;
 
 			// If the file is under 'phpunit', add it directly to the 'phpunit' key
