@@ -280,12 +280,12 @@ const ImageComponent = ( {
 					<View style={ focalPoint && styles.focalPointContent }>
 						<Animated.Image
 							style={ imageStyles }
+							fadeDuration={ 0 }
 							source={ {
 								uri:
 									networkURL && networkImageLoaded
 										? networkURL
-										: ( localURL && localURL ) ||
-										  ( url && url ),
+										: ( localURL && localURL ) || url,
 							} }
 							{ ...( ! focalPoint && {
 								resizeMethod: 'scale',
@@ -294,7 +294,7 @@ const ImageComponent = ( {
 						/>
 						<Image
 							source={ networkURL }
-							style={ { height: 1, width: 1, opacity: 0 } }
+							style={ styles.nonVisibleImage }
 							onLoad={ () => {
 								setNetworkImageLoaded( true );
 							} }
