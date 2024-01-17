@@ -135,7 +135,7 @@ An accessible description for the button.
 
 #### `disabled`: `boolean`
 
-Whether the button is disabled. If `true`, this will force a `button` element to be rendered.
+Whether the button is disabled. If `true`, this will force a `button` element to be rendered, even when an `href` is given.
 
 -   Required: No
 

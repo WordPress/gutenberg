@@ -77,6 +77,7 @@ function InstalledFonts() {
 		!! libraryFontSelected && libraryFontSelected?.source !== 'theme';
 
 	useEffect( () => {
+		handleSelectFont( libraryFontSelected );
 		refreshLibrary();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );

@@ -536,17 +536,21 @@ function ViewTable( {
 											minWidth: 20,
 										} }
 									>
-										<SingleSelectionCheckbox
-											id={ getItemId( item ) || index }
-											item={ item }
-											selection={ selection }
-											onSelectionChange={
-												onSelectionChange
-											}
-											getItemId={ getItemId }
-											data={ data }
-											primaryField={ primaryField }
-										/>
+										<span className="dataviews-view-table__cell-content-wrapper">
+											<SingleSelectionCheckbox
+												id={
+													getItemId( item ) || index
+												}
+												item={ item }
+												selection={ selection }
+												onSelectionChange={
+													onSelectionChange
+												}
+												getItemId={ getItemId }
+												data={ data }
+												primaryField={ primaryField }
+											/>
+										</span>
 									</td>
 								) }
 								{ visibleFields.map( ( field ) => (
@@ -560,9 +564,20 @@ function ViewTable( {
 												field.maxWidth || undefined,
 										} }
 									>
-										{ field.render( {
-											item,
-										} ) }
+										<span
+											className={ classnames(
+												'dataviews-view-table__cell-content-wrapper',
+												{
+													'dataviews-view-table__primary-field':
+														primaryField?.id ===
+														field.id,
+												}
+											) }
+										>
+											{ field.render( {
+												item,
+											} ) }
+										</span>
 									</td>
 								) ) }
 								{ !! actions?.length && (

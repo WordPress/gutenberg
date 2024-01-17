@@ -168,7 +168,16 @@
 			padding-left: $grid-unit-05;
 		}
 	}
-
+	tbody {
+		td {
+			vertical-align: top;
+		}
+		.dataviews-view-table__cell-content-wrapper {
+			min-height: $grid-unit-40;
+			display: flex;
+			align-items: center;
+		}
+	}
 	.dataviews-view-table-header-button {
 		padding: $grid-unit-05 $grid-unit-10;
 		font-size: 11px;
@@ -193,6 +202,44 @@
 	}
 }
 
+.dataviews-view-list__primary-field,
+.dataviews-view-grid__primary-field,
+.dataviews-view-table__primary-field {
+	font-size: $default-font-size;
+	font-weight: 500;
+	color: $gray-900;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	display: block;
+	width: 100%;
+
+	a {
+		text-decoration: none;
+		color: inherit;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		width: 100%;
+
+		&:hover {
+			color: $gray-900;
+		}
+	}
+
+	button.components-button.is-link {
+		text-decoration: none;
+		color: inherit;
+		font-weight: inherit;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		width: 100%;
+	}
+}
+
 .dataviews-view-grid {
 	margin-bottom: $grid-unit-30;
 	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -207,23 +254,17 @@
 	}
 
 	.dataviews-view-grid__card {
-		padding: $grid-unit-05;
-		.dataviews-view-grid__primary-field {
-			.dataviews-view-grid__title-field {
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				display: block;
-				font-size: $default-font-size;
-				width: 100%;
-			}
+		border-radius: $radius-block-ui * 2;
+		border: 1px solid $gray-200;
+		height: 100%;
+		justify-content: flex-start;
 
-			.dataviews-view-grid__title-field a,
-			button.dataviews-view-grid__title-field {
-				font-weight: 500;
-				color: $gray-900;
-				text-decoration: none;
-			}
+		.dataviews-view-grid__title-actions {
+			padding: 0 $grid-unit-05;
+		}
+
+		.dataviews-view-grid__primary-field {
+			min-height: $grid-unit-50;
 		}
 
 		&:focus {
@@ -236,9 +277,9 @@
 		width: 100%;
 		min-height: 200px;
 		aspect-ratio: 1/1;
-		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-		border-radius: $radius-block-ui * 2;
 		overflow: hidden;
+		border-bottom: 1px solid $gray-200;
+		background-color: $gray-100;
 
 		> * {
 			object-fit: cover;
@@ -248,7 +289,7 @@
 	}
 
 	.dataviews-view-grid__primary-field {
-		min-height: $grid-unit-30;
+		padding: $grid-unit-10;
 	}
 
 	.dataviews-view-grid__fields {
@@ -256,12 +297,14 @@
 		font-size: 12px;
 		line-height: 16px;
 
+		&:not(:empty) {
+			padding: $grid-unit-15;
+			padding-top: 0;
+		}
+
 		.dataviews-view-grid__field {
-			.dataviews-view-grid__field-header {
-				color: $gray-700;
-			}
 			.dataviews-view-grid__field-value {
-				color: $gray-900;
+				color: $gray-700;
 			}
 		}
 	}
@@ -293,6 +336,7 @@
 		&:not(.is-selected):hover {
 			color: var(--wp-admin-theme-color);
 
+			.dataviews-view-list__primary-field,
 			.dataviews-view-list__fields {
 				color: var(--wp-admin-theme-color);
 			}
@@ -305,6 +349,7 @@
 			background-color: var(--wp-admin-theme-color);
 			color: $white;
 
+			.dataviews-view-list__primary-field,
 			.dataviews-view-list__fields,
 			.components-button {
 				color: $white;
@@ -383,6 +428,10 @@
 
 			&:last-child {
 				margin-right: 0;
+			}
+
+			&:empty {
+				display: none;
 			}
 		}
 	}
