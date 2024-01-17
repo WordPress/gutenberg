@@ -299,7 +299,7 @@ function FontLibraryProvider( { children } ) {
 		}
 	}
 
-	async function uninstallFont( fontFamilyToUninstall ) {
+	async function uninstallFontFamily( fontFamilyToUninstall ) {
 		try {
 			// Uninstall the font family.
 			// (Removes the font files from the server and the posts from the database).
@@ -441,7 +441,7 @@ function FontLibraryProvider( { children } ) {
 				getFontFacesActivated,
 				loadFontFaceAsset,
 				installFont,
-				uninstallFont,
+				uninstallFontFamily,
 				toggleActivateFont,
 				getAvailableFontsOutline,
 				modalTabOpen,

@@ -32,7 +32,7 @@ function InstalledFonts() {
 		baseThemeFonts,
 		handleSetLibraryFontSelected,
 		refreshLibrary,
-		uninstallFont,
+		uninstallFontFamily,
 		isResolvingLibrary,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
@@ -49,7 +49,7 @@ function InstalledFonts() {
 
 	const handleConfirmUninstall = async () => {
 		try {
-			await uninstallFont( libraryFontSelected );
+			await uninstallFontFamily( libraryFontSelected );
 			setNotice( {
 				type: 'success',
 				message: __( 'Font family uninstalled successfully.' ),
