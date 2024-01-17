@@ -153,6 +153,13 @@ function setBlockEditMode( setEditMode, blocks, mode ) {
 	} );
 }
 
+function getHasOverridableBlocks( blocks ) {
+	return blocks.some( ( block ) => {
+		if ( isPartiallySynced( block ) ) return true;
+		return getHasOverridableBlocks( block.innerBlocks );
+	} );
+}
+
 export default function ReusableBlockEdit( {
 	name,
 	attributes: { ref, overrides },
@@ -214,15 +221,23 @@ export default function ReusableBlockEdit( {
 		[ innerBlocks, setBlockEditingMode ]
 	);
 
-	// Apply the initial overrides from the pattern block to the inner blocks.
-	useEffect( () => {
-		const initialBlocks =
+	const hasOverridableBlocks = useMemo(
+		() => getHasOverridableBlocks( innerBlocks ),
+		[ innerBlocks ]
+	);
+
+	const initialBlocks = useMemo(
+		() =>
 			// Clone the blocks to generate new client IDs.
 			editedRecord.blocks?.map( ( block ) => cloneBlock( block ) ) ??
 			( editedRecord.content && typeof editedRecord.content !== 'function'
 				? parse( editedRecord.content )
-				: [] );
+				: [] ),
+		[ editedRecord.blocks, editedRecord.content ]
+	);
 
+	// Apply the initial overrides from the pattern block to the inner blocks.
+	useEffect( () => {
 		defaultValuesRef.current = {};
 		const editingMode = getBlockEditingMode( patternClientId );
 		// Replace the contents of the blocks with the overrides.
@@ -243,7 +258,7 @@ export default function ReusableBlockEdit( {
 	}, [
 		__unstableMarkNextChangeAsNotPersistent,
 		patternClientId,
-		editedRecord,
+		initialBlocks,
 		replaceInnerBlocks,
 		registry,
 		getBlockEditingMode,
@@ -299,6 +314,12 @@ export default function ReusableBlockEdit( {
 		editOriginalProps.onClick( event );
 	};
 
+	const resetOverrides = () => {
+		if ( overrides ) {
+			replaceInnerBlocks( patternClientId, initialBlocks );
+		}
+	};
+
 	let children = null;
 
 	if ( hasAlreadyRendered ) {
@@ -339,6 +360,21 @@ export default function ReusableBlockEdit( {
 					</ToolbarGroup>
 				</BlockControls>
 			) }
+
+			{ hasOverridableBlocks && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ resetOverrides }
+							disabled={ ! overrides }
+							__experimentalIsFocusable
+						>
+							{ __( 'Reset to original' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+
 			{ children === null ? (
 				<div { ...innerBlocksProps } />
 			) : (
