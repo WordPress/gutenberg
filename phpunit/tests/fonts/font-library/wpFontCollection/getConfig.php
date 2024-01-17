@@ -58,12 +58,12 @@ class Tests_Fonts_WpFontCollection_GetConfig extends WP_UnitTestCase {
 					'description' => 'My collection description',
 				),
 			),
-			'with data'   => array(
+			'with font_families'   => array(
 				'config'        => array(
 					'slug'        => 'my-collection',
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
-					'data'        => array( 'this is mock data' => true ),
+					'font_families' => [ array() ],
 				),
 				'expected_data' => array(
 					'slug'        => 'my-collection',
