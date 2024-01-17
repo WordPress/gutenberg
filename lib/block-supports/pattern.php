@@ -13,8 +13,17 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-pattern-partial-sync
 	 * @param WP_Block_Type $block_type Block Type.
 	 */
 	function gutenberg_register_pattern_support( $block_type ) {
-		global $block_bindings_allowed_blocks;
-		$pattern_support = array_key_exists( $block_type->name, $block_bindings_allowed_blocks );
+		// Note that this should be a duplicate or a subset of the $allowed_blocks
+		// defined in the `process_block_bindings` function.
+		// It should also match the client side config defined in
+		// `packages/patterns/src/constants.js`.
+		$allowed_blocks  = array(
+			'core/paragraph' => array( 'content' ),
+			'core/heading'   => array( 'content' ),
+			'core/image'     => array( 'url', 'title', 'alt' ),
+			'core/button'    => array( 'url', 'text' ),
+		);
+		$pattern_support = array_key_exists( $block_type->name, $allowed_blocks );
 
 		if ( $pattern_support ) {
 			if ( ! $block_type->uses_context ) {
