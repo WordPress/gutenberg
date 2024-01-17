@@ -13,6 +13,7 @@ gutenberg_enqueue_module( 'directive-each-view' );
 		<template data-wp-each="state.letters">
 			<p data-wp-text="context.item" data-testid="item"></p>
 		</template>
+		<!-- SSRed elements; they should be removed on hydration -->
 		<p data-testid="item" data-wp-each-child>A</p>
 		<p data-testid="item" data-wp-each-child>B</p>
 		<p data-testid="item" data-wp-each-child>C</p>
