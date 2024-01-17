@@ -45,7 +45,7 @@ const styleSupportKeys = [
 	SHADOW_SUPPORT_KEY,
 ];
 
-const hasStyleSupport = ( nameOrType ) =>
+export const hasStyleSupport = ( nameOrType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( nameOrType, key ) );
 
 /**

@@ -15,6 +15,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { getActiveStyle, getRenderedStyles, replaceActiveStyle } from './utils';
 import { store as blockEditorStore } from '../../store';
+import { cleanEmptyObject } from '../../hooks/utils';
 
 /**
  *
@@ -67,11 +68,13 @@ export default function useStylesForBlocks( { clientId, onSwitch } ) {
 			blockType,
 			styles: getBlockStyles( block.name ),
 			className: block.attributes.className || '',
+			attributes: block.attributes,
 		};
 	};
-	const { styles, block, blockType, className } = useSelect( selector, [
-		clientId,
-	] );
+	const { styles, block, blockType, className, attributes } = useSelect(
+		selector,
+		[ clientId ]
+	);
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const stylesToRender = getRenderedStyles( styles );
 	const activeStyle = getActiveStyle( stylesToRender, className );
@@ -83,8 +86,15 @@ export default function useStylesForBlocks( { clientId, onSwitch } ) {
 			activeStyle,
 			style
 		);
+
+		const newStyleAttribute = cleanEmptyObject( {
+			...attributes.style,
+			variation: style.name !== 'default' ? style.name : undefined,
+		} );
+
 		updateBlockAttributes( clientId, {
 			className: styleClassName,
+			style: newStyleAttribute,
 		} );
 		onSwitch();
 	};
