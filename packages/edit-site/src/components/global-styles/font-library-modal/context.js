@@ -204,29 +204,10 @@ function FontLibraryProvider( { children } ) {
 	async function installFont( font ) {
 		setIsInstalling( true );
 		try {
-			// Get the ID of the font family post, if it is already installed.
+			// Get the font family if it is already installed.
 			let installedFontFamily = await fetchGetFontFamilyBySlug(
 				font.slug
-			)
-				.then( ( response ) => {
-					if ( ! response || response.length === 0 ) {
-						return null;
-					}
-					const fontFamilyPost = response[ 0 ];
-					return {
-						id: fontFamilyPost.id,
-						...fontFamilyPost.font_family_settings,
-						fontFace:
-							fontFamilyPost?._embedded?.font_faces.map(
-								( face ) => face.font_face_settings
-							) || [],
-					};
-				} )
-				.catch( ( e ) => {
-					// eslint-disable-next-line no-console
-					console.error( e );
-					return null;
-				} );
+			);
 
 			// Otherwise, install it.
 			if ( ! installedFontFamily ) {
