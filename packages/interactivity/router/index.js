@@ -1,28 +1,18 @@
+// Import all from @wordpress/interactivity
+
 /**
  * External dependencies
  */
-import { hydrate, render } from 'preact';
+import { render } from 'preact';
 /**
  * Internal dependencies
  */
-import { toVdom, hydratedIslands } from './vdom';
-import { createRootFragment } from './utils';
-import { directivePrefix } from './constants';
+import { directivePrefix } from '../src/constants';
+import { toVdom } from '../src/vdom';
+import { getRegionRootFragment } from '../src/init';
 
 // The cache of visited and prefetched pages.
 const pages = new Map();
-
-// Keep the same root fragment for each interactive region node.
-const regionRootFragments = new WeakMap();
-const getRegionRootFragment = ( region ) => {
-	if ( ! regionRootFragments.has( region ) ) {
-		regionRootFragments.set(
-			region,
-			createRootFragment( region.parentElement, region )
-		);
-	}
-	return regionRootFragments.get( region );
-};
 
 // Helper to remove domain and hash from the URL. We are only interesting in
 // caching the path and the query.
@@ -157,21 +147,8 @@ window.addEventListener( 'popstate', async () => {
 	}
 } );
 
-// Initialize the router with the initial DOM.
-export const init = async () => {
-	document
-		.querySelectorAll( `[data-${ directivePrefix }-interactive]` )
-		.forEach( ( node ) => {
-			if ( ! hydratedIslands.has( node ) ) {
-				const fragment = getRegionRootFragment( node );
-				const vdom = toVdom( node );
-				hydrate( vdom, fragment );
-			}
-		} );
-
-	// Cache the current regions.
-	pages.set(
-		cleanUrl( window.location ),
-		Promise.resolve( regionsToVdom( document ) )
-	);
-};
+// Cache the current regions.
+pages.set(
+	cleanUrl( window.location ),
+	Promise.resolve( regionsToVdom( document ) )
+);

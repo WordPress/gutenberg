@@ -2,11 +2,10 @@
  * Internal dependencies
  */
 import registerDirectives from './directives';
-import { init } from './router';
+import { init } from './init';
 
 export { store } from './store';
 export { directive, getContext, getElement } from './hooks';
-export { navigate, prefetch } from './router';
 export {
 	useWatch,
 	useInit,
