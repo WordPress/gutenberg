@@ -30,14 +30,14 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$font_family_id       = WP_REST_Font_Families_Controller_Test::create_font_family_post();
 		self::$other_font_family_id = WP_REST_Font_Families_Controller_Test::create_font_family_post();
-		self::$font_face_id1        = self::create_font_face_post(
+
+		self::$font_face_id1 = self::create_font_face_post(
 			self::$font_family_id,
 			array(
 				'fontFamily' => '"Open Sans"',
 				'fontWeight' => '400',
 				'fontStyle'  => 'normal',
 				'src'        => home_url( '/wp-content/fonts/open-sans-medium.ttf' ),
-
 			)
 		);
 		self::$font_face_id2 = self::create_font_face_post(
@@ -69,13 +69,14 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 
 	public static function create_font_face_post( $parent_id, $settings = array() ) {
 		$settings = array_merge( self::$default_settings, $settings );
+		$title    = WP_Font_Family_Utils::get_font_face_slug( $settings );
 		return self::factory()->post->create(
 			wp_slash(
 				array(
 					'post_type'    => 'wp_font_face',
 					'post_status'  => 'publish',
-					'post_title'   => $settings['fontFamily'],
-					'post_name'    => sanitize_title( $settings['fontFamily'] ),
+					'post_title'   => $title,
+					'post_name'    => sanitize_title( $title ),
 					'post_content' => wp_json_encode( $settings ),
 					'post_parent'  => $parent_id,
 				)
@@ -200,8 +201,8 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 		);
 
 		$empty_settings = array(
-			'src'        => array(),
 			'fontFamily' => '',
+			'src'        => array(),
 		);
 
 		wp_set_current_user( self::$admin_id );
@@ -291,7 +292,7 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 			wp_json_encode(
 				array(
 					'fontFamily' => '"Open Sans"',
-					'fontWeight' => '400',
+					'fontWeight' => '200',
 					'fontStyle'  => 'normal',
 					'src'        => array_keys( $files )[0],
 				)
@@ -312,7 +313,7 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 			$settings,
 			array(
 				'fontFamily' => '"Open Sans"',
-				'fontWeight' => '400',
+				'fontWeight' => '200',
 				'fontStyle'  => 'normal',
 			)
 		);
@@ -336,7 +337,7 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 			wp_json_encode(
 				array(
 					'fontFamily' => '"Open Sans"',
-					'fontWeight' => '400',
+					'fontWeight' => '200',
 					'fontStyle'  => 'normal',
 					'src'        => array_keys( $files ),
 				)
@@ -382,7 +383,13 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 		$request->set_param(
 			'font_face_settings',
 			wp_json_encode(
-				array_merge( self::$default_settings, array( 'src' => array_keys( $files )[0] ) )
+				array_merge(
+					self::$default_settings,
+					array(
+						'fontWeight' => '200',
+						'src'        => array_keys( $files )[0],
+					)
+				)
 			)
 		);
 		$request->set_file_params( $files );
@@ -404,7 +411,7 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 			wp_json_encode(
 				array(
 					'fontFamily' => '"Open Sans"',
-					'fontWeight' => '400',
+					'fontWeight' => '200',
 					'fontStyle'  => 'normal',
 					'src'        => 'https://fonts.gstatic.com/s/open-sans/v30/KFOkCnqEu92Fr1MmgWxPKTM1K9nz.ttf',
 				)
@@ -459,6 +466,32 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	}
 
 	/**
+	 * @covers WP_REST_Font_Faces_Controller::create_item
+	 */
+	public function test_create_item_with_duplicate_properties() {
+		$settings     = array(
+			'fontFamily' => '"Open Sans"',
+			'fontWeight' => '200',
+			'fontStyle'  => 'italic',
+			'src'        => home_url( '/wp-content/fonts/open-sans-italic-light.ttf' ),
+		);
+		$font_face_id = self::create_font_face_post( self::$font_family_id, $settings );
+
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
+		$request->set_param( 'font_face_settings', wp_json_encode( $settings ) );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_duplicate_font_face', $response, 400 );
+		$expected_message = 'A font face matching those settings already exists.';
+		$message          = $response->as_error()->get_error_messages()[0];
+		$this->assertSame( $expected_message, $message );
+
+		wp_delete_post( $font_face_id, true );
+	}
+
+	/**
 	 * @covers WP_REST_Font_Faces_Controller::validate_create_font_face_request
 	 */
 	public function test_create_item_default_theme_json_version() {
@@ -469,6 +502,7 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 			wp_json_encode(
 				array(
 					'fontFamily' => '"Open Sans"',
+					'fontWeight' => '200',
 					'src'        => 'https://fonts.gstatic.com/s/open-sans/v30/KFOkCnqEu92Fr1MmgWxPKTM1K9nz.ttf',
 				)
 			)
@@ -602,7 +636,7 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	/**
 	 * @dataProvider data_create_item_santize_font_family
 	 *
-	 * @covers WP_REST_Font_Families_Controller::update_item
+	 * @covers WP_REST_Font_Face_Controller::sanitize_font_face_settings
 	 */
 	public function test_create_item_santize_font_family( $font_family_setting, $expected ) {
 		$settings = array_merge( self::$default_settings, array( 'fontFamily' => $font_family_setting ) );
@@ -619,9 +653,9 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 
 	public function data_create_item_santize_font_family() {
 		return array(
-			array( 'Libre Barcode 128 Text', "'Libre Barcode 128 Text'" ),
-			array( 'B612 Mono', "'B612 Mono'" ),
-			array( 'Open Sans, Noto Sans, sans-serif', "'Open Sans', 'Noto Sans', sans-serif" ),
+			array( 'Libre Barcode 128 Text', '"Libre Barcode 128 Text"' ),
+			array( 'B612 Mono', '"B612 Mono"' ),
+			array( 'Open Sans, Noto Sans, sans-serif', '"Open Sans", "Noto Sans", sans-serif' ),
 		);
 	}
 

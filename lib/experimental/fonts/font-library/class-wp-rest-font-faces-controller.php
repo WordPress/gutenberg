@@ -295,6 +295,22 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$settings    = $request->get_param( 'font_face_settings' );
 		$file_params = $request->get_file_params();
 
+		// Check that the necessary font face properties are unique.
+		$existing_font_face = get_posts(
+			array(
+				'post_type'      => $this->post_type,
+				'posts_per_page' => 1,
+				'title'          => WP_Font_Family_Utils::get_font_face_slug( $settings ),
+			)
+		);
+		if ( ! empty( $existing_font_face ) ) {
+			return new WP_Error(
+				'rest_duplicate_font_face',
+				__( 'A font face matching those settings already exists.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
 		// Move the uploaded font asset from the temp folder to the fonts directory.
 		if ( ! function_exists( 'wp_handle_upload' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -648,11 +664,15 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		// Settings have already been decoded by ::sanitize_font_face_settings().
 		$settings = $request->get_param( 'font_face_settings' );
 
+		// Store this "slug" as the post_title rather than post_name, since it uses the fontFamily setting,
+		// which may contain multibyte characters.
+		$title = WP_Font_Family_Utils::get_font_face_slug( $settings );
+
 		$prepared_post->post_type    = $this->post_type;
 		$prepared_post->post_parent  = $request['font_family_id'];
 		$prepared_post->post_status  = 'publish';
-		$prepared_post->post_title   = $settings['fontFamily'];
-		$prepared_post->post_name    = sanitize_title( $settings['fontFamily'] );
+		$prepared_post->post_title   = $title;
+		$prepared_post->post_name    = sanitize_title( $title );
 		$prepared_post->post_content = wp_json_encode( $settings );
 
 		return $prepared_post;
@@ -751,10 +771,10 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		// Provide required, empty settings if needed.
 		if ( null === $settings ) {
 			$settings = array(
-				'src' => array(),
+				'fontFamily' => '',
+				'src'        => array(),
 			);
 		}
-		$settings['fontFamily'] = $post->post_title ?? '';
 
 		// Only return the properties defined in the schema.
 		return array_intersect_key( $settings, $properties );

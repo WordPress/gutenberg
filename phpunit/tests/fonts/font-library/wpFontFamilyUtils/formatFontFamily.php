@@ -36,11 +36,11 @@ class Tests_Fonts_WpFontsFamilyUtils_FormatFontFamily extends WP_UnitTestCase {
 		return array(
 			'data_families_with_spaces_and_numbers' => array(
 				'font_family' => 'Rock 3D , Open Sans,serif',
-				'expected'    => "'Rock 3D', 'Open Sans', serif",
+				'expected'    => '"Rock 3D", "Open Sans", serif',
 			),
 			'data_single_font_family'               => array(
 				'font_family' => 'Rock 3D',
-				'expected'    => "'Rock 3D'",
+				'expected'    => '"Rock 3D"',
 			),
 			'data_no_spaces'                        => array(
 				'font_family' => 'Rock3D',
@@ -48,7 +48,7 @@ class Tests_Fonts_WpFontsFamilyUtils_FormatFontFamily extends WP_UnitTestCase {
 			),
 			'data_many_spaces_and_existing_quotes'  => array(
 				'font_family' => 'Rock 3D serif, serif,sans-serif, "Open Sans"',
-				'expected'    => "'Rock 3D serif', serif, sans-serif, \"Open Sans\"",
+				'expected'    => '"Rock 3D serif", serif, sans-serif, "Open Sans"',
 			),
 			'data_empty_family'                     => array(
 				'font_family' => ' ',
