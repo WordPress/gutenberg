@@ -77,7 +77,7 @@ const defaultConfigPerViewType = {
 };
 
 const DEFAULT_VIEW = {
-	type: LAYOUT_TABLE,
+	type: LAYOUT_LIST,
 	search: '',
 	page: 1,
 	perPage: 20,
