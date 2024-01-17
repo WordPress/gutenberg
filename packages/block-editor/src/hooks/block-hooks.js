@@ -96,13 +96,8 @@ function BlockHooksControlPure( { name, clientId } ) {
 					}
 
 					// If no hooked block was found in any of its designated locations,
-					// but it exists elsewhere in the block tree, we consider it manually inserted.
-					// In this case, we take note and will remove the corresponding toggle from the
-					// block inspector panel.
-					return {
-						...clientIds,
-						[ block.name ]: false,
-					};
+					// we set the toggle to disabled.
+					return clientIds;
 				},
 				{}
 			);
@@ -118,13 +113,7 @@ function BlockHooksControlPure( { name, clientId } ) {
 
 	const { insertBlock, removeBlock } = useDispatch( blockEditorStore );
 
-	// Remove toggle if block isn't present in the designated location but elsewhere in the block tree.
-	const hookedBlocksForCurrentBlockIfNotPresentElsewhere =
-		hookedBlocksForCurrentBlock?.filter(
-			( block ) => hookedBlockClientIds?.[ block.name ] !== false
-		);
-
-	if ( ! hookedBlocksForCurrentBlockIfNotPresentElsewhere.length ) {
+	if ( ! hookedBlocksForCurrentBlock.length ) {
 		return null;
 	}
 
