@@ -17,7 +17,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	fetchGetFontFamilyBySlug,
 	fetchInstallFontFamily,
-	fetchUninstallFonts,
+	fetchUninstallFontFamily,
 	fetchFontCollections,
 	fetchFontCollection,
 } from './resolvers';
@@ -296,13 +296,21 @@ function FontLibraryProvider( { children } ) {
 		}
 	}
 
-	async function uninstallFont( font ) {
+	async function uninstallFont( fontFamilyToUninstall ) {
 		try {
-			// Uninstall the font (remove the font files from the server and the post from the database).
-			const response = await fetchUninstallFonts( [ font ] );
+			// Get the font family data by slug.
+			const fontFamilyToUninstallData = await fetchGetFontFamilyBySlug(
+				fontFamilyToUninstall.slug
+			);
+
+			// Uninstall the font (remove the font files from the server and the posts from the database).
+			const uninstalledFontFamily = await fetchUninstallFontFamily(
+				fontFamilyToUninstallData.id
+			);
+
 			// Deactivate the font family (remove the font family from the global styles).
-			if ( 0 === response.errors.length ) {
-				deactivateFontFamily( font );
+			if ( uninstalledFontFamily.deleted ) {
+				deactivateFontFamily( fontFamilyToUninstall );
 				// Save the global styles to the database.
 				await saveSpecifiedEntityEdits(
 					'root',
@@ -311,9 +319,11 @@ function FontLibraryProvider( { children } ) {
 					[ 'settings.typography.fontFamilies' ]
 				);
 			}
+
 			// Refresh the library (the library font families from database).
 			refreshLibrary();
-			return response;
+
+			return uninstalledFontFamily;
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( error );
