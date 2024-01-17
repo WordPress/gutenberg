@@ -14,8 +14,11 @@ export {
 	useCallback,
 	useMemo,
 } from './utils';
+export { directivePrefix } from './constants';
+export { toVdom } from './vdom';
+export { getRegionRootFragment } from './init';
 
-export { h as createElement, cloneElement } from 'preact';
+export { h as createElement, cloneElement, render } from 'preact';
 export { useContext, useState, useRef } from 'preact/hooks';
 export { deepSignal } from 'deepsignal';
 

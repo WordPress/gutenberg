@@ -1,15 +1,14 @@
 // Import all from @wordpress/interactivity
 
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { render } from 'preact';
-/**
- * Internal dependencies
- */
-import { directivePrefix } from '../src/constants';
-import { toVdom } from '../src/vdom';
-import { getRegionRootFragment } from '../src/init';
+import {
+	render,
+	directivePrefix,
+	toVdom,
+	getRegionRootFragment,
+} from '@wordpress/interactivity';
 
 // The cache of visited and prefetched pages.
 const pages = new Map();
