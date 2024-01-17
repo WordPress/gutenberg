@@ -188,3 +188,60 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 		return apply_filters( 'font_dir', $defaults );
 	}
 }
+
+// @core-merge: Filters should go in `src/wp-includes/default-filters.php`,
+// functions in a general file for font library.
+if ( ! function_exists( '_wp_delete_font_family' ) ) {
+	/**
+	 * Deletes child font faces when a font family is deleted.
+	 *
+	 * @access private
+	 * @since 6.5.0
+	 *
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post    Post object.
+	 * @return void
+	 */
+	function _wp_delete_font_family( $post_id, $post ) {
+		if ( 'wp_font_family' !== $post->post_type ) {
+			return;
+		}
+
+		$font_faces = get_children(
+			array(
+				'post_parent' => $post_id,
+				'post_type'   => 'wp_font_face',
+			)
+		);
+
+		foreach ( $font_faces as $font_face ) {
+			wp_delete_post( $font_face->ID, true );
+		}
+	}
+	add_action( 'deleted_post', '_wp_delete_font_family', 10, 2 );
+}
+
+if ( ! function_exists( '_wp_delete_font_face' ) ) {
+	/**
+	 * Deletes associated font files when a font face is deleted.
+	 *
+	 * @access private
+	 * @since 6.5.0
+	 *
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post    Post object.
+	 * @return void
+	 */
+	function _wp_delete_font_face( $post_id, $post ) {
+		if ( 'wp_font_face' !== $post->post_type ) {
+			return;
+		}
+
+		$font_files = get_post_meta( $post_id, '_wp_font_face_files', false );
+
+		foreach ( $font_files as $font_file ) {
+			wp_delete_file( wp_get_font_dir()['path'] . '/' . $font_file );
+		}
+	}
+	add_action( 'before_delete_post', '_wp_delete_font_face', 10, 2 );
+}

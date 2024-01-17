@@ -9,12 +9,14 @@ import {
 	useEntityRecords,
 	store as coreStore,
 } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import {
-	fetchInstallFont,
+	fetchGetFontFamilyBySlug,
+	fetchInstallFontFamily,
 	fetchUninstallFonts,
 	fetchFontCollections,
 	fetchFontCollection,
@@ -26,10 +28,12 @@ import {
 	mergeFontFamilies,
 	loadFontFaceInBrowser,
 	getDisplaySrcFromFontFace,
-	makeFormDataFromFontFamily,
+	makeFontFacesFormData,
+	makeFontFamilyFormData,
+	batchInstallFontFaces,
+	checkFontFaceInstalled,
 } from './utils';
 import { toggleFont } from './utils/toggleFont';
-import getIntersectingFontFaces from './utils/get-intersecting-font-faces';
 
 export const FontLibraryContext = createContext( {} );
 
@@ -60,12 +64,19 @@ function FontLibraryProvider( { children } ) {
 		records: libraryPosts = [],
 		isResolving: isResolvingLibrary,
 		hasResolved: hasResolvedLibrary,
-	} = useEntityRecords( 'postType', 'wp_font_family', { refreshKey } );
+	} = useEntityRecords( 'postType', 'wp_font_family', {
+		refreshKey,
+		_embed: true,
+	} );
 
 	const libraryFonts =
-		( libraryPosts || [] ).map( ( post ) =>
-			JSON.parse( post.content.raw )
-		) || [];
+		( libraryPosts || [] ).map( ( post ) => {
+			post.font_family_settings.fontFace =
+				post?._embedded?.font_faces.map(
+					( face ) => face.font_face_settings
+				) || [];
+			return post.font_family_settings;
+		} ) || [];
 
 	// Global Styles (settings) font families
 	const [ fontFamilies, setFontFamilies ] = useGlobalSetting(
@@ -192,35 +203,96 @@ function FontLibraryProvider( { children } ) {
 		return getActivatedFontsOutline( source )[ slug ] || [];
 	};
 
-	async function installFont( font ) {
+	async function installFont( fontFamilyToInstall ) {
 		setIsInstalling( true );
 		try {
-			// Prepare formData to install.
-			const formData = makeFormDataFromFontFamily( font );
-			// Install the fonts (upload the font files to the server and create the post in the database).
-			const response = await fetchInstallFont( formData );
-			const fontsInstalled = response?.successes || [];
-			// Get intersecting font faces between the fonts we tried to installed and the fonts that were installed
-			// (to avoid activating a non installed font).
-			const fontToBeActivated = getIntersectingFontFaces(
-				fontsInstalled,
-				[ font ]
+			// Get the font family if it already exists.
+			let installedFontFamily = await fetchGetFontFamilyBySlug(
+				fontFamilyToInstall.slug
 			);
-			// Activate the font families (add the font families to the global styles).
-			activateCustomFontFamilies( fontToBeActivated );
+
+			// Otherwise create it.
+			if ( ! installedFontFamily ) {
+				// Prepare font family form data to install.
+				installedFontFamily = await fetchInstallFontFamily(
+					makeFontFamilyFormData( fontFamilyToInstall )
+				);
+			}
+
+			// Collect font faces that have already been installed (to be activated later)
+			const alreadyInstalledFontFaces =
+				installedFontFamily.fontFace.filter( ( fontFaceToInstall ) =>
+					checkFontFaceInstalled(
+						fontFaceToInstall,
+						fontFamilyToInstall.fontFace
+					)
+				);
+
+			// Filter out Font Faces that have already been installed (so that they are not re-installed)
+			fontFamilyToInstall.fontFace = fontFamilyToInstall.fontFace.filter(
+				( fontFaceToInstall ) =>
+					! checkFontFaceInstalled(
+						fontFaceToInstall,
+						installedFontFamily.fontFace
+					)
+			);
+
+			// Install the fonts (upload the font files to the server and create the post in the database).
+			let sucessfullyInstalledFontFaces = [];
+			let unsucessfullyInstalledFontFaces = [];
+			if ( fontFamilyToInstall.fontFace.length > 0 ) {
+				const response = await batchInstallFontFaces(
+					installedFontFamily.id,
+					makeFontFacesFormData( fontFamilyToInstall )
+				);
+				sucessfullyInstalledFontFaces = response?.successes;
+				unsucessfullyInstalledFontFaces = response?.errors;
+			}
+
+			const detailedErrorMessage = unsucessfullyInstalledFontFaces.reduce(
+				( errorMessageCollection, error ) => {
+					return `${ errorMessageCollection } ${ error.message }`;
+				},
+				''
+			);
+
+			// If there were no successes and nothing already installed then we don't need to activate anything and can bounce now.
+			if (
+				sucessfullyInstalledFontFaces.length === 0 &&
+				alreadyInstalledFontFaces.length === 0
+			) {
+				throw new Error(
+					__( 'No font faces were installed. ' ) +
+						detailedErrorMessage
+				);
+			}
+
+			// Use the sucessfully installed font faces
+			// As well as any font faces that were already installed (those will be activated)
+			fontFamilyToInstall.fontFace = [
+				...sucessfullyInstalledFontFaces,
+				...alreadyInstalledFontFaces,
+			];
+
+			// Activate the font family (add the font family to the global styles).
+			activateCustomFontFamilies( [ fontFamilyToInstall ] );
+
 			// Save the global styles to the database.
 			saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [
 				'settings.typography.fontFamilies',
 			] );
-			refreshLibrary();
-			setIsInstalling( false );
 
-			return response;
-		} catch ( error ) {
+			refreshLibrary();
+
+			if ( unsucessfullyInstalledFontFaces.length > 0 ) {
+				throw new Error(
+					__(
+						'Some font faces were installed. There were some errors. '
+					) + detailedErrorMessage
+				);
+			}
+		} finally {
 			setIsInstalling( false );
-			return {
-				errors: [ error ],
-			};
 		}
 	}
 
@@ -239,7 +311,7 @@ function FontLibraryProvider( { children } ) {
 					[ 'settings.typography.fontFamilies' ]
 				);
 			}
-			// Refresh the library (the the library font families from database).
+			// Refresh the library (the library font families from database).
 			refreshLibrary();
 			return response;
 		} catch ( error ) {
