@@ -360,7 +360,8 @@ export default function ReusableBlockEdit( {
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ resetOverrides }
-							aria-disabled={ overrides ? 'false' : 'true' }
+							disabled={ ! overrides }
+							__experimentalIsFocusable
 						>
 							{ __( 'Reset to original' ) }
 						</ToolbarButton>
