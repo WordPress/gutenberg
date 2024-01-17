@@ -762,12 +762,11 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 		$this->assertArrayHasKey( 'theme_json_version', $data );
 		$this->assertSame( WP_Theme_JSON::LATEST_SCHEMA, $data['theme_json_version'] );
 
-		$font_face_ids = get_posts(
+		$font_face_ids = get_children(
 			array(
-				'fields'         => 'ids',
-				'post_parent'    => $post_id,
-				'post_type'      => 'wp_font_face',
-				'posts_per_page' => 999,
+				'fields'      => 'ids',
+				'post_parent' => $post_id,
+				'post_type'   => 'wp_font_face',
 			)
 		);
 		$this->assertArrayHasKey( 'font_faces', $data );
