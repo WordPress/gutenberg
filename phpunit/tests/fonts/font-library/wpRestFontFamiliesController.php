@@ -767,6 +767,8 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 				'fields'      => 'ids',
 				'post_parent' => $post_id,
 				'post_type'   => 'wp_font_face',
+				'order'       => 'ASC',
+				'orderby'     => 'ID',
 			)
 		);
 		$this->assertArrayHasKey( 'font_faces', $data );
