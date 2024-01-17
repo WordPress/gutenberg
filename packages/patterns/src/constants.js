@@ -28,4 +28,9 @@ export const PARTIAL_SYNCING_SUPPORTED_BLOCKS = {
 		text: __( 'Text' ),
 		url: __( 'URL' ),
 	},
+	'core/image': {
+		url: __( 'URL' ),
+		title: __( 'Title' ),
+		alt: __( 'Alt Text' ),
+	},
 };
