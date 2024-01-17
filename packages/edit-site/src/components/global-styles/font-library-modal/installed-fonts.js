@@ -52,17 +52,17 @@ function InstalledFonts() {
 			await uninstallFont( libraryFontSelected );
 			setNotice( {
 				type: 'success',
-				message: __( 'Fonts were uninstalled successfully.' ),
+				message: __( 'Font family uninstalled successfully.' ),
 			} );
 
-			// If the font was succesfully uninstalled it is unselected
+			// If the font was succesfully uninstalled it is unselected.
 			handleUnselectFont();
 			setIsConfirmDeleteOpen( false );
 		} catch ( error ) {
 			setNotice( {
 				type: 'error',
 				message:
-					__( 'There was an error uninstalling the fonts.' ) +
+					__( 'There was an error uninstalling the font family.' ) +
 					error.message,
 			} );
 		}
