@@ -175,8 +175,10 @@ class WP_Font_Family_Utils {
 				// Remove quotes to normalize font-family names, and ';' to use as a separator.
 				$elem = trim( str_replace( array( '"', "'", ';' ), '', $elem ) );
 
-				// Normalize comma separated lists by removing spaces in between items,
-				// but keep spaces within items (e.g. "Open Sans" and "OpenSans" are different fonts).
+				// Normalize comma separated lists by removing whitespace in between items,
+				// but keep whitespace within items (e.g. "Open Sans" and "OpenSans" are different fonts).
+				// CSS spec for whitespace includes: U+000A LINE FEED, U+0009 CHARACTER TABULATION, or U+0020 SPACE,
+				// which by default are all matched by \s in PHP.
 				return preg_replace( '/,\s+/', ',', $elem );
 			},
 			$slug_elements
