@@ -39,7 +39,7 @@ android {
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 33
+        targetSdkVersion 34
         buildConfigField "boolean", "SHOULD_ATTACH_JS_BUNDLE", willPublishReactNativeBridgeBinary.toString()
     }
 
