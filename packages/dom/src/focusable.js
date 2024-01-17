@@ -33,6 +33,7 @@ function buildSelector( sequential ) {
 		sequential ? '[tabindex]:not([tabindex^="-"])' : '[tabindex]',
 		'a[href]',
 		'button:not([disabled])',
+		'[role="button"][tabindex]',
 		'input:not([type="hidden"]):not([disabled])',
 		'select:not([disabled])',
 		'textarea:not([disabled])',

@@ -94,8 +94,10 @@ export default function ViewList( {
 									onClick={ () =>
 										onSelectionChange( [ item ] )
 									}
+									tabIndex={
+										tabIndex === undefined ? 0 : tabIndex
+									}
 									{ ...otherProps }
-									tabIndex={ tabIndex }
 								>
 									<HStack spacing={ 3 } justify="start">
 										<div className="dataviews-view-list__media-wrapper">
