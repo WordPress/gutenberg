@@ -8,7 +8,7 @@ import { deepSignal, peek } from 'deepsignal';
  * Internal dependencies
  */
 import { createPortal } from './portals';
-import { useWatch, useInit } from './utils';
+import { useWatch, useInit, useEffect } from './utils';
 import { directive } from './hooks';
 
 const isObject = ( item ) =>
@@ -86,6 +86,27 @@ export default () => {
 			};
 		} );
 	} );
+
+	const getGlobalEventDirective =
+		( type ) =>
+		( { directives, evaluate } ) => {
+			directives[ `on-${ type }` ]
+				.filter( ( { suffix } ) => suffix !== 'default' )
+				.forEach( ( entry ) => {
+					useEffect( () => {
+						const cb = ( event ) => evaluate( entry, event );
+						const globalVar = type === 'window' ? window : document;
+						globalVar.addEventListener( entry.suffix, cb );
+						return () =>
+							globalVar.removeEventListener( entry.suffix, cb );
+					}, [] );
+				} );
+		};
+
+	// data-wp-on-window--[event]
+	directive( 'on-window', getGlobalEventDirective( 'window' ) );
+	// data-wp-on-document--[event]
+	directive( 'on-document', getGlobalEventDirective( 'document' ) );
 
 	// data-wp-class--[classname]
 	directive(
