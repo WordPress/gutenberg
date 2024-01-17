@@ -2098,12 +2098,11 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			if ( 'aspect-ratio' === $css_property ) {
-				// For aspect ratio to work, the width must be 100%.
-				// If a width support is added in the future, this should be updated
-				// to check if a width value is present before outputting this rule.
+				// For aspect ratio to work, other dimensions rules must be unset.
+				// This ensures that a fixed height does not override the aspect ratio.
 				$declarations[] = array(
-					'name'  => 'width',
-					'value' => '100%',
+					'name'  => 'min-height',
+					'value' => 'unset',
 				);
 			}
 

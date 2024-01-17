@@ -354,8 +354,18 @@ export default function DimensionsPanel( {
 	const showMinHeightControl = useHasMinHeight( settings );
 	const minHeightValue = decodeValue( inheritedValue?.dimensions?.minHeight );
 	const setMinHeightValue = ( newValue ) => {
+		const tempValue = setImmutably(
+			value,
+			[ 'dimensions', 'minHeight' ],
+			newValue
+		);
+		// Apply min-height, while removing any applied aspect ratio.
 		onChange(
-			setImmutably( value, [ 'dimensions', 'minHeight' ], newValue )
+			setImmutably(
+				tempValue,
+				[ 'dimensions', 'aspectRatio' ],
+				undefined
+			)
 		);
 	};
 	const resetMinHeightValue = () => {
@@ -368,9 +378,16 @@ export default function DimensionsPanel( {
 	const aspectRatioValue = decodeValue(
 		inheritedValue?.dimensions?.aspectRatio
 	);
+	// Gotta change something here
 	const setAspectRatioValue = ( newValue ) => {
+		const tempValue = setImmutably(
+			value,
+			[ 'dimensions', 'aspectRatio' ],
+			newValue
+		);
+		// Apply aspect-ratio, while removing any applied min-height.
 		onChange(
-			setImmutably( value, [ 'dimensions', 'aspectRatio' ], newValue )
+			setImmutably( tempValue, [ 'dimensions', 'minHeight' ], undefined )
 		);
 	};
 	const hasAspectRatioValue = () => !! value?.dimensions?.aspectRatio;
