@@ -14,6 +14,7 @@ import { useEffect, useState } from '@wordpress/element';
  */
 import Tabs from '..';
 import type { TabsProps } from '../types';
+import { act } from 'react-dom/test-utils';
 
 type Tab = {
 	tabId: string;
@@ -1173,64 +1174,79 @@ describe( 'Tabs', () => {
 			} );
 		} );
 		describe( 'When `selectedId` is changed by the controlling component', () => {
-			it( 'should automatically update focus if the selected tab already had focus', async () => {
-				const { rerender } = render(
-					<ControlledTabs
-						tabs={ TABS }
-						selectedTabId="beta"
-						selectOnMove={ false }
-					/>
-				);
+			describe.each( [ true, false ] )(
+				'When `selectOnMove` is `%s`',
+				( selectOnMove ) => {
+					it( 'should move focus to the newly selected tab if the previously selected tab was focused', async () => {
+						const { rerender } = render(
+							<ControlledTabs
+								tabs={ TABS }
+								selectedTabId="beta"
+								selectOnMove={ selectOnMove }
+							/>
+						);
 
-				// Tab key should focus the currently selected tab, which is Beta.
-				await press.Tab();
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-				expect( await getSelectedTab() ).toHaveFocus();
+						// Tab key should focus the currently selected tab, which is Beta.
+						await press.Tab();
+						expect( await getSelectedTab() ).toHaveTextContent(
+							'Beta'
+						);
+						expect( await getSelectedTab() ).toHaveFocus();
 
-				rerender(
-					<ControlledTabs
-						tabs={ TABS }
-						selectedTabId="gamma"
-						selectOnMove={ false }
-					/>
-				);
+						rerender(
+							<ControlledTabs
+								tabs={ TABS }
+								selectedTabId="gamma"
+								selectOnMove={ selectOnMove }
+							/>
+						);
 
-				// When the selected tab is changed, it should automatically receive focus.
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-				expect( await getSelectedTab() ).toHaveFocus();
-			} );
-			it( 'should not automatically update focus if the selected tab was not already focused', async () => {
-				const { rerender } = render(
-					<ControlledTabs
-						tabs={ TABS }
-						selectedTabId="beta"
-						selectOnMove={ false }
-					/>
-				);
+						// When the selected tab is changed, it should automatically receive focus.
+						expect( await getSelectedTab() ).toHaveTextContent(
+							'Gamma'
+						);
+						expect( await getSelectedTab() ).toHaveFocus();
+					} );
+					it( 'should not move focus to the newly selected tab if the previously selected tab was not focused', async () => {
+						const { rerender } = render(
+							<ControlledTabs
+								tabs={ TABS }
+								selectedTabId="beta"
+								selectOnMove={ selectOnMove }
+							/>
+						);
 
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
+						expect( await getSelectedTab() ).toHaveTextContent(
+							'Beta'
+						);
 
-				// Tab key should focus the currently selected tab, which is Beta.
-				await press.Tab();
-				expect( await getSelectedTab() ).toHaveFocus();
-				// Arrow left to focus Alpha, which is not the currently
-				// selected tab
-				await press.ArrowLeft();
+						// Tab key should focus the currently selected tab, which is Beta.
+						await press.Tab();
+						expect( await getSelectedTab() ).toHaveFocus();
+						// Focus Alpha, which is not the currently selected tab
+						// (not the most elegant way, but it does the job).
+						act( () =>
+							screen.getByRole( 'tab', { name: 'Alpha' } ).focus()
+						);
 
-				rerender(
-					<ControlledTabs
-						tabs={ TABS }
-						selectedTabId="gamma"
-						selectOnMove={ false }
-					/>
-				);
+						rerender(
+							<ControlledTabs
+								tabs={ TABS }
+								selectedTabId="gamma"
+								selectOnMove={ selectOnMove }
+							/>
+						);
 
-				// When the selected tab is changed, it should not automatically receive focus.
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
-				expect(
-					screen.getByRole( 'tab', { name: 'Alpha' } )
-				).toHaveFocus();
-			} );
+						// When the selected tab is changed, it should not automatically receive focus.
+						expect( await getSelectedTab() ).toHaveTextContent(
+							'Gamma'
+						);
+						expect(
+							screen.getByRole( 'tab', { name: 'Alpha' } )
+						).toHaveFocus();
+					} );
+				}
+			);
 		} );
 
 		describe( 'When `selectOnMove` is `true`', () => {

@@ -174,6 +174,7 @@ function Tabs( {
 				return activeElement === item.element;
 			} );
 		const previousSelectedTabHadFocus =
+			typeof previousSelectedId === 'string' &&
 			previousSelectedId === activeElement?.id;
 
 		// If the previously selected tab had focus when the selection changed,
