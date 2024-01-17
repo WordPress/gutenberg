@@ -39,16 +39,11 @@ function getAbsolutePosition( element ) {
  *  - It uses the "resetAnimation" flag to reset the animation
  *    from the beginning in order to animate to the new destination point.
  *
- * @param {Object}  $1                          Options
- * @param {boolean} $1.enableAnimation          Whether to enable the animation.
- * @param {*}       $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
- * @param {string}  $1.clientId
+ * @param {Object} $1                          Options
+ * @param {*}      $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
+ * @param {string} $1.clientId
  */
-function useMovingAnimation( {
-	enableAnimation = true,
-	triggerAnimationOnChange,
-	clientId,
-} ) {
+function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 	const ref = useRef();
 	const {
 		isTyping,
@@ -98,7 +93,6 @@ function useMovingAnimation( {
 		// To do: consider enableing the _moving_ animation even for large
 		// posts, while only disabling the _insertion_ animation?
 		const disableAnimation =
-			! enableAnimation ||
 			window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ||
 			isTyping() ||
 			getGlobalBlockCount() > BLOCK_ANIMATION_THRESHOLD;
@@ -153,7 +147,6 @@ function useMovingAnimation( {
 		previous,
 		prevRect,
 		clientId,
-		enableAnimation,
 		isTyping,
 		getGlobalBlockCount,
 		isBlockSelected,
