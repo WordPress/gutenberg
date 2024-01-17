@@ -31,12 +31,13 @@ const DEFAULT_TABS = [
 ];
 
 const tabsFromCollections = ( collections ) =>
-	collections.map( ( { id, name } ) => ( {
-		id,
+	collections.map( ( { slug, name } ) => ( {
+		slug,
 		title:
-			collections.length === 1 && id === 'default-font-collection'
+			collections.length === 1 && slug === 'default-font-collection'
 				? __( 'Install Fonts' )
 				: name,
+		id: slug,
 	} ) );
 
 function FontLibraryModal( {
@@ -76,7 +77,7 @@ function FontLibraryModal( {
 								contents = <InstalledFonts />;
 								break;
 							default:
-								contents = <FontCollection id={ id } />;
+								contents = <FontCollection />;
 						}
 						return (
 							<Tabs.TabPanel
