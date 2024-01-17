@@ -1513,6 +1513,21 @@ function removalPromptData( state = false, action ) {
 	return state;
 }
 
+function blockBindingsSources( state = {}, action ) {
+	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
+		return {
+			...state,
+			[ action.sourceName ]: {
+				label: action.sourceLabel,
+				component: action.sourceComponent,
+				useSource: action.useSource,
+			},
+		};
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning any rules that a block editor may provide in order to
  * prevent a user from accidentally removing certain blocks. These rules are
@@ -2044,6 +2059,7 @@ const combinedReducers = combineReducers( {
 	blockEditingModes,
 	styleOverrides,
 	removalPromptData,
+	blockBindingsSources,
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,

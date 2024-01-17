@@ -170,6 +170,14 @@ export function getStyleOverrides( state ) {
 	return state.styleOverrides;
 }
 
+export function getAllBlockBindingsSources( state ) {
+	return state.blockBindingsSources;
+}
+
+export function getBlockBindingsSource( state, sourceName ) {
+	return state?.blockBindingsSources?.[ sourceName ];
+}
+
 /** @typedef {import('./actions').InserterMediaCategory} InserterMediaCategory */
 /**
  * Returns the registered inserter media categories through the public API.

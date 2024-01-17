@@ -240,6 +240,16 @@ export function clearBlockRemovalPrompt() {
 	};
 }
 
+export function registerBlockBindingsSource( source ) {
+	return {
+		type: 'REGISTER_BLOCK_BINDINGS_SOURCE',
+		sourceName: source.name,
+		sourceLabel: source.label,
+		sourceComponent: source.component,
+		useSource: source.useSource,
+	};
+}
+
 /**
  * Returns an action object used to set up any rules that a block editor may
  * provide in order to prevent a user from accidentally removing certain
