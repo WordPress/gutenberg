@@ -139,6 +139,12 @@
 		border-radius: 0;
 	}
 
+	// List view items will be displaced up or down relative to their original position
+	// when a user is dragging a block within the list view. This creates a space for a
+	// visual indicator of where the block will be placed when dropped. The `normal` state
+	// is used to allow rows to smoothly transition back into their original position,
+	// without attaching the transition to the list view leaf itself. This prevents rows
+	// from animating too much once the user has dropped the block.
 	&.is-displacement-normal {
 		transition: transform 0.2s;
 		transform: translateY(0);
@@ -157,7 +163,10 @@
 		@include reduce-motion("transition");
 	}
 
-	// Collapse multi-selections down into a single row space while dragging.
+	// Collapse multi-selections down into a single row space while dragging. The following
+	// rules ensure that during a multi-selection, the space for additional blocks is factored in
+	// when displacing up and down. The result is that there should only ever be a single row's
+	// worth of space for the visual indicator of where a block will be placed when dropped.
 	&.is-after-dragged-blocks {
 		transition: transform 0.2s;
 		transform: translateY(calc(var(--wp-admin--list-view-dragged-items-height, 36px) * -1));
@@ -176,6 +185,9 @@
 		@include reduce-motion("transition");
 	}
 
+	// To ensure displaced rows behave correctly, ensure that blocks that are currently being dragged
+	// are visually hidden. The below rules are used in favor of `display: none` to ensure that
+	// there is no flicker when a user begins to drag a block.
 	&.is-dragging {
 		opacity: 0;
 		// The row's left position is set to 0 to ensure that the animation
