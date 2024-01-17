@@ -679,7 +679,7 @@ a context provider wrapper around each rendered item, and those wrappers are the
 </ul>
 ```
 
-For server-side rendered lists, another directive called `data-wp-each-child` ensures hydration works as expected. It should be placed in the server-side rendered elements.
+For server-side rendered lists, another directive called `data-wp-each-child` ensures hydration works as expected. This directive is added automatically when the directive is processed on the server.
 
 ```html
 <ul data-wp-context='{ "list": [ "hello", "hola", "olá" ] }'>
