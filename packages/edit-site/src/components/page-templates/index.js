@@ -235,7 +235,6 @@ export default function DataviewsTemplates() {
 				},
 				maxWidth: 420,
 				minWidth: 360,
-				//width: '1%',
 				enableSorting: false,
 			},
 			{
