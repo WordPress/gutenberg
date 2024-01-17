@@ -8,6 +8,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import HeadingLevelIcon from './heading-level-icon';
+import { useBlockEditingMode } from '../block-editing-mode';
 
 const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
 
@@ -32,14 +33,18 @@ const POPOVER_PROPS = {
  * Dropdown for selecting a heading level (1 through 6) or paragraph (0).
  *
  * @param {WPHeadingLevelDropdownProps} props Component props.
- *
- * @return {ComponentType} The toolbar.
  */
 export default function HeadingLevelDropdown( {
 	options = HEADING_LEVELS,
 	value,
 	onChange,
 } ) {
+	const blockEditingMode = useBlockEditingMode();
+
+	if ( blockEditingMode !== 'default' ) {
+		return;
+	}
+
 	return (
 		<ToolbarDropdownMenu
 			popoverProps={ POPOVER_PROPS }

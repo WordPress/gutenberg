@@ -2,8 +2,15 @@
  * Internal dependencies
  */
 import AlignmentUI from './ui';
+import { useBlockEditingMode } from '../block-editing-mode';
 
 const AlignmentControl = ( props ) => {
+	const blockEditingMode = useBlockEditingMode();
+
+	if ( blockEditingMode !== 'default' ) {
+		return;
+	}
+
 	return <AlignmentUI { ...props } isToolbar={ false } />;
 };
 
