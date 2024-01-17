@@ -331,7 +331,11 @@ export default function Image( {
 	}, [ isSelected ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
-	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
+	const allowCrop =
+		! multiImageSelection &&
+		canEditImage &&
+		! isEditingImage &&
+		hasNonContentControls;
 
 	function switchToCover() {
 		replaceBlocks(
