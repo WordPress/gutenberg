@@ -233,8 +233,8 @@ export default function DataviewsTemplates() {
 						)
 					);
 				},
-				maxWidth: 420,
-				minWidth: 360,
+				maxWidth: 400,
+				minWidth: 320,
 				enableSorting: false,
 			},
 			{
