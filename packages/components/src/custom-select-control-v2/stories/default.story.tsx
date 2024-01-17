@@ -1,3 +1,4 @@
+//@ts-nocheck
 /**
  * External dependencies
  */
@@ -11,12 +12,12 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import CustomSelect from '../custom-select';
-import { CustomSelectItem } from '..';
+import NewCustomSelect from '../default-component';
+import { CustomSelect, CustomSelectItem } from '..';
 
-const meta: Meta< typeof CustomSelect > = {
-	title: 'Components (Experimental)/CustomSelectControl v2',
-	component: CustomSelect,
+const meta: Meta< typeof NewCustomSelect > = {
+	title: 'Components (Experimental)/CustomSelectControl v2/Default',
+	component: NewCustomSelect,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		CustomSelectItem,
