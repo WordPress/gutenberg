@@ -113,7 +113,8 @@ class WP_Font_Family_Utils {
 	 *
 	 * Used for comparison with other font faces in the same family, to prevent duplicates
 	 * that would both match according the CSS font matching spec. Uses only simple case-insensitive
-	 * matching for unicodeRange, so does not handle overlapping ranges.
+	 * matching for fontFamily and unicodeRange, so does not handle overlapping font-family lists or
+	 * unicode ranges.
 	 *
 	 * @since 6.5.0
 	 *
