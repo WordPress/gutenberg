@@ -21,6 +21,7 @@ const REPO = 'gutenberg';
 const IGNORED_PATHS = [
 	'lib/experiments-page.php',
 	'packages/e2e-tests/plugins',
+	'packages/block-library', // this is handled automatically.
 ];
 
 const DEBUG = !! getArg( 'debug' );
@@ -73,7 +74,7 @@ async function main() {
 	// These should be paths where we expect to find PHP files that
 	// will require syncing to WordPress Core. This list should be
 	// extremely selective.
-	const paths = [ '/lib', '/packages/block-library', '/phpunit' ];
+	const paths = [ '/lib', '/phpunit' ];
 
 	console.log( `• Fetching all commits made to ${ REPO } since: ${ since }` );
 	let commits = await fetchAllCommitsFromPaths( since, paths );
