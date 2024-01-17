@@ -99,7 +99,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 	 *
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function get_items( $request ) {
+	public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$collections = array();
 		foreach ( WP_Font_Library::get_font_collections() as $collection ) {
 			$collections[] = $collection->get_config();
