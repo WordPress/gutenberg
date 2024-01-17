@@ -11,6 +11,7 @@ buildscript {
         espressoVersion = '3.0.1'
 
         // libs
+        // TODO: Update Aztec version to the future version that will include the Android SDK upgrade to version 14.
         aztecVersion = 'v1.9.0'
         wordpressUtilsVersion = '3.3.0'
 
