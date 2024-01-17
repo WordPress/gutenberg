@@ -13,7 +13,13 @@ export async function fetchInstallFontFamily( data ) {
 		method: 'POST',
 		body: data,
 	};
-	return apiFetch( config );
+	return apiFetch( config ).then( ( response ) => {
+		return {
+			id: response.id,
+			...response.font_face_settings,
+			fontFace: [],
+		};
+	} );
 }
 
 export async function fetchInstallFontFace( fontFamilyId, data ) {
