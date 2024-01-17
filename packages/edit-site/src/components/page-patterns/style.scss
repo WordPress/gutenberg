@@ -1,10 +1,11 @@
 .edit-site-patterns {
+	background: #1e1e1e;
 	border-left: 1px solid $gray-800;
-	background: none;
 	margin: $header-height 0 0;
 	border-radius: 0;
 	padding: 0;
 	overflow-x: auto;
+	min-height: 100%;
 
 	.components-base-control {
 		width: 100%;
