@@ -14,6 +14,7 @@ module.exports = {
 	name: 'interactivity',
 	entry: {
 		index: `./packages/interactivity/src/index.js`,
+		router: `./packages/interactivity/router/index.js`,
 		navigation: './packages/block-library/src/navigation/view.js',
 		query: './packages/block-library/src/query/view.js',
 		image: './packages/block-library/src/image/view.js',
@@ -35,6 +36,7 @@ module.exports = {
 	externalsType: 'module',
 	externals: {
 		'@wordpress/interactivity': '@wordpress/interactivity',
+		'@wordpress/interactivity/router': '@wordpress/interactivity/router',
 	},
 	resolve: {
 		extensions: [ '.js', '.ts', '.tsx' ],
