@@ -84,10 +84,26 @@ const ImageComponent = ( {
 				}
 			} );
 
-			if ( url.startsWith( 'file:///' ) ) {
-				return setLocalURL( url );
-			} else if ( url.startsWith( 'https://' ) ) {
-				return setNetworkURL( url );
+			if ( Platform.isAndroid ) {
+				if ( url.startsWith( 'https://' ) ) {
+					RNImage.prefetch( url )
+						.then( () => {
+							setNetworkURL( url );
+							setNetworkImageLoaded( true );
+						} )
+						.catch( () => {
+							setLocalURL( url );
+						} );
+				} else {
+				}
+			}
+
+			if ( Platform.isIOS ) {
+				if ( url.startsWith( 'file:///' ) ) {
+					return setLocalURL( url );
+				} else if ( url.startsWith( 'https://' ) ) {
+					return setNetworkURL( url );
+				}
 			}
 		}
 		return () => ( isCurrent = false );
@@ -233,6 +249,7 @@ const ImageComponent = ( {
 		imageHeight && { height: imageHeight },
 		shapeStyle,
 	];
+
 	const imageSelectedStyles = [
 		usePreferredColorSchemeStyle(
 			styles.imageBorder,
@@ -240,6 +257,19 @@ const ImageComponent = ( {
 		),
 		{ height: containerSize?.height },
 	];
+
+	const platformURI = Platform.isAndroid
+		? /* Android source prop */
+		  {
+				uri: networkURL || localURL || url,
+		  }
+		: /* iOS source prop */
+		  {
+				uri:
+					networkURL && networkImageLoaded
+						? networkURL
+						: ( localURL && localURL ) || url,
+		  };
 
 	return (
 		<View
@@ -278,27 +308,52 @@ const ImageComponent = ( {
 					</View>
 				) : (
 					<View style={ focalPoint && styles.focalPointContent }>
-						<Animated.Image
-							style={ imageStyles }
-							fadeDuration={ 0 }
-							source={ {
-								uri:
-									networkURL && networkImageLoaded
-										? networkURL
-										: ( localURL && localURL ) || url,
-							} }
-							{ ...( ! focalPoint && {
-								resizeMethod: 'scale',
-							} ) }
-							resizeMode={ imageResizeMode }
-						/>
-						<Image
-							source={ networkURL }
-							style={ styles.nonVisibleImage }
-							onLoad={ () => {
-								setNetworkImageLoaded( true );
-							} }
-						/>
+						{ Platform.isAndroid && (
+							<>
+								{ networkImageLoaded && (
+									<Animated.Image
+										style={ imageStyles }
+										fadeDuration={ 0 }
+										source={ platformURI || localURL }
+										{ ...( ! focalPoint && {
+											resizeMethod: 'scale',
+										} ) }
+										resizeMode={ imageResizeMode }
+									/>
+								) }
+								{ ! networkImageLoaded && (
+									<Animated.Image
+										style={ imageStyles }
+										fadeDuration={ 0 }
+										source={ { uri: url } }
+										{ ...( ! focalPoint && {
+											resizeMethod: 'scale',
+										} ) }
+										resizeMode={ imageResizeMode }
+									/>
+								) }
+							</>
+						) }
+						{ Platform.isIOS && (
+							<>
+								<Animated.Image
+									style={ imageStyles }
+									fadeDuration={ 0 }
+									source={ platformURI }
+									{ ...( ! focalPoint && {
+										resizeMethod: 'scale',
+									} ) }
+									resizeMode={ imageResizeMode }
+								/>
+								<Image
+									source={ networkURL }
+									style={ styles.nonVisibleImage }
+									onLoad={ () => {
+										setNetworkImageLoaded( true );
+									} }
+								/>
+							</>
+						) }
 					</View>
 				) }
 
