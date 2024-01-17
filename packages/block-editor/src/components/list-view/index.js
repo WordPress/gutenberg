@@ -42,7 +42,7 @@ import useListViewExpandSelectedItem from './use-list-view-expand-selected-item'
 import { store as blockEditorStore } from '../../store';
 import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
 import { focusListItem } from './utils';
-import useClipboardHandler from '../writing-flow/use-clipboard-handler';
+import useClipboardHandler from './use-clipboard-handler';
 
 const expanded = ( state, action ) => {
 	if ( Array.isArray( action.clientIds ) ) {
