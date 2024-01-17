@@ -70,12 +70,15 @@ function FontLibraryProvider( { children } ) {
 	} );
 
 	const libraryFonts =
-		( libraryPosts || [] ).map( ( post ) => {
-			post.font_family_settings.fontFace =
-				post?._embedded?.font_faces.map(
-					( face ) => face.font_face_settings
-				) || [];
-			return post.font_family_settings;
+		( libraryPosts || [] ).map( ( fontFamilyPost ) => {
+			return {
+				id: fontFamilyPost.id,
+				...fontFamilyPost.font_family_settings,
+				fontFace:
+					fontFamilyPost?._embedded?.font_faces.map(
+						( face ) => face.font_face_settings
+					) || [],
+			};
 		} ) || [];
 
 	// Global Styles (settings) font families
@@ -298,15 +301,10 @@ function FontLibraryProvider( { children } ) {
 
 	async function uninstallFont( fontFamilyToUninstall ) {
 		try {
-			// Get the font family data by slug.
-			const fontFamilyToUninstallData = await fetchGetFontFamilyBySlug(
-				fontFamilyToUninstall.slug
-			);
-
 			// Uninstall the font family.
 			// (Removes the font files from the server and the posts from the database).
 			const uninstalledFontFamily = await fetchUninstallFontFamily(
-				fontFamilyToUninstallData.id
+				fontFamilyToUninstall.id
 			);
 
 			// Deactivate the font family if delete request is successful
