@@ -19,6 +19,10 @@
 -   Remove `data-wp-slot` and `data-wp-fill`. ([#57854](https://github.com/WordPress/gutenberg/pull/57854))
 -   Remove `wp-data-navigation-link` directive. ([#57853](https://github.com/WordPress/gutenberg/pull/57853))
 
+### Bug Fix
+
+-   Prevent `wp-data-on=""` from creating `onDefault` handlers. ([#57925](https://github.com/WordPress/gutenberg/pull/57925))
+
 ## 3.2.0 (2024-01-10)
 
 ### Bug Fix
