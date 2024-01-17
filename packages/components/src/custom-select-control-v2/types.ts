@@ -9,15 +9,14 @@ import type * as Ariakit from '@ariakit/react';
 import type { useDeprecatedProps } from './use-deprecated-props';
 
 export type LegacyAdapterProps = Parameters< typeof useDeprecatedProps >[ 0 ];
+export type CustomSelectStore = {
+	/**
+	 * The store object returned by Ariakit's `useSelectStore` hook.
+	 */
+	store: Ariakit.SelectStore;
+};
 
-export type CustomSelectContext =
-	| {
-			/**
-			 * The store object returned by Ariakit's `useSelectStore` hook.
-			 */
-			store: Ariakit.SelectStore;
-	  }
-	| undefined;
+export type CustomSelectContext = CustomSelectStore | undefined;
 
 export type CustomSelectProps = {
 	/**
