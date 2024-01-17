@@ -9,7 +9,7 @@ gutenberg_enqueue_module( 'directive-on-document-view' );
 ?>
 
 <div data-wp-interactive='{ "namespace": "directive-on-document" }'>
-	<div data-wp-on-document--keydown="actions.keydownHandler">
+	<div data-wp-on-document--keydown="callbacks.keydownHandler">
 		<p data-wp-text="state.counter" data-testid="counter">0</p>
 	</div>
 </div>
