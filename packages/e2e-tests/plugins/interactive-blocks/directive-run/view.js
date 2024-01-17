@@ -4,12 +4,13 @@
 import {
 	store,
 	directive,
-	navigate,
 	useInit,
 	useWatch,
 	cloneElement,
 	getElement,
 } from '@wordpress/interactivity';
+// eslint-disable-next-line no-restricted-syntax
+import { navigate } from '@wordpress/interactivity/router';
 
 // Custom directive to show hide the content elements in which it is placed.
 directive(

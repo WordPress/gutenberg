@@ -1,7 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { store, navigate } from '@wordpress/interactivity';
+import { store } from '@wordpress/interactivity';
+// eslint-disable-next-line no-restricted-syntax
+import { navigate } from '@wordpress/interactivity/router';
 
 const { state } = store( 'router', {
 	state: {

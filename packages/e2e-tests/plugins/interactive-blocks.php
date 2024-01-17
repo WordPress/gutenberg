@@ -24,7 +24,7 @@ add_action(
 				gutenberg_register_module(
 					$name . '-view',
 					$view_file,
-					array( '@wordpress/interactivity' ),
+					array( '@wordpress/interactivity', '@wordpress/interactivity/router' ),
 					filemtime( $view_file ),
 					true
 				);
