@@ -265,22 +265,6 @@
 
 		.dataviews-view-grid__primary-field {
 			min-height: $grid-unit-50;
-
-			.dataviews-view-grid__title-field {
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				display: block;
-				font-size: $default-font-size;
-				width: 100%;
-			}
-
-			.dataviews-view-grid__title-field a,
-			button.dataviews-view-grid__title-field {
-				font-weight: 500;
-				color: $gray-900;
-				text-decoration: none;
-			}
 		}
 	}
 
