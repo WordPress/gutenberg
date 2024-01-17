@@ -329,12 +329,11 @@ function processCommits( commits ) {
 
 			let current = result;
 
-			// If the file is under 'phpunit', add it directly to the 'phpunit' key
-			// this is it's helpful to have a full list of commits that modify tests.
+			// If the file is under 'phpunit', always add it to the 'phpunit' key
+			// as it's helpful to have a full list of commits that modify tests.
 			if ( parts.includes( 'phpunit' ) ) {
 				current.phpunit = current.phpunit || [];
 				current.phpunit = [ ...current.phpunit, commit ];
-				return;
 			}
 
 			for ( let i = 0; i < parts.length; i++ ) {
