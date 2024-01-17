@@ -23,7 +23,7 @@ const IGNORED_PATHS = [
 	'packages/e2e-tests/plugins',
 ];
 
-const DEBUG = false;
+const DEBUG = !! getArg( 'debug' );
 
 const __filename = fileURLToPath( import.meta.url );
 const __dirname = dirname( __filename );
@@ -32,20 +32,36 @@ async function main() {
 	const authToken = getArg( 'token' );
 	if ( ! authToken ) {
 		console.error(
-			'Aborted. The --token argument is required. See: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token'
+			'Error. The --token argument is required. See: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token'
 		);
 		process.exit( 1 );
 	}
 
-	const since = getArg( 'since' );
-	if ( ! since ) {
+	const sinceArg = getArg( 'since' );
+	let since;
+
+	if ( sinceArg ) {
+		if ( validateSince( sinceArg ) ) {
+			since = sinceArg;
+		} else {
+			console.error(
+				'Error: The --since argument cannot be more than 2 months from the current date.'
+			);
+			process.exit( 1 );
+		}
+	} else {
 		console.error(
-			'Aborted. The --since argument is required (e.g. 2023-11-01).'
+			`Error. The --since argument is required (e.g. YYYY-MM-DD). This should be the date of the previous release's final RC.`
 		);
 		process.exit( 1 );
 	}
 
 	console.log( 'Welcome to the PHP Sync Issue Generator!' );
+
+	if ( DEBUG ) {
+		console.log( 'DEBUG MODE' );
+	}
+
 	const octokit = new Octokit( {
 		auth: authToken,
 	} );
@@ -121,6 +137,16 @@ async function main() {
 
 	// Write the Markdown content to a file
 	fs.writeFileSync( nodePath.join( __dirname, 'issueContent.md' ), content );
+}
+
+function validateSince( sinceArg ) {
+	const maxMonths = 3;
+
+	const sinceDate = new Date( sinceArg );
+	const maxPreviousDate = new Date();
+	maxPreviousDate.setMonth( maxPreviousDate.getMonth() - maxMonths );
+
+	return sinceDate >= maxPreviousDate;
 }
 
 async function getAllCommitsFromPaths( octokit, owner, repo, since, paths ) {
