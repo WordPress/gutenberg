@@ -13,7 +13,13 @@ export async function fetchInstallFontFamily( data ) {
 		method: 'POST',
 		body: data,
 	};
-	return apiFetch( config );
+	return apiFetch( config ).then( ( response ) => {
+		return {
+			id: response.id,
+			...response.font_face_settings,
+			fontFace: [],
+		};
+	} );
 }
 
 export async function fetchInstallFontFace( fontFamilyId, data ) {
@@ -22,7 +28,12 @@ export async function fetchInstallFontFace( fontFamilyId, data ) {
 		method: 'POST',
 		body: data,
 	};
-	return apiFetch( config );
+	return apiFetch( config ).then( ( response ) => {
+		return {
+			id: response.id,
+			...response.font_face_settings,
+		};
+	} );
 }
 
 export async function fetchGetFontFamilyBySlug( slug ) {
@@ -30,7 +41,20 @@ export async function fetchGetFontFamilyBySlug( slug ) {
 		path: `/wp/v2/font-families?slug=${ slug }&_embed=true`,
 		method: 'GET',
 	};
-	return apiFetch( config );
+	return apiFetch( config ).then( ( response ) => {
+		if ( ! response || response.length === 0 ) {
+			return null;
+		}
+		const fontFamilyPost = response[ 0 ];
+		return {
+			id: fontFamilyPost.id,
+			...fontFamilyPost.font_family_settings,
+			fontFace:
+				fontFamilyPost?._embedded?.font_faces.map(
+					( face ) => face.font_face_settings
+				) || [],
+		};
+	} );
 }
 
 export async function fetchUninstallFonts( fonts ) {

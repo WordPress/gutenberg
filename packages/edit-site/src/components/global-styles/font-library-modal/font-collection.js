@@ -30,7 +30,6 @@ import CollectionFontDetails from './collection-font-details';
 import { toggleFont } from './utils/toggleFont';
 import { getFontsOutline } from './utils/fonts-outline';
 import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
-import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
 import { downloadFontFaceAsset } from './utils';
 
 const DEFAULT_CATEGORY = {
@@ -182,9 +181,18 @@ function FontCollection( { id } ) {
 			return;
 		}
 
-		const response = await installFont( fontFamily );
-		const installNotice = getNoticeFromInstallResponse( response );
-		setNotice( installNotice );
+		try {
+			await installFont( fontFamily );
+			setNotice( {
+				type: 'success',
+				message: __( 'Fonts were installed successfully.' ),
+			} );
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message: error.message,
+			} );
+		}
 		resetFontsToInstall();
 	};
 
