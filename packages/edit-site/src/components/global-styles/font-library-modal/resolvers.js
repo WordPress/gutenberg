@@ -28,7 +28,12 @@ export async function fetchInstallFontFace( fontFamilyId, data ) {
 		method: 'POST',
 		body: data,
 	};
-	return apiFetch( config );
+	return apiFetch( config ).then( ( response ) => {
+		return {
+			id: response.id,
+			...response.font_face_settings,
+		};
+	} );
 }
 
 export async function fetchGetFontFamilyBySlug( slug ) {

@@ -23,7 +23,6 @@ import { FontLibraryContext } from './context';
 import { Font } from '../../../../lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser } from './utils';
-import { getNoticeFromInstallResponse } from './utils/get-notice-from-response';
 import { unlock } from '../../../lock-unlock';
 
 const { ProgressBar } = unlock( componentsPrivateApis );
@@ -164,9 +163,19 @@ function LocalFonts() {
 			return;
 		}
 
-		const response = await installFont( fontFamilies[ 0 ] );
-		const installNotice = getNoticeFromInstallResponse( response );
-		setNotice( installNotice );
+		try {
+			await installFont( fontFamilies[ 0 ] );
+			setNotice( {
+				type: 'success',
+				message: __( 'Fonts were installed successfully.' ),
+			} );
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message: error,
+			} );
+		}
+
 		setIsUploading( false );
 	};
 

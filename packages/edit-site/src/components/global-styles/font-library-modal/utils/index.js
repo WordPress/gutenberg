@@ -245,3 +245,23 @@ export async function downloadFontFaceAsset( url ) {
 			throw error;
 		} );
 }
+
+/*
+ * Determine if a given Font Face is present in a given collection.
+ * We determine that a font face has been installed by comparing the fontWeight and fontStyle
+ *
+ * @param {Object} fontFace The Font Face to seek
+ * @param {Array} collection The Collection to seek in
+ * @returns True if the font face is found in the collection.  Otherwise False.
+ */
+export function checkFontFaceInstalled( fontFace, collection ) {
+	return (
+		-1 !==
+		collection.findIndex( ( collectionFontFace ) => {
+			return (
+				collectionFontFace.fontWeight === fontFace.fontWeight &&
+				collectionFontFace.fontStyle === fontFace.fontStyle
+			);
+		} )
+	);
+}
