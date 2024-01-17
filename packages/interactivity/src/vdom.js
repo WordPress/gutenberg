@@ -43,7 +43,7 @@ export function toVdom( root ) {
 	);
 
 	function walk( node ) {
-		const { attributes, nodeType } = node;
+		const { attributes, nodeType, localName } = node;
 
 		if ( nodeType === 3 ) return [ node.data ];
 		if ( nodeType === 4 ) {
@@ -93,7 +93,7 @@ export function toVdom( root ) {
 
 		if ( ignore && ! island )
 			return [
-				h( node.localName, {
+				h( localName, {
 					...props,
 					innerHTML: node.innerHTML,
 					__directives: { ignore: true },
@@ -118,7 +118,7 @@ export function toVdom( root ) {
 			);
 		}
 
-		if ( node.localName === 'template' ) {
+		if ( localName === 'template' ) {
 			props.content = [ ...node.content.childNodes ].map( ( childNode ) =>
 				toVdom( childNode )
 			);
@@ -137,7 +137,7 @@ export function toVdom( root ) {
 		// Restore previous namespace.
 		if ( island ) namespaces.pop();
 
-		return [ h( node.localName, props, children ) ];
+		return [ h( localName, props, children ) ];
 	}
 
 	return walk( treeWalker.currentNode );
