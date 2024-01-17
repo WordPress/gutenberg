@@ -170,6 +170,18 @@ export default function DataviewsTemplates() {
 		[ setTemplateId ]
 	);
 
+	const onDetailsChange = useCallback(
+		( items ) => {
+			if ( items?.length === 1 ) {
+				history.push( {
+					postId: items[ 0 ].id,
+					postType: TEMPLATE_POST_TYPE,
+				} );
+			}
+		},
+		[ history ]
+	);
+
 	const authors = useMemo( () => {
 		if ( ! allTemplates ) {
 			return EMPTY_ARRAY;
@@ -363,6 +375,7 @@ export default function DataviewsTemplates() {
 					view={ view }
 					onChangeView={ onChangeView }
 					onSelectionChange={ onSelectionChange }
+					onDetailsChange={ onDetailsChange }
 					deferredRendering={
 						! view.hiddenFields?.includes( 'preview' )
 					}
