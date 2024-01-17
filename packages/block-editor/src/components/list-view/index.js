@@ -221,6 +221,9 @@ function ListViewComponent(
 
 	const firstDraggedBlockClientId = draggedClientIds?.[ 0 ];
 
+	// Convert a blockDropTarget into indexes relative to the blocks in the list view.
+	// These values are used to determine which blocks should be displaced to make room
+	// for the drop indicator. See `ListViewBranch` and `getDragDisplacementValues`.
 	const { blockDropTargetIndex, blockDropPosition, firstDraggedBlockIndex } =
 		useMemo( () => {
 			let _blockDropTargetIndex, _firstDraggedBlockIndex;
@@ -235,6 +238,7 @@ function ListViewComponent(
 						? foundBlockIndex
 						: foundBlockIndex + 1;
 			} else if ( blockDropTarget === null ) {
+				// A `null` value is used to indicate that the user is dragging outside of the list view.
 				_blockDropTargetIndex = null;
 			}
 

@@ -14,7 +14,7 @@ import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { Appender } from './appender';
 import ListViewBlock from './block';
 import { useListViewContext } from './context';
-import { isClientIdSelected } from './utils';
+import { getDragDisplacementValues, isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 
@@ -151,90 +151,18 @@ function ListViewBranch( props ) {
 
 				const isDragged = !! draggedClientIds?.includes( clientId );
 
-				let displacement;
-				let isNesting;
-				let isAfterDraggedBlocks;
-
-				if ( ! isDragged ) {
-					const thisBlockIndex = blockIndexes[ clientId ];
-					isAfterDraggedBlocks =
-						thisBlockIndex > firstDraggedBlockIndex;
-
-					// Determine where to displace the position of the current block, relative
-					// to the blocks being dragged (in their original position) and the drop target
-					// (the position where a user is currently dragging the blocks to).
-					if (
-						blockDropTargetIndex !== undefined &&
-						blockDropTargetIndex !== null &&
-						firstDraggedBlockIndex !== undefined
-					) {
-						// If the block is being dragged and there is a valid drop target,
-						// determine if the block being rendered should be displaced up or down.
-
-						if ( thisBlockIndex !== undefined ) {
-							if (
-								thisBlockIndex >= firstDraggedBlockIndex &&
-								thisBlockIndex < blockDropTargetIndex
-							) {
-								// If the current block appears after the set of dragged blocks
-								// (in their original position), but is before the drop target,
-								// then the current block should be displaced up.
-								displacement = 'up';
-							} else if (
-								thisBlockIndex < firstDraggedBlockIndex &&
-								thisBlockIndex >= blockDropTargetIndex
-							) {
-								// If the current block appears before the set of dragged blocks
-								// (in their original position), but is after the drop target,
-								// then the current block should be displaced down.
-								displacement = 'down';
-							} else {
-								displacement = 'normal';
-							}
-							isNesting =
-								typeof blockDropTargetIndex === 'number' &&
-								blockDropTargetIndex - 1 === thisBlockIndex &&
-								blockDropPosition === 'inside';
-						}
-					} else if (
-						blockDropTargetIndex === null &&
-						firstDraggedBlockIndex !== undefined
-					) {
-						// A `null` value for `blockDropTargetIndex` indicates that the
-						// drop target is outside of the valid areas within the list view.
-						// In this case, the drag is still active, but as there is no
-						// valid drop target, we should remove the gap indicating where
-						// the block would be inserted.
-						if (
-							thisBlockIndex !== undefined &&
-							thisBlockIndex >= firstDraggedBlockIndex
-						) {
-							displacement = 'up';
-						} else {
-							displacement = 'normal';
-						}
-					} else if (
-						blockDropTargetIndex !== undefined &&
-						blockDropTargetIndex !== null &&
-						firstDraggedBlockIndex === undefined
-					) {
-						// If the blockdrop target is defined, but there are no dragged blocks,
-						// then the block should be displaced relative to the drop target.
-						if (
-							thisBlockIndex !== undefined
-							// blockDropTargetIndex !== 0 &&
-							// blockDropPosition !== 'top'
-						) {
-							if ( thisBlockIndex < blockDropTargetIndex ) {
-								displacement = 'normal';
-							} else {
-								displacement = 'down';
-							}
-						}
-					} else if ( blockDropTargetIndex === null ) {
-						displacement = 'normal';
-					}
-				}
+				// Determine the displacement of the block while dragging. This
+				// works out whether the current block should be displaced up or
+				// down, relative to the dragged blocks and the drop target.
+				const { displacement, isAfterDraggedBlocks, isNesting } =
+					getDragDisplacementValues( {
+						blockIndexes,
+						blockDropTargetIndex,
+						blockDropPosition,
+						clientId,
+						firstDraggedBlockIndex,
+						isDragged,
+					} );
 
 				const { itemInView } = fixedListWindow;
 				const blockInView = itemInView( nextPosition );
