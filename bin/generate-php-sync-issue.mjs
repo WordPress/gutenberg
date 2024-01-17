@@ -28,8 +28,9 @@ const DEBUG = !! getArg( 'debug' );
 const __filename = fileURLToPath( import.meta.url );
 const __dirname = dirname( __filename );
 
+const authToken = getArg( 'token' );
+
 async function main() {
-	const authToken = getArg( 'token' );
 	if ( ! authToken ) {
 		console.error(
 			'Error. The --token argument is required. See: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token'
@@ -75,13 +76,7 @@ async function main() {
 	const paths = [ '/lib', '/packages/block-library', '/phpunit' ];
 
 	console.log( `• Fetching all commits made to ${ REPO } since: ${ since }` );
-	let commits = await getAllCommitsFromPaths(
-		octokit,
-		OWNER,
-		REPO,
-		since,
-		paths
-	);
+	let commits = await getAllCommitsFromPaths( since, paths );
 
 	// Remove identical commits based on sha
 	commits = commits.reduce( ( acc, current ) => {
@@ -100,7 +95,7 @@ async function main() {
 	);
 	const commitsWithCommitData = await Promise.all(
 		commits.map( async ( commit ) => {
-			const commitData = await getCommit( octokit, commit.sha );
+			const commitData = await getCommit( commit.sha );
 
 			// Our Issue links to the PRs associated with the commits so we must
 			// provide this data. We could also get the PR data from the commit data,
@@ -149,17 +144,30 @@ function validateSince( sinceArg ) {
 	return sinceDate >= maxPreviousDate;
 }
 
-async function getAllCommitsFromPaths( octokit, owner, repo, since, paths ) {
+async function octokitPaginate( method, params ) {
+	return octokitRequest( method, params, { paginate: true } );
+}
+
+async function octokitRequest( method = '', params = {}, settings = {} ) {
+	const octokit = new Octokit( { auth: authToken } );
+	params.owner = OWNER;
+	params.repo = REPO;
+
+	const requestType = settings?.paginate ? 'paginate' : 'request';
+
+	const result = await octokit[ requestType ]( method, params );
+
+	if ( requestType === 'paginate' ) {
+		return result;
+	}
+	return result.data;
+}
+
+async function getAllCommitsFromPaths( since, paths ) {
 	let commits = [];
 
 	for ( const path of paths ) {
-		const pathCommits = await getAllCommits(
-			octokit,
-			owner,
-			repo,
-			since,
-			path
-		);
+		const pathCommits = await getAllCommits( since, path );
 		commits = [ ...commits, ...pathCommits ];
 	}
 
@@ -410,49 +418,18 @@ function generateIssueContent( result, level = 1 ) {
 	return issueContent;
 }
 
-async function getAllCommits( octokit, owner, repo, since, path ) {
-	let commits = [];
-	if ( DEBUG ) {
-		// just fetch the first 30 results using octokit.request
-		const { data } = await octokit.request(
-			'GET /repos/{owner}/{repo}/commits',
-			{
-				owner,
-				repo,
-				since,
-				per_page: 30,
-				path,
-			}
-		);
-
-		commits = data;
-	} else {
-		// The paginate method will fetch all pages of results from the API.
-		// We limit the total results because we only fetch commits
-		// since a certain date (via the "since" param).
-		commits = await octokit.paginate( 'GET /repos/{owner}/{repo}/commits', {
-			owner,
-			repo,
-			since,
-			per_page: 100,
-			path,
-		} );
-	}
-
-	return commits;
+async function getAllCommits( since, path ) {
+	return await octokitPaginate( 'GET /repos/{owner}/{repo}/commits', {
+		since,
+		per_page: 30,
+		path,
+	} );
 }
 
-async function getCommit( octokit, sha ) {
-	const { data: commit } = await octokit.request(
-		'GET /repos/{owner}/{repo}/commits/{sha}',
-		{
-			owner: OWNER,
-			repo: REPO,
-			sha,
-		}
-	);
-
-	return commit;
+async function getCommit( sha ) {
+	return octokitRequest( 'GET /repos/{owner}/{repo}/commits/{sha}', {
+		sha,
+	} );
 }
 
 // eslint-disable-next-line no-unused-vars
