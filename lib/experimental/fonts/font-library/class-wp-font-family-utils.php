@@ -109,13 +109,25 @@ class WP_Font_Family_Utils {
 	}
 
 	/**
-	 * Generates a slug from font face properties.
+	 * Generates a slug from font face properties, e.g. `open sans;normal;400;100%;U+0-10FFFF`
 	 *
-	 * Used for comparison with other font faces in the same family.
+	 * Used for comparison with other font faces in the same family, to prevent duplicates
+	 * that would both match according the CSS font matching spec. Uses only simple case-insensitive
+	 * matching for unicodeRange, so does not handle overlapping ranges.
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param array $settings Font face settings.
+	 * @link https://drafts.csswg.org/css-fonts/#font-style-matching
+	 *
+	 * @param array $settings {
+	 *     Font face settings.
+	 *
+	 *     @type string $fontFamily   Font family name.
+	 *     @type string $fontStyle    Optional font style, defaults to 'normal'.
+	 *     @type string $fontWeight   Optional font weight, defaults to 400.
+	 *     @type string $fontStretch  Optional font stretch, defaults to '100%'.
+	 *     @type string $unicodeRange Optional unicode range, defaults to 'U+0-10FFFF'.
+	 * }
 	 * @return string Font face slug.
 	 */
 	public static function get_font_face_slug( $settings ) {
@@ -125,12 +137,13 @@ class WP_Font_Family_Utils {
 				'fontFamily'   => '',
 				'fontStyle'    => 'normal',
 				'fontWeight'   => '400',
-				'fontStretch'  => 'normal',
+				'fontStretch'  => '100%',
 				'unicodeRange' => 'U+0-10FFFF',
 			)
 		);
 
 		// Convert all values to lowercase for comparison.
+		// Font family names may use multibyte characters.
 		$font_family   = mb_strtolower( $settings['fontFamily'] );
 		$font_style    = strtolower( $settings['fontStyle'] );
 		$font_weight   = strtolower( $settings['fontWeight'] );
@@ -157,10 +170,14 @@ class WP_Font_Family_Utils {
 
 		$slug_elements = array( $font_family, $font_style, $font_weight, $font_stretch, $unicode_range );
 
-		// Remove quotes to normalize font-family names, and ';' to use as a separator.
 		$slug_elements = array_map(
 			function ( $elem ) {
-				return trim( str_replace( array( '"', "'", ';' ), '', $elem ) );
+				// Remove quotes to normalize font-family names, and ';' to use as a separator.
+				$elem = trim( str_replace( array( '"', "'", ';' ), '', $elem ) );
+
+				// Normalize comma separated lists by removing spaces in between items,
+				// but keep spaces within items (e.g. "Open Sans" and "OpenSans" are different fonts).
+				return preg_replace( '/,\s+/', ',', $elem );
 			},
 			$slug_elements
 		);

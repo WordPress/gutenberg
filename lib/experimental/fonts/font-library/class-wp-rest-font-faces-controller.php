@@ -663,7 +663,10 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 
 		// Settings have already been decoded by ::sanitize_font_face_settings().
 		$settings = $request->get_param( 'font_face_settings' );
-		$title    = WP_Font_Family_Utils::get_font_face_slug( $settings );
+
+		// Store this "slug" as the post_title rather than post_name, since it uses the fontFamily setting,
+		// which may contain multibyte characters.
+		$title = WP_Font_Family_Utils::get_font_face_slug( $settings );
 
 		$prepared_post->post_type    = $this->post_type;
 		$prepared_post->post_parent  = $request['font_family_id'];
