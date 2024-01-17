@@ -217,6 +217,7 @@ export default () => {
 						attribute !== 'download' &&
 						attribute !== 'rowSpan' &&
 						attribute !== 'colSpan' &&
+						attribute !== 'role' &&
 						attribute in el
 					) {
 						try {
