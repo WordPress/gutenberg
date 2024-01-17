@@ -76,7 +76,7 @@ async function main() {
 	const paths = [ '/lib', '/packages/block-library', '/phpunit' ];
 
 	console.log( `• Fetching all commits made to ${ REPO } since: ${ since }` );
-	let commits = await getAllCommitsFromPaths( since, paths );
+	let commits = await fetchAllCommitsFromPaths( since, paths );
 
 	// Remove identical commits based on sha
 	commits = commits.reduce( ( acc, current ) => {
@@ -95,7 +95,7 @@ async function main() {
 	);
 	const commitsWithCommitData = await Promise.all(
 		commits.map( async ( commit ) => {
-			const commitData = await getCommit( commit.sha );
+			const commitData = await fetchCommit( commit.sha );
 
 			// Our Issue links to the PRs associated with the commits so we must
 			// provide this data. We could also get the PR data from the commit data,
@@ -170,11 +170,11 @@ async function octokitRequest( method = '', params = {}, settings = {} ) {
 	}
 }
 
-async function getAllCommitsFromPaths( since, paths ) {
+async function fetchAllCommitsFromPaths( since, paths ) {
 	let commits = [];
 
 	for ( const path of paths ) {
-		const pathCommits = await getAllCommits( since, path );
+		const pathCommits = await fetchAllCommits( since, path );
 		commits = [ ...commits, ...pathCommits ];
 	}
 
@@ -425,7 +425,7 @@ function generateIssueContent( result, level = 1 ) {
 	return issueContent;
 }
 
-async function getAllCommits( since, path ) {
+async function fetchAllCommits( since, path ) {
 	return await octokitPaginate( 'GET /repos/{owner}/{repo}/commits', {
 		since,
 		per_page: 30,
@@ -433,7 +433,7 @@ async function getAllCommits( since, path ) {
 	} );
 }
 
-async function getCommit( sha ) {
+async function fetchCommit( sha ) {
 	return octokitRequest( 'GET /repos/{owner}/{repo}/commits/{sha}', {
 		sha,
 	} );
