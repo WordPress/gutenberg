@@ -80,11 +80,13 @@ export default () => {
 
 	// data-wp-on--[event]
 	directive( 'on', ( { directives: { on }, element, evaluate } ) => {
-		on.forEach( ( entry ) => {
-			element.props[ `on${ entry.suffix }` ] = ( event ) => {
-				evaluate( entry, event );
-			};
-		} );
+		on.filter( ( { suffix } ) => suffix !== 'default' ).forEach(
+			( entry ) => {
+				element.props[ `on${ entry.suffix }` ] = ( event ) => {
+					evaluate( entry, event );
+				};
+			}
+		);
 	} );
 
 	// data-wp-class--[classname]

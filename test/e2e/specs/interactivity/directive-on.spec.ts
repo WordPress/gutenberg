@@ -44,11 +44,11 @@ test.describe( 'data-wp-on', () => {
 		await expect( option ).toHaveText( 'dog' );
 	} );
 
-	test( 'should work with custom events', async ( { page } ) => {
-		const counter = page.getByTestId( 'custom events counter' );
+	test( 'should not work if no event is defined', async ( { page } ) => {
+		const counter = page.getByTestId( 'counter not working' );
 		await page
-			.getByTestId( 'custom events button' )
-			.click( { clickCount: 3, delay: 100 } );
-		await expect( counter ).toHaveText( '3' );
+			.getByTestId( 'button not working' )
+			.click( { clickCount: 1, delay: 100 } );
+		await expect( counter ).toHaveText( '0' );
 	} );
 } );
