@@ -9,6 +9,7 @@ import {
 	useEntityRecords,
 	store as coreStore,
 } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -261,7 +262,8 @@ function FontLibraryProvider( { children } ) {
 				alreadyInstalledFontFaces.length === 0
 			) {
 				throw new Error(
-					'No font faces were installed. ' + detailedErrorMessage
+					__( 'No font faces were installed. ' ) +
+						detailedErrorMessage
 				);
 			}
 
@@ -284,8 +286,9 @@ function FontLibraryProvider( { children } ) {
 
 			if ( unsucessfullyInstalledFontFaces.length > 0 ) {
 				throw new Error(
-					'Some font faces were installed. There were some errors. ' +
-						detailedErrorMessage
+					__(
+						'Some font faces were installed. There were some errors. '
+					) + detailedErrorMessage
 				);
 			}
 		} finally {
@@ -308,7 +311,7 @@ function FontLibraryProvider( { children } ) {
 					[ 'settings.typography.fontFamilies' ]
 				);
 			}
-			// Refresh the library (the the library font families from database).
+			// Refresh the library (the library font families from database).
 			refreshLibrary();
 			return response;
 		} catch ( error ) {
