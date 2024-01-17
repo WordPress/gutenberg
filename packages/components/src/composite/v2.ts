@@ -18,5 +18,7 @@ export {
 	useCompositeStore,
 } from '@ariakit/react';
 
+export { default as CompositeExperienceHelper } from './composite-experience-helper';
+
 /* eslint-disable-next-line no-restricted-imports */
 export type { CompositeStore } from '@ariakit/react';
