@@ -17,7 +17,6 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	HeadingLevelDropdown,
-	useBlockEditingMode,
 } from '@wordpress/block-editor';
 
 /**
@@ -41,7 +40,6 @@ function HeadingEdit( {
 		} ),
 		style,
 	} );
-	const blockEditingMode = useBlockEditingMode();
 
 	const { canGenerateAnchors } = useSelect( ( select ) => {
 		const { getGlobalBlockCount, getSettings } = select( blockEditorStore );
@@ -92,22 +90,20 @@ function HeadingEdit( {
 
 	return (
 		<>
-			{ blockEditingMode === 'default' && (
-				<BlockControls group="block">
-					<HeadingLevelDropdown
-						value={ level }
-						onChange={ ( newLevel ) =>
-							setAttributes( { level: newLevel } )
-						}
-					/>
-					<AlignmentControl
-						value={ textAlign }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { textAlign: nextAlign } );
-						} }
-					/>
-				</BlockControls>
-			) }
+			<BlockControls group="block">
+				<HeadingLevelDropdown
+					value={ level }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
+					}
+				/>
+				<AlignmentControl
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
+			</BlockControls>
 			<RichText
 				identifier="content"
 				tagName={ tagName }
