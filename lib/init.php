@@ -60,14 +60,21 @@ add_action( 'admin_menu', 'gutenberg_menu', 9 );
 
 if ( ! function_exists( 'html_contains_block' ) ) {
 	/**
-	 * Recursively find a block by attribute.
+	 * Returns whether the given HTML contains a block
+	 * of the given type and, if provided,
+	 * a given attribute and attribute value.
 	 *
 	 * @param  string  $html The html to search in.
-	 * @param  string  $block_name The block type to search for.
-	 * @param  string  $attribute_name The attribute name to search for.
-	 * @param  string  $attribute_value The attribute value to search for.
+	 * @param  string  $block_name      Find this block type,
+	 *                                  with an optional "core/" namespace,
+	 *                                  e.g. "paragraph", "core/paragraph",
+	 *                                  "my_plugin/my_block".
+	 * @param  string  $attribute_name  If provided, the block must also
+	 *                                  contain this attribute.
+	 * @param  string  $attribute_value If provided, the given attribute's
+	 *                                  value must also match this.
 	 *
-	 * @return bool    True if block is found, false otherwise
+	 * @return bool                     True if block is found, false otherwise
 	 */
 	function html_contains_block( $html, $block_name, $attribute_name = null, $attribute_value = null ) {
 		$at = 0;
@@ -79,33 +86,23 @@ if ( ! function_exists( 'html_contains_block' ) ) {
 		 * document, avoiding all the performance drawbacks of achieving
 		 * a full representation of block content just to check if one block
 		 * is there.
+		 *
+		 * @see WP_Block_Parser.
 		 */
 		$pattern = sprintf(
 			'~<!--\s+?wp:%s\s+(?P<attrs>{(?:(?:[^}]+|}+(?=})|(?!}\s+/?-->).)*+)?}\s+)?/?-->~s',
-			// @TODO: we could ensure that there's a namespace on the block name.
 			preg_quote( $block_name, '~' )
 		);
 
-		while ( false !== preg_match( $pattern, $html, $matches, PREG_OFFSET_CAPTURE, $at ) ) {
-
-			// bail if no matches
-			if ( empty ($matches) ) {
-				return false;
-			}
-
+		while ( 1 === preg_match( $pattern, $html, $matches, PREG_OFFSET_CAPTURE, $at ) ) {
 			$at = $matches[0][1] + strlen( $matches[0][0] );
 
 			if ( ! isset( $attribute_name ) ) {
 				return true;
 			}
 
-			// Don't parse JSON if it's not possible for the attribute to exist.
-			if ( ! str_contains( $matches['attrs'][0], "\"{$attribute_name}\":" ) ) {
-				continue;
-			}
-
 			$attrs = json_decode( $matches['attrs'][0], /* as-associative */ true );
-			if ( ! isset( $attrs[ $attribute_name ] ) ) {
+			if ( ! array_key_exists( $attribute_name, $attrs ) ) {
 				continue;
 			}
 
