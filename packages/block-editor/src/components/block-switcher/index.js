@@ -163,49 +163,54 @@ function BlockSwitcherDropdownMenuContents( {
 
 export const BlockSwitcher = ( { clientIds } ) => {
 	const blockInformation = useBlockDisplayInformation( clientIds?.[ 0 ] );
-	const { canRemove, hasBlockStyles, icon, blocks, invalidBlocks } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockRootClientId,
-					getBlocksByClientId,
-					canRemoveBlocks,
-				} = select( blockEditorStore );
-				const { getBlockStyles, getBlockType } = select( blocksStore );
-				const _blocks = getBlocksByClientId( clientIds );
-				if (
-					! _blocks.length ||
-					_blocks.some( ( block ) => ! block )
-				) {
-					return { invalidBlocks: true };
-				}
-				const rootClientId = getBlockRootClientId( clientIds );
-				const [ { name: firstBlockName } ] = _blocks;
-				const _isSingleBlockSelected = _blocks.length === 1;
-				let _icon;
-				if ( _isSingleBlockSelected ) {
-					_icon = blockInformation?.icon; // Take into account active block variations.
-				} else {
-					const isSelectionOfSameType =
-						new Set( _blocks.map( ( { name } ) => name ) ).size ===
-						1;
-					// When selection consists of blocks of multiple types, display an
-					// appropriate icon to communicate the non-uniformity.
-					_icon = isSelectionOfSameType
-						? getBlockType( firstBlockName )?.icon
-						: copy;
-				}
-				return {
-					canRemove: canRemoveBlocks( clientIds, rootClientId ),
-					hasBlockStyles:
-						_isSingleBlockSelected &&
-						!! getBlockStyles( firstBlockName )?.length,
-					icon: _icon,
-					blocks: _blocks,
-				};
-			},
-			[ clientIds, blockInformation?.icon ]
-		);
+	const {
+		canRemove,
+		hasBlockStyles,
+		icon,
+		invalidBlocks,
+		isReusable,
+		isTemplate,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				getBlocksByClientId,
+				canRemoveBlocks,
+			} = select( blockEditorStore );
+			const { getBlockStyles, getBlockType } = select( blocksStore );
+			const _blocks = getBlocksByClientId( clientIds );
+			if ( ! _blocks.length || _blocks.some( ( block ) => ! block ) ) {
+				return { invalidBlocks: true };
+			}
+			const rootClientId = getBlockRootClientId( clientIds );
+			const [ { name: firstBlockName } ] = _blocks;
+			const _isSingleBlockSelected = _blocks.length === 1;
+			let _icon;
+			if ( _isSingleBlockSelected ) {
+				_icon = blockInformation?.icon; // Take into account active block variations.
+			} else {
+				const isSelectionOfSameType =
+					new Set( _blocks.map( ( { name } ) => name ) ).size === 1;
+				// When selection consists of blocks of multiple types, display an
+				// appropriate icon to communicate the non-uniformity.
+				_icon = isSelectionOfSameType
+					? getBlockType( firstBlockName )?.icon
+					: copy;
+			}
+			return {
+				canRemove: canRemoveBlocks( clientIds, rootClientId ),
+				hasBlockStyles:
+					_isSingleBlockSelected &&
+					!! getBlockStyles( firstBlockName )?.length,
+				icon: _icon,
+				isReusable:
+					_isSingleBlockSelected && isReusableBlock( _blocks[ 0 ] ),
+				isTemplate:
+					_isSingleBlockSelected && isTemplatePart( _blocks[ 0 ] ),
+			};
+		},
+		[ clientIds, blockInformation?.icon ]
+	);
 	const blockTitle = useBlockDisplayTitle( {
 		clientId: clientIds?.[ 0 ],
 		maximumLength: 35,
@@ -213,9 +218,6 @@ export const BlockSwitcher = ( { clientIds } ) => {
 	if ( invalidBlocks ) {
 		return null;
 	}
-	const isSingleBlock = blocks.length === 1;
-	const isReusable = isSingleBlock && isReusableBlock( blocks[ 0 ] );
-	const isTemplate = isSingleBlock && isTemplatePart( blocks[ 0 ] );
 	const hideDropdown = ! hasBlockStyles && ! canRemove;
 	if ( hideDropdown ) {
 		return (
@@ -238,6 +240,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 			</ToolbarGroup>
 		);
 	}
+	const isSingleBlock = clientIds.length === 1;
 	const blockSwitcherLabel = isSingleBlock
 		? blockTitle
 		: __( 'Multiple blocks selected' );
@@ -248,9 +251,9 @@ export const BlockSwitcher = ( { clientIds } ) => {
 				_n(
 					'Change type of %d block',
 					'Change type of %d blocks',
-					blocks.length
+					clientIds.length
 				),
-				blocks.length
+				clientIds.length
 		  );
 	return (
 		<ToolbarGroup>
