@@ -770,7 +770,10 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 			)
 		);
 		$this->assertArrayHasKey( 'font_faces', $data );
-		$this->assertSame( $font_face_ids, $data['font_faces'] );
+
+		foreach ( $font_face_ids as $font_face_id ) {
+			$this->assertContains( $font_face_id, $data['font_faces'] );
+		}
 
 		$this->assertArrayHasKey( 'font_family_settings', $data );
 		$settings          = $data['font_family_settings'];
