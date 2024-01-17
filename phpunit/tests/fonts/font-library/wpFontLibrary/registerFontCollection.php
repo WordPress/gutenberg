@@ -48,7 +48,7 @@ class Tests_Fonts_WpFontLibrary_RegisterFontCollection extends WP_Font_Library_U
 	public function test_should_return_error_if_config_is_empty() {
 		$config = array();
 		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( 'Font Collection config options is required as a non-empty array.' );
+		$this->expectExceptionMessage( 'Font Collection config options are required as a non-empty array.' );
 		WP_Font_Library::register_font_collection( $config );
 	}
 
