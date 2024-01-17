@@ -214,16 +214,30 @@ export default function PagePages() {
 				getValue: ( { item } ) => item.featured_media,
 				render: ( { item } ) =>
 					!! item.featured_media ? (
-						<Media
-							className="edit-site-page-pages__featured-image"
-							id={ item.featured_media }
-							size={
-								view.type === LAYOUT_GRID
-									? [ 'large', 'full', 'medium', 'thumbnail' ]
-									: [ 'thumbnail', 'medium', 'large', 'full' ]
-							}
-						/>
-					) : null,
+						<span className="edit-site-page-pages__media-wrapper">
+							<Media
+								className="edit-site-page-pages__featured-image"
+								id={ item.featured_media }
+								size={
+									view.type === LAYOUT_GRID
+										? [
+												'large',
+												'full',
+												'medium',
+												'thumbnail',
+										  ]
+										: [
+												'thumbnail',
+												'medium',
+												'large',
+												'full',
+										  ]
+								}
+							/>
+						</span>
+					) : (
+						<span className="edit-site-page-pages__media-wrapper"></span>
+					),
 				enableSorting: false,
 			},
 			{
