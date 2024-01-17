@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -15,11 +14,13 @@ import { store as editorStore } from '../../store';
 
 const identity = ( x ) => x;
 
-export function PostTaxonomies( {
-	postType,
-	taxonomies,
-	taxonomyWrapper = identity,
-} ) {
+export function PostTaxonomies( { taxonomyWrapper = identity } ) {
+	const { postType, taxonomies } = useSelect( ( select ) => {
+		return {
+			postType: select( editorStore ).getCurrentPostType(),
+			taxonomies: select( coreStore ).getTaxonomies( { per_page: -1 } ),
+		};
+	}, [] );
 	const availableTaxonomies = ( taxonomies ?? [] ).filter( ( taxonomy ) =>
 		taxonomy.types.includes( postType )
 	);
@@ -43,11 +44,4 @@ export function PostTaxonomies( {
 	} );
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		return {
-			postType: select( editorStore ).getCurrentPostType(),
-			taxonomies: select( coreStore ).getTaxonomies( { per_page: -1 } ),
-		};
-	} ),
-] )( PostTaxonomies );
+export default PostTaxonomies;
