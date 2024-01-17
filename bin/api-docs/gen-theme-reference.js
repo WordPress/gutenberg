@@ -75,6 +75,42 @@ const keys = ( maybeObject ) => {
 };
 
 /**
+ * Get definition from ref.
+ *
+ * @param {string} ref
+ * @return {Object} definition
+ * @throws {Error} If the referenced definition is not found in 'themejson.definitions'.
+ *
+ * @example
+ * getDefinition( '#/definitions/typographyProperties/properties/fontFamily' )
+ *  // returns themejson.definitions.typographyProperties.properties.fontFamily
+ */
+const resolveDefinitionRef = ( ref ) => {
+	const refParts = ref.split( '/' );
+	const definition = refParts[ refParts.length - 1 ];
+	if ( ! themejson.definitions[ definition ] ) {
+		throw new Error( `Can't resolve '${ ref }'. Definition not found` );
+	}
+	return themejson.definitions[ definition ];
+};
+
+/**
+ * Get properties from an array.
+ *
+ * @param {Object} items
+ * @return {Object} properties
+ */
+const getPropertiesFromArray = ( items ) => {
+	// if its a $ref resolve it
+	if ( items.$ref ) {
+		return resolveDefinitionRef( items.$ref ).properties;
+	}
+
+	// otherwise just return the properties
+	return items.properties;
+};
+
+/**
  * Convert settings properties to markup.
  *
  * @param {Object} struct
@@ -96,7 +132,9 @@ const getSettingsPropertiesMarkup = ( struct ) => {
 		const def = 'default' in props[ key ] ? props[ key ].default : '';
 		const ps =
 			props[ key ].type === 'array'
-				? keys( props[ key ].items.properties ).sort().join( ', ' )
+				? keys( getPropertiesFromArray( props[ key ].items ) )
+						.sort()
+						.join( ', ' )
 				: '';
 		markup += `| ${ key } | ${ props[ key ].type } | ${ def } | ${ ps } |\n`;
 	} );

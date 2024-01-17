@@ -820,7 +820,7 @@ test.describe( 'List View', () => {
 			.click();
 		await page
 			.getByRole( 'menu', { name: 'Options for Heading' } )
-			.getByRole( 'menuitem', { name: 'Delete blocks' } )
+			.getByRole( 'menuitem', { name: 'Delete' } )
 			.click();
 		await expect
 			.poll(

@@ -52,7 +52,6 @@ export function initializeEditor( id, settings ) {
 	// We dispatch actions and update the store synchronously before rendering
 	// so that we won't trigger unnecessary re-renders with useEffect.
 	dispatch( preferencesStore ).setDefaults( 'core/edit-site', {
-		editorMode: 'visual',
 		welcomeGuide: true,
 		welcomeGuideStyles: true,
 		welcomeGuidePage: true,
@@ -62,6 +61,7 @@ export function initializeEditor( id, settings ) {
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
 		distractionFree: false,
+		editorMode: 'visual',
 		fixedToolbar: false,
 		focusMode: false,
 		inactivePanels: [],

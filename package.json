@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "17.5.0-rc.1",
+	"version": "17.5.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -359,8 +359,7 @@
 			"wp-scripts lint-style"
 		],
 		"package-lock.json": [
-			"npm run lint:lockfile",
-			"node ./bin/check-latest-npm.js"
+			"npm run lint:lockfile"
 		],
 		"packages/*/package.json": [
 			"wp-scripts lint-pkg-json"

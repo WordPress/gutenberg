@@ -45,6 +45,12 @@ export type BorderBoxControlProps = ColorProps &
 		 * properties but for each side; `top`, `right`, `bottom`, and `left`.
 		 */
 		value: AnyBorder;
+		/**
+		 * Start opting into the larger default height that will become the default size in a future version.
+		 *
+		 * @default false
+		 */
+		__next40pxDefaultSize?: boolean;
 	};
 
 export type LinkedButtonProps = Pick< BorderBoxControlProps, 'size' > & {

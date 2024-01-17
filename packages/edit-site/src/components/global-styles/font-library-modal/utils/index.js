@@ -9,6 +9,11 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 import { unlock } from '../../../../lock-unlock';
 
+/**
+ * Browser dependencies
+ */
+const { File } = window;
+
 export function setUIValuesNeeded( font, extraValues = {} ) {
 	if ( ! font.name && ( font.fontFamily || font.slug ) ) {
 		font.name = font.fontFamily || font.slug;
@@ -163,4 +168,34 @@ export function makeFormDataFromFontFamily( fontFamily ) {
 
 	formData.append( 'font_family_settings', JSON.stringify( newFontFamily ) );
 	return formData;
+}
+
+/*
+ * Downloads a font face asset from a URL to the client and returns a File object.
+ */
+export async function downloadFontFaceAsset( url ) {
+	return fetch( new Request( url ) )
+		.then( ( response ) => {
+			if ( ! response.ok ) {
+				throw new Error(
+					`Error downloading font face asset from ${ url }. Server responded with status: ${ response.status }`
+				);
+			}
+			return response.blob();
+		} )
+		.then( ( blob ) => {
+			const filename = url.split( '/' ).pop();
+			const file = new File( [ blob ], filename, {
+				type: blob.type,
+			} );
+			return file;
+		} )
+		.catch( ( error ) => {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Error downloading font face asset from ${ url }:`,
+				error
+			);
+			throw error;
+		} );
 }
