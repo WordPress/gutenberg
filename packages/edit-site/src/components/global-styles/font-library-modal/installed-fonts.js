@@ -49,6 +49,7 @@ function InstalledFonts() {
 
 	const handleConfirmUninstall = async () => {
 		const response = await uninstallFont( libraryFontSelected );
+		// TODO: Refactor uninstall notices
 		// const uninstallNotice = getNoticeFromUninstallResponse( response );
 		// setNotice( uninstallNotice );
 		// If the font was succesfully uninstalled it is unselected
