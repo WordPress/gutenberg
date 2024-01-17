@@ -44,6 +44,14 @@ test.describe( 'data-wp-on', () => {
 		await expect( option ).toHaveText( 'dog' );
 	} );
 
+	test( 'should work with custom events', async ( { page } ) => {
+		const counter = page.getByTestId( 'custom events counter' );
+		await page
+			.getByTestId( 'custom events button' )
+			.click( { clickCount: 3, delay: 100 } );
+		await expect( counter ).toHaveText( '3' );
+	} );
+
 	test( 'should not work if no event is defined', async ( { page } ) => {
 		const counter = page.getByTestId( 'counter not working' );
 		await page
