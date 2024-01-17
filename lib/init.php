@@ -58,44 +58,69 @@ function gutenberg_menu() {
 }
 add_action( 'admin_menu', 'gutenberg_menu', 9 );
 
-if ( ! function_exists( 'recursively_find_block_by_attribute' ) ) {
+if ( ! function_exists( 'html_contains_block' ) ) {
 	/**
 	 * Recursively find a block by attribute.
 	 *
-	 * @param array  $blocks The blocks to search in.
-	 * @param string $block_name The block type to search for.
-	 * @param mixed  $attribute_name The attribute name to search for.
-	 * @param mixed  $attribute_value The attribute value to search for.
-	 * @param array  $found_blocks The found blocks.
+	 * @param  string  $html The html to search in.
+	 * @param  string  $block_name The block type to search for.
+	 * @param  string  $attribute_name The attribute name to search for.
+	 * @param  string  $attribute_value The attribute value to search for.
 	 *
-	 * @return array Found blocks
+	 * @return bool    True if block is found, false otherwise
 	 */
-	function recursively_find_block_by_attribute( $blocks, $block_name, $attribute_name, $attribute_value, $found_blocks = array() ) {
-		foreach ( $blocks as $block ) {
-			if (
-				$block['blockName'] === $block_name &&
-				isset( $block['attrs'][ $attribute_name ] ) &&
-				$attribute_value === $block['attrs'][ $attribute_name ]
-			) {
-				$found_blocks[] = $block;
-			}
-			if ( $block['innerBlocks'] ) {
-				$found_blocks = array_merge(
-					$found_blocks,
-					recursively_find_block_by_attribute(
-						$block['innerBlocks'],
-						$block_name,
-						$attribute_name,
-						$attribute_value,
-						$found_blocks
-					)
-				);
-			}
-		}
-		return $found_blocks;
-	}
-}
+	function html_contains_block( $html, $block_name, $attribute_name = null, $attribute_value = null ) {
+	$at = 0;
 
+	/**
+	 * This is the same regex as the one used in the block parser.
+	 * It is better to use this solution to look for a block's existence
+	 * in a document compared to having to parsing the blocks in the
+	 * document, avoiding all the performance drawbacks of achieving
+	 * a full representation of block content just to check if one block
+	 * is there.
+	 */
+	$pattern = sprintf(
+		'~<!--\s+?wp:%s\s+(?P<attrs>{(?:(?:[^}]+|}+(?=})|(?!}\s+/?-->).)*+)?}\s+)?/?-->~s',
+		// @TODO: we could ensure that there's a namespace on the block name.
+		preg_quote( $block_name, '~' )
+	);
+
+	while ( false !== preg_match( $pattern, $html, $matches, PREG_OFFSET_CAPTURE, $at ) ) {
+
+		// bail if no matches
+		if ( empty ($matches) ) {
+			return false;
+		}
+
+		$at = $matches[0][1] + strlen( $matches[0][0] );
+
+		if ( ! isset( $attribute_name ) ) {
+			return true;
+		}
+
+		// Don't parse JSON if it's not possible for the attribute to exist.
+		if ( ! str_contains( $matches['attrs'][0], "\"{$attribute_name}\":" ) ) {
+			continue;
+		}
+
+		$attrs = json_decode( $matches['attrs'][0], /* as-associative */ true );
+		if ( ! isset( $attrs[ $attribute_name ] ) ) {
+			continue;
+		}
+
+		if ( ! isset( $attribute_value ) ) {
+			return true;
+		}
+
+		if ( $attribute_value === $attrs[ $attribute_name ] ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+}
 if ( ! function_exists( 'get_template_parts_that_use_menu' ) ) {
 	/**
 	 * Get all template parts that use a menu.
@@ -116,15 +141,12 @@ if ( ! function_exists( 'get_template_parts_that_use_menu' ) ) {
 		// with the ref attribute set to $wp_navigation_id.
 		$wp_template_part_posts_with_navigation = array();
 		foreach ( $wp_template_part_posts as $wp_template_part_post ) {
-			$wp_template_part_blocks = parse_blocks( $wp_template_part_post->post_content );
-			$found_avigation         = count(
-				recursively_find_block_by_attribute(
-					$wp_template_part_blocks,
-					'core/navigation',
-					'ref',
-					$wp_navigation_id
-				)
-			) > 0;
+			$found_avigation = html_contains_block(
+				$wp_template_part_post->post_content,
+				'navigation',
+				'ref',
+				$wp_navigation_id
+			);
 			if ( $found_avigation ) {
 				$wp_template_part_posts_with_navigation[] = $wp_template_part_post->ID;
 			}
