@@ -91,7 +91,7 @@ class WP_Font_Family_Utils {
 				function ( $family ) {
 					$trimmed = trim( $family );
 					if ( ! empty( $trimmed ) && strpos( $trimmed, ' ' ) !== false && strpos( $trimmed, "'" ) === false && strpos( $trimmed, '"' ) === false ) {
-							return "'" . $trimmed . "'";
+							return '"' . $trimmed . '"';
 					}
 					return $trimmed;
 				},
@@ -106,5 +106,63 @@ class WP_Font_Family_Utils {
 		}
 
 		return $font_family;
+	}
+
+	/**
+	 * Generates a slug from font face properties.
+	 *
+	 * Used for comparison with other font faces in the same family.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param array $settings Font face settings.
+	 * @return string Font face slug.
+	 */
+	public static function get_font_face_slug( $settings ) {
+		$settings = wp_parse_args(
+			$settings,
+			array(
+				'fontFamily'  => '',
+				'fontStyle'   => 'normal',
+				'fontWeight'  => '400',
+				'fontStretch' => 'normal',
+			)
+		);
+
+		// Convert all values to lowercase for comparison.
+		$font_family  = mb_strtolower( $settings['fontFamily'] );
+		$font_style   = strtolower( $settings['fontStyle'] );
+		$font_weight  = strtolower( $settings['fontWeight'] );
+		$font_stretch = strtolower( $settings['fontStretch'] );
+
+		// Convert weight keywords to numeric strings.
+		$font_weight = str_replace( 'normal', '400', $font_weight );
+		$font_weight = str_replace( 'bold', '700', $font_weight );
+
+		// Convert stretch keywords to numeric strings.
+		$font_stretch_map = array(
+			'ultra-condensed' => '50%',
+			'extra-condensed' => '62.5%',
+			'condensed'       => '75%',
+			'semi-condensed'  => '87.5%',
+			'normal'          => '100%',
+			'semi-expanded'   => '112.5%',
+			'expanded'        => '125%',
+			'extra-expanded'  => '150%',
+			'untra-expanded'  => '200%',
+		);
+		$font_stretch     = str_replace( array_keys( $font_stretch_map ), array_values( $font_stretch_map ), $font_stretch );
+
+		$slug_elements = array( $font_family, $font_style, $font_weight, $font_stretch );
+
+		// Remove quotes to normalize font-family names, and ';' to use as a separator.
+		$slug_elements = array_map(
+			function ( $elem ) {
+				return trim( str_replace( array( '"', "'", ';' ), '', $elem ) );
+			},
+			$slug_elements
+		);
+
+		return join( ';', $slug_elements );
 	}
 }

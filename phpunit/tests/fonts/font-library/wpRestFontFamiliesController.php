@@ -548,7 +548,7 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 		/**
 	 * @dataProvider data_update_item_santize_font_family
 	 *
-	 * @covers WP_REST_Font_Families_Controller::update_item
+	 * @covers WP_REST_Font_Families_Controller::sanitize_font_face_settings
 	 */
 	public function test_update_item_santize_font_family( $font_family_setting, $expected ) {
 		wp_set_current_user( self::$admin_id );
@@ -567,9 +567,9 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 
 	public function data_update_item_santize_font_family() {
 		return array(
-			array( 'Libre Barcode 128 Text', "'Libre Barcode 128 Text'" ),
-			array( 'B612 Mono', "'B612 Mono'" ),
-			array( 'Open Sans, Noto Sans, sans-serif', "'Open Sans', 'Noto Sans', sans-serif" ),
+			array( 'Libre Barcode 128 Text', '"Libre Barcode 128 Text"' ),
+			array( 'B612 Mono', '"B612 Mono"' ),
+			array( 'Open Sans, Noto Sans, sans-serif', '"Open Sans", "Noto Sans", sans-serif' ),
 		);
 	}
 
