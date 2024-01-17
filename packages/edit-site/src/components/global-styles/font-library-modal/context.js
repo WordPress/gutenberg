@@ -326,10 +326,11 @@ function FontLibraryProvider( { children } ) {
 			return uninstalledFontFamily;
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
-			console.error( error );
-			return {
-				errors: [ error ],
-			};
+			console.error(
+				`There was an error uninstalling the font family:`,
+				error
+			);
+			throw error;
 		}
 	}
 
