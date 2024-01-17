@@ -3,6 +3,11 @@
 	display: none;
 }
 
+// Hide pencil icon that indicates editable blocks from previews.
+.block-editor-block-preview__content-iframe .block-editor-block-list__block:not(.is-editing-disabled)::before {
+	display: none;
+}
+
 .block-editor-block-preview__live-content {
 	* {
 		pointer-events: none;
