@@ -53,6 +53,9 @@
 			"type": "string"
 		}
 	},
+	"example": {
+		"preview": "<figure class=\"wp-block-post-featured-image\"><div class=\"block-editor-media-placeholder\" style=\"overflow: auto\"><svg style=\"background: #e1e1e1; stroke: currentColor;\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 60 60\" preserveAspectRatio=\"none\" class=\"components-placeholder__illustration\" aria-hidden=\"true\" focusable=\"false\"><path vector-effect=\"non-scaling-stroke\" d=\"M60 60 0 0\"></path></svg></div></figure>"
+	},
 	"usesContext": [ "postId", "postType", "queryId" ],
 	"supports": {
 		"align": [ "left", "right", "center", "wide", "full" ],

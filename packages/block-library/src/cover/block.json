@@ -80,6 +80,9 @@
 			"default": "div"
 		}
 	},
+	"example": {
+		"preview": "<div class=\"wp-block-cover is-light\"><span aria-hidden=\"true\" class=\"wp-block-cover__background has-background-dim\" style=\"background-color:#FFF\"><div class=\"block-editor-media-placeholder\" style=\"overflow: auto\"><svg style=\"background: #e1e1e1; stroke: currentColor;stroke: currentColor;box-sizing: content-box;height: 100%;left: 50%;position: absolute;top: 50%;transform: translate(-50%, -50%);width: 100%;\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 60 60\" preserveAspectRatio=\"none\" class=\"components-placeholder__illustration\" aria-hidden=\"true\" focusable=\"false\"><path vector-effect=\"non-scaling-stroke\" d=\"M60 60 0 0\"></path></svg></div></span><div class=\"wp-block-cover__inner-container\">[[INNER_BLOCKS]]</div></div>"
+	},
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"anchor": true,

@@ -264,25 +264,81 @@ require_once __DIR__ . '/experimental/data-views.php';
 function modify_block_attributes_before_render( $block ) {
 	$block_type_registry = WP_Block_Type_Registry::get_instance();
 	$block_type = $block_type_registry->get_registered( $block['blockName'] );
+	// we should use the bindings API!
 	if ( isset( $block_type->example ) && isset( $block_type->example[ 'attributes' ] ) ) {
 		foreach( $block_type->example[ 'attributes' ] as $attribute_name => $attribute_value ) {
 			// Only replace attributes that are already set.
 			if ( isset( $block['attrs'][ $attribute_name ] ) ) {
 				$block['attrs'][ $attribute_name ] = $attribute_value;
 			}
+			$block['attrs'][ $attribute_name ] = $attribute_value;
+			if ( $block['blockName'] === 'core/cover' ) {
+				//var_dump( $block['attrs'] );
+				//var_dump( $attribute_name );
+				//var_dump( $attribute_value );
+			}
+
 			$attribute_definition = $block_type->attributes[ $attribute_name ];
 			// Is this attribute sourced from the block markup istead of the block json comment.
 			if ( isset( $attribute_definition['source'] ) && $attribute_definition['source'] === 'attribute' ) {
 				$processor = new WP_HTML_Tag_Processor( $block['innerHTML'] ); //Should this be innerContent?
 				if ( $processor->next_tag( $attribute_definition['selector'] ) ) {
 					$processor->set_attribute( $attribute_definition['attribute'], $attribute_value );
-					$block['innerHTML'] = $processor->get_updated_html();
+					//$block['innerHTML'] = $processor->get_updated_html();
 					$block['innerContent'] = array( $processor->get_updated_html() );
 				}
 			}
 		}
 	}
+
 	return $block;
 }
 
-add_filter( 'render_block_data', 'modify_block_attributes_before_render', 10, 2 );
+function modify_block_attributes_during_render( $block_content, $block ) {
+	//var_dump( $block['blockName'] );
+	$block_type_registry = WP_Block_Type_Registry::get_instance();
+	$block_type = $block_type_registry->get_registered( $block['blockName'] );
+	/*if ( isset( $block_type->example ) && isset( $block_type->example[ 'attributes' ] ) ) {
+
+		if ( $block['blockName'] === 'core/cover' ) {
+			if ( isset( $block['attrs']['useFeaturedImage'] ) ) {
+				$processor = new WP_HTML_Tag_Processor( $block_content );
+				$processor->next_tag();
+				$processor->set_attribute( 'style', 'background-image: url('. $block_type->example[ 'attributes' ]['url'] .');' );
+				$block_content = $processor->get_updated_html();
+			}
+		}
+	}*/
+
+	if ( $block['blockName'] === 'core/cover' ) {
+		//var_dump( $block_content );
+		/*$processor = new WP_HTML_Tag_Processor( $block_content );
+		if ( ! $processor->next_tag('img') ) {
+			if ( isset( $block['attrs']['useFeaturedImage'] ) && $block['attrs']['useFeaturedImage'] ) {
+				$inner_blocks_html = $block['innerBlocks'][0]['innerHTML'];
+				return str_replace( '[[INNER_BLOCKS]]', $inner_blocks_html, $block_type->example[ 'preview' ] );
+			}
+		}*/
+	}
+
+	/*if ( isset( $block_type->example[ 'preview' ] ) && $block_content === '' ) {
+		return $block_type->example[ 'preview' ];
+	}*/
+
+	return $block_content;
+}
+
+//add_filter( 'render_block_data', 'modify_block_attributes_before_render', 10, 2 );
+//add_filter( 'render_block', 'modify_block_attributes_during_render', 10, 2 );
+
+
+function modify_post_thumbnail_html( $html, $post_id, $post_thumbnail_id, $size, $attr ) {
+	$classes = isset( $attr['class'] ) ? $attr['class'] : '';
+	$style = isset( $attr['style'] ) ? $attr['style'] : '';
+	if ( ! $html ) {
+		return '<img width="2000" height="2000" src="http://wp-src.test/wp-content/themes/twentytwentyfour/placeholder.svg" class="wp-post-image ' . $classes . '" alt="" style="' . $style . '" decoding="async" />';
+	}
+	return $html;
+
+}
+add_filter( 'post_thumbnail_html', 'modify_post_thumbnail_html', 10, 5 );

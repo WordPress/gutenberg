@@ -54,6 +54,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 
 	$featured_image = get_the_post_thumbnail( $post_ID, $size_slug, $attr );
+	//var_dump( $featured_image );
 	if ( ! $featured_image ) {
 		return '';
 	}
