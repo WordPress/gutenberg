@@ -8,6 +8,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
  */
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 import { unlock } from '../../../../lock-unlock';
+import { fetchInstallFontFace } from '../resolvers';
 
 /**
  * Browser dependencies
@@ -135,39 +136,84 @@ export function getDisplaySrcFromFontFace( input, urlPrefix ) {
 	return src;
 }
 
-export function makeFormDataFromFontFamily( fontFamily ) {
+export function makeFontFamilyFormData( fontFamily ) {
 	const formData = new FormData();
 	const { kebabCase } = unlock( componentsPrivateApis );
 
-	const newFontFamily = {
-		...fontFamily,
+	const { fontFace, category, ...familyWithValidParameters } = fontFamily;
+	const fontFamilySettings = {
+		...familyWithValidParameters,
 		slug: kebabCase( fontFamily.slug ),
 	};
 
-	if ( newFontFamily?.fontFace ) {
-		const newFontFaces = newFontFamily.fontFace.map(
-			( face, faceIndex ) => {
-				if ( face.file ) {
-					// Slugified file name because the it might contain spaces or characters treated differently on the server.
-					const fileId = `file-${ faceIndex }`;
-					// Add the files to the formData
-					formData.append( fileId, face.file, face.file.name );
-					// remove the file object from the face object the file is referenced by the uploadedFile key
-					const { file, ...faceWithoutFileProperty } = face;
-					const newFace = {
-						...faceWithoutFileProperty,
-						uploadedFile: fileId,
-					};
-					return newFace;
-				}
-				return face;
-			}
-		);
-		newFontFamily.fontFace = newFontFaces;
-	}
-
-	formData.append( 'font_family_settings', JSON.stringify( newFontFamily ) );
+	formData.append(
+		'font_family_settings',
+		JSON.stringify( fontFamilySettings )
+	);
 	return formData;
+}
+
+export function makeFontFacesFormData( font ) {
+	if ( font?.fontFace ) {
+		const fontFacesFormData = font.fontFace.map( ( face, faceIndex ) => {
+			const formData = new FormData();
+			if ( face.file ) {
+				// Slugified file name because the it might contain spaces or characters treated differently on the server.
+				const fileId = `file-${ faceIndex }`;
+				// Add the files to the formData
+				formData.append( fileId, face.file, face.file.name );
+				// remove the file object from the face object the file is referenced in src
+				const { file, ...faceWithoutFileProperty } = face;
+				const fontFaceSettings = {
+					...faceWithoutFileProperty,
+					src: fileId,
+				};
+				formData.append(
+					'font_face_settings',
+					JSON.stringify( fontFaceSettings )
+				);
+			} else {
+				formData.append( 'font_face_settings', JSON.stringify( face ) );
+			}
+			return formData;
+		} );
+
+		return fontFacesFormData;
+	}
+}
+
+export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
+	const promises = fontFacesData.map( ( faceData ) =>
+		fetchInstallFontFace( fontFamilyId, faceData )
+	);
+	const responses = await Promise.allSettled( promises );
+
+	const results = {
+		errors: [],
+		successes: [],
+	};
+
+	responses.forEach( ( result, index ) => {
+		if ( result.status === 'fulfilled' ) {
+			const response = result.value;
+			if ( response.id ) {
+				results.successes.push( response );
+			} else {
+				results.errors.push( {
+					data: fontFacesData[ index ],
+					message: `Error: ${ response.message }`,
+				} );
+			}
+		} else {
+			// Handle network errors or other fetch-related errors
+			results.errors.push( {
+				data: fontFacesData[ index ],
+				error: `Fetch error: ${ result.reason }`,
+			} );
+		}
+	} );
+
+	return results;
 }
 
 /*
