@@ -18,11 +18,14 @@ import { useRefEffect } from '@wordpress/compose';
 import { getPasteEventData } from '../../utils/pasting';
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
+import { focusListItem } from './utils';
 
-export default function useClipboardHandler() {
+export default function useClipboardHandler( { selectBlock } ) {
 	const {
+		getBlockOrder,
 		getBlockRootClientId,
 		getBlocksByClientId,
+		getPreviousBlockClientId,
 		getSelectedBlockClientIds,
 		getSettings,
 		canInsertBlockType,
@@ -33,6 +36,14 @@ export default function useClipboardHandler() {
 	const notifyCopy = useNotifyCopy();
 
 	return useRefEffect( ( node ) => {
+		function updateFocusAndSelection( focusClientId, shouldSelectBlock ) {
+			if ( shouldSelectBlock ) {
+				selectBlock( undefined, focusClientId, null, null );
+			}
+
+			focusListItem( focusClientId, node );
+		}
+
 		// Determine which blocks to update:
 		// If the current (focused) block is part of the block selection, use the whole selection.
 		// If the focused block is not part of the block selection, only update the focused block.
@@ -54,7 +65,7 @@ export default function useClipboardHandler() {
 				blocksToUpdate,
 				firstBlockClientId,
 				firstBlockRootClientId,
-				selectedBlockClientIds,
+				originallySelectedBlockClientIds: selectedBlockClientIds,
 			};
 		}
 
@@ -83,7 +94,9 @@ export default function useClipboardHandler() {
 
 			const {
 				blocksToUpdate: selectedBlockClientIds,
+				firstBlockClientId,
 				firstBlockRootClientId,
+				originallySelectedBlockClientIds,
 			} = getBlocksToUpdate( clientId );
 
 			if ( selectedBlockClientIds.length === 0 ) {
@@ -137,7 +150,27 @@ export default function useClipboardHandler() {
 				) {
 					return;
 				}
-				removeBlocks( selectedBlockClientIds );
+
+				let blockToFocus =
+					getPreviousBlockClientId( firstBlockClientId ) ??
+					// If the previous block is not found (when the first block is deleted),
+					// fallback to focus the parent block.
+					firstBlockRootClientId;
+
+				// Remove blocks, but don't update selection, and it will be handled below.
+				removeBlocks( selectedBlockClientIds, false );
+
+				// Update the selection if the original selection has been removed.
+				const shouldUpdateSelection =
+					originallySelectedBlockClientIds.length > 0 &&
+					getSelectedBlockClientIds().length === 0;
+
+				// If there's no previous block nor parent block, focus the first block.
+				if ( ! blockToFocus ) {
+					blockToFocus = getBlockOrder()[ 0 ];
+				}
+
+				updateFocusAndSelection( blockToFocus, shouldUpdateSelection );
 			} else if ( event.type === 'paste' ) {
 				const {
 					__experimentalCanUserUseUnfilteredHTML:
@@ -176,6 +209,11 @@ export default function useClipboardHandler() {
 				if ( selectedBlockClientIds.length === 1 ) {
 					const [ selectedBlockClientId ] = selectedBlockClientIds;
 
+					// If a single block is focused, and the blocks to be posted can
+					// be inserted within the block, then append the pasted blocks
+					// within the focused block. For example, if you have copied a paragraph
+					// block and paste it within a single Group block, this will append
+					// the paragraph block within the Group block.
 					if (
 						blocks.every( ( block ) =>
 							canInsertBlockType(
@@ -189,6 +227,7 @@ export default function useClipboardHandler() {
 							undefined,
 							selectedBlockClientId
 						);
+						updateFocusAndSelection( blocks[ 0 ]?.clientId, false );
 						return;
 					}
 				}
@@ -199,6 +238,7 @@ export default function useClipboardHandler() {
 					blocks.length - 1,
 					-1
 				);
+				updateFocusAndSelection( blocks[ 0 ]?.clientId, false );
 			}
 		}
 

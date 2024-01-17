@@ -138,23 +138,6 @@ function ListViewComponent(
 
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
 
-	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone( {
-		dropZoneElement,
-		expandedState,
-		setExpandedState,
-	} );
-	const elementRef = useRef();
-
-	// Allow handling of copy, cut, and paste events.
-	const clipBoardRef = useClipboardHandler();
-
-	const treeGridRef = useMergeRefs( [
-		clipBoardRef,
-		elementRef,
-		dropZoneRef,
-		ref,
-	] );
-
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
@@ -176,11 +159,31 @@ function ListViewComponent(
 		},
 		[ setSelectedTreeId, updateBlockSelection, onSelect, getBlock ]
 	);
+
+	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone( {
+		dropZoneElement,
+		expandedState,
+		setExpandedState
+	} );
+	const elementRef = useRef();
+
+	// Allow handling of copy, cut, and paste events.
+	const clipBoardRef = useClipboardHandler( {
+		selectBlock: selectEditorBlock,
+	} );
+
+	const treeGridRef = useMergeRefs( [
+		clipBoardRef,
+		elementRef,
+		dropZoneRef,
+		ref,
+	] );
+
 	useEffect( () => {
 		// If a blocks are already selected when the list view is initially
 		// mounted, shift focus to the first selected block.
 		if ( selectedClientIds?.length ) {
-			focusListItem( selectedClientIds[ 0 ], elementRef );
+			focusListItem( selectedClientIds[ 0 ], elementRef?.current );
 		}
 		// Disable reason: Only focus on the selected item when the list view is mounted.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
