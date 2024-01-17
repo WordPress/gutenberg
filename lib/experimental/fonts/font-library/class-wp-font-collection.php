@@ -20,59 +20,59 @@ if ( class_exists( 'WP_Font_Collection' ) ) {
  */
 class WP_Font_Collection {
 
-    /**
-     * The unique slug for the font collection.
-     *
+	/**
+	 * The unique slug for the font collection.
+	 *
 	 * @since 6.5.0
-	 * 
-     * @var string
-     */
-    private $slug;
+	 *
+	 * @var string
+	 */
+	private $slug;
 
-    /**
-     * The name of the font collection.
-     *
+	/**
+	 * The name of the font collection.
+	 *
 	 * @since 6.5.0
-	 * 
-     * @var string
-     */
-    private $name;
+	 *
+	 * @var string
+	 */
+	private $name;
 
-    /**
-     * Description of the font collection.
-     *
+	/**
+	 * Description of the font collection.
+	 *
 	 * @since 6.5.0
-	 * 
-     * @var string
-     */
-    private $description;
+	 *
+	 * @var string
+	 */
+	private $description;
 
-    /**
-     * Source of the font collection.
-     *
+	/**
+	 * Source of the font collection.
+	 *
 	 * @since 6.5.0
-	 * 
-     * @var string
-     */
-    private $src;
+	 *
+	 * @var string
+	 */
+	private $src;
 
-    /**
-     * Array of font families in the collection.
-     *
+	/**
+	 * Array of font families in the collection.
+	 *
 	 * @since 6.5.0
-	 * 
-     * @var array
-     */
-    private $font_families;
+	 *
+	 * @var array
+	 */
+	private $font_families;
 
-    /**
-     * Categories associated with the font collection.
-     *
+	/**
+	 * Categories associated with the font collection.
+	 *
 	 * @since 6.5.0
-	 * 
-     * @var array
-     */
-    private $categories;
+	 *
+	 * @var array
+	 */
+	private $categories;
 
 
 	/**
@@ -84,41 +84,41 @@ class WP_Font_Collection {
 	 *  See {@see wp_register_font_collection()} for the supported fields.
 	 * @throws Exception If the required parameters are missing.
 	 */
-    public function __construct($config) {
-        if ( empty( $config ) || !is_array( $config ) ) {
-            throw new Exception('Font Collection config options are required as a non-empty array.');
-        }
+	public function __construct( $config ) {
+		if ( empty( $config ) || ! is_array( $config ) ) {
+			throw new Exception( 'Font Collection config options are required as a non-empty array.' );
+		}
 
-        $this->validate_config( $config );
+		$this->validate_config( $config );
 
-        $this->slug          = $config['slug'];
-        $this->name          = $config['name'];
-        $this->description   = $config['description'] ?? '';
-        $this->src           = $config['src'] ?? '';
-		$this->font_families = $config['font_families'] ?? [];
-		$this->categories    = $config['categories'] ?? [];
-    }
+		$this->slug          = $config['slug'];
+		$this->name          = $config['name'];
+		$this->description   = $config['description'] ?? '';
+		$this->src           = $config['src'] ?? '';
+		$this->font_families = $config['font_families'] ?? array();
+		$this->categories    = $config['categories'] ?? array();
+	}
 
 	/**
-     * Validates the config array.
-     *
-     * Ensures that required keys are present and valid.
-     *
-     * @param array $config Configuration array.
-     * @throws Exception If required keys are missing.
-     */
-    private function validate_config($config) {
-        $required_keys = ['slug', 'name'];
-        foreach ($required_keys as $key) {
-            if (empty($config[$key])) {
-                throw new Exception("Font Collection config {$key} is required as a non-empty string.");
-            }
-        }
+	 * Validates the config array.
+	 *
+	 * Ensures that required keys are present and valid.
+	 *
+	 * @param array $config Configuration array.
+	 * @throws Exception If required keys are missing.
+	 */
+	private function validate_config( $config ) {
+		$required_keys = array( 'slug', 'name' );
+		foreach ( $required_keys as $key ) {
+			if ( empty( $config[ $key ] ) ) {
+				throw new Exception( "Font Collection config {$key} is required as a non-empty string." );
+			}
+		}
 
 		if ( empty( $config['src'] ) && empty( $config['font_families'] ) ) {
-			throw new Exception('Font Collection config "src" option OR "font_families" option are required.');
+			throw new Exception( 'Font Collection config "src" option OR "font_families" option are required.' );
 		}
-    }
+	}
 
 	/**
 	 * Gets the font collection config.
@@ -134,16 +134,16 @@ class WP_Font_Collection {
 	 * }
 	 */
 	public function get_config() {
-        return array(
-            'slug'        => $this->slug,
-            'name'        => $this->name,
-            'description' => $this->description,
-        );
+		return array(
+			'slug'        => $this->slug,
+			'name'        => $this->name,
+			'description' => $this->description,
+		);
 	}
 
 	/**
 	 * Gets the font collection content.
-	 * 
+	 *
 	 * Load the font collection data from the src if it is not already loaded.
 	 *
 	 * @since 6.5.0
@@ -154,21 +154,21 @@ class WP_Font_Collection {
 	 *     @type array $font_families      The font collection's font families.
 	 *     @type string $categories        The font collection's categories.
 	 * }
-	 * 
+	 *
 	 * A WP_Error object if there was an error loading the font collection data.
 	 */
 	public function get_content() {
 		// If the font families are not loaded, and the src is not empty, load the data from the src.
-		if ( empty( $this->font_families ) && !empty( $this->src ) ) {
+		if ( empty( $this->font_families ) && ! empty( $this->src ) ) {
 			$data = $this->load_contents_from_src();
 			if ( is_wp_error( $data ) ) {
 				return $data;
 			}
 		}
-		
+
 		return array(
 			'font_families' => $this->font_families,
-			'categories'    => $this->categories
+			'categories'    => $this->categories,
 		);
 	}
 
@@ -212,7 +212,7 @@ class WP_Font_Collection {
 		}
 
 		$this->font_families = $data['font_families'];
-		$this->categories    = $data['categories'] ?? [];
+		$this->categories    = $data['categories'] ?? array();
 
 		return $data;
 	}

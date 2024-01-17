@@ -25,7 +25,7 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 		$src = new ReflectionProperty( WP_Font_Collection::class, 'src' );
 		$src->setAccessible( true );
 
-		$config          = array(
+		$config     = array(
 			'slug'        => 'my-collection',
 			'name'        => 'My Collection',
 			'description' => 'My collection description',

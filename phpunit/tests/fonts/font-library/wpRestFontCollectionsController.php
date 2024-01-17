@@ -13,8 +13,8 @@
 class WP_REST_Font_Collections_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	protected static $admin_id;
 	protected static $editor_id;
-	protected static $mock_file; 
-	
+	protected static $mock_file;
+
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$admin_id  = $factory->user->create(
@@ -27,14 +27,16 @@ class WP_REST_Font_Collections_Controller_Test extends WP_Test_REST_Controller_T
 				'role' => 'editor',
 			)
 		);
-		$mock_file = wp_tempnam( 'my-collection-data-' );
+		$mock_file       = wp_tempnam( 'my-collection-data-' );
 		file_put_contents( $mock_file, '{"font_families": [ "mock" ], "categories": [ "mock" ] }' );
 
-		wp_register_font_collection( array(
-			'name' => 'My Collection',
-			'slug' => 'mock-col-slug',
-			'src' => $mock_file,
-		) );
+		wp_register_font_collection(
+			array(
+				'name' => 'My Collection',
+				'slug' => 'mock-col-slug',
+				'src'  => $mock_file,
+			)
+		);
 	}
 
 	public static function wpTearDownAfterClass() {
@@ -76,7 +78,7 @@ class WP_REST_Font_Collections_Controller_Test extends WP_Test_REST_Controller_T
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-collections/mock-col-slug' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status(), 'Response code is not 200' );
-		
+
 		$response_data = $response->get_data();
 		$this->assertArrayHasKey( 'name', $response_data, 'Response data does not have the name key.' );
 		$this->assertArrayHasKey( 'slug', $response_data, 'Response data does not have the slug key.' );
@@ -106,7 +108,7 @@ class WP_REST_Font_Collections_Controller_Test extends WP_Test_REST_Controller_T
 	 * @covers WP_REST_Font_Collections_Controller::get_item
 	 */
 	public function test_get_item_invalid_id_permission() {
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-collections/mock-col-slug' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/font-collections/mock-col-slug' );
 
 		wp_set_current_user( 0 );
 		$response = rest_get_server()->dispatch( $request );
@@ -158,5 +160,4 @@ class WP_REST_Font_Collections_Controller_Test extends WP_Test_REST_Controller_T
 	public function test_get_item_schema() {
 		// Controller does not use test_get_item_schema().
 	}
-
 }

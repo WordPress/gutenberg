@@ -85,7 +85,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 		// If there was an error getting the collection data, return the error.
 		if ( is_wp_error( $contents ) ) {
 			$contents->add_data( array( 'status' => 500 ) );
-			return rest_ensure_response ( $contents );
+			return rest_ensure_response( $contents );
 		}
 
 		$collection_data = array_merge( $config, $contents );

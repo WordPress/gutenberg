@@ -34,8 +34,8 @@ class Tests_Fonts_WpFontCollection_GetContent extends WP_UnitTestCase {
 
 		// Mock the response body.
 		$mock_collection_data = array(
-			'font_families' => [ 'mock' ],
-			'categories'    => [ 'mock' ],
+			'font_families' => array( 'mock' ),
+			'categories'    => array( 'mock' ),
 		);
 
 		return array(
@@ -67,7 +67,7 @@ class Tests_Fonts_WpFontCollection_GetContent extends WP_UnitTestCase {
 		file_put_contents( $mock_file, '{"font_families":[ "mock" ], "categories":[ "mock" ] }' );
 
 		return array(
-			'with a file' => array(
+			'with a file'                           => array(
 				'config'        => array(
 					'slug'        => 'my-collection',
 					'name'        => 'My Collection',
@@ -76,13 +76,13 @@ class Tests_Fonts_WpFontCollection_GetContent extends WP_UnitTestCase {
 				),
 				'expected_data' => array(
 					'font_families' => array( 'mock' ),
-					'categories' => array( 'mock' ),
+					'categories'    => array( 'mock' ),
 				),
 			),
-			'with a url'  => array(
+			'with a url'                            => array(
 				'config'        => array(
 					'slug'        => 'my-collection-with-url',
-					'name'        => 'My Collection with URL',	
+					'name'        => 'My Collection with URL',
 					'description' => 'My collection description',
 					'src'         => 'https://localhost/fonts/mock-font-collection.json',
 				),
@@ -91,8 +91,8 @@ class Tests_Fonts_WpFontCollection_GetContent extends WP_UnitTestCase {
 					'categories'    => array( 'mock' ),
 				),
 			),
-			'with font_families and categories'   => array(
-				'config'            => array(
+			'with font_families and categories'     => array(
+				'config'        => array(
 					'slug'          => 'my-collection',
 					'name'          => 'My Collection',
 					'description'   => 'My collection description',
@@ -104,8 +104,8 @@ class Tests_Fonts_WpFontCollection_GetContent extends WP_UnitTestCase {
 					'categories'    => array( 'mock' ),
 				),
 			),
-			'with font_families without categories'   => array(
-				'config'            => array(
+			'with font_families without categories' => array(
+				'config'        => array(
 					'slug'          => 'my-collection',
 					'name'          => 'My Collection',
 					'description'   => 'My collection description',
