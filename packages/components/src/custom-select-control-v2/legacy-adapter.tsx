@@ -1,15 +1,23 @@
 /**
  * Internal dependencies
  */
-import CustomSelect from './custom-select';
-import type { LegacyCustomSelectProps } from './types';
-import { useDeprecatedProps } from './use-deprecated-props';
+import _LegacyCustomSelect from './legacy-component';
+import _NewCustomSelect from './default-component';
+import type { CustomSelectProps, LegacyCustomSelectProps } from './types';
 
-export function LegacyAdapter( props: LegacyCustomSelectProps ) {
+function isLegacy( props: any ): props is LegacyCustomSelectProps {
 	return (
-		<CustomSelect
-			{ ...useDeprecatedProps( props ) }
-			hideLabelFromVision={ props.hideLabelFromVision }
-		/>
+		typeof props.options !== 'undefined' ||
+		props.__experimentalShowSelectedHint !== undefined
 	);
+}
+
+export function DefaultExport(
+	props: LegacyCustomSelectProps | CustomSelectProps
+) {
+	if ( isLegacy( props ) ) {
+		return <_LegacyCustomSelect { ...props } />;
+	}
+
+	return <_NewCustomSelect { ...props } />;
 }

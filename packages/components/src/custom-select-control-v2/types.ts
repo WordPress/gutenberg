@@ -6,9 +6,7 @@ import type * as Ariakit from '@ariakit/react';
 /**
  * Internal dependencies
  */
-import type { useDeprecatedProps } from './use-deprecated-props';
 
-export type LegacyAdapterProps = Parameters< typeof useDeprecatedProps >[ 0 ];
 export type CustomSelectStore = {
 	/**
 	 * The store object returned by Ariakit's `useSelectStore` hook.
@@ -75,6 +73,8 @@ type Option = {
  */
 type OnChangeObject = {
 	selectedItem: Option;
+	highlightedIndex?: number;
+	isOpen?: boolean;
 };
 
 export type LegacyCustomSelectProps = {
