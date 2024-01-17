@@ -339,11 +339,6 @@ function processCommits( commits ) {
 			for ( let i = 0; i < parts.length; i++ ) {
 				const part = parts[ i ];
 
-				// Skip 'src' part under 'block-library'
-				if ( part === 'src' && parts[ i - 1 ] === 'block-library' ) {
-					continue;
-				}
-
 				if ( i === parts.length - 1 ) {
 					current[ part ] = current[ part ] || [];
 					current[ part ] = [ ...current[ part ], commit ];
