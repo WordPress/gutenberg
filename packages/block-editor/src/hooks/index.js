@@ -11,6 +11,7 @@ import align from './align';
 import './lock';
 import anchor from './anchor';
 import ariaLabel from './aria-label';
+import bindings from './bindings';
 import customClassName from './custom-class-name';
 import './generated-class-name';
 import style from './style';
@@ -32,6 +33,7 @@ createBlockEditFilter(
 	[
 		align,
 		anchor,
+		bindings,
 		customClassName,
 		style,
 		duotone,
