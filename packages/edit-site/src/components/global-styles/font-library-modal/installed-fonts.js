@@ -48,15 +48,24 @@ function InstalledFonts() {
 	const [ notice, setNotice ] = useState( null );
 
 	const handleConfirmUninstall = async () => {
-		const response = await uninstallFont( libraryFontSelected );
-		// TODO: Refactor uninstall notices
-		// const uninstallNotice = getNoticeFromUninstallResponse( response );
-		// setNotice( uninstallNotice );
-		// If the font was succesfully uninstalled it is unselected
-		if ( ! response?.errors?.length ) {
+		try {
+			await uninstallFont( libraryFontSelected );
+			setNotice( {
+				type: 'success',
+				message: __( 'Fonts were uninstalled successfully.' ),
+			} );
+
+			// If the font was succesfully uninstalled it is unselected
 			handleUnselectFont();
+			setIsConfirmDeleteOpen( false );
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message:
+					__( 'There was an error uninstalling the fonts.' ) +
+					error.message,
+			} );
 		}
-		setIsConfirmDeleteOpen( false );
 	};
 
 	const handleUninstallClick = async () => {
