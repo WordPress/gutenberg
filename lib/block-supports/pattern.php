@@ -13,7 +13,8 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-pattern-partial-sync
 	 * @param WP_Block_Type $block_type Block Type.
 	 */
 	function gutenberg_register_pattern_support( $block_type ) {
-		$pattern_support = 'core/paragraph' === $block_type->name ? true : false;
+		global $block_bindings_allowed_blocks;
+		$pattern_support = array_key_exists( $block_type->name, $block_bindings_allowed_blocks );
 
 		if ( $pattern_support ) {
 			if ( ! $block_type->uses_context ) {

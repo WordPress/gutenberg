@@ -27,6 +27,7 @@ import {
 	store as blockEditorStore,
 	BlockControls,
 } from '@wordpress/block-editor';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse, cloneBlock } from '@wordpress/blocks';
 
 /**
@@ -35,10 +36,13 @@ import { parse, cloneBlock } from '@wordpress/blocks';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
+const { PARTIAL_SYNCING_SUPPORTED_BLOCKS } = unlock( patternsPrivateApis );
 
 function isPartiallySynced( block ) {
 	return (
-		'core/paragraph' === block.name &&
+		Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
+			block.name
+		) &&
 		!! block.attributes.metadata?.bindings &&
 		Object.values( block.attributes.metadata.bindings ).some(
 			( binding ) => binding.source.name === 'pattern_attributes'
@@ -100,7 +104,7 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 			defaultValues[ blockId ] ??= {};
 			defaultValues[ blockId ][ attributeKey ] =
 				block.attributes[ attributeKey ];
-			if ( overrides[ blockId ] ) {
+			if ( overrides[ blockId ]?.[ attributeKey ] !== undefined ) {
 				newAttributes[ attributeKey ] =
 					overrides[ blockId ][ attributeKey ];
 			}
@@ -130,6 +134,8 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 				defaultValues[ blockId ][ attributeKey ]
 			) {
 				overrides[ blockId ] ??= {};
+				// TODO: We need a way to represent `undefined` in the serialized overrides.
+				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
 				overrides[ blockId ][ attributeKey ] =
 					block.attributes[ attributeKey ];
 			}
