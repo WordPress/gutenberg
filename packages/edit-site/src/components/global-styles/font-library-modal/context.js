@@ -303,12 +303,14 @@ function FontLibraryProvider( { children } ) {
 				fontFamilyToUninstall.slug
 			);
 
-			// Uninstall the font (remove the font files from the server and the posts from the database).
+			// Uninstall the font family.
+			// (Removes the font files from the server and the posts from the database).
 			const uninstalledFontFamily = await fetchUninstallFontFamily(
 				fontFamilyToUninstallData.id
 			);
 
-			// Deactivate the font family (remove the font family from the global styles).
+			// Deactivate the font family if delete request is successful
+			// (Removes the font family from the global styles).
 			if ( uninstalledFontFamily.deleted ) {
 				deactivateFontFamily( fontFamilyToUninstall );
 				// Save the global styles to the database.
