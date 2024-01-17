@@ -95,6 +95,7 @@ const ImageComponent = ( {
 							setLocalURL( url );
 						} );
 				} else {
+					setLocalURL( url );
 				}
 			}
 
@@ -213,12 +214,12 @@ const ImageComponent = ( {
 		focalPoint && styles.focalPointContainer,
 	];
 
-	const opacityValue = useRef( new Animated.Value( 0.3 ) ).current;
+	const opacityValue = useRef( new Animated.Value( 1 ) ).current;
 
 	useEffect( () => {
 		Animated.timing( opacityValue, {
 			toValue: isUploadInProgress ? 0.3 : 1,
-			duration: 200,
+			duration: 100,
 			useNativeDriver: true,
 		} ).start();
 	}, [ isUploadInProgress, opacityValue ] );
@@ -257,19 +258,6 @@ const ImageComponent = ( {
 		),
 		{ height: containerSize?.height },
 	];
-
-	const platformURI = Platform.isAndroid
-		? /* Android source prop */
-		  {
-				uri: networkURL || localURL || url,
-		  }
-		: /* iOS source prop */
-		  {
-				uri:
-					networkURL && networkImageLoaded
-						? networkURL
-						: ( localURL && localURL ) || url,
-		  };
 
 	return (
 		<View
@@ -310,22 +298,22 @@ const ImageComponent = ( {
 					<View style={ focalPoint && styles.focalPointContent }>
 						{ Platform.isAndroid && (
 							<>
-								{ networkImageLoaded && (
+								{ networkImageLoaded && networkURL && (
 									<Animated.Image
 										style={ imageStyles }
 										fadeDuration={ 0 }
-										source={ platformURI || localURL }
+										source={ { uri: networkURL } }
 										{ ...( ! focalPoint && {
 											resizeMethod: 'scale',
 										} ) }
 										resizeMode={ imageResizeMode }
 									/>
 								) }
-								{ ! networkImageLoaded && (
+								{ ! networkImageLoaded && ! networkURL && (
 									<Animated.Image
 										style={ imageStyles }
 										fadeDuration={ 0 }
-										source={ { uri: url } }
+										source={ { uri: localURL } }
 										{ ...( ! focalPoint && {
 											resizeMethod: 'scale',
 										} ) }
@@ -339,7 +327,11 @@ const ImageComponent = ( {
 								<Animated.Image
 									style={ imageStyles }
 									fadeDuration={ 0 }
-									source={ platformURI }
+									source={
+										networkURL && networkImageLoaded
+											? networkURL
+											: ( localURL && localURL ) || url
+									}
 									{ ...( ! focalPoint && {
 										resizeMethod: 'scale',
 									} ) }
