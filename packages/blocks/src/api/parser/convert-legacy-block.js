@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * Convert legacy blocks to their canonical form. This function is used
  * both in the parser level for previous content and to convert such blocks
  * used in Custom Post Types templates.
@@ -77,5 +82,12 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 		newAttributes.legacy = true;
 	}
 
-	return [ name, newAttributes ];
+	/**
+	 * Filter the name and/or attributes of the block while the parsing process.
+	 *
+	 * @since 13.7.2
+	 *
+	 * @param {Array} $data Two dimmensional array containing the block name and attributes.
+	 */
+	return applyFilters( 'blocks.migrateBlockType', [ name, newAttributes ] );
 }

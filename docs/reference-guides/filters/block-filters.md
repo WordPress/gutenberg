@@ -83,6 +83,31 @@ wp.hooks.addFilter(
 
 The following filters are available to change the behavior of blocks while editing in the block editor.
 
+### `blocks.migrateBlockType`
+
+Filter the name and/or attributes of the block while the parsing process.
+Use this hook as an opportunity to change the name and/or attributes of the block.
+The function bound to the hook will run both at the parser level for previous content and to convert such blocks used in Custom Post Types templates.
+
+Take advantage of it, for instance, to convert legacy blocks to their canonical form:
+
+_Example:_
+
+```js
+wp.hooks.addFilter(
+	'blocks.migrateBlockType',
+	'my-plugin/book-update-block-name',
+	function ( [ name, attributes ] ) {
+		// Convert 'my-plugin/book-obsolete-block-name' block in existing content to 'my-plugin/book'.
+		if ( 'my-plugin/book-obsolete-block-name' === name ) {
+			name = 'my-plugin/book';		
+		}
+
+		return [ name, attributes ];
+	}
+);
+```
+
 ### `blocks.getSaveElement`
 
 A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `React.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
