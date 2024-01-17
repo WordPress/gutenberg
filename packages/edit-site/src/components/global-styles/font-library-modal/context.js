@@ -322,16 +322,16 @@ function FontLibraryProvider( { children } ) {
 		const response = await fetchFontCollections();
 		setFontCollections( response );
 	};
-	const getFontCollection = async ( id ) => {
+	const getFontCollection = async ( slug ) => {
 		try {
 			const hasData = !! collections.find(
-				( collection ) => collection.id === id
-			)?.data;
+				( collection ) => collection.slug === slug
+			)?.font_families;
 			if ( hasData ) return;
-			const response = await fetchFontCollection( id );
+			const response = await fetchFontCollection( slug );
 			const updatedCollections = collections.map( ( collection ) =>
-				collection.id === id
-					? { ...collection, data: { ...response?.data } }
+				collection.slug === slug
+					? { ...collection, ...response }
 					: collection
 			);
 			setFontCollections( updatedCollections );

@@ -37,8 +37,8 @@ const DEFAULT_CATEGORY = {
 	id: 'all',
 	name: __( 'All' ),
 };
-function FontCollection( { id } ) {
-	const requiresPermission = id === 'default-font-collection';
+function FontCollection( { slug } ) {
+	const requiresPermission = slug === 'default-font-collection';
 
 	const getGoogleFontsPermissionFromStorage = () => {
 		return (
@@ -58,7 +58,7 @@ function FontCollection( { id } ) {
 	const { collections, getFontCollection, installFont } =
 		useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
-		( collection ) => collection.id === id
+		( collection ) => collection.slug === slug
 	);
 
 	useEffect( () => {
@@ -70,12 +70,12 @@ function FontCollection( { id } ) {
 		handleStorage();
 		window.addEventListener( 'storage', handleStorage );
 		return () => window.removeEventListener( 'storage', handleStorage );
-	}, [ id, requiresPermission ] );
+	}, [ slug, requiresPermission ] );
 
 	useEffect( () => {
 		const fetchFontCollection = async () => {
 			try {
-				await getFontCollection( id );
+				await getFontCollection( slug );
 				resetFilters();
 			} catch ( e ) {
 				setNotice( {
@@ -86,12 +86,12 @@ function FontCollection( { id } ) {
 			}
 		};
 		fetchFontCollection();
-	}, [ id, getFontCollection ] );
+	}, [ slug, getFontCollection ] );
 
 	useEffect( () => {
 		setSelectedFont( null );
 		setNotice( null );
-	}, [ id ] );
+	}, [ slug ] );
 
 	useEffect( () => {
 		// If the selected fonts change, reset the selected fonts to install
@@ -109,10 +109,10 @@ function FontCollection( { id } ) {
 	}, [ notice ] );
 
 	const collectionFonts = useMemo(
-		() => selectedCollection?.data?.fontFamilies ?? [],
+		() => selectedCollection?.font_families ?? [],
 		[ selectedCollection ]
 	);
-	const collectionCategories = selectedCollection?.data?.categories ?? [];
+	const collectionCategories = selectedCollection?.categories ?? [];
 
 	const categories = [ DEFAULT_CATEGORY, ...collectionCategories ];
 
@@ -269,11 +269,11 @@ function FontCollection( { id } ) {
 
 			<Spacer margin={ 4 } />
 			{ ! renderConfirmDialog &&
-				! selectedCollection?.data?.fontFamilies &&
+				! selectedCollection?.font_families &&
 				! notice && <Spinner /> }
 
 			{ ! renderConfirmDialog &&
-				!! selectedCollection?.data?.fontFamilies?.length &&
+				!! selectedCollection?.font_families?.length &&
 				! fonts.length && (
 					<Text>
 						{ __(
@@ -294,10 +294,10 @@ function FontCollection( { id } ) {
 				<FontsGrid>
 					{ fonts.map( ( font ) => (
 						<FontCard
-							key={ font.slug }
-							font={ font }
+							key={ font.font_family_settings.slug }
+							font={ font.font_family_settings }
 							onClick={ () => {
-								setSelectedFont( font );
+								setSelectedFont( font.font_family_settings );
 							} }
 						/>
 					) ) }
