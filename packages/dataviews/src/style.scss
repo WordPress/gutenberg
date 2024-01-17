@@ -253,13 +253,28 @@
 		grid-template-columns: repeat(4, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
 	}
 
+	.dataviews-view-grid__card {
+		border-radius: $radius-block-ui * 2;
+		border: 1px solid $gray-200;
+		height: 100%;
+		justify-content: flex-start;
+
+		.dataviews-view-grid__title-actions {
+			padding: 0 $grid-unit-05;
+		}
+
+		.dataviews-view-grid__primary-field {
+			min-height: $grid-unit-50;
+		}
+	}
+
 	.dataviews-view-grid__media {
 		width: 100%;
 		min-height: 200px;
 		aspect-ratio: 1/1;
-		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-		border-radius: $radius-block-ui * 2;
 		overflow: hidden;
+		border-bottom: 1px solid $gray-200;
+		background-color: $gray-100;
 
 		> * {
 			object-fit: cover;
@@ -268,17 +283,23 @@
 		}
 	}
 
+	.dataviews-view-grid__primary-field {
+		padding: $grid-unit-10;
+	}
+
 	.dataviews-view-grid__fields {
 		position: relative;
 		font-size: 12px;
 		line-height: 16px;
 
+		&:not(:empty) {
+			padding: $grid-unit-15;
+			padding-top: 0;
+		}
+
 		.dataviews-view-grid__field {
-			.dataviews-view-grid__field-header {
-				color: $gray-700;
-			}
 			.dataviews-view-grid__field-value {
-				color: $gray-900;
+				color: $gray-700;
 			}
 		}
 	}
@@ -402,6 +423,10 @@
 
 			&:last-child {
 				margin-right: 0;
+			}
+
+			&:empty {
+				display: none;
 			}
 		}
 	}
