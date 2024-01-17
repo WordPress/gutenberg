@@ -146,8 +146,10 @@ window.addEventListener( 'popstate', async () => {
 	}
 } );
 
-// Cache the current regions.
-pages.set(
-	cleanUrl( window.location ),
-	Promise.resolve( regionsToVdom( document ) )
-);
+document.addEventListener( 'DOMContentLoaded', () => {
+	// Cache the current regions.
+	pages.set(
+		cleanUrl( window.location ),
+		Promise.resolve( regionsToVdom( document ) )
+	);
+} );
