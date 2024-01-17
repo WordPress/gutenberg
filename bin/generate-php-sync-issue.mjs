@@ -155,12 +155,19 @@ async function octokitRequest( method = '', params = {}, settings = {} ) {
 
 	const requestType = settings?.paginate ? 'paginate' : 'request';
 
-	const result = await octokit[ requestType ]( method, params );
+	try {
+		const result = await octokit[ requestType ]( method, params );
 
-	if ( requestType === 'paginate' ) {
-		return result;
+		if ( requestType === 'paginate' ) {
+			return result;
+		}
+		return result.data;
+	} catch ( error ) {
+		console.error(
+			`Error making request to ${ method }: ${ error.message }`
+		);
+		process.exit( 1 );
 	}
-	return result.data;
 }
 
 async function getAllCommitsFromPaths( since, paths ) {
