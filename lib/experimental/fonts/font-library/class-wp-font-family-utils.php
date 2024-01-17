@@ -122,18 +122,20 @@ class WP_Font_Family_Utils {
 		$settings = wp_parse_args(
 			$settings,
 			array(
-				'fontFamily'  => '',
-				'fontStyle'   => 'normal',
-				'fontWeight'  => '400',
-				'fontStretch' => 'normal',
+				'fontFamily'   => '',
+				'fontStyle'    => 'normal',
+				'fontWeight'   => '400',
+				'fontStretch'  => 'normal',
+				'unicodeRange' => 'U+0-10FFFF',
 			)
 		);
 
 		// Convert all values to lowercase for comparison.
-		$font_family  = mb_strtolower( $settings['fontFamily'] );
-		$font_style   = strtolower( $settings['fontStyle'] );
-		$font_weight  = strtolower( $settings['fontWeight'] );
-		$font_stretch = strtolower( $settings['fontStretch'] );
+		$font_family   = mb_strtolower( $settings['fontFamily'] );
+		$font_style    = strtolower( $settings['fontStyle'] );
+		$font_weight   = strtolower( $settings['fontWeight'] );
+		$font_stretch  = strtolower( $settings['fontStretch'] );
+		$unicode_range = strtoupper( $settings['unicodeRange'] );
 
 		// Convert weight keywords to numeric strings.
 		$font_weight = str_replace( 'normal', '400', $font_weight );
@@ -153,7 +155,7 @@ class WP_Font_Family_Utils {
 		);
 		$font_stretch     = str_replace( array_keys( $font_stretch_map ), array_values( $font_stretch_map ), $font_stretch );
 
-		$slug_elements = array( $font_family, $font_style, $font_weight, $font_stretch );
+		$slug_elements = array( $font_family, $font_style, $font_weight, $font_stretch, $unicode_range );
 
 		// Remove quotes to normalize font-family names, and ';' to use as a separator.
 		$slug_elements = array_map(
