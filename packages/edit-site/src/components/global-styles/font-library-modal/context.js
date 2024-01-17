@@ -69,9 +69,10 @@ function FontLibraryProvider( { children } ) {
 
 	const libraryFonts =
 		( libraryPosts || [] ).map( ( post ) => {
-			post.font_family_settings.fontFace = post._embedded.font_faces.map(
-				( face ) => face.font_face_settings
-			);
+			post.font_family_settings.fontFace =
+				post?._embedded?.font_faces.map(
+					( face ) => face.font_face_settings
+				) || [];
 			return post.font_family_settings;
 		} ) || [];
 
@@ -204,8 +205,23 @@ function FontLibraryProvider( { children } ) {
 		setIsInstalling( true );
 		try {
 			// Get the ID of the font family post, if it is already installed.
-			let fontFamilyId = await fetchGetFontFamilyBySlug( font.slug )
-				.then( ( response ) => response?.[ 0 ]?.id )
+			let installedFontFamily = await fetchGetFontFamilyBySlug(
+				font.slug
+			)
+				.then( ( response ) => {
+					if ( ! response || response.length === 0 ) {
+						return null;
+					}
+					const fontFamilyPost = response[ 0 ];
+					return {
+						id: fontFamilyPost.id,
+						...fontFamilyPost.font_family_settings,
+						fontFace:
+							fontFamilyPost?._embedded?.font_faces.map(
+								( face ) => face.font_face_settings
+							) || [],
+					};
+				} )
 				.catch( ( e ) => {
 					// eslint-disable-next-line no-console
 					console.error( e );
@@ -213,16 +229,49 @@ function FontLibraryProvider( { children } ) {
 				} );
 
 			// Otherwise, install it.
-			if ( ! fontFamilyId ) {
+			if ( ! installedFontFamily ) {
 				const fontFamilyFormData = makeFontFamilyFormData( font );
 				// Prepare font family form data to install.
-				fontFamilyId = await fetchInstallFontFamily(
+				installedFontFamily = await fetchInstallFontFamily(
 					fontFamilyFormData
 				)
-					.then( ( response ) => response.id )
+					.then( ( response ) => {
+						return {
+							id: response.id,
+							...response.font_face_settings,
+							fontFace: [],
+						};
+					} )
 					.catch( ( e ) => {
 						throw Error( e.message );
 					} );
+			}
+
+			// Filter Font Faces that have already been installed
+			// We determine that by comparing the fontWeight and fontStyle
+			font.fontFace = font.fontFace.filter( ( fontFaceToInstall ) => {
+				return (
+					-1 ===
+					installedFontFamily.fontFace.findIndex(
+						( installedFontFace ) => {
+							return (
+								installedFontFace.fontWeight ===
+									fontFaceToInstall.fontWeight &&
+								installedFontFace.fontStyle ===
+									fontFaceToInstall.fontStyle
+							);
+						}
+					)
+				);
+			} );
+
+			if ( font.fontFace.length === 0 ) {
+				// Looks like we're only trying to install fonts that are already installed.
+				// Let's not do that.
+				// TODO: Exit with an error message?
+				return {
+					errors: [ 'All font faces are already installed' ],
+				};
 			}
 
 			// Prepare font faces form data to install.
@@ -230,7 +279,7 @@ function FontLibraryProvider( { children } ) {
 
 			// Install the fonts (upload the font files to the server and create the post in the database).
 			const response = await batchInstallFontFaces(
-				fontFamilyId,
+				installedFontFamily.id,
 				fontFacesFormData
 			);
 
