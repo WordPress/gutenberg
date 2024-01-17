@@ -58,8 +58,8 @@ add_filter( 'render_block', 'gutenberg_process_directives_in_root_blocks', 10, 2
  * 'WP-INNER-BLOCKS' tag in the HTML with those blocks.
  *
  * @param string $html The HTML to process.
- * @param mixed $context The context to use when processing.
- * @param array $namespace_stack Stack of namespaces passed by reference.
+ * @param mixed  $context The context to use when processing.
+ * @param array  $namespace_stack Stack of namespaces passed by reference.
  *
  * @return string The processed HTML.
  */
