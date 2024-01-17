@@ -177,6 +177,6 @@ describe( 'BlockSwitcher', () => {
 			screen.getByRole( 'menu', {
 				name: 'Block Name',
 			} )
-		).toHaveTextContent( 'There is no available transform' );
+		).toHaveTextContent( 'No transforms.' );
 	} );
 } );

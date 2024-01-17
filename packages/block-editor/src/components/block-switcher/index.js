@@ -31,16 +31,16 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
 function BlockSwitcherDropdownMenuContents( {
 	onClose,
-	blocks,
 	clientIds,
 	hasBlockStyles,
 	canRemove,
 } ) {
 	const { replaceBlocks, multiSelect, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
-	const { possibleBlockTransformations, patterns } = useSelect(
+	const { possibleBlockTransformations, patterns, blocks } = useSelect(
 		( select ) => {
 			const {
+				getBlocksByClientId,
 				getBlockRootClientId,
 				getBlockTransformItems,
 				__experimentalGetPatternTransformItems,
@@ -48,18 +48,20 @@ function BlockSwitcherDropdownMenuContents( {
 			const rootClientId = getBlockRootClientId(
 				Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
 			);
+			const _blocks = getBlocksByClientId( clientIds );
 			return {
+				blocks: _blocks,
 				possibleBlockTransformations: getBlockTransformItems(
-					blocks,
+					_blocks,
 					rootClientId
 				),
 				patterns: __experimentalGetPatternTransformItems(
-					blocks,
+					_blocks,
 					rootClientId
 				),
 			};
 		},
-		[ clientIds, blocks ]
+		[ clientIds ]
 	);
 	const blockVariationTransformations = useBlockVariationTransforms( {
 		clientIds,
@@ -111,7 +113,11 @@ function BlockSwitcherDropdownMenuContents( {
 		hasBlockOrBlockVariationTransforms ||
 		hasPatternTransformation;
 	if ( ! hasContents ) {
-		return <p>{ __( 'There is no available transform.' ) }</p>;
+		return (
+			<p className="block-editor-block-switcher__no-transforms">
+				{ __( 'No transforms.' ) }
+			</p>
+		);
 	}
 	return (
 		<div className="block-editor-block-switcher__container">
@@ -280,7 +286,6 @@ export const BlockSwitcher = ( { clientIds } ) => {
 						{ ( { onClose } ) => (
 							<BlockSwitcherDropdownMenuContents
 								onClose={ onClose }
-								blocks={ blocks }
 								clientIds={ clientIds }
 								hasBlockStyles={ hasBlockStyles }
 								canRemove={ canRemove }
