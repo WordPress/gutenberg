@@ -133,7 +133,6 @@ function BlockListBlock( {
 			}
 			mayDisplayControls={ mayDisplayControls }
 			mayDisplayParentControls={ mayDisplayParentControls }
-			blockEditingMode={ context.blockEditingMode }
 		/>
 	);
 

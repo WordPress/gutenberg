@@ -2,16 +2,13 @@
  * WordPress dependencies
  */
 import { useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import {
-	useBlockEditContext,
-	blockEditingModeKey,
-} from '../block-edit/context';
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
 /**
  * @typedef {'disabled'|'contentOnly'|'default'} BlockEditingMode
@@ -48,8 +45,8 @@ import {
  * @return {BlockEditingMode} The current editing mode.
  */
 export function useBlockEditingMode( mode ) {
-	const context = useBlockEditContext();
-	const { clientId = '' } = context;
+	const { clientId = '', blockEditingMode } =
+		useContext( PrivateBlockContext );
 	const { setBlockEditingMode, unsetBlockEditingMode } =
 		useDispatch( blockEditorStore );
 	useEffect( () => {
@@ -62,5 +59,5 @@ export function useBlockEditingMode( mode ) {
 			}
 		};
 	}, [ clientId, mode, setBlockEditingMode, unsetBlockEditingMode ] );
-	return context[ blockEditingModeKey ];
+	return blockEditingMode;
 }

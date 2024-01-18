@@ -13,7 +13,6 @@ import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
 	mayDisplayParentControlsKey,
-	blockEditingModeKey,
 } from './context';
 
 /**
@@ -29,7 +28,6 @@ export { useBlockEditContext };
 export default function BlockEdit( {
 	mayDisplayControls,
 	mayDisplayParentControls,
-	blockEditingMode,
 	// The remaining props are passed through the BlockEdit filters and are thus
 	// public API!
 	...props
@@ -61,7 +59,6 @@ export default function BlockEdit( {
 					// usage outside of the package (this context is exposed).
 					[ mayDisplayControlsKey ]: mayDisplayControls,
 					[ mayDisplayParentControlsKey ]: mayDisplayParentControls,
-					[ blockEditingModeKey ]: blockEditingMode,
 				} ),
 				[
 					name,
@@ -72,7 +69,6 @@ export default function BlockEdit( {
 					__unstableLayoutClassNames,
 					mayDisplayControls,
 					mayDisplayParentControls,
-					blockEditingMode,
 				]
 			) }
 		>
