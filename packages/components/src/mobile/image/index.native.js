@@ -316,18 +316,20 @@ const ImageComponent = ( {
 							<>
 								<Animated.Image
 									style={ imageStyles }
-									source={
-										networkURL && networkImageLoaded
-											? networkURL
-											: ( localURL && localURL ) || url
-									}
+									source={ {
+										uri:
+											networkURL && networkImageLoaded
+												? networkURL
+												: ( localURL && localURL ) ||
+												  url,
+									} }
 									{ ...( ! focalPoint && {
 										resizeMethod: 'scale',
 									} ) }
 									resizeMode={ imageResizeMode }
 								/>
 								<Image
-									source={ networkURL }
+									source={ { uri: networkURL } }
 									style={ styles.nonVisibleImage }
 									onLoad={ () => {
 										setNetworkImageLoaded( true );
