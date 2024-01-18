@@ -32,12 +32,11 @@ const DEFAULT_TABS = [
 
 const tabsFromCollections = ( collections ) =>
 	collections.map( ( { slug, name } ) => ( {
-		slug,
+		id: slug,
 		title:
 			collections.length === 1 && slug === 'default-font-collection'
 				? __( 'Install Fonts' )
 				: name,
-		id: slug,
 	} ) );
 
 function FontLibraryModal( {
