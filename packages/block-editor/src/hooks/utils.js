@@ -449,6 +449,7 @@ export function createBlockEditFilter( features ) {
 							name={ props.name }
 							isSelected={ props.isSelected }
 							clientId={ props.clientId }
+							context={ props.context }
 							setAttributes={ props.setAttributes }
 							__unstableParentLayout={
 								props.__unstableParentLayout
