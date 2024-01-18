@@ -87,13 +87,16 @@ const ImageComponent = ( {
 			if ( url.startsWith( 'file:///' ) ) {
 				setLocalURL( url );
 			} else if ( url.startsWith( 'https://' ) ) {
-				if ( Platform.isAndroid ) {
-					RNImage.prefetch( url ).then( () => {
-						setNetworkURL( url );
-						setNetworkImageLoaded( true );
-					} );
-				} else if ( Platform.isIOS ) {
+				if ( Platform.isIOS ) {
 					setNetworkURL( url );
+				} else if ( Platform.isAndroid ) {
+					const result = RNImage.prefetch( url );
+					if ( result ) {
+						RNImage.prefetch( url ).then( () => {
+							setNetworkURL( url );
+							setNetworkImageLoaded( true );
+						} );
+					}
 				}
 			}
 		}
