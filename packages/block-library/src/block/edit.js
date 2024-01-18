@@ -104,9 +104,14 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 			defaultValues[ blockId ] ??= {};
 			defaultValues[ blockId ][ attributeKey ] =
 				block.attributes[ attributeKey ];
-			if ( overrides[ blockId ]?.[ attributeKey ] !== undefined ) {
+			if (
+				overrides[ blockId ] &&
+				Object.hasOwn( overrides[ blockId ], attributeKey )
+			) {
 				newAttributes[ attributeKey ] =
-					overrides[ blockId ][ attributeKey ];
+					overrides[ blockId ][ attributeKey ] === undefined
+						? null
+						: overrides[ blockId ][ attributeKey ];
 			}
 		}
 		return {
@@ -134,10 +139,10 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 				defaultValues[ blockId ][ attributeKey ]
 			) {
 				overrides[ blockId ] ??= {};
-				// TODO: We need a way to represent `undefined` in the serialized overrides.
-				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
 				overrides[ blockId ][ attributeKey ] =
-					block.attributes[ attributeKey ];
+					block.attributes[ attributeKey ] === undefined
+						? null
+						: block.attributes[ attributeKey ];
 			}
 		}
 	}

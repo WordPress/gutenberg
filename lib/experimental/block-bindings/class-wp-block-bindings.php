@@ -16,6 +16,10 @@ if ( class_exists( 'WP_Block_Bindings' ) ) {
  * Core class used to define supported blocks, register sources, and populate HTML with content from those sources.
  */
 class WP_Block_Bindings {
+	/**
+	 * A singleton flag to represent skipping processing the attribute.
+	 */
+	const SKIP = array();
 
 	/**
 	 * Holds the registered block bindings sources, keyed by source identifier.

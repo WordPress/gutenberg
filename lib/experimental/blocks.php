@@ -105,7 +105,7 @@ if ( $gutenberg_experiments && (
 				'core/paragraph' => array( 'content' ),
 				'core/heading'   => array( 'content' ),
 				'core/image'     => array( 'url', 'title', 'alt' ),
-				'core/button'    => array( 'url', 'text' ),
+				'core/button'    => array( 'url', 'text', 'linkTarget' ),
 			);
 
 			// If the block doesn't have the bindings property or isn't one of the allowed block types, return.
@@ -153,7 +153,7 @@ if ( $gutenberg_experiments && (
 				}
 				$source_value = $source_callback( $source_args, $block_instance, $binding_attribute );
 				// If the value is null, process next attribute.
-				if ( is_null( $source_value ) ) {
+				if ( WP_Block_Bindings::SKIP === $source_value ) {
 					continue;
 				}
 
