@@ -8,22 +8,28 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { Children } from '@wordpress/element';
+import {
+	Children,
+	useContext,
+	createContext,
+	forwardRef,
+} from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import type { TooltipProps, TooltipInternalContext } from './types';
+import type {
+	TooltipProps,
+	TooltipInternalContext as TooltipInternalContextType,
+} from './types';
 import Shortcut from '../shortcut';
 import { positionToPlacement } from '../popover/utils';
-import {
-	contextConnect,
-	useContextSystem,
-	ContextSystemProvider,
-	removeExtraPropsAddedByContext,
-} from '../context';
 import type { WordPressComponentProps } from '../context';
+
+const TooltipInternalContext = createContext< TooltipInternalContextType >( {
+	isNestedInTooltip: false,
+} );
 
 /**
  * Time over anchor to wait before showing tooltip
@@ -31,12 +37,10 @@ import type { WordPressComponentProps } from '../context';
 export const TOOLTIP_DELAY = 700;
 
 const CONTEXT_VALUE = {
-	Tooltip: {
-		isNestedInTooltip: true,
-	},
+	isNestedInTooltip: true,
 };
 
-function UnconnectedTooltip(
+function UnforwardedTooltip(
 	props: WordPressComponentProps< TooltipProps, 'div', false >,
 	ref: React.ForwardedRef< any >
 ) {
@@ -49,14 +53,10 @@ function UnconnectedTooltip(
 		shortcut,
 		text,
 
-		// From Internal Context system
-		isNestedInTooltip,
-
 		...restProps
-	} = useContextSystem< typeof props & TooltipInternalContext >(
-		props,
-		'Tooltip'
-	);
+	} = props;
+
+	const { isNestedInTooltip } = useContext( TooltipInternalContext );
 
 	const baseId = useInstanceId( Tooltip, 'tooltip' );
 	const describedById = text || shortcut ? baseId : undefined;
@@ -97,21 +97,15 @@ function UnconnectedTooltip(
 	} );
 
 	if ( isNestedInTooltip ) {
-		// Avoid passing certain props added by the useContextSystem hook when
-		// cloning children, as they are not intended for this scenario.
-		const clonedProps = removeExtraPropsAddedByContext(
-			restProps,
-			'Tooltip'
-		);
 		return isOnlyChild ? (
-			<Ariakit.Role { ...clonedProps } render={ children } />
+			<Ariakit.Role { ...restProps } render={ children } />
 		) : (
 			children
 		);
 	}
 
 	return (
-		<ContextSystemProvider value={ CONTEXT_VALUE }>
+		<TooltipInternalContext.Provider value={ CONTEXT_VALUE }>
 			<Ariakit.TooltipAnchor
 				onClick={ hideOnClick ? tooltipStore.hide : undefined }
 				store={ tooltipStore }
@@ -123,6 +117,7 @@ function UnconnectedTooltip(
 			{ isOnlyChild && ( text || shortcut ) && (
 				<Ariakit.Tooltip
 					{ ...restProps }
+					className="components-tooltip"
 					unmountOnHide
 					gutter={ 4 }
 					id={ describedById }
@@ -140,10 +135,10 @@ function UnconnectedTooltip(
 					) }
 				</Ariakit.Tooltip>
 			) }
-		</ContextSystemProvider>
+		</TooltipInternalContext.Provider>
 	);
 }
 
-export const Tooltip = contextConnect( UnconnectedTooltip, 'Tooltip' );
+export const Tooltip = forwardRef( UnforwardedTooltip );
 
 export default Tooltip;
