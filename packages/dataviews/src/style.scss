@@ -289,7 +289,7 @@
 		border-bottom: 1px solid $gray-200;
 		background-color: $gray-100;
 
-		> * {
+		img {
 			object-fit: cover;
 			width: 100%;
 			height: 100%;
@@ -400,6 +400,7 @@
 		overflow: hidden;
 		position: relative;
 		flex-shrink: 0;
+		background-color: $gray-100;
 
 		img {
 			width: 100%;
