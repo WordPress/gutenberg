@@ -262,6 +262,12 @@ require_once __DIR__ . '/experimental/data-views.php';
 
 // Updates all blocks to use their example data, if they have it.
 function modify_block_attributes_before_render( $block ) {
+
+
+	if ( ! isset( $_GET['block_preview'] ) ) {
+		return $block;
+	};
+
 	$block_type_registry = WP_Block_Type_Registry::get_instance();
 	$block_type = $block_type_registry->get_registered( $block['blockName'] );
 	// we should use the bindings API!

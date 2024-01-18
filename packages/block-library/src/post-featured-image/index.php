@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Server-side rendering of the `core/post-featured-image` block.
  *
@@ -20,7 +21,6 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	$post_ID = $block->context['postId'];
 
 	$is_link        = isset( $attributes['isLink'] ) && $attributes['isLink'];
-	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
 	$attr           = get_block_core_post_featured_image_border_attributes( $attributes );
 	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
 
@@ -54,7 +54,9 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 
 	$featured_image = get_the_post_thumbnail( $post_ID, $size_slug, $attr );
-	//var_dump( $featured_image );
+	if ( $attributes['featured_image'] ) {
+		$featured_image = $attributes['featured_image'] ;
+	}
 	if ( ! $featured_image ) {
 		return '';
 	}
@@ -91,6 +93,18 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 	return "<figure {$wrapper_attributes}>{$featured_image}</figure>";
 }
+
+function assign_featured_image( $block ) {
+	global $post;
+	$size_slug = isset( $block['attrs']['sizeSlug'] ) ? $block['attrs']['sizeSlug'] : 'post-thumbnail';
+	$attr      = get_block_core_post_featured_image_border_attributes( $block['attrs'] );
+
+	$block['attrs']['featured_image'] = get_the_post_thumbnail( $post->id, $size_slug, $attr );
+
+	return $block;
+}
+
+add_filter( 'render_block_data', 'assign_featured_image', 8, 2 );
 
 /**
  * Generate markup for the HTML element that will be used for the overlay.

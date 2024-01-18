@@ -6,7 +6,15 @@
 	"category": "theme",
 	"description": "Display a post's featured image.",
 	"textdomain": "default",
+	"example": {
+		"attributes": {
+			"featured_image": "<figure style=\"margin-bottom:var(--wp--preset--spacing--40);\" class=\"wp-block-post-featured-image\"><img src=\"https://images.pexels.com/photos/14850795/pexels-photo-14850795.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1\" class=\"attachment-post-thumbnail size-post-thumbnail wp-post-image\" alt=\"\" style=\"object-fit:cover;\" decoding=\"async\"></figure>"
+		}
+	},
 	"attributes": {
+		"featured_image": {
+			"type": "string"
+		},
 		"isLink": {
 			"type": "boolean",
 			"default": false
