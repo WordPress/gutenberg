@@ -42,7 +42,6 @@ import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import useScrollUponInsertion from './use-scroll-upon-insertion';
 import { useSettings } from '../use-settings';
-import { PrivateBlockContext } from './private-block-context';
 
 const EMPTY_ARRAY = [];
 
@@ -345,7 +344,7 @@ function BlockListBlock( {
 		order + 1
 	);
 
-	const block = (
+	return (
 		<BlockWrapper
 			accessibilityLabel={ accessibilityLabel }
 			blockCategory={ blockCategory }
@@ -397,23 +396,13 @@ function BlockListBlock( {
 							}
 							wrapperProps={ wrapperProps }
 							mayDisplayControls={ mayDisplayControls }
+							blockEditingMode={ blockEditingMode }
 						/>
 						<View onLayout={ onLayout } />
 					</GlobalStylesContext.Provider>
 				)
 			}
 		</BlockWrapper>
-	);
-
-	return (
-		<PrivateBlockContext.Provider
-			value={ {
-				clientId,
-				blockEditingMode,
-			} }
-		>
-			{ block }
-		</PrivateBlockContext.Provider>
 	);
 }
 
