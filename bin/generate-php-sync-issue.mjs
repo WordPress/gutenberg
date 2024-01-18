@@ -24,6 +24,8 @@ const IGNORED_PATHS = [
 	'packages/block-library', // this is handled automatically.
 ];
 
+const MAX_NESTING_LEVEL = 3;
+
 const DEBUG = !! getArg( 'debug' );
 
 const __filename = fileURLToPath( import.meta.url );
@@ -118,7 +120,7 @@ async function main() {
 
 	const processResult = pipe(
 		processCommits,
-		removeNesting,
+		reduceNesting,
 		dedupePRsPerLevel,
 		removeEmptyLevels,
 		sortLevels
@@ -266,14 +268,14 @@ function dedupePRsPerLevel( data ) {
 	return processLevel( data );
 }
 
-function removeNesting( data, maxLevel = 3 ) {
+function reduceNesting( data ) {
 	function processLevel( levelData, level = 1 ) {
 		const processedData = {};
 
 		for ( const [ key, value ] of Object.entries( levelData ) ) {
 			if ( Array.isArray( value ) ) {
 				processedData[ key ] = value;
-			} else if ( level < maxLevel ) {
+			} else if ( level < MAX_NESTING_LEVEL ) {
 				processedData[ key ] = processLevel( value, level + 1 );
 			} else {
 				processedData[ key ] = flattenData( value );
