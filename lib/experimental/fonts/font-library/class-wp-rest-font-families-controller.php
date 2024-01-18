@@ -263,6 +263,8 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 		foreach ( $this->get_font_face_ids( $font_family_id ) as $font_face_id ) {
 			wp_delete_post( $font_face_id, true );
 		}
+
+		return $deleted;
 	}
 
 	/**

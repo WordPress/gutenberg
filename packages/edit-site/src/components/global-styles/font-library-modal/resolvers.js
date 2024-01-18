@@ -57,14 +57,10 @@ export async function fetchGetFontFamilyBySlug( slug ) {
 	} );
 }
 
-export async function fetchUninstallFonts( fonts ) {
-	const data = {
-		font_families: fonts,
-	};
+export async function fetchUninstallFontFamily( fontFamilyId ) {
 	const config = {
-		path: '/wp/v2/font-families',
+		path: `/wp/v2/font-families/${ fontFamilyId }?force=true`,
 		method: 'DELETE',
-		data,
 	};
 	return apiFetch( config );
 }
