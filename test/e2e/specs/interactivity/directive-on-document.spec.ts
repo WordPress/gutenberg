@@ -40,6 +40,7 @@ test.describe( 'data-wp-on-document', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		// Add the element back.
 		await visibilityButton.click();
-		await expect( counter ).toHaveText( '1' );
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( counter ).toHaveText( '2' );
 	} );
 } );

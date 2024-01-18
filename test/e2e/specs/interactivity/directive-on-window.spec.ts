@@ -39,5 +39,7 @@ test.describe( 'data-wp-on-window', () => {
 		// Add the element back.
 		await visibilityButton.click();
 		await expect( counter ).toHaveText( '1' );
+		await page.setViewportSize( { width: 200, height: 600 } );
+		await expect( counter ).toHaveText( '2' );
 	} );
 } );
