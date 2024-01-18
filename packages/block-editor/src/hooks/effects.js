@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -28,7 +28,6 @@ function EffectsInspectorControl( { children, resetAllFilter } ) {
 		</InspectorControls>
 	);
 }
-
 export function EffectsPanel( { clientId, setAttributes, settings } ) {
 	const isEnabled = useHasEffectsPanel( settings );
 	const blockAttributes = useSelect(
@@ -36,10 +35,17 @@ export function EffectsPanel( { clientId, setAttributes, settings } ) {
 		[ clientId ]
 	);
 	const shadow = blockAttributes?.style?.shadow;
-	const value = useMemo( () => attributesToStyle( shadow ), [ shadow ] );
+	const value = useMemo(
+		() => ( {
+			shadow,
+		} ),
+		[ shadow ]
+	);
 
-	const onChange = ( newShadow ) => {
-		setAttributes( styleToAttributes( newShadow, blockAttributes.style ) );
+	const onChange = ( newValue ) => {
+		setAttributes( {
+			style: { ...blockAttributes.style, shadow: newValue.shadow },
+		} );
 	};
 
 	if ( ! isEnabled ) {
@@ -55,24 +61,4 @@ export function EffectsPanel( { clientId, setAttributes, settings } ) {
 			onChange={ onChange }
 		/>
 	);
-}
-
-function styleToAttributes( newStyle, oldStyle ) {
-	const shadowValue = newStyle?.shadow;
-	const shadowSlug = shadowValue?.startsWith( 'var:preset|shadow|' )
-		? shadowValue.substring( 'var:preset|shadow|'.length )
-		: undefined;
-
-	return {
-		style: {
-			...oldStyle,
-			shadow: shadowSlug,
-		},
-	};
-}
-
-function attributesToStyle( shadow ) {
-	return {
-		shadow: shadow ? 'var:preset|shadow|' + shadow : undefined,
-	};
 }
