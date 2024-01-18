@@ -29,7 +29,8 @@ const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/button': [ 'url', 'text' ],
 };
 
-function BlockBindingsUI( { name: blockName, clientId } ) {
+function BlockBindingsUI( props ) {
+	const { name: blockName, clientId } = props;
 	const { attributes, sources } = useSelect( ( select ) => {
 		return {
 			attributes:
@@ -88,7 +89,10 @@ function BlockBindingsUI( { name: blockName, clientId } ) {
 													}
 													key={ sourceName }
 												>
-													{ source.component() }
+													{ source.component(
+														props,
+														attribute
+													) }
 												</DropdownMenu>
 											);
 										}
@@ -105,6 +109,7 @@ function BlockBindingsUI( { name: blockName, clientId } ) {
 
 export default {
 	edit: BlockBindingsUI,
+	attributeKeys: [ 'metadata' ],
 	hasSupport() {
 		return true;
 	},
