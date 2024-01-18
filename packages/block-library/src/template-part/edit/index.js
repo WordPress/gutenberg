@@ -29,6 +29,43 @@ import {
 	useTemplatePartArea,
 } from './utils/hooks';
 
+function ReplaceButton( {
+	isEntityAvailable,
+	area,
+	clientId,
+	templatePartId,
+	isTemplatePartSelectionOpen,
+	setIsTemplatePartSelectionOpen,
+} ) {
+	const { templateParts } = useAlternativeTemplateParts(
+		area,
+		templatePartId
+	);
+	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
+
+	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
+	const canReplace =
+		isEntityAvailable &&
+		hasReplacements &&
+		( area === 'header' || area === 'footer' );
+
+	if ( ! canReplace ) {
+		return null;
+	}
+
+	return (
+		<MenuItem
+			onClick={ () => {
+				setIsTemplatePartSelectionOpen( true );
+			} }
+			aria-expanded={ isTemplatePartSelectionOpen }
+			aria-haspopup="dialog"
+		>
+			{ __( 'Replace' ) }
+		</MenuItem>
+	);
+}
+
 export default function TemplatePartEdit( {
 	attributes,
 	setAttributes,
@@ -81,22 +118,12 @@ export default function TemplatePartEdit( {
 		},
 		[ templatePartId, attributes.area, clientId ]
 	);
-	const { templateParts } = useAlternativeTemplateParts(
-		area,
-		templatePartId
-	);
-	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
-	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
+
 	const areaObject = useTemplatePartArea( area );
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || areaObject.tagName;
-
-	const canReplace =
-		isEntityAvailable &&
-		hasReplacements &&
-		( area === 'header' || area === 'footer' );
 
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
@@ -153,36 +180,33 @@ export default function TemplatePartEdit( {
 						/>
 					</TagName>
 				) }
-				{ canReplace && (
-					<BlockSettingsMenuControls>
-						{ ( { selectedClientIds } ) => {
-							// Only enable for single selection that matches the current block.
-							// Ensures menu item doesn't render multiple times.
-							if (
-								! (
-									selectedClientIds.length === 1 &&
-									clientId === selectedClientIds[ 0 ]
-								)
-							) {
-								return null;
-							}
+				<BlockSettingsMenuControls>
+					{ ( { selectedClientIds } ) => {
+						// Only enable for single selection that matches the current block.
+						// Ensures menu item doesn't render multiple times.
+						if (
+							! (
+								selectedClientIds.length === 1 &&
+								clientId === selectedClientIds[ 0 ]
+							)
+						) {
+							return null;
+						}
 
-							return (
-								<MenuItem
-									onClick={ () => {
-										setIsTemplatePartSelectionOpen( true );
-									} }
-									aria-expanded={
-										isTemplatePartSelectionOpen
-									}
-									aria-haspopup="dialog"
-								>
-									{ __( 'Replace' ) }
-								</MenuItem>
-							);
-						} }
-					</BlockSettingsMenuControls>
-				) }
+						return (
+							<ReplaceButton
+								{ ...{
+									isEntityAvailable,
+									area,
+									clientId,
+									templatePartId,
+									isTemplatePartSelectionOpen,
+									setIsTemplatePartSelectionOpen,
+								} }
+							/>
+						);
+					} }
+				</BlockSettingsMenuControls>
 				{ isEntityAvailable && (
 					<TemplatePartInnerBlocks
 						tagName={ TagName }
