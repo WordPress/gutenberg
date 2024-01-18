@@ -303,7 +303,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	}
 }
 
-.block-editor-block-list__block.is-editing-disabled > .block-editor-block-list__block:not(.is-editing-disabled):not(.is-selected):not(.has-child-selected) {
+.edit-site-editor-canvas__block-list:hover .block-editor-block-list__block.is-editing-disabled > .block-editor-block-list__block:not(.is-editing-disabled):not(.is-selected):not(.has-child-selected) {
 	&::after {
 		content: "";
 		border-style: dotted;
