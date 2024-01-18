@@ -207,7 +207,11 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 		return {};
 	}, [ homepageId, postType, postId, path ] );
 
-	if ( path === '/wp_template/all' && postId ) {
+	if (
+		( path === '/wp_template/all' ||
+			( path === '/wp_template' && window?.__experimentalAdminViews ) ) &&
+		postId
+	) {
 		return { isReady: true, postType: 'wp_template', postId, context };
 	}
 
