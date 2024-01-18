@@ -55,7 +55,7 @@ async function main() {
 	let since;
 
 	if ( sinceArg ) {
-		if ( validateSince( sinceArg ) ) {
+		if ( validateDate( sinceArg ) ) {
 			since = sinceArg;
 		} else {
 			console.error(
@@ -70,15 +70,33 @@ async function main() {
 		process.exit( 1 );
 	}
 
+	const lastRcDateArg = getArg( 'lastrcdate' );
+	let lastRcDate;
+
+	if ( lastRcDateArg ) {
+		if (
+			validateDate( lastRcDateArg ) &&
+			isAfter( lastRcDateArg, since )
+		) {
+			lastRcDate = lastRcDateArg;
+		} else {
+			console.error(
+				`Error: The --lastrcdate argument must be a date after the --since date.`
+			);
+			process.exit( 1 );
+		}
+	} else {
+		console.error(
+			`Error: The --lastrcdate argument is required (e.g. YYYY-MM-DD).`
+		);
+		process.exit( 1 );
+	}
+
 	console.log( 'Welcome to the PHP Sync Issue Generator!' );
 
 	if ( DEBUG ) {
 		console.log( 'DEBUG MODE' );
 	}
-
-	const octokit = new Octokit( {
-		auth: authToken,
-	} );
 
 	console.log( '--------------------------------' );
 	console.log( '• Running script...' );
@@ -134,6 +152,18 @@ async function main() {
 				commitData.pullRequest = pullRequest;
 			}
 
+			// This is temporarily required because PRs merged between Beta 1 (since)
+			// and the final RC may have already been manually backported to Core.
+			// This is however no reliable way to identify these PRs as the `Cackport to WP beta/RC`
+			// label is manually removed once the PR has been backported.
+			// In future releases we will instead retain the label and add a **new** label
+			// to indicate the PR has been backported to Core.
+			// As a result, in the future we will be able to exclude any PRs that have
+			// the `Backport to WP beta/RC` label.
+			if ( isAfter( lastRcDate, commitData.commit.committer.date ) ) {
+				commitData.isBeforeLastRCDate = true;
+			}
+
 			return commitData;
 		} )
 	);
@@ -156,7 +186,18 @@ async function main() {
 	fs.writeFileSync( nodePath.join( __dirname, 'issueContent.md' ), content );
 }
 
-function validateSince( sinceArg ) {
+/**
+ * Checks if the first date is after the second date.
+ *
+ * @param {string} date1 - The first date.
+ * @param {string} date2 - The second date.
+ * @return {boolean} - Returns true if the first date is after the second date, false otherwise.
+ */
+function isAfter( date1, date2 ) {
+	return new Date( date1 ) > new Date( date2 );
+}
+
+function validateDate( sinceArg ) {
 	const sinceDate = new Date( sinceArg );
 	const maxPreviousDate = new Date();
 	maxPreviousDate.setMonth(
@@ -381,8 +422,12 @@ function processCommits( commits ) {
 	return result;
 }
 
-function formatPRLine( pr ) {
-	return `- [ ] ${ pr.url } - @${ pr.creator } | Trac ticket | Core backport PR\n`;
+function formatPRLine( { pullRequest: pr, isBeforeLastRCDate } ) {
+	return `- [ ] ${ pr.url } - @${
+		pr.creator
+	} | Trac ticket | Core backport PR ${
+		isBeforeLastRCDate && '(⚠️ Check for existing backport in Trac)'
+	}\n`;
 }
 
 function formatHeading( level, key ) {
@@ -404,7 +449,7 @@ function generateIssueContent( result, level = 1 ) {
 
 		if ( Array.isArray( value ) ) {
 			value.forEach( ( commit ) => {
-				issueContent += formatPRLine( commit.pullRequest );
+				issueContent += formatPRLine( commit );
 			} );
 		} else {
 			issueContent += generateIssueContent( value, level + 1 );
