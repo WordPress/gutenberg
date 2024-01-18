@@ -3,7 +3,6 @@
  */
 import { h, options, createContext, cloneElement } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
-import { deepSignal } from 'deepsignal';
 import type { VNode, Context, RefObject } from 'preact';
 
 /**
@@ -60,7 +59,6 @@ interface Scope {
 	evaluate: Evaluate;
 	context: Context< any >;
 	ref: RefObject< HTMLElement >;
-	state: any;
 	props: any;
 }
 
@@ -142,10 +140,9 @@ export const getElement = () => {
 			'Cannot call `getElement()` outside getters and actions used by directives.'
 		);
 	}
-	const { ref, state, props } = getScope();
+	const { ref, props } = getScope();
 	return Object.freeze( {
 		ref: ref.current,
-		state,
 		props: deepImmutable( props ),
 	} );
 };
@@ -313,7 +310,6 @@ const Directives = ( {
 	scope.context = useContext( context );
 	/* eslint-disable react-hooks/rules-of-hooks */
 	scope.ref = previousScope?.ref || useRef( null );
-	scope.state = previousScope?.state || useRef( deepSignal( {} ) ).current;
 	/* eslint-enable react-hooks/rules-of-hooks */
 
 	// Create a fresh copy of the vnode element and add the props to the scope.
