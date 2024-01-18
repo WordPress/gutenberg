@@ -93,12 +93,12 @@ class WP_Font_Collection {
 	public function __construct( $config ) {
 		$this->is_config_valid( $config );
 
-		$this->slug          = $config['slug'] ?? '';
-		$this->name          = $config['name'] ?? '';
-		$this->description   = $config['description'] ?? '';
-		$this->src           = $config['src'] ?? '';
-		$this->font_families = $config['font_families'] ?? array();
-		$this->categories    = $config['categories'] ?? array();
+		$this->slug          = isset( $config['slug'] ) ? $config['slug'] : '';
+		$this->name          = isset( $config['name'] ) ? $config['name'] : '';
+		$this->description   = isset( $config['description'] ) ? $config['description'] : '';
+		$this->src           = isset( $config['src'] ) ? $config['src'] : '';
+		$this->font_families = isset( $config['font_families'] ) ? $config['font_families'] : array();
+		$this->categories    = isset( $config['categories'] ) ? $config['categories'] : array();
 	}
 
 	/**
@@ -119,7 +119,7 @@ class WP_Font_Collection {
 	 */
 	public static function is_config_valid( $config ) {
 		if ( empty( $config ) || ! is_array( $config ) ) {
-			_doing_it_wrong( __METHOD__, __('Font Collection config options are required as a non-empty array.', 'gutenberg'), '6.5.0' );
+			_doing_it_wrong( __METHOD__, __( 'Font Collection config options are required as a non-empty array.', 'gutenberg' ), '6.5.0' );
 			return false;
 		}
 
@@ -135,7 +135,7 @@ class WP_Font_Collection {
 			( empty( $config['src'] ) && empty( $config['font_families'] ) ) ||
 			( ! empty( $config['src'] ) && ! empty( $config['font_families'] ) )
 		) {
-			_doing_it_wrong( __METHOD__, __('Font Collection config "src" option OR "font_families" option are required.', 'gutenberg'), '6.5.0' );
+			_doing_it_wrong( __METHOD__, __( 'Font Collection config "src" option OR "font_families" option are required.', 'gutenberg' ), '6.5.0' );
 			return false;
 		}
 
