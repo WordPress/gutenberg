@@ -81,7 +81,7 @@ function gutenberg_init_font_library_routes() {
 			'map_meta_cap'                   => false,
 			'query_var'                      => false,
 			'show_in_rest'                   => true,
-			'rest_base'                      => 'font-faces',
+			'rest_base'                      => 'font-families/(?P<font_family_id>[\d]+)/font-faces',
 			'rest_controller_class'          => 'WP_REST_Font_Faces_Controller',
 			'autosave_rest_controller_class' => 'WP_REST_Autosave_Fonts_Controller',
 		)
@@ -190,7 +190,7 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 
 // @core-merge: Filters should go in `src/wp-includes/default-filters.php`,
 // functions in a general file for font library.
-if ( ! function_exists( '_wp_delete_font_family' ) ) {
+if ( ! function_exists( '_wp_after_delete_font_family' ) ) {
 	/**
 	 * Deletes child font faces when a font family is deleted.
 	 *
@@ -201,7 +201,7 @@ if ( ! function_exists( '_wp_delete_font_family' ) ) {
 	 * @param WP_Post $post    Post object.
 	 * @return void
 	 */
-	function _wp_delete_font_family( $post_id, $post ) {
+	function _wp_after_delete_font_family( $post_id, $post ) {
 		if ( 'wp_font_family' !== $post->post_type ) {
 			return;
 		}
@@ -217,10 +217,10 @@ if ( ! function_exists( '_wp_delete_font_family' ) ) {
 			wp_delete_post( $font_face->ID, true );
 		}
 	}
-	add_action( 'deleted_post', '_wp_delete_font_family', 10, 2 );
+	add_action( 'deleted_post', '_wp_after_delete_font_family', 10, 2 );
 }
 
-if ( ! function_exists( '_wp_delete_font_face' ) ) {
+if ( ! function_exists( '_wp_before_delete_font_face' ) ) {
 	/**
 	 * Deletes associated font files when a font face is deleted.
 	 *
@@ -231,7 +231,7 @@ if ( ! function_exists( '_wp_delete_font_face' ) ) {
 	 * @param WP_Post $post    Post object.
 	 * @return void
 	 */
-	function _wp_delete_font_face( $post_id, $post ) {
+	function _wp_before_delete_font_face( $post_id, $post ) {
 		if ( 'wp_font_face' !== $post->post_type ) {
 			return;
 		}
@@ -242,5 +242,5 @@ if ( ! function_exists( '_wp_delete_font_face' ) ) {
 			wp_delete_file( wp_get_font_dir()['path'] . '/' . $font_file );
 		}
 	}
-	add_action( 'before_delete_post', '_wp_delete_font_face', 10, 2 );
+	add_action( 'before_delete_post', '_wp_before_delete_font_face', 10, 2 );
 }

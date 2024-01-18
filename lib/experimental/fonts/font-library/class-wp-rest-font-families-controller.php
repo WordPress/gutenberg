@@ -40,7 +40,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Checks if a given request has access to font families.
+	 * Checks if a given request has access to a font family.
 	 *
 	 * @since 6.5.0
 	 *
@@ -191,17 +191,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 			);
 		}
 
-		$deleted = parent::delete_item( $request );
-
-		if ( is_wp_error( $deleted ) ) {
-			return $deleted;
-		}
-
-		foreach ( $this->get_font_face_ids( $font_family_id ) as $font_face_id ) {
-			wp_delete_post( $font_face_id, true );
-		}
-
-		return $deleted;
+		return parent::delete_item( $request );
 	}
 
 	/**

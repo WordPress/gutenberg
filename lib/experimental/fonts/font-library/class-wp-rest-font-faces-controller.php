@@ -16,32 +16,6 @@ if ( class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
  */
 class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	/**
-	 * The base of the parent Font Family controller's route.
-	 *
-	 * @since 6.5.0
-	 * @var string
-	 */
-	private $parent_base;
-
-	/**
-	 * Parent font family post type
-	 *
-	 * @since 6.5.0
-	 * @var string
-	 */
-	private $parent_post_type;
-
-	public function __construct( $post_type ) {
-		parent::__construct( $post_type );
-
-		$parent_post_type       = 'wp_font_family';
-		$this->parent_post_type = $parent_post_type;
-		$parent_post_type_obj   = get_post_type_object( $parent_post_type );
-		$this->parent_base      = $parent_post_type_obj->rest_base;
-		$this->namespace        = $parent_post_type_obj->rest_namespace;
-	}
-
-	/**
 	 * Registers the routes for posts.
 	 *
 	 * @since 6.5.0
@@ -51,7 +25,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	public function register_routes() {
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->parent_base . '/(?P<font_family_id>[\d]+)/' . $this->rest_base,
+			'/' . $this->rest_base,
 			array(
 				'args'   => array(
 					'font_family_id' => array(
@@ -78,7 +52,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->parent_base . '/(?P<font_family_id>[\d]+)/' . $this->rest_base . '/(?P<id>[\d]+)',
+			'/' . $this->rest_base . '/(?P<id>[\d]+)',
 			array(
 				'args'   => array(
 					'font_family_id' => array(
@@ -95,7 +69,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_item' ),
-					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => array(),
 				),
 				array(
@@ -120,9 +94,10 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 *
 	 * @since 6.5.0
 	 *
+	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check( $request ) {
+	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- required by parent class
 		$post_type = get_post_type_object( $this->post_type );
 
 		if ( ! current_user_can( $post_type->cap->read ) ) {
@@ -134,6 +109,18 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Checks if a given request has access to a font face.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+	 */
+	public function get_item_permissions_check( $request ) {
+		return $this->get_items_permissions_check( $request );
 	}
 
 	/**
@@ -652,7 +639,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$font_family_post = get_post( (int) $font_family_id );
 
 		if ( empty( $font_family_post ) || empty( $font_family_post->ID )
-		|| $this->parent_post_type !== $font_family_post->post_type
+		|| 'wp_font_family' !== $font_family_post->post_type
 		) {
 			return $error;
 		}
@@ -672,13 +659,13 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		// Entity meta.
 		$links = array(
 			'self'       => array(
-				'href' => rest_url( $this->namespace . '/' . $this->parent_base . '/' . $post->post_parent . '/' . $this->rest_base . '/' . $post->ID ),
+				'href' => rest_url( $this->namespace . '/font-families/' . $post->post_parent . '/font-faces/' . $post->ID ),
 			),
 			'collection' => array(
-				'href' => rest_url( $this->namespace . '/' . $this->parent_base . '/' . $post->post_parent . '/' . $this->rest_base ),
+				'href' => rest_url( $this->namespace . '/font-families/' . $post->post_parent . '/font-faces' ),
 			),
 			'parent'     => array(
-				'href' => rest_url( $this->namespace . '/' . $this->parent_base . '/' . $post->post_parent ),
+				'href' => rest_url( $this->namespace . '/font-families/' . $post->post_parent ),
 			),
 		);
 
