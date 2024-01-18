@@ -54,7 +54,9 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		fullscreenMode: true,
+		inactivePanels: [],
 		isPublishSidebarEnabled: true,
+		openPanels: [ 'post-status' ],
 		preferredStyleVariations: {},
 		themeStyles: true,
 		welcomeGuide: true,
