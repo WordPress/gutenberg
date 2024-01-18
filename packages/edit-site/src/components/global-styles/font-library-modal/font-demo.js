@@ -62,7 +62,7 @@ function FontFaceDemo( { customPreviewUrl, fontFace, text, style = {} } ) {
 			}
 		};
 		loadAsset();
-	}, [ fontFace, isIntersecting, loadFontFaceAsset ] );
+	}, [ fontFace, isIntersecting, loadFontFaceAsset, isPreviewImage ] );
 
 	return (
 		<div ref={ ref }>
