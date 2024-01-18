@@ -59,7 +59,7 @@ interface Scope {
 	evaluate: Evaluate;
 	context: Context< any >;
 	ref: RefObject< HTMLElement >;
-	props: any;
+	attributes: h.JSX.HTMLAttributes;
 }
 
 interface Evaluate {
@@ -140,10 +140,10 @@ export const getElement = () => {
 			'Cannot call `getElement()` outside getters and actions used by directives.'
 		);
 	}
-	const { ref, props } = getScope();
+	const { ref, attributes } = getScope();
 	return Object.freeze( {
 		ref: ref.current,
-		props: deepImmutable( props ),
+		attributes: deepImmutable( attributes ),
 	} );
 };
 
@@ -312,9 +312,10 @@ const Directives = ( {
 	scope.ref = previousScope?.ref || useRef( null );
 	/* eslint-enable react-hooks/rules-of-hooks */
 
-	// Create a fresh copy of the vnode element and add the props to the scope.
+	// Create a fresh copy of the vnode element and add the props to the scope,
+	// named as attributes (HTML Attributes).
 	element = cloneElement( element, { ref: scope.ref } );
-	scope.props = element.props;
+	scope.attributes = element.props;
 
 	// Recursively render the wrapper for the next priority level.
 	const children =
