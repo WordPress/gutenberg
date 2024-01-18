@@ -5,6 +5,7 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	Tooltip,
 } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 
@@ -38,21 +39,24 @@ export default function ViewGrid( {
 	const usedData = deferredRendering ? shownData : data;
 	return (
 		<Grid
-			gap={ 8 }
+			gap={ 6 }
 			columns={ 2 }
 			alignment="top"
 			className="dataviews-view-grid"
 		>
 			{ usedData.map( ( item ) => (
 				<VStack
-					spacing={ 3 }
+					spacing={ 0 }
 					key={ getItemId( item ) }
 					className="dataviews-view-grid__card"
 				>
 					<div className="dataviews-view-grid__media">
 						{ mediaField?.render( { item } ) }
 					</div>
-					<HStack justify="space-between">
+					<HStack
+						justify="space-between"
+						className="dataviews-view-grid__title-actions"
+					>
 						<HStack className="dataviews-view-grid__primary-field">
 							{ primaryField?.render( { item } ) }
 						</HStack>
@@ -79,12 +83,14 @@ export default function ViewGrid( {
 									key={ field.id }
 									spacing={ 1 }
 								>
-									<div className="dataviews-view-grid__field-header">
-										{ field.header }
-									</div>
-									<div className="dataviews-view-grid__field-value">
-										{ renderedValue }
-									</div>
+									<Tooltip
+										text={ field.header }
+										placement="left"
+									>
+										<div className="dataviews-view-grid__field-value">
+											{ renderedValue }
+										</div>
+									</Tooltip>
 								</VStack>
 							);
 						} ) }

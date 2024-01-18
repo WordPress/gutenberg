@@ -3,4 +3,4 @@
  */
 import { createContext } from '@wordpress/element';
 
-export const PrivateBlockContext = createContext( null );
+export const PrivateBlockContext = createContext( {} );

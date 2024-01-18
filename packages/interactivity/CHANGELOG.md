@@ -10,10 +10,18 @@
 
 -   Add the `data-wp-run` directive along with the `useInit` and `useWatch` hooks. ([57805](https://github.com/WordPress/gutenberg/pull/57805))
 
+### Enhancements
+
+-  Update `preact`, `@preact/signals` and `deepsignal` dependencies. ([57891](https://github.com/WordPress/gutenberg/pull/57891))
+
 ### Breaking Changes
 
 -   Remove `data-wp-slot` and `data-wp-fill`. ([#57854](https://github.com/WordPress/gutenberg/pull/57854))
 -   Remove `wp-data-navigation-link` directive. ([#57853](https://github.com/WordPress/gutenberg/pull/57853))
+
+### Bug Fix
+
+-   Prevent `wp-data-on=""` from creating `onDefault` handlers. ([#57925](https://github.com/WordPress/gutenberg/pull/57925))
 
 ## 3.2.0 (2024-01-10)
 

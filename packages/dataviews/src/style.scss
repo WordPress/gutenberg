@@ -59,6 +59,10 @@
 	margin: $grid-unit-40 0 $grid-unit-20;
 }
 
+.dataviews-view-table-wrapper {
+	overflow-x: scroll;
+}
+
 .dataviews-view-table {
 	width: 100%;
 	text-indent: 0;
@@ -81,7 +85,12 @@
 	td,
 	th {
 		padding: $grid-unit-15;
-		min-width: 160px;
+		white-space: nowrap;
+
+		@include break-huge() {
+			min-width: 200px;
+		}
+
 		&[data-field-id="actions"] {
 			text-align: right;
 		}
@@ -200,6 +209,10 @@
 	.dataviews-view-table-header {
 		padding-left: $grid-unit-05;
 	}
+
+	.dataviews-view-table__actions-column {
+		width: 1%;
+	}
 }
 
 .dataviews-view-list__primary-field,
@@ -253,19 +266,38 @@
 		grid-template-columns: repeat(4, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
 	}
 
+	.dataviews-view-grid__card {
+		border-radius: $radius-block-ui * 2;
+		border: 1px solid $gray-200;
+		height: 100%;
+		justify-content: flex-start;
+
+		.dataviews-view-grid__title-actions {
+			padding: 0 $grid-unit-05;
+		}
+
+		.dataviews-view-grid__primary-field {
+			min-height: $grid-unit-50;
+		}
+	}
+
 	.dataviews-view-grid__media {
 		width: 100%;
 		min-height: 200px;
 		aspect-ratio: 1/1;
-		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-		border-radius: $radius-block-ui * 2;
 		overflow: hidden;
+		border-bottom: 1px solid $gray-200;
+		background-color: $gray-100;
 
-		> * {
+		img {
 			object-fit: cover;
 			width: 100%;
 			height: 100%;
 		}
+	}
+
+	.dataviews-view-grid__primary-field {
+		padding: $grid-unit-10;
 	}
 
 	.dataviews-view-grid__fields {
@@ -273,12 +305,14 @@
 		font-size: 12px;
 		line-height: 16px;
 
+		&:not(:empty) {
+			padding: $grid-unit-15;
+			padding-top: 0;
+		}
+
 		.dataviews-view-grid__field {
-			.dataviews-view-grid__field-header {
-				color: $gray-700;
-			}
 			.dataviews-view-grid__field-value {
-				color: $gray-900;
+				color: $gray-700;
 			}
 		}
 	}
@@ -366,6 +400,7 @@
 		overflow: hidden;
 		position: relative;
 		flex-shrink: 0;
+		background-color: $gray-100;
 
 		img {
 			width: 100%;
@@ -402,6 +437,10 @@
 
 			&:last-child {
 				margin-right: 0;
+			}
+
+			&:empty {
+				display: none;
 			}
 		}
 	}

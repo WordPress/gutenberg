@@ -42,6 +42,7 @@ import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import useScrollUponInsertion from './use-scroll-upon-insertion';
 import { useSettings } from '../use-settings';
+import { PrivateBlockContext } from './private-block-context';
 
 const EMPTY_ARRAY = [];
 
@@ -183,6 +184,7 @@ function BlockListBlock( {
 		isParentSelected,
 		order,
 		mayDisplayControls,
+		blockEditingMode,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -196,6 +198,7 @@ function BlockListBlock( {
 				getBlockName,
 				isFirstMultiSelectedBlock,
 				getMultiSelectedBlockClientIds,
+				getBlockEditingMode,
 			} = select( blockEditorStore );
 			const currentBlockType = getBlockType( name || 'core/missing' );
 			const currentBlockCategory = currentBlockType?.category;
@@ -249,6 +252,7 @@ function BlockListBlock( {
 						getMultiSelectedBlockClientIds().every(
 							( id ) => getBlockName( id ) === name
 						) ),
+				blockEditingMode: getBlockEditingMode( clientId ),
 			};
 		},
 		[ clientId, isSelected, name, rootClientId ]
@@ -341,7 +345,7 @@ function BlockListBlock( {
 		order + 1
 	);
 
-	return (
+	const block = (
 		<BlockWrapper
 			accessibilityLabel={ accessibilityLabel }
 			blockCategory={ blockCategory }
@@ -399,6 +403,17 @@ function BlockListBlock( {
 				)
 			}
 		</BlockWrapper>
+	);
+
+	return (
+		<PrivateBlockContext.Provider
+			value={ {
+				clientId,
+				blockEditingMode,
+			} }
+		>
+			{ block }
+		</PrivateBlockContext.Provider>
 	);
 }
 
