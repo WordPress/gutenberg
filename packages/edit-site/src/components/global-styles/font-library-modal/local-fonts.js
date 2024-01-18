@@ -100,7 +100,7 @@ function LocalFonts() {
 				return fontFaceData;
 			} )
 		);
-		await handleInstall( fontFacesLoaded );
+		handleInstall( fontFacesLoaded );
 	};
 
 	// Create a function to read the file as array buffer
@@ -182,9 +182,27 @@ function LocalFonts() {
 
 	return (
 		<>
-			<Spacer margin={ 16 } />
 			<DropZone onFilesDrop={ handleDropZone } />
 			<VStack className="font-library-modal__local-fonts">
+				{ notice && (
+					<FlexItem>
+						<Notice
+							isDismissible={ false }
+							status={ notice.type }
+							className="font-library-modal__upload-area__notice"
+						>
+							{ notice.message }
+						</Notice>
+						<Spacer margin={ 2 } />
+					</FlexItem>
+				) }
+				{ isUploading && (
+					<FlexItem>
+						<div className="font-library-modal__upload-area">
+							<ProgressBar />
+						</div>
+					</FlexItem>
+				) }
 				{ ! isUploading && (
 					<FormFileUpload
 						accept={ ALLOWED_FILE_EXTENSIONS.map(
@@ -202,13 +220,6 @@ function LocalFonts() {
 						) }
 					/>
 				) }
-				{ isUploading && (
-					<FlexItem>
-						<div className="font-library-modal__upload-area">
-							<ProgressBar />
-						</div>
-					</FlexItem>
-				) }
 				<Spacer margin={ 2 } />
 				<Text className="font-library-modal__upload-area__text">
 					{ sprintf(
@@ -219,18 +230,6 @@ function LocalFonts() {
 						supportedFormats
 					) }
 				</Text>
-				{ ! isUploading && notice && (
-					<FlexItem>
-						<Spacer margin={ 2 } />
-						<Notice
-							isDismissible={ false }
-							status={ notice.type }
-							className="font-library-modal__upload-area__notice"
-						>
-							{ notice.message }
-						</Notice>
-					</FlexItem>
-				) }
 			</VStack>
 		</>
 	);
