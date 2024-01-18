@@ -32,7 +32,6 @@ import {
 import { IMAGE_BACKGROUND_TYPE } from '../shared';
 import * as paragraph from '../../paragraph';
 import * as cover from '..';
-import { PrivateBlockContext } from '../../../../block-editor/src/components/block-list/private-block-context';
 
 // Avoid errors due to mocked stylesheet files missing required selectors.
 jest.mock( '@wordpress/compose', () => ( {
@@ -81,20 +80,14 @@ const MEDIA_OPTIONS = [
 // Simplified tree to render Cover edit within slot.
 const CoverEdit = ( props ) => (
 	<SlotFillProvider>
-		<PrivateBlockContext.Provider
-			value={ {
-				clientId: 0,
-			} }
-		>
-			<BlockEdit
-				isSelected
-				mayDisplayControls
-				name={ cover.name }
-				clientId={ 0 }
-				{ ...props }
-			/>
-			<BottomSheetSettings isVisible />
-		</PrivateBlockContext.Provider>
+		<BlockEdit
+			isSelected
+			mayDisplayControls
+			name={ cover.name }
+			clientId={ 0 }
+			{ ...props }
+		/>
+		<BottomSheetSettings isVisible />
 	</SlotFillProvider>
 );
 
