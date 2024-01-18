@@ -138,13 +138,13 @@ if ( ! function_exists( 'get_template_parts_that_use_menu' ) ) {
 		// with the ref attribute set to $wp_navigation_id.
 		$wp_template_part_posts_with_navigation = array();
 		foreach ( $wp_template_part_posts as $wp_template_part_post ) {
-			$found_avigation = html_contains_block(
+			$found_navigation = html_contains_block(
 				$wp_template_part_post->post_content,
 				'navigation',
 				'ref',
 				$wp_navigation_id
 			);
-			if ( $found_avigation ) {
+			if ( $found_navigation ) {
 				$wp_template_part_posts_with_navigation[] = $wp_template_part_post->ID;
 			}
 		}
