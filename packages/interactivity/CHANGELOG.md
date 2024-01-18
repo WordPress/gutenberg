@@ -18,7 +18,7 @@
 
 -   Remove `data-wp-slot` and `data-wp-fill`. ([#57854](https://github.com/WordPress/gutenberg/pull/57854))
 -   Remove `wp-data-navigation-link` directive. ([#57853](https://github.com/WordPress/gutenberg/pull/57853))
--	Remove unused `state` and rename `props` to `attributes` in `getElement()`. ([#57974](https://github.com/WordPress/gutenberg/pull/57974))
+-   Remove unused `state` and rename `props` to `attributes` in `getElement()`. ([#57974](https://github.com/WordPress/gutenberg/pull/57974))
 
 ### Bug Fix
 
