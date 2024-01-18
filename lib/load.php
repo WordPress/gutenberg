@@ -341,8 +341,9 @@ function modify_block_attributes_during_render( $block_content, $block ) {
 function modify_post_thumbnail_html( $html, $post_id, $post_thumbnail_id, $size, $attr ) {
 	$classes = isset( $attr['class'] ) ? $attr['class'] : '';
 	$style = isset( $attr['style'] ) ? $attr['style'] : '';
+	$placeholder_svg = "%3Csvg fill='none' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60' preserveAspectRatio='none' class='components-placeholder__illustration' aria-hidden='true' focusable='false' style='background: %23e1e1e1; stroke: %23000;'%3E%3Cpath vector-effect='non-scaling-stroke' d='M60 60 0 0'%3E%3C/path%3E%3C/svg%3E ";
 	if ( ! $html ) {
-		return '<img width="2000" height="2000" src="http://wp-src.test/wp-content/themes/twentytwentyfour/placeholder.svg" class="wp-post-image ' . $classes . '" alt="" style="' . $style . '" decoding="async" />';
+		return '<img width="2000" height="2000" src="data:image/svg+xml;charset=UTF-8,' . $placeholder_svg . '" class="wp-post-image ' . $classes . '" alt="" style="' . $style . '" decoding="async" />';
 	}
 	return $html;
 
