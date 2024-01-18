@@ -119,7 +119,7 @@ class WP_Font_Collection {
 	 */
 	public static function is_config_valid( $config ) {
 		if ( empty( $config ) || ! is_array( $config ) ) {
-			_doing_it_wrong( __METHOD__, 'Font Collection config options are required as a non-empty array.', 'Your_Version_Number' );
+			_doing_it_wrong( __METHOD__, __('Font Collection config options are required as a non-empty array.', 'gutenberg'), '6.5.0' );
 			return false;
 		}
 
@@ -135,7 +135,7 @@ class WP_Font_Collection {
 			( empty( $config['src'] ) && empty( $config['font_families'] ) ) ||
 			( ! empty( $config['src'] ) && ! empty( $config['font_families'] ) )
 		) {
-			_doing_it_wrong( __METHOD__, 'Font Collection config "src" option OR "font_families" option are required.', '6.5' );
+			_doing_it_wrong( __METHOD__, __('Font Collection config "src" option OR "font_families" option are required.', 'gutenberg'), '6.5.0' );
 			return false;
 		}
 
