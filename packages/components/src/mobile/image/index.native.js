@@ -84,22 +84,16 @@ const ImageComponent = ( {
 				}
 			} );
 
-			if ( Platform.isAndroid ) {
-				if ( url.startsWith( 'file:///' ) ) {
-					return setLocalURL( url );
-				} else if ( url.startsWith( 'https://' ) ) {
+			if ( url.startsWith( 'file:///' ) ) {
+				setLocalURL( url );
+			} else if ( url.startsWith( 'https://' ) ) {
+				if ( Platform.isAndroid ) {
 					RNImage.prefetch( url ).then( () => {
 						setNetworkURL( url );
 						setNetworkImageLoaded( true );
 					} );
-				}
-			}
-
-			if ( Platform.isIOS ) {
-				if ( url.startsWith( 'file:///' ) ) {
-					return setLocalURL( url );
-				} else if ( url.startsWith( 'https://' ) ) {
-					return setNetworkURL( url );
+				} else if ( Platform.isIOS ) {
+					setNetworkURL( url );
 				}
 			}
 		}
@@ -322,7 +316,6 @@ const ImageComponent = ( {
 							<>
 								<Animated.Image
 									style={ imageStyles }
-									fadeDuration={ 0 }
 									source={
 										networkURL && networkImageLoaded
 											? networkURL
