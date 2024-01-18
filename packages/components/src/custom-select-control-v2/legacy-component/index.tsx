@@ -22,15 +22,17 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 			const state = store.getState();
 
 			const changeObject = {
-				selectedItem: {
-					// Value will always be a string for the legacy component
-					name: value as string,
-					key: state.activeId as string,
-				},
 				highlightedIndex: state.renderedItems.findIndex(
 					( item ) => item.value === value
 				),
+				inputValue: '',
 				isOpen: state.open,
+				selectedItem: {
+					// Value will always be a string for the legacy component
+					name: value as string,
+					key: value as string,
+				},
+				type: '',
 			};
 			props.onChange( changeObject );
 		},
