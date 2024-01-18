@@ -19,7 +19,7 @@ import {
 	RichTextShortcut,
 } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
-import { link as linkIcon, linkOff } from '@wordpress/icons';
+import { link as linkIcon } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 
 /**
@@ -119,32 +119,17 @@ function Edit( {
 				character="k"
 				onUse={ onRemoveFormat }
 			/>
-			{ isActive && (
-				<RichTextToolbarButton
-					name="link"
-					icon={ linkOff }
-					title={ __( 'Unlink' ) }
-					onClick={ onRemoveFormat }
-					isActive={ isActive }
-					shortcutType="primaryShift"
-					shortcutCharacter="k"
-					aria-haspopup="true"
-					aria-expanded={ addingLink || isActive }
-				/>
-			) }
-			{ ! isActive && (
-				<RichTextToolbarButton
-					name="link"
-					icon={ linkIcon }
-					title={ title }
-					onClick={ addLink }
-					isActive={ isActive }
-					shortcutType="primary"
-					shortcutCharacter="k"
-					aria-haspopup="true"
-					aria-expanded={ addingLink || isActive }
-				/>
-			) }
+			<RichTextToolbarButton
+				name="link"
+				icon={ linkIcon }
+				title={ isActive ? __( 'Edit Link' ) : title }
+				onClick={ addLink }
+				isActive={ isActive || addingLink }
+				shortcutType="primary"
+				shortcutCharacter="k"
+				aria-haspopup="true"
+				aria-expanded={ addingLink }
+			/>
 			{ ( addingLink || ( isActive && clickedLink ) ) && (
 				<InlineLinkUI
 					addingLink={ addingLink }
