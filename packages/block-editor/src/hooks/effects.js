@@ -31,15 +31,16 @@ function EffectsInspectorControl( { children, resetAllFilter } ) {
 
 export function EffectsPanel( { clientId, setAttributes, settings } ) {
 	const isEnabled = useHasEffectsPanel( settings );
-	const onChange = ( newShadow ) => {
-		setAttributes( styleToAttributes( newShadow ) );
-	};
 	const blockAttributes = useSelect(
 		( select ) => select( blockEditorStore ).getBlockAttributes( clientId ),
 		[ clientId ]
 	);
-	const shadow = blockAttributes?.shadow;
-	const value = useMemo( () => attributesToStyle( { shadow } ), [ shadow ] );
+	const shadow = blockAttributes?.style?.shadow;
+	const value = useMemo( () => attributesToStyle( shadow ), [ shadow ] );
+
+	const onChange = ( newShadow ) => {
+		setAttributes( styleToAttributes( newShadow, blockAttributes.style ) );
+	};
 
 	if ( ! isEnabled ) {
 		return null;
@@ -56,22 +57,22 @@ export function EffectsPanel( { clientId, setAttributes, settings } ) {
 	);
 }
 
-function styleToAttributes( style ) {
-	const shadowValue = style?.shadow;
+function styleToAttributes( newStyle, oldStyle ) {
+	const shadowValue = newStyle?.shadow;
 	const shadowSlug = shadowValue?.startsWith( 'var:preset|shadow|' )
 		? shadowValue.substring( 'var:preset|shadow|'.length )
 		: undefined;
 
 	return {
-		style: undefined, // TODO: check for style prop, and return it if it exists
-		shadow: shadowSlug,
+		style: {
+			...oldStyle,
+			shadow: shadowSlug,
+		},
 	};
 }
 
-function attributesToStyle( attributes ) {
+function attributesToStyle( shadow ) {
 	return {
-		shadow: attributes.shadow
-			? 'var:preset|shadow|' + attributes.shadow
-			: undefined,
+		shadow: shadow ? 'var:preset|shadow|' + shadow : undefined,
 	};
 }
