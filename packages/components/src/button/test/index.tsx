@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -110,6 +110,91 @@ describe( 'Button', () => {
 			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
 				'has-text'
 			);
+		} );
+
+		it( 'should render correctly as a tooltip anchor', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<>
+					<Tooltip text="Tooltip text">
+						<Button icon={ plusCircle } label="Tooltip anchor" />
+					</Tooltip>
+					<Button>Focus me</Button>
+				</>
+			);
+
+			const anchor = screen.getByRole( 'button', {
+				name: 'Tooltip anchor',
+			} );
+
+			await user.tab();
+
+			expect( anchor ).toHaveFocus();
+
+			const tooltip = await screen.findByRole( 'tooltip', {
+				name: 'Tooltip text',
+			} );
+
+			expect( tooltip ).toBeVisible();
+
+			await user.tab();
+
+			expect(
+				screen.getByRole( 'button', { name: 'Focus me' } )
+			).toHaveFocus();
+
+			expect(
+				screen.queryByRole( 'tooltip', {
+					name: 'Tooltip text',
+				} )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should render correctly as a tooltip anchor, ignoring its internal tooltip in favour of the external tooltip', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<>
+					<Tooltip text="Tooltip text">
+						<Button icon={ plusCircle } label="Button label" />
+					</Tooltip>
+					<Button>Focus me</Button>
+				</>
+			);
+
+			const anchor = screen.getByRole( 'button', {
+				name: 'Button label',
+			} );
+
+			await user.tab();
+
+			expect( anchor ).toHaveFocus();
+
+			const tooltip = await screen.findByRole( 'tooltip', {
+				name: 'Tooltip text',
+			} );
+
+			expect( tooltip ).toBeVisible();
+			// Check that the tooltip that would be normally rendered internally by
+			// the `Button` component is ignored, because of an outer tooltip.
+			expect(
+				screen.queryByRole( 'tooltip', {
+					name: 'Button label',
+				} )
+			).not.toBeInTheDocument();
+
+			await user.tab();
+
+			expect(
+				screen.getByRole( 'button', { name: 'Focus me' } )
+			).toHaveFocus();
+
+			expect(
+				screen.queryByRole( 'tooltip', {
+					name: 'Tooltip text',
+				} )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'should add a disabled prop to the button', () => {
