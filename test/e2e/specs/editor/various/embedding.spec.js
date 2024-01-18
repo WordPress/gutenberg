@@ -12,7 +12,7 @@ const EMBED_URLS = [
 ];
 
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
-	url: 'https://wordpress.org/gutenberg/handbook/block-api/attributes/',
+	url: 'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/',
 	html: '<div class="wp-embedded-content" data-secret="shhhh it is a secret"></div>',
 	type: 'rich',
 	provider_name: 'WordPress',
@@ -188,7 +188,7 @@ test.describe( 'Embedding content', () => {
 		] );
 	} );
 
-	// @todo: See if there is regression for https://github.com/WordPress/gutenberg/pull/14705.
+	// Reason: A possible regression of https://github.com/WordPress/gutenberg/pull/14705.
 	test.skip( 'should retry embeds that could not be embedded with trailing slashes, without the trailing slashes', async ( {
 		editor,
 		embedUtils,
