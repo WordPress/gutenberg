@@ -51,14 +51,12 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @dataProvider data_should_throw_exception
+	 * @dataProvider data_should_do_ti_wrong
 	 *
 	 * @param mixed  $config Config of the font collection.
-	 * @param string $expected_exception_message Expected exception message.
 	 */
-	public function test_should_throw_exception( $config, $expected_exception_message ) {
-		$this->expectException( 'Exception' );
-		$this->expectExceptionMessage( $expected_exception_message );
+	public function test_should_do_ti_wrong( $config ) {
+		$this->setExpectedIncorrectUsage( 'WP_Font_Collection::is_config_valid' );
 		new WP_Font_Collection( $config );
 	}
 
@@ -67,7 +65,7 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 	 *
 	 * @return array
 	 */
-	public function data_should_throw_exception() {
+	public function data_should_do_ti_wrong() {
 		return array(
 			'no id'                           => array(
 				array(
@@ -75,27 +73,22 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 					'description' => 'My collection description',
 					'src'         => 'my-collection-data.json',
 				),
-				'Font Collection config slug is required as a non-empty string.',
 			),
 
 			'no config'                       => array(
 				'',
-				'Font Collection config options are required as a non-empty array.',
 			),
 
 			'empty array'                     => array(
 				array(),
-				'Font Collection config options are required as a non-empty array.',
 			),
 
 			'boolean instead of config array' => array(
 				false,
-				'Font Collection config options are required as a non-empty array.',
 			),
 
 			'null instead of config array'    => array(
 				null,
-				'Font Collection config options are required as a non-empty array.',
 			),
 
 			'missing src'                     => array(
@@ -104,7 +97,6 @@ class Tests_Fonts_WpFontCollection_Construct extends WP_UnitTestCase {
 					'name'        => 'My Collection',
 					'description' => 'My collection description',
 				),
-				'Font Collection config "src" option OR "font_families" option are required.',
 			),
 		);
 	}

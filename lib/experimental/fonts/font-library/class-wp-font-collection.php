@@ -81,18 +81,20 @@ class WP_Font_Collection {
 	 * @since 6.5.0
 	 *
 	 * @param array $config Font collection config options.
-	 *  See {@see wp_register_font_collection()} for the supported fields.
-	 * @throws Exception If the required parameters are missing.
+	 *  {
+	 *      @type string $slug        The font collection's unique slug.
+	 *      @type string $name        The font collection's name.
+	 *      @type string $description The font collection's description.
+	 *      @type string $src         The font collection's source.
+	 *      @type array  $font_families An array of font families in the font collection.
+	 *      @type array  $categories The font collection's categories.
+	 *  }
 	 */
 	public function __construct( $config ) {
-		if ( empty( $config ) || ! is_array( $config ) ) {
-			throw new Exception( 'Font Collection config options are required as a non-empty array.' );
-		}
+		$this->is_config_valid( $config );
 
-		$this->validate_config( $config );
-
-		$this->slug          = $config['slug'];
-		$this->name          = $config['name'];
+		$this->slug          = $config['slug'] ?? '';
+		$this->name          = $config['name'] ?? '';
 		$this->description   = $config['description'] ?? '';
 		$this->src           = $config['src'] ?? '';
 		$this->font_families = $config['font_families'] ?? array();
@@ -100,24 +102,44 @@ class WP_Font_Collection {
 	}
 
 	/**
-	 * Validates the config array.
+	 * Checks if the font collection config is valid.
 	 *
-	 * Ensures that required keys are present and valid.
+	 * @since 6.5.0
 	 *
-	 * @param array $config Configuration array.
-	 * @throws Exception If required keys are missing.
+	 * @param array $config Font collection config options.
+	 *  {
+	 *      @type string $slug        The font collection's unique slug.
+	 *      @type string $name        The font collection's name.
+	 *      @type string $description The font collection's description.
+	 *      @type string $src         The font collection's source.
+	 *      @type array  $font_families An array of font families in the font collection.
+	 *      @type array  $categories The font collection's categories.
+	 *  }
+	 * @return bool True if the font collection config is valid and false otherwise.
 	 */
-	private function validate_config( $config ) {
+	public static function is_config_valid( $config ) {
+		if ( empty( $config ) || ! is_array( $config ) ) {
+			_doing_it_wrong( __METHOD__, 'Font Collection config options are required as a non-empty array.', 'Your_Version_Number' );
+			return false;
+		}
+
 		$required_keys = array( 'slug', 'name' );
 		foreach ( $required_keys as $key ) {
 			if ( empty( $config[ $key ] ) ) {
-				throw new Exception( "Font Collection config {$key} is required as a non-empty string." );
+				_doing_it_wrong( __METHOD__, "Font Collection config {$key} is required as a non-empty string.", '6.5' );
+				return false;
 			}
 		}
 
-		if ( empty( $config['src'] ) && empty( $config['font_families'] ) ) {
-			throw new Exception( 'Font Collection config "src" option OR "font_families" option are required.' );
+		if (
+			( empty( $config['src'] ) && empty( $config['font_families'] ) ) ||
+			( ! empty( $config['src'] ) && ! empty( $config['font_families'] ) )
+		) {
+			_doing_it_wrong( __METHOD__, 'Font Collection config "src" option OR "font_families" option are required.', '6.5' );
+			return false;
 		}
+
+		return true;
 	}
 
 	/**
