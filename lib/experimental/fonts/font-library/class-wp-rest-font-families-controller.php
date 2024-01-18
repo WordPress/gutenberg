@@ -389,7 +389,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 			$properties = $this->get_item_schema()['properties'];
 			return array(
 				'theme_json_version'   => $properties['theme_json_version'],
-				// Font family settings is stringified JSON, to work with multipart/form-data.
+				// When creating or updating, font_family_settings is stringified JSON, to work with multipart/form-data.
 				// Font families don't currently support file uploads, but may accept preview files in the future.
 				'font_family_settings' => array(
 					'description'       => __( 'font-family declaration in theme.json format, encoded as a string.', 'gutenberg' ),

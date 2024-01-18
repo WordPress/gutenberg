@@ -586,9 +586,9 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			),
 		);
 
-			$this->schema = $schema;
+		$this->schema = $schema;
 
-			return $this->add_additional_fields_schema( $this->schema );
+		return $this->add_additional_fields_schema( $this->schema );
 	}
 
 	/**
@@ -637,7 +637,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$properties = $this->get_item_schema()['properties'];
 		return array(
 			'theme_json_version' => $properties['theme_json_version'],
-			// Font face settings is stringified JSON, to work with multipart/form-data used
+			// When creating, font_face_settings is stringified JSON, to work with multipart/form-data used
 			// when uploading font files.
 			'font_face_settings' => array(
 				'description'       => __( 'font-face declaration in theme.json format, encoded as a string.', 'gutenberg' ),
