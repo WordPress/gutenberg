@@ -39,7 +39,7 @@ export async function fetchInstallFontFace( fontFamilyId, data ) {
 
 export async function fetchGetFontFamilyBySlug( slug ) {
 	const config = {
-		path: `${ FONT_FAMILIES_URL }s?slug=${ slug }&_embed=true`,
+		path: `${ FONT_FAMILIES_URL }?slug=${ slug }&_embed=true`,
 		method: 'GET',
 	};
 	const response = await apiFetch( config );
