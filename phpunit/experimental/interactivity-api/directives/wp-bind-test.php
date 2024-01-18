@@ -14,16 +14,17 @@
  */
 class Tests_Directives_WpBind extends WP_UnitTestCase {
 	public function test_directive_sets_attribute() {
-		$markup = '<img data-wp-bind--src="context.myblock.imageSource" />';
+		$markup = '<img data-wp-bind--src="context.imageSource" />';
 		$tags   = new WP_HTML_Tag_Processor( $markup );
 		$tags->next_tag();
 
 		$context_before = new WP_Directive_Context( array( 'myblock' => array( 'imageSource' => './wordpress.png' ) ) );
 		$context        = $context_before;
-		gutenberg_interactivity_process_wp_bind( $tags, $context );
+		$directive_ns   = 'myblock';
+		gutenberg_interactivity_process_wp_bind( $tags, $context, $directive_ns );
 
 		$this->assertSame(
-			'<img src="./wordpress.png" data-wp-bind--src="context.myblock.imageSource" />',
+			'<img src="./wordpress.png" data-wp-bind--src="context.imageSource" />',
 			$tags->get_updated_html()
 		);
 		$this->assertSame( './wordpress.png', $tags->get_attribute( 'src' ) );
@@ -31,13 +32,14 @@ class Tests_Directives_WpBind extends WP_UnitTestCase {
 	}
 
 	public function test_directive_ignores_empty_bound_attribute() {
-		$markup = '<img data-wp-bind.="context.myblock.imageSource" />';
+		$markup = '<img data-wp-bind.="context.imageSource" />';
 		$tags   = new WP_HTML_Tag_Processor( $markup );
 		$tags->next_tag();
 
 		$context_before = new WP_Directive_Context( array( 'myblock' => array( 'imageSource' => './wordpress.png' ) ) );
 		$context        = $context_before;
-		gutenberg_interactivity_process_wp_bind( $tags, $context );
+		$directive_ns   = 'myblock';
+		gutenberg_interactivity_process_wp_bind( $tags, $context, $directive_ns );
 
 		$this->assertSame( $markup, $tags->get_updated_html() );
 		$this->assertNull( $tags->get_attribute( 'src' ) );

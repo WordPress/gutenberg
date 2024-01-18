@@ -22,6 +22,7 @@ DOM elements are connected to data stored in the state and context through direc
     - [`wp-on`](#wp-on) ![](https://img.shields.io/badge/EVENT_HANDLERS-afd2e3.svg)
     - [`wp-watch`](#wp-watch) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
     - [`wp-init`](#wp-init) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
+    - [`wp-run`](#wp-run) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
     - [`wp-key`](#wp-key) ![](https://img.shields.io/badge/TEMPLATING-afd2e3.svg)
   - [Values of directives are references to store properties](#values-of-directives-are-references-to-store-properties)
 - [The store](#the-store)
@@ -471,6 +472,62 @@ store( "myPlugin", {
 
 The `wp-init` can return a function. If it does, the returned function will run when the element is removed from the DOM.
 
+#### `wp-run` 
+
+It runs the passed callback **during node's render execution**.
+
+You can use and compose hooks like `useState`, `useWatch` or `useEffect` inside inside the passed callback and create your own logic, providing more flexibility than previous directives.
+
+You can attach several `wp-run` to the same DOM element by using the syntax `data-wp-run--[unique-id]`. _The unique id doesn't need to be unique globally, it just needs to be different than the other unique ids of the `wp-run` directives of that DOM element._
+
+_Example of `data-wp-run` directive_ 
+
+```html
+<div data-wp-run="callbacks.logInView">
+  <p>Hi!</p>
+</div>
+```
+
+<details>
+  <summary><em>See store used with the directive above</em></summary>
+
+```js
+import { store, useState, useEffect } from '@wordpress/interactivity';
+
+// Unlike `data-wp-init` and `data-wp-watch`, you can use any hooks inside
+// `data-wp-run` callbacks.
+const useInView = ( ref ) => {
+  const [ inView, setInView ] = useState( false );
+  useEffect( () => {
+    const observer = new IntersectionObserver( ( [ entry ] ) => {
+      setInView( entry.isIntersecting );
+    } );
+    if ( ref ) observer.observe( ref );
+    return () => ref && observer.unobserve( ref );
+  }, []);
+  return inView;
+};
+
+store( 'myPlugin', {
+  callbacks: {
+    logInView: () => {
+      const { ref } = getElement();
+      const isInView = useInView( ref );
+      useEffect( () => {
+        if ( isInView ) {
+          console.log( 'Inside' );
+        } else {
+          console.log( 'Outside' );
+        }
+      });
+    }
+  },
+} );
+```
+
+</details>
+<br/>
+
 #### `wp-key` 
 
 The `wp-key` directive assigns a unique key to an element to help the Interactivity API identify it when iterating through arrays of elements. This becomes important if your array elements can move (e.g., due to sorting), get inserted, or get deleted. A well-chosen key value helps the Interactivity API infer what exactly has changed in the array, allowing it to make the correct updates to the DOM.
@@ -528,7 +585,7 @@ In the example below, we get `state.isPlaying` from `otherPlugin` instead of `my
 
 ```html
 <div data-wp-interactive='{ "namespace": "myPlugin" }'>
-	<div data-bind--hidden="otherPlugin::!state.isPlaying" ... >
+  <div data-bind--hidden="otherPlugin::!state.isPlaying" ... >
 		<iframe ...></iframe>
 	</div>
 </div>

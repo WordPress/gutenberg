@@ -180,7 +180,10 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 								'View site (opens in a new tab)'
 							) }
 							icon={ external }
-							className="edit-site-site-hub__site-view-link"
+							className={ classnames(
+								'edit-site-site-hub__site-view-link',
+								{ 'is-transparent': isTransparent }
+							) }
 						/>
 					) }
 				</HStack>

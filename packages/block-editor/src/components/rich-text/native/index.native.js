@@ -52,10 +52,6 @@ import { getFormatColors } from './get-format-colors';
 import styles from './style.scss';
 import ToolbarButtonWithOptions from './toolbar-button-with-options';
 
-const unescapeSpaces = ( text ) => {
-	return text.replace( /&nbsp;|&#160;/gi, ' ' );
-};
-
 // The flattened color palettes array is memoized to ensure that the same array instance is
 // returned for the colors palettes. This value might be used as a prop, so having the same
 // instance will prevent unnecessary re-renders of the RichText component.
@@ -318,7 +314,7 @@ export class RichText extends Component {
 		}
 
 		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
-			unescapeSpaces( event.nativeEvent.text )
+			event.nativeEvent.text
 		);
 		// On iOS, onChange can be triggered after selection changes, even though there are no content changes.
 		if ( contentWithoutRootTag === this.value.toString() ) {
@@ -333,7 +329,7 @@ export class RichText extends Component {
 
 	onTextUpdate( event ) {
 		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
-			unescapeSpaces( event.nativeEvent.text )
+			event.nativeEvent.text
 		);
 
 		this.debounceCreateUndoLevel();
@@ -660,7 +656,7 @@ export class RichText extends Component {
 
 		// Check and dicsard stray event, where the text and selection is equal to the ones already cached.
 		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
-			unescapeSpaces( event.nativeEvent.text )
+			event.nativeEvent.text
 		);
 		if (
 			contentWithoutRootTag === this.value.toString() &&

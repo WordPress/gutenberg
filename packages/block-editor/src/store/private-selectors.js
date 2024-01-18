@@ -15,7 +15,7 @@ import {
 	canInsertBlockType,
 	__experimentalGetAllowedPatterns,
 } from './selectors';
-import { getUserPatterns, checkAllowListRecursive } from './utils';
+import { getAllPatterns, checkAllowListRecursive } from './utils';
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -253,26 +253,20 @@ export const getInserterMediaCategories = createSelector(
  */
 export const hasAllowedPatterns = createSelector(
 	( state, rootClientId = null ) => {
-		const patterns = state.settings.__experimentalBlockPatterns;
-		const userPatterns = getUserPatterns( state );
+		const patterns = getAllPatterns( state );
 		const { allowedBlockTypes } = getSettings( state );
-		return [ ...userPatterns, ...patterns ].some(
-			( { name, inserter = true } ) => {
-				if ( ! inserter ) {
-					return false;
-				}
-				const { blocks } = __experimentalGetParsedPattern(
-					state,
-					name
-				);
-				return (
-					checkAllowListRecursive( blocks, allowedBlockTypes ) &&
-					blocks.every( ( { name: blockName } ) =>
-						canInsertBlockType( state, blockName, rootClientId )
-					)
-				);
+		return patterns.some( ( { name, inserter = true } ) => {
+			if ( ! inserter ) {
+				return false;
 			}
-		);
+			const { blocks } = __experimentalGetParsedPattern( state, name );
+			return (
+				checkAllowListRecursive( blocks, allowedBlockTypes ) &&
+				blocks.every( ( { name: blockName } ) =>
+					canInsertBlockType( state, blockName, rootClientId )
+				)
+			);
+		} );
 	},
 	( state, rootClientId ) => [
 		...__experimentalGetAllowedPatterns.getDependants(
@@ -281,3 +275,14 @@ export const hasAllowedPatterns = createSelector(
 		),
 	]
 );
+
+/**
+ * Returns the element of the last element that had focus when focus left the editor canvas.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {Object} Element.
+ */
+export function getLastFocus( state ) {
+	return state.lastFocus;
+}

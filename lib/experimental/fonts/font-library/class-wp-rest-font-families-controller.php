@@ -276,7 +276,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	 * @return bool Whether the font directory exists.
 	 */
 	private function has_upload_directory() {
-		$upload_dir = WP_Font_Library::get_fonts_dir();
+		$upload_dir = wp_get_font_dir()['path'];
 		return is_dir( $upload_dir );
 	}
 
@@ -290,7 +290,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	private function has_write_permission() {
 		// The update endpoints requires write access to the temp and the fonts directories.
 		$temp_dir   = get_temp_dir();
-		$upload_dir = WP_Font_Library::get_fonts_dir();
+		$upload_dir = wp_get_font_dir()['path'];
 		if ( ! is_writable( $temp_dir ) || ! wp_is_writable( $upload_dir ) ) {
 			return false;
 		}
@@ -353,7 +353,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 		}
 
 		if ( $this->needs_write_permission( $font_family_settings ) ) {
-			$upload_dir = WP_Font_Library::get_fonts_dir();
+			$upload_dir = wp_get_font_dir()['path'];
 			if ( ! $this->has_upload_directory() ) {
 				if ( ! wp_mkdir_p( $upload_dir ) ) {
 					$errors[] = new WP_Error(
