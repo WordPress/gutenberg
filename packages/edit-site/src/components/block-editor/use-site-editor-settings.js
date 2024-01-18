@@ -12,6 +12,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { usePostLinkProps } from './use-post-link-props';
+import StaticBlockPreview from '../static-block-preview';
 
 const { useBlockEditorSettings } = unlock( editorPrivateApis );
 
@@ -126,6 +127,9 @@ export function useSpecificEditorSettings() {
 			supportsTemplateMode: true,
 			focusMode: canvasMode !== 'view',
 			defaultRenderingMode,
+			blockPreview: window.__experimentalStaticBlockPreviews
+				? StaticBlockPreview
+				: undefined,
 			getPostLinkProps,
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,

@@ -144,3 +144,12 @@ function _gutenberg_register_wp_templates_additional_fields() {
 }
 
 add_action( 'rest_api_init', '_gutenberg_register_wp_templates_additional_fields' );
+/**
+ * Registers the Block Rederer REST API routes.
+ */
+function gutenberg_register_block_rederer_routes() {
+	$block_renderer_controller = new Gutenberg_Render_Blocks_Controller();
+	$block_renderer_controller->register_routes();
+}
+
+add_action( 'rest_api_init', 'gutenberg_register_block_rederer_routes' );

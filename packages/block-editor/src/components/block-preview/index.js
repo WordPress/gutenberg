@@ -29,6 +29,41 @@ export function BlockPreview( {
 	__experimentalMinHeight,
 	__experimentalPadding,
 } ) {
+	const settings = useSelect(
+		( select ) => select( blockEditorStore ).getSettings(),
+		[]
+	);
+
+	return (
+		<DefaultBlockPreview
+			blocks={ blocks }
+			viewportWidth={ viewportWidth }
+			minHeight={ minHeight }
+			additionalStyles={ additionalStyles }
+			__experimentalMinHeight={ __experimentalMinHeight }
+			__experimentalPadding={ __experimentalPadding }
+		>
+			{ settings.blockPreview &&
+				settings.blockPreview( {
+					blocks,
+					viewportWidth,
+					minHeight,
+					additionalStyles,
+				} ) }
+		</DefaultBlockPreview>
+	);
+}
+
+function DefaultBlockPreview( {
+	children,
+	blocks,
+	viewportWidth = 1200,
+	minHeight,
+	additionalStyles = [],
+	// Deprecated props:
+	__experimentalMinHeight,
+	__experimentalPadding,
+} ) {
 	if ( __experimentalMinHeight ) {
 		minHeight = __experimentalMinHeight;
 		deprecated( 'The __experimentalMinHeight prop', {
@@ -75,7 +110,9 @@ export function BlockPreview( {
 				viewportWidth={ viewportWidth }
 				minHeight={ minHeight }
 				additionalStyles={ additionalStyles }
-			/>
+			>
+				{ children }
+			</AutoHeightBlockPreview>
 		</ExperimentalBlockEditorProvider>
 	);
 }

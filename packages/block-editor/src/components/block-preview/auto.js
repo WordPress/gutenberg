@@ -21,6 +21,7 @@ const MAX_HEIGHT = 2000;
 const EMPTY_ADDITIONAL_STYLES = [];
 
 function ScaledBlockPreview( {
+	children,
 	viewportWidth,
 	containerWidth,
 	minHeight,
@@ -111,7 +112,11 @@ function ScaledBlockPreview( {
 			>
 				<EditorStyles styles={ editorStyles } />
 				{ contentResizeListener }
-				<MemoizedBlockList renderAppender={ false } />
+				{ children ? (
+					children
+				) : (
+					<MemoizedBlockList renderAppender={ false } />
+				) }
 			</Iframe>
 		</Disabled>
 	);
@@ -131,7 +136,9 @@ export default function AutoBlockPreview( props ) {
 					<ScaledBlockPreview
 						{ ...props }
 						containerWidth={ containerWidth }
-					/>
+					>
+						{ props.children }
+					</ScaledBlockPreview>
 				) }
 			</div>
 		</>
