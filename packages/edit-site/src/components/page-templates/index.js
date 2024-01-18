@@ -216,20 +216,25 @@ export default function DataviewsTemplates() {
 				id: 'description',
 				getValue: ( { item } ) => item.description,
 				render: ( { item } ) => {
-					return item.description
-						? decodeEntities( item.description )
-						: view.type === LAYOUT_TABLE && (
-								<>
-									<Text variant="muted" aria-hidden="true">
-										&#8212;
-									</Text>
-									<VisuallyHidden>
-										{ __( 'No description.' ) }
-									</VisuallyHidden>
-								</>
-						  );
+					return item.description ? (
+						<span className="page-templates-description">
+							{ decodeEntities( item.description ) }
+						</span>
+					) : (
+						view.type === LAYOUT_TABLE && (
+							<>
+								<Text variant="muted" aria-hidden="true">
+									&#8212;
+								</Text>
+								<VisuallyHidden>
+									{ __( 'No description.' ) }
+								</VisuallyHidden>
+							</>
+						)
+					);
 				},
-				maxWidth: 200,
+				maxWidth: 400,
+				minWidth: 320,
 				enableSorting: false,
 			},
 			{
@@ -242,6 +247,7 @@ export default function DataviewsTemplates() {
 				enableHiding: false,
 				type: ENUMERATION_TYPE,
 				elements: authors,
+				width: '1%',
 			},
 		],
 		[ authors, view.type ]
