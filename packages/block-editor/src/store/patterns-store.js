@@ -32,7 +32,7 @@ const getAllPatterns = createRegistrySelector( ( select ) =>
 				__experimentalUserPatternCategories = [],
 				__experimentalReusableBlocks = [],
 			} = settings;
-			const userPatterns = __experimentalReusableBlocks.map(
+			const userPatterns = ( __experimentalReusableBlocks ?? [] ).map(
 				( userPattern ) => {
 					return {
 						name: `core/block/${ userPattern.id }`,
@@ -41,10 +41,9 @@ const getAllPatterns = createRegistrySelector( ( select ) =>
 						title: userPattern.title.raw,
 						categories: userPattern.wp_pattern_category.map(
 							( catId ) => {
-								const category =
-									__experimentalUserPatternCategories.find(
-										( { id } ) => id === catId
-									);
+								const category = (
+									__experimentalUserPatternCategories ?? []
+								).find( ( { id } ) => id === catId );
 								return category ? category.slug : catId;
 							}
 						),
