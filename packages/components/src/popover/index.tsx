@@ -126,6 +126,7 @@ const UnconnectedPopover = (
 	const {
 		animate = true,
 		headerTitle,
+		constrainTabbing,
 		onClose,
 		children,
 		className,
@@ -264,6 +265,7 @@ const UnconnectedPopover = (
 	}
 
 	const [ dialogRef, dialogProps ] = useDialog( {
+		constrainTabbing,
 		focusOnMount,
 		__unstableOnClose: onDialogClose,
 		// @ts-expect-error The __unstableOnClose property needs to be deprecated first (see https://github.com/WordPress/gutenberg/pull/27675)

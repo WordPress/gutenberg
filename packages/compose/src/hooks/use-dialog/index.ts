@@ -20,6 +20,7 @@ import useMergeRefs from '../use-merge-refs';
 
 type DialogOptions = {
 	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
+	constrainTabbing?: boolean;
 	onClose?: () => void;
 	/**
 	 * Use the `onClose` prop instead.
@@ -48,6 +49,7 @@ type useDialogReturn = [
  */
 function useDialog( options: DialogOptions ): useDialogReturn {
 	const currentOptions = useRef< DialogOptions | undefined >();
+	const { constrainTabbing = options.focusOnMount !== false } = options;
 	useEffect( () => {
 		currentOptions.current = options;
 	}, Object.values( options ) );
@@ -83,7 +85,7 @@ function useDialog( options: DialogOptions ): useDialogReturn {
 
 	return [
 		useMergeRefs( [
-			options.focusOnMount !== false ? constrainedTabbingRef : null,
+			constrainTabbing ? constrainedTabbingRef : null,
 			options.focusOnMount !== false ? focusReturnRef : null,
 			options.focusOnMount !== false ? focusOnMountRef : null,
 			closeOnEscapeRef,
