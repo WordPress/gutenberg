@@ -426,7 +426,7 @@ function formatPRLine( { pullRequest: pr, isBeforeLastRCDate } ) {
 	return `- [ ] ${ pr.url } - @${
 		pr.creator
 	} | Trac ticket | Core backport PR ${
-		isBeforeLastRCDate && '(⚠️ Check for existing backport in Trac)'
+		isBeforeLastRCDate ? '(⚠️ Check for existing backport in Trac)' : ''
 	}\n`;
 }
 
