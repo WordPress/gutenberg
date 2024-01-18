@@ -9,6 +9,7 @@ import {
 	store as blockEditorStore,
 	__experimentalRecursionProvider as RecursionProvider,
 	__experimentalUseHasRecursion as useHasRecursion,
+	InspectorControls,
 } from '@wordpress/block-editor';
 import { Spinner, Modal, MenuItem } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -159,14 +160,16 @@ export default function TemplatePartEdit( {
 	return (
 		<>
 			<RecursionProvider uniqueId={ templatePartId }>
-				<TemplatePartAdvancedControls
-					tagName={ tagName }
-					setAttributes={ setAttributes }
-					isEntityAvailable={ isEntityAvailable }
-					templatePartId={ templatePartId }
-					defaultWrapper={ areaObject.tagName }
-					hasInnerBlocks={ innerBlocks.length > 0 }
-				/>
+				<InspectorControls group="advanced">
+					<TemplatePartAdvancedControls
+						tagName={ tagName }
+						setAttributes={ setAttributes }
+						isEntityAvailable={ isEntityAvailable }
+						templatePartId={ templatePartId }
+						defaultWrapper={ areaObject.tagName }
+						hasInnerBlocks={ innerBlocks.length > 0 }
+					/>
+				</InspectorControls>
 				{ isPlaceholder && (
 					<TagName { ...blockProps }>
 						<TemplatePartPlaceholder
