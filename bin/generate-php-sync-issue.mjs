@@ -19,8 +19,9 @@ const OWNER = 'wordpress';
 const REPO = 'gutenberg';
 
 const IGNORED_PATHS = [
-	'lib/experiments-page.php',
-	'packages/e2e-tests/plugins',
+	'lib/load.php', // plugin specific code.
+	'lib/experiments-page.php', // experiments are plugin specific.
+	'packages/e2e-tests/plugins', // PHP files related to e2e tests only.
 	'packages/block-library', // this is handled automatically.
 ];
 
