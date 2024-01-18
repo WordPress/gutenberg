@@ -70,6 +70,7 @@ export function BlockPreview( {
 		<ExperimentalBlockEditorProvider
 			value={ renderedBlocks }
 			settings={ settings }
+			inert={ true }
 		>
 			<AutoHeightBlockPreview
 				viewportWidth={ viewportWidth }
