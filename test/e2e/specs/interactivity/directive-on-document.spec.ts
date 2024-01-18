@@ -26,4 +26,20 @@ test.describe( 'data-wp-on-document', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		await expect( counter ).toHaveText( '1' );
 	} );
+	test( 'the event listener is removed when the element is removed', async ( {
+		page,
+	} ) => {
+		const counter = page.getByTestId( 'counter' );
+		const visibilityButton = page.getByTestId( 'visibility' );
+		await expect( counter ).toHaveText( '0' );
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( counter ).toHaveText( '1' );
+		// Remove the element.
+		await visibilityButton.click();
+		// This keyboard press should not increase the counter.
+		await page.keyboard.press( 'ArrowDown' );
+		// Add the element back.
+		await visibilityButton.click();
+		await expect( counter ).toHaveText( '1' );
+	} );
 } );

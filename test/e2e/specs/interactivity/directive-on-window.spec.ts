@@ -25,4 +25,19 @@ test.describe( 'data-wp-on-window', () => {
 		const counter = page.getByTestId( 'counter' );
 		await expect( counter ).toHaveText( '1' );
 	} );
+	test( 'the event listener is removed when the element is removed', async ( {
+		page,
+	} ) => {
+		const counter = page.getByTestId( 'counter' );
+		const visibilityButton = page.getByTestId( 'visibility' );
+		await page.setViewportSize( { width: 600, height: 600 } );
+		await expect( counter ).toHaveText( '1' );
+		// Remove the element.
+		await visibilityButton.click();
+		// This resize should not increase the counter.
+		await page.setViewportSize( { width: 300, height: 600 } );
+		// Add the element back.
+		await visibilityButton.click();
+		await expect( counter ).toHaveText( '1' );
+	} );
 } );
