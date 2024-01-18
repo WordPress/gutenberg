@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useContext } from '@wordpress/element';
 
 /**
@@ -49,6 +49,12 @@ export function useBlockEditingMode( mode ) {
 		useContext( PrivateBlockContext );
 	const { setBlockEditingMode, unsetBlockEditingMode } =
 		useDispatch( blockEditorStore );
+	const globalBlockEditingMode = useSelect(
+		( select ) =>
+			// Avoid adding the subscription if not needed!
+			clientId ? null : select( blockEditorStore ).getBlockEditingMode(),
+		[ clientId ]
+	);
 	useEffect( () => {
 		if ( mode ) {
 			setBlockEditingMode( clientId, mode );
@@ -59,5 +65,5 @@ export function useBlockEditingMode( mode ) {
 			}
 		};
 	}, [ clientId, mode, setBlockEditingMode, unsetBlockEditingMode ] );
-	return blockEditingMode;
+	return clientId ? blockEditingMode : globalBlockEditingMode;
 }
