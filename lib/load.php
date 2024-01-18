@@ -149,10 +149,11 @@ require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-font-collectio
 require __DIR__ . '/experimental/fonts/font-library/class-wp-rest-autosave-font-families-controller.php';
 require __DIR__ . '/experimental/fonts/font-library/font-library.php';
 
-// Load the Font Face.
-require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face.php';
-require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face-resolver.php';
-
+if ( ! class_exists( 'WP_Font_Face' ) ){
+	// Load the Font Face and Font Face Resolver.
+	require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face.php';
+	require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face-resolver.php';
+}
 
 /*
 	* As _gutenberg_get_iframed_editor_assets_6_4() overrides Core's _wp_get_iframed_editor_assets(),
