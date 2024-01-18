@@ -12,12 +12,11 @@ import { shortcutAriaLabel } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import Button from '../../button';
 import Modal from '../../modal';
 import Tooltip, { TOOLTIP_DELAY } from '..';
 
 const props = {
-	children: <Button>Tooltip anchor</Button>,
+	children: <button>Tooltip anchor</button>,
 	text: 'tooltip text',
 };
 
@@ -56,8 +55,8 @@ describe( 'Tooltip', () => {
 			render(
 				// @ts-expect-error Tooltip cannot have more than one child element
 				<Tooltip { ...props }>
-					<Button>First button</Button>
-					<Button>Second button</Button>
+					<button>First button</button>
+					<button>Second button</button>
 				</Tooltip>
 			);
 
@@ -153,9 +152,7 @@ describe( 'Tooltip', () => {
 			render(
 				<>
 					<Tooltip { ...props }>
-						<Button disabled __experimentalIsFocusable>
-							Tooltip anchor
-						</Button>
+						<button aria-disabled="true">Tooltip anchor</button>
 					</Tooltip>
 					<button>Focus me</button>
 				</>
@@ -207,9 +204,7 @@ describe( 'Tooltip', () => {
 			render(
 				<>
 					<Tooltip { ...props }>
-						<Button disabled __experimentalIsFocusable>
-							Tooltip anchor
-						</Button>
+						<button aria-disabled="true">Tooltip anchor</button>
 					</Tooltip>
 					<button>Focus me</button>
 				</>
@@ -321,12 +316,12 @@ describe( 'Tooltip', () => {
 
 			render(
 				<Tooltip { ...props }>
-					<Button
+					<button
 						onMouseEnter={ onMouseEnterMock }
 						onMouseLeave={ onMouseLeaveMock }
 					>
 						Tooltip anchor
-					</Button>
+					</button>
 				</Tooltip>
 			);
 
@@ -454,7 +449,7 @@ describe( 'Tooltip', () => {
 				<Tooltip text="Outer tooltip">
 					<Tooltip text="Middle tooltip">
 						<Tooltip text="Inner tooltip">
-							<Button>Tooltip anchor</Button>
+							<button>Tooltip anchor</button>
 						</Tooltip>
 					</Tooltip>
 				</Tooltip>
