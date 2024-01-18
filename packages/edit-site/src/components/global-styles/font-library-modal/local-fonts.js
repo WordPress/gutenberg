@@ -173,7 +173,7 @@ function LocalFonts() {
 		} catch ( error ) {
 			setNotice( {
 				type: 'error',
-				message: error,
+				message: error.message,
 			} );
 		}
 
