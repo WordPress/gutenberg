@@ -55,8 +55,12 @@ export default function useLayoutAreas() {
 	}
 
 	// Templates
-	if ( path === '/wp_template/all' ) {
-		const isListLayout = type === 'list';
+	if (
+		path === '/wp_template/all' ||
+		( path === '/wp_template' && window?.__experimentalAdminViews )
+	) {
+		const isListLayout =
+			isCustom !== 'true' && ( ! type || type === 'list' );
 		return {
 			areas: {
 				content: <PageTemplates />,
