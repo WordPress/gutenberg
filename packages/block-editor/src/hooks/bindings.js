@@ -6,6 +6,7 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { addFilter } from '@wordpress/hooks';
 import { plugins as pluginsIcon } from '@wordpress/icons';
 
 /**
@@ -108,3 +109,25 @@ export default {
 		return true;
 	},
 };
+
+if ( window.__experimentalBlockBindings ) {
+	addFilter(
+		'blocks.registerBlockType',
+		'core/block-bindings-ui',
+		( settings, name ) => {
+			if ( ! ( name in BLOCK_BINDINGS_ALLOWED_BLOCKS ) ) {
+				return settings;
+			}
+			const contextItems = [ 'postId', 'postType', 'queryId' ];
+			const usesContextArray = settings.usesContext;
+			const oldUsesContextArray = new Set( usesContextArray );
+			contextItems.forEach( ( item ) => {
+				if ( ! oldUsesContextArray.has( item ) ) {
+					usesContextArray.push( item );
+				}
+			} );
+			settings.usesContext = usesContextArray;
+			return settings;
+		}
+	);
+}
