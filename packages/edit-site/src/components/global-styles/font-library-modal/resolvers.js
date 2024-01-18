@@ -7,9 +7,12 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 
+const FONT_FAMILIES_URL = '/wp/v2/font-families';
+const FONT_COLLECTIONS_URL = '/wp/v2/font-collections';
+
 export async function fetchInstallFontFamily( data ) {
 	const config = {
-		path: '/wp/v2/font-families',
+		path: FONT_FAMILIES_URL,
 		method: 'POST',
 		body: data,
 	};
@@ -23,7 +26,7 @@ export async function fetchInstallFontFamily( data ) {
 
 export async function fetchInstallFontFace( fontFamilyId, data ) {
 	const config = {
-		path: `/wp/v2/font-families/${ fontFamilyId }/font-faces`,
+		path: `${ FONT_FAMILIES_URL }/${ fontFamilyId }/font-faces`,
 		method: 'POST',
 		body: data,
 	};
@@ -36,7 +39,7 @@ export async function fetchInstallFontFace( fontFamilyId, data ) {
 
 export async function fetchGetFontFamilyBySlug( slug ) {
 	const config = {
-		path: `/wp/v2/font-families?slug=${ slug }&_embed=true`,
+		path: `${ FONT_FAMILIES_URL }s?slug=${ slug }&_embed=true`,
 		method: 'GET',
 	};
 	const response = await apiFetch( config );
@@ -56,7 +59,7 @@ export async function fetchGetFontFamilyBySlug( slug ) {
 
 export async function fetchUninstallFontFamily( fontFamilyId ) {
 	const config = {
-		path: `/wp/v2/font-families/${ fontFamilyId }?force=true`,
+		path: `${ FONT_FAMILIES_URL }/${ fontFamilyId }?force=true`,
 		method: 'DELETE',
 	};
 	return await apiFetch( config );
@@ -64,7 +67,7 @@ export async function fetchUninstallFontFamily( fontFamilyId ) {
 
 export async function fetchFontCollections() {
 	const config = {
-		path: '/wp/v2/font-collections',
+		path: FONT_COLLECTIONS_URL,
 		method: 'GET',
 	};
 	return await apiFetch( config );
@@ -72,7 +75,7 @@ export async function fetchFontCollections() {
 
 export async function fetchFontCollection( id ) {
 	const config = {
-		path: `/wp/v2/font-collections/${ id }`,
+		path: `${ FONT_COLLECTIONS_URL }/${ id }`,
 		method: 'GET',
 	};
 	return await apiFetch( config );
