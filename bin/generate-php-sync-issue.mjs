@@ -32,11 +32,19 @@ const __filename = fileURLToPath( import.meta.url );
 const __dirname = dirname( __filename );
 
 const authToken = getArg( 'token' );
+const stableWPRelease = getArg( 'wpstable' );
 
 async function main() {
 	if ( ! authToken ) {
 		console.error(
 			'Error. The --token argument is required. See: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token'
+		);
+		process.exit( 1 );
+	}
+
+	if ( ! stableWPRelease ) {
+		console.error(
+			'Error. The --wpstable argument is required. It should be the current stable WordPress release (e.g. 6.4).'
 		);
 		process.exit( 1 );
 	}
@@ -305,6 +313,12 @@ function reduceNesting( data ) {
 function processCommits( commits ) {
 	const result = {};
 
+	// This dir sholud be ignored, since whatever is in there is already in core.
+	// It exists to provide compatibility for older releases, because we have to
+	// support the current and the previous WP versions.
+	// See: https://github.com/WordPress/gutenberg/pull/57890#pullrequestreview-1828994247.
+	const prevReleaseCompatDirToIgnore = `lib/compat/wordpress-${ stableWPRelease }`;
+
 	commits.forEach( ( commit ) => {
 		// Skip commits without an associated pull request
 		if ( ! commit.pullRequest ) {
@@ -317,7 +331,7 @@ function processCommits( commits ) {
 			}
 
 			if (
-				IGNORED_PATHS.some(
+				[ ...IGNORED_PATHS, prevReleaseCompatDirToIgnore ].some(
 					( path ) =>
 						file.filename.startsWith( path ) ||
 						file.filename === path
