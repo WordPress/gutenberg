@@ -4,7 +4,7 @@
 
 ### Enhancements
 
-- Prevent the usage of Preact components in `wp-text`. ([#57879](https://github.com/WordPress/gutenberg/pull/57879))
+-   Prevent the usage of Preact components in `wp-text`. ([#57879](https://github.com/WordPress/gutenberg/pull/57879))
 
 ### New Features
 
@@ -12,7 +12,7 @@
 
 ### Enhancements
 
--  Update `preact`, `@preact/signals` and `deepsignal` dependencies. ([57891](https://github.com/WordPress/gutenberg/pull/57891))
+-   Update `preact`, `@preact/signals` and `deepsignal` dependencies. ([57891](https://github.com/WordPress/gutenberg/pull/57891))
 
 ### Breaking Changes
 
