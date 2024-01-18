@@ -59,6 +59,10 @@
 	margin: $grid-unit-40 0 $grid-unit-20;
 }
 
+.dataviews-view-table-wrapper {
+	overflow-x: scroll;
+}
+
 .dataviews-view-table {
 	width: 100%;
 	text-indent: 0;
@@ -81,7 +85,12 @@
 	td,
 	th {
 		padding: $grid-unit-15;
-		min-width: 160px;
+		white-space: nowrap;
+
+		@include break-huge() {
+			min-width: 200px;
+		}
+
 		&[data-field-id="actions"] {
 			text-align: right;
 		}
@@ -199,6 +208,10 @@
 
 	.dataviews-view-table-header {
 		padding-left: $grid-unit-05;
+	}
+
+	.dataviews-view-table__actions-column {
+		width: 1%;
 	}
 }
 

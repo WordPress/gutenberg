@@ -20,7 +20,10 @@ export default function PageMain() {
 		params: { path },
 	} = useLocation();
 
-	if ( path === '/wp_template/all' ) {
+	if (
+		path === '/wp_template/all' ||
+		( path === '/wp_template' && window?.__experimentalAdminViews )
+	) {
 		return <PageTemplates />;
 	} else if ( path === '/wp_template_part/all' ) {
 		return <PageTemplateParts />;
