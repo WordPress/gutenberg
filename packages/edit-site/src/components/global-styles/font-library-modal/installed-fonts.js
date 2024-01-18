@@ -138,7 +138,12 @@ function InstalledFonts() {
 
 			{ ! libraryFontSelected && (
 				<>
-					{ isResolvingLibrary && <Spinner /> }
+					{ isResolvingLibrary && (
+						<FlexItem>
+							<Spacer margin={ 2 } />
+							<Spinner />
+						</FlexItem>
+					) }
 					{ baseCustomFonts.length > 0 && (
 						<>
 							<Spacer margin={ 2 } />
