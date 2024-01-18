@@ -43,12 +43,12 @@ function FontsGrid( { title, children, pageSize = 32 } ) {
 					{ items.map( ( child, i ) => {
 						if ( i === itemsLimit - 1 ) {
 							return (
-								<div key={ i } ref={ setLastItem }>
+								<div key={ child.key } ref={ setLastItem }>
 									{ child }
 								</div>
 							);
 						}
-						return <div key={ i }>{ child }</div>;
+						return <div key={ child.key }>{ child }</div>;
 					} ) }
 				</div>
 			</VStack>
