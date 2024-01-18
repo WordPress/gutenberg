@@ -4,6 +4,11 @@
 import createSelector from 'rememo';
 
 /**
+ * WordPress dependencies
+ */
+import { createRegistrySelector } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import {
@@ -13,9 +18,9 @@ import {
 	getSettings,
 	__experimentalGetParsedPattern,
 	canInsertBlockType,
-	__experimentalGetAllowedPatterns,
 } from './selectors';
-import { getAllPatterns, checkAllowListRecursive } from './utils';
+import { checkAllowListRecursive } from './utils';
+import { store as patternsStore } from './patterns-store';
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -251,29 +256,35 @@ export const getInserterMediaCategories = createSelector(
  *
  * @return {boolean} If there is at least one allowed pattern.
  */
-export const hasAllowedPatterns = createSelector(
-	( state, rootClientId = null ) => {
-		const patterns = getAllPatterns( state );
-		const { allowedBlockTypes } = getSettings( state );
-		return patterns.some( ( { name, inserter = true } ) => {
-			if ( ! inserter ) {
-				return false;
-			}
-			const { blocks } = __experimentalGetParsedPattern( state, name );
-			return (
-				checkAllowListRecursive( blocks, allowedBlockTypes ) &&
-				blocks.every( ( { name: blockName } ) =>
-					canInsertBlockType( state, blockName, rootClientId )
-				)
-			);
-		} );
-	},
-	( state, rootClientId ) => [
-		...__experimentalGetAllowedPatterns.getDependants(
-			state,
-			rootClientId
-		),
-	]
+export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, rootClientId = null ) => {
+			const patterns = select( patternsStore ).getAllPatterns( state );
+			const { allowedBlockTypes } = getSettings( state );
+			return patterns.some( ( { name, inserter = true } ) => {
+				if ( ! inserter ) {
+					return false;
+				}
+				const { blocks } = __experimentalGetParsedPattern(
+					state,
+					name
+				);
+				return (
+					checkAllowListRecursive( blocks, allowedBlockTypes ) &&
+					blocks.every( ( { name: blockName } ) =>
+						canInsertBlockType( state, blockName, rootClientId )
+					)
+				);
+			} );
+		},
+		( state, rootClientId ) => [
+			select( patternsStore ).getAllPatterns( state ),
+			state.settings.allowedBlockTypes,
+			state.settings.templateLock,
+			state.blockListSettings[ rootClientId ],
+			state.blocks.byClientId.get( rootClientId ),
+		]
+	)
 );
 
 /**

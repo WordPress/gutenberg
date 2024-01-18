@@ -17,6 +17,7 @@ import { STORE_NAME } from './name';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { forwardResolver, getNormalizedCommaSeparable } from './utils';
 import { getSyncProvider } from './sync';
+import { fetchBlockPatterns } from './fetch';
 
 /**
  * Requests authors from the REST API.
@@ -619,17 +620,7 @@ getCurrentThemeGlobalStylesRevisions.shouldInvalidate = ( action ) => {
 export const getBlockPatterns =
 	() =>
 	async ( { dispatch } ) => {
-		const restPatterns = await apiFetch( {
-			path: '/wp/v2/block-patterns/patterns',
-		} );
-		const patterns = restPatterns?.map( ( pattern ) =>
-			Object.fromEntries(
-				Object.entries( pattern ).map( ( [ key, value ] ) => [
-					camelCase( key ),
-					value,
-				] )
-			)
-		);
+		const patterns = await fetchBlockPatterns();
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
 	};
 
