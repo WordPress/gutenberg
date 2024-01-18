@@ -9,7 +9,7 @@ import {
 	useEntityRecords,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -265,8 +265,11 @@ function FontLibraryProvider( { children } ) {
 				alreadyInstalledFontFaces.length === 0
 			) {
 				throw new Error(
-					__( 'No font faces were installed. ' ) +
+					sprintf(
+						/* translators: %s: Specific error message returned from server. */
+						__( 'No font faces were installed. %s' ),
 						detailedErrorMessage
+					)
 				);
 			}
 
@@ -289,9 +292,13 @@ function FontLibraryProvider( { children } ) {
 
 			if ( unsucessfullyInstalledFontFaces.length > 0 ) {
 				throw new Error(
-					__(
-						'Some font faces were installed. There were some errors. '
-					) + detailedErrorMessage
+					sprintf(
+						/* translators: %s: Specific error message returned from server. */
+						__(
+							'Some font faces were installed. There were some errors. %s'
+						),
+						detailedErrorMessage
+					)
 				);
 			}
 		} finally {
