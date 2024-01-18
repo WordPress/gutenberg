@@ -77,7 +77,7 @@ const defaultConfigPerViewType = {
 };
 
 const DEFAULT_VIEW = {
-	type: LAYOUT_TABLE,
+	type: LAYOUT_LIST,
 	search: '',
 	page: 1,
 	perPage: 20,
@@ -168,6 +168,18 @@ export default function DataviewsTemplates() {
 		( items ) =>
 			setTemplateId( items?.length === 1 ? items[ 0 ].id : null ),
 		[ setTemplateId ]
+	);
+
+	const onDetailsChange = useCallback(
+		( items ) => {
+			if ( items?.length === 1 ) {
+				history.push( {
+					postId: items[ 0 ].id,
+					postType: TEMPLATE_POST_TYPE,
+				} );
+			}
+		},
+		[ history ]
 	);
 
 	const authors = useMemo( () => {
@@ -369,6 +381,7 @@ export default function DataviewsTemplates() {
 					view={ view }
 					onChangeView={ onChangeView }
 					onSelectionChange={ onSelectionChange }
+					onDetailsChange={ onDetailsChange }
 					deferredRendering={
 						! view.hiddenFields?.includes( 'preview' )
 					}
