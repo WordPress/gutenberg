@@ -371,7 +371,7 @@ function processCommits( commits ) {
 }
 
 function formatPRLine( pr ) {
-	return `- [ ] ${ pr.url } - @/${ pr.creator } | Trac ticket | Core backport PR\n`;
+	return `- [ ] ${ pr.url } - @${ pr.creator } | Trac ticket | Core backport PR\n`;
 }
 
 function formatHeading( level, key ) {
