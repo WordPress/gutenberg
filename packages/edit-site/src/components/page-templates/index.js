@@ -77,7 +77,7 @@ const defaultConfigPerViewType = {
 };
 
 const DEFAULT_VIEW = {
-	type: LAYOUT_LIST,
+	type: window?.__experimentalAdminViews ? LAYOUT_LIST : LAYOUT_TABLE,
 	search: '',
 	page: 1,
 	perPage: 20,
