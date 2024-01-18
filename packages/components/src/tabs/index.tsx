@@ -168,22 +168,20 @@ function Tabs( {
 		const currentItem = items.find( ( item ) => item.id === selectedId );
 		const activeElement = currentItem?.element?.ownerDocument.activeElement;
 
-		const tabsHasFocus =
-			activeElement &&
-			items.some( ( item ) => {
-				return activeElement === item.element;
-			} );
+		if (
+			! activeElement ||
+			! items.some( ( item ) => activeElement === item.element )
+		) {
+			return; // Return early if no tabs are focused.
+		}
+
 		const previousSelectedTabHadFocus =
 			typeof previousSelectedId === 'string' &&
 			previousSelectedId === activeElement?.id;
 
 		// If the previously selected tab had focus when the selection changed,
 		// move focus to the newly selected tab.
-		if (
-			tabsHasFocus &&
-			previousSelectedTabHadFocus &&
-			selectedId !== activeElement.id
-		) {
+		if ( previousSelectedTabHadFocus && selectedId !== activeElement.id ) {
 			move( selectedId );
 			return;
 		}
@@ -192,7 +190,7 @@ function Tabs( {
 		// selection changed, update the activeId to the currently focused tab.
 		// The activeId controls how arrow key navigation behaves. Keeping them
 		// in sync avoids confusion when navigating tabs with the keyboard.
-		if ( tabsHasFocus && ! previousSelectedTabHadFocus ) {
+		if ( ! previousSelectedTabHadFocus ) {
 			setActiveId( activeElement.id );
 		}
 	}, [
