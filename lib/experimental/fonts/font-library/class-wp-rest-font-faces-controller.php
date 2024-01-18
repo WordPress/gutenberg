@@ -31,12 +31,8 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 */
 	private $parent_post_type;
 
-	public function __construct() {
-		$post_type       = 'wp_font_face';
-		$this->post_type = $post_type;
-
-		$post_type_obj   = get_post_type_object( $post_type );
-		$this->rest_base = $post_type_obj->rest_base;
+	public function __construct( $post_type ) {
+		parent::__construct( $post_type );
 
 		$parent_post_type       = 'wp_font_family';
 		$this->parent_post_type = $parent_post_type;
@@ -67,7 +63,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'get_font_faces_permissions_check' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 					'args'                => $this->get_collection_params(),
 				),
 				array(
@@ -99,7 +95,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_item' ),
-					'permission_callback' => array( $this, 'get_font_faces_permissions_check' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 					'args'                => array(),
 				),
 				array(
@@ -126,10 +122,10 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 *
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_font_faces_permissions_check() {
+	public function get_items_permissions_check( $request ) {
 		$post_type = get_post_type_object( $this->post_type );
 
-		if ( ! current_user_can( $post_type->cap->edit_posts ) ) {
+		if ( ! current_user_can( $post_type->cap->read ) ) {
 			return new WP_Error(
 				'rest_cannot_read',
 				__( 'Sorry, you are not allowed to access font faces.', 'gutenberg' ),
@@ -240,7 +236,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		$font_family = $this->get_font_family_post( $request['font_family_id'] );
+		$font_family = $this->get_parent_font_family_post( $request['font_family_id'] );
 		if ( is_wp_error( $font_family ) ) {
 			return $font_family;
 		}
@@ -263,7 +259,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		}
 
 		// Check that the font face has a valid parent font family.
-		$font_family = $this->get_font_family_post( $request['font_family_id'] );
+		$font_family = $this->get_parent_font_family_post( $request['font_family_id'] );
 		if ( is_wp_error( $font_family ) ) {
 			return $font_family;
 		}
@@ -296,14 +292,16 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$file_params = $request->get_file_params();
 
 		// Check that the necessary font face properties are unique.
-		$existing_font_face = get_posts(
+		$query = new WP_Query(
 			array(
-				'post_type'      => $this->post_type,
-				'posts_per_page' => 1,
-				'title'          => WP_Font_Family_Utils::get_font_face_slug( $settings ),
+				'post_type'              => $this->post_type,
+				'posts_per_page'         => 1,
+				'title'                  => WP_Font_Family_Utils::get_font_face_slug( $settings ),
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
 			)
 		);
-		if ( ! empty( $existing_font_face ) ) {
+		if ( ! empty( $query->get_posts() ) ) {
 			return new WP_Error(
 				'rest_duplicate_font_face',
 				__( 'A font face matching those settings already exists.', 'gutenberg' ),
@@ -391,19 +389,46 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 * @param WP_REST_Request $request Request object.
 	 * @return WP_REST_Response Response object.
 	 */
-	public function prepare_item_for_response( $item, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- required by parent class
-		$data = array();
+	public function prepare_item_for_response( $item, $request ) {
+		$fields = $this->get_fields_for_response( $request );
+		$data   = array();
 
-		$data['id']                 = $item->ID;
-		$data['theme_json_version'] = 2;
-		$data['parent']             = $item->post_parent;
-		$data['font_face_settings'] = $this->get_settings_from_post( $item );
+		if ( rest_is_field_included( 'id', $fields ) ) {
+			$data['id'] = $item->ID;
+		}
+		if ( rest_is_field_included( 'theme_json_version', $fields ) ) {
+			$data['theme_json_version'] = 2;
+		}
+
+		if ( rest_is_field_included( 'parent', $fields ) ) {
+			$data['parent'] = $item->post_parent;
+		}
+
+		if ( rest_is_field_included( 'font_face_settings', $fields ) ) {
+			$data['font_face_settings'] = $this->get_settings_from_post( $item );
+		}
+
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'edit';
+		$data    = $this->add_additional_fields_to_object( $data, $request );
+		$data    = $this->filter_response_by_context( $data, $context );
 
 		$response = rest_ensure_response( $data );
-		$links    = $this->prepare_links( $item );
-		$response->add_links( $links );
 
-		return $response;
+		if ( rest_is_field_included( '_links', $fields ) ) {
+			$links = $this->prepare_links( $item );
+			$response->add_links( $links );
+		}
+
+		/**
+		 * Filters the font face data for a REST API response.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param WP_REST_Response $response The response object.
+		 * @param WP_Post          $post     Font face post object.
+		 * @param WP_REST_Request  $request  Request object.
+		 */
+		return apply_filters( 'rest_prepare_font_face', $response, $item, $request );
 	}
 
 	/**
@@ -427,6 +452,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 				'id'                 => array(
 					'description' => __( 'Unique identifier for the post.', 'default' ),
 					'type'        => 'integer',
+					'context'     => array( 'edit' ),
 					'readonly'    => true,
 				),
 				'theme_json_version' => array(
@@ -435,36 +461,39 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 					'default'     => 2,
 					'minimum'     => 2,
 					'maximum'     => 2,
+					'context'     => array( 'edit' ),
 				),
 				'parent'             => array(
 					'description' => __( 'The ID for the parent font family of the font face.', 'gutenberg' ),
 					'type'        => 'integer',
+					'context'     => array( 'edit' ),
 				),
 				// Font face settings come directly from theme.json schema
 				// See https://schemas.wp.org/trunk/theme.json
 				'font_face_settings' => array(
 					'description'          => __( 'font-face declaration in theme.json format.', 'gutenberg' ),
 					'type'                 => 'object',
+					'context'              => array( 'edit' ),
 					'properties'           => array(
 						'fontFamily'            => array(
-							'description' => 'CSS font-family value.',
+							'description' => __( 'CSS font-family value.', 'gutenberg' ),
 							'type'        => 'string',
 							'default'     => '',
 						),
 						'fontStyle'             => array(
-							'description' => 'CSS font-style value.',
+							'description' => __( 'CSS font-style value.', 'gutenberg' ),
 							'type'        => 'string',
 							'default'     => 'normal',
 						),
 						'fontWeight'            => array(
-							'description' => 'List of available font weights, separated by a space.',
+							'description' => __( 'List of available font weights, separated by a space.', 'gutenberg' ),
 							'default'     => '400',
 							// Changed from `oneOf` to avoid errors from loose type checking.
 							// e.g. a fontWeight of "400" validates as both a string and an integer due to is_numeric check.
 							'type'        => array( 'string', 'integer' ),
 						),
 						'fontDisplay'           => array(
-							'description' => 'CSS font-display value.',
+							'description' => __( 'CSS font-display value.', 'gutenberg' ),
 							'type'        => 'string',
 							'default'     => 'fallback',
 							'enum'        => array(
@@ -476,7 +505,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 							),
 						),
 						'src'                   => array(
-							'description' => 'Paths or URLs to the font files.',
+							'description' => __( 'Paths or URLs to the font files.', 'gutenberg' ),
 							// Changed from `oneOf` to `anyOf` due to rest_sanitize_array converting a string into an array.
 							'anyOf'       => array(
 								array(
@@ -492,43 +521,43 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 							'default'     => array(),
 						),
 						'fontStretch'           => array(
-							'description' => 'CSS font-stretch value.',
+							'description' => __( 'CSS font-stretch value.', 'gutenberg' ),
 							'type'        => 'string',
 						),
 						'ascentOverride'        => array(
-							'description' => 'CSS ascent-override value.',
+							'description' => __( 'CSS ascent-override value.', 'gutenberg' ),
 							'type'        => 'string',
 						),
 						'descentOverride'       => array(
-							'description' => 'CSS descent-override value.',
+							'description' => __( 'CSS descent-override value.', 'gutenberg' ),
 							'type'        => 'string',
 						),
 						'fontVariant'           => array(
-							'description' => 'CSS font-variant value.',
+							'description' => __( 'CSS font-variant value.', 'gutenberg' ),
 							'type'        => 'string',
 						),
 						'fontFeatureSettings'   => array(
-							'description' => 'CSS font-feature-settings value.',
+							'description' => __( 'CSS font-feature-settings value.', 'gutenberg' ),
 							'type'        => 'string',
 						),
 						'fontVariationSettings' => array(
-							'description' => 'CSS font-variation-settings value.',
+							'description' => __( 'CSS font-variation-settings value.', 'gutenberg' ),
 							'type'        => 'string',
 						),
 						'lineGapOverride'       => array(
-							'description' => 'CSS line-gap-override value.',
+							'description' => __( 'CSS line-gap-override value.', 'gutenberg' ),
 							'type'        => 'string',
 						),
 						'sizeAdjust'            => array(
-							'description' => 'CSS size-adjust value.',
+							'description' => __( 'CSS size-adjust value.', 'gutenberg' ),
 							'type'        => 'string',
 						),
 						'unicodeRange'          => array(
-							'description' => 'CSS unicode-range value.',
+							'description' => __( 'CSS unicode-range value.', 'gutenberg' ),
 							'type'        => 'string',
 						),
 						'preview'               => array(
-							'description' => 'URL to a preview image of the font face.',
+							'description' => __( 'URL to a preview image of the font face.', 'gutenberg' ),
 							'type'        => 'string',
 						),
 					),
@@ -538,9 +567,9 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			),
 		);
 
-		$this->schema = $schema;
+			$this->schema = $schema;
 
-		return $this->add_additional_fields_schema( $this->schema );
+			return $this->add_additional_fields_schema( $this->schema );
 	}
 
 	/**
@@ -551,13 +580,31 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 * @return array Collection parameters.
 	 */
 	public function get_collection_params() {
-		$params = parent::get_collection_params();
+		$query_params = parent::get_collection_params();
 
-		return array(
-			'page'     => $params['page'],
-			'per_page' => $params['per_page'],
-			'search'   => $params['search'],
-		);
+		$query_params['context']['default'] = 'edit';
+
+		// Remove unneeded params.
+		unset( $query_params['after'] );
+		unset( $query_params['modified_after'] );
+		unset( $query_params['before'] );
+		unset( $query_params['modified_before'] );
+		unset( $query_params['search'] );
+		unset( $query_params['search_columns'] );
+		unset( $query_params['slug'] );
+		unset( $query_params['status'] );
+
+		$query_params['orderby']['default'] = 'id';
+		$query_params['orderby']['enum']    = array( 'id', 'include' );
+
+		/**
+		 * Filters collection parameters for the font face controller.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @param array $query_params JSON Schema-formatted collection parameters.
+		 */
+		return apply_filters( 'rest_font_face_collection_params', $query_params );
 	}
 
 	/**
@@ -584,18 +631,6 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Allow the font face post type to be managed through the REST API.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @param WP_Post_Type|string $post_type Post type name or object.
-	 * @return bool Whether the post type is allowed in REST.
-	 */
-	protected function check_is_post_type_allowed( $post_type ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- required by parent class
-		return true;
-	}
-
-	/**
 	 * Get the parent font family, if the ID is valid.
 	 *
 	 * @since 6.5.0
@@ -603,7 +638,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 * @param int $font_family_id Supplied ID.
 	 * @return WP_Post|WP_Error Post object if ID is valid, WP_Error otherwise.
 	 */
-	protected function get_font_family_post( $font_family_id ) {
+	protected function get_parent_font_family_post( $font_family_id ) {
 		$error = new WP_Error(
 			'rest_post_invalid_parent',
 			__( 'Invalid post parent ID.', 'default' ),
@@ -725,7 +760,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		$status = 500;
 		$code   = 'rest_font_upload_unknown_error';
 
-		if ( 'Sorry, you are not allowed to upload this file type.' === $message ) {
+		if ( __( 'Sorry, you are not allowed to upload this file type.', 'default' ) === $message ) {
 			$status = 400;
 			$code   = 'rest_font_upload_invalid_file_type';
 		}

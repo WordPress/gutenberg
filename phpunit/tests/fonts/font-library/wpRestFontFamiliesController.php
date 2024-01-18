@@ -145,9 +145,9 @@ class WP_REST_Font_Families_Controller_Test extends WP_Test_REST_Controller_Test
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertCount( 2, $data );
 		$this->assertArrayHasKey( '_links', $data[0] );
-		$this->check_font_family_data( $data[0], self::$font_family_id1, $data[0]['_links'] );
+		$this->check_font_family_data( $data[0], self::$font_family_id2, $data[0]['_links'] );
 		$this->assertArrayHasKey( '_links', $data[1] );
-		$this->check_font_family_data( $data[1], self::$font_family_id2, $data[1]['_links'] );
+		$this->check_font_family_data( $data[1], self::$font_family_id1, $data[1]['_links'] );
 	}
 
 	/**
