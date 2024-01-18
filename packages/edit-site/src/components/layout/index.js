@@ -172,7 +172,6 @@ export default function Layout() {
 						'is-distraction-free':
 							isDistractionFree && canvasMode === 'edit',
 						'is-full-canvas': canvasMode === 'edit',
-						'is-edit-mode': canvasMode === 'edit',
 						'has-fixed-toolbar': hasFixedToolbar,
 						'is-block-toolbar-visible': hasBlockSelected,
 					}
