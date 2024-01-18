@@ -23,7 +23,7 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 
 			const changeObject = {
 				selectedItem: {
-					// value will always be a string for the legacy component
+					// Value will always be a string for the legacy component
 					name: value as string,
 					key: state.activeId as string,
 				},
@@ -36,37 +36,33 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 		},
 	} );
 
-	const transformOptionsToChildren = () => {
-		return props.options.map(
-			( { name, key, __experimentalHint, ...rest } ) => {
-				const withHint = (
-					<>
-						<span>{ name }</span>
-						<span className="components-custom-select-control__item-hint">
-							{ __experimentalHint }
-						</span>
-					</>
-				);
+	const children = props.options.map(
+		( { name, key, __experimentalHint, ...rest } ) => {
+			const withHint = (
+				<>
+					<span>{ name }</span>
+					<span className="components-custom-select-control__item-hint">
+						{ __experimentalHint }
+					</span>
+				</>
+			);
 
-				return (
-					<CustomSelectItem
-						{ ...rest }
-						key={ key }
-						value={ name }
-						children={
-							props.__experimentalShowSelectedHint
-								? withHint
-								: name
-						}
-					/>
-				);
-			}
-		);
-	};
+			return (
+				<CustomSelectItem
+					{ ...rest }
+					key={ key }
+					value={ name }
+					children={
+						props.__experimentalShowSelectedHint ? withHint : name
+					}
+				/>
+			);
+		}
+	);
 
 	const translatedProps = {
 		'aria-describedby': props.describedBy,
-		children: transformOptionsToChildren(),
+		children,
 		label: props.label,
 	};
 
