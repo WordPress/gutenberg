@@ -80,8 +80,7 @@ class WP_Font_Collection {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param array $config Font collection config options.
-	 *  {
+	 * @param array $config Font collection config options. {
 	 *      @type string $slug        The font collection's unique slug.
 	 *      @type string $name        The font collection's name.
 	 *      @type string $description The font collection's description.
@@ -106,8 +105,7 @@ class WP_Font_Collection {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param array $config Font collection config options.
-	 *  {
+	 * @param array $config Font collection config options. {
 	 *      @type string $slug        The font collection's unique slug.
 	 *      @type string $name        The font collection's name.
 	 *      @type string $description The font collection's description.
@@ -126,7 +124,12 @@ class WP_Font_Collection {
 		$required_keys = array( 'slug', 'name' );
 		foreach ( $required_keys as $key ) {
 			if ( empty( $config[ $key ] ) ) {
-				_doing_it_wrong( __METHOD__, "Font Collection config {$key} is required as a non-empty string.", '6.5' );
+				_doing_it_wrong(
+					__METHOD__,
+					// translators: %s: Font collection config key.
+					sprintf( __( 'Font Collection config %s is required as a non-empty string.', 'gutenberg' ), $key ),
+					'6.5.0'
+				);
 				return false;
 			}
 		}
