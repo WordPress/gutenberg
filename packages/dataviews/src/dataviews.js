@@ -5,7 +5,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useMemo, useState, useCallback } from '@wordpress/element';
+import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,7 +14,8 @@ import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
-import { VIEW_LAYOUTS } from './constants';
+import { VIEW_LAYOUTS, LAYOUT_TABLE } from './constants';
+import BulkActions from './bulk-actions';
 
 const defaultGetItemId = ( item ) => item.id;
 const defaultOnSelectionChange = () => {};
@@ -36,6 +37,23 @@ export default function DataViews( {
 	deferredRendering = false,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
+
+	useEffect( () => {
+		if (
+			selection.length > 0 &&
+			selection.some(
+				( id ) => ! data.some( ( item ) => item.id === id )
+			)
+		) {
+			const newSelection = selection.filter( ( id ) =>
+				data.some( ( item ) => item.id === id )
+			);
+			setSelection( newSelection );
+			onSelectionChange(
+				data.filter( ( item ) => newSelection.includes( item.id ) )
+			);
+		}
+	}, [ selection, data, onSelectionChange ] );
 
 	const onSetSelection = useCallback(
 		( items ) => {
@@ -75,6 +93,15 @@ export default function DataViews( {
 							onChangeView={ onChangeView }
 						/>
 					</HStack>
+					{ view.type === LAYOUT_TABLE && (
+						<BulkActions
+							actions={ actions }
+							data={ data }
+							onSelectionChange={ onSetSelection }
+							selection={ selection }
+							getItemId={ getItemId }
+						/>
+					) }
 					<ViewActions
 						fields={ _fields }
 						view={ view }

@@ -8,22 +8,37 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { Children } from '@wordpress/element';
+import { Children, cloneElement } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import type { TooltipProps } from './types';
+import type { TooltipProps, TooltipInternalContext } from './types';
 import Shortcut from '../shortcut';
 import { positionToPlacement } from '../popover/utils';
+import {
+	contextConnect,
+	useContextSystem,
+	ContextSystemProvider,
+} from '../context';
+import type { WordPressComponentProps } from '../context';
 
 /**
  * Time over anchor to wait before showing tooltip
  */
 export const TOOLTIP_DELAY = 700;
 
-function Tooltip( props: TooltipProps ) {
+const CONTEXT_VALUE = {
+	Tooltip: {
+		isNestedInTooltip: true,
+	},
+};
+
+function UnconnectedTooltip(
+	props: WordPressComponentProps< TooltipProps, 'div', false >,
+	ref: React.ForwardedRef< any >
+) {
 	const {
 		children,
 		delay = TOOLTIP_DELAY,
@@ -32,7 +47,15 @@ function Tooltip( props: TooltipProps ) {
 		position,
 		shortcut,
 		text,
-	} = props;
+
+		// From Internal Context system
+		isNestedInTooltip,
+
+		...restProps
+	} = useContextSystem< typeof props & TooltipInternalContext >(
+		props,
+		'Tooltip'
+	);
 
 	const baseId = useInstanceId( Tooltip, 'tooltip' );
 	const describedById = text || shortcut ? baseId : undefined;
@@ -43,7 +66,7 @@ function Tooltip( props: TooltipProps ) {
 		if ( 'development' === process.env.NODE_ENV ) {
 			// eslint-disable-next-line no-console
 			console.error(
-				'Tooltip should be called with only a single child element.'
+				'wp-components.Tooltip should be called with only a single child element.'
 			);
 		}
 	}
@@ -64,24 +87,37 @@ function Tooltip( props: TooltipProps ) {
 	}
 	computedPlacement = computedPlacement || 'bottom';
 
-	const tooltipStore = Ariakit.useTooltipStore( {
+	// Removing the `Ariakit` namespace from the hook name allows ESLint to
+	// properly identify the hook, and apply the correct linting rules.
+	const useAriakitTooltipStore = Ariakit.useTooltipStore;
+	const tooltipStore = useAriakitTooltipStore( {
 		placement: computedPlacement,
 		showTimeout: delay,
 	} );
 
+	if ( isNestedInTooltip ) {
+		return isOnlyChild
+			? cloneElement( children, {
+					...restProps,
+					ref,
+			  } )
+			: children;
+	}
+
 	return (
-		<>
+		<ContextSystemProvider value={ CONTEXT_VALUE }>
 			<Ariakit.TooltipAnchor
 				onClick={ hideOnClick ? tooltipStore.hide : undefined }
 				store={ tooltipStore }
 				render={ isOnlyChild ? children : undefined }
+				ref={ ref }
 			>
 				{ isOnlyChild ? undefined : children }
 			</Ariakit.TooltipAnchor>
 			{ isOnlyChild && ( text || shortcut ) && (
 				<Ariakit.Tooltip
+					{ ...restProps }
 					unmountOnHide
-					className="components-tooltip"
 					gutter={ 4 }
 					id={ describedById }
 					overflowPadding={ 0.5 }
@@ -98,8 +134,10 @@ function Tooltip( props: TooltipProps ) {
 					) }
 				</Ariakit.Tooltip>
 			) }
-		</>
+		</ContextSystemProvider>
 	);
 }
+
+export const Tooltip = contextConnect( UnconnectedTooltip, 'Tooltip' );
 
 export default Tooltip;

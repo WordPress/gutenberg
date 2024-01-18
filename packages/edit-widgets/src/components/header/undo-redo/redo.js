@@ -2,13 +2,14 @@
  * WordPress dependencies
  */
 import { __, isRTL } from '@wordpress/i18n';
-import { ToolbarButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { redo as redoIcon, undo as undoIcon } from '@wordpress/icons';
 import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
+import { forwardRef } from '@wordpress/element';
 
-export default function RedoButton() {
+function RedoButton( props, ref ) {
 	const shortcut = isAppleOS()
 		? displayShortcut.primaryShift( 'z' )
 		: displayShortcut.primary( 'y' );
@@ -19,7 +20,9 @@ export default function RedoButton() {
 	);
 	const { redo } = useDispatch( coreStore );
 	return (
-		<ToolbarButton
+		<Button
+			{ ...props }
+			ref={ ref }
 			icon={ ! isRTL() ? redoIcon : undoIcon }
 			label={ __( 'Redo' ) }
 			shortcut={ shortcut }
@@ -31,3 +34,5 @@ export default function RedoButton() {
 		/>
 	);
 }
+
+export default forwardRef( RedoButton );

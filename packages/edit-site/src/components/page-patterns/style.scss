@@ -254,6 +254,15 @@
 		top: 0;
 		z-index: 2;
 	}
+
+	.edit-site-patterns__pattern-title {
+		display: block;
+		width: 100%;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		color: inherit;
+	}
 }
 
 .dataviews-action-modal__duplicate-pattern {

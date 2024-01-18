@@ -35,7 +35,7 @@ class WP_Font_Collection {
 	 * @since 6.5.0
 	 *
 	 * @param array $config Font collection config options.
-	 *                      See {@see wp_register_font_collection()} for the supported fields.
+	 *  See {@see wp_register_font_collection()} for the supported fields.
 	 * @throws Exception If the required parameters are missing.
 	 */
 	public function __construct( $config ) {
@@ -43,16 +43,16 @@ class WP_Font_Collection {
 			throw new Exception( 'Font Collection config options is required as a non-empty array.' );
 		}
 
-		if ( empty( $config['id'] ) || ! is_string( $config['id'] ) ) {
-			throw new Exception( 'Font Collection config ID is required as a non-empty string.' );
+		if ( empty( $config['slug'] ) || ! is_string( $config['slug'] ) ) {
+			throw new Exception( 'Font Collection config slug is required as a non-empty string.' );
 		}
 
 		if ( empty( $config['name'] ) || ! is_string( $config['name'] ) ) {
 			throw new Exception( 'Font Collection config name is required as a non-empty string.' );
 		}
 
-		if ( empty( $config['src'] ) || ! is_string( $config['src'] ) ) {
-			throw new Exception( 'Font Collection config "src" option is required as a non-empty string.' );
+		if ( ( empty( $config['src'] ) || ! is_string( $config['src'] ) ) && ( empty( $config['data'] ) ) ) {
+			throw new Exception( 'Font Collection config "src" option OR "data" option is required.' );
 		}
 
 		$this->config = $config;
@@ -63,21 +63,59 @@ class WP_Font_Collection {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @return array An array containing the font collection config.
+	 * @return array {
+	 *     An array of font collection config.
+	 *
+	 *     @type string $slug        The font collection's unique slug.
+	 *     @type string $name        The font collection's name.
+	 *     @type string $description The font collection's description.
+	 * }
 	 */
 	public function get_config() {
-		return $this->config;
+		return array(
+			'slug'        => $this->config['slug'],
+			'name'        => $this->config['name'],
+			'description' => $this->config['description'] ?? '',
+		);
 	}
 
 	/**
-	 * Gets the font collection data.
+	 * Gets the font collection config and data.
+	 *
+	 * This function returns an array containing the font collection's unique ID,
+	 * name, and its data as a PHP array.
 	 *
 	 * @since 6.5.0
 	 *
-	 * @return array|WP_Error An array containing the list of font families in theme.json format on success,
+	 * @return array {
+	 *     An array of font collection config and data.
+	 *
+	 *     @type string $slug          The font collection's unique ID.
+	 *     @type string $name        The font collection's name.
+	 *     @type string $description The font collection's description.
+	 *     @type array  $data        The font collection's data as a PHP array.
+	 * }
+	 */
+	public function get_config_and_data() {
+		$config_and_data         = $this->get_config();
+		$config_and_data['data'] = $this->load_data();
+		return $config_and_data;
+	}
+
+	/**
+	 * Loads the font collection data.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return array|WP_Error An array containing the list of font families in font-collection.json format on success,
 	 *                        else an instance of WP_Error on failure.
 	 */
-	public function get_data() {
+	public function load_data() {
+
+		if ( ! empty( $this->config['data'] ) ) {
+			return $this->config['data'];
+		}
+
 		// If the src is a URL, fetch the data from the URL.
 		if ( str_contains( $this->config['src'], 'http' ) && str_contains( $this->config['src'], '://' ) ) {
 			if ( ! wp_http_validate_url( $this->config['src'] ) ) {
@@ -104,9 +142,6 @@ class WP_Font_Collection {
 			}
 		}
 
-		$collection_data         = $this->get_config();
-		$collection_data['data'] = $data;
-		unset( $collection_data['src'] );
-		return $collection_data;
+		return $data;
 	}
 }
