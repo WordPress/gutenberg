@@ -1,4 +1,3 @@
-//@ts-nocheck
 /**
  * External dependencies
  */
@@ -13,7 +12,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import LegacyCustomSelect from '../legacy-component';
-import { CustomSelect, CustomSelectItem } from '..';
+import { CustomSelect } from '..';
 
 const meta: Meta< typeof LegacyCustomSelect > = {
 	title: 'Components (Experimental)/CustomSelectControl v2/Legacy',
@@ -43,35 +42,14 @@ const meta: Meta< typeof LegacyCustomSelect > = {
 };
 export default meta;
 
-export const Default: StoryFn = () => {
-	const options = [
-		{
-			key: 'small',
-			name: 'Small',
-			style: { fontSize: '50%' },
-		},
-		{
-			key: 'normal',
-			name: 'Normal',
-			style: { fontSize: '100%' },
-		},
-		{
-			key: 'large',
-			name: 'Large',
-			style: { fontSize: '200%' },
-		},
-		{
-			key: 'huge',
-			name: 'Huge',
-			style: { fontSize: '300%' },
-		},
-	];
-
-	return <CustomSelect label="Font Size" options={ options } />;
+const Template: StoryFn< typeof LegacyCustomSelect > = ( props ) => {
+	return <CustomSelect { ...props } />;
 };
 
-export const Controlled: StoryFn = () => {
-	const options = [
+export const Default = Template.bind( {} );
+Default.args = {
+	label: 'Font Size',
+	options: [
 		{
 			key: 'small',
 			name: 'Small',
@@ -92,18 +70,43 @@ export const Controlled: StoryFn = () => {
 			name: 'Huge',
 			style: { fontSize: '300%' },
 		},
-	];
+	],
+};
 
-	const [ fontSize, setFontSize ] = useState( options[ 0 ] );
+export const Controlled: StoryFn< typeof LegacyCustomSelect > = ( props ) => {
+	const [ fontSize, setFontSize ] = useState( props.options[ 0 ] );
+
+	const onChange: ( typeof props )[ 'onChange' ] = ( changeObject ) => {
+		setFontSize( changeObject.selectedItem );
+		props.onChange?.( changeObject );
+	};
 
 	return (
-		<CustomSelect
-			label="Font Size"
-			options={ options }
-			onChange={ ( { selectedItem } ) => {
-				setFontSize( selectedItem );
-			} }
-			value={ options.find( ( option ) => option.key === fontSize.key ) }
-		/>
+		<CustomSelect { ...props } onChange={ onChange } value={ fontSize } />
 	);
+};
+Controlled.args = {
+	label: 'Font Size',
+	options: [
+		{
+			key: 'small',
+			name: 'Small',
+			style: { fontSize: '50%' },
+		},
+		{
+			key: 'normal',
+			name: 'Normal',
+			style: { fontSize: '100%' },
+		},
+		{
+			key: 'large',
+			name: 'Large',
+			style: { fontSize: '200%' },
+		},
+		{
+			key: 'huge',
+			name: 'Huge',
+			style: { fontSize: '300%' },
+		},
+	],
 };

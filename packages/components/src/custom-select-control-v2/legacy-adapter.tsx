@@ -8,7 +8,7 @@ import type { CustomSelectProps, LegacyCustomSelectProps } from './types';
 function isLegacy( props: any ): props is LegacyCustomSelectProps {
 	return (
 		typeof props.options !== 'undefined' ||
-		props.__experimentalShowSelectedHint !== undefined
+		typeof props.__experimentalShowSelectedHint !== 'undefined'
 	);
 }
 

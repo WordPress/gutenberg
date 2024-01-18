@@ -1,4 +1,3 @@
-//@ts-nocheck
 /**
  * External dependencies
  */
@@ -50,16 +49,16 @@ const meta: Meta< typeof NewCustomSelect > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof CustomSelect > = ( props ) => {
+const Template: StoryFn< typeof NewCustomSelect > = ( props ) => {
 	return <CustomSelect { ...props } />;
 };
 
-const ControlledTemplate: StoryFn< typeof CustomSelect > = ( props ) => {
+const ControlledTemplate: StoryFn< typeof NewCustomSelect > = ( props ) => {
 	const [ value, setValue ] = useState< string | string[] >();
 	return (
 		<CustomSelect
 			{ ...props }
-			onChange={ ( nextValue ) => {
+			onChange={ ( nextValue: string | string[] ) => {
 				setValue( nextValue );
 				props.onChange?.( nextValue );
 			} }
