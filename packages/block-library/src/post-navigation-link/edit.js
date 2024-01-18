@@ -162,7 +162,6 @@ export default function PostNavigationLinkEdit( {
 					onChange={ ( value ) =>
 						setAttributes( {
 							taxonomy: value,
-							inSameTerm: value === '' ? false : true,
 						} )
 					}
 					help={ __(
