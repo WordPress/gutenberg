@@ -77,7 +77,7 @@ function FontLibraryModal( {
 								contents = <InstalledFonts />;
 								break;
 							default:
-								contents = <FontCollection />;
+								contents = <FontCollection slug={ id } />;
 						}
 						return (
 							<Tabs.TabPanel
