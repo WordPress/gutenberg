@@ -9,14 +9,15 @@ import { fileURLToPath } from 'url';
 import nodePath, { dirname } from 'path';
 
 function getArg( argName ) {
-	const arg = process.argv.find( ( arg ) =>
-		arg.startsWith( `--${ argName }=` )
+	const arg = process.argv.find( ( _arg ) =>
+		_arg.startsWith( `--${ argName }=` )
 	);
 	return arg ? arg.split( '=' )[ 1 ] : null;
 }
 
 const OWNER = 'wordpress';
 const REPO = 'gutenberg';
+const MAX_MONTHS_TO_QUERY = 4;
 
 const IGNORED_PATHS = [
 	'lib/load.php', // plugin specific code.
@@ -58,7 +59,7 @@ async function main() {
 			since = sinceArg;
 		} else {
 			console.error(
-				'Error: The --since argument cannot be more than 2 months from the current date.'
+				`Error: The --since argument cannot be more than ${ MAX_MONTHS_TO_QUERY } months from the current date.`
 			);
 			process.exit( 1 );
 		}
@@ -109,14 +110,24 @@ async function main() {
 		commits.map( async ( commit ) => {
 			const commitData = await fetchCommit( commit.sha );
 
+			// In the future we will want to exclude PRs based on label
+			// so we will need to fetch the full PR data for each commit.
+			// For now we can just set this to null.
+			const fullPRData = null;
+			// const fullPRData = getPullRequestDataForCommit( commit.sha );
+
 			// Our Issue links to the PRs associated with the commits so we must
 			// provide this data. We could also get the PR data from the commit data,
 			// using getPullRequestDataForCommit, but that requires yet another
 			// network request. Therefore we optimise for trying to build
 			// the PR URL from the commit data we have available.
 			const pullRequest = {
-				url: buildPRURL( commit ),
-				creator: commit?.author?.login || 'unknown',
+				url: fullPRData?.html_url || buildPRURL( commit ),
+				creator:
+					fullPRData?.user?.login ||
+					commit?.author?.login ||
+					'unknown',
+				labels: fullPRData?.labels || [],
 			};
 
 			if ( pullRequest ) {
@@ -146,11 +157,11 @@ async function main() {
 }
 
 function validateSince( sinceArg ) {
-	const maxMonths = 3;
-
 	const sinceDate = new Date( sinceArg );
 	const maxPreviousDate = new Date();
-	maxPreviousDate.setMonth( maxPreviousDate.getMonth() - maxMonths );
+	maxPreviousDate.setMonth(
+		maxPreviousDate.getMonth() - MAX_MONTHS_TO_QUERY
+	);
 
 	return sinceDate >= maxPreviousDate;
 }
@@ -322,7 +333,7 @@ function processCommits( commits ) {
 
 	commits.forEach( ( commit ) => {
 		// Skip commits without an associated pull request
-		if ( ! commit.pullRequest ) {
+		if ( ! commit?.pullRequest ) {
 			return;
 		}
 		commit.files.forEach( ( file ) => {
@@ -420,12 +431,10 @@ async function fetchCommit( sha ) {
 }
 
 // eslint-disable-next-line no-unused-vars
-async function getPullRequestDataForCommit( octokit, commitSha ) {
-	const { data: pullRequests } = await octokit.request(
+async function getPullRequestDataForCommit( commitSha ) {
+	const pullRequests = octokitRequest(
 		'GET /repos/{owner}/{repo}/commits/{commit_sha}/pulls',
 		{
-			owner: OWNER,
-			repo: REPO,
 			commit_sha: commitSha,
 		}
 	);
@@ -433,10 +442,7 @@ async function getPullRequestDataForCommit( octokit, commitSha ) {
 	// If a related Pull Request is found, return its URL and creator
 	if ( pullRequests.length > 0 ) {
 		const pullRequest = pullRequests[ 0 ];
-		return {
-			url: pullRequest.html_url,
-			creator: pullRequest.user.login,
-		};
+		return pullRequest;
 	}
 
 	return null;
