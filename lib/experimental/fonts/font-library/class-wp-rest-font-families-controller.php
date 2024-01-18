@@ -18,6 +18,14 @@ if ( class_exists( 'WP_REST_Font_Families_Controller' ) ) {
  */
 class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	/**
+	 * Whether the controller supports batching.
+	 *
+	 * @since 6.5.0
+	 * @var false
+	 */
+	protected $allow_batch = false;
+
+	/**
 	 * Checks if a given request has access to font families.
 	 *
 	 * @since 6.5.0
@@ -178,10 +186,9 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function delete_item( $request ) {
-		$font_family_id = $request->get_param( 'id' );
-		$force          = isset( $request['force'] ) ? (bool) $request['force'] : false;
+		$force = isset( $request['force'] ) ? (bool) $request['force'] : false;
 
-		// We don't support trashing for revisions.
+		// We don't support trashing for font families.
 		if ( ! $force ) {
 			return new WP_Error(
 				'rest_trash_not_supported',
@@ -243,7 +250,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 		 * @param WP_Post          $post     Font family post object.
 		 * @param WP_REST_Request  $request  Request object.
 		 */
-		return apply_filters( 'rest_prepare_font_family', $response, $item, $request );
+		return apply_filters( 'rest_prepare_wp_font_family', $response, $item, $request );
 	}
 
 		/**
@@ -352,7 +359,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 		 *
 		 * @param array $query_params JSON Schema-formatted collection parameters.
 		 */
-		return apply_filters( 'rest_font_family_collection_params', $query_params );
+		return apply_filters( 'rest_wp_font_family_collection_params', $query_params );
 	}
 
 	/**
@@ -364,7 +371,9 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 	 * @return array Context parameter details.
 	 */
 	public function get_context_param( $args = array() ) {
-		$args['default'] = 'edit';
+		if ( isset( $args['default'] ) ) {
+			$args['default'] = 'edit';
+		}
 		return parent::get_context_param( $args );
 	}
 
@@ -411,6 +420,7 @@ class WP_REST_Font_Families_Controller extends WP_REST_Posts_Controller {
 				'post_parent'            => $font_family_id,
 				'post_type'              => 'wp_font_face',
 				'posts_per_page'         => 99,
+				'order'                  => 'ASC',
 				'orderby'                => 'id',
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,

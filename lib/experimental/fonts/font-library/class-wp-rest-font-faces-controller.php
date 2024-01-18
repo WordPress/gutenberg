@@ -16,6 +16,14 @@ if ( class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
  */
 class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	/**
+	 * Whether the controller supports batching.
+	 *
+	 * @since 6.5.0
+	 * @var false
+	 */
+	protected $allow_batch = false;
+
+	/**
 	 * Registers the routes for posts.
 	 *
 	 * @since 6.5.0
@@ -70,7 +78,9 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_item' ),
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
-					'args'                => array(),
+					'args'                => array(
+						'context' => $this->get_context_param( array( 'default' => 'edit' ) ),
+					),
 				),
 				array(
 					'methods'             => WP_REST_Server::DELETABLE,
@@ -85,7 +95,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 					),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
-			)
+			),
 		);
 	}
 
@@ -251,9 +261,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			return $font_family;
 		}
 
-		$response = parent::get_item( $request );
-
-		if ( (int) $font_family->ID !== (int) $response->data['parent'] ) {
+		if ( (int) $font_family->ID !== (int) $post->post_parent ) {
 			return new WP_Error(
 				'rest_font_face_parent_id_mismatch',
 				/* translators: %d: A post id. */
@@ -262,7 +270,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 			);
 		}
 
-		return $response;
+		return parent::get_item( $request );
 	}
 
 	/**
@@ -354,7 +362,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	public function delete_item( $request ) {
 		$force = isset( $request['force'] ) ? (bool) $request['force'] : false;
 
-		// We don't support trashing for revisions.
+		// We don't support trashing for font faces.
 		if ( ! $force ) {
 			return new WP_Error(
 				'rest_trash_not_supported',
@@ -401,7 +409,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 
 		$response = rest_ensure_response( $data );
 
-		if ( rest_is_field_included( '_links', $fields ) ) {
+		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
 			$links = $this->prepare_links( $item );
 			$response->add_links( $links );
 		}
@@ -415,7 +423,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		 * @param WP_Post          $post     Font face post object.
 		 * @param WP_REST_Request  $request  Request object.
 		 */
-		return apply_filters( 'rest_prepare_font_face', $response, $item, $request );
+		return apply_filters( 'rest_prepare_wp_font_face', $response, $item, $request );
 	}
 
 	/**
@@ -439,7 +447,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 				'id'                 => array(
 					'description' => __( 'Unique identifier for the post.', 'default' ),
 					'type'        => 'integer',
-					'context'     => array( 'edit' ),
+					'context'     => array( 'edit', 'embed' ),
 					'readonly'    => true,
 				),
 				'theme_json_version' => array(
@@ -448,19 +456,19 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 					'default'     => 2,
 					'minimum'     => 2,
 					'maximum'     => 2,
-					'context'     => array( 'edit' ),
+					'context'     => array( 'edit', 'embed' ),
 				),
 				'parent'             => array(
 					'description' => __( 'The ID for the parent font family of the font face.', 'gutenberg' ),
 					'type'        => 'integer',
-					'context'     => array( 'edit' ),
+					'context'     => array( 'edit', 'embed' ),
 				),
 				// Font face settings come directly from theme.json schema
 				// See https://schemas.wp.org/trunk/theme.json
 				'font_face_settings' => array(
 					'description'          => __( 'font-face declaration in theme.json format.', 'gutenberg' ),
 					'type'                 => 'object',
-					'context'              => array( 'edit' ),
+					'context'              => array( 'edit', 'embed' ),
 					'properties'           => array(
 						'fontFamily'            => array(
 							'description' => __( 'CSS font-family value.', 'gutenberg' ),
@@ -591,7 +599,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 		 *
 		 * @param array $query_params JSON Schema-formatted collection parameters.
 		 */
-		return apply_filters( 'rest_font_face_collection_params', $query_params );
+		return apply_filters( 'rest_wp_font_face_collection_params', $query_params );
 	}
 
 	/**

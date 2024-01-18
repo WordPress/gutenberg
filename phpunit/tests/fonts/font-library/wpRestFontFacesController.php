@@ -112,10 +112,24 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	}
 
 	/**
-	 * @doesNotPerformAssertions
+	 * @covers WP_REST_Font_Faces_Controller::get_context_param
 	 */
 	public function test_context_param() {
-		// Controller does not use get_context_param().
+		// Collection.
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertArrayNotHasKey( 'allow_batch', $data['endpoints'][0] );
+		$this->assertSame( 'edit', $data['endpoints'][0]['args']['context']['default'] );
+		$this->assertSame( array( 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
+
+		// Single.
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces/' . self::$font_face_id1 );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertArrayNotHasKey( 'allow_batch', $data['endpoints'][0] );
+		$this->assertSame( 'edit', $data['endpoints'][0]['args']['context']['default'] );
+		$this->assertSame( array( 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
 	}
 
 	/**
