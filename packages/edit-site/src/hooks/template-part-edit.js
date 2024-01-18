@@ -52,16 +52,14 @@ function EditTemplatePartMenuItem( { attributes } ) {
 	}
 
 	return (
-		<BlockControls group="other">
-			<ToolbarButton
-				{ ...linkProps }
-				onClick={ ( event ) => {
-					linkProps.onClick( event );
-				} }
-			>
-				{ __( 'Edit' ) }
-			</ToolbarButton>
-		</BlockControls>
+		<ToolbarButton
+			{ ...linkProps }
+			onClick={ ( event ) => {
+				linkProps.onClick( event );
+			} }
+		>
+			{ __( 'Edit' ) }
+		</ToolbarButton>
 	);
 }
 
@@ -74,7 +72,9 @@ export const withEditBlockControls = createHigherOrderComponent(
 			<>
 				<BlockEdit { ...props } />
 				{ isDisplayed && (
-					<EditTemplatePartMenuItem attributes={ attributes } />
+					<BlockControls group="other">
+						<EditTemplatePartMenuItem attributes={ attributes } />
+					</BlockControls>
 				) }
 			</>
 		);
