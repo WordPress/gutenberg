@@ -155,13 +155,13 @@ function TemplatePreview( { content, viewType } ) {
 
 export default function DataviewsTemplates() {
 	const { params } = useLocation();
-	const { type } = params;
+	const { layout } = params;
 	const defaultView = useMemo( () => {
 		return {
 			...DEFAULT_VIEW,
-			type: type ?? DEFAULT_VIEW.type,
+			type: layout ?? DEFAULT_VIEW.type,
 		};
-	}, [ type ] );
+	}, [ layout ] );
 	const [ view, setView ] = useState( defaultView );
 	const { records: allTemplates, isResolving: isLoadingData } =
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
@@ -361,7 +361,7 @@ export default function DataviewsTemplates() {
 
 				history.push( {
 					...params,
-					type: newView.type,
+					layout: newView.type,
 				} );
 			}
 

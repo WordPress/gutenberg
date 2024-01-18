@@ -46,7 +46,7 @@ const EMPTY_ARRAY = [];
 
 function useView( postType ) {
 	const { params } = useLocation();
-	const { activeView = 'all', isCustom = 'false', type } = params;
+	const { activeView = 'all', isCustom = 'false', layout } = params;
 	const history = useHistory();
 	const selectedDefaultView = useMemo( () => {
 		const defaultView =
@@ -54,14 +54,14 @@ function useView( postType ) {
 			DEFAULT_VIEWS[ postType ].find(
 				( { slug } ) => slug === activeView
 			)?.view;
-		if ( isCustom === 'false' && type ) {
+		if ( isCustom === 'false' && layout ) {
 			return {
 				...defaultView,
-				type,
+				type: layout,
 			};
 		}
 		return defaultView;
-	}, [ isCustom, activeView, type, postType ] );
+	}, [ isCustom, activeView, layout, postType ] );
 	const [ view, setView ] = useState( selectedDefaultView );
 
 	useEffect( () => {
@@ -121,7 +121,7 @@ function useView( postType ) {
 			if ( viewToSet.type !== view?.type ) {
 				history.push( {
 					...params,
-					type: viewToSet.type,
+					layout: viewToSet.type,
 				} );
 			}
 			setView( viewToSet );

@@ -20,12 +20,12 @@ const { useLocation } = unlock( routerPrivateApis );
 export default function useLayoutAreas() {
 	const isSiteEditorLoading = useIsSiteEditorLoading();
 	const { params } = useLocation();
-	const { postType, postId, path, type, isCustom } = params ?? {};
+	const { postType, postId, path, layout, isCustom } = params ?? {};
 
 	// Regular page
 	if ( path === '/page' ) {
 		const isListLayout =
-			isCustom !== 'true' && ( ! type || type === 'list' );
+			isCustom !== 'true' && ( ! layout || layout === 'list' );
 		return {
 			areas: {
 				content: window.__experimentalAdminViews ? (
@@ -60,7 +60,7 @@ export default function useLayoutAreas() {
 		( path === '/wp_template' && window?.__experimentalAdminViews )
 	) {
 		const isListLayout =
-			isCustom !== 'true' && ( ! type || type === 'list' );
+			isCustom !== 'true' && ( ! layout || layout === 'list' );
 		return {
 			areas: {
 				content: <PageTemplates />,

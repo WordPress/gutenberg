@@ -82,7 +82,7 @@ export default function useSyncPathWithURL() {
 					postType: navigatorParams?.postType,
 					postId: navigatorParams?.postId,
 					path: undefined,
-					type: undefined,
+					layout: undefined,
 				} );
 			} else if (
 				navigatorLocation.path.startsWith( '/page/' ) &&
@@ -92,7 +92,7 @@ export default function useSyncPathWithURL() {
 					postType: 'page',
 					postId: navigatorParams?.postId,
 					path: undefined,
-					type: undefined,
+					layout: undefined,
 				} );
 			} else if ( navigatorLocation.path === '/patterns' ) {
 				updateUrlParams( {
@@ -123,7 +123,7 @@ export default function useSyncPathWithURL() {
 					postId: undefined,
 					categoryType: undefined,
 					categoryId: undefined,
-					type: undefined,
+					layout: undefined,
 					path:
 						navigatorLocation.path === '/'
 							? undefined
