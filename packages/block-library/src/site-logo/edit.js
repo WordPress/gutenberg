@@ -154,9 +154,7 @@ const SiteLogo = ( {
 
 	const img = (
 		<img
-			className={ classnames( 'custom-logo', {
-				[ borderProps.className ]: !! borderProps.className,
-			} ) }
+			className={ classnames( 'custom-logo', borderProps.className ) }
 			src={ logoUrl }
 			alt={ alt }
 			onLoad={ ( event ) => {
