@@ -482,6 +482,21 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	/**
 	 * @covers WP_REST_Font_Faces_Controller::create_item
 	 */
+	public function test_create_item_missing_parent() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/font-families/' . REST_TESTS_IMPOSSIBLY_HIGH_NUMBER . '/font-faces' );
+		$request->set_param(
+			'font_face_settings',
+			wp_json_encode( array_merge( self::$default_settings, array( 'fontWeight' => '100' ) ) )
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_post_invalid_parent', $response, 404 );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Faces_Controller::create_item
+	 */
 	public function test_create_item_with_duplicate_properties() {
 		$settings     = array(
 			'fontFamily' => '"Open Sans"',
@@ -689,10 +704,10 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	 */
 	public function test_delete_item() {
 		wp_set_current_user( self::$admin_id );
-		$font_face_id     = self::create_font_face_post( self::$font_family_id );
-		$request          = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces/' . $font_face_id );
-		$request['force'] = true;
-		$response         = rest_get_server()->dispatch( $request );
+		$font_face_id = self::create_font_face_post( self::$font_family_id );
+		$request      = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces/' . $font_face_id );
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertNull( get_post( $font_face_id ) );
@@ -724,9 +739,36 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	 */
 	public function test_delete_item_invalid_font_face_id() {
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces/' . REST_TESTS_IMPOSSIBLY_HIGH_NUMBER );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . self::$font_family_id . '/font-faces/' . REST_TESTS_IMPOSSIBLY_HIGH_NUMBER );
+		$request->set_param( 'force', true );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_post_invalid_id', $response, 404 );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Faces_Controller::delete
+	 */
+	public function test_delete_item_missing_parent() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . REST_TESTS_IMPOSSIBLY_HIGH_NUMBER . '/font-faces/' . self::$font_face_id1 );
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_post_invalid_parent', $response, 404 );
+	}
+
+	/**
+	 * @covers WP_REST_Font_Faces_Controller::get_item
+	 */
+	public function test_delete_item_invalid_parent_id() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/font-families/' . self::$other_font_family_id . '/font-faces/' . self::$font_face_id1 );
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_font_face_parent_id_mismatch', $response, 404 );
+
+		$expected_message = 'The font face does not belong to the specified font family with id of "' . self::$other_font_family_id . '"';
+		$this->assertSame( $expected_message, $response->as_error()->get_error_messages()[0], 'The message must contain the correct parent ID.' );
 	}
 
 	/**

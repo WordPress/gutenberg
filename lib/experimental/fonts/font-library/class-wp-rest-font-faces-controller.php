@@ -95,7 +95,7 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 					),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
-			),
+			)
 		);
 	}
 
@@ -282,6 +282,11 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
+		$font_family = $this->get_parent_font_family_post( $request['font_family_id'] );
+		if ( is_wp_error( $font_family ) ) {
+			return $font_family;
+		}
+
 		// Settings have already been decoded by ::sanitize_font_face_settings().
 		$settings    = $request->get_param( 'font_face_settings' );
 		$file_params = $request->get_file_params();
@@ -360,6 +365,25 @@ class WP_REST_Font_Faces_Controller extends WP_REST_Posts_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function delete_item( $request ) {
+		$post = $this->get_post( $request['id'] );
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		$font_family = $this->get_parent_font_family_post( $request['font_family_id'] );
+		if ( is_wp_error( $font_family ) ) {
+			return $font_family;
+		}
+
+		if ( (int) $font_family->ID !== (int) $post->post_parent ) {
+			return new WP_Error(
+				'rest_font_face_parent_id_mismatch',
+				/* translators: %d: A post id. */
+				sprintf( __( 'The font face does not belong to the specified font family with id of "%d"', 'gutenberg' ), $font_family->ID ),
+				array( 'status' => 404 )
+			);
+		}
+
 		$force = isset( $request['force'] ) ? (bool) $request['force'] : false;
 
 		// We don't support trashing for font faces.
