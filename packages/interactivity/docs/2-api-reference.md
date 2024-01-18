@@ -365,7 +365,7 @@ store( "myPlugin", {
 </details>
 <br/>
 
-≈
+The `wp-on` directive is executed each time the associated event is triggered.
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored.
 
@@ -389,11 +389,11 @@ _Example of `wp-on-window` directive_
 
 ```js
 store( "myPlugin", {
-  callbacks: {
-   logWidth() {
+	callbacks: {
+		logWidth() {
 			console.log( 'Window width: ', window.innerWidth );
 		},
-  },
+	},
 } );
 ```
 
@@ -402,7 +402,7 @@ store( "myPlugin", {
 
 ≈
 
-The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored.
+The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
 
 #### `wp-on-document`
 
@@ -424,8 +424,8 @@ _Example of `wp-on-document` directive_
 
 ```js
 store( "myPlugin", {
-  callbacks: {
-   logKeydown(event) {
+	callbacks: {
+		logKeydown(event) {
 			console.log( 'Key pressed: ', event.key );
 		},
   },
@@ -435,9 +435,7 @@ store( "myPlugin", {
 </details>
 <br/>
 
-≈
-
-The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored.
+The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
 
 #### `wp-watch`
 
