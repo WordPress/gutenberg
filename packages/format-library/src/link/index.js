@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useLayoutEffect } from '@wordpress/element';
 import {
 	getTextContent,
 	applyFormat,
@@ -11,6 +11,7 @@ import {
 	isCollapsed,
 	insert,
 	create,
+	useAnchor,
 } from '@wordpress/rich-text';
 import { isURL, isEmail } from '@wordpress/url';
 import {
@@ -39,6 +40,42 @@ function Edit( {
 	contentRef,
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
+	const [ clickedLink, setClickedLink ] = useState( false );
+
+	const anchorElement = useAnchor( {
+		editableContentElement: contentRef.current,
+		settings: link,
+	} );
+
+	function setClickedLinkTrue() {
+		setClickedLink( true );
+	}
+
+	function setClickedLinkFalse() {
+		setClickedLink( false );
+	}
+
+	useLayoutEffect( () => {
+		// log tagNAME of anchorElement
+		if ( anchorElement?.tagName?.toLowerCase() === 'a' ) {
+			// add an event listener to the anchorElement
+			// for a click event
+
+			anchorElement?.addEventListener( 'click', setClickedLinkTrue );
+		}
+
+		return () => {
+			// remove the event listener from the anchorElement
+			// for a click event
+			if ( anchorElement instanceof window.Element ) {
+				anchorElement?.removeEventListener(
+					'click',
+					setClickedLinkTrue
+				);
+			}
+			setClickedLinkFalse();
+		};
+	}, [ anchorElement, isActive ] );
 
 	function addLink() {
 		const text = getTextContent( slice( value ) );
@@ -108,7 +145,7 @@ function Edit( {
 					aria-expanded={ addingLink || isActive }
 				/>
 			) }
-			{ ( addingLink || isActive ) && (
+			{ ( addingLink || ( isActive && clickedLink ) ) && (
 				<InlineLinkUI
 					addingLink={ addingLink }
 					stopAddingLink={ stopAddingLink }
