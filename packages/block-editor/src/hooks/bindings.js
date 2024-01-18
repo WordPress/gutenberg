@@ -40,6 +40,9 @@ function BlockBindingsUI( props ) {
 			).getAllBlockBindingsSources(),
 		};
 	}, [] );
+	if ( ! ( blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS ) ) {
+		return null;
+	}
 
 	return (
 		<>
