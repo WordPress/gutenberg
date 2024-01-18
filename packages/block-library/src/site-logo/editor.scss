@@ -21,8 +21,6 @@
 
 	img {
 		display: block;
-		height: auto;
-		max-width: 100%;
 	}
 
 	.wp-block-image__crop-area {
@@ -165,10 +163,6 @@
 }
 
 .wp-block-site-logo.has-custom-border {
-	.reactEasyCrop_CropArea {
-		border-width: 0;
-	}
-
 	.wp-block-image__crop-area {
 		box-sizing: border-box;
 	}
