@@ -694,7 +694,7 @@ Give special visual emphasis to a quote from your text. ([Source](https://github
 
 -	**Name:** core/pullquote
 -	**Category:** text
--	**Supports:** align (full, left, right, wide), anchor, color (background, gradients, link, text), typography (fontSize, lineHeight)
+-	**Supports:** align (full, left, right, wide), anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** citation, textAlign, value
 
 ## Query Loop

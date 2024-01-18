@@ -8,10 +8,8 @@ import removeAccents from 'remove-accents';
  */
 import {
 	Icon,
-	__experimentalView as View,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	VisuallyHidden,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -79,7 +77,7 @@ const defaultConfigPerViewType = {
 };
 
 const DEFAULT_VIEW = {
-	type: LAYOUT_TABLE,
+	type: window?.__experimentalAdminViews ? LAYOUT_LIST : LAYOUT_TABLE,
 	search: '',
 	page: 1,
 	perPage: 20,
@@ -96,28 +94,19 @@ function normalizeSearchInput( input = '' ) {
 
 function TemplateTitle( { item, viewType } ) {
 	if ( viewType === LAYOUT_LIST ) {
-		return (
-			<>
-				{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
-			</>
-		);
+		return decodeEntities( item.title?.rendered ) || __( '(no title)' );
 	}
 
 	return (
-		<VStack spacing={ 1 }>
-			<View as="span" className="dataviews-view-grid__title-field">
-				<Link
-					params={ {
-						postId: item.id,
-						postType: item.type,
-						canvas: 'edit',
-					} }
-				>
-					{ decodeEntities( item.title?.rendered ) ||
-						__( '(no title)' ) }
-				</Link>
-			</View>
-		</VStack>
+		<Link
+			params={ {
+				postId: item.id,
+				postType: item.type,
+				canvas: 'edit',
+			} }
+		>
+			{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
+		</Link>
 	);
 }
 
@@ -181,6 +170,18 @@ export default function DataviewsTemplates() {
 		[ setTemplateId ]
 	);
 
+	const onDetailsChange = useCallback(
+		( items ) => {
+			if ( items?.length === 1 ) {
+				history.push( {
+					postId: items[ 0 ].id,
+					postType: TEMPLATE_POST_TYPE,
+				} );
+			}
+		},
+		[ history ]
+	);
+
 	const authors = useMemo( () => {
 		if ( ! allTemplates ) {
 			return EMPTY_ARRAY;
@@ -228,19 +229,24 @@ export default function DataviewsTemplates() {
 				getValue: ( { item } ) => item.description,
 				render: ( { item } ) => {
 					return item.description ? (
-						decodeEntities( item.description )
+						<span className="page-templates-description">
+							{ decodeEntities( item.description ) }
+						</span>
 					) : (
-						<>
-							<Text variant="muted" aria-hidden="true">
-								&#8212;
-							</Text>
-							<VisuallyHidden>
-								{ __( 'No description.' ) }
-							</VisuallyHidden>
-						</>
+						view.type === LAYOUT_TABLE && (
+							<>
+								<Text variant="muted" aria-hidden="true">
+									&#8212;
+								</Text>
+								<VisuallyHidden>
+									{ __( 'No description.' ) }
+								</VisuallyHidden>
+							</>
+						)
 					);
 				},
-				maxWidth: 200,
+				maxWidth: 400,
+				minWidth: 320,
 				enableSorting: false,
 			},
 			{
@@ -253,6 +259,7 @@ export default function DataviewsTemplates() {
 				enableHiding: false,
 				type: ENUMERATION_TYPE,
 				elements: authors,
+				width: '1%',
 			},
 		],
 		[ authors, view.type ]
@@ -374,6 +381,7 @@ export default function DataviewsTemplates() {
 					view={ view }
 					onChangeView={ onChangeView }
 					onSelectionChange={ onSelectionChange }
+					onDetailsChange={ onDetailsChange }
 					deferredRendering={
 						! view.hiddenFields?.includes( 'preview' )
 					}

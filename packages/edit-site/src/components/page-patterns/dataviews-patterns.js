@@ -4,7 +4,6 @@
 import {
 	__experimentalHStack as HStack,
 	Button,
-	__experimentalHeading as Heading,
 	Tooltip,
 	Flex,
 } from '@wordpress/components';
@@ -197,24 +196,24 @@ function Title( { item, categoryId } ) {
 					/>
 				</Tooltip>
 			) }
-			<Flex as="span" gap={ 0 } justify="left">
+			<Flex
+				as="div"
+				gap={ 0 }
+				justify="left"
+				className="edit-site-patterns__pattern-title"
+			>
 				{ item.type === PATTERN_TYPES.theme ? (
-					<span className="dataviews-view-grid__title-field">
-						{ item.title }
-					</span>
+					item.title
 				) : (
-					<Heading level={ 5 }>
-						<Button
-							variant="link"
-							onClick={ onClick }
-							// Required for the grid's roving tab index system.
-							// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
-							tabIndex="-1"
-							className="dataviews-view-grid__title-field"
-						>
-							{ item.title || item.name }
-						</Button>
-					</Heading>
+					<Button
+						variant="link"
+						onClick={ onClick }
+						// Required for the grid's roving tab index system.
+						// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
+						tabIndex="-1"
+					>
+						{ item.title || item.name }
+					</Button>
 				) }
 			</Flex>
 		</HStack>

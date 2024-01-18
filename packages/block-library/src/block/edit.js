@@ -27,6 +27,7 @@ import {
 	store as blockEditorStore,
 	BlockControls,
 } from '@wordpress/block-editor';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse, cloneBlock } from '@wordpress/blocks';
 
 /**
@@ -35,10 +36,13 @@ import { parse, cloneBlock } from '@wordpress/blocks';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
+const { PARTIAL_SYNCING_SUPPORTED_BLOCKS } = unlock( patternsPrivateApis );
 
 function isPartiallySynced( block ) {
 	return (
-		'core/paragraph' === block.name &&
+		Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
+			block.name
+		) &&
 		!! block.attributes.metadata?.bindings &&
 		Object.values( block.attributes.metadata.bindings ).some(
 			( binding ) => binding.source.name === 'pattern_attributes'
@@ -100,7 +104,7 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 			defaultValues[ blockId ] ??= {};
 			defaultValues[ blockId ][ attributeKey ] =
 				block.attributes[ attributeKey ];
-			if ( overrides[ blockId ] ) {
+			if ( overrides[ blockId ]?.[ attributeKey ] !== undefined ) {
 				newAttributes[ attributeKey ] =
 					overrides[ blockId ][ attributeKey ];
 			}
@@ -130,6 +134,8 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 				defaultValues[ blockId ][ attributeKey ]
 			) {
 				overrides[ blockId ] ??= {};
+				// TODO: We need a way to represent `undefined` in the serialized overrides.
+				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
 				overrides[ blockId ][ attributeKey ] =
 					block.attributes[ attributeKey ];
 			}
@@ -144,6 +150,13 @@ function setBlockEditMode( setEditMode, blocks, mode ) {
 			mode || ( isPartiallySynced( block ) ? 'contentOnly' : 'disabled' );
 		setEditMode( block.clientId, editMode );
 		setBlockEditMode( setEditMode, block.innerBlocks, mode );
+	} );
+}
+
+function getHasOverridableBlocks( blocks ) {
+	return blocks.some( ( block ) => {
+		if ( isPartiallySynced( block ) ) return true;
+		return getHasOverridableBlocks( block.innerBlocks );
 	} );
 }
 
@@ -208,15 +221,23 @@ export default function ReusableBlockEdit( {
 		[ innerBlocks, setBlockEditingMode ]
 	);
 
-	// Apply the initial overrides from the pattern block to the inner blocks.
-	useEffect( () => {
-		const initialBlocks =
+	const hasOverridableBlocks = useMemo(
+		() => getHasOverridableBlocks( innerBlocks ),
+		[ innerBlocks ]
+	);
+
+	const initialBlocks = useMemo(
+		() =>
 			// Clone the blocks to generate new client IDs.
 			editedRecord.blocks?.map( ( block ) => cloneBlock( block ) ) ??
 			( editedRecord.content && typeof editedRecord.content !== 'function'
 				? parse( editedRecord.content )
-				: [] );
+				: [] ),
+		[ editedRecord.blocks, editedRecord.content ]
+	);
 
+	// Apply the initial overrides from the pattern block to the inner blocks.
+	useEffect( () => {
 		defaultValuesRef.current = {};
 		const editingMode = getBlockEditingMode( patternClientId );
 		// Replace the contents of the blocks with the overrides.
@@ -237,7 +258,7 @@ export default function ReusableBlockEdit( {
 	}, [
 		__unstableMarkNextChangeAsNotPersistent,
 		patternClientId,
-		editedRecord,
+		initialBlocks,
 		replaceInnerBlocks,
 		registry,
 		getBlockEditingMode,
@@ -293,6 +314,12 @@ export default function ReusableBlockEdit( {
 		editOriginalProps.onClick( event );
 	};
 
+	const resetOverrides = () => {
+		if ( overrides ) {
+			replaceInnerBlocks( patternClientId, initialBlocks );
+		}
+	};
+
 	let children = null;
 
 	if ( hasAlreadyRendered ) {
@@ -333,6 +360,21 @@ export default function ReusableBlockEdit( {
 					</ToolbarGroup>
 				</BlockControls>
 			) }
+
+			{ hasOverridableBlocks && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ resetOverrides }
+							disabled={ ! overrides }
+							__experimentalIsFocusable
+						>
+							{ __( 'Reset to original' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+
 			{ children === null ? (
 				<div { ...innerBlocksProps } />
 			) : (

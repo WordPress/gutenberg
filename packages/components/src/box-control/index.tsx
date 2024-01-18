@@ -72,6 +72,7 @@ function useUniqueId( idProp?: string ) {
  * ```
  */
 function BoxControl( {
+	__next40pxDefaultSize = false,
 	id: idProp,
 	inputProps = defaultInputProps,
 	onChange = noop,
@@ -151,6 +152,7 @@ function BoxControl( {
 		values: inputValues,
 		onMouseOver,
 		onMouseOut,
+		__next40pxDefaultSize,
 	};
 
 	return (
