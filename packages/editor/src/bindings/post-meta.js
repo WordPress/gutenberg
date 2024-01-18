@@ -11,26 +11,26 @@ import { useSelect } from '@wordpress/data';
 import { unlock } from '../lock-unlock';
 import { store as editorStore } from '../store';
 
-function PostMetaComponent( props, selectedAttribute ) {
+function PostMetaComponent( props, blockContext, selectedAttribute ) {
 	const {
 		DropdownMenuGroupV2: DropdownMenuGroup,
 		DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 		DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
 	} = unlock( componentsPrivateApis );
-	const { context, metadata, setAttributes } = props;
+	const { metadata, setAttributes } = props;
 	// TODO: Expose the post meta in the `types` REST API endpoint and use that.
 	const data = useSelect(
 		( select ) => {
-			const postId = context.postId
-				? context.postId
+			const postId = blockContext.postId
+				? blockContext.postId
 				: select( editorStore ).getCurrentPostId();
-			const postType = context.postType
-				? context.postType
+			const postType = blockContext.postType
+				? blockContext.postType
 				: select( editorStore ).getCurrentPostType();
 			const { getEntityRecord } = select( coreStore );
 			return getEntityRecord( 'postType', postType, postId );
 		},
-		[ context.postId, context.postType ]
+		[ blockContext.postId, blockContext.postType ]
 	);
 	if ( ! data || ! data.meta ) {
 		return null;

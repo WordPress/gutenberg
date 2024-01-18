@@ -6,15 +6,16 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { useContext } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { plugins as pluginsIcon } from '@wordpress/icons';
-
 /**
  * Internal dependencies
  */
 import { BlockControls } from '../components';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
+import BlockContext from '../components/block-context';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -31,15 +32,19 @@ const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 
 function BlockBindingsUI( props ) {
 	const { name: blockName, clientId } = props;
-	const { attributes, sources } = useSelect( ( select ) => {
-		return {
-			attributes:
-				select( blockEditorStore ).getBlockAttributes( clientId ),
-			sources: unlock(
-				select( blockEditorStore )
-			).getAllBlockBindingsSources(),
-		};
-	}, [] );
+	const { attributes, sources } = useSelect(
+		( select ) => {
+			return {
+				attributes:
+					select( blockEditorStore ).getBlockAttributes( clientId ),
+				sources: unlock(
+					select( blockEditorStore )
+				).getAllBlockBindingsSources(),
+			};
+		},
+		[ clientId ]
+	);
+	const blockContext = useContext( BlockContext );
 	if ( ! ( blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS ) ) {
 		return null;
 	}
@@ -94,6 +99,7 @@ function BlockBindingsUI( props ) {
 												>
 													{ source.component(
 														props,
+														blockContext,
 														attribute
 													) }
 												</DropdownMenu>
