@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalView as View,
-	__experimentalVStack as VStack,
-	Button,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -82,10 +78,21 @@ function useView( type ) {
 	const { editEntityRecord } = useDispatch( coreStore );
 
 	const customView = useMemo( () => {
-		return (
-			editedViewRecord?.content && JSON.parse( editedViewRecord?.content )
-		);
+		const storedView =
+			editedViewRecord?.content &&
+			JSON.parse( editedViewRecord?.content );
+		if ( ! storedView ) {
+			return storedView;
+		}
+
+		return {
+			...storedView,
+			layout: {
+				...( DEFAULT_CONFIG_PER_VIEW_TYPE[ storedView?.type ] || {} ),
+			},
+		};
 	}, [ editedViewRecord?.content ] );
+
 	const setCustomView = useCallback(
 		( viewToSet ) => {
 			editEntityRecord(
@@ -224,32 +231,22 @@ export default function PagePages() {
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => {
-					return (
-						<VStack spacing={ 1 }>
-							<View
-								as="span"
-								className="dataviews-view-grid__title-field"
-							>
-								{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
-									view.type
-								) ? (
-									<Link
-										params={ {
-											postId: item.id,
-											postType: item.type,
-											canvas: 'edit',
-										} }
-									>
-										{ decodeEntities(
-											item.title?.rendered
-										) || __( '(no title)' ) }
-									</Link>
-								) : (
-									decodeEntities( item.title?.rendered ) ||
-									__( '(no title)' )
-								) }
-							</View>
-						</VStack>
+					return [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
+						view.type
+					) ? (
+						<Link
+							params={ {
+								postId: item.id,
+								postType: item.type,
+								canvas: 'edit',
+							} }
+						>
+							{ decodeEntities( item.title?.rendered ) ||
+								__( '(no title)' ) }
+						</Link>
+					) : (
+						decodeEntities( item.title?.rendered ) ||
+							__( '(no title)' )
 					);
 				},
 				maxWidth: 400,

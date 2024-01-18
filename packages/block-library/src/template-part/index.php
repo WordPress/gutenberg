@@ -281,8 +281,8 @@ function register_block_core_template_part() {
 	register_block_type_from_metadata(
 		__DIR__ . '/template-part',
 		array(
-			'render_callback' => 'render_block_core_template_part',
-			'variations'      => build_template_part_block_variations(),
+			'render_callback'    => 'render_block_core_template_part',
+			'variation_callback' => 'build_template_part_block_variations',
 		)
 	);
 }

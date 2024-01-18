@@ -76,6 +76,7 @@ export default function SidebarNavigationScreenPagesDataViews() {
 	return (
 		<SidebarNavigationScreen
 			title={ __( 'Pages' ) }
+			description={ __( 'Browse and manage pages.' ) }
 			content={ <DataViewsSidebarContent /> }
 			footer={
 				<VStack spacing={ 0 }>
