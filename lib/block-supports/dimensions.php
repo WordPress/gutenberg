@@ -103,6 +103,11 @@ function gutenberg_render_dimensions_support( $block_content, $block ) {
 		isset( $dimensions_block_styles['aspectRatio'] )
 	) {
 		$dimensions_block_styles['minHeight'] = 'unset';
+	} elseif (
+		isset( $block_attributes['style']['dimensions']['minHeight'] ) ||
+		isset( $block_attributes['minHeight'] )
+	) {
+		$dimensions_block_styles['aspectRatio'] = 'unset';
 	}
 
 	$styles = gutenberg_style_engine_get_styles( array( 'dimensions' => $dimensions_block_styles ) );
