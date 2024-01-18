@@ -11,7 +11,8 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { CustomSelect, CustomSelectItem } from '..';
+import CustomSelect from '../custom-select';
+import { CustomSelectItem } from '..';
 
 const meta: Meta< typeof CustomSelect > = {
 	title: 'Components (Experimental)/CustomSelectControl v2',

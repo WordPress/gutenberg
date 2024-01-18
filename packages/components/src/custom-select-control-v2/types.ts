@@ -3,6 +3,12 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type * as Ariakit from '@ariakit/react';
+/**
+ * Internal dependencies
+ */
+import type { useDeprecatedProps } from './use-deprecated-props';
+
+export type LegacyAdapterProps = Parameters< typeof useDeprecatedProps >[ 0 ];
 
 export type CustomSelectContext =
 	| {
@@ -47,6 +53,48 @@ export type CustomSelectProps = {
 	 * Can be used to externally control the value of the control.
 	 */
 	value?: string | string[];
+};
+/**
+ * The legacy object structure for the options array.
+ */
+type Option = {
+	key: string;
+	name: string;
+	style?: {};
+	className?: string;
+	__experimentalHint?: string;
+};
+
+/**
+ * The legacy object returned from the onChange event.
+ */
+type OnChangeObject = {
+	selectedItem: Option;
+};
+
+export type LegacyCustomSelectProps = {
+	/**
+	 * Label for the control.
+	 */
+	label: string;
+	/**
+	 * A function that receives the new value of the input.
+	 */
+	onChange?: ( newValue: OnChangeObject ) => void;
+	/**
+	 * The options that can be chosen from.
+	 */
+	options: Array< Option >;
+	/**
+	 * The size of the control.
+	 *
+	 * @default 'default'
+	 */
+	size?: CustomSelectProps[ 'size' ];
+	/**
+	 * Can be used to externally control the value of the control.
+	 */
+	value?: Option;
 };
 
 export type CustomSelectItemProps = {
