@@ -110,6 +110,10 @@ function MediaContainer( props, ref ) {
 		onSelectMedia,
 		onWidthChange,
 		enableResize,
+		imageWidth,
+		imageHeight,
+		imageScale,
+		imageAspectRatio,
 	} = props;
 
 	const isTemporaryMedia = ! mediaId && isBlobURL( mediaUrl );
@@ -138,7 +142,18 @@ function MediaContainer( props, ref ) {
 				: {};
 
 		const mediaTypeRenderers = {
-			image: () => <img src={ mediaUrl } alt={ mediaAlt } />,
+			image: () => (
+				<img
+					src={ mediaUrl }
+					alt={ mediaAlt }
+					width={ imageWidth }
+					height={ imageHeight }
+					style={ {
+						objectFit: imageScale,
+						aspectRatio: imageAspectRatio,
+					} }
+				/>
+			),
 			video: () => <video controls src={ mediaUrl } />,
 		};
 

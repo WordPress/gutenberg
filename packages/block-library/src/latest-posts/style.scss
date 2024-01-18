@@ -59,9 +59,15 @@
 		display: inline-block;
 	}
 	img {
-		height: auto;
-		width: auto;
 		max-width: 100%;
+
+		&:not([width]) {
+			width: auto;
+		}
+
+		&:not([height]) {
+			height: auto;
+		}
 	}
 	&.alignleft {
 		/*rtl:ignore*/

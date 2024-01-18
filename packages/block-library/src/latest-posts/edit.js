@@ -16,16 +16,19 @@ import {
 	Spinner,
 	ToggleControl,
 	ToolbarGroup,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { dateI18n, format, getSettings } from '@wordpress/date';
 import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockControls,
-	__experimentalImageSizeControl as ImageSizeControl,
 	useBlockProps,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
@@ -43,6 +46,8 @@ import {
 	MAX_POSTS_COLUMNS,
 } from './constants';
 
+import { unlock } from '../lock-unlock';
+
 /**
  * Module Constants
  */
@@ -55,6 +60,21 @@ const USERS_LIST_QUERY = {
 	has_published_posts: [ 'post' ],
 	context: 'view',
 };
+
+const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
+
+const scaleOptions = [
+	{
+		value: 'cover',
+		label: _x( 'Cover', 'Scale option for dimensions control' ),
+		help: __( 'Image covers the space evenly.' ),
+	},
+	{
+		value: 'contain',
+		label: _x( 'Contain', 'Scale option for dimensions control' ),
+		help: __( 'Image is contained without distortion.' ),
+	},
+];
 
 function getFeaturedImageDetails( post, size ) {
 	const image = post._embedded?.[ 'wp:featuredmedia' ]?.[ '0' ];
@@ -87,16 +107,11 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		featuredImageSizeSlug,
 		featuredImageSizeWidth,
 		featuredImageSizeHeight,
+		featuredImageScale,
+		featuredImageAspectRation,
 		addLinkToFeaturedImage,
 	} = attributes;
-	const {
-		imageSizes,
-		latestPosts,
-		defaultImageWidth,
-		defaultImageHeight,
-		categoriesList,
-		authorList,
-	} = useSelect(
+	const { imageSizes, latestPosts, categoriesList, authorList } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getUsers } = select( coreStore );
 			const settings = select( blockEditorStore ).getSettings();
@@ -116,12 +131,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			);
 
 			return {
-				defaultImageWidth:
-					settings.imageDimensions?.[ featuredImageSizeSlug ]
-						?.width ?? 0,
-				defaultImageHeight:
-					settings.imageDimensions?.[ featuredImageSizeSlug ]
-						?.height ?? 0,
 				imageSizes: settings.imageSizes,
 				latestPosts: getEntityRecords(
 					'postType',
@@ -197,6 +206,19 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		setAttributes( { categories: allCategories } );
 	};
 
+	const updateImage = ( newSizeSlug ) => {
+		setAttributes( {
+			featuredImageSizeSlug: newSizeSlug,
+		} );
+	};
+
+	// TODO: Can allow more units after figuring out how they should interact
+	// with the ResizableBox and ImageEditor components. Calculations later on
+	// for those components are currently assuming px units.
+	const dimensionsUnitsOptions = useCustomUnits( {
+		availableUnits: [ 'px' ],
+	} );
+
 	const hasPosts = !! latestPosts?.length;
 	const inspectorControls = (
 		<InspectorControls>
@@ -261,75 +283,116 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				/>
 			</PanelBody>
 
-			<PanelBody title={ __( 'Featured image' ) }>
-				<ToggleControl
-					__nextHasNoMarginBottom
-					label={ __( 'Display featured image' ) }
-					checked={ displayFeaturedImage }
-					onChange={ ( value ) =>
-						setAttributes( { displayFeaturedImage: value } )
+			<ToolsPanel label={ __( 'Featured image' ) }>
+				<ToolsPanelItem
+					label={ __( 'Featured image' ) }
+					isShownByDefault={ true }
+					hasValue={ () => displayFeaturedImage === true }
+					onDeselect={ () =>
+						setAttributes( { displayFeaturedImage: false } )
 					}
-				/>
+				>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Display featured image' ) }
+						checked={ displayFeaturedImage }
+						onChange={ ( value ) =>
+							setAttributes( { displayFeaturedImage: value } )
+						}
+					/>
+				</ToolsPanelItem>
 				{ displayFeaturedImage && (
 					<>
-						<ImageSizeControl
-							onChange={ ( value ) => {
-								const newAttrs = {};
-								if ( value.hasOwnProperty( 'width' ) ) {
-									newAttrs.featuredImageSizeWidth =
-										value.width;
-								}
-								if ( value.hasOwnProperty( 'height' ) ) {
-									newAttrs.featuredImageSizeHeight =
-										value.height;
-								}
-								setAttributes( newAttrs );
+						<DimensionsTool
+							value={ {
+								width: featuredImageSizeWidth,
+								height: featuredImageSizeHeight,
+								scale: featuredImageScale,
+								aspectRatio: featuredImageAspectRation,
 							} }
-							slug={ featuredImageSizeSlug }
-							width={ featuredImageSizeWidth }
-							height={ featuredImageSizeHeight }
-							imageWidth={ defaultImageWidth }
-							imageHeight={ defaultImageHeight }
-							imageSizeOptions={ imageSizeOptions }
-							imageSizeHelp={ __(
-								'Select the size of the source image.'
-							) }
-							onChangeImage={ ( value ) =>
+							onChange={ ( {
+								width: newWidth,
+								height: newHeight,
+								scale: newScale,
+								aspectRatio: newAspectRatio,
+							} ) => {
+								// Rebuilding the object forces setting `undefined`
+								// for values that are removed since setAttributes
+								// doesn't do anything with keys that aren't set.
 								setAttributes( {
-									featuredImageSizeSlug: value,
-									featuredImageSizeWidth: undefined,
-									featuredImageSizeHeight: undefined,
+									// CSS includes `height: auto`, but we need
+									// `width: auto` to fix the aspect ratio when
+									// only height is set due to the width and
+									// height attributes set via the server.
+									featuredImageSizeWidth:
+										! newWidth && newHeight
+											? 'auto'
+											: newWidth,
+									featuredImageSizeHeight: newHeight,
+									featuredImageScale: newScale,
+									featuredImageAspectRation: newAspectRatio,
+								} );
+							} }
+							defaultScale="cover"
+							defaultAspectRatio="auto"
+							scaleOptions={ scaleOptions }
+							unitsOptions={ dimensionsUnitsOptions }
+						/>
+						<ResolutionTool
+							value={ featuredImageSizeSlug }
+							onChange={ updateImage }
+							options={ imageSizeOptions }
+						/>
+						<ToolsPanelItem
+							label={ __( 'Image alignment' ) }
+							isShownByDefault={ displayFeaturedImage }
+							hasValue={ () => featuredImageAlign !== undefined }
+							onDeselect={ () =>
+								setAttributes( {
+									featuredImageAlign: undefined,
 								} )
 							}
-						/>
-						<BaseControl className="editor-latest-posts-image-alignment-control">
-							<BaseControl.VisualLabel>
-								{ __( 'Image alignment' ) }
-							</BaseControl.VisualLabel>
-							<BlockAlignmentToolbar
-								value={ featuredImageAlign }
+						>
+							<BaseControl className="editor-latest-posts-image-alignment-control">
+								<BaseControl.VisualLabel>
+									{ __( 'Image alignment' ) }
+								</BaseControl.VisualLabel>
+								<BlockAlignmentToolbar
+									value={ featuredImageAlign }
+									onChange={ ( value ) =>
+										setAttributes( {
+											featuredImageAlign: value,
+										} )
+									}
+									controls={ [ 'left', 'center', 'right' ] }
+									isCollapsed={ false }
+								/>
+							</BaseControl>
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							label={ __( 'Add link to featured image' ) }
+							isShownByDefault={ displayFeaturedImage }
+							hasValue={ () => addLinkToFeaturedImage === true }
+							onDeselect={ () =>
+								setAttributes( {
+									addLinkToFeaturedImage: false,
+								} )
+							}
+						>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Add link to featured image' ) }
+								checked={ addLinkToFeaturedImage }
 								onChange={ ( value ) =>
 									setAttributes( {
-										featuredImageAlign: value,
+										addLinkToFeaturedImage: value,
 									} )
 								}
-								controls={ [ 'left', 'center', 'right' ] }
-								isCollapsed={ false }
 							/>
-						</BaseControl>
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Add link to featured image' ) }
-							checked={ addLinkToFeaturedImage }
-							onChange={ ( value ) =>
-								setAttributes( {
-									addLinkToFeaturedImage: value,
-								} )
-							}
-						/>
+						</ToolsPanelItem>
 					</>
 				) }
-			</PanelBody>
+			</ToolsPanel>
 
 			<PanelBody title={ __( 'Sorting and filtering' ) }>
 				<QueryControls
@@ -465,9 +528,11 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 						<img
 							src={ imageSourceUrl }
 							alt={ featuredImageAlt }
+							width={ featuredImageSizeWidth }
+							height={ featuredImageSizeHeight }
 							style={ {
-								maxWidth: featuredImageSizeWidth,
-								maxHeight: featuredImageSizeHeight,
+								objectFit: featuredImageScale,
+								aspectRatio: featuredImageAspectRation,
 							} }
 						/>
 					);
