@@ -8,6 +8,7 @@ export { store } from './store';
 export { directive, getContext, getElement } from './hooks';
 export { navigate, prefetch } from './router';
 export {
+	withScope,
 	useWatch,
 	useInit,
 	useEffect,

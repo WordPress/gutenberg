@@ -71,7 +71,35 @@ export function useSignalEffect( callback ) {
  * @param {Function} func The passed function.
  * @return {Function} The wrapped function.
  */
-const withScope = ( func ) => {
+export const withScope = ( func ) => {
+	// Check if the property is a generator. If it is, we turn it into an
+	// asynchronous function where we restore the default namespace and scope
+	// each time it awaits/yields.
+	if ( func?.constructor?.name === 'GeneratorFunction' ) {
+		return async ( args ) => {
+			const scope = getScope();
+			const gen = func( ...args );
+			let value;
+			let it;
+			while ( true ) {
+				setScope( scope );
+				try {
+					it = gen.next( value );
+				} finally {
+					resetScope();
+				}
+				try {
+					value = await it.value;
+				} catch ( e ) {
+					gen.throw( e );
+				}
+
+				if ( it.done ) break;
+			}
+			return value;
+		};
+	}
+	// We asume is a function.
 	const scope = getScope();
 	return ( ...args ) => {
 		setScope( scope );
