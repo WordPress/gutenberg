@@ -450,7 +450,7 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 	} );
 
-	test( 'should select, duplicate, delete, and deselect blocks using keyboard', async ( {
+	test( 'should cut, copy, paste, select, duplicate, delete, and deselect blocks using keyboard', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -807,6 +807,100 @@ test.describe( 'List View', () => {
 			.toMatchObject( [
 				{ name: 'core/heading', selected: false, focused: false },
 				{ name: 'core/file', selected: false, focused: true },
+			] );
+
+		// Copy and paste blocks. To begin, add another Group block.
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{ name: 'core/paragraph' },
+				{ name: 'core/pullquote' },
+			],
+		} );
+
+		// Click the newly inserted Group block List View item to ensure it is focused.
+		await listView
+			.getByRole( 'link', {
+				name: 'Group',
+				expanded: false,
+			} )
+			.click();
+
+		// Move down to group block, expand, and then move to the paragraph block.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await pageUtils.pressKeys( 'primary+c' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'Should be able to copy focused block and paste in the list view via keyboard shortcuts'
+			)
+			.toMatchObject( [
+				{ name: 'core/heading', selected: false, focused: false },
+				{ name: 'core/file', selected: false, focused: false },
+				{
+					name: 'core/group',
+					selected: true,
+					innerBlocks: [
+						{
+							name: 'core/pullquote',
+							selected: false,
+							focused: true,
+						},
+						{
+							name: 'core/pullquote',
+							selected: false,
+							focused: false,
+						},
+					],
+				},
+			] );
+
+		// Cut and paste blocks.
+		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+x' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'Should be able to cut a block in the list view, with the preceding block being selected'
+			)
+			.toMatchObject( [
+				{ name: 'core/heading', selected: false, focused: false },
+				{ name: 'core/file', selected: true, focused: true },
+			] );
+
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'Should be able to paste previously cut block in the list view via keyboard shortcuts'
+			)
+			.toMatchObject( [
+				{ name: 'core/heading', selected: false, focused: false },
+				{
+					name: 'core/group',
+					selected: true,
+					focused: true,
+					innerBlocks: [
+						{
+							name: 'core/pullquote',
+							selected: false,
+							focused: false,
+						},
+						{
+							name: 'core/pullquote',
+							selected: false,
+							focused: false,
+						},
+					],
+				},
 			] );
 	} );
 
