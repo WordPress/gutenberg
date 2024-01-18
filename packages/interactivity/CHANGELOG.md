@@ -10,6 +10,7 @@
 ### New Features
 
 -   Add the `data-wp-run` directive along with the `useInit` and `useWatch` hooks. ([57805](https://github.com/WordPress/gutenberg/pull/57805))
+-   Add `wp-data-on-window` and `wp-data-on-document` directives. ([57931](https://github.com/WordPress/gutenberg/pull/57931))
 
 ### Breaking Changes
 
