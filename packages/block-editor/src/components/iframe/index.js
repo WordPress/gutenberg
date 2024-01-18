@@ -28,7 +28,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
-import { useCompatibilityStyles } from './use-compatibility-styles';
+import { getCompatibilityStyles } from './get-compatibility-styles';
 import { store as blockEditorStore } from '../../store';
 
 function bubbleEvent( event, Constructor, frame ) {
@@ -121,7 +121,6 @@ function Iframe( {
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
-	const compatStyles = useCompatibilityStyles();
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 	const [ contentResizeListener, { height: contentHeight } ] =
@@ -156,7 +155,7 @@ function Iframe( {
 
 			contentDocument.dir = ownerDocument.dir;
 
-			for ( const compatStyle of compatStyles ) {
+			for ( const compatStyle of getCompatibilityStyles() ) {
 				if ( contentDocument.getElementById( compatStyle.id ) ) {
 					continue;
 				}

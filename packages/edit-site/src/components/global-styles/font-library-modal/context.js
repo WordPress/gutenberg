@@ -213,14 +213,13 @@ function FontLibraryProvider( { children } ) {
 				'settings.typography.fontFamilies',
 			] );
 			refreshLibrary();
-			setIsInstalling( false );
-
 			return response;
 		} catch ( error ) {
-			setIsInstalling( false );
 			return {
 				errors: [ error ],
 			};
+		} finally {
+			setIsInstalling( false );
 		}
 	}
 

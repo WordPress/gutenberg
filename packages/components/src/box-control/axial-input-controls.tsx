@@ -20,6 +20,7 @@ const groupedSides = [ 'vertical', 'horizontal' ] as const;
 type GroupedSide = ( typeof groupedSides )[ number ];
 
 export default function AxialInputControls( {
+	__next40pxDefaultSize,
 	onChange,
 	onFocus,
 	values,
@@ -105,6 +106,7 @@ export default function AxialInputControls( {
 						<Tooltip placement="top-end" text={ LABELS[ side ] }>
 							<StyledUnitControl
 								{ ...props }
+								__next40pxDefaultSize={ __next40pxDefaultSize }
 								className="component-box-control__unit-control"
 								id={ inputId }
 								isPressEnterToChange
@@ -126,6 +128,7 @@ export default function AxialInputControls( {
 						</Tooltip>
 						<FlexedRangeControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize={ __next40pxDefaultSize }
 							aria-controls={ inputId }
 							label={ LABELS[ side ] }
 							hideLabelFromVision

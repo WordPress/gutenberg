@@ -8,10 +8,8 @@ import removeAccents from 'remove-accents';
  */
 import {
 	Icon,
-	__experimentalView as View,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	VisuallyHidden,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -96,28 +94,19 @@ function normalizeSearchInput( input = '' ) {
 
 function TemplateTitle( { item, viewType } ) {
 	if ( viewType === LAYOUT_LIST ) {
-		return (
-			<>
-				{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
-			</>
-		);
+		return decodeEntities( item.title?.rendered ) || __( '(no title)' );
 	}
 
 	return (
-		<VStack spacing={ 1 }>
-			<View as="span" className="dataviews-view-grid__title-field">
-				<Link
-					params={ {
-						postId: item.id,
-						postType: item.type,
-						canvas: 'edit',
-					} }
-				>
-					{ decodeEntities( item.title?.rendered ) ||
-						__( '(no title)' ) }
-				</Link>
-			</View>
-		</VStack>
+		<Link
+			params={ {
+				postId: item.id,
+				postType: item.type,
+				canvas: 'edit',
+			} }
+		>
+			{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
+		</Link>
 	);
 }
 
@@ -227,18 +216,18 @@ export default function DataviewsTemplates() {
 				id: 'description',
 				getValue: ( { item } ) => item.description,
 				render: ( { item } ) => {
-					return item.description ? (
-						decodeEntities( item.description )
-					) : (
-						<>
-							<Text variant="muted" aria-hidden="true">
-								&#8212;
-							</Text>
-							<VisuallyHidden>
-								{ __( 'No description.' ) }
-							</VisuallyHidden>
-						</>
-					);
+					return item.description
+						? decodeEntities( item.description )
+						: view.type === LAYOUT_TABLE && (
+								<>
+									<Text variant="muted" aria-hidden="true">
+										&#8212;
+									</Text>
+									<VisuallyHidden>
+										{ __( 'No description.' ) }
+									</VisuallyHidden>
+								</>
+						  );
 				},
 				maxWidth: 200,
 				enableSorting: false,
