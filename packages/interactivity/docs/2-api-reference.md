@@ -375,7 +375,7 @@ It allows to attach global window events like `resize`, `copy`, `focus` and then
 
 [List of supported window events.](https://developer.mozilla.org/en-US/docs/Web/API/Window#events)
 
-> The syntax of this directive is `data-wp-on--[window-event]` (like `data-wp-on-window--resize`
+> The syntax of this directive is `data-wp-on-window--[window-event]` (like `data-wp-on-window--resize`
 or `data-wp-on-window--languagechange`).
 
 _Example of `wp-on-window` directive_
@@ -400,8 +400,6 @@ store( "myPlugin", {
 </details>
 <br/>
 
-≈
-
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
 
 #### `wp-on-document`
@@ -411,7 +409,7 @@ It allows to attach global document events like `scroll`, `mousemove`, `keydown`
 [List of supported document events.](https://developer.mozilla.org/en-US/docs/Web/API/Document#events)
 
 > The syntax of this directive is `data-wp-on-document--[document-event]` (like `data-wp-on-document--keydown`
-or `data-wp-on-document--languagechange`).
+or `data-wp-on-document--selectionchange`).
 
 _Example of `wp-on-document` directive_
 
