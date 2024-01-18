@@ -127,15 +127,14 @@ if ( ! function_exists( 'get_template_parts_that_use_menu' ) ) {
 	 * @return array template parts that use the menu
 	 */
 	function get_template_parts_that_use_menu( $wp_navigation_id ) {
-		// get all wp_template_part posts.
+
 		$wp_template_part_posts = get_posts(
 			array(
 				'post_type'      => 'wp_template_part',
 				'posts_per_page' => -1,
 			)
 		);
-		// loop through them and find the ones that have a navigation block,
-		// with the ref attribute set to $wp_navigation_id.
+
 		$wp_template_part_posts_with_navigation = array();
 		foreach ( $wp_template_part_posts as $wp_template_part_post ) {
 			$found_navigation = html_contains_block(
