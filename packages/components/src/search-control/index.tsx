@@ -31,6 +31,7 @@ function UnforwardedSearchControl(
 		className,
 		onChange,
 		value,
+		label = __( 'Search' ),
 		placeholder = __( 'Search' ),
 		hideLabelFromVision = true,
 		onClose,
@@ -86,6 +87,7 @@ function UnforwardedSearchControl(
 				__next40pxDefaultSize
 				id={ instanceId }
 				hideLabelFromVision={ hideLabelFromVision }
+				label={ label }
 				ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
 				type="search"
 				size={ size }

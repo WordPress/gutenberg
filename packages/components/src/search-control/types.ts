@@ -3,10 +3,7 @@
  */
 import type { InputControlProps } from '../input-control/types';
 
-export type SearchControlProps = Pick<
-	InputControlProps,
-	'help' | 'label' | 'value'
-> & {
+export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
 	/**
 	 * @deprecated This is now the default.
 	 * @ignore
@@ -24,6 +21,12 @@ export type SearchControlProps = Pick<
 	 * @default true
 	 */
 	hideLabelFromVision?: InputControlProps[ 'hideLabelFromVision' ];
+	/**
+	 * The accessible label for the input.
+	 *
+	 * @default 'Search'
+	 */
+	label?: string;
 	/**
 	 * A function that receives the value of the input when the value is changed.
 	 */
