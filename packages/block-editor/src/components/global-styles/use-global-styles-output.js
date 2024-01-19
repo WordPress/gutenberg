@@ -21,7 +21,6 @@ import {
 	ROOT_BLOCK_SELECTOR,
 	scopeSelector,
 	appendToSelector,
-	getMergedVariation,
 } from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
 import {
@@ -673,14 +672,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 				const variations = {};
 
 				Object.entries( node.variations ).forEach(
-					( [ variationName, variationNode ] ) => {
-						const variation = getMergedVariation(
-							variationNode,
-							tree
-						);
+					( [ variationName, variation ] ) => {
 						variations[ variationName ] =
 							pickStyleKeys( variation );
-
 						const variationSelector =
 							blockSelectors[ blockName ].styleVariationSelectors[
 								variationName
