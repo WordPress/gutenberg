@@ -18,7 +18,7 @@ import {
 	getSettings,
 	canInsertBlockType,
 } from './selectors';
-import { checkAllowListRecursive } from './utils';
+import { checkAllowListRecursive, getAllPatternsDependants } from './utils';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { store } from './';
 import { unlock } from '../lock-unlock';
@@ -283,7 +283,7 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 			} );
 		},
 		( state, rootClientId ) => [
-			state.blockPatterns,
+			getAllPatternsDependants( state ),
 			state.settings.allowedBlockTypes,
 			state.settings.templateLock,
 			state.blockListSettings[ rootClientId ],
@@ -293,53 +293,42 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 );
 
 export const getAllPatterns = createRegistrySelector( ( select ) =>
-	createSelector(
-		( state ) => {
-			// This setting is left for back compat.
-			const {
-				__experimentalBlockPatterns,
-				__experimentalFetchBlockPatterns,
-				__experimentalUserPatternCategories = [],
-				__experimentalReusableBlocks = [],
-			} = state.settings;
-			const userPatterns = ( __experimentalReusableBlocks ?? [] ).map(
-				( userPattern ) => {
-					return {
-						name: `core/block/${ userPattern.id }`,
-						id: userPattern.id,
-						type: INSERTER_PATTERN_TYPES.user,
-						title: userPattern.title.raw,
-						categories: userPattern.wp_pattern_category.map(
-							( catId ) => {
-								const category = (
-									__experimentalUserPatternCategories ?? []
-								).find( ( { id } ) => id === catId );
-								return category ? category.slug : catId;
-							}
-						),
-						content: userPattern.content.raw,
-						syncStatus: userPattern.wp_pattern_sync_status,
-					};
-				}
-			);
-			return [
-				...userPatterns,
-				...__experimentalBlockPatterns,
-				...unlock( select( store ) ).getFetchedPatterns(
-					__experimentalFetchBlockPatterns
-				),
-			];
-		},
-		( state ) => {
-			return [
-				state.settings.__experimentalBlockPatterns,
-				state.settings.__experimentalUserPatternCategories,
-				state.settings.__experimentalReusableBlocks,
-				state.settings.__experimentalFetchBlockPatterns,
-				state.blockPatterns,
-			];
-		}
-	)
+	createSelector( ( state ) => {
+		// This setting is left for back compat.
+		const {
+			__experimentalBlockPatterns,
+			__experimentalFetchBlockPatterns,
+			__experimentalUserPatternCategories = [],
+			__experimentalReusableBlocks = [],
+		} = state.settings;
+		const userPatterns = ( __experimentalReusableBlocks ?? [] ).map(
+			( userPattern ) => {
+				return {
+					name: `core/block/${ userPattern.id }`,
+					id: userPattern.id,
+					type: INSERTER_PATTERN_TYPES.user,
+					title: userPattern.title.raw,
+					categories: userPattern.wp_pattern_category.map(
+						( catId ) => {
+							const category = (
+								__experimentalUserPatternCategories ?? []
+							).find( ( { id } ) => id === catId );
+							return category ? category.slug : catId;
+						}
+					),
+					content: userPattern.content.raw,
+					syncStatus: userPattern.wp_pattern_sync_status,
+				};
+			}
+		);
+		return [
+			...userPatterns,
+			...__experimentalBlockPatterns,
+			...unlock( select( store ) ).getFetchedPatterns(
+				__experimentalFetchBlockPatterns
+			),
+		];
+	}, getAllPatternsDependants )
 );
 
 /**

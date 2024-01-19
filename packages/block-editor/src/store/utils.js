@@ -39,3 +39,13 @@ export const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 
 	return true;
 };
+
+export const getAllPatternsDependants = ( state ) => {
+	return [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.__experimentalUserPatternCategories,
+		state.settings.__experimentalReusableBlocks,
+		state.settings.__experimentalFetchBlockPatterns,
+		state.blockPatterns,
+	];
+};
