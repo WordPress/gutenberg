@@ -20,6 +20,14 @@ import { unlock } from '../lock-unlock';
  *
  * @return {WPHigherOrderComponent} Higher-order component.
  */
+
+const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
+	'core/paragraph': [ 'content' ],
+	'core/heading': [ 'content' ],
+	'core/image': [ 'url', 'title' ],
+	'core/button': [ 'url', 'text' ],
+};
+
 const createEditFunctionWithBindingsAttribute = () =>
 	createHigherOrderComponent(
 		( BlockEdit ) => ( props ) => {
@@ -49,12 +57,23 @@ const createEditFunctionWithBindingsAttribute = () =>
 						);
 
 						if ( source ) {
-							// Second argument (`setValue`) will be used to update the value in the future.
-							const [ value ] = source.useSource(
+							// Second argument (`updateMetaValue`) will be used to update the value in the future.
+							const {
+								placeholder,
+								useValue: [ metaValue = null ] = [],
+							} = source.useSource(
 								props,
 								settings.source.attributes
 							);
-							updatedAttributes[ attributeName ] = value;
+
+							if ( placeholder ) {
+								updatedAttributes.placeholder = placeholder;
+								updatedAttributes[ attributeName ] = null;
+							}
+
+							if ( metaValue ) {
+								updatedAttributes[ attributeName ] = metaValue;
+							}
 						}
 					}
 				);
@@ -89,6 +108,9 @@ const createEditFunctionWithBindingsAttribute = () =>
  * @return {WPBlockSettings} Filtered block settings.
  */
 function shimAttributeSource( settings ) {
+	if ( ! ( settings.name in BLOCK_BINDINGS_ALLOWED_BLOCKS ) ) {
+		return settings;
+	}
 	settings.edit = createEditFunctionWithBindingsAttribute()( settings.edit );
 
 	return settings;
