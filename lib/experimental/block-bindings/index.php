@@ -5,9 +5,8 @@
  * @package gutenberg
  */
 
-require_once __DIR__ . '/sources/index.php';
-require_once __DIR__ . '/html-processing.php';
-
+require_once __DIR__ . '/class-wp-block-bindings.php';
+require_once __DIR__ . '/block-bindings.php';
 // Register the sources.
 $gutenberg_experiments = get_option( 'gutenberg-experiments' );
 if ( $gutenberg_experiments ) {

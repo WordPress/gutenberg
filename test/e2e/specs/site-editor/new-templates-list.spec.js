@@ -7,18 +7,22 @@ test.describe( 'Templates', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
-			requestUtils.activatePlugin( 'gutenberg-test-dataviews' ),
+			requestUtils.setGutenbergExperiments( [ 'gutenberg-dataviews' ] ),
 		] );
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
-			requestUtils.deactivatePlugin( 'gutenberg-test-dataviews' ),
 			requestUtils.deleteAllTemplates( 'wp_template' ),
+			requestUtils.setGutenbergExperiments( [] ),
 		] );
 	} );
 	test( 'Sorting', async ( { admin, page } ) => {
-		await admin.visitSiteEditor( { path: '/wp_template/all' } );
+		await admin.visitSiteEditor( { path: '/wp_template' } );
+		// Switch to table layout.
+		await page.getByLabel( 'View options' ).click();
+		await page.getByRole( 'menuitem', { name: 'Layout' } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 		// Descending by title.
 		await page
 			.getByRole( 'button', { name: 'Template', exact: true } )
@@ -48,7 +52,13 @@ test.describe( 'Templates', () => {
 			title: 'Date Archives',
 			content: 'hi',
 		} );
-		await admin.visitSiteEditor( { path: '/wp_template/all' } );
+		await admin.visitSiteEditor( { path: '/wp_template' } );
+
+		// Switch to table layout.
+		await page.getByLabel( 'View options' ).click();
+		await page.getByRole( 'menuitem', { name: 'Layout' } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+
 		// Global search.
 		await page.getByRole( 'searchbox', { name: 'Filter list' } ).click();
 		await page.keyboard.type( 'tag' );
@@ -84,7 +94,13 @@ test.describe( 'Templates', () => {
 		await expect( titles ).toHaveCount( 2 );
 	} );
 	test( 'Field visibility', async ( { admin, page } ) => {
-		await admin.visitSiteEditor( { path: '/wp_template/all' } );
+		await admin.visitSiteEditor( { path: '/wp_template' } );
+
+		// Switch to table layout.
+		await page.getByLabel( 'View options' ).click();
+		await page.getByRole( 'menuitem', { name: 'Layout' } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+
 		await page.getByRole( 'button', { name: 'Description' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
 		await expect(

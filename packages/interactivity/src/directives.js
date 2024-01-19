@@ -1,23 +1,15 @@
 /**
  * External dependencies
  */
-import {
-	useContext,
-	useMemo,
-	useEffect,
-	useRef,
-	useLayoutEffect,
-} from 'preact/hooks';
+import { useContext, useMemo, useRef } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
 
 /**
  * Internal dependencies
  */
 import { createPortal } from './portals';
-import { useSignalEffect } from './utils';
+import { useWatch, useInit } from './utils';
 import { directive } from './hooks';
-import { SlotProvider, Slot, Fill } from './slots';
-import { navigate } from './router';
 
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
@@ -75,24 +67,26 @@ export default () => {
 	// data-wp-watch--[name]
 	directive( 'watch', ( { directives: { watch }, evaluate } ) => {
 		watch.forEach( ( entry ) => {
-			useSignalEffect( () => evaluate( entry ) );
+			useWatch( () => evaluate( entry ) );
 		} );
 	} );
 
 	// data-wp-init--[name]
 	directive( 'init', ( { directives: { init }, evaluate } ) => {
 		init.forEach( ( entry ) => {
-			useEffect( () => evaluate( entry ), [] );
+			useInit( () => evaluate( entry ) );
 		} );
 	} );
 
 	// data-wp-on--[event]
 	directive( 'on', ( { directives: { on }, element, evaluate } ) => {
-		on.forEach( ( entry ) => {
-			element.props[ `on${ entry.suffix }` ] = ( event ) => {
-				evaluate( entry, event );
-			};
-		} );
+		on.filter( ( { suffix } ) => suffix !== 'default' ).forEach(
+			( entry ) => {
+				element.props[ `on${ entry.suffix }` ] = ( event ) => {
+					evaluate( entry, event );
+				};
+			}
+		);
 	} );
 
 	// data-wp-class--[classname]
@@ -118,7 +112,7 @@ export default () => {
 							? `${ currentClass } ${ name }`
 							: name;
 
-					useEffect( () => {
+					useInit( () => {
 						// This seems necessary because Preact doesn't change the class
 						// names on the hydration, so we have to do it manually. It doesn't
 						// need deps because it only needs to do it the first time.
@@ -127,7 +121,7 @@ export default () => {
 						} else {
 							element.ref.current.classList.add( name );
 						}
-					}, [] );
+					} );
 				} );
 		}
 	);
@@ -182,7 +176,7 @@ export default () => {
 				if ( ! result ) delete element.props.style[ key ];
 				else element.props.style[ key ] = result;
 
-				useEffect( () => {
+				useInit( () => {
 					// This seems necessary because Preact doesn't change the styles on
 					// the hydration, so we have to do it manually. It doesn't need deps
 					// because it only needs to do it the first time.
@@ -191,7 +185,7 @@ export default () => {
 					} else {
 						element.ref.current.style[ key ] = result;
 					}
-				}, [] );
+				} );
 			} );
 	} );
 
@@ -202,22 +196,11 @@ export default () => {
 				const attribute = entry.suffix;
 				const result = evaluate( entry );
 				element.props[ attribute ] = result;
-				// Preact doesn't handle the `role` attribute properly, as it doesn't remove it when `null`.
-				// We need this workaround until the following issue is solved:
-				// https://github.com/preactjs/preact/issues/4136
-				useLayoutEffect( () => {
-					if (
-						attribute === 'role' &&
-						( result === null || result === undefined )
-					) {
-						element.ref.current.removeAttribute( attribute );
-					}
-				}, [ attribute, result ] );
 
 				// This seems necessary because Preact doesn't change the attributes
 				// on the hydration, so we have to do it manually. It doesn't need
 				// deps because it only needs to do it the first time.
-				useEffect( () => {
+				useInit( () => {
 					const el = element.ref.current;
 
 					// We set the value directly to the corresponding
@@ -260,52 +243,10 @@ export default () => {
 					} else {
 						el.removeAttribute( attribute );
 					}
-				}, [] );
+				} );
 			}
 		);
 	} );
-
-	// data-wp-navigation-link
-	directive(
-		'navigation-link',
-		( {
-			directives: { 'navigation-link': navigationLink },
-			props: { href },
-			element,
-		} ) => {
-			const { value: link } = navigationLink.find(
-				( { suffix } ) => suffix === 'default'
-			);
-
-			useEffect( () => {
-				// Prefetch the page if it is in the directive options.
-				if ( link?.prefetch ) {
-					// prefetch( href );
-				}
-			} );
-
-			// Don't do anything if it's falsy.
-			if ( link !== false ) {
-				element.props.onclick = async ( event ) => {
-					event.preventDefault();
-
-					// Fetch the page (or return it from cache).
-					await navigate( href );
-
-					// Update the scroll, depending on the option. True by default.
-					if ( link?.scroll === 'smooth' ) {
-						window.scrollTo( {
-							top: 0,
-							left: 0,
-							behavior: 'smooth',
-						} );
-					} else if ( link?.scroll !== false ) {
-						window.scrollTo( 0, 0 );
-					}
-				};
-			}
-		}
-	);
 
 	// data-wp-ignore
 	directive(
@@ -330,64 +271,17 @@ export default () => {
 	// data-wp-text
 	directive( 'text', ( { directives: { text }, element, evaluate } ) => {
 		const entry = text.find( ( { suffix } ) => suffix === 'default' );
-		element.props.children = evaluate( entry );
+		try {
+			const result = evaluate( entry );
+			element.props.children =
+				typeof result === 'object' ? null : result.toString();
+		} catch ( e ) {
+			element.props.children = null;
+		}
 	} );
 
-	// data-wp-slot
-	directive(
-		'slot',
-		( { directives: { slot }, props: { children }, element } ) => {
-			const { value } = slot.find(
-				( { suffix } ) => suffix === 'default'
-			);
-			const name = typeof value === 'string' ? value : value.name;
-			const position = value.position || 'children';
-
-			if ( position === 'before' ) {
-				return (
-					<>
-						<Slot name={ name } />
-						{ children }
-					</>
-				);
-			}
-			if ( position === 'after' ) {
-				return (
-					<>
-						{ children }
-						<Slot name={ name } />
-					</>
-				);
-			}
-			if ( position === 'replace' ) {
-				return <Slot name={ name }>{ children }</Slot>;
-			}
-			if ( position === 'children' ) {
-				element.props.children = (
-					<Slot name={ name }>{ element.props.children }</Slot>
-				);
-			}
-		},
-		{ priority: 4 }
-	);
-
-	// data-wp-fill
-	directive(
-		'fill',
-		( { directives: { fill }, props: { children }, evaluate } ) => {
-			const entry = fill.find( ( { suffix } ) => suffix === 'default' );
-			const slot = evaluate( entry );
-			return <Fill slot={ slot }>{ children }</Fill>;
-		},
-		{ priority: 4 }
-	);
-
-	// data-wp-slot-provider
-	directive(
-		'slot-provider',
-		( { props: { children } } ) => (
-			<SlotProvider>{ children }</SlotProvider>
-		),
-		{ priority: 4 }
-	);
+	// data-wp-run
+	directive( 'run', ( { directives: { run }, evaluate } ) => {
+		run.forEach( ( entry ) => evaluate( entry ) );
+	} );
 };

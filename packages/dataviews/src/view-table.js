@@ -437,7 +437,7 @@ function ViewTable( {
 	);
 
 	return (
-		<div>
+		<div className="dataviews-view-table-wrapper">
 			<table
 				className="dataviews-view-table"
 				aria-busy={ isLoading }
@@ -506,7 +506,10 @@ function ViewTable( {
 							</th>
 						) ) }
 						{ !! actions?.length && (
-							<th data-field-id="actions">
+							<th
+								data-field-id="actions"
+								className="dataviews-view-table__actions-column"
+							>
 								<span className="dataviews-view-table-header">
 									{ __( 'Actions' ) }
 								</span>
@@ -536,17 +539,21 @@ function ViewTable( {
 											minWidth: 20,
 										} }
 									>
-										<SingleSelectionCheckbox
-											id={ getItemId( item ) || index }
-											item={ item }
-											selection={ selection }
-											onSelectionChange={
-												onSelectionChange
-											}
-											getItemId={ getItemId }
-											data={ data }
-											primaryField={ primaryField }
-										/>
+										<span className="dataviews-view-table__cell-content-wrapper">
+											<SingleSelectionCheckbox
+												id={
+													getItemId( item ) || index
+												}
+												item={ item }
+												selection={ selection }
+												onSelectionChange={
+													onSelectionChange
+												}
+												getItemId={ getItemId }
+												data={ data }
+												primaryField={ primaryField }
+											/>
+										</span>
 									</td>
 								) }
 								{ visibleFields.map( ( field ) => (
@@ -560,13 +567,24 @@ function ViewTable( {
 												field.maxWidth || undefined,
 										} }
 									>
-										{ field.render( {
-											item,
-										} ) }
+										<span
+											className={ classnames(
+												'dataviews-view-table__cell-content-wrapper',
+												{
+													'dataviews-view-table__primary-field':
+														primaryField?.id ===
+														field.id,
+												}
+											) }
+										>
+											{ field.render( {
+												item,
+											} ) }
+										</span>
 									</td>
 								) ) }
 								{ !! actions?.length && (
-									<td>
+									<td className="dataviews-view-table__actions-column">
 										<ItemActions
 											item={ item }
 											actions={ actions }

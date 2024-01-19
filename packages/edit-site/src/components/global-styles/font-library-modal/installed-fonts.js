@@ -32,7 +32,7 @@ function InstalledFonts() {
 		baseThemeFonts,
 		handleSetLibraryFontSelected,
 		refreshLibrary,
-		uninstallFont,
+		uninstallFontFamily,
 		isResolvingLibrary,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
@@ -48,15 +48,24 @@ function InstalledFonts() {
 	const [ notice, setNotice ] = useState( null );
 
 	const handleConfirmUninstall = async () => {
-		const response = await uninstallFont( libraryFontSelected );
-		// TODO: Refactor uninstall notices
-		// const uninstallNotice = getNoticeFromUninstallResponse( response );
-		// setNotice( uninstallNotice );
-		// If the font was succesfully uninstalled it is unselected
-		if ( ! response?.errors?.length ) {
+		try {
+			await uninstallFontFamily( libraryFontSelected );
+			setNotice( {
+				type: 'success',
+				message: __( 'Font family uninstalled successfully.' ),
+			} );
+
+			// If the font was succesfully uninstalled it is unselected.
 			handleUnselectFont();
+			setIsConfirmDeleteOpen( false );
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message:
+					__( 'There was an error uninstalling the font family. ' ) +
+					error.message,
+			} );
 		}
-		setIsConfirmDeleteOpen( false );
 	};
 
 	const handleUninstallClick = async () => {
@@ -77,6 +86,7 @@ function InstalledFonts() {
 		!! libraryFontSelected && libraryFontSelected?.source !== 'theme';
 
 	useEffect( () => {
+		handleSelectFont( libraryFontSelected );
 		refreshLibrary();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
