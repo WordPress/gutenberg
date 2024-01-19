@@ -53,7 +53,7 @@ export function createRegistrySelector( registrySelector ) {
 			selector = registrySelector( wrappedSelector.registry.select );
 			selectorsByRegistry.set( wrappedSelector.registry, selector );
 		}
-		return selector( ...args );
+		return selectorsByRegistry.get( wrappedSelector.registry )( ...args );
 	};
 
 	/**

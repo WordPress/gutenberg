@@ -7,6 +7,7 @@ import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
+	fetchBlockPatterns,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -101,7 +102,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		pageOnFront,
 		pageForPosts,
 		userPatternCategories,
-		restBlockPatterns,
 		restBlockPatternCategories,
 	} = useSelect(
 		( select ) => {
@@ -112,7 +112,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				getEntityRecord,
 				getUserPatternCategories,
 				getEntityRecords,
-				getBlockPatterns,
 				getBlockPatternCategories,
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
@@ -148,7 +147,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
 				userPatternCategories: getUserPatternCategories(),
-				restBlockPatterns: getBlockPatterns(),
 				restBlockPatternCategories: getBlockPatternCategories(),
 			};
 		},
@@ -161,26 +159,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 	const settingsBlockPatternCategories =
 		settings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
 		settings.__experimentalBlockPatternCategories; // WP 5.9
-
-	const blockPatterns = useMemo(
-		() =>
-			[
-				...( settingsBlockPatterns || [] ),
-				...( restBlockPatterns || [] ),
-			]
-				.filter(
-					( x, index, arr ) =>
-						index === arr.findIndex( ( y ) => x.name === y.name )
-				)
-				.filter( ( { postTypes } ) => {
-					return (
-						! postTypes ||
-						( Array.isArray( postTypes ) &&
-							postTypes.includes( postType ) )
-					);
-				} ),
-		[ settingsBlockPatterns, restBlockPatterns, postType ]
-	);
 
 	const blockPatternCategories = useMemo(
 		() =>
@@ -254,8 +232,26 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			isDistractionFree,
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
+			__experimentalFetchBlockPatterns: async () => {
+				const restPatterns = await fetchBlockPatterns();
+				return [
+					...( settingsBlockPatterns || [] ),
+					...( restPatterns || [] ),
+				]
+					.filter(
+						( x, index, arr ) =>
+							index ===
+							arr.findIndex( ( y ) => x.name === y.name )
+					)
+					.filter( ( { postTypes } ) => {
+						return (
+							! postTypes ||
+							( Array.isArray( postTypes ) &&
+								postTypes.includes( postType ) )
+						);
+					} );
+			},
 			__experimentalReusableBlocks: reusableBlocks,
-			__experimentalBlockPatterns: blockPatterns,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
@@ -296,7 +292,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			hasUploadPermissions,
 			reusableBlocks,
 			userPatternCategories,
-			blockPatterns,
+			settingsBlockPatterns,
 			blockPatternCategories,
 			canUseUnfilteredHTML,
 			undo,

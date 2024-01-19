@@ -26,12 +26,10 @@ import { createRegistrySelector } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import {
-	getAllPatterns,
-	checkAllowListRecursive,
-	checkAllowList,
-} from './utils';
+import { checkAllowListRecursive, checkAllowList } from './utils';
 import { orderBy } from '../utils/sorting';
+import { store } from './';
+import { unlock } from '../lock-unlock';
 
 /**
  * A block selection object.
@@ -2260,39 +2258,27 @@ export const __experimentalGetDirectInsertBlock = createSelector(
 	]
 );
 
-export const __experimentalGetParsedPattern = createSelector(
-	( state, patternName ) => {
-		const patterns = getAllPatterns( state );
-		const pattern = patterns.find( ( { name } ) => name === patternName );
-		if ( ! pattern ) {
-			return null;
-		}
-		return {
-			...pattern,
-			blocks: parse( pattern.content, {
-				__unstableSkipMigrationLogs: true,
-			} ),
-		};
-	},
-	( state ) => [ getAllPatterns( state ) ]
-);
-
-const getAllAllowedPatterns = createSelector(
-	( state ) => {
-		const patterns = getAllPatterns( state );
-		const { allowedBlockTypes } = getSettings( state );
-
-		const parsedPatterns = patterns
-			.filter( ( { inserter = true } ) => !! inserter )
-			.map( ( { name } ) =>
-				__experimentalGetParsedPattern( state, name )
-			);
-		const allowedPatterns = parsedPatterns.filter( ( { blocks } ) =>
-			checkAllowListRecursive( blocks, allowedBlockTypes )
-		);
-		return allowedPatterns;
-	},
-	( state ) => [ getAllPatterns( state ), state.settings.allowedBlockTypes ]
+export const __experimentalGetParsedPattern = createRegistrySelector(
+	( select ) =>
+		createSelector(
+			( state, patternName ) => {
+				const { getAllPatterns } = unlock( select( store ) );
+				const patterns = getAllPatterns();
+				const pattern = patterns.find(
+					( { name } ) => name === patternName
+				);
+				if ( ! pattern ) {
+					return null;
+				}
+				return {
+					...pattern,
+					blocks: parse( pattern.content, {
+						__unstableSkipMigrationLogs: true,
+					} ),
+				};
+			},
+			( state ) => [ state.blockPatterns ]
+		)
 );
 
 /**
@@ -2303,24 +2289,44 @@ const getAllAllowedPatterns = createSelector(
  *
  * @return {Array?} The list of allowed patterns.
  */
-export const __experimentalGetAllowedPatterns = createSelector(
-	( state, rootClientId = null ) => {
-		const availableParsedPatterns = getAllAllowedPatterns( state );
-		const patternsAllowed = availableParsedPatterns.filter(
-			( { blocks } ) =>
-				blocks.every( ( { name } ) =>
-					canInsertBlockType( state, name, rootClientId )
-				)
-		);
+export const __experimentalGetAllowedPatterns = createRegistrySelector(
+	( select ) => {
+		return createSelector(
+			( state, rootClientId = null ) => {
+				const {
+					getAllPatterns,
+					__experimentalGetParsedPattern: getParsedPattern,
+				} = unlock( select( store ) );
+				const patterns = getAllPatterns();
+				const { allowedBlockTypes } = getSettings( state );
 
-		return patternsAllowed;
-	},
-	( state, rootClientId ) => [
-		getAllAllowedPatterns( state ),
-		state.settings.templateLock,
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
-	]
+				const parsedPatterns = patterns
+					.filter( ( { inserter = true } ) => !! inserter )
+					.map( ( { name } ) => getParsedPattern( name ) );
+				const availableParsedPatterns = parsedPatterns.filter(
+					( { blocks } ) =>
+						checkAllowListRecursive( blocks, allowedBlockTypes )
+				);
+				const patternsAllowed = availableParsedPatterns.filter(
+					( { blocks } ) =>
+						blocks.every( ( { name } ) =>
+							canInsertBlockType( state, name, rootClientId )
+						)
+				);
+
+				return patternsAllowed;
+			},
+			( state, rootClientId ) => {
+				return [
+					state.blockPatterns,
+					state.settings.allowedBlockTypes,
+					state.settings.templateLock,
+					state.blockListSettings[ rootClientId ],
+					state.blocks.byClientId.get( rootClientId ),
+				];
+			}
+		);
+	}
 );
 
 /**
@@ -2336,32 +2342,35 @@ export const __experimentalGetAllowedPatterns = createSelector(
  *
  * @return {Array} The list of matched block patterns based on declared `blockTypes` and block name.
  */
-export const getPatternsByBlockTypes = createSelector(
-	( state, blockNames, rootClientId = null ) => {
-		if ( ! blockNames ) return EMPTY_ARRAY;
-		const patterns = __experimentalGetAllowedPatterns(
-			state,
-			rootClientId
-		);
-		const normalizedBlockNames = Array.isArray( blockNames )
-			? blockNames
-			: [ blockNames ];
-		const filteredPatterns = patterns.filter( ( pattern ) =>
-			pattern?.blockTypes?.some?.( ( blockName ) =>
-				normalizedBlockNames.includes( blockName )
-			)
-		);
-		if ( filteredPatterns.length === 0 ) {
-			return EMPTY_ARRAY;
-		}
-		return filteredPatterns;
-	},
-	( state, blockNames, rootClientId ) => [
-		...__experimentalGetAllowedPatterns.getDependants(
-			state,
-			rootClientId
-		),
-	]
+export const getPatternsByBlockTypes = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, blockNames, rootClientId = null ) => {
+			if ( ! blockNames ) return EMPTY_ARRAY;
+			const patterns = select( store ).__experimentalGetAllowedPatterns(
+				state,
+				rootClientId
+			);
+			const normalizedBlockNames = Array.isArray( blockNames )
+				? blockNames
+				: [ blockNames ];
+			const filteredPatterns = patterns.filter( ( pattern ) =>
+				pattern?.blockTypes?.some?.( ( blockName ) =>
+					normalizedBlockNames.includes( blockName )
+				)
+			);
+			if ( filteredPatterns.length === 0 ) {
+				return EMPTY_ARRAY;
+			}
+			return filteredPatterns;
+		},
+		( state, blockNames, rootClientId ) => [
+			state.blockPatterns,
+			state.settings.allowedBlockTypes,
+			state.settings.templateLock,
+			state.blockListSettings[ rootClientId ],
+			state.blocks.byClientId.get( rootClientId ),
+		]
+	)
 );
 
 export const __experimentalGetPatternsByBlockTypes = createSelector(
