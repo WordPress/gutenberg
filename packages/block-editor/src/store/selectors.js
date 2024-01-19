@@ -28,7 +28,7 @@ import { createRegistrySelector } from '@wordpress/data';
  */
 import { checkAllowListRecursive, checkAllowList } from './utils';
 import { orderBy } from '../utils/sorting';
-import { store } from './';
+import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 
 /**
@@ -2262,7 +2262,7 @@ export const __experimentalGetParsedPattern = createRegistrySelector(
 	( select ) =>
 		createSelector(
 			( state, patternName ) => {
-				const { getAllPatterns } = unlock( select( store ) );
+				const { getAllPatterns } = unlock( select( STORE_NAME ) );
 				const patterns = getAllPatterns();
 				const pattern = patterns.find(
 					( { name } ) => name === patternName
@@ -2277,7 +2277,13 @@ export const __experimentalGetParsedPattern = createRegistrySelector(
 					} ),
 				};
 			},
-			( state ) => [ state.blockPatterns ]
+			( state ) => [
+				state.settings.__experimentalBlockPatterns,
+				state.settings.__experimentalUserPatternCategories,
+				state.settings.__experimentalReusableBlocks,
+				state.settings.__experimentalFetchBlockPatterns,
+				state.blockPatterns,
+			]
 		)
 );
 
@@ -2296,7 +2302,7 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 				const {
 					getAllPatterns,
 					__experimentalGetParsedPattern: getParsedPattern,
-				} = unlock( select( store ) );
+				} = unlock( select( STORE_NAME ) );
 				const patterns = getAllPatterns();
 				const { allowedBlockTypes } = getSettings( state );
 
@@ -2318,6 +2324,10 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 			},
 			( state, rootClientId ) => {
 				return [
+					state.settings.__experimentalBlockPatterns,
+					state.settings.__experimentalUserPatternCategories,
+					state.settings.__experimentalReusableBlocks,
+					state.settings.__experimentalFetchBlockPatterns,
 					state.blockPatterns,
 					state.settings.allowedBlockTypes,
 					state.settings.templateLock,
@@ -2346,10 +2356,10 @@ export const getPatternsByBlockTypes = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, blockNames, rootClientId = null ) => {
 			if ( ! blockNames ) return EMPTY_ARRAY;
-			const patterns = select( store ).__experimentalGetAllowedPatterns(
-				state,
-				rootClientId
-			);
+			const patterns =
+				select( STORE_NAME ).__experimentalGetAllowedPatterns(
+					rootClientId
+				);
 			const normalizedBlockNames = Array.isArray( blockNames )
 				? blockNames
 				: [ blockNames ];
@@ -2364,6 +2374,10 @@ export const getPatternsByBlockTypes = createRegistrySelector( ( select ) =>
 			return filteredPatterns;
 		},
 		( state, blockNames, rootClientId ) => [
+			state.settings.__experimentalBlockPatterns,
+			state.settings.__experimentalUserPatternCategories,
+			state.settings.__experimentalReusableBlocks,
+			state.settings.__experimentalFetchBlockPatterns,
 			state.blockPatterns,
 			state.settings.allowedBlockTypes,
 			state.settings.templateLock,
@@ -2373,8 +2387,8 @@ export const getPatternsByBlockTypes = createRegistrySelector( ( select ) =>
 	)
 );
 
-export const __experimentalGetPatternsByBlockTypes = createSelector(
-	( state, blockNames, rootClientId = null ) => {
+export const __experimentalGetPatternsByBlockTypes = createRegistrySelector(
+	( select ) => {
 		deprecated(
 			'wp.data.select( "core/block-editor" ).__experimentalGetPatternsByBlockTypes',
 			{
@@ -2384,14 +2398,8 @@ export const __experimentalGetPatternsByBlockTypes = createSelector(
 				version: '6.4',
 			}
 		);
-		return getPatternsByBlockTypes( state, blockNames, rootClientId );
-	},
-	( state, blockNames, rootClientId ) => [
-		...__experimentalGetAllowedPatterns.getDependants(
-			state,
-			rootClientId
-		),
-	]
+		return select( STORE_NAME ).getPatternsByBlockTypes;
+	}
 );
 
 /**
@@ -2411,45 +2419,55 @@ export const __experimentalGetPatternsByBlockTypes = createSelector(
  *
  * @return {WPBlockPattern[]} Items that are eligible for a pattern transformation.
  */
-export const __experimentalGetPatternTransformItems = createSelector(
-	( state, blocks, rootClientId = null ) => {
-		if ( ! blocks ) return EMPTY_ARRAY;
-		/**
-		 * For now we only handle blocks without InnerBlocks and take into account
-		 * the `__experimentalRole` property of blocks' attributes for the transformation.
-		 * Note that the blocks have been retrieved through `getBlock`, which doesn't
-		 * return the inner blocks of an inner block controller, so we still need
-		 * to check for this case too.
-		 */
-		if (
-			blocks.some(
-				( { clientId, innerBlocks } ) =>
-					innerBlocks.length ||
-					areInnerBlocksControlled( state, clientId )
-			)
-		) {
-			return EMPTY_ARRAY;
-		}
+export const __experimentalGetPatternTransformItems = createRegistrySelector(
+	( select ) =>
+		createSelector(
+			( state, blocks, rootClientId = null ) => {
+				if ( ! blocks ) return EMPTY_ARRAY;
+				/**
+				 * For now we only handle blocks without InnerBlocks and take into account
+				 * the `__experimentalRole` property of blocks' attributes for the transformation.
+				 * Note that the blocks have been retrieved through `getBlock`, which doesn't
+				 * return the inner blocks of an inner block controller, so we still need
+				 * to check for this case too.
+				 */
+				if (
+					blocks.some(
+						( { clientId, innerBlocks } ) =>
+							innerBlocks.length ||
+							areInnerBlocksControlled( state, clientId )
+					)
+				) {
+					return EMPTY_ARRAY;
+				}
 
-		// Create a Set of the selected block names that is used in patterns filtering.
-		const selectedBlockNames = Array.from(
-			new Set( blocks.map( ( { name } ) => name ) )
-		);
-		/**
-		 * Here we will return first set of possible eligible block patterns,
-		 * by checking the `blockTypes` property. We still have to recurse through
-		 * block pattern's blocks and try to find matches from the selected blocks.
-		 * Now this happens in the consumer to avoid heavy operations in the selector.
-		 */
-		return getPatternsByBlockTypes(
-			state,
-			selectedBlockNames,
-			rootClientId
-		);
-	},
-	( state, blocks, rootClientId ) => [
-		...getPatternsByBlockTypes.getDependants( state, rootClientId ),
-	]
+				// Create a Set of the selected block names that is used in patterns filtering.
+				const selectedBlockNames = Array.from(
+					new Set( blocks.map( ( { name } ) => name ) )
+				);
+				/**
+				 * Here we will return first set of possible eligible block patterns,
+				 * by checking the `blockTypes` property. We still have to recurse through
+				 * block pattern's blocks and try to find matches from the selected blocks.
+				 * Now this happens in the consumer to avoid heavy operations in the selector.
+				 */
+				return select( STORE_NAME ).getPatternsByBlockTypes(
+					selectedBlockNames,
+					rootClientId
+				);
+			},
+			( state, blocks, rootClientId ) => [
+				state.settings.__experimentalBlockPatterns,
+				state.settings.__experimentalUserPatternCategories,
+				state.settings.__experimentalReusableBlocks,
+				state.settings.__experimentalFetchBlockPatterns,
+				state.blockPatterns,
+				state.settings.allowedBlockTypes,
+				state.settings.templateLock,
+				state.blockListSettings[ rootClientId ],
+				state.blocks.byClientId.get( rootClientId ),
+			]
+		)
 );
 
 /**
