@@ -5,25 +5,25 @@ import type { InputControlProps } from '../input-control/types';
 
 export type SearchControlProps = Pick<
 	InputControlProps,
-	| 'help'
-	| 'hideLabelFromVision'
-	| 'label'
-	| 'onDrag'
-	| 'onDragStart'
-	| 'onDragEnd'
-	| 'value'
+	'help' | 'label' | 'value'
 > & {
 	/**
 	 * @deprecated This is now the default.
 	 * @ignore
 	 */
-	__next40pxDefaultSize?: boolean;
+	__next40pxDefaultSize?: InputControlProps[ '__next40pxDefaultSize' ];
 	/**
 	 * Start opting into the new margin-free styles that will become the default in a future version.
 	 *
 	 * @default false
 	 */
 	__nextHasNoMarginBottom?: boolean;
+	/**
+	 * If true, the label will only be visible to screen readers.
+	 *
+	 * @default true
+	 */
+	hideLabelFromVision?: InputControlProps[ 'hideLabelFromVision' ];
 	/**
 	 * A function that receives the value of the input when the value is changed.
 	 */
@@ -36,6 +36,12 @@ export type SearchControlProps = Pick<
 	 * rather than just clearing the input value.
 	 */
 	onClose?: () => void;
+	/** @ignore */
+	onDrag?: InputControlProps[ 'onDrag' ];
+	/** @ignore */
+	onDragStart?: InputControlProps[ 'onDragStart' ];
+	/** @ignore */
+	onDragEnd?: InputControlProps[ 'onDragEnd' ];
 	/**
 	 * A placeholder for the input.
 	 *
