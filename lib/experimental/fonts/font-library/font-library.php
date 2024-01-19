@@ -49,7 +49,8 @@ function gutenberg_init_font_library_routes() {
 		'show_in_rest'                   => true,
 		'rest_base'                      => 'font-families',
 		'rest_controller_class'          => 'WP_REST_Font_Families_Controller',
-		'autosave_rest_controller_class' => 'WP_REST_Autosave_Fonts_Controller',
+		// Disable autosave endpoints for font families.
+		'autosave_rest_controller_class' => 'stdClass',
 	);
 	register_post_type( 'wp_font_family', $args );
 
@@ -83,7 +84,8 @@ function gutenberg_init_font_library_routes() {
 			'show_in_rest'                   => true,
 			'rest_base'                      => 'font-families/(?P<font_family_id>[\d]+)/font-faces',
 			'rest_controller_class'          => 'WP_REST_Font_Faces_Controller',
-			'autosave_rest_controller_class' => 'WP_REST_Autosave_Fonts_Controller',
+			// Disable autosave endpoints for font faces.
+			'autosave_rest_controller_class' => 'stdClass',
 		)
 	);
 
