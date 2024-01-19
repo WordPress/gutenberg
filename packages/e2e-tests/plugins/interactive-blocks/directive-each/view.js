@@ -126,6 +126,31 @@ store( 'directive-each', {
 	},
 } );
 
+store( 'directive-each', {
+	state: {
+		animalBreeds: [
+			{ name: "Dog", breeds: [ 'chihuahua', 'rottweiler' ] },
+			{ name: "Cat", breeds: [ 'sphynx', 'siamese' ] },
+		],
+	},
+	actions: {
+		addAnimal() {
+			state.animalBreeds.unshift( {
+				name: "Rat", breeds: [ 'dumbo', 'rex' ]
+			} );
+		},
+		addBreeds() {
+			state
+				.animalBreeds
+				.forEach( ( { name, breeds } ) => {
+					if ( name === 'Dog') breeds.unshift( 'german shepherd' );
+					if ( name === 'Cat') breeds.unshift( 'maine coon' );
+					if ( name === 'Rat') breeds.unshift( 'satin' );
+				} );
+		}
+	}
+} );
+
 const html = `
 <div
 	data-wp-interactive='{ "namespace": "directive-each" }'

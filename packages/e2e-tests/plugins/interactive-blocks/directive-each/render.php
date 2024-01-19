@@ -111,11 +111,11 @@ gutenberg_enqueue_module( 'directive-each-view' );
 			data-wp-on--click="actions.unshiftNumberAndName"
 		>Unshift</button>
 		<template
-			data-wp-each="state.numbersAndNames"
-			data-wp-each-key="context.item.value"
+			data-wp-each--number="state.numbersAndNames"
+			data-wp-each-key="state.numberId"
 		>
-			<p data-wp-text="context.item.name" data-testid="item"></p>
-			<p data-wp-text="context.item.value" data-testid="item"></p>
+			<p data-wp-text="context.number.name" data-testid="item"></p>
+			<p data-wp-text="context.number.value" data-testid="item"></p>
 		</template>
 		<p data-testid="item" data-wp-each-child>two</p>
 		<p data-testid="item" data-wp-each-child>2</p>
@@ -123,6 +123,37 @@ gutenberg_enqueue_module( 'directive-each-view' );
 		<p data-testid="item" data-wp-each-child>3</p>
 		<p data-testid="item">four</p>
 		<p data-testid="item">4</p>
+	</div>
+
+
+	<div data-testid="nested">
+		<button
+			data-testid="add animal"
+			data-wp-on--click="actions.addAnimal"
+		>Add animal</button>
+		<button
+			data-testid="add breeds"
+			data-wp-on--click="actions.addBreeds"
+		>Add breeds</button>
+
+		<ul>
+			<template
+				data-wp-each--animal="state.animalBreeds"
+				data-wp-each-key="context.animal.name"
+			>
+				<li data-testid="animal">
+					<span
+						data-testid="name"
+						data-wp-text="context.animal.name"
+					></span>
+					<ul>
+						<template data-wp-each--breed="context.animal.breeds">
+							<li data-wp-text="context.breed"></li>
+						</template>
+					</ul>
+				</li>
+			</template>
+		</ul>
 	</div>
 </div>
 
