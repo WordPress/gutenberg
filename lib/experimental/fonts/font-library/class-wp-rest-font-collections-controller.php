@@ -92,7 +92,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 		// If the collection doesn't exist returns a 404.
 		if ( is_wp_error( $collection ) ) {
 			$collection->add_data( array( 'status' => 404 ) );
-			return rest_ensure_response( $collection );
+			return $collection;
 		}
 
 		$config   = $collection->get_config();
@@ -101,7 +101,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 		// If there was an error getting the collection data, return the error.
 		if ( is_wp_error( $contents ) ) {
 			$contents->add_data( array( 'status' => 500 ) );
-			return rest_ensure_response( $contents );
+			return $contents;
 		}
 
 		$collection_data = array_merge( $config, $contents );
