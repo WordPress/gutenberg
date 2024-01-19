@@ -112,6 +112,8 @@ class WP_REST_Font_Faces_Controller_Test extends WP_Test_REST_Controller_Testcas
 	}
 
 	public function test_font_faces_no_autosave_routes() {
+		// @core-merge: Enable this test.
+		$this->markTestSkipped( 'This test only works with WP 6.4 and above. Enable it once 6.5 is released.' );
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayNotHasKey(
 			'/wp/v2/font-families/(?P<font_family_id>[\d]+)/font-faces/(?P<id>[\d]+)/autosaves',
