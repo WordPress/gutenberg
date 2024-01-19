@@ -59,8 +59,7 @@ add_filter( 'render_block', 'gutenberg_process_directives_in_root_blocks', 10, 2
  *
  * @param string $html The HTML to process.
  * @param mixed  $context The context to use when processing.
- * @param array  $inner_blocks The inner blocks to process.
- * @param array  $namespace_stack Stack of namespackes passed by reference.
+ * @param array  $namespace_stack Stack of namespaces passed by reference.
  *
  * @return string The processed HTML.
  */
