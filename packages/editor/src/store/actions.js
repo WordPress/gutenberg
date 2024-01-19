@@ -181,12 +181,13 @@ export const savePost =
 			dispatch.editPost( { content }, { undoIgnore: true } );
 		}
 
-		const preSaveOK = await applyFilters(
-			'editor.__unstablePreSavePost',
-			Promise.resolve( true ),
-			options
-		);
-		if ( ! preSaveOK ) {
+		if (
+			! ( await applyFilters(
+				'editor.__unstablePreSavePost',
+				Promise.resolve( true ),
+				options
+			) )
+		) {
 			return;
 		}
 
