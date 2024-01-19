@@ -36,9 +36,9 @@ function TabPanelLayout( {
 								>
 									{ notice.message }
 								</Notice>
-								<Spacer margin={ 4 } />
 							</FlexBlock>
 						) }
+						<Spacer margin={ 4 } />
 						<HStack justify="flex-start">
 							{ !! handleBack && (
 								<Button
