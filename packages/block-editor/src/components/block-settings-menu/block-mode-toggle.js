@@ -38,7 +38,7 @@ export function BlockModeToggle( {
 		mode === 'visual' ? __( 'Edit as HTML' ) : __( 'Edit visually' );
 
 	return (
-		<DropdownMenuItem onClick={ onToggleMode } hideOnClick={ false }>
+		<DropdownMenuItem onClick={ onToggleMode }>
 			{ /* TODO: what if `small` is true? What contents are displayed? */ }
 			{ ! small && (
 				<DropdownMenuItemLabel>{ label }</DropdownMenuItemLabel>

@@ -18,7 +18,7 @@ test.describe( 'Unsynced pattern', () => {
 		await requestUtils.deleteAllPatternCategories();
 	} );
 
-	test( 'create a new unsynced pattern via the block options menu', async ( {
+	test.only( 'create a new unsynced pattern via the block options menu', async ( {
 		editor,
 		page,
 	} ) => {
@@ -52,6 +52,11 @@ test.describe( 'Unsynced pattern', () => {
 
 		await page.keyboard.press( 'Enter' );
 
+		// Wait for modal to close
+		await expect(
+			page.getByRole( 'dialog', { name: 'Create pattern' } )
+		).toHaveCount( 0 );
+
 		// Check that the block content is still the same. If the pattern was added as synced
 		// the content would be wrapped by a pattern block.
 		await expect
@@ -60,6 +65,9 @@ test.describe( 'Unsynced pattern', () => {
 				'The block content should be the same after converting to an unsynced pattern'
 			)
 			.toEqual( before );
+
+		// Dimiss "Options" dropdown menu
+		await page.keyboard.press( 'Escape' );
 
 		// Check that the new pattern is available in the inserter and that it gets inserted as
 		// a plain paragraph block.

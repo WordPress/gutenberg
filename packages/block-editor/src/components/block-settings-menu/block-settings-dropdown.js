@@ -278,7 +278,11 @@ export function BlockSettingsDropdown( {
 	// dropdown content. This would normally work out of the box for the
 	// `DropdownMenu` component, but in this case the toggle may receive an
 	// external id from the parent `ToolbarItem` that can't be ignored.
-	const dropdownTriggerId = toggleProps?.id;
+	const dropdownMenuExtraProps = {};
+
+	if ( !! toggleProps?.id ) {
+		dropdownMenuExtraProps[ 'aria-labelledby' ] = toggleProps?.id;
+	}
 
 	const closeDropdown = useCallback( () => {
 		setOpenedBlockSettingsMenu( undefined );
@@ -370,9 +374,7 @@ export function BlockSettingsDropdown( {
 							onInsertBefore();
 						}
 					} }
-					// TODO: make sure this is needed, and that it's not overriding
-					// values even when `dropdownTriggerId` is not defined.
-					aria-labelledby={ dropdownTriggerId }
+					{ ...dropdownMenuExtraProps }
 					{ ...props }
 				>
 					<>
