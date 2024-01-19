@@ -158,12 +158,12 @@ async function main() {
 
 			// This is temporarily required because PRs merged between Beta 1 (since)
 			// and the final RC may have already been manually backported to Core.
-			// This is however no reliable way to identify these PRs as the `Cackport to WP beta/RC`
+			// This is however no reliable way to identify these PRs as the `Backport to WP beta/RC`
 			// label is manually removed once the PR has been backported.
-			// In future releases we will instead retain the label and add a **new** label
-			// to indicate the PR has been backported to Core.
+			// In future releases we will add a **new** label `Backported`
+			// to indicate the PR was backported to Core.
 			// As a result, in the future we will be able to exclude any PRs that have
-			// the `Backport to WP beta/RC` label.
+			// already been backported using the `Backported` label.
 			if ( isAfter( lastRcDate, commitData.commit.committer.date ) ) {
 				commitData.isBeforeLastRCDate = true;
 			}
