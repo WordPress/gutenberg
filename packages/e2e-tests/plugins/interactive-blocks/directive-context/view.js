@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import { store, getContext } from '@wordpress/interactivity';
-// eslint-disable-next-line no-restricted-syntax
-import { navigate } from '@wordpress/interactivity/router';
 
 store( 'directive-context', {
 	state: {
@@ -52,10 +50,11 @@ const { actions } = store( 'directive-context-navigate', {
 			ctx.newText = 'some new text';
 		},
 		navigate() {
-			return navigate( window.location, {
-				force: true,
-				html,
-			} );
+			return import( '@wordpress/interactivity/router' ).then(
+				( { default: { actions: { navigate } } } ) =>
+					navigate( window.location, { force: true, html } )
+			);
+
 		},
 		*asyncNavigate() {
 			yield actions.navigate();

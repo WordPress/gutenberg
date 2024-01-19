@@ -8,6 +8,7 @@ import {
 	directivePrefix,
 	toVdom,
 	getRegionRootFragment,
+	store,
 } from '@wordpress/interactivity';
 
 // The cache of visited and prefetched pages.
@@ -146,10 +147,19 @@ window.addEventListener( 'popstate', async () => {
 	}
 } );
 
-document.addEventListener( 'DOMContentLoaded', () => {
-	// Cache the current regions.
-	pages.set(
-		cleanUrl( window.location ),
-		Promise.resolve( regionsToVdom( document ) )
-	);
+// Cache the current regions.
+pages.set(
+	cleanUrl( window.location ),
+	Promise.resolve( regionsToVdom( document ) )
+);
+
+export default store( 'core/router', {
+	actions: {
+		*navigate( ...args ) {
+			return yield navigate( ...args );
+		},
+		*prefetch( ...args ) {
+			return yield prefetch( ...args );
+		},
+	},
 } );

@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import { store } from '@wordpress/interactivity';
-// eslint-disable-next-line no-restricted-syntax
-import { navigate } from '@wordpress/interactivity/router';
 
 const html = `
 		<div
@@ -19,7 +17,10 @@ const html = `
 
 store( 'directive-key', {
 	actions: {
-		navigate() {
+		*navigate() {
+			const {
+				default: { actions: { navigate } },
+			} = yield import( '@wordpress/interactivity/router' );
 			navigate( window.location, {
 				force: true,
 				html,

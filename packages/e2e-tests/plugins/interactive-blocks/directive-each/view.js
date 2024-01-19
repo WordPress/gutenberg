@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import { store, getContext } from '@wordpress/interactivity';
-// eslint-disable-next-line no-restricted-syntax
-import { navigate } from '@wordpress/interactivity/router';
 
 const { state } = store( 'directive-each' );
 
@@ -151,7 +149,10 @@ const html = `
 
 store( 'directive-each', {
 	actions: {
-		navigate() {
+		*navigate() {
+			const {
+				default: { actions: { navigate } },
+			} = yield import( '@wordpress/interactivity/router' );
 			return navigate( window.location, {
 				force: true,
 				html,

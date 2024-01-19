@@ -9,8 +9,6 @@ import {
 	cloneElement,
 	getElement,
 } from '@wordpress/interactivity';
-// eslint-disable-next-line no-restricted-syntax
-import { navigate } from '@wordpress/interactivity/router';
 
 // Custom directive to show hide the content elements in which it is placed.
 directive(
@@ -59,7 +57,10 @@ const { state } = store( 'directive-run', {
 		increment() {
 			state.clickCount = state.clickCount + 1;
 		},
-		navigate() {
+		*navigate() {
+			const {
+				default: { actions: { navigate } },
+			} = yield import( '@wordpress/interactivity/router' );
 			navigate( window.location, {
 				force: true,
 				html,

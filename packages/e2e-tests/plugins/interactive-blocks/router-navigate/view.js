@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import { store } from '@wordpress/interactivity';
-// eslint-disable-next-line no-restricted-syntax
-import { navigate } from '@wordpress/interactivity/router';
 
 const { state } = store( 'router', {
 	state: {
@@ -21,6 +19,9 @@ const { state } = store( 'router', {
 			const force = e.target.dataset.forceNavigation === 'true';
 			const { timeout } = state;
 
+			const {
+				default: { actions: { navigate } },
+			} = yield import( '@wordpress/interactivity/router' );
 			yield navigate( e.target.href, { force, timeout } );
 
 			state.navigations -= 1;

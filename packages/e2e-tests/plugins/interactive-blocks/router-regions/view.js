@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import { store, getContext } from '@wordpress/interactivity';
-// eslint-disable-next-line no-restricted-syntax
-import { navigate } from '@wordpress/interactivity/router';
 
 const { state } = store( 'router-regions', {
 	state: {
@@ -21,6 +19,9 @@ const { state } = store( 'router-regions', {
 		router: {
 			*navigate( e ) {
 				e.preventDefault();
+				const {
+					default: { actions: { navigate } },
+				} = yield import( '@wordpress/interactivity/router' );
 				yield navigate( e.target.href );
 			},
 			back() {
