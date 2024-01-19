@@ -29,7 +29,7 @@ import { createRegistrySelector } from '@wordpress/data';
 import { checkAllowListRecursive, checkAllowList } from './utils';
 import { orderBy } from '../utils/sorting';
 import { store } from './';
-import { store as patternsStore } from './patterns-store';
+import { unlock } from '../lock-unlock';
 
 /**
  * A block selection object.
@@ -2241,8 +2241,8 @@ export const __experimentalGetParsedPattern = createRegistrySelector(
 	( select ) =>
 		createSelector(
 			( state, patternName ) => {
-				const patterns =
-					select( patternsStore ).getAllPatterns( state );
+				const { getAllPatterns } = unlock( select( store ) );
+				const patterns = getAllPatterns();
 				const pattern = patterns.find(
 					( { name } ) => name === patternName
 				);
@@ -2256,7 +2256,7 @@ export const __experimentalGetParsedPattern = createRegistrySelector(
 					} ),
 				};
 			},
-			( state ) => [ select( patternsStore ).getAllPatterns( state ) ]
+			( state ) => [ state.blockPatterns ]
 		)
 );
 
@@ -2272,15 +2272,16 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 	( select ) => {
 		return createSelector(
 			( state, rootClientId = null ) => {
-				const patterns =
-					select( patternsStore ).getAllPatterns( state );
+				const {
+					getAllPatterns,
+					__experimentalGetParsedPattern: getParsedPattern,
+				} = unlock( select( store ) );
+				const patterns = getAllPatterns();
 				const { allowedBlockTypes } = getSettings( state );
 
 				const parsedPatterns = patterns
 					.filter( ( { inserter = true } ) => !! inserter )
-					.map( ( { name } ) =>
-						__experimentalGetParsedPattern( state, name )
-					);
+					.map( ( { name } ) => getParsedPattern( name ) );
 				const availableParsedPatterns = parsedPatterns.filter(
 					( { blocks } ) =>
 						checkAllowListRecursive( blocks, allowedBlockTypes )
@@ -2296,7 +2297,7 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 			},
 			( state, rootClientId ) => {
 				return [
-					select( patternsStore ).getAllPatterns(),
+					state.blockPatterns,
 					state.settings.allowedBlockTypes,
 					state.settings.templateLock,
 					state.blockListSettings[ rootClientId ],
@@ -2342,7 +2343,7 @@ export const getPatternsByBlockTypes = createRegistrySelector( ( select ) =>
 			return filteredPatterns;
 		},
 		( state, blockNames, rootClientId ) => [
-			select( patternsStore ).getAllPatterns(),
+			state.blockPatterns,
 			state.settings.allowedBlockTypes,
 			state.settings.templateLock,
 			state.blockListSettings[ rootClientId ],

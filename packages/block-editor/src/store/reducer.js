@@ -2017,6 +2017,15 @@ export function lastFocus( state = false, action ) {
 	return state;
 }
 
+function blockPatterns( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_BLOCK_PATTERNS':
+			return action.patterns;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
@@ -2047,6 +2056,7 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
+	blockPatterns,
 } );
 
 function withAutomaticChangeReset( reducer ) {

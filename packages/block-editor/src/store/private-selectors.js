@@ -16,11 +16,12 @@ import {
 	getBlockParents,
 	getBlockEditingMode,
 	getSettings,
-	__experimentalGetParsedPattern,
 	canInsertBlockType,
 } from './selectors';
 import { checkAllowListRecursive } from './utils';
-import { store as patternsStore } from './patterns-store';
+import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
+import { store } from './';
+import { unlock } from '../lock-unlock';
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -247,6 +248,10 @@ export const getInserterMediaCategories = createSelector(
 	]
 );
 
+export function getFetchedPatterns( state ) {
+	return state.blockPatterns;
+}
+
 /**
  * Returns whether there is at least one allowed pattern for inner blocks children.
  * This is useful for deferring the parsing of all patterns until needed.
@@ -259,16 +264,16 @@ export const getInserterMediaCategories = createSelector(
 export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, rootClientId = null ) => {
-			const patterns = select( patternsStore ).getAllPatterns( state );
+			const { getAllPatterns, __experimentalGetParsedPattern } = unlock(
+				select( store )
+			);
+			const patterns = getAllPatterns();
 			const { allowedBlockTypes } = getSettings( state );
 			return patterns.some( ( { name, inserter = true } ) => {
 				if ( ! inserter ) {
 					return false;
 				}
-				const { blocks } = __experimentalGetParsedPattern(
-					state,
-					name
-				);
+				const { blocks } = __experimentalGetParsedPattern( name );
 				return (
 					checkAllowListRecursive( blocks, allowedBlockTypes ) &&
 					blocks.every( ( { name: blockName } ) =>
@@ -278,12 +283,62 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 			} );
 		},
 		( state, rootClientId ) => [
-			select( patternsStore ).getAllPatterns( state ),
+			state.blockPatterns,
 			state.settings.allowedBlockTypes,
 			state.settings.templateLock,
 			state.blockListSettings[ rootClientId ],
 			state.blocks.byClientId.get( rootClientId ),
 		]
+	)
+);
+
+export const getAllPatterns = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state ) => {
+			// This setting is left for back compat.
+			const {
+				__experimentalBlockPatterns,
+				__experimentalFetchBlockPatterns,
+				__experimentalUserPatternCategories = [],
+				__experimentalReusableBlocks = [],
+			} = state.settings;
+			const userPatterns = ( __experimentalReusableBlocks ?? [] ).map(
+				( userPattern ) => {
+					return {
+						name: `core/block/${ userPattern.id }`,
+						id: userPattern.id,
+						type: INSERTER_PATTERN_TYPES.user,
+						title: userPattern.title.raw,
+						categories: userPattern.wp_pattern_category.map(
+							( catId ) => {
+								const category = (
+									__experimentalUserPatternCategories ?? []
+								).find( ( { id } ) => id === catId );
+								return category ? category.slug : catId;
+							}
+						),
+						content: userPattern.content.raw,
+						syncStatus: userPattern.wp_pattern_sync_status,
+					};
+				}
+			);
+			return [
+				...userPatterns,
+				...__experimentalBlockPatterns,
+				...unlock( select( store ) ).getFetchedPatterns(
+					__experimentalFetchBlockPatterns
+				),
+			];
+		},
+		( state ) => {
+			return [
+				state.settings.__experimentalBlockPatterns,
+				state.settings.__experimentalUserPatternCategories,
+				state.settings.__experimentalReusableBlocks,
+				state.settings.__experimentalFetchBlockPatterns,
+				state.blockPatterns,
+			];
+		}
 	)
 );
 
