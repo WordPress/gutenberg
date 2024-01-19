@@ -19,7 +19,11 @@ import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { SearchControlProps } from './types';
 import type { ForwardedRef } from 'react';
 import { ContextSystemProvider } from '../context';
-import { SearchIconWrapper, InputControlWithoutWebkitStyles } from './styles';
+import {
+	SearchIconWrapper,
+	InputControlWithoutWebkitStyles,
+	CloseIconWrapper,
+} from './styles';
 
 function UnforwardedSearchControl(
 	{
@@ -52,13 +56,16 @@ function UnforwardedSearchControl(
 		};
 
 		return (
-			<Button
-				__next40pxDefaultSize
-				size={ size }
-				icon={ closeSmall }
-				label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
-				onClick={ onClose ?? onReset }
-			/>
+			<CloseIconWrapper size={ size }>
+				<Button
+					size="small"
+					icon={ closeSmall }
+					label={
+						onClose ? __( 'Close search' ) : __( 'Reset search' )
+					}
+					onClick={ onClose ?? onReset }
+				/>
+			</CloseIconWrapper>
 		);
 	};
 
@@ -71,7 +78,6 @@ function UnforwardedSearchControl(
 	);
 
 	// TODO:
-	// - always use compact close button?
 	// - comb the codebase for `components-search-control__*` selectors
 	// - remove stylesheet
 

@@ -10,7 +10,7 @@ import { space } from '../utils/space';
 import type { SearchControlProps } from './types';
 import InputControl from '../input-control';
 
-const inlineStartPadding = ( {
+const inlinePadding = ( {
 	size,
 }: Required< Pick< SearchControlProps, 'size' > > ) => {
 	return space( size === 'compact' ? 1 : 2 );
@@ -18,7 +18,12 @@ const inlineStartPadding = ( {
 
 export const SearchIconWrapper = styled.div`
 	display: flex;
-	padding-inline-start: ${ inlineStartPadding };
+	padding-inline-start: ${ inlinePadding };
+`;
+
+export const CloseIconWrapper = styled.div`
+	display: flex;
+	padding-inline-end: ${ inlinePadding };
 `;
 
 export const InputControlWithoutWebkitStyles = styled( InputControl )`
