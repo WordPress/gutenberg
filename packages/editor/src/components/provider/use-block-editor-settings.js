@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Platform, useMemo, useCallback } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { resolveSelect, useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
@@ -239,6 +239,9 @@ function useBlockEditorSettings( settings, postType, postId ) {
 	}, [ settings.allowedBlockTypes, hiddenBlockTypes, blockTypes ] );
 
 	const forceDisableFocusMode = settings.focusMode === false;
+	const syncGetEntityRecord = useCallback( async ( ...args ) => {
+		return await resolveSelect( coreStore ).getEntityRecord( ...args );
+	}, [] );
 
 	return useMemo(
 		() => ( {
@@ -283,6 +286,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					? [ [ 'core/navigation', {}, [] ] ]
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
+			__experimentalSyncGetEntityRecord: syncGetEntityRecord,
 		} ),
 		[
 			allowedBlockTypes,
@@ -306,6 +310,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			pageForPosts,
 			postType,
 			setIsInserterOpened,
+			syncGetEntityRecord,
 		]
 	);
 }

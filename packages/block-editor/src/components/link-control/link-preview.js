@@ -7,14 +7,9 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	Button,
-	ExternalLink,
-	__experimentalText as Text,
-	Tooltip,
-} from '@wordpress/components';
+import { Button, ExternalLink, Tooltip } from '@wordpress/components';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { Icon, globe, info, linkOff, edit } from '@wordpress/icons';
+import { Icon, globe, info, linkOff } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
@@ -23,37 +18,53 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { ViewerSlot } from './viewer-slot';
 
 import useRichUrlData from './use-rich-url-data';
+import useEntityData from './use-entity-data';
+import { ICONS_MAP } from './constants';
 
 export default function LinkPreview( {
 	value,
-	onEditClick,
 	hasRichPreviews = false,
 	hasUnlinkControl = false,
 	onRemove,
 	additionalControls,
 } ) {
+	// Only use the image if the type is a media attachment.
+	const showRichDataImage = value?.type === 'attachment';
+
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
 
-	const { richData, isFetching } = useRichUrlData( showRichPreviews );
+	const { richData, isFetching: isFetchingRichURLData } =
+		useRichUrlData( showRichPreviews );
+
+	const { entityData, isFetching: isFetchingEntityData } = useEntityData(
+		value?.type,
+		value?.id
+	);
+
+	const isFetching = isFetchingRichURLData || isFetchingEntityData;
 
 	// Rich data may be an empty object so test for that.
-	const hasRichData = richData && Object.keys( richData ).length;
+	const hasRichData =
+		( richData && Object.keys( richData ).length ) ||
+		( entityData && Object.keys( entityData ).length );
 
 	const displayURL =
 		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
 		'';
 
+	const displayTitle = stripHTML(
+		entityData?.title?.rendered || richData?.title || displayURL
+	);
+
 	// url can be undefined if the href attribute is unset
 	const isEmptyURL = ! value?.url?.length;
 
-	const displayTitle =
-		! isEmptyURL &&
-		stripHTML( richData?.title || value?.title || displayURL );
-
 	let icon;
 
-	if ( richData?.icon ) {
+	if ( entityData?.type ) {
+		icon = <Icon icon={ ICONS_MAP[ entityData.type ] } />;
+	} else if ( richData?.icon ) {
 		icon = <img src={ richData?.icon } alt="" />;
 	} else if ( isEmptyURL ) {
 		icon = <Icon icon={ info } size={ 32 } />;
@@ -100,9 +111,13 @@ export default function LinkPreview( {
 									</ExternalLink>
 								</Tooltip>
 
-								{ value?.url && displayTitle !== displayURL && (
+								{ ( entityData?.slug ||
+									( value?.url &&
+										displayTitle !== displayURL ) ) && (
 									<span className="block-editor-link-control__search-item-info">
-										{ displayURL }
+										{ filterURLForDisplay(
+											'/' + entityData?.slug
+										) || displayURL }
 									</span>
 								) }
 							</>
@@ -114,13 +129,6 @@ export default function LinkPreview( {
 					</span>
 				</span>
 
-				<Button
-					icon={ edit }
-					label={ __( 'Edit' ) }
-					className="block-editor-link-control__search-item-action"
-					onClick={ onEditClick }
-					iconSize={ 24 }
-				/>
 				{ hasUnlinkControl && (
 					<Button
 						icon={ linkOff }
@@ -134,9 +142,9 @@ export default function LinkPreview( {
 			</div>
 
 			{ !! (
-				( hasRichData &&
-					( richData?.image || richData?.description ) ) ||
-				isFetching
+				hasRichData &&
+				showRichDataImage &&
+				( richData?.image || isFetching )
 			) && (
 				<div className="block-editor-link-control__search-item-bottom">
 					{ ( richData?.image || isFetching ) && (
@@ -151,24 +159,6 @@ export default function LinkPreview( {
 						>
 							{ richData?.image && (
 								<img src={ richData?.image } alt="" />
-							) }
-						</div>
-					) }
-
-					{ ( richData?.description || isFetching ) && (
-						<div
-							aria-hidden={ ! richData?.description }
-							className={ classnames(
-								'block-editor-link-control__search-item-description',
-								{
-									'is-placeholder': ! richData?.description,
-								}
-							) }
-						>
-							{ richData?.description && (
-								<Text truncate numberOfLines="2">
-									{ richData.description }
-								</Text>
 							) }
 						</div>
 					) }

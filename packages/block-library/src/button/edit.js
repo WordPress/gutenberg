@@ -315,7 +315,7 @@ function ButtonEdit( props ) {
 						richTextRef.current?.focus();
 					} }
 					anchor={ popoverAnchor }
-					focusOnMount={ isEditingURL ? 'firstElement' : false }
+					focusOnMount={ 'firstElement' }
 					__unstableSlotName={ '__unstable-block-tools-after' }
 					shift
 				>

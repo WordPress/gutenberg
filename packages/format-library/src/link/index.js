@@ -11,6 +11,7 @@ import {
 	isCollapsed,
 	insert,
 	create,
+	concat,
 } from '@wordpress/rich-text';
 import { isURL, isEmail } from '@wordpress/url';
 import {
@@ -64,6 +65,18 @@ function Edit( {
 
 	function stopAddingLink( returnFocus = true ) {
 		setAddingLink( false );
+
+		// Remove any active formats.
+		// Cloning the existing value has the effect of removing
+		// any active formats and is roughly equivalent to the
+		// following mutation:
+		// value.activeFormats = [];
+		const newValue = concat( value );
+
+		// Update to force format to no longer be active.
+		onChange( newValue );
+
+		// Handle focus
 		if ( returnFocus ) {
 			onFocus();
 		}

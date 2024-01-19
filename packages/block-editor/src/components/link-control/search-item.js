@@ -3,28 +3,15 @@
  */
 import { __ } from '@wordpress/i18n';
 import { MenuItem, TextHighlight } from '@wordpress/components';
-import {
-	Icon,
-	globe,
-	page,
-	tag,
-	postList,
-	category,
-	file,
-	home,
-	verse,
-} from '@wordpress/icons';
+import { Icon, globe, home, verse } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
 import { pipe } from '@wordpress/compose';
 
-const ICONS_MAP = {
-	post: postList,
-	page,
-	post_tag: tag,
-	category,
-	attachment: file,
-};
+/**
+ * Internal dependencies
+ */
+import { ICONS_MAP } from './constants';
 
 function SearchItemIcon( { isURL, suggestion } ) {
 	let icon = null;

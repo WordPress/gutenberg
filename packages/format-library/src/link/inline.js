@@ -42,7 +42,6 @@ const LINK_SETTINGS = [
 function InlineLinkUI( {
 	isActive,
 	activeAttributes,
-	addingLink,
 	value,
 	onChange,
 	stopAddingLink,
@@ -90,12 +89,9 @@ function InlineLinkUI( {
 	}
 
 	function onChangeLink( nextValue ) {
-		// LinkControl calls `onChange` immediately upon the toggling a setting.
-		// Before merging the next value with the current link value, check if
-		// the setting was toggled.
-		const didToggleSetting =
-			linkValue.opensInNewTab !== nextValue.opensInNewTab &&
-			nextValue.url === undefined;
+		const hasLink = linkValue?.url;
+		const isNewLink = ! hasLink;
+
 		// Merge the next value with the current link value.
 		nextValue = {
 			...linkValue,
@@ -180,15 +176,12 @@ function InlineLinkUI( {
 
 			newValue.start = newValue.end;
 
-			// Hides the Link UI.
-			newValue.activeFormats = [];
-			onChange( newValue );
-		}
+			// Hides the Link UI on change except upon the initial creation of the link.
+			if ( ! isNewLink ) {
+				newValue.activeFormats = [];
+			}
 
-		// Focus should only be shifted back to the formatted segment when the
-		// URL is submitted.
-		if ( ! didToggleSetting ) {
-			stopAddingLink();
+			onChange( newValue );
 		}
 
 		if ( ! isValidHref( newUrl ) ) {
@@ -216,14 +209,6 @@ function InlineLinkUI( {
 	// See https://github.com/WordPress/gutenberg/pull/34742.
 	const forceRemountKey = useLinkInstanceKey( popoverAnchor );
 
-	// Focus should only be moved into the Popover when the Link is being created or edited.
-	// When the Link is in "preview" mode focus should remain on the rich text because at
-	// this point the Link dialog is informational only and thus the user should be able to
-	// continue editing the rich text.
-	// Ref used because the focusOnMount prop shouldn't evolve during render of a Popover
-	// otherwise it causes a render of the content.
-	const focusOnMount = useRef( addingLink ? 'firstElement' : false );
-
 	async function handleCreate( pageTitle ) {
 		const page = await createPageEntity( {
 			title: pageTitle,
@@ -250,8 +235,20 @@ function InlineLinkUI( {
 		);
 	}
 
+	const hasLink = linkValue?.url;
+
+	// Focus should only be moved into the Popover when the Link is being **created**.
+	// When the link has already been created it is in a pseudo "preview" mode and thus
+	// focus should remain on the rich text because at this point the Link dialog is
+	// partially informational and thus the user should be able to continue editing the
+	// rich text.
+	// Ref used because the focusOnMount prop shouldn't evolve during render of a Popover
+	// otherwise it causes a render of the content.
+	const focusOnMount = useRef( hasLink ? false : 'firstElement' );
+
 	return (
 		<Popover
+			role="dialog"
 			anchor={ popoverAnchor }
 			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
@@ -264,7 +261,7 @@ function InlineLinkUI( {
 				value={ linkValue }
 				onChange={ onChangeLink }
 				onRemove={ removeLink }
-				forceIsEditingLink={ addingLink }
+				onCancel={ stopAddingLink }
 				hasRichPreviews
 				createSuggestion={ createPageEntity && handleCreate }
 				withCreateSuggestion={ userCanCreatePages }
