@@ -111,11 +111,11 @@ gutenberg_enqueue_module( 'directive-each-view' );
 			data-wp-on--click="actions.unshiftNumberAndName"
 		>Unshift</button>
 		<template
-			data-wp-each--number="state.numbersAndNames"
-			data-wp-each-key="state.numberId"
+			data-wp-each="state.numbersAndNames"
+			data-wp-each-key="context.item.value"
 		>
-			<p data-wp-text="context.number.name" data-testid="item"></p>
-			<p data-wp-text="context.number.value" data-testid="item"></p>
+			<p data-wp-text="context.item.name" data-testid="item"></p>
+			<p data-wp-text="context.item.value" data-testid="item"></p>
 		</template>
 		<p data-testid="item" data-wp-each-child>two</p>
 		<p data-testid="item" data-wp-each-child>2</p>
