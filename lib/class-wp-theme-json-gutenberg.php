@@ -541,7 +541,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var string[]
 	 */
 	const ELEMENTS = array(
-		'link'    => 'a:where(:not(.wp-element-button))', // The `where` is needed to lower the specificity.
+		'link'    => 'a:not(.wp-element-button)',
 		'heading' => 'h1, h2, h3, h4, h5, h6',
 		'h1'      => 'h1',
 		'h2'      => 'h2',
@@ -550,7 +550,7 @@ class WP_Theme_JSON_Gutenberg {
 		'h5'      => 'h5',
 		'h6'      => 'h6',
 		// We have the .wp-block-button__link class so that this will target older buttons that have been serialized.
-		'button'  => ':where(.wp-element-button), :where(.wp-block-button__link)',
+		'button'  => '.wp-element-button, .wp-block-button__link',
 		// The block classes are necessary to target older content that won't use the new class names.
 		'caption' => '.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption',
 		'cite'    => 'cite',
@@ -988,7 +988,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		foreach ( $blocks as $block_name => $block_type ) {
-			$root_selector = ':where(' . wp_get_block_css_selector( $block_type ) . ')';
+			$root_selector = wp_get_block_css_selector( $block_type );
 
 			static::$blocks_metadata[ $block_name ]['selector']  = $root_selector;
 			static::$blocks_metadata[ $block_name ]['selectors'] = static::get_block_selectors( $block_type, $root_selector );
@@ -2573,7 +2573,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// 2. Generate and append the rules that use the general selector.
-		$block_rules .= static::to_ruleset( $selector, $declarations );
+		$block_rules .= static::to_ruleset( ":where($selector)", $declarations );
 
 		// 3. Generate and append the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
@@ -2590,7 +2590,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 5. Generate and append the feature level rulesets.
 		foreach ( $feature_declarations as $feature_selector => $individual_feature_declarations ) {
-			$block_rules .= static::to_ruleset( $feature_selector, $individual_feature_declarations );
+			$block_rules .= static::to_ruleset( ":where($feature_selector)", $individual_feature_declarations );
 		}
 
 		// 6. Generate and append the style variation rulesets.

@@ -839,7 +839,7 @@ export const toStyles = (
 					( [ cssSelector, declarations ] ) => {
 						if ( declarations.length ) {
 							const rules = declarations.join( ';' );
-							ruleset += `${ cssSelector }{${ rules };}`;
+							ruleset += `:where(${ cssSelector }) {${ rules };}`;
 						}
 					}
 				);
@@ -932,7 +932,9 @@ export const toStyles = (
 				isTemplate
 			);
 			if ( declarations?.length ) {
-				ruleset += `${ selector }{${ declarations.join( ';' ) };}`;
+				ruleset += `:where(${ selector }) {${ declarations.join(
+					';'
+				) };}`;
 			}
 
 			// Check for pseudo selector in `styles` and handle separately.
@@ -1050,7 +1052,7 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 	const result = {};
 	blockTypes.forEach( ( blockType ) => {
 		const name = blockType.name;
-		const selector = `:where(${ getBlockCSSSelector( blockType ) })`;
+		const selector = getBlockCSSSelector( blockType );
 		let duotoneSelector = getBlockCSSSelector(
 			blockType,
 			'filter.duotone'
