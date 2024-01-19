@@ -43,7 +43,7 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'get_fonts_collection_permissions_check' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 				),
 			)
 		);
@@ -55,10 +55,26 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_item' ),
-					'permission_callback' => array( $this, 'get_fonts_collection_permissions_check' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 				),
 			)
 		);
+	}
+
+	/**
+	 * Gets the font collections available.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$collections = array();
+		foreach ( WP_Font_Library::get_font_collections() as $collection ) {
+			$collections[] = $collection->get_config();
+		}
+
+		return rest_ensure_response( $collections, 200 );
 	}
 
 	/**
@@ -93,29 +109,14 @@ class WP_REST_Font_Collections_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Gets the font collections available.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
-	 */
-	public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		$collections = array();
-		foreach ( WP_Font_Library::get_font_collections() as $collection ) {
-			$collections[] = $collection->get_config();
-		}
-
-		return rest_ensure_response( $collections, 200 );
-	}
-
-	/**
 	 * Checks whether the user has permissions to use the Fonts Collections.
 	 *
 	 * @since 6.5.0
 	 *
 	 * @return true|WP_Error True if the request has write access for the item, WP_Error object otherwise.
 	 */
-	public function get_fonts_collection_permissions_check() {
+	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
 			return new WP_Error(
 				'rest_cannot_read',
