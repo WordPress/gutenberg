@@ -322,6 +322,8 @@ export default () => {
 			element,
 			evaluate,
 		} ) => {
+			if ( element.type !== 'template' ) return;
+
 			const { Provider } = inheritedContext;
 			const inheritedValue = useContext( inheritedContext );
 
