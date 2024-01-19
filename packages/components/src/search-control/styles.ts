@@ -10,7 +10,7 @@ import { space } from '../utils/space';
 import type { SearchControlProps } from './types';
 import InputControl from '../input-control';
 
-const horizontalPadding = ( {
+const inlineStartPadding = ( {
 	size,
 }: Required< Pick< SearchControlProps, 'size' > > ) => {
 	return space( size === 'compact' ? 1 : 2 );
@@ -18,7 +18,7 @@ const horizontalPadding = ( {
 
 export const SearchIconWrapper = styled.div`
 	display: flex;
-	padding: 0 ${ horizontalPadding };
+	padding-inline-start: ${ inlineStartPadding };
 `;
 
 export const InputControlWithoutWebkitStyles = styled( InputControl )`

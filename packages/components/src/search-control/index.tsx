@@ -72,7 +72,6 @@ function UnforwardedSearchControl(
 
 	// TODO:
 	// - always use compact close button?
-	// - RTL support re: prefix/suffix
 	// - comb the codebase for `components-search-control__*` selectors
 	// - remove stylesheet
 
