@@ -71,7 +71,6 @@ function UnforwardedSearchControl(
 	);
 
 	// TODO:
-	// - compact size
 	// - always use compact close button?
 	// - RTL support re: prefix/suffix
 	// - comb the codebase for `components-search-control__*` selectors
@@ -85,6 +84,7 @@ function UnforwardedSearchControl(
 				hideLabelFromVision={ hideLabelFromVision }
 				ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
 				type="search"
+				size={ size }
 				className={ classnames(
 					'components-search-control',
 					className
