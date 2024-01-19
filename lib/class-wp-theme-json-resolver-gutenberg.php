@@ -225,7 +225,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Theme supports have been inlined and the `$theme_support_data` argument removed.
 	 * @since 6.0.0 Added an `$options` parameter to allow the theme data to be returned without theme supports.
-	 * @since 6.5.0 Theme data will now also include block style variations that were registered with a style object.
+	 * @since 6.5.0 Theme data will now also include block style variations that
+	 *              were registered with a style object or included via a standalone file.
 	 *
 	 * @param array $deprecated Deprecated. Not used.
 	 * @param array $options {
@@ -373,9 +374,53 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 
 		if ( $options['with_block_style_variations'] ) {
+			// Absorb block style variations that were registered with a style object.
 			$block_style_variations_data = WP_Theme_JSON_Gutenberg::get_from_block_styles_registry();
 			$with_block_style_variations = new WP_Theme_JSON_Gutenberg( $block_style_variations_data );
 			$with_theme_supports->merge( $with_block_style_variations );
+
+			// Resolve shared block style variations that were bundled in the
+			// theme via standalone theme.json files.
+			$shared_block_style_variations = static::get_style_variations( '/block-styles' );
+			$variations_data               = array();
+			$registry                      = WP_Block_Styles_Registry::get_instance();
+
+			foreach ( $shared_block_style_variations as $variation ) {
+				if ( empty( $variation['supportedBlockTypes'] ) || empty( $variation['styles'] ) ) {
+					continue;
+				}
+
+				$variation_slug = _wp_to_kebab_case( $variation['title'] );
+
+				// If it proves desirable, block style variations could include
+				// custom settings which can be included here.
+				foreach ( $variation['supportedBlockTypes'] as $block_type ) {
+					// Automatically register the block style variation if it
+					// hasn't been already.
+					$registered_styles = $registry->get_registered_styles_for_block( $block_type );
+					if ( ! array_key_exists( $variation_slug, $registered_styles ) ) {
+						gutenberg_register_block_style(
+							$block_type,
+							array(
+								'name'  => $variation_slug,
+								'label' => $variation['title'],
+							)
+						);
+					}
+
+					$path = array( $block_type, 'variations', $variation_slug );
+					_wp_array_set( $variations_data, $path, $variation['styles'] );
+				}
+			}
+
+			if ( ! empty( $variations_data ) ) {
+				$variations_theme_json_data = array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array( 'blocks' => $variations_data ),
+				);
+				$with_shared_variations     = new WP_Theme_JSON_Gutenberg( $variations_theme_json_data );
+				$with_theme_supports->merge( $with_shared_variations );
+			}
 		}
 
 		$with_theme_supports->merge( static::$theme );
@@ -743,14 +788,16 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Returns the style variations defined by the theme (parent and child).
 	 *
 	 * @since 6.2.0 Returns parent theme variations if theme is a child.
+	 * @since 6.5.0 Added configurable directory to allow block style variations
+	 *              to reside in a different directory to theme style variations.
 	 *
 	 * @return array
 	 */
-	public static function get_style_variations() {
+	public static function get_style_variations( $dir = 'styles' ) {
 		$variation_files    = array();
 		$variations         = array();
-		$base_directory     = get_stylesheet_directory() . '/styles';
-		$template_directory = get_template_directory() . '/styles';
+		$base_directory     = get_stylesheet_directory() . '/' . $dir;
+		$template_directory = get_template_directory() . '/' . $dir;
 		if ( is_dir( $base_directory ) ) {
 			$variation_files = static::recursively_iterate_json( $base_directory );
 		}
