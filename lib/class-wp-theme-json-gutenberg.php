@@ -328,6 +328,7 @@ class WP_Theme_JSON_Gutenberg {
 		'patterns',
 		'settings',
 		'styles',
+		'supportedBlockTypes',
 		'templateParts',
 		'title',
 		'version',
