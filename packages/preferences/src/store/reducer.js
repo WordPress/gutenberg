@@ -83,7 +83,42 @@ export const preferences = withPersistenceLayer( ( state = {}, action ) => {
 	return state;
 } );
 
-export default combineReducers( {
-	defaults,
-	preferences,
-} );
+const PROXIED_ACTIONS = [ 'SET_PREFERENCE_VALUE', 'SET_PREFERENCE_DEFAULTS' ];
+function withProxiedScope( reducer ) {
+	return ( state, action ) => {
+		const { scope, type } = action;
+		if (
+			PROXIED_ACTIONS.includes( type ) &&
+			state?.scopeProxies[ scope ]
+		) {
+			const proxiedScope = state.scopeProxies[ scope ];
+			const updatedAction = {
+				...action,
+				scope: proxiedScope ?? scope,
+			};
+			return reducer( state, updatedAction );
+		}
+		reducer( state, action );
+	};
+}
+
+function scopeProxies( state, action ) {
+	if ( action.type === 'SET_SCOPE_PROXY' ) {
+		const { fromScope, toScope } = action;
+
+		return {
+			...state,
+			[ fromScope ]: toScope,
+		};
+	}
+
+	return state;
+}
+
+export default withProxiedScope(
+	combineReducers( {
+		defaults,
+		preferences,
+		scopeProxies,
+	} )
+);

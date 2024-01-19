@@ -215,6 +215,23 @@ _Returns_
 
 -   `Object`: Action object.
 
+#### setScopeProxy
+
+Adds a way to proxy from one scope to another.
+
+If a consumer tries to get or set a preference from the `fromScope`, it will instead be proxied to the `toScope`.
+
+This is useful for backwards compatibility when a preference has been migrated to another scope.
+
+_Parameters_
+
+-   _fromScope_ `string`: The scope to proxy from.
+-   _toScope_ `string`: The scope to proxy to.
+
+_Returns_
+
+-   `Object`: Action object.
+
 #### toggle
 
 Returns an action object used in signalling that a preference should be toggled.

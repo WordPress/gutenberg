@@ -52,6 +52,7 @@ export function initializeEditor(
 	const target = document.getElementById( id );
 	const root = createRoot( target );
 
+	dispatch( preferencesStore ).setScopeProxy( 'core/edit-post', 'core' );
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		fullscreenMode: true,
 		isPublishSidebarEnabled: true,

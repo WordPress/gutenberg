@@ -21,6 +21,7 @@ import Editor from './editor';
  * @param {Object} postId   ID of the post to edit (unused right now)
  */
 export function initializeEditor( id, postType, postId ) {
+	dispatch( preferencesStore ).setScopeProxy( 'core/edit-post', 'core' );
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		editorMode: 'visual',
 		fullscreenMode: true,

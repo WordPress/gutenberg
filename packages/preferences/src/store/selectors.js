@@ -9,6 +9,9 @@
  * @return {*} Is the feature enabled?
  */
 export function get( state, scope, name ) {
+	if ( state.scopeProxies[ scope ] ) {
+		scope = state.scopeProxies[ scope ];
+	}
 	const value = state.preferences[ scope ]?.[ name ];
 	return value !== undefined ? value : state.defaults[ scope ]?.[ name ];
 }

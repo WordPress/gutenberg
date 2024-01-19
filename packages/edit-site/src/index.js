@@ -51,6 +51,7 @@ export function initializeEditor( id, settings ) {
 
 	// We dispatch actions and update the store synchronously before rendering
 	// so that we won't trigger unnecessary re-renders with useEffect.
+	dispatch( preferencesStore ).setScopeProxy( 'core/edit-site', 'core' );
 	dispatch( preferencesStore ).setDefaults( 'core/edit-site', {
 		welcomeGuide: true,
 		welcomeGuideStyles: true,

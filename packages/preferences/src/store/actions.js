@@ -80,3 +80,25 @@ export async function setPersistenceLayer( persistenceLayer ) {
 		persistedData,
 	};
 }
+
+/**
+ * Adds a way to proxy from one scope to another.
+ *
+ * If a consumer tries to get or set a preference from the `fromScope`, it will
+ * instead be proxied to the `toScope`.
+ *
+ * This is useful for backwards compatibility when a preference has been
+ * migrated to another scope.
+ *
+ * @param {string} fromScope The scope to proxy from.
+ * @param {string} toScope   The scope to proxy to.
+ *
+ * @return {Object} Action object.
+ */
+export function setScopeProxy( fromScope, toScope ) {
+	return {
+		type: 'SET_SCOPE_PROXY',
+		fromScope,
+		toScope,
+	};
+}
