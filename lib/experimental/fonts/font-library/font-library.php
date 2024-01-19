@@ -27,8 +27,8 @@ function gutenberg_init_font_library_routes() {
 			'singular_name' => __( 'Font Family', 'gutenberg' ),
 		),
 		'public'                         => false,
-		'_builtin'                       => true,  /* internal use only. don't use this when registering your own post type. */
-		'show_in_rest'                   => true,
+		'_builtin'                       => true, /* internal use only. don't use this when registering your own post type. */
+		'hierarchical'                   => false,
 		'capabilities'                   => array(
 			'read'                   => 'edit_theme_options',
 			'read_post'              => 'edit_theme_options',
@@ -45,26 +45,25 @@ function gutenberg_init_font_library_routes() {
 			'delete_published_posts' => 'edit_theme_options',
 		),
 		'map_meta_cap'                   => false,
+		'query_var'                      => false,
+		'show_in_rest'                   => true,
 		'rest_base'                      => 'font-families',
 		'rest_controller_class'          => 'WP_REST_Font_Families_Controller',
-		'autosave_rest_controller_class' => 'WP_REST_Autosave_Font_Families_Controller',
-		'query_var'                      => false,
+		'autosave_rest_controller_class' => 'WP_REST_Autosave_Fonts_Controller',
 	);
 	register_post_type( 'wp_font_family', $args );
 
 	register_post_type(
 		'wp_font_face',
 		array(
-			'labels'       => array(
+			'labels'                         => array(
 				'name'          => __( 'Font Faces', 'gutenberg' ),
 				'singular_name' => __( 'Font Face', 'gutenberg' ),
 			),
-			'public'       => false,
-			'_builtin'     => true,                              /* internal use only. don't use this when registering your own post type. */
-			'hierarchical' => false,
-			'show_in_rest' => false,
-			'rest_base'    => 'font-faces',
-			'capabilities' => array(
+			'public'                         => false,
+			'_builtin'                       => true, /* internal use only. don't use this when registering your own post type. */
+			'hierarchical'                   => false,
+			'capabilities'                   => array(
 				'read'                   => 'edit_theme_options',
 				'read_post'              => 'edit_theme_options',
 				'read_private_posts'     => 'edit_theme_options',
@@ -79,17 +78,18 @@ function gutenberg_init_font_library_routes() {
 				'delete_others_posts'    => 'edit_theme_options',
 				'delete_published_posts' => 'edit_theme_options',
 			),
-			'map_meta_cap' => false,
-			'query_var'    => false,
+			'map_meta_cap'                   => false,
+			'query_var'                      => false,
+			'show_in_rest'                   => true,
+			'rest_base'                      => 'font-families/(?P<font_family_id>[\d]+)/font-faces',
+			'rest_controller_class'          => 'WP_REST_Font_Faces_Controller',
+			'autosave_rest_controller_class' => 'WP_REST_Autosave_Fonts_Controller',
 		)
 	);
 
 	// @core-merge: This code will go into Core's `create_initial_rest_routes()`.
 	$font_collections_controller = new WP_REST_Font_Collections_Controller();
 	$font_collections_controller->register_routes();
-
-	$font_faces_controller = new WP_REST_Font_Faces_Controller();
-	$font_faces_controller->register_routes();
 }
 
 add_action( 'rest_api_init', 'gutenberg_init_font_library_routes' );
@@ -190,7 +190,7 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 
 // @core-merge: Filters should go in `src/wp-includes/default-filters.php`,
 // functions in a general file for font library.
-if ( ! function_exists( '_wp_delete_font_family' ) ) {
+if ( ! function_exists( '_wp_after_delete_font_family' ) ) {
 	/**
 	 * Deletes child font faces when a font family is deleted.
 	 *
@@ -201,7 +201,7 @@ if ( ! function_exists( '_wp_delete_font_family' ) ) {
 	 * @param WP_Post $post    Post object.
 	 * @return void
 	 */
-	function _wp_delete_font_family( $post_id, $post ) {
+	function _wp_after_delete_font_family( $post_id, $post ) {
 		if ( 'wp_font_family' !== $post->post_type ) {
 			return;
 		}
@@ -217,10 +217,10 @@ if ( ! function_exists( '_wp_delete_font_family' ) ) {
 			wp_delete_post( $font_face->ID, true );
 		}
 	}
-	add_action( 'deleted_post', '_wp_delete_font_family', 10, 2 );
+	add_action( 'deleted_post', '_wp_after_delete_font_family', 10, 2 );
 }
 
-if ( ! function_exists( '_wp_delete_font_face' ) ) {
+if ( ! function_exists( '_wp_before_delete_font_face' ) ) {
 	/**
 	 * Deletes associated font files when a font face is deleted.
 	 *
@@ -231,7 +231,7 @@ if ( ! function_exists( '_wp_delete_font_face' ) ) {
 	 * @param WP_Post $post    Post object.
 	 * @return void
 	 */
-	function _wp_delete_font_face( $post_id, $post ) {
+	function _wp_before_delete_font_face( $post_id, $post ) {
 		if ( 'wp_font_face' !== $post->post_type ) {
 			return;
 		}
@@ -242,5 +242,5 @@ if ( ! function_exists( '_wp_delete_font_face' ) ) {
 			wp_delete_file( wp_get_font_dir()['path'] . '/' . $font_file );
 		}
 	}
-	add_action( 'before_delete_post', '_wp_delete_font_face', 10, 2 );
+	add_action( 'before_delete_post', '_wp_before_delete_font_face', 10, 2 );
 }
