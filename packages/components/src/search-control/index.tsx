@@ -79,7 +79,6 @@ function UnforwardedSearchControl(
 
 	// TODO:
 	// - comb the codebase for `components-search-control__*` selectors
-	// - remove stylesheet
 
 	return (
 		<ContextSystemProvider value={ baseControlContextValue }>
