@@ -72,11 +72,3 @@ export async function fetchFontCollections() {
 	};
 	return apiFetch( config );
 }
-
-export async function fetchFontCollection( id ) {
-	const config = {
-		path: `/wp/v2/font-collections/${ id }`,
-		method: 'GET',
-	};
-	return apiFetch( config );
-}

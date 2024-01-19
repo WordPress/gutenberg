@@ -405,25 +405,6 @@ function FontLibraryProvider( { children } ) {
 		const response = await fetchFontCollections();
 		setFontCollections( response );
 	};
-	const getFontCollection = async ( id ) => {
-		try {
-			const hasData = !! collections.find(
-				( collection ) => collection.id === id
-			)?.data;
-			if ( hasData ) return;
-			const response = await fetchFontCollection( id );
-			const updatedCollections = collections.map( ( collection ) =>
-				collection.id === id
-					? { ...collection, data: { ...response?.data } }
-					: collection
-			);
-			setFontCollections( updatedCollections );
-		} catch ( e ) {
-			// eslint-disable-next-line no-console
-			console.error( e );
-			throw e;
-		}
-	};
 
 	useEffect( () => {
 		getFontCollections();
@@ -454,7 +435,6 @@ function FontLibraryProvider( { children } ) {
 				hasResolvedLibrary,
 				isInstalling,
 				collections,
-				getFontCollection,
 			} }
 		>
 			{ children }
