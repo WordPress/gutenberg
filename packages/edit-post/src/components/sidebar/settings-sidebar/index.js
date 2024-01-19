@@ -157,6 +157,7 @@ const SettingsSidebar = () => {
 			// the selected tab to `null` avoids that.
 			selectedTabId={ isSettingsSidebarActive ? sidebarName : null }
 			onSelect={ onTabSelect }
+			selectOnMove={ false }
 		>
 			<SidebarContent
 				sidebarName={ sidebarName }
