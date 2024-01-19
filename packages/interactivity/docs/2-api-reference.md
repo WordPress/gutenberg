@@ -26,6 +26,7 @@ DOM elements are connected to data stored in the state and context through direc
     - [`wp-init`](#wp-init) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
     - [`wp-run`](#wp-run) ![](https://img.shields.io/badge/SIDE_EFFECTS-afd2e3.svg)
     - [`wp-key`](#wp-key) ![](https://img.shields.io/badge/TEMPLATING-afd2e3.svg)
+    - [`wp-each`](#wp-each) ![](https://img.shields.io/badge/TEMPLATING-afd2e3.svg)
   - [Values of directives are references to store properties](#values-of-directives-are-references-to-store-properties)
 - [The store](#the-store)
   - [Elements of the store](#elements-of-the-store)
