@@ -76,6 +76,7 @@ class WP_Font_Collection {
 			'slug'        => $this->config['slug'],
 			'name'        => $this->config['name'],
 			'description' => $this->config['description'] ?? '',
+			'require_download' => $this->config['require_download'] ?? false,
 		);
 	}
 
