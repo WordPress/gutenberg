@@ -297,6 +297,9 @@ function Navigation( {
 			),
 		[ clientId ]
 	);
+	const overlayType = window?.__experimentalNavOverlayAuto
+		? 'auto'
+		: overlayMenu;
 	const isResponsive = 'never' !== overlayMenu;
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -311,7 +314,7 @@ function Navigation( {
 				'is-vertical': orientation === 'vertical',
 				'no-wrap': flexWrap === 'nowrap',
 				'is-responsive': isResponsive,
-				'is-collapsed': useIsCollapsed( overlayMenu, navRef ),
+				'is-collapsed': useIsCollapsed( overlayType, navRef ),
 				'has-text-color': !! textColor.color || !! textColor?.class,
 				[ getColorClassName( 'color', textColor?.slug ) ]:
 					!! textColor?.slug,
