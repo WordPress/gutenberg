@@ -14,6 +14,10 @@ store( 'directive-each', {
 store( 'directive-each', {
 	state: {
 		fruits: [ 'avocado', 'banana', 'cherimoya' ],
+		get fruitId() {
+			const { idPrefix, fruit } = getContext();
+			return `${idPrefix}${fruit}`;
+		}
 	},
 	actions: {
 		removeFruit() {

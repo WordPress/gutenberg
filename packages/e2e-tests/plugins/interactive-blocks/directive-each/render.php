@@ -175,6 +175,28 @@ gutenberg_enqueue_module( 'directive-each-view' );
 			<p data-wp-text="context.item" data-testid="item"></p>
 		</div>
 	</div>
+
+
+	<div data-testid="derived state">
+		<button
+			data-testid="rotate" data-wp-on--click="actions.rotateFruits"
+		>Rotate</button>
+		<template
+			data-wp-context='{ "idPrefix": "fruit-" }'
+			data-wp-each--fruit="state.fruits"
+			data-wp-each-key="state.fruitId"
+		>
+			<p
+				data-testid="item"
+				data-wp-text="context.fruit"
+				data-wp-bind--data-fruit-id="state.fruitId"
+			></p>
+		</template>
+		<!-- SSRed elements; they should be removed on hydration -->
+		<p data-testid="item" data-wp-each-child>avocado</p>
+		<p data-testid="item" data-wp-each-child>banana</p>
+		<p data-testid="item" data-wp-each-child>cherimoya</p>
+	</div>
 </div>
 
 <hr>

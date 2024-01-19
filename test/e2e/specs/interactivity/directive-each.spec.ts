@@ -450,4 +450,37 @@ test.describe( 'data-wp-each', () => {
 		await expect( elements ).toHaveCount( 1 );
 		await expect( elements ).toBeEmpty();
 	} );
+
+	test( 'should work with derived state as keys', async ( { page } ) => {
+		const elements = page
+			.getByTestId( 'derived state' )
+			.getByTestId( 'item' );
+
+		// These tags are included to check that the elements are not unmounted
+		// and mounted again. If an element remounts, its tag should be missing.
+		await elements.evaluateAll( ( refs ) =>
+			refs.forEach( ( ref, index ) => {
+				if ( ref instanceof HTMLElement ) {
+					ref.dataset.tag = `${ index }`;
+				}
+			} )
+		);
+
+		await page
+			.getByTestId( 'derived state' )
+			.getByTestId( 'rotate' )
+			.click();
+
+		await expect( elements ).toHaveText( [
+			'cherimoya',
+			'avocado',
+			'banana',
+		] );
+
+		// Get the tags. They should not have disappeared or changed.
+		const [ cherimoya, avocado, banana ] = await elements.all();
+		await expect( cherimoya ).toHaveAttribute( 'data-tag', '2' );
+		await expect( avocado ).toHaveAttribute( 'data-tag', '0' );
+		await expect( banana ).toHaveAttribute( 'data-tag', '1' );
+	} );
 } );
