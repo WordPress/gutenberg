@@ -46,14 +46,13 @@ function FontCollection( { id } ) {
 		);
 	};
 
-	const [ notice, setNotice ] = useState( null );
 	const [ selectedFont, setSelectedFont ] = useState( null );
 	const [ fontsToInstall, setFontsToInstall ] = useState( [] );
 	const [ filters, setFilters ] = useState( {} );
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const { collections, getFontCollection, installFont } =
+	const { collections, getFontCollection, installFont, notice, setNotice } =
 		useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
 		( collection ) => collection.id === id
@@ -84,27 +83,17 @@ function FontCollection( { id } ) {
 			}
 		};
 		fetchFontCollection();
-	}, [ id, getFontCollection ] );
+	}, [ id, getFontCollection, setNotice ] );
 
 	useEffect( () => {
 		setSelectedFont( null );
 		setNotice( null );
-	}, [ id ] );
+	}, [ id, setNotice ] );
 
 	useEffect( () => {
 		// If the selected fonts change, reset the selected fonts to install
 		setFontsToInstall( [] );
 	}, [ selectedFont ] );
-
-	// Reset notice after 5 seconds
-	useEffect( () => {
-		if ( notice && notice?.duration !== 0 ) {
-			const timeout = setTimeout( () => {
-				setNotice( null );
-			}, notice.duration ?? 5000 );
-			return () => clearTimeout( timeout );
-		}
-	}, [ notice ] );
 
 	const collectionFonts = useMemo(
 		() => selectedCollection?.data?.fontFamilies ?? [],

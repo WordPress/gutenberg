@@ -33,6 +33,8 @@ function InstalledFonts() {
 		refreshLibrary,
 		uninstallFontFamily,
 		isResolvingLibrary,
+		notice,
+		setNotice,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
 
@@ -43,8 +45,6 @@ function InstalledFonts() {
 	const handleSelectFont = ( font ) => {
 		handleSetLibraryFontSelected( font );
 	};
-
-	const [ notice, setNotice ] = useState( null );
 
 	const handleConfirmUninstall = async () => {
 		try {
@@ -89,16 +89,6 @@ function InstalledFonts() {
 		refreshLibrary();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
-
-	// Reset notice after 5 seconds
-	useEffect( () => {
-		if ( notice ) {
-			const timeout = setTimeout( () => {
-				setNotice( null );
-			}, 5000 );
-			return () => clearTimeout( timeout );
-		}
-	}, [ notice ] );
 
 	return (
 		<TabPanelLayout

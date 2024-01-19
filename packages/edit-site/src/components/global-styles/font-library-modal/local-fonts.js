@@ -12,7 +12,7 @@ import {
 	FlexItem,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useContext, useState, useEffect } from '@wordpress/element';
+import { useContext, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,8 +28,7 @@ import { unlock } from '../../../lock-unlock';
 const { ProgressBar } = unlock( componentsPrivateApis );
 
 function LocalFonts() {
-	const { installFont } = useContext( FontLibraryContext );
-	const [ notice, setNotice ] = useState( null );
+	const { installFont, notice, setNotice } = useContext( FontLibraryContext );
 	const [ isUploading, setIsUploading ] = useState( false );
 	const supportedFormats =
 		ALLOWED_FILE_EXTENSIONS.slice( 0, -1 )
@@ -43,16 +42,6 @@ function LocalFonts() {
 	const onFilesUpload = ( event ) => {
 		handleFilesUpload( event.target.files );
 	};
-
-	// Reset notice after 5 seconds
-	useEffect( () => {
-		if ( notice ) {
-			const timeout = setTimeout( () => {
-				setNotice( null );
-			}, 5000 );
-			return () => clearTimeout( timeout );
-		}
-	}, [ notice ] );
 
 	/**
 	 * Filters the selected files to only allow the ones with the allowed extensions
