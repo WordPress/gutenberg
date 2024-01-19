@@ -14,6 +14,8 @@ import {
 	Button,
 	Notice,
 } from '@wordpress/components';
+import { store as editorStore } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
 import { debounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { search, closeSmall } from '@wordpress/icons';
@@ -54,10 +56,15 @@ function FontCollection( { id } ) {
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const { collections, getFontCollection, installFont } =
-		useContext( FontLibraryContext );
+	const { collections, installFont } = useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
 		( collection ) => collection.id === id
+	);
+
+	const fontLibraryAssetInstall = useSelect(
+		( select ) =>
+			select( editorStore ).getEditorSettings().fontLibraryAssetInstall,
+		[]
 	);
 
 	useEffect( () => {
@@ -70,22 +77,6 @@ function FontCollection( { id } ) {
 		window.addEventListener( 'storage', handleStorage );
 		return () => window.removeEventListener( 'storage', handleStorage );
 	}, [ id, requiresPermission ] );
-
-	useEffect( () => {
-		const fetchFontCollection = async () => {
-			try {
-				await getFontCollection( id );
-				resetFilters();
-			} catch ( e ) {
-				setNotice( {
-					type: 'error',
-					message: e?.message,
-					duration: 0, // Don't auto-hide.
-				} );
-			}
-		};
-		fetchFontCollection();
-	}, [ id, getFontCollection ] );
 
 	useEffect( () => {
 		setSelectedFont( null );
@@ -130,10 +121,6 @@ function FontCollection( { id } ) {
 
 	const debouncedUpdateSearchInput = debounce( handleUpdateSearchInput, 300 );
 
-	const resetFilters = () => {
-		setFilters( {} );
-	};
-
 	const resetSearch = () => {
 		setFilters( { ...filters, search: '' } );
 	};
@@ -153,32 +140,65 @@ function FontCollection( { id } ) {
 		setFontsToInstall( [] );
 	};
 
-	const handleInstall = async () => {
-		const fontFamily = fontsToInstall[ 0 ];
+	const handleFontDownload = async ( fontFamily ) => {
+		return Promise.all(
+			fontFamily.fontFace.map( async ( fontFace ) => {
+				if ( fontFace.src ) {
+					fontFace.file = await downloadFontFaceAsset( fontFace.src );
+				}
+			} )
+		).then( () => {
+			return fontFamily;
+		} );
+	};
 
-		try {
-			if ( fontFamily?.fontFace ) {
-				await Promise.all(
-					fontFamily.fontFace.map( async ( fontFace ) => {
-						if ( fontFace.downloadFromUrl ) {
-							fontFace.file = await downloadFontFaceAsset(
-								fontFace.downloadFromUrl
-							);
-							delete fontFace.downloadFromUrl;
-						}
-					} )
-				);
-			}
-		} catch ( error ) {
-			// If any of the fonts fail to download,
-			// show an error notice and stop the request from being sent.
+	const handleInstall = async () => {
+		let fontFamily = fontsToInstall[ 0 ];
+
+		//NOTE: This is only necessary while the collection potentially includes the depreciated 'downloadFromUrl' property.
+		if ( fontFamily?.fontFace ) {
+			fontFamily.fontFace = fontFamily.fontFace.map( ( fontFace ) => {
+				fontFace.src = fontFace.downloadFromUrl || fontFace.src;
+				delete fontFace.downloadFromUrl;
+				return fontFace;
+			} );
+		}
+		////////////
+
+		// If a collection says you have to install but the system says you can't then throw an error
+		if (
+			fontLibraryAssetInstall === 'denied' &&
+			selectedCollection.require_download === true
+		) {
 			setNotice( {
 				type: 'error',
 				message: __(
-					'Error installing the fonts, could not be downloaded.'
+					'Font upload is not allowed, only font collections that are configured to allow hosting can be used.'
 				),
 			} );
 			return;
+		}
+
+		// If the system says we MUST install OR
+		// The collection says we MUST install
+		// Then download the assets
+		if (
+			fontLibraryAssetInstall === 'required' ||
+			selectedCollection.require_download === true
+		) {
+			try {
+				fontFamily = await handleFontDownload( fontFamily );
+			} catch ( error ) {
+				// If any of the fonts fail to download,
+				// show an error notice and stop the request from being sent.
+				setNotice( {
+					type: 'error',
+					message: __(
+						'Error installing the fonts, could not be downloaded.'
+					),
+				} );
+				return;
+			}
 		}
 
 		try {

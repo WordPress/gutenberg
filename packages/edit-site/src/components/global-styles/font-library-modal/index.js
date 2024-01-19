@@ -7,6 +7,8 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
+import { store as editorStore } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -19,36 +21,49 @@ import { unlock } from '../../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
-const DEFAULT_TABS = [
-	{
-		id: 'installed-fonts',
-		title: __( 'Library' ),
-	},
-	{
-		id: 'upload-fonts',
-		title: __( 'Upload' ),
-	},
-];
-
-const tabsFromCollections = ( collections ) =>
-	collections.map( ( { id, name } ) => ( {
-		id,
-		title:
-			collections.length === 1 && id === 'default-font-collection'
-				? __( 'Install Fonts' )
-				: name,
-	} ) );
-
 function FontLibraryModal( {
 	onRequestClose,
 	initialTabId = 'installed-fonts',
 } ) {
 	const { collections } = useContext( FontLibraryContext );
 
+	const fontLibraryAssetInstall = useSelect(
+		( select ) =>
+			select( editorStore ).getEditorSettings().fontLibraryAssetInstall,
+		[]
+	);
+
 	const tabs = [
-		...DEFAULT_TABS,
-		...tabsFromCollections( collections || [] ),
+		{
+			id: 'installed-fonts',
+			title: __( 'Library' ),
+		},
 	];
+
+	if ( fontLibraryAssetInstall !== 'denied' ) {
+		tabs.push( {
+			id: 'upload-fonts',
+			title: __( 'Upload' ),
+		} );
+	}
+
+	collections
+		.filter( ( fontCollection ) => {
+			// Don't show collections that require installation when the system doesn't allowe it
+			if (
+				fontCollection.require_download === true &&
+				fontLibraryAssetInstall === 'denied'
+			) {
+				return false;
+			}
+			return true;
+		} )
+		.forEach( ( { id, name } ) => {
+			tabs.push( {
+				id,
+				title: name,
+			} );
+		} );
 
 	return (
 		<Modal
