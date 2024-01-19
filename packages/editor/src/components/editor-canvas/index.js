@@ -28,7 +28,7 @@ import { useMergeRefs } from '@wordpress/compose';
 import PostTitle from '../post-title';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import EditTemplateBlocksNotification from './edit-template-blocks-notification';
+import TemplateSelection from './template-selection';
 
 const {
 	LayoutStyle,
@@ -293,94 +293,100 @@ function EditorCanvas( {
 	] );
 
 	return (
-		<BlockCanvas
-			shouldIframe={
-				! disableIframe || [ 'Tablet', 'Mobile' ].includes( deviceType )
-			}
-			contentRef={ contentRef }
-			styles={ styles }
-			height="100%"
-			iframeProps={ {
-				className: classnames( 'editor-canvas__iframe', {
-					'has-history': hasHistory,
-				} ),
-				...iframeProps,
-				style: {
-					...iframeProps?.style,
-					...deviceStyles,
-				},
-			} }
-		>
-			{ themeSupportsLayout &&
-				! themeHasDisabledLayoutStyles &&
-				renderingMode === 'post-only' && (
-					<>
-						<LayoutStyle
-							selector=".editor-editor-canvas__post-title-wrapper"
-							layout={ fallbackLayout }
-						/>
-						<LayoutStyle
-							selector=".block-editor-block-list__layout.is-root-container"
-							layout={ postEditorLayout }
-						/>
-						{ align && <LayoutStyle css={ alignCSS } /> }
-						{ postContentLayoutStyles && (
-							<LayoutStyle
-								layout={ postContentLayout }
-								css={ postContentLayoutStyles }
-							/>
-						) }
-					</>
-				) }
-			{ renderingMode === 'post-only' && (
-				<div
-					className={ classnames(
-						'editor-editor-canvas__post-title-wrapper',
-						// The following class is only here for backward comapatibility
-						// some themes might be using it to style the post title.
-						'edit-post-visual-editor__post-title-wrapper',
-						{
-							'has-global-padding': hasRootPaddingAwareAlignments,
-						}
-					) }
-					contentEditable={ false }
-					ref={ observeTypingRef }
-					style={ {
-						// This is using inline styles
-						// so it's applied for both iframed and non iframed editors.
-						marginTop: '4rem',
-					} }
-				>
-					<PostTitle ref={ titleRef } />
-				</div>
-			) }
-			<RecursionProvider
-				blockName={ wrapperBlockName }
-				uniqueId={ wrapperUniqueId }
+		<>
+			<BlockCanvas
+				shouldIframe={
+					! disableIframe ||
+					[ 'Tablet', 'Mobile' ].includes( deviceType )
+				}
+				contentRef={ contentRef }
+				styles={ styles }
+				height="100%"
+				iframeProps={ {
+					className: classnames( 'editor-canvas__iframe', {
+						'has-history': hasHistory,
+					} ),
+					...iframeProps,
+					style: {
+						...iframeProps?.style,
+						...deviceStyles,
+					},
+				} }
 			>
-				<BlockList
-					className={ classnames(
-						className,
-						'is-' + deviceType.toLowerCase() + '-preview',
-						renderingMode !== 'post-only'
-							? 'wp-site-blocks'
-							: `${ blockListLayoutClass } wp-block-post-content`, // Ensure root level blocks receive default/flow blockGap styling rules.
-						renderingMode !== 'all' && 'is-' + renderingMode
+				{ themeSupportsLayout &&
+					! themeHasDisabledLayoutStyles &&
+					renderingMode === 'post-only' && (
+						<>
+							<LayoutStyle
+								selector=".editor-editor-canvas__post-title-wrapper"
+								layout={ fallbackLayout }
+							/>
+							<LayoutStyle
+								selector=".block-editor-block-list__layout.is-root-container"
+								layout={ postEditorLayout }
+							/>
+							{ align && <LayoutStyle css={ alignCSS } /> }
+							{ postContentLayoutStyles && (
+								<LayoutStyle
+									layout={ postContentLayout }
+									css={ postContentLayoutStyles }
+								/>
+							) }
+						</>
 					) }
-					layout={ blockListLayout }
-					dropZoneElement={
-						// When iframed, pass in the html element of the iframe to
-						// ensure the drop zone extends to the edges of the iframe.
-						disableIframe
-							? localRef.current
-							: localRef.current?.parentNode
-					}
-					renderAppender={ renderAppender }
-				/>
-				<EditTemplateBlocksNotification contentRef={ localRef } />
-			</RecursionProvider>
-			{ children }
-		</BlockCanvas>
+				{ renderingMode === 'post-only' && (
+					<div
+						className={ classnames(
+							'editor-editor-canvas__post-title-wrapper',
+							// The following class is only here for backward comapatibility
+							// some themes might be using it to style the post title.
+							'edit-post-visual-editor__post-title-wrapper',
+							{
+								'has-global-padding':
+									hasRootPaddingAwareAlignments,
+							}
+						) }
+						contentEditable={ false }
+						ref={ observeTypingRef }
+						style={ {
+							// This is using inline styles
+							// so it's applied for both iframed and non iframed editors.
+							marginTop: '4rem',
+						} }
+					>
+						<PostTitle ref={ titleRef } />
+					</div>
+				) }
+				<RecursionProvider
+					blockName={ wrapperBlockName }
+					uniqueId={ wrapperUniqueId }
+				>
+					<BlockList
+						className={ classnames(
+							className,
+							'is-' + deviceType.toLowerCase() + '-preview',
+							renderingMode !== 'post-only'
+								? 'wp-site-blocks'
+								: `${ blockListLayoutClass } wp-block-post-content`, // Ensure root level blocks receive default/flow blockGap styling rules.
+							renderingMode !== 'all' && 'is-' + renderingMode
+						) }
+						layout={ blockListLayout }
+						dropZoneElement={
+							// When iframed, pass in the html element of the iframe to
+							// ensure the drop zone extends to the edges of the iframe.
+							disableIframe
+								? localRef.current
+								: localRef.current?.parentNode
+						}
+						renderAppender={ renderAppender }
+					/>
+					{ renderingMode === 'template-locked' && (
+						<TemplateSelection canvasRef={ localRef } />
+					) }
+				</RecursionProvider>
+				{ children }
+			</BlockCanvas>
+		</>
 	);
 }
 

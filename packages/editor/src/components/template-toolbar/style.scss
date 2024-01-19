@@ -1,0 +1,13 @@
+.editor-template-toolbar {
+	position: absolute;
+	left: $grid-unit-20;
+	top: $grid-unit-20;
+}
+
+.editor-template-toolbar__title {
+	fill: var(--wp-block-synced-color);
+
+	.components-text {
+		color: var(--wp-block-synced-color);
+	}
+}
