@@ -33,6 +33,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import Page from '../page';
+import { useStateWithSessionStorage } from '../page/utils';
 import Link from '../routes/link';
 import AddNewTemplate from '../add-new-template';
 import { useAddedBy, AvatarImage } from '../list/added-by';
@@ -157,11 +158,17 @@ function TemplatePreview( { content, viewType } ) {
 
 export default function DataviewsTemplates() {
 	const [ templateId, setTemplateId ] = useState( null );
-	const [ view, setView ] = useState( DEFAULT_VIEW );
-	const { records: allTemplates, isResolving: isLoadingData } =
-		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
-			per_page: -1,
-		} );
+	const [ view, setView ] = useStateWithSessionStorage(
+		'page-templates-view-config',
+		DEFAULT_VIEW
+	);
+	const {
+		records: allTemplates,
+		hasResolved: hasLoadedData,
+		isResolving: isLoadingData,
+	} = useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
+		per_page: -1,
+	} );
 	const history = useHistory();
 
 	const onSelectionChange = useCallback(
@@ -341,6 +348,11 @@ export default function DataviewsTemplates() {
 
 	const onChangeView = useCallback(
 		( newView ) => {
+			// The data view consumer can send back a new view if
+			// it receives empty or incomplete data, so while we're
+			// waiting for that to load we'll ignore any updates.
+			if ( ! hasLoadedData || isLoadingData ) return;
+
 			if ( newView.type !== view.type ) {
 				newView = {
 					...newView,
@@ -352,7 +364,7 @@ export default function DataviewsTemplates() {
 
 			setView( newView );
 		},
-		[ view.type, setView ]
+		[ view.type, setView, hasLoadedData, isLoadingData ]
 	);
 
 	return (
