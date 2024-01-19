@@ -30,7 +30,7 @@
 	// In the case of this appender, it needs to apply those same rules to avoid layout shifts.
 	// Such shifts happen when the bottom margin of the Title block has been set to less than the default 1em margin of paragraphs.
 	:where(body .is-layout-constrained) & {
-		> :first-child:first-child {
+		> :first-child {
 			margin-block-start: 0;
 		}
 
