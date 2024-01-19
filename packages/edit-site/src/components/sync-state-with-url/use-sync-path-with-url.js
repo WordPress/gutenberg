@@ -82,6 +82,7 @@ export default function useSyncPathWithURL() {
 					postType: navigatorParams?.postType,
 					postId: navigatorParams?.postId,
 					path: undefined,
+					layout: undefined,
 				} );
 			} else if (
 				navigatorLocation.path.startsWith( '/page/' ) &&
@@ -91,6 +92,7 @@ export default function useSyncPathWithURL() {
 					postType: 'page',
 					postId: navigatorParams?.postId,
 					path: undefined,
+					layout: undefined,
 				} );
 			} else if ( navigatorLocation.path === '/patterns' ) {
 				updateUrlParams( {
@@ -99,12 +101,29 @@ export default function useSyncPathWithURL() {
 					canvas: undefined,
 					path: navigatorLocation.path,
 				} );
+			} else if (
+				// These sidebar paths are special in the sense that the url in these pages may or may not have a postId and we need to retain it if it has.
+				// The "type" property should be kept as well.
+				( navigatorLocation.path === '/page' &&
+					window?.__experimentalAdminViews ) ||
+				( navigatorLocation.path === '/wp_template' &&
+					window?.__experimentalAdminViews ) ||
+				( navigatorLocation.path === '/wp_template/all' &&
+					! window?.__experimentalAdminViews )
+			) {
+				updateUrlParams( {
+					postType: undefined,
+					categoryType: undefined,
+					categoryId: undefined,
+					path: navigatorLocation.path,
+				} );
 			} else {
 				updateUrlParams( {
 					postType: undefined,
 					postId: undefined,
 					categoryType: undefined,
 					categoryId: undefined,
+					layout: undefined,
 					path:
 						navigatorLocation.path === '/'
 							? undefined
