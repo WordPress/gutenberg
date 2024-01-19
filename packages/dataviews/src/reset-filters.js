@@ -12,12 +12,12 @@ export default function ResetFilter( { view, onChangeView } ) {
 			size="compact"
 			variant="tertiary"
 			onClick={ () => {
-				onChangeView( ( currentView ) => ( {
-					...currentView,
+				onChangeView( {
+					...view,
 					page: 1,
 					search: '',
 					filters: [],
-				} ) );
+				} );
 			} }
 		>
 			{ __( 'Reset filters' ) }

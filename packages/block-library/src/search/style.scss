@@ -62,35 +62,7 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	.wp-block-search__button[aria-expanded="true"] {
 		max-width: calc(100% - 100px);
 	}
-}
 
-// We are lowering the specificity so that the button element can override the rule for the button inside the search block.
-:where(.wp-block-search__button-inside .wp-block-search__inside-wrapper) {
-	padding: $grid-unit-05;
-	border: 1px solid $gray-600;
-	box-sizing: border-box;
-
-	.wp-block-search__input {
-		border-radius: 0;
-		border: none;
-		padding: 0 $grid-unit-05;
-
-		&:focus {
-			outline: none;
-		}
-	}
-
-	// For lower specificity.
-	:where(.wp-block-search__button) {
-		padding: $grid-unit-05 $grid-unit-10;
-	}
-}
-
-.wp-block-search.aligncenter .wp-block-search__inside-wrapper {
-	margin: auto;
-}
-
-.wp-block-search__button-behavior-expand {
 	.wp-block-search__inside-wrapper {
 		transition-property: width;
 		min-width: 0 !important;
@@ -123,7 +95,33 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	}
 }
 
-.wp-block[data-align="right"] .wp-block-search__button-behavior-expand {
+// We are lowering the specificity so that the button element can override the rule for the button inside the search block.
+:where(.wp-block-search__button-inside .wp-block-search__inside-wrapper) {
+	padding: $grid-unit-05;
+	border: 1px solid $gray-600;
+	box-sizing: border-box;
+
+	.wp-block-search__input {
+		border-radius: 0;
+		border: none;
+		padding: 0 $grid-unit-05;
+
+		&:focus {
+			outline: none;
+		}
+	}
+
+	// For lower specificity.
+	:where(.wp-block-search__button) {
+		padding: $grid-unit-05 $grid-unit-10;
+	}
+}
+
+.wp-block-search.aligncenter .wp-block-search__inside-wrapper {
+	margin: auto;
+}
+
+.wp-block[data-align="right"] .wp-block-search.wp-block-search__button-only {
 	.wp-block-search__inside-wrapper {
 		float: right;
 	}

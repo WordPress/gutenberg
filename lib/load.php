@@ -79,7 +79,10 @@ require __DIR__ . '/compat/wordpress-6.4/html-api/class-gutenberg-html-tag-proce
 require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-attribute-token-6-5.php';
 require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-span-6-5.php';
 require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-text-replacement-6-5.php';
+require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-open-elements-6-5.php';
+require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-processor-state-6-5.php';
 require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-tag-processor-6-5.php';
+require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-processor-6-5.php';
 
 /*
  * The HTML Processor appeared after WordPress 6.3. If Gutenberg is running on a version of
@@ -101,6 +104,7 @@ require __DIR__ . '/compat/wordpress-6.4/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.4/kses.php';
 
 // WordPress 6.5 compat.
+require __DIR__ . '/compat/wordpress-6.5/blocks.php';
 require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.5/class-wp-navigation-block-renderer.php';
 require __DIR__ . '/compat/wordpress-6.5/kses.php';
@@ -117,8 +121,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
-require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-store.php';
-require __DIR__ . '/experimental/interactivity-api/store.php';
+require __DIR__ . '/experimental/interactivity-api/class-wp-interactivity-initial-state.php';
+require __DIR__ . '/experimental/interactivity-api/initial-state.php';
 require __DIR__ . '/experimental/interactivity-api/modules.php';
 require __DIR__ . '/experimental/interactivity-api/class-wp-directive-processor.php';
 require __DIR__ . '/experimental/interactivity-api/class-wp-directive-context.php';
@@ -128,6 +132,7 @@ require __DIR__ . '/experimental/interactivity-api/directives/wp-context.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-class.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-style.php';
 require __DIR__ . '/experimental/interactivity-api/directives/wp-text.php';
+require __DIR__ . '/experimental/interactivity-api/directives/wp-interactive.php';
 
 require __DIR__ . '/experimental/modules/class-gutenberg-modules.php';
 
@@ -184,15 +189,6 @@ if (
 	require __DIR__ . '/experimental/fonts/font-face/bc-layer/class-wp-web-fonts.php';
 } elseif ( ! class_exists( 'WP_Fonts' ) ) {
 
-	// Disables the Font Library.
-	// @core-merge: this should not go to core.
-	add_action(
-		'enqueue_block_editor_assets',
-		function () {
-			wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDisableFontLibrary = true', 'before' );
-		}
-	);
-
 	// Turns off Font Face hooks in Core.
 	// @since 6.4.0.
 	remove_action( 'wp_head', 'wp_print_font_faces', 50 );
@@ -221,7 +217,6 @@ require __DIR__ . '/script-loader.php';
 require __DIR__ . '/global-styles-and-settings.php';
 require __DIR__ . '/class-wp-theme-json-data-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
-require __DIR__ . '/class-wp-theme-json-schema-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/class-wp-duotone-gutenberg.php';
 require __DIR__ . '/blocks.php';
@@ -253,7 +248,6 @@ require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/shadow.php';
 require __DIR__ . '/block-supports/background.php';
-require __DIR__ . '/block-supports/behaviors.php';
 require __DIR__ . '/block-supports/pattern.php';
 
 // Data views.

@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo, useState, useRef } from '@wordpress/element';
 import {
 	GlobalStylesContext,
 	getMergedGlobalStyles,
@@ -40,6 +40,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockOutline from './block-outline';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
+import useScrollUponInsertion from './use-scroll-upon-insertion';
 import { useSettings } from '../use-settings';
 
 const EMPTY_ARRAY = [];
@@ -103,6 +104,18 @@ function BlockWrapper( {
 	];
 	const accessible = ! ( isSelected || isDescendentBlockSelected );
 
+	const ref = useRef();
+	const [ isLayoutCalculated, setIsLayoutCalculated ] = useState();
+	useScrollUponInsertion( {
+		clientId,
+		isSelected,
+		isLayoutCalculated,
+		elementRef: ref,
+	} );
+	const onLayout = useCallback( () => {
+		setIsLayoutCalculated( true );
+	}, [] );
+
 	return (
 		<Pressable
 			accessibilityLabel={ accessibilityLabel }
@@ -111,6 +124,8 @@ function BlockWrapper( {
 			disabled={ ! isTouchable }
 			onPress={ onFocus }
 			style={ blockWrapperStyle }
+			ref={ ref }
+			onLayout={ onLayout }
 		>
 			<BlockOutline
 				blockCategory={ blockCategory }
@@ -168,6 +183,7 @@ function BlockListBlock( {
 		isParentSelected,
 		order,
 		mayDisplayControls,
+		blockEditingMode,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -181,6 +197,7 @@ function BlockListBlock( {
 				getBlockName,
 				isFirstMultiSelectedBlock,
 				getMultiSelectedBlockClientIds,
+				getBlockEditingMode,
 			} = select( blockEditorStore );
 			const currentBlockType = getBlockType( name || 'core/missing' );
 			const currentBlockCategory = currentBlockType?.category;
@@ -234,6 +251,7 @@ function BlockListBlock( {
 						getMultiSelectedBlockClientIds().every(
 							( id ) => getBlockName( id ) === name
 						) ),
+				blockEditingMode: getBlockEditingMode( clientId ),
 			};
 		},
 		[ clientId, isSelected, name, rootClientId ]
@@ -378,6 +396,7 @@ function BlockListBlock( {
 							}
 							wrapperProps={ wrapperProps }
 							mayDisplayControls={ mayDisplayControls }
+							blockEditingMode={ blockEditingMode }
 						/>
 						<View onLayout={ onLayout } />
 					</GlobalStylesContext.Provider>

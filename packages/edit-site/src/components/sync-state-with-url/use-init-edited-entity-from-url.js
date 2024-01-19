@@ -128,10 +128,25 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 						return currentTemplate.id;
 					}
 				}
-
 				// If no template is assigned, use the default template.
+				let slugToCheck;
+				// In `draft` status we might not have a slug available, so we use the `single`
+				// post type templates slug(ex page, single-post, single-product etc..).
+				// Pages do not need the `single` prefix in the slug to be prioritized
+				// through template hierarchy.
+				if ( editedEntity.slug ) {
+					slugToCheck =
+						postTypeToResolve === 'page'
+							? `${ postTypeToResolve }-${ editedEntity.slug }`
+							: `single-${ postTypeToResolve }-${ editedEntity.slug }`;
+				} else {
+					slugToCheck =
+						postTypeToResolve === 'page'
+							? 'page'
+							: `single-${ postTypeToResolve }`;
+				}
 				return getDefaultTemplateId( {
-					slug: `${ postTypeToResolve }-${ editedEntity?.slug }`,
+					slug: slugToCheck,
 				} );
 			}
 

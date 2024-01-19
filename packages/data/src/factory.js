@@ -39,11 +39,18 @@
  * @return {Function} Registry selector that can be registered with a store.
  */
 export function createRegistrySelector( registrySelector ) {
+	let selector;
+	let lastRegistry;
 	// Create a selector function that is bound to the registry referenced by `selector.registry`
 	// and that has the same API as a regular selector. Binding it in such a way makes it
 	// possible to call the selector directly from another selector.
-	const selector = ( ...args ) =>
-		registrySelector( selector.registry.select )( ...args );
+	const wrappedSelector = ( ...args ) => {
+		if ( ! selector || lastRegistry !== wrappedSelector.registry ) {
+			selector = registrySelector( wrappedSelector.registry.select );
+			lastRegistry = wrappedSelector.registry;
+		}
+		return selector( ...args );
+	};
 
 	/**
 	 * Flag indicating that the selector is a registry selector that needs the correct registry
@@ -52,9 +59,9 @@ export function createRegistrySelector( registrySelector ) {
 	 *
 	 * @type {boolean}
 	 */
-	selector.isRegistrySelector = true;
+	wrappedSelector.isRegistrySelector = true;
 
-	return selector;
+	return wrappedSelector;
 }
 
 /**
