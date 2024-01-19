@@ -15,6 +15,8 @@ const {
 	clickIfClickable,
 	launchApp,
 	tapStatusBariOS,
+	longPressElement,
+	longPressMiddleOfElement,
 } = require( '../helpers/utils' );
 
 const ADD_BLOCK_ID = isAndroid() ? 'Add block' : 'add-block-button';
@@ -103,6 +105,47 @@ class EditorPage {
 
 	async typeTextToTextBlock( block, text, clear ) {
 		await typeString( this.driver, block, text, clear );
+	}
+
+	async pasteClipboardToTextBlock( element, { timeout = 1000 } = {} ) {
+		if ( this.driver.isAndroid ) {
+			await longPressMiddleOfElement( this.driver, element );
+		} else {
+			await longPressElement( this.driver, element );
+		}
+
+		if ( this.driver.isAndroid ) {
+			// Long pressing seemingly results in drag-and-drop blurring the input, so
+			// we tap again to re-focus the input.
+			await this.driver
+				.action( 'pointer', {
+					parameters: { pointerType: 'touch' },
+				} )
+				.move( { origin: element } )
+				.down()
+				.up()
+				.perform();
+
+			const location = await element.getLocation();
+			const approximatePasteMenuLocation = {
+				x: location.x + 30,
+				y: location.y - 120,
+			};
+			await this.driver
+				.action( 'pointer', {
+					parameters: { pointerType: 'touch' },
+				} )
+				.move( approximatePasteMenuLocation )
+				.down()
+				.up()
+				.perform();
+		} else {
+			const pasteMenuItem = await this.driver.$(
+				'//XCUIElementTypeMenuItem[@name="Paste"]'
+			);
+			await pasteMenuItem.waitForDisplayed( { timeout } );
+			await pasteMenuItem.click();
+		}
 	}
 
 	// Finds the wd element for new block that was added and sets the element attribute
