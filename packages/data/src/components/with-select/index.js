@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent } from '@wordpress/compose';
-import { memo } from '@wordpress/element';
+import { createHigherOrderComponent, pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -54,7 +53,7 @@ import useSelect from '../use-select';
 const withSelect = ( mapSelectToProps ) =>
 	createHigherOrderComponent(
 		( WrappedComponent ) =>
-			memo( ( ownProps ) => {
+			pure( ( ownProps ) => {
 				const mapSelect = ( select, registry ) =>
 					mapSelectToProps( select, ownProps, registry );
 				const mergeProps = useSelect( mapSelect );
