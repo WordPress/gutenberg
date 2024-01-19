@@ -67,7 +67,7 @@ async function main() {
 		}
 	} else {
 		console.error(
-			`Error. The --since argument is required (e.g. YYYY-MM-DD). This should be the date of the previous release's final RC.`
+			`Error. The --since argument is required (e.g. YYYY-MM-DD). This should be the date of the final Gutenberg release that was included in the last stable WP Core release (see https://developer.wordpress.org/block-editor/contributors/versions-in-wordpress/).`
 		);
 		process.exit( 1 );
 	}
