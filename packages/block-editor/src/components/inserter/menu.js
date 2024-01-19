@@ -13,11 +13,11 @@ import {
 	useMemo,
 	useImperativeHandle,
 	useRef,
+	useDeferredValue,
 } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useDebouncedInput } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -48,8 +48,10 @@ function InserterMenu(
 	},
 	ref
 ) {
-	const [ filterValue, setFilterValue, delayedFilterValue ] =
-		useDebouncedInput( __experimentalFilterValue );
+	const [ filterValue, setFilterValue ] = useState(
+		__experimentalFilterValue
+	);
+	const deferredFilterValue = useDeferredValue( filterValue );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
 	const [ selectedPatternCategory, setSelectedPatternCategory ] =
 		useState( null );
@@ -200,12 +202,12 @@ function InserterMenu(
 
 	const showPatternPanel =
 		selectedTab === 'patterns' &&
-		! delayedFilterValue &&
+		! deferredFilterValue &&
 		selectedPatternCategory;
-	const showAsTabs = ! delayedFilterValue && ( showPatterns || showMedia );
+	const showAsTabs = ! deferredFilterValue && ( showPatterns || showMedia );
 	const showMediaPanel =
 		selectedTab === 'media' &&
-		! delayedFilterValue &&
+		! deferredFilterValue &&
 		selectedMediaCategory;
 
 	const handleSetSelectedTab = ( value ) => {
@@ -235,10 +237,10 @@ function InserterMenu(
 					placeholder={ __( 'Search' ) }
 					ref={ searchRef }
 				/>
-				{ !! delayedFilterValue && (
+				{ !! deferredFilterValue && (
 					<div className="block-editor-inserter__no-tab-container">
 						<InserterSearchResults
-							filterValue={ delayedFilterValue }
+							filterValue={ deferredFilterValue }
 							onSelect={ onSelect }
 							onHover={ onHover }
 							onHoverPattern={ onHoverPattern }
@@ -261,7 +263,7 @@ function InserterMenu(
 						tabsContents={ inserterTabsContents }
 					/>
 				) }
-				{ ! delayedFilterValue && ! showAsTabs && (
+				{ ! deferredFilterValue && ! showAsTabs && (
 					<div className="block-editor-inserter__no-tab-container">
 						{ blocksTab }
 					</div>
