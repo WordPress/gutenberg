@@ -23,8 +23,7 @@ import { SearchIconWrapper, InputControlWithoutWebkitStyles } from './styles';
 
 function UnforwardedSearchControl(
 	{
-		__nextHasNoMarginBottom,
-		__next40pxDefaultSize = false,
+		__nextHasNoMarginBottom = false,
 		className,
 		onChange,
 		value,
@@ -54,7 +53,7 @@ function UnforwardedSearchControl(
 
 		return (
 			<Button
-				__next40pxDefaultSize={ __next40pxDefaultSize }
+				__next40pxDefaultSize
 				size={ size }
 				icon={ closeSmall }
 				label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
@@ -81,7 +80,7 @@ function UnforwardedSearchControl(
 	return (
 		<ContextSystemProvider value={ baseControlContextValue }>
 			<InputControlWithoutWebkitStyles
-				__next40pxDefaultSize={ __next40pxDefaultSize }
+				__next40pxDefaultSize
 				id={ instanceId }
 				hideLabelFromVision={ hideLabelFromVision }
 				ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }

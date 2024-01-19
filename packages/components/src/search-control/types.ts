@@ -5,7 +5,6 @@ import type { InputControlProps } from '../input-control/types';
 
 export type SearchControlProps = Pick<
 	InputControlProps,
-	| '__next40pxDefaultSize'
 	| 'help'
 	| 'hideLabelFromVision'
 	| 'label'
@@ -14,6 +13,11 @@ export type SearchControlProps = Pick<
 	| 'onDragEnd'
 	| 'value'
 > & {
+	/**
+	 * @deprecated This is now the default.
+	 * @ignore
+	 */
+	__next40pxDefaultSize?: boolean;
 	/**
 	 * Start opting into the new margin-free styles that will become the default in a future version.
 	 *
