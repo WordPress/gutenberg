@@ -12,7 +12,6 @@ import {
 	FlexItem,
 	Flex,
 	Button,
-	Notice,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -206,6 +205,7 @@ function FontCollection( { id } ) {
 					? selectedCollection.description
 					: __( 'Select font variants to install.' )
 			}
+			notice={ notice }
 			handleBack={ !! selectedFont && handleUnselectFont }
 			footer={
 				fontsToInstall.length > 0 && (
@@ -217,22 +217,6 @@ function FontCollection( { id } ) {
 				<>
 					<Spacer margin={ 8 } />
 					<GoogleFontsConfirmDialog />
-				</>
-			) }
-
-			{ notice && (
-				<>
-					<FlexItem>
-						<Spacer margin={ 2 } />
-						<Notice
-							isDismissible={ false }
-							status={ notice.type }
-							className="font-library-modal__font-collection__notice"
-						>
-							{ notice.message }
-						</Notice>
-					</FlexItem>
-					<Spacer margin={ 2 } />
 				</>
 			) }
 

@@ -9,7 +9,6 @@ import {
 	__experimentalSpacer as Spacer,
 	Button,
 	Spinner,
-	Notice,
 	FlexItem,
 } from '@wordpress/components';
 
@@ -105,6 +104,7 @@ function InstalledFonts() {
 		<TabPanelLayout
 			title={ libraryFontSelected?.name || '' }
 			description={ tabDescription }
+			notice={ notice }
 			handleBack={ !! libraryFontSelected && handleUnselectFont }
 			footer={
 				<Footer
@@ -120,33 +120,17 @@ function InstalledFonts() {
 				handleCancelUninstall={ handleCancelUninstall }
 			/>
 
-			{ notice && (
-				<>
-					<FlexItem>
-						<Spacer margin={ 2 } />
-						<Notice
-							isDismissible={ false }
-							status={ notice.type }
-							className="font-library-modal__font-collection__notice"
-						>
-							{ notice.message }
-						</Notice>
-					</FlexItem>
-					<Spacer margin={ 4 } />
-				</>
-			) }
-
 			{ ! libraryFontSelected && (
 				<>
 					{ isResolvingLibrary && (
 						<FlexItem>
 							<Spacer margin={ 2 } />
 							<Spinner />
+							<Spacer margin={ 2 } />
 						</FlexItem>
 					) }
 					{ baseCustomFonts.length > 0 && (
 						<>
-							<Spacer margin={ 2 } />
 							<FontsGrid>
 								{ baseCustomFonts.map( ( font ) => (
 									<LibraryFontCard

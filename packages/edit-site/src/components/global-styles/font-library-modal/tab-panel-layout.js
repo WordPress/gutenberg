@@ -8,12 +8,15 @@ import {
 	__experimentalSpacer as Spacer,
 	__experimentalHStack as HStack,
 	Button,
+	Notice,
+	FlexBlock,
 } from '@wordpress/components';
 import { chevronLeft } from '@wordpress/icons';
 
 function TabPanelLayout( {
 	title,
 	description,
+	notice,
 	handleBack,
 	children,
 	footer,
@@ -24,6 +27,18 @@ function TabPanelLayout( {
 			<VStack spacing={ 4 } justify="space-between">
 				<header>
 					<VStack spacing={ 2 }>
+						{ notice && (
+							<FlexBlock>
+								<Spacer margin={ 4 } />
+								<Notice
+									isDismissible={ false }
+									status={ notice.type }
+								>
+									{ notice.message }
+								</Notice>
+								<Spacer margin={ 4 } />
+							</FlexBlock>
+						) }
 						<HStack justify="flex-start">
 							{ !! handleBack && (
 								<Button
