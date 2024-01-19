@@ -49,7 +49,7 @@ export default function SidebarNavigationScreen( {
 				dashboardLink: getSettings().__experimentalDashboardLink,
 				dashboardLinkText:
 					getSettings().__experimentalDashboardLinkText,
-				// Do note call `getTheme` with null, it will cause a request to
+				// Do not call `getTheme` with null, it will cause a request to
 				// the server.
 				previewingThemeName: currentlyPreviewingThemeId
 					? select( coreStore ).getTheme( currentlyPreviewingThemeId )
