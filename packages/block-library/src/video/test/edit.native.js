@@ -35,7 +35,7 @@ describe( 'Video block', () => {
 <!-- /wp:video -->
 		`,
 		} );
-		const addVideoButton = await screen.queryByText( 'Add video' );
+		const addVideoButton = screen.queryByText( 'Add video' );
 		expect( addVideoButton ).toBeVisible();
 	} );
 
@@ -47,7 +47,7 @@ describe( 'Video block', () => {
 <!-- /wp:video -->
 		`,
 		} );
-		const addVideoButton = await screen.queryByText( 'Add video' );
+		const addVideoButton = screen.queryByText( 'Add video' );
 		expect( addVideoButton ).toBeNull();
 	} );
 
@@ -61,7 +61,7 @@ https://videopress.com/<VIDEO_ID>
 <!-- /wp:video -->
 		`,
 		} );
-		const addVideoButton = await screen.queryByText( 'Add video' );
+		const addVideoButton = screen.queryByText( 'Add video' );
 		expect( addVideoButton ).toBeNull();
 	} );
 } );
