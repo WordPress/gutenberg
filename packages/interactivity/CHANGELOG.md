@@ -4,20 +4,23 @@
 
 ### Enhancements
 
-- Prevent the usage of Preact components in `wp-text`. ([#57879](https://github.com/WordPress/gutenberg/pull/57879))
+-   Prevent the usage of Preact components in `wp-text`. ([#57879](https://github.com/WordPress/gutenberg/pull/57879))
+-   Update `preact`, `@preact/signals` and `deepsignal` dependencies. ([57891](https://github.com/WordPress/gutenberg/pull/57891))
 
 ### New Features
 
 -   Add the `data-wp-run` directive along with the `useInit` and `useWatch` hooks. ([57805](https://github.com/WordPress/gutenberg/pull/57805))
-
-### Enhancements
-
--  Update `preact`, `@preact/signals` and `deepsignal` dependencies. ([57891](https://github.com/WordPress/gutenberg/pull/57891))
+-   Add `wp-data-on-window` and `wp-data-on-document` directives. ([57931](https://github.com/WordPress/gutenberg/pull/57931))
 
 ### Breaking Changes
 
 -   Remove `data-wp-slot` and `data-wp-fill`. ([#57854](https://github.com/WordPress/gutenberg/pull/57854))
 -   Remove `wp-data-navigation-link` directive. ([#57853](https://github.com/WordPress/gutenberg/pull/57853))
+-   Remove unused `state` and rename `props` to `attributes` in `getElement()`. ([#57974](https://github.com/WordPress/gutenberg/pull/57974))
+
+### Bug Fix
+
+-   Prevent `wp-data-on=""` from creating `onDefault` handlers. ([#57925](https://github.com/WordPress/gutenberg/pull/57925))
 
 ## 3.2.0 (2024-01-10)
 
