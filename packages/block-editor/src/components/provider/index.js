@@ -19,12 +19,7 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 
 export const ExperimentalBlockEditorProvider = withRegistryProvider(
 	( props ) => {
-		const {
-			children,
-			settings,
-			stripExperimentalSettings = false,
-			inert,
-		} = props;
+		const { children, settings, stripExperimentalSettings = false } = props;
 
 		const { __experimentalUpdateSettings } = unlock(
 			useDispatch( blockEditorStore )
@@ -51,7 +46,9 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 
 		return (
 			<SlotFillProvider passthrough>
-				{ ! inert && <KeyboardShortcuts.Register /> }
+				{ ! settings.__unstableIsPreviewMode && (
+					<KeyboardShortcuts.Register />
+				) }
 				<BlockRefsProvider>{ children }</BlockRefsProvider>
 			</SlotFillProvider>
 		);
