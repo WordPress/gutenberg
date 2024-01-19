@@ -44,17 +44,16 @@ export function createRegistrySelector( registrySelector ) {
 	// and that has the same API as a regular selector. Binding it in such a way makes it
 	// possible to call the selector directly from another selector.
 	const wrappedSelector = ( ...args ) => {
+		let selector = selectorsByRegistry.get( wrappedSelector.registry );
 		// We want to make sure the cache persists even when new registry
 		// instances are created. For example patterns create their own editors
 		// with their own core/block-editor stores, so we should keep track of
 		// the cache for each registry instance.
-		if ( ! selectorsByRegistry.has( wrappedSelector.registry ) ) {
-			selectorsByRegistry.set(
-				wrappedSelector.registry,
-				registrySelector( wrappedSelector.registry.select )
-			);
+		if ( ! selector ) {
+			selector = registrySelector( wrappedSelector.registry.select );
+			selectorsByRegistry.set( wrappedSelector.registry, selector );
 		}
-		return selectorsByRegistry.get( wrappedSelector.registry )( ...args );
+		return selector( ...args );
 	};
 
 	/**
