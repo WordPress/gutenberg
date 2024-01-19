@@ -47,7 +47,7 @@ export default function SaveButton( {
 						)
 					) || isActivatingTheme,
 				isSaveViewOpen: isSaveViewOpened(),
-				// Do note call `getTheme` with null, it will cause a request to
+				// Do not call `getTheme` with null, it will cause a request to
 				// the server.
 				previewingThemeName: currentlyPreviewingThemeId
 					? select( coreStore ).getTheme( currentlyPreviewingThemeId )
