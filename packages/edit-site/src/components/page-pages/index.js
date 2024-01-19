@@ -212,18 +212,37 @@ export default function PagePages() {
 				id: 'featured-image',
 				header: __( 'Featured Image' ),
 				getValue: ( { item } ) => item.featured_media,
-				render: ( { item } ) =>
-					!! item.featured_media ? (
-						<Media
-							className="edit-site-page-pages__featured-image"
-							id={ item.featured_media }
-							size={
-								view.type === LAYOUT_GRID
-									? [ 'large', 'full', 'medium', 'thumbnail' ]
-									: [ 'thumbnail', 'medium', 'large', 'full' ]
-							}
-						/>
-					) : null,
+				render: ( { item } ) => (
+					<span
+						className={
+							view.type === LAYOUT_TABLE
+								? 'edit-site-page-pages__media-wrapper'
+								: ''
+						}
+					>
+						{ !! item.featured_media ? (
+							<Media
+								className="edit-site-page-pages__featured-image"
+								id={ item.featured_media }
+								size={
+									view.type === LAYOUT_GRID
+										? [
+												'large',
+												'full',
+												'medium',
+												'thumbnail',
+										  ]
+										: [
+												'thumbnail',
+												'medium',
+												'large',
+												'full',
+										  ]
+								}
+							/>
+						) : null }
+					</span>
+				),
 				enableSorting: false,
 			},
 			{

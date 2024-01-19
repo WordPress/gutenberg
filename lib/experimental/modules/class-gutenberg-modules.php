@@ -176,7 +176,7 @@ class Gutenberg_Modules {
 	 * is set to false, the version number is the currently installed WordPress
 	 * version. If $version is set to null, no version is added.
 	 *
-	 * @param array $version The version of the module.
+	 * @param string|false|null $version The version of the module.
 	 * @return string A string presenting the version.
 	 */
 	private static function get_version_query_string( $version ) {
@@ -327,9 +327,9 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadat
 /**
  * Enqueue modules associated with the block.
  *
- * @param string   $block_content The block content.
- * @param array    $block         The full block, including name and attributes.
- * @param WP_Block $instance      The block instance.
+ * @param string   $block_content  The block content.
+ * @param array    $parsed_block   The full block, including name and attributes.
+ * @param WP_Block $block_instance The block instance.
  */
 function gutenberg_filter_render_block_enqueue_view_modules( $block_content, $parsed_block, $block_instance ) {
 	$block_type = $block_instance->block_type;
