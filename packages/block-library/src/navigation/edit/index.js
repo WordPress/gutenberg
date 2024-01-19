@@ -32,8 +32,9 @@ import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	PanelBody,
-	CustomSelectControl,
 	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Button,
 	Spinner,
 	Notice,
@@ -524,28 +525,6 @@ function Navigation( {
 	);
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
-	const overlayMenuOptions = [
-		{
-			name: __( 'Off' ),
-			key: 'never',
-		},
-		{
-			name: __( 'Always' ),
-			key: 'always',
-		},
-		{
-			name: __( 'On mobile' ),
-			key: 'mobile',
-			__experimentalHint: __( 'Show the overlay on smaller screens.' ),
-		},
-		{
-			name: __( 'Automatic' ),
-			key: 'auto',
-			__experimentalHint: __(
-				'Use the overlay when the navigation items do not fit on one line.'
-			),
-		},
-	];
 	const stylingInspectorControls = (
 		<>
 			<InspectorControls>
@@ -590,23 +569,33 @@ function Navigation( {
 							</>
 						) }
 
-						<CustomSelectControl
-							className="wp-block-navigation__overlay-menu-custom-select-control"
-							label={ __( 'Navigation Overlay' ) }
+						<h3>{ __( 'Overlay Menu' ) }</h3>
+						<ToggleGroupControl
+							__nextHasNoMarginBottom
+							label={ __( 'Configure overlay menu' ) }
+							value={ overlayMenu }
 							help={ __(
-								'Replace the items with an icon that opens a full-screen navigation on click.'
+								'Collapses the navigation options in a menu icon opening an overlay.'
 							) }
-							value={ overlayMenuOptions.find( ( option ) => {
-								return option.key === overlayMenu;
-							} ) }
-							options={ overlayMenuOptions }
-							onChange={ ( option ) => {
-								setAttributes( {
-									overlayMenu: option.selectedItem.key,
-								} );
-							} }
-							__nextUnconstrainedWidt
-						/>
+							onChange={ ( value ) =>
+								setAttributes( { overlayMenu: value } )
+							}
+							isBlock
+							hideLabelFromVision
+						>
+							<ToggleGroupControlOption
+								value="never"
+								label={ __( 'Off' ) }
+							/>
+							<ToggleGroupControlOption
+								value="mobile"
+								label={ __( 'Mobile' ) }
+							/>
+							<ToggleGroupControlOption
+								value="always"
+								label={ __( 'Always' ) }
+							/>
+						</ToggleGroupControl>
 						{ hasSubmenus && (
 							<>
 								<h3>{ __( 'Submenus' ) }</h3>
