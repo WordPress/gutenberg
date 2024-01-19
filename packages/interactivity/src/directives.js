@@ -132,6 +132,7 @@ export default () => {
 	// data-wp-init--[name]
 	directive( 'init', ( { directives: { init }, evaluate } ) => {
 		init.forEach( ( entry ) => {
+			// TODO: Replace with useEffect to prevent unneeded scopes.
 			useInit( () => evaluate( entry ) );
 		} );
 	} );

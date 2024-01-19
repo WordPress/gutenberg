@@ -12,7 +12,14 @@ import { effect } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import { getScope, setScope, resetScope } from './hooks';
+import {
+	getScope,
+	setScope,
+	resetScope,
+	getNamespace,
+	setNamespace,
+	resetNamespace,
+} from './hooks';
 
 const afterNextFrame = ( callback ) => {
 	return new Promise( ( resolve ) => {
@@ -72,17 +79,20 @@ export function useSignalEffect( callback ) {
  * @return {Function} The wrapped function.
  */
 export const withScope = ( func ) => {
-	if ( func?.constructor?.name === 'Promise' ) {
-		const scope = getScope();
+	const scope = getScope();
+	const ns = getNamespace();
+	if ( func?.constructor?.name === 'GeneratorFunction' ) {
 		return async ( ...args ) => {
 			const gen = func( ...args );
 			let value;
 			let it;
 			while ( true ) {
+				setNamespace( ns );
 				setScope( scope );
 				try {
 					it = gen.next( value );
 				} finally {
+					resetNamespace();
 					resetScope();
 				}
 				try {
@@ -95,12 +105,13 @@ export const withScope = ( func ) => {
 			return value;
 		};
 	}
-	const scope = getScope();
 	return ( ...args ) => {
+		setNamespace( ns );
 		setScope( scope );
 		try {
 			return func( ...args );
 		} finally {
+			resetNamespace();
 			resetScope();
 		}
 	};

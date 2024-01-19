@@ -16,10 +16,12 @@ test.describe( 'withScope', () => {
 		await utils.deleteAllPosts();
 	} );
 
-	test( 'it should test', async ( { page } ) => {
-		const counter = page.getByTestId( 'counter' );
-		await expect( counter ).toHaveText( '0' );
-		await page.keyboard.press( 'ArrowDown' );
-		await expect( counter ).toHaveText( '1' );
+	test( 'directives using withScope should work with async and sync functions', async ( {
+		page,
+	} ) => {
+		const asyncCounter = page.getByTestId( 'asyncCounter' );
+		await expect( asyncCounter ).toHaveText( '1' );
+		const syncCounter = page.getByTestId( 'syncCounter' );
+		await expect( syncCounter ).toHaveText( '1' );
 	} );
 } );

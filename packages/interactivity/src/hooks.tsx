@@ -156,6 +156,8 @@ export const resetScope = () => {
 	scopeStack.pop();
 };
 
+export const getNamespace = () => namespaceStack.slice( -1 )[ 0 ];
+
 export const setNamespace = ( namespace: string ) => {
 	namespaceStack.push( namespace );
 };
