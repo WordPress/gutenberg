@@ -19,6 +19,7 @@ const OWNER = 'wordpress';
 const REPO = 'gutenberg';
 const MAX_MONTHS_TO_QUERY = 4;
 
+// The following paths will be ignored when generating the issue content.
 const IGNORED_PATHS = [
 	'lib/load.php', // plugin specific code.
 	'lib/experiments-page.php', // experiments are plugin specific.
@@ -26,9 +27,10 @@ const IGNORED_PATHS = [
 	'packages/block-library', // this is handled automatically.
 ];
 
-const MAX_NESTING_LEVEL = 3;
+// PRs containing the following labels will be ignored when generating the issue content.
+const LABELS_TO_IGNORE = [ 'Backport from WordPress Core' ];
 
-const DEBUG = !! getArg( 'debug' );
+const MAX_NESTING_LEVEL = 3;
 
 const __filename = fileURLToPath( import.meta.url );
 const __dirname = dirname( __filename );
@@ -94,10 +96,6 @@ async function main() {
 
 	console.log( 'Welcome to the PHP Sync Issue Generator!' );
 
-	if ( DEBUG ) {
-		console.log( 'DEBUG MODE' );
-	}
-
 	console.log( '--------------------------------' );
 	console.log( '• Running script...' );
 
@@ -139,7 +137,7 @@ async function main() {
 			// using getPullRequestDataForCommit, but that requires yet another
 			// network request. Therefore we optimise for trying to build
 			// the PR URL from the commit data we have available.
-			const pullRequest = {
+			commitData.pullRequest = {
 				url: fullPRData?.html_url || buildPRURL( commit ),
 				creator:
 					fullPRData?.user?.login ||
@@ -148,8 +146,14 @@ async function main() {
 				labels: fullPRData?.labels || [],
 			};
 
-			if ( pullRequest ) {
-				commitData.pullRequest = pullRequest;
+			// if the PR labels contain any of the labels to ignore, skip this commit
+			// by returning null.
+			if (
+				commitData.pullRequest.labels.some( ( label ) =>
+					LABELS_TO_IGNORE.includes( label.name )
+				)
+			) {
+				return null;
 			}
 
 			// This is temporarily required because PRs merged between Beta 1 (since)
