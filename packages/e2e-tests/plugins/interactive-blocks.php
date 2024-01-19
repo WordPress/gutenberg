@@ -24,7 +24,13 @@ add_action(
 				gutenberg_register_module(
 					$name . '-view',
 					$view_file,
-					array( '@wordpress/interactivity', '@wordpress/interactivity/router' ),
+					array(
+						'@wordpress/interactivity',
+						array(
+							'id'     => '@wordpress/interactivity/router',
+							'import' => 'dynamic',
+						),
+					),
 					filemtime( $view_file ),
 					true
 				);
