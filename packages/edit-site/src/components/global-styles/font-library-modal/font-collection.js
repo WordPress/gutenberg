@@ -160,11 +160,10 @@ function FontCollection( { slug } ) {
 			if ( fontFamily?.fontFace ) {
 				await Promise.all(
 					fontFamily.fontFace.map( async ( fontFace ) => {
-						if ( fontFace.downloadFromUrl ) {
+						if ( fontFace.src ) {
 							fontFace.file = await downloadFontFaceAsset(
-								fontFace.downloadFromUrl
+								fontFace.src
 							);
-							delete fontFace.downloadFromUrl;
 						}
 					} )
 				);
