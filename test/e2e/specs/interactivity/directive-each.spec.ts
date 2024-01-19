@@ -328,9 +328,7 @@ test.describe( 'data-wp-each', () => {
 		await expect( delta ).toHaveAttribute( 'data-tag', '2' );
 	} );
 
-	test( 'should work with nested lists modifying the top list', async ( {
-		page,
-	} ) => {
+	test( 'should work with nested lists', async ( { page } ) => {
 		const mainElement = page.getByTestId( 'nested' );
 
 		// These tags are included to check that the elements are not unmounted
