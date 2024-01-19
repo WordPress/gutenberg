@@ -11,7 +11,6 @@ import {
 	isCollapsed,
 	insert,
 	create,
-	useAnchor,
 } from '@wordpress/rich-text';
 import { isURL, isEmail } from '@wordpress/url';
 import {
@@ -42,11 +41,6 @@ function Edit( {
 	const [ addingLink, setAddingLink ] = useState( false );
 	const [ clickedLink, setClickedLink ] = useState( false );
 
-	const anchorElement = useAnchor( {
-		editableContentElement: contentRef.current,
-		settings: link,
-	} );
-
 	function setClickedLinkTrue() {
 		setClickedLink( true );
 	}
@@ -56,26 +50,19 @@ function Edit( {
 	}
 
 	useLayoutEffect( () => {
-		// log tagNAME of anchorElement
-		if ( anchorElement?.tagName?.toLowerCase() === 'a' ) {
-			// add an event listener to the anchorElement
-			// for a click event
+		const editableContentElement = contentRef.current;
 
-			anchorElement?.addEventListener( 'click', setClickedLinkTrue );
+		function handleClick() {
+			setClickedLinkTrue();
 		}
 
+		editableContentElement.addEventListener( 'click', handleClick );
+
 		return () => {
-			// remove the event listener from the anchorElement
-			// for a click event
-			if ( anchorElement instanceof window.Element ) {
-				anchorElement?.removeEventListener(
-					'click',
-					setClickedLinkTrue
-				);
-			}
+			editableContentElement.removeEventListener( 'click', handleClick );
 			setClickedLinkFalse();
 		};
-	}, [ anchorElement, isActive ] );
+	}, [ contentRef, isActive ] );
 
 	function addLink() {
 		const text = getTextContent( slice( value ) );
