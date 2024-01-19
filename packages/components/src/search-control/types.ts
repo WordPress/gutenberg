@@ -24,6 +24,9 @@ export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
 	/**
 	 * The accessible label for the input.
 	 *
+	 * A label should always be provided as an accessibility best practice,
+	 * even when a placeholder is defined and `hideLabelFromVision` is `true`.
+	 *
 	 * @default 'Search'
 	 */
 	label?: string;

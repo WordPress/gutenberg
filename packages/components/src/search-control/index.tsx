@@ -122,6 +122,7 @@ function UnforwardedSearchControl(
  *
  *   return (
  *     <SearchControl
+ *       __nextHasNoMarginBottom
  *       value={ searchInput }
  *       onChange={ setSearchInput }
  *     />
