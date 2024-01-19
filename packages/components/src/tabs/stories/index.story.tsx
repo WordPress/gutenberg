@@ -274,29 +274,17 @@ const ControlledModeTemplate: StoryFn< typeof Tabs > = ( props ) => {
 					<DropdownMenu
 						controls={ [
 							{
-								onClick: () =>
-									setTimeout(
-										() => setSelectedTabId( 'tab1' ),
-										3000
-									),
+								onClick: () => setSelectedTabId( 'tab1' ),
 								title: 'Tab 1',
 								isActive: selectedTabId === 'tab1',
 							},
 							{
-								onClick: () =>
-									setTimeout(
-										() => setSelectedTabId( 'tab2' ),
-										3000
-									),
+								onClick: () => setSelectedTabId( 'tab2' ),
 								title: 'Tab 2',
 								isActive: selectedTabId === 'tab2',
 							},
 							{
-								onClick: () =>
-									setTimeout(
-										() => setSelectedTabId( 'tab3' ),
-										3000
-									),
+								onClick: () => setSelectedTabId( 'tab3' ),
 								title: 'Tab 3',
 								isActive: selectedTabId === 'tab3',
 							},
@@ -312,7 +300,6 @@ const ControlledModeTemplate: StoryFn< typeof Tabs > = ( props ) => {
 export const ControlledMode = ControlledModeTemplate.bind( {} );
 ControlledMode.args = {
 	selectedTabId: 'tab3',
-	selectOnMove: false,
 };
 
 const TabBecomesDisabledTemplate: StoryFn< typeof Tabs > = ( props ) => {
