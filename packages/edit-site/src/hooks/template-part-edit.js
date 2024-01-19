@@ -68,16 +68,14 @@ export const withEditBlockControls = createHigherOrderComponent(
 		const { attributes, name } = props;
 		const isDisplayed = name === 'core/template-part' && attributes.slug;
 
-		if ( ! isDisplayed ) {
-			return <BlockEdit { ...props } />;
-		}
-
 		return (
 			<>
-				<BlockEdit { ...props } />
-				<BlockControls group="other">
-					<EditTemplatePartMenuItem attributes={ attributes } />
-				</BlockControls>
+				<BlockEdit key="edit" { ...props } />
+				{ isDisplayed && (
+					<BlockControls group="other">
+						<EditTemplatePartMenuItem attributes={ attributes } />
+					</BlockControls>
+				) }
 			</>
 		);
 	},
