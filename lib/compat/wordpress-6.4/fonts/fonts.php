@@ -59,6 +59,31 @@ if ( ! function_exists( 'wp_print_font_faces' ) ) {
 		$wp_font_face = new WP_Font_Face();
 		$wp_font_face->generate_and_print( $fonts );
 	}
+} else {
+	// @core-merge: do not merge this code into Core.
+
+	// Remove Core's hooked callback to replace with the plugin's callback.
+	remove_action( 'wp_head', 'wp_print_font_faces', 50 );
+	remove_action( 'admin_print_styles', 'wp_print_font_faces', 50 );
+	add_action( 'wp_head', '_gutenberg_print_font_faces', 50 );
+	add_action( 'admin_print_styles', '_gutenberg_print_font_faces', 50 );
+
+	/**
+	 * Generates and prints font-face styles for given fonts or theme.json fonts.
+	 *
+	 * @access private
+	 */
+	function _gutenberg_print_font_faces() {
+		// Uses the plugin's resolver, i.e. that includes changes not yet merged
+		// that may not yet be merged into WP Core.
+		$fonts = Gutenberg_Font_Face_Resolver_6_4::get_fonts_from_theme_json();
+
+		if ( empty( $fonts ) ) {
+			return;
+		}
+
+		wp_print_font_faces( $fonts );
+	}
 }
 
 // @core-merge: do not merge this code into Core.
