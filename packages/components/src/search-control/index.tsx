@@ -78,9 +78,6 @@ function UnforwardedSearchControl(
 		[ __nextHasNoMarginBottom ]
 	);
 
-	// TODO:
-	// - comb the codebase for `components-search-control__*` selectors
-
 	return (
 		<ContextSystemProvider value={ baseControlContextValue }>
 			<InputControlWithoutWebkitStyles
@@ -110,36 +107,6 @@ function UnforwardedSearchControl(
 				{ ...restProps }
 			/>
 		</ContextSystemProvider>
-
-		// <BaseControl
-		// 	__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-		// 	label={ label }
-		// 	id={ id }
-		// 	hideLabelFromVision={ hideLabelFromVision }
-		// 	help={ help }
-		// 	className={ classnames( className, 'components-search-control', {
-		// 		'is-next-40px-default-size': __next40pxDefaultSize,
-		// 		'is-size-compact': size === 'compact',
-		// 	} ) }
-		// >
-		// 	<div className="components-search-control__input-wrapper">
-		// 		<input
-		// 			{ ...restProps }
-		// 			ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
-		// 			className="components-search-control__input"
-		// 			id={ id }
-		// 			type="search"
-		// 			placeholder={ placeholder }
-		// 			onChange={ ( event ) => onChange( event.target.value ) }
-		// 			onKeyDown={ onKeyDown }
-		// 			autoComplete="off"
-		// 			value={ value || '' }
-		// 		/>
-		// 		<div className="components-search-control__icon">
-		// 			{ renderRightButton() }
-		// 		</div>
-		// 	</div>
-		// </BaseControl>
 	);
 }
 
