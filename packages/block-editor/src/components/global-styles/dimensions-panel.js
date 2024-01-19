@@ -378,7 +378,6 @@ export default function DimensionsPanel( {
 	const aspectRatioValue = decodeValue(
 		inheritedValue?.dimensions?.aspectRatio
 	);
-	// Gotta change something here
 	const setAspectRatioValue = ( newValue ) => {
 		const tempValue = setImmutably(
 			value,

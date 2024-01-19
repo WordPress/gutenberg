@@ -157,13 +157,13 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 
 export default {
 	useBlockProps,
-	attributeKeys: [ 'style' ],
+	attributeKeys: [ 'minHeight', 'style' ],
 	hasSupport( name ) {
 		return hasDimensionsSupport( name, 'aspectRatio' );
 	},
 };
 
-function useBlockProps( { name, style } ) {
+function useBlockProps( { name, minHeight, style } ) {
 	if (
 		! hasDimensionsSupport( name, 'aspectRatio' ) ||
 		shouldSkipSerialization( name, DIMENSIONS_SUPPORT_KEY, 'aspectRatio' )
@@ -175,7 +175,25 @@ function useBlockProps( { name, style } ) {
 		'has-aspect-ratio': !! style?.dimensions?.aspectRatio,
 	} );
 
-	return { className };
+	// Allow dimensions-based inline style overrides to override any global styles rules that
+	// might be set for the block, and therefore affect the display of the aspect ratio.
+	const inlineStyleOverrides = {};
+
+	// Apply rules to unset incompatible styles.
+	// Note that a set `aspectRatio` will win out if both an aspect ratio and a minHeight are set.
+	// This is because the aspect ratio is a newer block support, so (in theory) any aspect ratio
+	// that is set should be intentional and should override any existing minHeight. The Cover block
+	// and dimensions controls have logic that will manually clear the aspect ratio if a minHeight
+	// is set.
+	if ( style?.dimensions?.aspectRatio ) {
+		// To ensure the aspect ratio does not get overridden by `minHeight` unset any existing rule.
+		inlineStyleOverrides.minHeight = 'unset';
+	} else if ( minHeight || style?.dimensions?.minHeight ) {
+		// To ensure the minHeight does not get overridden by `aspectRatio` unset any existing rule.
+		inlineStyleOverrides.aspectRatio = 'unset';
+	}
+
+	return { className, style: inlineStyleOverrides };
 }
 
 /**

@@ -434,6 +434,12 @@ export function getStylesDeclarations(
 			);
 		}
 
+		// For aspect ratio to work, other dimensions rules (and Cover block defaults) must be unset.
+		// This ensures that a fixed height does not override the aspect ratio.
+		if ( cssProperty === 'aspect-ratio' ) {
+			output.push( 'min-height: unset' );
+		}
+
 		output.push( `${ cssProperty }: ${ ruleValue }` );
 	} );
 
