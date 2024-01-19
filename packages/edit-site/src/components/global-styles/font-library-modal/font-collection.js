@@ -17,6 +17,8 @@ import {
 import { debounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { search, closeSmall } from '@wordpress/icons';
+import { store as editorStore } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -37,6 +39,12 @@ const DEFAULT_CATEGORY = {
 	name: __( 'All' ),
 };
 function FontCollection( { slug } ) {
+	const fontLibraryDownloadAssets = useSelect(
+		( select ) =>
+			select( editorStore ).getEditorSettings().fontLibraryDownloadAssets,
+		[]
+	);
+
 	const requiresPermission = slug === 'default-font-collection';
 
 	const getGoogleFontsPermissionFromStorage = () => {
@@ -157,7 +165,7 @@ function FontCollection( { slug } ) {
 		const fontFamily = fontsToInstall[ 0 ];
 
 		try {
-			if ( fontFamily?.fontFace ) {
+			if ( fontFamily?.fontFace && fontLibraryDownloadAssets ) {
 				await Promise.all(
 					fontFamily.fontFace.map( async ( fontFace ) => {
 						if ( fontFace.src ) {
