@@ -2164,9 +2164,6 @@
 				},
 				"core/widget-group": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
-				"variations": {
-					"$ref": "#/definitions/stylesVariationsPropertiesComplete"
 				}
 			},
 			"patternProperties": {
@@ -2197,7 +2194,7 @@
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
 						"variations": {
-							"$ref": "#/definitions/stylesVariationsPropertiesAndRefComplete"
+							"$ref": "#/definitions/stylesVariationsPropertiesComplete"
 						}
 					},
 					"additionalProperties": false
@@ -2209,21 +2206,6 @@
 			"patternProperties": {
 				"^[a-z][a-z0-9-]*$": {
 					"$ref": "#/definitions/stylesVariationPropertiesComplete"
-				}
-			}
-		},
-		"stylesVariationsPropertiesAndRefComplete": {
-			"type": "object",
-			"patternProperties": {
-				"^[a-z][a-z0-9-]*$": {
-					"oneOf": [
-						{
-							"$ref": "#/definitions/refComplete"
-						},
-						{
-							"$ref": "#/definitions/stylesVariationPropertiesComplete"
-						}
-					]
 				}
 			}
 		},
