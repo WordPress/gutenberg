@@ -245,6 +245,68 @@ describe.each( [
 		expect( screen.getByText( 'Hint' ) ).toBeVisible();
 	} );
 
+	it( 'Should return object onChange', async () => {
+		const user = userEvent.setup();
+		const mockOnChange = jest.fn();
+
+		render( <CustomSelect { ...props } onChange={ mockOnChange } /> );
+
+		await user.click(
+			screen.getByRole( 'combobox', {
+				expanded: false,
+			} )
+		);
+
+		expect( mockOnChange ).toHaveBeenNthCalledWith(
+			1,
+			expect.objectContaining( {
+				inputValue: '',
+				isOpen: false,
+				selectedItem: { key: 'violets', name: 'violets' },
+				type: '',
+			} )
+		);
+
+		await user.click(
+			screen.getByRole( 'option', {
+				name: 'aquamarine',
+			} )
+		);
+
+		expect( mockOnChange ).toHaveBeenNthCalledWith(
+			2,
+			expect.objectContaining( {
+				inputValue: '',
+				isOpen: false,
+				selectedItem: expect.objectContaining( {
+					name: 'aquamarine',
+				} ),
+				type: '',
+			} )
+		);
+	} );
+
+	it( 'Should return selectedItem object when specified onChange', async () => {
+		const user = userEvent.setup();
+		const mockOnChange = jest.fn(
+			( { selectedItem } ) => selectedItem.key
+		);
+
+		render( <CustomSelect { ...props } onChange={ mockOnChange } /> );
+
+		await user.tab();
+		expect(
+			screen.getByRole( 'combobox', {
+				expanded: false,
+			} )
+		).toHaveFocus();
+
+		await user.keyboard( '{p}' );
+		await user.keyboard( '{enter}' );
+
+		expect( mockOnChange ).toHaveReturnedWith( 'poppy' );
+	} );
+
 	describe( 'Keyboard behavior and accessibility', () => {
 		it( 'Should be able to change selection using keyboard', async () => {
 			const user = userEvent.setup();
