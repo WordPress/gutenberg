@@ -42,6 +42,8 @@ test.describe( 'data-wp-on-document', () => {
 		await visibilityButton.click();
 		await expect( counter ).toHaveText( '1' );
 		await page.keyboard.press( 'ArrowDown' );
-		await expect( counter ).toHaveText( '2' );
+		// Force a new locator to prevent flaky tests.
+		const updatedCounter = page.getByTestId( 'counter' );
+		await expect( updatedCounter ).toHaveText( '2' );
 	} );
 } );
