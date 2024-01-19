@@ -125,7 +125,6 @@ gutenberg_enqueue_module( 'directive-each-view' );
 		<p data-testid="item">4</p>
 	</div>
 
-
 	<div data-testid="nested">
 		<button
 			data-testid="add animal"
@@ -153,6 +152,21 @@ gutenberg_enqueue_module( 'directive-each-view' );
 					</ul>
 				</li>
 			</template>
+			<!-- SSRed elements; they should be removed on hydration -->
+			<li data-testid="animal" data-wp-each-child>
+				<span data-testid="name">Dog</span>
+				<ul>
+					<li>Chihuahua</li>
+					<li>Rottweiler</li>
+				</ul>
+			</li>
+			<li data-testid="animal" data-wp-each-child>
+				<span data-testid="name">Cat</span>
+				<ul>
+					<li>Sphynx</li>
+					<li>Siamese</li>
+				</ul>
+			</li>
 		</ul>
 	</div>
 </div>
