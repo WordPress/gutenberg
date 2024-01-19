@@ -441,4 +441,15 @@ test.describe( 'data-wp-each', () => {
 			await expect( c3 ).toHaveAttribute( 'data-tag', '8' );
 		}
 	} );
+
+	test( 'should do nothing when used on non-template elements', async ( {
+		page,
+	} ) => {
+		const elements = page
+			.getByTestId( 'invalid tag' )
+			.getByTestId( 'item' );
+
+		await expect( elements ).toHaveCount( 1 );
+		await expect( elements ).toBeEmpty();
+	} );
 } );

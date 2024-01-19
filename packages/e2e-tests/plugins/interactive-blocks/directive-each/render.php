@@ -169,6 +169,12 @@ gutenberg_enqueue_module( 'directive-each-view' );
 			</li>
 		</ul>
 	</div>
+
+	<div data-testid="invalid tag">
+		<div data-wp-each="state.letters">
+			<p data-wp-text="context.item" data-testid="item"></p>
+		</div>
+	</div>
 </div>
 
 <hr>
