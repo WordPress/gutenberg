@@ -32,6 +32,15 @@ const withDeprecatedKeys = ( originalGet ) => ( state, scope, name ) => {
 			}
 		);
 
+		const value = originalGet( state, 'core', name );
+
+		// Hotfix for 17.5. Some of the preferences in the list above haven't been
+		// migrated to core in 17.5 (i.e: `editorMode`, https://github.com/WordPress/gutenberg/pull/57642))
+		// so we should fallback to the passed scope to avoid unexpected `undefined` values.
+		if ( value === undefined ) {
+			return originalGet( state, scope, name );
+		}
+
 		return originalGet( state, 'core', name );
 	}
 
