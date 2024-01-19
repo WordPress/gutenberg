@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
