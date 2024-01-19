@@ -41,17 +41,26 @@ export default function SidebarNavigationScreen( {
 	description,
 	backPath: backPathProp,
 } ) {
-	const { dashboardLink, dashboardLinkText } = useSelect( ( select ) => {
-		const { getSettings } = unlock( select( editSiteStore ) );
-		return {
-			dashboardLink: getSettings().__experimentalDashboardLink,
-			dashboardLinkText: getSettings().__experimentalDashboardLinkText,
-		};
-	}, [] );
-	const { getTheme } = useSelect( coreStore );
+	const { dashboardLink, dashboardLinkText, previewingThemeName } = useSelect(
+		( select ) => {
+			const { getSettings } = unlock( select( editSiteStore ) );
+			const currentlyPreviewingThemeId = currentlyPreviewingTheme();
+			return {
+				dashboardLink: getSettings().__experimentalDashboardLink,
+				dashboardLinkText:
+					getSettings().__experimentalDashboardLinkText,
+				// Do not call `getTheme` with null, it will cause a request to
+				// the server.
+				previewingThemeName: currentlyPreviewingThemeId
+					? select( coreStore ).getTheme( currentlyPreviewingThemeId )
+							?.name?.rendered
+					: undefined,
+			};
+		},
+		[]
+	);
 	const location = useLocation();
 	const navigator = useNavigator();
-	const theme = getTheme( currentlyPreviewingTheme() );
 	const icon = isRTL() ? chevronRight : chevronLeft;
 
 	return (
@@ -108,7 +117,7 @@ export default function SidebarNavigationScreen( {
 							? title
 							: sprintf(
 									'Previewing %1$s: %2$s',
-									theme?.name?.rendered,
+									previewingThemeName,
 									title
 							  ) }
 					</Heading>
