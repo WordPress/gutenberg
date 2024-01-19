@@ -126,6 +126,18 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-navigation-overlay-auto',
+		__( 'Navigation overlay', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Allow navigation to switch to overlay mode when wrapping automatically', 'gutenberg' ),
+			'id'    => 'gutenberg-navigation-overlay-auto',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
