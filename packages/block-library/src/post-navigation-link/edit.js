@@ -66,7 +66,6 @@ export default function PostNavigationLinkEdit( {
 			const filteredTaxonomies = getTaxonomies( {
 				type: postType,
 				per_page: -1,
-				context: 'view',
 			} );
 			return filteredTaxonomies;
 		},
@@ -77,12 +76,14 @@ export default function PostNavigationLinkEdit( {
 			label: __( 'Unfiltered' ),
 			value: '',
 		};
-		const taxonomyOptions = ( taxonomies ?? [] ).map( ( item ) => {
-			return {
-				value: item.slug,
-				label: item.name,
-			};
-		} );
+		const taxonomyOptions = ( taxonomies ?? [] )
+			.filter( ( { visibility } ) => !! visibility?.publicly_queryable )
+			.map( ( item ) => {
+				return {
+					value: item.slug,
+					label: item.name,
+				};
+			} );
 
 		return [ selectOption, ...taxonomyOptions ];
 	};
