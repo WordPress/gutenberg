@@ -29,11 +29,11 @@ if ( ! function_exists( 'wp_block_bindings' ) ) {
  * @param string   $source_name The name of the source.
  * @param string   $label The label of the source.
  * @param callable $apply The callback executed when the source is processed during block rendering. The callable should have the following signature:
- *                        function (object $source_attrs, object $block_instance, string $attribute_name): string
+ *                        function (object $source_attrs, object $block_instance, string $attribute_name): WP_Binding_Patch
  *                        - object $source_attrs: Object containing source ID used to look up the override value, i.e. {"value": "{ID}"}.
  *                        - object $block_instance: The block instance.
  *                        - string $attribute_name: The name of an attribute used to retrieve an override value from the block context.
- *                        The callable should return a string that will be used to override the block's original value.
+ *                        The callable should return a patch that will be used to override the block's original value.
  * @return void
  */
 if ( ! function_exists( 'wp_block_bindings_register_source' ) ) {
@@ -56,14 +56,14 @@ if ( ! function_exists( 'wp_block_bindings_get_sources' ) ) {
 /**
  * Replaces the HTML content of a block based on the provided source value.
  *
- * @param string $block_content Block Content.
- * @param string $block_name The name of the block to process.
- * @param string $block_attr The attribute of the block we want to process.
- * @param string $source_value The value used to replace the HTML.
+ * @param string           $block_content Block Content.
+ * @param string           $block_name    The name of the block to process.
+ * @param string           $block_attr    The attribute of the block we want to process.
+ * @param WP_Binding_Patch $source_value  The patch used to apply to the HTML.
  * @return string The modified block content.
  */
 if ( ! function_exists( 'wp_block_bindings_replace_html' ) ) {
-	function wp_block_bindings_replace_html( $block_content, $block_name, $block_attr, $source_value ) {
-		return wp_block_bindings()->replace_html( $block_content, $block_name, $block_attr, $source_value );
+	function wp_block_bindings_replace_html( $block_content, $block_name, $block_attr, $source_patch ) {
+		return wp_block_bindings()->replace_html( $block_content, $block_name, $block_attr, $source_patch );
 	}
 }

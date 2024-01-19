@@ -14,7 +14,8 @@ if ( function_exists( 'wp_block_bindings_register_source' ) ) {
 			$post_id = get_the_ID();
 		}
 
-		return get_post_meta( $post_id, $source_attrs['value'], true );
+		$source_value = get_post_meta( $post_id, $source_attrs['value'], true );
+		return new WP_Binding_Patch( WP_Binding_Patch_Operation::Replace, $source_value );
 	};
 	wp_block_bindings_register_source(
 		'post_meta',

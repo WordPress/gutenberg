@@ -13,6 +13,27 @@ if ( class_exists( 'WP_Block_Bindings' ) ) {
 }
 
 /**
+ * Enum for patch operations.
+ */
+class WP_Binding_Patch_Operation {
+	const Remove = 'remove';
+	const Replace = 'replace';
+}
+
+/**
+ * Class used to represent a patch to apply to a block binding.
+ */
+class WP_Binding_Patch {
+	public $op;
+	public $value;
+
+	public function __construct( $op, $value = null ) {
+		$this->op = $op;
+		$this->value = $value;
+	}
+}
+
+/**
  * Core class used to define supported blocks, register sources, and populate HTML with content from those sources.
  */
 class WP_Block_Bindings {
@@ -30,11 +51,11 @@ class WP_Block_Bindings {
 	 * @param string   $source_name The name of the source.
 	 * @param string   $label The label of the source.
 	 * @param callable $apply The callback executed when the source is processed during block rendering. The callable should have the following signature:
-	 *                        function (object $source_attrs, object $block_instance, string $attribute_name): string
+	 *                        function (object $source_attrs, object $block_instance, string $attribute_name): WP_Binding_Patch
 	 *                        - object $source_attrs: Object containing source ID used to look up the override value, i.e. {"value": "{ID}"}.
 	 *                        - object $block_instance: The block instance.
 	 *                        - string $attribute_name: The name of an attribute used to retrieve an override value from the block context.
-	 *                        The callable should return a string that will be used to override the block's original value.
+	 *                        The callable should return a patch that will be used to override the block's original value.
 	 *
 	 * @return void
 	 */
@@ -48,12 +69,12 @@ class WP_Block_Bindings {
 	/**
 	 * Depending on the block attributes, replace the proper HTML based on the value returned by the source.
 	 *
-	 * @param string $block_content Block Content.
-	 * @param string $block_name The name of the block to process.
-	 * @param string $block_attr The attribute of the block we want to process.
-	 * @param string $source_value The value used to replace the HTML.
+	 * @param string           $block_content Block Content.
+	 * @param string           $block_name    The name of the block to process.
+	 * @param string           $block_attr    The attribute of the block we want to process.
+	 * @param WP_Binding_Patch $source_patch  The patch used to apply to the HTML.
 	 */
-	public function replace_html( $block_content, $block_name, $block_attr, $source_value ) {
+	public function replace_html( $block_content, $block_name, $block_attr, $source_patch ) {
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 		if ( null === $block_type ) {
 			return;
@@ -63,6 +84,7 @@ class WP_Block_Bindings {
 		switch ( $block_type->attributes[ $block_attr ]['source'] ) {
 			case 'html':
 			case 'rich-text':
+				$source_value = WP_Binding_Patch_Operation::Remove === $source_patch->op ? '' : $source_patch->value;
 				$block_reader = new WP_HTML_Tag_Processor( $block_content );
 
 				// TODO: Support for CSS selectors whenever they are ready in the HTML API.
@@ -136,7 +158,11 @@ class WP_Block_Bindings {
 				) ) {
 					return $block_content;
 				}
-				$amended_content->set_attribute( $block_type->attributes[ $block_attr ]['attribute'], esc_attr( $source_value ) );
+				if ( WP_Binding_Patch_Operation::Remove === $source_patch->op ) {
+					$amended_content->remove_attribute( $block_type->attributes[ $block_attr ]['attribute'] );
+				} else if ( WP_Binding_Patch_Operation::Replace === $source_patch->op ) {
+					$amended_content->set_attribute( $block_type->attributes[ $block_attr ]['attribute'], esc_attr( $source_patch->value ) );
+				}
 				return $amended_content->get_updated_html();
 				break;
 

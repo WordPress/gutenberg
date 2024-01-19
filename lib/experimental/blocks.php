@@ -105,7 +105,7 @@ if ( $gutenberg_experiments && (
 				'core/paragraph' => array( 'content' ),
 				'core/heading'   => array( 'content' ),
 				'core/image'     => array( 'url', 'title', 'alt' ),
-				'core/button'    => array( 'url', 'text' ),
+				'core/button'    => array( 'url', 'text', 'linkTarget' ),
 			);
 
 			// If the block doesn't have the bindings property or isn't one of the allowed block types, return.
@@ -151,14 +151,14 @@ if ( $gutenberg_experiments && (
 				} else {
 					$source_args = $binding_source['source']['attributes'];
 				}
-				$source_value = $source_callback( $source_args, $block_instance, $binding_attribute );
+				$source_patch = $source_callback( $source_args, $block_instance, $binding_attribute );
 				// If the value is null, process next attribute.
-				if ( is_null( $source_value ) ) {
+				if ( is_null( $source_patch ) ) {
 					continue;
 				}
 
 				// Process the HTML based on the block and the attribute.
-				$modified_block_content = wp_block_bindings_replace_html( $modified_block_content, $block_instance->name, $binding_attribute, $source_value );
+				$modified_block_content = wp_block_bindings_replace_html( $modified_block_content, $block_instance->name, $binding_attribute, $source_patch );
 			}
 			return $modified_block_content;
 		}

@@ -21,7 +21,7 @@ if ( $gutenberg_experiments && array_key_exists( 'gutenberg-pattern-partial-sync
 			'core/paragraph' => array( 'content' ),
 			'core/heading'   => array( 'content' ),
 			'core/image'     => array( 'url', 'title', 'alt' ),
-			'core/button'    => array( 'url', 'text' ),
+			'core/button'    => array( 'url', 'text', 'linkTarget' ),
 		);
 		$pattern_support = array_key_exists( $block_type->name, $allowed_blocks );
 
