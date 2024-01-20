@@ -342,7 +342,7 @@ const ImageURLInputUI = ( {
 							<Button
 								icon={ linkOff }
 								className="remove-link"
-								label={ __( 'Remove link' ) }
+								label={ __( 'Disable expand on click' ) }
 								onClick={ () => {
 									onSetLightbox( false );
 								} }
