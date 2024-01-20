@@ -67,8 +67,7 @@
 			@include break-small() {
 				&:not(.is-horizontal) .block-editor-block-mover__move-button-container {
 					position: relative;
-					top: -6px;
-					justify-content: flex-start;
+					top: -10px;
 				}
 			}
 		}

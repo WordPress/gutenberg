@@ -117,8 +117,7 @@
 			@include break-small() {
 				&:not(.is-horizontal) .block-editor-block-mover__move-button-container {
 					position: relative;
-					top: -6px;
-					justify-content: flex-start;
+					top: -10px;
 				}
 			}
 		}
@@ -234,9 +233,9 @@
 		&::before {
 			content: "";
 			width: $border-width;
-			margin-top: $grid-unit-15;
-			margin-bottom: $grid-unit-15;
+			height: $grid-unit-30;
 			background-color: $gray-300;
+			margin-top: $grid-unit-05;
 			margin-left: $grid-unit;
 		}
 
