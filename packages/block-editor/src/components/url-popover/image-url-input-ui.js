@@ -253,7 +253,9 @@ const ImageURLInputUI = ( {
 					anchor={ popoverAnchor }
 					onFocusOutside={ onFocusOutside() }
 					onClose={ closeLinkUI }
-					renderSettings={ () => advancedOptions }
+					renderSettings={
+						! lightboxEnabled ? () => advancedOptions : null
+					}
 					additionalControls={
 						showLinkEditor && (
 							<MenuGroup>
