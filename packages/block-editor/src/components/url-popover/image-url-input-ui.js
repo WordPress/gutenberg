@@ -151,7 +151,6 @@ const ImageURLInputUI = ( {
 			linkDestination: LINK_DESTINATION_NONE,
 			href: '',
 		} );
-		setIsOpen( false );
 	};
 
 	const getLinkDestinations = () => {
