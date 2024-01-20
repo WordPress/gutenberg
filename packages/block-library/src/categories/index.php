@@ -23,7 +23,9 @@ function render_block_core_categories( $attributes ) {
 		'show_count'   => ! empty( $attributes['showPostCounts'] ),
 		'title_li'     => '',
 		'hide_empty'   => empty( $attributes['showEmpty'] ),
+		'taxonomy'     => $attributes['taxonomy'],
 	);
+
 	if ( ! empty( $attributes['showOnlyTopLevel'] ) && $attributes['showOnlyTopLevel'] ) {
 		$args['parent'] = 0;
 	}
