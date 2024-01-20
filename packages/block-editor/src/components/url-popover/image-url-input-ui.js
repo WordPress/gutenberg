@@ -328,30 +328,28 @@ const ImageURLInputUI = ( {
 						</>
 					) }
 					{ ! url && ! isEditingLink && lightboxEnabled && (
-						<>
-							<div
-								className="block-editor-url-popover__expand-on-click block-editor-url-popover__expand-on-click__unlink"
-								url={ url }
-							>
+						<div className="block-editor-url-popover__expand-on-click">
+							<div className="fullscreen-icon">
 								{ fullscreen }
-								<div className="expand-on-click__unlink-textbox">
-									<p>{ __( 'Expand on click' ) }</p>
-									<p className="expand-on-click__description">
-										{ __(
-											'Scales the image with a lightbox effect'
-										) }
-									</p>
-								</div>
-								<Button
-									icon={ linkOff }
-									label={ __( 'Remove link' ) }
-									onClick={ () => {
-										onSetLightbox( false );
-									} }
-									size="compact"
-								/>
 							</div>
-						</>
+							<div className="text">
+								<p>{ __( 'Expand on click' ) }</p>
+								<p className="description">
+									{ __(
+										'Scales the image with a lightbox effect'
+									) }
+								</p>
+							</div>
+							<Button
+								icon={ linkOff }
+								className="remove-link"
+								label={ __( 'Remove link' ) }
+								onClick={ () => {
+									onSetLightbox( false );
+								} }
+								size="compact"
+							/>
+						</div>
 					) }
 				</URLPopover>
 			) }
