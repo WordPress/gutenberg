@@ -64,12 +64,15 @@ export default function useLayoutAreas() {
 		return {
 			areas: {
 				content: <PageTemplates />,
-				preview: isListLayout && (
+				preview: window.__experimentalAdminViews && isListLayout && (
 					<Editor isLoading={ isSiteEditorLoading } />
 				),
 			},
 			widths: {
-				content: isListLayout ? 380 : undefined,
+				content:
+					window.__experimentalAdminViews && isListLayout
+						? 380
+						: undefined,
 			},
 		};
 	}
