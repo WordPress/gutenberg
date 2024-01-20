@@ -4,6 +4,10 @@
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+/**
  * Internal dependencies
  */
 import _CustomSelect from '../custom-select';
@@ -11,10 +15,19 @@ import type { LegacyCustomSelectProps } from '../types';
 import { CustomSelectItem } from '..';
 
 function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
+	const {
+		__experimentalShowSelectedHint,
+		__nextUnconstrainedWidth,
+		options,
+		onChange,
+		value: valueProp,
+		...restProps
+	} = props;
+
 	// Forward props + store from v2 implementation
 	const store = Ariakit.useSelectStore( {
 		async setValue( value ) {
-			if ( ! props.onChange ) return;
+			if ( ! onChange ) return;
 
 			// Executes the logic in a microtask after the popup is closed.
 			// This is simply to ensure the isOpen state matches that in Downshift.
@@ -34,11 +47,11 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 				},
 				type: '',
 			};
-			props.onChange( changeObject );
+			onChange( changeObject );
 		},
 	} );
 
-	const children = props.options.map(
+	const children = options.map(
 		( { name, key, __experimentalHint, ...rest } ) => {
 			const withHint = (
 				<>
@@ -55,17 +68,27 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 					key={ key }
 					value={ name }
 					children={
-						props.__experimentalShowSelectedHint ? withHint : name
+						__experimentalShowSelectedHint ? withHint : name
 					}
 				/>
 			);
 		}
 	);
 
+	if ( __nextUnconstrainedWidth ) {
+		deprecated(
+			'Constrained width styles for wp.components.CustomSelectControl',
+			{
+				hint: 'This behaviour is now built-in.',
+				since: '6.4',
+			}
+		);
+	}
+
 	const translatedProps = {
 		'aria-describedby': props.describedBy,
 		children,
-		label: props.label,
+		...restProps,
 	};
 
 	return <_CustomSelect { ...translatedProps } store={ store } />;

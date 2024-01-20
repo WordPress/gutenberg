@@ -18,6 +18,11 @@ const meta: Meta< typeof LegacyCustomSelect > = {
 	title: 'Components (Experimental)/CustomSelectControl v2/Legacy',
 	component: LegacyCustomSelect,
 	argTypes: {
+		onBlur: { control: { type: null } },
+		onChange: { control: { type: null } },
+		onFocus: { control: { type: null } },
+		onMouseOut: { control: { type: null } },
+		onMouseOver: { control: { type: null } },
 		value: { control: { type: null } },
 	},
 	parameters: {

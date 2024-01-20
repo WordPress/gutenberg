@@ -3,6 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type * as Ariakit from '@ariakit/react';
+import type { FocusEventHandler, MouseEventHandler } from 'react';
 /**
  * Internal dependencies
  */
@@ -79,6 +80,10 @@ type OnChangeObject = {
 
 export type LegacyCustomSelectProps = {
 	/**
+	 * Optional classname for the component.
+	 */
+	className?: string;
+	/**
 	 * Used to visually hide the label. It will always be visible to screen readers.
 	 *
 	 */
@@ -94,9 +99,26 @@ export type LegacyCustomSelectProps = {
 	 */
 	label: string;
 	/**
-	 * A function that receives the new value of the input.
+	 * Function called with the control's internal state changes. The `selectedItem`
+	 * property contains the next selected item.
 	 */
 	onChange?: ( newValue: OnChangeObject ) => void;
+	/**
+	 * A handler for `onBlur` events.
+	 */
+	onBlur?: FocusEventHandler< HTMLButtonElement >;
+	/**
+	 * A handler for `onFocus` events.
+	 */
+	onFocus?: FocusEventHandler< HTMLButtonElement >;
+	/**
+	 * A handler for `onMouseOver` events.
+	 */
+	onMouseOut?: MouseEventHandler< HTMLButtonElement >;
+	/**
+	 * A handler for `onMouseOut` events.
+	 */
+	onMouseOver?: MouseEventHandler< HTMLButtonElement >;
 	/**
 	 * The options that can be chosen from.
 	 */
@@ -111,6 +133,11 @@ export type LegacyCustomSelectProps = {
 	 * Can be used to externally control the value of the control.
 	 */
 	value?: Option;
+	/**
+	 * Legacy way to add additional text to the right of each option.
+	 *
+	 * @default false
+	 */
 	__experimentalShowSelectedHint?: boolean;
 	/**
 	 * Opt-in prop for an unconstrained width style which became the default in
@@ -119,6 +146,12 @@ export type LegacyCustomSelectProps = {
 	 * @deprecated
 	 */
 	__nextUnconstrainedWidth?: boolean;
+	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
 };
 
 export type CustomSelectItemProps = {
