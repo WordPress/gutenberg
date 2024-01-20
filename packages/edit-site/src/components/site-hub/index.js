@@ -17,10 +17,12 @@ import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
-import { forwardRef } from '@wordpress/element';
+import { memo } from '@wordpress/element';
 import { search, external } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -31,7 +33,7 @@ import { unlock } from '../../lock-unlock';
 
 const HUB_ANIMATION_DURATION = 0.3;
 
-const SiteHub = forwardRef( ( { isTransparent, ...restProps }, ref ) => {
+const SiteHub = memo( ( { isTransparent, className } ) => {
 	const { canvasMode, dashboardLink, homeUrl, siteTitle } = useSelect(
 		( select ) => {
 			const { getCanvasMode, getSettings } = unlock(
@@ -56,11 +58,9 @@ const SiteHub = forwardRef( ( { isTransparent, ...restProps }, ref ) => {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 
 	const disableMotion = useReducedMotion();
-	const {
-		setCanvasMode,
-		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-	} = unlock( useDispatch( editSiteStore ) );
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+	const { setDeviceType } = useDispatch( editorStore );
 	const isBackToDashboardButton = canvasMode === 'view';
 	const siteIconButtonProps = isBackToDashboardButton
 		? {
@@ -75,7 +75,7 @@ const SiteHub = forwardRef( ( { isTransparent, ...restProps }, ref ) => {
 					event.preventDefault();
 					if ( canvasMode === 'edit' ) {
 						clearSelectedBlock();
-						setPreviewDeviceType( 'desktop' );
+						setDeviceType( 'Desktop' );
 						setCanvasMode( 'view' );
 					}
 				},
@@ -83,12 +83,13 @@ const SiteHub = forwardRef( ( { isTransparent, ...restProps }, ref ) => {
 
 	return (
 		<motion.div
-			ref={ ref }
-			{ ...restProps }
-			className={ classnames(
-				'edit-site-site-hub',
-				restProps.className
-			) }
+			className={ classnames( 'edit-site-site-hub', className ) }
+			variants={ {
+				isDistractionFree: { x: '-100%' },
+				isDistractionFreeHovering: { x: 0 },
+				view: { x: 0 },
+				edit: { x: 0 },
+			} }
 			initial={ false }
 			transition={ {
 				type: 'tween',
@@ -179,7 +180,10 @@ const SiteHub = forwardRef( ( { isTransparent, ...restProps }, ref ) => {
 								'View site (opens in a new tab)'
 							) }
 							icon={ external }
-							className="edit-site-site-hub__site-view-link"
+							className={ classnames(
+								'edit-site-site-hub__site-view-link',
+								{ 'is-transparent': isTransparent }
+							) }
 						/>
 					) }
 				</HStack>
@@ -192,6 +196,7 @@ const SiteHub = forwardRef( ( { isTransparent, ...restProps }, ref ) => {
 						icon={ search }
 						onClick={ () => openCommandCenter() }
 						label={ __( 'Open command palette' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
 					/>
 				) }
 			</HStack>

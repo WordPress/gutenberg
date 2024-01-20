@@ -13,6 +13,7 @@ export const ALLOWED_BLOCKS = [
 	'core/site-logo',
 	'core/navigation-submenu',
 	'core/loginout',
+	'core/buttons',
 ];
 
 export const PRIORITIZED_INSERTER_BLOCKS = [
@@ -36,3 +37,5 @@ export const SELECT_NAVIGATION_MENUS_ARGS = [
 	'wp_navigation',
 	PRELOADED_NAVIGATION_MENUS_QUERY,
 ];
+
+export const NAVIGATION_MOBILE_COLLAPSE = '600px';

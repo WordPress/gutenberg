@@ -9,7 +9,7 @@
 
 add_action(
 	'init',
-	function() {
+	function () {
 		// Register all blocks found in the `interactive-blocks` folder.
 		if ( file_exists( __DIR__ . '/interactive-blocks/' ) ) {
 			$block_json_files = glob( __DIR__ . '/interactive-blocks/**/block.json' );
@@ -21,17 +21,17 @@ add_action(
 
 				$view_file = plugin_dir_url( $block_folder ) . $name . '/' . 'view.js';
 
-				wp_register_script(
+				gutenberg_register_module(
 					$name . '-view',
 					$view_file,
-					array( 'wp-interactivity' ),
+					array( '@wordpress/interactivity' ),
 					filemtime( $view_file ),
 					true
 				);
 
 				register_block_type_from_metadata( $block_folder );
-			};
-		};
+			}
+		}
 
 		// Temporary fix to disable SSR of directives during E2E testing. This
 		// is required at this moment, as SSR for directives is not stabilized
@@ -39,10 +39,9 @@ add_action(
 		// HTML is not correct or malformed.
 		if ( 'true' === $_GET['disable_directives_ssr'] ) {
 			remove_filter(
-				'render_block',
-				'gutenberg_interactivity_process_directives_in_root_blocks'
+				'render_block_data',
+				'gutenberg_interactivity_mark_root_interactive_blocks'
 			);
 		}
-
 	}
 );

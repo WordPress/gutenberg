@@ -5,27 +5,6 @@
  * @package gutenberg
  */
 
-/**
- * Checks whether the experimental Interactivity API should be used for a block.
- *
- * Note: This function is located here instead of in interactivity-api/blocks.php because it has to be available earler.
- *
- * @param string $block_name Block name.
- * @return bool Whether Interactivity API is used for block.
- */
-function gutenberg_should_block_use_interactivity_api( $block_name ) {
-
-	/**
-	 * Filters whether the experimental Interactivity API should be used for a block.
-	 *
-	 * @since 6.3.0
-	 *
-	 * @param bool   $enabled    Whether Interactivity API is used for block.
-	 * @param string $block_name Block name.
-	 */
-	return (bool) apply_filters( 'gutenberg_should_block_use_interactivity_api', true, $block_name );
-}
-
 if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 	/**
 	 * Enqueues a frontend script for a specific block.
@@ -63,7 +42,7 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 		 *                        is to ensure the content exists.
 		 * @return string Block content.
 		 */
-		$callback = static function( $content, $block ) use ( $args, $block_name ) {
+		$callback = static function ( $content, $block ) use ( $args, $block_name ) {
 
 			// Sanity check.
 			if ( empty( $block['blockName'] ) || $block_name !== $block['blockName'] ) {
@@ -100,24 +79,90 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 }
 
 
-/**
- * Registers the metadata block attribute for block types.
- *
- * @param array $args Array of arguments for registering a block type.
- * @return array $args
- */
-function gutenberg_register_metadata_attribute( $args ) {
-	// Setup attributes if needed.
-	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
-		$args['attributes'] = array();
+
+
+$gutenberg_experiments = get_option( 'gutenberg-experiments' );
+if ( $gutenberg_experiments && (
+	array_key_exists( 'gutenberg-block-bindings', $gutenberg_experiments ) ||
+	array_key_exists( 'gutenberg-pattern-partial-syncing', $gutenberg_experiments )
+) ) {
+
+	require_once __DIR__ . '/block-bindings/index.php';
+
+	if ( ! function_exists( 'gutenberg_process_block_bindings' ) ) {
+		/**
+		 * Process the block bindings attribute.
+		 *
+		 * @param string   $block_content Block Content.
+		 * @param array    $block Block attributes.
+		 * @param WP_Block $block_instance The block instance.
+		 */
+		function gutenberg_process_block_bindings( $block_content, $block, $block_instance ) {
+
+			// Allowed blocks that support block bindings.
+			// TODO: Look for a mechanism to opt-in for this. Maybe adding a property to block attributes?
+			$allowed_blocks = array(
+				'core/paragraph' => array( 'content' ),
+				'core/heading'   => array( 'content' ),
+				'core/image'     => array( 'url', 'title', 'alt' ),
+				'core/button'    => array( 'url', 'text' ),
+			);
+
+			// If the block doesn't have the bindings property or isn't one of the allowed block types, return.
+			if ( ! isset( $block['attrs']['metadata']['bindings'] ) || ! isset( $allowed_blocks[ $block_instance->name ] ) ) {
+				return $block_content;
+			}
+
+			// Assuming the following format for the bindings property of the "metadata" attribute:
+			//
+			// "bindings": {
+			//   "title": {
+			//     "source": {
+			//       "name": "post_meta",
+			//       "attributes": { "value": "text_custom_field" }
+			//     }
+			//   },
+			//   "url": {
+			//     "source": {
+			//       "name": "post_meta",
+			//       "attributes": { "value": "text_custom_field" }
+			//     }
+			//   }
+			// }
+			//
+
+			$block_bindings_sources = wp_block_bindings_get_sources();
+			$modified_block_content = $block_content;
+			foreach ( $block['attrs']['metadata']['bindings'] as $binding_attribute => $binding_source ) {
+
+				// If the attribute is not in the list, process next attribute.
+				if ( ! in_array( $binding_attribute, $allowed_blocks[ $block_instance->name ], true ) ) {
+					continue;
+				}
+				// If no source is provided, or that source is not registered, process next attribute.
+				if ( ! isset( $binding_source['source'] ) || ! isset( $binding_source['source']['name'] ) || ! isset( $block_bindings_sources[ $binding_source['source']['name'] ] ) ) {
+					continue;
+				}
+
+				$source_callback = $block_bindings_sources[ $binding_source['source']['name'] ]['apply'];
+				// Get the value based on the source.
+				if ( ! isset( $binding_source['source']['attributes'] ) ) {
+					$source_args = array();
+				} else {
+					$source_args = $binding_source['source']['attributes'];
+				}
+				$source_value = $source_callback( $source_args, $block_instance, $binding_attribute );
+				// If the value is null, process next attribute.
+				if ( is_null( $source_value ) ) {
+					continue;
+				}
+
+				// Process the HTML based on the block and the attribute.
+				$modified_block_content = wp_block_bindings_replace_html( $modified_block_content, $block_instance->name, $binding_attribute, $source_value );
+			}
+			return $modified_block_content;
+		}
 	}
 
-	if ( ! array_key_exists( 'metadata', $args['attributes'] ) ) {
-		$args['attributes']['metadata'] = array(
-			'type' => 'object',
-		);
-	}
-
-	return $args;
+	add_filter( 'render_block', 'gutenberg_process_block_bindings', 20, 3 );
 }
-add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );

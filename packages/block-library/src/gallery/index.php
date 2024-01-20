@@ -33,6 +33,21 @@ function block_core_gallery_data_id_backcompatibility( $parsed_block ) {
 add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' );
 
 /**
+ * Filter to randomize the order of image blocks.
+ *
+ * @param array $parsed_block The block being rendered.
+ * @return array The block object with randomized order of image blocks.
+ */
+function block_core_gallery_random_order( $parsed_block ) {
+	if ( 'core/gallery' === $parsed_block['blockName'] && ! empty( $parsed_block['attrs']['randomOrder'] ) ) {
+		shuffle( $parsed_block['innerBlocks'] );
+	}
+	return $parsed_block;
+}
+
+add_filter( 'render_block_data', 'block_core_gallery_random_order' );
+
+/**
  * Adds a style tag for the --wp--style--unstable-gallery-gap var.
  *
  * The Gallery block needs to recalculate Image block width based on
@@ -44,7 +59,7 @@ add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' 
  * @return string The content of the block being rendered.
  */
 function block_core_gallery_render( $attributes, $content ) {
-	$gap = _wp_array_get( $attributes, array( 'style', 'spacing', 'blockGap' ) );
+	$gap = $attributes['style']['spacing']['blockGap'] ?? null;
 	// Skip if gap value contains unsupported characters.
 	// Regex for CSS value borrowed from `safecss_filter_attr`, and used here
 	// because we only want to match against the value, not the CSS attribute.

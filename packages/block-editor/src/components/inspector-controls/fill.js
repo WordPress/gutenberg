@@ -7,12 +7,15 @@ import {
 } from '@wordpress/components';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import useDisplayBlockControls from '../use-display-block-controls';
+import {
+	useBlockEditContext,
+	mayDisplayControlsKey,
+} from '../block-edit/context';
 import groups from './groups';
 
 export default function InspectorControlsFill( {
@@ -33,13 +36,13 @@ export default function InspectorControlsFill( {
 		group = __experimentalGroup;
 	}
 
-	const isDisplayed = useDisplayBlockControls();
+	const context = useBlockEditContext();
 	const Fill = groups[ group ]?.Fill;
 	if ( ! Fill ) {
 		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
-	if ( ! isDisplayed ) {
+	if ( ! context[ mayDisplayControlsKey ] ) {
 		return null;
 	}
 
@@ -60,28 +63,42 @@ export default function InspectorControlsFill( {
 	);
 }
 
-function ToolsPanelInspectorControl( { children, resetAllFilter, fillProps } ) {
-	const { registerResetAllFilter, deregisterResetAllFilter } = fillProps;
+function RegisterResetAll( { resetAllFilter, children } ) {
+	const { registerResetAllFilter, deregisterResetAllFilter } =
+		useContext( ToolsPanelContext );
 	useEffect( () => {
-		if ( resetAllFilter && registerResetAllFilter ) {
+		if (
+			resetAllFilter &&
+			registerResetAllFilter &&
+			deregisterResetAllFilter
+		) {
 			registerResetAllFilter( resetAllFilter );
-		}
-		return () => {
-			if ( resetAllFilter && deregisterResetAllFilter ) {
+			return () => {
 				deregisterResetAllFilter( resetAllFilter );
-			}
-		};
+			};
+		}
 	}, [ resetAllFilter, registerResetAllFilter, deregisterResetAllFilter ] );
+	return children;
+}
+
+function ToolsPanelInspectorControl( { children, resetAllFilter, fillProps } ) {
+	// `fillProps.forwardedContext` is an array of context provider entries, provided by slot,
+	// that should wrap the fill markup.
+	const { forwardedContext = [] } = fillProps;
 
 	// Children passed to InspectorControlsFill will not have
 	// access to any React Context whose Provider is part of
 	// the InspectorControlsSlot tree. So we re-create the
 	// Provider in this subtree.
-	const value =
-		fillProps && Object.keys( fillProps ).length > 0 ? fillProps : null;
-	return (
-		<ToolsPanelContext.Provider value={ value }>
+	const innerMarkup = (
+		<RegisterResetAll resetAllFilter={ resetAllFilter }>
 			{ children }
-		</ToolsPanelContext.Provider>
+		</RegisterResetAll>
+	);
+	return forwardedContext.reduce(
+		( inner, [ Provider, props ] ) => (
+			<Provider { ...props }>{ inner }</Provider>
+		),
+		innerMarkup
 	);
 }

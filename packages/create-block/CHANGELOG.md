@@ -2,7 +2,45 @@
 
 ## Unreleased
 
+## 4.33.0 (2024-01-10)
+
+### New Feature
+
+-   Add support for the `viewModule` property ([#57712](https://github.com/WordPress/gutenberg/pull/57712)).
+
+## 4.32.0 (2023-12-13)
+
+## 4.31.0 (2023-11-29)
+
+## 4.30.0 (2023-11-16)
+
+## 4.29.0 (2023-11-02)
+
+## 4.28.0 (2023-10-18)
+
+### New Feature
+
+-   Add new `transformer` property to external templates to allow customization of any values being passed from cli or the template.[#55423](https://github.com/WordPress/gutenberg/pull/55423)
+
+## 4.27.0 (2023-10-05)
+
+## 4.26.0 (2023-09-20)
+
+## 4.25.0 (2023-08-31)
+
+## 4.24.0 (2023-08-16)
+
+## 4.23.0 (2023-08-10)
+
+### Enhancement
+
+-   Add support for the `example` property and add it to the default template ([#52803](https://github.com/WordPress/gutenberg/pull/52803)).
+
 ## 4.22.0 (2023-07-20)
+
+### Enhancement
+
+-   Add support for the `viewScript` property ([#52612](https://github.com/WordPress/gutenberg/pull/52612)).
 
 ## 4.21.0 (2023-07-05)
 

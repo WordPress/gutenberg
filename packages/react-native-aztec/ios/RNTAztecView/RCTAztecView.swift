@@ -650,13 +650,9 @@ class RCTAztecView: Aztec.TextView {
     ///
     private func applyFontConstraints(to baseFont: UIFont) -> UIFont {
         let oldDescriptor = baseFont.fontDescriptor
-        let newFontSize: CGFloat
+        let fontMetrics = UIFontMetrics(forTextStyle: .body)
 
-        if let fontSize = fontSize {
-            newFontSize = fontSize
-        } else {
-            newFontSize = baseFont.pointSize
-        }
+        let newFontSize = fontMetrics.scaledValue(for: fontSize ?? baseFont.pointSize)
 
         var newTraits = oldDescriptor.symbolicTraits
 
@@ -689,7 +685,13 @@ class RCTAztecView: Aztec.TextView {
     ///
     private func refreshFont() {
         let newFont = applyFontConstraints(to: defaultFont)
+        font = newFont
+        placeholderLabel.font = newFont
         defaultFont = newFont
+
+        if textStorage.length > 0 {
+            typingAttributes[NSAttributedString.Key.font] = newFont
+        }
     }
 
     /// This method refreshes the font for the palceholder field and typing attributes.

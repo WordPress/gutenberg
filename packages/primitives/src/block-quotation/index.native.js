@@ -20,6 +20,9 @@ export const BlockQuotation = forwardRef( ( { ...props }, ref ) => {
 			styles.wpBlockQuoteLight,
 			styles.wpBlockQuoteDark
 		),
+		style?.baseColors?.color?.text && {
+			borderLeftColor: style.baseColors.color.text,
+		},
 		style?.color && {
 			borderLeftColor: style.color,
 		},

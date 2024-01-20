@@ -9,9 +9,6 @@
 	"keywords": [ "img", "photo", "picture" ],
 	"textdomain": "default",
 	"attributes": {
-		"align": {
-			"type": "string"
-		},
 		"url": {
 			"type": "string",
 			"source": "attribute",
@@ -28,10 +25,16 @@
 			"__experimentalRole": "content"
 		},
 		"caption": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "figcaption",
 			"__experimentalRole": "content"
+		},
+		"lightbox": {
+			"type": "object",
+			"enabled": {
+				"type": "boolean"
+			}
 		},
 		"title": {
 			"type": "string",
@@ -64,10 +67,10 @@
 			"__experimentalRole": "content"
 		},
 		"width": {
-			"type": "number"
+			"type": "string"
 		},
 		"height": {
-			"type": "number"
+			"type": "string"
 		},
 		"aspectRatio": {
 			"type": "string"
@@ -89,10 +92,9 @@
 		}
 	},
 	"supports": {
+		"interactivity": true,
+		"align": [ "left", "center", "right", "wide", "full" ],
 		"anchor": true,
-		"behaviors": {
-			"lightbox": true
-		},
 		"color": {
 			"text": false,
 			"background": false
@@ -127,5 +129,6 @@
 		{ "name": "rounded", "label": "Rounded" }
 	],
 	"editorStyle": "wp-block-image-editor",
-	"style": "wp-block-image"
+	"style": "wp-block-image",
+	"viewScript": "file:./view.min.js"
 }

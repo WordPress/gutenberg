@@ -28,11 +28,11 @@ const blockViewRegex = new RegExp(
  * the block will still call the core function when updates are back ported.
  */
 const prefixFunctions = [
-	'build_query_vars_from_query_block',
 	'wp_apply_colors_support',
 	'wp_enqueue_block_support_styles',
 	'wp_get_typography_font_size_value',
 	'wp_style_engine_get_styles',
+	'wp_get_global_settings',
 ];
 
 /**

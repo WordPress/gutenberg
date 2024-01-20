@@ -223,7 +223,7 @@ if ( ! function_exists( 'wp_print_fonts' ) ) {
  */
 add_filter(
 	'mime_types',
-	static function( $mime_types ) {
+	static function ( $mime_types ) {
 		// Webfonts formats.
 		$mime_types['woff2'] = 'font/woff2';
 		$mime_types['woff']  = 'font/woff';
@@ -246,7 +246,7 @@ add_action( 'init', 'WP_Fonts_Resolver::register_fonts_from_theme_json', 21 );
 
 add_filter(
 	'block_editor_settings_all',
-	static function( $settings ) {
+	static function ( $settings ) {
 		ob_start();
 		wp_print_fonts( true );
 		$styles = ob_get_clean();

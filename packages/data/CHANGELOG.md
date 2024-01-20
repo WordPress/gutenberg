@@ -2,6 +2,42 @@
 
 ## Unreleased
 
+## 9.19.0 (2024-01-10)
+
+## 9.18.0 (2023-12-13)
+
+## 9.17.0 (2023-11-29)
+
+## 9.16.0 (2023-11-16)
+
+## 9.15.0 (2023-11-02)
+
+## 9.14.0 (2023-10-18)
+
+## 9.13.1 (2023-10-12)
+
+### Bug Fix
+
+-  Fix `combineReducers()` types ([#55321](https://github.com/WordPress/gutenberg/pull/55321)).
+
+## 9.13.0 (2023-10-05)
+
+### Enhancements
+
+-  Change implementation of `combineReducers` so that it doesn't use `eval` internally, and can run with a CSP policy that doesn't allow `unsafe-eval` ([#54606](https://github.com/WordPress/gutenberg/pull/54606)).
+
+## 9.12.0 (2023-09-20)
+
+## 9.11.0 (2023-08-31)
+
+## 9.10.0 (2023-08-16)
+
+### Enhancements
+
+-  Warn if the `useSelect` hook returns different values when called with the same state and parameters ([#53666](https://github.com/WordPress/gutenberg/pull/53666)).
+
+## 9.9.0 (2023-08-10)
+
 ### Bug Fix
 
 -   Update the type definitions for dispatched actions by accounting for Promisified return values and thunks. Previously, a dispatched action's return type was the same as the return type of the original action creator, which did not account for how dispatch works internally. (Plain actions get wrapped in a Promise, and thunk actions ultimately resolve to the innermost function's return type).

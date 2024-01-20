@@ -14,6 +14,7 @@ import {
 	toCustomProperties,
 	toStyles,
 	getStylesDeclarations,
+	processCSSNesting,
 } from '../use-global-styles-output';
 import { ROOT_BLOCK_SELECTOR } from '../utils';
 
@@ -965,6 +966,44 @@ describe( 'global styles renderer', () => {
 				'font-family: sans-serif',
 				'font-size: 15px',
 			] );
+		} );
+	} );
+
+	describe( 'processCSSNesting', () => {
+		it( 'should return processed CSS without any nested selectors', () => {
+			expect(
+				processCSSNesting( 'color: red; margin: auto;', '.foo' )
+			).toEqual( '.foo{color: red; margin: auto;}' );
+		} );
+		it( 'should return processed CSS with nested selectors', () => {
+			expect(
+				processCSSNesting(
+					'color: red; margin: auto; &.one{color: blue;} & .two{color: green;}',
+					'.foo'
+				)
+			).toEqual(
+				'.foo{color: red; margin: auto;}.foo.one{color: blue;}.foo .two{color: green;}'
+			);
+		} );
+		it( 'should return processed CSS with pseudo elements', () => {
+			expect(
+				processCSSNesting(
+					'color: red; margin: auto; &::before{color: blue;} & ::before{color: green;}  &.one::before{color: yellow;} & .two::before{color: purple;}',
+					'.foo'
+				)
+			).toEqual(
+				'.foo{color: red; margin: auto;}.foo::before{color: blue;}.foo ::before{color: green;}.foo.one::before{color: yellow;}.foo .two::before{color: purple;}'
+			);
+		} );
+		it( 'should return processed CSS with multiple root selectors', () => {
+			expect(
+				processCSSNesting(
+					'color: red; margin: auto; &.one{color: blue;} & .two{color: green;} &::before{color: yellow;} & ::before{color: purple;}  &.three::before{color: orange;} & .four::before{color: skyblue;}',
+					'.foo, .bar'
+				)
+			).toEqual(
+				'.foo, .bar{color: red; margin: auto;}.foo.one, .bar.one{color: blue;}.foo .two, .bar .two{color: green;}.foo::before, .bar::before{color: yellow;}.foo ::before, .bar ::before{color: purple;}.foo.three::before, .bar.three::before{color: orange;}.foo .four::before, .bar .four::before{color: skyblue;}'
+			);
 		} );
 	} );
 } );

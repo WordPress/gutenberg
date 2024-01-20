@@ -1,0 +1,17 @@
+.page-templates-preview-field {
+	&.is-viewtype-list {
+		.block-editor-block-preview__container {
+			height: 120px;
+		}
+	}
+
+	&.is-viewtype-grid {
+		.block-editor-block-preview__container {
+			height: auto;
+		}
+	}
+}
+
+.page-templates-description {
+	white-space: normal;
+}

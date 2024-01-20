@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "core/post-featured-image",
-	"title": "Post Featured Image",
+	"title": "Featured Image",
 	"category": "theme",
 	"description": "Display a post's featured image.",
 	"textdomain": "default",
@@ -51,6 +51,10 @@
 		},
 		"customGradient": {
 			"type": "string"
+		},
+		"useFirstImageFromPost": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],

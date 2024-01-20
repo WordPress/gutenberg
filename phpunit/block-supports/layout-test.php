@@ -464,4 +464,92 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	/**
+	 * Check that gutenberg_restore_group_inner_container() restores the legacy inner container on the Group block.
+	 *
+	 * @dataProvider data_restore_group_inner_container
+	 *
+	 * @covers ::gutenberg_restore_group_inner_container
+	 *
+	 * @param array  $args            Dataset to test.
+	 * @param string $expected_output The expected output.
+	 */
+	public function test_restore_group_inner_container( $args, $expected_output ) {
+		$actual_output = gutenberg_restore_group_inner_container( $args['block_content'], $args['block'] );
+		$this->assertEquals( $expected_output, $actual_output );
+	}
+
+	/**
+	 * Data provider for test_restore_group_inner_container.
+	 *
+	 * @return array
+	 */
+	public function data_restore_group_inner_container() {
+		return array(
+			'group block with existing inner container'    => array(
+				'args'            => array(
+					'block_content' => '<div class="wp-block-group"><div class="wp-block-group__inner-container"></div></div>',
+					'block'         => array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(
+							'layout' => array(
+								'type' => 'default',
+							),
+						),
+						'innerBlocks'  => array(),
+						'innerHTML'    => '<div class="wp-block-group"><div class="wp-block-group__inner-container"></div></div>',
+						'innerContent' => array(
+							'<div class="wp-block-group"><div class="wp-block-group__inner-container">',
+							' ',
+							' </div></div>',
+						),
+					),
+				),
+				'expected_output' => '<div class="wp-block-group"><div class="wp-block-group__inner-container"></div></div>',
+			),
+			'group block with no existing inner container' => array(
+				'args'            => array(
+					'block_content' => '<div class="wp-block-group"></div>',
+					'block'         => array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(
+							'layout' => array(
+								'type' => 'default',
+							),
+						),
+						'innerBlocks'  => array(),
+						'innerHTML'    => '<div class="wp-block-group"></div>',
+						'innerContent' => array(
+							'<div class="wp-block-group">',
+							' ',
+							' </div>',
+						),
+					),
+				),
+				'expected_output' => '<div class="wp-block-group"><div class="wp-block-group__inner-container"></div></div>',
+			),
+			'group block with layout classnames'           => array(
+				'args'            => array(
+					'block_content' => '<div class="wp-block-group is-layout-constrained wp-block-group-is-layout-constrained"></div>',
+					'block'         => array(
+						'blockName'    => 'core/group',
+						'attrs'        => array(
+							'layout' => array(
+								'type' => 'default',
+							),
+						),
+						'innerBlocks'  => array(),
+						'innerHTML'    => '<div class="wp-block-group"></div>',
+						'innerContent' => array(
+							'<div class="wp-block-group">',
+							' ',
+							' </div>',
+						),
+					),
+				),
+				'expected_output' => '<div class="wp-block-group"><div class="wp-block-group__inner-container is-layout-constrained wp-block-group-is-layout-constrained"></div></div>',
+			),
+		);
+	}
 }

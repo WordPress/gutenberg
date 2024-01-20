@@ -54,6 +54,8 @@ const {
 	updateSettings,
 	validateBlocksToTemplate,
 	registerInserterMediaCategory,
+	setBlockEditingMode,
+	unsetBlockEditingMode,
 } = actions;
 
 describe( 'actions', () => {
@@ -217,8 +219,9 @@ describe( 'actions', () => {
 			};
 			const dispatch = jest.fn();
 			dispatch.ensureDefaultBlock = jest.fn();
+			const registry = createRegistry();
 
-			replaceBlock( 'chicken', block )( { select, dispatch } );
+			replaceBlock( 'chicken', block )( { select, dispatch, registry } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REPLACE_BLOCKS',
@@ -283,8 +286,12 @@ describe( 'actions', () => {
 			};
 			const dispatch = jest.fn();
 			dispatch.ensureDefaultBlock = jest.fn();
+			const registry = createRegistry();
 
-			replaceBlocks( [ 'chicken' ], blocks )( { select, dispatch } );
+			replaceBlocks(
+				[ 'chicken' ],
+				blocks
+			)( { select, dispatch, registry } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REPLACE_BLOCKS',
@@ -317,6 +324,7 @@ describe( 'actions', () => {
 			};
 			const dispatch = jest.fn();
 			dispatch.ensureDefaultBlock = jest.fn();
+			const registry = createRegistry();
 
 			replaceBlocks(
 				[ 'chicken' ],
@@ -324,7 +332,7 @@ describe( 'actions', () => {
 				null,
 				null,
 				meta
-			)( { select, dispatch } );
+			)( { select, dispatch, registry } );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REPLACE_BLOCKS',
@@ -626,8 +634,9 @@ describe( 'actions', () => {
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
 			} );
+			const registry = createRegistry();
 
-			removeBlocks( clientIds )( { select, dispatch } );
+			removeBlocks( clientIds )( { select, dispatch, registry } );
 
 			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
 				clientId,
@@ -737,8 +746,8 @@ describe( 'actions', () => {
 			const dispatch = Object.assign( jest.fn(), {
 				selectPreviousBlock: jest.fn(),
 			} );
-
-			removeBlock( clientId )( { select, dispatch } );
+			const registry = createRegistry();
+			removeBlock( clientId )( { select, dispatch, registry } );
 
 			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
 				clientId,
@@ -751,7 +760,7 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should dispatch REMOVE_BLOCKS action, opting out of select previous', () => {
+		it( 'should dispatch REMOVE_BLOCKS action, opting out of select previous', async () => {
 			const clientId = 'myclientid';
 
 			const select = {
@@ -763,7 +772,11 @@ describe( 'actions', () => {
 				selectPreviousBlock: jest.fn(),
 			} );
 
-			removeBlocks( [ clientId ], false )( { select, dispatch } );
+			const registry = createRegistry();
+			removeBlocks(
+				[ clientId ],
+				false
+			)( { select, dispatch, registry } );
 
 			expect( dispatch.selectPreviousBlock ).not.toHaveBeenCalled();
 
@@ -1266,9 +1279,9 @@ describe( 'actions', () => {
 					fetch: () => {},
 				} )( {
 					select: {
-						getSettings: () => ( {
-							inserterMediaCategories: [ { name: 'a' } ],
-						} ),
+						getRegisteredInserterMediaCategories: () => [
+							{ name: 'a' },
+						],
 					},
 				} );
 				expect( console ).toHaveErroredWith(
@@ -1283,11 +1296,9 @@ describe( 'actions', () => {
 					fetch: () => {},
 				} )( {
 					select: {
-						getSettings: () => ( {
-							inserterMediaCategories: [
-								{ labels: { name: 'a' } },
-							],
-						} ),
+						getRegisteredInserterMediaCategories: () => [
+							{ labels: { name: 'a' } },
+						],
 					},
 				} );
 				expect( console ).toHaveErroredWith(
@@ -1308,18 +1319,40 @@ describe( 'actions', () => {
 			const dispatch = jest.fn();
 			registerInserterMediaCategory( category )( {
 				select: {
-					getSettings: () => ( { inserterMediaCategories } ),
+					getRegisteredInserterMediaCategories: () =>
+						inserterMediaCategories,
 				},
 				dispatch,
 			} );
 			expect( dispatch ).toHaveBeenLastCalledWith( {
-				type: 'UPDATE_SETTINGS',
-				settings: {
-					inserterMediaCategories: [
-						...inserterMediaCategories,
-						{ ...category, isExternalResource: true },
-					],
-				},
+				type: 'REGISTER_INSERTER_MEDIA_CATEGORY',
+				category: { ...category, isExternalResource: true },
+			} );
+		} );
+	} );
+
+	describe( 'setBlockEditingMode', () => {
+		it( 'should return the SET_BLOCK_EDITING_MODE action', () => {
+			expect(
+				setBlockEditingMode(
+					'14501cc2-90a6-4f52-aa36-ab6e896135d1',
+					'default'
+				)
+			).toEqual( {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+				mode: 'default',
+			} );
+		} );
+	} );
+
+	describe( 'unsetBlockEditingMode', () => {
+		it( 'should return the UNSET_BLOCK_EDITING_MODE action', () => {
+			expect(
+				unsetBlockEditingMode( '14501cc2-90a6-4f52-aa36-ab6e896135d1' )
+			).toEqual( {
+				type: 'UNSET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
 			} );
 		} );
 	} );

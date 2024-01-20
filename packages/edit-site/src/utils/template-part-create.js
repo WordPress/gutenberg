@@ -9,12 +9,17 @@ import { paramCase as kebabCase } from 'change-case';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
+/**
+ * Internal dependencies
+ */
+import { TEMPLATE_PART_POST_TYPE } from './constants';
+
 export const useExistingTemplateParts = () => {
 	return useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecords(
 				'postType',
-				'wp_template_part',
+				TEMPLATE_PART_POST_TYPE,
 				{
 					per_page: -1,
 				}

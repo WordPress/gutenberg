@@ -23,7 +23,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	BlockVariationPicker,
-	useSetting,
+	useSettings,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
@@ -106,14 +106,9 @@ function ColumnsEditContainer( {
 	const { verticalAlignment, align } = attributes;
 	const { width } = sizes || {};
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'%',
-			'px',
-			'em',
-			'rem',
-			'vw',
-		],
+		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 	} );
 
 	useEffect( () => {

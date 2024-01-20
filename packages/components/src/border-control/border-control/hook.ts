@@ -8,7 +8,8 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
  */
 import * as styles from '../styles';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 
 import type { Border, BorderControlProps } from '../types';
@@ -40,8 +41,12 @@ export function useBorderControl(
 		value: border,
 		width,
 		__experimentalIsRenderedInSidebar = false,
+		__next40pxDefaultSize,
 		...otherProps
 	} = useContextSystem( props, 'BorderControl' );
+
+	const computedSize =
+		size === 'default' && __next40pxDefaultSize ? '__unstable-large' : size;
 
 	const [ widthValue, originalWidthUnit ] = parseQuantityAndUnitFromRawValue(
 		border?.width
@@ -129,10 +134,10 @@ export function useBorderControl(
 	}
 	const innerWrapperClassName = useMemo( () => {
 		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
-		const heightStyle = styles.wrapperHeight( size );
+		const heightStyle = styles.wrapperHeight( computedSize );
 
 		return cx( styles.innerWrapper(), widthStyle, heightStyle );
-	}, [ wrapperWidth, cx, size ] );
+	}, [ wrapperWidth, cx, computedSize ] );
 
 	const sliderClassName = useMemo( () => {
 		return cx( styles.borderSlider() );
@@ -154,7 +159,8 @@ export function useBorderControl(
 		value: border,
 		widthUnit,
 		widthValue,
-		size,
+		size: computedSize,
 		__experimentalIsRenderedInSidebar,
+		__next40pxDefaultSize,
 	};
 }

@@ -46,19 +46,17 @@ $preview-image-height: 140px;
 }
 
 // Provides positioning context for search actions
-.block-editor-link-control__search-input-container {
+.block-editor-link-control__search-input-container,
+.block-editor-link-control__search-input-wrapper {
 	position: relative;
-}
-
-// If the input doesn't have a visible label then
-// we need to expand the input itself to occupy
-// the full available horizontal space.
-.block-editor-link-control__search-input.has-no-label .block-editor-url-input__input {
-	flex: 1;
 }
 
 .block-editor-link-control__field {
 	margin: $grid-unit-20; // allow margin collapse for vertical spacing.
+
+	.components-base-control__label {
+		color: $gray-900;
+	}
 
 	input[type="text"],
 	// Specificity overide of URLInput defaults.
@@ -69,9 +67,13 @@ $preview-image-height: 140px;
 		border-radius: $radius-block-ui;
 		height: $button-size-next-default-40px; // components do not properly support unstable-large yet.
 		margin: 0;
-		padding: $grid-unit-10 $grid-unit-20;
+		padding: $grid-unit-10 $button-size-next-default-40px $grid-unit-10 $grid-unit-20;
 		position: relative;
 		width: 100%;
+
+		.has-actions & {
+			padding-right: $grid-unit-20;
+		}
 	}
 }
 
@@ -79,13 +81,19 @@ $preview-image-height: 140px;
 	margin: -$grid-unit-20 * 0.5 $grid-unit-20 $grid-unit-20; // negative margin to bring the error a bit closer to the button
 }
 
+.block-editor-link-control__search-enter {
+	position: absolute;
+	right: 19px; // specific to place the button properly.
+	top: 3px;
+
+	svg {
+		position: relative;
+		top: -2px; // the icon itself is not centered within the bounds; this centers it.
+	}
+}
+
 .block-editor-link-control__search-actions {
-	display: flex;
-	flex-direction: row-reverse; // put "Cancel" on the left but retain DOM order.
-	justify-content: flex-start;
-	gap: $grid-unit-10;
-	padding: $grid-unit-10;
-	order: 20;
+	padding: $grid-unit-10 $grid-unit-20 $grid-unit-20;
 }
 
 .block-editor-link-control__search-results-wrapper {
@@ -193,6 +201,11 @@ $preview-image-height: 140px;
 		align-items: center;
 	}
 
+	&.is-url-title .block-editor-link-control__search-item-title {
+		// To prevent overflow when the title is a URL
+		word-break: break-all;
+	}
+
 	.block-editor-link-control__search-item-icon {
 		position: relative;
 		margin-right: $grid-unit-10;
@@ -215,9 +228,9 @@ $preview-image-height: 140px;
 
 	.block-editor-link-control__search-item-title {
 		display: block;
-		margin-bottom: 0.2em;
 		font-weight: 500;
 		position: relative;
+		line-height: $grid-unit-30;
 
 		mark {
 			font-weight: 600;
@@ -280,9 +293,9 @@ $preview-image-height: 140px;
 
 		img {
 			display: block; // remove unwanted space below image
-			max-width: 100%;
-			height: $preview-image-height; // limit height
-			max-height: $preview-image-height; // limit height
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
 		}
 	}
 }
@@ -291,6 +304,7 @@ $preview-image-height: 140px;
 	display: flex;
 	flex-direction: row;
 	width: 100%; // clip.
+	align-items: center;
 }
 
 .block-editor-link-control__search-item-bottom {
@@ -395,17 +409,25 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__setting {
-	margin-bottom: $grid-unit-20;
+	margin-bottom: 0;
 	flex: 1;
 	padding: $grid-unit-10 0 $grid-unit-10 $grid-unit-30;
+
+	.components-base-control__field {
+		display: flex; // don't allow label to wrap under checkbox.
+
+		.components-checkbox-control__label {
+			color: $gray-900;
+		}
+	}
 
 	// Cancel left margin inherited from WP Admin Forms CSS.
 	input {
 		margin-left: 0;
 	}
 
-	&.block-editor-link-control__setting:last-child {
-		margin-bottom: 0;
+	.is-preview & {
+		padding: 20px $grid-unit-10 $grid-unit-10 0;
 	}
 }
 
@@ -416,6 +438,10 @@ $preview-image-height: 140px;
 	.components-button.block-editor-link-control__drawer-toggle {
 		padding-left: 0;
 		gap: 0;
+
+		&[aria-expanded="true"] {
+			color: $gray-900;
+		}
 
 		// Point downwards when open (same as list view expander)
 		&[aria-expanded="true"] svg {
@@ -442,8 +468,13 @@ $preview-image-height: 140px;
 		left: auto;
 		bottom: auto;
 		top: calc(50% - #{$spinner-size} / 2);
-		right: $grid-unit-20;
+		right: $grid-unit-50;
 	}
+}
+
+.block-editor-link-control .block-editor-link-control__search-input-wrapper.has-actions .components-spinner {
+	top: calc(50% + #{$spinner-size} / 4); // Add top spacing because this input has a visual label.
+	right: $grid-unit-15;
 }
 
 .block-editor-link-control__search-item-action {

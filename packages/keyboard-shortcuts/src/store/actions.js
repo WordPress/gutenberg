@@ -29,9 +29,9 @@
  * @example
  *
  *```js
+ * import { useEffect } from 'react';
  * import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  * import { useSelect, useDispatch } from '@wordpress/data';
- * import { useEffect } from '@wordpress/element';
  * import { __ } from '@wordpress/i18n';
  *
  * const ExampleComponent = () => {
@@ -91,9 +91,9 @@ export function registerShortcut( {
  * @example
  *
  *```js
+ * import { useEffect } from 'react';
  * import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  * import { useSelect, useDispatch } from '@wordpress/data';
- * import { useEffect } from '@wordpress/element';
  * import { __ } from '@wordpress/i18n';
  *
  * const ExampleComponent = () => {

@@ -7,7 +7,7 @@
 
 .line {
 	background-color: $gray-lighten-20;
-	flex: 1;
+	flex: 1 0 10px;
 	height: 2;
 }
 
@@ -15,9 +15,12 @@
 	background-color: $gray-50;
 }
 
-.text {
-	flex: 1;
+.textContainer {
+	flex: 0 1 auto;
 	margin-left: 15px;
 	margin-right: 15px;
+}
+
+.text {
 	text-align: center;
 }

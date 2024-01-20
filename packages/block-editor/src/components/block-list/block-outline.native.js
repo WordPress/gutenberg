@@ -13,7 +13,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './block.scss';
 
-const TEXT_BLOCKS_WITH_OUTLINE = [ 'core/missing' ];
+const TEXT_BLOCKS_WITH_OUTLINE = [ 'core/missing', 'core/freeform' ];
 
 function BlockOutline( {
 	blockCategory,
@@ -23,6 +23,8 @@ function BlockOutline( {
 	name,
 } ) {
 	const textBlockWithOutline = TEXT_BLOCKS_WITH_OUTLINE.includes( name );
+	const socialBlockWithOutline = name.includes( 'core/social-link' );
+
 	const hasBlockTextCategory =
 		blockCategory === 'text' && ! textBlockWithOutline;
 	const hasBlockMediaCategory =
@@ -47,6 +49,7 @@ function BlockOutline( {
 		( ( hasBlockTextCategory && hasInnerBlocks ) ||
 			( ! hasBlockTextCategory && hasInnerBlocks ) ||
 			( ! hasBlockTextCategory && isRootList ) ||
+			socialBlockWithOutline ||
 			textBlockWithOutline );
 
 	return (

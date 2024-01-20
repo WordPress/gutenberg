@@ -2,7 +2,6 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
@@ -20,21 +19,19 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 /**
  * Internal dependencies
  */
-import {
-	contextConnect,
-	useContextSystem,
-	WordPressComponentProps,
-} from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect, useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
+import { patternMatch, findParent } from '../utils/router';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
+import * as styles from '../styles';
 import type {
 	NavigatorProviderProps,
 	NavigatorLocation,
 	NavigatorContext as NavigatorContextType,
 	Screen,
 } from '../types';
-import { patternMatch, findParent } from '../utils/router';
 
 type MatchedPath = ReturnType< typeof patternMatch >;
 type ScreenAction = { type: string; screen: Screen };
@@ -251,8 +248,7 @@ function UnconnectedNavigatorProvider(
 
 	const cx = useCx();
 	const classes = useMemo(
-		// Prevents horizontal overflow while animating screen transitions.
-		() => cx( css( { overflowX: 'hidden' } ), className ),
+		() => cx( styles.navigatorProviderWrapper, className ),
 		[ className, cx ]
 	);
 
@@ -271,7 +267,6 @@ function UnconnectedNavigatorProvider(
  * view (via the `NavigatorButton` and `NavigatorBackButton` components or the
  * `useNavigator` hook).
  *
- * @example
  * ```jsx
  * import {
  *   __experimentalNavigatorProvider as NavigatorProvider,

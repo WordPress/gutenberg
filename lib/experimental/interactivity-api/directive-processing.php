@@ -1,86 +1,92 @@
 <?php
 /**
- * Functions and hooks to process the server side rendering of the Interactivity
- * API directives.
+ * Functions and hooks to process the Interactivity API directives in the
+ * server.
  *
  * @package Gutenberg
  * @subpackage Interactivity API
  */
 
 /**
- * Process directives in each block.
+ * Marks the block as a root block. Checks that there is already a root block in
+ * order not to mark template-parts or synced patterns as root blocks, where the
+ * parent is null.
+ *
+ * @param array $parsed_block The parsed block.
+ *
+ * @return array The parsed block.
+ */
+function gutenberg_interactivity_mark_root_interactive_blocks( $parsed_block ) {
+	if ( ! WP_Directive_Processor::has_interactive_root_block() ) {
+		$block_type     = WP_Block_Type_Registry::get_instance()->get_registered( $parsed_block['blockName'] );
+		$is_interactive = isset( $block_type->supports['interactivity'] ) && $block_type->supports['interactivity'];
+		if ( $is_interactive ) {
+			WP_Directive_Processor::mark_interactive_root_block( $parsed_block );
+		}
+	}
+
+	return $parsed_block;
+}
+add_filter( 'render_block_data', 'gutenberg_interactivity_mark_root_interactive_blocks', 10, 1 );
+
+/**
+ * Processes the directives in the root blocks.
  *
  * @param string $block_content The block content.
  * @param array  $block         The full block.
  *
  * @return string Filtered block content.
  */
-function gutenberg_interactivity_process_directives_in_root_blocks( $block_content, $block ) {
-	// Don't process inner blocks or root blocks that don't contain directives.
-	if ( ! WP_Directive_Processor::is_root_block( $block ) || strpos( $block_content, 'data-wp-' ) === false ) {
-		return $block_content;
+function gutenberg_process_directives_in_root_blocks( $block_content, $block ) {
+	if ( WP_Directive_Processor::is_marked_as_interactive_root_block( $block ) ) {
+		WP_Directive_Processor::unmark_interactive_root_block();
+		$context         = new WP_Directive_Context();
+		$namespace_stack = array();
+		return gutenberg_process_interactive_html( $block_content, $context, $namespace_stack );
 	}
 
-	// TODO: Add some directive/components registration mechanism.
-	$directives = array(
-		'data-wp-bind'    => 'gutenberg_interactivity_process_wp_bind',
-		'data-wp-context' => 'gutenberg_interactivity_process_wp_context',
-		'data-wp-class'   => 'gutenberg_interactivity_process_wp_class',
-		'data-wp-style'   => 'gutenberg_interactivity_process_wp_style',
-		'data-wp-text'    => 'gutenberg_interactivity_process_wp_text',
+	return $block_content;
+}
+add_filter( 'render_block', 'gutenberg_process_directives_in_root_blocks', 10, 2 );
+
+/**
+ * Processes interactive HTML by applying directives to the HTML tags.
+ *
+ * It uses the WP_Directive_Processor class to parse the HTML and apply the
+ * directives. If a tag contains a 'WP-INNER-BLOCKS' string and there are inner
+ * blocks to process, the function processes these inner blocks and replaces the
+ * 'WP-INNER-BLOCKS' tag in the HTML with those blocks.
+ *
+ * @param string $html The HTML to process.
+ * @param mixed  $context The context to use when processing.
+ * @param array  $inner_blocks The inner blocks to process.
+ * @param array  $namespace_stack Stack of namespackes passed by reference.
+ *
+ * @return string The processed HTML.
+ */
+function gutenberg_process_interactive_html( $html, $context, &$namespace_stack = array() ) {
+	static $directives = array(
+		'data-wp-interactive' => 'gutenberg_interactivity_process_wp_interactive',
+		'data-wp-context'     => 'gutenberg_interactivity_process_wp_context',
+		'data-wp-bind'        => 'gutenberg_interactivity_process_wp_bind',
+		'data-wp-class'       => 'gutenberg_interactivity_process_wp_class',
+		'data-wp-style'       => 'gutenberg_interactivity_process_wp_style',
+		'data-wp-text'        => 'gutenberg_interactivity_process_wp_text',
 	);
 
-	$tags = new WP_Directive_Processor( $block_content );
-	$tags = gutenberg_interactivity_process_directives( $tags, 'data-wp-', $directives );
-	return $tags->get_updated_html();
-}
-add_filter( 'render_block', 'gutenberg_interactivity_process_directives_in_root_blocks', 10, 2 );
-
-/**
- * Mark the inner blocks with a temporary property so we can discard them later,
- * and process only the root blocks.
- *
- * @param array $parsed_block The parsed block.
- * @param array $source_block The source block.
- * @param array $parent_block The parent block.
- *
- * @return array The parsed block.
- */
-function gutenberg_interactivity_mark_inner_blocks( $parsed_block, $source_block, $parent_block ) {
-	if ( ! isset( $parent_block ) ) {
-		WP_Directive_Processor::add_root_block( $parsed_block );
-	}
-	return $parsed_block;
-}
-add_filter( 'render_block_data', 'gutenberg_interactivity_mark_inner_blocks', 10, 3 );
-
-/**
- * Process directives.
- *
- * @param WP_Directive_Processor $tags An instance of the WP_Directive_Processor.
- * @param string                 $prefix Attribute prefix.
- * @param string[]               $directives Directives.
- *
- * @return WP_Directive_Processor The modified instance of the
- * WP_Directive_Processor.
- */
-function gutenberg_interactivity_process_directives( $tags, $prefix, $directives ) {
-	$context   = new WP_Directive_Context;
+	$tags      = new WP_Directive_Processor( $html );
+	$prefix    = 'data-wp-';
 	$tag_stack = array();
-
 	while ( $tags->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
 		$tag_name = $tags->get_tag();
 
-		// Is this a tag that closes the latest opening tag?
 		if ( $tags->is_tag_closer() ) {
 			if ( 0 === count( $tag_stack ) ) {
 				continue;
 			}
-
 			list( $latest_opening_tag_name, $attributes ) = end( $tag_stack );
 			if ( $latest_opening_tag_name === $tag_name ) {
 				array_pop( $tag_stack );
-
 				// If the matching opening tag didn't have any directives, we move on.
 				if ( 0 === count( $attributes ) ) {
 					continue;
@@ -94,7 +100,7 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
 				 * the directive processor inside `$directives`, e.g., "wp-bind"
 				 * from "wp-bind--src" and "wp-context" from "wp-context" etc...
 				 */
-				list( $type ) = WP_Directive_Processor::parse_attribute_name( $name );
+				list( $type ) = $tags::parse_attribute_name( $name );
 				if ( array_key_exists( $type, $directives ) ) {
 					$attributes[] = $type;
 				}
@@ -107,44 +113,77 @@ function gutenberg_interactivity_process_directives( $tags, $prefix, $directives
 			 * encounter the matching closing tag.
 			 */
 			if (
-				! WP_Directive_Processor::is_html_void_element( $tags->get_tag() ) &&
+				! $tags::is_html_void_element( $tag_name ) &&
 				( 0 !== count( $attributes ) || 0 !== count( $tag_stack ) )
 			) {
 				$tag_stack[] = array( $tag_name, $attributes );
 			}
 		}
 
-		foreach ( $attributes as $attribute ) {
-			call_user_func( $directives[ $attribute ], $tags, $context );
+		// Extract all directive names. They'll be used later on.
+		$directive_names     = array_keys( $directives );
+		$directive_names_rev = array_reverse( $directive_names );
+
+		/*
+		 * Sort attributes by the order they appear in the `$directives`
+		 * argument, considering it as the priority order in which
+		 * directives should be processed. Note that the order is reversed
+		 * for tag closers.
+		 */
+		$sorted_attrs = array_intersect(
+			$tags->is_tag_closer()
+				? $directive_names_rev
+				: $directive_names,
+			$attributes
+		);
+
+		foreach ( $sorted_attrs as $attribute ) {
+			call_user_func_array(
+				$directives[ $attribute ],
+				array(
+					$tags,
+					$context,
+					end( $namespace_stack ),
+					&$namespace_stack,
+				)
+			);
 		}
 	}
 
-	return $tags;
+	return $tags->get_updated_html();
 }
 
 /**
- * Resolve the reference using the store and the context from the provided path.
+ * Resolves the passed reference from the store and the context under the given
+ * namespace.
  *
- * @param string $path Path.
+ * A reference could be either a single path or a namespace followed by a path,
+ * separated by two colons, i.e, `namespace::path.to.prop`. If the reference
+ * contains a namespace, that namespace overrides the one passed as argument.
+ *
+ * @param string $reference Reference value.
+ * @param string $ns Inherited namespace.
  * @param array  $context Context data.
- * @return mixed
+ * @return mixed Resolved value.
  */
-function gutenberg_interactivity_evaluate_reference( $path, array $context = array() ) {
-	$store = array_merge(
-		WP_Interactivity_Store::get_data(),
-		array( 'context' => $context )
+function gutenberg_interactivity_evaluate_reference( $reference, $ns, array $context = array() ) {
+	// Extract the namespace from the reference (if present).
+	list( $ns, $path ) = WP_Directive_Processor::parse_attribute_value( $reference, $ns );
+
+	$store = array(
+		'state'   => WP_Interactivity_Initial_State::get_state( $ns ),
+		'context' => $context[ $ns ] ?? array(),
 	);
 
 	/*
-	 * Check first if the directive path is preceded by a negator operator (!),
+	 * Checks first if the directive path is preceded by a negator operator (!),
 	 * indicating that the value obtained from the Interactivity Store (or the
 	 * passed context) using the subsequent path should be negated.
 	 */
 	$should_negate_value = '!' === $path[0];
-
-	$path          = $should_negate_value ? substr( $path, 1 ) : $path;
-	$path_segments = explode( '.', $path );
-	$current       = $store;
+	$path                = $should_negate_value ? substr( $path, 1 ) : $path;
+	$path_segments       = explode( '.', $path );
+	$current             = $store;
 	foreach ( $path_segments as $p ) {
 		if ( isset( $current[ $p ] ) ) {
 			$current = $current[ $p ];
@@ -154,7 +193,7 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
 	}
 
 	/*
-	 * Check if $current is an anonymous function or an arrow function, and if
+	 * Checks if $current is an anonymous function or an arrow function, and if
 	 * so, call it passing the store. Other types of callables are ignored on
 	 * purpose, as arbitrary strings or arrays could be wrongly evaluated as
 	 * "callables".
@@ -162,9 +201,14 @@ function gutenberg_interactivity_evaluate_reference( $path, array $context = arr
 	 * E.g., "file" is an string and a "callable" (the "file" function exists).
 	 */
 	if ( $current instanceof Closure ) {
-		$current = call_user_func( $current, $store );
+		/*
+		 * TODO: Figure out a way to implement derived state without having to
+		 * pass the store as argument:
+		 *
+		 * $current = call_user_func( $current );
+		 */
 	}
 
-	// Return the opposite if it has a negator operator (!).
+	// Returns the opposite if it has a negator operator (!).
 	return $should_negate_value ? ! $current : $current;
 }

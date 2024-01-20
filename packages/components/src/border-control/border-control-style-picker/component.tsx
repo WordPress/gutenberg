@@ -12,7 +12,8 @@ import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import { View } from '../../view';
 import { Flex } from '../../flex';
 import { VisuallyHidden } from '../../visually-hidden';
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { useBorderControlStylePicker } from './hook';
 
 import type { LabelProps, StylePickerProps } from '../types';
@@ -62,7 +63,7 @@ const BorderControlStylePicker = (
 						key={ borderStyle.value }
 						className={ buttonClassName }
 						icon={ borderStyle.icon }
-						isSmall
+						size="small"
 						isPressed={ borderStyle.value === value }
 						onClick={ () =>
 							onChange(

@@ -97,7 +97,7 @@ export class FileEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { downloadButtonText } = attributes;
 
-		if ( downloadButtonText === undefined || downloadButtonText === '' ) {
+		if ( RichText.isEmpty( downloadButtonText ) ) {
 			setAttributes( {
 				downloadButtonText: _x( 'Download', 'button label' ),
 			} );
@@ -552,7 +552,7 @@ export class FileEdit extends Component {
 					icon={ <BlockIcon icon={ icon } /> }
 					labels={ {
 						title: __( 'File' ),
-						instructions: __( 'CHOOSE A FILE' ),
+						instructions: __( 'Choose a file' ),
 					} }
 					onSelect={ this.onSelectFile }
 					onFocus={ this.props.onFocus }

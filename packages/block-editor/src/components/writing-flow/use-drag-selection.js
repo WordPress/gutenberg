@@ -27,8 +27,12 @@ function setContentEditableWrapper( node, value ) {
 export default function useDragSelection() {
 	const { startMultiSelect, stopMultiSelect } =
 		useDispatch( blockEditorStore );
-	const { isSelectionEnabled, hasMultiSelection, isDraggingBlocks } =
-		useSelect( blockEditorStore );
+	const {
+		isSelectionEnabled,
+		hasSelectedBlock,
+		isDraggingBlocks,
+		isMultiSelecting,
+	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -45,7 +49,7 @@ export default function useDragSelection() {
 				// so wait until the next animation frame to get the browser
 				// selection.
 				rafId = defaultView.requestAnimationFrame( () => {
-					if ( hasMultiSelection() ) {
+					if ( ! hasSelectedBlock() ) {
 						return;
 					}
 
@@ -84,6 +88,16 @@ export default function useDragSelection() {
 					return;
 				}
 
+				// Abort if we are already multi-selecting.
+				if ( isMultiSelecting() ) {
+					return;
+				}
+
+				// Abort if selection is leaving writing flow.
+				if ( node === target ) {
+					return;
+				}
+
 				// Check the attribute, not the contentEditable attribute. All
 				// child elements of the content editable wrapper are editable
 				// and return true for this property. We only want to start
@@ -96,7 +110,11 @@ export default function useDragSelection() {
 					return;
 				}
 
-				anchorElement = ownerDocument.activeElement;
+				// Do not rely on the active element because it may change after
+				// the mouse leaves for the first time. See
+				// https://github.com/WordPress/gutenberg/issues/48747.
+				anchorElement = target;
+
 				startMultiSelect();
 
 				// `onSelectionStart` is called after `mousedown` and
@@ -123,7 +141,7 @@ export default function useDragSelection() {
 			startMultiSelect,
 			stopMultiSelect,
 			isSelectionEnabled,
-			hasMultiSelection,
+			hasSelectedBlock,
 		]
 	);
 }

@@ -3,10 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import {
-	BlockControls,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { BlockControls, useBlockEditingMode } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { ToolbarButton } from '@wordpress/components';
 import { addFilter } from '@wordpress/hooks';
@@ -18,9 +15,9 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import { useLink } from '../components/routes/link';
 import { unlock } from '../lock-unlock';
+import { NAVIGATION_POST_TYPE } from '../utils/constants';
 
 const { useLocation } = unlock( routerPrivateApis );
-const { useBlockEditingMode } = unlock( blockEditorPrivateApis );
 
 function NavigationMenuEdit( { attributes } ) {
 	const { ref } = attributes;
@@ -30,7 +27,7 @@ function NavigationMenuEdit( { attributes } ) {
 		( select ) => {
 			return select( coreStore ).getEntityRecord(
 				'postType',
-				'wp_navigation',
+				NAVIGATION_POST_TYPE,
 				// Ideally this should be an official public API.
 				ref
 			);
@@ -46,7 +43,7 @@ function NavigationMenuEdit( { attributes } ) {
 		},
 		{
 			// this applies to Navigation Menus as well.
-			fromTemplateId: params.postId,
+			fromTemplateId: params.postId || navigationMenu?.id,
 		}
 	);
 

@@ -202,7 +202,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 
 export const withBookQueryControls = ( BlockEdit ) => ( props ) => {
 	// We only want to add these controls if it is our variation,
-	// so here we can implement a custom logic to check for that, similiar
+	// so here we can implement a custom logic to check for that, similar
 	// to the `isActive` function described above.
 	// The following assumes that you wrote a custom `isMyBooksVariation`
 	// function to handle that.

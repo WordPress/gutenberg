@@ -8,7 +8,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  */
 import { useContext, useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { store as blocksStore, hasBlockSupport } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
 
 /**
@@ -19,12 +19,14 @@ import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import { GlobalStylesContext } from './context';
 import { unlock } from '../../lock-unlock';
 
-const EMPTY_CONFIG = { settings: {}, styles: {}, behaviors: {} };
+const EMPTY_CONFIG = { settings: {}, styles: {} };
 
 const VALID_SETTINGS = [
 	'appearanceTools',
-	'behaviors',
 	'useRootPaddingAwareAlignments',
+	'background.backgroundImage',
+	'background.backgroundRepeat',
+	'background.backgroundSize',
 	'border.color',
 	'border.radius',
 	'border.style',
@@ -51,6 +53,8 @@ const VALID_SETTINGS = [
 	'layout.contentSize',
 	'layout.definitions',
 	'layout.wideSize',
+	'lightbox.enabled',
+	'lightbox.allowEditing',
 	'position.fixed',
 	'position.sticky',
 	'spacing.customSpacingSize',
@@ -62,6 +66,7 @@ const VALID_SETTINGS = [
 	'spacing.units',
 	'typography.fluid',
 	'typography.customFontSize',
+	'typography.defaultFontSizes',
 	'typography.dropCap',
 	'typography.fontFamilies',
 	'typography.fontSizes',
@@ -116,7 +121,7 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 					`settings${ appendedBlockPath }.${ setting }`
 				) ??
 				getValueFromObjectPath( configToUse, `settings.${ setting }` );
-			if ( value ) {
+			if ( value !== undefined ) {
 				result = setImmutably( result, setting.split( '.' ), value );
 			}
 		} );
@@ -234,6 +239,7 @@ export function useSettingsForBlockElement(
 				...updatedSettings.typography,
 				fontSizes: {},
 				customFontSize: false,
+				defaultFontSizes: false,
 			};
 		}
 
@@ -326,7 +332,8 @@ export function useSettingsForBlockElement(
 			const sides = Array.isArray( supports?.spacing?.[ key ] )
 				? supports?.spacing?.[ key ]
 				: supports?.spacing?.[ key ]?.sides;
-			if ( sides?.length ) {
+			// Check if spacing type is supported before adding sides.
+			if ( sides?.length && updatedSettings.spacing?.[ key ] ) {
 				updatedSettings.spacing = {
 					...updatedSettings.spacing,
 					[ key ]: {
@@ -459,113 +466,4 @@ export function useGradientsPerOrigin( settings ) {
 		defaultGradients,
 		shouldDisplayDefaultGradients,
 	] );
-}
-
-export function __experimentalUseGlobalBehaviors( blockName, source = 'all' ) {
-	const {
-		merged: mergedConfig,
-		base: baseConfig,
-		user: userConfig,
-		setUserConfig,
-	} = useContext( GlobalStylesContext );
-	const finalPath = ! blockName
-		? `behaviors`
-		: `behaviors.blocks.${ blockName }`;
-
-	let rawResult, result;
-	switch ( source ) {
-		case 'all':
-			rawResult = getValueFromObjectPath( mergedConfig, finalPath );
-			result = getValueFromVariable( mergedConfig, blockName, rawResult );
-			break;
-		case 'user':
-			rawResult = getValueFromObjectPath( userConfig, finalPath );
-			result = getValueFromVariable( mergedConfig, blockName, rawResult );
-			break;
-		case 'base':
-			rawResult = getValueFromObjectPath( baseConfig, finalPath );
-			result = getValueFromVariable( baseConfig, blockName, rawResult );
-			break;
-		default:
-			throw 'Unsupported source';
-	}
-
-	const animation = result?.lightbox?.animation || 'zoom';
-
-	const setBehavior = ( newValue ) => {
-		let newBehavior;
-		// The user saves with Apply Globally option.
-		if ( typeof newValue === 'object' ) {
-			newBehavior = newValue;
-		} else {
-			switch ( newValue ) {
-				case 'lightbox':
-					newBehavior = {
-						lightbox: {
-							enabled: true,
-							animation,
-						},
-					};
-					break;
-				case 'fade':
-					newBehavior = {
-						lightbox: {
-							enabled: true,
-							animation: 'fade',
-						},
-					};
-					break;
-				case 'zoom':
-					newBehavior = {
-						lightbox: {
-							enabled: true,
-							animation: 'zoom',
-						},
-					};
-					break;
-				case '':
-					newBehavior = {
-						lightbox: {
-							enabled: false,
-							animation,
-						},
-					};
-					break;
-				default:
-					break;
-			}
-		}
-		setUserConfig( ( currentConfig ) =>
-			setImmutably( currentConfig, finalPath.split( '.' ), newBehavior )
-		);
-	};
-	let behavior = '';
-	if ( result === undefined ) behavior = 'default';
-	if ( result?.lightbox.enabled ) behavior = 'lightbox';
-
-	return { behavior, inheritedBehaviors: result, setBehavior };
-}
-
-export function __experimentalUseHasBehaviorsPanel(
-	settings,
-	name,
-	{ blockSupportOnly = false } = {}
-) {
-	if ( ! settings?.behaviors || ! window?.__experimentalInteractivityAPI ) {
-		return false;
-	}
-
-	// If every behavior is disabled on block supports, do not show the behaviors inspector control.
-	const hasSomeBlockSupport = Object.keys( settings?.behaviors ).some(
-		( key ) => hasBlockSupport( name, `behaviors.${ key }` )
-	);
-
-	if ( blockSupportOnly ) {
-		return hasSomeBlockSupport;
-	}
-
-	// If every behavior is disabled, do not show the behaviors inspector control.
-	return Object.values( settings?.behaviors ).some(
-		( value ) => value === true && hasSomeBlockSupport
-	);
 }

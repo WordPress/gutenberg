@@ -159,6 +159,13 @@ export const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 	'typography.fontFamily': 'fontFamily',
 };
 
+export const TOOLSPANEL_DROPDOWNMENU_PROPS = {
+	popoverProps: {
+		placement: 'left-start',
+		offset: 259, // Inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+	},
+};
+
 function findInPresetsBy(
 	features,
 	blockName,
@@ -394,6 +401,27 @@ export function scopeSelector( scope, selector ) {
 }
 
 /**
+ * Appends a sub-selector to an existing one.
+ *
+ * Given the compounded `selector` "h1, h2, h3"
+ * and the `toAppend` selector ".some-class" the result will be
+ * "h1.some-class, h2.some-class, h3.some-class".
+ *
+ * @param {string} selector Original selector.
+ * @param {string} toAppend Selector to append.
+ *
+ * @return {string} The new selector.
+ */
+export function appendToSelector( selector, toAppend ) {
+	if ( ! selector.includes( ',' ) ) {
+		return selector + toAppend;
+	}
+	const selectors = selector.split( ',' );
+	const newSelectors = selectors.map( ( sel ) => sel + toAppend );
+	return newSelectors.join( ',' );
+}
+
+/**
  * Compares global style variations according to their styles and settings properties.
  *
  * @example
@@ -415,7 +443,6 @@ export function areGlobalStyleConfigsEqual( original, variation ) {
 	}
 	return (
 		fastDeepEqual( original?.styles, variation?.styles ) &&
-		fastDeepEqual( original?.settings, variation?.settings ) &&
-		fastDeepEqual( original?.behaviors, variation?.behaviors )
+		fastDeepEqual( original?.settings, variation?.settings )
 	);
 }

@@ -12,10 +12,14 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { __, isRTL } from '@wordpress/i18n';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useAsyncList, useViewportMatch } from '@wordpress/compose';
+import {
+	useAsyncList,
+	useViewportMatch,
+	useDebouncedInput,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,25 +29,30 @@ import Grid from './grid';
 import NoPatterns from './no-patterns';
 import usePatterns from './use-patterns';
 import SidebarButton from '../sidebar-button';
-import useDebouncedInput from '../../utils/use-debounced-input';
 import { unlock } from '../../lock-unlock';
-import { SYNC_TYPES, USER_PATTERN_CATEGORY, PATTERNS } from './utils';
-import Pagination from './pagination';
+import { PATTERN_SYNC_TYPES, PATTERN_TYPES } from '../../utils/constants';
+import Pagination from '../pagination';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const SYNC_FILTERS = {
-	all: __( 'All' ),
-	[ SYNC_TYPES.full ]: __( 'Synced' ),
-	[ SYNC_TYPES.unsynced ]: __( 'Standard' ),
+	all: _x( 'All', 'Option that shows all patterns' ),
+	[ PATTERN_SYNC_TYPES.full ]: _x(
+		'Synced',
+		'Option that shows all synchronized patterns'
+	),
+	[ PATTERN_SYNC_TYPES.unsynced ]: _x(
+		'Not synced',
+		'Option that shows all patterns that are not synchronized'
+	),
 };
 
 const SYNC_DESCRIPTIONS = {
 	all: '',
-	[ SYNC_TYPES.full ]: __(
+	[ PATTERN_SYNC_TYPES.full ]: __(
 		'Patterns that are kept in sync across the site.'
 	),
-	[ SYNC_TYPES.unsynced ]: __(
+	[ PATTERN_SYNC_TYPES.unsynced ]: __(
 		'Patterns that can be changed freely without affecting the site.'
 	),
 };
@@ -64,7 +73,7 @@ export default function PatternsList( { categoryId, type } ) {
 	const deferredSyncedFilter = useDeferredValue( syncFilter );
 
 	const isUncategorizedThemePatterns =
-		type === PATTERNS && categoryId === 'uncategorized';
+		type === PATTERN_TYPES.theme && categoryId === 'uncategorized';
 
 	const { patterns, isResolving } = usePatterns(
 		type,
@@ -78,6 +87,16 @@ export default function PatternsList( { categoryId, type } ) {
 		}
 	);
 
+	const updateSearchFilter = ( value ) => {
+		setCurrentPage( 1 );
+		setFilterValue( value );
+	};
+
+	const updateSyncFilter = ( value ) => {
+		setCurrentPage( 1 );
+		setSyncFilter( value );
+	};
+
 	const id = useId();
 	const titleId = `${ id }-title`;
 	const descriptionId = `${ id }-description`;
@@ -90,14 +109,12 @@ export default function PatternsList( { categoryId, type } ) {
 	const pageIndex = currentPage - 1;
 	const numPages = Math.ceil( patterns.length / PAGE_SIZE );
 
-	const list = useMemo(
-		() =>
-			patterns.slice(
-				pageIndex * PAGE_SIZE,
-				pageIndex * PAGE_SIZE + PAGE_SIZE
-			),
-		[ pageIndex, patterns ]
-	);
+	const list = useMemo( () => {
+		return patterns.slice(
+			pageIndex * PAGE_SIZE,
+			pageIndex * PAGE_SIZE + PAGE_SIZE
+		);
+	}, [ pageIndex, patterns ] );
 
 	const asyncList = useAsyncList( list, { step: 10 } );
 
@@ -138,21 +155,23 @@ export default function PatternsList( { categoryId, type } ) {
 					<FlexBlock className="edit-site-patterns__search-block">
 						<SearchControl
 							className="edit-site-patterns__search"
-							onChange={ ( value ) => setFilterValue( value ) }
+							onChange={ ( value ) =>
+								updateSearchFilter( value )
+							}
 							placeholder={ __( 'Search patterns' ) }
 							label={ __( 'Search patterns' ) }
 							value={ filterValue }
 							__nextHasNoMarginBottom
 						/>
 					</FlexBlock>
-					{ categoryId === USER_PATTERN_CATEGORY && (
+					{ type === PATTERN_TYPES.theme && (
 						<ToggleGroupControl
 							className="edit-site-patterns__sync-status-filter"
 							hideLabelFromVision
 							label={ __( 'Filter by sync status' ) }
 							value={ syncFilter }
 							isBlock
-							onChange={ ( value ) => setSyncFilter( value ) }
+							onChange={ ( value ) => updateSyncFilter( value ) }
 							__nextHasNoMarginBottom
 						>
 							{ Object.entries( SYNC_FILTERS ).map(
@@ -198,6 +217,7 @@ export default function PatternsList( { categoryId, type } ) {
 			</VStack>
 			{ numPages > 1 && (
 				<Pagination
+					className="edit-site-patterns__pagination"
 					currentPage={ currentPage }
 					numPages={ numPages }
 					changePage={ changePage }

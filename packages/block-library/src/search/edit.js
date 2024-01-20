@@ -16,7 +16,7 @@ import {
 	getTypographyClassesAndStyles as useTypographyProps,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
-	useSetting,
+	useSettings,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -52,14 +52,12 @@ import {
 	PC_WIDTH_DEFAULT,
 	PX_WIDTH_DEFAULT,
 	MIN_WIDTH,
-	MIN_WIDTH_UNIT,
+	isPercentageUnit,
 } from './utils.js';
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
 const DEFAULT_INNER_PADDING = '4px';
-
-const BUTTON_BEHAVIOR_EXPAND = 'expand-searchfield';
 
 export default function SearchEdit( {
 	className,
@@ -79,12 +77,11 @@ export default function SearchEdit( {
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
-		buttonBehavior,
 		isSearchFieldHidden,
 		style,
 	} = attributes;
 
-	const insertedInNavigationBlock = useSelect(
+	const wasJustInsertedIntoNavigationBlock = useSelect(
 		( select ) => {
 			const { getBlockParentsByBlockName, wasBlockJustInserted } =
 				select( blockEditorStore );
@@ -98,15 +95,21 @@ export default function SearchEdit( {
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
-	if ( insertedInNavigationBlock ) {
-		// This side-effect should not create an undo level.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( {
-			showLabel: false,
-			buttonUseIcon: true,
-			buttonPosition: 'button-inside',
-		} );
-	}
+	useEffect( () => {
+		if ( wasJustInsertedIntoNavigationBlock ) {
+			// This side-effect should not create an undo level.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				showLabel: false,
+				buttonUseIcon: true,
+				buttonPosition: 'button-inside',
+			} );
+		}
+	}, [
+		__unstableMarkNextChangeAsNotPersistent,
+		wasJustInsertedIntoNavigationBlock,
+		setAttributes,
+	] );
 
 	const borderRadius = style?.border?.radius;
 	const borderProps = useBorderProps( attributes );
@@ -119,8 +122,10 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
-	const fluidTypographySettings = useSetting( 'typography.fluid' );
-	const layout = useSetting( 'layout' );
+	const [ fluidTypographySettings, layout ] = useSettings(
+		'typography.fluid',
+		'layout'
+	);
 	const typographyProps = useTypographyProps( attributes, {
 		typography: {
 			fluid: fluidTypographySettings,
@@ -178,9 +183,6 @@ export default function SearchEdit( {
 				: undefined,
 			buttonUseIcon && ! hasNoButton
 				? 'wp-block-search__icon-button'
-				: undefined,
-			hasOnlyButton && BUTTON_BEHAVIOR_EXPAND === buttonBehavior
-				? 'wp-block-search__button-behavior-expand'
 				: undefined,
 			hasOnlyButton && isSearchFieldHidden
 				? 'wp-block-search__searchfield-hidden'
@@ -317,7 +319,7 @@ export default function SearchEdit( {
 				: borderProps.style ),
 		};
 		const handleButtonClick = () => {
-			if ( hasOnlyButton && BUTTON_BEHAVIOR_EXPAND === buttonBehavior ) {
+			if ( hasOnlyButton ) {
 				setAttributes( {
 					isSearchFieldHidden: ! isSearchFieldHidden,
 				} );
@@ -405,7 +407,13 @@ export default function SearchEdit( {
 					>
 						<UnitControl
 							id={ unitControlInputId }
-							min={ `${ MIN_WIDTH }${ MIN_WIDTH_UNIT }` }
+							min={
+								isPercentageUnit( widthUnit ) ? 0 : MIN_WIDTH
+							}
+							max={
+								isPercentageUnit( widthUnit ) ? 100 : undefined
+							}
+							step={ 1 }
 							onChange={ ( newWidth ) => {
 								const filteredWidth =
 									widthUnit === '%' &&
@@ -439,7 +447,7 @@ export default function SearchEdit( {
 								return (
 									<Button
 										key={ widthValue }
-										isSmall
+										size="small"
 										variant={
 											widthValue === width &&
 											widthUnit === '%'

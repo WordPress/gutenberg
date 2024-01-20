@@ -21,6 +21,15 @@ export interface BorderIndividualStyles< T extends BoxEdge > {
 }
 
 export interface Style {
+	background?: {
+		backgroundImage: {
+			url?: CSSProperties[ 'backgroundImage' ];
+			source?: string;
+		};
+		backgroundPosition?: CSSProperties[ 'backgroundPosition' ];
+		backgroundRepeat?: CSSProperties[ 'backgroundRepeat' ];
+		backgroundSize?: CSSProperties[ 'backgroundSize' ];
+	};
 	border?: {
 		color?: CSSProperties[ 'borderColor' ];
 		radius?:

@@ -92,13 +92,12 @@ export const useGlobalStyles = () => {
 	return globalStyles;
 };
 
-export const withGlobalStyles = ( WrappedComponent ) => ( props ) =>
-	(
-		<GlobalStylesContext.Consumer>
-			{ ( globalStyles ) => (
-				<WrappedComponent { ...props } globalStyles={ globalStyles } />
-			) }
-		</GlobalStylesContext.Consumer>
-	);
+export const withGlobalStyles = ( WrappedComponent ) => ( props ) => (
+	<GlobalStylesContext.Consumer>
+		{ ( globalStyles ) => (
+			<WrappedComponent { ...props } globalStyles={ globalStyles } />
+		) }
+	</GlobalStylesContext.Consumer>
+);
 
 export default GlobalStylesContext;

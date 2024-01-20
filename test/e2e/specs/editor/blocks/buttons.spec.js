@@ -30,7 +30,9 @@ test.describe( 'Buttons', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/buttons' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Content' );
@@ -162,6 +164,99 @@ test.describe( 'Buttons', () => {
 		);
 	} );
 
+	test( 'can toggle button link settings', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/buttons' } );
+		await page.keyboard.type( 'WordPress' );
+		await pageUtils.pressKeys( 'primary+k' );
+		await page.keyboard.type( 'https://www.wordpress.org/' );
+		await page.keyboard.press( 'Enter' );
+
+		// Edit link.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Open Advanced settings panel.
+		await page
+			.getByRole( 'region', {
+				name: 'Editor content',
+			} )
+			.getByRole( 'button', {
+				name: 'Advanced',
+			} )
+			.click();
+
+		const newTabCheckbox = page.getByLabel( 'Open in new tab' );
+		const noFollowCheckbox = page.getByLabel( 'nofollow' );
+
+		// Navigate to and toggle the "Open in new tab" checkbox.
+		await newTabCheckbox.click();
+
+		// Toggle should still have focus and be checked.
+		await expect( newTabCheckbox ).toBeChecked();
+		await expect( newTabCheckbox ).toBeFocused();
+
+		await page
+			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
+			.locator( '.block-editor-link-control' )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
+
+		// The link should have been inserted.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'WordPress',
+							url: 'https://www.wordpress.org/',
+							rel: 'noreferrer noopener',
+							linkTarget: '_blank',
+						},
+					},
+				],
+			},
+		] );
+
+		// Edit link again.
+		await page.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Navigate to and toggle the "nofollow" checkbox.
+		await noFollowCheckbox.click();
+
+		// expect settings for `Open in new tab` and `No follow`
+		await expect( newTabCheckbox ).toBeChecked();
+		await expect( noFollowCheckbox ).toBeChecked();
+
+		await page
+			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
+			.locator( '.block-editor-link-control' )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
+
+		// Check the content again.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							text: 'WordPress',
+							url: 'https://www.wordpress.org/',
+							rel: 'noreferrer noopener nofollow',
+							linkTarget: '_blank',
+						},
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'can resize width', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
@@ -196,11 +291,11 @@ test.describe( 'Buttons', () => {
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Color Text styles"i]'
 		);
-		await page.click( 'role=button[name="Color: Cyan bluish gray"i]' );
+		await page.click( 'role=option[name="Color: Cyan bluish gray"i]' );
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
 		);
-		await page.click( 'role=button[name="Color: Vivid red"i]' );
+		await page.click( 'role=option[name="Color: Vivid red"i]' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
@@ -261,7 +356,7 @@ test.describe( 'Buttons', () => {
 			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
 		);
 		await page.click( 'role=tab[name="Gradient"i]' );
-		await page.click( 'role=button[name="Gradient: Purple to yellow"i]' );
+		await page.click( 'role=option[name="Gradient: Purple to yellow"i]' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();

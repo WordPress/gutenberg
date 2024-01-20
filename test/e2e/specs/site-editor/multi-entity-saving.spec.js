@@ -23,7 +23,7 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 		} );
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test( 'save flow should work as expected', async ( { editor, page } ) => {
