@@ -102,6 +102,17 @@ describe( 'Tooltip', () => {
 				screen.queryByRole( 'button', { description: 'tooltip text' } )
 			).not.toBeInTheDocument();
 		} );
+
+		it( 'should not leak Tooltip props to the tooltip anchor', () => {
+			render(
+				<Tooltip data-foo>
+					<button>Anchor</button>
+				</Tooltip>
+			);
+			expect(
+				screen.getByRole( 'button', { name: 'Anchor' } )
+			).not.toHaveAttribute( 'data-foo' );
+		} );
 	} );
 
 	describe( 'keyboard focus', () => {
