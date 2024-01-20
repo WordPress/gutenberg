@@ -7,6 +7,7 @@ import type { FocusEventHandler, MouseEventHandler } from 'react';
 /**
  * Internal dependencies
  */
+import type { InputBaseProps } from '../input-control/types';
 
 export type CustomSelectStore = {
 	/**
@@ -50,9 +51,9 @@ export type CustomSelectProps = {
 	/**
 	 * The size of the control.
 	 *
-	 * @default 'default'
+	 * @default default
 	 */
-	size?: 'default' | 'small';
+	size?: 'compact' | 'default' | 'small';
 	/**
 	 * Can be used to externally control the value of the control.
 	 */
@@ -78,7 +79,10 @@ type OnChangeObject = {
 	isOpen?: boolean;
 };
 
-export type LegacyCustomSelectProps = {
+export type LegacyCustomSelectProps = Pick<
+	InputBaseProps,
+	'__next40pxDefaultSize' | 'size'
+> & {
 	/**
 	 * Optional classname for the component.
 	 */
@@ -124,12 +128,6 @@ export type LegacyCustomSelectProps = {
 	 */
 	options: Array< Option >;
 	/**
-	 * The size of the control.
-	 *
-	 * @default 'default'
-	 */
-	size?: CustomSelectProps[ 'size' ];
-	/**
 	 * Can be used to externally control the value of the control.
 	 */
 	value?: Option;
@@ -146,12 +144,6 @@ export type LegacyCustomSelectProps = {
 	 * @deprecated
 	 */
 	__nextUnconstrainedWidth?: boolean;
-	/**
-	 * Start opting into the larger default height that will become the default size in a future version.
-	 *
-	 * @default false
-	 */
-	__next40pxDefaultSize?: boolean;
 };
 
 export type CustomSelectItemProps = {

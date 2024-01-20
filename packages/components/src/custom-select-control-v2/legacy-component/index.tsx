@@ -17,9 +17,12 @@ import { CustomSelectItem } from '..';
 function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 	const {
 		__experimentalShowSelectedHint,
+		__next40pxDefaultSize = false,
 		__nextUnconstrainedWidth,
 		options,
 		onChange,
+		// TO-DO 'default' should be the 'compact' size
+		size = 'default',
 		value: valueProp,
 		...restProps
 	} = props;
@@ -88,6 +91,10 @@ function _LegacyCustomSelect( props: LegacyCustomSelectProps ) {
 	const translatedProps = {
 		'aria-describedby': props.describedBy,
 		children,
+		size:
+			__next40pxDefaultSize || size === '__unstable-large'
+				? 'default'
+				: size,
 		...restProps,
 	};
 

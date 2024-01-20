@@ -21,6 +21,7 @@ export const CustomSelectLabel = styled( Ariakit.SelectLabel )`
 `;
 
 const inputHeights = {
+	compact: 32,
 	default: 40,
 	small: 24,
 };
