@@ -122,7 +122,7 @@ test.describe( 'Embedding content', () => {
 		await expect(
 			currenEmbedBlock.getByRole( 'textbox', { name: 'Embed URL' } ),
 			'WordPress invalid content. Should render failed, edit state.'
-		).toHaveValue( 'https://wordpress.org/gutenberg/handbook/' );
+		).toHaveValue( 'https://wordpress.org/gutenberg/handbook' );
 
 		await embedUtils.insertEmbed( 'https://twitter.com/thatbunty' );
 		await expect(
@@ -189,7 +189,7 @@ test.describe( 'Embedding content', () => {
 	} );
 
 	// Reason: A possible regression of https://github.com/WordPress/gutenberg/pull/14705.
-	test.skip( 'should retry embeds that could not be embedded with trailing slashes, without the trailing slashes', async ( {
+	test( 'should retry embeds that could not be embedded with trailing slashes, without the trailing slashes', async ( {
 		editor,
 		embedUtils,
 	} ) => {
