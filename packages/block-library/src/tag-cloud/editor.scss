@@ -1,0 +1,11 @@
+.wp-block-tag-cloud.is-style-outline {
+	display: block;
+
+	// CSS classes are not passed to the ServerSideRender component,
+	// so nested selectors must be used to apply outline block styles.
+	.wp-block-tag-cloud {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1ch;
+	}
+}
