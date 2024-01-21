@@ -271,6 +271,7 @@
 		border: 1px solid $gray-200;
 		height: 100%;
 		justify-content: flex-start;
+		overflow: hidden;
 
 		.dataviews-view-grid__title-actions {
 			padding: 0 $grid-unit-05;
