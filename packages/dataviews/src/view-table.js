@@ -539,7 +539,7 @@ function ViewTable( {
 											minWidth: 20,
 										} }
 									>
-										<span className="dataviews-view-table__cell-content-wrapper">
+										<div className="dataviews-view-table__cell-content-wrapper">
 											<SingleSelectionCheckbox
 												id={
 													getItemId( item ) || index
@@ -553,7 +553,7 @@ function ViewTable( {
 												data={ data }
 												primaryField={ primaryField }
 											/>
-										</span>
+										</div>
 									</td>
 								) }
 								{ visibleFields.map( ( field ) => (
@@ -567,7 +567,7 @@ function ViewTable( {
 												field.maxWidth || undefined,
 										} }
 									>
-										<span
+										<div
 											className={ classnames(
 												'dataviews-view-table__cell-content-wrapper',
 												{
@@ -580,7 +580,7 @@ function ViewTable( {
 											{ field.render( {
 												item,
 											} ) }
-										</span>
+										</div>
 									</td>
 								) ) }
 								{ !! actions?.length && (
