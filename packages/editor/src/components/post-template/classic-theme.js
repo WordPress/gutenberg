@@ -65,6 +65,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 		canEdit,
 		currentTemplateId,
 		getPostLinkProps,
+		getEditorSettings,
 	} = useSelect(
 		( select ) => {
 			const { canUser, getEntityRecords } = select( coreStore );
@@ -94,6 +95,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 					!! _currentTemplateId,
 				currentTemplateId: _currentTemplateId,
 				getPostLinkProps: editorSettings.getPostLinkProps,
+				getEditorSettings: select( editorStore ).getEditorSettings,
 			};
 		},
 		[ allowSwitchingTemplate ]
@@ -180,6 +182,13 @@ function PostTemplateDropdownContent( { onClose } ) {
 								),
 								{
 									type: 'snackbar',
+									actions: [
+										{
+											label: __( 'Go back' ),
+											onClick: () =>
+												getEditorSettings().goBack(),
+										},
+									],
 								}
 							);
 						} }
