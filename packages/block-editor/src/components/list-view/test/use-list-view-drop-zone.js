@@ -127,6 +127,7 @@ describe( 'getListViewDropTarget', () => {
 
 			expect( target ).toEqual( {
 				blockIndex: 0,
+				clientId: 'block-1',
 				dropPosition: 'inside',
 				rootClientId: 'block-1',
 			} );
@@ -142,6 +143,7 @@ describe( 'getListViewDropTarget', () => {
 
 			expect( target ).toEqual( {
 				blockIndex: 0,
+				clientId: 'block-3',
 				dropPosition: 'inside',
 				rootClientId: 'block-3',
 			} );
@@ -244,6 +246,7 @@ describe( 'getListViewDropTarget', () => {
 
 			expect( target ).toEqual( {
 				blockIndex: 1,
+				clientId: 'block-1',
 				dropPosition: 'inside',
 				rootClientId: 'block-1',
 			} );
@@ -277,6 +280,7 @@ describe( 'getListViewDropTarget', () => {
 
 			expect( target ).toEqual( {
 				blockIndex: 0,
+				clientId: 'block-1',
 				dropPosition: 'inside',
 				rootClientId: 'block-1',
 			} );
