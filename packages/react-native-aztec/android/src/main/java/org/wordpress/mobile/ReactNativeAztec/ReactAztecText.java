@@ -239,13 +239,7 @@ public class ReactAztecText extends AztecText {
     }
 
     public void onMarkFormatting(String colorString) {
-        ArrayList<ITextFormat> appliedStyles = getAppliedStyles(getSelectionStart(), getSelectionEnd());
         inlineFormatter.setMarkStyleColor(colorString);
-
-        if (appliedStyles.contains(AztecTextFormat.FORMAT_MARK)) {
-            inlineFormatter.updateMarkStyle(getSelectionStart(), getSelectionEnd());
-            return;
-        }
 
         Set<ITextFormat> selectedStylesSet = new HashSet<>(getSelectedStyles());
         Set<ITextFormat> newFormatsSet = new HashSet<>();
