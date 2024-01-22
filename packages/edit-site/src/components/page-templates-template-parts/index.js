@@ -32,7 +32,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import Page from '../page';
-import Link from '../routes/link';
+import { default as Link, useLink } from '../routes/link';
 import AddNewTemplate from '../add-new-template';
 import { useAddedBy, AvatarImage } from '../list/added-by';
 import {
@@ -136,8 +136,13 @@ function Preview( { content, viewType } ) {
 	const settings = usePatternSettings();
 	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
 	const blocks = useMemo( () => {
-		return parse( content );
-	}, [ content ] );
+		return parse( item.content.raw );
+	}, [ item.content.raw ] );
+	const { onClick } = useLink( {
+		postId: item.id,
+		postType: item.type,
+		canvas: 'edit',
+	} );
 	if ( ! blocks?.length ) {
 		return null;
 	}
@@ -154,7 +159,14 @@ function Preview( { content, viewType } ) {
 				className={ `page-templates-preview-field is-viewtype-${ viewType }` }
 				style={ { backgroundColor } }
 			>
-				<BlockPreview blocks={ blocks } />
+				<button
+					className="page-templates-preview-field__button"
+					type="button"
+					onClick={ onClick }
+					aria-label={ item.title?.rendered || item.title }
+				>
+					<BlockPreview blocks={ blocks } />
+				</button>
 			</div>
 		</ExperimentalBlockEditorProvider>
 	);
