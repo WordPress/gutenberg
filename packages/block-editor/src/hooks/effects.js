@@ -3,7 +3,6 @@
  */
 import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -35,12 +34,7 @@ export function EffectsPanel( { clientId, setAttributes, settings } ) {
 		[ clientId ]
 	);
 	const shadow = blockAttributes?.style?.shadow;
-	const value = useMemo(
-		() => ( {
-			shadow,
-		} ),
-		[ shadow ]
-	);
+	const value = { shadow };
 
 	const onChange = ( newValue ) => {
 		setAttributes( {
