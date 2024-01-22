@@ -3902,7 +3902,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		foreach ( $selector_parts as $part ) {
 			$result[] = preg_replace_callback(
-				'/((?::is|not|has|where\([^)]+\))?\s*)([^\s:]+)/',
+				'/((?::\([^)]+\))?\s*)([^\s:]+)/',
 				function ( $matches ) use ( $variation_class ) {
 					return $matches[1] . $matches[2] . $variation_class;
 				},
