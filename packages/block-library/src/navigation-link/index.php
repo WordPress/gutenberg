@@ -362,7 +362,7 @@ function block_core_navigation_link_unregister_variation( $name ) {
 	// Search for the variation and remove it from the array.
 	foreach ( $variations as $i => $variation ) {
 		if ( $variation['name'] === $name ) {
-			unset( $variations );
+			unset( $variations[ $i ] );
 			break;
 		}
 	}
