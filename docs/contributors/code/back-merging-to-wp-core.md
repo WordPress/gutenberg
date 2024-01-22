@@ -13,12 +13,11 @@ Changes to files within the following files/directories will typically require b
 
 The following directories/files do _not_ require back-merging to WP Core:
 
--   `lib`
-    -   `load.php` - Plugin specific code.
-    -   `experiments-page.php` - experiments are Plugin specific.
--   `packages`
-    -   `block-library` - this is handled automatically during the packages sync process.
-    -   `e2e-tests/plugins` - PHP files related to e2e tests only. Mostly fixture data generators.
+-   `lib/load.php` - Plugin specific code.
+-   `lib/experiments-page.php` - experiments are Plugin specific.
+-   `packages/block-library` - this is handled automatically during the packages sync process.
+-   `packages/e2e-tests/plugins` - PHP files related to e2e tests only. Mostly fixture data generators.
+-   `phpunit/blocks` - the code is maintained in Gutenberg so the test should be as well.
 
 Please note this list is not exhaustive.
 
