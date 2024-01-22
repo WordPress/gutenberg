@@ -7,7 +7,7 @@ const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 /**
  * WordPress dependencies
  */
-const DEWP = require( '@wordpress/dependency-extraction-webpack-plugin' );
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 
 /**
  * Internal dependencies
@@ -73,7 +73,10 @@ module.exports = {
 		],
 	},
 	plugins: [
-		...plugins,
+		...plugins?.filter(
+			( plugin ) =>
+				plugin.constructor.name !== 'DependencyExtractionWebpackPlugin'
+		),
 		// TODO: Move it to a different Webpack file.
 		new CopyWebpackPlugin( {
 			patterns: [
@@ -83,7 +86,7 @@ module.exports = {
 				},
 			],
 		} ),
-		new DEWP( {
+		new DependencyExtractionWebpackPlugin( {
 			requestToExternalModule: ( request ) =>
 				request === '@wordpress/interactivity/router',
 		} ),
