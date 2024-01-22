@@ -40,8 +40,8 @@ const parseInitialState = () => {
 	);
 	if ( ! storeTag?.textContent ) return {};
 	try {
-		const { initialState } = JSON.parse( storeTag.textContent );
-		if ( isObject( initialState ) ) return initialState;
+		const { state } = JSON.parse( storeTag.textContent );
+		if ( isObject( state ) ) return state;
 		throw Error( 'Parsed state is not an object' );
 	} catch ( e ) {
 		// eslint-disable-next-line no-console

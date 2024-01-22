@@ -49,7 +49,7 @@ $test_store_tag_double  = $test_store_tag_counter * 2;
 if ( 'missing' !== $attributes['condition'] ) {
 
 	if ( 'ok' === $attributes['condition'] ) {
-		$test_store_tag_json = '{ "initialState": { "store-tag": { "counter": { "value": 3 } } } }';
+		$test_store_tag_json = '{ "state": { "store-tag": { "counter": { "value": 3 } } } }';
 	}
 
 	if ( 'corrupted-json' === $attributes['condition'] ) {
