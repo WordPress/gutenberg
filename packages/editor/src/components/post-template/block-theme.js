@@ -24,15 +24,14 @@ const POPOVER_PROPS = {
 };
 
 export default function BlockThemeControl( { id } ) {
-	const { isTemplateHidden, getPostLinkProps, goBack } = useSelect(
+	const { isTemplateHidden, getPostLinkProps, getEditorSettings } = useSelect(
 		( select ) => {
-			const { getRenderingMode, getEditorSettings } = unlock(
-				select( editorStore )
-			);
+			const { getRenderingMode, getEditorSettings: _getEditorSettings } =
+				unlock( select( editorStore ) );
 			return {
 				isTemplateHidden: getRenderingMode() === 'post-only',
-				getPostLinkProps: getEditorSettings().getPostLinkProps,
-				goBack: getEditorSettings().goBack,
+				getPostLinkProps: _getEditorSettings().getPostLinkProps,
+				getEditorSettings: _getEditorSettings,
 			};
 		},
 		[]
@@ -83,7 +82,8 @@ export default function BlockThemeControl( { id } ) {
 										actions: [
 											{
 												label: __( 'Go back' ),
-												onClick: () => goBack(),
+												onClick: () =>
+													getEditorSettings().goBack(),
 											},
 										],
 									}
