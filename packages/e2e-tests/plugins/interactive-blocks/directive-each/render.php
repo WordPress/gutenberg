@@ -156,15 +156,21 @@ gutenberg_enqueue_module( 'directive-each-view' );
 			<li data-testid="animal" data-wp-each-child>
 				<span data-testid="name">Dog</span>
 				<ul>
-					<li>Chihuahua</li>
-					<li>Rottweiler</li>
+					<template data-wp-each--breed="context.animal.breeds">
+						<li data-wp-text="context.breed"></li>
+					</template>
+					<li data-wp-each-child>Chihuahua</li>
+					<li data-wp-each-child>Rottweiler</li>
 				</ul>
 			</li>
 			<li data-testid="animal" data-wp-each-child>
 				<span data-testid="name">Cat</span>
 				<ul>
-					<li>Sphynx</li>
-					<li>Siamese</li>
+					<template data-wp-each--breed="context.animal.breeds">
+						<li data-wp-text="context.breed"></li>
+					</template>
+					<li data-wp-each-child>Sphynx</li>
+					<li data-wp-each-child>Siamese</li>
 				</ul>
 			</li>
 		</ul>
