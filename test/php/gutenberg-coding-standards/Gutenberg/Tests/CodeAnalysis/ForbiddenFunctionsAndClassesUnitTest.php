@@ -15,7 +15,7 @@ use PHP_CodeSniffer\Tests\Standards\AbstractSniffUnitTest;
 use PHP_CodeSniffer\Ruleset;
 
 /**
- * Unit test class for the GuardedFunctionAndClassNames sniff.
+ * Unit test class for the ForbiddenFunctionsAndClassesSniff sniff.
  */
 final class ForbiddenFunctionsAndClassesUnitTest extends AbstractSniffUnitTest {
 
