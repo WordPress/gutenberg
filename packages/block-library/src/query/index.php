@@ -148,7 +148,7 @@ function register_block_core_query() {
 					'type' => 'dynamic',
 				),
 			),
-			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' ),
+			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
 		);
 	}
 }
