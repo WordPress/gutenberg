@@ -14,6 +14,9 @@
 class Block_Navigation_Link_Variations_Test extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
+
+		$this->markTestSkipped( 'See: https://core.trac.wordpress.org/ticket/60309' );
+
 		register_post_type(
 			'custom_book',
 			array(
