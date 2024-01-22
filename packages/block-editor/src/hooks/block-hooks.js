@@ -55,8 +55,7 @@ function BlockHooksControlPure( { name, clientId } ) {
 			const _hookedBlockClientIds = hookedBlocksForCurrentBlock.reduce(
 				( clientIds, block ) => {
 					// If the block doesn't exist anywhere in the block tree,
-					// we know that we have to display the toggle for it, and set
-					// it to disabled.
+					// we know that we have to set the toggle to disabled.
 					if ( getGlobalBlockCount( block.name ) === 0 ) {
 						return clientIds;
 					}
