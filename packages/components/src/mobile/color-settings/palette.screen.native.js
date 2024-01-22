@@ -112,7 +112,11 @@ const PaletteScreen = () => {
 
 	function getClearButton() {
 		return (
-			<TouchableWithoutFeedback onPress={ onClear } hitSlop={ HIT_SLOP }>
+			<TouchableWithoutFeedback
+				accessibilityLabel={ __( 'Clear selected color' ) }
+				onPress={ onClear }
+				hitSlop={ HIT_SLOP }
+			>
 				<View style={ styles.clearButtonContainer }>
 					<Text style={ clearButtonStyle }>{ __( 'Reset' ) }</Text>
 				</View>
