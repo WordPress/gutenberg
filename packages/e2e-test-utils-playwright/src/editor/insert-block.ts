@@ -22,9 +22,10 @@ async function insertBlock(
 	blockRepresentation: BlockRepresentation,
 	{ clientId }: { clientId?: string } = {}
 ) {
-	await this.page.waitForFunction(
-		() => window?.wp?.blocks && window?.wp?.data
-	);
+	await this.canvas.locator( 'body' ).waitFor( { state: 'visible' } );
+	// await this.page.waitForFunction(
+	// 	() => window?.wp?.blocks && window?.wp?.data
+	// );
 
 	await this.page.evaluate(
 		( [ _blockRepresentation, _clientId ] ) => {

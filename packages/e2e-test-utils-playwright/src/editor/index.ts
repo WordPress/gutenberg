@@ -5,7 +5,7 @@ import type {
 	Browser,
 	Page,
 	BrowserContext,
-	FrameLocator,
+	// FrameLocator,
 } from '@playwright/test';
 
 /**
@@ -44,8 +44,9 @@ export class Editor {
 		this.browser = this.context.browser()!;
 	}
 
-	get canvas(): FrameLocator {
-		return this.page.frameLocator( '[name="editor-canvas"]' );
+	get canvas(): Page {
+		return this.page;
+		// return this.page.frameLocator( '[name="editor-canvas"]' );
 	}
 
 	/** @borrows clickBlockOptionsMenuItem as this.clickBlockOptionsMenuItem */
