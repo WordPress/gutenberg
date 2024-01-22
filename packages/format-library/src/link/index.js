@@ -39,28 +39,22 @@ function Edit( {
 	contentRef,
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
-	const [ clickedLink, setClickedLink ] = useState( false );
-
-	function setClickedLinkTrue() {
-		setClickedLink( true );
-	}
-
-	function setClickedLinkFalse() {
-		setClickedLink( false );
-	}
 
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
 
-		function handleClick() {
-			setClickedLinkTrue();
+		function handleClick( event ) {
+			if ( event.target.tagName !== 'A' ) {
+				return;
+			}
+			setAddingLink( true );
 		}
 
 		editableContentElement.addEventListener( 'click', handleClick );
 
 		return () => {
 			editableContentElement.removeEventListener( 'click', handleClick );
-			setClickedLinkFalse();
+			setAddingLink( false );
 		};
 	}, [ contentRef, isActive ] );
 
@@ -117,7 +111,7 @@ function Edit( {
 				aria-haspopup="true"
 				aria-expanded={ addingLink }
 			/>
-			{ ( addingLink || ( isActive && clickedLink ) ) && (
+			{ addingLink && (
 				<InlineLinkUI
 					addingLink={ addingLink }
 					stopAddingLink={ stopAddingLink }
