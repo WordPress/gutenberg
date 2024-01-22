@@ -884,8 +884,8 @@ export class RichText extends Component {
 		// On android if content is empty we need to send no content or else the placeholder will not show.
 		if (
 			! this.isIOS &&
-			( value.toString() === '' ||
-				value.toString() === EMPTY_PARAGRAPH_TAGS )
+			( value?.toString() === '' ||
+				value?.toString() === EMPTY_PARAGRAPH_TAGS )
 		) {
 			return '';
 		}
