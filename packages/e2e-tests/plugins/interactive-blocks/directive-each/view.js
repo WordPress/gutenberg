@@ -150,10 +150,10 @@ const html = `
 store( 'directive-each', {
 	actions: {
 		*navigate() {
-			const {
-				default: { actions: { navigate } },
-			} = yield import( '@wordpress/interactivity/router' );
-			return navigate( window.location, {
+			const { actions } = yield import(
+				"@wordpress/interactivity/router"
+			);
+			return actions.navigate( window.location, {
 				force: true,
 				html,
 			} );

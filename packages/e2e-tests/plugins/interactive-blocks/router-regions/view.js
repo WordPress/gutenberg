@@ -19,10 +19,10 @@ const { state } = store( 'router-regions', {
 		router: {
 			*navigate( e ) {
 				e.preventDefault();
-				const {
-					default: { actions: { navigate } },
-				} = yield import( '@wordpress/interactivity/router' );
-				yield navigate( e.target.href );
+				const { actions } = yield import(
+					"@wordpress/interactivity/router"
+				);
+				yield actions.navigate( e.target.href );
 			},
 			back() {
 				history.back();

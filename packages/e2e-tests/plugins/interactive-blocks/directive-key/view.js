@@ -18,10 +18,10 @@ const html = `
 store( 'directive-key', {
 	actions: {
 		*navigate() {
-			const {
-				default: { actions: { navigate } },
-			} = yield import( '@wordpress/interactivity/router' );
-			navigate( window.location, {
+			const { actions } = yield import(
+				"@wordpress/interactivity/router"
+			);
+			return actions.navigate( window.location, {
 				force: true,
 				html,
 			} );

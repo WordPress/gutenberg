@@ -51,8 +51,11 @@ const { actions } = store( 'directive-context-navigate', {
 		},
 		navigate() {
 			return import( '@wordpress/interactivity/router' ).then(
-				( { default: { actions: { navigate } } } ) =>
-					navigate( window.location, { force: true, html } )
+				( { actions: routerActions } ) =>
+					routerActions.navigate(
+						window.location,
+						{ force: true, html },
+					)
 			);
 
 		},

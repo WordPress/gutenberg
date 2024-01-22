@@ -19,10 +19,10 @@ const { state } = store( 'router', {
 			const force = e.target.dataset.forceNavigation === 'true';
 			const { timeout } = state;
 
-			const {
-				default: { actions: { navigate } },
-			} = yield import( '@wordpress/interactivity/router' );
-			yield navigate( e.target.href, { force, timeout } );
+			const { actions } = yield import(
+				"@wordpress/interactivity/router"
+			);
+			yield actions.navigate( e.target.href, { force, timeout } );
 
 			state.navigations -= 1;
 
