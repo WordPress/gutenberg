@@ -104,8 +104,6 @@ export default function useSyncPathWithURL() {
 			} else if (
 				// These sidebar paths are special in the sense that the url in these pages may or may not have a postId and we need to retain it if it has.
 				// The "type" property should be kept as well.
-				( navigatorLocation.path === '/page' &&
-					window?.__experimentalAdminViews ) ||
 				( navigatorLocation.path === '/wp_template' &&
 					window?.__experimentalAdminViews ) ||
 				( navigatorLocation.path === '/wp_template/all' &&
