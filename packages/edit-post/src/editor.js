@@ -42,35 +42,16 @@ function Editor( {
 			( select ) => {
 				const { isFeatureActive, getEditedPostTemplate } =
 					select( editPostStore );
-				const {
-					getEntityRecord,
-					getPostType,
-					getEntityRecords,
-					canUser,
-				} = select( coreStore );
+				const { getEntityRecord, getPostType, canUser } =
+					select( coreStore );
 				const { getEditorSettings } = select( editorStore );
-				const isTemplatePart = [ 'wp_template_part' ].includes(
-					currentPost.postType
+
+				const postObject = getEntityRecord(
+					'postType',
+					currentPost.postType,
+					currentPost.postId
 				);
-				// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
-				// to avoid the special case.
-				let postObject;
-				if ( isTemplatePart ) {
-					const posts = getEntityRecords(
-						'postType',
-						currentPost.postType,
-						{
-							wp_id: currentPost.postId,
-						}
-					);
-					postObject = posts?.[ 0 ];
-				} else {
-					postObject = getEntityRecord(
-						'postType',
-						currentPost.postType,
-						currentPost.postId
-					);
-				}
+
 				const supportsTemplateMode =
 					getEditorSettings().supportsTemplateMode;
 				const isViewable =
