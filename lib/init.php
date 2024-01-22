@@ -63,6 +63,9 @@ if ( ! function_exists( 'html_contains_block' ) ) {
 	 * Returns whether the given HTML contains a block
 	 * of the given type and, if provided,
 	 * a given attribute and attribute value.
+	 * 
+	 * Note that it's not possible to search for an attribute
+	 * whose value is `null`.
 	 *
 	 * @param  string  $html The html to search in.
 	 * @param  string  $block_name      Find this block type,
@@ -91,7 +94,7 @@ if ( ! function_exists( 'html_contains_block' ) ) {
 		 */
 		$pattern = sprintf(
 			'~<!--\s+?wp:%s\s+(?P<attrs>{(?:(?:[^}]+|}+(?=})|(?!}\s+/?-->).)*+)?}\s+)?/?-->~s',
-			preg_quote( $block_name, '~' )
+			preg_quote( str_replace( 'core/', '', $block_name ), '~' )
 		);
 
 		while ( 1 === preg_match( $pattern, $html, $matches, PREG_OFFSET_CAPTURE, $at ) ) {
@@ -102,7 +105,7 @@ if ( ! function_exists( 'html_contains_block' ) ) {
 			}
 
 			$attrs = json_decode( $matches['attrs'][0], /* as-associative */ true );
-			if ( ! array_key_exists( $attribute_name, $attrs ) ) {
+			if ( ! isset( $attrs[ $attribute_name ] ) ) {
 				continue;
 			}
 
