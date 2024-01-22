@@ -15,7 +15,9 @@ import {
 } from '../../utils/constants';
 
 export const DEFAULT_CONFIG_PER_VIEW_TYPE = {
-	[ LAYOUT_TABLE ]: {},
+	[ LAYOUT_TABLE ]: {
+		primaryField: 'title',
+	},
 	[ LAYOUT_GRID ]: {
 		mediaField: 'featured-image',
 		primaryField: 'title',

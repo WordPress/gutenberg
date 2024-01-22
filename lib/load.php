@@ -79,7 +79,10 @@ require __DIR__ . '/compat/wordpress-6.4/html-api/class-gutenberg-html-tag-proce
 require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-attribute-token-6-5.php';
 require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-span-6-5.php';
 require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-text-replacement-6-5.php';
+require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-open-elements-6-5.php';
+require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-processor-state-6-5.php';
 require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-tag-processor-6-5.php';
+require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-processor-6-5.php';
 
 /*
  * The HTML Processor appeared after WordPress 6.3. If Gutenberg is running on a version of
@@ -101,6 +104,7 @@ require __DIR__ . '/compat/wordpress-6.4/script-loader.php';
 require __DIR__ . '/compat/wordpress-6.4/kses.php';
 
 // WordPress 6.5 compat.
+require __DIR__ . '/compat/wordpress-6.5/blocks.php';
 require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
 require __DIR__ . '/compat/wordpress-6.5/class-wp-navigation-block-renderer.php';
 require __DIR__ . '/compat/wordpress-6.5/kses.php';
@@ -184,15 +188,6 @@ if (
 	require __DIR__ . '/experimental/fonts/font-face/bc-layer/class-wp-webfonts.php';
 	require __DIR__ . '/experimental/fonts/font-face/bc-layer/class-wp-web-fonts.php';
 } elseif ( ! class_exists( 'WP_Fonts' ) ) {
-
-	// Disables the Font Library.
-	// @core-merge: this should not go to core.
-	add_action(
-		'enqueue_block_editor_assets',
-		function () {
-			wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDisableFontLibrary = true', 'before' );
-		}
-	);
 
 	// Turns off Font Face hooks in Core.
 	// @since 6.4.0.

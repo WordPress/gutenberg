@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useCallback, RawHTML, useContext } from '@wordpress/element';
+import { memo, useCallback, RawHTML, useContext } from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -21,7 +21,7 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
-import { compose, pure } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 
 /**
@@ -133,6 +133,7 @@ function BlockListBlock( {
 			}
 			mayDisplayControls={ mayDisplayControls }
 			mayDisplayParentControls={ mayDisplayParentControls }
+			blockEditingMode={ context.blockEditingMode }
 		/>
 	);
 
@@ -482,7 +483,7 @@ BlockListBlock = compose(
 )( BlockListBlock );
 
 // This component provides all the information we need through a single store
-// subscription (useSelect mapping). Only the necesssary props are passed down
+// subscription (useSelect mapping). Only the necessary props are passed down
 // to the BlockListBlock component, which is a filtered component, so these
 // props are public API. To avoid adding to the public API, we use a private
 // context to pass the rest of the information to the filtered BlockListBlock
@@ -738,4 +739,4 @@ function BlockListBlockProvider( props ) {
 	);
 }
 
-export default pure( BlockListBlockProvider );
+export default memo( BlockListBlockProvider );
