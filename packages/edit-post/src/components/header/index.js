@@ -64,6 +64,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		hasBlockSelection,
 		hasActiveMetaboxes,
 		hasFixedToolbar,
+		isEditingTemplate,
 		isPublishSidebarOpened,
 		showIconLabels,
 		hasHistory,
@@ -77,6 +78,8 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			hasHistory: !! select( editorStore ).getEditorSettings().goBack,
+			isEditingTemplate:
+				select( editorStore ).getCurrentPostType() === 'wp_template',
 			isPublishSidebarOpened:
 				select( editPostStore ).isPublishSidebarOpened(),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
@@ -147,7 +150,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				<div
 					className={ classnames( 'edit-post-header__center', {
 						'is-collapsed':
-							hasHistory &&
+							isEditingTemplate &&
 							hasBlockSelection &&
 							! isBlockToolsCollapsed &&
 							hasFixedToolbar &&
