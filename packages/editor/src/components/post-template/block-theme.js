@@ -24,15 +24,19 @@ const POPOVER_PROPS = {
 };
 
 export default function BlockThemeControl( { id } ) {
-	const { isTemplateHidden, getPostLinkProps } = useSelect( ( select ) => {
-		const { getRenderingMode, getEditorSettings } = unlock(
-			select( editorStore )
-		);
-		return {
-			isTemplateHidden: getRenderingMode() === 'post-only',
-			getPostLinkProps: getEditorSettings().getPostLinkProps,
-		};
-	}, [] );
+	const { isTemplateHidden, getPostLinkProps, goBack } = useSelect(
+		( select ) => {
+			const { getRenderingMode, getEditorSettings } = unlock(
+				select( editorStore )
+			);
+			return {
+				isTemplateHidden: getRenderingMode() === 'post-only',
+				getPostLinkProps: getEditorSettings().getPostLinkProps,
+				goBack: getEditorSettings().goBack,
+			};
+		},
+		[]
+	);
 	const { editedRecord: template, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_template',
@@ -47,6 +51,7 @@ export default function BlockThemeControl( { id } ) {
 				canvas: 'edit',
 		  } )
 		: {};
+
 	if ( ! hasResolved ) {
 		return null;
 	}
@@ -75,6 +80,12 @@ export default function BlockThemeControl( { id } ) {
 									),
 									{
 										type: 'snackbar',
+										actions: [
+											{
+												label: __( 'Go back' ),
+												onClick: () => goBack(),
+											},
+										],
 									}
 								);
 							} }
