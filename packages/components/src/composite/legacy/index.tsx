@@ -33,10 +33,7 @@ export interface InitialStateProps {
 	shift?: boolean;
 }
 
-type Component = {
-	( ...any: any ): React.ReactElement | null;
-	displayName?: string;
-};
+type Component = React.FunctionComponent< any >;
 
 type CompositeStore = ReturnType< typeof Current.useCompositeStore >;
 type CompositeStoreState = { store: CompositeStore };
