@@ -15,7 +15,7 @@ import { DataViews } from '@wordpress/dataviews';
  * Internal dependencies
  */
 import Page from '../page';
-import Link from '../routes/link';
+import { default as Link, useLink } from '../routes/link';
 import {
 	DEFAULT_VIEWS,
 	DEFAULT_CONFIG_PER_VIEW_TYPE,
@@ -150,6 +150,42 @@ const STATUSES = [
 ];
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
+function FeaturedImage( { item, viewType } ) {
+	const { onClick } = useLink( {
+		postId: item.id,
+		postType: item.type,
+		canvas: 'edit',
+	} );
+	return (
+		<span
+			className={
+				viewType === LAYOUT_TABLE
+					? 'edit-site-page-pages__media-wrapper'
+					: ''
+			}
+		>
+			{ !! item.featured_media ? (
+				<button
+					className="page-pages-preview-field__button"
+					type="button"
+					onClick={ onClick }
+					aria-label={ item.title?.rendered || item.title }
+				>
+					<Media
+						className="edit-site-page-pages__featured-image"
+						id={ item.featured_media }
+						size={
+							viewType === LAYOUT_GRID
+								? [ 'large', 'full', 'medium', 'thumbnail' ]
+								: [ 'thumbnail', 'medium', 'large', 'full' ]
+						}
+					/>
+				</button>
+			) : null }
+		</span>
+	);
+}
+
 export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
@@ -243,35 +279,7 @@ export default function PagePages() {
 				header: __( 'Featured Image' ),
 				getValue: ( { item } ) => item.featured_media,
 				render: ( { item } ) => (
-					<span
-						className={
-							view.type === LAYOUT_TABLE
-								? 'edit-site-page-pages__media-wrapper'
-								: ''
-						}
-					>
-						{ !! item.featured_media ? (
-							<Media
-								className="edit-site-page-pages__featured-image"
-								id={ item.featured_media }
-								size={
-									view.type === LAYOUT_GRID
-										? [
-												'large',
-												'full',
-												'medium',
-												'thumbnail',
-										  ]
-										: [
-												'thumbnail',
-												'medium',
-												'large',
-												'full',
-										  ]
-								}
-							/>
-						) : null }
-					</span>
+					<FeaturedImage item={ item } viewType={ view.type } />
 				),
 				enableSorting: false,
 			},
