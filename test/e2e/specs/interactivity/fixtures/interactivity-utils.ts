@@ -29,7 +29,10 @@ export default class InteractivityUtils {
 		// this moment, as SSR for directives is not stabilized yet and we need
 		// to ensure hydration works, even when the SSR'ed HTML is not correct.
 		const url = new URL( link );
-		url.searchParams.append( 'disable_directives_ssr', 'true' );
+		url.searchParams.append(
+			'disable_server_directive_processing',
+			'true'
+		);
 		return url.href;
 	}
 

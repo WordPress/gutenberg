@@ -6,7 +6,7 @@
  * @subpackage Interactivity API
  */
 
-if ( ! function_exists( 'wp_process_directives_of_interactive_blocks' ) ) {
+if ( ! function_exists( 'wp_interactivity_process_directives_of_interactive_blocks' ) ) {
 	/**
 	 * Processes the directives on the rendered HTML of the interactive blocks.
 	 *
@@ -20,7 +20,7 @@ if ( ! function_exists( 'wp_process_directives_of_interactive_blocks' ) ) {
 	 * @param array $parsed_block The parsed block.
 	 * @return array The same parsed block.
 	 */
-	function wp_process_directives_of_interactive_blocks( $parsed_block ) {
+	function wp_interactivity_process_directives_of_interactive_blocks( $parsed_block ) {
 		static $root_interactive_block = null;
 
 		if ( null === $root_interactive_block ) {
@@ -45,7 +45,7 @@ if ( ! function_exists( 'wp_process_directives_of_interactive_blocks' ) ) {
 
 		return $parsed_block;
 	}
-	add_filter( 'render_block_data', 'wp_process_directives_of_interactive_blocks', 10, 1 );
+	add_filter( 'render_block_data', 'wp_interactivity_process_directives_of_interactive_blocks', 10, 1 );
 }
 
 if ( ! function_exists( 'wp_interactivity' ) ) {
