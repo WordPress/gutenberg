@@ -75,7 +75,7 @@ module.exports = {
 	plugins: [
 		...plugins?.filter(
 			( plugin ) =>
-				plugin.constructor.name !== 'DependencyExtractionWebpackPlugin'
+				plugin.constructor?.name !== 'DependencyExtractionWebpackPlugin'
 		),
 		// TODO: Move it to a different Webpack file.
 		new CopyWebpackPlugin( {
