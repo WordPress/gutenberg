@@ -164,6 +164,7 @@ function ButtonEdit( props ) {
 		text,
 		url,
 		width,
+		metadata,
 	} = attributes;
 
 	const TagName = tagName || 'a';
@@ -276,6 +277,7 @@ function ButtonEdit( props ) {
 					onReplace={ onReplace }
 					onMerge={ mergeBlocks }
 					identifier="text"
+					isContentBound={ metadata?.bindings?.text }
 				/>
 			</div>
 			<BlockControls group="block">
@@ -287,7 +289,7 @@ function ButtonEdit( props ) {
 						} }
 					/>
 				) }
-				{ ! isURLSet && isLinkTag && (
+				{ ! isURLSet && isLinkTag && ! metadata?.bindings?.url && (
 					<ToolbarButton
 						name="link"
 						icon={ link }
@@ -296,7 +298,7 @@ function ButtonEdit( props ) {
 						onClick={ startEditing }
 					/>
 				) }
-				{ isURLSet && isLinkTag && (
+				{ isURLSet && isLinkTag && ! metadata?.bindings?.url && (
 					<ToolbarButton
 						name="link"
 						icon={ linkOff }
@@ -307,43 +309,46 @@ function ButtonEdit( props ) {
 					/>
 				) }
 			</BlockControls>
-			{ isLinkTag && isSelected && ( isEditingURL || isURLSet ) && (
-				<Popover
-					placement="bottom"
-					onClose={ () => {
-						setIsEditingURL( false );
-						richTextRef.current?.focus();
-					} }
-					anchor={ popoverAnchor }
-					focusOnMount={ isEditingURL ? 'firstElement' : false }
-					__unstableSlotName={ '__unstable-block-tools-after' }
-					shift
-				>
-					<LinkControl
-						value={ linkValue }
-						onChange={ ( {
-							url: newURL,
-							opensInNewTab: newOpensInNewTab,
-							nofollow: newNofollow,
-						} ) =>
-							setAttributes(
-								getUpdatedLinkAttributes( {
-									rel,
-									url: newURL,
-									opensInNewTab: newOpensInNewTab,
-									nofollow: newNofollow,
-								} )
-							)
-						}
-						onRemove={ () => {
-							unlink();
+			{ isLinkTag &&
+				isSelected &&
+				( isEditingURL || isURLSet ) &&
+				! metadata?.bindings?.url && (
+					<Popover
+						placement="bottom"
+						onClose={ () => {
+							setIsEditingURL( false );
 							richTextRef.current?.focus();
 						} }
-						forceIsEditingLink={ isEditingURL }
-						settings={ LINK_SETTINGS }
-					/>
-				</Popover>
-			) }
+						anchor={ popoverAnchor }
+						focusOnMount={ isEditingURL ? 'firstElement' : false }
+						__unstableSlotName={ '__unstable-block-tools-after' }
+						shift
+					>
+						<LinkControl
+							value={ linkValue }
+							onChange={ ( {
+								url: newURL,
+								opensInNewTab: newOpensInNewTab,
+								nofollow: newNofollow,
+							} ) =>
+								setAttributes(
+									getUpdatedLinkAttributes( {
+										rel,
+										url: newURL,
+										opensInNewTab: newOpensInNewTab,
+										nofollow: newNofollow,
+									} )
+								)
+							}
+							onRemove={ () => {
+								unlink();
+								richTextRef.current?.focus();
+							} }
+							forceIsEditingLink={ isEditingURL }
+							settings={ LINK_SETTINGS }
+						/>
+					</Popover>
+				) }
 			<InspectorControls>
 				<WidthPanel
 					selectedWidth={ width }
