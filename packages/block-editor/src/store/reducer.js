@@ -2017,6 +2017,21 @@ export function lastFocus( state = false, action ) {
 	return state;
 }
 
+function blockBindingsSources( state = {}, action ) {
+	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
+		return {
+			...state,
+			[ action.sourceName ]: {
+				label: action.sourceLabel,
+				component: action.sourceComponent,
+				useSource: action.useSource,
+			},
+		};
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isTyping,
@@ -2047,6 +2062,7 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
+	blockBindingsSources,
 } );
 
 function withAutomaticChangeReset( reducer ) {
