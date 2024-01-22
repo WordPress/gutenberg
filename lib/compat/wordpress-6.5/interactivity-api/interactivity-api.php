@@ -2,7 +2,7 @@
 /**
  * Interactivity API: Functions and hooks
  *
- * @package Gutenberg
+ * @package WordPress
  * @subpackage Interactivity API
  */
 
