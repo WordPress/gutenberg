@@ -376,7 +376,7 @@ export function RichTextWrapper(
 					useFirefoxCompat(),
 					anchorRef,
 				] ) }
-				contentEditable={ true }
+				contentEditable={ props.isContentBound ? false : true }
 				suppressContentEditableWarning={ true }
 				className={ classnames(
 					'block-editor-rich-text__editable',
