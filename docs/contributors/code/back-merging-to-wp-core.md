@@ -1,4 +1,4 @@
-# Back Merging code to WordPress Core
+# Back-merging code to WordPress Core
 
 For major releases of the WordPress software, Gutenberg features need to be merged into WordPress Core. Typically this involves taking changes made in `.php` files within the Gutenberg repository and making the equivalent updates in the WP Core codebase.
 
