@@ -49,14 +49,13 @@ function Editor( {
 					canUser,
 				} = select( coreStore );
 				const { getEditorSettings } = select( editorStore );
-				const isTemplate = [
-					'wp_template',
-					'wp_template_part',
-				].includes( currentPost.postType );
+				const isTemplatePart = [ 'wp_template_part' ].includes(
+					currentPost.postType
+				);
 				// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
 				// to avoid the special case.
 				let postObject;
-				if ( isTemplate ) {
+				if ( isTemplatePart ) {
 					const posts = getEntityRecords(
 						'postType',
 						currentPost.postType,
@@ -84,7 +83,10 @@ function Editor( {
 						'preferredStyleVariations'
 					),
 					template:
-						supportsTemplateMode && isViewable && canEditTemplate
+						supportsTemplateMode &&
+						isViewable &&
+						canEditTemplate &&
+						currentPost.postType !== 'wp_template'
 							? getEditedPostTemplate()
 							: null,
 					post: postObject,
@@ -94,12 +96,15 @@ function Editor( {
 		);
 
 	const { updatePreferredStyleVariations } = useDispatch( editPostStore );
+	const defaultRenderingMode =
+		currentPost.postType === 'wp_template' ? 'all' : 'post-only';
 
 	const editorSettings = useMemo( () => {
 		const result = {
 			...settings,
 			getPostLinkProps,
 			goBack,
+			defaultRenderingMode,
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -114,6 +119,7 @@ function Editor( {
 		updatePreferredStyleVariations,
 		getPostLinkProps,
 		goBack,
+		defaultRenderingMode,
 	] );
 
 	if ( ! post ) {

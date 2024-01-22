@@ -45,7 +45,7 @@ function ModeSwitcher() {
 			isCodeEditingEnabled:
 				select( editorStore ).getEditorSettings().codeEditingEnabled,
 			isEditingTemplate:
-				select( editorStore ).getRenderingMode() === 'template-only',
+				select( editorStore ).getCurrentPostType() === 'wp_template',
 			mode: select( editPostStore ).getEditorMode(),
 		} ),
 		[]

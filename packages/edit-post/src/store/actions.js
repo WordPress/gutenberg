@@ -470,15 +470,6 @@ export function setIsEditingTemplate() {
 }
 
 /**
- * Switches to the template mode.
- */
-export const __unstableSwitchToTemplateMode =
-	() =>
-	( { registry } ) => {
-		registry.dispatch( editorStore ).setRenderingMode( 'template-only' );
-	};
-
-/**
  * Create a block based template.
  *
  * @deprecated
