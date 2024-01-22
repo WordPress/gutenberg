@@ -60,7 +60,9 @@ export default function useLayoutAreas() {
 		( path === '/wp_template' && window?.__experimentalAdminViews )
 	) {
 		const isListLayout =
-			isCustom !== 'true' && ( ! layout || layout === 'list' );
+			isCustom !== 'true' &&
+			( ! layout || layout === 'list' ) &&
+			window?.__experimentalAdminViews;
 		return {
 			areas: {
 				content: <PageTemplates />,
