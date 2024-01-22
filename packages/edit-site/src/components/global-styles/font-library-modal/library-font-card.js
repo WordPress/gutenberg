@@ -13,7 +13,8 @@ import { FontLibraryContext } from './context';
 function LibraryFontCard( { font, ...props } ) {
 	const { getFontFacesActivated } = useContext( FontLibraryContext );
 
-	const variantsInstalled = font.fontFace?.length || 1;
+	const variantsInstalled =
+		font?.fontFace?.length > 0 ? font.fontFace.length : 1;
 	const variantsActive = getFontFacesActivated(
 		font.slug,
 		font.source
