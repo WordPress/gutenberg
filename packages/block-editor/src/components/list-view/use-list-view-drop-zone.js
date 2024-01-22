@@ -550,7 +550,7 @@ export default function useListViewDropZone( {
 				rtl,
 			]
 		),
-		200
+		50
 	);
 
 	const ref = useDropZone( {
