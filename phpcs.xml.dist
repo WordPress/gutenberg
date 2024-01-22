@@ -156,10 +156,10 @@
 	<rule ref="Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses">
 		<include-pattern>./packages/block-library/src/*/*.php</include-pattern>
 		<properties>
-			<property name="restricted_functions" type="array">
+			<property name="forbidden_functions" type="array">
 				<element value="(G|g)utenberg.*"/>
 			</property>
-			<property name="restricted_classes" type="array">
+			<property name="forbidden_classes" type="array">
 				<element value="(G|g)utenberg.*"/>
 			</property>
 		</properties>
