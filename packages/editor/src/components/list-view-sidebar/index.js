@@ -123,6 +123,11 @@ export default function ListViewSidebar() {
 			<Tabs
 				onSelect={ ( tabName ) => setTab( tabName ) }
 				selectOnMove={ false }
+				// The initial tab value is set explicitly to avoid a an initial
+				// render where no tab is selected. This ensures that the
+				// tabpanel height is correct so the relevant scroll container
+				// can be rendered internally.
+				initialTabId="list-view"
 			>
 				<div className="edit-post-editor__document-overview-panel__header">
 					<Button
