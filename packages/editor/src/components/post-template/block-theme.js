@@ -24,10 +24,13 @@ const POPOVER_PROPS = {
 };
 
 export default function BlockThemeControl( { id } ) {
-	const { isTemplateHidden } = useSelect( ( select ) => {
-		const { getRenderingMode } = unlock( select( editorStore ) );
+	const { isTemplateHidden, getPostLinkProps } = useSelect( ( select ) => {
+		const { getRenderingMode, getEditorSettings } = unlock(
+			select( editorStore )
+		);
 		return {
 			isTemplateHidden: getRenderingMode() === 'post-only',
+			getPostLinkProps: getEditorSettings().getPostLinkProps,
 		};
 	}, [] );
 	const { editedRecord: template, hasResolved } = useEntityRecord(
@@ -38,7 +41,13 @@ export default function BlockThemeControl( { id } ) {
 	const { getEditorSettings } = useSelect( editorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { setRenderingMode } = useDispatch( editorStore );
-
+	const editTemplate = getPostLinkProps
+		? getPostLinkProps( {
+				postId: template.wp_id,
+				postType: 'wp_template',
+				canvas: 'edit',
+		  } )
+		: {};
 	if ( ! hasResolved ) {
 		return null;
 	}
@@ -58,8 +67,9 @@ export default function BlockThemeControl( { id } ) {
 				<>
 					<MenuGroup>
 						<MenuItem
-							onClick={ () => {
+							onClick={ ( event ) => {
 								setRenderingMode( 'template-only' );
+								editTemplate.onClick( event );
 								onClose();
 								createSuccessNotice(
 									__(
