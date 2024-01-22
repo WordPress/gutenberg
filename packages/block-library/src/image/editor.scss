@@ -27,6 +27,12 @@
 			opacity: 0;
 		}
 	}
+	.block-bindings-media-placeholder-message {
+		opacity: 0;
+	}
+	&.is-selected .block-bindings-media-placeholder-message {
+		opacity: 1;
+	}
 
 	// Remove the transition while we still have a legacy placeholder style.
 	// Otherwise the content jumps between the 1px placeholder border, and any inherited custom
@@ -37,7 +43,6 @@
 		transition: none;
 	}
 }
-
 
 figure.wp-block-image:not(.wp-block) {
 	margin: 0;
