@@ -557,7 +557,7 @@ export function getLayoutStyles( {
 					displayMode &&
 					validDisplayModes.includes( displayMode )
 				) {
-					ruleset += `${ selector } .${ className } { display:${ displayMode }; }`;
+					ruleset += `:where(${ selector } .${ className }) { display:${ displayMode }; }`;
 				}
 
 				if ( baseStyles?.length ) {
@@ -575,9 +575,9 @@ export function getLayoutStyles( {
 						}
 
 						if ( declarations.length ) {
-							const combinedSelector = `${ selector } .${ className }${
+							const combinedSelector = `:where(${ selector } .${ className }${
 								baseStyle?.selector || ''
-							}`;
+							})`;
 							ruleset += `${ combinedSelector } { ${ declarations.join(
 								'; '
 							) }; }`;

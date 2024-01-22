@@ -1519,7 +1519,7 @@ class WP_Theme_JSON_Gutenberg {
 						in_array( $layout_definition['displayMode'], $valid_display_modes, true )
 					) {
 						$layout_selector = sprintf(
-							'%s .%s',
+							':where(%s .%s)',
 							$selector,
 							$class_name
 						);
@@ -1552,7 +1552,7 @@ class WP_Theme_JSON_Gutenberg {
 							}
 
 							$layout_selector = sprintf(
-								'%s .%s%s',
+								':where(%s .%s%s)',
 								$selector,
 								$class_name,
 								$base_style_rule['selector']
