@@ -9,7 +9,7 @@
 
 namespace GutenbergCS\Gutenberg\Tests\CodeAnalysis;
 
-use GutenbergCS\Gutenberg\Sniffs\CodeAnalysis\RestrictedFunctionsAndClassesSniff;
+use GutenbergCS\Gutenberg\Sniffs\CodeAnalysis\ForbiddenFunctionsAndClassesSniff;
 use PHP_CodeSniffer\Config;
 use PHP_CodeSniffer\Tests\Standards\AbstractSniffUnitTest;
 use PHP_CodeSniffer\Ruleset;
@@ -17,7 +17,7 @@ use PHP_CodeSniffer\Ruleset;
 /**
  * Unit test class for the GuardedFunctionAndClassNames sniff.
  */
-final class RestrictedFunctionsAndClassesUnitTest extends AbstractSniffUnitTest {
+final class ForbiddenFunctionsAndClassesUnitTest extends AbstractSniffUnitTest {
 
 	/**
 	 * Holds the original Ruleset instance.
@@ -100,13 +100,13 @@ final class RestrictedFunctionsAndClassesUnitTest extends AbstractSniffUnitTest 
 		$current_ruleset                                  = clone self::$original_ruleset;
 		$GLOBALS['PHP_CODESNIFFER_RULESETS']['Gutenberg'] = $current_ruleset;
 
-		if ( ! isset( $current_ruleset->sniffs[ RestrictedFunctionsAndClassesSniff::class ] )
-		     || ( ! $current_ruleset->sniffs[ RestrictedFunctionsAndClassesSniff::class ] instanceof RestrictedFunctionsAndClassesSniff )
+		if ( ! isset( $current_ruleset->sniffs[ ForbiddenFunctionsAndClassesSniff::class ] )
+		     || ( ! $current_ruleset->sniffs[ ForbiddenFunctionsAndClassesSniff::class ] instanceof ForbiddenFunctionsAndClassesSniff )
 		) {
 			throw new \RuntimeException( 'Cannot set ruleset parameters required for this test.' );
 		}
 
-		$sniff           = $current_ruleset->sniffs[ RestrictedFunctionsAndClassesSniff::class ];
+		$sniff           = $current_ruleset->sniffs[ ForbiddenFunctionsAndClassesSniff::class ];
 		$sniff->restricted_functions = array(
 			'(G|g)utenberg.*',
 		);

@@ -20,7 +20,7 @@ use PHP_CodeSniffer\Sniffs\Sniff;
  *
  * @since   1.0.0
  */
-final class RestrictedFunctionsAndClassesSniff implements Sniff {
+final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 
 	/**
 	 * Holds regular expressions for classes whose usage is restricted.
