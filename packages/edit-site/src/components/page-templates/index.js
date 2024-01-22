@@ -16,7 +16,6 @@ import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { ENTER, SPACE } from '@wordpress/keycodes';
 import { parse } from '@wordpress/blocks';
 import {
 	BlockPreview,
@@ -53,12 +52,11 @@ import {
 import { postRevisionsAction } from '../actions';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
-import PostPreview from '../post-preview';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
@@ -156,18 +154,30 @@ function TemplatePreview( { content, viewType } ) {
 }
 
 export default function DataviewsTemplates() {
-	const [ templateId, setTemplateId ] = useState( null );
-	const [ view, setView ] = useState( DEFAULT_VIEW );
+	const { params } = useLocation();
+	const { layout } = params;
+	const defaultView = useMemo( () => {
+		return {
+			...DEFAULT_VIEW,
+			type: layout ?? DEFAULT_VIEW.type,
+		};
+	}, [ layout ] );
+	const [ view, setView ] = useState( defaultView );
 	const { records: allTemplates, isResolving: isLoadingData } =
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
 	const history = useHistory();
-
 	const onSelectionChange = useCallback(
-		( items ) =>
-			setTemplateId( items?.length === 1 ? items[ 0 ].id : null ),
-		[ setTemplateId ]
+		( items ) => {
+			if ( view?.type === LAYOUT_LIST ) {
+				history.push( {
+					...params,
+					postId: items.length === 1 ? items[ 0 ].id : undefined,
+				} );
+			}
+		},
+		[ history, params, view?.type ]
 	);
 
 	const onDetailsChange = useCallback(
@@ -348,90 +358,41 @@ export default function DataviewsTemplates() {
 						...defaultConfigPerViewType[ newView.type ],
 					},
 				};
+
+				history.push( {
+					...params,
+					layout: newView.type,
+				} );
 			}
 
 			setView( newView );
 		},
-		[ view.type, setView ]
+		[ view.type, setView, history, params ]
 	);
 
 	return (
-		<>
-			<Page
-				className={
-					view.type === LAYOUT_LIST
-						? 'edit-site-template-pages-list-view'
-						: null
-				}
-				title={ __( 'Templates' ) }
-				actions={
-					<AddNewTemplate
-						templateType={ TEMPLATE_POST_TYPE }
-						showIcon={ false }
-						toggleProps={ { variant: 'primary' } }
-					/>
-				}
-			>
-				<DataViews
-					paginationInfo={ paginationInfo }
-					fields={ fields }
-					actions={ actions }
-					data={ data }
-					isLoading={ isLoadingData }
-					view={ view }
-					onChangeView={ onChangeView }
-					onSelectionChange={ onSelectionChange }
-					onDetailsChange={ onDetailsChange }
-					deferredRendering={
-						! view.hiddenFields?.includes( 'preview' )
-					}
+		<Page
+			title={ __( 'Templates' ) }
+			actions={
+				<AddNewTemplate
+					templateType={ TEMPLATE_POST_TYPE }
+					showIcon={ false }
+					toggleProps={ { variant: 'primary' } }
 				/>
-			</Page>
-			{ view.type === LAYOUT_LIST && (
-				<Page>
-					<div
-						className="edit-site-template-pages-preview"
-						tabIndex={ 0 }
-						role="button"
-						onKeyDown={ ( event ) => {
-							const { keyCode } = event;
-							if ( keyCode === ENTER || keyCode === SPACE ) {
-								history.push( {
-									postId: templateId,
-									postType: TEMPLATE_POST_TYPE,
-									canvas: 'edit',
-								} );
-							}
-						} }
-						onClick={ () =>
-							history.push( {
-								postId: templateId,
-								postType: TEMPLATE_POST_TYPE,
-								canvas: 'edit',
-							} )
-						}
-					>
-						{ templateId !== null ? (
-							<PostPreview
-								postId={ templateId }
-								postType={ TEMPLATE_POST_TYPE }
-							/>
-						) : (
-							<div
-								style={ {
-									display: 'flex',
-									flexDirection: 'column',
-									justifyContent: 'center',
-									textAlign: 'center',
-									height: '100%',
-								} }
-							>
-								<p>{ __( 'Select a template to preview' ) }</p>
-							</div>
-						) }
-					</div>
-				</Page>
-			) }
-		</>
+			}
+		>
+			<DataViews
+				paginationInfo={ paginationInfo }
+				fields={ fields }
+				actions={ actions }
+				data={ data }
+				isLoading={ isLoadingData }
+				view={ view }
+				onChangeView={ onChangeView }
+				onSelectionChange={ onSelectionChange }
+				onDetailsChange={ onDetailsChange }
+				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
+			/>
+		</Page>
 	);
 }

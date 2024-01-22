@@ -26,4 +26,42 @@ describe( 'Video block', () => {
 
 		expect( screen.getByText( 'Invalid URL.' ) ).toBeVisible();
 	} );
+
+	it( 'should render empty state when source is not present', async () => {
+		await initializeEditor( {
+			initialHtml: `
+<!-- wp:video -->
+<figure class="wp-block-video"></figure>
+<!-- /wp:video -->
+		`,
+		} );
+		const addVideoButton = screen.queryByText( 'Add video' );
+		expect( addVideoButton ).toBeVisible();
+	} );
+
+	it( 'should not render empty state when video source is present', async () => {
+		await initializeEditor( {
+			initialHtml: `
+<!-- wp:video {"id":1234} -->
+<figure class="wp-block-video"><video controls src="https://VIDEO_URL.mp4"></video></figure>
+<!-- /wp:video -->
+		`,
+		} );
+		const addVideoButton = screen.queryByText( 'Add video' );
+		expect( addVideoButton ).toBeNull();
+	} );
+
+	it( `should not render empty state when 'guid' and 'id' attributes are present`, async () => {
+		await initializeEditor( {
+			initialHtml: `
+<!-- wp:video {"guid":"ABCD1234","id":1234 -->
+<figure class="wp-block-video wp-block-embed is-type-video is-provider-videopress"><div class="wp-block-embed__wrapper">
+https://videopress.com/<VIDEO_ID>
+</div></figure>
+<!-- /wp:video -->
+		`,
+		} );
+		const addVideoButton = screen.queryByText( 'Add video' );
+		expect( addVideoButton ).toBeNull();
+	} );
 } );

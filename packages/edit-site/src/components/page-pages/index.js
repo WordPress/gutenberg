@@ -10,7 +10,6 @@ import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
-import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -38,7 +37,6 @@ import {
 	viewPostAction,
 	useEditPostAction,
 } from '../actions';
-import PostPreview from '../post-preview';
 import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
@@ -46,13 +44,24 @@ const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
-function useView( type ) {
-	const {
-		params: { activeView = 'all', isCustom = 'false' },
-	} = useLocation();
-	const selectedDefaultView =
-		isCustom === 'false' &&
-		DEFAULT_VIEWS[ type ].find( ( { slug } ) => slug === activeView )?.view;
+function useView( postType ) {
+	const { params } = useLocation();
+	const { activeView = 'all', isCustom = 'false', layout } = params;
+	const history = useHistory();
+	const selectedDefaultView = useMemo( () => {
+		const defaultView =
+			isCustom === 'false' &&
+			DEFAULT_VIEWS[ postType ].find(
+				( { slug } ) => slug === activeView
+			)?.view;
+		if ( isCustom === 'false' && layout ) {
+			return {
+				...defaultView,
+				type: layout,
+			};
+		}
+		return defaultView;
+	}, [ isCustom, activeView, layout, postType ] );
 	const [ view, setView ] = useState( selectedDefaultView );
 
 	useEffect( () => {
@@ -107,13 +116,26 @@ function useView( type ) {
 		[ editEntityRecord, editedViewRecord?.id ]
 	);
 
+	const setDefaultViewAndUpdateUrl = useCallback(
+		( viewToSet ) => {
+			if ( viewToSet.type !== view?.type ) {
+				history.push( {
+					...params,
+					layout: viewToSet.type,
+				} );
+			}
+			setView( viewToSet );
+		},
+		[ params, view?.type, history ]
+	);
+
 	if ( isCustom === 'false' ) {
-		return [ view, setView ];
+		return [ view, setDefaultViewAndUpdateUrl ];
 	} else if ( isCustom === 'true' && customView ) {
 		return [ customView, setCustomView ];
 	}
 	// Loading state where no the view was not found on custom views or default views.
-	return [ DEFAULT_VIEWS[ type ][ 0 ].view, setView ];
+	return [ DEFAULT_VIEWS[ postType ][ 0 ].view, setDefaultViewAndUpdateUrl ];
 }
 
 // See https://github.com/WordPress/gutenberg/issues/55886
@@ -131,12 +153,20 @@ const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'tra
 export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
-	const [ pageId, setPageId ] = useState( null );
 	const history = useHistory();
+	const { params } = useLocation();
+	const { isCustom = 'false' } = params;
 
 	const onSelectionChange = useCallback(
-		( items ) => setPageId( items?.length === 1 ? items[ 0 ].id : null ),
-		[ setPageId ]
+		( items ) => {
+			if ( isCustom === 'false' && view?.type === LAYOUT_LIST ) {
+				history.push( {
+					...params,
+					postId: items.length === 1 ? items[ 0 ].id : undefined,
+				} );
+			}
+		},
+		[ history, params, view?.type, isCustom ]
 	);
 
 	const onDetailsChange = useCallback(
@@ -366,85 +396,33 @@ export default function PagePages() {
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
-		<>
-			<Page
-				className={
-					view.type === LAYOUT_LIST
-						? 'edit-site-page-pages-list-view'
-						: null
-				}
-				title={ __( 'Pages' ) }
-				actions={
-					<>
-						<Button variant="primary" onClick={ openModal }>
-							{ __( 'Add new page' ) }
-						</Button>
-						{ showAddPageModal && (
-							<AddNewPageModal
-								onSave={ handleNewPage }
-								onClose={ closeModal }
-							/>
-						) }
-					</>
-				}
-			>
-				<DataViews
-					paginationInfo={ paginationInfo }
-					fields={ fields }
-					actions={ actions }
-					data={ pages || EMPTY_ARRAY }
-					isLoading={ isLoadingPages || isLoadingAuthors }
-					view={ view }
-					onChangeView={ onChangeView }
-					onSelectionChange={ onSelectionChange }
-					onDetailsChange={ onDetailsChange }
-				/>
-			</Page>
-			{ view.type === LAYOUT_LIST && (
-				<Page>
-					<div
-						className="edit-site-page-pages-preview"
-						tabIndex={ 0 }
-						role="button"
-						onKeyDown={ ( event ) => {
-							const { keyCode } = event;
-							if ( keyCode === ENTER || keyCode === SPACE ) {
-								history.push( {
-									postId: pageId,
-									postType,
-									canvas: 'edit',
-								} );
-							}
-						} }
-						onClick={ () =>
-							history.push( {
-								postId: pageId,
-								postType,
-								canvas: 'edit',
-							} )
-						}
-					>
-						{ pageId !== null ? (
-							<PostPreview
-								postId={ pageId }
-								postType={ postType }
-							/>
-						) : (
-							<div
-								style={ {
-									display: 'flex',
-									flexDirection: 'column',
-									justifyContent: 'center',
-									textAlign: 'center',
-									height: '100%',
-								} }
-							>
-								<p>{ __( 'Select a page to preview' ) }</p>
-							</div>
-						) }
-					</div>
-				</Page>
-			) }
-		</>
+		<Page
+			title={ __( 'Pages' ) }
+			actions={
+				<>
+					<Button variant="primary" onClick={ openModal }>
+						{ __( 'Add new page' ) }
+					</Button>
+					{ showAddPageModal && (
+						<AddNewPageModal
+							onSave={ handleNewPage }
+							onClose={ closeModal }
+						/>
+					) }
+				</>
+			}
+		>
+			<DataViews
+				paginationInfo={ paginationInfo }
+				fields={ fields }
+				actions={ actions }
+				data={ pages || EMPTY_ARRAY }
+				isLoading={ isLoadingPages || isLoadingAuthors }
+				view={ view }
+				onChangeView={ onChangeView }
+				onSelectionChange={ onSelectionChange }
+				onDetailsChange={ onDetailsChange }
+			/>
+		</Page>
 	);
 }

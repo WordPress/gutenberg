@@ -15,6 +15,7 @@ import {
 	privateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useEntityProp } from '@wordpress/core-data';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 
 /**
@@ -38,12 +39,12 @@ export const format = {
 	},
 	interactive: true,
 	contentEditable: false,
-	[ usesContextKey ]: [ 'postType' ],
+	[ usesContextKey ]: [ 'postType', 'postId' ],
 	edit: function Edit( {
 		value,
 		onChange,
 		isObjectActive,
-		context: { postType },
+		context: { postType, postId },
 	} ) {
 		const registry = useRegistry();
 		const {
@@ -74,6 +75,9 @@ export const format = {
 			return parentCoreBlocks && parentCoreBlocks.length > 0;
 		}, [] );
 
+		const [ meta ] = useEntityProp( 'postType', postType, 'meta', postId );
+		const footnotesSupported = 'string' === typeof meta?.footnotes;
+
 		const { selectionChange, insertBlock } =
 			useDispatch( blockEditorStore );
 
@@ -81,7 +85,7 @@ export const format = {
 			return null;
 		}
 
-		if ( postType !== 'post' && postType !== 'page' ) {
+		if ( ! footnotesSupported ) {
 			return null;
 		}
 
