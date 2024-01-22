@@ -2486,7 +2486,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * @param string $expected  Expected block style variation CSS selector.
 	 */
 	public function test_get_block_style_variation_selector( $selector, $expected ) {
-		$actual = WP_Theme_JSON_Gutenberg::get_block_style_variation_selector( 'custom', $selector );
+		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
+
+		$func = $theme_json->getMethod( 'get_block_style_variation_selector' );
+		$func->setAccessible( true );
+
+		$actual = $func->invoke( null, 'custom', $selector );
+
 		$this->assertEquals( $expected, $actual );
 	}
 
