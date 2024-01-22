@@ -5,6 +5,11 @@ const { join } = require( 'path' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 
 /**
+ * WordPress dependencies
+ */
+const DEWP = require( '@wordpress/dependency-extraction-webpack-plugin' );
+
+/**
  * Internal dependencies
  */
 const { baseConfig, plugins } = require( './shared' );
@@ -32,11 +37,8 @@ module.exports = {
 		},
 		path: join( __dirname, '..', '..' ),
 		environment: { module: true },
-	},
-	externalsType: 'module',
-	externals: {
-		'@wordpress/interactivity': '@wordpress/interactivity',
-		'@wordpress/interactivity/router': '@wordpress/interactivity/router',
+		module: true,
+		chunkFormat: 'module',
 	},
 	resolve: {
 		extensions: [ '.js', '.ts', '.tsx' ],
@@ -80,6 +82,10 @@ module.exports = {
 					to: './build/modules/importmap-polyfill.min.js',
 				},
 			],
+		} ),
+		new DEWP( {
+			requestToExternalModule: ( request ) =>
+				request === '@wordpress/interactivity/router',
 		} ),
 	],
 	watchOptions: {
