@@ -141,8 +141,14 @@ function register_block_core_query() {
 		gutenberg_register_module(
 			'@wordpress/block-library/query',
 			'/wp-content/plugins/gutenberg/build/interactivity/query.min.js',
-			array( '@wordpress/interactivity', '@wordpress/interactivity/router' ),
-			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+			array(
+				'@wordpress/interactivity',
+				array(
+					'id'   => '@wordpress/interactivity/router',
+					'type' => 'dynamic',
+				),
+			),
+			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' ),
 		);
 	}
 }

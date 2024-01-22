@@ -153,7 +153,7 @@ pages.set(
 	Promise.resolve( regionsToVdom( document ) )
 );
 
-export default store( 'core/router', {
+export const { state, actions } = store( 'core/router', {
 	actions: {
 		*navigate( ...args ) {
 			return yield navigate( ...args );
