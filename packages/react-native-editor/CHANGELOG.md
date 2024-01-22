@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.110.1
 -   [**] Fix crash when RichText values are not defined [#58088]
 
 ## 1.110.0
