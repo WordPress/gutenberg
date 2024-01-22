@@ -131,7 +131,7 @@ export default function ListViewSidebar() {
 			>
 				<div className="edit-post-editor__document-overview-panel__header">
 					<Button
-						className="edit-post-editor__document-overview-panel__close-button"
+						className="editor-list-view-sidebar__close-button"
 						icon={ closeSmall }
 						label={ __( 'Close' ) }
 						onClick={ closeListView }
@@ -148,19 +148,15 @@ export default function ListViewSidebar() {
 
 				<Tabs.TabPanel
 					ref={ listViewContainerRef }
-					className="edit-post-editor__list-view-container"
+					className="editor-list-view-sidebar__list-view-container"
 					tabId="list-view"
 					focusable={ false }
 				>
-					<div className="edit-post-editor__list-view-panel-content">
+					<div className="editor-list-view-sidebar__list-view-panel-content">
 						<ListView dropZoneElement={ dropZoneElement } />
 					</div>
 				</Tabs.TabPanel>
-				<Tabs.TabPanel
-					className="editor-list-view-sidebar__list-view-container"
-					tabId="outline"
-					focusable={ false }
-				>
+				<Tabs.TabPanel tabId="outline" focusable={ false }>
 					<ListViewOutline />
 				</Tabs.TabPanel>
 			</Tabs>
