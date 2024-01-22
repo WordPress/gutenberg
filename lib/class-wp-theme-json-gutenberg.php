@@ -3896,22 +3896,18 @@ class WP_Theme_JSON_Gutenberg {
 			return $variation_class;
 		}
 
+		$limit          = 1;
 		$selector_parts = explode( ',', $block_selector );
 		$result         = array();
 
 		foreach ( $selector_parts as $part ) {
-			$class_added = false;
-			$result[]    = preg_replace_callback(
+			$result[] = preg_replace_callback(
 				'/((?::is|not|has|where\([^)]+\))?\s*)([^\s:]+)/',
-				function ( $matches ) use ( $variation_class, &$class_added ) {
-					if ( $class_added ) {
-						return $matches[0];
-					}
-
-					$class_added = true;
+				function ( $matches ) use ( $variation_class ) {
 					return $matches[1] . $matches[2] . $variation_class;
 				},
-				$part
+				$part,
+				$limit
 			);
 		}
 
