@@ -33,7 +33,8 @@ function HeadingEdit( {
 	style,
 	clientId,
 } ) {
-	const { textAlign, content, level, placeholder, anchor } = attributes;
+	const { textAlign, content, level, placeholder, anchor, metadata } =
+		attributes;
 	const tagName = 'h' + level;
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -138,6 +139,7 @@ function HeadingEdit( {
 				onRemove={ () => onReplace( [] ) }
 				placeholder={ placeholder || __( 'Heading' ) }
 				textAlign={ textAlign }
+				isContentBound={ metadata?.bindings?.content }
 				{ ...( Platform.isNative && { deleteEnter: true } ) } // setup RichText on native mobile to delete the "Enter" key as it's handled by the JS/RN side
 				{ ...blockProps }
 			/>
