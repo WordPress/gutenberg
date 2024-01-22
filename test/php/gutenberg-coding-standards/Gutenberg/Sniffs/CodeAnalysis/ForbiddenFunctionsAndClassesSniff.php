@@ -14,7 +14,7 @@ use PHP_CodeSniffer\Sniffs\Sniff;
 
 /**
  * This sniff enforces usage restrictions on specific classes and functions within the Gutenberg project.
- * While it permits the declaration of these classes/functions, their actual usage in code is restricted based on defined regular expressions.
+ * While it permits the declaration of these classes/functions, their actual usage in code is forbidden based on defined regular expressions.
  *
  * @package gutenberg/gutenberg-coding-standards
  *
@@ -23,22 +23,22 @@ use PHP_CodeSniffer\Sniffs\Sniff;
 final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 
 	/**
-	 * Holds regular expressions for classes whose usage is restricted.
+	 * Holds regular expressions for classes whose usage is forbidden.
 	 * Note that declaring functions with names matching these regular expressions is still permitted.
 	 * Useful for enforcing security or architectural constraints.
 	 *
-	 * @var array Array of regex patterns for restricted classes.
+	 * @var array Array of regex patterns for forbidden classes.
 	 */
-	public $restricted_classes = array();
+	public $forbidden_classes = array();
 
 	/**
-	 * Holds regular expressions for classes whose usage is restricted.
+	 * Holds regular expressions for classes whose usage is forbidden.
 	 * Note that declaring classes with names matching these regular expressions is still permitted.
 	 * Useful for enforcing security or architectural constraints.
 	 *
-	 * @var array Array of regex patterns for restricted functions.
+	 * @var array Array of regex patterns for forbidden functions.
 	 */
-	public $restricted_functions = array();
+	public $forbidden_functions = array();
 
 	/**
 	 * Registers the tokens that this sniff wants to listen for.
@@ -73,7 +73,7 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	 * @return void
 	 */
 	private function process_string_token( File $phpcs_file, $stack_pointer ) {
-		if ( empty( $this->restricted_functions ) && empty( $this->restricted_classes ) ) {
+		if ( empty( $this->forbidden_functions ) && empty( $this->forbidden_classes ) ) {
 			// Nothing to process.
 			return;
 		}
@@ -102,7 +102,7 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	}
 
 	/**
-	 * Checks for restricted class usage.
+	 * Checks for forbidden class usage.
 	 *
 	 * @param File $phpcs_file    File being scanned.
 	 * @param int  $stack_pointer Position of the text token in the token stack.
@@ -113,8 +113,8 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 		$tokens     = $phpcs_file->getTokens();
 		$class_name = $tokens[ $stack_pointer ]['content'];
 
-		foreach ( $this->restricted_classes as $restricted_class ) {
-			$regexp = sprintf( '/^%s$/', $restricted_class );
+		foreach ( $this->forbidden_classes as $forbidden_class ) {
+			$regexp = sprintf( '/^%s$/', $forbidden_class );
 			if ( 1 !== preg_match( $regexp, $class_name ) ) {
 				// The class has a valid name; bypassing further checks.
 				return;
@@ -126,7 +126,7 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	}
 
 	/**
-	 * Checks for restricted function usage.
+	 * Checks for forbidden function usage.
 	 *
 	 * @param File $phpcs_file    File being scanned.
 	 * @param int  $stack_pointer Position of the text token in the token stack.
@@ -137,7 +137,7 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 		$tokens        = $phpcs_file->getTokens();
 		$function_name = $tokens[ $stack_pointer ]['content'];
 
-		foreach ( $this->restricted_functions as $disallowed_function_call ) {
+		foreach ( $this->forbidden_functions as $disallowed_function_call ) {
 			$regexp = sprintf( '/^%s$/', $disallowed_function_call );
 			if ( 1 !== preg_match( $regexp, $function_name ) ) {
 				// The function has a valid name; bypassing further checks.
@@ -154,8 +154,8 @@ final class ForbiddenFunctionsAndClassesSniff implements Sniff {
 	 * after the class properties have been set.
 	 */
 	private function on_register_event() {
-		$this->restricted_classes   = self::sanitize( $this->restricted_classes );
-		$this->restricted_functions = self::sanitize( $this->restricted_functions );
+		$this->forbidden_classes   = self::sanitize( $this->forbidden_classes );
+		$this->forbidden_functions = self::sanitize( $this->forbidden_functions );
 	}
 
 	/**

@@ -107,11 +107,11 @@ final class ForbiddenFunctionsAndClassesUnitTest extends AbstractSniffUnitTest {
 		}
 
 		$sniff           = $current_ruleset->sniffs[ ForbiddenFunctionsAndClassesSniff::class ];
-		$sniff->restricted_functions = array(
+		$sniff->forbidden_functions = array(
 			'(G|g)utenberg.*',
 		);
 
-		$sniff->restricted_classes = array(
+		$sniff->forbidden_classes = array(
 			'(G|g)utenberg.*',
 		);
 	}
