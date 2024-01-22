@@ -338,7 +338,36 @@ function register_block_core_navigation_link_variation( $variation ) {
 		return;
 	}
 
-	$navigation_block_type->variations[] = $variation;
+	$navigation_block_type->variations = array_merge(
+		$navigation_block_type->variations,
+		array( $variation )
+	);
+}
+
+/**
+ * Unregister a variation for a post type / taxonomy for the navigation link block.
+ *
+ * @param string $name Name of the post type / taxonomy (which was used as variation name).
+ * @return void
+ */
+function block_core_navigation_link_unregister_variation( $name ) {
+	// Directly get the variations from the registered block type
+	// because there's no server side (un)registration for variations (see #47170).
+	$navigation_block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/navigation-link' );
+	// If the block is not registered (yet), there's no need to remove a variation.
+	if ( ! $navigation_block_type || empty( $navigation_block_type->variations ) ) {
+		return;
+	}
+	$variations = $navigation_block_type->variations;
+	// Search for the variation and remove it from the array.
+	foreach ( $variations as $i => $variation ) {
+		if ( $variation['name'] === $name ) {
+			unset( $variations[ $i ] );
+			break;
+		}
+	}
+	// Reindex array after removing one variation.
+	$navigation_block_type->variations = array_values( $variations );
 }
 
 /**
