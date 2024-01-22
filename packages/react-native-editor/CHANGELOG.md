@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Fix crash when RichText values are not defined [#58088]
 
 ## 1.110.0
 -   [*] [internal] Move InserterButton from components package to block-editor package [#56494]
