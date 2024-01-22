@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [**] Video block: Fix logic for displaying empty state based on source presence [#58015]
+-   [**] Fix crash when RichText values are not defined [#58088]
 
 ## 1.111.0
 -   [**] Image block media uploads display a custom error message when there is no internet connection [#56937]
