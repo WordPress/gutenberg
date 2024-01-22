@@ -55,13 +55,10 @@ export default function useLayoutAreas() {
 	}
 
 	// Templates
-	if (
-		path === '/wp_template/all' ||
-		( path === '/wp_template' && window?.__experimentalAdminViews )
-	) {
+	if ( path === '/wp_template/all' ) {
 		const isListLayout =
 			isCustom !== 'true' &&
-			( ! layout || layout === 'list' ) &&
+			layout === 'list' &&
 			window?.__experimentalAdminViews;
 		return {
 			areas: {
