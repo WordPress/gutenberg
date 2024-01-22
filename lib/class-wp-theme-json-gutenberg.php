@@ -186,9 +186,7 @@ class WP_Theme_JSON_Gutenberg {
 			'use_default_names' => false,
 			'value_key'         => 'shadow',
 			'css_vars'          => '--wp--preset--shadow--$slug',
-			'classes'           => array(
-				'.has-$slug-shadow' => 'box-shadow',
-			),
+			'classes'           => array(),
 			'properties'        => array( 'box-shadow' ),
 		),
 	);

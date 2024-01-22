@@ -88,7 +88,7 @@ export default function EffectsPanel( {
 		: [];
 	const setShadow = ( newValue ) => {
 		const slug = mergedShadowPresets?.find(
-			( { shadow: s } ) => s === newValue
+			( { shadow: shadowName } ) => shadowName === newValue
 		)?.slug;
 
 		onChange(
