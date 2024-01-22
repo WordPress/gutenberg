@@ -338,7 +338,7 @@ function block_core_navigation_link_register_variation( $variation ) {
 		return;
 	}
 
-	$navigation_block_type->variations = array_merge( $navigation_block_type->variations, $variation );
+	$navigation_block_type->variations = array_merge( $navigation_block_type->variations, array( $variation ) );
 }
 
 /**
