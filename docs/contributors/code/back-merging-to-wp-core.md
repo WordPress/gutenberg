@@ -19,7 +19,6 @@ The following directories/files do _not_ require back-merging to WP Core:
 -   `packages`
     -   `block-library` - this is handled automatically during the packages sync process.
     -   `e2e-tests/plugins` - PHP files related to e2e tests only. Mostly fixture data generators.
--   ## `phpunit`
 
 Please note this list is not exhaustive.
 
