@@ -78,22 +78,17 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 	}
 }
 
-$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-if ( $gutenberg_experiments && (
-	array_key_exists( 'gutenberg-block-bindings', $gutenberg_experiments )
-) ) {
+require_once __DIR__ . '/block-bindings/index.php';
 
-	require_once __DIR__ . '/block-bindings/index.php';
-
-	if ( ! function_exists( 'gutenberg_process_block_bindings' ) ) {
-		/**
-		 * Process the block bindings attribute.
-		 *
-		 * @param string   $block_content Block Content.
-		 * @param array    $block Block attributes.
-		 * @param WP_Block $block_instance The block instance.
-		 */
-		function gutenberg_process_block_bindings( $block_content, $block, $block_instance ) {
+if ( ! function_exists( 'gutenberg_process_block_bindings' ) ) {
+	/**
+	 * Process the block bindings attribute.
+	 *
+	 * @param string   $block_content Block Content.
+	 * @param array    $block Block attributes.
+	 * @param WP_Block $block_instance The block instance.
+	 */
+	function gutenberg_process_block_bindings( $block_content, $block, $block_instance ) {
 
 			// Allowed blocks that support block bindings.
 			// TODO: Look for a mechanism to opt-in for this. Maybe adding a property to block attributes?
@@ -157,8 +152,7 @@ if ( $gutenberg_experiments && (
 				$modified_block_content = wp_block_bindings_replace_html( $modified_block_content, $block_instance->name, $binding_attribute, $source_value );
 			}
 			return $modified_block_content;
-		}
 	}
-
-	add_filter( 'render_block', 'gutenberg_process_block_bindings', 20, 3 );
 }
+
+add_filter( 'render_block', 'gutenberg_process_block_bindings', 20, 3 );
