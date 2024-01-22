@@ -386,6 +386,320 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		await expect( blockLibrary ).toBeHidden();
 	} );
+
+	test( 'should insert block with the slash inserter when using multiple words', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '/tag cloud' );
+
+		await expect(
+			page.getByRole( 'option', { name: 'Tag Cloud', selected: true } )
+		).toBeVisible();
+		await page.keyboard.press( 'Enter' );
+
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Tag Cloud' } )
+		).toBeVisible();
+	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/23263
+	test( 'inserts blocks at root level when using the root appender while selection is in an inner block', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/buttons' } );
+
+		// After inserting the Buttons block the inner button block should be selected.
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Button text' } )
+		).toBeFocused();
+		await page.keyboard.type( '1.1' );
+
+		// The block appender is only visible when there's no selection.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
+
+		// Insert a new block using the root appender.
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add block' } )
+			.click();
+		await page
+			.getByRole( 'searchbox', {
+				name: 'Search for blocks and patterns',
+			} )
+			.fill( 'Paragraph' );
+		await page.getByRole( 'option', { name: 'Paragraph' } ).click();
+		await page.keyboard.type( '2' );
+
+		// Should show a buttons block followed by a paragraph.
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/buttons' },
+				{ name: 'core/paragraph' },
+			] );
+	} );
+
+	// // Check for regression of https://github.com/WordPress/gutenberg/issues/24262.
+	test( 'inserts a block in proper place after having clicked `Browse All` from inline inserter', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'First paragraph' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '## Heading' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Second paragraph' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Third paragraph' );
+
+		const boundingBox = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.boundingBox();
+
+		// Using the between inserter.
+		await page.mouse.move(
+			boundingBox.x + boundingBox.width / 2,
+			boundingBox.y - 10,
+			{ steps: 10 }
+		);
+
+		await page
+			.getByRole( 'button', {
+				name: 'Add block',
+			} )
+			.click();
+		await page.getByRole( 'button', { name: 'Browse All' } ).click();
+		await page
+			.getByRole( 'listbox', { name: 'Media' } )
+			.getByRole( 'option', { name: 'Image' } )
+			.click();
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph' },
+				{ name: 'core/image' },
+				{ name: 'core/heading' },
+				{ name: 'core/paragraph' },
+				{ name: 'core/paragraph' },
+			] );
+	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/25785.
+	test( 'inserts a block should show a blue line indicator', async ( {
+		admin,
+		editor,
+		page,
+		insertingBlocksUtils,
+	} ) => {
+		await admin.createNewPost();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'First paragraph' );
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const paragraphBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+
+		await editor.selectBlocks( paragraphBlock );
+		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.click();
+		await page
+			.getByRole( 'listbox', { name: 'Text' } )
+			.getByRole( 'option', { name: 'Heading' } )
+			.hover();
+
+		await expect( insertingBlocksUtils.indicator ).toBeVisible();
+
+		const paragraphBoundingBox = await paragraphBlock.boundingBox();
+		const indicatorBoundingBox =
+			await insertingBlocksUtils.indicator.boundingBox();
+
+		// Expect the indicator to be below the selected block.
+		expect( indicatorBoundingBox.y ).toBeGreaterThan(
+			paragraphBoundingBox.y
+		);
+	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/24403.
+	test( 'inserts a block in proper place after having clicked `Browse All` from block appender', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/group' } );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph after group' },
+		} );
+
+		await editor.canvas
+			.getByRole( 'button', {
+				name: 'Group: Gather blocks in a container.',
+			} )
+			.click();
+		await editor.canvas
+			.getByRole( 'button', {
+				name: 'Add block',
+			} )
+			.click();
+		await page.getByRole( 'button', { name: 'Browse All' } ).click();
+		await page
+			.getByRole( 'listbox', { name: 'Text' } )
+			.getByRole( 'option', { name: 'Paragraph' } )
+			.click();
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.fill( 'Paragraph inside group' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Paragraph inside group' },
+					},
+				],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Paragraph after group' },
+			},
+		] );
+	} );
+
+	test( 'passes the search value in the main inserter when clicking `Browse all`', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/group' } );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph after group' },
+		} );
+
+		await editor.canvas
+			.getByRole( 'button', {
+				name: 'Group: Gather blocks in a container.',
+			} )
+			.click();
+		await editor.canvas
+			.getByRole( 'button', {
+				name: 'Add block',
+			} )
+			.click();
+
+		const searchBox = page.getByRole( 'searchbox', {
+			name: 'Search for blocks and patterns',
+		} );
+
+		await searchBox.fill( 'Verse' );
+		await page.getByRole( 'button', { name: 'Browse All' } ).click();
+
+		await expect( searchBox ).toHaveValue( 'Verse' );
+		await expect(
+			page.getByRole( 'listbox', { name: 'Blocks' } )
+		).toHaveCount( 1 );
+	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/27586.
+	test( 'can close the main inserter after inserting a single-use block, like the More block', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.click();
+		await page.getByRole( 'option', { name: 'More', exact: true } ).click();
+
+		// Moving focus to the More block should close the inserter.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Read more' } )
+			.fill( 'More' );
+		await expect(
+			page.getByRole( 'region', {
+				name: 'Block Library',
+			} )
+		).toBeHidden();
+	} );
+
+	test( 'shows block preview when hovering over block in inserter', async ( {
+		admin,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.click();
+		await page
+			.getByRole( 'listbox', { name: 'Text' } )
+			.getByRole( 'option', { name: 'Paragraph' } )
+			.hover();
+
+		await expect(
+			page.locator( '.block-editor-inserter__preview' )
+		).toBeInViewport();
+	} );
+
+	[ 'large', 'small' ].forEach( ( viewport ) => {
+		test( `last-inserted block should be given and keep the selection (${ viewport } viewport)`, async ( {
+			admin,
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await pageUtils.setBrowserViewport( viewport );
+			await admin.createNewPost();
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Testing inserted block selection' },
+			} );
+
+			await page
+				.getByRole( 'toolbar', { name: 'Document tools' } )
+				.getByRole( 'button', { name: 'Toggle block inserter' } )
+				.click();
+			await page
+				.getByRole( 'listbox', { name: 'Media' } )
+				.getByRole( 'option', { name: 'Image' } )
+				.click();
+
+			await expect(
+				editor.canvas.getByRole( 'document', { name: 'Block: Image' } )
+			).toBeVisible();
+			await expect
+				.poll( () =>
+					page.evaluate(
+						() =>
+							window.wp.data
+								.select( 'core/block-editor' )
+								.getSelectedBlock()?.name
+					)
+				)
+				.toBe( 'core/image' );
+		} );
+	} );
 } );
 
 test.describe( 'insert media from inserter', () => {
