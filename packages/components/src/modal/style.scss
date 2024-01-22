@@ -160,7 +160,7 @@
 	}
 
 	&.is-scrollable:focus-visible {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
