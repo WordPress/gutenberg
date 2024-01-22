@@ -4,11 +4,7 @@
 	flex-grow: 1;
 	overflow: hidden;
 	margin: 0;
-	margin-top: $header-height;
-	@include break-medium() {
-		border-radius: 8px;
-		margin: $canvas-padding $canvas-padding $canvas-padding 0;
-	}
+	height: 100%;
 }
 
 .edit-site-page-header {
