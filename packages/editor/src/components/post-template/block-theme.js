@@ -24,18 +24,19 @@ const POPOVER_PROPS = {
 };
 
 export default function BlockThemeControl( { id } ) {
-	const { isTemplateHidden, getPostLinkProps, getEditorSettings } = useSelect(
-		( select ) => {
+	const { isTemplateHidden, getPostLinkProps, getEditorSettings, hasGoBack } =
+		useSelect( ( select ) => {
 			const { getRenderingMode, getEditorSettings: _getEditorSettings } =
 				unlock( select( editorStore ) );
+			const editorSettings = _getEditorSettings();
 			return {
 				isTemplateHidden: getRenderingMode() === 'post-only',
-				getPostLinkProps: _getEditorSettings().getPostLinkProps,
+				getPostLinkProps: editorSettings.getPostLinkProps,
 				getEditorSettings: _getEditorSettings,
+				hasGoBack: editorSettings.hasOwnProperty( 'goBack' ),
 			};
-		},
-		[]
-	);
+		}, [] );
+
 	const { editedRecord: template, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_template',
@@ -54,7 +55,14 @@ export default function BlockThemeControl( { id } ) {
 	if ( ! hasResolved ) {
 		return null;
 	}
-
+	const notificationAction = hasGoBack
+		? [
+				{
+					label: __( 'Go back' ),
+					onClick: () => getEditorSettings().goBack(),
+				},
+		  ]
+		: undefined;
 	return (
 		<DropdownMenu
 			popoverProps={ POPOVER_PROPS }
@@ -79,13 +87,7 @@ export default function BlockThemeControl( { id } ) {
 									),
 									{
 										type: 'snackbar',
-										actions: [
-											{
-												label: __( 'Go back' ),
-												onClick: () =>
-													getEditorSettings().goBack(),
-											},
-										],
+										actions: notificationAction,
 									}
 								);
 							} }

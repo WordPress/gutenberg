@@ -22,22 +22,29 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 export default function SiteEditorCanvas() {
-	const { templateType, isFocusMode, isViewMode } = useSelect( ( select ) => {
-		const { getEditedPostType, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
+	const location = useLocation();
+	const { templateType, isFocusableEntity, isViewMode } = useSelect(
+		( select ) => {
+			const { getEditedPostType, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
 
-		const _templateType = getEditedPostType();
+			const _templateType = getEditedPostType();
 
-		return {
-			templateType: _templateType,
-			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
-			isViewMode: getCanvasMode() === 'view',
-		};
-	}, [] );
-
+			return {
+				templateType: _templateType,
+				isFocusableEntity: FOCUSABLE_ENTITIES.includes( _templateType ),
+				isViewMode: getCanvasMode() === 'view',
+			};
+		},
+		[]
+	);
+	const isFocusMode = location.params.focusMode || isFocusableEntity;
 	const [ resizeObserver, sizes ] = useResizeObserver();
 
 	const settings = useSiteEditorSettings();
