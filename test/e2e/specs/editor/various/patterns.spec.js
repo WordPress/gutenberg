@@ -18,7 +18,7 @@ test.describe( 'Unsynced pattern', () => {
 		await requestUtils.deleteAllPatternCategories();
 	} );
 
-	test.only( 'create a new unsynced pattern via the block options menu', async ( {
+	test( 'create a new unsynced pattern via the block options menu', async ( {
 		editor,
 		page,
 	} ) => {
