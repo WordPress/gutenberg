@@ -163,7 +163,7 @@ function ListViewComponent(
 	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone( {
 		dropZoneElement,
 		expandedState,
-		setExpandedState
+		setExpandedState,
 	} );
 	const elementRef = useRef();
 
