@@ -19,6 +19,7 @@ const meta: Meta< typeof Theme > = {
 		background: { control: { type: 'color' } },
 	},
 	parameters: {
+		badges: [ 'private' ],
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
