@@ -27,7 +27,6 @@ import useSyncPathWithURL, {
 import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
 import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
-import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SidebarNavigationScreenTemplatesBrowseDataviews from '../sidebar-navigation-screen-templates-browse-dataviews';
 import SaveHub from '../save-hub';
 import { unlock } from '../../lock-unlock';
@@ -82,11 +81,8 @@ function SidebarScreens() {
 			<SidebarScreenWrapper path="/patterns">
 				<SidebarNavigationScreenPatterns />
 			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/:postType(wp_template)/all">
+			<SidebarScreenWrapper path="/:postType(wp_template|wp_template_part)/all">
 				<SidebarNavigationScreenTemplatesBrowseDataviews />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/:postType(wp_template_part)/all">
-				<SidebarNavigationScreenTemplatesBrowse />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/:postType(wp_template_part|wp_block)/:postId">
 				<SidebarNavigationScreenPattern />

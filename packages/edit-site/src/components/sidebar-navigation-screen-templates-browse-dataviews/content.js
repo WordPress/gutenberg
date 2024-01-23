@@ -9,7 +9,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import DataViewItem from '../sidebar-dataviews/dataview-item';
 import { useAddedBy } from '../list/added-by';
 import { layout } from '@wordpress/icons';
@@ -30,13 +29,15 @@ function TemplateDataviewItem( { template, isActive } ) {
 	);
 }
 
-export default function DataviewsTemplatesSidebarContent( { activeView } ) {
-	const { records: allTemplates, isResolving: isLoadingData } =
-		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
-			per_page: -1,
-		} );
+export default function DataviewsTemplatesSidebarContent( {
+	activeView,
+	postType,
+} ) {
+	const { records } = useEntityRecords( 'postType', postType, {
+		per_page: -1,
+	} );
 	const firstItemPerAuthorText = useMemo( () => {
-		const firstItemPerAuthor = allTemplates?.reduce( ( acc, template ) => {
+		const firstItemPerAuthor = records?.reduce( ( acc, template ) => {
 			const author = template.author_text;
 			if ( author && ! acc[ author ] ) {
 				acc[ author ] = template;
@@ -47,8 +48,8 @@ export default function DataviewsTemplatesSidebarContent( { activeView } ) {
 			( firstItemPerAuthor && Object.values( firstItemPerAuthor ) ) ??
 			EMPTY_ARRAY
 		);
-	}, [ allTemplates ] );
-	console.error( { allTemplates, isLoadingData, firstItemPerAuthorText } );
+	}, [ records ] );
+
 	return (
 		<ItemGroup>
 			<DataViewItem

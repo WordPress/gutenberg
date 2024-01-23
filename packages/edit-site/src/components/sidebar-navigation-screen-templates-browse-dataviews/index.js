@@ -59,7 +59,10 @@ export default function SidebarNavigationScreenTemplatesBrowse() {
 			description={ config[ postType ].description }
 			backPath={ config[ postType ].backPath }
 			content={
-				<DataviewsTemplatesSidebarContent activeView={ activeView } />
+				<DataviewsTemplatesSidebarContent
+					activeView={ activeView }
+					postType={ postType }
+				/>
 			}
 		/>
 	);
