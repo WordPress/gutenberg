@@ -62,13 +62,13 @@ export const format = {
 					return false;
 				}
 
-				const { meta } = select( coreDataStore ).getEntityRecord(
+				const entityRecord = select( coreDataStore ).getEntityRecord(
 					'postType',
 					postType,
 					postId
 				);
 
-				if ( 'string' !== typeof meta?.footnotes ) {
+				if ( 'string' !== typeof entityRecord?.meta?.footnotes ) {
 					return false;
 				}
 
