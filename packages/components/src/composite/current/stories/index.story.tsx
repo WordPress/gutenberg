@@ -34,6 +34,28 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		CompositeItem,
 	},
+	parameters: {
+		docs: {
+			source: { transform },
+			extractArgTypes: ( component: React.FunctionComponent ) => {
+				const name = component.displayName;
+				const path = name
+					?.replace(
+						/([a-z])([A-Z])/g,
+						( _, a, b ) => `${ a }-${ b.toLowerCase() }`
+					)
+					.toLowerCase();
+				const url = `https://ariakit.org/reference/${ path }`;
+				return {
+					props: {
+						name: 'Props',
+						description: `See <a href="${ url }">Ariakit docs</a> for <code>${ name }</code>`,
+						table: { type: { summary: undefined } },
+					},
+				};
+			},
+		},
+	},
 };
 export default meta;
 
@@ -60,7 +82,4 @@ export const Default: StoryFn< typeof Composite > = ( { ...initialState } ) => {
 			</CompositeRow>
 		</Composite>
 	);
-};
-Default.parameters = {
-	docs: { source: { transform } },
 };
