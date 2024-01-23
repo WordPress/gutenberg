@@ -163,10 +163,6 @@ function Preview( { content, viewType } ) {
 export default function PageTemplatesTemplateParts( { postType } ) {
 	const { params } = useLocation();
 	const { activeView = 'all', layout } = params;
-	const { records: allTemplates, isResolving: isLoadingData } =
-		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
-			per_page: -1,
-		} );
 	const defaultView = useMemo( () => {
 		return {
 			...DEFAULT_VIEW,
@@ -202,6 +198,13 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 		} ) );
 	}, [ activeView ] );
 
+	const { records, isResolving: isLoadingData } = useEntityRecords(
+		'postType',
+		TEMPLATE_POST_TYPE,
+		{
+			per_page: -1,
+		}
+	);
 	const history = useHistory();
 	const onSelectionChange = useCallback(
 		( items ) => {
