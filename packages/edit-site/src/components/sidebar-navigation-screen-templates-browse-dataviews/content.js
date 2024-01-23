@@ -4,7 +4,6 @@
 import { useEntityRecords } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -32,6 +31,7 @@ function TemplateDataviewItem( { template, isActive } ) {
 export default function DataviewsTemplatesSidebarContent( {
 	activeView,
 	postType,
+	config,
 } ) {
 	const { records } = useEntityRecords( 'postType', postType, {
 		per_page: -1,
@@ -54,7 +54,7 @@ export default function DataviewsTemplatesSidebarContent( {
 		<ItemGroup>
 			<DataViewItem
 				slug={ 'all' }
-				title={ __( 'All templates' ) }
+				title={ config[ postType ].title }
 				icon={ layout }
 				isActive={ activeView === 'all' }
 				isCustom="false"

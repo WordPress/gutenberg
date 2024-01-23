@@ -62,6 +62,7 @@ export default function SidebarNavigationScreenTemplatesBrowse() {
 				<DataviewsTemplatesSidebarContent
 					activeView={ activeView }
 					postType={ postType }
+					config={ config }
 				/>
 			}
 		/>
