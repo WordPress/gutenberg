@@ -2,6 +2,7 @@
  * External dependencies
  */
 import removeAccents from 'remove-accents';
+import classNames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -143,9 +144,7 @@ function Preview( { content, viewType } ) {
 		postType: item.type,
 		canvas: 'edit',
 	} );
-	if ( ! blocks?.length ) {
-		return null;
-	}
+	const isEmpty = ! blocks?.length;
 	// Wrap everything in a block editor provider to ensure 'styles' that are needed
 	// for the previews are synced between the site editor store and the block editor store.
 	// Additionally we need to have the `__experimentalBlockPatterns` setting in order to
@@ -160,12 +159,16 @@ function Preview( { content, viewType } ) {
 				style={ { backgroundColor } }
 			>
 				<button
-					className="page-templates-preview-field__button"
+					className={ classNames(
+						'page-templates-preview-field__button',
+						{ 'is-inactive': isEmpty }
+					) }
 					type="button"
-					onClick={ onClick }
+					onClick={ ! isEmpty ? onClick : undefined }
 					aria-label={ item.title?.rendered || item.title }
+					aria-disabled={ isEmpty }
 				>
-					<BlockPreview blocks={ blocks } />
+					{ ! isEmpty && <BlockPreview blocks={ blocks } /> }
 				</button>
 			</div>
 		</ExperimentalBlockEditorProvider>

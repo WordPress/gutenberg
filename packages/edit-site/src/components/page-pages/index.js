@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
@@ -40,6 +45,7 @@ import {
 import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
+
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
@@ -156,21 +162,24 @@ function FeaturedImage( { item, viewType } ) {
 		postType: item.type,
 		canvas: 'edit',
 	} );
+	const hasMedia = !! item.featured_media;
 	return (
 		<span
-			className={
-				viewType === LAYOUT_TABLE
-					? 'edit-site-page-pages__media-wrapper'
-					: ''
-			}
+			className={ {
+				'edit-site-page-pages__media-wrapper':
+					viewType === LAYOUT_TABLE,
+			} }
 		>
-			{ !! item.featured_media ? (
-				<button
-					className="page-pages-preview-field__button"
-					type="button"
-					onClick={ onClick }
-					aria-label={ item.title?.rendered || item.title }
-				>
+			<button
+				className={ classNames( 'page-pages-preview-field__button', {
+					'is-inactive': ! hasMedia,
+				} ) }
+				type="button"
+				onClick={ hasMedia ? onClick : undefined }
+				aria-label={ item.title?.rendered || item.title }
+				aria-disabled={ ! hasMedia }
+			>
+				{ hasMedia && (
 					<Media
 						className="edit-site-page-pages__featured-image"
 						id={ item.featured_media }
@@ -180,8 +189,8 @@ function FeaturedImage( { item, viewType } ) {
 								: [ 'thumbnail', 'medium', 'large', 'full' ]
 						}
 					/>
-				</button>
-			) : null }
+				) }
+			</button>
 		</span>
 	);
 }
