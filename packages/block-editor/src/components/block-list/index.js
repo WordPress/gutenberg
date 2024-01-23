@@ -155,25 +155,38 @@ function Items( {
 	__experimentalAppenderTagName,
 	layout = defaultLayout,
 } ) {
-	const { order, temporarilyEditingAsBlocks } = useSelect(
-		( select ) => {
-			const {
-				getBlockOrderWithAsyncFlag,
-				__unstableGetTemporarilyEditingAsBlocks,
-			} = unlock( select( blockEditorStore ) );
-			return {
-				order: getBlockOrderWithAsyncFlag( rootClientId ),
-				temporarilyEditingAsBlocks:
-					__unstableGetTemporarilyEditingAsBlocks(),
-			};
-		},
-		[ rootClientId ]
-	);
+	const { order, selectedBlocks, visibleBlocks, temporarilyEditingAsBlocks } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockOrder,
+					getSelectedBlockClientIds,
+					__unstableGetVisibleBlocks,
+					__unstableGetTemporarilyEditingAsBlocks,
+				} = select( blockEditorStore );
+				return {
+					order: getBlockOrder( rootClientId ),
+					selectedBlocks: getSelectedBlockClientIds(),
+					visibleBlocks: __unstableGetVisibleBlocks(),
+					temporarilyEditingAsBlocks:
+						__unstableGetTemporarilyEditingAsBlocks(),
+				};
+			},
+			[ rootClientId ]
+		);
 
 	return (
 		<LayoutProvider value={ layout }>
-			{ order.map( ( { clientId, isAsync } ) => (
-				<AsyncModeProvider key={ clientId } value={ isAsync }>
+			{ order.map( ( clientId ) => (
+				<AsyncModeProvider
+					key={ clientId }
+					value={
+						// Only provide data asynchronously if the block is
+						// not visible and not selected.
+						! visibleBlocks.has( clientId ) &&
+						! selectedBlocks.includes( clientId )
+					}
+				>
 					<BlockListBlock
 						rootClientId={ rootClientId }
 						clientId={ clientId }
