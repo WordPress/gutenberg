@@ -49,6 +49,7 @@ export function BlockRemovalWarningModal( { rules } ) {
 	return (
 		<Modal
 			title={ __( 'Be careful!' ) }
+			overlayClassName="block-editor-block-removal-warning-modal"
 			onRequestClose={ clearBlockRemovalPrompt }
 		>
 			<p>

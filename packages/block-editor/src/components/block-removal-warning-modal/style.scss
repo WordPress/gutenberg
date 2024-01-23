@@ -1,0 +1,7 @@
+.block-editor-block-removal-warning-modal {
+	.components-modal__frame {
+		@include break-small() {
+			max-width: $break-mobile;
+		}
+	}
+}
