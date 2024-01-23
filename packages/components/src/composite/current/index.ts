@@ -19,4 +19,4 @@ export {
 } from '@ariakit/react';
 
 /* eslint-disable-next-line no-restricted-imports */
-export type { CompositeStore } from '@ariakit/react';
+export type { CompositeStore, CompositeStoreProps } from '@ariakit/react';

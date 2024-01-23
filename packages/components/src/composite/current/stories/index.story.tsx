@@ -11,16 +11,29 @@ import { isRTL } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { Composite, CompositeRow, CompositeItem, useCompositeStore } from '..';
+import {
+	Composite,
+	CompositeGroup,
+	CompositeRow,
+	CompositeItem,
+	useCompositeStore,
+} from '..';
+import { UseCompositeStorePlaceholder, transform } from './utils';
 
-type InitialState = Parameters< typeof useCompositeStore >[ 0 ];
-
-const Placeholder = ( _: InitialState ) => <></>;
-
-const meta: Meta< typeof Placeholder > = {
-	title: 'Components/Composite/Composite (New)',
-	id: 'components-composite-new',
-	component: Placeholder,
+const meta: Meta< typeof UseCompositeStorePlaceholder > = {
+	title: 'Components/Composite/Composite (Current)',
+	id: 'components-composite-current',
+	component: UseCompositeStorePlaceholder,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		Composite,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		CompositeGroup,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		CompositeRow,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		CompositeItem,
+	},
 };
 export default meta;
 
@@ -29,22 +42,25 @@ export const Default: StoryFn< typeof Composite > = ( { ...initialState } ) => {
 	const store = useCompositeStore( { rtl, ...initialState } );
 
 	return (
-		<Composite store={ store } aria-label="Ariakit Composite">
-			<CompositeRow>
-				<CompositeItem>Item A1</CompositeItem>
-				<CompositeItem>Item A2</CompositeItem>
-				<CompositeItem>Item A3</CompositeItem>
+		<Composite role="grid" store={ store } aria-label="Ariakit Composite">
+			<CompositeRow role="row">
+				<CompositeItem role="gridcell">Item A1</CompositeItem>
+				<CompositeItem role="gridcell">Item A2</CompositeItem>
+				<CompositeItem role="gridcell">Item A3</CompositeItem>
 			</CompositeRow>
-			<CompositeRow>
-				<CompositeItem>Item B1</CompositeItem>
-				<CompositeItem>Item B2</CompositeItem>
-				<CompositeItem>Item B3</CompositeItem>
+			<CompositeRow role="row">
+				<CompositeItem role="gridcell">Item B1</CompositeItem>
+				<CompositeItem role="gridcell">Item B2</CompositeItem>
+				<CompositeItem role="gridcell">Item B3</CompositeItem>
 			</CompositeRow>
-			<CompositeRow>
-				<CompositeItem>Item C1</CompositeItem>
-				<CompositeItem>Item C2</CompositeItem>
-				<CompositeItem>Item C3</CompositeItem>
+			<CompositeRow role="row">
+				<CompositeItem role="gridcell">Item C1</CompositeItem>
+				<CompositeItem role="gridcell">Item C2</CompositeItem>
+				<CompositeItem role="gridcell">Item C3</CompositeItem>
 			</CompositeRow>
 		</Composite>
 	);
+};
+Default.parameters = {
+	docs: { source: { transform } },
 };
