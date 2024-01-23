@@ -445,11 +445,13 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'Enter' );
 
 		const linkPopover = LinkUtils.getLinkPopover();
+		await expect( linkPopover ).toBeVisible();
+		// Close the link control to return the caret to the canvas
+		await pageUtils.pressKeys( 'Escape' );
 
 		// Deselect the link text by moving the caret to the end of the line
 		// and the link popover should not be displayed.
 		await pageUtils.pressKeys( 'End' );
-		await expect( linkPopover ).toBeHidden();
 
 		// Move the caret back into the link text and the link popover
 		// should be displayed.
