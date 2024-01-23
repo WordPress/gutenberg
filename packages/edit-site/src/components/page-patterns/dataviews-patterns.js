@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -109,6 +104,23 @@ const SYNC_FILTERS = [
 	},
 ];
 
+function PreviewWrapper( { item, onClick, ariaDescribedBy, children } ) {
+	if ( item.type === PATTERN_TYPES.theme ) {
+		return children;
+	}
+	return (
+		<button
+			className="page-patterns-preview-field__button"
+			type="button"
+			onClick={ onClick }
+			aria-label={ item.title }
+			aria-describedby={ ariaDescribedBy }
+		>
+			{ children }
+		</button>
+	);
+}
+
 function Preview( { item, categoryId, viewType } ) {
 	const descriptionId = useId();
 	const isUserPattern = item.type === PATTERN_TYPES.user;
@@ -147,18 +159,10 @@ function Preview( { item, categoryId, viewType } ) {
 				className={ `page-patterns-preview-field is-viewtype-${ viewType }` }
 				style={ { backgroundColor } }
 			>
-				<button
-					className={ classnames(
-						'page-patterns-preview-field__button',
-						{ 'is-inactive': isNonUserPattern }
-					) }
-					type="button"
-					onClick={
-						item.type !== PATTERN_TYPES.theme ? onClick : undefined
-					}
-					aria-disabled={ item.type === PATTERN_TYPES.theme }
-					aria-label={ item.title }
-					aria-describedby={
+				<PreviewWrapper
+					item={ item }
+					onClick={ onClick }
+					ariaDescribedBy={
 						ariaDescriptions.length
 							? ariaDescriptions
 									.map(
@@ -172,7 +176,7 @@ function Preview( { item, categoryId, viewType } ) {
 					{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
 					{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
 					{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
-				</button>
+				</PreviewWrapper>
 			</div>
 			{ ariaDescriptions.map( ( ariaDescription, index ) => (
 				<div

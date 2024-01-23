@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classNames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
@@ -171,11 +166,10 @@ function FeaturedImage( { item, viewType } ) {
 			} }
 		>
 			<button
-				className={ classNames( 'page-pages-preview-field__button' ) }
+				className="page-pages-preview-field__button"
 				type="button"
 				onClick={ onClick }
-				aria-label={ item.title?.rendered || item.title }
-				aria-disabled={ ! hasMedia }
+				aria-label={ item.title?.rendered || __( '(no title)' ) }
 			>
 				{ hasMedia && (
 					<Media

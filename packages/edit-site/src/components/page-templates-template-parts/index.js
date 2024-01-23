@@ -2,7 +2,6 @@
  * External dependencies
  */
 import removeAccents from 'remove-accents';
-import classNames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -159,13 +158,10 @@ function Preview( { content, viewType } ) {
 				style={ { backgroundColor } }
 			>
 				<button
-					className={ classNames(
-						'page-templates-preview-field__button'
-					) }
+					className="page-templates-preview-field__button"
 					type="button"
 					onClick={ onClick }
 					aria-label={ item.title?.rendered || item.title }
-					aria-disabled={ isEmpty }
 				>
 					{ ! isEmpty && <BlockPreview blocks={ blocks } /> }
 				</button>
