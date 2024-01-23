@@ -167,8 +167,15 @@ export const deleteTemplateAction = {
 export const renameTemplateAction = {
 	id: 'rename-template',
 	label: __( 'Rename' ),
-	isEligible: ( template ) =>
-		isTemplateRemovable( template ) && template.is_custom,
+	isEligible: ( template ) => {
+		if (
+			! isTemplateRemovable( template ) ||
+			( template.type === TEMPLATE_POST_TYPE && ! template.is_custom )
+		) {
+			return false;
+		}
+		return true;
+	},
 	RenderModal: ( { items: templates, closeModal } ) => {
 		const template = templates[ 0 ];
 		const title = decodeEntities( template.title.rendered );
