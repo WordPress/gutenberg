@@ -221,6 +221,7 @@ export function useBlockSettings( name, parentLayout ) {
 		isTextEnabled,
 		isHeadingEnabled,
 		isButtonEnabled,
+		shadow,
 	] = useSettings(
 		'background.backgroundImage',
 		'background.backgroundSize',
@@ -268,7 +269,8 @@ export function useBlockSettings( name, parentLayout ) {
 		'color.link',
 		'color.text',
 		'color.heading',
-		'color.button'
+		'color.button',
+		'shadow'
 	);
 
 	const rawSettings = useMemo( () => {
@@ -345,6 +347,7 @@ export function useBlockSettings( name, parentLayout ) {
 			},
 			layout,
 			parentLayout,
+			shadow,
 		};
 	}, [
 		backgroundImage,
@@ -395,6 +398,7 @@ export function useBlockSettings( name, parentLayout ) {
 		isTextEnabled,
 		isHeadingEnabled,
 		isButtonEnabled,
+		shadow,
 	] );
 
 	return useSettingsForBlockElement( rawSettings, name );

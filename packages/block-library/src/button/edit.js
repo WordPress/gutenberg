@@ -32,6 +32,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
+	__experimentalUseShadowProps as useShadowProps,
 	__experimentalLinkControl as LinkControl,
 	__experimentalGetElementClassName,
 	store as blockEditorStore,
@@ -184,6 +185,7 @@ function ButtonEdit( props ) {
 	const borderProps = useBorderProps( attributes );
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
+	const shadowProps = useShadowProps( attributes );
 	const ref = useRef();
 	const richTextRef = useRef();
 	const blockProps = useBlockProps( {
@@ -266,6 +268,7 @@ function ButtonEdit( props ) {
 						...borderProps.style,
 						...colorProps.style,
 						...spacingProps.style,
+						...shadowProps.style,
 					} }
 					onSplit={ ( value ) =>
 						createBlock( 'core/button', {

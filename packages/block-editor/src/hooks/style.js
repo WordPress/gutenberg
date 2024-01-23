@@ -28,6 +28,11 @@ import {
 	DimensionsPanel,
 } from './dimensions';
 import {
+	EFFECTS_SUPPORT_KEYS,
+	SHADOW_SUPPORT_KEY,
+	EffectsPanel,
+} from './effects';
+import {
 	shouldSkipSerialization,
 	useStyleOverride,
 	useBlockSettings,
@@ -37,6 +42,7 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
+	...EFFECTS_SUPPORT_KEYS,
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
 	DIMENSIONS_SUPPORT_KEY,
@@ -110,6 +116,7 @@ const skipSerializationPathsEdit = {
 	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		SPACING_SUPPORT_KEY,
 	],
+	[ `${ SHADOW_SUPPORT_KEY }` ]: [ SHADOW_SUPPORT_KEY ],
 };
 
 /**
@@ -336,6 +343,7 @@ function BlockStyleControls( {
 			<TypographyPanel { ...passedProps } />
 			<BorderPanel { ...passedProps } />
 			<DimensionsPanel { ...passedProps } />
+			<EffectsPanel { ...passedProps } />
 		</>
 	);
 }
