@@ -171,11 +171,12 @@ function FontLibraryProvider( { children } ) {
 
 	const getAvailableFontsOutline = ( availableFontFamilies ) => {
 		const outline = availableFontFamilies.reduce( ( acc, font ) => {
-			const availableFontFaces = Array.isArray( font?.fontFace )
-				? font?.fontFace.map(
-						( face ) => `${ face.fontStyle + face.fontWeight }`
-				  )
-				: [ 'normal400' ]; // If the font doesn't have fontFace, we assume it is a system font and we add the defaults: normal 400
+			const availableFontFaces =
+				font?.fontFace && font.fontFace?.length > 0
+					? font?.fontFace.map(
+							( face ) => `${ face.fontStyle + face.fontWeight }`
+					  )
+					: [ 'normal400' ]; // If the font doesn't have fontFace, we assume it is a system font and we add the defaults: normal 400
 
 			acc[ font.slug ] = availableFontFaces;
 			return acc;
@@ -224,26 +225,35 @@ function FontLibraryProvider( { children } ) {
 
 			// Collect font faces that have already been installed (to be activated later)
 			const alreadyInstalledFontFaces =
-				installedFontFamily.fontFace.filter( ( fontFaceToInstall ) =>
-					checkFontFaceInstalled(
-						fontFaceToInstall,
-						fontFamilyToInstall.fontFace
-					)
-				);
+				installedFontFamily.fontFace && fontFamilyToInstall.fontFace
+					? installedFontFamily.fontFace.filter(
+							( fontFaceToInstall ) =>
+								checkFontFaceInstalled(
+									fontFaceToInstall,
+									fontFamilyToInstall.fontFace
+								)
+					  )
+					: [];
 
 			// Filter out Font Faces that have already been installed (so that they are not re-installed)
-			fontFamilyToInstall.fontFace = fontFamilyToInstall.fontFace.filter(
-				( fontFaceToInstall ) =>
-					! checkFontFaceInstalled(
-						fontFaceToInstall,
-						installedFontFamily.fontFace
-					)
-			);
+			if (
+				installedFontFamily.fontFace &&
+				fontFamilyToInstall.fontFace
+			) {
+				fontFamilyToInstall.fontFace =
+					fontFamilyToInstall.fontFace.filter(
+						( fontFaceToInstall ) =>
+							! checkFontFaceInstalled(
+								fontFaceToInstall,
+								installedFontFamily.fontFace
+							)
+					);
+			}
 
 			// Install the fonts (upload the font files to the server and create the post in the database).
 			let sucessfullyInstalledFontFaces = [];
 			let unsucessfullyInstalledFontFaces = [];
-			if ( fontFamilyToInstall.fontFace.length > 0 ) {
+			if ( fontFamilyToInstall?.fontFace?.length > 0 ) {
 				const response = await batchInstallFontFaces(
 					installedFontFamily.id,
 					makeFontFacesFormData( fontFamilyToInstall )
@@ -261,6 +271,7 @@ function FontLibraryProvider( { children } ) {
 
 			// If there were no successes and nothing already installed then we don't need to activate anything and can bounce now.
 			if (
+				fontFamilyToInstall?.fontFace?.length > 0 &&
 				sucessfullyInstalledFontFaces.length === 0 &&
 				alreadyInstalledFontFaces.length === 0
 			) {
