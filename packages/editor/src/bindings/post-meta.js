@@ -42,6 +42,9 @@ export default {
 		const updateMetaValue = ( newValue ) => {
 			setMeta( { ...meta, [ metaKey ]: newValue } );
 		};
-		return { useValue: [ metaValue, updateMetaValue ] };
+		return {
+			placeholder: keyToLabel( metaKey ),
+			useValue: [ metaValue, updateMetaValue ],
+		};
 	},
 };
