@@ -106,6 +106,8 @@ export default function useSyncPathWithURL() {
 				// The "type" property should be kept as well.
 				( navigatorLocation.path === '/wp_template' &&
 					window?.__experimentalAdminViews ) ||
+				( navigatorLocation.path === '/pages' &&
+					window?.__experimentalAdminViews ) ||
 				( navigatorLocation.path === '/wp_template/all' &&
 					! window?.__experimentalAdminViews )
 			) {
