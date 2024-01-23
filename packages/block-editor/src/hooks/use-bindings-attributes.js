@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { getBlockType } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
@@ -31,7 +32,7 @@ const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 const createEditFunctionWithBindingsAttribute = () =>
 	createHigherOrderComponent(
 		( BlockEdit ) => ( props ) => {
-			const { clientId } = useBlockEditContext();
+			const { clientId, name: blockName } = useBlockEditContext();
 
 			const {
 				getBlockBindingsSource,
@@ -66,9 +67,25 @@ const createEditFunctionWithBindingsAttribute = () =>
 								settings.source.attributes
 							);
 
-							if ( placeholder ) {
-								updatedAttributes.placeholder = placeholder;
-								updatedAttributes[ attributeName ] = null;
+							if (
+								placeholder &&
+								( ! metaValue || metaValue === '' )
+							) {
+								// If the attribute is `src` or `href`, a placeholder can't be used because it is not a valid url.
+								// Adding this workaround until attributes and metadata fields types are improved and include `url`.
+								const htmlAttribute =
+									getBlockType( blockName ).attributes[
+										attributeName
+									].attribute;
+								if (
+									htmlAttribute === 'src' ||
+									htmlAttribute === 'href'
+								) {
+									updatedAttributes[ attributeName ] = null;
+								} else {
+									updatedAttributes[ attributeName ] =
+										placeholder;
+								}
 							}
 
 							if ( metaValue ) {
