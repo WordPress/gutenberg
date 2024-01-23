@@ -133,7 +133,7 @@ export default function Image( {
 
 	const imageRef = useRef();
 	const { allowResize = true } = context;
-	const { getBlock } = useSelect( blockEditorStore );
+	const { getBlock, getSettings } = useSelect( blockEditorStore );
 
 	const image = useSelect(
 		( select ) =>
@@ -143,31 +143,26 @@ export default function Image( {
 		[ id, isSingleSelected ]
 	);
 
-	const { canInsertCover, imageEditing, imageSizes, maxWidth, mediaUpload } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockRootClientId,
-					getSettings,
-					canInsertBlockType,
-				} = select( blockEditorStore );
+	const { canInsertCover, imageEditing, imageSizes, maxWidth } = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, canInsertBlockType } =
+				select( blockEditorStore );
 
-				const rootClientId = getBlockRootClientId( clientId );
-				const settings = getSettings();
+			const rootClientId = getBlockRootClientId( clientId );
+			const settings = getSettings();
 
-				return {
-					imageEditing: settings.imageEditing,
-					imageSizes: settings.imageSizes,
-					maxWidth: settings.maxWidth,
-					mediaUpload: settings.mediaUpload,
-					canInsertCover: canInsertBlockType(
-						'core/cover',
-						rootClientId
-					),
-				};
-			},
-			[ clientId ]
-		);
+			return {
+				imageEditing: settings.imageEditing,
+				imageSizes: settings.imageSizes,
+				maxWidth: settings.maxWidth,
+				canInsertCover: canInsertBlockType(
+					'core/cover',
+					rootClientId
+				),
+			};
+		},
+		[ clientId ]
+	);
 
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
@@ -192,7 +187,6 @@ export default function Image( {
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
 		)
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
-	const canUploadMedia = !! mediaUpload;
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
@@ -201,7 +195,7 @@ export default function Image( {
 		if (
 			! isExternalImage( id, url ) ||
 			! isSingleSelected ||
-			! canUploadMedia
+			! getSettings().mediaUpload
 		) {
 			setExternalBlob();
 			return;
@@ -216,7 +210,7 @@ export default function Image( {
 			.then( ( blob ) => setExternalBlob( blob ) )
 			// Do nothing, cannot upload.
 			.catch( () => {} );
-	}, [ id, url, isSingleSelected, externalBlob, canUploadMedia ] );
+	}, [ id, url, isSingleSelected, externalBlob ] );
 
 	// Get naturalWidth and naturalHeight from image ref, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
@@ -284,6 +278,10 @@ export default function Image( {
 	}
 
 	function uploadExternal() {
+		const { mediaUpload } = getSettings();
+		if ( ! mediaUpload ) {
+			return;
+		}
 		mediaUpload( {
 			filesList: [ externalBlob ],
 			onFileChange( [ img ] ) {

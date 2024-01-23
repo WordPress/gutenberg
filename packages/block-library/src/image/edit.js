@@ -276,7 +276,11 @@ export function ImageEdit( {
 		const file = getBlobByURL( url );
 
 		if ( file ) {
-			getSettings().mediaUpload( {
+			const { mediaUpload } = getSettings();
+			if ( ! mediaUpload ) {
+				return;
+			}
+			mediaUpload( {
 				filesList: [ file ],
 				onFileChange: ( [ img ] ) => {
 					onSelectImage( img );
