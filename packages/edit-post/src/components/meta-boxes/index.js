@@ -30,7 +30,7 @@ export default function MetaBoxes( { location } ) {
 		[ location ]
 	);
 
-	const hasMetaBoxes = metaBoxes?.length > 0;
+	const hasMetaBoxes = !! metaBoxes?.length;
 
 	// When editor is ready, initialize postboxes (wp core script) and metabox
 	// saving. This initializes all meta box locations, not just this specific
