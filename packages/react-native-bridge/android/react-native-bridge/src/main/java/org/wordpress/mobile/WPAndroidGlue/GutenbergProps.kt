@@ -118,7 +118,6 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK = "instagramEmbed"
         const val PROP_CAPABILITIES_LOOM_EMBED_BLOCK = "loomEmbed"
         const val PROP_CAPABILITIES_SMARTFRAME_EMBED_BLOCK = "smartframeEmbed"
-        const val PROP_CAPABILITIES_MEDIAFILES_COLLECTION_BLOCK = "mediaFilesCollectionBlock"
         const val PROP_CAPABILITIES_MENTIONS = "mentions"
         const val PROP_CAPABILITIES_XPOSTS = "xposts"
         const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor"

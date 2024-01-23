@@ -30,7 +30,6 @@ public enum Capabilities: String {
     case layoutGridBlock
     case tiledGalleryBlock
     case videoPressBlock
-    case mediaFilesCollectionBlock
     case mentions
     case xposts
     case unsupportedBlockEditor
