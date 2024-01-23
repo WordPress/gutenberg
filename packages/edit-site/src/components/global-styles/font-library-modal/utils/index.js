@@ -9,6 +9,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 import { unlock } from '../../../../lock-unlock';
 import { fetchInstallFontFace } from '../resolvers';
+import { formatFontFamily } from './preview-styles';
 
 /**
  * Browser dependencies
@@ -93,13 +94,18 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 		// eslint-disable-next-line no-undef
 	} else if ( source instanceof File ) {
 		dataSource = await source.arrayBuffer();
+	} else {
+		return;
 	}
 
-	// eslint-disable-next-line no-undef
-	const newFont = new FontFace( fontFace.fontFamily, dataSource, {
-		style: fontFace.fontStyle,
-		weight: fontFace.fontWeight,
-	} );
+	const newFont = new window.FontFace(
+		formatFontFamily( fontFace.fontFamily ),
+		dataSource,
+		{
+			style: fontFace.fontStyle,
+			weight: fontFace.fontWeight,
+		}
+	);
 
 	const loadedFace = await newFont.load();
 

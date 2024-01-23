@@ -33,7 +33,7 @@ import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
 import { downloadFontFaceAsset } from './utils';
 
 const DEFAULT_CATEGORY = {
-	id: 'all',
+	slug: 'all',
 	name: __( 'All' ),
 };
 function FontCollection( { slug } ) {
@@ -160,11 +160,10 @@ function FontCollection( { slug } ) {
 			if ( fontFamily?.fontFace ) {
 				await Promise.all(
 					fontFamily.fontFace.map( async ( fontFace ) => {
-						if ( fontFace.downloadFromUrl ) {
+						if ( fontFace.src ) {
 							fontFace.file = await downloadFontFaceAsset(
-								fontFace.downloadFromUrl
+								fontFace.src
 							);
-							delete fontFace.downloadFromUrl;
 						}
 					} )
 				);
@@ -264,8 +263,8 @@ function FontCollection( { slug } ) {
 							{ categories &&
 								categories.map( ( category ) => (
 									<option
-										value={ category.id }
-										key={ category.id }
+										value={ category.slug }
+										key={ category.slug }
 									>
 										{ category.name }
 									</option>

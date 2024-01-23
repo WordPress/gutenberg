@@ -9,7 +9,7 @@ import { deepSignal, peek } from 'deepsignal';
  */
 import { createPortal } from './portals';
 import { useWatch, useInit } from './utils';
-import { directive } from './hooks';
+import { directive, getScope, getEvaluate } from './hooks';
 
 const isObject = ( item ) =>
 	item && typeof item === 'object' && ! Array.isArray( item );
@@ -27,6 +27,64 @@ const mergeDeepSignals = ( target, source, overwrite ) => {
 		}
 	}
 };
+
+const newRule =
+	/(?:([\u0080-\uFFFF\w-%@]+) *:? *([^{;]+?);|([^;}{]*?) *{)|(}\s*)/g;
+const ruleClean = /\/\*[^]*?\*\/|  +/g;
+const ruleNewline = /\n+/g;
+const empty = ' ';
+
+/**
+ * Convert a css style string into a object.
+ *
+ * Made by Cristian Bote (@cristianbote) for Goober.
+ * https://unpkg.com/browse/goober@2.1.13/src/core/astish.js
+ *
+ * @param {string} val CSS string.
+ * @return {Object} CSS object.
+ */
+const cssStringToObject = ( val ) => {
+	const tree = [ {} ];
+	let block, left;
+
+	while ( ( block = newRule.exec( val.replace( ruleClean, '' ) ) ) ) {
+		if ( block[ 4 ] ) {
+			tree.shift();
+		} else if ( block[ 3 ] ) {
+			left = block[ 3 ].replace( ruleNewline, empty ).trim();
+			tree.unshift( ( tree[ 0 ][ left ] = tree[ 0 ][ left ] || {} ) );
+		} else {
+			tree[ 0 ][ block[ 1 ] ] = block[ 2 ]
+				.replace( ruleNewline, empty )
+				.trim();
+		}
+	}
+
+	return tree[ 0 ];
+};
+
+/**
+ * Creates a directive that adds an event listener to the global window or
+ * document object.
+ *
+ * @param {string} type 'window' or 'document'
+ * @return {void}
+ */
+const getGlobalEventDirective =
+	( type ) =>
+	( { directives, evaluate } ) => {
+		directives[ `on-${ type }` ]
+			.filter( ( { suffix } ) => suffix !== 'default' )
+			.forEach( ( entry ) => {
+				useInit( () => {
+					const cb = ( event ) => evaluate( entry, event );
+					const globalVar = type === 'window' ? window : document;
+					globalVar.addEventListener( entry.suffix, cb );
+					return () =>
+						globalVar.removeEventListener( entry.suffix, cb );
+				}, [] );
+			} );
+	};
 
 export default () => {
 	// data-wp-context
@@ -74,6 +132,7 @@ export default () => {
 	// data-wp-init--[name]
 	directive( 'init', ( { directives: { init }, evaluate } ) => {
 		init.forEach( ( entry ) => {
+			// TODO: Replace with useEffect to prevent unneeded scopes.
 			useInit( () => evaluate( entry ) );
 		} );
 	} );
@@ -88,6 +147,11 @@ export default () => {
 			}
 		);
 	} );
+
+	// data-wp-on-window--[event]
+	directive( 'on-window', getGlobalEventDirective( 'window' ) );
+	// data-wp-on-document--[event]
+	directive( 'on-document', getGlobalEventDirective( 'document' ) );
 
 	// data-wp-class--[classname]
 	directive(
@@ -125,41 +189,6 @@ export default () => {
 				} );
 		}
 	);
-
-	const newRule =
-		/(?:([\u0080-\uFFFF\w-%@]+) *:? *([^{;]+?);|([^;}{]*?) *{)|(}\s*)/g;
-	const ruleClean = /\/\*[^]*?\*\/|  +/g;
-	const ruleNewline = /\n+/g;
-	const empty = ' ';
-
-	/**
-	 * Convert a css style string into a object.
-	 *
-	 * Made by Cristian Bote (@cristianbote) for Goober.
-	 * https://unpkg.com/browse/goober@2.1.13/src/core/astish.js
-	 *
-	 * @param {string} val CSS string.
-	 * @return {Object} CSS object.
-	 */
-	const cssStringToObject = ( val ) => {
-		const tree = [ {} ];
-		let block, left;
-
-		while ( ( block = newRule.exec( val.replace( ruleClean, '' ) ) ) ) {
-			if ( block[ 4 ] ) {
-				tree.shift();
-			} else if ( block[ 3 ] ) {
-				left = block[ 3 ].replace( ruleNewline, empty ).trim();
-				tree.unshift( ( tree[ 0 ][ left ] = tree[ 0 ][ left ] || {} ) );
-			} else {
-				tree[ 0 ][ block[ 1 ] ] = block[ 2 ]
-					.replace( ruleNewline, empty )
-					.trim();
-			}
-		}
-
-		return tree[ 0 ];
-	};
 
 	// data-wp-style--[style-key]
 	directive( 'style', ( { directives: { style }, element, evaluate } ) => {
@@ -284,4 +313,49 @@ export default () => {
 	directive( 'run', ( { directives: { run }, evaluate } ) => {
 		run.forEach( ( entry ) => evaluate( entry ) );
 	} );
+
+	// data-wp-each--[item]
+	directive(
+		'each',
+		( {
+			directives: { each, 'each-key': eachKey },
+			context: inheritedContext,
+			element,
+			evaluate,
+		} ) => {
+			if ( element.type !== 'template' ) return;
+
+			const { Provider } = inheritedContext;
+			const inheritedValue = useContext( inheritedContext );
+
+			const [ entry ] = each;
+			const { namespace, suffix } = entry;
+
+			const list = evaluate( entry );
+			return list.map( ( item ) => {
+				const mergedContext = deepSignal( {} );
+
+				const itemProp = suffix === 'default' ? 'item' : suffix;
+				const newValue = deepSignal( {
+					[ namespace ]: { [ itemProp ]: item },
+				} );
+				mergeDeepSignals( newValue, inheritedValue );
+				mergeDeepSignals( mergedContext, newValue, true );
+
+				const scope = { ...getScope(), context: mergedContext };
+				const key = eachKey
+					? getEvaluate( { scope } )( eachKey[ 0 ] )
+					: item;
+
+				return (
+					<Provider value={ mergedContext } key={ key }>
+						{ element.props.content }
+					</Provider>
+				);
+			} );
+		},
+		{ priority: 20 }
+	);
+
+	directive( 'each-child', () => null );
 };

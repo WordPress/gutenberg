@@ -18,11 +18,7 @@ test.describe( 'Templates', () => {
 		] );
 	} );
 	test( 'Sorting', async ( { admin, page } ) => {
-		await admin.visitSiteEditor( { path: '/wp_template' } );
-		// Switch to table layout.
-		await page.getByLabel( 'View options' ).click();
-		await page.getByRole( 'menuitem', { name: 'Layout' } ).click();
-		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+		await admin.visitSiteEditor( { path: '/wp_template/all' } );
 		// Descending by title.
 		await page
 			.getByRole( 'button', { name: 'Template', exact: true } )
@@ -52,13 +48,7 @@ test.describe( 'Templates', () => {
 			title: 'Date Archives',
 			content: 'hi',
 		} );
-		await admin.visitSiteEditor( { path: '/wp_template' } );
-
-		// Switch to table layout.
-		await page.getByLabel( 'View options' ).click();
-		await page.getByRole( 'menuitem', { name: 'Layout' } ).click();
-		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
-
+		await admin.visitSiteEditor( { path: '/wp_template/all' } );
 		// Global search.
 		await page.getByRole( 'searchbox', { name: 'Filter list' } ).click();
 		await page.keyboard.type( 'tag' );
@@ -94,13 +84,7 @@ test.describe( 'Templates', () => {
 		await expect( titles ).toHaveCount( 2 );
 	} );
 	test( 'Field visibility', async ( { admin, page } ) => {
-		await admin.visitSiteEditor( { path: '/wp_template' } );
-
-		// Switch to table layout.
-		await page.getByLabel( 'View options' ).click();
-		await page.getByRole( 'menuitem', { name: 'Layout' } ).click();
-		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
-
+		await admin.visitSiteEditor( { path: '/wp_template/all' } );
 		await page.getByRole( 'button', { name: 'Description' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
 		await expect(
