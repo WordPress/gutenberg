@@ -39,7 +39,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 }
 
 .emotion-8 {
-  background: #fff;
+  background: var(--wp-components-color-background, #fff);
   border: 1px solid transparent;
   border-radius: 2px;
   display: -webkit-inline-box;
@@ -53,7 +53,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 }
 
 .emotion-8:hover {
-  border-color: #757575;
+  border-color: var(--wp-components-color-gray-700, #757575);
 }
 
 .emotion-8:focus-within {
@@ -366,7 +366,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
 }
 
 .emotion-8 {
-  background: #fff;
+  background: var(--wp-components-color-background, #fff);
   border: 1px solid transparent;
   border-radius: 2px;
   display: -webkit-inline-box;
@@ -380,7 +380,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
 }
 
 .emotion-8:hover {
-  border-color: #757575;
+  border-color: var(--wp-components-color-gray-700, #757575);
 }
 
 .emotion-8:focus-within {
@@ -586,7 +586,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 }
 
 .emotion-8 {
-  background: #fff;
+  background: var(--wp-components-color-background, #fff);
   border: 1px solid transparent;
   border-radius: 2px;
   display: -webkit-inline-box;
@@ -600,7 +600,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 }
 
 .emotion-8:hover {
-  border-color: #757575;
+  border-color: var(--wp-components-color-gray-700, #757575);
 }
 
 .emotion-8:focus-within {
@@ -907,7 +907,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
 }
 
 .emotion-8 {
-  background: #fff;
+  background: var(--wp-components-color-background, #fff);
   border: 1px solid transparent;
   border-radius: 2px;
   display: -webkit-inline-box;
@@ -921,7 +921,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
 }
 
 .emotion-8:hover {
-  border-color: #757575;
+  border-color: var(--wp-components-color-gray-700, #757575);
 }
 
 .emotion-8:focus-within {

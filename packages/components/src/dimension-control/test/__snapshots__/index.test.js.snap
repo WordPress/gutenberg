@@ -96,7 +96,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   -ms-flex: 1;
   flex: 1;
   position: relative;
-  background-color: #fff;
+  background-color: var(--wp-components-color-background, #fff);
   width: 100%;
 }
 
@@ -174,7 +174,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   position: absolute;
   right: 0;
   top: 0;
-  border-color: #949494;
+  border-color: var(--wp-components-color-gray-600, #949494);
   border-style: solid;
   border-width: 1px;
   padding-left: 2px;
@@ -367,7 +367,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   -ms-flex: 1;
   flex: 1;
   position: relative;
-  background-color: #fff;
+  background-color: var(--wp-components-color-background, #fff);
   width: 100%;
 }
 
@@ -445,7 +445,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   position: absolute;
   right: 0;
   top: 0;
-  border-color: #949494;
+  border-color: var(--wp-components-color-gray-600, #949494);
   border-style: solid;
   border-width: 1px;
   padding-left: 2px;
@@ -648,7 +648,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   -ms-flex: 1;
   flex: 1;
   position: relative;
-  background-color: #fff;
+  background-color: var(--wp-components-color-background, #fff);
   width: 100%;
 }
 
@@ -726,7 +726,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   position: absolute;
   right: 0;
   top: 0;
-  border-color: #949494;
+  border-color: var(--wp-components-color-gray-600, #949494);
   border-style: solid;
   border-width: 1px;
   padding-left: 2px;
@@ -941,7 +941,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   -ms-flex: 1;
   flex: 1;
   position: relative;
-  background-color: #fff;
+  background-color: var(--wp-components-color-background, #fff);
   width: 100%;
 }
 
@@ -1019,7 +1019,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   position: absolute;
   right: 0;
   top: 0;
-  border-color: #949494;
+  border-color: var(--wp-components-color-gray-600, #949494);
   border-style: solid;
   border-width: 1px;
   padding-left: 2px;
