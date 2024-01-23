@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, directive, getContext } from '@wordpress/interactivity';
+import { store, directive } from '@wordpress/interactivity';
 
 // Mock `data-wp-show` directive to test when things are removed from the
 // DOM.  Replace with `data-wp-show` when it's ready.
@@ -19,16 +19,21 @@ directive(
 const { state } = store( 'directive-on-document', {
 	state: {
 		counter: 0,
+		isVisible: true,
+		isEventAttached: 'no',
 	},
 	callbacks: {
-		keydownHandler: ( ) => {
+		keydownHandler() {
 			state.counter += 1;
+		},
+		init() {
+			state.isEventAttached = 'yes';
 		},
 	},
 	actions: {
 		visibilityHandler: () => {
-			const context = getContext();
-			context.isVisible = ! context.isVisible;
+			state.isEventAttached = 'no';
+			state.isVisible = ! state.isVisible;
 		},
 	}
 } );
