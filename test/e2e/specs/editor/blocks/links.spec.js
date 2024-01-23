@@ -229,7 +229,7 @@ test.describe( 'Links', () => {
 
 		// Click on the Edit button.
 		await page.getByRole( 'button', { name: 'Edit' } ).click();
-
+		await page.getByLabel( 'Edit', { exact: true } ).click();
 		// Change the URL.
 		// getByPlaceholder required in order to handle Link Control component
 		// managing focus onto other inputs within the control.
@@ -250,8 +250,13 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( `can remove existing links`, async ( { editor, LinkUtils } ) => {
+	test( `can remove existing links`, async ( {
+		editor,
+		LinkUtils,
+		pageUtils,
+	} ) => {
 		await LinkUtils.createAndReselectLink();
+		await pageUtils.pressKeys( 'primary+k' );
 
 		const linkPopover = LinkUtils.getLinkPopover();
 
@@ -336,6 +341,7 @@ test.describe( 'Links', () => {
 		// Make a collapsed selection inside the link.
 		await pageUtils.pressKeys( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'ArrowRight' );
+		await pageUtils.pressKeys( 'primary+k' );
 
 		const linkPopover = LinkUtils.getLinkPopover();
 		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
@@ -441,10 +447,10 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+K' );
+		const linkPopover = LinkUtils.getLinkPopover();
 		await page.keyboard.type( URL );
 		await pageUtils.pressKeys( 'Enter' );
 
-		const linkPopover = LinkUtils.getLinkPopover();
 		await expect( linkPopover ).toBeVisible();
 		// Close the link control to return the caret to the canvas
 		await pageUtils.pressKeys( 'Escape' );
@@ -455,13 +461,15 @@ test.describe( 'Links', () => {
 		await expect( linkPopover ).toBeHidden();
 
 		// Move the caret back into the link text and the link popover
-		// should be displayed.
+		// should not be displayed.
 		await pageUtils.pressKeys( 'ArrowLeft' );
-		await expect( linkPopover ).toBeVisible();
+		await expect( linkPopover ).toBeHidden();
 
 		// Switch the Link UI into "Edit" mode via keyboard shortcut
 		// and check that the input has the correct value.
 		await pageUtils.pressKeys( 'primary+K' );
+		await pageUtils.pressKeys( 'Tab' );
+		await pageUtils.pressKeys( 'Enter' );
 
 		await expect(
 			linkPopover.getByRole( 'combobox', {
@@ -477,15 +485,11 @@ test.describe( 'Links', () => {
 
 		// Move back into the RichText.
 		await pageUtils.pressKeys( 'Escape' );
-
-		// ...but the Link Popover should still be active because we are within the link.
-		await expect( linkPopover ).toBeVisible();
+		// Link Popover should be hidden even though it's within the linked text.
+		await expect( linkPopover ).toBeHidden();
 
 		// Move outside of the link entirely.
 		await pageUtils.pressKeys( 'ArrowRight' );
-
-		// Link Popover should now disappear because we are no longer within the link.
-		await expect( linkPopover ).toBeHidden();
 
 		// Append some text to the paragraph to assert that focus has been returned
 		// to the correct location within the RichText.
@@ -561,7 +565,9 @@ test.describe( 'Links', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 
 		// Edit link.
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await pageUtils.pressKeys( 'primary+K' );
+		await pageUtils.pressKeys( 'Tab' );
+		await pageUtils.pressKeys( 'Enter' );
 
 		// Open settings.
 		await page
@@ -638,6 +644,8 @@ test.describe( 'Links', () => {
 
 		// Edit link.
 		await pageUtils.pressKeys( 'primary+k' );
+		await pageUtils.pressKeys( 'Tab' );
+		await pageUtils.pressKeys( 'Enter' );
 
 		// getByPlaceholder required in order to handle Link Control component
 		// managing focus onto other inputs within the control.
@@ -650,6 +658,14 @@ test.describe( 'Links', () => {
 		// Navigate back to the link editing state inputs to verify appears as changed.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
+		// Navigate back to the popover.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		// Navigate back to inputs to verify appears as changed.
+		await pageUtils.pressKeys( 'primary+k' );
+		await pageUtils.pressKeys( 'Tab' );
+		await pageUtils.pressKeys( 'Enter' );
 
 		expect(
 			await page
@@ -706,6 +722,8 @@ test.describe( 'Links', () => {
 		// Move back into the link.
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+k' );
+		await pageUtils.pressKeys( 'Tab' );
+		await pageUtils.pressKeys( 'Enter' );
 
 		// Toggle the Advanced settings to be open.
 		// This should set the editor preference to persist this
@@ -722,14 +740,13 @@ test.describe( 'Links', () => {
 		// Move focus out of Link UI and into Paragraph block.
 		await pageUtils.pressKeys( 'Escape' );
 
-		// Move caret back into the "WordPress" link to trigger
-		// the Link UI for that link.
-		await pageUtils.pressKeys( 'Alt+ArrowRight' );
-		await pageUtils.pressKeys( 'ArrowRight' );
-		await pageUtils.pressKeys( 'ArrowRight' );
+		// Move caret back into the "WordPress" link
+		await pageUtils.pressKeys( 'ArrowRight', { times: 3 } );
 
 		// Switch Link UI to "edit" mode.
-		await page.getByRole( 'button', { name: 'Edit' } ).click();
+		await pageUtils.pressKeys( 'primary+k' );
+		await pageUtils.pressKeys( 'Tab' );
+		await pageUtils.pressKeys( 'Enter' );
 
 		// Check that the Advanced settings are still expanded/open
 		// and I can see the open in new tab checkbox. This verifies
@@ -926,6 +943,7 @@ test.describe( 'Links', () => {
 			// collapsed RichTextValue that contains a link format.
 			await pageUtils.pressKeys( 'ArrowLeft' );
 			await pageUtils.pressKeys( 'ArrowRight' );
+			await pageUtils.pressKeys( 'primary+k' );
 
 			const linkPopover = LinkUtils.getLinkPopover();
 
