@@ -286,10 +286,15 @@ function FontLibraryProvider( { children } ) {
 
 			// Use the sucessfully installed font faces
 			// As well as any font faces that were already installed (those will be activated)
-			fontFamilyToInstall.fontFace = [
-				...sucessfullyInstalledFontFaces,
-				...alreadyInstalledFontFaces,
-			];
+			if (
+				sucessfullyInstalledFontFaces?.length > 0 ||
+				alreadyInstalledFontFaces?.length > 0
+			) {
+				fontFamilyToInstall.fontFace = [
+					...sucessfullyInstalledFontFaces,
+					...alreadyInstalledFontFaces,
+				];
+			}
 
 			// Activate the font family (add the font family to the global styles).
 			activateCustomFontFamilies( [ fontFamilyToInstall ] );
