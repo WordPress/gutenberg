@@ -251,7 +251,7 @@ class EditorPage {
 
 		if ( options.autoscroll ) {
 			if ( isAndroid() ) {
-				await swipeDown( this.driver );
+				await swipeDown( this.driver, { endYCoefficient: 2 } );
 			} else {
 				await tapStatusBariOS( this.driver );
 			}
@@ -288,7 +288,10 @@ class EditorPage {
 			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`
 		);
 		if ( elements.length === 0 ) {
-			await swipeUp( this.driver, undefined, 100, 1 );
+			await swipeUp( this.driver, undefined, {
+				delay: 100,
+				endYCoefficient: 1,
+			} );
 			return this.androidScrollAndReturnElement( accessibilityLabel );
 		}
 		return elements[ elements.length - 1 ];
@@ -301,7 +304,10 @@ class EditorPage {
 		const elements = await this.driver.$$( `~${ id }` );
 
 		if ( elements.length === 0 ) {
-			await swipeUp( this.driver, undefined, 100, 1 );
+			await swipeUp( this.driver, undefined, {
+				delay: 100,
+				endYCoefficient: 1,
+			} );
 			return this.scrollAndReturnElementByAccessibilityId( id );
 		}
 		return elements[ elements.length - 1 ];
