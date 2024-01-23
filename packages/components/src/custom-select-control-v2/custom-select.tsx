@@ -6,7 +6,7 @@ import * as Ariakit from '@ariakit/react';
 /**
  * WordPress dependencies
  */
-import { createContext } from '@wordpress/element';
+import { createContext, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -61,8 +61,10 @@ export function _CustomSelect( {
 > ) {
 	const { value: currentValue } = store.useState();
 
-	const computedRenderSelectedValue =
-		renderSelectedValue ?? defaultRenderSelectedValue;
+	const computedRenderSelectedValue = useMemo(
+		() => renderSelectedValue ?? defaultRenderSelectedValue,
+		[ renderSelectedValue ]
+	);
 
 	return (
 		<>
