@@ -19,6 +19,7 @@ const allowedParentBlockAlignments = [ 'left', 'center', 'right' ];
 function ParagraphBlock( {
 	attributes,
 	mergeBlocks,
+	isSelected,
 	onReplace,
 	setAttributes,
 	style,
@@ -93,7 +94,9 @@ function ParagraphBlock( {
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }
 				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
-				placeholder={ placeholder || __( 'Start writing…' ) }
+				placeholder={
+					placeholder || ( isSelected ? __( 'Start writing…' ) : '' )
+				}
 				textAlign={ textAlignment }
 				__unstableEmbedURLOnPaste
 			/>
