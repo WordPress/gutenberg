@@ -101,7 +101,7 @@ class WP_Block_Bindings {
 						foreach ( $selector_attribute_names as $name ) {
 							$selector_attrs[ $name ] = $block_reader->get_attribute( $name );
 						}
-						$selector_markup = "<$selector>" . esc_html( $source_value ) . "</$selector>";
+						$selector_markup = "<$selector>" . wp_kses_post( $source_value ) . "</$selector>";
 						$amended_content = new WP_HTML_Tag_Processor( $selector_markup );
 						$amended_content->next_tag();
 						foreach ( $selector_attrs as $attribute_key => $attribute_value ) {
