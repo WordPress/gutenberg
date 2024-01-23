@@ -211,7 +211,7 @@ function InlineLinkUI( {
 	//  not the highlighted text. Given that useAnchor uses document.getSelection,
 	//  it will return null, since it can't find the <mark> element within the Link UI.
 	//  This caches the last truthy value of the selection anchor reference.
-	//
+	// This ensures the Popover is positioned correctly on initial submission of the link.
 	const cachedRect = useCachedTruthy( popoverAnchor.getBoundingClientRect() );
 	popoverAnchor.getBoundingClientRect = () => cachedRect;
 
