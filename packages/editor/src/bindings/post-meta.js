@@ -3,6 +3,7 @@
  */
 import { useEntityProp } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
@@ -12,7 +13,7 @@ const { getCurrentPostType } = select( editorStore );
 
 export default {
 	name: 'post_meta',
-	label: 'Post Meta',
+	label: __( 'Post Meta' ),
 	useSource( props, sourceAttributes ) {
 		const { context } = props;
 		const { value: metaKey } = sourceAttributes;
