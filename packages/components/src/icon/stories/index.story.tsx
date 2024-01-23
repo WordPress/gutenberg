@@ -32,41 +32,76 @@ Default.args = {
 	icon: wordpress,
 };
 
-export const FillColor: StoryFn< typeof Icon > = ( args ) => {
+/**
+ * When `icon` is an SVG element, the `currentColor` prop can be used to
+ * render it in the CSS `currentColor`.
+ */
+export const WithCurrentColor: StoryFn< typeof Icon > = ( args ) => {
 	return (
 		<div
 			style={ {
-				fill: 'blue',
+				background: 'blue',
+				color: 'white',
 			} }
 		>
 			<Icon { ...args } />
+			Some text
 		</div>
 	);
 };
-FillColor.args = {
+WithCurrentColor.args = {
 	...Default.args,
+	currentColor: true,
 };
+
+const renderIcon = ( { size = 24, ...restProps } ) => (
+	<SVG width={ size } height={ size } viewBox="0 0 24 24" { ...restProps }>
+		<Path d="M5 4v3h5.5v12h3V7H19V4z" />
+	</SVG>
+);
 
 export const WithAFunction = Template.bind( {} );
 WithAFunction.args = {
 	...Default.args,
-	icon: () => (
-		<SVG>
-			<Path d="M5 4v3h5.5v12h3V7H19V4z" />
-		</SVG>
-	),
+	icon: renderIcon,
 };
-
-const MyIconComponent = () => (
-	<SVG>
+WithAFunction.parameters = {
+	docs: {
+		source: {
+			code: `
+const renderIcon = ( { size = 24, ...restProps } ) => (
+	<SVG width={ size } height={ size } viewBox="0 0 24 24" { ...restProps }>
 		<Path d="M5 4v3h5.5v12h3V7H19V4z" />
 	</SVG>
 );
+
+<Icon icon={ renderIcon } />
+			`,
+		},
+	},
+};
+
+const MyIconComponent = renderIcon;
 
 export const WithAComponent = Template.bind( {} );
 WithAComponent.args = {
 	...Default.args,
 	icon: MyIconComponent,
+};
+WithAComponent.parameters = {
+	docs: {
+		source: {
+			code: `
+const MyIconComponent = ( { size = 24, ...restProps } ) => (
+	<SVG width={ size } height={ size } viewBox="0 0 24 24" { ...restProps }>
+		<Path d="M5 4v3h5.5v12h3V7H19V4z" />
+	</SVG>
+);
+
+<Icon icon={ <MyIconComponent /> } />
+			`,
+		},
+	},
 };
 
 export const WithAnSVG = Template.bind( {} );

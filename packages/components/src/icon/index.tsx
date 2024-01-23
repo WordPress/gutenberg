@@ -18,6 +18,8 @@ import { SVG } from '@wordpress/primitives';
  */
 import Dashicon from '../dashicon';
 import type { IconKey as DashiconIconKey } from '../dashicon/types';
+import { withCurrentColor } from './with-currentcolor';
+export { withCurrentColor } from './with-currentcolor';
 
 export type IconType =
 	| DashiconIconKey
@@ -39,6 +41,13 @@ interface BaseProps {
 	 * @default `20` when a Dashicon is rendered, `24` for all other icons.
 	 */
 	size?: number;
+	/**
+	 * Whether the icon should be rendered in the CSS `currentColor`.
+	 * Only has an effect on SVG elements.
+	 *
+	 * @default false
+	 */
+	currentColor?: boolean;
 }
 
 type AdditionalProps< T > = T extends ComponentType< infer U >
@@ -52,6 +61,7 @@ export type Props = BaseProps & AdditionalProps< IconType >;
 function Icon( {
 	icon = null,
 	size = 'string' === typeof icon ? 20 : 24,
+	currentColor = false,
 	...additionalProps
 }: Props ) {
 	if ( 'string' === typeof icon ) {
@@ -71,15 +81,16 @@ function Icon( {
 	}
 
 	if ( 'function' === typeof icon ) {
-		return createElement( icon, {
+		const element = createElement( icon, {
 			size,
 			...additionalProps,
 		} );
+		return currentColor ? withCurrentColor( element ) : element;
 	}
 
 	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
 		const appliedProps = {
-			...icon.props,
+			...( currentColor ? withCurrentColor( icon ) : icon ).props,
 			width: size,
 			height: size,
 			...additionalProps,
@@ -89,11 +100,12 @@ function Icon( {
 	}
 
 	if ( isValidElement( icon ) ) {
-		return cloneElement( icon, {
+		const element = cloneElement( icon, {
 			// @ts-ignore Just forwarding the size prop along
 			size,
 			...additionalProps,
 		} );
+		return currentColor ? withCurrentColor( element ) : element;
 	}
 
 	return icon;
