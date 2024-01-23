@@ -42,6 +42,9 @@ function Edit( {
 
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
+		if ( ! editableContentElement ) {
+			return;
+		}
 
 		function handleClick( event ) {
 			if ( event.target.tagName !== 'A' ) {
