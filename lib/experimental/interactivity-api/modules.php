@@ -8,6 +8,9 @@
 
 /**
  * Register the `@wordpress/interactivity` module.
+ *
+ * !! This will be removed once https://github.com/WordPress/gutenberg/pull/58066
+ * is merged.
  */
 function gutenberg_register_interactivity_module() {
 	wp_register_script_module(
