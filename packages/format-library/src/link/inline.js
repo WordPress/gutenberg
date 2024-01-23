@@ -257,7 +257,7 @@ function InlineLinkUI( {
 			onClose={ stopAddingLink }
 			onFocusOutside={ () => stopAddingLink( false ) }
 			placement="bottom"
-			offset={ 8 }
+			offset={ 10 }
 			shift
 		>
 			<LinkControl
