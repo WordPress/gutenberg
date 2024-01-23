@@ -55,6 +55,8 @@ export default function BlockThemeControl( { id } ) {
 	if ( ! hasResolved ) {
 		return null;
 	}
+	// The site editor does not have a `goBack` setting as it uses its own routing
+	// and assigns its own backlink to focusMode pages.
 	const notificationAction = hasGoBack
 		? [
 				{
