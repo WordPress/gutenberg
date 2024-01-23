@@ -12,8 +12,12 @@ import Editor from '../editor';
 import DataviewsPatterns from '../page-patterns/dataviews-patterns';
 import PagePages from '../page-pages';
 import PagePatterns from '../page-patterns';
-import PageTemplateParts from '../page-template-parts';
-import PageTemplates from '../page-templates';
+import PageTemplatesTemplateParts from '../page-templates-template-parts';
+
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../utils/constants';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -21,7 +25,6 @@ export default function useLayoutAreas() {
 	const isSiteEditorLoading = useIsSiteEditorLoading();
 	const { params } = useLocation();
 	const { postType, postId, path, layout, isCustom } = params ?? {};
-
 	// Regular page
 	if ( path === '/page' ) {
 		const isListLayout =
@@ -62,7 +65,11 @@ export default function useLayoutAreas() {
 			window?.__experimentalAdminViews;
 		return {
 			areas: {
-				content: <PageTemplates />,
+				content: (
+					<PageTemplatesTemplateParts
+						postType={ TEMPLATE_POST_TYPE }
+					/>
+				),
 				preview: isListLayout && (
 					<Editor isLoading={ isSiteEditorLoading } />
 				),
@@ -75,9 +82,23 @@ export default function useLayoutAreas() {
 
 	// Template parts
 	if ( path === '/wp_template_part/all' ) {
+		const isListLayout =
+			isCustom !== 'true' &&
+			layout === 'list' &&
+			window?.__experimentalAdminViews;
 		return {
 			areas: {
-				content: <PageTemplateParts />,
+				content: (
+					<PageTemplatesTemplateParts
+						postType={ TEMPLATE_PART_POST_TYPE }
+					/>
+				),
+				preview: isListLayout && (
+					<Editor isLoading={ isSiteEditorLoading } />
+				),
+			},
+			widths: {
+				content: isListLayout ? 380 : undefined,
 			},
 		};
 	}

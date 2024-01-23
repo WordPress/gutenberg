@@ -37,6 +37,7 @@ import AddNewTemplate from '../add-new-template';
 import { useAddedBy, AvatarImage } from '../list/added-by';
 import {
 	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
 	ENUMERATION_TYPE,
 	OPERATOR_IN,
 	OPERATOR_NOT_IN,
@@ -48,10 +49,11 @@ import {
 	useResetTemplateAction,
 	deleteTemplateAction,
 	renameTemplateAction,
-} from './template-actions';
+} from './actions';
 import { postRevisionsAction } from '../actions';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
+import AddNewTemplatePart from './add-new-template-part';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
@@ -90,19 +92,24 @@ function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
 }
 
-function TemplateTitle( { item, viewType } ) {
+function Title( { item, viewType } ) {
 	if ( viewType === LAYOUT_LIST ) {
 		return decodeEntities( item.title?.rendered ) || __( '(no title)' );
 	}
-
+	const linkProps = {
+		params: {
+			postId: item.id,
+			postType: item.type,
+			canvas: 'edit',
+		},
+	};
+	if ( item.type === TEMPLATE_PART_POST_TYPE ) {
+		linkProps.state = {
+			backPath: '/wp_template_part/all',
+		};
+	}
 	return (
-		<Link
-			params={ {
-				postId: item.id,
-				postType: item.type,
-				canvas: 'edit',
-			} }
-		>
+		<Link { ...linkProps }>
 			{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
 		</Link>
 	);
@@ -125,7 +132,7 @@ function AuthorField( { item, viewType } ) {
 	);
 }
 
-function TemplatePreview( { content, viewType } ) {
+function Preview( { content, viewType } ) {
 	const settings = usePatternSettings();
 	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
 	const blocks = useMemo( () => {
@@ -153,7 +160,7 @@ function TemplatePreview( { content, viewType } ) {
 	);
 }
 
-export default function DataviewsTemplates() {
+export default function PageTemplatesTemplateParts( { postType } ) {
 	const { params } = useLocation();
 	const { layout } = params;
 	const defaultView = useMemo( () => {
@@ -163,10 +170,13 @@ export default function DataviewsTemplates() {
 		};
 	}, [ layout ] );
 	const [ view, setView ] = useState( defaultView );
-	const { records: allTemplates, isResolving: isLoadingData } =
-		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
+	const { records, isResolving: isLoadingData } = useEntityRecords(
+		'postType',
+		postType,
+		{
 			per_page: -1,
-		} );
+		}
+	);
 	const history = useHistory();
 	const onSelectionChange = useCallback(
 		( items ) => {
@@ -181,27 +191,27 @@ export default function DataviewsTemplates() {
 	);
 
 	const authors = useMemo( () => {
-		if ( ! allTemplates ) {
+		if ( ! records ) {
 			return EMPTY_ARRAY;
 		}
 		const authorsSet = new Set();
-		allTemplates.forEach( ( template ) => {
+		records.forEach( ( template ) => {
 			authorsSet.add( template.author_text );
 		} );
 		return Array.from( authorsSet ).map( ( author ) => ( {
 			value: author,
 			label: author,
 		} ) );
-	}, [ allTemplates ] );
+	}, [ records ] );
 
-	const fields = useMemo(
-		() => [
+	const fields = useMemo( () => {
+		const _fields = [
 			{
 				header: __( 'Preview' ),
 				id: 'preview',
 				render: ( { item } ) => {
 					return (
-						<TemplatePreview
+						<Preview
 							content={ item.content.raw }
 							viewType={ view.type }
 						/>
@@ -212,16 +222,21 @@ export default function DataviewsTemplates() {
 				enableSorting: false,
 			},
 			{
-				header: __( 'Template' ),
+				header:
+					postType === TEMPLATE_POST_TYPE
+						? __( 'Template' )
+						: __( 'Template Part' ),
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => (
-					<TemplateTitle item={ item } viewType={ view.type } />
+					<Title item={ item } viewType={ view.type } />
 				),
 				maxWidth: 400,
 				enableHiding: false,
 			},
-			{
+		];
+		if ( postType === TEMPLATE_POST_TYPE ) {
+			_fields.push( {
 				header: __( 'Description' ),
 				id: 'description',
 				getValue: ( { item } ) => item.description,
@@ -246,35 +261,37 @@ export default function DataviewsTemplates() {
 				maxWidth: 400,
 				minWidth: 320,
 				enableSorting: false,
+			} );
+		}
+		// TODO: The plan is to support fields reordering, which would require an API like `order` or something
+		// similar. With the aforementioned API we wouldn't need to construct the fields array like this.
+		_fields.push( {
+			header: __( 'Author' ),
+			id: 'author',
+			getValue: ( { item } ) => item.author_text,
+			render: ( { item } ) => {
+				return <AuthorField viewType={ view.type } item={ item } />;
 			},
-			{
-				header: __( 'Author' ),
-				id: 'author',
-				getValue: ( { item } ) => item.author_text,
-				render: ( { item } ) => {
-					return <AuthorField viewType={ view.type } item={ item } />;
-				},
-				enableHiding: false,
-				type: ENUMERATION_TYPE,
-				elements: authors,
-				width: '1%',
-			},
-		],
-		[ authors, view.type ]
-	);
+			enableHiding: false,
+			type: ENUMERATION_TYPE,
+			elements: authors,
+			width: '1%',
+		} );
+		return _fields;
+	}, [ postType, authors, view.type ] );
 
 	const { data, paginationInfo } = useMemo( () => {
-		if ( ! allTemplates ) {
+		if ( ! records ) {
 			return {
 				data: EMPTY_ARRAY,
 				paginationInfo: { totalItems: 0, totalPages: 0 },
 			};
 		}
-		let filteredTemplates = [ ...allTemplates ];
+		let filteredData = [ ...records ];
 		// Handle global search.
 		if ( view.search ) {
 			const normalizedSearch = normalizeSearchInput( view.search );
-			filteredTemplates = filteredTemplates.filter( ( item ) => {
+			filteredData = filteredData.filter( ( item ) => {
 				const title = item.title?.rendered || item.slug;
 				return (
 					normalizeSearchInput( title ).includes(
@@ -295,7 +312,7 @@ export default function DataviewsTemplates() {
 					filter.operator === OPERATOR_IN &&
 					!! filter.value
 				) {
-					filteredTemplates = filteredTemplates.filter( ( item ) => {
+					filteredData = filteredData.filter( ( item ) => {
 						return item.author_text === filter.value;
 					} );
 				} else if (
@@ -303,7 +320,7 @@ export default function DataviewsTemplates() {
 					filter.operator === OPERATOR_NOT_IN &&
 					!! filter.value
 				) {
-					filteredTemplates = filteredTemplates.filter( ( item ) => {
+					filteredData = filteredData.filter( ( item ) => {
 						return item.author_text !== filter.value;
 					} );
 				}
@@ -312,8 +329,8 @@ export default function DataviewsTemplates() {
 
 		// Handle sorting.
 		if ( view.sort ) {
-			filteredTemplates = sortByTextFields( {
-				data: filteredTemplates,
+			filteredData = sortByTextFields( {
+				data: filteredData,
 				view,
 				fields,
 				textFields: [ 'title' ],
@@ -321,10 +338,10 @@ export default function DataviewsTemplates() {
 		}
 		// Handle pagination.
 		return getPaginationResults( {
-			data: filteredTemplates,
+			data: filteredData,
 			view,
 		} );
-	}, [ allTemplates, view, fields ] );
+	}, [ records, view, fields ] );
 
 	const resetTemplateAction = useResetTemplateAction();
 	const actions = useMemo(
@@ -360,13 +377,21 @@ export default function DataviewsTemplates() {
 
 	return (
 		<Page
-			title={ __( 'Templates' ) }
+			title={
+				postType === TEMPLATE_POST_TYPE
+					? __( 'Templates' )
+					: __( 'Template Parts' )
+			}
 			actions={
-				<AddNewTemplate
-					templateType={ TEMPLATE_POST_TYPE }
-					showIcon={ false }
-					toggleProps={ { variant: 'primary' } }
-				/>
+				postType === TEMPLATE_POST_TYPE ? (
+					<AddNewTemplate
+						templateType={ postType }
+						showIcon={ false }
+						toggleProps={ { variant: 'primary' } }
+					/>
+				) : (
+					<AddNewTemplatePart />
+				)
 			}
 		>
 			<DataViews
