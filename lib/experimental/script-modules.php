@@ -3,9 +3,9 @@
 /**
  * Enqueue modules associated with the block.
  *
- * @param string   $block_content The block content.
- * @param array    $block         The full block, including name and attributes.
- * @param WP_Block $instance      The block instance.
+ * @param string   $block_content  The block content.
+ * @param array    $parsed_block   The full block, including name and attributes.
+ * @param WP_Block $block_instance The block instance.
  */
 function gutenberg_filter_render_block_enqueue_view_modules( $block_content, $parsed_block, $block_instance ) {
 	$block_type = $block_instance->block_type;
@@ -127,6 +127,15 @@ function gutenberg_generate_block_asset_module_id( $block_name, $field_name, $in
 	return $asset_handle;
 }
 
+/**
+ * Registers a REST field for block types to provide view module IDs.
+ *
+ * Adds the `view_module_ids` field to block type objects in the REST API, which
+ * lists the script module IDs for any script modules associated with the
+ * block's viewModule(s) key.
+ *
+ * @since 6.5.0
+ */
 function gutenberg_register_view_module_ids_rest_field() {
 	register_rest_field(
 		'block-type',
@@ -151,33 +160,33 @@ add_action( 'rest_api_init', 'gutenberg_register_view_module_ids_rest_field' );
  *
  * @param string            $module_identifier The identifier of the module. Should be unique. It will be used in the final import map.
  * @param string            $src               Full URL of the module, or path of the script relative to the WordPress root directory.
- * @param array             $dependencies      Optional. An array of module identifiers of the dependencies of this module. The dependencies can be strings or arrays. If they are arrays, they need an `id` key with the module identifier, and can contain a `type` key with either `static` or `dynamic`. By default, dependencies that don't contain a type are considered static.
- * @param string|false|null $version           Optional. String specifying module version number. Defaults to false. It is added to the URL as a query string for cache busting purposes. If SCRIPT_DEBUG is true, the version is the current timestamp. If $version is set to false, the version number is the currently installed WordPress version. If $version is set to null, no version is added.
- * @deprecated 17.6.0 gutenberg_register_module is deprecated. Use wp_register_script_module instead.
+ * @param array             $dependencies      Optional. An array of module identifiers of the dependencies of this module. The dependencies can be strings or arrays. If they are arrays, they need an `id` key with the module identifier, and can contain an `import` key with either `static` or `dynamic`. By default, dependencies that don't contain an import are considered static.
+ * @param string|false|null $version           Optional. String specifying module version number. Defaults to false. It is added to the URL as a query string for cache busting purposes. If $version is set to false, the version number is the currently installed WordPress version. If $version is set to null, no version is added.
+ * @deprecated 17.6.0 gutenberg_register_module is deprecated. Please use wp_register_script_module instead.
  */
-function gutenberg_register_module( $module_id, $src = '' ) {
+function gutenberg_register_module( $module_identifier, $src = '', $dependencies = array(), $version = false ) {
 	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6.0', 'wp_register_script_module' );
-	wp_script_modules()->register( $module_id, $src );
+	wp_script_modules()->register( $module_identifier, $src, $dependencies, $version );
 }
 
 /**
  * Marks the module to be enqueued in the page.
  *
  * @param string $module_identifier The identifier of the module.
- * @deprecated 17.6.0 gutenberg_enqueue_module is deprecated. Use wp_enqueue_script_module instead.
+ * @deprecated 17.6.0 gutenberg_enqueue_module is deprecated. Please use wp_enqueue_script_module instead.
  */
-function gutenberg_enqueue_module( $module_id ) {
+function gutenberg_enqueue_module( $module_identifier ) {
 	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6.0', 'wp_enqueue_script_module' );
-	wp_script_modules()->enqueue( $module_id );
+	wp_script_modules()->enqueue( $module_identifier );
 }
 
 /**
  * Unmarks the module so it is not longer enqueued in the page.
  *
  * @param string $module_identifier The identifier of the module.
- * @deprecated 17.6.0 gutenberg_dequeue_module is deprecated. Use wp_dequeue_script_module instead.
+ * @deprecated 17.6.0 gutenberg_dequeue_module is deprecated. Please use wp_dequeue_script_module instead.
  */
-function gutenberg_dequeue_module( $module_id ) {
+function gutenberg_dequeue_module( $module_identifier ) {
 	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6.0', 'wp_dequeue_script_module' );
-	wp_script_modules()->dequeue( $module_id );
+	wp_script_modules()->dequeue( $module_identifier );
 }
