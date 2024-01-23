@@ -95,7 +95,8 @@ function ParagraphBlock( {
 				onReplace={ onReplace }
 				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
 				placeholder={
-					placeholder || ( isSelected ? __( 'Start writing…' ) : '' )
+					placeholder ||
+					( isSelected ? __( 'Type / to choose a block' ) : '' )
 				}
 				textAlign={ textAlignment }
 				__unstableEmbedURLOnPaste

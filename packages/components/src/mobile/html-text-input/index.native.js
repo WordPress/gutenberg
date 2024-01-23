@@ -125,7 +125,7 @@ export class HTMLTextInput extends Component {
 						value={ this.state.value }
 						onChangeText={ this.edit }
 						onBlur={ this.stopEditing }
-						placeholder={ __( 'Start writing…' ) }
+						placeholder={ __( 'Start writing with text or HTML' ) }
 						placeholderTextColor={ placeholderStyle.color }
 						scrollEnabled={ false }
 						// [Only iOS] This prop prevents the text input from

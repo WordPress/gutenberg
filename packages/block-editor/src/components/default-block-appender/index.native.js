@@ -48,7 +48,7 @@ export function DefaultBlockAppender( {
 	const value =
 		typeof placeholder === 'string'
 			? decodeEntities( placeholder )
-			: __( 'Start writing…' );
+			: __( 'Type / to choose a block' );
 
 	const appenderStyles = [
 		styles.blockHolder,
