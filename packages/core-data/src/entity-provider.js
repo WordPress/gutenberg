@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	createContext,
-	useContext,
-	useCallback,
-	useMemo,
-} from '@wordpress/element';
+import { createContext, useContext, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 
@@ -132,6 +127,8 @@ export function useEntityProp( kind, name, prop, _id ) {
 	return [ value, setValue, fullValue ];
 }
 
+const parsedBlocksCache = new WeakMap();
+
 /**
  * Hook that returns block content getters and setters for
  * the nearest provided entity of the specified type.
@@ -153,16 +150,36 @@ export function useEntityProp( kind, name, prop, _id ) {
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
-	const { content, editedBlocks, meta } = useSelect(
+	const { blocks, meta } = useSelect(
 		( select ) => {
 			if ( ! id ) {
 				return {};
 			}
-			const { getEditedEntityRecord } = select( STORE_NAME );
+			const { getEditedEntityRecord, getEntityRecord } =
+				select( STORE_NAME );
 			const editedRecord = getEditedEntityRecord( kind, name, id );
+
+			let editedBlocks = editedRecord.blocks;
+
+			if ( ! editedBlocks ) {
+				if (
+					editedRecord.content &&
+					typeof editedRecord.content !== 'function'
+				) {
+					// Attach the cache to the original record.
+					const entityRecord = getEntityRecord( kind, name, id );
+					editedBlocks = parsedBlocksCache.get( entityRecord );
+					if ( ! editedBlocks ) {
+						editedBlocks = parse( editedRecord.content );
+						parsedBlocksCache.set( entityRecord, editedBlocks );
+					}
+				} else {
+					editedBlocks = EMPTY_ARRAY;
+				}
+			}
+
 			return {
-				editedBlocks: editedRecord.blocks,
-				content: editedRecord.content,
+				blocks: editedBlocks,
 				meta: editedRecord.meta,
 			};
 		},
@@ -170,20 +187,6 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	);
 	const { __unstableCreateUndoLevel, editEntityRecord } =
 		useDispatch( STORE_NAME );
-
-	const blocks = useMemo( () => {
-		if ( ! id ) {
-			return undefined;
-		}
-
-		if ( editedBlocks ) {
-			return editedBlocks;
-		}
-
-		return content && typeof content !== 'function'
-			? parse( content )
-			: EMPTY_ARRAY;
-	}, [ id, editedBlocks, content ] );
 
 	const updateFootnotes = useCallback(
 		( _blocks ) => updateFootnotesFromMeta( _blocks, meta ),
