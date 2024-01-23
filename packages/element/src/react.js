@@ -32,6 +32,7 @@ import {
 	startTransition,
 	lazy,
 	Suspense,
+	version,
 } from 'react';
 
 /**
@@ -237,6 +238,11 @@ export { lazy };
  * @see https://reactjs.org/docs/react-api.html#reactsuspense
  */
 export { Suspense };
+
+/**
+ * Current version of React.
+ */
+export { version };
 
 /**
  * Concatenate two or more React children objects.
