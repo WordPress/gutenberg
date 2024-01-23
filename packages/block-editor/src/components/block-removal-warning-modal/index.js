@@ -53,8 +53,8 @@ export function BlockRemovalWarningModal( { rules } ) {
 		>
 			<p>
 				{ _n(
-					'Your post or page content will not be displayed if you delete this block. Removing this block is not advised.',
-					'Your post or page content will not be displayed if you delete these blocks. Removing these blocks is not advised.',
+					'Deleting this block will stop your post or page content from displaying on this template. It is not recommended.',
+					'Deleting these blocks will stop your post or page content from displaying on this template. It is not recommended.',
 					blockNamesForPrompt.length
 				) }
 			</p>
