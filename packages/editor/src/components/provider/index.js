@@ -113,7 +113,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
 			const postContext =
-				rootLevelPost.type !== 'wp_template'
+				rootLevelPost.type !== 'wp_template' || shouldRenderTemplate
 					? { postId: post.id, postType: post.type }
 					: {};
 
