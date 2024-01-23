@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 27.0.0 (2024-01-10)
+
 ### New Features
 
 -   Add experimental support for `viewModule` field in block.json for `build` and `start` scripts ([#57461](https://github.com/WordPress/gutenberg/pull/57461)).

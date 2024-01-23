@@ -70,6 +70,42 @@ test.describe( 'Post Editor Template mode', () => {
 		).toBeVisible();
 	} );
 
+	test( 'Swap templates and proper template resolution when switching to default template', async ( {
+		editor,
+		page,
+		requestUtils,
+		postEditorTemplateMode,
+	} ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+		await postEditorTemplateMode.createPostAndSaveDraft();
+		await page.reload();
+		await postEditorTemplateMode.disableTemplateWelcomeGuide();
+		await postEditorTemplateMode.openTemplatePopover();
+		// Swap to a custom template, save and reload.
+		await page
+			.getByRole( 'menuitem', {
+				name: 'Swap template',
+			} )
+			.click();
+		await page
+			.getByRole( 'option', {
+				name: 'Custom',
+			} )
+			.click();
+		await editor.saveDraft();
+		await page.reload();
+		// Swap to the default template.
+		await postEditorTemplateMode.openTemplatePopover();
+		await page
+			.getByRole( 'menuitem', {
+				name: 'Use default template',
+			} )
+			.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Template options' } )
+		).toHaveText( 'Single Entries' );
+	} );
+
 	test( 'Allow creating custom block templates in classic themes', async ( {
 		editor,
 		page,

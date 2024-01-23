@@ -338,3 +338,25 @@ export function setLastFocus( lastFocus = null ) {
 		lastFocus,
 	};
 }
+
+/**
+ * Action that stops temporarily editing as blocks.
+ *
+ * @param {string} clientId The block's clientId.
+ */
+export function stopEditingAsBlocks( clientId ) {
+	return ( { select, dispatch } ) => {
+		const focusModeToRevert =
+			select.__unstableGetTemporarilyEditingFocusModeToRevert();
+		dispatch.__unstableMarkNextChangeAsNotPersistent();
+		dispatch.updateBlockAttributes( clientId, {
+			templateLock: 'contentOnly',
+		} );
+		dispatch.updateBlockListSettings( clientId, {
+			...select.getBlockListSettings( clientId ),
+			templateLock: 'contentOnly',
+		} );
+		dispatch.updateSettings( { focusMode: focusModeToRevert } );
+		dispatch.__unstableSetTemporarilyEditingAsBlocks();
+	};
+}

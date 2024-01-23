@@ -43,7 +43,12 @@ describe( 'convertPreferencesPackageData', () => {
 			.toMatchInlineSnapshot( `
 		{
 		  "core": {
+		    "editorMode": "visual",
 		    "fixedToolbar": true,
+		    "hiddenBlockTypes": [
+		      "core/audio",
+		      "core/cover",
+		    ],
 		    "inactivePanels": [],
 		    "openPanels": [
 		      "post-status",
@@ -54,12 +59,7 @@ describe( 'convertPreferencesPackageData', () => {
 		    "welcomeGuide": false,
 		  },
 		  "core/edit-post": {
-		    "editorMode": "visual",
 		    "fullscreenMode": false,
-		    "hiddenBlockTypes": [
-		      "core/audio",
-		      "core/cover",
-		    ],
 		    "pinnedItems": {
 		      "my-sidebar-plugin/title-sidebar": false,
 		    },
