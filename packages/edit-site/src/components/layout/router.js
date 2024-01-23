@@ -12,7 +12,6 @@ import Editor from '../editor';
 import DataviewsPatterns from '../page-patterns/dataviews-patterns';
 import PagePages from '../page-pages';
 import PagePatterns from '../page-patterns';
-import PageTemplateParts from '../page-template-parts';
 import PageTemplatesTemplateParts from '../page-templates-template-parts';
 
 import {
@@ -89,12 +88,10 @@ export default function useLayoutAreas() {
 			window?.__experimentalAdminViews;
 		return {
 			areas: {
-				content: window?.__experimentalAdminViews ? (
+				content: (
 					<PageTemplatesTemplateParts
 						postType={ TEMPLATE_PART_POST_TYPE }
 					/>
-				) : (
-					<PageTemplateParts />
 				),
 				preview: isListLayout && (
 					<Editor isLoading={ isSiteEditorLoading } />

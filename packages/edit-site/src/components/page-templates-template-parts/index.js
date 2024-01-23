@@ -53,7 +53,7 @@ import {
 import { postRevisionsAction } from '../actions';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
-import AddNewTemplatePart from '../page-template-parts/add-new-template-part';
+import AddNewTemplatePart from './add-new-template-part';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
