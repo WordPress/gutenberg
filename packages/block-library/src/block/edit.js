@@ -27,7 +27,8 @@ import {
 	store as blockEditorStore,
 	BlockControls,
 } from '@wordpress/block-editor';
-import { getBlockSupport, parse } from '@wordpress/blocks';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
+import { parse, cloneBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -35,20 +36,23 @@ import { getBlockSupport, parse } from '@wordpress/blocks';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
+const { PARTIAL_SYNCING_SUPPORTED_BLOCKS } = unlock( patternsPrivateApis );
 
 function isPartiallySynced( block ) {
 	return (
-		!! getBlockSupport( block.name, '__experimentalConnections', false ) &&
-		!! block.attributes.connections?.attributes &&
-		Object.values( block.attributes.connections.attributes ).some(
-			( connection ) => connection.source === 'pattern_attributes'
+		Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
+			block.name
+		) &&
+		!! block.attributes.metadata?.bindings &&
+		Object.values( block.attributes.metadata.bindings ).some(
+			( binding ) => binding.source.name === 'pattern_attributes'
 		)
 	);
 }
 function getPartiallySyncedAttributes( block ) {
-	return Object.entries( block.attributes.connections.attributes )
+	return Object.entries( block.attributes.metadata.bindings )
 		.filter(
-			( [ , connection ] ) => connection.source === 'pattern_attributes'
+			( [ , binding ] ) => binding.source.name === 'pattern_attributes'
 		)
 		.map( ( [ attributeKey ] ) => attributeKey );
 }
@@ -97,9 +101,12 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 		const attributes = getPartiallySyncedAttributes( block );
 		const newAttributes = { ...block.attributes };
 		for ( const attributeKey of attributes ) {
-			defaultValues[ blockId ] = block.attributes[ attributeKey ];
-			if ( overrides[ blockId ] ) {
-				newAttributes[ attributeKey ] = overrides[ blockId ];
+			defaultValues[ blockId ] ??= {};
+			defaultValues[ blockId ][ attributeKey ] =
+				block.attributes[ attributeKey ];
+			if ( overrides[ blockId ]?.[ attributeKey ] !== undefined ) {
+				newAttributes[ attributeKey ] =
+					overrides[ blockId ][ attributeKey ];
 			}
 		}
 		return {
@@ -111,7 +118,7 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 }
 
 function getOverridesFromBlocks( blocks, defaultValues ) {
-	/** @type {Record<string, unknown>} */
+	/** @type {Record<string, Record<string, unknown>>} */
 	const overrides = {};
 	for ( const block of blocks ) {
 		Object.assign(
@@ -123,9 +130,14 @@ function getOverridesFromBlocks( blocks, defaultValues ) {
 		const attributes = getPartiallySyncedAttributes( block );
 		for ( const attributeKey of attributes ) {
 			if (
-				block.attributes[ attributeKey ] !== defaultValues[ blockId ]
+				block.attributes[ attributeKey ] !==
+				defaultValues[ blockId ][ attributeKey ]
 			) {
-				overrides[ blockId ] = block.attributes[ attributeKey ];
+				overrides[ blockId ] ??= {};
+				// TODO: We need a way to represent `undefined` in the serialized overrides.
+				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
+				overrides[ blockId ][ attributeKey ] =
+					block.attributes[ attributeKey ];
 			}
 		}
 	}
@@ -138,6 +150,13 @@ function setBlockEditMode( setEditMode, blocks, mode ) {
 			mode || ( isPartiallySynced( block ) ? 'contentOnly' : 'disabled' );
 		setEditMode( block.clientId, editMode );
 		setBlockEditMode( setEditMode, block.innerBlocks, mode );
+	} );
+}
+
+function getHasOverridableBlocks( blocks ) {
+	return blocks.some( ( block ) => {
+		if ( isPartiallySynced( block ) ) return true;
+		return getHasOverridableBlocks( block.innerBlocks );
 	} );
 }
 
@@ -183,8 +202,7 @@ export default function ReusableBlockEdit( {
 					innerBlocks: blocks,
 					userCanEdit: canEdit,
 					getBlockEditingMode: editingMode,
-					getPostLinkProps:
-						getSettings().__experimentalGetPostLinkProps,
+					getPostLinkProps: getSettings().getPostLinkProps,
 				};
 			},
 			[ patternClientId, ref ]
@@ -203,14 +221,23 @@ export default function ReusableBlockEdit( {
 		[ innerBlocks, setBlockEditingMode ]
 	);
 
-	// Apply the initial overrides from the pattern block to the inner blocks.
-	useEffect( () => {
-		const initialBlocks =
-			editedRecord.blocks ??
+	const hasOverridableBlocks = useMemo(
+		() => getHasOverridableBlocks( innerBlocks ),
+		[ innerBlocks ]
+	);
+
+	const initialBlocks = useMemo(
+		() =>
+			// Clone the blocks to generate new client IDs.
+			editedRecord.blocks?.map( ( block ) => cloneBlock( block ) ) ??
 			( editedRecord.content && typeof editedRecord.content !== 'function'
 				? parse( editedRecord.content )
-				: [] );
+				: [] ),
+		[ editedRecord.blocks, editedRecord.content ]
+	);
 
+	// Apply the initial overrides from the pattern block to the inner blocks.
+	useEffect( () => {
 		defaultValuesRef.current = {};
 		const editingMode = getBlockEditingMode( patternClientId );
 		// Replace the contents of the blocks with the overrides.
@@ -231,7 +258,7 @@ export default function ReusableBlockEdit( {
 	}, [
 		__unstableMarkNextChangeAsNotPersistent,
 		patternClientId,
-		editedRecord,
+		initialBlocks,
 		replaceInnerBlocks,
 		registry,
 		getBlockEditingMode,
@@ -254,6 +281,7 @@ export default function ReusableBlockEdit( {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		templateLock: 'all',
 		layout,
 		renderAppender: innerBlocks?.length
 			? undefined
@@ -284,6 +312,12 @@ export default function ReusableBlockEdit( {
 	const handleEditOriginal = ( event ) => {
 		setBlockEditMode( setBlockEditingMode, innerBlocks, 'default' );
 		editOriginalProps.onClick( event );
+	};
+
+	const resetOverrides = () => {
+		if ( overrides ) {
+			replaceInnerBlocks( patternClientId, initialBlocks );
+		}
 	};
 
 	let children = null;
@@ -326,6 +360,21 @@ export default function ReusableBlockEdit( {
 					</ToolbarGroup>
 				</BlockControls>
 			) }
+
+			{ hasOverridableBlocks && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ resetOverrides }
+							disabled={ ! overrides }
+							__experimentalIsFocusable
+						>
+							{ __( 'Reset to original' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+
 			{ children === null ? (
 				<div { ...innerBlocksProps } />
 			) : (

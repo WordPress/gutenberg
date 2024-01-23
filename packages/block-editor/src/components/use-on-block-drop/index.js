@@ -133,7 +133,6 @@ export function onBlockDrop(
  * A function that returns an event handler function for block-related file drop events.
  *
  * @param {string}   targetRootClientId    The root client id where the block(s) will be inserted.
- * @param {number}   targetBlockIndex      The index where the block(s) will be inserted.
  * @param {Function} getSettings           A function that gets the block editor settings.
  * @param {Function} updateBlockAttributes A function that updates a block's attributes.
  * @param {Function} canInsertBlockType    A function that returns checks whether a block type can be inserted.
@@ -143,7 +142,6 @@ export function onBlockDrop(
  */
 export function onFilesDrop(
 	targetRootClientId,
-	targetBlockIndex,
 	getSettings,
 	updateBlockAttributes,
 	canInsertBlockType,
@@ -175,17 +173,11 @@ export function onFilesDrop(
 /**
  * A function that returns an event handler function for block-related HTML drop events.
  *
- * @param {string}   targetRootClientId    The root client id where the block(s) will be inserted.
- * @param {number}   targetBlockIndex      The index where the block(s) will be inserted.
  * @param {Function} insertOrReplaceBlocks A function that inserts or replaces blocks.
  *
  * @return {Function} The event handler for a block-related HTML drop event.
  */
-export function onHTMLDrop(
-	targetRootClientId,
-	targetBlockIndex,
-	insertOrReplaceBlocks
-) {
+export function onHTMLDrop( insertOrReplaceBlocks ) {
 	return ( HTML ) => {
 		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
 
@@ -309,17 +301,12 @@ export default function useOnBlockDrop(
 	);
 	const _onFilesDrop = onFilesDrop(
 		targetRootClientId,
-		targetBlockIndex,
 		getSettings,
 		updateBlockAttributes,
 		canInsertBlockType,
 		insertOrReplaceBlocks
 	);
-	const _onHTMLDrop = onHTMLDrop(
-		targetRootClientId,
-		targetBlockIndex,
-		insertOrReplaceBlocks
-	);
+	const _onHTMLDrop = onHTMLDrop( insertOrReplaceBlocks );
 
 	return ( event ) => {
 		const files = getFilesFromDataTransfer( event.dataTransfer );

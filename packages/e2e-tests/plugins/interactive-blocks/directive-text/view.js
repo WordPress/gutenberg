@@ -1,11 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext } from '@wordpress/interactivity';
+import { store, getContext, createElement } from '@wordpress/interactivity';
 
 const { state } = store( 'directive-context', {
 	state: {
 		text: 'Text 1',
+		component: () => (createElement( 'div', {}, state.text )),
+		number: 1,
+		boolean: true
 	},
 	actions: {
 		toggleStateText() {

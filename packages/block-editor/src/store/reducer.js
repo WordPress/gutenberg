@@ -1907,6 +1907,21 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
 }
 
 /**
+ * Reducer returning the focus mode that should be used when temporarily edit as blocks finishes.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function temporarilyEditingFocusModeRevert( state = '', action ) {
+	if ( action.type === 'SET_TEMPORARILY_EDITING_AS_BLOCKS' ) {
+		return action.focusModeToRevert;
+	}
+	return state;
+}
+
+/**
  * Reducer returning a map of block client IDs to block editing modes.
  *
  * @param {Map}    state  Current state.
@@ -2024,6 +2039,7 @@ const combinedReducers = combineReducers( {
 	highlightedBlock,
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,
+	temporarilyEditingFocusModeRevert,
 	blockVisibility,
 	blockEditingModes,
 	styleOverrides,

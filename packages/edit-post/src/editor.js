@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	ErrorBoundary,
@@ -14,7 +13,6 @@ import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { CommandMenu } from '@wordpress/commands';
-import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -34,81 +32,66 @@ function Editor( {
 	initialEdits,
 	...props
 } ) {
-	const isLargeViewport = useViewportMatch( 'medium' );
 	const { currentPost, getPostLinkProps, goBack } = usePostHistory(
 		initialPostId,
 		initialPostType
 	);
 
-	const {
-		hasFixedToolbar,
-		focusMode,
-		isDistractionFree,
-		hasInlineToolbar,
-		post,
-		preferredStyleVariations,
-		hiddenBlockTypes,
-		blockTypes,
-		template,
-	} = useSelect(
-		( select ) => {
-			const {
-				isFeatureActive,
-				getEditedPostTemplate,
-				getHiddenBlockTypes,
-			} = select( editPostStore );
-			const { getEntityRecord, getPostType, getEntityRecords, canUser } =
-				select( coreStore );
-			const { getEditorSettings } = select( editorStore );
-			const { getBlockTypes } = select( blocksStore );
-			const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
-				currentPost.postType
-			);
-			// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
-			// to avoid the special case.
-			let postObject;
-			if ( isTemplate ) {
-				const posts = getEntityRecords(
-					'postType',
-					currentPost.postType,
-					{
-						wp_id: currentPost.postId,
-					}
-				);
-				postObject = posts?.[ 0 ];
-			} else {
-				postObject = getEntityRecord(
-					'postType',
-					currentPost.postType,
-					currentPost.postId
-				);
-			}
-			const supportsTemplateMode =
-				getEditorSettings().supportsTemplateMode;
-			const isViewable =
-				getPostType( currentPost.postType )?.viewable ?? false;
-			const canEditTemplate = canUser( 'create', 'templates' );
-			return {
-				hasFixedToolbar:
-					isFeatureActive( 'fixedToolbar' ) || ! isLargeViewport,
-				focusMode: isFeatureActive( 'focusMode' ),
-				isDistractionFree: isFeatureActive( 'distractionFree' ),
-				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
-				preferredStyleVariations: select( preferencesStore ).get(
-					'core/edit-post',
-					'preferredStyleVariations'
-				),
-				hiddenBlockTypes: getHiddenBlockTypes(),
-				blockTypes: getBlockTypes(),
-				template:
-					supportsTemplateMode && isViewable && canEditTemplate
-						? getEditedPostTemplate()
-						: null,
-				post: postObject,
-			};
-		},
-		[ currentPost.postType, currentPost.postId, isLargeViewport ]
-	);
+	const { hasInlineToolbar, post, preferredStyleVariations, template } =
+		useSelect(
+			( select ) => {
+				const { isFeatureActive, getEditedPostTemplate } =
+					select( editPostStore );
+				const {
+					getEntityRecord,
+					getPostType,
+					getEntityRecords,
+					canUser,
+				} = select( coreStore );
+				const { getEditorSettings } = select( editorStore );
+				const isTemplate = [
+					'wp_template',
+					'wp_template_part',
+				].includes( currentPost.postType );
+				// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
+				// to avoid the special case.
+				let postObject;
+				if ( isTemplate ) {
+					const posts = getEntityRecords(
+						'postType',
+						currentPost.postType,
+						{
+							wp_id: currentPost.postId,
+						}
+					);
+					postObject = posts?.[ 0 ];
+				} else {
+					postObject = getEntityRecord(
+						'postType',
+						currentPost.postType,
+						currentPost.postId
+					);
+				}
+				const supportsTemplateMode =
+					getEditorSettings().supportsTemplateMode;
+				const isViewable =
+					getPostType( currentPost.postType )?.viewable ?? false;
+				const canEditTemplate = canUser( 'create', 'templates' );
+				return {
+					hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
+					preferredStyleVariations: select( preferencesStore ).get(
+						'core/edit-post',
+						'preferredStyleVariations'
+					),
+					template:
+						supportsTemplateMode && isViewable && canEditTemplate
+							? getEditedPostTemplate()
+							: null,
+					post: postObject,
+				};
+			},
+			[ currentPost.postType, currentPost.postId ]
+		);
 
 	const { updatePreferredStyleVariations } = useDispatch( editPostStore );
 
@@ -121,40 +104,12 @@ function Editor( {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
 			},
-			hasFixedToolbar,
-			focusMode,
-			isDistractionFree,
 			hasInlineToolbar,
-
-			// Keep a reference of the `allowedBlockTypes` from the server to handle use cases
-			// where we need to differentiate if a block is disabled by the user or some plugin.
-			defaultAllowedBlockTypes: settings.allowedBlockTypes,
 		};
-
-		// Omit hidden block types if exists and non-empty.
-		if ( hiddenBlockTypes.length > 0 ) {
-			// Defer to passed setting for `allowedBlockTypes` if provided as
-			// anything other than `true` (where `true` is equivalent to allow
-			// all block types).
-			const defaultAllowedBlockTypes =
-				true === settings.allowedBlockTypes
-					? blockTypes.map( ( { name } ) => name )
-					: settings.allowedBlockTypes || [];
-
-			result.allowedBlockTypes = defaultAllowedBlockTypes.filter(
-				( type ) => ! hiddenBlockTypes.includes( type )
-			);
-		}
-
 		return result;
 	}, [
 		settings,
-		hasFixedToolbar,
 		hasInlineToolbar,
-		focusMode,
-		isDistractionFree,
-		hiddenBlockTypes,
-		blockTypes,
 		preferredStyleVariations,
 		updatePreferredStyleVariations,
 		getPostLinkProps,

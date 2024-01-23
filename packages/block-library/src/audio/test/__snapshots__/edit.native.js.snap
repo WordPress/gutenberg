@@ -532,3 +532,15 @@ exports[`Audio block renders placeholder without crashing 1`] = `
   </View>
 </View>
 `;
+
+exports[`Audio block should enable autoplay setting 1`] = `
+"<!-- wp:audio {"id":5} -->
+<figure class="wp-block-audio"><audio controls src="https://cldup.com/59IrU0WJtq.mp3" autoplay></audio></figure>
+<!-- /wp:audio -->"
+`;
+
+exports[`Audio block should enable loop setting 1`] = `
+"<!-- wp:audio {"id":5} -->
+<figure class="wp-block-audio"><audio controls src="https://cldup.com/59IrU0WJtq.mp3" loop></audio></figure>
+<!-- /wp:audio -->"
+`;

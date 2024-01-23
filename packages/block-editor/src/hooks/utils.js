@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { useMemo, useEffect, useId, useState } from '@wordpress/element';
+import { memo, useMemo, useEffect, useId, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-import { createHigherOrderComponent, pure } from '@wordpress/compose';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -177,7 +177,10 @@ export function useBlockSettings( name, parentLayout ) {
 		backgroundImage,
 		backgroundSize,
 		fontFamilies,
-		fontSizes,
+		userFontSizes,
+		themeFontSizes,
+		defaultFontSizes,
+		defaultFontSizesEnabled,
 		customFontSize,
 		fontStyle,
 		fontWeight,
@@ -222,7 +225,10 @@ export function useBlockSettings( name, parentLayout ) {
 		'background.backgroundImage',
 		'background.backgroundSize',
 		'typography.fontFamilies',
-		'typography.fontSizes',
+		'typography.fontSizes.custom',
+		'typography.fontSizes.theme',
+		'typography.fontSizes.default',
+		'typography.defaultFontSizes',
 		'typography.customFontSize',
 		'typography.fontStyle',
 		'typography.fontWeight',
@@ -304,9 +310,12 @@ export function useBlockSettings( name, parentLayout ) {
 					custom: fontFamilies,
 				},
 				fontSizes: {
-					custom: fontSizes,
+					custom: userFontSizes,
+					theme: themeFontSizes,
+					default: defaultFontSizes,
 				},
 				customFontSize,
+				defaultFontSizes: defaultFontSizesEnabled,
 				fontStyle,
 				fontWeight,
 				lineHeight,
@@ -341,7 +350,10 @@ export function useBlockSettings( name, parentLayout ) {
 		backgroundImage,
 		backgroundSize,
 		fontFamilies,
-		fontSizes,
+		userFontSizes,
+		themeFontSizes,
+		defaultFontSizes,
+		defaultFontSizesEnabled,
 		customFontSize,
 		fontStyle,
 		fontWeight,
@@ -390,10 +402,10 @@ export function useBlockSettings( name, parentLayout ) {
 
 export function createBlockEditFilter( features ) {
 	// We don't want block controls to re-render when typing inside a block.
-	// `pure` will prevent re-renders unless props change, so only pass the
+	// `memo` will prevent re-renders unless props change, so only pass the
 	// needed props and not the whole attributes object.
 	features = features.map( ( settings ) => {
-		return { ...settings, Edit: pure( settings.edit ) };
+		return { ...settings, Edit: memo( settings.edit ) };
 	} );
 	const withBlockEditHooks = createHigherOrderComponent(
 		( OriginalBlockEdit ) => ( props ) => {
@@ -476,7 +488,7 @@ function BlockProps( { index, useBlockProps, setAllWrapperProps, ...props } ) {
 	return null;
 }
 
-const BlockPropsPure = pure( BlockProps );
+const BlockPropsPure = memo( BlockProps );
 
 export function createBlockListBlockFilter( features ) {
 	const withBlockListBlockHooks = createHigherOrderComponent(

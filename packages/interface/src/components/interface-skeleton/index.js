@@ -11,7 +11,7 @@ import {
 	__unstableUseNavigateRegions as useNavigateRegions,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -68,7 +68,7 @@ function InterfaceSkeleton(
 
 	const defaultLabels = {
 		/* translators: accessibility text for the top bar landmark region. */
-		header: __( 'Header' ),
+		header: _x( 'Header', 'header landmark area' ),
 		/* translators: accessibility text for the content landmark region. */
 		body: __( 'Content' ),
 		/* translators: accessibility text for the secondary sidebar landmark region. */

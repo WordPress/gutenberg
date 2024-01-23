@@ -8,17 +8,14 @@ import removeAccents from 'remove-accents';
  */
 import {
 	Icon,
-	__experimentalView as View,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	VisuallyHidden,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { ENTER, SPACE } from '@wordpress/keycodes';
 import { parse } from '@wordpress/blocks';
 import {
 	BlockPreview,
@@ -55,17 +52,18 @@ import {
 import { postRevisionsAction } from '../actions';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
-import PostPreview from '../post-preview';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
 const defaultConfigPerViewType = {
-	[ LAYOUT_TABLE ]: {},
+	[ LAYOUT_TABLE ]: {
+		primaryField: 'title',
+	},
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
@@ -77,14 +75,14 @@ const defaultConfigPerViewType = {
 };
 
 const DEFAULT_VIEW = {
-	type: LAYOUT_TABLE,
+	type: window?.__experimentalAdminViews ? LAYOUT_LIST : LAYOUT_TABLE,
 	search: '',
 	page: 1,
 	perPage: 20,
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'preview' ],
-	layout: {},
+	layout: defaultConfigPerViewType[ LAYOUT_TABLE ],
 	filters: [],
 };
 
@@ -94,28 +92,19 @@ function normalizeSearchInput( input = '' ) {
 
 function TemplateTitle( { item, viewType } ) {
 	if ( viewType === LAYOUT_LIST ) {
-		return (
-			<>
-				{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
-			</>
-		);
+		return decodeEntities( item.title?.rendered ) || __( '(no title)' );
 	}
 
 	return (
-		<VStack spacing={ 1 }>
-			<View as="span" className="edit-site-list-title__customized-info">
-				<Link
-					params={ {
-						postId: item.id,
-						postType: item.type,
-						canvas: 'edit',
-					} }
-				>
-					{ decodeEntities( item.title?.rendered ) ||
-						__( '(no title)' ) }
-				</Link>
-			</View>
-		</VStack>
+		<Link
+			params={ {
+				postId: item.id,
+				postType: item.type,
+				canvas: 'edit',
+			} }
+		>
+			{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
+		</Link>
 	);
 }
 
@@ -165,18 +154,42 @@ function TemplatePreview( { content, viewType } ) {
 }
 
 export default function DataviewsTemplates() {
-	const [ templateId, setTemplateId ] = useState( null );
-	const [ view, setView ] = useState( DEFAULT_VIEW );
+	const { params } = useLocation();
+	const { layout } = params;
+	const defaultView = useMemo( () => {
+		return {
+			...DEFAULT_VIEW,
+			type: layout ?? DEFAULT_VIEW.type,
+		};
+	}, [ layout ] );
+	const [ view, setView ] = useState( defaultView );
 	const { records: allTemplates, isResolving: isLoadingData } =
 		useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
 	const history = useHistory();
-
 	const onSelectionChange = useCallback(
-		( items ) =>
-			setTemplateId( items?.length === 1 ? items[ 0 ].id : null ),
-		[ setTemplateId ]
+		( items ) => {
+			if ( view?.type === LAYOUT_LIST ) {
+				history.push( {
+					...params,
+					postId: items.length === 1 ? items[ 0 ].id : undefined,
+				} );
+			}
+		},
+		[ history, params, view?.type ]
+	);
+
+	const onDetailsChange = useCallback(
+		( items ) => {
+			if ( items?.length === 1 ) {
+				history.push( {
+					postId: items[ 0 ].id,
+					postType: TEMPLATE_POST_TYPE,
+				} );
+			}
+		},
+		[ history ]
 	);
 
 	const authors = useMemo( () => {
@@ -226,19 +239,24 @@ export default function DataviewsTemplates() {
 				getValue: ( { item } ) => item.description,
 				render: ( { item } ) => {
 					return item.description ? (
-						decodeEntities( item.description )
+						<span className="page-templates-description">
+							{ decodeEntities( item.description ) }
+						</span>
 					) : (
-						<>
-							<Text variant="muted" aria-hidden="true">
-								&#8212;
-							</Text>
-							<VisuallyHidden>
-								{ __( 'No description.' ) }
-							</VisuallyHidden>
-						</>
+						view.type === LAYOUT_TABLE && (
+							<>
+								<Text variant="muted" aria-hidden="true">
+									&#8212;
+								</Text>
+								<VisuallyHidden>
+									{ __( 'No description.' ) }
+								</VisuallyHidden>
+							</>
+						)
 					);
 				},
-				maxWidth: 200,
+				maxWidth: 400,
+				minWidth: 320,
 				enableSorting: false,
 			},
 			{
@@ -251,6 +269,7 @@ export default function DataviewsTemplates() {
 				enableHiding: false,
 				type: ENUMERATION_TYPE,
 				elements: authors,
+				width: '1%',
 			},
 		],
 		[ authors, view.type ]
@@ -339,89 +358,41 @@ export default function DataviewsTemplates() {
 						...defaultConfigPerViewType[ newView.type ],
 					},
 				};
+
+				history.push( {
+					...params,
+					layout: newView.type,
+				} );
 			}
 
 			setView( newView );
 		},
-		[ view.type, setView ]
+		[ view.type, setView, history, params ]
 	);
 
 	return (
-		<>
-			<Page
-				className={
-					view.type === LAYOUT_LIST
-						? 'edit-site-template-pages-list-view'
-						: null
-				}
-				title={ __( 'Templates' ) }
-				actions={
-					<AddNewTemplate
-						templateType={ TEMPLATE_POST_TYPE }
-						showIcon={ false }
-						toggleProps={ { variant: 'primary' } }
-					/>
-				}
-			>
-				<DataViews
-					paginationInfo={ paginationInfo }
-					fields={ fields }
-					actions={ actions }
-					data={ data }
-					isLoading={ isLoadingData }
-					view={ view }
-					onChangeView={ onChangeView }
-					onSelectionChange={ onSelectionChange }
-					deferredRendering={
-						! view.hiddenFields?.includes( 'preview' )
-					}
+		<Page
+			title={ __( 'Templates' ) }
+			actions={
+				<AddNewTemplate
+					templateType={ TEMPLATE_POST_TYPE }
+					showIcon={ false }
+					toggleProps={ { variant: 'primary' } }
 				/>
-			</Page>
-			{ view.type === LAYOUT_LIST && (
-				<Page>
-					<div
-						className="edit-site-template-pages-preview"
-						tabIndex={ 0 }
-						role="button"
-						onKeyDown={ ( event ) => {
-							const { keyCode } = event;
-							if ( keyCode === ENTER || keyCode === SPACE ) {
-								history.push( {
-									postId: templateId,
-									postType: TEMPLATE_POST_TYPE,
-									canvas: 'edit',
-								} );
-							}
-						} }
-						onClick={ () =>
-							history.push( {
-								postId: templateId,
-								postType: TEMPLATE_POST_TYPE,
-								canvas: 'edit',
-							} )
-						}
-					>
-						{ templateId !== null ? (
-							<PostPreview
-								postId={ templateId }
-								postType={ TEMPLATE_POST_TYPE }
-							/>
-						) : (
-							<div
-								style={ {
-									display: 'flex',
-									flexDirection: 'column',
-									justifyContent: 'center',
-									textAlign: 'center',
-									height: '100%',
-								} }
-							>
-								<p>{ __( 'Select a template to preview' ) }</p>
-							</div>
-						) }
-					</div>
-				</Page>
-			) }
-		</>
+			}
+		>
+			<DataViews
+				paginationInfo={ paginationInfo }
+				fields={ fields }
+				actions={ actions }
+				data={ data }
+				isLoading={ isLoadingData }
+				view={ view }
+				onChangeView={ onChangeView }
+				onSelectionChange={ onSelectionChange }
+				onDetailsChange={ onDetailsChange }
+				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
+			/>
+		</Page>
 	);
 }

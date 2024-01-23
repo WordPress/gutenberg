@@ -57,10 +57,7 @@ test.describe( 'Toolbar roving tabindex', () => {
 		// ensures list block toolbar uses roving tabindex
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'List' );
-		await ToolbarRovingTabindexUtils.testBlockToolbarKeyboardNavigation(
-			'List text',
-			'Select parent block: List'
-		);
+		await ToolbarRovingTabindexUtils.focusBlockToolbar();
 		await page.click( `role=button[name="Select parent block: List"i]` );
 		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'List' );
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
