@@ -17,6 +17,7 @@
 
 ### Experimental
 
+-   `Guide`, `Modal`: Restore accent color themability ([#58098](https://github.com/WordPress/gutenberg/pull/58098)).
 -   `BoxControl`: Update design ([#56665](https://github.com/WordPress/gutenberg/pull/56665)).
 -   `CustomSelect`: adjust `renderSelectedValue` to fix sizing ([#57865](https://github.com/WordPress/gutenberg/pull/57865)).
 
