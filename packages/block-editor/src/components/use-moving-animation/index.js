@@ -21,13 +21,6 @@ import { store as blockEditorStore } from '../../store';
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
-function getAbsolutePosition( element ) {
-	return {
-		top: element.offsetTop,
-		left: element.offsetLeft,
-	};
-}
-
 /**
  * Hook used to compute the styles required to move a div into a new position.
  *
@@ -42,8 +35,13 @@ function getAbsolutePosition( element ) {
  * @param {Object} $1                          Options
  * @param {*}      $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
  * @param {string} $1.clientId
+ * @param {string} $1.elementSelector          A CSS selector string used to find the position of an element to animate from.
  */
-function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
+function useMovingAnimation( {
+	triggerAnimationOnChange,
+	clientId,
+	elementSelector,
+} ) {
 	const ref = useRef();
 	const {
 		isTyping,
@@ -56,17 +54,30 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 
 	// Whenever the trigger changes, we need to take a snapshot of the current
 	// position of the block to use it as a destination point for the animation.
-	const { previous, prevRect } = useMemo(
-		() => ( {
-			previous: ref.current && getAbsolutePosition( ref.current ),
-			prevRect: ref.current && ref.current.getBoundingClientRect(),
-		} ),
+	const { prevRect } = useMemo(
+		() => {
+			let previousPosition;
+
+			if ( ref.current && elementSelector ) {
+				const { ownerDocument } = ref.current;
+				const element = ownerDocument.querySelector( elementSelector );
+				if ( element ) {
+					previousPosition = element.getBoundingClientRect();
+				}
+			} else if ( ref.current ) {
+				previousPosition = ref.current.getBoundingClientRect();
+			}
+
+			return {
+				prevRect: previousPosition,
+			};
+		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ triggerAnimationOnChange ]
 	);
 
 	useLayoutEffect( () => {
-		if ( ! previous || ! ref.current ) {
+		if ( ! prevRect || ! ref.current ) {
 			return;
 		}
 
@@ -133,10 +144,10 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 		} );
 
 		ref.current.style.transform = undefined;
-		const destination = getAbsolutePosition( ref.current );
+		const destination = ref.current.getBoundingClientRect();
 
-		const x = Math.round( previous.left - destination.left );
-		const y = Math.round( previous.top - destination.top );
+		const x = Math.round( prevRect.left - destination.left );
+		const y = Math.round( prevRect.top - destination.top );
 
 		controller.start( { x: 0, y: 0, from: { x, y } } );
 
@@ -144,7 +155,6 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 			controller.stop();
 		};
 	}, [
-		previous,
 		prevRect,
 		clientId,
 		isTyping,
